@@ -121,7 +121,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -163,7 +163,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -236,7 +236,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -433,7 +433,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -693,7 +693,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -817,7 +817,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event ESC</label>
             </Measurement>
             <Settlements/>
@@ -1010,7 +1010,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -1018,7 +1018,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="20" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="21" ratioText="text_trigger_ratio_capacity_per_height"/>
+                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="25" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="26" ratioText="text_trigger_ratio_capacity_per_height"/>
                 <label>label_altitude</label>
             </Measurement>
             <Measurement>
@@ -1052,7 +1052,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -1124,7 +1124,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -1132,7 +1132,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="25" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_voltage GAM</label>
             </Measurement>
@@ -1152,7 +1152,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="25" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_capacity GAM</label>
             </Measurement>
@@ -1161,7 +1161,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="25" comment="comment_trigger_current"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <label>label_power GAM</label>
             </Measurement>
@@ -1238,7 +1238,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="20" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="25" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_rpm GAM</label>
             </Measurement>
@@ -1323,7 +1323,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -1583,7 +1583,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -1707,7 +1707,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event ESC</label>
             </Measurement>
             <Settlements>
@@ -1962,7 +1962,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -1970,7 +1970,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="37" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="39" ratioText="text_trigger_ratio_capacity_per_height"/>
+                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="47" sumTriggerText="text_trigger_motor_sum" countTriggerText="text_trigger_count" ratioRefOrdinal="48" ratioText="text_trigger_ratio_capacity_per_height"/>
                 <label>label_altitude</label>
             </Measurement>
             <Measurement>
@@ -2004,7 +2004,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -2076,7 +2076,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -2273,7 +2273,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -2281,7 +2281,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="47" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
                 <label>label_voltage EAM</label>
@@ -2303,7 +2303,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="47" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="26" type="Integer"/>
                 <label>label_capacity EAM</label>
@@ -2313,7 +2313,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="47" comment="comment_trigger_current"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="27" type="Integer"/>
                 <label>label_power EAM</label>
@@ -2509,7 +2509,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="37" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="47" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="35" type="Integer"/>
                 <label>label_rpm EAM</label>
@@ -2535,7 +2535,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -2659,7 +2659,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event ESC</label>
             </Measurement>
             <Settlements>
@@ -2906,7 +2906,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -2945,7 +2945,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -3016,7 +3016,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -3198,7 +3198,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -3434,7 +3434,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -3701,7 +3701,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event ESC</label>
             </Measurement>
             <Settlements/>
@@ -3792,7 +3792,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -3800,7 +3800,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="61" sumTriggerText="text_trigger_motor_sum" ratioRefOrdinal="62" ratioText="text_trigger_ratio_capacity_per_height"/>
+                <statistics min="true" max="true" avg="false" sigma="false" sumByTriggerRefOrdinal="74" sumTriggerText="text_trigger_motor_sum" ratioRefOrdinal="75" ratioText="text_trigger_ratio_capacity_per_height"/>
                 <label>label_altitude</label>
             </Measurement>
             <Measurement>
@@ -3834,7 +3834,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -3906,7 +3906,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -4103,7 +4103,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -4363,7 +4363,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -4371,7 +4371,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="74" comment="comment_trigger_current"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
                 <label>label_voltage ESC</label>
@@ -4393,7 +4393,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="74" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="26" type="Integer"/>
                 <label>label_capacity ESC</label>
@@ -4403,7 +4403,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="74" comment="comment_trigger_current"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="27" type="Integer"/>
                 <label>label_power ESC</label>
@@ -4413,7 +4413,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="74" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="35" type="Integer"/>
                 <label>label_rpm ESC</label>
@@ -4489,7 +4489,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event ESC</label>
             </Measurement>
             <Settlements>
@@ -4736,7 +4736,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -4775,7 +4775,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -4846,7 +4846,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -4947,7 +4947,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="61" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="74" comment="comment_trigger_current"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -5028,7 +5028,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -5264,7 +5264,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -5376,7 +5376,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>label_event ESC</label>
             </Measurement>
             <Measurement>
