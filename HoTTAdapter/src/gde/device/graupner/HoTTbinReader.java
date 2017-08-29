@@ -320,10 +320,10 @@ public class HoTTbinReader {
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
-		HoTTbinReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx
+		HoTTbinReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx 9=Event Rx
 		HoTTbinReader.recordSetGAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetEAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
-		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
+		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx 7=Event Vario
 		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		HoTTbinReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		HoTTbinReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
@@ -332,7 +332,7 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsEAM = new int[31];
 		HoTTbinReader.pointsVario = new int[8];
 		HoTTbinReader.pointsVario[2] = 100000;
-		HoTTbinReader.pointsGPS = new int[13];
+		HoTTbinReader.pointsGPS = new int[15];
 		HoTTbinReader.pointsChannel = new int[23];
 		HoTTbinReader.pointsESC = new int[14];
 		HoTTbinReader.timeStep_ms = 0;
@@ -815,7 +815,7 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsEAM = new int[31];
 		HoTTbinReader.pointsVario = new int[8];
 		HoTTbinReader.pointsVario[2] = 100000;
-		HoTTbinReader.pointsGPS = new int[13];
+		HoTTbinReader.pointsGPS = new int[15];
 		HoTTbinReader.pointsChannel = new int[23];
 		HoTTbinReader.pointsESC = new int[14];
 		HoTTbinReader.timeStep_ms = 0;
@@ -1434,8 +1434,15 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsGPS[9] = 0;
 			HoTTbinReader.pointsGPS[10] = (_buf0[1] & 0xFF) * 1000;
 			HoTTbinReader.pointsGPS[11] = (_buf0[2] & 0xFF) * 1000;
+			HoTTbinReader.pointsGPS[12] = (_buf3[3] & 0xFF) * 1000;
+			try {
+				HoTTbinReader.pointsGPS[13] = Integer.valueOf(String.format("%c", _buf3[4])) * 1000;
+			}
+			catch (NumberFormatException e1) {
+				//ignore;
+			}
 		}
-		HoTTbinReader.pointsGPS[12] = (_buf1[1] & 0xFF) * 1000; //Event
+		HoTTbinReader.pointsGPS[14] = (_buf1[1] & 0x0F) * 1000; //Event
 
 		HoTTbinReader.isJustParsed = true;
 	}

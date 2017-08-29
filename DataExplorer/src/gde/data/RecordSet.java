@@ -602,7 +602,7 @@ public final class RecordSet extends AbstractRecordSet {
 	/**
 	 * method to remove a record name
 	 */
-	void removeRecordName(String deleteRecordName) {
+	public void removeRecordName(String deleteRecordName) {
 		Vector<String> newRecordNames = new Vector<String>();
 		for (String recordKey : this.recordNames) {
 			if (!recordKey.equals(deleteRecordName)) newRecordNames.add(recordKey);

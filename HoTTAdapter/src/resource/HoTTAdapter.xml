@@ -114,15 +114,15 @@
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="6" type="Integer"/>
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
-                <label>lable_voltage_rx_min</label>
+                <label>label_voltage_rx_min</label>
             </Measurement>
             <Measurement>
                 <name>event</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>lable_event Rx</label>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>label_event Rx</label>
             </Measurement>
             <Settlements/>
             <ReferenceGroups/>
@@ -305,8 +305,13 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+<<<<<<< HEAD
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>lable_event Vario</label>
+=======
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>label_event Vario</label>
+>>>>>>> add missing measurements (GAM,EAM) and events(preliminary use inverse
             </Measurement>
             <Settlements/>
             <ReferenceGroups/>
@@ -422,12 +427,32 @@
                 <label>label_temperature_rx</label>
             </Measurement>
             <Measurement>
+                <name>satellites</name>
+                <symbol></symbol>
+                <unit>#</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                 <label>label_satellites</label>
+            </Measurement>
+            <Measurement>
+                <name>Fix</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
                 <name>event</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+<<<<<<< HEAD
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>lable_event GPS</label>
+=======
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>label_event GPS</label>
+>>>>>>> add missing measurements (GAM,EAM) and events(preliminary use inverse
             </Measurement>
             <Settlements/>
             <ReferenceGroups/>
@@ -655,6 +680,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="false" max="false" avg="false" sigma="false"/>
+                <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
                 <label>label_cell_number min GAM</label>
             </Measurement>
             <Measurement>
@@ -670,8 +696,13 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+<<<<<<< HEAD
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>lable_event GAM</label>
+=======
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>label_event GAM</label>
+>>>>>>> add missing measurements (GAM,EAM) and events(preliminary use inverse
             </Measurement>
             <Settlements>
                 <Settlement settlementId="1">
@@ -1154,8 +1185,13 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+<<<<<<< HEAD
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>lable_event EAM</label>
+=======
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>label_event EAM</label>
+>>>>>>> add missing measurements (GAM,EAM) and events(preliminary use inverse
             </Measurement>
             <Settlements>
                 <Settlement settlementId="1">
@@ -1474,7 +1510,7 @@
                 <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <label>lable_radio_channel</label>
+                <label>label_radio_channel</label>
             </Measurement>
             <Measurement>
                 <name>Tx</name>
@@ -1784,8 +1820,13 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+<<<<<<< HEAD
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
                 <label>lable_event ESC</label>
+=======
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
+                <label>label_event ESC</label>
+>>>>>>> add missing measurements (GAM,EAM) and events(preliminary use inverse
             </Measurement>
             <Settlements>
                 <Settlement settlementId="16">

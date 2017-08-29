@@ -922,6 +922,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsGPS[15] = DataParser.parse2Short(_buf2, 6) * 1000;
 			HoTTbinReader.pointsGPS[16] = (_buf1[3] & 0xFF) * 1000;
 			HoTTbinReader.pointsGPS[17] = 0;
+			//18=Satellites 19=Fix 20=HomeDirection 21=NorthVelocity 22=SpeedAccuracy 23=Time 24=EastVelocity 25=HorizontalAccuracy 26=Altitude 27=Fix2 28=Version
 			HoTTbinReader.pointsGPS[18] = (_buf3[3] & 0xFF) * 1000;
 			try {
 				HoTTbinReader.pointsGPS[19] = Integer.valueOf(String.format("%c", _buf3[4])) * 1000;

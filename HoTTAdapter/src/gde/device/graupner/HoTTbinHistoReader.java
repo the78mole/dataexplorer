@@ -185,7 +185,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		HoTTbinHistoReader.pointsEAM = new int[31];
 		HoTTbinHistoReader.pointsVario = new int[8];
 		HoTTbinHistoReader.pointsVario[2] = 100000;
-		HoTTbinHistoReader.pointsGPS = new int[13];
+		HoTTbinHistoReader.pointsGPS = new int[15];
 		HoTTbinHistoReader.pointsChannel = new int[23];
 		HoTTbinHistoReader.pointsESC = new int[14];
 		HoTTbinHistoReader.timeStep_ms = 0;
@@ -602,7 +602,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		HoTTbinHistoReader.pointsEAM = new int[31];
 		HoTTbinHistoReader.pointsVario = new int[8];
 		HoTTbinHistoReader.pointsVario[2] = 100000;
-		HoTTbinHistoReader.pointsGPS = new int[13];
+		HoTTbinHistoReader.pointsGPS = new int[15];
 		HoTTbinHistoReader.pointsChannel = new int[23];
 		HoTTbinHistoReader.pointsESC = new int[14];
 		HoTTbinHistoReader.timeStep_ms = 0;

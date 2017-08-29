@@ -114,14 +114,9 @@ public class HoTTAdapterDialogTabItem extends CTabItem {
 				filler.setLayoutData(fillerLData);
 			}
 			{
-				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
-				//0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel 17=OilLevel, 18=Voltage 1, 19=Voltage 2, 20=Temperature 1, 21=Temperature 2
-				//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Revolution, 21=Height, 22=Climb 1, 23=Climb 3, 24=Voltage 1, 25=Voltage 2, 26=Temperature 1, 27=Temperature 2 
-				//0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-				for (int i = 0; i < this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).size(); i++) {
-					this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i),
-							this.device, 1));
+				//PERFORMANCE: add only the measurements from the active channel configuration
+				if (this.channelConfigNumber == this.application.getActiveChannelNumber()) {
+					createMeasurementsControls(this.channelConfigNumber);
 				}
 			}
 			this.scolledComposite.addControlListener(new ControlListener() {
@@ -138,5 +133,21 @@ public class HoTTAdapterDialogTabItem extends CTabItem {
 				}
 			});
 		}
+	}
+
+	/**
+	 * create measurement controls for tabitem
+	 * @param channelConfigNumber
+	 */
+	public void createMeasurementsControls(final int channelConfigNumber) {
+		for (int i = 0; i < this.device.getChannelMeasuremtsReplacedNames(channelConfigNumber).size(); i++) {
+			this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(channelConfigNumber).get(i),
+					this.device, 1));
+		}
+		this.mainTabComposite.layout(true);
+	}
+	
+	public boolean isMeasurementTypesCreated() {
+		return this.measurementTypes.size() > 0;
 	}
 }

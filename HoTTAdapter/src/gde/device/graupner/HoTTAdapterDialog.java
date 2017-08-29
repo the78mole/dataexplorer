@@ -30,6 +30,7 @@ import gde.device.graupner.hott.MessageIds;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
 
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -77,7 +78,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	final HoTTAdapter						device;																																			// get device specific things, get serial port, ...
 	final Settings							settings;																																		// application configuration settings
 	final HoTTAdapterSerialPort	serialPort;																																	// open/close port execute getData()....
-
+	final Vector<HoTTAdapterDialogTabItem> dialogTabItems = new Vector<HoTTAdapterDialogTabItem>();
+	
 	HoTTAdapterLiveGatherer			lifeGatherer;
 	boolean											isVisibilityChanged		= false;
 	boolean											isHoTTAdapter 				= false;
@@ -113,6 +115,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	@Override
 	public void open() {
 		try {
+			dialogTabItems.clear();
 			this.isHoTTAdapter = this.device != null && (this.device.getName().equals("HoTTAdapter") || this.device.getName().equals("HoTTAdapterM")); //$NON-NLS-1$
 			this.isHoTTAdapter2 = this.device != null && this.device.getName().startsWith("HoTTAdapter2"); //$NON-NLS-1$
 			this.isHoTTAdapterX = this.device != null && this.device.getName().equals("HoTTAdapterX"); //$NON-NLS-1$
@@ -174,11 +177,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				});
 				{
 					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
-
-					{
-						for (int i = 0; i < this.device.getChannelCount(); i++) {
-							new HoTTAdapterDialogTabItem(this.tabFolder, this, (i + 1), this.device);
-						}
+					for (int i = 0; i < this.device.getChannelCount(); i++) {
+						dialogTabItems.add(new HoTTAdapterDialogTabItem(this.tabFolder, this, (i + 1), this.device));
 					}
 					FormData tabFolderLData = new FormData();
 					tabFolderLData.top = new FormAttachment(0, 1000, 0);
@@ -196,6 +196,10 @@ public class HoTTAdapterDialog extends DeviceDialog {
 							if (channelNumber > 0 && channelNumber <= HoTTAdapterDialog.this.device.getChannelCount()) { // enable other tabs for future use
 								String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText(); //$NON-NLS-1$
 								Channels.getInstance().switchChannel(configKey);
+								//PERFORMANCE: create measurement controls on the fly and not at dialog creation time
+								if (!dialogTabItems.get(channelNumber - 1).isMeasurementTypesCreated()) {
+									dialogTabItems.get(channelNumber - 1).createMeasurementsControls(channelNumber);
+								}
 							}
 							if (isHoTTAdapter) {
 								HoTTAdapterDialog.this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(HoTTAdapterDialog.this.device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
@@ -204,10 +208,10 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								HoTTAdapterDialog.this.tolerateSignLongitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
 							}
 							else if (isHoTTAdapter2){ 
-								HoTTAdapterDialog.this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(HoTTAdapterDialog.this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
-								HoTTAdapterDialog.this.tolrateSignLatitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
-								HoTTAdapterDialog.this.filterFactorLongitudeCombo.select((int) (Double.parseDouble((String) HoTTAdapterDialog.this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.FILTER_FACTOR.value())) / 5 - 2));
-								HoTTAdapterDialog.this.tolerateSignLongitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
+								HoTTAdapterDialog.this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(HoTTAdapterDialog.this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
+								HoTTAdapterDialog.this.tolrateSignLatitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
+								HoTTAdapterDialog.this.filterFactorLongitudeCombo.select((int) (Double.parseDouble((String) HoTTAdapterDialog.this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.FILTER_FACTOR.value())) / 5 - 2));
+								HoTTAdapterDialog.this.tolerateSignLongitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
 							}
 							if (isHoTTAdapterX) {
 								HoTTAdapterDialog.this.enableFilter.setVisible(false);
@@ -300,9 +304,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(java.util.logging.Level.FINEST, "filterStartTimeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (isHoTTAdapter2 && application.getActiveChannelNumber() == 6) {
-										//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm
-										//15=DistanceStart, 75=DiffDistance, 76=LapsDistance		
-										HoTTAdapterDialog.this.device.setMeasurementPropertyValue(6, 73, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.STRING, HoTTAdapterDialog.this.filterStartTimeCombo.getText().trim());
+										//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance		
+										HoTTAdapterDialog.this.device.setMeasurementPropertyValue(6, 87, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.STRING, HoTTAdapterDialog.this.filterStartTimeCombo.getText().trim());
 										HoTTAdapterDialog.this.device.makeInActiveDisplayable(application.getActiveRecordSet());
 										HoTTAdapterDialog.this.enableSaveButton(true);
 									}
@@ -347,8 +350,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(java.util.logging.Level.FINEST, "filterMaxTimeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (isHoTTAdapter2 && application.getActiveChannelNumber() == 6) {
-										//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm
-										//15=DistanceStart, 75=DiffDistance, 76=LapsDistance		
+											//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance		
 										HoTTAdapterDialog.this.device.setMeasurementPropertyValue(6, 5, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.STRING, HoTTAdapterDialog.this.filterMaxTimeCombo.getText().trim());
 										HoTTAdapterDialog.this.device.makeInActiveDisplayable(application.getActiveRecordSet());
 										HoTTAdapterDialog.this.enableSaveButton(true);
@@ -394,9 +396,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(java.util.logging.Level.FINEST, "filterLapMinTimeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (isHoTTAdapter2 && application.getActiveChannelNumber() == 6) {
-										//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm
-										//15=DistanceStart, 75=DiffDistance, 76=LapsDistance		
-										HoTTAdapterDialog.this.device.setMeasurementPropertyValue(6, 74, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.STRING, HoTTAdapterDialog.this.filterLapMinTimeCombo.getText().trim());
+										//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance		
+										HoTTAdapterDialog.this.device.setMeasurementPropertyValue(6, 88, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.STRING, HoTTAdapterDialog.this.filterLapMinTimeCombo.getText().trim());
 										HoTTAdapterDialog.this.device.makeInActiveDisplayable(application.getActiveRecordSet());
 										HoTTAdapterDialog.this.enableSaveButton(true);
 									}
@@ -441,9 +442,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(java.util.logging.Level.FINEST, "absorptionLevelCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (isHoTTAdapter2 && application.getActiveChannelNumber() == 6) {
-										//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm
-										//15=DistanceStart, 75=DiffDistance, 76=LapsDistance		
-										HoTTAdapterDialog.this.device.setMeasurementPropertyValue(6, 72, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.STRING, HoTTAdapterDialog.this.absorptionLevelCombo.getText().trim());
+										//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance		
+										HoTTAdapterDialog.this.device.setMeasurementPropertyValue(6, 86, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.STRING, HoTTAdapterDialog.this.absorptionLevelCombo.getText().trim());
 										HoTTAdapterDialog.this.device.makeInActiveDisplayable(application.getActiveRecordSet());
 										HoTTAdapterDialog.this.enableSaveButton(true);
 									}
@@ -488,9 +488,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(java.util.logging.Level.FINEST, "filterMinDeltaRxDbmCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (isHoTTAdapter2 && application.getActiveChannelNumber() == 6) {
-										//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm
-										//15=DistanceStart, 75=DiffDistance, 76=LapsDistance		
-										HoTTAdapterDialog.this.device.setMeasurementPropertyValue(6, 73, MeasurementPropertyTypes.NONE_SPECIFIED.value(), DataTypes.STRING, HoTTAdapterDialog.this.filterMinDeltaRxDbmCombo.getText().trim());
+										//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance		
+										HoTTAdapterDialog.this.device.setMeasurementPropertyValue(6, 87, MeasurementPropertyTypes.NONE_SPECIFIED.value(), DataTypes.STRING, HoTTAdapterDialog.this.filterMinDeltaRxDbmCombo.getText().trim());
 										HoTTAdapterDialog.this.device.makeInActiveDisplayable(application.getActiveRecordSet());
 										HoTTAdapterDialog.this.enableSaveButton(true);
 									}
@@ -535,9 +534,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								public void widgetSelected(SelectionEvent evt) {
 									log.log(java.util.logging.Level.FINEST, "filterMinDistDeltaCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 									if (isHoTTAdapter2 && application.getActiveChannelNumber() == 6) {
-										//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm
-										//15=DistanceStart, 75=DiffDistance, 76=LapsDistance		
-										HoTTAdapterDialog.this.device.setMeasurementPropertyValue(6, 75, MeasurementPropertyTypes.NONE_SPECIFIED.value(), DataTypes.STRING, HoTTAdapterDialog.this.filterMinDeltaDistCombo.getText().trim());
+										//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance		
+										HoTTAdapterDialog.this.device.setMeasurementPropertyValue(6, 89, MeasurementPropertyTypes.NONE_SPECIFIED.value(), DataTypes.STRING, HoTTAdapterDialog.this.filterMinDeltaDistCombo.getText().trim());
 										HoTTAdapterDialog.this.device.makeInActiveDisplayable(application.getActiveRecordSet());
 										HoTTAdapterDialog.this.enableSaveButton(true);
 									}
@@ -933,20 +931,19 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.tolerateSignLongitude.setSelection(this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
 			}
 			else if (isHoTTAdapter2) { 
-				this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
-				this.tolrateSignLatitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
-				this.filterFactorLongitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
-				this.tolerateSignLongitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
+				this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
+				this.tolrateSignLatitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
+				this.filterFactorLongitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
+				this.tolerateSignLongitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
 				int activeChannelNumber = this.application.getActiveChannelNumber();
-				if (activeChannelNumber == 6 && this.device.getNumberOfMeasurements(activeChannelNumber) > 72  && this.device.getMeasurementPropertyValue(activeChannelNumber, 74, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
-					this.filterStartTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 73, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
-					this.filterLapMinTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 74, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
+				if (activeChannelNumber == 6 && this.device.getNumberOfMeasurements(activeChannelNumber) > 86  && this.device.getMeasurementPropertyValue(activeChannelNumber, 88, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
+					this.filterStartTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 87, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
+					this.filterLapMinTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 88, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
 					this.filterMaxTimeCombo.select(findPosition(filterMaxItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 5, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
-					//5=Rx_dbm, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm
+					//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance		
 					this.absorptionLevelCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 72, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 12));
-					//15=DistanceStart, 75=DiffDistance, 76=LapsDistance		
-					this.filterMinDeltaRxDbmCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 73, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 10));
-					this.filterMinDeltaDistCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 75, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 0));
+					this.filterMinDeltaRxDbmCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 86, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 10));
+					this.filterMinDeltaDistCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 89, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 0));
 				}
 			}
 			else if (isHoTTAdapterD) { 
