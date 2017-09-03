@@ -6,7 +6,7 @@
         <manufacturerURL>http://www.graupner.de</manufacturerURL>
         <group>logger</group>
         <image>HoTTAdapter2.png</image>
-        <usage>false</usage>
+        <usage>true</usage>
     </Device>
     <SerialPort>
         <port></port>
@@ -79,7 +79,7 @@
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-                <property name="scale_sync_ref_ordinal" value="4" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="4" type="Integer"/>
                 <property name="filter_factor" value="180" type="String"/>
             </Measurement>
             <Measurement>
@@ -119,7 +119,7 @@
                 <unit>m/3sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>climb 10</name>
@@ -127,7 +127,7 @@
                 <unit>m/10sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>latitude</name>
@@ -372,7 +372,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="42" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="42" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>temperature G1</name>
@@ -380,7 +380,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>temperature G2</name>
@@ -388,7 +388,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>voltage E</name>
@@ -397,7 +397,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="29" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="29" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>current E</name>
@@ -406,7 +406,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="30" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>capacity E</name>
@@ -415,7 +415,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="31" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="31" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>power E</name>
@@ -424,7 +424,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="32" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>balance E</name>
@@ -433,7 +433,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="33" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="33" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E1</name>
@@ -442,7 +442,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.02" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="34" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="34" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>cell_voltage E2</name>
@@ -575,7 +575,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="42" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="42" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>voltage ES2</name>
@@ -583,7 +583,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="42" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="42" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>temperature E1</name>
@@ -591,7 +591,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>temperature E2</name>
@@ -599,7 +599,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>voltage M</name>
@@ -608,7 +608,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="29" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="29" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>current M</name>
@@ -617,7 +617,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="30" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="30" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>capacity M</name>
@@ -625,7 +625,7 @@
                 <unit>mAh</unit>
                 <active>true</active>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="31" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="31" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>power M</name>
@@ -634,7 +634,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="32" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="32" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M</name>
@@ -643,7 +643,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="40" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="40" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>temperature M1</name>
@@ -651,7 +651,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="7" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="7" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 1</name>
@@ -666,7 +666,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 3</name>
@@ -674,7 +674,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 4</name>
@@ -682,7 +682,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 5</name>
@@ -690,7 +690,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 6</name>
@@ -698,7 +698,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 7</name>
@@ -706,7 +706,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 8</name>
@@ -714,7 +714,7 @@
                 <unit>µsec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 9</name>
@@ -722,7 +722,7 @@
                 <unit>µsec</unit>
                 <active>false</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 10</name>
@@ -730,7 +730,7 @@
                 <unit>µsec</unit>
                 <active>false</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 11</name>
@@ -738,7 +738,7 @@
                 <unit>µsec</unit>
                 <active>false</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 12</name>
@@ -746,7 +746,7 @@
                 <unit>µsec</unit>
                 <active>false</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 13</name>
@@ -754,7 +754,7 @@
                 <unit>µsec</unit>
                 <active>false</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 14</name>
@@ -762,7 +762,7 @@
                 <unit>µsec</unit>
                 <active>false</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 15</name>
@@ -770,7 +770,7 @@
                 <unit>µsec</unit>
                 <active>false</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 16</name>
@@ -778,34 +778,34 @@
                 <unit>µsec</unit>
                 <active>false</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="76" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="76" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Power Off</name>
                 <symbol>evt</symbol>
                 <unit></unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>Batt Low</name>
                 <symbol>evt</symbol>
                 <unit></unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>Reset</name>
                 <symbol>evt</symbol>
                 <unit></unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>Reserve</name>
                 <symbol>evt</symbol>
                 <unit></unit>
-                <active>false</active>
+                <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
@@ -930,7 +930,7 @@
                 <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
-                <property name="scale_sync_ref_ordinal" value="110" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="110" type="Integer"/>
                 <property name="none_specified" value="50" type="String"/>
             </Measurement>
             <Measurement>
@@ -939,7 +939,7 @@
                 <unit>Sek</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="111" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="111" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>voltage_rx_min</name>
@@ -1010,7 +1010,7 @@
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-             </Measurement>
+            </Measurement>
             <Measurement>
                 <name>current M_max</name>
                 <symbol>I</symbol>
@@ -1047,7 +1047,7 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-              </Measurement>
+            </Measurement>
             <Measurement>
                 <name>event Vario</name>
                 <symbol></symbol>
@@ -1065,19 +1065,24 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-             </Measurement>
+            </Measurement>
             <Measurement>
                 <name>event EAM</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-             </Measurement>
+            </Measurement>
             <Measurement>
                 <name>event ESC</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
             </Measurement>
+            <Settlements/>
+            <ReferenceGroups/>
+            <TransitionGroups/>
+            <Transitions/>
+            <ScoreGroups/>
         </Channel>
         <property name="enable_filter" value="true" type="Boolean"/>
         <property name="text_mode" value="true" type="Boolean"/>
