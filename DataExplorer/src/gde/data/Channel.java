@@ -755,10 +755,14 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	public void setObjectKey(String newObjectKey) {
-		this.objectKey = newObjectKey;
-		if (this.activeRecordSet != null) {
-			if (newObjectKey.equals(GDE.STRING_EMPTY))	this.activeRecordSet.setUnsaved(Channel.UNSAVED_REASON_REMOVE_OBJECT_KEY);
-			else 																				this.activeRecordSet.setUnsaved(Channel.UNSAVED_REASON_ADD_OBJECT_KEY);
+		if (!this.objectKey.equals(newObjectKey)) {
+			this.objectKey = newObjectKey;
+			if (this.activeRecordSet != null) {
+				if (newObjectKey.equals(GDE.STRING_EMPTY))
+					this.activeRecordSet.setUnsaved(Channel.UNSAVED_REASON_REMOVE_OBJECT_KEY);
+				else
+					this.activeRecordSet.setUnsaved(Channel.UNSAVED_REASON_ADD_OBJECT_KEY);
+			}
 		}
 	}
 
