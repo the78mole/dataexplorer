@@ -124,7 +124,7 @@ public class CSVReaderWriter {
 	}
 
 	/**
-	 * evaluate channel/configuartion and check units for absolute data
+	 * evaluate channel/configuration and check units for absolute data
 	 * <ul>
 	 * <li>if the channel/configuration does not match device the first channel/configuration of the device will choosen
 	 * <li>if units of absolute data will not match a warning dialog will show all red measurements kesy with expected units 

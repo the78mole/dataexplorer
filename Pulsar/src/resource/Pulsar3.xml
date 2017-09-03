@@ -37,7 +37,7 @@
         <separator>comma</separator>
         <leader>#</leader>
         <trailer>0D0A</trailer>
-        <preferredDataLocation>/Users/brueg/Documents/DataExplorer/Pulsar3</preferredDataLocation>
+        <preferredDataLocation></preferredDataLocation>
         <preferredFileExtention>*.acp</preferredFileExtention>
     </DataBlock>
     <State>
