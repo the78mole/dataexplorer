@@ -1152,7 +1152,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader.pointsESC[105] = (_buf1[1] & 0xFF) * 1000; //Event
 		}
 		else {
-			//71=VoltageM, 72=CurrentM, 73=CapacityM, 74=PowerM, 75=RevolutionM, 76=TemperatureM 1, 77=TemperatureM 2 78=Voltage_min, 79=Current_max, 80=Revolution_max, 81=Temperature1_max, 82=Temperature2_max 83=Event M
 			//73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max, 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
 			if (!HoTTAdapter.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 4000 && HoTTbinReader.tmpCurrent > -10
 					&& HoTTbinReader.tmpRevolution > -1 && HoTTbinReader.tmpRevolution < 20000

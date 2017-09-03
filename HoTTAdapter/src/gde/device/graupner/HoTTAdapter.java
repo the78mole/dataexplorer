@@ -1158,8 +1158,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			}
 		}
 		recordSet.syncScaleOfSyncableRecords();
-		this.application.updateStatisticsData(true);
 		this.updateVisibilityStatus(recordSet, true);
+		this.application.updateStatisticsData(true);
 	}
 
 	/**
@@ -1674,14 +1674,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		int filterMinDeltaRxDbm = 3;
 		int filterMinDeltaDist = 20;
 		if (this.getMeasurementPropertyValue(channelNumber, ordinalLabsRx_dbm, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
-			//				//5=Rx_dbm, 109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm
-			//				this.filterMaxTimeCombo.select(findPosition(filterMaxItems, this.device.getMeasurementPropertyValue(1, 5, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
-			//				this.absorptionLevelCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 109, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 12));
-			//				this.filterStartTimeCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
-			//				this.filterLapMinTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
-			//				this.filterMinDeltaRxDbmCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 10));
-			//				//15=DistanceStart, 112=DiffDistance, 113=LapsDistance
-			//				this.filterMinDistDeltaCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 112, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
 			try {
 				absorptionLevel = Integer.valueOf(this.getMeasurementPropertyValue(channelNumber, ordinalSmoothRx_dbm, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim());
 			} catch (NumberFormatException e) {
@@ -1889,6 +1881,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				lastDistanceValue = recordDiffDistance.get(i);
 			}
 		}
+		recordSet.setSaved(true); //adding description will set unsaved reason
 	}
 
 }

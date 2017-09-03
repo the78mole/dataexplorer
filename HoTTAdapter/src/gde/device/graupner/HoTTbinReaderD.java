@@ -99,6 +99,11 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		//70=VoltageM, 71=CurrentM, 72=CapacityM, 73=PowerM, 74=RevolutionM, 75=TemperatureM
 		//76=Ch 1, 77=Ch 2 , 78=Ch 3 .. 91=Ch 16
 		//92=PowerOff, 93=BattLow, 94=Reset, 95=reserved
+		//96=Test 00 97=Test 01.. 108=Test 12
+		//109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm, 112=DiffDistance, 113=LapsDistance		
+		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
 		HoTTbinReaderD.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReaderD.points[2] = 0;
 		HoTTbinReader.pointsGAM = HoTTbinReader.pointsEAM = HoTTbinReader.pointsESC = HoTTbinReader.pointsVario = HoTTbinReader.pointsGPS = HoTTbinReaderD.points;
@@ -309,7 +314,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 								}
 								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null) {
-									parseESC(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, channelNumber);
+									parseESC(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, channelNumber);
 									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 									isSensorData = true;
 								}
@@ -348,7 +353,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 
 						++countPackageLoss; // add up lost packages in telemetry data 
 						++HoTTbinReader.countLostPackages;
-						//HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+						//HoTTbinReaderD.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReaderD.timeStep_ms+10) / 10.0)*1000.0); 
 
 						parseChannel(HoTTbinReader.buf); //Channels
 						HoTTbinReaderD.recordSet.addPoints(HoTTbinReaderD.points, HoTTbinReader.timeStep_ms);
@@ -421,7 +426,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReaderD.isGpsStartTimeSet = false;
 		HoTTbinReaderD.recordSet = null;
 		HoTTbinReaderD.isJustMigrated = false;
-		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx_dbm, 5=Rx_dbm, 6=VoltageRx, 7=TemperatureRx 
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
 		//18=GPS.Satelites, 19=GPS.Fix, 20=HomeDirection, 21=NorthVelocity, 22=SpeedAccuracy, 23=GPS.Time, 24=EastVelocity, 25=HorizontalAccuracy, 26=Altitude, 27=GPS.Fix2, 28=Version
@@ -430,6 +435,11 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		//70=VoltageM, 71=CurrentM, 72=CapacityM, 73=PowerM, 74=RevolutionM, 75=TemperatureM
 		//76=Ch 1, 77=Ch 2 , 78=Ch 3 .. 91=Ch 16
 		//92=PowerOff, 93=BattLow, 94=Reset, 95=reserved
+		//96=Test 00 97=Test 01.. 108=Test 12
+		//109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm, 112=DiffDistance, 113=LapsDistance		
+		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
 		HoTTbinReaderD.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReader.pointsGAM = new int[HoTTbinReaderD.points.length];
 		HoTTbinReader.pointsEAM = new int[HoTTbinReaderD.points.length];
@@ -599,7 +609,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 											//System.out.println("isElectricData i = " + i);
 											isReceiverData = isVarioData = isGPSData = isGeneralData = isElectricData = isMotorDriverData = false;
 										}
-										parseESC(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, channelNumber);
+										parseESC(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, channelNumber);
 										isMotorDriverData = true;
 									}
 									break;
@@ -693,7 +703,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 
 						++countPackageLoss; // add up lost packages in telemetry data 
 						++HoTTbinReader.countLostPackages;
-						//HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+						//HoTTbinReaderD.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReaderD.timeStep_ms+10) / 10.0)*1000.0); 
 
 						parseChannel(HoTTbinReader.buf); //Channels
 						HoTTbinReaderD.recordSet.addPoints(HoTTbinReaderD.points, HoTTbinReader.timeStep_ms);
@@ -767,6 +777,12 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			for (int k = 46; k < 46 + 24; k++) {
 				HoTTbinReaderD.points[k] = HoTTbinReader.pointsEAM[k];
 			}
+			//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+			//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+			//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
+			HoTTbinReaderD.points[119] = HoTTbinReader.pointsEAM[119];
+			HoTTbinReaderD.points[120] = HoTTbinReader.pointsEAM[120];
+			HoTTbinReaderD.points[131] = HoTTbinReader.pointsEAM[131];
 		}
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//29=VoltageG, 30=CurrentG, 31=CapacityG, 32=PowerG, 33=BalanceG, 34=CellVoltageG 1, 35=CellVoltageG 2 .... 39=CellVoltageG 6, 40=Revolution, 41=FuelLevel, 42=VoltageG 1, 43=VoltageG 2, 44=TemperatureG 1, 45=TemperatureG 2
@@ -778,6 +794,13 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			for (int k = 29; k < 29 + 17; k++) {
 				HoTTbinReaderD.points[k] = HoTTbinReader.pointsGAM[k];
 			}
+			//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+			//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+			//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
+			for (int k = 115; k < 115 + 4; k++) {
+				HoTTbinReaderD.points[k] = HoTTbinReader.pointsGAM[k];
+			}
+			HoTTbinReaderD.points[130] = HoTTbinReader.pointsGAM[130];
 		}
 		//8=Height, 9=Climb 1, 10=Climb 3
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -789,6 +812,10 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			for (int k = 12; k < 12 + 17; k++) {
 				HoTTbinReaderD.points[k] = HoTTbinReader.pointsGPS[k];
 			}
+			//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+			//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+			//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
+			HoTTbinReaderD.points[129] = HoTTbinReader.pointsGAM[129];
 		}
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		if (isVarioData && (HoTTbinReader.pointsVario[8] != 0 || HoTTbinReader.pointsVario[9] != 0 || HoTTbinReader.pointsVario[10] != 0 || HoTTbinReader.pointsVario[11] != 0)) {
@@ -796,16 +823,28 @@ public class HoTTbinReaderD extends HoTTbinReader {
 				HoTTbinReaderD.points[j] = HoTTbinReader.pointsVario[j];
 			}
 		}
+		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
+		HoTTbinReaderD.points[128] = HoTTbinReader.pointsVario[128];
+
 		//special test data of FBL receivers
 		for (int j = 96; j < 96 + 13; j++) {
 			HoTTbinReaderD.points[j] = HoTTbinReader.pointsVario[j];
 		}
 			
+		//70=VoltageM, 71=CurrentM, 72=CapacityM, 73=PowerM, 74=RevolutionM, 75=TemperatureM
 		if (isMotorDriverData) {
-			//70=VoltageM, 71=CurrentM, 72=CapacityM, 73=PowerM, 74=RevolutionM, 75=TemperatureM
 			for (int j = 70; j < 70 + 6 && j < HoTTbinReaderD.points.length; j++) {
 				HoTTbinReaderD.points[j] = HoTTbinReader.pointsESC[j];
 			}
+			//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+			//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+			//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
+			for (int j = 121; j < 121 + 6 && j < HoTTbinReaderD.points.length; j++) {
+				HoTTbinReaderD.points[j] = HoTTbinReader.pointsESC[j];
+			}
+			HoTTbinReaderD.points[132] = HoTTbinReader.pointsESC[132];
 		}
 		HoTTbinReaderD.recordSet.addPoints(HoTTbinReaderD.points, HoTTbinReader.timeStep_ms);
 		HoTTbinReaderD.isJustMigrated = true;
@@ -827,7 +866,15 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReaderD.points[5] = (_buf[4] & 0xFF) * -1000;
 			HoTTbinReaderD.points[6] = (_buf[35] & 0xFF) * 1000;
 			HoTTbinReaderD.points[7] = ((_buf[36] & 0xFF) - 20) * 1000;
+			HoTTbinReaderD.points[114] = (_buf[39] & 0xFF) * 1000;
 		}
+		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
+		if ((_buf[32] & 0x40) > 0 || (_buf[32] & 0x20) > 0 && HoTTbinReader.tmpTemperatureRx >= 70) //T = 70 - 20 = 50 lowest temperature warning
+			HoTTbinReaderD.points[127] = (_buf[32] & 0x60) * 1000; //Event V,T only
+		else
+			HoTTbinReaderD.points[127] = 0;
 	}
 
 	/**
@@ -862,6 +909,10 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		for (int i = 0, j = 0; i < 5; i++, j += 2) {
 			HoTTbinReader.pointsVario[i + 104] = DataParser.parse2Short(_buf4, 0 + j) * 1000;
 		}
+		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
+		HoTTbinReader.pointsVario[128] = (_buf1[1] & 0x3F) * 1000; //Event
 	}
 
 	/**
@@ -956,6 +1007,10 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			}
 			HoTTbinReader.pointsGPS[28] = (_buf4[9] & 0xFF) * 1000;
 		}
+		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
+		HoTTbinReader.pointsGPS[129] = (_buf1[1] & 0x0F) * 1000; //Event
 	}
 
 	private static int getStartTime(byte HH, byte mm, byte ss, byte SSS) {
@@ -1016,7 +1071,15 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsGAM[43] = HoTTbinReader.tmpVoltage2 * 100;
 			HoTTbinReader.pointsGAM[44] = ((_buf2[3] & 0xFF) - 20) * 1000;
 			HoTTbinReader.pointsGAM[45] = ((_buf2[4] & 0xFF) - 20) * 1000;
+			//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+			//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+			//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
+			HoTTbinReader.pointsGAM[115] = DataParser.parse2Short(_buf4, 1) * 1000; //Speed [km/h
+			HoTTbinReader.pointsGAM[116] = (_buf4[3] & 0xFF) * 1000; //lowest cell voltage 124 = 2.48 V
+			HoTTbinReader.pointsGAM[117] = (_buf4[4] & 0xFF) * 1000; //cell number lowest cell voltage
+			HoTTbinReader.pointsGAM[118] = (_buf4[8] & 0xFF) * 1000; //Pressure
 		}
+		HoTTbinReader.pointsGAM[130] = ((_buf1[1] & 0xFF) + ((_buf1[2] & 0x7F) << 8)) * 1000; //Event
 	}
 
 	/**
@@ -1076,7 +1139,13 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsEAM[67] = HoTTbinReader.tmpVoltage2 * 100;
 			HoTTbinReader.pointsEAM[68] = ((_buf3[1] & 0xFF) - 20) * 1000;
 			HoTTbinReader.pointsEAM[69] = ((_buf3[2] & 0xFF) - 20) * 1000;
+			HoTTbinReader.pointsEAM[119] = ((_buf4[6] & 0xFF) * 60 + (_buf4[7] & 0xFF)) * 1000; // motor time
+			HoTTbinReader.pointsEAM[120] = DataParser.parse2Short(_buf4, 8) * 1000; // speed
 		}
+		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
+		HoTTbinReader.pointsEAM[131] = ((_buf1[1] & 0xFF) + ((_buf1[2] & 0x7F) << 8)) * 1000; //Event
 	}
 
 	/**
@@ -1136,7 +1205,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 	 * @param channelNumber
 	 * @throws DataInconsitsentException
 	 */
-	private static void parseESC(byte[] _buf0, byte[] _buf1, byte[] _buf2, int channelNumber) throws DataInconsitsentException {
+	private static void parseESC(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, int channelNumber) throws DataInconsitsentException {
 		HoTTbinReader.tmpVoltage = DataParser.parse2Short(_buf1, 3);
 		HoTTbinReader.tmpCurrent = DataParser.parse2Short(_buf2, 1);
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf1, 7);
@@ -1158,6 +1227,17 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsESC[73] = Double.valueOf(HoTTbinReader.pointsESC[70] / 1000.0 * HoTTbinReader.pointsESC[71]).intValue();
 			HoTTbinReader.pointsESC[74] = HoTTbinReader.tmpRevolution * 1000;
 			HoTTbinReader.pointsESC[75] = (HoTTbinReader.tmpTemperatureFet - 20) * 1000;
+
+			HoTTbinReader.pointsESC[121] = (_buf2[9] - 20) * 1000;
+			HoTTbinReader.pointsESC[122] = DataParser.parse2Short(_buf1, 5) * 1000;
+			HoTTbinReader.pointsESC[123] = DataParser.parse2Short(_buf2, 3) * 1000;
+			HoTTbinReader.pointsESC[124] = DataParser.parse2Short(_buf2, 7) * 1000;
+			HoTTbinReader.pointsESC[125] = (_buf2[0] - 20) * 1000;
+			HoTTbinReader.pointsESC[126] = (_buf3[0] - 20) * 1000;
 		}
+		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
+		HoTTbinReader.pointsESC[132] = (_buf1[1] & 0xFF) * 1000; //Event
 	}
 }

@@ -514,7 +514,6 @@ public class OsdReaderWriter {
 			recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true, true);
 		}
 		recordSet.setRecordSetDescription(recordSetComment);
-		recordSet.setSaved(true); //setRecordSetDescription is calling setUnsavedReason()
 
 		//apply record sets records properties
 		if (log.isLoggable(Level.FINE)) {
@@ -530,7 +529,7 @@ public class OsdReaderWriter {
 		for (int i = 0; i < recordKeys.length; ++i) {
 			Record record = recordSet.get(recordKeys[i]);
 			if (record != null) {
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " - setSerializedProperties " + recordKeys[i]);
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " - setSerializedProperties " + recordsProperties[i].subSequence(6, recordsProperties[i].indexOf('|')));
 				record.setSerializedProperties(recordsProperties[i]);
 				record.setSerializedDeviceSpecificProperties(recordsProperties[i]);
 			}

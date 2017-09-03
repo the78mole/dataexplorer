@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -840,13 +839,14 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			}
 
 			if (recordSet.getChannelConfigNumber() == 6) { // do lab calculation with configuration Lab-Time only
-				//5=Rx_dbm, 84=SmoothedRx_dbm, 85=DiffRx_dbm, 86=LapsRx_dbm
-				//19=DistanceStart, 87=DiffDistance, 88=LapsDistance
-				runLabsCalculation(recordSet, 6, 5, 84, 85, 86, 19, 87, 88);
+				//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance		
+				//5=Rx_dbm, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm
+				//18=DistanceStart, 89=DiffDistance, 90=LapsDistance
+				runLabsCalculation(recordSet, 6, 5, 86, 87, 88, 18, 89, 90);
 			}
-			//recordSet.syncScaleOfSyncableRecords();
-			this.application.updateStatisticsData(true);
+			recordSet.syncScaleOfSyncableRecords();
 			this.updateVisibilityStatus(recordSet, true);
+			this.application.updateStatisticsData(true);
 		}
 	}
 
@@ -1144,20 +1144,10 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	@Override
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
 		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
-		//3.2.7 to 3.3.0 comes with
-		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
-		//9=Height, 10=Climb 1, 11=Climb 3, 12=Climb 10
-		//13=Latitude, 14=Longitude, 15=Velocity, 16=DistanceStart, 17=DirectionStart, 18=TripDistance
-		//19=Voltage G, 20=Current G, 21=Capacity G, 22=Power G, 23=Balance G, 24=CellVoltage G1, 25=CellVoltage G2 .... 29=CellVoltage G6, 30=Revolution G, 31=FuelLevel, 32=Voltage G1, 33=Voltage G2, 34=Temperature G1, 35=Temperature G2
-		//36=Voltage E, 37=Current E, 38=Capacity E, 39=Power E, 40=Balance E, 41=CellVoltage E1, 42=CellVoltage E2 .... 54=CellVoltage E14, 55=Voltage E1, 56=Voltage E2, 57=Temperature E1, 58=Temperature E2 59=Revolution E
-		//60=VoltageM, 61=CurrentM, 62=CapacityM, 63=PowerM, 64=RevolutionM, 65=TemperatureM 1, 66=TemperatureM 2 67=Voltage_min, 68=Current_max, 69=Revolution_max, 70=Temperature1_max, 71=Temperature2_max
-		//with channel configuration 4
-		//60=Ch 1, 61=Ch 2, 62=Ch 3 .. 75=Ch 16, 76=PowerOff, 77=BatterieLow, 78=Reset, 79=reserve
-		//80=VoltageM, 81=CurrentM, 82=CapacityM, 83=PowerM, 84=RevolutionM, 85=TemperatureM 1, 86=TemperatureM 2 87=Voltage_min, 88=Current_max, 89=Revolution_max, 90=Temperature1_max, 91=Temperature2_max
-		//with channel configuration 6
-		//5=Rx_dbm, 15=DistanceStart, 72=SmoothedRx_dbm, 73=DiffRx_dbm, 74=LapsRx_dbm 75=DiffDistance, 76=LapsDistance		
+		
+		//3.2.7 extend this measurements: 66/86=TemperatureM 2 67/87=Voltage_min, 68/88=Current_max, 69/89=Revolution_max, 70/90=Temperature1_max, 71/91=Temperature2_max
+		//3.3.1 extend this measurements: 9=EventRx, 14=EventVario, 21=NumSatellites 22=GPS-Fix 23=EventGPS, 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G, 70=MotorTime 71=Speed 72=Event E, 85/105=Event M
 
-		//3.3.1 comes with
 		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
 		//10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
 		//15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
@@ -1170,112 +1160,495 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		//with channel configuration 6
 		//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance		
 
-		Vector<String> recordKeys = new Vector<String>();
-		recordKeys.addAll(Arrays.asList(recordSet.getRecordNames()));
 		StringBuilder sb = new StringBuilder().append(GDE.LINE_SEPARATOR);
+
+		String[] recordKeys = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		//incoming filePropertiesRecordNames may mismatch recordKeyNames, but addNoneCalculation will use original name
+		Vector<String> noneCalculationRecordNames = new Vector<String>(); 
+		Vector<String> fileRecordsPropertiesVector = new Vector<String>();
+		fileRecordsPropertiesVector.addAll(Arrays.asList(fileRecordsProperties)); 
+
 		
-		switch (fileRecordsProperties.length) {
-		case 44: //Android HoTTAdapter3
-			Iterator<String>  it = recordKeys.iterator();
-			int i = 0;
-			while (it.hasNext()) {
-				String recordKey = (String) it.next();
-
-				switch (i) { //index must match actual XML (this is language independent)
-				case 8: //8=VoltageRxMin
-				case 28: //28=Balance G,
-				case 29: //29=CellVoltage G1
-				case 30: //30=CellVoltage G2
-				case 31: //31=CellVoltage G3
-				case 32: //32=CellVoltage G4
-				case 33: //33=CellVoltage G5
-				case 34: //34=CellVoltage G6
-				case 37: //37=Voltage G1,
-				case 38: //38=Voltage G2,
-				case 39: //39=Temperature G1,
-				case 40: //40=Temperature G2
-				case 46: //46=Voltage E,
-				case 47: //47=Current E,
-				case 48: //48=Capacity E,
-				case 49: //49=Power E,
-				case 69: //69=Revolution E
-				case 73: //73=Voltage M,
-				case 74: //74=Current M,
-				case 75: //75=Capacity M,
-				case 76: //76=Power M,
-				case 77: //77=Revolution M,
-					sb.append("sort out fixed key -> " + recordKey + GDE.STRING_NEW_LINE);
-					it.remove();
-					recordSet.get(recordKey).setActive(null);
-					break;
-				}
-				++i;
-			}
-			break;
-		}
-
-		//set noneCalculationRecordsNames for this recordSet since it deviate to initial measurements
-		Vector<String> noneCalculationRecordNames = new Vector<String>();
-		Iterator<String>  it = recordKeys.iterator();
-		int j = 0;
-		while (it.hasNext()) {
-			String recordKey = (String) it.next();
-			try {
-				if (j < fileRecordsProperties.length) {
-					HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
-					//attention match in names is language dependent and may need language switch and/or additional rules
-					if (recordKey.toLowerCase().equals(recordProps.get(Record.NAME).toLowerCase())
-							|| (j>=0 && j<=3) //RF_RXSQ, RXSQ, Strenght, Paketverlust
-							|| (fileRecordsProperties.length == 44 //HoTTAdapter3
-								&& (j==15 //EntfernungStart != AbstandStart
-									|| (j==24 && recordKey.startsWith("Balance")) //Balance != CellBalance
-									|| (j>=25 && j<=42) //CellVoltage E1 != CellVoltage 1 -> Temperature E2 != Temperature 2
-									|| (j==43 && recordKey.startsWith("Temperatur")))) //Temperature M_1 != Temperature ESC
-							|| (j==30) //Tankfüllstand
-							|| (j==53) //ZellenSpannung ES14 instead of ZellenSpannung E14
-							|| recordKey.replaceAll(GDE.STRING_BLANK, GDE.STRING_EMPTY).replaceAll(GDE.STRING_UNDER_BAR, GDE.STRING_EMPTY).equals(recordProps.get(Record.NAME).replaceAll(GDE.STRING_BLANK, GDE.STRING_EMPTY).replaceAll(GDE.STRING_UNDER_BAR, GDE.STRING_EMPTY)) //Temperatur M_1 ==  TemperaturM 1
-							|| recordKey.startsWith(recordProps.get(Record.NAME)) //Drehzahl
-							&& recordProps.get(Record.IS_ACTIVE) != null) {
-						sb.append(String.format("%19s match %19s isAvtive = %s\n", recordKey, recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+		try {
+			switch (fileRecordsProperties.length) {
+			case 44: //Android HoTTAdapter3 - special case
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					switch (i) {
+					case 8:  //8=VoltageRx_min
+					case 9:  //EventRx
+					case 14: //EventVario
+					case 21: //NumSatellites
+					case 22: //GPS-Fix
+					case 23: //EventGPS
+					case 28: //Balance G,
+					case 29: //CellVoltage G1
+					case 30: //CellVoltage G2
+					case 31: //CellVoltage G3
+					case 32: //CellVoltage G4
+					case 33: //CellVoltage G5
+					case 34: //CellVoltage G6
+					case 37: //Voltage G1,
+					case 38: //Voltage G2,
+					case 39: //Temperature G1,
+					case 40: //Temperature G2
+					case 41: //Speed G
+					case 42: //LowestCellVoltage
+					case 43: //LowestCellNumber
+					case 44: //Pressure
+					case 45: //Event G
+					case 46: //Voltage E,
+					case 47: //Current E,
+					case 48: //Capacity E,
+					case 49: //Power E,
+					case 69: //Revolution E
+					case 70: //MotorTime E
+					case 71: //Speed E
+					case 72: //Event E
+					case 73: //Voltage M,
+					case 74: //Current M,
+					case 75: //Capacity M,
+					case 76: //Power M,
+					case 77: //Revolution M
+					case 79: //TemperatureM 2 
+					case 80: //Voltage_min
+					case 81: //Current_max
+					case 82: //Revolution_max
+					case 83: //Temperature1_max
+					case 84: //Temperature2_max				
+					case 85: //Event M
+						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
+						recordSet.get(i).setActive(null);
+						break;
+					default:
+						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+						sb.append(String.format("%19s match %19s isAvtive = %s\n", recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+						cleanedRecordNames.add(recordKeys[i]);
 						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
-						if (recordProps.get(Record.IS_ACTIVE).equals("false")) {
-							if (!recordProps.get(Record.NAME).toLowerCase().startsWith("ch")) {//VolrageRx_min, Revolution EAM, 
-								recordSet.get(recordKey).setActive(null);
+						if (fileRecordsProperties[j].contains("_isActive=false"))
+							recordSet.get(i).setActive(false);
+						++j;
+						break;
+					}
+				}
+				break;
+				
+			case 58: //General, GAM, EAM (no ESC) prior to 3.0.4 added PowerOff, BatterieLow, Reset, reserve
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					switch (i) { //list of added measurements
+					case 8:  //8=VoltageRx_min
+					case 9:  //EventRx
+					case 14: //EventVario
+					case 21: //NumSatellites
+					case 22: //GPS-Fix
+					case 23: //EventGPS
+					case 41: //Speed G
+					case 42: //LowestCellVoltage
+					case 43: //LowestCellNumber
+					case 44: //Pressure
+					case 45: //Event G
+					case 69: //Revolution E
+					case 70: //MotorTime E
+					case 71: //Speed E
+					case 72: //Event E
+					case 73: //Voltage M,
+					case 74: //Current M,
+					case 75: //Capacity M,
+					case 76: //Power M,
+					case 77: //Revolution M
+					case 78: //TemperatureM 1 
+					case 79: //TemperatureM 2 
+					case 80: //Voltage_min
+					case 81: //Current_max
+					case 82: //Revolution_max
+					case 83: //Temperature1_max
+					case 84: //Temperature2_max				
+					case 85: //Event M
+						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
+						recordSet.get(i).setActive(null);
+						break;
+					default:
+						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+						sb.append(String.format("%19s match %19s isAvtive = %s\n", recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+						cleanedRecordNames.add(recordKeys[i]);
+						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+						if (fileRecordsProperties[j].contains("_isActive=false"))
+							recordSet.get(i).setActive(false);
+						++j;
+						break;
+					}
+				}
+				break;
+			case 74: //Channels (no ESC) prior to 3.0.4 added PowerOff, BatterieLow, Reset, reserve
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					switch (i) { //list of added measurements
+					case 8:  //8=VoltageRx_min
+					case 9:  //EventRx
+					case 14: //EventVario
+					case 21: //NumSatellites
+					case 22: //GPS-Fix
+					case 23: //EventGPS
+					case 41: //Speed G
+					case 42: //LowestCellVoltage
+					case 43: //LowestCellNumber
+					case 44: //Pressure
+					case 45: //Event G
+					case 69: //Revolution E
+					case 70: //MotorTime E
+					case 71: //Speed E
+					case 72: //Event E
+					case 89: //PowerOff
+					case 90: //BatterieLow
+					case 91: //Reset
+					case 92: //reserve
+					case 93: //Voltage M,
+					case 94: //Current M,
+					case 95: //Capacity M,
+					case 96: //Power M,
+					case 97: //Revolution M
+					case 98: //TemperatureM 1 
+					case 99: //TemperatureM 2 
+					case 100: //Voltage_min
+					case 101: //Current_max
+					case 102: //Revolution_max
+					case 103: //Temperature1_max
+					case 104: //Temperature2_max				
+					case 105: //Event M
+						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
+						recordSet.get(i).setActive(null);
+						break;
+					default:
+						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+						sb.append(String.format("%19s match %19s isAvtive = %s\n", recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+						cleanedRecordNames.add(recordKeys[i]);
+						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+						if (fileRecordsProperties[j].contains("_isActive=false"))
+							recordSet.get(i).setActive(false);
+						++j;
+						break;
+					}
+				}
+				break;
+				
+			case 64: //General, GAM, EAM, ESC 3.0.4 added VoltageM, CurrentM, CapacityM, PowerM, RevolutionM, TemperatureM 1
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					switch (i) { //list of added measurements
+					case 8:  //8=VoltageRx_min
+					case 9:  //EventRx
+					case 14: //EventVario
+					case 21: //NumSatellites
+					case 22: //GPS-Fix
+					case 23: //EventGPS
+					case 41: //Speed G
+					case 42: //LowestCellVoltage
+					case 43: //LowestCellNumber
+					case 44: //Pressure
+					case 45: //Event G
+					case 69: //Revolution E
+					case 70: //MotorTime E
+					case 71: //Speed E
+					case 72: //Event E
+					case 79: //TemperatureM 2 
+					case 80: //Voltage_min
+					case 81: //Current_max
+					case 82: //Revolution_max
+					case 83: //Temperature1_max
+					case 84: //Temperature2_max				
+					case 85: //Event M
+						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
+						recordSet.get(i).setActive(null);
+						break;
+					default:
+						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+						sb.append(String.format("%19s match %19s isAvtive = %s\n", recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+						cleanedRecordNames.add(recordKeys[i]);
+						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+						if (fileRecordsProperties[j].contains("_isActive=false"))
+							recordSet.get(i).setActive(false);
+						++j;
+						break;
+					}
+				}
+				break;
+			case 84: //Channels 3.0.4 added VoltageM, CurrentM, CapacityM, PowerM, RevolutionM, TemperatureM 1
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					switch (i) { //list of added measurements
+					case   8: //8=VoltageRx_min
+					case   9: //EventRx
+					case  14: //EventVario
+					case  21: //NumSatellites
+					case  22: //GPS-Fix
+					case  23: //EventGPS
+					case  41: //Speed G
+					case  42: //LowestCellVoltage
+					case  43: //LowestCellNumber
+					case  44: //Pressure
+					case  45: //Event G
+					case  69: //Revolution E
+					case  70: //MotorTime E
+					case  71: //Speed E
+					case  72: //Event E
+					case  99: //TemperatureM 2 
+					case 100: //Voltage_min
+					case 101: //Current_max
+					case 102: //Revolution_max
+					case 103: //Temperature1_max
+					case 104: //Temperature2_max				
+					case 105: //Event M
+						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
+						recordSet.get(i).setActive(null);
+						break;
+					default:
+						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+						sb.append(String.format("%19s match %19s isAvtive = %s\n", recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+						cleanedRecordNames.add(recordKeys[i]);
+						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+						if (fileRecordsProperties[j].contains("_isActive=false"))
+							recordSet.get(i).setActive(false);
+						++j;
+						break;
+					}
+				}
+				break;
+
+				
+			case 66: //General, GAM, EAM, ESC 3.1.9 added VoltageRx_min, Revolution EAM
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					switch (i) { //list of added measurements
+					case 9:  //EventRx
+					case 14: //EventVario
+					case 21: //NumSatellites
+					case 22: //GPS-Fix
+					case 23: //EventGPS
+					case 41: //Speed G
+					case 42: //LowestCellVoltage
+					case 43: //LowestCellNumber
+					case 44: //Pressure
+					case 45: //Event G
+					case 70: //MotorTime E
+					case 71: //Speed E
+					case 72: //Event E
+					case 79: //TemperatureM 2 
+					case 80: //Voltage_min
+					case 81: //Current_max
+					case 82: //Revolution_max
+					case 83: //Temperature1_max
+					case 84: //Temperature2_max				
+					case 85: //Event M
+						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
+						recordSet.get(i).setActive(null);
+						break;
+					default:
+						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+						sb.append(String.format("%19s match %19s isAvtive = %s\n", recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+						cleanedRecordNames.add(recordKeys[i]);
+						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+						if (fileRecordsProperties[j].contains("_isActive=false")) {
+							switch (i) { //OSD saved initially after 3.0.4 and after 3.1.9 
+							case   8: //8=VoltageRx_min
+							case  69: //Revolution E
+								sb.append(String.format("previous added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
+								cleanedRecordNames.remove(recordKeys[i]);
 								noneCalculationRecordNames.remove(recordProps.get(Record.NAME));
-							}
-							else {
-								recordSet.get(recordKey).setActive(false);
+								fileRecordsPropertiesVector.remove(fileRecordsProperties[j]);
+								recordSet.get(i).setActive(null);
+								break;
+							default:
+								recordSet.get(i).setActive(false);
+								break;
 							}
 						}
 						++j;
+						break;
+					}
+				}
+				break;
+			case 86: 
+				if (recordSet.getChannelConfigNumber() == 4) { //Channels 3.1.9 added VoltageRx_min, Revolution EAM
+					for (int i = 0, j = 0; i < recordKeys.length; i++) {
+						switch (i) { //list of added measurements
+						case 9: //EventRx
+						case 14: //EventVario
+						case 21: //NumSatellites
+						case 22: //GPS-Fix
+						case 23: //EventGPS
+						case 41: //Speed G
+						case 42: //LowestCellVoltage
+						case 43: //LowestCellNumber
+						case 44: //Pressure
+						case 45: //Event G
+						case 70: //MotorTime E
+						case 71: //Speed E
+						case 72: //Event E
+						case 99: //TemperatureM 2 
+						case 100: //Voltage_min
+						case 101: //Current_max
+						case 102: //Revolution_max
+						case 103: //Temperature1_max
+						case 104: //Temperature2_max				
+						case 105: //Event M
+							sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
+							recordSet.get(i).setActive(null);
+							break;
+						default:
+							HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+							sb.append(String.format("%19s match %19s isAvtive = %s\n", recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+							cleanedRecordNames.add(recordKeys[i]);
+							noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+							if (fileRecordsProperties[j].contains("_isActive=false")) {
+								switch (i) { //OSD saved initially after 3.0.4 and after 3.1.9 
+								case   8: //8=VoltageRx_min
+								case  69: //Revolution E
+									sb.append(String.format("previous added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
+									cleanedRecordNames.remove(recordKeys[i]);
+									noneCalculationRecordNames.remove(recordProps.get(Record.NAME));
+									fileRecordsPropertiesVector.remove(fileRecordsProperties[j]);
+									recordSet.get(i).setActive(null);
+									break;
+								default:
+									recordSet.get(i).setActive(false);
+									break;
+								}
+							}
+							++j;
+							break;
+						}
+					}
+				}
+				else { //3.3.1 General, GAM, EAM, ESC 
+					//3.3.1 extend this measurements: 9=EventRx, 14=EventVario, 21=NumSatellites 22=GPS-Fix 23=EventGPS, 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G, 70=MotorTime 71=Speed 72=Event E, 85/105=Event M
+					cleanedRecordNames.addAll(Arrays.asList(recordKeys));
+					for (int i = 0; i < fileRecordsProperties.length; i++) {
+						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[i], Record.DELIMITER, Record.propertyKeys);
+						if (fileRecordsProperties[i].contains("_isActive=true")) {
+							noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+						}
+						else if (fileRecordsProperties[i].contains("_isActive=false")) {
+							recordSet.get(i).setActive(false);
+							noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+						}
+						else {
+							recordSet.get(i).setActive(null);
+						}
+					}
+				}
+
+				break;
+
+			case 72:	//3.2.7 General, GAM, EAM, ESC
+			case 77:	//3.3.7 Lab-Time
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					//3.3.1 extend this measurements: 9=EventRx, 14=EventVario, 21=NumSatellites 22=GPS-Fix 23=EventGPS, 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G, 70=MotorTime 71=Speed 72=Event E, 85/105=Event M
+					switch (i) {
+					case 9:  //EventRx
+					case 14: //EventVario
+					case 21: //NumSatellites
+					case 22: //GPS-Fix
+					case 23: //EventGPS
+					case 41: //Speed G
+					case 42: //LowestCellVoltage
+					case 43: //LowestCellNumber
+					case 44: //Pressure
+					case 45: //Event G
+					case 70: //MotorTime E
+					case 71: //Speed E
+					case 72: //Event E
+					case 85: //Event M
+						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
+						recordSet.get(i).setActive(null);
+						break;
+					default:
+						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+						sb.append(String.format("%19s match %19s isAvtive = %s\n", recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+						cleanedRecordNames.add(recordKeys[i]);
+						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+						if (fileRecordsProperties[j].contains("_isActive=false"))
+							recordSet.get(i).setActive(false);
+						++j;
+						break;
+					}
+				}
+				break;
+			case 92:	//3.2.7 Channels
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					//3.3.1 extend this measurements: 9=EventRx, 14=EventVario, 21=NumSatellites 22=GPS-Fix 23=EventGPS, 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G, 70=MotorTime 71=Speed 72=Event E, 85/105=Event M
+					switch (i) {
+					case 9:   //EventRx
+					case 14:  //EventVario
+					case 21:  //NumSatellites
+					case 22:  //GPS-Fix
+					case 23:  //EventGPS
+					case 41:  //Speed G
+					case 42:  //LowestCellVoltage
+					case 43:  //LowestCellNumber
+					case 44:  //Pressure
+					case 45:  //Event G
+					case 70:  //MotorTime E
+					case 71:  //Speed E
+					case 72:  //Event E
+					case 105: //Event M
+						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
+						recordSet.get(i).setActive(null);
+						break;
+					default:
+						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+						sb.append(String.format("%19s match %19s isAvtive = %s\n", recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+						cleanedRecordNames.add(recordKeys[i]);
+						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+						if (fileRecordsProperties[j].contains("_isActive=false"))
+							recordSet.get(i).setActive(false);
+						++j;
+						break;
+					}
+				}
+				break;
+
+			case 860:	//3.3.1 General, GAM, EAM, ESC
+			case 106:	//3.3.1 Channels
+			case 91:	//3.3.1 Lab-Time
+			default:
+				cleanedRecordNames.addAll(Arrays.asList(recordKeys));
+				for (int i = 0; i < fileRecordsProperties.length; i++) {
+					HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[i], Record.DELIMITER, Record.propertyKeys);
+					if (fileRecordsProperties[i].contains("_isActive=true")) {
+						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+					}
+					else if (fileRecordsProperties[i].contains("_isActive=false")) {
+						recordSet.get(i).setActive(false);
+						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
 					}
 					else {
-						sb.append("recordSetKeys remove none matching -> " + recordKey + GDE.STRING_NEW_LINE);
-						it.remove();
-						recordSet.get(recordKey).setActive(null); //keep sync records enabled
+						recordSet.get(i).setActive(null);
 					}
 				}
-				else {
-					sb.append("remove recordSetKey and record -> " + recordKey + GDE.STRING_NEW_LINE);
-					it.remove();
-					recordSet.remove(recordKey);
-				}
+				break;
 			}
-			catch (Throwable e) {
-				log.log(Level.WARNING, e.getMessage(), e);
-			}
-				}
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, String.format("recordKey to fileRecordsProperties mismatch, check:\n %s \nfileRecordsProperties.length = %d recordKeys.length = %d %s", e.getMessage(), fileRecordsProperties.length, recordKeys.length, sb.toString()));
+		}
+
+		recordKeys = cleanedRecordNames.toArray(new String[1]);
+		//incoming filePropertiesRecordNames may mismatch recordKeyNames, but addNoneCalculation will use original incoming name
 		recordSet.setNoneCalculationRecordNames(noneCalculationRecordNames.toArray(new String[1]));
 		
-		if (noneCalculationRecordNames.size() < fileRecordsProperties.length - 2) {
-			sb.append("noneCalculationRecords = " + noneCalculationRecordNames.size() + GDE.STRING_NEW_LINE);
-			sb.append("recordSet.getNoneCalculationMeasurementNames.length = " + this.getNoneCalculationMeasurementNames(recordSet.getChannelConfigNumber(), recordKeys.toArray(new String[1])).length + GDE.STRING_NEW_LINE);
-			sb.append("fileRecordsProperties.length = " + fileRecordsProperties.length);
-			sb.append("recordSet.getRecordNames.length = " + recordSet.getRecordNames().length);
+		if (fileRecordsProperties.length != fileRecordsPropertiesVector.size()) { //if stored again with newer version and isActive handled null as false 
+			for (int i = 0; i < fileRecordsPropertiesVector.size(); i++) {
+				fileRecordsProperties[i] = fileRecordsPropertiesVector.get(i);
+			}
+			//fileRecordsProperties = fileRecordsPropertiesVector.toArray(new String[1]); //can't be used since it will no be propagated
+		}
+		
+		if ((recordKeys.length < 86 || (recordKeys.length == 86 && recordSet.getChannelConfigNumber() == 4)) && noneCalculationRecordNames.size() < fileRecordsPropertiesVector.size()) {
+			sb.append(String.format("recordKeys.length = %d\n", recordKeys.length));
+			sb.append(String.format("noneCalculationRecords.length = %d\n", noneCalculationRecordNames.size()));
+			sb.append(String.format("fileRecordsProperties.length = %d\n", fileRecordsProperties.length));
+			sb.append(String.format("recordSet.getNoneCalculationMeasurementNames.length = %d\n", this.getNoneCalculationMeasurementNames(recordSet.getChannelConfigNumber(), recordSet.getRecordNames()).length));
+			sb.append(String.format("recordSet.getRecordNames.length = %d\n", recordSet.getRecordNames().length));
 			log.log(Level.SEVERE, sb.toString());
 			if (this.application.getStatusBar() != null) this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE2402));
 		}
-		return recordKeys.toArray(new String[1]);
+		return recordKeys;
 	}
 
 	//IHistoDevice functions
