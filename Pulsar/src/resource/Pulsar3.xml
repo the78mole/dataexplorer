@@ -32,7 +32,7 @@
     </TimeBase>
     <DataBlock>
         <format inputType="SERIAL_IO" formatType="BYTE" size="160"/>
-        <format inputType="FILE_IO" formatType="VALUE" size="24"/>
+        <format inputType="FILE_IO" formatType="VALUE" size="40"/>
         <timeUnit>sec</timeUnit>
         <separator>comma</separator>
         <leader>#</leader>
@@ -41,12 +41,11 @@
         <preferredFileExtention>*.acp</preferredFileExtention>
     </DataBlock>
     <State>
-        <property name="state_charge" value="1" type="Integer" description="Ladeoperation"/>
-        <property name="state_discharge" value="2" type="Integer" description="Entladeoperation"/>
-        <property name="state_monitoring" value="3" type="Integer" description="Beobachten"/>
-        <property name="state_dry_time" value="4" type="Integer" description="Warten auf anderen Status"/>
-        <property name="state_finish" value="5" type="Integer" description="alle Programme abgelaufen"/>
-        <property name="state_error" value="6" type="Integer" description="Fehler"/>
+        <property name="state_charge" value="67" type="Integer" description="charge program"/>
+        <property name="state_discharge" value="68" type="Integer" description="discharge program"/>
+        <property name="state_error" value="69" type="Integer" description="error"/>
+        <property name="state_finish" value="70" type="Integer" description="program finshed"/>
+        <property name="state_manual_stop" value="77" type="Integer" description="manual program stop"/>
     </State>
     <Channels>
         <Channel name="type_outlet" type="TYPE_OUTLET">
@@ -91,6 +90,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
+                <property name="factor" value="100.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>battery_internal_resistance</name>
@@ -98,6 +98,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="1000.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>balance</name>
@@ -232,6 +233,149 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="8" type="Integer"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 1</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 2</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 3</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 4</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 5</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 6</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 7</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 8</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 9</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 10</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 11</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 12</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 13</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 14</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 15</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>balancer_power 16</name>
+                <symbol></symbol>
+                <unit>%</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="factor" value="10000.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Settlements/>
             <ReferenceGroups/>

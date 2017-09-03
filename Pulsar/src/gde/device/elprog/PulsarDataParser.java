@@ -20,6 +20,7 @@ package gde.device.elprog;
 
 import java.util.logging.Logger;
 
+import gde.GDE;
 import gde.device.CheckSumTypes;
 import gde.device.FormatTypes;
 import gde.exception.DevicePropertiesInconsistenceException;
@@ -33,6 +34,8 @@ public class PulsarDataParser extends DataParser {
 	static Logger			log										= Logger.getLogger(DataParser.class.getName());
 
 	protected final int offset;
+	protected int intermediateState;
+	
 	/**
 	 * @param useTimeFactor
 	 * @param useLeaderChar
@@ -86,9 +89,9 @@ public class PulsarDataParser extends DataParser {
 	@Override
 	public void parse(String inputLine, int lineNum) throws DevicePropertiesInconsistenceException {
 		String[] strValues = inputLine.split(this.separator);
-		String strValue = strValues[0].trim().substring(1);
+		String strValue = strValues[0].trim();
 		this.channelConfigNumber = 1; 
-		this.state = Integer.parseInt(strValue.substring(strValue.length()-1));
+		this.state = strValue.charAt(3);
 		this.valueSize = this.dataBlockSize;
 		this.values = new int[this.valueSize];
 		int[] tmpValues = new int[this.valueSize];
@@ -99,11 +102,15 @@ public class PulsarDataParser extends DataParser {
 //		strValue = strValue.length() > 0 ? strValue : "0";
 		
 
-		for (int i = 0, j = 0; i < this.valueSize-3; i++,j++) {
-			strValue = strValues[j+this.offset].trim();
+		for (int i = 0; i < this.valueSize-this.offset-1; i++) {
+			strValue = strValues[i + this.offset].trim();
 			try {
 				tmpValues[i] = strValue.length() > 0 ? Integer.parseInt(strValue) : 0;
-				if (i >= 5 ) j++;
+				if (i >= 5 ) {
+					++i;
+ 					strValue = strValues[i + this.offset].trim();
+					tmpValues[i] = strValue.length() > 0 && !strValue.equals(GDE.STRING_COLON) ? Integer.parseInt(strValue) : 100;
+				}
 			}
 			catch (NumberFormatException e) {
 				tmpValues[i] = 0;
@@ -116,24 +123,33 @@ public class PulsarDataParser extends DataParser {
 		values[0] = tmpValues[0];
 		values[1] = tmpValues[1];
 		values[2] = tmpValues[3] * 1000;			
-		values[3] = Double.valueOf((values[0] / 1000.0) * (values[1] / 1000.0) * 10000).intValue();							// power U*I [W]
+		values[3] = Double.valueOf((values[0] / 1000.0) * (values[1] / 1000.0) * 1000).intValue();							// power U*I [W]
 		values[4] = Double.valueOf((values[0] / 1000.0) * (values[2] / 1000.0)).intValue();											// energy U*C [mWh]
 		//5=Temperature 6=Ri
 		values[5] = tmpValues[2];
 		values[6] = tmpValues[4];
-		//7=Balance
-		//values[7] = 0;
 		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
-		for (int i = 0; i < 16; i++) {
-			values[i+8] = tmpValues[i+5];
+		for (int i = 0,j=0; i < 16; ++i,j+=2) {
+			values[i+8] = tmpValues[j+5];
 			if (values[i + 8] > 0) {
 				maxVotage = values[i + 8] > maxVotage ? values[i + 8] : maxVotage;
 				minVotage = values[i + 8] < minVotage ? values[i + 8] : minVotage;
 			}
+			//System.out.println(String.format("zelle %d = %d", i,values[i+8]));
 		}
 		//7=Balance
 		values[7] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
-
+		//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
+		for (int i = 0, j = 0; i < 16; ++i, j+=2) {
+			values[i+24] = tmpValues[j+6];
+			//System.out.println(String.format("power %d = %d", i,values[i+24]));
+		}
+		//detect program ending
+		//#03D05__M_B4 -> manual ending
+		//#03C05__EPB4 -> program finished
+		//#04D01__EE_0 -> program cycle ended
+		if ((strValue = strValues[0].trim()).charAt(8) != '_')
+			this.intermediateState = strValue.charAt(8);
 	}
 
 }

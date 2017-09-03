@@ -18,8 +18,12 @@
 ****************************************************************************************/
 package gde.device.elprog;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -59,13 +63,14 @@ import gde.utils.FileUtils;
 public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	final static Logger	log	= Logger.getLogger(Pulsar3.class.getName());
 
-	protected final Settings					settings												= Settings.getInstance();
-	protected final DataExplorer			application = DataExplorer.getInstance();
-	protected final Channels					channels = Channels.getInstance(application);
+	protected final Settings					settings			= Settings.getInstance();
+	protected final DataExplorer			application		= DataExplorer.getInstance();
+	protected final Channels					channels			= Channels.getInstance(application);
 	protected final PulsarSerialPort	serialPort;
 	protected PulsarGathererThread		gathererThread;
-	protected boolean								isFileIO		= false;
-	protected boolean								isSerialIO	= false;
+	protected boolean									isFileIO			= false;
+	protected boolean									isSerialIO		= false;
+	protected Map<Integer, String>		batteryTypes	= new HashMap<Integer, String>();
 
 	/**
 	 * constructor using properties file
@@ -92,6 +97,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 		}
 
 		this.serialPort = new PulsarSerialPort(this, this.application);
+		initBatteryTypes();
 	}
 
 	/**
@@ -117,8 +123,20 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 		}
 
 		this.serialPort = new PulsarSerialPort(this, this.application);
+		initBatteryTypes();
 	}
 	
+	/**
+	 * initialize known battery types
+	 */
+	protected void initBatteryTypes() {
+		batteryTypes.put(0, "NiCd");
+		batteryTypes.put(1, "NiMH");
+		batteryTypes.put(4, "LiIo");
+		batteryTypes.put(5, "LiPo");
+		batteryTypes.put(7, "LiFe");
+	}
+
 	/**
 	 * update the file import menu by adding new entry to import device specific files
 	 * @param importMenue
@@ -146,7 +164,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	 * import device specific *.acp data files
 	 */
 	public void importDeviceData() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT3900));
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT3900));		
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
@@ -158,20 +176,21 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
+							String recordNameExtend = GDE.STRING_EMPTY;
 							try {
-								String recordNameExtend;
+								BufferedReader reader = null;
 								try {
-									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-									Integer.valueOf(recordNameExtend);
+									reader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedImportFile), "ISO-8859-1")); //$NON-NLS-1$	
+									String line = reader.readLine();
+									if (line.startsWith("#")) {
+										recordNameExtend = batteryTypes.get(Integer.valueOf(line.substring(4, 6)));		
+										recordNameExtend = recordNameExtend == null ? GDE.STRING_EMPTY : recordNameExtend;
+									}
+									reader.close();
 								}
 								catch (Exception e) {
-									try {
-										recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-3, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-										Integer.valueOf(recordNameExtend);
-									}
-									catch (Exception e1) {
-										recordNameExtend = GDE.STRING_EMPTY;
-									}
+									//ignore and use empty string as battery type since it is unknown
+									if (reader != null) reader.close();
 								}
 								CSVSerialDataReaderWriter.read(selectedImportFile, Pulsar3.this, recordNameExtend, 1, 
 										new  PulsarDataParser(getDataBlockTimeUnitFactor(), getDataBlockLeader(), getDataBlockSeparator().value(), null, null, Math.abs(getDataBlockSize(InputTypes.FILE_IO)), getDataBlockFormat(InputTypes.FILE_IO), false, 2)
@@ -189,6 +208,14 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 			}
 		};
 		reader.start();
+	}
+
+	/**
+	 * query if the record set numbering should follow channel configuration numbering
+	 * @return true where devices does not distinguish between channels (for example Av4ms_FV_762)
+	 */
+	public boolean recordSetNumberFollowChannel() {
+		return false;
 	}
 
 	/**
@@ -247,18 +274,9 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 		for (int i = 0; i < recordDataSize; i++) {
-			lovDataSize = deviceDataBufferSize/3;
-			//prepare convert buffer for conversion
-			System.arraycopy(dataBuffer, offset, convertBuffer, 0, deviceDataBufferSize/3);
-			for (int j = deviceDataBufferSize/3; j < deviceDataBufferSize; j++) { //start at minimum length of data buffer 
-				convertBuffer[j] = dataBuffer[offset+j];
-				++lovDataSize;
-				if (dataBuffer[offset+j] == 0x0A && dataBuffer[offset+j-1] == 0x0D)
-					break;
-			}
-
+			System.arraycopy(dataBuffer, offset, convertBuffer, 0, deviceDataBufferSize);
 			recordSet.addPoints(convertDataBytes(points, convertBuffer));
-			offset += lovDataSize+8;
+			offset += lovDataSize+10;
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
@@ -279,6 +297,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 				Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)), this.getDataBlockFormat(InputTypes.SERIAL_IO), false);
 
 		try {
+			//System.out.println(new String(dataBuffer));
 			byte[] lineBuffer = new byte[160];
 			System.arraycopy(dataBuffer, 0, lineBuffer, 0, dataBuffer.length);
 			data.parse(new String(lineBuffer), 1);
@@ -311,7 +330,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
 			
-			//0=VersorgungsSpg. 1=Spannung 2=Strom  
+			//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
 			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
@@ -325,7 +344,8 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
-			//7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6
+			//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
+			//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
 			for (int j=0, k=0; j<10; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
 				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
 				//log.log(Level.OFF, j + " k+19 = " + (k+19));
@@ -352,26 +372,26 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	*/
 	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
-		//0=VersorgungsSpg. 1=Spannung 2=Strom 3=Ladung 4=Leistung 5=Energie 6=Temp.intern 7=Temp.extern 8=Balance
-		//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10
+		//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
+		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
+		//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
 		try {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				if(index > 9 && record.getUnit().equals("V"))
+				if(index > 7 && record.getUnit().equals("V"))
 					try {
-						dataTableRow[index + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor)); //$NON-NLS-1$
+						dataTableRow[index + 1] = String.format("%.3f", ((record.realGet(rowIndex) / 1000.0) * factor)); //$NON-NLS-1$
 					}
 					catch (Exception e) {
-						dataTableRow[index + 1] = String.format("%.3f", (((record.realGet(record.realSize()-1) / 1000.0) - reduction) * factor)); //$NON-NLS-1$
+						dataTableRow[index + 1] = String.format("%.3f", ((record.realGet(record.realSize()-1) / 1000.0) * factor)); //$NON-NLS-1$
 					}
 				else
 					try {
-						dataTableRow[index + 1] = record.getDecimalFormat().format((((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+						dataTableRow[index + 1] = record.getDecimalFormat().format(((record.realGet(rowIndex) / 1000.0) * factor));
 					}
 					catch (Exception e) {
-						dataTableRow[index + 1] = record.getDecimalFormat().format((((record.realGet(record.realSize()-1) / 1000.0) - reduction) * factor));
+						dataTableRow[index + 1] = record.getDecimalFormat().format(((record.realGet(record.realSize()-1) / 1000.0) * factor));
 					}
 				++index;
 			}
@@ -388,12 +408,12 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public double translateValue(Record record, double value) {
-		//0=VersorgungsSpg. 1=Spannung 2=Strom 3=Ladung 4=Leistung 5=Energie 6=Temp.intern 7=Temp.extern 8=Balance
-		//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10
-		double offset = record.getOffset(); // != 0 if curve has an defined offset
+		//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
+		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
+		//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		
-		double newValue = value * factor + offset;
+		double newValue = value * factor;
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
@@ -404,12 +424,12 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public double reverseTranslateValue(Record record, double value) {
-		//0=VersorgungsSpg. 1=Spannung 2=Strom 3=Ladung 4=Leistung 5=Energie 6=Temp.intern 7=Temp.extern 8=Balance
-		//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10
-		double offset = record.getOffset(); // != 0 if curve has an defined offset
+		//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
+		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
+		//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 
-		double newValue = value / factor - offset;
+		double newValue = value / factor;
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
@@ -424,8 +444,9 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 		if (recordSet.isRaw()) {
 			// calculate the values required
 			try {
-				//0=VersorgungsSpg. 1=Spannung 2=Strom 3=Ladung 4=Leistung 5=Energie 6=Temp.intern 7=Temp.extern 8=Balance
-				//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10
+				//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
+				//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
+				//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
 				int displayableCounter = 0;
 
 				
@@ -460,8 +481,9 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 
-		//0=VersorgungsSpg. 1=Spannung 2=Strom 3=Ladung 4=Leistung 5=Energie 6=Temp.intern 7=Temp.extern 8=Balance
-		//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10
+		//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
+		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
+		//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
 		recordSet.setAllDisplayable();
 		for (int i=7; i<recordSet.size(); ++i) {
 				Record record = recordSet.get(i);
@@ -542,6 +564,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	@Override
 	public int[] getCellVoltageOrdinals() {
 		//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
-		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16		return new int[] {1, 3};
+		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
+		//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
 		return new int[] {0, 2};	}
 }

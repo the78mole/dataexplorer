@@ -396,7 +396,7 @@ public final class RecordSet extends AbstractRecordSet {
 				try {
 					this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
 				} catch (Exception e) {
-					// temp
+					log.log(Level.SEVERE, String.format("Record %s not found, matching recordName %s", this.noneCalculationRecords[i], get(i).name));
 				}
 			}
 			if (log.isLoggable(Level.FINEST)) {

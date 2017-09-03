@@ -1967,7 +1967,8 @@ public class Record extends Vector<Integer> {
 		sb.append(NAME).append(GDE.STRING_EQUAL).append(this.name).append(DELIMITER);
 		sb.append(UNIT).append(GDE.STRING_EQUAL).append(this.unit == null ? GDE.STRING_EMPTY : this.unit).append(DELIMITER);
 		sb.append(SYMBOL).append(GDE.STRING_EQUAL).append(this.symbol == null || this.symbol.equals("null") ? GDE.STRING_EMPTY : this.symbol).append(DELIMITER);
-		sb.append(IS_ACTIVE).append(GDE.STRING_EQUAL).append(this.isActive()).append(DELIMITER);
+		if (this.isActive != null) 
+			sb.append(IS_ACTIVE).append(GDE.STRING_EQUAL).append(this.isActive()).append(DELIMITER);
 		sb.append(IS_DIPLAYABLE).append(GDE.STRING_EQUAL).append(this.isDisplayable).append(DELIMITER);
 		sb.append(IS_VISIBLE).append(GDE.STRING_EQUAL).append(this.isVisible).append(DELIMITER);
 		sb.append(MAX_VALUE).append(GDE.STRING_EQUAL).append(this.maxValue).append(DELIMITER);
