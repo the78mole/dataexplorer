@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.device.ChannelTypes;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -210,7 +211,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.application.updateAllTabs(true);
 
 				this.application.getActiveDevice().setLastChannelNumber(channelNumber);
-				this.application.setupHistoWindows();
+				if (Settings.getInstance().isHistoActive()) this.application.setupHistoWindows();
 			}
 		}
 		else
