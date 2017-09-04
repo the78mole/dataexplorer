@@ -430,7 +430,7 @@
                  <label>label_satellites</label>
             </Measurement>
             <Measurement>
-                <name>Fix</name>
+                <name>GPS-Fix</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
