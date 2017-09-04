@@ -51,6 +51,7 @@ import gde.exception.DataInconsitsentException;
 import gde.exception.DevicePropertiesInconsistenceException;
 import gde.exception.SerialPortException;
 import gde.io.CSVSerialDataReaderWriter;
+import gde.io.LogViewReader;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -98,6 +99,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 
 		this.serialPort = new PulsarSerialPort(this, this.application);
 		initBatteryTypes();
+		LogViewReader.putDeviceMap("pulsar 3", "Pulsar3"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -124,6 +126,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 
 		this.serialPort = new PulsarSerialPort(this, this.application);
 		initBatteryTypes();
+		LogViewReader.putDeviceMap("pulsar 3", "Pulsar3"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	/**

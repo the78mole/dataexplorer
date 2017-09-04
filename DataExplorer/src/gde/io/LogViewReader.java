@@ -59,7 +59,7 @@ public class LogViewReader {
 
 	final static DataExplorer		application	= DataExplorer.getInstance();
 	final static Channels 								channels 		= Channels.getInstance();
-	private static class LogViewDeviceMap extends HashMap<String, String> {
+	public static class LogViewDeviceMap extends HashMap<String, String> {
 		private static final long	serialVersionUID	= 1L;
 
 		public boolean containsKey(String key) {
@@ -142,11 +142,17 @@ public class LogViewReader {
 		deviceMap.put("junsi icharger 308 duo", "iCharger308DUO"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("junsi icharger 4010 duo", "iCharger4010DUO"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("junsi celllog 8s", "CellLog 8S"); //$NON-NLS-1$ //$NON-NLS-2$
-		deviceMap.put("pulsar 3", "Pulsar3"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("openformat\\jlog2", "JLog2"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("openformat\\kosmik", "Kosmik"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("openformat\\av4ms_fv_762", "AV4ms_FV_762"); //$NON-NLS-1$ //$NON-NLS-2$
 		// add more supported devices here, key in lower case
+	}
+	
+	/**
+	 * enable adding entries to LogViewDeviceMap on device level
+	 */
+	public static String putDeviceMap(String key, String value) {
+		return deviceMap.put(key, value);
 	}
 
 	
