@@ -96,21 +96,18 @@ public class Channels extends HashMap<Integer, Channel> {
 			// "2 : Outlet", use the first digit to calculate the channel number
 			if (channelName.contains(GDE.STRING_COLON) && channelName.split(GDE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(GDE.STRING_COLON)[0].trim().charAt(0))) {
 				return new Integer(channelName.split(GDE.STRING_COLON)[0].trim());
-			}
-			else // old file content "Outlet 2" use the last digit to calculate the channel number
+			} else // old file content "Outlet 2" use the last digit to calculate the channel number
 			if (channelName.contains(GDE.STRING_BLANK) && channelName.split(GDE.STRING_BLANK).length > 1 && Character.isDigit(channelName.split(GDE.STRING_BLANK)[1].trim().charAt(0))) {
 				try {
 					return new Integer(channelName.split(GDE.STRING_BLANK)[1].trim());
-				}
-				catch (NumberFormatException e) {
+				} catch (NumberFormatException e) {
 					if (channelName.split(GDE.STRING_BLANK)[1].trim().contains("+")) {
 						String tmpNum = channelName.split(GDE.STRING_BLANK)[1].trim();
 						log.log(Level.WARNING, "channel name = " + channelName);
 						return new Integer(tmpNum.substring(0, tmpNum.indexOf(GDE.STRING_PLUS))) + new Integer(tmpNum.substring(tmpNum.indexOf(GDE.STRING_PLUS) + 1));
 					}
 				}
-			}
-			else {
+			} else {
 				for (String name : this.getChannelNames()) {
 					// try name matching "Outlet"
 					if (name.split(GDE.STRING_COLON)[1].trim().equals(channelName) || name.split(GDE.STRING_COLON)[1].trim().split(GDE.STRING_BLANK)[0].trim().equals(channelName)) {
@@ -185,8 +182,7 @@ public class Channels extends HashMap<Integer, Channel> {
 					this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 				}
 				this.application.selectObjectKey(Channels.this.getActiveChannel().getObjectKey());
-			}
-			else {
+			} else {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$
 			}
 			this.application.cleanHeaderAndCommentInGraphicsWindow();
@@ -211,10 +207,14 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.application.updateAllTabs(true);
 
 				this.application.getActiveDevice().setLastChannelNumber(channelNumber);
-				if (Settings.getInstance().isHistoActive()) this.application.setupHistoWindows();
+				if (this.application.isHistoActive() != Settings.getInstance().isHistoActive()) {
+					// this case may exist during DE startup
+					this.application.setHisto(Settings.getInstance().isHistoActive());
+				} else if (Settings.getInstance().isHistoActive()) {
+					this.application.resetHisto();
+				}
 			}
-		}
-		else
+		} else
 			this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW0006));
 	}
 
@@ -254,8 +254,7 @@ public class Channels extends HashMap<Integer, Channel> {
 					activeRecordSet.parent.clear();
 				}
 			}
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			// ignore since this clear operations are not really required
 			log.log(Level.WARNING, e.getMessage(), e);
 		}

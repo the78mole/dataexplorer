@@ -788,7 +788,7 @@ public class MenuBar {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "suppressModeItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.settings.setSuppressMode(MenuBar.this.suppressModeItem.getSelection());
 
-							if (MenuBar.this.settings.isHistoActive()) MenuBar.this.application.setupHistoWindows();
+							if (MenuBar.this.settings.isHistoActive()) MenuBar.this.application.resetHisto();
 						}
 					});
 				}

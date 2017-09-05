@@ -452,7 +452,7 @@ public class MenuToolBar {
 								if (MenuToolBar.this.application.getActiveDevice() != null)
 									MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.activeObjectKey, MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 								if (!previousObjectKey.equals(MenuToolBar.this.activeObjectKey) && MenuToolBar.this.settings.isHistoActive())
-									MenuToolBar.this.application.setupHistoWindows(); 
+									MenuToolBar.this.application.resetHisto(); 
 
 							}
 						});

@@ -388,7 +388,9 @@ public class SettingsDialog extends Dialog {
 											SettingsDialog.log.log(Level.FINE, "default directory from directoy dialog = " + defaultDataDirectory); //$NON-NLS-1$
 											SettingsDialog.this.settings.setDataFilePath(defaultDataDirectory);
 											SettingsDialog.this.defaultDataPath.setText(defaultDataDirectory);
-											SettingsDialog.this.application.setupHistoWindows();
+											if (SettingsDialog.this.settings.isHistoActive()) {
+												SettingsDialog.this.application.resetHisto();
+											}
 										}
 									}
 								});
@@ -811,8 +813,7 @@ public class SettingsDialog extends Dialog {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									SettingsDialog.log.log(Level.FINEST, "histoActive.widgetSelected, event=" + evt); //$NON-NLS-1$
-									SettingsDialog.this.settings.setHistoActive(SettingsDialog.this.histoActive.getSelection());
-									SettingsDialog.this.application.setupHistoWindows();
+									SettingsDialog.this.application.setHisto(SettingsDialog.this.histoActive.getSelection());
 								}
 							});
 						}
@@ -1182,7 +1183,7 @@ public class SettingsDialog extends Dialog {
 									@Override
 									public void focusLost(FocusEvent e) {
 										if (!this.trimmedInitialText.equals(SettingsDialog.this.histoRetrospectMonths.getText().trim())) {
-											SettingsDialog.this.application.setupHistoWindows();
+											SettingsDialog.this.application.resetHisto();
 										}
 									}
 
@@ -1208,7 +1209,9 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchDataPathImports.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchDataPathImports(SettingsDialog.this.histoSearchDataPathImports.getSelection());
-										SettingsDialog.this.application.setupHistoWindows();
+										if (SettingsDialog.this.settings.isHistoActive()) {
+											SettingsDialog.this.application.resetHisto();
+										}
 									}
 								});
 							}
@@ -1227,7 +1230,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchImportPath.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchImportPath(SettingsDialog.this.histoSearchImportPath.getSelection());
-										SettingsDialog.this.application.setupHistoWindows();
+										SettingsDialog.this.application.resetHisto();
 									}
 								});
 							}
@@ -1255,7 +1258,7 @@ public class SettingsDialog extends Dialog {
 											SettingsDialog.log.log(Level.FINEST, "histoIgnoreLogObjectKey.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setFilesWithOtherObject(SettingsDialog.this.histoIgnoreLogObjectKey.getSelection());
 											SettingsDialog.this.settings.setFilesWithoutObject(SettingsDialog.this.histoIgnoreLogObjectKey.getSelection());
-											SettingsDialog.this.application.setupHistoWindows();
+											SettingsDialog.this.application.resetHisto();
 										}
 									});
 								}
@@ -1288,7 +1291,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSubdirectoryLevel.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSubDirectoryLevelMax(SettingsDialog.this.histoSubdirectoryLevel.getText().trim());
-										SettingsDialog.this.application.setupHistoWindows();
+										SettingsDialog.this.application.resetHisto();
 									}
 								});
 							}
@@ -1330,7 +1333,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSamplingTimespan_ms.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSamplingTimespan_ms(SettingsDialog.this.histoSamplingTimespan_ms.getText().trim());
-										SettingsDialog.this.application.setupHistoWindows();
+										SettingsDialog.this.application.resetHisto();
 									}
 								});
 							}
@@ -1349,7 +1352,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoChannelMix.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setChannelMix(SettingsDialog.this.histoChannelMix.getSelection());
-										SettingsDialog.this.application.setupHistoWindows();
+										SettingsDialog.this.application.resetHisto();
 									}
 								});
 							}

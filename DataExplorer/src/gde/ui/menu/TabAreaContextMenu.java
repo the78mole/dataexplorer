@@ -260,13 +260,13 @@ public class TabAreaContextMenu {
 									FileUtils.deleteFile(linkFilePath);
 									if (TabAreaContextMenu.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0071, new Object[] { file.getAbsolutePath() })) == SWT.YES) {
 										FileUtils.deleteFile(file.getPath());
-										TabAreaContextMenu.this.application.setupHistoWindows();
+										TabAreaContextMenu.this.application.resetHisto();
 									}
 								}
 								else {
 									if (TabAreaContextMenu.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0050, new Object[] { file.getAbsolutePath() })) == SWT.YES) {
 										FileUtils.deleteFile(file.getPath());
-										TabAreaContextMenu.this.application.setupHistoWindows();
+										TabAreaContextMenu.this.application.resetHisto();
 									}
 								}
 							}
@@ -313,7 +313,7 @@ public class TabAreaContextMenu {
 							TabAreaContextMenu.this.settings.setSuppressMode(true);
 							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(true);
 
-							TabAreaContextMenu.this.application.setupHistoWindows();
+							TabAreaContextMenu.this.application.resetHisto();
 						}
 					});
 				}
@@ -330,7 +330,7 @@ public class TabAreaContextMenu {
 							TabAreaContextMenu.this.settings.setSuppressMode(true);
 							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(true);
 
-							TabAreaContextMenu.this.application.setupHistoWindows();
+							TabAreaContextMenu.this.application.resetHisto();
 						}
 					});
 				}
@@ -348,7 +348,7 @@ public class TabAreaContextMenu {
 							else
 								ExclusionActivity.clearExcludeLists(null);
 
-							TabAreaContextMenu.this.application.setupHistoWindows();
+							TabAreaContextMenu.this.application.resetHisto();
 						}
 					});
 				}
@@ -364,7 +364,7 @@ public class TabAreaContextMenu {
 							TabAreaContextMenu.this.settings.setSuppressMode(TabAreaContextMenu.this.suppressModeItem.getSelection());
 							TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.setSelection(TabAreaContextMenu.this.suppressModeItem.getSelection());
 
-							TabAreaContextMenu.this.application.setupHistoWindows();
+							TabAreaContextMenu.this.application.resetHisto();
 						}
 					});
 				}
