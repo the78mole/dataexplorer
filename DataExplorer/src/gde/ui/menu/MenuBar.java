@@ -709,7 +709,7 @@ public class MenuBar {
 										Settings.getInstance().getGraphicsTemplatePath(), template.getDefaultFileName());
 								fileDialog.open();
 								String templateFileName = fileDialog.getFileName();
-								if (templateFileName != null && templateFileName.length() > 4 && !templateFileName.equals(template.getDefaultFileName())) {
+								if (templateFileName != null && templateFileName.length() > 4) {
 									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
 									template.setHistoFileName(templateFileName);
 									template.store();
@@ -723,7 +723,7 @@ public class MenuBar {
 											Settings.getInstance().getGraphicsTemplatePath(), template.getDefaultFileName());
 									fileDialog.open();
 									String templateFileName = fileDialog.getFileName();
-									if (templateFileName != null && templateFileName.length() > 4 && !templateFileName.equals(template.getDefaultFileName())) {
+									if (templateFileName != null && templateFileName.length() > 4) {
 										MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
 										template.setNewFileName(templateFileName);
 										activeChannel.saveTemplate();

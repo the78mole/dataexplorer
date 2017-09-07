@@ -110,7 +110,7 @@ public final class HistoGraphicsTemplate extends Properties {
 				}
 			}
 
-			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + this.histoFileName;
+			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + ((this.histoFileName != null && this.histoFileName.equals(GDE.STRING_EMPTY) || this.histoFileName == null) ? this.defaultFileName : this.histoFileName);
 			try (FileOutputStream stream = new FileOutputStream(new File(this.currentFileFilePath))) {
 				this.storeToXML(stream, "-- DataExplorer Histo GraphicsTemplate --"); //$NON-NLS-1$
 			}
