@@ -13,6 +13,7 @@ Version 3.3.1 - xx yyy 2017
 HoTTAdapter*
 	* add missing measurements (GAM,EAM) and events(preliminary use inverse bits) to HoTTAdapter
 	* add missing measurements (GAM,EAM) and events(preliminary use inverse bits) to HoTTAdapter2
+	* add inverse bit alarms and warning
 Pulsar3
 	* add initial support, import and LogView
 

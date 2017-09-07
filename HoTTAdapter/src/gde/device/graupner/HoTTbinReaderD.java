@@ -90,6 +90,8 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		boolean isSensorData = false;
 		HoTTbinReaderD.isGpsStartTimeSet = false;
 		HoTTbinReaderD.recordSet = null;
+		byte lastWarningDetected = 0;
+		int warningKeepCounter = 1;
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -154,6 +156,16 @@ public class HoTTbinReaderD extends HoTTbinReader {
 					HoTTbinReaderD.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
 					HoTTbinReaderD.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
+				
+				//check for event character
+				if (warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
+					warningKeepCounter = 100; //keep detected warning to make it visible in graphics
+					if (log.isLoggable(Level.OFF)) 
+						log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = HoTTbinReader.buf[32])+64));
+				}
+				else {
+					--warningKeepCounter;
+				}
 
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx		
@@ -172,6 +184,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 							parseReceiver(HoTTbinReader.buf);
 							isReceiverData = true;
 						}
+						HoTTbinReader.buf[32] = lastWarningDetected;
 						parseChannel(HoTTbinReader.buf); //Channels
 
 						//fill data block 0 receiver voltage an temperature
@@ -355,6 +368,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						++HoTTbinReader.countLostPackages;
 						//HoTTbinReaderD.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReaderD.timeStep_ms+10) / 10.0)*1000.0); 
 
+						HoTTbinReader.buf[32] = lastWarningDetected;
 						parseChannel(HoTTbinReader.buf); //Channels
 						HoTTbinReaderD.recordSet.addPoints(HoTTbinReaderD.points, HoTTbinReader.timeStep_ms);
 						HoTTbinReader.timeStep_ms += 10;
@@ -426,6 +440,8 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReaderD.isGpsStartTimeSet = false;
 		HoTTbinReaderD.recordSet = null;
 		HoTTbinReaderD.isJustMigrated = false;
+		byte lastWarningDetected = 0;
+		int warningKeepCounter = 1;
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx_dbm, 5=Rx_dbm, 6=VoltageRx, 7=TemperatureRx 
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -497,6 +513,16 @@ public class HoTTbinReaderD extends HoTTbinReader {
 					HoTTbinReaderD.logger.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
 					HoTTbinReaderD.logger.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
+				
+				//check for event character
+				if (warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
+					warningKeepCounter = 100; //keep detected warning to make it visible in graphics
+					if (HoTTbinReader.buf[32] != 0 && log.isLoggable(Level.OFF)) 
+						log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = HoTTbinReader.buf[32])+64));
+				}
+				else {
+					--warningKeepCounter;
+				}
 
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
@@ -515,6 +541,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 							parseReceiver(HoTTbinReader.buf);
 							isReceiverData = true;
 						}
+						HoTTbinReader.buf[32] = lastWarningDetected;
 						parseChannel(HoTTbinReader.buf);
 
 						if (actualSensor == -1)
@@ -705,6 +732,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						++HoTTbinReader.countLostPackages;
 						//HoTTbinReaderD.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReaderD.timeStep_ms+10) / 10.0)*1000.0); 
 
+						HoTTbinReader.buf[32] = lastWarningDetected;
 						parseChannel(HoTTbinReader.buf); //Channels
 						HoTTbinReaderD.recordSet.addPoints(HoTTbinReaderD.points, HoTTbinReader.timeStep_ms);
 						HoTTbinReader.timeStep_ms += 10;
@@ -872,7 +900,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
 		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
 		if ((_buf[32] & 0x40) > 0 || (_buf[32] & 0x20) > 0 && HoTTbinReader.tmpTemperatureRx >= 70) //T = 70 - 20 = 50 lowest temperature warning
-			HoTTbinReaderD.points[127] = (_buf[32] & 0x60) * 1000; //Event V,T only
+			HoTTbinReaderD.points[127] = (_buf[32] & 0x60) * 1000; //inverse event V,T only
 		else
 			HoTTbinReaderD.points[127] = 0;
 	}
@@ -912,7 +940,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
 		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
 		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
-		HoTTbinReader.pointsVario[128] = (_buf1[1] & 0x3F) * 1000; //Event
+		HoTTbinReader.pointsVario[128] = (_buf1[1] & 0x3F) * 1000; //inverse event
 	}
 
 	/**
@@ -1010,7 +1038,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
 		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
 		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
-		HoTTbinReader.pointsGPS[129] = (_buf1[1] & 0x0F) * 1000; //Event
+		HoTTbinReader.pointsGPS[129] = (_buf1[1] & 0x0F) * 1000; //inverse event
 	}
 
 	private static int getStartTime(byte HH, byte mm, byte ss, byte SSS) {
@@ -1079,7 +1107,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsGAM[117] = (_buf4[4] & 0xFF) * 1000; //cell number lowest cell voltage
 			HoTTbinReader.pointsGAM[118] = (_buf4[8] & 0xFF) * 1000; //Pressure
 		}
-		HoTTbinReader.pointsGAM[130] = ((_buf1[1] & 0xFF) + ((_buf1[2] & 0x7F) << 8)) * 1000; //Event
+		HoTTbinReader.pointsGAM[130] = ((_buf1[1] & 0xFF) + ((_buf1[2] & 0x7F) << 8)) * 1000; //inverse event
 	}
 
 	/**
@@ -1145,7 +1173,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
 		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
 		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
-		HoTTbinReader.pointsEAM[131] = ((_buf1[1] & 0xFF) + ((_buf1[2] & 0x7F) << 8)) * 1000; //Event
+		HoTTbinReader.pointsEAM[131] = ((_buf1[1] & 0xFF) + ((_buf1[2] & 0x7F) << 8)) * 1000; //inverse event
 	}
 
 	/**
@@ -1190,11 +1218,11 @@ public class HoTTbinReaderD extends HoTTbinReader {
 				HoTTbinReaderD.points[67] = 1500 * 1000;
 			}
 		}
-		//92=PowerOff, 93=BattLow, 94=Reset, 95=reserved
+		//92=PowerOff, 93=BattLow, 94=Reset, 95=Warning
 		HoTTbinReaderD.points[92] = (_buf[50] & 0x01) * 100000;
 		HoTTbinReaderD.points[93] = (_buf[50] & 0x02) * 50000;
 		HoTTbinReaderD.points[94] = (_buf[50] & 0x04) * 25000;
-		HoTTbinReaderD.points[95] = (_buf[50] & 0x00) * 1000; //reserved for future use
+		HoTTbinReaderD.points[95] = _buf[32] * 1000; //warning
 	}
 
 	/**
@@ -1238,6 +1266,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
 		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
 		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
-		HoTTbinReader.pointsESC[132] = (_buf1[1] & 0xFF) * 1000; //Event
+		HoTTbinReader.pointsESC[132] = (_buf1[1] & 0xFF) * 1000; //inverse event
 	}
 }

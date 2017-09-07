@@ -117,12 +117,12 @@
                 <label>label_voltage_rx_min</label>
             </Measurement>
             <Measurement>
-                <name>event Rx</name>
+                <name>warning Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_event Rx</label>
+                <label>label_warning Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -1006,12 +1006,12 @@
                 <label>label_voltage_rx_min</label>
             </Measurement>
             <Measurement>
-                <name>event Rx</name>
+                <name>warning Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_event Rx</label>
+                <label>label_warning Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -1752,10 +1752,10 @@
             </Settlements>
             <ReferenceGroups>
                 <ReferenceGroup referenceGroupId="1" referenceRule="sum" comment="voltage">
-                    <MeasurementMapping measurementOrdinal="19"/>
+                    <MeasurementMapping measurementOrdinal="24"/>
                 </ReferenceGroup>
                 <ReferenceGroup referenceGroupId="2" referenceRule="sum" comment="current">
-                    <MeasurementMapping measurementOrdinal="20"/>
+                    <MeasurementMapping measurementOrdinal="25"/>
                 </ReferenceGroup>
             </ReferenceGroups>
             <TransitionGroups>
@@ -1769,12 +1769,12 @@
                 </TransitionGroup>
             </TransitionGroups>
             <Transitions>
-                <Transition transitionId="0" refOrdinal="20" classType="peak" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Dauer höchstens 15 Sekunden"/>
-                <Transition transitionId="1" refOrdinal="20" classType="peak" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromspitze mit mindestens dem 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Dauer höchstens 15 Sekunden"/>
-                <Transition transitionId="3" refOrdinal="20" classType="pulse" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Pulsdauer mindestens 1,5 Sekunden"/>
-                <Transition transitionId="4" refOrdinal="20" classType="pulse" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Pulsdauer mindestens 1,5 Sekunden"/>
-                <Transition transitionId="6" refOrdinal="20" classType="slope" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel; Einbruchschwellwert mindestens 1,5 Sekunden"/>
-                <Transition transitionId="7" refOrdinal="20" classType="slope" valueType="deltaFactor" thresholdValue="9.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert; Anstiegschwellwert mindestens 1,5 Sekunden"/>
+                <Transition transitionId="0" refOrdinal="25" classType="peak" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Dauer höchstens 15 Sekunden"/>
+                <Transition transitionId="1" refOrdinal="25" classType="peak" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromspitze mit mindestens dem 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Dauer höchstens 15 Sekunden"/>
+                <Transition transitionId="3" refOrdinal="25" classType="pulse" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Pulsdauer mindestens 1,5 Sekunden"/>
+                <Transition transitionId="4" refOrdinal="25" classType="pulse" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Pulsdauer mindestens 1,5 Sekunden"/>
+                <Transition transitionId="6" refOrdinal="25" classType="slope" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel; Einbruchschwellwert mindestens 1,5 Sekunden"/>
+                <Transition transitionId="7" refOrdinal="25" classType="slope" valueType="deltaFactor" thresholdValue="9.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert; Anstiegschwellwert mindestens 1,5 Sekunden"/>
             </Transitions>
             <ScoreGroups>
                 <Scoregroup scoregroupId="0">
@@ -1958,12 +1958,12 @@
                 <label>label_voltage_rx_min</label>
             </Measurement>
             <Measurement>
-                <name>event Rx</name>
+                <name>warning Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_event Rx</label>
+                <label>label_warning Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -2704,10 +2704,10 @@
             </Settlements>
             <ReferenceGroups>
                 <ReferenceGroup referenceGroupId="1" referenceRule="sum" comment="voltage">
-                    <MeasurementMapping measurementOrdinal="36"/>
+                    <MeasurementMapping measurementOrdinal="46"/>
                 </ReferenceGroup>
                 <ReferenceGroup referenceGroupId="2" referenceRule="sum" comment="current">
-                    <MeasurementMapping measurementOrdinal="37"/>
+                    <MeasurementMapping measurementOrdinal="47"/>
                 </ReferenceGroup>
             </ReferenceGroups>
             <TransitionGroups>
@@ -2721,12 +2721,12 @@
                 </TransitionGroup>
             </TransitionGroups>
             <Transitions>
-                <Transition transitionId="0" refOrdinal="37" classType="peak" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Dauer höchstens 15 Sekunden"/>
-                <Transition transitionId="1" refOrdinal="37" classType="peak" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromspitze mit mindestens dem 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Dauer höchstens 15 Sekunden"/>
-                <Transition transitionId="3" refOrdinal="37" classType="pulse" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Pulsdauer mindestens 1,5 Sekunden"/>
-                <Transition transitionId="4" refOrdinal="37" classType="pulse" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Pulsdauer mindestens 1,5 Sekunden"/>
-                <Transition transitionId="6" refOrdinal="37" classType="slope" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel; Einbruchschwellwert mindestens 1,5 Sekunden"/>
-                <Transition transitionId="7" refOrdinal="37" classType="slope" valueType="deltaFactor" thresholdValue="9.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert; Anstiegschwellwert mindestens 1,5 Sekunden"/>
+                <Transition transitionId="0" refOrdinal="47" classType="peak" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Dauer höchstens 15 Sekunden"/>
+                <Transition transitionId="1" refOrdinal="47" classType="peak" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromspitze mit mindestens dem 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Dauer höchstens 15 Sekunden"/>
+                <Transition transitionId="3" refOrdinal="47" classType="pulse" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Pulsdauer mindestens 1,5 Sekunden"/>
+                <Transition transitionId="4" refOrdinal="47" classType="pulse" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Pulsdauer mindestens 1,5 Sekunden"/>
+                <Transition transitionId="6" refOrdinal="47" classType="slope" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel; Einbruchschwellwert mindestens 1,5 Sekunden"/>
+                <Transition transitionId="7" refOrdinal="47" classType="slope" valueType="deltaFactor" thresholdValue="9.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert; Anstiegschwellwert mindestens 1,5 Sekunden"/>
             </Transitions>
             <ScoreGroups>
                 <Scoregroup scoregroupId="0">
@@ -2902,12 +2902,12 @@
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
             </Measurement>
             <Measurement>
-                <name>event Rx</name>
+                <name>warning Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_event Rx</label>
+                <label>label_warning Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -3569,28 +3569,29 @@
                 <symbol>evt</symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
             </Measurement>
             <Measurement>
                 <name>Batt Low</name>
                 <symbol>evt</symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
             </Measurement>
             <Measurement>
                 <name>Reset</name>
                 <symbol>evt</symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
             </Measurement>
             <Measurement>
-                <name>Reserve</name>
-                <symbol>evt</symbol>
+                <name>warning</name>
+                <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <label>label_warning</label>
             </Measurement>
             <Measurement>
                 <name>voltage M</name>
@@ -3788,12 +3789,12 @@
                 <label>label_voltage_rx_min</label>
             </Measurement>
             <Measurement>
-                <name>event Rx</name>
+                <name>warning Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_event Rx</label>
+                <label>label_warning Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -4534,10 +4535,10 @@
             </Settlements>
             <ReferenceGroups>
                 <ReferenceGroup referenceGroupId="1" referenceRule="sum" comment="voltage">
-                    <MeasurementMapping measurementOrdinal="60"/>
+                    <MeasurementMapping measurementOrdinal="73"/>
                 </ReferenceGroup>
                 <ReferenceGroup referenceGroupId="2" referenceRule="sum" comment="current">
-                    <MeasurementMapping measurementOrdinal="61"/>
+                    <MeasurementMapping measurementOrdinal="74"/>
                 </ReferenceGroup>
             </ReferenceGroups>
             <TransitionGroups>
@@ -4551,12 +4552,12 @@
                 </TransitionGroup>
             </TransitionGroups>
             <Transitions>
-                <Transition transitionId="0" refOrdinal="61" classType="peak" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Dauer höchstens 15 Sekunden"/>
-                <Transition transitionId="1" refOrdinal="61" classType="peak" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromspitze mit mindestens dem 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Dauer höchstens 15 Sekunden"/>
-                <Transition transitionId="3" refOrdinal="61" classType="pulse" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Pulsdauer mindestens 1,5 Sekunden"/>
-                <Transition transitionId="4" refOrdinal="61" classType="pulse" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Pulsdauer mindestens 1,5 Sekunden"/>
-                <Transition transitionId="6" refOrdinal="61" classType="slope" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel; Einbruchschwellwert mindestens 1,5 Sekunden"/>
-                <Transition transitionId="7" refOrdinal="61" classType="slope" valueType="deltaFactor" thresholdValue="9.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert; Anstiegschwellwert mindestens 1,5 Sekunden"/>
+                <Transition transitionId="0" refOrdinal="74" classType="peak" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Dauer höchstens 15 Sekunden"/>
+                <Transition transitionId="1" refOrdinal="74" classType="peak" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromspitze mit mindestens dem 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Dauer höchstens 15 Sekunden"/>
+                <Transition transitionId="3" refOrdinal="74" classType="pulse" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Pulsdauer mindestens 1,5 Sekunden"/>
+                <Transition transitionId="4" refOrdinal="74" classType="pulse" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Pulsdauer mindestens 1,5 Sekunden"/>
+                <Transition transitionId="6" refOrdinal="74" classType="slope" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel; Einbruchschwellwert mindestens 1,5 Sekunden"/>
+                <Transition transitionId="7" refOrdinal="74" classType="slope" valueType="deltaFactor" thresholdValue="9.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert; Anstiegschwellwert mindestens 1,5 Sekunden"/>
             </Transitions>
             <ScoreGroups>
                 <Scoregroup scoregroupId="0">
@@ -4732,12 +4733,12 @@
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
             </Measurement>
             <Measurement>
-                <name>event Rx</name>
+                <name>warning Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_event Rx</label>
+                <label>label_warning Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
