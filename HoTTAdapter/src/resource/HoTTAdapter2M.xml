@@ -117,12 +117,12 @@
                 <label>label_voltage_rx_min</label>
             </Measurement>
             <Measurement>
-                <name>warning Rx</name>
+                <name>event Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_warning Rx</label>
+                <label>label_event Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -1006,12 +1006,12 @@
                 <label>label_voltage_rx_min</label>
             </Measurement>
             <Measurement>
-                <name>warning Rx</name>
+                <name>event Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_warning Rx</label>
+                <label>label_event Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -1958,12 +1958,12 @@
                 <label>label_voltage_rx_min</label>
             </Measurement>
             <Measurement>
-                <name>warning Rx</name>
+                <name>event Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_warning Rx</label>
+                <label>label_event Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -2902,12 +2902,12 @@
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
             </Measurement>
             <Measurement>
-                <name>warning Rx</name>
+                <name>event Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_warning Rx</label>
+                <label>label_event Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -3789,12 +3789,12 @@
                 <label>label_voltage_rx_min</label>
             </Measurement>
             <Measurement>
-                <name>warning Rx</name>
+                <name>event Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_warning Rx</label>
+                <label>label_event Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>
@@ -4733,12 +4733,12 @@
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
             </Measurement>
             <Measurement>
-                <name>warning Rx</name>
+                <name>event Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_warning Rx</label>
+                <label>label_event Rx</label>
             </Measurement>
             <Measurement>
                 <name>altitude (relativ)</name>

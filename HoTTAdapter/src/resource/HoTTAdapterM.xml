@@ -117,12 +117,12 @@
                 <label>label_voltage_rx_min</label>
             </Measurement>
             <Measurement>
-                <name>warning Rx</name>
+                <name>event Rx</name>
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
                 <trailDisplay discloseAll="true" defaultTrail="max"/>
-                <label>label_warning Rx</label>
+                <label>label_event Rx</label>
             </Measurement>
             <Settlements/>
             <ReferenceGroups/>
