@@ -1762,9 +1762,10 @@ public class LogViewReader {
 			position += data_in.read(buffer);
 			int numberChars = parse2Int(buffer);
 			
-			if (log.isLoggable(Level.SEVERE)) log.log(Level.SEVERE, "numberChars = " + numberChars); //$NON-NLS-1$
-			if (numberChars > 100) 
+			if (numberChars > 100) {
+				log.log(Level.SEVERE, "numberChars = " + numberChars); //$NON-NLS-1$				
 				throw new DataInconsitsentException("Corrupt input file");
+			}
 			buffer = new byte[numberChars];
 			position += data_in.read(buffer);
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "R_%" + new String(buffer) + "%@");			

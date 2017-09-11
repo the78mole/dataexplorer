@@ -173,7 +173,7 @@ public class iChargerSerialPort extends DeviceCommPort {
 	}
 
 	/**
-	 * query the size of data starting at he end, requires an empty data buffer
+	 * query the size of data starting at the end, requires an empty data buffer
 	 * @return
 	 */
 	protected int getArrayLengthByCheckEnding() {
