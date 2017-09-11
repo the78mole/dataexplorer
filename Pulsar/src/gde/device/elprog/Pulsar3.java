@@ -50,7 +50,6 @@ import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DevicePropertiesInconsistenceException;
 import gde.exception.SerialPortException;
-import gde.io.CSVSerialDataReaderWriter;
 import gde.io.LogViewReader;
 import gde.log.Level;
 import gde.messages.Messages;
@@ -278,6 +277,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 
 		for (int i = 0; i < recordDataSize; i++) {
 			System.arraycopy(dataBuffer, offset, convertBuffer, 0, deviceDataBufferSize);
+			//no cell internal Ri stored in LogView files
 			recordSet.addPoints(convertDataBytes(points, convertBuffer));
 			offset += lovDataSize+10;
 
@@ -301,7 +301,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 
 		try {
 			//System.out.println(new String(dataBuffer));
-			byte[] lineBuffer = new byte[160];
+			byte[] lineBuffer = new byte[Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO))];
 			System.arraycopy(dataBuffer, 0, lineBuffer, 0, dataBuffer.length);
 			data.parse(new String(lineBuffer), 1);
 		}
@@ -323,47 +323,25 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
-		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.size()];
+		int[] points = new int[recordSet.getNoneCalculationRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int progressCycle = 0;
+		int progressCycle = 1;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-		
+
+		int index = 0;
 		for (int i = 0; i < recordDataSize; i++) {
-			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize); //$NON-NLS-1$
-			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
-			
-			//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
-			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
-			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
-			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
-			//3=Ladung 4=Leistung 5=Energie
-			points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
-			points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue();							// power U*I [W]
-			points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
-			//6=Temp.intern 7=Temp.extern 
-			points[6] = (((convertBuffer[32]&0xff) << 24) + ((convertBuffer[33]&0xff) << 16) + ((convertBuffer[34]&0xff) << 8) + ((convertBuffer[35]&0xff) << 0));
-			points[7] = (((convertBuffer[36]&0xff) << 24) + ((convertBuffer[37]&0xff) << 16) + ((convertBuffer[38]&0xff) << 8) + ((convertBuffer[39]&0xff) << 0));
+			index = i * dataBufferSize;
+			if (Pulsar3.log.isLoggable(Level.FINER)) 
+				Pulsar3.log.log(Level.FINER, i + " i*dataBufferSize = " + index); //$NON-NLS-1$
 
-			int maxVotage = Integer.MIN_VALUE;
-			int minVotage = Integer.MAX_VALUE;
-			//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
-			//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
-			for (int j=0, k=0; j<10; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
-				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
-				//log.log(Level.OFF, j + " k+19 = " + (k+19));
-				points[j + 9] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff) << 0));
-				if (points[j + 9] > 0) {
-					maxVotage = points[j + 9] > maxVotage ? points[j + 9] : maxVotage;
-					minVotage = points[j + 9] < minVotage ? points[j + 9] : minVotage;
-				}
+			for (int j = 0; j < points.length; j++) {
+				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8)
+						+ ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
 			}
-			//calculate balance on the fly
-			points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 
-			recordSet.addPoints(points);
-			
-			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
+				recordSet.addPoints(points);
+
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		recordSet.syncScaleOfSyncableRecords();
@@ -377,7 +355,8 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
 		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
-		//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
+		//24=RiZelle1 25=RiZelle2 26=RiZelle3 27=RiZelle4 28=RiZelle5 29=RiZelle6 ... 39=RiZelle16
+		//40=BalancerZelle1 41=BalancerZelle2 42=BalancerZelle3 43=BalancerZelle4 44=BalancerZelle5 45=BalancerZelle6 ... 55=BalancerZelle16
 		try {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
@@ -413,7 +392,8 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	public double translateValue(Record record, double value) {
 		//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
 		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
-		//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
+		//24=RiZelle1 25=RiZelle2 26=RiZelle3 27=RiZelle4 28=RiZelle5 29=RiZelle6 ... 39=RiZelle16
+		//40=BalancerZelle1 41=BalancerZelle2 42=BalancerZelle3 43=BalancerZelle4 44=BalancerZelle5 45=BalancerZelle6 ... 55=BalancerZelle16
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		
 		double newValue = value * factor;
@@ -429,7 +409,8 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	public double reverseTranslateValue(Record record, double value) {
 		//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
 		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
-		//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
+		//24=RiZelle1 25=RiZelle2 26=RiZelle3 27=RiZelle4 28=RiZelle5 29=RiZelle6 ... 39=RiZelle16
+		//40=BalancerZelle1 41=BalancerZelle2 42=BalancerZelle3 43=BalancerZelle4 44=BalancerZelle5 45=BalancerZelle6 ... 55=BalancerZelle16
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 
 		double newValue = value / factor;
@@ -449,7 +430,8 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 			try {
 				//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
 				//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
-				//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
+				//24=RiZelle1 25=RiZelle2 26=RiZelle3 27=RiZelle4 28=RiZelle5 29=RiZelle6 ... 39=RiZelle16
+				//40=BalancerZelle1 41=BalancerZelle2 42=BalancerZelle3 43=BalancerZelle4 44=BalancerZelle5 45=BalancerZelle6 ... 55=BalancerZelle16
 				int displayableCounter = 0;
 
 				
@@ -486,7 +468,8 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 
 		//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
 		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
-		//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
+		//24=RiZelle1 25=RiZelle2 26=RiZelle3 27=RiZelle4 28=RiZelle5 29=RiZelle6 ... 39=RiZelle16
+		//40=BalancerZelle1 41=BalancerZelle2 42=BalancerZelle3 43=BalancerZelle4 44=BalancerZelle5 45=BalancerZelle6 ... 55=BalancerZelle16
 		recordSet.setAllDisplayable();
 		for (int i=7; i<recordSet.size(); ++i) {
 				Record record = recordSet.get(i);
@@ -568,6 +551,38 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	public int[] getCellVoltageOrdinals() {
 		//0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=Ri 7=Balance
 		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
-		//24=BalancerZelle1 25=BalancerZelle2 26=BalancerZelle3 27=BalancerZelle4 28=BalancerZelle5 29=BalancerZelle6 ... 39=BalancerZelle16
-		return new int[] {0, 2};	}
+		//24=RiZelle1 25=RiZelle2 26=RiZelle3 27=RiZelle4 28=RiZelle5 29=RiZelle6 ... 39=RiZelle16
+		//40=BalancerZelle1 41=BalancerZelle2 42=BalancerZelle3 43=BalancerZelle4 44=BalancerZelle5 45=BalancerZelle6 ... 55=BalancerZelle16
+		return new int[] {0, 2};	
+	}
+	
+	/**
+	 * query the process name according defined states
+	 * @param buffer
+	 * @return
+	 */
+	public String getProcessName(byte[] buffer) throws Exception {
+		//#03C05____B4,00070,11625,06572,000,00064,00037,3879,0,3887,0,3880,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0
+		return String.format("%s [%s]", this.getRecordSetStateNameReplacement(buffer[3]), batteryTypes.get(Integer.valueOf(new String(buffer).substring(4, 6))));
+	}
+
+	/**
+	 * @param buffer
+	 * @return true|false depending on program finish or manual finish
+	 */
+	public boolean isProcessing(byte[] buffer) {
+		//detect program ending
+		//#03D05__M_B4 -> manual ending
+		//#03C05__EPB4 -> program finished
+		//#04D01__EE_0 -> program cycle ended
+		switch ((char) buffer[8]) {
+		case 'M': //manual finish
+		case 'E': //program finished
+			return false;
+
+		case '_':
+		default:
+			return true;
+		}
+	}
 }

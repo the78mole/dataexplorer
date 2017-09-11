@@ -24,9 +24,8 @@ package gde.device.elprog;
  */ 
 public class MessageIds { 
 
-	public final static String	GDE_MSGE3901 = "GDE_MSGE3901";
-	public final static String	GDE_MSGW3901 = "GDE_MSGW3901";
-	public final static String	GDE_MSGI3901 = "GDE_MSGI3901";
+	public final static String	GDE_MSGW3900 = "GDE_MSGW3900";
+	public final static String	GDE_MSGI3900 = "GDE_MSGI3900";
 	public final static String	GDE_MSGT3900 = "GDE_MSGT3900";
 	public final static String	GDE_MSGT3901 = "GDE_MSGT3901";
 	public final static String	GDE_MSGT3902 = "GDE_MSGT3902";
@@ -34,5 +33,6 @@ public class MessageIds {
 	public final static String	GDE_MSGT3904 = "GDE_MSGT3904";
 	public final static String	GDE_MSGT3905 = "GDE_MSGT3905";
 	public final static String	GDE_MSGT3906 = "GDE_MSGT3906";
+	public final static String	GDE_MSGT3907 = "GDE_MSGT3907";
 
  }
