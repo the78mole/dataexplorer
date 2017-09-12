@@ -99,6 +99,7 @@ public class PulsarSerialPort extends DeviceCommPort {
 	public synchronized byte[] getData() throws Exception {
 		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
 		int startIndex;
+		this.index = 0;
 
 		try {
 			//receive data while needed
@@ -128,6 +129,10 @@ public class PulsarSerialPort extends DeviceCommPort {
 			}
 			throw e;
 		}
+
+		if (log.isLoggable(Level.FINE))
+			log.log(Level.FINE, new String(this.answer));
+
 		return this.data;
 	}
 
@@ -175,6 +180,9 @@ public class PulsarSerialPort extends DeviceCommPort {
 		readNewData();
 		findDataEnd(this.index = 0);
 
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, new String(this.answer));
+
 		return this.data;
 	}
 
@@ -187,6 +195,8 @@ public class PulsarSerialPort extends DeviceCommPort {
 		if (!this.isDataReceived) {
 			this.answer = new byte[this.tmpDataLength];
 			this.answer = this.read(this.answer, this.timeout, this.stableIndex);
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, new String(this.answer));
 			this.isDataReceived = true;
 		}
 	}

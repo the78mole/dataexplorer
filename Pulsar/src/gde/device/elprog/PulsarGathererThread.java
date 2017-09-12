@@ -93,7 +93,7 @@ public class PulsarGathererThread extends Thread {
 		String processName = GDE.STRING_EMPTY;
 
 		this.isCollectDataStopped = false;
-		PulsarGathererThread.log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
+		log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
 		while (!this.isCollectDataStopped) {
 			try {
@@ -117,13 +117,15 @@ public class PulsarGathererThread extends Thread {
 						try {
 							processName = this.device.getProcessName(dataBuffer);
 							isProgrammExecuting = this.device.isProcessing(dataBuffer);
+							if (log.isLoggable(Level.FINE))
+								log.log(Level.FINE, String.format("isProgramExecuting = %s, processName = %s", isProgrammExecuting, processName));
 						}
 						catch (Exception e) {
 							log.log(Level.WARNING, String .format("Error in getProcessName evaluating '%s'", StringHelper.byte2CharString(dataBuffer, dataBuffer.length)));
 							continue;
 						}
-					if (PulsarGathererThread.log.isLoggable(Level.FINE))
-						PulsarGathererThread.log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "processing mode = " + processName); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE))
+						log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "processing mode = " + processName); //$NON-NLS-1$
 				}
 				catch (final Exception e) {
 					//CellLog returns $STARTBULK;69;1000;65 or $ENDBULK;64 or $NEWSECTION;1000;48
@@ -133,8 +135,8 @@ public class PulsarGathererThread extends Thread {
 					}
 					while (sb.length() > 5 && (sb.charAt(sb.length() - 1) == '\n' || sb.charAt(sb.length() - 1) == '\r'))
 						sb.deleteCharAt(sb.length() - 1);
-					PulsarGathererThread.log.log(Level.WARNING, sb.toString());
-					PulsarGathererThread.log.log(Level.WARNING, e.getMessage(), e);
+					log.log(Level.WARNING, sb.toString());
+					log.log(Level.WARNING, e.getMessage(), e);
 					continue;
 				}
 
@@ -147,8 +149,8 @@ public class PulsarGathererThread extends Thread {
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") " + processName; //$NON-NLS-1$
 						this.channel.put(this.recordSetKey, RecordSet.createRecordSet(this.recordSetKey, this.application.getActiveDevice(), this.channel.getNumber(), true, false, true));
-						if (PulsarGathererThread.log.isLoggable(Level.FINE))
-							PulsarGathererThread.log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE))
+							log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, this.recordSetKey + " created for channel " + this.channel.getName()); //$NON-NLS-1$
 						if (this.channel.getActiveRecordSet() == null) this.channel.setActiveRecordSet(this.recordSetKey);
 						recordSet = this.channel.get(this.recordSetKey);
 						this.channel.applyTemplateBasics(this.recordSetKey);
@@ -174,13 +176,14 @@ public class PulsarGathererThread extends Thread {
 						}
 						if (measurementCount > 0 && measurementCount % 5 == 0) {
 							this.device.updateVisibilityStatus(recordSet, true);
+							recordSet.syncScaleOfSyncableRecords();
 						}
 					}
 				}
 				else { // no program is executing, wait for 180 seconds max. for actions
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3900));
-					if (PulsarGathererThread.log.isLoggable(Level.FINE))
-						PulsarGathererThread.log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation"); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE))
+						log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation"); //$NON-NLS-1$
 
 					if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // record set has data points, save data and wait
 						finalizeRecordSet(false);
@@ -190,7 +193,7 @@ public class PulsarGathererThread extends Thread {
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGT3907));
 					}
 					else if (0 == (setRetryCounter(getRetryCounter() - 1))) {
-						if (PulsarGathererThread.log.isLoggable(Level.FINE)) PulsarGathererThread.log.log(Level.FINE, "iCharge activation timeout"); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "iCharge activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW3900));
 						stopDataGatheringThread(false, null);
 					}
@@ -209,10 +212,10 @@ public class PulsarGathererThread extends Thread {
 				// this case will be reached while program is started, checked and the check not asap committed, stop pressed
 				else if (e instanceof TimeOutException && !isProgrammExecuting) {
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3900));
-					if (PulsarGathererThread.log.isLoggable(Level.FINE))
-						PulsarGathererThread.log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE))
+						log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 					if (0 == (setRetryCounter(getRetryCounter() - 1))) {
-						if (PulsarGathererThread.log.isLoggable(Level.FINE)) PulsarGathererThread.log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
 						this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW3900));
 						stopDataGatheringThread(false, null);
 					}
@@ -220,13 +223,13 @@ public class PulsarGathererThread extends Thread {
 				// program end or unexpected exception occurred, stop data gathering to enable save data by user
 				else {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					if (PulsarGathererThread.log.isLoggable(Level.FINE)) PulsarGathererThread.log.log(Level.FINE, "iCharger program end detected"); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "iCharger program end detected"); //$NON-NLS-1$
 					stopDataGatheringThread(true, e);
 				}
 			}
 		}
 		this.application.setStatusMessage(GDE.STRING_EMPTY);
-		if (PulsarGathererThread.log.isLoggable(Level.FINE)) PulsarGathererThread.log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 	}
 
 	/**
@@ -238,13 +241,13 @@ public class PulsarGathererThread extends Thread {
 		final String $METHOD_NAME = "stopDataGatheringThread"; //$NON-NLS-1$
 
 		if (throwable != null) {
-			PulsarGathererThread.log.logp(Level.WARNING, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
+			log.logp(Level.WARNING, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
 		}
 
 		this.isCollectDataStopped = true;
 
 		if (this.serialPort != null && this.serialPort.getXferErrors() > 0) {
-			PulsarGathererThread.log.log(Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(Level.WARNING, "During complete data transfer " + this.serialPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (this.serialPort != null && this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
 			this.serialPort.close();
@@ -282,7 +285,7 @@ public class PulsarGathererThread extends Thread {
 			this.application.updateDataTable(this.recordSetKey, false);
 
 			this.device.setAverageTimeStep_ms(tmpRecordSet.getAverageTimeStep_ms());
-			PulsarGathererThread.log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms()); //$NON-NLS-1$
+			log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms()); //$NON-NLS-1$
 		}
 	}
 
