@@ -704,6 +704,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 		int numAvailableBytes = readBuffer.length;
 		int readBytes = 0;
 		int timeOutCounter = timeout_msec / sleepTime;
+		if (log.isLoggable(Level.FINE)) log.log(Level.OFF, "entry");
 		if (stableIndex >= timeOutCounter) {
 			log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGE0013));
 		}
@@ -738,7 +739,8 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 				readBuffer = tmpBuffer;
 			}
 
-			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
+			if (log.isLoggable(Level.FINE)) 
+				log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBytes));
 
 		}
 		catch (IndexOutOfBoundsException e) {
@@ -863,8 +865,8 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			--timeOutCounter;
 
 			if (timeOutCounter == 0) {
+				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, String.format("byteCounter = %d numBytesAvailable = %d", byteCounter, numBytesAvailable));
 				TimeOutException e = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { expectedBytes, timeout_msec }));
-				log.logp(Level.SEVERE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
 				throw e;
 			}
 
