@@ -166,4 +166,15 @@ public class PulsarDataParser extends DataParser {
 		}
 	}
 
+	/**
+	 * @return the values
+	 */
+	public int[] getValues(int[] existingPoints) {
+		for (int i=0; i<existingPoints.length && i<this.values.length; ++i) {
+			if (existingPoints[i] != 0)
+				this.values[i] = existingPoints[i];
+		}
+		return this.values;
+	}
+
 }

@@ -38,7 +38,6 @@ public class PulsarSerialPort extends DeviceCommPort {
 	final static Logger	log							= Logger.getLogger(PulsarSerialPort.$CLASS_NAME);
 
 	final byte					startByte;
-	final byte					startByteRi;
 	final byte					endByte;
 	final byte					endByte_1;
 	final byte[]				tmpByte					= new byte[1];
@@ -51,7 +50,6 @@ public class PulsarSerialPort extends DeviceCommPort {
 	byte[]							data						= new byte[] { 0x00 };
 
 	long								time						= 0;
-	boolean							isDataReceived	= false;
 	int									index						= 0;
 	boolean							isEndByte_1			= false;
 
@@ -62,13 +60,11 @@ public class PulsarSerialPort extends DeviceCommPort {
 	public PulsarSerialPort(IDevice currentDevice, DataExplorer currentApplication) {
 		super(currentDevice, currentApplication);
 		this.startByte = (byte) this.device.getDataBlockLeader().charAt(0);
-		this.startByteRi = '!';
 		this.endByte = this.device.getDataBlockEnding()[this.device.getDataBlockEnding().length - 1];
 		this.endByte_1 = this.device.getDataBlockEnding().length == 2 ? this.device.getDataBlockEnding()[0] : 0x00;
 		this.tmpDataLength = Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
 		this.timeout = this.device.getDeviceConfiguration().getReadTimeOut();
 		this.stableIndex = this.device.getDeviceConfiguration().getReadStableIndex();
-		this.isDataReceived = false;
 		this.index = 0;
 		this.tmpData = new byte[0];
 	}
@@ -79,13 +75,11 @@ public class PulsarSerialPort extends DeviceCommPort {
 	public PulsarSerialPort(DeviceConfiguration deviceConfiguration) {
 		super(deviceConfiguration);
 		this.startByte = (byte) this.device.getDataBlockLeader().charAt(0);
-		this.startByteRi = '!';
 		this.endByte = this.device.getDataBlockEnding()[this.device.getDataBlockEnding().length - 1];
 		this.endByte_1 = this.device.getDataBlockEnding().length == 2 ? this.device.getDataBlockEnding()[0] : 0x00;
 		this.tmpDataLength = Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
 		this.timeout = this.device.getDeviceConfiguration().getReadTimeOut();
 		this.stableIndex = this.device.getDeviceConfiguration().getReadStableIndex();
-		this.isDataReceived = false;
 		this.index = 0;
 		this.tmpData = new byte[0];
 	}
@@ -98,30 +92,14 @@ public class PulsarSerialPort extends DeviceCommPort {
 	 */
 	public synchronized byte[] getData() throws Exception {
 		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
-		int startIndex;
 		this.index = 0;
 
 		try {
 			//receive data while needed
-			readNewData();
-
-			//find start index
-			while (this.index < this.answer.length && (this.answer[this.index] != this.startByte || this.answer[this.index] != this.startByteRi)) 
-				++this.index;
-
-			if (this.index < this.answer.length) {
-				startIndex = this.index;
-				++this.index;
-				this.tmpData = new byte[0];
-			}
-			else { //startIndex not found, read new data
-				this.isDataReceived = false;
-				this.index = 0;
-				return getData();
-			}
-
-			//find end index
-			findDataEnd(startIndex);
+			this.answer = new byte[this.tmpDataLength];
+			this.answer = this.read(this.answer, this.timeout, this.stableIndex);
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, new String(this.answer));
 		}
 		catch (Exception e) {
 			if (!(e instanceof TimeOutException)) {
@@ -129,11 +107,7 @@ public class PulsarSerialPort extends DeviceCommPort {
 			}
 			throw e;
 		}
-
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, new String(this.answer));
-
-		return this.data;
+		return this.answer;
 	}
 
 	/**
@@ -144,7 +118,7 @@ public class PulsarSerialPort extends DeviceCommPort {
 	 */
 	protected byte[] findDataEnd(int startIndex) throws IOException, TimeOutException {
 		final String $METHOD_NAME = "findDataEnd"; //$NON-NLS-1$
-		int endIndex;
+		int endIndex = 0;
 		while (this.index < this.answer.length && !((this.endByte_1 != 0x00 || this.answer[this.index - 1] == this.endByte_1 || this.isEndByte_1 == true) && this.answer[this.index] == this.endByte))
 			++this.index;
 
@@ -164,8 +138,10 @@ public class PulsarSerialPort extends DeviceCommPort {
 				}
 				while (sb.length() > 5 && (sb.charAt(sb.length() - 1) == '\n' || sb.charAt(sb.length() - 1) == '\r'))
 					sb.deleteCharAt(sb.length() - 1);
-				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, PulsarSerialPort.$CLASS_NAME, $METHOD_NAME, sb.toString());
+				if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, PulsarSerialPort.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, "1" + new String(this.data));
 			return this.data;
 		}
 		//endIndex not found, save temporary data, read new data
@@ -176,13 +152,11 @@ public class PulsarSerialPort extends DeviceCommPort {
 		System.arraycopy(this.data, 0, this.tmpData, 0, this.data.length);
 		System.arraycopy(this.answer, startIndex, this.tmpData, this.data.length, this.answer.length - startIndex);
 
-		this.isDataReceived = false;
 		readNewData();
 		findDataEnd(this.index = 0);
 
-		if (log.isLoggable(Level.FINER))
-			log.log(Level.FINER, new String(this.answer));
-
+		if (log.isLoggable(Level.FINE))
+			log.log(Level.FINE, "2" + new String(this.data));
 		return this.data;
 	}
 
@@ -192,13 +166,10 @@ public class PulsarSerialPort extends DeviceCommPort {
 	 * @throws TimeOutException
 	 */
 	protected void readNewData() throws IOException, TimeOutException {
-		if (!this.isDataReceived) {
-			this.answer = new byte[this.tmpDataLength];
-			this.answer = this.read(this.answer, this.timeout, this.stableIndex);
-			if (log.isLoggable(Level.FINE))
-				log.log(Level.FINE, new String(this.answer));
-			this.isDataReceived = true;
-		}
+		this.answer = new byte[this.tmpDataLength];
+		this.answer = this.read(this.answer, this.timeout, this.stableIndex);
+		if (log.isLoggable(Level.FINE))
+			log.log(Level.FINE, new String(this.answer));
 	}
 
 	/**

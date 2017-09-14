@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.device.elprog;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import gde.GDE;
@@ -25,6 +26,7 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
+import gde.device.InputTypes;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
@@ -33,6 +35,7 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 /**
  * @author brueg
@@ -71,6 +74,12 @@ public class PulsarGathererThread extends Thread {
 
 		if (!this.serialPort.isConnected()) {
 			this.serialPort.open();
+			try {
+				this.serialPort.cleanInputStream();
+			}
+			catch (IOException e) {
+				// ignore
+			}
 			this.isPortOpenedByLiveGatherer = true;
 		}
 		this.setPriority(Thread.MAX_PRIORITY);
@@ -88,28 +97,33 @@ public class PulsarGathererThread extends Thread {
 		long measurementCount = 0;
 		final byte					startByte = (byte) this.device.getDataBlockLeader().charAt(0);
 		final byte					startByteRi = '!';
-		byte[] dataBuffer = null;
-		byte[] dataBufferRi = null;
+		int maxBufferSize = this.device.getDataBlockSize(InputTypes.SERIAL_IO);
+		byte[] tmpBuffer = null;
+		byte[] dataBuffer = new byte[158];
+		byte[] dataBufferRi = new byte[64];
 		String processName = GDE.STRING_EMPTY;
+		long lastCycleTime = 0;
 
 		this.isCollectDataStopped = false;
 		log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
-
+		lastCycleTime = System.nanoTime()/1000000;
 		while (!this.isCollectDataStopped) {
 			try {
 				// get data from device
-				dataBuffer = this.serialPort.getData();
-				if (dataBuffer[0] == startByte) {
-					try {
-						dataBufferRi = this.serialPort.getData();
-					}
-					catch (TimeOutException e) {
-						// ignore since this line will only send in case of charging with balancer
-					}
+				tmpBuffer = this.serialPort.getData();
+				log.log(Level.OFF, startByte + " " + new String(tmpBuffer));
+				
+				if (tmpBuffer.length <= maxBufferSize) {
+					//find line of Ri starting with ! only while more than 160 bytes received
+					int index = 0;
+					while (tmpBuffer.length > 160 && index < tmpBuffer.length && tmpBuffer[index] != startByteRi)
+						++index;
+					if (index > 159 && tmpBuffer[index] == startByteRi && (tmpBuffer.length - index) == 66) { //! line with Ri values exist
+						System.arraycopy(tmpBuffer, index, dataBufferRi, 0, dataBufferRi.length);
+						log.log(Level.OFF, startByteRi + " " + new String(dataBufferRi));
+					} 
 				}
-				else { //retry get default data line
-					continue;
-				}
+				System.arraycopy(tmpBuffer, 0, dataBuffer, 0, dataBuffer.length);
 
 				// check if device is ready for data capturing
 				// device sends at the end of transmission $ENDBULK;64
@@ -128,7 +142,6 @@ public class PulsarGathererThread extends Thread {
 						log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "processing mode = " + processName); //$NON-NLS-1$
 				}
 				catch (final Exception e) {
-					//CellLog returns $STARTBULK;69;1000;65 or $ENDBULK;64 or $NEWSECTION;1000;48
 					StringBuilder sb = new StringBuilder();
 					for (byte b : dataBuffer) {
 						sb.append((char) b);
@@ -164,7 +177,7 @@ public class PulsarGathererThread extends Thread {
 
 					if (measurementCount > 0) {// prepare the data for adding to record set
 						if (dataBufferRi != null && dataBufferRi[0] == startByteRi)
-							this.device.convertDataBytes(points, dataBufferRi);
+							points = this.device.convertDataBytes(points, dataBufferRi);
 					 recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));//constant time step
 					}
 					
@@ -174,11 +187,12 @@ public class PulsarGathererThread extends Thread {
 						if (recordSet.size() > 0 && recordSet.isChildOfActiveChannel() && recordSet.equals(this.channels.getActiveChannel().getActiveRecordSet())) {
 							PulsarGathererThread.this.application.updateAllTabs(false);
 						}
-						if (measurementCount > 0 && measurementCount % 5 == 0) {
+						if (measurementCount > 0 && measurementCount % 2 == 0) {
 							this.device.updateVisibilityStatus(recordSet, true);
 							recordSet.syncScaleOfSyncableRecords();
 						}
 					}
+					this.application.setStatusMessage(GDE.STRING_EMPTY);
 				}
 				else { // no program is executing, wait for 180 seconds max. for actions
 					this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3900));
@@ -207,7 +221,7 @@ public class PulsarGathererThread extends Thread {
 				// this case will be reached while NiXx Akku discharge/charge/discharge cycle
 				if (e instanceof TimeOutException && isProgrammExecuting) {
 					//tolerate timeout, just update status message
-					this.application.setStatusMessage(">>>> serial port Timeout <<<<");
+					this.application.setStatusMessage(">>>> serial port timeout <<<<");
 				}
 				// this case will be reached while program is started, checked and the check not asap committed, stop pressed
 				else if (e instanceof TimeOutException && !isProgrammExecuting) {
@@ -223,10 +237,15 @@ public class PulsarGathererThread extends Thread {
 				// program end or unexpected exception occurred, stop data gathering to enable save data by user
 				else {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "iCharger program end detected"); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "program end detected"); //$NON-NLS-1$
 					stopDataGatheringThread(true, e);
 				}
 			}
+			//force data collection every second
+			lastCycleTime += 5000;
+			long delay = lastCycleTime - (System.nanoTime()/1000000);
+			if (delay > 0 ) WaitTimer.delay(delay);
+			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("delay = %d", delay)); //$NON-NLS-1$
 		}
 		this.application.setStatusMessage(GDE.STRING_EMPTY);
 		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$

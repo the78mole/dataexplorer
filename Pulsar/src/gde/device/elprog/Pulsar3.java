@@ -308,7 +308,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 		catch (DevicePropertiesInconsistenceException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return data.getValues();
+		return data.getValues(points);
 	}
 
 	/**
