@@ -705,6 +705,11 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				if (ordinal >= 0 && ordinal <= 5) {
 					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
 				}
+				else if (ordinal == 92) { //Warning
+					dataTableRow[index + 1] = record.realGet(rowIndex) == 0 
+							? GDE.STRING_EMPTY 
+									: String.format("'%c'", ((record.realGet(rowIndex) / 1000)+64));
+				}
 				else {
 					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 				}
@@ -865,11 +870,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					HoTTAdapter2.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
-							}
-							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_BIN;
+						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN) || !selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+							log.log(Level.WARNING, String.format("skip selectedImportFile %s since it has not a supported file ending", selectedImportFile));
 						}
 						HoTTAdapter2.logger.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
@@ -878,11 +880,16 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 							try {
-								HoTTbinReader2.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
+									HoTTbinReader2.read(selectedImportFile);
+								}
+								else if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+									HoTTlogReader2.read(selectedImportFile);
+								}
 								if (!isInitialSwitched) {
 									Channel activeChannel = HoTTAdapter2.this.application.getActiveChannel();
 									HoTTbinReader2.channels.switchChannel(activeChannel.getName());
-									activeChannel.switchRecordSet(HoTTbinReader2.recordSet.getName());
+									activeChannel.switchRecordSet(HoTTlogReader2.recordSet.getName());
 									isInitialSwitched = true;
 								}
 								else {

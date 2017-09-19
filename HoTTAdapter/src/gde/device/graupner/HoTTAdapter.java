@@ -1011,13 +1011,20 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
+			int channel = recordSet.getChannelConfigNumber();
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				int ordinal = record.getOrdinal();
 				// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
-				if (ordinal >= 0 && ordinal <= 5 && record.getParent().getChannelConfigNumber() == 1) { // Receiver
+				if (channel == 1 && ordinal >= 0 && ordinal <= 5) { // Receiver
 					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
-				} else {
+				} 
+				else if (channel == 6 && ordinal == 22) { //Channels warning
+					dataTableRow[index + 1] = record.realGet(rowIndex) == 0 
+							? GDE.STRING_EMPTY 
+									: String.format("'%c'", ((record.realGet(rowIndex) / 1000)+64));
+				}
+				else {
 					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 				}
 				++index;

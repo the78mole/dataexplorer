@@ -18,12 +18,14 @@
 ****************************************************************************************/
 package gde.device.graupner;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -168,84 +170,124 @@ public class HoTTbinReader {
 					data_out = null;
 					data_in.close();
 					data_in = null;
+					file_input.close();
+					file_input = null;
 					return getFileInfo(outputFile);
 				}
 				DataExplorer.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
 				throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
 			}
-			// end evaluate for HoTTAdapterX files containing normal HoTT V4
-			// sensor data
-
-			if (numberLogs < 7000) {
-				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2406));
-			}
-			else if (numberLogs < 5500) {
-				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
-				throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
-			}
-
-			for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
-				HoTTAdapter.isSensorType[i] = false;
-			}
-			data_in.close();
-
-			file_input = new FileInputStream(file);
-			data_in = new DataInputStream(file_input);
-			data_in.read(buffer);
-
-			long position = (file.length() / 2) - ((NUMBER_LOG_RECORDS_TO_SCAN * 64) / 2);
-			position = position - position % 64;
-			if (position <= 0) {
-				sensorCount = 1;
-			}
-			else {
-				if (position > 64 * 4000) {
-					// 64 byte = 0.01 seconds for 40 seconds maximum sensor scan
-					// time (40 / 0.01 = 6000)
-					position = 64 * 4000;
+			// end evaluate for HoTTAdapterX files containing normal HoTT V4 sensor data
+			else if (new String(buffer).startsWith("FILE TAG IDVER")) {
+				//read header size
+				String preHeader = new String(buffer);
+				int indexOf = preHeader.indexOf("LOG DATA OFFSET : ");
+				if (indexOf > 10) {
+					int logDataOffset = Integer.valueOf(preHeader.substring(indexOf+18, indexOf+18+8));
+					data_in.close();
+					data_in = null;
+					file_input.close();
+					file_input = null;
+					file_input = new FileInputStream(file);
+					BufferedReader reader;
+					StringBuilder sb = new StringBuilder();
+					String line;
+					reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "ISO-8859-1")); //$NON-NLS-1$	
+					while ((line = reader.readLine()) != null && sb.append(line).append(GDE.STRING_NEW_LINE).length() < logDataOffset) {
+						if (line.contains(": ") && line.indexOf(GDE.STRING_COLON) > 5) {
+							String key = line.split(": ")[0].trim();
+							String value = null;
+							try {
+								value = line.split(": ")[1].trim();
+							}
+							catch (Exception e) {
+								// ignore and skip this entry
+							}
+							if (value != null) {
+								fileInfo.put(line.split(": ")[0].trim(), line.split(": ")[1].trim());
+								if (log.isLoggable(Level.FINE))
+									log.log(Level.FINE, String.format("%16s : %s", line.split(": ")[0].trim(), fileInfo.get(line.split(": ")[0].trim())));
+							}
+						}
+					}
+					reader.close();
+					sensorCount = fileInfo.get("DETECTED SENSOR") != null ? fileInfo.get("DETECTED SENSOR").split(GDE.STRING_COMMA).length - 1 : 0;
+					fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
+					fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + ((file.length() - logDataOffset) / 78));
+					if (fileInfo.get("DETECTED SENSOR") != null)
+						HoTTbinReader.sensorSignature.append(fileInfo.get("DETECTED SENSOR").substring(9));
 				}
+			}
 
-				data_in.skip(position - 64);
-				for (int i = 0; i < NUMBER_LOG_RECORDS_TO_SCAN; i++) {
-					data_in.read(buffer);
-					if (HoTTbinReader.log.isLoggable(Level.FINER)) HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+			if (data_in != null) { //*.log already closed data_in and do not need a sensor scan.
+				if (numberLogs < 7000) {
+					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2406));
+				}
+				else if (numberLogs < 5500) {
+					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
+					throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
+				}
+				for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
+					HoTTAdapter.isSensorType[i] = false;
+				}
+				data_in.close();
+				file_input = new FileInputStream(file);
+				data_in = new DataInputStream(file_input);
+				data_in.read(buffer);
+				long position = (file.length() / 2) - ((NUMBER_LOG_RECORDS_TO_SCAN * 64) / 2);
+				position = position - position % 64;
+				if (position <= 0) {
+					sensorCount = 1;
+				}
+				else {
+					if (position > 64 * 4000) {
+						// 64 byte = 0.01 seconds for 40 seconds maximum sensor scan
+						// time (40 / 0.01 = 6000)
+						position = 64 * 4000;
+					}
 
-					switch (buffer[7]) {
-					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.VARIO.name()).append(GDE.STRING_COMMA);
-						HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] = true;
-						break;
-					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GPS.name()).append(GDE.STRING_COMMA);
-						HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] = true;
-						break;
-					case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GAM.name()).append(GDE.STRING_COMMA);
-						HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] = true;
-						break;
-					case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.EAM.name()).append(GDE.STRING_COMMA);
-						HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] = true;
-						break;
-					case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-						if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
-						HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] = true;
-						break;
+					data_in.skip(position - 64);
+					for (int i = 0; i < NUMBER_LOG_RECORDS_TO_SCAN; i++) {
+						data_in.read(buffer);
+						if (HoTTbinReader.log.isLoggable(Level.FINER)) HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+
+						switch (buffer[7]) {
+						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.VARIO.name()).append(GDE.STRING_COMMA);
+							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] = true;
+							break;
+						case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GPS.name()).append(GDE.STRING_COMMA);
+							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] = true;
+							break;
+						case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GAM.name()).append(GDE.STRING_COMMA);
+							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] = true;
+							break;
+						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.EAM.name()).append(GDE.STRING_COMMA);
+							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] = true;
+							break;
+						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
+							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
+							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] = true;
+							break;
+						}
+					}
+					for (boolean element : HoTTAdapter.isSensorType) {
+						if (element == true) 
+							++sensorCount;
 					}
 				}
-				for (boolean element : HoTTAdapter.isSensorType) {
-					if (element == true)
-					++sensorCount;
-				}
+				fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
+				fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
 			}
 			HoTTbinReader.sensorSignature.deleteCharAt(HoTTbinReader.sensorSignature.length() - 1).append(GDE.STRING_RIGHT_BRACKET);
-			fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
-			fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
-
-			if (HoTTbinReader.log.isLoggable(Level.FINE)) for (Entry<String, String> entry : fileInfo.entrySet()) {
-				HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
-				HoTTbinReader.log.log(Level.FINE, file.getName() + " - " + "sensor count = " + sensorCount);
-			}
+			if (HoTTbinReader.log.isLoggable(Level.FINE)) 
+				for (Entry<String, String> entry : fileInfo.entrySet()) {
+					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
+					HoTTbinReader.log.log(Level.FINE, file.getName() + " - " + "sensor count = " + sensorCount);
+				} 
 		}
 		finally {
 			if (data_in != null) data_in.close();
@@ -405,14 +447,14 @@ public class HoTTbinReader {
 					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
-				//check for event character
-				if (warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
-					warningKeepCounter = 100; //keep detected warning to make it visible in graphics
-					if (log.isLoggable(Level.OFF)) 
-						log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = HoTTbinReader.buf[32])+64));
-				}
-				else {
-					--warningKeepCounter;
+				if (HoTTAdapter.isChannelsChannelEnabled) {	//check for event character
+					if ((HoTTbinReader.buf[32] & 0x7F) != 0 && warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
+						warningKeepCounter = 100; //keep detected warning to make it visible in graphics
+						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = (byte) (HoTTbinReader.buf[32] & 0x7F)) + 64));
+					}
+					else {
+						--warningKeepCounter;
+					} 
 				}
 
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { // switch
@@ -812,7 +854,7 @@ public class HoTTbinReader {
 		HoTTbinReader.recordSetEAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
 		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-		HoTTbinReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
+		HoTTbinReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16 19=PowerOff 20=BattLow 21=Reset 22=Warning
 		HoTTbinReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperaure
 		HoTTbinReader.pointsReceiver = new int[10];
 		HoTTbinReader.pointsGAM = new int[26];
@@ -899,14 +941,14 @@ public class HoTTbinReader {
 					HoTTbinReader.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
-				//check for event character
-				if (warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
-					warningKeepCounter = 100; //keep detected warning to make it visible in graphics
-					if (log.isLoggable(Level.OFF)) 
-						log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = HoTTbinReader.buf[32])+64));
-				}
-				else {
-					--warningKeepCounter;
+				if (HoTTAdapter.isChannelsChannelEnabled) {	//check for event character
+					if ((HoTTbinReader.buf[32] & 0x7F) != 0 && warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
+						warningKeepCounter = 100; //keep detected warning to make it visible in graphics
+						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = (byte) (HoTTbinReader.buf[32] & 0x7F)) + 64));
+					}
+					else {
+						--warningKeepCounter;
+					} 
 				}
 
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { // switch into text modus
@@ -1741,5 +1783,31 @@ public class HoTTbinReader {
 			startTimeStamp = file.lastModified();
 		}
 		return startTimeStamp;
+	}
+	
+	/**
+	 * check if file time stamp match log internal recorded start time and replace if required
+	 * @param formattedLogStartTime
+	 * @param fileStartTimeStamp_ms
+	 * @return
+	 */
+	protected static long getStartTimeStamp(String formattedLogStartTime, long fileStartTimeStamp_ms) {
+		long startTimeStamp_ms = fileStartTimeStamp_ms;
+		String formattedFileStartTimeStamp = StringHelper.getFormatedTime("YYYY-MM-dd HH:mm:ss.SSS", fileStartTimeStamp_ms);
+		
+		if (!formattedFileStartTimeStamp.contains(formattedLogStartTime)) {		//LOG START TIME  : 15:08:28
+
+			int year = Integer.parseInt(formattedFileStartTimeStamp.substring(0,4));
+			int month = Integer.parseInt(formattedFileStartTimeStamp.substring(5, 7));
+			int day = Integer.parseInt(formattedFileStartTimeStamp.substring(8, 10));
+			
+			int hour = Integer.parseInt(formattedLogStartTime.substring(0, 2));
+			int minute = Integer.parseInt(formattedLogStartTime.substring(3, 5));
+			int second = Integer.parseInt(formattedLogStartTime.substring(6, 8));
+
+			GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
+			fileStartTimeStamp_ms = calendar.getTimeInMillis();
+		}
+		return startTimeStamp_ms;
 	}
 }

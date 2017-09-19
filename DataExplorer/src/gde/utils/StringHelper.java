@@ -698,6 +698,20 @@ public class StringHelper {
 	}
 
 	/**
+	 * convert a byte array into a 2 hex character string representation
+	 * @param bytes
+	 * @param size
+	 * @return string with converted characters
+	 */
+	public static String byte2Hex2CharString(byte[] bytes, int start, int size) {
+		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%3d", size)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
+		for (int i = start; i < start+size; i++) {
+			sb.append(String.format(" %02X", bytes[i])); //$NON-NLS-1$
+		}
+		return sb.toString();
+	}
+
+	/**
 	 * convert a byte array into a decimal string representation
 	 * @param bytes
 	 * @return string with converted characters

@@ -146,14 +146,15 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 				
-				//check for event character
-				if (warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
-					warningKeepCounter = 100; //keep detected warning to make it visible in graphics
-					if (log.isLoggable(Level.OFF)) 
-						log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = HoTTbinReader.buf[32])+64));
-				}
-				else {
-					--warningKeepCounter;
+				if (channelNumber == 4) {					//check for event character
+					if ((HoTTbinReader.buf[32] & 0x7F) != 0 && warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
+						warningKeepCounter = 100; //keep detected warning to make it visible in graphics
+						if (log.isLoggable(Level.FINE)) 
+							log.log(Level.FINE, String.format("Event '%c' detected", (lastWarningDetected = (byte) (HoTTbinReader.buf[32] & 0x7F)) + 64));
+					}
+					else {
+						--warningKeepCounter;
+					} 
 				}
 
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
@@ -483,16 +484,16 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.logger.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 				
-				//check for event character
-				if (warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
-					warningKeepCounter = 100; //keep detected warning to make it visible in graphics
-					if (log.isLoggable(Level.OFF)) 
-						log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = HoTTbinReader.buf[32])+64));
+				if (channelNumber == 4) {					//check for event character
+					if ((HoTTbinReader.buf[32] & 0x7F) != 0 && warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
+						warningKeepCounter = 100; //keep detected warning to make it visible in graphics
+						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = (byte) (HoTTbinReader.buf[32] & 0x7F)) + 64));
+					}
+					else {
+						--warningKeepCounter;
+					} 
 				}
-				else {
-					--warningKeepCounter;
-				}
-
+				
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
 						if (HoTTbinReader2.logger.isLoggable(Level.FINE))

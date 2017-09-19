@@ -1564,8 +1564,11 @@ public class FileUtils {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
 		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		Vector<String> extensionFilter = new Vector<String>();
+		extensionFilter.addAll(Arrays.asList(device.getDeviceConfiguration().getDataBlockPreferredFileExtention().split(GDE.STRING_COMMA)));
+		extensionFilter.add(GDE.IS_WINDOWS ? GDE.FILE_ENDING_STAR_STAR : GDE.FILE_ENDING_STAR);
 		final FileDialog fd = DataExplorer.application.openFileOpenDialog(dialogTitleMessage,
-				new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(), (GDE.IS_WINDOWS ? GDE.FILE_ENDING_STAR_STAR : GDE.FILE_ENDING_STAR) }, searchDirectory, null, SWT.MULTI);
+				extensionFilter.toArray(new String[1]), searchDirectory, null, SWT.MULTI);
 
 		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.application.isObjectoriented())
 				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
