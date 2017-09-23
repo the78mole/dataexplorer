@@ -67,7 +67,7 @@ import gde.utils.WaitTimer;
  * @author Winfried Brügmann
  */
 public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
-	final static Logger logger = Logger.getLogger(HoTTAdapter2.class.getName());
+	final static Logger log = Logger.getLogger(HoTTAdapter2.class.getName());
 
 	/**
 	 * constructor using properties file
@@ -656,7 +656,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		int index = 0;
 		for (int i = 0; i < recordDataSize; i++) {
 			index = i * dataBufferSize + timeStampBufferSize;
-			if (HoTTAdapter2.logger.isLoggable(Level.FINER)) HoTTAdapter2.logger.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
 
 			for (int j = 0; j < points.length; j++) {
 				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8)
@@ -717,7 +717,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			HoTTAdapter2.logger.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -764,7 +764,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			newValue = (value - reduction) * factor + offset;
 		}
 
-		HoTTAdapter2.logger.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -798,7 +798,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			newValue = (value - offset) / factor + reduction;
 		}
 
-		HoTTAdapter2.logger.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -873,7 +873,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN) || !selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
 							log.log(Level.WARNING, String.format("skip selectedImportFile %s since it has not a supported file ending", selectedImportFile));
 						}
-						HoTTAdapter2.logger.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > MIN_FILENAME_LENGTH) {
 							Integer channelConfigNumber = HoTTAdapter2.this.application.getActiveChannelNumber();
@@ -889,7 +889,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 								if (!isInitialSwitched) {
 									Channel activeChannel = HoTTAdapter2.this.application.getActiveChannel();
 									HoTTbinReader2.channels.switchChannel(activeChannel.getName());
-									activeChannel.switchRecordSet(HoTTlogReader2.recordSet.getName());
+									if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
+										activeChannel.switchRecordSet(HoTTbinReader2.recordSet.getName());
+									}
+									else if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+										activeChannel.switchRecordSet(HoTTlogReader2.recordSet.getName());
+									}
 									isInitialSwitched = true;
 								}
 								else {
@@ -898,7 +903,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 								WaitTimer.delay(500);
 							}
 							catch (Exception e) {
-								HoTTAdapter2.logger.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+								log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 							}
 						}
 					}
@@ -930,7 +935,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					HoTTAdapter2.logger.log(java.util.logging.Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
 				}
 			});
@@ -940,7 +945,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					HoTTAdapter2.logger.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
 				}
 			});
@@ -950,7 +955,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					HoTTAdapter2.logger.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 				}
 			});
@@ -992,7 +997,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					HoTTAdapter2.logger.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					importDeviceData();
 				}
 			});

@@ -32,7 +32,7 @@
         <leader>$</leader>
         <trailer>0D0A</trailer>
         <preferredDataLocation></preferredDataLocation>
-        <preferredFileExtention>*.bin</preferredFileExtention>
+        <preferredFileExtention>*.bin,*.log</preferredFileExtention>
     </DataBlock>
     <State>
         <property name="state_data_recording" value="01" type="Integer"/>
@@ -1009,7 +1009,7 @@
                 <symbol>U_min</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <property name="scale_sync_ref_ordinal" value="24" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="29" type="Integer"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -1018,7 +1018,7 @@
                 <unit>A_max</unit>
                 <active>true</active>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
-                <property name="scale_sync_ref_ordinal" value="25" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="30" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute M_max</name>

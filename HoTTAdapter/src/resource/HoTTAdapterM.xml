@@ -32,7 +32,7 @@
         <leader>$</leader>
         <trailer>0D0A</trailer>
         <preferredDataLocation></preferredDataLocation>
-        <preferredFileExtention>*.bin</preferredFileExtention>
+        <preferredFileExtention>*.bin,*.log</preferredFileExtention>
     </DataBlock>
     <State>
         <property type="Integer" value="01" name="state_data_recording"/>

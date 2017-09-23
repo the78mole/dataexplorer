@@ -56,7 +56,7 @@ import gde.utils.WaitTimer;
  * @author Winfried Brügmann
  */
 public class HoTTAdapterD extends HoTTAdapter implements IDevice {
-	final static Logger									logger														= Logger.getLogger(HoTTAdapterD.class.getName());
+	final static Logger									log														= Logger.getLogger(HoTTAdapterD.class.getName());
 
 	/**
 	 * constructor using properties file
@@ -609,8 +609,8 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 		int index = 0;
 		for (int i = 0; i < recordDataSize; i++) {
 			index = i * dataBufferSize + timeStampBufferSize;
-			if (HoTTAdapterD.logger.isLoggable(Level.FINER))
-				HoTTAdapterD.logger.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINER))
+				log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
 			
 			for (int j = 0; j < points.length; j++) {
 				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8) + ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
@@ -652,7 +652,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			}
 		}
 		catch (RuntimeException e) {
-			HoTTAdapterD.logger.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -696,7 +696,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			newValue = (value - reduction) * factor + offset;
 		}
 		
-		HoTTAdapterD.logger.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -728,7 +728,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			newValue = (value - offset) / factor + reduction;
 		}
 
-		HoTTAdapterD.logger.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$		
+		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$		
 		return newValue;
 	}
 
@@ -795,24 +795,31 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 					HoTTAdapterD.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
-							}
-							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_BIN;
+						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN) || !selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+							log.log(Level.WARNING, String.format("skip selectedImportFile %s since it has not a supported file ending", selectedImportFile));
 						}
-						HoTTAdapterD.logger.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+						log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > MIN_FILENAME_LENGTH) {
 							Integer channelConfigNumber = HoTTAdapterD.this.application.getActiveChannelNumber();
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 							try {
-								HoTTbinReaderD.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
+									HoTTbinReaderD.read(selectedImportFile);
+								}
+								else if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+									HoTTlogReaderD.read(selectedImportFile);
+								}
 								if (!isInitialSwitched) {
 									Channel activeChannel = HoTTAdapterD.this.application.getActiveChannel();
 									HoTTbinReaderD.channels.switchChannel(activeChannel.getName());
-									activeChannel.switchRecordSet(HoTTbinReaderD.recordSet.getName());
+									if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
+										activeChannel.switchRecordSet(HoTTbinReaderD.recordSet.getName());
+									}
+									else if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+										activeChannel.switchRecordSet(HoTTlogReaderD.recordSet.getName());
+									}
 									isInitialSwitched = true;
 								}
 								else {
@@ -821,7 +828,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 								WaitTimer.delay(500);
 							}
 							catch (Exception e) {
-								HoTTAdapterD.logger.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+								log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 							}
 						}
 					}
@@ -850,7 +857,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2405));
 			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					HoTTAdapterD.logger.log(java.util.logging.Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
 				}
 			});
@@ -859,7 +866,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2406));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					HoTTAdapterD.logger.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
 				}
 			});
@@ -868,7 +875,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2407));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					HoTTAdapterD.logger.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 				}
 			});
@@ -891,7 +898,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT2416));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event e) {
-					HoTTAdapterD.logger.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
+					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					importDeviceData();
 				}
 			});

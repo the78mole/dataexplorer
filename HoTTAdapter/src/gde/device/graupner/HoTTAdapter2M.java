@@ -83,7 +83,7 @@ public class HoTTAdapter2M extends HoTTAdapter2 {
 			}
 		}
 		catch (RuntimeException e) {
-			HoTTAdapter2.logger.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
 	}
@@ -116,7 +116,7 @@ public class HoTTAdapter2M extends HoTTAdapter2 {
 			newValue = (value - reduction) * factor + offset;
 		}
 
-		HoTTAdapter2.logger.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -148,7 +148,7 @@ public class HoTTAdapter2M extends HoTTAdapter2 {
 			newValue = (value - offset) / factor + reduction;
 		}
 
-		HoTTAdapter2.logger.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 

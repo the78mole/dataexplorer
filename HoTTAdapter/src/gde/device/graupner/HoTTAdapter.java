@@ -1220,11 +1220,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
-						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
-							}
-							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_BIN;
+						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN) || !selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+							log.log(Level.WARNING, String.format("skip selectedImportFile %s since it has not a supported file ending", selectedImportFile));
 						}
 						HoTTAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
@@ -1233,7 +1230,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							// String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 							try {
-								HoTTbinReader.read(selectedImportFile); // , HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
+									HoTTbinReader.read(selectedImportFile);
+								}
+								else if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+									HoTTlogReader.read(selectedImportFile);
+								}
 								if (!isInitialSwitched) {
 									if (HoTTAdapter.this.application.getActiveChannel().getActiveRecordSet() == null) {
 										Channel selectedChannel = Settings.getInstance().isFirstRecordSetChoice() ? HoTTAdapter.this.channels.get(1) : HoTTAdapter.this.application.getActiveChannel();

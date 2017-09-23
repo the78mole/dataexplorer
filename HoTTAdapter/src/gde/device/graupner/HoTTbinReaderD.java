@@ -1013,7 +1013,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsGPS[21] = DataParser.parse2Short(_buf3, 6) * 1000;
 			HoTTbinReader.pointsGPS[22] = (_buf3[8] & 0xFF) * 1000;
 			if (!HoTTbinReaderD.isGpsStartTimeSet) {
-				HoTTbinReaderD.gpsStartTime = getStartTime(_buf3[9], _buf4[0], _buf4[1], _buf4[2]);
+				HoTTbinReaderD.gpsStartTime = getStartTime(_buf3[9]&0xFF, _buf4[0]&0xFF, _buf4[1]&0xFF, _buf4[2]&0xFF);
 				HoTTbinReader.log.log(Level.FINE, String.format("%02d:%02d:%02d.%03d", (_buf3[9] & 0xFF), (_buf4[0] & 0xFF), (_buf4[1] & 0xFF), (_buf4[2] & 0xFF)));
 				HoTTbinReaderD.isGpsStartTimeSet = true;
 				final RecordSet activeRecordSet = HoTTbinReader.application.getActiveRecordSet();
@@ -1023,7 +1023,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 				}
 			}
 			//System.out.println(String.format("%02d:%02d:%02d.%03d - %d",(_buf3[9] & 0xFF),(_buf4[0] & 0xFF),(_buf4[1] & 0xFF),(_buf4[2] & 0xFF), (getStartTime(_buf3[9],_buf4[0],_buf4[1],_buf4[2]) - gpsStartTime)));
-			HoTTbinReader.pointsGPS[23] = getStartTime(_buf3[9], _buf4[0], _buf4[1], _buf4[2]) - HoTTbinReaderD.gpsStartTime;
+			HoTTbinReader.pointsGPS[23] = getStartTime(_buf3[9]&0xFF, _buf4[0]&0xFF, _buf4[1]&0xFF, _buf4[2]&0xFF) - HoTTbinReaderD.gpsStartTime;
 			HoTTbinReader.pointsGPS[24] = DataParser.parse2Short(_buf4, 3) * 1000;
 			HoTTbinReader.pointsGPS[25] = (_buf4[5] & 0xFF) * 1000;
 			HoTTbinReader.pointsGPS[26] = DataParser.parse2Short(_buf4, 6) * 1000;
@@ -1041,7 +1041,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.pointsGPS[129] = (_buf1[1] & 0x0F) * 1000; //inverse event
 	}
 
-	private static int getStartTime(byte HH, byte mm, byte ss, byte SSS) {
+	private static int getStartTime(int HH, int mm, int ss, int SSS) {
 		try {
 			return Integer.valueOf(String.format("%02d%02.0f%02.0f%03d", HH, 100.0 / 60 * mm, 100.0 / 60 * ss, SSS));
 		}
