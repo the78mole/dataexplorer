@@ -144,9 +144,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			tmpRecordSet = channel.get(recordSetName);
 			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 			tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
-			if (HoTTbinReader.application.getMenuToolBar() != null) {
-				channel.applyTemplate(recordSetName, false);
-			}
 			//recordSet initialized and ready to add data
 
 			//read all the data blocks from the file and parse
@@ -396,6 +393,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 				HoTTbinReader.application.setProgress(99, sThreadId);
 				device.makeInActiveDisplayable(HoTTbinReaderD.recordSet);
 				device.updateVisibilityStatus(HoTTbinReaderD.recordSet, true);
+				channel.applyTemplate(recordSetName, false);
 
 				//write filename after import to record description
 				HoTTbinReaderD.recordSet.descriptionAppendFilename(file.getName());
@@ -501,9 +499,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			tmpRecordSet = channel.get(recordSetName);
 			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 			tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
-			if (HoTTbinReader.application.getMenuToolBar() != null) {
-				channel.applyTemplate(recordSetName, false);
-			}
 			//recordSet initialized and ready to add data
 
 			//read all the data blocks from the file and parse
@@ -767,6 +762,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 					device.makeInActiveDisplayable(HoTTbinReaderD.recordSet);
 				}
 				device.updateVisibilityStatus(HoTTbinReaderD.recordSet, true);
+				channel.applyTemplate(recordSetName, false);
 
 				//write filename after import to record description
 				HoTTbinReaderD.recordSet.descriptionAppendFilename(file.getName());

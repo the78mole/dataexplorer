@@ -339,27 +339,27 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(i + Record.IS_START_END_DEFINED, Boolean.valueOf(record.isStartEndDefined()).toString());
 				this.template.setProperty(i + Record.DEFINED_MAX_VALUE, Double.valueOf(record.getMaxScaleValue()).toString());
 				this.template.setProperty(i + Record.DEFINED_MIN_VALUE, Double.valueOf(record.getMinScaleValue()).toString());
-				//smooth current drop
-				this.template.setProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, Boolean.toString(recordSet.isSmoothAtCurrentDrop()));
-				recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
-				//smooth voltage curve
-				this.template.setProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, Boolean.toString(recordSet.isSmoothAtCurrentDrop()));
-				recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
-				// time grid
-				color = recordSet.getColorTimeGrid();
-				rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
-				this.template.setProperty(RecordSet.TIME_GRID_COLOR, rgb);
-				this.template.setProperty(RecordSet.TIME_GRID_LINE_STYLE, Integer.valueOf(recordSet.getLineStyleTimeGrid()).toString());
-				this.template.setProperty(RecordSet.TIME_GRID_TYPE, Integer.valueOf(recordSet.getTimeGridType()).toString());
-				// curve grid
-				color = recordSet.getHorizontalGridColor();
-				rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
-				this.template.setProperty(RecordSet.HORIZONTAL_GRID_COLOR, rgb);
-				this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, Integer.valueOf(recordSet.getHorizontalGridLineStyle()).toString());
-				this.template.setProperty(RecordSet.HORIZONTAL_GRID_TYPE, Integer.valueOf(recordSet.getHorizontalGridType()).toString());
-				if (recordSet.get(recordSet.getHorizontalGridRecordOrdinal()) != null) {
-					this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, GDE.STRING_EMPTY + recordSet.getHorizontalGridRecordOrdinal());
-				}
+			}
+			//smooth current drop
+			this.template.setProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, Boolean.toString(recordSet.isSmoothAtCurrentDrop()));
+			recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
+			//smooth voltage curve
+			this.template.setProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, Boolean.toString(recordSet.isSmoothAtCurrentDrop()));
+			recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
+			// time grid
+			Color color = recordSet.getColorTimeGrid();
+			String rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
+			this.template.setProperty(RecordSet.TIME_GRID_COLOR, rgb);
+			this.template.setProperty(RecordSet.TIME_GRID_LINE_STYLE, Integer.valueOf(recordSet.getLineStyleTimeGrid()).toString());
+			this.template.setProperty(RecordSet.TIME_GRID_TYPE, Integer.valueOf(recordSet.getTimeGridType()).toString());
+			// curve grid
+			color = recordSet.getHorizontalGridColor();
+			rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
+			this.template.setProperty(RecordSet.HORIZONTAL_GRID_COLOR, rgb);
+			this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, Integer.valueOf(recordSet.getHorizontalGridLineStyle()).toString());
+			this.template.setProperty(RecordSet.HORIZONTAL_GRID_TYPE, Integer.valueOf(recordSet.getHorizontalGridType()).toString());
+			if (recordSet.get(recordSet.getHorizontalGridRecordOrdinal()) != null) {
+				this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, GDE.STRING_EMPTY + recordSet.getHorizontalGridRecordOrdinal());
 			}
 			this.template.store();
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "creating graphics template file " + Settings.getInstance().getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
@@ -380,11 +380,11 @@ public class Channel extends HashMap<String, RecordSet> {
 				if (this.template != null) this.template.load();
 				if (this.template != null && this.template.isAvailable()) {
 					log.log(Level.FINER, "name = " + this.template.getDefaultFileName());
+					int r, g, b;
 					for (int i = 0; i < recordSet.realSize(); ++i) {
 						Record record = recordSet.get(i);
 						record.setVisible(Boolean.valueOf(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
 						record.setPositionLeft(Boolean.valueOf(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"))); //$NON-NLS-1$
-						int r, g, b;
 						String color = this.template.getProperty(i + Record.COLOR, record.getRGB());
 						r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
 						g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
@@ -397,28 +397,28 @@ public class Channel extends HashMap<String, RecordSet> {
 						record.setStartEndDefined(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), new Double(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")) //$NON-NLS-1$ //$NON-NLS-2$
 								.doubleValue(), new Double(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "0")).doubleValue()); //$NON-NLS-1$
 						record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
-						//smooth current drop
-						recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
-						//smooth voltage curve
-						recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
-						// time grid
-						color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-						r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-						g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-						b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-						recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
-						recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-						recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-						// curve grid
-						color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-						r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-						g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-						b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-						recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
-						recordSet.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-						recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-						recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
 					}
+					//smooth current drop
+					recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
+					//smooth voltage curve
+					recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
+					// time grid
+					String color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
+					recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+					recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+					// curve grid
+					color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+					recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
+					recordSet.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+					recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+					recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
 				}
 			}
 			else { //take over values from last active record set
@@ -472,12 +472,12 @@ public class Channel extends HashMap<String, RecordSet> {
 		this.activeRecordSet = this.application.getActiveRecordSet();
 		if (recordSet != null) {
 			if (this.template != null) this.template.load();
+			int r, g, b;
 			if (this.template != null && this.template.isAvailable()) {
 				for (int i = 0; i < recordSet.size(); ++i) {
 					Record record = recordSet.get(i);
 					record.setVisible(Boolean.valueOf(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
 					record.setPositionLeft(Boolean.valueOf(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"))); //$NON-NLS-1$
-					int r, g, b;
 					String color = this.template.getProperty(i + Record.COLOR, record.getRGB());
 					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
 					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
@@ -487,30 +487,38 @@ public class Channel extends HashMap<String, RecordSet> {
 					record.setLineStyle(Integer.valueOf(this.template.getProperty(i + Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID)).intValue());
 					record.setRoundOut(Boolean.valueOf(this.template.getProperty(i + Record.IS_ROUND_OUT, "false"))); //$NON-NLS-1$
 					record.setStartpointZero(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_POINT_ZERO, "false"))); //$NON-NLS-1$
+					if (Boolean.valueOf(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false"))) {
+						System.out.println(i);
+					}
 					record.setStartEndDefined(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), new Double(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")) //$NON-NLS-1$ //$NON-NLS-2$
 							.doubleValue(), new Double(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "0")).doubleValue()); //$NON-NLS-1$
 					record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
-					//smooth current drop
-					recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
-					//smooth voltage curve
-					recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
-					// time grid
-					color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-					recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
-					recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-					recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-					// curve grid
-					color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-					recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
-					recordSet.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-					recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+				}
+				//smooth current drop
+				recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
+				//smooth voltage curve
+				recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
+				// time grid
+				String color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+				r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+				g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+				b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+				recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
+				recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+				recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+				// curve grid
+				color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+				r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+				g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+				b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+				recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
+				recordSet.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+				recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+				if (recordSet.get(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()).isVisible) {
 					recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
+				}
+				else {
+					recordSet.setHorizontalGridRecordOrdinal(findFirstVisibleRecord(recordSet)); //$NON-NLS-1$
 				}
 				recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
@@ -522,6 +530,19 @@ public class Channel extends HashMap<String, RecordSet> {
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param recordSet
+	 * @return the first visible recordSet record ordinal if horizontal grid is not defined
+	 */
+	protected int findFirstVisibleRecord(RecordSet recordSet) {
+		int j = 0;
+		for (; j < recordSet.size(); j++) {
+			if (recordSet.get(j).isVisible)
+				break;
+		}
+		return j;
 	}
 
 	/**

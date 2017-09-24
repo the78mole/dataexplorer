@@ -127,9 +127,6 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 			tmpRecordSet = channel.get(recordSetName);
 			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 			tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
-			if (HoTTbinReader.application.getMenuToolBar() != null) {
-				channel.applyTemplate(recordSetName, false);
-			}
 			//recordSet initialized and ready to add data
 
 			//read all the data blocks from the file and parse
@@ -278,6 +275,7 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 				HoTTbinReader.application.setProgress(99, sThreadId);
 				device.makeInActiveDisplayable(HoTTlogReaderD.recordSet);
 				device.updateVisibilityStatus(HoTTlogReaderD.recordSet, true);
+				channel.applyTemplate(recordSetName, false);
 
 				//write filename after import to record description
 				HoTTlogReaderD.recordSet.descriptionAppendFilename(file.getName());
@@ -302,18 +300,19 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 		//10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
 		//sensor byte: 26=sensor byte
 		//27=inverseBits 28,29=altitude 30,31=altitude_max 32,33=altitude_min 34,35=climb1 36,37=climb3 38,39=climb10
-		values[0] = (_buf[16] & 0xFF) * 1000; 
-		HoTTbinReader.tmpHeight = isHoTTAdapter2 ? DataParser.parse2Short(_buf, 28) - 500 : DataParser.parse2Short(_buf, 28);
-		values[1] = HoTTbinReader.tmpHeight * 1000;
-		//pointsVarioMax = DataParser.parse2Short(buf1, 30) * 1000;
-		//pointsVarioMin = DataParser.parse2Short(buf1, 32) * 1000;
-		values[2] = (DataParser.parse2UnsignedShort(_buf, 34) - 30000) * 10;
-		HoTTbinReader.tmpClimb10 = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf , 38) - 30000) * 10 : DataParser.parse2UnsignedShort(_buf , 38) + 1000;
-		values[3] = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf, 36) - 30000) * 10 : DataParser.parse2UnsignedShort(_buf, 36) * 1000;
-		values[4] = HoTTbinReader.tmpClimb10;
-		values[5] = (_buf[13] & 0xFF) * 1000;				//voltageRx
-		values[6] = ((_buf[14] & 0xFF) - 20) * 1000;//temperaturRx
-		values[7] = (_buf[27] & 0x3F) * 1000; 			//inverse event
+		HoTTlogReader.parseVario(_buf, values, isHoTTAdapter2);
+//		values[0] = (_buf[16] & 0xFF) * 1000; 
+//		HoTTbinReader.tmpHeight = isHoTTAdapter2 ? DataParser.parse2Short(_buf, 28) - 500 : DataParser.parse2Short(_buf, 28);
+//		values[1] = HoTTbinReader.tmpHeight * 1000;
+//		//pointsVarioMax = DataParser.parse2Short(buf1, 30) * 1000;
+//		//pointsVarioMin = DataParser.parse2Short(buf1, 32) * 1000;
+//		values[2] = (DataParser.parse2UnsignedShort(_buf, 34) - 30000) * 10;
+//		HoTTbinReader.tmpClimb10 = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf , 38) - 30000) * 10 : DataParser.parse2UnsignedShort(_buf , 38) + 1000;
+//		values[3] = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf, 36) - 30000) * 10 : DataParser.parse2UnsignedShort(_buf, 36) * 1000;
+//		values[4] = HoTTbinReader.tmpClimb10;
+//		values[5] = (_buf[13] & 0xFF) * 1000;				//voltageRx
+//		values[6] = ((_buf[14] & 0xFF) - 20) * 1000;//temperaturRx
+//		values[7] = (_buf[27] & 0x3F) * 1000; 			//inverse event
 
 		//if ((_buf[40] & 0xFF) == 0xFF) { // gyro receiver
 			//96=Test 00, 97=Test 01, 98=Test 02, ... , 108=Test 12
@@ -339,32 +338,33 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 		//27,28=InverseBits 29=moveDirection 30,31=speed 32,33,34,35,36=latitude 37,38,39,40,41=longitude 42,43=distanceStart 44,45=altitude
 		//46,47=climb1 48=climb3 49=#satellites 50=GPS-Fix 51=homeDirection 52,53=northVelocity 54=hAcc 55-58=GPStime 59,60=eastVelocity
 		//61=hAcc 62-65=freeChars 66=version
-		values[0] = (_buf[16] & 0xFF) * 1000; 
-		HoTTbinReader.tmpHeight = isHoTTAdapter2 ? DataParser.parse2Short(_buf, 44) - 500 : DataParser.parse2Short(_buf, 44);
-		HoTTbinReader.tmpClimb1 = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf, 46) - 30000) : DataParser.parse2UnsignedShort(_buf, 46);
-		HoTTbinReader.tmpClimb3 = isHoTTAdapter2 ? (_buf[48] & 0xFF) - 120 : (_buf[48] & 0xFF);
-		HoTTbinReader.tmpVelocity = DataParser.parse2Short(_buf, 30) * 1000;
-		values[6] = HoTTbinReader.tmpVelocity;
-		HoTTbinReader.tmpLatitude = DataParser.parse2Short(_buf, 33) * 10000 + DataParser.parse2Short(_buf, 35);
-		values[1] = HoTTbinReader.tmpLatitude;
-		HoTTbinReader.tmpLongitude = DataParser.parse2Short(_buf, 38) * 10000 + DataParser.parse2Short(_buf, 40);
-		values[2] = HoTTbinReader.tmpLongitude;
-		values[3] = HoTTbinReader.tmpHeight * 1000;		//altitude
-		values[4] = HoTTbinReader.tmpClimb1 * 10;			//climb1
-		values[5] = HoTTbinReader.tmpClimb3 * 1000;		//climb3
-		values[7] = DataParser.parse2Short(_buf, 42) * 1000;
-		values[8] = (_buf[51] & 0xFF) * 1000;
-		values[9] = 0; 																//trip length
-		values[10] = (_buf[13] & 0xFF) * 1000;				//voltageRx
-		values[11] = ((_buf[14] & 0xFF) - 20) * 1000;	//temperaturRx
-		values[12] = (_buf[49] & 0xFF) * 1000;
-		try {
-			values[13] = Integer.valueOf(String.format("%c", _buf[50])) * 1000;
-		}
-		catch (NumberFormatException e1) {
-			//ignore;
-		}
-		values[14] = (_buf[27] & 0x0F) * 1000; //inverse event
+		HoTTlogReader.parseGPS(_buf, values, isHoTTAdapter2);
+//		values[0] = (_buf[16] & 0xFF) * 1000; 
+//		HoTTbinReader.tmpHeight = isHoTTAdapter2 ? DataParser.parse2Short(_buf, 44) - 500 : DataParser.parse2Short(_buf, 44);
+//		HoTTbinReader.tmpClimb1 = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf, 46) - 30000) : DataParser.parse2UnsignedShort(_buf, 46);
+//		HoTTbinReader.tmpClimb3 = isHoTTAdapter2 ? (_buf[48] & 0xFF) - 120 : (_buf[48] & 0xFF);
+//		HoTTbinReader.tmpVelocity = DataParser.parse2Short(_buf, 30) * 1000;
+//		values[6] = HoTTbinReader.tmpVelocity;
+//		HoTTbinReader.tmpLatitude = DataParser.parse2Short(_buf, 33) * 10000 + DataParser.parse2Short(_buf, 35);
+//		values[1] = HoTTbinReader.tmpLatitude;
+//		HoTTbinReader.tmpLongitude = DataParser.parse2Short(_buf, 38) * 10000 + DataParser.parse2Short(_buf, 40);
+//		values[2] = HoTTbinReader.tmpLongitude;
+//		values[3] = HoTTbinReader.tmpHeight * 1000;		//altitude
+//		values[4] = HoTTbinReader.tmpClimb1 * 10;			//climb1
+//		values[5] = HoTTbinReader.tmpClimb3 * 1000;		//climb3
+//		values[7] = DataParser.parse2Short(_buf, 42) * 1000;
+//		values[8] = (_buf[51] & 0xFF) * 1000;
+//		values[9] = 0; 																//trip length
+//		values[10] = (_buf[13] & 0xFF) * 1000;				//voltageRx
+//		values[11] = ((_buf[14] & 0xFF) - 20) * 1000;	//temperaturRx
+//		values[12] = (_buf[49] & 0xFF) * 1000;
+//		try {
+//			values[13] = Integer.valueOf(String.format("%c", _buf[50])) * 1000;
+//		}
+//		catch (NumberFormatException e1) {
+//			//ignore;
+//		}
+//		values[14] = (_buf[27] & 0x0F) * 1000; //inverse event
 		
 		//sensor byte: 26=sensor byte
 		//27,28=InverseBits 29=moveDirection 30,31=speed 32,33,34,35,36=latitude 37,38,39,40,41=longitude 42,43=distanceStart 44,45=altitude

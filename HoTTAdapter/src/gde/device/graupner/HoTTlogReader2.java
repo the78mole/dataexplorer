@@ -123,9 +123,6 @@ public class HoTTlogReader2 extends HoTTlogReader {
 			tmpRecordSet = channel.get(recordSetName);
 			tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
 			tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
-			if (HoTTbinReader.application.getMenuToolBar() != null) {
-				channel.applyTemplate(recordSetName, false);
-			}
 			//recordSet initialized and ready to add data
 
 			//read all the data blocks from the file and parse
@@ -274,6 +271,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 				HoTTbinReader.application.setProgress(99, sThreadId);
 				device.makeInActiveDisplayable(HoTTlogReader2.recordSet);
 				device.updateVisibilityStatus(HoTTlogReader2.recordSet, true);
+				channel.applyTemplate(recordSetName, false);
 
 				//write filename after import to record description
 				HoTTlogReader2.recordSet.descriptionAppendFilename(file.getName());
