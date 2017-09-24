@@ -635,15 +635,27 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				int ordinal = record.getOrdinal();
-				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
+				//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx_dbm, 5=Rx_dbm, 6=VoltageRx, 7=TemperatureRx 
 				//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 				//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
-				//18=VoltageGen, 19=CurrentGen, 20=CapacityGen, 21=PowerGen, 22=BalanceGen, 23=CellVoltageGen 1, 24=CellVoltageGen 2 .... 28=CellVoltageGen 6, 29=Revolution, 30=FuelLevel, 31=VoltageGen 1, 32=VoltageGen 2, 33=TemperatureGen 1, 34=TemperatureGen 2
-				//35=VoltageGen, 36=CurrentGen, 37=CapacityGen, 38=PowerGen, 39=BalanceGen, 40=CellVoltageGen 1, 41=CellVoltageGen 2 .... 53=CellVoltageGen 14, 54=VoltageGen 1, 55=VoltageGen 2, 56=TemperatureGen 1, 57=TemperatureGen 2 
+				//18=GPS.Satelites, 19=GPS.Fix, 20=HomeDirection, 21=NorthVelocity, 22=SpeedAccuracy, 23=GPS.Time, 24=EastVelocity, 25=HorizontalAccuracy, 26=Altitude, 27=GPS.Fix2, 28=Version
+				//29=VoltageG, 30=CurrentG, 31=CapacityG, 32=PowerG, 33=BalanceG, 34=CellVoltageG 1, 35=CellVoltageG 2 .... 39=CellVoltageG 6, 40=Revolution, 41=FuelLevel, 42=VoltageG 1, 43=VoltageG 2, 44=TemperatureG 1, 45=TemperatureG 2
+				//46=VoltageE, 47=CurrentE, 48=CapacityE, 49=PowerE, 50=BalanceE, 51=CellVoltageE 1, 52=CellVoltageE 2 .... 64=CellVoltageE 14, 65=Revolution, 66=VoltageE 1, 67=VoltageE 2, 68=TemperatureE 1, 69=TemperatureE 2
+				//70=VoltageM, 71=CurrentM, 72=CapacityM, 73=PowerM, 74=RevolutionM, 75=TemperatureM
+				//76=Ch 1, 77=Ch 2 , 78=Ch 3 .. 91=Ch 16 92=PowerOff, 93=BattLow, 94=Reset, 95=warning
+				//96=Test 00 97=Test 01.. 108=Test 12
+				//109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm, 112=DiffDistance, 113=LapsDistance		
+				//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E 
+				//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
+				//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC 
 
 				if (ordinal >= 0 && ordinal <= 5){
 					dataTableRow[index + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0));
+				}
+				else if (ordinal == 95) { //Warning
+					dataTableRow[index + 1] = record.realGet(rowIndex) == 0 
+							? GDE.STRING_EMPTY 
+									: String.format("'%c'", ((record.realGet(rowIndex) / 1000)+64));
 				}
 				else {
 					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);

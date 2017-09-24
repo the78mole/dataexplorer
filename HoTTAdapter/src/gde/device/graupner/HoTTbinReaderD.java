@@ -90,8 +90,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		boolean isSensorData = false;
 		HoTTbinReaderD.isGpsStartTimeSet = false;
 		HoTTbinReaderD.recordSet = null;
-		byte lastWarningDetected = 0;
-		int warningKeepCounter = 1;
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -154,16 +152,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 					HoTTbinReaderD.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 				
-				//check for event character
-				if (warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
-					warningKeepCounter = 100; //keep detected warning to make it visible in graphics
-					if (log.isLoggable(Level.OFF)) 
-						log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = HoTTbinReader.buf[32])+64));
-				}
-				else {
-					--warningKeepCounter;
-				}
-
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx		
 						if (HoTTbinReaderD.logger.isLoggable(Level.FINER))
@@ -181,7 +169,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 							parseReceiver(HoTTbinReader.buf);
 							isReceiverData = true;
 						}
-						HoTTbinReader.buf[32] = lastWarningDetected;
 						parseChannel(HoTTbinReader.buf); //Channels
 
 						//fill data block 0 receiver voltage an temperature
@@ -364,8 +351,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						++countPackageLoss; // add up lost packages in telemetry data 
 						++HoTTbinReader.countLostPackages;
 						//HoTTbinReaderD.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReaderD.timeStep_ms+10) / 10.0)*1000.0); 
-
-						HoTTbinReader.buf[32] = lastWarningDetected;
+						
 						parseChannel(HoTTbinReader.buf); //Channels
 						HoTTbinReaderD.recordSet.addPoints(HoTTbinReaderD.points, HoTTbinReader.timeStep_ms);
 						HoTTbinReader.timeStep_ms += 10;
@@ -438,8 +424,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReaderD.isGpsStartTimeSet = false;
 		HoTTbinReaderD.recordSet = null;
 		HoTTbinReaderD.isJustMigrated = false;
-		byte lastWarningDetected = 0;
-		int warningKeepCounter = 1;
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx_dbm, 5=Rx_dbm, 6=VoltageRx, 7=TemperatureRx 
 		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
@@ -509,16 +493,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 					HoTTbinReaderD.logger.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 				
-				//check for event character
-				if (warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
-					warningKeepCounter = 100; //keep detected warning to make it visible in graphics
-					if (HoTTbinReader.buf[32] != 0 && log.isLoggable(Level.OFF)) 
-						log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = HoTTbinReader.buf[32])+64));
-				}
-				else {
-					--warningKeepCounter;
-				}
-
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
 						if (HoTTbinReaderD.logger.isLoggable(Level.FINE))
@@ -536,7 +510,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 							parseReceiver(HoTTbinReader.buf);
 							isReceiverData = true;
 						}
-						HoTTbinReader.buf[32] = lastWarningDetected;
 						parseChannel(HoTTbinReader.buf);
 
 						if (actualSensor == -1)
@@ -727,7 +700,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						++HoTTbinReader.countLostPackages;
 						//HoTTbinReaderD.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReaderD.timeStep_ms+10) / 10.0)*1000.0); 
 
-						HoTTbinReader.buf[32] = lastWarningDetected;
 						parseChannel(HoTTbinReader.buf); //Channels
 						HoTTbinReaderD.recordSet.addPoints(HoTTbinReaderD.points, HoTTbinReader.timeStep_ms);
 						HoTTbinReader.timeStep_ms += 10;
@@ -1218,7 +1190,10 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReaderD.points[92] = (_buf[50] & 0x01) * 100000;
 		HoTTbinReaderD.points[93] = (_buf[50] & 0x02) * 50000;
 		HoTTbinReaderD.points[94] = (_buf[50] & 0x04) * 25000;
-		HoTTbinReaderD.points[95] = _buf[32] * 1000; //warning
+		if (_buf[32] > 0 && _buf[32] < 27)
+			HoTTbinReader2.points[95] = _buf[32] * 1000; //warning
+		else
+			HoTTbinReader2.points[95] = 0;
 	}
 
 	/**

@@ -383,8 +383,6 @@ public class HoTTbinReader {
 		HoTTbinReader.lostPackages.clear();
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isJustParsed = false;
-		byte lastWarningDetected = 0;
-		int warningKeepCounter = 1;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && !HoTTAdapter.isChannelsChannelEnabled ? 10 : 1);
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
@@ -445,16 +443,6 @@ public class HoTTbinReader {
 					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
-				if (HoTTAdapter.isChannelsChannelEnabled) {	//check for event character
-					if ((HoTTbinReader.buf[32] & 0x7F) != 0 && warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
-						warningKeepCounter = 100; //keep detected warning to make it visible in graphics
-						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = (byte) (HoTTbinReader.buf[32] & 0x7F)) + 64));
-					}
-					else {
-						--warningKeepCounter;
-					} 
-				}
-
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { // switch
 					// into
 					// text
@@ -473,7 +461,6 @@ public class HoTTbinReader {
 							parseAddReceiver(HoTTbinReader.buf);
 						}
 						if (HoTTAdapter.isChannelsChannelEnabled) {
-							HoTTbinReader.buf[32] = lastWarningDetected;
 							parseAddChannel(HoTTbinReader.buf);
 						}
 						if (HoTTbinReader.isReceiverOnly && !HoTTAdapter.isChannelsChannelEnabled) {
@@ -740,7 +727,6 @@ public class HoTTbinReader {
 						// ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0);
 
 						if (HoTTAdapter.isChannelsChannelEnabled) {
-							HoTTbinReader.buf[32] = lastWarningDetected;
 							parseAddChannel(HoTTbinReader.buf);
 						}
 
@@ -877,8 +863,6 @@ public class HoTTbinReader {
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
-		byte lastWarningDetected = 0;
-		int warningKeepCounter = 1;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
@@ -939,16 +923,6 @@ public class HoTTbinReader {
 					HoTTbinReader.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
-				if (HoTTAdapter.isChannelsChannelEnabled) {	//check for event character
-					if ((HoTTbinReader.buf[32] & 0x7F) != 0 && warningKeepCounter <= 0 || (HoTTbinReader.buf[32] != 0 && HoTTbinReader.buf[32] != lastWarningDetected)) {
-						warningKeepCounter = 100; //keep detected warning to make it visible in graphics
-						if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = (byte) (HoTTbinReader.buf[32] & 0x7F)) + 64));
-					}
-					else {
-						--warningKeepCounter;
-					} 
-				}
-
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { // switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { // buf 3, 4, tx,rx
 						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
@@ -964,7 +938,6 @@ public class HoTTbinReader {
 							parseAddReceiver(HoTTbinReader.buf);
 						}
 						if (HoTTAdapter.isChannelsChannelEnabled) {
-							HoTTbinReader.buf[32] = lastWarningDetected;
 							parseAddChannel(HoTTbinReader.buf);
 						}
 
@@ -1185,7 +1158,6 @@ public class HoTTbinReader {
 						// HoTTbinReader.pointsReceiver[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0);
 
 						if (HoTTAdapter.isChannelsChannelEnabled) {
-							HoTTbinReader.buf[32] = lastWarningDetected;
 							parseAddChannel(HoTTbinReader.buf);
 						}
 
@@ -1307,7 +1279,10 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsChannel[19] = (_buf[50] & 0x01) * 100000;
 		HoTTbinReader.pointsChannel[20] = (_buf[50] & 0x02) * 50000;
 		HoTTbinReader.pointsChannel[21] = (_buf[50] & 0x04) * 25000;
-		HoTTbinReader.pointsChannel[22] = _buf[32] * 1000; //warning
+		if (_buf[32] > 0 && _buf[32] < 27)
+			HoTTbinReader.pointsChannel[22] = _buf[32] * 1000; //warning
+		else
+			HoTTbinReader.pointsChannel[22] = 0;
 		
 		if (_buf[5] == 0x00) { // channel 9-12
 			HoTTbinReader.pointsChannel[11] = (DataParser.parse2UnsignedShort(_buf, 24) / 2) * 1000;

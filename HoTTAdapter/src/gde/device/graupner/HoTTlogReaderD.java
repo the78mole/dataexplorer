@@ -100,8 +100,6 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 		int[] valuesGAM = new int[26];
 		int[] valuesEAM = new int[31];
 		int[] valuesESC = new int[14];
-		byte lastWarningDetected = 0;
-		int warningKeepCounter = 1;
 		int logTimeStep = 1000/Integer.valueOf(fileInfoHeader.get("COUNTER").split("/")[1].split(GDE.STRING_BLANK)[0]);
 		ReverseChannelPackageLoss reverseChannelPackageLossCounter = new ReverseChannelPackageLoss(logTimeStep);
 		HoTTbinReader.isTextModusSignaled = false;
@@ -140,16 +138,6 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 				//Ph(D)[4], Evt1(H)[5], Evt2(D)[6], Fch(D)[7], TXdBm(-D)[8], RXdBm(-D)[9], RfRcvRatio(D)[10], TrnRcvRatio(D)[11]				
 				//STATUS : Ph(D)[4], Evt1(H)[5], Evt2(D)[6], Fch(D)[7], TXdBm(-D)[8], RXdBm(-D)[9], RfRcvRatio(D)[10], TrnRcvRatio(D)[11]
 				//S.INFOR : DEV(D)[22], CH(D)[23], SID(H)[24], WARN(H)[25]
-				//check for event character
-				if ((HoTTbinReader.buf[25] & 0x7F) != 0 && warningKeepCounter <= 0 || (HoTTbinReader.buf[25] != 0 && HoTTbinReader.buf[25] != lastWarningDetected)) {
-					warningKeepCounter = logTimeStep / 10; //keep detected warning to make it visible in graphics
-					if (log.isLoggable(Level.OFF)) {
-						log.log(Level.OFF, String.format("Event '%c' detected", (lastWarningDetected = (byte) (HoTTbinReader.buf[25] & 0x7F)) + 64));
-					}
-				}
-				else {
-					--warningKeepCounter;
-				}
 				//if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 				if (HoTTbinReader.buf[8] != 0 && HoTTbinReader.buf[9] != 0) { //buf 8, 9, tx,rx, rx sensitivity data
 					if (HoTTbinReader.buf[24] != 0x1F) {//rx sensitivity data
@@ -175,7 +163,6 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 						HoTTlogReaderD.points[9] = 0;
 					}
 
-					//HoTTbinReader.buf[25] = lastWarningDetected;
 					parseChannel(HoTTbinReader.buf, valuesChannel, numberLogChannels);
 					//in 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16 19=PowerOff 20=BattLow 21=Reset 22=Warning
 					//out 76=Ch 1, 77=Ch 2 , 78=Ch 3 .. 91=Ch 16 92=PowerOff, 93=BattLow, 94=Reset, 95=warning
@@ -247,7 +234,6 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 						HoTTlogReaderD.points[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
 						countPackageLoss+=1; // add up lost packages in telemetry data 
 
-						//HoTTbinReader.buf[25] = lastWarningDetected;
 						parseChannel(HoTTbinReader.buf, valuesChannel, numberLogChannels);
 						//in 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16 19=PowerOff 20=BattLow 21=Reset 22=Warning
 						//out 76=Ch 1, 77=Ch 2 , 78=Ch 3 .. 91=Ch 16 92=PowerOff, 93=BattLow, 94=Reset, 95=warning
