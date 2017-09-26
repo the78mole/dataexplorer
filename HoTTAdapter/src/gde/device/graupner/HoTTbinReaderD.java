@@ -1191,9 +1191,9 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReaderD.points[93] = (_buf[50] & 0x02) * 50000;
 		HoTTbinReaderD.points[94] = (_buf[50] & 0x04) * 25000;
 		if (_buf[32] > 0 && _buf[32] < 27)
-			HoTTbinReader2.points[95] = _buf[32] * 1000; //warning
+			HoTTbinReaderD.points[95] = _buf[32] * 1000; //warning
 		else
-			HoTTbinReader2.points[95] = 0;
+			HoTTbinReaderD.points[95] = 0;
 	}
 
 	/**
