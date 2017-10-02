@@ -1817,6 +1817,19 @@ public final class RecordSet extends AbstractRecordSet {
 	}
 
 	/**
+	 * query record with specified Record.DataType
+	 * @return record ordinal or -1 if not found
+	 */
+	public int getRecordOrdinalOfDataType(Record.DataType dataType) {
+		for (Record record : this.values()) {
+			if (record.dataType == dataType) {
+				return record.ordinal;
+			}
+		}
+		return -1;
+	}
+
+	/**
 	 * find the first occurrence of given unit samples and return the record ordinal
 	 * @param units string array of unit
 	 * @return record ordinal or -1 if not found

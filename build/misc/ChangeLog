@@ -14,8 +14,11 @@ HoTTAdapter*
 	* add missing measurements (GAM,EAM) and events(preliminary use inverse bits) to HoTTAdapter
 	* add missing measurements (GAM,EAM) and events(preliminary use inverse bits) to HoTTAdapter2
 	* add inverse bit alarms and warning
+	* add initial support for new log data format (*.log)
 Pulsar3
 	* add initial support, import and LogView
+Devo-Telemetry
+	* add initial support CSV import converted log data files
 
 Version 3.3.0 - 01 Jul 2017
 OVERVIEW:

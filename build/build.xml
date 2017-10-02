@@ -216,6 +216,7 @@
 		<ant antfile="build.xml" target="clean" dir="Weatronic-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="UniTrend" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="Pulsar" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="Devo-Telemetry" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -399,6 +400,7 @@
 		<ant antfile="build.xml" target="package" dir="Weatronic-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="UniTrend" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="Pulsar" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="Devo-Telemetry" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -437,6 +439,7 @@
 			<include name="Weatronic-Telemetry/build/*.jar" />
 			<include name="UniTrend/build/*.jar" />
 			<include name="Pulsar/build/*.jar" />
+			<include name="Devo-Telemetry/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
