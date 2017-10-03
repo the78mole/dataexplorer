@@ -34,5 +34,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/QC-Copter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Weatronic-Telemetry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/WStechVario"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Devo-Telemetry"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -135,7 +135,7 @@ public class HoTTbinReader {
 			// sensor data
 			data_in.read(buffer);
 
-			if (new String(buffer).startsWith("GRAUPNER SD LOG")) {
+			if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_BIN) && new String(buffer).startsWith("GRAUPNER SD LOG")) {
 				boolean isHoTTV4 = true;
 				data_in.close();
 				file_input = new FileInputStream(file);
@@ -175,8 +175,7 @@ public class HoTTbinReader {
 				DataExplorer.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
 				throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
 			}
-			// end evaluate for HoTTAdapterX files containing normal HoTT V4 sensor data
-			else if (new String(buffer).startsWith("FILE TAG IDVER")) {
+			else if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_LOG) && new String(buffer).startsWith("FILE TAG IDVER")) {
 				//read header size
 				String preHeader = new String(buffer);
 				int indexOf = preHeader.indexOf("LOG DATA OFFSET : ");
@@ -216,7 +215,12 @@ public class HoTTbinReader {
 						HoTTbinReader.sensorSignature.append(fileInfo.get("DETECTED SENSOR").substring(9));
 				}
 			}
+			else if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_LOG) && data_in != null) {
+				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW0021));
+				throw new DataTypeException(Messages.getString(MessageIds.GDE_MSGW0021));
+			}
 
+				// end evaluate for HoTTAdapterX files containing normal HoTT V4 sensor data
 			if (data_in != null) { //*.log already closed data_in and do not need a sensor scan.
 				if (numberLogs < 7000) {
 					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2406));
