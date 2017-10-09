@@ -26,6 +26,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
+import java.io.File;
 import java.util.Date;
 import java.util.TreeMap;
 import java.util.logging.Logger;
@@ -113,17 +114,18 @@ public class WindowsHelper {
 									portDescription = manufacturer + GDE.STRING_BLANK + portDescription;
 								}
 							}
-							log.log(Level.FINE, WINDOWS_SERIAL_PORT_COM + portNumber + GDE.STRING_MESSAGE_CONCAT + portDescription);
+							if (log.isLoggable(Level.FINER)) 
+								log.log(Level.FINER, WINDOWS_SERIAL_PORT_COM + portNumber + GDE.STRING_MESSAGE_CONCAT + portDescription);
 							winPorts.put(portNumber, portDescription);
 						}
 						catch (Throwable e) {
-							log.log(Level.FINER, portString);
+							log.log(Level.WARNING, portString);
 						}
 					}
 			}
 		}
 		
-		if (log.isLoggable(Level.FINER)) {
+		if (log.isLoggable(Level.FINE)) {
 			for (int number : winPorts.keySet()) {
 				log.log(Level.FINE, WINDOWS_SERIAL_PORT_COM + number + GDE.STRING_MESSAGE_CONCAT + winPorts.get(number));
 			}
@@ -132,16 +134,18 @@ public class WindowsHelper {
 		if (winPorts.size() > 0) {
 			StringBuilder sb = new StringBuilder();
 			for (int number : winPorts.keySet()) {
-				sb.append(WINDOWS_SERIAL_PORT_COM).append(number).append(GDE.STRING_SEMICOLON);
+				sb.append(WINDOWS_SERIAL_PORT_COM).append(number).append(File.pathSeparator);
 			}
-			log.log(Level.FINE, "Windows port list = " + sb.toString()); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) 
+				log.log(Level.FINE, "set property gnu.io.rxtx.SerialPorts = " + sb.toString()); //$NON-NLS-1$
 			System.setProperty("gnu.io.rxtx.SerialPorts", sb.toString()); //$NON-NLS-1$
 		}
 		else {
 			System.setProperty("gnu.io.rxtx.SerialPorts", GDE.STRING_EMPTY); //$NON-NLS-1$
 			//System.clearProperty("gnu.io.rxtx.SerialPorts");
 		}
-		log.log(Level.FINE, "enum Windows ports  takes = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.FINE)) 
+			log.log(Level.FINE, "enum Windows ports  takes = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
