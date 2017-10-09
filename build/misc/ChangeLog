@@ -10,6 +10,7 @@ Version 3.3.1 - xx yyy 2017
 * fix GraphicsTemplate save problems
 * reduce graphical display changes to force unsaved hint
 * remove LogView files to be written as CSV export during junit test
+* enhance Windows port enumeration for BT serial ports (enumeration falls back while BT switched on)
 HoTTAdapter*
 	* add missing measurements (GAM,EAM) and events(preliminary use inverse bits) to HoTTAdapter
 	* add missing measurements (GAM,EAM) and events(preliminary use inverse bits) to HoTTAdapter2

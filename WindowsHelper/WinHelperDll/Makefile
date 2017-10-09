@@ -4,7 +4,7 @@
 
 !include <win32.mak>
 
-JDK=c:\Program Files\Java\jdk1.6.0_16
+JDK=c:\Programme\Java\jdk1.8.0_121
 
 all: $(OUTDIR) $(OUTDIR)\WinHelper32.dll
 x86: $(OUTDIR) $(OUTDIR)\WinHelper32.dll

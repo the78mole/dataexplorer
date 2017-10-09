@@ -33,6 +33,12 @@
 #include <swprintf.inl>
 #include <iostream>
 #include <tchar.h>
+#include <Cfgmgr32.h>
+#include <Bthsdpdef.h>
+#include <BluetoothAPIs.h>
+#pragma comment(lib, "Bthprops.lib")
+
+#define GSTD_S(x)	L##x
 
 #define MAX_KEY_LENGTH 255
 #define MAX_VALUE_NAME 16383
@@ -46,8 +52,13 @@ using namespace Microsoft::Win32;
 
 //#include <WinIoCtl.h>
 #ifndef GUID_DEVINTERFACE_COMPORT //{86E0D1E0-8089-11D0-9CE4-08003E301F73}
-	DEFINE_GUID(GUID_DEVINTERFACE_COMPORT, 0x86e0d1e0L, 0x8089, 0x11d0, 0x9c, 0xe4, 0x08, 0x00, 0x3e, 0x30, 0x1f, 0x73);
+	DEFINE_GUID(GUID_DEVINTERFACE_COMPORT, 0x86e0d1e0L, 0x8089, 0x11d0, 0x9c, 0xe4, 0x08, 0x00, 0x3e, 0x30, 0x1f, 0x73 );
 #endif
+
+#ifndef GUID_DEVCLASS_BLUETOOTH //{E0CBF06C-CD8B-4647-BB8A-263B43F0F974}';
+	DEFINE_GUID( GUID_DEVCLASS_BLUETOOTH, 0xe0cbf06cL, 0xcd8b, 0x4647, 0xbb, 0x8a, 0x26, 0x3b, 0x43, 0xf0, 0xf9, 0x74 );
+#endif
+
 
 /*****************************************************************************************************************
 WinHelper is a collection of windows native functions which are not accessible from Java 
@@ -57,7 +68,7 @@ D:\workspaces\gnu\WindowsHelper\WinHelperDll>"C:\Program Files\Java\jdk1.6.0_11\
 
 build:
 prepare the cygwin environment definitn e variable pointing to used JDK
-export JDK=/cygdrive/c/Programs/Java/jdk16_11
+export JDK=/cygdrive/c/Programme/Java/jdk1.8.0_121
 
 now call the compiler/linker to build the library (-lole32 defines the libole32.a lib; -mno-cygwin makes independent from cygwin1.dll,   -D__int64="long long" typedefs forJjava2C translation, see http://www.inonit.com/cygwin/jni/helloWorld/c.html)
 gcc WinHelper.cpp -I. -I$JDK/include -I$JDK/include/win32 -lole32 -luuid -mno-cygwin -D__int8=char -D__int16=short -D__int32=int -D__int64="long long" -Wl,--add-stdcall-alias -shared -o WinHelper.dll
@@ -330,12 +341,11 @@ JNIEXPORT jobjectArray JNICALL Java_gde_utils_WindowsHelper_enumerateSerialPorts
 	wchar_t wszTmpResult[MAX_PATH];
 	HDEVINFO hDevInfo = SetupDiGetClassDevs(&GUID_DEVINTERFACE_COMPORT, NULL, NULL,	DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
 	if(hDevInfo == INVALID_HANDLE_VALUE) {
-		printf("GDE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
-		sprintf_s(szReturn, "GDE_MSGW0035; (err=%lx)", GetLastError());
+		//printf("GDE_MSGW0035; 337 Build a list of all devices that are present in the system failed (err=%lx)\n",	GetLastError());
+		sprintf_s(szReturn, "GDE_MSGW0035; 337 (err=%lx)", GetLastError());
 		env->SetObjectArrayElement(	ret, 0, env->NewStringUTF(szReturn));
 		return ret; 
 	}
-
 	
 	DWORD dwDetailDataSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA) + 256;
 	SP_DEVICE_INTERFACE_DETAIL_DATA *pDetailData = (SP_DEVICE_INTERFACE_DETAIL_DATA*) new char[dwDetailDataSize];
@@ -347,8 +357,7 @@ JNIEXPORT jobjectArray JNICALL Java_gde_utils_WindowsHelper_enumerateSerialPorts
 		//printf("run for loop %d\n", deviceIndex);
 		if (SetupDiEnumDeviceInterfaces(hDevInfo, NULL, &GUID_DEVINTERFACE_COMPORT, deviceIndex, &deviceInterfaceData)) { // received device interface
 			SP_DEVINFO_DATA devInfoData = {sizeof(SP_DEVINFO_DATA)};			
-			if (SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, pDetailData, dwDetailDataSize, NULL, &devInfoData)) {
-				
+			if (SetupDiGetDeviceInterfaceDetail(hDevInfo, &deviceInterfaceData, pDetailData, dwDetailDataSize, NULL, &devInfoData)) {			
 				//SPDRP_FRIENDLYNAME SPDRP_DEVICEDESC SPDRP_DEVTYPE SPDRP_DRIVER SPDRP_ENUMERATOR_NAME SPDRP_LEGACYBUSTYPE SPDRP_MFG SPDRP_PHYSICAL_DEVICE_OBJECT_NAME
 				// get more info about what was found, using the device path
 				TCHAR frendlyName[MAX_PATH], manufacturer[MAX_PATH];
@@ -356,29 +365,42 @@ JNIEXPORT jobjectArray JNICALL Java_gde_utils_WindowsHelper_enumerateSerialPorts
 				//wprintf(TEXT("frendlyName = %s\n"), frendlyName);
 				//SetupDiGetDeviceRegistryProperty(hDevInfo, &devInfoData, SPDRP_DEVICEDESC, NULL, (PBYTE)description, sizeof(description), NULL);
 				//wprintf(TEXT("description = %s\n"), description);
+				//SetupDiGetDeviceRegistryProperty(hDevInfo, &devInfoData, SPDRP_HARDWAREID, NULL, (PBYTE)hardwareId, sizeof(hardwareId), NULL);
+				//wprintf(TEXT("hardwareId = %s\n"), hardwareId);
 				//SetupDiGetDeviceRegistryProperty(hDevInfo, &devInfoData, SPDRP_DRIVER, NULL, (PBYTE)driver, sizeof(driver), NULL);
 				//wprintf(TEXT("driver = %s\n"), driver);
 				SetupDiGetDeviceRegistryProperty(hDevInfo, &devInfoData, SPDRP_MFG, NULL, (PBYTE)manufacturer, sizeof(manufacturer), NULL);
 				//wprintf(TEXT("manufacturer = %s\n"), manufacturer);
 				
 				swprintf_s(wszTmpResult, TEXT("%s;%s"), manufacturer, frendlyName);				
-				//wprintf(L"%s", wszTmpResult);
-				
+				//wprintf(L"%s\n", wszTmpResult);			
 				size_t wszTmpResultSize = wcslen(wszTmpResult) + 1;
 				size_t convertedChars = 0;
 				const size_t newsize = wszTmpResultSize*2;
 				char *nstring = new char[newsize];
 				wcstombs_s(&convertedChars, nstring, newsize, wszTmpResult, _TRUNCATE);
-				//printf("%s\n", nstring);
+				//printf("env %s\n", nstring);
 				env->SetObjectArrayElement(	ret, deviceIndex, env->NewStringUTF(nstring));
-
-				
 			}
 			else {
-				printf("GDE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
-				sprintf_s(szReturn, "GDE_MSGW0035; (err=%lx)", GetLastError());
-				env->SetObjectArrayElement(	ret, 0, env->NewStringUTF(szReturn));
-				return ret; 
+				//printf("Not a standard serial device, skip (err=%lx)\n",	GetLastError());
+				TCHAR frendlyName[MAX_PATH], manufacturer[MAX_PATH];
+				SetupDiGetDeviceRegistryProperty(hDevInfo, &devInfoData, SPDRP_FRIENDLYNAME, NULL, (PBYTE)frendlyName, sizeof(frendlyName), NULL);
+				//wprintf(TEXT("frendlyName = %s\n"), frendlyName);
+				SetupDiGetDeviceRegistryProperty(hDevInfo, &devInfoData, SPDRP_MFG, NULL, (PBYTE)manufacturer, sizeof(manufacturer), NULL);
+				//wprintf(TEXT("manufacturer = %s\n"), manufacturer);
+				//SetupDiGetDeviceRegistryProperty(hDevInfo, &devInfoData, SPDRP_HARDWAREID, NULL, (PBYTE)hardwareId, sizeof(hardwareId), NULL);
+				//wprintf(TEXT("hardwareId = %s\n"), hardwareId);
+				
+				swprintf_s(wszTmpResult, TEXT("%s;%s"), manufacturer, frendlyName);				
+				//wprintf(L"%s\n", wszTmpResult);			
+				size_t wszTmpResultSize = wcslen(wszTmpResult) + 1;
+				size_t convertedChars = 0;
+				const size_t newsize = wszTmpResultSize*2;
+				char *nstring = new char[newsize];
+				wcstombs_s(&convertedChars, nstring, newsize, wszTmpResult, _TRUNCATE);
+				//printf("env %s\n", nstring);
+				env->SetObjectArrayElement(	ret, deviceIndex, env->NewStringUTF(nstring));
 			}
 		}
 		else {
@@ -386,8 +408,8 @@ JNIEXPORT jobjectArray JNICALL Java_gde_utils_WindowsHelper_enumerateSerialPorts
 				break;
 			}
 			else {
-				printf("GDE_MSGW0035; Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
-				sprintf_s(szReturn, "GDE_MSGW0035; (err=%lx)", GetLastError());
+				//printf("GDE_MSGW0035; 388 Build a list of all devices that are present in the system (err=%lx)\n",	GetLastError());
+				sprintf_s(szReturn, "GDE_MSGW0035; 388 (err=%lx)", GetLastError());
 				env->SetObjectArrayElement(	ret, 0, env->NewStringUTF(szReturn));
 				return ret; 
 			}

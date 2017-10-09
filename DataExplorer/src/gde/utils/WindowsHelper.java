@@ -90,6 +90,9 @@ public class WindowsHelper {
 		long startTime = new Date().getTime();
 		String[] enumPorts = enumerateSerialPorts();
 		if (enumPorts[0].startsWith("GDE_MSG")) {			 //$NON-NLS-1$
+			for (int i = 0; i < enumPorts.length; i++) {
+				log.log(Level.WARNING, enumPorts[i]);
+			}
 			log.log(Level.WARNING, Messages.getString(MessageIds.GDE_MSGW0035, new Object[] {enumPorts[0].split(GDE.STRING_SEMICOLON)[1]}));
 			return;
 		}
