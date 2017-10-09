@@ -376,16 +376,15 @@ public class RXTXCommDriver implements CommDriver
 		{
 			String PortName = tok.nextToken();
 
-			if (testRead(PortName, PortType))
-				CommPortIdentifier.addPortName(PortName,
-					PortType, this);
+			if (PortName.startsWith("COM") || testRead(PortName, PortType)) // Windows BT outgoing ports fail and doesn't get added
+				CommPortIdentifier.addPortName(PortName, PortType, this);
 		}
 	}
 
    /*
     * Register ports specified in the file "gnu.io.rxtx.properties"
     * Key system properties:
-    *                   gnu.io.rxtx.SerialPorts
+    *       gnu.io.rxtx.SerialPorts
     * 			gnu.io.rxtx.ParallelPorts
     *
     * Tested only with sun jdk1.3
