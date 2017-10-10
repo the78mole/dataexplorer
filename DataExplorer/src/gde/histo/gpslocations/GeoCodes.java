@@ -81,7 +81,7 @@ public final class GeoCodes {
 				log.log(Level.WARNING, "geoCode file not found"); //$NON-NLS-1$
 		}
 		catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, e.getMessage(), e); //$NON-NLS-1$
 		}
 		return location;
 
@@ -113,7 +113,7 @@ public final class GeoCodes {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			log.log(Level.WARNING, e.getMessage()); //$NON-NLS-1$
 		}
 		return location;
 	}
@@ -129,8 +129,7 @@ public final class GeoCodes {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "http read in " + (System.currentTimeMillis() - milliTime) + " ms!  gpsCoordinate=" + gpsCoordinate.toCsvString()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (Exception e1) {
-			log.log(Level.WARNING, "internet connection failed"); //$NON-NLS-1$
-			e1.printStackTrace();
+			log.log(Level.WARNING, "internet connection failed, check network capability if location data required"); //$NON-NLS-1$
 		}
 		return geoData;
 	}

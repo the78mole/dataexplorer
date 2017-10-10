@@ -210,19 +210,19 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		int datablocksLimit = (doFullRead ? (int) fileLength / HoTTbinHistoReader2.dataBlockSize : initializeBlocks) / (HoTTbinHistoReader2.isReceiverOnly && !isChannelsChannel ? 10 : 1);
 		for (int i = 0; i < datablocksLimit; i++) {
 			data_in.read(HoTTbinReader.buf);
-			if (HoTTbinReader2.logger.isLoggable(Level.FINE) && i % 10 == 0) {
-				HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
-				HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
+			if (HoTTbinHistoReader2.log.isLoggable(Level.FINE) && i % 10 == 0) {
+				HoTTbinHistoReader2.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
+				HoTTbinHistoReader2.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 			}
 
 			if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 				if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
-					if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
+					if (HoTTbinHistoReader2.log.isLoggable(Level.FINE)) HoTTbinHistoReader2.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
 					HoTTAdapter.reverseChannelPackageLossCounter.add(1);
 					HoTTbinReader2.points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 
-					if (HoTTbinReader2.logger.isLoggable(Level.FINER)) HoTTbinReader2.logger.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME,
+					if (HoTTbinHistoReader2.log.isLoggable(Level.FINER)) HoTTbinHistoReader2.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME,
 							StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1) + GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader.buf[7], false));
 
 					//fill receiver data
@@ -403,7 +403,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 
 					HoTTbinReader.timeStep_ms += 10; // add default time step from device of 10 msec
 				} else { //skip empty block, but add time step
-					if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, "-->> Found tx=rx=0 dBm");
+					if (HoTTbinHistoReader2.log.isLoggable(Level.FINE)) HoTTbinHistoReader2.log.log(Level.FINE, "-->> Found tx=rx=0 dBm");
 
 					HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 					HoTTbinReader2.points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
@@ -560,18 +560,18 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		long fileLength = HoTTbinHistoReader2.filePath.toFile().length();
 		for (int i = 0; i < initializeBlockLimit && i < fileLength / HoTTbinHistoReader2.dataBlockSize; i++) {
 			data_in.read(HoTTbinReader.buf);
-			if (HoTTbinReader2.logger.isLoggable(Level.FINEST)) {
-				HoTTbinReader2.logger.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
+			if (HoTTbinHistoReader2.log.isLoggable(Level.FINEST)) {
+				HoTTbinHistoReader2.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 			}
 
 			if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 				if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
-					if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
+					if (HoTTbinHistoReader2.log.isLoggable(Level.FINE)) HoTTbinHistoReader2.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
 					HoTTAdapter.reverseChannelPackageLossCounter.add(1);
 					HoTTbinReader2.points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 					//create and fill sensor specific data record sets
-					if (HoTTbinReader2.logger.isLoggable(Level.FINEST)) HoTTbinReader2.logger.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME,
+					if (HoTTbinHistoReader2.log.isLoggable(Level.FINEST)) HoTTbinHistoReader2.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME,
 							StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1) + GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader.buf[7], false));
 
 					//fill receiver data
@@ -656,12 +656,12 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 								break;
 							}
 
-							if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE,
+							if (HoTTbinHistoReader2.log.isLoggable(Level.FINE)) HoTTbinHistoReader2.log.log(Level.FINE,
 									"isReceiverData " + isReceiverData + " isVarioData " + isVarioData + " isGPSData " + isGPSData + " isGeneralData " + isGAMData + " isElectricData " + isEAMData);
 
 						}
 
-						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME,
+						if (HoTTbinHistoReader2.log.isLoggable(Level.FINE)) HoTTbinHistoReader2.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME,
 								"logCountVario = " + logCountVario + " logCountGPS = " + logCountGPS + " logCountGeneral = " + logCountGAM + " logCountElectric = " + logCountEAM);
 						lastSensor = actualSensor;
 						logCountVario = logCountGPS = logCountGAM = logCountEAM = logCountESC = 0;
@@ -737,7 +737,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 
 					HoTTbinReader.timeStep_ms += 10;// add default time step from log record of 10 msec
 				} else { //skip empty block, but add time step
-					if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, "-->> Found tx=rx=0 dBm");
+					if (HoTTbinHistoReader2.log.isLoggable(Level.FINE)) HoTTbinHistoReader2.log.log(Level.FINE, "-->> Found tx=rx=0 dBm");
 
 					HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 					HoTTbinReader2.points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;

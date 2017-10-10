@@ -452,7 +452,7 @@ public class HoTTbinReader {
 					// text
 					// modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { // buf 3, 4, tx,rx
-						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
+						if (HoTTbinReader.log.isLoggable(Level.FINE)) HoTTbinReader.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
 						HoTTAdapter.reverseChannelPackageLossCounter.add(1);
 						HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
@@ -718,7 +718,7 @@ public class HoTTbinReader {
 						}
 					}
 					else { // skip empty block, but add time step
-						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, "-->> Found tx=rx=0 dBm");
+						if (HoTTbinReader.log.isLoggable(Level.FINE)) HoTTbinReader.log.log(Level.FINE, "-->> Found tx=rx=0 dBm");
 
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 						HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
@@ -929,7 +929,7 @@ public class HoTTbinReader {
 
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { // switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { // buf 3, 4, tx,rx
-						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
+						if (HoTTbinReader.log.isLoggable(Level.FINE)) HoTTbinReader.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
 						HoTTAdapter.reverseChannelPackageLossCounter.add(1);
 						HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
@@ -1151,7 +1151,7 @@ public class HoTTbinReader {
 						}
 					}
 					else { // tx,rx == 0
-						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, "-->> Found tx=rx=0 dBm");
+						if (HoTTbinReader.log.isLoggable(Level.FINE)) HoTTbinReader.log.log(Level.FINE, "-->> Found tx=rx=0 dBm");
 
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 						HoTTbinReader.pointsReceiver[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;

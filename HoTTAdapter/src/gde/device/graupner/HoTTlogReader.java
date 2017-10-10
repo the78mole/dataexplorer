@@ -288,7 +288,7 @@ public class HoTTlogReader extends HoTTbinReader {
 						}
 					}
 					else { // tx,rx == 0
-						if (HoTTbinReader2.logger.isLoggable(Level.FINE)) HoTTbinReader2.logger.log(Level.FINE, "-->> Found tx=rx=0 dBm");
+						if (HoTTlogReader.log.isLoggable(Level.FINE)) HoTTlogReader.log.log(Level.FINE, "-->> Found tx=rx=0 dBm");
 
 						reverseChannelPackageLossCounter.add(0);
 						HoTTbinReader.pointsReceiver[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;

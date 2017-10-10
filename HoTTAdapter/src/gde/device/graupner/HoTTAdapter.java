@@ -956,8 +956,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public String getSupportedImportExtention() {
 		String importExtention = GDE.STRING_EMPTY;
 		if (isHistoImportSupported()) {
-			String preferredFileExtention = this.application.getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredFileExtention();
-			if (preferredFileExtention != null && !preferredFileExtention.isEmpty()) importExtention = preferredFileExtention.substring(1);
+			String[] preferredFileExtentions = this.application.getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredFileExtention().split(GDE.STRING_COMMA);
+			if (preferredFileExtentions != null && preferredFileExtentions.length != 0)
+				for (int i=0; i<preferredFileExtentions.length; i++) {
+					if (preferredFileExtentions[i].endsWith(GDE.FILE_ENDING_BIN)) {
+						importExtention = GDE.FILE_ENDING_DOT_BIN;
+						break;
+					}
+				}
 		}
 		return importExtention;
 	}
