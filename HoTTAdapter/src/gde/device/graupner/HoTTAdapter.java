@@ -950,7 +950,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	}
 
 	/**
-	 * @return an empty string or the device's import file extention if the device supports a native file import for histo purposes (e.g. '.bin')
+	 * @return an empty string or the device's import file extension if the device supports a native file import for histo purposes (e.g. '.bin')
 	 */
 	@Override
 	public String getSupportedImportExtention() {
