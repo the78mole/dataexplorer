@@ -20,6 +20,7 @@
 package gde.histo.datasources;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -71,7 +72,7 @@ public final class DirectoryScanner {
 
 	public enum DirectoryType {
 		DATA, IMPORT
-	};
+	}
 
 	/**
 	 * Re- initializes the class.
@@ -154,23 +155,10 @@ public final class DirectoryScanner {
 		if (isFullChange) {
 			this.unsuppressedTrusses.clear();
 			this.suppressedTrusses.clear();
-			{
-				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.DATA).toString());
-				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.DATA).toFile(), this.settings.getSubDirectoryLevelMax());
-				this.directoryFilesCount = files.size();
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
-						String.format("%04d files in histoDataDir '%s'  %s", files.size(), this.validatedDirectories.get(DirectoryType.DATA).getFileName(), this.validatedDirectories.get(DirectoryType.DATA))); //$NON-NLS-1$
 
-				addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
-			}
+			this.directoryFilesCount = addTrussesForDirectory(this.validatedDirectories.get(DirectoryType.DATA));
 			if (this.validatedDirectories.containsKey(DirectoryType.IMPORT)) {
-				FileUtils.checkDirectoryAndCreate(this.validatedDirectories.get(DirectoryType.IMPORT).toString());
-				List<File> files = FileUtils.getFileListing(this.validatedDirectories.get(DirectoryType.IMPORT).toFile(), this.settings.getSubDirectoryLevelMax());
-				this.directoryFilesCount += files.size();
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%04d files in histoImportDir '%s'  %s", files.size(), this.validatedDirectories.get(DirectoryType.IMPORT).getFileName(), //$NON-NLS-1$
-						this.validatedDirectories.get(DirectoryType.IMPORT)));
-
-				addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+				this.directoryFilesCount += addTrussesForDirectory(this.validatedDirectories.get(DirectoryType.IMPORT));
 			}
 
 			if (log.isLoggable(Level.FINE))
@@ -181,14 +169,34 @@ public final class DirectoryScanner {
 	}
 
 	/**
+	 * @param directoryPath
+	 * @return the number of files detected up to the specified sub-directory level
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws NotSupportedFileFormatException
+	 */
+	private int addTrussesForDirectory(Path directoryPath) throws FileNotFoundException, IOException, NotSupportedFileFormatException {
+		if (FileUtils.checkDirectoryExist(directoryPath.toString())) {
+			List<File> files = FileUtils.getFileListing(directoryPath.toFile(), this.settings.getSubDirectoryLevelMax());
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%04d files in histoDir '%s'  %s", files.size(), directoryPath.getFileName(), directoryPath)); //$NON-NLS-1$
+
+			addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+			return files.size();
+		} else {
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoDir not found in %s", directoryPath)); //$NON-NLS-1$
+			return 0;
+		}
+	}
+
+	/**
 	 * Use ignore lists to determine the vaults which are required for the data access.
 	 * @param deviceConfigurations
 	 * @throws IOException
 	 * @throws NotSupportedFileFormatException
 	*/
 	private void addTrusses(List<File> files, TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
-		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice()).getSupportedImportExtention()
-				: GDE.STRING_EMPTY;
+		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice())
+				.getSupportedImportExtention() : GDE.STRING_EMPTY;
 		final int suppressedSize = this.suppressedTrusses.size();
 		final int unsuppressedSize = this.unsuppressedTrusses.size();
 		int tmpSelectedFilesCount = 0;
