@@ -952,6 +952,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/**
 	 * @return an empty string or the device's import file extension if the device supports a native file import for histo purposes (e.g. '.bin')
 	 */
+	@Deprecated // getSupportedImportExtentions()
 	@Override
 	public String getSupportedImportExtention() {
 		String importExtention = GDE.STRING_EMPTY;
@@ -960,12 +961,32 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			if (preferredFileExtentions != null && preferredFileExtentions.length != 0)
 				for (int i=0; i<preferredFileExtentions.length; i++) {
 					if (preferredFileExtentions[i].endsWith(GDE.FILE_ENDING_BIN)) {
-						importExtention = GDE.FILE_ENDING_DOT_BIN;
+					importExtention = GDE.FILE_ENDING_DOT_BIN;
+					break;
+				}
+			}
+		}
+		return importExtention;
+	}
+
+	/**
+	 * @return the device's native file extentions if the device supports histo imports (e.g. 'bin' or 'log')
+	 */
+	@Override
+	public List<String> getSupportedImportExtentions() {
+		List<String> importExtentions = new ArrayList<>();
+		if (isHistoImportSupported()) {
+			String[] preferredFileExtentions = this.application.getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredFileExtention().split(GDE.STRING_COMMA);
+			if (preferredFileExtentions != null && preferredFileExtentions.length != 0) {
+				for (String preferredFileExtention : preferredFileExtentions) {
+					if (preferredFileExtention.endsWith(GDE.FILE_ENDING_BIN)) {
+						importExtentions.add(GDE.FILE_ENDING_BIN);
 						break;
 					}
 				}
+			}
 		}
-		return importExtention;
+		return importExtentions;
 	}
 
 	/**
@@ -1024,10 +1045,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb, 5=Velocity, 6=DistanceStart, 7=DirectionStart, 8=TripDistance, 9=VoltageRx, 10=TemperatureRx
 				if (channel == 1 && ordinal >= 0 && ordinal <= 5) { // Receiver
 					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
-				} 
+				}
 				else if (channel == 6 && ordinal == 22) { //Channels warning
-					dataTableRow[index + 1] = record.realGet(rowIndex) == 0 
-							? GDE.STRING_EMPTY 
+					dataTableRow[index + 1] = record.realGet(rowIndex) == 0
+							? GDE.STRING_EMPTY
 									: String.format("'%c'", ((record.realGet(rowIndex) / 1000)+64));
 				}
 				else {

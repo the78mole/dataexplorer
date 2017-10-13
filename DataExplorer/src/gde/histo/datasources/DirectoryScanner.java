@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ import gde.data.Channels;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.exception.NotSupportedFileFormatException;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.device.IHistoDevice;
@@ -61,7 +63,7 @@ public final class DirectoryScanner {
 
 	private IDevice														validatedDevice						= null;
 	private Channel														validatedChannel					= null;
-	private String														validatedImportExtention	= GDE.STRING_EMPTY;
+	private List<String>											validatedImportExtentions	= new ArrayList<>();
 
 	private final Map<DirectoryType, Path>		validatedDirectories			= new LinkedHashMap<>();
 	private int																directoryFilesCount				= 0;																// all directory files
@@ -80,7 +82,7 @@ public final class DirectoryScanner {
 	public synchronized void initialize() {
 		this.validatedDevice = null;
 		this.validatedChannel = null;
-		this.validatedImportExtention = GDE.STRING_EMPTY;
+		this.validatedImportExtentions = new ArrayList<>();
 
 		this.validatedDirectories.clear();
 		this.directoryFilesCount = 0;
@@ -96,7 +98,7 @@ public final class DirectoryScanner {
 			this.validatedDirectories.put(DirectoryType.DATA, Paths.get(this.settings.getDataFilePath()));
 		else
 			this.validatedDirectories.put(DirectoryType.DATA, filePath);
-		this.validatedImportExtention = GDE.FILE_ENDING_DOT_BIN;
+		this.validatedImportExtentions = ((IHistoDevice) DataExplorer.getInstance().getActiveDevice()).getSupportedImportExtentions();
 
 		this.unsuppressedTrusses.clear();
 		this.suppressedTrusses.clear();
@@ -122,9 +124,9 @@ public final class DirectoryScanner {
 		Channel lastChannel = this.validatedChannel;
 		Path lastHistoDataDir = this.validatedDirectories.get(DirectoryType.DATA);
 		Path lastHistoImportDir = this.validatedDirectories.get(DirectoryType.IMPORT);
-		String lastImportExtention = this.validatedImportExtention;
+		List<String> lastImportExtentions = this.validatedImportExtentions;
 
-		{
+		{ // determine validated values
 			this.validatedDevice = this.application.getActiveDevice();
 			this.validatedChannel = this.application.getActiveChannel();
 
@@ -134,15 +136,19 @@ public final class DirectoryScanner {
 				validatedDeviceName = this.application.getActiveDevice().getName().substring(0, this.application.getActiveDevice().getName().length() - 4);
 			}
 
+			this.validatedImportExtentions.clear();
 			this.validatedDirectories.clear();
 			String subPathData = this.application.getActiveObject() == null ? validatedDeviceName : this.application.getObjectKey();
 			this.validatedDirectories.put(DirectoryType.DATA, Paths.get(this.settings.getDataFilePath()).resolve(subPathData));
 			String subPathImport = this.application.getActiveObject() == null ? GDE.STRING_EMPTY : this.application.getObjectKey();
-			this.validatedImportExtention = this.validatedDevice instanceof IHistoDevice ? ((IHistoDevice) this.validatedDevice).getSupportedImportExtention() : GDE.STRING_EMPTY;
-			Path validatedImportDir = this.validatedDevice.getDeviceConfiguration().getImportBaseDir();
-			if (this.settings.getSearchImportPath() && validatedImportDir != null && !this.validatedImportExtention.isEmpty()
-					&& !validatedImportDir.resolve(subPathImport).equals(this.validatedDirectories.get(DirectoryType.DATA)))
-				this.validatedDirectories.put(DirectoryType.IMPORT, validatedImportDir.resolve(subPathImport));
+			if (isNativeImport()) {
+				this.validatedImportExtentions = ((IHistoDevice) this.validatedDevice).getSupportedImportExtentions();
+				if (!this.validatedImportExtentions.isEmpty()) {
+					Path validatedImportDir = this.validatedDevice.getDeviceConfiguration().getImportBaseDir();
+					if (this.settings.getSearchImportPath() && validatedImportDir != null && !validatedImportDir.resolve(subPathImport).equals(this.validatedDirectories.get(DirectoryType.DATA)))
+						this.validatedDirectories.put(DirectoryType.IMPORT, validatedImportDir.resolve(subPathImport));
+				}
+			}
 		}
 
 		boolean isFullChange = rebuildStep == RebuildStep.A_HISTOSET || this.unsuppressedTrusses.size() == 0;
@@ -151,7 +157,7 @@ public final class DirectoryScanner {
 		isFullChange = isFullChange || (lastHistoDataDir != null ? !lastHistoDataDir.equals(this.validatedDirectories.get(DirectoryType.DATA)) : true);
 		isFullChange = isFullChange
 				|| (lastHistoImportDir != null ? !lastHistoImportDir.equals(this.validatedDirectories.get(DirectoryType.IMPORT)) : this.validatedDirectories.containsKey(DirectoryType.IMPORT));
-		isFullChange = isFullChange || (lastImportExtention != null ? !lastImportExtention.equals(this.validatedImportExtention) : this.validatedImportExtention != null);
+		isFullChange = isFullChange || !lastImportExtentions.containsAll(this.validatedImportExtentions) || !this.validatedImportExtentions.containsAll(lastImportExtentions);
 		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("isFullChange %s", isFullChange)); //$NON-NLS-1$
 
 		if (isFullChange) {
@@ -182,7 +188,7 @@ public final class DirectoryScanner {
 			List<File> files = FileUtils.getFileListing(directoryPath.toFile(), this.settings.getSubDirectoryLevelMax());
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%04d files in histoDir '%s'  %s", files.size(), directoryPath.getFileName(), directoryPath)); //$NON-NLS-1$
 
-			addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+			addTrusses(files);
 			return files.size();
 		} else {
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoDir not found in %s", directoryPath)); //$NON-NLS-1$
@@ -196,62 +202,101 @@ public final class DirectoryScanner {
 	 * @throws IOException
 	 * @throws NotSupportedFileFormatException
 	*/
+	private void addTrusses(List<File> files) throws IOException, NotSupportedFileFormatException {
+		addTrusses(files, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+	}
+
 	private void addTrusses(List<File> files, TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
-		final String supportedImportExtention = this.application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) this.application.getActiveDevice())
-				.getSupportedImportExtention() : GDE.STRING_EMPTY;
 		final int suppressedSize = this.suppressedTrusses.size();
 		final int unsuppressedSize = this.unsuppressedTrusses.size();
 		int tmpSelectedFilesCount = 0;
 		for (File file : files) {
-			if (file.getName().endsWith(GDE.FILE_ENDING_OSD)) {
-				long startMillis = System.currentTimeMillis();
-				File actualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(file.getAbsolutePath()));
-				// getLinkContainedFilePath may have long response times in case of an unavailable network resources
-				// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
-				if (file.equals(actualFile) && (System.currentTimeMillis() - startMillis > 555) || !file.exists()) {
-					log.log(Level.WARNING, "Dead OSD link " + file + " pointing to " + actualFile); //$NON-NLS-1$ //$NON-NLS-2$
-					if (!file.delete()) {
-						log.log(Level.WARNING, "could not delete link file ", file); //$NON-NLS-1$
-					}
-				} else {
+			String extension = file.getName().substring(file.getName().lastIndexOf('.') + 1).toLowerCase();
+			if (extension.equals(file.getName())) {
+				// file w/o extension is discarded
+			} else if (extension.equals(GDE.FILE_ENDING_OSD)) {
+				File actualFile = getActualFile(file);
+				if (actualFile != null) {
 					tmpSelectedFilesCount++;
-					String objectDirectory = !deviceConfigurations.containsKey(file.toPath().getParent().getFileName().toString()) ? file.toPath().getParent().getFileName().toString() : GDE.STRING_EMPTY;
+					String objectDirectory = getObjectKey(deviceConfigurations, file);
 					for (VaultCollector truss : HistoOsdReaderWriter.readTrusses(actualFile, objectDirectory)) {
 						truss.getVault().setLogLinkPath(file.getAbsolutePath());
-						if (this.settings.isSuppressMode()) {
-							if (ExclusionData.isExcluded(truss.getVault().getLogFileAsPath(), truss.getVault().getLogRecordsetBaseName())) {
-								log.log(Level.INFO,
-										String.format("OSD candidate is in the exclusion list %s %s   %s", actualFile, truss.getVault().getLogRecordsetBaseName(), truss.getVault().getStartTimeStampFormatted())); //$NON-NLS-1$
-								this.suppressedTrusses.put(truss.getVault().getVaultName(), truss);
-							} else
-								this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
-						} else
-							this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
+						addTruss(truss);
 					}
 				}
-			} else if (!supportedImportExtention.isEmpty() && file.getName().endsWith(supportedImportExtention)) {
-				if (this.settings.getSearchDataPathImports()
-						|| (this.validatedDirectories.containsKey(DirectoryType.IMPORT) && file.toPath().startsWith(this.validatedDirectories.get(DirectoryType.IMPORT)))) {
+			} else if (isNativeImport(file.toPath().getParent(), extension)) {
 					tmpSelectedFilesCount++;
-					String objectDirectory = !deviceConfigurations.containsKey(file.toPath().getParent().getFileName().toString()) ? file.toPath().getParent().getFileName().toString() : GDE.STRING_EMPTY;
+					String objectDirectory = getObjectKey(deviceConfigurations, file);
 					String recordSetBaseName = DataExplorer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend(file.getName());
-					VaultCollector truss = new VaultCollector(objectDirectory, file, 0, Channels.getInstance().size(), recordSetBaseName);
-					if (this.settings.isSuppressMode()) {
-						if (ExclusionData.isExcluded(truss.getVault().getLogFileAsPath(), truss.getVault().getLogRecordsetBaseName())) {
-							log.log(Level.INFO, String.format("BIN candidate is in the exclusion list %s %s  %s", file, truss.getVault().getLogRecordsetBaseName(), truss.getVault().getStartTimeStampFormatted())); //$NON-NLS-1$
-							this.suppressedTrusses.put(truss.getVault().getVaultName(), truss);
-						} else
-							this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
-					} else
-						this.unsuppressedTrusses.put(truss.getVault().getVaultName(), truss);
-				}
+					addTruss(new VaultCollector(objectDirectory, file, 0, Channels.getInstance().size(), recordSetBaseName));
 			} else {
-				// file is discarded
+				// file w/o histo support is discarded
 			}
 		}
 		this.selectedFilesCount += tmpSelectedFilesCount;
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%04d files found --- %04d total trusses --- %04d excluded trusses", files.size(), //$NON-NLS-1$
 				this.unsuppressedTrusses.size() - unsuppressedSize + this.suppressedTrusses.size() - suppressedSize, this.suppressedTrusses.size() - suppressedSize));
+	}
+
+	/**
+	 * Adds support for link files pointing to data files.
+	 * Deletes a link file if the data file does not exist.
+	 * @return the data file (differs from {@code file} if {@code file} is a link file)
+	 */
+	private static File getActualFile(File file) throws IOException {
+		long startMillis = System.currentTimeMillis();
+		File actualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(file.getAbsolutePath()));
+		// getLinkContainedFilePath may have long response times in case of an unavailable network resources
+		// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
+		if (file.equals(actualFile) && (System.currentTimeMillis() - startMillis > 555) || !file.exists()) {
+			log.log(Level.WARNING, "Dead OSD link " + file + " pointing to " + actualFile); //$NON-NLS-1$ //$NON-NLS-2$
+			if (!file.delete()) {
+				log.log(Level.WARNING, "could not delete link file ", file); //$NON-NLS-1$
+			}
+			actualFile = null;
+		}
+		return actualFile;
+	}
+
+	/**
+	 * @param directoryPath is the path without filename
+	 * @param extension is the extension without dot
+	 * @return true if native import is supported and allowed
+	 */
+	private boolean isNativeImport(Path directoryPath, String extension) {
+		return isNativeImport() && this.validatedImportExtentions.contains(extension) && this.validatedDirectories.containsKey(DirectoryType.IMPORT)
+				&& directoryPath.startsWith(this.validatedDirectories.get(DirectoryType.IMPORT));
+	}
+
+	/**
+	 * @return true if native import is supported and allowed
+	 */
+	private boolean isNativeImport() {
+		return this.validatedDevice instanceof IHistoDevice && this.settings.getSearchDataPathImports();
+	}
+
+	/**
+	 * @param deviceConfigurations
+	 * @param file
+	 * @return the file directory name if it is not a device directory or an empty string
+	 */
+	private static String getObjectKey(TreeMap<String, DeviceConfiguration> deviceConfigurations, File file) {
+		String dirName = file.toPath().getParent().getFileName().toString();
+		return !deviceConfigurations.containsKey(dirName) ? dirName : GDE.STRING_EMPTY;
+	}
+
+	/**
+	 * Decide which list and put the truss into the list.
+	 * @param truss
+	 */
+	private void addTruss(VaultCollector truss) {
+		ExtendedVault vault = truss.getVault();
+		if (this.settings.isSuppressMode() && ExclusionData.isExcluded(vault.getLogFileAsPath(), vault.getLogRecordsetBaseName())) {
+			log.log(Level.INFO, String.format("discarded as per exclusion list %s %s   %s", vault.getLogFilePath(), vault.getLogRecordsetBaseName(), vault.getStartTimeStampFormatted()));
+			this.suppressedTrusses.put(vault.getVaultName(), truss);
+		} else {
+			this.unsuppressedTrusses.put(vault.getVaultName(), truss);
+		}
 	}
 
 	/**

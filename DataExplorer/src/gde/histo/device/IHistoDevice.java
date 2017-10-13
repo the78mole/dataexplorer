@@ -42,7 +42,13 @@ public interface IHistoDevice { //todo merging with IDevice later
 	/**
 	 * @return an empty string or the device's import file extention if the device supports a native file import for histo purposes (e.g. '.bin')
 	 */
-	public String getSupportedImportExtention() ;
+	@Deprecated // getSupportedImportExtentions()
+	public String getSupportedImportExtention();
+
+	/**
+	 * @return the device's native file extentions if the device supports histo imports (e.g. 'bin' or 'log')
+	 */
+	public List<String> getSupportedImportExtentions();
 
 	/**
 	 * Create history recordSet and add record data size points from binary file to each measurement.
@@ -57,7 +63,7 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * @throws IOException
 	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
 	 */
-	public List<ExtendedVault>  getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException;
+	public List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException;
 
 	/**
 	 * Reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
