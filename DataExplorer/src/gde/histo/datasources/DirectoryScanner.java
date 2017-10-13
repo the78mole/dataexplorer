@@ -124,27 +124,29 @@ public final class DirectoryScanner {
 		Path lastHistoImportDir = this.validatedDirectories.get(DirectoryType.IMPORT);
 		String lastImportExtention = this.validatedImportExtention;
 
-		this.validatedDevice = this.application.getActiveDevice();
-		this.validatedChannel = this.application.getActiveChannel();
+		{
+			this.validatedDevice = this.application.getActiveDevice();
+			this.validatedChannel = this.application.getActiveChannel();
 
-		//special directory handling for MC3000 and Q200 supporting battery sets but store data in normal device folder
-		String validatedDeviceName = this.validatedDevice.getName();
-		if (this.application.getActiveDevice().getName().endsWith("-Set")) { // MC3000-Set -> MC3000, Q200-Set -> Q200 //$NON-NLS-1$
-			validatedDeviceName = this.application.getActiveDevice().getName().substring(0, this.application.getActiveDevice().getName().length() - 4);
+			//special directory handling for MC3000 and Q200 supporting battery sets but store data in normal device folder
+			String validatedDeviceName = this.validatedDevice.getName();
+			if (this.application.getActiveDevice().getName().endsWith("-Set")) { // MC3000-Set -> MC3000, Q200-Set -> Q200 //$NON-NLS-1$
+				validatedDeviceName = this.application.getActiveDevice().getName().substring(0, this.application.getActiveDevice().getName().length() - 4);
+			}
+
+			this.validatedDirectories.clear();
+			String subPathData = this.application.getActiveObject() == null ? validatedDeviceName : this.application.getObjectKey();
+			this.validatedDirectories.put(DirectoryType.DATA, Paths.get(this.settings.getDataFilePath()).resolve(subPathData));
+			String subPathImport = this.application.getActiveObject() == null ? GDE.STRING_EMPTY : this.application.getObjectKey();
+			this.validatedImportExtention = this.validatedDevice instanceof IHistoDevice ? ((IHistoDevice) this.validatedDevice).getSupportedImportExtention() : GDE.STRING_EMPTY;
+			Path validatedImportDir = this.validatedDevice.getDeviceConfiguration().getImportBaseDir();
+			if (this.settings.getSearchImportPath() && validatedImportDir != null && !this.validatedImportExtention.isEmpty()
+					&& !validatedImportDir.resolve(subPathImport).equals(this.validatedDirectories.get(DirectoryType.DATA)))
+				this.validatedDirectories.put(DirectoryType.IMPORT, validatedImportDir.resolve(subPathImport));
 		}
 
-		this.validatedDirectories.clear();
-		String subPathData = this.application.getActiveObject() == null ? validatedDeviceName : this.application.getObjectKey();
-		this.validatedDirectories.put(DirectoryType.DATA, Paths.get(this.settings.getDataFilePath()).resolve(subPathData));
-		String subPathImport = this.application.getActiveObject() == null ? GDE.STRING_EMPTY : this.application.getObjectKey();
-		this.validatedImportExtention = this.validatedDevice instanceof IHistoDevice ? ((IHistoDevice) this.validatedDevice).getSupportedImportExtention() : GDE.STRING_EMPTY;
-		Path validatedImportDir = this.validatedDevice.getDeviceConfiguration().getImportBaseDir();
-		if (this.settings.getSearchImportPath() && validatedImportDir != null && !this.validatedImportExtention.isEmpty()
-				&& !validatedImportDir.resolve(subPathImport).equals(this.validatedDirectories.get(DirectoryType.DATA)))
-			this.validatedDirectories.put(DirectoryType.IMPORT, validatedImportDir.resolve(subPathImport));
-
 		boolean isFullChange = rebuildStep == RebuildStep.A_HISTOSET || this.unsuppressedTrusses.size() == 0;
-		isFullChange = isFullChange || (lastDevice != null ? !lastDevice.getName().equals(validatedDeviceName) : this.validatedDevice != null);
+		isFullChange = isFullChange || (lastDevice != null ? !lastDevice.getName().equals(this.validatedDevice.getName()) : this.validatedDevice != null);
 		isFullChange = isFullChange || (lastChannel != null ? !lastChannel.getChannelConfigKey().equals(this.validatedChannel.getChannelConfigKey()) : this.validatedChannel != null);
 		isFullChange = isFullChange || (lastHistoDataDir != null ? !lastHistoDataDir.equals(this.validatedDirectories.get(DirectoryType.DATA)) : true);
 		isFullChange = isFullChange
