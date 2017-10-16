@@ -22,15 +22,12 @@ package gde.histo.datasources;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -66,7 +63,6 @@ public final class HistoSetCollector {
 	private final Settings				settings									= Settings.getInstance();
 
 	private HistoSet							histoSet;
-	private int										matchingTrussesCount			= 0;																// selected by menu settings (eliminated by checks, e.g. device, object and retrospect period)
 	private int										availableTrussesCount			= 0;																// added to the trailrecordset (empty vaults eliminated, identical vaults eliminated based on setting)
 	private long									recordSetBytesSum					= 0;																// size of all the histo files which have been read to build the histo recordsets
 	private int										elapsedTime_ms						= 0;																// total time for rebuilding the HistoSet
@@ -162,7 +158,7 @@ public final class HistoSetCollector {
 
 	@Override
 	public String toString() {
-		return String.format("matchingTrussesCount=%,d  availableTrussesCount=%,d recordSetBytesSum=%,d elapsedTime_ms=%,d", this.matchingTrussesCount, //$NON-NLS-1$
+		return String.format("matchingTrussesCount=%,d  availableTrussesCount=%,d recordSetBytesSum=%,d elapsedTime_ms=%,d",  //$NON-NLS-1$
 				this.availableTrussesCount, this.recordSetBytesSum, this.elapsedTime_ms);
 	}
 
@@ -173,7 +169,6 @@ public final class HistoSetCollector {
 		this.histoSet = HistoSet.getInstance();
 
 		this.recordSetBytesSum = 0;
-		this.matchingTrussesCount = 0;
 		this.availableTrussesCount = 0;
 		this.elapsedTime_ms = 0;
 
@@ -381,38 +376,23 @@ public final class HistoSetCollector {
 	private Map<Path, Map<String, VaultCollector>> getTrusses4Screening() throws IOException, NotSupportedFileFormatException {
 		final Map<Path, Map<String, VaultCollector>> trusses4Paths = new LinkedHashMap<>();
 		final Map<Long, Set<ExtendedVault>> trusses4StartTimes = new HashMap<Long, Set<ExtendedVault>>();
-		final List<Integer> channelMixConfigNumbers = this.application.getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers();
-		final long minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-		int invalidRecordSetsCount = 0;
 		for (VaultCollector truss : this.histoSet.getUnsuppressedTrusses().values()) {
-			if (truss.getSourceDataSet().getDataSetType().isValidObject(truss, channelMixConfigNumbers, minStartTimeStamp_ms)) {
-				if (DISCARD_DUPLICATE_VAULTS) {
-					// add the truss to the multimap to find out if it is a duplicate according to the equals method criteria
-					long logStartTimestamp_ms = truss.getVault().getLogStartTimestamp_ms();
-					if (!trusses4StartTimes.containsKey(logStartTimestamp_ms)) trusses4StartTimes.put(logStartTimestamp_ms, new HashSet<ExtendedVault>());
-					if (!trusses4StartTimes.get(logStartTimestamp_ms).add(truss.getVault())) {
-						log.log(Level.WARNING, "duplicate vault was discarded: ", truss);
-						continue;
-					}
+			if (DISCARD_DUPLICATE_VAULTS) {
+				// add the truss to the multimap to find out if it is a duplicate according to the equals method criteria
+				long logStartTimestamp_ms = truss.getVault().getLogStartTimestamp_ms();
+				if (!trusses4StartTimes.containsKey(logStartTimestamp_ms)) trusses4StartTimes.put(logStartTimestamp_ms, new HashSet<ExtendedVault>());
+				if (!trusses4StartTimes.get(logStartTimestamp_ms).add(truss.getVault())) {
+					log.log(Level.WARNING, "duplicate vault was discarded: ", truss);
+					continue;
 				}
-
-				Path path = truss.getVault().getLogFileAsPath();
-				if (!trusses4Paths.containsKey(path)) trusses4Paths.put(path, new HashMap<String, VaultCollector>());
-				trusses4Paths.get(path).put(truss.getVault().getVaultFileName().toString(), truss);
-			} else {
-				invalidRecordSetsCount++;
-				log.log(Level.FINE, "skip   ", truss);
 			}
-		}
-		this.matchingTrussesCount = this.histoSet.getUnsuppressedTrusses().size() - invalidRecordSetsCount;
-		log.log(Level.FINE,
-				String.format("%04d trusses taken --- %04d checked trusses --- %04d invalid trusses", trusses4Paths.size(), this.histoSet.getUnsuppressedTrusses().size(), invalidRecordSetsCount)); //$NON-NLS-1$
-		return trusses4Paths;
-	}
 
-	public int getMatchingTrussesCount() {
-		return this.matchingTrussesCount;
+			Path path = truss.getVault().getLogFileAsPath();
+			if (!trusses4Paths.containsKey(path)) trusses4Paths.put(path, new HashMap<String, VaultCollector>());
+			trusses4Paths.get(path).put(truss.getVault().getVaultFileName().toString(), truss);
+		}
+		return trusses4Paths;
 	}
 
 	public int getAvailableTrussesCount() {

@@ -229,13 +229,13 @@ public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
 	}
 
 	public String getDirectoryScanStatistics() {
-		return Messages.getString(MessageIds.GDE_MSGI0064,
-				new Object[] { String.format("%,d", this.directoryScanner.getDirectoryFilesCount()), String.format("%,d", this.directoryScanner.getSelectedFilesCount()), //
-						String.format("%,d", this.directoryScanner.getSuppressedTrusses().size() + this.directoryScanner.getUnsuppressedTrusses().size()),
-						String.format("%,d", this.directoryScanner.getUnsuppressedTrusses().size()), //
-						String.format("%,d", this.histoSetCollector.getMatchingTrussesCount()), String.format("%,d", this.histoSetCollector.getAvailableTrussesCount()), //
+		return Messages.getString(MessageIds.GDE_MSGI0064, //
+				new Object[] { String.format("%,d", this.directoryScanner.getDirectoryFilesCount()),  //
 						String.format("%.2f", this.histoSetCollector.getRecordSetBytesSum() / 1024 / 1024.), //
-						String.format("%.2f", this.histoSetCollector.getElapsedTime_ms() / 1000.) });
+						String.format("%.2f", this.histoSetCollector.getElapsedTime_ms() / 1000.), //
+						String.format("%,d", this.directoryScanner.getSuppressedTrusses().size() + this.directoryScanner.getUnsuppressedTrusses().size()), //
+						String.format("%,d", this.directoryScanner.getUnsuppressedTrusses().size()), //
+						String.format("%,d", this.histoSetCollector.getAvailableTrussesCount()) });
 
 	}
 }

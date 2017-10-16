@@ -20,8 +20,6 @@
 package gde.histo.cache;
 
 import java.io.File;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -436,11 +434,6 @@ public final class VaultCollector {
 			return true;
 	}
 
-	public boolean isConsistentStartTimeStamp() {
-		long minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-		return isConsistentStartTimeStamp(minStartTimeStamp_ms);
-	}
-
 	public boolean isConsistentStartTimeStamp(long minStartTimeStamp_ms) {
 		if (this.vault.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
 			log.log(Level.FINE, String.format("%s candidate out of time range      '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getRectifiedObjectKey(), //$NON-NLS-1$
@@ -450,9 +443,8 @@ public final class VaultCollector {
 			return true;
 	}
 
-	public boolean isConsistentObjectKey() {
+	public boolean isConsistentObjectKey(boolean isValidatedObjectKey) {
 		boolean isValidObject = false;
-		boolean isValidatedObjectKey = this.settings.getValidatedObjectKey(this.application.getObjectKey()).isPresent();
 		if (this.application.getActiveObject() != null && !isValidatedObjectKey) {
 			log.log(Level.INFO, String.format("%s candidate found for empty object '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getLogObjectKey(), //$NON-NLS-1$
 					this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));

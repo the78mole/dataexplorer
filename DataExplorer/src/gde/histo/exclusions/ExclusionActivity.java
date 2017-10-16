@@ -33,12 +33,13 @@ import gde.log.Level;
  * @author Thomas Eickert (USER)
  */
 public final class ExclusionActivity {
-	private final static String								$CLASS_NAME								= ExclusionActivity.class.getName();
-	private final static Logger								log												= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME	= ExclusionActivity.class.getName();
+	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * Delete the exclusion files belonging to the directories with ignored files.
-	 * @param defaultPath this exclusion information is deleted in any case, e.g. if the suppress mode is currently OFF
+	 * The exclusion information is deleted in any case, e.g. if the suppress mode is currently OFF.
+	 * @param defaultPath
 	 */
 	public static void clearExcludeLists(Path defaultPath) {
 		Set<Path> exclusionDirectories = new HashSet<>();
@@ -58,7 +59,8 @@ public final class ExclusionActivity {
 	 */
 	public static synchronized void setExcludeRecordSet(Path filePath, String recordsetBaseName) {
 		final ExclusionData fileExclusionData = ExclusionData.getInstance(filePath.getParent());
-		if (recordsetBaseName.isEmpty()) fileExclusionData.setProperty((filePath.getFileName().toString()));
+		if (recordsetBaseName.isEmpty())
+			fileExclusionData.setProperty((filePath.getFileName().toString()));
 		else
 			fileExclusionData.addToProperty(filePath.getFileName().toString(), recordsetBaseName);
 		fileExclusionData.store();
