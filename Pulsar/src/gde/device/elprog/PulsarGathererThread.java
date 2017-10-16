@@ -278,14 +278,14 @@ public class PulsarGathererThread extends Thread {
 		log.log(Level.OFF, $METHOD_NAME+" - " + (recordSet != null && recordSet.getRecordDataSize(true) > 5));
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
-			if (enableEndMessage) this.application.openMessageDialog(Messages.getString("GDE_MSGT2609"));
+			if (enableEndMessage) this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT3907));
 		}
 		else {
 			if (throwable != null) {
-				cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() }) + Messages.getString("GDE_MSGT2608"));
+				cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() }) + Messages.getString(MessageIds.GDE_MSGT3908));
 			}
 			else {
-				if (enableEndMessage) cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026) + Messages.getString("GDE_MSGT2608"));
+				if (enableEndMessage) cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026) + Messages.getString(MessageIds.GDE_MSGT3908));
 			}
 		}
 	}
