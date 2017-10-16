@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.junit;
@@ -91,7 +91,7 @@ public class TestSuperClass extends TestCase {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Override
@@ -128,13 +128,15 @@ public class TestSuperClass extends TestCase {
 	/**
 	 * goes through the existing device properties files and set active flagged
 	 * devices into active devices list
-	 * 
+	 *
 	 * @throws FileNotFoundException
 	 */
 	public void initialize() throws FileNotFoundException {
-
 		this.settings.setPartialDataTable(false);
 		this.settings.setTimeFormat("relativ");
+
+		setHistoSettings();
+
 		File file = new File(this.settings.getDevicesPath());
 		if (!file.exists()) throw new FileNotFoundException(this.settings.getDevicesPath());
 		String[] files = file.list();
@@ -178,6 +180,27 @@ public class TestSuperClass extends TestCase {
 	}
 
 	/**
+	 *
+	 */
+	private void setHistoSettings() {
+		this.settings.setHistoActive(true); // should not have any influence on junit tests
+		// the next lines only hold settings which do not control the GUI appearance
+		this.settings.setSmartStatistics(true);
+		this.settings.setSearchImportPath(false);
+		this.settings.setSearchDataPathImports(true);
+		this.settings.setChannelMix(false);
+		this.settings.setSamplingTimespan_ms("2"); // this index corresponds to 1 sec
+		this.settings.setFilesWithoutObject(true);
+		this.settings.setFilesWithOtherObject(true);
+		this.settings.setRetrospectMonths("120"); // this is the current maximum value
+//		this.settings.setZippedCache(false); // keep the users setting in order not to delete any user cache entries
+		this.settings.setAbsoluteTransitionLevel("999"); // results in default value
+		this.settings.setAbsoluteTransitionLevel("999"); // results in default value
+		this.settings.setSuppressMode(false);
+		this.settings.setSubDirectoryLevelMax("5");
+	}
+
+	/**
 	 * calculates the new class name for the device
 	 */
 	protected IDevice getInstanceOfDevice(DeviceConfiguration selectedActiveDeviceConfig) {
@@ -218,7 +241,7 @@ public class TestSuperClass extends TestCase {
 	/**
 	 * this will setup empty channels according the device properties file
 	 * copied and modified from DeviceSelectionDialog.setupDataChannels();
-	 * 
+	 *
 	 * @param activeDevice
 	 *            (IDevice is the abstract type)
 	 */
@@ -257,16 +280,16 @@ public class TestSuperClass extends TestCase {
 		if (deviceConfig == null) new UnsupportedOperationException("deviceConfig == null");
 		IDevice device = this.getInstanceOfDevice(deviceConfig);
 		this.application.setActiveDeviceWoutUI(device);
-		
+
 		setupDataChannels(device);
-		
+
 		this.application.initiateUnitTestEnvironment(device, this.channels, activeObjectKey);
 	}
 
 	/**
 	 * method to draw the curves with it scales and defines the curve area
 	 * copied and modified from GraphicsComposite.drawCurves()
-	 * 
+	 *
 	 * @param recordSet
 	 * @param maxX
 	 * @param maxY
@@ -423,7 +446,7 @@ public class TestSuperClass extends TestCase {
 	/**
 	 * draw vertical (time) grid lines according the vector defined during
 	 * drawing of time scale
-	 * 
+	 *
 	 * @param recordSet
 	 * @param gc
 	 *            the graphics context to be used
@@ -444,7 +467,7 @@ public class TestSuperClass extends TestCase {
 	/**
 	 * draw horizontal (curve) grid lines according the vector prepared during
 	 * daring specified curve scale
-	 * 
+	 *
 	 * @param recordSet
 	 * @param gc
 	 *            the graphics context to be used
@@ -469,7 +492,7 @@ public class TestSuperClass extends TestCase {
 
 	/**
 	 * ger the path where the class GDE gets loaded
-	 * 
+	 *
 	 * @return
 	 */
 	protected String getLoaderPath() {

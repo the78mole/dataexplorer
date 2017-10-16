@@ -88,11 +88,11 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			final String line = GDE.RECORD_SET_NAME + GDE.STRING_EMPTY + header.get(sb.append(i + 1).append(GDE.STRING_BLANK).append(GDE.RECORD_SET_NAME).toString());
 			final HashMap<String, String> recordSetInfo = OsdReaderWriter.getRecordSetProperties(line);
 			final String logRecordSetBaseName = String.format("%s%s%s", recordSetInfo.get(GDE.RECORD_SET_NAME), TrailRecordSet.BASE_NAME_SEPARATOR, recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME));
-			final long enhancedStartTimeStamp_ms = HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo);
+			final long enhancedStartTimeStamp_ms = HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo, header);
 			final Channel recordSetInfoChannel = OsdReaderWriter.getChannel(recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME));
 			if (recordSetInfoChannel != null) {
-				VaultCollector vaultCollector = new VaultCollector(objectDirectory, file, fileVersion, recordSetSize, i, logRecordSetBaseName, header.get(GDE.DEVICE_NAME), enhancedStartTimeStamp_ms,
-						recordSetInfoChannel.getNumber(), logObjectKey);
+				VaultCollector vaultCollector = new VaultCollector(objectDirectory, file, fileVersion, recordSetSize, i, logRecordSetBaseName, header.get(GDE.DEVICE_NAME),
+						enhancedStartTimeStamp_ms, recordSetInfoChannel.getNumber(), logObjectKey);
 				trusses.add(vaultCollector);
 			}
 		}
@@ -182,9 +182,9 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 					data_in.readFully(buffer);
 
 					// setDeserializedProperties does not take all possible solutions to set the timestamp
-					if (log.isLoggable(Level.INFO) && histoRecordSet.getStartTimeStamp() != HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo))
-						log.log(Level.INFO, "startTimeStamp rectified " + HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo) + "  " + histoRecordSet.getStartTimeStamp()); //$NON-NLS-1$
-					histoRecordSet.setStartTimeStamp(HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo));
+					if (log.isLoggable(Level.INFO) && histoRecordSet.getStartTimeStamp() != HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo, header))
+						log.log(Level.INFO, "startTimeStamp rectified " + HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo, header) + "  " + histoRecordSet.getStartTimeStamp()); //$NON-NLS-1$
+					histoRecordSet.setStartTimeStamp(HistoOsdReaderWriter.getStartTimestamp_ms(recordSetInfo, header));
 					histoRecordSet.setFileDataPointerAndSize(recordSetDataPointer, recordDataSize, GDE.SIZE_BYTES_INTEGER * numberRecordAndTimeStamp * recordDataSize);
 					log.log(Level.FINE, recordSetInfoChannel.getName() + " recordDataSize=" + recordDataSize + "  recordSetDataPointer=" + recordSetDataPointer //$NON-NLS-1$ //$NON-NLS-2$
 							+ "  numberRecordAndTimeStamp=" + numberRecordAndTimeStamp); //$NON-NLS-1$
@@ -215,7 +215,8 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 					// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
 					// scores for duration and timestep values are filled in by the HistoRecordSet
 					scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = recordDataSize;
-					scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = packagesLost[0] != null && packagesLost[1] != null && packagesLost[1] != 0 ? (int) (packagesLost[0] * 100. / packagesLost[1]) : 0;
+					scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = packagesLost[0] != null && packagesLost[1] != null
+							&& packagesLost[1] != 0 ? (int) (packagesLost[0] * 100. / packagesLost[1]) : 0;
 					// recalculating the following scores from raw data would be feasible
 					scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = packagesLost[0] != null ? (int) (packagesLost[0].intValue()) : 0;
 					scores[ScoreLabelTypes.LOST_PACKAGES_PER_MILLE.ordinal()] = packagesLost[1] != null ? (int) (packagesLost[1] * 10. * 1000.) : 0; // percent -> per mille
@@ -335,7 +336,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 	 * @param recordSetInfo
 	 * @return start timestamp from recordset properties, alternatively take RecordedTS from RecordSetComment, alternatively FileCreatedTS
 	 */
-	private static long getStartTimestamp_ms(HashMap<String, String> recordSetInfo) {
+	private static long getStartTimestamp_ms(HashMap<String, String> recordSetInfo, HashMap<String, String> header) {
 		long startTimestamp_ms = 0;
 
 		HashMap<String, String> recordSetProps = StringHelper.splitString(recordSetInfo.get(GDE.RECORD_SET_PROPERTIES), Record.DELIMITER, RecordSet.propertyKeys);
@@ -346,24 +347,36 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			try {
 				// try 2: check if the original time stamp in the recordset comment is available
 				String recordSetDescription = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
-				Pattern datePattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}"); //$NON-NLS-1$
-				Matcher dateMatcher = datePattern.matcher(recordSetDescription);
-				Pattern timePattern = Pattern.compile("\\d{2}:\\d{2}:\\d{2}"); //$NON-NLS-1$
-				Matcher timeMatcher = timePattern.matcher(recordSetDescription);
-				if (dateMatcher.find() && timeMatcher.find()) {
-					String date = dateMatcher.group();
-					String time = timeMatcher.group();
-
+				String[] parts = recordSetDescription.split(" ");
+				String date = "";
+				String time = "";
+				for (String stringPart : parts) {
+					Pattern datePattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}"); //$NON-NLS-1$
+					Matcher dateMatcher = datePattern.matcher(stringPart);
+					Pattern timePattern = Pattern.compile("\\d{2}:\\d{2}:\\d{2}"); //$NON-NLS-1$
+					Matcher timeMatcher = timePattern.matcher(stringPart);
+					if (dateMatcher.find()) {
+						date = dateMatcher.group();
+					}
+					if (timeMatcher.find()) {
+						time = timeMatcher.group();
+					}
+				}
+				if (!date.isEmpty()) {
 					String[] strValueDate = date.split(GDE.STRING_DASH);
 					int year = Integer.parseInt(strValueDate[0]);
 					int month = Integer.parseInt(strValueDate[1]);
 					int day = Integer.parseInt(strValueDate[2]);
 
-					String[] strValueTime = time.split(GDE.STRING_COLON);
-					int hour = Integer.parseInt(strValueTime[0]);
-					int minute = Integer.parseInt(strValueTime[1]);
-					int second = Integer.parseInt(strValueTime[2]);
-
+					int hour = 0;
+					int minute = 0;
+					int second = 0;
+					if (!time.isEmpty()) {
+						String[] strValueTime = time.split(GDE.STRING_COLON);
+						hour = Integer.parseInt(strValueTime[0]);
+						minute = Integer.parseInt(strValueTime[1]);
+						second = Integer.parseInt(strValueTime[2]);
+					}
 					GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
 					startTimestamp_ms = calendar.getTimeInMillis();
 				}
@@ -372,10 +385,10 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			}
 		}
 		// try 3: take the osd file creation timestamp
-		if (startTimestamp_ms == 0 && recordSetInfo.containsKey(GDE.CREATION_TIME_STAMP)) {
+		if (startTimestamp_ms == 0 && header.containsKey(GDE.CREATION_TIME_STAMP)) {
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd" + ' ' + " HH:mm:ss"); //$NON-NLS-1$ //$NON-NLS-2$
 			try {
-				startTimestamp_ms = simpleDateFormat.parse(recordSetInfo.get(GDE.CREATION_TIME_STAMP)).getTime();
+				startTimestamp_ms = simpleDateFormat.parse(header.get(GDE.CREATION_TIME_STAMP)).getTime();
 			} catch (Exception ex) { // ParseException ex) {
 				throw new RuntimeException(ex);
 			}

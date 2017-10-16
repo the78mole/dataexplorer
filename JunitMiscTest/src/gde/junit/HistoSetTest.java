@@ -59,7 +59,8 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 
 		HistoSet histoSet = HistoSet.getInstance();
 
-		this.setDataPath(DataSource.TESTDATA, Paths.get(""));
+		String objectKey = "";
+		this.setDataPath(DataSource.TESTDATA, Paths.get(objectKey));
 		// >>> take one of these optional data sources for a smaller test portion <<<
 		//		this.setDataPath(DataSource.INDIVIDUAL, Paths.get("C:\\_Java\\workspace\\DataFilesTestSamples\\DataExplorer", "_Thomas", "DataExplorer"));
 		//		this.setDataPath(DataSource.INDIVIDUAL, Paths.get("C:\\_Java\\workspace\\DataFilesTestSamples\\DataExplorer", "_Winfried", "DataExplorer"));
@@ -69,22 +70,23 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 		try {
 			for (Entry<String, DeviceConfiguration> deviceEntry : this.deviceConfigurations.entrySet()) {
 				IDevice device = setDevice(deviceEntry.getKey());
-				setupDataChannels(device);
-				setupDeviceChannelObject(deviceEntry.getKey(), 1, "");
-				for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
-					this.channels.setActiveChannelNumber(channelEntry.getKey());
-					histoSet.rebuild4Test();
-					System.out.println(String.format("%33.44s  channelNumber=%2d  histoSetSize==%,11d", this.application.getActiveDevice().getName(), this.channels.getActiveChannelNumber(), histoSet.size()));
+				if (device != null) {
+					setupDataChannels(device);
+					setupDeviceChannelObject(deviceEntry.getKey(), 1, objectKey);
+					for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
+						this.channels.setActiveChannelNumber(channelEntry.getKey());
+
+						histoSet.scan4Test(this.dataPath.toPath().resolve(this.application.getActiveDevice().getName()), this.deviceConfigurations);
+						histoSet.rebuild4Test();
+						System.out.println(String.format("%33.44s  channelNumber=%2d  histoSetSize==%,11d", this.application.getActiveDevice().getName(), this.channels.getActiveChannelNumber(), histoSet.size()));
+					}
 				}
 			}
-
-			histoSet.setHistoFilePaths4Test(this.dataPath.toPath(), 5, this.deviceConfigurations);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.toString());
 		}
 
-		System.out.println(String.format("%,11d files processed from  %s", histoSet.getUnsuppressedTrusses().size(), this.dataPath.getAbsolutePath()));
 		StringBuilder sb = new StringBuilder();
 		for (Entry<String, Exception> failure : failures.entrySet()) {
 			sb.append(failure).append("\n");

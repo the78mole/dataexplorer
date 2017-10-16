@@ -297,23 +297,20 @@ public final class DirectoryScanner {
 	/**
 	 * Determine trusses in the osd files and in the native files (if supported by the device).
 	 */
-	public void setHistoFilePaths4Test(Path filePath, int subDirLevelMax, TreeMap<String, DeviceConfiguration> devices) throws IOException, NotSupportedFileFormatException {
+	public void addTrusses4Test(Path filePath, TreeMap<String, DeviceConfiguration> devices) throws IOException, NotSupportedFileFormatException {
 		this.initialize();
 
 		if (filePath == null)
 			this.validatedDirectories.put(DirectoryType.DATA, DirectoryType.DATA.getDataSetPath());
 		else
 			this.validatedDirectories.put(DirectoryType.DATA, filePath);
-		if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice)
 
-		{
-			Path dataDir = this.validatedDirectories.get(DirectoryType.DATA);
-			FileUtils.checkDirectoryAndCreate(dataDir.toString());
-			List<SourceDataSet> files = getFileListing(dataDir.toFile(), subDirLevelMax, DirectoryType.DATA.getDataSetExtensions());
-			log.log(Level.INFO, String.format("%04d files found in dataDir %s", files.size(), dataDir)); //$NON-NLS-1$
+		Path dataDir = this.validatedDirectories.get(DirectoryType.DATA);
+		FileUtils.checkDirectoryAndCreate(dataDir.toString());
+		List<SourceDataSet> files = getFileListing(dataDir.toFile(), Settings.getInstance().getSubDirectoryLevelMax(), DirectoryType.DATA.getDataSetExtensions());
+		log.log(Level.INFO, String.format("%04d files found in dataDir %s", files.size(), dataDir)); //$NON-NLS-1$
 
-			addTrusses(files, devices);
-		}
+		addTrusses(files, devices);
 		log.log(Level.INFO, String.format("%04d files selected", this.unsuppressedTrusses.size())); //$NON-NLS-1$
 	}
 

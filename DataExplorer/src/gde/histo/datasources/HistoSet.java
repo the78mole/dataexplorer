@@ -179,8 +179,8 @@ public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
 				histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
 	}
 
-	public void setHistoFilePaths4Test(Path filePath, int subDirLevelMax, TreeMap<String, DeviceConfiguration> devices) throws IOException, NotSupportedFileFormatException {
-		this.directoryScanner.setHistoFilePaths4Test(filePath, subDirLevelMax, devices);
+	public void scan4Test(Path filePath,TreeMap<String, DeviceConfiguration> devices) throws IOException, NotSupportedFileFormatException {
+		this.directoryScanner.addTrusses4Test(filePath, devices);
 	}
 
 	public void rebuild4Test() throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {

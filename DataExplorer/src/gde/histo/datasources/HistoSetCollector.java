@@ -188,7 +188,6 @@ public final class HistoSetCollector {
 	public void rebuild4Test() throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
 		// this.clear();
 		{
-			if (this.histoSet.getUnsuppressedTrusses().size() > 0) {
 				// step: build the workload map consisting of the cache key and the file path
 				Map<Path, Map<String, VaultCollector>> trussJobs = getTrusses4Screening();
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("trussJobs to load total     = %d", trussJobs.size())); //$NON-NLS-1$
@@ -225,7 +224,6 @@ public final class HistoSetCollector {
 				if (newVaults.size() > 0) {
 					VaultReaderWriter.storeVaultsInCache(newVaults);
 				}
-			}
 		}
 	}
 
