@@ -1,124 +1,42 @@
-GNU DataExplorer - News - comes with version 3.3.0 - 01 Aug 2017
+GNU DataExplorer - News - comes with version 3.3.1 - 17 Oct 2017
 
-1) general updates and fixes
-	- fix analog display of synchronized master record
-	- support UTC time formatting
-	- enhance GPS coordinates support (longitude / latitude)
-		- formatting in degrees/minutes or decimal degrees based on unit settings in the device XML
-	- keep selected channel after opening an OSD file
-	- add history graphics template support (no default set of templates get delivered) 
-	- fix STM virtual serial port enumeration problem (Graupner MC-28/26)
-	- fix device XML migration problem with devices using USB
-	- simplify device XMLs to language neutral version to reduce maintenance effort
-
+1) general corrections
+	* fix retrieving working state from XML (iCharger and others) 
+	* fix NullPointerException while KMZ export having a not completely initialized object
+	* fix object initialization using wrong object key
+	* fix serial connected iCharger live gatherer tolerating timeouts
+	* fix object update problem while removing objects
+	* fix GraphicsTemplate save problems
+	* reduce graphical display changes to force unsaved hint
+	* remove LogView files to be written as CSV export during junit test
+	* enhance Windows port enumeration for BT serial ports (enumeration falls back while BT switched on)
 2) HoTTAdapter*
-	- fix start time stamp using last modified of log file
-	- fix header in graphics window displaying consistent actual date, this is independent of the log file date
-	- add MDL converter functionality for MC-28/MC-26 from/to MC-32,MC-20,MX-20,MC-16
-	- update MDL-Plug-in
+	* fix HoTTAdapter* GAM capacity filter null value
+	* add missing measurements (GAM,EAM) and events(preliminary use inverse bits)
+	* add inverse bit events and warning
+	* add initial support for new log data format (*.log)
+3) Pulsar3
+	* add initial support import of *.acp, live-data, import of LogView files
+4) Devo-Telemetry
+	* add initial support CSV import converted binary log data files
 
-3) iCharger (serial communication only)
-	- fix problems with received strings which are not a valid status
-4) MC3000
-	- add support for Lithium-Titanate batteries (BATT TYPE: LTO) FW 1.14
-
-5) NMEA-Adapter
-	- fix NMEA-Adapter parser to handle not supported NMEA sentence at begin
-
-6) UT16E Unitrend multimeter
-	- add support
-
-7) S32, latest and greatest JLog3
-	- correct RPM factor
-
-8) SM GPS-Logger (1+2) 
-	- update configuration capability to FW 1.19
-
-9) SM UniLog2
-	- update configuration capability to FW 1.14
-
-19) VC820, VC840
-	- fix table update problem while starting new recording in table view
-
-20) History analysis
-	- add context menu support
-		- graphics template support (no default set of templates get delivered) 
-		- analyze values in detail in the measurement mode (absolute / delta)
-		  - measurements table
-		  - delta measurements with regression and boxplot
-		- right click on a source file in the history graph / table and 
-			- open it in the graphics tab for detailed analysis
-			- exclude / reintegrate it in the history analysis (e.g. preflight tests)
-			- delete it permanently (e.g. unintentional recordings)
-	- user interface enhancements
-		- identify the source files via x-axis tool tips showing the filename
-		- show source directories in the graphics header tooltip
-		- enhance smart statistics (quantiles, boxplots) and outlier identification
-		- show the GPS location in a human readable text in the history table (requires internet access)
-	- minor enhancements
-		- support print and screen capturing
-		- integrate files from subdirectories (maximum directory level setting) 
-		- some additional measurements have been stripped off (e.g. file size, CPU time)
-		- fix package loss unit (was per mille)
-		- update DeviceProperties schema to V31 to enable updates regarding history analysis
-
-21) update users guideline documentation 
-
-1) Verbesserungen und Fehlerkorrekturen
-	- Korrektur des AnaloG Displays zum synchronisierten Master-Datensatz
-	- Unterstützung für UTC Zeitformatierung
-	- Verbesserte GPS-Koordinatenuntestützung (longitude / latitude)
-		- Formatierung in Grad/Minuten oder Dezimalgrad basierend auf der angegebenen Einheit in der Geräte XML
-	- bleibe bei ausgewählten Ausgang/Kanal beim öffnen von OSD-Dateien
-	- STM virtualle serielle Ports werden  jetzt aufgelistet (Graupner MC-28/26)
-	- Korrektur der Geräte-XML Migration für Geräte mit echtem USB Anschluss
-	- Vereinfachung der Geräte-XML zu einer Sprache neutralen Version, um den Wartungsaufwand zu reduzieren
-
+1) allgemeine Korrekturen
+	* korrigiert Abfrage des Arbeitsstatus spezifiziert in XML (iCharger,....) 
+	* korrigiert NullPointerException beim KMZ Export und nicht komplett initialisiertem Objekt
+	* korrigiert Objekt-Initialisierung mit Verwendung von falschem Objektschlüssel
+	* korrigiert seriell angeschlossener iCharger Live-Datensammler toleriert jetzt Timeouts
+	* korrigiert Objekt-Aktualisierung beim Entfernen von Objekten
+	* korrigiert Grafikvorlage Sicherungsproblem
+	* Reduzierung von grafischen Anzeige-Änderungen, die eine Sicherungsnachfrage auslösen
+	* entferne LogView Dateien als CSV-Export während des Junis-Testlauf
+	* verbessert Auflistung von seriellen Ports unter Windows für Bluetooth virtuellen seriellen Ports
 2) HoTTAdapter*
-	- Korrektur des Start-Zeit-Eintrages unter Einbeziehung des letzten Änderungsdatums der Log-Dateien
-	- Korrektur der Überschrift im Grafik-Fenster zum aktuellen Bearbeitungsdatum, das ist unabhängig vom Log-Datumseintrag
-	- MDL Konvertierungdfunktionalität für MC-28/MC-26 from/to MC-32,MC-20,MX-20,MC-16 (keine Beta Firmware)
-	- Update des MDL Plug-ins
-
-3) iCharger (nur serielle Kommunikation)
-	- Korrektur beim Empfang von Zeichenketten mit ungültiger Information
+	* korrigiert HoTTAdapter* GAM Kapazitätsfilter mit Nullwerten
+	* fehlende Messwerte (GAM,EAM) Auswertung hinzugefügt
+	* Alarm-und Ereignis-Auswertung hinzugefügt
+	* initiale Unterstützung für neues Logdatenformat (*.log) hinzugefügt
+3) Pulsar3
+	* initiale Unterstützung für Import *.acp, Live-Aufnahme, Import LogView-Dateien
+4) Devo-Telemetry
+	* initiale Unterstützung für Import von CSV-Dateien nach Konvertierung der binären Logdaten
 	
-4) MC3000
-	- Unterstützung für Lithium-Titanate Akkus (BATT TYPE: LTO) FW >= 1.14
-
-5) NMEA-Adapter
-	- Korrektur des NMEA-Adapter-Parser, toleriert jetzt nicht unterstützte NMEA Sätze am Anfang
-
-6) UT16E Unitrend Multimeter
-	- Unterstützung eingeführt
-
-7) S32, JLog3
-	- Korrektur des Drehzahl-Faktors
-
-8) SM GPS-Logger (1+2) 
-	- Konfiguration unterstützt jetzt FW 1.19
-
-9) SM UniLog2
-	- Konfiguration unterstützt jetzt to FW 1.14
-
-19) VC820, VC840
-	- Korrektur des Tabellen-Updates beim Anfang eines neuen Datensatzes
-
-20) Historien-Analyse
-	- Historien-Grafik-Templates werden unterstützt, es gibt aber kein Standard-Template durch die Installation
-	- Kontext-Menu Unterstützung
-		- detaillierte Analyseunterstützung beim Messen (absolute und Differenzmessung)
-		- Laden spezifischer Logdateien über Grafik und Tabelle
-		- Aussortieren und Einsortieren von Dateien in die History-Analyse (z.B. Bodentests)
-		- permanentes Löschen von irrelevanten Aufnahmen
-	- Verbesserungen der Benutzerschnittstelle
-		- Identifikation und Anzeige der zugehörigen Log-Datei über Tooltips der Zeitachse
-		- Anzeige der verwendeten Verzeichnisse in der Grafiküberschrift als Tooltip
-		- Verbesserung der Statistik (Quantile, Boxplots) und eingezeichnete Artefakte
-		- Anzeige der GPS Location in lesbarer Form in der Historien-Tabelle (benötigt Internet-Zugriff)
-		- Unterstützung fürs Drucken und Übertrag ins Clipboard
-		- Einbeziehung von Dateien in Unterverzeichnissen durch Konfiguration der Suchtiefe 
-		- Korrektur der Einheit zu verlorenen Paketen
-		- Neues DeviceProperties Schema to V31 für die History-Analyse
-
-21) Update des Benutzerhandbuches und interner Hilfedokumentation 

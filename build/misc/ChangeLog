@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.3.1 - xx yyy 2017
+Version 3.3.1 - 17 Oct 2017
 * fix retrieving working state from XML (iCharger and others) 
 * fix NullPointerException while KMZ export having a not completely initialized object
 * fix object initialization using wrong object key
