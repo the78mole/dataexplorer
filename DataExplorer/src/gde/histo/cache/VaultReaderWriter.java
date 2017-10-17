@@ -21,6 +21,7 @@ package gde.histo.cache;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,16 +37,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import gde.GDE;
 import gde.config.Settings;
-import gde.exception.DataInconsitsentException;
-import gde.exception.DataTypeException;
-import gde.exception.NotSupportedFileFormatException;
+import gde.histo.datasources.DirectoryScanner.SourceDataSet;
 import gde.histo.datasources.HistoSetCollector.ProgressManager;
-import gde.histo.device.IHistoDevice;
-import gde.histo.io.HistoOsdReaderWriter;
 import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
@@ -63,26 +60,14 @@ public final class VaultReaderWriter {
 
 	/**
 	 * Read file and populate the vault from the recordset.
-	 * @param filePath is the actual file path, not the path to the link file
-	 * @param trusses
-	 * @throws DataTypeException for the bin file reader only
-	 * @throws DataInconsitsentException
-	 * @throws NotSupportedFileFormatException
-	 * @throws IOException
 	 * @return the vaults extracted from the file based on the input trusses
 	 */
-	public static List<ExtendedVault> loadVaultsFromFile(Path filePath, Map<String, VaultCollector> trusses)
-			throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+	public static List<ExtendedVault> loadVaultsFromFile(Path filePath, Map<String, VaultCollector> trusses) {
 		List<ExtendedVault> histoVaults = null;
 
-		final String supportedImportExtention = application.getActiveDevice() instanceof IHistoDevice ? ((IHistoDevice) application.getActiveDevice()).getSupportedImportExtention() : GDE.STRING_EMPTY;
 		try {
-			if (!supportedImportExtention.isEmpty() && filePath.toString().endsWith(supportedImportExtention))
-				histoVaults = ((IHistoDevice) DataExplorer.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses.values());
-			else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_OSD))
-				histoVaults = HistoOsdReaderWriter.readVaults(filePath, trusses.values());
-			else
-				throw new IllegalArgumentException();
+			SourceDataSet dataSet = new SourceDataSet(filePath);
+			histoVaults = dataSet.readVaults(trusses);
 		} catch (Exception e) {
 			histoVaults = new ArrayList<ExtendedVault>();
 			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
@@ -95,16 +80,15 @@ public final class VaultReaderWriter {
 
 	/**
 	 * Read cached vaults and reduce the trussJobs map.
-	 * @param trussJobs with the actual path (not the link file path) and a map of vault skeletons (the key vaultFileName prevents double entries)
+	 * @param trussJobs lists all source files with a map of their vault skeletons (the key vaultFileName prevents double entries)
 	 * @return the vaults and trusses loaded from the cache
 	 * @throws IOException during opening or traversing the zip file
 	 */
-	public static synchronized List<ExtendedVault> loadVaultsFromCache(Map<Path, Map<String, VaultCollector>> trussJobs, ProgressManager progress) throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
+	public static synchronized List<ExtendedVault> loadVaultsFromCache(Map<Path, Map<String, VaultCollector>> trussJobs, ProgressManager progress) //
+			throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
 		List<ExtendedVault> vaults = new ArrayList<>();
 
 		Path cacheFilePath = ExtendedVault.getVaultsFolder();
-		log.log(Level.FINER, "cacheFilePath=", cacheFilePath); //$NON-NLS-1$
-		VaultProxy vaultIO = new VaultProxy();
 		if (VaultReaderWriter.settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
 			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
 				Iterator<Map.Entry<Path, Map<String, VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
@@ -114,25 +98,23 @@ public final class VaultReaderWriter {
 					while (trussesIterator.hasNext()) {
 						progress.countInLoop(1);
 						VaultCollector truss = trussesIterator.next().getValue();
-						if (zf.getEntry(truss.getVault().getVaultName()) != null) {
+						ZipEntry vaultName = zf.getEntry(truss.getVault().getVaultName());
+						if (vaultName != null) {
 							HistoVault histoVault = null;
 							try {
-								histoVault = vaultIO.load(new BufferedInputStream(zf.getInputStream(zf.getEntry(truss.getVault().getVaultName()))));
-							}
-							catch (Exception e) {
+								histoVault = VaultProxy.load(new BufferedInputStream(zf.getInputStream(vaultName)));
+							} catch (Exception e) {
 								log.log(Level.SEVERE, e.getMessage(), e);
 							}
 
-							if (histoVault != null) {
-								vaults.add(histoVault.getExtendedVault());
-							}
+							if (histoVault != null) vaults.add(histoVault.getExtendedVault());
 							trussesIterator.remove();
 						}
 					}
 					if (map.size() == 0) trussJobsIterator.remove();
 				}
 			}
-			} else if (!VaultReaderWriter.settings.isZippedCache() && FileUtils.checkDirectoryAndCreate(cacheFilePath.toString())) {
+		} else if (!VaultReaderWriter.settings.isZippedCache() && FileUtils.checkDirectoryExist(cacheFilePath.toString())) {
 			Iterator<Map.Entry<Path, Map<String, VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
 			while (trussJobsIterator.hasNext()) {
 				final Map<String, VaultCollector> map = trussJobsIterator.next().getValue();
@@ -142,16 +124,14 @@ public final class VaultReaderWriter {
 					VaultCollector truss = trussesIterator.next().getValue();
 					if (FileUtils.checkFileExist(cacheFilePath.resolve(truss.getVault().getVaultName()).toString())) {
 						HistoVault histoVault = null;
-						try (InputStream inputStream = new BufferedInputStream(new FileInputStream(cacheFilePath.resolve(truss.getVault().getVaultName()).toFile()))) {
-							histoVault = vaultIO.load(inputStream);
-						}
-						catch (Exception e) {
+						File vaultFile = cacheFilePath.resolve(truss.getVault().getVaultName()).toFile();
+						try (InputStream inputStream = new BufferedInputStream(new FileInputStream(vaultFile))) {
+							histoVault = VaultProxy.load(inputStream);
+						} catch (Exception e) {
 							log.log(Level.SEVERE, e.getMessage(), e);
 						}
 
-						if (histoVault != null) {
-							vaults.add(histoVault.getExtendedVault());
-						}
+						if (histoVault != null) vaults.add(histoVault.getExtendedVault());
 						trussesIterator.remove();
 					}
 				}
@@ -168,7 +148,6 @@ public final class VaultReaderWriter {
 	 */
 	public static long storeVaultsInCache(List<ExtendedVault> newVaults) throws IOException {
 		Path cacheFilePath = ExtendedVault.getVaultsFolder();
-		VaultProxy vaultIO = new VaultProxy();
 		if (settings.isZippedCache()) {
 			// use a zip file system because it supports adding files in contrast to the standard procedure using a ZipOutputStream
 			Map<String, String> env = new HashMap<String, String>();
@@ -178,10 +157,8 @@ public final class VaultReaderWriter {
 					// name the file inside the zip file
 					Path filePath = zipFileSystem.getPath(histoVault.getVaultFileName().toString());
 					if (!FileUtils.checkFileExist(filePath.toString())) {
-						//					if (!filePath.toFile().exists()) {
 						try (BufferedOutputStream zipOutputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
-							vaultIO.store(histoVault, zipOutputStream);
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%s  %s", histoVault.getVaultFileName(), cacheFilePath.toString())); //$NON-NLS-1$
+							VaultProxy.store(histoVault, zipOutputStream);
 						} catch (Exception e) {
 							log.log(Level.SEVERE, e.getMessage(), e);
 						}
@@ -193,8 +170,7 @@ public final class VaultReaderWriter {
 			for (ExtendedVault histoVault : newVaults) {
 				Path filePath = cacheFilePath.resolve(histoVault.getVaultFileName());
 				try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
-					vaultIO.store(histoVault, outputStream);
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%s  %s", histoVault.getVaultFileName(), cacheFilePath.toString())); //$NON-NLS-1$
+					VaultProxy.store(histoVault, outputStream);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 				}

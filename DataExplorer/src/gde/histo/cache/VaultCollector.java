@@ -44,6 +44,7 @@ import gde.device.TrailTypes;
 import gde.device.TransitionAmountType;
 import gde.device.TransitionCalculusType;
 import gde.device.TransitionFigureType;
+import gde.histo.datasources.DirectoryScanner.SourceDataSet;
 import gde.histo.settlements.AmountEvaluator;
 import gde.histo.settlements.CalculusEvaluator;
 import gde.histo.settlements.FigureEvaluator;
@@ -66,6 +67,7 @@ public final class VaultCollector {
 
 	private final DataExplorer	application	= DataExplorer.getInstance();
 	private final Settings			settings		= Settings.getInstance();
+	private SourceDataSet				sourceDataSet;
 
 	/**
 	 * @param objectDirectory validated object key
@@ -100,7 +102,7 @@ public final class VaultCollector {
 	@Override
 	public String toString() {
 		return String.format("logChannelNumber=%d  logRecordSetOrdinal=%d  startTimestamp=%s  %s", //$NON-NLS-1$
-				this.vault.getVaultDeviceName(), this.vault.getLogChannelNumber(), this.vault.getLogRecordSetOrdinal(), this.vault.getStartTimeStampFormatted(), this.vault.getLogFilePath());
+				this.vault.getLogChannelNumber(), this.vault.getLogRecordSetOrdinal(), this.vault.getStartTimeStampFormatted(), this.vault.getLogFilePath());
 	}
 
 	/**
@@ -418,7 +420,7 @@ public final class VaultCollector {
 		if (this.application.getActiveDevice() != null && !this.vault.getLogDeviceName().equals(this.application.getActiveDevice().getName())
 				&& !(this.vault.logDeviceName.startsWith("HoTTViewer") && this.application.getActiveDevice().getName().equals("HoTTViewer"))) { // HoTTViewer V3 -> HoTTViewerAdapter //$NON-NLS-1$ //$NON-NLS-2$
 			log.log(Level.INFO, String.format("%s candidate found for wrong device '%-11s' in %s  %s", this.vault.getLogFileExtension(), this.vault.getLogDeviceName(), this.vault.getLogFilePath(), //$NON-NLS-1$
-					this.vault.getStartTimeStampFormatted()));
+							this.vault.getStartTimeStampFormatted()));
 			return false;
 		} else
 			return true;
@@ -469,6 +471,14 @@ public final class VaultCollector {
 
 	public ExtendedVault getVault() {
 		return this.vault;
+	}
+
+	public void setSourceDataSet(SourceDataSet sourceDataSet) {
+		this.sourceDataSet = sourceDataSet;
+	}
+
+	public SourceDataSet getSourceDataSet() {
+		return this.sourceDataSet;
 	}
 
 }

@@ -343,8 +343,41 @@ public final class ExtendedVault extends HistoVault {
 		return this.logObjectKey.isEmpty() ? this.logObjectDirectory : this.logObjectKey;
 	}
 
+	/**
+	 * @return true if this is a vault skeleton only
+	 */
 	public boolean isTruss() {
 		return this.getMeasurements().isEmpty();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + this.logChannelNumber;
+		result = prime * result + ((this.logDeviceName == null) ? 0 : this.logDeviceName.hashCode());
+		result = prime * result + (int) (this.logStartTimestampMs ^ (this.logStartTimestampMs >>> 32));
+		return result;
+	}
+
+	/**
+	 * Identify duplicates originating from copied log files or from file conversions (e.g. bin to osd).
+	 * @param obj
+	 * @return true if a truss or a fully populated vault have the same origin log file
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		HistoVault other = (HistoVault) obj;
+		if (this.logChannelNumber != other.logChannelNumber) return false;
+		if (this.logDeviceName == null) {
+			if (other.logDeviceName != null) return false;
+		} else if (!this.logDeviceName.equals(other.logDeviceName)) return false;
+		if (this.logStartTimestampMs != other.logStartTimestampMs) return false;
+		return true;
 	}
 
 }

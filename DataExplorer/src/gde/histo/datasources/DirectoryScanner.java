@@ -39,6 +39,8 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
+import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
@@ -145,7 +147,7 @@ public final class DirectoryScanner {
 	/**
 	 * File types supported by the history.
 	 */
-	private static class SourceDataSet {
+	public static class SourceDataSet {
 
 		private final Path				path;
 		private final DataSetType	dataSetType;
@@ -153,7 +155,7 @@ public final class DirectoryScanner {
 		/** Use {@code getFile} only */
 		private File							file;
 
-		private enum DataSetType {
+		enum DataSetType {
 			OSD {
 				@Override
 				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException, NotSupportedFileFormatException {
@@ -164,10 +166,22 @@ public final class DirectoryScanner {
 						String objectDirectory = dataFile.getObjectKey(deviceConfigurations);
 						for (VaultCollector truss : HistoOsdReaderWriter.readTrusses(actualFile, objectDirectory)) {
 							truss.getVault().setLogLinkPath(linkPath);
+							truss.setSourceDataSet(dataFile);
 							trusses.add(truss);
 						}
 					}
 					return trusses;
+				}
+
+				@Override
+				public boolean isValidObject(VaultCollector truss, List<Integer> channelMixConfigNumbers, long minStartTimeStamp_ms) {
+					return truss.isConsistentDevice() && truss.isConsistentChannel(channelMixConfigNumbers) && truss.isConsistentStartTimeStamp(minStartTimeStamp_ms)
+							&& truss.isConsistentObjectKey();
+				}
+
+				@Override
+				List<ExtendedVault> readVaults(Path filePath, Map<String, VaultCollector> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+					return HistoOsdReaderWriter.readVaults(filePath, trusses.values());
 				}
 			},
 			BIN {
@@ -176,17 +190,55 @@ public final class DirectoryScanner {
 					String objectDirectory = dataFile.getObjectKey(deviceConfigurations);
 					String recordSetBaseName = DataExplorer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend(dataFile.getFile().getName());
 					VaultCollector truss = new VaultCollector(objectDirectory, dataFile.getFile(), 0, Channels.getInstance().size(), recordSetBaseName);
+					truss.setSourceDataSet(dataFile);
 					return new ArrayList<>(Arrays.asList(truss));
 				}
+
+				@Override
+				public boolean isValidObject(VaultCollector truss, List<Integer> channelMixConfigNumbers, long minStartTimeStamp_ms) {
+					return truss.isConsistentStartTimeStamp(minStartTimeStamp_ms) && truss.isConsistentObjectKey();
+				}
+
+				@Override
+				List<ExtendedVault> readVaults(Path filePath, Map<String, VaultCollector> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+					return ((IHistoDevice) DataExplorer.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses.values());
+				}
 			},
-			LOG {
+			LOG { // was not merged with bin - we expect differences in the future
 				@Override
 				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException, NotSupportedFileFormatException {
 					return BIN.getTrusses(deviceConfigurations, dataFile);
 				}
+
+				@Override
+				public boolean isValidObject(VaultCollector truss, List<Integer> channelMixConfigNumbers, long minStartTimeStamp_ms) {
+					return BIN.isValidObject(truss, channelMixConfigNumbers, minStartTimeStamp_ms);
+				}
+
+				@Override
+				List<ExtendedVault> readVaults(Path filePath, Map<String, VaultCollector> trusses)
+						throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+					return BIN.readVaults(filePath, trusses);
+				}
 			};
 
+			/**
+			 * Determine which trusses are requested from the source file.
+			 * @param deviceConfigurations helps to determine if the source file resides in an object directory
+			 * @param dataFile is the source file
+			 * @return the vault skeletons delivered by the source file based on the current device (and channel and object in case of bin files)
+			 */
 			abstract List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException, NotSupportedFileFormatException;
+
+			public abstract boolean isValidObject(VaultCollector truss, List<Integer> channelMixConfigNumbers, long minStartTimeStamp_ms); // todo determine this in getTrusses, and also select unsuppressed trusses???
+
+			/**
+			 * Promote trusses into vaults by reading the source file.
+			 * @param dataFile
+			 * @param trusses lists the requested vaults
+			 * @return the fully populated vaults
+			 */
+			abstract List<ExtendedVault> readVaults(Path dataFile, Map<String, VaultCollector> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException;
 
 			/**
 			 * @param extension of the file w/o dot
@@ -201,6 +253,33 @@ public final class DirectoryScanner {
 					return DataSetType.LOG;
 				else
 					return null;
+			}
+
+			/**
+			 * Compose the record set extend to give capability to identify source of this record set
+			 * @param fileName
+			 * @return
+			 */
+			private static String getRecordSetExtend(String fileName) {
+				String recordSetNameExtend = GDE.STRING_EMPTY;
+				if (fileName.contains(GDE.STRING_UNDER_BAR)) {
+					try {
+						Integer.parseInt(fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)));
+						recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+					} catch (Exception e) {
+						if (fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)).length() <= 8)
+							recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+					}
+				} else {
+					try {
+						Integer.parseInt(fileName.substring(0, 4));
+						recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, 4) + GDE.STRING_RIGHT_BRACKET;
+					} catch (Exception e) {
+						if (fileName.substring(0, fileName.length()).length() <= 8 + 4)
+							recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.length() - 4) + GDE.STRING_RIGHT_BRACKET;
+					}
+				}
+				return recordSetNameExtend;
 			}
 
 			/**
@@ -275,6 +354,15 @@ public final class DirectoryScanner {
 
 		List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
 			return dataSetType.getTrusses(deviceConfigurations, this);
+		}
+
+		public DataSetType getDataSetType() {
+			return this.dataSetType;
+		}
+
+		public List<ExtendedVault> readVaults(Map<String, VaultCollector> trusses) //
+				throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+			return dataSetType.readVaults(path, trusses);
 		}
 	}
 
@@ -451,33 +539,6 @@ public final class DirectoryScanner {
 			}
 		}
 		return result;
-	}
-
-	/**
-	 * Compose the record set extend to give capability to identify source of this record set
-	 * @param fileName
-	 * @return
-	 */
-	private static String getRecordSetExtend(String fileName) {
-		String recordSetNameExtend = GDE.STRING_EMPTY;
-		if (fileName.contains(GDE.STRING_UNDER_BAR)) {
-			try {
-				Integer.parseInt(fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)));
-				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
-			} catch (Exception e) {
-				if (fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)).length() <= 8)
-					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
-			}
-		} else {
-			try {
-				Integer.parseInt(fileName.substring(0, 4));
-				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, 4) + GDE.STRING_RIGHT_BRACKET;
-			} catch (Exception e) {
-				if (fileName.substring(0, fileName.length()).length() <= 8 + 4)
-					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.length() - 4) + GDE.STRING_RIGHT_BRACKET;
-			}
-		}
-		return recordSetNameExtend;
 	}
 
 	public Map<String, VaultCollector> getUnsuppressedTrusses() {
