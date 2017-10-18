@@ -15,6 +15,11 @@
         <timeStep>-1.0</timeStep>
         <UTCdelta>0</UTCdelta>
     </TimeBase>
+    <DataBlock>
+        <format inputType="FILE_IO" formatType="BYTE" size="64"/>
+        <timeUnit>msec</timeUnit>
+        <preferredDataLocation></preferredDataLocation>
+    </DataBlock>
     <State>
         <property name="state_data_recording" value="01" type="Integer"/>
     </State>
