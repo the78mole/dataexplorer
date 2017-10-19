@@ -19,12 +19,17 @@
 ****************************************************************************************/
 package gde.junit;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import gde.config.Settings;
 import gde.data.Channel;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
@@ -46,45 +51,73 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 	}
 
 	/**
-	 * fills histoSet by reading all logs into all devices and all channels.
-	 * uses cache data.
-	 * ET Win PC elapsed times for DataFilesTestSamples\DataExplorer with 144 files resulting in 223 vaults (using a zipped cache):
+	 * Fills the histoset by reading all logs into all devices and all channels.
+	 * uses cache data in a 2nd internal loop.
+	 * ET 12.2016: Win PC elapsed times for DataFilesTestSamples\DataExplorer with 144 files resulting in 223 vaults (using a zipped cache):
 	 *  - 1st run w/o vault cache 72 sec
 	 *  - 2nd run with vault cache 23 sec
+	 * ET 10.2017: Win PC elapsed times for DataFilesTestSamples\DataExplorer with 224 files resulting in 333 vaults (using a UN/zipped cache) including 73 bin files:
+	 *  - 1st run w/o vault cache 230/225 sec (20,7 MBi cache)
+	 *  - 2nd run with vault cache 56/56 sec (2,49 MBi cache)
 	 */
 	public void testBuildHistoSet4TestSamples() {
-		System.out
-				.println(String.format("Max Memory=%,11d   Total Memory=%,11d   Free Memory=%,11d", Runtime.getRuntime().maxMemory(), Runtime.getRuntime().totalMemory(), Runtime.getRuntime().freeMemory()));
+		System.out.println(String.format("Max Memory=%,11d   Total Memory=%,11d   Free Memory=%,11d", Runtime.getRuntime().maxMemory(), Runtime.getRuntime().totalMemory(),
+				Runtime.getRuntime().freeMemory()));
 		TreeMap<String, Exception> failures = new TreeMap<String, Exception>();
 
 		HistoSet histoSet = HistoSet.getInstance();
 
-		String objectKey = "";
-		this.setDataPath(DataSource.TESTDATA, Paths.get(objectKey));
+		this.setDataPath(DataSource.TESTDATA, Paths.get(""));
 		// >>> take one of these optional data sources for a smaller test portion <<<
 		//		this.setDataPath(DataSource.INDIVIDUAL, Paths.get("C:\\_Java\\workspace\\DataFilesTestSamples\\DataExplorer", "_Thomas", "DataExplorer"));
 		//		this.setDataPath(DataSource.INDIVIDUAL, Paths.get("C:\\_Java\\workspace\\DataFilesTestSamples\\DataExplorer", "_Winfried", "DataExplorer"));
 
 		FileUtils.checkDirectoryAndCreate(this.dataPath.toString());
-		histoSet.initialize();
-		try {
-			for (Entry<String, DeviceConfiguration> deviceEntry : this.deviceConfigurations.entrySet()) {
-				IDevice device = setDevice(deviceEntry.getKey());
-				if (device != null) {
-					setupDataChannels(device);
-					setupDeviceChannelObject(deviceEntry.getKey(), 1, objectKey);
-					for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
-						this.channels.setActiveChannelNumber(channelEntry.getKey());
+		List<String> objectKeyCandidates = Settings.getInstance().getObjectKeyCandidates(this.deviceConfigurations);
+		objectKeyCandidates.add(""); // empty string for 'device oriented'
 
-						histoSet.scan4Test(this.dataPath.toPath().resolve(this.application.getActiveDevice().getName()), this.deviceConfigurations);
-						histoSet.rebuild4Test();
-						System.out.println(String.format("%33.44s  channelNumber=%2d  histoSetSize==%,11d", this.application.getActiveDevice().getName(), this.channels.getActiveChannelNumber(), histoSet.size()));
+		List<Long> elapsed_sec = new ArrayList<>();
+		this.settings.resetHistoCache();
+		for (int i = 0; i < 2; i++) { // run twice for cache effects measuring
+			long nanoTime = System.nanoTime();
+			histoSet.initialize();
+			try {
+				for (Entry<String, DeviceConfiguration> deviceEntry : this.deviceConfigurations.entrySet()) {
+					IDevice device = setDevice(deviceEntry.getKey());
+					if (device != null) {
+						setupDataChannels(device);
+						System.out.println(this.application.getActiveDevice().getName());
+						for (String objectKey : objectKeyCandidates) {
+							setupDeviceChannelObject(deviceEntry.getKey(), 1, objectKey);
+							Path sourcePath = objectKey.isEmpty() //
+									? this.dataPath.toPath().resolve(this.application.getActiveDevice().getName()) //
+									: this.dataPath.toPath().resolve(objectKey);
+							for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
+								this.channels.setActiveChannelNumber(channelEntry.getKey());
+
+								histoSet.scan4Test(sourcePath, this.deviceConfigurations);
+								int tmpSize = -histoSet.size();
+								histoSet.rebuild4Test();
+								tmpSize += histoSet.size();
+								if (tmpSize > 0) {
+									System.out.println(String.format("%40.44s channelNumber=%2d  histoSetSize==%,11d", //
+											objectKey, this.channels.getActiveChannelNumber(), tmpSize));
+								}
+							}
+						}
 					}
 				}
+				elapsed_sec.add(TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - nanoTime));
+				System.out.println(String.format(" T O T A L            histoSetSize==%,11d  elapsed=%d", //
+						histoSet.size(), elapsed_sec.get(elapsed_sec.size() - 1)));
+			} catch (Exception e) {
+				e.printStackTrace();
+				fail(e.toString());
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.toString());
+
+		}
+		for (int j = 0; j < elapsed_sec.size(); j++) {
+			System.out.println(String.format("duration%d=%,5d", j, elapsed_sec.get(j)));
 		}
 
 		StringBuilder sb = new StringBuilder();

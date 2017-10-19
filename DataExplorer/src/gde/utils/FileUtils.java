@@ -229,7 +229,7 @@ public class FileUtils {
 						FileUtils.log.log(Level.WARNING, "no delete permission on " + directory.getAbsolutePath()); //$NON-NLS-1$
 					}
 				}
-				FileUtils.log.log(Level.WARNING, dir.getAbsolutePath() + " deletion " + dir.delete()); //$NON-NLS-1$
+				FileUtils.log.log(Level.FINE, dir.getAbsolutePath() + " deletion " + dir.delete()); //$NON-NLS-1$
 			}
 			catch (Exception e) {
 				if (e instanceof FileNotFoundException) {

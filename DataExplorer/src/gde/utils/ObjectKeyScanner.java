@@ -27,12 +27,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.device.DeviceConfiguration;
 import gde.exception.NotSupportedFileFormatException;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
@@ -259,7 +261,8 @@ public class ObjectKeyScanner extends Thread {
 	private List<String> getObsoleteObjectKeys(File rootDirectory) throws FileNotFoundException {
 		// get current object key list as a basis for determining the obsolete object keys
 		List<String> resultObjectKeys = new ArrayList<>(this.settings.getRealObjectKeys());
-		resultObjectKeys.removeAll(this.settings.getObjectKeyCandidates());
+		Map<String, DeviceConfiguration> devices = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
+		resultObjectKeys.removeAll(this.settings.getObjectKeyNovelties(devices));
 
 		for (File dir : FileUtils.getDirectories(rootDirectory)) {
 			if (!FileUtils.getFileListing(dir, Integer.MAX_VALUE).isEmpty()) {

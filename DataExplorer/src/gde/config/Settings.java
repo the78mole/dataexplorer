@@ -39,6 +39,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -66,6 +67,7 @@ import org.xml.sax.SAXException;
 
 import gde.GDE;
 import gde.device.DeviceConfiguration;
+import gde.exception.ApplicationConfigurationException;
 import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
@@ -878,8 +880,36 @@ public class Settings extends Properties {
 	 * Scan the sub-directories in the data file and import file paths.
 	 * @return all non-empty sub-directories which neither represent devices nor objects
 	 */
-	public List<String> getObjectKeyCandidates() {
+	public List<String> getObjectKeyNovelties(Map<String, DeviceConfiguration> devices) {
 		Set<String> result = new HashSet<String>();
+		ArrayList<Path> dirPaths = getSourcePaths();
+
+		final Set<String> actualObjects = getRealObjectKeys();
+		for (Path dirPath : dirPaths) {
+			if (!(dirPath == null || dirPath.toString().isEmpty())) {
+				try {
+					final File filePath = dirPath.toFile();
+					for (File file : FileUtils.getDirectories(filePath)) {
+						if (!devices.containsKey(file.getName()) && !actualObjects.stream().filter(s -> s.equalsIgnoreCase(file.getName())).findFirst().isPresent()) {
+							if (!FileUtils.getFileListing(file, Integer.MAX_VALUE).isEmpty()) {
+								result.add(file.getName());
+							}
+						}
+					}
+				}
+				catch (FileNotFoundException e) {
+					log.log(Level.WARNING, e.getLocalizedMessage(), e);
+				}
+			}
+		}
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "object candidates=", result); //$NON-NLS-1$
+		return new ArrayList<String>(result);
+	}
+
+	/**
+	 * @return the valid paths for source files
+	 */
+	private ArrayList<Path> getSourcePaths() {
 		ArrayList<Path> dirPaths = new ArrayList<Path>();
 		{
 			final String dataFilePath = getDataFilePath();
@@ -888,7 +918,7 @@ public class Settings extends Properties {
 				log.log(Level.FINE, "data path ", dataFilePath); //$NON-NLS-1$
 			}
 		}
-		{
+		if (DataExplorer.getInstance().getActiveDevice() != null) 		{
 			String tmpImportDirPath = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredDataLocation();
 			if (getSearchImportPath() && tmpImportDirPath != null && !tmpImportDirPath.trim().isEmpty() && !tmpImportDirPath.equals(GDE.FILE_SEPARATOR_UNIX)) {
 				Path path = Paths.get(tmpImportDirPath);
@@ -910,14 +940,23 @@ public class Settings extends Properties {
 				dirPaths.add(path);
 			}
 		}
-		final Set<String> actualObjects = getRealObjectKeys();
-		final TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
+		return dirPaths;
+	}
+
+	/**
+	 * Scan the sub-directories in the data file and import file paths.
+	 * @return all non-empty sub-directories which do not represent devices
+	 */
+	public List<String> getObjectKeyCandidates(Map<String, DeviceConfiguration> devices) {
+		Set<String> result = new HashSet<String>();
+		ArrayList<Path> dirPaths = getSourcePaths();
+
 		for (Path dirPath : dirPaths) {
 			if (!(dirPath == null || dirPath.toString().isEmpty())) {
 				try {
 					final File filePath = dirPath.toFile();
 					for (File file : FileUtils.getDirectories(filePath)) {
-						if (!actualConfigurations.containsKey(file.getName()) && !actualObjects.stream().filter(s -> s.equalsIgnoreCase(file.getName())).findFirst().isPresent()) {
+						if (!devices.containsKey(file.getName())) {
 							if (!FileUtils.getFileListing(file, Integer.MAX_VALUE).isEmpty()) {
 								result.add(file.getName());
 							}
@@ -929,7 +968,6 @@ public class Settings extends Properties {
 				}
 			}
 		}
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "object candidates=", result); //$NON-NLS-1$
 		return new ArrayList<String>(result);
 	}
 
@@ -2699,7 +2737,7 @@ public class Settings extends Properties {
 	public void setRetrospectMonths(String uintValue) {
 		try {
 			int value = Integer.parseUnsignedInt(uintValue.trim());
-			if (value < 1 || value > 120) value = 12;
+			if (value < 1 || value > 240) value = 12;
 			this.setProperty(Settings.RETROSPECT_MONTHS, String.valueOf(value));
 		}
 		catch (Exception e) {
