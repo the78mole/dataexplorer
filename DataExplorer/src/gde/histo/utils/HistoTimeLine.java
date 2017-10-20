@@ -39,8 +39,6 @@ import org.eclipse.swt.graphics.Point;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.histo.cache.ExtendedVault;
-import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecordSet;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -60,7 +58,6 @@ public final class HistoTimeLine {
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	private final Settings			settings		= Settings.getInstance();
-	private final HistoSet			histoSet		= HistoSet.getInstance();
 
 	enum Density {
 		EXTREME(4), HIGH(8), MEDIUM(10), LOW(16);
@@ -93,7 +90,6 @@ public final class HistoTimeLine {
 
 	private TrailRecordSet								trailRecordSet;																									// this class does not utilize any specific trail recordset methods
 	private int														width;																													// number of pixels for the timescale length (includes left/right margins and the chart region)
-	private long													leftmostTimeStamp, rightmostTimeStamp;													// define the corners of the chart region
 	private TreeMap<Long, Double>					relativeTimeScale;																							// maps histoset timestamps to x-axis with range 0 to 1
 	private Density												density;																												// degree of population on the x -axis
 	private final TreeMap<Long, Integer>	scalePositions			= new TreeMap<>(Collections.reverseOrder());
@@ -103,14 +99,10 @@ public final class HistoTimeLine {
 	 * Take the timeline width and calculates the x-axis pixel positions for the timestamp values.
 	 * @param newTrailRecordSet any recordset object (no trail recordset required)
 	 * @param newWidth  number of pixels for the timescale length including left/right margins for boxplots
-	 * @param newLeftmostTimeStamp  in modes zoom, pan, scope
-	 * @param newRightmostTimeStamp  in modes zoom, pan, scope
 	 */
-	public synchronized void initialize(TrailRecordSet newTrailRecordSet, int newWidth, long newLeftmostTimeStamp, long newRightmostTimeStamp) {
+	public synchronized void initialize(TrailRecordSet newTrailRecordSet, int newWidth) {
 		this.trailRecordSet = newTrailRecordSet;
 		this.width = newWidth;
-		this.leftmostTimeStamp = newLeftmostTimeStamp;
-		this.rightmostTimeStamp = newRightmostTimeStamp;
 		setRelativeScale();
 		defineDensity();
 		setScalePositions();
@@ -118,8 +110,9 @@ public final class HistoTimeLine {
 
 	@Override
 	public String toString() {
-		return String.format("width=%d  leftmostTimeStamp = %,d  rightmostTimeStamp = %,d  density=%s scalePositionsSize=%d scaleTimeStamps_ms=%d", this.width, this.leftmostTimeStamp,
-				this.rightmostTimeStamp, this.density.toString(), this.scaleTimeStamps_ms.size(), this.scaleTimeStamps_ms.entrySet().parallelStream().mapToInt(c -> c.getValue().size()).sum());
+		return String.format("width=%d  leftmostTimeStamp = %,d  rightmostTimeStamp = %,d  density=%s scalePositionsSize=%d scaleTimeStamps_ms=%d", //
+				this.width, this.trailRecordSet.getLeftmostTimeStamp_ms(), this.trailRecordSet.getRightmostTimeStamp_ms(), this.density.toString(), this.scaleTimeStamps_ms.size(),
+				this.scaleTimeStamps_ms.entrySet().parallelStream().mapToInt(c -> c.getValue().size()).sum());
 	}
 
 	/**
@@ -137,7 +130,7 @@ public final class HistoTimeLine {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("time line - x0=%d y0=%d - width=%d", x0, y0, this.width)); //$NON-NLS-1$
 
 		// calculate the maximum time to be displayed and define the corresponding label format
-		final DateTimePattern timeFormat = getScaleFormat(this.trailRecordSet.getTopTimeStamp_ms() - this.trailRecordSet.getLastTimeStamp_ms());
+		final DateTimePattern timeFormat = getScaleFormat(this.trailRecordSet.getLeftmostTimeStamp_ms() - this.trailRecordSet.getRightmostTimeStamp_ms());
 
 		String timeLineDescription;
 		Point pt; // to calculate the space required to draw the time values
@@ -154,7 +147,8 @@ public final class HistoTimeLine {
 		} else {
 			throw new UnsupportedOperationException();
 		}
-		pt = gc.textExtent(LocalizedDateTime.getFormatedTime(timeFormat, this.histoSet.isEmpty() ? 11 : this.histoSet.firstKey())); // $NON-NLS-1$
+		long sampleTimeStamp_ms = trailRecordSet.getTimeStepSize() == 0  ? 11 : trailRecordSet.getLeftmostTimeStamp_ms();
+		pt = gc.textExtent(LocalizedDateTime.getFormatedTime(timeFormat, sampleTimeStamp_ms)); // $NON-NLS-1$
 		GraphicsUtils.drawTimeLineText(timeLineDescription, (x0 + this.width / 2), y0 + pt.y * 5 / 2 + 2, gc, SWT.HORIZONTAL);
 		drawTickMarks(gc, x0, y0, pt, timeFormat);
 	}
@@ -170,7 +164,7 @@ public final class HistoTimeLine {
 
 		long totalTime_month = TimeUnit.DAYS.convert(totalDisplayTime_ms, TimeUnit.MILLISECONDS) / 30;
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(this.leftmostTimeStamp); // start year
+		cal.setTimeInMillis(this.trailRecordSet.getLeftmostTimeStamp_ms()); // start year
 		if (totalTime_month < 12 && Calendar.getInstance().get(Calendar.YEAR) == cal.get(Calendar.YEAR)) { // starts in the current year
 			if (this.density == Density.EXTREME)
 				timeFormat = DateTimePattern.MMdd;
@@ -244,8 +238,8 @@ public final class HistoTimeLine {
 		LinkedHashMap<Long, Long> applicableDistances = new LinkedHashMap<>();
 		long lastTimeStamp = 0;
 		long applicableDistancesSum = 0;
-		for (Entry<Long, List<ExtendedVault>> entry : this.histoSet.subMap(this.leftmostTimeStamp, true, this.rightmostTimeStamp, true).entrySet()) {
-			long currentTimeStamp = entry.getKey();
+		for (int i = 0; i < this.trailRecordSet.getTimeStepSize(); i++) {
+			long currentTimeStamp = ((long) this.trailRecordSet.getTime_ms(i));
 			if (log.isLoggable(Level.FINER)) {
 				ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentTimeStamp), ZoneId.systemDefault());
 				log.log(Level.FINER, "timestamp = " + currentTimeStamp + "  " + zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)); //$NON-NLS-1$ //$NON-NLS-2$

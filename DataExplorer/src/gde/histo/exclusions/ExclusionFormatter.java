@@ -24,8 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import gde.GDE;
-import gde.histo.cache.VaultCollector;
-import gde.histo.datasources.HistoSet;
+import gde.ui.DataExplorer;
 
 /**
  * Exclusion data administration.
@@ -38,9 +37,8 @@ public final class ExclusionFormatter {
 	 */
 	public static String getExcludedTrussesAsText() {
 		Set<String> exclusionTexts = new HashSet<>();
-		for (VaultCollector truss : HistoSet.getInstance().getSuppressedTrusses().values()) {
-			Path fileDir = truss.getVault().getLogFileAsPath().getParent();
-			exclusionTexts.add(getFormattedProperty(ExclusionData.getInstance(fileDir), truss.getVault().getLogFileAsPath().getFileName().toString()));
+		for (Path path : DataExplorer.getInstance().getHistoSet().getExcludedPaths()) {
+			exclusionTexts.add(getFormattedProperty(ExclusionData.getInstance(path.getParent()),path.getFileName().toString()));
 		}
 
 		StringBuilder sb = new StringBuilder();

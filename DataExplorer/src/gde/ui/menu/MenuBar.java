@@ -49,7 +49,7 @@ import gde.device.DeviceConfiguration;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.histo.config.HistoGraphicsTemplate;
-import gde.histo.datasources.HistoSet;
+import gde.histo.recordings.TrailRecordSet;
 import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -60,8 +60,8 @@ import gde.ui.dialog.DeviceSelectionDialog;
 import gde.ui.dialog.PrintSelectionDialog;
 import gde.ui.dialog.TimeSetDialog;
 import gde.ui.dialog.edit.DevicePropertiesEditor;
-import gde.ui.tab.GraphicsWindow;
 import gde.ui.tab.GraphicsComposite.GraphicsMode;
+import gde.ui.tab.GraphicsWindow;
 
 /**
  * menu bar implementation class for the DataExplorer
@@ -659,7 +659,7 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
-								HistoSet.getInstance().getTrailRecordSet().saveTemplate();
+								DataExplorer.getInstance().getHistoSet().getTrailRecordSet().saveTemplate();
 							}
 							else {
 								MenuBar.this.channels.getActiveChannel().saveTemplate();
@@ -676,10 +676,11 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreDefaultGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
-								HistoGraphicsTemplate template = HistoSet.getInstance().getTrailRecordSet().getTemplate();
+								TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
+								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
 								template.setHistoFileName(template.getDefaultFileName());
 								template.load();
-								HistoSet.getInstance().getTrailRecordSet().applyTemplate(true);
+								trailRecordSet.applyTemplate(true);
 							}
 							else {
 								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
@@ -704,7 +705,7 @@ public class MenuBar {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
 							if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
-								HistoGraphicsTemplate template = HistoSet.getInstance().getTrailRecordSet().getTemplate();
+								HistoGraphicsTemplate template = DataExplorer.getInstance().getHistoSet().getTrailRecordSet().getTemplate();
 								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
 										Settings.getInstance().getGraphicsTemplatePath(), template.getDefaultFileName());
 								fileDialog.open();
@@ -743,11 +744,12 @@ public class MenuBar {
 							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
 									Settings.getInstance().getGraphicsTemplatePath(), null, SWT.SINGLE);
 							if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
-								HistoGraphicsTemplate template = HistoSet.getInstance().getTrailRecordSet().getTemplate();
+								TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
+								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
 								template.setHistoFileName(fileDialog.getFileName());
 								MenuBar.log.log(Level.FINE, "templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
 								template.load();
-								HistoSet.getInstance().getTrailRecordSet().applyTemplate(true);
+								trailRecordSet.applyTemplate(true);
 							}
 							else {
 								Channel activeChannel = MenuBar.this.channels.getActiveChannel();

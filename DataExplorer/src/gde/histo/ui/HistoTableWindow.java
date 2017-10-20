@@ -76,8 +76,6 @@ public class HistoTableWindow extends CTabItem {
 
 	private static final int					TEXT_EXTENT_FACTOR	= 6;
 
-	private final HistoSet						histoSet						= HistoSet.getInstance();
-
 	private Table											dataTable;
 	private TableColumn								recordsColumn;
 	private TableCursor								cursor;
@@ -262,7 +260,9 @@ public class HistoTableWindow extends CTabItem {
 					updateVector(HistoTableWindow.this.dataTable.indexOf(HistoTableWindow.this.cursor.getRow()), HistoTableWindow.this.dataTable.getTopIndex());
 				}
 
-				TrailRecordSet trailRecordSet = Channels.getInstance().getActiveChannel() != null ? trailRecordSet = HistoSet.getInstance().getTrailRecordSet() : null;
+				TrailRecordSet trailRecordSet = Channels.getInstance().getActiveChannel() != null //
+						? trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet() //
+						: null;
 				int rowNumber = HistoTableWindow.this.dataTable.indexOf(HistoTableWindow.this.cursor.getRow()); // 0-based
 				int columnNumber = HistoTableWindow.this.cursor.getColumn(); // 0-based
 				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "row=" + rowNumber + "  column=" + columnNumber); //$NON-NLS-1$ //$NON-NLS-2$
@@ -295,7 +295,7 @@ public class HistoTableWindow extends CTabItem {
 		this.dataTable.addListener(SWT.SetData, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				TrailRecordSet trailRecordSet = HistoTableWindow.this.histoSet.getTrailRecordSet();
+				TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
 				if (trailRecordSet.size() > 0) {
 					TableItem item = (TableItem) event.item;
 					if (HistoTableWindow.this.dataTable.indexOf(item) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
@@ -402,7 +402,7 @@ public class HistoTableWindow extends CTabItem {
 	}
 
 	public boolean isHeaderTextValid() {
-		String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(this.histoSet.getTrailRecordSet());
+		String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(DataExplorer.getInstance().getHistoSet().getTrailRecordSet());
 		if (tableHeaderRow.length == this.dataTable.getColumnCount() - 2) {
 			boolean isValid = true;
 			for (int i = 0; i < tableHeaderRow.length; i++) {
@@ -418,7 +418,7 @@ public class HistoTableWindow extends CTabItem {
 
 	public boolean isRowTextAndTrailValid() {
 		boolean isValid = false;
-		TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
+		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
 		for (int j = 0; j < this.dataTable.getItems().length; j++) {
 			TableItem tableItem = this.dataTable.getItems()[j];
 			int index = HistoTableWindow.this.dataTable.indexOf(tableItem);
@@ -458,8 +458,9 @@ public class HistoTableWindow extends CTabItem {
 
 		// set the data columns of the new header line
 		Channel activeChannel = this.channels.getActiveChannel();
-		if (activeChannel != null && this.histoSet != null && this.histoSet.getTrailRecordSet() != null) {
-			String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(this.histoSet.getTrailRecordSet());
+		HistoSet histoSet = DataExplorer.getInstance().getHistoSet();
+		if (activeChannel != null && histoSet != null && histoSet.getTrailRecordSet() != null) {
+			String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(histoSet.getTrailRecordSet());
 			if (tableHeaderRow.length > 0) {
 				for (String headerString : tableHeaderRow) {
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
@@ -469,7 +470,7 @@ public class HistoTableWindow extends CTabItem {
 			}
 			else {
 				if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { //$NON-NLS-1$ //$NON-NLS-2$
-					//Linux SWT need additional header field for padding 
+					//Linux SWT need additional header field for padding
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 					column.setWidth(100);
 				}

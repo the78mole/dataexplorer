@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -64,8 +65,11 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	private final List<Integer>						durations_mm				= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
 
-	private final TrailDataTags						dataTags						= new TrailDataTags();
-	private final TrailRecordSynchronizer	synchronizer				= new TrailRecordSynchronizer(this);
+	private final TrailDataTags												dataTags						= new TrailDataTags();
+	private final TrailRecordSynchronizer							synchronizer				= new TrailRecordSynchronizer(this);
+
+	/** Data source for this recordset. */
+	private final TreeMap<Long, List<ExtendedVault>>	histoVaults;
 
 	public enum DisplayTag {
 		FILE_NAME, DIRECTORY_NAME, BASE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, GPS_LOCATION;
@@ -91,9 +95,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @param recordNames
 	 * @param timeSteps
 	 */
-	private TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames, TimeSteps timeSteps) {
+	private TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames, TimeSteps timeSteps, TreeMap<Long, List<ExtendedVault>>	histoVaults) {
 		super(useDevice, channelNumber, "Trail", recordNames, timeSteps); //$NON-NLS-1$
 		String deviceSignature = useDevice.getName() + GDE.STRING_UNDER_BAR + channelNumber;
+		this.histoVaults = histoVaults;
 		this.template = new HistoGraphicsTemplate(deviceSignature);
 		if (this.template != null) this.template.load();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
@@ -106,11 +111,11 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @param channelConfigNumber (number of the outlet or configuration)
 	 * @return a trail record set containing all trail records (empty) as specified
 	 */
-	public static synchronized TrailRecordSet createRecordSet(IDevice device, int channelConfigNumber) {
+	public static synchronized TrailRecordSet createRecordSet(IDevice device, int channelConfigNumber, TreeMap<Long, List<ExtendedVault>>	histoVaults	) {
 		String[] names = device.getDeviceConfiguration().getMeasurementSettlementScoregroupNames(channelConfigNumber);
 		TimeSteps timeSteps = new TimeSteps(-1, INITIAL_RECORD_CAPACITY);
 
-		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names, timeSteps);
+		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names, timeSteps, histoVaults);
 		printRecordNames("createRecordSet() " + newTrailRecordSet.getName() + " - ", newTrailRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 		List<MeasurementType> channelMeasurements = device.getDeviceConfiguration().getChannelMeasuremts(channelConfigNumber);
 		LinkedHashMap<Integer, SettlementType> channelSettlements = device.getDeviceConfiguration().getChannel(channelConfigNumber).getSettlements();
@@ -409,11 +414,11 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return this.dataTags;
 	}
 
-	public long getTopTimeStamp_ms() {
+	public long getLeftmostTimeStamp_ms() {
 		return this.timeStep_ms.firstElement() / 10;
 	}
 
-	public long getLastTimeStamp_ms() {
+	public long getRightmostTimeStamp_ms() {
 		return this.timeStep_ms.lastElement() / 10;
 	}
 
@@ -444,6 +449,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			return record.isMeasurementMode() || record.isDeltaMeasurementMode();
 		} else
 			return false;
+	}
+
+	public TreeMap<Long, List<ExtendedVault>> getHistoVaults() {
+		return this.histoVaults;
 	}
 
 }

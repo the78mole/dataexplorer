@@ -24,9 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import gde.histo.cache.VaultCollector;
-import gde.histo.datasources.HistoSet;
 import gde.log.Level;
+import gde.ui.DataExplorer;
 
 /**
  * Exclusion activity processing.
@@ -44,8 +43,8 @@ public final class ExclusionActivity {
 	public static void clearExcludeLists(Path defaultPath) {
 		Set<Path> exclusionDirectories = new HashSet<>();
 		if (defaultPath != null) exclusionDirectories.add(defaultPath);
-		for (VaultCollector truss : HistoSet.getInstance().getSuppressedTrusses().values()) {
-			exclusionDirectories.add(truss.getVault().getLogFileAsPath().getParent());
+		for (Path path : DataExplorer.getInstance().getHistoSet().getExcludedPaths()) {
+			exclusionDirectories.add(path.getParent());
 		}
 		for (Path ignorePath : exclusionDirectories) {
 			ExclusionData.getInstance(ignorePath).delete();

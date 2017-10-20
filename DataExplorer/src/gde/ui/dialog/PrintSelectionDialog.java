@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.dialog;
@@ -63,7 +63,6 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
-import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.HistoGraphicsWindow;
 import gde.log.Level;
@@ -107,7 +106,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	};
 
 	/**
-	* Auto-generated main method to display this 
+	* Auto-generated main method to display this
 	* org.eclipse.swt.widgets.Dialog inside a new Shell.
 	*/
 	public static void main(String[] args) {
@@ -139,6 +138,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.pack();
 			this.dialogShell.setSize(400, 400);
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					switch (event.detail) {
 					case SWT.TRAVERSE_ESCAPE:
@@ -150,6 +150,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				}
 			});
 			this.dialogShell.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent arg0) {
 					PrintSelectionDialog.this.application.resetShellIcon();
 				}
@@ -167,6 +168,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				this.configurationGroup.setText(Messages.getString(MessageIds.GDE_MSGT0448));
 				this.configurationGroup.setBounds(7, 36, 168, 286);
 				this.configurationGroup.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINEST, "configurationGroup.paintControl, event=" + evt); //$NON-NLS-1$
 						Channel activeChannel = Channels.getInstance().getActiveChannel();
@@ -189,8 +191,8 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						PrintSelectionDialog.this.curveCompareButton.setSelection(isCopareWindowPrintable); // ET unclear why this line was set on comment
 
 						boolean isHistoWindowPrintable = false;
-						if (activeChannel != null) {
-							TrailRecordSet activeRecordSet = HistoSet.getInstance().getTrailRecordSet();
+						if (activeChannel != null && DataExplorer.getInstance().getHistoSet() != null) {
+							TrailRecordSet activeRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
 							if (activeRecordSet != null) isHistoWindowPrintable = activeRecordSet.size() > 0;
 						}
 						PrintSelectionDialog.this.histoGraphicsButton.setEnabled(isHistoWindowPrintable);
@@ -390,7 +392,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		else
 			histoGraphicsImageAWT = null;
 
-		// select the tab which was active before 
+		// select the tab which was active before
 		this.application.selectTab(currentTabIndex);
 
 		Thread printThread = new Thread() {
@@ -549,7 +551,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 * This class is the painter for the document content. 
+	 * This class is the painter for the document content.
 	 * Depending of the image data loaded it will paint graphics, statistics or object characteristics
 	 */
 	static class Document extends Component implements Printable {
@@ -582,8 +584,9 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		 * @param g the graphics context
 		 * @param pageFormat
 		 * @param page
-		 * @return 
+		 * @return
 		 */
+		@Override
 		public int print(Graphics g, PageFormat pageFormat, int page) {
 			Graphics2D g2d = (Graphics2D) g;
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY()); // set the origin to 0,0 for the top left corner
@@ -711,14 +714,14 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//		log.log(Level.INFO, "trim = " + trim);
 	//		log.log(Level.INFO, "clientArea = " + clientArea);
 	//		log.log(Level.INFO, "bounds = " + bounds);
-	//		Rectangle printBounds = new Rectangle(-trim.x, -trim.y, clientArea.width-(trim.width), clientArea.height-(trim.height)); 
+	//		Rectangle printBounds = new Rectangle(-trim.x, -trim.y, clientArea.width-(trim.width), clientArea.height-(trim.height));
 	//		log.log(Level.INFO, "printBounds = " + printBounds);
 	//
 	//		double scaleFactor = printerDPI.x / screenDPI.x;
 	//
 	//		// Start the print job
 	//		if (isLandscape) {
-	//			
+	//
 	//		}
 	//		else { // is portrait
 	//			if (printer.startJob(de.DE_NAME_LONG)) {
@@ -732,7 +735,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//					ImageData graphicsImageData = graphicsImage.getImageData();
 	//					Image graphicsPrinterImage = new Image(printer, graphicsImageData);
 	//					scaleFactor = 1.0 * printBounds.width / graphicsImageData.width;
-	//					gc.drawImage(graphicsPrinterImage, 0, 0, graphicsImageData.width, graphicsImageData.height, 
+	//					gc.drawImage(graphicsPrinterImage, 0, 0, graphicsImageData.width, graphicsImageData.height,
 	//						printBounds.x, printBounds.y + pt.y + 20, (int) (scaleFactor * graphicsImageData.width), (int) (scaleFactor * graphicsImageData.height));
 	//					graphicsPrinterImage.dispose();
 	//					graphicsImage.dispose();
@@ -750,7 +753,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//						ImageData objectImageData = objectImage.getImageData();
 	//						Image objectPrinterImage = new Image(printer, objectImageData);
 	//						scaleFactor = 1.0 * printBounds.width / objectImageData.width;
-	//						gc.drawImage(objectPrinterImage, 0, 0, objectImageData.width, objectImageData.height, 
+	//						gc.drawImage(objectPrinterImage, 0, 0, objectImageData.width, objectImageData.height,
 	//							printBounds.x, printBounds.y + printBounds.height / 2, (int) (scaleFactor * objectImageData.width),	(int) (scaleFactor * objectImageData.height));
 	//						objectPrinterImage.dispose();
 	//						objectImage.dispose();
@@ -776,7 +779,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//						ImageData objectImageData = objectImage.getImageData();
 	//						Image objectPrinterImage = new Image(printer, objectImageData);
 	//						scaleFactor = 1.0 * printBounds.width / objectImageData.width;
-	//						gc.drawImage(objectPrinterImage, 0, 0, objectImageData.width, objectImageData.height, 
+	//						gc.drawImage(objectPrinterImage, 0, 0, objectImageData.width, objectImageData.height,
 	//							printBounds.x, printBounds.y + printBounds.height / 2, (int) (scaleFactor * objectImageData.width),	(int) (scaleFactor * objectImageData.height));
 	//						objectPrinterImage.dispose();
 	//						objectImage.dispose();
@@ -795,7 +798,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	//					ImageData objectImageData = objectImage.getImageData();
 	//					Image objectPrinterImage = new Image(printer, objectImageData);
 	//					scaleFactor = 1.0 * printBounds.width / objectImageData.width;
-	//					gc.drawImage(objectPrinterImage, 0, 0, objectImageData.width, objectImageData.height, 
+	//					gc.drawImage(objectPrinterImage, 0, 0, objectImageData.width, objectImageData.height,
 	//						printBounds.x, printBounds.y + pt.y + 20, (int)(scaleFactor * objectImageData.width),	(int)(scaleFactor * objectImageData.height));
 	//					objectPrinterImage.dispose();
 	//					objectImage.dispose();

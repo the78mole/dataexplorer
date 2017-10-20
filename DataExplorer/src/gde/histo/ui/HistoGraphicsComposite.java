@@ -52,7 +52,6 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
-import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionFormatter;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
@@ -80,7 +79,6 @@ public final class HistoGraphicsComposite extends Composite {
 	private final static String				$CLASS_NAME			= HistoGraphicsComposite.class.getName();
 	private final static Logger				log							= Logger.getLogger($CLASS_NAME);
 
-	private final HistoSet						histoSet				= HistoSet.getInstance();
 	private final DataExplorer				application			= DataExplorer.getInstance();
 	private final Settings						settings				= Settings.getInstance();
 	private final Channels						channels				= Channels.getInstance();
@@ -183,7 +181,7 @@ public final class HistoGraphicsComposite extends Composite {
 					String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
 					StringBuilder sb = new StringBuilder();
 					String toolTipText = GDE.STRING_EMPTY;
-					for (Entry<DirectoryType, Path> directoryEntry : HistoGraphicsComposite.this.histoSet.getValidatedDirectories().entrySet()) {
+					for (Entry<DirectoryType, Path> directoryEntry : DataExplorer.getInstance().getHistoSet().getValidatedDirectories().entrySet()) {
 						String truncatedPath = directoryEntry.getValue().getFileName().toString().length() > 22 ? directoryEntry.getValue().getFileName().toString().substring(0, 22) + ellipsisText
 								: directoryEntry.getValue().getFileName().toString();
 						sb.append(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK).append(truncatedPath);
@@ -315,7 +313,7 @@ public final class HistoGraphicsComposite extends Composite {
 	private TrailRecordSet getTrailRecordSet() {
 		TrailRecordSet trailRecordSet = null;
 		if (this.channels.getActiveChannel() != null) {
-			trailRecordSet = this.histoSet.getTrailRecordSet();
+			trailRecordSet = this.application.getHistoSet().getTrailRecordSet();
 		}
 		return trailRecordSet;
 	}
@@ -377,7 +375,7 @@ public final class HistoGraphicsComposite extends Composite {
 
 		if (trailRecordSet.getTimeStepSize() > 0) {
 			// initialize early in order to avoid problems in mouse move events
-			this.timeLine.initialize(trailRecordSet, width, trailRecordSet.getTopTimeStamp_ms(), trailRecordSet.getLastTimeStamp_ms());
+			this.timeLine.initialize(trailRecordSet, width);
 
 			// draw curves for each active record
 			trailRecordSet.setDrawAreaBounds(this.curveAreaBounds);
@@ -445,7 +443,7 @@ public final class HistoGraphicsComposite extends Composite {
 
 	private void setRecordSetCommentStandard() {
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		this.recordSetComment.setText(this.histoSet.getDirectoryScanStatistics());
+		this.recordSetComment.setText(this.application.getHistoSet().getDirectoryScanStatistics());
 	}
 
 	/**

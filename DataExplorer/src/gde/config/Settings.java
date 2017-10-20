@@ -2857,14 +2857,17 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @param isDataSettingsAtHomePath true if the history data settings are stored in the user's home path
+	 * @param isDataSettingsAtHomePath true if the history data settings are stored in the user's home path (not in the data path)
 	 */
 	public void setDataSettingsAtHomePath(boolean isDataSettingsAtHomePath) {
-		this.setProperty(Settings.IS_DATA_SETTINGS_AT_HOME_PATH, String.valueOf(isDataSettingsAtHomePath));
+		if (this.isDataSettingsAtHomePath() != isDataSettingsAtHomePath) {
+			DataExplorer.getInstance().getHistoSet().cleanExclusionData();
+			this.setProperty(Settings.IS_DATA_SETTINGS_AT_HOME_PATH, String.valueOf(isDataSettingsAtHomePath));
+		}
 	}
 
 	/**
-	 * @return true if the history data settings are stored in the user's home path
+	 * @return true if the history data settings are stored in the user's home path (not in the data path)
 	 */
 	public boolean isDataSettingsAtHomePath() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_DATA_SETTINGS_AT_HOME_PATH, "true")); //$NON-NLS-1$

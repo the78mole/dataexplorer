@@ -26,10 +26,10 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.Record;
-import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
+import gde.ui.DataExplorer;
 import gde.utils.LocalizedDateTime;
 import gde.utils.LocalizedDateTime.DateTimePattern;
 import gde.utils.StringHelper;
@@ -81,7 +81,7 @@ public final class TrailRecordSetFormatter {
 	private static TrailRecordSet getTrailRecordSet() {
 		TrailRecordSet trailRecordSet = null;
 		if (channels.getActiveChannel() != null) {
-			trailRecordSet = HistoSet.getInstance().getTrailRecordSet();
+			trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
 		}
 		return trailRecordSet;
 	}

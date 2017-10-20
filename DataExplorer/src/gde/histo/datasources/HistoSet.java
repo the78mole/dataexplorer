@@ -18,11 +18,11 @@
 ****************************************************************************************/
 package gde.histo.datasources;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,33 +33,26 @@ import gde.device.DeviceConfiguration;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
-import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.recordings.TrailRecordSet;
-import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 
 /**
+ * Facade of the history module.
  * Supports the selection of histo vaults and provides a trail recordset based on the vaults.
- * Sorted by recordSet startTimeStamp in reverse order; each timestamp may hold multiple vaults.
  * @author Thomas Eickert
  */
-public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
-	private final static String	$CLASS_NAME				= HistoSet.class.getName();
-	private static final long		serialVersionUID	= 1111377035274863787L;
-	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
+public final class HistoSet {
+	private final static String			$CLASS_NAME	= HistoSet.class.getName();
+	@SuppressWarnings("unused")
+	private final static Logger			log					= Logger.getLogger($CLASS_NAME);
 
-	private final DataExplorer	application				= DataExplorer.getInstance();
-	private final Settings			settings					= Settings.getInstance();
+	private final Settings					settings		= Settings.getInstance();
 
-	private static HistoSet			histoSet					= null;
-
-	private DirectoryScanner		directoryScanner;
-	private HistoSetCollector		histoSetCollector;
+	private final HistoSetCollector	histoSetCollector;
 
 	/**
 	 * Defines the first step during rebuilding the histoset data.
@@ -119,123 +112,66 @@ public final class HistoSet extends TreeMap<Long, List<ExtendedVault>> {
 
 	};
 
-	public static HistoSet getInstance() {
-		if (histoSet == null) {
-			histoSet = new HistoSet();
-			histoSet.initialize();
-		}
-		return histoSet;
-	}
-
-	private HistoSet() {
-		super(Collections.reverseOrder());
-		this.directoryScanner = new DirectoryScanner();
+	public HistoSet() {
 		this.histoSetCollector = new HistoSetCollector();
-	}
-
-	/**
-	 * Re- initializes the singleton.
-	 */
-	public synchronized void initialize() {
-		this.clear();
-
-		this.directoryScanner.initialize();
 		this.histoSetCollector.initialize();
-
-		log.log(Level.FINER, "", this);
 	}
 
 	/**
-	 * Clears trails for refill but keeps the trail recordset.
+	 * Determine histo files, build a recordset based job list and read from the log file or the cache for each job.
+	 * Populate the trail recordset.
+	 * Disregard rebuild steps if histo file paths have changed which may occur if new files have been added by the user or the device, channel or object was modified.
+	 * @param rebuildStep
+	 * @param isWithUi true allows actions on the user interface (progress bar, message boxes)
+	 * @return true if the HistoSet was rebuilt
 	 */
-	@Override
-	public void clear() {
-		// deep clear in order to reduce memory consumption prior to garbage collection
-		for (List<ExtendedVault> timestampHistoVaults : this.values()) {
-			timestampHistoVaults.clear();
-		}
-		super.clear();
-
-		// this.histoFilePaths.clear(); is accomplished by files validation
-		log.log(Level.FINER, "", this);
+	public synchronized boolean rebuild4Screening(RebuildStep rebuildStep, boolean isWithUi) //
+			throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+		return this.histoSetCollector.rebuild4Screening(rebuildStep, isWithUi);
 	}
 
-	@Override
-	public String toString() {
-		return String.format("device=%s  channel=%d  objectKey=%s timeSteps=%d size=%d", this.application.getActiveDevice() == null ? null : this.application.getActiveDevice().getName(), //$NON-NLS-1$
-				this.application.getActiveChannelNumber(), this.application.getObjectKey(), this.size(), this.entrySet().parallelStream().mapToInt(c -> c.getValue().size()).sum());
-	}
-
-	/**
-	 * @param histoVault
-	 */
-	public void putVault(ExtendedVault histoVault) {
-		List<ExtendedVault> timeStampHistoVaults = this.get(histoVault.getLogStartTimestamp_ms());
-		if (timeStampHistoVaults == null) {
-			this.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<ExtendedVault>());
-		}
-		timeStampHistoVaults.add(histoVault);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
-				histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
-	}
-
-	public void scan4Test(Path filePath,TreeMap<String, DeviceConfiguration> devices) throws IOException, NotSupportedFileFormatException {
-		this.directoryScanner.addTrusses4Test(filePath, devices);
-	}
-
-	public void rebuild4Test() throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
-		this.histoSetCollector.rebuild4Test();
+	public void rebuild4Test(Path filePath, TreeMap<String, DeviceConfiguration> devices) //
+			throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+		this.histoSetCollector.rebuild4Test(filePath, devices);
 	}
 
 	public TrailRecordSet getTrailRecordSet() {
 		return this.histoSetCollector.getTrailRecordSet();
 	}
 
-	/**
-	 * Toggles the exclusion directory definition and cleans exclusion directories.
-	 * @param isDataSettingsAtHomePath true if the history data settings are stored in the user's home path
-	 */
-	public synchronized void setDataSettingsAtHomePath(boolean isDataSettingsAtHomePath) {
-		if (this.settings.isDataSettingsAtHomePath() != isDataSettingsAtHomePath) {
-			ArrayList<Path> dataPaths = new ArrayList<Path>();
-			dataPaths.add(Paths.get(this.settings.getDataFilePath()));
-			ExclusionData.deleteExclusionsDirectory(dataPaths);
-
-			this.settings.setDataSettingsAtHomePath(isDataSettingsAtHomePath);
-		}
+	public synchronized void cleanExclusionData() {
+		ArrayList<Path> dataPaths = new ArrayList<Path>();
+		dataPaths.add(Paths.get(this.settings.getDataFilePath()));
+		ExclusionData.deleteExclusionsDirectory(dataPaths);
 	}
 
 	/**
 	 * @return the validatedDirectories which hold the history recordsets
 	 */
 	public Map<DirectoryType, Path> getValidatedDirectories() {
-		return this.directoryScanner.getValidatedDirectories();
+		return this.histoSetCollector.getValidatedDirectories();
 	}
 
-	public Map<String, VaultCollector> getSuppressedTrusses() {
-		return this.directoryScanner.getSuppressedTrusses();
-	}
-
-	public Map<String, VaultCollector> getUnsuppressedTrusses() {
-		return this.directoryScanner.getUnsuppressedTrusses();
-	}
-
-	public DirectoryScanner getDirectoryScanner() {
-		return this.directoryScanner;
-	}
-
-	public HistoSetCollector getHistoSetCollector() {
-		return this.histoSetCollector;
+	/**
+	 * @return the paths which have been ignored on a file basis or suppressed on a recordset basis
+	 */
+	public List<Path> getExcludedPaths() {
+		List<Path> result = this.histoSetCollector.getIgnoredFiles();
+		for (VaultCollector truss : this.histoSetCollector.getSuppressedTrusses().values()) {
+			result.add(truss.getVault().getLogFileAsPath());
+		}
+		return result;
 	}
 
 	public String getDirectoryScanStatistics() {
 		return Messages.getString(MessageIds.GDE_MSGI0064, //
-				new Object[] { String.format("%,d", this.directoryScanner.getDirectoryFilesCount()),  //
+				new Object[] { String.format("%,d", this.histoSetCollector.getDirectoryFilesCount()), //
+						String.format("%,d", this.histoSetCollector.getReadFilesCount()), //
 						String.format("%.2f", this.histoSetCollector.getRecordSetBytesSum() / 1024 / 1024.), //
 						String.format("%.2f", this.histoSetCollector.getElapsedTime_ms() / 1000.), //
-						String.format("%,d", this.directoryScanner.getSuppressedTrusses().size() + this.directoryScanner.getUnsuppressedTrusses().size()), //
-						String.format("%,d", this.directoryScanner.getUnsuppressedTrusses().size()), //
-						String.format("%,d", this.histoSetCollector.getAvailableTrussesCount()) });
+						String.format("%,d", this.histoSetCollector.getSuppressedTrusses().size() + this.histoSetCollector.getUnsuppressedTrusses().size()), //
+						// String.format("%,d", this.histoSetCollector.getDuplicateTrussesCount()), //
+						String.format("%,d", this.histoSetCollector.getTimeStepSize()) });
 
 	}
 }

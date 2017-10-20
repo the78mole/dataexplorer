@@ -101,8 +101,7 @@ public final class ExclusionData extends Properties {
 	 * @param dataDirectories
 	 */
 	public static void deleteExclusionsDirectory(List<Path> dataDirectories) {
-		Path exclusionsDir = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
-		FileUtils.deleteDirectory(exclusionsDir.toString());
+		FileUtils.deleteDirectory(getUserExclusionsDir().toString());
 		for (Path dataPath : dataDirectories) {
 			try {
 				for (File file : FileUtils.getFileListing(dataPath.toFile(), Integer.MAX_VALUE, Settings.HISTO_EXCLUSIONS_FILE_NAME)) {
@@ -165,7 +164,6 @@ public final class ExclusionData extends Properties {
 	}
 
 	private void load() {
-		Path exclusionsDir = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
 		boolean takeUserDir = Settings.getInstance().isDataSettingsAtHomePath();
 		if (!takeUserDir) {
 			FileUtils.checkDirectoryAndCreate(this.dataFileDir.toString());
@@ -181,6 +179,7 @@ public final class ExclusionData extends Properties {
 			}
 		}
 		if (takeUserDir) {
+			Path exclusionsDir = getUserExclusionsDir();
 			FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
 			String fileName = SecureHash.sha1(this.dataFileDir.toString());
 			if (exclusionsDir.resolve(fileName).toFile().exists()) {
@@ -195,10 +194,17 @@ public final class ExclusionData extends Properties {
 	}
 
 	/**
+	 * @return
+	 */
+	private static Path getUserExclusionsDir() {
+		return Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
+	}
+
+	/**
 	 * Write the file if excludes are defined, else delete the file.
 	 */
 	public void store() {
-		Path exclusionsDir = Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
+		Path exclusionsDir = getUserExclusionsDir();
 		if (this.size() > 0) {
 			boolean takeUserDir = Settings.getInstance().isDataSettingsAtHomePath();
 			if (!takeUserDir) {
@@ -227,8 +233,7 @@ public final class ExclusionData extends Properties {
 	}
 
 	public void delete() {
-		Path exclusionsDir = Paths.get( //
-				Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
+		Path exclusionsDir = getUserExclusionsDir();
 		FileUtils.deleteFile(this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toString());
 		String fileName = SecureHash.sha1(this.dataFileDir.toString());
 		FileUtils.deleteFile(this.dataFileDir.resolve(exclusionsDir.resolve(fileName)).toString());

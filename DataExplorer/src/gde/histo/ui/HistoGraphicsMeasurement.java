@@ -30,7 +30,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
-import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
@@ -50,7 +49,6 @@ public final class HistoGraphicsMeasurement {
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	private final DataExplorer	application	= DataExplorer.getInstance();
-	private final HistoSet			histoSet		= HistoSet.getInstance();
 
 	public enum HistoGraphicsMode {
 		MEASURE, MEASURE_DELTA, RESET
@@ -71,7 +69,7 @@ public final class HistoGraphicsMeasurement {
 	public HistoGraphicsMeasurement(Canvas graphicCanvas, Text recordSetComment, HistoTimeLine timeLine) {
 		this.graphicCanvas = graphicCanvas;
 
-		TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
+		TrailRecordSet trailRecordSet = this.application.getHistoSet().getTrailRecordSet();
 		this.trailRecord = (TrailRecord) trailRecordSet.get(trailRecordSet.getRecordKeyMeasurement());
 		this.curveSurvey = new CurveSurvey(this.canvasGC, this.trailRecord, timeLine);
 		this.isSingleMeasurement = trailRecordSet.isMeasurementMode(trailRecordSet.getRecordKeyMeasurement());

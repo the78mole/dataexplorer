@@ -28,11 +28,12 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Logger;
 
 import gde.GDE;
@@ -60,25 +61,23 @@ import gde.utils.OperatingSystemHelper;
  * @author Thomas Eickert (USER)
  */
 public final class DirectoryScanner {
-	private final static String								$CLASS_NAME								= DirectoryScanner.class.getName();
-	private final static Logger								log												= Logger.getLogger($CLASS_NAME);
+	private final static String							$CLASS_NAME								= DirectoryScanner.class.getName();
+	private final static Logger							log												= Logger.getLogger($CLASS_NAME);
 
-	private final DataExplorer								application								= DataExplorer.getInstance();
-	private final Settings										settings									= Settings.getInstance();
+	private static List<Integer>						channelMixConfigNumbers;
+	private static long											minStartTimeStamp_ms;
+	private static boolean									isValidatedObjectKey;
 
-	private IDevice														validatedDevice						= null;
-	private Channel														validatedChannel					= null;
-	private List<String>											validatedImportExtentions	= new ArrayList<>();
+	private final DataExplorer							application								= DataExplorer.getInstance();
+	private final Settings									settings									= Settings.getInstance();
 
-	private final Map<DirectoryType, Path>		validatedDirectories			= new LinkedHashMap<>();
-	private int																directoryFilesCount				= 0;																// selected from directory files (selected by extension)
+	private IDevice													validatedDevice						= null;
+	private Channel													validatedChannel					= null;
+	private List<String>										validatedImportExtentions	= new ArrayList<>();
 
-	private final Map<String, VaultCollector>	unsuppressedTrusses				= new HashMap<>();									// authorized recordsets (excluded vaults eliminated - by the user in suppress mode)
-	private final Map<String, VaultCollector>	suppressedTrusses					= new HashMap<>();									// excluded vaults
-
-	private static List<Integer>							channelMixConfigNumbers;
-	private static long												minStartTimeStamp_ms;
-	private static boolean										isValidatedObjectKey;
+	private final Map<DirectoryType, Path>	validatedDirectories			= new LinkedHashMap<>();
+	private final LongAdder									nonWorkableCount					= new LongAdder();
+	private final List<Path>								ignoredFiles							= new ArrayList<>();
 
 	/**
 	 * Data sources supported by the history including osd link files.
@@ -366,7 +365,16 @@ public final class DirectoryScanner {
 				throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
 			return dataSetType.readVaults(path, trusses);
 		}
-	}
+
+		public Path getPath() {
+			return this.path;
+		}
+
+		@Override
+		public String toString() {
+			return this.path.toString();
+		}
+}
 
 	/**
 	 * Re- initializes the class.
@@ -374,24 +382,16 @@ public final class DirectoryScanner {
 	public synchronized void initialize() {
 		this.validatedDevice = null;
 		this.validatedChannel = null;
-		this.validatedImportExtentions = new ArrayList<>();
 
+		this.validatedImportExtentions.clear();
 		this.validatedDirectories.clear();
-		this.directoryFilesCount = 0;
-
-		this.unsuppressedTrusses.clear();
-		this.suppressedTrusses.clear();
 	}
 
 	/**
-	 * Determine trusses in the osd files and in the native files (if supported by the device).
+	 * return the sourceFiles for osd reader (possibly link files) or for import
 	 */
-	public void addTrusses4Test(Path filePath, TreeMap<String, DeviceConfiguration> devices) throws IOException, NotSupportedFileFormatException {
+	public List<SourceDataSet> readSourceFiles4Test(Path filePath) throws IOException, NotSupportedFileFormatException {
 		this.initialize();
-
-		channelMixConfigNumbers = this.application.getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers();
-		minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-		isValidatedObjectKey = this.settings.getValidatedObjectKey(this.application.getObjectKey()).isPresent();
 
 		if (filePath == null)
 			this.validatedDirectories.put(DirectoryType.DATA, DirectoryType.DATA.getDataSetPath());
@@ -400,11 +400,8 @@ public final class DirectoryScanner {
 
 		Path dataDir = this.validatedDirectories.get(DirectoryType.DATA);
 		FileUtils.checkDirectoryAndCreate(dataDir.toString());
-		List<SourceDataSet> files = getFileListing(dataDir.toFile(), Settings.getInstance().getSubDirectoryLevelMax(), DirectoryType.DATA.getDataSetExtensions());
-		log.log(Level.INFO, String.format("%04d files found in dataDir %s", files.size(), dataDir)); //$NON-NLS-1$
 
-		addTrusses(files, devices);
-		log.log(Level.INFO, String.format("%04d files selected", this.unsuppressedTrusses.size())); //$NON-NLS-1$
+		return readSourceFiles();
 	}
 
 	/**
@@ -434,7 +431,8 @@ public final class DirectoryScanner {
 			}
 		}
 
-		boolean isFullChange = rebuildStep == RebuildStep.A_HISTOSET || this.unsuppressedTrusses.size() == 0;
+		boolean isFirstCall = lastDevice == null;
+		boolean isFullChange = rebuildStep == RebuildStep.A_HISTOSET || isFirstCall;
 		isFullChange = isFullChange || (lastDevice != null ? !lastDevice.getName().equals(this.validatedDevice.getName()) : this.validatedDevice != null);
 		isFullChange = isFullChange || (lastChannel != null ? !lastChannel.getChannelConfigKey().equals(this.validatedChannel.getChannelConfigKey()) : this.validatedChannel != null);
 		isFullChange = isFullChange || (lastHistoDataDir != null ? !lastHistoDataDir.equals(this.validatedDirectories.get(DirectoryType.DATA)) : true);
@@ -443,76 +441,30 @@ public final class DirectoryScanner {
 		isFullChange = isFullChange || !lastImportExtentions.containsAll(this.validatedImportExtentions) || !this.validatedImportExtentions.containsAll(lastImportExtentions);
 		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("isFullChange %s", isFullChange)); //$NON-NLS-1$
 
-		if (isFullChange) {
-			channelMixConfigNumbers = this.application.getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers();
-			minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-			isValidatedObjectKey = this.settings.getValidatedObjectKey(this.application.getObjectKey()).isPresent();
-
-			this.unsuppressedTrusses.clear();
-			this.suppressedTrusses.clear();
-
-			this.directoryFilesCount = addTrussesForDirectory(this.validatedDirectories.get(DirectoryType.DATA), DirectoryType.DATA.getDataSetExtensions());
-
-			if (this.validatedDirectories.containsKey(DirectoryType.IMPORT)) {
-				this.directoryFilesCount += addTrussesForDirectory(this.validatedDirectories.get(DirectoryType.IMPORT), this.validatedImportExtentions);
-			}
-
-			if (log.isLoggable(Level.FINE))
-				log.log(Level.FINE, String.format("in total %04d trusses found --- %04d valid trusses --- %04d excluded trusses", this.unsuppressedTrusses.size() + this.suppressedTrusses.size(), //$NON-NLS-1$
-						this.unsuppressedTrusses.size(), this.suppressedTrusses.size()));
-		}
 		return !isFullChange;
 	}
 
 	/**
-	 * @param directoryPath
-	 * @param extensions contains lowercase file extensions without dot
-	 * @return the number of files detected up to the specified sub-directory level
+	 * @return the log files from all validated directories matching the validated extensions
 	 */
-	private int addTrussesForDirectory(Path directoryPath, List<String> extensions) throws FileNotFoundException, IOException, NotSupportedFileFormatException {
-		if (FileUtils.checkDirectoryExist(directoryPath.toString())) {
-			List<SourceDataSet> sourceFiles = getFileListing(directoryPath.toFile(), this.settings.getSubDirectoryLevelMax(), extensions);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%04d files in histoDir '%s'  %s", sourceFiles.size(), directoryPath.getFileName(), directoryPath)); //$NON-NLS-1$
+	public List<SourceDataSet> readSourceFiles() throws FileNotFoundException {
+		channelMixConfigNumbers = this.application.getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers();
+		minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+		isValidatedObjectKey = this.settings.getValidatedObjectKey(this.application.getObjectKey()).isPresent();
 
-			addTrusses(sourceFiles);
-			return sourceFiles.size();
-		} else {
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoDir not found in %s", directoryPath)); //$NON-NLS-1$
-			return 0;
-		}
-	}
+		List<SourceDataSet> result = new ArrayList<>();
+		nonWorkableCount.reset();
+		ignoredFiles.clear();
 
-	/**
-	 * Use ignore lists to determine the vaults which are required for the data access.
-	 * @param sourceFiles for osd reader (might be a link file) or for import
-	 */
-	private void addTrusses(List<SourceDataSet> sourceFiles) throws IOException, NotSupportedFileFormatException {
-		addTrusses(sourceFiles, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
-	}
-
-	/**
-	 * Use ignore lists to determine the vaults which are required for the data access.
-	 */
-	private void addTrusses(List<SourceDataSet> sourceFiles, TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException, NotSupportedFileFormatException {
-		final int suppressedSize = this.suppressedTrusses.size();
-		final int unsuppressedSize = this.unsuppressedTrusses.size();
-		for (SourceDataSet sourceFile : sourceFiles) {
-			List<VaultCollector> trusses = sourceFile.getTrusses(deviceConfigurations);
-			if (!trusses.isEmpty()) {
-				for (VaultCollector truss : trusses) {
-					ExtendedVault vault = truss.getVault();
-					if (ExclusionData.isExcluded(vault.getLogFileAsPath(), vault.getLogRecordsetBaseName())) {
-						log.log(Level.INFO, String.format("discarded as per exclusion list %s %s   %s", vault.getLogFilePath(), vault.getLogRecordsetBaseName(), vault.getStartTimeStampFormatted()));
-						this.suppressedTrusses.put(vault.getVaultName(), truss);
-					} else {
-						this.unsuppressedTrusses.put(vault.getVaultName(), truss);
-					}
-				}
+		for (Entry<DirectoryType, Path> entry : this.validatedDirectories.entrySet()) {
+			Path dir = entry.getValue();
+			if (FileUtils.checkDirectoryExist(dir.toString())) {
+				result.addAll(getFileListing(dir.toFile(), this.settings.getSubDirectoryLevelMax(), entry.getKey().getDataSetExtensions()));
+			} else {
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoDir not found in %s", dir)); //$NON-NLS-1$
 			}
 		}
-
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%04d files found --- %04d total trusses --- %04d excluded trusses", sourceFiles.size(), //$NON-NLS-1$
-				this.unsuppressedTrusses.size() - unsuppressedSize + this.suppressedTrusses.size() - suppressedSize, this.suppressedTrusses.size() - suppressedSize));
+		return result;
 	}
 
 	/**
@@ -522,17 +474,24 @@ public final class DirectoryScanner {
 	 * @param extensions contains lowercase file extensions without dot
 	 * @return the unsorted files matching the {@code extensions} and not discarded as per exclusion list
 	 */
-	private static List<SourceDataSet> getFileListing(File rootDirectory, int recursionDepth, List<String> extensions) throws FileNotFoundException {
+	private List<SourceDataSet> getFileListing(File rootDirectory, int recursionDepth, List<String> extensions) throws FileNotFoundException {
 		List<SourceDataSet> result = new ArrayList<>();
 		if (rootDirectory.isDirectory() && rootDirectory.canRead()) {
 			File[] filesAndDirs = rootDirectory.listFiles();
 			if (filesAndDirs != null) {
 				for (File file : Arrays.asList(filesAndDirs)) {
 					if (file.isFile()) {
-						if (SourceDataSet.isWorkableFile(file.toPath(), extensions) //
-								&& !ExclusionData.isExcluded(file.toPath())) {
-							SourceDataSet originFile = new SourceDataSet(file);
-							result.add(originFile);
+						if (SourceDataSet.isWorkableFile(file.toPath(), extensions)) {
+							if (!ExclusionData.isExcluded(file.toPath())) {
+								SourceDataSet originFile = new SourceDataSet(file);
+								result.add(originFile);
+							} else {
+								ignoredFiles.add(file.toPath());
+								log.log(Level.INFO, String.format("file is ignored                %s", file.getPath()));
+							}
+						} else {
+							nonWorkableCount.increment();
+							log.log(Level.INFO, String.format("file is not valid              %s", file.getPath()));
 						}
 					} else if (recursionDepth > 0) { //recursive walk by calling itself
 						List<SourceDataSet> deeperList = getFileListing(file, recursionDepth - 1, extensions);
@@ -544,20 +503,21 @@ public final class DirectoryScanner {
 		return result;
 	}
 
-	public Map<String, VaultCollector> getUnsuppressedTrusses() {
-		return this.unsuppressedTrusses;
-	}
-
-	public Map<String, VaultCollector> getSuppressedTrusses() {
-		return this.suppressedTrusses;
-	}
-
 	public Map<DirectoryType, Path> getValidatedDirectories() {
 		return this.validatedDirectories;
 	}
 
-	public int getDirectoryFilesCount() {
-		return this.directoryFilesCount;
+	/**
+	 * @return the number of files which have been discarded during the last read operation due to an invalid file format
+	 */
+	public int getNonWorkableCount() {
+		return nonWorkableCount.intValue();
 	}
 
+	/**
+	 * @return the files which have been discarded during the last read operation based on the exclusion lists
+	 */
+	public List<Path> getIgnoredFiles() {
+		return ignoredFiles;
+	}
 }

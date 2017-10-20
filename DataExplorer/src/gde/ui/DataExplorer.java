@@ -857,7 +857,7 @@ public class DataExplorer extends Composite {
 	public synchronized void setHisto(boolean isActive) {
 		if (isActive) {
 			this.settings.setHistoActive(true);
-			this.histoSet = HistoSet.getInstance();
+			this.histoSet = new HistoSet();
 
 			if (this.histoGraphicsTabItem != null) this.resetGraphicsWindowHeaderAndMeasurement();
 
@@ -2051,7 +2051,7 @@ public class DataExplorer extends Composite {
 		boolean isRebuilt = false;
 		try {
 			setCursor(SWTResourceManager.getCursor(CURSOR_WAIT));
-			isRebuilt = this.histoSet.getHistoSetCollector().rebuild4Screening(rebuildStep, isWithUi);
+			isRebuilt = this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
 
 			if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
 				if (this.histoSet.getTrailRecordSet() != null) this.histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
@@ -2061,7 +2061,7 @@ public class DataExplorer extends Composite {
 			String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 			setProgress(100, sThreadId);
 			if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
-				if (this.histoSet.getUnsuppressedTrusses().isEmpty()) {
+				if (this.histoSet.getTrailRecordSet().getTimeStepSize() == 0) {
 					StringBuilder sb = new StringBuilder();
 					for (Path path : this.histoSet.getValidatedDirectories().values()) {
 						sb.append(path.toString()).append(GDE.STRING_NEW_LINE);
@@ -2459,15 +2459,16 @@ public class DataExplorer extends Composite {
 	 * @param enabled
 	 */
 	public void setMeasurementActive(String recordKey, boolean enabled) {
-		if (isRecordSetVisible(GraphicsType.HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
+		TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
+		if (isRecordSetVisible(GraphicsType.HISTO) && trailRecordSet.containsKey(recordKey)) {
 			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
-			this.histoSet.getTrailRecordSet().setMeasurementMode(recordKey, enabled);
-			TrailRecord trailRecord = (TrailRecord) this.histoSet.getTrailRecordSet().get(recordKey);
+			trailRecordSet.setMeasurementMode(recordKey, enabled);
+			TrailRecord trailRecord = (TrailRecord) trailRecordSet.get(recordKey);
 			if (enabled && !trailRecord.isVisible()) {
 				this.histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
 				this.histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
 			}
-			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), HistoGraphicsMode.MEASURE);
+			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(trailRecordSet, HistoGraphicsMode.MEASURE);
 		} else {
 			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
 			RecordSet recordSet = isGraphicsTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
@@ -2499,15 +2500,16 @@ public class DataExplorer extends Composite {
 	 */
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordKey);
-		if (isRecordSetVisible(GraphicsType.HISTO) && this.histoSet.getTrailRecordSet().containsKey(recordKey)) {
+		TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
+		if (isRecordSetVisible(GraphicsType.HISTO) && trailRecordSet.containsKey(recordKey)) {
 			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
-			this.histoSet.getTrailRecordSet().setDeltaMeasurementMode(recordKey, enabled);
-			TrailRecord trailRecord = (TrailRecord) this.histoSet.getTrailRecordSet().get(recordKey);
+			trailRecordSet.setDeltaMeasurementMode(recordKey, enabled);
+			TrailRecord trailRecord = (TrailRecord) trailRecordSet.get(recordKey);
 			if (enabled && !trailRecord.isVisible()) {
 				this.histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
 				this.histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
 			}
-			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(this.histoSet.getTrailRecordSet(), HistoGraphicsMode.MEASURE_DELTA);
+			if (enabled) this.histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(trailRecordSet, HistoGraphicsMode.MEASURE_DELTA);
 		} else {
 			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
 			RecordSet recordSet = isGraphicsTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
@@ -3493,4 +3495,9 @@ public class DataExplorer extends Composite {
 		Messages.reloadResources();
 		DeviceXmlResource.reloadResources();
 	}
+
+	public HistoSet getHistoSet() {
+		return this.histoSet;
+	}
+
 }
