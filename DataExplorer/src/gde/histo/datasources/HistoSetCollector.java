@@ -69,6 +69,7 @@ public final class HistoSetCollector {
 	private final DataExplorer												application								= DataExplorer.getInstance();
 	private final DirectoryScanner										directoryScanner;
 
+	/** Sorted by recordSet startTimeStamp in reverse order; each timestamp may hold multiple vaults. */
 	private final TreeMap<Long, List<ExtendedVault>>	histoVaults								= new TreeMap<>(Collections.reverseOrder());
 	private final Map<String, VaultCollector>					unsuppressedTrusses				= new HashMap<>();													// authorized recordsets (excluded vaults eliminated - by the user in suppress mode)
 	private final Map<String, VaultCollector>					suppressedTrusses					= new HashMap<>();													// excluded vaults

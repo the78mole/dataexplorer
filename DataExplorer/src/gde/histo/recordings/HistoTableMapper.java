@@ -55,7 +55,7 @@ public final class HistoTableMapper {
 			for (int i = 0, j = dataSize - 1; i < dataSize; i++, j--) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, trailRecordSet.getTime_ms(j)));
-				headerRow[j] = sb.toString();
+				headerRow[i] = sb.toString();
 			}
 		}
 		return headerRow;
@@ -104,10 +104,10 @@ public final class HistoTableMapper {
 				for (int i = 0, j = trailRecord.realSize() - 1; i < trailRecord.realSize(); i++, j--)
 					if (trailRecord.getSuiteRecords().getSuiteValue(selector.getTrailType().getSuiteMasterIndex(), j) != null) {
 						StringBuilder sb = new StringBuilder();
-						sb.append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteLowerIndex(), i))); //$NON-NLS-1$
+						sb.append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteLowerIndex(), j))); //$NON-NLS-1$
 						String delimiter = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteMasterIndex(), i))); //$NON-NLS-1$
-						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteUpperIndex(), i))); //$NON-NLS-1$
+						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteMasterIndex(), j))); //$NON-NLS-1$
+						sb.append(delimiter).append(String.format("%.8s", formatter.getTableValue(selector.getTrailType().getSuiteUpperIndex(), j))); //$NON-NLS-1$
 						dataTableRow[i + 2] = sb.toString().intern();
 					}
 			}
