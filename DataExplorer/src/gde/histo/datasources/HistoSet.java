@@ -139,6 +139,9 @@ public final class HistoSet {
 		return this.histoSetCollector.getTrailRecordSet();
 	}
 
+	/**
+	 * Is thread safe with respect to concurrent rebuilds.
+	 */
 	public synchronized void cleanExclusionData() {
 		ArrayList<Path> dataPaths = new ArrayList<Path>();
 		dataPaths.add(Paths.get(this.settings.getDataFilePath()));
@@ -169,8 +172,8 @@ public final class HistoSet {
 						String.format("%,d", this.histoSetCollector.getReadFilesCount()), //
 						String.format("%.2f", this.histoSetCollector.getRecordSetBytesSum() / 1024 / 1024.), //
 						String.format("%.2f", this.histoSetCollector.getElapsedTime_ms() / 1000.), //
-						String.format("%,d", this.histoSetCollector.getSuppressedTrusses().size() + this.histoSetCollector.getUnsuppressedTrusses().size()), //
-						// String.format("%,d", this.histoSetCollector.getDuplicateTrussesCount()), //
+						String.format("%,d", this.histoSetCollector.getUnsuppressedTrusses().size()//
+								+ this.histoSetCollector.getSuppressedTrusses().size() + this.histoSetCollector.getDuplicateTrussesCount()), //
 						String.format("%,d", this.histoSetCollector.getTimeStepSize()) });
 
 	}

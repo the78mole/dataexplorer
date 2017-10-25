@@ -124,7 +124,7 @@ public final class HistoSelectorComposite extends Composite {
 			this.curveSelectorHeader.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					if (HistoSelectorComposite.log.isLoggable(Level.OFF)) HistoSelectorComposite.log.log(Level.OFF, "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
+					if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
 					HistoSelectorComposite.this.application.clearMeasurementModes();
 					if (!HistoSelectorComposite.this.curveSelectorHeader.getSelection()) {
 						// use this check button to deselect all selected curves
@@ -148,7 +148,6 @@ public final class HistoSelectorComposite extends Composite {
 						}
 					}
 					doUpdateCurveSelectorTable();
-					//HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true); // ET rebuilds the graphics only if new files have been found
 					HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false);
 				}
 			});
@@ -169,7 +168,7 @@ public final class HistoSelectorComposite extends Composite {
 			this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					if (HistoSelectorComposite.log.isLoggable(Level.OFF)) HistoSelectorComposite.log.log(Level.OFF, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
+					if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
 						final TableItem eventItem = (TableItem) evt.item;
 						// avoid phantom measurements with invisible curves
@@ -184,7 +183,6 @@ public final class HistoSelectorComposite extends Composite {
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, eventItem.getData(DataExplorer.RECORD_NAME));
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);
 						if (toggleRecordSelection(eventItem, true, false)) {
-							//HistoSelectorComposite.this.application.updateHistoTabs(RebuildStep.F_FILE_CHECK, true);
 							HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false);
 						}
 					}
@@ -246,7 +244,7 @@ public final class HistoSelectorComposite extends Composite {
 					selectorCombos[i].addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent event) {
-							if (HistoSelectorComposite.log.isLoggable(Level.OFF)) HistoSelectorComposite.log.log(Level.OFF, "selectorCombos.SelectionListener, event=" + event); //$NON-NLS-1$
+							if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "selectorCombos.SelectionListener, event=" + event); //$NON-NLS-1$
 							Combo combo = (Combo) event.getSource();
 							record.getTrailSelector().setTrailTextSelectedIndex(combo.getSelectionIndex());
 							HistoSelectorComposite.this.application.updateHistoTabs(record.getOrdinal(), true);

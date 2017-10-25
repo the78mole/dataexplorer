@@ -380,7 +380,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			if (doUpdateVisibilityStatus) {
 				updateVisibleAndDisplayableRecordsForTable();
 			}
-			this.application.updateHistoGraphicsWindow(true);
 		}
 	}
 

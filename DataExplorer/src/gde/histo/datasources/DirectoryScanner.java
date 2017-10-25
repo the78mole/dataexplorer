@@ -439,12 +439,13 @@ public final class DirectoryScanner {
 		isFullChange = isFullChange
 				|| (lastHistoImportDir != null ? !lastHistoImportDir.equals(this.validatedDirectories.get(DirectoryType.IMPORT)) : this.validatedDirectories.containsKey(DirectoryType.IMPORT));
 		isFullChange = isFullChange || !lastImportExtentions.containsAll(this.validatedImportExtentions) || !this.validatedImportExtentions.containsAll(lastImportExtentions);
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("isFullChange %s", isFullChange)); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("isFullChange %s", isFullChange)); //$NON-NLS-1$
 
 		return !isFullChange;
 	}
 
 	/**
+	 * Use file name extension lists and ignore file lists to determine the files required for the data access.
 	 * @return the log files from all validated directories matching the validated extensions
 	 */
 	public List<SourceDataSet> readSourceFiles() throws FileNotFoundException {

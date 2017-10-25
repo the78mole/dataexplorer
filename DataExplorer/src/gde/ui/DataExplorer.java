@@ -844,7 +844,7 @@ public class DataExplorer extends Composite {
 	 * Does nothing if the histoActive setting is false.
 	 */
 	public synchronized void resetHisto() {
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("isHistoActive=%b", this.settings.isHistoActive())); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("isHistoActive=%b", this.settings.isHistoActive())); //$NON-NLS-1$
 		if (this.settings.isHistoActive()) {
 			if (this.histoGraphicsTabItem != null) this.resetGraphicsWindowHeaderAndMeasurement();
 			this.updateHistoTabs(RebuildStep.A_HISTOSET, true);
@@ -994,7 +994,7 @@ public class DataExplorer extends Composite {
 	 * updates the histo table.
 	 */
 	public synchronized void updateHistoTable(final boolean forceClean) {
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("started")); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
 		GDE.display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -1999,7 +1999,7 @@ public class DataExplorer extends Composite {
 
 	/**
 	 * update the histo tabs if visible.
-	 * @param recordOrdinal this single record is updated from the histo recordset
+	 * @param recordOrdinal specifies the record from the trail recordset to be updated
 	 */
 	public void updateHistoTabs(int recordOrdinal, boolean isWithUi) {
 		RecordingsCollector.addVaults(this.histoSet.getTrailRecordSet(), recordOrdinal);
@@ -2009,18 +2009,14 @@ public class DataExplorer extends Composite {
 
 	/**
 	 * update the histo tabs if visible.
-	 * @param readFromFiles if true then reload from files; if false then use histo vault data
+	 * @param readFromDirectories true reloads from files; false uses histo vault data
 	 */
-	public void updateHistoTabs(boolean readFromFiles, boolean rebuildTrails) {
-		if (this.histoGraphicsTabItem != null) updateHistoTabs(readFromFiles ? RebuildStep.B_HISTOVAULTS : rebuildTrails ? RebuildStep.C_TRAILRECORDSET : RebuildStep.E_USER_INTERFACE, true);
+	public void updateHistoTabs(boolean readFromDirectories, boolean rebuildTrails) {
+		if (this.histoGraphicsTabItem != null) updateHistoTabs(readFromDirectories ? RebuildStep.B_HISTOVAULTS : rebuildTrails ? RebuildStep.C_TRAILRECORDSET : RebuildStep.E_USER_INTERFACE, true);
 	}
 
-	/**
-	 * update a histo tab in case it has the focus.
-	 * @param rebuildStep
-	 */
-	public void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("started")); //$NON-NLS-1$
+	private void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			if (this.histoGraphicsTabItem != null && ((!this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
 					|| (!this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible()))) {
@@ -2047,7 +2043,7 @@ public class DataExplorer extends Composite {
 	}
 
 	public synchronized void rebuildHisto(RebuildStep rebuildStep, boolean isWithUi) {
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("started")); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
 		boolean isRebuilt = false;
 		try {
 			setCursor(SWTResourceManager.getCursor(CURSOR_WAIT));
@@ -2097,7 +2093,7 @@ public class DataExplorer extends Composite {
 	 * @param redrawCurveSelector
 	 */
 	public void updateHistoGraphicsWindow(boolean redrawCurveSelector) {
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("started")); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			if (!this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
 				DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);

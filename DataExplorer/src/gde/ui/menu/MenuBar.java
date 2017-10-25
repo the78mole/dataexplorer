@@ -681,6 +681,7 @@ public class MenuBar {
 								template.setHistoFileName(template.getDefaultFileName());
 								template.load();
 								trailRecordSet.applyTemplate(true);
+								DataExplorer.getInstance().updateHistoGraphicsWindow(true);
 							}
 							else {
 								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
@@ -750,6 +751,7 @@ public class MenuBar {
 								MenuBar.log.log(Level.FINE, "templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
 								template.load();
 								trailRecordSet.applyTemplate(true);
+								DataExplorer.getInstance().updateHistoGraphicsWindow(true);
 							}
 							else {
 								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
