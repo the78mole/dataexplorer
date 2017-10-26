@@ -448,7 +448,7 @@ public final class RecordSet extends AbstractRecordSet {
 		dataTableRow[0] = this.getFormatedTime_sec(index, isAbsolute);
 		this.device.prepareDataTableRow(this, dataTableRow, index);
 
-		if (this.settings.isDataTableTransitions()) {
+		if (this.settings.isHistoActive() && this.settings.isDataTableTransitions()) {
 			return TransitionTableMapper.getExtendedRow(this, index, dataTableRow);
 		} else
 			return dataTableRow;

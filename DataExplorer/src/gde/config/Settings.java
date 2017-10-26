@@ -2956,14 +2956,14 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @param enabled true extended curve delta measuring display
+	 * @param enabled true adds a transition column to the data table
 	 */
 	public void setDataTableTransitions(boolean enabled) {
 		this.setProperty(Settings.IS_DATA_TABLE_TRANSITIONS, String.valueOf(enabled));
 	}
 
 	/**
-	 * @return true for extended curve delta measuring display
+	 * @return true adds a transition column to the data table
 	 */
 	public boolean isDataTableTransitions() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_DATA_TABLE_TRANSITIONS, "false")); //$NON-NLS-1$
