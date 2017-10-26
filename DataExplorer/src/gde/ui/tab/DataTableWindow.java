@@ -486,7 +486,7 @@ public class DataTableWindow extends CTabItem {
 						column.setText(sb.toString());
 					}
 				}
-				if (this.settings.isDataTableTransitions()) {
+				if (this.settings.isHistoActive() && this.settings.isDataTableTransitions()) {
 					IDevice device = this.application.getActiveDevice();
 					HashMap<Integer, TransitionGroupType> transitionGroups = device.getDeviceConfiguration().getChannel(this.channels.getActiveChannelNumber()).getTransitionGroups();
 					for (Entry<Integer, TransitionGroupType> transitionGroupEntry : transitionGroups.entrySet()) {
