@@ -120,53 +120,60 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 	*/
 	public EnumSet<DisplayTag> getActiveDisplayTags() {
 		if (this.activeDisplayTags == null) {
-			EnumSet<DisplayTag> resultTags = EnumSet.allOf(DisplayTag.class);
-
-			if (!this.get(DataTag.FILE_PATH).isEmpty()) {
-				{
-					if (this.get(DataTag.GPS_LOCATION).isEmpty()) resultTags.remove(DisplayTag.GPS_LOCATION);
-				}
-				{
-					Path directoryPath = Paths.get(this.get(DataTag.FILE_PATH).get(0)).getParent();
-					Path basePath = directoryPath.getParent();
-					boolean sameDirectory = true;
-					boolean sameBase = true;
-					for (String filePath : this.get(DataTag.FILE_PATH)) {
-						Path path = Paths.get(filePath);
-						if (!path.getParent().equals(directoryPath)) sameDirectory = false;
-						if (!path.getParent().getParent().equals(basePath)) sameBase = false;
-						if (!sameDirectory && !sameBase) break;
-					}
-					if (sameDirectory) resultTags.remove(DisplayTag.DIRECTORY_NAME);
-					if (sameBase) resultTags.remove(DisplayTag.BASE_PATH);
-				}
-				{
-					String channelNumber = this.get(DataTag.CHANNEL_NUMBER).get(0);
-					boolean sameChannel = true;
-					for (String tmp : this.get(DataTag.CHANNEL_NUMBER)) {
-						if (!tmp.equals(channelNumber) || DataExplorer.application.getActiveChannelNumber() != Integer.parseInt(tmp)) {
-							sameChannel = false;
-							break;
-						}
-					}
-					if (sameChannel) resultTags.remove(DisplayTag.CHANNEL_NUMBER);
-				}
-				{
-					String objectKey = this.get(DataTag.RECTIFIED_OBJECTKEY).get(0);
-					boolean sameObject = true;
-					for (String tmp : this.get(DataTag.RECTIFIED_OBJECTKEY)) {
-						if (!tmp.equals(objectKey)) {
-							sameObject = false;
-							break;
-						}
-					}
-					if (sameObject) resultTags.remove(DisplayTag.RECTIFIED_OBJECTKEY);
-				}
-				this.activeDisplayTags = resultTags;
-			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "activeDisplayTags.size()=", resultTags.size()); //$NON-NLS-1$
+			defineActiveDisplayTags();
 		}
 		return this.activeDisplayTags;
+	}
+
+	/**
+	 *
+	 */
+	public void defineActiveDisplayTags() {
+		EnumSet<DisplayTag> resultTags = EnumSet.allOf(DisplayTag.class);
+
+		if (!this.get(DataTag.FILE_PATH).isEmpty()) {
+			{
+				if (this.get(DataTag.GPS_LOCATION).isEmpty()) resultTags.remove(DisplayTag.GPS_LOCATION);
+			}
+			{
+				Path directoryPath = Paths.get(this.get(DataTag.FILE_PATH).get(0)).getParent();
+				Path basePath = directoryPath.getParent();
+				boolean sameDirectory = true;
+				boolean sameBase = true;
+				for (String filePath : this.get(DataTag.FILE_PATH)) {
+					Path path = Paths.get(filePath);
+					if (!path.getParent().equals(directoryPath)) sameDirectory = false;
+					if (!path.getParent().getParent().equals(basePath)) sameBase = false;
+					if (!sameDirectory && !sameBase) break;
+				}
+				if (sameDirectory) resultTags.remove(DisplayTag.DIRECTORY_NAME);
+				if (sameBase) resultTags.remove(DisplayTag.BASE_PATH);
+			}
+			{
+				String channelNumber = this.get(DataTag.CHANNEL_NUMBER).get(0);
+				boolean sameChannel = true;
+				for (String tmp : this.get(DataTag.CHANNEL_NUMBER)) {
+					if (!tmp.equals(channelNumber) || DataExplorer.application.getActiveChannelNumber() != Integer.parseInt(tmp)) {
+						sameChannel = false;
+						break;
+					}
+				}
+				if (sameChannel) resultTags.remove(DisplayTag.CHANNEL_NUMBER);
+			}
+			{
+				String objectKey = this.get(DataTag.RECTIFIED_OBJECTKEY).get(0);
+				boolean sameObject = true;
+				for (String tmp : this.get(DataTag.RECTIFIED_OBJECTKEY)) {
+					if (!tmp.equals(objectKey)) {
+						sameObject = false;
+						break;
+					}
+				}
+				if (sameObject) resultTags.remove(DisplayTag.RECTIFIED_OBJECTKEY);
+			}
+			this.activeDisplayTags = resultTags;
+		}
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "activeDisplayTags.size()=", resultTags.size()); //$NON-NLS-1$
 	}
 
 	public List<String> getDataGpsLocations() {

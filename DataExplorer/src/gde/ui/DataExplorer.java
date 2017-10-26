@@ -99,6 +99,7 @@ import gde.device.resource.DeviceXmlResource;
 import gde.histo.datasources.HistoSet;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.recordings.RecordingsCollector;
+import gde.histo.recordings.TrailDataTags;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
@@ -624,9 +625,9 @@ public class DataExplorer extends Composite {
 			this.displayTab.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {
-					if (log.isLoggable(Level.FINER) && DataExplorer.this.displayTab.getSelectionIndex() >= 0)
-						log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "displayTab.paintControl " + DataExplorer.this.displayTab.getItems()[DataExplorer.this.displayTab.getSelectionIndex()].getText() //$NON-NLS-1$
-								+ GDE.STRING_MESSAGE_CONCAT + DataExplorer.this.displayTab.getSelectionIndex() + GDE.STRING_MESSAGE_CONCAT + evt);
+					if (log.isLoggable(Level.FINER) && DataExplorer.this.displayTab.getSelectionIndex() >= 0) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME,
+							"displayTab.paintControl " + DataExplorer.this.displayTab.getItems()[DataExplorer.this.displayTab.getSelectionIndex()].getText() //$NON-NLS-1$
+									+ GDE.STRING_MESSAGE_CONCAT + DataExplorer.this.displayTab.getSelectionIndex() + GDE.STRING_MESSAGE_CONCAT + evt);
 					if (isRecordSetVisible(GraphicsType.NORMAL)) {
 						if (DataExplorer.this.graphicsTabItem.isCurveSelectorEnabled())
 							DataExplorer.this.graphicsTabItem.setSashFormWeights(DataExplorer.this.graphicsTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
@@ -1004,10 +1005,13 @@ public class DataExplorer extends Composite {
 					}
 					TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
 					if (trailRecordSet != null) {
-						final int tagSize = DataExplorer.this.settings.isDisplayScores() && trailRecordSet.getDataTags().getActiveDisplayTags() != null
-								? trailRecordSet.getDataTags().getActiveDisplayTags().size()
-								: 0;
-						DataExplorer.this.histoTableTabItem.setRowCount(trailRecordSet.getVisibleAndDisplayableRecordsForTable().size() + tagSize);
+						int tableRowCount = trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
+						if (DataExplorer.this.settings.isDisplayScores()) {
+							TrailDataTags dataTags = trailRecordSet.getDataTags();
+							dataTags.defineActiveDisplayTags();
+							if (dataTags.getActiveDisplayTags() != null) tableRowCount += dataTags.getActiveDisplayTags().size();
+						}
+						DataExplorer.this.histoTableTabItem.setRowCount(tableRowCount);
 					}
 				}
 			}
@@ -2012,7 +2016,8 @@ public class DataExplorer extends Composite {
 	 * @param readFromDirectories true reloads from files; false uses histo vault data
 	 */
 	public void updateHistoTabs(boolean readFromDirectories, boolean rebuildTrails) {
-		if (this.histoGraphicsTabItem != null) updateHistoTabs(readFromDirectories ? RebuildStep.B_HISTOVAULTS : rebuildTrails ? RebuildStep.C_TRAILRECORDSET : RebuildStep.E_USER_INTERFACE, true);
+		if (this.histoGraphicsTabItem != null)
+			updateHistoTabs(readFromDirectories ? RebuildStep.B_HISTOVAULTS : rebuildTrails ? RebuildStep.C_TRAILRECORDSET : RebuildStep.E_USER_INTERFACE, true);
 	}
 
 	private void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
@@ -2072,9 +2077,9 @@ public class DataExplorer extends Composite {
 			RebuildStep maximumRebuildStep = this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? this.rebuildStepInvisibleTab : performedRebuildStep;
 			// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
 			this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > this.rebuildStepInvisibleTab.scopeOfWork ? RebuildStep.E_USER_INTERFACE : RebuildStep.F_FILE_CHECK;
-			if (log.isLoggable(Level.FINER))
-				log.log(Level.FINER, String.format("rebuildStep=%s  performedRebuildStep=%s  maximumRebuildStep=%s  rebuildStepInvisibleTab=%s", rebuildStep, performedRebuildStep, maximumRebuildStep, //$NON-NLS-1$
-						this.rebuildStepInvisibleTab));
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
+					String.format("rebuildStep=%s  performedRebuildStep=%s  maximumRebuildStep=%s  rebuildStepInvisibleTab=%s", rebuildStep, performedRebuildStep, maximumRebuildStep, //$NON-NLS-1$
+							this.rebuildStepInvisibleTab));
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			if (isWithUi) openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
