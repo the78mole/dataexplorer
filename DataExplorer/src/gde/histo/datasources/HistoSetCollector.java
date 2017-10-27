@@ -274,8 +274,8 @@ public final class HistoSetCollector {
 					isRebuilt = true;
 					this.directoryScanner.initialize();
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("directoryScanner      initialize")); //$NON-NLS-1$
-					progress.set(LoadProgress.INITIALIZED.endPercentage);
 				}
+				progress.set(LoadProgress.INITIALIZED.endPercentage);
 			}
 			boolean isHistoFilePathsValid = this.directoryScanner.validateHistoFilePaths(rebuildStep);
 			{
@@ -299,9 +299,7 @@ public final class HistoSetCollector {
 				if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS).contains(rebuildStep)) {
 					isRebuilt = true;
 					this.recordSetBytesSum = 0;
-					if (this.unsuppressedTrusses.size() <= 0)
-						progress.set(LoadProgress.CACHED.endPercentage);
-					else {
+					if (!this.unsuppressedTrusses.isEmpty()) {
 						Map<Path, Map<String, VaultCollector>> trussJobs;
 						{
 							long nanoTimeCheckFilesSum = -System.nanoTime();
@@ -369,9 +367,9 @@ public final class HistoSetCollector {
 									String.format("%,5d recordsets store in cache     time=%,6d [ms] :: per second:%5d :: Rate=%,6d MB/s", newVaults.size(), //$NON-NLS-1$
 											TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum), newVaults.size() * 1000 / TimeUnit.NANOSECONDS.toMillis(nanoTimeWriteVaultSum),
 											(this.recordSetBytesSum - recordSetBytesCachedSum) / TimeUnit.NANOSECONDS.toMicros(nanoTimeWriteVaultSum)));
-							progress.set(LoadProgress.CACHED.endPercentage);
 						}
 					}
+					progress.set(LoadProgress.CACHED.endPercentage);
 				}
 				{
 					if (!isHistoFilePathsValid || EnumSet.of(RebuildStep.A_HISTOSET, RebuildStep.B_HISTOVAULTS, RebuildStep.C_TRAILRECORDSET).contains(rebuildStep)) {
@@ -489,10 +487,7 @@ public final class HistoSetCollector {
 		return this.elapsedTime_ms;
 	}
 
-	/**
-	 * Is thread safe with respect to concurrent rebuilds or initializings.
-	 */
-	public synchronized TrailRecordSet getTrailRecordSet() {
+	public TrailRecordSet getTrailRecordSet() {
 		return this.trailRecordSet;
 	}
 
