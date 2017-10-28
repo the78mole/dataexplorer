@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 3.3.2 - xx yyy 2017
 * xyz ...
 History analysis
+* Enhance initial vertical lines positions in delta measurement mode
 * Fix Histo table column values for non-reversed timestamp sequence
 * Fix table entries for GPS location which are not shown sometimes
 * Enhance histo graphics redraw performance

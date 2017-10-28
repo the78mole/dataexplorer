@@ -59,57 +59,28 @@ public final class HistoSet {
 	 * A minimum of steps may be selected for performance reasons.
 	 */
 	public enum RebuildStep {
-		/**
-		* true starts from scratch on
-		*/
+		/** starts from scratch on */
 		A_HISTOSET(5),
-		/**
-		* true starts building the histo vaults
-		*/
+		/** starts building the histo vaults */
 		B_HISTOVAULTS(4),
-		/**
-		* true starts building the trail recordset from the histo vaults
-		*/
+		/** starts building the trail recordset from the histo vaults */
 		C_TRAILRECORDSET(3),
-		/**
-		* true starts refreshing the trail data from the histo vaults
-		*/
+		/** starts refreshing the trail data from the histo vaults */
 		D_TRAIL_DATA(2),
-		/**
-		* starts updating the graphics and table
-		*/
+		/** starts updating the graphics and table */
 		E_USER_INTERFACE(1),
-		/**
-		* starts with a file check only which decides which update activity is required
-		*/
+		/** starts with a file check only which decides which update activity is required */
 		F_FILE_CHECK(0);
 
-		/**
-		 * zero is the lowest scopeOfWork.
-		 */
+		/** zero is the lowest scopeOfWork. */
 		public final int					scopeOfWork;
-		/**
-		 * use this to avoid repeatedly cloning actions instead of values()
-		 */
+
+		/** use this to avoid repeatedly cloning actions instead of values() */
 		public static RebuildStep	VALUES[]	= values();
 
 		private RebuildStep(int scopeOfWork) {
 			this.scopeOfWork = scopeOfWork;
 		}
-
-		/**
-		 * @param scopeOfWork zero is the lowest scopeOfWork
-		 * @return the rebuild step corresponding to the scope of work
-		 */
-		public static RebuildStep area(int scopeOfWork) {
-			for (RebuildStep rebuildStep : values()) {
-				if (rebuildStep.scopeOfWork == scopeOfWork) {
-					return rebuildStep;
-				}
-			}
-			throw new IllegalArgumentException(String.valueOf(scopeOfWork));
-		}
-
 	};
 
 	public HistoSet() {
@@ -120,7 +91,8 @@ public final class HistoSet {
 	/**
 	 * Determine histo files, build a recordset based job list and read from the log file or the cache for each job.
 	 * Populate the trail recordset.
-	 * Disregard rebuild steps if histo file paths have changed which may occur if new files have been added by the user or the device, channel or object was modified.
+	 * Disregard rebuild steps if histo file paths have changed which may occur if new files have been added by the user
+	 * or the device, channel or object was modified.
 	 * @param rebuildStep
 	 * @param isWithUi true allows actions on the user interface (progress bar, message boxes)
 	 * @return true if the HistoSet was rebuilt
@@ -172,8 +144,7 @@ public final class HistoSet {
 						String.format("%,d", this.histoSetCollector.getReadFilesCount()), //
 						String.format("%.2f", this.histoSetCollector.getRecordSetBytesSum() / 1024 / 1024.), //
 						String.format("%.2f", this.histoSetCollector.getElapsedTime_ms() / 1000.), //
-						String.format("%,d", this.histoSetCollector.getUnsuppressedTrusses().size()//
-								+ this.histoSetCollector.getSuppressedTrusses().size() + this.histoSetCollector.getDuplicateTrussesCount()), //
+						String.format("%,d", this.histoSetCollector.getUnsuppressedTrusses().size() + this.histoSetCollector.getSuppressedTrusses().size() + this.histoSetCollector.getDuplicateTrussesCount()), //
 						String.format("%,d", this.histoSetCollector.getTimeStepSize()) });
 
 	}

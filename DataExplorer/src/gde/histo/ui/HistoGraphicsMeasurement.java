@@ -25,175 +25,259 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSetFormatter;
-import gde.histo.utils.HistoTimeLine;
 import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.StringHelper;
 
 /**
- * Curve survey activity mapper for mouse movements and other UI actions like menus, checkboxes.
+ * Curve survey activity mapper for mouse movements and other UI actions from menus, checkboxes etc.
  * @author Thomas Eickert (USER)
  */
 public final class HistoGraphicsMeasurement {
-	private final static String	$CLASS_NAME	= HistoGraphicsComposite.class.getName();
+	private final static String	$CLASS_NAME	= HistoGraphicsMeasurement.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private final DataExplorer	application	= DataExplorer.getInstance();
-
 	public enum HistoGraphicsMode {
-		MEASURE, MEASURE_DELTA, RESET
+
+		/** Single measurement mode is active */
+		MEASURE {
+			@Override
+			void setMode(HistoGraphicsComposite hgc) {
+				hgc.graphicsMeasurement.isLeftMouseMeasure = true;
+				hgc.graphicsMeasurement.isRightMouseMeasure = false;
+			}
+
+			@Override
+			void drawMeasurement(HistoGraphicsComposite hgc, long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
+				HistoGraphicsMeasurement hgm = hgc.graphicsMeasurement;
+
+				hgm.curveSurvey.setPosMeasure(hgc.curveAreaBounds, timestampMeasureNew_ms);
+
+				String statusMessage = hgm.curveSurvey.drawMeasurementGraphics();
+				DataExplorer.getInstance().setStatusMessage(statusMessage);
+
+				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestampMeasureNew_ms));
+			}
+
+			@Override
+			void drawLeftMeasurement(HistoGraphicsComposite hgc, long timestamp_ms) {
+				HistoGraphicsMeasurement hgm = hgc.graphicsMeasurement;
+				long startTime = new Date().getTime();
+				hgm.curveSurvey.cleanMeasurementPointer(hgc.canvasImage);
+
+				hgm.curveSurvey.setPosMeasure(hgc.curveAreaBounds, timestamp_ms);
+				String statusMessage = hgm.curveSurvey.drawMeasurementGraphics();
+				DataExplorer.getInstance().setStatusMessage(statusMessage);
+
+				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestamp_ms));
+				if (log.isLoggable(Level.TIME))
+					log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+			}
+
+			@Override
+			void drawRightMeasurement(HistoGraphicsComposite hgc, long timestamp_ms) {
+			}
+
+			@Override
+			void drawInitialMeasurement(HistoGraphicsComposite hgc) {
+				long timestampMeasureNew_ms = hgc.timeLine.getAdjacentTimestamp(hgc.curveAreaBounds.width / 4);
+				long timestampDeltaNew_ms = timestampMeasureNew_ms; // is not required for single measurement
+				hgc.graphicsMeasurement.drawMeasurement(timestampMeasureNew_ms, timestampDeltaNew_ms);
+			}
+		},
+
+		/** delta measurement mode is active */
+		MEASURE_DELTA {
+			@Override
+			void setMode(HistoGraphicsComposite hgc) {
+				hgc.graphicsMeasurement.isLeftMouseMeasure = false;
+				hgc.graphicsMeasurement.isRightMouseMeasure = true;
+			}
+
+			@Override
+			void drawMeasurement(HistoGraphicsComposite hgc, long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
+				HistoGraphicsMeasurement hgm = hgc.graphicsMeasurement;
+				hgm.curveSurvey.setPosMeasure(hgc.curveAreaBounds, timestampMeasureNew_ms);
+				hgm.curveSurvey.setPosDelta(hgc.curveAreaBounds, timestampDeltaNew_ms);
+
+				String statusMessage = hgm.curveSurvey.drawDeltaMeasurementGraphics();
+				DataExplorer.getInstance().setStatusMessage(statusMessage);
+
+				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestampMeasureNew_ms));
+			}
+
+			@Override
+			void drawLeftMeasurement(HistoGraphicsComposite hgc, long timestamp_ms) {
+				HistoGraphicsMeasurement hgm = hgc.graphicsMeasurement;
+				long startTime = new Date().getTime();
+				hgm.curveSurvey.cleanMeasurementPointer(hgc.canvasImage);
+
+				hgm.curveSurvey.setPosMeasure(hgc.curveAreaBounds, timestamp_ms);
+				String statusMessage = hgm.curveSurvey.drawDeltaMeasurementGraphics();
+				DataExplorer.getInstance().setStatusMessage(statusMessage);
+
+				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestamp_ms));
+				if (log.isLoggable(Level.TIME))
+					log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+			}
+
+			@Override
+			void drawRightMeasurement(HistoGraphicsComposite hgc, long timestamp_ms) {
+				HistoGraphicsMeasurement hgm = hgc.graphicsMeasurement;
+				long startTime = new Date().getTime();
+				hgm.curveSurvey.cleanMeasurementPointer(hgc.canvasImage);
+
+				hgm.curveSurvey.setPosDelta(hgc.curveAreaBounds, timestamp_ms);
+				String statusMessage = hgm.curveSurvey.drawDeltaMeasurementGraphics();
+				DataExplorer.getInstance().setStatusMessage(statusMessage);
+
+				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestamp_ms));
+				if (log.isLoggable(Level.TIME))
+					log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+			}
+
+			@Override
+			void drawInitialMeasurement(HistoGraphicsComposite hgc) {
+				if (hgc.timeLine.getScalePositions().size() > 1) {
+					int margin = hgc.curveAreaBounds.width / (hgc.timeLine.getScalePositions().size() + 1);
+					long timestampMeasureNew_ms = hgc.timeLine.getAdjacentTimestamp(margin);
+// long timestampDeltaNew_ms = hgc.timeLine.getAdjacentTimestamp(hgc.curveAreaBounds.width - margin);
+					long timestampDeltaNew_ms = hgc.timeLine.getAdjacentTimestamp(hgc.curveAreaBounds.width * 2 / 3);
+
+					hgc.graphicsMeasurement.drawMeasurement(timestampMeasureNew_ms, timestampDeltaNew_ms);
+				}
+			}
+		};
+
+		/**
+		 * Set graphics window measurement mode.
+		 */
+		abstract void setMode(HistoGraphicsComposite graphicsComposite);
+
+		/**
+		 * Perform the UI activities required for a measurement.
+		 */
+		abstract void drawMeasurement(HistoGraphicsComposite hgc, long timestampMeasureNew_ms, long timestampDeltaNew_ms);
+
+		/**
+		 * Perform the UI activities for the first measurement timestamp.
+		 * In case of delta measurement: the timestamp which is initially on the left.
+		 */
+		abstract void drawLeftMeasurement(HistoGraphicsComposite hgc, long timestamp_ms);
+
+		/**
+		 * Perform the UI activities for the second measurement timestamp used for delta measurement.
+		 */
+		abstract void drawRightMeasurement(HistoGraphicsComposite hgc, long timestamp_ms);
+
+		/**
+		 * Perform the UI activities in case the measurement mode is changed.
+		 */
+		abstract void drawInitialMeasurement(HistoGraphicsComposite hgc);
+
+		private static String getSelectedMeasurementsAsTable(HistoGraphicsComposite hgc, long timestamp_ms) {
+			hgc.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD)); //$NON-NLS-1$
+			return TrailRecordSetFormatter.getSelectedMeasurementsAsTable(timestamp_ms);
+		}
+
 	};
 
-	boolean										isLeftMouseMeasure	= false;
-	boolean										isRightMouseMeasure	= false;
+	boolean																isLeftMouseMeasure	= false;
+	boolean																isRightMouseMeasure	= false;
 
-	private final TrailRecord	trailRecord;
-	private final CurveSurvey	curveSurvey;
-	private final boolean			isSingleMeasurement;
+	private final HistoGraphicsComposite	graphicsComposite;
+	private final TrailRecord							trailRecord;
+	private final CurveSurvey							curveSurvey;
 
-	private final Canvas			graphicCanvas;
-	private final Text				recordSetComment;
+	private GC														canvasGC;
+	private HistoGraphicsMode							mode;
 
-	private GC								canvasGC;
+	public HistoGraphicsMeasurement(HistoGraphicsComposite graphicsComposite) {
+		this.graphicsComposite = graphicsComposite;
 
-	public HistoGraphicsMeasurement(Canvas graphicCanvas, Text recordSetComment, HistoTimeLine timeLine) {
-		this.graphicCanvas = graphicCanvas;
-
-		TrailRecordSet trailRecordSet = this.application.getHistoSet().getTrailRecordSet();
+		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
 		this.trailRecord = (TrailRecord) trailRecordSet.get(trailRecordSet.getRecordKeyMeasurement());
-		this.curveSurvey = new CurveSurvey(this.canvasGC, this.trailRecord, timeLine);
-		this.isSingleMeasurement = trailRecordSet.isMeasurementMode(trailRecordSet.getRecordKeyMeasurement());
 
-		this.recordSetComment = recordSetComment;
+		this.curveSurvey = new CurveSurvey(this.canvasGC, this.trailRecord, graphicsComposite.timeLine);
 	}
 
 	/**
 	 * Draw a refreshed measurement.
 	 */
-	public void drawMeasurement(Image canvasImage, Rectangle curveAreaBounds) {
-		drawMeasurement(this.curveSurvey.getTimestampMeasure_ms(), this.curveSurvey.getTimestampDelta_ms(), canvasImage, curveAreaBounds);
+	public void drawMeasurement() {
+		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
+		if (trailRecordSet.isSurveyMode(trailRecordSet.getRecordKeyMeasurement())) {
+			drawMeasurement(this.curveSurvey.getTimestampMeasure_ms(), this.curveSurvey.getTimestampDelta_ms());
+		}
 	}
 
 	/**
 	 * Draw a new measurement based on the timestamp values.
 	 */
-	public void drawMeasurement(long timestampMeasureNew_ms, long timestampDeltaNew_ms, Image canvasImage, Rectangle curveAreaBounds) {
+	private void drawMeasurement(long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
+		Image canvasImage = this.graphicsComposite.canvasImage;
 		// set the gc properties
-		this.canvasGC = new GC(this.graphicCanvas);
+		this.canvasGC = new GC(this.graphicsComposite.graphicCanvas);
 		this.canvasGC.setForeground(this.trailRecord.getColor());
 
 		this.curveSurvey.setCanvasGC(this.canvasGC);
 		// all obsolete lines are cleaned up now draw new position marker
 		this.curveSurvey.cleanMeasurementPointer(canvasImage);
 
-		if (this.isSingleMeasurement) {
-			setModeState(HistoGraphicsMode.MEASURE);
-			this.curveSurvey.setPosMeasure(curveAreaBounds, timestampMeasureNew_ms);
-
-			String statusMessage = this.curveSurvey.drawMeasurementGraphics();
-			this.application.setStatusMessage(statusMessage);
-
-			this.recordSetComment.setText(this.getSelectedMeasurementsAsTable(timestampMeasureNew_ms));
-		}
-		else {
-			setModeState(HistoGraphicsMode.MEASURE_DELTA);
-			this.curveSurvey.setPosMeasure(curveAreaBounds, timestampMeasureNew_ms);
-			this.curveSurvey.setPosDelta(curveAreaBounds, timestampDeltaNew_ms);
-
-			String statusMessage = this.curveSurvey.drawDeltaMeasurementGraphics();
-			this.application.setStatusMessage(statusMessage);
-
-			this.recordSetComment.setText(this.getSelectedMeasurementsAsTable(timestampMeasureNew_ms));
-		}
+		this.mode.drawMeasurement(this.graphicsComposite, timestampMeasureNew_ms, timestampDeltaNew_ms);
 
 		this.canvasGC.dispose();
 	}
 
 	/**
-	 * Clean (old) measurement pointer - check pointer in curve area.
+	 * Reset the graphic area and status message.
 	 */
-	public void cleanMeasurementPointer(Image canvasImage) {
-		this.canvasGC = new GC(this.graphicCanvas);
-		this.curveSurvey.setCanvasGC(this.canvasGC);
+	public void cleanMeasurement() {
+		this.isLeftMouseMeasure = false;
+		this.isRightMouseMeasure = false;
 
-		this.curveSurvey.cleanMeasurementPointer(canvasImage);
+		this.canvasGC = new GC(this.graphicsComposite.graphicCanvas);
+		this.curveSurvey.setCanvasGC(this.canvasGC);
+		
+		this.curveSurvey.cleanMeasurementPointer(this.graphicsComposite.canvasImage);
+
+		this.graphicsComposite.setRecordSetCommentStandard();
+		DataExplorer.getInstance().setStatusMessage(GDE.STRING_EMPTY);
 	}
 
 	/**
 	 * Switch measurement mode.
-	 * @param mode
 	 */
 	public void setModeState(HistoGraphicsMode mode) {
-		switch (mode) {
-		case MEASURE:
-			this.isLeftMouseMeasure = true;
-			this.isRightMouseMeasure = false;
-			break;
-		case MEASURE_DELTA:
-			this.isLeftMouseMeasure = false;
-			this.isRightMouseMeasure = true;
-			break;
-		default:
-			this.isLeftMouseMeasure = false;
-			this.isRightMouseMeasure = false;
-			break;
-		}
+		this.mode = mode;
+		mode.setMode(this.graphicsComposite);
 	}
 
 	/**
-	 * Draw the survey graphics.
-	 * @param timestamp_ms
-	 * @param canvasImage
+	 * Draw the survey graphics while moving the vertical line.
 	 */
-	public void processMouseMove(long timestamp_ms, Image canvasImage, Rectangle curveAreaBounds) {
-		this.canvasGC = new GC(this.graphicCanvas);
+	public void processMouseDownMove(long timestamp_ms) {
+// , this.canvasImage, this.curveAreaBounds
+		this.canvasGC = new GC(this.graphicsComposite.graphicCanvas);
 		this.curveSurvey.setCanvasGC(this.canvasGC);
 		this.canvasGC.setForeground(this.trailRecord.getColor());
 
 		if (this.isLeftMouseMeasure) {
 			int yPosMeasureNew = new HistoGraphicsMapper(this.trailRecord).getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timestamp_ms));
 			if (this.curveSurvey.isNewMeasureSpot(timestamp_ms, yPosMeasureNew)) {
-				long startTime = new Date().getTime();
-				this.curveSurvey.cleanMeasurementPointer(canvasImage);
-
-				if (this.isSingleMeasurement) {
-					this.curveSurvey.setPosMeasure(curveAreaBounds, timestamp_ms);
-					String statusMessage = this.curveSurvey.drawMeasurementGraphics();
-					this.application.setStatusMessage(statusMessage);
-				}
-				else {
-					this.curveSurvey.setPosMeasure(curveAreaBounds, timestamp_ms);
-					String statusMessage = this.curveSurvey.drawDeltaMeasurementGraphics();
-					this.application.setStatusMessage(statusMessage);
-				}
-
-				this.recordSetComment.setText(this.getSelectedMeasurementsAsTable(timestamp_ms));
-				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				this.mode.drawLeftMeasurement(this.graphicsComposite, timestamp_ms);
 			}
-			this.canvasGC.dispose();
-		}
-		else if (this.isRightMouseMeasure) {
+		} else if (this.isRightMouseMeasure) {
 			int yPosDeltaNew = new HistoGraphicsMapper(this.trailRecord).getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timestamp_ms));
 			if (this.curveSurvey.isNewDeltaSpot(timestamp_ms, yPosDeltaNew)) {
-				long startTime = new Date().getTime();
-				this.curveSurvey.cleanMeasurementPointer(canvasImage);
-
-				this.curveSurvey.setPosDelta(curveAreaBounds, timestamp_ms);
-				String statusMessage = this.curveSurvey.drawDeltaMeasurementGraphics();
-				this.application.setStatusMessage(statusMessage);
-
-				this.recordSetComment.setText(this.getSelectedMeasurementsAsTable(timestamp_ms));
-				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				this.mode.drawRightMeasurement(this.graphicsComposite, timestamp_ms);
 			}
 		}
 
@@ -201,20 +285,30 @@ public final class HistoGraphicsMeasurement {
 	}
 
 	/**
+	 * Perform UI activities at mouse up movements.
+	 */
+	public void processMouseUpMove(int xPos) {
+		if (this.curveSurvey.isOverVerticalLine(xPos)) {
+			this.graphicsComposite.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/MoveH.gif")); //$NON-NLS-1$
+		} else {
+			this.graphicsComposite.graphicCanvas.setCursor(DataExplorer.getInstance().getCursor());
+		}
+	}
+
+	/**
 	 * Determine which vertical line was moved.
-	 * @param xPos
 	 */
 	public void processMouseDownAction(int xPos) {
-		if (this.curveSurvey.isNearMeasureLine(xPos)) {
-			this.isLeftMouseMeasure = true;
-			this.isRightMouseMeasure = false;
-		}
-		else if (this.curveSurvey.isNearDeltaLine(xPos)) {
-			this.isRightMouseMeasure = true;
-			this.isLeftMouseMeasure = false;
-		}
-		else {
-			throw new UnsupportedOperationException();
+		if (this.curveSurvey.isOverVerticalLine(xPos)) {
+			if (this.curveSurvey.isNearMeasureLine(xPos)) {
+				this.isLeftMouseMeasure = true;
+				this.isRightMouseMeasure = false;
+			} else if (this.curveSurvey.isNearDeltaLine(xPos)) {
+				this.isRightMouseMeasure = true;
+				this.isLeftMouseMeasure = false;
+			} else {
+				throw new UnsupportedOperationException();
+			}
 		}
 	}
 
@@ -225,21 +319,12 @@ public final class HistoGraphicsMeasurement {
 		if (this.isLeftMouseMeasure) {
 			this.isLeftMouseMeasure = false;
 			// application.setStatusMessage(GDE.STRING_EMPTY);
-		}
-		else if (this.isRightMouseMeasure) {
+		} else if (this.isRightMouseMeasure) {
 			this.isRightMouseMeasure = false;
 			// application.setStatusMessage(GDE.STRING_EMPTY);
 		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	private String getSelectedMeasurementsAsTable(long timestamp_ms) {
-		this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD)); //$NON-NLS-1$
-		return TrailRecordSetFormatter.getSelectedMeasurementsAsTable(timestamp_ms);
-	}
-
-	public boolean isOverVerticalLine(int xPos) {
-		return this.curveSurvey.isOverVerticalLine(xPos);
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

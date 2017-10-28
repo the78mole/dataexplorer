@@ -76,54 +76,55 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert
  */
 public final class HistoGraphicsComposite extends Composite {
-	private final static String				$CLASS_NAME			= HistoGraphicsComposite.class.getName();
-	private final static Logger				log							= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME			= HistoGraphicsComposite.class.getName();
+	private final static Logger	log							= Logger.getLogger($CLASS_NAME);
 
-	private final DataExplorer				application			= DataExplorer.getInstance();
-	private final Settings						settings				= Settings.getInstance();
-	private final Channels						channels				= Channels.getInstance();
-	private final HistoTimeLine				timeLine				= new HistoTimeLine();
-	private final GraphicsType				graphicsType;
+	private final DataExplorer	application			= DataExplorer.getInstance();
+	private final Settings			settings				= Settings.getInstance();
+	private final Channels			channels				= Channels.getInstance();
+	final HistoTimeLine					timeLine				= new HistoTimeLine();
+	private final GraphicsType	graphicsType;
 
-	Menu															popupmenu;
-	TabAreaContextMenu								contextMenu;
-	Color															curveAreaBackground;
-	Color															surroundingBackground;
-	Color															curveAreaBorderColor;
+	Menu												popupmenu;
+	TabAreaContextMenu					contextMenu;
+	Color												curveAreaBackground;
+	Color												surroundingBackground;
+	Color												curveAreaBorderColor;
 
 	// drawing canvas
-	Text															graphicsHeader;
-	Text															recordSetComment;
+	Text												graphicsHeader;
+	Text												recordSetComment;
 
-	Canvas														graphicCanvas;
-	int																headerHeight		= 0;
-	int																headerGap				= 0;
-	int																commentHeight		= 0;
-	int																commentGap			= 0;
-	String														graphicsHeaderText;
-	Point															oldSize					= new Point(0, 0);												// composite size - control resized
+	Canvas											graphicCanvas;
+	int													headerHeight		= 0;
+	int													headerGap				= 0;
+	int													commentHeight		= 0;
+	int													commentGap			= 0;
+	String											graphicsHeaderText;
+	/** composite size - control resized */
+	Point												oldSize					= new Point(0, 0);
 
 	// mouse actions
-	int																xDown						= 0;
-	int																xUp							= 0;
-	int																xLast						= 0;
-	int																yDown						= 0;
-	int																yUp							= 0;
+	int													xDown						= 0;
+	int													xUp							= 0;
+	int													xLast						= 0;
+	int													yDown						= 0;
+	int													yUp							= 0;
 
-	Rectangle													canvasBounds;
-	Image															canvasImage;
-	GC																canvasImageGC;
-	GC																canvasGC;
-	Rectangle													curveAreaBounds	= new Rectangle(0, 0, 1, 1);
+	Rectangle										canvasBounds;
+	Image												canvasImage;
+	GC													canvasImageGC;
+	GC													canvasGC;
+	Rectangle										curveAreaBounds	= new Rectangle(0, 0, 1, 1);
 
-	private HistoGraphicsMeasurement	graphicsMeasurement;
+	HistoGraphicsMeasurement		graphicsMeasurement;
 
 	HistoGraphicsComposite(SashForm useParent) {
 		super(useParent, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
 		this.graphicsType = GraphicsType.HISTO;
 
-		//get the background colors
+		// get the background colors
 		this.curveAreaBackground = this.settings.getGraphicsCurveAreaBackground();
 		this.surroundingBackground = this.settings.getGraphicsSurroundingBackground();
 		this.curveAreaBorderColor = this.settings.getGraphicsCurvesBorderColor();
@@ -178,22 +179,32 @@ public final class HistoGraphicsComposite extends Composite {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
-					String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
-					StringBuilder sb = new StringBuilder();
+					String headerText = GDE.STRING_EMPTY;
 					String toolTipText = GDE.STRING_EMPTY;
-					for (Entry<DirectoryType, Path> directoryEntry : DataExplorer.getInstance().getHistoSet().getValidatedDirectories().entrySet()) {
-						String truncatedPath = directoryEntry.getValue().getFileName().toString().length() > 22 ? directoryEntry.getValue().getFileName().toString().substring(0, 22) + ellipsisText
-								: directoryEntry.getValue().getFileName().toString();
-						sb.append(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK).append(truncatedPath);
-						toolTipText += GDE.STRING_NEW_LINE + directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + directoryEntry.getValue().toString();
+					{ // getBaseTexts
+						StringBuilder sb = new StringBuilder();
+						String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
+						for (Entry<DirectoryType, Path> directoryEntry : DataExplorer.getInstance().getHistoSet().getValidatedDirectories().entrySet()) {
+							String fileName = directoryEntry.getValue().getFileName().toString();
+							String truncatedPath = fileName.length() > 22 ? fileName.substring(0, 22) + ellipsisText : fileName;
+							sb.append(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK).append(truncatedPath);
+							toolTipText +=
+									GDE.STRING_NEW_LINE + directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + directoryEntry.getValue().toString();
+						}
+						headerText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
+						if (!toolTipText.isEmpty()) toolTipText = toolTipText.substring(1);
 					}
-					String levelsText = Settings.getInstance().getSubDirectoryLevelMax() > 0
-							? GDE.STRING_NEW_LINE + "+ " + Settings.getInstance().getSubDirectoryLevelMax() + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT0870) : GDE.STRING_EMPTY; //$NON-NLS-1$
-					String tmpHeaderText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
-					if (HistoGraphicsComposite.this.graphicsHeaderText == null || !tmpHeaderText.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
-						HistoGraphicsComposite.this.graphicsHeader.setText(HistoGraphicsComposite.this.graphicsHeaderText = tmpHeaderText);
+					if (!headerText.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
+						HistoGraphicsComposite.this.graphicsHeaderText = headerText;
+						HistoGraphicsComposite.this.graphicsHeader.setText(headerText);
 					}
-					if (!toolTipText.isEmpty()) HistoGraphicsComposite.this.graphicsHeader.setToolTipText(toolTipText.substring(1) + levelsText);
+					{ // getFullText
+						int levelMax = Settings.getInstance().getSubDirectoryLevelMax();
+						String levelsText = levelMax > 0 ? GDE.STRING_NEW_LINE + "+ " + levelMax + GDE.STRING_BLANK + Messages.getString(MessageIds.GDE_MSGT0870)
+								: GDE.STRING_EMPTY;
+						if (!toolTipText.isEmpty()) toolTipText = toolTipText + levelsText;
+					}
+					HistoGraphicsComposite.this.graphicsHeader.setToolTipText(toolTipText);
 				}
 			});
 		}
@@ -239,8 +250,7 @@ public final class HistoGraphicsComposite extends Composite {
 					// System.out.println("width = " + GraphicsComposite.this.getSize().x);
 					try {
 						drawAreaPaintControl(evt);
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						log.log(Level.SEVERE, e.getMessage(), e);
 					}
 				}
@@ -271,8 +281,8 @@ public final class HistoGraphicsComposite extends Composite {
 	}
 
 	/**
-	* Draw the containing records and sets the comment.
-	*/
+	 * Draw the containing records and sets the comment.
+	 */
 	private void drawAreaPaintControl() {
 		long startTime = new Date().getTime();
 		// Get the canvas and its dimensions
@@ -286,7 +296,7 @@ public final class HistoGraphicsComposite extends Composite {
 		this.canvasImageGC.fillRectangle(this.canvasBounds);
 		this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		// get gc for other drawing operations
-		this.canvasGC = new GC(this.graphicCanvas); // SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType);
+		this.canvasGC = new GC(this.graphicCanvas);
 
 		setRecordSetCommentStandard();
 
@@ -297,11 +307,10 @@ public final class HistoGraphicsComposite extends Composite {
 			// changed curve selection may change the scale end values
 			trailRecordSet.syncScaleOfSyncableRecords();
 
-			if (this.graphicsMeasurement != null && trailRecordSet.isSurveyMode(trailRecordSet.getRecordKeyMeasurement())) {
-				this.graphicsMeasurement.drawMeasurement(this.canvasImage, this.curveAreaBounds);
+			if (this.graphicsMeasurement != null) {
+				this.graphicsMeasurement.drawMeasurement();
 			}
-		}
-		else
+		} else
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 
 		this.canvasGC.dispose();
@@ -369,7 +378,8 @@ public final class HistoGraphicsComposite extends Composite {
 		int gapBot = 3 * pt.y + 4; // space used for time scale text and scales with description or legend;
 		y0 = bounds.height - yMax - gapBot;
 		height = y0 - yMax; // recalculate due to modulo 10 ??
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+				+ width + ", height=" + height); //$NON-NLS-1$
 		this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
 
@@ -393,11 +403,13 @@ public final class HistoGraphicsComposite extends Composite {
 			gc.drawLine(x0 - 1, yMax - 1, x0 - 1, y0);
 			gc.drawLine(xMax + 1, yMax - 1, xMax + 1, y0);
 
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startInitTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() //$NON-NLS-1$ //$NON-NLS-2$
+					- startInitTime)));
 
 			long startTime = new Date().getTime();
 			HistoCurveUtils.drawTrailRecordSet(trailRecordSet, gc, dataScaleWidth, this.canvasBounds, this.curveAreaBounds, this.timeLine);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() //$NON-NLS-1$ //$NON-NLS-2$
+					- startTime)));
 		}
 	}
 
@@ -407,8 +419,7 @@ public final class HistoGraphicsComposite extends Composite {
 	public void redrawGraphics() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			doRedrawGraphics();
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -429,8 +440,7 @@ public final class HistoGraphicsComposite extends Composite {
 			this.graphicCanvas.redraw(size.x - 5, 5, 5, 5, true);
 			this.graphicCanvas.redraw(5, size.y - 5, 5, 5, true);
 			this.graphicCanvas.redraw(size.x - 5, size.y - 5, 5, 5, true);
-		}
-		else {
+		} else {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(); // do full update where required"); //$NON-NLS-1$
 			this.graphicCanvas.redraw(); // do full update where required
 		}
@@ -441,7 +451,7 @@ public final class HistoGraphicsComposite extends Composite {
 		this.recordSetComment.notifyListeners(SWT.FocusOut, new Event());
 	}
 
-	private void setRecordSetCommentStandard() {
+	void setRecordSetCommentStandard() {
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.recordSetComment.setText(this.application.getHistoSet().getDirectoryScanStatistics());
 	}
@@ -456,23 +466,10 @@ public final class HistoGraphicsComposite extends Composite {
 		// draw full graph at first because the curve area might change (due to new new scales)
 		drawAreaPaintControl();
 
-		this.graphicsMeasurement = new HistoGraphicsMeasurement(this.graphicCanvas, this.recordSetComment, this.timeLine);
+		this.graphicsMeasurement = new HistoGraphicsMeasurement(this);
 		this.setModeState(mode);
 
-		if (mode == HistoGraphicsMode.MEASURE_DELTA) {
-			if (this.timeLine.getScalePositions().size() > 1) {
-				int margin = this.curveAreaBounds.width / (this.timeLine.getScalePositions().size() + 1);
-				long timestampMeasureNew_ms = this.timeLine.getAdjacentTimestamp(margin);
-				long timestampDeltaNew_ms = this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width - margin);
-
-				this.graphicsMeasurement.drawMeasurement(timestampMeasureNew_ms, timestampDeltaNew_ms, this.canvasImage, this.curveAreaBounds);
-			}
-		}
-		else {
-			long timestampMeasureNew_ms = this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width / 4);
-			long timestampDeltaNew_ms = this.timeLine.getAdjacentTimestamp(this.curveAreaBounds.width * 2 / 3);
-			this.graphicsMeasurement.drawMeasurement(timestampMeasureNew_ms, timestampDeltaNew_ms, this.canvasImage, this.curveAreaBounds);
-		}
+		mode.drawInitialMeasurement(this);
 	}
 
 	/**
@@ -480,31 +477,18 @@ public final class HistoGraphicsComposite extends Composite {
 	 */
 	public void cleanMeasurement() {
 		if (this.graphicsMeasurement != null) {
-			this.graphicsMeasurement.cleanMeasurementPointer(this.canvasImage);
-		}
+			this.graphicsMeasurement.cleanMeasurement();
 
-		this.graphicsMeasurement = null;
-		setRecordSetCommentStandard();
-		this.application.setStatusMessage(GDE.STRING_EMPTY);
+			this.graphicsMeasurement = null;
+		}
 	}
 
 	/**
 	 * Set graphics window measurement mode.
-	 * @param mode MODE_RESET, MODE_MEASURE, MODE_DELTA_MEASURE
+	 * @param mode
 	 */
 	public void setModeState(HistoGraphicsMode mode) {
-		switch (mode) {
-		case MEASURE:
-			this.graphicsMeasurement.setModeState(mode);
-			break;
-		case MEASURE_DELTA:
-			this.graphicsMeasurement.setModeState(mode);
-			break;
-		case RESET:
-		default:
-			cleanMeasurement();
-			break;
-		}
+		this.graphicsMeasurement.setModeState(mode);
 	}
 
 	/**
@@ -545,27 +529,23 @@ public final class HistoGraphicsComposite extends Composite {
 					this.graphicCanvas.setCursor(this.application.getCursor());
 					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.curveAreaBounds.y) {
 						Long timestamp_ms = this.timeLine.getSnappedTimestamp(evt.x);
-						String text = timestamp_ms != null ? Paths.get(trailRecordSet.getDataTags().getByIndex(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString() : null;
+						String text = timestamp_ms != null
+								? Paths.get(trailRecordSet.getDataTags().getByIndex(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString()
+								: null;
 						if (text != null) {
-							if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText()))) this.graphicCanvas.setToolTipText(text);
-						}
-						else
+							if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText())))
+								this.graphicCanvas.setToolTipText(text);
+						} else
 							this.graphicCanvas.setToolTipText(null);
-					}
-					else
+					} else
 						this.graphicCanvas.setToolTipText(null);
 				}
 
 				if (this.graphicsMeasurement != null) {
 					if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
-						this.graphicsMeasurement.processMouseMove(this.timeLine.getAdjacentTimestamp(evt.x), this.canvasImage, this.curveAreaBounds);
-					}
-					else if (this.graphicsMeasurement.isOverVerticalLine(evt.x)) {
-						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/MoveH.gif")); //$NON-NLS-1$
-					}
-					else {
-						this.graphicCanvas.setCursor(this.application.getCursor());
-					}
+						this.graphicsMeasurement.processMouseDownMove(this.timeLine.getAdjacentTimestamp(evt.x));
+					} else
+						this.graphicsMeasurement.processMouseUpMove(evt.x);
 				}
 			}
 		}
@@ -584,20 +564,19 @@ public final class HistoGraphicsComposite extends Composite {
 				this.yDown = point.y;
 
 				if (evt.button == 1) {
-					if (this.graphicsMeasurement != null && this.graphicsMeasurement.isOverVerticalLine(this.xDown)) {
+					if (this.graphicsMeasurement != null) {
 						this.graphicsMeasurement.processMouseDownAction(this.xDown);
 					}
-				}
-				else if (evt.button == 3) { // right button
+				} else if (evt.button == 3) { // right button
 					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
 					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
 					if (this.xDown == 0 || this.xDown == this.curveAreaBounds.width) {
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
-					}
-					else {
-						Map<DataTag, String> dataTags = getTrailRecordSet().getDataTags().getByIndex(getTrailRecordSet().getIndex(HistoGraphicsComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // evt.x is already relative to curve area
+					} else {
+						Map<DataTag, String> dataTags = getTrailRecordSet().getDataTags().getByIndex(getTrailRecordSet() //
+								.getIndex(HistoGraphicsComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // is already relative to curve area
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
@@ -640,8 +619,7 @@ public final class HistoGraphicsComposite extends Composite {
 			this.headerGap = 5;
 			this.headerHeight = stringHeight;
 			gc.dispose();
-		}
-		else {
+		} else {
 			this.headerGap = 0;
 			this.headerHeight = 0;
 		}
@@ -655,8 +633,7 @@ public final class HistoGraphicsComposite extends Composite {
 			int stringHeight = gc.stringExtent(this.recordSetComment.getText()).y;
 			this.commentHeight = stringHeight * 2 + 8;
 			gc.dispose();
-		}
-		else {
+		} else {
 			this.commentGap = 0;
 			this.commentHeight = 0;
 		}
@@ -717,7 +694,7 @@ public final class HistoGraphicsComposite extends Composite {
 				this.canvasImageGC.setBackground(this.surroundingBackground);
 				this.canvasImageGC.fillRectangle(this.canvasBounds);
 				this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.canvasGC = new GC(this.graphicCanvas); // SWTResourceManager.getGC(this.graphicCanvas, "curveArea_" + this.windowType);
+				this.canvasGC = new GC(this.graphicCanvas);
 				drawCurves(trailRecordSet, this.canvasBounds, this.canvasImageGC);
 				graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
 				GC graphicsGC = new GC(graphicsImage);

@@ -2331,13 +2331,13 @@ public class DataExplorer extends Composite {
 	public void resetGraphicsWindowHeaderAndMeasurement() {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			this.histoGraphicsTabItem.clearHeaderAndComment();
-			this.histoGraphicsTabItem.getGraphicsComposite().setModeState(HistoGraphicsMode.RESET);
+			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					DataExplorer.this.histoGraphicsTabItem.clearHeaderAndComment();
-					DataExplorer.this.histoGraphicsTabItem.getGraphicsComposite().setModeState(HistoGraphicsMode.RESET);
+					DataExplorer.this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 				}
 			});
 		}
