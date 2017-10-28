@@ -40,20 +40,33 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public final class ExtendedVault extends HistoVault {
-	final private static String	$CLASS_NAME	= ExtendedVault.class.getName();
-	final private static Logger	log					= Logger.getLogger($CLASS_NAME);
+	private static final String				$CLASS_NAME	= ExtendedVault.class.getName();
+	private static final Logger				log					= Logger.getLogger($CLASS_NAME);
 
-	private static Path					activeDevicePath;														// criterion for the active device version key cache
-	private static String				activeDeviceKey;														// caches the version key for the active device which is calculated only if the device is changed by the user
-	private static long					activeDeviceLastModified_ms;								// caches the version key for the active device which is calculated only if the device is changed by the user
+	private static final DataExplorer	application	= DataExplorer.getInstance();
+	private static final Settings			settings		= Settings.getInstance();
+
+	/**
+	 * Criterion for the active device version key cache
+	 */
+	private static Path								activeDevicePath;
+	/**
+	 * Caches the version key for the active device which is calculated only if the device is changed by the user
+	 */
+	private static String							activeDeviceKey;
+	/**
+	 * Caches the version key for the active device which is calculated only if the device is changed by the user
+	 */
+	private static long								activeDeviceLastModified_ms;
 
 	public static Path getCacheDirectory() {
-		return Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
+		return Paths.get(settings.getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
 	}
 
 	/**
 	 * @param newVaultsDirectoryName directory or zip file name
-	 * @return true if the vault directory name conforms to current versions of the Data Explorer / device XML, to the current channel and to user settings (e.g. sampling timespan) and to various additional attributes
+	 * @return true if the vault directory name conforms to current versions of the Data Explorer / device XML, to the current channel and to
+	 *         user settings (e.g. sampling timespan) and to various additional attributes
 	 */
 	public static boolean isValidDirectory(String newVaultsDirectoryName) {
 		return newVaultsDirectoryName.equals(getVaultsDirectoryName());
@@ -62,11 +75,12 @@ public final class ExtendedVault extends HistoVault {
 	/**
 	 * The vaults directory name is determined without any log file contents.
 	 * This supports vault directory scanning functions in the future.
-	 * @return directory or zip file name as a unique identifier encoding the data explorer version, the device xml file contents(sha1) plus channel number and some settings values
+	 * @return directory or zip file name as a unique identifier encoding the data explorer version, the device xml file contents(sha1) plus
+	 *         channel number and some settings values
 	 */
 	public static String getVaultsDirectoryName() {
-		String tmpSubDirectoryLongKey = String.format("%s,%s,%d,%d,%f,%f", GDE.VERSION, getActiveDeviceKey(), DataExplorer.getInstance().getActiveChannelNumber(), //$NON-NLS-1$
-				Settings.getInstance().getSamplingTimespan_ms(), Settings.getInstance().getMinmaxQuantileDistance(), Settings.getInstance().getAbsoluteTransitionLevel());
+		String tmpSubDirectoryLongKey = String.format("%s,%s,%d,%d,%f,%f", GDE.VERSION, getActiveDeviceKey(), application.getActiveChannelNumber(), //$NON-NLS-1$
+				settings.getSamplingTimespan_ms(), settings.getMinmaxQuantileDistance(), settings.getAbsoluteTransitionLevel());
 		return SecureHash.sha1(tmpSubDirectoryLongKey);
 
 	}
@@ -109,22 +123,18 @@ public final class ExtendedVault extends HistoVault {
 	 * @return sha1 key as a unique identifier for the device xml file contents
 	 */
 	public static String getActiveDeviceKey() {
-		File file = new File(DataExplorer.getInstance().getActiveDevice().getPropertiesFileName());
+		File file = new File(application.getActiveDevice().getPropertiesFileName());
 		if (activeDeviceKey == null || activeDevicePath == null || !activeDevicePath.equals(file.toPath()) || activeDeviceLastModified_ms != file.lastModified()) {
 			try {
 				activeDeviceKey = SecureHash.sha1(file);
 				activeDevicePath = file.toPath();
 				activeDeviceLastModified_ms = file.lastModified();
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		return activeDeviceKey;
 	}
-
-	private final DataExplorer	application	= DataExplorer.getInstance();
-	private final Settings			settings		= Settings.getInstance();
 
 	/**
 	 * @param objectDirectory validated object key
@@ -140,14 +150,15 @@ public final class ExtendedVault extends HistoVault {
 	 * @param logChannelNumber may differ from UI settings in case of channel mix
 	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
 	 */
-	public ExtendedVault(String objectDirectory, Path filePath, long fileLastModified_ms, long fileLength, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal, String logRecordSetBaseName,
-			String logDeviceName, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
+	public ExtendedVault(String objectDirectory, Path filePath, long fileLastModified_ms, long fileLength, int fileVersion, int logRecordSetSize,
+			int logRecordSetOrdinal, String logRecordSetBaseName, String logDeviceName, long logStartTimestamp_ms, int logChannelNumber,
+			String logObjectKey) {
 		this.vaultDataExplorerVersion = GDE.VERSION;
 		this.vaultDeviceKey = getActiveDeviceKey();
-		this.vaultDeviceName = this.application.getActiveDevice().getName();
-		this.vaultChannelNumber = this.application.getActiveChannelNumber();
-		this.vaultObjectKey = this.application.getObjectKey();
-		this.vaultSamplingTimespanMs = this.settings.getSamplingTimespan_ms();
+		this.vaultDeviceName = application.getActiveDevice().getName();
+		this.vaultChannelNumber = application.getActiveChannelNumber();
+		this.vaultObjectKey = application.getObjectKey();
+		this.vaultSamplingTimespanMs = settings.getSamplingTimespan_ms();
 
 		this.logLinkPath = GDE.STRING_EMPTY;
 		this.logFilePath = filePath.toString(); // toString in order to avoid 'Object' during marshalling
@@ -168,10 +179,10 @@ public final class ExtendedVault extends HistoVault {
 		this.vaultName = getVaultName(filePath, fileLastModified_ms, fileLength, logRecordSetOrdinal);
 		this.vaultCreatedMs = System.currentTimeMillis();
 
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER,
-				String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetOrdinal=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s", //$NON-NLS-1$
-						objectDirectory, filePath.getFileName().toString(), logRecordSetBaseName, StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logFileLastModified), //$NON-NLS-1$
-						StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestampMs), logChannelNumber, logObjectKey)); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetOrdinal=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s", //$NON-NLS-1$
+					objectDirectory, filePath.getFileName().toString(), logRecordSetBaseName, StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logFileLastModified), //$NON-NLS-1$
+					StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestampMs), logChannelNumber, logObjectKey)); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("vaultDirectory=%s  vaultName=%s", this.vaultDirectory, this.vaultName)); //$NON-NLS-1$
 	}
 
@@ -228,23 +239,26 @@ public final class ExtendedVault extends HistoVault {
 	}
 
 	/**
-	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the
+	 *          meantime)
 	 * @return empty in case of unavailable measurement
 	 */
 	public HashMap<Integer, PointType> getMeasurementPoints(int measurementOrdinal) {
-		return this.getMeasurements().containsKey(measurementOrdinal) ? new HashMap<Integer, PointType>() : this.getMeasurements().get(measurementOrdinal).getTrails();
+		return this.getMeasurements().containsKey(measurementOrdinal) ? new HashMap<Integer, PointType>()
+				: this.getMeasurements().get(measurementOrdinal).getTrails();
 	}
 
 	/**
-	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the
+	 *          meantime)
 	 * @param trailOrdinal
 	 * @return null in case of unavailable measurement or trail
 	 */
 	public Integer getMeasurementPoint(int measurementOrdinal, int trailOrdinal) {
 		if (this.getMeasurements().containsKey(measurementOrdinal)) {
-			return this.getMeasurements().get(measurementOrdinal).getTrails().containsKey(trailOrdinal) ? this.getMeasurements().get(measurementOrdinal).getTrails().get(trailOrdinal).value : null;
-		}
-		else {
+			return this.getMeasurements().get(measurementOrdinal).getTrails().containsKey(trailOrdinal)
+					? this.getMeasurements().get(measurementOrdinal).getTrails().get(trailOrdinal).value : null;
+		} else {
 			return null;
 		}
 	}
@@ -264,9 +278,9 @@ public final class ExtendedVault extends HistoVault {
 	 */
 	public Integer getSettlementPoint(int settlementId, int trailOrdinal) {
 		if (this.getSettlements().containsKey(settlementId)) {
-			return this.getSettlements().get(settlementId).getTrails().containsKey(trailOrdinal) ? this.getSettlements().get(settlementId).getTrails().get(trailOrdinal).value : null;
-		}
-		else {
+			return this.getSettlements().get(settlementId).getTrails().containsKey(trailOrdinal)
+					? this.getSettlements().get(settlementId).getTrails().get(trailOrdinal).value : null;
+		} else {
 			return null;
 		}
 	}
@@ -296,8 +310,7 @@ public final class ExtendedVault extends HistoVault {
 			point = getSettlementPoint(trailRecord.getSettlement().getSettlementId(), trailType.ordinal());
 		else if (trailRecord.isScoreGroup()) {
 			point = getScorePoint(trailType.ordinal());
-		}
-		else
+		} else
 			throw new UnsupportedOperationException();
 
 		if (log.isLoggable(Level.FINEST))

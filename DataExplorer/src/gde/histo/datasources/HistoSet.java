@@ -59,17 +59,29 @@ public final class HistoSet {
 	 * A minimum of steps may be selected for performance reasons.
 	 */
 	public enum RebuildStep {
-		/** starts from scratch on */
+		/**
+		 * starts from scratch on
+		 */
 		A_HISTOSET(5),
-		/** starts building the histo vaults */
+		/**
+		 * starts building the histo vaults
+		 */
 		B_HISTOVAULTS(4),
-		/** starts building the trail recordset from the histo vaults */
+		/**
+		 * starts building the trail recordset from the histo vaults
+		 */
 		C_TRAILRECORDSET(3),
-		/** starts refreshing the trail data from the histo vaults */
+		/**
+		 * starts refreshing the trail data from the histo vaults
+		 */
 		D_TRAIL_DATA(2),
-		/** starts updating the graphics and table */
+		/**
+		 * starts updating the graphics and table
+		 */
 		E_USER_INTERFACE(1),
-		/** starts with a file check only which decides which update activity is required */
+		/**
+		 * starts with a file check only which decides which update activity is required
+		 */
 		F_FILE_CHECK(0);
 
 		/** zero is the lowest scopeOfWork. */
@@ -132,7 +144,7 @@ public final class HistoSet {
 	 */
 	public List<Path> getExcludedPaths() {
 		List<Path> result = this.histoSetCollector.getIgnoredFiles();
-		for (VaultCollector truss : this.histoSetCollector.getSuppressedTrusses().values()) {
+		for (VaultCollector truss : this.histoSetCollector.getSuppressedTrusses()) {
 			result.add(truss.getVault().getLogFileAsPath());
 		}
 		return result;
@@ -144,7 +156,7 @@ public final class HistoSet {
 						String.format("%,d", this.histoSetCollector.getReadFilesCount()), //
 						String.format("%.2f", this.histoSetCollector.getRecordSetBytesSum() / 1024 / 1024.), //
 						String.format("%.2f", this.histoSetCollector.getElapsedTime_ms() / 1000.), //
-						String.format("%,d", this.histoSetCollector.getUnsuppressedTrusses().size() + this.histoSetCollector.getSuppressedTrusses().size() + this.histoSetCollector.getDuplicateTrussesCount()), //
+						String.format("%,d", this.histoSetCollector.getTrussesCount()), //
 						String.format("%,d", this.histoSetCollector.getTimeStepSize()) });
 
 	}

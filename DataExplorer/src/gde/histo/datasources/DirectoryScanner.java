@@ -108,7 +108,8 @@ public final class DirectoryScanner {
 					if (importDir == null) {
 						return null;
 					} else {
-						String subPathImport = DataExplorer.getInstance().getActiveObject() == null ? GDE.STRING_EMPTY : DataExplorer.getInstance().getObjectKey();
+						String subPathImport = DataExplorer.getInstance().getActiveObject() == null ? GDE.STRING_EMPTY
+								: DataExplorer.getInstance().getObjectKey();
 						Path importPath = importDir.resolve(subPathImport);
 						return !importPath.equals(DirectoryType.DATA.getDataSetPath()) ? importPath : null;
 					}
@@ -162,7 +163,8 @@ public final class DirectoryScanner {
 		private enum DataSetType {
 			OSD {
 				@Override
-				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException, NotSupportedFileFormatException {
+				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException,
+						NotSupportedFileFormatException {
 					List<VaultCollector> trusses = new ArrayList<>();
 					File actualFile = dataFile.getActualFile();
 					if (actualFile != null) {
@@ -178,19 +180,19 @@ public final class DirectoryScanner {
 				}
 
 				public boolean isValidObject(VaultCollector truss) {
-					return truss.isConsistentDevice() && truss.isConsistentChannel(channelMixConfigNumbers) && truss.isConsistentStartTimeStamp(minStartTimeStamp_ms)
-							&& truss.isConsistentObjectKey(isValidatedObjectKey);
+					return truss.isConsistentDevice() && truss.isConsistentChannel(channelMixConfigNumbers) && truss.isConsistentStartTimeStamp(minStartTimeStamp_ms) && truss.isConsistentObjectKey(isValidatedObjectKey);
 				}
 
 				@Override
-				List<ExtendedVault> readVaults(Path filePath, Map<String, VaultCollector> trusses)
-						throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
-					return HistoOsdReaderWriter.readVaults(filePath, trusses.values());
+				List<ExtendedVault> readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
+						DataInconsitsentException, DataTypeException {
+					return HistoOsdReaderWriter.readVaults(filePath, trusses);
 				}
 			},
 			BIN {
 				@Override
-				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException, NotSupportedFileFormatException {
+				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException,
+						NotSupportedFileFormatException {
 					String objectDirectory = dataFile.getObjectKey(deviceConfigurations);
 					String recordSetBaseName = DataExplorer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend(dataFile.getFile().getName());
 					VaultCollector truss = new VaultCollector(objectDirectory, dataFile.getFile(), 0, Channels.getInstance().size(), recordSetBaseName);
@@ -206,20 +208,21 @@ public final class DirectoryScanner {
 				}
 
 				@Override
-				List<ExtendedVault> readVaults(Path filePath, Map<String, VaultCollector> trusses)
-						throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
-					return ((IHistoDevice) DataExplorer.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses.values());
+				List<ExtendedVault> readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
+						DataInconsitsentException, DataTypeException {
+					return ((IHistoDevice) DataExplorer.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses);
 				}
 			},
 			LOG { // was not merged with bin - we expect differences in the future
 				@Override
-				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException, NotSupportedFileFormatException {
+				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException,
+						NotSupportedFileFormatException {
 					return BIN.getTrusses(deviceConfigurations, dataFile);
 				}
 
 				@Override
-				List<ExtendedVault> readVaults(Path filePath, Map<String, VaultCollector> trusses)
-						throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+				List<ExtendedVault> readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
+						DataInconsitsentException, DataTypeException {
 					return BIN.readVaults(filePath, trusses);
 				}
 			};
@@ -230,7 +233,8 @@ public final class DirectoryScanner {
 			 * @param dataFile is the source file
 			 * @return the vault skeletons delivered by the source file based on the current device (and channel and object in case of bin files)
 			 */
-			abstract List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException, NotSupportedFileFormatException;
+			abstract List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException,
+					NotSupportedFileFormatException;
 
 			/**
 			 * Promote trusses into vaults by reading the source file.
@@ -238,8 +242,8 @@ public final class DirectoryScanner {
 			 * @param trusses lists the requested vaults
 			 * @return the fully populated vaults
 			 */
-			abstract List<ExtendedVault> readVaults(Path dataFile, Map<String, VaultCollector> trusses)
-					throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException;
+			abstract List<ExtendedVault> readVaults(Path dataFile, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
+					DataInconsitsentException, DataTypeException;
 
 			/**
 			 * @param extension of the file w/o dot
@@ -361,8 +365,8 @@ public final class DirectoryScanner {
 			return this.dataSetType;
 		}
 
-		public List<ExtendedVault> readVaults(Map<String, VaultCollector> trusses) //
-				throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+		public List<ExtendedVault> readVaults(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
+				DataInconsitsentException, DataTypeException {
 			return dataSetType.readVaults(path, trusses);
 		}
 
@@ -374,7 +378,7 @@ public final class DirectoryScanner {
 		public String toString() {
 			return this.path.toString();
 		}
-}
+	}
 
 	/**
 	 * Re- initializes the class.
@@ -405,7 +409,8 @@ public final class DirectoryScanner {
 	}
 
 	/**
-	 * Determine file paths from an input directory and an import directory which fit to the objectKey, the device, the channel and the file extensions.
+	 * Determine file paths from an input directory and an import directory which fit to the objectKey, the device, the channel and the file
+	 * extensions.
 	 * @param rebuildStep defines which steps during histo data collection are skipped
 	 * @return true if the list of file paths has already been valid
 	 * @throws NotSupportedFileFormatException
@@ -432,16 +437,17 @@ public final class DirectoryScanner {
 		}
 
 		boolean isFirstCall = lastDevice == null;
-		boolean isFullChange = rebuildStep == RebuildStep.A_HISTOSET || isFirstCall;
-		isFullChange = isFullChange || (lastDevice != null ? !lastDevice.getName().equals(this.validatedDevice.getName()) : this.validatedDevice != null);
-		isFullChange = isFullChange || (lastChannel != null ? !lastChannel.getChannelConfigKey().equals(this.validatedChannel.getChannelConfigKey()) : this.validatedChannel != null);
-		isFullChange = isFullChange || (lastHistoDataDir != null ? !lastHistoDataDir.equals(this.validatedDirectories.get(DirectoryType.DATA)) : true);
-		isFullChange = isFullChange
-				|| (lastHistoImportDir != null ? !lastHistoImportDir.equals(this.validatedDirectories.get(DirectoryType.IMPORT)) : this.validatedDirectories.containsKey(DirectoryType.IMPORT));
-		isFullChange = isFullChange || !lastImportExtentions.containsAll(this.validatedImportExtentions) || !this.validatedImportExtentions.containsAll(lastImportExtentions);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("isFullChange %s", isFullChange)); //$NON-NLS-1$
+		boolean isChange = rebuildStep == RebuildStep.A_HISTOSET || isFirstCall;
+		isChange = isChange || (lastDevice != null ? !lastDevice.getName().equals(this.validatedDevice.getName()) : this.validatedDevice != null);
+		isChange = isChange || (lastChannel != null ? !lastChannel.getChannelConfigKey().equals(this.validatedChannel.getChannelConfigKey())
+				: this.validatedChannel != null);
+		isChange = isChange || (lastHistoDataDir != null ? !lastHistoDataDir.equals(this.validatedDirectories.get(DirectoryType.DATA)) : true);
+		isChange = isChange || (lastHistoImportDir != null ? !lastHistoImportDir.equals(this.validatedDirectories.get(DirectoryType.IMPORT))
+				: this.validatedDirectories.containsKey(DirectoryType.IMPORT));
+		isChange = isChange || !lastImportExtentions.containsAll(this.validatedImportExtentions) || !this.validatedImportExtentions.containsAll(lastImportExtentions);
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("isChange %s", isChange)); //$NON-NLS-1$
 
-		return !isFullChange;
+		return !isChange;
 	}
 
 	/**
@@ -494,7 +500,7 @@ public final class DirectoryScanner {
 							nonWorkableCount.increment();
 							log.log(Level.INFO, String.format("file is not valid              %s", file.getPath()));
 						}
-					} else if (recursionDepth > 0) { //recursive walk by calling itself
+					} else if (recursionDepth > 0) { // recursive walk by calling itself
 						List<SourceDataSet> deeperList = getFileListing(file, recursionDepth - 1, extensions);
 						result.addAll(deeperList);
 					}

@@ -62,7 +62,7 @@ public final class VaultReaderWriter {
 	 * Read file and populate the vault from the recordset.
 	 * @return the vaults extracted from the file based on the input trusses
 	 */
-	public static List<ExtendedVault> loadVaultsFromFile(Path filePath, Map<String, VaultCollector> trusses) {
+	public static List<ExtendedVault> loadVaultsFromFile(Path filePath, List<VaultCollector> trusses) {
 		List<ExtendedVault> histoVaults = null;
 
 		try {
@@ -84,20 +84,20 @@ public final class VaultReaderWriter {
 	 * @return the vaults and trusses loaded from the cache
 	 * @throws IOException during opening or traversing the zip file
 	 */
-	public static synchronized List<ExtendedVault> loadVaultsFromCache(Map<Path, Map<String, VaultCollector>> trussJobs, ProgressManager progress) //
+	public static synchronized List<ExtendedVault> loadVaultsFromCache(Map<Path, List<VaultCollector>> trussJobs, ProgressManager progress) //
 			throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
 		List<ExtendedVault> vaults = new ArrayList<>();
 
 		Path cacheFilePath = ExtendedVault.getVaultsFolder();
 		if (VaultReaderWriter.settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
 			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
-				Iterator<Map.Entry<Path, Map<String, VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
+				Iterator<Map.Entry<Path, List<VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
 				while (trussJobsIterator.hasNext()) {
-					final Map<String, VaultCollector> map = trussJobsIterator.next().getValue();
-					final Iterator<Map.Entry<String, VaultCollector>> trussesIterator = map.entrySet().iterator();
+					final List<VaultCollector> map = trussJobsIterator.next().getValue();
+					final Iterator<VaultCollector> trussesIterator = map.iterator();
 					while (trussesIterator.hasNext()) {
 						progress.countInLoop(1);
-						VaultCollector truss = trussesIterator.next().getValue();
+						VaultCollector truss = trussesIterator.next();
 						ZipEntry vaultName = zf.getEntry(truss.getVault().getVaultName());
 						if (vaultName != null) {
 							HistoVault histoVault = null;
@@ -115,13 +115,13 @@ public final class VaultReaderWriter {
 				}
 			}
 		} else if (!VaultReaderWriter.settings.isZippedCache() && FileUtils.checkDirectoryExist(cacheFilePath.toString())) {
-			Iterator<Map.Entry<Path, Map<String, VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
+			Iterator<Map.Entry<Path, List<VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
 			while (trussJobsIterator.hasNext()) {
-				final Map<String, VaultCollector> map = trussJobsIterator.next().getValue();
-				final Iterator<Map.Entry<String, VaultCollector>> trussesIterator = map.entrySet().iterator();
+				final List<VaultCollector> map = trussJobsIterator.next().getValue();
+				final Iterator<VaultCollector> trussesIterator = map.iterator();
 				while (trussesIterator.hasNext()) {
 					progress.countInLoop(1);
-					VaultCollector truss = trussesIterator.next().getValue();
+					VaultCollector truss = trussesIterator.next();
 					if (FileUtils.checkFileExist(cacheFilePath.resolve(truss.getVault().getVaultName()).toString())) {
 						HistoVault histoVault = null;
 						File vaultFile = cacheFilePath.resolve(truss.getVault().getVaultName()).toFile();
