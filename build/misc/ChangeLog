@@ -1,5 +1,16 @@
 Development history / change log, please read from bottom up
 
+Version 3.3.2 - xx yyy 2017
+* xyz ...
+History analysis
+* Fix Histo table column values for non-reversed timestamp sequence
+* Fix table entries for GPS location which are not shown sometimes
+* Enhance histo graphics redraw performance
+* Enhance directory screening performance
+* Prepare histo kernel for forthcoming *.log files
+* Fix creating empty directories in case of unknown objects or devices
+* Enhance history module code base segregration from the application kernel 
+
 Version 3.3.1 - 17 Oct 2017
 * fix retrieving working state from XML (iCharger and others) 
 * fix NullPointerException while KMZ export having a not completely initialized object
