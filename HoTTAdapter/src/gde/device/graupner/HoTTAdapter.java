@@ -1167,7 +1167,16 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
+		calculateInactiveRecords(recordSet);
+		recordSet.syncScaleOfSyncableRecords();
+		this.updateVisibilityStatus(recordSet, true);
+		this.application.updateStatisticsData(true);
+	}
 
+	/**
+	 * function to calculate values for inactive records, data not readable from device
+	 */
+	public void calculateInactiveRecords(RecordSet recordSet) {
 		if (recordSet.getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude 3=Height
 			// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 			Record recordLatitude = recordSet.get(1);
@@ -1192,9 +1201,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				// GPSHelper.calculateLabs(this, recordSet, 1, 2, 7, 9, 6);
 			}
 		}
-		recordSet.syncScaleOfSyncableRecords();
-		this.updateVisibilityStatus(recordSet, true);
-		this.application.updateStatisticsData(true);
 	}
 
 	/**

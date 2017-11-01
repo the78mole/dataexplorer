@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
+import gde.data.RecordSet;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.histo.cache.ExtendedVault;
@@ -79,5 +80,11 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * @param filePath
 	 */
 	public void importDeviceData(Path filePath);
+
+	/**
+	 * Function to calculate values for inactive records, data not readable from device.
+	 * Extracted from makeInActiveDisplayable which performs activities related to the UI.
+	 */
+	public void calculateInactiveRecords(RecordSet recordSet);
 
 }

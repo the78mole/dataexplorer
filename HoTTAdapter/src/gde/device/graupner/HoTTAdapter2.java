@@ -706,8 +706,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
 				}
 				else if (ordinal == 92) { //Warning
-					dataTableRow[index + 1] = record.realGet(rowIndex) == 0 
-							? GDE.STRING_EMPTY 
+					dataTableRow[index + 1] = record.realGet(rowIndex) == 0
+							? GDE.STRING_EMPTY
 									: String.format("'%c'", ((record.realGet(rowIndex) / 1000)+64));
 				}
 				else {
@@ -810,48 +810,62 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-		//10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
-		//15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
-		//24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6, 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G
-		//46=Voltage E, 47=Current E, 48=Capacity E, 49=Power E, 50=Balance E, 51=CellVoltage E1, 52=CellVoltage E2 .... 64=CellVoltage E14, 65=Voltage E1, 66=Voltage E2, 67=Temperature E1, 68=Temperature E2 69=Revolution E 70=MotorTime 71=Speed 72=Event E
-		//73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max, 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
-
-		//73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
-		//93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
-		final int latOrdinal = 15, lonOrdinal = 16, altOrdinal = 10, distOrdinal = 18, tripOrdinal = 20;
 		if (recordSet != null) {
-			Record recordLatitude = recordSet.get(latOrdinal);
-			Record recordLongitude = recordSet.get(lonOrdinal);
-			Record recordAlitude = recordSet.get(altOrdinal);
-			if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData() && recordAlitude.hasReasonableData()) { // 13=Latitude, 14=Longitude 9=Height
-				int recordSize = recordLatitude.realSize();
-				int startAltitude = recordAlitude.get(8); // using this as start point might be sense less if the GPS data has no 3D-fix
-				//check GPS latitude and longitude
-				int indexGPS = 0;
-				int i = 0;
-				for (; i < recordSize; ++i) {
-					if (recordLatitude.get(i) != 0 && recordLongitude.get(i) != 0) {
-						indexGPS = i;
-						++i;
-						break;
-					}
-				}
-				startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation
-
-				GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, startAltitude, distOrdinal, tripOrdinal);
-				//GPSHelper.calculateLabs(this, recordSet, latOrdinal, lonOrdinal, distOrdinal, tripOrdinal, 15);
-			}
-
-			if (recordSet.getChannelConfigNumber() == 6) { // do lab calculation with configuration Lab-Time only
-				//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance		
-				//5=Rx_dbm, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm
-				//18=DistanceStart, 89=DiffDistance, 90=LapsDistance
-				runLabsCalculation(recordSet, 6, 5, 86, 87, 88, 18, 89, 90);
-			}
+			calculateInactiveRecords(recordSet);
 			recordSet.syncScaleOfSyncableRecords();
 			this.updateVisibilityStatus(recordSet, true);
 			this.application.updateStatisticsData(true);
+		}
+	}
+
+	/**
+	 * function to calculate values for inactive records, data not readable from device
+	 */
+	@Override
+	public void calculateInactiveRecords(RecordSet recordSet) {
+		// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
+		// 10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+		// 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+		// 24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6,
+		// 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage,
+		// 43=LowestCellNumber, 44=Pressure, 45=Event G
+		// 46=Voltage E, 47=Current E, 48=Capacity E, 49=Power E, 50=Balance E, 51=CellVoltage E1, 52=CellVoltage E2 .... 64=CellVoltage E14,
+		// 65=Voltage E1, 66=Voltage E2, 67=Temperature E1, 68=Temperature E2 69=Revolution E 70=MotorTime 71=Speed 72=Event E
+		// 73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max,
+		// 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
+
+		// 73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
+		// 93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max,
+		// 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+		final int latOrdinal = 15, lonOrdinal = 16, altOrdinal = 10, distOrdinal = 18, tripOrdinal = 20;
+		Record recordLatitude = recordSet.get(latOrdinal);
+		Record recordLongitude = recordSet.get(lonOrdinal);
+		Record recordAlitude = recordSet.get(altOrdinal);
+		if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData() && recordAlitude.hasReasonableData()) { // 13=Latitude,
+																																																													// 14=Longitude 9=Height
+			int recordSize = recordLatitude.realSize();
+			int startAltitude = recordAlitude.get(8); // using this as start point might be sense less if the GPS data has no 3D-fix
+			// check GPS latitude and longitude
+			int indexGPS = 0;
+			int i = 0;
+			for (; i < recordSize; ++i) {
+				if (recordLatitude.get(i) != 0 && recordLongitude.get(i) != 0) {
+					indexGPS = i;
+					++i;
+					break;
+				}
+			}
+			startAltitude = recordAlitude.get(indexGPS); // set initial altitude to enable absolute altitude calculation
+
+			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, startAltitude, distOrdinal, tripOrdinal);
+			// GPSHelper.calculateLabs(this, recordSet, latOrdinal, lonOrdinal, distOrdinal, tripOrdinal, 15);
+		}
+
+		if (recordSet.getChannelConfigNumber() == 6) { // do lab calculation with configuration Lab-Time only
+			// 5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance
+			// 5=Rx_dbm, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm
+			// 18=DistanceStart, 89=DiffDistance, 90=LapsDistance
+			runLabsCalculation(recordSet, 6, 5, 86, 87, 88, 18, 89, 90);
 		}
 	}
 
@@ -1156,7 +1170,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	@Override
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
 		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
-		
+
 		//3.2.7 extend this measurements: 66/86=TemperatureM 2 67/87=Voltage_min, 68/88=Current_max, 69/89=Revolution_max, 70/90=Temperature1_max, 71/91=Temperature2_max
 		//3.3.1 extend this measurements: 9=EventRx, 14=EventVario, 21=NumSatellites 22=GPS-Fix 23=EventGPS, 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G, 70=MotorTime 71=Speed 72=Event E, 85/105=Event M
 
@@ -1170,18 +1184,18 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		//73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
 		//93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
 		//with channel configuration 6
-		//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance		
+		//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance
 
 		StringBuilder sb = new StringBuilder().append(GDE.LINE_SEPARATOR);
 
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
 		//incoming filePropertiesRecordNames may mismatch recordKeyNames, but addNoneCalculation will use original name
-		Vector<String> noneCalculationRecordNames = new Vector<String>(); 
+		Vector<String> noneCalculationRecordNames = new Vector<String>();
 		Vector<String> fileRecordsPropertiesVector = new Vector<String>();
-		fileRecordsPropertiesVector.addAll(Arrays.asList(fileRecordsProperties)); 
+		fileRecordsPropertiesVector.addAll(Arrays.asList(fileRecordsProperties));
 
-		
+
 		try {
 			switch (fileRecordsProperties.length) {
 			case 44: //Android HoTTAdapter3 - special case
@@ -1222,12 +1236,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					case 75: //Capacity M,
 					case 76: //Power M,
 					case 77: //Revolution M
-					case 79: //TemperatureM 2 
+					case 79: //TemperatureM 2
 					case 80: //Voltage_min
 					case 81: //Current_max
 					case 82: //Revolution_max
 					case 83: //Temperature1_max
-					case 84: //Temperature2_max				
+					case 84: //Temperature2_max
 					case 85: //Event M
 						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
 						recordSet.get(i).setActive(null);
@@ -1244,7 +1258,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					}
 				}
 				break;
-				
+
 			case 58: //General, GAM, EAM (no ESC) prior to 3.0.4 added PowerOff, BatterieLow, Reset, reserve
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					switch (i) { //list of added measurements
@@ -1268,13 +1282,13 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					case 75: //Capacity M,
 					case 76: //Power M,
 					case 77: //Revolution M
-					case 78: //TemperatureM 1 
-					case 79: //TemperatureM 2 
+					case 78: //TemperatureM 1
+					case 79: //TemperatureM 2
 					case 80: //Voltage_min
 					case 81: //Current_max
 					case 82: //Revolution_max
 					case 83: //Temperature1_max
-					case 84: //Temperature2_max				
+					case 84: //Temperature2_max
 					case 85: //Event M
 						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
 						recordSet.get(i).setActive(null);
@@ -1318,13 +1332,13 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					case 95: //Capacity M,
 					case 96: //Power M,
 					case 97: //Revolution M
-					case 98: //TemperatureM 1 
-					case 99: //TemperatureM 2 
+					case 98: //TemperatureM 1
+					case 99: //TemperatureM 2
 					case 100: //Voltage_min
 					case 101: //Current_max
 					case 102: //Revolution_max
 					case 103: //Temperature1_max
-					case 104: //Temperature2_max				
+					case 104: //Temperature2_max
 					case 105: //Event M
 						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
 						recordSet.get(i).setActive(null);
@@ -1341,7 +1355,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					}
 				}
 				break;
-				
+
 			case 64: //General, GAM, EAM, ESC 3.0.4 added VoltageM, CurrentM, CapacityM, PowerM, RevolutionM, TemperatureM 1
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					switch (i) { //list of added measurements
@@ -1360,12 +1374,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					case 70: //MotorTime E
 					case 71: //Speed E
 					case 72: //Event E
-					case 79: //TemperatureM 2 
+					case 79: //TemperatureM 2
 					case 80: //Voltage_min
 					case 81: //Current_max
 					case 82: //Revolution_max
 					case 83: //Temperature1_max
-					case 84: //Temperature2_max				
+					case 84: //Temperature2_max
 					case 85: //Event M
 						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
 						recordSet.get(i).setActive(null);
@@ -1400,12 +1414,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					case  70: //MotorTime E
 					case  71: //Speed E
 					case  72: //Event E
-					case  99: //TemperatureM 2 
+					case  99: //TemperatureM 2
 					case 100: //Voltage_min
 					case 101: //Current_max
 					case 102: //Revolution_max
 					case 103: //Temperature1_max
-					case 104: //Temperature2_max				
+					case 104: //Temperature2_max
 					case 105: //Event M
 						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
 						recordSet.get(i).setActive(null);
@@ -1423,7 +1437,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				}
 				break;
 
-				
+
 			case 66: //General, GAM, EAM, ESC 3.1.9 added VoltageRx_min, Revolution EAM
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					switch (i) { //list of added measurements
@@ -1440,12 +1454,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					case 70: //MotorTime E
 					case 71: //Speed E
 					case 72: //Event E
-					case 79: //TemperatureM 2 
+					case 79: //TemperatureM 2
 					case 80: //Voltage_min
 					case 81: //Current_max
 					case 82: //Revolution_max
 					case 83: //Temperature1_max
-					case 84: //Temperature2_max				
+					case 84: //Temperature2_max
 					case 85: //Event M
 						sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
 						recordSet.get(i).setActive(null);
@@ -1456,7 +1470,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						cleanedRecordNames.add(recordKeys[i]);
 						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
 						if (fileRecordsProperties[j].contains("_isActive=false")) {
-							switch (i) { //OSD saved initially after 3.0.4 and after 3.1.9 
+							switch (i) { //OSD saved initially after 3.0.4 and after 3.1.9
 							case   8: //8=VoltageRx_min
 							case  69: //Revolution E
 								sb.append(String.format("previous added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
@@ -1475,7 +1489,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					}
 				}
 				break;
-			case 86: 
+			case 86:
 				if (recordSet.getChannelConfigNumber() == 4) { //Channels 3.1.9 added VoltageRx_min, Revolution EAM
 					for (int i = 0, j = 0; i < recordKeys.length; i++) {
 						switch (i) { //list of added measurements
@@ -1492,12 +1506,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						case 70: //MotorTime E
 						case 71: //Speed E
 						case 72: //Event E
-						case 99: //TemperatureM 2 
+						case 99: //TemperatureM 2
 						case 100: //Voltage_min
 						case 101: //Current_max
 						case 102: //Revolution_max
 						case 103: //Temperature1_max
-						case 104: //Temperature2_max				
+						case 104: //Temperature2_max
 						case 105: //Event M
 							sb.append(String.format("added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
 							recordSet.get(i).setActive(null);
@@ -1508,7 +1522,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 							cleanedRecordNames.add(recordKeys[i]);
 							noneCalculationRecordNames.add(recordProps.get(Record.NAME));
 							if (fileRecordsProperties[j].contains("_isActive=false")) {
-								switch (i) { //OSD saved initially after 3.0.4 and after 3.1.9 
+								switch (i) { //OSD saved initially after 3.0.4 and after 3.1.9
 								case   8: //8=VoltageRx_min
 								case  69: //Revolution E
 									sb.append(String.format("previous added measurement set to isCalculation=true -> %s\n", recordKeys[i]));
@@ -1527,7 +1541,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						}
 					}
 				}
-				else { //3.3.1 General, GAM, EAM, ESC 
+				else { //3.3.1 General, GAM, EAM, ESC
 					//3.3.1 extend this measurements: 9=EventRx, 14=EventVario, 21=NumSatellites 22=GPS-Fix 23=EventGPS, 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G, 70=MotorTime 71=Speed 72=Event E, 85/105=Event M
 					cleanedRecordNames.addAll(Arrays.asList(recordKeys));
 					for (int i = 0; i < fileRecordsProperties.length; i++) {
@@ -1643,14 +1657,14 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		recordKeys = cleanedRecordNames.toArray(new String[1]);
 		//incoming filePropertiesRecordNames may mismatch recordKeyNames, but addNoneCalculation will use original incoming name
 		recordSet.setNoneCalculationRecordNames(noneCalculationRecordNames.toArray(new String[1]));
-		
-		if (fileRecordsProperties.length != fileRecordsPropertiesVector.size()) { //if stored again with newer version and isActive handled null as false 
+
+		if (fileRecordsProperties.length != fileRecordsPropertiesVector.size()) { //if stored again with newer version and isActive handled null as false
 			for (int i = 0; i < fileRecordsPropertiesVector.size(); i++) {
 				fileRecordsProperties[i] = fileRecordsPropertiesVector.get(i);
 			}
 			//fileRecordsProperties = fileRecordsPropertiesVector.toArray(new String[1]); //can't be used since it will no be propagated
 		}
-		
+
 		if ((recordKeys.length < 86 || (recordKeys.length == 86 && recordSet.getChannelConfigNumber() == 4)) && noneCalculationRecordNames.size() < fileRecordsPropertiesVector.size()) {
 			sb.append(String.format("recordKeys.length = %d\n", recordKeys.length));
 			sb.append(String.format("noneCalculationRecords.length = %d\n", noneCalculationRecordNames.size()));

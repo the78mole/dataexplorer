@@ -546,7 +546,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			// no display tmpRecordSet.syncScaleOfSyncableRecords();
 
 			tmpRecordSet.setSaved(true);
-			device.makeInActiveDisplayable(tmpRecordSet);
+			device.calculateInactiveRecords(tmpRecordSet);
 			device.updateVisibilityStatus(tmpRecordSet, true);
 			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", tmpRecordSet.getChannelConfigName(), fileLength //$NON-NLS-1$
 					/ HoTTbinHistoReader.dataBlockSize, histoRandomSample.getReadingCount(), tmpRecordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
@@ -921,7 +921,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 			// no display tmpRecordSet.syncScaleOfSyncableRecords();
 
 			tmpRecordSet.setSaved(true);
-			device.makeInActiveDisplayable(tmpRecordSet);
+			device.calculateInactiveRecords(tmpRecordSet);
 			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", tmpRecordSet.getChannelConfigName(), fileLength //$NON-NLS-1$
 					/ HoTTbinHistoReader.dataBlockSize, histoRandomSample.getReadingCount(), tmpRecordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
 			HoTTbinHistoReader.setTimeMarks(TimeMark.FINISHED);
