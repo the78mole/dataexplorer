@@ -204,7 +204,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.application.getMenuToolBar().updateChannelSelector();
 				this.application.getMenuToolBar().updateRecordSetSelectCombo();
 				this.application.updateMenusRegardingGPSData();
-				this.application.updateAllTabs(true);
+				if (recordSet != null) this.application.updateAllTabs(true);
 
 				this.application.getActiveDevice().setLastChannelNumber(channelNumber);
 				if (this.application.isHistoActive() != Settings.getInstance().isHistoActive()) {
