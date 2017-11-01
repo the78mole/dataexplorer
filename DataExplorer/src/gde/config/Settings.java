@@ -256,6 +256,8 @@ public class Settings extends Properties {
 	public static final String			GPS_LOCATIONS_DIR_NAME					= "Locations";																																										//$NON-NLS-1$
 	public static final String			GPS_API_URL											= "http://maps.googleapis.com/maps/api/geocode/xml?latlng=";																			//$NON-NLS-1$
 
+	private static double[]					SAMPLING_TIMESPANS							= new double[] { 10., 5., 1., .5, .1, .05, .001 };
+
 	BufferedReader									reader;																																																														// to read the application settings
 	BufferedWriter									writer;																																																														// to write the application settings
 
@@ -273,6 +275,7 @@ public class Settings extends Properties {
 	String													applHomePath;																																																											// default path to application home directory
 	Comparator<String>							comparator											= new RecordSetNameComparator();																																	//used to sort object key list
 	Properties											measurementProperties						= new Properties();
+
 
 	public enum GeoCodeGoogle {
 		STREET_ADDRESS, ROUTE, POLITICAL, ADMINISTRATIVE_AREA_LEVEL_3, ADMINISTRATIVE_AREA_LEVEL_2;
@@ -2657,10 +2660,9 @@ public class Settings extends Properties {
 	 * @return sampling timespan values in seconds with seven values ranging from 0.001 to 10.0 based on the current locale
 	 */
 	public static String[] getSamplingTimespanValues() {
-		double[] values_ss = { 10., 5., 1., .5, .1, .05, .001 };
 		String[] textValues = new String[7];
-		for (int i = 0; i < values_ss.length; i++) {
-			textValues[i] = String.valueOf(values_ss[i]);
+		for (int i = 0; i < SAMPLING_TIMESPANS.length; i++) {
+			textValues[i] = String.valueOf(SAMPLING_TIMESPANS[i]);
 		}
 		return textValues;
 	}
@@ -2678,15 +2680,15 @@ public class Settings extends Properties {
 	 * @return the sampling time which defines the timespan for one single sample value for the history (default is 1 sec)
 	 */
 	public int getSamplingTimespan_ms() {
-		String textValue;
+		double result;
 		try {
-			textValue = getSamplingTimespanValues()[getSamplingTimespanOrdinal()];
+			result = SAMPLING_TIMESPANS[getSamplingTimespanOrdinal()];
 		}
 		catch (Exception e) {
 			setSamplingTimespan_ms(Double.toString(1.)); // one second
-			textValue = getSamplingTimespanValues()[getSamplingTimespanOrdinal()];
+			result = SAMPLING_TIMESPANS[getSamplingTimespanOrdinal()];
 		}
-		return (int) (Double.valueOf(textValue) * 1000.);
+		return (int) (result * 1000.);
 	}
 
 	/**

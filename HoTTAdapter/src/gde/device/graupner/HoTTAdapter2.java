@@ -764,7 +764,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			newValue = (value - reduction) * factor + offset;
 		}
 
-		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -798,7 +798,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			newValue = (value - offset) / factor + reduction;
 		}
 
-		log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 

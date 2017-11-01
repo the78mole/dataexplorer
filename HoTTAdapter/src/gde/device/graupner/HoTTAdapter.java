@@ -958,11 +958,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		String importExtention = GDE.STRING_EMPTY;
 		if (isHistoImportSupported()) {
 			String[] preferredFileExtentions = this.application.getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredFileExtention().split(GDE.STRING_COMMA);
-			if (preferredFileExtentions != null && preferredFileExtentions.length != 0)
-				for (int i=0; i<preferredFileExtentions.length; i++) {
-					if (preferredFileExtentions[i].endsWith(GDE.FILE_ENDING_BIN)) {
-					importExtention = GDE.FILE_ENDING_DOT_BIN;
-					break;
+			if (preferredFileExtentions != null && preferredFileExtentions.length != 0) {
+				for (String preferredFileExtention : preferredFileExtentions) {
+					if (preferredFileExtention.endsWith(GDE.FILE_ENDING_BIN)) {
+						importExtention = GDE.FILE_ENDING_DOT_BIN;
+						break;
+					}
 				}
 			}
 		}
@@ -1085,7 +1086,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			newValue = (value - reduction) * factor + offset;
 		}
 
-		HoTTAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -1110,7 +1111,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			newValue = (value - offset) / factor + reduction;
 		}
 
-		HoTTAdapter.log.log(java.util.logging.Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 

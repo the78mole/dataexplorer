@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.data;
@@ -199,7 +199,7 @@ public class TimeSteps extends Vector<Long> {
 			return this.isConstant ? this.getTime_ms(1) : (double) this.lastElement() / elementCount / 10.0;
 		}
 		catch (Exception e) {
-			// a redraw event where the record set has no records 
+			// a redraw event where the record set has no records
 			return 0.0;
 		}
 	}
@@ -263,7 +263,7 @@ public class TimeSteps extends Vector<Long> {
 				long diff = this.get(i) - this.get(i - 1);
 				sqSum += (diff - baseTimeSpan) * (diff - baseTimeSpan);
 			}
-			log.log(Level.FINE, String.format("avg=%f  sigma=%f", getAverageTimeStep_ms(), Math.sqrt(sqSum / (this.elementCount - 1)) / 10)); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("avg=%f  sigma=%f", getAverageTimeStep_ms(), Math.sqrt(sqSum / (this.elementCount - 1)) / 10)); //$NON-NLS-1$
 			return Math.sqrt(sqSum / (this.elementCount - 1)) / 10.;
 		}
 	}
@@ -276,7 +276,7 @@ public class TimeSteps extends Vector<Long> {
 	}
 
 	/**
-	 * @return the maximum time relative to the displayable area 
+	 * @return the maximum time relative to the displayable area
 	 */
 	public double getMaxTime_ms() {
 		double maxTime = 0.0;
@@ -292,7 +292,7 @@ public class TimeSteps extends Vector<Long> {
 
 	/**
 	 * Find the indexes in this time vector where the given time value is placed
-	 * In case of the given time in in between two available measurement points both bounding indexes are returned, 
+	 * In case of the given time in in between two available measurement points both bounding indexes are returned,
 	 * only in case where the given time matches an existing entry both indexes are equal.
 	 * In cases where the returned indexes are not equal the related point x/y has to be interpolated.
 	 * @param time_ms
@@ -367,7 +367,7 @@ public class TimeSteps extends Vector<Long> {
 				}
 			}
 			else {
-				// determine index 
+				// determine index
 				long value_ms = (long) (time_ms * 10.0);
 				int result = Collections.binarySearch(this, value_ms, comparator);
 				if (result >= 0)
@@ -392,7 +392,7 @@ public class TimeSteps extends Vector<Long> {
 	}
 
 	/**
-	 * return the number of milliseconds since January 1, 1970, 00:00:00 GMT represented by the start date time of the dependent record set 
+	 * return the number of milliseconds since January 1, 1970, 00:00:00 GMT represented by the start date time of the dependent record set
 	 * @return
 	 */
 	public long getStartTimeStamp() {

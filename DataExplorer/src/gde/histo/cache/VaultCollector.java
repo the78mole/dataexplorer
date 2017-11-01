@@ -166,7 +166,7 @@ public final class VaultCollector {
 			for (Entry<TrailTypes, Integer> entry : trailPoints.entrySet()) {
 				entryPoints.addPoint(entry.getKey(), entry.getValue());
 			}
-			log.log(Level.FINER, record.getName() + " data ", entryPoints); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " data ", entryPoints); //$NON-NLS-1$
 		}
 	}
 
