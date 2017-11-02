@@ -19,12 +19,13 @@
 
 package gde.histo.exclusions;
 
+import static java.util.logging.Level.FINE;
+
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -48,7 +49,7 @@ public final class ExclusionActivity {
 		}
 		for (Path ignorePath : exclusionDirectories) {
 			ExclusionData.getInstance(ignorePath).delete();
-			log.log(Level.FINE, "deleted : ", ignorePath); //$NON-NLS-1$
+			log.log(FINE, "deleted : ", ignorePath); //$NON-NLS-1$
 		}
 	}
 

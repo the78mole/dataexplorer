@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -38,7 +37,7 @@ import gde.device.SettlementType;
 import gde.device.TrailTypes;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.utils.Spot;
-import gde.log.Level;
+import gde.log.Logger;
 
 /**
  * Hold histo data points of one measurement or settlement; score points are a third option.
@@ -74,9 +73,11 @@ public final class TrailRecord extends Record {
 	 * @param measurementType
 	 * @param parentTrail
 	 */
-	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, MeasurementType measurementType, TrailRecordSet parentTrail, int initialCapacity) {
-		super(newDevice, newOrdinal, newName, measurementType.getSymbol(), measurementType.getUnit(), measurementType.isActive(), null, measurementType.getProperty(), initialCapacity);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, measurementType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, MeasurementType measurementType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
+	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, MeasurementType measurementType, TrailRecordSet parentTrail,
+			int initialCapacity) {
+		super(newDevice, newOrdinal, newName, measurementType.getSymbol(), measurementType.getUnit(), measurementType.isActive(), null,
+				measurementType.getProperty(), initialCapacity);
+		log.fine(() -> measurementType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, MeasurementType measurementType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
 		this.parentTrail = parentTrail;
 		super.parent = null; // we currently have no common abstract class of Record and TrailRecord or no common interface of Record and TrailRecord
 		this.measurementType = measurementType;
@@ -94,9 +95,11 @@ public final class TrailRecord extends Record {
 	 * @param settlementType
 	 * @param parentTrail
 	 */
-	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, SettlementType settlementType, TrailRecordSet parentTrail, int initialCapacity) {
-		super(newDevice, newOrdinal, newName, settlementType.getSymbol(), settlementType.getUnit(), settlementType.isActive(), null, settlementType.getProperty(), initialCapacity);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, settlementType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, SettlementType settlementType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
+	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, SettlementType settlementType, TrailRecordSet parentTrail,
+			int initialCapacity) {
+		super(newDevice, newOrdinal, newName, settlementType.getSymbol(), settlementType.getUnit(), settlementType.isActive(), null,
+				settlementType.getProperty(), initialCapacity);
+		log.fine(() -> settlementType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, SettlementType settlementType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
 		this.parentTrail = parentTrail;
 		super.parent = null;
 		this.measurementType = null;
@@ -115,9 +118,11 @@ public final class TrailRecord extends Record {
 	 * @param scoregroupType
 	 * @param parentTrail
 	 */
-	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, ScoreGroupType scoregroupType, TrailRecordSet parentTrail, int initialCapacity) {
-		super(newDevice, newOrdinal, newName, scoregroupType.getSymbol(), scoregroupType.getUnit(), scoregroupType.isActive(), null, scoregroupType.getProperty(), initialCapacity);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, scoregroupType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, ScoregroupType scoregroupType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
+	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, ScoreGroupType scoregroupType, TrailRecordSet parentTrail,
+			int initialCapacity) {
+		super(newDevice, newOrdinal, newName, scoregroupType.getSymbol(), scoregroupType.getUnit(), scoregroupType.isActive(), null,
+				scoregroupType.getProperty(), initialCapacity);
+		log.fine(() -> scoregroupType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, ScoregroupType scoregroupType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
 		this.parentTrail = parentTrail;
 		super.parent = null;
 		this.measurementType = null;
@@ -175,8 +180,7 @@ public final class TrailRecord extends Record {
 				this.minValue = Integer.MAX_VALUE;
 				this.maxValue = Integer.MIN_VALUE;
 			}
-		}
-		else {
+		} else {
 			if (this.isEmpty())
 				this.minValue = this.maxValue = point;
 			else {
@@ -185,8 +189,8 @@ public final class TrailRecord extends Record {
 			}
 		}
 		super.addElement(point);
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " adding point = " + point); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		log.finer(() -> this.name + " adding point = " + point); //$NON-NLS-1$
+		log.finest(() -> this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -218,19 +222,17 @@ public final class TrailRecord extends Record {
 			this.factor = 1.0;
 			PropertyType property = this.getProperty(IDevice.FACTOR);
 			if (property != null)
-				this.factor = Double.valueOf(property.getValue());
+				this.factor = Double.parseDouble(property.getValue());
 			else if (this.scoreGroupType != null)
 				this.factor = this.scoreGroupType.getFactor();
 			else if (this.settlementType != null)
 				this.factor = this.settlementType.getFactor();
 			else if (this.measurementType != null) {
 				this.factor = this.measurementType.getFactor();
-			}
-			else
+			} else
 				try {
 					this.factor = this.getDevice().getMeasurementFactor(this.parentTrail.getChannelConfigNumber(), this.ordinal);
-				}
-				catch (RuntimeException e) {
+				} catch (RuntimeException e) {
 					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
 				}
 		}
@@ -243,7 +245,7 @@ public final class TrailRecord extends Record {
 			this.offset = 0.0;
 			PropertyType property = this.getProperty(IDevice.OFFSET);
 			if (property != null)
-				this.offset = Double.valueOf(property.getValue());
+				this.offset = Double.parseDouble(property.getValue());
 			else if (this.scoreGroupType != null)
 				this.offset = this.scoreGroupType.getOffset();
 			else if (this.settlementType != null)
@@ -253,8 +255,7 @@ public final class TrailRecord extends Record {
 			else
 				try {
 					this.offset = this.getDevice().getMeasurementOffset(this.parentTrail.getChannelConfigNumber(), this.ordinal);
-				}
-				catch (RuntimeException e) {
+				} catch (RuntimeException e) {
 					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
 				}
 		}
@@ -267,7 +268,7 @@ public final class TrailRecord extends Record {
 			this.reduction = 0.0;
 			PropertyType property = this.getProperty(IDevice.REDUCTION);
 			if (property != null)
-				this.reduction = Double.valueOf(property.getValue());
+				this.reduction = Double.parseDouble(property.getValue());
 			else if (this.scoreGroupType != null)
 				this.reduction = this.scoreGroupType.getReduction();
 			else if (this.settlementType != null)
@@ -277,9 +278,8 @@ public final class TrailRecord extends Record {
 			else
 				try {
 					String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.parentTrail.getChannelConfigNumber(), this.ordinal, IDevice.REDUCTION);
-					if (strValue != null && strValue.length() > 0) this.reduction = Double.valueOf(strValue.trim().replace(',', '.'));
-				}
-				catch (RuntimeException e) {
+					if (strValue != null && strValue.length() > 0) this.reduction = Double.parseDouble(strValue.trim().replace(',', '.'));
+				} catch (RuntimeException e) {
 					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
 				}
 		}
@@ -330,13 +330,10 @@ public final class TrailRecord extends Record {
 	public boolean hasReasonableData() {
 		boolean hasReasonableData = false;
 		if (this.suiteRecords.getSuiteLength() == 0) {
-			hasReasonableData = this.realSize() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE
-					&& (this.minValue != this.maxValue || this.device.translateValue(this, this.maxValue / 1000.0) != 0.0);
-		}
-		else {
+			hasReasonableData = this.realSize() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE && (this.minValue != this.maxValue || this.device.translateValue(this, this.maxValue / 1000.0) != 0.0);
+		} else {
 			for (SuiteRecord suiteRecord : this.suiteRecords.values()) {
-				if (suiteRecord.size() > 0 && suiteRecord.getMinRecordValue() != Integer.MAX_VALUE && suiteRecord.getMaxRecordValue() != Integer.MIN_VALUE
-						&& (suiteRecord.getMinRecordValue() != suiteRecord.getMaxRecordValue() || this.device.translateValue(this, suiteRecord.getMaxRecordValue() / 1000.0) != 0.0)) {
+				if (suiteRecord.size() > 0 && suiteRecord.getMinRecordValue() != Integer.MAX_VALUE && suiteRecord.getMaxRecordValue() != Integer.MIN_VALUE && (suiteRecord.getMinRecordValue() != suiteRecord.getMaxRecordValue() || this.device.translateValue(this, suiteRecord.getMaxRecordValue() / 1000.0) != 0.0)) {
 					hasReasonableData = true;
 					break;
 				}
@@ -380,10 +377,10 @@ public final class TrailRecord extends Record {
 	}
 
 	/**
-	* get the time in msec at given horizontal display position
-	* @param xPos of the display point
-	* @return time value in msec
-	*/
+	 * get the time in msec at given horizontal display position
+	 * @param xPos of the display point
+	 * @return time value in msec
+	 */
 	@Override
 	@Deprecated // replaced by gde.utils.HistoTimeLine.getTimestamp(int)
 	public double getHorizontalDisplayPointTime_ms(int xPos) {
@@ -391,10 +388,10 @@ public final class TrailRecord extends Record {
 	}
 
 	/**
-	* get the formatted time with unit at given position
-	* @param xPos of the display point
-	* @return string of time value in simple date format HH:ss:mm:SSS
-	*/
+	 * get the formatted time with unit at given position
+	 * @param xPos of the display point
+	 * @return string of time value in simple date format HH:ss:mm:SSS
+	 */
 	@Override
 	@Deprecated // replaced by gde.utils.HistoTimeLine.getTimestamp(int)
 	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
@@ -538,8 +535,7 @@ public final class TrailRecord extends Record {
 		if (enabled) {
 			this.maxScaleValue = this.maxDisplayValue = newMaxScaleValue;
 			this.minScaleValue = this.minDisplayValue = newMinScaleValue;
-		}
-		else {
+		} else {
 			this.maxScaleValue = this.parentTrail.getDevice().translateValue(this, this.maxValue / 1000.0);
 			this.minScaleValue = this.parentTrail.getDevice().translateValue(this, this.minValue / 1000.0);
 		}
@@ -573,7 +569,8 @@ public final class TrailRecord extends Record {
 	 * Supports suites.
 	 * @param timeStamp1_ms
 	 * @param timeStamp2_ms
-	 * @return the portion of the timestamps_ms and aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned list is empty.)
+	 * @return the portion of the timestamps_ms and aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If
+	 *         fromIndex and toIndex are equal, the returned list is empty.)
 	 */
 	public List<Spot<Double>> getSubPoints(long timeStamp1_ms, long timeStamp2_ms) {
 		int index1 = this.getIndex(timeStamp1_ms);
@@ -590,7 +587,7 @@ public final class TrailRecord extends Record {
 				result.add(new Spot<Double>(this.parentTrail.getTime_ms(i), this.device.translateValue(this, points.elementAt(i) / 1000.)));
 			}
 		}
-		log.log(Level.FINER, "", Arrays.toString(result.toArray()));
+		log.finer(() -> Arrays.toString(result.toArray()));
 		return result;
 	}
 
@@ -616,11 +613,13 @@ public final class TrailRecord extends Record {
 	}
 
 	public int getSuiteMaxValue() {
-		return this.suiteRecords.getSuiteMaxValue() == this.suiteRecords.getSuiteMinValue() ? this.suiteRecords.getSuiteMaxValue() + 100 : this.suiteRecords.getSuiteMaxValue();
+		return this.suiteRecords.getSuiteMaxValue() == this.suiteRecords.getSuiteMinValue() ? this.suiteRecords.getSuiteMaxValue() + 100
+				: this.suiteRecords.getSuiteMaxValue();
 	}
 
 	public int getSuiteMinValue() {
-		return this.suiteRecords.getSuiteMaxValue() == this.suiteRecords.getSuiteMinValue() ? this.suiteRecords.getSuiteMinValue() - 100 : this.suiteRecords.getSuiteMinValue();
+		return this.suiteRecords.getSuiteMaxValue() == this.suiteRecords.getSuiteMinValue() ? this.suiteRecords.getSuiteMinValue() - 100
+				: this.suiteRecords.getSuiteMinValue();
 	}
 
 	/**
@@ -643,8 +642,9 @@ public final class TrailRecord extends Record {
 	 * @return the localized value of the label property from the device channel entry or an empty string.
 	 */
 	public String getLabel() {
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("started")); //$NON-NLS-1$
-		String label = this.measurementType != null ? this.measurementType.getLabel() : this.settlementType != null ? this.settlementType.getLabel() : this.scoreGroupType.getLabel();
+		log.finest(() -> String.format("started")); //$NON-NLS-1$
+		String label = this.measurementType != null ? this.measurementType.getLabel() : this.settlementType != null ? this.settlementType.getLabel()
+				: this.scoreGroupType.getLabel();
 		return getDeviceXmlReplacement(label);
 	}
 

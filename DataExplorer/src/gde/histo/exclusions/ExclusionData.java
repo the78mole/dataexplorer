@@ -19,6 +19,10 @@
 
 package gde.histo.exclusions;
 
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,12 +36,11 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.utils.SecureHash;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.utils.FileUtils;
 
 /**
@@ -73,7 +76,7 @@ public final class ExclusionData extends Properties {
 		if (Settings.getInstance().isSuppressMode()) {
 			String exclusionValue = getInstance(dataFilePath.getParent()).getProperty(dataFilePath.getFileName().toString());
 			boolean result = exclusionValue != null && exclusionValue.isEmpty();
-			if (result) log.log(Level.FINE, String.format("file excluded %s", dataFilePath.toString())); //$NON-NLS-1$
+			if (result) log.log(FINE, "file excluded ", dataFilePath); //$NON-NLS-1$
 			return result;
 		} else {
 			return false;
@@ -89,7 +92,7 @@ public final class ExclusionData extends Properties {
 		if (Settings.getInstance().isSuppressMode()) {
 			String exclusionValue = getInstance(dataFilePath.getParent()).getProperty(dataFilePath.getFileName().toString());
 			boolean result = exclusionValue != null && (exclusionValue.isEmpty() || exclusionValue.contains(recordsetBaseName));
-			if (result) log.log(Level.FINE, String.format("recordset excluded %s %s", dataFilePath.toString(), recordsetBaseName)); //$NON-NLS-1$
+			if (result) log.fine(() -> String.format("recordset excluded %s %s", dataFilePath.toString(), recordsetBaseName)); //$NON-NLS-1$
 			return result;
 		} else {
 			return false;
@@ -108,7 +111,7 @@ public final class ExclusionData extends Properties {
 					FileUtils.deleteFile(file.getPath());
 				}
 			} catch (FileNotFoundException e) {
-				log.log(Level.WARNING, e.getMessage(), e);
+				log.log(WARNING, e.getMessage(), e);
 			}
 		}
 	}
@@ -168,13 +171,14 @@ public final class ExclusionData extends Properties {
 		if (!takeUserDir) {
 			FileUtils.checkDirectoryAndCreate(this.dataFileDir.toString());
 			if (this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile().exists()) {
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile()), "UTF-8"))) { //$NON-NLS-1$
+				try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
+						this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile()), "UTF-8"))) { //$NON-NLS-1$
 					this.load(reader);
 				} catch (Exception e) {
 					if (e instanceof FileNotFoundException)
 						takeUserDir = true; // supports write protected data drives
 					else
-						log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+						log.log(SEVERE, e.getLocalizedMessage(), e);
 				}
 			}
 		}
@@ -186,7 +190,7 @@ public final class ExclusionData extends Properties {
 				try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(exclusionsDir.resolve(fileName).toFile())))) {
 					this.load(reader);
 				} catch (Throwable e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
+					log.log(SEVERE, e.getMessage(), e);
 					e.printStackTrace();
 				}
 			}
@@ -209,22 +213,24 @@ public final class ExclusionData extends Properties {
 			boolean takeUserDir = Settings.getInstance().isDataSettingsAtHomePath();
 			if (!takeUserDir) {
 				FileUtils.checkDirectoryAndCreate(this.dataFileDir.toString());
-				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile()), "UTF-8"))) { //$NON-NLS-1$
+				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+						this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile()), "UTF-8"))) { //$NON-NLS-1$
 					this.store(writer, this.dataFileDir.toString());
 				} catch (Throwable e) {
 					if (e instanceof FileNotFoundException)
 						takeUserDir = true; // supports write protected data drives
 					else
-						log.log(Level.SEVERE, e.getMessage(), e);
+						log.log(SEVERE, e.getMessage(), e);
 				}
 			}
 			if (takeUserDir) {
 				FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
 				String fileName = SecureHash.sha1(this.dataFileDir.toString());
-				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exclusionsDir.resolve(fileName).toFile()), "UTF-8"))) { //$NON-NLS-1$
+				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exclusionsDir.resolve(fileName).toFile()),
+						"UTF-8"))) { //$NON-NLS-1$
 					this.store(writer, this.dataFileDir.toString());
 				} catch (Throwable e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
+					log.log(SEVERE, e.getMessage(), e);
 					e.printStackTrace();
 				}
 			}

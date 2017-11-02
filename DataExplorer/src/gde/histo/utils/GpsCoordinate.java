@@ -19,13 +19,14 @@
 
 package gde.histo.utils;
 
+import static java.util.logging.Level.FINEST;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 import gde.GDE;
-import gde.log.Level;
+import gde.log.Logger;
 
 /**
  * represents a latitude and longitude
@@ -39,7 +40,7 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 
 	private double							latitude;
 	private double							longitude;
-	private DecimalFormat				format				= new DecimalFormat("##.#######", new DecimalFormatSymbols(Locale.US));	// 7 digits  //$NON-NLS-1$
+	private DecimalFormat				format				= new DecimalFormat("##.#######", new DecimalFormatSymbols(Locale.US));	// 7 digits //$NON-NLS-1$
 
 	public GpsCoordinate() {
 
@@ -58,9 +59,10 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 	 * @param angularCoordinate is the trigonometric representation. e.g. P075221848P065891377P015957524P098718577 for { 48.782917, 9.182243 }
 	 */
 	public GpsCoordinate(String angularCoordinate) {
-		StringBuilder sb = new StringBuilder(angularCoordinate.replace('P', '+').replace('M', '-')).insert(2, '.').insert(13, '.').insert(24, '.').insert(35, '.');
-		this.latitude = Math.toDegrees(Math.atan2(Double.valueOf(sb.substring(0, 11)), Double.valueOf(sb.substring(11, 22))));
-		this.longitude = Math.toDegrees(Math.atan2(Double.valueOf(sb.substring(22, 33)), Double.valueOf(sb.substring(33, 44))));
+		StringBuilder sb = new StringBuilder(angularCoordinate.replace('P', '+').replace('M', '-')) //
+				.insert(2, '.').insert(13, '.').insert(24, '.').insert(35, '.');
+		this.latitude = Math.toDegrees(Math.atan2(Double.parseDouble(sb.substring(0, 11)), Double.parseDouble(sb.substring(11, 22))));
+		this.longitude = Math.toDegrees(Math.atan2(Double.parseDouble(sb.substring(22, 33)), Double.parseDouble(sb.substring(33, 44))));
 	}
 
 	/**
@@ -70,7 +72,7 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 		String angularCoordinate = String.format(Locale.US, "%+10.8f%+10.8f%+10.8f%+10.8f", Math.sin(Math.toRadians(this.latitude)), Math.cos(Math.toRadians(this.latitude)), //$NON-NLS-1$
 				Math.sin(Math.toRadians(this.longitude)), Math.cos(Math.toRadians(this.longitude)));
 		angularCoordinate = angularCoordinate.replace(".", "").replace('+', 'P').replace('-', 'M'); //$NON-NLS-1$ //$NON-NLS-2$
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, angularCoordinate, this);
+		log.log(FINEST, angularCoordinate, this);
 		return angularCoordinate;
 	}
 
@@ -114,10 +116,10 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 			return false;
 		}
 		GpsCoordinate c = (GpsCoordinate) o;
-		//		// compare exactly
-		//		String me = this.getLatitudeAsString() + this.getLongitudeAsString();
-		//		String you = c.getLatitudeAsString() + c.getLongitudeAsString();
-		//		return me.equals(you);
+		// // compare exactly
+		// String me = this.getLatitudeAsString() + this.getLongitudeAsString();
+		// String you = c.getLatitudeAsString() + c.getLongitudeAsString();
+		// return me.equals(you);
 
 		return getDistance(c) <= GPS_ACCURACY;
 	}
@@ -158,7 +160,7 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 		double sqOppositeLeg = Math.sin(dPhi / 2.) * Math.sin(dPhi / 2.) //
 				+ Math.cos(phi1) * Math.cos(phi2) * Math.sin(dLambda / 2.) * Math.sin(dLambda / 2.);
 		double zeta = 2. * Math.atan2(Math.sqrt(sqOppositeLeg), Math.sqrt(1. - sqOppositeLeg));
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("distance=%f  %s  %s", EARTH_RADIUS * zeta, this, yourCoordinate)); //$NON-NLS-1$
+		log.fine(() -> String.format("distance=%f  %s  %s", EARTH_RADIUS * zeta, this, yourCoordinate)); //$NON-NLS-1$
 		return EARTH_RADIUS * zeta;
 	}
 

@@ -18,7 +18,9 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
-import java.util.logging.Logger;
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.WARNING;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -31,7 +33,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -136,27 +138,27 @@ public final class HistoGraphicsWindow extends CTabItem {
 	 * @param newSelectorCompositeWidth the changed curve selector width
 	 */
 	public void setSashFormWeights(int newSelectorCompositeWidth) {
-		log.log(Level.FINER, "newSelectorCompositeWidth= ", newSelectorCompositeWidth); //$NON-NLS-1$
+		log.log(FINER, "newSelectorCompositeWidth= ", newSelectorCompositeWidth); //$NON-NLS-1$
 		int tabFolderClientAreaWidth = this.tabFolder.getBounds().width;
 		// begin workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ????
 		int bestGuessWidth = this.application.getClientArea().width;
 		if (tabFolderClientAreaWidth > bestGuessWidth) {
-			log.log(Level.WARNING, "tabFolder clientAreaWidth missmatch, tabFolderWidth = " + tabFolderClientAreaWidth + " vs applicationWidth = " + bestGuessWidth); //$NON-NLS-1$ //$NON-NLS-2$
+			log.log(WARNING, "tabFolder clientAreaWidth missmatch, tabFolderWidth = " + tabFolderClientAreaWidth + " vs applicationWidth = " + bestGuessWidth); //$NON-NLS-1$ //$NON-NLS-2$
 			tabFolderClientAreaWidth = bestGuessWidth;
 			this.tabFolder.setSize(tabFolderClientAreaWidth, this.tabFolder.getBounds().height);
 		}
 		// end workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ????
 		int selectorCompositeWidth = newSelectorCompositeWidth > tabFolderClientAreaWidth / 2 ? tabFolderClientAreaWidth / 2 : newSelectorCompositeWidth;
 		int[] newWeights = new int[] { selectorCompositeWidth, tabFolderClientAreaWidth - selectorCompositeWidth };
-		log.log(Level.FINER, "newSelectorCompositeWidth= ", selectorCompositeWidth); //$NON-NLS-1$
+		log.log(FINER, "newSelectorCompositeWidth= ", selectorCompositeWidth); //$NON-NLS-1$
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			try {
 				this.graphicSashForm.setWeights(this.sashFormWeights);
 			} catch (IllegalArgumentException e) {
-				log.log(Level.WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e); //$NON-NLS-1$
+				log.log(WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e); //$NON-NLS-1$
 			}
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (log.isLoggable(FINE)) log.log(FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 	}
 

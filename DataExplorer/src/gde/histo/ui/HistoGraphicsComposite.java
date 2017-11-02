@@ -18,12 +18,15 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.SEVERE;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -59,7 +62,7 @@ import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.utils.HistoCurveUtils;
 import gde.histo.utils.HistoTimeLine;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -146,12 +149,12 @@ public final class HistoGraphicsComposite extends Composite {
 		this.addListener(SWT.Resize, new Listener() {
 			@Override
 			public void handleEvent(Event evt) {
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "GraphicsComposite.controlResized() = " + evt); //$NON-NLS-1$
+				log.finer(() -> "GraphicsComposite.controlResized() = " + evt); //$NON-NLS-1$
 				Rectangle clientRect = HistoGraphicsComposite.this.getClientArea();
 				Point size = new Point(clientRect.width, clientRect.height);
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, HistoGraphicsComposite.this.oldSize + " - " + size); //$NON-NLS-1$
+				log.finer(() -> HistoGraphicsComposite.this.oldSize + " - " + size); //$NON-NLS-1$
 				if (!HistoGraphicsComposite.this.oldSize.equals(size)) {
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "size changed, update " + HistoGraphicsComposite.this.oldSize + " - " + size); //$NON-NLS-1$ //$NON-NLS-2$
+					log.fine(() -> "size changed, update " + HistoGraphicsComposite.this.oldSize + " - " + size); //$NON-NLS-1$ //$NON-NLS-2$
 					HistoGraphicsComposite.this.oldSize = size;
 					setComponentBounds();
 					doRedrawGraphics();
@@ -161,7 +164,7 @@ public final class HistoGraphicsComposite extends Composite {
 		this.addHelpListener(new HelpListener() {
 			@Override
 			public void helpRequested(HelpEvent evt) {
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "GraphicsComposite.helpRequested " + evt); //$NON-NLS-1$
+				log.finer(() -> "GraphicsComposite.helpRequested " + evt); //$NON-NLS-1$
 				switch (HistoGraphicsComposite.this.graphicsType) {
 				default:
 				case HISTO:
@@ -178,7 +181,7 @@ public final class HistoGraphicsComposite extends Composite {
 			this.graphicsHeader.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
+					log.finer(() -> "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
 					String headerText = GDE.STRING_EMPTY;
 					String toolTipText = GDE.STRING_EMPTY;
 					{ // getBaseTexts
@@ -188,8 +191,7 @@ public final class HistoGraphicsComposite extends Composite {
 							String fileName = directoryEntry.getValue().getFileName().toString();
 							String truncatedPath = fileName.length() > 22 ? fileName.substring(0, 22) + ellipsisText : fileName;
 							sb.append(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK).append(truncatedPath);
-							toolTipText +=
-									GDE.STRING_NEW_LINE + directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + directoryEntry.getValue().toString();
+							toolTipText += GDE.STRING_NEW_LINE + directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + directoryEntry.getValue().toString();
 						}
 						headerText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
 						if (!toolTipText.isEmpty()) toolTipText = toolTipText.substring(1);
@@ -215,21 +217,21 @@ public final class HistoGraphicsComposite extends Composite {
 			this.graphicCanvas.addMouseMoveListener(new MouseMoveListener() {
 				@Override
 				public void mouseMove(MouseEvent evt) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseMove = " + evt); //$NON-NLS-1$
+					log.finest(() -> "graphicCanvas.mouseMove = " + evt); //$NON-NLS-1$
 					mouseMoveAction(evt);
 				}
 			});
 			this.graphicCanvas.addMouseTrackListener(new MouseTrackAdapter() {
 				@Override
 				public void mouseExit(MouseEvent evt) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseExit, event=" + evt); //$NON-NLS-1$
+					log.finest(() -> "graphicCanvas.mouseExit, event=" + evt); //$NON-NLS-1$
 					HistoGraphicsComposite.this.graphicCanvas.setCursor(DataExplorer.getInstance().getCursor());
 				}
 			});
 			this.graphicCanvas.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseDown(MouseEvent evt) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseDown, event=" + evt); //$NON-NLS-1$
+					log.finest(() -> "graphicCanvas.mouseDown, event=" + evt); //$NON-NLS-1$
 					if (evt.button == 1 || evt.button == 3) {
 						mouseDownAction(evt);
 					}
@@ -237,7 +239,7 @@ public final class HistoGraphicsComposite extends Composite {
 
 				@Override
 				public void mouseUp(MouseEvent evt) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicCanvas.mouseUp, event=" + evt); //$NON-NLS-1$
+					log.finest(() -> "graphicCanvas.mouseUp, event=" + evt); //$NON-NLS-1$
 					if (evt.button == 1 || evt.button == 3) {
 						mouseUpAction(evt);
 					}
@@ -246,12 +248,12 @@ public final class HistoGraphicsComposite extends Composite {
 			this.graphicCanvas.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "graphicCanvas.paintControl, event=" + evt); //$NON-NLS-1$
+					log.finer(() -> "graphicCanvas.paintControl, event=" + evt); //$NON-NLS-1$
 					// System.out.println("width = " + GraphicsComposite.this.getSize().x);
 					try {
 						drawAreaPaintControl(evt);
 					} catch (Exception e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
+						log.log(SEVERE, e.getMessage(), e);
 					}
 				}
 			});
@@ -264,7 +266,7 @@ public final class HistoGraphicsComposite extends Composite {
 			this.recordSetComment.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetComment.paintControl, event=" + evt); //$NON-NLS-1$
+					log.finer(() -> "recordSetComment.paintControl, event=" + evt); //$NON-NLS-1$
 				}
 			});
 		}
@@ -276,7 +278,7 @@ public final class HistoGraphicsComposite extends Composite {
 	 * @param evt
 	 */
 	private void drawAreaPaintControl(PaintEvent evt) {
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
+		log.finest(() -> "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
 		drawAreaPaintControl();
 	}
 
@@ -287,7 +289,7 @@ public final class HistoGraphicsComposite extends Composite {
 		long startTime = new Date().getTime();
 		// Get the canvas and its dimensions
 		this.canvasBounds = this.graphicCanvas.getClientArea();
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "canvas size = " + this.canvasBounds); //$NON-NLS-1$
+		log.finer(() -> "canvas size = " + this.canvasBounds); //$NON-NLS-1$
 
 		if (this.canvasImage != null) this.canvasImage.dispose();
 		this.canvasImage = new Image(GDE.display, this.canvasBounds);
@@ -316,7 +318,7 @@ public final class HistoGraphicsComposite extends Composite {
 		this.canvasGC.dispose();
 		this.canvasImageGC.dispose();
 		// this.canvasImage.dispose(); //zooming, marking, ... needs a reference to canvasImage
-		if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+		log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 	}
 
 	private TrailRecordSet getTrailRecordSet() {
@@ -342,14 +344,14 @@ public final class HistoGraphicsComposite extends Composite {
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
 			TrailRecord tmpRecord = (TrailRecord) trailRecordSet.getRecordsSortedForDisplay()[i];
 			if (tmpRecord != null && tmpRecord.isScaleVisible()) {
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "==>> " + tmpRecord.getName() + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$
+				log.finer(() -> "==>> " + tmpRecord.getName() + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$
 				if (tmpRecord.isPositionLeft())
 					numberCurvesLeft++;
 				else
 					numberCurvesRight++;
 			}
 		}
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(FINE)) log.log(FINE, "nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// calculate the bounds left for the curves
 		int dataScaleWidth; // horizontal space used for text and scales, numbers and caption
@@ -378,10 +380,10 @@ public final class HistoGraphicsComposite extends Composite {
 		int gapBot = 3 * pt.y + 4; // space used for time scale text and scales with description or legend;
 		y0 = bounds.height - yMax - gapBot;
 		height = y0 - yMax; // recalculate due to modulo 10 ??
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		log.finer(() -> "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				+ width + ", height=" + height); //$NON-NLS-1$
 		this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
+		log.finer(() -> "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
 
 		if (trailRecordSet.getTimeStepSize() > 0) {
 			// initialize early in order to avoid problems in mouse move events
@@ -403,12 +405,12 @@ public final class HistoGraphicsComposite extends Composite {
 			gc.drawLine(x0 - 1, yMax - 1, x0 - 1, y0);
 			gc.drawLine(xMax + 1, yMax - 1, xMax + 1, y0);
 
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() //$NON-NLS-1$ //$NON-NLS-2$
+			log.fine(() -> "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() //$NON-NLS-1$ //$NON-NLS-2$
 					- startInitTime)));
 
 			long startTime = new Date().getTime();
 			HistoCurveUtils.drawTrailRecordSet(trailRecordSet, gc, dataScaleWidth, this.canvasBounds, this.curveAreaBounds, this.timeLine);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() //$NON-NLS-1$ //$NON-NLS-2$
+			log.fine(() -> "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() //$NON-NLS-1$ //$NON-NLS-2$
 					- startTime)));
 		}
 	}
@@ -434,14 +436,14 @@ public final class HistoGraphicsComposite extends Composite {
 	 */
 	synchronized void doRedrawGraphics() {
 		if (!GDE.IS_LINUX) { // old code changed due to Mountain Lion refresh problems
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update"); //$NON-NLS-1$
+			log.finer(() -> "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update"); //$NON-NLS-1$
 			Point size = this.graphicCanvas.getSize();
 			this.graphicCanvas.redraw(5, 5, 5, 5, true); // image based - let OS handle the update
 			this.graphicCanvas.redraw(size.x - 5, 5, 5, 5, true);
 			this.graphicCanvas.redraw(5, size.y - 5, 5, 5, true);
 			this.graphicCanvas.redraw(size.x - 5, size.y - 5, 5, 5, true);
 		} else {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(); // do full update where required"); //$NON-NLS-1$
+			log.finer(() -> "this.graphicCanvas.redraw(); // do full update where required"); //$NON-NLS-1$
 			this.graphicCanvas.redraw(); // do full update where required
 		}
 		this.recordSetComment.redraw();
@@ -496,7 +498,7 @@ public final class HistoGraphicsComposite extends Composite {
 	 * @param Point containing corrected x,y position value
 	 */
 	private Point checkCurveBounds(int xPos, int yPos) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "in  xPos = " + xPos + " yPos = " + yPos); //$NON-NLS-1$ //$NON-NLS-2$
+		log.finer(() -> "in  xPos = " + xPos + " yPos = " + yPos); //$NON-NLS-1$ //$NON-NLS-2$
 		int tmpxPos = xPos - this.curveAreaBounds.x;
 		int tmpyPos = yPos - this.curveAreaBounds.y;
 		int minX = 0;
@@ -509,7 +511,7 @@ public final class HistoGraphicsComposite extends Composite {
 		if (tmpyPos < minY || tmpyPos > maxY) {
 			tmpyPos = tmpyPos < minY ? minY : maxY;
 		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "out xPos = " + tmpxPos + " yPos = " + tmpyPos); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(FINER)) log.log(FINER, "out xPos = " + tmpxPos + " yPos = " + tmpyPos); //$NON-NLS-1$ //$NON-NLS-2$
 		return new Point(tmpxPos, tmpyPos);
 	}
 
@@ -665,17 +667,17 @@ public final class HistoGraphicsComposite extends Composite {
 		int width = graphicsBounds.width;
 		int height = this.headerHeight;
 		this.graphicsHeader.setBounds(x, y, width, height);
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.setBounds " + this.graphicsHeader.getBounds()); //$NON-NLS-1$
+		log.finer(() -> "recordSetHeader.setBounds " + this.graphicsHeader.getBounds()); //$NON-NLS-1$
 
 		y = this.headerGap + this.headerHeight;
 		height = graphicsBounds.height - (this.headerGap + this.commentGap + this.commentHeight + this.headerHeight);
 		this.graphicCanvas.setBounds(x, y, width, height);
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "graphicCanvas.setBounds " + this.graphicCanvas.getBounds()); //$NON-NLS-1$
+		log.finer(() -> "graphicCanvas.setBounds " + this.graphicCanvas.getBounds()); //$NON-NLS-1$
 
 		y = this.headerGap + this.headerHeight + height + this.commentGap;
 		height = this.commentHeight;
 		this.recordSetComment.setBounds(20, y, width - 40, height - 5);
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetComment.setBounds " + this.recordSetComment.getBounds()); //$NON-NLS-1$
+		log.finer(() -> "recordSetComment.setBounds " + this.recordSetComment.getBounds()); //$NON-NLS-1$
 	}
 
 	/**

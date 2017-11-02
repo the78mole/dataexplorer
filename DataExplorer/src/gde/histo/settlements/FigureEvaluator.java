@@ -19,14 +19,14 @@
 
 package gde.histo.settlements;
 
-import java.util.logging.Logger;
+import static java.util.logging.Level.FINE;
 
 import gde.GDE;
 import gde.device.FigureTypes;
 import gde.device.TransitionFigureType;
 import gde.histo.recordings.RecordingsCollector;
 import gde.histo.transitions.Transition;
-import gde.log.Level;
+import gde.log.Logger;
 
 /**
  * Collect settlement data for the trail recordset and subordinate objects.
@@ -49,26 +49,22 @@ public final class FigureEvaluator {
 	 */
 	public void addFromTransition(Transition transition) {
 		TransitionFigureType transitionFigure = this.histoSettlement.getSettlement().getEvaluation().getTransitionFigure();
-		log.log(Level.FINE, GDE.STRING_GREATER, transitionFigure);
+		log.log(FINE, GDE.STRING_GREATER, transitionFigure);
 		final int reverseTranslatedResult;
 		if (transitionFigure.getFigureType() == FigureTypes.COUNT) {
 			reverseTranslatedResult = transition.getThresholdSize() * 1000; // all internal values are multiplied by 1000
-		}
-		else if (transitionFigure.getFigureType() == FigureTypes.TIME_SUM_SEC) {
+		} else if (transitionFigure.getFigureType() == FigureTypes.TIME_SUM_SEC) {
 			reverseTranslatedResult = (int) (this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) - this.histoSettlement.getParent().getTime_ms(transition.getThresholdStartIndex()));
-		}
-		else if (transitionFigure.getFigureType() == FigureTypes.TIME_STEP_SEC) {
+		} else if (transitionFigure.getFigureType() == FigureTypes.TIME_STEP_SEC) {
 			reverseTranslatedResult = (int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdStartIndex());
-		}
-		else {
+		} else {
 			reverseTranslatedResult = 0;
 			throw new UnsupportedOperationException();
 		}
 		// add to settlement record
 		this.histoSettlement.add(reverseTranslatedResult);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
-				String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  figureType=%s", this.histoSettlement.getName(), (int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) //$NON-NLS-1$
-						, reverseTranslatedResult, transitionFigure.getFigureType()));
+		log.fine(() -> String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  figureType=%s", //$NON-NLS-1$
+				this.histoSettlement.getName(), (int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1), reverseTranslatedResult, transitionFigure.getFigureType()));
 	}
 
 }

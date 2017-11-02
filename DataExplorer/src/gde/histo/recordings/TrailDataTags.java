@@ -26,7 +26,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.histo.cache.ExtendedVault;
@@ -35,7 +34,7 @@ import gde.histo.gpslocations.GpsCluster;
 import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.recordings.TrailRecordSet.DisplayTag;
 import gde.histo.utils.GpsCoordinate;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -110,14 +109,13 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 				if (logTagEntry.getValue().size() > 0) dataTags4Index.put(logTagEntry.getKey(), logTagEntry.getValue().get(index));
 			}
 			return dataTags4Index;
-		}
-		else
+		} else
 			return new HashMap<DataTag, String>();
 	}
 
 	/**
-	* @return the tags which have been filled and carry non-redundant data
-	*/
+	 * @return the tags which have been filled and carry non-redundant data
+	 */
 	public EnumSet<DisplayTag> getActiveDisplayTags() {
 		if (this.activeDisplayTags == null) {
 			defineActiveDisplayTags();
@@ -173,7 +171,7 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 			}
 			this.activeDisplayTags = resultTags;
 		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "activeDisplayTags.size()=", resultTags.size()); //$NON-NLS-1$
+		log.finer(() -> "activeDisplayTags.size()=" + resultTags.size()); //$NON-NLS-1$
 	}
 
 	public List<String> getDataGpsLocations() {

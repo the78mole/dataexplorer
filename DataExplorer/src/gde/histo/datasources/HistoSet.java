@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
@@ -37,6 +36,7 @@ import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.recordings.TrailRecordSet;
+import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 
@@ -143,7 +143,7 @@ public final class HistoSet {
 	 * @return the paths which have been ignored on a file basis or suppressed on a recordset basis
 	 */
 	public List<Path> getExcludedPaths() {
-		List<Path> result = this.histoSetCollector.getIgnoredFiles();
+		List<Path> result = this.histoSetCollector.getExcludedFiles();
 		for (VaultCollector truss : this.histoSetCollector.getSuppressedTrusses()) {
 			result.add(truss.getVault().getLogFileAsPath());
 		}

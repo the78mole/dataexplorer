@@ -22,14 +22,13 @@ package gde.histo.recordings;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
 import gde.histo.utils.Spot;
 import gde.histo.utils.UniversalQuantile;
-import gde.log.Level;
+import gde.log.Logger;
 
 /**
  * Define a view on a section of the trail record.
@@ -50,7 +49,8 @@ public final class TrailRecordCutter {
 		if (!subPoints.isEmpty()) {
 			this.quantile = new UniversalQuantile<>(subPoints); // take all points for display
 
-			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, UniversalQuantile.BOXPLOT_SIGMA_FACTOR, UniversalQuantile.BOXPLOT_OUTLIER_FACTOR);
+			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, UniversalQuantile.BOXPLOT_SIGMA_FACTOR,
+					UniversalQuantile.BOXPLOT_OUTLIER_FACTOR);
 
 			// eliminate Tukey outliers for regression
 			List<Double> outliers = tmpQuantile.getOutliers();
@@ -60,12 +60,11 @@ public final class TrailRecordCutter {
 			}
 
 			this.regression = new SingleResponseRegression<>(subPoints, RegressionType.QUADRATIC);
-			if (log.isLoggable(Level.FINER)) {
-				log.log(Level.FINER,
-						String.format("xAxisSize=%d regressionRealSize=%d starts at %tF %tR", this.quantile.getSize(), this.regression.getRealSize(), new Date(timeStamp1_ms), new Date(timeStamp1_ms)));
-			}
-		}
-		else {
+			log.finer(() -> String.format("xAxisSize=%d regressionRealSize=%d starts at %tF %tR", //
+					this.quantile.getSize(), this.regression.getRealSize(), new Date(timeStamp1_ms), new Date(timeStamp1_ms)));
+		} else
+
+		{
 			this.regression = null;
 			this.quantile = null;
 		}

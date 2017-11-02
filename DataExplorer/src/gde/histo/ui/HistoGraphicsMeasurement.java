@@ -20,7 +20,6 @@
 package gde.histo.ui;
 
 import java.util.Date;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
@@ -31,7 +30,7 @@ import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSetFormatter;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.StringHelper;
@@ -77,8 +76,7 @@ public final class HistoGraphicsMeasurement {
 				DataExplorer.getInstance().setStatusMessage(statusMessage);
 
 				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestamp_ms));
-				if (log.isLoggable(Level.TIME))
-					log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 			}
 
 			@Override
@@ -124,8 +122,7 @@ public final class HistoGraphicsMeasurement {
 				DataExplorer.getInstance().setStatusMessage(statusMessage);
 
 				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestamp_ms));
-				if (log.isLoggable(Level.TIME))
-					log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 			}
 
 			@Override
@@ -139,8 +136,7 @@ public final class HistoGraphicsMeasurement {
 				DataExplorer.getInstance().setStatusMessage(statusMessage);
 
 				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestamp_ms));
-				if (log.isLoggable(Level.TIME))
-					log.log(Level.TIME, "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+				log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 			}
 
 			@Override
@@ -245,7 +241,7 @@ public final class HistoGraphicsMeasurement {
 
 		this.canvasGC = new GC(this.graphicsComposite.graphicCanvas);
 		this.curveSurvey.setCanvasGC(this.canvasGC);
-		
+
 		this.curveSurvey.cleanMeasurementPointer(this.graphicsComposite.canvasImage);
 
 		this.graphicsComposite.setRecordSetCommentStandard();
@@ -323,8 +319,7 @@ public final class HistoGraphicsMeasurement {
 			this.isRightMouseMeasure = false;
 			// application.setStatusMessage(GDE.STRING_EMPTY);
 		}
-		if (log.isLoggable(Level.FINER))
-			log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
+		log.time(() -> "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

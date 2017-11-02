@@ -18,10 +18,11 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.FINEST;
+
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -58,6 +59,7 @@ import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.recordings.TrailRecordSet.DisplayTag;
+import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -117,7 +119,7 @@ public class HistoTableWindow extends CTabItem {
 		this.cursor.addKeyListener(new KeyListener() {
 			@Override
 			public void keyReleased(KeyEvent event) {
-				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) HistoTableWindow.log.log(java.util.logging.Level.FINEST, ("cursor.keyReleased, keycode: " + event.keyCode)); //$NON-NLS-1$
+				log.finest(() -> "cursor.keyReleased, keycode: " + event.keyCode); //$NON-NLS-1$
 
 				if (event.stateMask == SWT.MOD1) {
 					switch (event.keyCode) {
@@ -167,8 +169,7 @@ public class HistoTableWindow extends CTabItem {
 						HistoTableWindow.this.cursor.setSelection(HistoTableWindow.this.dataTable.getItemCount() - 1, HistoTableWindow.this.cursor.getColumn());
 						break;
 					}
-				}
-				else if (event.stateMask == 0) {
+				} else if (event.stateMask == 0) {
 					switch (event.keyCode) {
 					case SWT.HOME:
 						// Home: go to first column
@@ -196,7 +197,8 @@ public class HistoTableWindow extends CTabItem {
 			 * the TableCursor has already internally processed the home/end keyevent and changed the row/column.
 			 * Therefore, we need a Vector that stores the last cell positions, so we can access the position before the current position.
 			 * @param col
-			 * @see  <a href="http://www.javadocexamples.com/org/eclipse/swt/custom/org.eclipse.swt.custom.TableCursor-source.html">TableCursor source</a>
+			 * @see <a href="http://www.javadocexamples.com/org/eclipse/swt/custom/org.eclipse.swt.custom.TableCursor-source.html">TableCursor
+			 *      source</a>
 			 */
 			private void workaroundTableCursor(int col) {
 				/*
@@ -205,15 +207,14 @@ public class HistoTableWindow extends CTabItem {
 				 * fired and the TableCursor automatically changed the row.
 				 */
 				int row = HistoTableWindow.this.rowVector.get(0);
-				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINER)) HistoTableWindow.log.log(java.util.logging.Level.FINER, ("Setting selection to row: " + row)); //$NON-NLS-1$
+				log.finer(() -> "Setting selection to row: " + row); //$NON-NLS-1$
 				HistoTableWindow.this.cursor.setSelection(row, col);
 
 				/*
 				 * As the TableCursor automatically changes the rows and we go back, the item that was on top of the list changes.
 				 * We fix that here to get the original item at the top of the list again.
 				 */
-				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINER))
-					HistoTableWindow.log.log(java.util.logging.Level.FINER, ("Setting top index: " + HistoTableWindow.this.topindexVector.get(0))); //$NON-NLS-1$
+				log.finer(() -> "Setting top index: " + HistoTableWindow.this.topindexVector.get(0)); //$NON-NLS-1$
 				HistoTableWindow.this.dataTable.setTopIndex(HistoTableWindow.this.topindexVector.get(0));
 
 				/*
@@ -227,14 +228,12 @@ public class HistoTableWindow extends CTabItem {
 
 			@Override
 			public void keyPressed(KeyEvent event) {
-				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) HistoTableWindow.log.log(java.util.logging.Level.FINEST, "cursor.keyPressed " + event); //$NON-NLS-1$
+				log.log(FINEST, "cursor.keyPressed ", event); //$NON-NLS-1$
 				// System.out.println("cursor.keyPressed " + (event.stateMask & SWT.MOD1) + " - " + event.keyCode );
-				if (HistoTableWindow.this.cursor.getRow() != null && !(event.stateMask == SWT.MOD1 && event.keyCode != 0x99) && !(event.stateMask == SWT.MOD1 && event.keyCode != 0x97)
-						&& event.keyCode != SWT.MOD1) {
+				if (HistoTableWindow.this.cursor.getRow() != null && !(event.stateMask == SWT.MOD1 && event.keyCode != 0x99) && !(event.stateMask == SWT.MOD1 && event.keyCode != 0x97) && event.keyCode != SWT.MOD1) {
 					// select the table row where the cursor get moved to
 					HistoTableWindow.this.dataTable.setSelection(new TableItem[] { HistoTableWindow.this.cursor.getRow() });
-				}
-				else if (HistoTableWindow.this.cursor.getRow() != null && (event.stateMask & SWT.MOD1) == SWT.MOD1 && event.keyCode == 0x61) {
+				} else if (HistoTableWindow.this.cursor.getRow() != null && (event.stateMask & SWT.MOD1) == SWT.MOD1 && event.keyCode == 0x61) {
 					// System.out.println("select all");
 					HistoTableWindow.this.dataTable.setSelection(HistoTableWindow.this.dataTable.getItems());
 				}
@@ -255,7 +254,7 @@ public class HistoTableWindow extends CTabItem {
 			// This is called as the user navigates around the table
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				if (HistoTableWindow.log.isLoggable(Level.FINEST)) HistoTableWindow.log.log(Level.FINEST, "cursor.widgetSelected " + event); //$NON-NLS-1$
+				log.log(FINEST, "cursor.widgetSelected ", event); //$NON-NLS-1$
 				if (HistoTableWindow.this.cursor.getRow() != null) {
 					updateVector(HistoTableWindow.this.dataTable.indexOf(HistoTableWindow.this.cursor.getRow()), HistoTableWindow.this.dataTable.getTopIndex());
 				}
@@ -265,14 +264,13 @@ public class HistoTableWindow extends CTabItem {
 						: null;
 				int rowNumber = HistoTableWindow.this.dataTable.indexOf(HistoTableWindow.this.cursor.getRow()); // 0-based
 				int columnNumber = HistoTableWindow.this.cursor.getColumn(); // 0-based
-				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "row=" + rowNumber + "  column=" + columnNumber); //$NON-NLS-1$ //$NON-NLS-2$
+				log.finer(() -> "row=" + rowNumber + "  column=" + columnNumber); //$NON-NLS-1$ //$NON-NLS-2$
 				if (HistoTableWindow.this.dataTable.getColumnCount() <= 2 || columnNumber < 2 || trailRecordSet == null || trailRecordSet.isEmpty()) {
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), null);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
-				}
-				else {
+				} else {
 					Map<DataTag, String> dataTags = trailRecordSet.getDataTags().getByIndex(columnNumber - 2);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
@@ -280,7 +278,7 @@ public class HistoTableWindow extends CTabItem {
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
 				}
 				HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
-				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "DataTag.FILE_PATH=" + HistoTableWindow.this.popupmenu.getData(TabMenuOnDemand.DATA_FILE_PATH.name())); //$NON-NLS-1$
+				log.finer(() -> "DataTag.FILE_PATH=" + HistoTableWindow.this.popupmenu.getData(TabMenuOnDemand.DATA_FILE_PATH.name())); //$NON-NLS-1$
 			}
 		});
 
@@ -288,7 +286,7 @@ public class HistoTableWindow extends CTabItem {
 		this.dataTable.addHelpListener(new HelpListener() {
 			@Override
 			public void helpRequested(HelpEvent evt) {
-				if (HistoTableWindow.log.isLoggable(Level.FINER)) HistoTableWindow.log.log(Level.FINER, "dataTable.helpRequested " + evt); //$NON-NLS-1$
+				log.log(FINER, "dataTable.helpRequested ", evt); //$NON-NLS-1$
 				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_95.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
@@ -302,8 +300,7 @@ public class HistoTableWindow extends CTabItem {
 						int index = HistoTableWindow.this.dataTable.indexOf(item);
 						TrailRecord trailRecord = (TrailRecord) trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
 						item.setText(HistoTableMapper.getTableRow(trailRecord));
-					}
-					else if (HistoTableWindow.this.settings.isDisplayTags()) {
+					} else if (HistoTableWindow.this.settings.isDisplayTags()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item) - trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
 						DisplayTag[] activeDisplayTags = trailRecordSet.getDataTags().getActiveDisplayTags().toArray(new DisplayTag[] {});
 						item.setText(HistoTableMapper.getTableTagRow(trailRecordSet, activeDisplayTags[index]));
@@ -322,15 +319,14 @@ public class HistoTableWindow extends CTabItem {
 				 * fired and the TableCursor automatically changed the row.
 				 */
 				int row = HistoTableWindow.this.rowVector.get(HistoTableWindow.this.rowVector.size() - 1);
-				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINER)) HistoTableWindow.log.log(java.util.logging.Level.FINER, ("Setting selection to row: " + row)); //$NON-NLS-1$
+				log.log(FINER, "Setting selection to row: ", row); //$NON-NLS-1$
 				HistoTableWindow.this.cursor.setSelection(row, col);
 
 				/*
 				 * As the TableCursor automatically changes the rows and we go back, the item that was on top of the list changes.
 				 * We fix that here to get the original item at the top of the list again.
 				 */
-				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINER))
-					HistoTableWindow.log.log(java.util.logging.Level.FINER, ("Setting top index: " + HistoTableWindow.this.topindexVector.get(0))); //$NON-NLS-1$
+				log.finer(() -> "Setting top index: " + HistoTableWindow.this.topindexVector.get(0)); //$NON-NLS-1$
 				HistoTableWindow.this.dataTable.setTopIndex(HistoTableWindow.this.topindexVector.get(HistoTableWindow.this.topindexVector.size() - 1));
 
 				HistoTableWindow.this.cursor.setVisible(true);
@@ -341,11 +337,13 @@ public class HistoTableWindow extends CTabItem {
 
 			@Override
 			public void keyReleased(KeyEvent event) {
-				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) HistoTableWindow.log.log(java.util.logging.Level.FINEST, ("dataTable.keyReleased, keycode: " + event.keyCode)); //$NON-NLS-1$
-				if (event.keyCode == SWT.MOD2 && HistoTableWindow.this.rowVector.size() > 0) { // ET 20.06.2017 2nd condition added due to rowVector.get index violation
+				log.finest(() -> "dataTable.keyReleased, keycode: " + event.keyCode); //$NON-NLS-1$
+				if (event.keyCode == SWT.MOD2 && HistoTableWindow.this.rowVector.size() > 0) { // ET 20.06.2017 2nd condition added due to rowVector.get index
+																																												// violation
 					int rowIndex = HistoTableWindow.this.rowVector.get(HistoTableWindow.this.rowVector.size() - 1) + this.selectionFlowIndex;
 					// check table bounds reached
-					rowIndex = rowIndex < 0 ? 0 : rowIndex > HistoTableWindow.this.dataTable.getItems().length - 1 ? HistoTableWindow.this.dataTable.getItems().length - 1 : rowIndex;
+					rowIndex = rowIndex < 0 ? 0 : rowIndex > HistoTableWindow.this.dataTable.getItems().length - 1
+							? HistoTableWindow.this.dataTable.getItems().length - 1 : rowIndex;
 
 					updateVector(rowIndex, HistoTableWindow.this.dataTable.getTopIndex());
 					workaroundTableCursor(HistoTableWindow.this.cursor.getColumn());
@@ -359,7 +357,7 @@ public class HistoTableWindow extends CTabItem {
 
 			@Override
 			public void keyPressed(KeyEvent event) {
-				if (HistoTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) HistoTableWindow.log.log(java.util.logging.Level.FINEST, ("dataTable.keyPressed, keycode: " + event.keyCode)); //$NON-NLS-1$
+				log.finest(() -> "dataTable.keyPressed, keycode: " + event.keyCode); //$NON-NLS-1$
 				if (event.stateMask == SWT.MOD2 && ((event.stateMask & SWT.MOD1) == 0) && ((event.stateMask & SWT.MOD3) == 0)) {
 					switch (event.keyCode) {
 					case SWT.ARROW_UP:
@@ -411,8 +409,7 @@ public class HistoTableWindow extends CTabItem {
 					break;
 			}
 			return isValid;
-		}
-		else
+		} else
 			return false;
 	}
 
@@ -425,8 +422,7 @@ public class HistoTableWindow extends CTabItem {
 			if (HistoTableWindow.this.dataTable.indexOf(tableItem) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
 				TrailRecord trailRecord = (TrailRecord) trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
 				isValid = tableItem.getText().equals(HistoTableMapper.getTableRowText(trailRecord)) && tableItem.getText(1).equals(trailRecord.getTrailSelector().getTrailText());
-			}
-			else {
+			} else {
 				isValid = tableItem.getText().isEmpty();
 			}
 			if (!isValid) //
@@ -467,16 +463,15 @@ public class HistoTableWindow extends CTabItem {
 					column.setWidth((int) (headerString.length() * TEXT_EXTENT_FACTOR * 21 / 20.));
 					column.setText(headerString.intern());
 				}
-			}
-			else {
+			} else {
 				if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { //$NON-NLS-1$ //$NON-NLS-2$
-					//Linux SWT need additional header field for padding
+					// Linux SWT need additional header field for padding
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 					column.setWidth(100);
 				}
 			}
 		}
-		log.log(Level.FINER, "dataTable.getColumnCount() ", this.dataTable.getColumnCount()); //$NON-NLS-1$
+		log.log(FINER, "dataTable.getColumnCount() ", this.dataTable.getColumnCount()); //$NON-NLS-1$
 	}
 
 	/**

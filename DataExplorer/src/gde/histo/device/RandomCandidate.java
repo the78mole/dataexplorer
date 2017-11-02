@@ -21,9 +21,9 @@ package gde.histo.device;
 
 import java.util.Arrays;
 import java.util.Random;
-import java.util.logging.Logger;
 
-import gde.log.Level;
+import gde.log.Logger;
+
 
 /**
  * A sample candidate chosen by a randomized selection.
@@ -48,7 +48,7 @@ public final class RandomCandidate extends Candidate {
 
 	private enum Action {
 		/**
-		 *  predecessor points are not used as a sample
+		 * predecessor points are not used as a sample
 		 */
 		DISCARD,
 		/**
@@ -56,7 +56,8 @@ public final class RandomCandidate extends Candidate {
 		 */
 		FORCE_RELEASE,
 		/**
-		 * points are a candidate for release but may be discarded to compensate an oversampling action; predecessor points must NOT be minmax points
+		 * points are a candidate for release but may be discarded to compensate an oversampling action;
+		 * predecessor points must NOT be minmax points
 		 */
 		COMPENSATE_RELEASE
 	}
@@ -81,8 +82,7 @@ public final class RandomCandidate extends Candidate {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("timeStep_ms=%,d isSampleTimePassed=%b isRandomCandidate=%b", this.timeStep_ms, this.isSampleTimePassed, this.isRandomCandidate));
-		sb.append("\n").append(String.format("nextStartTimeStamp_ms=%,d nextSamplingTimeStamp_ms=%,d isMinMax=%b timeSpanSamplingCount=%d", this.nextStartTimeStamp_ms, this.nextSamplingTimeStamp_ms,
-				this.isMinMax, this.timeSpanSamplingCount));
+		sb.append("\n").append(String.format("nextStartTimeStamp_ms=%,d nextSamplingTimeStamp_ms=%,d isMinMax=%b timeSpanSamplingCount=%d", this.nextStartTimeStamp_ms, this.nextSamplingTimeStamp_ms, this.isMinMax, this.timeSpanSamplingCount));
 		if (this.points != null)
 			sb.append("\n").append(Arrays.toString(this.points));
 		else
@@ -109,7 +109,7 @@ public final class RandomCandidate extends Candidate {
 				++this.timeSpanSamplingCount;
 		}
 
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%,12d isValidSample=%b", previousCandidate.timeStep_ms, isValidSample));
+		log.finer(() -> String.format("%,12d isValidSample=%b", previousCandidate.timeStep_ms, isValidSample));
 		return isValidSample;
 	}
 
@@ -130,7 +130,7 @@ public final class RandomCandidate extends Candidate {
 			this.nextSamplingTimeStamp_ms = previousCandidate.nextStartTimeStamp_ms + rand.nextInt(this.samplingTimespan_ms);
 			this.isSampleTimePassed = false;
 			this.timeSpanSamplingCount = 0;
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "******************** " + String.format("timeStep_ms=%d nextSamplingTimeStamp_ms=%d", newTimeStep_ms, this.nextSamplingTimeStamp_ms));
+			log.finer(() -> "******************** " + String.format("timeStep_ms=%d nextSamplingTimeStamp_ms=%d", newTimeStep_ms, this.nextSamplingTimeStamp_ms));
 
 			this.isRandomCandidate = newTimeStep_ms >= this.nextSamplingTimeStamp_ms;
 			this.isMinMax = this.maxMinObserver.update(newPoints, newTimeStep_ms, previousCandidate.points);
@@ -161,8 +161,7 @@ public final class RandomCandidate extends Candidate {
 			this.points = null;
 		}
 
-		if (log.isLoggable(Level.FINER))
-			log.log(Level.FINER, String.format("timeStep_ms=%,12d isSampleTimePassed=%b isRandomCandidate=%b", newTimeStep_ms, this.isSampleTimePassed, this.isRandomCandidate));
+		log.finer(() -> String.format("timeStep_ms=%,12d isSampleTimePassed=%b isRandomCandidate=%b", newTimeStep_ms, this.isSampleTimePassed, this.isRandomCandidate));
 	}
 
 	/**
@@ -208,8 +207,7 @@ public final class RandomCandidate extends Candidate {
 		} else {
 			throw new UnsupportedOperationException("is never reached");
 		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("action=%-11s %,12d isLastMinMax=%b isLastRandomCandidate=%b isMinMax=%b isRandomCandidate=%b", predecessorAction.toString(),
-				lastItem.timeStep_ms, lastItem.isMinMax, lastItem.isRandomCandidate, this.isMinMax, this.isRandomCandidate));
+		log.finer(() -> String.format("action=%-11s %,12d isLastMinMax=%b isLastRandomCandidate=%b isMinMax=%b isRandomCandidate=%b", predecessorAction.toString(), lastItem.timeStep_ms, lastItem.isMinMax, lastItem.isRandomCandidate, this.isMinMax, this.isRandomCandidate));
 
 		return predecessorAction == Action.FORCE_RELEASE || predecessorAction == Action.COMPENSATE_RELEASE && lastItem.timeSpanSamplingCount <= 0;
 	}

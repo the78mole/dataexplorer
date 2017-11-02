@@ -18,10 +18,11 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
+import static java.util.logging.Level.FINEST;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
@@ -39,7 +40,7 @@ import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
 import gde.histo.utils.Spot;
 import gde.histo.utils.UniversalQuantile;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
@@ -124,7 +125,7 @@ public final class CurveSurvey {
 		 * @param length
 		 */
 		private void drawHorizontalLine(int posFromTop, int posFromLeft, int length, LineMark lineMark) {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("posFromLeft=%d posFromTop=%d length=%d", posFromLeft, posFromTop, length)); //$NON-NLS-1$
+			log.finer(() -> String.format("posFromLeft=%d posFromTop=%d length=%d", posFromLeft, posFromTop, length)); //$NON-NLS-1$
 			setLineMark(lineMark);
 			CurveSurvey.this.canvasGC.drawLine(posFromLeft + this.offSetX, posFromTop + this.offSetY, posFromLeft + this.offSetX + length - 1, posFromTop + this.offSetY);
 		}
@@ -138,7 +139,7 @@ public final class CurveSurvey {
 		 * @param posFromLeft2
 		 */
 		private void drawConnectingLine(int posFromLeft1, int posFromTop1, int posFromLeft2, int posFromTop2, LineMark lineMark) {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "posFromLeft1=" + posFromLeft1 + " posFromTop1=" + posFromTop1 + " posFromLeft2=" + posFromLeft2 + " posFromTop2=" + posFromTop2); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			log.finer(() -> "posFromLeft1=" + posFromLeft1 + " posFromTop1=" + posFromTop1 + " posFromLeft2=" + posFromLeft2 + " posFromTop2=" + posFromTop2); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			if (posFromLeft1 != posFromLeft2 || posFromTop1 != posFromTop2) {
 				setLineMark(lineMark);
 				CurveSurvey.this.canvasGC.drawLine(posFromLeft1 + this.offSetX, posFromTop1 + this.offSetY, posFromLeft2 + this.offSetX, posFromTop2 + this.offSetY);
@@ -154,8 +155,8 @@ public final class CurveSurvey {
 		 * @param lineMark
 		 */
 		private void drawOutlier(int posFromLeft1, int posFromTop1, int radius, LineMark lineMark) {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "posFromLeft1=" + posFromLeft1 + " posFromTop1=" + posFromTop1); //$NON-NLS-1$ //$NON-NLS-2$
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yUpperLimit=" + this.yUpperLimit + " yLowerLimit=" + this.yLowerLimit); //$NON-NLS-1$ //$NON-NLS-2$
+			log.finer(() -> "posFromLeft1=" + posFromLeft1 + " posFromTop1=" + posFromTop1); //$NON-NLS-1$ //$NON-NLS-2$
+			log.finer(() -> "yUpperLimit=" + this.yUpperLimit + " yLowerLimit=" + this.yLowerLimit); //$NON-NLS-1$ //$NON-NLS-2$
 
 			setLineMark(lineMark);
 
@@ -173,7 +174,7 @@ public final class CurveSurvey {
 			this.yUpperLimit = Math.min(this.yUpperLimit, Math.min(posFromTop1, posFromTop2));
 			this.xLeftLimit = Math.min(this.xLeftLimit, Math.min(posFromLeft1, posFromLeft2));
 			this.xRightLimit = Math.max(this.xRightLimit, Math.max(posFromLeft1, posFromLeft2));
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "xLeftLimit=" + this.xLeftLimit + " xRightLimit=" + this.xRightLimit + "yUpperLimit=" + this.yUpperLimit //$NON-NLS-1$//$NON-NLS-2$
+			log.finer(() -> "xLeftLimit=" + this.xLeftLimit + " xRightLimit=" + this.xRightLimit + "yUpperLimit=" + this.yUpperLimit //$NON-NLS-1$//$NON-NLS-2$
 					+ " yLowerLimit=" + this.yLowerLimit);
 		}
 
@@ -183,8 +184,7 @@ public final class CurveSurvey {
 		 * @param points is a list of the display points approximated by the parabola (one point per log timestamp)
 		 */
 		public void drawRegressionParabolaLine(List<Spot<Integer>> points) {
-			if (log.isLoggable(Level.FINER))
-				log.log(Level.FINER, "xPos0=" + points.get(0).x() + " xPosN=" + points.get(points.size() - 1).x() + " yPos0=" + points.get(0).y() + " yPosN=" + points.get(points.size() - 1).y()); //$NON-NLS-1$ //$NON-NLS-2$
+			log.finer(() -> "xPos0=" + points.get(0).x() + " xPosN=" + points.get(points.size() - 1).x() + " yPos0=" + points.get(0).y() + " yPosN=" + points.get(points.size() - 1).y()); //$NON-NLS-1$ //$NON-NLS-2$
 
 			// determine the display points for all x axis pixels within the bounded survey range
 			SingleResponseRegression<Integer> singleResponseRegression = new SingleResponseRegression<>(points, RegressionType.QUADRATIC);
@@ -196,8 +196,7 @@ public final class CurveSurvey {
 				int yPosStart = (int) (singleResponseRegression.getResponse(xPosStart) + .5);
 				int yPosEnd = (int) (singleResponseRegression.getResponse(xPosEnd) + .5);
 				drawConnectingLine(xPosStart, yPosStart, xPosEnd, yPosEnd, LineMark.PARABOLA_LINE);
-			}
-			else {
+			} else {
 				pointArray = new int[(xPosEnd - xPosStart) * 2];
 				for (int i = 0; i < xPosEnd - xPosStart; i++) {
 					pointArray[i * 2] = this.offSetX + xPosStart + i;
@@ -230,7 +229,7 @@ public final class CurveSurvey {
 				this.yLowerLimit = Math.min(this.height, yLowerLimitTmp + 3);
 				this.yUpperLimit = Math.max(0, yUpperLimitTmp - 3);
 			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yUpperLimit=" + this.yUpperLimit + " yLowerLimit=" + this.yLowerLimit); //$NON-NLS-1$ //$NON-NLS-2$
+			log.finer(() -> "yUpperLimit=" + this.yUpperLimit + " yLowerLimit=" + this.yLowerLimit); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		public void drawCross(int posFromLeft1, int posFromTop1) {
@@ -251,7 +250,7 @@ public final class CurveSurvey {
 			this.yUpperLimit = Math.min(this.yUpperLimit, Math.min(posFromTop1, posFromTop2));
 			this.xLeftLimit = Math.min(this.xLeftLimit, Math.min(posFromLeft1, posFromLeft2));
 			this.xRightLimit = Math.max(this.xRightLimit, Math.max(posFromLeft1, posFromLeft2));
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "xLeftLimit=" + this.xLeftLimit + " xRightLimit=" + this.xRightLimit + "yUpperLimit=" + this.yUpperLimit //$NON-NLS-1$//$NON-NLS-2$
+			log.finer(() -> "xLeftLimit=" + this.xLeftLimit + " xRightLimit=" + this.xRightLimit + "yUpperLimit=" + this.yUpperLimit //$NON-NLS-1$//$NON-NLS-2$
 					+ " yLowerLimit=" + this.yLowerLimit);
 		}
 
@@ -281,12 +280,13 @@ public final class CurveSurvey {
 				drawHorizontalLine(yPosUpperWhisker, xPos - halfBoxWidth / 2, halfBoxWidth, LineMark.BOXPLOT);
 				drawVerticalLine(xPos, yPosUpperWhisker, yPosQuartile3 - yPosUpperWhisker, LineMark.BOXPLOT);
 
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("xPos=%d  LW=%d Q1=%d Q2=%d Q3=%d UW=%d ", xPos, yPosLowerWhisker, yPosQuartile1, //$NON-NLS-1$
+				log.finer(() -> String.format("xPos=%d  LW=%d Q1=%d Q2=%d Q3=%d UW=%d ", xPos, yPosLowerWhisker, yPosQuartile1, //$NON-NLS-1$
 						yPosBoxplot[UniversalQuantile.BoxplotItems.QUARTILE2.ordinal()], yPosQuartile3, yPosUpperWhisker));
 			}
 			{
 				int yPosBottom = yPosBoxplot[UniversalQuantile.BoxplotItems.QUARTILE0.ordinal()];
-				if (yPosBottom != yPosBoxplot[UniversalQuantile.BoxplotItems.LOWER_WHISKER.ordinal()]) drawOutlier(xPos, yPosBottom, radius, LineMark.BOXPLOT);
+				if (yPosBottom != yPosBoxplot[UniversalQuantile.BoxplotItems.LOWER_WHISKER.ordinal()])
+					drawOutlier(xPos, yPosBottom, radius, LineMark.BOXPLOT);
 				int yPosTop = yPosBoxplot[UniversalQuantile.BoxplotItems.QUARTILE4.ordinal()];
 				if (yPosTop != yPosBoxplot[UniversalQuantile.BoxplotItems.UPPER_WHISKER.ordinal()]) drawOutlier(xPos, yPosTop, radius, LineMark.BOXPLOT);
 
@@ -294,7 +294,7 @@ public final class CurveSurvey {
 				this.yLowerLimit = Math.max(this.yLowerLimit, yPosBottom + radius);
 				this.yUpperLimit = Math.min(this.yUpperLimit, yPosTop - radius);
 			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "xLeftLimit=" + this.xLeftLimit + " xRightLimit=" + this.xRightLimit + " yUpperLimit=" + this.yUpperLimit //$NON-NLS-1$//$NON-NLS-2$
+			log.finer(() -> "xLeftLimit=" + this.xLeftLimit + " xRightLimit=" + this.xRightLimit + " yUpperLimit=" + this.yUpperLimit //$NON-NLS-1$//$NON-NLS-2$
 					+ " yLowerLimit=" + this.yLowerLimit);
 		}
 
@@ -309,17 +309,15 @@ public final class CurveSurvey {
 		}
 
 		/**
-				 * erase a vertical line by re-drawing the curve area image
-				 * @param posFromLeft
-				 * @param posFromTop
-				 * @param length
-				 * @param lineWidth
-				 */
+		 * erase a vertical line by re-drawing the curve area image
+		 * @param posFromLeft
+		 * @param posFromTop
+		 * @param length
+		 * @param lineWidth
+		 */
 		public void eraseVerticalLine(Image canvasImage, int posFromLeft, int posFromTop, int length, int lineWidth) {
-			if (log.isLoggable(Level.FINER))
-				log.log(Level.FINER, String.format("imageDisposed=%s posFromLeft=%d posFromTop=%d lineWidth=%d length=%d", canvasImage.isDisposed(), posFromLeft, posFromTop, lineWidth, length)); //$NON-NLS-1$
-			CurveSurvey.this.canvasGC.drawImage(canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth,
-					length);
+			log.finer(() -> String.format("imageDisposed=%s posFromLeft=%d posFromTop=%d lineWidth=%d length=%d", canvasImage.isDisposed(), posFromLeft, posFromTop, lineWidth, length)); //$NON-NLS-1$
+			CurveSurvey.this.canvasGC.drawImage(canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length);
 		}
 
 		/**
@@ -330,11 +328,10 @@ public final class CurveSurvey {
 		 * @param lineWidth
 		 */
 		public void eraseHorizontalLine(Image canvasImage, int posFromTop, int posFromLeft, int length, int lineWidth) {
-			if (log.isLoggable(Level.FINER))
-				log.log(Level.FINER, String.format("imageDisposed=%s posFromLeft=%d posFromTop=%d lineWidth=%d length=%d", canvasImage.isDisposed(), posFromLeft, posFromTop, lineWidth, length)); //$NON-NLS-1$
+			log.finer(() -> String.format("imageDisposed=%s posFromLeft=%d posFromTop=%d lineWidth=%d length=%d", canvasImage.isDisposed(), posFromLeft, posFromTop, lineWidth, length)); //$NON-NLS-1$
 			// do not erase lines beyond the y axis drawing area
-			if (posFromTop >= 0 && posFromTop <= this.height) CurveSurvey.this.canvasGC.drawImage(canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth,
-					posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
+			if (posFromTop >= 0 && posFromTop <= this.height)
+				CurveSurvey.this.canvasGC.drawImage(canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
 		}
 
 		/**
@@ -349,7 +346,7 @@ public final class CurveSurvey {
 					int right = Math.min(this.width, this.xRightLimit + maxLineWidth); // right is never less than 0 due to the lineWidth
 					int top = Math.min(this.height, Math.max(0, this.yUpperLimit - maxLineWidth));
 					int bottom = Math.min(this.height, Math.max(0, this.yLowerLimit + maxLineWidth));
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "left=" + left + " top=" + top + " width=" + (right - left) + " height=" + (bottom - top)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					log.finer(() -> "left=" + left + " top=" + top + " width=" + (right - left) + " height=" + (bottom - top)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
 					CurveSurvey.this.canvasGC.drawImage(canvasImage, left + this.offSetX, top + this.offSetY, right - left, bottom - top, left + this.offSetX, top + this.offSetY, right - left, bottom - top);
 				}
@@ -379,7 +376,7 @@ public final class CurveSurvey {
 			int boxWidth = 15;
 			if (Math.abs(CurveSurvey.this.xPosDelta - CurveSurvey.this.xPosMeasure) > boxWidth) {
 				boxWidth += ((int) Math.log(Math.abs(CurveSurvey.this.xPosDelta - CurveSurvey.this.xPosMeasure))) * 4 - 10;
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("boxwidth=%d ", boxWidth)); //$NON-NLS-1$
+				log.log(FINEST, "boxwidth=", boxWidth); //$NON-NLS-1$
 			}
 			return boxWidth + boxWidth * (Settings.getInstance().getBoxplotScaleOrdinal() - 1) / 2;
 		}
@@ -419,13 +416,14 @@ public final class CurveSurvey {
 		this.linePainter.drawCross(this.xPosMeasure, this.yPosMeasure);
 
 		if (this.yPosMeasure >= Integer.MIN_VALUE) {
-			//			String formattedTimeWithUnit = LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timeLine.getAdjacentTimestamp(this.xPosMeasure));
-			statusMessage = Messages.getString(MessageIds.GDE_MSGT0256,
-					new Object[] { this.trailRecord.getName(), new TrailRecordFormatter(this.trailRecord).getMeasureValue(this.trailRecord.getParentTrail().getIndex(this.timestampMeasure_ms)),
-							this.trailRecord.getUnit(), LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timestampMeasure_ms) });
-		}
-		else {
-			statusMessage = Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { this.trailRecord.getName(), GDE.STRING_STAR, this.trailRecord.getUnit(), GDE.STRING_STAR });
+			// String formattedTimeWithUnit = LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss,
+			// this.timeLine.getAdjacentTimestamp(this.xPosMeasure));
+			statusMessage = Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { this.trailRecord.getName(), new TrailRecordFormatter(
+					this.trailRecord).getMeasureValue(this.trailRecord.getParentTrail().getIndex(this.timestampMeasure_ms)), this.trailRecord.getUnit(),
+					LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timestampMeasure_ms) });
+		} else {
+			statusMessage = Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { this.trailRecord.getName(), GDE.STRING_STAR,
+					this.trailRecord.getUnit(), GDE.STRING_STAR });
 		}
 		return statusMessage;
 	}
@@ -446,28 +444,26 @@ public final class CurveSurvey {
 				String unitText = this.trailRecord.getUnit();
 				String avgText = this.recordSection.getFormattedBoundsAvg();
 				String slopeText = this.recordSection.getFormattedBoundsSlope();
-				statusMessage = Messages.getString(MessageIds.GDE_MSGT0848,
-						new Object[] { this.trailRecord.getName(), unitText, deltaText, LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) })
-						+ Messages.getString(MessageIds.GDE_MSGT0879, new Object[] { unitText, avgText, unitText, slopeText });
-			}
-			else {
+				statusMessage = Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { this.trailRecord.getName(), unitText, deltaText,
+						LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) }) + Messages.getString(MessageIds.GDE_MSGT0879, new Object[] {
+								unitText, avgText, unitText, slopeText });
+			} else {
 				String deltaText = this.recordSection.getFormattedBoundsDelta();
 				String unitText = this.trailRecord.getUnit();
-				statusMessage = Messages.getString(MessageIds.GDE_MSGT0848,
-						new Object[] { this.trailRecord.getName(), unitText, deltaText, LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) });
+				statusMessage = Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { this.trailRecord.getName(), unitText, deltaText,
+						LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) });
 			}
-		}
-		else {
+		} else {
 			if (this.recordSection.isValidBounds() && this.settings.isCurveSurvey()) {
 				drawCurveSurvey();
 				String unitText = this.trailRecord.getUnit();
 				String avgText = this.recordSection.getFormattedBoundsAvg();
 				String slopeText = this.recordSection.getFormattedBoundsSlope();
-				statusMessage = Messages.getString(MessageIds.GDE_MSGT0848,
-						new Object[] { this.trailRecord.getName(), GDE.STRING_STAR, this.trailRecord.getUnit(), LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) })
-						+ Messages.getString(MessageIds.GDE_MSGT0879, new Object[] { unitText, avgText, unitText, slopeText });
-			}
-			else {
+				statusMessage = Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { this.trailRecord.getName(), GDE.STRING_STAR,
+						this.trailRecord.getUnit(),
+						LocalizedDateTime.getFormatedDistance(this.timestampMeasure_ms, this.timestampDelta_ms) }) + Messages.getString(MessageIds.GDE_MSGT0879, new Object[] {
+								unitText, avgText, unitText, slopeText });
+			} else {
 				statusMessage = Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { this.trailRecord.getName(), GDE.STRING_STAR });
 			}
 		}
@@ -488,13 +484,12 @@ public final class CurveSurvey {
 			int yRegressionPosMeasure = mapper.getVerticalDisplayPos(this.recordSection.getBoundedSlopeValue(this.timestampMeasure_ms));
 			int yRegressionPosDelta = mapper.getVerticalDisplayPos(this.recordSection.getBoundedSlopeValue(this.timestampDelta_ms));
 			this.linePainter.drawLinearRegressionLine(this.xPosMeasure, yRegressionPosMeasure, this.xPosDelta, yRegressionPosDelta);
-		}
-		else {
+		} else {
 			List<Spot<Integer>> points = new ArrayList<>();
 			for (Spot<Double> entry : this.recordSection.getBoundedParabolaValues()) {
 				points.add(new Spot<Integer>(this.timeLine.getXPosTimestamp((long) entry.x().doubleValue()), mapper.getVerticalDisplayPos(entry.y())));
 			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "values " + Arrays.toString(points.toArray()));
+			log.finer(() -> "values " + Arrays.toString(points.toArray()));
 			this.linePainter.drawRegressionParabolaLine(points);
 		}
 		{
@@ -515,7 +510,7 @@ public final class CurveSurvey {
 	public void cleanMeasurementPointer(Image canvasImage) {
 		if (this.linePainter != null && this.linePainter.isSizeForErasure(canvasImage)) {
 			if (this.xPosMeasure > 0) {
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "xPosMeasure=" + this.xPosMeasure + " xPosTimestamp=" + this.timeLine.getXPosTimestamp(this.timestampMeasure_ms)); //$NON-NLS-1$ //$NON-NLS-2$
+				log.finer(() -> "xPosMeasure=" + this.xPosMeasure + " xPosTimestamp=" + this.timeLine.getXPosTimestamp(this.timestampMeasure_ms)); //$NON-NLS-1$ //$NON-NLS-2$
 				this.linePainter.eraseVerticalLine(canvasImage, this.xPosMeasure, 0, this.curveAreaBounds.height, LineMark.MEASURE_CROSS.lineWidth);
 				this.linePainter.eraseHorizontalLine(canvasImage, this.yPosMeasure, 0, this.curveAreaBounds.width, LineMark.MEASURE_CROSS.lineWidth);
 			}
@@ -524,8 +519,7 @@ public final class CurveSurvey {
 				this.linePainter.eraseHorizontalLine(canvasImage, this.yPosDelta, 0, this.curveAreaBounds.width, LineMark.DELTA_CROSS.lineWidth);
 				this.linePainter.cleanRectangle(canvasImage);
 			}
-		}
-		else {
+		} else {
 			// not erasing the lines provokes a full redraw if the size has changed sufficiently
 		}
 	}
@@ -544,7 +538,7 @@ public final class CurveSurvey {
 		long timestampMeasureNew_ms = timeStampMeasure_ms;
 		int yPosMeasureNew = mapper.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timeStampMeasure_ms));
 		if (!isNullAcceptable && yPosMeasureNew == Integer.MIN_VALUE) {
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampMeasure_ms=%d search first non-null value from the left", timeStampMeasure_ms)); //$NON-NLS-1$
+			log.fine(() -> String.format("timestampMeasure_ms=%d search first non-null value from the left", timeStampMeasure_ms)); //$NON-NLS-1$
 			int i = -1;
 			while (yPosMeasureNew == Integer.MIN_VALUE) {
 				yPosMeasureNew = mapper.getVerticalDisplayPos(++i);
@@ -555,7 +549,7 @@ public final class CurveSurvey {
 		this.timestampMeasure_ms = timestampMeasureNew_ms;
 		this.xPosMeasure = this.timeLine.getXPosTimestamp(timestampMeasureNew_ms);
 		this.yPosMeasure = yPosMeasureNew;
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", this.timestampMeasure_ms, this.xPosMeasure, this.yPosMeasure)); //$NON-NLS-1$
+		log.fine(() -> String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", this.timestampMeasure_ms, this.xPosMeasure, this.yPosMeasure)); //$NON-NLS-1$
 
 		this.recordSection = new TrailRecordCutter(this.trailRecord, this.timestampMeasure_ms, this.timestampDelta_ms);
 	}
@@ -574,7 +568,7 @@ public final class CurveSurvey {
 		long timestampDeltaNew_ms = timeStampDelta_ms;
 		int yPosDeltaNew = mapper.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timeStampDelta_ms));
 		if (!isNullAcceptable && yPosDeltaNew == Integer.MIN_VALUE) {
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampDelta_ms=%d search first non-null value from the right", timeStampDelta_ms)); //$NON-NLS-1$
+			log.fine(() -> String.format("timestampDelta_ms=%d search first non-null value from the right", timeStampDelta_ms)); //$NON-NLS-1$
 			int i = this.trailRecord.getParentTrail().getTimeStepSize();
 			while (yPosDeltaNew == Integer.MIN_VALUE) {
 				yPosDeltaNew = mapper.getVerticalDisplayPos(--i);
@@ -585,7 +579,7 @@ public final class CurveSurvey {
 		this.timestampDelta_ms = timestampDeltaNew_ms;
 		this.xPosDelta = this.timeLine.getXPosTimestamp(timestampDeltaNew_ms);
 		this.yPosDelta = yPosDeltaNew;
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("timestampDelta_ms=%d xPosDelta=%d yPosDelta=%d", this.timestampDelta_ms, this.xPosDelta, this.yPosDelta)); //$NON-NLS-1$
+		log.fine(() -> String.format("timestampDelta_ms=%d xPosDelta=%d yPosDelta=%d", this.timestampDelta_ms, this.xPosDelta, this.yPosDelta)); //$NON-NLS-1$
 
 		this.recordSection = new TrailRecordCutter(this.trailRecord, this.timestampMeasure_ms, this.timestampDelta_ms);
 	}

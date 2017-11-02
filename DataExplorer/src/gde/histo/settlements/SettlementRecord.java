@@ -18,11 +18,12 @@
 ****************************************************************************************/
 package gde.histo.settlements;
 
+import static java.util.logging.Level.FINE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.RecordSet;
@@ -33,7 +34,7 @@ import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.SettlementType;
 import gde.histo.utils.UniversalQuantile;
-import gde.log.Level;
+import gde.log.Logger;
 
 /**
  * Hold settlement points of a line or curve calculated from measurements.
@@ -84,7 +85,7 @@ public final class SettlementRecord extends Vector<Integer> {
 		this.parent = parent;
 		this.logChannelNumber = logChannelNumber;
 		initializeProperties(this, newSettlement.getProperty());
-		log.log(Level.FINE, "newSettlement  ", this); //$NON-NLS-1$
+		log.log(FINE, "newSettlement  ", this); //$NON-NLS-1$
 	}
 
 	/**
@@ -95,7 +96,7 @@ public final class SettlementRecord extends Vector<Integer> {
 	private void initializeProperties(SettlementRecord recordRef, List<PropertyType> newProperties) {
 		this.properties = this.properties != null ? this.properties : new ArrayList<PropertyType>(); // offset, factor, reduction, ...
 		for (PropertyType property : newProperties) {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%20s - %s = %s", recordRef.name, property.getName(), property.getValue())); //$NON-NLS-1$
+			log.finer(() -> String.format("%20s - %s = %s", recordRef.name, property.getName(), property.getValue())); //$NON-NLS-1$
 			this.properties.add(property.clone());
 		}
 	}
@@ -111,10 +112,10 @@ public final class SettlementRecord extends Vector<Integer> {
 	public synchronized boolean add(Integer e) {
 		double translateValue = translateValue(e / 1000.0);
 		if (translateValue > getBeyondLimit()) {
-			log.log(Level.WARNING, String.format("discard beyond value=%f", translateValue), this); //$NON-NLS-1$
+			log.warning(() -> String.format("discard beyond value=%f", translateValue) + this); //$NON-NLS-1$
 			return false;
 		} else if (translateValue < getBelowLimit()) {
-			log.log(Level.WARNING, String.format("discard below value=%f", translateValue), this); //$NON-NLS-1$
+			log.warning(() -> String.format("discard below value=%f", translateValue) + this); //$NON-NLS-1$
 			return false;
 		} else {
 			return super.add(e);
@@ -179,7 +180,7 @@ public final class SettlementRecord extends Vector<Integer> {
 		double value = 1.0;
 		PropertyType property = this.getProperty(IDevice.FACTOR);
 		if (property != null)
-			value = Double.valueOf(property.getValue()).doubleValue();
+			value = Double.parseDouble(property.getValue());
 		else {
 			// take default
 		}
@@ -198,7 +199,7 @@ public final class SettlementRecord extends Vector<Integer> {
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.OFFSET);
 		if (property != null)
-			value = Double.valueOf(property.getValue()).doubleValue();
+			value = Double.parseDouble(property.getValue());
 		else {
 			// take default
 		}
@@ -217,7 +218,7 @@ public final class SettlementRecord extends Vector<Integer> {
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.REDUCTION);
 		if (property != null)
-			value = Double.valueOf(property.getValue()).doubleValue();
+			value = Double.parseDouble(property.getValue());
 		else {
 			// take default
 		}
@@ -264,7 +265,7 @@ public final class SettlementRecord extends Vector<Integer> {
 	 */
 	private double translateValue(double value) {
 		double newValue = (value - this.getReduction()) * this.getFactor() + this.getOffset();
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "for " + this.name + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.finer(() -> "for " + this.name + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -275,7 +276,7 @@ public final class SettlementRecord extends Vector<Integer> {
 	 */
 	public double reverseTranslateValue(double value) { // todo support settlements based on GPS-longitude or GPS-latitude with a base class common for Record, TrailRecord and Settlement
 		double newValue = (value - this.getOffset()) / this.getFactor() + this.getReduction();
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "for " + this.name + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		log.finer(() -> "for " + this.name + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
 
@@ -302,7 +303,7 @@ public final class SettlementRecord extends Vector<Integer> {
 		double value = Double.MAX_VALUE;
 		PropertyType property = this.getProperty(BEYOND_LIMIT);
 		if (property != null)
-			value = Double.valueOf(property.getValue());
+			value = Double.parseDouble(property.getValue());
 		else {
 			// take default
 		}
@@ -313,7 +314,7 @@ public final class SettlementRecord extends Vector<Integer> {
 		double value = -Double.MAX_VALUE;
 		PropertyType property = this.getProperty(BELOW_LIMIT);
 		if (property != null)
-			value = Double.valueOf(property.getValue());
+			value = Double.parseDouble(property.getValue());
 		else {
 			// take default
 		}

@@ -18,23 +18,26 @@
 ****************************************************************************************/
 package gde.histo.utils;
 
+import static java.util.logging.Level.FINEST;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
-import gde.log.Level;
+import gde.log.Logger;
 
 /**
- *  Immutable regression analysis class for one response variable,
- *  Linear regression <em>y</em> = &alpha; + &beta; <em>x</em>, (where <em>y</em> is the response variable, <em>x</em> is the independent variable,
- *  &alpha; is the <em>y-intercept</em>, and &beta; is the <em>slope</em>).
- *  It includes the coefficient of determination <em>R</em><sup>2</sup> and the standard deviation of the estimates for the slope.<br>
- *  Quadratic regression of the best-fit parabola <em>y = &alpha; + &beta; x + &gamma; x<sup>2</sup></em>.<br>
- * 	@see <a href="http://algs4.cs.princeton.edu/14analysis/LinearRegression.java.html">Basic algorithm</a>
- * 	@see <a href="http://www.stksachs.uni-leipzig.de/tl_files/media/pdf/lehrbuecher/informatik/Regressionsanalyse.pdf">Quadratic regression</a>
- *  @author Robert Sedgewick
- *  @author Kevin Wayne
- *  @author Thomas Eickert
+ * Immutable regression analysis class for one response variable,
+ * Linear regression <em>y</em> = &alpha; + &beta; <em>x</em>, (where <em>y</em> is the response variable, <em>x</em> is the independent
+ * variable,
+ * &alpha; is the <em>y-intercept</em>, and &beta; is the <em>slope</em>).
+ * It includes the coefficient of determination <em>R</em><sup>2</sup> and the standard deviation of the estimates for the slope.<br>
+ * Quadratic regression of the best-fit parabola <em>y = &alpha; + &beta; x + &gamma; x<sup>2</sup></em>.<br>
+ * @see <a href="http://algs4.cs.princeton.edu/14analysis/LinearRegression.java.html">Basic algorithm</a>
+ * @see <a href="http://www.stksachs.uni-leipzig.de/tl_files/media/pdf/lehrbuecher/informatik/Regressionsanalyse.pdf">Quadratic
+ *      regression</a>
+ * @author Robert Sedgewick
+ * @author Kevin Wayne
+ * @author Thomas Eickert
  */
 public final class SingleResponseRegression<T extends Number> {
 	private final static String	$CLASS_NAME	= SingleResponseRegression.class.getName();
@@ -132,15 +135,15 @@ public final class SingleResponseRegression<T extends Number> {
 	}
 
 	/**
-	* @return the <em>y</em>-intercept &alpha; of the best-fit line <em>y = &alpha; + &beta; x</em>
-	*/
+	 * @return the <em>y</em>-intercept &alpha; of the best-fit line <em>y = &alpha; + &beta; x</em>
+	 */
 	public double getIntercept() {
 		return this.ybar - getSlope() * this.xbar;
 	}
 
 	/**
-	* @return the slope &beta; of the best-fit line <em>y</em> = &alpha; + &beta; <em>x</em>
-	*/
+	 * @return the slope &beta; of the best-fit line <em>y</em> = &alpha; + &beta; <em>x</em>
+	 */
 	public double getSlope() {
 		if (this.n < 2)
 			return 0;
@@ -158,13 +161,13 @@ public final class SingleResponseRegression<T extends Number> {
 			return 0;
 		else {
 			return 1. - this.rss / this.yybar;
-			// ET 02.06.2017 changed : the original line was not valid for quadratic regression   -> return this.ssr / this.yybar;
+			// ET 02.06.2017 changed : the original line was not valid for quadratic regression -> return this.ssr / this.yybar;
 		}
 	}
 
 	/**
-	* @return the standard error of the estimate for the intercept
-	*/
+	 * @return the standard error of the estimate for the intercept
+	 */
 	public double getInterceptStdErr() {
 		if (this.ssr == 0.) setErrorSums();
 
@@ -178,8 +181,8 @@ public final class SingleResponseRegression<T extends Number> {
 	}
 
 	/**
-	* @return the standard error of the estimate for the slope
-	*/
+	 * @return the standard error of the estimate for the slope
+	 */
 	public double getSlopeStdErr() {
 		if (this.ssr == 0.) setErrorSums();
 
@@ -192,8 +195,8 @@ public final class SingleResponseRegression<T extends Number> {
 	}
 
 	/**
-	* @return the <em>y</em>-curvature &gamma; of the best-fit parabola <em>y = &alpha; + &beta; x + &gamma; x<sup>2</sup></em>
-	*/
+	 * @return the <em>y</em>-curvature &gamma; of the best-fit parabola <em>y = &alpha; + &beta; x + &gamma; x<sup>2</sup></em>
+	 */
 	public double getGamma() {
 		if (!isQuadratic()) throw new UnsupportedOperationException();
 		if (this.n <= 2)
@@ -205,17 +208,16 @@ public final class SingleResponseRegression<T extends Number> {
 			}
 			double denominator = this.zzbar * this.xxbar - this.zxbar * this.zxbar;
 			if (denominator == 0.) {
-				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, "numerator=" + numerator + "  denominator=" + denominator);
+				log.warning(() -> "numerator=" + numerator + "  denominator=" + denominator);
 				return 0.;
-			}
-			else
+			} else
 				return numerator / denominator;
 		}
 	}
 
 	/**
-	* @return the <em>y</em>-slope &beta; of the best-fit parabola <em>y = &alpha; + &beta; x + &gamma; x<sup>2</sup></em>
-	*/
+	 * @return the <em>y</em>-slope &beta; of the best-fit parabola <em>y = &alpha; + &beta; x + &gamma; x<sup>2</sup></em>
+	 */
 	public double getBeta() {
 		if (!isQuadratic()) throw new UnsupportedOperationException();
 		if (this.n <= 1)
@@ -224,7 +226,7 @@ public final class SingleResponseRegression<T extends Number> {
 			double numerator = this.xybar - getGamma() * this.zxbar;
 			double denominator = this.xxbar;
 			if (denominator == 0.) {
-				if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, "numerator=" + numerator + "  denominator=" + denominator);
+				log.warning(() -> "numerator=" + numerator + "  denominator=" + denominator);
 				return 0.;
 			}
 			return numerator / denominator;
@@ -232,27 +234,27 @@ public final class SingleResponseRegression<T extends Number> {
 	}
 
 	/**
-	* @return the <em>y</em>-intercept &alpha; of the best-fit parabola <em>y = &alpha; + &beta; x + &gamma; x<sup>2</sup></em>
-	*/
+	 * @return the <em>y</em>-intercept &alpha; of the best-fit parabola <em>y = &alpha; + &beta; x + &gamma; x<sup>2</sup></em>
+	 */
 	public double getAlpha() {
 		if (!isQuadratic()) throw new UnsupportedOperationException();
 		return this.ybar - getGamma() * this.zbar - getBeta() * this.xbar;
 	}
 
 	/**
-	* @return the expected response {@code y} for all the input values of the independent variable {@code x}
-	*/
+	 * @return the expected response {@code y} for all the input values of the independent variable {@code x}
+	 */
 	public List<Spot<Double>> getResponse() {
 		List<Spot<Double>> responses = new ArrayList<>();
 		for (int i = 0; i < this.xx.size(); i++) {
 			responses.add(new Spot<Double>(this.xx.get(i), getResponse(this.xx.get(i))));
-			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "xResponse=" + responses.get(i).x() + "  yResponse=" + responses.get(i).y());
+			if (log.isLoggable(FINEST)) log.log(FINEST, "xResponse=" + responses.get(i).x() + "  yResponse=" + responses.get(i).y());
 		}
 		return responses;
 	}
 
 	/**
-	 * @param  xValue the independent variable
+	 * @param xValue the independent variable
 	 * @return the expected response {@code y} given the value of the independent variable {@code x}
 	 */
 	public double getResponse(double xValue) {
@@ -270,15 +272,15 @@ public final class SingleResponseRegression<T extends Number> {
 	}
 
 	/**
-	* @return the delta of the {@code x} bounds values
-	*/
+	 * @return the delta of the {@code x} bounds values
+	 */
 	public double getRegressorDelta() {
 		return this.xx.get(this.xx.size() - 1) - this.xx.get(0);
 	}
 
 	/**
-	* @return the delta of the {@code y} bounds values
-	*/
+	 * @return the delta of the {@code y} bounds values
+	 */
 	public double getDelta() {
 		return this.yy.get(this.yy.size() - 1) - this.yy.get(0);
 	}
@@ -293,15 +295,15 @@ public final class SingleResponseRegression<T extends Number> {
 	}
 
 	/**
-	* @return the average of the y values
-	*/
+	 * @return the average of the y values
+	 */
 	public double getAvg() {
 		return this.ybar;
 	}
 
 	/**
-	* @return the sample standard deviation of the y values
-	*/
+	 * @return the sample standard deviation of the y values
+	 */
 	public double getSigma() {
 		if (this.n < 2)
 			return 0;
@@ -314,15 +316,14 @@ public final class SingleResponseRegression<T extends Number> {
 	}
 
 	/**
-	* @return a string representation of the regression results
-	*/
+	 * @return a string representation of the regression results
+	 */
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder();
 		if (isQuadratic()) {
 			s.append(String.format("%.4f + %.4f n + %.4f n2", getAlpha(), getBeta(), getGamma()));
-		}
-		else {
+		} else {
 			s.append(String.format("%.4f n + %.4f", getSlope(), getIntercept()));
 			s.append("  (R^2 = " + String.format("%.3f", getR2()) + ")");
 		}

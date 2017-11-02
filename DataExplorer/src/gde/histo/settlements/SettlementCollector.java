@@ -19,11 +19,14 @@
 
 package gde.histo.settlements;
 
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.FINEST;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -46,7 +49,7 @@ import gde.histo.transitions.Transition;
 import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
 import gde.histo.utils.UniversalQuantile;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -54,10 +57,10 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert (USER)
  */
 public final class SettlementCollector {
-	private final static String				$CLASS_NAME	= RecordingsCollector.class.getName();
-	private final static Logger				log					= Logger.getLogger($CLASS_NAME);
+	private final static String		$CLASS_NAME	= RecordingsCollector.class.getName();
+	private final static Logger		log					= Logger.getLogger($CLASS_NAME);
 
-	private final static Settings			settings		= Settings.getInstance();
+	private final static Settings	settings		= Settings.getInstance();
 
 	/**
 	 * Take histo transitions which are applicable and fetch trigger time steps and records from the parent.
@@ -69,14 +72,11 @@ public final class SettlementCollector {
 		for (Transition transition : transitions) {
 			if (evaluation.getTransitionFigure() != null) {
 				addFigure(histoSettlement, transition);
-			}
-			else if (evaluation.getTransitionAmount() != null) {
+			} else if (evaluation.getTransitionAmount() != null) {
 				addAmount(histoSettlement, transition);
-			}
-			else if (evaluation.getTransitionCalculus() != null) {
+			} else if (evaluation.getTransitionCalculus() != null) {
 				addCalculus(histoSettlement, transition);
-			}
-			else {
+			} else {
 				throw new UnsupportedOperationException();
 			}
 		}
@@ -89,26 +89,22 @@ public final class SettlementCollector {
 	 */
 	private static void addFigure(SettlementRecord histoSettlement, Transition transition) {
 		TransitionFigureType transitionFigure = histoSettlement.getSettlement().getEvaluation().getTransitionFigure();
-		log.log(Level.FINE, GDE.STRING_GREATER, transitionFigure);
+		log.log(FINE, GDE.STRING_GREATER, transitionFigure);
 		final int reverseTranslatedResult;
 		if (transitionFigure.getFigureType() == FigureTypes.COUNT) {
 			reverseTranslatedResult = transition.getThresholdSize() * 1000; // all internal values are multiplied by 1000
-		}
-		else if (transitionFigure.getFigureType() == FigureTypes.TIME_SUM_SEC) {
+		} else if (transitionFigure.getFigureType() == FigureTypes.TIME_SUM_SEC) {
 			reverseTranslatedResult = (int) (histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) - histoSettlement.getParent().getTime_ms(transition.getThresholdStartIndex()));
-		}
-		else if (transitionFigure.getFigureType() == FigureTypes.TIME_STEP_SEC) {
+		} else if (transitionFigure.getFigureType() == FigureTypes.TIME_STEP_SEC) {
 			reverseTranslatedResult = (int) histoSettlement.getParent().getTime_ms(transition.getThresholdStartIndex());
-		}
-		else {
+		} else {
 			reverseTranslatedResult = 0;
 			throw new UnsupportedOperationException();
 		}
 		// add to settlement record
 		histoSettlement.add(reverseTranslatedResult);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
-				String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  figureType=%s", histoSettlement.getName(), (int) histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) //$NON-NLS-1$
-						, reverseTranslatedResult, transitionFigure.getFigureType()));
+		log.fine(() -> String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  figureType=%s", histoSettlement.getName(), (int) histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) //$NON-NLS-1$
+				, reverseTranslatedResult, transitionFigure.getFigureType()));
 	}
 
 	/**
@@ -119,62 +115,57 @@ public final class SettlementCollector {
 	private static void addAmount(SettlementRecord histoSettlement, Transition transition) {
 		IDevice device = DataExplorer.application.getActiveDevice();
 		TransitionAmountType transitionAmount = histoSettlement.getSettlement().getEvaluation().getTransitionAmount();
-		log.log(Level.FINE, GDE.STRING_GREATER, transitionAmount);
+		log.log(FINE, GDE.STRING_GREATER, transitionAmount);
 		final Record record = histoSettlement.getParent().get(histoSettlement.getParent().getRecordNames()[transitionAmount.getRefOrdinal()]);
-		log.log(Level.FINE, record.getName() + " values   " + record.subList(transition.getReferenceStartIndex(), transition.getThresholdEndIndex() + 1)); //$NON-NLS-1$
+		log.fine(() -> record.getName() + " values   " + record.subList(transition.getReferenceStartIndex(), transition.getThresholdEndIndex() + 1)); //$NON-NLS-1$
 		final int reverseTranslatedResult;
 		if (transitionAmount.getAmountType() == AmountTypes.MIN) {
 			double min = Double.MAX_VALUE;
 			for (int j = transition.getThresholdStartIndex(); j < transition.getThresholdEndIndex() + 1; j++)
-				if (record.elementAt(j) != null)
-					min = Math.min(min, transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.));
+				if (record.elementAt(j) != null) min = Math.min(min, transitionAmount.isUnsigned()
+						? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.));
 			reverseTranslatedResult = (int) (histoSettlement.reverseTranslateValue(min) * 1000.);
-		}
-		else if (transitionAmount.getAmountType() == AmountTypes.MAX) {
+		} else if (transitionAmount.getAmountType() == AmountTypes.MAX) {
 			double max = transitionAmount.isUnsigned() ? 0. : -Double.MAX_VALUE;
 			for (int j = transition.getThresholdStartIndex(); j < transition.getThresholdEndIndex() + 1; j++)
-				if (record.elementAt(j) != null)
-					max = Math.max(max, transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.));
+				if (record.elementAt(j) != null) max = Math.max(max, transitionAmount.isUnsigned()
+						? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.));
 			reverseTranslatedResult = (int) (histoSettlement.reverseTranslateValue(max) * 1000.);
-		}
-		else if (transitionAmount.getAmountType() == AmountTypes.AVG) {
+		} else if (transitionAmount.getAmountType() == AmountTypes.AVG) {
 			double avg = 0., value = 0.;
 			int skipCount = 0;
 			for (int j = transition.getThresholdStartIndex(); j < transition.getThresholdEndIndex() + 1; j++)
 				if (record.elementAt(j) != null) {
-					value = transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.);
+					value = transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.))
+							: device.translateValue(record, record.elementAt(j) / 1000.);
 					double deltaAvg = value - avg;
 					avg += deltaAvg / (j - transition.getThresholdStartIndex() - skipCount + 1);
-				}
-				else
+				} else
 					skipCount++;
 			reverseTranslatedResult = (int) (histoSettlement.reverseTranslateValue(avg) * 1000.);
-		}
-		else if (transitionAmount.getAmountType() == AmountTypes.SIGMA) {
+		} else if (transitionAmount.getAmountType() == AmountTypes.SIGMA) {
 			// https://en.wikipedia.org/wiki/Standard_deviation#Rapid_calculation_methods
 			double avg = 0., q = 0., value = 0.;
 			int skipCount = 0;
 			for (int j = transition.getThresholdStartIndex(); j < transition.getThresholdEndIndex() + 1; j++)
 				if (record.elementAt(j) != null) {
-					value = transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.);
+					value = transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.))
+							: device.translateValue(record, record.elementAt(j) / 1000.);
 					double deltaAvg = value - avg;
 					avg += deltaAvg / (j - transition.getThresholdStartIndex() - skipCount + 1);
 					q += deltaAvg * (value - avg);
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("value=%f  deltaAvg=%f  q=%f", value, deltaAvg, q)); //$NON-NLS-1$
-				}
-				else
+					if (log.isLoggable(FINE)) log.log(FINE, String.format("value=%f  deltaAvg=%f  q=%f", value, deltaAvg, q)); //$NON-NLS-1$
+				} else
 					skipCount++;
 			reverseTranslatedResult = (int) (histoSettlement.reverseTranslateValue(Math.sqrt(q / (transition.getThresholdSize() - skipCount - 1))) * 1000.);
-		}
-		else {
+		} else {
 			reverseTranslatedResult = 0;
 			throw new UnsupportedOperationException();
 		}
 		// add to settlement record
 		histoSettlement.add(reverseTranslatedResult);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
-				String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  amountType=%s", histoSettlement.getName(), (int) histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) //$NON-NLS-1$
-						, reverseTranslatedResult, transitionAmount.getAmountType()));
+		log.fine(() -> String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  amountType=%s", //$NON-NLS-1$
+				histoSettlement.getName(), (int) histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1), reverseTranslatedResult, transitionAmount.getAmountType()));
 	}
 
 	/**
@@ -184,7 +175,7 @@ public final class SettlementCollector {
 	 */
 	private static void addCalculus(SettlementRecord histoSettlement, Transition transition) {
 		TransitionCalculusType calculus = histoSettlement.getSettlement().getEvaluation().getTransitionCalculus();
-		log.log(Level.FINEST, GDE.STRING_GREATER, calculus);
+		log.log(FINEST, GDE.STRING_GREATER, calculus);
 		final ChannelType logChannel = DataExplorer.application.getActiveDevice().getDeviceConfiguration().getChannel(histoSettlement.getLogChannelNumber());
 		final RecordGroup recordGroup = new RecordGroup(histoSettlement, logChannel.getReferenceGroupById(calculus.getReferenceGroupId()));
 		if (recordGroup.hasReasonableData()) {
@@ -192,47 +183,52 @@ public final class SettlementCollector {
 			if (calculus.getCalculusType() == CalculusTypes.DELTA) {
 				final double deltaValue = calculateLevelDelta(recordGroup, calculus.getDeltaBasis(), calculus.getLeveling(), transition);
 				reverseTranslatedResult = (int) (histoSettlement.reverseTranslateValue(calculus.isUnsigned() ? Math.abs(deltaValue) : deltaValue) * 1000.);
-			}
-			else if (calculus.getCalculusType() == CalculusTypes.DELTA_PERMILLE) {
+			} else if (calculus.getCalculusType() == CalculusTypes.DELTA_PERMILLE) {
 				final double deltaValue = calculateLevelDelta(recordGroup, calculus.getDeltaBasis(), calculus.getLeveling(), transition);
-				reverseTranslatedResult = (int) (histoSettlement.reverseTranslateValue(calculus.isUnsigned() ? Math.abs(deltaValue) : deltaValue) * 1000. * 1000.);
-			}
-			else if (calculus.getCalculusType() == CalculusTypes.RELATIVE_DELTA_PERCENT) {
+				reverseTranslatedResult = (int) (histoSettlement.reverseTranslateValue(calculus.isUnsigned() ? Math.abs(deltaValue)
+						: deltaValue) * 1000. * 1000.);
+			} else if (calculus.getCalculusType() == CalculusTypes.RELATIVE_DELTA_PERCENT) {
 				final double relativeDeltaValue = calculateLevelDelta(recordGroup, calculus.getDeltaBasis(), calculus.getLeveling(), transition) / (recordGroup.getRealMax() - recordGroup.getRealMin());
-				reverseTranslatedResult = (int) (calculus.isUnsigned() ? Math.abs(relativeDeltaValue) * 1000. * 100. : relativeDeltaValue * 1000. * 100.); // all internal values are multiplied by 1000
-			}
-			else if (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE) {
+				reverseTranslatedResult = (int) (calculus.isUnsigned() ? Math.abs(relativeDeltaValue) * 1000. * 100. : relativeDeltaValue * 1000. * 100.); // all
+																																																																										// internal
+																																																																										// values
+																																																																										// are
+																																																																										// multiplied
+																																																																										// by
+																																																																										// 1000
+			} else if (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE) {
 				final double denominator = calculateLevelDelta(recordGroup, calculus.getDeltaBasis(), calculus.getLeveling(), transition);
-				final RecordGroup divisorRecordGroup = new RecordGroup(histoSettlement, logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()));
+				final RecordGroup divisorRecordGroup = new RecordGroup(histoSettlement,
+						logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()));
 				if (!divisorRecordGroup.hasReasonableData()) {
 					return;
 				}
 
 				final double divisor = calculateLevelDelta(divisorRecordGroup, calculus.getDeltaBasis(), calculus.getDivisorLeveling(), transition);
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordGroup.getComment() + " denominator " + denominator + " divisor " + divisor); //$NON-NLS-1$
+				log.finer(() -> recordGroup.getComment() + " denominator " + denominator + " divisor " + divisor); //$NON-NLS-1$
 				if (calculus.getCalculusType() == CalculusTypes.RATIO) {
-					reverseTranslatedResult = (int) (calculus.isUnsigned() ? Math.abs(denominator / divisor * 1000.) : denominator / divisor * 1000.); // all internal values are multiplied by 1000
+					reverseTranslatedResult = (int) (calculus.isUnsigned() ? Math.abs(denominator / divisor * 1000.) : denominator / divisor * 1000.);
+					// all internal values are multiplied by 1000
+				} else {
+					reverseTranslatedResult = (int) (calculus.isUnsigned() ? Math.abs(denominator / divisor * 1000. * 1000.)
+							: denominator / divisor * 1000. * 1000.);
+					// all internal values are multiplied by 1000
 				}
-				else {
-					reverseTranslatedResult = (int) (calculus.isUnsigned() ? Math.abs(denominator / divisor * 1000. * 1000.) : denominator / divisor * 1000. * 1000.); // all internal values are multiplied by 1000
-				}
-			}
-			else {
+			} else {
 				reverseTranslatedResult = 0;
 				throw new UnsupportedOperationException();
 			}
 			// add to settlement record --- no recordgroup zero ratios which often occur for discharge logs from UDP60
-			boolean isNeglectableRatioValue = recordGroup.getSize() > 1 && reverseTranslatedResult == 0.0
-					&& (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE);
+			boolean isNeglectableRatioValue = recordGroup.getSize() > 1 && reverseTranslatedResult == 0.0 && (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE);
 			if (!isNeglectableRatioValue) histoSettlement.add(reverseTranslatedResult);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
-					String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", histoSettlement.getName(), (int) histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) //$NON-NLS-1$
-							, reverseTranslatedResult, calculus.getCalculusType()));
+			log.fine(() -> String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", histoSettlement.getName(), (int) histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) //$NON-NLS-1$
+					, reverseTranslatedResult, calculus.getCalculusType()));
 		}
 	}
 
 	/**
-	 * Walk through the measurement record and calculates the difference between the threshold level value and the base level value (reference or recovery).
+	 * Walk through the measurement record and calculates the difference between the threshold level value and the base level value (reference
+	 * or recovery).
 	 * Skip null measurement values.
 	 * @param recordGroup holds the measurement points
 	 * @param leveling rule for determining the level value from the device configuration
@@ -274,8 +270,7 @@ public final class SettlementCollector {
 					}
 				}
 			}
-		}
-		else if (leveling == LevelingTypes.LAST) {
+		} else if (leveling == LevelingTypes.LAST) {
 			for (int j = transition.getReferenceEndIndex(); j >= transition.getReferenceStartIndex(); j--) {
 				Double aggregatedValue = recordGroup.getReal(j);
 				if (aggregatedValue != null) {
@@ -300,8 +295,7 @@ public final class SettlementCollector {
 					}
 				}
 			}
-		}
-		else if (leveling == LevelingTypes.MID) {
+		} else if (leveling == LevelingTypes.MID) {
 			if (transition.getReferenceSize() > 1) {
 				int midIndex = (transition.getReferenceStartIndex() + transition.getReferenceEndIndex()) / 2;
 				for (int i = midIndex, j = midIndex + 1; i <= transition.getReferenceEndIndex() && j >= transition.getReferenceStartIndex(); i++, j--) {
@@ -316,8 +310,7 @@ public final class SettlementCollector {
 						break;
 					}
 				}
-			}
-			else {
+			} else {
 				referenceExtremum = recordGroup.getReal(transition.getReferenceStartIndex());
 			}
 			if (transition.getThresholdSize() > 1) {
@@ -334,8 +327,7 @@ public final class SettlementCollector {
 						break;
 					}
 				}
-			}
-			else {
+			} else {
 				thresholdExtremum = recordGroup.getReal(transition.getThresholdStartIndex());
 			}
 			if (transition.getRecoveryStartIndex() > 0) {
@@ -353,13 +345,11 @@ public final class SettlementCollector {
 							break;
 						}
 					}
-				}
-				else {
+				} else {
 					recoveryExtremum = recordGroup.getReal(transition.getRecoveryStartIndex());
 				}
 			}
-		}
-		else if (leveling == LevelingTypes.AVG) {
+		} else if (leveling == LevelingTypes.AVG) {
 			double value = 0.;
 			int skipCount = 0;
 			for (int j = transition.getReferenceStartIndex(); j < transition.getReferenceEndIndex() + 1; j++) {
@@ -393,8 +383,7 @@ public final class SettlementCollector {
 				}
 				recoveryExtremum = value / (transition.getRecoverySize() - skipCount);
 			}
-		}
-		else if (leveling == LevelingTypes.MINMAX) {
+		} else if (leveling == LevelingTypes.MINMAX) {
 			if (isPositiveDirection) {
 				referenceExtremum = Double.MAX_VALUE;
 				for (int j = transition.getReferenceStartIndex(); j < transition.getReferenceEndIndex() + 1; j++) {
@@ -414,8 +403,7 @@ public final class SettlementCollector {
 						if (aggregatedValue != null && aggregatedValue < recoveryExtremum) recoveryExtremum = aggregatedValue;
 					}
 				}
-			}
-			else {
+			} else {
 				referenceExtremum = -Double.MAX_VALUE;
 				for (int j = transition.getReferenceStartIndex(); j < transition.getReferenceEndIndex() + 1; j++) {
 					Double aggregatedValue = recordGroup.getReal(j);
@@ -435,13 +423,13 @@ public final class SettlementCollector {
 					}
 				}
 			}
-		}
-		else if (leveling == LevelingTypes.SMOOTH_MINMAX) {
+		} else if (leveling == LevelingTypes.SMOOTH_MINMAX) {
 			final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
+			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty()
+					? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
 			final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
-			final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
-					: SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
+			final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty()
+					? Double.parseDouble(channelProperty2.getValue()) : SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
 			final double probabilityCutPoint = !isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance() : settings.getMinmaxQuantileDistance();
 			{
 				List<Double> values = new ArrayList<Double>();
@@ -451,7 +439,7 @@ public final class SettlementCollector {
 				}
 				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
 				referenceExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reference " + Arrays.toString(values.toArray()));
+				log.fine(() -> "reference " + Arrays.toString(values.toArray()));
 			}
 			{
 				List<Double> values = new ArrayList<Double>();
@@ -461,8 +449,9 @@ public final class SettlementCollector {
 					if (aggregatedValue != null) values.add(aggregatedValue);
 				}
 				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
-				thresholdExtremum = tmpQuantile.getQuantile(isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance() : SettlementCollector.settings.getMinmaxQuantileDistance());
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "threshold " + Arrays.toString(values.toArray()));
+				thresholdExtremum = tmpQuantile.getQuantile(isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance()
+						: SettlementCollector.settings.getMinmaxQuantileDistance());
+				log.fine(() -> "threshold " + Arrays.toString(values.toArray()));
 			}
 			{
 				if (transition.getRecoveryStartIndex() > 0) {
@@ -473,11 +462,10 @@ public final class SettlementCollector {
 					}
 					UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
 					recoveryExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recovery " + Arrays.toString(values.toArray()));
+					log.fine(() -> "recovery " + Arrays.toString(values.toArray()));
 				}
 			}
-		}
-		else {
+		} else {
 			throw new UnsupportedOperationException();
 		}
 
@@ -488,14 +476,17 @@ public final class SettlementCollector {
 		else if (deltaBasis == DeltaBasisTypes.BOTH_AVG)
 			deltaValue = thresholdExtremum - (referenceExtremum + recoveryExtremum) / 2.;
 		else if (deltaBasis == DeltaBasisTypes.INNER)
-			deltaValue = isPositiveDirection ? thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum) : thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum);
+			deltaValue = isPositiveDirection ? thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum)
+					: thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum);
 		else if (deltaBasis == DeltaBasisTypes.OUTER)
-			deltaValue = isPositiveDirection ? thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum) : thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum);
+			deltaValue = isPositiveDirection ? thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum)
+					: thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum);
 		else
 			throw new UnsupportedOperationException();
 
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%s %s referenceExtremum=%f  thresholdExtremum=%f  recoveryExtremum=%f  deltaValue=%f  @ isBasedOnRecovery=%s" //$NON-NLS-1$
-				, recordGroup.getComment(), leveling.value(), referenceExtremum, thresholdExtremum, recoveryExtremum, deltaValue, deltaBasis));
+		if (log.isLoggable(FINE))
+			log.log(FINE, String.format("%s %s referenceExtremum=%f  thresholdExtremum=%f  recoveryExtremum=%f  deltaValue=%f  @ isBasedOnRecovery=%s" //$NON-NLS-1$
+					, recordGroup.getComment(), leveling.value(), referenceExtremum, thresholdExtremum, recoveryExtremum, deltaValue, deltaBasis));
 		return deltaValue;
 	}
 
@@ -510,16 +501,17 @@ public final class SettlementCollector {
 			if (transition.isSlope()) {
 				int fromIndex = transition.getReferenceStartIndex();
 				int toIndex = transition.getThresholdEndIndex() + 1;
-				SingleResponseRegression<Double> regression = new SingleResponseRegression<>(recordGroup.getSubPoints(fromIndex, toIndex), RegressionType.LINEAR);
+				SingleResponseRegression<Double> regression = new SingleResponseRegression<>(recordGroup.getSubPoints(fromIndex, toIndex),
+						RegressionType.LINEAR);
 				isPositiveDirection = regression.getSlope() > 0;
-			}
-			else {
+			} else {
 				int fromIndex = transition.getReferenceStartIndex();
 				int toIndex = transition.getRecoveryEndIndex() + 1;
-				SingleResponseRegression<Double> regression = new SingleResponseRegression<>(recordGroup.getSubPoints(fromIndex, toIndex), RegressionType.QUADRATIC);
+				SingleResponseRegression<Double> regression = new SingleResponseRegression<>(recordGroup.getSubPoints(fromIndex, toIndex),
+						RegressionType.QUADRATIC);
 				isPositiveDirection = regression.getGamma() < 0;
 			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "direction: ", isPositiveDirection);
+			if (log.isLoggable(FINER)) log.log(FINER, "direction: ", isPositiveDirection);
 		}
 		return isPositiveDirection;
 	}

@@ -18,12 +18,12 @@
 ****************************************************************************************/
 package gde.histo.transitions;
 
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.Record;
 import gde.device.TransitionClassTypes;
 import gde.device.TransitionType;
+import gde.log.Logger;
 import gde.utils.StringHelper;
 
 /**

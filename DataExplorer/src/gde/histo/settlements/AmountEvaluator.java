@@ -19,7 +19,7 @@
 
 package gde.histo.settlements;
 
-import java.util.logging.Logger;
+import static java.util.logging.Level.FINE;
 
 import gde.GDE;
 import gde.data.Record;
@@ -28,7 +28,7 @@ import gde.device.IDevice;
 import gde.device.TransitionAmountType;
 import gde.histo.recordings.RecordingsCollector;
 import gde.histo.transitions.Transition;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -53,62 +53,57 @@ public final class AmountEvaluator {
 	public void addFromTransition(Transition transition) {
 		IDevice device = DataExplorer.application.getActiveDevice();
 		TransitionAmountType transitionAmount = this.histoSettlement.getSettlement().getEvaluation().getTransitionAmount();
-		log.log(Level.FINE, GDE.STRING_GREATER, transitionAmount);
+		log.log(FINE, GDE.STRING_GREATER, transitionAmount);
 		final Record record = this.histoSettlement.getParent().get(this.histoSettlement.getParent().getRecordNames()[transitionAmount.getRefOrdinal()]);
-		log.log(Level.FINE, record.getName() + " values   " + record.subList(transition.getReferenceStartIndex(), transition.getThresholdEndIndex() + 1)); //$NON-NLS-1$
+		log.fine(() -> record.getName() + " values   " + record.subList(transition.getReferenceStartIndex(), transition.getThresholdEndIndex() + 1)); //$NON-NLS-1$
 		final int reverseTranslatedResult;
 		if (transitionAmount.getAmountType() == AmountTypes.MIN) {
 			double min = Double.MAX_VALUE;
 			for (int j = transition.getThresholdStartIndex(); j < transition.getThresholdEndIndex() + 1; j++)
-				if (record.elementAt(j) != null)
-					min = Math.min(min, transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.));
+				if (record.elementAt(j) != null) min = Math.min(min, transitionAmount.isUnsigned()
+						? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.));
 			reverseTranslatedResult = (int) (this.histoSettlement.reverseTranslateValue(min) * 1000.);
-		}
-		else if (transitionAmount.getAmountType() == AmountTypes.MAX) {
+		} else if (transitionAmount.getAmountType() == AmountTypes.MAX) {
 			double max = transitionAmount.isUnsigned() ? 0. : -Double.MAX_VALUE;
 			for (int j = transition.getThresholdStartIndex(); j < transition.getThresholdEndIndex() + 1; j++)
-				if (record.elementAt(j) != null)
-					max = Math.max(max, transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.));
+				if (record.elementAt(j) != null) max = Math.max(max, transitionAmount.isUnsigned()
+						? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.));
 			reverseTranslatedResult = (int) (this.histoSettlement.reverseTranslateValue(max) * 1000.);
-		}
-		else if (transitionAmount.getAmountType() == AmountTypes.AVG) {
+		} else if (transitionAmount.getAmountType() == AmountTypes.AVG) {
 			double avg = 0., value = 0.;
 			int skipCount = 0;
 			for (int j = transition.getThresholdStartIndex(); j < transition.getThresholdEndIndex() + 1; j++)
 				if (record.elementAt(j) != null) {
-					value = transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.);
+					value = transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.))
+							: device.translateValue(record, record.elementAt(j) / 1000.);
 					double deltaAvg = value - avg;
 					avg += deltaAvg / (j - transition.getThresholdStartIndex() - skipCount + 1);
-				}
-				else
+				} else
 					skipCount++;
 			reverseTranslatedResult = (int) (this.histoSettlement.reverseTranslateValue(avg) * 1000.);
-		}
-		else if (transitionAmount.getAmountType() == AmountTypes.SIGMA) {
+		} else if (transitionAmount.getAmountType() == AmountTypes.SIGMA) {
 			// https://en.wikipedia.org/wiki/Standard_deviation#Rapid_calculation_methods
 			double avg = 0., q = 0., value = 0.;
 			int skipCount = 0;
 			for (int j = transition.getThresholdStartIndex(); j < transition.getThresholdEndIndex() + 1; j++)
 				if (record.elementAt(j) != null) {
-					value = transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.)) : device.translateValue(record, record.elementAt(j) / 1000.);
+					value = transitionAmount.isUnsigned() ? Math.abs(device.translateValue(record, record.elementAt(j) / 1000.))
+							: device.translateValue(record, record.elementAt(j) / 1000.);
 					double deltaAvg = value - avg;
 					avg += deltaAvg / (j - transition.getThresholdStartIndex() - skipCount + 1);
 					q += deltaAvg * (value - avg);
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("value=%f  deltaAvg=%f  q=%f", value, deltaAvg, q)); //$NON-NLS-1$
-				}
-				else
+					if (log.isLoggable(FINE)) log.log(FINE, String.format("value=%f  deltaAvg=%f  q=%f", value, deltaAvg, q)); //$NON-NLS-1$
+				} else
 					skipCount++;
 			reverseTranslatedResult = (int) (this.histoSettlement.reverseTranslateValue(Math.sqrt(q / (transition.getThresholdSize() - skipCount - 1))) * 1000.);
-		}
-		else {
+		} else {
 			reverseTranslatedResult = 0;
 			throw new UnsupportedOperationException();
 		}
 		// add to settlement record
 		this.histoSettlement.add(reverseTranslatedResult);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
-				String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  amountType=%s", this.histoSettlement.getName(), (int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) //$NON-NLS-1$
-						, reverseTranslatedResult, transitionAmount.getAmountType()));
+		if (log.isLoggable(FINE)) log.log(FINE, String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  amountType=%s", //$NON-NLS-1$
+				this.histoSettlement.getName(), (int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1), reverseTranslatedResult, transitionAmount.getAmountType()));
 	}
 
 }

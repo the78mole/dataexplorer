@@ -111,4 +111,9 @@ public class PointType {
         this.name = value;
     }
 
+		@Override
+		public String toString() {
+			return "" + id + " " + name + " " + value;
+		}
+
 }

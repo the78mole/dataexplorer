@@ -23,12 +23,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.graphics.Point;
 
 import gde.histo.utils.HistoTimeLine;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -57,8 +56,7 @@ public final class HistoGraphicsMapper {
 	 * @return the display point x axis value and multiple y axis values; null if the trail record value is null
 	 */
 	public List<PointArray> getSuiteDisplayPoints(HistoTimeLine timeLine, int xDisplayOffset, int yDisplayOffset) {
-		if (xDisplayOffset != this.trailRecord.getParentTrail().getDrawAreaBounds().x
-				|| yDisplayOffset != (this.trailRecord.getParentTrail().getDrawAreaBounds().height + this.trailRecord.getParentTrail().getDrawAreaBounds().y)) {
+		if (xDisplayOffset != this.trailRecord.getParentTrail().getDrawAreaBounds().x || yDisplayOffset != (this.trailRecord.getParentTrail().getDrawAreaBounds().height + this.trailRecord.getParentTrail().getDrawAreaBounds().y)) {
 			throw new UnsupportedOperationException(); // replace parameters with fields access
 		}
 		List<PointArray> suitePoints = new ArrayList<>();
@@ -70,8 +68,7 @@ public final class HistoGraphicsMapper {
 				else
 					suitePoints.add(null);
 			}
-		}
-		else {
+		} else {
 			int firstOrdinal = this.trailRecord.getTrailSelector().getTrailType().getSuiteMasterIndex();
 			for (int i = 0; i < timeLine.getScalePositions().size(); i++) {
 				if (this.trailRecord.getSuiteRecords().getSuiteValue(firstOrdinal, i) != null)
@@ -116,8 +113,7 @@ public final class HistoGraphicsMapper {
 	 * @return point time, value; null if the trail record value is null
 	 */
 	public Point[] getDisplayPoints(HistoTimeLine timeLine, int xDisplayOffset, int yDisplayOffset) {
-		if (xDisplayOffset != this.trailRecord.getParentTrail().getDrawAreaBounds().x
-				|| yDisplayOffset != (this.trailRecord.getParentTrail().getDrawAreaBounds().height + this.trailRecord.getParentTrail().getDrawAreaBounds().y)) {
+		if (xDisplayOffset != this.trailRecord.getParentTrail().getDrawAreaBounds().x || yDisplayOffset != (this.trailRecord.getParentTrail().getDrawAreaBounds().height + this.trailRecord.getParentTrail().getDrawAreaBounds().y)) {
 			throw new UnsupportedOperationException(); // replace parameters with fields access
 		}
 		Point[] points = new Point[this.trailRecord.realSize()];
@@ -131,9 +127,8 @@ public final class HistoGraphicsMapper {
 							yDisplayOffset - (int) ((decimalDegreeValue * 1000. - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue()));
 				}
 			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "yPos = " + Arrays.toString(points)); //$NON-NLS-1$
-		}
-		else {
+			log.finer(() -> "yPos = " + Arrays.toString(points)); //$NON-NLS-1$
+		} else {
 			Integer value = 0;
 			for (int i = 0; i < this.trailRecord.realSize(); i++) {
 				value = this.trailRecord.elementAt(i);
@@ -142,7 +137,7 @@ public final class HistoGraphicsMapper {
 							yDisplayOffset - (int) ((value / 1000.0 - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue()));
 				}
 			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, Arrays.toString(points));
+			log.finer(() -> Arrays.toString(points));
 		}
 		return points;
 	}
@@ -162,26 +157,25 @@ public final class HistoGraphicsMapper {
 				double decimalDegreeValue = value / 1000000 + value % 1000000 / 600000.;
 				verticalDisplayPos = this.trailRecord.getParentTrail().getDrawAreaBounds().height - (int) ((decimalDegreeValue * 1000. - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue());
 			}
-		}
-		else {
+		} else {
 			value = points.elementAt(index);
-			if (value != null) verticalDisplayPos = this.trailRecord.getParentTrail().getDrawAreaBounds().height - (int) ((value / 1000.0 - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue());
+			if (value != null)
+				verticalDisplayPos = this.trailRecord.getParentTrail().getDrawAreaBounds().height - (int) ((value / 1000.0 - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue());
 		}
 		return verticalDisplayPos;
 	}
 
 	public int getVerticalDisplayPos(double translatedValue) {
-		int verticalDisplayPos = Integer.MIN_VALUE;
+		int verticalDisplayPos;
 
 		int point = (int) (DataExplorer.application.getActiveDevice().reverseTranslateValue(this.trailRecord, translatedValue) * 1000.);
 		if (DataExplorer.application.getActiveDevice().isGPSCoordinates(this.trailRecord)) {
 			double decimalDegreeValue = point / 1000000 + point % 1000000 / 600000.;
 			verticalDisplayPos = this.trailRecord.getParentTrail().getDrawAreaBounds().height - (int) ((decimalDegreeValue * 1000. - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue());
-		}
-		else {
+		} else {
 			verticalDisplayPos = this.trailRecord.getParentTrail().getDrawAreaBounds().height - (int) ((point / 1000.0 - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue());
 		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("translatedValue=%f reverseTranslatedPoint=%d yPos=%d", translatedValue, point, verticalDisplayPos)); //$NON-NLS-1$
+		log.finer(() -> String.format("translatedValue=%f reverseTranslatedPoint=%d yPos=%d", translatedValue, point, verticalDisplayPos)); //$NON-NLS-1$
 		return verticalDisplayPos;
 	}
 

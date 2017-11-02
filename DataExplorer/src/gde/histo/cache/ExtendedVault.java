@@ -24,14 +24,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.TrailTypes;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.utils.SecureHash;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
@@ -40,11 +39,15 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public final class ExtendedVault extends HistoVault {
-	private static final String				$CLASS_NAME	= ExtendedVault.class.getName();
-	private static final Logger				log					= Logger.getLogger($CLASS_NAME);
+	private static final String				$CLASS_NAME			= ExtendedVault.class.getName();
+	private static final Logger				log							= Logger.getLogger($CLASS_NAME);
 
-	private static final DataExplorer	application	= DataExplorer.getInstance();
-	private static final Settings			settings		= Settings.getInstance();
+	/**
+	 * For hashing combined keys.
+	 */
+	private static final String				SHA1_DELIMITER	= ",";
+	private static final DataExplorer	application			= DataExplorer.getInstance();
+	private static final Settings			settings				= Settings.getInstance();
 
 	/**
 	 * Criterion for the active device version key cache
@@ -79,8 +82,9 @@ public final class ExtendedVault extends HistoVault {
 	 *         channel number and some settings values
 	 */
 	public static String getVaultsDirectoryName() {
-		String tmpSubDirectoryLongKey = String.format("%s,%s,%d,%d,%f,%f", GDE.VERSION, getActiveDeviceKey(), application.getActiveChannelNumber(), //$NON-NLS-1$
-				settings.getSamplingTimespan_ms(), settings.getMinmaxQuantileDistance(), settings.getAbsoluteTransitionLevel());
+		final String d = SHA1_DELIMITER;
+		String tmpSubDirectoryLongKey = GDE.VERSION + d + getActiveDeviceKey() + d + application.getActiveChannelNumber() //
+				+ d + settings.getSamplingTimespan_ms() + d + settings.getMinmaxQuantileDistance() + d + settings.getAbsoluteTransitionLevel();
 		return SecureHash.sha1(tmpSubDirectoryLongKey);
 
 	}
@@ -102,7 +106,9 @@ public final class ExtendedVault extends HistoVault {
 	 * @return the file name as a unique identifier (sha1)
 	 */
 	public static String getVaultName(Path newLogFileName, long newFileLastModified_ms, long newFileLength, int newLogRecordSetOrdinal) {
-		return SecureHash.sha1(getVaultsDirectoryName() + String.format("%s,%d,%d,%d", newLogFileName.getFileName(), newFileLastModified_ms, newFileLength, newLogRecordSetOrdinal)); //$NON-NLS-1$
+		final String d = SHA1_DELIMITER;
+		return SecureHash.sha1(getVaultsDirectoryName() + d + newLogFileName.getFileName() + d + newFileLastModified_ms //
+				+ d + newFileLength + d + newLogRecordSetOrdinal);
 	}
 
 	/**
@@ -179,11 +185,10 @@ public final class ExtendedVault extends HistoVault {
 		this.vaultName = getVaultName(filePath, fileLastModified_ms, fileLength, logRecordSetOrdinal);
 		this.vaultCreatedMs = System.currentTimeMillis();
 
-		if (log.isLoggable(Level.FINER))
-			log.log(Level.FINER, String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetOrdinal=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s", //$NON-NLS-1$
-					objectDirectory, filePath.getFileName().toString(), logRecordSetBaseName, StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logFileLastModified), //$NON-NLS-1$
-					StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestampMs), logChannelNumber, logObjectKey)); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("vaultDirectory=%s  vaultName=%s", this.vaultDirectory, this.vaultName)); //$NON-NLS-1$
+		log.finer(() -> String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetOrdinal=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s", //$NON-NLS-1$
+				objectDirectory, filePath.getFileName().toString(), logRecordSetBaseName, StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logFileLastModified), //$NON-NLS-1$
+				StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestampMs), logChannelNumber, logObjectKey)); //$NON-NLS-1$
+		log.finer(() -> String.format("vaultDirectory=%s  vaultName=%s", this.vaultDirectory, this.vaultName)); //$NON-NLS-1$
 	}
 
 	/**
@@ -313,8 +318,8 @@ public final class ExtendedVault extends HistoVault {
 		} else
 			throw new UnsupportedOperationException();
 
-		if (log.isLoggable(Level.FINEST))
-			log.log(Level.FINEST, String.format(" %s trail %3d  %s %s", trailRecord.getName(), trailRecord.getTrailSelector().getTrailOrdinal(), getVaultFileName(), getLogFilePath())); //$NON-NLS-1$
+		log.finest(() -> String.format(" %s trail %3d  %s %s", //$NON-NLS-1$
+				trailRecord.getName(), trailRecord.getTrailSelector().getTrailOrdinal(), getVaultFileName(), getLogFilePath()));
 		return point;
 	}
 

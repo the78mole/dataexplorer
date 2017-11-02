@@ -19,6 +19,8 @@
 
 package gde.histo.cache;
 
+import static java.util.logging.Level.SEVERE;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -36,14 +38,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import gde.config.Settings;
 import gde.histo.datasources.DirectoryScanner.SourceDataSet;
 import gde.histo.datasources.HistoSetCollector.ProgressManager;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 
@@ -70,8 +71,8 @@ public final class VaultReaderWriter {
 			histoVaults = dataSet.readVaults(trusses);
 		} catch (Exception e) {
 			histoVaults = new ArrayList<ExtendedVault>();
-			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-			log.log(Level.INFO, String.format("invalid file format: %s  channelNumber=%d  %s", //$NON-NLS-1$
+			log.log(SEVERE, e.getMessage(), e);
+			log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //$NON-NLS-1$
 					application.getActiveDevice().getName(), application.getActiveChannelNumber(), filePath));
 		}
 
@@ -89,7 +90,7 @@ public final class VaultReaderWriter {
 		List<ExtendedVault> vaults = new ArrayList<>();
 
 		Path cacheFilePath = ExtendedVault.getVaultsFolder();
-		if (VaultReaderWriter.settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
+		if (settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
 			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
 				Iterator<Map.Entry<Path, List<VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
 				while (trussJobsIterator.hasNext()) {
@@ -104,17 +105,17 @@ public final class VaultReaderWriter {
 							try {
 								histoVault = VaultProxy.load(new BufferedInputStream(zf.getInputStream(vaultName)));
 							} catch (Exception e) {
-								log.log(Level.SEVERE, e.getMessage(), e);
+								log.log(SEVERE, e.getMessage(), e);
 							}
 
 							if (histoVault != null) vaults.add(histoVault.getExtendedVault());
 							trussesIterator.remove();
 						}
 					}
-					if (map.size() == 0) trussJobsIterator.remove();
+					if (map.isEmpty()) trussJobsIterator.remove();
 				}
 			}
-		} else if (!VaultReaderWriter.settings.isZippedCache() && FileUtils.checkDirectoryExist(cacheFilePath.toString())) {
+		} else if (!settings.isZippedCache() && FileUtils.checkDirectoryExist(cacheFilePath.toString())) {
 			Iterator<Map.Entry<Path, List<VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
 			while (trussJobsIterator.hasNext()) {
 				final List<VaultCollector> map = trussJobsIterator.next().getValue();
@@ -128,14 +129,14 @@ public final class VaultReaderWriter {
 						try (InputStream inputStream = new BufferedInputStream(new FileInputStream(vaultFile))) {
 							histoVault = VaultProxy.load(inputStream);
 						} catch (Exception e) {
-							log.log(Level.SEVERE, e.getMessage(), e);
+							log.log(SEVERE, e.getMessage(), e);
 						}
 
 						if (histoVault != null) vaults.add(histoVault.getExtendedVault());
 						trussesIterator.remove();
 					}
 				}
-				if (map.size() == 0) trussJobsIterator.remove();
+				if (map.isEmpty()) trussJobsIterator.remove();
 			}
 		}
 		return vaults;
@@ -160,7 +161,7 @@ public final class VaultReaderWriter {
 						try (BufferedOutputStream zipOutputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
 							VaultProxy.store(histoVault, zipOutputStream);
 						} catch (Exception e) {
-							log.log(Level.SEVERE, e.getMessage(), e);
+							log.log(SEVERE, e.getMessage(), e);
 						}
 					}
 				}
@@ -172,7 +173,7 @@ public final class VaultReaderWriter {
 				try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
 					VaultProxy.store(histoVault, outputStream);
 				} catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
+					log.log(SEVERE, e.getMessage(), e);
 				}
 			}
 		}

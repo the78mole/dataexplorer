@@ -19,20 +19,22 @@
 ****************************************************************************************/
 package gde.histo.device;
 
+import static java.util.logging.Level.FINER;
+
 import java.util.Arrays;
 import java.util.Random;
-import java.util.logging.Logger;
 
 import gde.config.Settings;
 import gde.device.TransitionClassTypes;
 import gde.device.TransitionType;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
  * Randomized measurements sampling based on a constant sampling timespan which also supports a 100% sampling.<br>
  * Supports oversampling (i.e. sampling timespans with multiple sample sets) in order not to loose extremum values.<br>
- * Remarks: <br>a) The sampling algorithm guarantees all min/max points to be elements of the samples.<br>
+ * Remarks: <br>
+ * a) The sampling algorithm guarantees all min/max points to be elements of the samples.<br>
  * This may result in a small number of additional samples ('oversampling') in sampling timespans with multiple new min/max sets.<br>
  * b) The algorithm may be taught with a selection of sample points to reduce oversampling.<br>
  * Max/min estimations derived form a sufficient number of point sets can be fed into the Sampler object.<br>
@@ -44,12 +46,14 @@ public final class UniversalSampler {
 	private final static String		$CLASS_NAME				= UniversalSampler.class.getName();
 	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
 
-	private final int							samplingTimespan_ms;																	// actual used timespan; one sample in this time span + potential oversampling samples
+	private final int							samplingTimespan_ms;																	// actual used timespan; one sample in this time span +
+																																											// potential oversampling samples
 
 	private int										readingCount			= 0;
 	private int										samplingCount			= 0;
 
-	private final int							pointsLength;																					// supports internal points array with more elements than the external points
+	private final int							pointsLength;																					// supports internal points array with more elements than the
+																																											// external points
 
 	private Candidate							lastCandidate;
 
@@ -100,7 +104,7 @@ public final class UniversalSampler {
 			this.lastCandidate = new Candidate();
 			this.thisCandidate = null;
 		}
-		log.log(Level.FINER, "", this); //$NON-NLS-1$
+		log.log(FINER, "", this); //$NON-NLS-1$
 	}
 
 	/**
@@ -109,7 +113,11 @@ public final class UniversalSampler {
 	 * @param newRecordTimespan_ms log measurement rate
 	 * @return a new instance
 	 */
-	public static UniversalSampler createSampler(int channelNumber, int newPointsLength, int newRecordTimespan_ms) { // reading a binFile with 500K records into a recordset takes 45 to 15 s; reading the file with 5k samples takes 0,60 to 0,35 s which is 1% to 2,5%
+	public static UniversalSampler createSampler(int channelNumber, int newPointsLength, int newRecordTimespan_ms) { // reading a binFile with 500K
+																																																										// records into a recordset takes
+																																																										// 45 to 15 s; reading the file
+																																																										// with 5k samples takes 0,60 to
+																																																										// 0,35 s which is 1% to 2,5%
 		int[] tmpMaxPoints = new int[newPointsLength];
 		int[] tmpMinPoints = new int[newPointsLength];
 		Arrays.fill(tmpMaxPoints, Integer.MIN_VALUE);
@@ -130,15 +138,16 @@ public final class UniversalSampler {
 
 	@Override
 	public String toString() {
-		return String.format("pointsLength=%d  samplingTimespan_ms=%d userSamplingTimespan_ms=%d  readingCount=%d samplingCount=%d oversamplingCount=%d", this.pointsLength, this.samplingTimespan_ms,
-				Settings.getInstance().getSamplingTimespan_ms(), this.readingCount, this.samplingCount, this.oversamplingCount);
+		return String.format("pointsLength=%d  samplingTimespan_ms=%d userSamplingTimespan_ms=%d  readingCount=%d samplingCount=%d oversamplingCount=%d", this.pointsLength, this.samplingTimespan_ms, Settings.getInstance().getSamplingTimespan_ms(), this.readingCount, this.samplingCount, this.oversamplingCount);
 	}
 
 	/**
-	 * Accept or reject a new candidate.<p>
+	 * Accept or reject a new candidate.
+	 * <p>
 	 * In case of random sampling:<br>
 	 * Try to take not more than one sample per sampling timespan.
-	 * Thus a premature sample is only taken if a minmax state has been detected which did not persist in the next measurement points (oversampling case).
+	 * Thus a premature sample is only taken if a minmax state has been detected which did not persist in the next measurement points
+	 * (oversampling case).
 	 * In all cases the sample is made ready for use one cycle later which results in loosing the last sample of the population.
 	 * @param newPoints
 	 * @param newTimeStep_ms
@@ -177,8 +186,8 @@ public final class UniversalSampler {
 			this.samplingCount += increment;
 		}
 		this.oversamplingCount += overSamplingIncrement;
-		if (log.isLoggable(Level.FINER) && overSamplingIncrement > 0)
-			log.log(Level.FINER, String.format("%,12d  ", this.lastCandidate.timeStep_ms) + String.format(String.format("%0" + this.oversamplingCount + "d", 0)));
+		if (overSamplingIncrement > 0)
+			log.finer(() -> String.format("%,12d  ", this.lastCandidate.timeStep_ms) + String.format(String.format("%0" + this.oversamplingCount + "d", 0)));
 	}
 
 	/**

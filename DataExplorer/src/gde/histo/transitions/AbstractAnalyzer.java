@@ -19,12 +19,14 @@
 
 package gde.histo.transitions;
 
+import static java.util.logging.Level.FINEST;
+
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -32,7 +34,7 @@ import gde.data.Record;
 import gde.device.TransitionClassTypes;
 import gde.device.TransitionType;
 import gde.device.TransitionValueTypes;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
@@ -41,15 +43,20 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public class AbstractAnalyzer {
-	final static String				$CLASS_NAME	= AbstractAnalyzer.class.getName();
-	final static Logger				log					= Logger.getLogger($CLASS_NAME);
+	final static String					$CLASS_NAME								= AbstractAnalyzer.class.getName();
+	final static Logger					log												= Logger.getLogger($CLASS_NAME);
 
-	protected SettlementDeque	referenceDeque;
-	protected SettlementDeque	thresholdDeque;
-	protected SettlementDeque	recoveryDeque;
+	/**
+	 * Cache settings value due to frequent access.
+	 */
+	private static final double	MINMAX_QUANTILE_DISTANCE	= Settings.getInstance().getMinmaxQuantileDistance();
 
-	protected TriggerState		previousTriggerState;
-	protected TriggerState		triggerState;
+	protected SettlementDeque		referenceDeque;
+	protected SettlementDeque		thresholdDeque;
+	protected SettlementDeque		recoveryDeque;
+
+	protected TriggerState			previousTriggerState;
+	protected TriggerState			triggerState;
 
 	protected enum TriggerState {
 		/**
@@ -68,7 +75,8 @@ public class AbstractAnalyzer {
 	}
 
 	/**
-	 * Provide the extremum value of the deque for reference purposes and the information if the deque has sufficient elements for the deque time period.
+	 * Provide the extremum value of the deque for reference purposes and the information if the deque has sufficient elements for the deque
+	 * time period.
 	 * Ensure the maximum deque time period by removing elements from the front of the deque.
 	 * Expect elements to be added in chronological order.
 	 * Do not support null measurement values.
@@ -144,7 +152,7 @@ public class AbstractAnalyzer {
 			super.clear();
 			this.timeStampDeque.clear();
 			this.extremeValue = this.isMinimumExtremum ? Double.MAX_VALUE : -Double.MAX_VALUE;
-			//  leave untouched because of initialize()  this.startIndex = -1;
+			// leave untouched because of initialize() this.startIndex = -1;
 			this.sortedValues = null;
 		}
 
@@ -171,8 +179,7 @@ public class AbstractAnalyzer {
 					for (Double value : this) {
 						this.extremeValue = Math.min(this.extremeValue, value.doubleValue());
 					}
-				}
-				else {
+				} else {
 					this.extremeValue = -Double.MAX_VALUE;
 					for (Double value : this) {
 						this.extremeValue = Math.max(this.extremeValue, value.doubleValue());
@@ -318,8 +325,7 @@ public class AbstractAnalyzer {
 				for (int i = 0; i < this.timeStampDeque.size(); i++) {
 					if (getDuration_ms() > this.timePeriod_100ns) {
 						this.pollFirst(); // polls timestampDeque also
-					}
-					else {
+					} else {
 						break;
 					}
 				}
@@ -332,7 +338,7 @@ public class AbstractAnalyzer {
 
 		public List<Double> getSortedValues() {
 			if (this.sortedValues == null) {
-				this.sortedValues = Arrays.asList(this.toArray(new Double[0]));
+				this.sortedValues = new ArrayList<>(this);
 				Collections.sort(this.sortedValues);
 			}
 			return this.sortedValues;
@@ -350,13 +356,11 @@ public class AbstractAnalyzer {
 				if (probabilityCutPoint >= 1. / (realSize + 1) && probabilityCutPoint < (double) realSize / (realSize + 1)) {
 					double position = (realSize + 1) * probabilityCutPoint;
 					return this.getSortedValues().get((int) position - 1) + (position - (int) position) * (this.getSortedValues().get((int) position) - this.getSortedValues().get((int) position - 1));
-				}
-				else if (probabilityCutPoint < 1. / (realSize + 1))
+				} else if (probabilityCutPoint < 1. / (realSize + 1))
 					return this.getSortedValues().get(0);
 				else
 					return this.getSortedValues().get(realSize - 1);
-			}
-			else
+			} else
 				throw new UnsupportedOperationException();
 		}
 
@@ -365,25 +369,24 @@ public class AbstractAnalyzer {
 		 * @return NaN for empty deque or a leveled extremum value for comparisons, i.e. a more stable value than the extremum value
 		 */
 		public double getBenchmarkValue() {
-			if (Settings.getInstance().getMinmaxQuantileDistance() == 0.) {
+			if (MINMAX_QUANTILE_DISTANCE == 0.) {
 				// bypass deque sort
 				return this.extremeValue;
-			}
-			else {
-				return this.isMinimumExtremum ? this.getQuantileValue(Settings.getInstance().getMinmaxQuantileDistance()) : this.getQuantileValue(1. - Settings.getInstance().getMinmaxQuantileDistance());
+			} else {
+				return this.isMinimumExtremum ? this.getQuantileValue(MINMAX_QUANTILE_DISTANCE) : this.getQuantileValue(1. - MINMAX_QUANTILE_DISTANCE);
 			}
 		}
 
 		/**
 		 * please note: requires a sort over the full deque size.
-		 * @return NaN for empty deque or a leveled translated value for security comparisons which shall ensure that the majority of the values did NOT pass a comparison level
+		 * @return NaN for empty deque or a leveled translated value for security comparisons which shall ensure that the majority of the values did
+		 *         NOT pass a comparison level
 		 */
 		public double getSecurityValue() {
 			if (this.isEmpty()) {
 				return Double.NaN;
-			}
-			else {
-				return this.isMinimumExtremum ? this.getQuantileValue(1. - Settings.getInstance().getMinmaxQuantileDistance()) : this.getQuantileValue(Settings.getInstance().getMinmaxQuantileDistance());
+			} else {
+				return this.isMinimumExtremum ? this.getQuantileValue(1. - MINMAX_QUANTILE_DISTANCE) : this.getQuantileValue(MINMAX_QUANTILE_DISTANCE);
 			}
 		}
 
@@ -397,20 +400,19 @@ public class AbstractAnalyzer {
 			for (double translatedValue : this) {
 				averageValue += (translatedValue - averageValue) / ++i;
 			}
-			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("averageValue=%f", averageValue)); //$NON-NLS-1$
+			log.log(FINEST, "averageValue=", averageValue); //$NON-NLS-1$
 			return averageValue;
 		}
 
 		private void setExtremeValue(double removedValue) {
 			if (this.isEmpty()) {
 				this.extremeValue = this.isMinimumExtremum ? Double.MAX_VALUE : -Double.MAX_VALUE;
-			}
-			else if (removedValue == this.extremeValue) {
+			} else if (removedValue == this.extremeValue) {
 				// avoid the calculation of a new extreme value if the neighbor value is identical
 				if (removedValue != this.peekFirst()) {
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("removedValue=%f extremeValue=%f", removedValue, this.extremeValue)); //$NON-NLS-1$
+					log.finest(() -> String.format("removedValue=%f extremeValue=%f", removedValue, this.extremeValue)); //$NON-NLS-1$
 					this.extremeValue = this.isMinimumExtremum ? getQuantileValue(0.) : getQuantileValue(1.);
-					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("extremeValue=%f", this.extremeValue)); //$NON-NLS-1$
+					log.finest(() -> String.format("extremeValue=%f", this.extremeValue)); //$NON-NLS-1$
 				}
 			}
 		}
@@ -464,7 +466,8 @@ public class AbstractAnalyzer {
 	protected class LevelChecker {
 		final private TransitionType	transitionType;
 
-		final private double					absoluteDelta;						// ensures for DELTA_FACTOR transitions a minimum delta between the translated value and the base value derived from the reference period
+		final private double					absoluteDelta;						// ensures for DELTA_FACTOR transitions a minimum delta between the translated value and
+																														// the base value derived from the reference period
 		final private double					translatedThresholdValue;
 		final private double					translatedRecoveryValue;
 		final private boolean					isDeltaFactor;
@@ -486,7 +489,8 @@ public class AbstractAnalyzer {
 			this.absoluteDelta = Settings.getInstance().getAbsoluteTransitionLevel() * (translatedMaxValue - translatedMinValue);
 			this.translatedThresholdValue = transitionType.getThresholdValue();
 			this.translatedRecoveryValue = transitionType.getClassType() != TransitionClassTypes.SLOPE
-					? transitionType.getRecoveryValue().orElseThrow(() -> new UnsupportedOperationException("recovery value. transitionID=" + transitionType.getTransitionId())) : 0; //$NON-NLS-1$
+					? transitionType.getRecoveryValue().orElseThrow(() -> new UnsupportedOperationException(
+							"recovery value. transitionID=" + transitionType.getTransitionId())) : 0; //$NON-NLS-1$
 		}
 
 		/**
@@ -497,22 +501,19 @@ public class AbstractAnalyzer {
 			final boolean isBeyond;
 			if (AbstractAnalyzer.this.referenceDeque.isEmpty()) {
 				isBeyond = false;
-			}
-			else if (this.isDeltaFactor) {
+			} else if (this.isDeltaFactor) {
 				final double baseValue = AbstractAnalyzer.this.referenceDeque.getBenchmarkValue();
 				if (this.transitionType.isGreater())
 					isBeyond = translatedValue > baseValue + this.absoluteDelta && translatedValue > baseValue + this.transitionType.getThresholdValue() * Math.abs(baseValue);
 				else
 					isBeyond = translatedValue < baseValue - this.absoluteDelta && translatedValue < baseValue + this.transitionType.getThresholdValue() * Math.abs(baseValue);
-			}
-			else if (this.isDeltaValue) {
+			} else if (this.isDeltaValue) {
 				final double baseValue = AbstractAnalyzer.this.referenceDeque.getBenchmarkValue();
 				if (this.transitionType.isGreater())
 					isBeyond = translatedValue > baseValue + this.translatedThresholdValue;
 				else
 					isBeyond = translatedValue < baseValue + this.translatedThresholdValue;
-			}
-			else if (this.transitionType.getValueType() == TransitionValueTypes.UPPER_THRESHOLD)
+			} else if (this.transitionType.getValueType() == TransitionValueTypes.UPPER_THRESHOLD)
 				isBeyond = translatedValue > this.translatedThresholdValue;
 			else if (this.transitionType.getValueType() == TransitionValueTypes.LOWER_THRESHOLD)
 				isBeyond = translatedValue < this.translatedThresholdValue;
@@ -531,12 +532,11 @@ public class AbstractAnalyzer {
 				final double baseValue = AbstractAnalyzer.this.referenceDeque.getBenchmarkValue();
 				isBeyond = this.transitionType.isGreater() ? translatedValue < baseValue + this.transitionType.getRecoveryValue().orElse(null) * baseValue
 						: translatedValue > baseValue + this.transitionType.getRecoveryValue().orElse(null) * baseValue;
-			}
-			else if (this.isDeltaValue) {
+			} else if (this.isDeltaValue) {
 				final double baseValue = AbstractAnalyzer.this.referenceDeque.getBenchmarkValue();
-				isBeyond = this.transitionType.isGreater() ? translatedValue < baseValue + this.translatedRecoveryValue : translatedValue > baseValue + this.translatedRecoveryValue;
-			}
-			else {
+				isBeyond = this.transitionType.isGreater() ? translatedValue < baseValue + this.translatedRecoveryValue
+						: translatedValue > baseValue + this.translatedRecoveryValue;
+			} else {
 				isBeyond = this.transitionType.isGreater() ? translatedValue < this.translatedRecoveryValue : translatedValue > this.translatedRecoveryValue;
 			}
 			return isBeyond;
@@ -550,8 +550,10 @@ public class AbstractAnalyzer {
 			sb.append(String.format("%s > %s ", this.previousTriggerState, this.triggerState)); //$NON-NLS-1$
 			sb.append(this.previousTriggerState != null && this.previousTriggerState == TriggerState.WAITING && !this.thresholdDeque.isEmpty()
 					? this.referenceDeque.getFormatedDuration(this.referenceDeque.size() - 1)
-					: this.previousTriggerState == TriggerState.TRIGGERED && !this.thresholdDeque.isEmpty() ? this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1)
-							: this.previousTriggerState == TriggerState.RECOVERING && !this.recoveryDeque.isEmpty() ? this.recoveryDeque.getFormatedDuration(this.recoveryDeque.size() - 1) : "null"); //$NON-NLS-1$
+					: this.previousTriggerState == TriggerState.TRIGGERED && !this.thresholdDeque.isEmpty()
+							? this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1)
+							: this.previousTriggerState == TriggerState.RECOVERING && !this.recoveryDeque.isEmpty()
+									? this.recoveryDeque.getFormatedDuration(this.recoveryDeque.size() - 1) : "null"); //$NON-NLS-1$
 			sb.append(String.format(": referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", this.referenceDeque.size(), this.thresholdDeque.size(), this.recoveryDeque.size())) //$NON-NLS-1$
 					.append(GDE.STRING_NEW_LINE);
 			sb.append(String.format("%38s reference bench=%.1f extreme=", "", this.referenceDeque.getBenchmarkValue()) + this.referenceDeque.getExtremeValue() + this.referenceDeque.getTranslatedValues()); //$NON-NLS-1$ //$NON-NLS-2$

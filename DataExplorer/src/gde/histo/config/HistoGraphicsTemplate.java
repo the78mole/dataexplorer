@@ -18,16 +18,19 @@
 ****************************************************************************************/
 package gde.histo.config;
 
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.log.Level;
+import gde.log.Logger;
 
 /**
  * Histo graphics visualization, store, restore.
@@ -57,7 +60,7 @@ public final class HistoGraphicsTemplate extends Properties {
 		this.defaultFileName = deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
 		this.templateFilePath = this.defaultFileName;
 		this.setHistoFileName(deviceSignature + "H" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4));
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "Histo graphics template file is " + this.templateFilePath); //$NON-NLS-1$
+		log.log(FINE, "Histo graphics template file is ", this.templateFilePath); //$NON-NLS-1$
 	}
 
 	public boolean isAvailable() {
@@ -78,22 +81,19 @@ public final class HistoGraphicsTemplate extends Properties {
 			File file = new File(this.currentFileFilePath);
 			if (file.exists() && !file.isDirectory()) {
 				// histo template is already available
-			}
-			else {
+			} else {
 				file = new File(this.templatePath + GDE.FILE_SEPARATOR_UNIX + this.defaultFileName);
 			}
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "opening template file " + file.getAbsolutePath()); //$NON-NLS-1$
+			log.log(FINE, "opening template file ", file.getAbsolutePath()); //$NON-NLS-1$
 			try (FileInputStream stream = new FileInputStream(file)) {
 				this.loadFromXML(stream);
 			}
 			this.isAvailable = true;
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "template file successful loaded " + this.currentFileFilePath); //$NON-NLS-1$
-		}
-		catch (InvalidPropertiesFormatException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-		}
-		catch (Exception e) {
-			log.log(Level.WARNING, e.getMessage());
+			log.log(FINE, "template file successful loaded ", this.currentFileFilePath); //$NON-NLS-1$
+		} catch (InvalidPropertiesFormatException e) {
+			log.log(SEVERE, e.getMessage(), e);
+		} catch (Exception e) {
+			log.log(WARNING, e.getMessage());
 		}
 	}
 
@@ -106,21 +106,20 @@ public final class HistoGraphicsTemplate extends Properties {
 			File tmpPath = new File(this.templatePath);
 			if (!tmpPath.exists()) {
 				if (!tmpPath.mkdir()) {
-					log.log(Level.WARNING, "failed to create " + tmpPath);
+					log.log(WARNING, "failed to create ", tmpPath);
 				}
 			}
 
-			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + ((this.histoFileName != null && this.histoFileName.equals(GDE.STRING_EMPTY) || this.histoFileName == null) ? this.defaultFileName : this.histoFileName);
+			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + ((this.histoFileName != null && this.histoFileName.equals(GDE.STRING_EMPTY) || this.histoFileName == null)
+					? this.defaultFileName : this.histoFileName);
 			try (FileOutputStream stream = new FileOutputStream(new File(this.currentFileFilePath))) {
 				this.storeToXML(stream, "-- DataExplorer Histo GraphicsTemplate --"); //$NON-NLS-1$
 			}
 			this.isSaved = true;
-		}
-		catch (InvalidPropertiesFormatException e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-		}
-		catch (Exception e) {
-			log.log(Level.WARNING, e.getMessage(), e);
+		} catch (InvalidPropertiesFormatException e) {
+			log.log(SEVERE, e.getMessage(), e);
+		} catch (Exception e) {
+			log.log(WARNING, e.getMessage(), e);
 		}
 	}
 

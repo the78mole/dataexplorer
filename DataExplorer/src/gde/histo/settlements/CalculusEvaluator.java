@@ -19,10 +19,12 @@
 
 package gde.histo.settlements;
 
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.FINEST;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -39,7 +41,7 @@ import gde.histo.transitions.Transition;
 import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
 import gde.histo.utils.UniversalQuantile;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -150,7 +152,8 @@ public final class CalculusEvaluator {
 			double recoveryExtremum = 0.;
 			if (this.transition.getReferenceSize() > 1) {
 				int midIndex = (this.transition.getReferenceStartIndex() + this.transition.getReferenceEndIndex()) / 2;
-				for (int i = midIndex, j = midIndex + 1; i <= this.transition.getReferenceEndIndex() && j >= this.transition.getReferenceStartIndex(); i++, j--) {
+				for (int i = midIndex, j = midIndex + 1; i <= this.transition.getReferenceEndIndex() && j >= this.transition.getReferenceStartIndex();
+						i++, j--) {
 					Double aggregatedValue = this.tmpRecordGroup.getReal(i);
 					if (aggregatedValue != null) {
 						referenceExtremum = aggregatedValue;
@@ -162,8 +165,7 @@ public final class CalculusEvaluator {
 						break;
 					}
 				}
-			}
-			else {
+			} else {
 				referenceExtremum = this.tmpRecordGroup.getReal(this.transition.getReferenceStartIndex());
 			}
 			if (this.transition.getThresholdSize() > 1) {
@@ -180,8 +182,7 @@ public final class CalculusEvaluator {
 						break;
 					}
 				}
-			}
-			else {
+			} else {
 				thresholdExtremum = this.tmpRecordGroup.getReal(this.transition.getThresholdStartIndex());
 			}
 			if (this.transition.getRecoveryStartIndex() > 0) {
@@ -199,8 +200,7 @@ public final class CalculusEvaluator {
 							break;
 						}
 					}
-				}
-				else {
+				} else {
 					recoveryExtremum = this.tmpRecordGroup.getReal(this.transition.getRecoveryStartIndex());
 				}
 			}
@@ -285,8 +285,7 @@ public final class CalculusEvaluator {
 						if (aggregatedValue != null && aggregatedValue < recoveryExtremum) recoveryExtremum = aggregatedValue;
 					}
 				}
-			}
-			else {
+			} else {
 				referenceExtremum = -Double.MAX_VALUE;
 				for (int j = this.transition.getReferenceStartIndex(); j < this.transition.getReferenceEndIndex() + 1; j++) {
 					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
@@ -325,10 +324,11 @@ public final class CalculusEvaluator {
 			final IDevice device = DataExplorer.application.getActiveDevice();
 			final Settings settings = Settings.getInstance();
 			final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty() ? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
+			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty()
+					? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
 			final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
-			final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty() ? Double.parseDouble(channelProperty2.getValue())
-					: SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
+			final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty()
+					? Double.parseDouble(channelProperty2.getValue()) : SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
 			final double probabilityCutPoint = !isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance() : settings.getMinmaxQuantileDistance();
 			{
 				List<Double> values = new ArrayList<Double>();
@@ -338,7 +338,7 @@ public final class CalculusEvaluator {
 				}
 				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
 				referenceExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "reference " + Arrays.toString(values.toArray()));
+				log.fine(() -> "reference " + Arrays.toString(values.toArray()));
 			}
 			{
 				List<Double> values = new ArrayList<Double>();
@@ -348,8 +348,9 @@ public final class CalculusEvaluator {
 					if (aggregatedValue != null) values.add(aggregatedValue);
 				}
 				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
-				thresholdExtremum = tmpQuantile.getQuantile(isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance() : settings.getMinmaxQuantileDistance());
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "threshold " + Arrays.toString(values.toArray()));
+				thresholdExtremum = tmpQuantile.getQuantile(isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance()
+						: settings.getMinmaxQuantileDistance());
+				log.fine(() -> "threshold " + Arrays.toString(values.toArray()));
 			}
 			{
 				if (this.transition.getRecoveryStartIndex() > 0) {
@@ -360,7 +361,7 @@ public final class CalculusEvaluator {
 					}
 					UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
 					recoveryExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recovery " + Arrays.toString(values.toArray()));
+					log.fine(() -> "recovery " + Arrays.toString(values.toArray()));
 				}
 			}
 			deltaValue = calcDeltaValue(isPositiveDirection, referenceExtremum, thresholdExtremum, recoveryExtremum);
@@ -375,7 +376,7 @@ public final class CalculusEvaluator {
 		 * @return the delta value of the reference / recovery phase and the threshold phase
 		 */
 		private double calcDeltaValue(boolean isPositiveDirection, double referenceExtremum, double thresholdExtremum, double recoveryExtremum) {
-			double deltaValue = 0.;
+			final double deltaValue;
 
 			if (this.transition.isSlope() || this.deltaBasis == null || this.deltaBasis == DeltaBasisTypes.REFERENCE)
 				deltaValue = thresholdExtremum - referenceExtremum;
@@ -384,13 +385,15 @@ public final class CalculusEvaluator {
 			else if (this.deltaBasis == DeltaBasisTypes.BOTH_AVG)
 				deltaValue = thresholdExtremum - (referenceExtremum + recoveryExtremum) / 2.;
 			else if (this.deltaBasis == DeltaBasisTypes.INNER)
-				deltaValue = isPositiveDirection ? thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum) : thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum);
+				deltaValue = isPositiveDirection ? thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum)
+						: thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum);
 			else if (this.deltaBasis == DeltaBasisTypes.OUTER)
-				deltaValue = isPositiveDirection ? thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum) : thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum);
+				deltaValue = isPositiveDirection ? thresholdExtremum - Math.min(referenceExtremum, recoveryExtremum)
+						: thresholdExtremum - Math.max(referenceExtremum, recoveryExtremum);
 			else
 				throw new UnsupportedOperationException();
 
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("referenceExtremum=%f  thresholdExtremum=%f  recoveryExtremum=%f  deltaValue=%f  @ isBasedOnRecovery=%s" //$NON-NLS-1$
+			log.fine(() -> String.format("referenceExtremum=%f  thresholdExtremum=%f  recoveryExtremum=%f  deltaValue=%f  @ isBasedOnRecovery=%s" //$NON-NLS-1$
 					, referenceExtremum, thresholdExtremum, recoveryExtremum, deltaValue, this.deltaBasis));
 			return deltaValue;
 		}
@@ -406,16 +409,17 @@ public final class CalculusEvaluator {
 				if (this.transition.isSlope()) {
 					int fromIndex = this.transition.getReferenceStartIndex();
 					int toIndex = this.transition.getThresholdEndIndex() + 1;
-					SingleResponseRegression<Double> regression = new SingleResponseRegression<>(this.tmpRecordGroup.getSubPoints(fromIndex, toIndex), RegressionType.LINEAR);
+					SingleResponseRegression<Double> regression = new SingleResponseRegression<>(this.tmpRecordGroup.getSubPoints(fromIndex, toIndex),
+							RegressionType.LINEAR);
 					isPositiveDirection = regression.getSlope() > 0;
-				}
-				else {
+				} else {
 					int fromIndex = this.transition.getReferenceStartIndex();
 					int toIndex = this.transition.getRecoveryEndIndex() + 1;
-					SingleResponseRegression<Double> regression = new SingleResponseRegression<>(this.tmpRecordGroup.getSubPoints(fromIndex, toIndex), RegressionType.QUADRATIC);
+					SingleResponseRegression<Double> regression = new SingleResponseRegression<>(this.tmpRecordGroup.getSubPoints(fromIndex, toIndex),
+							RegressionType.QUADRATIC);
 					isPositiveDirection = regression.getGamma() < 0;
 				}
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "direction: ", isPositiveDirection);
+				log.log(FINER, "direction: ", isPositiveDirection);
 			}
 			return isPositiveDirection;
 		}
@@ -432,7 +436,7 @@ public final class CalculusEvaluator {
 		this.calculus = newHistoSettlement.getSettlement().getEvaluation().getTransitionCalculus();
 		this.logChannel = DataExplorer.application.getActiveDevice().getDeviceConfiguration().getChannel(newHistoSettlement.getLogChannelNumber());
 		this.recordGroup = new RecordGroup(newHistoSettlement, this.logChannel.getReferenceGroupById(this.calculus.getReferenceGroupId()));
-		log.log(Level.FINEST, GDE.STRING_GREATER, this.calculus);
+		log.log(FINEST, GDE.STRING_GREATER, this.calculus);
 	}
 
 	/**
@@ -446,47 +450,47 @@ public final class CalculusEvaluator {
 			final CalculusTypes calculusType = this.calculus.getCalculusType();
 			if (calculusType == CalculusTypes.DELTA) {
 				double deltaValue = calculateLevelDelta(this.recordGroup, this.calculus.getLeveling(), transition);
-				reverseTranslatedResult = (int) (this.histoSettlement.reverseTranslateValue(this.calculus.isUnsigned() ? Math.abs(deltaValue) : deltaValue) * 1000.);
-			}
-			else if (calculusType == CalculusTypes.DELTA_PERMILLE) {
+				reverseTranslatedResult = (int) (this.histoSettlement.reverseTranslateValue(this.calculus.isUnsigned() ? Math.abs(deltaValue)
+						: deltaValue) * 1000.);
+			} else if (calculusType == CalculusTypes.DELTA_PERMILLE) {
 				double deltaValue = calculateLevelDelta(this.recordGroup, this.calculus.getLeveling(), transition);
-				reverseTranslatedResult = (int) (this.histoSettlement.reverseTranslateValue(this.calculus.isUnsigned() ? Math.abs(deltaValue) : deltaValue) * 1000. * 1000.);
-			}
-			else if (calculusType == CalculusTypes.RELATIVE_DELTA_PERCENT) {
+				reverseTranslatedResult = (int) (this.histoSettlement.reverseTranslateValue(this.calculus.isUnsigned() ? Math.abs(deltaValue)
+						: deltaValue) * 1000. * 1000.);
+			} else if (calculusType == CalculusTypes.RELATIVE_DELTA_PERCENT) {
 				double relativeDeltaValue = calculateLevelDelta(this.recordGroup, this.calculus.getLeveling(), transition) / (this.recordGroup.getRealMax() - this.recordGroup.getRealMin());
-				reverseTranslatedResult = (int) (this.calculus.isUnsigned() ? Math.abs(relativeDeltaValue) * 1000. * 100. : relativeDeltaValue * 1000. * 100.); // all internal values are multiplied by 1000
-			}
-			else if (calculusType == CalculusTypes.RATIO || calculusType == CalculusTypes.RATIO_PERMILLE) {
+				reverseTranslatedResult = (int) (this.calculus.isUnsigned() ? Math.abs(relativeDeltaValue) * 1000. * 100.
+						: relativeDeltaValue * 1000. * 100.); // all internal values are multiplied by 1000
+			} else if (calculusType == CalculusTypes.RATIO || calculusType == CalculusTypes.RATIO_PERMILLE) {
 				double denominator = calculateLevelDelta(this.recordGroup, this.calculus.getLeveling(), transition);
-				RecordGroup divisorRecordGroup = new RecordGroup(this.histoSettlement, this.logChannel.getReferenceGroupById(this.calculus.getReferenceGroupIdDivisor()));
+				RecordGroup divisorRecordGroup = new RecordGroup(this.histoSettlement,
+						this.logChannel.getReferenceGroupById(this.calculus.getReferenceGroupIdDivisor()));
 				if (!divisorRecordGroup.hasReasonableData()) {
 					return;
 				}
 
 				double divisor = calculateLevelDelta(divisorRecordGroup, this.calculus.getDivisorLeveling(), transition);
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.recordGroup.getComment() + " denominator " + denominator + " divisor " + divisor); //$NON-NLS-1$
+				log.finer(() -> this.recordGroup.getComment() + " denominator " + denominator + " divisor " + divisor); //$NON-NLS-1$
 				if (calculusType == CalculusTypes.RATIO) {
-					reverseTranslatedResult = (int) (this.calculus.isUnsigned() ? Math.abs(denominator / divisor * 1000.) : denominator / divisor * 1000.); // all internal values are multiplied by 1000
+					reverseTranslatedResult = (int) (this.calculus.isUnsigned() ? Math.abs(denominator / divisor * 1000.) : denominator / divisor * 1000.);
+					// all internal values are multiplied by 1000
+				} else {
+					reverseTranslatedResult = (int) (this.calculus.isUnsigned() ? Math.abs(denominator / divisor * 1000. * 1000.)
+							: denominator / divisor * 1000. * 1000.); // all internal values are multiplied by 1000
 				}
-				else {
-					reverseTranslatedResult = (int) (this.calculus.isUnsigned() ? Math.abs(denominator / divisor * 1000. * 1000.) : denominator / divisor * 1000. * 1000.); // all internal values are multiplied by 1000
-				}
-			}
-			else {
+			} else {
 				reverseTranslatedResult = 0;
 				throw new UnsupportedOperationException();
 			}
 
 			this.histoSettlement.add(reverseTranslatedResult);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
-					String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", this.histoSettlement.getName(), //$NON-NLS-1$
-							(int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1)
-							, reverseTranslatedResult, calculusType));
+			log.fine(() -> String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", this.histoSettlement.getName(), //$NON-NLS-1$
+					(int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1), reverseTranslatedResult, calculusType));
 		}
 	}
 
 	/**
-	 * Walk through the measurement record and calculates the difference between the threshold level value and the base level value (reference or recovery).
+	 * Walk through the measurement record and calculates the difference between the threshold level value and the base level value (reference
+	 * or recovery).
 	 * Skip null measurement values.
 	 * @param recordGroup holds the measurement points
 	 * @param leveling rule for determining the level value from the device configuration
@@ -500,23 +504,17 @@ public final class CalculusEvaluator {
 
 		if (leveling == LevelingTypes.FIRST) {
 			deltaValue = deltaLevelCalculator.calcFirst();
-		}
-		else if (leveling == LevelingTypes.LAST) {
+		} else if (leveling == LevelingTypes.LAST) {
 			deltaValue = deltaLevelCalculator.calcLast();
-		}
-		else if (leveling == LevelingTypes.MID) {
+		} else if (leveling == LevelingTypes.MID) {
 			deltaValue = deltaLevelCalculator.calcMid();
-		}
-		else if (leveling == LevelingTypes.AVG) {
+		} else if (leveling == LevelingTypes.AVG) {
 			deltaValue = deltaLevelCalculator.calcAvg();
-		}
-		else if (leveling == LevelingTypes.MINMAX) {
+		} else if (leveling == LevelingTypes.MINMAX) {
 			deltaValue = deltaLevelCalculator.calcMinMax();
-		}
-		else if (leveling == LevelingTypes.SMOOTH_MINMAX) {
+		} else if (leveling == LevelingTypes.SMOOTH_MINMAX) {
 			deltaValue = deltaLevelCalculator.calcSmoothMinMax();
-		}
-		else {
+		} else {
 			throw new UnsupportedOperationException();
 		}
 

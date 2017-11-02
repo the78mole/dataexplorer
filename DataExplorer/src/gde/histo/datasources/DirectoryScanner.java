@@ -19,6 +19,9 @@
 
 package gde.histo.datasources;
 
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.INFO;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,7 +37,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -51,7 +53,7 @@ import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.device.IHistoDevice;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.io.HistoOsdReaderWriter;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
@@ -77,7 +79,7 @@ public final class DirectoryScanner {
 
 	private final Map<DirectoryType, Path>	validatedDirectories			= new LinkedHashMap<>();
 	private final LongAdder									nonWorkableCount					= new LongAdder();
-	private final List<Path>								ignoredFiles							= new ArrayList<>();
+	private final List<Path>								excludedFiles							= new ArrayList<>();
 
 	/**
 	 * Data sources supported by the history including osd link files.
@@ -326,12 +328,9 @@ public final class DirectoryScanner {
 		}
 
 		/**
-		 * @return the file name extension or an empty string
-		 */
-		/**
 		 * Adds support for link files pointing to data files.
 		 * Deletes a link file if the data file does not exist.
-		 * @return the data file (differs from {@code file} if {@code file} is a link file)
+		 * @return the data file (differs from {@code file} in case of a link file)
 		 */
 		private File getActualFile() throws IOException {
 			long startMillis = System.currentTimeMillis();
@@ -339,11 +338,11 @@ public final class DirectoryScanner {
 			// getLinkContainedFilePath may have long response times in case of an unavailable network resources
 			// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
 			if (getFile().equals(actualFile) && (System.currentTimeMillis() - startMillis > 555) || !getFile().exists()) {
-				log.log(Level.WARNING, "Dead OSD link " + getFile() + " pointing to " + actualFile); //$NON-NLS-1$ //$NON-NLS-2$
+				log.warning(() -> String.format("Dead OSD link %s pointing to %s", getFile(), actualFile)); //$NON-NLS-1$
 				if (!getFile().delete()) {
-					log.log(Level.WARNING, "could not delete link file ", getFile()); //$NON-NLS-1$
+					log.warning(() -> String.format("could not delete link file ", getFile())); //$NON-NLS-1$
 				}
-				actualFile = null;
+				return null;
 			}
 			return actualFile;
 		}
@@ -445,7 +444,7 @@ public final class DirectoryScanner {
 		isChange = isChange || (lastHistoImportDir != null ? !lastHistoImportDir.equals(this.validatedDirectories.get(DirectoryType.IMPORT))
 				: this.validatedDirectories.containsKey(DirectoryType.IMPORT));
 		isChange = isChange || !lastImportExtentions.containsAll(this.validatedImportExtentions) || !this.validatedImportExtentions.containsAll(lastImportExtentions);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("isChange %s", isChange)); //$NON-NLS-1$
+		log.log(FINE, "isChange=", isChange); //$NON-NLS-1$
 
 		return !isChange;
 	}
@@ -461,14 +460,14 @@ public final class DirectoryScanner {
 
 		List<SourceDataSet> result = new ArrayList<>();
 		nonWorkableCount.reset();
-		ignoredFiles.clear();
+		excludedFiles.clear();
 
 		for (Entry<DirectoryType, Path> entry : this.validatedDirectories.entrySet()) {
 			Path dir = entry.getValue();
 			if (FileUtils.checkDirectoryExist(dir.toString())) {
 				result.addAll(getFileListing(dir.toFile(), this.settings.getSubDirectoryLevelMax(), entry.getKey().getDataSetExtensions()));
 			} else {
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("histoDir not found in %s", dir)); //$NON-NLS-1$
+				log.log(FINE, "histoDir not found in ", dir); //$NON-NLS-1$
 			}
 		}
 		return result;
@@ -493,12 +492,12 @@ public final class DirectoryScanner {
 								SourceDataSet originFile = new SourceDataSet(file);
 								result.add(originFile);
 							} else {
-								ignoredFiles.add(file.toPath());
-								log.log(Level.INFO, String.format("file is ignored                %s", file.getPath()));
+								excludedFiles.add(file.toPath());
+								log.log(INFO, "file is excluded               ", file);
 							}
 						} else {
 							nonWorkableCount.increment();
-							log.log(Level.INFO, String.format("file is not valid              %s", file.getPath()));
+							log.log(INFO, "file is not workable           ", file);
 						}
 					} else if (recursionDepth > 0) { // recursive walk by calling itself
 						List<SourceDataSet> deeperList = getFileListing(file, recursionDepth - 1, extensions);
@@ -524,7 +523,7 @@ public final class DirectoryScanner {
 	/**
 	 * @return the files which have been discarded during the last read operation based on the exclusion lists
 	 */
-	public List<Path> getIgnoredFiles() {
-		return ignoredFiles;
+	public List<Path> getExcludedFiles() {
+		return excludedFiles;
 	}
 }

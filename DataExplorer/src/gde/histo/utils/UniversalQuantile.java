@@ -23,9 +23,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.DoubleConsumer;
-import java.util.logging.Logger;
 
-import gde.log.Level;
+import gde.log.Logger;
+
 
 /**
  * Immutable quantile calculation of a probability distribution after removing outliers.
@@ -49,10 +49,22 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	 */
 	public static final double	BOXPLOT_OUTLIER_FACTOR	= 1.5;
 
-	private final boolean				isSample;																										// required for probability calculations from the population
-	private final List<T>				trunk;																											// remaining population after removing the elimination members
-	private final List<T>				outcasts;																										// values to be eliminated from the population
-	private final List<T>				castaways								= new ArrayList<>();								// outlier and outcast members not contained in the trunk
+	/**
+	 * required for probability calculations from the population
+	 */
+	private final boolean				isSample;
+	/**
+	 * remaining population after removing the elimination members
+	 */
+	private final List<T>				trunk;
+	/**
+	 * values to be eliminated from the population
+	 */
+	private final List<T>				outcasts;
+	/**
+	 * outlier and outcast members not contained in the trunk
+	 */
+	private final List<T>				castaways								= new ArrayList<>();
 
 	private T										firstValidElement;
 	private T										lastValidElement;
@@ -65,32 +77,32 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	};
 
 	/**
-	 *  Implements the Gauss error function.<br>
-	 *  <em>erf(z) = 2 / &radic;&pi;  &int;e<sup>-t&sup2;</sup>,  t = 0..z</em>
-	 *  <p>
-	 *  Examples:<br>
-	 *  {@code erf(1.0) = 0.8427007877600067}         // actual = 0.84270079294971486934 <br>
-	 *  {@code Phi(1.0) = 0.8413447386043253}         // actual = 0.8413447460 <br>
-	 *  <br>
-	 *  {@code erf(-1.0) = -0.8427007877600068} <br>
-	 *  {@code Phi(-1.0) = 0.15865526139567465} <br>
-	 *  <br>
-	 *  {@code erf(3.0) = 0.9999779095015785}         // actual = 0.99997790950300141456 <br>
-	 *  {@code Phi(3.0) = 0.9986501019267444} <br>
-	 *  <br>
-	 *  {@code erf(30.0) = 1.0} <br>
-	 *  {@code Phi(30.0) = 1.0} <br>
-	 *  <br>
-	 *  {@code erf(-30.0) = -1.0} <br>
-	 *  {@code Phi(-30.0) = 0.0} <br>
-	 *  <br>
-	 *  {@code erf(1.0E-20)  = -3.0000000483809686E-8}     // true answer 1.13E-20 <br>
-	 *  {@code Phi(1.0E-20)  = 0.49999998499999976} <br>
+	 * Implements the Gauss error function.<br>
+	 * <em>erf(z) = 2 / &radic;&pi; &int;e<sup>-t&sup2;</sup>, t = 0..z</em>
+	 * <p>
+	 * Examples:<br>
+	 * {@code erf(1.0) = 0.8427007877600067} // actual = 0.84270079294971486934 <br>
+	 * {@code Phi(1.0) = 0.8413447386043253} // actual = 0.8413447460 <br>
+	 * <br>
+	 * {@code erf(-1.0) = -0.8427007877600068} <br>
+	 * {@code Phi(-1.0) = 0.15865526139567465} <br>
+	 * <br>
+	 * {@code erf(3.0) = 0.9999779095015785} // actual = 0.99997790950300141456 <br>
+	 * {@code Phi(3.0) = 0.9986501019267444} <br>
+	 * <br>
+	 * {@code erf(30.0) = 1.0} <br>
+	 * {@code Phi(30.0) = 1.0} <br>
+	 * <br>
+	 * {@code erf(-30.0) = -1.0} <br>
+	 * {@code Phi(-30.0) = 0.0} <br>
+	 * <br>
+	 * {@code erf(1.0E-20)  = -3.0000000483809686E-8} // true answer 1.13E-20 <br>
+	 * {@code Phi(1.0E-20)  = 0.49999998499999976} <br>
 	 *
-	 *  @see <a href="http://introcs.cs.princeton.edu/java/21function/ErrorFunction.java.html">Error Function</a>
-	 *  @author Robert Sedgewick
-	 *  @author Kevin Wayne
-	 *  @author Thomas Eickert
+	 * @see <a href="http://introcs.cs.princeton.edu/java/21function/ErrorFunction.java.html">Error Function</a>
+	 * @author Robert Sedgewick
+	 * @author Kevin Wayne
+	 * @author Thomas Eickert
 	 */
 	private static class ErrorFunction {
 
@@ -103,8 +115,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 		public static double erf(double z) {
 			double t = 1.0 / (1.0 + 0.5 * Math.abs(z));
 			// use Horner's method
-			double ans = 1 - t * Math.exp(-z * z - 1.26551223
-					+ t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * (0.17087277))))))))));
+			double ans = 1 - t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * (0.17087277))))))))));
 			if (z >= 0)
 				return ans;
 			else
@@ -239,8 +250,8 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 		this.firstValidElement = population.get(0).y();
 		this.lastValidElement = population.get(population.size() - 1).y();
 
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + population.size() + Arrays.toString(population.toArray()));
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + this.trunk.size() + Arrays.toString(this.trunk.toArray()));
+		log.finest(() -> "" + population.size() + Arrays.toString(population.toArray()));
+		log.finest(() -> "" + this.trunk.size() + Arrays.toString(this.trunk.toArray()));
 	}
 
 	/**
@@ -276,8 +287,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 
 		if (outcasts.isEmpty()) {
 			this.trunk = new ArrayList<T>(population);
-		}
-		else {
+		} else {
 			this.trunk = new ArrayList<T>();
 			for (T element : population) {
 				if (outcasts.contains(element))
@@ -322,8 +332,8 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 			}
 		}
 
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + population.size() + Arrays.toString(population.toArray()));
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + this.trunk.size() + Arrays.toString(this.trunk.toArray()));
+		log.finest(() -> "" + population.size() + Arrays.toString(population.toArray()));
+		log.finest(() -> "" + this.trunk.size() + Arrays.toString(this.trunk.toArray()));
 	}
 
 	/**
@@ -425,21 +435,18 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 			if (probabilityCutPoint >= 1. / (pSize + 1) && probabilityCutPoint < (double) pSize / (pSize + 1)) {
 				double position = (pSize + 1) * probabilityCutPoint;
 				return this.trunk.get((int) position - 1).doubleValue() + (position - (int) position) * (this.trunk.get((int) position).doubleValue() - this.trunk.get((int) position - 1).doubleValue());
-			}
-			else if (probabilityCutPoint < 1. / (pSize + 1))
+			} else if (probabilityCutPoint < 1. / (pSize + 1))
 				return this.trunk.get(0).doubleValue();
 			else
 				return this.trunk.get(pSize - 1).doubleValue();
-		}
-		else {
+		} else {
 			if (probabilityCutPoint > 0. && probabilityCutPoint < 1.) {
 				double position = pSize * probabilityCutPoint;
 				if (position % 2 == 0)
 					return (this.trunk.get((int) position).doubleValue() + this.trunk.get((int) (position + 1)).doubleValue()) / 2.;
 				else
 					return this.trunk.get((int) (position)).doubleValue();
-			}
-			else if (probabilityCutPoint == 0.)
+			} else if (probabilityCutPoint == 0.)
 				return this.trunk.get(0).doubleValue();
 			else
 				return this.trunk.get(pSize - 1).doubleValue();

@@ -19,17 +19,18 @@
 
 package gde.histo.gpslocations;
 
+import static java.util.logging.Level.FINER;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import gde.config.Settings;
 import gde.histo.utils.GpsCoordinate;
+import gde.log.Logger;
 
 /**
  * Takes a list of GPS coordinates and provides the clusters assigned to the locations.
@@ -63,18 +64,17 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 		public void accept(GpsCoordinate newGpsCoordinate) {
 			if (GpsCluster.this.getReference() == newGpsCoordinate) { // == due to equals override
 				// a distance to myself is not useful
-				log.log(Level.FINEST, "add myself to the empty clusteredItems list", this.clusteredItems.size()); //$NON-NLS-1$
+				log.finest(() -> "add myself to the empty clusteredItems list" + this.clusteredItems.size()); //$NON-NLS-1$
 				this.clusteredItems.add(newGpsCoordinate);
 				this.identifiedClusters.put(newGpsCoordinate, this.clusteredItems);
-			}
-			else {
+			} else {
 				final double distance = GpsCluster.this.getReference().getDistance(newGpsCoordinate);
-				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("ClusterRadius=%f  distance=%f  to %s", this.settings.getGpsLocationRadius(), distance, newGpsCoordinate)); //$NON-NLS-1$
+				log.finest(() -> String.format("ClusterRadius=%f  distance=%f  to %s", //$NON-NLS-1$
+						this.settings.getGpsLocationRadius(), distance, newGpsCoordinate));
 				if (distance <= this.settings.getGpsLocationRadius()) {
 					this.clusteredItems.add(newGpsCoordinate);
 					this.identifiedClusters.put(newGpsCoordinate, this.clusteredItems);
-				}
-				else {
+				} else {
 					this.relicts.add(newGpsCoordinate);
 					this.relictSqDistances.add(distance * distance);
 					this.relictSqDistanceSum += distance * distance;
@@ -94,19 +94,19 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 		 * @return the new random reference point for the next clustering step or null if the residuum does not contain elements
 		 */
 		public GpsCoordinate getResiduumReference() {
-			GpsCoordinate residuumReference = null;
 			// select an arbitrary GPS coordinate with probability Square(Distance)
 			final double arbitrarySqDistance = Math.random() * this.relictSqDistanceSum;
 			double cumulativeSqDistance = 0.;
 			for (int i = 0; i < this.relictSqDistances.size(); i++) {
 				cumulativeSqDistance += this.relictSqDistances.get(i);
 				if (arbitrarySqDistance <= cumulativeSqDistance) {
-					residuumReference = this.relicts.get(i);
-					break;
+					GpsCoordinate residuumReference = this.relicts.get(i);
+					log.finer(() -> String.format("relictsSize=%d  new reference=%s", //$NON-NLS-1$
+							this.relicts.size(), residuumReference));
+					return residuumReference;
 				}
 			}
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("relictsSize=%d  new reference=%s", this.relicts.size(), residuumReference)); //$NON-NLS-1$
-			return residuumReference;
+			return null;
 		}
 
 		/**
@@ -141,7 +141,7 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 			xAvg += (Math.cos(phi) * Math.cos(lambda) - xAvg) / (i + 1);
 			yAvg += (Math.cos(phi) * Math.sin(lambda) - yAvg) / (i + 1);
 			zAvg += (Math.sin(phi) - zAvg) / (i + 1);
-			log.log(Level.FINER, "coordinate=", gpsCoordinate); //$NON-NLS-1$
+			log.log(FINER, "coordinate=", gpsCoordinate); //$NON-NLS-1$
 		}
 		final GpsCoordinate result;
 		if (Math.abs(xAvg) < 1.e-11 && Math.abs(yAvg) < 1.e-11 && Math.abs(zAvg) < 1.e-11)
@@ -150,7 +150,7 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 			double hyp = Math.sqrt(xAvg * xAvg + yAvg * yAvg);
 			result = new GpsCoordinate(Math.toDegrees(Math.atan2(zAvg, hyp)), Math.toDegrees(Math.atan2(yAvg, xAvg)));
 		}
-		log.log(Level.FINER, "result=", result); //$NON-NLS-1$
+		log.log(FINER, "result=", result); //$NON-NLS-1$
 		return result;
 	}
 
@@ -169,7 +169,7 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 			xAvg += (Math.cos(phi) * Math.cos(lambda) - xAvg) / (i + 1);
 			yAvg += (Math.cos(phi) * Math.sin(lambda) - yAvg) / (i + 1);
 			zAvg += (Math.sin(phi) - zAvg) / (i + 1);
-			log.log(Level.FINER, "coordinate=", gpsCoordinate); //$NON-NLS-1$
+			log.log(FINER, "coordinate=", gpsCoordinate); //$NON-NLS-1$
 		}
 		final GpsCoordinate result;
 		if (Math.abs(xAvg) < 1.e-11 && Math.abs(yAvg) < 1.e-11 && Math.abs(zAvg) < 1.e-11)
@@ -178,7 +178,7 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 			double hyp = Math.sqrt(xAvg * xAvg + yAvg * yAvg);
 			result = new GpsCoordinate(Math.toDegrees(Math.atan2(zAvg, hyp)), Math.toDegrees(Math.atan2(yAvg, xAvg)));
 		}
-		log.log(Level.FINER, "result=", result); //$NON-NLS-1$
+		log.log(FINER, "result=", result); //$NON-NLS-1$
 		return result;
 	}
 
@@ -201,7 +201,7 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 				// take the remaining GPS coordinate list for the next iteration and take also the optimized reference coordinate
 				wip = distanceProcessor.getResiduumItems();
 				this.setReference(distanceProcessor.getResiduumReference()); // the distance processor accesses this reference in the next iteration step
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "number of clusters : ", this.getClusters().size() + "  new Cluster members : " + this.assignedClusters.size()); //$NON-NLS-1$ //$NON-NLS-2$
+				log.finer(() -> "number of clusters : " + this.getClusters().size() + "  new Cluster members : " + this.assignedClusters.size()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}

@@ -20,9 +20,8 @@
 package gde.histo.recordings;
 
 import java.util.Vector;
-import java.util.logging.Logger;
 
-import gde.log.Level;
+import gde.log.Logger;
 
 /**
  * Data points of one measurement or line or curve.
@@ -55,8 +54,7 @@ public final class SuiteRecord extends Vector<Integer> {
 				this.maxRecordValue = Integer.MIN_VALUE;
 				this.minRecordValue = Integer.MAX_VALUE;
 			}
-		}
-		else {
+		} else {
 			if (this.isEmpty())
 				this.minRecordValue = this.maxRecordValue = point;
 			else {
@@ -65,8 +63,8 @@ public final class SuiteRecord extends Vector<Integer> {
 			}
 		}
 		super.addElement(point);
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.trailOrdinal + " adding point = " + point); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, this.trailOrdinal + " minValue = " + this.minRecordValue + " maxValue = " + this.maxRecordValue); //$NON-NLS-1$ //$NON-NLS-2$
+		log.finer(() -> this.trailOrdinal + " adding point = " + point); //$NON-NLS-1$
+		log.finest(() -> this.trailOrdinal + " minValue = " + this.minRecordValue + " maxValue = " + this.maxRecordValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public int getTrailOrdinal() {

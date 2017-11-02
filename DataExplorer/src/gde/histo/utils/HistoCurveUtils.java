@@ -19,12 +19,14 @@
 ****************************************************************************************/
 package gde.histo.utils;
 
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
@@ -40,7 +42,7 @@ import gde.histo.recordings.PointArray;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.utils.HistoTimeLine.Density;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.GraphicsUtils;
 import gde.utils.MathUtils;
@@ -90,19 +92,19 @@ public final class HistoCurveUtils {
 	 * @param isDrawNameInRecordColor
 	 * @param isDrawNumbersInRecordColor
 	 */
-	public static void drawHistoScale(TrailRecord record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace, boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor,
-			boolean isDrawNumbersInRecordColor) {
+	public static void drawHistoScale(TrailRecord record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace,
+			boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
 		int numberTicks = 10, miniticks = 5;
 
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + "  x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		log.finer(() -> record.getName() + "  x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
 
-		//Draw the curve
-		//(yMaxValue - yMinValue) defines the area to be used for the curve
+		// Draw the curve
+		// (yMaxValue - yMinValue) defines the area to be used for the curve
 		double yMaxValue = record.getSyncMaxValue() / 1000.0;
 		double yMinValue = record.getSyncMinValue() / 1000.0;
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "unmodified yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(FINE)) log.log(FINE, "unmodified yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// yMinValueDisplay and yMaxValueDisplay used for scales and adapted values device and measure unit dependent
 		double yMinValueDisplay = yMinValue, yMaxValueDisplay = yMaxValue;
@@ -112,8 +114,8 @@ public final class HistoCurveUtils {
 			yMaxValueDisplay = record.getMaxScaleValue();
 			yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
 			yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "defined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(FINE)) log.log(FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(FINE)) log.log(FINE, "defined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			if (device != null) { // adapt to device specific range
 				if (!record.getTrailSelector().isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
@@ -122,7 +124,7 @@ public final class HistoCurveUtils {
 					yMinValueDisplay = device.translateValue(record, yMinValue);
 					yMaxValueDisplay = device.translateValue(record, yMaxValue);
 				}
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(FINE)) log.log(FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (device != null && (Math.abs(yMaxValue - yMinValue) < .0001)) { // equal value disturbs the scaling algorithm
 				double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
@@ -135,8 +137,8 @@ public final class HistoCurveUtils {
 				miniticks = (Integer) roundResult[3];
 				yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
 				yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "rounded -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(FINE)) log.log(FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
+				if (log.isLoggable(FINE)) log.log(FINE, "rounded -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (record.isStartpointZero()) {
 				// check if the main part of the curve is on positive side
@@ -147,20 +149,21 @@ public final class HistoCurveUtils {
 					yMaxValueDisplay = 0;
 					yMaxValue = yMaxValueDisplay - record.getOffset();
 				}
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "scale starts at 0 -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(FINE)) log.log(FINE, "scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(FINE))
+					log.log(FINE, "scale starts at 0 -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		record.setMinScaleValue(yMinValueDisplay);
 		record.setMaxScaleValue(yMaxValueDisplay);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "scale  -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(FINE)) log.log(FINE, "scale  -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 		String graphText = DeviceXmlResource.getInstance().getReplacement(record.isScaleSyncMaster() ? record.getSyncMasterName() : record.getName());
 		if (record.getSymbol() != null && record.getSymbol().length() > 0) graphText = graphText + "   " + record.getSymbol();
 		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		// adapt number space calculation to real displayed max number
-		//Point pt = gc.textExtent(df.format(yMaxValueDisplay));
-		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, df.format(yMaxValueDisplay) + " gc.textExtent = " + pt.toString());
+		// Point pt = gc.textExtent(df.format(yMaxValueDisplay));
+		// if (log.isLoggable(Level.FINE)) log.log(Level.FINE, df.format(yMaxValueDisplay) + " gc.textExtent = " + pt.toString());
 		Point pt = gc.textExtent("000,00"); //$NON-NLS-1$
 		int ticklength = 5;
 		int gap = 10;
@@ -170,17 +173,17 @@ public final class HistoCurveUtils {
 		gc.setLineStyle(SWT.LINE_SOLID);
 		boolean isPositionLeft = record.isPositionLeft();
 		int positionNumber = record.getParentTrail().getAxisPosition(record.getName(), isPositionLeft);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " positionNumber = " + positionNumber); //$NON-NLS-1$
+		log.fine(() -> record.getName() + " positionNumber = " + positionNumber); //$NON-NLS-1$
 		if (isDrawScaleInRecordColor)
 			gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
 		else
 			gc.setForeground(DataExplorer.COLOR_BLACK);
 		if (isPositionLeft) {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
-			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); //xPos = x0
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); // xPos = x0
+			log.fine(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); // yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks, isDrawNumbersInRecordColor);
-			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "drawText x = " + (xPos - pt.y - 15)); //xPosition Text Spannung [] //$NON-NLS-1$
+			log.finest(() -> "drawText x = " + (xPos - pt.y - 15)); // xPosition Text Spannung [] //$NON-NLS-1$
 			if (isDrawNameInRecordColor)
 				gc.setForeground(record.getColor());
 			else
@@ -188,8 +191,8 @@ public final class HistoCurveUtils {
 			GraphicsUtils.drawTextCentered(graphText, (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
 		} else {
 			int xPos = x0 + 1 + width + positionNumber * scaleWidthSpace;
-			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); //yMax
-			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); // yMax
+			log.finest(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); // yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks, isDrawNumbersInRecordColor);
 			if (isDrawNameInRecordColor)
 				gc.setForeground(record.getColor());
@@ -201,7 +204,7 @@ public final class HistoCurveUtils {
 		// set the values corresponding to the display area of this curve
 		record.setMinDisplayValue(yMinValue);
 		record.setMaxDisplayValue(yMaxValue);
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " data limit  -> yMinValue = " + yMinValue + "; yMaxValue = " + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(FINE)) log.log(FINE, record.getName() + " data limit  -> yMinValue = " + yMinValue + "; yMaxValue = " + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -216,8 +219,8 @@ public final class HistoCurveUtils {
 	 * @param timeLine
 	 */
 	public static void drawHistoCurve(TrailRecord record, GC gc, int x0, int y0, int width, int height, HistoTimeLine timeLine) {
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParentTrail().getDrawAreaBounds().toString()); //$NON-NLS-1$
+		log.fine(() -> record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
+		log.finer(() -> "curve area bounds = " + record.getParentTrail().getDrawAreaBounds().toString()); //$NON-NLS-1$
 
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
@@ -226,7 +229,7 @@ public final class HistoCurveUtils {
 
 		// get the number of data points size to be drawn
 		int displayableSize = record.realSize();
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "displayableSize = " + displayableSize); //$NON-NLS-1$
+		log.fine(() -> "displayableSize = " + displayableSize); //$NON-NLS-1$
 
 		record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
 		record.setDisplayScaleFactorValue(height);
@@ -241,13 +244,13 @@ public final class HistoCurveUtils {
 			if ((newPoint = points[j]) != null) { // in case of a suite the master triggers the display of all trails
 				drawHistoMarker(gc, newPoint, timeLine.getDensity());
 				if (oldPoint != null) {
-					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newPoint.toString());
+					if (log.isLoggable(FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newPoint.toString());
 					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 				}
 				oldPoint = newPoint; // remember the last draw point for next drawLine operation
 			}
 		}
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, sb.toString());
+		log.finest(() -> sb.toString());
 	}
 
 	/**
@@ -262,9 +265,9 @@ public final class HistoCurveUtils {
 	 * @param timeLine
 	 */
 	public static void drawHistoSuite(TrailRecord record, GC gc, int x0, int y0, int width, int height, HistoTimeLine timeLine) {
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParentTrail().getDrawAreaBounds().toString()); //$NON-NLS-1$
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("MinScaleValue=%f   MaxScaleValue=%f   MinDisplayValue=%f   MaxDisplayValue=%f", record.getMinScaleValue(), //$NON-NLS-1$
+		log.fine(() -> record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
+		log.finer(() -> "curve area bounds = " + record.getParentTrail().getDrawAreaBounds().toString()); //$NON-NLS-1$
+		log.fine(() -> String.format("MinScaleValue=%f   MaxScaleValue=%f   MinDisplayValue=%f   MaxDisplayValue=%f", record.getMinScaleValue(), //$NON-NLS-1$
 				record.getMaxScaleValue(), record.getMinDisplayValue(), record.getMaxDisplayValue()));
 
 		// set line properties according adjustment
@@ -289,15 +292,15 @@ public final class HistoCurveUtils {
 				; // neither boxplot nor the rangeplot needs this information
 			} else {
 				if (record.getTrailSelector().isBoxPlotSuite()) {
-					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(Arrays.toString(pointArray.getY()));
+					if (log.isLoggable(FINEST)) sb.append(GDE.LINE_SEPARATOR).append(Arrays.toString(pointArray.getY()));
 					// helper variables
 					final int posX = pointArray.getX();
-					final int q0PosY = pointArray.getY(0), q1PosY = pointArray.getY(1), q2PosY = pointArray.getY(2), q3PosY = pointArray.getY(3), q4PosY = pointArray.getY(4),
-							qLowerWhiskerY = pointArray.getY(5), qUpperWhiskerY = pointArray.getY(6);
+					final int q0PosY = pointArray.getY(0), q1PosY = pointArray.getY(1), q2PosY = pointArray.getY(2), q3PosY = pointArray.getY(3),
+							q4PosY = pointArray.getY(4), qLowerWhiskerY = pointArray.getY(5), qUpperWhiskerY = pointArray.getY(6);
 					final int interQuartileRange = q1PosY - q3PosY;
 					int boxWidth = timeLine.getDensity().getScaledBoxWidth();
-					int halfBoxWidth = (int) (boxWidth
-							* (1. + (Math.sqrt(durationIterator.next() / averageDuration) - 1) * timeLine.getDensity().boxWidthAmplitude * HistoCurveUtils.settings.getBoxplotSizeAdaptationOrdinal() / 3.0) / 2.); // divison by 3 is the best fit divisor; 2 results in bigger modulation rates
+					int halfBoxWidth = (int) (boxWidth * (1. + (Math.sqrt(durationIterator.next() / averageDuration) - 1) * timeLine.getDensity().boxWidthAmplitude * HistoCurveUtils.settings.getBoxplotSizeAdaptationOrdinal() / 3.0) / 2.);
+					// divison by 3 is the best fit divisor; 2 results in bigger modulation rates
 					halfBoxWidth = halfBoxWidth < 1 ? 1 : halfBoxWidth;
 					// draw main box
 					gc.drawRectangle(posX - halfBoxWidth, q3PosY, halfBoxWidth * 2, interQuartileRange);
@@ -322,20 +325,20 @@ public final class HistoCurveUtils {
 						; // no connecting lines required
 					} else {
 						final int oldPosX = oldPoints.getX();
-						if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(Arrays.toString(pointArray.getY()));
+						if (log.isLoggable(FINEST)) sb.append(GDE.LINE_SEPARATOR).append(Arrays.toString(pointArray.getY()));
 						// draw main curve
 						gc.drawLine(oldPosX, oldPoints.getY(0), posX, pointArray.getY(0));
 						// draw two extremum curves
 						gc.setLineStyle(SWT.LINE_DASH);
-						//						gc.drawLine(oldPosX, oldSuitePoints[1].y, posX, newSuitePoints[1].y);
-						//						gc.drawLine(oldPosX, oldSuitePoints[2].y, posX, newSuitePoints[2].y);
+						// gc.drawLine(oldPosX, oldSuitePoints[1].y, posX, newSuitePoints[1].y);
+						// gc.drawLine(oldPosX, oldSuitePoints[2].y, posX, newSuitePoints[2].y);
 						drawNullableLine(gc, new Point(oldPosX, oldPoints.getY(1)), new Point(posX, pointArray.getY(1)));
 						drawNullableLine(gc, new Point(oldPosX, oldPoints.getY(2)), new Point(posX, pointArray.getY(2)));
 					}
 					// draw vertical connection lines sparsely dotted
 					gc.setLineStyle(SWT.LINE_CUSTOM);
 					gc.setLineDash(new int[] { 2, 9 });
-					//					gc.drawLine(posX, newSuitePoints[1].y, posX, newSuitePoints[2].y);
+					// gc.drawLine(posX, newSuitePoints[1].y, posX, newSuitePoints[2].y);
 					drawNullableLine(gc, new Point(posX, pointArray.getY(1)), new Point(posX, pointArray.getY(2)));
 					gc.setLineStyle(SWT.LINE_SOLID);
 
@@ -345,7 +348,7 @@ public final class HistoCurveUtils {
 				}
 			}
 		}
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, sb.toString());
+		log.finest(() -> sb.toString());
 	}
 
 	/**
@@ -360,10 +363,10 @@ public final class HistoCurveUtils {
 
 	private static void drawHistoMarker(GC gc, Point newPoint, Density density) {
 		if (density == HistoTimeLine.Density.LOW) {
-			//Color last = gc.getBackground();
-			//gc.setBackground(color);
-			//gc.fillOval(newPoint.x - 4, newPoint.y - 4, 8, 8);
-			//gc.setBackground(last);
+			// Color last = gc.getBackground();
+			// gc.setBackground(color);
+			// gc.fillOval(newPoint.x - 4, newPoint.y - 4, 8, 8);
+			// gc.setBackground(last);
 			gc.drawOval(newPoint.x - 3, newPoint.y - 3, 6, 6);
 		} else if (density == HistoTimeLine.Density.MEDIUM) {
 			gc.drawOval(newPoint.x - 2, newPoint.y - 2, 4, 4);
@@ -378,7 +381,8 @@ public final class HistoCurveUtils {
 	 * Draw the visible curves for all measurements.
 	 * Support multiple curves for one single measurement.
 	 */
-	public static void drawTrailRecordSet(TrailRecordSet trailRecordSet, GC gc, int dataScaleWidth, Rectangle canvasBounds, Rectangle curveAreaBounds, HistoTimeLine timeLine) {
+	public static void drawTrailRecordSet(TrailRecordSet trailRecordSet, GC gc, int dataScaleWidth, Rectangle canvasBounds, Rectangle curveAreaBounds,
+			HistoTimeLine timeLine) {
 		int x0 = curveAreaBounds.x;
 		int y0 = curveAreaBounds.y + curveAreaBounds.height;
 		int width = curveAreaBounds.width;
@@ -397,8 +401,8 @@ public final class HistoCurveUtils {
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
 			TrailRecord actualRecord = (TrailRecord) trailRecordSet.getRecordsSortedForDisplay()[i];
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
-			if (log.isLoggable(Level.FINE) && isActualRecordEnabled) log.log(Level.FINE, String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", actualRecord.getName(), //$NON-NLS-1$
-					actualRecord.isVisible(), actualRecord.isDisplayable(), actualRecord.isScaleSynced(), actualRecord.isScaleVisible()));
+			if (isActualRecordEnabled) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
+					actualRecord.getName(), actualRecord.isVisible(), actualRecord.isDisplayable(), actualRecord.isScaleSynced(), actualRecord.isScaleVisible()));
 			if (actualRecord.isScaleVisible())
 				HistoCurveUtils.drawHistoScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
 

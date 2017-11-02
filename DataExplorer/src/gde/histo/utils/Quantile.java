@@ -29,11 +29,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 import java.util.function.DoubleConsumer;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import gde.log.Level;
+import gde.log.Logger;
 
 /**
  * calculates quantiles of a probability distribution after removing outliers.
@@ -43,7 +42,8 @@ import gde.log.Level;
  * this in turn is compensated by the fact that we mostly need 3 quantiles from the same population.
  * @author Thomas Eickert
  */
-// replaced by UniversalQuantile --- reason is spaghetti-like code due to integer, double and 2D-points support  ---  was not deleted for JUnit performance comparisons
+// replaced by UniversalQuantile --- reason is spaghetti-like code due to integer, double and 2D-points support --- was not deleted for
+// JUnit performance comparisons
 public class Quantile {
 	private final static String					$CLASS_NAME						= Quantile.class.getName();
 	private final static Logger					log										= Logger.getLogger($CLASS_NAME);
@@ -97,28 +97,28 @@ public class Quantile {
 	}
 
 	/**
-	 *  Implements the Gauss error function.
-	 *              erf(z) = 2 / sqrt(pi) * integral(exp(-t*t), t = 0..z)
-	 *  % java ErrorFunction 1.0
-	 *  erf(1.0) = 0.8427007877600067         // actual = 0.84270079294971486934
-	 *  Phi(1.0) = 0.8413447386043253         // actual = 0.8413447460
-	 *  % java ErrorFunction -1.0
-	 *  erf(-1.0) = -0.8427007877600068
-	 *  Phi(-1.0) = 0.15865526139567465
-	 *  % java ErrorFunction 3.0
-	 *  erf(3.0) = 0.9999779095015785         // actual = 0.99997790950300141456
-	 *  Phi(3.0) = 0.9986501019267444
-	 *  % java ErrorFunction 30
-	 *  erf(30.0) = 1.0
-	 *  Phi(30.0) = 1.0
-	 *  % java ErrorFunction -30
-	 *  erf(-30.0) = -1.0
-	 *  Phi(-30.0) = 0.0
-	 *  % java ErrorFunction 1E-20
-	 *  erf(1.0E-20)  = -3.0000000483809686E-8     // true anser 1.13E-20
-	 *  Phi(1.0E-20)  = 0.49999998499999976
+	 * Implements the Gauss error function.
+	 * erf(z) = 2 / sqrt(pi) * integral(exp(-t*t), t = 0..z)
+	 * % java ErrorFunction 1.0
+	 * erf(1.0) = 0.8427007877600067 // actual = 0.84270079294971486934
+	 * Phi(1.0) = 0.8413447386043253 // actual = 0.8413447460
+	 * % java ErrorFunction -1.0
+	 * erf(-1.0) = -0.8427007877600068
+	 * Phi(-1.0) = 0.15865526139567465
+	 * % java ErrorFunction 3.0
+	 * erf(3.0) = 0.9999779095015785 // actual = 0.99997790950300141456
+	 * Phi(3.0) = 0.9986501019267444
+	 * % java ErrorFunction 30
+	 * erf(30.0) = 1.0
+	 * Phi(30.0) = 1.0
+	 * % java ErrorFunction -30
+	 * erf(-30.0) = -1.0
+	 * Phi(-30.0) = 0.0
+	 * % java ErrorFunction 1E-20
+	 * erf(1.0E-20) = -3.0000000483809686E-8 // true anser 1.13E-20
+	 * Phi(1.0E-20) = 0.49999998499999976
 	 *
-	 *  @see <a href="http://introcs.cs.princeton.edu/java/21function/ErrorFunction.java.html">Error Function</a>
+	 * @see <a href="http://introcs.cs.princeton.edu/java/21function/ErrorFunction.java.html">Error Function</a>
 	 * @author Thomas Eickert
 	 */
 	private static class ErrorFunction {
@@ -132,8 +132,7 @@ public class Quantile {
 		public static double erf(double z) {
 			double t = 1.0 / (1.0 + 0.5 * Math.abs(z));
 			// use Horner's method
-			double ans = 1 - t * Math.exp(-z * z - 1.26551223
-					+ t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * (0.17087277))))))))));
+			double ans = 1 - t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * (0.17087277))))))))));
 			if (z >= 0)
 				return ans;
 			else
@@ -214,15 +213,15 @@ public class Quantile {
 		}
 		if (excludes.isEmpty()) {
 			this.iPopulation = new ArrayList<>(population);
-		}
-		else {
+		} else {
 			this.iPopulation = new ArrayList<>();
 			for (Integer value : population) {
 				if (!excludes.contains(value)) this.iPopulation.add(value);
 			}
 		}
 		this.firstFigure = this.iPopulation.size() > 0 && this.iPopulation.get(0) != null ? this.iPopulation.get(0) : -Double.MAX_VALUE;
-		this.lastFigure = this.iPopulation.size() > 0 && this.iPopulation.get(this.iPopulation.size() - 1) != null ? this.iPopulation.get(this.iPopulation.size() - 1) : -Double.MAX_VALUE;
+		this.lastFigure = this.iPopulation.size() > 0 && this.iPopulation.get(this.iPopulation.size() - 1) != null
+				? this.iPopulation.get(this.iPopulation.size() - 1) : -Double.MAX_VALUE;
 
 		Collections.sort(this.iPopulation);
 
@@ -239,8 +238,8 @@ public class Quantile {
 				this.iPopulation.remove(this.iPopulation.size() - 1);
 			}
 		}
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + population.size() + Arrays.toString(population.toArray()));
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + this.iPopulation.size() + Arrays.toString(this.iPopulation.toArray()));
+		log.finest(() -> "" + population.size() + Arrays.toString(population.toArray()));
+		log.finest(() -> "" + this.iPopulation.size() + Arrays.toString(this.iPopulation.toArray()));
 	}
 
 	/**
@@ -281,10 +280,9 @@ public class Quantile {
 			d2Population.remove(d2Population.size() - 1);
 		}
 
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + population.size() + Arrays.toString(population.toArray()));
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + this.dPopulation.size() + Arrays.toString(this.dPopulation.toArray()));
-		if (log.isLoggable(Level.FINEST))
-			log.log(Level.FINEST, String.format("lWhisker=%f q1=%f q2=%f q3=%f uWhisker=%f", getQuantileLowerWhisker(), getQuartile1(), getQuartile2(), getQuartile3(), getQuantileUpperWhisker()));
+		log.finest(() -> "" + population.size() + Arrays.toString(population.toArray()));
+		log.finest(() -> "" + this.dPopulation.size() + Arrays.toString(this.dPopulation.toArray()));
+		log.finest(() -> String.format("lWhisker=%f q1=%f q2=%f q3=%f uWhisker=%f", getQuantileLowerWhisker(), getQuartile1(), getQuartile2(), getQuartile3(), getQuantileUpperWhisker()));
 
 	}
 
@@ -313,15 +311,15 @@ public class Quantile {
 		}
 		if (excludes.isEmpty()) {
 			this.dPopulation = new ArrayList<>(population);
-		}
-		else {
+		} else {
 			this.dPopulation = new ArrayList<>();
 			for (Double value : population) {
 				if (!excludes.contains(value)) this.dPopulation.add(value);
 			}
 		}
 		this.firstFigure = this.dPopulation.get(0) != null ? this.dPopulation.get(0) : -Double.MAX_VALUE;
-		this.lastFigure = this.dPopulation.get(this.dPopulation.size() - 1) != null ? this.dPopulation.get(this.dPopulation.size() - 1) : -Double.MAX_VALUE;
+		this.lastFigure = this.dPopulation.get(this.dPopulation.size() - 1) != null ? this.dPopulation.get(this.dPopulation.size() - 1)
+				: -Double.MAX_VALUE;
 
 		Collections.sort(this.dPopulation);
 
@@ -337,10 +335,9 @@ public class Quantile {
 			this.dPopulation.remove(this.dPopulation.size() - 1);
 		}
 
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + population.size() + Arrays.toString(population.toArray()));
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "" + this.dPopulation.size() + Arrays.toString(this.dPopulation.toArray()));
-		if (log.isLoggable(Level.FINEST))
-			log.log(Level.FINEST, String.format("lWhisker=%f q1=%f q2=%f q3=%f uWhisker=%f", getQuantileLowerWhisker(), getQuartile1(), getQuartile2(), getQuartile3(), getQuantileUpperWhisker()));
+		log.finest(() -> "" + population.size() + Arrays.toString(population.toArray()));
+		log.finest(() -> "" + this.dPopulation.size() + Arrays.toString(this.dPopulation.toArray()));
+		log.finest(() -> String.format("lWhisker=%f q1=%f q2=%f q3=%f uWhisker=%f", getQuantileLowerWhisker(), getQuartile1(), getQuartile2(), getQuartile3(), getQuantileUpperWhisker()));
 	}
 
 	/**
@@ -367,9 +364,9 @@ public class Quantile {
 
 		// do not remove outliers
 
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "i " + iPopulation.size() + " " + this.iPopulation.size()); //$NON-NLS-1$ //$NON-NLS-2$
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(iPopulation.toArray()));
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(this.iPopulation.toArray()));
+		log.fine(() -> "i " + iPopulation.size() + " " + this.iPopulation.size()); //$NON-NLS-1$ //$NON-NLS-2$
+		log.finest(() -> Arrays.toString(iPopulation.toArray()));
+		log.finest(() -> Arrays.toString(this.iPopulation.toArray()));
 	}
 
 	/**
@@ -396,9 +393,9 @@ public class Quantile {
 
 		// do not remove outliers
 
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "d " + dPopulation.size() + " " + this.dPopulation.size()); //$NON-NLS-1$ //$NON-NLS-2$
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(dPopulation.toArray()));
-		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, Arrays.toString(this.dPopulation.toArray()));
+		log.fine(() -> "d " + dPopulation.size() + " " + this.dPopulation.size()); //$NON-NLS-1$ //$NON-NLS-2$
+		log.finest(() -> Arrays.toString(dPopulation.toArray()));
+		log.finest(() -> Arrays.toString(this.dPopulation.toArray()));
 	}
 
 	public double getMaxFigure() {
@@ -424,7 +421,8 @@ public class Quantile {
 	public double getSumFigure() {
 		if (this.sumFigure == null) {
 			if (this.dPopulation == null)
-				this.sumFigure = (double) this.iPopulation.parallelStream().mapToInt(x -> x).sum(); // do not extend to long as the vault only holds integer values
+				this.sumFigure = (double) this.iPopulation.parallelStream().mapToInt(x -> x).sum(); // do not extend to long as the vault only holds integer
+																																														// values
 			else
 				this.sumFigure = this.dPopulation.parallelStream().mapToDouble(x -> x).sum();
 		}
@@ -449,8 +447,7 @@ public class Quantile {
 				avg += (value - avg) / (i + 1);
 			}
 			return avg;
-		}
-		else {
+		} else {
 			double avg = 0;
 			for (int i = 0; i < this.dPopulation.size(); i++) {
 				double value = this.dPopulation.get(i);
@@ -475,16 +472,17 @@ public class Quantile {
 				double value = this.iPopulation.get(i).doubleValue();
 				varTimesN += (value - avg) * (value - avg);
 			}
-			return this.iPopulation.size() > 0 ? Math.sqrt(varTimesN / (this.fixings.contains(Fixings.IS_SAMPLE) ? this.iPopulation.size() - 1 : this.iPopulation.size())) : 0;
-		}
-		else {
+			return this.iPopulation.size() > 0 ? Math.sqrt(varTimesN / (this.fixings.contains(Fixings.IS_SAMPLE) ? this.iPopulation.size() - 1
+					: this.iPopulation.size())) : 0;
+		} else {
 			double avg = getAvgOBS();
 			double varTimesN = 0;
 			for (int i = 0; i < this.dPopulation.size(); i++) {
 				double value = this.dPopulation.get(i);
 				varTimesN += (value - avg) * (value - avg);
 			}
-			return this.dPopulation.size() > 0 ? Math.sqrt(varTimesN / (this.fixings.contains(Fixings.IS_SAMPLE) ? this.dPopulation.size() - 1 : this.dPopulation.size())) : 0;
+			return this.dPopulation.size() > 0 ? Math.sqrt(varTimesN / (this.fixings.contains(Fixings.IS_SAMPLE) ? this.dPopulation.size() - 1
+					: this.dPopulation.size())) : 0;
 		}
 	}
 
@@ -498,9 +496,9 @@ public class Quantile {
 				varTimesN += (value - avg) * (value - avg) * count / ++count; // pls note the counter increment
 				avg += (value - avg) / count;
 			}
-			return this.iPopulation.size() > 0 ? Math.sqrt(varTimesN / (this.fixings.contains(Fixings.IS_SAMPLE) ? this.iPopulation.size() - 1 : this.iPopulation.size())) : 0;
-		}
-		else {
+			return this.iPopulation.size() > 0 ? Math.sqrt(varTimesN / (this.fixings.contains(Fixings.IS_SAMPLE) ? this.iPopulation.size() - 1
+					: this.iPopulation.size())) : 0;
+		} else {
 			double avg = 0;
 			double varTimesN = 0;
 			double count = 0; // double count improves the performance in this case (not in the integer based branch)
@@ -509,17 +507,17 @@ public class Quantile {
 				varTimesN += (value - avg) * (value - avg) * count / ++count; // pls note the counter increment
 				avg += (value - avg) / count;
 			}
-			return this.dPopulation.size() > 0 ? Math.sqrt(varTimesN / (this.fixings.contains(Fixings.IS_SAMPLE) ? this.dPopulation.size() - 1 : this.dPopulation.size())) : 0;
+			return this.dPopulation.size() > 0 ? Math.sqrt(varTimesN / (this.fixings.contains(Fixings.IS_SAMPLE) ? this.dPopulation.size() - 1
+					: this.dPopulation.size())) : 0;
 		}
 	}
 
 	public double getSigmaFigure() {
-		// takes about 310 ms for 100 iPopulations with 500k members on ET's machine (compared to 680/500 ms for sigmaOBS/sigmaRunningOBS  )
+		// takes about 310 ms for 100 iPopulations with 500k members on ET's machine (compared to 680/500 ms for sigmaOBS/sigmaRunningOBS )
 		if (this.sigmaFigure == null) {
 			if (this.dPopulation == null) {
 				this.sigmaFigure = this.iPopulation.parallelStream().collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getSigma(this.fixings.contains(Fixings.IS_SAMPLE));
-			}
-			else
+			} else
 				this.sigmaFigure = this.dPopulation.parallelStream().collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getSigma(this.fixings.contains(Fixings.IS_SAMPLE));
 		}
 		return this.sigmaFigure;
@@ -537,13 +535,11 @@ public class Quantile {
 				if (probabilityCutPoint >= 1. / (pSize + 1) && probabilityCutPoint < (double) pSize / (pSize + 1)) {
 					double position = (pSize + 1) * probabilityCutPoint;
 					return this.iPopulation.get((int) position - 1) + (position - (int) position) * (this.iPopulation.get((int) position) - this.iPopulation.get((int) position - 1));
-				}
-				else if (probabilityCutPoint < 1. / (pSize + 1))
+				} else if (probabilityCutPoint < 1. / (pSize + 1))
 					return this.iPopulation.get(0);
 				else
 					return this.iPopulation.get(pSize - 1);
-			}
-			else {
+			} else {
 				if (probabilityCutPoint > 0. && probabilityCutPoint < 1.) {
 					double position = pSize * probabilityCutPoint;
 					if (position % 2 == 0)
@@ -552,26 +548,22 @@ public class Quantile {
 					else
 						// take element p due to zerobased index in combination with upper bound operation in the calculation rule
 						return this.iPopulation.get((int) (position));
-				}
-				else if (probabilityCutPoint == 0.)
+				} else if (probabilityCutPoint == 0.)
 					return this.iPopulation.get(0);
 				else
 					return this.iPopulation.get(pSize - 1);
 			}
-		}
-		else {
+		} else {
 			int pSize = this.dPopulation.size();
 			if (this.fixings.contains(Fixings.IS_SAMPLE)) {
 				if (probabilityCutPoint >= 1. / (pSize + 1) && probabilityCutPoint < (double) pSize / (pSize + 1)) {
 					double position = (pSize + 1) * probabilityCutPoint;
 					return this.dPopulation.get((int) position - 1) + (position - (int) position) * (this.dPopulation.get((int) position) - this.dPopulation.get((int) position - 1));
-				}
-				else if (probabilityCutPoint < 1. / (pSize + 1))
+				} else if (probabilityCutPoint < 1. / (pSize + 1))
 					return this.dPopulation.get(0);
 				else
 					return this.dPopulation.get(pSize - 1);
-			}
-			else {
+			} else {
 				if (probabilityCutPoint > 0. && probabilityCutPoint < 1.) {
 					double position = pSize * probabilityCutPoint;
 					if (position % 2 == 0)
@@ -580,8 +572,7 @@ public class Quantile {
 					else
 						// take element p due to zerobased index in combination with upper bound operation in the calculation rule
 						return this.dPopulation.get((int) (position));
-				}
-				else if (probabilityCutPoint == 0.)
+				} else if (probabilityCutPoint == 0.)
 					return this.dPopulation.get(0);
 				else
 					return this.dPopulation.get(pSize - 1);
@@ -622,18 +613,19 @@ public class Quantile {
 			for (int i = 0; i < this.iPopulation.size() * probabilityCutPoint; i++) {
 				if (this.iPopulation.get(i) >= whiskerLimitValue) {
 					// get the corrected value which is crucial for samples
-					value = getQuantile((.5 + i) / this.iPopulation.size()); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					// add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					value = getQuantile((.5 + i) / this.iPopulation.size());
 					// take the whisker limit value if the interpolation / estimation value is beyond the limit
 					value = value < whiskerLimitValue ? whiskerLimitValue : value;
 					break;
 				}
 			}
-		}
-		else {
+		} else {
 			for (int i = 0; i < this.dPopulation.size() * probabilityCutPoint; i++) {
 				if (this.dPopulation.get(i) >= whiskerLimitValue) {
 					// get the corrected value which is crucial for samples
-					value = getQuantile((.5 + i) / this.dPopulation.size()); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					// add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					value = getQuantile((.5 + i) / this.dPopulation.size());
 					// take the whisker limit value if the interpolation / estimation value is beyond the limit
 					value = value < whiskerLimitValue ? whiskerLimitValue : value;
 					break;
@@ -652,18 +644,19 @@ public class Quantile {
 			for (int i = this.iPopulation.size() - 1; i > this.iPopulation.size() * probabilityCutPoint; i--) {
 				if (this.iPopulation.get(i) <= whiskerLimitValue) {
 					// get the corrected value which is crucial for samples
-					value = getQuantile((.5 + i) / this.iPopulation.size()); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					// add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					value = getQuantile((.5 + i) / this.iPopulation.size());
 					// take the whisker limit value if the interpolation / estimation value is beyond the limit
 					value = value > whiskerLimitValue ? whiskerLimitValue : value;
 					break;
 				}
 			}
-		}
-		else {
+		} else {
 			for (int i = this.dPopulation.size() - 1; i > this.dPopulation.size() * probabilityCutPoint; i--) {
 				if (this.dPopulation.get(i) <= whiskerLimitValue) {
 					// get the corrected value which is crucial for samples
-					value = getQuantile((.5 + i) / this.dPopulation.size()); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					// add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+					value = getQuantile((.5 + i) / this.dPopulation.size());
 					// take the whisker limit value if the interpolation / estimation value is beyond the limit
 					value = value > whiskerLimitValue ? whiskerLimitValue : value;
 					break;

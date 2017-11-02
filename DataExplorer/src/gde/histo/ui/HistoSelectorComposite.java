@@ -18,9 +18,9 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
+import static java.util.logging.Level.FINEST;
+
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.TableItem;
 import gde.GDE;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
+import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -102,7 +103,7 @@ public final class HistoSelectorComposite extends Composite {
 		this.addHelpListener(new HelpListener() {
 			@Override
 			public void helpRequested(HelpEvent evt) {
-				if (HistoSelectorComposite.log.isLoggable(Level.FINEST)) HistoSelectorComposite.log.log(Level.FINEST, "helpRequested " + evt); //$NON-NLS-1$
+				log.log(FINEST, "helpRequested ", evt); //$NON-NLS-1$
 				HistoSelectorComposite.this.application.openHelpDialog("", "HelpInfo_41.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
@@ -124,7 +125,7 @@ public final class HistoSelectorComposite extends Composite {
 			this.curveSelectorHeader.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
+					log.fine(() -> "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
 					HistoSelectorComposite.this.application.clearMeasurementModes();
 					if (!HistoSelectorComposite.this.curveSelectorHeader.getSelection()) {
 						// use this check button to deselect all selected curves
@@ -168,11 +169,11 @@ public final class HistoSelectorComposite extends Composite {
 			this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
+					log.fine(() -> "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
 					if (evt != null && evt.item != null) {
 						final TableItem eventItem = (TableItem) evt.item;
 						// avoid phantom measurements with invisible curves
-						if (HistoSelectorComposite.log.isLoggable(Level.FINER)) HistoSelectorComposite.log.log(Level.FINER, "checked/Old=" + eventItem.getChecked() + eventItem.getData(DataExplorer.OLD_STATE)); //$NON-NLS-1$
+						log.finer(() -> "checked/Old=" + eventItem.getChecked() + eventItem.getData(DataExplorer.OLD_STATE)); //$NON-NLS-1$
 						final TrailRecord activeRecord = getTableItemRecord(eventItem);
 						TrailRecordSet trailRecordSet = HistoSelectorComposite.this.application.getHistoSet().getTrailRecordSet();
 						if (!eventItem.getChecked() && (Boolean) eventItem.getData(DataExplorer.OLD_STATE) //
@@ -203,7 +204,7 @@ public final class HistoSelectorComposite extends Composite {
 	 * Update of the curve selector table.
 	 */
 	public synchronized void doUpdateCurveSelectorTable() {
-		HistoSelectorComposite.log.log(Level.FINE, "start"); //$NON-NLS-1$
+		log.fine("start"); //$NON-NLS-1$
 		this.curveSelectorTable.removeAll();
 		for (TableEditor editor : this.editors) {
 			if (editor != null) { // non displayable records
@@ -227,7 +228,7 @@ public final class HistoSelectorComposite extends Composite {
 				if (itemWidth < textSize + checkBoxWidth) itemWidth = textSize + checkBoxWidth;
 				textSize2 = (int) (record.getTrailSelector().getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10) * TEXT_EXTENT_FACTOR * 15 / 20.);
 				if (itemWidth2 < textSize2 + checkBoxWidth) itemWidth2 = textSize2 + checkBoxWidth;
-				// if (log.isLoggable(Level.FINE)) log.log(Level.FINE, item.getText() + " " + itemWidth);
+				// log.fine(() -> item.getText() + " " + itemWidth);
 				if (record.isDisplayable()) {
 					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 					item.setForeground(record.getColor());
@@ -244,7 +245,7 @@ public final class HistoSelectorComposite extends Composite {
 					selectorCombos[i].addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent event) {
-							if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "selectorCombos.SelectionListener, event=" + event); //$NON-NLS-1$
+							log.fine("selectorCombos.SelectionListener, event=" + event); //$NON-NLS-1$
 							Combo combo = (Combo) event.getSource();
 							record.getTrailSelector().setTrailTextSelectedIndex(combo.getSelectionIndex());
 							HistoSelectorComposite.this.application.updateHistoTabs(record.getOrdinal(), true);
@@ -263,7 +264,7 @@ public final class HistoSelectorComposite extends Composite {
 			}
 			this.selectorColumnWidth = itemWidth;
 			this.curveTypeColumnWidth = itemWidth2;
-			if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "*curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
+			log.fine(() -> "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 		}
 		this.tableCurveTypeColumn.setWidth(this.curveTypeColumnWidth);
 		if (this.oldSelectorColumnWidth != this.selectorColumnWidth) {
@@ -273,7 +274,7 @@ public final class HistoSelectorComposite extends Composite {
 		}
 		this.application.setGraphicsSashFormWeights(this.getCompositeWidth(), GraphicsType.HISTO);
 
-		if (HistoSelectorComposite.log.isLoggable(Level.FINER)) HistoSelectorComposite.log.log(Level.FINER, "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
+		log.fine(() -> "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 	}
 
 	/**
@@ -302,15 +303,14 @@ public final class HistoSelectorComposite extends Composite {
 	}
 
 	public void setRecordSelection(TrailRecord activeRecord, boolean isVisible) {
-		final TableItem tableItem = Arrays.stream(this.curveSelectorTable.getItems()).filter(c -> ((String) c.getData(DataExplorer.RECORD_NAME)).equals(activeRecord.getName())).findFirst()
-				.orElseThrow(UnsupportedOperationException::new);
+		final TableItem tableItem = Arrays.stream(this.curveSelectorTable.getItems()).filter(c -> ((String) c.getData(DataExplorer.RECORD_NAME)).equals(activeRecord.getName())).findFirst().orElseThrow(UnsupportedOperationException::new);
 		tableItem.setChecked(isVisible);
 		if (activeRecord != null) setRecordSelection(activeRecord, isVisible, tableItem);
 	}
 
 	private void setRecordSelection(TrailRecord activeRecord, boolean isVisible, final TableItem tableItem) {
 		// activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-		if (HistoSelectorComposite.log.isLoggable(Level.FINER)) HistoSelectorComposite.log.log(Level.FINER, "isVisible old= " + activeRecord.isVisible()); //$NON-NLS-1$
+		log.fine(() -> "isVisible old= " + activeRecord.isVisible()); //$NON-NLS-1$
 		if (isVisible) {
 			activeRecord.setVisible(true);
 			// activeRecord.setDisplayable(true);
@@ -339,11 +339,11 @@ public final class HistoSelectorComposite extends Composite {
 		TrailRecord activeRecord = getTableItemRecord(item);
 		if (!isTableSelection || item.getChecked() != (Boolean) item.getData(DataExplorer.OLD_STATE)) {
 			isToggled = true;
-			if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "selection state changed = " + activeRecord.getName()); //$NON-NLS-1$
+			log.fine(() -> "selection state changed= " + activeRecord.getName()); //$NON-NLS-1$
 			// get newest timestamp and newest recordSet within this entry (both collections are in descending order)
 			if (activeRecord != null) {
 				setRecordSelection(activeRecord, isTableSelection && item.getChecked() || forceVisible, item);
-				if (HistoSelectorComposite.log.isLoggable(Level.FINE)) HistoSelectorComposite.log.log(Level.FINE, "isVisible= " + activeRecord.isVisible()); //$NON-NLS-1$
+				log.fine(() -> "isVisible= " + activeRecord.isVisible()); //$NON-NLS-1$
 			}
 		}
 		return isToggled;

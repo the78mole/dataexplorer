@@ -19,11 +19,13 @@
 
 package gde.histo.recordings;
 
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.WARNING;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import gde.device.IDevice;
 import gde.device.TrailTypes;
@@ -31,7 +33,7 @@ import gde.histo.cache.ExtendedVault;
 import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.gpslocations.GpsCluster;
 import gde.histo.utils.GpsCoordinate;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -94,7 +96,7 @@ public final class RecordingsCollector {
 			}
 		}
 		trailRecordSet.syncScaleOfSyncableRecords();
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, " " + trailRecord.getTrailSelector());
+		log.finer(() -> " " + trailRecord.getTrailSelector());
 	}
 
 	/**
@@ -131,12 +133,12 @@ public final class RecordingsCollector {
 
 						suiteRecords.get(i).addElement(point);
 					}
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(" %s trail %3d  %s  %d minVal=%d maxVal=%d", trailRecord.getName(), //$NON-NLS-1$
+					if (log.isLoggable(FINER)) log.log(FINER, String.format(" %s trail %3d  %s  %d minVal=%d maxVal=%d", trailRecord.getName(), //$NON-NLS-1$
 							trailSelector.getTrailOrdinal(), histoVault.getLogFilePath(), point, suiteRecords.get(i).getMinRecordValue(), suiteRecords.get(i).getMaxRecordValue()));
 				}
 			}
 		}
-		log.log(Level.FINER, " " , trailSelector);
+		log.log(FINER, " ", trailSelector);
 	}
 
 	/**
@@ -179,7 +181,8 @@ public final class RecordingsCollector {
 					Integer longitudePoint = histoVault.getMeasurementPoint(longitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
 
 					if (latitudePoint != null && longitudePoint != null)
-						gpsCluster.add(new GpsCoordinate(device.translateValue(latitudeRecord, latitudePoint / 1000.), device.translateValue(longitudeRecord, longitudePoint / 1000.)));
+						gpsCluster.add(new GpsCoordinate(device.translateValue(latitudeRecord, latitudePoint / 1000.),
+								device.translateValue(longitudeRecord, longitudePoint / 1000.)));
 					else
 						gpsCluster.add(null); // this keeps the sequence in parallel with the vaults sequence
 				}
@@ -190,7 +193,7 @@ public final class RecordingsCollector {
 				try {
 					gpsLocationsThread.start();
 				} catch (RuntimeException e) {
-					log.log(Level.WARNING, e.getMessage(), e);
+					log.log(WARNING, e.getMessage(), e);
 				}
 			}
 		}
@@ -210,8 +213,7 @@ public final class RecordingsCollector {
 			// refresh the histo table which might already have been painted without the GPS coordinates
 			if (trailRecordSet.getDataTags().getDataGpsLocations().size() > 0) {
 				RecordingsCollector.application.updateHistoTable(false);
-				if (log.isLoggable(Level.FINER))
-					log.log(Level.FINER, "fill in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " ms!  GPS locations size=" + gpsCluster.getAssignedClusters().values().size()); //$NON-NLS-1$ //$NON-NLS-2$
+				log.finer(() -> "fill in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " ms!  GPS locations size=" + gpsCluster.getAssignedClusters().values().size()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -253,9 +255,9 @@ public final class RecordingsCollector {
 			trailSelector.setMostApplicableTrailTextOrdinal();
 		}
 		if (trailSelector.getTrailTextSelectedIndex() < 0) {
-			log.log(Level.INFO, String.format("%s : no trail types identified", record.getName())); //$NON-NLS-1$
+			log.info(() -> String.format("%s : no trail types identified" + record.getName())); //$NON-NLS-1$
 		} else {
-			log.log(Level.FINER, "", trailSelector); //$NON-NLS-1$
+			log.log(FINER, "", trailSelector); //$NON-NLS-1$
 		}
 	}
 

@@ -22,9 +22,8 @@ package gde.histo.device;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
-import gde.log.Level;
+import gde.log.Logger;
 
 /**
  * Provide information about the max and min value sets based on the point sets delivered.
@@ -43,8 +42,14 @@ public class MaxMinObserver {
 	List<Integer>								thisMinIndices	= new ArrayList<>();
 	List<Integer>								lastMinIndices	= new ArrayList<>();
 
-	private boolean							isLastAutonomousExtremum;													// true if the last points item has min/max values at positions where the current item has not
-	private boolean							isThisChanged;																		// true if the current candidate has changed the max or min value set
+	/**
+	 * true if the last points item has min/max values at positions where the current item has not
+	 */
+	private boolean							isLastAutonomousExtremum;
+	/**
+	 * true if the current candidate has changed the max or min value set
+	 */
+	private boolean							isThisChanged;
 
 	public MaxMinObserver(int[] newMaxPoints, int[] newMinPoints) {
 		this.maxPoints = new int[newMaxPoints.length];
@@ -99,7 +104,7 @@ public class MaxMinObserver {
 				this.isThisChanged = true;
 			}
 		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("timeStep_ms=%,12d newMinMax=%b %s", timeStep_ms, this.isThisChanged, Arrays.toString(points)));
+		log.finer(() -> String.format("timeStep_ms=%,12d newMinMax=%b %s", timeStep_ms, this.isThisChanged, Arrays.toString(points)));
 		if (isLastChanged && this.isThisChanged) setLastAutonomousExtremum(points, timeStep_ms, lastPoints);
 		return this.isThisChanged;
 	}
@@ -121,7 +126,7 @@ public class MaxMinObserver {
 			}
 			if (!autonomousIndices.isEmpty()) {
 				this.isLastAutonomousExtremum = true;
-				log.log(Level.FINER, String.format("%,12d  autonomous last max found %s from %s", timeStep_ms, Arrays.toString(autonomousIndices.toArray()), Arrays.toString(this.lastMaxIndices.toArray())));
+				log.finer(() -> String.format("%,12d  autonomous last max found %s from %s", timeStep_ms, Arrays.toString(autonomousIndices.toArray()), Arrays.toString(this.lastMaxIndices.toArray())));
 			}
 		}
 		{
@@ -132,7 +137,7 @@ public class MaxMinObserver {
 			}
 			if (!autonomousIndices.isEmpty()) {
 				this.isLastAutonomousExtremum = true;
-				log.log(Level.FINER, String.format("%,12d  autonomous last min found %s from %s", timeStep_ms, Arrays.toString(autonomousIndices.toArray()), Arrays.toString(this.lastMinIndices.toArray())));
+				log.finer(() -> String.format("%,12d  autonomous last min found %s from %s", timeStep_ms, Arrays.toString(autonomousIndices.toArray()), Arrays.toString(this.lastMinIndices.toArray())));
 			}
 		}
 	}

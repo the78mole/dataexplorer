@@ -18,6 +18,9 @@
 ****************************************************************************************/
 package gde.histo.gpslocations;
 
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.WARNING;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,7 +31,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -42,7 +44,7 @@ import org.w3c.dom.NodeList;
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.utils.GpsCoordinate;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.utils.FileUtils;
 
 /**
@@ -64,24 +66,24 @@ public final class GeoCodes {
 		FileUtils.checkDirectoryAndCreate(settings.getHistoLocationsDirectory().toString());
 		List<File> files;
 		try {
-			File geoFile = null;
+			File geoFile;
 			files = FileUtils.getFileListing(settings.getHistoLocationsDirectory().toFile(), 1);
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%04d files found in locationsDir %s", files.size(), settings.getHistoLocationsDirectory().toString())); //$NON-NLS-1$
+			log.finer(() -> String.format("%04d files found in locationsDir %s", files.size(), settings.getHistoLocationsDirectory().toString())); //$NON-NLS-1$
 			{
-				final Comparator<File> distanceComparison = (File f1, File f2) -> Double.compare(new GpsCoordinate(f1.getName()).getDistance(gpsCoordinate),
-						(new GpsCoordinate(f2.getName()).getDistance(gpsCoordinate)));
-				final Predicate<File> minDistanceFilter = f -> (new GpsCoordinate(f.getName())).getDistance(gpsCoordinate) < GeoCodes.settings.getGpsLocationRadius();
+				final Comparator<File> distanceComparison = (File f1, File f2) -> Double.compare(new GpsCoordinate(
+						f1.getName()).getDistance(gpsCoordinate), (new GpsCoordinate(f2.getName()).getDistance(gpsCoordinate)));
+				final Predicate<File> minDistanceFilter = f -> (new GpsCoordinate(
+						f.getName())).getDistance(gpsCoordinate) < GeoCodes.settings.getGpsLocationRadius();
 				File closestFile = files.parallelStream().filter(minDistanceFilter).min(distanceComparison).orElseGet(() -> GeoCodes.aquireGeoData(gpsCoordinate));
 				geoFile = closestFile;
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("file from stream %s   file from loop %s", geoFile.getName(), closestFile.getName())); //$NON-NLS-1$
+				log.finer(() -> String.format("file from stream %s   file from loop %s", geoFile.getName(), closestFile.getName())); //$NON-NLS-1$
 			}
 			if (FileUtils.checkFileExist(geoFile.getPath()))
 				location = getLocation(geoFile).replace("Unnamed Road, ", ""); //$NON-NLS-1$ //$NON-NLS-2$
 			else
-				log.log(Level.WARNING, "geoCode file not found"); //$NON-NLS-1$
-		}
-		catch (FileNotFoundException e) {
-			log.log(Level.WARNING, e.getMessage(), e); //$NON-NLS-1$
+				log.log(WARNING, "geoCode file not found"); //$NON-NLS-1$
+		} catch (FileNotFoundException e) {
+			log.log(WARNING, e.getMessage(), e); // $NON-NLS-1$
 		}
 		return location;
 
@@ -96,24 +98,23 @@ public final class GeoCodes {
 		try (InputStream inputStream = new FileInputStream(file)) {
 			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
 			XPath xpath = XPathFactory.newInstance().newXPath();
-			//			XPathExpression expr = xpath.compile("/GeocodeResponse/result[3]/formatted_address"); // 1-based
+			// XPathExpression expr = xpath.compile("/GeocodeResponse/result[3]/formatted_address"); // 1-based
 			final XPathExpression expr = xpath.compile("/GeocodeResponse/result[type/text()='" + GeoCodes.settings.getGpsAddressType().name().toLowerCase() + "']/formatted_address"); //$NON-NLS-1$ //$NON-NLS-2$
 			location = expr.evaluate(doc, XPathConstants.STRING).toString();
-			log.log(Level.FINER, "1st try formatted_address=", location); //$NON-NLS-1$
+			log.log(FINER, "1st try formatted_address=", location); //$NON-NLS-1$
 
 			if (location.isEmpty()) {
 				NodeList nodes = (NodeList) xpath.evaluate("/GeocodeResponse/result/formatted_address", doc, XPathConstants.NODESET); //$NON-NLS-1$
 				for (int i = 0; i < nodes.getLength(); i++) {
 					location = nodes.item(i).getTextContent();
 					if (!location.isEmpty()) {
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "loop formatted_address=" + nodes.item(i).getTextContent()); //$NON-NLS-1$
+						if (log.isLoggable(FINER)) log.log(FINER, "loop formatted_address=", nodes.item(i).getTextContent()); //$NON-NLS-1$
 						break;
 					}
 				}
 			}
-		}
-		catch (Exception e) {
-			log.log(Level.WARNING, e.getMessage()); //$NON-NLS-1$
+		} catch (Exception e) {
+			log.log(WARNING, e.getMessage()); // $NON-NLS-1$
 		}
 		return location;
 	}
@@ -126,10 +127,9 @@ public final class GeoCodes {
 				ReadableByteChannel readableByteChannel = java.nio.channels.Channels.newChannel(inputStream);
 				FileOutputStream fileOutputStream = new FileOutputStream(geoData)) {
 			fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, 1 << 20); // limit 1 MB
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "http read in " + (System.currentTimeMillis() - milliTime) + " ms!  gpsCoordinate=" + gpsCoordinate.toCsvString()); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		catch (Exception e1) {
-			log.log(Level.WARNING, "internet connection failed, check network capability if location data required"); //$NON-NLS-1$
+			log.finer(() -> "http read in " + (System.currentTimeMillis() - milliTime) + " ms!  gpsCoordinate=" + gpsCoordinate.toCsvString()); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (Exception e1) {
+			log.log(WARNING, "internet connection failed, check network capability if location data required"); //$NON-NLS-1$
 		}
 		return geoData;
 	}

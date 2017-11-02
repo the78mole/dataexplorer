@@ -19,15 +19,21 @@
 
 package gde.histo.transitions;
 
+import static gde.histo.transitions.AbstractAnalyzer.TriggerState.RECOVERING;
+import static gde.histo.transitions.AbstractAnalyzer.TriggerState.TRIGGERED;
+import static gde.histo.transitions.AbstractAnalyzer.TriggerState.WAITING;
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.FINEST;
+
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
 import gde.device.TransitionType;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -55,7 +61,7 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 	 * @return all transitions with the key thresholdStartTimestamp_ms
 	 */
 	public TreeMap<Long, Transition> findTransitions(Record record, TransitionType transitionType) {
-		this.triggerState = TriggerState.WAITING;
+		this.triggerState = WAITING;
 		initializeDeques(record, transitionType);
 
 		return findPulseTransitions(record, transitionType);
@@ -82,10 +88,10 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 				boolean isThresholdLevel = levelChecker.isBeyondThresholdLevel(translatedValue);
 				// check if the current value is beyond the threshold and if the majority of the reference values did not pass the threshold
 				if (isThresholdLevel && !this.referenceDeque.isAddableInTimePeriod(timeStamp_100ns) && !levelChecker.isBeyondThresholdLevel(this.referenceDeque.getSecurityValue())) {
-					this.triggerState = TriggerState.TRIGGERED;
+					this.triggerState = TRIGGERED;
 					this.thresholdDeque.initialize(i);
 					this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
-					log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
+					log.finer(() -> Integer.toString(transitionType.getTransitionId()) + this);
 				} else {
 					this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 				}
@@ -99,13 +105,13 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 					// check if only a minimum of the threshold values actually passed the recovery level (in order to tolerate a minimum of jitters)
 					if (!levelChecker.isBeyondRecoveryLevel(this.thresholdDeque.getSecurityValue())) {
 						// threshold must conform perfectly to the threshold requirements which are level and MINIMUM time
-						this.triggerState = TriggerState.RECOVERING;
+						this.triggerState = RECOVERING;
 						this.recoveryDeque.initialize(i);
 						this.recoveryDeque.addLast(translatedValue, timeStamp_100ns);
-						log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
+						log.finer(() -> Integer.toString(transitionType.getTransitionId()) + this);
 					} else {
-						this.triggerState = TriggerState.WAITING;
-						log.log(Level.FINER, " threshold SecurityValue ", this); //$NON-NLS-1$
+						this.triggerState = WAITING;
+						log.log(FINER, " threshold SecurityValue ", this); //$NON-NLS-1$
 						this.thresholdDeque.clear();
 						this.referenceDeque.initialize(i);
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
@@ -113,8 +119,8 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 				} else if (!isPersistentTrigger && !isInThresholdTime) { // hysteresis is traversed while falling back to recovery
 					this.thresholdDeque.addLast(translatedValue, timeStamp_100ns);
 				} else if (!isPersistentTrigger && isInThresholdTime) { // no hysteresis within threshold time
-					this.triggerState = TriggerState.WAITING;
-					log.log(Level.FINER, " !isPersistentTrigger ", this); //$NON-NLS-1$
+					this.triggerState = WAITING;
+					log.log(FINER, " !isPersistentTrigger ", this); //$NON-NLS-1$
 					this.thresholdDeque.clear();
 					this.referenceDeque.initialize(i);
 					this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
@@ -126,33 +132,34 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 				this.previousTriggerState = this.triggerState;
 				boolean isPersistentRecovery = levelChecker.isBeyondRecoveryLevel(translatedValue);
 				if (!this.recoveryDeque.isAddableInTimePeriod(timeStamp_100ns)) {
-					// final check if the majority of the reference and recovery values did not pass the threshold and if only a minimum of the threshold values actually passed the recovery level
+					// final check if the majority of the reference and recovery values did not pass the threshold and if only a minimum of the threshold values
+					// actually passed the recovery level
 					if (!levelChecker.isBeyondThresholdLevel(this.referenceDeque.getSecurityValue()) //
 							&& !levelChecker.isBeyondRecoveryLevel(this.thresholdDeque.getSecurityValue()) //
 							&& !levelChecker.isBeyondThresholdLevel(this.recoveryDeque.getSecurityValue())) {
-						this.triggerState = TriggerState.WAITING;
-						log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
-						Transition transition = new Transition(this.referenceDeque.startIndex, this.referenceDeque.size(), this.thresholdDeque.startIndex, this.thresholdDeque.size(),
-								this.recoveryDeque.startIndex, this.recoveryDeque.size(), record, transitionType);
+						this.triggerState = WAITING;
+						log.log(FINER, Integer.toString(transitionType.getTransitionId()), this);
+						Transition transition = new Transition(this.referenceDeque.startIndex, this.referenceDeque.size(), this.thresholdDeque.startIndex,
+								this.thresholdDeque.size(), this.recoveryDeque.startIndex, this.recoveryDeque.size(), record, transitionType);
 						transitions.put(transition.getThresholdStartTimeStamp_ms(), transition);
-						log.log(Level.FINE, GDE.STRING_GREATER, transition);
+						log.log(FINE, GDE.STRING_GREATER, transition);
 						this.thresholdDeque.clear();
 						this.referenceDeque.initialize(this.recoveryDeque.getStartIndex());
 						this.referenceDeque.addLastByMoving(this.recoveryDeque);
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 					} else {
-						if (log.isLoggable(Level.WARNING)) log.log(Level.WARNING, String.format("%d trigger security check provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
+						log.warning(() -> String.format("%d trigger security check provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
 								transitionType.getTransitionId(), this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
-						this.triggerState = TriggerState.WAITING;
-						log.log(Level.FINER, Integer.toString(transitionType.getTransitionId()), this);
+						this.triggerState = WAITING;
+						log.finer(() -> Integer.toString(transitionType.getTransitionId()) + this);
 						this.thresholdDeque.clear();
 						this.referenceDeque.initialize(this.recoveryDeque.getStartIndex());
 						this.referenceDeque.addLastByMoving(this.recoveryDeque);
 						this.referenceDeque.addLast(translatedValue, timeStamp_100ns);
 					}
 				} else if (!isPersistentRecovery) {
-					this.triggerState = TriggerState.WAITING;
-					log.log(Level.FINER, " !isPersistentRecovery " + transitionType.getTransitionId(), this); //$NON-NLS-1$
+					this.triggerState = WAITING;
+					log.log(FINER, " !isPersistentRecovery " + transitionType.getTransitionId(), this); //$NON-NLS-1$
 					this.thresholdDeque.clear();
 					this.referenceDeque.initialize(this.recoveryDeque.getStartIndex());
 					this.referenceDeque.addLastByMoving(this.recoveryDeque);
@@ -164,20 +171,20 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 			} // end switch
 		} // end for
 		// take the current transition even if the recovery time is not exhausted
-		if (this.triggerState == TriggerState.RECOVERING) {
-			// final check if the majority of the reference and recovery values did not pass the threshold and if only a minimum of the threshold values actually passed the recovery level
+		if (this.triggerState == RECOVERING) {
+			// final check if the majority of the reference and recovery values did not pass the threshold and if only a minimum of the threshold values
+			// actually passed the recovery level
 			if (!levelChecker.isBeyondThresholdLevel(this.referenceDeque.getSecurityValue()) //
 					&& !levelChecker.isBeyondRecoveryLevel(this.thresholdDeque.getSecurityValue()) //
 					&& !levelChecker.isBeyondThresholdLevel(this.recoveryDeque.getSecurityValue())) {
-				Transition transition = new Transition(this.referenceDeque.startIndex, this.referenceDeque.size(), this.thresholdDeque.startIndex, this.thresholdDeque.size(), this.recoveryDeque.startIndex,
-						this.recoveryDeque.size(), record, transitionType);
+				Transition transition = new Transition(this.referenceDeque.startIndex, this.referenceDeque.size(), this.thresholdDeque.startIndex,
+						this.thresholdDeque.size(), this.recoveryDeque.startIndex, this.recoveryDeque.size(), record, transitionType);
 				transitions.put(transition.getThresholdStartTimeStamp_ms(), transition);
-				log.log(Level.FINE, GDE.STRING_GREATER, transition);
+				log.log(FINE, GDE.STRING_GREATER, transition);
 			}
-		} else if (this.triggerState == TriggerState.TRIGGERED) {
-			log.log(Level.FINER,
-					String.format("ends %s %s  referenceExtreme=%f ", this.triggerState, this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), this.referenceDeque.extremeValue) //$NON-NLS-1$
-							+ this.thresholdDeque.getExtremeValue() + this.thresholdDeque.getTranslatedValues());
+		} else if (this.triggerState == TRIGGERED) {
+			log.finer(() -> String.format("ends %s %s  referenceExtreme=%f ", //$NON-NLS-1$
+					this.triggerState, this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), this.referenceDeque.extremeValue) + this.thresholdDeque.getExtremeValue() + this.thresholdDeque.getTranslatedValues());
 		}
 		return transitions;
 	}
@@ -189,7 +196,8 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 	private void initializeDeques(Record transitionRecord, TransitionType transitionType) {
 		final int referenceDequeSize = (int) (transitionType.getReferenceTimeMsec() / this.recordSet.getAverageTimeStep_ms());
 		final int thresholdDequeSize = (int) (transitionType.getThresholdTimeMsec() / this.recordSet.getAverageTimeStep_ms());
-		final int recoveryDequeSize = (int) (transitionType.getRecoveryTimeMsec().orElseThrow(() -> new UnsupportedOperationException("recovery time. transitionID=" + transitionType.getTransitionId())) //$NON-NLS-1$
+		final int recoveryDequeSize = (int) (transitionType.getRecoveryTimeMsec().orElseThrow(() -> new UnsupportedOperationException(
+				"recovery time. transitionID=" + transitionType.getTransitionId())) //$NON-NLS-1$
 				/ this.recordSet.getAverageTimeStep_ms());
 
 		this.referenceDeque = new SettlementDeque(referenceDequeSize, transitionType.isGreater(), transitionType.getReferenceTimeMsec() * 10);
@@ -199,9 +207,8 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 
 		int descriptionCutPoint = transitionRecord.getParent().getDescription().indexOf("\r"); //$NON-NLS-1$
 		if (descriptionCutPoint < 0) descriptionCutPoint = 11;
-		log.log(Level.FINEST, transitionType.getTransitionId() + "  " + transitionRecord.getParent().getName() + " " + " " //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-				+ transitionRecord.getParent().getDescription().substring(0, descriptionCutPoint)
-				+ String.format(" %s initialized: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", transitionRecord.getName(), referenceDequeSize, thresholdDequeSize, recoveryDequeSize)); //$NON-NLS-1$
+		if (log.isLoggable(FINEST)) log.log(FINEST, transitionType.getTransitionId() + "  " + transitionRecord.getParent().getName() + " " + " " //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
+				+ transitionRecord.getParent().getDescription().substring(0, descriptionCutPoint) + String.format(" %s initialized: referenceDequeSize=%d  thresholdDequeSize=%d  recoveryDequeSize=%d", transitionRecord.getName(), referenceDequeSize, thresholdDequeSize, recoveryDequeSize)); //$NON-NLS-1$
 	}
 
 }

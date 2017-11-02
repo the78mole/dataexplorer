@@ -19,17 +19,19 @@
 
 package gde.histo.recordings;
 
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINER;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.Record;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
 import gde.histo.ui.CurveSurvey;
-import gde.log.Level;
+import gde.log.Logger;
 
 /**
  * Scale synchronization for measurements, settlements and scores.
@@ -65,8 +67,7 @@ public final class TrailRecordSynchronizer {
 						scaleSyncedRecords.get(syncMasterRecordOrdinal).add(syncMasterRecord);
 						syncMasterRecord.setSyncMinValue(Integer.MAX_VALUE);
 						syncMasterRecord.setSyncMaxValue(Integer.MIN_VALUE);
-						if (log.isLoggable(Level.FINER))
-							log.log(Level.FINER, "add syncMaster " + syncMasterRecord.getName() + " syncMinValue=" + syncMasterRecord.getSyncMinValue() + " syncMaxValue=" + syncMasterRecord.getSyncMaxValue());
+						log.finer(() -> "add syncMaster " + syncMasterRecord.getName() + " syncMinValue=" + syncMasterRecord.getSyncMinValue() + " syncMaxValue=" + syncMasterRecord.getSyncMaxValue());
 					}
 					if (!this.trailRecordSet.isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
 						if (Math.abs(i - syncMasterRecordOrdinal) >= scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
@@ -78,12 +79,12 @@ public final class TrailRecordSynchronizer {
 						this.trailRecordSet.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_END_VALUES);
 						this.trailRecordSet.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
 						this.trailRecordSet.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_SCALE_POSITION);
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add " + tmpRecord.getName()); //$NON-NLS-1$
+						log.finer(() -> "add " + tmpRecord.getName()); //$NON-NLS-1$
 					}
 				}
 			}
 		}
-		if (log.isLoggable(Level.FINE)) {
+		if (log.isLoggable(FINE)) {
 			StringBuilder sb = new StringBuilder();
 			for (Integer syncRecordOrdinal : scaleSyncedRecords.keySet()) {
 				sb.append(GDE.STRING_NEW_LINE).append(syncRecordOrdinal).append(GDE.STRING_COLON);
@@ -91,7 +92,7 @@ public final class TrailRecordSynchronizer {
 					sb.append(tmpRecord.getName()).append(GDE.STRING_SEMICOLON);
 				}
 			}
-			log.log(Level.FINE, sb.toString());
+			log.log(FINE, sb.toString());
 		}
 	}
 
@@ -102,19 +103,18 @@ public final class TrailRecordSynchronizer {
 	public void updateAllSyncScales() {
 		for (Record record : this.trailRecordSet.getRecordsSortedForDisplay()) {
 			TrailRecord actualRecord = (TrailRecord) record;
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, actualRecord.getName() + "   isVisible=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() //$NON-NLS-1$ //$NON-NLS-2$
+			log.finer(() -> actualRecord.getName() + "   isVisible=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() //$NON-NLS-1$ //$NON-NLS-2$
 					+ " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
 
 			if (actualRecord.isVisible() && actualRecord.isDisplayable()) {
 				if (!actualRecord.getTrailSelector().isTrailSuite()) {
 					actualRecord.setSyncMinValue((int) (actualRecord.getMinValue() * actualRecord.getSyncMasterFactor()));
 					actualRecord.setSyncMaxValue((int) (actualRecord.getMaxValue() * actualRecord.getSyncMasterFactor()));
-				}
-				else {
+				} else {
 					actualRecord.setSyncMinValue((int) (actualRecord.getSuiteMinValue() * actualRecord.getSyncMasterFactor()));
 					actualRecord.setSyncMaxValue((int) (actualRecord.getSuiteMaxValue() * actualRecord.getSyncMasterFactor()));
 				}
-				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, actualRecord.getName() + "   syncMin = " + actualRecord.getSyncMinValue() + "; syncMax = " + actualRecord.getSyncMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$
+				log.finer(() -> actualRecord.getName() + "   syncMin = " + actualRecord.getSyncMinValue() + "; syncMax = " + actualRecord.getSyncMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
@@ -138,7 +138,7 @@ public final class TrailRecordSynchronizer {
 				if (syncRecord.isVisible() && syncRecord.isDisplayable()) {
 					tmpMin = Math.min(tmpMin, syncRecord.getSyncMinValue());
 					tmpMax = Math.max(tmpMax, syncRecord.getSyncMaxValue());
-					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, syncRecord.getName() + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+					if (log.isLoggable(FINER)) log.log(FINER, syncRecord.getName() + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 			// now we have the max/min values over all sync records of the current sync group
@@ -147,8 +147,8 @@ public final class TrailRecordSynchronizer {
 				((TrailRecord) syncRecord).setSyncMaxValue(tmpMax);
 			}
 
-			if (isAffected && log.isLoggable(Level.FINER))
-				log.log(Level.FINER, this.trailRecordSet.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpMin / 1000.0 + "; syncMax = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+			if (isAffected && log.isLoggable(FINER))
+				log.log(FINER, this.trailRecordSet.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpMin / 1000.0 + "; syncMax = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

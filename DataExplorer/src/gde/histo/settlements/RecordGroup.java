@@ -22,14 +22,13 @@ package gde.histo.settlements;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import gde.data.Record;
 import gde.device.MeasurementMappingType;
 import gde.device.ReferenceGroupType;
 import gde.device.ReferenceRuleTypes;
 import gde.histo.utils.Spot;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -55,7 +54,8 @@ public final class RecordGroup {
 			this.records[i] = settlementRecord.getParent().get(settlementRecord.getParent().getRecordNames()[measurementMappingType.getMeasurementOrdinal()]);
 			i++;
 		}
-		if (!referenceGroupType.getSettlementMapping().isEmpty()) throw new UnsupportedOperationException("settlements based on settlements not supported");
+		if (!referenceGroupType.getSettlementMapping().isEmpty()) throw new UnsupportedOperationException(
+				"settlements based on settlements not supported");
 	}
 
 	/**
@@ -107,8 +107,7 @@ public final class RecordGroup {
 			if (record.elementAt(index) == null) {
 				result = null;
 				break;
-			}
-			else {
+			} else {
 				final double translatedValue = DataExplorer.application.getActiveDevice().translateValue(record, record.elementAt(index) / 1000.);
 				result = calculateAggregate(result, i, translatedValue);
 			}
@@ -126,41 +125,34 @@ public final class RecordGroup {
 		double recurrentResult = tmpResult;
 		if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.AVG) {
 			recurrentResult += (translatedValue - recurrentResult) / (aggregationStepIndex + 1);
-		}
-		else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MAX) {
+		} else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MAX) {
 			if (aggregationStepIndex != 0)
 				recurrentResult = Math.max(recurrentResult, translatedValue);
 			else
 				recurrentResult = translatedValue;
-		}
-		else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MIN) {
+		} else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.MIN) {
 			if (aggregationStepIndex == 0)
 				recurrentResult = translatedValue;
 			else
 				recurrentResult = Math.max(recurrentResult, translatedValue);
-		}
-		else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.PRODUCT) {
+		} else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.PRODUCT) {
 			if (aggregationStepIndex == 0)
 				recurrentResult = translatedValue;
 			else
 				recurrentResult *= translatedValue;
-		}
-		else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.QUOTIENT) {
+		} else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.QUOTIENT) {
 			if (aggregationStepIndex == 0)
 				recurrentResult = translatedValue;
 			else
 				recurrentResult /= translatedValue;
-		}
-		else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SPREAD) {
+		} else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SPREAD) {
 			if (aggregationStepIndex == 0)
 				recurrentResult = translatedValue;
 			else
 				recurrentResult -= translatedValue;
-		}
-		else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SUM) {
+		} else if (this.referenceGroupType.getReferenceRule() == ReferenceRuleTypes.SUM) {
 			recurrentResult += translatedValue;
-		}
-		else
+		} else
 			throw new UnsupportedOperationException();
 		return recurrentResult;
 	}
@@ -168,7 +160,8 @@ public final class RecordGroup {
 	/**
 	 * @param fromIndex
 	 * @param toIndex
-	 * @return the portion of the timestamps_ms and aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex are equal, the returned List is empty.)
+	 * @return the portion of the timestamps_ms and aggregated translated values between fromIndex, inclusive, and toIndex, exclusive. (If
+	 *         fromIndex and toIndex are equal, the returned List is empty.)
 	 */
 	public List<Spot<Double>> getSubPoints(int fromIndex, int toIndex) {
 		int recordSize = toIndex - fromIndex;
@@ -176,7 +169,7 @@ public final class RecordGroup {
 		for (int i = fromIndex; i < toIndex; i++) {
 			if (getReal(i) != null) result.add(new Spot<Double>(this.settlementRecord.getParent().getTime_ms(i), getReal(i)));
 		}
-		log.log(Level.FINER, "", Arrays.toString(result.toArray()));
+		log.finer(() -> Arrays.toString(result.toArray()));
 		return result;
 	}
 

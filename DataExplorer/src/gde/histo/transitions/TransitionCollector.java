@@ -28,14 +28,13 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import gde.data.RecordSet;
 import gde.device.ChannelType;
 import gde.device.TransitionClassTypes;
 import gde.device.TransitionGroupType;
 import gde.device.TransitionType;
-import gde.log.Level;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -59,11 +58,10 @@ public final class TransitionCollector {
 		for (TransitionType transitionType : channelType.getTransitions().values()) {
 			final TreeMap<Long, Transition> transitionsFromRecord = findTransitions(recordSet, transitionType);
 			if (!transitionsFromRecord.isEmpty()) {
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%d  transitionCount=%d", transitionType.getTransitionId(), 999)); //$NON-NLS-1$
+				log.fine(() -> String.format("%d  transitionCount=%d", transitionType.getTransitionId(), 999)); //$NON-NLS-1$
 
 				// assign the transitions to all transition groups which have a mapping to this transition type
-				Iterable<TransitionGroupType> iterable = channelType.getTransitionGroups().values().stream()
-						.filter(group -> group.getTransitionMapping().stream().anyMatch(mapping -> mapping.getTransitionId() == transitionType.getTransitionId()))::iterator;
+				Iterable<TransitionGroupType> iterable = channelType.getTransitionGroups().values().stream().filter(group -> group.getTransitionMapping().stream().anyMatch(mapping -> mapping.getTransitionId() == transitionType.getTransitionId()))::iterator;
 				for (TransitionGroupType transitionGroupType : iterable) {
 					if (!transitionContainer.containsKey(transitionGroupType.getTransitionGroupId())) {
 						// build the container
@@ -80,7 +78,7 @@ public final class TransitionCollector {
 						groupTransitions.remove(timeStamp_ms);
 					}
 					if (!duplicates.isEmpty()) {
-						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("%d  removals due to general overlap:  duplicatesSize=%d", transitionType.getTransitionId(), duplicates.size())); //$NON-NLS-1$
+						log.fine(() -> String.format("%d  removals due to general overlap:  duplicatesSize=%d", transitionType.getTransitionId(), duplicates.size())); //$NON-NLS-1$
 					}
 				}
 			}
@@ -100,16 +98,13 @@ public final class TransitionCollector {
 		if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
 			PeakAnalyzer histoTransitions = new PeakAnalyzer(recordSet);
 			transitionsFromRecord = histoTransitions.findTransitions(recordSet.get(recordSet.getRecordNames()[transitionType.getRefOrdinal()]), transitionType);
-		}
-		else if (transitionType.getClassType() == TransitionClassTypes.PULSE) {
+		} else if (transitionType.getClassType() == TransitionClassTypes.PULSE) {
 			PulseAnalyzer histoTransitions = new PulseAnalyzer(recordSet);
 			transitionsFromRecord = histoTransitions.findTransitions(recordSet.get(recordSet.getRecordNames()[transitionType.getRefOrdinal()]), transitionType);
-		}
-		else if (transitionType.getClassType() == TransitionClassTypes.SLOPE) {
+		} else if (transitionType.getClassType() == TransitionClassTypes.SLOPE) {
 			SlopeAnalyzer histoTransitions = new SlopeAnalyzer(recordSet);
 			transitionsFromRecord = histoTransitions.findTransitions(recordSet.get(recordSet.getRecordNames()[transitionType.getRefOrdinal()]), transitionType);
-		}
-		else {
+		} else {
 			throw new UnsupportedOperationException();
 		}
 
@@ -133,13 +128,11 @@ public final class TransitionCollector {
 				else if (previousTransitionEntry.equals(inferiorTransitionEntry)) {
 					duplicates.add(previousTransitionEntry.getKey());
 					previousTransitionEntry = transitionEntry;
-				}
-				else {
+				} else {
 					duplicates.add(transitionEntry.getKey());
 					// keep previousTransitionEntry for the next overlap check
 				}
-			}
-			else {
+			} else {
 				previousTransitionEntry = transitionEntry;
 			}
 		}
@@ -151,7 +144,8 @@ public final class TransitionCollector {
 	 * @param groupTransitions
 	 * @return the merged transitions with existing transitions for the current group and class
 	 */
-	private static TreeMap<Long, Transition> getSuperiorTransitions(final TreeMap<Long, Transition> transitionsFromRecord, final TreeMap<Long, Transition> groupTransitions) {
+	private static TreeMap<Long, Transition> getSuperiorTransitions(final TreeMap<Long, Transition> transitionsFromRecord,
+			final TreeMap<Long, Transition> groupTransitions) {
 		final TreeMap<Long, Transition> newTransitions;
 		newTransitions = new TreeMap<>(transitionsFromRecord);
 		if (!groupTransitions.isEmpty()) {
@@ -170,7 +164,7 @@ public final class TransitionCollector {
 				});
 			}
 			if (!intersection.isEmpty()) {
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("removals due to same timestamp:  intersectionSize=%d", intersection.size())); //$NON-NLS-1$
+				log.fine(() -> String.format("removals due to same timestamp:  intersectionSize=%d", intersection.size())); //$NON-NLS-1$
 			}
 		}
 		return newTransitions;
@@ -188,35 +182,33 @@ public final class TransitionCollector {
 
 		final Transition transition2 = entry2.getValue();
 		final Transition transition1 = entry1.getValue();
-		final boolean isOverlap = transition2.getReferenceStartTimeStamp_ms() < transition1.getThresholdEndTimeStamp_ms()
-				&& transition1.getReferenceStartTimeStamp_ms() < transition2.getThresholdEndTimeStamp_ms(); // !start2.after(end1) && !start1.after(end2)
+		final boolean isOverlap = transition2.getReferenceStartTimeStamp_ms() < transition1.getThresholdEndTimeStamp_ms() && transition1.getReferenceStartTimeStamp_ms() < transition2.getThresholdEndTimeStamp_ms();
+		// !start2.after(end1) && !start1.after(end2)
 		final boolean isTransition1Prioritized = (transition1.isPeak() && !transition2.isPeak()) || (transition1.isPulse() && !transition2.isPeak() && !transition2.isPulse());
 		final boolean isTransition2Prioritized = (transition2.isPeak() && !transition1.isPeak()) || (transition2.isPulse() && !transition1.isPeak() && !transition1.isPulse());
 
 		if (isOverlap) {
 			if (isTransition1Prioritized) {
 				inferiorTransition = Optional.of(entry2);
-			}
-			else if (isTransition2Prioritized) {
+			} else if (isTransition2Prioritized) {
 				inferiorTransition = Optional.of(entry1);
-			}
-			else {
+			} else {
 				final long transition1Duration = transition1.getThresholdEndTimeStamp_ms() - transition1.getReferenceStartTimeStamp_ms();
 				final long transition2Duration = transition2.getThresholdEndTimeStamp_ms() - transition2.getReferenceStartTimeStamp_ms();
 				if (transition1Duration < transition2Duration) {
 					inferiorTransition = Optional.of(entry2);
-				}
-				else if (transition2Duration < transition1Duration) {
+				} else if (transition2Duration < transition1Duration) {
 					inferiorTransition = Optional.of(entry1);
-				}
-				else {
+				} else {
 					// no criterion found
 					inferiorTransition = Optional.of(entry1);
 				}
 			}
 		}
 
-		inferiorTransition.ifPresent(x -> log.log(Level.FINER, "discarded due to " + (isTransition1Prioritized || isTransition2Prioritized ? "class:  " : "duration:  "), x.getValue())); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		inferiorTransition.ifPresent(x -> log.finer(() -> ("discarded due to " //
+				+ (isTransition1Prioritized || isTransition2Prioritized ? "class:  " : "duration:  ") //
+				+ x.getValue())));
 		return inferiorTransition;
 	}
 
