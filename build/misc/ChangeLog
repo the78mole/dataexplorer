@@ -4,10 +4,13 @@ Version 3.3.2 - xx yyy 2017
 * xyz ...
 History analysis
 * Enhance initial vertical lines positions in delta measurement mode
-* Fix Histo table column values for non-reversed timestamp sequence
+* Fix histo table column values for non-reversed timestamp sequence
 * Fix table entries for GPS location which are not shown sometimes
-* Enhance histo graphics redraw performance
-* Enhance directory screening performance
+* Enhance performance
+	-- redraw graphics
+	-- scan log file folders
+	-- read osd / bin
+	-- switch channel
 * Prepare histo kernel for forthcoming *.log files
 * Fix creating empty directories in case of unknown objects or devices
 * Enhance history module code base segregration from the application kernel 

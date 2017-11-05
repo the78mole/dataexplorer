@@ -180,7 +180,7 @@ public class OsdReaderWriter {
 	 * @throws IOException
 	 * @throws NotSupportedFileFormatException
 	 */
-	private static HashMap<String, String> readHeader(final String filePath, DataInputStream data_in) throws IOException, NotSupportedFileFormatException {
+	protected static HashMap<String, String> readHeader(final String filePath, DataInputStream data_in) throws IOException, NotSupportedFileFormatException {
 		String line;
 		HashMap<String, String> header = new HashMap<String, String>();
 		int headerCounter = GDE.OSD_FORMAT_HEADER_KEYS.length + 1;
@@ -553,7 +553,7 @@ public class OsdReaderWriter {
 	 * @throws IOException
 	 * @throws UnsupportedEncodingException
 	 */
-	protected static List<HashMap<String, String>> readRecordSetsInfo4AllVersions(DataInputStream data_in, HashMap<String, String> header)
+	private static List<HashMap<String, String>> readRecordSetsInfo4AllVersions(DataInputStream data_in, HashMap<String, String> header)
 			throws NumberFormatException, IOException, UnsupportedEncodingException {
 		String line;
 		// record sets with it properties and records
@@ -1021,7 +1021,7 @@ public class OsdReaderWriter {
 				catch (Exception e) {
 					try {
 						if (data_out != null) data_out.close();
-						if (updatedFile.exists()) 
+						if (updatedFile.exists())
 							if(updatedFile.delete())
 								log.log(Level.WARNING, "failed to delete " + filePath);
 						if (data_in != null) data_in.close();

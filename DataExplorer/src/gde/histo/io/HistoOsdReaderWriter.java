@@ -376,11 +376,13 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 	 */
 	public static List<VaultCollector> readTrusses(File file, String objectDirectory) throws IOException, NotSupportedFileFormatException {
 		List<VaultCollector> trusses = new ArrayList<>();
+		final HeaderParser osdHeader;
 
-		final HashMap<String, String> header = getHeader(file.toString());
-
-		HistoOsdReaderWriter readerWriter = new HistoOsdReaderWriter();
-		HeaderParser osdHeader = readerWriter.new HeaderParser(header);
+		InputStream inputStream = defineStream(file);
+		try (DataInputStream data_in = new DataInputStream(inputStream)) { // closes the inputStream also
+			HashMap<String, String> header = readHeader(file.toString(), data_in);
+			osdHeader = new HistoOsdReaderWriter().new HeaderParser(header);
+		}
 
 		final List<RecordSetParser> osdRecordSets = osdHeader.getOsdRecordSets();
 		for (int i = 0; i < osdRecordSets.size(); ++i) {
@@ -412,17 +414,9 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 
 		File file = filePath.toFile();
 		InputStream inputStream = defineStream(file);
-
 		try (DataInputStream data_in = new DataInputStream(inputStream)) { // closes the inputStream also
-			final HashMap<String, String> header = getHeader(filePath.toString());
+			final HashMap<String, String> header = readHeader(filePath.toString(), data_in);
 			final HeaderParser osdHeader = new HistoOsdReaderWriter().new HeaderParser(header);
-
-			{ // skip header lines and recordset lines
-				// todo optimize double reading in OsdReaderWriter: the file first for the header only and a 2nd time for the payload only
-				while (!data_in.readUTF().startsWith(GDE.RECORD_SET_SIZE))
-					log.finest("skip"); //$NON-NLS-1$
-				final List<HashMap<String, String>> discardableRecordSetsInfo = readRecordSetsInfo4AllVersions(data_in, header);
-			}
 
 			long startTimeNs = System.nanoTime();
 			long unreadDataPointer = -1;
