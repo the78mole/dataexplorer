@@ -13,10 +13,15 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
+
+import java.io.FileNotFoundException;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -30,11 +35,6 @@ import gde.exception.DataInconsitsentException;
 import gde.log.Level;
 import gde.messages.Messages;
 
-import java.io.FileNotFoundException;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
 /**
  * Graupner Ultramat Trio Plus 14
  * @author Winfried Brügmann
@@ -44,8 +44,8 @@ public class UltraTrioPlus14 extends Ultramat {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public UltraTrioPlus14(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -53,7 +53,7 @@ public class UltraTrioPlus14 extends Ultramat {
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2200), Messages.getString(MessageIds.GDE_MSGT2201), Messages.getString(MessageIds.GDE_MSGT2202),
 				Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGI2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2207),
-				Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), 
+				Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206),
 				Messages.getString(MessageIds.GDE_MSGT2222), Messages.getString(MessageIds.GDE_MSGT2222)};
 
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
@@ -70,7 +70,7 @@ public class UltraTrioPlus14 extends Ultramat {
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 		this.USAGE_MODE = new String[] { Messages.getString(MessageIds.GDE_MSGT2200), Messages.getString(MessageIds.GDE_MSGT2201), Messages.getString(MessageIds.GDE_MSGT2202),
 				Messages.getString(MessageIds.GDE_MSGT2203), Messages.getString(MessageIds.GDE_MSGI2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2207),
-				Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), 
+				Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206), Messages.getString(MessageIds.GDE_MSGT2206),
 				Messages.getString(MessageIds.GDE_MSGT2222), Messages.getString(MessageIds.GDE_MSGT2222)};
 
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
@@ -78,7 +78,7 @@ public class UltraTrioPlus14 extends Ultramat {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	@Override
 	public int getLovDataByteSize() {
@@ -94,12 +94,12 @@ public class UltraTrioPlus14 extends Ultramat {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO)); 
+		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO));
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
 		int offset = 4;
 		int progressCycle = 0;
@@ -128,7 +128,7 @@ public class UltraTrioPlus14 extends Ultramat {
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 				recordSet.addPoints(convertDataBytes(points, convertBuffer));
 			}
-			
+
 			recordSet.setTimeStep_ms(this.getAverageTimeStep_ms() != null ? this.getAverageTimeStep_ms() : 1000);
 		}
 
@@ -157,7 +157,7 @@ public class UltraTrioPlus14 extends Ultramat {
 			points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
 			points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16);
 			points[6] = 0;
-			// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6 
+			// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6
 			for (int i = 0, j = 0; i < points.length - 7; ++i, j += 4) {
 				points[i + 7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25 + j], (char) dataBuffer[26 + j], (char) dataBuffer[27 + j], (char) dataBuffer[28 + j]),
 						16);
@@ -180,12 +180,12 @@ public class UltraTrioPlus14 extends Ultramat {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -199,7 +199,7 @@ public class UltraTrioPlus14 extends Ultramat {
 		for (int i = 0; i < recordDataSize; i++) {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
-			logger.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
+			if (logger.isLoggable(Level.FINER)) logger.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 7=SpannungZelle1 8=SpannungZelle2....
 			points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
@@ -225,7 +225,7 @@ public class UltraTrioPlus14 extends Ultramat {
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 2500) / recordDataSize), sThreadId);
 		}
-	
+
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		recordSet.syncScaleOfSyncableRecords();
 	}
@@ -233,7 +233,7 @@ public class UltraTrioPlus14 extends Ultramat {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -246,7 +246,7 @@ public class UltraTrioPlus14 extends Ultramat {
 		for (int i = recordSet.size() - numCells - 1; i < recordSet.size(); ++i) {
 			Record record = recordSet.get(i);
 			record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
-			log.log(Level.FINER, record.getName() + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData())); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData())); //$NON-NLS-1$
 		}
 
 		if (log.isLoggable(Level.FINE)) {
@@ -279,7 +279,7 @@ public class UltraTrioPlus14 extends Ultramat {
 	 * check if one of the outlet channels are in processing mode
 	 * @param outletNum 1
 	 * @param dataBuffer
-	 * @return true if channel 1 is active 
+	 * @return true if channel 1 is active
 	 */
 	@Override
 	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
@@ -290,7 +290,7 @@ public class UltraTrioPlus14 extends Ultramat {
 					log.log(Level.FINE,	"operationMode1 = " + operationMode1);
 				}
 				//0=no processing 1=charge 2=discharge 3=pause 4=finished 5=error 6=balance 11=store charge 12=store discharge
-				return (operationMode1 > 0 && operationMode1 < 4) || operationMode1 == 6 || operationMode1 == 11 || operationMode1 == 12; 
+				return (operationMode1 > 0 && operationMode1 < 4) || operationMode1 == 6 || operationMode1 == 11 || operationMode1 == 12;
 			}
 			catch (NumberFormatException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -304,7 +304,7 @@ public class UltraTrioPlus14 extends Ultramat {
 					log.log(Level.FINE,	"operationMode1 = " + operationMode2);
 				}
 				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error 6=balance 11=store charge 12=store discharge
-				return (operationMode2 > 0 && operationMode2 < 4) || operationMode2 == 6 || operationMode2 == 11 || operationMode2 == 12; 
+				return (operationMode2 > 0 && operationMode2 < 4) || operationMode2 == 6 || operationMode2 == 11 || operationMode2 == 12;
 			}
 			catch (NumberFormatException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -318,7 +318,7 @@ public class UltraTrioPlus14 extends Ultramat {
 					log.log(Level.FINE,	"operationMode1 = " + operationMode3);
 				}
 				//0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error 6=balance 11=store charge 12=store discharge
-				return (operationMode3 > 0 && operationMode3 < 4) || operationMode3 == 6 || operationMode3 == 11 || operationMode3 == 12; 
+				return (operationMode3 > 0 && operationMode3 < 4) || operationMode3 == 6 || operationMode3 == 11 || operationMode3 == 12;
 			}
 			catch (NumberFormatException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -330,7 +330,7 @@ public class UltraTrioPlus14 extends Ultramat {
 
 	/**
 	 * query the processing mode, main modes are charge/discharge, make sure the data buffer contains at index 15,16 the processing modes
-	 * @param dataBuffer 
+	 * @param dataBuffer
 	 * @return 0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
 	 */
 	@Override
