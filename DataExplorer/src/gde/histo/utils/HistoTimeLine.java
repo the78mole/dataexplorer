@@ -259,7 +259,7 @@ public final class HistoTimeLine {
 		long maxVerifiedTimeStamp = -1; // first timeStamp maximumTimeStamp which is the first one due to descending order
 
 		LinkedHashMap<Long, Long> applicableDistances = new LinkedHashMap<>();
-		long applicableDistancesSum = 0;
+		double applicableDistancesSum = 0;
 		{// pass 1: build distances list and distances sum for all timestamps in the timestamp sliding window
 			log.log(FINER, "", this); //$NON-NLS-1$
 			long lastTimeStamp = 0;
