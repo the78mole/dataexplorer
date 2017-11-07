@@ -59,10 +59,12 @@ import gde.utils.LocalizedDateTime.DateTimePattern;
  * @author Thomas Eickert
  */
 public final class HistoTimeLine {
-	private final static String	$CLASS_NAME	= HistoTimeLine.class.getName();
-	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
+	private final static String						$CLASS_NAME			= HistoTimeLine.class.getName();
+	private final static Logger						log							= Logger.getLogger($CLASS_NAME);
 
-	private final Settings			settings		= Settings.getInstance();
+	private final Settings								settings				= Settings.getInstance();
+
+	private final TreeMap<Long, Integer>	scalePositions	= new TreeMap<>(Collections.reverseOrder());
 
 	enum Density {
 		EXTREME(4), HIGH(8), MEDIUM(10), LOW(16);
@@ -95,16 +97,25 @@ public final class HistoTimeLine {
 	}
 
 	private TrailRecordSet								trailRecordSet;
-	/** number of pixels for the timescale length (includes left/right margins and the chart region) */
-	private int														width;
-	/** define the corners of the chart region */
-	private long													leftmostTimeStamp, rightmostTimeStamp;
-	/** maps histoset timestamps to x-axis with range 0 to 1 */
-	private TreeMap<Long, Double>					relativeTimeScale;
-	/** degree of population on the x -axis */
+	/**
+	 * degree of population on the x -axis
+	 */
 	private Density												density;
-	private final TreeMap<Long, Integer>	scalePositions			= new TreeMap<>(Collections.reverseOrder());
-	/** access timestamps by x axis position (naturalOrder) */
+	/**
+	 * number of pixels for the timescale length (includes left/right margins and the chart region)
+	 */
+	private int														width;
+	/**
+	 * define the corners of the chart region
+	 */
+	private long													leftmostTimeStamp, rightmostTimeStamp;
+	/**
+	 * maps histoset timestamps to x-axis with range 0 to 1
+	 */
+	private TreeMap<Long, Double>					relativeTimeScale;
+	/**
+	 * access timestamps by x axis position (naturalOrder)
+	 */
 	private TreeMap<Integer, List<Long>>	scaleTimeStamps_ms	= new TreeMap<Integer, List<Long>>();
 
 	/**
@@ -243,96 +254,101 @@ public final class HistoTimeLine {
 	 * Calculate the relative position on the timescale based on isReversed and isTimeframeAdjustment.
 	 * (leftmost: 0, rightmost: 1)
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings({ "unused", "serial" })
 	private void setRelativeScale() {
 		long maxVerifiedTimeStamp = -1; // first timeStamp maximumTimeStamp which is the first one due to descending order
 
-		// pass 1: build distances list and distances sum for all timestamps in the timestamp sliding window
-		log.log(FINER, "", this); //$NON-NLS-1$
 		LinkedHashMap<Long, Long> applicableDistances = new LinkedHashMap<>();
-		long lastTimeStamp = 0;
 		long applicableDistancesSum = 0;
-		for (int i = 0; i < this.trailRecordSet.getTimeStepSize(); i++) {
-			long currentTimeStamp = ((long) this.trailRecordSet.getTime_ms(i));
-			if (log.isLoggable(FINER)) {
-				ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentTimeStamp), ZoneId.systemDefault());
-				log.log(FINER, "timestamp = " + currentTimeStamp + "  " + zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			if (lastTimeStamp != 0) {
-				long currentDistance = lastTimeStamp - currentTimeStamp;
-				applicableDistances.put(currentTimeStamp, currentDistance);
-				applicableDistancesSum += currentDistance;
-			} else {
-				maxVerifiedTimeStamp = currentTimeStamp;
-			}
-			lastTimeStamp = currentTimeStamp;
-		}
-		if (log.isLoggable(FINER))
-			log.log(FINER, "applicableDistancesSum = " + applicableDistancesSum + " number of distances = " + applicableDistances.size()); //$NON-NLS-1$ //$NON-NLS-2$
-
-		// pass 2: build the relative timeScale list from relative distances
-		if (this.settings.isXAxisReversed()) {
-			this.relativeTimeScale = new TreeMap<>(Collections.reverseOrder());
-			this.relativeTimeScale.put(maxVerifiedTimeStamp, 0.); // highest timestamp is at the leftmost position
-		} else {
-			this.relativeTimeScale = new TreeMap<>();
-			this.relativeTimeScale.put(maxVerifiedTimeStamp, 1.); // highest timestamp is at the rightmost position
-		}
-		double applicableDistancesTotal = applicableDistancesSum;
-		@SuppressWarnings("unused")
-		final boolean isNaturalTimescale = false;
-		if (isNaturalTimescale == true) {
-			// true is not used anymore:
-			// use 'non-logarithmic' with a spread ordinal of zero which results in values very close to the natural timescale
-			// build final relative TimeScale List --- this a simple version illustrating the calculation baseline
-			double relativeTimeScaleSum = 0.;
-			for (Entry<Long, Long> entry : applicableDistances.entrySet()) {
-				double relativeDistance = entry.getValue() / applicableDistancesTotal;
-				// relativeDistances.add(relativeDistance);
-				relativeTimeScaleSum += relativeDistance;
-				if (this.settings.isXAxisReversed())
-					this.relativeTimeScale.put(entry.getKey(), relativeTimeScaleSum);
-				else
-					this.relativeTimeScale.put(entry.getKey(), 1. - relativeTimeScaleSum);
-				log.finest(() -> "relativeTimeScale = " + entry.getValue()); //$NON-NLS-1$
-			}
-			log.log(FINER, "relativeTimeScaleSum = ", relativeTimeScaleSum); //$NON-NLS-1$
-		} else {
-			// pass 2.1: build normalized distances List
-			LinkedHashMap<Long, Double> normalizedDistances = new LinkedHashMap<>();
-			double normalizedDistancesMin = 0.;
-			double normalizedDistancesSum = 0.;
-			for (Entry<Long, Long> entry : applicableDistances.entrySet()) {
-				double normalizedDistance;
-				if (this.settings.isXAxisLogarithmicDistance()) {
-					normalizedDistance = entry.getValue() != 0 ? Math.log(entry.getValue() / applicableDistancesTotal) : 0;
-				} else {
-					normalizedDistance = entry.getValue() / applicableDistancesTotal;
+		{// pass 1: build distances list and distances sum for all timestamps in the timestamp sliding window
+			log.log(FINER, "", this); //$NON-NLS-1$
+			long lastTimeStamp = 0;
+			for (int i = 0; i < this.trailRecordSet.getTimeStepSize(); i++) {
+				long currentTimeStamp = ((long) this.trailRecordSet.getTime_ms(i));
+				if (log.isLoggable(FINER)) {
+					ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentTimeStamp), ZoneId.systemDefault());
+					log.log(FINER, "timestamp = " + currentTimeStamp + "  " + zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				normalizedDistances.put(entry.getKey(), normalizedDistance);
-				normalizedDistancesMin = Math.min(normalizedDistancesMin, normalizedDistance);
-				normalizedDistancesSum += normalizedDistance;
-				log.finest(() -> "normalizedDistance=" + normalizedDistance); //$NON-NLS-1$
+				if (lastTimeStamp != 0) {
+					long currentDistance = lastTimeStamp - currentTimeStamp;
+					applicableDistances.put(currentTimeStamp, currentDistance);
+					applicableDistancesSum += currentDistance;
+				} else {
+					maxVerifiedTimeStamp = currentTimeStamp;
+				}
+				lastTimeStamp = currentTimeStamp;
 			}
-			log.log(FINER, "normalizedDistancesSum=", normalizedDistancesSum); //$NON-NLS-1$
+			if (log.isLoggable(FINER))
+				log.log(FINER, "applicableDistancesSum = " + applicableDistancesSum + " number of distances = " + applicableDistances.size()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		{// pass 2: build the relative timeScale list from relative distances
+			if (this.settings.isXAxisReversed()) {
+				this.relativeTimeScale = new TreeMap<Long, Double>(Collections.reverseOrder());
+				this.relativeTimeScale.put(maxVerifiedTimeStamp, 0.); // highest timestamp is at the leftmost position
+			} else {
+				this.relativeTimeScale = new TreeMap<Long, Double>() {
+					/**
+					 * value is based on descending order and must be transformed
+					 * (e.g. a lefthand value becomes a righthand value)
+					 */
+					@Override
+					public Double put(Long key, Double value) {
+						return super.put(key, 1. - value);
+					}
+				};
+				this.relativeTimeScale.put(maxVerifiedTimeStamp, 0.); // highest timestamp is at the rightmost position
+			}
+		}
+		{
+			@SuppressWarnings("unused")
+			final boolean isNaturalTimescale = false;
+			if (isNaturalTimescale == true) {
+				// true is not used anymore:
+				// use 'non-logarithmic' with a spread ordinal of zero which results in values very close to the natural timescale
+				// build final relative TimeScale List --- this a simple version illustrating the calculation baseline
+				double relativeTimeScaleSum = 0.;
+				for (Entry<Long, Long> entry : applicableDistances.entrySet()) {
+					double relativeDistance = entry.getValue() / applicableDistancesSum;
+					// relativeDistances.add(relativeDistance);
+					relativeTimeScaleSum += relativeDistance;
+					this.relativeTimeScale.put(entry.getKey(), relativeTimeScaleSum);
+					log.finest(() -> "relativeTimeScale = " + entry.getValue()); //$NON-NLS-1$
+				}
+				log.log(FINER, "relativeTimeScaleSum = ", relativeTimeScaleSum); //$NON-NLS-1$
+			} else {
+				// pass 2.1: build normalized distances List
+				LinkedHashMap<Long, Double> normalizedDistances = new LinkedHashMap<>();
+				double normalizedDistancesMin = 0.;
+				double normalizedDistancesSum = 0.;
+				for (Entry<Long, Long> entry : applicableDistances.entrySet()) {
+					double normalizedDistance;
+					if (this.settings.isXAxisLogarithmicDistance()) {
+						normalizedDistance = entry.getValue() != 0 ? Math.log(entry.getValue() / applicableDistancesSum) : 0;
+					} else {
+						normalizedDistance = entry.getValue() / applicableDistancesSum;
+					}
+					normalizedDistances.put(entry.getKey(), normalizedDistance);
+					normalizedDistancesMin = Math.min(normalizedDistancesMin, normalizedDistance);
+					normalizedDistancesSum += normalizedDistance;
+					log.finest(() -> "normalizedDistance=" + normalizedDistance); //$NON-NLS-1$
+				}
+				log.log(FINER, "normalizedDistancesSum=", normalizedDistancesSum); //$NON-NLS-1$
 
-			// pass 2.2: take logDistanceMin as a reference and scale to the final position range which is 0 to 1
-			// high spread values result in a rather equidistant placement of timesteps (distant timestamps move close together which
-			// results in more space for timesteps with small distances)
-			// so we get reasonable adjustments for spreadValues from 0 to 5
-			double logBaseDivisor = Math.log(1 + Math.pow(10, this.settings.getXAxisSpreadOrdinal() - 3));
-			double scaleConstant = normalizedDistancesSum / logBaseDivisor + (1 - normalizedDistancesMin / logBaseDivisor) * normalizedDistances.size();
-			double relativeTimeScaleSum = 0.;
-			for (Entry<Long, Double> entry2 : normalizedDistances.entrySet()) {
-				double relativeDistance = (1. + (entry2.getValue() - normalizedDistancesMin) / logBaseDivisor) / scaleConstant;
-				relativeTimeScaleSum += relativeDistance;
-				if (this.settings.isXAxisReversed())
+				// pass 2.2: take logDistanceMin as a reference and scale to the final position range which is 0 to 1
+				// high spread values result in a rather equidistant placement of timesteps (distant timestamps move close together which
+				// results in more space for timesteps with small distances)
+				// so we get reasonable adjustments for spreadValues from 0 to 5
+				double logBaseDivisor = Math.log(1 + Math.pow(10, this.settings.getXAxisSpreadOrdinal() - 3));
+				double scaleConstant = normalizedDistancesSum / logBaseDivisor + (1 - normalizedDistancesMin / logBaseDivisor) * normalizedDistances.size();
+				double relativeTimeScaleSum = 0.;
+				for (Entry<Long, Double> entry2 : normalizedDistances.entrySet()) {
+					double relativeDistance = (1. + (entry2.getValue() - normalizedDistancesMin) / logBaseDivisor) / scaleConstant;
+					relativeTimeScaleSum += relativeDistance;
 					this.relativeTimeScale.put(entry2.getKey(), relativeTimeScaleSum);
-				else
-					this.relativeTimeScale.put(entry2.getKey(), 1. - relativeTimeScaleSum);
-				log.finest(() -> "relativeTimeScale=" + this.relativeTimeScale.get(entry2.getKey())); //$NON-NLS-1$
+					log.finest(() -> "relativeTimeScale=" + this.relativeTimeScale.get(entry2.getKey())); //$NON-NLS-1$
+				}
+				log.log(FINER, "relativeTimeScaleSum=", relativeTimeScaleSum); //$NON-NLS-1$
 			}
-			log.log(FINER, "relativeTimeScaleSum=", relativeTimeScaleSum); //$NON-NLS-1$
 		}
 	}
 
@@ -383,14 +399,13 @@ public final class HistoTimeLine {
 	private void drawTickMarks(GC gc, int x0, int y0, Point pt, DateTimePattern timeFormat) {
 		int tickLength = pt.y / 2 + 1;
 		int gap = pt.y / 3;
-		int labelGap = 4;
+		int labelGap = 4 + pt.x;
 		int lastXPosLabel = -Integer.MAX_VALUE;
 		String lastText = GDE.STRING_BLANK;
-		for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed -> important for next if
+		for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) {
 			int xPos = x0 + entry.getValue();
 			String text = LocalizedDateTime.getFormatedTime(timeFormat, entry.getKey());
-			if ((this.settings.isXAxisReversed() && lastXPosLabel + pt.x + labelGap < xPos && !lastText.equals(text)) //
-					|| (!this.settings.isXAxisReversed() && lastXPosLabel - pt.x - labelGap > xPos && !lastText.equals(text))) {
+			if (!lastText.equals(text) && (Math.abs(lastXPosLabel - xPos) > labelGap)) { // abs supports asc / desc scale
 				gc.drawLine(xPos, y0 + 1, xPos, y0 + tickLength);
 				GraphicsUtils.drawTextCentered(text, xPos, y0 + tickLength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 				lastText = text;

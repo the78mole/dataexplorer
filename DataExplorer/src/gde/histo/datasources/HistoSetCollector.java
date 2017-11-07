@@ -124,7 +124,6 @@ public final class HistoSetCollector {
 		}
 	}
 
-	private final DataExplorer												application						= DataExplorer.getInstance();
 	private final DirectoryScanner										directoryScanner;
 
 	/**

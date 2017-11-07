@@ -46,6 +46,8 @@ public final class ExtendedVault extends HistoVault {
 	 * For hashing combined keys.
 	 */
 	private static final String				SHA1_DELIMITER	= ",";
+	private static final String				timestampFormat	= "yyyy-MM-dd HH:mm:ss";
+
 	private static final DataExplorer	application			= DataExplorer.getInstance();
 	private static final Settings			settings				= Settings.getInstance();
 
@@ -230,16 +232,17 @@ public final class ExtendedVault extends HistoVault {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(this.vaultName).append(GDE.STRING_COMMA_BLANK);
-		sb.append("isTruss=").append(isTruss()).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append("logRecordSetOrdinal=").append(this.logRecordSetOrdinal).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append("logRecordsetBaseName=").append(this.logRecordsetBaseName).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append("logChannelNumber=").append(this.logChannelNumber).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append("logObjectKey=").append(this.logObjectKey).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(GDE.STRING_COMMA_BLANK); //$NON-NLS-1$
-		sb.append(this.logLinkPath).append(GDE.STRING_COMMA_BLANK);
-		sb.append(this.logFilePath).append(GDE.STRING_COMMA_BLANK);
-		sb.append("vaultDirectory=").append(this.vaultDirectory); //$NON-NLS-1$
+		final String d = GDE.STRING_COMMA_BLANK;
+		sb.append(this.vaultName).append(d);
+		sb.append("isTruss=").append(isTruss()).append(d);
+		sb.append("logRecordSetOrdinal=").append(this.logRecordSetOrdinal).append(d);
+		sb.append("logRecordsetBaseName=").append(this.logRecordsetBaseName).append(d);
+		sb.append("logChannelNumber=").append(this.logChannelNumber).append(d);
+		sb.append("logObjectKey=").append(this.logObjectKey).append(d);
+		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(d);
+		sb.append(this.logLinkPath).append(d);
+		sb.append(this.logFilePath).append(d);
+		sb.append("vaultDirectory=").append(this.vaultDirectory);
 		return sb.toString();
 	}
 
@@ -327,7 +330,7 @@ public final class ExtendedVault extends HistoVault {
 	 * @return yyyy-MM-dd HH:mm:ss
 	 */
 	public String getStartTimeStampFormatted() {
-		return StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", this.logStartTimestampMs); //$NON-NLS-1$
+		return StringHelper.getFormatedTime(timestampFormat, this.logStartTimestampMs); // $NON-NLS-1$
 	}
 
 	public String getLogFileExtension() {

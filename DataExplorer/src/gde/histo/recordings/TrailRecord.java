@@ -648,6 +648,11 @@ public final class TrailRecord extends Record {
 		return getDeviceXmlReplacement(label);
 	}
 
+	public String getTableRowHeader() {
+		return getUnit().length() > 0 ? (getNameReplacement() + GDE.STRING_BLANK_LEFT_BRACKET + getUnit() + GDE.STRING_RIGHT_BRACKET).intern()
+				: getNameReplacement().intern();
+	}
+
 	/**
 	 * @param replacementKey
 	 * @return the replacement name of the specified key or an empty string if there is no key entry

@@ -31,8 +31,8 @@ import gde.GDE;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.gpslocations.GeoCodes;
 import gde.histo.gpslocations.GpsCluster;
+import gde.histo.recordings.HistoTableMapper.DisplayTag;
 import gde.histo.recordings.TrailRecordSet.DataTag;
-import gde.histo.recordings.TrailRecordSet.DisplayTag;
 import gde.histo.utils.GpsCoordinate;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -54,7 +54,10 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 	private final List<String>	dataRecordSetOrdinals		= new ArrayList<String>();
 	private final List<String>	dataGpsLocations				= new ArrayList<String>();
 
-	private EnumSet<DisplayTag>	activeDisplayTags				= null;													// caching
+	/**
+	 * Caching for active tags.
+	 */
+	private EnumSet<DisplayTag>	activeDisplayTags				= null;
 
 	public TrailDataTags() {
 		this.put(DataTag.LINK_PATH, this.dataLinkPaths);

@@ -65,7 +65,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	public static final String												BASE_NAME_SEPARATOR	= " | ";
 
 	/**
-	 * graphics template holds view configuration
+	 * Holds the view configuration.
 	 */
 	private final HistoGraphicsTemplate								template;
 
@@ -76,17 +76,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	/** Data source for this recordset. */
 	private final TreeMap<Long, List<ExtendedVault>>	histoVaults;
-
-	public enum DisplayTag {
-		FILE_NAME, DIRECTORY_NAME, BASE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, GPS_LOCATION;
-
-		/** use this instead of values() to avoid repeatedly cloning actions. */
-		public static final DisplayTag VALUES[] = values();
-
-		public static DisplayTag fromOrdinal(int ordinal) {
-			return DisplayTag.VALUES[ordinal];
-		}
-	}
 
 	public enum DataTag {
 		LINK_PATH, FILE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, RECORDSET_ORDINAL, GPS_LOCATION

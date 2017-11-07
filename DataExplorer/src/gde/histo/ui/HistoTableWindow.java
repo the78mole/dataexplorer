@@ -52,13 +52,14 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.data.Record;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionFormatter;
 import gde.histo.recordings.HistoTableMapper;
+import gde.histo.recordings.HistoTableMapper.DisplayTag;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
-import gde.histo.recordings.TrailRecordSet.DisplayTag;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -296,12 +297,13 @@ public class HistoTableWindow extends CTabItem {
 				TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
 				if (trailRecordSet.size() > 0) {
 					TableItem item = (TableItem) event.item;
-					if (HistoTableWindow.this.dataTable.indexOf(item) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
+					Vector<Record> currentRecords = trailRecordSet.getVisibleAndDisplayableRecordsForTable();
+					if (HistoTableWindow.this.dataTable.indexOf(item) < currentRecords.size()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item);
-						TrailRecord trailRecord = (TrailRecord) trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
+						TrailRecord trailRecord = (TrailRecord) currentRecords.get(index);
 						item.setText(HistoTableMapper.getTableRow(trailRecord));
 					} else if (HistoTableWindow.this.settings.isDisplayTags()) {
-						int index = HistoTableWindow.this.dataTable.indexOf(item) - trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
+						int index = HistoTableWindow.this.dataTable.indexOf(item) - currentRecords.size();
 						DisplayTag[] activeDisplayTags = trailRecordSet.getDataTags().getActiveDisplayTags().toArray(new DisplayTag[] {});
 						item.setText(HistoTableMapper.getTableTagRow(trailRecordSet, activeDisplayTags[index]));
 					}
@@ -421,7 +423,7 @@ public class HistoTableWindow extends CTabItem {
 			int index = HistoTableWindow.this.dataTable.indexOf(tableItem);
 			if (HistoTableWindow.this.dataTable.indexOf(tableItem) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
 				TrailRecord trailRecord = (TrailRecord) trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
-				isValid = tableItem.getText().equals(HistoTableMapper.getTableRowText(trailRecord)) && tableItem.getText(1).equals(trailRecord.getTrailSelector().getTrailText());
+				isValid = tableItem.getText().equals(trailRecord.getTableRowHeader()) && tableItem.getText(1).equals(trailRecord.getTrailSelector().getTrailText());
 			} else {
 				isValid = tableItem.getText().isEmpty();
 			}
