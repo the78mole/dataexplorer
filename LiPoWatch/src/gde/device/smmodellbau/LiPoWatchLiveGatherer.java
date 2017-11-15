@@ -13,10 +13,16 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.Channel;
@@ -32,12 +38,6 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.WaitTimer;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.Logger;
 
 /**
  * Thread implementation to gather data from LiPoWatch device
@@ -67,7 +67,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 	final HashMap<String, Double> calcValues = new HashMap<String, Double>();
 
 	/**
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public LiPoWatchLiveGatherer(DataExplorer currentApplication, LiPoWatch useDevice, LiPoWatchSerialPort useSerialPort, LiPoWatchDialog useDialog) throws Exception {
 		super("liveDataGatherer");
@@ -76,7 +76,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		this.serialPort = useSerialPort;
 		this.dialog = useDialog;
 		this.channels = Channels.getInstance();
-		this.channelNumber = 1; 
+		this.channelNumber = 1;
 		this.channel = this.channels.get(this.channelNumber);
 		this.configKey = this.device.getChannelNameReplacement(this.channelNumber);
 
@@ -140,7 +140,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 		updateActiveState(recordSet);
 		final int[] points = new int[recordSet.size()];
 		final LiPoWatch usedDevice = this.device;
-		
+
 		try {
 			this.serialPort.checkConnectionStatus();
 			this.serialPort.wait4LiveData(100);
@@ -149,7 +149,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 			String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } );
 			cleanup(recordSetKey, message, e);
 		}
-		
+
 		this.timer = new Timer();
 		this.timerTask = new TimerTask() {
 			int updateViewCounter = -5;
@@ -172,12 +172,12 @@ public class LiPoWatchLiveGatherer extends Thread {
 							LiPoWatchLiveGatherer.this.channels.getActiveChannel().switchRecordSet(recordSetKey);
 							LiPoWatchLiveGatherer.this.isSwitchedRecordSet = true;
 						}
-						
+
 						if (updateViewCounter++ % 5 == 0) {
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "updateVisibilityStatus " + updateViewCounter); //$NON-NLS-1$
 							usedDevice.updateVisibilityStatus(recordSet, true);
 						}
-						
+
 						if (recordSet.isChildOfActiveChannel() && recordSet.equals(LiPoWatchLiveGatherer.this.channels.getActiveChannel().getActiveRecordSet())) {
 							LiPoWatchLiveGatherer.this.application.updateAllTabs(false);
 						}
@@ -190,24 +190,24 @@ public class LiPoWatchLiveGatherer extends Thread {
 				catch (TimeOutException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
-					+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1602); //$NON-NLS-1$ 
+					+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1602); //$NON-NLS-1$
 					cleanup(recordSetKey, message, e);
 				}
 				catch (IOException e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { e.getClass().getSimpleName(), e.getMessage() } )
-					+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1602); //$NON-NLS-1$ 
+					+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGW1602); //$NON-NLS-1$
 					cleanup(recordSetKey, message, e);
 				}
 				catch (Throwable e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
-					String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$ 
+					String message = e.getClass().getSimpleName() + " - " + e.getMessage(); //$NON-NLS-1$
 					cleanup(recordSetKey, message, e);
 				}
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "======> exit"); //$NON-NLS-1$
 			}
 		};
-		
+
 		// start the prepared timer thread within the live data gatherer thread
 		this.timer.scheduleAtFixedRate(this.timerTask, delay, period);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "exit"); //$NON-NLS-1$
@@ -220,7 +220,8 @@ public class LiPoWatchLiveGatherer extends Thread {
 	 */
 	private void updateActiveState(RecordSet recordSet) {
 		// check if measurements isActive == false and set to isDisplayable == false
-		for (Record record : recordSet.values()) {
+		for (int i = 0; i < recordSet.size(); i++) {
+			Record record = recordSet.get(i);
 			if (!record.isActive()) {
 				record.setDisplayable(false);
 				record.setVisible(false);
@@ -244,7 +245,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 
 	/**
 	 * stop the timer task thread, this tops data capturing
-	 * waits for all running timers tasks are ended before return 
+	 * waits for all running timers tasks are ended before return
 	 */
 	public void stopTimerThread() {
 		if (this.timerTask != null) this.timerTask.cancel();
@@ -260,7 +261,7 @@ public class LiPoWatchLiveGatherer extends Thread {
 	 */
 	void cleanup(final String recordSetKey, String message, Throwable e) {
 		this.stopTimerThread();
-		if(this.isPortOpenedByLiveGatherer) this.serialPort.close(); 
+		if(this.isPortOpenedByLiveGatherer) this.serialPort.close();
 		this.channel.get(recordSetKey).clear();
 		this.channel.remove(recordSetKey);
 		this.application.getMenuToolBar().updateRecordSetSelectCombo();

@@ -13,10 +13,18 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
+
+import java.io.FileNotFoundException;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabItem;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -32,14 +40,6 @@ import gde.exception.DataInconsitsentException;
 import gde.log.Level;
 import gde.messages.Messages;
 
-import java.io.FileNotFoundException;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabItem;
-
 /**
  * Graupner Ultra Duo Plus base class which extends the Ultramat base class
  * @author Winfried Brügmann
@@ -49,8 +49,8 @@ public class UltraDuoPlus45 extends Ultramat {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public UltraDuoPlus45(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -103,7 +103,7 @@ public class UltraDuoPlus45 extends Ultramat {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	@Override
 	public int getLovDataByteSize() {
@@ -119,7 +119,7 @@ public class UltraDuoPlus45 extends Ultramat {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -171,7 +171,7 @@ public class UltraDuoPlus45 extends Ultramat {
 		int minVotage = Integer.MAX_VALUE;
 
 		try {
-			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
+			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance
 			points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
 			points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
 			points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
@@ -183,7 +183,7 @@ public class UltraDuoPlus45 extends Ultramat {
 			points[6] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[11], (char) dataBuffer[12], (char) dataBuffer[13], (char) dataBuffer[14]), 16);
 			points[7] = 0;
 
-			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7 
+			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7
 			for (int i = 0, j = 0; i < points.length - 8; ++i, j += 4) {
 				points[i + 8] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41 + j], (char) dataBuffer[42 + j], (char) dataBuffer[43 + j], (char) dataBuffer[44 + j]),
 						16);
@@ -206,12 +206,12 @@ public class UltraDuoPlus45 extends Ultramat {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -227,7 +227,7 @@ public class UltraDuoPlus45 extends Ultramat {
 			int minVotage = Integer.MAX_VALUE;
 			logger.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
-			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
+			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance
 			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
 			points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
 			points[1] = (((convertBuffer[4] & 0xff) << 24) + ((convertBuffer[5] & 0xff) << 16) + ((convertBuffer[6] & 0xff) << 8) + ((convertBuffer[7] & 0xff) << 0));
@@ -253,7 +253,7 @@ public class UltraDuoPlus45 extends Ultramat {
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 2500) / recordDataSize), sThreadId);
 		}
-		
+
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		recordSet.syncScaleOfSyncableRecords();
 	}
@@ -274,13 +274,13 @@ public class UltraDuoPlus45 extends Ultramat {
 	 */
 	@Override
 	public int[] getCellVoltageOrdinals() {
-		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance
 		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
 		// 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10 19=SpannungZelle11 20=SpannungZelle12 21=SpannungZelle13 22=SpannungZelle14
 
 		// LINK
-		// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance 
-		// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7 
+		// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance
+		// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7
 		// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
 		return new int[] { 0, this.channels.getActiveChannelNumber() == 3 ? 6 : 2 };
 	}
@@ -288,7 +288,7 @@ public class UltraDuoPlus45 extends Ultramat {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -306,7 +306,8 @@ public class UltraDuoPlus45 extends Ultramat {
 		}
 
 		if (logger.isLoggable(Level.FINE)) {
-			for (Record record : recordSet.values()) {
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
 				logger.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
@@ -325,7 +326,7 @@ public class UltraDuoPlus45 extends Ultramat {
 	 * check if one of the outlet channels are in processing mode
 	 * @param outletNum 1 or 2
 	 * @param dataBuffer
-	 * @return true if channel 1 or 2 is active 
+	 * @return true if channel 1 or 2 is active
 	 */
 	@Override
 	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
@@ -335,7 +336,7 @@ public class UltraDuoPlus45 extends Ultramat {
 				logger.log(Level.FINE,
 						"operationModeOut1 = " + (operationModeOut1 != null && operationModeOut1.length() > 0 ? this.USAGE_MODE[Integer.parseInt(operationModeOut1, 16)] : operationModeOut1)); //$NON-NLS-1$
 			}
-			if (this.settings.isReduceChargeDischarge()) 
+			if (this.settings.isReduceChargeDischarge())
 				return operationModeOut1 != null && operationModeOut1.length() == 2 && (operationModeOut1.equals("01") || operationModeOut1.equals("02") || (this.settings.isContinuousRecordSet() && operationModeOut1.equals("03")));
 			return operationModeOut1 != null && operationModeOut1.length() == 2 && !(operationModeOut1.equals(Ultramat.OPERATIONS_MODE_NONE) || operationModeOut1.equals(Ultramat.OPERATIONS_MODE_ERROR));
 		}
@@ -345,7 +346,7 @@ public class UltraDuoPlus45 extends Ultramat {
 				logger.log(Level.FINE,
 						"operationModeOut2 = " + (operationModeOut2 != null && operationModeOut2.length() > 0 ? this.USAGE_MODE[Integer.parseInt(operationModeOut2, 16)] : operationModeOut2)); //$NON-NLS-1$
 			}
-			if (this.settings.isReduceChargeDischarge()) 
+			if (this.settings.isReduceChargeDischarge())
 				return operationModeOut2 != null && operationModeOut2.length() == 2 && (operationModeOut2.equals("01") || operationModeOut2.equals("02") || (this.settings.isContinuousRecordSet() && operationModeOut2.equals("03")));
 			return operationModeOut2 != null && operationModeOut2.length() == 2 && !(operationModeOut2.equals(Ultramat.OPERATIONS_MODE_NONE) || operationModeOut2.equals(Ultramat.OPERATIONS_MODE_ERROR));
 		}
@@ -355,7 +356,7 @@ public class UltraDuoPlus45 extends Ultramat {
 
 	/**
 	 * query the processing mode, main modes are charge/discharge, make sure the data buffer contains at index 15,16 the processing modes
-	 * @param dataBuffer 
+	 * @param dataBuffer
 	 * @return 0 = no processing, 1 = charge, 2 = discharge, 3 = delay, 4 = pause, 5 = current operation finished, 6 = error, 7 = balancer, 8 = tire heater, 9 = motor
 	 */
 	@Override
@@ -446,9 +447,9 @@ public class UltraDuoPlus45 extends Ultramat {
 	}
 
 	/**
-	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device
 	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
+	 * As default the function should return null which stands for no device custom tab item.
 	 */
 	@Override
 	public CTabItem getUtilityDeviceTabItem() {

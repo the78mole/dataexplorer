@@ -250,7 +250,8 @@ public class UltraTrioPlus14 extends Ultramat {
 		}
 
 		if (log.isLoggable(Level.FINE)) {
-			for (Record record : recordSet.values()) {
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
 				log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}

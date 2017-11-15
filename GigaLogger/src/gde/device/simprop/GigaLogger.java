@@ -13,14 +13,13 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.simprop;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -68,8 +67,8 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public GigaLogger(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -110,6 +109,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
+	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 		// ...
 		return lov2osdMap;
@@ -119,17 +119,19 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
+	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
 		return ""; //$NON-NLS-1$
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
+	@Override
 	public int getLovDataByteSize() {
 		return 0; // sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
@@ -143,8 +145,9 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
+	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
 		NMEAParser data = new NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)), this,
@@ -199,6 +202,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
+	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		//noop due to previous parsed CSV data
 		return points;
@@ -208,13 +212,14 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
+	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
@@ -279,6 +284,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * function to prepare a row of record set for export while translating available measurement values.
 	 * @return pointer to filled data table row with formated values
 	 */
+	@Override
 	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		return super.prepareExportRow(recordSet, dataTableRow, rowIndex);
 		//previous code, replaced by super class generic implementation
@@ -312,6 +318,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
+	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
 			int index = 0;
@@ -319,7 +326,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				
+
 				switch (record.getDataType()) {
 				case GPS_LATITUDE:
 				case GPS_LONGITUDE:
@@ -327,7 +334,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 					double value = (record.realGet(rowIndex) / 1000000.0);
 					int grad = (int) value;
 					double minuten = (value - grad) * 100;
-					dataTableRow[index + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$				
+					dataTableRow[index + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
 					break;
 
 				default:
@@ -348,6 +355,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double translateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -380,6 +388,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
+	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -410,11 +419,12 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
+	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int displayableCounter = 0;
 		Record record;
@@ -427,7 +437,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
-				log.log(Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ 
+				log.log(Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -444,9 +454,10 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread, 
-	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
 	 */
+	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		this.application.updateStatisticsData();
 	}
@@ -464,6 +475,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
+	@Override
 	public String[] getUsedPropertyKeys() {
 		return new String[] { IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION };
 	}
@@ -471,8 +483,9 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
-	 * as example a file selection dialog could be opened to import serialized ASCII data 
+	 * as example a file selection dialog could be opened to import serialized ASCII data
 	 */
+	@Override
 	public void open_closeCommPort() {
 		importCsvFiles();
 	}
@@ -526,6 +539,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT3505));
 			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "convertKLM3DRelativeItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
@@ -535,6 +549,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 			convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT3506));
 			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
@@ -544,6 +559,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 			convertKMZ3DAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZ3DAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT3507));
 			convertKMZ3DAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "convertKLM3DAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
@@ -564,7 +580,8 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 				for (int i = 0; i < ordinals.length; i++) {
 					ordinals[i] = -1;
 				}
-				for (Record record : activeRecordSet.values()) {
+				for (int i = 0; i < activeRecordSet.size(); i++) {
+					Record record = activeRecordSet.get(i);
 					switch (record.getDataType()) {
 					case GPS_LATITUDE:
 						ordinals[0] = record.getOrdinal();
@@ -585,22 +602,22 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 						break;
 					}
 				}
-				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3503),    
+				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3503),
 						ordinals[1], ordinals[0], ordinals[2], ordinals[7],
 						-1, -1, ordinals[13], type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 			}
 			else {
-				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3503), 
-						-1, -1, 
-						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m", "feet"}), 
-						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h"}), 
+				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3503),
+						-1, -1,
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m", "feet"}),
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h"}),
 						-1, -1, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 			}
 		}
 	}
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
@@ -634,7 +651,8 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 					for (int i = 0; i < ordinals.length; i++) {
 						ordinals[i] = -1;
 					}
-					for (Record record : activeRecordSet.values()) {
+					for (int i = 0; i < activeRecordSet.size(); i++) {
+						Record record = activeRecordSet.get(i);
 						switch (record.getDataType()) {
 						case GPS_LATITUDE:
 							ordinals[0] = record.getOrdinal();
@@ -656,23 +674,23 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 						}
 					}
 					exportFileName = new FileHandler().exportFileKMZ(
-							ordinals[0], 
-							ordinals[2], 
-							ordinals[7], 
-							additionalMeasurementOrdinal, 
-							findRecordByUnit(activeRecordSet, "m/s"), 
-							findRecordByUnit(activeRecordSet, "km"), 
-							ordinals[13], 
+							ordinals[0],
+							ordinals[2],
+							ordinals[7],
+							additionalMeasurementOrdinal,
+							findRecordByUnit(activeRecordSet, "m/s"),
+							findRecordByUnit(activeRecordSet, "km"),
+							ordinals[13],
 							true,
 							isExportTmpDir);
 				}
 				else {
-					exportFileName = new FileHandler().exportFileKMZ(-1, -1, 
-							activeRecordSet.findRecordOrdinalByUnit(new String[] {"m", "feet"}), 
-							additionalMeasurementOrdinal, 
-							findRecordByUnit(activeRecordSet, "m/s"), 
-							findRecordByUnit(activeRecordSet, "km"), 
-							-1, 
+					exportFileName = new FileHandler().exportFileKMZ(-1, -1,
+							activeRecordSet.findRecordOrdinalByUnit(new String[] {"m", "feet"}),
+							additionalMeasurementOrdinal,
+							findRecordByUnit(activeRecordSet, "m/s"),
+							findRecordByUnit(activeRecordSet, "km"),
+							-1,
 							true,
 							isExportTmpDir);
 				}
@@ -683,8 +701,9 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 
 	private int findRecordByUnit(RecordSet recordSet, String unit) {
 		if (recordSet != null) {
-			for (Entry<String, Record> entry : recordSet.entrySet()) {
-				if (entry.getValue().getUnit().equalsIgnoreCase(unit)) return entry.getValue().getOrdinal();
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
+				if (record.getUnit().equalsIgnoreCase(unit)) return record.getOrdinal();
 			}
 		}
 		return -1;
@@ -733,6 +752,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT3508, GDE.MOD1));
 			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT3508));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					open_closeCommPort();

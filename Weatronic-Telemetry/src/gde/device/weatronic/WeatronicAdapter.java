@@ -13,10 +13,23 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.weatronic;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.widgets.FileDialog;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -35,19 +48,6 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.WaitTimer;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.widgets.FileDialog;
 
 /**
  * PowerLab8 base device class
@@ -68,8 +68,8 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public WeatronicAdapter(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -178,12 +178,12 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -295,7 +295,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -311,7 +311,8 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		}
 
 		if (WeatronicAdapter.log.isLoggable(java.util.logging.Level.FINE)) {
-			for (Record record : recordSet.values()) {
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
 				WeatronicAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable());
 			}
 		}
@@ -320,8 +321,8 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread, 
-	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
@@ -364,8 +365,8 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * query if the measurements get build up dynamically while reading (import) the data 
-	 * the implementation must create measurementType while reading the import data, 
+	 * query if the measurements get build up dynamically while reading (import) the data
+	 * the implementation must create measurementType while reading the import data,
 	 * refer to Weatronic-Telemetry implementation DataHeader
 	 * @return true
 	 */
@@ -426,7 +427,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
@@ -437,7 +438,8 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			int latOrdinal = -1, longOrdinal = -1;
 			if (activeRecordSet != null) {
-				for (Record record : activeRecordSet.values()) {
+				for (int i = 0; i < activeRecordSet.size(); i++) {
+					Record record = activeRecordSet.get(i);
 					Record.DataType datatype = record.getDataType();
 					switch (datatype) {
 					case GPS_LATITUDE:
@@ -477,11 +479,12 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				for (Record record : activeRecordSet.values()) {
+				for (int i = 0; i < activeRecordSet.size(); i++) {
+					Record record = activeRecordSet.get(i);
 					Record.DataType datatype = record.getDataType();
 					switch (datatype) {
 					case SPEED:
-						if (record.getName().startsWith("Rx")) 
+						if (record.getName().startsWith("Rx"))
 							return record.getOrdinal();
 						break;
 					default:
@@ -503,7 +506,8 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				for (Record record : activeRecordSet.values()) {
+				for (int i = 0; i < activeRecordSet.size(); i++) {
+					Record record = activeRecordSet.get(i);
 					Record.DataType datatype = record.getDataType();
 					switch (datatype) {
 					case GPS_LATITUDE:
@@ -542,7 +546,8 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 			final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
-				for (Record record : activeRecordSet.values()) {
+				for (int i = 0; i < activeRecordSet.size(); i++) {
+					Record record = activeRecordSet.get(i);
 					Record.DataType datatype = record.getDataType();
 					switch (datatype) {
 					case GPS_LATITUDE:

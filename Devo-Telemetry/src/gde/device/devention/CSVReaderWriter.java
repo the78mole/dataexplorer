@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.devention;
@@ -81,7 +81,7 @@ public class CSVReaderWriter {
 	static long								lastTimeStamp		= 0;
 
 	/**
-	 * read the first two line of CSV file and prepare a map with all available information 
+	 * read the first two line of CSV file and prepare a map with all available information
 	 * @param separator
 	 * @param filePath
 	 * @return map with GDE.DEVICE_NAME,GDE.CSV_DATA_HEADER,[GDE.CHANNEL_CONFIG_NAME]
@@ -134,7 +134,7 @@ public class CSVReaderWriter {
 	 * evaluate channel/configuration and check units for absolute data
 	 * <ul>
 	 * <li>if the channel/configuration does not match device the first channel/configuration of the device will chosen
-	 * <li>if units of absolute data will not match a warning dialog will show all red measurements keys with expected units 
+	 * <li>if units of absolute data will not match a warning dialog will show all red measurements keys with expected units
 	 * </ul>
 	 * @param header
 	 */
@@ -163,14 +163,14 @@ public class CSVReaderWriter {
 		header.put(GDE.CHANNEL_CONFIG_NUMBER, "" + CSVReaderWriter.channels.getActiveChannelNumber());
 		CSVReaderWriter.log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + header.get(GDE.CHANNEL_CONFIG_NUMBER) + " : " + header.get(GDE.CHANNEL_CONFIG_NAME));
 
-		for (int i = 0; i < headerLineArray.length; i++) {
-			if (headerLineArray[i].toLowerCase().startsWith("timer")) {
+		for (String element : headerLineArray) {
+			if (element.toLowerCase().startsWith("timer")) {
 				header.put(CSVReaderWriter.OFFSET_TIMER, ++offsetTimer + GDE.STRING_EMPTY);
 				continue; //skip timer entries
 			}
-			String mappedMeasurement = DevoAdapter.properties.getProperty(headerLineArray[i]);
+			String mappedMeasurement = DevoAdapter.properties.getProperty(element);
 			if (mappedMeasurement == null) {
-				mappedMeasurement = String.format("%s [-]", headerLineArray[i]);
+				mappedMeasurement = String.format("%s [-]", element);
 			}
 			//check if the mapped measurement name is already in use
 			int count = 1;
@@ -199,11 +199,11 @@ public class CSVReaderWriter {
 	/**
 	 * read the selected CSV file
 	 * @return record set created
-	 * @throws NotSupportedFileFormatException 
-	 * @throws MissMatchDeviceException 
-	 * @throws IOException 
-	 * @throws DataInconsitsentException 
-	 * @throws DataTypeException 
+	 * @throws NotSupportedFileFormatException
+	 * @throws MissMatchDeviceException
+	 * @throws IOException
+	 * @throws DataInconsitsentException
+	 * @throws DataTypeException
 	 */
 	public static RecordSet read(char separator, String filePath, String recordSetNameExtend) throws NotSupportedFileFormatException, MissMatchDeviceException, IOException, DataInconsitsentException,
 			DataTypeException {
@@ -232,7 +232,7 @@ public class CSVReaderWriter {
 
 				// check for device name and channel or configuration in first line
 				if (!CSVReaderWriter.application.getActiveDevice().getName().equals(fileHeader.get(GDE.DEVICE_NAME))) {
-					MissMatchDeviceException e = new MissMatchDeviceException(Messages.getString(MessageIds.GDE_MSGW0013, new Object[] { fileHeader.get(GDE.DEVICE_NAME) })); // mismatch device name 
+					MissMatchDeviceException e = new MissMatchDeviceException(Messages.getString(MessageIds.GDE_MSGW0013, new Object[] { fileHeader.get(GDE.DEVICE_NAME) })); // mismatch device name
 					CSVReaderWriter.log.log(Level.SEVERE, e.getMessage(), e);
 					throw e;
 				}
@@ -262,7 +262,8 @@ public class CSVReaderWriter {
 				recordSetName = recordSet.getName(); // cut length
 
 				//find GPS related records and try to assign data type
-				for (Record record : recordSet.values()) {
+				for (int i = 0; i < recordSet.size(); i++) {
+					Record record = recordSet.get(i);
 					if (record.getUnit().equals("km/h") || record.getUnit().equals("m/s"))
 						record.setDataType(Record.DataType.SPEED);
 					else if (record.getUnit().equals("m") && (record.getName().toLowerCase().contains("alti") || record.getName().toLowerCase().contains("höhe")))
@@ -277,7 +278,7 @@ public class CSVReaderWriter {
 
 				//initial use file last modification date as start time
 				startTimeStamp = (long) (new File(filePath).lastModified() - recordSet.getMaxTime_ms());
-				
+
 				//find start time if GPS in use
 				int offsetTimerEntries = Integer.valueOf(fileHeader.get(CSVReaderWriter.OFFSET_TIMER)).intValue();
 				int gpsTimeRecordOrdinal = recordSet.getRecordOrdinalOfDataType(Record.DataType.GPS_TIME);
@@ -301,7 +302,7 @@ public class CSVReaderWriter {
 							+ new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp));
 							break;
 						}
-					} 
+					}
 				}
 				else {
 					//correct data and start time -> use file last modification date
@@ -349,7 +350,7 @@ public class CSVReaderWriter {
 						time_ms = Integer.valueOf(data).intValue();
 
 					parseLineAddPoints(recordSet, offsetTimerEntries, updateRecordNames, points, line, GDE.STRING_EMPTY + separator);
-					
+
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
 					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
 					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
@@ -408,16 +409,16 @@ public class CSVReaderWriter {
 		GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute+minuteAdd, second+secondAdd);
 		long timeStamp = calendar.getTimeInMillis() + (strValue.contains(GDE.STRING_DOT) ? Integer.parseInt(strValue.substring(strValue.lastIndexOf(GDE.STRING_DOT) + 1)) : 0);
 		int time_ms = 0;
-		
+
 		if (lastTimeStamp <= timeStamp) {
 			time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));
 			lastTimeStamp = timeStamp;
-//			if (startTimeStamp == 0) 
+//			if (startTimeStamp == 0)
 //				startTimeStamp = timeStamp;
 		}
 		else
 			return; //time doesn't change, do not add points
-		
+
 		for (int i = 0; i < updateRecordNames.length; i++) { // only iterate over record names found in file
 			try {
 				strValue = dataStr[i + offsetTimer].trim();
@@ -431,7 +432,7 @@ public class CSVReaderWriter {
 			case GPS_LATITUDE:
 				int latLong = Integer.valueOf(strValue.replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
 				int grad = latLong / 10000000;
-				int minuten = (int) (latLong - (grad * 10000000)) / 100000;
+				int minuten = (latLong - (grad * 10000000)) / 100000;
 				double seconds = (latLong - (grad * 10000000.0) - (minuten * 100000.0)) / 1000;
 				points[i] = (int) ((grad + ((minuten + seconds/60.0)/100.0)) * 1000000.0);
 				break;
@@ -441,7 +442,7 @@ public class CSVReaderWriter {
 				int secondNew = Integer.parseInt(strValue.substring(6, 8));
 				calendar = new GregorianCalendar(year, month - 1, day, hourNew, minuteNew, secondNew);
 				long timeStampNew = calendar.getTimeInMillis();
-				points[i] = (int) (timeStampNew - startTimeStamp); 
+				points[i] = (int) (timeStampNew - startTimeStamp);
 				break;
 
 			default:
@@ -459,7 +460,7 @@ public class CSVReaderWriter {
 
 	/**
 	 * write data CVS file
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) throws Exception {
 		BufferedWriter writer;
@@ -481,14 +482,14 @@ public class CSVReaderWriter {
 			CSVReaderWriter.log.log(Level.FINE, "written header line = " + CSVReaderWriter.sb.toString()); //$NON-NLS-1$
 
 			CSVReaderWriter.sb = new StringBuffer();
-			CSVReaderWriter.sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; 
+			CSVReaderWriter.sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]";
 			// write the measurements signature
 			for (int i = 0; i < recordSet.size(); i++) {
 				MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), i);
 				Record record = recordSet.get(i);
 				CSVReaderWriter.log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 				if (isRaw) {
-					if (!measurement.isCalculation()) { // only use active records for writing raw data 
+					if (!measurement.isCalculation()) { // only use active records for writing raw data
 						CSVReaderWriter.sb.append(record.getName()).append(" [---]").append(separator); //$NON-NLS-1$
 						CSVReaderWriter.log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 					}

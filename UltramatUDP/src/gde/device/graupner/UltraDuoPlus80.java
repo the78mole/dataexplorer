@@ -13,10 +13,18 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
+
+import java.io.FileNotFoundException;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabItem;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -32,14 +40,6 @@ import gde.exception.DataInconsitsentException;
 import gde.log.Level;
 import gde.messages.Messages;
 
-import java.io.FileNotFoundException;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabItem;
-
 /**
  * Graupner Ultra Duo Plus 80 base class
  * @author Winfried Brügmann
@@ -49,57 +49,57 @@ public class UltraDuoPlus80 extends Ultramat {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public UltraDuoPlus80(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { 
+		this.USAGE_MODE = new String[] {
 				Messages.getString(MessageIds.GDE_MSGT2200), //no operation
 				Messages.getString(MessageIds.GDE_MSGT2201), //charge
 				Messages.getString(MessageIds.GDE_MSGT2202), //discharge
-				Messages.getString(MessageIds.GDE_MSGT2203), 
-				Messages.getString(MessageIds.GDE_MSGT2200), 
-				Messages.getString(MessageIds.GDE_MSGT2205), 
+				Messages.getString(MessageIds.GDE_MSGT2203),
+				Messages.getString(MessageIds.GDE_MSGT2200),
+				Messages.getString(MessageIds.GDE_MSGT2205),
 				Messages.getString(MessageIds.GDE_MSGT2206),
-				Messages.getString(MessageIds.GDE_MSGT2207), 
+				Messages.getString(MessageIds.GDE_MSGT2207),
 				Messages.getString(MessageIds.GDE_MSGT2222), //storage
 				Messages.getString(MessageIds.GDE_MSGT2209) };
-		this.CHARGE_MODE = new String[] { 
+		this.CHARGE_MODE = new String[] {
 				Messages.getString(MessageIds.GDE_MSGT2210), //NiXx Automatic
 				Messages.getString(MessageIds.GDE_MSGT2212), //Normal
 				Messages.getString(MessageIds.GDE_MSGT2213), //Linear
 				Messages.getString(MessageIds.GDE_MSGT2216), //ReFlex
 				Messages.getString(MessageIds.GDE_MSGT2218), //charge CV-CC
-				Messages.getString(MessageIds.GDE_MSGT2215), 
+				Messages.getString(MessageIds.GDE_MSGT2215),
 				Messages.getString(MessageIds.GDE_MSGT2216),
-				Messages.getString(MessageIds.GDE_MSGT2217), 
-				Messages.getString(MessageIds.GDE_MSGT2218), 
-				Messages.getString(MessageIds.GDE_MSGT2219), 
+				Messages.getString(MessageIds.GDE_MSGT2217),
+				Messages.getString(MessageIds.GDE_MSGT2218),
+				Messages.getString(MessageIds.GDE_MSGT2219),
 				Messages.getString(MessageIds.GDE_MSGT2220),
-				Messages.getString(MessageIds.GDE_MSGT2221), 
+				Messages.getString(MessageIds.GDE_MSGT2221),
 				Messages.getString(MessageIds.GDE_MSGT2222) };
-		this.DISCHARGE_MODE = new String[] { 
+		this.DISCHARGE_MODE = new String[] {
 				Messages.getString(MessageIds.GDE_MSGT2210), //NiXx Automatic
 				Messages.getString(MessageIds.GDE_MSGT2212), //Normal
 				Messages.getString(MessageIds.GDE_MSGT2213), //Linear
 				Messages.getString(MessageIds.GDE_MSGT2216), //ReFlex
 				Messages.getString(MessageIds.GDE_MSGT2218), //charge CV-CC
-				Messages.getString(MessageIds.GDE_MSGT2224), 
+				Messages.getString(MessageIds.GDE_MSGT2224),
 				Messages.getString(MessageIds.GDE_MSGT2220),
 				Messages.getString(MessageIds.GDE_MSGT2222) };
 		this.DELAY_MODE = new String[] { GDE.STRING_EMPTY, GDE.STRING_EMPTY, GDE.STRING_EMPTY, GDE.STRING_EMPTY };
-		this.CURRENT_MODE = new String[] { 
-				Messages.getString(MessageIds.GDE_MSGT2229), 
-				Messages.getString(MessageIds.GDE_MSGT2230), 
+		this.CURRENT_MODE = new String[] {
+				Messages.getString(MessageIds.GDE_MSGT2229),
+				Messages.getString(MessageIds.GDE_MSGT2230),
 				Messages.getString(MessageIds.GDE_MSGT2231),
-				Messages.getString(MessageIds.GDE_MSGT2232), 
-				Messages.getString(MessageIds.GDE_MSGT2233), 
-				Messages.getString(MessageIds.GDE_MSGT2234), 
+				Messages.getString(MessageIds.GDE_MSGT2232),
+				Messages.getString(MessageIds.GDE_MSGT2233),
+				Messages.getString(MessageIds.GDE_MSGT2234),
 				Messages.getString(MessageIds.GDE_MSGT2235),
-				Messages.getString(MessageIds.GDE_MSGT2236), 
+				Messages.getString(MessageIds.GDE_MSGT2236),
 				Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
@@ -114,50 +114,50 @@ public class UltraDuoPlus80 extends Ultramat {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { 
+		this.USAGE_MODE = new String[] {
 				Messages.getString(MessageIds.GDE_MSGT2200), //no operation
 				Messages.getString(MessageIds.GDE_MSGT2201), //charge
 				Messages.getString(MessageIds.GDE_MSGT2202), //discharge
-				Messages.getString(MessageIds.GDE_MSGT2203), 
-				Messages.getString(MessageIds.GDE_MSGT2200), 
-				Messages.getString(MessageIds.GDE_MSGT2205), 
+				Messages.getString(MessageIds.GDE_MSGT2203),
+				Messages.getString(MessageIds.GDE_MSGT2200),
+				Messages.getString(MessageIds.GDE_MSGT2205),
 				Messages.getString(MessageIds.GDE_MSGT2206),
-				Messages.getString(MessageIds.GDE_MSGT2207), 
+				Messages.getString(MessageIds.GDE_MSGT2207),
 				Messages.getString(MessageIds.GDE_MSGT2222), //storage
 				Messages.getString(MessageIds.GDE_MSGT2209) };
-		this.CHARGE_MODE = new String[] { 
+		this.CHARGE_MODE = new String[] {
 				Messages.getString(MessageIds.GDE_MSGT2210), //NiXx Automatic
 				Messages.getString(MessageIds.GDE_MSGT2212), //Normal
 				Messages.getString(MessageIds.GDE_MSGT2213), //Linear
 				Messages.getString(MessageIds.GDE_MSGT2216), //ReFlex
 				Messages.getString(MessageIds.GDE_MSGT2218), //charge CV-CC
-				Messages.getString(MessageIds.GDE_MSGT2215), 
+				Messages.getString(MessageIds.GDE_MSGT2215),
 				Messages.getString(MessageIds.GDE_MSGT2216),
-				Messages.getString(MessageIds.GDE_MSGT2217), 
-				Messages.getString(MessageIds.GDE_MSGT2218), 
-				Messages.getString(MessageIds.GDE_MSGT2219), 
+				Messages.getString(MessageIds.GDE_MSGT2217),
+				Messages.getString(MessageIds.GDE_MSGT2218),
+				Messages.getString(MessageIds.GDE_MSGT2219),
 				Messages.getString(MessageIds.GDE_MSGT2220),
-				Messages.getString(MessageIds.GDE_MSGT2221), 
+				Messages.getString(MessageIds.GDE_MSGT2221),
 				Messages.getString(MessageIds.GDE_MSGT2222) };
-		this.DISCHARGE_MODE = new String[] { 
+		this.DISCHARGE_MODE = new String[] {
 				Messages.getString(MessageIds.GDE_MSGT2210), //NiXx Automatic
 				Messages.getString(MessageIds.GDE_MSGT2212), //Normal
 				Messages.getString(MessageIds.GDE_MSGT2213), //Linear
 				Messages.getString(MessageIds.GDE_MSGT2216), //ReFlex
 				Messages.getString(MessageIds.GDE_MSGT2218), //charge CV-CC
-				Messages.getString(MessageIds.GDE_MSGT2224), 
+				Messages.getString(MessageIds.GDE_MSGT2224),
 				Messages.getString(MessageIds.GDE_MSGT2220),
 				Messages.getString(MessageIds.GDE_MSGT2222) };
 		this.DELAY_MODE = new String[] { GDE.STRING_EMPTY, GDE.STRING_EMPTY, GDE.STRING_EMPTY, GDE.STRING_EMPTY };
-		this.CURRENT_MODE = new String[] { 
-				Messages.getString(MessageIds.GDE_MSGT2229), 
-				Messages.getString(MessageIds.GDE_MSGT2230), 
+		this.CURRENT_MODE = new String[] {
+				Messages.getString(MessageIds.GDE_MSGT2229),
+				Messages.getString(MessageIds.GDE_MSGT2230),
 				Messages.getString(MessageIds.GDE_MSGT2231),
-				Messages.getString(MessageIds.GDE_MSGT2232), 
-				Messages.getString(MessageIds.GDE_MSGT2233), 
-				Messages.getString(MessageIds.GDE_MSGT2234), 
+				Messages.getString(MessageIds.GDE_MSGT2232),
+				Messages.getString(MessageIds.GDE_MSGT2233),
+				Messages.getString(MessageIds.GDE_MSGT2234),
 				Messages.getString(MessageIds.GDE_MSGT2235),
-				Messages.getString(MessageIds.GDE_MSGT2236), 
+				Messages.getString(MessageIds.GDE_MSGT2236),
 				Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
@@ -165,7 +165,7 @@ public class UltraDuoPlus80 extends Ultramat {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	@Override
 	public int getLovDataByteSize() {
@@ -181,7 +181,7 @@ public class UltraDuoPlus80 extends Ultramat {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -204,7 +204,7 @@ public class UltraDuoPlus80 extends Ultramat {
 					System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize2);
 				else if (outputChannel == 2)
 					System.arraycopy(dataBuffer, channel2Offset + offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize2);
-				
+
 				recordSet.addPoints(convertDataBytes(points, convertBuffer));
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
@@ -265,12 +265,12 @@ public class UltraDuoPlus80 extends Ultramat {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -286,7 +286,7 @@ public class UltraDuoPlus80 extends Ultramat {
 				int minVotage = Integer.MAX_VALUE;
 				logger.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i * dataBufferSize); //$NON-NLS-1$
 				System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
-				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
+				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance
 				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
 				points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
 				points[1] = (((convertBuffer[4] & 0xff) << 24) + ((convertBuffer[5] & 0xff) << 16) + ((convertBuffer[6] & 0xff) << 8) + ((convertBuffer[7] & 0xff) << 0));
@@ -316,11 +316,11 @@ public class UltraDuoPlus80 extends Ultramat {
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		recordSet.syncScaleOfSyncableRecords();
 	}
-	
+
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -337,7 +337,8 @@ public class UltraDuoPlus80 extends Ultramat {
 		}
 
 		if (logger.isLoggable(Level.FINE)) {
-			for (Record record : recordSet.values()) {
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
 				logger.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
@@ -368,7 +369,7 @@ public class UltraDuoPlus80 extends Ultramat {
 	 */
 	@Override
 	public int[] getCellVoltageOrdinals() {
-		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance
 		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle6 15=SpannungZelle7
 		return new int[] { 0, 2 };
 	}
@@ -377,7 +378,7 @@ public class UltraDuoPlus80 extends Ultramat {
 	 * check if one of the outlet channels are in processing mode
 	 * @param outletNum 1 or 2
 	 * @param dataBuffer
-	 * @return true if channel 1 or 2 is active 
+	 * @return true if channel 1 or 2 is active
 	 */
 	@Override
 	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
@@ -387,7 +388,7 @@ public class UltraDuoPlus80 extends Ultramat {
 				logger.log(Level.FINE,
 						"processingModeOut1 = " + (processingModeOut1 != null && processingModeOut1.length() > 0 ? this.USAGE_MODE[Integer.parseInt(processingModeOut1, 16)] : processingModeOut1)); //$NON-NLS-1$
 			}
-			if (this.settings.isReduceChargeDischarge()) 
+			if (this.settings.isReduceChargeDischarge())
 				return processingModeOut1 != null && processingModeOut1.length() == 2 && (processingModeOut1.equals("01") || processingModeOut1.equals("02") || (this.settings.isContinuousRecordSet() && processingModeOut1.equals("03")));
 			return processingModeOut1 != null && processingModeOut1.length() == 2 && !(processingModeOut1.equals(Ultramat.OPERATIONS_MODE_NONE) || processingModeOut1.equals(Ultramat.OPERATIONS_MODE_ERROR));
 		}
@@ -397,7 +398,7 @@ public class UltraDuoPlus80 extends Ultramat {
 				logger.log(Level.FINE,
 						"processingModeOut2 = " + (processingModeOut2 != null && processingModeOut2.length() > 0 ? this.USAGE_MODE[Integer.parseInt(processingModeOut2, 16)] : processingModeOut2)); //$NON-NLS-1$
 			}
-			if (this.settings.isReduceChargeDischarge()) 
+			if (this.settings.isReduceChargeDischarge())
 				return processingModeOut2 != null && processingModeOut2.length() == 2 && (processingModeOut2.equals("01") || processingModeOut2.equals("02") || (this.settings.isContinuousRecordSet() && processingModeOut2.equals("03")));
 			return processingModeOut2 != null && processingModeOut2.length() == 2 && !(processingModeOut2.equals(Ultramat.OPERATIONS_MODE_NONE) || processingModeOut2.equals(Ultramat.OPERATIONS_MODE_ERROR));
 		}
@@ -407,7 +408,7 @@ public class UltraDuoPlus80 extends Ultramat {
 
 	/**
 	 * query the processing mode, main modes are charge/discharge, make sure the data buffer contains at index 15,16 the processing modes
-	 * @param dataBuffer 
+	 * @param dataBuffer
 	 * @return 0 = no processing, 1 = charge, 2 = discharge, 3 = delay, 4 = pause, 5 = current operation finished, 6 = error, 7 = balancer, 8 = tire heater, 9 = motor
 	 */
 	@Override
@@ -463,14 +464,14 @@ public class UltraDuoPlus80 extends Ultramat {
 
 	/**
 	 * query the firmware version
-	 * @param dataBuffer 
+	 * @param dataBuffer
 	 * @return v2.0
 	 */
 	@Override
 	public String getFirmwareVersion(byte[] dataBuffer) {
 		return this.firmware;
 	}
-		
+
 	/**
 	 * query the cycle number of the given outlet channel
 	 * @param outletNum
@@ -518,9 +519,9 @@ public class UltraDuoPlus80 extends Ultramat {
 	}
 
 	/**
-	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device
 	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.  
+	 * As default the function should return null which stands for no device custom tab item.
 	 */
 	@Override
 	public CTabItem getUtilityDeviceTabItem() {

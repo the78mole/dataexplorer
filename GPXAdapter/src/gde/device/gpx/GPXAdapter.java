@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.gpx;
@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -84,8 +83,8 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public GPXAdapter(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -132,7 +131,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 		try {
 			if (!new File(preopertyFilePath).exists()) {
 				File path = new File(Settings.getInstance().getApplHomePath() + "/Mapping"); //$NON-NLS-1$
-				if (!path.exists() && !path.isDirectory()) 
+				if (!path.exists() && !path.isDirectory())
 					path.mkdir();
 				//extract initial property files
 				FileUtils.extract(this.getClass(), "GPXAdapter.properties", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -195,7 +194,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
 	@Override
@@ -205,7 +204,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	@Override
 	public int getLovDataByteSize() {
@@ -221,7 +220,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -288,12 +287,12 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -345,8 +344,8 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public boolean isGPSCoordinates(Record record) {
-		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { 
-			// 0=GPS-latitude 1=GPS-longitude 
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) {
+			// 0=GPS-latitude 1=GPS-longitude
 			return true;
 		}
 		return false;
@@ -411,7 +410,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 
 		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 		double newValue = 0;
-		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude
 			newValue = value / 1000.0;
 		}
 		else {
@@ -450,7 +449,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 
 		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 		double newValue = 0;
-		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude
 			newValue = value * 1000.0;
 		}
 		else {
@@ -463,7 +462,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -476,22 +475,22 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(i);
-			if (log.isLoggable(Level.FINE)) 
+			if (log.isLoggable(Level.FINE))
 				log.log(Level.FINE, record.getName() + " = " + this.getMeasurementNameReplacement(recordSet.getChannelConfigNumber(), i)); //$NON-NLS-1$
 
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
 				if (log.isLoggable(Level.FINE))
-					log.log(Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ //$NON-NLS-2$ 
+					log.log(Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
-				if (log.isLoggable(Level.FINE)) 
+				if (log.isLoggable(Level.FINE))
 					log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
-		if (log.isLoggable(Level.FINER)) 
+		if (log.isLoggable(Level.FINER))
 			log.log(Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 	}
@@ -499,8 +498,8 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread, 
-	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
@@ -528,7 +527,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
-	 * as example a file selection dialog could be opened to import serialized ASCII data 
+	 * as example a file selection dialog could be opened to import serialized ASCII data
 	 */
 	@Override
 	public void open_closeCommPort() {
@@ -672,7 +671,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	//	}
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
@@ -702,7 +701,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
-				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, additionalMeasurementOrdinal, findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, //$NON-NLS-1$ //$NON-NLS-2$ 
+				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, additionalMeasurementOrdinal, findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, //$NON-NLS-1$ //$NON-NLS-2$
 						true, isExportTmpDir);
 			}
 		}
@@ -710,8 +709,9 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	private int findRecordByUnit(RecordSet recordSet, String unit) {
-		for (Entry<String, Record> entry : recordSet.entrySet()) {
-			if (entry.getValue().getUnit().equalsIgnoreCase(unit)) return entry.getValue().getOrdinal();
+		for (int i = 0; i < recordSet.size(); i++) {
+			Record record = recordSet.get(i);
+			if (record.getUnit().equalsIgnoreCase(unit)) return record.getOrdinal();
 		}
 		return -1;
 	}

@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.elprog;
@@ -74,8 +74,8 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public Pulsar3(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -87,7 +87,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
 				if (!isFileIO) isFileIO = format.getInputType() == InputTypes.FILE_IO;
 			}
-			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
+			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 			} else { //InputTypes.FILE_IO
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3903), Messages.getString(MessageIds.GDE_MSGT3903));
@@ -114,7 +114,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
 				if (!isFileIO) isFileIO = format.getInputType() == InputTypes.FILE_IO;
 			}
-			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
+			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
 			} else { //InputTypes.FILE_IO
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3903), Messages.getString(MessageIds.GDE_MSGT3903));
@@ -127,7 +127,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 		initBatteryTypes();
 		LogViewReader.putDeviceMap("pulsar 3", "Pulsar3"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/**
 	 * initialize known battery types
 	 */
@@ -146,13 +146,14 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	public void updateFileImportMenu(Menu importMenue) {
 		MenuItem importDeviceLogItem;
 
-		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
 			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT3904, GDE.MOD1));
 			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT3904));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					if (!isSerialIO) open_closeCommPort();
@@ -166,7 +167,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	 * import device specific *.acp data files
 	 */
 	public void importDeviceData() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT3900));		
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT3900));
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
@@ -182,10 +183,10 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 							try {
 								BufferedReader reader = null;
 								try {
-									reader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedImportFile), "ISO-8859-1")); //$NON-NLS-1$	
+									reader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedImportFile), "ISO-8859-1")); //$NON-NLS-1$
 									String line = reader.readLine();
 									if (line.startsWith("#")) {
-										recordNameExtend = batteryTypes.get(Integer.valueOf(line.substring(4, 6)));		
+										recordNameExtend = batteryTypes.get(Integer.valueOf(line.substring(4, 6)));
 										recordNameExtend = recordNameExtend == null ? GDE.STRING_EMPTY : recordNameExtend;
 									}
 									reader.close();
@@ -194,7 +195,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 									//ignore and use empty string as battery type since it is unknown
 									if (reader != null) reader.close();
 								}
-								CSVSerialDataReaderWriter.read(selectedImportFile, Pulsar3.this, recordNameExtend, 1, 
+								CSVSerialDataReaderWriter.read(selectedImportFile, Pulsar3.this, recordNameExtend, 1,
 										new  PulsarDataParser(getDataBlockTimeUnitFactor(), getDataBlockLeader(), getDataBlockSeparator().value(), null, null, Math.abs(getDataBlockSize(InputTypes.FILE_IO)), getDataBlockFormat(InputTypes.FILE_IO), false, 2)
 								);
 							}
@@ -216,6 +217,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	 * query if the record set numbering should follow channel configuration numbering
 	 * @return true where devices does not distinguish between channels (for example Av4ms_FV_762)
 	 */
+	@Override
 	public boolean recordSetNumberFollowChannel() {
 		return false;
 	}
@@ -235,7 +237,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
 	@Override
@@ -245,7 +247,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	@Override
 	public int getLovDataByteSize() {
@@ -261,7 +263,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -331,7 +333,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 		int index = 0;
 		for (int i = 0; i < recordDataSize; i++) {
 			index = i * dataBufferSize;
-			if (Pulsar3.log.isLoggable(Level.FINER)) 
+			if (Pulsar3.log.isLoggable(Level.FINER))
 				Pulsar3.log.log(Level.FINER, i + " i*dataBufferSize = " + index); //$NON-NLS-1$
 
 			for (int j = 0; j < points.length; j++) {
@@ -381,7 +383,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTableRow;		
+		return dataTableRow;
 	}
 
 	/**
@@ -395,7 +397,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 		//24=RiZelle1 25=RiZelle2 26=RiZelle3 27=RiZelle4 28=RiZelle5 29=RiZelle6 ... 39=RiZelle16
 		//40=BalancerZelle1 41=BalancerZelle2 42=BalancerZelle3 43=BalancerZelle4 44=BalancerZelle5 45=BalancerZelle6 ... 55=BalancerZelle16
 		double factor = record.getFactor(); // != 1 if a unit translation is required
-		
+
 		double newValue = value * factor;
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
@@ -434,16 +436,17 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 				//40=BalancerZelle1 41=BalancerZelle2 42=BalancerZelle3 43=BalancerZelle4 44=BalancerZelle5 45=BalancerZelle6 ... 55=BalancerZelle16
 				int displayableCounter = 0;
 
-				
+
 				// check if measurements isActive == false and set to isDisplayable == false
-				for (Record record : recordSet.values()) {
+				for (int i = 0; i < recordSet.size(); i++) {
+					Record record = recordSet.get(i);
 					if (record.isActive() && record.hasReasonableData()) {
 						++displayableCounter;
 					}
 				}
-				
+
 				log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
-				recordSet.setConfiguredDisplayable(displayableCounter);		
+				recordSet.setConfiguredDisplayable(displayableCounter);
 
 				if (recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
 					this.application.updateGraphicsWindow();
@@ -477,9 +480,10 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 				if (log.isLoggable(Level.FINER))
 					log.log(Level.FINER, record.getName() + " setDisplayable=" + record.hasReasonableData()); //$NON-NLS-1$
 		}
-		
+
 		if (log.isLoggable(Level.FINE)) {
-			for (Record record : recordSet.values()) {
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
 				log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
@@ -553,9 +557,9 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 		//8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 ... 23=SpannungZelle16
 		//24=RiZelle1 25=RiZelle2 26=RiZelle3 27=RiZelle4 28=RiZelle5 29=RiZelle6 ... 39=RiZelle16
 		//40=BalancerZelle1 41=BalancerZelle2 42=BalancerZelle3 43=BalancerZelle4 44=BalancerZelle5 45=BalancerZelle6 ... 55=BalancerZelle16
-		return new int[] {0, 2};	
+		return new int[] {0, 2};
 	}
-	
+
 	/**
 	 * query the process name according defined states
 	 * @param buffer

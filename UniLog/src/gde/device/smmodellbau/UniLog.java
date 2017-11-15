@@ -784,7 +784,8 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			int displayableCounter = 0;
 
 			// check if measurements isActive == false and set to isDisplayable == false
-			for (Record tmpRecord : recordSet.values()) {
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record tmpRecord = recordSet.get(i);
 				if (tmpRecord.isActive() && tmpRecord.isDisplayable()) {
 					if (log.isLoggable(Level.FINE))
 						log.log(Level.FINE, "add to displayable counter: " + tmpRecord.getName());

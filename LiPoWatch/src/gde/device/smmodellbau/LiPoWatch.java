@@ -13,10 +13,17 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -36,13 +43,6 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
 import gde.utils.StringHelper;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
 
 /**
  * Sample device class, used as template for new device implementations
@@ -72,8 +72,8 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public LiPoWatch(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -121,7 +121,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
@@ -143,7 +143,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	public int getLovDataByteSize() {
 		return 37;
@@ -157,7 +157,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int[] points = new int[this.getNumberOfMeasurements(1)];
@@ -166,16 +166,16 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		int offset = 0; //offset data pointer while non constant data length
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
-		for (int i = 0; i < recordDataSize; i++) { 
-//			length = (tmp1ReadBuffer[0] & 0x7F);   
+		for (int i = 0; i < recordDataSize; i++) {
+//			length = (tmp1ReadBuffer[0] & 0x7F);
 //			tmp2ReadBuffer = new byte[length-1];
-//			this.read(tmp2ReadBuffer, 4000);		
+//			this.read(tmp2ReadBuffer, 4000);
 //			readBuffer = new byte[length];
 //			readBuffer[0] = tmp1ReadBuffer[0];
 //			System.arraycopy(tmp2ReadBuffer, 0, readBuffer, 1, length-1);
 			int length = (dataBuffer[offset] & 0x7F);
 			byte[] readBuffer = new byte[length];
-			
+
 			System.arraycopy(dataBuffer, offset+4, readBuffer, 0, length);
 			recordSet.addPoints(convertDataBytes(points, readBuffer));
 			offset += (length+4);
@@ -194,7 +194,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		StringBuilder sb = new StringBuilder();
 		int tmpValue = 0;
-		int totalVotage = 0;		
+		int totalVotage = 0;
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
 		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature , 4=Balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, ....
@@ -202,7 +202,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		//Servoimpuls_in
 		points[1] = (((dataBuffer[6] & 0xFF) << 8) + (dataBuffer[5] & 0xFF) & 0xFFF0) / 16 * 1000;
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(1)" + points[16]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-		//Servoimpuls_out 
+		//Servoimpuls_out
 		points[2] = (((dataBuffer[8] & 0xFF) << 8) + (dataBuffer[7] & 0xFF) & 0xFFF0) / 16 * 1000;
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(2)" + points[17]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -212,7 +212,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(3)" + points[18]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// number cells (first measurement might be wrong, so use avarage if possible)
-		int numberCells = (dataBuffer[5] & 0x0F); 
+		int numberCells = (dataBuffer[5] & 0x0F);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "numberCells = " + numberCells); //$NON-NLS-1$
 		// read cell voltage values
 		int i;
@@ -227,8 +227,8 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		//measurement modus absolute/relative
 		boolean isRelative = ((dataBuffer[9] & 0xF0) >> 4) == 1;
 		points[0] = isRelative ? totalVotage : points[i + 4]; // total battery voltage
-		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.insert(0, "(0)" + points[0] + "; "); //$NON-NLS-1$ //$NON-NLS-2$	
-		
+		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.insert(0, "(0)" + points[0] + "; "); //$NON-NLS-1$ //$NON-NLS-2$
+
 		points[4] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 		if (LiPoWatch.log.isLoggable(Level.FINE)) sb.append("(" + (i + 4) + ")" + points[1]).append("; "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -240,12 +240,12 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal busy to user 
+	 * since this is a long term operation the progress bar should be updated to signal busy to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
@@ -258,7 +258,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordDataSize; i++) {
 			System.arraycopy(dataBuffer, i * dataBufferSize, convertBuffer, 0, dataBufferSize);
 
-			// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=Balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, .... 
+			// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=Balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, ....
 			points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
 			points[1] = (((convertBuffer[4] & 0xff) << 24) + ((convertBuffer[5] & 0xff) << 16) + ((convertBuffer[6] & 0xff) << 8) + ((convertBuffer[7] & 0xff) << 0));
 			points[2] = (((convertBuffer[8] & 0xff) << 24) + ((convertBuffer[9] & 0xff) << 16) + ((convertBuffer[10] & 0xff) << 8) + ((convertBuffer[11] & 0xff) << 0));
@@ -318,7 +318,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTableRow;		
+		return dataTableRow;
 	}
 
 	/**
@@ -329,7 +329,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public double translateValue(Record record, double value) {
 		double newValue = value;
 
-		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=Balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, .... 
+		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=Balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, ....
 		PropertyType property = null;
 		if (record.getOrdinal() == 3) {//3=temperature [°C]
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
@@ -355,7 +355,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	public double reverseTranslateValue(Record record, double value) {
 		double newValue = value;
 
-		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=Balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, .... 
+		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=Balance, 5=cell voltage, 6=cell voltage, 7=cell voltage, ....
 		PropertyType property = null;
 		if (record.getOrdinal() == 3) {//3=temperature [°C]
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
@@ -376,7 +376,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 */
@@ -390,14 +390,15 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 			//if (log.isLoggable(Level.FINER)) log.log(Level.FINER, record.getName() + ".setVisible = " + hasReasonableData);
 			record.setDisplayable(hasReasonableData);
 			if (hasReasonableData) ++displayableCounter;
-			if (log.isLoggable(Level.FINER)) 
+			if (log.isLoggable(Level.FINER))
 				log.log(Level.FINER, record.getName() + " setDisplayable=" + hasReasonableData); //$NON-NLS-1$
 		}
 		recordSet.setConfiguredDisplayable(displayableCounter);
 
 		if (LiPoWatch.log.isLoggable(Level.FINE)) {
-			for (Record record : recordSet.values()) {
-				if (log.isLoggable(Level.FINE)) 
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
+				if (log.isLoggable(Level.FINE))
 					log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
@@ -406,8 +407,8 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread, 
-	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		int displayableCounter = 0;
@@ -415,12 +416,12 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordSet.size(); ++i) {
 			Record record = recordSet.get(i);
 			if (record.isActive() && record.isDisplayable()) {
-				if (log.isLoggable(Level.FINE)) 
+				if (log.isLoggable(Level.FINE))
 					log.log(Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
-		if (log.isLoggable(Level.FINE)) 
+		if (log.isLoggable(Level.FINE))
 			log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
 	}
@@ -509,7 +510,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public int[] getCellVoltageOrdinals() {
-		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
+		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, ....
 		return new int[] { 0, 3 };
 	}
 

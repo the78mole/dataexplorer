@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.opentx;
@@ -73,7 +73,7 @@ public class CSVReaderWriter {
 	final static Channels			channels		= Channels.getInstance();
 
 	/**
-	 * read the first two line of CSV file and prepare a map with all available information 
+	 * read the first two line of CSV file and prepare a map with all available information
 	 * @param separator
 	 * @param filePath
 	 * @return map with GDE.DEVICE_NAME,GDE.CSV_DATA_HEADER,[GDE.CHANNEL_CONFIG_NAME]
@@ -126,7 +126,7 @@ public class CSVReaderWriter {
 	 * evaluate channel/configuration and check units for absolute data
 	 * <ul>
 	 * <li>if the channel/configuration does not match device the first channel/configuration of the device will chosen
-	 * <li>if units of absolute data will not match a warning dialog will show all red measurements keys with expected units 
+	 * <li>if units of absolute data will not match a warning dialog will show all red measurements keys with expected units
 	 * </ul>
 	 * @param header
 	 */
@@ -138,7 +138,7 @@ public class CSVReaderWriter {
 
 		String headerLine = header.get(GDE.CSV_DATA_HEADER);
 
-		// Spannung;Strom;Ladung; < Spannung;Strom;Ladung;Leistung;Energie; 	
+		// Spannung;Strom;Ladung; < Spannung;Strom;Ladung;Leistung;Energie;
 		String[] headerLineArray = headerLine.split(GDE.STRING_EMPTY + separator);
 		header.put(GDE.CSV_DATA_TYPE, GDE.CSV_DATA_TYPE_RAW);
 		CSVReaderWriter.log.log(Level.FINE, GDE.CSV_DATA_TYPE + header.get(GDE.CSV_DATA_TYPE));
@@ -195,11 +195,11 @@ public class CSVReaderWriter {
 	/**
 	 * read the selected CSV file
 	 * @return record set created
-	 * @throws NotSupportedFileFormatException 
-	 * @throws MissMatchDeviceException 
-	 * @throws IOException 
-	 * @throws DataInconsitsentException 
-	 * @throws DataTypeException 
+	 * @throws NotSupportedFileFormatException
+	 * @throws MissMatchDeviceException
+	 * @throws IOException
+	 * @throws DataInconsitsentException
+	 * @throws DataTypeException
 	 */
 	public static RecordSet read(char separator, String filePath, String recordSetNameExtend) throws NotSupportedFileFormatException, MissMatchDeviceException, IOException, DataInconsitsentException,
 			DataTypeException {
@@ -226,7 +226,7 @@ public class CSVReaderWriter {
 
 				// check for device name and channel or configuration in first line
 				if (!CSVReaderWriter.application.getActiveDevice().getName().equals(fileHeader.get(GDE.DEVICE_NAME))) {
-					MissMatchDeviceException e = new MissMatchDeviceException(Messages.getString(MessageIds.GDE_MSGW0013, new Object[] { fileHeader.get(GDE.DEVICE_NAME) })); // mismatch device name 
+					MissMatchDeviceException e = new MissMatchDeviceException(Messages.getString(MessageIds.GDE_MSGW0013, new Object[] { fileHeader.get(GDE.DEVICE_NAME) })); // mismatch device name
 					CSVReaderWriter.log.log(Level.SEVERE, e.getMessage(), e);
 					throw e;
 				}
@@ -256,7 +256,8 @@ public class CSVReaderWriter {
 				recordSetName = recordSet.getName(); // cut length
 
 				//find GPS related records and try to assign data type
-				for (Record record : recordSet.values()) {
+				for (int i = 0; i < recordSet.size(); i++) {
+					Record record = recordSet.get(i);
 					if (record.getName().toLowerCase().contains("gps") && record.getName().toLowerCase().contains("speed"))
 						record.setDataType(Record.DataType.SPEED);
 					else if (record.getName().toLowerCase().contains("gps") && (record.getName().toLowerCase().contains("alt") || record.getName().toLowerCase().contains("höhe")))
@@ -288,13 +289,13 @@ public class CSVReaderWriter {
 					int year = Integer.parseInt(data.substring(0, 4));
 					int month = Integer.parseInt(data.substring(5, 7));
 					int day = Integer.parseInt(data.substring(8, 10));
-					
+
 					data = dataStr[1].trim();
 						int hour = Integer.parseInt(data.substring(0, 2));
 						int minute = Integer.parseInt(data.substring(3, 5));
 						int second = Integer.parseInt(data.substring(6, 8));
 						int millis = Integer.parseInt(data.substring(9, 12));
-						
+
 						Calendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
 						long timeStamp = calendar.getTimeInMillis() + millis;
 
@@ -344,7 +345,7 @@ public class CSVReaderWriter {
 						}
 					}
 					recordSet.addPoints(points, time_ms);
-					
+
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
 					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
 					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
@@ -396,7 +397,7 @@ public class CSVReaderWriter {
 
 	/**
 	 * write data CVS file
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) throws Exception {
 		BufferedWriter writer;
@@ -418,14 +419,14 @@ public class CSVReaderWriter {
 			CSVReaderWriter.log.log(Level.FINE, "written header line = " + CSVReaderWriter.sb.toString()); //$NON-NLS-1$
 
 			CSVReaderWriter.sb = new StringBuffer();
-			CSVReaderWriter.sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; 
+			CSVReaderWriter.sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]";
 			// write the measurements signature
 			for (int i = 0; i < recordSet.size(); i++) {
 				MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), i);
 				Record record = recordSet.get(i);
 				CSVReaderWriter.log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 				if (isRaw) {
-					if (!measurement.isCalculation()) { // only use active records for writing raw data 
+					if (!measurement.isCalculation()) { // only use active records for writing raw data
 						CSVReaderWriter.sb.append(record.getName()).append(" [---]").append(separator); //$NON-NLS-1$
 						CSVReaderWriter.log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 					}

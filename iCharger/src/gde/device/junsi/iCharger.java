@@ -13,10 +13,16 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.junsi;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -34,19 +40,13 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
 /**
  * Junsi iCharger base device class
  * @author Winfried Brügmann
  */
 public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(iCharger.class.getName());
-	
+
 	public final static String		CONFIG_EXT_TEMP_CUT_OFF			= "ext_temp_cut_off"; //$NON-NLS-1$
 	public final static String		CONFIG_WAIT_TIME						= "wait_time"; //$NON-NLS-1$
 	public final static String		CONFIG_IN_VOLTAGE_CUT_OFF		= "in_voltage_cut_off"; //$NON-NLS-1$
@@ -64,8 +64,8 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public iCharger(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -75,7 +75,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		this.serialPort = new iChargerSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
-		if (this.application.getMenuToolBar() != null) 
+		if (this.application.getMenuToolBar() != null)
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2606), Messages.getString(MessageIds.GDE_MSGT2605));
 	}
 
@@ -91,9 +91,9 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 		this.application = DataExplorer.getInstance();
 		if (deviceConfig.getSerialPortType() != null) {
 			this.serialPort = new iChargerSerialPort(this, this.application);
-		}		
+		}
 		this.channels = Channels.getInstance();
-		if (this.application.getMenuToolBar() != null) 
+		if (this.application.getMenuToolBar() != null)
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT2606), Messages.getString(MessageIds.GDE_MSGT2605));
 	}
 
@@ -111,7 +111,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
@@ -120,10 +120,10 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	public int getLovDataByteSize() {
-		return 158;  
+		return 158;
 	}
 
 	/**
@@ -135,7 +135,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		//device specific implementation required
@@ -147,7 +147,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		//device specific implementation required
 		return points;
 	}
@@ -183,12 +183,12 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		//device specific implementation required
@@ -226,7 +226,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTableRow;		
+		return dataTableRow;
 	}
 
 	/**
@@ -239,7 +239,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 		//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double factor = record.getFactor(); // != 1 if a unit translation is required
-		
+
 		double newValue = value * factor + offset;
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
@@ -264,7 +264,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -280,9 +280,10 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 				if (log.isLoggable(Level.FINER))
 					log.log(Level.FINER, record.getName() + " setDisplayable=" + record.hasReasonableData()); //$NON-NLS-1$
 		}
-		
+
 		if (log.isLoggable(Level.FINE)) {
-			for (Record record : recordSet.values()) {
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
 				log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
@@ -291,8 +292,8 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread, 
-	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are live measurement points only the calculation will take place directly after switch all to displayable
@@ -303,16 +304,17 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 				//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10
 				int displayableCounter = 0;
 
-				
+
 				// check if measurements isActive == false and set to isDisplayable == false
-				for (Record record : recordSet.values()) {
+				for (int i = 0; i < recordSet.size(); i++) {
+					Record record = recordSet.get(i);
 					if (record.isActive() && record.hasReasonableData()) {
 						++displayableCounter;
 					}
 				}
-				
+
 				log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
-				recordSet.setConfiguredDisplayable(displayableCounter);		
+				recordSet.setConfiguredDisplayable(displayableCounter);
 
 				if (recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
 					this.application.updateGraphicsWindow();
@@ -340,7 +342,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	public String[] getUsedPropertyKeys() {
 		return new String[] {IDevice.OFFSET, IDevice.FACTOR};
 	}
-	
+
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
@@ -385,7 +387,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 			}
 		}
 	}
-	
+
 	/**
 	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
 	 * set value of -1 to suppress this measurement
@@ -396,7 +398,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 		//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8 17=SpannungZelle9 18=SpannungZelle10
 		return new int[] {1, 3};
 	}
-	
+
 	/**
 	 * query the process name according defined states
 	 * @param buffer
@@ -405,7 +407,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	public String getProcessName(byte[] buffer) throws Exception {
 		return this.getRecordSetStateNameReplacement(Integer.parseInt((new String(buffer).split(this.getDataBlockSeparator().value())[1])));
 	}
-	
+
 	/**
 	 * query number of Lithium cells of this charger device
 	 * @return
@@ -416,7 +418,7 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	 * query device for specific smoothing index
 	 * 0 do nothing at all
 	 * 1 current drops just a single peak
-	 * 2 current drop more or equal than 2 measurements 
+	 * 2 current drop more or equal than 2 measurements
 	 */
 	@Override
 	public int	getCurrentSmoothIndex() {

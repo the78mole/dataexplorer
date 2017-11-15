@@ -13,10 +13,17 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.estner;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -35,13 +42,6 @@ import gde.exception.SerialPortException;
 import gde.io.LogViewReader;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
 
 /**
  * Akkumatik base device class
@@ -62,8 +62,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public Akkumatik(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -120,7 +120,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
 	@Override
@@ -130,7 +130,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	@Override
 	public int getLovDataByteSize() {
@@ -146,7 +146,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -159,8 +159,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		long startCycleTime = 0, timeStep = 0, lastCycleTime = -1;
 
 		// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
-		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
-		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
+		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6
+		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12
 		// none constant time steps
 		byte[] sizeBuffer = new byte[4];
 		byte[] convertBuffer = new byte[deviceDataBufferSize];
@@ -265,7 +265,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * check if processing 
+	 * check if processing
 	 * Ladephase (0=stop, 1...n, siehe Bedienungsanleitung)
 	 * @param dataBuffer
 	 * @return
@@ -277,7 +277,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get processing mode 
+	 * get processing mode
 	 * (0= LADE, 1= ENTL, 2= E+L, 3= L+E, 4= (L)E+L, 5= (E)L+E, 6= SENDER, LAGERN wird mit 0 oder 1 gemeldet)
 	 * @param dataBuffer
 	 * @return
@@ -287,7 +287,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get processing phase 
+	 * get processing phase
 	 * 0=Stop; 10=Pause
 	 * @param dataBuffer
 	 * @return
@@ -297,7 +297,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get processing type 
+	 * get processing type
 	 * Ladeart (0=Normal, 1=Puls, 2=Reflex, 3=Fast)
 	 * @param dataBuffer
 	 * @return
@@ -307,7 +307,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get processing time 
+	 * get processing time
 	 * (00:00:11)
 	 * @param dataBuffer
 	 * @return
@@ -319,7 +319,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get processing time 
+	 * get processing time
 	 * (00:00:11)
 	 * @param dataBuffer
 	 * @return
@@ -332,12 +332,12 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -349,8 +349,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
-		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
-		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
+		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6
+		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12
 
 		int timeStampBufferSize = 0;
 		if (!recordSet.isTimeStepConstant()) {
@@ -371,8 +371,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 
 			// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
-			// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
-			// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
+			// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6
+			// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12
 			points[0] = (((convertBuffer[0] & 0xff) << 24) + ((convertBuffer[1] & 0xff) << 16) + ((convertBuffer[2] & 0xff) << 8) + ((convertBuffer[3] & 0xff) << 0));
 			points[1] = (((convertBuffer[4] & 0xff) << 24) + ((convertBuffer[5] & 0xff) << 16) + ((convertBuffer[6] & 0xff) << 8) + ((convertBuffer[7] & 0xff) << 0));
 			points[2] = (((convertBuffer[8] & 0xff) << 24) + ((convertBuffer[9] & 0xff) << 16) + ((convertBuffer[10] & 0xff) << 8) + ((convertBuffer[11] & 0xff) << 0));
@@ -386,8 +386,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;
 
-			// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
-			// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
+			// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6
+			// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12
 			for (int j = 0, k = 0; j < 12; ++j, k += GDE.SIZE_BYTES_INTEGER) {
 				points[j + 10] = (((convertBuffer[k + 28] & 0xff) << 24) + ((convertBuffer[k + 29] & 0xff) << 16) + ((convertBuffer[k + 30] & 0xff) << 8) + ((convertBuffer[k + 31] & 0xff) << 0));
 				if (points[j + 10] > 0) {
@@ -416,13 +416,13 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
-		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
-		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
+		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6
+		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12
 		try {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				if (record.getOrdinal() > 8 && record.getUnit().equals("V")) //cell voltage 
+				if (record.getOrdinal() > 8 && record.getUnit().equals("V")) //cell voltage
 					dataTableRow[index + 1] = String.format("%.3f", ((record.realGet(rowIndex) / 1000.0) * factor));
 				else
 					dataTableRow[index + 1] = record.getDecimalFormat().format(((record.realGet(rowIndex) / 1000.0) * factor));
@@ -443,8 +443,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	@Override
 	public double translateValue(Record record, double value) {
 		// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
-		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
-		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
+		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6
+		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 
@@ -461,8 +461,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
-		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
-		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
+		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6
+		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 
@@ -474,7 +474,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -483,8 +483,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 
 		// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
-		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
-		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
+		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6
+		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12
 		recordSet.setAllDisplayable();
 		for (String recordKey : recordSet.getNoneCalculationRecordNames()) {
 			recordSet.get(recordKey).setActive(true);
@@ -496,7 +496,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 		}
 
 		if (Akkumatik.log.isLoggable(java.util.logging.Level.FINE)) {
-			for (Record record : recordSet.values()) {
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
 				Akkumatik.log.log(java.util.logging.Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable());
 			}
 		}
@@ -505,8 +506,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread, 
-	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
@@ -515,8 +516,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 			// calculate the values required
 			try {
 				// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
-				// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
-				// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
+				// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6
+				// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12
 				int displayableCounter = 0;
 
 				// check if measurements isActive == false and set to isDisplayable == false
@@ -631,8 +632,8 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	@Override
 	public int[] getCellVoltageOrdinals() {
 		// 0=Voltage 4=Current 2=Capacity 3=Power 4=Energy 5=SupplyVoltage 6=Resistance 7=Temperature 8=TemperatureInt 9=Balance
-		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6 
-		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12 
+		// 10=CellVoltage1 11=CellVoltage2 12=CellVoltage3 13=CellVoltage4 14=CellVoltage5 15=CellVoltage6
+		// 16=CellVoltage7 17=CellVoltage8 18=CellVoltage9 19=CellVoltage10 20=CellVoltage11 21=CellVoltage12
 		return new int[] { 0, 2 };
 	}
 
@@ -644,7 +645,7 @@ public class Akkumatik extends DeviceConfiguration implements IDevice {
 	 * query device for specific smoothing index
 	 * 0 do nothing at all
 	 * 1 current drops just a single peak
-	 * 2 current drop more or equal than 2 measurements 
+	 * 2 current drop more or equal than 2 measurements
 	 */
 	@Override
 	public int	getCurrentSmoothIndex() {

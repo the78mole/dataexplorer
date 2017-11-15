@@ -108,18 +108,18 @@ public class LogReader {
 		return measurementId == 0xFFFF
 				|| (measurementId & 0xFF00) == 0x1000
 				|| (measurementId & 0xFF00) == 0x1100
-				|| ((measurementId >= 0x1200 && measurementId <= 0x125E) 
+				|| ((measurementId >= 0x1200 && measurementId <= 0x125E)
 						&& (LogReader.measurements.get(measurementId) != null ? LogReader.measurements.get(measurementId).getName().contains("Function") : true)
 				|| LogReader.measurements.get(measurementId).getName().contains("ControlID"));
 	}
 
 	private boolean isStatusFilter(int measurementId) {
-		return measurementId == 0x0C0A 
-				|| measurementId == 0x2c09 
-				|| measurementId == 0x2c86 
-				|| measurementId == 0x2c8c 
-				|| measurementId == 0x0c1a 
-				|| measurementId == 0x0c2a 
+		return measurementId == 0x0C0A
+				|| measurementId == 0x2c09
+				|| measurementId == 0x2c86
+				|| measurementId == 0x2c8c
+				|| measurementId == 0x0c1a
+				|| measurementId == 0x0c2a
 				|| measurementId == 0x2c19
 				|| measurementId == 0x2c29;
 	}
@@ -169,7 +169,7 @@ public class LogReader {
 			this.offset = DataParser.byte2Double(bytes, true)[0];
 			System.arraycopy(buffer, 75, bytes, 0, 8);
 			this.factor = DataParser.byte2Double(bytes, true)[0];
-			this.factor = (this.factor - 0.0) < Measurement.DBL_EPSILON ? 1.0 : this.factor; 
+			this.factor = (this.factor - 0.0) < Measurement.DBL_EPSILON ? 1.0 : this.factor;
 			this.unit = new String(buffer, 83, 8).trim();
 			if (LogReader.log.isLoggable(java.util.logging.Level.FINER))
 				System.out.println(String.format(Locale.ENGLISH, "%s[%s] factor=%f offset=%f Id=%d type=%d;", this.name, this.unit, this.factor, this.offset, this.id, this.dataType.value));
@@ -327,7 +327,7 @@ public class LogReader {
 							"_Main_InputTemperature" };
 					String[] powerSupplyUnits = { "-", "V", "A", "V", "A", "V", "V", "°C" };
 					double[] powerSupplyFactors = { 1.0, 1 / 1000.0, 1 / 1000.0, 1 / 1000.0, 1 / 1000.0, 1 / 1000.0, 1 / 1000.0, 1.0 };
-					//"%d;%.3fV;%.3fA;%.3fV;%.3fA;%.3fV;%.3fV;%d°C;", status, voltage / 1000.0f, current / 1000.0f, inVoltage / 1000.0f, inCurrent / 1000.0f, mainVoltage / 1000.0f, reserveVoltage / 1000.0f, inTemperature));					
+					//"%d;%.3fV;%.3fA;%.3fV;%.3fA;%.3fV;%.3fV;%d°C;", status, voltage / 1000.0f, current / 1000.0f, inVoltage / 1000.0f, inCurrent / 1000.0f, mainVoltage / 1000.0f, reserveVoltage / 1000.0f, inTemperature));
 					for (int j = 0; j < powerSupplyNames.length; j++) {
 						if (j == 0 && WeatronicAdapter.isStatusFilter) continue;
 
@@ -436,7 +436,8 @@ public class LogReader {
 			String recordSetName = (LogReader.channels.getActiveChannel().size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 			LogReader.recordSet = RecordSet.createRecordSet(recordSetName, LogReader.device, activeChannelConfigNumber, recordNames, recordSymbols, recordUnits, LogReader.device.getTimeStep_ms(), true, true, true);
 			LogReader.recordSet.getName(); // cut/correct length of recordSetName
-			for (gde.data.Record record : LogReader.recordSet.values()) {
+			for (int i = 0; i < LogReader.recordSet.size(); i++) {
+				gde.data.Record record = LogReader.recordSet.get(i);
 				MeasurementType measurementType = LogReader.device.getMeasurement(activeChannelConfigNumber, record.getOrdinal());
 				if (measurementType == null || measurementType.getProperty(gde.data.Record.DataType.DEFAULT.value()) != null) continue;
 				record.setDataType();
@@ -447,7 +448,7 @@ public class LogReader {
 		private boolean isDuplicatedName(int ordinal, int channelConfigNumber, String name) {
 			String[] measurementNames = LogReader.device.getMeasurementNamesReplacements(channelConfigNumber);
 			for (int i = 0; i < ordinal; i++) {
-				if (measurementNames[i].equals(name)) 
+				if (measurementNames[i].equals(name))
 					return true;
 			}
 			return false;
@@ -466,7 +467,7 @@ public class LogReader {
 			gdeMeasurement.setActive(isActive);
 			gdeMeasurement.setFactor(factor);
 			gdeMeasurement.setOffset(offset);
-			
+
 			switch (dataType) {
 			case GPS_LATITUDE:
 				PropertyType tmpPropertyType = new PropertyType();
@@ -544,7 +545,7 @@ public class LogReader {
 			}
 		}
 
-		private void setupMeasurement(final int channelConfig, final int measurementOrdinal, Measurement measurement, 
+		private void setupMeasurement(final int channelConfig, final int measurementOrdinal, Measurement measurement,
 				boolean isClearStatistics) {
 			++this.realUsedMeasurementCount;
 			MeasurementType gdeMeasurement = LogReader.device.getMeasurement(channelConfig, measurementOrdinal);
@@ -748,7 +749,7 @@ public class LogReader {
 				this.reserveVoltage = DataParser.parse2Short(buffer, 14 + offset);
 				this.inTemperature = DataParser.parse2Short(buffer, 16 + offset);
 
-				//"_Cell%d_Status","_Cell%d_Voltage","_Cell%d_Current","_Cell%d_Capacity","_Cell%d_Temperature"				
+				//"_Cell%d_Status","_Cell%d_Voltage","_Cell%d_Current","_Cell%d_Capacity","_Cell%d_Temperature"
 				this.cell1_Status = DataParser.parse2Int(buffer, 20 + offset); //1110272
 				this.cell1_Voltage = DataParser.parse2Short(buffer, 24 + offset);
 				this.cell1_Current = DataParser.parse2Short(buffer, 26 + offset);
@@ -800,7 +801,7 @@ public class LogReader {
 					System.out.print(String.format(Locale.ENGLISH, "%d;%.3fV;%.3fA;%.3fV;%.3fA;%.3fV;%.3fV;%d°C;", this.status, this.voltage / 1000.0f, this.current / 1000.0f, this.inVoltage / 1000.0f,
 							this.inCurrent / 1000.0f, this.mainVoltage / 1000.0f, this.reserveVoltage / 1000.0f, this.inTemperature));
 
-				//"_Cell%d_Status","_Cell%d_Voltage","_Cell%d_Current","_Cell%d_Capacity","_Cell%d_Temperature"				
+				//"_Cell%d_Status","_Cell%d_Voltage","_Cell%d_Current","_Cell%d_Capacity","_Cell%d_Temperature"
 				if (LogReader.log.isLoggable(java.util.logging.Level.FINER)) {
 					System.out.print(String.format(Locale.ENGLISH, "%d;%.3fV;%.3fA;%.3fAh;%d°C;", this.cell1_Status, this.cell1_Voltage / 1000.0f, this.cell1_Current / 1000.0f, this.cell1_Capacity / 1000.0f,
 							this.cell1_Temperature));
@@ -854,7 +855,7 @@ public class LogReader {
 				addPointsVector.add(this.reserveVoltage * 1000);
 				addPointsVector.add(this.inTemperature * 1000);
 
-				//"_Cell%d_Status","_Cell%d_Voltage","_Cell%d_Current","_Cell%d_Capacity","_Cell%d_Temperature"				
+				//"_Cell%d_Status","_Cell%d_Voltage","_Cell%d_Current","_Cell%d_Capacity","_Cell%d_Temperature"
 				if (!WeatronicAdapter.isStatusFilter) addPointsVector.add(this.cell1_Status * 1000);
 				addPointsVector.add(this.cell1_Voltage * 1000);
 				addPointsVector.add(this.cell1_Current * 1000);
@@ -996,7 +997,7 @@ public class LogReader {
 					while (iteratorMeasurementIds.hasNext()) {
 						int measurementId = iteratorMeasurementIds.next();
 						DataItem dataItem = LogReader.receivedDataItems.get(measurementId);
-						if (dataItem == null) { //data not received 
+						if (dataItem == null) { //data not received
 							Measurement measurement = LogReader.measurements.get(measurementId);
 							switch (measurement.getDataType()) {
 							case PaketGPS:
@@ -1132,7 +1133,7 @@ public class LogReader {
 	/**
 	 * read complete file data and display the first found record set
 	 * @param filePath
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static synchronized RecordSet read(String filePath, Integer channelConfigNumber) throws Exception {
 		final String $METHOD_NAME = "read";

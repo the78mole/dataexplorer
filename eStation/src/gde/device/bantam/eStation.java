@@ -13,10 +13,18 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.bantam;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -35,21 +43,13 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
 /**
  * eStation base device class
  * @author Winfried Brügmann
  */
 public class eStation extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(eStation.class.getName());
-	
+
 	public final	String[]	USAGE_MODE;
 	public	      String[]	ACCU_TYPES;
 
@@ -71,8 +71,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public eStation(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -118,7 +118,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
@@ -127,10 +127,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	public int getLovDataByteSize() {
-		return 84;  
+		return 84;
 	}
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
@@ -141,7 +141,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -150,8 +150,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		int offset = 0;
 		int progressCycle = 0;
 		int lovDataSize = this.getLovDataByteSize();
-		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0; 
-		
+		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0;
+
 		if (dataBuffer[0] == 0x7B) {
 			byte[] convertBuffer = new byte[deviceDataBufferSize];
 			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
@@ -162,13 +162,13 @@ public class eStation extends DeviceConfiguration implements IDevice {
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 			}
-			
+
 			recordSet.setTimeStep_ms(this.getAverageTimeStep_ms() != null ? this.getAverageTimeStep_ms() : 1478); // no average time available, use a hard coded one
 		}
 		else { // none constant time steps
 			byte[] sizeBuffer = new byte[4];
 			byte[] convertBuffer = new byte[deviceDataBufferSize];
-			
+
 			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 			for (int i = 0; i < recordDataSize; i++) {
 				System.arraycopy(dataBuffer, offset, sizeBuffer, 0, 4);
@@ -176,7 +176,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				System.arraycopy(dataBuffer, offset + 4, convertBuffer, 0, deviceDataBufferSize);
 				recordSet.addPoints(convertDataBytes(points, convertBuffer));
 				offset += lovDataSize;
-				
+
 				StringBuilder sb = new StringBuilder();
 				byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize - 4];
 				//sb.append(timeBuffer.length).append(" - ");
@@ -192,7 +192,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				sb.append(" - ").append(sumTimeDelta += deltaTime);
 				log.log(Level.FINER, sb.toString());
 				lastDateTime = dateTime;
-				
+
 				recordSet.addTimeStep_ms(sumTimeDelta);
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
@@ -211,10 +211,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-		
+
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
 		points[0] = Integer.valueOf((((dataBuffer[35] & 0xFF)-0x80)*100 + ((dataBuffer[36] & 0xFF)-0x80))*10);  //35,36   feed-back voltage
 		points[1] = Integer.valueOf((((dataBuffer[33] & 0xFF)-0x80)*100 + ((dataBuffer[34] & 0xFF)-0x80))*10);  //33,34   feed-back current : 0=0.0A,900=9.00A
@@ -239,14 +239,14 @@ public class eStation extends DeviceConfiguration implements IDevice {
 
 		return points;
 	}
-	
+
 	/**
 	 * query if the eStation executes discharge > charge > discharge cycles
 	 */
 	boolean isCycleMode(byte[] dataBuffer) {
 		return (((dataBuffer[8] & 0xFF)-0x80) & 0x10) > 0;
 	}
-	
+
 	/**
 	 * getNumberOfCycle for NiCd and NiMh, for LiXx it  will return 0
 	 * accuCellType -> Lithium=1, NiMH=2, NiCd=3, Pb=4
@@ -256,7 +256,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public int getNumberOfCycle(byte[] dataBuffer) {
 		int cycleCount = 0;
 		int accuCellType = getAccuCellType(dataBuffer);
-		
+
 		if 			(accuCellType == 2) {
 			cycleCount = (dataBuffer[16] & 0xFF)- 0x80;
 			//log.info("NiMh D<C " + ((dataBuffer[15] & 0xFF)- 0x80));
@@ -265,7 +265,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			cycleCount = (dataBuffer[12] & 0xFF)- 0x80;
 			//log.info("NiCd D<C " + ((dataBuffer[11] & 0xFF)- 0x80));
 		}
-		
+
 		return cycleCount;
 	}
 
@@ -298,7 +298,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @return 0 = no processing, 1 = discharge, 2 = charge
 	 */
 	public int getProcessingMode(byte[] dataBuffer) {
-		int modeIndex = (dataBuffer[24] & 0xFF) - 0x80; // processing=1, stop=0 
+		int modeIndex = (dataBuffer[24] & 0xFF) - 0x80; // processing=1, stop=0
 		if(modeIndex != 0) {
 			modeIndex = (dataBuffer[8] & 0x0F) == 0x01 ? 2 : 1;
 		}
@@ -343,17 +343,17 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		}
 		return configData;
 	}
-	
+
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
@@ -363,7 +363,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-		
+
 		int timeStampBufferSize = 0;
 		if(!recordSet.isTimeStepConstant()) {
 			timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
@@ -380,7 +380,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordDataSize; i++) {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize);
 			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
-			
+
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
@@ -405,12 +405,12 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			}
 			//calculate balance on the fly
 			points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-			
-			if(recordSet.isTimeStepConstant()) 
+
+			if(recordSet.isTimeStepConstant())
 				recordSet.addPoints(points);
 			else
 				recordSet.addPoints(points, timeStamps.get(i)/10.0);
-			
+
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
@@ -438,7 +438,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTableRow;		
+		return dataTableRow;
 	}
 
 	/**
@@ -447,11 +447,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double translateValue(Record record, double value) {
-		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg.
 		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double factor = record.getFactor(); // != 1 if a unit translation is required
-		
+
 		double newValue = value * factor + offset;
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
@@ -463,7 +463,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * @return double of device dependent value
 	 */
 	public double reverseTranslateValue(Record record, double value) {
-		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg.
 		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
 		double offset = record.getOffset(); // != 0 if curve has an defined offset
 		double factor = record.getFactor(); // != 1 if a unit translation is required
@@ -476,7 +476,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -495,9 +495,10 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				if (log.isLoggable(Level.FINER))
 					log.log(Level.FINER, record.getName() + " setDisplayable=" + record.hasReasonableData());
 		}
-		
+
 		if (log.isLoggable(Level.FINE)) {
-			for (Record record : recordSet.values()) {
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
 				log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable());
 			}
 		}
@@ -506,8 +507,8 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread, 
-	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are live measurement points only the calculation will take place directly after switch all to displayable
@@ -518,16 +519,16 @@ public class eStation extends DeviceConfiguration implements IDevice {
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 8=Balance
 				int displayableCounter = 0;
 
-				
+
 				// check if measurements isActive == false and set to isDisplayable == false
 				for (String measurementKey : recordSet.keySet()) {
 					Record record = recordSet.get(measurementKey);
-					
+
 					if (record.isActive() && (record.getOrdinal() <= 6 || record.hasReasonableData())) {
 						++displayableCounter;
 					}
 				}
-				
+
 				Record record = recordSet.get(3);//3=Leistung
 				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
 					this.calculationThreads.put(record.getName(), new CalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
@@ -539,7 +540,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 					}
 				}
 				++displayableCounter;
-				
+
 				record = recordSet.get(4);//4=Energie
 				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
 					this.calculationThreads.put(record.getName(), new CalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
@@ -549,11 +550,11 @@ public class eStation extends DeviceConfiguration implements IDevice {
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, e.getMessage(), e);
 					}
-				}		
+				}
 				++displayableCounter;
-				
+
 				log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
-				recordSet.setConfiguredDisplayable(displayableCounter);		
+				recordSet.setConfiguredDisplayable(displayableCounter);
 
 				if (recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
 					this.application.updateGraphicsWindow();
@@ -581,7 +582,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public String[] getUsedPropertyKeys() {
 		return new String[] {IDevice.OFFSET, IDevice.FACTOR};
 	}
-	
+
 	/**
 	 * @return the dialog
 	 */
@@ -589,7 +590,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	public EStationDialog getDialog() {
 		return this.dialog;
 	}
-	
+
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
@@ -636,14 +637,14 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			}
 		}
 	}
-	
+
 	/**
 	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
 	public int[] getCellVoltageOrdinals() {
-		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg. 
+		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temp.extern 6=Temp.intern 7=VersorgungsSpg.
 		return new int[] {0, 2};
 	}
 
@@ -689,7 +690,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 	 * query device for specific smoothing index
 	 * 0 do nothing at all
 	 * 1 current drops just a single peak
-	 * 2 current drop more or equal than 2 measurements 
+	 * 2 current drop more or equal than 2 measurements
 	 */
 	@Override
 	public int	getCurrentSmoothIndex() {

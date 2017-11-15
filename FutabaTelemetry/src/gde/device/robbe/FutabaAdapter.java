@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.robbe;
@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -229,7 +228,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber 
+	 * @param channelNumber
 	 * @return converted configuration data
 	 */
 	@Override
@@ -239,7 +238,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	@Override
 	public int getLovDataByteSize() {
@@ -262,12 +261,12 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -319,7 +318,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -471,7 +470,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -507,7 +506,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
 				if (FutabaAdapter.log.isLoggable(java.util.logging.Level.FINE))
-					FutabaAdapter.log.log(java.util.logging.Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ //$NON-NLS-2$ 
+					FutabaAdapter.log.log(java.util.logging.Level.FINE, i + " " + record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -535,8 +534,8 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread, 
-	 * target is to make sure all data point not coming from device directly are available and can be displayed 
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
@@ -556,7 +555,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
-	 * as example a file selection dialog could be opened to import serialized ASCII data 
+	 * as example a file selection dialog could be opened to import serialized ASCII data
 	 */
 	@Override
 	public void open_closeCommPort() {
@@ -599,7 +598,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
@@ -609,7 +608,8 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				for (Record record : activeRecordSet.values()) {
+				for (int i = 0; i < activeRecordSet.size(); i++) {
+					Record record = activeRecordSet.get(i);
 					if (record.getDataType().equals(Record.DataType.GPS_LATITUDE) || record.getDataType().equals(Record.DataType.GPS_LONGITUDE)) {
 						containsGPSdata = record.hasReasonableData();
 						break;
@@ -654,14 +654,16 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	private int findRecordByUnit(RecordSet recordSet, String unit) {
-		for (Entry<String, Record> entry : recordSet.entrySet()) {
-			if (entry.getValue().getUnit().equalsIgnoreCase(unit)) return entry.getValue().getOrdinal();
+		for (int i = 0; i < recordSet.size(); i++) {
+			Record record = recordSet.get(i);
+			if (record.getUnit().equalsIgnoreCase(unit)) return record.getOrdinal();
 		}
 		return -1;
 	}
 
 	private int findRecordByType(RecordSet recordSet, Record.DataType dataType) {
-		for (Record record : recordSet.values()) {
+		for (int i = 0; i < recordSet.size(); i++) {
+			Record record = recordSet.get(i);
 			if (record.getDataType().equals(dataType) && record.hasReasonableData()) return record.getOrdinal();
 		}
 		return -1;

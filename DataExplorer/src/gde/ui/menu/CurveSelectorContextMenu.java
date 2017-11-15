@@ -1186,7 +1186,8 @@ public class CurveSelectorContextMenu {
 							double oldMinValue = compareSet.getMinValue();
 							double oldMaxValue = compareSet.getMaxValue();
 							CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue)); //$NON-NLS-1$
-							for (Record record : compareSet.values()) {
+							for (int i = 0; i < compareSet.size(); i++) {
+								Record record = recordSet.get(i);
 								double newMinValue = record.getMinScaleValue();
 								double newMaxValue = record.getMaxScaleValue();
 								CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE,
@@ -1200,8 +1201,8 @@ public class CurveSelectorContextMenu {
 									compareSet.setMaxValue(newMaxValue); // store new max value into record set
 								}
 							}
-							for (Entry<String, Record> entry : compareSet.entrySet()) {
-								entry.getValue().setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
+							for (Record record : compareSet.values()) {
+								record.setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
 							}
 
 							CurveSelectorContextMenu.this.application.updateCompareWindow();

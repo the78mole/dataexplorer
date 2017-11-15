@@ -13,15 +13,15 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.bantam;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 import javax.xml.bind.JAXBException;
 
@@ -44,19 +44,19 @@ public class eStationBC680W extends eStation {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public eStationBC680W(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		this.dialog = new EStationDialog(this.application.getShell(), this);
-		this.ACCU_TYPES = new String[] { 
+		this.ACCU_TYPES = new String[] {
 				Messages.getString(MessageIds.GDE_MSGT1403), //0=Lithium
 				GDE.STRING_EMPTY,
 				GDE.STRING_EMPTY,
 				GDE.STRING_EMPTY,
 				Messages.getString(MessageIds.GDE_MSGT1404), //4=NiMH
-				Messages.getString(MessageIds.GDE_MSGT1405), //5=NiCd 
+				Messages.getString(MessageIds.GDE_MSGT1405), //5=NiCd
 				Messages.getString(MessageIds.GDE_MSGT1406), //6=Pb
 				"Save","Load"};
 	}
@@ -68,13 +68,13 @@ public class eStationBC680W extends eStation {
 	public eStationBC680W(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		this.dialog = new EStationDialog(this.application.getShell(), this);
-		this.ACCU_TYPES = new String[] { 
+		this.ACCU_TYPES = new String[] {
 				Messages.getString(MessageIds.GDE_MSGT1403), //0=Lithium
 				GDE.STRING_EMPTY,
 				GDE.STRING_EMPTY,
 				GDE.STRING_EMPTY,
 				Messages.getString(MessageIds.GDE_MSGT1404), //4=NiMH
-				Messages.getString(MessageIds.GDE_MSGT1405), //5=NiCd 
+				Messages.getString(MessageIds.GDE_MSGT1405), //5=NiCd
 				Messages.getString(MessageIds.GDE_MSGT1406), //6=Pb
 				"Save","Load"};
 	}
@@ -112,11 +112,11 @@ public class eStationBC680W extends eStation {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	@Override
 	public int getLovDataByteSize() {
-		return 120;  
+		return 120;
 	}
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
@@ -127,7 +127,7 @@ public class eStationBC680W extends eStation {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -137,8 +137,8 @@ public class eStationBC680W extends eStation {
 		int offset = 0;
 		int progressCycle = 0;
 		int lovDataSize = this.getLovDataByteSize();
-		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0; 
-		
+		long lastDateTime = 0, sumTimeDelta = 0, deltaTime = 0;
+
 		if (dataBuffer[0] == 0x7B) {
 			byte[] convertBuffer = new byte[deviceDataBufferSize];
 			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
@@ -149,13 +149,13 @@ public class eStationBC680W extends eStation {
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 			}
-			
+
 			recordSet.setTimeStep_ms(this.getAverageTimeStep_ms() != null ? this.getAverageTimeStep_ms() : 1478); // no average time available, use a hard coded one
 		}
 		else { // none constant time steps
 			byte[] sizeBuffer = new byte[4];
 			byte[] convertBuffer = new byte[deviceDataBufferSize];
-			
+
 			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 			for (int i = 0; i < recordDataSize; i++) {
 				System.arraycopy(dataBuffer, offset, sizeBuffer, 0, 4);
@@ -163,7 +163,7 @@ public class eStationBC680W extends eStation {
 				System.arraycopy(dataBuffer, offset + 4, convertBuffer, 0, deviceDataBufferSize);
 				recordSet.addPoints(convertDataBytes(points, convertBuffer));
 				offset += lovDataSize;
-				
+
 				StringBuilder sb = new StringBuilder();
 				byte[] timeBuffer = new byte[lovDataSize - deviceDataBufferSize - 4];
 				//sb.append(timeBuffer.length).append(" - ");
@@ -179,7 +179,7 @@ public class eStationBC680W extends eStation {
 				sb.append(" - ").append(sumTimeDelta += deltaTime);
 				log.log(Level.FINER, sb.toString());
 				lastDateTime = dateTime;
-				
+
 				recordSet.addTimeStep_ms(sumTimeDelta);
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
@@ -191,7 +191,7 @@ public class eStationBC680W extends eStation {
 		updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
 	}
-	
+
 	/**
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
 	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
@@ -199,20 +199,20 @@ public class eStationBC680W extends eStation {
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
 	@Override
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-		
+
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.byte2FourDigitsIntegerString(dataBuffer, (byte)0x80, 1, dataBuffer.length-2));
-		
+
 		// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=VersorgungsSpg. 7=Balance
-		points[0] = Integer.valueOf((((dataBuffer[15] & 0xFF)-0x80)*100 + ((dataBuffer[16] & 0xFF)-0x80))*10);  
-		points[1] = Integer.valueOf((((dataBuffer[11] & 0xFF)-0x80)*100 + ((dataBuffer[12] & 0xFF)-0x80))*10);  
-		points[2] = Integer.valueOf((((dataBuffer[7] & 0xFF)-0x80)*100 + ((dataBuffer[8] & 0xFF)-0x80))*1000);  
+		points[0] = Integer.valueOf((((dataBuffer[15] & 0xFF)-0x80)*100 + ((dataBuffer[16] & 0xFF)-0x80))*10);
+		points[1] = Integer.valueOf((((dataBuffer[11] & 0xFF)-0x80)*100 + ((dataBuffer[12] & 0xFF)-0x80))*10);
+		points[2] = Integer.valueOf((((dataBuffer[7] & 0xFF)-0x80)*100 + ((dataBuffer[8] & 0xFF)-0x80))*1000);
 		points[3] = Double.valueOf((points[0] / 1000.0) * (points[1] / 1000.0) * 1000).intValue(); 							// power U*I [W]
 		points[4] = Double.valueOf((points[0] / 1000.0) * (points[2] / 1000.0)).intValue();											// energy U*C [mWh]
-		points[5] = Integer.valueOf((((dataBuffer[13] & 0xFF)-0x80)*100 + ((dataBuffer[14] & 0xFF)-0x80))*10);  
-		points[6] = Integer.valueOf((((dataBuffer[4] & 0xFF)-0x80)*100 + ((dataBuffer[5] & 0xFF)-0x80))*10);  
+		points[5] = Integer.valueOf((((dataBuffer[13] & 0xFF)-0x80)*100 + ((dataBuffer[14] & 0xFF)-0x80))*10);
+		points[6] = Integer.valueOf((((dataBuffer[4] & 0xFF)-0x80)*100 + ((dataBuffer[5] & 0xFF)-0x80))*10);
 		points[7] = 0;
 
 		// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
@@ -228,17 +228,17 @@ public class eStationBC680W extends eStation {
 
 		return points;
 	}
-	
+
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -249,7 +249,7 @@ public class eStationBC680W extends eStation {
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-		
+
 		int timeStampBufferSize = 0;
 		if(!recordSet.isTimeStepConstant()) {
 			timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
@@ -262,11 +262,11 @@ public class eStationBC680W extends eStation {
 			}
 		}
 		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString());
-		
+
 		for (int i = 0; i < recordDataSize; i++) {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize);
 			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
-			
+
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=Temperature 6=VersorgungsSpg. 7=Balance
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
@@ -290,18 +290,18 @@ public class eStationBC680W extends eStation {
 			}
 			//calculate balance on the fly
 			points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-			
-			if(recordSet.isTimeStepConstant()) 
+
+			if(recordSet.isTimeStepConstant())
 				recordSet.addPoints(points);
 			else
 				recordSet.addPoints(points, timeStamps.get(i)/10.0);
-			
+
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		recordSet.syncScaleOfSyncableRecords();
 	}
-	
+
 	/**
 	 * query if the eStation executes discharge > charge > discharge cycles
 	 */
@@ -309,7 +309,7 @@ public class eStationBC680W extends eStation {
 	boolean isCycleMode(byte[] dataBuffer) {
 		return (((dataBuffer[8] & 0xFF)-0x80) & 0x10) > 0;
 	}
-	
+
 	/**
 	 * getNumberOfCycle for NiCd and NiMh, for LiXx it  will return 0
 	 * accuCellType -> Lithium=1, NiMH=2, NiCd=3, Pb=4
@@ -345,7 +345,7 @@ public class eStationBC680W extends eStation {
 	 */
 	@Override
 	public int getProcessingMode(byte[] dataBuffer) {
-		int modeIndex = (dataBuffer[1] & 0xFF) - 0x80; // processing >= 1, stop=0 
+		int modeIndex = (dataBuffer[1] & 0xFF) - 0x80; // processing >= 1, stop=0
 		if(modeIndex != 0) {
 			modeIndex = (dataBuffer[1] & 0x0F) == 0x02 ? 2 : 1;
 		}
@@ -364,7 +364,7 @@ public class eStationBC680W extends eStation {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -384,9 +384,10 @@ public class eStationBC680W extends eStation {
 				if (log.isLoggable(Level.FINER))
 					log.log(Level.FINER, record.getName() + " setDisplayable=" + record.hasReasonableData());
 		}
-		
+
 		if (log.isLoggable(Level.FINE)) {
-			for (Record record : recordSet.values()) {
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
 				log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable());
 			}
 		}

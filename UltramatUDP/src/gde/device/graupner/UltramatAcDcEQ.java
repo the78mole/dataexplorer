@@ -13,10 +13,15 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
+
+import java.io.FileNotFoundException;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -30,11 +35,6 @@ import gde.exception.DataInconsitsentException;
 import gde.log.Level;
 import gde.messages.Messages;
 
-import java.io.FileNotFoundException;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-
 /**
  * Graupner Ultra Quick 70
  * @author Winfried Brügmann
@@ -44,14 +44,14 @@ public class UltramatAcDcEQ extends Ultramat {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException 
-	 * @throws FileNotFoundException 
+	 * @throws JAXBException
+	 * @throws FileNotFoundException
 	 */
 	public UltramatAcDcEQ(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { 
+		this.USAGE_MODE = new String[] {
 				Messages.getString(MessageIds.GDE_MSGT2200), //no activity
 				Messages.getString(MessageIds.GDE_MSGT2201), //charge
 				Messages.getString(MessageIds.GDE_MSGT2202), //discharge
@@ -73,7 +73,7 @@ public class UltramatAcDcEQ extends Ultramat {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.USAGE_MODE = new String[] { 
+		this.USAGE_MODE = new String[] {
 				Messages.getString(MessageIds.GDE_MSGT2200), //no activity
 				Messages.getString(MessageIds.GDE_MSGT2201), //charge
 				Messages.getString(MessageIds.GDE_MSGT2202), //discharge
@@ -88,7 +88,7 @@ public class UltramatAcDcEQ extends Ultramat {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
 	 */
 	@Override
 	public int getLovDataByteSize() {
@@ -104,7 +104,7 @@ public class UltramatAcDcEQ extends Ultramat {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -177,12 +177,12 @@ public class UltramatAcDcEQ extends Ultramat {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user 
+	 * since this is a long term operation the progress bar should be updated to signal business to user
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException 
+	 * @throws DataInconsitsentException
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -230,7 +230,7 @@ public class UltramatAcDcEQ extends Ultramat {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview 
+	 * where some curves are hided for better overview
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -248,7 +248,8 @@ public class UltramatAcDcEQ extends Ultramat {
 		}
 
 		if (log.isLoggable(Level.FINE)) {
-			for (Record record : recordSet.values()) {
+			for (int i = 0; i < recordSet.size(); i++) {
+				Record record = recordSet.get(i);
 				log.log(Level.FINE, record.getName() + " isActive=" + record.isActive() + " isVisible=" + record.isVisible() + " isDisplayable=" + record.isDisplayable()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
@@ -265,7 +266,7 @@ public class UltramatAcDcEQ extends Ultramat {
 
 	/**
 	 * query the product code 0=Ultramat50, 1=Ultramat40, 2=Ultramat14Trio, 3=Ultramat18, 4=ultramat45, 5=Ultramat60, 6=Ultramat80
-	 * @param dataBuffer 
+	 * @param dataBuffer
 	 * @return v2.0
 	 */
 	@Override
@@ -278,7 +279,7 @@ public class UltramatAcDcEQ extends Ultramat {
 	 * check if one of the outlet channels are in processing mode
 	 * @param outletNum 1
 	 * @param dataBuffer
-	 * @return true if channel 1 is active 
+	 * @return true if channel 1 is active
 	 */
 	@Override
 	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
@@ -289,7 +290,7 @@ public class UltramatAcDcEQ extends Ultramat {
 					log.log(Level.FINE, "operationMode1 = " + operationMode1);
 				}
 				//0=no processing 1=charge 2=discharge 3=pause 4=finished 5=auto-balance 7=balance 11=store charge 12=store discharge
-				return (operationMode1 > 0 && operationMode1 < 4) || operationMode1 == 5 || operationMode1 == 7 || operationMode1 == 11 || operationMode1 == 12; 
+				return (operationMode1 > 0 && operationMode1 < 4) || operationMode1 == 5 || operationMode1 == 7 || operationMode1 == 11 || operationMode1 == 12;
 			}
 			catch (NumberFormatException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -301,7 +302,7 @@ public class UltramatAcDcEQ extends Ultramat {
 
 	/**
 	 * query the processing mode, main modes are charge/discharge, make sure the data buffer contains at index 15,16 the processing modes
-	 * @param dataBuffer 
+	 * @param dataBuffer
 	 * @return 0 = no processing, 1 = charge, 2 = discharge, 3 = pause, 4 = current operation finished, 5 = error
 	 */
 	@Override
