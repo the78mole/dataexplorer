@@ -23,7 +23,6 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -33,6 +32,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
 import gde.log.Level;
+import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -63,13 +63,13 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	protected TimeSteps													timeStep_ms;
 
 	protected String														header													= null;
-	protected String[]													recordNames;																																	//Spannung, Strom, ..
+	protected String[]													recordNames;																																	// Spannung, Strom, ..
 	protected String														description											= GDE.STRING_EMPTY;
 
 	protected boolean														hasDisplayableData							= false;
 	protected Rectangle													drawAreaBounds;																																// draw area in display pixel
 
-	//display in data table
+	// display in data table
 	protected Vector<Record>										visibleAndDisplayableRecords		= new Vector<Record>();												//collection of records visible and displayable
 	protected Vector<Record>										allRecords											= new Vector<Record>();												//collection of all records
 	// sync enabled records
@@ -79,7 +79,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	protected String														recordKeyMeasurement						= GDE.STRING_EMPTY;
 
 	protected double														maxValue												= Integer.MIN_VALUE;
-	protected double														minValue												= Integer.MAX_VALUE;													//min max value
+	protected double														minValue												= Integer.MAX_VALUE;													// min max value
 
 	public static final String									TIME_STEP_MS										= "timeStep_ms";															//$NON-NLS-1$
 	public static final String									START_TIME_STAMP								= "startTimeStamp";														//$NON-NLS-1$
@@ -293,6 +293,14 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
+	 * @return the maximum time of this record set, which should correspondence to the last entry in timeSteps
+	 */
+	public double getMaxTime_ms() {
+		return this.timeStep_ms == null ? 0.0 : this.timeStep_ms.isConstant ? this.timeStep_ms.getMaxTime_ms() * (this.get(0).realSize() - 1)
+				: this.timeStep_ms.getMaxTime_ms();
+	}
+
+	/**
 	 * @return the maxValue
 	 */
 	public double getMaxValue() {
@@ -415,13 +423,14 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public void setDrawAreaBounds(Rectangle newDrawAreaBounds) {
 		this.drawAreaBounds = newDrawAreaBounds;
+		log.finest(() -> "drawAreaBounds = " + this.drawAreaBounds); //$NON-NLS-1$
 	}
 
 	/**
 	 * @return the channel/configuration number
 	 */
 	public int getChannelConfigNumber() {
-		return this.parent != null ? this.parent.number : 1; //compare set does not have a parent
+		return this.parent != null ? this.parent.number : 1; // compare set does not have a parent
 	}
 
 	/**
@@ -442,7 +451,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	public void setHorizontalGridRecordOrdinal(int newHorizontalGridRecordOrdinal) {
 		int tmpOrdinal = newHorizontalGridRecordOrdinal;
 		if (tmpOrdinal >= this.size()) tmpOrdinal = 0;
-		this.horizontalGridRecordOrdinal = this.isOneOfSyncableRecord(this.get(tmpOrdinal)) ? this.getSyncMasterRecordOrdinal(this.get(tmpOrdinal)) : tmpOrdinal;
+		this.horizontalGridRecordOrdinal = this.isOneOfSyncableRecord(this.get(tmpOrdinal).getName()) ? this.getSyncMasterRecordOrdinal(this.get(tmpOrdinal).getName()) : tmpOrdinal;
 	}
 
 	/**
@@ -509,18 +518,18 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	* @param syncMasterRecordOrdinal
-	* @param tmpRecord
-	* @return true if the scaleSyncedRecords vector contains the given record not using equivalent entries, like the Vector.contains() method
-	*/
-	public boolean isRecordContained(int syncMasterRecordOrdinal, Record tmpRecord) {
+	 * @param syncMasterRecordOrdinal
+	 * @param recordName
+	 * @return true if the scaleSyncedRecords vector contains the given record not using equivalent entries, like the Vector.contains() method
+	 */
+	public boolean isRecordContained(int syncMasterRecordOrdinal, String recordName) {
 		final String $METHOD_NAME = "isRecordContained";
 		boolean isContained = false;
 		synchronized (this.scaleSyncedRecords) {
 			if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) != null) {
 				for (Record tempRecord : this.scaleSyncedRecords.get(syncMasterRecordOrdinal)) {
-					if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + tmpRecord.name);
-					if (tempRecord.name.equals(tmpRecord.name)) {
+					if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + recordName);
+					if (tempRecord.name.equals(recordName)) {
 						isContained = true;
 						break;
 					}
@@ -545,7 +554,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public void syncMasterSlaveRecords(Record syncInputRecord, int type) {
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			if (this.isRecordContained(syncRecordOrdinal, syncInputRecord)) {
+			if (this.isRecordContained(syncRecordOrdinal, syncInputRecord.getName())) {
 				switch (type) {
 				case Record.TYPE_AXIS_END_VALUES:
 					boolean tmpIsRoundout = syncInputRecord.isRoundOut;
@@ -561,7 +570,8 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 							tmpRecord.minScaleValue = minScaleValue;
 							tmpRecord.maxScaleValue = maxScaleValue;
 						}
-						//log.log(Level.OFF, String.format("%s minScaleValue=%.2f maxScaleValue=%.2f", tmpRecord.getName(), tmpRecord.minScaleValue, tmpRecord.maxScaleValue));
+						// log.log(Level.OFF, String.format("%s minScaleValue=%.2f maxScaleValue=%.2f", tmpRecord.getName(), tmpRecord.minScaleValue,
+						// tmpRecord.maxScaleValue));
 					}
 					break;
 				case Record.TYPE_AXIS_NUMBER_FORMAT:
@@ -633,12 +643,12 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * @param queryRecord the record key to be used for the query
+	 * @param recordName the record key to be used for the query
 	 * @return true if syncable records contains queryRecordKey
 	 */
-	public boolean isOneOfSyncableRecord(Record queryRecord) {
+	public boolean isOneOfSyncableRecord(String recordName) {
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			if (this.isRecordContained(syncRecordOrdinal, queryRecord)) {
+			if (this.isRecordContained(syncRecordOrdinal, recordName)) {
 				return true;
 			}
 		}
@@ -646,12 +656,12 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * @param queryRecord the record key to be used for the query
+	 * @param recordName the record key to be used for the query
 	 * @return the synchronization master record name
 	 */
-	public int getSyncMasterRecordOrdinal(Record queryRecord) {
+	public int getSyncMasterRecordOrdinal(String recordName) {
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			if (this.isRecordContained(syncRecordOrdinal, queryRecord)) {
+			if (this.isRecordContained(syncRecordOrdinal, recordName)) {
 				return syncRecordOrdinal;
 			}
 		}

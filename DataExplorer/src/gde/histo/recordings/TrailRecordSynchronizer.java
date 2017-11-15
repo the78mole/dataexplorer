@@ -69,7 +69,7 @@ public final class TrailRecordSynchronizer {
 						syncMasterRecord.setSyncMaxValue(Integer.MIN_VALUE);
 						log.finer(() -> "add syncMaster " + syncMasterRecord.getName() + " syncMinValue=" + syncMasterRecord.getSyncMinValue() + " syncMaxValue=" + syncMasterRecord.getSyncMaxValue());
 					}
-					if (!this.trailRecordSet.isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
+					if (!this.trailRecordSet.isRecordContained(syncMasterRecordOrdinal, tmpRecord.getName())) {
 						if (Math.abs(i - syncMasterRecordOrdinal) >= scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
 							scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
 						else

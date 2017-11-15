@@ -209,11 +209,28 @@ public final class TrailRecord extends Record {
 	}
 
 	/**
+	 * @return the point size of a single curve or a suite (calls realSize())
+	 */
+	@Override
+	public synchronized int size() {
+		return realSize();
+	}
+
+	/**
 	 * @return the point size of a single curve or a suite
 	 */
 	@Override
 	public int realSize() {
 		return this.trailSelector.isTrailSuite() ? this.suiteRecords.realSize() : super.realSize();
+	}
+
+	/**
+	 * Standard get(int index).
+	 * @param index
+	 */
+	@Override
+	public synchronized Integer get(int index) {
+		return super.get(index);
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
@@ -324,6 +341,20 @@ public final class TrailRecord extends Record {
 	}
 
 	/**
+	 * @param newMinDisplayValue the minDisplayValue to set
+	 */
+	public void setMinDisplayValue(double newMinDisplayValue) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * @param newMaxDisplayValue the maxDisplayValue to set
+	 */
+	public void setMaxDisplayValue(double newMaxDisplayValue) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * @return true if the record or the suite contains reasonable data which can be displayed
 	 */
 	@Override // reason is trail record suites with a master record without point values and minValue/maxValue != 0 in case of empty records
@@ -357,6 +388,15 @@ public final class TrailRecord extends Record {
 	public boolean isScaleVisible() {
 		boolean isValidDisplayRecord = this.isMeasurement() || (this.isSettlement() && this.settings.isDisplaySettlements()) || (this.isScoreGroup() && this.settings.isDisplayScores());
 		return isValidDisplayRecord && super.isScaleVisible();
+	}
+
+	/**
+	 * query time step time in mills seconds at index
+	 * @return time step in msec
+	 */
+	public double getTime_ms(int index) {
+		throw new UnsupportedOperationException();
+//		return this.parent.timeStep_ms.getTime_ms(index);
 	}
 
 	@Override

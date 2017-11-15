@@ -544,13 +544,6 @@ public final class RecordSet extends AbstractRecordSet {
 	}
 
 	/**
-	 * @return the maximum time of this record set, which should correspondence to the last entry in timeSteps
-	 */
-	public double getMaxTime_ms() {
-		return this.timeStep_ms == null ? 0.0 : this.timeStep_ms.isConstant ? this.timeStep_ms.getMaxTime_ms() * (this.get(0).realSize() - 1) : this.timeStep_ms.getMaxTime_ms();
-	}
-
-	/**
 	 * method to get the sorted record names as array for display purpose
 	 * sorted according display requirement, grid record first, syncMasterRecords second, all remaining
 	 * @return Record[] containing records
@@ -1311,8 +1304,8 @@ public final class RecordSet extends AbstractRecordSet {
 	public String getHorizontalGridRecordName() {
 		String gridRecordName = this.horizontalGridRecordOrdinal == -1 || this.horizontalGridRecordOrdinal > this.getRecordNames().length - 1 ? GDE.STRING_DASH
 				: this.getRecordNames()[this.horizontalGridRecordOrdinal];
-		boolean isOneOfSycableAndOneOfSynableVisible = this.horizontalGridRecordOrdinal >= 0 && this.isOneOfSyncableRecord(this.get(this.horizontalGridRecordOrdinal))
-				&& this.isOneSyncableVisible(this.getSyncMasterRecordOrdinal(this.get(gridRecordName)));
+		boolean isOneOfSycableAndOneOfSynableVisible = this.horizontalGridRecordOrdinal >= 0 && this.isOneOfSyncableRecord(this.get(this.horizontalGridRecordOrdinal).getName())
+				&& this.isOneSyncableVisible(this.getSyncMasterRecordOrdinal(gridRecordName));
 		if (this.get(gridRecordName) != null && !isOneOfSycableAndOneOfSynableVisible && !(this.get(gridRecordName).isVisible && this.get(gridRecordName).isDisplayable)) {
 			gridRecordName = this.getFirstRecordName();
 			log.log(Level.FINE, "gridRecordName = " + gridRecordName); //$NON-NLS-1$
@@ -1541,7 +1534,7 @@ public final class RecordSet extends AbstractRecordSet {
 						this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
 						this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
 					}
-					if (!this.isRecordContained(syncMasterRecordOrdinal, tmpRecord)) {
+					if (!this.isRecordContained(syncMasterRecordOrdinal, tmpRecord.getName())) {
 						if (Math.abs(i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
 							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
 						else

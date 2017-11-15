@@ -1453,8 +1453,8 @@ public class Record extends Vector<Integer> {
 	 */
 	public DecimalFormat getDecimalFormat() {
 		if (this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.isScaleSynced() + " - " + this.getAbstractParent().getSyncMasterRecordOrdinal(this));
-		return this.isScaleSynced() ? this.getAbstractParent().get(this.getAbstractParent().getSyncMasterRecordOrdinal(this)).df : this.df;
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.isScaleSynced() + " - " + this.getAbstractParent().getSyncMasterRecordOrdinal(this.name));
+		return this.isScaleSynced() ? this.getAbstractParent().get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name)).df : this.df;
 	}
 
 	/**
@@ -1807,8 +1807,8 @@ public class Record extends Vector<Integer> {
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
 		AbstractRecordSet abstractParent = this.getAbstractParent();
-		if (abstractParent.isOneOfSyncableRecord(this) && this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(this)).getFactor() != 1) {
-			this.syncMasterFactor = this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(this)).getFactor();
+		if (abstractParent.isOneOfSyncableRecord(this.name) && this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(this.name)).getFactor() != 1) {
+			this.syncMasterFactor = this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(this.name)).getFactor();
 			this.displayScaleFactorValue = this.displayScaleFactorValue * this.syncMasterFactor;
 		}
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", //$NON-NLS-1$
@@ -1825,8 +1825,8 @@ public class Record extends Vector<Integer> {
 		} else
 			this.minDisplayValue = newMinDisplayValue;
 
-		if (this.getAbstractParent().isOneOfSyncableRecord(this)) {
-			for (Record tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this))) {
+		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
+			for (Record tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
 				tmpRecord.minDisplayValue = this.minDisplayValue;
 			}
 		}
@@ -1841,8 +1841,8 @@ public class Record extends Vector<Integer> {
 		} else
 			this.maxDisplayValue = newMaxDisplayValue;
 
-		if (this.getAbstractParent().isOneOfSyncableRecord(this)) {
-			for (Record tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this))) {
+		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
+			for (Record tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
 				tmpRecord.maxDisplayValue = this.maxDisplayValue;
 			}
 		}
@@ -1976,7 +1976,7 @@ public class Record extends Vector<Integer> {
 		sb.append(NAME).append(GDE.STRING_EQUAL).append(this.name).append(DELIMITER);
 		sb.append(UNIT).append(GDE.STRING_EQUAL).append(this.unit == null ? GDE.STRING_EMPTY : this.unit).append(DELIMITER);
 		sb.append(SYMBOL).append(GDE.STRING_EQUAL).append(this.symbol == null || this.symbol.equals("null") ? GDE.STRING_EMPTY : this.symbol).append(DELIMITER);
-		if (this.isActive != null) 
+		if (this.isActive != null)
 			sb.append(IS_ACTIVE).append(GDE.STRING_EQUAL).append(this.isActive()).append(DELIMITER);
 		sb.append(IS_DIPLAYABLE).append(GDE.STRING_EQUAL).append(this.isDisplayable).append(DELIMITER);
 		sb.append(IS_VISIBLE).append(GDE.STRING_EQUAL).append(this.isVisible).append(DELIMITER);
@@ -2419,7 +2419,7 @@ public class Record extends Vector<Integer> {
 	 * @return the isScaleSynced
 	 */
 	public boolean isScaleSynced() {
-		return this.getAbstractParent().isOneOfSyncableRecord(this);
+		return this.getAbstractParent().isOneOfSyncableRecord(this.name);
 	}
 
 	/**
@@ -2433,8 +2433,8 @@ public class Record extends Vector<Integer> {
 	 * @return true if the record is the scale sync master
 	 */
 	public boolean isScaleVisible() {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.getAbstractParent().isOneOfSyncableRecord(this));
-		return isScaleSyncMaster() ? this.getAbstractParent().isOneSyncableVisible(this.ordinal) : !this.getAbstractParent().isOneOfSyncableRecord(this) && this.isVisible && this.isDisplayable;
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.getAbstractParent().isOneOfSyncableRecord(this.name));
+		return isScaleSyncMaster() ? this.getAbstractParent().isOneSyncableVisible(this.ordinal) : !this.getAbstractParent().isOneOfSyncableRecord(this.name) && this.isVisible && this.isDisplayable;
 	}
 
 	/**
