@@ -19,6 +19,8 @@
 
 package gde.histo.recordings;
 
+import java.util.Arrays;
+
 /**
  * Data points of multiple measurements or lines or curves.
  * @author Thomas Eickert (USER)
@@ -54,6 +56,11 @@ public final class PointArray {
 	 */
 	public Integer getY(int suiteOrdinal) {
 		return this.getY()[suiteOrdinal];
+	}
+
+	@Override
+	public String toString() {
+		return "PointArray [x=" + this.x + ", y=" + Arrays.toString(this.y) + "]";
 	}
 
 }

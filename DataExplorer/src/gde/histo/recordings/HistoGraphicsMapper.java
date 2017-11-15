@@ -26,6 +26,8 @@ import java.util.Vector;
 
 import org.eclipse.swt.graphics.Point;
 
+import gde.data.IRecord;
+import gde.data.Record;
 import gde.histo.utils.HistoTimeLine;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -60,7 +62,7 @@ public final class HistoGraphicsMapper {
 			throw new UnsupportedOperationException(); // replace parameters with fields access
 		}
 		List<PointArray> suitePoints = new ArrayList<>();
-		if (this.trailRecord.getDevice().isGPSCoordinates(this.trailRecord)) {
+		if (this.trailRecord.getDevice().isGPSCoordinates((IRecord) (Record) this.trailRecord)) {
 			int firstOrdinal = this.trailRecord.getTrailSelector().getTrailType().getSuiteMasterIndex();
 			for (int i = 0; i < timeLine.getScalePositions().size(); i++) {
 				if (this.trailRecord.getSuiteRecords().getSuiteValue(firstOrdinal, i) != null)
@@ -89,7 +91,7 @@ public final class HistoGraphicsMapper {
 			double decimalDegreeValue = value / 1000000 + value % 1000000 / 600000.;
 			pointArray.setY(j, yDisplayOffset - (int) ((decimalDegreeValue * 1000. - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue()));
 		}
-
+		log.finer(() -> pointArray.toString());
 		return pointArray;
 	}
 
@@ -117,7 +119,7 @@ public final class HistoGraphicsMapper {
 			throw new UnsupportedOperationException(); // replace parameters with fields access
 		}
 		Point[] points = new Point[this.trailRecord.realSize()];
-		if (this.trailRecord.getDevice().isGPSCoordinates(this.trailRecord)) {
+		if (this.trailRecord.getDevice().isGPSCoordinates((IRecord) (Record) this.trailRecord)) {
 			Integer value = 0;
 			for (int i = 0; i < this.trailRecord.realSize(); i++) {
 				value = this.trailRecord.elementAt(i);
@@ -151,7 +153,7 @@ public final class HistoGraphicsMapper {
 
 		int verticalDisplayPos = Integer.MIN_VALUE;
 		Integer value = 0;
-		if (DataExplorer.application.getActiveDevice().isGPSCoordinates(this.trailRecord)) {
+		if (DataExplorer.application.getActiveDevice().isGPSCoordinates((IRecord) (Record) this.trailRecord)) {
 			value = points.elementAt(index);
 			if (value != null) {
 				double decimalDegreeValue = value / 1000000 + value % 1000000 / 600000.;
@@ -169,7 +171,7 @@ public final class HistoGraphicsMapper {
 		int verticalDisplayPos;
 
 		int point = (int) (DataExplorer.application.getActiveDevice().reverseTranslateValue(this.trailRecord, translatedValue) * 1000.);
-		if (DataExplorer.application.getActiveDevice().isGPSCoordinates(this.trailRecord)) {
+		if (DataExplorer.application.getActiveDevice().isGPSCoordinates((IRecord) (Record) this.trailRecord)) {
 			double decimalDegreeValue = point / 1000000 + point % 1000000 / 600000.;
 			verticalDisplayPos = this.trailRecord.getParentTrail().getDrawAreaBounds().height - (int) ((decimalDegreeValue * 1000. - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue());
 		} else {

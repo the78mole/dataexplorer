@@ -25,6 +25,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
 import gde.GDE;
+import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
@@ -54,7 +55,7 @@ public class CurveUtils {
 	 */
 	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace, boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
-		RecordSet parent = ((RecordSet) record.getParent());
+		RecordSet parent = (record.getParent());
 		final boolean isCompareSet = parent.isCompareSet();
 		int numberTicks = 10, miniticks = 5;
 
@@ -207,7 +208,7 @@ public class CurveUtils {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName()+ String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "curve area bounds = " + record.getParent().getDrawAreaBounds().toString()); //$NON-NLS-1$
 
-		RecordSet parent = ((RecordSet) record.getParent());
+		RecordSet parent = (record.getParent());
 
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
@@ -270,7 +271,7 @@ public class CurveUtils {
 					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 				}
 			}
-			else if (record.getDevice().isGPSCoordinates(record)) {
+			else if (record.getDevice().isGPSCoordinates((IRecord) record)) {
 				//int tmpDelta = 0;
 				for (int j = 0; j <= displayableSize && displayableSize > 1; j += xScaleFactor) {
 					// get the point to be drawn
