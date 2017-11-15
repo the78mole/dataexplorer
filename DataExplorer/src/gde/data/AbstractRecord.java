@@ -27,7 +27,8 @@ import org.eclipse.swt.graphics.Color;
  * Supports all classes which access both the Records class and the TrailRecords class.
  * @author Thomas Eickert (USER)
  */
-public abstract class AbstractRecord extends Vector<Integer> {
+public abstract class AbstractRecord extends Vector<Integer> implements IRecord{
+	private static final long serialVersionUID = 3212164037419263272L;
 
 	protected AbstractRecord() {
 		super();
