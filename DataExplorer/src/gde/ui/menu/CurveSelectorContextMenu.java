@@ -123,24 +123,21 @@ public class CurveSelectorContextMenu {
 										CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.GDE_MSGT0085));
 										CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.actualRecord.isVisible();
 										CurveSelectorContextMenu.this.lineVisible.setSelection(CurveSelectorContextMenu.this.isRecordVisible);
-										if (!CurveSelectorContextMenu.this.isTypeHisto) {
-											CurveSelectorContextMenu.this.isSmoothAtCurrentDrop = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothAtCurrentDrop();
-											CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setSelection(CurveSelectorContextMenu.this.isSmoothAtCurrentDrop);
-										}
-										else {
+
+										CurveSelectorContextMenu.this.isSmoothAtCurrentDrop = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothAtCurrentDrop();
+										CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setSelection(CurveSelectorContextMenu.this.isSmoothAtCurrentDrop);
+										if (CurveSelectorContextMenu.this.isTypeHisto) {
 											CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setEnabled(false);
-											CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setSelection(false);
 											CurveSelectorContextMenu.this.timeGrid.setEnabled(false);
 											CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
 										}
+										CurveSelectorContextMenu.this.isSmoothVoltageCurve = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothVoltageCurve();
+										CurveSelectorContextMenu.this.smoothVoltageCurveItem.setSelection(CurveSelectorContextMenu.this.isSmoothVoltageCurve);
+										// WBrueg the condition "Ultra" has no background in my opinion
 										if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet.getDevice().getName().startsWith("Ultra")) {
-											CurveSelectorContextMenu.this.smoothVoltageCurveItem.setEnabled(true);
-											CurveSelectorContextMenu.this.isSmoothVoltageCurve = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothVoltageCurve();
-											CurveSelectorContextMenu.this.smoothVoltageCurveItem.setSelection(CurveSelectorContextMenu.this.isSmoothVoltageCurve);
 										}
 										else {
 											CurveSelectorContextMenu.this.smoothVoltageCurveItem.setEnabled(false);
-											CurveSelectorContextMenu.this.smoothVoltageCurveItem.setSelection(false);
 										}
 
 										// check measurement selections

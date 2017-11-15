@@ -41,7 +41,6 @@ import gde.device.MeasurementType;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.StatisticsType;
-import gde.histo.recordings.TrailRecord;
 import gde.log.Level;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
@@ -52,7 +51,7 @@ import gde.utils.TimeLine;
  * @author Winfried Brügmann
  * class record holds data points of one measurement or line or curve
  */
-public class Record extends Vector<Integer> {
+public class Record extends AbstractRecord {
 	final static String					$CLASS_NAME				= Record.class.getName();
 	final static long						serialVersionUID	= 26031957;
 	final static Logger					log								= Logger.getLogger(Record.class.getName());
@@ -376,6 +375,7 @@ public class Record extends Vector<Integer> {
 	 * copy constructor
 	 */
 	private Record(Record record, int dataIndex, boolean isFromBegin) {
+		super();
 		//super(record); // vector
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.name + " Record(Record, int, boolean)"); //$NON-NLS-1$
 		this.parent = record.parent;
@@ -1232,7 +1232,7 @@ public class Record extends Vector<Integer> {
 	 * @return the parent also for TrailRecord instances
 	 */
 	public AbstractRecordSet getAbstractParent() {
-		return this instanceof TrailRecord ? ((TrailRecord) this).getParentTrail() : this.parent;
+		return this.parent;
 	}
 
 	/**
@@ -1519,7 +1519,7 @@ public class Record extends Vector<Integer> {
 	 * @return the translated and decimal formatted value at the given index or a standard string in case of a null value
 	 */
 	public String getFormattedMeasureValue(int index) {
-		if (this.device.isGPSCoordinates((IRecord) this)) {
+		if (this.device.isGPSCoordinates(this)) {
 			if (this.getUnit().endsWith("'")) //$NON-NLS-1$
 				return this.elementAt(index) != null ? StringHelper.getFormatedWithMinutes("%2d %04.1f", this.device.translateValue(this, this.elementAt(index) / 1000.)).trim() : GDE.STRING_STAR; //$NON-NLS-1$
 			else
@@ -1533,7 +1533,7 @@ public class Record extends Vector<Integer> {
 	 * @return the translated and decimal formatted value at the given index
 	 */
 	public String getFormattedScaleValue(double finalValue) {
-		if (this.device.isGPSCoordinates((IRecord) this)) {
+		if (this.device.isGPSCoordinates(this)) {
 			if (this.getUnit().endsWith("'")) //$NON-NLS-1$
 				return StringHelper.getFormatedWithMinutes("%2d %04.1f", finalValue); //$NON-NLS-1$
 			else
@@ -1548,7 +1548,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public String getFormattedTableValue(double value) {
 		final String formattedValue;
-		if (this.device.isGPSCoordinates((IRecord) this)) {
+		if (this.device.isGPSCoordinates(this)) {
 			// if (this.getDataType() == DataType.GPS_LATITUDE etc ???
 			if (this.getUnit().endsWith("'")) { //$NON-NLS-1$
 				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", this.device.translateValue(this, value)).trim(); //$NON-NLS-1$
@@ -1575,7 +1575,7 @@ public class Record extends Vector<Integer> {
 	 */
 	public String getFormattedStatisticsValue(double value) {
 		final String formattedValue;
-		if (this.device.isGPSCoordinates((IRecord) this)) {
+		if (this.device.isGPSCoordinates(this)) {
 			if (this.getUnit().endsWith("'")) { //$NON-NLS-1$
 				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", this.device.translateValue(this, value)).trim(); //$NON-NLS-1$
 			} else {
@@ -1637,7 +1637,7 @@ public class Record extends Vector<Integer> {
 			int[] indexs = this.findBoundingIndexes(tmpTimeValue);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, tmpTimeValue + "; " + indexs[0] + "; " + indexs[1]); //$NON-NLS-1$ //$NON-NLS-2$
 			if (super.size() > 0) {
-				if (this.getDevice().isGPSCoordinates((IRecord) this)) {
+				if (this.getDevice().isGPSCoordinates(this)) {
 					int grad0 = this.get(indexs[0]) / 1000000;
 					if (indexs[0] == indexs[1]) {
 						if (this.getUnit().endsWith("'"))
@@ -1820,7 +1820,7 @@ public class Record extends Vector<Integer> {
 	 * @param newMinDisplayValue the minDisplayValue to set
 	 */
 	public void setMinDisplayValue(double newMinDisplayValue) {
-		if (this.device.isGPSCoordinates((IRecord) this)) {
+		if (this.device.isGPSCoordinates(this)) {
 			this.minDisplayValue = this.device.translateValue(this, newMinDisplayValue) * 1000;
 		} else
 			this.minDisplayValue = newMinDisplayValue;
@@ -1836,7 +1836,7 @@ public class Record extends Vector<Integer> {
 	 * @param newMaxDisplayValue the maxDisplayValue to set
 	 */
 	public void setMaxDisplayValue(double newMaxDisplayValue) {
-		if (this.device.isGPSCoordinates((IRecord) this)) {
+		if (this.device.isGPSCoordinates(this)) {
 			this.maxDisplayValue = this.device.translateValue(this, newMaxDisplayValue) * 1000;
 		} else
 			this.maxDisplayValue = newMaxDisplayValue;

@@ -74,7 +74,9 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	private final TrailDataTags												dataTags						= new TrailDataTags();
 	private final TrailRecordSynchronizer							synchronizer				= new TrailRecordSynchronizer(this);
 
-	/** Data source for this recordset. */
+	/**
+	 * Data source for this recordset.
+	 */
 	private final TreeMap<Long, List<ExtendedVault>>	histoVaults;
 
 	public enum DataTag {
@@ -100,10 +102,8 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	/**
 	 * Create a trail record set containing records according the channel configuration which is loaded from device properties file.
-	 * The trail records' display sequence (= LinkedHashMap sequence) supports pinning score / settlement records at the top based on device xml
-	 * settings.
-	 * @param device the instance of the device
-	 * @param channelConfigNumber (number of the outlet or configuration)
+	 * The trail records' display sequence (= LinkedHashMap sequence) supports pinning score / settlement records at the top
+	 * based on device xml settings.
 	 * @return a trail record set containing all trail records (empty) as specified
 	 */
 	public static synchronized TrailRecordSet createRecordSet(TreeMap<Long, List<ExtendedVault>> histoVaults) {
@@ -196,9 +196,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return newTrailRecordSet;
 	}
 
-	/**
-	 * overwrites default HashMap method
-	 */
 	@Override
 	public Record put(String key, Record record) {
 		return super.put(key, record);
@@ -229,11 +226,15 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	public void updateVisibleAndDisplayableRecordsForTable() {
 		this.visibleAndDisplayableRecords.removeAllElements();
 		this.allRecords.removeAllElements();
+
 		// get by insertion order
 		for (Map.Entry<String, Record> entry : this.entrySet()) {
 			final TrailRecord record = (TrailRecord) entry.getValue();
-			if (record.isMeasurement() || (record.isSettlement() && this.settings.isDisplaySettlements()) || (record.isScoreGroup() && this.settings.isDisplayScores())) {
+			if (record.isMeasurement() //
+					|| (record.isSettlement() && this.settings.isDisplaySettlements()) //
+					|| (record.isScoreGroup() && this.settings.isDisplayScores())) {
 				record.setDisplayable(record.isActive() && record.hasReasonableData());
+
 				if (record.isVisible() && record.isDisplayable()) // only selected records get displayed
 					this.visibleAndDisplayableRecords.add(record);
 				this.allRecords.add(record);

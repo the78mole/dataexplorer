@@ -69,6 +69,14 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	protected boolean														hasDisplayableData							= false;
 	protected Rectangle													drawAreaBounds;																																// draw area in display pixel
 
+	// current drop, shadow point vector to mark data points capable to be smoothed
+	protected boolean														isSmoothAtCurrentDrop						= false;
+	protected Vector<Integer[]>									currentDropShadow								= new Vector<Integer[]>(0);
+	public static final String									SMOOTH_AT_CURRENT_DROP					= "RecordSet_smoothAtCurrentDrop";						//$NON-NLS-1$
+
+	protected boolean														isSmoothVoltageCurve						= false;
+	public static final String									SMOOTH_VOLTAGE_CURVE						= "RecordSet_smoothVoltageCurve";							//$NON-NLS-1$
+
 	// display in data table
 	protected Vector<Record>										visibleAndDisplayableRecords		= new Vector<Record>();												//collection of records visible and displayable
 	protected Vector<Record>										allRecords											= new Vector<Record>();												//collection of all records
@@ -257,14 +265,14 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 		if (isLeft) {
 			for (String recordName : this.recordNames) {
 				Record tmpRecord = this.get(recordName);
-				if (tmpRecord.isPositionLeft && tmpRecord.isScaleVisible()) ++value;
+				if (tmpRecord.isPositionLeft() && tmpRecord.isScaleVisible()) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
 		} else {
 			for (String recordName : this.recordNames) {
 				log.log(Level.FINER, "record name = " + recordName); //$NON-NLS-1$
 				Record tmpRecord = this.get(recordName);
-				if (!tmpRecord.isPositionLeft && tmpRecord.isScaleVisible()) ++value;
+				if (!tmpRecord.isPositionLeft() && tmpRecord.isScaleVisible()) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
 		}
@@ -518,6 +526,36 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
+	 * query boolean value to enable curve smoothing due to current drop
+	 */
+	public boolean isSmoothAtCurrentDrop() {
+		return this.isSmoothAtCurrentDrop;
+	}
+
+	/**
+	 * set boolean value to enable curve smoothing due to current drop
+	 * @param enable
+	 */
+	public void setSmoothAtCurrentDrop(boolean enable) {
+		this.isSmoothAtCurrentDrop = enable;
+	}
+
+	/**
+	 * query boolean value to enable curve smoothing due to pulsed voltage curve
+	 */
+	public boolean isSmoothVoltageCurve() {
+		return this.isSmoothVoltageCurve;
+	}
+
+	/**
+	 * set boolean value to enable curve smoothing due to pulsed voltage curve
+	 * @param enable
+	 */
+	public void setSmoothVoltageCurve(boolean enable) {
+		this.isSmoothVoltageCurve = enable;
+	}
+
+	/**
 	 * @param syncMasterRecordOrdinal
 	 * @param recordName
 	 * @return true if the scaleSyncedRecords vector contains the given record not using equivalent entries, like the Vector.contains() method
@@ -564,11 +602,9 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 					double maxScaleValue = syncInputRecord.maxScaleValue;
 					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						synchronized (tmpRecord) {
-							tmpRecord.isRoundOut = tmpIsRoundout;
-							tmpRecord.isStartpointZero = tmpIsStartpointZero;
-							tmpRecord.isStartEndDefined = tmpIsStartEndDefined;
-							tmpRecord.minScaleValue = minScaleValue;
-							tmpRecord.maxScaleValue = maxScaleValue;
+							tmpRecord.setRoundOut(tmpIsRoundout);
+							tmpRecord.setStartpointZero(tmpIsStartpointZero);
+							tmpRecord.setStartEndDefined(tmpIsStartEndDefined, minScaleValue, maxScaleValue);
 						}
 						// log.log(Level.OFF, String.format("%s minScaleValue=%.2f maxScaleValue=%.2f", tmpRecord.getName(), tmpRecord.minScaleValue,
 						// tmpRecord.maxScaleValue));
@@ -580,7 +616,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						synchronized (tmpRecord) {
 							tmpRecord.df = (DecimalFormat) tmpDf.clone();
-							tmpRecord.numberFormat = numberFormat;
+							tmpRecord.setNumberFormat(numberFormat);
 						}
 					}
 					break;
@@ -588,7 +624,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 					boolean tmpIsPositionLeft = syncInputRecord.isPositionLeft;
 					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						synchronized (tmpRecord) {
-							tmpRecord.isPositionLeft = tmpIsPositionLeft;
+							tmpRecord.setPositionLeft(tmpIsPositionLeft);
 						}
 					}
 					break;
@@ -610,7 +646,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	public boolean isOneSyncableVisible() {
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
 			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-				if (tmpRecord != null && tmpRecord.isVisible) {
+				if (tmpRecord != null && tmpRecord.isVisible()) {
 					return true;
 				}
 			}
@@ -624,7 +660,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	 */
 	public boolean isOneSyncableVisible(int syncMasterOrdinal) {
 		for (Record tmpRecord : this.scaleSyncedRecords.get(syncMasterOrdinal)) {
-			if (tmpRecord != null && tmpRecord.isVisible && tmpRecord.isDisplayable) {
+			if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
 				return true;
 			}
 		}
@@ -647,17 +683,12 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	 * @return true if syncable records contains queryRecordKey
 	 */
 	public boolean isOneOfSyncableRecord(String recordName) {
-		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			if (this.isRecordContained(syncRecordOrdinal, recordName)) {
-				return true;
-			}
-		}
-		return false;
+		return getSyncMasterRecordOrdinal(recordName) >= 0;
 	}
 
 	/**
 	 * @param recordName the record key to be used for the query
-	 * @return the synchronization master record name
+	 * @return the synchronization master record name or -1 if not found
 	 */
 	public int getSyncMasterRecordOrdinal(String recordName) {
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {

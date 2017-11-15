@@ -90,14 +90,6 @@ public final class RecordSet extends AbstractRecordSet {
 	int														scopeModeOffset;																																																																			// defines the offset in record pixel
 	int														scopeModeSize;																																																																				// defines the number of record pixels to be displayed
 
-	//current drop, shadow point vector to mark data points capable to be smoothed
-	boolean												isSmoothAtCurrentDrop					= false;
-	Vector<Integer[]>							currentDropShadow							= new Vector<Integer[]>(0);
-	public static final String		SMOOTH_AT_CURRENT_DROP				= "RecordSet_smoothAtCurrentDrop";																																											//$NON-NLS-1$
-
-	boolean												isSmoothVoltageCurve					= false;
-	public static final String		SMOOTH_VOLTAGE_CURVE					= "RecordSet_smoothVoltageCurve";																																												//$NON-NLS-1$
-
 	int[]													voltageLimits									= CellVoltageValues.getVoltageLimits();																																									// voltage limits for LiXx cells, initial LiPo
 	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";																																														// each main tickmark //$NON-NLS-1$
 
@@ -1735,36 +1727,6 @@ public final class RecordSet extends AbstractRecordSet {
 				}
 			}
 		}
-	}
-
-	/**
-	 * query boolean value to enable curve smoothing due to current drop
-	 */
-	public boolean isSmoothAtCurrentDrop() {
-		return this.isSmoothAtCurrentDrop;
-	}
-
-	/**
-	 * set boolean value to enable curve smoothing due to current drop
-	 * @param enable
-	 */
-	public void setSmoothAtCurrentDrop(boolean enable) {
-		this.isSmoothAtCurrentDrop = enable;
-	}
-
-	/**
-	 * query boolean value to enable curve smoothing due to pulsed voltage curve
-	 */
-	public boolean isSmoothVoltageCurve() {
-		return this.isSmoothVoltageCurve;
-	}
-
-	/**
-	 * set boolean value to enable curve smoothing due to pulsed voltage curve
-	 * @param enable
-	 */
-	public void setSmoothVoltageCurve(boolean enable) {
-		this.isSmoothVoltageCurve = enable;
 	}
 
 	/**
