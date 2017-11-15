@@ -47,7 +47,7 @@ import gde.ui.SWTResourceManager;
  * Supports the GDE kernel record class and the history trail record class.
  * @author Thomas Eickert (USER)
  */
-public abstract class CommonRecord extends Vector<Integer> {
+public abstract class CommonRecord extends AbstractRecord {
 	private static final String		$CLASS_NAME								= CommonRecord.class.getName();
 	private static final long			serialVersionUID					= 26031957;
 	private static final Logger		log												= Logger.getLogger($CLASS_NAME);
