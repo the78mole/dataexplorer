@@ -23,7 +23,6 @@ import static java.util.logging.Level.FINE;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +96,9 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		this.histoVaults = histoVaults;
 		this.template = new HistoGraphicsTemplate(deviceSignature);
 		if (this.template != null) this.template.load();
+
+		this.visibleAndDisplayableRecords		= new Vector<TrailRecord>();
+		this.allRecords											= new Vector<TrailRecord>();
 		log.fine(() -> " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
 	}
 
@@ -236,10 +238,24 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				record.setDisplayable(record.isActive() && record.hasReasonableData());
 
 				if (record.isVisible() && record.isDisplayable()) // only selected records get displayed
-					this.visibleAndDisplayableRecords.add(record);
-				this.allRecords.add(record);
+					getVisibleAndDisplayableRecords().add(record);
+				getDisplayRecords().add(record);
 			}
 		}
+	}
+
+	/**
+	 * @return visible and displayable records (p.e. to build the partial data table)
+	 */
+	public Vector<TrailRecord> getVisibleAndDisplayableRecords() {
+		return (Vector<TrailRecord>) this.visibleAndDisplayableRecords;
+	}
+
+	/**
+	 * @return all records for display
+	 */
+	public Vector<TrailRecord> getDisplayRecords() {
+		return (Vector<TrailRecord>) this.allRecords;
 	}
 
 	/**
@@ -438,8 +454,15 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return this.parent.getNumber();
 	}
 
-	public HashMap<Integer, Vector<Record>> getScaleSyncedRecords() {
+	public Map<Integer, Vector<? extends Record>> getScaleSyncedRecords() {
 		return this.scaleSyncedRecords;
+	}
+
+	/**
+	 * @return the Vector containing the slave records sync by the master name
+	 */
+	public Vector<TrailRecord> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
+		return (Vector<TrailRecord>) this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
 	}
 
 	/**

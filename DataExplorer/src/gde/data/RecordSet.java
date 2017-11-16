@@ -124,6 +124,8 @@ public final class RecordSet extends AbstractRecordSet {
 		super(useDevice, channelNumber, newName, measurementNames, newTimeSteps);
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
+		this.visibleAndDisplayableRecords		= new Vector<Record>();
+		this.allRecords											= new Vector<Record>();
 	}
 
 	/**
@@ -141,6 +143,8 @@ public final class RecordSet extends AbstractRecordSet {
 		this.isRaw = true;
 		this.isCompareSet = GraphicsType.COMPARE == graphicsType;
 		this.isUtilitySet = GraphicsType.UTIL == graphicsType;
+		this.visibleAndDisplayableRecords		= new Vector<Record>();
+		this.allRecords											= new Vector<Record>();
 	}
 
 	/**
@@ -231,6 +235,8 @@ public final class RecordSet extends AbstractRecordSet {
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
 
+		this.visibleAndDisplayableRecords		= new Vector<Record>();
+		this.allRecords											= new Vector<Record>();
 		this.syncScaleOfSyncableRecords();
 	}
 
@@ -300,6 +306,9 @@ public final class RecordSet extends AbstractRecordSet {
 		this.horizontalGridRecordOrdinal = recordSet.horizontalGridRecordOrdinal;
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
+
+		this.visibleAndDisplayableRecords		= new Vector<Record>();
+		this.allRecords											= new Vector<Record>();
 
 		this.device.updateVisibilityStatus(this, false);
 	}
@@ -569,9 +578,23 @@ public final class RecordSet extends AbstractRecordSet {
 		this.allRecords.removeAllElements();
 		for (int i = 0; i < this.size(); ++i) {
 			final Record record = this.get(i);
-			if (record.isVisible && record.isDisplayable) this.visibleAndDisplayableRecords.add(record);
-			this.allRecords.add(record);
+			if (record.isVisible && record.isDisplayable) getVisibleAndDisplayableRecords().add(record);
+			getDisplayRecords().add(record);
 		}
+	}
+
+	/**
+	 * @return visible and displayable records (p.e. to build the partial data table)
+	 */
+	public Vector<Record> getVisibleAndDisplayableRecords() {
+		return (Vector<Record>) this.visibleAndDisplayableRecords;
+	}
+
+	/**
+	 * @return all records for display
+	 */
+	public Vector<Record> getDisplayRecords() {
+		return (Vector<Record>) this.allRecords;
 	}
 
 	/**
@@ -1522,16 +1545,16 @@ public final class RecordSet extends AbstractRecordSet {
 					if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
 						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add syncMaster " + this.get(syncMasterRecordOrdinal).name);
 						this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
-						this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
+						getScaleSyncedRecords(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
 						this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
 						this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
 					}
 					if (!this.isRecordContained(syncMasterRecordOrdinal, tmpRecord.getName())) {
 						if (Math.abs(i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
-							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
+							getScaleSyncedRecords(syncMasterRecordOrdinal).add(tmpRecord);
 						else
 							//sort while add
-							this.scaleSyncedRecords.get(syncMasterRecordOrdinal).add(Math.abs(i - syncMasterRecordOrdinal), tmpRecord);
+							getScaleSyncedRecords(syncMasterRecordOrdinal).add(Math.abs(i - syncMasterRecordOrdinal), tmpRecord);
 
 						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
 						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);
@@ -1605,6 +1628,13 @@ public final class RecordSet extends AbstractRecordSet {
 
 			if (isAffected && log.isLoggable(Level.FINE)) log.log(Level.FINE, this.get(syncRecordOrdinal).getSyncMasterName() + "; syncMin = " + tmpSyncMin / 1000.0 + "; syncMax = " + tmpSyncMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+	}
+
+	/**
+	 * @return the Vector containing the slave records sync by the master name
+	 */
+	public Vector<Record> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
+		return (Vector<Record>) this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
 	}
 
 	/**

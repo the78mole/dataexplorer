@@ -52,7 +52,6 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.Record;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionFormatter;
 import gde.histo.recordings.HistoTableMapper;
@@ -297,7 +296,7 @@ public class HistoTableWindow extends CTabItem {
 				TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
 				if (trailRecordSet.size() > 0) {
 					TableItem item = (TableItem) event.item;
-					Vector<Record> currentRecords = trailRecordSet.getVisibleAndDisplayableRecordsForTable();
+					Vector<TrailRecord> currentRecords = (Vector<TrailRecord>) trailRecordSet.getVisibleAndDisplayableRecordsForTable();
 					if (HistoTableWindow.this.dataTable.indexOf(item) < currentRecords.size()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item);
 						TrailRecord trailRecord = (TrailRecord) currentRecords.get(index);

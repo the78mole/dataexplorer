@@ -22,6 +22,7 @@ package gde.data;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.eclipse.swt.SWT;
@@ -77,11 +78,21 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	protected boolean														isSmoothVoltageCurve						= false;
 	public static final String									SMOOTH_VOLTAGE_CURVE						= "RecordSet_smoothVoltageCurve";							//$NON-NLS-1$
 
-	// display in data table
-	protected Vector<Record>										visibleAndDisplayableRecords		= new Vector<Record>();												//collection of records visible and displayable
-	protected Vector<Record>										allRecords											= new Vector<Record>();												//collection of all records
-	// sync enabled records
-	protected HashMap<Integer, Vector<Record>>	scaleSyncedRecords							= new HashMap<Integer, Vector<Record>>(2);		//collection of record keys where scales might be synchronized
+	/**
+	 * records visible and displayable.
+	 * display in data table.
+	 */
+	protected Vector<? extends Record>								visibleAndDisplayableRecords;
+	/**
+	 * all records.
+	 * display in curve selector.
+	 */
+	protected Vector<? extends Record>								allRecords;
+	/**
+	 * sync enabled records.
+	 * record keys where scales might be synchronized.
+	 */
+	protected Map<Integer, Vector<? extends Record>>	scaleSyncedRecords							= new HashMap<Integer, Vector<? extends Record>>(2);
 
 	// measurement
 	protected String														recordKeyMeasurement						= GDE.STRING_EMPTY;
@@ -171,7 +182,6 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 
 		this.parent = this.channels.get(channelConfigurationNumber);
 		this.name = recordSet.name;
-
 	}
 
 	/**
@@ -216,21 +226,21 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	/**
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
-	public Vector<Record> getVisibleAndDisplayableRecordsForTable() {
+	public Vector<? extends Record> getVisibleAndDisplayableRecordsForTable() {
 		return this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords;
 	}
 
 	/**
 	 * @return visible and displayable records (p.e. to build the partial data table)
 	 */
-	public Vector<Record> getVisibleAndDisplayableRecords() {
+	public Vector<? extends Record> getVisibleAndDisplayableRecords() {
 		return this.visibleAndDisplayableRecords;
 	}
 
 	/**
 	 * @return all records for display
 	 */
-	public Vector<Record> getDisplayRecords() {
+	public Vector<? extends Record> getDisplayRecords() {
 		return this.allRecords;
 	}
 
@@ -595,11 +605,11 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 			if (this.isRecordContained(syncRecordOrdinal, syncInputRecord.getName())) {
 				switch (type) {
 				case Record.TYPE_AXIS_END_VALUES:
-					boolean tmpIsRoundout = syncInputRecord.isRoundOut;
-					boolean tmpIsStartpointZero = syncInputRecord.isStartpointZero;
-					boolean tmpIsStartEndDefined = syncInputRecord.isStartEndDefined;
-					double minScaleValue = syncInputRecord.minScaleValue;
-					double maxScaleValue = syncInputRecord.maxScaleValue;
+					boolean tmpIsRoundout = syncInputRecord.isRoundOut();
+					boolean tmpIsStartpointZero = syncInputRecord.isStartpointZero();
+					boolean tmpIsStartEndDefined = syncInputRecord.isStartEndDefined();
+					double minScaleValue = syncInputRecord.getMinScaleValue();
+					double maxScaleValue = syncInputRecord.getMaxScaleValue();
 					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						synchronized (tmpRecord) {
 							tmpRecord.setRoundOut(tmpIsRoundout);
@@ -612,7 +622,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 					break;
 				case Record.TYPE_AXIS_NUMBER_FORMAT:
 					DecimalFormat tmpDf = syncInputRecord.df;
-					int numberFormat = syncInputRecord.numberFormat;
+					int numberFormat = syncInputRecord.getNumberFormat();
 					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						synchronized (tmpRecord) {
 							tmpRecord.df = (DecimalFormat) tmpDf.clone();
@@ -621,7 +631,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 					}
 					break;
 				case Record.TYPE_AXIS_SCALE_POSITION:
-					boolean tmpIsPositionLeft = syncInputRecord.isPositionLeft;
+					boolean tmpIsPositionLeft = syncInputRecord.isPositionLeft();
 					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						synchronized (tmpRecord) {
 							tmpRecord.setPositionLeft(tmpIsPositionLeft);
@@ -670,7 +680,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	/**
 	 * @return the Vector containing the slave records sync by the master name
 	 */
-	public Vector<Record> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
+	public Vector<? extends Record> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
 		return this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
 	}
 

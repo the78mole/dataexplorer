@@ -2661,7 +2661,7 @@ public class DeviceConfiguration {
 	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
 			int index = 0;
-			Vector<Record> records = recordSet.getVisibleAndDisplayableRecordsForTable();
+			Vector<Record> records = (Vector<Record>) recordSet.getVisibleAndDisplayableRecordsForTable();
 			for (final Record record : records) {
 				if (isGPSCoordinates((IRecord) record)) {
 					int grad = record.realGet(rowIndex) / 1000000;

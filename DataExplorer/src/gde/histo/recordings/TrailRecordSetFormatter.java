@@ -25,7 +25,6 @@ import java.util.Vector;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channels;
-import gde.data.Record;
 import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -47,7 +46,7 @@ public final class TrailRecordSetFormatter {
 		Properties displayProps = settings.getMeasurementDisplayProperties();
 		TrailRecordSet trailRecordSet = getTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
-			Vector<Record> records = trailRecordSet.getVisibleAndDisplayableRecords();
+			Vector<TrailRecord> records = trailRecordSet.getVisibleAndDisplayableRecords();
 
 			StringBuilder sb = new StringBuilder().append(String.format("%-11.11s", Messages.getString(MessageIds.GDE_MSGT0799))); //$NON-NLS-1$
 			sb.append(GDE.STRING_OR).append(String.format("%-16s", Messages.getString(MessageIds.GDE_MSGT0652))); //$NON-NLS-1$

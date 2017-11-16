@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Vector;
@@ -636,7 +637,7 @@ public class Record extends AbstractRecord {
 
 	public String getSyncMasterName() {
 		StringBuilder sb = new StringBuilder().append(this.name.split(GDE.STRING_BLANK)[0]);
-		HashMap<Integer, Vector<Record>> syncedRecords = this.getAbstractParent().scaleSyncedRecords;
+		Map<Integer, Vector<? extends Record>> syncedRecords = this.getAbstractParent().scaleSyncedRecords;
 		if (syncedRecords.get(this.ordinal) != null && syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1) {
 			sb.append(GDE.STRING_BLANK).append(
 					syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1 ? syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR)

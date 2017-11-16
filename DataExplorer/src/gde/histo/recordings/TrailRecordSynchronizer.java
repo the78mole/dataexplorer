@@ -22,8 +22,8 @@ package gde.histo.recordings;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import gde.GDE;
@@ -52,7 +52,7 @@ public final class TrailRecordSynchronizer {
 	 * Support settlements.
 	 */
 	public void syncScales() {
-		HashMap<Integer, Vector<Record>> scaleSyncedRecords = this.trailRecordSet.getScaleSyncedRecords();
+		Map<Integer, Vector<? extends Record>> scaleSyncedRecords = this.trailRecordSet.getScaleSyncedRecords();
 		scaleSyncedRecords.clear();
 
 		for (int i = 0; i < this.trailRecordSet.size(); i++) {
@@ -64,17 +64,17 @@ public final class TrailRecordSynchronizer {
 					TrailRecord syncMasterRecord = (TrailRecord) this.trailRecordSet.get(syncMasterRecordOrdinal);
 					if (scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
 						scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
-						scaleSyncedRecords.get(syncMasterRecordOrdinal).add(syncMasterRecord);
+						((Vector<TrailRecord>) scaleSyncedRecords.get(syncMasterRecordOrdinal)).add(syncMasterRecord);
 						syncMasterRecord.setSyncMinValue(Integer.MAX_VALUE);
 						syncMasterRecord.setSyncMaxValue(Integer.MIN_VALUE);
 						log.finer(() -> "add syncMaster " + syncMasterRecord.getName() + " syncMinValue=" + syncMasterRecord.getSyncMinValue() + " syncMaxValue=" + syncMasterRecord.getSyncMaxValue());
 					}
 					if (!this.trailRecordSet.isRecordContained(syncMasterRecordOrdinal, tmpRecord.getName())) {
 						if (Math.abs(i - syncMasterRecordOrdinal) >= scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
-							scaleSyncedRecords.get(syncMasterRecordOrdinal).add(tmpRecord);
+							((Vector<TrailRecord>) scaleSyncedRecords.get(syncMasterRecordOrdinal)).add(tmpRecord);
 						else
 							// sort while add
-							scaleSyncedRecords.get(syncMasterRecordOrdinal).add(Math.abs(i - syncMasterRecordOrdinal), tmpRecord);
+							((Vector<TrailRecord>) scaleSyncedRecords.get(syncMasterRecordOrdinal)).add(Math.abs(i - syncMasterRecordOrdinal), tmpRecord);
 
 						this.trailRecordSet.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_END_VALUES);
 						this.trailRecordSet.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
@@ -128,7 +128,7 @@ public final class TrailRecordSynchronizer {
 	 * Update referenced records to enable drawing of the curve, set min/max.
 	 */
 	public void updateSyncRecordScale() {
-		for (Map.Entry<Integer, Vector<Record>> syncRecordsEntry : this.trailRecordSet.getScaleSyncedRecords().entrySet()) {
+		for (Entry<Integer, Vector<? extends Record>> syncRecordsEntry : this.trailRecordSet.getScaleSyncedRecords().entrySet()) {
 			boolean isAffected = false;
 
 			int syncRecordOrdinal = syncRecordsEntry.getKey();
