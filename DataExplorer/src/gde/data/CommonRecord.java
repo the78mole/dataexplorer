@@ -288,6 +288,7 @@ public abstract class CommonRecord extends AbstractRecord {
 		return this.add(point);
 	}
 
+	@Override
 	public abstract boolean add(Integer point);
 
 	@Override
@@ -306,6 +307,7 @@ public abstract class CommonRecord extends AbstractRecord {
 		return super.set(index, point);
 	}
 
+	@Override
 	public int getOrdinal() {
 		return this.ordinal;
 	}
@@ -314,24 +316,27 @@ public abstract class CommonRecord extends AbstractRecord {
 		this.ordinal = newOrdinal;
 	}
 
+	@Override
 	public String getName() {
 		return this.name;
 	}
 
 	public String getSyncMasterName() {
 		StringBuilder sb = new StringBuilder().append(this.name.split(GDE.STRING_BLANK)[0]);
-		Map<Integer, Vector<? extends Record>> syncedRecords = this.getAbstractParent().scaleSyncedRecords;
-		if (syncedRecords.get(this.ordinal) != null && syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1) {
-			sb.append(GDE.STRING_BLANK).append(syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1
-					? syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR).append(GDE.STRING_DOT);
+		Map<Integer, Vector<? extends AbstractRecord>> syncedRecords = this.getAbstractParent().scaleSyncedRecords;
+		if (syncedRecords.get(this.ordinal) != null && syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK).length > 1) {
+			sb.append(GDE.STRING_BLANK);
+			String[] splitName = syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK);
+			sb.append(splitName.length > 1 ? splitName[1] : GDE.STRING_STAR);
+			sb.append(GDE.STRING_DOT);
 			sb.append(GDE.STRING_DOT);
 			String trailer = GDE.STRING_STAR;
-			for (Record tmpRecord : syncedRecords.get(this.ordinal)) {
-				if (tmpRecord.isDisplayable && tmpRecord.realSize() > 1) trailer = tmpRecord.name;
+			for (AbstractRecord tmpRecord : syncedRecords.get(this.ordinal)) {
+				if (tmpRecord.isDisplayable() && tmpRecord.realSize() > 1) trailer = tmpRecord.getName();
 			}
 			sb.append(trailer.split(GDE.STRING_BLANK).length > 1 ? trailer.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
 		} else {
-			sb.append(GDE.STRING_MESSAGE_CONCAT).append(syncedRecords.get(this.ordinal).lastElement().name);
+			sb.append(GDE.STRING_MESSAGE_CONCAT).append(syncedRecords.get(this.ordinal).lastElement().getName());
 		}
 		return sb.toString();
 	}
@@ -403,6 +408,7 @@ public abstract class CommonRecord extends AbstractRecord {
 		return newProperty;
 	}
 
+	@Override
 	public double getFactor() {
 		double value = 1.0;
 		PropertyType property = this.getProperty(IDevice.FACTOR);
@@ -425,6 +431,7 @@ public abstract class CommonRecord extends AbstractRecord {
 			this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
+	@Override
 	public double getOffset() {
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.OFFSET);
@@ -447,6 +454,7 @@ public abstract class CommonRecord extends AbstractRecord {
 			this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
+	@Override
 	public double getReduction() {
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.REDUCTION);
@@ -471,10 +479,12 @@ public abstract class CommonRecord extends AbstractRecord {
 			this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
+	@Override
 	public boolean isVisible() {
 		return this.isVisible;
 	}
 
+	@Override
 	public void setVisible(boolean enabled) {
 		this.isVisible = enabled;
 	}
@@ -505,6 +515,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	 * time calculation needs always the real size of the record
 	 * @return real vector size
 	 */
+	@Override
 	public int realSize() {
 		return super.size();
 	}
@@ -516,13 +527,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	public Integer getLast() {
 		return super.size() > 0 ? super.get(super.size() - 1) : 0;
 	}
-
-	/**
-	 * overwrites vector get(int index) to enable zoom
-	 * @param index
-	 */
-	@Override
-	public abstract Integer get(int index);
 
 	/**
 	 * ET: throws NullPointerException if super.get(index) is null.
@@ -539,14 +543,17 @@ public abstract class CommonRecord extends AbstractRecord {
 		}
 	}
 
+	@Override
 	public boolean isPositionLeft() {
 		return this.isPositionLeft;
 	}
 
+	@Override
 	public void setPositionLeft(boolean enabled) {
 		this.isPositionLeft = enabled;
 	}
 
+	@Override
 	public Color getColor() {
 		return this.color;
 	}
@@ -555,18 +562,24 @@ public abstract class CommonRecord extends AbstractRecord {
 		return String.format("%d, %d,%d", this.color.getRed(), this.color.getGreen(), this.color.getBlue());
 	}
 
+	@Override
 	public void setColor(Color newColor) {
 		this.color = newColor;
 	}
 
+	@Override
 	public abstract boolean isRoundOut();
 
+	@Override
 	public abstract void setRoundOut(boolean enabled);
 
+	@Override
 	public abstract boolean isStartpointZero();
 
+	@Override
 	public abstract void setStartpointZero(boolean enabled);
 
+	@Override
 	public abstract boolean isStartEndDefined();
 
 	/**
@@ -575,38 +588,46 @@ public abstract class CommonRecord extends AbstractRecord {
 	 * @param newMinScaleValue
 	 * @param newMaxScaleValue
 	 */
+	@Override
 	public abstract void setStartEndDefined(boolean enabled, double newMinScaleValue, double newMaxScaleValue);
 
 	public abstract void setMinScaleValue(double newMinScaleValue);
 
 	public abstract void setMaxScaleValue(double newMaxScaleValue);
 
+	@Override
 	public int getLineWidth() {
 		return this.lineWidth;
 	}
 
+	@Override
 	public void setLineWidth(int newLineWidth) {
 		this.lineWidth = newLineWidth;
 	}
 
+	@Override
 	public int getLineStyle() {
 		return this.lineStyle;
 	}
 
+	@Override
 	public void setLineStyle(int newLineStyle) {
 		this.lineStyle = newLineStyle;
 	}
 
+	@Override
 	public int getNumberFormat() {
 		return this.numberFormat;
 	}
 
+	@Override
 	public abstract void setNumberFormat(int newNumberFormat);
 
 	/**
 	 * Temporarily used as long as we have no common abstract class of Record and TrailRecord or no common interface of Record and TrailRecord.
 	 * @return the parent also for TrailRecord instances
 	 */
+	@Override
 	public AbstractRecordSet getAbstractParent() {
 		return this.parent;
 	}
@@ -614,6 +635,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	/**
 	 * @return the isDisplayable
 	 */
+	@Override
 	public boolean isDisplayable() {
 		return this.isDisplayable;
 	}
@@ -649,11 +671,13 @@ public abstract class CommonRecord extends AbstractRecord {
 	/**
 	 * @return the maxScaleValue
 	 */
+	@Override
 	public abstract double getMaxScaleValue();
 
 	/**
 	 * @return the minScaleValue
 	 */
+	@Override
 	public abstract double getMinScaleValue();
 
 	/**
@@ -747,8 +771,9 @@ public abstract class CommonRecord extends AbstractRecord {
 
 	/**
 	 * @param finalValue is the value to be displayed (without applying a factor or GPS coordinates fraction correction)
-	 * @return the translated and decimal formatted value at the given index
+	 * @return the translated and decimal formatted value
 	 */
+	@Override
 	public abstract String getFormattedScaleValue(double finalValue);
 
 	/**
@@ -801,6 +826,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	/**
 	 * @return the isMeasurementMode
 	 */
+	@Override
 	public boolean isMeasurementMode() {
 		return this.isMeasurementMode;
 	}
@@ -808,6 +834,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	/**
 	 * @param enabled the isMeasurementMode to set
 	 */
+	@Override
 	public void setMeasurementMode(boolean enabled) {
 		this.isMeasurementMode = enabled;
 	}
@@ -815,6 +842,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	/**
 	 * @return the isDeltaMeasurementMode
 	 */
+	@Override
 	public boolean isDeltaMeasurementMode() {
 		return this.isDeltaMeasurementMode;
 	}
@@ -822,6 +850,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	/**
 	 * @param enabled the isDeltaMeasurementMode to set
 	 */
+	@Override
 	public void setDeltaMeasurementMode(boolean enabled) {
 		this.isDeltaMeasurementMode = enabled;
 	}
@@ -863,6 +892,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	/**
 	 * @return the numberScaleTicks
 	 */
+	@Override
 	public int getNumberScaleTicks() {
 		return this.numberScaleTicks;
 	}
@@ -870,6 +900,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	/**
 	 * @param newNumberScaleTicks the numberScaleTicks to set
 	 */
+	@Override
 	public void setNumberScaleTicks(int newNumberScaleTicks) {
 		this.numberScaleTicks = newNumberScaleTicks;
 	}
@@ -952,6 +983,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	/**
 	 * @return true if the record is the scale sync master
 	 */
+	@Override
 	public boolean isScaleVisible() {
 		if (log.isLoggable(Level.FINER))
 			log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.getAbstractParent().isOneOfSyncableRecord(getName()));
@@ -972,16 +1004,15 @@ public abstract class CommonRecord extends AbstractRecord {
 	public abstract boolean hasReasonableData();
 
 	/**
-	 * query the dataType of this record
-	 * @return
+	 * @return the dataType of this record
 	 */
+	@Override
 	public Record.DataType getDataType() {
 		return this.dataType == null ? DataType.DEFAULT : this.dataType;
 	}
 
 	/**
 	 * set the dataType of this record by evaluating its name
-	 * @return
 	 */
 	public void setDataType() {
 		if (this.name.equalsIgnoreCase("Latitude") || this.name.contains("GPS_Lat") || this.name.equalsIgnoreCase("Breitengrad") || this.name.toLowerCase().contains("sirka"))
@@ -996,7 +1027,6 @@ public abstract class CommonRecord extends AbstractRecord {
 
 	/**
 	 * set the dataType of this record
-	 * @return
 	 */
 	public void setDataType(Record.DataType newDataType) {
 		this.dataType = newDataType;

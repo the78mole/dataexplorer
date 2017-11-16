@@ -51,8 +51,10 @@ public abstract class AbstractRecord extends Vector<Integer> implements IRecord{
 
 	public abstract double getReduction();
 
+	@Override
 	public abstract int getOrdinal();
 
+	@Override
 	public abstract String getName();
 
 	public abstract boolean isVisible();
@@ -99,15 +101,8 @@ public abstract class AbstractRecord extends Vector<Integer> implements IRecord{
 
 	public abstract void setNumberFormat(int newNumberFormat);
 
-	/**
-	 * Temporarily used as long as we have no common abstract class of Record and TrailRecord or no common interface of Record and TrailRecord.
-	 * @return the parent also for TrailRecord instances
-	 */
 	public abstract AbstractRecordSet getAbstractParent();
 
-	/**
-	 * @return the isDisplayable
-	 */
 	public abstract boolean isDisplayable();
 
 	public abstract double getMaxScaleValue();
@@ -116,7 +111,7 @@ public abstract class AbstractRecord extends Vector<Integer> implements IRecord{
 
 	/**
 	 * @param finalValue is the value to be displayed (without applying a factor or GPS coordinates fraction correction)
-	 * @return the translated and decimal formatted value at the given index
+	 * @return the translated and decimal formatted value
 	 */
 	public abstract String getFormattedScaleValue(double finalValue);
 
@@ -133,7 +128,7 @@ public abstract class AbstractRecord extends Vector<Integer> implements IRecord{
 	public abstract void setNumberScaleTicks(int newNumberScaleTicks);
 
 	/**
-	 * @return true if the record is the scale sync master
+	 * @return true if the record is the scale sync master and is visible
 	 */
 	public abstract boolean isScaleVisible();
 

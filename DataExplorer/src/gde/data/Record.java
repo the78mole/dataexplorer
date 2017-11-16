@@ -50,7 +50,7 @@ import gde.utils.TimeLine;
 
 /**
  * @author Winfried Brügmann
- * class record holds data points of one measurement or line or curve
+ *         class record holds data points of one measurement or line or curve
  */
 public class Record extends AbstractRecord {
 	final static String					$CLASS_NAME				= Record.class.getName();
@@ -150,7 +150,7 @@ public class Record extends AbstractRecord {
 	protected double							minScaleValue							= this.minValue;
 	DataType											dataType									= Record.DataType.DEFAULT;
 
-	//synchronize
+	// synchronize
 	protected int									syncMaxValue							= 0;																																																																		// max value of the curve if synced
 	protected int									syncMinValue							= 0;																																																																		// min value of the curve if synced
 
@@ -183,7 +183,7 @@ public class Record extends AbstractRecord {
 	protected double							minDisplayValue;																																																																									// min value in device units, correspond to draw area
 	protected double							maxDisplayValue;																																																																									// max value in device units, correspond to draw area
 
-	//current drop, make curve capable to be smoothed
+	// current drop, make curve capable to be smoothed
 	boolean												isVoltageRecord						= false;
 	int														voltageValuesSize					= 9;
 	int[]													voltageValues							= new int[voltageValuesSize];
@@ -205,36 +205,38 @@ public class Record extends AbstractRecord {
 	public final static String		IS_VISIBLE								= "_isVisible";																																																													// defines if data are displayed  //$NON-NLS-1$
 	public final static String		IS_POSITION_LEFT					= "_isPositionLeft";																																																										// defines the side where the axis id displayed  //$NON-NLS-1$
 	public final static String		COLOR											= "_color";																																																															// defines which color is used to draw the curve //$NON-NLS-1$
-	public final static String		LINE_WITH									= "_lineWidth";																																																													//$NON-NLS-1$
-	public final static String		LINE_STYLE								= "_lineStyle";																																																													//$NON-NLS-1$
+	public final static String		LINE_WITH									= "_lineWidth";																																							//$NON-NLS-1$
+	public final static String		LINE_STYLE								= "_lineStyle";																																							//$NON-NLS-1$
 	public final static String		IS_ROUND_OUT							= "_isRoundOut";																																																												// defines if axis values are rounded //$NON-NLS-1$
 	public final static String		IS_START_POINT_ZERO				= "_isStartpointZero";																																																									// defines if axis value starts at zero //$NON-NLS-1$
 	public final static String		IS_START_END_DEFINED			= "_isStartEndDefined";																																																									// defines that explicit end values are defined for axis //$NON-NLS-1$
-	public final static String		NUMBER_FORMAT							= "_numberFormat";																																																											//$NON-NLS-1$
-	public final static String		MAX_VALUE									= "_maxValue";																																																													//$NON-NLS-1$
+	public final static String		NUMBER_FORMAT							= "_numberFormat";																																					//$NON-NLS-1$
+	public final static String		MAX_VALUE									= "_maxValue";																																							//$NON-NLS-1$
 	public final static String		DEFINED_MAX_VALUE					= "_defMaxValue";																																																												// overwritten max value //$NON-NLS-1$
-	public final static String		MIN_VALUE									= "_minValue";																																																													//$NON-NLS-1$
+	public final static String		MIN_VALUE									= "_minValue";																																							//$NON-NLS-1$
 	public final static String		DEFINED_MIN_VALUE					= "_defMinValue";																																																												// overwritten min value //$NON-NLS-1$
 	public final static String		DATA_TYPE									= "_dataType";																																																													// data type of record //$NON-NLS-1$
 
-	public final static String[]	propertyKeys							= new String[] { NAME, UNIT, SYMBOL, IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE, IS_ROUND_OUT,
-			IS_START_POINT_ZERO, IS_START_END_DEFINED, NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE, DATA_TYPE };
+	public final static String[]	propertyKeys							= new String[] { NAME, UNIT, SYMBOL,		//
+			IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE,				//
+			IS_ROUND_OUT, IS_START_POINT_ZERO, IS_START_END_DEFINED,																		//
+			NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE, DATA_TYPE };
 
 	public final static int				TYPE_AXIS_END_VALUES			= 0;																																																																		// defines axis end values types like isRoundout, isStartpointZero, isStartEndDefined
 	public final static int				TYPE_AXIS_NUMBER_FORMAT		= 1;																																																																		// defines axis scale values format
 	public final static int				TYPE_AXIS_SCALE_POSITION	= 2;																																																																		// defines axis scale position left or right
 
-	public enum DataType { //some data types require in some situation special execution algorithm
-		DEFAULT("default"), //all normal measurement values which do not require special handling
-		GPS_LATITUDE("GPS latitude"), //GPS geo-coordinate require at least 6 decimal digits [°]
-		GPS_LONGITUDE("GPS longitude"), //GPS geo-coordinate require at least 6 decimal digits [°]
-		GPS_ALTITUDE("GPS altitude"), //GPS or absolute altitude required in some case for GPS related calculations like speed, distance, ...
-		GPS_AZIMUTH("GPS azimuth"), //GPS azimuth, to be used for live display and positioning of icon if used
-		GPS_TIME("GPS time"), //GPS time, to be used as time stamp or start time if available
-		SPEED("speed"), //speed, to be used for KMZ export with colors of specified velocity
-		DATE_TIME("date time"), //special data type where no formatting or calculation can be executed, just display
-		CURRENT("current"), //data type to unique identify current type, mainly used for smoothing current drops
-		VOLTAGE("voltage"); //data type to unique identify voltage type, to smoothing reflex or pulsing voltage values
+	public enum DataType { // some data types require in some situation special execution algorithm
+		DEFAULT("default"), // all normal measurement values which do not require special handling
+		GPS_LATITUDE("GPS latitude"), // GPS geo-coordinate require at least 6 decimal digits [°]
+		GPS_LONGITUDE("GPS longitude"), // GPS geo-coordinate require at least 6 decimal digits [°]
+		GPS_ALTITUDE("GPS altitude"), // GPS or absolute altitude required in some case for GPS related calculations like speed, distance, ...
+		GPS_AZIMUTH("GPS azimuth"), // GPS azimuth, to be used for live display and positioning of icon if used
+		GPS_TIME("GPS time"), // GPS time, to be used as time stamp or start time if available
+		SPEED("speed"), // speed, to be used for KMZ export with colors of specified velocity
+		DATE_TIME("date time"), // special data type where no formatting or calculation can be executed, just display
+		CURRENT("current"), // data type to unique identify current type, mainly used for smoothing current drops
+		VOLTAGE("voltage"); // data type to unique identify voltage type, to smoothing reflex or pulsing voltage values
 
 		private final String value;
 
@@ -366,7 +368,7 @@ public class Record extends AbstractRecord {
 	public Record clone(String newName) {
 		Record newRecord = new Record(this);
 		newRecord.name = newName;
-		if (newRecord.parent.timeStep_ms != null) { //record.clone() have copied timeSteps where the parent record set
+		if (newRecord.parent.timeStep_ms != null) { // record.clone() have copied timeSteps where the parent record set
 			newRecord.timeStep_ms = null; // route to parent timeSteps
 		}
 		return newRecord;
@@ -377,7 +379,7 @@ public class Record extends AbstractRecord {
 	 */
 	private Record(Record record, int dataIndex, boolean isFromBegin) {
 		super();
-		//super(record); // vector
+		// super(record); // vector
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.name + " Record(Record, int, boolean)"); //$NON-NLS-1$
 		this.parent = record.parent;
 		this.parent.setZoomMode(false);
@@ -411,12 +413,12 @@ public class Record extends AbstractRecord {
 			}
 		}
 
-		if (record.timeStep_ms != null && !record.timeStep_ms.isConstant) { //time step vector must be updated as well
+		if (record.timeStep_ms != null && !record.timeStep_ms.isConstant) { // time step vector must be updated as well
 			this.timeStep_ms = record.timeStep_ms.clone(dataIndex, isFromBegin);
 		} else if (record.timeStep_ms != null && record.timeStep_ms.isConstant) {
 			this.timeStep_ms = record.timeStep_ms.clone();
 		} else {
-			this.timeStep_ms = null; //refer to parent time steps
+			this.timeStep_ms = null; // refer to parent time steps
 		}
 
 		this.drawTimeWidth = this.getMaxTime_ms();
@@ -473,22 +475,22 @@ public class Record extends AbstractRecord {
 		// set color defaults
 		switch (recordOrdinal) {
 		case 0: // erste Kurve
-			this.color = SWTResourceManager.getColor(0, 0, 255); //(SWT.COLOR_BLUE));
+			this.color = SWTResourceManager.getColor(0, 0, 255); // (SWT.COLOR_BLUE));
 			break;
 		case 1: // zweite Kurve
-			this.color = SWTResourceManager.getColor(0, 128, 0); //SWT.COLOR_DARK_GREEN));
+			this.color = SWTResourceManager.getColor(0, 128, 0); // SWT.COLOR_DARK_GREEN));
 			break;
 		case 2: // dritte Kurve
-			this.color = SWTResourceManager.getColor(128, 0, 0); //(SWT.COLOR_DARK_RED));
+			this.color = SWTResourceManager.getColor(128, 0, 0); // (SWT.COLOR_DARK_RED));
 			break;
 		case 3: // vierte Kurve
-			this.color = SWTResourceManager.getColor(255, 0, 255); //(SWT.COLOR_MAGENTA));
+			this.color = SWTResourceManager.getColor(255, 0, 255); // (SWT.COLOR_MAGENTA));
 			break;
 		case 4: // fünfte Kurve
-			this.color = SWTResourceManager.getColor(64, 0, 64); //(SWT.COLOR_CYAN));
+			this.color = SWTResourceManager.getColor(64, 0, 64); // (SWT.COLOR_CYAN));
 			break;
 		case 5: // sechste Kurve
-			this.color = SWTResourceManager.getColor(0, 128, 128); //(SWT.COLOR_DARK_YELLOW));
+			this.color = SWTResourceManager.getColor(0, 128, 128); // (SWT.COLOR_DARK_YELLOW));
 			break;
 		case 6: // Kurve
 			this.color = SWTResourceManager.getColor(128, 128, 0);
@@ -522,12 +524,12 @@ public class Record extends AbstractRecord {
 			break;
 		default:
 			Random rand = new Random();
-			this.color = SWTResourceManager.getColor(rand.nextInt() & 0xff, rand.nextInt() & 0xff, rand.nextInt() & 0xff); //(SWT.COLOR_GREEN));
+			this.color = SWTResourceManager.getColor(rand.nextInt() & 0xff, rand.nextInt() & 0xff, rand.nextInt() & 0xff); // (SWT.COLOR_GREEN));
 			break;
 		}
 		// set position defaults
 		if (recordOrdinal % 2 == 0) {
-			this.setPositionLeft(true); //position left
+			this.setPositionLeft(true); // position left
 		} else {
 			this.setPositionLeft(false); // position right
 		}
@@ -561,13 +563,13 @@ public class Record extends AbstractRecord {
 
 		switch (this.device.getCurrentSmoothIndex()) {
 		case 1:
-			//add shadow data points to detect current drops to nearly zero
+			// add shadow data points to detect current drops to nearly zero
 			if (this.isCurrentRecord && super.size() > 5) {
 				int index = super.size();
-				//check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
+				// check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
 				if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
 					if (this.dropStartIndex == 0) {
-						this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
+						this.dropStartIndex = index; // reduce run in slope and reduce index by one measurement
 						this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, index - 2 });
 					}
 					this.dropEndIndex = index + ((index - this.dropStartIndex) + 1);
@@ -580,16 +582,16 @@ public class Record extends AbstractRecord {
 			}
 			break;
 		case 2:
-			//add shadow data points to detect current drops to nearly zero
+			// add shadow data points to detect current drops to nearly zero
 			if (this.isCurrentRecord && super.size() > 5) {
 				int index = super.size();
-				//check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
+				// check value is close to zero and there should be a delta to the actual max value, we could have very low values which should be skipped
 				if (this.maxValue > 200 && point < (this.maxValue >> 2)) {
 					if (this.dropStartIndex == 0) {
-						this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
+						this.dropStartIndex = index; // reduce run in slope and reduce index by one measurement
 					} else if (!this.dropIndexWritten) { // run into another drop while previous one is not handled
 						this.parent.currentDropShadow.add(new Integer[] { this.dropStartIndex - 2, index - 2 });
-						this.dropStartIndex = index; //reduce run in slope and reduce index by one measurement
+						this.dropStartIndex = index; // reduce run in slope and reduce index by one measurement
 						this.dropIndexWritten = true;
 					}
 					this.dropEndIndex = index + ((index - this.dropStartIndex) * 4);
@@ -639,19 +641,20 @@ public class Record extends AbstractRecord {
 
 	public String getSyncMasterName() {
 		StringBuilder sb = new StringBuilder().append(this.name.split(GDE.STRING_BLANK)[0]);
-		Map<Integer, Vector<? extends Record>> syncedRecords = this.getAbstractParent().scaleSyncedRecords;
-		if (syncedRecords.get(this.ordinal) != null && syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1) {
-			sb.append(GDE.STRING_BLANK).append(
-					syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK).length > 1 ? syncedRecords.get(this.ordinal).firstElement().name.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR)
-					.append(GDE.STRING_DOT);
+		Map<Integer, Vector<? extends AbstractRecord>> syncedRecords = this.getAbstractParent().scaleSyncedRecords;
+		if (syncedRecords.get(this.ordinal) != null && syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK).length > 1) {
+			String[] splitName = syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK);
+			sb.append(GDE.STRING_BLANK);
+			sb.append(splitName.length > 1 ? syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
+			sb.append(GDE.STRING_DOT);
 			sb.append(GDE.STRING_DOT);
 			String trailer = GDE.STRING_STAR;
-			for (Record tmpRecord : syncedRecords.get(this.ordinal)) {
-				if (tmpRecord.isDisplayable && tmpRecord.realSize() > 1) trailer = tmpRecord.name;
+			for (AbstractRecord tmpRecord : syncedRecords.get(this.ordinal)) {
+				if (tmpRecord.isDisplayable() && tmpRecord.realSize() > 1) trailer = tmpRecord.getName();
 			}
 			sb.append(trailer.split(GDE.STRING_BLANK).length > 1 ? trailer.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
 		} else {
-			sb.append(GDE.STRING_MESSAGE_CONCAT).append(syncedRecords.get(this.ordinal).lastElement().name);
+			sb.append(GDE.STRING_MESSAGE_CONCAT).append(syncedRecords.get(this.ordinal).lastElement().getName());
 		}
 		return sb.toString();
 	}
@@ -740,7 +743,7 @@ public class Record extends AbstractRecord {
 			try {
 				value = this.getDevice().getMeasurementFactor(this.getAbstractParent().parent.number, this.ordinal);
 			} catch (RuntimeException e) {
-				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
+				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
 			}
 		return value;
 	}
@@ -763,7 +766,7 @@ public class Record extends AbstractRecord {
 			try {
 				value = this.getDevice().getMeasurementOffset(this.getAbstractParent().parent.number, this.ordinal);
 			} catch (RuntimeException e) {
-				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
+				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
 			}
 		return value;
 	}
@@ -787,7 +790,7 @@ public class Record extends AbstractRecord {
 				String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.getAbstractParent().parent.number, this.ordinal, IDevice.REDUCTION);
 				if (strValue != null && strValue.length() > 0) value = Double.valueOf(strValue.trim().replace(',', '.')).doubleValue();
 			} catch (RuntimeException e) {
-				//log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
+				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
 			}
 		}
 		return value;
@@ -1033,7 +1036,7 @@ public class Record extends AbstractRecord {
 			index = index < 0 ? 0 : index;
 		}
 		int returnValue = super.get(index);
-		//log.log(Level.INFO, "index=" + index);
+		// log.log(Level.INFO, "index=" + index);
 		if (elementCount != 0) {
 			if (!this.parent.isCompareSet) {
 				if (this.parent.isSmoothAtCurrentDrop) {
@@ -1483,7 +1486,7 @@ public class Record extends AbstractRecord {
 	public DecimalFormat getDecimalFormat() {
 		if (this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.isScaleSynced() + " - " + this.getAbstractParent().getSyncMasterRecordOrdinal(this.name));
-		return this.isScaleSynced() ? this.getAbstractParent().get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name)).df : this.df;
+		return this.isScaleSynced() ? ((Record) this.getAbstractParent().get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))).df : this.df;
 	}
 
 	/**
@@ -1627,19 +1630,19 @@ public class Record extends AbstractRecord {
 	}
 
 	/**
-	* get the time in msec at given horizontal display position
-	* @param xPos of the display point
-	* @return time value in msec
-	*/
+	 * get the time in msec at given horizontal display position
+	 * @param xPos of the display point
+	 * @return time value in msec
+	 */
 	public double getHorizontalDisplayPointTime_ms(int xPos) {
 		return this.drawTimeWidth * xPos / this.parent.drawAreaBounds.width;
 	}
 
 	/**
-	* get the formatted time with unit at given position
-	* @param xPos of the display point
-	* @return string of time value in simple date format HH:ss:mm:SSS
-	*/
+	 * get the formatted time with unit at given position
+	 * @param xPos of the display point
+	 * @return string of time value in simple date format HH:ss:mm:SSS
+	 */
 	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
 		return TimeLine.getFomatedTimeWithUnit(
 				this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms() + (this.settings != null && this.settings.isTimeFormatAbsolute() ? this.getStartTimeStamp() : 0)); // use GMT time zone for durations now. initially was 1292400000 == 1970-01-16 00:00:00.000
@@ -1706,11 +1709,11 @@ public class Record extends AbstractRecord {
 			}
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, xPos + " -> timeValue = " + TimeLine.getFomatedTime(tmpTimeValue) + " pointPosY = " + pointPosY); //$NON-NLS-1$ //$NON-NLS-2$
 
-			//check yPos out of range, the graph might not visible within this area
-			//		if(pointPosY > this.parent.drawAreaBounds.height)
-			//			log.log(Level.WARNING, "pointPosY > drawAreaBounds.height");
-			//		if(pointPosY < 0)
-			//			log.log(Level.WARNING, "pointPosY < 0");
+			// check yPos out of range, the graph might not visible within this area
+			// if(pointPosY > this.parent.drawAreaBounds.height)
+			// log.log(Level.WARNING, "pointPosY > drawAreaBounds.height");
+			// if(pointPosY < 0)
+			// log.log(Level.WARNING, "pointPosY < 0");
 		} catch (RuntimeException e) {
 			log.log(Level.WARNING, e.getMessage() + " xPos = " + xPos, e); //$NON-NLS-1$
 		}
@@ -1725,13 +1728,13 @@ public class Record extends AbstractRecord {
 	 */
 	public String getVerticalDisplayPointAsFormattedScaleValue(int yPos, Rectangle drawAreaBounds) {
 		String displayPointValue;
-		//scales are all synchronized in viewpoint of end values (min/max)
+		// scales are all synchronized in viewpoint of end values (min/max)
 		//PropertyType syncProperty = this.parent.isCompareSet ? null : this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-		//if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
-		//	Record syncRecord = this.parent.get(this.ordinal);
+		// if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+		// Record syncRecord = this.parent.get(this.ordinal);
 		//		displayPointValue = syncRecord.df.format(Double.valueOf(syncRecord.minDisplayValue +  ((syncRecord.maxDisplayValue - syncRecord.minDisplayValue) * (drawAreaBounds.height-yPos) / drawAreaBounds.height)));
-		//}
-		//else
+		// }
+		// else
 		if (this.parent.isZoomMode)
 			displayPointValue = this.df.format(Double.valueOf(this.minZoomScaleValue + ((this.maxZoomScaleValue - this.minZoomScaleValue) * (drawAreaBounds.height - yPos) / drawAreaBounds.height)));
 		else
@@ -1784,7 +1787,7 @@ public class Record extends AbstractRecord {
 			measureDelta = (this.maxZoomScaleValue - this.minZoomScaleValue) * points.y / this.parent.drawAreaBounds.height;
 		else
 			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / this.parent.drawAreaBounds.height;
-		double timeDelta = this.drawTimeWidth * points.x / this.parent.drawAreaBounds.width / 1000; //sec
+		double timeDelta = this.drawTimeWidth * points.x / this.parent.drawAreaBounds.width / 1000; // sec
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
 		return new DecimalFormat("0.0").format(measureDelta / timeDelta); //$NON-NLS-1$
 	}
@@ -1842,7 +1845,7 @@ public class Record extends AbstractRecord {
 			this.displayScaleFactorValue = this.displayScaleFactorValue * this.syncMasterFactor;
 		}
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", //$NON-NLS-1$
-				drawAreaHeight, this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue)));
+					drawAreaHeight, this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue)));
 
 	}
 
@@ -1856,8 +1859,9 @@ public class Record extends AbstractRecord {
 			this.minDisplayValue = newMinDisplayValue;
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
-			for (Record tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
-				tmpRecord.minDisplayValue = this.minDisplayValue;
+			for (AbstractRecord tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
+				Record record = (Record) tmpRecord;
+				record.minDisplayValue = this.minDisplayValue;
 			}
 		}
 	}
@@ -1872,8 +1876,9 @@ public class Record extends AbstractRecord {
 			this.maxDisplayValue = newMaxDisplayValue;
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
-			for (Record tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
-				tmpRecord.maxDisplayValue = this.maxDisplayValue;
+			for (AbstractRecord tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
+				Record record = (Record) tmpRecord;
+				record.maxDisplayValue = this.maxDisplayValue;
 			}
 		}
 	}
@@ -1915,7 +1920,7 @@ public class Record extends AbstractRecord {
 		this.minZoomScaleValue = newMinZoomScaleValue;
 		this.maxZoomScaleValue = newMaxZoomScaleValue;
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " - minScaleValue/minZoomScaleValue = " + this.minScaleValue + "/" + newMinZoomScaleValue //$NON-NLS-1$//$NON-NLS-2$
-				+ " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/" + newMaxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
+					+ " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/" + newMaxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -2021,7 +2026,7 @@ public class Record extends AbstractRecord {
 			sb.append(property.getName()).append(GDE.STRING_UNDER_BAR).append(property.getType()).append(GDE.STRING_EQUAL).append(property.getValue()).append(DELIMITER);
 		}
 		if (this.statistics != null) sb.append(this.statistics.toString()).append(DELIMITER);
-		//formatting
+		// formatting
 		sb.append(DEFINED_MAX_VALUE).append(GDE.STRING_EQUAL).append(this.maxScaleValue).append(DELIMITER);
 		sb.append(DEFINED_MIN_VALUE).append(GDE.STRING_EQUAL).append(this.minScaleValue).append(DELIMITER);
 		sb.append(IS_POSITION_LEFT).append(GDE.STRING_EQUAL).append(this.isPositionLeft).append(DELIMITER);
@@ -2096,7 +2101,7 @@ public class Record extends AbstractRecord {
 
 		tmpValue = recordProps.get(NAME);
 		if (tmpValue != null && tmpValue.length() > 0) {
-			this.setName(tmpValue); //replace the record set key as well
+			this.setName(tmpValue); // replace the record set key as well
 		}
 	}
 
@@ -2109,7 +2114,7 @@ public class Record extends AbstractRecord {
 		StringBuilder sb = new StringBuilder().append("update: "); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINE)) sb.append(this.name).append(GDE.STRING_MESSAGE_CONCAT);
 
-		//this.getDevice().getUsedPropertyKeys()) needs to declare "statistics" to enable statistics re-construction during OSD file load
+		// this.getDevice().getUsedPropertyKeys()) needs to declare "statistics" to enable statistics re-construction during OSD file load
 		if (recordDeviceProps.get("statistics") != null) {
 			MeasurementType measurement = device.getMeasurement(this.parent.parent.number, this.ordinal);
 			measurement.setStatistics(StatisticsType.fromString(recordDeviceProps.get("statistics")));
@@ -2426,8 +2431,8 @@ public class Record extends AbstractRecord {
 	}
 
 	/**
-		 * calculate sum of min/max delta of each trigger range
-		 */
+	 * calculate sum of min/max delta of each trigger range
+	 */
 	double calculateTimeSum_ms() {
 		synchronized (this) {
 			double sum = 0;

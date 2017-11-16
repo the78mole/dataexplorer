@@ -598,6 +598,14 @@ public final class RecordSet extends AbstractRecordSet {
 	}
 
 	/**
+	 * @return visible and display able records (p.e. to build the partial data table)
+	 */
+	@Override
+	public Vector<Record> getVisibleAndDisplayableRecordsForTable() {
+		return (Vector<Record>) (this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords);
+	}
+
+	/**
 	 * @return visible and displayable records (p.e. to build the partial data table)
 	 */
 	@Override
@@ -1584,7 +1592,8 @@ public final class RecordSet extends AbstractRecordSet {
 			StringBuilder sb = new StringBuilder();
 			for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
 				sb.append("\n").append(syncRecordOrdinal).append(GDE.STRING_COLON);
-				for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+				for (AbstractRecord record : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+					Record tmpRecord = (Record) record;
 					sb.append(tmpRecord.name).append(GDE.STRING_SEMICOLON);
 				}
 			}
@@ -1602,7 +1611,8 @@ public final class RecordSet extends AbstractRecordSet {
 			boolean isAffected = false;
 			int tmpSyncMin = Integer.MAX_VALUE;
 			int tmpSyncMax = Integer.MIN_VALUE;
-			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+			for (AbstractRecord record : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+				Record tmpRecord = (Record) record;
 				synchronized (tmpRecord) {
 					if (tmpRecord.isVisible && tmpRecord.isDisplayable) {
 						isAffected = true;
@@ -1616,7 +1626,8 @@ public final class RecordSet extends AbstractRecordSet {
 					}
 				}
 			}
-			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+			for (AbstractRecord record : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+				Record tmpRecord = (Record) record;
 				synchronized (tmpRecord) {
 					if (this.isScopeMode) {
 						tmpRecord.scopeMin = tmpSyncMin;

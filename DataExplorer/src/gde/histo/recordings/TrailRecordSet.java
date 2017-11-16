@@ -251,6 +251,13 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	/**
+	 * @return visible and display able records (p.e. to build the partial data table)
+	 */
+	public Vector<TrailRecord> getVisibleAndDisplayableRecordsForTable() {
+		return (Vector<TrailRecord>) (this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords);
+	}
+
+	/**
 	 * @return visible and displayable records (p.e. to build the partial data table)
 	 */
 	@Override
@@ -297,17 +304,17 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @return all measurement records and settlement / score records based on display settings
 	 */
 	public TrailRecord[] getRecordsSortedForDisplay() {
-		Vector<Record> displayRecords = new Vector<Record>();
+		Vector<TrailRecord> displayRecords = new Vector<>();
 		// add the record with horizontal grid
-		for (Record record : this.getDisplayRecords()) {
+		for (TrailRecord record : this.getDisplayRecords()) {
 			if (record.getOrdinal() == this.getHorizontalGridRecordOrdinal()) displayRecords.add(record);
 		}
 		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
-		for (Record record : this.getDisplayRecords()) {
+		for (TrailRecord record : this.getDisplayRecords()) {
 			if (record.getOrdinal() != this.getHorizontalGridRecordOrdinal() && record.isScaleSyncMaster()) displayRecords.add(record);
 		}
 		// add all others
-		for (Record record : this.getDisplayRecords()) {
+		for (TrailRecord record : this.getDisplayRecords()) {
 			if (record.getOrdinal() != this.getHorizontalGridRecordOrdinal() && !record.isScaleSyncMaster()) displayRecords.add(record);
 		}
 
@@ -462,7 +469,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return this.parent.getNumber();
 	}
 
-	public Map<Integer, Vector<? extends Record>> getScaleSyncedRecords() {
+	public Map<Integer, Vector<? extends AbstractRecord>> getScaleSyncedRecords() {
 		return this.scaleSyncedRecords;
 	}
 
@@ -479,7 +486,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @return true if the record isMeasurementMode or isDeltaMeasurementMode
 	 */
 	public boolean isSurveyMode(String recordKey) {
-		Record record = this.get(recordKey);
+		TrailRecord record = this.get(recordKey);
 		if (record != null) {
 			return record.isMeasurementMode() || record.isDeltaMeasurementMode();
 		} else

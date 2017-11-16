@@ -82,17 +82,17 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * records visible and displayable.
 	 * display in data table.
 	 */
-	protected Vector<? extends Record>								visibleAndDisplayableRecords;
+	protected Vector<? extends AbstractRecord>								visibleAndDisplayableRecords;
 	/**
 	 * all records.
 	 * display in curve selector.
 	 */
-	protected Vector<? extends Record>								allRecords;
+	protected Vector<? extends AbstractRecord>								allRecords;
 	/**
 	 * sync enabled records.
 	 * record keys where scales might be synchronized.
 	 */
-	protected Map<Integer, Vector<? extends Record>>	scaleSyncedRecords							= new HashMap<Integer, Vector<? extends Record>>(2);
+	protected Map<Integer, Vector<? extends AbstractRecord>>	scaleSyncedRecords							= new HashMap<Integer, Vector<? extends AbstractRecord>>(2);
 
 	// measurement
 	protected String														recordKeyMeasurement						= GDE.STRING_EMPTY;
@@ -218,21 +218,21 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	/**
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
-	public Vector<? extends Record> getVisibleAndDisplayableRecordsForTable() {
+	public Vector<? extends AbstractRecord> getVisibleAndDisplayableRecordsForTable() {
 		return this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords;
 	}
 
 	/**
 	 * @return visible and displayable records (p.e. to build the partial data table)
 	 */
-	public Vector<? extends Record> getVisibleAndDisplayableRecords() {
+	public Vector<? extends AbstractRecord> getVisibleAndDisplayableRecords() {
 		return this.visibleAndDisplayableRecords;
 	}
 
 	/**
 	 * @return all records for display
 	 */
-	public Vector<? extends Record> getDisplayRecords() {
+	public Vector<? extends AbstractRecord> getDisplayRecords() {
 		return this.allRecords;
 	}
 
@@ -567,9 +567,9 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 		boolean isContained = false;
 		synchronized (this.scaleSyncedRecords) {
 			if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) != null) {
-				for (Record tempRecord : this.scaleSyncedRecords.get(syncMasterRecordOrdinal)) {
-					if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.name + " with " + recordName);
-					if (tempRecord.name.equals(recordName)) {
+				for (AbstractRecord tempRecord : this.scaleSyncedRecords.get(syncMasterRecordOrdinal)) {
+					if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.getName() + " with " + recordName);
+					if (tempRecord.getName().equals(recordName)) {
 						isContained = true;
 						break;
 					}
@@ -602,7 +602,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 					boolean tmpIsStartEndDefined = syncInputRecord.isStartEndDefined();
 					double minScaleValue = syncInputRecord.getMinScaleValue();
 					double maxScaleValue = syncInputRecord.getMaxScaleValue();
-					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+					for (AbstractRecord tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						synchronized (tmpRecord) {
 							tmpRecord.setRoundOut(tmpIsRoundout);
 							tmpRecord.setStartpointZero(tmpIsStartpointZero);
@@ -615,7 +615,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 				case Record.TYPE_AXIS_NUMBER_FORMAT:
 					DecimalFormat tmpDf = syncInputRecord.df;
 					int numberFormat = syncInputRecord.getNumberFormat();
-					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+					for (AbstractRecord tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						synchronized (tmpRecord) {
 							tmpRecord.df = (DecimalFormat) tmpDf.clone();
 							tmpRecord.setNumberFormat(numberFormat);
@@ -624,7 +624,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 					break;
 				case Record.TYPE_AXIS_SCALE_POSITION:
 					boolean tmpIsPositionLeft = syncInputRecord.isPositionLeft();
-					for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+					for (AbstractRecord tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						synchronized (tmpRecord) {
 							tmpRecord.setPositionLeft(tmpIsPositionLeft);
 						}
@@ -647,7 +647,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 */
 	public boolean isOneSyncableVisible() {
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			for (Record tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
+			for (AbstractRecord tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 				if (tmpRecord != null && tmpRecord.isVisible()) {
 					return true;
 				}
@@ -661,7 +661,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * @return true if one of the syncable records is visible
 	 */
 	public boolean isOneSyncableVisible(int syncMasterOrdinal) {
-		for (Record tmpRecord : this.scaleSyncedRecords.get(syncMasterOrdinal)) {
+		for (AbstractRecord tmpRecord : this.scaleSyncedRecords.get(syncMasterOrdinal)) {
 			if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
 				return true;
 			}
@@ -672,7 +672,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	/**
 	 * @return the Vector containing the slave records sync by the master name
 	 */
-	public Vector<? extends Record> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
+	public Vector<? extends AbstractRecord> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
 		return this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
 	}
 

@@ -198,17 +198,6 @@ public final class TrailRecord extends CommonRecord {
 		return this.trailSelector.isTrailSuite() ? this.suiteRecords.realSize() : super.realSize();
 	}
 
-	/**
-	 * Standard get(int index).
-	 * @param index
-	 */
-	@Deprecated
-	@Override
-	public synchronized Integer get(int index) {
-		throw new UnsupportedOperationException();
-		// return super.get(index);
-	}
-
 	@Override // reason is translateValue which accesses the device for offset etc.
 	public double getFactor() {
 		if (this.factor == Double.MIN_VALUE) {
@@ -319,6 +308,7 @@ public final class TrailRecord extends CommonRecord {
 	/**
 	 * @param newMinDisplayValue the minDisplayValue to set
 	 */
+	@Override
 	public void setMinDisplayValue(double newMinDisplayValue) {
 		throw new UnsupportedOperationException();
 	}
@@ -326,6 +316,7 @@ public final class TrailRecord extends CommonRecord {
 	/**
 	 * @param newMaxDisplayValue the maxDisplayValue to set
 	 */
+	@Override
 	public void setMaxDisplayValue(double newMaxDisplayValue) {
 		throw new UnsupportedOperationException();
 	}
@@ -370,6 +361,7 @@ public final class TrailRecord extends CommonRecord {
 	 * query time step time in mills seconds at index
 	 * @return time step in msec
 	 */
+	@Override
 	@Deprecated
 	public double getTime_ms(int index) {
 		throw new UnsupportedOperationException();
@@ -581,12 +573,9 @@ public final class TrailRecord extends CommonRecord {
 		return this.suiteRecords;
 	}
 
-	@Deprecated
 	@Override
 	public String getFormattedScaleValue(double finalValue) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-		// return null;
+		return new TrailRecordFormatter(this).getScaleValue(finalValue);
 	}
 
 }

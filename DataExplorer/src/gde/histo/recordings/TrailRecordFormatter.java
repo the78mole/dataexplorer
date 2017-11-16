@@ -23,7 +23,10 @@ import java.text.DecimalFormat;
 import java.util.Vector;
 
 import gde.GDE;
-import gde.data.Record;
+import gde.data.AbstractRecordSet;
+import gde.device.IDevice;
+import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
 
 /**
  * Output formatting based on trailRecord data.
@@ -31,7 +34,9 @@ import gde.data.Record;
  */
 public final class TrailRecordFormatter {
 
-	private final TrailRecord				trailRecord;
+	private final IDevice device = DataExplorer.getInstance().getActiveDevice();
+
+	private final TrailRecord trailRecord;
 
 	public TrailRecordFormatter(TrailRecord trailRecord) {
 		this.trailRecord = trailRecord;
@@ -56,30 +61,26 @@ public final class TrailRecordFormatter {
 					df.applyPattern("0.000"); //$NON-NLS-1$
 				else
 					df.applyPattern("0.00"); //$NON-NLS-1$
-			}
-			else if (Math.abs(maxScaleValue) < 100 && Math.abs(minScaleValue) < 100) {
+			} else if (Math.abs(maxScaleValue) < 100 && Math.abs(minScaleValue) < 100) {
 				if (maxScaleValue - minScaleValue < 0.1)
 					df.applyPattern("0.000"); //$NON-NLS-1$
 				else if (maxScaleValue - minScaleValue < 1.)
 					df.applyPattern("0.00"); //$NON-NLS-1$
 				else
 					df.applyPattern("0.0"); //$NON-NLS-1$
-			}
-			else if (Math.abs(maxScaleValue) < 1000 && Math.abs(minScaleValue) < 1000) {
+			} else if (Math.abs(maxScaleValue) < 1000 && Math.abs(minScaleValue) < 1000) {
 				if (maxScaleValue - minScaleValue < 1.)
 					df.applyPattern("0.00"); //$NON-NLS-1$
 				else if (maxScaleValue - minScaleValue < 10.)
 					df.applyPattern("0.0"); //$NON-NLS-1$
 				else
 					df.applyPattern("0"); //$NON-NLS-1$
-			}
-			else if (Math.abs(maxScaleValue) < 10000 && Math.abs(minScaleValue) < 10000) {
+			} else if (Math.abs(maxScaleValue) < 10000 && Math.abs(minScaleValue) < 10000) {
 				if (maxScaleValue - minScaleValue < 10.)
 					df.applyPattern("0.0"); //$NON-NLS-1$
 				else
 					df.applyPattern("0"); //$NON-NLS-1$
-			}
-			else {
+			} else {
 				df.applyPattern("0"); //$NON-NLS-1$
 			}
 			break;
@@ -105,8 +106,14 @@ public final class TrailRecordFormatter {
 	 * @param value is the value to be displayed (without applying a factor or GPS coordinates fraction correction)
 	 * @return the translated and decimal formatted value at the given index
 	 */
-	public String getScaleValue(double value) {
-		return ((Record) this.trailRecord).getFormattedScaleValue(value);
+	public String getScaleValue(double finalValue) {
+		if (this.device.isGPSCoordinates(this.trailRecord)) {
+			if (this.trailRecord.getUnit().endsWith("'")) //$NON-NLS-1$
+				return StringHelper.getFormatedWithMinutes("%2d %04.1f", finalValue); //$NON-NLS-1$
+			else
+				return this.getDecimalFormat().format(finalValue);
+		} else
+			return this.getDecimalFormat().format(finalValue);
 	}
 
 	/**
@@ -114,15 +121,7 @@ public final class TrailRecordFormatter {
 	 * @return the formatted value also for GPS coordinates
 	 */
 	public String getTableValue(double value) {
-		return ((Record) this.trailRecord).getFormattedTableValue(value);
-	}
-
-	/**
-	 * @param index
-	 * @return the formatted value also for GPS coordinates
-	 */
-	public String getTableValue(int index) {
-		return ((Record) this.trailRecord).getFormattedTableValue(this.trailRecord.elementAt(index) /1000.);
+		return getFormattedTableValue(value);
 	}
 
 	/**
@@ -131,7 +130,7 @@ public final class TrailRecordFormatter {
 	 * @return the formatted value also for GPS coordinates
 	 */
 	public String getTableValue(int suiteOrdinal, int index) {
-		return ((Record) this.trailRecord).getFormattedTableValue(this.trailRecord.getSuiteRecords().get(suiteOrdinal).get(index) /1000.);
+		return getFormattedTableValue(this.trailRecord.getSuiteRecords().get(suiteOrdinal).get(index) / 1000.);
 	}
 
 	/**
@@ -144,9 +143,46 @@ public final class TrailRecordFormatter {
 
 		if (points.elementAt(index) != null) {
 			return getTableValue(points.elementAt(index) / 1000.);
-		}
-		else
+		} else
 			return GDE.STRING_STAR;
+	}
+
+	/**
+	 * @param value is the untranslated value (<em>intValue / 1000.</em>)
+	 * @return the formatted value also for GPS coordinates
+	 */
+	private String getFormattedTableValue(double value) {
+		final String formattedValue;
+		if (this.device.isGPSCoordinates(this.trailRecord)) {
+			// if (this.getDataType() == DataType.GPS_LATITUDE etc ???
+			if (this.trailRecord.getUnit().endsWith("'")) { //$NON-NLS-1$
+				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", this.device.translateValue(this, value)).trim(); //$NON-NLS-1$
+			} else {
+				formattedValue = String.format("%8.6f", this.device.translateValue(this, value)); //$NON-NLS-1$
+			}
+		} else {
+			formattedValue = this.getDecimalFormat().format(this.device.translateValue(this, value));
+		}
+		return formattedValue;
+	}
+
+	/**
+	 * @param index
+	 * @return the formatted value also for GPS coordinates
+	 */
+	public String getTableValue(int index) {
+		return getFormattedTableValue(this.trailRecord.realGet(index) / 1000.);
+	}
+
+	/**
+	 * @return the decimal format used by this record
+	 */
+	private DecimalFormat getDecimalFormat() {
+		if (this.trailRecord.getNumberFormat() == -1) this.trailRecord.setNumberFormat(-1); // update the number format to actual automatic formating
+		AbstractRecordSet parent = this.trailRecord.getAbstractParent();
+// if (log.isLoggable(Level.FINE))
+// log.log(Level.FINE, this.trailRecord.isScaleSynced() + " - " + parent.getSyncMasterRecordOrdinal(this.trailRecord.getName()));
+		return this.trailRecord.isScaleSynced() ? parent.get(parent.getSyncMasterRecordOrdinal(this.trailRecord.getName())).df : this.df;
 	}
 
 }
