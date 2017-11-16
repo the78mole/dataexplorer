@@ -742,7 +742,7 @@ public abstract class CommonRecord extends AbstractRecord {
 		if (this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
 		if (log.isLoggable(Level.FINE))
 			log.log(Level.FINE, this.isScaleSynced() + " - " + this.getAbstractParent().getSyncMasterRecordOrdinal(getName()));
-		return this.isScaleSynced() ? this.getAbstractParent().get(this.getAbstractParent().getSyncMasterRecordOrdinal(getName())).df : this.df;
+		return this.isScaleSynced() ? this.getAbstractParent().get(this.getAbstractParent().getSyncMasterRecordOrdinal(getName())).getRealDf() : this.df;
 	}
 
 	/**

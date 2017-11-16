@@ -19,6 +19,7 @@
 
 package gde.histo.recordings;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -328,10 +329,12 @@ public final class TrailRecord extends CommonRecord {
 	public boolean hasReasonableData() {
 		boolean hasReasonableData = false;
 		if (this.suiteRecords.getSuiteLength() == 0) {
-			hasReasonableData = this.realSize() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE && (this.minValue != this.maxValue || this.device.translateValue(this, this.maxValue / 1000.0) != 0.0);
+			hasReasonableData = this.realSize() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE //
+					&& (this.minValue != this.maxValue || RecordingsCollector.decodeVaultValue(this, this.maxValue / 1000.0) != 0.0);
 		} else {
 			for (SuiteRecord suiteRecord : this.suiteRecords.values()) {
-				if (suiteRecord.size() > 0 && suiteRecord.getMinRecordValue() != Integer.MAX_VALUE && suiteRecord.getMaxRecordValue() != Integer.MIN_VALUE && (suiteRecord.getMinRecordValue() != suiteRecord.getMaxRecordValue() || this.device.translateValue(this, suiteRecord.getMaxRecordValue() / 1000.0) != 0.0)) {
+				if (suiteRecord.size() > 0 && suiteRecord.getMinRecordValue() != Integer.MAX_VALUE && suiteRecord.getMaxRecordValue() != Integer.MIN_VALUE //
+						&& (suiteRecord.getMinRecordValue() != suiteRecord.getMaxRecordValue() || RecordingsCollector.decodeVaultValue(this, suiteRecord.getMaxRecordValue() / 1000.0) != 0.0)) {
 					hasReasonableData = true;
 					break;
 				}
@@ -409,12 +412,12 @@ public final class TrailRecord extends CommonRecord {
 	@Deprecated // not supported
 	@Override
 	public void setRoundOut(boolean enabled) {
- //		this.isRoundOut = enabled;
+		// this.isRoundOut = enabled;
 	}
 
 	@Override
 	public boolean isStartpointZero() {
-		 return this.isStartpointZero;
+		return this.isStartpointZero;
 	}
 
 	@Override
@@ -440,8 +443,8 @@ public final class TrailRecord extends CommonRecord {
 			this.maxScaleValue = this.maxDisplayValue = newMaxScaleValue;
 			this.minScaleValue = this.minDisplayValue = newMinScaleValue;
 		} else {
-			this.maxScaleValue = this.parentTrail.getDevice().translateValue(this, this.maxValue / 1000.0);
-			this.minScaleValue = this.parentTrail.getDevice().translateValue(this, this.minValue / 1000.0);
+			this.maxScaleValue =RecordingsCollector.decodeVaultValue(this, this.maxValue / 1000.0);
+			this.minScaleValue =RecordingsCollector.decodeVaultValue(this, this.minValue / 1000.0);
 		}
 	}
 
@@ -488,7 +491,7 @@ public final class TrailRecord extends CommonRecord {
 		Vector<Integer> points = this.getPoints();
 		for (int i = fromIndex; i < toIndex; i++) {
 			if (points.elementAt(i) != null) {
-				result.add(new Spot<Double>(this.parentTrail.getTime_ms(i), this.device.translateValue(this, points.elementAt(i) / 1000.)));
+				result.add(new Spot<Double>(this.parentTrail.getTime_ms(i), RecordingsCollector.decodeVaultValue(this, points.elementAt(i) / 1000.)));
 			}
 		}
 		log.finer(() -> Arrays.toString(result.toArray()));
@@ -576,6 +579,22 @@ public final class TrailRecord extends CommonRecord {
 	@Override
 	public String getFormattedScaleValue(double finalValue) {
 		return new TrailRecordFormatter(this).getScaleValue(finalValue);
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.data.AbstractRecord#getRealDf()
+	 */
+	@Override
+	public DecimalFormat getRealDf() {
+		return this.df;
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.data.AbstractRecord#setRealDf(java.text.DecimalFormat)
+	 */
+	@Override
+	public void setRealDf(DecimalFormat realDf) {
+		this.df = realDf;
 	}
 
 }

@@ -19,6 +19,7 @@
 
 package gde.data;
 
+import java.text.DecimalFormat;
 import java.util.Vector;
 
 import org.eclipse.swt.graphics.Color;
@@ -131,5 +132,15 @@ public abstract class AbstractRecord extends Vector<Integer> implements IRecord{
 	 * @return true if the record is the scale sync master and is visible
 	 */
 	public abstract boolean isScaleVisible();
+
+	/**
+	 * @return the decimal format of this record (without looking for synced records)
+	 */
+	public abstract DecimalFormat getRealDf();
+
+	/**
+	 * @param realDf is the decimal format of this record (without updating synced records)
+	 */
+	public abstract void setRealDf(DecimalFormat realDf);
 
 }

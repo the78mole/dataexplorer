@@ -613,11 +613,11 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 					}
 					break;
 				case Record.TYPE_AXIS_NUMBER_FORMAT:
-					DecimalFormat tmpDf = syncInputRecord.df;
+					DecimalFormat tmpDf = syncInputRecord.getRealDf();
 					int numberFormat = syncInputRecord.getNumberFormat();
 					for (AbstractRecord tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
 						synchronized (tmpRecord) {
-							tmpRecord.df = (DecimalFormat) tmpDf.clone();
+							tmpRecord.setRealDf((DecimalFormat) tmpDf.clone());
 							tmpRecord.setNumberFormat(numberFormat);
 						}
 					}

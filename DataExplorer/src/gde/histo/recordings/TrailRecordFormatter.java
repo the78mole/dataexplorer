@@ -23,7 +23,6 @@ import java.text.DecimalFormat;
 import java.util.Vector;
 
 import gde.GDE;
-import gde.data.AbstractRecordSet;
 import gde.device.IDevice;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
@@ -111,9 +110,9 @@ public final class TrailRecordFormatter {
 			if (this.trailRecord.getUnit().endsWith("'")) //$NON-NLS-1$
 				return StringHelper.getFormatedWithMinutes("%2d %04.1f", finalValue); //$NON-NLS-1$
 			else
-				return this.getDecimalFormat().format(finalValue);
+				return this.trailRecord.getDecimalFormat().format(finalValue);
 		} else
-			return this.getDecimalFormat().format(finalValue);
+			return this.trailRecord.getDecimalFormat().format(finalValue);
 	}
 
 	/**
@@ -161,7 +160,7 @@ public final class TrailRecordFormatter {
 				formattedValue = String.format("%8.6f", this.device.translateValue(this, value)); //$NON-NLS-1$
 			}
 		} else {
-			formattedValue = this.getDecimalFormat().format(this.device.translateValue(this, value));
+			formattedValue = this.trailRecord.getDecimalFormat().format(this.device.translateValue(this, value));
 		}
 		return formattedValue;
 	}
@@ -172,17 +171,6 @@ public final class TrailRecordFormatter {
 	 */
 	public String getTableValue(int index) {
 		return getFormattedTableValue(this.trailRecord.realGet(index) / 1000.);
-	}
-
-	/**
-	 * @return the decimal format used by this record
-	 */
-	private DecimalFormat getDecimalFormat() {
-		if (this.trailRecord.getNumberFormat() == -1) this.trailRecord.setNumberFormat(-1); // update the number format to actual automatic formating
-		AbstractRecordSet parent = this.trailRecord.getAbstractParent();
-// if (log.isLoggable(Level.FINE))
-// log.log(Level.FINE, this.trailRecord.isScaleSynced() + " - " + parent.getSyncMasterRecordOrdinal(this.trailRecord.getName()));
-		return this.trailRecord.isScaleSynced() ? parent.get(parent.getSyncMasterRecordOrdinal(this.trailRecord.getName())).df : this.df;
 	}
 
 }

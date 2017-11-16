@@ -2574,4 +2574,20 @@ public class Record extends AbstractRecord {
 		this.voltageValuesSize = newVoltageValuesSize;
 	}
 
+	/* (non-Javadoc)
+	 * @see gde.data.AbstractRecord#getRealDf()
+	 */
+	@Override
+	public DecimalFormat getRealDf() {
+		return this.df;
+	}
+
+	/* (non-Javadoc)
+	 * @see gde.data.AbstractRecord#setRealDf(java.text.DecimalFormat)
+	 */
+	@Override
+	public void setRealDf(DecimalFormat realDf) {
+		this.df = realDf;
+	}
+
 }
