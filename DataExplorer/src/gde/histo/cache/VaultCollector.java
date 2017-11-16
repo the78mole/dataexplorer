@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import gde.config.Settings;
+import gde.data.AbstractRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.ChannelPropertyType;
@@ -59,6 +60,39 @@ import gde.ui.DataExplorer;
 public final class VaultCollector {
 	final private static String	$CLASS_NAME	= VaultCollector.class.getName();
 	final private static Logger	log					= Logger.getLogger($CLASS_NAME);
+
+	/**
+	 * Reverse translate a measured value into a normalized histo vault value.</br>
+	 * Data types might require a special normalization (e.g. GPS coordinates).
+	 * This is the equivalent of {@code device.reverseTranslateValue} for data dedicated to the histo vault.
+	 * It determines the represented value
+	 * from a calculated trail value (e.g. a calculated scale end value).
+	 * @return the normalized histo vault value (as a multiplied int for fractional digits support)
+	 */
+	public static double encodeVaultValue(AbstractRecord record, double value) {
+		final double newValue;
+		if (DataExplorer.getInstance().getActiveDevice().isGPSCoordinates(record)) {
+			newValue = (int) (value * 1000.);
+		} else {
+			switch (record.getDataType()) {
+			// lat and lon only required if isGPSCoordinates is not implemented
+			case GPS_LATITUDE:
+			case GPS_LONGITUDE:
+				newValue = (int) (value * 1000.);
+				break;
+
+			default:
+				double factor = record.getFactor(); // != 1 if a unit translation is required
+				double offset = record.getOffset(); // != 0 if a unit translation is required
+				double reduction = record.getReduction(); // != 0 if a unit translation is required
+
+				newValue = (value - offset) / factor + reduction;
+				break;
+			}
+		}
+		Logger.getLogger(IDevice.class.getName()).fine(() -> "for " + record.getName() + " in value = " + value + " out value = " + newValue);
+		return newValue;
+	}
 
 	private ExtendedVault				vault;
 
@@ -272,12 +306,12 @@ public final class VaultCollector {
 					int deltaValue = record.getSumTriggeredRange();
 					double translatedValue = device.translateDeltaValue(record, deltaValue / 1000.); // standard division by 1000 ensures correct reduction /
 																																														// offset
-					trailPoints.put(TrailTypes.REAL_SUM_TRIGGERED, (int) (device.reverseTranslateValue(record, translatedValue) * 1000.));
+					trailPoints.put(TrailTypes.REAL_SUM_TRIGGERED, encodeMeasurementValue(record, translatedValue));
 				} else if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 					int deltaValue = record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal());
 					double translatedValue = device.translateDeltaValue(record, deltaValue / 1000.); // standard division by 1000 ensures correct reduction /
 																																														// offset
-					trailPoints.put(TrailTypes.REAL_SUM_TRIGGERED, (int) (device.reverseTranslateValue(record, translatedValue) * 1000.));
+					trailPoints.put(TrailTypes.REAL_SUM_TRIGGERED, encodeMeasurementValue(record, translatedValue));
 				}
 			}
 			if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
@@ -286,11 +320,11 @@ public final class VaultCollector {
 				if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
 					if (referencedStatistics.isAvg()) {
 						double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.) / device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.);
-						trailPoints.put(TrailTypes.REAL_MAX_RATIO_TRIGGERED, (int) (device.reverseTranslateValue(record, ratio) * 1000.));
+						trailPoints.put(TrailTypes.REAL_MAX_RATIO_TRIGGERED, encodeMeasurementValue(record, ratio));
 						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
 					} else if (referencedStatistics.isMax()) {
 						double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.) / device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.);
-						trailPoints.put(TrailTypes.REAL_MAX_RATIO_TRIGGERED, (int) (device.reverseTranslateValue(record, ratio) * 1000.));
+						trailPoints.put(TrailTypes.REAL_MAX_RATIO_TRIGGERED, encodeMeasurementValue(record, ratio));
 						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
 					}
 				}
@@ -298,14 +332,15 @@ public final class VaultCollector {
 		}
 		if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
 			int timeSum_ms = record.getTimeSumTriggeredRange_ms();
-			trailPoints.put(TrailTypes.REAL_TIME_SUM_TRIGGERED, (int) device.reverseTranslateValue(record, timeSum_ms));
-			// do not multiply by 1000 -> results in seconds
+			trailPoints.put(TrailTypes.REAL_TIME_SUM_TRIGGERED, encodeMeasurementValue(record, timeSum_ms / 1000.)); // -> results in seconds
 		}
 		if (measurementStatistics.isCountByTrigger() != null) {
 			int countValue = record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0;
-			trailPoints.put(TrailTypes.REAL_COUNT_TRIGGERED, (int) (device.reverseTranslateValue(record, countValue) * 1000.));
-			// multiply by 1000 -> all counters are internally stored multiplied by thousand
+			trailPoints.put(TrailTypes.REAL_COUNT_TRIGGERED, encodeMeasurementValue(record, countValue));
+			// all counters are internally stored multiplied by thousand
 		}
+
+		trailPoints.put(TrailTypes.REAL_COUNT, encodeMeasurementValue(record, encodeMeasurementValue(record, record.realSize())));
 
 		return trailPoints;
 	}
@@ -330,25 +365,25 @@ public final class VaultCollector {
 				? Double.parseDouble(channelProperty2.getValue()) : SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
 		// invoke translation because of GPS coordinates (decimal fraction range is x.0000 to x.5999 [recurring decimal])
 		UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), isSampled, sigmaFactor, outlierFactor);
-		trailPoints.put(TrailTypes.AVG, (int) (device.reverseTranslateValue(record, quantile.getAvgFigure()) * 1000.));
-		trailPoints.put(TrailTypes.MAX, (int) (device.reverseTranslateValue(record, quantile.getPopulationMaxFigure()) * 1000.));
-		trailPoints.put(TrailTypes.MIN, (int) (device.reverseTranslateValue(record, quantile.getPopulationMinFigure()) * 1000.));
-		trailPoints.put(TrailTypes.SD, (int) (device.reverseTranslateValue(record, quantile.getSigmaFigure()) * 1000.));
-		trailPoints.put(TrailTypes.Q0, (int) (device.reverseTranslateValue(record, quantile.getQuartile0()) * 1000.));
-		trailPoints.put(TrailTypes.Q1, (int) (device.reverseTranslateValue(record, quantile.getQuartile1()) * 1000.));
-		trailPoints.put(TrailTypes.Q2, (int) (device.reverseTranslateValue(record, quantile.getQuartile2()) * 1000.));
-		trailPoints.put(TrailTypes.Q3, (int) (device.reverseTranslateValue(record, quantile.getQuartile3()) * 1000.));
-		trailPoints.put(TrailTypes.Q4, (int) (device.reverseTranslateValue(record, quantile.getQuartile4()) * 1000.));
-		trailPoints.put(TrailTypes.Q_25_PERMILLE, (int) (device.reverseTranslateValue(record, quantile.getQuantile(.025)) * 1000.));
-		trailPoints.put(TrailTypes.Q_975_PERMILLE, (int) (device.reverseTranslateValue(record, quantile.getQuantile(.975)) * 1000.));
-		trailPoints.put(TrailTypes.Q_LOWER_WHISKER, (int) (device.reverseTranslateValue(record, quantile.getQuantileLowerWhisker()) * 1000.));
-		trailPoints.put(TrailTypes.Q_UPPER_WHISKER, (int) (device.reverseTranslateValue(record, quantile.getQuantileUpperWhisker()) * 1000.));
+		trailPoints.put(TrailTypes.AVG, encodeMeasurementValue(record, quantile.getAvgFigure()));
+		trailPoints.put(TrailTypes.MAX, encodeMeasurementValue(record, quantile.getPopulationMaxFigure()));
+		trailPoints.put(TrailTypes.MIN, encodeMeasurementValue(record, quantile.getPopulationMinFigure()));
+		trailPoints.put(TrailTypes.SD, encodeMeasurementValue(record, quantile.getSigmaFigure()));
+		trailPoints.put(TrailTypes.Q0, encodeMeasurementValue(record, quantile.getQuartile0()));
+		trailPoints.put(TrailTypes.Q1, encodeMeasurementValue(record, quantile.getQuartile1()));
+		trailPoints.put(TrailTypes.Q2, encodeMeasurementValue(record, quantile.getQuartile2()));
+		trailPoints.put(TrailTypes.Q3, encodeMeasurementValue(record, quantile.getQuartile3()));
+		trailPoints.put(TrailTypes.Q4, encodeMeasurementValue(record, quantile.getQuartile4()));
+		trailPoints.put(TrailTypes.Q_25_PERMILLE, encodeMeasurementValue(record, quantile.getQuantile(.025)));
+		trailPoints.put(TrailTypes.Q_975_PERMILLE, encodeMeasurementValue(record, quantile.getQuantile(.975)));
+		trailPoints.put(TrailTypes.Q_LOWER_WHISKER, encodeMeasurementValue(record, quantile.getQuantileLowerWhisker()));
+		trailPoints.put(TrailTypes.Q_UPPER_WHISKER, encodeMeasurementValue(record, quantile.getQuantileUpperWhisker()));
 
-		trailPoints.put(TrailTypes.FIRST, (int) (device.reverseTranslateValue(record, quantile.getFirstFigure()) * 1000.));
-		trailPoints.put(TrailTypes.LAST, (int) (device.reverseTranslateValue(record, quantile.getLastFigure()) * 1000.));
+		trailPoints.put(TrailTypes.FIRST, encodeMeasurementValue(record, quantile.getFirstFigure()));
+		trailPoints.put(TrailTypes.LAST, encodeMeasurementValue(record, quantile.getLastFigure()));
 		// trigger trail types sum are not supported for measurements
-		trailPoints.put(TrailTypes.SUM, (int) (0 * 1000.));
-		trailPoints.put(TrailTypes.COUNT, (int) (device.reverseTranslateValue(record, quantile.getSize()) * 1000.));
+		trailPoints.put(TrailTypes.SUM, 0);
+		trailPoints.put(TrailTypes.COUNT, encodeMeasurementValue(record, quantile.getSize()));
 
 		return trailPoints;
 	}
@@ -378,31 +413,31 @@ public final class VaultCollector {
 						? Double.parseDouble(channelProperty2.getValue()) : SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
 				UniversalQuantile<Double> quantile = new UniversalQuantile<>(histoSettlement.getTranslatedValues(), true, sigmaFactor, outlierFactor);
 
-				entryPoints.addPoint(TrailTypes.REAL_AVG, (int) (histoSettlement.reverseTranslateValue(quantile.getAvgFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.REAL_MAX, (int) (histoSettlement.reverseTranslateValue(quantile.getPopulationMaxFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.REAL_MIN, (int) (histoSettlement.reverseTranslateValue(quantile.getPopulationMinFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.REAL_SD, (int) (histoSettlement.reverseTranslateValue(quantile.getSigmaFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.REAL_SUM, (int) (histoSettlement.reverseTranslateValue(quantile.getSumFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.REAL_COUNT, (int) (histoSettlement.reverseTranslateValue(quantile.getSize() * 1000) * 1000.));
+				entryPoints.addPoint(TrailTypes.REAL_AVG, encodeSettlementValue(histoSettlement, quantile.getAvgFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_MAX, encodeSettlementValue(histoSettlement, quantile.getPopulationMaxFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_MIN, encodeSettlementValue(histoSettlement, quantile.getPopulationMinFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_SD, encodeSettlementValue(histoSettlement, quantile.getSigmaFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_SUM, encodeSettlementValue(histoSettlement, quantile.getSumFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_COUNT, encodeSettlementValue(histoSettlement, quantile.getSize()));
 
-				entryPoints.addPoint(TrailTypes.AVG, (int) (histoSettlement.reverseTranslateValue(quantile.getAvgFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.MAX, (int) (histoSettlement.reverseTranslateValue(quantile.getPopulationMaxFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.MIN, (int) (histoSettlement.reverseTranslateValue(quantile.getPopulationMinFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.SD, (int) (histoSettlement.reverseTranslateValue(quantile.getSigmaFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.Q0, (int) (histoSettlement.reverseTranslateValue(quantile.getQuartile0()) * 1000.));
-				entryPoints.addPoint(TrailTypes.Q1, (int) (histoSettlement.reverseTranslateValue(quantile.getQuartile1()) * 1000.));
-				entryPoints.addPoint(TrailTypes.Q2, (int) (histoSettlement.reverseTranslateValue(quantile.getQuartile2()) * 1000.));
-				entryPoints.addPoint(TrailTypes.Q3, (int) (histoSettlement.reverseTranslateValue(quantile.getQuartile3()) * 1000.));
-				entryPoints.addPoint(TrailTypes.Q4, (int) (histoSettlement.reverseTranslateValue(quantile.getQuartile4()) * 1000.));
-				entryPoints.addPoint(TrailTypes.Q_25_PERMILLE, (int) (histoSettlement.reverseTranslateValue(quantile.getQuantile(.025)) * 1000.));
-				entryPoints.addPoint(TrailTypes.Q_975_PERMILLE, (int) (histoSettlement.reverseTranslateValue(quantile.getQuantile(.975)) * 1000.));
-				entryPoints.addPoint(TrailTypes.Q_LOWER_WHISKER, (int) (histoSettlement.reverseTranslateValue(quantile.getQuantileLowerWhisker()) * 1000.));
-				entryPoints.addPoint(TrailTypes.Q_UPPER_WHISKER, (int) (histoSettlement.reverseTranslateValue(quantile.getQuantileUpperWhisker()) * 1000.));
+				entryPoints.addPoint(TrailTypes.AVG, encodeSettlementValue(histoSettlement, quantile.getAvgFigure()));
+				entryPoints.addPoint(TrailTypes.MAX, encodeSettlementValue(histoSettlement, quantile.getPopulationMaxFigure()));
+				entryPoints.addPoint(TrailTypes.MIN, encodeSettlementValue(histoSettlement, quantile.getPopulationMinFigure()));
+				entryPoints.addPoint(TrailTypes.SD, encodeSettlementValue(histoSettlement, quantile.getSigmaFigure()));
+				entryPoints.addPoint(TrailTypes.Q0, encodeSettlementValue(histoSettlement, quantile.getQuartile0()));
+				entryPoints.addPoint(TrailTypes.Q1, encodeSettlementValue(histoSettlement, quantile.getQuartile1()));
+				entryPoints.addPoint(TrailTypes.Q2, encodeSettlementValue(histoSettlement, quantile.getQuartile2()));
+				entryPoints.addPoint(TrailTypes.Q3, encodeSettlementValue(histoSettlement, quantile.getQuartile3()));
+				entryPoints.addPoint(TrailTypes.Q4, encodeSettlementValue(histoSettlement, quantile.getQuartile4()));
+				entryPoints.addPoint(TrailTypes.Q_25_PERMILLE, encodeSettlementValue(histoSettlement, quantile.getQuantile(.025)));
+				entryPoints.addPoint(TrailTypes.Q_975_PERMILLE, encodeSettlementValue(histoSettlement, quantile.getQuantile(.975)));
+				entryPoints.addPoint(TrailTypes.Q_LOWER_WHISKER, encodeSettlementValue(histoSettlement, quantile.getQuantileLowerWhisker()));
+				entryPoints.addPoint(TrailTypes.Q_UPPER_WHISKER, encodeSettlementValue(histoSettlement, quantile.getQuantileUpperWhisker()));
 
-				entryPoints.addPoint(TrailTypes.FIRST, (int) (histoSettlement.reverseTranslateValue(quantile.getFirstFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.LAST, (int) (histoSettlement.reverseTranslateValue(quantile.getLastFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.SUM, (int) (histoSettlement.reverseTranslateValue(quantile.getSumFigure()) * 1000.));
-				entryPoints.addPoint(TrailTypes.COUNT, (int) (histoSettlement.reverseTranslateValue(quantile.getSize()) * 1000.));
+				entryPoints.addPoint(TrailTypes.FIRST, encodeSettlementValue(histoSettlement, quantile.getFirstFigure()));
+				entryPoints.addPoint(TrailTypes.LAST, encodeSettlementValue(histoSettlement, quantile.getLastFigure()));
+				entryPoints.addPoint(TrailTypes.SUM, encodeSettlementValue(histoSettlement, quantile.getSumFigure()));
+				entryPoints.addPoint(TrailTypes.COUNT, encodeSettlementValue(histoSettlement, quantile.getSize()));
 			}
 			log.finer(() -> histoSettlement.getName() + " data " + this.vault.getSettlements()); //$NON-NLS-1$
 		}
@@ -420,6 +455,23 @@ public final class VaultCollector {
 			}
 		}
 		log.fine(() -> "scores " + this.vault.getScores()); //$NON-NLS-1$
+	}
+
+	private int encodeMeasurementValue(Record record, double value) {
+		// todo harmonize encodeVaultValue methods later
+		return (int) (encodeVaultValue(record, value) * 1000.);
+	}
+
+	/**
+	 * Function to translate values represented into normalized settlement values.
+	 * Does not support settlements based on GPS-longitude or GPS-latitude.
+	 * @return double of settlement dependent value
+	 */
+	public int encodeSettlementValue(SettlementRecord record, double value) {
+		// todo harmonize encodeVaultValue methods later
+		// todo support settlements based on GPS-longitude or GPS-latitude with a base class common for Record, TrailRecord and Settlement
+		double newValue = (value - record.getOffset()) / record.getFactor() + record.getReduction();
+		return (int) (newValue * 1000.);
 	}
 
 	public boolean isConsistentDevice() {

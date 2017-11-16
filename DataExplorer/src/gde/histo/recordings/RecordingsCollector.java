@@ -63,7 +63,7 @@ public final class RecordingsCollector {
 	 */
 	public static void addVaults(TrailRecordSet trailRecordSet) {
 		for (String recordName : trailRecordSet.getRecordNames()) {
-			TrailRecord trailRecord = (TrailRecord) trailRecordSet.get(recordName);
+			TrailRecord trailRecord = trailRecordSet.get(recordName);
 			if (trailRecord.getTrailSelector().getTrailType().isSuite()) {
 				trailRecord.setSuite(trailRecordSet.getHistoVaults().size());
 			}
@@ -73,7 +73,7 @@ public final class RecordingsCollector {
 				trailRecordSet.addVaultHeader(histoVault);
 
 				for (String recordName : trailRecordSet.getRecordNames()) {
-					addVault(histoVault, (TrailRecord) trailRecordSet.get(recordName));
+					addVault(histoVault, trailRecordSet.get(recordName));
 				}
 			}
 		}
@@ -142,6 +142,38 @@ public final class RecordingsCollector {
 	}
 
 	/**
+	 * Translate a normalized histo vault value into to values represented. </br>
+	 * Data types might require a special normalization (e.g. GPS coordinates).
+	 * This is the equivalent of {@code device.translateValue} for data dedicated to the histo vault.
+	 * @return double of device dependent value
+	 */
+	public static double decodeVaultValue(TrailRecord record, double value) {
+		// todo move into TrailRecord if devices do not require any special logic
+		final double newValue;
+		if (application.getActiveDevice().isGPSCoordinates(record)) {
+			newValue = value / 1000.;
+		} else {
+			switch (record.getDataType()) {
+			// lat and lon only required if isGPSCoordinates is not implemented
+			case GPS_LATITUDE:
+			case GPS_LONGITUDE:
+				newValue = value / 1000.;
+				break;
+
+			default:
+				double factor = record.getFactor(); // != 1 if a unit translation is required
+				double offset = record.getOffset(); // != 0 if a unit translation is required
+				double reduction = record.getReduction(); // != 0 if a unit translation is required
+
+				newValue = (value - reduction) * factor + offset;
+				break;
+			}
+		}
+		Logger.getLogger(IDevice.class.getName()).fine(() -> "for " + record.getName() + " in value = " + value + " out value = " + newValue);
+		return newValue;
+	}
+
+	/**
 	 * Support adding / subtracting trail values from a preceding suite master record.
 	 * @param trailType
 	 * @param previousFactor the summation factor from the last iteration
@@ -160,15 +192,14 @@ public final class RecordingsCollector {
 	 * Support asynchronous geocode fetches from the internet.
 	 */
 	public static void setGpsLocationsTags(TrailRecordSet trailRecordSet) {
-		IDevice device = DataExplorer.application.getActiveDevice();
 		String[] recordNames = trailRecordSet.getRecordNames();
 		// locate the GPS coordinates records
 		TrailRecord latitudeRecord = null, longitudeRecord = null;
 		for (String recordName : recordNames) { // todo fill HistoVault's DataType and access via DataType without hard coded measurement names
 			if (recordName.toLowerCase().contains("latitud")) //$NON-NLS-1$
-				latitudeRecord = (TrailRecord) trailRecordSet.get(recordName);
+				latitudeRecord = trailRecordSet.get(recordName);
 			else if (recordName.toLowerCase().contains("longitud")) //$NON-NLS-1$
-				longitudeRecord = (TrailRecord) trailRecordSet.get(recordName);
+				longitudeRecord = trailRecordSet.get(recordName);
 			if (latitudeRecord != null && longitudeRecord != null) break;
 		}
 
@@ -180,12 +211,14 @@ public final class RecordingsCollector {
 					Integer latitudePoint = histoVault.getMeasurementPoint(latitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
 					Integer longitudePoint = histoVault.getMeasurementPoint(longitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
 
-					if (latitudePoint != null && longitudePoint != null)
-						gpsCluster.add(new GpsCoordinate(device.translateValue(latitudeRecord, latitudePoint / 1000.),
-								device.translateValue(longitudeRecord, longitudePoint / 1000.)));
-					else
+					if (latitudePoint != null && longitudePoint != null) {
+						// todo why division by 1000?
+						gpsCluster.add(new GpsCoordinate(decodeVaultValue(latitudeRecord, latitudePoint / 1000.),
+								decodeVaultValue(longitudeRecord, longitudePoint / 1000.)));
+					} else {
 						gpsCluster.add(null); // this keeps the sequence in parallel with the vaults sequence
 				}
+			}
 			}
 			// populate the GPS locations list for subsequently filling the histo table
 			if (gpsCluster.parallelStream().filter(Objects::nonNull).count() > 0) {
@@ -224,7 +257,7 @@ public final class RecordingsCollector {
 	public static void defineTrailTypes(TrailRecordSet trailRecordSet) {
 		String[] trailRecordNames = trailRecordSet.getRecordNames();
 		for (String trailRecordName : trailRecordNames) {
-			TrailRecord trailRecord = ((TrailRecord) trailRecordSet.get(trailRecordName));
+			TrailRecord trailRecord = (trailRecordSet.get(trailRecordName));
 			trailRecord.getTrailSelector().setApplicableTrailTypes();
 			applyTemplateTrailData(trailRecord);
 		}

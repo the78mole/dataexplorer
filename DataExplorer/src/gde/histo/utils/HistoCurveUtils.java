@@ -37,8 +37,10 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
 import gde.device.resource.DeviceXmlResource;
+import gde.histo.cache.VaultCollector;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.PointArray;
+import gde.histo.recordings.RecordingsCollector;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.utils.HistoTimeLine.Density;
@@ -112,8 +114,8 @@ public final class HistoCurveUtils {
 		if (record.isStartEndDefined()) {
 			yMinValueDisplay = record.getMinScaleValue();
 			yMaxValueDisplay = record.getMaxScaleValue();
-			yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
-			yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
+			yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
+			yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
 			if (log.isLoggable(FINE)) log.log(FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 			if (log.isLoggable(FINE)) log.log(FINE, "defined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
@@ -121,8 +123,8 @@ public final class HistoCurveUtils {
 				if (!record.getTrailSelector().isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
 					; // in case of an empty record leave the values unchanged
 				else {
-					yMinValueDisplay = device.translateValue(record, yMinValue);
-					yMaxValueDisplay = device.translateValue(record, yMaxValue);
+					yMinValueDisplay = RecordingsCollector.decodeVaultValue(record, yMinValue);
+					yMaxValueDisplay = RecordingsCollector.decodeVaultValue(record, yMaxValue);
 				}
 				if (log.isLoggable(FINE)) log.log(FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -135,8 +137,8 @@ public final class HistoCurveUtils {
 				yMaxValueDisplay = (Double) roundResult[1];
 				numberTicks = (Integer) roundResult[2];
 				miniticks = (Integer) roundResult[3];
-				yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
-				yMaxValue = device.reverseTranslateValue(record, yMaxValueDisplay);
+				yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
+				yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
 				if (log.isLoggable(FINE)) log.log(FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
 				if (log.isLoggable(FINE)) log.log(FINE, "rounded -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -144,10 +146,10 @@ public final class HistoCurveUtils {
 				// check if the main part of the curve is on positive side
 				if (record.getAvgValue() > 0) { // main part of curve is on positive side
 					yMinValueDisplay = 0;
-					yMinValue = yMinValueDisplay - record.getOffset();
+					yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
 				} else {// main part of curve is on negative side
 					yMaxValueDisplay = 0;
-					yMaxValue = yMaxValueDisplay - record.getOffset();
+					yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
 				}
 				if (log.isLoggable(FINE)) log.log(FINE, "scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 				if (log.isLoggable(FINE))

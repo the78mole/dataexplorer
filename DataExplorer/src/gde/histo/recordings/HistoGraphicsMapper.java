@@ -26,6 +26,7 @@ import java.util.Vector;
 
 import org.eclipse.swt.graphics.Point;
 
+import gde.histo.cache.VaultCollector;
 import gde.histo.utils.HistoTimeLine;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -167,13 +168,12 @@ public final class HistoGraphicsMapper {
 
 	public int getVerticalDisplayPos(double translatedValue) {
 		int verticalDisplayPos;
-
-		int point = (int) (DataExplorer.application.getActiveDevice().reverseTranslateValue(this.trailRecord, translatedValue) * 1000.);
+		double point = VaultCollector.encodeVaultValue(this.trailRecord, translatedValue);
 		if (DataExplorer.application.getActiveDevice().isGPSCoordinates(this.trailRecord)) {
-			double decimalDegreeValue = point / 1000000 + point % 1000000 / 600000.;
+			double decimalDegreeValue = point / 1000 + point % 1000 / 600.;
 			verticalDisplayPos = this.trailRecord.getParentTrail().getDrawAreaBounds().height - (int) ((decimalDegreeValue * 1000. - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue());
 		} else {
-			verticalDisplayPos = this.trailRecord.getParentTrail().getDrawAreaBounds().height - (int) ((point / 1000.0 - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue());
+			verticalDisplayPos = this.trailRecord.getParentTrail().getDrawAreaBounds().height - (int) ((point - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue());
 		}
 		log.finer(() -> String.format("translatedValue=%f reverseTranslatedPoint=%d yPos=%d", translatedValue, point, verticalDisplayPos)); //$NON-NLS-1$
 		return verticalDisplayPos;

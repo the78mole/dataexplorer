@@ -155,12 +155,12 @@ public final class TrailRecordFormatter {
 		if (this.device.isGPSCoordinates(this.trailRecord)) {
 			// if (this.getDataType() == DataType.GPS_LATITUDE etc ???
 			if (this.trailRecord.getUnit().endsWith("'")) { //$NON-NLS-1$
-				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", this.device.translateValue(this, value)).trim(); //$NON-NLS-1$
+				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", RecordingsCollector.decodeVaultValue(this.trailRecord, value)).trim(); //$NON-NLS-1$
 			} else {
-				formattedValue = String.format("%8.6f", this.device.translateValue(this, value)); //$NON-NLS-1$
+				formattedValue = String.format("%8.6f", RecordingsCollector.decodeVaultValue(this.trailRecord, value)); //$NON-NLS-1$
 			}
 		} else {
-			formattedValue = this.trailRecord.getDecimalFormat().format(this.device.translateValue(this, value));
+			formattedValue = this.trailRecord.getDecimalFormat().format(RecordingsCollector.decodeVaultValue(this.trailRecord, value));
 		}
 		return formattedValue;
 	}

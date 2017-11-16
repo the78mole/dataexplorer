@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Vector;
 
 import gde.GDE;
+import gde.data.AbstractRecord;
 import gde.data.CommonRecord;
 import gde.data.Record;
 import gde.device.IDevice;
@@ -306,20 +307,28 @@ public final class TrailRecord extends CommonRecord {
 		this.minScaleValue = newMinScaleValue;
 	}
 
-	/**
-	 * @param newMinDisplayValue the minDisplayValue to set
-	 */
 	@Override
 	public void setMinDisplayValue(double newMinDisplayValue) {
-		throw new UnsupportedOperationException();
+		this.minDisplayValue = RecordingsCollector.decodeVaultValue(this, newMinDisplayValue) * 1000;
+
+		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
+			for (AbstractRecord tmpRecord : this.getAbstractParent().getScaleSyncedRecords(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
+				TrailRecord record = (TrailRecord) tmpRecord;
+				record.minDisplayValue = this.minDisplayValue;
+			}
+		}
 	}
 
-	/**
-	 * @param newMaxDisplayValue the maxDisplayValue to set
-	 */
 	@Override
 	public void setMaxDisplayValue(double newMaxDisplayValue) {
-		throw new UnsupportedOperationException();
+		this.maxDisplayValue = RecordingsCollector.decodeVaultValue(this, newMaxDisplayValue) * 1000;
+
+		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
+			for (AbstractRecord tmpRecord : this.getAbstractParent().getScaleSyncedRecords(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
+				TrailRecord record = (TrailRecord) tmpRecord;
+				record.maxDisplayValue = this.maxDisplayValue;
+			}
+		}
 	}
 
 	/**
@@ -443,8 +452,8 @@ public final class TrailRecord extends CommonRecord {
 			this.maxScaleValue = this.maxDisplayValue = newMaxScaleValue;
 			this.minScaleValue = this.minDisplayValue = newMinScaleValue;
 		} else {
-			this.maxScaleValue =RecordingsCollector.decodeVaultValue(this, this.maxValue / 1000.0);
-			this.minScaleValue =RecordingsCollector.decodeVaultValue(this, this.minValue / 1000.0);
+			this.maxScaleValue = RecordingsCollector.decodeVaultValue(this, this.maxValue / 1000.0);
+			this.minScaleValue = RecordingsCollector.decodeVaultValue(this, this.minValue / 1000.0);
 		}
 	}
 
