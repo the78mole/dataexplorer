@@ -623,10 +623,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	@Override
 	public abstract void setNumberFormat(int newNumberFormat);
 
-	/**
-	 * Temporarily used as long as we have no common abstract class of Record and TrailRecord or no common interface of Record and TrailRecord.
-	 * @return the parent also for TrailRecord instances
-	 */
 	@Override
 	public AbstractRecordSet getAbstractParent() {
 		return this.parent;

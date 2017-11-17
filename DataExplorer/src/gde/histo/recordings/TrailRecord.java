@@ -52,7 +52,6 @@ public final class TrailRecord extends CommonRecord {
 
 	public final static String		TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
 
-	private final TrailRecordSet	parentTrail;
 	private final MeasurementType	measurementType;																			// measurement / settlement / scoregroup are options
 	private final SettlementType	settlementType;																				// measurement / settlement / scoregroup are options
 	private final ScoreGroupType	scoreGroupType;																				// measurement / settlement / scoregroup are options
@@ -78,8 +77,7 @@ public final class TrailRecord extends CommonRecord {
 		super(newDevice, newOrdinal, newName, measurementType.getSymbol(), measurementType.getUnit(), measurementType.isActive(), null,
 				measurementType.getProperty(), initialCapacity);
 		log.fine(() -> measurementType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, MeasurementType measurementType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
-		this.parentTrail = parentTrail;
-		super.parent = null; // we currently have no common abstract class of Record and TrailRecord or no common interface of Record and TrailRecord
+		super.parent = parentTrail;
 		this.measurementType = measurementType;
 		this.settlementType = null;
 		this.scoreGroupType = null;
@@ -100,8 +98,7 @@ public final class TrailRecord extends CommonRecord {
 		super(newDevice, newOrdinal, newName, settlementType.getSymbol(), settlementType.getUnit(), settlementType.isActive(), null,
 				settlementType.getProperty(), initialCapacity);
 		log.fine(() -> settlementType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, SettlementType settlementType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
-		this.parentTrail = parentTrail;
-		super.parent = null;
+		super.parent = parentTrail;
 		this.measurementType = null;
 		this.settlementType = settlementType;
 		this.scoreGroupType = null;
@@ -123,8 +120,7 @@ public final class TrailRecord extends CommonRecord {
 		super(newDevice, newOrdinal, newName, scoregroupType.getSymbol(), scoregroupType.getUnit(), scoregroupType.isActive(), null,
 				scoregroupType.getProperty(), initialCapacity);
 		log.fine(() -> scoregroupType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, ScoregroupType scoregroupType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
-		this.parentTrail = parentTrail;
-		super.parent = null;
+		super.parent = parentTrail;
 		this.measurementType = null;
 		this.settlementType = null;
 		this.scoreGroupType = scoregroupType;
@@ -215,7 +211,7 @@ public final class TrailRecord extends CommonRecord {
 				this.factor = this.measurementType.getFactor();
 			} else
 				try {
-					this.factor = this.getDevice().getMeasurementFactor(this.parentTrail.getChannelConfigNumber(), this.ordinal);
+					this.factor = this.getDevice().getMeasurementFactor(this.parent.getChannelConfigNumber(), this.ordinal);
 				} catch (RuntimeException e) {
 					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
 				}
@@ -238,7 +234,7 @@ public final class TrailRecord extends CommonRecord {
 				this.offset = this.measurementType.getOffset();
 			else
 				try {
-					this.offset = this.getDevice().getMeasurementOffset(this.parentTrail.getChannelConfigNumber(), this.ordinal);
+					this.offset = this.getDevice().getMeasurementOffset(this.parent.getChannelConfigNumber(), this.ordinal);
 				} catch (RuntimeException e) {
 					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
 				}
@@ -261,7 +257,7 @@ public final class TrailRecord extends CommonRecord {
 				this.reduction = this.measurementType.getReduction();
 			else
 				try {
-					String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.parentTrail.getChannelConfigNumber(), this.ordinal, IDevice.REDUCTION);
+					String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.parent.getChannelConfigNumber(), this.ordinal, IDevice.REDUCTION);
 					if (strValue != null && strValue.length() > 0) this.reduction = Double.parseDouble(strValue.trim().replace(',', '.'));
 				} catch (RuntimeException e) {
 					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
@@ -407,10 +403,6 @@ public final class TrailRecord extends CommonRecord {
 		return this.syncMasterFactor;
 	}
 
-	public TrailRecordSet getParentTrail() {
-		return this.parentTrail;
-	}
-
 	@Deprecated // not supported
 	@Override
 	public boolean isRoundOut() {
@@ -482,6 +474,13 @@ public final class TrailRecord extends CommonRecord {
 	}
 
 	/**
+	 * @return the parent
+	 */
+	public TrailRecordSet getParentTrail() {
+		return (TrailRecordSet) this.parent;
+	}
+
+	/**
 	 * Supports suites.
 	 * @param timeStamp1_ms
 	 * @param timeStamp2_ms
@@ -500,7 +499,7 @@ public final class TrailRecord extends CommonRecord {
 		Vector<Integer> points = this.getPoints();
 		for (int i = fromIndex; i < toIndex; i++) {
 			if (points.elementAt(i) != null) {
-				result.add(new Spot<Double>(this.parentTrail.getTime_ms(i), RecordingsCollector.decodeVaultValue(this, points.elementAt(i) / 1000.)));
+				result.add(new Spot<Double>(this.parent.getTime_ms(i), RecordingsCollector.decodeVaultValue(this, points.elementAt(i) / 1000.)));
 			}
 		}
 		log.finer(() -> Arrays.toString(result.toArray()));
@@ -512,7 +511,7 @@ public final class TrailRecord extends CommonRecord {
 	 * @return the index fitting exactly to the timeStamp
 	 */
 	public int getIndex(long timeStamp_ms) {
-		return this.parentTrail.getIndex(timeStamp_ms);
+		return this.getParentTrail().getIndex(timeStamp_ms);
 	}
 
 	/**
