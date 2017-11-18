@@ -15,6 +15,8 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
+import gde.GDE;
+import gde.device.resource.DeviceXmlResource;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 
@@ -295,6 +297,14 @@ public enum TrailTypes {
 		return this.suiteMembers[index];
 	}
 
+	public TrailTypes[] getMembers() {
+		if (this.suiteMembers.length == 0) {
+			return new TrailTypes[] {this} ;
+		}
+		else
+			return this.suiteMembers;
+	}
+
 	public boolean isRangePlot() {
 		return this.suiteMembers.length == RANGE_PLOT_SIZE;
 	}
@@ -310,6 +320,35 @@ public enum TrailTypes {
 	public String getDisplayName() {
 		return this.displayName;
 	}
+
+	public String getDisplayNameWithTriggerText(IChannelItem channelItem) {
+		if (this.isTriggered()) {
+			StatisticsType measurementStatistics = ((MeasurementType) channelItem).getStatistics();
+			if (this.equals(TrailTypes.REAL_COUNT_TRIGGERED)) {
+				return getDeviceXmlReplacement(measurementStatistics.getCountTriggerText());
+			} else if (this.equals(TrailTypes.REAL_SUM_TRIGGERED)) {
+				return getDeviceXmlReplacement(measurementStatistics.getSumTriggerText());
+			} else if (this.equals(TrailTypes.REAL_TIME_SUM_TRIGGERED)) {
+				return getDeviceXmlReplacement(measurementStatistics.getSumTriggerTimeText());
+			} else if (this.equals(TrailTypes.REAL_AVG_RATIO_TRIGGERED)) {
+				return getDeviceXmlReplacement(measurementStatistics.getRatioText());
+			} else if (this.equals(TrailTypes.REAL_MAX_RATIO_TRIGGERED)) {
+				return getDeviceXmlReplacement(measurementStatistics.getRatioText());
+			} else
+				throw new UnsupportedOperationException("TrailTypes.isTriggered"); //$NON-NLS-1$
+		} else {
+			return this.displayName;
+		}
+	}
+
+	/**
+	 * @param replacementKey
+	 * @return the replacement name of the specified key or an empty string if there is no key entry
+	 */
+	private String getDeviceXmlReplacement(String replacementKey) {
+		return replacementKey != null ? DeviceXmlResource.getInstance().getReplacement(replacementKey) : GDE.STRING_EMPTY;
+	}
+
 
 	public boolean isForSummation() {
 		return this.isForSummation;
