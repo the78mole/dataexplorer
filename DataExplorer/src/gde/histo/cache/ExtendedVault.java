@@ -27,8 +27,6 @@ import java.util.HashMap;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.TrailTypes;
-import gde.histo.recordings.TrailRecord;
 import gde.histo.utils.SecureHash;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -303,27 +301,6 @@ public final class ExtendedVault extends HistoVault {
 	 */
 	public Integer getScorePoint(int scoreLabelOrdinal) {
 		return this.getScores().get(scoreLabelOrdinal).getValue();
-	}
-
-	/**
-	 * @param trailRecord
-	 * @param trailType
-	 * @return the vault value for the selected trail type
-	 */
-	public Integer getPoint(TrailRecord trailRecord, TrailTypes trailType) {
-		Integer point;
-		if (trailRecord.isMeasurement())
-			point = getMeasurementPoint(trailRecord.getOrdinal(), trailType.ordinal());
-		else if (trailRecord.isSettlement())
-			point = getSettlementPoint(trailRecord.getSettlement().getSettlementId(), trailType.ordinal());
-		else if (trailRecord.isScoreGroup()) {
-			point = getScorePoint(trailType.ordinal());
-		} else
-			throw new UnsupportedOperationException();
-
-		log.finest(() -> String.format(" %s trail %3d  %s %s", //$NON-NLS-1$
-				trailRecord.getName(), trailRecord.getTrailSelector().getTrailOrdinal(), getVaultFileName(), getLogFilePath()));
-		return point;
 	}
 
 	/**

@@ -28,16 +28,15 @@ import java.util.Vector;
 import gde.GDE;
 import gde.data.AbstractRecord;
 import gde.data.CommonRecord;
-import gde.data.Record;
+import gde.device.IChannelItem;
 import gde.device.IDevice;
-import gde.device.MeasurementType;
 import gde.device.PropertyType;
-import gde.device.ScoreGroupType;
-import gde.device.SettlementType;
 import gde.device.TrailTypes;
 import gde.device.resource.DeviceXmlResource;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.utils.Spot;
 import gde.log.Logger;
+import gde.ui.DataExplorer;
 
 /**
  * Hold histo data points of one measurement or settlement; score points are a third option.
@@ -45,94 +44,32 @@ import gde.log.Logger;
  * Supports suites, i.e. records for multiple trails for combined curves.
  * @author Thomas Eickert
  */
-public final class TrailRecord extends CommonRecord {
-	private final static String		$CLASS_NAME					= TrailRecord.class.getName();
-	private final static long			serialVersionUID		= 110124007964748556L;
-	private final static Logger		log									= Logger.getLogger($CLASS_NAME);
+public abstract class TrailRecord extends CommonRecord {
+	private final static String	$CLASS_NAME					= TrailRecord.class.getName();
+	private final static long		serialVersionUID		= 110124007964748556L;
+	private final static Logger	log									= Logger.getLogger($CLASS_NAME);
 
-	public final static String		TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
+	public final static String	TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";					// reference to the selected trail //$NON-NLS-1$
 
-	private final MeasurementType	measurementType;																			// measurement / settlement / scoregroup are options
-	private final SettlementType	settlementType;																				// measurement / settlement / scoregroup are options
-	private final ScoreGroupType	scoreGroupType;																				// measurement / settlement / scoregroup are options
-	private final TrailSelector		trailSelector;
+	protected final IChannelItem			channelItem;
+	protected final TrailSelector			trailSelector;
 
-	private final SuiteRecords		suiteRecords;
+	protected final SuiteRecords			suiteRecords					= new SuiteRecords();
 
-	private double								factor							= Double.MIN_VALUE;
-	private double								offset							= Double.MIN_VALUE;
-	private double								reduction						= Double.MIN_VALUE;
+	protected double									factor								= Double.MIN_VALUE;
+	protected double									offset								= Double.MIN_VALUE;
+	protected double									reduction							= Double.MIN_VALUE;
 
-	final DeviceXmlResource				xmlResource					= DeviceXmlResource.getInstance();
+	final protected DeviceXmlResource	xmlResource						= DeviceXmlResource.getInstance();
 
-	/**
-	 * Create a vector for a measurementType to hold data points.
-	 * @param newDevice
-	 * @param newOrdinal
-	 * @param measurementType
-	 * @param parentTrail
-	 */
-	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, MeasurementType measurementType, TrailRecordSet parentTrail,
-			int initialCapacity) {
-		super(newDevice, newOrdinal, newName, measurementType.getSymbol(), measurementType.getUnit(), measurementType.isActive(), null,
-				measurementType.getProperty(), initialCapacity);
-		log.fine(() -> measurementType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, MeasurementType measurementType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
+	protected TrailRecord(IChannelItem channelItem, int newOrdinal, TrailRecordSet parentTrail, int initialCapacity) {
+		super(DataExplorer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
+				channelItem.isActive(), null, channelItem.getProperty(), initialCapacity);
+		this.channelItem = channelItem;
 		super.parent = parentTrail;
-		this.measurementType = measurementType;
-		this.settlementType = null;
-		this.scoreGroupType = null;
 
 		this.trailSelector = new TrailSelector(this);
-		this.suiteRecords = new SuiteRecords();
-	}
-
-	/**
-	 * Create a vector for a settlementType to hold data points.
-	 * @param newDevice
-	 * @param newOrdinal
-	 * @param settlementType
-	 * @param parentTrail
-	 */
-	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, SettlementType settlementType, TrailRecordSet parentTrail,
-			int initialCapacity) {
-		super(newDevice, newOrdinal, newName, settlementType.getSymbol(), settlementType.getUnit(), settlementType.isActive(), null,
-				settlementType.getProperty(), initialCapacity);
-		log.fine(() -> settlementType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, SettlementType settlementType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
-		super.parent = parentTrail;
-		this.measurementType = null;
-		this.settlementType = settlementType;
-		this.scoreGroupType = null;
-
-		this.trailSelector = new TrailSelector(this);
-		this.suiteRecords = new SuiteRecords();
-	}
-
-	/**
-	 * Create a vector for a scoregroupType to hold all scores of a scoregroup.
-	 * The scores are not related to time steps.
-	 * @param newDevice
-	 * @param newOrdinal
-	 * @param scoregroupType
-	 * @param parentTrail
-	 */
-	public TrailRecord(IDevice newDevice, int newOrdinal, String newName, ScoreGroupType scoregroupType, TrailRecordSet parentTrail,
-			int initialCapacity) {
-		super(newDevice, newOrdinal, newName, scoregroupType.getSymbol(), scoregroupType.getUnit(), scoregroupType.isActive(), null,
-				scoregroupType.getProperty(), initialCapacity);
-		log.fine(() -> scoregroupType.getName() + " TrailRecord(IDevice newDevice, int newOrdinal, ScoregroupType scoregroupType, TrailRecordSet parentTrail)"); //$NON-NLS-1$
-		super.parent = parentTrail;
-		this.measurementType = null;
-		this.settlementType = null;
-		this.scoreGroupType = scoregroupType;
-
-		this.trailSelector = new TrailSelector(this);
-		this.suiteRecords = new SuiteRecords();
-	}
-
-	@Override
-	@Deprecated
-	public synchronized Record clone() {
-		throw new UnsupportedOperationException("clone"); //$NON-NLS-1$
+		log.fine(() -> channelItem.toString());
 	}
 
 	@Deprecated
@@ -203,18 +140,8 @@ public final class TrailRecord extends CommonRecord {
 			PropertyType property = this.getProperty(IDevice.FACTOR);
 			if (property != null)
 				this.factor = Double.parseDouble(property.getValue());
-			else if (this.scoreGroupType != null)
-				this.factor = this.scoreGroupType.getFactor();
-			else if (this.settlementType != null)
-				this.factor = this.settlementType.getFactor();
-			else if (this.measurementType != null) {
-				this.factor = this.measurementType.getFactor();
-			} else
-				try {
-					this.factor = this.getDevice().getMeasurementFactor(this.parent.getChannelConfigNumber(), this.ordinal);
-				} catch (RuntimeException e) {
-					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
-				}
+			else
+				this.factor = this.channelItem.getFactor();
 		}
 		return this.factor;
 	}
@@ -226,18 +153,8 @@ public final class TrailRecord extends CommonRecord {
 			PropertyType property = this.getProperty(IDevice.OFFSET);
 			if (property != null)
 				this.offset = Double.parseDouble(property.getValue());
-			else if (this.scoreGroupType != null)
-				this.offset = this.scoreGroupType.getOffset();
-			else if (this.settlementType != null)
-				this.offset = this.settlementType.getOffset();
-			else if (this.measurementType != null)
-				this.offset = this.measurementType.getOffset();
 			else
-				try {
-					this.offset = this.getDevice().getMeasurementOffset(this.parent.getChannelConfigNumber(), this.ordinal);
-				} catch (RuntimeException e) {
-					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
-				}
+				this.offset = this.channelItem.getOffset();
 		}
 		return this.offset;
 	}
@@ -249,19 +166,8 @@ public final class TrailRecord extends CommonRecord {
 			PropertyType property = this.getProperty(IDevice.REDUCTION);
 			if (property != null)
 				this.reduction = Double.parseDouble(property.getValue());
-			else if (this.scoreGroupType != null)
-				this.reduction = this.scoreGroupType.getReduction();
-			else if (this.settlementType != null)
-				this.reduction = this.settlementType.getReduction();
-			else if (this.measurementType != null)
-				this.reduction = this.measurementType.getReduction();
 			else
-				try {
-					String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.parent.getChannelConfigNumber(), this.ordinal, IDevice.REDUCTION);
-					if (strValue != null && strValue.length() > 0) this.reduction = Double.parseDouble(strValue.trim().replace(',', '.'));
-				} catch (RuntimeException e) {
-					// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
-				}
+				this.reduction = this.channelItem.getReduction();
 		}
 		return this.reduction;
 	}
@@ -273,39 +179,39 @@ public final class TrailRecord extends CommonRecord {
 
 	}
 
-	@Override // reason is missing scope mode
+	@Override
 	public int getMaxValue() {
 		return this.maxValue == this.minValue ? this.maxValue + 100 : this.maxValue;
 	}
 
-	@Override // reason is missing scope mode
+	@Override
 	public int getMinValue() {
 		return this.minValue == this.maxValue ? this.minValue - 100 : this.minValue;
 	}
 
-	@Override // reason is missing zoom mode
+	@Override
 	public double getMaxScaleValue() {
 		return this.maxScaleValue;
 	}
 
-	@Override // reason is missing zoom mode
+	@Override
 	public void setMaxScaleValue(double newMaxScaleValue) {
 		this.maxScaleValue = newMaxScaleValue;
 	}
 
-	@Override // reason is missing zoom mode
+	@Override
 	public double getMinScaleValue() {
 		return this.minScaleValue;
 	}
 
-	@Override // reason is missing zoom mode
+	@Override
 	public void setMinScaleValue(double newMinScaleValue) {
 		this.minScaleValue = newMinScaleValue;
 	}
 
 	@Override
 	public void setMinDisplayValue(double newMinDisplayValue) {
-		this.minDisplayValue = RecordingsCollector.decodeVaultValue(this, newMinDisplayValue) * 1000;
+		this.minDisplayValue = RecordingsCollector.decodeVaultValue(this, newMinDisplayValue);
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
 			for (AbstractRecord tmpRecord : this.getAbstractParent().getScaleSyncedRecords(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
@@ -317,7 +223,7 @@ public final class TrailRecord extends CommonRecord {
 
 	@Override
 	public void setMaxDisplayValue(double newMaxDisplayValue) {
-		this.maxDisplayValue = RecordingsCollector.decodeVaultValue(this, newMaxDisplayValue) * 1000;
+		this.maxDisplayValue = RecordingsCollector.decodeVaultValue(this, newMaxDisplayValue);
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
 			for (AbstractRecord tmpRecord : this.getAbstractParent().getScaleSyncedRecords(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
@@ -357,18 +263,20 @@ public final class TrailRecord extends CommonRecord {
 	}
 
 	/**
+	 * @return true if the record is not suppressed by histo display settings which hide records
+	 */
+	public boolean isAllowedBySetting() {
+		return false;
+	}
+
+	/**
 	 * @return true if the record is the scale sync master and if the record is for display according to histo display settings
 	 */
 	@Override // reason are the histo display settings which hide records
 	public boolean isScaleVisible() {
-		boolean isValidDisplayRecord = this.isMeasurement() || (this.isSettlement() && this.settings.isDisplaySettlements()) || (this.isScoreGroup() && this.settings.isDisplayScores());
-		return isValidDisplayRecord && super.isScaleVisible();
+		return super.isScaleVisible();
 	}
 
-	/**
-	 * query time step time in mills seconds at index
-	 * @return time step in msec
-	 */
 	@Override
 	@Deprecated
 	public double getTime_ms(int index) {
@@ -381,22 +289,43 @@ public final class TrailRecord extends CommonRecord {
 		return this.displayScaleFactorValue;
 	}
 
-	@Override // reason is missing scope mode
+	/**
+	 * Take the current max/minValues form this record and recalculate the synced max/minValues.
+	 * Support suites.
+	 */
+	public void setSyncMaxMinValue() {
+		if (isVisible() && isDisplayable()) {
+			if (getTrailSelector().isTrailSuite()) {
+				int suiteMaxValue = suiteRecords.getSuiteMaxValue();
+				int suiteMinValue = suiteRecords.getSuiteMinValue();
+				int tmpMaxValue = suiteMaxValue == suiteMinValue ? suiteMaxValue + 100 : suiteMaxValue;
+				int tmpMinValue = suiteMaxValue == suiteMinValue ? suiteMinValue - 100 : suiteMinValue;
+				setSyncMaxValue((int) (tmpMaxValue * getSyncMasterFactor()));
+				setSyncMinValue((int) (tmpMinValue * getSyncMasterFactor()));
+			} else {
+				setSyncMaxValue((int) (getMaxValue() * getSyncMasterFactor()));
+				setSyncMinValue((int) (getMinValue() * getSyncMasterFactor()));
+			}
+			log.finer(() -> getName() + "   syncMin = " + getSyncMinValue() + "; syncMax = " + getSyncMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
+
+	@Override
 	public int getSyncMinValue() {
 		return this.syncMinValue == this.syncMaxValue ? this.syncMinValue - 100 : this.syncMinValue;
 	}
 
-	public void setSyncMinValue(int syncMinValue) {
-		this.syncMinValue = syncMinValue;
+	public void setSyncMinValue(int value) {
+		this.syncMinValue = value;
 	}
 
-	@Override // reason is missing scope mode
+	@Override
 	public int getSyncMaxValue() {
 		return this.syncMaxValue == this.syncMinValue ? this.syncMaxValue + 100 : this.syncMaxValue;
 	}
 
-	public void setSyncMaxValue(int syncMaxValue) {
-		this.syncMaxValue = syncMaxValue;
+	public void setSyncMaxValue(int value) {
+		this.syncMaxValue = value;
 	}
 
 	public double getSyncMasterFactor() {
@@ -447,30 +376,6 @@ public final class TrailRecord extends CommonRecord {
 			this.maxScaleValue = RecordingsCollector.decodeVaultValue(this, this.maxValue / 1000.0);
 			this.minScaleValue = RecordingsCollector.decodeVaultValue(this, this.minValue / 1000.0);
 		}
-	}
-
-	public boolean isMeasurement() {
-		return this.measurementType != null;
-	}
-
-	public boolean isSettlement() {
-		return this.settlementType != null;
-	}
-
-	public boolean isScoreGroup() {
-		return this.scoreGroupType != null;
-	}
-
-	public MeasurementType getMeasurement() {
-		return this.measurementType;
-	}
-
-	public SettlementType getSettlement() {
-		return this.settlementType;
-	}
-
-	public ScoreGroupType getScoregroup() {
-		return this.scoreGroupType;
 	}
 
 	/**
@@ -527,16 +432,6 @@ public final class TrailRecord extends CommonRecord {
 		return points;
 	}
 
-	public int getSuiteMaxValue() {
-		return this.suiteRecords.getSuiteMaxValue() == this.suiteRecords.getSuiteMinValue() ? this.suiteRecords.getSuiteMaxValue() + 100
-				: this.suiteRecords.getSuiteMaxValue();
-	}
-
-	public int getSuiteMinValue() {
-		return this.suiteRecords.getSuiteMaxValue() == this.suiteRecords.getSuiteMinValue() ? this.suiteRecords.getSuiteMinValue() - 100
-				: this.suiteRecords.getSuiteMinValue();
-	}
-
 	/**
 	 * Defines new suite records from the selected trail and the suite master record.
 	 * @param initialCapacity
@@ -557,10 +452,7 @@ public final class TrailRecord extends CommonRecord {
 	 * @return the localized value of the label property from the device channel entry or an empty string.
 	 */
 	public String getLabel() {
-		log.finest(() -> String.format("started")); //$NON-NLS-1$
-		String label = this.measurementType != null ? this.measurementType.getLabel() : this.settlementType != null ? this.settlementType.getLabel()
-				: this.scoreGroupType.getLabel();
-		return getDeviceXmlReplacement(label);
+		return getDeviceXmlReplacement(this.channelItem.getLabel());
 	}
 
 	public String getTableRowHeader() {
@@ -604,5 +496,23 @@ public final class TrailRecord extends CommonRecord {
 	public void setRealDf(DecimalFormat realDf) {
 		this.df = realDf;
 	}
+
+	public IChannelItem getChannelItem() {
+		return this.channelItem;
+	}
+
+	/**
+	 * Analyze device configuration entries to find applicable trail types.
+	 * Build applicable trail type lists for display purposes.
+	 * Use device settings trigger texts for trigger trail types and score labels for score trail types; message texts otherwise.
+	 */
+	public abstract void setApplicableTrailTypes();
+
+	/**
+	 * @param vault
+	 * @param trailType
+	 * @return the point value
+	 */
+	public abstract Integer getVaultPoint(ExtendedVault vault, TrailTypes trailType);
 
 }

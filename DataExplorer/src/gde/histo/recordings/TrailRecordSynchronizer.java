@@ -105,17 +105,7 @@ public final class TrailRecordSynchronizer {
 		for (TrailRecord actualRecord : this.trailRecordSet.getRecordsSortedForDisplay()) {
 			log.finer(() -> actualRecord.getName() + "   isVisible=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() //$NON-NLS-1$ //$NON-NLS-2$
 					+ " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
-
-			if (actualRecord.isVisible() && actualRecord.isDisplayable()) {
-				if (!actualRecord.getTrailSelector().isTrailSuite()) {
-					actualRecord.setSyncMinValue((int) (actualRecord.getMinValue() * actualRecord.getSyncMasterFactor()));
-					actualRecord.setSyncMaxValue((int) (actualRecord.getMaxValue() * actualRecord.getSyncMasterFactor()));
-				} else {
-					actualRecord.setSyncMinValue((int) (actualRecord.getSuiteMinValue() * actualRecord.getSyncMasterFactor()));
-					actualRecord.setSyncMaxValue((int) (actualRecord.getSuiteMaxValue() * actualRecord.getSyncMasterFactor()));
-				}
-				log.finer(() -> actualRecord.getName() + "   syncMin = " + actualRecord.getSyncMinValue() + "; syncMax = " + actualRecord.getSyncMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+			actualRecord.setSyncMaxMinValue();
 		}
 
 		// the same procedure is required for those records which are synchronized
@@ -149,8 +139,7 @@ public final class TrailRecordSynchronizer {
 				syncRecord.setSyncMaxValue(tmpMax);
 			}
 
-			if (isAffected && log.isLoggable(FINER))
-			 {
+			if (isAffected && log.isLoggable(FINER)) {
 				TrailRecord record = (TrailRecord) this.trailRecordSet.get(syncRecordOrdinal);
 				log.log(FINER, record.getSyncMasterName() + "; syncMin = " + tmpMin / 1000.0 + "; syncMax = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 			}

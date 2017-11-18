@@ -22,8 +22,8 @@ package gde.histo.recordings;
 import java.nio.file.Paths;
 import java.util.function.BiFunction;
 
-import gde.GDE;
 import gde.config.Settings;
+import gde.device.TrailTypes;
 import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -205,24 +205,12 @@ public final class HistoTableMapper {
 
 	private static String getSuiteCellValue(TrailRecord trailRecord, int index) {
 		String cellValue = "";
-		TrailSelector selector = trailRecord.getTrailSelector();
-		if (trailRecord.getSuiteRecords().getSuiteValue(selector.getTrailType().getSuiteMasterIndex(), index) != null) {
-			StringBuilder sb = new StringBuilder();
+		TrailTypes trailType = trailRecord.getTrailSelector().getTrailType();
+		if (!trailRecord.getSuiteRecords().isNullValue(trailType, index)) {
 			TrailRecordFormatter formatter = new TrailRecordFormatter(trailRecord);
-			sb.append(trunc(formatter.getTableValue(selector.getTrailType().getSuiteLowerIndex(), index), 8));
-			String d = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK;
-			sb.append(d).append(trunc(formatter.getTableValue(selector.getTrailType().getSuiteMasterIndex(), index), 8));
-			sb.append(d).append(trunc(formatter.getTableValue(selector.getTrailType().getSuiteUpperIndex(), index), 8));
-			cellValue = sb.toString().intern();
+			cellValue = formatter.getTableSuiteValue(index, trailType);
 		}
 		return cellValue;
-	}
-
-	/**
-	 * Performant replacement for String.format("%.8s", ss)
-	 */
-	private static String trunc(String ss, int maxLength) {
-		return ss.substring(0, Math.min(maxLength, ss.length()));
 	}
 
 	/**

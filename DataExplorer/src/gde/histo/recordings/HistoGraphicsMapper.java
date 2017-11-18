@@ -125,7 +125,7 @@ public final class HistoGraphicsMapper {
 				if (value != null) {
 					double decimalDegreeValue = value / 1000000 + value % 1000000 / 600000.;
 					points[i] = new Point(xDisplayOffset + timeLine.getScalePositions().get((long) this.trailRecord.getParentTrail().getTime_ms(i)),
-							yDisplayOffset - (int) ((decimalDegreeValue * 1000. - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue()));
+							yDisplayOffset - (int) ((decimalDegreeValue - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue()));
 				}
 			}
 			log.finer(() -> "yPos = " + Arrays.toString(points)); //$NON-NLS-1$

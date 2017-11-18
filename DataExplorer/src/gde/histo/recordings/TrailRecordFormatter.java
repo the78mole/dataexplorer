@@ -24,6 +24,7 @@ import java.util.Vector;
 
 import gde.GDE;
 import gde.device.IDevice;
+import gde.device.TrailTypes;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
@@ -33,9 +34,16 @@ import gde.utils.StringHelper;
  */
 public final class TrailRecordFormatter {
 
-	private final IDevice device = DataExplorer.getInstance().getActiveDevice();
+	/**
+	 * Performant replacement for String.format("%.8s", ss)
+	 */
+	private static String trunc(String ss, int maxLength) {
+		return ss.substring(0, Math.min(maxLength, ss.length()));
+	}
 
-	private final TrailRecord trailRecord;
+	private final IDevice			device	= DataExplorer.getInstance().getActiveDevice();
+
+	private final TrailRecord	trailRecord;
 
 	public TrailRecordFormatter(TrailRecord trailRecord) {
 		this.trailRecord = trailRecord;
@@ -116,11 +124,19 @@ public final class TrailRecordFormatter {
 	}
 
 	/**
-	 * @param value is the untranslated value (<em>intValue / 1000.</em>)
+	 * @param index
+	 * @param trailType
 	 * @return the formatted value also for GPS coordinates
 	 */
-	public String getTableValue(double value) {
-		return getFormattedTableValue(value);
+	public String getTableSuiteValue(int index, TrailTypes trailType) {
+		String cellValue;
+		StringBuilder sb = new StringBuilder();
+		sb.append(getTruncatedTableValue(trailType.getSuiteLowerIndex(), index, 8));
+		String d = sb.length() > 3 ? Character.toString((char) 183) : GDE.STRING_BLANK_COLON_BLANK; // 183: middle dot
+		sb.append(d).append(getTruncatedTableValue(trailType.getSuiteMasterIndex(), index, 8));
+		sb.append(d).append(getTruncatedTableValue(trailType.getSuiteUpperIndex(), index, 8));
+		cellValue = sb.toString();
+		return cellValue;
 	}
 
 	/**
@@ -128,8 +144,8 @@ public final class TrailRecordFormatter {
 	 * @param index
 	 * @return the formatted value also for GPS coordinates
 	 */
-	public String getTableValue(int suiteOrdinal, int index) {
-		return getFormattedTableValue(this.trailRecord.getSuiteRecords().get(suiteOrdinal).get(index) / 1000.);
+	private String getTruncatedTableValue(int suiteOrdinal, int index, int length) {
+		return trunc(getTableValue(this.trailRecord.getSuiteRecords().get(suiteOrdinal).get(index) / 1000.), 8);
 	}
 
 	/**
@@ -150,7 +166,7 @@ public final class TrailRecordFormatter {
 	 * @param value is the untranslated value (<em>intValue / 1000.</em>)
 	 * @return the formatted value also for GPS coordinates
 	 */
-	private String getFormattedTableValue(double value) {
+	public String getTableValue(double value) {
 		final String formattedValue;
 		if (this.device.isGPSCoordinates(this.trailRecord)) {
 			// if (this.getDataType() == DataType.GPS_LATITUDE etc ???
@@ -170,7 +186,7 @@ public final class TrailRecordFormatter {
 	 * @return the formatted value also for GPS coordinates
 	 */
 	public String getTableValue(int index) {
-		return getFormattedTableValue(this.trailRecord.realGet(index) / 1000.);
+		return getTableValue(this.trailRecord.elementAt(index) / 1000.);
 	}
 
 }

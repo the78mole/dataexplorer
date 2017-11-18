@@ -72,13 +72,13 @@ public final class VaultCollector {
 	public static double encodeVaultValue(AbstractRecord record, double value) {
 		final double newValue;
 		if (DataExplorer.getInstance().getActiveDevice().isGPSCoordinates(record)) {
-			newValue = (int) (value * 1000.);
+			newValue = value * 1000.;
 		} else {
 			switch (record.getDataType()) {
 			// lat and lon only required if isGPSCoordinates is not implemented
 			case GPS_LATITUDE:
 			case GPS_LONGITUDE:
-				newValue = (int) (value * 1000.);
+				newValue = value * 1000.;
 				break;
 
 			default:

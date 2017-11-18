@@ -107,25 +107,26 @@ public final class RecordingsCollector {
 	private static void addVault(ExtendedVault histoVault, TrailRecord trailRecord) {
 		TrailSelector trailSelector = trailRecord.getTrailSelector();
 		if (!trailSelector.isTrailSuite()) {
-			trailRecord.addElement(histoVault.getPoint(trailRecord, trailSelector.getTrailType()));
+			trailRecord.addElement(trailRecord.getVaultPoint(histoVault, trailSelector.getTrailType()));
 		} else {
 			TrailTypes suiteTrailType = trailSelector.getTrailType();
+			List<TrailTypes> suiteMembers = suiteTrailType.getSuiteMembers();
 			if (!suiteTrailType.isRangePlot()) {
 				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
-				for (int i = 0; i < suiteTrailType.getSuiteMembers().size(); i++) {
-					suiteRecords.get(i).addElement(histoVault.getPoint(trailRecord, suiteTrailType.getSuiteMembers().get(i)));
+				for (int i = 0; i < suiteMembers.size(); i++) {
+					suiteRecords.get(i).addElement(trailRecord.getVaultPoint(histoVault, suiteMembers.get(i)));
 				}
 			} else {
 				int tmpSummationFactor = 0;
 				int masterPoint = 0; // this is the base value for adding or subtracting standard deviations
 
 				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
-				for (int i = 0; i < suiteTrailType.getSuiteMembers().size(); i++) {
-					Integer point = histoVault.getPoint(trailRecord, suiteTrailType.getSuiteMembers().get(i));
+				for (int i = 0; i < suiteMembers.size(); i++) {
+					Integer point = trailRecord.getVaultPoint(histoVault, suiteMembers.get(i));
 					if (point == null) {
 						suiteRecords.get(i).addElement(null);
 					} else {
-						tmpSummationFactor = getSummationFactor(suiteTrailType.getSuiteMembers().get(i), tmpSummationFactor);
+						tmpSummationFactor = getSummationFactor(suiteMembers.get(i), tmpSummationFactor);
 						if (tmpSummationFactor == 0)
 							masterPoint = point; // use in the next iteration if summation is necessary, e.g. avg+2*sd
 						else
@@ -257,8 +258,8 @@ public final class RecordingsCollector {
 	public static void defineTrailTypes(TrailRecordSet trailRecordSet) {
 		String[] trailRecordNames = trailRecordSet.getRecordNames();
 		for (String trailRecordName : trailRecordNames) {
-			TrailRecord trailRecord = (trailRecordSet.get(trailRecordName));
-			trailRecord.getTrailSelector().setApplicableTrailTypes();
+			TrailRecord trailRecord = trailRecordSet.get(trailRecordName);
+			trailRecord.setApplicableTrailTypes();
 			applyTemplateTrailData(trailRecord);
 		}
 	}

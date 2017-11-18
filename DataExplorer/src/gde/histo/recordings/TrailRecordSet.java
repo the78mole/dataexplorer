@@ -98,8 +98,8 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		this.template = new HistoGraphicsTemplate(deviceSignature);
 		if (this.template != null) this.template.load();
 
-		this.visibleAndDisplayableRecords		= new Vector<TrailRecord>();
-		this.allRecords											= new Vector<TrailRecord>();
+		this.visibleAndDisplayableRecords = new Vector<TrailRecord>();
+		this.allRecords = new Vector<TrailRecord>();
 		log.fine(() -> " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
 	}
 
@@ -127,8 +127,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (ScoreGroupType scoreGroup : channelScoreGroups.values()) {
 				PropertyType topPlacementProperty = scoreGroup.getProperty("histo_top_placement"); //$NON-NLS-1$
 				if (topPlacementProperty != null ? Boolean.parseBoolean(topPlacementProperty.getValue()) : false) {
-					TrailRecord tmpRecord = new TrailRecord(device, myIndex, scoreGroup.getName(), scoreGroup, newTrailRecordSet,
-							scoreGroup.getProperty().size());
+					TrailRecord tmpRecord = new ScoregroupTrail(myIndex, scoreGroup, newTrailRecordSet, scoreGroup.getProperty().size());
 					newTrailRecordSet.put(scoreGroup.getName(), tmpRecord);
 					tmpRecord.setColorDefaultsAndPosition(myIndex);
 					if (newTrailRecordSet.size() == 1) tmpRecord.setColor(SWTResourceManager.getColor(0, 0, 0)); // top score group entry, set color to black
@@ -142,7 +141,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (SettlementType settlement : channelSettlements.values()) {
 				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
 				if (topPlacementProperty != null ? Boolean.parseBoolean(topPlacementProperty.getValue()) : false) {
-					TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, INITIAL_RECORD_CAPACITY);
+					TrailRecord tmpRecord = new SettlementRecord(myIndex, settlement, newTrailRecordSet, INITIAL_RECORD_CAPACITY);
 					newTrailRecordSet.put(settlement.getName(), tmpRecord);
 					tmpRecord.setColorDefaultsAndPosition(myIndex);
 					if (log.isLoggable(FINE)) log.log(FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
@@ -153,9 +152,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		{// display section 2: all measurements
 			for (int i = 0; i < channelMeasurements.size(); i++) {
 				MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
-				TrailRecord tmpRecord = new TrailRecord(device, i, measurement.getName(), measurement, newTrailRecordSet, INITIAL_RECORD_CAPACITY); // ordinal
-																																																																						// starts
-																																																																						// at 0
+				TrailRecord tmpRecord = new MeasurementRecord(i, measurement, newTrailRecordSet, INITIAL_RECORD_CAPACITY); // ordinal starts at 0
 				newTrailRecordSet.put(measurement.getName(), tmpRecord);
 				tmpRecord.setColorDefaultsAndPosition(i);
 				if (log.isLoggable(FINE)) log.log(FINE, "added measurement record for " + measurement.getName() + " - " + i); //$NON-NLS-1$ //$NON-NLS-2$
@@ -166,7 +163,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (SettlementType settlement : channelSettlements.values()) {
 				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
 				if (!(topPlacementProperty != null ? Boolean.parseBoolean(topPlacementProperty.getValue()) : false)) {
-					TrailRecord tmpRecord = new TrailRecord(device, myIndex, settlement.getName(), settlement, newTrailRecordSet, INITIAL_RECORD_CAPACITY);
+					TrailRecord tmpRecord = new SettlementRecord(myIndex, settlement, newTrailRecordSet, INITIAL_RECORD_CAPACITY);
 					newTrailRecordSet.put(settlement.getName(), tmpRecord);
 					tmpRecord.setColorDefaultsAndPosition(myIndex);
 					if (log.isLoggable(FINE)) log.log(FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
@@ -179,8 +176,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (ScoreGroupType scoreGroup : channelScoreGroups.values()) {
 				PropertyType topPlacementProperty = scoreGroup.getProperty("histo_top_placement"); //$NON-NLS-1$
 				if (!(topPlacementProperty != null ? Boolean.parseBoolean(topPlacementProperty.getValue()) : false)) {
-					TrailRecord tmpRecord = new TrailRecord(device, myIndex, scoreGroup.getName(), scoreGroup, newTrailRecordSet,
-							scoreGroup.getProperty().size());
+					TrailRecord tmpRecord = new ScoregroupTrail(myIndex, scoreGroup, newTrailRecordSet, scoreGroup.getProperty().size());
 					newTrailRecordSet.put(scoreGroup.getName(), tmpRecord);
 					tmpRecord.setColorDefaultsAndPosition(myIndex);
 					if (log.isLoggable(FINE)) log.log(FINE, "added scoregroup record for " + scoreGroup.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
@@ -238,9 +234,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		// get by insertion order
 		for (Map.Entry<String, AbstractRecord> entry : this.entrySet()) {
 			final TrailRecord record = (TrailRecord) entry.getValue();
-			if (record.isMeasurement() //
-					|| (record.isSettlement() && this.settings.isDisplaySettlements()) //
-					|| (record.isScoreGroup() && this.settings.isDisplayScores())) {
+			if (record.isAllowedBySetting()) {
 				record.setDisplayable(record.isActive() && record.hasReasonableData());
 
 				if (record.isVisible() && record.isDisplayable()) // only selected records get displayed
@@ -253,6 +247,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	/**
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
+	@Override
 	public Vector<TrailRecord> getVisibleAndDisplayableRecordsForTable() {
 		return (Vector<TrailRecord>) (this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords);
 	}
