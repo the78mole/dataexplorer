@@ -11,6 +11,7 @@ package gde.device;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -55,7 +56,7 @@ import javax.xml.bind.annotation.XmlType;
     "property",
     "label"
 })
-public class ScoreGroupType {
+public class ScoreGroupType implements IChannelItem {
 
     @XmlElement(required = true)
     protected String name;
@@ -79,7 +80,8 @@ public class ScoreGroupType {
      *     {@link String }
      *
      */
-    public String getName() {
+    @Override
+		public String getName() {
         return name;
     }
 
@@ -103,7 +105,8 @@ public class ScoreGroupType {
      *     {@link String }
      *
      */
-    public String getSymbol() {
+    @Override
+		public String getSymbol() {
         return symbol;
     }
 
@@ -127,7 +130,8 @@ public class ScoreGroupType {
      *     {@link String }
      *
      */
-    public String getUnit() {
+    @Override
+		public String getUnit() {
         return unit;
     }
 
@@ -147,7 +151,8 @@ public class ScoreGroupType {
      * Gets the value of the active property.
      *
      */
-    public boolean isActive() {
+    @Override
+		public boolean isActive() {
         return active;
     }
 
@@ -210,7 +215,8 @@ public class ScoreGroupType {
      *
      *
      */
-    public List<PropertyType> getProperty() {
+    @Override
+		public List<PropertyType> getProperty() {
         if (property == null) {
             property = new ArrayList<PropertyType>();
         }
@@ -225,7 +231,8 @@ public class ScoreGroupType {
      *     {@link String }
      *
      */
-    public String getLabel() {
+    @Override
+		public String getLabel() {
         return label;
     }
 
@@ -239,6 +246,11 @@ public class ScoreGroupType {
      */
     public void setLabel(String value) {
         this.label = value;
+    }
+
+    @Override
+		public String getChannelItemId() {
+        return "" + scoreGroupId + "_" + name;
     }
 
     /**
@@ -302,7 +314,8 @@ public class ScoreGroupType {
   	 * @param propertyKey
   	 * @return PropertyType object
   	 */
-  	public PropertyType getProperty(String propertyKey) {
+  	@Override
+		public PropertyType getProperty(String propertyKey) {
   		PropertyType tmpProperty = null;
   		List<PropertyType> properties = this.getProperty();
   		for (PropertyType propertyType : properties) {
@@ -318,7 +331,8 @@ public class ScoreGroupType {
   	 * get the offset value
   	 * @return the offset, if property does not exist return 0.0 as default value
   	 */
-  	public double getOffset() {
+  	@Override
+		public double getOffset() {
   		double value = 0.0;
   		PropertyType tmpProperty = this.getProperty(IDevice.OFFSET);
   		if (tmpProperty != null)
@@ -344,7 +358,8 @@ public class ScoreGroupType {
   	 * get the reduction value
   	 * @return the offset, if property does not exist return 0.0 as default value
   	 */
-  	public double getReduction() {
+  	@Override
+		public double getReduction() {
   		double value = 0.0;
   		PropertyType tmpProperty = this.getProperty(IDevice.REDUCTION);
   		if (tmpProperty != null)
@@ -370,7 +385,8 @@ public class ScoreGroupType {
   	 * get the factor value
   	 * @return the factor, if property does not exist return 1.0 as default value
   	 */
-  	public double getFactor() {
+  	@Override
+		public double getFactor() {
   		double value = 1.0;
   		PropertyType tmpProperty = getProperty(IDevice.FACTOR);
   		if (tmpProperty != null)
@@ -391,5 +407,10 @@ public class ScoreGroupType {
   			tmpProperty.setValue("" + factor); //$NON-NLS-1$
   		}
   	}
+
+		@Override
+		public Optional<TrailDisplayType> getTrailDisplay() {
+			return Optional.empty();
+		}
 
 }

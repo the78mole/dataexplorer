@@ -58,7 +58,7 @@ import javax.xml.bind.annotation.XmlType;
     "trailDisplay",
     "label"
 })
-public class SettlementType {
+public class SettlementType implements IChannelItem {
 
     @XmlElement(required = true)
     protected String name;
@@ -82,7 +82,8 @@ public class SettlementType {
      *     {@link String }
      *
      */
-    public String getName() {
+    @Override
+		public String getName() {
         return name;
     }
 
@@ -106,7 +107,8 @@ public class SettlementType {
      *     {@link String }
      *
      */
-    public String getSymbol() {
+    @Override
+		public String getSymbol() {
         return symbol;
     }
 
@@ -130,7 +132,8 @@ public class SettlementType {
      *     {@link String }
      *
      */
-    public String getUnit() {
+    @Override
+		public String getUnit() {
         return unit;
     }
 
@@ -150,7 +153,8 @@ public class SettlementType {
      * Gets the value of the active property.
      *
      */
-    public boolean isActive() {
+    @Override
+		public boolean isActive() {
         return active;
     }
 
@@ -208,7 +212,8 @@ public class SettlementType {
      *
      *
      */
-    public List<PropertyType> getProperty() {
+    @Override
+		public List<PropertyType> getProperty() {
         if (property == null) {
             property = new ArrayList<PropertyType>();
         }
@@ -223,7 +228,8 @@ public class SettlementType {
      *     {@link TrailDisplayType }
      *
      */
-    public Optional<TrailDisplayType> getTrailDisplay() {
+    @Override
+		public Optional<TrailDisplayType> getTrailDisplay() {
       return Optional.ofNullable(trailDisplay);
     }
 
@@ -247,7 +253,8 @@ public class SettlementType {
      *     {@link String }
      *
      */
-    public String getLabel() {
+    @Override
+		public String getLabel() {
         return label;
     }
 
@@ -261,6 +268,11 @@ public class SettlementType {
      */
     public void setLabel(String value) {
         this.label = value;
+    }
+
+    @Override
+		public String getChannelItemId() {
+        return "" + settlementId + "_" + name;
     }
 
     /**
@@ -324,6 +336,7 @@ public class SettlementType {
 	 * @param propertyKey
 	 * @return PropertyType object
 	 */
+	@Override
 	public PropertyType getProperty(String propertyKey) {
 		PropertyType tmpProperty = null;
 		List<PropertyType> properties = this.getProperty();
@@ -340,6 +353,7 @@ public class SettlementType {
 	 * get the offset value
 	 * @return the offset, if property does not exist return 0.0 as default value
 	 */
+	@Override
 	public double getOffset() {
 		double value = 0.0;
 		PropertyType tmpProperty = this.getProperty(IDevice.OFFSET);
@@ -366,6 +380,7 @@ public class SettlementType {
 	 * get the reduction value
 	 * @return the offset, if property does not exist return 0.0 as default value
 	 */
+	@Override
 	public double getReduction() {
 		double value = 0.0;
 		PropertyType tmpProperty = this.getProperty(IDevice.REDUCTION);
@@ -392,6 +407,7 @@ public class SettlementType {
 	 * get the factor value
 	 * @return the factor, if property does not exist return 1.0 as default value
      */
+	@Override
 	public double getFactor() {
 		double value = 1.0;
 		PropertyType tmpProperty = getProperty(IDevice.FACTOR);
