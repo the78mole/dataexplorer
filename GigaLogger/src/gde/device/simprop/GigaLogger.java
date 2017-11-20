@@ -265,11 +265,14 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public boolean isGPSCoordinates(Record record) {
-		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) {
-			//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
+		switch (record.getDataType()) {
+		case GPS_LATITUDE:
+		case GPS_LONGITUDE:
 			return true;
+
+		default:
+			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -316,16 +319,20 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 				double offset = record.getOffset(); // != 0 if curve has an defined offset
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-				if (index > 1) {
-					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
-				}
-				else {
+				
+				switch (record.getDataType()) {
+				case GPS_LATITUDE:
+				case GPS_LONGITUDE:
 					//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
 					double value = (record.realGet(rowIndex) / 1000000.0);
 					int grad = (int) value;
 					double minuten = (value - grad) * 100;
-					dataTableRow[index + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
+					dataTableRow[index + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$				
+					break;
+
+				default:
+					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
+					break;
 				}
 				++index;
 			}
@@ -550,24 +557,47 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE | DeviceConfiguration.HEIGHT_CLAMPTOGROUND
 	 */
 	public void export2KMZ3D(int type) {
-		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-		//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3503), 1, 0, 2, 7, 9, 11, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+		RecordSet activeRecordSet = this.application.getActiveRecordSet();
+		if (activeRecordSet != null) {
+			if (activeRecordSet.containsGPSdata()) {
+				int[] ordinals = new int[15];
+				for (int i = 0; i < ordinals.length; i++) {
+					ordinals[i] = -1;
+				}
+				for (Record record : activeRecordSet.values()) {
+					switch (record.getDataType()) {
+					case GPS_LATITUDE:
+						ordinals[0] = record.getOrdinal();
+						break;
+					case GPS_LONGITUDE:
+						ordinals[1] = record.getOrdinal();
+						break;
+					case GPS_ALTITUDE:
+						ordinals[2] = record.getOrdinal();
+						break;
+					case SPEED:
+						ordinals[7] = record.getOrdinal();
+						break;
+					case GPS_AZIMUTH:
+						ordinals[13] = record.getOrdinal();
+						break;
+					default:
+						break;
+					}
+				}
+				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3503),    
+						ordinals[1], ordinals[0], ordinals[2], ordinals[7],
+						-1, -1, ordinals[13], type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+			}
+			else {
+				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT3503), 
+						-1, -1, 
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m", "feet"}), 
+						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km/h"}), 
+						-1, -1, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+			}
+		}
 	}
-
-	//	/**
-	//	 * exports the actual displayed data set to GPX file format
-	//	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
-	//	 */
-	//	public void export2GPX(int type) {
-	//		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-	//		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
-	//		//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
-	//		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-	//		new FileHandler().exportFileGPX(Messages.getString(MessageIds.GDE_MSGT2004), 1, 0, 2, 7, 8, type == DeviceConfiguration.HEIGHT_RELATIVE);
-	//	}
 
 	/**
 	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
@@ -580,8 +610,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-				containsGPSdata = activeRecordSet.get(0).hasReasonableData() && activeRecordSet.get(1).hasReasonableData() && activeRecordSet.get(2).hasReasonableData();
+				containsGPSdata = activeRecordSet.containsGPSdata();
 			}
 		}
 		return containsGPSdata;
@@ -600,8 +629,53 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
-				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, additionalMeasurementOrdinal, findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, true,
-						isExportTmpDir);
+				if (activeRecordSet.containsGPSdata()) {
+					int[] ordinals = new int[15];
+					for (int i = 0; i < ordinals.length; i++) {
+						ordinals[i] = -1;
+					}
+					for (Record record : activeRecordSet.values()) {
+						switch (record.getDataType()) {
+						case GPS_LATITUDE:
+							ordinals[0] = record.getOrdinal();
+							break;
+						case GPS_LONGITUDE:
+							ordinals[1] = record.getOrdinal();
+							break;
+						case GPS_ALTITUDE:
+							ordinals[2] = record.getOrdinal();
+							break;
+						case SPEED:
+							ordinals[7] = record.getOrdinal();
+							break;
+						case GPS_AZIMUTH:
+							ordinals[13] = record.getOrdinal();
+							break;
+						default:
+							break;
+						}
+					}
+					exportFileName = new FileHandler().exportFileKMZ(
+							ordinals[0], 
+							ordinals[2], 
+							ordinals[7], 
+							additionalMeasurementOrdinal, 
+							findRecordByUnit(activeRecordSet, "m/s"), 
+							findRecordByUnit(activeRecordSet, "km"), 
+							ordinals[13], 
+							true,
+							isExportTmpDir);
+				}
+				else {
+					exportFileName = new FileHandler().exportFileKMZ(-1, -1, 
+							activeRecordSet.findRecordOrdinalByUnit(new String[] {"m", "feet"}), 
+							additionalMeasurementOrdinal, 
+							findRecordByUnit(activeRecordSet, "m/s"), 
+							findRecordByUnit(activeRecordSet, "km"), 
+							-1, 
+							true,
+							isExportTmpDir);
+				}
 			}
 		}
 		return exportFileName;
