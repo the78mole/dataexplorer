@@ -510,7 +510,7 @@ public abstract class TrailRecord extends CommonRecord {
 
 	/**
 	 * @param vault
-	 * @param trailType
+	 * @param trailType is the requested trail type which may differ from the selected trail type (e.g. suites)
 	 * @return the point value
 	 */
 	public abstract Integer getVaultPoint(ExtendedVault vault, TrailTypes trailType);

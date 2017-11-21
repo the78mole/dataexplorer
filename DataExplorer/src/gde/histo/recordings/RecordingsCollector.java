@@ -62,40 +62,40 @@ public final class RecordingsCollector {
 	 * Every record takes the selected trail type / score data from the history vault and populates its data.
 	 */
 	public static void addVaults(TrailRecordSet trailRecordSet) {
-		for (String recordName : trailRecordSet.getRecordNames()) {
-			TrailRecord trailRecord = trailRecordSet.get(recordName);
-			if (trailRecord.getTrailSelector().getTrailType().isSuite()) {
-				trailRecord.setSuite(trailRecordSet.getHistoVaults().size());
-			}
-		}
 		for (Map.Entry<Long, List<ExtendedVault>> entry : trailRecordSet.getHistoVaults().entrySet()) {
 			for (ExtendedVault histoVault : entry.getValue()) {
 				trailRecordSet.addVaultHeader(histoVault);
-
-				for (String recordName : trailRecordSet.getRecordNames()) {
-					addVault(histoVault, trailRecordSet.get(recordName));
-				}
 			}
+		}
+
+		for (String recordName : trailRecordSet.getRecordNames()) {
+			addVaults(trailRecordSet, recordName);
 		}
 	}
 
 	/**
 	 * Set the data points for one single trail record.
 	 * The record takes the selected trail type / score data from the trail record vault and populates its data.
-	 * @param recordOrdinal
+	 * @param recordName
 	 */
-	public static synchronized void addVaults(TrailRecordSet trailRecordSet, int recordOrdinal) {
-		TrailRecord trailRecord = (TrailRecord) trailRecordSet.get(recordOrdinal);
+	public static synchronized void addVaults(TrailRecordSet trailRecordSet, String recordName) {
+		TrailRecord trailRecord = trailRecordSet.get(recordName);
 
 		trailRecord.clear();
-		if (trailRecord.getTrailSelector().isTrailSuite()) trailRecord.setSuite(trailRecordSet.getHistoVaults().size());
-
-		for (Map.Entry<Long, List<ExtendedVault>> entry : trailRecordSet.getHistoVaults().entrySet()) {
-			for (ExtendedVault histoVault : entry.getValue()) {
-				addVault(histoVault, trailRecord);
+		if (!trailRecord.getTrailSelector().isTrailSuite()) {
+			for (Map.Entry<Long, List<ExtendedVault>> entry : trailRecordSet.getHistoVaults().entrySet()) {
+				for (ExtendedVault histoVault : entry.getValue()) {
+					trailRecord.addElement(trailRecord.getVaultPoint(histoVault, trailRecord.getTrailSelector().getTrailType()));
+				}
+			}
+		} else {
+			trailRecord.setSuite(trailRecordSet.getHistoVaults().size());
+			for (Map.Entry<Long, List<ExtendedVault>> entry : trailRecordSet.getHistoVaults().entrySet()) {
+				for (ExtendedVault histoVault : entry.getValue()) {
+					addVaultToSuite(histoVault, trailRecord);
+				}
 			}
 		}
-		trailRecordSet.syncScaleOfSyncableRecords();
 		log.finer(() -> " " + trailRecord.getTrailSelector());
 	}
 
@@ -104,39 +104,35 @@ public final class RecordingsCollector {
 	 * Supports trail suites.
 	 * @param histoVault
 	 */
-	private static void addVault(ExtendedVault histoVault, TrailRecord trailRecord) {
+	private static void addVaultToSuite(ExtendedVault histoVault, TrailRecord trailRecord) {
 		TrailSelector trailSelector = trailRecord.getTrailSelector();
-		if (!trailSelector.isTrailSuite()) {
-			trailRecord.addElement(trailRecord.getVaultPoint(histoVault, trailSelector.getTrailType()));
+		List<TrailTypes> suiteMembers = trailSelector.getTrailType().getSuiteMembers();
+
+		if (!trailSelector.getTrailType().isRangePlot()) {
+			SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
+			for (int i = 0; i < trailSelector.getTrailType().getSuiteMembers().size(); i++) {
+				suiteRecords.get(i).addElement(trailRecord.getVaultPoint(histoVault, suiteMembers.get(i)));
+			}
 		} else {
-			TrailTypes suiteTrailType = trailSelector.getTrailType();
-			List<TrailTypes> suiteMembers = suiteTrailType.getSuiteMembers();
-			if (!suiteTrailType.isRangePlot()) {
-				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
-				for (int i = 0; i < suiteMembers.size(); i++) {
-					suiteRecords.get(i).addElement(trailRecord.getVaultPoint(histoVault, suiteMembers.get(i)));
-				}
-			} else {
-				int tmpSummationFactor = 0;
-				int masterPoint = 0; // this is the base value for adding or subtracting standard deviations
+			int tmpSummationFactor = 0;
+			int masterPoint = 0; // this is the base value for adding or subtracting standard deviations
 
-				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
-				for (int i = 0; i < suiteMembers.size(); i++) {
-					Integer point = trailRecord.getVaultPoint(histoVault, suiteMembers.get(i));
-					if (point == null) {
-						suiteRecords.get(i).addElement(null);
-					} else {
-						tmpSummationFactor = getSummationFactor(suiteMembers.get(i), tmpSummationFactor);
-						if (tmpSummationFactor == 0)
-							masterPoint = point; // use in the next iteration if summation is necessary, e.g. avg+2*sd
-						else
-							point = masterPoint + tmpSummationFactor * point * 2;
+			SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
+			for (int i = 0; i < suiteMembers.size(); i++) {
+				Integer point = trailRecord.getVaultPoint(histoVault, suiteMembers.get(i));
+				if (point == null) {
+					suiteRecords.get(i).addElement(null);
+				} else {
+					tmpSummationFactor = getSummationFactor(suiteMembers.get(i), tmpSummationFactor);
+					if (tmpSummationFactor == 0)
+						masterPoint = point; // use in the next iteration if summation is necessary, e.g. avg+2*sd
+					else
+						point = masterPoint + tmpSummationFactor * point * 2;
 
-						suiteRecords.get(i).addElement(point);
-					}
-					if (log.isLoggable(FINER)) log.log(FINER, String.format(" %s trail %3d  %s  %d minVal=%d maxVal=%d", trailRecord.getName(), //$NON-NLS-1$
-							trailSelector.getTrailOrdinal(), histoVault.getLogFilePath(), point, suiteRecords.get(i).getMinRecordValue(), suiteRecords.get(i).getMaxRecordValue()));
+					suiteRecords.get(i).addElement(point);
 				}
+				if (log.isLoggable(FINER)) log.log(FINER, String.format(" %s trail %3d  %s  %d minVal=%d maxVal=%d", trailRecord.getName(), //$NON-NLS-1$
+						trailSelector.getTrailOrdinal(), histoVault.getLogFilePath(), point, suiteRecords.get(i).getMinRecordValue(), suiteRecords.get(i).getMaxRecordValue()));
 			}
 		}
 		log.log(FINER, " ", trailSelector);
@@ -218,8 +214,8 @@ public final class RecordingsCollector {
 								decodeVaultValue(longitudeRecord, longitudePoint / 1000.)));
 					} else {
 						gpsCluster.add(null); // this keeps the sequence in parallel with the vaults sequence
+					}
 				}
-			}
 			}
 			// populate the GPS locations list for subsequently filling the histo table
 			if (gpsCluster.parallelStream().filter(Objects::nonNull).count() > 0) {

@@ -29,8 +29,8 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public final class MeasurementTrail extends TrailRecord {
-	private final static String		$CLASS_NAME				= MeasurementTrail.class.getName();
-	private final static long			serialVersionUID	= 110124007964748556L;
+	private final static String	$CLASS_NAME				= MeasurementTrail.class.getName();
+	private final static long		serialVersionUID	= 110124007964748556L;
 	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
 	/**

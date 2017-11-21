@@ -2042,10 +2042,11 @@ public class DataExplorer extends Composite {
 
 	/**
 	 * update the histo tabs if visible.
-	 * @param recordOrdinal specifies the record from the trail recordset to be updated
+	 * @param recordName specifies the record from the trail recordset to be updated
 	 */
-	public void updateHistoTabs(int recordOrdinal, boolean isWithUi) {
-		RecordingsCollector.addVaults(this.histoSet.getTrailRecordSet(), recordOrdinal);
+	public void updateHistoTabs(String recordName, boolean isWithUi) {
+		RecordingsCollector.addVaults(this.histoSet.getTrailRecordSet(), recordName);
+		this.histoSet.getTrailRecordSet().syncScaleOfSyncableRecords();
 		DataExplorer.this.updateHistoTabs(RebuildStep.F_FILE_CHECK, isWithUi); // ET rebuilds the graphics only if new files have been found
 		this.updateHistoGraphicsWindow(false); // ET redraws once again in the rare case if new files have been found
 	}
@@ -2523,7 +2524,7 @@ public class DataExplorer extends Composite {
 		if (isRecordSetVisible(GraphicsType.HISTO) && trailRecordSet.containsKey(recordKey)) {
 			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 			trailRecordSet.setMeasurementMode(recordKey, enabled);
-			TrailRecord trailRecord = (TrailRecord) trailRecordSet.get(recordKey);
+			TrailRecord trailRecord = trailRecordSet.get(recordKey);
 			if (enabled && !trailRecord.isVisible()) {
 				this.histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
 				this.histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
@@ -2566,7 +2567,7 @@ public class DataExplorer extends Composite {
 		if (isRecordSetVisible(GraphicsType.HISTO) && trailRecordSet.containsKey(recordKey)) {
 			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 			trailRecordSet.setDeltaMeasurementMode(recordKey, enabled);
-			TrailRecord trailRecord = (TrailRecord) trailRecordSet.get(recordKey);
+			TrailRecord trailRecord = trailRecordSet.get(recordKey);
 			if (enabled && !trailRecord.isVisible()) {
 				this.histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
 				this.histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
