@@ -121,8 +121,8 @@ public class iCharger306B extends iCharger {
 			points[2] = values[2];			
 			//3=Ladung 4=Leistung 5=Energie
 			points[3] = values[11] * 1000;
-			points[4] = points[1] * points[2] / 100; 							// power U*I [W]
-			points[5] = points[1]/1000 * points[3]/1000;						// energy U*C [mWh]
+			points[4] = points[1] * points[2] / 100; 									// power U*I [W]
+			points[5] = (int) (points[1]/1000.0 * points[3]/1000.0);	// energy U*C [mWh]
 			//6=Temp.intern 7=Temp.extern 
 			points[6] = values[9];
 			points[7] = values[10];
