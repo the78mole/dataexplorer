@@ -28,7 +28,7 @@ import org.eclipse.swt.graphics.Color;
  * Supports all classes which access both the Records class and the TrailRecords class.
  * @author Thomas Eickert (USER)
  */
-public abstract class AbstractRecord extends Vector<Integer> implements IRecord{
+public abstract class AbstractRecord extends Vector<Integer> implements IRecord {
 	private static final long serialVersionUID = 3212164037419263272L;
 
 	protected AbstractRecord() {
@@ -142,5 +142,13 @@ public abstract class AbstractRecord extends Vector<Integer> implements IRecord{
 	 * @param realDf is the decimal format of this record (without updating synced records)
 	 */
 	public abstract void setRealDf(DecimalFormat realDf);
+
+	/**
+	 * Determine the property references.
+	 * @return the ordinal number of the sync master record or -1 if the record scale is not synchronized
+	 */
+	public abstract int getSyncMasterRecordOrdinal();
+
+	public abstract void setSyncMinMax(int newMin, int newMax);
 
 }

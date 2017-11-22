@@ -497,6 +497,13 @@ public abstract class CommonRecord extends AbstractRecord {
 
 	public abstract int getSyncMinValue();
 
+	@Override
+	public void setSyncMinMax(int newMin, int newMax) {
+		this.syncMinValue = newMin;
+		this.syncMaxValue = newMax;
+		log.finer(() -> getName() + " syncMinValue=" + newMin + " syncMaxValue=" + newMax);
+	}
+
 	public int getRealMaxValue() {
 		return this.maxValue;
 	}
@@ -795,15 +802,7 @@ public abstract class CommonRecord extends AbstractRecord {
 
 	}
 
-	/**
-	 * @param newMinDisplayValue the minDisplayValue to set
-	 */
-	public abstract void setMinDisplayValue(double newMinDisplayValue);
-
-	/**
-	 * @param newMaxDisplayValue the maxDisplayValue to set
-	 */
-	public abstract void setMaxDisplayValue(double newMaxDisplayValue);
+	public abstract void setMinMaxDisplayValue(double newMinDisplayValue, double newMaxDisplayValue);
 
 	/**
 	 * @return the minDisplayValue

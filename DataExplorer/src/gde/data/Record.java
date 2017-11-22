@@ -38,6 +38,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.device.DataTypes;
 import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
@@ -868,6 +869,13 @@ public class Record extends AbstractRecord {
 
 	public int getSyncMinValue() {
 		return this.parent.isScopeMode ? this.scopeMin : this.syncMinValue == this.syncMaxValue ? this.syncMinValue - 100 : this.syncMinValue;
+	}
+
+	@Override
+	public void setSyncMinMax(int newMin, int newMax) {
+		this.syncMinValue = newMin;
+		this.syncMaxValue = newMax;
+		log.finer(() -> getName() + " syncMinValue=" + newMin + " syncMaxValue=" + newMax);
 	}
 
 	public int getRealMaxValue() {
@@ -1885,35 +1893,19 @@ public class Record extends AbstractRecord {
 
 	}
 
-	/**
-	 * @param newMinDisplayValue the minDisplayValue to set
-	 */
-	public void setMinDisplayValue(double newMinDisplayValue) {
+	public void setMinMaxDisplayValue(double newMinDisplayValue, double newMaxDisplayValue) {
 		if (this.device.isGPSCoordinates(this)) {
 			this.minDisplayValue = this.device.translateValue(this, newMinDisplayValue) * 1000;
-		} else
+			this.maxDisplayValue = this.device.translateValue(this, newMaxDisplayValue) * 1000;
+		} else {
 			this.minDisplayValue = newMinDisplayValue;
+			this.maxDisplayValue = newMaxDisplayValue;
+		}
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
 			for (AbstractRecord tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
 				Record record = (Record) tmpRecord;
 				record.minDisplayValue = this.minDisplayValue;
-			}
-		}
-	}
-
-	/**
-	 * @param newMaxDisplayValue the maxDisplayValue to set
-	 */
-	public void setMaxDisplayValue(double newMaxDisplayValue) {
-		if (this.device.isGPSCoordinates(this)) {
-			this.maxDisplayValue = this.device.translateValue(this, newMaxDisplayValue) * 1000;
-		} else
-			this.maxDisplayValue = newMaxDisplayValue;
-
-		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
-			for (AbstractRecord tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
-				Record record = (Record) tmpRecord;
 				record.maxDisplayValue = this.maxDisplayValue;
 			}
 		}
@@ -2563,8 +2555,7 @@ public class Record extends AbstractRecord {
 	}
 
 	/**
-	 * query the dataType of this record
-	 * @return
+	 * @return the dataType of this record
 	 */
 	@Override
 	public Record.DataType getDataType() {
@@ -2573,7 +2564,6 @@ public class Record extends AbstractRecord {
 
 	/**
 	 * set the dataType of this record by evaluating its name
-	 * @return
 	 */
 	public void setDataType() {
 		this.dataType = DataType.guess(this.name);
@@ -2581,7 +2571,6 @@ public class Record extends AbstractRecord {
 
 	/**
 	 * set the dataType of this record
-	 * @return
 	 */
 	public void setDataType(Record.DataType newDataType) {
 		this.dataType = newDataType;
@@ -2602,20 +2591,25 @@ public class Record extends AbstractRecord {
 		this.voltageValuesSize = newVoltageValuesSize;
 	}
 
-	/* (non-Javadoc)
-	 * @see gde.data.AbstractRecord#getRealDf()
-	 */
 	@Override
 	public DecimalFormat getRealDf() {
 		return this.df;
 	}
 
-	/* (non-Javadoc)
-	 * @see gde.data.AbstractRecord#setRealDf(java.text.DecimalFormat)
-	 */
 	@Override
 	public void setRealDf(DecimalFormat realDf) {
 		this.df = realDf;
+	}
+
+	@Override
+	public int getSyncMasterRecordOrdinal() {
+		final PropertyType syncProperty = this.parent.isUtilitySet ? getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())
+				: this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+		if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
+			return Integer.parseInt(syncProperty.getValue());
+		} else {
+			return -1;
+		}
 	}
 
 }

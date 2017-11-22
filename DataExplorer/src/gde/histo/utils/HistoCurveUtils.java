@@ -204,9 +204,7 @@ public final class HistoCurveUtils {
 		}
 
 		// set the values corresponding to the display area of this curve
-		record.setMinDisplayValue(yMinValue);
-		record.setMaxDisplayValue(yMaxValue);
-		if (log.isLoggable(FINE)) log.log(FINE, record.getName() + " data limit  -> yMinValue = " + yMinValue + "; yMaxValue = " + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		record.setMinMaxDisplayValue(yMinValue, yMaxValue);
 	}
 
 	/**

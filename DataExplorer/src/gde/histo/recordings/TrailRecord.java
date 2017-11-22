@@ -30,6 +30,7 @@ import gde.data.AbstractRecord;
 import gde.data.CommonRecord;
 import gde.device.IChannelItem;
 import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
 import gde.device.PropertyType;
 import gde.device.TrailTypes;
 import gde.device.resource.DeviceXmlResource;
@@ -210,27 +211,18 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	@Override
-	public void setMinDisplayValue(double newMinDisplayValue) {
+	public void setMinMaxDisplayValue(double newMinDisplayValue, double newMaxDisplayValue) {
 		this.minDisplayValue = RecordingsCollector.decodeVaultValue(this, newMinDisplayValue);
-
-		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
-			for (AbstractRecord tmpRecord : this.getAbstractParent().getScaleSyncedRecords(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
-				TrailRecord record = (TrailRecord) tmpRecord;
-				record.minDisplayValue = this.minDisplayValue;
-			}
-		}
-	}
-
-	@Override
-	public void setMaxDisplayValue(double newMaxDisplayValue) {
 		this.maxDisplayValue = RecordingsCollector.decodeVaultValue(this, newMaxDisplayValue);
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
 			for (AbstractRecord tmpRecord : this.getAbstractParent().getScaleSyncedRecords(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
 				TrailRecord record = (TrailRecord) tmpRecord;
+				record.minDisplayValue = this.minDisplayValue;
 				record.maxDisplayValue = this.maxDisplayValue;
 			}
 		}
+		log.fine(getName() + " data limit  -> yMinValue = " + newMinDisplayValue + "; yMaxValue = " + newMaxDisplayValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -514,5 +506,15 @@ public abstract class TrailRecord extends CommonRecord {
 	 * @return the point value
 	 */
 	public abstract Integer getVaultPoint(ExtendedVault vault, TrailTypes trailType);
+
+	@Override
+	public int getSyncMasterRecordOrdinal() {
+		final PropertyType syncProperty = getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+		if (syncProperty != null && !syncProperty.getValue().isEmpty()) {
+			return Integer.parseInt(syncProperty.getValue());
+		} else {
+			return -1;
+		}
+	}
 
 }

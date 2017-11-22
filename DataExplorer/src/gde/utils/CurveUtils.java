@@ -25,7 +25,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
 import gde.GDE;
-import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
@@ -189,8 +188,7 @@ public class CurveUtils {
 		}
 
 		// set the values corresponding to the display area of this curve
-		record.setMinDisplayValue(yMinValue);
-		record.setMaxDisplayValue(yMaxValue);
+		record.setMinMaxDisplayValue(yMinValue, yMaxValue);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " data limit  -> yMinValue = " + yMinValue + "; yMaxValue = " + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -271,7 +269,7 @@ public class CurveUtils {
 					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
 				}
 			}
-			else if (record.getDevice().isGPSCoordinates((IRecord) record)) {
+			else if (record.getDevice().isGPSCoordinates(record)) {
 				//int tmpDelta = 0;
 				for (int j = 0; j <= displayableSize && displayableSize > 1; j += xScaleFactor) {
 					// get the point to be drawn
