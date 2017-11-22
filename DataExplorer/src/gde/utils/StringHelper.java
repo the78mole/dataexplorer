@@ -686,6 +686,19 @@ public class StringHelper {
 	/**
 	 * convert a byte array into a 2 hex character string representation
 	 * @param bytes
+	 * @return string with converted characters
+	 */
+	public static String byte2Hex2CharString(byte[] bytes) {
+		final StringBuffer sb = new StringBuffer();
+		for (final byte b : bytes) {
+			sb.append(String.format("%02X", b)); //$NON-NLS-1$
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * convert a byte array into a 2 hex character string representation
+	 * @param bytes
 	 * @param size
 	 * @return string with converted characters
 	 */

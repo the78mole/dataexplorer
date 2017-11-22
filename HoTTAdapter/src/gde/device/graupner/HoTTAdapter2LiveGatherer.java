@@ -81,7 +81,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 				HoTTAdapter.IS_SLAVE_MODE = false;
 				HoTTAdapter2LiveGatherer.logger.log(Level.FINE, "HoTTAdapter2.IS_SLAVE_MODE = " + HoTTAdapter.IS_SLAVE_MODE);
 
-				for (int i = 0; i < 10
+				for (int i = 0; i < 3
 						&& (HoTTAdapter.isSensorType[0] == false && HoTTAdapter.isSensorType[1] == false && HoTTAdapter.isSensorType[2] == false && HoTTAdapter.isSensorType[3] == false
 								&& HoTTAdapter.isSensorType[4] == false && HoTTAdapter.isSensorType[5] == false); i++) {
 					try {

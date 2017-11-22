@@ -110,15 +110,16 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	public synchronized byte[] getData(boolean checkBeginEndSignature) throws Exception {
 		final String $METHOD_NAME = "getData";
 		byte[] data = new byte[this.DATA_LENGTH];
-
+		byte[] tmp = new byte[1];
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "-----> getData entry");
 		try {
 			if (!HoTTAdapter.IS_SLAVE_MODE) {
 				this.write(HoTTAdapterSerialPort.QUERY_SENSOR_DATA);
-				this.read(HoTTAdapterSerialPort.ANSWER, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
+				this.read(tmp, HoTTAdapterSerialPort.READ_TIMEOUT_MS, false);
 				data[0] = HoTTAdapterSerialPort.ANSWER[0];
 				WaitTimer.delay(4);
 				this.write(this.SENSOR_TYPE);
-				this.read(HoTTAdapterSerialPort.ANSWER, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
+				this.read(tmp, HoTTAdapterSerialPort.READ_TIMEOUT_MS, false);
 				HoTTAdapterSerialPort.ANSWER[0] = this.SENSOR_TYPE[0];
 				data[1] = HoTTAdapterSerialPort.ANSWER[0];
 			}
@@ -130,17 +131,14 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			}
 
 			this.read(this.ANSWER_DATA, HoTTAdapterSerialPort.READ_TIMEOUT_MS, true);
-
+			
+			WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
+			
 			if (checkBeginEndSignature && HoTTAdapter.IS_SLAVE_MODE) {
 				synchronizeDataBlock(data, checkBeginEndSignature);
 			}
 			else
 				System.arraycopy(this.ANSWER_DATA, 0, data, (HoTTAdapter.IS_SLAVE_MODE ? 0 : 2), this.ANSWER_DATA.length);
-
-			if (HoTTAdapterSerialPort.log.isLoggable(Level.FINEST)) {
-				HoTTAdapterSerialPort.log.logp(Level.FINEST, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(data));
-				HoTTAdapterSerialPort.log.logp(Level.FINEST, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
-			}
 
 			if (!this.isInterruptedByUser && checkBeginEndSignature && !(data[2] == HoTTAdapterSerialPort.DATA_BEGIN && data[data.length - 2] == HoTTAdapterSerialPort.DATA_END)) {
 				this.addXferError();
@@ -156,18 +154,19 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		catch (FailedQueryException e) {
 			if (!this.isQueryRetry) {
 				this.isQueryRetry = true;
+				WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 				data = getData(true);
 			}
 			else {
 				this.isQueryRetry = false;
-				WaitTimer.delay(HoTTAdapterSerialPort.READ_TIMEOUT_MS);
+				WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
 				TimeOutException te = new TimeOutException(Messages.getString(MessageIds.GDE_MSGE0011, new Object[] { this.ANSWER_DATA.length, HoTTAdapterSerialPort.READ_TIMEOUT_MS }));
 				HoTTAdapterSerialPort.log.log(Level.SEVERE, te.getMessage(), te);
 				throw te;
 			}
 		}
 		if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) {
-			HoTTAdapterSerialPort.log.logp(Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(data));
+			//HoTTAdapterSerialPort.log.logp(Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(data));
 			HoTTAdapterSerialPort.log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
 		}
 		return data;
@@ -583,7 +582,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		byte[] cmd2 = new byte[cmdAll.length - 7];
 		System.arraycopy(cmdAll, 7, cmd2, 0, cmdAll.length - 7);
 		this.write(cmd2);
-
+		log.log(Level.OFF, StringHelper.byte2Hex2CharString(cmdAll));
 		WaitTimer.delay(HoTTAdapterSerialPort.CMD_GAP_MS);
 	}
 
