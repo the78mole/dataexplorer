@@ -387,6 +387,7 @@ public class HoTTbinReader {
 		HoTTbinReader.lostPackages.clear();
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isJustParsed = false;
+		boolean isWrongDataBlockNummerSignaled = false;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && !HoTTAdapter.isChannelsChannelEnabled ? 10 : 1);
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
@@ -447,11 +448,8 @@ public class HoTTbinReader {
 					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
 
-				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { // switch
-					// into
-					// text
-					// modus
-					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { // buf 3, 4, tx,rx
+				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { // switch into text modus
+					if (HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { // buf 3, 4, tx,rx
 						if (HoTTbinReader.log.isLoggable(Level.FINE)) HoTTbinReader.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
 						HoTTAdapter.reverseChannelPackageLossCounter.add(1);
@@ -477,239 +475,230 @@ public class HoTTbinReader {
 						if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
 						}
-
-						HoTTbinReader.timeStep_ms += 10;// add default time step
-						// from device of 10
-						// msec
-
-						// log.log(Level.OFF, "sensor type ID = " +
-						// StringHelper.byte2Hex2CharString(new byte[] {(byte)
-						// (HoTTbinReader.buf[7] & 0xFF)}, 1));
-						switch ((byte) (HoTTbinReader.buf[7] & 0xFF)) {
-						case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
-						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()]) {
-								// check if recordSetVario initialized,
-								// transmitter and receiver data always present,
-								// but not in the same data rate and signals
-								if (HoTTbinReader.recordSetVario == null) {
-									channel = HoTTbinReader.channels.get(2);
+						HoTTbinReader.timeStep_ms += 10;// add default time step from device of 10 msec
+						// log.log(Level.OFF, "sensor type ID = " + StringHelper.byte2Hex2CharString(new byte[] {(byte) (HoTTbinReader.buf[7] & 0xFF)}, 1));
+						if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4) { // expected data block number
+							switch ((byte) (HoTTbinReader.buf[7] & 0xFF)) {
+							case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
+							case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()]) {
+									// check if recordSetVario initialized, transmitter and receiver data always present, but not in the same data rate and signals
+									if (HoTTbinReader.recordSetVario == null) {
+										channel = HoTTbinReader.channels.get(2);
 									channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
 											? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey()
 											: date);
 									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
 											+ HoTTAdapter.Sensor.VARIO.value() + recordSetNameExtend;
-									HoTTbinReader.recordSetVario = RecordSet.createRecordSet(recordSetName, device, 2, true, true, true);
-									channel.put(recordSetName, HoTTbinReader.recordSetVario);
-									HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.VARIO.value(), HoTTbinReader.recordSetVario);
-									tmpRecordSet = channel.get(recordSetName);
-									tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT
+										HoTTbinReader.recordSetVario = RecordSet.createRecordSet(recordSetName, device, 2, true, true, true);
+										channel.put(recordSetName, HoTTbinReader.recordSetVario);
+										HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.VARIO.value(), HoTTbinReader.recordSetVario);
+										tmpRecordSet = channel.get(recordSetName);
+									  tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT
 											+ Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
-									tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
-									if (HoTTbinReader.application.getMenuToolBar() != null) {
-										channel.applyTemplate(recordSetName, false);
+										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
+										if (HoTTbinReader.application.getMenuToolBar() != null) {
+											channel.applyTemplate(recordSetName, false);
+										}
+									}
+									// recordSetVario initialized and ready to add data
+									// fill data block 1 to 2
+									if (HoTTbinReader.buf[33] == 1) {
+										HoTTbinReader.buf1 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
+									}
+									if (HoTTbinReader.buf[33] == 2) {
+										HoTTbinReader.buf2 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
+									}
+									if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null) {
+										version = parseAddVario(version, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2);
+										HoTTbinReader.buf1 = HoTTbinReader.buf2 = null;
 									}
 								}
-								// recordSetVario initialized and ready to add data
-								// fill data block 1 to 2
-								if (HoTTbinReader.buf[33] == 1) {
-									HoTTbinReader.buf1 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-								}
-								if (HoTTbinReader.buf[33] == 2) {
-									HoTTbinReader.buf2 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-								}
-								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null) {
-									version = parseAddVario(version, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2);
-									HoTTbinReader.buf1 = HoTTbinReader.buf2 = null;
-								}
-							}
-							break;
+								break;
 
-						case HoTTAdapter.SENSOR_TYPE_GPS_115200:
-						case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()]) {
-								// check if recordSetReceiver initialized,
-								// transmitter and receiver data always present,
-								// but not in the same data rate as signals
-								if (HoTTbinReader.recordSetGPS == null) {
-									channel = HoTTbinReader.channels.get(3);
+							case HoTTAdapter.SENSOR_TYPE_GPS_115200:
+							case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()]) {
+									// check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate as signals
+									if (HoTTbinReader.recordSetGPS == null) {
+										channel = HoTTbinReader.channels.get(3);
 									channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
 											? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey()
 											: date);
-									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK+ HoTTAdapter.Sensor.GPS.value() + recordSetNameExtend;
-									HoTTbinReader.recordSetGPS = RecordSet.createRecordSet(recordSetName, device, 3, true, true, true);
-									channel.put(recordSetName, HoTTbinReader.recordSetGPS);
-									HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GPS.value(), HoTTbinReader.recordSetGPS);
-									tmpRecordSet = channel.get(recordSetName);
-									tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT+ Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
-									tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
-									if (HoTTbinReader.application.getMenuToolBar() != null) {
-										channel.applyTemplate(recordSetName, false);
+										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GPS.value() + recordSetNameExtend;
+										HoTTbinReader.recordSetGPS = RecordSet.createRecordSet(recordSetName, device, 3, true, true, true);
+										channel.put(recordSetName, HoTTbinReader.recordSetGPS);
+										HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GPS.value(), HoTTbinReader.recordSetGPS);
+										tmpRecordSet = channel.get(recordSetName);
+										tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
+										if (HoTTbinReader.application.getMenuToolBar() != null) {
+											channel.applyTemplate(recordSetName, false);
+										}
+									}
+									// recordSetGPS initialized and ready to add data
+									// fill data block 1 to 3
+									if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
+										HoTTbinReader.buf1 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
+									}
+									if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
+										HoTTbinReader.buf2 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
+									}
+									if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
+										HoTTbinReader.buf3 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
+									}
+									if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null) {
+										parseAddGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3);
+										HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = null;
 									}
 								}
-								// recordSetGPS initialized and ready to add data
-								// fill data block 1 to 3
-								if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
-									HoTTbinReader.buf1 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-								}
-								if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
-									HoTTbinReader.buf2 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-								}
-								if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
-									HoTTbinReader.buf3 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-								}
-								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null) {
-									parseAddGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3);
-									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = null;
-								}
-							}
-							break;
+								break;
 
-						case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
-						case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()]) {
-								// check if recordSetGeneral initialized,
-								// transmitter and receiver data always present,
-								// but not in the same data rate and signals
-								if (HoTTbinReader.recordSetGAM == null) {
-									channel = HoTTbinReader.channels.get(4);
+							case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
+							case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()]) {
+									// check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
+									if (HoTTbinReader.recordSetGAM == null) {
+										channel = HoTTbinReader.channels.get(4);
 									channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
 											? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey()
 											: date);
-									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GAM.value() + recordSetNameExtend;
-									HoTTbinReader.recordSetGAM = RecordSet.createRecordSet(recordSetName, device, 4, true, true, true);
-									channel.put(recordSetName, HoTTbinReader.recordSetGAM);
-									HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GAM.value(), HoTTbinReader.recordSetGAM);
-									tmpRecordSet = channel.get(recordSetName);
-									tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
-									tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
-									if (HoTTbinReader.application.getMenuToolBar() != null) {
-										channel.applyTemplate(recordSetName, false);
+										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GAM.value() + recordSetNameExtend;
+										HoTTbinReader.recordSetGAM = RecordSet.createRecordSet(recordSetName, device, 4, true, true, true);
+										channel.put(recordSetName, HoTTbinReader.recordSetGAM);
+										HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.GAM.value(), HoTTbinReader.recordSetGAM);
+										tmpRecordSet = channel.get(recordSetName);
+										tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
+										if (HoTTbinReader.application.getMenuToolBar() != null) {
+											channel.applyTemplate(recordSetName, false);
+										}
+									}
+									// recordSetGeneral initialized and ready to add data
+									// fill data block 1 to 4
+									if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
+										HoTTbinReader.buf1 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
+									}
+									if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
+										HoTTbinReader.buf2 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
+									}
+									if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
+										HoTTbinReader.buf3 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
+									}
+									if (HoTTbinReader.buf4 == null && HoTTbinReader.buf[33] == 4) {
+										HoTTbinReader.buf4 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
+									}
+									if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
+										parseAddGAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
+										HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 									}
 								}
-								// recordSetGeneral initialized and ready to add data
-								// fill data block 1 to 4
-								if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
-									HoTTbinReader.buf1 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-								}
-								if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
-									HoTTbinReader.buf2 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-								}
-								if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
-									HoTTbinReader.buf3 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-								}
-								if (HoTTbinReader.buf4 == null && HoTTbinReader.buf[33] == 4) {
-									HoTTbinReader.buf4 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-								}
-								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
-									parseAddGAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
-								}
-							}
-							break;
+								break;
 
-						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
-						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()]) {
-								// check if recordSetGeneral initialized,
-								// transmitter and receiver data always present,
-								// but not in the same data rate and signals
-								if (HoTTbinReader.recordSetEAM == null) {
-									channel = HoTTbinReader.channels.get(5);
+							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
+							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()]) {
+									// check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
+									if (HoTTbinReader.recordSetEAM == null) {
+										channel = HoTTbinReader.channels.get(5);
 									channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
 											? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey()
 											: date);
-									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.EAM.value() + recordSetNameExtend;
-									HoTTbinReader.recordSetEAM = RecordSet.createRecordSet(recordSetName, device, 5, true, true, true);
-									channel.put(recordSetName, HoTTbinReader.recordSetEAM);
-									HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.EAM.value(), HoTTbinReader.recordSetEAM);
-									tmpRecordSet = channel.get(recordSetName);
-									tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
-									tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
-									if (HoTTbinReader.application.getMenuToolBar() != null) {
-										channel.applyTemplate(recordSetName, false);
+										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.EAM.value() + recordSetNameExtend;
+										HoTTbinReader.recordSetEAM = RecordSet.createRecordSet(recordSetName, device, 5, true, true, true);
+										channel.put(recordSetName, HoTTbinReader.recordSetEAM);
+										HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.EAM.value(), HoTTbinReader.recordSetEAM);
+										tmpRecordSet = channel.get(recordSetName);
+										tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
+										if (HoTTbinReader.application.getMenuToolBar() != null) {
+											channel.applyTemplate(recordSetName, false);
+										}
+									}
+									// recordSetElectric initialized and ready to add data
+									// fill data block 1 to 4
+									if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
+										HoTTbinReader.buf1 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
+									}
+									if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
+										HoTTbinReader.buf2 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
+									}
+									if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
+										HoTTbinReader.buf3 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
+									}
+									if (HoTTbinReader.buf4 == null && HoTTbinReader.buf[33] == 4) {
+										HoTTbinReader.buf4 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
+									}
+									if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
+										parseAddEAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
+										HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 									}
 								}
-								// recordSetElectric initialized and ready to add data
-								// fill data block 1 to 4
-								if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
-									HoTTbinReader.buf1 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-								}
-								if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
-									HoTTbinReader.buf2 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-								}
-								if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
-									HoTTbinReader.buf3 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-								}
-								if (HoTTbinReader.buf4 == null && HoTTbinReader.buf[33] == 4) {
-									HoTTbinReader.buf4 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-								}
-								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
-									parseAddEAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
-								}
-							}
-							break;
+								break;
 
-						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
-						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()]) {
-								// check if recordSetMotorDriver initialized,
-								// transmitter and receiver data always present,
-								// but not in the same data rate and signals
-								if (HoTTbinReader.recordSetESC == null) {
-									channel = HoTTbinReader.channels.get(7);
+							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
+							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()]) {
+									// check if recordSetMotorDriver initialized, transmitter and receiver data always present, but not in the same data rate and signals
+									if (HoTTbinReader.recordSetESC == null) {
+										channel = HoTTbinReader.channels.get(7);
 									channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
 											? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey()
 											: date);
-									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ESC.value() + recordSetNameExtend;
-									HoTTbinReader.recordSetESC = RecordSet.createRecordSet(recordSetName, device, 7, true, true, true);
-									channel.put(recordSetName, HoTTbinReader.recordSetESC);
-									HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ESC.value(), HoTTbinReader.recordSetESC);
-									tmpRecordSet = channel.get(recordSetName);
-									tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
-									tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
-									if (HoTTbinReader.application.getMenuToolBar() != null) {
-										channel.applyTemplate(recordSetName, false);
+										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ESC.value() + recordSetNameExtend;
+										HoTTbinReader.recordSetESC = RecordSet.createRecordSet(recordSetName, device, 7, true, true, true);
+										channel.put(recordSetName, HoTTbinReader.recordSetESC);
+										HoTTAdapter.recordSets.put(HoTTAdapter.Sensor.ESC.value(), HoTTbinReader.recordSetESC);
+										tmpRecordSet = channel.get(recordSetName);
+										tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime);
+										tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
+										if (HoTTbinReader.application.getMenuToolBar() != null) {
+											channel.applyTemplate(recordSetName, false);
+										}
+									}
+									// recordSetMotorDriver initialized and ready to add data
+									// fill data block 1 to 4
+									if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
+										HoTTbinReader.buf1 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
+									}
+									if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
+										HoTTbinReader.buf2 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
+									}
+									if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 2) {
+										HoTTbinReader.buf3 = new byte[30];
+										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
+									}
+									if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null) {
+										parseAddESC(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3);
+										HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 									}
 								}
-								// recordSetMotorDriver initialized and ready to add data
-								// fill data block 1 to 4
-								if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
-									HoTTbinReader.buf1 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-								}
-								if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
-									HoTTbinReader.buf2 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-								}
-								if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 2) {
-									HoTTbinReader.buf3 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-								}
-								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null) {
-									parseAddESC(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3);
-									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
-								}
+								break;
 							}
-							break;
 						}
-
-						if (menuToolBar != null && i % progressIndicator == 0)
-							HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+						else {
+							if (!isWrongDataBlockNummerSignaled) {
+								application.openMessageDialogAsync(String.format("Datenblocknummer ausserhalb des Bereichs von 0 bis 5 (%d)", buf[33]));
+								isWrongDataBlockNummerSignaled = true;
+							}
+							HoTTbinReader.isJustParsed = true;
+						}
+						if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 
 						if (HoTTbinReader.isJustParsed && HoTTbinReader.countLostPackages > 0) {
 							HoTTbinReader.lostPackages.add(HoTTbinReader.countLostPackages);
@@ -726,21 +715,16 @@ public class HoTTbinReader {
 						++countPackageLoss; // add up lost packages in telemetry
 						// data
 						++HoTTbinReader.countLostPackages;
-						// HoTTbinReader.pointsReceiver[0] = (int)
-						// (countPackageLoss*100.0 /
-						// ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0);
+						// HoTTbinReader.pointsReceiver[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader.timeStep_ms+10) / 10.0)*1000.0);
 
 						if (HoTTAdapter.isChannelsChannelEnabled) {
 							parseAddChannel(HoTTbinReader.buf);
 						}
 
 						HoTTbinReader.timeStep_ms += 10;
-						// reset buffer to avoid mixing data >> 20 Jul 14, not
-						// any longer required due to protocol change requesting
-						// next sensor data block
-						// HoTTbinReader.buf1 = HoTTbinReader.buf2 =
-						// HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
-					}
+						// reset buffer to avoid mixing data >> 20 Jul 14, not any longer required due to protocol change requesting next sensor data block
+						// HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
+					} 
 				}
 				else if (!HoTTbinReader.isTextModusSignaled) {
 					HoTTbinReader.isTextModusSignaled = true;
@@ -1283,8 +1267,10 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsChannel[19] = (_buf[50] & 0x01) * 100000;
 		HoTTbinReader.pointsChannel[20] = (_buf[50] & 0x02) * 50000;
 		HoTTbinReader.pointsChannel[21] = (_buf[50] & 0x04) * 25000;
-		if (_buf[32] > 0 && _buf[32] < 27)
+		if (_buf[32] > 0 && _buf[32] < 27) {
 			HoTTbinReader.pointsChannel[22] = _buf[32] * 1000; //warning
+			log.log(Level.WARNING, String.format("Warning %d occured at %s", HoTTbinReader.pointsChannel[22]/1000, StringHelper.getFormatedTime("HH:mm:ss.SSS", HoTTbinReader.timeStep_ms+HoTTbinReader.recordSetChannel.getStartTimeStamp())));
+		}
 		else
 			HoTTbinReader.pointsChannel[22] = 0;
 		
