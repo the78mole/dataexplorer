@@ -54,13 +54,13 @@ public abstract class TrailRecord extends CommonRecord {
 	protected final IChannelItem			channelItem;
 	protected final TrailSelector			trailSelector;
 
-	protected final SuiteRecords			suiteRecords					= new SuiteRecords();
+	protected final SuiteRecords			suiteRecords	= new SuiteRecords();
 
-	protected double									factor								= Double.MIN_VALUE;
-	protected double									offset								= Double.MIN_VALUE;
-	protected double									reduction							= Double.MIN_VALUE;
+	protected double									factor				= Double.MIN_VALUE;
+	protected double									offset				= Double.MIN_VALUE;
+	protected double									reduction			= Double.MIN_VALUE;
 
-	final protected DeviceXmlResource	xmlResource						= DeviceXmlResource.getInstance();
+	final protected DeviceXmlResource	xmlResource		= DeviceXmlResource.getInstance();
 
 	protected TrailRecord(IChannelItem channelItem, int newOrdinal, TrailRecordSet parentTrail, int initialCapacity) {
 		super(DataExplorer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),

@@ -280,74 +280,104 @@ public final class HistoCurveUtils {
 		// int xScaleFactor = 1; // x-axis scaling not supported
 		// record.setDisplayScaleFactorTime(xScaleFactor);
 		record.setDisplayScaleFactorValue(height);
+		if (record.getTrailSelector().isBoxPlotSuite()) {
+			drawBoxPlot(record, gc, timeLine);
+		} else if (record.getTrailSelector().isRangePlotSuite()) {
+			drawRangePlot(record, gc, timeLine);
+		} else {
+			throw new UnsupportedOperationException();
+		}
+	}
 
+	/**
+	 * @param record
+	 * @param gc
+	 * @param timeLine
+	 */
+	public static void drawRangePlot(TrailRecord record, GC gc, HistoTimeLine timeLine) {
+		StringBuffer sb = new StringBuffer(); // logging purpose
 		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-		List<PointArray> suitePoints = new HistoGraphicsMapper(record).getSuiteDisplayPoints(timeLine, x0, y0);
+		List<PointArray> suitePoints = new HistoGraphicsMapper(record).getSuiteDisplayPoints(timeLine);
 		PointArray oldPoints = null;
 
-		StringBuffer sb = new StringBuffer(); // logging purpose
-		List<Integer> durations_mm = record.getParentTrail().getDurations_mm();
-		double averageDuration = durations_mm.parallelStream().mapToDouble(d -> d).average().getAsDouble();
-		Iterator<Integer> durationIterator = durations_mm.iterator();
 		for (PointArray pointArray : suitePoints) {
 			if (pointArray == null) {
 				; // neither boxplot nor the rangeplot needs this information
 			} else {
-				if (record.getTrailSelector().isBoxPlotSuite()) {
-					if (log.isLoggable(FINEST)) sb.append(GDE.LINE_SEPARATOR).append(Arrays.toString(pointArray.getY()));
-					// helper variables
-					final int posX = pointArray.getX();
-					final int q0PosY = pointArray.getY(0), q1PosY = pointArray.getY(1), q2PosY = pointArray.getY(2), q3PosY = pointArray.getY(3),
-							q4PosY = pointArray.getY(4), qLowerWhiskerY = pointArray.getY(5), qUpperWhiskerY = pointArray.getY(6);
-					final int interQuartileRange = q1PosY - q3PosY;
-					int boxWidth = timeLine.getDensity().getScaledBoxWidth();
-					int halfBoxWidth = (int) (boxWidth * (1. + (Math.sqrt(durationIterator.next() / averageDuration) - 1) * timeLine.getDensity().boxWidthAmplitude * HistoCurveUtils.settings.getBoxplotSizeAdaptationOrdinal() / 3.0) / 2.);
-					// divison by 3 is the best fit divisor; 2 results in bigger modulation rates
-					halfBoxWidth = halfBoxWidth < 1 ? 1 : halfBoxWidth;
-					// draw main box
-					gc.drawRectangle(posX - halfBoxWidth, q3PosY, halfBoxWidth * 2, interQuartileRange);
-					gc.drawLine(posX - halfBoxWidth, q2PosY, posX + halfBoxWidth, q2PosY);
-					// draw min and lower whisker
-					if (q0PosY > qLowerWhiskerY) {
-						drawHistoMarker(gc, new Point(posX, pointArray.getY(0)), timeLine.getDensity());
-					}
-					gc.drawLine(posX, qLowerWhiskerY, posX, q1PosY);
-					gc.drawLine(posX - halfBoxWidth / 2, qLowerWhiskerY, posX + halfBoxWidth / 2, qLowerWhiskerY);
-					// draw max and upper whisker
-					if (q4PosY < qUpperWhiskerY) {
-						drawHistoMarker(gc, new Point(posX, pointArray.getY(4)), timeLine.getDensity());
-					}
-					gc.drawLine(posX, qUpperWhiskerY, posX, q3PosY);
-					gc.drawLine(posX - halfBoxWidth / 2, qUpperWhiskerY, posX + halfBoxWidth / 2, qUpperWhiskerY);
-				} else if (record.getTrailSelector().isRangePlotSuite()) { // other suite members do not require a special treatment
-					final int posX = pointArray.getX();
-					drawHistoMarker(gc, new Point(posX, pointArray.getY(0)), timeLine.getDensity());
-					// helper variables
-					if (oldPoints == null) {
-						; // no connecting lines required
-					} else {
-						final int oldPosX = oldPoints.getX();
-						if (log.isLoggable(FINEST)) sb.append(GDE.LINE_SEPARATOR).append(Arrays.toString(pointArray.getY()));
-						// draw main curve
-						gc.drawLine(oldPosX, oldPoints.getY(0), posX, pointArray.getY(0));
-						// draw two extremum curves
-						gc.setLineStyle(SWT.LINE_DASH);
-						// gc.drawLine(oldPosX, oldSuitePoints[1].y, posX, newSuitePoints[1].y);
-						// gc.drawLine(oldPosX, oldSuitePoints[2].y, posX, newSuitePoints[2].y);
-						drawNullableLine(gc, new Point(oldPosX, oldPoints.getY(1)), new Point(posX, pointArray.getY(1)));
-						drawNullableLine(gc, new Point(oldPosX, oldPoints.getY(2)), new Point(posX, pointArray.getY(2)));
-					}
-					// draw vertical connection lines sparsely dotted
-					gc.setLineStyle(SWT.LINE_CUSTOM);
-					gc.setLineDash(new int[] { 2, 9 });
-					// gc.drawLine(posX, newSuitePoints[1].y, posX, newSuitePoints[2].y);
-					drawNullableLine(gc, new Point(posX, pointArray.getY(1)), new Point(posX, pointArray.getY(2)));
-					gc.setLineStyle(SWT.LINE_SOLID);
-
-					oldPoints = pointArray;
+				final int posX = pointArray.getX();
+				drawHistoMarker(gc, new Point(posX, pointArray.getY(0)), timeLine.getDensity());
+				// helper variables
+				if (oldPoints == null) {
+					; // no connecting lines required
 				} else {
-					throw new UnsupportedOperationException();
+					final int oldPosX = oldPoints.getX();
+					if (log.isLoggable(FINEST)) sb.append(GDE.LINE_SEPARATOR).append(Arrays.toString(pointArray.getY()));
+					// draw main curve
+					gc.drawLine(oldPosX, oldPoints.getY(0), posX, pointArray.getY(0));
+					// draw two extremum curves
+					gc.setLineStyle(SWT.LINE_DASH);
+					// gc.drawLine(oldPosX, oldSuitePoints[1].y, posX, newSuitePoints[1].y);
+					// gc.drawLine(oldPosX, oldSuitePoints[2].y, posX, newSuitePoints[2].y);
+					drawNullableLine(gc, new Point(oldPosX, oldPoints.getY(1)), new Point(posX, pointArray.getY(1)));
+					drawNullableLine(gc, new Point(oldPosX, oldPoints.getY(2)), new Point(posX, pointArray.getY(2)));
 				}
+				// draw vertical connection lines sparsely dotted
+				gc.setLineStyle(SWT.LINE_CUSTOM);
+				gc.setLineDash(new int[] { 2, 9 });
+				// gc.drawLine(posX, newSuitePoints[1].y, posX, newSuitePoints[2].y);
+				drawNullableLine(gc, new Point(posX, pointArray.getY(1)), new Point(posX, pointArray.getY(2)));
+				gc.setLineStyle(SWT.LINE_SOLID);
+
+				oldPoints = pointArray;
+			}
+		}
+		log.finest(() -> sb.toString());
+	}
+
+	/**
+	 * @param record
+	 * @param gc
+	 * @param timeLine
+	 */
+	public static void drawBoxPlot(TrailRecord record, GC gc, HistoTimeLine timeLine) {
+		StringBuffer sb = new StringBuffer(); // logging purpose
+		List<PointArray> suitePoints = new HistoGraphicsMapper(record).getSuiteDisplayPoints(timeLine);
+
+		List<Integer> durations_mm = record.getParentTrail().getDurations_mm();
+		double averageDuration = durations_mm.parallelStream().mapToDouble(d -> d).average().getAsDouble();
+		Iterator<Integer> durationIterator = durations_mm.iterator();
+
+		int boxWidth = timeLine.getDensity().getScaledBoxWidth();
+		// divison by 3 is the best fit divisor; 2 results in bigger modulation rates
+		double boxSizeFactor = timeLine.getDensity().boxWidthAmplitude * HistoCurveUtils.settings.getBoxplotSizeAdaptationOrdinal() / 3.0;
+
+		for (PointArray pointArray : suitePoints) {
+			if (pointArray == null) {
+				; // neither boxplot nor the rangeplot needs this information
+			} else {
+				if (log.isLoggable(FINEST)) sb.append(GDE.LINE_SEPARATOR).append(Arrays.toString(pointArray.getY()));
+				// helper variables
+				final int posX = pointArray.getX();
+				final int q0PosY = pointArray.getY(0), q1PosY = pointArray.getY(1), q2PosY = pointArray.getY(2), q3PosY = pointArray.getY(3),
+						q4PosY = pointArray.getY(4), qLowerWhiskerY = pointArray.getY(5), qUpperWhiskerY = pointArray.getY(6);
+				final int interQuartileRange = q1PosY - q3PosY;
+				int halfBoxWidth = (int) (boxWidth * (1. + (Math.sqrt(durationIterator.next() / averageDuration) - 1) * boxSizeFactor) / 2.);
+				halfBoxWidth = halfBoxWidth < 1 ? 1 : halfBoxWidth;
+				// draw main box
+				gc.drawRectangle(posX - halfBoxWidth, q3PosY, halfBoxWidth * 2, interQuartileRange);
+				gc.drawLine(posX - halfBoxWidth, q2PosY, posX + halfBoxWidth, q2PosY);
+				// draw min and lower whisker
+				if (q0PosY > qLowerWhiskerY) {
+					drawHistoMarker(gc, new Point(posX, pointArray.getY(0)), timeLine.getDensity());
+				}
+				gc.drawLine(posX, qLowerWhiskerY, posX, q1PosY);
+				gc.drawLine(posX - halfBoxWidth / 2, qLowerWhiskerY, posX + halfBoxWidth / 2, qLowerWhiskerY);
+				// draw max and upper whisker
+				if (q4PosY < qUpperWhiskerY) {
+					drawHistoMarker(gc, new Point(posX, pointArray.getY(4)), timeLine.getDensity());
+				}
+				gc.drawLine(posX, qUpperWhiskerY, posX, q3PosY);
+				gc.drawLine(posX - halfBoxWidth / 2, qUpperWhiskerY, posX + halfBoxWidth / 2, qUpperWhiskerY);
 			}
 		}
 		log.finest(() -> sb.toString());

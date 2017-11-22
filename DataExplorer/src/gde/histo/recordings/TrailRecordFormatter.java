@@ -142,10 +142,10 @@ public final class TrailRecordFormatter {
 	/**
 	 * @param suiteOrdinal
 	 * @param index
-	 * @return the formatted value also for GPS coordinates
+	 * @return the formatted and truncated value also for GPS coordinates
 	 */
 	private String getTruncatedTableValue(int suiteOrdinal, int index, int length) {
-		return trunc(getTableValue(this.trailRecord.getSuiteRecords().get(suiteOrdinal).get(index) / 1000.), 8);
+		return trunc(getTableValue(this.trailRecord.getSuiteRecords().get(suiteOrdinal).get(index) / 1000.), length);
 	}
 
 	/**

@@ -110,7 +110,6 @@ public final class TrailRecordSynchronizer {
 
 		// the same procedure is required for those records which are synchronized
 		updateSyncRecordScale();
-		;
 	}
 
 	/**

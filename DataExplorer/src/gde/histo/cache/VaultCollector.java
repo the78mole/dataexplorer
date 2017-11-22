@@ -24,7 +24,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import gde.config.Settings;
@@ -97,6 +96,7 @@ public final class VaultCollector {
 	private ExtendedVault				vault;
 
 	private final DataExplorer	application	= DataExplorer.getInstance();
+	private IDevice							device			= DataExplorer.getInstance().getActiveDevice();
 	private final Settings			settings		= Settings.getInstance();
 	private SourceDataSet				sourceDataSet;
 
@@ -176,7 +176,7 @@ public final class VaultCollector {
 	 * @param isSampled
 	 */
 	private void setMeasurementPoints(RecordSet recordSet, boolean isSampled) {
-		List<MeasurementType> channelMeasurements = this.application.getActiveDevice().getChannelMeasuremts(this.vault.getLogChannelNumber());
+		List<MeasurementType> channelMeasurements = device.getChannelMeasuremts(this.vault.getLogChannelNumber());
 		for (int i = 0; i < recordSet.getRecordNames().length; i++) {
 			MeasurementType measurementType = channelMeasurements.get(i);
 			Record record = recordSet.get(recordSet.getRecordNames()[i]);
@@ -184,20 +184,14 @@ public final class VaultCollector {
 			CompartmentType entryPoints = new CompartmentType(i, measurementType.getName(), DataTypes.fromDataType(record.getDataType()));
 			this.vault.getMeasurements().put(i, entryPoints);
 			entryPoints.setTrails(new HashMap<Integer, PointType>());
-			Map<TrailTypes, Integer> trailPoints = new HashMap<>();
 
 			if (record.isEmpty()) {
 				log.fine(() -> String.format("no data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLogFilePath())); //$NON-NLS-1$
 			} else {
-				StatisticsType measurementStatistics = measurementType.getStatistics();
-				if (measurementStatistics != null) { // this creates trail types mismatch : && record.hasReasonableData()) {
-					trailPoints.putAll(getTrailStatisticsPoints(record, measurementStatistics, recordSet));
+				if (measurementType.getStatistics() != null) { // this creates trail types mismatch : && record.hasReasonableData()) {
+					setTrailStatisticsPoints(entryPoints, record, recordSet);
 				}
-				trailPoints.putAll(getTrailPoints(record, isSampled));
-			}
-
-			for (Entry<TrailTypes, Integer> entry : trailPoints.entrySet()) {
-				entryPoints.addPoint(entry.getKey(), entry.getValue());
+				setTrailPoints(entryPoints, record, isSampled);
 			}
 			log.finer(() -> record.getName() + " data " + entryPoints); //$NON-NLS-1$
 		}
@@ -211,7 +205,7 @@ public final class VaultCollector {
 	private LinkedHashMap<String, SettlementRecord> determineSettlements(RecordSet recordSet, GroupTransitions transitions) {
 		LinkedHashMap<String, SettlementRecord> histoSettlements = new LinkedHashMap<String, SettlementRecord>();
 
-		for (SettlementType settlementType : this.application.getActiveDevice().getDeviceConfiguration().getChannel(this.vault.logChannelNumber).getSettlements().values()) {
+		for (SettlementType settlementType : device.getDeviceConfiguration().getChannel(this.vault.logChannelNumber).getSettlements().values()) {
 			if (settlementType.getEvaluation() != null) {
 				final TransitionFigureType transitionFigureType = settlementType.getEvaluation().getTransitionFigure();
 				final TransitionAmountType transitionAmountType = settlementType.getEvaluation().getTransitionAmount();
@@ -248,14 +242,16 @@ public final class VaultCollector {
 	}
 
 	/**
+	 * Set the list of point values for trail types marked as 'real'.
+	 * @param entryPoints is the target object
 	 * @param record
-	 * @param measurementStatistics
 	 * @param recordSet
-	 * @return the list of point values for each trail type marked as 'real'
 	 */
-	private Map<TrailTypes, Integer> getTrailStatisticsPoints(Record record, StatisticsType measurementStatistics, RecordSet recordSet) {
-		final Map<TrailTypes, Integer> trailPoints = new HashMap<>();
-		final IDevice device = this.application.getActiveDevice();
+	private void  setTrailStatisticsPoints(CompartmentType entryPoints, Record record, RecordSet recordSet) {
+		StatisticsType measurementStatistics = this.device.getChannelMeasuremts(this.vault.getLogChannelNumber()).get(record.getOrdinal()).getStatistics();
+
+		entryPoints.addPoint(TrailTypes.REAL_FIRST, transmuteValue(record, record.elementAt(0)));
+		entryPoints.addPoint(TrailTypes.REAL_LAST, transmuteValue(record, record.elementAt(record.realSize() - 1)));
 
 		int triggerRefOrdinal = -1;
 		if (measurementStatistics.getTriggerRefOrdinal() != null) {
@@ -265,98 +261,133 @@ public final class VaultCollector {
 			// }
 		}
 		boolean isTriggerLevel = measurementStatistics.getTrigger() != null;
+
 		if (measurementStatistics.isAvg()) {
-			if (isTriggerLevel)
-				trailPoints.put(TrailTypes.REAL_AVG, record.getAvgValueTriggered() != Integer.MIN_VALUE ? record.getAvgValueTriggered() : 0);
-			else if (triggerRefOrdinal < 0 || record.getAvgValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
-				trailPoints.put(TrailTypes.REAL_AVG, triggerRefOrdinal < 0 ? record.getAvgValue() : (Integer) record.getAvgValueTriggered(triggerRefOrdinal));
+			if (isTriggerLevel) {
+				int dd = record.getAvgValueTriggered() != Integer.MIN_VALUE ? record.getAvgValueTriggered() : 0;
+				entryPoints.addPoint(TrailTypes.REAL_AVG, transmuteValue(record, dd));
+			} else if (triggerRefOrdinal < 0) {
+				entryPoints.addPoint(TrailTypes.REAL_AVG, transmuteValue(record, record.getAvgValue()));
+			} else if (record.getAvgValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) {
+				entryPoints.addPoint(TrailTypes.REAL_AVG, transmuteValue(record, record.getAvgValueTriggered(triggerRefOrdinal)));
+			}
 		} else {
-			trailPoints.put(TrailTypes.REAL_AVG, record.getAvgValue());
+			entryPoints.addPoint(TrailTypes.REAL_AVG, transmuteValue(record, record.getAvgValue()));
 		}
+
 		if (measurementStatistics.isMax()) {
-			if (isTriggerLevel)
-				trailPoints.put(TrailTypes.REAL_MAX, record.getMaxValueTriggered());
-			else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
-				trailPoints.put(TrailTypes.REAL_MAX, triggerRefOrdinal < 0 ? record.getRealMaxValue()
-						: (Integer) record.getMaxValueTriggered(triggerRefOrdinal));
+			if (isTriggerLevel) {
+				entryPoints.addPoint(TrailTypes.REAL_MAX, transmuteValue(record, record.getMaxValueTriggered()));
+			} else if (triggerRefOrdinal < 0) {
+				entryPoints.addPoint(TrailTypes.REAL_MAX, transmuteValue(record, record.getRealMaxValue()));
+			} else if (record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) {
+				entryPoints.addPoint(TrailTypes.REAL_MAX, transmuteValue(record, record.getMaxValueTriggered(triggerRefOrdinal)));
+			}
 		} else {
-			trailPoints.put(TrailTypes.REAL_MAX, record.getRealMaxValue());
+			entryPoints.addPoint(TrailTypes.REAL_MAX, transmuteValue(record, record.getRealMaxValue()));
 		}
+
 		if (measurementStatistics.isMin()) {
-			if (isTriggerLevel)
-				trailPoints.put(TrailTypes.REAL_MIN, record.getMinValueTriggered());
-			else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE) //
-				trailPoints.put(TrailTypes.REAL_MIN, triggerRefOrdinal < 0 ? record.getRealMinValue()
-						: (Integer) record.getMinValueTriggered(triggerRefOrdinal));
+			if (isTriggerLevel) {
+				entryPoints.addPoint(TrailTypes.REAL_MIN, transmuteValue(record, record.getMinValueTriggered()));
+			} else if (triggerRefOrdinal < 0) {
+				entryPoints.addPoint(TrailTypes.REAL_MIN, transmuteValue(record, record.getRealMinValue()));
+			} else if (record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE) {
+				entryPoints.addPoint(TrailTypes.REAL_MIN, transmuteValue(record, record.getMinValueTriggered(triggerRefOrdinal)));
+			}
 		} else {
-			trailPoints.put(TrailTypes.REAL_MIN, record.getRealMinValue());
+			entryPoints.addPoint(TrailTypes.REAL_MIN, transmuteValue(record, record.getRealMinValue()));
 		}
+
 		if (measurementStatistics.isSigma()) {
-			if (isTriggerLevel)
-				trailPoints.put(TrailTypes.REAL_SD, record.getSigmaValueTriggered());
-			else if (triggerRefOrdinal < 0 || record.getSigmaValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) //
-				trailPoints.put(TrailTypes.REAL_SD, triggerRefOrdinal < 0 ? (Integer) record.getSigmaValue()
-						: (Integer) record.getSigmaValueTriggered(triggerRefOrdinal));
+			if (isTriggerLevel) {
+				entryPoints.addPoint(TrailTypes.REAL_SD, transmuteDelta(record, record.getSigmaValueTriggered()));
+			} else if (triggerRefOrdinal < 0) {
+				entryPoints.addPoint(TrailTypes.REAL_SD, transmuteDelta(record, record.getSigmaValue()));
+			} else if (record.getSigmaValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE) {
+				entryPoints.addPoint(TrailTypes.REAL_SD, transmuteDelta(record, record.getSigmaValueTriggered(triggerRefOrdinal)));
+			}
 		} else {
-			trailPoints.put(TrailTypes.REAL_SD, record.getSigmaValue());
+			entryPoints.addPoint(TrailTypes.REAL_SD, transmuteDelta(record, record.getSigmaValue()));
 		}
-		if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
+
+		Integer refOrdinal = measurementStatistics.getSumByTriggerRefOrdinal();
+		if (refOrdinal != null) {
 			if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1) {
+				// Warning: Sum values do not sum correctly in case of offset != 0. Reason is summing up the offset multiple times.
 				if (isTriggerLevel) {
-					int deltaValue = record.getSumTriggeredRange();
-					double translatedValue = device.translateDeltaValue(record, deltaValue / 1000.); // standard division by 1000 ensures correct reduction /
-																																														// offset
-					trailPoints.put(TrailTypes.REAL_SUM_TRIGGERED, encodeMeasurementValue(record, translatedValue));
-				} else if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-					int deltaValue = record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal());
-					double translatedValue = device.translateDeltaValue(record, deltaValue / 1000.); // standard division by 1000 ensures correct reduction /
-																																														// offset
-					trailPoints.put(TrailTypes.REAL_SUM_TRIGGERED, encodeMeasurementValue(record, translatedValue));
+					entryPoints.addPoint(TrailTypes.REAL_SUM_TRIGGERED, transmuteDelta(record, record.getSumTriggeredRange()));
+				} else {
+					entryPoints.addPoint(TrailTypes.REAL_SUM_TRIGGERED, transmuteDelta(record, record.getSumTriggeredRange(refOrdinal)));
 				}
 			}
-			if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-				Record referencedRecord = recordSet.get(measurementStatistics.getRatioRefOrdinal().intValue());
-				StatisticsType referencedStatistics = device.getMeasurementStatistic(this.vault.getLogChannelNumber(), measurementStatistics.getRatioRefOrdinal());
-				if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
+
+			Integer ratioRefOrdinal = measurementStatistics.getRatioRefOrdinal();
+			if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && ratioRefOrdinal != null) {
+				Record referencedRecord = recordSet.get(ratioRefOrdinal.intValue());
+				StatisticsType referencedStatistics = device.getMeasurementStatistic(this.vault.getLogChannelNumber(), ratioRefOrdinal);
+				if (referencedRecord != null) {
 					if (referencedStatistics.isAvg()) {
-						double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.) / device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.);
-						trailPoints.put(TrailTypes.REAL_MAX_RATIO_TRIGGERED, encodeMeasurementValue(record, ratio));
+						double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(ratioRefOrdinal) / 1000.) //
+								/ device.translateDeltaValue(record, record.getSumTriggeredRange(refOrdinal) / 1000.);
 						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
+						entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
 					} else if (referencedStatistics.isMax()) {
-						double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.) / device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.);
-						trailPoints.put(TrailTypes.REAL_MAX_RATIO_TRIGGERED, encodeMeasurementValue(record, ratio));
+						double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(ratioRefOrdinal) / 1000.) //
+								/ device.translateDeltaValue(record, record.getSumTriggeredRange(refOrdinal) / 1000.);
 						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
+						entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
 					}
 				}
 			}
 		}
-		if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
-			int timeSum_ms = record.getTimeSumTriggeredRange_ms();
-			trailPoints.put(TrailTypes.REAL_TIME_SUM_TRIGGERED, encodeMeasurementValue(record, timeSum_ms / 1000.)); // -> results in seconds
+
+		String sumTriggerTimeText = measurementStatistics.getSumTriggerTimeText();
+		if (measurementStatistics.getTrigger() != null && sumTriggerTimeText != null && sumTriggerTimeText.length() > 1) {
+			// omitting the multiplication by 1000 results in seconds
+			entryPoints.addPoint(TrailTypes.REAL_TIME_SUM_TRIGGERED, transmuteScalar(record, record.getTimeSumTriggeredRange_ms()));
 		}
 		if (measurementStatistics.isCountByTrigger() != null) {
 			int countValue = record.getTriggerRanges() != null ? record.getTriggerRanges().size() : 0;
-			trailPoints.put(TrailTypes.REAL_COUNT_TRIGGERED, encodeMeasurementValue(record, countValue));
 			// all counters are internally stored multiplied by thousand
+			entryPoints.addPoint(TrailTypes.REAL_COUNT_TRIGGERED, transmuteScalar(record, countValue * 1000));
 		}
 
-		trailPoints.put(TrailTypes.REAL_COUNT, encodeMeasurementValue(record, encodeMeasurementValue(record, record.realSize())));
-
-		return trailPoints;
+		// all counters are internally stored multiplied by thousand
+		entryPoints.addPoint(TrailTypes.REAL_COUNT, transmuteScalar(record, record.realSize() * 1000));
 	}
 
 	/**
-	 * @param record
-	 * @param isSampled
-	 * @return the list of point values for each standard trail type
+	 * Provides an encoded histo vault value which can be decoded by applying the factor, offset and reduction.
+	 * @return a record value (point) transformed into the device independent histo vault value (point)
 	 */
-	private Map<TrailTypes, Integer> getTrailPoints(Record record, boolean isSampled) {
-		final Map<TrailTypes, Integer> trailPoints = new HashMap<>();
-		final IDevice device = this.application.getActiveDevice();
+	private int transmuteValue(Record record, int value) {
+		return encodeMeasurementValue(record, device.translateValue(record, value / 1000.));
+	}
 
-		trailPoints.put(TrailTypes.REAL_FIRST, record.elementAt(0));
-		trailPoints.put(TrailTypes.REAL_LAST, record.elementAt(record.realSize() - 1));
+	/**
+	 * Provides an encoded histo vault value which can be decoded by applying the factor, offset and reduction.
+	 * @return a record delta value transformed into the device independent histo vault value
+	 */
+	private int transmuteDelta(Record record, int deltaValue) {
+		return encodeMeasurementValue(record, device.translateDeltaValue(record, deltaValue / 1000.));
+	}
 
+	/**
+	 * Provides an encoded histo vault value which can be decoded by applying the factor, offset and reduction.
+	 * @return a scalar (e.g. ratio) transformed into the device independent histo vault value
+	 */
+	private int transmuteScalar(Record record, int scalar) {
+		return encodeMeasurementValue(record, scalar / 1000.);
+	}
+
+	/**
+	 * Set the list of point values for standard trail types.
+	 * @param entryPoints is the target object
+	 * @param record
+	 * @param isSampled true indicates that the record values are a sample from the original values
+	 */
+	private void setTrailPoints(CompartmentType entryPoints, Record record, boolean isSampled) {
 		final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 		final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty()
 				? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
@@ -365,27 +396,25 @@ public final class VaultCollector {
 				? Double.parseDouble(channelProperty2.getValue()) : SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
 		// invoke translation because of GPS coordinates (decimal fraction range is x.0000 to x.5999 [recurring decimal])
 		UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), isSampled, sigmaFactor, outlierFactor);
-		trailPoints.put(TrailTypes.AVG, encodeMeasurementValue(record, quantile.getAvgFigure()));
-		trailPoints.put(TrailTypes.MAX, encodeMeasurementValue(record, quantile.getPopulationMaxFigure()));
-		trailPoints.put(TrailTypes.MIN, encodeMeasurementValue(record, quantile.getPopulationMinFigure()));
-		trailPoints.put(TrailTypes.SD, encodeMeasurementValue(record, quantile.getSigmaFigure()));
-		trailPoints.put(TrailTypes.Q0, encodeMeasurementValue(record, quantile.getQuartile0()));
-		trailPoints.put(TrailTypes.Q1, encodeMeasurementValue(record, quantile.getQuartile1()));
-		trailPoints.put(TrailTypes.Q2, encodeMeasurementValue(record, quantile.getQuartile2()));
-		trailPoints.put(TrailTypes.Q3, encodeMeasurementValue(record, quantile.getQuartile3()));
-		trailPoints.put(TrailTypes.Q4, encodeMeasurementValue(record, quantile.getQuartile4()));
-		trailPoints.put(TrailTypes.Q_25_PERMILLE, encodeMeasurementValue(record, quantile.getQuantile(.025)));
-		trailPoints.put(TrailTypes.Q_975_PERMILLE, encodeMeasurementValue(record, quantile.getQuantile(.975)));
-		trailPoints.put(TrailTypes.Q_LOWER_WHISKER, encodeMeasurementValue(record, quantile.getQuantileLowerWhisker()));
-		trailPoints.put(TrailTypes.Q_UPPER_WHISKER, encodeMeasurementValue(record, quantile.getQuantileUpperWhisker()));
+		entryPoints.addPoint(TrailTypes.AVG, encodeMeasurementValue(record, quantile.getAvgFigure()));
+		entryPoints.addPoint(TrailTypes.MAX, encodeMeasurementValue(record, quantile.getPopulationMaxFigure()));
+		entryPoints.addPoint(TrailTypes.MIN, encodeMeasurementValue(record, quantile.getPopulationMinFigure()));
+		entryPoints.addPoint(TrailTypes.SD, encodeMeasurementValue(record, quantile.getSigmaFigure()));
+		entryPoints.addPoint(TrailTypes.Q0, encodeMeasurementValue(record, quantile.getQuartile0()));
+		entryPoints.addPoint(TrailTypes.Q1, encodeMeasurementValue(record, quantile.getQuartile1()));
+		entryPoints.addPoint(TrailTypes.Q2, encodeMeasurementValue(record, quantile.getQuartile2()));
+		entryPoints.addPoint(TrailTypes.Q3, encodeMeasurementValue(record, quantile.getQuartile3()));
+		entryPoints.addPoint(TrailTypes.Q4, encodeMeasurementValue(record, quantile.getQuartile4()));
+		entryPoints.addPoint(TrailTypes.Q_25_PERMILLE, encodeMeasurementValue(record, quantile.getQuantile(.025)));
+		entryPoints.addPoint(TrailTypes.Q_975_PERMILLE, encodeMeasurementValue(record, quantile.getQuantile(.975)));
+		entryPoints.addPoint(TrailTypes.Q_LOWER_WHISKER, encodeMeasurementValue(record, quantile.getQuantileLowerWhisker()));
+		entryPoints.addPoint(TrailTypes.Q_UPPER_WHISKER, encodeMeasurementValue(record, quantile.getQuantileUpperWhisker()));
 
-		trailPoints.put(TrailTypes.FIRST, encodeMeasurementValue(record, quantile.getFirstFigure()));
-		trailPoints.put(TrailTypes.LAST, encodeMeasurementValue(record, quantile.getLastFigure()));
+		entryPoints.addPoint(TrailTypes.FIRST, encodeMeasurementValue(record, quantile.getFirstFigure()));
+		entryPoints.addPoint(TrailTypes.LAST, encodeMeasurementValue(record, quantile.getLastFigure()));
 		// trigger trail types sum are not supported for measurements
-		trailPoints.put(TrailTypes.SUM, 0);
-		trailPoints.put(TrailTypes.COUNT, encodeMeasurementValue(record, quantile.getSize()));
-
-		return trailPoints;
+		entryPoints.addPoint(TrailTypes.SUM, 0);
+		entryPoints.addPoint(TrailTypes.COUNT, encodeMeasurementValue(record, quantile.getSize()));
 	}
 
 	/**
@@ -393,7 +422,6 @@ public final class VaultCollector {
 	 * @param histoSettlements
 	 */
 	private void setSettlements(LinkedHashMap<String, SettlementRecord> histoSettlements) {
-		final IDevice device = this.application.getActiveDevice();
 		for (Entry<String, SettlementRecord> entry : histoSettlements.entrySet()) {
 			SettlementRecord histoSettlement = entry.getValue();
 			SettlementType settlementType = histoSettlement.getSettlement();
@@ -449,9 +477,10 @@ public final class VaultCollector {
 	 */
 	private void setScorePoints(Integer[] scorePoints) {
 		for (ScoreLabelTypes scoreLabelTypes : EnumSet.allOf(ScoreLabelTypes.class)) {
-			if (scorePoints[scoreLabelTypes.ordinal()] != null) {
-				this.vault.getScores().put(scoreLabelTypes.ordinal(), new PointType(scoreLabelTypes.ordinal(), scoreLabelTypes.toString(),
-						scorePoints[scoreLabelTypes.ordinal()]));
+			Integer scoreValue = scorePoints[scoreLabelTypes.ordinal()];
+			if (scoreValue != null) {
+				PointType pointType = new PointType(scoreLabelTypes.ordinal(), scoreLabelTypes.toString(), scoreValue);
+				this.vault.getScores().put(scoreLabelTypes.ordinal(), pointType);
 			}
 		}
 		log.fine(() -> "scores " + this.vault.getScores()); //$NON-NLS-1$
@@ -469,14 +498,14 @@ public final class VaultCollector {
 	 */
 	public int encodeSettlementValue(SettlementRecord record, double value) {
 		// todo harmonize encodeVaultValue methods later
-		// todo support settlements based on GPS-longitude or GPS-latitude with a base class common for Record, TrailRecord and Settlement
+		// todo support settlements based on GPS-longitude or GPS-latitude with a base class common for Record and SettlementRecord
 		double newValue = (value - record.getOffset()) / record.getFactor() + record.getReduction();
 		return (int) (newValue * 1000.);
 	}
 
 	public boolean isConsistentDevice() {
-		if (this.application.getActiveDevice() != null && !this.vault.getLogDeviceName().equals(this.application.getActiveDevice().getName()) //
-				&& !(this.vault.logDeviceName.startsWith("HoTTViewer") && this.application.getActiveDevice().getName().equals("HoTTViewer"))) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (device != null && !this.vault.getLogDeviceName().equals(device.getName()) //
+				&& !(this.vault.logDeviceName.startsWith("HoTTViewer") && device.getName().equals("HoTTViewer"))) { //$NON-NLS-1$ //$NON-NLS-2$
 			// HoTTViewer V3 -> HoTTViewerAdapter
 			log.info(() -> String.format("%s candidate found for wrong device '%-11s' in %s  %s", //$NON-NLS-1$
 					this.vault.getLogFileExtension(), this.vault.getLogDeviceName(), this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));

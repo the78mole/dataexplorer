@@ -141,7 +141,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (SettlementType settlement : channelSettlements.values()) {
 				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
 				if (topPlacementProperty != null ? Boolean.parseBoolean(topPlacementProperty.getValue()) : false) {
-					TrailRecord tmpRecord = new SettlementRecord(myIndex, settlement, newTrailRecordSet, INITIAL_RECORD_CAPACITY);
+					TrailRecord tmpRecord = new SettlementTrail(myIndex, settlement, newTrailRecordSet, INITIAL_RECORD_CAPACITY);
 					newTrailRecordSet.put(settlement.getName(), tmpRecord);
 					tmpRecord.setColorDefaultsAndPosition(myIndex);
 					if (log.isLoggable(FINE)) log.log(FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$
@@ -152,7 +152,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		{// display section 2: all measurements
 			for (int i = 0; i < channelMeasurements.size(); i++) {
 				MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
-				TrailRecord tmpRecord = new MeasurementRecord(i, measurement, newTrailRecordSet, INITIAL_RECORD_CAPACITY); // ordinal starts at 0
+				TrailRecord tmpRecord = new MeasurementTrail(i, measurement, newTrailRecordSet, INITIAL_RECORD_CAPACITY); // ordinal starts at 0
 				newTrailRecordSet.put(measurement.getName(), tmpRecord);
 				tmpRecord.setColorDefaultsAndPosition(i);
 				if (log.isLoggable(FINE)) log.log(FINE, "added measurement record for " + measurement.getName() + " - " + i); //$NON-NLS-1$ //$NON-NLS-2$
@@ -163,7 +163,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (SettlementType settlement : channelSettlements.values()) {
 				PropertyType topPlacementProperty = settlement.getProperty("histo_top_placement"); //$NON-NLS-1$
 				if (!(topPlacementProperty != null ? Boolean.parseBoolean(topPlacementProperty.getValue()) : false)) {
-					TrailRecord tmpRecord = new SettlementRecord(myIndex, settlement, newTrailRecordSet, INITIAL_RECORD_CAPACITY);
+					TrailRecord tmpRecord = new SettlementTrail(myIndex, settlement, newTrailRecordSet, INITIAL_RECORD_CAPACITY);
 					newTrailRecordSet.put(settlement.getName(), tmpRecord);
 					tmpRecord.setColorDefaultsAndPosition(myIndex);
 					if (log.isLoggable(FINE)) log.log(FINE, "added settlement record for " + settlement.getName() + " - " + myIndex); //$NON-NLS-1$ //$NON-NLS-2$

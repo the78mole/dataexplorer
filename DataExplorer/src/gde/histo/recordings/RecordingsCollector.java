@@ -88,7 +88,7 @@ public final class RecordingsCollector {
 		TrailRecord trailRecord = (TrailRecord) trailRecordSet.get(recordOrdinal);
 
 		trailRecord.clear();
-		trailRecord.setSuite(trailRecordSet.getHistoVaults().size());
+		if (trailRecord.getTrailSelector().isTrailSuite()) trailRecord.setSuite(trailRecordSet.getHistoVaults().size());
 
 		for (Map.Entry<Long, List<ExtendedVault>> entry : trailRecordSet.getHistoVaults().entrySet()) {
 			for (ExtendedVault histoVault : entry.getValue()) {

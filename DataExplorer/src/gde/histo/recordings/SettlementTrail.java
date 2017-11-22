@@ -19,52 +19,52 @@
 
 package gde.histo.recordings;
 
-import gde.device.MeasurementType;
+import gde.device.SettlementType;
 import gde.device.TrailTypes;
 import gde.histo.cache.ExtendedVault;
 import gde.log.Logger;
 
 /**
- * Trail records containing measurement values.
+ * Trail records containing settlement values.
  * @author Thomas Eickert (USER)
  */
-public final class MeasurementRecord extends TrailRecord {
-	private final static String		$CLASS_NAME				= MeasurementRecord.class.getName();
-	private final static long			serialVersionUID	= 110124007964748556L;
+public final class SettlementTrail extends TrailRecord {
+	private final static String	$CLASS_NAME				= SettlementTrail.class.getName();
+	private final static long		serialVersionUID	= 110124007964748556L;
 	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * @param newOrdinal
-	 * @param measurementType
+	 * @param settlementType
 	 * @param parent
 	 * @param initialCapacity
 	 */
-	public MeasurementRecord(int newOrdinal, MeasurementType measurementType, TrailRecordSet parent, int initialCapacity) {
-		super(measurementType, newOrdinal, parent, initialCapacity);
+	public SettlementTrail(int newOrdinal, SettlementType settlementType, TrailRecordSet parent, int initialCapacity) {
+		super(settlementType, newOrdinal, parent, initialCapacity);
 	}
 
-	public MeasurementType getMeasurement() {
-		return (MeasurementType) this.channelItem;
+	public SettlementType getSettlement() {
+		return (SettlementType) this.channelItem;
 	}
 
 	@Override
 	public boolean isAllowedBySetting() {
-		return true;
+		return this.settings.isDisplaySettlements();
 	}
 
-	@Override // for clarity only
+	@Override
 	public boolean isScaleVisible() {
-		return super.isScaleVisible();
+		return this.settings.isDisplaySettlements() && super.isScaleVisible();
 	}
 
 	@Override
 	public void setApplicableTrailTypes() {
-		getTrailSelector().setApplicableTrails4Measurement();
+		getTrailSelector().setApplicableTrails4Settlement();
 	}
 
 	@Override
 	public Integer getVaultPoint(ExtendedVault vault, TrailTypes trailType) {
-		return vault.getMeasurementPoint(this.getOrdinal(), trailType.ordinal());
+		return vault.getSettlementPoint(this.getOrdinal(), trailType.ordinal());
 	}
 
 }
