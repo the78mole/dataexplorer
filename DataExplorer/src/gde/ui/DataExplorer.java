@@ -104,6 +104,7 @@ import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.ui.HistoGraphicsWindow;
+import gde.histo.ui.HistoSummaryWindow;
 import gde.histo.ui.HistoTableWindow;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
@@ -167,7 +168,8 @@ public class DataExplorer extends Composite {
 	public final static int				TAB_INDEX_COMPARE									= 5;
 	public final static int				TAB_INDEX_COMMENT									= 6;
 	public final static int				TAB_INDEX_HISTO_GRAPHIC						= 7;
-	public final static int				TAB_INDEX_HISTO_TABLE							= 8;
+	public final static int				TAB_INDEX_HISTO_SUMMARY						= 8;
+	public final static int				TAB_INDEX_HISTO_TABLE							= 9;
 
 	public final static String		COMPARE_RECORD_SET								= "compare_set";																						//$NON-NLS-1$
 	public final static String		UTILITY_RECORD_SET								= "utility_set";																						//$NON-NLS-1$
@@ -198,6 +200,7 @@ public class DataExplorer extends Composite {
 	FileCommentWindow							fileCommentTabItem;
 	ObjectDescriptionWindow				objectDescriptionTabItem;
 	HistoGraphicsWindow						histoGraphicsTabItem;
+	HistoSummaryWindow						histoSummaryTabItem;
 	HistoTableWindow							histoTableTabItem;
 	final Vector<CTabItem>				customTabItems										= new Vector<CTabItem>();
 	GraphicsWindow								utilGraphicsTabItem;
@@ -684,7 +687,7 @@ public class DataExplorer extends Composite {
 					int tabSelectionIndex = tabFolder.getSelectionIndex();
 					DataExplorer.this.tabSelectedIndex = tabFolder.getSelectionIndex();
 					try {
-						if (log.isLoggable(Level.OFF)) 
+						if (log.isLoggable(Level.OFF))
 							log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "old=" + tabPreviousIndex + " new=" + tabSelectionIndex + " addSelectionListener, event=" + evt); //$NON-NLS-1$
 
 						if (tabFolder.getItem(tabPreviousIndex) instanceof HistoGraphicsWindow) {
@@ -873,6 +876,7 @@ public class DataExplorer extends Composite {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("isHistoActive=%b", this.settings.isHistoActive())); //$NON-NLS-1$
 		if (this.settings.isHistoActive()) {
 			if (this.histoGraphicsTabItem != null) this.resetGraphicsWindowHeaderAndMeasurement();
+			if (this.histoSummaryTabItem != null) this.resetSummaryWindowHeaderAndMeasurement();
 			this.updateHistoTabs(RebuildStep.A_HISTOSET, true);
 		}
 	}
@@ -886,16 +890,20 @@ public class DataExplorer extends Composite {
 			this.histoSet = new HistoSet();
 
 			if (this.histoGraphicsTabItem != null) this.resetGraphicsWindowHeaderAndMeasurement();
+			if (this.histoSummaryTabItem != null) this.resetSummaryWindowHeaderAndMeasurement();
 
 			this.setHistoGraphicsTabItemVisible(true);
+			this.setHistoSummaryTabItemVisible(true);
 			this.setHistoTableTabItemVisible(true);
 
 			this.updateHistoTabs(RebuildStep.A_HISTOSET, true);
 		}
 		else {
 			if (this.histoGraphicsTabItem != null) this.resetGraphicsWindowHeaderAndMeasurement();
+			if (this.histoSummaryTabItem != null) this.resetSummaryWindowHeaderAndMeasurement();
 
 			this.setHistoGraphicsTabItemVisible(false);
+			this.setHistoSummaryTabItemVisible(false);
 			this.setHistoTableTabItemVisible(false);
 
 			this.settings.setHistoActive(false);
@@ -909,6 +917,7 @@ public class DataExplorer extends Composite {
 	public boolean isHistoActive() {
 		return this.histoSet != null //
 				&& this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() //
+				&& this.histoSummaryTabItem != null && !this.histoSummaryTabItem.isDisposed() //
 				&& this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed();
 	}
 
@@ -1479,6 +1488,7 @@ public class DataExplorer extends Composite {
 			this.enableDeviceSwitchButtons(false);
 			// remove Histo tabs at this place because setupDevice is not called if all devices are removed
 			this.setHistoGraphicsTabItemVisible(false);
+			this.setHistoSummaryTabItemVisible(false);
 			this.setHistoTableTabItemVisible(false);
 		}
 
@@ -2011,7 +2021,7 @@ public class DataExplorer extends Composite {
 						DataExplorer.this.doUpdateAllTabs(force, redrawCurveSelector);
 					}
 				});
-			} 
+			}
 		}
 	}
 
@@ -2063,6 +2073,7 @@ public class DataExplorer extends Composite {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			if (this.histoGraphicsTabItem != null && ((!this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
+					|| (!this.histoSummaryTabItem.isDisposed() && this.histoSummaryTabItem.isVisible())	 //
 					|| (!this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible()))) {
 				Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 				try {
@@ -2076,6 +2087,7 @@ public class DataExplorer extends Composite {
 		else {
 			GDE.display.asyncExec((Runnable) () -> {
 				if (this.histoGraphicsTabItem != null && ((!DataExplorer.this.histoGraphicsTabItem.isDisposed() && DataExplorer.this.histoGraphicsTabItem.isVisible()) //
+						|| (!DataExplorer.this.histoSummaryTabItem.isDisposed() && DataExplorer.this.histoSummaryTabItem.isVisible()) //
 						|| (!DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible()))) {
 					Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 					try {
@@ -2160,11 +2172,45 @@ public class DataExplorer extends Composite {
 		}
 	}
 
+	public void updateHistoSummaryWindow() {
+		if (this.histoSummaryTabItem != null) // histo not active or testing without UI
+			updateHistoSummaryWindow(true);
+	}
+
+	/**
+	 * update the histoSummaryWindow from the histo recordset.
+	 * @param redrawCurveSelector
+	 */
+	public void updateHistoSummaryWindow(boolean redrawCurveSelector) {
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
+		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+			if (!this.histoSummaryTabItem.isActiveCurveSelectorContextMenu()) {
+				DataExplorer.this.histoSummaryTabItem.redrawGraphics(redrawCurveSelector);
+			}
+		} else {
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (!DataExplorer.this.histoSummaryTabItem.isActiveCurveSelectorContextMenu()) {
+						DataExplorer.this.histoSummaryTabItem.redrawGraphics(redrawCurveSelector);
+					}
+				}
+			});
+		}
+	}
+
 	/**
 	 * query if histoGraphicsWindow is visible
 	 */
 	public boolean isHistoGraphicsWindowVisible() {
 		return (DataExplorer.this.displayTab.getItem(this.displayTab.getSelectionIndex()) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO);
+	}
+
+	/**
+	 * query if histoSummaryWindow is visible
+	 */
+	public boolean isHistoSummaryWindowVisible() {
+		return (DataExplorer.this.displayTab.getItem(this.displayTab.getSelectionIndex()) instanceof HistoSummaryWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO);
 	}
 
 	/**
@@ -2215,8 +2261,9 @@ public class DataExplorer extends Composite {
 						}
 						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO)) {
 							DataExplorer.this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
-						}
-						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow)) {
+						} else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoSummaryWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO)) {
+							DataExplorer.this.histoSummaryTabItem.redrawGraphics(refreshCurveSelector);
+						} else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow)) {
 							DataExplorer.this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 						}
 					}
@@ -2394,6 +2441,22 @@ public class DataExplorer extends Composite {
 				public void run() {
 					DataExplorer.this.histoGraphicsTabItem.clearHeaderAndComment();
 					DataExplorer.this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
+				}
+			});
+		}
+	}
+
+	/**
+	 * reset the histo summary window measurement pointer including table and header
+	 */
+	public void resetSummaryWindowHeaderAndMeasurement() {
+		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+			this.histoSummaryTabItem.clearHeaderAndComment();
+		} else {
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					DataExplorer.this.histoSummaryTabItem.clearHeaderAndComment();
 				}
 			});
 		}
@@ -2647,7 +2710,7 @@ public class DataExplorer extends Composite {
 					this.statusBar.setSerialPortDisconnected();
 					this.statusBar.setSerialRxOff();
 					this.statusBar.setSerialTxOff();
-				} 
+				}
 			}
 		}
 		else {
@@ -2739,6 +2802,7 @@ public class DataExplorer extends Composite {
 	public void enableGraphicsHeader(boolean enabled) {
 		this.graphicsTabItem.enableGraphicsHeader(enabled);
 		if (this.histoGraphicsTabItem != null) this.histoGraphicsTabItem.enableGraphicsHeader(enabled);
+		if (this.histoSummaryTabItem != null) this.histoSummaryTabItem.enableGraphicsHeader(enabled);
 		this.settings.setGraphicsHeaderVisible(enabled);
 		this.isGraphicsHeaderVisible = enabled;
 	}
@@ -2749,6 +2813,7 @@ public class DataExplorer extends Composite {
 	public void enableRecordSetComment(boolean enabled) {
 		this.graphicsTabItem.enableRecordSetComment(enabled);
 		if (this.histoGraphicsTabItem != null) this.histoGraphicsTabItem.enableRecordSetComment(enabled);
+		if (this.histoSummaryTabItem != null) this.histoSummaryTabItem.enableRecordSetComment(enabled);
 		this.settings.setRecordCommentVisible(enabled);
 		this.isRecordCommentVisible = enabled;
 	}
@@ -2908,6 +2973,13 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
+	 * return the histo summary window content as image
+	 */
+	public Image getHistoSummaryContentAsImage() {
+		return this.histoSummaryTabItem.getContentAsImage();
+	}
+
+	/**
 	 * return the histo table window content as image
 	 */
 	public Image getHistoTableContentAsImage() {
@@ -2952,8 +3024,9 @@ public class DataExplorer extends Composite {
 		}
 		else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) {
 			graphicsImage = this.histoGraphicsTabItem.getContentAsImage();
-		}
-		else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoTableWindow) {
+		} else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoSummaryWindow) {
+			graphicsImage = this.histoSummaryTabItem.getContentAsImage();
+		} else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoTableWindow) {
 			graphicsImage = this.histoTableTabItem.getContentAsImage();
 		}
 		else {
@@ -3046,6 +3119,9 @@ public class DataExplorer extends Composite {
 		else if (this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) {
 			this.settings.setObjectDescriptionInnerAreaBackground(innerAreaBackground);
 			this.histoGraphicsTabItem.setCurveAreaBackground(innerAreaBackground);
+		} else if (this.displayTab.getItem(tabSelectionIndex) instanceof HistoSummaryWindow) {
+			this.settings.setObjectDescriptionInnerAreaBackground(innerAreaBackground);
+			this.histoSummaryTabItem.setCurveAreaBackground(innerAreaBackground);
 		}
 	}
 
@@ -3135,6 +3211,9 @@ public class DataExplorer extends Composite {
 		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow)) {
 			this.settings.setUtilitySurroundingBackground(surroundingBackground);
 			this.histoGraphicsTabItem.setSurroundingBackground(surroundingBackground);
+		} else if ((this.displayTab.getItem(tabSelectionIndex) instanceof HistoSummaryWindow)) {
+			this.settings.setUtilitySurroundingBackground(surroundingBackground);
+			this.histoSummaryTabItem.setSurroundingBackground(surroundingBackground);
 		}
 	}
 
@@ -3188,6 +3267,30 @@ public class DataExplorer extends Composite {
 			if (this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed()) {
 				this.histoGraphicsTabItem.dispose();
 				this.histoGraphicsTabItem = null;
+			}
+		}
+	}
+
+	/**
+	 * set Histo summary tab item visible or invisible
+	 * @param visible
+	 */
+	public void setHistoSummaryTabItemVisible(boolean visible) {
+		if (visible) {
+			if (this.histoSummaryTabItem == null || this.histoSummaryTabItem.isDisposed()) {
+				int position = (this.displayTab.getItems().length < DataExplorer.TAB_INDEX_HISTO_SUMMARY ? this.displayTab.getItems().length : DataExplorer.TAB_INDEX_HISTO_SUMMARY);
+				this.histoSummaryTabItem = new HistoSummaryWindow(this.displayTab, SWT.NONE, position);
+				this.histoSummaryTabItem.create();
+				//restore window settings
+				this.setCurveSelectorEnabled(this.isCurveSelectorEnabled);
+				this.enableRecordSetComment(this.isRecordCommentVisible);
+				this.enableCurveSurvey(false);
+				this.enableGraphicsHeader(true); // this.isGraphicsHeaderVisible
+			}
+		} else {
+			if (this.histoSummaryTabItem != null && !this.histoSummaryTabItem.isDisposed()) {
+				this.histoSummaryTabItem.dispose();
+				this.histoSummaryTabItem = null;
 			}
 		}
 	}

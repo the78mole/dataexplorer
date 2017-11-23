@@ -116,7 +116,7 @@ public final class HistoSelectorComposite extends Composite {
 			this.initialSelectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8;
 			FormData curveSelectorHeaderLData = new FormData();
 			curveSelectorHeaderLData.width = this.initialSelectorHeaderWidth;
-			curveSelectorHeaderLData.height = 25;
+			curveSelectorHeaderLData.height = AbstractHistoChartWindow.HEADER_ROW_HEIGHT;
 			curveSelectorHeaderLData.left = new FormAttachment(0, 1000, GDE.IS_WINDOWS ? 6 : 0);
 			curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 0);
 			this.curveSelectorHeader.setLayoutData(curveSelectorHeaderLData);
@@ -161,7 +161,7 @@ public final class HistoSelectorComposite extends Composite {
 			curveTableLData.width = 82;
 			curveTableLData.height = 457;
 			curveTableLData.left = new FormAttachment(0, 1000, 0);
-			curveTableLData.top = new FormAttachment(0, 1000, 25);
+			curveTableLData.top = new FormAttachment(0, 1000, AbstractHistoChartWindow.HEADER_ROW_HEIGHT);
 			curveTableLData.bottom = new FormAttachment(1000, 1000, 0);
 			curveTableLData.right = new FormAttachment(1000, 1000, 0);
 			this.curveSelectorTable.setLayoutData(curveTableLData);

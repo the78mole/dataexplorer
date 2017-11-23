@@ -65,6 +65,7 @@ import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.HistoGraphicsWindow;
+import gde.histo.ui.HistoSummaryWindow;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -95,6 +96,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Button							graphicsButton;
 	Button							curveCompareButton;
 	Button							histoGraphicsButton;
+	Button							histoSummaryButton;
 	Group								orientationGroup;
 	Button							landscapeButton;
 
@@ -102,7 +104,8 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	private Button			headerButton;
 
 	private enum Artefact {
-		GRAPHICS, COMPARE, STATISTICS, OBJECT, HISTOGRAPHICS
+		GRAPHICS, COMPARE, STATISTICS, OBJECT, //
+		HISTOGRAPHICS, HISTOSUMMARY
 	};
 
 	/**
@@ -197,6 +200,8 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						}
 						PrintSelectionDialog.this.histoGraphicsButton.setEnabled(isHistoWindowPrintable);
 						PrintSelectionDialog.this.histoGraphicsButton.setSelection(isHistoWindowPrintable);
+						PrintSelectionDialog.this.histoSummaryButton.setEnabled(isHistoWindowPrintable);
+						PrintSelectionDialog.this.histoSummaryButton.setSelection(isHistoWindowPrintable);
 					}
 				});
 				{
@@ -205,7 +210,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					this.graphicsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0458));
 					this.graphicsButton.setImage(SWTResourceManager.getImage("gde/resource/Graphics.gif")); //$NON-NLS-1$
 					this.graphicsButton.setSelection(true);
-					this.graphicsButton.setBounds(8, 16, 148, 45);
+					this.graphicsButton.setBounds(8, 12, 148, 45);
 				}
 				{
 					this.statisticsButton = new Button(this.configurationGroup, SWT.CHECK | SWT.LEFT);
@@ -213,14 +218,14 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					this.statisticsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0459));
 					this.statisticsButton.setImage(SWTResourceManager.getImage("gde/resource/Statistics.gif")); //$NON-NLS-1$
 					this.statisticsButton.setSelection(true);
-					this.statisticsButton.setBounds(8, 62, 148, 45);
+					this.statisticsButton.setBounds(8, 57, 148, 45);
 				}
 				{
 					this.objectButton = new Button(this.configurationGroup, SWT.CHECK | SWT.LEFT);
 					this.objectButton.setText(Messages.getString(MessageIds.GDE_MSGT0455));
 					this.objectButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0460));
 					this.objectButton.setImage(SWTResourceManager.getImage("gde/resource/Object.gif")); //$NON-NLS-1$
-					this.objectButton.setBounds(8, 108, 148, 45);
+					this.objectButton.setBounds(8, 102, 148, 45);
 				}
 				{
 					this.curveCompareButton = new Button(this.configurationGroup, SWT.CHECK | SWT.LEFT);
@@ -228,7 +233,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					this.curveCompareButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0461));
 					this.curveCompareButton.setImage(SWTResourceManager.getImage("gde/resource/Graphics.gif")); //$NON-NLS-1$
 					this.curveCompareButton.setSelection(false);
-					this.curveCompareButton.setBounds(8, 155, 148, 45);
+					this.curveCompareButton.setBounds(8, 147, 148, 45);
 				}
 				{
 					this.histoGraphicsButton = new Button(this.configurationGroup, SWT.CHECK | SWT.LEFT);
@@ -236,7 +241,15 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					this.histoGraphicsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0866));
 					this.histoGraphicsButton.setImage(SWTResourceManager.getImage("gde/resource/HistoGraphics.gif")); //$NON-NLS-1$
 					this.histoGraphicsButton.setSelection(false);
-					this.histoGraphicsButton.setBounds(8, 200, 148, 45);
+					this.histoGraphicsButton.setBounds(8, 192, 148, 45);
+				}
+				{
+					this.histoSummaryButton = new Button(this.configurationGroup, SWT.CHECK | SWT.LEFT);
+					this.histoSummaryButton.setText(Messages.getString(MessageIds.GDE_MSGT0885));
+					this.histoSummaryButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0886));
+					this.histoSummaryButton.setImage(SWTResourceManager.getImage("gde/resource/HistoSummary.gif")); //$NON-NLS-1$
+					this.histoSummaryButton.setSelection(false);
+					this.histoSummaryButton.setBounds(8, 237, 148, 45);
 				}
 			}
 			{
@@ -312,6 +325,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						if (PrintSelectionDialog.this.statisticsButton.getSelection()) artefacts.add(Artefact.STATISTICS);
 						if (PrintSelectionDialog.this.objectButton.getSelection()) artefacts.add(Artefact.OBJECT);
 						if (PrintSelectionDialog.this.histoGraphicsButton.getSelection()) artefacts.add(Artefact.HISTOGRAPHICS);
+						if (PrintSelectionDialog.this.histoSummaryButton.getSelection()) artefacts.add(Artefact.HISTOSUMMARY);
 						initiatePrinting(PrintSelectionDialog.this.headerButton.getSelection(), orientation, artefacts);
 						PrintSelectionDialog.this.dialogShell.dispose();
 					}
@@ -343,8 +357,10 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 	private void initiatePrinting(final boolean isPrintRequestHeader, final int orientation, EnumSet<Artefact> artefacts) {
 		final int currentTabIndex = this.application.getTabSelectionIndex();
-		org.eclipse.swt.graphics.Image graphicsImageSWT, compareImageSWT, statisticsImageSWT, objectImageSWT, histoGraphicsImageSWT;
-		final java.awt.Image graphicsImageAWT, compareImageAWT, statisticsImageAWT, objectImageAWT, histoGraphicsImageAWT;
+		org.eclipse.swt.graphics.Image graphicsImageSWT, compareImageSWT, statisticsImageSWT, objectImageSWT;
+		org.eclipse.swt.graphics.Image histoGraphicsImageSWT, histoSummaryImageSWT;
+		final java.awt.Image graphicsImageAWT, compareImageAWT, statisticsImageAWT, objectImageAWT;
+		final java.awt.Image histoGraphicsImageAWT, histoSummaryImageAWT;
 
 		//get all required images
 		if (artefacts.contains(Artefact.GRAPHICS) && this.application.getGraphicsPrintImage() != null) {
@@ -391,6 +407,15 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		}
 		else
 			histoGraphicsImageAWT = null;
+
+		if (artefacts.contains(Artefact.HISTOSUMMARY) && this.application.getHistoGraphicsContentAsImage() != null) {
+			this.application.selectTab(c -> c instanceof HistoSummaryWindow);
+			WaitTimer.delay(250);
+			histoSummaryImageAWT = convertToAWT((histoSummaryImageSWT = this.application.getHistoGraphicsContentAsImage()).getImageData());
+			histoSummaryImageSWT.dispose();
+		}
+		else
+			histoSummaryImageAWT = null;
 
 		// select the tab which was active before
 		this.application.selectTab(currentTabIndex);
@@ -447,6 +472,8 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
 						if (artefacts.contains(Artefact.HISTOGRAPHICS))
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.HISTOSUMMARY))
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0887) : "", histoSummaryImageAWT), documentPageFormat);
 					}
 					else if (documentPageFormat.getOrientation() == PageFormat.LANDSCAPE) {
 						if (artefacts.contains(Artefact.GRAPHICS))
@@ -455,9 +482,11 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
 						if (artefacts.contains(Artefact.OBJECT)) book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
 						if (artefacts.contains(Artefact.COMPARE))
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", histoGraphicsImageAWT), documentPageFormat);
 						if (artefacts.contains(Artefact.HISTOGRAPHICS))
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
+						if (artefacts.contains(Artefact.HISTOSUMMARY))
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0887) : "", histoSummaryImageAWT), documentPageFormat);
 					}
 					else if (documentPageFormat.getOrientation() == PageFormat.PORTRAIT) {
 						EnumSet<Artefact> printJobs = artefacts.clone();
@@ -482,6 +511,11 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
 							printJobs.removeAll(EnumSet.of(Artefact.GRAPHICS, Artefact.HISTOGRAPHICS));
 						}
+						else if (printJobs.containsAll(EnumSet.of(Artefact.GRAPHICS, Artefact.HISTOSUMMARY))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0887) : "", histoSummaryImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.GRAPHICS, Artefact.HISTOSUMMARY));
+						}
 						else if (printJobs.containsAll(EnumSet.of(Artefact.GRAPHICS))) {
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0143) : "", graphicsImageAWT), documentPageFormat);
 							printJobs.removeAll(EnumSet.of(Artefact.GRAPHICS));
@@ -502,6 +536,11 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
 							printJobs.removeAll(EnumSet.of(Artefact.STATISTICS, Artefact.HISTOGRAPHICS));
 						}
+						else if (printJobs.containsAll(EnumSet.of(Artefact.STATISTICS, Artefact.HISTOSUMMARY))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0887) : "", histoSummaryImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.STATISTICS, Artefact.HISTOSUMMARY));
+						}
 						else if (printJobs.containsAll(EnumSet.of(Artefact.STATISTICS))) {
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0350) : "", statisticsImageAWT), documentPageFormat);
 							printJobs.removeAll(EnumSet.of(Artefact.STATISTICS));
@@ -517,6 +556,11 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
 							printJobs.removeAll(EnumSet.of(Artefact.OBJECT, Artefact.HISTOGRAPHICS));
 						}
+						else if (printJobs.containsAll(EnumSet.of(Artefact.OBJECT, Artefact.HISTOSUMMARY))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0887) : "", histoSummaryImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.OBJECT, Artefact.HISTOSUMMARY));
+						}
 						else if (printJobs.containsAll(EnumSet.of(Artefact.OBJECT))) {
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0403) : "", objectImageAWT), documentPageFormat);
 							printJobs.removeAll(EnumSet.of(Artefact.OBJECT));
@@ -527,14 +571,29 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
 							printJobs.removeAll(EnumSet.of(Artefact.COMPARE, Artefact.HISTOGRAPHICS));
 						}
+						else if (printJobs.containsAll(EnumSet.of(Artefact.COMPARE, Artefact.HISTOSUMMARY))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0887) : "", histoSummaryImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.COMPARE, Artefact.HISTOSUMMARY));
+						}
 						else if (printJobs.containsAll(EnumSet.of(Artefact.COMPARE))) {
 							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT), documentPageFormat);
 							printJobs.removeAll(EnumSet.of(Artefact.COMPARE));
 						}
 
-						if (printJobs.containsAll(EnumSet.of(Artefact.HISTOGRAPHICS))) {
-							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
-							printJobs.removeAll(EnumSet.of(Artefact.HISTOGRAPHICS));
+						if (printJobs.containsAll(EnumSet.of(Artefact.COMPARE, Artefact.HISTOGRAPHICS))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0144) : "", compareImageAWT,
+									isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0867) : "", histoGraphicsImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.COMPARE, Artefact.HISTOGRAPHICS));
+						}
+						else if (printJobs.containsAll(EnumSet.of(Artefact.HISTOSUMMARY))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0887) : "", histoSummaryImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.HISTOSUMMARY));
+						}
+
+						if (printJobs.containsAll(EnumSet.of(Artefact.HISTOSUMMARY))) {
+							book.append(new Document(isPrintRequestHeader ? fileName + Messages.getString(MessageIds.GDE_MSGT0887) : "", histoSummaryImageAWT), documentPageFormat);
+							printJobs.removeAll(EnumSet.of(Artefact.HISTOSUMMARY));
 						}
 					}
 					try {

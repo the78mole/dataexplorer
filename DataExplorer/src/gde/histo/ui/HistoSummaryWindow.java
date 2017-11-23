@@ -39,11 +39,11 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
 /**
- * Histo graphics window as a sash form of a curve selection table and a drawing canvas.
+ * Histo summary window as a sash form of a curve selection table and a drawing canvas.
  * @author Thomas Eickert
  */
-public final class HistoGraphicsWindow extends AbstractHistoChartWindow {
-	private final static String			$CLASS_NAME							= HistoGraphicsWindow.class.getName();
+public final class HistoSummaryWindow extends AbstractHistoChartWindow {
+	private final static String			$CLASS_NAME							= HistoSummaryWindow.class.getName();
 	private final static Logger			log											= Logger.getLogger($CLASS_NAME);
 
 	private final CTabFolder				tabFolder;
@@ -57,12 +57,12 @@ public final class HistoGraphicsWindow extends AbstractHistoChartWindow {
 
 	private final DataExplorer			application							= DataExplorer.getInstance();
 
-	public HistoGraphicsWindow(CTabFolder currentDisplayTab, int style, int index) {
+	public HistoSummaryWindow(CTabFolder currentDisplayTab, int style, int index) {
 		super(currentDisplayTab, style, index);
 		SWTResourceManager.registerResourceUser(this);
 		this.tabFolder = currentDisplayTab;
 		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.GDE_MSGT0792));
+		this.setText(Messages.getString(MessageIds.GDE_MSGT0883));
 	}
 
 	public synchronized void create() {
@@ -93,9 +93,9 @@ public final class HistoGraphicsWindow extends AbstractHistoChartWindow {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					HistoGraphicsWindow.this.graphicsComposite.doRedrawGraphics();
-					HistoGraphicsWindow.this.graphicsComposite.updateCaptions();
-					if (redrawCurveSelector) HistoGraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
+					HistoSummaryWindow.this.graphicsComposite.doRedrawGraphics();
+					HistoSummaryWindow.this.graphicsComposite.updateCaptions();
+					if (redrawCurveSelector) HistoSummaryWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 				}
 			});
 		}
@@ -111,7 +111,7 @@ public final class HistoGraphicsWindow extends AbstractHistoChartWindow {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					HistoGraphicsWindow.this.graphicsComposite.updateCaptions();
+					HistoSummaryWindow.this.graphicsComposite.updateCaptions();
 				}
 			});
 		}
@@ -127,7 +127,7 @@ public final class HistoGraphicsWindow extends AbstractHistoChartWindow {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					HistoGraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
+					HistoSummaryWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 				}
 			});
 		}
