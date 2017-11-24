@@ -50,7 +50,6 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.CurveSelectorContextMenu;
-import gde.ui.tab.GraphicsWindow.GraphicsType;
 
 /**
  * Composite with a header (Curve Selector, ..) and table rows for the curves.
@@ -272,7 +271,7 @@ public final class HistoSelectorComposite extends Composite {
 			this.tableSelectorColumn.setWidth(this.selectorColumnWidth - 2);
 			this.oldSelectorColumnWidth = this.selectorColumnWidth;
 		}
-		this.application.setGraphicsSashFormWeights(this.getCompositeWidth(), GraphicsType.HISTO);
+		this.application.setHistoChartSashFormWeights(this);
 
 		log.fine(() -> "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 	}

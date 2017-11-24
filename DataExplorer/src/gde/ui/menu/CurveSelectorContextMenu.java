@@ -110,7 +110,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
 							CurveSelectorContextMenu.this.isTypeCompare = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.COMPARE);
 							CurveSelectorContextMenu.this.isTypeUtility = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.UTIL);
-							CurveSelectorContextMenu.this.isTypeHisto = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.HISTO);
+							CurveSelectorContextMenu.this.isTypeHisto = CurveSelectorContextMenu.this.application.isHistoGraphicsWindowVisible() || CurveSelectorContextMenu.this.application.isHistoSummaryWindowVisible();
 							CurveSelectorContextMenu.this.recordSet = CurveSelectorContextMenu.this.application.getRecordSetOfVisibleTab();
 
 							if (CurveSelectorContextMenu.this.recordSet != null) {

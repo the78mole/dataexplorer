@@ -70,7 +70,6 @@ import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
 import gde.ui.menu.TabAreaContextMenu.TabMenuOnDemand;
 import gde.ui.menu.TabAreaContextMenu.TabMenuType;
-import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.utils.GraphicsUtils;
 import gde.utils.StringHelper;
 
@@ -86,7 +85,6 @@ public final class HistoGraphicsComposite extends Composite {
 	private final Settings			settings				= Settings.getInstance();
 	private final Channels			channels				= Channels.getInstance();
 	final HistoTimeLine					timeLine				= new HistoTimeLine();
-	private final GraphicsType	graphicsType;
 
 	Menu												popupmenu;
 	TabAreaContextMenu					contextMenu;
@@ -125,7 +123,6 @@ public final class HistoGraphicsComposite extends Composite {
 	HistoGraphicsComposite(SashForm useParent) {
 		super(useParent, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
-		this.graphicsType = GraphicsType.HISTO;
 
 		// get the background colors
 		this.curveAreaBackground = this.settings.getGraphicsCurveAreaBackground();
@@ -165,12 +162,7 @@ public final class HistoGraphicsComposite extends Composite {
 			@Override
 			public void helpRequested(HelpEvent evt) {
 				log.finer(() -> "GraphicsComposite.helpRequested " + evt); //$NON-NLS-1$
-				switch (HistoGraphicsComposite.this.graphicsType) {
-				default:
-				case HISTO:
-					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_94.html"); //$NON-NLS-1$ //$NON-NLS-2$
-					break;
-				}
+				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_94.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		{
@@ -342,7 +334,7 @@ public final class HistoGraphicsComposite extends Composite {
 		int numberCurvesRight = 0;
 		int numberCurvesLeft = 0;
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
-			TrailRecord tmpRecord = (TrailRecord) trailRecordSet.getRecordsSortedForDisplay()[i];
+			TrailRecord tmpRecord = trailRecordSet.getRecordsSortedForDisplay()[i];
 			if (tmpRecord != null && tmpRecord.isScaleVisible()) {
 				log.finer(() -> "==>> " + tmpRecord.getName() + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$
 				if (tmpRecord.isPositionLeft())

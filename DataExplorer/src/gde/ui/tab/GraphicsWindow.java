@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.tab;
@@ -71,7 +71,7 @@ public class GraphicsWindow extends CTabItem {
 	final GraphicsType					graphicsType;
 
 	public enum GraphicsType {
-		NORMAL, COMPARE, UTIL, HISTO;
+		NORMAL, COMPARE, UTIL;
 
 		public TabMenuType toTabType() {
 			switch (this) {
@@ -81,8 +81,6 @@ public class GraphicsWindow extends CTabItem {
 				return TabMenuType.COMPARE;
 			case UTIL:
 				return TabMenuType.UTILITY;
-			case HISTO:
-				return TabMenuType.HISTOGRAPHICS;
 			default:
 				throw new UnsupportedOperationException();
 			}
@@ -120,7 +118,7 @@ public class GraphicsWindow extends CTabItem {
 	}
 
 	/**
-	 * query if this component is visible 
+	 * query if this component is visible
 	 * @return true if graphics window is visible
 	 */
 	public boolean isVisible() {
@@ -138,6 +136,7 @@ public class GraphicsWindow extends CTabItem {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					GraphicsWindow.this.graphicsComposite.doRedrawGraphics();
 					GraphicsWindow.this.graphicsComposite.updateCaptions();
@@ -156,6 +155,7 @@ public class GraphicsWindow extends CTabItem {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					GraphicsWindow.this.graphicsComposite.updateCaptions();
 				}
@@ -164,7 +164,7 @@ public class GraphicsWindow extends CTabItem {
 	}
 
 	/**
-	 * method to update the curves displayed in the curve selector panel 
+	 * method to update the curves displayed in the curve selector panel
 	 */
 	public void updateCurveSelectorTable() {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
@@ -172,6 +172,7 @@ public class GraphicsWindow extends CTabItem {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					GraphicsWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 				}
@@ -185,14 +186,14 @@ public class GraphicsWindow extends CTabItem {
 	 */
 	public void setSashFormWeights(int newSelectorCompositeWidth) {
 		int tabFolderClientAreaWidth = this.tabFolder.getBounds().width;
-		// begin workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ???? 
+		// begin workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ????
 		int bestGuessWidth = this.application.getClientArea().width;
 		if (tabFolderClientAreaWidth > bestGuessWidth) {
 			log.log(Level.WARNING, "tabFolder clientAreaWidth missmatch, tabFolderWidth = " + tabFolderClientAreaWidth + " vs applicationWidth = " + bestGuessWidth);
 			tabFolderClientAreaWidth = bestGuessWidth;
 			this.tabFolder.setSize(tabFolderClientAreaWidth, this.tabFolder.getBounds().height);
 		}
-		// end workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ???? 
+		// end workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ????
 		newSelectorCompositeWidth = newSelectorCompositeWidth > tabFolderClientAreaWidth / 2 ? tabFolderClientAreaWidth / 2 : newSelectorCompositeWidth;
 		int[] newWeights = new int[] { newSelectorCompositeWidth, tabFolderClientAreaWidth - newSelectorCompositeWidth };
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
@@ -223,7 +224,7 @@ public class GraphicsWindow extends CTabItem {
 	}
 
 	/**
-	 * @return true if selector is enabled 
+	 * @return true if selector is enabled
 	 */
 	public boolean isCurveSelectorEnabled() {
 		return this.isCurveSelectorEnabled;

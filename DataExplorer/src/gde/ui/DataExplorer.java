@@ -104,6 +104,7 @@ import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.ui.HistoGraphicsWindow;
+import gde.histo.ui.HistoSelectorComposite;
 import gde.histo.ui.HistoSummaryWindow;
 import gde.histo.ui.HistoTableWindow;
 import gde.io.OsdReaderWriter;
@@ -651,12 +652,16 @@ public class DataExplorer extends Composite {
 					}
 					else if (isRecordSetVisible(GraphicsType.UTIL) && DataExplorer.this.utilGraphicsTabItem != null) {
 						DataExplorer.this.utilGraphicsTabItem.setSashFormWeights(DataExplorer.this.utilGraphicsTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
-					}
-					else if (isRecordSetVisible(GraphicsType.HISTO)) {
+					} else if (isHistoGraphicsWindowVisible()) {
 						if (DataExplorer.this.histoGraphicsTabItem.isCurveSelectorEnabled())
 							DataExplorer.this.histoGraphicsTabItem.setSashFormWeights(DataExplorer.this.histoGraphicsTabItem.getCurveSelectorComposite().getCompositeWidth());
 						else
 							DataExplorer.this.histoGraphicsTabItem.setSashFormWeights(0);
+					} else if (isHistoSummaryWindowVisible()) {
+						if (DataExplorer.this.histoSummaryTabItem.isCurveSelectorEnabled())
+							DataExplorer.this.histoSummaryTabItem.setSashFormWeights(DataExplorer.this.histoSummaryTabItem.getCurveSelectorComposite().getCompositeWidth());
+						else
+							DataExplorer.this.histoSummaryTabItem.setSashFormWeights(0);
 					}
 					if (DataExplorer.this.objectDescriptionTabItem != null) {
 						if (DataExplorer.this.objectDescriptionTabItem.isVisible()) {
@@ -714,11 +719,11 @@ public class DataExplorer extends Composite {
 							DataExplorer.this.enableZoomMenuButtons(false);
 							DataExplorer.this.updateGraphicsWindow();
 						}
-						else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) {
-							log.log(Level.FINER, "HistoGraphicsWindow in displayTab.widgetSelected, event=" + evt); //$NON-NLS-1$
+						else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoSummaryWindow //
+								|| DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) {
+							log.log(Level.FINER, "HistoChartWindow in displayTab.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DataExplorer.this.updateHistoTabs(DataExplorer.this.rebuildStepInvisibleTab, true); // saves some time compared to HistoSet.RebuildStep.E_USER_INTERFACE
-						}
-						else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoTableWindow) {
+						} else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoTableWindow) {
 							log.log(Level.FINER, "HistoTableWindow in displayTab.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DataExplorer.this.updateHistoTabs(HistoSet.RebuildStep.E_USER_INTERFACE, true); // ensures rebuild after trails change or record selector change
 						}
@@ -1019,7 +1024,7 @@ public class DataExplorer extends Composite {
 		GDE.display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				if (DataExplorer.this.histoTableTabItem != null && !DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible()) {
+				if (isHistoTableWindowVisible()) {
 					if (forceClean || !DataExplorer.this.histoTableTabItem.isRowTextAndTrailValid() || !DataExplorer.this.histoTableTabItem.isHeaderTextValid()) {
 						DataExplorer.this.histoTableTabItem.setHeader();
 					}
@@ -2072,9 +2077,9 @@ public class DataExplorer extends Composite {
 	private void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if (this.histoGraphicsTabItem != null && ((!this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible()) //
-					|| (!this.histoSummaryTabItem.isDisposed() && this.histoSummaryTabItem.isVisible())	 //
-					|| (!this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible()))) {
+			if (isHistoGraphicsWindowVisible() //
+					|| isHistoSummaryWindowVisible() //
+					|| isHistoTableWindowVisible()) {
 				Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 				try {
 					rebuilThread.start();
@@ -2086,9 +2091,9 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec((Runnable) () -> {
-				if (this.histoGraphicsTabItem != null && ((!DataExplorer.this.histoGraphicsTabItem.isDisposed() && DataExplorer.this.histoGraphicsTabItem.isVisible()) //
-						|| (!DataExplorer.this.histoSummaryTabItem.isDisposed() && DataExplorer.this.histoSummaryTabItem.isVisible()) //
-						|| (!DataExplorer.this.histoTableTabItem.isDisposed() && DataExplorer.this.histoTableTabItem.isVisible()))) {
+				if (isHistoGraphicsWindowVisible() //
+						|| isHistoSummaryWindowVisible() //
+						|| isHistoTableWindowVisible()) {
 					Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 					try {
 						rebuilThread.start();
@@ -2199,18 +2204,22 @@ public class DataExplorer extends Composite {
 		}
 	}
 
-	/**
-	 * query if histoGraphicsWindow is visible
-	 */
 	public boolean isHistoGraphicsWindowVisible() {
-		return (DataExplorer.this.displayTab.getItem(this.displayTab.getSelectionIndex()) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO);
+		CTabItem currentTab = this.displayTab.getItem(this.displayTab.getSelectionIndex());
+		return currentTab instanceof HistoGraphicsWindow //
+				&& this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible();
 	}
 
-	/**
-	 * query if histoSummaryWindow is visible
-	 */
 	public boolean isHistoSummaryWindowVisible() {
-		return (DataExplorer.this.displayTab.getItem(this.displayTab.getSelectionIndex()) instanceof HistoSummaryWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO);
+		CTabItem currentTab = this.displayTab.getItem(this.displayTab.getSelectionIndex());
+		return currentTab instanceof HistoSummaryWindow //
+				&& this.histoSummaryTabItem != null && !this.histoSummaryTabItem.isDisposed() && this.histoSummaryTabItem.isVisible();
+	}
+
+	public boolean isHistoTableWindowVisible() {
+		CTabItem currentTab = this.displayTab.getItem(this.displayTab.getSelectionIndex());
+		return currentTab instanceof HistoTableWindow //
+				&& this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible();
 	}
 
 	/**
@@ -2237,8 +2246,9 @@ public class DataExplorer extends Composite {
 					}
 					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
 						this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
-					}
-					else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow)) {
+					} else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoSummaryWindow)) {
+						DataExplorer.this.histoSummaryTabItem.redrawGraphics(refreshCurveSelector);
+					} else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow)) {
 						this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
 					}
 				}
@@ -2258,10 +2268,7 @@ public class DataExplorer extends Composite {
 						}
 						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
 							DataExplorer.this.utilGraphicsTabItem.redrawGraphics(refreshCurveSelector);
-						}
-						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO)) {
-							DataExplorer.this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
-						} else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoSummaryWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.HISTO)) {
+						} else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoSummaryWindow)) {
 							DataExplorer.this.histoSummaryTabItem.redrawGraphics(refreshCurveSelector);
 						} else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow)) {
 							DataExplorer.this.histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
@@ -2329,14 +2336,18 @@ public class DataExplorer extends Composite {
 			this.utilGraphicsTabItem.setSashFormWeights(newSelectorCopositeWidth);
 			break;
 
-		case HISTO:
-			this.histoGraphicsTabItem.setSashFormWeights(newSelectorCopositeWidth);
-			break;
-
 		default:
-			this.graphicsTabItem.setSashFormWeights(newSelectorCopositeWidth);
+				this.graphicsTabItem.setSashFormWeights(newSelectorCopositeWidth);
 			break;
 		}
+	}
+
+	/**
+	 * Set the sashForm weights for all histo windows which use the composite.
+	 */
+	public void setHistoChartSashFormWeights(HistoSelectorComposite composite) {
+		if (this.histoGraphicsTabItem.getCurveSelectorComposite().equals(composite)) this.histoGraphicsTabItem.setSashFormWeights(composite.getCompositeWidth());
+		if (this.histoSummaryTabItem.getCurveSelectorComposite().equals(composite)) this.histoSummaryTabItem.setSashFormWeights(composite.getCompositeWidth());
 	}
 
 	/**
@@ -2368,7 +2379,8 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * check the given graphics window type is visible to decide which record set to be used
+	 * check the given graphics window type is visible to decide which record set to be used.
+	 * Does not support histo windows.
 	 * @param type (GraphicsWindow.TYPE_NORMAL/GraphicsWindow.TYPE_COMPARE)
 	 * @return true if the the record set in it window is visible
 	 */
@@ -2379,11 +2391,7 @@ public class DataExplorer extends Composite {
 			result = this.compareTabItem != null && !this.compareTabItem.isDisposed() && this.compareTabItem.isVisible();
 			break;
 
-		case HISTO:
-			result = this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible();
-			break;
-
-		case UTIL:
+			case UTIL:
 			result = this.utilGraphicsTabItem != null && !this.utilGraphicsTabItem.isDisposed() && this.utilGraphicsTabItem.isVisible();
 			break;
 
@@ -2405,7 +2413,7 @@ public class DataExplorer extends Composite {
 			return this.compareSet;
 		else if (this.isRecordSetVisible(GraphicsType.UTIL))
 			return this.utilitySet;
-		else if (this.isRecordSetVisible(GraphicsType.HISTO)) return this.histoSet.getTrailRecordSet();
+		else if (this.isHistoGraphicsWindowVisible() || isHistoSummaryWindowVisible()) return this.histoSet.getTrailRecordSet();
 
 		return this.getActiveRecordSet();
 	}
@@ -2554,7 +2562,7 @@ public class DataExplorer extends Composite {
 	 * clear measurement pointer
 	 */
 	public void clearMeasurementModes() {
-		if (isRecordSetVisible(GraphicsType.HISTO)) {
+		if (isHistoGraphicsWindowVisible() || isHistoSummaryWindowVisible()) {
 			this.histoSet.getTrailRecordSet().clearMeasurementModes();
 			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 		}
@@ -2584,7 +2592,7 @@ public class DataExplorer extends Composite {
 	 */
 	public void setMeasurementActive(String recordKey, boolean enabled) {
 		TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
-		if (isRecordSetVisible(GraphicsType.HISTO) && trailRecordSet.containsKey(recordKey)) {
+		if (isHistoGraphicsWindowVisible() && trailRecordSet.containsKey(recordKey)) {
 			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 			trailRecordSet.setMeasurementMode(recordKey, enabled);
 			TrailRecord trailRecord = trailRecordSet.get(recordKey);
@@ -2627,7 +2635,7 @@ public class DataExplorer extends Composite {
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordKey);
 		TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
-		if (isRecordSetVisible(GraphicsType.HISTO) && trailRecordSet.containsKey(recordKey)) {
+		if (isHistoGraphicsWindowVisible() && trailRecordSet.containsKey(recordKey)) {
 			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 			trailRecordSet.setDeltaMeasurementMode(recordKey, enabled);
 			TrailRecord trailRecord = trailRecordSet.get(recordKey);
@@ -2896,8 +2904,9 @@ public class DataExplorer extends Composite {
 	public Image getGraphicsPrintImage() {
 		return this.isRecordSetVisible(GraphicsType.COMPARE) ? this.compareTabItem.getGraphicsComposite().getGraphicsPrintImage()
 				: this.isRecordSetVisible(GraphicsType.UTIL) ? this.utilGraphicsTabItem.getGraphicsComposite().getGraphicsPrintImage()
-						: this.isRecordSetVisible(GraphicsType.HISTO) ? this.histoGraphicsTabItem.getGraphicsComposite().getGraphicsPrintImage()
-								: this.graphicsTabItem.getGraphicsComposite().getGraphicsPrintImage();
+						: this.isHistoGraphicsWindowVisible() ? this.histoGraphicsTabItem.getGraphicsComposite().getGraphicsPrintImage()
+								: this.isHistoSummaryWindowVisible() ? this.histoSummaryTabItem.getGraphicsComposite().getGraphicsPrintImage()
+										: this.graphicsTabItem.getGraphicsComposite().getGraphicsPrintImage();
 	}
 
 	/**

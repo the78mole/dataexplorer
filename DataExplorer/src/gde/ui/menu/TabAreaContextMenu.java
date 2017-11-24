@@ -84,7 +84,15 @@ public class TabAreaContextMenu {
 	private MenuItem						suppressModeItem;
 
 	public enum TabMenuType {
-		GRAPHICS, COMPARE, UTILITY, HISTOGRAPHICS, HISTOTABLE, SIMPLE, TABLE, DIGITAL
+		GRAPHICS, COMPARE, UTILITY, HISTOGRAPHICS, HISTOSUMMARY, HISTOTABLE, SIMPLE, TABLE, DIGITAL;
+
+		boolean isHisto() {
+			return this == HISTOGRAPHICS || this == HISTOSUMMARY || this == HISTOTABLE;
+		}
+
+		boolean isHistoChart() {
+			return this == HISTOGRAPHICS || this == HISTOSUMMARY ;
+		}
 	};
 
 	public enum TabMenuOnDemand {
@@ -101,7 +109,7 @@ public class TabAreaContextMenu {
 					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().recordCommentMenuItem.getSelection());
 				}
-				if (type == TabMenuType.HISTOGRAPHICS) {
+				if (type.isHistoChart()) {
 					TabAreaContextMenu.this.suppressModeItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().suppressModeItem.getSelection());
 					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().curveSelectionMenuItem.getSelection());
 					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().graphicsHeaderMenuItem.getSelection());
@@ -211,7 +219,7 @@ public class TabAreaContextMenu {
 			}
 		});
 		if (!this.isCreated) {
-			if (type == TabMenuType.HISTOGRAPHICS || type == TabMenuType.HISTOTABLE) {
+			if (type.isHisto()) {
 				{
 					this.fileName = new MenuItem(popupMenu, SWT.None);
 					this.fileName.setText(">> [" + Messages.getString(MessageIds.GDE_MSGT0864) + "] <<"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -370,7 +378,7 @@ public class TabAreaContextMenu {
 				}
 			}
 
-			if (type == TabMenuType.GRAPHICS || type == TabMenuType.HISTOGRAPHICS || type == TabMenuType.HISTOTABLE) { // -1 as index mean initialization phase
+			if (type == TabMenuType.GRAPHICS || type.isHisto()) { // -1 as index mean initialization phase
 				this.curveSelectionItem = new MenuItem(popupMenu, SWT.CHECK);
 				this.curveSelectionItem.setText(Messages.getString(MessageIds.GDE_MSGT0040));
 				this.curveSelectionItem.addListener(SWT.Selection, new Listener() {
@@ -439,7 +447,7 @@ public class TabAreaContextMenu {
 				}
 			});
 
-			if (type == TabMenuType.GRAPHICS || type == TabMenuType.COMPARE || type == TabMenuType.UTILITY || type == TabMenuType.HISTOGRAPHICS || type == TabMenuType.HISTOTABLE) {
+			if (type == TabMenuType.GRAPHICS || type == TabMenuType.COMPARE || type == TabMenuType.UTILITY || type.isHisto()) {
 				this.copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027).substring(0, Messages.getString(MessageIds.GDE_MSGT0027).lastIndexOf('\t')));
 				this.copyPrintImageItem.addListener(SWT.Selection, new Listener() {
@@ -481,7 +489,7 @@ public class TabAreaContextMenu {
 				});
 			}
 
-			if (type == TabMenuType.GRAPHICS || type == TabMenuType.COMPARE || type == TabMenuType.UTILITY || type == TabMenuType.HISTOGRAPHICS) {
+			if (type == TabMenuType.GRAPHICS || type == TabMenuType.COMPARE || type == TabMenuType.UTILITY || type.isHistoChart()) {
 				this.borderColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				this.borderColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0464));
 				this.borderColorItem.addListener(SWT.Selection, new Listener() {
