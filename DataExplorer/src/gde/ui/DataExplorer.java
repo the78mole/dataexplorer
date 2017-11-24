@@ -3291,7 +3291,7 @@ public class DataExplorer extends Composite {
 				this.histoSummaryTabItem = new HistoSummaryWindow(this.displayTab, SWT.NONE, position);
 				this.histoSummaryTabItem.create();
 				//restore window settings
-				this.setCurveSelectorEnabled(this.isCurveSelectorEnabled);
+				this.setCurveSelectorEnabled(true); // this.isCurveSelectorEnabled
 				this.enableRecordSetComment(this.isRecordCommentVisible);
 				this.enableCurveSurvey(false);
 				this.enableGraphicsHeader(true); // this.isGraphicsHeaderVisible
@@ -3457,6 +3457,19 @@ public class DataExplorer extends Composite {
 			}
 		}
 		return this.utilGraphicsTabItem;
+	}
+
+	/**
+	 * @return the selector which is shared by all histo chart tabs
+	 */
+	public HistoSelectorComposite getHistoChartSelectorComposite() {
+		if (this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed()) {
+			return this.histoGraphicsTabItem.getCurveSelectorComposite();
+		} else if (this.histoSummaryTabItem != null && !this.histoSummaryTabItem.isDisposed()) {
+			return this.histoSummaryTabItem.getCurveSelectorComposite();
+		} else {
+			return null;
+		}
 	}
 
 	/**

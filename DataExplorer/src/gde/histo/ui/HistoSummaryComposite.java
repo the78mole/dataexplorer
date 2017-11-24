@@ -55,7 +55,6 @@ import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.exclusions.ExclusionFormatter;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
-import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.utils.HistoCurveUtils;
 import gde.histo.utils.HistoTimeLine;
 import gde.log.Logger;
@@ -69,14 +68,14 @@ import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 import gde.utils.StringHelper;
 
 /**
- * Curves for the histo graphics window.
+ * Curves for the histo summary window.
  * @author Thomas Eickert
  */
-public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
-	private final static String	$CLASS_NAME	= HistoGraphicsComposite.class.getName();
+public final class HistoSummaryComposite extends AbstractHistoChartComposite {
+	private final static String	$CLASS_NAME	= HistoSummaryComposite.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	final HistoTimeLine					timeLine		= new HistoTimeLine();
+	private final HistoTimeLine	timeLine		= new HistoTimeLine();
 
 	/** composite size - control resized */
 	Point												oldSize			= new Point(0, 0);
@@ -90,7 +89,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 
 	HistoGraphicsMeasurement		graphicsMeasurement;
 
-	HistoGraphicsComposite(SashForm useParent) {
+	HistoSummaryComposite(SashForm useParent) {
 		super(useParent, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
 
@@ -117,12 +116,12 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 			@Override
 			public void handleEvent(Event evt) {
 				log.finer(() -> "GraphicsComposite.controlResized() = " + evt); //$NON-NLS-1$
-				Rectangle clientRect = HistoGraphicsComposite.this.getClientArea();
+				Rectangle clientRect = HistoSummaryComposite.this.getClientArea();
 				Point size = new Point(clientRect.width, clientRect.height);
-				log.finer(() -> HistoGraphicsComposite.this.oldSize + " - " + size); //$NON-NLS-1$
-				if (!HistoGraphicsComposite.this.oldSize.equals(size)) {
-					log.fine(() -> "size changed, update " + HistoGraphicsComposite.this.oldSize + " - " + size); //$NON-NLS-1$ //$NON-NLS-2$
-					HistoGraphicsComposite.this.oldSize = size;
+				log.finer(() -> HistoSummaryComposite.this.oldSize + " - " + size); //$NON-NLS-1$
+				if (!HistoSummaryComposite.this.oldSize.equals(size)) {
+					log.fine(() -> "size changed, update " + HistoSummaryComposite.this.oldSize + " - " + size); //$NON-NLS-1$ //$NON-NLS-2$
+					HistoSummaryComposite.this.oldSize = size;
 					setComponentBounds();
 					doRedrawGraphics();
 				}
@@ -158,9 +157,9 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 						headerText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
 						if (!toolTipText.isEmpty()) toolTipText = toolTipText.substring(1);
 					}
-					if (!headerText.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
-						HistoGraphicsComposite.this.graphicsHeaderText = headerText;
-						HistoGraphicsComposite.this.graphicsHeader.setText(headerText);
+					if (!headerText.equals(HistoSummaryComposite.this.graphicsHeaderText)) {
+						HistoSummaryComposite.this.graphicsHeaderText = headerText;
+						HistoSummaryComposite.this.graphicsHeader.setText(headerText);
 					}
 					{ // getFullText
 						int levelMax = Settings.getInstance().getSubDirectoryLevelMax();
@@ -168,7 +167,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 								: GDE.STRING_EMPTY;
 						if (!toolTipText.isEmpty()) toolTipText = toolTipText + levelsText;
 					}
-					HistoGraphicsComposite.this.graphicsHeader.setToolTipText(toolTipText);
+					HistoSummaryComposite.this.graphicsHeader.setToolTipText(toolTipText);
 				}
 			});
 		}
@@ -187,7 +186,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 				@Override
 				public void mouseExit(MouseEvent evt) {
 					log.finest(() -> "graphicCanvas.mouseExit, event=" + evt); //$NON-NLS-1$
-					HistoGraphicsComposite.this.graphicCanvas.setCursor(DataExplorer.getInstance().getCursor());
+					HistoSummaryComposite.this.graphicCanvas.setCursor(DataExplorer.getInstance().getCursor());
 				}
 			});
 			this.graphicCanvas.addMouseListener(new MouseAdapter() {
@@ -284,41 +283,6 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	}
 
 	/**
-	 * Draw the pointer for measurement modes.
-	 * Select only valid timestamps on the x axis.
-	 * @param trailRecordSet
-	 * @param mode
-	 */
-	public void drawMeasurePointer(TrailRecordSet trailRecordSet, HistoGraphicsMode mode) {
-		// draw full graph at first because the curve area might change (due to new new scales)
-		drawAreaPaintControl();
-
-		this.graphicsMeasurement = new HistoGraphicsMeasurement(this);
-		this.setModeState(mode);
-
-		mode.drawInitialMeasurement(this);
-	}
-
-	/**
-	 * Clean everything related to the measurement.
-	 */
-	public void cleanMeasurement() {
-		if (this.graphicsMeasurement != null) {
-			this.graphicsMeasurement.cleanMeasurement();
-
-			this.graphicsMeasurement = null;
-		}
-	}
-
-	/**
-	 * Set graphics window measurement mode.
-	 * @param mode
-	 */
-	public void setModeState(HistoGraphicsMode mode) {
-		this.graphicsMeasurement.setModeState(mode);
-	}
-
-	/**
 	 * Check input x,y value against curve are bounds and correct to bound if required.
 	 * @param Point containing corrected x,y position value
 	 */
@@ -395,20 +359,20 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 						this.graphicsMeasurement.processMouseDownAction(this.xDown);
 					}
 				} else if (evt.button == 3) { // right button
-					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
-					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
+					HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
+					HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
 					if (this.xDown == 0 || this.xDown == this.curveAreaBounds.width) {
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
+						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
+						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
+						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 					} else {
 						Map<DataTag, String> dataTags = getTrailRecordSet().getDataTags().getByIndex(getTrailRecordSet() //
-								.getIndex(HistoGraphicsComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // is already relative to curve area
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
+								.getIndex(HistoSummaryComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // is already relative to curve area
+						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
+						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
+						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
 					}
-					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
+					HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
 				}
 			}
 		}
