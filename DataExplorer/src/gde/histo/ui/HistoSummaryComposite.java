@@ -55,6 +55,7 @@ import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.exclusions.ExclusionFormatter;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
+import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.utils.HistoCurveUtils;
 import gde.histo.utils.HistoTimeLine;
 import gde.log.Logger;
@@ -428,6 +429,16 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 			log.fine(() -> "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() //$NON-NLS-1$ //$NON-NLS-2$
 					- startTime)));
 		}
+	}
+
+	@Override
+	public void cleanMeasurement() {
+	}
+
+	@Override
+	public void drawMeasurePointer(TrailRecordSet trailRecordSet, HistoGraphicsMode mode) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

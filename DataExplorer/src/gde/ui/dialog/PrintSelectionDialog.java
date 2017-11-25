@@ -408,10 +408,10 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		else
 			histoGraphicsImageAWT = null;
 
-		if (artefacts.contains(Artefact.HISTOSUMMARY) && this.application.getHistoGraphicsContentAsImage() != null) {
+		if (artefacts.contains(Artefact.HISTOSUMMARY) && this.application.getHistoSummaryContentAsImage() != null) {
 			this.application.selectTab(c -> c instanceof HistoSummaryWindow);
 			WaitTimer.delay(250);
-			histoSummaryImageAWT = convertToAWT((histoSummaryImageSWT = this.application.getHistoGraphicsContentAsImage()).getImageData());
+			histoSummaryImageAWT = convertToAWT((histoSummaryImageSWT = this.application.getHistoSummaryContentAsImage()).getImageData());
 			histoSummaryImageSWT.dispose();
 		}
 		else

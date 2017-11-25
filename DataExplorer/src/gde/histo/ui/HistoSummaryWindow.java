@@ -46,7 +46,7 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 
 		// determine the selector which is shared by all chart windows
 		HistoSelectorComposite selectorComposite = this.application.getHistoChartSelectorComposite();
-//		this.curveSelectorComposite = selectorComposite != null ? selectorComposite : new HistoSelectorComposite(this.graphicSashForm);
+		this.curveSelectorComposite = selectorComposite != null ? selectorComposite : new HistoSelectorComposite(this.graphicSashForm);
 		this.curveSelectorComposite = new HistoSelectorComposite(this.graphicSashForm);
 
 		this.graphicsComposite = new HistoSummaryComposite(this.graphicSashForm);

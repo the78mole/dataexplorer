@@ -242,7 +242,7 @@ public final class RecordingsCollector {
 			trailRecordSet.getDataTags().add(gpsCluster);
 			// refresh the histo table which might already have been painted without the GPS coordinates
 			if (trailRecordSet.getDataTags().getDataGpsLocations().size() > 0) {
-				RecordingsCollector.application.updateHistoTable(false);
+				RecordingsCollector.application.updateHistoTableWindow(false);
 				log.finer(() -> "fill in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " ms!  GPS locations size=" + gpsCluster.getAssignedClusters().values().size()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}

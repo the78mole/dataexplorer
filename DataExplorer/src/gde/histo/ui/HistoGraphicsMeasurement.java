@@ -178,7 +178,7 @@ public final class HistoGraphicsMeasurement {
 		 */
 		abstract void drawInitialMeasurement(HistoGraphicsComposite hgc);
 
-		private static String getSelectedMeasurementsAsTable(HistoGraphicsComposite hgc, long timestamp_ms) {
+		private static String getSelectedMeasurementsAsTable(AbstractHistoChartComposite hgc, long timestamp_ms) {
 			hgc.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD)); //$NON-NLS-1$
 			return TrailRecordSetFormatter.getSelectedMeasurementsAsTable(timestamp_ms);
 		}

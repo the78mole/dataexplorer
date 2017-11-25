@@ -80,7 +80,7 @@ public final class HistoSet {
 		 */
 		E_USER_INTERFACE(1),
 		/**
-		 * starts with a file check only which decides which update activity is required
+		 * starts with a file check only which decides which update activity is required --- not implemented
 		 */
 		F_FILE_CHECK(0);
 

@@ -148,7 +148,7 @@ public final class HistoSelectorComposite extends Composite {
 						}
 					}
 					doUpdateCurveSelectorTable();
-					HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false);
+					HistoSelectorComposite.this.application.updateHistoChartWindow(false);
 				}
 			});
 		}
@@ -183,7 +183,7 @@ public final class HistoSelectorComposite extends Composite {
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, eventItem.getData(DataExplorer.RECORD_NAME));
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);
 						if (toggleRecordSelection(eventItem, true, false)) {
-							HistoSelectorComposite.this.application.updateHistoGraphicsWindow(false);
+							HistoSelectorComposite.this.application.updateHistoChartWindow(false);
 						}
 					}
 				}

@@ -41,6 +41,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
+import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
@@ -317,4 +318,15 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	 * @param dataScaleWidth is the width of one single scale
 	 */
 	protected abstract void drawCurveArea(TrailRecordSet trailRecordSet, GC gc, int dataScaleWidth);
+
+	/**
+	 * Clean everything related to the measurement.
+	 */
+	public abstract void cleanMeasurement();
+
+	/**
+	 * Draw the pointer for measurement modes.
+	 * Select only valid timestamps on the x axis.
+	 */
+	public abstract void drawMeasurePointer(TrailRecordSet trailRecordSet, HistoGraphicsMode mode);
 }

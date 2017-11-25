@@ -102,6 +102,7 @@ import gde.histo.recordings.RecordingsCollector;
 import gde.histo.recordings.TrailDataTags;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
+import gde.histo.ui.AbstractHistoChartWindow;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.ui.HistoGraphicsWindow;
 import gde.histo.ui.HistoSelectorComposite;
@@ -652,16 +653,12 @@ public class DataExplorer extends Composite {
 					}
 					else if (isRecordSetVisible(GraphicsType.UTIL) && DataExplorer.this.utilGraphicsTabItem != null) {
 						DataExplorer.this.utilGraphicsTabItem.setSashFormWeights(DataExplorer.this.utilGraphicsTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
-					} else if (isHistoGraphicsWindowVisible()) {
-						if (DataExplorer.this.histoGraphicsTabItem.isCurveSelectorEnabled())
-							DataExplorer.this.histoGraphicsTabItem.setSashFormWeights(DataExplorer.this.histoGraphicsTabItem.getCurveSelectorComposite().getCompositeWidth());
+					} else if (isHistoChartWindowVisible()) {
+						 AbstractHistoChartWindow chartWindow =((AbstractHistoChartWindow) DataExplorer.this.displayTab.getSelection());
+						if (chartWindow.isCurveSelectorEnabled())
+							chartWindow.setSashFormWeights(chartWindow.getCurveSelectorComposite().getCompositeWidth());
 						else
-							DataExplorer.this.histoGraphicsTabItem.setSashFormWeights(0);
-					} else if (isHistoSummaryWindowVisible()) {
-						if (DataExplorer.this.histoSummaryTabItem.isCurveSelectorEnabled())
-							DataExplorer.this.histoSummaryTabItem.setSashFormWeights(DataExplorer.this.histoSummaryTabItem.getCurveSelectorComposite().getCompositeWidth());
-						else
-							DataExplorer.this.histoSummaryTabItem.setSashFormWeights(0);
+							chartWindow.setSashFormWeights(0);
 					}
 					if (DataExplorer.this.objectDescriptionTabItem != null) {
 						if (DataExplorer.this.objectDescriptionTabItem.isVisible()) {
@@ -1017,27 +1014,28 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * updates the histo table.
+	 * updates (redraws) the histo table if visible.
 	 */
-	public synchronized void updateHistoTable(final boolean forceClean) {
+	public synchronized void updateHistoTableWindow(final boolean forceClean) {
+		if (! (this.displayTab.getSelection() instanceof HistoTableWindow)) return;
+
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
 		GDE.display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				if (isHistoTableWindowVisible()) {
-					if (forceClean || !DataExplorer.this.histoTableTabItem.isRowTextAndTrailValid() || !DataExplorer.this.histoTableTabItem.isHeaderTextValid()) {
-						DataExplorer.this.histoTableTabItem.setHeader();
+				HistoTableWindow tableTabItem = DataExplorer.this.histoTableTabItem;
+				if (forceClean || !tableTabItem.isRowTextAndTrailValid() || !tableTabItem.isHeaderTextValid()) {
+					tableTabItem.setHeader();
+				}
+				TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
+				if (trailRecordSet != null) {
+					int tableRowCount = trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
+					if (DataExplorer.this.settings.isDisplayScores()) {
+						TrailDataTags dataTags = trailRecordSet.getDataTags();
+						dataTags.defineActiveDisplayTags();
+						if (dataTags.getActiveDisplayTags() != null) tableRowCount += dataTags.getActiveDisplayTags().size();
 					}
-					TrailRecordSet trailRecordSet = DataExplorer.this.histoSet.getTrailRecordSet();
-					if (trailRecordSet != null) {
-						int tableRowCount = trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
-						if (DataExplorer.this.settings.isDisplayScores()) {
-							TrailDataTags dataTags = trailRecordSet.getDataTags();
-							dataTags.defineActiveDisplayTags();
-							if (dataTags.getActiveDisplayTags() != null) tableRowCount += dataTags.getActiveDisplayTags().size();
-						}
-						DataExplorer.this.histoTableTabItem.setRowCount(tableRowCount);
-					}
+					tableTabItem.setRowCount(tableRowCount);
 				}
 			}
 		});
@@ -2062,12 +2060,11 @@ public class DataExplorer extends Composite {
 	public void updateHistoTabs(String recordName, boolean isWithUi) {
 		RecordingsCollector.addVaults(this.histoSet.getTrailRecordSet(), recordName);
 		this.histoSet.getTrailRecordSet().syncScaleOfSyncableRecords();
-		DataExplorer.this.updateHistoTabs(RebuildStep.F_FILE_CHECK, isWithUi); // ET rebuilds the graphics only if new files have been found
-		this.updateHistoGraphicsWindow(false); // ET redraws once again in the rare case if new files have been found
+		DataExplorer.this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, isWithUi);
 	}
 
 	/**
-	 * update the histo tabs if visible.
+	 * update any visible histo tab.
 	 * @param readFromDirectories true reloads from files; false uses histo vault data
 	 */
 	public void updateHistoTabs(boolean readFromDirectories, boolean rebuildTrails) {
@@ -2077,9 +2074,7 @@ public class DataExplorer extends Composite {
 	private void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if (isHistoGraphicsWindowVisible() //
-					|| isHistoSummaryWindowVisible() //
-					|| isHistoTableWindowVisible()) {
+			if (isHistoChartWindowVisible() || isHistoTableWindowVisible()) {
 				Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 				try {
 					rebuilThread.start();
@@ -2091,9 +2086,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			GDE.display.asyncExec((Runnable) () -> {
-				if (isHistoGraphicsWindowVisible() //
-						|| isHistoSummaryWindowVisible() //
-						|| isHistoTableWindowVisible()) {
+				if (isHistoChartWindowVisible() || isHistoTableWindowVisible()) {
 					Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 					try {
 						rebuilThread.start();
@@ -2115,8 +2108,8 @@ public class DataExplorer extends Composite {
 
 			if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
 				if (this.histoSet.getTrailRecordSet() != null) this.histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
-				updateHistoGraphicsWindow(true);
-				updateHistoTable(rebuildStep.scopeOfWork >= RebuildStep.E_USER_INTERFACE.scopeOfWork);
+				updateHistoChartWindow(true);
+				updateHistoTableWindow(rebuildStep.scopeOfWork >= RebuildStep.E_USER_INTERFACE.scopeOfWork);
 			}
 			String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 			setProgress(100, sThreadId);
@@ -2149,77 +2142,41 @@ public class DataExplorer extends Composite {
 		}
 	}
 
-	public void updateHistoGraphicsWindow() {
-		if (this.histoGraphicsTabItem != null) // histo not active or testing without UI
-			updateHistoGraphicsWindow(true);
-	}
-
 	/**
-	 * update the histoGraphicsWindow from the histo recordset.
+	 * update (redraw) any visible histo chart window from the histo recordset.
 	 * @param redrawCurveSelector
 	 */
-	public void updateHistoGraphicsWindow(boolean redrawCurveSelector) {
+	public void updateHistoChartWindow(boolean redrawCurveSelector) {
+		if (! (this.displayTab.getSelection() instanceof AbstractHistoChartWindow)) return;
+
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if (!this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
-				DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);
+			AbstractHistoChartWindow chartWindow = (AbstractHistoChartWindow) DataExplorer.this.displayTab.getSelection();
+			if (!chartWindow.isActiveCurveSelectorContextMenu()) {
+				chartWindow.redrawGraphics(redrawCurveSelector);
 			}
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					if (!DataExplorer.this.histoGraphicsTabItem.isActiveCurveSelectorContextMenu()) {
-						DataExplorer.this.histoGraphicsTabItem.redrawGraphics(redrawCurveSelector);
+					AbstractHistoChartWindow chartWindow = (AbstractHistoChartWindow) DataExplorer.this.displayTab.getSelection();
+					if (!chartWindow.isActiveCurveSelectorContextMenu()) {
+						chartWindow.redrawGraphics(redrawCurveSelector);
 					}
 				}
 			});
 		}
 	}
 
-	public void updateHistoSummaryWindow() {
-		if (this.histoSummaryTabItem != null) // histo not active or testing without UI
-			updateHistoSummaryWindow(true);
-	}
-
-	/**
-	 * update the histoSummaryWindow from the histo recordset.
-	 * @param redrawCurveSelector
-	 */
-	public void updateHistoSummaryWindow(boolean redrawCurveSelector) {
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
-		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if (!this.histoSummaryTabItem.isActiveCurveSelectorContextMenu()) {
-				DataExplorer.this.histoSummaryTabItem.redrawGraphics(redrawCurveSelector);
-			}
-		} else {
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (!DataExplorer.this.histoSummaryTabItem.isActiveCurveSelectorContextMenu()) {
-						DataExplorer.this.histoSummaryTabItem.redrawGraphics(redrawCurveSelector);
-					}
-				}
-			});
-		}
-	}
-
-	public boolean isHistoGraphicsWindowVisible() {
-		CTabItem currentTab = this.displayTab.getItem(this.displayTab.getSelectionIndex());
-		return currentTab instanceof HistoGraphicsWindow //
-				&& this.histoGraphicsTabItem != null && !this.histoGraphicsTabItem.isDisposed() && this.histoGraphicsTabItem.isVisible();
-	}
-
-	public boolean isHistoSummaryWindowVisible() {
-		CTabItem currentTab = this.displayTab.getItem(this.displayTab.getSelectionIndex());
-		return currentTab instanceof HistoSummaryWindow //
-				&& this.histoSummaryTabItem != null && !this.histoSummaryTabItem.isDisposed() && this.histoSummaryTabItem.isVisible();
+	public boolean isHistoChartWindowVisible() {
+		CTabItem currentTab = this.displayTab.getSelection();
+		return currentTab instanceof AbstractHistoChartWindow ? !currentTab.isDisposed() : false;
 	}
 
 	public boolean isHistoTableWindowVisible() {
-		CTabItem currentTab = this.displayTab.getItem(this.displayTab.getSelectionIndex());
-		return currentTab instanceof HistoTableWindow //
-				&& this.histoTableTabItem != null && !this.histoTableTabItem.isDisposed() && this.histoTableTabItem.isVisible();
+		CTabItem currentTab = this.displayTab.getSelection();
+		return currentTab instanceof HistoTableWindow ? !currentTab.isDisposed() : false;
 	}
 
 	/**
@@ -2413,7 +2370,7 @@ public class DataExplorer extends Composite {
 			return this.compareSet;
 		else if (this.isRecordSetVisible(GraphicsType.UTIL))
 			return this.utilitySet;
-		else if (this.isHistoGraphicsWindowVisible() || isHistoSummaryWindowVisible()) return this.histoSet.getTrailRecordSet();
+		else if (this.isHistoChartWindowVisible()) return this.histoSet.getTrailRecordSet();
 
 		return this.getActiveRecordSet();
 	}
@@ -2559,14 +2516,13 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * clear measurement pointer
+	 * clear measurement pointer of visible tab window.
 	 */
 	public void clearMeasurementModes() {
-		if (isHistoGraphicsWindowVisible() || isHistoSummaryWindowVisible()) {
+		if (isHistoChartWindowVisible()) {
 			this.histoSet.getTrailRecordSet().clearMeasurementModes();
-			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
-		}
-		else {
+			((AbstractHistoChartWindow) this.displayTab.getSelection()).getGraphicsComposite().cleanMeasurement();
+		} else {
 			boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
 			RecordSet recordSet = isGraphicsTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
 			if (recordSet != null) {
@@ -2592,7 +2548,7 @@ public class DataExplorer extends Composite {
 	 */
 	public void setMeasurementActive(String recordKey, boolean enabled) {
 		TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
-		if (isHistoGraphicsWindowVisible() && trailRecordSet.containsKey(recordKey)) {
+		if (isHistoChartWindowVisible() && trailRecordSet.containsKey(recordKey)) {
 			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 			trailRecordSet.setMeasurementMode(recordKey, enabled);
 			TrailRecord trailRecord = trailRecordSet.get(recordKey);
@@ -2635,7 +2591,7 @@ public class DataExplorer extends Composite {
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordKey);
 		TrailRecordSet trailRecordSet = this.histoSet.getTrailRecordSet();
-		if (isHistoGraphicsWindowVisible() && trailRecordSet.containsKey(recordKey)) {
+		if (isHistoChartWindowVisible() && trailRecordSet.containsKey(recordKey)) {
 			this.histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 			trailRecordSet.setDeltaMeasurementMode(recordKey, enabled);
 			TrailRecord trailRecord = trailRecordSet.get(recordKey);
@@ -2899,14 +2855,13 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * @return the canvasImage alias graphics window
+	 * @return the canvasImage alias graphics window for the visible tab.
 	 */
 	public Image getGraphicsPrintImage() {
 		return this.isRecordSetVisible(GraphicsType.COMPARE) ? this.compareTabItem.getGraphicsComposite().getGraphicsPrintImage()
 				: this.isRecordSetVisible(GraphicsType.UTIL) ? this.utilGraphicsTabItem.getGraphicsComposite().getGraphicsPrintImage()
-						: this.isHistoGraphicsWindowVisible() ? this.histoGraphicsTabItem.getGraphicsComposite().getGraphicsPrintImage()
-								: this.isHistoSummaryWindowVisible() ? this.histoSummaryTabItem.getGraphicsComposite().getGraphicsPrintImage()
-										: this.graphicsTabItem.getGraphicsComposite().getGraphicsPrintImage();
+						: this.isHistoChartWindowVisible() ? ((AbstractHistoChartWindow) this.displayTab.getSelection()).getGraphicsComposite().getGraphicsPrintImage()
+								: this.graphicsTabItem.getGraphicsComposite().getGraphicsPrintImage();
 	}
 
 	/**

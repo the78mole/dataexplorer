@@ -283,12 +283,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 	}
 
-	/**
-	 * Draw the pointer for measurement modes.
-	 * Select only valid timestamps on the x axis.
-	 * @param trailRecordSet
-	 * @param mode
-	 */
+	@Override
 	public void drawMeasurePointer(TrailRecordSet trailRecordSet, HistoGraphicsMode mode) {
 		// draw full graph at first because the curve area might change (due to new new scales)
 		drawAreaPaintControl();
@@ -299,9 +294,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		mode.drawInitialMeasurement(this);
 	}
 
-	/**
-	 * Clean everything related to the measurement.
-	 */
+	@Override
 	public void cleanMeasurement() {
 		if (this.graphicsMeasurement != null) {
 			this.graphicsMeasurement.cleanMeasurement();

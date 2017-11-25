@@ -56,8 +56,8 @@ public final class HistoGraphicsWindow extends AbstractHistoChartWindow {
 }
 
 	@Override
-	public HistoGraphicsComposite getGraphicsComposite() {
-		return (HistoGraphicsComposite) this.graphicsComposite;
+	public AbstractHistoChartComposite getGraphicsComposite() {
+		return (AbstractHistoChartComposite) this.graphicsComposite;
 	}
 
 }
