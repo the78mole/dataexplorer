@@ -90,20 +90,30 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	 */
 	public void redrawGraphics(final boolean redrawCurveSelector) {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			if (redrawCurveSelector) this.curveSelectorComposite.doUpdateCurveSelectorTable();
+			setFixedGraphicCanvas();
+
 			this.graphicsComposite.doRedrawGraphics();
 			this.graphicsComposite.updateCaptions();
-			if (redrawCurveSelector) this.curveSelectorComposite.doUpdateCurveSelectorTable();
 		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
+					if (redrawCurveSelector) AbstractHistoChartWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
+					setFixedGraphicCanvas();
+
 					AbstractHistoChartWindow.this.graphicsComposite.doRedrawGraphics();
 					AbstractHistoChartWindow.this.graphicsComposite.updateCaptions();
-					if (redrawCurveSelector) AbstractHistoChartWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 				}
+
 			});
 		}
 	}
+
+	/**
+	 * Option to set a graphics area which position and size does not depend on the header and the comment (e.g. for the summary graphics)
+	 */
+	protected abstract void setFixedGraphicCanvas();
 
 	/**
 	 * Update graphics window header and description.

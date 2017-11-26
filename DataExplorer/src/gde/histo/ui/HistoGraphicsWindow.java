@@ -57,7 +57,12 @@ public final class HistoGraphicsWindow extends AbstractHistoChartWindow {
 
 	@Override
 	public AbstractHistoChartComposite getGraphicsComposite() {
-		return (AbstractHistoChartComposite) this.graphicsComposite;
+		return this.graphicsComposite;
+	}
+
+	@Override
+	protected void setFixedGraphicCanvas() {
+		// not required for this chart type
 	}
 
 }

@@ -21,6 +21,7 @@ package gde.histo.ui;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.log.Logger;
@@ -33,8 +34,8 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public final class HistoSummaryWindow extends AbstractHistoChartWindow {
-	private final static String			$CLASS_NAME							= HistoSummaryWindow.class.getName();
-	private final static Logger			log											= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME	= HistoSummaryWindow.class.getName();
+	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	public HistoSummaryWindow(CTabFolder currentDisplayTab, int style, int index) {
 		super(currentDisplayTab, style, index);
@@ -54,11 +55,19 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 
 		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0883));
-}
+	}
 
 	@Override
 	public AbstractHistoChartComposite getGraphicsComposite() {
 		return this.graphicsComposite;
+	}
+
+	@Override
+	protected void setFixedGraphicCanvas() {
+		final Rectangle realBounds = this.curveSelectorComposite.getRealBounds();
+		log.finer(() -> "y = " + realBounds.y + "height = " + realBounds.height); //$NON-NLS-1$
+		this.graphicsComposite.setFixedGraphicCanvas(realBounds.y, realBounds.height);
+		this.graphicsComposite.setComponentBounds();
 	}
 
 }

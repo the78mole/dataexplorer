@@ -54,12 +54,16 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public abstract class AbstractHistoChartComposite extends Composite {
-	private final static String		$CLASS_NAME			= HistoSummaryComposite.class.getName();
-	private final static Logger	log							= Logger.getLogger($CLASS_NAME);
+	private final static String		$CLASS_NAME					= HistoSummaryComposite.class.getName();
+	private final static Logger		log									= Logger.getLogger($CLASS_NAME);
 
-	protected final DataExplorer	application			= DataExplorer.getInstance();
-	protected final Settings			settings				= Settings.getInstance();
-	protected final Channels			channels				= Channels.getInstance();
+	protected final static int		DEFAULT_TOP_GAP			= 10; // free gap on top of the curves
+	protected final static int		DEFAULT_HEADER_GAP	= 5;
+	protected final static int		DEFAULT_COMMENT_GAP	= 5;
+
+	protected final DataExplorer	application					= DataExplorer.getInstance();
+	protected final Settings			settings						= Settings.getInstance();
+	protected final Channels			channels						= Channels.getInstance();
 
 	protected Menu								popupmenu;
 	protected TabAreaContextMenu	contextMenu;
@@ -71,17 +75,19 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	protected Text								graphicsHeader;
 	protected Text								recordSetComment;
 	protected Canvas							graphicCanvas;
-	int														headerHeight		= 0;
-	int														headerGap				= 0;
-	int														commentHeight		= 0;
-	int														commentGap			= 0;
+	int														headerHeight				= 0;
+	int														headerGap						= 0;
+	int														commentHeight				= 0;
+	int														commentGap					= 0;
 	protected String							graphicsHeaderText;
 
 	protected Rectangle						canvasBounds;
 	protected Image								canvasImage;
 	protected GC									canvasImageGC;
 	protected GC									canvasGC;
-	protected Rectangle						curveAreaBounds	= new Rectangle(0, 0, 1, 1);
+	protected Rectangle						curveAreaBounds			= new Rectangle(0, 0, 1, 1);
+	private int										fixedCanvasY				= -1;
+	private int										fixedCanvasHeight		= -1;
 
 	public AbstractHistoChartComposite(Composite parent, int style) {
 		super(parent, style);
@@ -144,10 +150,9 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	 */
 	public void enableGraphicsHeader(boolean enabled) {
 		if (enabled) {
-			this.headerGap = 5;
+			this.headerGap = DEFAULT_HEADER_GAP;
 			GC gc = new GC(this.graphicsHeader);
 			int stringHeight = gc.stringExtent(this.graphicsHeader.getText()).y;
-			this.headerGap = 5;
 			this.headerHeight = stringHeight;
 			gc.dispose();
 		} else {
@@ -159,7 +164,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 
 	public void enableRecordSetComment(boolean enabled) {
 		if (enabled) {
-			this.commentGap = 0;
+			this.commentGap = DEFAULT_COMMENT_GAP;
 			GC gc = new GC(this.recordSetComment);
 			int stringHeight = gc.stringExtent(this.recordSetComment.getText()).y;
 			this.commentHeight = stringHeight * 2 + 8;
@@ -198,15 +203,25 @@ public abstract class AbstractHistoChartComposite extends Composite {
 		this.graphicsHeader.setBounds(x, y, width, height);
 		log.finer(() -> "recordSetHeader.setBounds " + this.graphicsHeader.getBounds()); //$NON-NLS-1$
 
-		y = this.headerGap + this.headerHeight;
-		height = graphicsBounds.height - (this.headerGap + this.commentGap + this.commentHeight + this.headerHeight);
+		y = this.fixedCanvasY < 0 ? this.headerGap + this.headerHeight : this.fixedCanvasY;
+		height = this.fixedCanvasHeight < 0 ? graphicsBounds.height - (this.headerGap + this.commentGap + this.commentHeight + this.headerHeight)
+				: this.fixedCanvasHeight;
 		this.graphicCanvas.setBounds(x, y, width, height);
 		log.finer(() -> "graphicCanvas.setBounds " + this.graphicCanvas.getBounds()); //$NON-NLS-1$
 
-		y = this.headerGap + this.headerHeight + height + this.commentGap;
+		y += height + this.commentGap;
 		height = this.commentHeight;
 		this.recordSetComment.setBounds(20, y, width - 40, height - 5);
 		log.finer(() -> "recordSetComment.setBounds " + this.recordSetComment.getBounds()); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param fixedY is the constant left upper position or -1 in case of a flexible value
+	 * @param fixedHeight is the constant height or -1 in case of a flexible height
+	 */
+	public void setFixedGraphicCanvas(int fixedY, int fixedHeight) {
+		this.fixedCanvasY = fixedY;
+		this.fixedCanvasHeight = fixedHeight;
 	}
 
 	/**
@@ -296,8 +311,8 @@ public abstract class AbstractHistoChartComposite extends Composite {
 		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
 
 		// calculate the vertical area available for plotting graphs
-		yMax = 10; // free gap on top of the curves
-		int gapBot = 3 * pt.y + 4; // space used for time scale text and scales with description or legend;
+		yMax = DEFAULT_TOP_GAP; // free gap on top of the curves
+		int gapBot = 3 * pt.y; // space used for time scale text and scales with description or legend;
 		y0 = bounds.height - yMax - gapBot;
 		height = y0 - yMax; // recalculate due to modulo 10 ??
 		log.finer(() -> "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$

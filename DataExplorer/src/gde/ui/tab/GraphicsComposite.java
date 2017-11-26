@@ -80,6 +80,10 @@ import gde.utils.TimeLine;
 public class GraphicsComposite extends Composite {
 	final static Logger log = Logger.getLogger(GraphicsComposite.class.getName());
 
+	protected final static int		DEFAULT_TOP_GAP			= 10; // free gap on top of the curves
+	protected final static int		DEFAULT_HEADER_GAP	= 5;
+	protected final static int		DEFAULT_COMMENT_GAP	= 5;
+
 	public enum GraphicsMode {
 		RESET, ZOOM, MEASURE, MEASURE_DELTA, PAN, CUT_LEFT, CUT_RIGHT, SCOPE
 	};
@@ -829,8 +833,8 @@ public class GraphicsComposite extends Composite {
 		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
 
 		// calculate the vertical area available for plotting graphs
-		yMax = 10; // free gap on top of the curves
-		int gapBot = 3 * pt.y + 4; // space used for time scale text and scales with description or legend;
+		yMax = DEFAULT_TOP_GAP; // free gap on top of the curves
+		int gapBot = 3 * pt.y; // space used for time scale text and scales with description or legend;
 		y0 = bounds.height - yMax - gapBot;
 		height = y0 - yMax; // recalculate due to modulo 10 ??
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
@@ -1724,10 +1728,9 @@ public class GraphicsComposite extends Composite {
 	 */
 	public void enableGraphicsHeader(boolean enabled) {
 		if (enabled) {
-			this.headerGap = 5;
+			this.headerGap = DEFAULT_HEADER_GAP;
 			GC gc = new GC(this.graphicsHeader);
 			int stringHeight = gc.stringExtent(this.graphicsHeader.getText()).y;
-			this.headerGap = 5;
 			this.headerHeight = stringHeight;
 			gc.dispose();
 		}
@@ -1743,7 +1746,7 @@ public class GraphicsComposite extends Composite {
 	 */
 	public void enableRecordSetComment(boolean enabled) {
 		if (enabled) {
-			this.commentGap = 0;
+			this.commentGap = DEFAULT_COMMENT_GAP;
 			GC gc = new GC(this.recordSetComment);
 			int stringHeight = gc.stringExtent(this.recordSetComment.getText()).y;
 			this.commentHeight = stringHeight * 2 + 8;

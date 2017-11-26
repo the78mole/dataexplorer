@@ -29,6 +29,7 @@ import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -355,5 +356,15 @@ public final class HistoSelectorComposite extends Composite {
 	private TrailRecord getTableItemRecord(TableItem item) {
 		TrailRecordSet trailRecordSet = HistoSelectorComposite.this.application.getHistoSet().getTrailRecordSet();
 		return trailRecordSet.get(item.getData(DataExplorer.RECORD_NAME));
+	}
+
+	/**
+	 * @return the bounds of the table rows relative to the top left header pixel
+	 */
+	public Rectangle getRealBounds() {
+		Rectangle lastRowBounds = this.curveSelectorTable.getItem(this.curveSelectorTable.getItemCount() - 1).getBounds();
+		int headerHeight = this.curveSelectorTable.getLocation().y;
+
+		return new Rectangle(getBounds().x, headerHeight, getBounds().width, lastRowBounds.y + lastRowBounds.height);
 	}
 }
