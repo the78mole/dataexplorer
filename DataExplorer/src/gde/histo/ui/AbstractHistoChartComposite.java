@@ -19,8 +19,6 @@
 
 package gde.histo.ui;
 
-import static java.util.logging.Level.FINE;
-
 import java.util.Date;
 
 import org.eclipse.swt.SWT;
@@ -37,9 +35,7 @@ import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.Channel;
 import gde.data.Channels;
-import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.log.Logger;
@@ -55,15 +51,18 @@ import gde.utils.StringHelper;
  */
 public abstract class AbstractHistoChartComposite extends Composite {
 	private final static String		$CLASS_NAME					= HistoSummaryComposite.class.getName();
-	private final static Logger		log									= Logger.getLogger($CLASS_NAME);
+	private final static Logger	log									= Logger.getLogger($CLASS_NAME);
 
-	protected final static int		DEFAULT_TOP_GAP			= 10; // free gap on top of the curves
+	protected final static int		DEFAULT_TOP_GAP			= 10;																		// free gap on top of the curves
+	protected final static int		DEFAULT_SIDE_GAP		= 10;																		// free gap at the leftmost and rightmost graphics area
 	protected final static int		DEFAULT_HEADER_GAP	= 5;
 	protected final static int		DEFAULT_COMMENT_GAP	= 5;
 
 	protected final DataExplorer	application					= DataExplorer.getInstance();
 	protected final Settings			settings						= Settings.getInstance();
 	protected final Channels			channels						= Channels.getInstance();
+
+	protected TrailRecordSet			trailRecordSet;
 
 	protected Menu								popupmenu;
 	protected TabAreaContextMenu	contextMenu;
@@ -91,15 +90,11 @@ public abstract class AbstractHistoChartComposite extends Composite {
 
 	public AbstractHistoChartComposite(Composite parent, int style) {
 		super(parent, style);
-		// TODO Auto-generated constructor stub
+		trailRecordSet = this.channels.getActiveChannel() != null ? this.application.getHistoSet().getTrailRecordSet() : null;
 	}
 
-	protected TrailRecordSet getTrailRecordSet() {
-		TrailRecordSet trailRecordSet = null;
-		if (this.channels.getActiveChannel() != null) {
-			trailRecordSet = this.application.getHistoSet().getTrailRecordSet();
-		}
-		return trailRecordSet;
+	protected TrailRecordSet retrieveTrailRecordSet() {
+		return this.channels.getActiveChannel() != null ? this.application.getHistoSet().getTrailRecordSet() : null;
 	}
 
 	/**
@@ -222,6 +217,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	public void setFixedGraphicCanvas(int fixedY, int fixedHeight) {
 		this.fixedCanvasY = fixedY;
 		this.fixedCanvasHeight = fixedHeight;
+		log.off(() -> "y = " + fixedY + "height = " + fixedHeight); //$NON-NLS-1$
 	}
 
 	/**
@@ -230,109 +226,112 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	public Image getGraphicsPrintImage() {
 		Image graphicsImage = null;
 		int graphicsHeight = 30 + this.canvasBounds.height + 40;
-		Channel activeChannel = this.channels.getActiveChannel();
-		if (activeChannel != null) {
-			TrailRecordSet trailRecordSet = getTrailRecordSet();
-			if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
-				if (this.canvasImage != null) this.canvasImage.dispose();
-				this.canvasImage = new Image(GDE.display, this.canvasBounds);
-				this.canvasImageGC = new GC(this.canvasImage); // SWTResourceManager.getGC(this.canvasImage);
-				this.canvasImageGC.setBackground(this.surroundingBackground);
-				this.canvasImageGC.fillRectangle(this.canvasBounds);
-				this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.canvasGC = new GC(this.graphicCanvas);
-				drawCurves(trailRecordSet, this.canvasBounds, this.canvasImageGC);
-				graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
-				GC graphicsGC = new GC(graphicsImage);
-				graphicsGC.setForeground(this.graphicsHeader.getForeground());
-				graphicsGC.setBackground(this.surroundingBackground);
-				graphicsGC.setFont(this.graphicsHeader.getFont());
-				graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
-				if (this.graphicsHeader.getText().length() > 1) {
-					GraphicsUtils.drawTextCentered(this.graphicsHeader.getText(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
-				}
-				graphicsGC.setFont(this.recordSetComment.getFont());
-				if (this.recordSetComment.getText().length() > 1) {
-					GraphicsUtils.drawText(this.recordSetComment.getText(), 20, graphicsHeight - 40, graphicsGC, SWT.HORIZONTAL);
-				}
-				graphicsGC.drawImage(this.canvasImage, 0, 30);
-				graphicsGC.dispose();
-				this.canvasGC.dispose();
-				this.canvasImageGC.dispose();
+		trailRecordSet = retrieveTrailRecordSet();
+		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
+			if (this.canvasImage != null) this.canvasImage.dispose();
+			this.canvasImage = new Image(GDE.display, this.canvasBounds);
+			this.canvasImageGC = new GC(this.canvasImage); // SWTResourceManager.getGC(this.canvasImage);
+			this.canvasImageGC.setBackground(this.surroundingBackground);
+			this.canvasImageGC.fillRectangle(this.canvasBounds);
+			this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.canvasGC = new GC(this.graphicCanvas);
+			drawCurves();
+			graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
+			GC graphicsGC = new GC(graphicsImage);
+			graphicsGC.setForeground(this.graphicsHeader.getForeground());
+			graphicsGC.setBackground(this.surroundingBackground);
+			graphicsGC.setFont(this.graphicsHeader.getFont());
+			graphicsGC.fillRectangle(0, 0, this.canvasBounds.width, graphicsHeight);
+			if (this.graphicsHeader.getText().length() > 1) {
+				GraphicsUtils.drawTextCentered(this.graphicsHeader.getText(), this.canvasBounds.width / 2, 20, graphicsGC, SWT.HORIZONTAL);
 			}
+			graphicsGC.setFont(this.recordSetComment.getFont());
+			if (this.recordSetComment.getText().length() > 1) {
+				GraphicsUtils.drawText(this.recordSetComment.getText(), 20, graphicsHeight - 40, graphicsGC, SWT.HORIZONTAL);
+			}
+			graphicsGC.drawImage(this.canvasImage, 0, 30);
+			graphicsGC.dispose();
+			this.canvasGC.dispose();
+			this.canvasImageGC.dispose();
 		}
 		return graphicsImage;
 	}
 
 	/**
-	 * Draw the curves with its scales and define the curve area.
-	 * @param trailRecordSet the record set to be drawn
-	 * @param bounds the bounds where the curves and scales are drawn
-	 * @param gc the graphics context to be used for the graphics operations
+	 * Draw the record graphs with their scales and define the curve area.
 	 */
-	protected void drawCurves(TrailRecordSet trailRecordSet, Rectangle bounds, GC gc) {
+	protected void drawCurves() {
 		long startInitTime = new Date().getTime();
+		int dataScaleWidth = defineDataScaleWidth();
+		setCurveAreaBounds(dataScaleWidth, defineNumberLeftRightScales());
+		log.fine(() -> "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startInitTime)));
 
-		// calculate number of curve scales, left and right side
-		int numberCurvesRight = 0;
-		int numberCurvesLeft = 0;
-		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
-			TrailRecord tmpRecord = trailRecordSet.getRecordsSortedForDisplay()[i];
-			if (tmpRecord != null && tmpRecord.isScaleVisible()) {
-				log.finer(() -> "==>> " + tmpRecord.getName() + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$
-				if (tmpRecord.isPositionLeft())
-					numberCurvesLeft++;
-				else
-					numberCurvesRight++;
-			}
+		if (trailRecordSet.getTimeStepSize() > 0) {
+			trailRecordSet.setDrawAreaBounds(this.curveAreaBounds);
+			drawCurveArea(dataScaleWidth);
 		}
-		if (log.isLoggable(FINE)) log.log(FINE, "nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 
-		// calculate the bounds left for the curves
+	/**
+	 * @return the space width to be used for any of the scales
+	 */
+	private int defineDataScaleWidth() {
+		// calculate the space width to be used for the scales
 		int dataScaleWidth; // horizontal space used for text and scales, numbers and caption
+		{
+			Point pt = canvasImageGC.textExtent("-000,00"); //$NON-NLS-1$
+			int horizontalGap = pt.x / 5;
+			int horizontalNumberExtend = pt.x;
+			int horizontalCaptionExtend = pt.y;
+			dataScaleWidth = horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;
+		}
+		return dataScaleWidth;
+	}
+
+	/**
+	 * @param dataScaleWidth is the space width to be used for any of the scales
+	 * @param numberLeftRightScales holds the numbers of scales {left, right}
+	 */
+	private void setCurveAreaBounds(int dataScaleWidth, int[] numberLeftRightScales) {
+		int spaceLeft = numberLeftRightScales[0] * dataScaleWidth;
+		int spaceRight = numberLeftRightScales[1] * dataScaleWidth;
+
 		int x0, y0; // the lower left corner of the curve area
 		int xMax, yMax; // the upper right corner of the curve area
 		int width; // x coordinate width - time scale
 		int height; // y coordinate - make modulo 10 ??
 
-		// calculate the horizontal space width to be used for the scales
-		Point pt = gc.textExtent("-000,00"); //$NON-NLS-1$
-		int horizontalGap = pt.x / 5;
-		int horizontalNumberExtend = pt.x;
-		int horizontalCaptionExtend = pt.y;
-		dataScaleWidth = horizontalNumberExtend + horizontalCaptionExtend + horizontalGap;
-		int spaceLeft = numberCurvesLeft * dataScaleWidth;
-		int spaceRight = numberCurvesRight * dataScaleWidth;
-
 		// calculate the horizontal area available for plotting graphs
-		int gapSide = 10; // free gap left or right side of the curves
-		x0 = spaceLeft + (numberCurvesLeft > 0 ? gapSide / 2 : gapSide);// enable a small gap if no axis is shown
-		xMax = bounds.width - spaceRight - (numberCurvesRight > 0 ? gapSide / 2 : gapSide);
+		int gapSide = DEFAULT_SIDE_GAP; // free gap left or right side of the curves
+		x0 = spaceLeft + (numberLeftRightScales[0] > 0 ? gapSide / 2 : gapSide);// enable a small gap if no axis is shown
+		xMax = canvasBounds.width - spaceRight - (numberLeftRightScales[1] > 0 ? gapSide / 2 : gapSide);
 		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
 
+		int gapBot; // space used for time scale text and scales with description or legend;
+		{
+			Point pt = canvasImageGC.textExtent("0"); //$NON-NLS-1$
+			gapBot = 3 * pt.y;
+		}
 		// calculate the vertical area available for plotting graphs
 		yMax = DEFAULT_TOP_GAP; // free gap on top of the curves
-		int gapBot = 3 * pt.y; // space used for time scale text and scales with description or legend;
-		y0 = bounds.height - yMax - gapBot;
+		y0 = canvasBounds.height - yMax - gapBot;
 		height = y0 - yMax; // recalculate due to modulo 10 ??
-		log.finer(() -> "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-				+ width + ", height=" + height); //$NON-NLS-1$
-		this.curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
-		log.finer(() -> "curve bounds = " + this.curveAreaBounds); //$NON-NLS-1$
+		log.finer(() -> "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-6$
 
-		log.fine(() -> "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() //$NON-NLS-1$ //$NON-NLS-2$
-				- startInitTime)));
-
-		drawCurveArea(trailRecordSet, gc, dataScaleWidth);
+		curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
+		log.finer(() -> "curve bounds = " + curveAreaBounds); //$NON-NLS-1$
 	}
 
 	/**
+	 * @return numberLeftRightScales holds the numbers of scales {left, right}
+	 */
+	protected abstract int[] defineNumberLeftRightScales();
+
+	/**
 	 * Draw the curves into the curve area.
-	 * @param trailRecordSet
-	 * @param gc
 	 * @param dataScaleWidth is the width of one single scale
 	 */
-	protected abstract void drawCurveArea(TrailRecordSet trailRecordSet, GC gc, int dataScaleWidth);
+	protected abstract void drawCurveArea(int dataScaleWidth);
 
 	/**
 	 * Clean everything related to the measurement.
@@ -344,4 +343,5 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	 * Select only valid timestamps on the x axis.
 	 */
 	public abstract void drawMeasurePointer(TrailRecordSet trailRecordSet, HistoGraphicsMode mode);
+
 }

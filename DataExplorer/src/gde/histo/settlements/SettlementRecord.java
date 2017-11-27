@@ -48,17 +48,6 @@ public final class SettlementRecord extends Vector<Integer> {
 	private static final long						serialVersionUID							= 6130190003229390899L;
 	private static final Logger					log														= Logger.getLogger($CLASS_NAME);
 
-	/**
-	 * We allow 1 lower and 1 upper outlier for a log with 740 measurements
-	 */
-	public static final double					OUTLIER_SIGMA_DEFAULT					= 3.;
-	/**
-	 * Specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
-	 * Tolerance interval: <em>TI = &plusmn; z * &sigma; with z >= 0</em><br>
-	 * Outliers are identified only if they lie beyond this limit.
-	 */
-	public static final double					OUTLIER_RANGE_FACTOR_DEFAULT	= 2.;
-
 	private static final int						INITIAL_RECORD_CAPACITY				= 22;
 	private static final String					BELOW_LIMIT										= MeasurementPropertyTypes.BELOW_LIMIT.value();
 	private static final String					BEYOND_LIMIT									= MeasurementPropertyTypes.BEYOND_LIMIT.value();

@@ -19,9 +19,15 @@
 
 package gde.histo.recordings;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import gde.device.ScoreGroupType;
 import gde.device.TrailTypes;
 import gde.histo.cache.ExtendedVault;
+import gde.histo.datasources.HistoSet;
+import gde.histo.utils.UniversalQuantile;
 import gde.log.Logger;
 
 /**
@@ -65,6 +71,21 @@ public final class ScoregroupTrail extends TrailRecord {
 	@Override
 	public Integer getVaultPoint(ExtendedVault vault, TrailTypes trailType) {
 		return vault.getScorePoint(getScoregroup().getScoreGroupId());
+	}
+
+	@Override // reason is only one value per vault
+	protected double[] determineSummaryMinMax() {
+		if (vaultMaximums.isEmpty() || vaultMinimums.isEmpty()) return new double[0];
+
+		// both lists hold identical values because there are no max/min values but only one value per vault
+		List<Double> decodedValues = vaultMaximums.stream().map(i -> RecordingsCollector.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+
+		UniversalQuantile<Double> quantile = new UniversalQuantile<>(decodedValues, true, //
+				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+
+		double[] result = new double[] { quantile.getQuartile0(), quantile.getQuartile4() };
+		log.finest(() -> getName() + " " + Arrays.toString(result));
+		return result;
 	}
 
 }

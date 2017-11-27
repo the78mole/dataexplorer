@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import gde.config.Settings;
 import gde.device.IDevice;
 import gde.device.TrailTypes;
 import gde.histo.cache.ExtendedVault;
@@ -81,11 +82,17 @@ public final class RecordingsCollector {
 	public static synchronized void addVaults(TrailRecordSet trailRecordSet, String recordName) {
 		TrailRecord trailRecord = trailRecordSet.get(recordName);
 
+		boolean isSmartStatistics = Settings.getInstance().isSmartStatistics();
+
 		trailRecord.clear();
 		if (!trailRecord.getTrailSelector().isTrailSuite()) {
 			for (Map.Entry<Long, List<ExtendedVault>> entry : trailRecordSet.getHistoVaults().entrySet()) {
 				for (ExtendedVault histoVault : entry.getValue()) {
 					trailRecord.addElement(trailRecord.getVaultPoint(histoVault, trailRecord.getTrailSelector().getTrailType()));
+					if (isSmartStatistics) {
+						Integer point = trailRecord.getVaultPoint(histoVault, TrailTypes.REAL_MIN);
+						if (point != null) trailRecord.addExtrema(trailRecord.getVaultPoint(histoVault, TrailTypes.REAL_MIN), trailRecord.getVaultPoint(histoVault, TrailTypes.REAL_MAX));
+					}
 				}
 			}
 		} else {
@@ -93,6 +100,10 @@ public final class RecordingsCollector {
 			for (Map.Entry<Long, List<ExtendedVault>> entry : trailRecordSet.getHistoVaults().entrySet()) {
 				for (ExtendedVault histoVault : entry.getValue()) {
 					addVaultToSuite(histoVault, trailRecord);
+					if (isSmartStatistics) {
+						Integer point = trailRecord.getVaultPoint(histoVault, TrailTypes.REAL_MIN);
+						if (point != null) trailRecord.addExtrema(point, trailRecord.getVaultPoint(histoVault, TrailTypes.REAL_MAX));
+					}
 				}
 			}
 		}

@@ -21,6 +21,7 @@ package gde.histo.recordings;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.OFF;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -237,8 +238,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 */
 	public void updateSyncRecordScale() {
 		for (TrailRecord actualRecord : getVisibleAndDisplayableRecords()) {
-			log.finer(() -> actualRecord.getName() + "   isVisible=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() //$NON-NLS-1$ //$NON-NLS-2$
-					+ " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
+			log.finer(() -> "set scale base value " + actualRecord.getName() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
 			actualRecord.setSyncMaxMinValue();
 		}
 
@@ -259,9 +259,51 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				syncRecord.setSyncMinMax(tmpMin, tmpMax);
 			}
 
-			if (isAffected && log.isLoggable(FINER))
-			 {
+			if (isAffected && log.isLoggable(FINER)) {
 				log.log(FINER, this.get((int) syncRecordsEntry.getKey()).getSyncMasterName() + "; syncMin = " + tmpMin / 1000.0 + "; syncMax = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+	}
+
+	/**
+	 * Update referenced records to enable drawing of the summary graphics.
+	 * Set the sync vaults max/min values.
+	 * Update the scale values from sync record.</br>
+	 * Takes all records.
+	 * Needs not to check suite records because the summary max/min values comprise all suite members.
+	 */
+	public void updateSyncSummary() {
+		for (TrailRecord actualRecord : getDisplayRecords()) {
+			actualRecord.setSyncSummaryMinMax();
+			log.finer(() -> actualRecord.getName() + "   syncMin = " + actualRecord.syncSummaryMin + "; syncMax = " + actualRecord.syncSummaryMax); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		for (java.util.Map.Entry<Integer, Vector<TrailRecord>> syncRecordsEntry : this.getScaleSyncedRecords().entrySet()) {
+			if (syncRecordsEntry.getValue().size() <= 1) continue; // keep the sync summary min/max values
+
+			boolean isAffected = false;
+			double tmpMin = Double.MAX_VALUE;
+			double tmpMax = -Double.MAX_VALUE;
+			for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
+				if (syncRecord.syncSummaryMax != null && syncRecord.syncSummaryMin != null) {
+					isAffected = true;
+					tmpMin = Math.min(tmpMin, syncRecord.syncSummaryMin);
+					tmpMax = Math.max(tmpMax, syncRecord.syncSummaryMax);
+					if (log.isLoggable(FINER)) log.log(FINER, syncRecord.getName() + " tmpMin  = " + tmpMin + "; tmpMax  = " + tmpMax); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+			// now we have the max/min values over all sync records of the current sync group
+			if (tmpMin == Double.MAX_VALUE || tmpMax == -Double.MAX_VALUE) {
+				for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
+					syncRecord.resetSyncSummaryMinMax();
+				}
+			} else {
+				for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
+					syncRecord.setSyncSummaryMinMax(tmpMin, tmpMax);
+				}
+			}
+			if (isAffected && log.isLoggable(OFF)) {
+				log.log(OFF, this.get((int) syncRecordsEntry.getKey()).getSyncMasterName() + "; syncMin = " + tmpMin + "; syncMax = " + tmpMax); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}

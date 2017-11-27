@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.SEVERE;
 
@@ -53,6 +54,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.exclusions.ExclusionFormatter;
+import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
@@ -76,7 +78,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	private final static String	$CLASS_NAME	= HistoGraphicsComposite.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	final HistoTimeLine					timeLine		= new HistoTimeLine();
+	final HistoTimeLine	timeLine		= new HistoTimeLine();
 
 	/** composite size - control resized */
 	Point												oldSize			= new Point(0, 0);
@@ -264,9 +266,9 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 
 		setRecordSetCommentStandard();
 
-		TrailRecordSet trailRecordSet = getTrailRecordSet();
+		trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
-			drawCurves(trailRecordSet, this.canvasBounds, this.canvasImageGC);
+			drawCurves();
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 			// changed curve selection may change the scale end values
 			trailRecordSet.syncScaleOfSyncableRecords();
@@ -339,7 +341,6 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	void mouseMoveAction(MouseEvent evt) {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			TrailRecordSet trailRecordSet = getTrailRecordSet();
 			if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0 && this.canvasImage != null) {
 				Point point = checkCurveBounds(evt.x, evt.y);
 				evt.x = point.x;
@@ -377,7 +378,6 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	void mouseDownAction(MouseEvent evt) {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			TrailRecordSet trailRecordSet = getTrailRecordSet();
 			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 				Point point = checkCurveBounds(evt.x, evt.y);
 				this.xDown = point.x;
@@ -395,7 +395,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 					} else {
-						Map<DataTag, String> dataTags = getTrailRecordSet().getDataTags().getByIndex(getTrailRecordSet() //
+						Map<DataTag, String> dataTags = trailRecordSet.getDataTags().getByIndex(trailRecordSet //
 								.getIndex(HistoGraphicsComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // is already relative to curve area
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
 						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
@@ -413,7 +413,6 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	void mouseUpAction(MouseEvent evt) {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
 		if (activeChannel != null) {
-			TrailRecordSet trailRecordSet = getTrailRecordSet();
 			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 				Point point = checkCurveBounds(evt.x, evt.y);
 				this.xUp = point.x;
@@ -429,34 +428,94 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	}
 
 	@Override
-	protected void drawCurveArea(TrailRecordSet trailRecordSet, GC gc, int dataScaleWidth) {
-		if (trailRecordSet.getTimeStepSize() > 0) {
-			// initialize early in order to avoid problems in mouse move events
-			this.timeLine.initialize(trailRecordSet, this.curveAreaBounds.width);
+	protected void drawCurveArea(int dataScaleWidth) {
+		canvasImageGC.setBackground(this.curveAreaBackground);
+		canvasImageGC.fillRectangle(this.curveAreaBounds);
+		canvasImageGC.setBackground(this.surroundingBackground);
 
-			// draw curves for each active record
-			trailRecordSet.setDrawAreaBounds(this.curveAreaBounds);
+		// draw draw area bounding
+		canvasImageGC.setForeground(this.curveAreaBorderColor);
 
-			gc.setBackground(this.curveAreaBackground);
-			gc.fillRectangle(this.curveAreaBounds);
-			gc.setBackground(this.surroundingBackground);
+		int xMax = curveAreaBounds.x + curveAreaBounds.width;
+		int y0 = curveAreaBounds.y + curveAreaBounds.height;
+		canvasImageGC.drawLine(curveAreaBounds.x - 1, curveAreaBounds.y - 1, xMax + 1, curveAreaBounds.y - 1); // top line
+		canvasImageGC.drawLine(curveAreaBounds.x - 1, curveAreaBounds.y - 1, curveAreaBounds.x - 1, y0); // left fence
+		canvasImageGC.drawLine(xMax + 1, curveAreaBounds.y - 1, xMax + 1, y0); // right fence
 
-			// draw draw area bounding
-			gc.setForeground(this.curveAreaBorderColor);
+		// initialize early in order to avoid problems in mouse move events
+		this.timeLine.initialize(trailRecordSet, this.curveAreaBounds.width);
+		this.timeLine.drawTimeLine(canvasImageGC, curveAreaBounds.x, y0);
 
-			int xMax = curveAreaBounds.x + curveAreaBounds.width;
-			int y0 = curveAreaBounds.y + curveAreaBounds.height;
-			gc.drawLine(curveAreaBounds.x - 1, curveAreaBounds.y - 1, xMax + 1, curveAreaBounds.y - 1); // top line
-			gc.drawLine(curveAreaBounds.x - 1, curveAreaBounds.y - 1, curveAreaBounds.x - 1, y0); // left fence
-			gc.drawLine(xMax + 1, curveAreaBounds.y - 1, xMax + 1, y0); // right fence
+		long startTime = new Date().getTime();
+		drawTrailRecordSet(dataScaleWidth);
+		log.fine(() -> "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() //$NON-NLS-1$ //$NON-NLS-2$
+				- startTime)));
+	}
 
-			this.timeLine.drawTimeLine(gc, curveAreaBounds.x, y0);
+	/**
+	 * Draw the visible curves for all channel items.
+	 * Support multiple curves for one single item.
+	 */
+	private void drawTrailRecordSet(int dataScaleWidth) {
+		int x0 = curveAreaBounds.x;
+		int y0 = curveAreaBounds.y + curveAreaBounds.height;
+		int width = curveAreaBounds.width;
+		int height = curveAreaBounds.height;
 
-			long startTime = new Date().getTime();
-			HistoCurveUtils.drawTrailRecordSet(trailRecordSet, gc, dataScaleWidth, this.canvasBounds, this.curveAreaBounds, this.timeLine);
-			log.fine(() -> "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() //$NON-NLS-1$ //$NON-NLS-2$
-					- startTime)));
+		// check for activated horizontal grid
+		boolean isCurveGridEnabled = trailRecordSet.getHorizontalGridType() > 0;
+
+		// draw each record using sorted record set names
+		boolean isDrawScaleInRecordColor = settings.isDrawScaleInRecordColor();
+		boolean isDrawNameInRecordColor = settings.isDrawNameInRecordColor();
+		boolean isDrawNumbersInRecordColor = settings.isDrawNumbersInRecordColor();
+
+		// sync scales are used for suites (e.g. boxplot) AND synced records
+		trailRecordSet.updateSyncRecordScale(); // should be better done in case of trail selection
+		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
+			TrailRecord actualRecord = trailRecordSet.getRecordsSortedForDisplay()[i];
+			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
+			if (isActualRecordEnabled) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
+					actualRecord.getName(), actualRecord.isVisible(), actualRecord.isDisplayable(), actualRecord.isScaleSynced(), actualRecord.isScaleVisible()));
+			if (actualRecord.isScaleVisible())
+				HistoCurveUtils.drawHistoScale(actualRecord, canvasImageGC, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
+
+			if (isCurveGridEnabled && actualRecord.getOrdinal() == trailRecordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
+				HistoCurveUtils.drawCurveGrid(trailRecordSet, canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
+
+			if (isActualRecordEnabled) {
+				// gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
+				// gc.drawRectangle(x0, y0-height, width, height);
+				canvasImageGC.setClipping(x0 - 1, y0 - height - 1, width + 2, height + 2);
+				if (actualRecord.getTrailSelector().isTrailSuite()) {
+					HistoCurveUtils.drawHistoSuite(actualRecord, canvasImageGC, x0, y0, width, height, timeLine);
+				} else {
+					// CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet());
+					HistoCurveUtils.drawHistoCurve(actualRecord, canvasImageGC, x0, y0, width, height, timeLine);
+				}
+				canvasImageGC.setClipping(canvasBounds);
+			}
 		}
+	}
+
+	@Override
+	protected int[] defineNumberLeftRightScales() {
+		// calculate number of curve scales, left and right side
+		int numberCurvesRight = 0;
+		int numberCurvesLeft = 0;
+		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
+			TrailRecord tmpRecord = trailRecordSet.getRecordsSortedForDisplay()[i];
+			if (tmpRecord != null && tmpRecord.isScaleVisible()) {
+				log.finer(() -> "==>> " + tmpRecord.getName() + " isScaleVisible = " + tmpRecord.isScaleVisible()); //$NON-NLS-1$ //$NON-NLS-2$
+				if (tmpRecord.isPositionLeft())
+					numberCurvesLeft++;
+				else
+					numberCurvesRight++;
+			}
+		}
+		if (log.isLoggable(FINE)) log.log(FINE, "nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
+		int[] numberLeftRightScales = new int[] { numberCurvesLeft, numberCurvesRight };
+		return numberLeftRightScales;
 	}
 
 }

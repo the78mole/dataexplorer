@@ -42,6 +42,7 @@ import gde.device.TransitionAmountType;
 import gde.device.TransitionCalculusType;
 import gde.device.TransitionFigureType;
 import gde.histo.datasources.DirectoryScanner.SourceDataSet;
+import gde.histo.datasources.HistoSet;
 import gde.histo.settlements.AmountEvaluator;
 import gde.histo.settlements.CalculusEvaluator;
 import gde.histo.settlements.FigureEvaluator;
@@ -390,10 +391,10 @@ public final class VaultCollector {
 	private void setTrailPoints(CompartmentType entryPoints, Record record, boolean isSampled) {
 		final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 		final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty()
-				? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
+				? Double.parseDouble(channelProperty.getValue()) : HistoSet.OUTLIER_SIGMA_DEFAULT;
 		final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 		final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty()
-				? Double.parseDouble(channelProperty2.getValue()) : SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
+				? Double.parseDouble(channelProperty2.getValue()) : HistoSet.OUTLIER_RANGE_FACTOR_DEFAULT;
 		// invoke translation because of GPS coordinates (decimal fraction range is x.0000 to x.5999 [recurring decimal])
 		UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), isSampled, sigmaFactor, outlierFactor);
 		entryPoints.addPoint(TrailTypes.AVG, encodeMeasurementValue(record, quantile.getAvgFigure()));
@@ -435,10 +436,10 @@ public final class VaultCollector {
 
 				final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 				final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty()
-						? Double.parseDouble(channelProperty.getValue()) : SettlementRecord.OUTLIER_SIGMA_DEFAULT;
+						? Double.parseDouble(channelProperty.getValue()) : HistoSet.OUTLIER_SIGMA_DEFAULT;
 				final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
 				final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty()
-						? Double.parseDouble(channelProperty2.getValue()) : SettlementRecord.OUTLIER_RANGE_FACTOR_DEFAULT;
+						? Double.parseDouble(channelProperty2.getValue()) : HistoSet.OUTLIER_RANGE_FACTOR_DEFAULT;
 				UniversalQuantile<Double> quantile = new UniversalQuantile<>(histoSettlement.getTranslatedValues(), true, sigmaFactor, outlierFactor);
 
 				entryPoints.addPoint(TrailTypes.REAL_AVG, encodeSettlementValue(histoSettlement, quantile.getAvgFigure()));
