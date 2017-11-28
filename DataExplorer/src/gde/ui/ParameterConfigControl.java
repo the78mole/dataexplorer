@@ -136,11 +136,11 @@ public class ParameterConfigControl {
 						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText().replace(GDE.STRING_DOT,GDE.STRING_EMPTY));
 						if (ParameterConfigControl.this.value < sliderMinValue) {
 							ParameterConfigControl.this.value = sliderMinValue;
-							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : (int)ParameterConfigControl.this.value/devisor));
+							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : (int)(ParameterConfigControl.this.value/devisor)));
 						}
 						if (ParameterConfigControl.this.value > sliderMaxValue) {
 							ParameterConfigControl.this.value = sliderMaxValue;
-							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : (int)ParameterConfigControl.this.value/devisor));
+							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : (int)(ParameterConfigControl.this.value/devisor)));
 						}
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
 						ParameterConfigControl.this.slider.setSelection(ParameterConfigControl.this.value + ParameterConfigControl.this.offset);
@@ -194,7 +194,7 @@ public class ParameterConfigControl {
 					if (devisor == 1.0)
 						ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, ParameterConfigControl.this.value));
 					else
-						ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, (int)ParameterConfigControl.this.value/devisor));
+						ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, (int)(ParameterConfigControl.this.value/devisor)));
 					if (evt.data == null) {
 						Event changeEvent = new Event();
 						changeEvent.index = valueIndex;
