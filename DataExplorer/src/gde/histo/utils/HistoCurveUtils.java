@@ -427,7 +427,7 @@ public final class HistoCurveUtils {
 		boolean isDrawNumbersInRecordColor = settings.isDrawNumbersInRecordColor();
 
 		// sync scales are used for suites (e.g. boxplot) AND synced records
-		trailRecordSet.updateAllSyncScales(); // should be better done in case of trail selection
+		trailRecordSet.updateSyncRecordScale(); // should be better done in case of trail selection
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
 			TrailRecord actualRecord = trailRecordSet.getRecordsSortedForDisplay()[i];
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();

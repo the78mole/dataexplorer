@@ -46,22 +46,22 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert
  */
 public abstract class TrailRecord extends CommonRecord {
-	private final static String	$CLASS_NAME					= TrailRecord.class.getName();
-	private final static long		serialVersionUID		= 110124007964748556L;
-	private final static Logger	log									= Logger.getLogger($CLASS_NAME);
+	private final static String				$CLASS_NAME					= TrailRecord.class.getName();
+	private final static long					serialVersionUID		= 110124007964748556L;
+	private final static Logger				log									= Logger.getLogger($CLASS_NAME);
 
-	public final static String	TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";					// reference to the selected trail //$NON-NLS-1$
+	public final static String				TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
 
 	protected final IChannelItem			channelItem;
 	protected final TrailSelector			trailSelector;
 
-	protected final SuiteRecords			suiteRecords	= new SuiteRecords();
+	protected final SuiteRecords			suiteRecords				= new SuiteRecords();
 
-	protected double									factor				= Double.MIN_VALUE;
-	protected double									offset				= Double.MIN_VALUE;
-	protected double									reduction			= Double.MIN_VALUE;
+	protected double									factor							= Double.MIN_VALUE;
+	protected double									offset							= Double.MIN_VALUE;
+	protected double									reduction						= Double.MIN_VALUE;
 
-	final protected DeviceXmlResource	xmlResource		= DeviceXmlResource.getInstance();
+	final protected DeviceXmlResource	xmlResource					= DeviceXmlResource.getInstance();
 
 	protected TrailRecord(IChannelItem channelItem, int newOrdinal, TrailRecordSet parentTrail, int initialCapacity) {
 		super(DataExplorer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
@@ -286,20 +286,18 @@ public abstract class TrailRecord extends CommonRecord {
 	 * Support suites.
 	 */
 	public void setSyncMaxMinValue() {
-		if (isVisible() && isDisplayable()) {
-			if (getTrailSelector().isTrailSuite()) {
-				int suiteMaxValue = suiteRecords.getSuiteMaxValue();
-				int suiteMinValue = suiteRecords.getSuiteMinValue();
-				int tmpMaxValue = suiteMaxValue == suiteMinValue ? suiteMaxValue + 100 : suiteMaxValue;
-				int tmpMinValue = suiteMaxValue == suiteMinValue ? suiteMinValue - 100 : suiteMinValue;
-				setSyncMaxValue((int) (tmpMaxValue * getSyncMasterFactor()));
-				setSyncMinValue((int) (tmpMinValue * getSyncMasterFactor()));
-			} else {
-				setSyncMaxValue((int) (getMaxValue() * getSyncMasterFactor()));
-				setSyncMinValue((int) (getMinValue() * getSyncMasterFactor()));
-			}
-			log.finer(() -> getName() + "   syncMin = " + getSyncMinValue() + "; syncMax = " + getSyncMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$
+		if (getTrailSelector().isTrailSuite()) {
+			int suiteMaxValue = suiteRecords.getSuiteMaxValue();
+			int suiteMinValue = suiteRecords.getSuiteMinValue();
+			int tmpMaxValue = suiteMaxValue == suiteMinValue ? suiteMaxValue + 100 : suiteMaxValue;
+			int tmpMinValue = suiteMaxValue == suiteMinValue ? suiteMinValue - 100 : suiteMinValue;
+			syncMaxValue = (int) (tmpMaxValue * getSyncMasterFactor());
+			syncMinValue = (int) (tmpMinValue * getSyncMasterFactor());
+		} else {
+			syncMaxValue = (int) (getMaxValue() * getSyncMasterFactor());
+			syncMinValue = (int) (getMinValue() * getSyncMasterFactor());
 		}
+		log.finer(() -> getName() + "   syncMin = " + getSyncMinValue() + "; syncMax = " + getSyncMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -432,8 +430,9 @@ public abstract class TrailRecord extends CommonRecord {
 		this.suiteRecords.clear();
 
 		List<TrailTypes> suiteMembers = this.trailSelector.getTrailType().getSuiteMembers();
-		for (int i = 0; i < suiteMembers.size(); i++)
+		for (int i = 0; i < suiteMembers.size(); i++) {
 			this.suiteRecords.put(i, new SuiteRecord(suiteMembers.get(i).ordinal(), initialCapacity));
+		}
 	}
 
 	public String getNameReplacement() {

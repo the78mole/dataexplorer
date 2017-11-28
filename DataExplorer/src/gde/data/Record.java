@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Vector;
@@ -36,6 +35,7 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.AbstractRecordSet.SyncedRecords;
 import gde.device.DataTypes;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
@@ -682,7 +682,7 @@ public class Record extends AbstractRecord {
 
 	public String getSyncMasterName() {
 		StringBuilder sb = new StringBuilder().append(this.name.split(GDE.STRING_BLANK)[0]);
-		Map<Integer, Vector<? extends AbstractRecord>> syncedRecords = this.getAbstractParent().scaleSyncedRecords;
+		SyncedRecords<Record> syncedRecords = this.getParent().getScaleSyncedRecords();
 		if (syncedRecords.get(this.ordinal) != null && syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK).length > 1) {
 			String[] splitName = syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK);
 			sb.append(GDE.STRING_BLANK);
@@ -690,7 +690,7 @@ public class Record extends AbstractRecord {
 			sb.append(GDE.STRING_DOT);
 			sb.append(GDE.STRING_DOT);
 			String trailer = GDE.STRING_STAR;
-			for (AbstractRecord tmpRecord : syncedRecords.get(this.ordinal)) {
+			for (Record tmpRecord : syncedRecords.get(this.ordinal)) {
 				if (tmpRecord.isDisplayable() && tmpRecord.realSize() > 1) trailer = tmpRecord.getName();
 			}
 			sb.append(trailer.split(GDE.STRING_BLANK).length > 1 ? trailer.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
@@ -1906,8 +1906,7 @@ public class Record extends AbstractRecord {
 		}
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
-			for (AbstractRecord tmpRecord : this.getAbstractParent().scaleSyncedRecords.get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
-				Record record = (Record) tmpRecord;
+			for (Record record : this.getParent().getScaleSyncedRecords().get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
 				record.minDisplayValue = this.minDisplayValue;
 				record.maxDisplayValue = this.maxDisplayValue;
 			}

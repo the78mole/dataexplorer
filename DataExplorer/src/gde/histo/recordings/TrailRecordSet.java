@@ -20,6 +20,7 @@
 package gde.histo.recordings;
 
 import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINER;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -70,9 +71,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	private final HistoGraphicsTemplate								template;
 
 	private final List<Integer>												durations_mm				= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
-
 	private final TrailDataTags												dataTags						= new TrailDataTags();
-	private final TrailRecordSynchronizer							synchronizer				= new TrailRecordSynchronizer(this);
 
 	/**
 	 * Data source for this recordset.
@@ -195,6 +194,15 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return newTrailRecordSet;
 	}
 
+	/**
+	 * @param recordOrdinal
+	 * @return the record based on ordinal
+	 */
+	@Override
+	public TrailRecord get(int recordOrdinal) {
+		return (TrailRecord) super.get(recordOrdinal);
+	}
+
 	@Override
 	public TrailRecord get(Object recordName) {
 		return (TrailRecord) super.get(recordName);
@@ -219,7 +227,43 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 */
 	@Override
 	public void syncScaleOfSyncableRecords() {
-		this.synchronizer.syncScales();
+		this.scaleSyncedRecords.initSyncedScales();
+	}
+
+	/**
+	 * Update referenced records to enable drawing of the curve, set min/max.
+	 * Set the sync max/min values for visible records inclusive referenced suite records.
+	 * Update the scale values from sync record if visible.
+	 */
+	public void updateSyncRecordScale() {
+		for (TrailRecord actualRecord : getVisibleAndDisplayableRecords()) {
+			log.finer(() -> actualRecord.getName() + "   isVisible=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() //$NON-NLS-1$ //$NON-NLS-2$
+					+ " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
+			actualRecord.setSyncMaxMinValue();
+		}
+
+		for (Map.Entry<Integer, Vector<TrailRecord>> syncRecordsEntry : this.getScaleSyncedRecords().entrySet()) {
+			boolean isAffected = false;
+			int tmpMin = Integer.MAX_VALUE;
+			int tmpMax = Integer.MIN_VALUE;
+			for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
+				if (syncRecord.isVisible() && syncRecord.isDisplayable()) {
+					isAffected = true;
+					tmpMin = Math.min(tmpMin, syncRecord.getSyncMinValue());
+					tmpMax = Math.max(tmpMax, syncRecord.getSyncMaxValue());
+					if (log.isLoggable(FINER)) log.log(FINER, syncRecord.getName() + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+			// now we have the max/min values over all sync records of the current sync group
+			for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
+				syncRecord.setSyncMinMax(tmpMin, tmpMax);
+			}
+
+			if (isAffected && log.isLoggable(FINER))
+			 {
+				log.log(FINER, this.get((int) syncRecordsEntry.getKey()).getSyncMasterName() + "; syncMin = " + tmpMin / 1000.0 + "; syncMax = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
 	}
 
 	/**
@@ -247,6 +291,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	/**
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<TrailRecord> getVisibleAndDisplayableRecordsForTable() {
 		return (Vector<TrailRecord>) (this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords);
@@ -255,6 +300,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	/**
 	 * @return visible and displayable records (p.e. to build the partial data table)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<TrailRecord> getVisibleAndDisplayableRecords() {
 		return (Vector<TrailRecord>) this.visibleAndDisplayableRecords;
@@ -263,19 +309,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	/**
 	 * @return all records for display
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<TrailRecord> getDisplayRecords() {
 		return (Vector<TrailRecord>) this.allRecords;
-	}
-
-	/**
-	 * Update the scale values from sync record if visible
-	 * and update referenced records to enable drawing of the curve, set min/max.
-	 */
-	@Override
-	public void updateSyncRecordScale() {
-		throw new UnsupportedOperationException("is not required for histo");
-		// this.synchronizer.updateSyncRecordScale();
 	}
 
 	/**
@@ -316,14 +353,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return displayRecords.toArray(new TrailRecord[displayRecords.size()]);
 	}
 
-	/**
-	 * Set the sync max/min values for visible records inclusive referenced suite records.
-	 * Update records to enable drawing of the curve.
-	 */
-	public void updateAllSyncScales() {
-		this.synchronizer.updateAllSyncScales();
-	}
-
 	public void addVaultHeader(ExtendedVault histoVault) {
 		int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
 		this.durations_mm.add(duration_mm);
@@ -339,7 +368,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 */
 	public void saveTemplate() {
 		for (int i = 0; i < this.size(); ++i) {
-			TrailRecord record = (TrailRecord) this.get(i);
+			TrailRecord record = this.get(i);
 			this.template.setProperty(i + Record.IS_VISIBLE, String.valueOf(record.isVisible()));
 			this.template.setProperty(i + Record.IS_POSITION_LEFT, String.valueOf(record.isPositionLeft()));
 			Color color = record.getColor();
@@ -367,7 +396,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		if (this.template != null && this.template.isAvailable()) {
 			boolean isHorizontalGridOrdinalSet = false;
 			for (int i = 0; i < this.size(); ++i) {
-				TrailRecord record = (TrailRecord) this.get(i);
+				TrailRecord record = this.get(i);
 				record.setVisible(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_VISIBLE, "false"))); //$NON-NLS-1$
 				record.setPositionLeft(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"))); //$NON-NLS-1$
 				int r, g, b;
@@ -464,13 +493,15 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return this.parent.getNumber();
 	}
 
-	public Map<Integer, Vector<? extends AbstractRecord>> getScaleSyncedRecords() {
-		return this.scaleSyncedRecords;
+	@SuppressWarnings("unchecked")
+	public SyncedRecords<TrailRecord> getScaleSyncedRecords() {
+		return (SyncedRecords<TrailRecord>) this.scaleSyncedRecords;
 	}
 
 	/**
 	 * @return the Vector containing the slave records sync by the master name
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<TrailRecord> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
 		return (Vector<TrailRecord>) this.scaleSyncedRecords.get(syncMasterRecordOrdinal);

@@ -19,10 +19,11 @@
 
 package gde.data;
 
+import static java.util.logging.Level.FINE;
+
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Vector;
 
 import org.eclipse.swt.SWT;
@@ -45,92 +46,297 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRecord> {
-	protected final static String								$CLASS_NAME											= AbstractRecordSet.class.getName();
-	protected final static long									serialVersionUID								= 26031957;
-	protected final static Logger								log															= Logger.getLogger($CLASS_NAME);
+	protected final static String											$CLASS_NAME							= AbstractRecordSet.class.getName();
+	protected final static long												serialVersionUID				= 26031957;
+	protected final static Logger											log											= Logger.getLogger($CLASS_NAME);
 
-	public static final int											MAX_NAME_LENGTH									= 40;
+	public static final int														MAX_NAME_LENGTH					= 40;
 
-	protected static final int									INITIAL_RECORD_CAPACITY					= 55;
-	protected static final String								DESCRIPTION_TEXT_LEAD						= Messages.getString(MessageIds.GDE_MSGT0129);
+	protected static final int												INITIAL_RECORD_CAPACITY	= 55;
+	protected static final String											DESCRIPTION_TEXT_LEAD		= Messages.getString(MessageIds.GDE_MSGT0129);
 
-	protected final DataExplorer								application;																																	// pointer to main application
-	protected final Channels										channels;																																			// start point of data hierarchy
+	/**
+	 * Collection of records where scales might be synchronized.
+	 */
+	protected SyncedRecords<? extends AbstractRecord>	scaleSyncedRecords			= new SyncedRecords<>(2);
+
+	public class SyncedRecords<T extends AbstractRecord> extends HashMap<Integer, Vector<T>> {
+		private final static long	serialVersionUID	= -1231656159005000097L;
+		@SuppressWarnings("hiding")
+		private final Logger			log								= Logger.getLogger(SyncedRecords.class.getName());
+
+		protected SyncedRecords(int initialCapacity) {
+			super(initialCapacity);
+		}
+
+		/**
+		 * @param recordName the record key to be used for the query
+		 * @return true if syncable records contains queryRecordKey
+		 */
+		boolean isOneOfSyncableRecord(String recordName) {
+			return getSyncMasterRecordOrdinal(recordName) >= 0;
+		}
+
+		/**
+		 * @param recordName the record key to be used for the query
+		 * @return the synchronization master record name or -1 if not found
+		 */
+		int getSyncMasterRecordOrdinal(String recordName) {
+			for (Integer syncRecordOrdinal : this.keySet()) {
+				if (this.isRecordContained(syncRecordOrdinal, recordName)) {
+					return syncRecordOrdinal;
+				}
+			}
+			return -1;
+		}
+
+		/**
+		 * @param syncMasterRecordOrdinal
+		 * @param recordName
+		 * @return true if the scaleSyncedRecords vector contains the given record not using equivalent entries, like the Vector.contains() method
+		 */
+		boolean isRecordContained(int syncMasterRecordOrdinal, String recordName) {
+			final String $METHOD_NAME = "isRecordContained";
+			boolean isContained = false;
+			synchronized (this) {
+				if (this.get(syncMasterRecordOrdinal) != null) {
+					for (AbstractRecord tempRecord : this.get(syncMasterRecordOrdinal)) {
+						if (log.isLoggable(Level.FINER))
+							log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.getName() + " with " + recordName);
+						if (tempRecord.getName().equals(recordName)) {
+							isContained = true;
+							break;
+						}
+					}
+				}
+			}
+			return isContained;
+		}
+
+		/**
+		 * Define sync groups according device properties.
+		 * Set axis end values, number format and scale position.
+		 * Support settlements.
+		 */
+		public void initSyncedScales() {
+			clear();
+
+			for (int i = 0; i < AbstractRecordSet.this.size(); i++) {
+				@SuppressWarnings("unchecked")
+				T tmpRecord = (T) AbstractRecordSet.this.get(i);
+				int syncMasterRecordOrdinal = tmpRecord.getSyncMasterRecordOrdinal();
+				if (syncMasterRecordOrdinal >= 0) {
+					@SuppressWarnings("unchecked")
+					T syncMasterRecord = (T) AbstractRecordSet.this.get(syncMasterRecordOrdinal);
+					if (get(syncMasterRecordOrdinal) == null) {
+						put(syncMasterRecordOrdinal, new Vector<T>());
+						get(syncMasterRecordOrdinal).add(syncMasterRecord);
+						syncMasterRecord.setSyncMinMax(Integer.MIN_VALUE, Integer.MAX_VALUE);
+					}
+					if (!isRecordContained(syncMasterRecordOrdinal, tmpRecord.getName())) {
+						if (Math.abs(i - syncMasterRecordOrdinal) >= get(syncMasterRecordOrdinal).size())
+							get(syncMasterRecordOrdinal).add(tmpRecord);
+						else
+							// sort while add
+							get(syncMasterRecordOrdinal).add(Math.abs(i - syncMasterRecordOrdinal), tmpRecord);
+
+						syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_END_VALUES);
+						syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
+						syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_SCALE_POSITION);
+						log.finer(() -> "add " + tmpRecord.getName()); //$NON-NLS-1$
+					}
+				}
+			}
+			if (log.isLoggable(FINE)) {
+				StringBuilder sb = new StringBuilder();
+				for (Integer syncRecordOrdinal : this.keySet()) {
+					sb.append(GDE.STRING_NEW_LINE).append(syncRecordOrdinal).append(GDE.STRING_COLON);
+					for (AbstractRecord tmpRecord : get(syncRecordOrdinal)) {
+						sb.append(tmpRecord.getName()).append(GDE.STRING_SEMICOLON);
+					}
+				}
+				log.log(FINE, sb.toString());
+			}
+		}
+
+		/**
+		 * Synchronize scale properties of master and slave scale synchronized records.
+		 */
+		void syncMasterSlaveRecords(AbstractRecord syncInputRecord, int type) {
+			for (Integer syncRecordOrdinal : this.keySet()) {
+				if (this.isRecordContained(syncRecordOrdinal, syncInputRecord.getName())) {
+					switch (type) {
+					case Record.TYPE_AXIS_END_VALUES:
+						boolean tmpIsRoundout = syncInputRecord.isRoundOut();
+						boolean tmpIsStartpointZero = syncInputRecord.isStartpointZero();
+						boolean tmpIsStartEndDefined = syncInputRecord.isStartEndDefined();
+						double minScaleValue = syncInputRecord.getMinScaleValue();
+						double maxScaleValue = syncInputRecord.getMaxScaleValue();
+						for (AbstractRecord tmpRecord : this.get(syncRecordOrdinal)) {
+							synchronized (tmpRecord) {
+								tmpRecord.setRoundOut(tmpIsRoundout);
+								tmpRecord.setStartpointZero(tmpIsStartpointZero);
+								tmpRecord.setStartEndDefined(tmpIsStartEndDefined, minScaleValue, maxScaleValue);
+							}
+							log.log(Level.FINER, String.format("%s minScaleValue=%.2f maxScaleValue=%.2f", //
+									tmpRecord.getName(), tmpRecord.getMinScaleValue(), tmpRecord.getMaxScaleValue()));
+						}
+						break;
+					case Record.TYPE_AXIS_NUMBER_FORMAT:
+						DecimalFormat tmpDf = syncInputRecord.getRealDf();
+						int numberFormat = syncInputRecord.getNumberFormat();
+						for (AbstractRecord tmpRecord : this.get(syncRecordOrdinal)) {
+							synchronized (tmpRecord) {
+								tmpRecord.setRealDf((DecimalFormat) tmpDf.clone());
+								tmpRecord.setNumberFormat(numberFormat);
+							}
+						}
+						break;
+					case Record.TYPE_AXIS_SCALE_POSITION:
+						boolean tmpIsPositionLeft = syncInputRecord.isPositionLeft();
+						for (AbstractRecord tmpRecord : this.get(syncRecordOrdinal)) {
+							synchronized (tmpRecord) {
+								tmpRecord.setPositionLeft(tmpIsPositionLeft);
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+
+		/**
+		 * @return true if one of the syncable records is visible
+		 */
+		boolean isOneSyncableVisible() {
+			for (Integer syncRecordOrdinal : this.keySet()) {
+				for (AbstractRecord tmpRecord : this.get(syncRecordOrdinal)) {
+					if (tmpRecord != null && tmpRecord.isVisible()) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * @param syncMasterOrdinal the record name of the sync master record
+		 * @return true if one of the syncable records is visible
+		 */
+		boolean isOneSyncableVisible(int syncMasterOrdinal) {
+			for (AbstractRecord tmpRecord : this.get(syncMasterOrdinal)) {
+				if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+	}
+
+	/**
+	 * pointer to main application.
+	 */
+	protected final DataExplorer								application;
+	/**
+	 * start point of data hierarchy.
+	 */
+	protected final Channels										channels;
 	protected final IDevice											device;
 	protected final Settings										settings												= Settings.getInstance();
 	protected final Channel											parent;
 
-	protected String														name;																																					//1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
+	/**
+	 * 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
+	 */
+	protected String														name;
 	protected TimeSteps													timeStep_ms;
 
 	protected String														header													= null;
-	protected String[]													recordNames;																																	// Spannung, Strom, ..
+	/**
+	 * Spannung, Strom, ..
+	 */
+	protected String[]													recordNames;
 	protected String														description											= GDE.STRING_EMPTY;
 
 	protected boolean														hasDisplayableData							= false;
-	protected Rectangle													drawAreaBounds;																																// draw area in display pixel
+	protected Rectangle													drawAreaBounds;
 
 	// current drop, shadow point vector to mark data points capable to be smoothed
 	protected boolean														isSmoothAtCurrentDrop						= false;
-	protected Vector<Integer[]>									currentDropShadow								= new Vector<Integer[]>(0);
-	public static final String									SMOOTH_AT_CURRENT_DROP					= "RecordSet_smoothAtCurrentDrop";						//$NON-NLS-1$
+	protected Vector<Integer[]>									currentDropShadow								= new Vector<>(0);
+	public static final String									SMOOTH_AT_CURRENT_DROP					= "RecordSet_smoothAtCurrentDrop";					//$NON-NLS-1$
 
 	protected boolean														isSmoothVoltageCurve						= false;
-	public static final String									SMOOTH_VOLTAGE_CURVE						= "RecordSet_smoothVoltageCurve";							//$NON-NLS-1$
+	public static final String									SMOOTH_VOLTAGE_CURVE						= "RecordSet_smoothVoltageCurve";						//$NON-NLS-1$
 
 	/**
 	 * records visible and displayable.
 	 * display in data table.
 	 */
-	protected Vector<? extends AbstractRecord>								visibleAndDisplayableRecords;
+	protected Vector<? extends AbstractRecord>	visibleAndDisplayableRecords;
 	/**
 	 * all records.
 	 * display in curve selector.
 	 */
-	protected Vector<? extends AbstractRecord>								allRecords;
-	/**
-	 * sync enabled records.
-	 * record keys where scales might be synchronized.
-	 */
-	protected Map<Integer, Vector<? extends AbstractRecord>>	scaleSyncedRecords							= new HashMap<Integer, Vector<? extends AbstractRecord>>(2);
+	protected Vector<? extends AbstractRecord>	allRecords;
 
 	// measurement
 	protected String														recordKeyMeasurement						= GDE.STRING_EMPTY;
 
 	protected double														maxValue												= Integer.MIN_VALUE;
-	protected double														minValue												= Integer.MAX_VALUE;													// min max value
+	protected double														minValue												= Integer.MAX_VALUE;
 
-	public static final String									TIME_STEP_MS										= "timeStep_ms";															//$NON-NLS-1$
-	public static final String									START_TIME_STAMP								= "startTimeStamp";														//$NON-NLS-1$
-	protected static final String								TIME														= "time";																			//$NON-NLS-1$
-	protected static final String								TIME_GRID_TYPE									= "RecordSet_timeGridType";										//$NON-NLS-1$
-	protected static final String								TIME_GRID_COLOR									= "RecordSet_timeGridColor";									//$NON-NLS-1$
-	protected static final String								TIME_GRID_LINE_STYLE						= "RecordSet_timeGridLineStyle";							//$NON-NLS-1$
-	public static final int											TIME_GRID_NONE									= 0;																					// no time grid
-	public static final int											TIME_GRID_MAIN									= 1;																					// each main tickmark
-	public static final int											TIME_GRID_MOD60									= 2;																					// each mod60 tickmark
+	public static final String									TIME_STEP_MS										= "timeStep_ms";														//$NON-NLS-1$
+	public static final String									START_TIME_STAMP								= "startTimeStamp";													//$NON-NLS-1$
+	protected static final String								TIME														= "time";																		//$NON-NLS-1$
+	protected static final String								TIME_GRID_TYPE									= "RecordSet_timeGridType";									//$NON-NLS-1$
+	protected static final String								TIME_GRID_COLOR									= "RecordSet_timeGridColor";								//$NON-NLS-1$
+	protected static final String								TIME_GRID_LINE_STYLE						= "RecordSet_timeGridLineStyle";						//$NON-NLS-1$
+	/**
+	 * no time grid
+	 */
+	public static final int											TIME_GRID_NONE									= 0;
+	/**
+	 * each main tickmark
+	 */
+	public static final int											TIME_GRID_MAIN									= 1;
+	/**
+	 * each mod60 tickmark
+	 */
+	public static final int											TIME_GRID_MOD60									= 2;
 	protected int																timeGridType										= TIME_GRID_NONE;
-	protected Vector<Integer>										timeGrid												= new Vector<Integer>();											// contains the time grid position, updated from TimeLine.drawTickMarks
+	/**
+	 * contains the time grid position, updated from TimeLine.drawTickMarks
+	 */
+	protected Vector<Integer>										timeGrid												= new Vector<Integer>();
 	protected Color															timeGridColor										= DataExplorer.COLOR_GREY;
 	protected int																timeGridLineStyle								= SWT.LINE_DOT;
 
 	@Deprecated
-	protected static final String								HORIZONTAL_GRID_RECORD					= "RecordSet_horizontalGridRecord";						//$NON-NLS-1$
-	protected static final String								HORIZONTAL_GRID_RECORD_ORDINAL	= "RecordSet_horizontalGridRecordOrdinal";		//$NON-NLS-1$
-	protected static final String								HORIZONTAL_GRID_TYPE						= "RecordSet_horizontalGridType";							//$NON-NLS-1$
-	protected static final String								HORIZONTAL_GRID_COLOR						= "RecordSet_horizontalGridColor";						//$NON-NLS-1$
-	protected static final String								HORIZONTAL_GRID_LINE_STYLE			= "RecordSet_horizontalGridLineStyle";				//$NON-NLS-1$
-	public static final int											HORIZONTAL_GRID_NONE						= 0;																					// no time grid
-	public static final int											HORIZONTAL_GRID_EVERY						= 1;																					// each main tickmark
-	public static final int											HORIZONTAL_GRID_SECOND					= 2;																					// each main tickmark
+	protected static final String								HORIZONTAL_GRID_RECORD					= "RecordSet_horizontalGridRecord";					//$NON-NLS-1$
+	protected static final String								HORIZONTAL_GRID_RECORD_ORDINAL	= "RecordSet_horizontalGridRecordOrdinal";	//$NON-NLS-1$
+	protected static final String								HORIZONTAL_GRID_TYPE						= "RecordSet_horizontalGridType";						//$NON-NLS-1$
+	protected static final String								HORIZONTAL_GRID_COLOR						= "RecordSet_horizontalGridColor";					//$NON-NLS-1$
+	protected static final String								HORIZONTAL_GRID_LINE_STYLE			= "RecordSet_horizontalGridLineStyle";			//$NON-NLS-1$
+	public static final int											HORIZONTAL_GRID_NONE						= 0;
+	public static final int											HORIZONTAL_GRID_EVERY						= 1;
+	public static final int											HORIZONTAL_GRID_SECOND					= 2;
 	protected int																horizontalGridType							= HORIZONTAL_GRID_NONE;
-	protected Vector<Integer>										horizontalGrid									= new Vector<Integer>();											// contains the time grid position, updated from TimeLine.drawTickMarks
+	/**
+	 * contains the time grid position, updated from TimeLine.drawTickMarks
+	 */
+	protected Vector<Integer>										horizontalGrid									= new Vector<Integer>();
 	protected Color															horizontalGridColor							= DataExplorer.COLOR_GREY;
 	protected int																horizontalGridLineStyle					= SWT.LINE_DASH;
-	protected int																horizontalGridRecordOrdinal			= -1;																					// recordNames[horizontalGridRecord]
+	/**
+	 * recordNames[horizontalGridRecord]
+	 */
+	protected int																horizontalGridRecordOrdinal			= -1;
 
 	/**
-	 * Special record set data buffers according the size of given names array, where the name is the key to access the data buffer used to hold compare able records (compare set).
+	 * Special record set data buffers according the size of given names array, where the name is the key to access the data buffer used to hold
+	 * compare able records (compare set).
 	 * @param application
 	 * @param useDevice the device
 	 * @param newName for the records like "1) Laden"
@@ -166,11 +372,13 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 
 		this.recordNames = measurementNames.clone();
 		this.timeStep_ms = newTimeSteps;
-		this.description = (this.device != null ? this.device.getName() + GDE.STRING_MESSAGE_CONCAT : GDE.STRING_EMPTY) + DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
+		this.description = (this.device != null ? this.device.getName() + GDE.STRING_MESSAGE_CONCAT
+				: GDE.STRING_EMPTY) + DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
 	}
 
 	/**
-	 * Copy constructor - used to copy a record set to another channel/configuration, where the configuration coming from the device properties file.
+	 * Copy constructor - used to copy a record set to another channel/configuration, where the configuration coming from the device properties
+	 * file.
 	 * @param recordSet
 	 * @param channelConfigurationNumber
 	 */
@@ -196,7 +404,8 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 		this.device = recordSet.device;
 
 		this.parent = recordSet.parent;
-		this.name = recordSet.name.length() < MAX_NAME_LENGTH ? recordSet.name + GDE.STRING_UNDER_BAR : recordSet.name.substring(0, MAX_NAME_LENGTH - 1) + GDE.STRING_UNDER_BAR;
+		this.name = recordSet.name.length() < MAX_NAME_LENGTH ? recordSet.name + GDE.STRING_UNDER_BAR
+				: recordSet.name.substring(0, MAX_NAME_LENGTH - 1) + GDE.STRING_UNDER_BAR;
 
 		this.recordNames = recordNames;
 	}
@@ -461,7 +670,8 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	public void setHorizontalGridRecordOrdinal(int newHorizontalGridRecordOrdinal) {
 		int tmpOrdinal = newHorizontalGridRecordOrdinal;
 		if (tmpOrdinal >= this.size()) tmpOrdinal = 0;
-		this.horizontalGridRecordOrdinal = this.isOneOfSyncableRecord(this.get(tmpOrdinal).getName()) ? this.getSyncMasterRecordOrdinal(this.get(tmpOrdinal).getName()) : tmpOrdinal;
+		this.horizontalGridRecordOrdinal = this.scaleSyncedRecords.isOneOfSyncableRecord(this.get(tmpOrdinal).getName())
+				? this.scaleSyncedRecords.getSyncMasterRecordOrdinal(this.get(tmpOrdinal).getName()) : tmpOrdinal;
 	}
 
 	/**
@@ -558,102 +768,17 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	}
 
 	/**
-	 * @param syncMasterRecordOrdinal
-	 * @param recordName
-	 * @return true if the scaleSyncedRecords vector contains the given record not using equivalent entries, like the Vector.contains() method
-	 */
-	public boolean isRecordContained(int syncMasterRecordOrdinal, String recordName) {
-		final String $METHOD_NAME = "isRecordContained";
-		boolean isContained = false;
-		synchronized (this.scaleSyncedRecords) {
-			if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) != null) {
-				for (AbstractRecord tempRecord : this.scaleSyncedRecords.get(syncMasterRecordOrdinal)) {
-					if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "compare " + tempRecord.getName() + " with " + recordName);
-					if (tempRecord.getName().equals(recordName)) {
-						isContained = true;
-						break;
-					}
-				}
-			}
-		}
-		return isContained;
-	}
-
-	/**
-	 * Update the scale values from sync record if visible and update referenced records to enable drawing of curve, set min/max.
-	 */
-	public abstract void updateSyncRecordScale();
-
-	/**
 	 * Synchronize scales according device properties.
 	 */
-	public abstract void syncScaleOfSyncableRecords();
+	public void syncScaleOfSyncableRecords() {
+		this.scaleSyncedRecords.initSyncedScales();
+	}
 
 	/**
 	 * Synchronize scale properties of master and slave scale synchronized records.
 	 */
 	public void syncMasterSlaveRecords(AbstractRecord syncInputRecord, int type) {
-		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			if (this.isRecordContained(syncRecordOrdinal, syncInputRecord.getName())) {
-				switch (type) {
-				case Record.TYPE_AXIS_END_VALUES:
-					boolean tmpIsRoundout = syncInputRecord.isRoundOut();
-					boolean tmpIsStartpointZero = syncInputRecord.isStartpointZero();
-					boolean tmpIsStartEndDefined = syncInputRecord.isStartEndDefined();
-					double minScaleValue = syncInputRecord.getMinScaleValue();
-					double maxScaleValue = syncInputRecord.getMaxScaleValue();
-					for (AbstractRecord tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-						synchronized (tmpRecord) {
-							tmpRecord.setRoundOut(tmpIsRoundout);
-							tmpRecord.setStartpointZero(tmpIsStartpointZero);
-							tmpRecord.setStartEndDefined(tmpIsStartEndDefined, minScaleValue, maxScaleValue);
-						}
-						// log.log(Level.OFF, String.format("%s minScaleValue=%.2f maxScaleValue=%.2f", tmpRecord.getName(), tmpRecord.minScaleValue,
-						// tmpRecord.maxScaleValue));
-					}
-					break;
-				case Record.TYPE_AXIS_NUMBER_FORMAT:
-					DecimalFormat tmpDf = syncInputRecord.getRealDf();
-					int numberFormat = syncInputRecord.getNumberFormat();
-					for (AbstractRecord tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-						synchronized (tmpRecord) {
-							tmpRecord.setRealDf((DecimalFormat) tmpDf.clone());
-							tmpRecord.setNumberFormat(numberFormat);
-						}
-					}
-					break;
-				case Record.TYPE_AXIS_SCALE_POSITION:
-					boolean tmpIsPositionLeft = syncInputRecord.isPositionLeft();
-					for (AbstractRecord tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-						synchronized (tmpRecord) {
-							tmpRecord.setPositionLeft(tmpIsPositionLeft);
-						}
-					}
-					break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * @return true only if both isSyncableSynced && isOneSyncableVisible are true
-	 */
-	public boolean hasSynchronizedRecords() {
-		return !this.scaleSyncedRecords.isEmpty();
-	}
-
-	/**
-	 * @return true if one of the syncable records is visible
-	 */
-	public boolean isOneSyncableVisible() {
-		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			for (AbstractRecord tmpRecord : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-				if (tmpRecord != null && tmpRecord.isVisible()) {
-					return true;
-				}
-			}
-		}
-		return false;
+		this.scaleSyncedRecords.syncMasterSlaveRecords(syncInputRecord, type);
 	}
 
 	/**
@@ -661,12 +786,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * @return true if one of the syncable records is visible
 	 */
 	public boolean isOneSyncableVisible(int syncMasterOrdinal) {
-		for (AbstractRecord tmpRecord : this.scaleSyncedRecords.get(syncMasterOrdinal)) {
-			if (tmpRecord != null && tmpRecord.isVisible() && tmpRecord.isDisplayable()) {
-				return true;
-			}
-		}
-		return false;
+		return this.scaleSyncedRecords.isOneSyncableVisible(syncMasterOrdinal);
 	}
 
 	/**
@@ -685,7 +805,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * @return true if syncable records contains queryRecordKey
 	 */
 	public boolean isOneOfSyncableRecord(String recordName) {
-		return getSyncMasterRecordOrdinal(recordName) >= 0;
+		return this.scaleSyncedRecords.isOneOfSyncableRecord(recordName);
 	}
 
 	/**
@@ -693,12 +813,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * @return the synchronization master record name or -1 if not found
 	 */
 	public int getSyncMasterRecordOrdinal(String recordName) {
-		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-			if (this.isRecordContained(syncRecordOrdinal, recordName)) {
-				return syncRecordOrdinal;
-			}
-		}
-		return -1;
+		return this.scaleSyncedRecords.getSyncMasterRecordOrdinal(recordName);
 	}
 
 	public String getDescription() {

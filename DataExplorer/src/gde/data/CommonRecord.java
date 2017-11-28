@@ -23,15 +23,14 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
-import java.util.Vector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.AbstractRecordSet.SyncedRecords;
 import gde.data.Record.DataType;
 import gde.device.DataTypes;
 import gde.device.IDevice;
@@ -323,7 +322,7 @@ public abstract class CommonRecord extends AbstractRecord {
 
 	public String getSyncMasterName() {
 		StringBuilder sb = new StringBuilder().append(this.name.split(GDE.STRING_BLANK)[0]);
-		Map<Integer, Vector<? extends AbstractRecord>> syncedRecords = this.getAbstractParent().scaleSyncedRecords;
+		SyncedRecords<? extends AbstractRecord> syncedRecords = this.getAbstractParent().scaleSyncedRecords;
 		if (syncedRecords.get(this.ordinal) != null && syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK).length > 1) {
 			sb.append(GDE.STRING_BLANK);
 			String[] splitName = syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK);
@@ -959,8 +958,8 @@ public abstract class CommonRecord extends AbstractRecord {
 					}
 				}
 				this.sigmaValue = (super.size() - zeroCount - 1) != 0
-						? Double.valueOf(Math.sqrt(sumPoweredValues / (super.size() - zeroCount - 1)) * 1000).intValue() : 0; // ET realSize corresponds to the
-																																																									// looped elements
+						? Double.valueOf(Math.sqrt(sumPoweredValues / (super.size() - zeroCount - 1)) * 1000).intValue() : 0;
+				// ET realSize corresponds to the looped elements
 			}
 		}
 	}

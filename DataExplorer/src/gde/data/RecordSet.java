@@ -34,9 +34,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
-import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
-import gde.device.PropertyType;
 import gde.device.TriggerType;
 import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
@@ -72,32 +70,35 @@ public final class RecordSet extends AbstractRecordSet {
 	boolean												isRaw													= false;																																																								//indicates imported file with raw data, no translation at all
 	boolean												isFromFile										= false;																																																								//indicates that this record set was created by loading data from file
 	boolean												isRecalculation								= true;																																																									//indicates record is modified and need re-calculation
-	int														fileDataSize									= 0;																																																										//number of integer values per record
+	int														fileDataSize									= 0;																					// number of integer values per record
 	int														fileDataBytes									= 0;																																																										//number of bytes containing all records data
 	long													fileDataPointer								= 0;																																																										//file pointer where the data of this record begins
 	int														xScaleStep										= 0;																																																										// steps in x direction to draw the curves, normally 1
 
-	//for compare set x min/max and y max (time) might be different
+	// for compare set x min/max and y max (time) might be different
 	boolean												isCompareSet									= false;
 	boolean												isUtilitySet									= false;
 	double												maxTime												= 0.0;																																																									//compare set -> each record will have its own timeSteps_ms,
-	//so the biggest record in view point of time will define the time scale
+	// so the biggest record in view point of time will define the time scale
 
-	//zooming
-	int														zoomLevel											= 0;																																																										//0 == not zoomed
+	// zooming
+	int														zoomLevel											= 0;																					// 0 == not zoomed
 	boolean												isZoomMode										= false;
 	boolean												isScopeMode										= false;
-	int														scopeModeOffset;																																																																			// defines the offset in record pixel
+	int														scopeModeOffset;																														// defines the offset in record pixel
 	int														scopeModeSize;																																																																				// defines the number of record pixels to be displayed
 
 	int[]													voltageLimits									= CellVoltageValues.getVoltageLimits();																																									// voltage limits for LiXx cells, initial LiPo
-	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";																																														// each main tickmark //$NON-NLS-1$
+	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";									// each main tickmark //$NON-NLS-1$
 
-	//	boolean												isSyncRecordSelected					= false;
-	//	public static final	String		SYNC_RECORD_SELECTED					= "Syncable_record_selected";
+	// boolean isSyncRecordSelected = false;
+	// public static final String SYNC_RECORD_SELECTED = "Syncable_record_selected";
 
-	public static final String[]	propertyKeys									= new String[] { TIME_STEP_MS, START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL, HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE,
-			TIME_GRID_LINE_STYLE, TIME_GRID_COLOR, HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE, HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS };
+	public static final String[]	propertyKeys									= new String[] { TIME_STEP_MS,								//
+			START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL,																											//
+			HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR,												//
+			HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE,																											//
+			HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS };
 
 	int														configuredDisplayable					= 0;																																																										// number of record which must be displayable before table calculation begins
 
@@ -106,7 +107,7 @@ public final class RecordSet extends AbstractRecordSet {
 	public final static String		UNSAVED_REASON_CONFIGURATION	= Messages.getString(MessageIds.GDE_MSGT0132);
 	public final static String		UNSAVED_REASON_COMMENT				= Messages.getString(MessageIds.GDE_MSGT0610);
 	Vector<String>								unsaveReasons									= new Vector<String>();
-	int														changeCounter									= 0;																																																										// indicates change in general
+	int														changeCounter									= 0;																					// indicates change in general
 
 	private GroupTransitions			histoTransitions;
 
@@ -124,8 +125,9 @@ public final class RecordSet extends AbstractRecordSet {
 		super(useDevice, channelNumber, newName, measurementNames, newTimeSteps);
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
-		this.visibleAndDisplayableRecords		= new Vector<Record>();
-		this.allRecords											= new Vector<Record>();
+		this.visibleAndDisplayableRecords = new Vector<Record>();
+		this.allRecords = new Vector<Record>();
+		this.scaleSyncedRecords = new SyncedRecords<Record>(2);
 	}
 
 	/**
@@ -139,12 +141,13 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms, GraphicsType graphicsType) {
 		super(DataExplorer.getInstance(), useDevice, newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30), new String[0]);
-		//this.timeStep_ms = new TimeSteps(this.get(0), newTimeStep_ms);
+		// this.timeStep_ms = new TimeSteps(this.get(0), newTimeStep_ms);
 		this.isRaw = true;
 		this.isCompareSet = GraphicsType.COMPARE == graphicsType;
 		this.isUtilitySet = GraphicsType.UTIL == graphicsType;
-		this.visibleAndDisplayableRecords		= new Vector<Record>();
-		this.allRecords											= new Vector<Record>();
+		this.visibleAndDisplayableRecords = new Vector<Record>();
+		this.allRecords = new Vector<Record>();
+		this.scaleSyncedRecords = new SyncedRecords<Record>(2);
 	}
 
 	/**
@@ -173,7 +176,7 @@ public final class RecordSet extends AbstractRecordSet {
 			}
 			log.log(Level.FINER, "newRecordNames = " + sb.toString()); //$NON-NLS-1$
 		}
-		//copy records while exchange record name (may change to other language!)
+		// copy records while exchange record name (may change to other language!)
 		for (int i = 0; i < newRecordNames.length; i++) {
 			if (!oldRecordNames[i].equals(newRecordNames[i])) {
 				// add the old record with new name
@@ -196,7 +199,7 @@ public final class RecordSet extends AbstractRecordSet {
 			tmpRecord.triggerLevel = tmpTrigger != null ? tmpTrigger.getLevel() : null;
 			tmpRecord.minTriggerTimeSec = tmpTrigger != null ? tmpTrigger.getMinTimeSec() : null;
 
-			//copy record properties if -> record properties available == name equal
+			// copy record properties if -> record properties available == name equal
 			if (recordSet.get(this.recordNames[i]) != null)
 				tmpRecord.setProperties(recordSet.get(this.recordNames[i]).getProperties());
 			else
@@ -212,7 +215,7 @@ public final class RecordSet extends AbstractRecordSet {
 
 		this.isCompareSet = recordSet.isCompareSet;
 
-		//		this.maxSize = recordSet.maxSize;
+		// this.maxSize = recordSet.maxSize;
 		this.maxTime = recordSet.maxTime;
 		this.maxValue = recordSet.maxValue;
 		this.minValue = recordSet.minValue;
@@ -235,8 +238,9 @@ public final class RecordSet extends AbstractRecordSet {
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
 
-		this.visibleAndDisplayableRecords		= new Vector<Record>();
-		this.allRecords											= new Vector<Record>();
+		this.visibleAndDisplayableRecords = new Vector<Record>();
+		this.allRecords = new Vector<Record>();
+		this.scaleSyncedRecords = new SyncedRecords<Record>(this.recordNames.length);
 		this.syncScaleOfSyncableRecords();
 	}
 
@@ -262,7 +266,7 @@ public final class RecordSet extends AbstractRecordSet {
 			this.put(recordKey, this.get(recordKey).clone(dataIndex, isFromBegin));
 		}
 
-		if (recordSet.timeStep_ms != null) { //time step vector must be updated as well
+		if (recordSet.timeStep_ms != null) { // time step vector must be updated as well
 			this.timeStep_ms = recordSet.timeStep_ms.clone(dataIndex, isFromBegin);
 		}
 
@@ -284,7 +288,7 @@ public final class RecordSet extends AbstractRecordSet {
 
 		this.isCompareSet = recordSet.isCompareSet;
 
-		//		this.maxSize = recordSet.maxSize;
+		// this.maxSize = recordSet.maxSize;
 		this.maxTime = recordSet.maxTime;
 		this.maxValue = recordSet.maxValue;
 		this.minValue = recordSet.minValue;
@@ -307,8 +311,9 @@ public final class RecordSet extends AbstractRecordSet {
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
 
-		this.visibleAndDisplayableRecords		= new Vector<Record>();
-		this.allRecords											= new Vector<Record>();
+		this.visibleAndDisplayableRecords = new Vector<Record>();
+		this.allRecords = new Vector<Record>();
+		this.scaleSyncedRecords = new SyncedRecords<Record>(this.recordNames.length);
 
 		this.device.updateVisibilityStatus(this, false);
 	}
@@ -482,8 +487,8 @@ public final class RecordSet extends AbstractRecordSet {
 
 	/**
 	 * @return a valid time step in msec for record sets from devices with constant time step between measurement points !
-	 * For devices with none constant time step between measurement points it returns the average value.
-	 * Do not use for calculation, use for logging purpose only.
+	 *         For devices with none constant time step between measurement points it returns the average value.
+	 *         Do not use for calculation, use for logging purpose only.
 	 */
 	public double getAverageTimeStep_ms() {
 		return this.timeStep_ms != null ? this.timeStep_ms.getAverageTimeStep_ms() : this.get(0).timeStep_ms != null ? this.get(0).timeStep_ms.getAverageTimeStep_ms() : -1.0;
@@ -569,12 +574,12 @@ public final class RecordSet extends AbstractRecordSet {
 		for (Record record : this.getValues()) {
 			if (record.size() > 0 && record.ordinal == this.horizontalGridRecordOrdinal) displayRecords.add(record);
 		}
-		//add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
+		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
 		for (int i = 0; i < this.size(); ++i) {
 			final Record record = this.get(i);
 			if (record.size() > 0 && record.ordinal != this.horizontalGridRecordOrdinal && record.isScaleSyncMaster()) displayRecords.add(record);
 		}
-		//add all others
+		// add all others
 		for (int i = 0; i < this.size(); ++i) {
 			final Record record = this.get(i);
 			if (record.size() > 0 && record.ordinal != this.horizontalGridRecordOrdinal && !record.isScaleSyncMaster()) displayRecords.add(record);
@@ -600,6 +605,7 @@ public final class RecordSet extends AbstractRecordSet {
 	/**
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<Record> getVisibleAndDisplayableRecordsForTable() {
 		return (Vector<Record>) (this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords);
@@ -608,6 +614,7 @@ public final class RecordSet extends AbstractRecordSet {
 	/**
 	 * @return visible and displayable records (p.e. to build the partial data table)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<Record> getVisibleAndDisplayableRecords() {
 		return (Vector<Record>) this.visibleAndDisplayableRecords;
@@ -616,6 +623,7 @@ public final class RecordSet extends AbstractRecordSet {
 	/**
 	 * @return all records for display
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<Record> getDisplayRecords() {
 		return (Vector<Record>) this.allRecords;
@@ -732,9 +740,9 @@ public final class RecordSet extends AbstractRecordSet {
 
 	/**
 	 * method to set the sorted active or in active record names as string array
-	 *  - records which does not have inactive or active flag are calculated from active or inactive
-	 *  - all records not calculated may have the active status and must be stored
-	 *  - set this during IDevice.crossCheckMeasurements() to cache this and avoid recalculation based on initial device measurements
+	 * - records which does not have inactive or active flag are calculated from active or inactive
+	 * - all records not calculated may have the active status and must be stored
+	 * - set this during IDevice.crossCheckMeasurements() to cache this and avoid recalculation based on initial device measurements
 	 */
 	public void setNoneCalculationRecordNames(final String[] recordNames) {
 		this.noneCalculationRecords = recordNames;
@@ -742,8 +750,8 @@ public final class RecordSet extends AbstractRecordSet {
 
 	/**
 	 * method to get the sorted active or in active record names as string array
-	 *  - records which does not have inactive or active flag are calculated from active or inactive
-	 *  - all records not calculated may have the active status and must be stored
+	 * - records which does not have inactive or active flag are calculated from active or inactive
+	 * - all records not calculated may have the active status and must be stored
 	 * @return String[] containing record names
 	 */
 	public String[] getNoneCalculationRecordNames() {
@@ -754,14 +762,14 @@ public final class RecordSet extends AbstractRecordSet {
 	}
 
 	/**
-	 *	clear the record set compare view
+	 * clear the record set compare view
 	 */
 	@Override
 	public void clear() {
 		super.clear();
 		this.recordNames = new String[0];
 		this.timeStep_ms = null;
-		//		this.maxSize = 0;
+		// this.maxSize = 0;
 		this.maxTime = 0.0;
 		this.maxValue = -20000;
 		this.minValue = 20000;
@@ -774,13 +782,13 @@ public final class RecordSet extends AbstractRecordSet {
 	 * does not clear any fields in the recordSet, in the records or in timeStep.
 	 */
 	public void cleanup() {
-		//		this.histoSettlements.clear();
-		//		this.histoScoregroups.clear();
-		//		this.visibleAndDisplayableRecords.clear();
-		//		this.visibleAndDisplayableRecords.trimToSize();
-		//		this.allRecords.clear();
-		//		this.allRecords.trimToSize();
-		//		this.scaleSyncedRecords.clear();
+		// this.histoSettlements.clear();
+		// this.histoScoregroups.clear();
+		// this.visibleAndDisplayableRecords.clear();
+		// this.visibleAndDisplayableRecords.trimToSize();
+		// this.allRecords.clear();
+		// this.allRecords.trimToSize();
+		// this.scaleSyncedRecords.clear();
 
 		this.timeStep_ms.clear();
 		this.timeStep_ms.trimToSize();
@@ -788,7 +796,7 @@ public final class RecordSet extends AbstractRecordSet {
 			record.clear();
 			record.trimToSize();
 		}
-		//		clear();  because cleanup is intended to reduce the heap size this clear is not required
+		// clear(); because cleanup is intended to reduce the heap size this clear is not required
 	}
 
 	/**
@@ -845,7 +853,6 @@ public final class RecordSet extends AbstractRecordSet {
 		RecordSet newRecordSet = new RecordSet(device, channelConfigNumber, tmpRecordSetName, recordNames, timeSteps, isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
-
 		for (int i = 0; i < recordNames.length; i++) {
 			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
 			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(),
@@ -886,7 +893,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	public boolean isChildOfActiveChannel() {
 		boolean isChild = false;
-		//Channels channels = Channels.getInstance();
+		// Channels channels = Channels.getInstance();
 		RecordSet uiRecordSet = this.channels.getActiveChannel().get(this.name);
 		if (uiRecordSet == this) isChild = true;
 		return isChild;
@@ -899,7 +906,7 @@ public final class RecordSet extends AbstractRecordSet {
 	public Record put(String key, AbstractRecord record) {
 		super.put(key, record);
 		Record newRecord = this.get(key);
-		//for compare set record following properties has to be checked at the point where
+		// for compare set record following properties has to be checked at the point where
 		newRecord.keyName = key;
 		newRecord.parent = this;
 
@@ -1029,7 +1036,7 @@ public final class RecordSet extends AbstractRecordSet {
 						Thread.sleep(1000);
 					}
 				} catch (InterruptedException e) {
-					//ignore
+					// ignore
 				}
 				Channel activeChannel = RecordSet.this.channels.getActiveChannel();
 				if (activeChannel != null && activeChannel.getFullQualifiedFileName() != null) activeChannel.checkAndLoadData();
@@ -1068,7 +1075,7 @@ public final class RecordSet extends AbstractRecordSet {
 
 	/**
 	 * @return the isFromFile, this flag indicates to call the make allInActiveDisplayable
-	 * - the handling might be different if data captured directly from device
+	 *         - the handling might be different if data captured directly from device
 	 */
 	public boolean isFromFile() {
 		return this.isFromFile;
@@ -1142,7 +1149,7 @@ public final class RecordSet extends AbstractRecordSet {
 					record.zoomOffset = 0;
 					record.zoomTimeOffset = 0.0;
 					record.drawTimeWidth = record.getMaxTime_ms();
-					//log.log(Level.INFO, this.name + "this.getMaxTime_ms() = " + record.drawTimeWidth);
+					// log.log(Level.INFO, this.name + "this.getMaxTime_ms() = " + record.drawTimeWidth);
 					record.minZoomScaleValue = record.minScaleValue;
 					record.maxZoomScaleValue = record.maxScaleValue;
 					log.log(Level.FINER, this.name + " zoomTimeOffset " + TimeLine.getFomatedTimeWithUnit(record.zoomTimeOffset) + " drawTimeWidth " + TimeLine.getFomatedTimeWithUnit(record.drawTimeWidth)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1400,8 +1407,7 @@ public final class RecordSet extends AbstractRecordSet {
 
 		sb.append(TIME_GRID_TYPE).append(GDE.STRING_EQUAL).append(this.timeGridType).append(Record.DELIMITER);
 		sb.append(TIME_GRID_LINE_STYLE).append(GDE.STRING_EQUAL).append(this.timeGridLineStyle).append(Record.DELIMITER);
-		sb.append(TIME_GRID_COLOR).append(GDE.STRING_EQUAL).append(this.timeGridColor.getRed()).append(GDE.STRING_COMMA).append(this.timeGridColor.getGreen()).append(GDE.STRING_COMMA)
-				.append(this.timeGridColor.getBlue()).append(Record.DELIMITER);
+		sb.append(TIME_GRID_COLOR).append(GDE.STRING_EQUAL).append(this.timeGridColor.getRed()).append(GDE.STRING_COMMA).append(this.timeGridColor.getGreen()).append(GDE.STRING_COMMA).append(this.timeGridColor.getBlue()).append(Record.DELIMITER);
 
 		sb.append(HORIZONTAL_GRID_RECORD_ORDINAL).append(GDE.STRING_EQUAL).append(this.horizontalGridRecordOrdinal).append(Record.DELIMITER);
 		sb.append(HORIZONTAL_GRID_TYPE).append(GDE.STRING_EQUAL).append(this.horizontalGridType).append(Record.DELIMITER);
@@ -1558,61 +1564,20 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	@Override
 	public void syncScaleOfSyncableRecords() {
-		this.scaleSyncedRecords.clear(); //	= new HashMap<Integer,Vector<Record>>(1);
-		for (int i = 0; i < this.size() && !this.isCompareSet; i++) {
-			final PropertyType syncProperty = this.isUtilitySet ? this.get(i).getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())
-					: this.device.getMeasruementProperty(this.parent.number, i, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-			if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
-				final Record tmpRecord = this.get(i);
-				final int syncMasterRecordOrdinal = Integer.parseInt(syncProperty.getValue());
-				if (syncMasterRecordOrdinal >= 0) {
-					if (this.scaleSyncedRecords.get(syncMasterRecordOrdinal) == null) {
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add syncMaster " + this.get(syncMasterRecordOrdinal).name);
-						this.scaleSyncedRecords.put(syncMasterRecordOrdinal, new Vector<Record>());
-						getScaleSyncedRecords(syncMasterRecordOrdinal).add(this.get(syncMasterRecordOrdinal));
-						this.get(syncMasterRecordOrdinal).syncMinValue = Integer.MAX_VALUE;
-						this.get(syncMasterRecordOrdinal).syncMaxValue = Integer.MIN_VALUE;
-					}
-					if (!this.isRecordContained(syncMasterRecordOrdinal, tmpRecord.getName())) {
-						if (Math.abs(i - syncMasterRecordOrdinal) >= this.scaleSyncedRecords.get(syncMasterRecordOrdinal).size())
-							getScaleSyncedRecords(syncMasterRecordOrdinal).add(tmpRecord);
-						else
-							//sort while add
-							getScaleSyncedRecords(syncMasterRecordOrdinal).add(Math.abs(i - syncMasterRecordOrdinal), tmpRecord);
-
-						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_END_VALUES);
-						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_NUMBER_FORMAT);
-						this.syncMasterSlaveRecords(this.get(syncMasterRecordOrdinal), Record.TYPE_AXIS_SCALE_POSITION);
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "add " + tmpRecord.name);
-					}
-				}
-			}
-		}
-		if (log.isLoggable(Level.FINE)) {
-			StringBuilder sb = new StringBuilder();
-			for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
-				sb.append("\n").append(syncRecordOrdinal).append(GDE.STRING_COLON);
-				for (AbstractRecord record : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-					Record tmpRecord = (Record) record;
-					sb.append(tmpRecord.name).append(GDE.STRING_SEMICOLON);
-				}
-			}
-			log.log(Level.FINE, sb.toString());
-		}
+		if (this.isCompareSet) return;
+		this.scaleSyncedRecords.initSyncedScales();
 	}
 
 	/**
 	 * update the scale values from sync record if visible
 	 * and update referenced records to enable drawing of curve, set min/max
 	 */
-	@Override
 	public void updateSyncRecordScale() {
 		for (int syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
 			boolean isAffected = false;
 			int tmpSyncMin = Integer.MAX_VALUE;
 			int tmpSyncMax = Integer.MIN_VALUE;
-			for (AbstractRecord record : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-				Record tmpRecord = (Record) record;
+			for (Record tmpRecord : this.getScaleSyncedRecords().get(syncRecordOrdinal)) {
 				synchronized (tmpRecord) {
 					if (tmpRecord.isVisible && tmpRecord.isDisplayable) {
 						isAffected = true;
@@ -1626,8 +1591,7 @@ public final class RecordSet extends AbstractRecordSet {
 					}
 				}
 			}
-			for (AbstractRecord record : this.scaleSyncedRecords.get(syncRecordOrdinal)) {
-				Record tmpRecord = (Record) record;
+			for (Record tmpRecord : this.getScaleSyncedRecords().get(syncRecordOrdinal)) {
 				synchronized (tmpRecord) {
 					if (this.isScopeMode) {
 						tmpRecord.scopeMin = tmpSyncMin;
@@ -1657,9 +1621,15 @@ public final class RecordSet extends AbstractRecordSet {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	public SyncedRecords<Record> getScaleSyncedRecords() {
+		return (SyncedRecords<Record>) this.scaleSyncedRecords;
+	}
+
 	/**
 	 * @return the Vector containing the slave records sync by the master name
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<Record> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
 		return (Vector<Record>) this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
@@ -1764,7 +1734,7 @@ public final class RecordSet extends AbstractRecordSet {
 		if (enable) {
 			// iterate children and set min/max values
 			for (String recordKey : this.recordNames) {
-				//StringBuilder sb = new StringBuilder();
+				// StringBuilder sb = new StringBuilder();
 				Record record = this.get(recordKey);
 				if (record.isVisible && record.isDisplayable) {
 					int min = 0, max = 0, value;
@@ -1777,9 +1747,9 @@ public final class RecordSet extends AbstractRecordSet {
 								max = value;
 							else if (value < min) min = value;
 						}
-						//sb.append(value).append(", ");
+						// sb.append(value).append(", ");
 					}
-					//log.log(Level.INFO, sb.toString());
+					// log.log(Level.INFO, sb.toString());
 					log.log(Level.FINE, record.getName() + ": scopeMin = " + min / 1000.0 + "; scopeMax = " + max / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 					record.setScopeMinMax(min, max);
 				}
