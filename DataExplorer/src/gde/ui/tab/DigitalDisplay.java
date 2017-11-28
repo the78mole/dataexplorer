@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.tab;
@@ -92,7 +92,7 @@ public class DigitalDisplay extends Composite {
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
+							Record record = activeRecordSet.get(DigitalDisplay.this.recordKey);
 							if (record != null && record.size() > 0) {
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "update label for " + DigitalDisplay.this.recordKey); //$NON-NLS-1$
 								DigitalDisplay.this.textDigitalLabel
@@ -127,7 +127,7 @@ public class DigitalDisplay extends Composite {
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
+							Record record = activeRecordSet.get(DigitalDisplay.this.recordKey);
 							if (record != null) {
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "update label for " + DigitalDisplay.this.recordKey); //$NON-NLS-1$
 								DigitalDisplay.this.textDigitalLabel.setText(activeRecordSet.get(DigitalDisplay.this.recordKey).getName() + " [ " + activeRecordSet.get(DigitalDisplay.this.recordKey).getUnit() + " ]");
@@ -150,7 +150,7 @@ public class DigitalDisplay extends Composite {
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
+							Record record = activeRecordSet.get(DigitalDisplay.this.recordKey);
 							if (record != null && record.size() > 0) {
 								String actualValue = record.getFormattedStatisticsValue(record.lastElement() / 1000.0);
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, DigitalDisplay.this.recordKey + " actualValue=" + actualValue); //$NON-NLS-1$
@@ -179,7 +179,7 @@ public class DigitalDisplay extends Composite {
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
+							Record record = activeRecordSet.get(DigitalDisplay.this.recordKey);
 							if (record != null && record.size() > 0) {
 								String minValue = Messages.getString(MessageIds.GDE_MSGT0237) + record.getFormattedStatisticsValue(record.getMinValue() / 1000.0);
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, DigitalDisplay.this.recordKey + " minValue=" + minValue); //$NON-NLS-1$
@@ -202,7 +202,7 @@ public class DigitalDisplay extends Composite {
 					if (activeChannel != null) {
 						RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 						if (activeRecordSet != null) {
-							Record record = activeRecordSet.getRecord(DigitalDisplay.this.recordKey);
+							Record record = activeRecordSet.get(DigitalDisplay.this.recordKey);
 							if (record != null && record.size() > 0) {
 								String maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + record.getFormattedStatisticsValue(record.getMaxValue() / 1000.0);
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, DigitalDisplay.this.recordKey + " maxValue=" + maxValue); //$NON-NLS-1$

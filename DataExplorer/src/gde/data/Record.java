@@ -623,6 +623,7 @@ public class Record extends AbstractRecord {
 		return super.set(index, point);
 	}
 
+	@Override
 	public int getOrdinal() {
 		return this.ordinal;
 	}
@@ -631,6 +632,7 @@ public class Record extends AbstractRecord {
 		this.ordinal = newOrdinal;
 	}
 
+	@Override
 	public String getName() {
 		return this.name;
 	}
@@ -728,6 +730,7 @@ public class Record extends AbstractRecord {
 		return newProperty;
 	}
 
+	@Override
 	public double getFactor() {
 		double value = 1.0;
 		PropertyType property = this.getProperty(IDevice.FACTOR);
@@ -750,6 +753,7 @@ public class Record extends AbstractRecord {
 			this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
+	@Override
 	public double getOffset() {
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.OFFSET);
@@ -772,6 +776,7 @@ public class Record extends AbstractRecord {
 			this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
+	@Override
 	public double getReduction() {
 		double value = 0.0;
 		PropertyType property = this.getProperty(IDevice.REDUCTION);
@@ -796,10 +801,12 @@ public class Record extends AbstractRecord {
 			this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
+	@Override
 	public boolean isVisible() {
 		return this.isVisible;
 	}
 
+	@Override
 	public void setVisible(boolean enabled) {
 		this.isVisible = enabled;
 	}
@@ -994,6 +1001,7 @@ public class Record extends AbstractRecord {
 	 * time calculation needs always the real size of the record
 	 * @return real vector size
 	 */
+	@Override
 	public int realSize() {
 		return super.size();
 	}
@@ -1086,14 +1094,17 @@ public class Record extends AbstractRecord {
 		return translatedValues;
 	}
 
+	@Override
 	public boolean isPositionLeft() {
 		return this.isPositionLeft;
 	}
 
+	@Override
 	public void setPositionLeft(boolean enabled) {
 		this.isPositionLeft = enabled;
 	}
 
+	@Override
 	public Color getColor() {
 		return this.color;
 	}
@@ -1102,26 +1113,32 @@ public class Record extends AbstractRecord {
 		return String.format("%d, %d,%d", this.color.getRed(), this.color.getGreen(), this.color.getBlue());
 	}
 
+	@Override
 	public void setColor(Color newColor) {
 		this.color = newColor;
 	}
 
+	@Override
 	public boolean isRoundOut() {
 		return this.parent.isZoomMode ? false : this.isRoundOut;
 	}
 
+	@Override
 	public void setRoundOut(boolean enabled) {
 		this.isRoundOut = enabled;
 	}
 
+	@Override
 	public boolean isStartpointZero() {
 		return this.parent.isZoomMode ? false : this.isStartpointZero;
 	}
 
+	@Override
 	public void setStartpointZero(boolean enabled) {
 		this.isStartpointZero = enabled;
 	}
 
+	@Override
 	public boolean isStartEndDefined() {
 		return this.parent.isZoomMode ? true : this.isStartEndDefined;
 	}
@@ -1132,6 +1149,7 @@ public class Record extends AbstractRecord {
 	 * @param newMinScaleValue
 	 * @param newMaxScaleValue
 	 */
+	@Override
 	public void setStartEndDefined(boolean enabled, double newMinScaleValue, double newMaxScaleValue) {
 		this.isStartEndDefined = enabled;
 		if (enabled) {
@@ -1158,26 +1176,32 @@ public class Record extends AbstractRecord {
 			this.maxScaleValue = newMaxScaleValue;
 	}
 
+	@Override
 	public int getLineWidth() {
 		return this.lineWidth;
 	}
 
+	@Override
 	public void setLineWidth(int newLineWidth) {
 		this.lineWidth = newLineWidth;
 	}
 
+	@Override
 	public int getLineStyle() {
 		return this.lineStyle;
 	}
 
+	@Override
 	public void setLineStyle(int newLineStyle) {
 		this.lineStyle = newLineStyle;
 	}
 
+	@Override
 	public int getNumberFormat() {
 		return this.numberFormat;
 	}
 
+	@Override
 	public void setNumberFormat(int newNumberFormat) {
 		this.numberFormat = newNumberFormat;
 		switch (newNumberFormat) {
@@ -1232,6 +1256,7 @@ public class Record extends AbstractRecord {
 	 * Temporarily used as long as we have no common abstract class of Record and TrailRecord or no common interface of Record and TrailRecord.
 	 * @return the parent also for TrailRecord instances
 	 */
+	@Override
 	public AbstractRecordSet getAbstractParent() {
 		return this.parent;
 	}
@@ -1254,6 +1279,7 @@ public class Record extends AbstractRecord {
 	/**
 	 * @return the isDisplayable
 	 */
+	@Override
 	public boolean isDisplayable() {
 		return this.isDisplayable;
 	}
@@ -1289,6 +1315,7 @@ public class Record extends AbstractRecord {
 	/**
 	 * @return the maxScaleValue
 	 */
+	@Override
 	public double getMaxScaleValue() {
 		return this.parent.isZoomMode ? this.maxZoomScaleValue : this.maxScaleValue;
 	}
@@ -1296,6 +1323,7 @@ public class Record extends AbstractRecord {
 	/**
 	 * @return the minScaleValue
 	 */
+	@Override
 	public double getMinScaleValue() {
 		return this.parent.isZoomMode ? this.minZoomScaleValue : this.minScaleValue;
 	}
@@ -1533,6 +1561,7 @@ public class Record extends AbstractRecord {
 	 * @param finalValue is the value to be displayed (without applying a factor or GPS coordinates fraction correction)
 	 * @return the translated and decimal formatted value at the given index
 	 */
+	@Override
 	public String getFormattedScaleValue(double finalValue) {
 		if (this.device.isGPSCoordinates(this)) {
 			if (this.getUnit().endsWith("'")) //$NON-NLS-1$
@@ -1807,9 +1836,9 @@ public class Record extends AbstractRecord {
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		AbstractRecordSet abstractParent = this.getAbstractParent();
-		if (abstractParent.isOneOfSyncableRecord(this.name) && this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(this.name)).getFactor() != 1) {
-			this.syncMasterFactor = this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(this.name)).getFactor();
+		RecordSet parent = this.getParent();
+		if (parent.isOneOfSyncableRecord(this.name) && this.getFactor() / parent.get(parent.getSyncMasterRecordOrdinal(this.name)).getFactor() != 1) {
+			this.syncMasterFactor = this.getFactor() / parent.get(parent.getSyncMasterRecordOrdinal(this.name)).getFactor();
 			this.displayScaleFactorValue = this.displayScaleFactorValue * this.syncMasterFactor;
 		}
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", //$NON-NLS-1$
@@ -1892,6 +1921,7 @@ public class Record extends AbstractRecord {
 	/**
 	 * @return the isMeasurementMode
 	 */
+	@Override
 	public boolean isMeasurementMode() {
 		return this.isMeasurementMode;
 	}
@@ -1899,6 +1929,7 @@ public class Record extends AbstractRecord {
 	/**
 	 * @param enabled the isMeasurementMode to set
 	 */
+	@Override
 	public void setMeasurementMode(boolean enabled) {
 		this.isMeasurementMode = enabled;
 	}
@@ -1906,6 +1937,7 @@ public class Record extends AbstractRecord {
 	/**
 	 * @return the isDeltaMeasurementMode
 	 */
+	@Override
 	public boolean isDeltaMeasurementMode() {
 		return this.isDeltaMeasurementMode;
 	}
@@ -1913,6 +1945,7 @@ public class Record extends AbstractRecord {
 	/**
 	 * @param enabled the isDeltaMeasurementMode to set
 	 */
+	@Override
 	public void setDeltaMeasurementMode(boolean enabled) {
 		this.isDeltaMeasurementMode = enabled;
 	}
@@ -2112,6 +2145,7 @@ public class Record extends AbstractRecord {
 	/**
 	 * @return the numberScaleTicks
 	 */
+	@Override
 	public int getNumberScaleTicks() {
 		return this.numberScaleTicks;
 	}
@@ -2119,6 +2153,7 @@ public class Record extends AbstractRecord {
 	/**
 	 * @param newNumberScaleTicks the numberScaleTicks to set
 	 */
+	@Override
 	public void setNumberScaleTicks(int newNumberScaleTicks) {
 		this.numberScaleTicks = newNumberScaleTicks;
 	}
@@ -2433,6 +2468,7 @@ public class Record extends AbstractRecord {
 	/**
 	 * @return true if the record is the scale sync master
 	 */
+	@Override
 	public boolean isScaleVisible() {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.getAbstractParent().isOneOfSyncableRecord(this.name));
 		return isScaleSyncMaster() ? this.getAbstractParent().isOneSyncableVisible(this.ordinal) : !this.getAbstractParent().isOneOfSyncableRecord(this.name) && this.isVisible && this.isDisplayable;
@@ -2489,6 +2525,7 @@ public class Record extends AbstractRecord {
 	 * query the dataType of this record
 	 * @return
 	 */
+	@Override
 	public Record.DataType getDataType() {
 		return this.dataType == null ? DataType.DEFAULT : this.dataType;
 	}

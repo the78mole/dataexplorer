@@ -574,7 +574,7 @@ public class DataTableWindow extends CTabItem {
 	private synchronized boolean setEditedRecordPoint(final TableItem row, final int column) {
 		String recordName = DataTableWindow.this.dataTable.getColumn(column).getText();
 		recordName = recordName.substring(0, recordName.lastIndexOf(GDE.STRING_BLANK));
-		Record editRecord = DataTableWindow.this.application.getActiveRecordSet().getRecord(recordName);
+		Record editRecord = DataTableWindow.this.application.getActiveRecordSet().get(recordName);
 		if (editRecord != null && StringHelper.verifyTypedInput(DataTypes.DOUBLE, row.getText(column))) {
 			editRecord.set(DataTableWindow.this.dataTable.indexOf(DataTableWindow.this.cursor.getRow()), (int) (Double.valueOf(row.getText(column).replace(',', '.')) * 1000));
 			return true;

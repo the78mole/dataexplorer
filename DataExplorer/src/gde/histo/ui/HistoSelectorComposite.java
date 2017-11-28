@@ -223,7 +223,7 @@ public final class HistoSelectorComposite extends Composite {
 			Combo[] selectorCombos = new Combo[recordSet.size()];
 			this.editors = new TableEditor[recordSet.size()];
 			for (int i = 0; i < recordSet.getDisplayRecords().size(); i++) {
-				TrailRecord record = (TrailRecord) recordSet.getDisplayRecords().get(i);
+				TrailRecord record = recordSet.getDisplayRecords().get(i);
 				textSize = record.getName().length() * TEXT_EXTENT_FACTOR;
 				if (itemWidth < textSize + checkBoxWidth) itemWidth = textSize + checkBoxWidth;
 				textSize2 = (int) (record.getTrailSelector().getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10) * TEXT_EXTENT_FACTOR * 15 / 20.);
@@ -355,6 +355,6 @@ public final class HistoSelectorComposite extends Composite {
 	 */
 	private TrailRecord getTableItemRecord(TableItem item) {
 		TrailRecordSet trailRecordSet = HistoSelectorComposite.this.application.getHistoSet().getTrailRecordSet();
-		return (TrailRecord) trailRecordSet.getRecord((String) item.getData(DataExplorer.RECORD_NAME));
+		return trailRecordSet.get(item.getData(DataExplorer.RECORD_NAME));
 	}
 }

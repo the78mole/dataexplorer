@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.tab;
@@ -213,7 +213,7 @@ public class SelectorComposite extends Composite {
 					case SWT.Dispose:
 					case SWT.KeyDown:
 					case SWT.MouseMove: {
-						if (toolTip == null) 
+						if (toolTip == null)
 							break;
 						toolTip.dispose();
 						toolTip = null;
@@ -357,16 +357,16 @@ public class SelectorComposite extends Composite {
 			Record activeRecord;
 			switch (SelectorComposite.this.graphicsType) {
 			case COMPARE:
-				activeRecord = SelectorComposite.this.application.getCompareSet().getRecord(recordName);
+				activeRecord = SelectorComposite.this.application.getCompareSet().get(recordName);
 				break;
 
 			case UTIL:
-				activeRecord = SelectorComposite.this.application.getUtilitySet().getRecord(recordName);
+				activeRecord = SelectorComposite.this.application.getUtilitySet().get(recordName);
 				break;
 
 			default:
 				RecordSet activeRecordSet = SelectorComposite.this.channels.getActiveChannel().getActiveRecordSet();
-				activeRecord = activeRecordSet != null ? activeRecordSet.getRecord(recordName) : null;
+				activeRecord = activeRecordSet != null ? activeRecordSet.get(recordName) : null;
 				break;
 			}
 			if (activeRecord != null) {

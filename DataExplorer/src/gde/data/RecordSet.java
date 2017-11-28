@@ -19,10 +19,10 @@
 package gde.data;
 
 import java.text.DecimalFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -177,7 +177,7 @@ public final class RecordSet extends AbstractRecordSet {
 		for (int i = 0; i < newRecordNames.length; i++) {
 			if (!oldRecordNames[i].equals(newRecordNames[i])) {
 				// add the old record with new name
-				this.put(newRecordNames[i], this.getRecord(oldRecordNames[i]).clone(newRecordNames[i]));
+				this.put(newRecordNames[i], this.get(oldRecordNames[i]).clone(newRecordNames[i]));
 				// remove the old record
 				this.remove(oldRecordNames[i]);
 			}
@@ -326,6 +326,20 @@ public final class RecordSet extends AbstractRecordSet {
 	}
 
 	/**
+	 * @param recordOrdinal
+	 * @return the record based on ordinal
+	 */
+	@Override
+	public Record get(int recordOrdinal) {
+		return (Record) super.get(recordOrdinal);
+	}
+
+	@Override
+	public Record get(Object recordName) {
+		return (Record) super.get(recordName);
+	}
+
+	/**
 	 * remove the record as well as the key
 	 */
 	public void remove(String recordKey) {
@@ -340,8 +354,8 @@ public final class RecordSet extends AbstractRecordSet {
 	public boolean checkAllRecordsDisplayable() {
 		int displayableRecordEntries = 0;
 		for (String recordKey : this.recordNames) {
-			if (this.getRecord(recordKey).isDisplayable()) ++displayableRecordEntries;
-			log.log(Level.FINER, recordKey + " isDiplayable = " + this.getRecord(recordKey).isDisplayable()); //$NON-NLS-1$
+			if (this.get(recordKey).isDisplayable()) ++displayableRecordEntries;
+			log.log(Level.FINER, recordKey + " isDiplayable = " + this.get(recordKey).isDisplayable()); //$NON-NLS-1$
 		}
 
 		int targetDisplayable = this.configuredDisplayable == 0 ? this.size() : this.configuredDisplayable;
@@ -359,7 +373,7 @@ public final class RecordSet extends AbstractRecordSet {
 		final String $METHOD_NAME = "addPoints"; //$NON-NLS-1$
 		if (points.length == this.size()) {
 			for (int i = 0; i < points.length; i++) {
-				this.getRecord(this.recordNames[i]).add(points[i]);
+				this.get(this.recordNames[i]).add(points[i]);
 			}
 			if (log.isLoggable(Level.FINEST)) {
 				StringBuilder sb = new StringBuilder();
@@ -395,7 +409,7 @@ public final class RecordSet extends AbstractRecordSet {
 		if (points.length <= this.getNoneCalculationRecordNames().length) {
 			for (int i = 0; i < points.length; i++) {
 				try {
-					this.getRecord(this.noneCalculationRecords[i]).add(points[i]);
+					this.get(this.noneCalculationRecords[i]).add(points[i]);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, String.format("Record %s not found, matching recordName %s", this.noneCalculationRecords[i], get(i).name));
 				}
@@ -552,7 +566,7 @@ public final class RecordSet extends AbstractRecordSet {
 	public Record[] getRecordsSortedForDisplay() {
 		Vector<Record> displayRecords = new Vector<Record>();
 		//add the record with horizontal grid
-		for (Record record : this.values()) {
+		for (Record record : this.getValues()) {
 			if (record.size() > 0 && record.ordinal == this.horizontalGridRecordOrdinal) displayRecords.add(record);
 		}
 		//add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
@@ -586,6 +600,7 @@ public final class RecordSet extends AbstractRecordSet {
 	/**
 	 * @return visible and displayable records (p.e. to build the partial data table)
 	 */
+	@Override
 	public Vector<Record> getVisibleAndDisplayableRecords() {
 		return (Vector<Record>) this.visibleAndDisplayableRecords;
 	}
@@ -593,6 +608,7 @@ public final class RecordSet extends AbstractRecordSet {
 	/**
 	 * @return all records for display
 	 */
+	@Override
 	public Vector<Record> getDisplayRecords() {
 		return (Vector<Record>) this.allRecords;
 	}
@@ -760,9 +776,9 @@ public final class RecordSet extends AbstractRecordSet {
 
 		this.timeStep_ms.clear();
 		this.timeStep_ms.trimToSize();
-		for (Map.Entry<String, Record> entry : this.entrySet()) {
-			entry.getValue().clear();
-			entry.getValue().trimToSize();
+		for (Record record : this.getValues()) {
+			record.clear();
+			record.trimToSize();
 		}
 		//		clear();  because cleanup is intended to reduce the heap size this clear is not required
 	}
@@ -872,7 +888,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 * overwrites default HashMap method
 	 */
 	@Override
-	public Record put(String key, Record record) {
+	public Record put(String key, AbstractRecord record) {
 		super.put(key, record);
 		Record newRecord = this.get(key);
 		//for compare set record following properties has to be checked at the point where
@@ -1114,7 +1130,7 @@ public final class RecordSet extends AbstractRecordSet {
 			this.resetMeasurement();
 			if (this.recordNames.length != 0) { // check existence of records, a compare set may have no records
 				// iterate children and reset min/max values
-				for (Record record : this.values()) {
+				for (Record record : this.getValues()) {
 					record.zoomOffset = 0;
 					record.zoomTimeOffset = 0.0;
 					record.drawTimeWidth = record.getMaxTime_ms();
@@ -1126,7 +1142,7 @@ public final class RecordSet extends AbstractRecordSet {
 			}
 		} else {
 			if (!this.isZoomMode) {
-				for (Record record : this.values()) {
+				for (Record record : this.getValues()) {
 					record.minZoomScaleValue = record.minScaleValue;
 					record.maxZoomScaleValue = record.maxScaleValue;
 				}
@@ -1151,7 +1167,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	public void setDisplayZoomBounds(Rectangle newDisplayZoomBounds) {
 		// iterate children
-		for (Record record : this.values()) {
+		for (Record record : this.getValues()) {
 			record.setZoomBounds(newDisplayZoomBounds);
 		}
 	}
@@ -1221,7 +1237,7 @@ public final class RecordSet extends AbstractRecordSet {
 
 	public void shift(int xPercent, int yPercent) {
 		// iterate children and set min/max values
-		for (Record record : this.values()) {
+		for (Record record : this.getValues()) {
 			double xShift_ms = record.drawTimeWidth * xPercent / 100;
 			if (record.zoomTimeOffset + xShift_ms <= 0) {
 				record.zoomOffset = 0;
@@ -1449,7 +1465,7 @@ public final class RecordSet extends AbstractRecordSet {
 			if (tmpValue != null && tmpValue.length() > 0) {
 				for (String recordKey : this.recordNames) {
 					if (recordKey.equals(tmpValue)) {
-						this.horizontalGridRecordOrdinal = this.getRecord(recordKey).ordinal;
+						this.horizontalGridRecordOrdinal = this.get(recordKey).getOrdinal();
 						break;
 					}
 				}
@@ -1633,6 +1649,7 @@ public final class RecordSet extends AbstractRecordSet {
 	/**
 	 * @return the Vector containing the slave records sync by the master name
 	 */
+	@Override
 	public Vector<Record> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
 		return (Vector<Record>) this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
 	}
@@ -1782,7 +1799,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	public boolean containsGPSdata() {
 		int sumGpsRelatedRecords = 0;
-		for (Record record : this.values()) {
+		for (Record record : this.getValues()) {
 			if (record.dataType == Record.DataType.GPS_LATITUDE || record.dataType == Record.DataType.GPS_LONGITUDE || record.dataType == Record.DataType.GPS_ALTITUDE) ++sumGpsRelatedRecords;
 		}
 		return sumGpsRelatedRecords == 3;
@@ -1793,7 +1810,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @return record ordinal or -1 if not found
 	 */
 	public int getRecordOrdinalOfType(Record.DataType dataType) {
-		for (Record record : this.values()) {
+		for (Record record : this.getValues()) {
 			if (record.dataType == dataType) {
 				if (record.hasReasonableData()) return record.ordinal;
 			}
@@ -1806,7 +1823,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @return record ordinal or -1 if not found
 	 */
 	public int getRecordOrdinalOfDataType(Record.DataType dataType) {
-		for (Record record : this.values()) {
+		for (Record record : this.getValues()) {
 			if (record.dataType == dataType) {
 				return record.ordinal;
 			}
@@ -1820,7 +1837,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @return record ordinal or -1 if not found
 	 */
 	public int findRecordOrdinalByUnit(String[] units) {
-		for (Record record : this.values()) {
+		for (Record record : this.getValues()) {
 			for (String unit : units) {
 				if (record.getUnit().toLowerCase().contains(unit.toLowerCase()) && record.hasReasonableData()) return record.getOrdinal();
 			}
@@ -1836,7 +1853,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @return record ordinal or -1 if not found
 	 */
 	public int findRecordOrdinalByUnit(String[] units, int minBoundaryValue, int maxBoundaryValue) {
-		for (Record record : this.values()) {
+		for (Record record : this.getValues()) {
 			if (record.getMinValue() / 1000 >= minBoundaryValue && record.getMaxValue() / 1000 <= maxBoundaryValue) for (String unit : units) {
 				if (record.getUnit().toLowerCase().contains(unit.toLowerCase()) && record.hasReasonableData()) return record.getOrdinal();
 			}
@@ -1844,4 +1861,8 @@ public final class RecordSet extends AbstractRecordSet {
 		return -1;
 	}
 
+	@SuppressWarnings("unchecked")
+	public Collection<Record> getValues() {
+		return (Collection<Record>) (Collection<?>) values();
+	}
 }

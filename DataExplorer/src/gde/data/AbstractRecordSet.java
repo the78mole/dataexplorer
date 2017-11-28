@@ -44,7 +44,7 @@ import gde.utils.StringHelper;
  * Support synchronizing the y axis scales.
  * @author Thomas Eickert (USER)
  */
-public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
+public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRecord> {
 	protected final static String								$CLASS_NAME											= AbstractRecordSet.class.getName();
 	protected final static long									serialVersionUID								= 26031957;
 	protected final static Logger								log															= Logger.getLogger($CLASS_NAME);
@@ -211,14 +211,6 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	}
 
 	/**
-	 * @param recordNameKey
-	 * @return a specific data vector selected by given key data name
-	 */
-	public Record getRecord(String recordNameKey) {
-		return this.get(recordNameKey);
-	}
-
-	/**
 	 * Update the collection of visible and displayable records in this record set for table view
 	 */
 	public abstract void updateVisibleAndDisplayableRecordsForTable();
@@ -274,14 +266,14 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 		int value = -1;
 		if (isLeft) {
 			for (String recordName : this.recordNames) {
-				Record tmpRecord = this.get(recordName);
+				AbstractRecord tmpRecord = this.get(recordName);
 				if (tmpRecord.isPositionLeft() && tmpRecord.isScaleVisible()) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
 		} else {
 			for (String recordName : this.recordNames) {
 				log.log(Level.FINER, "record name = " + recordName); //$NON-NLS-1$
-				Record tmpRecord = this.get(recordName);
+				AbstractRecord tmpRecord = this.get(recordName);
 				if (!tmpRecord.isPositionLeft() && tmpRecord.isScaleVisible()) ++value;
 				if (recordName.equals(recordKey)) break;
 			}
@@ -293,7 +285,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	 * @param recordOrdinal
 	 * @return the record based on ordinal
 	 */
-	public Record get(int recordOrdinal) {
+	public AbstractRecord get(int recordOrdinal) {
 		try {
 			return this.get(this.recordNames[recordOrdinal]);
 		} catch (Exception e) {
@@ -351,11 +343,11 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	 * @param enabled the boolean value to set
 	 */
 	public void setMeasurementMode(String recordKey, boolean enabled) {
-		Record record = this.get(recordKey);
+		AbstractRecord record = this.get(recordKey);
 		if (record != null) {
 			record.setMeasurementMode(enabled);
 			if (enabled) {
-				Record oldRecord = this.get(this.recordKeyMeasurement);
+				AbstractRecord oldRecord = this.get(this.recordKeyMeasurement);
 				if (oldRecord != null && !oldRecord.equals(record)) {
 					oldRecord.setMeasurementMode(false);
 					oldRecord.setDeltaMeasurementMode(false);
@@ -371,11 +363,11 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	 * @param enabled the boolean value to set
 	 */
 	public void setDeltaMeasurementMode(String recordKey, boolean enabled) {
-		Record record = this.get(recordKey);
+		AbstractRecord record = this.get(recordKey);
 		if (record != null) {
 			record.setDeltaMeasurementMode(enabled);
 			if (enabled) {
-				Record oldRecord = this.get(this.recordKeyMeasurement);
+				AbstractRecord oldRecord = this.get(this.recordKeyMeasurement);
 				if (oldRecord != null && !oldRecord.equals(record)) {
 					oldRecord.setMeasurementMode(false);
 					oldRecord.setDeltaMeasurementMode(false);
@@ -390,7 +382,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	 * Clear measurement modes if any.
 	 */
 	public void clearMeasurementModes() {
-		Record record = this.get(this.recordKeyMeasurement);
+		AbstractRecord record = this.get(this.recordKeyMeasurement);
 		if (record != null) {
 			record.setMeasurementMode(false);
 			record.setDeltaMeasurementMode(false);
@@ -600,7 +592,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, Record> {
 	/**
 	 * Synchronize scale properties of master and slave scale synchronized records.
 	 */
-	public void syncMasterSlaveRecords(Record syncInputRecord, int type) {
+	public void syncMasterSlaveRecords(AbstractRecord syncInputRecord, int type) {
 		for (Integer syncRecordOrdinal : this.scaleSyncedRecords.keySet()) {
 			if (this.isRecordContained(syncRecordOrdinal, syncInputRecord.getName())) {
 				switch (type) {

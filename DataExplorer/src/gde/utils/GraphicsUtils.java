@@ -27,8 +27,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 
+import gde.data.AbstractRecord;
 import gde.data.AbstractRecordSet;
-import gde.data.Record;
 import gde.data.RecordSet;
 import gde.log.Level;
 import gde.ui.DataExplorer;
@@ -60,7 +60,7 @@ public class GraphicsUtils {
 	 * @param numberTickmarks
 	 * @param isDrawNumbersInRecordColor
 	 */
-	public static void drawVerticalTickMarks(Record record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, int numberTickmarks, boolean isDrawNumbersInRecordColor) {
+	public static void drawVerticalTickMarks(AbstractRecord record, GC gc, int x0, int y0, int height, double minValue, double maxValue, int ticklength, int miniticks, int gap, boolean isPositionLeft, int numberTickmarks, boolean isDrawNumbersInRecordColor) {
 
 		gc.setForeground(DataExplorer.COLOR_BLACK);
 

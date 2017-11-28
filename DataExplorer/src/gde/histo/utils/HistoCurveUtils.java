@@ -231,7 +231,7 @@ public final class HistoCurveUtils {
 		int displayableSize = record.realSize();
 		log.fine(() -> "displayableSize = " + displayableSize); //$NON-NLS-1$
 
-		record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
+		// record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
 		record.setDisplayScaleFactorValue(height);
 
 		StringBuffer sb = new StringBuffer(); // logging purpose
@@ -275,8 +275,8 @@ public final class HistoCurveUtils {
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
 
-		int xScaleFactor = 1; // x-axis scaling not supported
-		record.setDisplayScaleFactorTime(xScaleFactor);
+		// int xScaleFactor = 1; // x-axis scaling not supported
+		// record.setDisplayScaleFactorTime(xScaleFactor);
 		record.setDisplayScaleFactorValue(height);
 
 		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
@@ -399,7 +399,7 @@ public final class HistoCurveUtils {
 		// sync scales are used for suites (e.g. boxplot) AND synced records
 		trailRecordSet.updateAllSyncScales(); // should be better done in case of trail selection
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
-			TrailRecord actualRecord = (TrailRecord) trailRecordSet.getRecordsSortedForDisplay()[i];
+			TrailRecord actualRecord = trailRecordSet.getRecordsSortedForDisplay()[i];
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			if (isActualRecordEnabled) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
 					actualRecord.getName(), actualRecord.isVisible(), actualRecord.isDisplayable(), actualRecord.isScaleSynced(), actualRecord.isScaleVisible()));

@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.tab;
@@ -149,9 +149,9 @@ public class CellVoltageWindow extends CTabItem {
 		this.channels = Channels.getInstance();
 		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0232));
-	
+
 		this.lithiumValuesDialog = new CellVoltageValuesDialog(this.application, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
-		
+
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
 		this.surroundingBackground = Settings.getInstance().getCellVoltageSurroundingAreaBackground();
@@ -164,12 +164,14 @@ public class CellVoltageWindow extends CTabItem {
 			this.setControl(this.cellVoltageMainComposite);
 			this.cellVoltageMainComposite.setMenu(this.popupmenu);
 			this.cellVoltageMainComposite.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "cellVoltageMainComposite.helpRequested " + evt); //$NON-NLS-1$
-					DataExplorer.getInstance().openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_9.html"); //$NON-NLS-1$ 
+					DataExplorer.getInstance().openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_9.html"); //$NON-NLS-1$
 				}
 			});
 			this.cellVoltageMainComposite.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(PaintEvent evt) {
 					log.log(Level.FINEST, "cellVoltageMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 					CellVoltageWindow.this.contextMenu.createMenu(CellVoltageWindow.this.popupmenu, TabMenuType.SIMPLE);
@@ -185,12 +187,14 @@ public class CellVoltageWindow extends CTabItem {
 			this.voltageLimitsSelection.setLayout(thisLayout);
 			this.voltageLimitsSelection.setBounds(0, 0, 420, GDE.IS_WINDOWS ? 40 : 45);
 			this.voltageLimitsSelection.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "voltageLimitsSelection.helpRequested " + evt); //$NON-NLS-1$
-					DataExplorer.getInstance().openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_9.html"); //$NON-NLS-1$ 
+					DataExplorer.getInstance().openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_9.html"); //$NON-NLS-1$
 				}
 			});
 			this.voltageLimitsSelection.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(PaintEvent evt) {
 					final String $METHOD_NAME1 = "paintControl";
 					log.logp(Level.FINEST, CellVoltageWindow.$CLASS_NAME, $METHOD_NAME1, "voltageLimitsSelection.paintControl, event=" + evt); //$NON-NLS-1$
@@ -357,6 +361,7 @@ public class CellVoltageWindow extends CTabItem {
 			this.digitalComposite.setLayout(digitalCompositeLayout);
 			//this.digitalComposite.setBounds(50, 50, 200, 50);
 			this.digitalComposite.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(final PaintEvent evt) {
 					log.log(Level.FINEST, "actualDigitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					updateVoltageAndCapacity();
@@ -366,28 +371,28 @@ public class CellVoltageWindow extends CTabItem {
 				this.voltageValue = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.voltageValue.setText("00.00"); //$NON-NLS-1$
 				this.voltageValue.setBackground(this.surroundingBackground);
-				this.voltageValue.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 15, SWT.NORMAL)); 
+				this.voltageValue.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 15, SWT.NORMAL));
 				this.voltageValue.setMenu(this.popupmenu);
 			}
 			{
 				this.voltageUnit = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.voltageUnit.setText("[V]"); //$NON-NLS-1$
 				this.voltageUnit.setBackground(this.surroundingBackground);
-				this.voltageUnit.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, SWT.NORMAL)); 
+				this.voltageUnit.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, SWT.NORMAL));
 				this.voltageUnit.setMenu(this.popupmenu);
 			}
 			{
 				this.capacitiyValue = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.capacitiyValue.setText("0000"); //$NON-NLS-1$
 				this.capacitiyValue.setBackground(this.surroundingBackground);
-				this.capacitiyValue.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 15, SWT.NORMAL)); 
+				this.capacitiyValue.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 15, SWT.NORMAL));
 				this.capacitiyValue.setMenu(this.popupmenu);
 			}
 			{
 				this.capacityUnit = new CLabel(this.digitalComposite, SWT.CENTER);
 				this.capacityUnit.setText("[mAh]"); //$NON-NLS-1$
 				this.capacityUnit.setBackground(this.surroundingBackground);
-				this.capacityUnit.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, SWT.NORMAL)); 
+				this.capacityUnit.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, SWT.NORMAL));
 				this.capacityUnit.setMenu(this.popupmenu);
 			}
 		}
@@ -427,7 +432,7 @@ public class CellVoltageWindow extends CTabItem {
 			// check if just created  or device switched or disabled
 			if (recordSet != null && recordSet.getDevice().isVoltagePerCellTabRequested() && !this.voltageVector.isEmpty()) {
 
-				
+
 
 				// if recordSet name signature changed new displays need to be created
 				boolean isCleanRequired = forceClean || this.oldRecordSet == null || !recordSet.getName().equals(this.oldRecordSet.getName()) || this.oldChannel == null
@@ -491,9 +496,9 @@ public class CellVoltageWindow extends CTabItem {
 			for (CellInfo cellInfo : this.voltageVector) {
 				tmpCellVoltageVector.add(cellInfo.getVoltage());
 			}
-		}		
+		}
 		this.voltageVector = new Vector<CellInfo>();
-		
+
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
@@ -582,7 +587,7 @@ public class CellVoltageWindow extends CTabItem {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateAndResize() {
 		boolean isSomeVoltagechanged = updateCellVoltageVector();
@@ -621,7 +626,7 @@ public class CellVoltageWindow extends CTabItem {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateVoltageAndCapacity() {
 		Channel activeChannel = CellVoltageWindow.this.channels.getActiveChannel();
@@ -630,14 +635,14 @@ public class CellVoltageWindow extends CTabItem {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
 				String[] recordKeys = activeRecordSet.getActiveRecordNames();
-				Record record_U = activeRecordSet.getRecord(recordKeys[this.firstMeasurement]); // voltage U
+				Record record_U = activeRecordSet.get(recordKeys[this.firstMeasurement]); // voltage U
 				if (record_U != null) {
 					this.voltageValue.setForeground(record_U.getColor());
 					this.voltageValue.setText(new DecimalFormat("0.00").format(device.translateValue(record_U, (record_U.getLast() / 1000.0)))); //$NON-NLS-1$
 					this.voltageUnit.setText("[" + record_U.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 					this.voltageValue.redraw();
 				}
-				Record record_C = activeRecordSet.getRecord(recordKeys[this.secondMeasurement]); // capacitiy C
+				Record record_C = activeRecordSet.get(recordKeys[this.secondMeasurement]); // capacitiy C
 				if (record_C != null) {
 					this.capacitiyValue.setForeground(record_C.getColor());
 					this.capacitiyValue.setText(new DecimalFormat("0").format(device.translateValue(record_C, (record_C.getLast() / 1000.0)))); //$NON-NLS-1$
@@ -655,13 +660,13 @@ public class CellVoltageWindow extends CTabItem {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void clearVoltageAndCapacity() {
 		this.voltageValue.setText(GDE.STRING_EMPTY);
 		this.voltageUnit.setText(GDE.STRING_EMPTY);
 		this.capacitiyValue.setText(GDE.STRING_EMPTY);
-		this.capacityUnit.setText(GDE.STRING_EMPTY); 
+		this.capacityUnit.setText(GDE.STRING_EMPTY);
 	}
 
 	/**
@@ -670,7 +675,7 @@ public class CellVoltageWindow extends CTabItem {
 	public void updateVoltageLimitsSelection() {
 		this.voltageLimitsSelection.redraw();
 	}
-	
+
 	/**
 	 * set the two measurement ordinal to be displayed underneath the cell voltage bars
 	 * @param firstMeasurementOrdinal
@@ -680,7 +685,7 @@ public class CellVoltageWindow extends CTabItem {
 		this.firstMeasurement = firstMeasurementOrdinal;
 		this.secondMeasurement = secondMeasurementOrdinal;
 	}
-	
+
 	/**
 	 * create visible tab window content as image
 	 * @return image with content
@@ -694,7 +699,7 @@ public class CellVoltageWindow extends CTabItem {
 
 		return tabContentImage;
 	}
-	
+
 	/**
 	 * @param newInnerAreaBackground the innerAreaBackground to set
 	 */

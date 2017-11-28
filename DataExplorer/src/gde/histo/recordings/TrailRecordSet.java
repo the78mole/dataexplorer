@@ -33,6 +33,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
+import gde.data.AbstractRecord;
 import gde.data.AbstractRecordSet;
 import gde.data.Record;
 import gde.data.TimeSteps;
@@ -199,8 +200,13 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	@Override
-	public Record put(String key, Record record) {
-		return super.put(key, record);
+	public TrailRecord get(Object recordName) {
+		return (TrailRecord) super.get(recordName);
+	}
+
+	@Override
+	public TrailRecord put(String recordName, AbstractRecord record) {
+		return (TrailRecord) super.put(recordName, record);
 	}
 
 	/**
@@ -230,7 +236,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		this.allRecords.removeAllElements();
 
 		// get by insertion order
-		for (Map.Entry<String, Record> entry : this.entrySet()) {
+		for (Map.Entry<String, AbstractRecord> entry : this.entrySet()) {
 			final TrailRecord record = (TrailRecord) entry.getValue();
 			if (record.isMeasurement() //
 					|| (record.isSettlement() && this.settings.isDisplaySettlements()) //
@@ -247,6 +253,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	/**
 	 * @return visible and displayable records (p.e. to build the partial data table)
 	 */
+	@Override
 	public Vector<TrailRecord> getVisibleAndDisplayableRecords() {
 		return (Vector<TrailRecord>) this.visibleAndDisplayableRecords;
 	}
@@ -254,6 +261,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	/**
 	 * @return all records for display
 	 */
+	@Override
 	public Vector<TrailRecord> getDisplayRecords() {
 		return (Vector<TrailRecord>) this.allRecords;
 	}
@@ -288,7 +296,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Sorted according display requirement, grid record first, syncMasterRecords second, all remaining.
 	 * @return all measurement records and settlement / score records based on display settings
 	 */
-	public Record[] getRecordsSortedForDisplay() {
+	public TrailRecord[] getRecordsSortedForDisplay() {
 		Vector<Record> displayRecords = new Vector<Record>();
 		// add the record with horizontal grid
 		for (Record record : this.getDisplayRecords()) {
@@ -461,6 +469,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	/**
 	 * @return the Vector containing the slave records sync by the master name
 	 */
+	@Override
 	public Vector<TrailRecord> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
 		return (Vector<TrailRecord>) this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
 	}

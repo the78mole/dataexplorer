@@ -24,10 +24,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-
 import gde.GDE;
+import gde.data.CommonRecord;
 import gde.data.Record;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
@@ -45,7 +43,7 @@ import gde.log.Logger;
  * Supports suites, i.e. records for multiple trails for combined curves.
  * @author Thomas Eickert
  */
-public final class TrailRecord extends Record {
+public final class TrailRecord extends CommonRecord {
 	private final static String		$CLASS_NAME					= TrailRecord.class.getName();
 	private final static long			serialVersionUID		= 110124007964748556L;
 	private final static Logger		log									= Logger.getLogger($CLASS_NAME);
@@ -139,30 +137,6 @@ public final class TrailRecord extends Record {
 		throw new UnsupportedOperationException("clone"); //$NON-NLS-1$
 	}
 
-	@Override
-	@Deprecated
-	public Record clone(String newName) {
-		throw new UnsupportedOperationException("clone"); //$NON-NLS-1$
-	}
-
-	@Override
-	@Deprecated
-	public Record clone(int dataIndex, boolean isFromBegin) {
-		throw new UnsupportedOperationException("clone"); //$NON-NLS-1$
-	}
-
-	@Override
-	@Deprecated
-	public Point getDisplayPoint(int measurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	@Deprecated
-	public Point getGPSDisplayPoint(int measurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
-		throw new UnsupportedOperationException();
-	}
-
 	@Deprecated
 	@Override
 	public synchronized boolean add(Integer point) {
@@ -228,9 +202,11 @@ public final class TrailRecord extends Record {
 	 * Standard get(int index).
 	 * @param index
 	 */
+	@Deprecated
 	@Override
 	public synchronized Integer get(int index) {
-		return super.get(index);
+		throw new UnsupportedOperationException();
+		// return super.get(index);
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
@@ -394,117 +370,10 @@ public final class TrailRecord extends Record {
 	 * query time step time in mills seconds at index
 	 * @return time step in msec
 	 */
+	@Deprecated
 	public double getTime_ms(int index) {
 		throw new UnsupportedOperationException();
-//		return this.parent.timeStep_ms.getTime_ms(index);
-	}
-
-	@Override
-	@Deprecated
-	public String getFormattedMeasureValue(int index) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * find the index closest to given time in msec
-	 * @param time_ms
-	 * @return index nearest to given time
-	 */
-	@Override
-	@Deprecated // replaced by gde.data.TrailRecordSet.getIndex(long)
-	public int findBestIndex(double time_ms) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * get the time in msec at given horizontal display position
-	 * @param xPos of the display point
-	 * @return time value in msec
-	 */
-	@Override
-	@Deprecated // replaced by gde.utils.HistoTimeLine.getTimestamp(int)
-	public double getHorizontalDisplayPointTime_ms(int xPos) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * get the formatted time with unit at given position
-	 * @param xPos of the display point
-	 * @return string of time value in simple date format HH:ss:mm:SSS
-	 */
-	@Override
-	@Deprecated // replaced by gde.utils.HistoTimeLine.getTimestamp(int)
-	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * calculate best fit index in data vector from given display point relative to the (zoomed) display width
-	 * @param xPos
-	 * @return position integer value
-	 */
-	@Override
-	@Deprecated // replaced by gde.data.TrailRecordSet.getIndex(gde.utils.HistoTimeLine.getTimestamp(int))
-	public int getHorizontalPointIndexFromDisplayPoint(int xPos) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * query data value (not translated in device units) from a display position point
-	 * @param xPos
-	 * @return displays yPos in pixel
-	 */
-	@Override
-	@Deprecated // replaced by gde.data.TrailRecord.getVerticalDisplayPos
-	public int getVerticalDisplayPointValue(int xPos) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * get the formatted scale value corresponding the vertical display point
-	 * @param yPos
-	 * @param drawAreaBounds
-	 * @return formated value
-	 */
-	@Override
-	@Deprecated // replaced by gde.data.TrailRecord.getVerticalDisplayPointAsFormattedScaleValue(int)
-	public String getVerticalDisplayPointAsFormattedScaleValue(int yPos, Rectangle drawAreaBounds) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * get the scale value corresponding the vertical display point
-	 * @param yPos
-	 * @param drawAreaBounds
-	 * @return formated value
-	 */
-	@Override
-	@Deprecated // replaced by gde.data.TrailRecord.getVerticalDisplayPos
-	public double getVerticalDisplayPointScaleValue(int yPos, Rectangle drawAreaBounds) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * get the value corresponding the display point
-	 * @param deltaPos
-	 * @param drawAreaBounds
-	 * @return formated value
-	 */
-	@Override
-	@Deprecated // replaced by gde.data.TrailRecord.getVerticalDisplayPos
-	public String getVerticalDisplayDeltaAsFormattedValue(int deltaPos, Rectangle drawAreaBounds) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * get the slope value of two given points, unit depends on device configuration
-	 * @param points describing the time difference (x) as well as the measurement difference (y)
-	 * @return formated string of value
-	 */
-	@Override
-	@Deprecated // replaced by getBoundedSlopeValue
-	public String getSlopeValue(Point points) {
-		throw new UnsupportedOperationException();
+// return this.parent.timeStep_ms.getTime_ms(index);
 	}
 
 	@Override
@@ -538,19 +407,22 @@ public final class TrailRecord extends Record {
 		return this.parentTrail;
 	}
 
-	@Override // reason is missing zoom mode
+	@Deprecated // not supported
+	@Override
 	public boolean isRoundOut() {
-		return this.isRoundOut;
+		// return this.isRoundOut;
+		return false;
+	}
+
+	@Deprecated // not supported
+	@Override
+	public void setRoundOut(boolean enabled) {
+ //		this.isRoundOut = enabled;
 	}
 
 	@Override
-	public void setRoundOut(boolean enabled) {
-		this.isRoundOut = enabled;
-	}
-
-	@Override // reason is missing zoom mode
 	public boolean isStartpointZero() {
-		return this.isStartpointZero;
+		 return this.isStartpointZero;
 	}
 
 	@Override
@@ -707,6 +579,14 @@ public final class TrailRecord extends Record {
 
 	public SuiteRecords getSuiteRecords() {
 		return this.suiteRecords;
+	}
+
+	@Deprecated
+	@Override
+	public String getFormattedScaleValue(double finalValue) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+		// return null;
 	}
 
 }

@@ -36,11 +36,11 @@ import org.eclipse.swt.widgets.TableItem;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.AbstractRecord;
 import gde.data.AbstractRecordSet;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
-import gde.histo.recordings.TrailRecord;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -79,7 +79,7 @@ public class CurveSelectorContextMenu {
 	boolean							isActiveEnValueDialog	= false;
 
 	TableItem						selectedItem;
-	Record							actualRecord					= null;
+	AbstractRecord			actualRecord					= null;
 	boolean							isRecordVisible				= false;
 	boolean							isSmoothAtCurrentDrop	= false;
 	boolean							isSmoothVoltageCurve	= false;
@@ -117,21 +117,21 @@ public class CurveSelectorContextMenu {
 								setAllEnabled(true);
 
 								if (CurveSelectorContextMenu.this.recordNameKey != null && CurveSelectorContextMenu.this.recordNameKey.length() > 1) {
-									CurveSelectorContextMenu.this.actualRecord = CurveSelectorContextMenu.this.recordSet.getRecord(CurveSelectorContextMenu.this.recordNameKey);
+									CurveSelectorContextMenu.this.actualRecord = CurveSelectorContextMenu.this.recordSet.get(CurveSelectorContextMenu.this.recordNameKey);
 									if (CurveSelectorContextMenu.this.actualRecord != null) {
 										CurveSelectorContextMenu.this.recordName.setText(">>>>  " + CurveSelectorContextMenu.this.recordNameKey + "  <<<<"); //$NON-NLS-1$ //$NON-NLS-2$
 										CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.GDE_MSGT0085));
 										CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.actualRecord.isVisible();
 										CurveSelectorContextMenu.this.lineVisible.setSelection(CurveSelectorContextMenu.this.isRecordVisible);
 
-										CurveSelectorContextMenu.this.isSmoothAtCurrentDrop = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothAtCurrentDrop();
+										CurveSelectorContextMenu.this.isSmoothAtCurrentDrop = CurveSelectorContextMenu.this.actualRecord.getAbstractParent().isSmoothAtCurrentDrop();
 										CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setSelection(CurveSelectorContextMenu.this.isSmoothAtCurrentDrop);
 										if (CurveSelectorContextMenu.this.isTypeHisto) {
 											CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setEnabled(false);
 											CurveSelectorContextMenu.this.timeGrid.setEnabled(false);
 											CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
 										}
-										CurveSelectorContextMenu.this.isSmoothVoltageCurve = CurveSelectorContextMenu.this.actualRecord.getParent().isSmoothVoltageCurve();
+										CurveSelectorContextMenu.this.isSmoothVoltageCurve = CurveSelectorContextMenu.this.actualRecord.getAbstractParent().isSmoothVoltageCurve();
 										CurveSelectorContextMenu.this.smoothVoltageCurveItem.setSelection(CurveSelectorContextMenu.this.isSmoothVoltageCurve);
 										// WBrueg the condition "Ultra" has no background in my opinion
 										if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet.getDevice().getName().startsWith("Ultra")) {
@@ -580,12 +580,12 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.this.axisEndManual.setSelection(true);
 						CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
 						CurveSelectorContextMenu.this.axisStarts0.setSelection(false);
-						Record record = CurveSelectorContextMenu.this.actualRecord;
+						AbstractRecord record = CurveSelectorContextMenu.this.actualRecord;
 						record.setStartpointZero(false);
 						CurveSelectorContextMenu.this.axisEndRound.setSelection(false);
 						record.setRoundOut(false);
 						//ET 26.09.2017 do not call getMin... because it is not supported for TrailRecords (parent!)
-						double[] oldMinMax = record instanceof TrailRecord ? new double[] { 0., 0. } : new double[] { record.getMinScaleValue(), record.getMaxScaleValue() };
+						double[] oldMinMax = new double[] { record.getMinScaleValue(), record.getMaxScaleValue() };
 						double[] newMinMax = CurveSelectorContextMenu.this.axisEndValuesDialog.open(oldMinMax);
 						record.setStartEndDefined(true, newMinMax[0], newMinMax[1]);
 						CurveSelectorContextMenu.this.actualRecord.getAbstractParent().syncMasterSlaveRecords(CurveSelectorContextMenu.this.actualRecord, Record.TYPE_AXIS_END_VALUES);
@@ -1152,9 +1152,9 @@ public class CurveSelectorContextMenu {
 								CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, "adapt compareSet maxRecordTime_sec = " + TimeLine.getFomatedTimeWithUnit(maxRecordTime_ms)); //$NON-NLS-1$
 
 								// new added record exceed size of existing, existing needs draw limit to be updated and to be padded
-								for (Entry<String, Record> tmpRecordEntry : compareSet.entrySet()) {
+								for (Entry<String, AbstractRecord> tmpRecordEntry : compareSet.entrySet()) {
 									if (!newRecordkey.equals(tmpRecordEntry.getKey())) {
-										Record tmpRecord = tmpRecordEntry.getValue();
+										Record tmpRecord = (Record) tmpRecordEntry.getValue();
 										if (tmpRecord.getCompareSetDrawLimit_ms() == Integer.MAX_VALUE // draw linit untouched
 												|| tmpRecord.getCompareSetDrawLimit_ms() < newRecordMaxTime_ms) {
 											double avgTimeStep_ms = tmpRecord.getAverageTimeStep_ms();
@@ -1184,7 +1184,7 @@ public class CurveSelectorContextMenu {
 							double oldMaxValue = compareSet.getMaxValue();
 							CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue)); //$NON-NLS-1$
 							for (int i = 0; i < compareSet.size(); i++) {
-								Record record = recordSet.get(i);
+								Record record = (Record) recordSet.get(i);
 								double newMinValue = record.getMinScaleValue();
 								double newMaxValue = record.getMaxScaleValue();
 								CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE,
@@ -1198,7 +1198,8 @@ public class CurveSelectorContextMenu {
 									compareSet.setMaxValue(newMaxValue); // store new max value into record set
 								}
 							}
-							for (Record record : compareSet.values()) {
+							for (AbstractRecord tmpRecord : compareSet.values()) {
+								Record record = (Record) tmpRecord;
 								record.setStartEndDefined(true, compareSet.getMinValue(), compareSet.getMaxValue());
 							}
 

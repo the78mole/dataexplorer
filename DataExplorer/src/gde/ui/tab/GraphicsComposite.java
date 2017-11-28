@@ -69,9 +69,9 @@ import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.utils.CurveUtils;
 import gde.utils.GraphicsUtils;
 import gde.utils.LocalizedDateTime;
+import gde.utils.LocalizedDateTime.DateTimePattern;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
-import gde.utils.LocalizedDateTime.DateTimePattern;
 
 /**
  * This class defines the main graphics window as a sash form of a curve selection table and a drawing canvas
@@ -1407,7 +1407,7 @@ public class GraphicsComposite extends Composite {
 							this.yLast = evt.y;
 						}
 						else if (this.isLeftMouseMeasure) {
-							Record record = recordSet.getRecord(measureRecordKey);
+							Record record = recordSet.get(measureRecordKey);
 							// clear old measure lines
 							eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
 							//no change don't needs to be calculated, but the calculation limits to bounds
@@ -1454,7 +1454,7 @@ public class GraphicsComposite extends Composite {
 							}
 						}
 						else if (this.isRightMouseMeasure) {
-							Record record = recordSet.getRecord(measureRecordKey);
+							Record record = recordSet.get(measureRecordKey);
 							// clear old delta measure lines
 							eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
 							//no change don't needs to be calculated, but the calculation limits to bounds

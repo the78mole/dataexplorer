@@ -101,8 +101,7 @@ public final class TrailRecordSynchronizer {
 	 * Update records to enable drawing of the curve.
 	 */
 	public void updateAllSyncScales() {
-		for (Record record : this.trailRecordSet.getRecordsSortedForDisplay()) {
-			TrailRecord actualRecord = (TrailRecord) record;
+		for (TrailRecord actualRecord : this.trailRecordSet.getRecordsSortedForDisplay()) {
 			log.finer(() -> actualRecord.getName() + "   isVisible=" + actualRecord.isVisible() + " isDisplayable=" + actualRecord.isDisplayable() //$NON-NLS-1$ //$NON-NLS-2$
 					+ " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
 
