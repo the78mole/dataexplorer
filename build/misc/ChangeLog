@@ -1,6 +1,7 @@
 Development history / change log, please read from bottom up
 
 Version 3.3.2 - xx yyy 2017
+* fix illegal formatting option in ParameterControl used for Graupner UDP charger
 * fix HoTTAdapter wrong data block number detection
 * add initial support for Junsi iCharger 106B
 History analysis
