@@ -597,9 +597,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	@Override
 	public abstract void setStartEndDefined(boolean enabled, double newMinScaleValue, double newMaxScaleValue);
 
-	public abstract void setMinScaleValue(double newMinScaleValue);
-
-	public abstract void setMaxScaleValue(double newMaxScaleValue);
+	public abstract void setMinMaxScaleValue(double newMinScaleValue, double newMaxScaleValue);
 
 	@Override
 	public int getLineWidth() {

@@ -19,6 +19,8 @@
 
 package gde.histo.recordings;
 
+import static java.util.logging.Level.FINE;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -215,18 +217,15 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	@Override
-	public void setMaxScaleValue(double newMaxScaleValue) {
-		this.maxScaleValue = newMaxScaleValue;
-	}
-
-	@Override
 	public double getMinScaleValue() {
 		return this.minScaleValue;
 	}
 
 	@Override
-	public void setMinScaleValue(double newMinScaleValue) {
-		this.minScaleValue = newMinScaleValue;
+	public void setMinMaxScaleValue(double minScaleValue, double maxScaleValue) {
+		this.minScaleValue = minScaleValue;
+		this.maxScaleValue = maxScaleValue;
+		if (log.isLoggable(FINE)) log.log(FINE, "scale  -> yMinValueDisplay = " + minScaleValue + "; yMaxValueDisplay = " + minScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -540,6 +539,14 @@ public abstract class TrailRecord extends CommonRecord {
 		this.vaultMinimums.add(vaultMinValue);
 	}
 
+	public Double getSyncSummaryMax() {
+		return this.syncSummaryMax;
+	}
+
+	public Double getSyncSummaryMin() {
+		return this.syncSummaryMin;
+	}
+
 	/**
 	 * Determine the extrema max/minValues from this record and recalculate the synced summary max/minValues.
 	 */
@@ -548,9 +555,7 @@ public abstract class TrailRecord extends CommonRecord {
 		if (minMax.length == 0) {
 			resetSyncSummaryMinMax();
 		} else {
-			double max = minMax[0] == minMax[1] ? minMax[1] * 1.1 : minMax[1];
-			double min = minMax[0] == minMax[1] ? minMax[0] * 0.9 : minMax[0];
-			setSyncSummaryMinMax(min, max);
+			setSyncSummaryMinMax(minMax[0], minMax[1]);
 		}
 	}
 

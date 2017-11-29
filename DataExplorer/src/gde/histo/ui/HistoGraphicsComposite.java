@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -52,8 +53,10 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.exclusions.ExclusionFormatter;
+import gde.histo.recordings.RecordingsCollector;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
@@ -68,6 +71,7 @@ import gde.ui.SWTResourceManager;
 import gde.ui.menu.TabAreaContextMenu;
 import gde.ui.menu.TabAreaContextMenu.TabMenuOnDemand;
 import gde.ui.menu.TabAreaContextMenu.TabMenuType;
+import gde.utils.MathUtils;
 import gde.utils.StringHelper;
 
 /**
@@ -78,7 +82,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	private final static String	$CLASS_NAME	= HistoGraphicsComposite.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	final HistoTimeLine	timeLine		= new HistoTimeLine();
+	final HistoTimeLine					timeLine		= new HistoTimeLine();
 
 	/** composite size - control resized */
 	Point												oldSize			= new Point(0, 0);
@@ -105,6 +109,8 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		this.contextMenu = new TabAreaContextMenu();
 
 		init();
+
+		enableGraphicsScale(true);
 	}
 
 	private void init() {
@@ -231,6 +237,18 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 				@Override
 				public void paintControl(PaintEvent evt) {
 					log.finer(() -> "recordSetComment.paintControl, event=" + evt); //$NON-NLS-1$
+				}
+			});
+		}
+		{
+			this.xScale = new Text(this, SWT.MULTI | SWT.LEFT | SWT.READ_ONLY);
+			this.xScale.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			this.xScale.setBackground(this.surroundingBackground);
+			this.xScale.setMenu(this.popupmenu);
+			this.xScale.addPaintListener(new PaintListener() {
+				@Override
+				public void paintControl(PaintEvent evt) {
+					log.finer(() -> "xScale.paintControl, event=" + evt); //$NON-NLS-1$
 				}
 			});
 		}
@@ -477,8 +495,9 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			if (isActualRecordEnabled) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
 					actualRecord.getName(), actualRecord.isVisible(), actualRecord.isDisplayable(), actualRecord.isScaleSynced(), actualRecord.isScaleVisible()));
+			int[] numberTickMarks = setRecordDisplayValues(actualRecord);
 			if (actualRecord.isScaleVisible())
-				HistoCurveUtils.drawHistoScale(actualRecord, canvasImageGC, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
+				HistoCurveUtils.drawHistoScale(actualRecord, canvasImageGC, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, numberTickMarks);
 
 			if (isCurveGridEnabled && actualRecord.getOrdinal() == trailRecordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
 				HistoCurveUtils.drawCurveGrid(trailRecordSet, canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
@@ -516,6 +535,71 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		if (log.isLoggable(FINE)) log.log(FINE, "nCurveLeft=" + numberCurvesLeft + ", nCurveRight=" + numberCurvesRight); //$NON-NLS-1$ //$NON-NLS-2$
 		int[] numberLeftRightScales = new int[] { numberCurvesLeft, numberCurvesRight };
 		return numberLeftRightScales;
+	}
+
+	/**
+	 * @param record
+	 * @return the number of ticks {numberTicks, numberMiniTicks}
+	 */
+	private int[] setRecordDisplayValues(TrailRecord record) {
+		int[] numberTickMarks = new int[] { 10, 5 };
+
+		// (yMaxValue - yMinValue) defines the area to be used for the curve
+		double yMaxValue = record.getSyncMaxValue() / 1000.0;
+		double yMinValue = record.getSyncMinValue() / 1000.0;
+		if (log.isLoggable(FINE)) log.log(FINE, "unmodified yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// yMinValueDisplay and yMaxValueDisplay used for scales and adapted values device and measure unit dependent
+		double yMinValueDisplay = yMinValue, yMaxValueDisplay = yMaxValue;
+
+		if (record.isStartEndDefined()) {
+			yMinValueDisplay = record.getMinScaleValue();
+			yMaxValueDisplay = record.getMaxScaleValue();
+			yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
+			yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
+			if (log.isLoggable(FINE)) log.log(FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+			if (log.isLoggable(FINE)) log.log(FINE, "defined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
+		} else {
+			if (!record.getTrailSelector().isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
+				; // in case of an empty record leave the values unchanged
+			else {
+				yMinValueDisplay = RecordingsCollector.decodeVaultValue(record, yMinValue);
+				yMaxValueDisplay = RecordingsCollector.decodeVaultValue(record, yMaxValue);
+			}
+			if (log.isLoggable(FINE)) log.log(FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
+
+			if (Math.abs(yMaxValue - yMinValue) < .0001) { // equal value disturbs the scaling algorithm
+				double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
+				yMaxValueDisplay = MathUtils.roundUp(yMaxValueDisplay, deltaValueDisplay); // max
+				yMinValueDisplay = MathUtils.roundDown(yMinValueDisplay, deltaValueDisplay); // min
+				Object[] roundResult = MathUtils.adaptRounding(yMinValueDisplay, yMaxValueDisplay, false, curveAreaBounds.height / 25 >= 3
+						? curveAreaBounds.height / 25 : 2);
+				yMinValueDisplay = (Double) roundResult[0];
+				yMaxValueDisplay = (Double) roundResult[1];
+				numberTickMarks[0] = (Integer) roundResult[2];
+				numberTickMarks[1] = (Integer) roundResult[3];
+				yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
+				yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
+				if (log.isLoggable(FINE)) log.log(FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
+				if (log.isLoggable(FINE)) log.log(FINE, "rounded -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (record.isStartpointZero()) {
+				// check if the main part of the curve is on positive side
+				if (record.getAvgValue() > 0) { // main part of curve is on positive side
+					yMinValueDisplay = 0;
+					yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
+				} else {// main part of curve is on negative side
+					yMaxValueDisplay = 0;
+					yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
+				}
+				if (log.isLoggable(FINE)) log.log(FINE, "scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(FINE))
+					log.log(FINE, "scale starts at 0 -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+		record.setMinMaxScaleValue(yMinValueDisplay, yMaxValueDisplay);
+		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
+		return numberTickMarks;
 	}
 
 }

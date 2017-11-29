@@ -240,6 +240,10 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 		this.graphicsComposite.enableGraphicsHeader(enabled);
 	}
 
+	public void enableGraphicsScale(boolean enabled) {
+		this.graphicsComposite.enableGraphicsScale(enabled);;
+	}
+
 	/**
 	 * @param curveAreaBackground the curveAreaBackground to set
 	 */

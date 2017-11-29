@@ -65,7 +65,8 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 	@Override
 	protected void setFixedGraphicCanvas() {
 		Rectangle realBounds = this.curveSelectorComposite.getRealBounds();
-		this.graphicsComposite.setFixedGraphicCanvas(realBounds.y, realBounds.height);
+		int heightWithScale = realBounds.height + this.graphicsComposite.getXScaleHeight() + AbstractHistoChartComposite.DEFAULT_TOP_GAP;
+		this.graphicsComposite.setFixedGraphicCanvas(realBounds.y - AbstractHistoChartComposite.DEFAULT_TOP_GAP, heightWithScale);
 	}
 
 }

@@ -19,35 +19,32 @@
 ****************************************************************************************/
 package gde.histo.utils;
 
-import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINEST;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Vector;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.IDevice;
 import gde.device.resource.DeviceXmlResource;
-import gde.histo.cache.VaultCollector;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.PointArray;
-import gde.histo.recordings.RecordingsCollector;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.utils.HistoTimeLine.Density;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.GraphicsUtils;
-import gde.utils.MathUtils;
 
 /**
  * Draw curves.
@@ -81,6 +78,103 @@ public final class HistoCurveUtils {
 	}
 
 	/**
+	 * Draw the summary scale elements using given rectangle for display.
+	 * @param record
+	 * @param gc
+	 * @param x0
+	 * @param y0
+	 * @param width
+	 * @param height
+	 * @param scaleWidthSpace
+	 * @param isDrawScaleInRecordColor
+	 * @param isDrawNameInRecordColor
+	 * @param isDrawNumbersInRecordColor
+	 */
+	public static void drawChannelItemScale(TrailRecord record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace,
+			boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
+		log.finer(() -> record.getName() + "  x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
+
+		Double tmpMin = record.getSyncSummaryMin();
+		Double tmpMax = record.getSyncSummaryMax();
+		if (tmpMin == null || tmpMax == null) return; // missing min/max means no values at all
+
+		// texts
+		String minScaleText = record.getFormattedScaleValue(floorStepwise(tmpMin, tmpMax - tmpMin));
+		String maxScaleText = record.getFormattedScaleValue(ceilStepwise(tmpMax, tmpMax - tmpMin));
+		String graphText = DeviceXmlResource.getInstance().getReplacement(record.isScaleSyncMaster() ? record.getSyncMasterName() : record.getName());
+		if (record.getSymbol() != null && record.getSymbol().length() > 0) graphText = graphText + "   " + record.getSymbol();
+		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+
+		// prepare layout
+		gc.setLineWidth(2);
+		gc.setLineStyle(SWT.LINE_SOLID);
+		int gap = 1;
+		int xN = x0 + width;
+		int yPos = y0 + height / 2;
+
+		{
+			Color color = isDrawScaleInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK;
+			gc.setForeground(color);
+			gc.drawLine(x0, y0 + 1, x0, y0 + height);
+			gc.drawLine(xN, y0 + 1, xN, y0 + height);
+		}
+		{
+			Color color = isDrawNumbersInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK;
+			gc.setForeground(color);
+			GraphicsUtils.drawTextCentered(minScaleText, x0 - gap - scaleWidthSpace / 2, yPos, gc, SWT.HORIZONTAL);
+			GraphicsUtils.drawTextCentered(maxScaleText, xN + gap + scaleWidthSpace / 2, yPos, gc, SWT.HORIZONTAL);
+		}
+		{
+			Color color = isDrawNameInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK;
+			gc.setForeground(color);
+			GraphicsUtils.drawTextCentered(graphText, x0 + width / 2, yPos, gc, SWT.HORIZONTAL);
+		}
+	}
+
+	/**
+	 * Ceiling of a given value according delta value level.
+	 * Round a positive value results in a higher value.
+	 * Round a negative value results in a lower value.
+	 * @return ceiling double value
+	 */
+	private static double ceilStepwise(double baseValue, double delta) {
+		// truncate rounding differences caused by encode/decode
+		BigDecimal decValue = new BigDecimal(baseValue).setScale(13, RoundingMode.DOWN);
+		BigDecimal threshold;
+		{ // Examples for value xxx.x: if less than 200 then round to 5, if less than 500 than round to 10, if less than 1000 than round to 20
+			double logReference = delta != 0. ? Math.log10(Math.abs(delta)) : baseValue != 0. ? Math.log10(Math.abs(baseValue)) : 0;
+			int roundConstant = (logReference % 1 < .3) ? 5 : (logReference % 1) < .7 ? 10 : 20;
+			threshold = new BigDecimal(roundConstant * Math.pow(10., Math.floor(logReference) - 2)).setScale(13, RoundingMode.DOWN);
+		}
+		BigDecimal remainder = decValue.remainder(threshold);
+		BigDecimal toAdd = remainder.compareTo(new BigDecimal(0.)) > 0 ? threshold.subtract(remainder) : remainder.abs();
+		log.off(() -> String.format("value=%f delta=%f threshold=%f result=%f", baseValue, delta, threshold, decValue.add(toAdd).doubleValue()));
+		return decValue.add(toAdd).doubleValue();
+	}
+
+	/**
+	 * Floor of a given value according delta value level.
+	 * Round a positive value results in a higher value.
+	 * Round a negative value results in a lower value.
+	 * @return floor double value
+	 */
+	private static double floorStepwise(double baseValue, double delta) {
+		// truncate rounding differences caused by encode/decode
+		BigDecimal decValue = new BigDecimal(baseValue).setScale(13, RoundingMode.DOWN);
+		BigDecimal threshold;
+		{ // Examples for value xxx.x: if less than 200 then round to 5, if less than 500 than round to 10, if less than 1000 than round to 20
+			double logReference = delta != 0. ? Math.log10(Math.abs(delta)) : baseValue != 0. ? Math.log10(Math.abs(baseValue)) : 0;
+			int roundConstant = (logReference % 1 < .3) ? 5 : (logReference % 1) < .7 ? 10 : 20;
+			threshold = new BigDecimal(roundConstant * Math.pow(10., Math.floor(logReference) - 2)).setScale(13, RoundingMode.DOWN);
+		}
+		BigDecimal remainder = decValue.remainder(threshold);
+		BigDecimal toSubtract = remainder.compareTo(new BigDecimal(0.)) < 0 ? threshold.add(remainder) : remainder;
+		log.off(() -> String.format("value=%f delta=%f threshold=%f result=%f", baseValue, delta, threshold, decValue.subtract(toSubtract).doubleValue()));
+		return decValue.subtract(toSubtract).doubleValue();
+	}
+
+	/**
 	 * Draw the data graph scale using gives rectangle for display.
 	 * All data point are multiplied with factor 1000 to avoid rounding errors for values below 1.0 (0.5 -> 0).
 	 * @param record
@@ -93,72 +187,13 @@ public final class HistoCurveUtils {
 	 * @param isDrawScaleInRecordColor
 	 * @param isDrawNameInRecordColor
 	 * @param isDrawNumbersInRecordColor
+	 * @param numberTickMarks the number of ticks {numberTicks, numberMiniTicks}
 	 */
 	public static void drawHistoScale(TrailRecord record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace,
-			boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
-		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
-		int numberTicks = 10, miniticks = 5;
-
+			boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor, int[] numberTickMarks) {
 		log.finer(() -> record.getName() + "  x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
 
-		// Draw the curve
-		// (yMaxValue - yMinValue) defines the area to be used for the curve
-		double yMaxValue = record.getSyncMaxValue() / 1000.0;
-		double yMinValue = record.getSyncMinValue() / 1000.0;
-		if (log.isLoggable(FINE)) log.log(FINE, "unmodified yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
-
-		// yMinValueDisplay and yMaxValueDisplay used for scales and adapted values device and measure unit dependent
-		double yMinValueDisplay = yMinValue, yMaxValueDisplay = yMaxValue;
-
-		if (record.isStartEndDefined()) {
-			yMinValueDisplay = record.getMinScaleValue();
-			yMaxValueDisplay = record.getMaxScaleValue();
-			yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
-			yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
-			if (log.isLoggable(FINE)) log.log(FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
-			if (log.isLoggable(FINE)) log.log(FINE, "defined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-		} else {
-			if (device != null) { // adapt to device specific range
-				if (!record.getTrailSelector().isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
-					; // in case of an empty record leave the values unchanged
-				else {
-					yMinValueDisplay = RecordingsCollector.decodeVaultValue(record, yMinValue);
-					yMaxValueDisplay = RecordingsCollector.decodeVaultValue(record, yMaxValue);
-				}
-				if (log.isLoggable(FINE)) log.log(FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			if (device != null && (Math.abs(yMaxValue - yMinValue) < .0001)) { // equal value disturbs the scaling algorithm
-				double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
-				yMaxValueDisplay = MathUtils.roundUp(yMaxValueDisplay, deltaValueDisplay); // max
-				yMinValueDisplay = MathUtils.roundDown(yMinValueDisplay, deltaValueDisplay); // min
-				Object[] roundResult = MathUtils.adaptRounding(yMinValueDisplay, yMaxValueDisplay, false, height / 25 >= 3 ? height / 25 : 2);
-				yMinValueDisplay = (Double) roundResult[0];
-				yMaxValueDisplay = (Double) roundResult[1];
-				numberTicks = (Integer) roundResult[2];
-				miniticks = (Integer) roundResult[3];
-				yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
-				yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
-				if (log.isLoggable(FINE)) log.log(FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
-				if (log.isLoggable(FINE)) log.log(FINE, "rounded -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			if (record.isStartpointZero()) {
-				// check if the main part of the curve is on positive side
-				if (record.getAvgValue() > 0) { // main part of curve is on positive side
-					yMinValueDisplay = 0;
-					yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
-				} else {// main part of curve is on negative side
-					yMaxValueDisplay = 0;
-					yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
-				}
-				if (log.isLoggable(FINE)) log.log(FINE, "scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
-				if (log.isLoggable(FINE))
-					log.log(FINE, "scale starts at 0 -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-		}
-		record.setMinScaleValue(yMinValueDisplay);
-		record.setMaxScaleValue(yMaxValueDisplay);
-		if (log.isLoggable(FINE)) log.log(FINE, "scale  -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 		String graphText = DeviceXmlResource.getInstance().getReplacement(record.isScaleSyncMaster() ? record.getSyncMasterName() : record.getName());
 		if (record.getSymbol() != null && record.getSymbol().length() > 0) graphText = graphText + "   " + record.getSymbol();
 		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -184,7 +219,7 @@ public final class HistoCurveUtils {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); // xPos = x0
 			log.fine(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); // yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks, isDrawNumbersInRecordColor);
+			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, record.getMinScaleValue(), record.getMaxScaleValue(), ticklength, numberTickMarks[1], gap, isPositionLeft, numberTickMarks[0], isDrawNumbersInRecordColor);
 			log.finest(() -> "drawText x = " + (xPos - pt.y - 15)); // xPosition Text Spannung [] //$NON-NLS-1$
 			if (isDrawNameInRecordColor)
 				gc.setForeground(record.getColor());
@@ -195,16 +230,13 @@ public final class HistoCurveUtils {
 			int xPos = x0 + 1 + width + positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); // yMax
 			log.finest(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); // yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks, isDrawNumbersInRecordColor);
+			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, record.getMinScaleValue(), record.getMaxScaleValue(), ticklength, numberTickMarks[1], gap, isPositionLeft, numberTickMarks[0], isDrawNumbersInRecordColor);
 			if (isDrawNameInRecordColor)
 				gc.setForeground(record.getColor());
 			else
 				gc.setForeground(DataExplorer.COLOR_BLACK);
 			GraphicsUtils.drawTextCentered(graphText, (xPos + scaleWidthSpace - pt.y - 5), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
-
-		// set the values corresponding to the display area of this curve
-		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
 	}
 
 	/**
