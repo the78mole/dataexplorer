@@ -271,15 +271,13 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	public static final String									SMOOTH_VOLTAGE_CURVE						= "RecordSet_smoothVoltageCurve";						//$NON-NLS-1$
 
 	/**
-	 * records visible and displayable.
 	 * display in data table.
 	 */
 	protected Vector<? extends AbstractRecord>	visibleAndDisplayableRecords;
 	/**
-	 * all records.
 	 * display in curve selector.
 	 */
-	protected Vector<? extends AbstractRecord>	allRecords;
+	protected Vector<? extends AbstractRecord>	displayRecords;
 
 	// measurement
 	protected String														recordKeyMeasurement						= GDE.STRING_EMPTY;
@@ -428,7 +426,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
 	public Vector<? extends AbstractRecord> getVisibleAndDisplayableRecordsForTable() {
-		return this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords;
+		return this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.displayRecords;
 	}
 
 	/**
@@ -442,7 +440,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * @return all records for display
 	 */
 	public Vector<? extends AbstractRecord> getDisplayRecords() {
-		return this.allRecords;
+		return this.displayRecords;
 	}
 
 	public String getName() {

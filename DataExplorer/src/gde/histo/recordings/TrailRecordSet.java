@@ -24,6 +24,7 @@ import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.OFF;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -99,7 +100,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		if (this.template != null) this.template.load();
 
 		this.visibleAndDisplayableRecords = new Vector<TrailRecord>();
-		this.allRecords = new Vector<TrailRecord>();
+		this.displayRecords = new Vector<TrailRecord>();
 		log.fine(() -> " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
 	}
 
@@ -269,10 +270,17 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Update referenced records to enable drawing of the summary graphics.
 	 * Set the sync vaults max/min values.
 	 * Update the scale values from sync record.</br>
-	 * Takes all records.
+	 * Take all records but build sync information only for display records.
 	 * Needs not to check suite records because the summary max/min values comprise all suite members.
 	 */
 	public void updateSyncSummary() {
+		{ // reset hidden records
+			List<TrailRecord> hiddenRecords = new ArrayList<>(this.getValues());
+			hiddenRecords.removeAll(getDisplayRecords());
+			for (TrailRecord actualRecord : hiddenRecords) {
+				actualRecord.resetSyncSummaryMinMax();
+			}
+		}
 		for (TrailRecord actualRecord : getDisplayRecords()) {
 			actualRecord.setSyncSummaryMinMax();
 			log.finer(() -> actualRecord.getName() + "   syncMin = " + actualRecord.syncSummaryMin + "; syncMax = " + actualRecord.syncSummaryMax); //$NON-NLS-1$ //$NON-NLS-2$
@@ -315,17 +323,18 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	@Override
 	public void updateVisibleAndDisplayableRecordsForTable() {
 		this.visibleAndDisplayableRecords.removeAllElements();
-		this.allRecords.removeAllElements();
+		this.displayRecords.removeAllElements();
 
 		// get by insertion order
 		for (Map.Entry<String, AbstractRecord> entry : this.entrySet()) {
 			final TrailRecord record = (TrailRecord) entry.getValue();
 			if (record.isAllowedBySetting()) {
-				record.setDisplayable(record.isActive() && record.hasReasonableData());
-
-				if (record.isVisible() && record.isDisplayable()) // only selected records get displayed
-					getVisibleAndDisplayableRecords().add(record);
-				getDisplayRecords().add(record);
+				if (record.isActive() && record.hasReasonableData()) {
+					record.setDisplayable(true);
+					getDisplayRecords().add(record);
+					if (record.isVisible()) // only selected records get displayed
+						getVisibleAndDisplayableRecords().add(record);
+				}
 			}
 		}
 	}
@@ -336,7 +345,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<TrailRecord> getVisibleAndDisplayableRecordsForTable() {
-		return (Vector<TrailRecord>) (this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords);
+		return (Vector<TrailRecord>) (this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.displayRecords);
 	}
 
 	/**
@@ -354,7 +363,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<TrailRecord> getDisplayRecords() {
-		return (Vector<TrailRecord>) this.allRecords;
+		return (Vector<TrailRecord>) this.displayRecords;
 	}
 
 	/**
@@ -563,6 +572,11 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	public TreeMap<Long, List<ExtendedVault>> getHistoVaults() {
 		return this.histoVaults;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Collection<TrailRecord> getValues() {
+		return (Collection<TrailRecord>) (Collection<?>) values();
 	}
 
 }

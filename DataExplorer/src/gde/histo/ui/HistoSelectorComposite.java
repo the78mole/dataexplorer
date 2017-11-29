@@ -229,7 +229,7 @@ public final class HistoSelectorComposite extends Composite {
 				textSize2 = (int) (record.getTrailSelector().getApplicableTrailsTexts().stream().mapToInt(w -> w.length()).max().orElse(10) * TEXT_EXTENT_FACTOR * 15 / 20.);
 				if (itemWidth2 < textSize2 + checkBoxWidth) itemWidth2 = textSize2 + checkBoxWidth;
 				// log.fine(() -> item.getText() + " " + itemWidth);
-				if (record.isDisplayable()) {
+				{
 					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 					item.setForeground(record.getColor());
 					item.setData(DataExplorer.RECORD_NAME, record.getName());

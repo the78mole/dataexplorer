@@ -126,7 +126,7 @@ public final class RecordSet extends AbstractRecordSet {
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
 		this.visibleAndDisplayableRecords = new Vector<Record>();
-		this.allRecords = new Vector<Record>();
+		this.displayRecords = new Vector<Record>();
 		this.scaleSyncedRecords = new SyncedRecords<Record>(2);
 	}
 
@@ -146,7 +146,7 @@ public final class RecordSet extends AbstractRecordSet {
 		this.isCompareSet = GraphicsType.COMPARE == graphicsType;
 		this.isUtilitySet = GraphicsType.UTIL == graphicsType;
 		this.visibleAndDisplayableRecords = new Vector<Record>();
-		this.allRecords = new Vector<Record>();
+		this.displayRecords = new Vector<Record>();
 		this.scaleSyncedRecords = new SyncedRecords<Record>(2);
 	}
 
@@ -239,7 +239,7 @@ public final class RecordSet extends AbstractRecordSet {
 		this.configuredDisplayable = recordSet.configuredDisplayable;
 
 		this.visibleAndDisplayableRecords = new Vector<Record>();
-		this.allRecords = new Vector<Record>();
+		this.displayRecords = new Vector<Record>();
 		this.scaleSyncedRecords = new SyncedRecords<Record>(this.recordNames.length);
 		this.syncScaleOfSyncableRecords();
 	}
@@ -312,7 +312,7 @@ public final class RecordSet extends AbstractRecordSet {
 		this.configuredDisplayable = recordSet.configuredDisplayable;
 
 		this.visibleAndDisplayableRecords = new Vector<Record>();
-		this.allRecords = new Vector<Record>();
+		this.displayRecords = new Vector<Record>();
 		this.scaleSyncedRecords = new SyncedRecords<Record>(this.recordNames.length);
 
 		this.device.updateVisibilityStatus(this, false);
@@ -594,7 +594,7 @@ public final class RecordSet extends AbstractRecordSet {
 	@Override
 	public void updateVisibleAndDisplayableRecordsForTable() {
 		this.visibleAndDisplayableRecords.removeAllElements();
-		this.allRecords.removeAllElements();
+		this.displayRecords.removeAllElements();
 		for (int i = 0; i < this.size(); ++i) {
 			final Record record = this.get(i);
 			if (record.isVisible && record.isDisplayable) getVisibleAndDisplayableRecords().add(record);
@@ -608,7 +608,7 @@ public final class RecordSet extends AbstractRecordSet {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<Record> getVisibleAndDisplayableRecordsForTable() {
-		return (Vector<Record>) (this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.allRecords);
+		return (Vector<Record>) (this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.displayRecords);
 	}
 
 	/**
@@ -626,7 +626,7 @@ public final class RecordSet extends AbstractRecordSet {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<Record> getDisplayRecords() {
-		return (Vector<Record>) this.allRecords;
+		return (Vector<Record>) this.displayRecords;
 	}
 
 	/**
