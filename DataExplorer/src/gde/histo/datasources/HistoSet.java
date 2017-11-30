@@ -29,16 +29,19 @@ import java.util.TreeMap;
 
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.exclusions.ExclusionData;
+import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
+import gde.ui.DataExplorer;
 
 /**
  * Facade of the history module.
@@ -46,35 +49,37 @@ import gde.messages.Messages;
  * @author Thomas Eickert
  */
 public final class HistoSet {
-	private final static String			$CLASS_NAME														= HistoSet.class.getName();
+	private final static String				$CLASS_NAME														= HistoSet.class.getName();
 	@SuppressWarnings("unused")
-	private final static Logger			log																		= Logger.getLogger($CLASS_NAME);
+	private final static Logger				log																		= Logger.getLogger($CLASS_NAME);
 
-	private final Settings					settings															= Settings.getInstance();
+	private static final DataExplorer	application														= DataExplorer.getInstance();
 
-	private final HistoSetCollector	histoSetCollector;
+	private final Settings						settings															= Settings.getInstance();
+
+	private final HistoSetCollector		histoSetCollector;
 
 	/**
 	 * We allow 1 lower and 1 upper outlier for a log with 740 measurements
 	 */
-	public static final double			OUTLIER_SIGMA_DEFAULT									= 3.;
+	public static final double				OUTLIER_SIGMA_DEFAULT									= 3.;
 	/**
 	 * Specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
 	 * Tolerance interval: <em>TI = &plusmn; z * &sigma; with z >= 0</em><br>
 	 * Outliers are identified only if they lie beyond this limit.
 	 */
-	public static final double			OUTLIER_RANGE_FACTOR_DEFAULT					= 2.;
+	public static final double				OUTLIER_RANGE_FACTOR_DEFAULT					= 2.;
 	/**
 	 * Outlier detection for the summary graphics.
 	 * We allow 1 outlier for 6 vaults.
 	 */
-	public static final double			SUMMARY_OUTLIER_SIGMA_DEFAULT					= 1.36;
+	public static final double				SUMMARY_OUTLIER_SIGMA_DEFAULT					= 1.36;
 	/**
 	 * Specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
 	 * Tolerance interval: <em>TI = &plusmn; z * &sigma; with z >= 0</em><br>
 	 * Outliers are identified only if they lie beyond this limit.
 	 */
-	public static final double			SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT	= 2.;
+	public static final double				SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT	= 3.;
 
 	/**
 	 * Defines the first step during rebuilding the histoset data.
@@ -116,6 +121,38 @@ public final class HistoSet {
 			this.scopeOfWork = scopeOfWork;
 		}
 	};
+
+	/**
+	 * Translate a normalized histo vault value into to values represented. </br>
+	 * Data types might require a special normalization (e.g. GPS coordinates).
+	 * This is the equivalent of {@code device.translateValue} for data dedicated to the histo vault.
+	 * @return double of device dependent value
+	 */
+	public static double decodeVaultValue(TrailRecord record, double value) {
+		// todo move into TrailRecord if devices do not require any special logic
+		final double newValue;
+		if (application.getActiveDevice().isGPSCoordinates(record)) {
+			newValue = value / 1000.;
+		} else {
+			switch (record.getDataType()) {
+			// lat and lon only required if isGPSCoordinates is not implemented
+			case GPS_LATITUDE:
+			case GPS_LONGITUDE:
+				newValue = value / 1000.;
+				break;
+
+			default:
+				double factor = record.getFactor(); // != 1 if a unit translation is required
+				double offset = record.getOffset(); // != 0 if a unit translation is required
+				double reduction = record.getReduction(); // != 0 if a unit translation is required
+
+				newValue = (value - reduction) * factor + offset;
+				break;
+			}
+		}
+		Logger.getLogger(IDevice.class.getName()).fine(() -> "for " + record.getName() + " in value = " + value + " out value = " + newValue);
+		return newValue;
+	}
 
 	public HistoSet() {
 		this.histoSetCollector = new HistoSetCollector();

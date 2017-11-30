@@ -84,7 +84,7 @@ public final class ScoregroupTrail extends TrailRecord {
 		if (vaultValues.isEmpty()) return new double[0];
 
 		// both lists hold identical values because there are no max/min values but only one value per vault
-		List<Double> decodedValues = vaultValues.stream().map(i -> RecordingsCollector.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+		List<Double> decodedValues = vaultValues.stream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
 
 		UniversalQuantile<Double> quantile = new UniversalQuantile<>(decodedValues, true, //
 				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);

@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.eclipse.swt.graphics.Point;
 
+import gde.histo.datasources.HistoSet;
 import gde.histo.utils.HistoTimeLine;
 import gde.log.Logger;
 
@@ -72,7 +73,7 @@ public final class HistoGraphicsMapper {
 		for (int j = 0; j < suiteSize; j++) {
 			Integer value = suiteRecords.getSuiteValue(j, index);
 			if (value != null) {
-				double decodedValue = RecordingsCollector.decodeVaultValue(trailRecord, value / 1000.0);
+				double decodedValue = HistoSet.decodeVaultValue(trailRecord, value / 1000.0);
 				pointArray.setY(j, yDisplayOffset - (int) ((decodedValue - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue()));
 			}
 		}
@@ -81,24 +82,43 @@ public final class HistoGraphicsMapper {
 	}
 
 	/**
+	 * Calculate the layout positions of the record points on the x axis.
+	 * The result has the record points order.
+	 * @param width x axis length in pixel
+	 * @param decodedMinScale is the value corresponding to the left border (xPos = 0)
+	 * @param decodedMaxScale is the value corresponding to the right border (xPos = width)
+	 * @return the markers' x axis pixel positions in an array with values corresponding to {@code width}
+	 */
+	public Integer[] determineMarkerXPos(int width, double decodedMinScale, double decodedMaxScale) {
+		if (width != this.trailRecord.getParentTrail().getDrawAreaBounds().width) {
+			throw new UnsupportedOperationException();
+		}
+		Integer[] xPos = new Integer[this.trailRecord.realSize()];
+		for (int i = 0; i < this.trailRecord.realSize(); i++) {
+			Integer value = this.trailRecord.elementAt(i);
+//			if (value != null) {
+//				double decodedValue = RecordingsCollector.decodeVaultValue(trailRecord, value / 1000.0);
+//				points[i] = new Point(xDisplayOffset + timeLine.getScalePositions().get((long) this.trailRecord.getParentTrail().getTime_ms(i)),
+//						yDisplayOffset - (int) ((decodedValue - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue()));
+//			}
+		}
+		log.finer(() -> Arrays.toString(xPos));
+		return xPos;
+	}
+
+	/**
 	 * Query the values for display.
 	 * @param timeLine
-	 * @param xDisplayOffset
-	 * @param yDisplayOffset
 	 * @return point time, value; null if the trail record value is null
 	 */
-	public Point[] getDisplayPoints(HistoTimeLine timeLine, int xDisplayOffsetOBS, int yDisplayOffsetOBS) {
-		if (xDisplayOffsetOBS != this.trailRecord.getParentTrail().getDrawAreaBounds().x //
-				|| yDisplayOffsetOBS != (this.trailRecord.getParentTrail().getDrawAreaBounds().height + this.trailRecord.getParentTrail().getDrawAreaBounds().y)) {
-			throw new UnsupportedOperationException(); // replace parameters with fields access
-		}
+	public Point[] getDisplayPoints(HistoTimeLine timeLine) {
 		int xDisplayOffset = this.trailRecord.getParentTrail().getDrawAreaBounds().x;
 		int yDisplayOffset = this.trailRecord.getParentTrail().getDrawAreaBounds().height + this.trailRecord.getParentTrail().getDrawAreaBounds().y;
 		Point[] points = new Point[this.trailRecord.realSize()];
 		for (int i = 0; i < this.trailRecord.realSize(); i++) {
 			Integer value = this.trailRecord.elementAt(i);
 			if (value != null) {
-				double decodedValue = RecordingsCollector.decodeVaultValue(trailRecord, value / 1000.0);
+				double decodedValue = HistoSet.decodeVaultValue(trailRecord, value / 1000.0);
 				points[i] = new Point(xDisplayOffset + timeLine.getScalePositions().get((long) this.trailRecord.getParentTrail().getTime_ms(i)),
 						yDisplayOffset - (int) ((decodedValue - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue()));
 			}
@@ -115,7 +135,7 @@ public final class HistoGraphicsMapper {
 		int verticalDisplayPos = Integer.MIN_VALUE;
 		Integer value = this.trailRecord.getPoints().elementAt(index);
 		if (value != null) {
-			double decodedValue = RecordingsCollector.decodeVaultValue(trailRecord, value / 1000.0);
+			double decodedValue = HistoSet.decodeVaultValue(trailRecord, value / 1000.0);
 			verticalDisplayPos = this.trailRecord.getParentTrail().getDrawAreaBounds().height - (int) ((decodedValue - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue());
 		}
 		return verticalDisplayPos;

@@ -25,6 +25,7 @@ import java.util.Vector;
 import gde.GDE;
 import gde.device.IDevice;
 import gde.device.TrailTypes;
+import gde.histo.datasources.HistoSet;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
@@ -171,12 +172,12 @@ public final class TrailRecordFormatter {
 		if (this.device.isGPSCoordinates(this.trailRecord)) {
 			// if (this.getDataType() == DataType.GPS_LATITUDE etc ???
 			if (this.trailRecord.getUnit().endsWith("'")) { //$NON-NLS-1$
-				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", RecordingsCollector.decodeVaultValue(this.trailRecord, value)).trim(); //$NON-NLS-1$
+				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", HistoSet.decodeVaultValue(this.trailRecord, value)).trim(); //$NON-NLS-1$
 			} else {
-				formattedValue = String.format("%8.6f", RecordingsCollector.decodeVaultValue(this.trailRecord, value)); //$NON-NLS-1$
+				formattedValue = String.format("%8.6f", HistoSet.decodeVaultValue(this.trailRecord, value)); //$NON-NLS-1$
 			}
 		} else {
-			formattedValue = this.trailRecord.getDecimalFormat().format(RecordingsCollector.decodeVaultValue(this.trailRecord, value));
+			formattedValue = this.trailRecord.getDecimalFormat().format(HistoSet.decodeVaultValue(this.trailRecord, value));
 		}
 		return formattedValue;
 	}

@@ -43,7 +43,6 @@ import gde.histo.utils.HistoTimeLine.Density;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.GraphicsUtils;
-import gde.utils.MathUtils;
 
 /**
  * Draw curves.
@@ -80,27 +79,25 @@ public final class HistoCurveUtils {
 	 * Draw the summary scale elements using given rectangle for display.
 	 * @param record
 	 * @param gc
-	 * @param x0
-	 * @param y0
-	 * @param width
-	 * @param height
-	 * @param scaleWidthSpace
+	 * @param stripY0 is the upper position of the drawing area strip
+	 * @param stripHeight is the height of the drawing area strip
+	 * @param scaleWidthSpace is the width of rhe left / right scale in pixels
+	 * @param decodedScaleMin is the value corresponding to the left border (xPos = 0)
+	 * @param decodedMaxScale is the value corresponding to the right border (xPos = width)
 	 * @param isDrawScaleInRecordColor
 	 * @param isDrawNameInRecordColor
 	 * @param isDrawNumbersInRecordColor
 	 */
-	public static void drawChannelItemScale(TrailRecord record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace,
-			boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
-		log.finer(() -> record.getName() + "  x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+	public static void drawChannelItemScale(TrailRecord record, GC gc, int stripY0, int stripHeight, int scaleWidthSpace, double decodedScaleMin,
+			double decodedMaxScale, boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
 		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
 
-		Double tmpMin = record.getSyncSummaryMin();
-		Double tmpMax = record.getSyncSummaryMax();
-		if (tmpMin == null || tmpMax == null) return; // missing min/max means no values at all
+		Rectangle drawAreaBounds = record.getParentTrail().getDrawAreaBounds();
+		int x0 = drawAreaBounds.x;
+		int width = drawAreaBounds.width;
+		log.finer(() -> record.getName() + "  x0=" + x0 + " y0=" + stripY0 + " width=" + width + " height=" + stripHeight + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
 		// texts
-		String minScaleText = record.getFormattedScaleValue(MathUtils.floorStepwise(tmpMin, tmpMax - tmpMin));
-		String maxScaleText = record.getFormattedScaleValue(MathUtils.ceilStepwise(tmpMax, tmpMax - tmpMin));
 		String graphText = DeviceXmlResource.getInstance().getReplacement(record.isScaleSyncMaster() ? record.getSyncMasterName() : record.getName());
 		if (record.getSymbol() != null && record.getSymbol().length() > 0) graphText = graphText + "   " + record.getSymbol();
 		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -109,20 +106,20 @@ public final class HistoCurveUtils {
 		gc.setLineWidth(2);
 		gc.setLineStyle(SWT.LINE_SOLID);
 		int gap = 1;
-		int xN = x0 + width;
-		int yPos = y0 + height / 2;
+		int xN = x0 + width + 1;
+		int yPos = stripY0 + stripHeight / 2 - 1;
 
 		{
 			Color color = isDrawScaleInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK;
 			gc.setForeground(color);
-			gc.drawLine(x0, y0 + 1, x0, y0 + height);
-			gc.drawLine(xN, y0 + 1, xN, y0 + height);
+			gc.drawLine(x0, stripY0 + 1, x0, stripY0 + stripHeight);
+			gc.drawLine(xN, stripY0 + 1, xN, stripY0 + stripHeight);
 		}
 		{
 			Color color = isDrawNumbersInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK;
 			gc.setForeground(color);
-			GraphicsUtils.drawTextCentered(minScaleText, x0 - gap - scaleWidthSpace / 2, yPos, gc, SWT.HORIZONTAL);
-			GraphicsUtils.drawTextCentered(maxScaleText, xN + gap + scaleWidthSpace / 2, yPos, gc, SWT.HORIZONTAL);
+			GraphicsUtils.drawTextCentered(record.getFormattedScaleValue(decodedScaleMin), x0 - gap - scaleWidthSpace / 2, yPos, gc, SWT.HORIZONTAL);
+			GraphicsUtils.drawTextCentered(record.getFormattedScaleValue(decodedMaxScale), xN + gap + scaleWidthSpace / 2, yPos, gc, SWT.HORIZONTAL);
 		}
 		{
 			Color color = isDrawNameInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK;
@@ -197,6 +194,52 @@ public final class HistoCurveUtils {
 	}
 
 	/**
+	 * Draw the points.
+	 * Support elaborate y-axis point placement based on number of points.
+	 * @param record
+	 * @param gc
+	 * @param x0
+	 * @param y0
+	 * @param width
+	 * @param height
+	 * @param timeLine
+	 */
+	public static void drawChannelItemSamples(TrailRecord record, GC gc, int x0, int y0, int width, int height, HistoTimeLine timeLine) {
+		log.off(() -> record.getName() + String.format(" x0 = %d, y0 = %d, width = %d, height = %d", x0, y0, width, height)); //$NON-NLS-1$
+		log.finer(() -> "curve area bounds = " + record.getParentTrail().getDrawAreaBounds().toString()); //$NON-NLS-1$
+
+		// set line properties according adjustment
+		gc.setForeground(record.getColor());
+		gc.setLineWidth(record.getLineWidth());
+		gc.setLineStyle(record.getLineStyle());
+
+		// get the number of data points size to be drawn
+		int displayableSize = record.realSize();
+		log.fine(() -> "displayableSize = " + displayableSize); //$NON-NLS-1$
+
+		// record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
+		record.setDisplayScaleFactorValue(height);
+
+		StringBuffer sb = new StringBuffer(); // logging purpose
+
+		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
+		Point[] points = new HistoGraphicsMapper(record).getDisplayPoints(timeLine);
+
+		Point newPoint, oldPoint = null;
+		for (int j = 0; j < points.length && j <= displayableSize && displayableSize >= 1; j++) {
+			if ((newPoint = points[j]) != null) { // in case of a suite the master triggers the display of all trails
+				drawHistoMarker(gc, newPoint, timeLine.getDensity());
+				if (oldPoint != null) {
+					if (log.isLoggable(FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newPoint.toString());
+					gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
+				}
+				oldPoint = newPoint; // remember the last draw point for next drawLine operation
+			}
+		}
+		log.finest(() -> sb.toString());
+	}
+
+	/**
 	 * Draw single curve.
 	 * Support logarithmic distances and elaborate x-axis point placement based on box width and number of points.
 	 * @param record
@@ -226,7 +269,7 @@ public final class HistoCurveUtils {
 		StringBuffer sb = new StringBuffer(); // logging purpose
 
 		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-		Point[] points = new HistoGraphicsMapper(record).getDisplayPoints(timeLine, x0, y0);
+		Point[] points = new HistoGraphicsMapper(record).getDisplayPoints(timeLine);
 
 		Point newPoint, oldPoint = null;
 		for (int j = 0; j < points.length && j <= displayableSize && displayableSize >= 1; j++) {

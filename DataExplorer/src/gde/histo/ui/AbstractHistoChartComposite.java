@@ -211,7 +211,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 
 		y = this.fixedCanvasY < 0 ? this.headerGap + this.headerHeight : this.fixedCanvasY;
 		height = this.fixedCanvasHeight < 0 ? graphicsBounds.height - (this.headerGap + this.commentGap + this.commentHeight + this.headerHeight)
-				: this.fixedCanvasHeight;
+				: this.fixedCanvasHeight + this.headerGap;
 		this.graphicCanvas.setBounds(x, y, width, height);
 		log.finer(() -> "graphicCanvas.setBounds " + this.graphicCanvas.getBounds()); //$NON-NLS-1$
 
@@ -228,7 +228,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	public void setFixedGraphicCanvas(int fixedY, int fixedHeight) {
 		this.fixedCanvasY = fixedY;
 		this.fixedCanvasHeight = fixedHeight;
-		log.off(() -> "y = " + fixedY + "height = " + fixedHeight); //$NON-NLS-1$
+		log.off(() -> "y = " + fixedY + "  height = " + fixedHeight); //$NON-NLS-1$
 	}
 
 	/**

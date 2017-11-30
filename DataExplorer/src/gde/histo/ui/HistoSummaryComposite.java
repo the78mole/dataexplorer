@@ -61,6 +61,8 @@ import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
+import gde.histo.ui.data.SummarySpots;
+import gde.histo.ui.data.SummarySpots.MarkerLine;
 import gde.histo.utils.HistoCurveUtils;
 import gde.histo.utils.HistoTimeLine;
 import gde.log.Logger;
@@ -450,16 +452,32 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 
 		trailRecordSet.updateSyncSummary();
 		boolean isPartialChart = settings.isPartialDataTable();
-		int yStep = (this.fixedCanvasHeight + 1) / trailRecordSet.getDisplayRecords().size();
-		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
-			TrailRecord actualRecord = trailRecordSet.getDisplayRecords().get(i);
-			if (actualRecord.isVisible()) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
-					actualRecord.getName(), actualRecord.isVisible(), actualRecord.isDisplayable(), actualRecord.isScaleSynced(), actualRecord.isScaleVisible()));
-			setRecordDisplayValues(actualRecord);
 
-			int yIndex = curveAreaBounds.y + yStep * i;
-			if (actualRecord.isScaleVisible() || !isPartialChart)
-				HistoCurveUtils.drawChannelItemScale(actualRecord, canvasImageGC, x0, yIndex, width, yStep, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
+		SummarySpots summarySpots = new SummarySpots(trailRecordSet, fixedCanvasHeight);
+
+		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
+			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
+			if (record.isVisible()) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
+					record.getName(), record.isVisible(), record.isDisplayable(), record.isScaleSynced(), record.isScaleVisible()));
+
+			setRecordDisplayValues(record);
+
+			Double tmpMin = record.getSyncSummaryMin();
+			Double tmpMax = record.getSyncSummaryMax();
+			if (tmpMin == null || tmpMax == null) continue;
+
+			MarkerLine markerLine = summarySpots.get(record.getOrdinal());
+			double decodedScaleMin = markerLine.defineDecodedScaleMin();
+			double decodedScaleMax = markerLine.defineDecodedScaleMax();
+
+			int stripHeight = markerLine.getStripHeight();
+			int stripY0 = curveAreaBounds.y + stripHeight * i + 2;
+			if (record.isScaleVisible() || !isPartialChart) {
+				HistoCurveUtils.drawChannelItemScale(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+						isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
+				markerLine.drawMarkers(canvasImageGC);
+				canvasImageGC.setBackground(this.surroundingBackground);
+			}
 		}
 	}
 

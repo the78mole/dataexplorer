@@ -362,9 +362,13 @@ public final class HistoSelectorComposite extends Composite {
 	 * @return the bounds of the table rows relative to the top left header pixel
 	 */
 	public Rectangle getRealBounds() {
-		Rectangle lastRowBounds = this.curveSelectorTable.getItem(this.curveSelectorTable.getItemCount() - 1).getBounds();
-		int headerHeight = this.curveSelectorTable.getLocation().y;
+		if (this.curveSelectorTable.getItemCount() > 0) {
+			Rectangle lastRowBounds = this.curveSelectorTable.getItem(this.curveSelectorTable.getItemCount() - 1).getBounds();
+			int headerHeight = this.curveSelectorTable.getLocation().y;
 
-		return new Rectangle(getBounds().x, headerHeight, getBounds().width, lastRowBounds.y + lastRowBounds.height);
+			return new Rectangle(getBounds().x, headerHeight, getBounds().width, lastRowBounds.y + lastRowBounds.height);
+		} else {
+			return new Rectangle(1, 1, 1, 1);
+		}
 	}
 }

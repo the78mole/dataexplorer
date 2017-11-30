@@ -37,6 +37,7 @@ import gde.device.PropertyType;
 import gde.device.TrailTypes;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.cache.ExtendedVault;
+import gde.histo.datasources.HistoSet;
 import gde.histo.utils.Spot;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -217,8 +218,8 @@ public abstract class TrailRecord extends CommonRecord {
 
 	@Override
 	public void setSyncedMinMaxDisplayValues(double newMinValue, double newMaxValue) {
-		this.minDisplayValue = RecordingsCollector.decodeVaultValue(this, newMinValue);
-		this.maxDisplayValue = RecordingsCollector.decodeVaultValue(this, newMaxValue);
+		this.minDisplayValue = HistoSet.decodeVaultValue(this, newMinValue);
+		this.maxDisplayValue = HistoSet.decodeVaultValue(this, newMaxValue);
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
 			for (AbstractRecord tmpRecord : this.getAbstractParent().getScaleSyncedRecords(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
@@ -238,11 +239,11 @@ public abstract class TrailRecord extends CommonRecord {
 		boolean hasReasonableData = false;
 		if (this.suiteRecords.getSuiteLength() == 0) {
 			hasReasonableData = this.realSize() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE //
-					&& (this.minValue != this.maxValue || RecordingsCollector.decodeVaultValue(this, this.maxValue / 1000.0) != 0.0);
+					&& (this.minValue != this.maxValue || HistoSet.decodeVaultValue(this, this.maxValue / 1000.0) != 0.0);
 		} else {
 			for (SuiteRecord suiteRecord : this.suiteRecords.values()) {
 				if (suiteRecord.size() > 0 && suiteRecord.getMinRecordValue() != Integer.MAX_VALUE && suiteRecord.getMaxRecordValue() != Integer.MIN_VALUE //
-						&& (suiteRecord.getMinRecordValue() != suiteRecord.getMaxRecordValue() || RecordingsCollector.decodeVaultValue(this, suiteRecord.getMaxRecordValue() / 1000.0) != 0.0)) {
+						&& (suiteRecord.getMinRecordValue() != suiteRecord.getMaxRecordValue() || HistoSet.decodeVaultValue(this, suiteRecord.getMaxRecordValue() / 1000.0) != 0.0)) {
 					hasReasonableData = true;
 					break;
 				}
@@ -368,8 +369,8 @@ public abstract class TrailRecord extends CommonRecord {
 			this.maxScaleValue = this.maxDisplayValue = newMaxScaleValue;
 			this.minScaleValue = this.minDisplayValue = newMinScaleValue;
 		} else {
-			this.maxScaleValue = RecordingsCollector.decodeVaultValue(this, this.maxValue / 1000.0);
-			this.minScaleValue = RecordingsCollector.decodeVaultValue(this, this.minValue / 1000.0);
+			this.maxScaleValue = HistoSet.decodeVaultValue(this, this.maxValue / 1000.0);
+			this.minScaleValue = HistoSet.decodeVaultValue(this, this.minValue / 1000.0);
 		}
 	}
 
@@ -399,7 +400,7 @@ public abstract class TrailRecord extends CommonRecord {
 		Vector<Integer> points = this.getPoints();
 		for (int i = fromIndex; i < toIndex; i++) {
 			if (points.elementAt(i) != null) {
-				result.add(new Spot<Double>(this.parent.getTime_ms(i), RecordingsCollector.decodeVaultValue(this, points.elementAt(i) / 1000.)));
+				result.add(new Spot<Double>(this.parent.getTime_ms(i), HistoSet.decodeVaultValue(this, points.elementAt(i) / 1000.)));
 			}
 		}
 		log.finer(() -> Arrays.toString(result.toArray()));

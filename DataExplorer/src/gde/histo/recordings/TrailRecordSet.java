@@ -185,7 +185,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				myIndex++; //
 			}
 		}
-		newTrailRecordSet.syncScaleOfSyncableRecords();
 
 		// setting all data in this create procedure and the synchronized keyword makes this method thread safe
 		RecordingsCollector.defineTrailTypes(newTrailRecordSet);

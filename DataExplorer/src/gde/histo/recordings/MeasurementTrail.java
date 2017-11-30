@@ -112,7 +112,7 @@ public final class MeasurementTrail extends TrailRecord {
 				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
 
 		double[] result = new double[] { minQuantile.getQuartile0(), maxQuantile.getQuartile4() };
-		log.finest(() -> getName() + " " + Arrays.toString(result));
+		log.finest(() -> getName() + " " + Arrays.toString(result) + "  max outlier size=" + maxQuantile.getOutliers().size() + "  min outlier size=" + minQuantile.getOutliers().size());
 		return result;
 	}
 
