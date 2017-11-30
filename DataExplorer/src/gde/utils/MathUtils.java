@@ -13,15 +13,23 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.utils;
 
-import gde.log.Level;
+import static java.lang.Math.abs;
+import static java.lang.Math.floor;
+import static java.lang.Math.log10;
+import static java.lang.Math.pow;
+import static java.math.RoundingMode.DOWN;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Locale;
-import java.util.logging.Logger;
+
+import gde.log.Level;
+import gde.log.Logger;
 
 /**
  * Class contains mathematics utility methods
@@ -29,7 +37,7 @@ import java.util.logging.Logger;
  */
 public class MathUtils {
 	private static Logger log = Logger.getLogger(MathUtils.class.getName());
-	
+
 	/**
 	 * @param value
 	 * @return
@@ -42,9 +50,9 @@ public class MathUtils {
 			roundValue = value >= -0.1 ? value - (value*100%5)/100 : value >= -0.5 ? value - (value*100%1)/100 : value >= -1 ? value - (value*10%1)/10 : value >= -10 ? value - value %1 : value >= -50 ? value - value %10 : value >= -500 ? value - value %50 : value - value % 100 ;
 		return roundValue;
 	}
-		
+
 	/**
-	 * round up given value according value delta value level 
+	 * round up given value according value delta value level
 	 * round up for a positive value results in a higher value
 	 * round up for a negative value results in a higher value
 	 * @param value
@@ -88,10 +96,10 @@ public class MathUtils {
 					roundValue = value + (10 - value % 10);
 				else if (delta < 1000)
 					roundValue = value + (50 - value % 50);
-				else  
+				else
 					roundValue = value + (100 - value % 100);
 			}
-			else {// value < 0 
+			else {// value < 0
 				if (delta < 0.001)
 					roundValue = value - (value % 0.0005);
 				else if (delta < 0.005)
@@ -138,9 +146,9 @@ public class MathUtils {
 		}
 		return roundValue;
 	}
-	
+
 	/**
-	 * round down given value according value delta value level 
+	 * round down given value according value delta value level
 	 * round down for a positive value results in a lower value
 	 * round down for a negative value results in a lower value
 	 * @param value
@@ -184,10 +192,10 @@ public class MathUtils {
 					roundValue = value - (value % 10);
 				else if (delta < 1000)
 					roundValue = value - (value % 50);
-				else  
+				else
 					roundValue = value - (value % 100);
 			}
-			else {// value < 0 
+			else {// value < 0
 				if (delta < 0.001)
 					roundValue = value - (0.0005 + value % 0.0005);
 				else if (delta < 0.005)
@@ -234,7 +242,7 @@ public class MathUtils {
 		}
 		return roundValue;
 	}
-	
+
 	/**
 	 * round up given value according value delta value level for auto scale
 	 * round up for a positive value results in a higher value
@@ -280,10 +288,10 @@ public class MathUtils {
 					roundValue = value + (10 - value % 10);
 				else if (delta < 2000)
 					roundValue = value + (50 - value % 50);
-				else  
+				else
 					roundValue = value + (100 - value % 100);
 			}
-			else {// value < 0 
+			else {// value < 0
 				if (delta < 0.01)
 					roundValue = value - (value % 0.00025);
 				else if (delta < 0.025)
@@ -322,7 +330,7 @@ public class MathUtils {
 		}
 		return roundValue;
 	}
-	
+
 	/**
 	 * round down given value according value delta value level for auto scale
 	 * round down for a positive value results in a lower value
@@ -368,10 +376,10 @@ public class MathUtils {
 					roundValue = value - (value % 10);
 				else if (delta < 2000)
 					roundValue = value - (value % 50);
-				else  
+				else
 					roundValue = value - (value % 100);
 			}
-			else {// value < 0 
+			else {// value < 0
 				if (delta < 0.01)
 					roundValue = value - (0.00025 + value % 0.00025);
 				else if (delta < 0.025)
@@ -413,16 +421,16 @@ public class MathUtils {
 
 
 	/**
-	 * adapted rounding  
+	 * adapted rounding
 	 * - a small number needs different rounding compared to a big number 0.05 -> 0.1, 529 -> 550
-	 * - a small value delta needs different rounding compared to a big delta 10 -> +-1, 200 +-10 
+	 * - a small value delta needs different rounding compared to a big delta 10 -> +-1, 200 +-10
 	 * - think about delta scale at this time to enable %2 or %5 or %10, depending on delta value
 	 * @param minValue
-	 * @param maxValue 
+	 * @param maxValue
 	 * @param isAuto - if true no real rounding will applied, scale end values are calculated during scale value calculation
 	 * 							 - if false end values are rounded and based on this values the scale will be calculated
 	 * @param maxNumberTicks - required as limit for scale value calculation
-	 * @return double array roundMinValue, roundMaxValue 
+	 * @return double array roundMinValue, roundMaxValue
 	 */
 	public static Object[] adaptRounding(double minValue, double maxValue, boolean isAuto, int maxNumberTicks) {
 		Object[] results = null;
@@ -560,7 +568,7 @@ public class MathUtils {
 				results = evaluateNumTicks(tmpMinValue, tmpMaxValue, maxNumberTicks, 0.01);
 			}
 		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, minValue + " --> " + tmpMinValue + " " + maxValue + " --> " + tmpMaxValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$	
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, minValue + " --> " + tmpMinValue + " " + maxValue + " --> " + tmpMaxValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return results;
 	}
 
@@ -568,7 +576,7 @@ public class MathUtils {
 		int newNumberTicks = 2, newNumberMiniTicks = 5;
 		double newMinValue = 0.0, newMaxValue = 0.0;
 		boolean isMinNegative = tmpMinValue < 0, isMaxNegative = tmpMaxValue < 0;
-		
+
 		if (!isMinNegative && !isMaxNegative) {
 			newMinValue = tmpMinValue * raise % 2 != 0 ? tmpMinValue + (2 - tmpMinValue * raise % 2) / raise : tmpMinValue;
 			newMaxValue = tmpMaxValue * raise % 2 != 0 ? tmpMaxValue - (tmpMaxValue * raise % 2) / raise : tmpMaxValue;
@@ -756,7 +764,7 @@ public class MathUtils {
 		int newNumberTicks = 2, newNumberMiniTicks = 5;
 		double newMinValue = 0.0, newMaxValue = 0.0;
 		boolean isMinNegative = tmpMinValue < 0, isMaxNegative = tmpMaxValue < 0;
-		
+
 		if (!isMinNegative && !isMaxNegative) {
 			newMinValue = tmpMinValue * raise % 2 != 0 ? tmpMinValue - (tmpMinValue * raise % 2) / raise : tmpMinValue;
 			newMaxValue = tmpMaxValue * raise % 2 != 0 ? tmpMaxValue + (2 - tmpMaxValue * raise % 2) / raise : tmpMaxValue;
@@ -939,4 +947,52 @@ public class MathUtils {
 		}
 		return new Object[] {Double.parseDouble(String.format(Locale.ENGLISH, "%.4f", newMinValue)), Double.parseDouble(String.format(Locale.ENGLISH, "%.4f", newMaxValue)), newNumberTicks, newNumberMiniTicks, new Object()};
 	}
+
+	/**
+	 * Ceiling of {@code value} based on {@code delta}.</br>
+	 * Both positive or negative values result in a higher value.
+	 * @return ceiling value based on steps such as 5% of {@code delta}
+	 */
+	public static double ceilStepwise(double value, double delta) {
+		if (value == 0.) return 0.;
+		// truncate double precision jitters (on the two least significant bits)
+		MathContext mC = new MathContext(13 - (int) log10(value), DOWN);
+		BigDecimal decValue = new BigDecimal(value, mC);
+		BigDecimal threshold = new BigDecimal(determineThreshold(value, delta), mC);
+		BigDecimal remainder = decValue.remainder(threshold);
+		BigDecimal toAdd = remainder.compareTo(new BigDecimal(0.)) > 0 ? threshold.subtract(remainder) : remainder.abs();
+		log.finest(() -> String.format("value=%f delta=%f threshold=%f result=%f", value, delta, threshold, decValue.add(toAdd).doubleValue()));
+		return decValue.add(toAdd).doubleValue();
+	}
+
+	/**
+	 * Floor of {@code value} based on {@code delta}.</br>
+	 * Both positive or negative values result in a lower value.
+	 * @return floor value based on steps such as 5% of {@code delta}
+	 */
+	public static double floorStepwise(double value, double delta) {
+		if (value == 0.) return 0.;
+		// truncate double precision jitters (on the two least significant bits)
+		MathContext mC = new MathContext(13 - (int) log10(value), DOWN);
+		BigDecimal decValue = new BigDecimal(value, mC);
+		BigDecimal threshold = new BigDecimal(determineThreshold(value, delta), mC);
+		BigDecimal remainder = decValue.remainder(threshold);
+		BigDecimal toSubtract = remainder.compareTo(new BigDecimal(0.)) < 0 ? threshold.add(remainder) : remainder;
+		log.finest(() -> String.format("value=%f delta=%f threshold=%f result=%f", value, delta, threshold, decValue.subtract(toSubtract).doubleValue()));
+		return decValue.subtract(toSubtract).doubleValue();
+	}
+
+	/**
+	 * Find a threshold in the same magnitude of the parameters.</p>
+	 * Examples for a value xxx.x with three digits before the decimal point:</br>
+	 * if less than 200 then threshold is 5, if less than 500 than 10, if less than 1000 than 20.
+	 * @param value != 0
+	 * @return a threshold value based on steps such as 5% of {@code delta} (or {@code value} alternatively)
+	 */
+	private static double determineThreshold(double value, double delta) {
+		double logReference = delta != 0. ? log10(abs(delta)) : log10(abs(value));
+		int roundConstant = (logReference % 1 < .3) ? 5 : (logReference % 1.) < .7 ? 10 : 20;
+		return roundConstant * pow(10., floor(logReference) - 2.);
+	}
+
 }

@@ -26,7 +26,6 @@ import java.util.function.DoubleConsumer;
 
 import gde.log.Logger;
 
-
 /**
  * Immutable quantile calculation of a probability distribution after removing outliers.
  * Is based on a mergesort and thus avg O(n log n).<br>
@@ -537,6 +536,12 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 		List<T> outliers = new ArrayList<>(this.castaways);
 		outliers.removeAll(this.outcasts);
 		return outliers;
+	}
+
+	@Override
+	public String toString() {
+		return "isSample=" + this.isSample + ", size=" + this.getSize() + ", castawaysSize=" + this.castaways.size() //
+				+ ", sumFigure=" + this.getSumFigure() + ", avgFigure=" + this.getAvgFigure() + ", sigmaFigure=" + this.getSigmaFigure() + "";
 	}
 
 }

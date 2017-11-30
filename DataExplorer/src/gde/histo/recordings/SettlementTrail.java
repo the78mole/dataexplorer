@@ -19,9 +19,16 @@
 
 package gde.histo.recordings;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import gde.device.SettlementType;
 import gde.device.TrailTypes;
 import gde.histo.cache.ExtendedVault;
+import gde.histo.datasources.HistoSet;
+import gde.histo.utils.UniversalQuantile;
 import gde.log.Logger;
 
 /**
@@ -29,9 +36,17 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public final class SettlementTrail extends TrailRecord {
-	private final static String	$CLASS_NAME				= SettlementTrail.class.getName();
-	private final static long		serialVersionUID	= 110124007964748556L;
-	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
+	private final static String		$CLASS_NAME				= SettlementTrail.class.getName();
+	private final static long			serialVersionUID	= 110124007964748556L;
+	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
+	/**
+	 * The real maximum values of all vaults added to this record.
+	 */
+	protected final List<Integer>	vaultMaximums			= new ArrayList<>();
+	/**
+	 * The real minimum values of all vaults added to this record.
+	 */
+	protected final List<Integer>	vaultMinimums			= new ArrayList<>();
 
 	/**
 	 * @param newOrdinal
@@ -48,7 +63,7 @@ public final class SettlementTrail extends TrailRecord {
 	}
 
 	@Override
-	public boolean isAllowedBySetting() {
+	protected boolean isAllowedBySetting() {
 		return this.settings.isDisplaySettlements();
 	}
 
@@ -65,6 +80,39 @@ public final class SettlementTrail extends TrailRecord {
 	@Override
 	public Integer getVaultPoint(ExtendedVault vault, TrailTypes trailType) {
 		return vault.getSettlementPoint(this.getOrdinal(), trailType.ordinal());
+	}
+
+	@Override
+	public void addSummaryPoints(ExtendedVault histoVault) {
+		Integer point = getVaultPoint(histoVault, TrailTypes.MIN);
+		if (point != null) {
+			this.vaultMaximums.add(point);
+			this.vaultMaximums.add(getVaultPoint(histoVault, TrailTypes.MAX));
+		}
+	}
+
+	@Override
+	public void clear() {
+		this.vaultMaximums.clear();
+		this.vaultMinimums.clear();
+		super.clear();
+	}
+
+	@Override
+	protected double[] determineSummaryMinMax() {
+		if (vaultMaximums.isEmpty() || vaultMinimums.isEmpty()) return new double[0];
+
+		List<Double> decodedMaximums = vaultMaximums.stream().map(i -> RecordingsCollector.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+		List<Double> decodedMinimums = vaultMinimums.stream().map(i -> RecordingsCollector.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+
+		UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true, //
+				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+		UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true, //
+				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+
+		double[] result = new double[] { minQuantile.getQuartile0(), maxQuantile.getQuartile4() };
+		log.finest(() -> getName() + " " + Arrays.toString(result));
+		return result;
 	}
 
 }

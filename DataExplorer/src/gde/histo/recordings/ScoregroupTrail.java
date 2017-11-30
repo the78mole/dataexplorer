@@ -19,6 +19,7 @@
 
 package gde.histo.recordings;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,9 +36,14 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public final class ScoregroupTrail extends TrailRecord {
-	private final static String	$CLASS_NAME				= ScoregroupTrail.class.getName();
-	private final static long		serialVersionUID	= 110124007964748556L;
-	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
+	private final static String		$CLASS_NAME				= ScoregroupTrail.class.getName();
+	private final static long			serialVersionUID	= 110124007964748556L;
+	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
+
+	/**
+	 * The score values of all vaults added to this record.
+	 */
+	protected final List<Integer>	vaultValues				= new ArrayList<>();
 
 	/**
 	 * @param newOrdinal
@@ -54,7 +60,7 @@ public final class ScoregroupTrail extends TrailRecord {
 	}
 
 	@Override
-	public boolean isAllowedBySetting() {
+	protected boolean isAllowedBySetting() {
 		return this.settings.isDisplayScores();
 	}
 
@@ -70,15 +76,15 @@ public final class ScoregroupTrail extends TrailRecord {
 
 	@Override
 	public Integer getVaultPoint(ExtendedVault vault, TrailTypes trailType) {
-		return vault.getScorePoint(getScoregroup().getScoreGroupId());
+		return vault.getScorePoint(trailType.ordinal());
 	}
 
-	@Override // reason is only one value per vault
+	@Override
 	protected double[] determineSummaryMinMax() {
-		if (vaultMaximums.isEmpty() || vaultMinimums.isEmpty()) return new double[0];
+		if (vaultValues.isEmpty()) return new double[0];
 
 		// both lists hold identical values because there are no max/min values but only one value per vault
-		List<Double> decodedValues = vaultMaximums.stream().map(i -> RecordingsCollector.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+		List<Double> decodedValues = vaultValues.stream().map(i -> RecordingsCollector.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
 
 		UniversalQuantile<Double> quantile = new UniversalQuantile<>(decodedValues, true, //
 				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
@@ -86,6 +92,18 @@ public final class ScoregroupTrail extends TrailRecord {
 		double[] result = new double[] { quantile.getQuartile0(), quantile.getQuartile4() };
 		log.finest(() -> getName() + " " + Arrays.toString(result));
 		return result;
+	}
+
+	@Override
+	public void addSummaryPoints(ExtendedVault histoVault) {
+		Integer point = getVaultPoint(histoVault, this.getTrailSelector().getTrailType());
+		if (point != null) this.vaultValues.add(point);
+	}
+
+	@Override
+	public void clear() {
+		this.vaultValues.clear();
+		super.clear();
 	}
 
 }

@@ -21,8 +21,6 @@ package gde.histo.utils;
 
 import static java.util.logging.Level.FINEST;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +43,7 @@ import gde.histo.utils.HistoTimeLine.Density;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.GraphicsUtils;
+import gde.utils.MathUtils;
 
 /**
  * Draw curves.
@@ -100,8 +99,8 @@ public final class HistoCurveUtils {
 		if (tmpMin == null || tmpMax == null) return; // missing min/max means no values at all
 
 		// texts
-		String minScaleText = record.getFormattedScaleValue(floorStepwise(tmpMin, tmpMax - tmpMin));
-		String maxScaleText = record.getFormattedScaleValue(ceilStepwise(tmpMax, tmpMax - tmpMin));
+		String minScaleText = record.getFormattedScaleValue(MathUtils.floorStepwise(tmpMin, tmpMax - tmpMin));
+		String maxScaleText = record.getFormattedScaleValue(MathUtils.ceilStepwise(tmpMax, tmpMax - tmpMin));
 		String graphText = DeviceXmlResource.getInstance().getReplacement(record.isScaleSyncMaster() ? record.getSyncMasterName() : record.getName());
 		if (record.getSymbol() != null && record.getSymbol().length() > 0) graphText = graphText + "   " + record.getSymbol();
 		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -130,48 +129,6 @@ public final class HistoCurveUtils {
 			gc.setForeground(color);
 			GraphicsUtils.drawTextCentered(graphText, x0 + width / 2, yPos, gc, SWT.HORIZONTAL);
 		}
-	}
-
-	/**
-	 * Ceiling of a given value according delta value level.
-	 * Round a positive value results in a higher value.
-	 * Round a negative value results in a lower value.
-	 * @return ceiling double value
-	 */
-	private static double ceilStepwise(double baseValue, double delta) {
-		// truncate rounding differences caused by encode/decode
-		BigDecimal decValue = new BigDecimal(baseValue).setScale(13, RoundingMode.DOWN);
-		BigDecimal threshold;
-		{ // Examples for value xxx.x: if less than 200 then round to 5, if less than 500 than round to 10, if less than 1000 than round to 20
-			double logReference = delta != 0. ? Math.log10(Math.abs(delta)) : baseValue != 0. ? Math.log10(Math.abs(baseValue)) : 0;
-			int roundConstant = (logReference % 1 < .3) ? 5 : (logReference % 1) < .7 ? 10 : 20;
-			threshold = new BigDecimal(roundConstant * Math.pow(10., Math.floor(logReference) - 2)).setScale(13, RoundingMode.DOWN);
-		}
-		BigDecimal remainder = decValue.remainder(threshold);
-		BigDecimal toAdd = remainder.compareTo(new BigDecimal(0.)) > 0 ? threshold.subtract(remainder) : remainder.abs();
-		log.off(() -> String.format("value=%f delta=%f threshold=%f result=%f", baseValue, delta, threshold, decValue.add(toAdd).doubleValue()));
-		return decValue.add(toAdd).doubleValue();
-	}
-
-	/**
-	 * Floor of a given value according delta value level.
-	 * Round a positive value results in a higher value.
-	 * Round a negative value results in a lower value.
-	 * @return floor double value
-	 */
-	private static double floorStepwise(double baseValue, double delta) {
-		// truncate rounding differences caused by encode/decode
-		BigDecimal decValue = new BigDecimal(baseValue).setScale(13, RoundingMode.DOWN);
-		BigDecimal threshold;
-		{ // Examples for value xxx.x: if less than 200 then round to 5, if less than 500 than round to 10, if less than 1000 than round to 20
-			double logReference = delta != 0. ? Math.log10(Math.abs(delta)) : baseValue != 0. ? Math.log10(Math.abs(baseValue)) : 0;
-			int roundConstant = (logReference % 1 < .3) ? 5 : (logReference % 1) < .7 ? 10 : 20;
-			threshold = new BigDecimal(roundConstant * Math.pow(10., Math.floor(logReference) - 2)).setScale(13, RoundingMode.DOWN);
-		}
-		BigDecimal remainder = decValue.remainder(threshold);
-		BigDecimal toSubtract = remainder.compareTo(new BigDecimal(0.)) < 0 ? threshold.add(remainder) : remainder;
-		log.off(() -> String.format("value=%f delta=%f threshold=%f result=%f", baseValue, delta, threshold, decValue.subtract(toSubtract).doubleValue()));
-		return decValue.subtract(toSubtract).doubleValue();
 	}
 
 	/**

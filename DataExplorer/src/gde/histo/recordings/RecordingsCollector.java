@@ -90,8 +90,7 @@ public final class RecordingsCollector {
 				for (ExtendedVault histoVault : entry.getValue()) {
 					trailRecord.addElement(trailRecord.getVaultPoint(histoVault, trailRecord.getTrailSelector().getTrailType()));
 					if (isSmartStatistics) {
-						Integer point = trailRecord.getVaultPoint(histoVault, TrailTypes.REAL_MIN);
-						if (point != null) trailRecord.addExtrema(trailRecord.getVaultPoint(histoVault, TrailTypes.REAL_MIN), trailRecord.getVaultPoint(histoVault, TrailTypes.REAL_MAX));
+						trailRecord.addSummaryPoints(histoVault);
 					}
 				}
 			}
@@ -101,8 +100,7 @@ public final class RecordingsCollector {
 				for (ExtendedVault histoVault : entry.getValue()) {
 					addVaultToSuite(histoVault, trailRecord);
 					if (isSmartStatistics) {
-						Integer point = trailRecord.getVaultPoint(histoVault, TrailTypes.REAL_MIN);
-						if (point != null) trailRecord.addExtrema(point, trailRecord.getVaultPoint(histoVault, TrailTypes.REAL_MAX));
+						trailRecord.addSummaryPoints(histoVault);
 					}
 				}
 			}

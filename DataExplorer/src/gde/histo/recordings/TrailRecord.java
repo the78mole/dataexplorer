@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.data.AbstractRecord;
@@ -38,9 +37,7 @@ import gde.device.PropertyType;
 import gde.device.TrailTypes;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.cache.ExtendedVault;
-import gde.histo.datasources.HistoSet;
 import gde.histo.utils.Spot;
-import gde.histo.utils.UniversalQuantile;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 
@@ -66,14 +63,6 @@ public abstract class TrailRecord extends CommonRecord {
 	 * If a suite trail is chosen the values are added to suite records and the trail record does not get values.
 	 */
 	protected final SuiteRecords			suiteRecords			= new SuiteRecords();
-	/**
-	 * The real maximum values of all vaults added to this record.
-	 */
-	protected final List<Integer>			vaultMaximums			= new ArrayList<>();
-	/**
-	 * The real minimum values of all vaults added to this record.
-	 */
-	protected final List<Integer>			vaultMinimums			= new ArrayList<>();
 
 	protected Double									syncSummaryMax		= null;
 	protected Double									syncSummaryMin		= null;
@@ -134,8 +123,6 @@ public abstract class TrailRecord extends CommonRecord {
 	@Override
 	public void clear() {
 		this.suiteRecords.clear();
-		this.vaultMaximums.clear();
-		this.vaultMinimums.clear();
 		super.clear();
 	}
 
@@ -275,7 +262,7 @@ public abstract class TrailRecord extends CommonRecord {
 	/**
 	 * @return true if the record is not suppressed by histo display settings which hide records
 	 */
-	public boolean isAllowedBySetting() {
+	protected boolean isAllowedBySetting() {
 		return false;
 	}
 
@@ -534,10 +521,10 @@ public abstract class TrailRecord extends CommonRecord {
 		}
 	}
 
-	public void addExtrema(Integer vaultMinValue, Integer vaultMaxValue) {
-		this.vaultMaximums.add(vaultMaxValue);
-		this.vaultMinimums.add(vaultMinValue);
-	}
+	/**
+	 * Measurements and setlements have min/max points; scores have one single scoregroup member point.
+	 */
+	public abstract void addSummaryPoints(ExtendedVault histoVault);
 
 	public Double getSyncSummaryMax() {
 		return this.syncSummaryMax;
@@ -569,24 +556,6 @@ public abstract class TrailRecord extends CommonRecord {
 		this.syncSummaryMin = this.syncSummaryMax = null;
 	}
 
-	/**
-	 * Provide the extremum values based on all the vaults which have been added to this record up to now.
-	 * @return the decoded extrema after removing outliers: {minExtremumValue, maxExtremumValue} or an empty array
-	 */
-	protected double[] determineSummaryMinMax() {
-		if (vaultMaximums.isEmpty() || vaultMinimums.isEmpty()) return new double[0];
-
-		List<Double> decodedMaximums = vaultMaximums.stream().map(i -> RecordingsCollector.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
-		List<Double> decodedMinimums = vaultMinimums.stream().map(i -> RecordingsCollector.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
-
-		UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true, //
-				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
-		UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true, //
-				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
-
-		double[] result = new double[] { minQuantile.getQuartile0(), maxQuantile.getQuartile4() };
-		log.finest(() -> getName() + " " + Arrays.toString(result));
-		return result;
-	}
+	protected abstract double[] determineSummaryMinMax();
 
 }
