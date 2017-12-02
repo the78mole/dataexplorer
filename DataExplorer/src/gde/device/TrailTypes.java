@@ -158,7 +158,7 @@ public enum TrailTypes {
 	public static final int										BOX_PLOT_SIZE			= 7;
 
 	private final int													displaySequence;
-	private final boolean											isForSummation;
+	private final boolean											isAlienValue;
 	private final boolean											isTriggered;
 	private final String											displayName;
 	private final boolean											isSubstitute;
@@ -182,7 +182,7 @@ public enum TrailTypes {
 
 	private TrailTypes(int displaySequence, boolean isForSummation, boolean isTriggered, String displayName) { // legacy
 		this.displaySequence = displaySequence;
-		this.isForSummation = isForSummation;
+		this.isAlienValue = isForSummation;
 		this.isTriggered = isTriggered;
 		this.displayName = displayName;
 		this.isSubstitute = false;
@@ -194,7 +194,7 @@ public enum TrailTypes {
 
 	private TrailTypes(int displaySequence, boolean isForSummation, boolean isTriggered, String displayName, boolean isSubstitute) {
 		this.displaySequence = displaySequence;
-		this.isForSummation = isForSummation;
+		this.isAlienValue = isForSummation;
 		this.isTriggered = isTriggered;
 		this.displayName = displayName;
 		this.isSubstitute = isSubstitute;
@@ -206,7 +206,7 @@ public enum TrailTypes {
 
 	private TrailTypes(int displaySequence, String displayName, boolean isSmartStatistics, TrailTypes[] suiteMembers) { // suites
 		this.displaySequence = displaySequence;
-		this.isForSummation = false;
+		this.isAlienValue = false;
 		this.isTriggered = false;
 		this.displayName = displayName;
 		this.isSubstitute = false;
@@ -350,8 +350,11 @@ public enum TrailTypes {
 	}
 
 
-	public boolean isForSummation() {
-		return this.isForSummation;
+	/**
+	 * @return true if these values are not in the range of the measurement values
+	 */
+	public boolean isAlienValue() {
+		return this.isAlienValue;
 	}
 
 	public boolean isTriggered() {

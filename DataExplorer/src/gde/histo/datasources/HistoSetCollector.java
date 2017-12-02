@@ -58,7 +58,6 @@ import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.DirectoryScanner.SourceDataSet;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.exclusions.ExclusionData;
-import gde.histo.recordings.RecordingsCollector;
 import gde.histo.recordings.TrailRecordSet;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -345,6 +344,7 @@ public final class HistoSetCollector {
 		}
 		{
 			this.trailRecordSet = TrailRecordSet.createRecordSet(this.histoVaults);
+			this.trailRecordSet.initializeFromVaults();
 		}
 	}
 
@@ -480,7 +480,7 @@ public final class HistoSetCollector {
 						isRebuilt = true;
 						long nanoTime = System.nanoTime();
 						this.trailRecordSet = TrailRecordSet.createRecordSet(this.histoVaults);
-						// this.trailRecordSet.checkAllDisplayable();
+						this.trailRecordSet.initializeFromVaults();
 						this.trailRecordSet.applyTemplate(true); // needs reasonable data
 						if (this.recordSetBytesSum > 0) {
 							long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
@@ -494,7 +494,7 @@ public final class HistoSetCollector {
 				{
 					if (EnumSet.of(RebuildStep.D_TRAIL_DATA).contains(rebuildStep)) { // saves some time compared to the logic above
 						isRebuilt = true;
-						RecordingsCollector.refillRecordSet(this.trailRecordSet);
+						this.trailRecordSet.refillRecordSet();
 					}
 					progress.set(CONVERTED);
 				}

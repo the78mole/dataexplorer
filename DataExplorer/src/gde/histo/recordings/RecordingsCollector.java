@@ -42,7 +42,7 @@ import gde.ui.DataExplorer;
  * Support initial collection and collections after user input (e.g. trail type selection).
  * @author Thomas Eickert (USER)
  */
-public final class RecordingsCollector {
+public final class RecordingsCollector1 {
 	private final static String				$CLASS_NAME	= RecordingsCollector.class.getName();
 	private final static Logger				log					= Logger.getLogger($CLASS_NAME);
 
@@ -63,14 +63,18 @@ public final class RecordingsCollector {
 	 * Every record takes the selected trail type / score data from the history vault and populates its data.
 	 */
 	public static void addVaults(TrailRecordSet trailRecordSet) {
+		addVaultList(trailRecordSet);
+
+		for (String recordName : trailRecordSet.getRecordNames()) {
+			addVaults(trailRecordSet, recordName);
+		}
+	}
+
+	public static void addVaultList(TrailRecordSet trailRecordSet) {
 		for (Map.Entry<Long, List<ExtendedVault>> entry : trailRecordSet.getHistoVaults().entrySet()) {
 			for (ExtendedVault histoVault : entry.getValue()) {
 				trailRecordSet.addVaultHeader(histoVault);
 			}
-		}
-
-		for (String recordName : trailRecordSet.getRecordNames()) {
-			addVaults(trailRecordSet, recordName);
 		}
 	}
 
@@ -186,7 +190,7 @@ public final class RecordingsCollector {
 	 * @return the alternating -1/+1 factor for summation trail types; 0 otherwise
 	 */
 	private static int getSummationFactor(TrailTypes trailType, int previousFactor) {
-		if (trailType.isForSummation()) {
+		if (trailType.isAlienValue()) {
 			return previousFactor == 0 ? -1 : previousFactor * -1;
 		} else {
 			return 0;

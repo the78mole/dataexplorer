@@ -55,8 +55,8 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
+import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionFormatter;
-import gde.histo.recordings.RecordingsCollector;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
@@ -451,9 +451,8 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		boolean isDrawNumbersInRecordColor = settings.isDrawNumbersInRecordColor();
 
 		trailRecordSet.updateSyncSummary();
-		boolean isPartialChart = settings.isPartialDataTable();
-
 		SummarySpots summarySpots = new SummarySpots(trailRecordSet, fixedCanvasHeight);
+		boolean isPartialChart = settings.isPartialDataTable();
 
 		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
@@ -461,10 +460,6 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 					record.getName(), record.isVisible(), record.isDisplayable(), record.isScaleSynced(), record.isScaleVisible()));
 
 			setRecordDisplayValues(record);
-
-			Double tmpMin = record.getSyncSummaryMin();
-			Double tmpMax = record.getSyncSummaryMax();
-			if (tmpMin == null || tmpMax == null) continue;
 
 			MarkerLine markerLine = summarySpots.get(record.getOrdinal());
 			double decodedScaleMin = markerLine.defineDecodedScaleMin();
@@ -522,8 +517,8 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 			if (!record.getTrailSelector().isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
 				; // in case of an empty record leave the values unchanged
 			else {
-				yMinValueDisplay = RecordingsCollector.decodeVaultValue(record, yMinValue);
-				yMaxValueDisplay = RecordingsCollector.decodeVaultValue(record, yMaxValue);
+				yMinValueDisplay = HistoSet.decodeVaultValue(record, yMinValue);
+				yMaxValueDisplay = HistoSet.decodeVaultValue(record, yMaxValue);
 			}
 			if (log.isLoggable(FINE)) log.log(FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 

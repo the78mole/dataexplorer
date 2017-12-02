@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import gde.device.MeasurementType;
 import gde.device.TrailTypes;
@@ -103,17 +104,28 @@ public final class MeasurementTrail extends TrailRecord {
 	protected double[] determineSummaryMinMax() {
 		if (vaultMaximums.isEmpty() || vaultMinimums.isEmpty()) return new double[0];
 
-		List<Double> decodedMaximums = vaultMaximums.stream().map(i -> RecordingsCollector.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
-		List<Double> decodedMinimums = vaultMinimums.stream().map(i -> RecordingsCollector.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+		TrailTypes trailType = getTrailSelector().getTrailType();
+		if (trailType.isAlienValue()) {
+			Stream<Integer> decodedVaultValues = getParentTrail().getHistoVaults().values().parallelStream().flatMap(l -> l.stream()).map(v -> getVaultPoint(v, trailType));
+			List<Double> decodedValues = decodedVaultValues.map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+			UniversalQuantile<Double> quantile = new UniversalQuantile<>(decodedValues, true, //
+					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
 
-		UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true, //
-				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
-		UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true, //
-				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+			double[] result = new double[] { quantile.getQuartile0(), quantile.getQuartile4() };
+			log.finest(() -> getName() + " " + Arrays.toString(result) + "  outlier size=" + quantile.getOutliers().size());
+			return result;
+		} else {
+			List<Double> decodedMaximums = vaultMaximums.parallelStream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+			List<Double> decodedMinimums = vaultMinimums.parallelStream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+			UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true, //
+					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+			UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true, //
+					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
 
-		double[] result = new double[] { minQuantile.getQuartile0(), maxQuantile.getQuartile4() };
-		log.finest(() -> getName() + " " + Arrays.toString(result) + "  max outlier size=" + maxQuantile.getOutliers().size() + "  min outlier size=" + minQuantile.getOutliers().size());
-		return result;
+			double[] result = new double[] { minQuantile.getQuartile0(), maxQuantile.getQuartile4() };
+			log.finest(() -> getName() + " " + Arrays.toString(result) + "  max outlier size=" + maxQuantile.getOutliers().size() + "  min outlier size=" + minQuantile.getOutliers().size());
+			return result;
+		}
 	}
 
 }
