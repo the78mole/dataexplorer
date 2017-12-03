@@ -24,6 +24,7 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -65,8 +66,12 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 	@Override
 	protected void setFixedGraphicCanvas() {
 		Rectangle realBounds = this.curveSelectorComposite.getRealBounds();
+		if (Settings.getInstance().isSmartStatistics()) {
 		int heightWithScale = realBounds.height + this.graphicsComposite.getXScaleHeight() + AbstractHistoChartComposite.DEFAULT_TOP_GAP;
 		this.graphicsComposite.setFixedGraphicCanvas(realBounds.y - AbstractHistoChartComposite.DEFAULT_TOP_GAP, heightWithScale);
+		} else {
+			this.graphicsComposite.setFixedGraphicCanvas(realBounds.y - AbstractHistoChartComposite.DEFAULT_TOP_GAP, 11);
+		}
 	}
 
 }

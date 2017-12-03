@@ -19,8 +19,6 @@
 
 package gde.histo.recordings;
 
-import static java.util.logging.Level.FINE;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,36 +50,39 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert
  */
 public abstract class TrailRecord extends CommonRecord {
-	private final static String				$CLASS_NAME					= TrailRecord.class.getName();
-	private final static long					serialVersionUID		= 110124007964748556L;
-	private final static Logger				log									= Logger.getLogger($CLASS_NAME);
+	private final static String					$CLASS_NAME					= TrailRecord.class.getName();
+	private final static long						serialVersionUID		= 110124007964748556L;
+	private final static Logger					log									= Logger.getLogger($CLASS_NAME);
 
-	public final static String				TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
+	public final static String					TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
 
-	protected final IChannelItem			channelItem;
-	protected final TrailSelector			trailSelector;
+	protected final IChannelItem				channelItem;
+	protected final TrailSelector				trailSelector;
 
-	protected final DeviceXmlResource	xmlResource				= DeviceXmlResource.getInstance();
+	protected final DeviceXmlResource		xmlResource					= DeviceXmlResource.getInstance();
 
 	/**
 	 * If a suite trail is chosen the values are added to suite records and the trail record does not get values.
 	 */
-	protected final SuiteRecords			suiteRecords			= new SuiteRecords();
+	protected final SuiteRecords				suiteRecords				= new SuiteRecords();
 
-	protected Double									syncSummaryMax		= null;
-	protected Double									syncSummaryMin		= null;
+	// min/max only depend on the vault q0/q4 values; a synced record has synced min/max values in these fields
+	protected Double										summaryMax					= null;
+	protected Double										summaryMin					= null;
 
-	protected double									factor						= Double.MIN_VALUE;
-	protected double									offset						= Double.MIN_VALUE;
-	protected double									reduction					= Double.MIN_VALUE;
+	protected double										factor							= Double.MIN_VALUE;
+	protected double										offset							= Double.MIN_VALUE;
+	protected double										reduction						= Double.MIN_VALUE;
 	/**
 	 * The real maximum values of all vaults added to this record.
 	 */
-	protected final List<Integer> vaultMaximums = new ArrayList<>();
+	protected final List<Integer>				vaultMaximums				= new ArrayList<>();
 	/**
 	 * The real minimum values of all vaults added to this record.
 	 */
-	protected final List<Integer> vaultMinimums = new ArrayList<>();
+	protected final List<Integer>				vaultMinimums				= new ArrayList<>();
+
+	protected UniversalQuantile<Double>	quantile;
 
 	protected TrailRecord(IChannelItem channelItem, int newOrdinal, TrailRecordSet parentTrail, int initialCapacity) {
 		super(DataExplorer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
@@ -137,6 +138,7 @@ public abstract class TrailRecord extends CommonRecord {
 		this.suiteRecords.clear();
 		this.vaultMaximums.clear();
 		this.vaultMinimums.clear();
+		this.quantile = null;
 		super.clear();
 	}
 
@@ -226,7 +228,7 @@ public abstract class TrailRecord extends CommonRecord {
 	public void setMinMaxScaleValue(double minScaleValue, double maxScaleValue) {
 		this.minScaleValue = minScaleValue;
 		this.maxScaleValue = maxScaleValue;
-		if (log.isLoggable(FINE)) log.log(FINE, "scale  -> yMinValueDisplay = " + minScaleValue + "; yMaxValueDisplay = " + minScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
+		log.fine(() -> getName() + " minScaleValue = " + minScaleValue + "; maxScaleValue = " + minScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -241,7 +243,7 @@ public abstract class TrailRecord extends CommonRecord {
 				record.maxDisplayValue = this.maxDisplayValue;
 			}
 		}
-		log.fine(getName() + " data limit  -> yMinValue = " + newMinValue + "; yMaxValue = " + newMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+		log.fine(getName() + getName() + " yMinValue = " + newMinValue + "; yMaxValue = " + newMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -316,7 +318,7 @@ public abstract class TrailRecord extends CommonRecord {
 			syncMaxValue = (int) (getMaxValue() * getSyncMasterFactor());
 			syncMinValue = (int) (getMinValue() * getSyncMasterFactor());
 		}
-		log.finer(() -> getName() + "   syncMin = " + getSyncMinValue() + "; syncMax = " + getSyncMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$
+		log.finer(() -> getName() + "  syncMin = " + getSyncMinValue() + "; syncMax = " + getSyncMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -324,17 +326,9 @@ public abstract class TrailRecord extends CommonRecord {
 		return this.syncMinValue == this.syncMaxValue ? this.syncMinValue - 100 : this.syncMinValue;
 	}
 
-	public void setSyncMinValue(int value) {
-		this.syncMinValue = value;
-	}
-
 	@Override
 	public int getSyncMaxValue() {
 		return this.syncMaxValue == this.syncMinValue ? this.syncMaxValue + 100 : this.syncMaxValue;
-	}
-
-	public void setSyncMaxValue(int value) {
-		this.syncMaxValue = value;
 	}
 
 	public double getSyncMasterFactor() {
@@ -547,33 +541,33 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	public Double getSyncSummaryMax() {
-		return this.syncSummaryMax;
+		return summaryMax != null ? summaryMax : 0.;
 	}
 
-	public Double getSyncSummaryMin() {
-		return this.syncSummaryMin;
+	public double getSyncSummaryMin() {
+		return summaryMin != null ? summaryMin : 0.;
 	}
 
 	/**
-	 * Determine the extrema max/minValues from this record and recalculate the synced summary max/minValues.
+	 * Determine and set the q0/q4 max/minValues for the summary window from this record.
 	 */
-	public void setSyncSummaryMinMax() {
+	public void setSummaryMinMax() {
 		double[] minMax = determineSummaryMinMax();
 		if (minMax.length == 0) {
-			resetSyncSummaryMinMax();
+			resetSummaryMinMax();
 		} else {
-			setSyncSummaryMinMax(minMax[0], minMax[1]);
+			setSummaryMinMax(minMax[0], minMax[1]);
 		}
 	}
 
-	public void setSyncSummaryMinMax(double newMin, double newMax) {
-		this.syncSummaryMin = newMin;
-		this.syncSummaryMax = newMax;
+	public void setSummaryMinMax(double newMin, double newMax) {
+		summaryMin = newMin;
+		summaryMax = newMax;
 		log.finer(() -> getName() + " syncSummaryMin=" + newMin + " syncSummaryMax=" + newMax);
 	}
 
-	public void resetSyncSummaryMinMax() {
-		this.syncSummaryMin = this.syncSummaryMax = null;
+	public void resetSummaryMinMax() {
+		summaryMin = summaryMax = null;
 	}
 
 	protected double[] determineSummaryMinMax() {
@@ -603,4 +597,32 @@ public abstract class TrailRecord extends CommonRecord {
 		}
 	}
 
+	/**
+	 * @return all the decoded record values including nulls
+	 */
+	protected List<Double> getDecodedNotNullValues() {
+		List<Double> decodedValues = new ArrayList<>();
+
+		final Vector<Integer> record;
+		if (this.trailSelector.isTrailSuite()) {
+			record = this.suiteRecords.get(this.trailSelector.getTrailType().getSuiteMasterIndex());
+		} else {
+			record = this;
+		}
+
+		for (Integer value : record) { // loops without calling the overridden getter
+			if (value != null) decodedValues.add(HistoSet.decodeVaultValue(this, value / 1000.));
+		}
+		return decodedValues;
+	}
+
+	protected void defineQuantile() {
+		quantile = new UniversalQuantile<>(getDecodedNotNullValues(), true, //
+				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+	}
+
+	public UniversalQuantile<Double> getQuantile() {
+		if (quantile == null) defineQuantile();
+		return quantile;
+	}
 }

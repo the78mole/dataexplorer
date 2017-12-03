@@ -514,6 +514,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	/**
 	 * return the 'best fit' number of measurement points in dependency of zoomMode or scopeMode
 	 */
+	@SuppressWarnings("sync-override")
 	@Override
 	public abstract int size();
 

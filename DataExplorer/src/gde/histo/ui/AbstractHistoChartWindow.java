@@ -284,10 +284,12 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	 */
 	public void setCurveSelectorEnabled(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
-		if (enabled)
+		this.graphicsComposite.setCurveSelectorEnabled(enabled);
+		if (enabled) {
 			setSashFormWeights(this.curveSelectorComposite.getCompositeWidth());
-		else
+		} else {
 			setSashFormWeights(0);
+		}
 	}
 
 }

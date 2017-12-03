@@ -19,6 +19,11 @@
 ****************************************************************************************/
 package gde.histo.utils;
 
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.LOWER_WHISKER;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE1;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE2;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE3;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.UPPER_WHISKER;
 import static java.util.logging.Level.FINEST;
 
 import java.util.Arrays;
@@ -42,6 +47,7 @@ import gde.histo.recordings.TrailRecordSet;
 import gde.histo.utils.HistoTimeLine.Density;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 import gde.utils.GraphicsUtils;
 
 /**
@@ -76,20 +82,143 @@ public final class HistoCurveUtils {
 	}
 
 	/**
+	 * draw vertical grid lines according the vector defined during drawing of markers
+	 * @param recordSet
+	 * @param x0 defines the offset for the xGrid x positions
+	 * @param gc the graphics context to be used
+	 * @param bounds
+	 * @param dashLineStyle to be used for the custom line style
+	 */
+	public static void drawSummaryGrid(TrailRecordSet recordSet, int x0, List<Integer> xGrid, GC gc, Rectangle bounds, int[] dashLineStyle) {
+		gc.setLineWidth(1);
+		// gc.setLineDash(dashLineStyle);
+		gc.setLineStyle(SWT.LINE_DOT);
+		gc.setForeground(DataExplorer.COLOR_DARK_GREEN);
+		for (int x : xGrid) {
+			gc.drawLine(x, bounds.y, x, bounds.y + bounds.height);
+		}
+	}
+
+	/**
 	 * Draw the summary scale elements using given rectangle for display.
 	 * @param record
 	 * @param gc
 	 * @param stripY0 is the upper position of the drawing area strip
 	 * @param stripHeight is the height of the drawing area strip
-	 * @param scaleWidthSpace is the width of rhe left / right scale in pixels
-	 * @param decodedScaleMin is the value corresponding to the left border (xPos = 0)
+	 * @param scaleWidthSpace is the width of the left / right scale in pixels
+	 * @param decodedMinScale is the value corresponding to the left border (xPos = 0)
 	 * @param decodedMaxScale is the value corresponding to the right border (xPos = width)
-	 * @param isDrawScaleInRecordColor
+	 * @param isDrawNumbersInRecordColor
+	 */
+	public static void drawChannelItemBoxplot(TrailRecord record, GC gc, int stripY0, int stripHeight, int scaleWidthSpace, double decodedMinScale,
+			double decodedMaxScale, boolean isDrawNumbersInRecordColor, boolean isDrawNumbers) {
+		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
+
+		Rectangle drawAreaBounds = record.getParentTrail().getDrawAreaBounds();
+		int x0 = drawAreaBounds.x;
+		int width = drawAreaBounds.width;
+		log.finer(() -> record.getName() + "  x0=" + x0 + " y0=" + stripY0 + " width=" + width + " height=" + stripHeight + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+
+		double scaleFactor = width / (decodedMaxScale - decodedMinScale);
+		List<String> scaleTexts =  Arrays.asList(new String[] { record.getFormattedScaleValue(decodedMinScale), record.getFormattedScaleValue(decodedMaxScale) });
+
+		// prepare layout
+		gc.setLineWidth(2);
+		gc.setLineStyle(SWT.LINE_SOLID);
+		int yPos = stripY0 + stripHeight / 2;
+		Point pt = gc.textExtent("0");
+		int scaleXGap = pt.x; // free distance between two scale numbers
+		int scaleYGap = pt.y / 2 + 1; // free distance between the boxplot and the scale numbers
+		int scaleY0 = stripY0 + stripHeight + scaleYGap;
+
+		int halfStdBoxHeight = stripHeight / 2 - 3;
+		int scaledHalfBoxHeight = halfStdBoxHeight + Settings.getInstance().getBoxplotScaleOrdinal();
+
+		double[] tukeyBoxPlot = record.getQuantile().getTukeyBoxPlot();
+		int xPosQ1 = x0 + (int) ((tukeyBoxPlot[QUARTILE1.ordinal()] - decodedMinScale) * scaleFactor);
+		int xPosQ2 = x0 + (int) ((tukeyBoxPlot[QUARTILE2.ordinal()] - decodedMinScale) * scaleFactor);
+		int xPosQ3 = x0 + (int) ((tukeyBoxPlot[QUARTILE3.ordinal()] - decodedMinScale) * scaleFactor);
+		{
+			gc.setForeground(record.getColor());
+			int boxOffset = (stripHeight - scaledHalfBoxHeight * 2) / 2;
+			gc.drawLine(xPosQ2, yPos - scaledHalfBoxHeight, xPosQ2, yPos + scaledHalfBoxHeight);
+			gc.drawRectangle(xPosQ1, stripY0 + boxOffset, xPosQ3 - xPosQ1, scaledHalfBoxHeight * 2);
+		}
+		if (isDrawNumbers) {
+			gc.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE - 1, SWT.NORMAL));
+			Color color = isDrawNumbersInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK;
+			gc.setForeground(color);
+			Point ptQ1 = gc.textExtent("" + record.getFormattedScaleValue(tukeyBoxPlot[QUARTILE1.ordinal()]));
+			String q1Text = "" + record.getFormattedScaleValue(tukeyBoxPlot[QUARTILE1.ordinal()]);
+			if (!scaleTexts.contains(q1Text)) {
+			GraphicsUtils.drawTextCentered(q1Text, xPosQ1, scaleY0, gc, SWT.HORIZONTAL);}
+			Point ptQ3 = gc.textExtent("" + record.getFormattedScaleValue(tukeyBoxPlot[QUARTILE3.ordinal()]));
+			String q3Text = "" + record.getFormattedScaleValue(tukeyBoxPlot[QUARTILE3.ordinal()]);
+			if ((ptQ3.x + ptQ1.x) / 2 + scaleXGap < xPosQ3 - xPosQ1 && !scaleTexts.contains(q3Text)) {
+				GraphicsUtils.drawTextCentered(q3Text, xPosQ3, scaleY0, gc, SWT.HORIZONTAL);
+			}
+			Point ptQ2 = gc.textExtent("" + record.getFormattedScaleValue(tukeyBoxPlot[QUARTILE2.ordinal()]));
+			String q2Text = "" + record.getFormattedScaleValue(tukeyBoxPlot[QUARTILE2.ordinal()]);
+			if ((ptQ2.x + ptQ1.x) / 2 + scaleXGap < xPosQ2 - xPosQ1 //
+					&& (ptQ3.x + ptQ2.x) / 2 + scaleXGap < xPosQ3 - xPosQ2  && !scaleTexts.contains(q2Text)) {
+				GraphicsUtils.drawTextCentered(q2Text, xPosQ2, scaleY0, gc, SWT.HORIZONTAL);
+			}
+			gc.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		}
+
+		{
+			gc.setLineWidth(1);
+			gc.setForeground(record.getColor());
+			int xPosLowerWhisker = x0 + (int) ((tukeyBoxPlot[LOWER_WHISKER.ordinal()] - decodedMinScale) * scaleFactor);
+			int xPosUpperWhisker = x0 + (int) ((tukeyBoxPlot[UPPER_WHISKER.ordinal()] - decodedMinScale) * scaleFactor);
+			gc.drawLine(xPosLowerWhisker, yPos, xPosQ1, yPos);
+			gc.drawLine(xPosUpperWhisker, yPos, xPosQ3, yPos);
+
+			int scaledHalfAntennaHeight = scaledHalfBoxHeight / 2;
+			gc.drawLine(xPosLowerWhisker, yPos - scaledHalfAntennaHeight, xPosLowerWhisker, yPos + scaledHalfAntennaHeight);
+			gc.drawLine(xPosUpperWhisker, yPos - scaledHalfAntennaHeight, xPosUpperWhisker, yPos + scaledHalfAntennaHeight);
+			if (isDrawNumbers) {
+				gc.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE - 1, SWT.NORMAL));
+				Color color = isDrawNumbersInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK;
+				gc.setForeground(color);
+				{
+					Point ptQ1 = gc.textExtent("" + record.getFormattedScaleValue(tukeyBoxPlot[QUARTILE1.ordinal()]));
+					String lowerText = "" + record.getFormattedScaleValue(tukeyBoxPlot[LOWER_WHISKER.ordinal()]);
+					Point ptLower = gc.textExtent(lowerText);
+					if ((ptLower.x + ptQ1.x) / 2 + scaleXGap < xPosQ1 - xPosLowerWhisker && !scaleTexts.contains(lowerText)) {
+						GraphicsUtils.drawTextCentered(lowerText, xPosLowerWhisker, scaleY0, gc, SWT.HORIZONTAL);
+					}
+				}
+				{
+					Point ptQ3 = gc.textExtent("" + record.getFormattedScaleValue(tukeyBoxPlot[QUARTILE3.ordinal()]));
+					String upperText = "" + record.getFormattedScaleValue(tukeyBoxPlot[UPPER_WHISKER.ordinal()]);
+					Point ptUpper = gc.textExtent(upperText);
+					if ((ptUpper.x + ptQ3.x) / 2 + scaleXGap < xPosUpperWhisker - xPosQ3 && !scaleTexts.contains(upperText)) {
+						GraphicsUtils.drawTextCentered(upperText, xPosUpperWhisker, scaleY0, gc, SWT.HORIZONTAL);
+					}
+				}
+				gc.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+			}
+		}
+
+	}
+
+	/**
+	 * Draw the summary scale elements using given rectangle for display.
+	 * @param record
+	 * @param gc
+	 * @param stripY0 is the upper position of the drawing area strip
+	 * @param stripHeight is the height of the drawing area strip
+	 * @param scaleWidthSpace is the width of the left / right scale in pixels
+	 * @param decodedMinScale is the value corresponding to the left border (xPos = 0)
+	 * @param decodedMaxScale is the value corresponding to the right border (xPos = width)
+	 * @param isDrawName
 	 * @param isDrawNameInRecordColor
 	 * @param isDrawNumbersInRecordColor
 	 */
-	public static void drawChannelItemScale(TrailRecord record, GC gc, int stripY0, int stripHeight, int scaleWidthSpace, double decodedScaleMin,
-			double decodedMaxScale, boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
+	public static void drawChannelItemScale(TrailRecord record, GC gc, int stripY0, int stripHeight, int scaleWidthSpace, double decodedMinScale,
+			double decodedMaxScale, boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor,
+			boolean isDrawName) {
 		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
 
 		Rectangle drawAreaBounds = record.getParentTrail().getDrawAreaBounds();
@@ -110,18 +239,12 @@ public final class HistoCurveUtils {
 		int yPos = stripY0 + stripHeight / 2 - 1;
 
 		{
-			Color color = isDrawScaleInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK;
-			gc.setForeground(color);
-			gc.drawLine(x0, stripY0 + 1, x0, stripY0 + stripHeight);
-			gc.drawLine(xN, stripY0 + 1, xN, stripY0 + stripHeight);
-		}
-		{
 			Color color = isDrawNumbersInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK;
 			gc.setForeground(color);
-			GraphicsUtils.drawTextCentered(record.getFormattedScaleValue(decodedScaleMin), x0 - gap - scaleWidthSpace / 2, yPos, gc, SWT.HORIZONTAL);
+			GraphicsUtils.drawTextCentered(record.getFormattedScaleValue(decodedMinScale), x0 - gap - scaleWidthSpace / 2, yPos, gc, SWT.HORIZONTAL);
 			GraphicsUtils.drawTextCentered(record.getFormattedScaleValue(decodedMaxScale), xN + gap + scaleWidthSpace / 2, yPos, gc, SWT.HORIZONTAL);
 		}
-		{
+		if (isDrawName) {
 			Color color = isDrawNameInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK;
 			gc.setForeground(color);
 			GraphicsUtils.drawTextCentered(graphText, x0 + width / 2, yPos, gc, SWT.HORIZONTAL);
@@ -212,7 +335,6 @@ public final class HistoCurveUtils {
 		gc.setForeground(record.getColor());
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
-
 
 		// record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
 		record.setDisplayScaleFactorValue(height);

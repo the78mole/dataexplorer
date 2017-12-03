@@ -21,7 +21,6 @@ package gde.histo.recordings;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
-import static java.util.logging.Level.OFF;
 import static java.util.logging.Level.WARNING;
 
 import java.util.ArrayList;
@@ -80,7 +79,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Support initial collection and collections after user input (e.g. trail type selection).
 	 * @author Thomas Eickert (USER)
 	 */
-	public final class RecordingsCollector {
+	final class RecordingsCollector {
 		@SuppressWarnings("hiding")
 		private final Logger log = Logger.getLogger(RecordingsCollector.class.getName());
 
@@ -92,7 +91,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		 * Set time steps for the trail recordset and the data points for all trail records.
 		 * Every record takes the selected trail type / score data from the history vault and populates its data.
 		 */
-		public void addVaults() {
+		void addVaults() {
 			for (Map.Entry<Long, List<ExtendedVault>> entry : histoVaults.entrySet()) {
 				for (ExtendedVault histoVault : entry.getValue()) {
 					addVaultHeader(histoVault);
@@ -156,7 +155,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			TrailSelector trailSelector = trailRecord.getTrailSelector();
 			List<TrailTypes> suiteMembers = trailSelector.getTrailType().getSuiteMembers();
 
-			if (!trailSelector.getTrailType().isRangePlot()) {
+			if (trailSelector.getTrailType().isBoxPlot()) {
 				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
 				for (int i = 0; i < trailSelector.getTrailType().getSuiteMembers().size(); i++) {
 					suiteRecords.get(i).addElement(trailRecord.getVaultPoint(histoVault, suiteMembers.get(i)));
@@ -205,10 +204,9 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		 * Support asynchronous geocode fetches from the internet.
 		 */
 		void setGpsLocationsTags() {
-			String[] recordNames = getRecordNames();
 			// locate the GPS coordinates records
 			TrailRecord latitudeRecord = null, longitudeRecord = null;
-			for (String recordName : recordNames) { // todo fill HistoVault's DataType and access via DataType without hard coded measurement names
+			for (String recordName : getRecordNames()) { // todo fill HistoVault's DataType and access via DataType without hard coded measurement names
 				if (recordName.toLowerCase().contains("latitud")) //$NON-NLS-1$
 					latitudeRecord = get(recordName);
 				else if (recordName.toLowerCase().contains("longitud")) //$NON-NLS-1$
@@ -283,7 +281,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		 * @param record
 		 */
 		private void applyTemplateTrailData(TrailRecord record) {
-			HistoGraphicsTemplate template = record.getParentTrail().getTemplate();
 			TrailSelector trailSelector = record.getTrailSelector();
 			if (template != null && template.isAvailable()) {
 				String property = template.getProperty(record.getOrdinal() + TrailRecord.TRAIL_TEXT_ORDINAL);
@@ -525,51 +522,41 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	/**
-	 * Update referenced records to enable drawing of the summary graphics.
-	 * Set the sync vaults max/min values.
-	 * Update the scale values from sync record.</br>
-	 * Take all records but build sync information only for display records.
+	 * Update the display records to enable drawing of the summary graphics.
 	 * Needs not to check suite records because the summary max/min values comprise all suite members.
 	 */
-	public void updateSyncSummary() {
-		{ // reset hidden records
-			List<TrailRecord> hiddenRecords = new ArrayList<>(this.getValues());
-			hiddenRecords.removeAll(getDisplayRecords());
-			for (TrailRecord actualRecord : hiddenRecords) {
-				actualRecord.resetSyncSummaryMinMax();
-			}
-		}
+	public void updateAndSyncSummaryMinMax() {
 		for (TrailRecord actualRecord : getDisplayRecords()) {
-			actualRecord.setSyncSummaryMinMax();
-			log.finer(() -> actualRecord.getName() + "   syncMin = " + actualRecord.syncSummaryMin + "; syncMax = " + actualRecord.syncSummaryMax); //$NON-NLS-1$ //$NON-NLS-2$
+			actualRecord.setSummaryMinMax();
+			log.finer(() -> actualRecord.getName() + "   summaryMin = " + actualRecord.summaryMin + "; summaryMax = " + actualRecord.summaryMax); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
+		// update the min/max values for synced records
 		for (java.util.Map.Entry<Integer, Vector<TrailRecord>> syncRecordsEntry : this.getScaleSyncedRecords().entrySet()) {
-			if (syncRecordsEntry.getValue().size() <= 1) continue; // keep the sync summary min/max values
-
 			boolean isAffected = false;
 			double tmpMin = Double.MAX_VALUE;
 			double tmpMax = -Double.MAX_VALUE;
 			for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
-				if (syncRecord.syncSummaryMax != null && syncRecord.syncSummaryMin != null) {
+				if (syncRecord.summaryMin != null && syncRecord.summaryMax != null) {
 					isAffected = true;
-					tmpMin = Math.min(tmpMin, syncRecord.syncSummaryMin);
-					tmpMax = Math.max(tmpMax, syncRecord.syncSummaryMax);
+					tmpMin = Math.min(tmpMin, syncRecord.summaryMin);
+					tmpMax = Math.max(tmpMax, syncRecord.summaryMax);
 					if (log.isLoggable(FINER)) log.log(FINER, syncRecord.getName() + " tmpMin  = " + tmpMin + "; tmpMax  = " + tmpMax); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
+
 			// now we have the max/min values over all sync records of the current sync group
 			if (tmpMin == Double.MAX_VALUE || tmpMax == -Double.MAX_VALUE) {
 				for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
-					syncRecord.resetSyncSummaryMinMax();
+					syncRecord.resetSummaryMinMax();
 				}
 			} else {
 				for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
-					syncRecord.setSyncSummaryMinMax(tmpMin, tmpMax);
+					syncRecord.setSummaryMinMax(tmpMin, tmpMax);
 				}
 			}
-			if (isAffected && log.isLoggable(OFF)) {
-				log.log(OFF, this.get((int) syncRecordsEntry.getKey()).getSyncMasterName() + "; syncMin = " + tmpMin + "; syncMax = " + tmpMax); //$NON-NLS-1$ //$NON-NLS-2$
+			if (isAffected && log.isLoggable(FINER)) {
+				log.log(FINER, this.get((int) syncRecordsEntry.getKey()).getSyncMasterName() + "; syncMin = " + tmpMin + "; syncMax = " + tmpMax); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -645,21 +632,21 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @return all measurement records and settlement / score records based on display settings
 	 */
 	public TrailRecord[] getRecordsSortedForDisplay() {
-		Vector<TrailRecord> displayRecords = new Vector<>();
+		Vector<TrailRecord> resultRecords = new Vector<>();
 		// add the record with horizontal grid
 		for (TrailRecord record : this.getDisplayRecords()) {
-			if (record.getOrdinal() == this.getValueGridRecordOrdinal()) displayRecords.add(record);
+			if (record.getOrdinal() == this.getValueGridRecordOrdinal()) resultRecords.add(record);
 		}
 		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
 		for (TrailRecord record : this.getDisplayRecords()) {
-			if (record.getOrdinal() != this.getValueGridRecordOrdinal() && record.isScaleSyncMaster()) displayRecords.add(record);
+			if (record.getOrdinal() != this.getValueGridRecordOrdinal() && record.isScaleSyncMaster()) resultRecords.add(record);
 		}
 		// add all others
 		for (TrailRecord record : this.getDisplayRecords()) {
-			if (record.getOrdinal() != this.getValueGridRecordOrdinal() && !record.isScaleSyncMaster()) displayRecords.add(record);
+			if (record.getOrdinal() != this.getValueGridRecordOrdinal() && !record.isScaleSyncMaster()) resultRecords.add(record);
 		}
 
-		return displayRecords.toArray(new TrailRecord[displayRecords.size()]);
+		return resultRecords.toArray(new TrailRecord[resultRecords.size()]);
 	}
 
 	/**

@@ -81,7 +81,7 @@ public final class ScoregroupTrail extends TrailRecord {
 	@Override // reason is trail record suites with a master record without point values and minValue/maxValue != 0 in case of empty records
 	public boolean hasReasonableData() {
 		return this.size() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE //
-				&& (syncSummaryMin == null && syncSummaryMax == null || syncSummaryMin != syncSummaryMax);
+				&& (summaryMin == null && summaryMax == null || summaryMin != summaryMax);
 	}
 
 	@Override

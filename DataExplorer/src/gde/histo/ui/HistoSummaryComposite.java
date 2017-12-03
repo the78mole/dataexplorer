@@ -53,7 +53,6 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionFormatter;
@@ -450,15 +449,17 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		boolean isDrawNameInRecordColor = settings.isDrawNameInRecordColor();
 		boolean isDrawNumbersInRecordColor = settings.isDrawNumbersInRecordColor();
 
-		trailRecordSet.updateSyncSummary();
+		trailRecordSet.updateSyncRecordScale();
+		trailRecordSet.updateAndSyncSummaryMinMax();
 		SummarySpots summarySpots = new SummarySpots(trailRecordSet, fixedCanvasHeight);
-		boolean isPartialChart = settings.isPartialDataTable();
+
+		if (isCurveGridEnabled)
+			HistoCurveUtils.drawSummaryGrid(trailRecordSet, dataScaleWidth, summarySpots.get(0).defineGrid(), canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
 
 		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
 			if (record.isVisible()) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
 					record.getName(), record.isVisible(), record.isDisplayable(), record.isScaleSynced(), record.isScaleVisible()));
-
 			setRecordDisplayValues(record);
 
 			MarkerLine markerLine = summarySpots.get(record.getOrdinal());
@@ -467,13 +468,31 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 
 			int stripHeight = markerLine.getStripHeight();
 			int stripY0 = curveAreaBounds.y + stripHeight * i + 2;
-			if (record.isScaleVisible() || !isPartialChart) {
+			if (record.isVisible() || !settings.isPartialDataTable()) {
 				HistoCurveUtils.drawChannelItemScale(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
-						isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
-				markerLine.drawMarkers(canvasImageGC);
+						isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, !isCurveSelectorEnabled);
+
+				HistoCurveUtils.drawChannelItemBoxplot(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+						isDrawNumbersInRecordColor, isSpaceBelow(i));
+
+				markerLine.drawAllMarkers(canvasImageGC);
+				markerLine.drawRecentMarkers(canvasImageGC);
 				canvasImageGC.setBackground(this.surroundingBackground);
 			}
 		}
+	}
+
+	/**
+	 * @param displayOrdinal is the counter based on the record display sequence
+	 * @return true if there is no record drawn below the current record
+	 */
+	private boolean isSpaceBelow(int displayOrdinal) {
+		int nextOrdinal = displayOrdinal + 1;
+		if (nextOrdinal < trailRecordSet.getDisplayRecords().size()) {
+			TrailRecord nextRecord = trailRecordSet.getDisplayRecords().get(nextOrdinal);
+			return !nextRecord.isVisible() && settings.isPartialDataTable();
+		} else
+			return true;
 	}
 
 	@Override
@@ -554,6 +573,15 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		record.setMinMaxScaleValue(yMinValueDisplay, yMaxValueDisplay);
 		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
 		return numberTickMarks;
+	}
+
+	@Override
+	protected void setRecordSetCommentStandard() {
+		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		if (settings.isSmartStatistics())
+			this.recordSetComment.setText(this.application.getHistoSet().getDirectoryScanStatistics());
+		else
+			this.recordSetComment.setText("supported only for smart statistics");
 	}
 
 }
