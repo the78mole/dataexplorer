@@ -152,8 +152,8 @@ public final class VaultCollector {
 			entryPoints.setTrails(new HashMap<Integer, PointType>());
 			Map<TrailTypes, Integer> trailPoints = new HashMap<>();
 
-			if (!record.hasReasonableData()) {
-				log.fine(() -> String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLogFilePath())); //$NON-NLS-1$
+			if (record.isEmpty()) {
+				log.fine(() -> String.format("no data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLogFilePath())); //$NON-NLS-1$
 			} else {
 				StatisticsType measurementStatistics = measurementType.getStatistics();
 				if (measurementStatistics != null) { // this creates trail types mismatch : && record.hasReasonableData()) {
