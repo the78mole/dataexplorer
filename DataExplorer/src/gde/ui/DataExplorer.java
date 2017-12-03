@@ -98,7 +98,6 @@ import gde.device.IDevice;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.datasources.HistoSet;
 import gde.histo.datasources.HistoSet.RebuildStep;
-import gde.histo.recordings.RecordingsCollector;
 import gde.histo.recordings.TrailDataTags;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
@@ -2058,8 +2057,7 @@ public class DataExplorer extends Composite {
 	 * @param recordName specifies the record from the trail recordset to be updated
 	 */
 	public void updateHistoTabs(String recordName, boolean isWithUi) {
-		RecordingsCollector.addVaults(this.histoSet.getTrailRecordSet(), recordName);
-		this.histoSet.getTrailRecordSet().syncScaleOfSyncableRecords();
+		this.histoSet.getTrailRecordSet().refillRecordSet();
 		DataExplorer.this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, isWithUi);
 	}
 
