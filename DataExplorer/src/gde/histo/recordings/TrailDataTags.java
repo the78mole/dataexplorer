@@ -71,7 +71,10 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 
 	@Override
 	public void clear() {
-		super.clear();
+		// super.clear(); do not clear the list of valid tags
+		for (List<String> list : this.values()) {
+			list.clear();
+		}
 
 		this.activeDisplayTags = null;
 	}
