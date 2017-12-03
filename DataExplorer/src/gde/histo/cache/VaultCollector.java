@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import gde.config.Settings;
-import gde.data.AbstractRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.ChannelPropertyType;
@@ -60,39 +59,6 @@ import gde.ui.DataExplorer;
 public final class VaultCollector {
 	final private static String	$CLASS_NAME	= VaultCollector.class.getName();
 	final private static Logger	log					= Logger.getLogger($CLASS_NAME);
-
-	/**
-	 * Reverse translate a measured value into a normalized histo vault value.</br>
-	 * Data types might require a special normalization (e.g. GPS coordinates).
-	 * This is the equivalent of {@code device.reverseTranslateValue} for data dedicated to the histo vault.
-	 * It determines the represented value
-	 * from a calculated trail value (e.g. a calculated scale end value).
-	 * @return the normalized histo vault value (as a multiplied int for fractional digits support)
-	 */
-	public static double encodeVaultValue(AbstractRecord record, double value) {
-		final double newValue;
-		if (DataExplorer.getInstance().getActiveDevice().isGPSCoordinates(record)) {
-			newValue = value * 1000.;
-		} else {
-			switch (record.getDataType()) {
-			// lat and lon only required if isGPSCoordinates is not implemented
-			case GPS_LATITUDE:
-			case GPS_LONGITUDE:
-				newValue = value * 1000.;
-				break;
-
-			default:
-				double factor = record.getFactor(); // != 1 if a unit translation is required
-				double offset = record.getOffset(); // != 0 if a unit translation is required
-				double reduction = record.getReduction(); // != 0 if a unit translation is required
-
-				newValue = (value - offset) / factor + reduction;
-				break;
-			}
-		}
-		Logger.getLogger(IDevice.class.getName()).fine(() -> "for " + record.getName() + " in value = " + value + " out value = " + newValue);
-		return newValue;
-	}
 
 	private ExtendedVault				vault;
 
@@ -489,7 +455,7 @@ public final class VaultCollector {
 
 	private int encodeMeasurementValue(Record record, double value) {
 		// todo harmonize encodeVaultValue methods later
-		return (int) (encodeVaultValue(record, value) * 1000.);
+		return (int) (HistoSet.encodeVaultValue(record, value) * 1000.);
 	}
 
 	/**

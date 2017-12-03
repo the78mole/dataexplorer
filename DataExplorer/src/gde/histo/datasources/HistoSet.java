@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import gde.config.Settings;
+import gde.data.AbstractRecord;
 import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
@@ -50,7 +50,6 @@ import gde.ui.DataExplorer;
  */
 public final class HistoSet {
 	private final static String				$CLASS_NAME														= HistoSet.class.getName();
-	@SuppressWarnings("unused")
 	private final static Logger				log																		= Logger.getLogger($CLASS_NAME);
 
 	private static final DataExplorer	application														= DataExplorer.getInstance();
@@ -129,7 +128,6 @@ public final class HistoSet {
 	 * @return double of device dependent value
 	 */
 	public static double decodeVaultValue(TrailRecord record, double value) {
-		// todo move into TrailRecord if devices do not require any special logic
 		final double newValue;
 		if (application.getActiveDevice().isGPSCoordinates(record)) {
 			newValue = value / 1000.;
@@ -150,7 +148,63 @@ public final class HistoSet {
 				break;
 			}
 		}
-		Logger.getLogger(IDevice.class.getName()).fine(() -> "for " + record.getName() + " in value = " + value + " out value = " + newValue);
+		log.fine(() -> "for " + record.getName() + " in value = " + value + " out value = " + newValue);
+		return newValue;
+	}
+
+	/**
+	 * This is the equivalent of {@code device.translateValue} for data dedicated to the histo vault.
+	 * @return the translated value for a value which represents a difference
+	 */
+	public static double decodeDeltaValue(TrailRecord record, double value) {
+		double newValue = 0;
+		if (application.getActiveDevice().isGPSCoordinates(record)) {
+			newValue = value / 1000.0;
+		} else {
+			switch (record.getDataType()) {
+			// lat and lon only required if isGPSCoordinates is not implemented
+			case GPS_LATITUDE:
+			case GPS_LONGITUDE:
+				newValue = value / 1000.;
+				break;
+
+			default:
+				newValue = value * record.getFactor();
+			}
+		}
+		return newValue;
+	}
+
+	/**
+	 * Reverse translate a measured value into a normalized histo vault value.</br>
+	 * Data types might require a special normalization (e.g. GPS coordinates).
+	 * This is the equivalent of {@code device.reverseTranslateValue} for data dedicated to the histo vault.
+	 * It determines the represented value
+	 * from a calculated trail value (e.g. a calculated scale end value).
+	 * @return the normalized histo vault value (as a multiplied int for fractional digits support)
+	 */
+	public static double encodeVaultValue(AbstractRecord record, double value) {
+		final double newValue;
+		if (DataExplorer.getInstance().getActiveDevice().isGPSCoordinates(record)) {
+			newValue = value * 1000.;
+		} else {
+			switch (record.getDataType()) {
+			// lat and lon only required if isGPSCoordinates is not implemented
+			case GPS_LATITUDE:
+			case GPS_LONGITUDE:
+				newValue = value * 1000.;
+				break;
+
+			default:
+				double factor = record.getFactor(); // != 1 if a unit translation is required
+				double offset = record.getOffset(); // != 0 if a unit translation is required
+				double reduction = record.getReduction(); // != 0 if a unit translation is required
+
+				newValue = (value - offset) / factor + reduction;
+				break;
+			}
+		}
+		log.fine(() -> "for " + record.getName() + " in value = " + value + " out value = " + newValue);
 		return newValue;
 	}
 

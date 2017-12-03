@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import gde.GDE;
 import gde.data.AbstractRecord;
@@ -39,6 +41,7 @@ import gde.device.resource.DeviceXmlResource;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.HistoSet;
 import gde.histo.utils.Spot;
+import gde.histo.utils.UniversalQuantile;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 
@@ -71,6 +74,14 @@ public abstract class TrailRecord extends CommonRecord {
 	protected double									factor						= Double.MIN_VALUE;
 	protected double									offset						= Double.MIN_VALUE;
 	protected double									reduction					= Double.MIN_VALUE;
+	/**
+	 * The real maximum values of all vaults added to this record.
+	 */
+	protected final List<Integer> vaultMaximums = new ArrayList<>();
+	/**
+	 * The real minimum values of all vaults added to this record.
+	 */
+	protected final List<Integer> vaultMinimums = new ArrayList<>();
 
 	protected TrailRecord(IChannelItem channelItem, int newOrdinal, TrailRecordSet parentTrail, int initialCapacity) {
 		super(DataExplorer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
@@ -124,6 +135,8 @@ public abstract class TrailRecord extends CommonRecord {
 	@Override
 	public void clear() {
 		this.suiteRecords.clear();
+		this.vaultMaximums.clear();
+		this.vaultMinimums.clear();
 		super.clear();
 	}
 
@@ -525,7 +538,13 @@ public abstract class TrailRecord extends CommonRecord {
 	/**
 	 * Measurements and setlements have min/max points; scores have one single scoregroup member point.
 	 */
-	public abstract void addSummaryPoints(ExtendedVault histoVault);
+	public void addSummaryPoints(ExtendedVault histoVault) {
+		Integer point = getVaultPoint(histoVault, TrailTypes.MAX);
+		if (point != null) {
+			this.vaultMaximums.add(point);
+			this.vaultMinimums.add(getVaultPoint(histoVault, TrailTypes.MIN));
+		}
+	}
 
 	public Double getSyncSummaryMax() {
 		return this.syncSummaryMax;
@@ -557,6 +576,31 @@ public abstract class TrailRecord extends CommonRecord {
 		this.syncSummaryMin = this.syncSummaryMax = null;
 	}
 
-	protected abstract double[] determineSummaryMinMax();
+	protected double[] determineSummaryMinMax() {
+		if (vaultMaximums.isEmpty() || vaultMinimums.isEmpty()) return new double[0];
+
+		TrailTypes trailType = getTrailSelector().getTrailType();
+		if (trailType.isAlienValue()) {
+			Stream<Integer> decodedVaultValues = getParentTrail().getHistoVaults().values().parallelStream().flatMap(l -> l.stream()).map(v -> getVaultPoint(v, trailType));
+			List<Double> decodedValues = decodedVaultValues.map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+			UniversalQuantile<Double> quantile = new UniversalQuantile<>(decodedValues, true, //
+					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+
+			double[] result = new double[] { quantile.getQuartile0(), quantile.getQuartile4() };
+			log.finest(() -> getName() + " " + Arrays.toString(result) + "  outlier size=" + quantile.getOutliers().size());
+			return result;
+		} else {
+			List<Double> decodedMaximums = vaultMaximums.parallelStream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+			List<Double> decodedMinimums = vaultMinimums.parallelStream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+			UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true, //
+					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+			UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true, //
+					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+
+			double[] result = new double[] { minQuantile.getQuartile0(), maxQuantile.getQuartile4() };
+			log.finest(() -> getName() + " " + Arrays.toString(result) + "  max outlier size=" + maxQuantile.getOutliers().size() + "  min outlier size=" + minQuantile.getOutliers().size());
+			return result;
+		}
+	}
 
 }

@@ -19,17 +19,9 @@
 
 package gde.histo.recordings;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import gde.device.MeasurementType;
 import gde.device.TrailTypes;
 import gde.histo.cache.ExtendedVault;
-import gde.histo.datasources.HistoSet;
-import gde.histo.utils.UniversalQuantile;
 import gde.log.Logger;
 
 /**
@@ -40,15 +32,6 @@ public final class MeasurementTrail extends TrailRecord {
 	private final static String		$CLASS_NAME				= MeasurementTrail.class.getName();
 	private final static long			serialVersionUID	= 110124007964748556L;
 	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
-
-	/**
-	 * The real maximum values of all vaults added to this record.
-	 */
-	protected final List<Integer>	vaultMaximums			= new ArrayList<>();
-	/**
-	 * The real minimum values of all vaults added to this record.
-	 */
-	protected final List<Integer>	vaultMinimums			= new ArrayList<>();
 
 	/**
 	 * @param newOrdinal
@@ -82,50 +65,6 @@ public final class MeasurementTrail extends TrailRecord {
 	@Override
 	public Integer getVaultPoint(ExtendedVault vault, TrailTypes trailType) {
 		return vault.getMeasurementPoint(this.getOrdinal(), trailType.ordinal());
-	}
-
-	@Override
-	public void addSummaryPoints(ExtendedVault histoVault) {
-		Integer point = getVaultPoint(histoVault, TrailTypes.MAX);
-		if (point != null) {
-			this.vaultMaximums.add(point);
-			this.vaultMinimums.add(getVaultPoint(histoVault, TrailTypes.MIN));
-		}
-	}
-
-	@Override
-	public void clear() {
-		this.vaultMaximums.clear();
-		this.vaultMinimums.clear();
-		super.clear();
-	}
-
-	@Override
-	protected double[] determineSummaryMinMax() {
-		if (vaultMaximums.isEmpty() || vaultMinimums.isEmpty()) return new double[0];
-
-		TrailTypes trailType = getTrailSelector().getTrailType();
-		if (trailType.isAlienValue()) {
-			Stream<Integer> decodedVaultValues = getParentTrail().getHistoVaults().values().parallelStream().flatMap(l -> l.stream()).map(v -> getVaultPoint(v, trailType));
-			List<Double> decodedValues = decodedVaultValues.map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
-			UniversalQuantile<Double> quantile = new UniversalQuantile<>(decodedValues, true, //
-					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
-
-			double[] result = new double[] { quantile.getQuartile0(), quantile.getQuartile4() };
-			log.finest(() -> getName() + " " + Arrays.toString(result) + "  outlier size=" + quantile.getOutliers().size());
-			return result;
-		} else {
-			List<Double> decodedMaximums = vaultMaximums.parallelStream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
-			List<Double> decodedMinimums = vaultMinimums.parallelStream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
-			UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true, //
-					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
-			UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true, //
-					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
-
-			double[] result = new double[] { minQuantile.getQuartile0(), maxQuantile.getQuartile4() };
-			log.finest(() -> getName() + " " + Arrays.toString(result) + "  max outlier size=" + maxQuantile.getOutliers().size() + "  min outlier size=" + minQuantile.getOutliers().size());
-			return result;
-		}
 	}
 
 }

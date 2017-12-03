@@ -68,12 +68,12 @@ import gde.ui.SWTResourceManager;
  */
 public final class TrailRecordSet extends AbstractRecordSet {
 	@SuppressWarnings("hiding")
-	private static final String												$CLASS_NAME					= TrailRecordSet.class.getName();
-	private static final long													serialVersionUID		= -1580283867987273535L;
+	private static final String	$CLASS_NAME					= TrailRecordSet.class.getName();
+	private static final long		serialVersionUID		= -1580283867987273535L;
 	@SuppressWarnings("hiding")
-	private static final Logger												log									= Logger.getLogger($CLASS_NAME);
+	private static final Logger	log									= Logger.getLogger($CLASS_NAME);
 
-	public static final String												BASE_NAME_SEPARATOR	= " | ";
+	public static final String	BASE_NAME_SEPARATOR	= " | ";
 
 	/**
 	 * Collect input data for the trail recordset and subordinate objects.
@@ -81,9 +81,12 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @author Thomas Eickert (USER)
 	 */
 	public final class RecordingsCollector {
-		private final  Logger				log					= Logger.getLogger(RecordingsCollector.class.getName());
+		@SuppressWarnings("hiding")
+		private final Logger log = Logger.getLogger(RecordingsCollector.class.getName());
 
-		private final  DataExplorer	application	= DataExplorer.getInstance();
+		RecordingsCollector() {
+			super();
+		}
 
 		/**
 		 * Set time steps for the trail recordset and the data points for all trail records.
@@ -97,7 +100,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			}
 
 			for (String recordName : getRecordNames()) {
-				addVaults( recordName);
+				addVaults(recordName);
 			}
 		}
 
@@ -311,8 +314,8 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 */
 	private final HistoGraphicsTemplate								template;
 
-	private final List<Integer>												durations_mm				= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
-	private final TrailDataTags												dataTags						= new TrailDataTags();
+	private final List<Integer>												durations_mm	= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
+	private final TrailDataTags												dataTags			= new TrailDataTags();
 
 	/**
 	 * Data source for this recordset.
@@ -442,7 +445,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	/**
 	 * Build data contents after building the records list.
 	 */
-	public  synchronized void initializeFromVaults() {
+	public synchronized void initializeFromVaults() {
 		// setting all data in this create procedure and the synchronized keyword makes this method thread safe
 		RecordingsCollector collector = new RecordingsCollector();
 		collector.defineTrailTypes();

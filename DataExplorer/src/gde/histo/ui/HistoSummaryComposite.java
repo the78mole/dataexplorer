@@ -509,8 +509,8 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		if (record.isStartEndDefined()) {
 			yMinValueDisplay = record.getMinScaleValue();
 			yMaxValueDisplay = record.getMaxScaleValue();
-			yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
-			yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
+			yMinValue = HistoSet.encodeVaultValue(record, yMinValueDisplay);
+			yMaxValue = HistoSet.encodeVaultValue(record, yMaxValueDisplay);
 			if (log.isLoggable(FINE)) log.log(FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 			if (log.isLoggable(FINE)) log.log(FINE, "defined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
@@ -532,8 +532,8 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 				yMaxValueDisplay = (Double) roundResult[1];
 				numberTickMarks[0] = (Integer) roundResult[2];
 				numberTickMarks[1] = (Integer) roundResult[3];
-				yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
-				yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
+				yMinValue = HistoSet.encodeVaultValue(record, yMinValueDisplay);
+				yMaxValue = HistoSet.encodeVaultValue(record, yMaxValueDisplay);
 				if (log.isLoggable(FINE)) log.log(FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
 				if (log.isLoggable(FINE)) log.log(FINE, "rounded -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -541,10 +541,10 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 				// check if the main part of the curve is on positive side
 				if (record.getAvgValue() > 0) { // main part of curve is on positive side
 					yMinValueDisplay = 0;
-					yMinValue = VaultCollector.encodeVaultValue(record, yMinValueDisplay);
+					yMinValue = HistoSet.encodeVaultValue(record, yMinValueDisplay);
 				} else {// main part of curve is on negative side
 					yMaxValueDisplay = 0;
-					yMaxValue = VaultCollector.encodeVaultValue(record, yMaxValueDisplay);
+					yMaxValue = HistoSet.encodeVaultValue(record, yMaxValueDisplay);
 				}
 				if (log.isLoggable(FINE)) log.log(FINE, "scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 				if (log.isLoggable(FINE))

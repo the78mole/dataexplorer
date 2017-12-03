@@ -24,7 +24,6 @@ import static java.util.logging.Level.FINE;
 import gde.GDE;
 import gde.device.FigureTypes;
 import gde.device.TransitionFigureType;
-import gde.histo.recordings.RecordingsCollector;
 import gde.histo.transitions.Transition;
 import gde.log.Logger;
 
@@ -33,7 +32,7 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public final class FigureEvaluator {
-	private final static String			$CLASS_NAME	= RecordingsCollector.class.getName();
+	private final static String			$CLASS_NAME	= FigureEvaluator.class.getName();
 	private final static Logger			log					= Logger.getLogger($CLASS_NAME);
 
 	private final SettlementRecord	histoSettlement;

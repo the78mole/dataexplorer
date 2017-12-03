@@ -26,7 +26,6 @@ import gde.data.Record;
 import gde.device.AmountTypes;
 import gde.device.IDevice;
 import gde.device.TransitionAmountType;
-import gde.histo.recordings.RecordingsCollector;
 import gde.histo.transitions.Transition;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -36,7 +35,7 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert (USER)
  */
 public final class AmountEvaluator {
-	private final static String			$CLASS_NAME	= RecordingsCollector.class.getName();
+	private final static String			$CLASS_NAME	= AmountEvaluator.class.getName();
 	private final static Logger			log					= Logger.getLogger($CLASS_NAME);
 
 	private final SettlementRecord	histoSettlement;

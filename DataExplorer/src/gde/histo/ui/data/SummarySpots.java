@@ -32,7 +32,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 
 import gde.config.Settings;
-import gde.histo.cache.VaultCollector;
+import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.data.SummarySpots.MarkerLine;
@@ -155,6 +155,7 @@ public class SummarySpots extends HashMap<Integer, MarkerLine> {
 		}
 
 		public double defineDecodedScaleMin() { // todo consider caching
+			log.finer(()-> "'" + this.record.getName() + "'  syncSummaryMin=" + record.getSyncSummaryMin() + " syncSummaryMax=" + record.getSyncSummaryMax());
 			return MathUtils.floorStepwise(record.getSyncSummaryMin(), record.getSyncSummaryMax() - record.getSyncSummaryMin());
 		}
 
@@ -163,7 +164,7 @@ public class SummarySpots extends HashMap<Integer, MarkerLine> {
 		}
 
 		private int definePointOffset() {
-			return (int) (VaultCollector.encodeVaultValue(record, defineDecodedScaleMin()) * 1000.);
+			return (int) (HistoSet.encodeVaultValue(record, defineDecodedScaleMin()) * 1000.);
 		}
 
 		private double defineScaleFactor() {

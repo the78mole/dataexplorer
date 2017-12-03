@@ -37,7 +37,6 @@ import gde.device.IDevice;
 import gde.device.LevelingTypes;
 import gde.device.TransitionCalculusType;
 import gde.histo.datasources.HistoSet;
-import gde.histo.recordings.RecordingsCollector;
 import gde.histo.transitions.Transition;
 import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
@@ -50,7 +49,7 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert (USER)
  */
 public final class CalculusEvaluator {
-	private final static String	$CLASS_NAME	= RecordingsCollector.class.getName();
+	private final static String	$CLASS_NAME	= CalculusEvaluator.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	/**

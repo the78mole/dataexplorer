@@ -19,10 +19,11 @@
 
 package gde.histo.recordings;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import gde.device.ScoreGroupType;
 import gde.device.TrailTypes;
@@ -39,11 +40,6 @@ public final class ScoregroupTrail extends TrailRecord {
 	private final static String		$CLASS_NAME				= ScoregroupTrail.class.getName();
 	private final static long			serialVersionUID	= 110124007964748556L;
 	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
-
-	/**
-	 * The score values of all vaults added to this record.
-	 */
-	protected final List<Integer>	vaultValues				= new ArrayList<>();
 
 	/**
 	 * @param newOrdinal
@@ -79,31 +75,37 @@ public final class ScoregroupTrail extends TrailRecord {
 		return vault.getScorePoint(trailType.ordinal());
 	}
 
-	@Override
-	protected double[] determineSummaryMinMax() {
-		if (vaultValues.isEmpty()) return new double[0];
-
-		// both lists hold identical values because there are no max/min values but only one value per vault
-		List<Double> decodedValues = vaultValues.stream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
-
-		UniversalQuantile<Double> quantile = new UniversalQuantile<>(decodedValues, true, //
-				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
-
-		double[] result = new double[] { quantile.getQuartile0(), quantile.getQuartile4() };
-		log.finest(() -> getName() + " " + Arrays.toString(result));
-		return result;
+	/**
+	 * @return true if the record or the suite contains reasonable data which can be displayed
+	 */
+	@Override // reason is trail record suites with a master record without point values and minValue/maxValue != 0 in case of empty records
+	public boolean hasReasonableData() {
+		return this.size() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE //
+				&& (syncSummaryMin == null && syncSummaryMax == null || syncSummaryMin != syncSummaryMax);
 	}
 
 	@Override
 	public void addSummaryPoints(ExtendedVault histoVault) {
-		Integer point = getVaultPoint(histoVault, this.getTrailSelector().getTrailType());
-		if (point != null) this.vaultValues.add(point);
+		Stream<TrailTypes> trailTypeStream = getScoregroup().getScore().stream().map(s -> TrailTypes.fromOrdinal(s.getLabel().ordinal()));
+		IntSummaryStatistics stats = trailTypeStream.map(t -> getVaultPoint(histoVault, t)).collect(Collectors.summarizingInt(Integer::intValue));
+		this.vaultMaximums.add(stats.getMax());
+		this.vaultMinimums.add(stats.getMin());
 	}
 
 	@Override
-	public void clear() {
-		this.vaultValues.clear();
-		super.clear();
+	protected double[] determineSummaryMinMax() {
+		if (vaultMaximums.isEmpty() || vaultMinimums.isEmpty()) return new double[0];
+
+		List<Double> decodedMaximums = vaultMaximums.parallelStream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+		List<Double> decodedMinimums = vaultMinimums.parallelStream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+		UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true, //
+				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+		UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true, //
+				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+
+		double[] result = new double[] { minQuantile.getQuartile0(), maxQuantile.getQuartile4() };
+		log.finest(() -> getName() + " " + Arrays.toString(result));
+		return result;
 	}
 
 }
