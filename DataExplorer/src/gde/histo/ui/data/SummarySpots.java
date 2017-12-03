@@ -125,7 +125,7 @@ public class SummarySpots extends HashMap<Integer, MarkerLine> {
 			double scaleFactor = defineScaleFactor();
 			double xOffset = pointOffset * scaleFactor + .5;
 
-			for (int i = 0; i < record.size(); i++) {
+			for (int i = 0; i < record.realSize(); i++) {
 				Integer point = record.get(i);
 				if (point != null) {
 					int xPos = (int) (point * scaleFactor - xOffset);

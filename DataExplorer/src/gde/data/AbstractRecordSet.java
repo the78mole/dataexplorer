@@ -513,7 +513,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * @return the maximum time of this record set, which should correspondence to the last entry in timeSteps
 	 */
 	public double getMaxTime_ms() {
-		return this.timeStep_ms == null ? 0.0 : this.timeStep_ms.isConstant ? this.timeStep_ms.getMaxTime_ms() * (this.get(0).realSize() - 1)
+		return this.timeStep_ms == null ? 0.0 : this.timeStep_ms.isConstant ? this.timeStep_ms.getMaxTime_ms() * (this.get(0).size() - 1)
 				: this.timeStep_ms.getMaxTime_ms();
 	}
 

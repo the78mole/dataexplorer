@@ -331,7 +331,7 @@ public abstract class CommonRecord extends AbstractRecord {
 			sb.append(GDE.STRING_DOT);
 			String trailer = GDE.STRING_STAR;
 			for (AbstractRecord tmpRecord : syncedRecords.get(this.ordinal)) {
-				if (tmpRecord.isDisplayable() && tmpRecord.realSize() > 1) trailer = tmpRecord.getName();
+				if (tmpRecord.isDisplayable() && tmpRecord.size() > 1) trailer = tmpRecord.getName();
 			}
 			sb.append(trailer.split(GDE.STRING_BLANK).length > 1 ? trailer.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
 		} else {
@@ -521,7 +521,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	 * time calculation needs always the real size of the record
 	 * @return real vector size
 	 */
-	@Override
 	public int realSize() {
 		return super.size();
 	}

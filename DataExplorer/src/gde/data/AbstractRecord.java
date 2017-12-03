@@ -62,8 +62,6 @@ public abstract class AbstractRecord extends Vector<Integer> implements IRecord 
 
 	public abstract void setVisible(boolean enabled);
 
-	public abstract int realSize();
-
 	public abstract boolean isPositionLeft();
 
 	public abstract void setPositionLeft(boolean enabled);

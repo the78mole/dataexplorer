@@ -213,9 +213,6 @@ public final class HistoCurveUtils {
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
 
-		// get the number of data points size to be drawn
-		int displayableSize = record.realSize();
-		log.fine(() -> "displayableSize = " + displayableSize); //$NON-NLS-1$
 
 		// record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
 		record.setDisplayScaleFactorValue(height);
@@ -226,6 +223,8 @@ public final class HistoCurveUtils {
 		Point[] points = new HistoGraphicsMapper(record).getDisplayPoints(timeLine);
 
 		Point newPoint, oldPoint = null;
+		int displayableSize = record.size();
+		log.fine(() -> "displayableSize = " + displayableSize); //$NON-NLS-1$
 		for (int j = 0; j < points.length && j <= displayableSize && displayableSize >= 1; j++) {
 			if ((newPoint = points[j]) != null) { // in case of a suite the master triggers the display of all trails
 				drawHistoMarker(gc, newPoint, timeLine.getDensity());
@@ -259,10 +258,6 @@ public final class HistoCurveUtils {
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
 
-		// get the number of data points size to be drawn
-		int displayableSize = record.realSize();
-		log.fine(() -> "displayableSize = " + displayableSize); //$NON-NLS-1$
-
 		// record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
 		record.setDisplayScaleFactorValue(height);
 
@@ -272,6 +267,8 @@ public final class HistoCurveUtils {
 		Point[] points = new HistoGraphicsMapper(record).getDisplayPoints(timeLine);
 
 		Point newPoint, oldPoint = null;
+		int displayableSize = record.size();
+		log.fine(() -> "displayableSize = " + displayableSize); //$NON-NLS-1$
 		for (int j = 0; j < points.length && j <= displayableSize && displayableSize >= 1; j++) {
 			if ((newPoint = points[j]) != null) { // in case of a suite the master triggers the display of all trails
 				drawHistoMarker(gc, newPoint, timeLine.getDensity());

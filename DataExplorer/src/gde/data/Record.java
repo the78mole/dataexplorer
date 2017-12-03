@@ -1052,7 +1052,6 @@ public class Record extends AbstractRecord {
 	 * time calculation needs always the real size of the record
 	 * @return real vector size
 	 */
-	@Override
 	public int realSize() {
 		return super.size();
 	}

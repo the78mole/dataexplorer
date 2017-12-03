@@ -141,19 +141,19 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	/**
-	 * @return the point size of a single curve or a suite (calls realSize())
-	 */
-	@Override
-	public synchronized int size() {
-		return realSize();
-	}
-
-	/**
 	 * @return the point size of a single curve or a suite
 	 */
 	@Override
-	public int realSize() {
+	public synchronized int size() {
 		return this.trailSelector.isTrailSuite() ? this.suiteRecords.realSize() : super.realSize();
+	}
+
+	/**
+	 * @return the point size of a single curve or a suite element (calls realSize())
+	 */
+	@Override
+	public int realSize() {
+		return super.realSize();
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
@@ -251,7 +251,7 @@ public abstract class TrailRecord extends CommonRecord {
 	public boolean hasReasonableData() {
 		boolean hasReasonableData = false;
 		if (this.suiteRecords.getSuiteLength() == 0) {
-			hasReasonableData = this.realSize() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE //
+			hasReasonableData = this.size() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE //
 					&& (this.minValue != this.maxValue || HistoSet.decodeVaultValue(this, this.maxValue / 1000.0) != 0.0);
 		} else {
 			for (SuiteRecord suiteRecord : this.suiteRecords.values()) {
@@ -270,7 +270,7 @@ public abstract class TrailRecord extends CommonRecord {
 	 */
 	@Override // reason is size for suite records
 	public boolean isActive() {
-		return this.isActive == null || this.realSize() == 0 ? false : this.isActive;
+		return this.isActive == null || this.size() == 0 ? false : this.isActive;
 	}
 
 	/**

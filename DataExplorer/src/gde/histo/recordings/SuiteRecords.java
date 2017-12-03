@@ -30,7 +30,7 @@ import gde.device.TrailTypes;
  * @author Thomas Eickert
  */
 public final class SuiteRecords extends HashMap<Integer, SuiteRecord> {
-	private static final long		serialVersionUID	= -5963216308453730035L;
+	private static final long serialVersionUID = -5963216308453730035L;
 
 	public SuiteRecords() {
 	}
@@ -43,6 +43,12 @@ public final class SuiteRecords extends HashMap<Integer, SuiteRecord> {
 		return this.values().parallelStream().mapToInt(s -> s.getMinRecordValue()).min().orElseThrow(() -> new UnsupportedOperationException());
 	}
 
+	@Deprecated
+	@Override // reason is potential mix-up of suite size with the record point size of suite records
+	public int size() {
+		throw new UnsupportedOperationException();
+	}
+
 	public int realSize() {
 		int result = 0;
 		for (SuiteRecord suiteRecord : this.values()) {
@@ -53,7 +59,7 @@ public final class SuiteRecords extends HashMap<Integer, SuiteRecord> {
 	}
 
 	public int getSuiteLength() {
-		return this.size();
+		return super.size();
 	}
 
 	/**
@@ -73,4 +79,5 @@ public final class SuiteRecords extends HashMap<Integer, SuiteRecord> {
 	public boolean isNullValue(TrailTypes trailType, int index) {
 		return getSuiteValue(trailType.getSuiteMasterIndex(), index) == null;
 	}
+
 }
