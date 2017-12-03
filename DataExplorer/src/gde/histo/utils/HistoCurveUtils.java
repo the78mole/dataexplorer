@@ -66,10 +66,10 @@ public final class HistoCurveUtils {
 		gc.setLineWidth(1);
 		gc.setLineDash(dashLineStyle);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
-		gc.setForeground(recordSet.getHorizontalGridColor());
+		gc.setForeground(recordSet.getValueGridColor());
 
-		Vector<Integer> horizontalGridVector = recordSet.getHorizontalGrid();
-		for (int i = 0; i < horizontalGridVector.size(); i += recordSet.getHorizontalGridType()) {
+		Vector<Integer> horizontalGridVector = recordSet.getValueGrid();
+		for (int i = 0; i < horizontalGridVector.size(); i += recordSet.getValueGridType()) {
 			int y = horizontalGridVector.get(i);
 			if (y > bounds.y && y < (bounds.y + bounds.height)) gc.drawLine(bounds.x, y, bounds.x + bounds.width, y);
 		}

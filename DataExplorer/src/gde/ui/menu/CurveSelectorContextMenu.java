@@ -58,7 +58,7 @@ public class CurveSelectorContextMenu {
 	final static Logger	log										= Logger.getLogger(CurveSelectorContextMenu.class.getName());
 
 	Menu								menu;
-	Menu								lineWidthMenu, lineTypeMenu, axisEndValuesMenu, axisNumberFormatMenu, axisPositionMenu, timeGridMenu, horizontalGridMenu, measurementMenu;
+	Menu								lineWidthMenu, lineTypeMenu, axisEndValuesMenu, axisNumberFormatMenu, axisPositionMenu, timeGridMenu, valueGridMenu, measurementMenu;
 	MenuItem						recordName, lineVisible, lineColor, copyCurveCompare, cleanCurveCompare;
 	MenuItem						lineWidth, lineWidthMenuItem1, lineWidthMenuItem2, lineWidthMenuItem3;
 	MenuItem						lineType, lineTypeMenuItem1, lineTypeMenuItem2, lineTypeMenuItem3, smoothAtCurrentDropItem, smoothVoltageCurveItem;
@@ -67,7 +67,7 @@ public class CurveSelectorContextMenu {
 	MenuItem						axisPosition, axisPositionLeft, axisPositionRight;
 	MenuItem						measurement, measurementRecordName, simpleMeasure, deltaMeasure;
 	MenuItem						timeGridColor, timeGrid, timeGridOff, timeGridMain, timeGridMod60;
-	MenuItem						horizontalGridRecordName, horizontalGridColor, horizontalGrid, horizontalGridOff, horizontalGridEveryTick, horizontalGridEverySecond;
+	MenuItem						valueGridRecordName, valueGridColor, valueGrid, valueGridOff, valueGridEveryTick, valueGridEverySecond;
 
 	AbstractRecordSet		recordSet;
 	final DataExplorer	application;
@@ -916,34 +916,34 @@ public class CurveSelectorContextMenu {
 			//				}
 			//			});
 
-			this.horizontalGrid = new MenuItem(popupmenu, SWT.CASCADE);
-			this.horizontalGrid.setText(Messages.getString(MessageIds.GDE_MSGT0100));
-			this.horizontalGridMenu = new Menu(this.horizontalGrid);
-			this.horizontalGrid.setMenu(this.horizontalGridMenu);
-			this.horizontalGridMenu.addMenuListener(new MenuListener() {
+			this.valueGrid = new MenuItem(popupmenu, SWT.CASCADE);
+			this.valueGrid.setText(Messages.getString(MessageIds.GDE_MSGT0100));
+			this.valueGridMenu = new Menu(this.valueGrid);
+			this.valueGrid.setMenu(this.valueGridMenu);
+			this.valueGridMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuShown(MenuEvent evt) {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						CurveSelectorContextMenu.this.horizontalGridRecordName
-								.setText(Messages.getString(MessageIds.GDE_MSGT0118) + CurveSelectorContextMenu.this.recordSet.get(CurveSelectorContextMenu.this.recordSet.getHorizontalGridRecordOrdinal()).getName());
-						int gridType = CurveSelectorContextMenu.this.recordSet.getHorizontalGridType();
+						CurveSelectorContextMenu.this.valueGridRecordName
+								.setText(Messages.getString(MessageIds.GDE_MSGT0118) + CurveSelectorContextMenu.this.recordSet.get(CurveSelectorContextMenu.this.recordSet.getValueGridRecordOrdinal()).getName());
+						int gridType = CurveSelectorContextMenu.this.recordSet.getValueGridType();
 						switch (gridType) {
-						case RecordSet.HORIZONTAL_GRID_EVERY:
-							CurveSelectorContextMenu.this.horizontalGridOff.setSelection(false);
-							CurveSelectorContextMenu.this.horizontalGridEveryTick.setSelection(true);
-							CurveSelectorContextMenu.this.horizontalGridEverySecond.setSelection(false);
+						case RecordSet.VALUE_GRID_EVERY:
+							CurveSelectorContextMenu.this.valueGridOff.setSelection(false);
+							CurveSelectorContextMenu.this.valueGridEveryTick.setSelection(true);
+							CurveSelectorContextMenu.this.valueGridEverySecond.setSelection(false);
 							break;
-						case RecordSet.HORIZONTAL_GRID_SECOND:
-							CurveSelectorContextMenu.this.horizontalGridOff.setSelection(false);
-							CurveSelectorContextMenu.this.horizontalGridEveryTick.setSelection(false);
-							CurveSelectorContextMenu.this.horizontalGridEverySecond.setSelection(true);
+						case RecordSet.VALUE_GRID_SECOND:
+							CurveSelectorContextMenu.this.valueGridOff.setSelection(false);
+							CurveSelectorContextMenu.this.valueGridEveryTick.setSelection(false);
+							CurveSelectorContextMenu.this.valueGridEverySecond.setSelection(true);
 							break;
-						case RecordSet.HORIZONTAL_GRID_NONE:
+						case RecordSet.VALUE_GRID_NONE:
 						default:
-							CurveSelectorContextMenu.this.horizontalGridOff.setSelection(true);
-							CurveSelectorContextMenu.this.horizontalGridEveryTick.setSelection(false);
-							CurveSelectorContextMenu.this.horizontalGridEverySecond.setSelection(false);
+							CurveSelectorContextMenu.this.valueGridOff.setSelection(true);
+							CurveSelectorContextMenu.this.valueGridEveryTick.setSelection(false);
+							CurveSelectorContextMenu.this.valueGridEverySecond.setSelection(false);
 							break;
 						}
 					}
@@ -955,81 +955,81 @@ public class CurveSelectorContextMenu {
 				}
 			});
 
-			this.horizontalGridRecordName = new MenuItem(this.horizontalGridMenu, SWT.NONE);
+			this.valueGridRecordName = new MenuItem(this.valueGridMenu, SWT.NONE);
 
-			new MenuItem(this.horizontalGridMenu, SWT.SEPARATOR);
+			new MenuItem(this.valueGridMenu, SWT.SEPARATOR);
 
-			this.horizontalGridOff = new MenuItem(this.horizontalGridMenu, SWT.CHECK);
-			this.horizontalGridOff.setText(Messages.getString(MessageIds.GDE_MSGT0119));
-			this.horizontalGridOff.addListener(SWT.Selection, new Listener() {
+			this.valueGridOff = new MenuItem(this.valueGridMenu, SWT.CHECK);
+			this.valueGridOff.setText(Messages.getString(MessageIds.GDE_MSGT0119));
+			this.valueGridOff.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridOff Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
-						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_NONE);
+						CurveSelectorContextMenu.this.recordSet.setValueGridType(RecordSet.VALUE_GRID_NONE);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						//if (!CurveSelectorContextMenu.this.isTypeHisto) ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
 						if (CurveSelectorContextMenu.this.isTypeCompare) {
-							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_NONE);
+							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.VALUE_GRID_NONE);
 						}
 					}
 				}
 			});
-			this.horizontalGridEveryTick = new MenuItem(this.horizontalGridMenu, SWT.CHECK);
-			this.horizontalGridEveryTick.setText(Messages.getString(MessageIds.GDE_MSGT0120));
-			this.horizontalGridEveryTick.addListener(SWT.Selection, new Listener() {
+			this.valueGridEveryTick = new MenuItem(this.valueGridMenu, SWT.CHECK);
+			this.valueGridEveryTick.setText(Messages.getString(MessageIds.GDE_MSGT0120));
+			this.valueGridEveryTick.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridMain Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
-						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_EVERY);
-						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordOrdinal(
+						CurveSelectorContextMenu.this.recordSet.setValueGridType(RecordSet.VALUE_GRID_EVERY);
+						CurveSelectorContextMenu.this.recordSet.setValueGridRecordOrdinal(
 								!CurveSelectorContextMenu.this.isTypeHisto && ((RecordSet) CurveSelectorContextMenu.this.recordSet).isCompareSet() ? 0 : CurveSelectorContextMenu.this.actualRecord.getOrdinal());
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						//if (!CurveSelectorContextMenu.this.isTypeHisto) ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
 						if (CurveSelectorContextMenu.this.isTypeCompare) {
-							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_EVERY);
+							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.VALUE_GRID_EVERY);
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
 						}
 					}
 				}
 			});
-			this.horizontalGridEverySecond = new MenuItem(this.horizontalGridMenu, SWT.CHECK);
-			this.horizontalGridEverySecond.setText(Messages.getString(MessageIds.GDE_MSGT0121));
-			this.horizontalGridEverySecond.addListener(SWT.Selection, new Listener() {
+			this.valueGridEverySecond = new MenuItem(this.valueGridMenu, SWT.CHECK);
+			this.valueGridEverySecond.setText(Messages.getString(MessageIds.GDE_MSGT0121));
+			this.valueGridEverySecond.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridMod60 Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
-						CurveSelectorContextMenu.this.recordSet.setHorizontalGridType(RecordSet.HORIZONTAL_GRID_SECOND);
-						CurveSelectorContextMenu.this.recordSet.setHorizontalGridRecordOrdinal(CurveSelectorContextMenu.this.actualRecord.getOrdinal());
+						CurveSelectorContextMenu.this.recordSet.setValueGridType(RecordSet.VALUE_GRID_SECOND);
+						CurveSelectorContextMenu.this.recordSet.setValueGridRecordOrdinal(CurveSelectorContextMenu.this.actualRecord.getOrdinal());
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						//if (!CurveSelectorContextMenu.this.isTypeHisto) ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
 						if (CurveSelectorContextMenu.this.isTypeCompare) {
-							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.HORIZONTAL_GRID_SECOND);
+							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.VALUE_GRID_SECOND);
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							CurveSelectorContextMenu.this.application.updateCompareWindow();
 						}
 					}
 				}
 			});
-			this.horizontalGridColor = new MenuItem(this.horizontalGridMenu, SWT.PUSH);
-			this.horizontalGridColor.setText(Messages.getString(MessageIds.GDE_MSGT0122));
-			this.horizontalGridColor.addListener(SWT.Selection, new Listener() {
+			this.valueGridColor = new MenuItem(this.valueGridMenu, SWT.PUSH);
+			this.valueGridColor.setText(Messages.getString(MessageIds.GDE_MSGT0122));
+			this.valueGridColor.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridColor Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
-							CurveSelectorContextMenu.this.recordSet.setHorizontalGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							CurveSelectorContextMenu.this.recordSet.setValueGridColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							//if (!CurveSelectorContextMenu.this.isTypeHisto) ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -1060,7 +1060,7 @@ public class CurveSelectorContextMenu {
 
 			this.measurement = new MenuItem(popupmenu, SWT.CASCADE);
 			this.measurement.setText(Messages.getString(MessageIds.GDE_MSGT0123));
-			this.measurementMenu = new Menu(this.horizontalGrid);
+			this.measurementMenu = new Menu(this.valueGrid);
 			this.measurement.setMenu(this.measurementMenu);
 			this.measurementMenu.addMenuListener(new MenuListener() {
 				@Override
@@ -1135,11 +1135,11 @@ public class CurveSelectorContextMenu {
 							newRecord.setVisible(true); // if a non visible record added
 
 							if (compareSet.size() == 1) { //set grid line mode and color from settings (previous compare behavior)
-								compareSet.setHorizontalGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalType());
-								compareSet.setHorizontalGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalColor());
+								compareSet.setValueGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalType());
+								compareSet.setValueGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalColor());
 								compareSet.setTimeGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalType());
 								compareSet.setTimeGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalColor());
-								compareSet.setHorizontalGridRecordOrdinal(0);
+								compareSet.setValueGridRecordOrdinal(0);
 							}
 							// check if the new added record exceeds the existing one in time or set draw limit and pad with dummy points
 							double maxRecordTime_ms = compareSet.getCompareSetMaxScaleTime_ms();
@@ -1241,7 +1241,7 @@ public class CurveSelectorContextMenu {
 		this.axisNumberFormat.setEnabled(enabled);
 		this.axisPosition.setEnabled(enabled);
 		this.timeGrid.setEnabled(enabled);
-		this.horizontalGrid.setEnabled(enabled);
+		this.valueGrid.setEnabled(enabled);
 		this.measurement.setEnabled(enabled);
 		this.copyCurveCompare.setEnabled(enabled);
 		this.cleanCurveCompare.setEnabled(enabled);

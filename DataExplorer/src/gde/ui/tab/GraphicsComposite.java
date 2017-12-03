@@ -869,7 +869,7 @@ public class GraphicsComposite extends Composite {
 		if (recordSet.getTimeGridType() > 0) drawTimeGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
 
 		// check for activated horizontal grid
-		boolean isCurveGridEnabled = recordSet.getHorizontalGridType() > 0;
+		boolean isCurveGridEnabled = recordSet.getValueGridType() > 0;
 
 		// draw each record using sorted record set names
 		long startTime = new Date().getTime();
@@ -884,7 +884,7 @@ public class GraphicsComposite extends Composite {
 					+ actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced());
 			if (actualRecord.isScaleVisible()) CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
 
-			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
+			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getValueGridRecordOrdinal()) // check for activated horizontal grid
 				drawCurveGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
 
 			if (isActualRecordEnabled) {
@@ -919,10 +919,10 @@ public class GraphicsComposite extends Composite {
 		gc.setLineWidth(1);
 		gc.setLineDash(dashLineStyle);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
-		gc.setForeground(recordSet.getHorizontalGridColor());
+		gc.setForeground(recordSet.getValueGridColor());
 
-		Vector<Integer> horizontalGridVector = recordSet.getHorizontalGrid();
-		for (int i = 0; i < horizontalGridVector.size(); i += recordSet.getHorizontalGridType()) {
+		Vector<Integer> horizontalGridVector = recordSet.getValueGrid();
+		for (int i = 0; i < horizontalGridVector.size(); i += recordSet.getValueGridType()) {
 			int y = horizontalGridVector.get(i);
 			if (y > bounds.y && y < (bounds.y + bounds.height)) gc.drawLine(bounds.x, y, bounds.x + bounds.width, y);
 		}

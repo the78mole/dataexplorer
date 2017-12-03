@@ -312,25 +312,25 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	protected int																timeGridLineStyle								= SWT.LINE_DOT;
 
 	@Deprecated
-	protected static final String								HORIZONTAL_GRID_RECORD					= "RecordSet_horizontalGridRecord";					//$NON-NLS-1$
-	protected static final String								HORIZONTAL_GRID_RECORD_ORDINAL	= "RecordSet_horizontalGridRecordOrdinal";	//$NON-NLS-1$
-	protected static final String								HORIZONTAL_GRID_TYPE						= "RecordSet_horizontalGridType";						//$NON-NLS-1$
-	protected static final String								HORIZONTAL_GRID_COLOR						= "RecordSet_horizontalGridColor";					//$NON-NLS-1$
-	protected static final String								HORIZONTAL_GRID_LINE_STYLE			= "RecordSet_horizontalGridLineStyle";			//$NON-NLS-1$
-	public static final int											HORIZONTAL_GRID_NONE						= 0;
-	public static final int											HORIZONTAL_GRID_EVERY						= 1;
-	public static final int											HORIZONTAL_GRID_SECOND					= 2;
-	protected int																horizontalGridType							= HORIZONTAL_GRID_NONE;
+	protected static final String								VALUE_GRID_RECORD					= "RecordSet_horizontalGridRecord";					//$NON-NLS-1$
+	protected static final String								VALUE_GRID_RECORD_ORDINAL	= "RecordSet_horizontalGridRecordOrdinal";	//$NON-NLS-1$
+	protected static final String								VALUE_GRID_TYPE						= "RecordSet_horizontalGridType";						//$NON-NLS-1$
+	protected static final String								VALUE_GRID_COLOR					= "RecordSet_horizontalGridColor";					//$NON-NLS-1$
+	protected static final String								VALUE_GRID_LINE_STYLE			= "RecordSet_horizontalGridLineStyle";			//$NON-NLS-1$
+	public static final int											VALUE_GRID_NONE						= 0;
+	public static final int											VALUE_GRID_EVERY					= 1;
+	public static final int											VALUE_GRID_SECOND					= 2;
+	protected int																valueGridType							= VALUE_GRID_NONE;
 	/**
 	 * contains the time grid position, updated from TimeLine.drawTickMarks
 	 */
-	protected Vector<Integer>										horizontalGrid									= new Vector<Integer>();
-	protected Color															horizontalGridColor							= DataExplorer.COLOR_GREY;
-	protected int																horizontalGridLineStyle					= SWT.LINE_DASH;
+	protected Vector<Integer>										valueGrid									= new Vector<Integer>();
+	protected Color															valueGridColor						= DataExplorer.COLOR_GREY;
+	protected int																valueGridLineStyle				= SWT.LINE_DASH;
 	/**
 	 * recordNames[horizontalGridRecord]
 	 */
-	protected int																horizontalGridRecordOrdinal			= -1;
+	protected int																valueGridRecordOrdinal		= -1;
 
 	/**
 	 * Special record set data buffers according the size of given names array, where the name is the key to access the data buffer used to hold
@@ -660,72 +660,72 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	/**
 	 * @return the horizontalGridRecord ordinal
 	 */
-	public abstract int getHorizontalGridRecordOrdinal();
+	public abstract int getValueGridRecordOrdinal();
 
 	/**
-	 * @param newHorizontalGridRecordOrdinal of the horizontal grid record name to set
+	 * @param newValueGridRecordOrdinal of the horizontal grid record name to set
 	 */
-	public void setHorizontalGridRecordOrdinal(int newHorizontalGridRecordOrdinal) {
-		int tmpOrdinal = newHorizontalGridRecordOrdinal;
+	public void setValueGridRecordOrdinal(int newValueGridRecordOrdinal) {
+		int tmpOrdinal = newValueGridRecordOrdinal;
 		if (tmpOrdinal >= this.size()) tmpOrdinal = 0;
-		this.horizontalGridRecordOrdinal = this.scaleSyncedRecords.isOneOfSyncableRecord(this.get(tmpOrdinal).getName())
+		this.valueGridRecordOrdinal = this.scaleSyncedRecords.isOneOfSyncableRecord(this.get(tmpOrdinal).getName())
 				? this.scaleSyncedRecords.getSyncMasterRecordOrdinal(this.get(tmpOrdinal).getName()) : tmpOrdinal;
 	}
 
 	/**
 	 * @return the horizontalGridType
 	 */
-	public int getHorizontalGridType() {
-		return this.horizontalGridType;
+	public int getValueGridType() {
+		return this.valueGridType;
 	}
 
 	/**
-	 * @param newHorizontalGridType the horizontalGridType to set
+	 * @param newValueGridType the horizontalGridType to set
 	 */
-	public void setHorizontalGridType(int newHorizontalGridType) {
-		this.horizontalGridType = newHorizontalGridType;
+	public void setValueGridType(int newValueGridType) {
+		this.valueGridType = newValueGridType;
 	}
 
 	/**
 	 * @return the horizontalGrid
 	 */
-	public Vector<Integer> getHorizontalGrid() {
-		return this.horizontalGrid;
+	public Vector<Integer> getValueGrid() {
+		return this.valueGrid;
 	}
 
 	/**
-	 * @param newHorizontalGrid the horizontalGrid to set
+	 * @param newValueGrid the horizontalGrid to set
 	 */
-	public void setHorizontalGrid(Vector<Integer> newHorizontalGrid) {
-		this.horizontalGrid = new Vector<Integer>(newHorizontalGrid);
+	public void setValueGrid(Vector<Integer> newValueGrid) {
+		this.valueGrid = new Vector<Integer>(newValueGrid);
 	}
 
 	/**
 	 * @return the horizontalGridColor
 	 */
-	public Color getHorizontalGridColor() {
-		return this.horizontalGridColor;
+	public Color getValueGridColor() {
+		return this.valueGridColor;
 	}
 
 	/**
 	 * @param newHorizontalGridColor the horizontalGridColor to set
 	 */
-	public void setHorizontalGridColor(Color newHorizontalGridColor) {
-		this.horizontalGridColor = newHorizontalGridColor;
+	public void setValueGridColor(Color newHorizontalGridColor) {
+		this.valueGridColor = newHorizontalGridColor;
 	}
 
 	/**
 	 * @return the horizontalGridLineStyle
 	 */
-	public int getHorizontalGridLineStyle() {
-		return this.horizontalGridLineStyle;
+	public int getValueGridLineStyle() {
+		return this.valueGridLineStyle;
 	}
 
 	/**
-	 * @param newHorizontalGridLineStyle the horizontalGridLineStyle to set
+	 * @param newValueGridLineStyle the horizontalGridLineStyle to set
 	 */
-	public void setHorizontalGridLineStyle(int newHorizontalGridLineStyle) {
-		this.horizontalGridLineStyle = newHorizontalGridLineStyle;
+	public void setValueGridLineStyle(int newValueGridLineStyle) {
+		this.valueGridLineStyle = newValueGridLineStyle;
 	}
 
 	/**

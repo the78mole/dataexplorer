@@ -353,13 +353,13 @@ public class Channel extends HashMap<String, RecordSet> {
 			this.template.setProperty(RecordSet.TIME_GRID_LINE_STYLE, Integer.valueOf(recordSet.getLineStyleTimeGrid()).toString());
 			this.template.setProperty(RecordSet.TIME_GRID_TYPE, Integer.valueOf(recordSet.getTimeGridType()).toString());
 			// curve grid
-			color = recordSet.getHorizontalGridColor();
+			color = recordSet.getValueGridColor();
 			rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
-			this.template.setProperty(RecordSet.HORIZONTAL_GRID_COLOR, rgb);
-			this.template.setProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, Integer.valueOf(recordSet.getHorizontalGridLineStyle()).toString());
-			this.template.setProperty(RecordSet.HORIZONTAL_GRID_TYPE, Integer.valueOf(recordSet.getHorizontalGridType()).toString());
-			if (recordSet.get(recordSet.getHorizontalGridRecordOrdinal()) != null) {
-				this.template.setProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, GDE.STRING_EMPTY + recordSet.getHorizontalGridRecordOrdinal());
+			this.template.setProperty(RecordSet.VALUE_GRID_COLOR, rgb);
+			this.template.setProperty(RecordSet.VALUE_GRID_LINE_STYLE, Integer.valueOf(recordSet.getValueGridLineStyle()).toString());
+			this.template.setProperty(RecordSet.VALUE_GRID_TYPE, Integer.valueOf(recordSet.getValueGridType()).toString());
+			if (recordSet.get(recordSet.getValueGridRecordOrdinal()) != null) {
+				this.template.setProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, GDE.STRING_EMPTY + recordSet.getValueGridRecordOrdinal());
 			}
 			this.template.store();
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "creating graphics template file " + Settings.getInstance().getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
@@ -411,14 +411,14 @@ public class Channel extends HashMap<String, RecordSet> {
 					recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
 					recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
 					// curve grid
-					color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+					color = this.template.getProperty(RecordSet.VALUE_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
 					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
 					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-					recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
-					recordSet.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-					recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-					recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
+					recordSet.setValueGridColor(SWTResourceManager.getColor(r, g, b));
+					recordSet.setValueGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+					recordSet.setValueGridType(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+					recordSet.setValueGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
 				}
 			}
 			else { //take over values from last active record set
@@ -437,7 +437,7 @@ public class Channel extends HashMap<String, RecordSet> {
 					record.setStartEndDefined(lastActiveRecord.isStartEndDefined, lastActiveRecord.getMinScaleValue(), lastActiveRecord.getMaxScaleValue());
 					record.setNumberFormat(lastActiveRecord.numberFormat);
 
-					RecordSet lastActiveParent = (RecordSet) lastActiveRecord.parent;
+					RecordSet lastActiveParent = lastActiveRecord.parent;
 					//smooth current drop
 					recordSet.setSmoothAtCurrentDrop(lastActiveParent.isSmoothAtCurrentDrop);
 					//smooth voltage curve
@@ -447,10 +447,10 @@ public class Channel extends HashMap<String, RecordSet> {
 					recordSet.setTimeGridLineStyle(lastActiveParent.timeGridLineStyle);
 					recordSet.setTimeGridType(lastActiveParent.timeGridType);
 					// curve grid
-					recordSet.setHorizontalGridColor(lastActiveParent.horizontalGridColor);
-					recordSet.setHorizontalGridLineStyle(lastActiveParent.horizontalGridLineStyle);
-					recordSet.setHorizontalGridType(lastActiveParent.horizontalGridType);
-					recordSet.setHorizontalGridRecordOrdinal(lastActiveParent.horizontalGridRecordOrdinal >= 0 ? lastActiveParent.horizontalGridRecordOrdinal : 0);
+					recordSet.setValueGridColor(lastActiveParent.valueGridColor);
+					recordSet.setValueGridLineStyle(lastActiveParent.valueGridLineStyle);
+					recordSet.setValueGridType(lastActiveParent.valueGridType);
+					recordSet.setValueGridRecordOrdinal(lastActiveParent.valueGridRecordOrdinal >= 0 ? lastActiveParent.valueGridRecordOrdinal : 0);
 					if(log.isLoggable(Level.FINER)) log.log(Level.FINER, "record = " + record.name + " isVisible=" + record.isVisible + " isPositionLeft=" + record.isPositionLeft + " isStartpointZero=" + record.isStartpointZero);
 				}
 			}
@@ -504,18 +504,18 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
 				recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
 				// curve grid
-				color = this.template.getProperty(RecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+				color = this.template.getProperty(RecordSet.VALUE_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 				r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
 				g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
 				b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-				recordSet.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
-				recordSet.setHorizontalGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-				recordSet.setHorizontalGridType(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				if (recordSet.get(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()).isVisible) {
-					recordSet.setHorizontalGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.HORIZONTAL_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
+				recordSet.setValueGridColor(SWTResourceManager.getColor(r, g, b));
+				recordSet.setValueGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
+				recordSet.setValueGridType(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+				if (recordSet.get(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, "-1")).intValue()).isVisible) {
+					recordSet.setValueGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
 				}
 				else {
-					recordSet.setHorizontalGridRecordOrdinal(findFirstVisibleRecord(recordSet)); //$NON-NLS-1$
+					recordSet.setValueGridRecordOrdinal(findFirstVisibleRecord(recordSet));
 				}
 				recordSet.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$

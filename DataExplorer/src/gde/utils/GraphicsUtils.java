@@ -88,7 +88,7 @@ public class GraphicsUtils {
 		// prepare grid vector
 		Vector<Integer> horizontalGrid = new Vector<Integer>();
 		AbstractRecordSet recordSet = record.getAbstractParent();
-		boolean isBuildGridVector = recordSet.getHorizontalGridType() != RecordSet.HORIZONTAL_GRID_NONE && recordSet.getHorizontalGridRecordOrdinal() == record.getOrdinal();
+		boolean isBuildGridVector = recordSet.getValueGridType() != RecordSet.VALUE_GRID_NONE && recordSet.getValueGridRecordOrdinal() == record.getOrdinal();
 
 		if (record.getNumberScaleTicks() != numberTicks) {
 			record.setNumberScaleTicks(numberTicks);
@@ -158,7 +158,7 @@ public class GraphicsUtils {
 			if (isBuildGridVector) horizontalGrid.add(yTickPosition);
 		}
 		if (isBuildGridVector) {
-			recordSet.setHorizontalGrid(horizontalGrid);
+			recordSet.setValueGrid(horizontalGrid);
 		}
 	}
 

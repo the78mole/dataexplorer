@@ -443,7 +443,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		int height = curveAreaBounds.height;
 
 		// check for activated horizontal grid
-		boolean isCurveGridEnabled = trailRecordSet.getHorizontalGridType() > 0;
+		boolean isCurveGridEnabled = trailRecordSet.getValueGridType() > 0;
 
 		// draw each record using sorted record set names
 		boolean isDrawScaleInRecordColor = settings.isDrawScaleInRecordColor();

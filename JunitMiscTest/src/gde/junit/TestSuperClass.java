@@ -407,7 +407,7 @@ public class TestSuperClass extends TestCase {
 		if (recordSet.getTimeGridType() > 0) drawTimeGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
 
 		// check for activated horizontal grid
-		boolean isCurveGridEnabled = recordSet.getHorizontalGridType() > 0;
+		boolean isCurveGridEnabled = recordSet.getValueGridType() > 0;
 
 		// draw each record using sorted record set names
 		recordSet.updateSyncRecordScale();
@@ -415,7 +415,7 @@ public class TestSuperClass extends TestCase {
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			if (actualRecord.isScaleVisible()) CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, true, true, true);
 
-			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getHorizontalGridRecordOrdinal()) // check
+			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getValueGridRecordOrdinal()) // check
 				// for
 				// activated
 				// horizontal
@@ -481,10 +481,10 @@ public class TestSuperClass extends TestCase {
 		gc.setLineWidth(1);
 		gc.setLineDash(dash);
 		gc.setLineStyle(SWT.LINE_CUSTOM);
-		gc.setForeground(recordSet.getHorizontalGridColor());
+		gc.setForeground(recordSet.getValueGridColor());
 		// curveAreaGC.setLineStyle(recordSet.getHorizontalGridLineStyle());
-		Vector<Integer> horizontalGridVector = recordSet.getHorizontalGrid();
-		for (int i = 0; i < horizontalGridVector.size() - 1; i += recordSet.getHorizontalGridType()) {
+		Vector<Integer> horizontalGridVector = recordSet.getValueGrid();
+		for (int i = 0; i < horizontalGridVector.size() - 1; i += recordSet.getValueGridType()) {
 			int y = horizontalGridVector.get(i);
 			gc.drawLine(0, y - useOffSetY, width - 1, y - useOffSetY);
 		}

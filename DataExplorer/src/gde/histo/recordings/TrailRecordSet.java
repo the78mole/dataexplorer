@@ -477,8 +477,8 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @return the horizontalGridRecord ordinal
 	 */
 	@Override
-	public int getHorizontalGridRecordOrdinal() {
-		return this.horizontalGridRecordOrdinal;
+	public int getValueGridRecordOrdinal() {
+		return this.valueGridRecordOrdinal;
 	}
 
 	/**
@@ -648,15 +648,15 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		Vector<TrailRecord> displayRecords = new Vector<>();
 		// add the record with horizontal grid
 		for (TrailRecord record : this.getDisplayRecords()) {
-			if (record.getOrdinal() == this.getHorizontalGridRecordOrdinal()) displayRecords.add(record);
+			if (record.getOrdinal() == this.getValueGridRecordOrdinal()) displayRecords.add(record);
 		}
 		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
 		for (TrailRecord record : this.getDisplayRecords()) {
-			if (record.getOrdinal() != this.getHorizontalGridRecordOrdinal() && record.isScaleSyncMaster()) displayRecords.add(record);
+			if (record.getOrdinal() != this.getValueGridRecordOrdinal() && record.isScaleSyncMaster()) displayRecords.add(record);
 		}
 		// add all others
 		for (TrailRecord record : this.getDisplayRecords()) {
-			if (record.getOrdinal() != this.getHorizontalGridRecordOrdinal() && !record.isScaleSyncMaster()) displayRecords.add(record);
+			if (record.getOrdinal() != this.getValueGridRecordOrdinal() && !record.isScaleSyncMaster()) displayRecords.add(record);
 		}
 
 		return displayRecords.toArray(new TrailRecord[displayRecords.size()]);
@@ -722,14 +722,14 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				// SWT.LINE_DOT)).intValue());
 				// recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
 				if (!isHorizontalGridOrdinalSet && record.isVisible()) { // set curve grid to the first visible record
-					color = this.template.getProperty(AbstractRecordSet.HORIZONTAL_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
+					color = this.template.getProperty(AbstractRecordSet.VALUE_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 					r = Integer.parseInt(color.split(GDE.STRING_COMMA)[0].trim());
 					g = Integer.parseInt(color.split(GDE.STRING_COMMA)[1].trim());
 					b = Integer.parseInt(color.split(GDE.STRING_COMMA)[2].trim());
-					this.setHorizontalGridColor(SWTResourceManager.getColor(r, g, b));
-					this.setHorizontalGridLineStyle(Integer.parseInt(this.template.getProperty(AbstractRecordSet.HORIZONTAL_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)));
-					this.setHorizontalGridType(Integer.parseInt(this.template.getProperty(AbstractRecordSet.HORIZONTAL_GRID_TYPE, "0"))); //$NON-NLS-1$
-					this.setHorizontalGridRecordOrdinal(record.getOrdinal()); // initial use top score trail record
+					this.setValueGridColor(SWTResourceManager.getColor(r, g, b));
+					this.setValueGridLineStyle(Integer.parseInt(this.template.getProperty(AbstractRecordSet.VALUE_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)));
+					this.setValueGridType(Integer.parseInt(this.template.getProperty(AbstractRecordSet.VALUE_GRID_TYPE, "0"))); //$NON-NLS-1$
+					this.setValueGridRecordOrdinal(record.getOrdinal()); // initial use top score trail record
 					isHorizontalGridOrdinalSet = true;
 				}
 			}

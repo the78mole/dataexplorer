@@ -480,7 +480,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		int height = curveAreaBounds.height;
 
 		// check for activated horizontal grid
-		boolean isCurveGridEnabled = trailRecordSet.getHorizontalGridType() > 0;
+		boolean isCurveGridEnabled = trailRecordSet.getValueGridType() > 0;
 
 		// draw each record using sorted record set names
 		boolean isDrawScaleInRecordColor = settings.isDrawScaleInRecordColor();
@@ -498,7 +498,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 			if (actualRecord.isScaleVisible())
 				HistoCurveUtils.drawHistoScale(actualRecord, canvasImageGC, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, numberTickMarks);
 
-			if (isCurveGridEnabled && actualRecord.getOrdinal() == trailRecordSet.getHorizontalGridRecordOrdinal()) // check for activated horizontal grid
+			if (isCurveGridEnabled && actualRecord.getOrdinal() == trailRecordSet.getValueGridRecordOrdinal()) // check for activated horizontal grid
 				HistoCurveUtils.drawCurveGrid(trailRecordSet, canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
 
 			if (isActualRecordEnabled) {

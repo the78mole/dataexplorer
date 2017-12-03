@@ -95,10 +95,10 @@ public final class RecordSet extends AbstractRecordSet {
 	// public static final String SYNC_RECORD_SELECTED = "Syncable_record_selected";
 
 	public static final String[]	propertyKeys									= new String[] { TIME_STEP_MS,								//
-			START_TIME_STAMP, HORIZONTAL_GRID_RECORD_ORDINAL,																											//
-			HORIZONTAL_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR,												//
-			HORIZONTAL_GRID_TYPE, HORIZONTAL_GRID_LINE_STYLE,																											//
-			HORIZONTAL_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS };
+			START_TIME_STAMP, VALUE_GRID_RECORD_ORDINAL,																													//
+			VALUE_GRID_RECORD, TIME_GRID_TYPE, TIME_GRID_LINE_STYLE, TIME_GRID_COLOR,															//
+			VALUE_GRID_TYPE, VALUE_GRID_LINE_STYLE,																																//
+			VALUE_GRID_COLOR, SMOOTH_AT_CURRENT_DROP, SMOOTH_VOLTAGE_CURVE, VOLTAGE_LIMITS };
 
 	int														configuredDisplayable					= 0;																																																										// number of record which must be displayable before table calculation begins
 
@@ -230,11 +230,11 @@ public final class RecordSet extends AbstractRecordSet {
 		this.timeGridColor = recordSet.timeGridColor;
 		this.timeGridLineStyle = recordSet.timeGridLineStyle;
 
-		this.horizontalGridType = recordSet.horizontalGridType;
-		this.horizontalGrid = new Vector<Integer>(recordSet.horizontalGrid);
-		this.horizontalGridColor = recordSet.horizontalGridColor;
-		this.horizontalGridLineStyle = recordSet.horizontalGridLineStyle;
-		this.horizontalGridRecordOrdinal = recordSet.horizontalGridRecordOrdinal;
+		this.valueGridType = recordSet.valueGridType;
+		this.valueGrid = new Vector<Integer>(recordSet.valueGrid);
+		this.valueGridColor = recordSet.valueGridColor;
+		this.valueGridLineStyle = recordSet.valueGridLineStyle;
+		this.valueGridRecordOrdinal = recordSet.valueGridRecordOrdinal;
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
 
@@ -303,11 +303,11 @@ public final class RecordSet extends AbstractRecordSet {
 		this.timeGridColor = recordSet.timeGridColor;
 		this.timeGridLineStyle = recordSet.timeGridLineStyle;
 
-		this.horizontalGridType = recordSet.horizontalGridType;
-		this.horizontalGrid = new Vector<Integer>(recordSet.horizontalGrid);
-		this.horizontalGridColor = recordSet.horizontalGridColor;
-		this.horizontalGridLineStyle = recordSet.horizontalGridLineStyle;
-		this.horizontalGridRecordOrdinal = recordSet.horizontalGridRecordOrdinal;
+		this.valueGridType = recordSet.valueGridType;
+		this.valueGrid = new Vector<Integer>(recordSet.valueGrid);
+		this.valueGridColor = recordSet.valueGridColor;
+		this.valueGridLineStyle = recordSet.valueGridLineStyle;
+		this.valueGridRecordOrdinal = recordSet.valueGridRecordOrdinal;
 
 		this.configuredDisplayable = recordSet.configuredDisplayable;
 
@@ -572,17 +572,17 @@ public final class RecordSet extends AbstractRecordSet {
 		Vector<Record> displayRecords = new Vector<Record>();
 		//add the record with horizontal grid
 		for (Record record : this.getValues()) {
-			if (record.size() > 0 && record.ordinal == this.horizontalGridRecordOrdinal) displayRecords.add(record);
+			if (record.size() > 0 && record.ordinal == this.valueGridRecordOrdinal) displayRecords.add(record);
 		}
 		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
 		for (int i = 0; i < this.size(); ++i) {
 			final Record record = this.get(i);
-			if (record.size() > 0 && record.ordinal != this.horizontalGridRecordOrdinal && record.isScaleSyncMaster()) displayRecords.add(record);
+			if (record.size() > 0 && record.ordinal != this.valueGridRecordOrdinal && record.isScaleSyncMaster()) displayRecords.add(record);
 		}
 		// add all others
 		for (int i = 0; i < this.size(); ++i) {
 			final Record record = this.get(i);
-			if (record.size() > 0 && record.ordinal != this.horizontalGridRecordOrdinal && !record.isScaleSyncMaster()) displayRecords.add(record);
+			if (record.size() > 0 && record.ordinal != this.valueGridRecordOrdinal && !record.isScaleSyncMaster()) displayRecords.add(record);
 		}
 
 		return displayRecords.toArray(new Record[0]);
@@ -1347,10 +1347,10 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @return the horizontalGridRecord
 	 */
 	@Deprecated
-	public String getHorizontalGridRecordName() {
-		String gridRecordName = this.horizontalGridRecordOrdinal == -1 || this.horizontalGridRecordOrdinal > this.getRecordNames().length - 1 ? GDE.STRING_DASH
-				: this.getRecordNames()[this.horizontalGridRecordOrdinal];
-		boolean isOneOfSycableAndOneOfSynableVisible = this.horizontalGridRecordOrdinal >= 0 && this.isOneOfSyncableRecord(this.get(this.horizontalGridRecordOrdinal).getName())
+	public String getValueGridRecordName() {
+		String gridRecordName = this.valueGridRecordOrdinal == -1 || this.valueGridRecordOrdinal > this.getRecordNames().length - 1 ? GDE.STRING_DASH
+				: this.getRecordNames()[this.valueGridRecordOrdinal];
+		boolean isOneOfSycableAndOneOfSynableVisible = this.valueGridRecordOrdinal >= 0 && this.isOneOfSyncableRecord(this.get(this.valueGridRecordOrdinal).getName())
 				&& this.isOneSyncableVisible(this.getSyncMasterRecordOrdinal(gridRecordName));
 		if (this.get(gridRecordName) != null && !isOneOfSycableAndOneOfSynableVisible && !(this.get(gridRecordName).isVisible && this.get(gridRecordName).isDisplayable)) {
 			gridRecordName = this.getFirstRecordName();
@@ -1367,8 +1367,8 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @return the horizontalGridRecord ordinal
 	 */
 	@Override
-	public int getHorizontalGridRecordOrdinal() {
-		return this.isCompareSet ? this.get(0).ordinal : this.horizontalGridRecordOrdinal;
+	public int getValueGridRecordOrdinal() {
+		return this.isCompareSet ? this.get(0).ordinal : this.valueGridRecordOrdinal;
 	}
 
 	/**
@@ -1409,11 +1409,11 @@ public final class RecordSet extends AbstractRecordSet {
 		sb.append(TIME_GRID_LINE_STYLE).append(GDE.STRING_EQUAL).append(this.timeGridLineStyle).append(Record.DELIMITER);
 		sb.append(TIME_GRID_COLOR).append(GDE.STRING_EQUAL).append(this.timeGridColor.getRed()).append(GDE.STRING_COMMA).append(this.timeGridColor.getGreen()).append(GDE.STRING_COMMA).append(this.timeGridColor.getBlue()).append(Record.DELIMITER);
 
-		sb.append(HORIZONTAL_GRID_RECORD_ORDINAL).append(GDE.STRING_EQUAL).append(this.horizontalGridRecordOrdinal).append(Record.DELIMITER);
-		sb.append(HORIZONTAL_GRID_TYPE).append(GDE.STRING_EQUAL).append(this.horizontalGridType).append(Record.DELIMITER);
-		sb.append(HORIZONTAL_GRID_LINE_STYLE).append(GDE.STRING_EQUAL).append(this.horizontalGridLineStyle).append(Record.DELIMITER);
-		sb.append(HORIZONTAL_GRID_COLOR).append(GDE.STRING_EQUAL).append(this.horizontalGridColor.getRed()).append(GDE.STRING_COMMA).append(this.horizontalGridColor.getGreen()).append(GDE.STRING_COMMA)
-				.append(this.horizontalGridColor.getBlue()).append(Record.DELIMITER);
+		sb.append(VALUE_GRID_RECORD_ORDINAL).append(GDE.STRING_EQUAL).append(this.valueGridRecordOrdinal).append(Record.DELIMITER);
+		sb.append(VALUE_GRID_TYPE).append(GDE.STRING_EQUAL).append(this.valueGridType).append(Record.DELIMITER);
+		sb.append(VALUE_GRID_LINE_STYLE).append(GDE.STRING_EQUAL).append(this.valueGridLineStyle).append(Record.DELIMITER);
+		sb.append(VALUE_GRID_COLOR).append(GDE.STRING_EQUAL).append(this.valueGridColor.getRed()).append(GDE.STRING_COMMA).append(this.valueGridColor.getGreen()).append(GDE.STRING_COMMA)
+				.append(this.valueGridColor.getBlue()).append(Record.DELIMITER);
 
 		sb.append(SMOOTH_AT_CURRENT_DROP).append(GDE.STRING_EQUAL).append(this.isSmoothAtCurrentDrop).append(Record.DELIMITER);
 		sb.append(SMOOTH_VOLTAGE_CURVE).append(GDE.STRING_EQUAL).append(this.isSmoothVoltageCurve).append(Record.DELIMITER);
@@ -1475,30 +1475,30 @@ public final class RecordSet extends AbstractRecordSet {
 					Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[1]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[2]));
 
 			// begin depreciated
-			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD);
+			tmpValue = recordSetProps.get(VALUE_GRID_RECORD);
 			if (tmpValue != null && tmpValue.length() > 0) {
 				for (String recordKey : this.recordNames) {
 					if (recordKey.equals(tmpValue)) {
-						this.horizontalGridRecordOrdinal = this.get(recordKey).getOrdinal();
+						this.valueGridRecordOrdinal = this.get(recordKey).getOrdinal();
 						break;
 					}
 				}
 			}
 			// end depreciated
-			tmpValue = recordSetProps.get(HORIZONTAL_GRID_RECORD_ORDINAL);
+			tmpValue = recordSetProps.get(VALUE_GRID_RECORD_ORDINAL);
 			if (tmpValue != null && tmpValue.length() > 0) {
 				try {
-					this.horizontalGridRecordOrdinal = Integer.valueOf(tmpValue.trim());
+					this.valueGridRecordOrdinal = Integer.valueOf(tmpValue.trim());
 				} catch (Exception e) {
-					this.horizontalGridRecordOrdinal = -1;
+					this.valueGridRecordOrdinal = -1;
 				}
 			}
-			tmpValue = recordSetProps.get(HORIZONTAL_GRID_TYPE);
-			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridType = Integer.valueOf(tmpValue.trim()).intValue();
-			tmpValue = recordSetProps.get(HORIZONTAL_GRID_LINE_STYLE);
-			if (tmpValue != null && tmpValue.length() > 0) this.horizontalGridLineStyle = Integer.valueOf(tmpValue.trim()).intValue();
-			tmpValue = recordSetProps.get(HORIZONTAL_GRID_COLOR);
-			if (tmpValue != null && tmpValue.length() > 5) this.horizontalGridColor = SWTResourceManager.getColor(Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[0]),
+			tmpValue = recordSetProps.get(VALUE_GRID_TYPE);
+			if (tmpValue != null && tmpValue.length() > 0) this.valueGridType = Integer.valueOf(tmpValue.trim()).intValue();
+			tmpValue = recordSetProps.get(VALUE_GRID_LINE_STYLE);
+			if (tmpValue != null && tmpValue.length() > 0) this.valueGridLineStyle = Integer.valueOf(tmpValue.trim()).intValue();
+			tmpValue = recordSetProps.get(VALUE_GRID_COLOR);
+			if (tmpValue != null && tmpValue.length() > 5) this.valueGridColor = SWTResourceManager.getColor(Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[0]),
 					Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[1]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[2]));
 
 			tmpValue = recordSetProps.get(SMOOTH_AT_CURRENT_DROP);
