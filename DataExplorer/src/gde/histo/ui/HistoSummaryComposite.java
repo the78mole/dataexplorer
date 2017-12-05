@@ -119,7 +119,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		this.setDragDetect(false);
 		this.setBackground(this.surroundingBackground);
 
-		this.contextMenu.createMenu(this.popupmenu, TabMenuType.HISTOGRAPHICS);
+		this.contextMenu.createMenu(this.popupmenu, TabMenuType.HISTOSUMMARY);
 
 		// help lister does not get active on Composite as well as on Canvas
 		this.addListener(SWT.Resize, new Listener() {

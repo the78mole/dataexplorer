@@ -174,7 +174,7 @@ public class SummarySpots extends HashMap<Integer, MarkerLine> {
 				int xDrawer = xPos - xPos % elementWidth;
 				resultXPositions[i] = xDrawer;
 			}
-			log.off(() -> Arrays.toString(resultXPositions));
+			log.finer(() -> Arrays.toString(resultXPositions));
 			return resultXPositions;
 		}
 
@@ -312,7 +312,7 @@ public class SummarySpots extends HashMap<Integer, MarkerLine> {
 			density = Density.HIGH;
 		else
 			density = Density.EXTREME;
-		log.off(() -> String.format("density=%s  convenientDistance=%d  thresholdDistance=%d  elementWidth=%d", //$NON-NLS-1$
+		log.finer(() -> String.format("density=%s  convenientDistance=%d  thresholdDistance=%d  elementWidth=%d", //$NON-NLS-1$
 				density, convenientDistance, density.getThresholdDistance(), density.markerWidth));
 		return density.markerWidth;
 	}

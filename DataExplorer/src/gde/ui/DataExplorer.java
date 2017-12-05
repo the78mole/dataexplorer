@@ -2066,7 +2066,8 @@ public class DataExplorer extends Composite {
 	 * @param readFromDirectories true reloads from files; false uses histo vault data
 	 */
 	public void updateHistoTabs(boolean readFromDirectories, boolean rebuildTrails) {
-		if (this.histoGraphicsTabItem != null) updateHistoTabs(readFromDirectories ? RebuildStep.B_HISTOVAULTS : rebuildTrails ? RebuildStep.C_TRAILRECORDSET : RebuildStep.E_USER_INTERFACE, true);
+		if (this.histoGraphicsTabItem != null || this.histoSummaryTabItem != null)
+			updateHistoTabs(readFromDirectories ? RebuildStep.B_HISTOVAULTS : rebuildTrails ? RebuildStep.C_TRAILRECORDSET : RebuildStep.E_USER_INTERFACE, true);
 	}
 
 	private void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
@@ -2275,6 +2276,7 @@ public class DataExplorer extends Composite {
 	public void setCurveSelectorEnabled(boolean value) {
 		this.graphicsTabItem.setCurveSelectorEnabled(value);
 		if (this.histoGraphicsTabItem != null) this.histoGraphicsTabItem.setCurveSelectorEnabled(value);
+		if (this.histoSummaryTabItem != null) this.histoSummaryTabItem.setCurveSelectorEnabled(value);
 		this.isCurveSelectorEnabled = value;
 	}
 
@@ -2415,11 +2417,13 @@ public class DataExplorer extends Composite {
 	public void resetSummaryWindowHeaderAndMeasurement() {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			this.histoSummaryTabItem.clearHeaderAndComment();
+			this.histoSummaryTabItem.getGraphicsComposite().cleanMeasurement();
 		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					DataExplorer.this.histoSummaryTabItem.clearHeaderAndComment();
+					DataExplorer.this.histoSummaryTabItem.getGraphicsComposite().cleanMeasurement();
 				}
 			});
 		}
@@ -3104,10 +3108,10 @@ public class DataExplorer extends Composite {
 		else if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.UTIL)) {
 			this.settings.setUtilityCurvesBorderColor(borderColor);
 			this.utilGraphicsTabItem.setCurveAreaBorderColor(borderColor);
-		}
-		else if ((this.displayTab.getItem(tabItemIndex) instanceof HistoGraphicsWindow)) {
+		} else if ((this.displayTab.getItem(tabItemIndex) instanceof AbstractHistoChartWindow)) {
 			this.settings.setUtilityCurvesBorderColor(borderColor);
 			this.histoGraphicsTabItem.setCurveAreaBorderColor(borderColor);
+			this.histoSummaryTabItem.setCurveAreaBorderColor(borderColor);
 		}
 	}
 
