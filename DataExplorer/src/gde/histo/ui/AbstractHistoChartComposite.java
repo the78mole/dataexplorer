@@ -38,10 +38,10 @@ import gde.config.Settings;
 import gde.data.Channels;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
+import gde.histo.ui.menu.HistoTabAreaContextMenu;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
-import gde.ui.menu.TabAreaContextMenu;
 import gde.utils.GraphicsUtils;
 import gde.utils.StringHelper;
 
@@ -50,48 +50,48 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public abstract class AbstractHistoChartComposite extends Composite {
-	private final static String		$CLASS_NAME							= HistoSummaryComposite.class.getName();
-	private final static Logger		log											= Logger.getLogger($CLASS_NAME);
+	private final static String				$CLASS_NAME							= HistoSummaryComposite.class.getName();
+	private final static Logger				log											= Logger.getLogger($CLASS_NAME);
 
-	protected final static int		DEFAULT_TOP_GAP					= 5;																		// free gap on top of the curves
-	protected final static int		DEFAULT_SIDE_GAP				= 10;																		// free gap at the leftmost and rightmost graphics
-	protected final static int		DEFAULT_BOTTOM_GAP			= 20;																		// space at the bottom of the plots for the scale
+	protected final static int				DEFAULT_TOP_GAP					= 5;																		// free gap on top of the curves
+	protected final static int				DEFAULT_SIDE_GAP				= 10;																		// free gap at the leftmost and rightmost graphics
+	protected final static int				DEFAULT_BOTTOM_GAP			= 20;																		// space at the bottom of the plots for the scale
 	// area
-	protected final static int		DEFAULT_HEADER_GAP			= 5;
-	protected final static int		DEFAULT_COMMENT_GAP			= 5;
+	protected final static int				DEFAULT_HEADER_GAP			= 5;
+	protected final static int				DEFAULT_COMMENT_GAP			= 5;
 
-	protected final DataExplorer	application							= DataExplorer.getInstance();
-	protected final Settings			settings								= Settings.getInstance();
-	protected final Channels			channels								= Channels.getInstance();
+	protected final DataExplorer			application							= DataExplorer.getInstance();
+	protected final Settings					settings								= Settings.getInstance();
+	protected final Channels					channels								= Channels.getInstance();
 
-	protected TrailRecordSet			trailRecordSet;
+	protected TrailRecordSet					trailRecordSet;
 
-	protected Menu								popupmenu;
-	protected TabAreaContextMenu	contextMenu;
+	protected Menu										popupmenu;
+	protected HistoTabAreaContextMenu	contextMenu;
 
-	protected Color								curveAreaBackground;
-	protected Color								surroundingBackground;
-	protected Color								curveAreaBorderColor;
+	protected Color										curveAreaBackground;
+	protected Color										surroundingBackground;
+	protected Color										curveAreaBorderColor;
 
-	protected Text								graphicsHeader;
-	protected Text								recordSetComment;
-	protected Text								xScale;
-	protected Canvas							graphicCanvas;
-	int														headerHeight						= 0;
-	int														headerGap								= 0;
-	int														commentHeight						= 0;
-	int														commentGap							= 0;
-	int														xScaleHeight						= 0;
-	protected String							graphicsHeaderText;
+	protected Text										graphicsHeader;
+	protected Text										recordSetComment;
+	protected Text										xScale;
+	protected Canvas									graphicCanvas;
+	int																headerHeight						= 0;
+	int																headerGap								= 0;
+	int																commentHeight						= 0;
+	int																commentGap							= 0;
+	int																xScaleHeight						= 0;
+	protected String									graphicsHeaderText;
 
-	protected Rectangle						canvasBounds;
-	protected Image								canvasImage;
-	protected GC									canvasImageGC;
-	protected GC									canvasGC;
-	protected Rectangle						curveAreaBounds					= new Rectangle(0, 0, 1, 1);
-	protected int									fixedCanvasY						= -1;
-	protected int									fixedCanvasHeight				= -1;
-	protected boolean							isCurveSelectorEnabled	= true;
+	protected Rectangle								canvasBounds;
+	protected Image										canvasImage;
+	protected GC											canvasImageGC;
+	protected GC											canvasGC;
+	protected Rectangle								curveAreaBounds					= new Rectangle(0, 0, 1, 1);
+	protected int											fixedCanvasY						= -1;
+	protected int											fixedCanvasHeight				= -1;
+	protected boolean									isCurveSelectorEnabled	= true;
 
 	public AbstractHistoChartComposite(Composite parent, int style) {
 		super(parent, style);

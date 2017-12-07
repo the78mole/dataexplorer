@@ -316,7 +316,7 @@ public final class DirectoryScanner {
 			return file;
 		}
 
-		static boolean isWorkableFile(Path path, List<String> extensions) {
+		public static boolean isWorkableFile(Path path, List<String> extensions) {
 			return extensions.contains(getExtension(path));
 		}
 

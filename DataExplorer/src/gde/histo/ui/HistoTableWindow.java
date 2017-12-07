@@ -59,37 +59,37 @@ import gde.histo.recordings.HistoTableMapper.DisplayTag;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
+import gde.histo.ui.menu.HistoTabAreaContextMenu;
+import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuOnDemand;
+import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuType;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
-import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabMenuOnDemand;
-import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 
 /**
  * Display the history in table form.
  * @author Thomas Eickert
  */
 public class HistoTableWindow extends CTabItem {
-	private final static String				$CLASS_NAME					= HistoTableWindow.class.getName();
-	private final static Logger				log									= Logger.getLogger($CLASS_NAME);
+	private final static String						$CLASS_NAME					= HistoTableWindow.class.getName();
+	private final static Logger						log									= Logger.getLogger($CLASS_NAME);
 
-	private static final int					TEXT_EXTENT_FACTOR	= 6;
+	private static final int							TEXT_EXTENT_FACTOR	= 6;
 
-	private Table											dataTable;
-	private TableColumn								recordsColumn;
-	private TableCursor								cursor;
-	private Vector<Integer>						rowVector						= new Vector<Integer>(2);
-	private Vector<Integer>						topindexVector			= new Vector<Integer>(2);
+	private Table													dataTable;
+	private TableColumn										recordsColumn;
+	private TableCursor										cursor;
+	private Vector<Integer>								rowVector						= new Vector<Integer>(2);
+	private Vector<Integer>								topindexVector			= new Vector<Integer>(2);
 
-	private final DataExplorer				application;
-	private final Channels						channels;
-	private final Settings						settings;
-	private final CTabFolder					tabFolder;
-	private final Menu								popupmenu;
-	private final TabAreaContextMenu	contextMenu;
+	private final DataExplorer						application;
+	private final Channels								channels;
+	private final Settings								settings;
+	private final CTabFolder							tabFolder;
+	private final Menu										popupmenu;
+	private final HistoTabAreaContextMenu	contextMenu;
 
 	public HistoTableWindow(CTabFolder dataTab, int style, int position) {
 		super(dataTab, style, position);
@@ -102,7 +102,7 @@ public class HistoTableWindow extends CTabItem {
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0793));
 
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-		this.contextMenu = new TabAreaContextMenu();
+		this.contextMenu = new HistoTabAreaContextMenu();
 	}
 
 	public void create() {
@@ -296,10 +296,10 @@ public class HistoTableWindow extends CTabItem {
 				TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
 				if (trailRecordSet.size() > 0) {
 					TableItem item = (TableItem) event.item;
-					Vector<TrailRecord> currentRecords = (Vector<TrailRecord>) trailRecordSet.getVisibleAndDisplayableRecordsForTable();
+					Vector<TrailRecord> currentRecords = trailRecordSet.getVisibleAndDisplayableRecordsForTable();
 					if (HistoTableWindow.this.dataTable.indexOf(item) < currentRecords.size()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item);
-						TrailRecord trailRecord = (TrailRecord) currentRecords.get(index);
+						TrailRecord trailRecord = currentRecords.get(index);
 						item.setText(HistoTableMapper.getTableRow(trailRecord));
 					} else if (HistoTableWindow.this.settings.isDisplayTags()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item) - currentRecords.size();
@@ -421,7 +421,7 @@ public class HistoTableWindow extends CTabItem {
 			TableItem tableItem = this.dataTable.getItems()[j];
 			int index = HistoTableWindow.this.dataTable.indexOf(tableItem);
 			if (HistoTableWindow.this.dataTable.indexOf(tableItem) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
-				TrailRecord trailRecord = (TrailRecord) trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
+				TrailRecord trailRecord = trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
 				isValid = tableItem.getText().equals(trailRecord.getTableRowHeader()) && tableItem.getText(1).equals(trailRecord.getTrailSelector().getTrailText());
 			} else {
 				isValid = tableItem.getText().isEmpty();

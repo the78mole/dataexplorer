@@ -82,11 +82,19 @@ public class MenuBar {
 	MenuItem										contentsMenuItem, webCheckMenuItem;
 	Menu												helpMenu;
 	MenuItem										helpMenuItem;
-	MenuItem										recordCommentMenuItem, graphicsCurveSurveyMenuItem, graphicsHeaderMenuItem, prevTabConfigItem, nextTabConfigItem;
-	MenuItem										curveSelectionMenuItem, prevChannelConfigItem, nextChannelConfigItem, prevRecordSetItem, nextRecordSetItem;
+	private MenuItem						recordCommentMenuItem;
+	private MenuItem						graphicsCurveSurveyMenuItem;
+	private MenuItem						graphicsHeaderMenuItem;
+	MenuItem										prevTabConfigItem;
+	MenuItem										nextTabConfigItem;
+	private MenuItem						curveSelectionMenuItem;
+	MenuItem										prevChannelConfigItem;
+	MenuItem										nextChannelConfigItem;
+	MenuItem										prevRecordSetItem;
+	MenuItem										nextRecordSetItem;
 	Menu												viewMenu;
 	MenuItem										viewMenuItem;
-	MenuItem										suppressModeItem;
+	private MenuItem						suppressModeItem;
 	Menu												graphicsMenu;
 	MenuItem										graphicsMenuItem, saveDefaultGraphicsTemplateItem, restoreDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem;
 	MenuItem										csvExportMenuItem1, csvExportMenuItem2, csvExportMenuItem3;
@@ -1347,5 +1355,45 @@ public class MenuBar {
 			if (item.getID() == id) return item;
 		}
 		return null;
+	}
+
+	public MenuItem getSuppressModeItem() {
+		return suppressModeItem;
+	}
+
+	public void setSuppressModeItem(MenuItem suppressModeItem) {
+		this.suppressModeItem = suppressModeItem;
+	}
+
+	public MenuItem getCurveSelectionMenuItem() {
+		return curveSelectionMenuItem;
+	}
+
+	public void setCurveSelectionMenuItem(MenuItem curveSelectionMenuItem) {
+		this.curveSelectionMenuItem = curveSelectionMenuItem;
+	}
+
+	public MenuItem getGraphicsHeaderMenuItem() {
+		return graphicsHeaderMenuItem;
+	}
+
+	public void setGraphicsHeaderMenuItem(MenuItem graphicsHeaderMenuItem) {
+		this.graphicsHeaderMenuItem = graphicsHeaderMenuItem;
+	}
+
+	public MenuItem getRecordCommentMenuItem() {
+		return recordCommentMenuItem;
+	}
+
+	public void setRecordCommentMenuItem(MenuItem recordCommentMenuItem) {
+		this.recordCommentMenuItem = recordCommentMenuItem;
+	}
+
+	public MenuItem getGraphicsCurveSurveyMenuItem() {
+		return graphicsCurveSurveyMenuItem;
+	}
+
+	public void setGraphicsCurveSurveyMenuItem(MenuItem graphicsCurveSurveyMenuItem) {
+		this.graphicsCurveSurveyMenuItem = graphicsCurveSurveyMenuItem;
 	}
 }

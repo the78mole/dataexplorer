@@ -62,6 +62,9 @@ import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.ui.data.SummarySpots;
 import gde.histo.ui.data.SummarySpots.MarkerLine;
+import gde.histo.ui.menu.HistoTabAreaContextMenu;
+import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuOnDemand;
+import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuType;
 import gde.histo.utils.HistoCurveUtils;
 import gde.histo.utils.HistoTimeLine;
 import gde.log.Logger;
@@ -69,9 +72,6 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
-import gde.ui.menu.TabAreaContextMenu;
-import gde.ui.menu.TabAreaContextMenu.TabMenuOnDemand;
-import gde.ui.menu.TabAreaContextMenu.TabMenuType;
 import gde.utils.MathUtils;
 import gde.utils.StringHelper;
 
@@ -107,7 +107,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		this.curveAreaBorderColor = this.settings.getGraphicsCurvesBorderColor();
 
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-		this.contextMenu = new TabAreaContextMenu();
+		this.contextMenu = new HistoTabAreaContextMenu();
 
 		init();
 
