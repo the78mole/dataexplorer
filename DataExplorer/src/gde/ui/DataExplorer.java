@@ -3251,7 +3251,7 @@ public class DataExplorer extends Composite {
 				this.setCurveSelectorEnabled(true); // this.isCurveSelectorEnabled
 				this.enableRecordSetComment(this.isRecordCommentVisible);
 				this.enableCurveSurvey(false);
-				this.enableGraphicsHeader(true); // this.isGraphicsHeaderVisible
+				this.enableGraphicsHeader(this.isGraphicsHeaderVisible);
 			}
 		} else {
 			if (this.histoSummaryTabItem != null && !this.histoSummaryTabItem.isDisposed()) {
