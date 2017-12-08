@@ -1184,15 +1184,19 @@ public class SettingsDialog extends Dialog {
 
 									@Override
 									public void focusLost(FocusEvent e) {
+										SettingsDialog.log.log(Level.FINEST, "histoRetrospectMonths.focusLost, event=" + e); //$NON-NLS-1$
 										if (!this.trimmedInitialText.equals(SettingsDialog.this.histoRetrospectMonths.getText().trim())) {
+											SettingsDialog.log.log(Level.FINEST, "setText=" + SettingsDialog.this.settings.getRetrospectMonths()); //$NON-NLS-1$
+											SettingsDialog.this.histoRetrospectMonths.setText(String.format("  %9d", SettingsDialog.this.settings.getRetrospectMonths()));
 											SettingsDialog.this.application.resetHisto();
 										}
 									}
 
 									@Override
 									public void focusGained(FocusEvent e) {
+										SettingsDialog.this.histoRetrospectMonths.setText(String.format("  %9d", SettingsDialog.this.settings.getRetrospectMonths()));
 										this.trimmedInitialText = SettingsDialog.this.histoRetrospectMonths.getText().trim();
-
+										SettingsDialog.log.log(Level.FINEST, "histoRetrospectMonths.focusGained, text=" + this.trimmedInitialText); //$NON-NLS-1$
 									}
 								});
 							}
