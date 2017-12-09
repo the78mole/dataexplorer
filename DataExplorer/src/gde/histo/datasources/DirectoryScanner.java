@@ -53,6 +53,7 @@ import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.device.IHistoDevice;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.io.HistoOsdReaderWriter;
+import gde.io.FileHandler;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
@@ -155,6 +156,7 @@ public final class DirectoryScanner {
 	 * File types supported by the history.
 	 */
 	public static class SourceDataSet {
+		private final IDevice device = DataExplorer.getInstance().getActiveDevice();
 
 		private final Path				path;
 		private final DataSetType	dataSetType;
@@ -369,6 +371,26 @@ public final class DirectoryScanner {
 			return dataSetType.readVaults(path, trusses);
 		}
 
+		/**
+		 * @param desiredRecordSetName is a valid recordsetName or empty
+		 * @return true if the file was opened or imported
+		 */
+		public boolean load(String desiredRecordSetName) {
+			if (!FileUtils.checkFileExist(path.toString())) return false;
+
+			if (path.endsWith(GDE.FILE_ENDING_DOT_OSD)) {
+				new FileHandler().openOsdFile(path.toString(), desiredRecordSetName);
+				return true;
+			} else if (device instanceof IHistoDevice) {
+				List<String> validatedImportExtentions = ((IHistoDevice) device).getSupportedImportExtentions();
+				if (!validatedImportExtentions.isEmpty() && SourceDataSet.isWorkableFile(path, validatedImportExtentions)) {
+					((IHistoDevice) device).importDeviceData(path);
+					return true;
+				}
+			}
+			return false;
+		}
+
 		public Path getPath() {
 			return this.path;
 		}
@@ -415,7 +437,7 @@ public final class DirectoryScanner {
 	 * @throws NotSupportedFileFormatException
 	 * @throws IOException
 	 */
-	public boolean validateHistoFilePaths(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
+	public synchronized boolean validateHistoFilePaths(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
 		IDevice lastDevice = this.validatedDevice;
 		Channel lastChannel = this.validatedChannel;
 		Path lastHistoDataDir = this.validatedDirectories.get(DirectoryType.DATA);

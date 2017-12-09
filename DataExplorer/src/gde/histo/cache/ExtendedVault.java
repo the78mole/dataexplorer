@@ -36,7 +36,7 @@ import gde.utils.StringHelper;
  * Add functions to the pure serializable histo vault object.
  * @author Thomas Eickert (USER)
  */
-public final class ExtendedVault extends HistoVault {
+public final class ExtendedVault extends HistoVault implements Comparable<ExtendedVault> {
 	private static final String				$CLASS_NAME			= ExtendedVault.class.getName();
 	private static final Logger				log							= Logger.getLogger($CLASS_NAME);
 
@@ -376,6 +376,14 @@ public final class ExtendedVault extends HistoVault {
 		} else if (!this.logDeviceName.equals(other.logDeviceName)) return false;
 		if (this.logStartTimestampMs != other.logStartTimestampMs) return false;
 		return true;
+	}
+
+	/**
+	 * The newest vault is the smallest one.
+	 */
+	@Override
+	public int compareTo(ExtendedVault o) {
+		return Long.compare(o.logStartTimestampMs, this.logStartTimestampMs);
 	}
 
 }

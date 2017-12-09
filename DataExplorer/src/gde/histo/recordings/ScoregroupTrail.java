@@ -20,13 +20,13 @@
 package gde.histo.recordings;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import gde.device.ScoreGroupType;
-import gde.device.TrailTypes;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.HistoSet;
 import gde.histo.utils.UniversalQuantile;
@@ -37,9 +37,9 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public final class ScoregroupTrail extends TrailRecord {
-	private final static String		$CLASS_NAME				= ScoregroupTrail.class.getName();
-	private final static long			serialVersionUID	= 110124007964748556L;
-	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME				= ScoregroupTrail.class.getName();
+	private final static long		serialVersionUID	= 110124007964748556L;
+	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * @param newOrdinal
@@ -71,8 +71,8 @@ public final class ScoregroupTrail extends TrailRecord {
 	}
 
 	@Override
-	public Integer getVaultPoint(ExtendedVault vault, TrailTypes trailType) {
-		return vault.getScorePoint(trailType.ordinal());
+	public Integer getVaultPoint(ExtendedVault vault, int trailOrdinal) {
+		return vault.getScorePoint(trailOrdinal);
 	}
 
 	/**
@@ -86,7 +86,7 @@ public final class ScoregroupTrail extends TrailRecord {
 
 	@Override
 	public void addSummaryPoints(ExtendedVault histoVault) {
-		Stream<TrailTypes> trailTypeStream = getScoregroup().getScore().stream().map(s -> TrailTypes.fromOrdinal(s.getLabel().ordinal()));
+		Stream<Integer> trailTypeStream = getScoregroup().getScore().stream().map(s -> s.getTrailOrdinal());
 		IntSummaryStatistics stats = trailTypeStream.map(t -> getVaultPoint(histoVault, t)).collect(Collectors.summarizingInt(Integer::intValue));
 		this.vaultMaximums.add(stats.getMax());
 		this.vaultMinimums.add(stats.getMin());
@@ -108,4 +108,36 @@ public final class ScoregroupTrail extends TrailRecord {
 		return result;
 	}
 
+	@Override
+	public double[][] determineMinMaxQuantiles() {
+		if (getScoregroup().getScore().size() == 1) {
+			int trailOrdinal = getScoregroup().getScore().get(0).getTrailOrdinal();
+			Collection<List<ExtendedVault>> vaults = this.getParentTrail().getHistoVaults().values();
+
+			Stream<Integer> points = vaults.parallelStream().flatMap(List::stream).map(v -> getVaultPoint(v, trailOrdinal));
+			List<Double> decodedValues = points.map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(decodedValues, true);
+
+			// as only one trail exists we take the values from this trail and provide them as both min and max
+			double[] tukeyBoxPlot = tmpQuantile.getTukeyBoxPlot();
+			return new double[][] { tukeyBoxPlot, tukeyBoxPlot };
+		} else {
+			int[] minMaxScoreOrdinals = this.trailSelector.determineMinMaxScoreOrdinals();
+			if (minMaxScoreOrdinals.length != 0) {
+				Collection<List<ExtendedVault>> vaults = this.getParentTrail().getHistoVaults().values();
+
+				Stream<Integer> pointMinimums = vaults.parallelStream().flatMap(List::stream).map(v -> getVaultPoint(v, minMaxScoreOrdinals[0]));
+				List<Double> decodedMinimums = pointMinimums.map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+				UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true);
+
+				Stream<Integer> pointMaximums = vaults.parallelStream().flatMap(List::stream).map(v -> getVaultPoint(v, minMaxScoreOrdinals[1]));
+				List<Double> decodedMaximums = pointMaximums.map(i1 -> HistoSet.decodeVaultValue(this, i1 / 1000.)).collect(Collectors.toList());
+				UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true);
+
+				return new double[][] { minQuantile.getTukeyBoxPlot(), maxQuantile.getTukeyBoxPlot() };
+			} else {
+				return new double[0][];
+			}
+		}
+	}
 }

@@ -23,8 +23,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -42,10 +40,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.datasources.DirectoryScanner.SourceDataSet;
-import gde.histo.device.IHistoDevice;
 import gde.histo.exclusions.ExclusionActivity;
 import gde.histo.recordings.TrailRecordSet;
-import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -127,7 +123,7 @@ public class HistoTabAreaContextMenu {
 						copyPrintImageItem.setEnabled(true);
 					} else {
 						setAllEnabled(true);
-						final String dataFilePath = popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString();
+						String dataFilePath = popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString();
 						if (dataFilePath.isEmpty()) {
 							fileName.setEnabled(false);
 							openRecordSetItem.setEnabled(false);
@@ -139,10 +135,9 @@ public class HistoTabAreaContextMenu {
 						} else {
 							openFolderItem.setEnabled(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN));
 
-							final String tmpFileName = Paths.get(dataFilePath).getFileName().toString();
-							fileName.setText(">> " + (tmpFileName.length() > 22 //$NON-NLS-1$
-									? "..." + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName).toString() //$NON-NLS-1$
-									+ GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString()) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
+							String tmpFileName = Paths.get(dataFilePath).getFileName().toString();
+							String displayName = tmpFileName.length() > 22 ? "..." + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName;
+							fileName.setText(">> " + displayName.toString() + GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString()) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
 							openRecordSetItem.setText(Messages.getString(dataFilePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN) ? MessageIds.GDE_MSGT0850
 									: MessageIds.GDE_MSGT0849));
 						}
@@ -150,6 +145,7 @@ public class HistoTabAreaContextMenu {
 						if (!GDE.IS_OS_ARCH_ARM) hideItem.setToolTipText(excludedList.isEmpty() ? Messages.getString(MessageIds.GDE_MSGT0798) : excludedList);
 					}
 				}
+
 				if (type == TabMenuType.HISTOTABLE) {
 					suppressModeItem.setSelection(application.getMenuBar().getSuppressModeItem().getSelection());
 					curveSelectionItem.setSelection(application.getMenuBar().getCurveSelectionMenuItem().getSelection());
@@ -190,10 +186,9 @@ public class HistoTabAreaContextMenu {
 						} else {
 							openFolderItem.setEnabled(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN));
 
-							final String tmpFileName = Paths.get(dataFilePath).getFileName().toString();
-							fileName.setText(">> " + (tmpFileName.length() > 22 //$NON-NLS-1$
-									? "..." + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName).toString() //$NON-NLS-1$
-									+ GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString()) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
+							String tmpFileName = Paths.get(dataFilePath).getFileName().toString();
+							String displayName = tmpFileName.length() > 22 ? "..." + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName;
+							fileName.setText(">> " + displayName.toString() + GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString()) + " <<"); //$NON-NLS-2$ //$NON-NLS-3$
 							openRecordSetItem.setText(Messages.getString(dataFilePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN) ? MessageIds.GDE_MSGT0850
 									: MessageIds.GDE_MSGT0849));
 						}
@@ -226,17 +221,9 @@ public class HistoTabAreaContextMenu {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "openRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-						File file = new File(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString());
-						if (FileUtils.checkFileExist(file.getPath())) {
-							List<String> validatedImportExtentions = application.getActiveDevice() instanceof IHistoDevice
-									? ((IHistoDevice) application.getActiveDevice()).getSupportedImportExtentions() : new ArrayList<String>();
-
-							if (file.toPath().endsWith(GDE.FILE_ENDING_DOT_OSD)) {
-								String recordSetName = popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString().split(Pattern.quote(TrailRecordSet.BASE_NAME_SEPARATOR))[0];
-								new FileHandler().openOsdFile(file.getAbsolutePath(), recordSetName);
-							} else if (!validatedImportExtentions.isEmpty() && SourceDataSet.isWorkableFile(file.toPath(), validatedImportExtentions)) {
-								((IHistoDevice) application.getActiveDevice()).importDeviceData(file.toPath());
-							}
+						SourceDataSet sourceDataSet = new SourceDataSet(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()));
+						String recordSetName = popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString().split(Pattern.quote(TrailRecordSet.BASE_NAME_SEPARATOR))[0];
+						if (sourceDataSet.load(recordSetName)) {
 							application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL));
 							application.updateGraphicsWindow();
 						}
@@ -388,7 +375,6 @@ public class HistoTabAreaContextMenu {
 					application.getMenuBar().getGraphicsHeaderMenuItem().setSelection(selection);
 					application.enableGraphicsHeader(selection);
 					application.updateHistoTabs(false, false);
-					;
 				}
 			});
 			displayGraphicsCommentItem = new MenuItem(popupMenu, SWT.CHECK);
@@ -402,7 +388,6 @@ public class HistoTabAreaContextMenu {
 					application.getMenuBar().getRecordCommentMenuItem().setSelection(selection);
 					application.enableRecordSetComment(selection);
 					application.updateHistoTabs(false, false);
-					;
 				}
 			});
 
@@ -417,7 +402,6 @@ public class HistoTabAreaContextMenu {
 					application.getMenuBar().getGraphicsCurveSurveyMenuItem().setSelection(selection);
 					application.enableCurveSurvey(selection);
 					application.updateHistoTabs(false, false);
-					;
 				}
 			});
 			separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);

@@ -101,7 +101,7 @@ public final class TrailSelector {
 		// if (this.trailRecord.channelItem != null) {
 		List<ScoreType> scoreTypes = ((ScoreGroupType) trailRecord.channelItem).getScore();
 		for (int i = 0; i < scoreTypes.size(); i++) {
-			this.applicableTrailsOrdinals.add(scoreTypes.get(i).getLabel().ordinal());
+			this.applicableTrailsOrdinals.add(scoreTypes.get(i).getTrailOrdinal());
 			this.applicableTrailsTexts.add(getDeviceXmlReplacement(scoreTypes.get(i).getValue()));
 		}
 		log.finer(() -> this.trailRecord.getName() + " score "); //$NON-NLS-1$
@@ -319,4 +319,21 @@ public final class TrailSelector {
 		return replacementKey != null ? this.xmlResource.getReplacement(replacementKey) : GDE.STRING_EMPTY;
 	}
 
+	/**
+	 * @return the ordinal numbers which hold the min / max values or return an empty array
+	 */
+	public int[] determineMinMaxScoreOrdinals() {
+		List<ScoreType> scoreTypes = ((ScoreGroupType) trailRecord.channelItem).getScore();
+		// find the score labels with a name containing min/max
+		int index4Min = -1, index4Max = -1;
+		for (int i = 0; i < this.applicableTrailsOrdinals.size(); i++) {
+			if (scoreTypes.get(i).getLabel().name().contains("min")) index4Min = i;
+			if (scoreTypes.get(i).getLabel().name().contains("max")) index4Max = i;
+		}
+		if (index4Min != -1 && index4Max != -1) {
+			return new int[] { index4Min, index4Max };
+		} else {
+			return new int[0];
+		}
+	}
 }

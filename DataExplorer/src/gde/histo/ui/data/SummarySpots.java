@@ -25,7 +25,6 @@ import static java.util.logging.Level.FINEST;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -35,39 +34,39 @@ import java.util.logging.Level;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 
 import gde.config.Settings;
 import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecord;
-import gde.histo.recordings.TrailRecordSet;
-import gde.histo.ui.data.SummarySpots.MarkerLine;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.MathUtils;
 
 /**
- * Graph element data belonging to the summary graph.
- * Corresponds to the recordset level.
- * Key is the record ordinal number.
- * xPos/yPos values define the lower left corner of a 2x2 pixel element (or mid left of an uneven sized element)
+ * Graph element data belonging to a record row in the summary graph.
+ * xPos/yPos values define the lower left corner of a 2x2 pixel element
  * @author Thomas Eickert (USER)
  */
-public class SummarySpots extends HashMap<Integer, MarkerLine> {
-	private static final String		$CLASS_NAME				= SummarySpots.class.getName();
-	private static final Logger		log								= Logger.getLogger($CLASS_NAME);
-	private static final long			serialVersionUID	= -1640475554952161258L;
+public class SummarySpots { // MarkerLine + Boxplot + Warnings
+	private static final String	$CLASS_NAME					= SummarySpots.class.getName();
+	private static final Logger	log									= Logger.getLogger($CLASS_NAME);
 
-	private final int							elementWidth;
-	private final TrailRecordSet	recordSet;
+	/**
+	 * Number of most recent logs which are checked for warnings.
+	 */
+	private static final int		WARNING_LOG_NUMBER	= 3;
 
-	private int										fixedCanvasHeight;
+	public enum OutlierWarning {
+		WHISKER_RANGE, QUARTILE_RANGE
+	}
 
-	enum Density {
+	public enum Density {
 		EXTREME(2), HIGH(3), MEDIUM(4), LOW(5);
 
 		private final Settings			settings					= Settings.getInstance();
 
-		private final int						distanceThreshold	= 30;											// number of pixels for comparison with the average pixel distance
+		private final int						distanceThreshold	= 65;											// number of pixels for comparison with the average pixel distance
 
 		private final int						markerWidth;																// in pixel
 
@@ -90,159 +89,237 @@ public class SummarySpots extends HashMap<Integer, MarkerLine> {
 			return density.name();
 		}
 
-		public int getThresholdDistance() {
+		public static Density toDensity(int drawAreaWidth, int markerNumber) {
+			Density density;
+			int convenientDistance = (int) (0. + drawAreaWidth / markerNumber);
+			// use the box size as a standard of comparison
+			if (convenientDistance > Density.LOW.getThresholdDistance())
+				density = Density.LOW;
+			else if (convenientDistance > Density.MEDIUM.getThresholdDistance())
+				density = Density.MEDIUM;
+			else if (convenientDistance > Density.HIGH.getThresholdDistance())
+				density = Density.HIGH;
+			else
+				density = Density.EXTREME;
+			log.finest(() -> String.format("density=%s  convenientDistance=%d  thresholdDistance=%d  elementWidth=%d", //$NON-NLS-1$
+					density, convenientDistance, density.getThresholdDistance(), density.markerWidth));
+			return density;
+		}
+
+		private int getThresholdDistance() {
 			double symmetricItemValue = this.markerWidth - avg();
 			return (int) ((1 + symmetricItemValue) * this.distanceThreshold / (1 + this.settings.getBoxplotScaleOrdinal()));
 		}
 	}
 
+	private final TrailRecord										record;
+
+	private int																	elementWidth;
+	private int																	stripHeight;
+
 	/**
-	 * Graph element data belonging to a record row in the summary graph.
-	 * Key is the x axis position.
+	 * The markers at the x position.
+	 * Key is the x axis position with a distance defined by the element size.
 	 */
-	public class MarkerLine {
-		private static final long										serialVersionUID	= 224357427594872383L;
+	private final TreeMap<Integer, PosMarkers>	xPositions	= new TreeMap<>();
+	private int																	stripNetX0;										// start pos for the first marker
+	private int																	stripNetWidth;								// relative start pos for the LAST marker
 
-		@SuppressWarnings("hiding")
-		private final Logger												log								= Logger.getLogger(MarkerLine.class.getName());
+	private double															xValueScaleFactor;
+	private double															xValueOffset;
+	private double															xPointScaleFactor;
+	private double															xPointOffset;
 
-		private final TrailRecord										record;
-		private final int														displayRank;
+	private OutlierWarning[]											minMaxWarning	= null;
 
-		private final TreeMap<Integer, PosMarkers>	xPositions				= new TreeMap<>();
-		private final int														stripX0;																													// start pos for the first marker
-		private final int														stripWidth;																												// start pos for the LAST marker
-		private final int														stripY0;																													// start pos for the drawing strip
-		private final int														stripHeight;
+	public SummarySpots(TrailRecord record) {
+		this.record = record;
+	}
 
-		MarkerLine(TrailRecord record, int displayRank) {
-			this.record = record;
-			this.displayRank = displayRank;
+	public void initialize(int newStripHeight, Density newDensity) {
+		clear();
 
-			this.stripHeight = (fixedCanvasHeight + elementWidth / 2) / recordSet.getDisplayRecords().size();
-			int tmpWidth = recordSet.getDrawAreaBounds().width - elementWidth - elementWidth % 2; // left and right gap for overlapping elements
-			this.stripWidth = tmpWidth - tmpWidth % elementWidth; // right gap for overlapping elements
-			this.stripX0 = recordSet.getDrawAreaBounds().x + elementWidth / 2;
-			this.stripY0 = recordSet.getDrawAreaBounds().y + stripHeight * displayRank + 1;
+		this.stripHeight = newStripHeight;
+		this.elementWidth = newDensity.markerWidth;
+
+		Rectangle drawAreaBounds = record.getParentTrail().getDrawAreaBounds();
+		// elements
+		this.stripNetX0 = drawAreaBounds.x + elementWidth / 2;
+		int tmpWidth = drawAreaBounds.width - elementWidth; // half left and right gap for overlapping elements
+		this.stripNetWidth = tmpWidth - tmpWidth % elementWidth; // additional right gap because of x position delta (is the elements size)
+
+		double decodedScaleMin = defineDecodedScaleMin();
+		double decodedScaleMax = defineDecodedScaleMax();
+
+		xValueScaleFactor = stripNetWidth / (decodedScaleMax - decodedScaleMin);
+		xValueOffset = decodedScaleMin * xValueScaleFactor - .5;
+
+		xPointScaleFactor = HistoSet.decodeDeltaValue(record, 1. / 1000.) / ((decodedScaleMax - decodedScaleMin) / stripNetWidth);
+		xPointOffset = HistoSet.encodeVaultValue(record, decodedScaleMin) * 1000. * xPointScaleFactor - .5;
+	}
+
+	/**
+	 * @param value is a real measurement value
+	 * @return the x axis position
+	 */
+	public int getXPos(double value) {
+		return (int) (value * xValueScaleFactor - xValueOffset);
+	}
+
+	/**
+	 * @param point is the record point value
+	 * @return the x axis position
+	 */
+	public int getXPos(Integer point) {
+		return (int) (point * xPointScaleFactor - xPointOffset);
+	}
+
+	public void clear() {
+		xPositions.clear();
+		minMaxWarning = null;
+	}
+
+	public OutlierWarning[] getMinMaxWarning() {
+		if (minMaxWarning == null) {
+			minMaxWarning = record.getMinMaxWarning(WARNING_LOG_NUMBER);
+		}
+		return minMaxWarning;
+	}
+
+	/**
+	 * Rebuild from record or suite master record data.
+	 * @return the list of marker objects which holds all marker positions on the x axis
+	 */
+	private TreeMap<Integer, PosMarkers> defineXPositions(int limit) {
+		log.finest(() -> record.getName());
+		TreeMap<Integer, PosMarkers> resultXPositions = new TreeMap<>();
+
+		final Vector<Integer> tmpRecord;
+		if (record.getTrailSelector().isTrailSuite()) {
+			tmpRecord = record.getSuiteRecords().get(record.getTrailSelector().getTrailType().getSuiteMasterIndex());
+		} else {
+			tmpRecord = record;
 		}
 
-		/**
-		 * Rebuild from record or suite master record data.
-		 * @return
-		 */
-		private TreeMap<Integer, PosMarkers> defineXPositions(int limit) {
-			log.finest(() -> record.getName());
-			TreeMap<Integer, PosMarkers> resultXPositions = new TreeMap<>();
-			int pointOffset = definePointOffset();
-			double scaleFactor = defineScaleFactor();
-			double xOffset = pointOffset * scaleFactor - .5;
-
-			final Vector<Integer> tmpRecord;
-			if (record.getTrailSelector().isTrailSuite()) {
-				tmpRecord = record.getSuiteRecords().get(record.getTrailSelector().getTrailType().getSuiteMasterIndex());
-			} else {
-				tmpRecord = record;
-			}
-
-			int actualLimit = limit > 0 && limit < tmpRecord.size() ? limit : tmpRecord.size();
-			for (int i = 0; i < actualLimit; i++) {
-				Integer point = tmpRecord.get(i);
-				if (point != null) {
-					int xPos = (int) (point * scaleFactor - xOffset);
-					int xDrawer = xPos - xPos % elementWidth;
-					log.finest(() -> "xPos=" + xPos);
-					PosMarkers posMarkers = resultXPositions.get(xDrawer);
-					if (posMarkers == null) {
-						posMarkers = new PosMarkers(stripHeight);
-						resultXPositions.put(xDrawer, posMarkers);
-					}
-					posMarkers.add(i);
-				}
-			}
-			return resultXPositions;
-		}
-
-		private int[] defineTukeyXPositions() {
-			double pointOffset = defineDecodedScaleMin();
-			double scaleFactor = stripWidth / (defineDecodedScaleMax() - defineDecodedScaleMin());
-			double xOffset = pointOffset * scaleFactor - .5;
-
-			double[] tukeyBoxPlot = record.getQuantile().getTukeyBoxPlot();
-			int[] resultXPositions = new int[tukeyBoxPlot.length];
-			for (int i = 0; i < tukeyBoxPlot.length; i++) {
-				int xPos = (int) (tukeyBoxPlot[i] * scaleFactor - xOffset);
+		int actualLimit = limit > 0 && limit < tmpRecord.size() ? limit : tmpRecord.size();
+		for (int i = 0; i < actualLimit; i++) {
+			Integer point = tmpRecord.get(i);
+			if (point != null) {
+				int xPos = getXPos(point);
 				int xDrawer = xPos - xPos % elementWidth;
-				resultXPositions[i] = xDrawer;
+				log.finest(() -> "xPos=" + xPos);
+				PosMarkers posMarkers = resultXPositions.get(xDrawer);
+				if (posMarkers == null) {
+					posMarkers = new PosMarkers(stripHeight);
+					resultXPositions.put(xDrawer, posMarkers);
+				}
+				posMarkers.add(i);
 			}
-			log.finer(() -> Arrays.toString(resultXPositions));
-			return resultXPositions;
 		}
+		return resultXPositions;
+	}
 
-		public List<Integer> defineGrid() {
-			List<Integer> grid = new ArrayList<>();
-			double xStep = stripWidth / 10.;
-			for (int i = 1; i < 10; i++) {
-				grid.add((stripX0 + (int) (xStep * i)));
+	public int[] defineTukeyXPositions() {
+		double[] tukeyBoxPlot = record.getQuantile().getTukeyBoxPlot();
+		int[] resultXPositions = new int[tukeyBoxPlot.length];
+		for (int i = 0; i < tukeyBoxPlot.length; i++) {
+			int xPos = getXPos(tukeyBoxPlot[i]);
+			resultXPositions[i] = xPos;
+		}
+		log.finer(() -> Arrays.toString(resultXPositions));
+		return resultXPositions;
+	}
+
+	public List<Integer> defineGrid() {
+		List<Integer> grid = new ArrayList<>();
+		double xStep = stripNetWidth / 10.;
+		for (int i = 1; i < 10; i++) {
+			grid.add((stripNetX0 + (int) (xStep * i)));
+		}
+		return grid;
+	}
+
+	public void drawRecentMarkers(GC gc, int stripY0) {
+		drawMarkers(gc, defineXPositions(WARNING_LOG_NUMBER), stripY0, DataExplorer.COLOR_RED);
+	}
+
+	public void drawAllMarkers(GC gc, int stripY0) {
+		drawMarkers(gc, getXPositions(), stripY0, DataExplorer.COLOR_GREY);
+	}
+
+	private void drawMarkers(GC gc, TreeMap<Integer, PosMarkers> tmpXPositions, int stripY0, Color color) {
+		gc.setLineWidth(1);
+		gc.setLineStyle(SWT.LINE_SOLID);
+		gc.setForeground(color);
+		gc.setBackground(color);
+
+		int[] tukeyXPositions = defineTukeyXPositions();
+		for (Map.Entry<Integer, PosMarkers> xEntry : tmpXPositions.entrySet()) {
+			int lowerLimit = tukeyXPositions[LOWER_WHISKER.ordinal()] - tukeyXPositions[LOWER_WHISKER.ordinal()] % elementWidth;
+			int upperLimit = tukeyXPositions[UPPER_WHISKER.ordinal()] - tukeyXPositions[UPPER_WHISKER.ordinal()] % elementWidth + elementWidth;
+			int actualWidth = xEntry.getKey() < lowerLimit || xEntry.getKey() >= upperLimit ? elementWidth * 2 : elementWidth;
+			for (Integer yPos : xEntry.getValue().yPositions) {
+				gc.fillRectangle(record.getParentTrail().getDrawAreaBounds().x + xEntry.getKey(), stripY0 + yPos - actualWidth / 2 + 1, actualWidth, actualWidth);
+				if (log.isLoggable(FINEST)) log.log(FINEST, String.format("x=%d y=%d", stripNetX0 + xEntry.getKey(), stripY0 + yPos));
 			}
-			return grid;
 		}
+	}
 
-		public void drawRecentMarkers(GC gc) {
-			drawMarkers(gc, defineXPositions(3), DataExplorer.COLOR_RED);
-		}
+	public double defineDecodedScaleMin() { // todo consider caching
+		log.finer(() -> "'" + this.record.getName() + "'  syncSummaryMin=" + record.getSyncSummaryMin() + " syncSummaryMax=" + record.getSyncSummaryMax());
+		return MathUtils.floorStepwise(record.getSyncSummaryMin(), record.getSyncSummaryMax() - record.getSyncSummaryMin());
+	}
 
-		public void drawAllMarkers(GC gc) {
-			drawMarkers(gc, getXPositions(), DataExplorer.COLOR_GREY);
-		}
+	public double defineDecodedScaleMax() { // todo consider caching
+		return MathUtils.ceilStepwise(record.getSyncSummaryMax(), record.getSyncSummaryMax() - record.getSyncSummaryMin());
+	}
 
-		private void drawMarkers(GC gc, TreeMap<Integer, PosMarkers> tmpXPositions, Color color) {
-			gc.setLineWidth(1);
-			gc.setLineStyle(SWT.LINE_SOLID);
-			gc.setForeground(color);
-			gc.setBackground(color);
+	public int getStripHeight() {
+		return this.stripHeight;
+	}
 
-			int[] tukeyXPositions = defineTukeyXPositions();
-			double lowerXPos = tukeyXPositions[LOWER_WHISKER.ordinal()];
-			double upperXPos = tukeyXPositions[UPPER_WHISKER.ordinal()];
-			for (Map.Entry<Integer, PosMarkers> xEntry : tmpXPositions.entrySet()) {
-				int actualWidth = xEntry.getKey() < lowerXPos || xEntry.getKey() > upperXPos ? elementWidth * 2 : elementWidth;
-				for (Integer yPos : xEntry.getValue().yPositions) {
-					gc.fillRectangle(stripX0 + xEntry.getKey(), stripY0 + yPos - actualWidth / 2 + 1, actualWidth, actualWidth);
-					if (log.isLoggable(FINEST)) log.log(FINEST, String.format("x=%d y=%d", stripX0 + xEntry.getKey(), stripY0 + yPos));
+	public int getElementWidth() {
+		return elementWidth;
+	}
+
+	public TreeMap<Integer, PosMarkers> getXPositions() {
+		if (xPositions.isEmpty()) xPositions.putAll(defineXPositions(-1));
+		return xPositions;
+	}
+
+	public List<Integer> getSnappedIndexes(int stripXPos) {
+		int index = stripXPos - stripXPos % elementWidth;
+		PosMarkers posMarkers = xPositions.get(index);
+		return posMarkers != null ? posMarkers : new ArrayList<>();
+
+	}
+
+	public List<Integer> getSnappedIndexes(int stripXPos, int stripYPos) {
+		if (stripYPos < 0 || stripYPos > stripHeight) return new ArrayList<>();
+
+		List<Integer> indexes = getSnappedIndexes(stripXPos);
+		if (indexes.size() <= 1) {
+			return indexes;
+		} else {
+			int maxAdditionalMarker = (stripHeight - elementWidth) / 2 / (elementWidth + 1) * 2;
+			if (maxAdditionalMarker == 0 || indexes.size() > maxAdditionalMarker + 1) {
+				return indexes;
+			} else {
+				int alternatingPosition = (stripHeight / 2 - stripYPos - 2 + elementWidth / 2) / (elementWidth + 1);
+				int index = alternatingPosition > 0 ? alternatingPosition * 2 - 1 : -alternatingPosition * 2;
+				if (index >= indexes.size()) { // the vertical space is not filled with markers
+					return new ArrayList<>();
+				} else {
+					log.finest(() -> "alternatingPosition=" + alternatingPosition + "  index=" + index);
+					return new ArrayList<>(Arrays.asList(new Integer[] { indexes.get(index) }));
 				}
 			}
 		}
-
-		public double defineDecodedScaleMin() { // todo consider caching
-			log.finer(() -> "'" + this.record.getName() + "'  syncSummaryMin=" + record.getSyncSummaryMin() + " syncSummaryMax=" + record.getSyncSummaryMax());
-			return MathUtils.floorStepwise(record.getSyncSummaryMin(), record.getSyncSummaryMax() - record.getSyncSummaryMin());
-		}
-
-		public double defineDecodedScaleMax() { // todo consider caching
-			return MathUtils.ceilStepwise(record.getSyncSummaryMax(), record.getSyncSummaryMax() - record.getSyncSummaryMin());
-		}
-
-		private int definePointOffset() {
-			return (int) (HistoSet.encodeVaultValue(record, defineDecodedScaleMin()) * 1000.);
-		}
-
-		private double defineScaleFactor() {
-			return record.getFactor() / ((defineDecodedScaleMax() - defineDecodedScaleMin()) / stripWidth) / 1000.;
-		}
-
-		public int getStripHeight() {
-			return this.stripHeight;
-		}
-
-		public TreeMap<Integer, PosMarkers> getXPositions() {
-			if (xPositions.isEmpty()) xPositions.putAll(defineXPositions(-1));
-			return xPositions;
-		}
-
 	}
 
 	/**
 	 * Graph elements for an x axis position in the summary record row.
+	 * The value is the record's data point index in order to get a back reference to the vault data.
 	 */
 	public class PosMarkers extends ArrayList<Integer> {
 		private static final long		serialVersionUID	= 5955746265581640576L;
@@ -263,12 +340,15 @@ public class SummarySpots extends HashMap<Integer, MarkerLine> {
 			this.halfDrawingHeight = (stripHeight - 1) / 2; // leave at least one pixel at the top of the strip
 		}
 
+		/**
+		 * @param index is the record's data point index
+		 */
 		@Override
-		public boolean add(Integer e) {
-			yPositions.add(-nextRelativeYPos + halfDrawingHeight + 1); // add 1 pixel for a little shift to the top
+		public boolean add(Integer index) {
+			yPositions.add(-nextRelativeYPos + halfDrawingHeight + 0); // add 0 pixel for a little shift to the bottom
 
 			// the next position is one step towards the outer border and alternates from the lower half to the upper half
-			if (this.size() % 2 == 0) {
+			if ((this.size() - 1) % 2 == 0 && nextRelativeYPos != 0) {
 				nextRelativeYPos = -Math.abs(nextRelativeYPos); // lower half
 			} else {
 				nextRelativeYPos = Math.abs(nextRelativeYPos) + yStep; // upper half
@@ -280,41 +360,8 @@ public class SummarySpots extends HashMap<Integer, MarkerLine> {
 				nextRelativeYPos = yStep - cycleNumber % yStep - 1;
 			}
 			log.log(Level.FINEST, "" + size(), String.format(" cycleNumber=%d nextRelativeYPos=%d", cycleNumber, nextRelativeYPos));
-			return super.add(e);
-		}
-	}
-
-	public SummarySpots(TrailRecordSet recordSet, int fixedCanvasHeight) {
-		super();
-		this.recordSet = recordSet;
-		this.fixedCanvasHeight = fixedCanvasHeight;
-
-		this.elementWidth = defineDensity();
-
-		for (int i = 0; i < recordSet.getDisplayRecords().size(); i++) {
-			TrailRecord record = recordSet.getDisplayRecords().get(i);
-			log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", record.getName(), record.isVisible(), record.isDisplayable(), record.isScaleSynced(), record.isScaleVisible()));
-
-			put(record.getOrdinal(), new MarkerLine(record, i));
+			return super.add(index);
 		}
 
 	}
-
-	private int defineDensity() {
-		Density density;
-		int convenientDistance = (int) (0. + recordSet.getDrawAreaBounds().width / recordSet.getTimeStepSize());
-		// use the box size as a standard of comparison
-		if (convenientDistance > Density.LOW.getThresholdDistance())
-			density = Density.LOW;
-		else if (convenientDistance > Density.MEDIUM.getThresholdDistance())
-			density = Density.MEDIUM;
-		else if (convenientDistance > Density.HIGH.getThresholdDistance())
-			density = Density.HIGH;
-		else
-			density = Density.EXTREME;
-		log.finer(() -> String.format("density=%s  convenientDistance=%d  thresholdDistance=%d  elementWidth=%d", //$NON-NLS-1$
-				density, convenientDistance, density.getThresholdDistance(), density.markerWidth));
-		return density.markerWidth;
-	}
-
 }

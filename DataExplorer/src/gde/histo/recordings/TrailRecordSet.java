@@ -125,24 +125,20 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 			trailRecord.clear();
 			if (!trailRecord.getTrailSelector().isTrailSuite()) {
-				for (Map.Entry<Long, List<ExtendedVault>> entry : histoVaults.entrySet()) {
-					for (ExtendedVault histoVault : entry.getValue()) {
-						trailRecord.addElement(trailRecord.getVaultPoint(histoVault, trailRecord.getTrailSelector().getTrailType()));
-						if (isSmartStatistics) {
-							trailRecord.addSummaryPoints(histoVault);
-						}
+				histoVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
+					trailRecord.addElement(trailRecord.getVaultPoint(v, trailRecord.getTrailSelector().getTrailOrdinal()));
+					if (isSmartStatistics) {
+						trailRecord.addSummaryPoints(v);
 					}
-				}
+				});
 			} else {
 				trailRecord.setSuite(histoVaults.size());
-				for (Map.Entry<Long, List<ExtendedVault>> entry : histoVaults.entrySet()) {
-					for (ExtendedVault histoVault : entry.getValue()) {
-						addVaultToSuite(histoVault, trailRecord);
-						if (isSmartStatistics) {
-							trailRecord.addSummaryPoints(histoVault);
-						}
+				histoVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
+					addVaultToSuite(v, trailRecord);
+					if (isSmartStatistics) {
+						trailRecord.addSummaryPoints(v);
 					}
-				}
+				});
 			}
 			log.finer(() -> " " + trailRecord.getTrailSelector());
 		}
@@ -158,7 +154,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			if (trailSelector.getTrailType().isBoxPlot()) {
 				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
 				for (int i = 0; i < trailSelector.getTrailType().getSuiteMembers().size(); i++) {
-					suiteRecords.get(i).addElement(trailRecord.getVaultPoint(histoVault, suiteMembers.get(i)));
+					suiteRecords.get(i).addElement(trailRecord.getVaultPoint(histoVault, suiteMembers.get(i).ordinal()));
 				}
 			} else {
 				int tmpSummationFactor = 0;
@@ -166,7 +162,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
 				for (int i = 0; i < suiteMembers.size(); i++) {
-					Integer point = trailRecord.getVaultPoint(histoVault, suiteMembers.get(i));
+					Integer point = trailRecord.getVaultPoint(histoVault, suiteMembers.get(i).ordinal());
 					if (point == null) {
 						suiteRecords.get(i).addElement(null);
 					} else {
@@ -823,5 +819,4 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	public Collection<TrailRecord> getValues() {
 		return (Collection<TrailRecord>) (Collection<?>) values();
 	}
-
 }
