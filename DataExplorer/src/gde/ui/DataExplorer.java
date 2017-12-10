@@ -2053,15 +2053,6 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * update the histo tabs if visible.
-	 * @param recordName specifies the record from the trail recordset to be updated
-	 */
-	public void updateHistoTabs(String recordName, boolean isWithUi) {
-		this.histoSet.getTrailRecordSet().refillRecordSet();
-		DataExplorer.this.updateHistoTabs(RebuildStep.E_USER_INTERFACE, isWithUi);
-	}
-
-	/**
 	 * update any visible histo tab.
 	 * @param readFromDirectories true reloads from files; false uses histo vault data
 	 */

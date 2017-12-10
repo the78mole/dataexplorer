@@ -440,6 +440,16 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	/**
+	 * Rebuild the record based on a new trail selection.
+	 */
+	public synchronized void refillRecord(TrailRecord record, int trailTextIndex) {
+		record.clear();
+		record.getTrailSelector().setTrailTextSelectedIndex(trailTextIndex);
+		RecordingsCollector collector = new RecordingsCollector();
+		collector.addVaults(record.getName());
+	}
+
+	/**
 	 * Build data contents after building the records list.
 	 */
 	public synchronized void initializeFromVaults() {
@@ -619,7 +629,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	public void cleanup() {
 		super.timeStep_ms.clear();
 		for (String recordName : super.getRecordNames()) {
-			((TrailRecord) super.get(recordName)).clear();
+			get(recordName).clear();
 		}
 		this.durations_mm.clear();
 
