@@ -310,7 +310,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 									HoTTbinReader.buf4 = new byte[30];
 									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
 								}
-								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null) {
+								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null) {
 									parseESC(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, channelNumber);
 									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
 									isSensorData = true;
