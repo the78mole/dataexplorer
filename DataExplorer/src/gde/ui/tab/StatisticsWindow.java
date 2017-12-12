@@ -214,12 +214,6 @@ public class StatisticsWindow extends CTabItem {
 						DataExplorer.getInstance().openHelpDialog("", "HelpInfo_5.html"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				});
-				this.dataTable.addPaintListener(new PaintListener() {
-					public void paintControl(PaintEvent evt) {
-						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dataTable.paintControl, event=" + evt); //$NON-NLS-1$
-						updateStatisticsData(false);
-					}
-				});
 				{
 					this.measurementTableColumn = new TableColumn(this.dataTable, SWT.LEFT);
 					this.measurementTableColumn.setWidth(180);
@@ -454,6 +448,7 @@ public class StatisticsWindow extends CTabItem {
 			this.oldRecordSet = null;
 		}
 		adaptTableSize();
+		this.dataTable.redraw();
 	}
 
 	/**
@@ -501,7 +496,7 @@ public class StatisticsWindow extends CTabItem {
 			row = new TableItem(this.dataTable, SWT.NONE);
 			row.setText(itemsText.split(DELIMITER));
 		}
-
+		this.dataTable.redraw();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "exit data table update"); //$NON-NLS-1$
 	}
 

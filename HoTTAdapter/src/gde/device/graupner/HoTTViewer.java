@@ -465,7 +465,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 		recordSet.syncScaleOfSyncableRecords();
-		this.application.updateStatisticsData(true);
+		this.application.updateStatisticsData();
 		this.updateVisibilityStatus(recordSet, true);
 		this.application.getActiveChannel().setFileDescription(recordSet.getFormatedTime_sec(0, true).trim().split(GDE.STRING_BLANK)[0]);
 		

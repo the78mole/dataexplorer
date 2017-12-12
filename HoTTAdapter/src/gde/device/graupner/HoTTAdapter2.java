@@ -814,7 +814,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			calculateInactiveRecords(recordSet);
 			recordSet.syncScaleOfSyncableRecords();
 			this.updateVisibilityStatus(recordSet, true);
-			this.application.updateStatisticsData(true);
+			this.application.updateStatisticsData();
 		}
 	}
 

@@ -469,7 +469,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 
-		this.application.updateStatisticsData(true);	
+		this.application.updateStatisticsData();	
 		this.updateVisibilityStatus(recordSet, true);
 	}
 	

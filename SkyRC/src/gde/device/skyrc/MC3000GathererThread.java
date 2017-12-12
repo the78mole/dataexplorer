@@ -261,12 +261,12 @@ public class MC3000GathererThread extends Thread {
 									}
 								}
 								if (recordSet5 != null) recordSet5.addPoints(points5);
-								MC3000GathererThread.this.application.updateAllTabs(false);
 								if (recordSet5 != null && (recordSet5.get(0).realSize() < 3 || recordSet5.get(0).realSize() % 10 == 0)) {
 									this.device.updateVisibilityStatus(recordSet5, true);
 								}
 							}
 							
+							MC3000GathererThread.this.application.updateAllTabs(false);
 							this.application.setStatusMessage(GDE.STRING_EMPTY);
 							
 							//check for all processing finished and stop gathering after 15 min
@@ -430,8 +430,6 @@ public class MC3000GathererThread extends Thread {
 			}
 
 			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
-
-			MC3000GathererThread.this.application.updateAllTabs(false);
 
 			if (recordSet.get(0).realSize() < 3 || recordSet.get(0).realSize() % 10 == 0) {
 				this.device.updateVisibilityStatus(recordSet, true);

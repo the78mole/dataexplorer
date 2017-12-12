@@ -656,8 +656,13 @@ public class GraphicsComposite extends Composite {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetComment.paintControl, event=" + evt); //$NON-NLS-1$
 					if (GraphicsComposite.this.channels.getActiveChannel() != null) {
 						RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
-						if (recordSet != null && (GraphicsComposite.this.recordSetCommentText == null || !recordSet.getRecordSetDescription().equals(GraphicsComposite.this.recordSetCommentText))) {
-							GraphicsComposite.this.recordSetComment.setText(GraphicsComposite.this.recordSetCommentText = recordSet.getRecordSetDescription());
+						if (recordSet != null) {
+							String tmpDescription = recordSet.getRecordSetDescription();
+							if (GraphicsComposite.this.recordSetCommentText == null 
+									|| !recordSet.getRecordSetDescription().equals(tmpDescription)) {
+								GraphicsComposite.this.recordSetComment.setText(GraphicsComposite.this.recordSetCommentText = tmpDescription);
+							}
+							
 						}
 					}
 				}

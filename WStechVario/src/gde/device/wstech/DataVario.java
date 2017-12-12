@@ -215,7 +215,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
 
 			GPSHelper.calculateValues(this, recordSet, 8, 7, 9, startAltitude, 13, 14, 15, 16);
-			this.application.updateStatisticsData(true);
+			this.application.updateStatisticsData();
 			this.updateVisibilityStatus(recordSet, true);
 		}
 	}

@@ -172,41 +172,59 @@ public class StatusBar {
 	 * set the serial com port rx light on
 	 */
 	public void setSerialRxOn() {
-		if (!this.rxButton.isDisposed()) this.rxButton.setImage(SWTResourceManager.getImage("gde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
+		if (!this.rxButton.isDisposed()) {
+			this.rxButton.setImage(SWTResourceManager.getImage("gde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
+			this.rxButton.redraw();
+		}
 	}
 
 	/**
 	 * set the serial com port rx light off
 	 */
 	public void setSerialRxOff() {
-		if (!this.rxButton.isDisposed()) this.rxButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
+		if (!this.rxButton.isDisposed()) {
+			this.rxButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
+			this.rxButton.redraw();
+		}
 	}
 
 	/**
 	 * set the serial com port tx light on
 	 */
 	public void setSerialTxOn() {
-		if (!this.txButton.isDisposed()) this.txButton.setImage(SWTResourceManager.getImage("gde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
+		if (!this.txButton.isDisposed()) {
+			this.txButton.setImage(SWTResourceManager.getImage("gde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
+			this.txButton.redraw();
+		}
 	}
 
 	/**
 	 * set the serial com port tx light off
 	 */
 	public void setSerialTxOff() {
-		if (!this.txButton.isDisposed()) this.txButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
+		if (!this.txButton.isDisposed()) {
+			this.txButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
+			this.txButton.redraw();
+		}
 	}
 
 	/**
 	 * set the serial com port light on
 	 */
 	public void setSerialPortConnected() {
-		if (!this.portButton.isDisposed()) this.portButton.setImage(SWTResourceManager.getImage("gde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
+		if (!this.portButton.isDisposed()) {
+			this.portButton.setImage(SWTResourceManager.getImage("gde/resource/LEDHotGreen.gif")); //$NON-NLS-1$
+			this.portButton.redraw();
+		}
 	}
 
 	/**
 	 * set the serial com port light off
 	 */
 	public void setSerialPortDisconnected() {
-		if (!this.portButton.isDisposed()) this.portButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
+		if (!this.portButton.isDisposed()) {
+			this.portButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
+			this.portButton.redraw();
+		}
 	}
 }

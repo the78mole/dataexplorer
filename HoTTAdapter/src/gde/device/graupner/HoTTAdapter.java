@@ -1170,7 +1170,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		calculateInactiveRecords(recordSet);
 		recordSet.syncScaleOfSyncableRecords();
 		this.updateVisibilityStatus(recordSet, true);
-		this.application.updateStatisticsData(true);
+		this.application.updateStatisticsData();
 	}
 
 	/**

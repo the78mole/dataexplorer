@@ -932,26 +932,6 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * updates the statistics window using current record set data
-	 * @param forceUpdate
-	 */
-	public void updateStatisticsData(final boolean forceUpdate) {
-		if (this.statisticsTabItem != null && !this.statisticsTabItem.isDisposed()) {
-			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-				this.statisticsTabItem.updateStatisticsData(forceUpdate);
-			}
-			else {
-				GDE.display.asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						DataExplorer.this.statisticsTabItem.updateStatisticsData(forceUpdate);
-					}
-				});
-			}
-		}
-	}
-
-	/**
 	 * setup the histo table header with timestep columns.
 	 */
 	public void setupHistoTableHeader() {
@@ -1331,7 +1311,6 @@ public class DataExplorer extends Composite {
 		GDE.display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
-				//Thread.sleep(5);
 				DataExplorer.this.statusBar.setProgress(0);
 				if (DataExplorer.this.taskBarItem != null) {
 					DataExplorer.this.taskBarItem.setProgress(0);
@@ -1356,63 +1335,67 @@ public class DataExplorer extends Composite {
 		return this.progessPercentage == 100 ? 0 : this.progessPercentage;
 	}
 
-	final boolean[] isRxOn = new boolean[] { true };
+	final boolean[] isTxOn = new boolean[] { true };
+	Runnable txOn = new Runnable() {
+		@Override
+		public void run() {
+			DataExplorer.this.statusBar.setSerialTxOn();
+			isTxOn[0] = true;
+		}
+	};
 
 	public void setSerialTxOn() {
+		if (isTxOn[0]) {
+			isTxOn[0] = false;
+			GDE.display.asyncExec(txOn);
+		}
+	}
+
+	final boolean[] isTxOff = new boolean[] { true };
+	Runnable txOff = new Runnable() {
+		@Override
+		public void run() {
+			DataExplorer.this.statusBar.setSerialTxOff();
+			isTxOff[0] = true;
+		}
+	};
+
+	public void setSerialTxOff() {
+		if (isTxOff[0]) {
+			isTxOff[0] = false;
+			GDE.display.asyncExec(txOff);
+		}
+	}
+
+	final boolean[] isRxOn = new boolean[] { true };
+	Runnable rxOn = new Runnable() {
+		@Override
+		public void run() {
+			DataExplorer.this.statusBar.setSerialRxOn();
+			isRxOn[0] = true;
+		}
+	};
+
+	public void setSerialRxOn() {
 		if (isRxOn[0]) {
 			isRxOn[0] = false;
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					DataExplorer.this.statusBar.setSerialTxOn();
-					isRxOn[0] = true;
-				}
-			});
+			GDE.display.asyncExec(rxOn);
 		}
 	}
 
 	final boolean[] isRxOff = new boolean[] { true };
-
-	public void setSerialTxOff() {
-		if (isRxOff[0]) {
-			isRxOff[0] = false;
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					DataExplorer.this.statusBar.setSerialTxOff();
-					isRxOff[0] = true;
-				}
-			});
+	Runnable rxOff = new Runnable() {
+		@Override
+		public void run() {
+			DataExplorer.this.statusBar.setSerialRxOff();
+			isRxOff[0] = true;
 		}
-	}
-
-	final boolean[] doneRxOn = new boolean[] { true };
-
-	public void setSerialRxOn() {
-		if (doneRxOn[0]) {
-			doneRxOn[0] = false;
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					DataExplorer.this.statusBar.setSerialRxOn();
-					doneRxOn[0] = true;
-				}
-			});
-		}
-	}
-
-	final boolean[] doneRxOff = new boolean[] { true };
+	};
 
 	public void setSerialRxOff() {
-		if (doneRxOff[0]) {
-			doneRxOff[0] = false;
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					DataExplorer.this.statusBar.setSerialRxOff();
-					doneRxOff[0] = true;
-				}
-			});
+		if (isRxOff[0]) {
+			isRxOff[0] = false;
+			GDE.display.asyncExec(rxOff);
 		}
 	}
 
@@ -2013,52 +1996,48 @@ public class DataExplorer extends Composite {
 	/**
 	 * update all visualization windows
 	 */
+	final boolean[] isUpdateAllTabs = new boolean[] { true };
 	public void updateAllTabs(final boolean force, final boolean redrawCurveSelector) {
-		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			this.updateGraphicsWindow(redrawCurveSelector);
-			this.updateStatisticsData(true);
-			if (force) {
-				this.updateDigitalWindow();
-				this.updateAnalogWindow();
+		//log.log(Level.OFF, "updateAllTabs entry " + this.isUpdateAllTabs[0]);
+		if (this.isUpdateAllTabs[0]) {
+			this.isUpdateAllTabs[0] = false;
+			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+				this.doUpdateAllTabs(force, redrawCurveSelector);
 			}
 			else {
-				this.updateDigitalWindowChilds();
-				this.updateAnalogWindowChilds();
-			}
-			this.updateCellVoltageWindow();
-			this.updateFileCommentWindow();
-			if (this.getActiveRecordSet() != null) {
-				this.updateDataTable(this.getActiveRecordSet().getName(), force);
-			}
-			else {
-				DataExplorer.this.updateDataTable(GDE.STRING_EMPTY, force);
-			}
+				GDE.display.asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						DataExplorer.this.doUpdateAllTabs(force, redrawCurveSelector);
+					}
+				});
+			} 
+		}
+	}
+
+	/**
+	 * update all visualization windows
+	 */
+	private void doUpdateAllTabs(final boolean force, final boolean redrawCurveSelector) {
+		this.updateGraphicsWindow(redrawCurveSelector);
+		this.updateStatisticsData();
+		if (force) {
+			this.updateDigitalWindow();
+			this.updateAnalogWindow();
 		}
 		else {
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					DataExplorer.this.updateGraphicsWindow(redrawCurveSelector);
-					DataExplorer.this.updateStatisticsData(true);
-					if (force) {
-						DataExplorer.this.updateDigitalWindow();
-						DataExplorer.this.updateAnalogWindow();
-					}
-					else {
-						DataExplorer.this.updateDigitalWindowChilds();
-						DataExplorer.this.updateAnalogWindowChilds();
-					}
-					DataExplorer.this.updateCellVoltageWindow();
-					DataExplorer.this.updateFileCommentWindow();
-					if (DataExplorer.this.getActiveRecordSet() != null) {
-						DataExplorer.this.updateDataTable(DataExplorer.this.getActiveRecordSet().getName(), force);
-					}
-					else {
-						DataExplorer.this.updateDataTable(GDE.STRING_EMPTY, force);
-					}
-				}
-			});
+			this.updateDigitalWindowChilds();
+			this.updateAnalogWindowChilds();
 		}
+		this.updateCellVoltageWindow();
+		this.updateFileCommentWindow();
+		if (this.getActiveRecordSet() != null) {
+			this.updateDataTable(this.getActiveRecordSet().getName(), force);
+		}
+		else {
+			DataExplorer.this.updateDataTable(GDE.STRING_EMPTY, force);
+		}
+		this.isUpdateAllTabs[0] = true;
 	}
 
 	/**
@@ -2659,31 +2638,35 @@ public class DataExplorer extends Composite {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			this.menuBar.setPortConnected(isOpenStatus);
 			this.menuToolBar.setPortConnected(isOpenStatus);
-			if (isOpenStatus && this.statusBar != null) {
-				this.statusBar.setSerialPortConnected();
-			}
-			else {
-				this.statusBar.setSerialPortDisconnected();
-				this.statusBar.setSerialRxOff();
-				this.statusBar.setSerialTxOff();
+			if (this.statusBar != null) {
+				if (isOpenStatus) {
+					this.statusBar.setSerialPortConnected();
+				}
+				else {
+					this.statusBar.setSerialPortDisconnected();
+					this.statusBar.setSerialRxOff();
+					this.statusBar.setSerialTxOff();
+				} 
 			}
 		}
 		else {
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					DataExplorer.this.menuBar.setPortConnected(isOpenStatus);
-					DataExplorer.this.menuToolBar.setPortConnected(isOpenStatus);
-					if (isOpenStatus && DataExplorer.this.statusBar != null) {
-						DataExplorer.this.statusBar.setSerialPortConnected();
+			if (DataExplorer.this.statusBar != null) {
+				GDE.display.asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						DataExplorer.this.menuBar.setPortConnected(isOpenStatus);
+						DataExplorer.this.menuToolBar.setPortConnected(isOpenStatus);
+						if (isOpenStatus) {
+							DataExplorer.this.statusBar.setSerialPortConnected();
+						}
+						else {
+							DataExplorer.this.statusBar.setSerialPortDisconnected();
+							DataExplorer.this.statusBar.setSerialRxOff();
+							DataExplorer.this.statusBar.setSerialTxOff();
+						}
 					}
-					else {
-						DataExplorer.this.statusBar.setSerialPortDisconnected();
-						DataExplorer.this.statusBar.setSerialRxOff();
-						DataExplorer.this.statusBar.setSerialTxOff();
-					}
-				}
-			});
+				});
+			}
 		}
 	}
 
