@@ -20,8 +20,10 @@
 package gde.histo.cache;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -29,8 +31,6 @@ import java.util.Map.Entry;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
-import gde.device.ChannelPropertyType;
-import gde.device.ChannelPropertyTypes;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.device.ScoreLabelTypes;
@@ -48,7 +48,8 @@ import gde.histo.settlements.FigureEvaluator;
 import gde.histo.settlements.SettlementRecord;
 import gde.histo.transitions.GroupTransitions;
 import gde.histo.transitions.Transition;
-import gde.histo.utils.UniversalQuantile;
+import gde.histo.utils.ElaborateTukeyQuantile;
+import gde.log.Level;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 
@@ -152,8 +153,8 @@ public final class VaultCollector {
 			this.vault.getMeasurements().put(i, entryPoints);
 			entryPoints.setTrails(new HashMap<Integer, PointType>());
 
-			if (record.isEmpty()) {
-				log.fine(() -> String.format("no data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLogFilePath())); //$NON-NLS-1$
+			if (!record.hasReasonableData()) {
+				log.fine(() -> String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLogFilePath())); //$NON-NLS-1$
 			} else {
 				if (measurementType.getStatistics() != null) { // this creates trail types mismatch : && record.hasReasonableData()) {
 					setTrailStatisticsPoints(entryPoints, record, recordSet);
@@ -179,26 +180,26 @@ public final class VaultCollector {
 				final TransitionCalculusType calculationType = settlementType.getEvaluation().getTransitionCalculus();
 
 				if (transitionFigureType != null) {
-					SettlementRecord histoSettlement = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
-					FigureEvaluator evaluator = new FigureEvaluator(histoSettlement);
+					SettlementRecord record = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
+					FigureEvaluator evaluator = new FigureEvaluator(record);
 					for (Transition transition : transitions.get(transitionFigureType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}
-					histoSettlements.put(settlementType.getName(), histoSettlement);
+					histoSettlements.put(settlementType.getName(), record);
 				} else if (transitionAmountType != null) {
-					SettlementRecord histoSettlement = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
-					AmountEvaluator evaluator = new AmountEvaluator(histoSettlement);
+					SettlementRecord record = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
+					AmountEvaluator evaluator = new AmountEvaluator(record);
 					for (Transition transition : transitions.get(transitionAmountType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}
-					histoSettlements.put(settlementType.getName(), histoSettlement);
+					histoSettlements.put(settlementType.getName(), record);
 				} else if (calculationType != null) {
-					SettlementRecord histoSettlement = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
-					CalculusEvaluator evaluator = new CalculusEvaluator(histoSettlement);
+					SettlementRecord record = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
+					CalculusEvaluator evaluator = new CalculusEvaluator(record);
 					for (Transition transition : transitions.get(calculationType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}
-					histoSettlements.put(settlementType.getName(), histoSettlement);
+					histoSettlements.put(settlementType.getName(), record);
 				} else {
 					throw new UnsupportedOperationException();
 				}
@@ -214,7 +215,7 @@ public final class VaultCollector {
 	 * @param record
 	 * @param recordSet
 	 */
-	private void  setTrailStatisticsPoints(CompartmentType entryPoints, Record record, RecordSet recordSet) {
+	private void setTrailStatisticsPoints(CompartmentType entryPoints, Record record, RecordSet recordSet) {
 		StatisticsType measurementStatistics = this.device.getChannelMeasuremts(this.vault.getLogChannelNumber()).get(record.getOrdinal()).getStatistics();
 
 		entryPoints.addPoint(TrailTypes.REAL_FIRST, transmuteValue(record, record.elementAt(0)));
@@ -355,14 +356,20 @@ public final class VaultCollector {
 	 * @param isSampled true indicates that the record values are a sample from the original values
 	 */
 	private void setTrailPoints(CompartmentType entryPoints, Record record, boolean isSampled) {
-		final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-		final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty()
-				? Double.parseDouble(channelProperty.getValue()) : HistoSet.OUTLIER_SIGMA_DEFAULT;
-		final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
-		final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty()
-				? Double.parseDouble(channelProperty2.getValue()) : HistoSet.OUTLIER_RANGE_FACTOR_DEFAULT;
-		// invoke translation because of GPS coordinates (decimal fraction range is x.0000 to x.5999 [recurring decimal])
-		UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), isSampled, sigmaFactor, outlierFactor);
+		ElaborateTukeyQuantile<Double> quantile = new ElaborateTukeyQuantile<>(record.getTranslatedValues(), true, true, false);
+		if (!quantile.getOutliers().isEmpty()) {
+			String[] outlierArray = new HashSet<Double>(quantile.getOutliers()).stream().map(v -> encodeMeasurementValue(record, v)) //
+					.map(p -> String.valueOf(p)).toArray(String[]::new);
+			entryPoints.setOutlierPoints(String.join(",", outlierArray));
+			log.log(Level.FINE, record.getName() + "  outliers=" + Arrays.toString(quantile.getOutliers().toArray()));
+		}
+		if (!quantile.getConstantScraps().isEmpty()) {
+			String[] scrappedArray = quantile.getConstantScraps().stream().map(v -> encodeMeasurementValue(record, v)) //
+					.map(p -> String.valueOf(p)).toArray(String[]::new);
+			entryPoints.setScrappedPoints(String.join(",", scrappedArray));
+			log.log(Level.FINE, record.getName() + "  scrappedValues=", Arrays.toString(quantile.getConstantScraps().toArray()));
+		}
+
 		entryPoints.addPoint(TrailTypes.AVG, encodeMeasurementValue(record, quantile.getAvgFigure()));
 		entryPoints.addPoint(TrailTypes.MAX, encodeMeasurementValue(record, quantile.getPopulationMaxFigure()));
 		entryPoints.addPoint(TrailTypes.MIN, encodeMeasurementValue(record, quantile.getPopulationMinFigure()));
@@ -390,51 +397,57 @@ public final class VaultCollector {
 	 */
 	private void setSettlements(LinkedHashMap<String, SettlementRecord> histoSettlements) {
 		for (Entry<String, SettlementRecord> entry : histoSettlements.entrySet()) {
-			SettlementRecord histoSettlement = entry.getValue();
-			SettlementType settlementType = histoSettlement.getSettlement();
+			SettlementRecord record = entry.getValue();
+			SettlementType settlementType = record.getSettlement();
 			CompartmentType entryPoints = new CompartmentType(settlementType.getSettlementId(), settlementType.getName(), DataTypes.DEFAULT);
 			this.vault.getSettlements().put(settlementType.getSettlementId(), entryPoints);
 			entryPoints.setTrails(new HashMap<Integer, PointType>());
 
-			if (histoSettlement.realSize() != 0 && histoSettlement.hasReasonableData()) {
-				entryPoints.addPoint(TrailTypes.REAL_FIRST, histoSettlement.elementAt(0));
-				entryPoints.addPoint(TrailTypes.REAL_LAST, histoSettlement.elementAt(histoSettlement.realSize() - 1));
+			if (record.realSize() != 0 && record.hasReasonableData()) {
+				entryPoints.addPoint(TrailTypes.REAL_FIRST, record.elementAt(0));
+				entryPoints.addPoint(TrailTypes.REAL_LAST, record.elementAt(record.realSize() - 1));
 
-				final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
-				final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty()
-						? Double.parseDouble(channelProperty.getValue()) : HistoSet.OUTLIER_SIGMA_DEFAULT;
-				final ChannelPropertyType channelProperty2 = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_RANGE_FACTOR);
-				final double outlierFactor = channelProperty2.getValue() != null && !channelProperty2.getValue().isEmpty()
-						? Double.parseDouble(channelProperty2.getValue()) : HistoSet.OUTLIER_RANGE_FACTOR_DEFAULT;
-				UniversalQuantile<Double> quantile = new UniversalQuantile<>(histoSettlement.getTranslatedValues(), true, sigmaFactor, outlierFactor);
+				ElaborateTukeyQuantile<Double> quantile = new ElaborateTukeyQuantile<>(record.getTranslatedValues(), true, true, false);
+				if (!quantile.getOutliers().isEmpty()) {
+					String[] outlierArray = new HashSet<Double>(quantile.getOutliers()).stream().map(v -> encodeSettlementValue(record, v)) //
+							.map(p -> String.valueOf(p)).toArray(String[]::new);
+					entryPoints.setOutlierPoints(String.join(",", outlierArray));
+					log.log(Level.FINE, record.getName() + "  outliers=" + Arrays.toString(quantile.getOutliers().toArray()));
+				}
+				if (!quantile.getConstantScraps().isEmpty()) {
+					String[] scrappedArray = quantile.getConstantScraps().stream().map(v -> encodeSettlementValue(record, v)) //
+							.map(p -> String.valueOf(p)).toArray(String[]::new);
+					entryPoints.setScrappedPoints(String.join(",", scrappedArray));
+					log.log(Level.FINE, record.getName() + "  scrappedValues=", Arrays.toString(quantile.getConstantScraps().toArray()));
+				}
 
-				entryPoints.addPoint(TrailTypes.REAL_AVG, encodeSettlementValue(histoSettlement, quantile.getAvgFigure()));
-				entryPoints.addPoint(TrailTypes.REAL_MAX, encodeSettlementValue(histoSettlement, quantile.getPopulationMaxFigure()));
-				entryPoints.addPoint(TrailTypes.REAL_MIN, encodeSettlementValue(histoSettlement, quantile.getPopulationMinFigure()));
-				entryPoints.addPoint(TrailTypes.REAL_SD, encodeSettlementValue(histoSettlement, quantile.getSigmaFigure()));
-				entryPoints.addPoint(TrailTypes.REAL_SUM, encodeSettlementValue(histoSettlement, quantile.getSumFigure()));
-				entryPoints.addPoint(TrailTypes.REAL_COUNT, encodeSettlementValue(histoSettlement, quantile.getSize()));
+				entryPoints.addPoint(TrailTypes.REAL_AVG, encodeSettlementValue(record, quantile.getAvgFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_MAX, encodeSettlementValue(record, quantile.getPopulationMaxFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_MIN, encodeSettlementValue(record, quantile.getPopulationMinFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_SD, encodeSettlementValue(record, quantile.getSigmaFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_SUM, encodeSettlementValue(record, quantile.getSumFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_COUNT, encodeSettlementValue(record, quantile.getSize()));
 
-				entryPoints.addPoint(TrailTypes.AVG, encodeSettlementValue(histoSettlement, quantile.getAvgFigure()));
-				entryPoints.addPoint(TrailTypes.MAX, encodeSettlementValue(histoSettlement, quantile.getPopulationMaxFigure()));
-				entryPoints.addPoint(TrailTypes.MIN, encodeSettlementValue(histoSettlement, quantile.getPopulationMinFigure()));
-				entryPoints.addPoint(TrailTypes.SD, encodeSettlementValue(histoSettlement, quantile.getSigmaFigure()));
-				entryPoints.addPoint(TrailTypes.Q0, encodeSettlementValue(histoSettlement, quantile.getQuartile0()));
-				entryPoints.addPoint(TrailTypes.Q1, encodeSettlementValue(histoSettlement, quantile.getQuartile1()));
-				entryPoints.addPoint(TrailTypes.Q2, encodeSettlementValue(histoSettlement, quantile.getQuartile2()));
-				entryPoints.addPoint(TrailTypes.Q3, encodeSettlementValue(histoSettlement, quantile.getQuartile3()));
-				entryPoints.addPoint(TrailTypes.Q4, encodeSettlementValue(histoSettlement, quantile.getQuartile4()));
-				entryPoints.addPoint(TrailTypes.Q_25_PERMILLE, encodeSettlementValue(histoSettlement, quantile.getQuantile(.025)));
-				entryPoints.addPoint(TrailTypes.Q_975_PERMILLE, encodeSettlementValue(histoSettlement, quantile.getQuantile(.975)));
-				entryPoints.addPoint(TrailTypes.Q_LOWER_WHISKER, encodeSettlementValue(histoSettlement, quantile.getQuantileLowerWhisker()));
-				entryPoints.addPoint(TrailTypes.Q_UPPER_WHISKER, encodeSettlementValue(histoSettlement, quantile.getQuantileUpperWhisker()));
+				entryPoints.addPoint(TrailTypes.AVG, encodeSettlementValue(record, quantile.getAvgFigure()));
+				entryPoints.addPoint(TrailTypes.MAX, encodeSettlementValue(record, quantile.getPopulationMaxFigure()));
+				entryPoints.addPoint(TrailTypes.MIN, encodeSettlementValue(record, quantile.getPopulationMinFigure()));
+				entryPoints.addPoint(TrailTypes.SD, encodeSettlementValue(record, quantile.getSigmaFigure()));
+				entryPoints.addPoint(TrailTypes.Q0, encodeSettlementValue(record, quantile.getQuartile0()));
+				entryPoints.addPoint(TrailTypes.Q1, encodeSettlementValue(record, quantile.getQuartile1()));
+				entryPoints.addPoint(TrailTypes.Q2, encodeSettlementValue(record, quantile.getQuartile2()));
+				entryPoints.addPoint(TrailTypes.Q3, encodeSettlementValue(record, quantile.getQuartile3()));
+				entryPoints.addPoint(TrailTypes.Q4, encodeSettlementValue(record, quantile.getQuartile4()));
+				entryPoints.addPoint(TrailTypes.Q_25_PERMILLE, encodeSettlementValue(record, quantile.getQuantile(.025)));
+				entryPoints.addPoint(TrailTypes.Q_975_PERMILLE, encodeSettlementValue(record, quantile.getQuantile(.975)));
+				entryPoints.addPoint(TrailTypes.Q_LOWER_WHISKER, encodeSettlementValue(record, quantile.getQuantileLowerWhisker()));
+				entryPoints.addPoint(TrailTypes.Q_UPPER_WHISKER, encodeSettlementValue(record, quantile.getQuantileUpperWhisker()));
 
-				entryPoints.addPoint(TrailTypes.FIRST, encodeSettlementValue(histoSettlement, quantile.getFirstFigure()));
-				entryPoints.addPoint(TrailTypes.LAST, encodeSettlementValue(histoSettlement, quantile.getLastFigure()));
-				entryPoints.addPoint(TrailTypes.SUM, encodeSettlementValue(histoSettlement, quantile.getSumFigure()));
-				entryPoints.addPoint(TrailTypes.COUNT, encodeSettlementValue(histoSettlement, quantile.getSize()));
+				entryPoints.addPoint(TrailTypes.FIRST, encodeSettlementValue(record, quantile.getFirstFigure()));
+				entryPoints.addPoint(TrailTypes.LAST, encodeSettlementValue(record, quantile.getLastFigure()));
+				entryPoints.addPoint(TrailTypes.SUM, encodeSettlementValue(record, quantile.getSumFigure()));
+				entryPoints.addPoint(TrailTypes.COUNT, encodeSettlementValue(record, quantile.getSize()));
 			}
-			log.finer(() -> histoSettlement.getName() + " data " + this.vault.getSettlements()); //$NON-NLS-1$
+			log.finer(() -> record.getName() + " data " + this.vault.getSettlements()); //$NON-NLS-1$
 		}
 	}
 

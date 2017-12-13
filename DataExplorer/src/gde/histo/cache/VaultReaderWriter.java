@@ -21,6 +21,13 @@ package gde.histo.cache;
 
 import static java.util.logging.Level.SEVERE;
 
+import gde.config.Settings;
+import gde.histo.datasources.DirectoryScanner.SourceDataSet;
+import gde.histo.datasources.HistoSetCollector.ProgressManager;
+import gde.log.Logger;
+import gde.ui.DataExplorer;
+import gde.utils.FileUtils;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -38,15 +45,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import gde.config.Settings;
-import gde.histo.datasources.DirectoryScanner.SourceDataSet;
-import gde.histo.datasources.HistoSetCollector.ProgressManager;
-import gde.log.Logger;
-import gde.ui.DataExplorer;
-import gde.utils.FileUtils;
 
 /**
  * File system access for vaults and trusses.
@@ -85,7 +86,7 @@ public final class VaultReaderWriter {
 	 * @return the vaults and trusses loaded from the cache
 	 * @throws IOException during opening or traversing the zip file
 	 */
-	public static synchronized List<ExtendedVault> loadVaultsFromCache(Map<Path, List<VaultCollector>> trussJobs, ProgressManager progress) //
+	public static synchronized List<ExtendedVault> loadVaultsFromCache(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress) //
 			throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
 		List<ExtendedVault> vaults = new ArrayList<>();
 
@@ -97,7 +98,7 @@ public final class VaultReaderWriter {
 					final List<VaultCollector> map = trussJobsIterator.next().getValue();
 					final Iterator<VaultCollector> trussesIterator = map.iterator();
 					while (trussesIterator.hasNext()) {
-						progress.countInLoop(1);
+						progress.ifPresent((p) -> p.countInLoop(1));
 						VaultCollector truss = trussesIterator.next();
 						ZipEntry vaultName = zf.getEntry(truss.getVault().getVaultName());
 						if (vaultName != null) {
@@ -121,7 +122,7 @@ public final class VaultReaderWriter {
 				final List<VaultCollector> map = trussJobsIterator.next().getValue();
 				final Iterator<VaultCollector> trussesIterator = map.iterator();
 				while (trussesIterator.hasNext()) {
-					progress.countInLoop(1);
+					progress.ifPresent((p) -> p.countInLoop(1));
 					VaultCollector truss = trussesIterator.next();
 					if (FileUtils.checkFileExist(cacheFilePath.resolve(truss.getVault().getVaultName()).toString())) {
 						HistoVault histoVault = null;

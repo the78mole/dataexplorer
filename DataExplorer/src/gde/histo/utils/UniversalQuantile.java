@@ -18,12 +18,25 @@
 ****************************************************************************************/
 package gde.histo.utils;
 
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.LOWER_WHISKER;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE0;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE1;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE2;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE3;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE4;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.UPPER_WHISKER;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map.Entry;
 import java.util.function.DoubleConsumer;
+import java.util.stream.Collectors;
 
+import gde.histo.datasources.HistoSet;
 import gde.log.Logger;
 
 /**
@@ -32,21 +45,9 @@ import gde.log.Logger;
  * NB: a 500k records clone + sort takes 45 ms (T is {@code Number} or {@code Spot<Number>}) on ET's machine.
  * @author Thomas Eickert
  */
-public final class UniversalQuantile<T extends Number & Comparable<T>> {
-	private final static String	$CLASS_NAME							= UniversalQuantile.class.getName();
-	private final static Logger	log											= Logger.getLogger($CLASS_NAME);
-
-	/**
-	 * Corresponds to the interquartile range (<em>0.25 < p < 0.75</em>)
-	 */
-	public static final double	BOXPLOT_SIGMA_FACTOR		= 0.674489694;
-	/**
-	 * Specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
-	 * Tolerance interval: <em>TI = &plusmn; z * &sigma; with z >= 0</em><br>
-	 * Outliers are identified only if they lie beyond this limit.
-	 * @see <a href="https://www.google.de/search?q=Tukey+boxplot">Tukey Boxplot</a>
-	 */
-	public static final double	BOXPLOT_OUTLIER_FACTOR	= 1.5;
+public class UniversalQuantile<T extends Number & Comparable<T>> {
+	private final static String	$CLASS_NAME			= UniversalQuantile.class.getName();
+	private final static Logger	log							= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * required for probability calculations from the population
@@ -61,9 +62,13 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	 */
 	private final List<T>				outcasts;
 	/**
-	 * outlier and outcast members not contained in the trunk
+	 * outlier and outcast members removed from the trunk
 	 */
-	private final List<T>				castaways								= new ArrayList<>();
+	private final List<T>				castaways				= new ArrayList<>();
+	/**
+	 * most frequent outlier candidates value within the ODL which are removed from in the trunk
+	 */
+	private final List<T>				constantScraps	= new ArrayList<>();
 
 	private T										firstValidElement;
 	private T										lastValidElement;
@@ -159,7 +164,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 		 * @param args
 		 */
 		@SuppressWarnings("unused")
-		public static void main(String[] args) {
+		public static void simpleTest(String[] args) {
 			double x = Double.parseDouble(args[0]);
 
 			System.out.println(String.format("erf(%f)  = %f", x, ErrorFunction.erf(x))); //$NON-NLS-1$
@@ -209,7 +214,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	}
 
 	/**
-	 * Does not remove outliers.
+	 * Is used for samples, does not remove outliers and supports complex objects.
 	 * @param population is taken as a sample (for the standard deviation)
 	 */
 	public UniversalQuantile(List<Spot<T>> population) {
@@ -217,6 +222,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	}
 
 	/**
+	 * Is used for samples, eliminates standard outliers (no constant outliers) and supports complex objects.
 	 * @param population holds the y value which is taken as a sample (for the standard deviation)
 	 * @param sigmaFactor specifies the tolerance interval <em>TI = &plusmn; z * &sigma; with z >= 0</em>
 	 * @param outlierFactor specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>)
@@ -232,19 +238,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 		}
 
 		Collections.sort(this.trunk);
-
-		// remove outliers except: if all outliers have the same value we expect them to carry a real value (e.g. height 0 m)
-		double outlierProbability = (1 - ErrorFunction.getProbability(sigmaFactor)) / 2.;
-		double extremumRange = (getQuantile(1. - outlierProbability) - getQuantile(outlierProbability)) * outlierFactor;
-		while (this.trunk.size() > 0 && this.trunk.get(0).doubleValue() < getQuantile(outlierProbability) - extremumRange) {
-			this.castaways.add(this.trunk.get(0));
-			this.trunk.remove(0);
-		}
-		while (this.trunk.size() > 0 && this.trunk.get(this.trunk.size() - 1).doubleValue() > getQuantile(1. - outlierProbability) + extremumRange) {
-			this.castaways.add(this.trunk.get(this.trunk.size() - 1));
-			this.trunk.remove(this.trunk.size() - 1);
-		}
-		if (this.trunk.isEmpty()) throw new UnsupportedOperationException("empty trunk");
+		removeOutliers(sigmaFactor, outlierFactor, outlierFactor);
 
 		this.firstValidElement = population.get(0).y();
 		this.lastValidElement = population.get(population.size() - 1).y();
@@ -254,31 +248,36 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	}
 
 	/**
+	 * Does not remove outliers.
 	 * @param population
 	 * @param isSample true calculates the sample standard deviation
 	 */
 	public UniversalQuantile(List<T> population, boolean isSample) {
-		this(population, isSample, 99., 99., new ArrayList<>());
+		this(population, isSample, 99., 99., 99., new ArrayList<>());
 	}
 
 	/**
+	 * Eliminates standard outliers (no constant outliers).
 	 * @param population
 	 * @param isSample true calculates the sample standard deviation
 	 * @param sigmaFactor specifies the tolerance interval <em>TI = &plusmn; z * &sigma; with z >= 0</em>
 	 * @param outlierFactor specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>)
 	 */
 	public UniversalQuantile(List<T> population, boolean isSample, double sigmaFactor, double outlierFactor) {
-		this(population, isSample, sigmaFactor, outlierFactor, new ArrayList<>());
+		this(population, isSample, sigmaFactor, outlierFactor, outlierFactor, new ArrayList<>());
 	}
 
 	/**
+	 * Eliminates all types of outliers and outcasts.
 	 * @param population
 	 * @param isSample true calculates the sample standard deviation
 	 * @param sigmaFactor specifies the tolerance interval <em>TI = &plusmn; z * &sigma; with z >= 0</em>
 	 * @param outlierFactor specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>)
+	 * @param constantOutlierFactor defines the inner limits for constant value elimination after outlier elimination
 	 * @param outcasts holds list members which are eliminated before the quantiles calculation
 	 */
-	public UniversalQuantile(List<T> population, boolean isSample, double sigmaFactor, double outlierFactor, List<T> outcasts) {
+	public UniversalQuantile(List<T> population, boolean isSample, double sigmaFactor, double outlierFactor, double constantOutlierFactor,
+			List<T> outcasts) {
 		if (population == null || population.isEmpty()) throw new IllegalArgumentException("empty population");
 		if (outcasts == null) throw new IllegalArgumentException("outcast is null");
 		this.isSample = isSample;
@@ -298,19 +297,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 		}
 
 		Collections.sort(this.trunk);
-
-		// remove outliers except: if all outliers have the same value we expect them to carry a real value (e.g. height 0 m)
-		double outlierProbability = (1 - ErrorFunction.getProbability(sigmaFactor)) / 2.;
-		double extremumRange = (getQuantile(1. - outlierProbability) - getQuantile(outlierProbability)) * outlierFactor;
-		while (this.trunk.size() > 0 && this.trunk.get(0).doubleValue() < getQuantile(outlierProbability) - extremumRange) {
-			this.castaways.add(this.trunk.get(0));
-			this.trunk.remove(0);
-		}
-		while (this.trunk.size() > 0 && this.trunk.get(this.trunk.size() - 1).doubleValue() > getQuantile(1. - outlierProbability) + extremumRange) {
-			this.castaways.add(this.trunk.get(this.trunk.size() - 1));
-			this.trunk.remove(this.trunk.size() - 1);
-		}
-		if (this.trunk.isEmpty()) throw new UnsupportedOperationException("empty trunk");
+		removeOutliers(sigmaFactor, outlierFactor, constantOutlierFactor);
 
 		this.firstValidElement = null;
 		// walk forward and get the first element which is not in the outcast / outlier lists
@@ -336,17 +323,106 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	}
 
 	/**
+	 * Removes at first the outliers beyond the outlier distance limit.
+	 * also removes constant values beyond the far outlier range.
+	 * They are suspected to originate from a technical reason.
+	 * @param sigmaFactor
+	 * @param outlierFactor defines the inner limits for outlier elimination
+	 * @param constantOutlierFactor defines the inner limits for constant value elimination after outlier elimination
+	 */
+	private void removeOutliers(double sigmaFactor, double outlierFactor, double constantOutlierFactor) {
+		if (constantOutlierFactor > outlierFactor) throw new IllegalArgumentException();
+
+		final double outlierProbability = (1 - ErrorFunction.getProbability(sigmaFactor)) / 2.;
+		final double q1WithOutliers = getQuantile(outlierProbability);
+		final double q3WithOutliers = getQuantile(1. - outlierProbability);
+		double toleranceInterval = q3WithOutliers - q1WithOutliers;
+		double nonOutlierRange = toleranceInterval * outlierFactor;
+		double nonConstantOutlierRange = toleranceInterval * constantOutlierFactor;
+		if (HistoSet.fuzzyEquals(toleranceInterval, 0.) // next line for keeping all event values
+				&& !HistoSet.fuzzyEquals(q3WithOutliers, 0.) && !HistoSet.fuzzyEquals(q1WithOutliers, 0.)) {
+			// take the more expensive avg +- sigma solution
+			toleranceInterval = getSigmaFigure() * sigmaFactor * 2.;
+			nonOutlierRange = toleranceInterval * outlierFactor;
+			nonConstantOutlierRange = toleranceInterval * constantOutlierFactor;
+			log.finer(() -> "avg=" + getAvgFigure() + "  sigma=" + getSigmaFigure());
+		}
+		if (!HistoSet.fuzzyEquals(toleranceInterval, 0.)) {
+			{
+				List<T> candidates = new ArrayList<>();
+				ListIterator<T> iterator = trunk.listIterator();
+				while (iterator.hasNext()) {
+					T value = iterator.next();
+					if (value.doubleValue() < q1WithOutliers - nonOutlierRange) {
+						castaways.add(value);
+						iterator.remove();
+					} else if (value.doubleValue() < q1WithOutliers - nonConstantOutlierRange) {
+						candidates.add(value);
+					} else
+						break;
+				}
+				if (castaways.isEmpty() && !candidates.isEmpty()) {
+					Collections.sort(candidates);
+					removeConstantOutliers(candidates, candidates.get(0));
+				}
+			}
+			{
+				List<T> candidates = new ArrayList<>();
+				ListIterator<T> iterator = trunk.listIterator(trunk.size());
+				while (iterator.hasPrevious()) {
+					T value = iterator.previous();
+					if (value.doubleValue() > q3WithOutliers + nonOutlierRange) {
+						castaways.add(value);
+						iterator.remove();
+					} else if (value.doubleValue() > q3WithOutliers + nonConstantOutlierRange) {
+						candidates.add(value);
+					} else
+						break;
+				}
+				if (castaways.isEmpty() && !candidates.isEmpty()) {
+					Collections.sort(candidates);
+					removeConstantOutliers(candidates, candidates.get(candidates.size() - 1));
+				}
+			}
+		}
+		if (trunk.isEmpty()) throw new UnsupportedOperationException("empty trunk");
+	}
+
+	/**
+	 * Constant outliers are supposed to originate from a technical origin.
+	 * @param candidates
+	 * @param scrappableCandidate is the extremum value which might be identified as outlier
+	 */
+	private void removeConstantOutliers(List<T> candidates, T scrappableCandidate) {
+		log.off(() -> candidates.stream().collect(Collectors.groupingBy(t -> t, Collectors.counting())).entrySet().toString());
+
+		// get the most frequent value of all candidates
+		candidates.stream().collect(Collectors.groupingBy(t -> t, Collectors.counting())).entrySet() //
+				.stream().max(Comparator.comparing(Entry::getValue)) //
+				.ifPresent(e -> {
+					T mostFrequentValue = e.getKey();
+					if (scrappableCandidate.equals(mostFrequentValue) && e.getValue() > 1) {
+						constantScraps.add(scrappableCandidate);
+						// remove all entries with this value
+						List<T> coll = new ArrayList<>();
+						coll.add(scrappableCandidate);
+						trunk.removeAll(coll);
+					}
+				});
+	}
+
+	/**
 	 * @return the value of the first element after outcast elimination and removing the outliers
 	 */
 	public double getFirstFigure() {
-		return this.firstValidElement.doubleValue();
+		return firstValidElement.doubleValue();
 	}
 
 	/**
 	 * @return the value of the last element after outcast elimination and removing the outliers
 	 */
 	public double getLastFigure() {
-		return this.lastValidElement.doubleValue();
+		return lastValidElement.doubleValue();
 	}
 
 	/**
@@ -354,7 +430,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	 */
 	public double getPopulationMaxFigure() {
 		double realMax = getQuartile4();
-		for (T t : this.castaways) {
+		for (T t : castaways) {
 			realMax = Math.max(realMax, t.doubleValue());
 		}
 		return realMax;
@@ -365,62 +441,62 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	 */
 	public double getPopulationMinFigure() {
 		double realMin = getQuartile0();
-		for (T t : this.castaways) {
+		for (T t : castaways) {
 			realMin = Math.min(realMin, t.doubleValue());
 		}
 		return realMin;
 	}
 
 	public double getSumFigure() {
-		if (this.sumFigure == null) {
-			this.sumFigure = this.trunk.parallelStream().mapToDouble(x -> x.doubleValue()).sum();
+		if (sumFigure == null) {
+			sumFigure = trunk.parallelStream().mapToDouble(x -> x.doubleValue()).sum();
 		}
-		return this.sumFigure;
+		return sumFigure;
 	}
 
 	public double getAvgOBS() {
 		double avg = 0;
-		for (int i = 0; i < this.trunk.size(); i++) {
-			double value = this.trunk.get(i).doubleValue();
+		for (int i = 0; i < trunk.size(); i++) {
+			double value = trunk.get(i).doubleValue();
 			avg += (value - avg) / (i + 1);
 		}
 		return avg;
 	}
 
 	public double getAvgFigure() {
-		if (this.avgFigure == null) {
-			this.avgFigure = this.trunk.parallelStream().mapToDouble(x -> x.doubleValue()).average().getAsDouble();
+		if (avgFigure == null) {
+			avgFigure = trunk.parallelStream().mapToDouble(x -> x.doubleValue()).average().getAsDouble();
 		}
-		return this.avgFigure;
+		return avgFigure;
 	}
 
 	public double getSigmaOBS() {
 		double avg = getAvgFigure();
 		double varTimesN = 0;
-		for (int i = 0; i < this.trunk.size(); i++) {
-			double value = this.trunk.get(i).doubleValue();
+		for (int i = 0; i < trunk.size(); i++) {
+			double value = trunk.get(i).doubleValue();
 			varTimesN += (value - avg) * (value - avg);
 		}
-		return this.trunk.size() > 0 ? Math.sqrt(varTimesN / (this.isSample ? this.trunk.size() - 1 : this.trunk.size())) : 0;
+		return trunk.size() > 0 ? Math.sqrt(varTimesN / (isSample ? trunk.size() - 1 : trunk.size())) : 0;
 	}
 
 	public double getSigmaRunningOBS() {
 		double avg = 0;
 		double varTimesN = 0;
 		int count = 0;
-		for (int i = 0; i < this.trunk.size(); i++) {
-			double value = this.trunk.get(i).doubleValue();
+		for (int i = 0; i < trunk.size(); i++) {
+			double value = trunk.get(i).doubleValue();
 			varTimesN += (value - avg) * (value - avg) * count / ++count; // pls note the counter increment
 			avg += (value - avg) / count;
 		}
-		return this.trunk.size() > 0 ? Math.sqrt(varTimesN / (this.isSample ? this.trunk.size() - 1 : this.trunk.size())) : 0;
+		return trunk.size() > 0 ? Math.sqrt(varTimesN / (isSample ? trunk.size() - 1 : trunk.size())) : 0;
 	}
 
 	public double getSigmaFigure() {
-		if (this.sigmaFigure == null) {
-			this.sigmaFigure = this.trunk.parallelStream().mapToDouble(t -> t.doubleValue()).collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getSigma(this.isSample);
+		if (sigmaFigure == null) {
+			sigmaFigure = trunk.parallelStream().mapToDouble(t -> t.doubleValue()).collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getSigma(isSample);
 		}
-		return this.sigmaFigure;
+		return sigmaFigure;
 	}
 
 	/**
@@ -429,31 +505,31 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	 * @return the quantile for the population or for a sample
 	 */
 	public double getQuantile(double probabilityCutPoint) {
-		int pSize = this.trunk.size();
-		if (this.isSample) {
+		int pSize = trunk.size();
+		if (isSample) {
 			if (probabilityCutPoint >= 1. / (pSize + 1) && probabilityCutPoint < (double) pSize / (pSize + 1)) {
 				double position = (pSize + 1) * probabilityCutPoint;
-				return this.trunk.get((int) position - 1).doubleValue() + (position - (int) position) * (this.trunk.get((int) position).doubleValue() - this.trunk.get((int) position - 1).doubleValue());
+				return trunk.get((int) position - 1).doubleValue() + (position - (int) position) * (trunk.get((int) position).doubleValue() - trunk.get((int) position - 1).doubleValue());
 			} else if (probabilityCutPoint < 1. / (pSize + 1))
-				return this.trunk.get(0).doubleValue();
+				return trunk.get(0).doubleValue();
 			else
-				return this.trunk.get(pSize - 1).doubleValue();
+				return trunk.get(pSize - 1).doubleValue();
 		} else {
 			if (probabilityCutPoint > 0. && probabilityCutPoint < 1.) {
 				double position = pSize * probabilityCutPoint;
 				if (position % 2 == 0)
-					return (this.trunk.get((int) position).doubleValue() + this.trunk.get((int) (position + 1)).doubleValue()) / 2.;
+					return (trunk.get((int) position).doubleValue() + trunk.get((int) (position + 1)).doubleValue()) / 2.;
 				else
-					return this.trunk.get((int) (position)).doubleValue();
+					return trunk.get((int) (position)).doubleValue();
 			} else if (probabilityCutPoint == 0.)
-				return this.trunk.get(0).doubleValue();
+				return trunk.get(0).doubleValue();
 			else
-				return this.trunk.get(pSize - 1).doubleValue();
+				return trunk.get(pSize - 1).doubleValue();
 		}
 	}
 
 	public double getQuartile0() {
-		return this.trunk.get(0).doubleValue();
+		return trunk.get(0).doubleValue();
 	}
 
 	public double getQuartile1() {
@@ -469,7 +545,7 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	}
 
 	public double getQuartile4() {
-		return this.trunk.get(this.trunk.size() - 1).doubleValue();
+		return trunk.get(trunk.size() - 1).doubleValue();
 	}
 
 	public double getInterQuartileRange() {
@@ -481,10 +557,10 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 		final double whiskerStartValue = getQuantile(probabilityCutPoint);
 		final double whiskerLimitValue = whiskerStartValue - getInterQuartileRange() * 1.5;
 		double value = whiskerStartValue;
-		for (int i = 0; i < this.trunk.size() * probabilityCutPoint; i++) {
-			if (this.trunk.get(i).doubleValue() >= whiskerLimitValue) {
+		for (int i = 0; i < trunk.size() * probabilityCutPoint; i++) {
+			if (trunk.get(i).doubleValue() >= whiskerLimitValue) {
 				// get the corrected value which is crucial for samples
-				value = getQuantile((.5 + i) / this.trunk.size()); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+				value = getQuantile((.5 + i) / trunk.size()); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
 				// take the whisker limit value if the interpolation / estimation value is beyond the limit
 				value = value < whiskerLimitValue ? whiskerLimitValue : value;
 				break;
@@ -498,10 +574,10 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 		final double whiskerStartValue = getQuantile(probabilityCutPoint);
 		final double whiskerLimitValue = whiskerStartValue + getInterQuartileRange() * 1.5;
 		double value = whiskerStartValue;
-		for (int i = this.trunk.size() - 1; i > this.trunk.size() * probabilityCutPoint; i--) {
-			if (this.trunk.get(i).doubleValue() <= whiskerLimitValue) {
+		for (int i = trunk.size() - 1; i >= trunk.size() * probabilityCutPoint; i--) {
+			if (trunk.get(i).doubleValue() <= whiskerLimitValue) {
 				// get the corrected value which is crucial for samples
-				value = getQuantile((.5 + i) / this.trunk.size()); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
+				value = getQuantile((.5 + i) / trunk.size()); // add .5 due to zerobased index and rule 0<p<1 which implies an index average value
 				// take the whisker limit value if the interpolation / estimation value is beyond the limit
 				value = value > whiskerLimitValue ? whiskerLimitValue : value;
 				break;
@@ -512,13 +588,13 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 
 	public double[] getTukeyBoxPlot() {
 		double[] values = new double[7];
-		values[BoxplotItems.QUARTILE0.ordinal()] = getQuartile0();
-		values[BoxplotItems.LOWER_WHISKER.ordinal()] = getQuantileLowerWhisker();
-		values[BoxplotItems.QUARTILE1.ordinal()] = getQuartile1();
-		values[BoxplotItems.QUARTILE2.ordinal()] = getQuartile2();
-		values[BoxplotItems.QUARTILE3.ordinal()] = getQuartile3();
-		values[BoxplotItems.UPPER_WHISKER.ordinal()] = getQuantileUpperWhisker();
-		values[BoxplotItems.QUARTILE4.ordinal()] = getQuartile4();
+		values[QUARTILE0.ordinal()] = getQuartile0();
+		values[LOWER_WHISKER.ordinal()] = getQuantileLowerWhisker();
+		values[QUARTILE1.ordinal()] = getQuartile1();
+		values[QUARTILE2.ordinal()] = getQuartile2();
+		values[QUARTILE3.ordinal()] = getQuartile3();
+		values[UPPER_WHISKER.ordinal()] = getQuantileUpperWhisker();
+		values[QUARTILE4.ordinal()] = getQuartile4();
 		return values;
 	}
 
@@ -526,22 +602,36 @@ public final class UniversalQuantile<T extends Number & Comparable<T>> {
 	 * @return the population size after eliminations and removing outliers
 	 */
 	public int getSize() {
-		return this.trunk.size();
+		return trunk.size();
 	}
 
 	/**
 	 * @return the outliers based on the sigmaFactor and the outlierFactor
 	 */
 	public List<T> getOutliers() {
-		List<T> outliers = new ArrayList<>(this.castaways);
-		outliers.removeAll(this.outcasts);
+		List<T> outliers = new ArrayList<>(castaways);
+		outliers.removeAll(outcasts);
 		return outliers;
+	}
+
+	public String getOutliersCsv() {
+		String[] array = getOutliers().stream().map(t -> String.valueOf(t.doubleValue())).toArray(String[]::new);
+		return String.join(",", array);
 	}
 
 	@Override
 	public String toString() {
-		return "isSample=" + this.isSample + ", size=" + this.getSize() + ", castawaysSize=" + this.castaways.size() //
-				+ ", sumFigure=" + this.getSumFigure() + ", avgFigure=" + this.getAvgFigure() + ", sigmaFigure=" + this.getSigmaFigure() + "";
+		return "isSample=" + isSample + ", size=" + getSize() + ", castawaysSize=" + castaways.size() + ", constantScraps=" + getConstantScrapsCsv() //
+				+ ", sumFigure=" + getSumFigure() + ", avgFigure=" + getAvgFigure() + ", sigmaFigure=" + getSigmaFigure() + "";
+	}
+
+	public List<T> getConstantScraps() {
+		return constantScraps;
+	}
+
+	public String getConstantScrapsCsv() {
+		String[] array = constantScraps.stream().map(t -> String.valueOf(t.doubleValue())).toArray(String[]::new);
+		return String.join(",", array);
 	}
 
 }

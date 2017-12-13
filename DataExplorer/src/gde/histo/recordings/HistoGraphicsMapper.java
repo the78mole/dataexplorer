@@ -82,31 +82,6 @@ public final class HistoGraphicsMapper {
 	}
 
 	/**
-	 * Calculate the layout positions of the record points on the x axis.
-	 * The result has the record points order.
-	 * @param width x axis length in pixel
-	 * @param decodedMinScale is the value corresponding to the left border (xPos = 0)
-	 * @param decodedMaxScale is the value corresponding to the right border (xPos = width)
-	 * @return the markers' x axis pixel positions in an array with values corresponding to {@code width}
-	 */
-	public Integer[] determineMarkerXPos(int width, double decodedMinScale, double decodedMaxScale) {
-		if (width != this.trailRecord.getParentTrail().getDrawAreaBounds().width) {
-			throw new UnsupportedOperationException();
-		}
-		Integer[] xPos = new Integer[this.trailRecord.realSize()];
-		for (int i = 0; i < this.trailRecord.realSize(); i++) {
-			Integer value = this.trailRecord.elementAt(i);
-//			if (value != null) {
-//				double decodedValue = RecordingsCollector.decodeVaultValue(trailRecord, value / 1000.0);
-//				points[i] = new Point(xDisplayOffset + timeLine.getScalePositions().get((long) this.trailRecord.getParentTrail().getTime_ms(i)),
-//						yDisplayOffset - (int) ((decodedValue - this.yOffset) * this.trailRecord.getDisplayScaleFactorValue()));
-//			}
-		}
-		log.finer(() -> Arrays.toString(xPos));
-		return xPos;
-	}
-
-	/**
 	 * Query the values for display.
 	 * @param timeLine
 	 * @return point time, value; null if the trail record value is null

@@ -19,20 +19,12 @@
 
 package gde.histo.recordings;
 
+import static gde.histo.datasources.HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR;
+import static gde.histo.datasources.HistoSet.SUMMARY_OUTLIER_SIGMA;
 import static gde.histo.utils.UniversalQuantile.BoxplotItems.LOWER_WHISKER;
 import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE1;
 import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE3;
 import static gde.histo.utils.UniversalQuantile.BoxplotItems.UPPER_WHISKER;
-
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import gde.GDE;
 import gde.data.AbstractRecord;
@@ -52,6 +44,18 @@ import gde.histo.utils.UniversalQuantile;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * Hold histo data points of one measurement or settlement; score points are a third option.
  * A histo data point holds one aggregated value (e.g. max, avg, quantile).
@@ -65,31 +69,24 @@ public abstract class TrailRecord extends CommonRecord {
 
 	public final static String					TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
 
-	protected final IChannelItem				channelItem;
-	protected final TrailSelector				trailSelector;
-
 	protected final DeviceXmlResource		xmlResource					= DeviceXmlResource.getInstance();
+
+	protected final IChannelItem				channelItem;
+
+	protected TrailSelector							trailSelector;
 
 	/**
 	 * If a suite trail is chosen the values are added to suite records and the trail record does not get values.
 	 */
 	protected final SuiteRecords				suiteRecords				= new SuiteRecords();
 
-	// min/max only depend on the vault q0/q4 values; a synced record has synced min/max values in these fields
+	// summary min/max only depend on the vault q0/q4 values; a synced record has synced min/max values in these fields
 	protected Double										summaryMax					= null;
 	protected Double										summaryMin					= null;
 
 	protected double										factor							= Double.MIN_VALUE;
 	protected double										offset							= Double.MIN_VALUE;
 	protected double										reduction						= Double.MIN_VALUE;
-	/**
-	 * The real maximum values of all vaults added to this record.
-	 */
-	protected final List<Integer>				vaultMaximums				= new ArrayList<>();
-	/**
-	 * The real minimum values of all vaults added to this record.
-	 */
-	protected final List<Integer>				vaultMinimums				= new ArrayList<>();
 
 	protected UniversalQuantile<Double>	quantile;
 	protected SummarySpots							summarySpots;
@@ -100,7 +97,6 @@ public abstract class TrailRecord extends CommonRecord {
 		this.channelItem = channelItem;
 		super.parent = parentTrail;
 
-		this.trailSelector = new TrailSelector(this);
 		log.fine(() -> channelItem.toString());
 	}
 
@@ -146,10 +142,9 @@ public abstract class TrailRecord extends CommonRecord {
 	@Override
 	public void clear() {
 		this.suiteRecords.clear();
-		this.vaultMaximums.clear();
-		this.vaultMinimums.clear();
 		this.quantile = null;
 		this.summarySpots = null;
+		resetSummaryMinMax();
 		super.clear();
 	}
 
@@ -260,20 +255,13 @@ public abstract class TrailRecord extends CommonRecord {
 	/**
 	 * @return true if the record or the suite contains reasonable data which can be displayed
 	 */
-	@Override // reason is trail record suites with a master record without point values and minValue/maxValue != 0 in case of empty records
+	@Override
 	public boolean hasReasonableData() {
 		boolean hasReasonableData = false;
-		if (this.suiteRecords.getSuiteLength() == 0) {
-			hasReasonableData = this.size() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE //
-					&& (this.minValue != this.maxValue || HistoSet.decodeVaultValue(this, this.maxValue / 1000.0) != 0.0);
-		} else {
-			for (SuiteRecord suiteRecord : this.suiteRecords.values()) {
-				if (suiteRecord.size() > 0 && suiteRecord.getMinRecordValue() != Integer.MAX_VALUE && suiteRecord.getMaxRecordValue() != Integer.MIN_VALUE //
-						&& (suiteRecord.getMinRecordValue() != suiteRecord.getMaxRecordValue() || HistoSet.decodeVaultValue(this, suiteRecord.getMaxRecordValue() / 1000.0) != 0.0)) {
-					hasReasonableData = true;
-					break;
-				}
-			}
+		if (this.size() > 0) {
+			double[] summaryExtrema = defineSummaryExtrema();
+			hasReasonableData = !HistoSet.fuzzyEquals(summaryExtrema[0], summaryExtrema[1]) || !HistoSet.fuzzyEquals(summaryExtrema[0], 0.);
+			log.log(Level.FINE, name, hasReasonableData);
 		}
 		return hasReasonableData;
 	}
@@ -344,17 +332,26 @@ public abstract class TrailRecord extends CommonRecord {
 		return this.syncMasterFactor;
 	}
 
+	/**
+	 ** @return always false as trail records do not use this mechanism
+	 ** @see gde.data.CommonRecord#isRoundOut()
+	 */
 	@Deprecated // not supported
 	@Override
 	public boolean isRoundOut() {
-		// return this.isRoundOut;
 		return false;
 	}
 
-	@Deprecated // not supported
+	/**
+	 * @return the template value which is passed through
+	 */
+	public boolean isRealRoundOut() {
+		return this.isRoundOut;
+	}
+
 	@Override
 	public void setRoundOut(boolean enabled) {
-		// this.isRoundOut = enabled;
+		this.isRoundOut = enabled;
 	}
 
 	@Override
@@ -494,20 +491,18 @@ public abstract class TrailRecord extends CommonRecord {
 		return new TrailRecordFormatter(this).getScaleValue(finalValue);
 	}
 
-	/* (non-Javadoc)
-	 * @see gde.data.AbstractRecord#getRealDf()
-	 */
 	@Override
 	public DecimalFormat getRealDf() {
 		return this.df;
 	}
 
-	/* (non-Javadoc)
-	 * @see gde.data.AbstractRecord#setRealDf(java.text.DecimalFormat)
-	 */
 	@Override
 	public void setRealDf(DecimalFormat realDf) {
 		this.df = realDf;
+	}
+
+	public String getFormattedRangeValue(double finalValue, double comparisonValue) {
+		return new TrailRecordFormatter(this).getRangeValue(finalValue, comparisonValue);
 	}
 
 	public IChannelItem getChannelItem() {
@@ -538,17 +533,6 @@ public abstract class TrailRecord extends CommonRecord {
 		}
 	}
 
-	/**
-	 * Measurements and setlements have min/max points; scores have one single scoregroup member point.
-	 */
-	public void addSummaryPoints(ExtendedVault histoVault) {
-		Integer point = getVaultPoint(histoVault, TrailTypes.MAX.ordinal());
-		if (point != null) {
-			this.vaultMaximums.add(point);
-			this.vaultMinimums.add(getVaultPoint(histoVault, TrailTypes.MIN.ordinal()));
-		}
-	}
-
 	public Double getSyncSummaryMax() {
 		return summaryMax != null ? summaryMax : 0.;
 	}
@@ -561,7 +545,7 @@ public abstract class TrailRecord extends CommonRecord {
 	 * Determine and set the q0/q4 max/minValues for the summary window from this record.
 	 */
 	public void setSummaryMinMax() {
-		double[] minMax = determineSummaryMinMax();
+		double[] minMax = defineSummaryExtrema();
 		if (minMax.length == 0) {
 			resetSummaryMinMax();
 		} else {
@@ -579,31 +563,42 @@ public abstract class TrailRecord extends CommonRecord {
 		summaryMin = summaryMax = null;
 	}
 
-	protected double[] determineSummaryMinMax() {
-		if (vaultMaximums.isEmpty() || vaultMinimums.isEmpty()) return new double[0];
-
+	protected double[] defineSummaryExtrema() { // todo consider caching this result
 		TrailTypes trailType = getTrailSelector().getTrailType();
 		if (trailType.isAlienValue()) {
 			Collection<List<ExtendedVault>> vaults = getParentTrail().getHistoVaults().values();
-			Stream<Integer> decodedVaultValues = vaults.parallelStream().flatMap(l -> l.stream()).map(v -> getVaultPoint(v, trailType.ordinal()));
-			List<Double> decodedValues = decodedVaultValues.map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
-			UniversalQuantile<Double> quantile = new UniversalQuantile<>(decodedValues, true, //
-					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
 
-			double[] result = new double[] { quantile.getQuartile0(), quantile.getQuartile4() };
-			log.finest(() -> getName() + " " + Arrays.toString(result) + "  outlier size=" + quantile.getOutliers().size());
-			return result;
+			Stream<Integer> alienPoints = vaults.parallelStream().flatMap(Collection::stream).map(v -> getVaultPoint(v, trailType.ordinal()));
+			List<Double> decodedAliens = alienPoints.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+			if (decodedAliens.isEmpty()) {
+				return new double[] { 0, 0 };
+			} else {
+				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(decodedAliens, true, //
+						SUMMARY_OUTLIER_SIGMA, SUMMARY_OUTLIER_RANGE_FACTOR);
+
+				double[] result = new double[] { tmpQuantile.getQuartile0(), tmpQuantile.getQuartile4() };
+				log.finer(() -> getName() + " " + Arrays.toString(result) + "  outlier size=" + tmpQuantile.getOutliers().size());
+				return result;
+			}
 		} else {
-			List<Double> decodedMaximums = vaultMaximums.parallelStream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
-			List<Double> decodedMinimums = vaultMinimums.parallelStream().map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
-			UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true, //
-					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
-			UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true, //
-					HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+			Collection<List<ExtendedVault>> vaults = getParentTrail().getHistoVaults().values();
 
-			double[] result = new double[] { minQuantile.getQuartile0(), maxQuantile.getQuartile4() };
-			log.finest(() -> getName() + " " + Arrays.toString(result) + "  max outlier size=" + maxQuantile.getOutliers().size() + "  min outlier size=" + minQuantile.getOutliers().size());
-			return result;
+			Stream<Integer> q0Points = vaults.parallelStream().flatMap(Collection::stream).map(v -> getVaultPoint(v, TrailTypes.Q0.ordinal()));
+			List<Double> decodedQ0s = q0Points.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+			Stream<Integer> q4Points = vaults.parallelStream().flatMap(Collection::stream).map(v -> getVaultPoint(v, TrailTypes.Q4.ordinal()));
+			List<Double> decodedQ4s = q4Points.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+
+			if (decodedQ0s.isEmpty() || decodedQ4s.isEmpty()) {
+				return new double[] { 0, 0 };
+			} else {
+				UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedQ0s, true, //
+						SUMMARY_OUTLIER_SIGMA, SUMMARY_OUTLIER_RANGE_FACTOR);
+				UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedQ4s, true, //
+						SUMMARY_OUTLIER_SIGMA, SUMMARY_OUTLIER_RANGE_FACTOR);
+				double[] result = new double[] { minQuantile.getQuartile0(), maxQuantile.getQuartile4() };
+				log.finer(() -> getName() + " " + Arrays.toString(result) + "  max outlier size=" + maxQuantile.getOutliers().size() + "  min outlier size=" + minQuantile.getOutliers().size());
+				return result;
+			}
 		}
 	}
 
@@ -628,7 +623,7 @@ public abstract class TrailRecord extends CommonRecord {
 
 	protected void defineQuantile() {
 		quantile = new UniversalQuantile<>(getDecodedNotNullValues(), true, //
-				HistoSet.SUMMARY_OUTLIER_SIGMA_DEFAULT, HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR_DEFAULT);
+				SUMMARY_OUTLIER_SIGMA, SUMMARY_OUTLIER_RANGE_FACTOR);
 	}
 
 	public UniversalQuantile<Double> getQuantile() {
@@ -642,40 +637,63 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	/**
-	 * @return the tukey box plot arrays for the scores defined as min or max of the score group or return an empty array
+	 * @return the tukey box plot arrays for the min/max trails or for score groups w/o min/max scores take the first score
 	 */
-	public abstract double[][] determineMinMaxQuantiles();
+	protected double[][] defineExtremumQuantiles() {
+		int[] extremumOrdinals = this.trailSelector.getExtremumOrdinals();
+		Collection<List<ExtendedVault>> vaults = this.getParentTrail().getHistoVaults().values();
+
+		Stream<Integer> pointMinimums = vaults.parallelStream().flatMap(List::stream).map(v -> getVaultPoint(v, extremumOrdinals[0]));
+		List<Double> decodedMinimums = pointMinimums.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+		UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true);
+
+		Stream<Integer> pointMaximums = vaults.parallelStream().flatMap(List::stream).map(v -> getVaultPoint(v, extremumOrdinals[1]));
+		List<Double> decodedMaximums = pointMaximums.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+		UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true);
+
+		return new double[][] { minQuantile.getTukeyBoxPlot(), maxQuantile.getTukeyBoxPlot() };
+	}
+
+	/**
+	 * @return the points for the q0/q4 trails; for score groups w/o min/max scores take the first score
+	 */
+	protected Integer[] getExtremumTrailPoints(ExtendedVault vault) {
+		int[] extremumOrdinals = this.trailSelector.getExtremumOrdinals();
+		return new Integer[] { getVaultPoint(vault, extremumOrdinals[0]), getVaultPoint(vault, extremumOrdinals[1]) };
+	}
 
 	/**
 	 * @param logLimit is the maximum number of the most recent logs which is checked for warnings
 	 * @return the array of warnings which may hold null values
 	 */
-	public OutlierWarning[] getMinMaxWarning(int logLimit) {
+	public OutlierWarning[] defineMinMaxWarning(int logLimit) {
 		OutlierWarning minWarning = null;
 		OutlierWarning maxWarning = null;
 
-		double[][] minMaxQuantiles = determineMinMaxQuantiles();
+		double[][] minMaxQuantiles = defineExtremumQuantiles();
+		double extremeMinOutlierLimit = minMaxQuantiles[0][QUARTILE1.ordinal()] - 3. * (minMaxQuantiles[0][QUARTILE3.ordinal()] - minMaxQuantiles[0][QUARTILE1.ordinal()]);
+		double extremeMaxOutlierLimit = minMaxQuantiles[1][QUARTILE3.ordinal()] + 3. * (minMaxQuantiles[1][QUARTILE3.ordinal()] - minMaxQuantiles[1][QUARTILE1.ordinal()]);
+
 		Collection<List<ExtendedVault>> vaults = this.getParentTrail().getHistoVaults().values();
 		Iterator<ExtendedVault> iterator = vaults.stream().flatMap(List::stream).iterator();
 
 		int actualLimit = logLimit > 0 && logLimit < size() ? logLimit : size();
 		for (int i = 0; i < actualLimit; i++) {
 			ExtendedVault vault = iterator.next();
-			Integer minPoint = getVaultPoint(vault, TrailTypes.MIN.ordinal());
-			Integer maxPoint = getVaultPoint(vault, TrailTypes.MAX.ordinal());
-			if (minPoint == null || maxPoint == null) continue;
+			Integer[] minMaxTrailPoints = getExtremumTrailPoints(vault);
+			if (minMaxTrailPoints[0] == null || minMaxTrailPoints[1] == null) continue;
 
-			double tmpMinValue = HistoSet.decodeVaultValue(this, minPoint / 1000.);
-			if (tmpMinValue < minMaxQuantiles[0][LOWER_WHISKER.ordinal()]) {
-				minWarning = OutlierWarning.WHISKER_RANGE;
-			} else if (minWarning == null && tmpMinValue < minMaxQuantiles[0][QUARTILE1.ordinal()]) {
-				minWarning = OutlierWarning.QUARTILE_RANGE;
+			double tmpMinValue = HistoSet.decodeVaultValue(this, minMaxTrailPoints[0] / 1000.0);
+			if (HistoSet.fuzzyCompare(tmpMinValue, extremeMinOutlierLimit) < 0) {
+				minWarning = OutlierWarning.FAR;
+			} else if (minWarning == null && HistoSet.fuzzyCompare(tmpMinValue, minMaxQuantiles[0][LOWER_WHISKER.ordinal()]) < 0) {
+				minWarning = OutlierWarning.CLOSE;
 			}
-			double tmpMaxValue = HistoSet.decodeVaultValue(this, maxPoint / 1000.);
-			if (tmpMaxValue > minMaxQuantiles[1][UPPER_WHISKER.ordinal()]) {
-				maxWarning = OutlierWarning.WHISKER_RANGE;
-			} else if (maxWarning == null && tmpMaxValue > minMaxQuantiles[0][QUARTILE3.ordinal()]) {
-				maxWarning = OutlierWarning.QUARTILE_RANGE;
+			double tmpMaxValue = HistoSet.decodeVaultValue(this, minMaxTrailPoints[1] / 1000.);
+			if (HistoSet.fuzzyCompare(tmpMaxValue, extremeMaxOutlierLimit) > 0) {
+				maxWarning = OutlierWarning.FAR;
+			} else if (maxWarning == null && HistoSet.fuzzyCompare(tmpMaxValue, minMaxQuantiles[1][UPPER_WHISKER.ordinal()]) > 0) {
+				maxWarning = OutlierWarning.CLOSE;
 			}
 		}
 		return new OutlierWarning[] { minWarning, maxWarning };

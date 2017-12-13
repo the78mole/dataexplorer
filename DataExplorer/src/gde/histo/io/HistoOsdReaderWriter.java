@@ -103,6 +103,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			return header.get(GDE.DEVICE_NAME);
 		}
 
+		@SuppressWarnings("unused")
 		ChannelTypes getChannelConfigType() {
 			return ChannelTypes.valueOf(header.get(GDE.CHANNEL_CONFIG_TYPE).trim());
 		}
@@ -163,6 +164,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			return HistoOsdReaderWriter.getChannel(recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME));
 		}
 
+		@SuppressWarnings("unused")
 		String getName() {
 			return recordSetInfo.get(GDE.RECORD_SET_NAME);
 		}

@@ -36,8 +36,8 @@ import gde.histo.utils.Spot;
 import gde.histo.utils.UniversalQuantile;
 
 public class QuantileTest extends TestSuperClass {
-	//maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
-	//-> we have our own JunitTest project referenced hint is related if test code is part of each project only
+	// maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
+	// -> we have our own JunitTest project referenced hint is related if test code is part of each project only
 	private final static String	$CLASS_NAME									= QuantileTest.class.getName();
 	private final static Logger	log													= Logger.getLogger($CLASS_NAME);
 
@@ -91,8 +91,16 @@ public class QuantileTest extends TestSuperClass {
 		assertEquals("getSigmaFigure=" + sigma, sigma, sigmaRunningOBS, DELTA);
 	}
 
+	public void testIqrNull() {
+		Double[] values = new Double[] {1.,1.,1.,1.,1.,1.,1.,7.};
+		UniversalQuantile<Double> quantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, true, false);
+		assertEquals("outlierSize=" + quantile.getOutliers().size(), quantile.getOutliers().size(), 0);
+		assertEquals("IQR=" + quantile.getInterQuartileRange(), quantile.getInterQuartileRange(), 0.);
+		System.out.println("Outliers : "+ quantile.getOutliersCsv());
+	}
+
 	public void testSortPerformance() {
-		// special double example :  -zero
+		// special double example : -zero
 		final Double d3 = -0d; // try this code with d3 = 0d; for comparison
 		if (d3 < 0d)
 			System.out.println("is never printed");
@@ -177,22 +185,22 @@ public class QuantileTest extends TestSuperClass {
 				}
 				counter++;
 			}
-			//			this.quantile = new Quantile(recordPoints,  6, 9);
+			// this.quantile = new Quantile(recordPoints, 6, 9);
 			Quantile quantileArray = new Quantile(arrayList, 6, 9);
 			log.log(Level.INFO, ">>> Class Quantile with Point2D <<<");
-			//			log.log(Level.INFO, "Avg   " + this.quantile.getAvgFigure() + " bisher " + this.quantile.getAvgOBS());
-			//			log.log(Level.INFO, "Sigma " + this.quantile.getSigmaFigure() + " bisher " + this.quantile.getSigmaRunningOBS());
+			// log.log(Level.INFO, "Avg " + this.quantile.getAvgFigure() + " bisher " + this.quantile.getAvgOBS());
+			// log.log(Level.INFO, "Sigma " + this.quantile.getSigmaFigure() + " bisher " + this.quantile.getSigmaRunningOBS());
 			log.log(Level.INFO, "Avg   " + quantileArray.getAvgFigure() + " bisher " + quantileArray.getAvgOBS());
 			log.log(Level.INFO, "Sigma " + quantileArray.getSigmaFigure() + " bisher " + quantileArray.getSigmaRunningOBS());
 
 			for (int j = 0; j < 4; j++) {
 				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
 				for (int i = 0; i < performanceTestLoops / 2; i++) {
-					//					genericQuantile = new GenericQuantile(recordList, false, 6, 9, exclusions);
+					// genericQuantile = new GenericQuantile(recordList, false, 6, 9, exclusions);
 					quantileArray = new Quantile(arrayList, 6, 9);
-					//					nanoTimeSigmaInt -= System.nanoTime();
-					//					genericQuantile.getSigmaRunningOBS();
-					//					nanoTimeSigmaInt += System.nanoTime();
+					// nanoTimeSigmaInt -= System.nanoTime();
+					// genericQuantile.getSigmaRunningOBS();
+					// nanoTimeSigmaInt += System.nanoTime();
 					nanoTimeSigmaDouble -= System.nanoTime();
 					quantileArray.getSigmaRunningOBS();
 					nanoTimeSigmaDouble += System.nanoTime();
@@ -203,11 +211,11 @@ public class QuantileTest extends TestSuperClass {
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
 				for (int i = 0; i < performanceTestLoops / 2; i++) {
-					//					genericQuantile = new GenericQuantile(recordList, false, 6, 9, exclusions);
+					// genericQuantile = new GenericQuantile(recordList, false, 6, 9, exclusions);
 					quantileArray = new Quantile(arrayList, 6, 9);
-					//					nanoTimeSigmaInt -= System.nanoTime();
-					//					genericQuantile.getSigmaFigure();
-					//					nanoTimeSigmaInt += System.nanoTime();
+					// nanoTimeSigmaInt -= System.nanoTime();
+					// genericQuantile.getSigmaFigure();
+					// nanoTimeSigmaInt += System.nanoTime();
 					nanoTimeSigmaDouble -= System.nanoTime();
 					quantileArray.getSigmaFigure();
 					nanoTimeSigmaDouble += System.nanoTime();
@@ -226,8 +234,8 @@ public class QuantileTest extends TestSuperClass {
 			iExclusions.add(null);
 			List<Double> dExclusions = new ArrayList<>();
 			dExclusions.add(null);
-			UniversalQuantile<Integer> genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., iExclusions);
-			UniversalQuantile<Double> genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., dExclusions);
+			UniversalQuantile<Integer> genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., 9., iExclusions);
+			UniversalQuantile<Double> genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., 9., dExclusions);
 			log.log(Level.INFO, ">>> Class GenericQuantile with Number <<<");
 			log.log(Level.INFO, "Avg   " + genericQuantile.getAvgFigure() + " bisher " + genericQuantile.getAvgOBS());
 			log.log(Level.INFO, "Sigma " + genericQuantile.getSigmaFigure() + " bisher " + genericQuantile.getSigmaRunningOBS());
@@ -237,8 +245,8 @@ public class QuantileTest extends TestSuperClass {
 			for (int j = 0; j < 4; j++) {
 				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
 				for (int i = 0; i < performanceTestLoops / 2; i++) {
-					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., iExclusions);
-					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., dExclusions);
+					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., 9., iExclusions);
+					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., 9., dExclusions);
 					nanoTimeSigmaInt -= System.nanoTime();
 					genericQuantile.getSigmaRunningOBS();
 					nanoTimeSigmaInt += System.nanoTime();
@@ -252,8 +260,8 @@ public class QuantileTest extends TestSuperClass {
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
 				for (int i = 0; i < performanceTestLoops / 2; i++) {
-					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., iExclusions);
-					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., dExclusions);
+					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., 9., iExclusions);
+					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., 9., dExclusions);
 					nanoTimeSigmaInt -= System.nanoTime();
 					genericQuantile.getSigmaFigure();
 					nanoTimeSigmaInt += System.nanoTime();

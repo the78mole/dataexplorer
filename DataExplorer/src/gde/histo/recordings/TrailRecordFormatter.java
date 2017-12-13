@@ -19,27 +19,70 @@
 
 package gde.histo.recordings;
 
-import java.text.DecimalFormat;
-import java.util.Vector;
-
 import gde.GDE;
 import gde.device.IDevice;
 import gde.device.TrailTypes;
 import gde.histo.datasources.HistoSet;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
+
+import java.text.DecimalFormat;
+import java.util.Vector;
 
 /**
  * Output formatting based on trailRecord data.
  * @author Thomas Eickert (USER)
  */
 public final class TrailRecordFormatter {
+	private final static String	$CLASS_NAME	= TrailRecordFormatter.class.getName();
+	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * Performant replacement for String.format("%.8s", ss)
 	 */
 	private static String trunc(String ss, int maxLength) {
 		return ss.substring(0, Math.min(maxLength, ss.length()));
+	}
+
+	/**
+	 * Define category based on the magnitude and the delta span of the values.
+	 * @param value1
+	 * @param value2
+	 */
+	private static DecimalFormat getDecimalFormat(double value1, double value2) {
+		DecimalFormat df = new DecimalFormat();
+		double rangeValue = Math.abs(value1 - value2);
+		if (Math.abs(value1) < 10 && Math.abs(value2) < 10) {
+			if (rangeValue < 0.01)
+				df.applyPattern("0.0000"); //$NON-NLS-1$
+			else if (rangeValue < 0.1)
+				df.applyPattern("0.000"); //$NON-NLS-1$
+			else
+				df.applyPattern("0.00"); //$NON-NLS-1$
+		} else if (Math.abs(value1) < 100 && Math.abs(value2) < 100) {
+			if (rangeValue < 0.1)
+				df.applyPattern("0.000"); //$NON-NLS-1$
+			else if (rangeValue < 1.)
+				df.applyPattern("0.00"); //$NON-NLS-1$
+			else
+				df.applyPattern("0.0"); //$NON-NLS-1$
+		} else if (Math.abs(value1) < 1000 && Math.abs(value2) < 1000) {
+			if (rangeValue < 1.)
+				df.applyPattern("0.00"); //$NON-NLS-1$
+			else if (rangeValue < 10.)
+				df.applyPattern("0.0"); //$NON-NLS-1$
+			else
+				df.applyPattern("0"); //$NON-NLS-1$
+		} else if (Math.abs(value1) < 10000 && Math.abs(value2) < 10000) {
+			if (rangeValue < 10.)
+				df.applyPattern("0.0"); //$NON-NLS-1$
+			else
+				df.applyPattern("0"); //$NON-NLS-1$
+		} else {
+			df.applyPattern("0"); //$NON-NLS-1$
+		}
+		return df;
 	}
 
 	private final IDevice			device	= DataExplorer.getInstance().getActiveDevice();
@@ -51,46 +94,14 @@ public final class TrailRecordFormatter {
 	}
 
 	/**
-	 * Define category based on maxValueAbs AND minValueAbs.
-	 * @param newNumberFormat
+	 * Define category based the number format or on the magnitude and the delta span of the scale values.
+	 * @param newNumberFormat holds the number of decimal places or -1 for a range based formatting
 	 */
 	public DecimalFormat getDecimalFormat(int newNumberFormat) {
 		DecimalFormat df = new DecimalFormat();
-
-		double maxScaleValue = this.trailRecord.getMaxScaleValue();
-		double minScaleValue = this.trailRecord.getMinScaleValue();
-
 		switch (newNumberFormat) {
 		case -1:
-			if (Math.abs(maxScaleValue) < 10 && Math.abs(minScaleValue) < 10) {
-				if (maxScaleValue - minScaleValue < 0.01)
-					df.applyPattern("0.0000"); //$NON-NLS-1$
-				else if (maxScaleValue - minScaleValue < 0.1)
-					df.applyPattern("0.000"); //$NON-NLS-1$
-				else
-					df.applyPattern("0.00"); //$NON-NLS-1$
-			} else if (Math.abs(maxScaleValue) < 100 && Math.abs(minScaleValue) < 100) {
-				if (maxScaleValue - minScaleValue < 0.1)
-					df.applyPattern("0.000"); //$NON-NLS-1$
-				else if (maxScaleValue - minScaleValue < 1.)
-					df.applyPattern("0.00"); //$NON-NLS-1$
-				else
-					df.applyPattern("0.0"); //$NON-NLS-1$
-			} else if (Math.abs(maxScaleValue) < 1000 && Math.abs(minScaleValue) < 1000) {
-				if (maxScaleValue - minScaleValue < 1.)
-					df.applyPattern("0.00"); //$NON-NLS-1$
-				else if (maxScaleValue - minScaleValue < 10.)
-					df.applyPattern("0.0"); //$NON-NLS-1$
-				else
-					df.applyPattern("0"); //$NON-NLS-1$
-			} else if (Math.abs(maxScaleValue) < 10000 && Math.abs(minScaleValue) < 10000) {
-				if (maxScaleValue - minScaleValue < 10.)
-					df.applyPattern("0.0"); //$NON-NLS-1$
-				else
-					df.applyPattern("0"); //$NON-NLS-1$
-			} else {
-				df.applyPattern("0"); //$NON-NLS-1$
-			}
+			df = getDecimalFormat(this.trailRecord.getMaxScaleValue(), this.trailRecord.getMinScaleValue());
 			break;
 		case 0:
 			df.applyPattern("0"); //$NON-NLS-1$
@@ -106,13 +117,27 @@ public final class TrailRecordFormatter {
 			df.applyPattern("0.000"); //$NON-NLS-1$
 			break;
 		}
-
 		return df;
 	}
 
 	/**
-	 * @param value is the value to be displayed (without applying a factor or GPS coordinates fraction correction)
-	 * @return the translated and decimal formatted value at the given index
+	 * @param finalValue is the value to be displayed (without applying a factor or GPS coordinates fraction correction)
+	 * @param range is the delta span which is used for determining the decimal places
+	 * @return decimal formatted value
+	 */
+	public String getRangeValue(double finalValue, double range) {
+		if (this.device.isGPSCoordinates(this.trailRecord)) {
+			if (this.trailRecord.getUnit().endsWith("'")) //$NON-NLS-1$
+				return StringHelper.getFormatedWithMinutes("%2d %04.1f", finalValue); //$NON-NLS-1$
+			else
+				return getDecimalFormat(finalValue, finalValue + range).format(finalValue);
+		} else
+			return getDecimalFormat(finalValue, finalValue + range).format(finalValue);
+	}
+
+	/**
+	 * @param finalValue is the value to be displayed (without applying a factor or GPS coordinates fraction correction)
+	 * @return decimal formatted value based on record's format
 	 */
 	public String getScaleValue(double finalValue) {
 		if (this.device.isGPSCoordinates(this.trailRecord)) {
@@ -127,7 +152,7 @@ public final class TrailRecordFormatter {
 	/**
 	 * @param index
 	 * @param trailType
-	 * @return the formatted value also for GPS coordinates
+	 * @return the translated and formatted value also for GPS coordinates
 	 */
 	public String getTableSuiteValue(int index, TrailTypes trailType) {
 		String cellValue;
@@ -143,7 +168,7 @@ public final class TrailRecordFormatter {
 	/**
 	 * @param suiteOrdinal
 	 * @param index
-	 * @return the formatted and truncated value also for GPS coordinates
+	 * @return the translated and formatted and truncated value also for GPS coordinates
 	 */
 	private String getTruncatedTableValue(int suiteOrdinal, int index, int length) {
 		return trunc(getTableValue(this.trailRecord.getSuiteRecords().get(suiteOrdinal).get(index) / 1000.), length);

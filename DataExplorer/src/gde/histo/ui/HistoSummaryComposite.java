@@ -25,12 +25,14 @@ import static java.util.logging.Level.SEVERE;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -54,9 +56,7 @@ import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.Channel;
 import gde.data.Channels;
-import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionFormatter;
@@ -71,6 +71,7 @@ import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuOnDemand;
 import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuType;
 import gde.histo.utils.HistoCurveUtils;
 import gde.histo.utils.HistoTimeLine;
+import gde.log.Level;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -132,12 +133,12 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 			@Override
 			public void handleEvent(Event evt) {
 				log.finer(() -> "GraphicsComposite.controlResized() = " + evt); //$NON-NLS-1$
-				Rectangle clientRect = HistoSummaryComposite.this.getClientArea();
+				Rectangle clientRect = getClientArea();
 				Point size = new Point(clientRect.width, clientRect.height);
-				log.finer(() -> HistoSummaryComposite.this.oldSize + " - " + size); //$NON-NLS-1$
-				if (!HistoSummaryComposite.this.oldSize.equals(size)) {
-					log.fine(() -> "size changed, update " + HistoSummaryComposite.this.oldSize + " - " + size); //$NON-NLS-1$ //$NON-NLS-2$
-					HistoSummaryComposite.this.oldSize = size;
+				log.finer(() -> oldSize + " - " + size); //$NON-NLS-1$
+				if (!oldSize.equals(size)) {
+					log.fine(() -> "size changed, update " + oldSize + " - " + size); //$NON-NLS-1$ //$NON-NLS-2$
+					oldSize = size;
 					setComponentBounds();
 					doRedrawGraphics();
 				}
@@ -173,9 +174,9 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 						headerText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
 						if (!toolTipText.isEmpty()) toolTipText = toolTipText.substring(1);
 					}
-					if (!headerText.equals(HistoSummaryComposite.this.graphicsHeaderText)) {
-						HistoSummaryComposite.this.graphicsHeaderText = headerText;
-						HistoSummaryComposite.this.graphicsHeader.setText(headerText);
+					if (!headerText.equals(graphicsHeaderText)) {
+						graphicsHeaderText = headerText;
+						graphicsHeader.setText(headerText);
 					}
 					{ // getFullText
 						int levelMax = Settings.getInstance().getSubDirectoryLevelMax();
@@ -183,7 +184,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 								: GDE.STRING_EMPTY;
 						if (!toolTipText.isEmpty()) toolTipText = toolTipText + levelsText;
 					}
-					HistoSummaryComposite.this.graphicsHeader.setToolTipText(toolTipText);
+					graphicsHeader.setToolTipText(toolTipText);
 				}
 			});
 		}
@@ -297,127 +298,116 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 
 		this.canvasGC.dispose();
 		this.canvasImageGC.dispose();
-		// this.canvasImage.dispose(); //zooming, marking, ... needs a reference to canvasImage
 		log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-	}
-
-	/**
-	 * Check input x,y value against curve are bounds and correct to bound if required.
-	 * @param Point containing corrected x,y position value
-	 */
-	private Point checkCurveBounds(int xPos, int yPos) {
-		log.finer(() -> "in  xPos = " + xPos + " yPos = " + yPos); //$NON-NLS-1$ //$NON-NLS-2$
-		int tmpxPos = xPos - this.curveAreaBounds.x;
-		int tmpyPos = yPos - this.curveAreaBounds.y;
-		int minX = 0;
-		int maxX = this.curveAreaBounds.width;
-		int minY = 0;
-		int maxY = this.curveAreaBounds.height;
-		if (tmpxPos < minX || tmpxPos > maxX) {
-			tmpxPos = tmpxPos < minX ? minX : maxX;
-		}
-		if (tmpyPos < minY || tmpyPos > maxY) {
-			tmpyPos = tmpyPos < minY ? minY : maxY;
-		}
-		if (log.isLoggable(FINER)) log.log(FINER, "out xPos = " + tmpxPos + " yPos = " + tmpyPos); //$NON-NLS-1$ //$NON-NLS-2$
-		return new Point(tmpxPos, tmpyPos);
 	}
 
 	/**
 	 * @param evt
 	 */
 	void mouseMoveAction(MouseEvent evt) {
-		getSnappedVaults(evt);
-		Channel activeChannel = Channels.getInstance().getActiveChannel();
-		if (activeChannel != null) {
-			if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0 && this.canvasImage != null) {
-				Point point = checkCurveBounds(evt.x, evt.y);
-				evt.x = point.x;
-				evt.y = point.y;
+		if (Channels.getInstance().getActiveChannel() == null) return;
 
-				{
-					this.graphicCanvas.setCursor(this.application.getCursor());
-					log.finest(() -> String.format("x=%d y=%d  curveAreaBounds=%s", evt.x, evt.y, this.curveAreaBounds.toString()));
-					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.curveAreaBounds.y) {
-						Long timestamp_ms = this.timeLine.getSnappedTimestamp(evt.x);
-						String text = timestamp_ms != null
-								? Paths.get(trailRecordSet.getDataTags().getByIndex(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString()
-								: null;
-						if (text != null) {
-							if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText())))
-								this.graphicCanvas.setToolTipText(text);
-						} else
-							this.graphicCanvas.setToolTipText(null);
-					} else
-						this.graphicCanvas.setToolTipText(null);
-				}
+		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0 && this.canvasImage != null) {
+			Point point = checkCurveBounds(evt.x, evt.y);
 
-				if (this.graphicsMeasurement != null) {
-					if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
-						this.graphicsMeasurement.processMouseDownMove(this.timeLine.getAdjacentTimestamp(evt.x));
-					} else
-						this.graphicsMeasurement.processMouseUpMove(evt.x);
+			this.graphicCanvas.setCursor(this.application.getCursor());
+			List<Integer> snappedIndices = getSnappedIndices(point);
+			if (!snappedIndices.isEmpty()) {
+				this.graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_CROSS));
+
+				Stream<String> fileNames = snappedIndices.stream().sorted(Comparator.reverseOrder()) //
+						.map(i -> Paths.get(trailRecordSet.getDataTags(i).get(DataTag.FILE_PATH))) //
+						.map(p -> p.getFileName().toString());
+				String text = String.join("\n", (Iterable<String>) fileNames::iterator);
+				if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText()))) {
+					log.log(Level.FINEST, "", text);
+					this.graphicCanvas.setToolTipText(text);
 				}
+			} else
+				this.graphicCanvas.setToolTipText(null);
+
+			if (this.graphicsMeasurement != null) {
+				if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
+					this.graphicsMeasurement.processMouseDownMove(this.timeLine.getAdjacentTimestamp(point.x));
+				} else
+					this.graphicsMeasurement.processMouseUpMove(point.x);
 			}
 		}
 	}
 
-	private List<ExtendedVault> getSnappedVaults(MouseEvent evt) {
+	/**
+	 * @param point is the mouse coordinate relative and restricted to the curve area bounds
+	 * @return the record identified by the mouse position or null
+	 */
+	private TrailRecord getVisibleDisplayRecord(Point point) {
+		if (trailRecordSet == null) return null; // graphics data have not been determined yet
+
+		int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
+		int stripWidth = curveAreaBounds.width;
+		int xPos = point.x;
+		int yPos = point.y - unkGap;
+		log.finest(() -> String.format("x=%d y=%d  stripXPos=%d  stripYPos=%d  stripHeight=%d", //
+				point.x, point.y, xPos, yPos, stripHeight));
+		if (yPos < 0 || yPos >= stripHeight * trailRecordSet.getDisplayRecords().size() - 1 //
+				|| xPos <= 0 || xPos >= stripWidth) // not in drawing area
+			return null;
+
+		int displayOrdinal = Math.min(yPos / stripHeight, trailRecordSet.getDisplayRecords().size() - 1);
+		if (displayOrdinal < 0) return null; // mouse position does not point to a visible record
+
+		TrailRecord record = trailRecordSet.getDisplayRecords().get(displayOrdinal);
+		log.finest(() -> String.format("x=%d y=%d  displayOrdinal=%d  record=%s", //
+				point.x, point.y, displayOrdinal, record.getName()));
+		return record.isVisible() ? record : null;
+	}
+
+	/**
+	 * @param point is the mouse coordinate relative and restricted to the curve area bounds
+	 * @return the recordset timestamp indices of the log data identified by the mouse position or an empty list
+	 */
+	private List<Integer> getSnappedIndices(Point point) {
 		if (trailRecordSet == null) return new ArrayList<>(); // graphics data have not been determined yet
 
-		int stripHeight = (fixedCanvasHeight) / trailRecordSet.getDisplayRecords().size();
-		int stripWidth = curveAreaBounds.width;
-		int stripXPos = evt.x - curveAreaBounds.x;
-		int stripYPos = evt.y - curveAreaBounds.y;
-		if (stripYPos <= 0 || stripYPos - unkGap >= stripHeight * trailRecordSet.getDisplayRecords().size() - 1 //
-				|| stripXPos < 0 || stripXPos > stripWidth) // not in drawing area
-			return new ArrayList<>();
+		TrailRecord record = getVisibleDisplayRecord(point);
+		if (record == null) return new ArrayList<>(); // mouse not pointing to a visible record
 
-		int displayOrdinal = Math.min((stripYPos - unkGap) / stripHeight, trailRecordSet.getDisplayRecords().size() - 1);
-		TrailRecord record = trailRecordSet.getDisplayRecords().get(displayOrdinal);
+		int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
+		int stripYPos = (point.y - unkGap) % stripHeight;
 
-		record.getSummarySpots().getSnappedIndexes(stripXPos, (stripYPos - unkGap) % stripHeight);
-		List<Integer> snappedIndexes = record.getSummarySpots().getSnappedIndexes(stripXPos);
-		if (snappedIndexes != null) {
-			List<ExtendedVault> vaults = snappedIndexes.parallelStream().map(i -> trailRecordSet.getHistoVaults().get((long) trailRecordSet.getTime_ms(i))) //
-					.flatMap(List::stream).sorted().collect(Collectors.toList());
-			log.off(() -> String.format("x=%d y=%d  displayOrdinal=%d  record=%s  numberMarkers=%d", //
-					evt.x, evt.y, displayOrdinal, record.getName(), snappedIndexes.size()));
-			return vaults;
-		}
-		return new ArrayList<>();
+		List<Integer> snappedIndexes = record.getSummarySpots().getSnappedIndexes(point.x, stripYPos);
+		log.log(FINER, "", Arrays.toString(snappedIndexes.toArray()));
+		return snappedIndexes;
 	}
 
 	/**
 	 * @param evt
 	 */
 	void mouseDownAction(MouseEvent evt) {
-		Channel activeChannel = Channels.getInstance().getActiveChannel();
-		if (activeChannel != null) {
-			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
-				Point point = checkCurveBounds(evt.x, evt.y);
-				this.xDown = point.x;
-				this.yDown = point.y;
+		if (Channels.getInstance().getActiveChannel() == null) return;
 
-				if (evt.button == 1) {
-					if (this.graphicsMeasurement != null) {
-						this.graphicsMeasurement.processMouseDownAction(this.xDown);
-					}
-				} else if (evt.button == 3) { // right button
-					HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
-					HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
-					if (this.xDown == 0 || this.xDown == this.curveAreaBounds.width) {
-						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
-						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
-						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
-					} else {
-						Map<DataTag, String> dataTags = trailRecordSet.getDataTags().getByIndex(trailRecordSet //
-								.getIndex(HistoSummaryComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // is already relative to curve area
-						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
-						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
-						HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
-					}
-					HistoSummaryComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
+		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
+			Point point = checkCurveBounds(evt.x, evt.y);
+			this.xDown = point.x;
+			this.yDown = point.y;
+
+			if (evt.button == 1) {
+				if (this.graphicsMeasurement != null) {
+					this.graphicsMeasurement.processMouseDownAction(this.xDown);
+				}
+			} else if (evt.button == 3) { // right button
+				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
+				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
+
+				List<Integer> snappedIndices = getSnappedIndices(point);
+				if (snappedIndices.size() == 1) {
+					Map<DataTag, String> dataTags = trailRecordSet.getDataTags(snappedIndices.get(0));
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
+					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
+				} else {
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
+					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 				}
 			}
 		}
@@ -427,17 +417,16 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 	 * @param evt
 	 */
 	void mouseUpAction(MouseEvent evt) {
-		Channel activeChannel = Channels.getInstance().getActiveChannel();
-		if (activeChannel != null) {
-			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
-				Point point = checkCurveBounds(evt.x, evt.y);
-				this.xUp = point.x;
-				this.yUp = point.y;
+		if (Channels.getInstance().getActiveChannel() == null) return;
 
-				if (evt.button == 1) {
-					if (this.graphicsMeasurement != null) {
-						this.graphicsMeasurement.processMouseUpAction();
-					}
+		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
+			Point point = checkCurveBounds(evt.x, evt.y);
+			this.xUp = point.x;
+			this.yUp = point.y;
+
+			if (evt.button == 1) {
+				if (this.graphicsMeasurement != null) {
+					this.graphicsMeasurement.processMouseUpAction();
 				}
 			}
 		}
@@ -482,7 +471,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 
 		boolean isCurveGridEnabled = trailRecordSet.getValueGridType() > 0;
 		if (isCurveGridEnabled)
-			HistoCurveUtils.drawSummaryGrid(trailRecordSet, dataScaleWidth, trailRecordSet.get(0).getSummarySpots().defineGrid(), canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
+			HistoCurveUtils.drawSummaryGrid(trailRecordSet, canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
 
 		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
@@ -494,21 +483,21 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 			summarySpots.initialize(stripHeight, density);
 
 			int stripY0 = curveAreaBounds.y + stripHeight * i + unkGap;
-			if (record.isVisible() || !settings.isPartialDataTable()) {
-				double decodedScaleMin = summarySpots.defineDecodedScaleMin();
-				double decodedScaleMax = summarySpots.defineDecodedScaleMax();
+			double decodedScaleMin = summarySpots.defineDecodedScaleMin();
+			double decodedScaleMax = summarySpots.defineDecodedScaleMax();
 
-				HistoCurveUtils.drawChannelItemScale(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
-						isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, !isCurveSelectorEnabled);
+			HistoCurveUtils.drawChannelItemScale(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+					isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, !isCurveSelectorEnabled);
+
+			if (record.isVisible() || !settings.isPartialDataTable()) {
 				HistoCurveUtils.drawChannelItemBoxplot(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
 						isDrawNumbersInRecordColor, isSpaceBelow(i));
 
 				summarySpots.drawAllMarkers(canvasImageGC, stripY0);
 				summarySpots.drawRecentMarkers(canvasImageGC, stripY0);
-
-				HistoCurveUtils.drawChannelItemWarnings(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth);
-				canvasImageGC.setBackground(this.surroundingBackground);
 			}
+			HistoCurveUtils.drawChannelItemWarnings(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth);
+			canvasImageGC.setBackground(this.surroundingBackground);
 		}
 	}
 

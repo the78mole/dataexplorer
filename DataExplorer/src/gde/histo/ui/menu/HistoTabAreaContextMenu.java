@@ -81,6 +81,8 @@ public class HistoTabAreaContextMenu {
 	private MenuItem						fileName, openRecordSetItem, deleteFileItem, openFolderItem, hideItem;
 	private Menu								hideMenu;
 	private MenuItem						hideMenuRecordSetItem, hideMenuFileItem, hideMenuRevokeItem;
+	private Menu								warningMenu;
+	private MenuItem						warningItem, warningCountItem0, warningCountItem1, warningCountItem2, warningCountItem3;
 	private MenuItem						suppressModeItem;
 
 	public enum TabMenuType {
@@ -116,6 +118,11 @@ public class HistoTabAreaContextMenu {
 						curveSelectionItem.setEnabled(true);
 						hideItem.setEnabled(true);
 						hideMenuRevokeItem.setEnabled(true);
+						warningItem.setEnabled(true);
+						warningCountItem0.setEnabled(true);
+						warningCountItem1.setEnabled(true);
+						warningCountItem2.setEnabled(true);
+						warningCountItem3.setEnabled(true);
 						displayGraphicsHeaderItem.setEnabled(true);
 						displayGraphicsCommentItem.setEnabled(true);
 						displayGraphicsCurveSurvey.setEnabled(true);
@@ -143,6 +150,7 @@ public class HistoTabAreaContextMenu {
 						}
 						String excludedList = popupMenu.getData(TabMenuOnDemand.EXCLUDED_LIST.toString()).toString();
 						if (!GDE.IS_OS_ARCH_ARM) hideItem.setToolTipText(excludedList.isEmpty() ? Messages.getString(MessageIds.GDE_MSGT0798) : excludedList);
+						setWarningCountIndex(settings.getWarningCountIndex());
 					}
 				}
 
@@ -165,6 +173,7 @@ public class HistoTabAreaContextMenu {
 					} else {
 						setAllEnabled(true);
 						curveSelectionItem.setEnabled(false);
+						warningItem.setEnabled(false);
 						displayGraphicsHeaderItem.setEnabled(false);
 						displayGraphicsCommentItem.setEnabled(false);
 						displayGraphicsCurveSurvey.setEnabled(false);
@@ -194,6 +203,7 @@ public class HistoTabAreaContextMenu {
 						}
 						String excludedList = popupMenu.getData(TabMenuOnDemand.EXCLUDED_LIST.toString()).toString();
 						if (!GDE.IS_OS_ARCH_ARM) hideItem.setToolTipText(excludedList.isEmpty() ? Messages.getString(MessageIds.GDE_MSGT0798) : excludedList);
+						setWarningCountIndex(settings.getWarningCountIndex());
 					}
 				}
 
@@ -337,6 +347,64 @@ public class HistoTabAreaContextMenu {
 					}
 				});
 			}
+
+			new MenuItem(popupMenu, SWT.SEPARATOR);
+			{
+				warningItem = new MenuItem(popupMenu, SWT.CASCADE);
+				warningItem.setText(Messages.getString(MessageIds.GDE_MSGT0888));
+				if (!GDE.IS_OS_ARCH_ARM) warningItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0889));
+				warningMenu = new Menu(hideItem);
+				warningItem.setMenu(warningMenu);
+			}
+			{
+				warningCountItem0 = new MenuItem(warningMenu, SWT.CHECK);
+				warningCountItem0.setText(String.valueOf(settings.getWarningCount(0)) + " logs");
+				warningCountItem0.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem0.widgetSelected, event=" + evt); //$NON-NLS-1$
+						setWarningCountIndex(0);
+						application.updateHistoTabs(false, false);
+					}
+				});
+			}
+			{
+				warningCountItem1 = new MenuItem(warningMenu, SWT.CHECK);
+				warningCountItem1.setText(String.valueOf(settings.getWarningCount(1)) + " logs");
+				warningCountItem1.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem1.widgetSelected, event=" + evt); //$NON-NLS-1$
+						setWarningCountIndex(1);
+						application.updateHistoTabs(false, false);
+					}
+				});
+			}
+			{
+				warningCountItem2 = new MenuItem(warningMenu, SWT.CHECK);
+				warningCountItem2.setText(String.valueOf(settings.getWarningCount(2)) + " logs");
+				warningCountItem2.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem2.widgetSelected, event=" + evt); //$NON-NLS-1$
+						setWarningCountIndex(2);
+						application.updateHistoTabs(false, false);
+					}
+				});
+			}
+			{
+				warningCountItem3 = new MenuItem(warningMenu, SWT.CHECK);
+				warningCountItem3.setText(String.valueOf(settings.getWarningCount(3)) + " logs");
+				warningCountItem3.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem3.widgetSelected, event=" + evt); //$NON-NLS-1$
+						setWarningCountIndex(3);
+						application.updateHistoTabs(false, false);
+					}
+				});
+			}
+
 			new MenuItem(popupMenu, SWT.SEPARATOR);
 			{
 				suppressModeItem = new MenuItem(popupMenu, SWT.CHECK);
@@ -522,6 +590,11 @@ public class HistoTabAreaContextMenu {
 		if (hideMenuFileItem != null) hideMenuFileItem.setEnabled(enabled);
 		if (hideMenuRevokeItem != null) hideMenuRevokeItem.setEnabled(enabled);
 		if (suppressModeItem != null) suppressModeItem.setEnabled(enabled);
+		if (warningItem != null) warningItem.setEnabled(enabled);
+		if (warningCountItem0 != null) warningCountItem0.setEnabled(enabled);
+		if (warningCountItem1 != null) warningCountItem1.setEnabled(enabled);
+		if (warningCountItem2 != null) warningCountItem2.setEnabled(enabled);
+		if (warningCountItem3 != null) warningCountItem3.setEnabled(enabled);
 
 		if (curveSelectionItem != null) curveSelectionItem.setEnabled(enabled);
 		if (displayGraphicsHeaderItem != null) displayGraphicsHeaderItem.setEnabled(enabled);
@@ -538,6 +611,17 @@ public class HistoTabAreaContextMenu {
 		if (editTableItem != null) editTableItem.setEnabled(enabled);
 		if (partialTableItem != null) partialTableItem.setEnabled(enabled);
 		if (setDigitalFontItem != null) setDigitalFontItem.setEnabled(enabled);
+	}
+
+	/**
+	 * @param newIndex
+	 */
+	private void setWarningCountIndex(int newIndex) {
+		settings.setWarningCountIndex(String.valueOf(newIndex));
+		warningCountItem0.setSelection(newIndex == 0);
+		warningCountItem1.setSelection(newIndex == 1);
+		warningCountItem2.setSelection(newIndex == 2);
+		warningCountItem3.setSelection(newIndex == 3);
 	}
 
 }

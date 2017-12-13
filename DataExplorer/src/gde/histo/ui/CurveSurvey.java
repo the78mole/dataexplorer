@@ -18,6 +18,13 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.LOWER_WHISKER;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE0;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE1;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE2;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE3;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE4;
+import static gde.histo.utils.UniversalQuantile.BoxplotItems.UPPER_WHISKER;
 import static java.util.logging.Level.FINEST;
 
 import java.util.ArrayList;
@@ -39,7 +46,6 @@ import gde.histo.utils.HistoTimeLine;
 import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
 import gde.histo.utils.Spot;
-import gde.histo.utils.UniversalQuantile;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -264,31 +270,31 @@ public final class CurveSurvey {
 				this.xLeftLimit = Math.min(xPosLeft, this.xLeftLimit);
 				this.xRightLimit = Math.max(xPosRight, this.xRightLimit);
 
-				int yPosQuartile1 = yPosBoxplot[UniversalQuantile.BoxplotItems.QUARTILE1.ordinal()];
+				int yPosQuartile1 = yPosBoxplot[QUARTILE1.ordinal()];
 				drawHorizontalLine(yPosQuartile1, xPosLeft, halfBoxWidth * 2, LineMark.BOXPLOT);
-				drawHorizontalLine(yPosBoxplot[UniversalQuantile.BoxplotItems.QUARTILE2.ordinal()], xPosLeft, halfBoxWidth * 2, LineMark.BOXPLOT);
-				int yPosQuartile3 = yPosBoxplot[UniversalQuantile.BoxplotItems.QUARTILE3.ordinal()];
+				drawHorizontalLine(yPosBoxplot[QUARTILE2.ordinal()], xPosLeft, halfBoxWidth * 2, LineMark.BOXPLOT);
+				int yPosQuartile3 = yPosBoxplot[QUARTILE3.ordinal()];
 				drawHorizontalLine(yPosQuartile3, xPosLeft, halfBoxWidth * 2, LineMark.BOXPLOT);
 				drawVerticalLine(xPosLeft, yPosQuartile3, yPosQuartile1 - yPosQuartile3, LineMark.BOXPLOT);
 				drawVerticalLine(xPosRight, yPosQuartile3, yPosQuartile1 - yPosQuartile3, LineMark.BOXPLOT);
 
-				int yPosLowerWhisker = yPosBoxplot[UniversalQuantile.BoxplotItems.LOWER_WHISKER.ordinal()];
+				int yPosLowerWhisker = yPosBoxplot[LOWER_WHISKER.ordinal()];
 				drawHorizontalLine(yPosLowerWhisker, xPos - halfBoxWidth / 2, halfBoxWidth, LineMark.BOXPLOT);
 				drawVerticalLine(xPos, yPosQuartile1, yPosLowerWhisker - yPosQuartile1, LineMark.BOXPLOT);
 
-				int yPosUpperWhisker = yPosBoxplot[UniversalQuantile.BoxplotItems.UPPER_WHISKER.ordinal()];
+				int yPosUpperWhisker = yPosBoxplot[UPPER_WHISKER.ordinal()];
 				drawHorizontalLine(yPosUpperWhisker, xPos - halfBoxWidth / 2, halfBoxWidth, LineMark.BOXPLOT);
 				drawVerticalLine(xPos, yPosUpperWhisker, yPosQuartile3 - yPosUpperWhisker, LineMark.BOXPLOT);
 
 				log.finer(() -> String.format("xPos=%d  LW=%d Q1=%d Q2=%d Q3=%d UW=%d ", xPos, yPosLowerWhisker, yPosQuartile1, //$NON-NLS-1$
-						yPosBoxplot[UniversalQuantile.BoxplotItems.QUARTILE2.ordinal()], yPosQuartile3, yPosUpperWhisker));
+						yPosBoxplot[QUARTILE2.ordinal()], yPosQuartile3, yPosUpperWhisker));
 			}
 			{
-				int yPosBottom = yPosBoxplot[UniversalQuantile.BoxplotItems.QUARTILE0.ordinal()];
-				if (yPosBottom != yPosBoxplot[UniversalQuantile.BoxplotItems.LOWER_WHISKER.ordinal()])
+				int yPosBottom = yPosBoxplot[QUARTILE0.ordinal()];
+				if (yPosBottom != yPosBoxplot[LOWER_WHISKER.ordinal()])
 					drawOutlier(xPos, yPosBottom, radius, LineMark.BOXPLOT);
-				int yPosTop = yPosBoxplot[UniversalQuantile.BoxplotItems.QUARTILE4.ordinal()];
-				if (yPosTop != yPosBoxplot[UniversalQuantile.BoxplotItems.UPPER_WHISKER.ordinal()]) drawOutlier(xPos, yPosTop, radius, LineMark.BOXPLOT);
+				int yPosTop = yPosBoxplot[QUARTILE4.ordinal()];
+				if (yPosTop != yPosBoxplot[UPPER_WHISKER.ordinal()]) drawOutlier(xPos, yPosTop, radius, LineMark.BOXPLOT);
 
 				// y axis limits may cross the top or bottom defined by the curve values
 				this.yLowerLimit = Math.max(this.yLowerLimit, yPosBottom + radius);

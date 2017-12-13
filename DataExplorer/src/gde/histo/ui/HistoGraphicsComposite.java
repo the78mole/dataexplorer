@@ -19,7 +19,6 @@
 package gde.histo.ui;
 
 import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.SEVERE;
 
 import java.nio.file.Path;
@@ -51,7 +50,6 @@ import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.Channel;
 import gde.data.Channels;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
@@ -124,12 +122,12 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 			@Override
 			public void handleEvent(Event evt) {
 				log.finer(() -> "GraphicsComposite.controlResized() = " + evt); //$NON-NLS-1$
-				Rectangle clientRect = HistoGraphicsComposite.this.getClientArea();
+				Rectangle clientRect = getClientArea();
 				Point size = new Point(clientRect.width, clientRect.height);
-				log.finer(() -> HistoGraphicsComposite.this.oldSize + " - " + size); //$NON-NLS-1$
-				if (!HistoGraphicsComposite.this.oldSize.equals(size)) {
-					log.fine(() -> "size changed, update " + HistoGraphicsComposite.this.oldSize + " - " + size); //$NON-NLS-1$ //$NON-NLS-2$
-					HistoGraphicsComposite.this.oldSize = size;
+				log.finer(() -> oldSize + " - " + size); //$NON-NLS-1$
+				if (!oldSize.equals(size)) {
+					log.fine(() -> "size changed, update " + oldSize + " - " + size); //$NON-NLS-1$ //$NON-NLS-2$
+					oldSize = size;
 					setComponentBounds();
 					doRedrawGraphics();
 				}
@@ -165,9 +163,9 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 						headerText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
 						if (!toolTipText.isEmpty()) toolTipText = toolTipText.substring(1);
 					}
-					if (!headerText.equals(HistoGraphicsComposite.this.graphicsHeaderText)) {
-						HistoGraphicsComposite.this.graphicsHeaderText = headerText;
-						HistoGraphicsComposite.this.graphicsHeader.setText(headerText);
+					if (!headerText.equals(graphicsHeaderText)) {
+						graphicsHeaderText = headerText;
+						graphicsHeader.setText(headerText);
 					}
 					{ // getFullText
 						int levelMax = Settings.getInstance().getSubDirectoryLevelMax();
@@ -175,7 +173,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 								: GDE.STRING_EMPTY;
 						if (!toolTipText.isEmpty()) toolTipText = toolTipText + levelsText;
 					}
-					HistoGraphicsComposite.this.graphicsHeader.setToolTipText(toolTipText);
+					graphicsHeader.setToolTipText(toolTipText);
 				}
 			});
 		}
@@ -298,7 +296,6 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 
 		this.canvasGC.dispose();
 		this.canvasImageGC.dispose();
-		// this.canvasImage.dispose(); //zooming, marking, ... needs a reference to canvasImage
 		log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 	}
 
@@ -331,60 +328,33 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	}
 
 	/**
-	 * Check input x,y value against curve are bounds and correct to bound if required.
-	 * @param Point containing corrected x,y position value
-	 */
-	private Point checkCurveBounds(int xPos, int yPos) {
-		log.finer(() -> "in  xPos = " + xPos + " yPos = " + yPos); //$NON-NLS-1$ //$NON-NLS-2$
-		int tmpxPos = xPos - this.curveAreaBounds.x;
-		int tmpyPos = yPos - this.curveAreaBounds.y;
-		int minX = 0;
-		int maxX = this.curveAreaBounds.width;
-		int minY = 0;
-		int maxY = this.curveAreaBounds.height;
-		if (tmpxPos < minX || tmpxPos > maxX) {
-			tmpxPos = tmpxPos < minX ? minX : maxX;
-		}
-		if (tmpyPos < minY || tmpyPos > maxY) {
-			tmpyPos = tmpyPos < minY ? minY : maxY;
-		}
-		if (log.isLoggable(FINER)) log.log(FINER, "out xPos = " + tmpxPos + " yPos = " + tmpyPos); //$NON-NLS-1$ //$NON-NLS-2$
-		return new Point(tmpxPos, tmpyPos);
-	}
-
-	/**
 	 * @param evt
 	 */
 	void mouseMoveAction(MouseEvent evt) {
-		Channel activeChannel = Channels.getInstance().getActiveChannel();
-		if (activeChannel != null) {
-			if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0 && this.canvasImage != null) {
-				Point point = checkCurveBounds(evt.x, evt.y);
-				evt.x = point.x;
-				evt.y = point.y;
+		if (Channels.getInstance().getActiveChannel() == null) return;
 
-				{
-					this.graphicCanvas.setCursor(this.application.getCursor());
-					if (evt.x > 0 && evt.y > this.curveAreaBounds.height - this.curveAreaBounds.y) {
-						Long timestamp_ms = this.timeLine.getSnappedTimestamp(evt.x);
-						String text = timestamp_ms != null
-								? Paths.get(trailRecordSet.getDataTags().getByIndex(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString()
-								: null;
-						if (text != null) {
-							if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText())))
-								this.graphicCanvas.setToolTipText(text);
-						} else
-							this.graphicCanvas.setToolTipText(null);
-					} else
-						this.graphicCanvas.setToolTipText(null);
-				}
+		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0 && this.canvasImage != null) {
+			Point point = checkCurveBounds(evt.x, evt.y);
 
-				if (this.graphicsMeasurement != null) {
-					if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
-						this.graphicsMeasurement.processMouseDownMove(this.timeLine.getAdjacentTimestamp(evt.x));
-					} else
-						this.graphicsMeasurement.processMouseUpMove(evt.x);
-				}
+			this.graphicCanvas.setCursor(this.application.getCursor());
+			if (point.x > 0 && point.y > this.curveAreaBounds.height - this.curveAreaBounds.y) {
+				Long timestamp_ms = this.timeLine.getSnappedTimestamp(point.x);
+				String text = timestamp_ms != null
+						? Paths.get(trailRecordSet.getDataTags().getByIndex(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString()
+						: null;
+				if (text != null) {
+					if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText())))
+						this.graphicCanvas.setToolTipText(text);
+				} else
+					this.graphicCanvas.setToolTipText(null);
+			} else
+				this.graphicCanvas.setToolTipText(null);
+
+			if (this.graphicsMeasurement != null) {
+				if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
+					this.graphicsMeasurement.processMouseDownMove(this.timeLine.getAdjacentTimestamp(point.x));
+				} else
+					this.graphicsMeasurement.processMouseUpMove(point.x);
 			}
 		}
 	}
@@ -393,32 +363,30 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	 * @param evt
 	 */
 	void mouseDownAction(MouseEvent evt) {
-		Channel activeChannel = Channels.getInstance().getActiveChannel();
-		if (activeChannel != null) {
-			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
-				Point point = checkCurveBounds(evt.x, evt.y);
-				this.xDown = point.x;
-				this.yDown = point.y;
+		if (Channels.getInstance().getActiveChannel() == null) return;
 
-				if (evt.button == 1) {
-					if (this.graphicsMeasurement != null) {
-						this.graphicsMeasurement.processMouseDownAction(this.xDown);
-					}
-				} else if (evt.button == 3) { // right button
-					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
-					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
-					if (this.xDown == 0 || this.xDown == this.curveAreaBounds.width) {
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
-					} else {
-						Map<DataTag, String> dataTags = trailRecordSet.getDataTags().getByIndex(trailRecordSet //
-								.getIndex(HistoGraphicsComposite.this.timeLine.getAdjacentTimestamp(this.xDown))); // is already relative to curve area
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
-						HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
-					}
-					HistoGraphicsComposite.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
+		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
+			Point point = checkCurveBounds(evt.x, evt.y);
+			this.xDown = point.x;
+			this.yDown = point.y;
+
+			if (evt.button == 1) {
+				if (this.graphicsMeasurement != null) {
+					this.graphicsMeasurement.processMouseDownAction(this.xDown);
+				}
+			} else if (evt.button == 3) { // right button
+				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
+				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
+				if (this.xDown > 0 && this.xDown < this.curveAreaBounds.width) {
+					Map<DataTag, String> dataTags = trailRecordSet.getDataTags(trailRecordSet //
+							.getIndex(timeLine.getAdjacentTimestamp(this.xDown))); // is already relative to curve area
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
+					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
+				} else {
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
+					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 				}
 			}
 		}
@@ -428,17 +396,16 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	 * @param evt
 	 */
 	void mouseUpAction(MouseEvent evt) {
-		Channel activeChannel = Channels.getInstance().getActiveChannel();
-		if (activeChannel != null) {
-			if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
-				Point point = checkCurveBounds(evt.x, evt.y);
-				this.xUp = point.x;
-				this.yUp = point.y;
+		if (Channels.getInstance().getActiveChannel() == null) return;
 
-				if (evt.button == 1) {
-					if (this.graphicsMeasurement != null) {
-						this.graphicsMeasurement.processMouseUpAction();
-					}
+		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
+			Point point = checkCurveBounds(evt.x, evt.y);
+			this.xUp = point.x;
+			this.yUp = point.y;
+
+			if (evt.button == 1) {
+				if (this.graphicsMeasurement != null) {
+					this.graphicsMeasurement.processMouseUpAction();
 				}
 			}
 		}

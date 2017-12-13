@@ -19,6 +19,20 @@
 
 package gde.histo.ui;
 
+import static java.util.logging.Level.FINER;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channels;
+import gde.histo.recordings.TrailRecordSet;
+import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
+import gde.histo.ui.menu.HistoTabAreaContextMenu;
+import gde.log.Logger;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.GraphicsUtils;
+import gde.utils.StringHelper;
+
 import java.util.Date;
 
 import org.eclipse.swt.SWT;
@@ -32,18 +46,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channels;
-import gde.histo.recordings.TrailRecordSet;
-import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
-import gde.histo.ui.menu.HistoTabAreaContextMenu;
-import gde.log.Logger;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.GraphicsUtils;
-import gde.utils.StringHelper;
 
 /**
  * Histo chart drawing area base class.
@@ -231,7 +233,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	public void setFixedGraphicCanvas(int fixedY, int fixedHeight) {
 		this.fixedCanvasY = fixedY;
 		this.fixedCanvasHeight = fixedHeight;
-		log.off(() -> "y = " + fixedY + "  height = " + fixedHeight); //$NON-NLS-1$
+		log.fine(() -> "y = " + fixedY + "  height = " + fixedHeight); //$NON-NLS-1$
 	}
 
 	/**
@@ -365,6 +367,28 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	 */
 	public void setCurveSelectorEnabled(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
+	}
+
+	/**
+	 * Check input x,y value against curve are bounds and correct to bound if required.
+	 * @param Point containing corrected x,y position value
+	 */
+	protected Point checkCurveBounds(int xPos, int yPos) {
+		log.finer(() -> "in  xPos = " + xPos + " yPos = " + yPos); //$NON-NLS-1$ //$NON-NLS-2$
+		int tmpxPos = xPos - this.curveAreaBounds.x;
+		int tmpyPos = yPos - this.curveAreaBounds.y;
+		int minX = 0;
+		int maxX = this.curveAreaBounds.width;
+		int minY = 0;
+		int maxY = this.curveAreaBounds.height;
+		if (tmpxPos < minX || tmpxPos > maxX) {
+			tmpxPos = tmpxPos < minX ? minX : maxX;
+		}
+		if (tmpyPos < minY || tmpyPos > maxY) {
+			tmpyPos = tmpyPos < minY ? minY : maxY;
+		}
+		if (log.isLoggable(FINER)) log.log(FINER, "out xPos = " + tmpxPos + " yPos = " + tmpyPos); //$NON-NLS-1$ //$NON-NLS-2$
+		return new Point(tmpxPos, tmpyPos);
 	}
 
 }

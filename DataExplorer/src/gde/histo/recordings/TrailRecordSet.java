@@ -120,24 +120,15 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		 */
 		private synchronized void addVaults(String recordName) {
 			TrailRecord trailRecord = get(recordName);
-
-			boolean isSmartStatistics = Settings.getInstance().isSmartStatistics();
-
 			trailRecord.clear();
 			if (!trailRecord.getTrailSelector().isTrailSuite()) {
 				histoVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
 					trailRecord.addElement(trailRecord.getVaultPoint(v, trailRecord.getTrailSelector().getTrailOrdinal()));
-					if (isSmartStatistics) {
-						trailRecord.addSummaryPoints(v);
-					}
 				});
 			} else {
 				trailRecord.setSuite(histoVaults.size());
 				histoVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
 					addVaultToSuite(v, trailRecord);
-					if (isSmartStatistics) {
-						trailRecord.addSummaryPoints(v);
-					}
 				});
 			}
 			log.finer(() -> " " + trailRecord.getTrailSelector());
@@ -219,7 +210,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 						Integer longitudePoint = histoVault.getMeasurementPoint(longitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
 
 						if (latitudePoint != null && longitudePoint != null) {
-							// todo why division by 1000?
 							gpsCluster.add(new GpsCoordinate(HistoSet.decodeVaultValue(latitudeRecord, latitudePoint / 1000.),
 									HistoSet.decodeVaultValue(longitudeRecord, longitudePoint / 1000.)));
 						} else {
@@ -312,6 +302,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	/**
 	 * Data source for this recordset.
+	 * Sorted by recordSet startTimeStamp in reverse order.
 	 */
 	private final TreeMap<Long, List<ExtendedVault>>	histoVaults;
 
@@ -668,7 +659,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			this.template.setProperty(i + Record.COLOR, rgb);
 			this.template.setProperty(i + Record.LINE_WITH, String.valueOf(record.getLineWidth()));
 			this.template.setProperty(i + Record.LINE_STYLE, String.valueOf(record.getLineStyle()));
-			this.template.setProperty(i + Record.IS_ROUND_OUT, String.valueOf(record.isRoundOut()));
+			this.template.setProperty(i + Record.IS_ROUND_OUT, String.valueOf(record.isRealRoundOut()));
 			this.template.setProperty(i + Record.IS_START_POINT_ZERO, String.valueOf(record.isStartpointZero()));
 			this.template.setProperty(i + Record.NUMBER_FORMAT, String.valueOf(record.getNumberFormat()));
 			this.template.setProperty(i + Record.IS_START_END_DEFINED, String.valueOf(record.isStartEndDefined()));
@@ -762,6 +753,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	public TrailDataTags getDataTags() {
 		return this.dataTags;
+	}
+
+	public Map<DataTag, String> getDataTags(int index) {
+		return this.dataTags.getByIndex(index);
 	}
 
 	public long getLeftmostTimeStamp_ms() {

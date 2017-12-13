@@ -21,6 +21,7 @@ package gde.histo.recordings;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,16 +30,14 @@ import gde.device.TrailTypes;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.HistoSet;
 import gde.histo.utils.UniversalQuantile;
-import gde.log.Logger;
 
 /**
  * Trail records containing settlement values.
  * @author Thomas Eickert (USER)
  */
 public final class SettlementTrail extends TrailRecord {
-	private final static String		$CLASS_NAME				= SettlementTrail.class.getName();
-	private final static long			serialVersionUID	= 110124007964748556L;
-	final static Logger		log								= Logger.getLogger($CLASS_NAME);
+	private final static long		serialVersionUID	= 110124007964748556L;
+
 	/**
 	 * @param newOrdinal
 	 * @param settlementType
@@ -47,6 +46,7 @@ public final class SettlementTrail extends TrailRecord {
 	 */
 	public SettlementTrail(int newOrdinal, SettlementType settlementType, TrailRecordSet parent, int initialCapacity) {
 		super(settlementType, newOrdinal, parent, initialCapacity);
+		this.trailSelector = new SettlementTrailSelector(this);
 	}
 
 	public SettlementType getSettlement() {
@@ -65,7 +65,7 @@ public final class SettlementTrail extends TrailRecord {
 
 	@Override
 	public void setApplicableTrailTypes() {
-		getTrailSelector().setApplicableTrails4Settlement();
+		getTrailSelector().setApplicableTrails();
 	}
 
 	@Override
@@ -74,15 +74,15 @@ public final class SettlementTrail extends TrailRecord {
 	}
 
 	@Override
-	public double[][] determineMinMaxQuantiles() {
+	protected double[][] defineExtremumQuantiles() {
 		Collection<List<ExtendedVault>> vaults = this.getParentTrail().getHistoVaults().values();
 
 		Stream<Integer> pointMinimums = vaults.parallelStream().flatMap(List::stream).map(v -> getVaultPoint(v, TrailTypes.MIN.ordinal()));
-		List<Double> decodedMinimums = pointMinimums.map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+		List<Double> decodedMinimums = pointMinimums.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
 		UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true);
 
 		Stream<Integer> pointMaximums = vaults.parallelStream().flatMap(List::stream).map(v -> getVaultPoint(v, TrailTypes.MAX.ordinal()));
-		List<Double> decodedMaximums = pointMaximums.map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
+		List<Double> decodedMaximums = pointMaximums.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
 		UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true);
 
 		return new double[][] { minQuantile.getTukeyBoxPlot(), maxQuantile.getTukeyBoxPlot() };

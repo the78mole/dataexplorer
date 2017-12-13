@@ -39,13 +39,14 @@ import org.eclipse.swt.graphics.Rectangle;
 import gde.config.Settings;
 import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecord;
+import gde.histo.recordings.TrailRecordSet;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.MathUtils;
 
 /**
  * Graph element data belonging to a record row in the summary graph.
- * xPos/yPos values define the lower left corner of a 2x2 pixel element
+ * xPos/yPos values define the lower left corner of a 2x2 pixel element.
  * @author Thomas Eickert (USER)
  */
 public class SummarySpots { // MarkerLine + Boxplot + Warnings
@@ -53,12 +54,10 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	private static final Logger	log									= Logger.getLogger($CLASS_NAME);
 
 	/**
-	 * Number of most recent logs which are checked for warnings.
+	 * Type of the outlier.
 	 */
-	private static final int		WARNING_LOG_NUMBER	= 3;
-
 	public enum OutlierWarning {
-		WHISKER_RANGE, QUARTILE_RANGE
+		FAR, CLOSE
 	}
 
 	public enum Density {
@@ -107,9 +106,20 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		}
 
 		private int getThresholdDistance() {
-			double symmetricItemValue = this.markerWidth - avg();
-			return (int) ((1 + symmetricItemValue) * this.distanceThreshold / (1 + this.settings.getBoxplotScaleOrdinal()));
+			double symmetricItemValue = markerWidth - avg();
+			return (int) ((1 + symmetricItemValue) * distanceThreshold / (1 + settings.getBoxplotScaleOrdinal()));
 		}
+	}
+
+	public static List<Integer> defineGrid(TrailRecordSet recordSet) {
+		List<Integer> grid = new ArrayList<>();
+		int stripNetX0 = recordSet.getDrawAreaBounds().x + Density.MEDIUM.markerWidth / 2;
+		int tmpWidth = recordSet.getDrawAreaBounds().width - Density.MEDIUM.markerWidth; // half left and right gap for overlapping elements
+		double xStep = tmpWidth / 10.;
+		for (int i = 1; i < 10; i++) {
+			grid.add((stripNetX0 + (int) (xStep * i)));
+		}
+		return grid;
 	}
 
 	private final TrailRecord										record;
@@ -121,16 +131,16 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	 * The markers at the x position.
 	 * Key is the x axis position with a distance defined by the element size.
 	 */
-	private final TreeMap<Integer, PosMarkers>	xPositions	= new TreeMap<>();
-	private int																	stripNetX0;										// start pos for the first marker
-	private int																	stripNetWidth;								// relative start pos for the LAST marker
+	private final TreeMap<Integer, PosMarkers>	xPositions		= new TreeMap<>();
+	private int																	stripNetX0;											// start pos for the first marker
+	private int																	stripNetWidth;									// relative start pos for the LAST marker
 
 	private double															xValueScaleFactor;
 	private double															xValueOffset;
 	private double															xPointScaleFactor;
 	private double															xPointOffset;
 
-	private OutlierWarning[]											minMaxWarning	= null;
+	private OutlierWarning[]										minMaxWarning	= null;
 
 	public SummarySpots(TrailRecord record) {
 		this.record = record;
@@ -139,14 +149,14 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	public void initialize(int newStripHeight, Density newDensity) {
 		clear();
 
-		this.stripHeight = newStripHeight;
-		this.elementWidth = newDensity.markerWidth;
+		stripHeight = newStripHeight;
+		elementWidth = newDensity.markerWidth;
 
 		Rectangle drawAreaBounds = record.getParentTrail().getDrawAreaBounds();
 		// elements
-		this.stripNetX0 = drawAreaBounds.x + elementWidth / 2;
+		stripNetX0 = drawAreaBounds.x + elementWidth / 2;
 		int tmpWidth = drawAreaBounds.width - elementWidth; // half left and right gap for overlapping elements
-		this.stripNetWidth = tmpWidth - tmpWidth % elementWidth; // additional right gap because of x position delta (is the elements size)
+		stripNetWidth = tmpWidth - tmpWidth % elementWidth; // additional right gap because of x position delta (is the elements size)
 
 		double decodedScaleMin = defineDecodedScaleMin();
 		double decodedScaleMax = defineDecodedScaleMax();
@@ -181,7 +191,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 
 	public OutlierWarning[] getMinMaxWarning() {
 		if (minMaxWarning == null) {
-			minMaxWarning = record.getMinMaxWarning(WARNING_LOG_NUMBER);
+			minMaxWarning = record.defineMinMaxWarning(Settings.getInstance().getWarningCount());
 		}
 		return minMaxWarning;
 	}
@@ -230,17 +240,8 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		return resultXPositions;
 	}
 
-	public List<Integer> defineGrid() {
-		List<Integer> grid = new ArrayList<>();
-		double xStep = stripNetWidth / 10.;
-		for (int i = 1; i < 10; i++) {
-			grid.add((stripNetX0 + (int) (xStep * i)));
-		}
-		return grid;
-	}
-
 	public void drawRecentMarkers(GC gc, int stripY0) {
-		drawMarkers(gc, defineXPositions(WARNING_LOG_NUMBER), stripY0, DataExplorer.COLOR_RED);
+		drawMarkers(gc, defineXPositions(Settings.getInstance().getWarningCount()), stripY0, DataExplorer.COLOR_RED);
 	}
 
 	public void drawAllMarkers(GC gc, int stripY0) {
@@ -255,18 +256,21 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 
 		int[] tukeyXPositions = defineTukeyXPositions();
 		for (Map.Entry<Integer, PosMarkers> xEntry : tmpXPositions.entrySet()) {
-			int lowerLimit = tukeyXPositions[LOWER_WHISKER.ordinal()] - tukeyXPositions[LOWER_WHISKER.ordinal()] % elementWidth;
-			int upperLimit = tukeyXPositions[UPPER_WHISKER.ordinal()] - tukeyXPositions[UPPER_WHISKER.ordinal()] % elementWidth + elementWidth;
-			int actualWidth = xEntry.getKey() < lowerLimit || xEntry.getKey() >= upperLimit ? elementWidth * 2 : elementWidth;
+			int lowerLimit = tukeyXPositions[LOWER_WHISKER.ordinal()] / elementWidth * elementWidth; // floor
+			int upperLimit = (tukeyXPositions[UPPER_WHISKER.ordinal()] / elementWidth + 1) * elementWidth; // ceiling
+			int actualWidth = xEntry.getKey() < lowerLimit || xEntry.getKey() > upperLimit ? elementWidth * 2 : elementWidth;
+
+			int xPosOffset = record.getParentTrail().getDrawAreaBounds().x - actualWidth / 2 + 1;
+			int yPosOffset = stripY0 - actualWidth / 2 + 1;
 			for (Integer yPos : xEntry.getValue().yPositions) {
-				gc.fillRectangle(record.getParentTrail().getDrawAreaBounds().x + xEntry.getKey(), stripY0 + yPos - actualWidth / 2 + 1, actualWidth, actualWidth);
-				if (log.isLoggable(FINEST)) log.log(FINEST, String.format("x=%d y=%d", stripNetX0 + xEntry.getKey(), stripY0 + yPos));
+				gc.fillRectangle(xEntry.getKey() + xPosOffset, yPos + yPosOffset, actualWidth, actualWidth);
+				if (log.isLoggable(FINEST)) log.log(FINEST, String.format("x=%d y=%d", xEntry.getKey() + xPosOffset, yPos + yPosOffset));
 			}
 		}
 	}
 
 	public double defineDecodedScaleMin() { // todo consider caching
-		log.finer(() -> "'" + this.record.getName() + "'  syncSummaryMin=" + record.getSyncSummaryMin() + " syncSummaryMax=" + record.getSyncSummaryMax());
+		log.finer(() -> "'" + record.getName() + "'  syncSummaryMin=" + record.getSyncSummaryMin() + " syncSummaryMax=" + record.getSyncSummaryMax());
 		return MathUtils.floorStepwise(record.getSyncSummaryMin(), record.getSyncSummaryMax() - record.getSyncSummaryMin());
 	}
 
@@ -275,7 +279,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	}
 
 	public int getStripHeight() {
-		return this.stripHeight;
+		return stripHeight;
 	}
 
 	public int getElementWidth() {
@@ -287,15 +291,21 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		return xPositions;
 	}
 
-	public List<Integer> getSnappedIndexes(int stripXPos) {
+	private List<Integer> getSnappedIndexes(int stripXPos) {
 		int index = stripXPos - stripXPos % elementWidth;
 		PosMarkers posMarkers = xPositions.get(index);
+		log.log(Level.FINER, "stripXPos=", stripXPos);
 		return posMarkers != null ? posMarkers : new ArrayList<>();
-
 	}
 
+	/**
+	 * @param stripXPos is the 0-based x axis position on the record drawing strip area
+	 * @param stripYPos is the 0-based x axis position on the record drawing strip area (top is zero)
+	 * @return the recordset timestamp indices of the log data identified by the mouse position or an empty list
+	 */
 	public List<Integer> getSnappedIndexes(int stripXPos, int stripYPos) {
 		if (stripYPos < 0 || stripYPos > stripHeight) return new ArrayList<>();
+		if (getXPositions().isEmpty()) return new ArrayList<>(); // either spots not initialized or no markers
 
 		List<Integer> indexes = getSnappedIndexes(stripXPos);
 		if (indexes.size() <= 1) {
@@ -305,13 +315,23 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 			if (maxAdditionalMarker == 0 || indexes.size() > maxAdditionalMarker + 1) {
 				return indexes;
 			} else {
-				int alternatingPosition = (stripHeight / 2 - stripYPos - 2 + elementWidth / 2) / (elementWidth + 1);
-				int index = alternatingPosition > 0 ? alternatingPosition * 2 - 1 : -alternatingPosition * 2;
-				if (index >= indexes.size()) { // the vertical space is not filled with markers
-					return new ArrayList<>();
+				// transform stripYPos into a scale relative to the markers area
+				int markersHeight = (elementWidth + 1) * (maxAdditionalMarker + 1);
+				int markersYPos = stripYPos - ((stripHeight - markersHeight) / 2);
+				if (markersYPos >= 0 && markersYPos < markersHeight) {
+					// determine the markers index which the cursor is pointing to (relative position is 0-based)
+					int relativePosition = markersYPos / (elementWidth + 1);
+					int alternatingPosition = maxAdditionalMarker / 2 - relativePosition;
+					log.finest(() -> "stripYPos=" + stripYPos + "  markersYPos=" + markersYPos + "  elementWidth=" + elementWidth + "  relativePosition=" + relativePosition + "  alternatingPosition=" + alternatingPosition);
+					int index = alternatingPosition > 0 ? alternatingPosition * 2 - 1 : -alternatingPosition * 2;
+					if (index >= indexes.size()) { // the vertical space is not filled with markers
+						return new ArrayList<>();
+					} else {
+						log.finest(() -> "alternatingPosition=" + alternatingPosition + "  index=" + index);
+						return new ArrayList<>(Arrays.asList(new Integer[] { indexes.get(index) }));
+					}
 				} else {
-					log.finest(() -> "alternatingPosition=" + alternatingPosition + "  index=" + index);
-					return new ArrayList<>(Arrays.asList(new Integer[] { indexes.get(index) }));
+					return new ArrayList<>();
 				}
 			}
 		}
@@ -337,7 +357,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		private int									nextRelativeYPos	= 0;																						// lower corner of a 2x2 element
 
 		PosMarkers(int stripHeight) {
-			this.halfDrawingHeight = (stripHeight - 1) / 2; // leave at least one pixel at the top of the strip
+			halfDrawingHeight = (stripHeight - 1) / 2; // leave at least one pixel at the top of the strip
 		}
 
 		/**
@@ -348,7 +368,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 			yPositions.add(-nextRelativeYPos + halfDrawingHeight + 0); // add 0 pixel for a little shift to the bottom
 
 			// the next position is one step towards the outer border and alternates from the lower half to the upper half
-			if ((this.size() - 1) % 2 == 0 && nextRelativeYPos != 0) {
+			if ((size() - 1) % 2 == 0 && nextRelativeYPos != 0) {
 				nextRelativeYPos = -Math.abs(nextRelativeYPos); // lower half
 			} else {
 				nextRelativeYPos = Math.abs(nextRelativeYPos) + yStep; // upper half

@@ -19,6 +19,9 @@
 
 package gde.histo.recordings;
 
+import static gde.histo.utils.ElaborateTukeyQuantile.CLOSE_OUTLIER_LIMIT;
+import static gde.histo.utils.ElaborateTukeyQuantile.INTER_QUARTILE_SIGMA;
+
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -49,8 +52,8 @@ public final class TrailRecordCutter {
 		if (!subPoints.isEmpty()) {
 			this.quantile = new UniversalQuantile<>(subPoints); // take all points for display
 
-			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, UniversalQuantile.BOXPLOT_SIGMA_FACTOR,
-					UniversalQuantile.BOXPLOT_OUTLIER_FACTOR);
+			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, INTER_QUARTILE_SIGMA,
+					CLOSE_OUTLIER_LIMIT); // todo check if removing such close outliers is correct
 
 			// eliminate Tukey outliers for regression
 			List<Double> outliers = tmpQuantile.getOutliers();
