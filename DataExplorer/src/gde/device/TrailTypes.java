@@ -351,7 +351,7 @@ public enum TrailTypes {
 
 
 	/**
-	 * @return true if these values are not in the range of the measurement values
+	 * @return true if these values are not in the number range of the measurement values (e.g. SD, counters)
 	 */
 	public boolean isAlienValue() {
 		return this.isAlienValue;
