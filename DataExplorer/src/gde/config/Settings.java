@@ -176,6 +176,8 @@ public class Settings extends Properties {
 	final static String							SUBDIRECTORY_LEVEL_MAX					= "subdirectory_level_max";																																				//$NON-NLS-1$
 	final static String							IS_DATA_TABLE_TRANSITIONS				= "is_data_table_transitions";																																		//$NON-NLS-1$
 	final static String							IS_FIRST_RECORDSET_CHOICE				= "is_first_recordset_choice";																																		//$NON-NLS-1$
+	final static String							WARNING_COUNT_CSV								= "warning_count_csv";																																						//$NON-NLS-1$
+	final static String							WARNING_COUNT_INDEX							= "warning_count_index";																																					//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -257,12 +259,13 @@ public class Settings extends Properties {
 	public static final String			GPS_API_URL											= "http://maps.googleapis.com/maps/api/geocode/xml?latlng=";																			//$NON-NLS-1$
 
 	private static double[]					SAMPLING_TIMESPANS							= new double[] { 10., 5., 1., .5, .1, .05, .001 };
+	private static String[]					WARNING_COUNT_VALUES						= new String[] { "2", "3", "5", "8" };
 
 	BufferedReader									reader;																																																														// to read the application settings
 	BufferedWriter									writer;																																																														// to write the application settings
 
 	boolean													isDevicePropertiesUpdated				= false;
-	//boolean													isDevicePropertiesReplaced			= false;
+	// boolean isDevicePropertiesReplaced = false;
 	boolean													isGraphicsTemplateUpdated				= false;
 	boolean													isHistocacheTemplateUpdated			= false;
 
@@ -275,7 +278,6 @@ public class Settings extends Properties {
 	String													applHomePath;																																																											// default path to application home directory
 	Comparator<String>							comparator											= new RecordSetNameComparator();																																	//used to sort object key list
 	Properties											measurementProperties						= new Properties();
-
 
 	public enum GeoCodeGoogle {
 		STREET_ADDRESS, ROUTE, POLITICAL, ADMINISTRATIVE_AREA_LEVEL_3, ADMINISTRATIVE_AREA_LEVEL_2;
@@ -373,10 +375,10 @@ public class Settings extends Properties {
 		// locale settings has been changed, replacement of device property files required
 		if (this.getLocaleChanged()) {
 			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, false, false);
-			//this.isDevicePropertiesReplaced = true;
+			// this.isDevicePropertiesReplaced = true;
 		}
 
-		if (this.isDevicePropertiesUpdated) { //check if previous devices exist and migrate device usage, default import directory, ....
+		if (this.isDevicePropertiesUpdated) { // check if previous devices exist and migrate device usage, default import directory, ....
 			this.migrationThread = new Thread("migration") {
 				@Override
 				public void run() {
@@ -532,7 +534,7 @@ public class Settings extends Properties {
 					Thread.sleep(5);
 				}
 				catch (InterruptedException e) {
-					//ignore
+					// ignore
 				}
 			}
 			FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$
@@ -587,11 +589,11 @@ public class Settings extends Properties {
 			if (!new File(propertyFilePath).exists()) {
 				File path = new File(this.getApplHomePath() + "/Mapping"); //$NON-NLS-1$
 				if (!path.exists() && !path.isDirectory()) path.mkdir();
-				//extract initial property files
+				// extract initial property files
 				FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 						Settings.PERMISSION_555);
 			}
-			//BufferedInputStream stream = new BufferedReader(new InputStreamReader(new FileInputStream(propertyFilePath), "UTF-8")); //$NON-NLS-1$
+			// BufferedInputStream stream = new BufferedReader(new InputStreamReader(new FileInputStream(propertyFilePath), "UTF-8")); //$NON-NLS-1$
 			BufferedInputStream stream = new BufferedInputStream(new FileInputStream(new File(propertyFilePath)));
 			this.measurementProperties.loadFromXML(stream);
 			stream.close();
@@ -618,7 +620,7 @@ public class Settings extends Properties {
 			this.load(this.reader);
 			this.reader.close();
 
-			//update file history
+			// update file history
 			for (int i = 0; i < 9; i++) {
 				String entry = this.getProperty(Settings.FILE_HISTORY_BEGIN + i);
 				if (entry != null && entry.length() > 4) {
@@ -733,7 +735,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_APPL_REGISTERED, this.isApplicationRegistered())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_LOCK_UUCP_HINTED, this.isLockUucpHinted())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LAST_UPDATE_CHECK, StringHelper.getDate())); //$NON-NLS-1$
-			//charger specials
+			// charger specials
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_REDUCE_CHARGE_DISCHARGE, this.isReduceChargeDischarge())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ALL_IN_ONE_RECORDSET, this.isContinuousRecordSet())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_PARTIAL_DATA_TABLE, this.isPartialDataTable())); //$NON-NLS-1$
@@ -783,6 +785,8 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SUBDIRECTORY_LEVEL_MAX, getSubDirectoryLevelMax())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATA_TABLE_TRANSITIONS, isDataTableTransitions())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_FIRST_RECORDSET_CHOICE, isFirstRecordSetChoice())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WARNING_COUNT_CSV, getWarningCountCsv())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WARNING_COUNT_INDEX, getWarningCountIndex())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -921,7 +925,7 @@ public class Settings extends Properties {
 				log.log(Level.FINE, "data path ", dataFilePath); //$NON-NLS-1$
 			}
 		}
-		if (DataExplorer.getInstance().getActiveDevice() != null) 		{
+		if (DataExplorer.getInstance().getActiveDevice() != null) {
 			String tmpImportDirPath = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredDataLocation();
 			if (getSearchImportPath() && tmpImportDirPath != null && !tmpImportDirPath.trim().isEmpty() && !tmpImportDirPath.equals(GDE.FILE_SEPARATOR_UNIX)) {
 				Path path = Paths.get(tmpImportDirPath);
@@ -1032,7 +1036,7 @@ public class Settings extends Properties {
 			System.arraycopy(activeObjectList, 0, tmpObjectKeys, 1, activeObjectList.length);
 			activeObjectList = tmpObjectKeys;
 		}
-		//check for invalid object key
+		// check for invalid object key
 		Vector<String> tmpObjectVector = new Vector<String>();
 		for (String objectKey : activeObjectList) {
 			boolean isDuplicateKey = tmpObjectVector.stream().anyMatch(x -> x.equalsIgnoreCase(objectKey));
@@ -1040,7 +1044,7 @@ public class Settings extends Properties {
 		}
 		activeObjectList = tmpObjectVector.toArray(new String[1]);
 
-		//find the active object index within sorted array
+		// find the active object index within sorted array
 		StringBuffer sb = new StringBuffer();
 		for (String element : activeObjectList) {
 			sb.append(element).append(GDE.STRING_SEMICOLON);
@@ -1874,7 +1878,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getGraphicsCurveAreaBackground() {
-		return getColor(Settings.GRAPHICS_AREA_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
+		return getColor(Settings.GRAPHICS_AREA_BACKGROUND, "250,249,211"); // COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -1897,7 +1901,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getCompareCurveAreaBackground() {
-		return getColor(Settings.COMPARE_AREA_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
+		return getColor(Settings.COMPARE_AREA_BACKGROUND, "250,249,211"); // COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -1920,7 +1924,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getUtilityCurveAreaBackground() {
-		return getColor(Settings.UTILITY_AREA_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
+		return getColor(Settings.UTILITY_AREA_BACKGROUND, "250,249,211"); // COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -1943,7 +1947,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getGraphicsSurroundingBackground() {
-		return getColor(Settings.GRAPHICS_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
+		return getColor(Settings.GRAPHICS_SURROUND_BACKGRD, "250,249,230"); // COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -1966,7 +1970,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getCompareSurroundingBackground() {
-		return getColor(Settings.COMPARE_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
+		return getColor(Settings.COMPARE_SURROUND_BACKGRD, "250,249,230"); // COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -1989,7 +1993,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getUtilitySurroundingBackground() {
-		return getColor(Settings.UTILITY_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
+		return getColor(Settings.UTILITY_SURROUND_BACKGRD, "250,249,230"); // COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -2012,7 +2016,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getGraphicsCurvesBorderColor() {
-		return getColor(Settings.GRAPHICS_BORDER_COLOR, "180,180,180"); //COLOR_GREY //$NON-NLS-1$
+		return getColor(Settings.GRAPHICS_BORDER_COLOR, "180,180,180"); // COLOR_GREY //$NON-NLS-1$
 	}
 
 	/**
@@ -2035,7 +2039,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getCurveCompareBorderColor() {
-		return getColor(Settings.COMPARE_BORDER_COLOR, "180,180,180"); //COLOR_GREY //$NON-NLS-1$
+		return getColor(Settings.COMPARE_BORDER_COLOR, "180,180,180"); // COLOR_GREY //$NON-NLS-1$
 	}
 
 	/**
@@ -2058,7 +2062,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getUtilityCurvesBorderColor() {
-		return getColor(Settings.UTILITY_BORDER_COLOR, "180,180,180"); //COLOR_GREY //$NON-NLS-1$
+		return getColor(Settings.UTILITY_BORDER_COLOR, "180,180,180"); // COLOR_GREY //$NON-NLS-1$
 	}
 
 	/**
@@ -2081,7 +2085,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getStatisticsSurroundingAreaBackground() {
-		return getColor(Settings.STATISTICS_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
+		return getColor(Settings.STATISTICS_SURROUND_BACKGRD, "250,249,230"); // COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -2104,7 +2108,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getStatisticsInnerAreaBackground() {
-		return getColor(Settings.STATISTICS_INNER_BACKGROUND, "255,255,255"); //COLOR_WHITE //$NON-NLS-1$
+		return getColor(Settings.STATISTICS_INNER_BACKGROUND, "255,255,255"); // COLOR_WHITE //$NON-NLS-1$
 	}
 
 	/**
@@ -2127,7 +2131,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getAnalogSurroundingAreaBackground() {
-		return getColor(Settings.ANALOG_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
+		return getColor(Settings.ANALOG_SURROUND_BACKGRD, "250,249,230"); // COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -2150,7 +2154,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getAnalogInnerAreaBackground() {
-		return getColor(Settings.ANALOG_INNER_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
+		return getColor(Settings.ANALOG_INNER_BACKGROUND, "250,249,211"); // COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -2173,7 +2177,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getDigitalSurroundingAreaBackground() {
-		return getColor(Settings.DIGITAL_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
+		return getColor(Settings.DIGITAL_SURROUND_BACKGRD, "250,249,230"); // COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -2196,7 +2200,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getDigitalInnerAreaBackground() {
-		return getColor(Settings.DIGITAL_INNER_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
+		return getColor(Settings.DIGITAL_INNER_BACKGROUND, "250,249,211"); // COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -2219,7 +2223,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getCellVoltageSurroundingAreaBackground() {
-		return getColor(Settings.CELL_VOLTAGE_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
+		return getColor(Settings.CELL_VOLTAGE_SURROUND_BACKGRD, "250,249,230"); // COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -2242,7 +2246,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getCellVoltageInnerAreaBackground() {
-		return getColor(Settings.CELL_VOLTAGE_INNER_BACKGROUND, "250,249,211"); //COLOR_CANVAS_YELLOW //$NON-NLS-1$
+		return getColor(Settings.CELL_VOLTAGE_INNER_BACKGROUND, "250,249,211"); // COLOR_CANVAS_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -2265,7 +2269,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getFileCommentSurroundingAreaBackground() {
-		return getColor(Settings.FILE_COMMENT_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
+		return getColor(Settings.FILE_COMMENT_SURROUND_BACKGRD, "250,249,230"); // COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -2288,7 +2292,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getFileCommentInnerAreaBackground() {
-		return getColor(Settings.FILE_COMMENT_INNER_BACKGROUND, "255,255,255"); //COLOR_WHITE //$NON-NLS-1$
+		return getColor(Settings.FILE_COMMENT_INNER_BACKGROUND, "255,255,255"); // COLOR_WHITE //$NON-NLS-1$
 	}
 
 	/**
@@ -2311,7 +2315,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getObjectDescriptionSurroundingAreaBackground() {
-		return getColor(Settings.OBJECT_DESC_SURROUND_BACKGRD, "250,249,230"); //COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
+		return getColor(Settings.OBJECT_DESC_SURROUND_BACKGRD, "250,249,230"); // COLOR_VERY_LIGHT_YELLOW //$NON-NLS-1$
 	}
 
 	/**
@@ -2334,7 +2338,7 @@ public class Settings extends Properties {
 	 * @return requested color
 	 */
 	public Color getObjectDescriptionInnerAreaBackground() {
-		return getColor(Settings.OBJECT_DESC_INNER_BACKGROUND, "255,255,255"); //COLOR_WHITE //$NON-NLS-1$
+		return getColor(Settings.OBJECT_DESC_INNER_BACKGROUND, "255,255,255"); // COLOR_WHITE //$NON-NLS-1$
 	}
 
 	/**
@@ -2465,7 +2469,7 @@ public class Settings extends Properties {
 	 * @return double value of display density font correction value
 	 */
 	public double getFontDisplayDensityAdaptionFactor() {
-		return Double.valueOf(this.getProperty(Settings.DISPLAY_DENSITY_FONT_CORRECT, "1.0")); //$NON-NLS-1$;
+		return Double.valueOf(this.getProperty(Settings.DISPLAY_DENSITY_FONT_CORRECT, "1.0")); //$NON-NLS-1$ ;
 	}
 
 	/**
@@ -2616,8 +2620,8 @@ public class Settings extends Properties {
 	}
 
 	/**
-	* @param isActive true if files from the device import directory are read for the history
-	*/
+	 * @param isActive true if files from the device import directory are read for the history
+	 */
 	public void setSearchImportPath(boolean isActive) {
 		this.setProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(isActive));
 	}
@@ -2912,7 +2916,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @param doubleValue the radius in km for GPS coordinates assignment to the same cluster  (default 0.5 km)
+	 * @param doubleValue the radius in km for GPS coordinates assignment to the same cluster (default 0.5 km)
 	 */
 	public void setGpsLocationRadius(double doubleValue) {
 		this.setProperty(Settings.GPS_LOCATION_RADIUS, String.valueOf(doubleValue));
@@ -2984,6 +2988,60 @@ public class Settings extends Properties {
 	 */
 	public boolean isFirstRecordSetChoice() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_FIRST_RECORDSET_CHOICE, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param csvValues holds the list with the permitted numbers of logs for warning analysis
+	 */
+	public void setWarningCountCsv(String csvValues) {
+		this.setProperty(Settings.IS_FIRST_RECORDSET_CHOICE, String.valueOf(csvValues));
+	}
+
+	/**
+	 * @return the list with the permitted numbers of logs for warning analysis
+	 */
+	public String getWarningCountCsv() {
+		String list = String.valueOf(this.getProperty(Settings.WARNING_COUNT_CSV, String.join(",", WARNING_COUNT_VALUES)));
+		return list;
+	}
+
+	private int[] getWarningCountValues() {
+		String[] items = getWarningCountCsv().split(",");
+		if (items.length != WARNING_COUNT_VALUES.length) {
+			setWarningCountCsv(String.join(",", Arrays.asList(WARNING_COUNT_VALUES)));
+		}
+		return Arrays.stream(getWarningCountCsv().split(",")).mapToInt(v -> Integer.valueOf(v)).toArray();
+	}
+
+	/**
+	 * @return the index number set by the user which is used for history log selection (default is 1)
+	 */
+	public int getWarningCountIndex() {
+		return Integer.valueOf(this.getProperty(Settings.WARNING_COUNT_INDEX, String.valueOf(1)));
+	}
+
+	/**
+	 * @return the number of logs which is analyzed for warnings
+	 */
+	public int getWarningCount() {
+		return getWarningCount(getWarningCountIndex());
+	}
+
+	/**
+	 * @return the number of most recent logs which is analyzed for warnings
+	 */
+	public int getWarningCount(int index) {
+		int[] warningCountValues = getWarningCountValues();
+		int realIndex = index > 0 && index < warningCountValues.length ? index : 1;
+		return Integer.valueOf(warningCountValues[realIndex]);
+	}
+
+
+	/**
+	 * @param uintValue the number of of most recent logs which is analyzed for warnings
+	 */
+	public void setWarningCountIndex(String uintValue) {
+		this.setProperty(Settings.WARNING_COUNT_INDEX, String.valueOf(uintValue));
 	}
 
 }
