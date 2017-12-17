@@ -121,7 +121,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -163,7 +168,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -236,7 +246,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -433,7 +448,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -693,7 +713,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -817,7 +842,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
             <Settlements/>
@@ -1010,7 +1040,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -1052,7 +1087,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -1124,7 +1164,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -1323,7 +1368,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -1583,7 +1633,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -1707,7 +1762,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
             <Settlements>
@@ -1962,7 +2022,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -2004,7 +2069,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -2076,7 +2146,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -2273,7 +2348,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -2535,7 +2615,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -2659,7 +2744,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
             <Settlements>
@@ -2906,7 +2996,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -2945,7 +3040,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -3016,7 +3116,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -3198,7 +3303,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -3434,7 +3544,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -3702,7 +3817,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
             <Settlements/>
@@ -3793,7 +3913,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -3835,7 +3960,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -3907,7 +4037,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -4104,7 +4239,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -4364,7 +4504,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -4490,7 +4635,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
             <Settlements>
@@ -4737,7 +4887,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
             <Measurement>
@@ -4776,7 +4931,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
             <Measurement>
@@ -4847,7 +5007,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
@@ -5029,7 +5194,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
             <Measurement>
@@ -5265,7 +5435,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
             <Measurement>
@@ -5377,7 +5552,12 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_avg_min_max"/>
+               	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
             <Measurement>
