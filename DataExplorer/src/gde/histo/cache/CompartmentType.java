@@ -35,6 +35,8 @@ import gde.histo.cache.HistoVault.PointsTypeAdapter;
  *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="text" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="dataType" use="required" type="{}data_types" />
+ *       &lt;attribute name="outlierPoints" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="scrappedPoints" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -43,7 +45,9 @@ import gde.histo.cache.HistoVault.PointsTypeAdapter;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "compartmentType", propOrder = { "trails" })
+@XmlType(name = "compartmentType", propOrder = {
+    "trails"
+})
 public class CompartmentType {
 
 	@XmlElement(required = true)
@@ -55,6 +59,10 @@ public class CompartmentType {
 	protected String											text;
 	@XmlAttribute(required = true)
 	protected DataTypes										dataType;
+	@XmlAttribute
+	protected String											outlierPoints;
+	@XmlAttribute
+	protected String											scrappedPoints;
 
 	public CompartmentType() {
 	}
@@ -170,6 +178,54 @@ public class CompartmentType {
      */
     public void setDataType(DataTypes value) {
         this.dataType = value;
+    }
+
+    /**
+     * Gets the value of the outlierPoints property.
+     *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
+     */
+    public String getOutlierPoints() {
+        return outlierPoints;
+    }
+
+    /**
+     * Sets the value of the outlierPoints property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setOutlierPoints(String value) {
+        this.outlierPoints = value;
+    }
+
+    /**
+     * Gets the value of the scrappedPoints property.
+     *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
+     */
+    public String getScrappedPoints() {
+        return scrappedPoints;
+    }
+
+    /**
+     * Sets the value of the scrappedPoints property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setScrappedPoints(String value) {
+        this.scrappedPoints = value;
     }
 
 }
