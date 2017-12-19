@@ -308,7 +308,7 @@ public class HistoTabAreaContextMenu {
 						settings.setSuppressMode(true);
 						application.getMenuBar().getSuppressModeItem().setSelection(true);
 
-						application.resetHisto();
+						application.updateHistoTabs(false, true);
 					}
 				});
 			}
@@ -325,7 +325,7 @@ public class HistoTabAreaContextMenu {
 						settings.setSuppressMode(true);
 						application.getMenuBar().getSuppressModeItem().setSelection(true);
 
-						application.resetHisto();
+						application.updateHistoTabs(false, true);
 					}
 				});
 			}

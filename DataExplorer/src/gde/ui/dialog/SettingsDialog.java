@@ -937,7 +937,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoSmartStatistics.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setSmartStatistics(SettingsDialog.this.histoSmartStatistics.getSelection());
-											SettingsDialog.this.application.updateHistoTabs(false, true);
+											SettingsDialog.this.application.updateHistoTabs(true, true);
 										}
 									});
 								}

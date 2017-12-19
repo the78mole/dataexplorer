@@ -515,11 +515,11 @@ public final class DirectoryScanner {
 								result.add(originFile);
 							} else {
 								excludedFiles.add(file.toPath());
-								log.log(INFO, "file is excluded               ", file);
+								log.log(INFO, "file is excluded              ", file);
 							}
 						} else {
 							nonWorkableCount.increment();
-							log.log(INFO, "file is not workable           ", file);
+							log.log(INFO, "file is not workable          ", file);
 						}
 					} else if (recursionDepth > 0) { // recursive walk by calling itself
 						List<SourceDataSet> deeperList = getFileListing(file, recursionDepth - 1, extensions);

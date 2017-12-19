@@ -24,11 +24,12 @@ import gde.device.DeviceConfiguration;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
-import gde.histo.cache.VaultCollector;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
+import gde.log.Level;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -125,7 +126,7 @@ public final class HistoSet {
 		/**
 		 * @return true if {@code comparisonStep} is included in or equal to this rebuild step
 		 */
-		public boolean isBiggerThan(RebuildStep comparisonStep) {
+		public boolean isEqualOrBiggerThan(RebuildStep comparisonStep) {
 			return this.scopeOfWork >= comparisonStep.scopeOfWork;
 		}
 	};
@@ -286,6 +287,11 @@ public final class HistoSet {
 		}
 	}
 
+	/**
+	 * collect the strongest rebuild action which was not performed (e.g. tab was not selected)
+	 */
+	private RebuildStep rebuildStepInvisibleTab = HistoSet.RebuildStep.E_USER_INTERFACE;
+
 	public HistoSet() {
 		this.histoSetCollector = new HistoSetCollector();
 		this.histoSetCollector.initialize();
@@ -315,6 +321,27 @@ public final class HistoSet {
 	}
 
 	/**
+	 * Determine the rebuild action for the invisible histo tabs or those which are not selected.
+	 * @param isRebuilt
+	 */
+	public void setRebuildStepInvisibleTabs(RebuildStep rebuildStep, boolean isRebuilt) {
+		RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTOVAULTS : rebuildStep;
+		// determine the maximum rebuild priority from the past updates
+		RebuildStep maximumRebuildStep = this.getRebuildStepInvisibleTab().scopeOfWork > performedRebuildStep.scopeOfWork ? this.getRebuildStepInvisibleTab()
+				: performedRebuildStep;
+		// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
+		this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > this.getRebuildStepInvisibleTab().scopeOfWork ? RebuildStep.E_USER_INTERFACE
+				: RebuildStep.F_FILE_CHECK;
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, String.format("rebuildStep=%s  performedRebuildStep=%s  maximumRebuildStep=%s  rebuildStepInvisibleTab=%s", //$NON-NLS-1$
+					rebuildStep, performedRebuildStep, maximumRebuildStep, this.getRebuildStepInvisibleTab()));
+	}
+
+	public RebuildStep getRebuildStepInvisibleTab() {
+		return rebuildStepInvisibleTab;
+	}
+
+	/**
 	 * Is thread safe with respect to concurrent rebuilds.
 	 */
 	public synchronized void cleanExclusionData() {
@@ -335,8 +362,8 @@ public final class HistoSet {
 	 */
 	public List<Path> getExcludedPaths() {
 		List<Path> result = this.histoSetCollector.getExcludedFiles();
-		for (VaultCollector truss : this.histoSetCollector.getSuppressedTrusses()) {
-			result.add(truss.getVault().getLogFileAsPath());
+		for (ExtendedVault vault : this.histoSetCollector.getSuppressedTrusses()) {
+			result.add(vault.getLogFileAsPath());
 		}
 		return result;
 	}
@@ -351,4 +378,5 @@ public final class HistoSet {
 						String.format("%,d", this.histoSetCollector.getTimeStepSize()) });
 
 	}
+
 }

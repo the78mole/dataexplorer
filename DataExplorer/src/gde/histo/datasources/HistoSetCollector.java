@@ -47,21 +47,23 @@ import gde.histo.exclusions.ExclusionData;
 import gde.histo.recordings.TrailRecordSet;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
-import gde.utils.StringHelper;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+
 
 /**
  * Convert the source files into a trail recordSet required for the history tabs.
@@ -128,37 +130,33 @@ public final class HistoSetCollector {
 	/**
 	 * Sorted by recordSet startTimeStamp in reverse order; each timestamp may hold multiple vaults.
 	 */
-	private final TreeMap<Long, List<ExtendedVault>>	histoVaults						= new TreeMap<>(Collections.reverseOrder());
-	/**
-	 * Authorized recordsets (excluded vaults eliminated - by the user in suppress mode)
-	 */
-	private final List<VaultCollector>								unsuppressedTrusses		= new ArrayList<>();
+	private final TreeMap<Long, List<ExtendedVault>>	histoVaults				= new TreeMap<>(Collections.reverseOrder());
+
 	/**
 	 * Excluded vaults via ignore lists
 	 */
-	private final List<VaultCollector>								suppressedTrusses			= new ArrayList<>();
-
+	private List<ExtendedVault>												suppressedVaults	= new ArrayList<>();
 	/**
 	 * Number of files which have been read for getting vaults
 	 */
-	private int																				readFilesCount				= 0;
+	private int																				readFilesCount		= 0;
 	/**
-	 * Number of duplicate vaults which are discarded
+	 * Number of trusses identified in the read files
 	 */
-	private int																				duplicateVaultsCount	= 0;
+	private int																				readTrussesCount;
 	/**
 	 * Size of all the histo files which have been read to build the histo recordsets
 	 */
-	private long																			recordSetBytesSum			= 0;
+	private long																			recordSetBytesSum	= 0;
 	/**
-	 * Total time for rebuilding the HistoSet
+	 * Total time for rebuilding the HistoSet in micorseconds
 	 */
-	private int																				elapsedTime_ms				= 0;
+	private int																				elapsedTime_us		= 0;
 
 	/**
 	 * Histo vault data transformed in a recordset format
 	 */
-	private TrailRecordSet														trailRecordSet				= null;
+	private TrailRecordSet														trailRecordSet		= null;
 
 	public enum LoadProgress {
 		STARTED(2), INITIALIZED(5), PATHS_VERIFIED(7), SCANNED(11), MATCHED(22), RESTORED(50), LOADED(80), CACHED(97), RECORDED(99), DONE(100);
@@ -265,7 +263,7 @@ public final class HistoSetCollector {
 	@Override
 	public String toString() {
 		return String.format("totalTrussesCount=%,d  availableVaultsCount=%,d recordSetBytesSum=%,d elapsedTime_ms=%,d", //$NON-NLS-1$
-				this.getTrussesCount(), this.getTimeStepSize(), this.recordSetBytesSum, this.elapsedTime_ms);
+				this.getTrussesCount(), this.getTimeStepSize(), this.recordSetBytesSum, this.getElapsedTime_ms());
 	}
 
 	/**
@@ -277,12 +275,12 @@ public final class HistoSetCollector {
 			timestampHistoVaults.clear();
 		}
 		this.histoVaults.clear();
-		this.unsuppressedTrusses.clear();
-		this.suppressedTrusses.clear();
+		this.suppressedVaults.clear();
 
+		this.readFilesCount = 0;
+		this.readTrussesCount = 0;
 		this.recordSetBytesSum = 0;
-		this.duplicateVaultsCount = 0;
-		this.elapsedTime_ms = 0;
+		this.elapsedTime_us = 0;
 
 		this.trailRecordSet = null;
 	}
@@ -294,12 +292,13 @@ public final class HistoSetCollector {
 
 		List<SourceDataSet> sourceFiles = this.directoryScanner.readSourceFiles4Test(filePath);
 		this.readFilesCount = sourceFiles.size();
-		addTrusses(sourceFiles, devices);
-		log.info(() -> String.format("%04d files selected", this.unsuppressedTrusses.size())); //$NON-NLS-1$
+		List<VaultCollector> trusses = getTrusses(sourceFiles, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+		removeSuppressed(trusses);
+		log.info(() -> String.format("%04d files selected", trusses.size())); //$NON-NLS-1$
 
 		{
 			// step: build the workload map consisting of the cache key and the file path
-			Map<Path, List<VaultCollector>> trussJobs = DUPLICATE_HANDLING.getTrussJobs(this.unsuppressedTrusses);
+			Map<Path, List<VaultCollector>> trussJobs = DUPLICATE_HANDLING.getTrussJobs(trusses);
 			log.info(() -> String.format("trussJobs to load total     = %d", trussJobs.size())); //$NON-NLS-1$
 
 			// step: put cached vaults into the histoSet map and reduce workload map
@@ -358,41 +357,43 @@ public final class HistoSetCollector {
 			log.log(FINER, GDE.STRING_GREATER, rebuildStep);
 			progress.ifPresent((p) -> p.set(STARTED));
 
-			if (realRebuildStep.isBiggerThan(RebuildStep.A_HISTOSET)) {
+			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.A_HISTOSET)) {
 				this.directoryScanner.initialize();
 				log.fine(() -> String.format("directoryScanner      initialize")); //$NON-NLS-1$
 			}
 			progress.ifPresent((p) -> p.set(INITIALIZED));
 
-			if (realRebuildStep.isBiggerThan(RebuildStep.F_FILE_CHECK)) {
+			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.F_FILE_CHECK)) {
 				boolean isHistoFilePathsValid = this.directoryScanner.validateHistoFilePaths(rebuildStep);
 				if (!isHistoFilePathsValid) {
 					realRebuildStep = RebuildStep.B_HISTOVAULTS;
 				} else { // histo record sets are ready to use
-					log.time(() -> String.format("%,5d trusses   file paths verified     time=%s [ss.SSS]", //$NON-NLS-1$
-							this.unsuppressedTrusses.size(), StringHelper.getFormatedDuration("ss.SSS", TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - startNanoTime))));
+					log.time(() -> String.format("  %3d file paths verified           time=%,6d [ms]", //$NON-NLS-1$
+							this.directoryScanner.getValidatedDirectories().size(), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime + 500000)));
 				}
 			}
 			progress.ifPresent((p) -> p.set(PATHS_VERIFIED));
 
-			if (realRebuildStep.isBiggerThan(RebuildStep.B_HISTOVAULTS)) {
+			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.B_HISTOVAULTS)) {
 				initialize();
+				List<VaultCollector> trusses;
 				{
 					List<SourceDataSet> sourceFiles = this.directoryScanner.readSourceFiles();
+					trusses = getTrusses(sourceFiles, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+					this.suppressedVaults = removeSuppressed(trusses);
 					this.readFilesCount = sourceFiles.size();
-					addTrusses(sourceFiles, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+					this.readTrussesCount = trusses.size();
 
 					long millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime);
 					if (millis > 0) log.time(() -> String.format("%,5d trusses    select folders     time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
-							this.unsuppressedTrusses.size(), millis, this.unsuppressedTrusses.size() * 1000 / millis));
+							trusses.size(), millis, trusses.size() * 1000 / millis));
 				}
 				progress.ifPresent((p) -> p.set(SCANNED));
 
-				this.recordSetBytesSum = 0;
-				if (!this.unsuppressedTrusses.isEmpty()) {
+				if (!trusses.isEmpty()) {
 					Map<Path, List<VaultCollector>> trussJobs;
 					{ // step: read from paths and identify duplicates
-						trussJobs = defineTrussJobs();
+						trussJobs = defineTrussJobs(trusses);
 						progress.ifPresent((p) -> p.set(MATCHED));
 					}
 					{// step: put cached vaults into the histoSet map and reduce workload map
@@ -431,7 +432,12 @@ public final class HistoSetCollector {
 			}
 			progress.ifPresent((p) -> p.set(CACHED));
 
-			if (realRebuildStep.isBiggerThan(RebuildStep.C_TRAILRECORDSET)) {
+			if (!realRebuildStep.isEqualOrBiggerThan(RebuildStep.B_HISTOVAULTS)) {
+				// the user may have added entries to the exclusion list
+				this.suppressedVaults.addAll(removeSuppressedHistoVaults());
+			}
+
+			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.C_TRAILRECORDSET)) {
 				long nanoTime = System.nanoTime();
 				this.trailRecordSet = TrailRecordSet.createRecordSet(this.histoVaults);
 				this.trailRecordSet.initializeFromVaults();
@@ -441,15 +447,15 @@ public final class HistoSetCollector {
 					log.fine(() -> String.format("%,5d timeSteps  to TrailRecordSet  time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
 							this.histoVaults.size(), micros / 1000, this.histoVaults.size() > 0 ? this.histoVaults.size() * 1000000 / micros : 0));
 				}
-			} else if (realRebuildStep.isBiggerThan(RebuildStep.D_TRAIL_DATA)) { // saves some time compared to the logic above
+			} else if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA)) { // saves some time compared to the logic above
 				this.trailRecordSet.refillRecordSet();
 			}
 			progress.ifPresent((p) -> p.set(RECORDED));
 
-			this.elapsedTime_ms = (int) ((System.nanoTime() - startNanoTime + 500000) / 1000000);
+			this.elapsedTime_us = (int) ((System.nanoTime() - startNanoTime + 500000) / 1000);
 			log.time(() -> String.format("%,5d timeSteps  total              time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
-					this.histoVaults.size(), this.elapsedTime_ms, (int) (this.histoVaults.size() * 1000. / this.elapsedTime_ms), (int) (this.recordSetBytesSum / 1.024 / 1024. / this.elapsedTime_ms)));
-			return realRebuildStep.isBiggerThan(RebuildStep.D_TRAIL_DATA);
+					this.histoVaults.size(), elapsedTime_us / 1000, this.histoVaults.size() * 1000000 / this.elapsedTime_us, (int) (this.recordSetBytesSum / 1.024 / 1.024 / this.elapsedTime_us)));
+			return realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA);
 		} finally {
 			progress.ifPresent((p) -> p.set(DONE));
 		}
@@ -504,51 +510,80 @@ public final class HistoSetCollector {
 	/**
 	 * @return the jobs determined from the paths after duplicates elimination
 	 */
-	private Map<Path, List<VaultCollector>> defineTrussJobs() throws IOException, NotSupportedFileFormatException {
+	private Map<Path, List<VaultCollector>> defineTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException {
 		Map<Path, List<VaultCollector>> trussJobs;
 		long nanoTime = System.nanoTime();
 		// step: build the workload map consisting of the cache key and the file path
-		trussJobs = DUPLICATE_HANDLING.getTrussJobs(this.unsuppressedTrusses);
+		trussJobs = DUPLICATE_HANDLING.getTrussJobs(trusses);
 		int jobSize = trussJobs.values().parallelStream().mapToInt(c -> c.size()).sum();
-		this.duplicateVaultsCount = this.unsuppressedTrusses.size() - jobSize;
 		if (jobSize > 0) {
 			long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 			log.finer(() -> String.format("%,5d trusses    job check          time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
-					jobSize, micros / 1000, this.unsuppressedTrusses.size() * 1000000 / micros));
+					jobSize, micros / 1000, trusses.size() * 1000000 / micros));
 		}
 		return trussJobs;
 	}
 
 	/**
-	 * Determine trusses in the osd files and in the native files (if supported by the device).
+	 * Check the histo vaults list for suppressed vaults in order to cope with additional suppressions by the user.
+	 * @return the suppressed vaults which have been detected in the vaults list
+	 */
+	private List<ExtendedVault> removeSuppressedHistoVaults() {
+		List<ExtendedVault> removed = new ArrayList<>();
+		this.histoVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
+			if (ExclusionData.isExcluded(v.getLogFileAsPath(), v.getLogRecordsetBaseName())) {
+				log.info(() -> String.format("discarded as per exclusion list   %s %s   %s", //$NON-NLS-1$
+						v.getLogFilePath(), v.getLogRecordsetBaseName(), v.getStartTimeStampFormatted()));
+				removed.add(v);
+			}
+		});
+		for (ExtendedVault vault : removed) {
+			List<ExtendedVault> vaultList = this.histoVaults.get(vault.getLogStartTimestamp_ms());
+			vaultList.remove(vault);
+			if (vaultList.isEmpty()) this.histoVaults.remove(vault.getLogStartTimestamp_ms());
+		}
+		return removed;
+	}
+
+	/**
 	 * Use ignore lists (for recordSets only) to determine the vaults which are required for the data access.
+	 * @return the vaults which have been removed due to user exclusions
+	 */
+	private List<ExtendedVault> removeSuppressed(List<VaultCollector> vaults) {
+		List<ExtendedVault> removed = new ArrayList<>();
+		int totalSize = vaults.size();
+		for (Iterator<VaultCollector> iterator = vaults.iterator(); iterator.hasNext();) {
+			ExtendedVault vault = iterator.next().getVault();
+			if (ExclusionData.isExcluded(vault.getLogFileAsPath(), vault.getLogRecordsetBaseName())) {
+				log.info(() -> String.format("discarded as per exclusion list   %s %s   %s", //$NON-NLS-1$
+						vault.getLogFilePath(), vault.getLogRecordsetBaseName(), vault.getStartTimeStampFormatted()));
+				iterator.remove();
+				removed.add(vault);
+			}
+		}
+		log.finer(() -> String.format("%04d total trusses --- %04d excluded trusses", totalSize, removed.size()));
+		return removed;
+	}
+
+	/**
+	 * Determine trusses in the osd files and in the native files (if supported by the device).
 	 * @param sourceFiles for osd reader (possibly link files) or for import
 	 */
-	private void addTrusses(List<SourceDataSet> sourceFiles, TreeMap<String, DeviceConfiguration> deviceConfigurations) throws IOException,
-			NotSupportedFileFormatException {
-		final int suppressedSize = this.suppressedTrusses.size();
-		final int unsuppressedSize = this.unsuppressedTrusses.size();
+	private List<VaultCollector> getTrusses(List<SourceDataSet> sourceFiles, TreeMap<String, DeviceConfiguration> deviceConfigurations)
+			throws IOException, NotSupportedFileFormatException {
+		List<VaultCollector> result = new ArrayList<>();
 		for (SourceDataSet sourceFile : sourceFiles) {
 			List<VaultCollector> trusses = sourceFile.getTrusses(deviceConfigurations);
 			if (!trusses.isEmpty()) {
 				for (VaultCollector truss : trusses) {
-					ExtendedVault vault = truss.getVault();
-					if (ExclusionData.isExcluded(vault.getLogFileAsPath(), vault.getLogRecordsetBaseName())) {
-						log.info(() -> String.format("discarded as per exclusion list   %s %s   %s", //$NON-NLS-1$
-								vault.getLogFilePath(), vault.getLogRecordsetBaseName(), vault.getStartTimeStampFormatted()));
-						this.suppressedTrusses.add(truss);
-					} else {
-						this.unsuppressedTrusses.add(truss);
-					}
+					result.add(truss);
 				}
 			} else {
 				log.info(() -> String.format("file w/o matching data%,7d kiB %s", //$NON-NLS-1$
 						sourceFile.getFile().length() / 1024, sourceFile.getPath()));
 			}
 		}
-
-		log.finer(() -> String.format("%04d files found --- %04d total trusses --- %04d excluded trusses", //$NON-NLS-1$
-				sourceFiles.size(), this.unsuppressedTrusses.size() - unsuppressedSize + this.suppressedTrusses.size() - suppressedSize, this.suppressedTrusses.size() - suppressedSize));
+		return result;
 	}
 
 	/**
@@ -568,7 +603,7 @@ public final class HistoSetCollector {
 	 * @return the total number of trusses identified in the files
 	 */
 	public int getTrussesCount() {
-		return this.unsuppressedTrusses.size() + this.suppressedTrusses.size() + this.duplicateVaultsCount;
+		return this.readTrussesCount;
 	}
 
 	/**
@@ -579,7 +614,7 @@ public final class HistoSetCollector {
 	}
 
 	public int getElapsedTime_ms() {
-		return this.elapsedTime_ms;
+		return this.elapsedTime_us / 1000;
 	}
 
 	public TrailRecordSet getTrailRecordSet() {
@@ -590,12 +625,8 @@ public final class HistoSetCollector {
 		return this.recordSetBytesSum;
 	}
 
-	public List<VaultCollector> getUnsuppressedTrusses() {
-		return this.unsuppressedTrusses;
-	}
-
-	public List<VaultCollector> getSuppressedTrusses() {
-		return this.suppressedTrusses;
+	public List<ExtendedVault> getSuppressedTrusses() {
+		return this.suppressedVaults;
 	}
 
 	public List<Path> getExcludedFiles() {

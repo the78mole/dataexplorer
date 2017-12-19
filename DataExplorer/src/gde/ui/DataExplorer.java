@@ -19,8 +19,6 @@
 ****************************************************************************************/
 package gde.ui;
 
-import static org.eclipse.swt.SWT.CURSOR_WAIT;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -238,8 +236,6 @@ public class DataExplorer extends Composite {
 
 	final FileTransfer						fileTransfer											= FileTransfer.getInstance();
 	Transfer[]										types															= new Transfer[] { this.fileTransfer };
-
-	private RebuildStep						rebuildStepInvisibleTab						= HistoSet.RebuildStep.E_USER_INTERFACE;										// collect the strongest rebuild action which was not performed (e.g. tab was not selected)
 
 	/**
 	 * main application class constructor
@@ -718,7 +714,7 @@ public class DataExplorer extends Composite {
 						else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoSummaryWindow //
 								|| DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoGraphicsWindow) {
 							log.log(Level.FINER, "HistoChartWindow in displayTab.widgetSelected, event=" + evt); //$NON-NLS-1$
-							DataExplorer.this.updateHistoTabs(DataExplorer.this.rebuildStepInvisibleTab, true); // saves some time compared to HistoSet.RebuildStep.E_USER_INTERFACE
+							DataExplorer.this.updateHistoTabs(DataExplorer.this.histoSet.getRebuildStepInvisibleTab(), true); // saves some time compared to HistoSet.RebuildStep.E_USER_INTERFACE
 						} else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof HistoTableWindow) {
 							log.log(Level.FINER, "HistoTableWindow in displayTab.widgetSelected, event=" + evt); //$NON-NLS-1$
 							DataExplorer.this.updateHistoTabs(HistoSet.RebuildStep.E_USER_INTERFACE, true); // ensures rebuild after trails change or record selector change
@@ -2054,11 +2050,12 @@ public class DataExplorer extends Composite {
 
 	/**
 	 * update any visible histo tab.
-	 * @param readFromDirectories true reloads from files; false uses histo vault data
+	 * @param createRecordSet true creates the recordset from the histo vaults; false uses the existing recordset
+	 * @param rebuildTrails true refills the recordset and keeps the selector settings; false only rebuilds the UI
 	 */
-	public void updateHistoTabs(boolean readFromDirectories, boolean rebuildTrails) {
-		if (this.histoGraphicsTabItem != null || this.histoSummaryTabItem != null)
-			updateHistoTabs(readFromDirectories ? RebuildStep.B_HISTOVAULTS : rebuildTrails ? RebuildStep.C_TRAILRECORDSET : RebuildStep.E_USER_INTERFACE, true);
+	public void updateHistoTabs(boolean createRecordSet, boolean rebuildTrails) {
+		if (this.histoGraphicsTabItem != null || this.histoSummaryTabItem != null || this.histoTableTabItem != null)
+			updateHistoTabs(createRecordSet ? RebuildStep.C_TRAILRECORDSET : rebuildTrails ? RebuildStep.D_TRAIL_DATA : RebuildStep.E_USER_INTERFACE, true);
 	}
 
 	private void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
@@ -2093,7 +2090,6 @@ public class DataExplorer extends Composite {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("started")); //$NON-NLS-1$
 		boolean isRebuilt = false;
 		try {
-			setCursor(SWTResourceManager.getCursor(CURSOR_WAIT));
 			isRebuilt = this.histoSet.rebuild4Screening(rebuildStep, isWithUi);
 
 			if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
@@ -2101,8 +2097,6 @@ public class DataExplorer extends Composite {
 				updateHistoChartWindow(true);
 				updateHistoTableWindow(rebuildStep.scopeOfWork >= RebuildStep.E_USER_INTERFACE.scopeOfWork);
 			}
-			String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-			setProgress(100, sThreadId);
 			if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS) {
 				if (this.histoSet.getTrailRecordSet().getTimeStepSize() == 0) {
 					StringBuilder sb = new StringBuilder();
@@ -2113,22 +2107,11 @@ public class DataExplorer extends Composite {
 					this.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, sb.toString() }));
 				}
 			}
-			// determine the rebuild action for the invisible histo tabs or those which are not selected
-			RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTOVAULTS : rebuildStep;
-			// determine the maximum rebuild priority from the past updates
-			RebuildStep maximumRebuildStep = this.rebuildStepInvisibleTab.scopeOfWork > performedRebuildStep.scopeOfWork ? this.rebuildStepInvisibleTab : performedRebuildStep;
-			// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
-			this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > this.rebuildStepInvisibleTab.scopeOfWork ? RebuildStep.E_USER_INTERFACE : RebuildStep.F_FILE_CHECK;
-			if (log.isLoggable(Level.FINER))
-				log.log(Level.FINER, String.format("rebuildStep=%s  performedRebuildStep=%s  maximumRebuildStep=%s  rebuildStepInvisibleTab=%s", rebuildStep, performedRebuildStep, maximumRebuildStep, //$NON-NLS-1$
-						this.rebuildStepInvisibleTab));
+			this.histoSet.setRebuildStepInvisibleTabs(rebuildStep, isRebuilt);
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			if (isWithUi) openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
-		}
-		finally {
-			this.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
 	}
 

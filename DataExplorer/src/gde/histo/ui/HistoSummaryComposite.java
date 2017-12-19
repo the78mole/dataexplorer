@@ -450,7 +450,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		this.timeLine.initialize(trailRecordSet, this.curveAreaBounds.width);
 
 		long startTime = new Date().getTime();
-		drawTrailRecordSet(dataScaleWidth);
+		if (fixedCanvasHeight > AbstractHistoChartComposite.ZERO_CANVAS_HEIGHT) drawTrailRecordSet(dataScaleWidth);
 		log.fine(() -> "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startTime)));
 	}
 
@@ -467,7 +467,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		trailRecordSet.updateAndSyncSummaryMinMax();
 
 		final Density density = Density.toDensity(trailRecordSet.getDrawAreaBounds().width, trailRecordSet.getTimeStepSize());
-		final int stripHeight = (fixedCanvasHeight) / trailRecordSet.getDisplayRecords().size();
+		final int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
 
 		boolean isCurveGridEnabled = trailRecordSet.getValueGridType() > 0;
 		if (isCurveGridEnabled)

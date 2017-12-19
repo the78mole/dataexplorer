@@ -58,9 +58,10 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	protected final static int				DEFAULT_TOP_GAP					= 5;																		// free gap on top of the curves
 	protected final static int				DEFAULT_SIDE_GAP				= 10;																		// free gap at the leftmost and rightmost graphics
 	protected final static int				DEFAULT_BOTTOM_GAP			= 20;																		// space at the bottom of the plots for the scale
-	// area
 	protected final static int				DEFAULT_HEADER_GAP			= 5;
 	protected final static int				DEFAULT_COMMENT_GAP			= 5;
+
+	protected final static int				ZERO_CANVAS_HEIGHT			= 11;																		// minimize if smart statistics is not active
 
 	protected final DataExplorer			application							= DataExplorer.getInstance();
 	protected final Settings					settings								= Settings.getInstance();
