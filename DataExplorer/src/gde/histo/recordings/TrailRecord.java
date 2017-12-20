@@ -26,8 +26,19 @@ import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE1;
 import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE3;
 import static gde.histo.utils.UniversalQuantile.BoxplotItems.UPPER_WHISKER;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import gde.GDE;
-import gde.data.AbstractRecord;
 import gde.data.CommonRecord;
 import gde.device.IChannelItem;
 import gde.device.IDevice;
@@ -44,18 +55,6 @@ import gde.histo.utils.UniversalQuantile;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  * Hold histo data points of one measurement or settlement; score points are a third option.
  * A histo data point holds one aggregated value (e.g. max, avg, quantile).
@@ -67,7 +66,7 @@ public abstract class TrailRecord extends CommonRecord {
 	private final static long						serialVersionUID		= 110124007964748556L;
 	private final static Logger					log									= Logger.getLogger($CLASS_NAME);
 
-	public final static String					TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
+	protected final static String				TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";						// reference to the selected trail //$NON-NLS-1$
 
 	protected final DeviceXmlResource		xmlResource					= DeviceXmlResource.getInstance();
 
@@ -242,9 +241,8 @@ public abstract class TrailRecord extends CommonRecord {
 		this.minDisplayValue = HistoSet.decodeVaultValue(this, newMinValue);
 		this.maxDisplayValue = HistoSet.decodeVaultValue(this, newMaxValue);
 
-		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
-			for (AbstractRecord tmpRecord : this.getAbstractParent().getScaleSyncedRecords(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
-				TrailRecord record = (TrailRecord) tmpRecord;
+		if (this.getParent().isOneOfSyncableRecord(this.name)) {
+			for (TrailRecord record : this.getParent().getScaleSyncedRecords(this.getParent().getSyncMasterRecordOrdinal(this.name))) {
 				record.minDisplayValue = this.minDisplayValue;
 				record.maxDisplayValue = this.maxDisplayValue;
 			}
@@ -390,7 +388,7 @@ public abstract class TrailRecord extends CommonRecord {
 	/**
 	 * @return the parent
 	 */
-	public TrailRecordSet getParentTrail() {
+	public TrailRecordSet getParent() {
 		return (TrailRecordSet) this.parent;
 	}
 
@@ -425,7 +423,7 @@ public abstract class TrailRecord extends CommonRecord {
 	 * @return the index fitting exactly to the timeStamp
 	 */
 	public int getIndex(long timeStamp_ms) {
-		return this.getParentTrail().getIndex(timeStamp_ms);
+		return this.getParent().getIndex(timeStamp_ms);
 	}
 
 	/**
@@ -566,7 +564,7 @@ public abstract class TrailRecord extends CommonRecord {
 	protected double[] defineSummaryExtrema() { // todo consider caching this result
 		TrailTypes trailType = getTrailSelector().getTrailType();
 		if (trailType.isAlienValue()) {
-			Collection<List<ExtendedVault>> vaults = getParentTrail().getHistoVaults().values();
+			Collection<List<ExtendedVault>> vaults = getParent().getHistoVaults().values();
 
 			Stream<Integer> alienPoints = vaults.parallelStream().flatMap(Collection::stream).map(v -> getVaultPoint(v, trailType.ordinal()));
 			List<Double> decodedAliens = alienPoints.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
@@ -581,7 +579,7 @@ public abstract class TrailRecord extends CommonRecord {
 				return result;
 			}
 		} else {
-			Collection<List<ExtendedVault>> vaults = getParentTrail().getHistoVaults().values();
+			Collection<List<ExtendedVault>> vaults = getParent().getHistoVaults().values();
 
 			Stream<Integer> q0Points = vaults.parallelStream().flatMap(Collection::stream).map(v -> getVaultPoint(v, TrailTypes.Q0.ordinal()));
 			List<Double> decodedQ0s = q0Points.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
@@ -641,7 +639,7 @@ public abstract class TrailRecord extends CommonRecord {
 	 */
 	protected double[][] defineExtremumQuantiles() {
 		int[] extremumOrdinals = this.trailSelector.getExtremumOrdinals();
-		Collection<List<ExtendedVault>> vaults = this.getParentTrail().getHistoVaults().values();
+		Collection<List<ExtendedVault>> vaults = this.getParent().getHistoVaults().values();
 
 		Stream<Integer> pointMinimums = vaults.parallelStream().flatMap(List::stream).map(v -> getVaultPoint(v, extremumOrdinals[0]));
 		List<Double> decodedMinimums = pointMinimums.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());
@@ -674,7 +672,7 @@ public abstract class TrailRecord extends CommonRecord {
 		double extremeMinOutlierLimit = minMaxQuantiles[0][QUARTILE1.ordinal()] - 3. * (minMaxQuantiles[0][QUARTILE3.ordinal()] - minMaxQuantiles[0][QUARTILE1.ordinal()]);
 		double extremeMaxOutlierLimit = minMaxQuantiles[1][QUARTILE3.ordinal()] + 3. * (minMaxQuantiles[1][QUARTILE3.ordinal()] - minMaxQuantiles[1][QUARTILE1.ordinal()]);
 
-		Collection<List<ExtendedVault>> vaults = this.getParentTrail().getHistoVaults().values();
+		Collection<List<ExtendedVault>> vaults = this.getParent().getHistoVaults().values();
 		Iterator<ExtendedVault> iterator = vaults.stream().flatMap(List::stream).iterator();
 
 		int actualLimit = logLimit > 0 && logLimit < size() ? logLimit : size();

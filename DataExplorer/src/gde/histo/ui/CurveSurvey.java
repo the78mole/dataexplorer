@@ -425,7 +425,7 @@ public final class CurveSurvey {
 			// String formattedTimeWithUnit = LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss,
 			// this.timeLine.getAdjacentTimestamp(this.xPosMeasure));
 			statusMessage = Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { this.trailRecord.getName(), new TrailRecordFormatter(
-					this.trailRecord).getMeasureValue(this.trailRecord.getParentTrail().getIndex(this.timestampMeasure_ms)), this.trailRecord.getUnit(),
+					this.trailRecord).getMeasureValue(this.trailRecord.getParent().getIndex(this.timestampMeasure_ms)), this.trailRecord.getUnit(),
 					LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, this.timestampMeasure_ms) });
 		} else {
 			statusMessage = Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { this.trailRecord.getName(), GDE.STRING_STAR,
@@ -542,14 +542,14 @@ public final class CurveSurvey {
 		this.curveAreaBounds = curveAreaBounds;
 
 		long timestampMeasureNew_ms = timeStampMeasure_ms;
-		int yPosMeasureNew = mapper.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timeStampMeasure_ms));
+		int yPosMeasureNew = mapper.getVerticalDisplayPos(this.trailRecord.getParent().getIndex(timeStampMeasure_ms));
 		if (!isNullAcceptable && yPosMeasureNew == Integer.MIN_VALUE) {
 			log.fine(() -> String.format("timestampMeasure_ms=%d search first non-null value from the left", timeStampMeasure_ms)); //$NON-NLS-1$
 			int i = -1;
 			while (yPosMeasureNew == Integer.MIN_VALUE) {
 				yPosMeasureNew = mapper.getVerticalDisplayPos(++i);
 			}
-			timestampMeasureNew_ms = this.trailRecord.getParentTrail().getDisplayTimeStamp_ms(i);
+			timestampMeasureNew_ms = this.trailRecord.getParent().getDisplayTimeStamp_ms(i);
 		}
 
 		this.timestampMeasure_ms = timestampMeasureNew_ms;
@@ -572,14 +572,14 @@ public final class CurveSurvey {
 		this.curveAreaBounds = curveAreaBounds;
 
 		long timestampDeltaNew_ms = timeStampDelta_ms;
-		int yPosDeltaNew = mapper.getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timeStampDelta_ms));
+		int yPosDeltaNew = mapper.getVerticalDisplayPos(this.trailRecord.getParent().getIndex(timeStampDelta_ms));
 		if (!isNullAcceptable && yPosDeltaNew == Integer.MIN_VALUE) {
 			log.fine(() -> String.format("timestampDelta_ms=%d search first non-null value from the right", timeStampDelta_ms)); //$NON-NLS-1$
-			int i = this.trailRecord.getParentTrail().getTimeStepSize();
+			int i = this.trailRecord.getParent().getTimeStepSize();
 			while (yPosDeltaNew == Integer.MIN_VALUE) {
 				yPosDeltaNew = mapper.getVerticalDisplayPos(--i);
 			}
-			timestampDeltaNew_ms = this.trailRecord.getParentTrail().getDisplayTimeStamp_ms(i);
+			timestampDeltaNew_ms = this.trailRecord.getParent().getDisplayTimeStamp_ms(i);
 		}
 
 		this.timestampDelta_ms = timestampDeltaNew_ms;

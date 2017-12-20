@@ -28,9 +28,10 @@ import org.eclipse.swt.graphics.Image;
 import gde.GDE;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.TrailRecord;
-import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSetFormatter;
 import gde.log.Logger;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.StringHelper;
@@ -63,6 +64,7 @@ public final class HistoGraphicsMeasurement {
 				DataExplorer.getInstance().setStatusMessage(statusMessage);
 
 				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestampMeasureNew_ms));
+				hgc.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0897));
 			}
 
 			@Override
@@ -76,6 +78,7 @@ public final class HistoGraphicsMeasurement {
 				DataExplorer.getInstance().setStatusMessage(statusMessage);
 
 				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestamp_ms));
+				hgc.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0897));
 				log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 			}
 
@@ -109,6 +112,7 @@ public final class HistoGraphicsMeasurement {
 				DataExplorer.getInstance().setStatusMessage(statusMessage);
 
 				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestampMeasureNew_ms));
+				hgc.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0897));
 			}
 
 			@Override
@@ -122,6 +126,7 @@ public final class HistoGraphicsMeasurement {
 				DataExplorer.getInstance().setStatusMessage(statusMessage);
 
 				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestamp_ms));
+				hgc.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0897));
 				log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 			}
 
@@ -136,6 +141,7 @@ public final class HistoGraphicsMeasurement {
 				DataExplorer.getInstance().setStatusMessage(statusMessage);
 
 				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc, timestamp_ms));
+				hgc.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0897));
 				log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 			}
 
@@ -195,11 +201,9 @@ public final class HistoGraphicsMeasurement {
 	private GC														canvasGC;
 	private HistoGraphicsMode							mode;
 
-	public HistoGraphicsMeasurement(HistoGraphicsComposite graphicsComposite) {
+	public HistoGraphicsMeasurement(HistoGraphicsComposite graphicsComposite, TrailRecord trailRecord) {
 		this.graphicsComposite = graphicsComposite;
-
-		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet();
-		this.trailRecord = trailRecordSet.get(trailRecordSet.getRecordKeyMeasurement());
+		this.trailRecord = trailRecord;
 
 		this.curveSurvey = new CurveSurvey(this.canvasGC, this.trailRecord, graphicsComposite.timeLine);
 	}
@@ -208,10 +212,7 @@ public final class HistoGraphicsMeasurement {
 	 * Draw a refreshed measurement.
 	 */
 	public void drawMeasurement() {
-		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet();
-		if (trailRecordSet.isSurveyMode(trailRecordSet.getRecordKeyMeasurement())) {
-			drawMeasurement(this.curveSurvey.getTimestampMeasure_ms(), this.curveSurvey.getTimestampDelta_ms());
-		}
+		drawMeasurement(this.curveSurvey.getTimestampMeasure_ms(), this.curveSurvey.getTimestampDelta_ms());
 	}
 
 	/**
@@ -266,12 +267,12 @@ public final class HistoGraphicsMeasurement {
 		this.canvasGC.setForeground(this.trailRecord.getColor());
 
 		if (this.isLeftMouseMeasure) {
-			int yPosMeasureNew = new HistoGraphicsMapper(this.trailRecord).getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timestamp_ms));
+			int yPosMeasureNew = new HistoGraphicsMapper(this.trailRecord).getVerticalDisplayPos(this.trailRecord.getParent().getIndex(timestamp_ms));
 			if (this.curveSurvey.isNewMeasureSpot(timestamp_ms, yPosMeasureNew)) {
 				this.mode.drawLeftMeasurement(this.graphicsComposite, timestamp_ms);
 			}
 		} else if (this.isRightMouseMeasure) {
-			int yPosDeltaNew = new HistoGraphicsMapper(this.trailRecord).getVerticalDisplayPos(this.trailRecord.getParentTrail().getIndex(timestamp_ms));
+			int yPosDeltaNew = new HistoGraphicsMapper(this.trailRecord).getVerticalDisplayPos(this.trailRecord.getParent().getIndex(timestamp_ms));
 			if (this.curveSurvey.isNewDeltaSpot(timestamp_ms, yPosDeltaNew)) {
 				this.mode.drawRightMeasurement(this.graphicsComposite, timestamp_ms);
 			}
@@ -320,6 +321,10 @@ public final class HistoGraphicsMeasurement {
 			// application.setStatusMessage(GDE.STRING_EMPTY);
 		}
 		log.time(() -> "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	public TrailRecord getTrailRecord() {
+		return trailRecord;
 	}
 
 }

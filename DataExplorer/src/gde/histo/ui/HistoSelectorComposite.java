@@ -23,6 +23,7 @@ import static java.util.logging.Level.FINEST;
 import java.util.Arrays;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.HelpEvent;
@@ -43,6 +44,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.log.Logger;
@@ -63,12 +65,15 @@ public final class HistoSelectorComposite extends Composite {
 	private final static Logger			log											= Logger.getLogger($CLASS_NAME);
 
 	private static final int				TEXT_EXTENT_FACTOR			= 6;
+	private static final int				XADDITION_CHARTSELECTOR	= 11;
+	private static final int				YGAP_CHARTSELECTOR			= 2;
 
 	private final HistoExplorer			presentHistoExplorer		= DataExplorer.getInstance().getPresentHistoExplorer();
 	private final Menu							popupmenu;
 	final CurveSelectorContextMenu	contextMenu;
 
 	private Button									curveSelectorHeader;
+	private Button									chartSelector, smartSelector;
 	private int											initialSelectorHeaderWidth;
 	private int											selectorColumnWidth;
 	private Table										curveSelectorTable;
@@ -93,6 +98,10 @@ public final class HistoSelectorComposite extends Composite {
 		this.contextMenu.createMenu(this.popupmenu);
 
 		initGUI();
+	}
+
+	public Button getCurveSelectorHeader() {
+		return this.curveSelectorHeader;
 	}
 
 	void initGUI() {
@@ -132,11 +141,10 @@ public final class HistoSelectorComposite extends Composite {
 						for (TableItem tableItem : HistoSelectorComposite.this.curveSelectorTable.getItems()) {
 							if (tableItem.getChecked()) {
 								// avoid phantom measurements with invisible curves
-								final TrailRecord activeRecord = getTableItemRecord(tableItem);
-								TrailRecordSet trailRecordSet = HistoSelectorComposite.this.presentHistoExplorer.getTrailRecordSet();
-								if (trailRecordSet.getRecordKeyMeasurement().equals(activeRecord.getName())) {
-									HistoSelectorComposite.this.contextMenu.setMeasurement(activeRecord.getName(), false);
-									HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(activeRecord.getName(), false);
+								String recordName = getTableItemRecord(tableItem).getName();
+								if (getParentWindow().isMeasureRecord(recordName)) {
+									HistoSelectorComposite.this.contextMenu.setMeasurement(recordName, false);
+									HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(recordName, false);
 								}
 								toggleRecordSelection(tableItem, false, false);
 							}
@@ -153,6 +161,57 @@ public final class HistoSelectorComposite extends Composite {
 				}
 			});
 		}
+		{
+			this.chartSelector = new Button(this, SWT.PUSH | SWT.LEFT | SWT.TRANSPARENT);
+			FormData chartSelectorLData = new FormData();
+			chartSelectorLData.width = 26;
+			chartSelectorLData.height = 26;
+			chartSelectorLData.left = new FormAttachment(0, 1000, this.initialSelectorHeaderWidth);
+			chartSelectorLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
+			this.chartSelector.setLayoutData(chartSelectorLData);
+			this.chartSelector.setImage(SWTResourceManager.getImage("gde/resource/moveToNext.png")); //$NON-NLS-1$
+			this.chartSelector.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0899));
+			this.chartSelector.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent evt) {
+					log.fine(() -> "chartSelector.widgetSelected, event=" + evt); //$NON-NLS-1$
+					HistoSelectorComposite.this.presentHistoExplorer.clearMeasurementModes();
+					for (TableItem tableItem : HistoSelectorComposite.this.curveSelectorTable.getItems()) {
+						if (tableItem.getChecked()) {
+							// avoid phantom measurements with invisible curves
+							String recordName = getTableItemRecord(tableItem).getName();
+							if (getParentWindow().isMeasureRecord(recordName)) {
+								HistoSelectorComposite.this.contextMenu.setMeasurement(recordName, false);
+								HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(recordName, false);
+							}
+						}
+					}
+					HistoSelectorComposite.this.presentHistoExplorer.scrollSummaryChart();
+					HistoSelectorComposite.this.presentHistoExplorer.updateHistoChartWindow(false);
+				}
+			});
+		}
+		{
+			this.smartSelector = new Button(this, SWT.TOGGLE | SWT.LEFT | SWT.TRANSPARENT);
+			FormData smartSelectorLData = new FormData();
+			smartSelectorLData.width = 26;
+			smartSelectorLData.height = 26;
+			smartSelectorLData.left = new FormAttachment(0, 1000, this.initialSelectorHeaderWidth + 26 * 3);
+			smartSelectorLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
+			this.smartSelector.setLayoutData(smartSelectorLData);
+			this.smartSelector.setImage(SWTResourceManager.getImage("gde/resource/smartSetting.png")); //$NON-NLS-1$
+			this.smartSelector.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0898));
+			this.smartSelector.setSelection(Settings.getInstance().isSmartStatistics());
+			this.smartSelector.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent evt) {
+					log.fine(() -> "smartSelector.widgetSelected, event=" + evt); //$NON-NLS-1$
+					Settings.getInstance().setSmartStatistics(smartSelector.getSelection());
+					DataExplorer.getInstance().getPresentHistoExplorer().updateHistoTabs(true, true);
+				}
+			});
+		}
+
 		{
 			this.curveSelectorTable = new Table(this, SWT.FULL_SELECTION | SWT.SINGLE | SWT.CHECK);
 			this.curveSelectorTable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -174,12 +233,11 @@ public final class HistoSelectorComposite extends Composite {
 						final TableItem eventItem = (TableItem) evt.item;
 						// avoid phantom measurements with invisible curves
 						log.finer(() -> "checked/Old=" + eventItem.getChecked() + eventItem.getData(DataExplorer.OLD_STATE)); //$NON-NLS-1$
-						final TrailRecord activeRecord = getTableItemRecord(eventItem);
-						TrailRecordSet trailRecordSet = HistoSelectorComposite.this.presentHistoExplorer.getTrailRecordSet();
+						String recordName = getTableItemRecord(eventItem).getName();
 						if (!eventItem.getChecked() && (Boolean) eventItem.getData(DataExplorer.OLD_STATE) //
-								&& trailRecordSet.getRecordKeyMeasurement().equals(activeRecord.getName())) {
-							HistoSelectorComposite.this.contextMenu.setMeasurement(activeRecord.getName(), false);
-							HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(activeRecord.getName(), false);
+								&& getParentWindow().isMeasureRecord(recordName)) {
+							HistoSelectorComposite.this.contextMenu.setMeasurement(recordName, false);
+							HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(recordName, false);
 						}
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, eventItem.getData(DataExplorer.RECORD_NAME));
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);
@@ -204,7 +262,6 @@ public final class HistoSelectorComposite extends Composite {
 	 * Update of the curve selector table.
 	 */
 	public synchronized void doUpdateCurveSelectorTable() {
-		log.fine("start"); //$NON-NLS-1$
 		this.curveSelectorTable.removeAll();
 		for (TableEditor editor : this.editors) {
 			if (editor != null) { // non displayable records
@@ -269,8 +326,11 @@ public final class HistoSelectorComposite extends Composite {
 		this.tableCurveTypeColumn.setWidth(this.curveTypeColumnWidth);
 		if (this.oldSelectorColumnWidth != this.selectorColumnWidth) {
 			this.curveSelectorHeader.setSize(this.selectorColumnWidth - 1, this.curveSelectorHeader.getSize().y);
-			this.tableSelectorColumn.setWidth(this.selectorColumnWidth - 2);
+			int xOverlap = 2;
+			this.tableSelectorColumn.setWidth(this.selectorColumnWidth - xOverlap);
 			this.oldSelectorColumnWidth = this.selectorColumnWidth;
+			FormData layoutData2 = (FormData) this.chartSelector.getLayoutData();
+			layoutData2.left = new FormAttachment(0, 1000, itemWidth - xOverlap);
 		}
 		this.presentHistoExplorer.setHistoChartSashFormWeights(this);
 
@@ -323,8 +383,8 @@ public final class HistoSelectorComposite extends Composite {
 			HistoSelectorComposite.this.popupmenu.getItem(0).setSelection(false);
 			tableItem.setData(DataExplorer.OLD_STATE, false);
 		}
-		activeRecord.getParentTrail().syncScaleOfSyncableRecords();
-		activeRecord.getParentTrail().updateVisibleAndDisplayableRecordsForTable();
+		activeRecord.getParent().syncScaleOfSyncableRecords();
+		activeRecord.getParent().updateVisibleAndDisplayableRecordsForTable();
 	}
 
 	/**
@@ -370,5 +430,9 @@ public final class HistoSelectorComposite extends Composite {
 		} else {
 			return new Rectangle(1, 1, 1, 1);
 		}
+	}
+
+	private AbstractHistoChartWindow getParentWindow() {
+		return (AbstractHistoChartWindow) ((CTabFolder) getParent().getParent()).getSelection();
 	}
 }

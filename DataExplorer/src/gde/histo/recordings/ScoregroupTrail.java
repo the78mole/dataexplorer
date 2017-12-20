@@ -98,7 +98,7 @@ public final class ScoregroupTrail extends TrailRecord {
 		List<Integer> scoreOrdinals = getScoregroup().getScore().stream().map(s -> s.getTrailOrdinal()) //
 				.collect(Collectors.toList());
 		// todo check why parallelStream() in the next statement results in sporadic unmatched length of decodedMax/Min
-		getParentTrail().getHistoVaults().values().stream().flatMap(Collection::stream).forEach(v -> {
+		getParent().getHistoVaults().values().stream().flatMap(Collection::stream).forEach(v -> {
 			// determine the min and max of all score entries in the score group of this vault
 			Stream<Integer> scoregroupPoints = scoreOrdinals.stream().map(t -> getVaultPoint(v, t));
 			DoubleSummaryStatistics stats = scoregroupPoints.map(i -> HistoSet.decodeVaultValue(this, i / 1000.)) //

@@ -54,20 +54,20 @@ import gde.ui.menu.MenuBar;
  * @author Thomas Eickert (USER)
  */
 public class HistoExplorer {
-	static final String					$CLASS_NAME	= HistoExplorer.class.getName();
-	static final Logger					log					= Logger.getLogger($CLASS_NAME);
+	static final String								$CLASS_NAME	= HistoExplorer.class.getName();
+	static final Logger								log					= Logger.getLogger($CLASS_NAME);
 
-	private final DataExplorer	application	= DataExplorer.getInstance();
-	private final Settings			settings		= Settings.getInstance();
+	private final DataExplorer				application	= DataExplorer.getInstance();
+	private final Settings						settings		= Settings.getInstance();
 
-	private final CTabFolder		displayTab;
-	private final HistoSet			histoSet;
+	private final CTabFolder					displayTab;
+	private final HistoSet						histoSet;
 
-	private HistoGraphicsWindow	histoGraphicsTabItem;
-	private HistoSummaryWindow	histoSummaryTabItem;
-	private HistoTableWindow		histoTableTabItem;
+	private AbstractHistoChartWindow	histoGraphicsTabItem;
+	private AbstractHistoChartWindow	histoSummaryTabItem;
+	private HistoTableWindow					histoTableTabItem;
 
-	private boolean							isCurveSurveyVisible;
+	private boolean										isCurveSurveyVisible;
 
 	public HistoExplorer(CTabFolder displayTab) {
 		this.displayTab = displayTab;
@@ -139,6 +139,14 @@ public class HistoExplorer {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Set the next graph into the window or alternatively restore to full vertical size.
+	 * Does not support redrawing.
+	 */
+	public void scrollSummaryChart() {
+		((HistoSummaryWindow) displayTab.getSelection()).scrollSummaryChart();
 	}
 
 	/**
@@ -346,14 +354,15 @@ public class HistoExplorer {
 	public void setMeasurementActive(String recordKey, boolean enabled) {
 		TrailRecordSet trailRecordSet = histoSet.getTrailRecordSet();
 		if (isHistoChartWindowVisible() && trailRecordSet.containsKey(recordKey)) {
-			histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 			trailRecordSet.setMeasurementMode(recordKey, enabled);
+			AbstractHistoChartWindow chartWindow = (AbstractHistoChartWindow) displayTab.getSelection();
+			chartWindow.getGraphicsComposite().cleanMeasurement();
 			TrailRecord trailRecord = trailRecordSet.get(recordKey);
 			if (enabled && !trailRecord.isVisible()) {
-				histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
-				histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
+				chartWindow.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
+				chartWindow.getGraphicsComposite().redrawGraphics();
 			}
-			if (enabled) histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(trailRecordSet, HistoGraphicsMode.MEASURE);
+			if (enabled) chartWindow.getGraphicsComposite().drawMeasurePointer(trailRecord, HistoGraphicsMode.MEASURE);
 		}
 	}
 
@@ -365,14 +374,15 @@ public class HistoExplorer {
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
 		TrailRecordSet trailRecordSet = histoSet.getTrailRecordSet();
 		if (isHistoChartWindowVisible() && trailRecordSet.containsKey(recordKey)) {
-			histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
 			trailRecordSet.setDeltaMeasurementMode(recordKey, enabled);
+			AbstractHistoChartWindow chartWindow = (AbstractHistoChartWindow) displayTab.getSelection();
+			chartWindow.getGraphicsComposite().cleanMeasurement();
 			TrailRecord trailRecord = trailRecordSet.get(recordKey);
 			if (enabled && !trailRecord.isVisible()) {
-				histoGraphicsTabItem.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
-				histoGraphicsTabItem.getGraphicsComposite().redrawGraphics();
+				chartWindow.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
+				chartWindow.getGraphicsComposite().redrawGraphics();
 			}
-			if (enabled) histoGraphicsTabItem.getGraphicsComposite().drawMeasurePointer(trailRecordSet, HistoGraphicsMode.MEASURE_DELTA);
+			if (enabled) chartWindow.getGraphicsComposite().drawMeasurePointer(trailRecord, HistoGraphicsMode.MEASURE_DELTA);
 		}
 	}
 
@@ -381,9 +391,9 @@ public class HistoExplorer {
 	 * @param innerAreaBackground the innerAreaBackground to set
 	 */
 	public void setInnerAreaBackground(Color innerAreaBackground) {
-			settings.setObjectDescriptionInnerAreaBackground(innerAreaBackground);
-			histoGraphicsTabItem.setCurveAreaBackground(innerAreaBackground);
-			histoSummaryTabItem.setCurveAreaBackground(innerAreaBackground);
+		settings.setObjectDescriptionInnerAreaBackground(innerAreaBackground);
+		histoGraphicsTabItem.setCurveAreaBackground(innerAreaBackground);
+		histoSummaryTabItem.setCurveAreaBackground(innerAreaBackground);
 	}
 
 	/**
@@ -391,9 +401,9 @@ public class HistoExplorer {
 	 * @param borderColor the borderColor to set
 	 */
 	public void setBorderColor(Color borderColor) {
-			settings.setCurveGraphicsBorderColor(borderColor);
-			histoGraphicsTabItem.setCurveAreaBorderColor(borderColor);
-			histoSummaryTabItem.setCurveAreaBorderColor(borderColor);
+		settings.setCurveGraphicsBorderColor(borderColor);
+		histoGraphicsTabItem.setCurveAreaBorderColor(borderColor);
+		histoSummaryTabItem.setCurveAreaBorderColor(borderColor);
 	}
 
 	/**
@@ -401,9 +411,9 @@ public class HistoExplorer {
 	 * @param surroundingBackground the surroundingBackground to set
 	 */
 	public void setSurroundingBackground(Color surroundingBackground) {
-			settings.setUtilitySurroundingBackground(surroundingBackground);
-			histoGraphicsTabItem.setSurroundingBackground(surroundingBackground);
-			histoSummaryTabItem.setSurroundingBackground(surroundingBackground);
+		settings.setUtilitySurroundingBackground(surroundingBackground);
+		histoGraphicsTabItem.setSurroundingBackground(surroundingBackground);
+		histoSummaryTabItem.setSurroundingBackground(surroundingBackground);
 	}
 
 	public void enableGraphicsHeader(boolean enabled) {
@@ -471,6 +481,10 @@ public class HistoExplorer {
 
 	public TrailRecordSet getTrailRecordSet() {
 		return histoSet.getTrailRecordSet();
+	}
+
+	public HistoSummaryWindow getHistoSummaryTabItem() {
+		return (HistoSummaryWindow) this.histoSummaryTabItem;
 	}
 
 }

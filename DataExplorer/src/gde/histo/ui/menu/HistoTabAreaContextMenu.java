@@ -82,7 +82,8 @@ public class HistoTabAreaContextMenu {
 	private MenuItem						fileName, openRecordSetItem, deleteFileItem, openFolderItem, hideItem;
 	private Menu								hideMenu;
 	private MenuItem						hideMenuRecordSetItem, hideMenuFileItem, hideMenuRevokeItem;
-	private Menu								warningMenu;
+	private Menu								trackMenu, warningMenu;
+	private MenuItem						trackItem, boxplotItem, spotsItem;
 	private MenuItem						warningItem, warningCountItem0, warningCountItem1, warningCountItem2, warningCountItem3;
 	private MenuItem						suppressModeItem;
 
@@ -119,6 +120,9 @@ public class HistoTabAreaContextMenu {
 						curveSelectionItem.setEnabled(true);
 						hideItem.setEnabled(true);
 						hideMenuRevokeItem.setEnabled(true);
+						trackItem.setEnabled(true);
+						boxplotItem.setEnabled(true);
+						spotsItem.setEnabled(true);
 						warningItem.setEnabled(true);
 						warningCountItem0.setEnabled(true);
 						warningCountItem1.setEnabled(true);
@@ -129,6 +133,7 @@ public class HistoTabAreaContextMenu {
 						displayGraphicsCurveSurvey.setEnabled(true);
 						copyTabItem.setEnabled(true);
 						copyPrintImageItem.setEnabled(true);
+						borderColorItem.setEnabled(true);
 					} else {
 						setAllEnabled(true);
 						String dataFilePath = popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString();
@@ -174,7 +179,7 @@ public class HistoTabAreaContextMenu {
 					} else {
 						setAllEnabled(true);
 						curveSelectionItem.setEnabled(false);
-						warningItem.setEnabled(false);
+						trackItem.setEnabled(false);
 						displayGraphicsHeaderItem.setEnabled(false);
 						displayGraphicsCommentItem.setEnabled(false);
 						displayGraphicsCurveSurvey.setEnabled(false);
@@ -350,7 +355,45 @@ public class HistoTabAreaContextMenu {
 
 			new MenuItem(popupMenu, SWT.SEPARATOR);
 			{
-				warningItem = new MenuItem(popupMenu, SWT.CASCADE);
+				trackItem = new MenuItem(popupMenu, SWT.CASCADE);
+				trackItem.setText(Messages.getString(MessageIds.GDE_MSGT0890));
+				if (!GDE.IS_OS_ARCH_ARM) trackItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0891));
+				trackMenu = new Menu(trackItem);
+				trackItem.setMenu(trackMenu);
+			}
+			{
+				boxplotItem = new MenuItem(trackMenu, SWT.CHECK);
+				boxplotItem.setText(Messages.getString(MessageIds.GDE_MSGT0892));
+				if (!GDE.IS_OS_ARCH_ARM) boxplotItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0893));
+				boxplotItem.setSelection(settings.isSummaryBoxVisible());
+				boxplotItem.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "boxplotItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+						boolean selection = boxplotItem.getSelection();
+						settings.setSummaryBoxVisible(selection);
+						application.getPresentHistoExplorer().updateHistoTabs(false, false);
+					}
+				});
+			}
+			{
+				spotsItem = new MenuItem(trackMenu, SWT.CHECK);
+				spotsItem.setText(Messages.getString(MessageIds.GDE_MSGT0894));
+				if (!GDE.IS_OS_ARCH_ARM) spotsItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0895));
+				spotsItem.setSelection(settings.isSummarySpotsVisible());
+				spotsItem.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "spotsItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+						boolean selection = spotsItem.getSelection();
+						settings.setSummarySpotsVisible(selection);
+						application.getPresentHistoExplorer().updateHistoTabs(false, false);
+					}
+				});
+			}
+
+			{
+				warningItem = new MenuItem(trackMenu, SWT.CASCADE);
 				warningItem.setText(Messages.getString(MessageIds.GDE_MSGT0888));
 				if (!GDE.IS_OS_ARCH_ARM) warningItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0889));
 				warningMenu = new Menu(hideItem);
@@ -582,20 +625,23 @@ public class HistoTabAreaContextMenu {
 	}
 
 	private void setAllEnabled(boolean enabled) {
-		if (fileName != null) fileName.setEnabled(enabled);
-		if (openRecordSetItem != null) openRecordSetItem.setEnabled(enabled);
-		if (deleteFileItem != null) deleteFileItem.setEnabled(enabled);
-		if (openFolderItem != null) openFolderItem.setEnabled(enabled);
-		if (hideItem != null) hideItem.setEnabled(enabled);
-		if (hideMenuRecordSetItem != null) hideMenuRecordSetItem.setEnabled(enabled);
-		if (hideMenuFileItem != null) hideMenuFileItem.setEnabled(enabled);
-		if (hideMenuRevokeItem != null) hideMenuRevokeItem.setEnabled(enabled);
-		if (suppressModeItem != null) suppressModeItem.setEnabled(enabled);
-		if (warningItem != null) warningItem.setEnabled(enabled);
-		if (warningCountItem0 != null) warningCountItem0.setEnabled(enabled);
-		if (warningCountItem1 != null) warningCountItem1.setEnabled(enabled);
-		if (warningCountItem2 != null) warningCountItem2.setEnabled(enabled);
-		if (warningCountItem3 != null) warningCountItem3.setEnabled(enabled);
+		fileName.setEnabled(enabled);
+		openRecordSetItem.setEnabled(enabled);
+		deleteFileItem.setEnabled(enabled);
+		openFolderItem.setEnabled(enabled);
+		hideItem.setEnabled(enabled);
+		hideMenuRecordSetItem.setEnabled(enabled);
+		hideMenuFileItem.setEnabled(enabled);
+		hideMenuRevokeItem.setEnabled(enabled);
+		suppressModeItem.setEnabled(enabled);
+		trackItem.setEnabled(enabled);
+		boxplotItem.setEnabled(enabled);
+		spotsItem.setEnabled(enabled);
+		warningItem.setEnabled(enabled);
+		warningCountItem0.setEnabled(enabled);
+		warningCountItem1.setEnabled(enabled);
+		warningCountItem2.setEnabled(enabled);
+		warningCountItem3.setEnabled(enabled);
 
 		curveSelectionItem.setEnabled(enabled);
 		displayGraphicsHeaderItem.setEnabled(enabled);

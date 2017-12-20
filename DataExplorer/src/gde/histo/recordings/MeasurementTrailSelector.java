@@ -67,7 +67,7 @@ public final class MeasurementTrailSelector extends TrailSelector {
 		final boolean[] applicablePrimitiveTrails;
 		Optional<TrailDisplayType> trailDisplay = trailRecord.channelItem.getTrailDisplay();
 		if (trailDisplay.map(x -> x.getDefaultTrail()).map(x -> x.isSuite()).orElse(false)) throw new UnsupportedOperationException(
-				"suite trail as a device measurement default"); //$NON-NLS-1$
+				"suite trail must not be a device measurement default");
 
 		boolean isSmartStatistics = this.settings.isSmartStatistics();
 		boolean hideAllTrails = trailDisplay.map(x -> x.isDiscloseAll()).orElse(false);
@@ -102,6 +102,10 @@ public final class MeasurementTrailSelector extends TrailSelector {
 		return false;
 	}
 
+	/**
+	 * @return an array corresponding to the primitive trail types
+	 *         (true if the entry is a legacy compound trail and appears in the device channel item)
+	 */
 	private boolean[] getApplicableLegacyTrails() {
 		final boolean[] applicablePrimitiveTrails;
 		applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
@@ -111,7 +115,7 @@ public final class MeasurementTrailSelector extends TrailSelector {
 				if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 					applicablePrimitiveTrails[TrailTypes.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
 					if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-						StatisticsType referencedStatistics = DataExplorer.application.getActiveDevice().getMeasurementStatistic(this.trailRecord.getParentTrail().getChannelConfigNumber(), measurementStatistics.getRatioRefOrdinal());
+						StatisticsType referencedStatistics = DataExplorer.application.getActiveDevice().getMeasurementStatistic(this.trailRecord.getParent().getChannelConfigNumber(), measurementStatistics.getRatioRefOrdinal());
 						applicablePrimitiveTrails[TrailTypes.REAL_AVG_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isAvg();
 						applicablePrimitiveTrails[TrailTypes.REAL_MAX_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isMax();
 					}

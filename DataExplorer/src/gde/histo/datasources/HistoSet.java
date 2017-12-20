@@ -369,10 +369,10 @@ public final class HistoSet {
 	public String getDirectoryScanStatistics() {
 		return Messages.getString(MessageIds.GDE_MSGI0064, //
 				new Object[] { String.format("%,d", this.histoSetCollector.getDirectoryFilesCount()), //
-						String.format("%,d", this.histoSetCollector.getReadFilesCount()), //
+						String.format("%,d", this.histoSetCollector.getMatchingFilesCount()), //
 						String.format("%.2f", this.histoSetCollector.getRecordSetBytesSum() / 1024 / 1024.), //
 						String.format("%.2f", this.histoSetCollector.getElapsedTime_ms() / 1000.), //
-						String.format("%,d", this.histoSetCollector.getTrussesCount()), //
+						String.format("%,d", this.histoSetCollector.getTrussesCount() + this.histoSetCollector.getSuppressedTrusses().size()), //
 						String.format("%,d", this.histoSetCollector.getTimeStepSize()) });
 
 	}

@@ -19,13 +19,13 @@
 
 package gde.histo.recordings;
 
-import gde.device.SettlementType;
-import gde.device.TrailDisplayType;
-import gde.device.TrailTypes;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
+
+import gde.device.SettlementType;
+import gde.device.TrailDisplayType;
+import gde.device.TrailTypes;
 
 /**
  * Handle the trail type assignment to a trailRecord.
@@ -38,9 +38,8 @@ public final class SettlementTrailSelector extends TrailSelector {
 
 	@Override
 	public void setApplicableTrails() {
-		Optional<TrailDisplayType> trailDisplay = trailRecord.channelItem.getTrailDisplay();
-		if (trailDisplay.map(x -> x.getDefaultTrail()).map(x -> x.isSuite()).orElse(false)) throw new UnsupportedOperationException(
-				"suite trail as a device settlement default");
+		if (trailRecord.channelItem.getTrailDisplay().map(x -> x.getDefaultTrail()).map(x -> x.isSuite()).orElse(false))
+			throw new UnsupportedOperationException("suite trail must not be a device settlement default");
 		final boolean[] applicablePrimitiveTrails = getApplicablePrimitiveTrails();
 
 		// build applicable trail type lists for display purposes
@@ -67,8 +66,7 @@ public final class SettlementTrailSelector extends TrailSelector {
 		Optional<TrailDisplayType> trailDisplay = trailRecord.channelItem.getTrailDisplay();
 
 		// set quantile-based non-suite trail types : triggered value sum are CURRENTLY not supported
-		final Boolean hideAllTrails = trailDisplay.map(x -> x.isDiscloseAll()).orElse(false);
-		if (!hideAllTrails) {
+		if (!trailDisplay.map(x -> x.isDiscloseAll()).orElse(false)) {
 			if (((SettlementType) trailRecord.channelItem).getEvaluation().getTransitionAmount() == null)
 				TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == this.settings.isSmartStatistics()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 			else

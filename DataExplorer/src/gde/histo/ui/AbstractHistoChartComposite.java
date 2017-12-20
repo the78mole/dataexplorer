@@ -19,9 +19,11 @@
 
 package gde.histo.ui;
 
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -38,6 +40,7 @@ import org.eclipse.swt.widgets.Text;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channels;
+import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.ui.menu.HistoTabAreaContextMenu;
@@ -99,6 +102,25 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	protected int											fixedCanvasHeight				= -1;
 	protected boolean									isCurveSelectorEnabled	= true;
 
+	/**
+	 * Returns the value nearest to {@code value} which is within the closed range {@code [min..max]}.
+	 *
+	 * <p>
+	 * If {@code value} is within the range {@code [min..max]}, {@code value} is returned
+	 * unchanged. If {@code value} is less than {@code min}, {@code min} is returned, and if
+	 * {@code value} is greater than {@code max}, {@code max} is returned.
+	 *
+	 * @param value the {@code int} value to constrain
+	 * @param min the lower bound (inclusive) of the range to constrain {@code value} to
+	 * @param max the upper bound (inclusive) of the range to constrain {@code value} to
+	 * @throws IllegalArgumentException if {@code min > max}
+	 * @see <a href="https://www.google.de/search?q=Guava 22.0">Guava 22.0</a>
+	 */
+	public static int constrainToRange(int value, int min, int max) { // todo move into gde.utils.MathUtils
+		if (min > max) throw new IllegalArgumentException();
+		return Math.min(Math.max(value, min), max);
+	}
+
 	public AbstractHistoChartComposite(Composite parent, int style) {
 		super(parent, style);
 	}
@@ -128,7 +150,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	 */
 	protected synchronized void doRedrawGraphics() {
 		if (!GDE.IS_LINUX) { // old code changed due to Mountain Lion refresh problems
-			log.finer(() -> "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update"); //$NON-NLS-1$
+			log.off(() -> "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update"); //$NON-NLS-1$
 			Point size = this.graphicCanvas.getSize();
 			this.graphicCanvas.redraw(5, 5, 5, 5, true); // image based - let OS handle the update
 			this.graphicCanvas.redraw(size.x - 5, 5, 5, 5, true);
@@ -151,9 +173,6 @@ public abstract class AbstractHistoChartComposite extends Composite {
 		this.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0896));
 	}
 
-	/**
-	 * Enable display of graphics header.
-	 */
 	public void enableGraphicsHeader(boolean enabled) {
 		if (enabled) {
 			this.headerGap = DEFAULT_HEADER_GAP;
@@ -194,6 +213,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	public void clearHeaderAndComment() {
 		if (this.channels.getActiveChannel() != null) {
 			this.recordSetComment.setText(GDE.STRING_EMPTY);
+			this.recordSetComment.setToolTipText(GDE.STRING_EMPTY);
 			this.graphicsHeader.setText(GDE.STRING_EMPTY);
 			this.graphicsHeaderText = null;
 			updateCaptions();
@@ -237,7 +257,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	public void setFixedGraphicCanvas(int fixedY, int fixedHeight) {
 		this.fixedCanvasY = fixedY;
 		this.fixedCanvasHeight = fixedHeight;
-		log.fine(() -> "y = " + fixedY + "  height = " + fixedHeight); //$NON-NLS-1$
+		log.finer(() -> "y = " + fixedY + "  height = " + fixedHeight); //$NON-NLS-1$
 	}
 
 	/**
@@ -283,11 +303,11 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	protected void drawCurves() {
 		long startInitTime = new Date().getTime();
 		int dataScaleWidth = defineDataScaleWidth();
-		setCurveAreaBounds(dataScaleWidth, defineNumberLeftRightScales());
-		log.fine(() -> "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startInitTime)));
+		curveAreaBounds = defineCurveAreaBounds(dataScaleWidth, defineNumberLeftRightScales());
+		log.off(() -> "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startInitTime)));
 
 		if (trailRecordSet.getTimeStepSize() > 0) {
-			trailRecordSet.setDrawAreaBounds(this.curveAreaBounds);
+			trailRecordSet.setDrawAreaBounds(curveAreaBounds);
 			drawCurveArea(dataScaleWidth);
 		}
 	}
@@ -312,20 +332,20 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	 * @param dataScaleWidth is the space width to be used for any of the scales
 	 * @param numberLeftRightScales holds the numbers of scales {left, right}
 	 */
-	private void setCurveAreaBounds(int dataScaleWidth, int[] numberLeftRightScales) {
+	private Rectangle defineCurveAreaBounds(int dataScaleWidth, int[] numberLeftRightScales) {
 		int spaceLeft = numberLeftRightScales[0] * dataScaleWidth;
 		int spaceRight = numberLeftRightScales[1] * dataScaleWidth;
 
 		int x0, y0; // the lower left corner of the curve area
 		int xMax, yMax; // the upper right corner of the curve area
-		int width; // x coordinate width - time scale
+		int width; // x coordinate width
 		int height; // y coordinate - make modulo 10 ??
 
 		// calculate the horizontal area available for plotting graphs
 		int gapSide = DEFAULT_SIDE_GAP; // free gap left or right side of the curves
 		x0 = spaceLeft + (numberLeftRightScales[0] > 0 ? gapSide / 2 : gapSide);// enable a small gap if no axis is shown
 		xMax = canvasBounds.width - spaceRight - (numberLeftRightScales[1] > 0 ? gapSide / 2 : gapSide);
-		width = ((xMax - x0) <= 0) ? 1 : (xMax - x0);
+		width = Math.max(1, xMax - x0);
 
 		// calculate the vertical area available for plotting graphs
 		yMax = DEFAULT_TOP_GAP; // free gap on top of the curves
@@ -333,8 +353,9 @@ public abstract class AbstractHistoChartComposite extends Composite {
 		height = y0 - yMax; // recalculate due to modulo 10 ??
 		log.finer(() -> "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-6$
 
-		curveAreaBounds = new Rectangle(x0, y0 - height, width, height);
-		log.finer(() -> "curve bounds = " + curveAreaBounds); //$NON-NLS-1$
+		Rectangle result = new Rectangle(x0, y0 - height, width, height);
+		log.log(FINE, "curve bounds=", result); //$NON-NLS-1$
+		return result;
 	}
 
 	/**
@@ -364,11 +385,13 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	 * Draw the pointer for measurement modes.
 	 * Select only valid timestamps on the x axis.
 	 */
-	public abstract void drawMeasurePointer(TrailRecordSet trailRecordSet, HistoGraphicsMode mode);
+	public abstract void drawMeasurePointer(TrailRecord trailRecord, HistoGraphicsMode mode);
 
 	/**
-	 * @param enabled
+	 * @return the measuring record if measuring is active
 	 */
+	public abstract Optional<TrailRecord> getMeasureRecord();
+
 	public void setCurveSelectorEnabled(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
 	}
@@ -381,16 +404,8 @@ public abstract class AbstractHistoChartComposite extends Composite {
 		log.finer(() -> "in  xPos = " + xPos + " yPos = " + yPos); //$NON-NLS-1$ //$NON-NLS-2$
 		int tmpxPos = xPos - this.curveAreaBounds.x;
 		int tmpyPos = yPos - this.curveAreaBounds.y;
-		int minX = 0;
-		int maxX = this.curveAreaBounds.width;
-		int minY = 0;
-		int maxY = this.curveAreaBounds.height;
-		if (tmpxPos < minX || tmpxPos > maxX) {
-			tmpxPos = tmpxPos < minX ? minX : maxX;
-		}
-		if (tmpyPos < minY || tmpyPos > maxY) {
-			tmpyPos = tmpyPos < minY ? minY : maxY;
-		}
+		tmpxPos = constrainToRange(tmpxPos, 0, this.curveAreaBounds.width);
+		tmpyPos = constrainToRange(tmpyPos, 0, this.curveAreaBounds.height);
 		if (log.isLoggable(FINER)) log.log(FINER, "out xPos = " + tmpxPos + " yPos = " + tmpyPos); //$NON-NLS-1$ //$NON-NLS-2$
 		return new Point(tmpxPos, tmpyPos);
 	}

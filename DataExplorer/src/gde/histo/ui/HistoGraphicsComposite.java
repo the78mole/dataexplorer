@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -55,7 +56,6 @@ import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionFormatter;
 import gde.histo.recordings.TrailRecord;
-import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.ui.menu.HistoTabAreaContextMenu;
@@ -63,6 +63,7 @@ import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuOnDemand;
 import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuType;
 import gde.histo.utils.HistoCurveUtils;
 import gde.histo.utils.HistoTimeLine;
+import gde.log.Level;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -268,7 +269,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		long startTime = new Date().getTime();
 		// Get the canvas and its dimensions
 		this.canvasBounds = this.graphicCanvas.getClientArea();
-		log.finer(() -> "canvas size = " + this.canvasBounds); //$NON-NLS-1$
+		log.log(Level.FINER, "canvas size = ", this.canvasBounds); //$NON-NLS-1$
 
 		if (this.canvasImage != null) this.canvasImage.dispose();
 		this.canvasImage = new Image(GDE.display, this.canvasBounds);
@@ -300,11 +301,11 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	}
 
 	@Override
-	public void drawMeasurePointer(TrailRecordSet trailRecordSet, HistoGraphicsMode mode) {
+	public void drawMeasurePointer(TrailRecord trailRecord, HistoGraphicsMode mode) {
 		// draw full graph at first because the curve area might change (due to new new scales)
 		drawAreaPaintControl();
 
-		this.graphicsMeasurement = new HistoGraphicsMeasurement(this);
+		this.graphicsMeasurement = new HistoGraphicsMeasurement(this, trailRecord);
 		this.setModeState(mode);
 
 		mode.drawInitialMeasurement(this);
@@ -317,6 +318,11 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 
 			this.graphicsMeasurement = null;
 		}
+	}
+
+	@Override
+	public Optional<TrailRecord> getMeasureRecord() {
+		return graphicsMeasurement != null ? Optional.of(graphicsMeasurement.getTrailRecord()) : Optional.empty();
 	}
 
 	/**
@@ -507,7 +513,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	 * @param record
 	 * @return the number of ticks {numberTicks, numberMiniTicks}
 	 */
-	private int[] setRecordDisplayValues(TrailRecord record) {
+	private int[] setRecordDisplayValues(TrailRecord record) { // todo simplify the implementation
 		int[] numberTickMarks = new int[] { 10, 5 };
 
 		// (yMaxValue - yMinValue) defines the area to be used for the curve
@@ -534,8 +540,8 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 			}
 			if (log.isLoggable(FINE)) log.log(FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 
-			if (Math.abs(yMaxValue - yMinValue) < .0001) { // equal value disturbs the scaling algorithm
-				double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
+			double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
+			if (Math.abs(deltaValueDisplay) < .0001) { // equal value disturbs the scaling algorithm
 				yMaxValueDisplay = MathUtils.roundUp(yMaxValueDisplay, deltaValueDisplay); // max
 				yMinValueDisplay = MathUtils.roundDown(yMinValueDisplay, deltaValueDisplay); // min
 				Object[] roundResult = MathUtils.adaptRounding(yMinValueDisplay, yMaxValueDisplay, false, curveAreaBounds.height / 25 >= 3

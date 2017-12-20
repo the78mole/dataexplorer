@@ -38,6 +38,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.data.AbstractRecord;
 import gde.data.AbstractRecordSet;
 import gde.data.Record;
@@ -53,6 +54,8 @@ import gde.histo.cache.ExtendedVault;
 import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.datasources.HistoSet;
 import gde.histo.gpslocations.GpsCluster;
+import gde.histo.ui.HistoExplorer;
+import gde.histo.ui.HistoSummaryWindow;
 import gde.histo.utils.GpsCoordinate;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -72,6 +75,12 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	private static final Logger	log									= Logger.getLogger($CLASS_NAME);
 
 	public static final String	BASE_NAME_SEPARATOR	= " | ";
+
+	public enum DataTag {
+		LINK_PATH, FILE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, RECORDSET_ORDINAL, GPS_LOCATION
+	};
+
+	protected final static String CHART_WEIGHT = "_chartWeight"; // weight of the charts (graphics or summary boxplot)
 
 	/**
 	 * Collect input data for the trail recordset and subordinate objects.
@@ -291,23 +300,21 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	}
 
+	private final HistoExplorer												presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
+
 	/**
 	 * Holds the view configuration.
 	 */
 	private final HistoGraphicsTemplate								template;
 
-	private final List<Integer>												durations_mm	= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
-	private final TrailDataTags												dataTags			= new TrailDataTags();
+	private final List<Integer>												durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
+	private final TrailDataTags												dataTags							= new TrailDataTags();
 
 	/**
 	 * Data source for this recordset.
 	 * Sorted by recordSet startTimeStamp in reverse order.
 	 */
 	private final TreeMap<Long, List<ExtendedVault>>	histoVaults;
-
-	public enum DataTag {
-		LINK_PATH, FILE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, RECORDSET_ORDINAL, GPS_LOCATION
-	};
 
 	/**
 	 * Hold trail records for measurements, settlements and scores.
@@ -666,6 +673,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			this.template.setProperty(i + Record.DEFINED_MIN_VALUE, String.valueOf(record.getMinScaleValue()));
 			this.template.setProperty(i + TrailRecord.TRAIL_TEXT_ORDINAL, String.valueOf(record.getTrailSelector().getTrailTextSelectedIndex()));
 		}
+		int[] chartWeights = presentHistoExplorer.getHistoSummaryTabItem().getChartWeights();
+		for (int i = 0; i < chartWeights.length; i++) {
+			this.template.setProperty(TrailRecordSet.CHART_WEIGHT + i, String.valueOf(chartWeights[i]));
+		}
 		this.template.store();
 		log.fine(() -> "creating histo graphics template file in " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 	}
@@ -715,6 +726,13 @@ public final class TrailRecordSet extends AbstractRecordSet {
 					this.setValueGridRecordOrdinal(record.getOrdinal()); // initial use top score trail record
 					isHorizontalGridOrdinalSet = true;
 				}
+			}
+			if (Settings.getInstance().isSmartStatistics()) { // only smart statistics supports multiple charts
+				int[] chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS;
+				for (int i = 0; i < chartWeights.length; i++) {
+					chartWeights[i] = Integer.parseInt(this.template.getProperty(TrailRecordSet.CHART_WEIGHT + i, String.valueOf(HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i])));
+				}
+				presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(chartWeights);
 			}
 			// ET 29.06.2017 this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 			log.fine(() -> "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
@@ -793,18 +811,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return (Vector<TrailRecord>) this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
 	}
 
-	/**
-	 * @param recordKey the key which record should be measured
-	 * @return true if the record isMeasurementMode or isDeltaMeasurementMode
-	 */
-	public boolean isSurveyMode(String recordKey) {
-		TrailRecord record = this.get(recordKey);
-		if (record != null) {
-			return record.isMeasurementMode() || record.isDeltaMeasurementMode();
-		} else
-			return false;
-	}
-
 	public TreeMap<Long, List<ExtendedVault>> getHistoVaults() {
 		return this.histoVaults;
 	}
@@ -813,4 +819,5 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	public Collection<TrailRecord> getValues() {
 		return (Collection<TrailRecord>) (Collection<?>) values();
 	}
+
 }

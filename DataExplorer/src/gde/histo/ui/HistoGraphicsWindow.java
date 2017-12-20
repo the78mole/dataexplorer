@@ -62,7 +62,7 @@ public final class HistoGraphicsWindow extends AbstractHistoChartWindow {
 	}
 
 	@Override
-	protected void setFixedGraphicCanvas() {
+	protected void setFixedGraphicCanvas(AbstractHistoChartComposite composite) {
 		// not required for this chart type
 	}
 

@@ -75,7 +75,7 @@ public final class SettlementTrail extends TrailRecord {
 
 	@Override
 	protected double[][] defineExtremumQuantiles() {
-		Collection<List<ExtendedVault>> vaults = this.getParentTrail().getHistoVaults().values();
+		Collection<List<ExtendedVault>> vaults = this.getParent().getHistoVaults().values();
 
 		Stream<Integer> pointMinimums = vaults.parallelStream().flatMap(List::stream).map(v -> getVaultPoint(v, TrailTypes.MIN.ordinal()));
 		List<Double> decodedMinimums = pointMinimums.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(this, i / 1000.)).collect(Collectors.toList());

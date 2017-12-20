@@ -33,25 +33,34 @@ import gde.ui.SWTResourceManager;
 
 /**
  * Histo summary window as a sash form of a curve selection table and a drawing canvas.
+ * The drawing canvas holds multiple charts.
  * @author Thomas Eickert
  */
 public final class HistoSummaryWindow extends AbstractHistoChartWindow {
-	private final static String	$CLASS_NAME	= HistoSummaryWindow.class.getName();
-	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
+	private static final String			$CLASS_NAME						= HistoSummaryWindow.class.getName();
+	private static final Logger			log										= Logger.getLogger($CLASS_NAME);
 
-	private HistoSummaryWindow(CTabFolder currentDisplayTab, int style, int index) {
+	public static final int[]				DEFAULT_CHART_WEIGHTS	= new int[] { 0, 10000 };							// 2nd chart is the default chart
+
+	protected SashForm							compositeSashForm;
+	protected HistoSummaryComposite	summaryComposite;
+
+	protected HistoSummaryWindow(CTabFolder currentDisplayTab, int style, int index) {
 		super(currentDisplayTab, style, index);
 	}
 
-	public static HistoSummaryWindow create(CTabFolder dataTab, int style, int position) {
+	public static AbstractHistoChartWindow create(CTabFolder dataTab, int style, int position) {
 		HistoSummaryWindow window = new HistoSummaryWindow(dataTab, style, position);
 
 		window.graphicSashForm = new SashForm(window.tabFolder, SWT.HORIZONTAL);
 		window.setControl(window.graphicSashForm);
 
 		window.curveSelectorComposite = new HistoSelectorComposite(window.graphicSashForm);
-		window.graphicsComposite = new HistoSummaryComposite(window.graphicSashForm);
+		window.compositeSashForm = new SashForm(window.graphicSashForm, SWT.VERTICAL);
+		window.summaryComposite = new HistoSummaryComposite(window.compositeSashForm); // at the top
+		window.graphicsComposite = new HistoGraphicsComposite(window.compositeSashForm);
 		window.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
+		window.compositeSashForm.setWeights(DEFAULT_CHART_WEIGHTS);
 
 		window.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		window.setText(Messages.getString(MessageIds.GDE_MSGT0883));
@@ -64,14 +73,114 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 	}
 
 	@Override
-	protected void setFixedGraphicCanvas() {
+	protected void setFixedGraphicCanvas(AbstractHistoChartComposite composite) {
 		Rectangle realBounds = this.curveSelectorComposite.getRealBounds();
 		if (Settings.getInstance().isSmartStatistics()) {
-			int heightWithScale = realBounds.height + this.graphicsComposite.getXScaleHeight() + AbstractHistoChartComposite.DEFAULT_TOP_GAP;
-			this.graphicsComposite.setFixedGraphicCanvas(realBounds.y - AbstractHistoChartComposite.DEFAULT_TOP_GAP, heightWithScale);
+			int heightWithScale = realBounds.height + composite.getXScaleHeight() + AbstractHistoChartComposite.DEFAULT_TOP_GAP;
+			composite.setFixedGraphicCanvas(realBounds.y - AbstractHistoChartComposite.DEFAULT_TOP_GAP, heightWithScale);
 		} else {
-			this.graphicsComposite.setFixedGraphicCanvas(realBounds.y - AbstractHistoChartComposite.DEFAULT_TOP_GAP, AbstractHistoChartComposite.ZERO_CANVAS_HEIGHT);
+			composite.setFixedGraphicCanvas(realBounds.y - AbstractHistoChartComposite.DEFAULT_TOP_GAP, AbstractHistoChartComposite.ZERO_CANVAS_HEIGHT);
 		}
+	}
+
+	protected void resetFixedGraphicCanvas(AbstractHistoChartComposite composite) {
+		composite.setFixedGraphicCanvas(-1, -1);
+	}
+
+	/**
+	 * Set the next graph into the window or alternatively restore to full vertical size.
+	 */
+	public void scrollSummaryChart() {
+		if (Settings.getInstance().isSmartStatistics()) {
+			if (compositeSashForm.getWeights()[0] < compositeSashForm.getWeights()[1]) {
+				compositeSashForm.setWeights(new int[] { 10000, 0 });
+			} else {
+				compositeSashForm.setWeights(new int[] { 0, 10000 });
+			}
+		} else {
+			setDefaultChart();
+		}
+	}
+
+	/**
+	 * Set the graphics chart into the window without redrawing.
+	 */
+	protected void setDefaultChart() {
+		compositeSashForm.setWeights(DEFAULT_CHART_WEIGHTS);
+	}
+
+	public int[] getChartWeights() {
+		return compositeSashForm.getWeights();
+	}
+
+	public void setChartWeights(int[] chartWeights) {
+		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
+			compositeSashForm.setWeights(chartWeights);
+		} else {
+			GDE.display.asyncExec((Runnable) () -> {
+				this.compositeSashForm.setWeights(chartWeights);
+			});
+		}
+	}
+
+	/**
+	 * Redraw the graphics canvas as well as the curve selector table.
+	 */
+	@Override
+	public void redrawGraphics(final boolean redrawCurveSelector) {
+		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
+			if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
+			if (!Settings.getInstance().isSmartStatistics()) setDefaultChart();
+
+			{
+				resetFixedGraphicCanvas(graphicsComposite);
+				graphicsComposite.doRedrawGraphics();
+				graphicsComposite.updateCaptions();
+			}
+			{
+				setFixedGraphicCanvas(summaryComposite);
+				summaryComposite.doRedrawGraphics();
+				summaryComposite.updateCaptions();
+			}
+		} else {
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
+					if (!Settings.getInstance().isSmartStatistics()) setDefaultChart();
+
+					{
+						resetFixedGraphicCanvas(graphicsComposite);
+						graphicsComposite.doRedrawGraphics();
+						graphicsComposite.updateCaptions();
+					}
+					{
+						setFixedGraphicCanvas(summaryComposite);
+						summaryComposite.doRedrawGraphics();
+						summaryComposite.updateCaptions();
+					}
+				}
+
+			});
+		}
+	}
+
+	@Override
+	public void enableGraphicsHeader(boolean enabled) {
+		this.graphicsComposite.enableGraphicsHeader(enabled);
+		this.summaryComposite.enableGraphicsHeader(enabled);
+	}
+
+	@Override
+	public void enableRecordSetComment(boolean enabled) {
+		this.graphicsComposite.enableRecordSetComment(enabled);
+		this.summaryComposite.enableRecordSetComment(enabled);
+	}
+
+	@Override
+	public void clearHeaderAndComment() {
+		this.graphicsComposite.clearHeaderAndComment();
+		this.summaryComposite.clearHeaderAndComment();
 	}
 
 }

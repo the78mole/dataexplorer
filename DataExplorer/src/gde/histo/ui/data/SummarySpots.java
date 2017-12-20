@@ -50,8 +50,8 @@ import gde.utils.MathUtils;
  * @author Thomas Eickert (USER)
  */
 public class SummarySpots { // MarkerLine + Boxplot + Warnings
-	private static final String	$CLASS_NAME					= SummarySpots.class.getName();
-	private static final Logger	log									= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME	= SummarySpots.class.getName();
+	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * Type of the outlier.
@@ -111,13 +111,19 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		}
 	}
 
-	public static List<Integer> defineGrid(TrailRecordSet recordSet) {
+	public static List<Integer> defineGrid(TrailRecordSet recordSet, boolean innerOnly) {
 		List<Integer> grid = new ArrayList<>();
 		int stripNetX0 = recordSet.getDrawAreaBounds().x + Density.MEDIUM.markerWidth / 2;
 		int tmpWidth = recordSet.getDrawAreaBounds().width - Density.MEDIUM.markerWidth; // half left and right gap for overlapping elements
 		double xStep = tmpWidth / 10.;
-		for (int i = 1; i < 10; i++) {
-			grid.add((stripNetX0 + (int) (xStep * i)));
+		if (innerOnly) {
+			for (int i = 1; i < 10; i++) {
+				grid.add((stripNetX0 + (int) (xStep * i)));
+			}
+		} else {
+			for (int i = 0; i < 11; i++) {
+				grid.add((stripNetX0 + (int) (xStep * i)));
+			}
 		}
 		return grid;
 	}
@@ -152,7 +158,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		stripHeight = newStripHeight;
 		elementWidth = newDensity.markerWidth;
 
-		Rectangle drawAreaBounds = record.getParentTrail().getDrawAreaBounds();
+		Rectangle drawAreaBounds = record.getParent().getDrawAreaBounds();
 		// elements
 		stripNetX0 = drawAreaBounds.x + elementWidth / 2;
 		int tmpWidth = drawAreaBounds.width - elementWidth; // half left and right gap for overlapping elements
@@ -201,7 +207,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	 * @return the list of marker objects which holds all marker positions on the x axis
 	 */
 	private TreeMap<Integer, PosMarkers> defineXPositions(int limit) {
-		log.finest(() -> record.getName());
+		log.finest(() -> record.getName() + "  limit=" + limit);
 		TreeMap<Integer, PosMarkers> resultXPositions = new TreeMap<>();
 
 		final Vector<Integer> tmpRecord;
@@ -260,7 +266,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 			int upperLimit = (tukeyXPositions[UPPER_WHISKER.ordinal()] / elementWidth + 1) * elementWidth; // ceiling
 			int actualWidth = xEntry.getKey() < lowerLimit || xEntry.getKey() > upperLimit ? elementWidth * 2 : elementWidth;
 
-			int xPosOffset = record.getParentTrail().getDrawAreaBounds().x - actualWidth / 2 + 1;
+			int xPosOffset = record.getParent().getDrawAreaBounds().x - actualWidth / 2 + 1;
 			int yPosOffset = stripY0 - actualWidth / 2 + 1;
 			for (Integer yPos : xEntry.getValue().yPositions) {
 				gc.fillRectangle(xEntry.getKey() + xPosOffset, yPos + yPosOffset, actualWidth, actualWidth);
@@ -287,13 +293,14 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	}
 
 	public TreeMap<Integer, PosMarkers> getXPositions() {
-		if (xPositions.isEmpty()) xPositions.putAll(defineXPositions(-1));
+		int positionsLimit = Settings.getInstance().isSummarySpotsVisible() ? -1 : Settings.getInstance().getWarningCount();
+		if (xPositions.isEmpty()) xPositions.putAll(defineXPositions(positionsLimit));
 		return xPositions;
 	}
 
 	private List<Integer> getSnappedIndexes(int stripXPos) {
 		int index = stripXPos - stripXPos % elementWidth;
-		PosMarkers posMarkers = xPositions.get(index);
+		PosMarkers posMarkers = getXPositions().get(index);
 		log.log(Level.FINER, "stripXPos=", stripXPos);
 		return posMarkers != null ? posMarkers : new ArrayList<>();
 	}

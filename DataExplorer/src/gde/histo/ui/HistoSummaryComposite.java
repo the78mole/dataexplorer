@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.swt.SWT;
@@ -61,7 +62,6 @@ import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionFormatter;
 import gde.histo.recordings.TrailRecord;
-import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.ui.data.SummarySpots;
@@ -462,6 +462,9 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		boolean isDrawScaleInRecordColor = settings.isDrawScaleInRecordColor();
 		boolean isDrawNameInRecordColor = settings.isDrawNameInRecordColor();
 		boolean isDrawNumbersInRecordColor = settings.isDrawNumbersInRecordColor();
+		boolean isPartialDataTable = settings.isPartialDataTable();
+		boolean isSummaryBoxVisible = settings.isSummaryBoxVisible();
+		boolean isSummarySpotsVisible = settings.isSummarySpotsVisible();
 
 		trailRecordSet.updateSyncRecordScale();
 		trailRecordSet.updateAndSyncSummaryMinMax();
@@ -470,8 +473,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		final int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
 
 		boolean isCurveGridEnabled = trailRecordSet.getValueGridType() > 0;
-		if (isCurveGridEnabled)
-			HistoCurveUtils.drawSummaryGrid(trailRecordSet, canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
+		if (isCurveGridEnabled) HistoCurveUtils.drawSummaryGrid(trailRecordSet, canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
 
 		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
@@ -488,12 +490,12 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 
 			HistoCurveUtils.drawChannelItemScale(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
 					isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, !isCurveSelectorEnabled);
+			if (record.isVisible() || !isPartialDataTable) {
+				if (isSummaryBoxVisible)
+					HistoCurveUtils.drawChannelItemBoxplot(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+							isDrawNumbersInRecordColor, isSpaceBelow(i));
 
-			if (record.isVisible() || !settings.isPartialDataTable()) {
-				HistoCurveUtils.drawChannelItemBoxplot(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
-						isDrawNumbersInRecordColor, isSpaceBelow(i));
-
-				summarySpots.drawAllMarkers(canvasImageGC, stripY0);
+				if (isSummarySpotsVisible) summarySpots.drawAllMarkers(canvasImageGC, stripY0);
 				summarySpots.drawRecentMarkers(canvasImageGC, stripY0);
 			}
 			HistoCurveUtils.drawChannelItemWarnings(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth);
@@ -519,9 +521,15 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 	}
 
 	@Override
-	public void drawMeasurePointer(TrailRecordSet trailRecordSet, HistoGraphicsMode mode) {
+	public void drawMeasurePointer(TrailRecord trailRecord, HistoGraphicsMode mode) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public Optional<TrailRecord> getMeasureRecord() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
@@ -529,14 +537,9 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		return new int[] { 1, 1 };
 	}
 
-	/**
-	 * @param record
-	 * @return the number of ticks {numberTicks, numberMiniTicks}
-	 */
-	private int[] setRecordDisplayValues(TrailRecord record) {
-		int[] numberTickMarks = new int[] { 10, 5 };
-
+	private void setRecordDisplayValues(TrailRecord record) { // todo simplify the implementation
 		// (yMaxValue - yMinValue) defines the area to be used for the curve
+		// point values divided by 1000
 		double yMaxValue = record.getSyncMaxValue() / 1000.0;
 		double yMinValue = record.getSyncMinValue() / 1000.0;
 		if (log.isLoggable(FINE)) log.log(FINE, "unmodified yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
@@ -544,54 +547,30 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		// yMinValueDisplay and yMaxValueDisplay used for scales and adapted values device and measure unit dependent
 		double yMinValueDisplay = yMinValue, yMaxValueDisplay = yMaxValue;
 
-		if (record.isStartEndDefined()) {
-			yMinValueDisplay = record.getMinScaleValue();
-			yMaxValueDisplay = record.getMaxScaleValue();
+		if (!record.getTrailSelector().isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
+			; // in case of an empty record leave the values unchanged
+		else {
+			yMinValueDisplay = HistoSet.decodeVaultValue(record, yMinValue);
+			yMaxValueDisplay = HistoSet.decodeVaultValue(record, yMaxValue);
+		}
+		if (log.isLoggable(FINE)) log.log(FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
+
+		double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
+		if (Math.abs(deltaValueDisplay) < .0001) { // equal value disturbs the scaling algorithm
+			yMaxValueDisplay = MathUtils.roundUp(yMaxValueDisplay, deltaValueDisplay); // max
+			yMinValueDisplay = MathUtils.roundDown(yMinValueDisplay, deltaValueDisplay); // min
+			Object[] roundResult = MathUtils.adaptRounding(yMinValueDisplay, yMaxValueDisplay, false, curveAreaBounds.height / 25 >= 3
+					? curveAreaBounds.height / 25 : 2);
+			yMinValueDisplay = (Double) roundResult[0];
+			yMaxValueDisplay = (Double) roundResult[1];
 			yMinValue = HistoSet.encodeVaultValue(record, yMinValueDisplay);
 			yMaxValue = HistoSet.encodeVaultValue(record, yMaxValueDisplay);
-			if (log.isLoggable(FINE)) log.log(FINE, "defined yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
-			if (log.isLoggable(FINE)) log.log(FINE, "defined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-		} else {
-			if (!record.getTrailSelector().isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
-				; // in case of an empty record leave the values unchanged
-			else {
-				yMinValueDisplay = HistoSet.decodeVaultValue(record, yMinValue);
-				yMaxValueDisplay = HistoSet.decodeVaultValue(record, yMaxValue);
-			}
-			if (log.isLoggable(FINE)) log.log(FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-
-			if (Math.abs(yMaxValue - yMinValue) < .0001) { // equal value disturbs the scaling algorithm
-				double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
-				yMaxValueDisplay = MathUtils.roundUp(yMaxValueDisplay, deltaValueDisplay); // max
-				yMinValueDisplay = MathUtils.roundDown(yMinValueDisplay, deltaValueDisplay); // min
-				Object[] roundResult = MathUtils.adaptRounding(yMinValueDisplay, yMaxValueDisplay, false, curveAreaBounds.height / 25 >= 3
-						? curveAreaBounds.height / 25 : 2);
-				yMinValueDisplay = (Double) roundResult[0];
-				yMaxValueDisplay = (Double) roundResult[1];
-				numberTickMarks[0] = (Integer) roundResult[2];
-				numberTickMarks[1] = (Integer) roundResult[3];
-				yMinValue = HistoSet.encodeVaultValue(record, yMinValueDisplay);
-				yMaxValue = HistoSet.encodeVaultValue(record, yMaxValueDisplay);
-				if (log.isLoggable(FINE)) log.log(FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
-				if (log.isLoggable(FINE)) log.log(FINE, "rounded -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			if (record.isStartpointZero()) {
-				// check if the main part of the curve is on positive side
-				if (record.getAvgValue() > 0) { // main part of curve is on positive side
-					yMinValueDisplay = 0;
-					yMinValue = HistoSet.encodeVaultValue(record, yMinValueDisplay);
-				} else {// main part of curve is on negative side
-					yMaxValueDisplay = 0;
-					yMaxValue = HistoSet.encodeVaultValue(record, yMaxValueDisplay);
-				}
-				if (log.isLoggable(FINE)) log.log(FINE, "scale starts at 0; yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
-				if (log.isLoggable(FINE))
-					log.log(FINE, "scale starts at 0 -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+			if (log.isLoggable(FINE)) log.log(FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
+			if (log.isLoggable(FINE)) log.log(FINE, "rounded -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+
 		record.setMinMaxScaleValue(yMinValueDisplay, yMaxValueDisplay);
 		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
-		return numberTickMarks;
 	}
 
 	@Override
@@ -602,6 +581,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		} else {
 			this.recordSetComment.setText("supported only for smart statistics");
 		}
+		this.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0896));
 	}
 
 }

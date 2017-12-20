@@ -174,7 +174,7 @@ public final class HistoTableMapper {
 	 * @return record name and trail text followed by formatted values as string array
 	 */
 	public static String[] getTableRow(TrailRecord trailRecord) {
-		int dataSize = trailRecord.getParentTrail().getTimeStepSize();
+		int dataSize = trailRecord.getParent().getTimeStepSize();
 		String[] dataTableRow = new String[dataSize + 2];
 
 		BiFunction<TrailRecord, Integer, String> valueFunction = trailRecord.getTrailSelector().isTrailSuite() //

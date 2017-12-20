@@ -41,10 +41,14 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public abstract class AbstractHistoChartWindow extends CTabItem {
-	private final static String	$CLASS_NAME			= AbstractHistoChartWindow.class.getName();
-	private final static Logger	log							= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME				= AbstractHistoChartWindow.class.getName();
+	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
-	protected static final int	SELECTOR_WIDTH	= 117;
+	protected static final int	SELECTOR_WIDTH		= 117;
+	/**
+	 * y position of the first table row and graphics chart gap.
+	 */
+	protected static final int	HEADER_ROW_HEIGHT	= 33;
 
 	private static ImageData flipHorizontal(ImageData inputImageData) {
 		int bytesPerPixel = inputImageData.bytesPerLine / inputImageData.width;
@@ -74,11 +78,6 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	protected boolean											isCurveSelectorEnabled	= true;
 	private int[]													sashFormWeights					= new int[] { 100, 1000 };
 
-	/**
-	 * y position of the first table row and graphics chart gap.
-	 */
-	static final int				HEADER_ROW_HEIGHT				= 33;
-
 	protected AbstractHistoChartWindow(CTabFolder parent, int style, int index) {
 		super(parent, style, index);
 		SWTResourceManager.registerResourceUser(this);
@@ -91,7 +90,7 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	public void redrawGraphics(final boolean redrawCurveSelector) {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			if (redrawCurveSelector) this.curveSelectorComposite.doUpdateCurveSelectorTable();
-			setFixedGraphicCanvas();
+			setFixedGraphicCanvas(graphicsComposite);
 
 			this.graphicsComposite.doRedrawGraphics();
 			this.graphicsComposite.updateCaptions();
@@ -100,7 +99,7 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 				@Override
 				public void run() {
 					if (redrawCurveSelector) AbstractHistoChartWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
-					setFixedGraphicCanvas();
+					setFixedGraphicCanvas(graphicsComposite);
 
 					AbstractHistoChartWindow.this.graphicsComposite.doRedrawGraphics();
 					AbstractHistoChartWindow.this.graphicsComposite.updateCaptions();
@@ -111,13 +110,14 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	}
 
 	/**
-	 * Option to set a graphics area which position and size does not depend on the header and the comment (e.g. for the summary graphics)
+	 * Option to set a graphics area with position and size not depending on the header and the comment (e.g. summary graphics)
 	 */
-	protected abstract void setFixedGraphicCanvas();
+	protected abstract void setFixedGraphicCanvas(AbstractHistoChartComposite composite);
 
 	/**
 	 * Update graphics window header and description.
 	 */
+	@Deprecated
 	public void updateCaptions() {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			this.graphicsComposite.updateCaptions();
@@ -134,6 +134,7 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	/**
 	 * Method to update the curves displayed in the curve selector panel.
 	 */
+	@Deprecated
 	public void updateCurveSelectorTable() {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			this.curveSelectorComposite.doUpdateCurveSelectorTable();
@@ -173,7 +174,7 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 			}
 		}
 		if (log.isLoggable(FINE))
-				log.log(FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			log.log(FINE, "sash weight = " + this.sashFormWeights[0] + ", " + this.sashFormWeights[1] + " tabFolderClientAreaWidth = " + tabFolderClientAreaWidth); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public int getWidth() {
@@ -188,10 +189,6 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 		return this.graphicSashForm;
 	}
 
-	/**
-	 * Query if this component is visible.
-	 * @return true if graphics window is visible
-	 */
 	public boolean isVisible() {
 		return this.graphicsComposite.isVisible();
 	}
@@ -210,10 +207,6 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 
 	public abstract AbstractHistoChartComposite getGraphicsComposite();
 
-	/**
-	 * Query the context menu activation state.
-	 * @return the state true/false
-	 */
 	public boolean isActiveCurveSelectorContextMenu() {
 		return this.curveSelectorComposite.contextMenu.isActive();
 	}
@@ -241,28 +234,19 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	}
 
 	public void enableGraphicsScale(boolean enabled) {
-		this.graphicsComposite.enableGraphicsScale(enabled);;
+		this.graphicsComposite.enableGraphicsScale(enabled);
 	}
 
-	/**
-	 * @param curveAreaBackground the curveAreaBackground to set
-	 */
 	public void setCurveAreaBackground(Color curveAreaBackground) {
 		this.graphicsComposite.curveAreaBackground = curveAreaBackground;
 		this.graphicsComposite.graphicCanvas.redraw();
 	}
 
-	/**
-	 * @param borderColor the curveAreaBackground to set
-	 */
 	public void setCurveAreaBorderColor(Color borderColor) {
 		this.graphicsComposite.curveAreaBorderColor = borderColor;
 		this.graphicsComposite.graphicCanvas.redraw();
 	}
 
-	/**
-	 * @param surroundingBackground the surroundingBackground to set
-	 */
 	public void setSurroundingBackground(Color surroundingBackground) {
 		this.graphicsComposite.surroundingBackground = surroundingBackground;
 		this.graphicsComposite.setBackground(surroundingBackground);
@@ -280,7 +264,6 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 
 	/**
 	 * Enable curve selector which relect to the sash form weights using the column widths.
-	 * @param enabled
 	 */
 	public void enableCurveSelector(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
@@ -290,6 +273,13 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 		} else {
 			setSashFormWeights(0);
 		}
+	}
+
+	/**
+	 * @return true if there is a measuring record with this name
+	 */
+	public boolean isMeasureRecord(String recordKeyName) {
+		return graphicsComposite.getMeasureRecord().map(r -> r.getName().equals(recordKeyName)).orElse(false);
 	}
 
 }

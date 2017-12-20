@@ -130,16 +130,20 @@ public final class HistoSetCollector {
 	/**
 	 * Sorted by recordSet startTimeStamp in reverse order; each timestamp may hold multiple vaults.
 	 */
-	private final TreeMap<Long, List<ExtendedVault>>	histoVaults				= new TreeMap<>(Collections.reverseOrder());
+	private final TreeMap<Long, List<ExtendedVault>>	histoVaults					= new TreeMap<>(Collections.reverseOrder());
 
 	/**
 	 * Excluded vaults via ignore lists
 	 */
-	private List<ExtendedVault>												suppressedVaults	= new ArrayList<>();
+	private List<ExtendedVault>												suppressedVaults		= new ArrayList<>();
 	/**
 	 * Number of files which have been read for getting vaults
 	 */
-	private int																				readFilesCount		= 0;
+	private int																				readFilesCount			= 0;
+	/**
+	 * Number of files which have log data for the object, device, analysis timespan etc.
+	 */
+	private int																				matchingFilesCount	= 0;
 	/**
 	 * Number of trusses identified in the read files
 	 */
@@ -147,16 +151,16 @@ public final class HistoSetCollector {
 	/**
 	 * Size of all the histo files which have been read to build the histo recordsets
 	 */
-	private long																			recordSetBytesSum	= 0;
+	private long																			recordSetBytesSum		= 0;
 	/**
 	 * Total time for rebuilding the HistoSet in micorseconds
 	 */
-	private int																				elapsedTime_us		= 0;
+	private int																				elapsedTime_us			= 0;
 
 	/**
 	 * Histo vault data transformed in a recordset format
 	 */
-	private TrailRecordSet														trailRecordSet		= null;
+	private TrailRecordSet														trailRecordSet			= null;
 
 	public enum LoadProgress {
 		STARTED(2), INITIALIZED(5), PATHS_VERIFIED(7), SCANNED(11), MATCHED(22), RESTORED(50), LOADED(80), CACHED(97), RECORDED(99), DONE(100);
@@ -278,6 +282,7 @@ public final class HistoSetCollector {
 		this.suppressedVaults.clear();
 
 		this.readFilesCount = 0;
+		this.matchingFilesCount = 0;
 		this.readTrussesCount = 0;
 		this.recordSetBytesSum = 0;
 		this.elapsedTime_us = 0;
@@ -578,6 +583,7 @@ public final class HistoSetCollector {
 				for (VaultCollector truss : trusses) {
 					result.add(truss);
 				}
+				this.matchingFilesCount += 1;
 			} else {
 				log.info(() -> String.format("file w/o matching data%,7d kiB %s", //$NON-NLS-1$
 						sourceFile.getFile().length() / 1024, sourceFile.getPath()));
@@ -643,6 +649,10 @@ public final class HistoSetCollector {
 
 	public int getReadFilesCount() {
 		return this.readFilesCount;
+	}
+
+	public int getMatchingFilesCount() {
+		return this.matchingFilesCount;
 	}
 
 }
