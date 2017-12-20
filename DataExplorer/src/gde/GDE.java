@@ -146,6 +146,7 @@ public class GDE {
 	public static final String							STRING_OS_NAME										= "os.name";																																																								//$NON-NLS-1$
 	public static final String							STRING_UTF_8											= "UTF-8";																																																									//$NON-NLS-1$
 	public static final String							STRING_ISO_8895_1									= "ISO-8859-1";																																																							//$NON-NLS-1$
+	public static final String							STRING_BLANK_PLUS_BLANK						= " + ";																																																											//$NON-NLS-1$
 	public static final String							STRING_PLUS												= "+";																																																											//$NON-NLS-1$
 	public static final String							STRING_MINUS											= "-";																																																											//$NON-NLS-1$
 	public static final String							STRING_TRUE												= "true";																																																										//$NON-NLS-1$
@@ -155,6 +156,8 @@ public class GDE {
 	public static final String							STRING_EXIT												= "exit - ";																																																								//$NON-NLS-1$
 	public static final String							STRING_BLANK_AT_BLANK							= " @ ";																																																										//$NON-NLS-1$
 	public static final String							STRING_GREATER										= ">";																																																											//$NON-NLS-1$
+	public static final String							STRING_ELLIPSIS										= "...";																																																								//$NON-NLS-1$
+	public static final String							STRING_CSV_SEPARATOR							= ",";																																																									//$NON-NLS-1$
 
 	public static final String[]						STRING_ARRAY_TRUE_FALSE						= new String[] { "true", "false" };																																													//$NON-NLS-1$ //$NON-NLS-2$
 

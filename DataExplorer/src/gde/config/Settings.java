@@ -178,6 +178,8 @@ public class Settings extends Properties {
 	final static String							IS_FIRST_RECORDSET_CHOICE				= "is_first_recordset_choice";																																		//$NON-NLS-1$
 	final static String							WARNING_COUNT_CSV								= "warning_count_csv";																																						//$NON-NLS-1$
 	final static String							WARNING_COUNT_INDEX							= "warning_count_index";																																					//$NON-NLS-1$
+	final static String							IS_SUMMARY_BOX_VISIBLE					= "is_summary_box_visible";																																				//$NON-NLS-1$
+	final static String							IS_SUMMARY_SPOTS_VISIBLE				= "is_summary_spots_visible";																																			//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -238,6 +240,7 @@ public class Settings extends Properties {
 	public static final String			IS_APPL_REGISTERED							= "is_GDE_registered";																																						//$NON-NLS-1$
 	public static final String			IS_LOCK_UUCP_HINTED							= "is_lock_uucp_hinted";																																					//$NON-NLS-1$
 	public static final String			LAST_UPDATE_CHECK								= "last_update_check";																																						//$NON-NLS-1$
+	public final static String			IS_OBJECT_TEMPLATES_ACTIVE			= "is_object_templates_active";																																		//$NON-NLS-1$
 
 	public final static String			GRID_DASH_STYLE									= "grid_dash_style";																																							//$NON-NLS-1$
 	public final static String			GRID_COMPARE_WINDOW_HOR_TYPE		= "grid_compare_horizontal_type";																																	//$NON-NLS-1$
@@ -735,6 +738,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_APPL_REGISTERED, this.isApplicationRegistered())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_LOCK_UUCP_HINTED, this.isLockUucpHinted())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LAST_UPDATE_CHECK, StringHelper.getDate())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_OBJECT_TEMPLATES_ACTIVE, isObjectTemplatesActive())); //$NON-NLS-1$
 			// charger specials
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_REDUCE_CHARGE_DISCHARGE, this.isReduceChargeDischarge())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ALL_IN_ONE_RECORDSET, this.isContinuousRecordSet())); //$NON-NLS-1$
@@ -787,6 +791,8 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_FIRST_RECORDSET_CHOICE, isFirstRecordSetChoice())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WARNING_COUNT_CSV, getWarningCountCsv())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WARNING_COUNT_INDEX, getWarningCountIndex())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_BOX_VISIBLE, isSummaryBoxVisible())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_SPOTS_VISIBLE, isSummarySpotsVisible())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -3042,6 +3048,48 @@ public class Settings extends Properties {
 	 */
 	public void setWarningCountIndex(String uintValue) {
 		this.setProperty(Settings.WARNING_COUNT_INDEX, String.valueOf(uintValue));
+	}
+
+	/**
+	 * @param enabled true if the summary graphics show all spots; false shows the most recent spots
+	 */
+	public void setSummaryBoxVisible(boolean enabled) {
+		this.setProperty(Settings.IS_SUMMARY_BOX_VISIBLE, String.valueOf(enabled));
+	}
+
+	/**
+	 * @return true if the summary graphics shows the boxplot
+	 */
+	public boolean isSummaryBoxVisible() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_SUMMARY_BOX_VISIBLE, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param enabled true if the summary graphics show all spots; false shows the most recent spots
+	 */
+	public void setSummarySpotsVisible(boolean enabled) {
+		this.setProperty(Settings.IS_SUMMARY_SPOTS_VISIBLE, String.valueOf(enabled));
+	}
+
+	/**
+	 * @return true if the summary graphics shows all spots; false shows the most recent spots
+	 */
+	public boolean isSummarySpotsVisible() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_SUMMARY_SPOTS_VISIBLE, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param enabled true if specific templates are available for objects
+	 */
+	public void setObjectTemplatesActive(boolean enabled) {
+		this.setProperty(Settings.IS_OBJECT_TEMPLATES_ACTIVE, String.valueOf(enabled));
+	}
+
+	/**
+	 * @return true if specific templates are available for objects
+	 */
+	public boolean isObjectTemplatesActive() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_OBJECT_TEMPLATES_ACTIVE, "true")); //$NON-NLS-1$
 	}
 
 }
