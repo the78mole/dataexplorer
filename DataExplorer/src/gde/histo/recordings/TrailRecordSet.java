@@ -38,7 +38,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
-import gde.config.Settings;
 import gde.data.AbstractRecord;
 import gde.data.AbstractRecordSet;
 import gde.data.Record;
@@ -242,7 +241,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				getDataTags().add(gpsCluster);
 				// refresh the histo table which might already have been painted without the GPS coordinates
 				if (getDataTags().getDataGpsLocations().size() > 0) {
-					application.updateHistoTableWindow(false);
+					application.getPresentHistoExplorer().updateHistoTableWindow(false);
 					log.finer(() -> "fill in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " ms!  GPS locations size=" + gpsCluster.getAssignedClusters().values().size()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}

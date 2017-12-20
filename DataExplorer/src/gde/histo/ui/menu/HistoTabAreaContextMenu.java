@@ -22,6 +22,7 @@ package gde.histo.ui.menu;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -257,13 +258,13 @@ public class HistoTabAreaContextMenu {
 								if (application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0071, new Object[] {
 										file.getAbsolutePath() })) == SWT.YES) {
 									FileUtils.deleteFile(file.getPath());
-									application.resetHisto();
+									application.getPresentHistoExplorer().resetHisto();
 								}
 							} else {
 								if (application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0050, new Object[] {
 										file.getAbsolutePath() })) == SWT.YES) {
 									FileUtils.deleteFile(file.getPath());
-									application.resetHisto();
+									application.getPresentHistoExplorer().resetHisto();
 								}
 							}
 						}
@@ -308,7 +309,7 @@ public class HistoTabAreaContextMenu {
 						settings.setSuppressMode(true);
 						application.getMenuBar().getSuppressModeItem().setSelection(true);
 
-						application.updateHistoTabs(false, true);
+						application.getPresentHistoExplorer().updateHistoTabs(false, true);
 					}
 				});
 			}
@@ -325,7 +326,7 @@ public class HistoTabAreaContextMenu {
 						settings.setSuppressMode(true);
 						application.getMenuBar().getSuppressModeItem().setSelection(true);
 
-						application.updateHistoTabs(false, true);
+						application.getPresentHistoExplorer().updateHistoTabs(false, true);
 					}
 				});
 			}
@@ -338,12 +339,11 @@ public class HistoTabAreaContextMenu {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-						if (popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()) != null)
-							ExclusionActivity.clearExcludeLists(Paths.get(popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString()).toString()).getParent());
-						else
-							ExclusionActivity.clearExcludeLists(null);
+						String dataFilePath = (String) popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString());
+						Path path = dataFilePath != null ? Paths.get(dataFilePath.toString()).getParent(): null;
+						ExclusionActivity.clearExcludeLists(path);
 
-						application.resetHisto();
+						application.getPresentHistoExplorer().resetHisto();
 					}
 				});
 			}
@@ -364,7 +364,7 @@ public class HistoTabAreaContextMenu {
 					public void widgetSelected(SelectionEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem0.widgetSelected, event=" + evt); //$NON-NLS-1$
 						setWarningCountIndex(0);
-						application.updateHistoTabs(false, false);
+						application.getPresentHistoExplorer().updateHistoTabs(false, false);
 					}
 				});
 			}
@@ -376,7 +376,7 @@ public class HistoTabAreaContextMenu {
 					public void widgetSelected(SelectionEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem1.widgetSelected, event=" + evt); //$NON-NLS-1$
 						setWarningCountIndex(1);
-						application.updateHistoTabs(false, false);
+						application.getPresentHistoExplorer().updateHistoTabs(false, false);
 					}
 				});
 			}
@@ -388,7 +388,7 @@ public class HistoTabAreaContextMenu {
 					public void widgetSelected(SelectionEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem2.widgetSelected, event=" + evt); //$NON-NLS-1$
 						setWarningCountIndex(2);
-						application.updateHistoTabs(false, false);
+						application.getPresentHistoExplorer().updateHistoTabs(false, false);
 					}
 				});
 			}
@@ -400,7 +400,7 @@ public class HistoTabAreaContextMenu {
 					public void widgetSelected(SelectionEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem3.widgetSelected, event=" + evt); //$NON-NLS-1$
 						setWarningCountIndex(3);
-						application.updateHistoTabs(false, false);
+						application.getPresentHistoExplorer().updateHistoTabs(false, false);
 					}
 				});
 			}
@@ -417,7 +417,7 @@ public class HistoTabAreaContextMenu {
 						settings.setSuppressMode(suppressModeItem.getSelection());
 						application.getMenuBar().getSuppressModeItem().setSelection(suppressModeItem.getSelection());
 
-						application.resetHisto();
+						application.getPresentHistoExplorer().resetHisto();
 					}
 				});
 			}
@@ -429,8 +429,9 @@ public class HistoTabAreaContextMenu {
 				public void handleEvent(Event e) {
 					HistoTabAreaContextMenu.log.log(Level.FINEST, "curveSelectionItem action performed! " + e); //$NON-NLS-1$
 					boolean selection = curveSelectionItem.getSelection();
-					application.setCurveSelectorEnabled(selection);
+					application.enableCurveSelector(selection);
 					application.getMenuBar().getCurveSelectionMenuItem().setSelection(selection);
+					application.getPresentHistoExplorer().updateHistoTabs(false, false);
 				}
 			});
 			displayGraphicsHeaderItem = new MenuItem(popupMenu, SWT.CHECK);
@@ -442,7 +443,7 @@ public class HistoTabAreaContextMenu {
 					boolean selection = displayGraphicsHeaderItem.getSelection();
 					application.getMenuBar().getGraphicsHeaderMenuItem().setSelection(selection);
 					application.enableGraphicsHeader(selection);
-					application.updateHistoTabs(false, false);
+					application.getPresentHistoExplorer().updateHistoTabs(false, false);
 				}
 			});
 			displayGraphicsCommentItem = new MenuItem(popupMenu, SWT.CHECK);
@@ -455,7 +456,7 @@ public class HistoTabAreaContextMenu {
 					boolean selection = displayGraphicsCommentItem.getSelection();
 					application.getMenuBar().getRecordCommentMenuItem().setSelection(selection);
 					application.enableRecordSetComment(selection);
-					application.updateHistoTabs(false, false);
+					application.getPresentHistoExplorer().updateHistoTabs(false, false);
 				}
 			});
 
@@ -468,8 +469,8 @@ public class HistoTabAreaContextMenu {
 					HistoTabAreaContextMenu.log.log(Level.FINEST, "displayGraphicsCurveSurvey action performed! " + e); //$NON-NLS-1$
 					boolean selection = displayGraphicsCurveSurvey.getSelection();
 					application.getMenuBar().getGraphicsCurveSurveyMenuItem().setSelection(selection);
-					application.enableCurveSurvey(selection);
-					application.updateHistoTabs(false, false);
+					application.getPresentHistoExplorer().enableCurveSurvey(selection);
+					application.getPresentHistoExplorer().updateHistoTabs(false, false);
 				}
 			});
 			separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);
@@ -570,7 +571,7 @@ public class HistoTabAreaContextMenu {
 						HistoTabAreaContextMenu.log.log(Level.FINEST, "partialTableItem action performed! " + e); //$NON-NLS-1$
 						Settings.getInstance().setPartialDataTable(partialTableItem.getSelection());
 						application.updateAllTabs(true, false);
-						application.updateHistoTabs(false, false);
+						application.getPresentHistoExplorer().updateHistoTabs(false, false);
 					}
 				});
 			}
@@ -596,13 +597,14 @@ public class HistoTabAreaContextMenu {
 		if (warningCountItem2 != null) warningCountItem2.setEnabled(enabled);
 		if (warningCountItem3 != null) warningCountItem3.setEnabled(enabled);
 
-		if (curveSelectionItem != null) curveSelectionItem.setEnabled(enabled);
-		if (displayGraphicsHeaderItem != null) displayGraphicsHeaderItem.setEnabled(enabled);
-		if (displayGraphicsCommentItem != null) displayGraphicsCommentItem.setEnabled(enabled);
-		if (displayGraphicsCurveSurvey != null) displayGraphicsCurveSurvey.setEnabled(enabled);
-		if (separatorView != null) separatorView.setEnabled(enabled);
-		if (copyTabItem != null) copyTabItem.setEnabled(enabled);
-		if (copyPrintImageItem != null) copyPrintImageItem.setEnabled(enabled);
+		curveSelectionItem.setEnabled(enabled);
+		displayGraphicsHeaderItem.setEnabled(enabled);
+		displayGraphicsCommentItem.setEnabled(enabled);
+		displayGraphicsCurveSurvey.setEnabled(enabled);
+		separatorView.setEnabled(enabled);
+		copyTabItem.setEnabled(enabled);
+		copyPrintImageItem.setEnabled(enabled);
+
 		if (separatorCopy != null) separatorCopy.setEnabled(enabled);
 		if (outherAreaColorItem != null) outherAreaColorItem.setEnabled(enabled);
 		if (innerAreaColorItem != null) innerAreaColorItem.setEnabled(enabled);

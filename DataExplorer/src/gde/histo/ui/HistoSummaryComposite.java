@@ -165,7 +165,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 					{ // getBaseTexts
 						StringBuilder sb = new StringBuilder();
 						String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
-						for (Entry<DirectoryType, Path> directoryEntry : DataExplorer.getInstance().getHistoSet().getValidatedDirectories().entrySet()) {
+						for (Entry<DirectoryType, Path> directoryEntry : presentHistoExplorer.getHistoSet().getValidatedDirectories().entrySet()) {
 							String fileName = directoryEntry.getValue().getFileName().toString();
 							String truncatedPath = fileName.length() > 22 ? fileName.substring(0, 22) + ellipsisText : fileName;
 							sb.append(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK).append(truncatedPath);
@@ -597,10 +597,11 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 	@Override
 	protected void setRecordSetCommentStandard() {
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		if (settings.isSmartStatistics())
-			this.recordSetComment.setText(this.application.getHistoSet().getDirectoryScanStatistics());
-		else
+		if (settings.isSmartStatistics()) {
+			this.recordSetComment.setText(presentHistoExplorer.getHistoSet().getDirectoryScanStatistics());
+		} else {
 			this.recordSetComment.setText("supported only for smart statistics");
+		}
 	}
 
 }

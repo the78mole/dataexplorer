@@ -66,6 +66,7 @@ import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.ui.DataExplorer.HistoExplorer;
 import gde.ui.SWTResourceManager;
 
 /**
@@ -73,44 +74,50 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public class HistoTableWindow extends CTabItem {
-	private final static String						$CLASS_NAME					= HistoTableWindow.class.getName();
-	private final static Logger						log									= Logger.getLogger($CLASS_NAME);
+	private final static String						$CLASS_NAME						= HistoTableWindow.class.getName();
+	private final static Logger						log										= Logger.getLogger($CLASS_NAME);
 
-	private static final int							TEXT_EXTENT_FACTOR	= 6;
+	private static final int							TEXT_EXTENT_FACTOR		= 6;
 
-	private Table													dataTable;
-	private TableColumn										recordsColumn;
-	private TableCursor										cursor;
-	private Vector<Integer>								rowVector						= new Vector<Integer>(2);
-	private Vector<Integer>								topindexVector			= new Vector<Integer>(2);
+	private final HistoExplorer						presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
+	private final Channels								channels							= Channels.getInstance();
+	private final Settings								settings							= Settings.getInstance();
 
-	private final DataExplorer						application;
-	private final Channels								channels;
-	private final Settings								settings;
 	private final CTabFolder							tabFolder;
 	private final Menu										popupmenu;
 	private final HistoTabAreaContextMenu	contextMenu;
 
-	public HistoTableWindow(CTabFolder dataTab, int style, int position) {
+	private Table													dataTable;
+	private TableColumn										recordsColumn;
+	private TableCursor										cursor;
+	private Vector<Integer>								rowVector							= new Vector<Integer>(2);
+	private Vector<Integer>								topindexVector				= new Vector<Integer>(2);
+
+	private HistoTableWindow(CTabFolder dataTab, int style, int position) {
 		super(dataTab, style, position);
 		SWTResourceManager.registerResourceUser(this);
 		this.tabFolder = dataTab;
-		this.application = DataExplorer.getInstance();
-		this.channels = Channels.getInstance();
-		this.settings = Settings.getInstance();
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+
+		this.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0793));
 
-		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.popupmenu = new Menu(DataExplorer.getInstance().getShell(), SWT.POP_UP);
 		this.contextMenu = new HistoTabAreaContextMenu();
 	}
 
-	public void create() {
-		this.dataTable = new Table(this.tabFolder, SWT.VIRTUAL | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
-		this.setControl(this.dataTable);
-		this.dataTable.setLinesVisible(true);
-		this.dataTable.setHeaderVisible(true);
+	public static HistoTableWindow create(CTabFolder dataTab, int style, int position) {
+		HistoTableWindow window = new HistoTableWindow(dataTab, style, position);
 
+		window.dataTable = new Table(window.tabFolder, SWT.VIRTUAL | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
+		window.setControl(window.dataTable);
+		window.dataTable.setLinesVisible(true);
+		window.dataTable.setHeaderVisible(true);
+
+		window.initGui();
+		return window;
+	}
+
+	private void initGui() {
 		final TableEditor editor = new TableEditor(this.dataTable);
 		editor.horizontalAlignment = SWT.LEFT;
 		editor.grabHorizontal = true;
@@ -260,7 +267,7 @@ public class HistoTableWindow extends CTabItem {
 				}
 
 				TrailRecordSet trailRecordSet = Channels.getInstance().getActiveChannel() != null //
-						? trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet() //
+						? trailRecordSet = presentHistoExplorer.getHistoSet().getTrailRecordSet() //
 						: null;
 				int rowNumber = HistoTableWindow.this.dataTable.indexOf(HistoTableWindow.this.cursor.getRow()); // 0-based
 				int columnNumber = HistoTableWindow.this.cursor.getColumn(); // 0-based
@@ -293,7 +300,7 @@ public class HistoTableWindow extends CTabItem {
 		this.dataTable.addListener(SWT.SetData, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
+				TrailRecordSet trailRecordSet = presentHistoExplorer.getHistoSet().getTrailRecordSet();
 				if (trailRecordSet.size() > 0) {
 					TableItem item = (TableItem) event.item;
 					Vector<TrailRecord> currentRecords = trailRecordSet.getVisibleAndDisplayableRecordsForTable();
@@ -401,7 +408,7 @@ public class HistoTableWindow extends CTabItem {
 	}
 
 	public boolean isHeaderTextValid() {
-		String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(DataExplorer.getInstance().getHistoSet().getTrailRecordSet());
+		String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(presentHistoExplorer.getHistoSet().getTrailRecordSet());
 		if (tableHeaderRow.length == this.dataTable.getColumnCount() - 2) {
 			boolean isValid = true;
 			for (int i = 0; i < tableHeaderRow.length; i++) {
@@ -416,7 +423,7 @@ public class HistoTableWindow extends CTabItem {
 
 	public boolean isRowTextAndTrailValid() {
 		boolean isValid = false;
-		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
+		TrailRecordSet trailRecordSet = presentHistoExplorer.getHistoSet().getTrailRecordSet();
 		for (int j = 0; j < this.dataTable.getItems().length; j++) {
 			TableItem tableItem = this.dataTable.getItems()[j];
 			int index = HistoTableWindow.this.dataTable.indexOf(tableItem);
@@ -455,7 +462,7 @@ public class HistoTableWindow extends CTabItem {
 
 		// set the data columns of the new header line
 		Channel activeChannel = this.channels.getActiveChannel();
-		HistoSet histoSet = DataExplorer.getInstance().getHistoSet();
+		HistoSet histoSet = presentHistoExplorer.getHistoSet();
 		if (activeChannel != null && histoSet != null && histoSet.getTrailRecordSet() != null) {
 			String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(histoSet.getTrailRecordSet());
 			if (tableHeaderRow.length > 0) {

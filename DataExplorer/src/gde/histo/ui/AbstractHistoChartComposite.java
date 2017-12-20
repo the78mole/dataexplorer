@@ -21,18 +21,6 @@ package gde.histo.ui;
 
 import static java.util.logging.Level.FINER;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channels;
-import gde.histo.recordings.TrailRecordSet;
-import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
-import gde.histo.ui.menu.HistoTabAreaContextMenu;
-import gde.log.Logger;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.GraphicsUtils;
-import gde.utils.StringHelper;
-
 import java.util.Date;
 
 import org.eclipse.swt.SWT;
@@ -47,6 +35,21 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channels;
+import gde.histo.recordings.TrailRecordSet;
+import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
+import gde.histo.ui.menu.HistoTabAreaContextMenu;
+import gde.log.Logger;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.DataExplorer.HistoExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.GraphicsUtils;
+import gde.utils.StringHelper;
+
 /**
  * Histo chart drawing area base class.
  * @author Thomas Eickert (USER)
@@ -55,8 +58,8 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	private final static String				$CLASS_NAME							= HistoSummaryComposite.class.getName();
 	private final static Logger				log											= Logger.getLogger($CLASS_NAME);
 
-	protected final static int				DEFAULT_TOP_GAP					= 5;																		// free gap on top of the curves
-	protected final static int				DEFAULT_SIDE_GAP				= 10;																		// free gap at the leftmost and rightmost graphics
+	protected final static int				DEFAULT_TOP_GAP					= 5;																		// space on top of the curves
+	protected final static int				DEFAULT_SIDE_GAP				= 10;																		// space at the leftmost and rightmost graphics
 	protected final static int				DEFAULT_BOTTOM_GAP			= 20;																		// space at the bottom of the plots for the scale
 	protected final static int				DEFAULT_HEADER_GAP			= 5;
 	protected final static int				DEFAULT_COMMENT_GAP			= 5;
@@ -64,6 +67,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	protected final static int				ZERO_CANVAS_HEIGHT			= 11;																		// minimize if smart statistics is not active
 
 	protected final DataExplorer			application							= DataExplorer.getInstance();
+	protected final HistoExplorer			presentHistoExplorer		= DataExplorer.getInstance().getPresentHistoExplorer();
 	protected final Settings					settings								= Settings.getInstance();
 	protected final Channels					channels								= Channels.getInstance();
 
@@ -98,11 +102,11 @@ public abstract class AbstractHistoChartComposite extends Composite {
 
 	public AbstractHistoChartComposite(Composite parent, int style) {
 		super(parent, style);
-		trailRecordSet = this.channels.getActiveChannel() != null ? this.application.getHistoSet().getTrailRecordSet() : null;
+		trailRecordSet = this.channels.getActiveChannel() != null ? this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet() : null;
 	}
 
 	protected TrailRecordSet retrieveTrailRecordSet() {
-		return this.channels.getActiveChannel() != null ? this.application.getHistoSet().getTrailRecordSet() : null;
+		return this.channels.getActiveChannel() != null ? this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet() : null;
 	}
 
 	/**
@@ -145,7 +149,8 @@ public abstract class AbstractHistoChartComposite extends Composite {
 
 	protected void setRecordSetCommentStandard() {
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		this.recordSetComment.setText(this.application.getHistoSet().getDirectoryScanStatistics());
+		this.recordSetComment.setText(this.application.getPresentHistoExplorer().getHistoSet().getDirectoryScanStatistics());
+		this.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0896));
 	}
 
 	/**

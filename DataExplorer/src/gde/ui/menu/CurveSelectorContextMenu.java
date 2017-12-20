@@ -110,7 +110,7 @@ public class CurveSelectorContextMenu {
 							CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
 							CurveSelectorContextMenu.this.isTypeCompare = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.COMPARE);
 							CurveSelectorContextMenu.this.isTypeUtility = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.UTIL);
-							CurveSelectorContextMenu.this.isTypeHisto = CurveSelectorContextMenu.this.application.isHistoChartWindowVisible();
+							CurveSelectorContextMenu.this.isTypeHisto = CurveSelectorContextMenu.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false);
 							CurveSelectorContextMenu.this.recordSet = CurveSelectorContextMenu.this.application.getRecordSetOfVisibleTab();
 
 							if (CurveSelectorContextMenu.this.recordSet != null) {
@@ -141,8 +141,8 @@ public class CurveSelectorContextMenu {
 										}
 
 										// check measurement selections
-										//deltaMeasure.setSelection(recordSet.isDeltaMeasurementMode(recordNameKey));
-										//disable all menu items which makes only sense if record is visible
+										// deltaMeasure.setSelection(recordSet.isDeltaMeasurementMode(recordNameKey));
+										// disable all menu items which makes only sense if record is visible
 										if (!CurveSelectorContextMenu.this.isRecordVisible) {
 											CurveSelectorContextMenu.this.copyCurveCompare.setEnabled(false);
 										}
@@ -227,7 +227,7 @@ public class CurveSelectorContextMenu {
 					if (CurveSelectorContextMenu.this.recordSet != null) {
 						boolean checked = CurveSelectorContextMenu.this.lineVisible.getSelection();
 						CurveSelectorContextMenu.this.actualRecord.setVisible(checked);
-						//CurveSelectorContextMenu.this.selectedItem.setChecked(checked);
+						// CurveSelectorContextMenu.this.selectedItem.setChecked(checked);
 						CurveSelectorContextMenu.this.recordSet.syncScaleOfSyncableRecords();
 						//if (!CurveSelectorContextMenu.this.isTypeHisto) ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
@@ -451,7 +451,7 @@ public class CurveSelectorContextMenu {
 					if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet != null) {
 						boolean checked = CurveSelectorContextMenu.this.smoothAtCurrentDropItem.getSelection();
 						((RecordSet) CurveSelectorContextMenu.this.recordSet).setSmoothAtCurrentDrop(checked);
-						//((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						// ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
@@ -466,7 +466,7 @@ public class CurveSelectorContextMenu {
 					if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet != null) {
 						boolean checked = CurveSelectorContextMenu.this.smoothVoltageCurveItem.getSelection();
 						((RecordSet) CurveSelectorContextMenu.this.recordSet).setSmoothVoltageCurve(checked);
-						//((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						// ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 					}
 				}
@@ -526,7 +526,7 @@ public class CurveSelectorContextMenu {
 				public void handleEvent(Event e) {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisEndRound.SelectionListener = " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
-						if (CurveSelectorContextMenu.this.axisEndRound.getSelection()) { //true
+						if (CurveSelectorContextMenu.this.axisEndRound.getSelection()) { // true
 							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
 							CurveSelectorContextMenu.this.actualRecord.setRoundOut(true);
 							CurveSelectorContextMenu.this.axisEndManual.setSelection(false);
@@ -584,7 +584,7 @@ public class CurveSelectorContextMenu {
 						record.setStartpointZero(false);
 						CurveSelectorContextMenu.this.axisEndRound.setSelection(false);
 						record.setRoundOut(false);
-						//ET 26.09.2017 do not call getMin... because it is not supported for TrailRecords (parent!)
+						// ET 26.09.2017 do not call getMin... because it is not supported for TrailRecords (parent!)
 						double[] oldMinMax = new double[] { record.getMinScaleValue(), record.getMaxScaleValue() };
 						double[] newMinMax = CurveSelectorContextMenu.this.axisEndValuesDialog.open(oldMinMax);
 						record.setStartEndDefined(true, newMinMax[0], newMinMax[1]);
@@ -834,7 +834,7 @@ public class CurveSelectorContextMenu {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "timeGridOff Action performed! " + e); //$NON-NLS-1$
 					if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet != null) {
 						((RecordSet) CurveSelectorContextMenu.this.recordSet).setTimeGridType(RecordSet.TIME_GRID_NONE);
-						//((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						// ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
 						if (CurveSelectorContextMenu.this.isTypeCompare) {
@@ -851,7 +851,7 @@ public class CurveSelectorContextMenu {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "timeGridMain Action performed! " + e); //$NON-NLS-1$
 					if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						((RecordSet) CurveSelectorContextMenu.this.recordSet).setTimeGridType(RecordSet.TIME_GRID_NONE);
-						//((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						// ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
 						if (CurveSelectorContextMenu.this.isTypeCompare) {
@@ -870,7 +870,7 @@ public class CurveSelectorContextMenu {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "timeGridMod60 Action performed! " + e); //$NON-NLS-1$
 					if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						((RecordSet) CurveSelectorContextMenu.this.recordSet).setTimeGridType(RecordSet.TIME_GRID_NONE);
-						//((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+						// ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
 						if (CurveSelectorContextMenu.this.isTypeCompare) {
@@ -891,7 +891,7 @@ public class CurveSelectorContextMenu {
 						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
 							((RecordSet) CurveSelectorContextMenu.this.recordSet).setTimeGridType(RecordSet.TIME_GRID_NONE);
-							//((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+							// ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
 							if (CurveSelectorContextMenu.this.isTypeCompare) {
@@ -903,18 +903,18 @@ public class CurveSelectorContextMenu {
 					}
 				}
 			});
-			//			timeGridLineStyle = new MenuItem(timeGridMenu, SWT.PUSH);
-			//			timeGridLineStyle.setText("Linientype");
-			//			timeGridLineStyle.setEnabled(false);
-			//			timeGridLineStyle.addListener(SWT.Selection, new Listener() {
-			//				public void handleEvent(Event e) {
-			//					log.log(Level.FINEST, "timeGridLineStyle Action performed!");
-			//					if (recordNameKey != null) {
-			//						recordSet.setTimeGridLineStyle(SWT.LINE_DOT);
-			//						application.updateGraphicsWindow();
-			//					}
-			//				}
-			//			});
+			// timeGridLineStyle = new MenuItem(timeGridMenu, SWT.PUSH);
+			// timeGridLineStyle.setText("Linientype");
+			// timeGridLineStyle.setEnabled(false);
+			// timeGridLineStyle.addListener(SWT.Selection, new Listener() {
+			// public void handleEvent(Event e) {
+			// log.log(Level.FINEST, "timeGridLineStyle Action performed!");
+			// if (recordNameKey != null) {
+			// recordSet.setTimeGridLineStyle(SWT.LINE_DOT);
+			// application.updateGraphicsWindow();
+			// }
+			// }
+			// });
 
 			this.valueGrid = new MenuItem(popupmenu, SWT.CASCADE);
 			this.valueGrid.setText(Messages.getString(MessageIds.GDE_MSGT0100));
@@ -1043,18 +1043,18 @@ public class CurveSelectorContextMenu {
 					}
 				}
 			});
-			//			horizontalGridLineStyle = new MenuItem(horizontalGridMenu, SWT.PUSH);
-			//			horizontalGridLineStyle.setText("Linientype");
-			//			horizontalGridLineStyle.setEnabled(false);
-			//			horizontalGridLineStyle.addListener(SWT.Selection, new Listener() {
-			//				public void handleEvent(Event e) {
-			//					log.log(Level.FINEST, "horizontalGridLineStyle Action performed!");
-			//					if (recordNameKey != null) {
-			//						recordSet.setHorizontalGridLineStyle(SWT.LINE_DASH);
-			//						application.updateGraphicsWindow();
-			//					}
-			//				}
-			//			});
+			// horizontalGridLineStyle = new MenuItem(horizontalGridMenu, SWT.PUSH);
+			// horizontalGridLineStyle.setText("Linientype");
+			// horizontalGridLineStyle.setEnabled(false);
+			// horizontalGridLineStyle.addListener(SWT.Selection, new Listener() {
+			// public void handleEvent(Event e) {
+			// log.log(Level.FINEST, "horizontalGridLineStyle Action performed!");
+			// if (recordNameKey != null) {
+			// recordSet.setHorizontalGridLineStyle(SWT.LINE_DASH);
+			// application.updateGraphicsWindow();
+			// }
+			// }
+			// });
 
 			new MenuItem(popupmenu, SWT.SEPARATOR);
 
@@ -1134,7 +1134,7 @@ public class CurveSelectorContextMenu {
 							newRecord.setDescription(copyFromRecordSet.getRecordSetDescription());
 							newRecord.setVisible(true); // if a non visible record added
 
-							if (compareSet.size() == 1) { //set grid line mode and color from settings (previous compare behavior)
+							if (compareSet.size() == 1) { // set grid line mode and color from settings (previous compare behavior)
 								compareSet.setValueGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalType());
 								compareSet.setValueGridColor(CurveSelectorContextMenu.this.settings.getGridCompareWindowHorizontalColor());
 								compareSet.setTimeGridType(CurveSelectorContextMenu.this.settings.getGridCompareWindowVerticalType());
@@ -1208,7 +1208,7 @@ public class CurveSelectorContextMenu {
 						else
 							CurveSelectorContextMenu.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0005));
 
-						//this is required before zoom operation
+						// this is required before zoom operation
 						CurveSelectorContextMenu.this.application.setCompareWindowMode(GraphicsMode.RESET, false);
 					}
 				}

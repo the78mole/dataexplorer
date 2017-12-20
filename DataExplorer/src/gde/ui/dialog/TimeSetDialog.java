@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
     							2016,2017 Thomas Eickert
 ****************************************************************************************/
@@ -70,7 +70,7 @@ public class TimeSetDialog extends Dialog {
 	private GregorianCalendar	calendar;
 
 	/**
-	* Auto-generated main method to display this 
+	* Auto-generated main method to display this
 	* org.eclipse.swt.widgets.Dialog inside a new Shell.
 	*/
 	public static void main(String[] args) {
@@ -125,7 +125,7 @@ public class TimeSetDialog extends Dialog {
 							activeChannel.setFileDescription(description);
 						}
 						TimeSetDialog.this.application.updateAllTabs(true, true);
-						TimeSetDialog.this.application.updateHistoTabs(false, false);
+						TimeSetDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
 					}
 				}
 			});

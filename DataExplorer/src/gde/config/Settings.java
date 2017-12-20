@@ -68,6 +68,7 @@ import org.xml.sax.SAXException;
 import gde.GDE;
 import gde.device.DeviceConfiguration;
 import gde.exception.ApplicationConfigurationException;
+import gde.histo.datasources.HistoSet;
 import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
@@ -2874,7 +2875,7 @@ public class Settings extends Properties {
 	 */
 	public void setDataSettingsAtHomePath(boolean isDataSettingsAtHomePath) {
 		if (this.isDataSettingsAtHomePath() != isDataSettingsAtHomePath) {
-			DataExplorer.getInstance().getHistoSet().cleanExclusionData();
+			HistoSet.cleanExclusionData();
 			this.setProperty(Settings.IS_DATA_SETTINGS_AT_HOME_PATH, String.valueOf(isDataSettingsAtHomePath));
 		}
 	}

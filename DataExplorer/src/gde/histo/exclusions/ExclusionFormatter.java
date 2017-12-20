@@ -37,7 +37,7 @@ public final class ExclusionFormatter {
 	 */
 	public static String getExcludedTrussesAsText() {
 		Set<String> exclusionTexts = new HashSet<>();
-		for (Path path : DataExplorer.getInstance().getHistoSet().getExcludedPaths()) {
+		for (Path path : DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths()) {
 			exclusionTexts.add(getFormattedProperty(ExclusionData.getInstance(path.getParent()),path.getFileName().toString()));
 		}
 

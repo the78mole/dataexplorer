@@ -28,6 +28,7 @@ import gde.config.Settings;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
+import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
 /**
@@ -38,24 +39,23 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 	private final static String	$CLASS_NAME	= HistoSummaryWindow.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	public HistoSummaryWindow(CTabFolder currentDisplayTab, int style, int index) {
+	private HistoSummaryWindow(CTabFolder currentDisplayTab, int style, int index) {
 		super(currentDisplayTab, style, index);
 	}
 
-	public synchronized void create() {
-		this.graphicSashForm = new SashForm(this.tabFolder, SWT.HORIZONTAL);
-		this.setControl(this.graphicSashForm);
+	public static HistoSummaryWindow create(CTabFolder dataTab, int style, int position) {
+		HistoSummaryWindow window = new HistoSummaryWindow(dataTab, style, position);
 
-		// determine the selector which is shared by all chart windows
-		HistoSelectorComposite selectorComposite = this.application.getHistoChartSelectorComposite();
-		this.curveSelectorComposite = selectorComposite != null ? selectorComposite : new HistoSelectorComposite(this.graphicSashForm);
-		this.curveSelectorComposite = new HistoSelectorComposite(this.graphicSashForm);
+		window.graphicSashForm = new SashForm(window.tabFolder, SWT.HORIZONTAL);
+		window.setControl(window.graphicSashForm);
 
-		this.graphicsComposite = new HistoSummaryComposite(this.graphicSashForm);
-		this.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
+		window.curveSelectorComposite = new HistoSelectorComposite(window.graphicSashForm);
+		window.graphicsComposite = new HistoSummaryComposite(window.graphicSashForm);
+		window.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
 
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-		this.setText(Messages.getString(MessageIds.GDE_MSGT0883));
+		window.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+		window.setText(Messages.getString(MessageIds.GDE_MSGT0883));
+		return window;
 	}
 
 	@Override

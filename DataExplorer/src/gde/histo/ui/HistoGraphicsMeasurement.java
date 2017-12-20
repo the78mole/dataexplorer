@@ -198,8 +198,8 @@ public final class HistoGraphicsMeasurement {
 	public HistoGraphicsMeasurement(HistoGraphicsComposite graphicsComposite) {
 		this.graphicsComposite = graphicsComposite;
 
-		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
-		this.trailRecord = (TrailRecord) trailRecordSet.get(trailRecordSet.getRecordKeyMeasurement());
+		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getTrailRecordSet();
+		this.trailRecord = trailRecordSet.get(trailRecordSet.getRecordKeyMeasurement());
 
 		this.curveSurvey = new CurveSurvey(this.canvasGC, this.trailRecord, graphicsComposite.timeLine);
 	}
@@ -208,7 +208,7 @@ public final class HistoGraphicsMeasurement {
 	 * Draw a refreshed measurement.
 	 */
 	public void drawMeasurement() {
-		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
+		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getTrailRecordSet();
 		if (trailRecordSet.isSurveyMode(trailRecordSet.getRecordKeyMeasurement())) {
 			drawMeasurement(this.curveSurvey.getTimestampMeasure_ms(), this.curveSurvey.getTimestampDelta_ms());
 		}

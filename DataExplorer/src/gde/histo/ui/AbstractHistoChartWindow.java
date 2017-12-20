@@ -34,6 +34,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import gde.GDE;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
+import gde.ui.DataExplorer.HistoExplorer;
 import gde.ui.SWTResourceManager;
 
 /**
@@ -64,7 +65,7 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 		return new ImageData(inputImageData.width, inputImageData.height, inputImageData.depth, inputImageData.palette, outBytesPerLine, outDataBytes);
 	}
 
-	protected final DataExplorer					application							= DataExplorer.getInstance();
+	protected final HistoExplorer					presentHistoExplorer		= DataExplorer.getInstance().getPresentHistoExplorer();
 
 	protected final CTabFolder						tabFolder;
 
@@ -89,7 +90,7 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	 * Redraw the graphics canvas as well as the curve selector table.
 	 */
 	public void redrawGraphics(final boolean redrawCurveSelector) {
-		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			if (redrawCurveSelector) this.curveSelectorComposite.doUpdateCurveSelectorTable();
 			setFixedGraphicCanvas();
 
@@ -119,7 +120,7 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	 * Update graphics window header and description.
 	 */
 	public void updateCaptions() {
-		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			this.graphicsComposite.updateCaptions();
 		} else {
 			GDE.display.asyncExec(new Runnable() {
@@ -135,7 +136,7 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	 * Method to update the curves displayed in the curve selector panel.
 	 */
 	public void updateCurveSelectorTable() {
-		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			this.curveSelectorComposite.doUpdateCurveSelectorTable();
 		} else {
 			GDE.display.asyncExec(new Runnable() {
@@ -154,7 +155,7 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 		log.log(FINER, "newSelectorCompositeWidth= ", newSelectorCompositeWidth); //$NON-NLS-1$
 		int tabFolderClientAreaWidth = this.tabFolder.getBounds().width;
 		// begin workaround: sometimes tabFolder.getClientArea().width returned values greater than screen size ????
-		int bestGuessWidth = this.application.getClientArea().width;
+		int bestGuessWidth = DataExplorer.getInstance().getClientArea().width;
 		if (tabFolderClientAreaWidth > bestGuessWidth) {
 			log.log(WARNING, "tabFolder clientAreaWidth missmatch, tabFolderWidth = " + tabFolderClientAreaWidth + " vs applicationWidth = " + bestGuessWidth); //$NON-NLS-1$ //$NON-NLS-2$
 			tabFolderClientAreaWidth = bestGuessWidth;
@@ -282,7 +283,7 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	 * Enable curve selector which relect to the sash form weights using the column widths.
 	 * @param enabled
 	 */
-	public void setCurveSelectorEnabled(boolean enabled) {
+	public void enableCurveSelector(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
 		this.graphicsComposite.setCurveSelectorEnabled(enabled);
 		if (enabled) {

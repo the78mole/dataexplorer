@@ -49,6 +49,7 @@ import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.ui.DataExplorer.HistoExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.CurveSelectorContextMenu;
 
@@ -64,7 +65,7 @@ public final class HistoSelectorComposite extends Composite {
 
 	private static final int				TEXT_EXTENT_FACTOR			= 6;
 
-	private final DataExplorer			application							= DataExplorer.getInstance();
+	private final HistoExplorer			presentHistoExplorer		= DataExplorer.getInstance().getPresentHistoExplorer();
 	private final Menu							popupmenu;
 	final CurveSelectorContextMenu	contextMenu;
 
@@ -88,7 +89,7 @@ public final class HistoSelectorComposite extends Composite {
 		super(useParent, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
 
-		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
+		this.popupmenu = new Menu(DataExplorer.getInstance().getShell(), SWT.POP_UP);
 		this.contextMenu = new CurveSelectorContextMenu();
 		this.contextMenu.createMenu(HistoSelectorComposite.this.popupmenu);
 
@@ -104,7 +105,7 @@ public final class HistoSelectorComposite extends Composite {
 			@Override
 			public void helpRequested(HelpEvent evt) {
 				log.log(FINEST, "helpRequested ", evt); //$NON-NLS-1$
-				HistoSelectorComposite.this.application.openHelpDialog("", "HelpInfo_41.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_41.html"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 		{
@@ -126,14 +127,14 @@ public final class HistoSelectorComposite extends Composite {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					log.fine(() -> "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
-					HistoSelectorComposite.this.application.clearMeasurementModes();
+					HistoSelectorComposite.this.presentHistoExplorer.clearMeasurementModes();
 					if (!HistoSelectorComposite.this.curveSelectorHeader.getSelection()) {
 						// use this check button to deselect all selected curves
 						for (TableItem tableItem : HistoSelectorComposite.this.curveSelectorTable.getItems()) {
 							if (tableItem.getChecked()) {
 								// avoid phantom measurements with invisible curves
 								final TrailRecord activeRecord = getTableItemRecord(tableItem);
-								TrailRecordSet trailRecordSet = HistoSelectorComposite.this.application.getHistoSet().getTrailRecordSet();
+								TrailRecordSet trailRecordSet = HistoSelectorComposite.this.presentHistoExplorer.getHistoSet().getTrailRecordSet();
 								if (trailRecordSet.getRecordKeyMeasurement().equals(activeRecord.getName())) {
 									HistoSelectorComposite.this.contextMenu.setMeasurement(activeRecord.getName(), false);
 									HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(activeRecord.getName(), false);
@@ -149,7 +150,7 @@ public final class HistoSelectorComposite extends Composite {
 						}
 					}
 					doUpdateCurveSelectorTable();
-					HistoSelectorComposite.this.application.updateHistoChartWindow(false);
+					HistoSelectorComposite.this.presentHistoExplorer.updateHistoChartWindow(false);
 				}
 			});
 		}
@@ -175,7 +176,7 @@ public final class HistoSelectorComposite extends Composite {
 						// avoid phantom measurements with invisible curves
 						log.finer(() -> "checked/Old=" + eventItem.getChecked() + eventItem.getData(DataExplorer.OLD_STATE)); //$NON-NLS-1$
 						final TrailRecord activeRecord = getTableItemRecord(eventItem);
-						TrailRecordSet trailRecordSet = HistoSelectorComposite.this.application.getHistoSet().getTrailRecordSet();
+						TrailRecordSet trailRecordSet = HistoSelectorComposite.this.presentHistoExplorer.getHistoSet().getTrailRecordSet();
 						if (!eventItem.getChecked() && (Boolean) eventItem.getData(DataExplorer.OLD_STATE) //
 								&& trailRecordSet.getRecordKeyMeasurement().equals(activeRecord.getName())) {
 							HistoSelectorComposite.this.contextMenu.setMeasurement(activeRecord.getName(), false);
@@ -184,7 +185,7 @@ public final class HistoSelectorComposite extends Composite {
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, eventItem.getData(DataExplorer.RECORD_NAME));
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);
 						if (toggleRecordSelection(eventItem, true, false)) {
-							HistoSelectorComposite.this.application.updateHistoChartWindow(false);
+							HistoSelectorComposite.this.presentHistoExplorer.updateHistoChartWindow(false);
 						}
 					}
 				}
@@ -218,7 +219,7 @@ public final class HistoSelectorComposite extends Composite {
 		int itemWidth2 = this.initialCurveTypeColumnWidth;
 		int textSize2 = 10;
 		boolean isOneVisible = false;
-		TrailRecordSet recordSet = HistoSelectorComposite.this.application.getHistoSet().getTrailRecordSet();
+		TrailRecordSet recordSet = HistoSelectorComposite.this.presentHistoExplorer.getHistoSet().getTrailRecordSet();
 		if (recordSet != null) {
 			Combo[] selectorCombos = new Combo[recordSet.size()];
 			this.editors = new TableEditor[recordSet.size()];
@@ -247,8 +248,8 @@ public final class HistoSelectorComposite extends Composite {
 						public void widgetSelected(SelectionEvent event) {
 							log.fine("selectorCombos.SelectionListener, event=" + event); //$NON-NLS-1$
 							Combo combo = (Combo) event.getSource();
-							recordSet.refillRecord(record, combo.getSelectionIndex());
-							HistoSelectorComposite.this.application.updateHistoTabs(false, false);
+							record.getTrailSelector().setTrailTextSelectedIndex(combo.getSelectionIndex());
+							HistoSelectorComposite.this.presentHistoExplorer.updateHistoTabs(record.getName(), true);
 						}
 					});
 					if (record.isVisible()) {
@@ -272,7 +273,7 @@ public final class HistoSelectorComposite extends Composite {
 			this.tableSelectorColumn.setWidth(this.selectorColumnWidth - 2);
 			this.oldSelectorColumnWidth = this.selectorColumnWidth;
 		}
-		this.application.setHistoChartSashFormWeights(this);
+		this.presentHistoExplorer.setHistoChartSashFormWeights(this);
 
 		log.fine(() -> "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 	}
@@ -354,7 +355,7 @@ public final class HistoSelectorComposite extends Composite {
 	 * @return the record of the record represented by the table item
 	 */
 	private TrailRecord getTableItemRecord(TableItem item) {
-		TrailRecordSet trailRecordSet = HistoSelectorComposite.this.application.getHistoSet().getTrailRecordSet();
+		TrailRecordSet trailRecordSet = HistoSelectorComposite.this.presentHistoExplorer.getHistoSet().getTrailRecordSet();
 		return trailRecordSet.get(item.getData(DataExplorer.RECORD_NAME));
 	}
 

@@ -154,7 +154,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 					{ // getBaseTexts
 						StringBuilder sb = new StringBuilder();
 						String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
-						for (Entry<DirectoryType, Path> directoryEntry : DataExplorer.getInstance().getHistoSet().getValidatedDirectories().entrySet()) {
+						for (Entry<DirectoryType, Path> directoryEntry : DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getValidatedDirectories().entrySet()) {
 							String fileName = directoryEntry.getValue().getFileName().toString();
 							String truncatedPath = fileName.length() > 22 ? fileName.substring(0, 22) + ellipsisText : fileName;
 							sb.append(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK).append(truncatedPath);

@@ -666,8 +666,9 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuBar.this.application.isHistoChartWindowVisible()) {
-								DataExplorer.getInstance().getHistoSet().getTrailRecordSet().saveTemplate();
+							boolean isHistoChartWindowVisible = MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false);
+							if (isHistoChartWindowVisible) {
+								MenuBar.this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet().saveTemplate();
 							}
 							else {
 								MenuBar.this.channels.getActiveChannel().saveTemplate();
@@ -683,13 +684,14 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreDefaultGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuBar.this.application.isHistoChartWindowVisible()) {
-								TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
+							boolean isHistoChartWindowVisible = MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false);
+							if (isHistoChartWindowVisible) {
+								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet();
 								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
 								template.setHistoFileName(template.getDefaultFileName());
 								template.load();
 								trailRecordSet.applyTemplate(true);
-								DataExplorer.getInstance().updateHistoChartWindow(true);
+								MenuBar.this.application.getPresentHistoExplorer().updateHistoChartWindow(true);
 							}
 							else {
 								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
@@ -713,10 +715,11 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
-							if (MenuBar.this.application.isHistoChartWindowVisible()) {
-								HistoGraphicsTemplate template = DataExplorer.getInstance().getHistoSet().getTrailRecordSet().getTemplate();
-								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
-										Settings.getInstance().getGraphicsTemplatePath(), template.getDefaultFileName());
+							boolean isHistoChartWindowVisible = MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false);
+							if (isHistoChartWindowVisible) {
+								HistoGraphicsTemplate template = MenuBar.this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet().getTemplate();
+								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] {
+										Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath(), template.getDefaultFileName());
 								fileDialog.open();
 								String templateFileName = fileDialog.getFileName();
 								if (templateFileName != null && templateFileName.length() > 4) {
@@ -755,13 +758,13 @@ public class MenuBar {
 							String templateFileName = fileDialog.getFileName();
 							if (templateFileName != null && templateFileName.length() > 4) {
 								MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
-								if (MenuBar.this.application.isHistoChartWindowVisible()) {
-									TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
+								if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
+									TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet();
 									HistoGraphicsTemplate template = trailRecordSet.getTemplate();
 									template.setHistoFileName(templateFileName);
 									template.load();
 									trailRecordSet.applyTemplate(true);
-									DataExplorer.getInstance().updateHistoChartWindow(true);
+									MenuBar.this.application.getPresentHistoExplorer().updateHistoChartWindow(true);
 								}
 								else {
 									Channel activeChannel = MenuBar.this.channels.getActiveChannel();
@@ -802,7 +805,7 @@ public class MenuBar {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "suppressModeItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.settings.setSuppressMode(MenuBar.this.suppressModeItem.getSelection());
 
-							if (MenuBar.this.settings.isHistoActive()) MenuBar.this.application.resetHisto();
+							MenuBar.this.application.getHistoExplorer().ifPresent(h -> h.resetHisto());
 						}
 					});
 				}
@@ -814,7 +817,7 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "kurveSelectionMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.setCurveSelectorEnabled(MenuBar.this.curveSelectionMenuItem.getSelection());
+							MenuBar.this.application.enableCurveSelector(MenuBar.this.curveSelectionMenuItem.getSelection());
 						}
 					});
 				}
@@ -866,14 +869,10 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "graphicsCurveSurvey.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuBar.this.graphicsCurveSurveyMenuItem.getSelection()) {
-								MenuBar.this.application.enableCurveSurvey(true);
-								MenuBar.this.application.updateHistoChartWindow(true);
-							}
-							else {
-								MenuBar.this.application.enableCurveSurvey(false);
-								MenuBar.this.application.updateHistoChartWindow(true);
-							}
+							MenuBar.this.application.getHistoExplorer().ifPresent(h -> {
+								h.enableCurveSurvey(MenuBar.this.graphicsCurveSurveyMenuItem.getSelection());
+								h.updateHistoChartWindow(MenuBar.this.graphicsCurveSurveyMenuItem.getSelection());
+							});
 						}
 					});
 				}
@@ -1042,7 +1041,7 @@ public class MenuBar {
 			*/
 
 			MenuItem sysItem = getItem(systemMenu, SWT.ID_QUIT);
-			//sysItem.addArmListener(armListener);
+			// sysItem.addArmListener(armListener);
 			sysItem.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -1050,7 +1049,7 @@ public class MenuBar {
 				};
 			});
 			sysItem = getItem(systemMenu, SWT.ID_HIDE_OTHERS);
-			//sysItem.addArmListener(armListener);
+			// sysItem.addArmListener(armListener);
 			sysItem.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -1059,7 +1058,7 @@ public class MenuBar {
 				};
 			});
 			sysItem = getItem(systemMenu, SWT.ID_HIDE);
-			//sysItem.addArmListener(armListener);
+			// sysItem.addArmListener(armListener);
 			sysItem.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -1068,7 +1067,7 @@ public class MenuBar {
 				};
 			});
 			sysItem = getItem(systemMenu, SWT.ID_PREFERENCES);
-			//sysItem.addArmListener(armListener);
+			// sysItem.addArmListener(armListener);
 			sysItem.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -1076,7 +1075,7 @@ public class MenuBar {
 				};
 			});
 			sysItem = getItem(systemMenu, SWT.ID_ABOUT);
-			//sysItem.addArmListener(armListener);
+			// sysItem.addArmListener(armListener);
 			sysItem.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
@@ -1245,7 +1244,7 @@ public class MenuBar {
 	}
 
 	/**
-	 * set the state of zoom  menu buttons
+	 * set the state of zoom menu buttons
 	 * @param enabled
 	 */
 	public void enableZoomMenuButtons(boolean enabled) {
@@ -1271,7 +1270,7 @@ public class MenuBar {
 	 * remove menu entries not any longer required
 	 */
 	public void cleanup() {
-		//cleanup exportMenu for device specific entries
+		// cleanup exportMenu for device specific entries
 		for (int i = this.exportMenu.getItemCount() - 1; this.exportMenu.getItemCount() > 3; i--) {
 			this.exportMenu.getItem(i).dispose();
 		}

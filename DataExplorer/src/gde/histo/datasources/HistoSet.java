@@ -18,6 +18,15 @@
 ****************************************************************************************/
 package gde.histo.datasources;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import gde.config.Settings;
 import gde.data.AbstractRecord;
 import gde.device.DeviceConfiguration;
@@ -34,15 +43,6 @@ import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Facade of the history module.
@@ -288,6 +288,15 @@ public final class HistoSet {
 	}
 
 	/**
+	 * Is thread safe with respect to concurrent rebuilds.
+	 */
+	public synchronized static void cleanExclusionData() {
+		ArrayList<Path> dataPaths = new ArrayList<Path>();
+		dataPaths.add(Paths.get(Settings.getInstance().getDataFilePath()));
+		ExclusionData.deleteExclusionsDirectory(dataPaths);
+	}
+
+	/**
 	 * collect the strongest rebuild action which was not performed (e.g. tab was not selected)
 	 */
 	private RebuildStep rebuildStepInvisibleTab = HistoSet.RebuildStep.E_USER_INTERFACE;
@@ -339,15 +348,6 @@ public final class HistoSet {
 
 	public RebuildStep getRebuildStepInvisibleTab() {
 		return rebuildStepInvisibleTab;
-	}
-
-	/**
-	 * Is thread safe with respect to concurrent rebuilds.
-	 */
-	public synchronized void cleanExclusionData() {
-		ArrayList<Path> dataPaths = new ArrayList<Path>();
-		dataPaths.add(Paths.get(this.settings.getDataFilePath()));
-		ExclusionData.deleteExclusionsDirectory(dataPaths);
 	}
 
 	/**

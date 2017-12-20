@@ -34,6 +34,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterJob;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -63,7 +64,6 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
-import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.HistoGraphicsWindow;
 import gde.histo.ui.HistoSummaryWindow;
 import gde.log.Level;
@@ -193,11 +193,10 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						PrintSelectionDialog.this.curveCompareButton.setEnabled(isCopareWindowPrintable);
 						PrintSelectionDialog.this.curveCompareButton.setSelection(isCopareWindowPrintable); // ET unclear why this line was set on comment
 
-						boolean isHistoWindowPrintable = false;
-						if (activeChannel != null && DataExplorer.getInstance().getHistoSet() != null) {
-							TrailRecordSet activeRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
-							if (activeRecordSet != null) isHistoWindowPrintable = activeRecordSet.size() > 0;
-						}
+						boolean isHistoWindowPrintable = activeChannel != null
+								? DataExplorer.getInstance().getHistoExplorer().map(h -> h.isPopulated()).orElse(false) //
+								: false;
+
 						PrintSelectionDialog.this.histoGraphicsButton.setEnabled(isHistoWindowPrintable);
 						PrintSelectionDialog.this.histoGraphicsButton.setSelection(isHistoWindowPrintable);
 						PrintSelectionDialog.this.histoSummaryButton.setEnabled(isHistoWindowPrintable);
@@ -399,22 +398,28 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		else
 			compareImageAWT = null;
 
-		if (artefacts.contains(Artefact.HISTOGRAPHICS) && this.application.getHistoGraphicsContentAsImage() != null) {
-			this.application.selectTab(c -> c instanceof HistoGraphicsWindow);
-			WaitTimer.delay(250);
-			histoGraphicsImageAWT = convertToAWT((histoGraphicsImageSWT = this.application.getHistoGraphicsContentAsImage()).getImageData());
-			histoGraphicsImageSWT.dispose();
-		}
-		else
+		if (artefacts.contains(Artefact.HISTOGRAPHICS)) {
+			Optional<org.eclipse.swt.graphics.Image> image = this.application.getHistoExplorer().map(h -> h.getHistoGraphicsContentAsImage());
+			if (image.isPresent()) {
+				this.application.selectTab(c -> c instanceof HistoGraphicsWindow);
+				WaitTimer.delay(250);
+				histoGraphicsImageAWT = convertToAWT((histoGraphicsImageSWT = image.orElse(null)).getImageData());
+				histoGraphicsImageSWT.dispose();
+			} else
+				histoGraphicsImageAWT = null;
+		} else
 			histoGraphicsImageAWT = null;
 
-		if (artefacts.contains(Artefact.HISTOSUMMARY) && this.application.getHistoSummaryContentAsImage() != null) {
-			this.application.selectTab(c -> c instanceof HistoSummaryWindow);
-			WaitTimer.delay(250);
-			histoSummaryImageAWT = convertToAWT((histoSummaryImageSWT = this.application.getHistoSummaryContentAsImage()).getImageData());
-			histoSummaryImageSWT.dispose();
-		}
-		else
+		if (artefacts.contains(Artefact.HISTOSUMMARY)) {
+			Optional<org.eclipse.swt.graphics.Image> image = this.application.getHistoExplorer().map(h -> h.getHistoSummaryContentAsImage());
+			if (image.isPresent()) {
+				this.application.selectTab(c -> c instanceof HistoSummaryWindow);
+				WaitTimer.delay(250);
+				histoSummaryImageAWT = convertToAWT((histoSummaryImageSWT = image.orElse(null)).getImageData());
+				histoSummaryImageSWT.dispose();
+			} else
+				histoSummaryImageAWT = null;
+		} else
 			histoSummaryImageAWT = null;
 
 		// select the tab which was active before

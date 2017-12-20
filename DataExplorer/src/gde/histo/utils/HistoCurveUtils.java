@@ -26,6 +26,17 @@ import static gde.histo.utils.UniversalQuantile.BoxplotItems.QUARTILE3;
 import static gde.histo.utils.UniversalQuantile.BoxplotItems.UPPER_WHISKER;
 import static java.util.logging.Level.FINEST;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.resource.DeviceXmlResource;
@@ -40,17 +51,6 @@ import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.GraphicsUtils;
-
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 
 /**
  * Draw curves.

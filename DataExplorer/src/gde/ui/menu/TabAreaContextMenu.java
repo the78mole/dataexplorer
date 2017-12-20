@@ -104,7 +104,7 @@ public class TabAreaContextMenu {
 					public void handleEvent(Event e) {
 						TabAreaContextMenu.log.log(Level.FINEST, "curveSelectionItem action performed! " + e); //$NON-NLS-1$
 						boolean selection = TabAreaContextMenu.this.curveSelectionItem.getSelection();
-						TabAreaContextMenu.this.application.setCurveSelectorEnabled(selection);
+						TabAreaContextMenu.this.application.enableCurveSelector(selection);
 						TabAreaContextMenu.this.application.getMenuBar().getCurveSelectionMenuItem().setSelection(selection);
 					}
 				});

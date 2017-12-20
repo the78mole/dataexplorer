@@ -42,9 +42,11 @@ public final class ExclusionActivity {
 	 * @param defaultPath
 	 */
 	public static void clearExcludeLists(Path defaultPath) {
+		if (!DataExplorer.getInstance().getHistoExplorer().isPresent()) throw new UnsupportedOperationException();
+
 		Set<Path> exclusionDirectories = new HashSet<>();
 		if (defaultPath != null) exclusionDirectories.add(defaultPath);
-		for (Path path : DataExplorer.getInstance().getHistoSet().getExcludedPaths()) {
+		for (Path path : DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths()) {
 			exclusionDirectories.add(path.getParent());
 		}
 		for (Path ignorePath : exclusionDirectories) {

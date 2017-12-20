@@ -207,11 +207,11 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.application.updateAllTabs(true);
 
 				this.application.getActiveDevice().setLastChannelNumber(channelNumber);
-				if (this.application.isHistoActive() != Settings.getInstance().isHistoActive()) {
+				if (this.application.getHistoExplorer().isPresent() != Settings.getInstance().isHistoActive()) {
 					// this case may exist during DE startup
 					this.application.setHisto(Settings.getInstance().isHistoActive());
 				} else if (Settings.getInstance().isHistoActive()) {
-					this.application.resetHisto();
+					this.application.getHistoExplorer().ifPresent(h -> h.resetHisto());
 				}
 			}
 		} else
