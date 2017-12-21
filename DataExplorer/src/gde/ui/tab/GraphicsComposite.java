@@ -658,8 +658,7 @@ public class GraphicsComposite extends Composite {
 						RecordSet recordSet = GraphicsComposite.this.channels.getActiveChannel().getActiveRecordSet();
 						if (recordSet != null) {
 							String tmpDescription = recordSet.getRecordSetDescription();
-							if (GraphicsComposite.this.recordSetCommentText == null 
-									|| !recordSet.getRecordSetDescription().equals(tmpDescription)) {
+							if (GraphicsComposite.this.recordSetCommentText == null || !tmpDescription.equals(GraphicsComposite.this.recordSetCommentText)) {
 								GraphicsComposite.this.recordSetComment.setText(GraphicsComposite.this.recordSetCommentText = tmpDescription);
 							}
 							
