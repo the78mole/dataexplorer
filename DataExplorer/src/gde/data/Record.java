@@ -1506,8 +1506,12 @@ public class Record extends Vector<Integer> {
 	public Point getGPSDisplayPoint(int measurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
 		//log.log(Level.OFF, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue()) + ")");
 		int grad = this.get(measurementPointIndex) / 1000000;
-		return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), yDisplayOffset - Double
-				.valueOf((((grad + ((this.get(measurementPointIndex) / 1000000.0 - grad) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
+		if (this.getUnit().endsWith("'"))
+			return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), yDisplayOffset - Double
+					.valueOf((((grad + ((this.get(measurementPointIndex) / 1000000.0 - grad) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
+		else	
+			return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), yDisplayOffset - Double
+					.valueOf((((grad + (this.get(measurementPointIndex) / 1000000.0 - grad)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
 	}
 
 	/**
@@ -1636,8 +1640,12 @@ public class Record extends Vector<Integer> {
 				if (this.getDevice().isGPSCoordinates(this)) {
 					int grad0 = this.get(indexs[0]) / 1000000;
 					if (indexs[0] == indexs[1]) {
-						pointPosY = Double.valueOf(this.parent.drawAreaBounds.height
-								- ((((grad0 + ((this.get(indexs[0]) / 1000000.0 - grad0) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+						if (this.getUnit().endsWith("'"))
+							pointPosY = Double.valueOf(this.parent.drawAreaBounds.height
+									- ((((grad0 + ((this.get(indexs[0]) / 1000000.0 - grad0) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
+						else 
+							pointPosY = Double.valueOf(this.parent.drawAreaBounds.height
+									- ((((grad0 + (this.get(indexs[0]) / 1000000.0 - grad0)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
 					} else {
 						int grad1 = this.get(indexs[1]) / 1000000;
 						double deltaValueY = (grad1 + ((this.get(indexs[1]) / 1000000.0 - grad1) / 0.60)) - (grad0 + ((this.get(indexs[0]) / 1000000.0 - grad0) / 0.60));
