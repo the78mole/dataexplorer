@@ -188,7 +188,7 @@ public class CurveUtils {
 		}
 
 		// set the values corresponding to the display area of this curve
-		record.setMinMaxDisplayValue(yMinValue, yMaxValue);
+		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " data limit  -> yMinValue = " + yMinValue + "; yMaxValue = " + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 

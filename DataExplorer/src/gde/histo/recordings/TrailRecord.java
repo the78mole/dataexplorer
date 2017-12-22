@@ -211,9 +211,9 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	@Override
-	public void setMinMaxDisplayValue(double newMinDisplayValue, double newMaxDisplayValue) {
-		this.minDisplayValue = RecordingsCollector.decodeVaultValue(this, newMinDisplayValue);
-		this.maxDisplayValue = RecordingsCollector.decodeVaultValue(this, newMaxDisplayValue);
+	public void setSyncedMinMaxDisplayValues(double newMinValue, double newMaxValue) {
+		this.minDisplayValue = RecordingsCollector.decodeVaultValue(this, newMinValue);
+		this.maxDisplayValue = RecordingsCollector.decodeVaultValue(this, newMaxValue);
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
 			for (AbstractRecord tmpRecord : this.getAbstractParent().getScaleSyncedRecords(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
@@ -222,7 +222,7 @@ public abstract class TrailRecord extends CommonRecord {
 				record.maxDisplayValue = this.maxDisplayValue;
 			}
 		}
-		log.fine(getName() + " data limit  -> yMinValue = " + newMinDisplayValue + "; yMaxValue = " + newMaxDisplayValue); //$NON-NLS-1$ //$NON-NLS-2$
+		log.fine(getName() + " data limit  -> yMinValue = " + newMinValue + "; yMaxValue = " + newMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**

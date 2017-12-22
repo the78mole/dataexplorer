@@ -1585,7 +1585,7 @@ public class Record extends AbstractRecord {
 		if (this.getUnit().endsWith("'"))
 			return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), yDisplayOffset - Double
 					.valueOf((((grad + ((this.get(measurementPointIndex) / 1000000.0 - grad) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
-		else	
+		else
 			return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), yDisplayOffset - Double
 					.valueOf((((grad + (this.get(measurementPointIndex) / 1000000.0 - grad)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
 	}
@@ -1720,7 +1720,7 @@ public class Record extends AbstractRecord {
 						if (this.getUnit().endsWith("'"))
 							pointPosY = Double.valueOf(this.parent.drawAreaBounds.height
 									- ((((grad0 + ((this.get(indexs[0]) / 1000000.0 - grad0) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
-						else 
+						else
 							pointPosY = Double.valueOf(this.parent.drawAreaBounds.height
 									- ((((grad0 + (this.get(indexs[0]) / 1000000.0 - grad0)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue)).intValue();
 					} else {
@@ -1893,7 +1893,10 @@ public class Record extends AbstractRecord {
 
 	}
 
-	public void setMinMaxDisplayValue(double newMinDisplayValue, double newMaxDisplayValue) {
+	/**
+	 * Set the min and max display values in all synced records.
+	 */
+	public void setSyncedMinMaxDisplayValues(double newMinDisplayValue, double newMaxDisplayValue) {
 		if (this.device.isGPSCoordinates(this)) {
 			this.minDisplayValue = this.device.translateValue(this, newMinDisplayValue) * 1000;
 			this.maxDisplayValue = this.device.translateValue(this, newMaxDisplayValue) * 1000;

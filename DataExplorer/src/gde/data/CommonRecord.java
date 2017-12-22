@@ -802,7 +802,12 @@ public abstract class CommonRecord extends AbstractRecord {
 
 	}
 
-	public abstract void setMinMaxDisplayValue(double newMinDisplayValue, double newMaxDisplayValue);
+	/**
+	 * Set the values in all synced records.
+	 * @param newMinValue is the minimum record point divided by 1000
+	 * @param newMaxValue is the maximum record point divided by 1000
+	 */
+	public abstract void setSyncedMinMaxDisplayValues(double newMinValue, double newMaxValue);
 
 	/**
 	 * @return the minDisplayValue

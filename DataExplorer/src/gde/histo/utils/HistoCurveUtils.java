@@ -204,7 +204,7 @@ public final class HistoCurveUtils {
 		}
 
 		// set the values corresponding to the display area of this curve
-		record.setMinMaxDisplayValue(yMinValue, yMaxValue);
+		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
 	}
 
 	/**
