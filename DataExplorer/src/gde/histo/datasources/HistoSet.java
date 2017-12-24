@@ -57,8 +57,6 @@ public final class HistoSet {
 
 	private static final DataExplorer	application										= DataExplorer.getInstance();
 
-	private final Settings						settings											= Settings.getInstance();
-
 	private final HistoSetCollector		histoSetCollector;
 
 	/**

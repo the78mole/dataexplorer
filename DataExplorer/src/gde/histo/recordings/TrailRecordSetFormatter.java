@@ -80,7 +80,7 @@ public final class TrailRecordSetFormatter {
 	private static TrailRecordSet getTrailRecordSet() {
 		TrailRecordSet trailRecordSet = null;
 		if (channels.getActiveChannel() != null) {
-			trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getTrailRecordSet();
+			trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet();
 		}
 		return trailRecordSet;
 	}

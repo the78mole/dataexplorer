@@ -49,7 +49,6 @@ import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.ui.DataExplorer.HistoExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.CurveSelectorContextMenu;
 
@@ -134,7 +133,7 @@ public final class HistoSelectorComposite extends Composite {
 							if (tableItem.getChecked()) {
 								// avoid phantom measurements with invisible curves
 								final TrailRecord activeRecord = getTableItemRecord(tableItem);
-								TrailRecordSet trailRecordSet = HistoSelectorComposite.this.presentHistoExplorer.getHistoSet().getTrailRecordSet();
+								TrailRecordSet trailRecordSet = HistoSelectorComposite.this.presentHistoExplorer.getTrailRecordSet();
 								if (trailRecordSet.getRecordKeyMeasurement().equals(activeRecord.getName())) {
 									HistoSelectorComposite.this.contextMenu.setMeasurement(activeRecord.getName(), false);
 									HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(activeRecord.getName(), false);
@@ -176,7 +175,7 @@ public final class HistoSelectorComposite extends Composite {
 						// avoid phantom measurements with invisible curves
 						log.finer(() -> "checked/Old=" + eventItem.getChecked() + eventItem.getData(DataExplorer.OLD_STATE)); //$NON-NLS-1$
 						final TrailRecord activeRecord = getTableItemRecord(eventItem);
-						TrailRecordSet trailRecordSet = HistoSelectorComposite.this.presentHistoExplorer.getHistoSet().getTrailRecordSet();
+						TrailRecordSet trailRecordSet = HistoSelectorComposite.this.presentHistoExplorer.getTrailRecordSet();
 						if (!eventItem.getChecked() && (Boolean) eventItem.getData(DataExplorer.OLD_STATE) //
 								&& trailRecordSet.getRecordKeyMeasurement().equals(activeRecord.getName())) {
 							HistoSelectorComposite.this.contextMenu.setMeasurement(activeRecord.getName(), false);
@@ -219,7 +218,7 @@ public final class HistoSelectorComposite extends Composite {
 		int itemWidth2 = this.initialCurveTypeColumnWidth;
 		int textSize2 = 10;
 		boolean isOneVisible = false;
-		TrailRecordSet recordSet = HistoSelectorComposite.this.presentHistoExplorer.getHistoSet().getTrailRecordSet();
+		TrailRecordSet recordSet = HistoSelectorComposite.this.presentHistoExplorer.getTrailRecordSet();
 		if (recordSet != null) {
 			Combo[] selectorCombos = new Combo[recordSet.size()];
 			this.editors = new TableEditor[recordSet.size()];
@@ -355,7 +354,7 @@ public final class HistoSelectorComposite extends Composite {
 	 * @return the record of the record represented by the table item
 	 */
 	private TrailRecord getTableItemRecord(TableItem item) {
-		TrailRecordSet trailRecordSet = HistoSelectorComposite.this.presentHistoExplorer.getHistoSet().getTrailRecordSet();
+		TrailRecordSet trailRecordSet = HistoSelectorComposite.this.presentHistoExplorer.getTrailRecordSet();
 		return trailRecordSet.get(item.getData(DataExplorer.RECORD_NAME));
 	}
 

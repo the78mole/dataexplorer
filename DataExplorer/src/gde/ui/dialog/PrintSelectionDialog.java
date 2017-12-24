@@ -194,7 +194,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						PrintSelectionDialog.this.curveCompareButton.setSelection(isCopareWindowPrintable); // ET unclear why this line was set on comment
 
 						boolean isHistoWindowPrintable = activeChannel != null
-								? DataExplorer.getInstance().getHistoExplorer().map(h -> h.isPopulated()).orElse(false) //
+								? DataExplorer.getInstance().getHistoExplorer().map(h -> h.hasRecords()).orElse(false) //
 								: false;
 
 						PrintSelectionDialog.this.histoGraphicsButton.setEnabled(isHistoWindowPrintable);

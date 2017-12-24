@@ -41,6 +41,7 @@ import gde.data.AbstractRecordSet;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.histo.ui.HistoExplorer;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;

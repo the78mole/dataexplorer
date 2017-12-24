@@ -666,9 +666,8 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							boolean isHistoChartWindowVisible = MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false);
-							if (isHistoChartWindowVisible) {
-								MenuBar.this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet().saveTemplate();
+							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
+								MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet().saveTemplate();
 							}
 							else {
 								MenuBar.this.channels.getActiveChannel().saveTemplate();
@@ -684,9 +683,8 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreDefaultGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							boolean isHistoChartWindowVisible = MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false);
-							if (isHistoChartWindowVisible) {
-								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet();
+							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
+								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
 								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
 								template.setHistoFileName(template.getDefaultFileName());
 								template.load();
@@ -715,9 +713,8 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
-							boolean isHistoChartWindowVisible = MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false);
-							if (isHistoChartWindowVisible) {
-								HistoGraphicsTemplate template = MenuBar.this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet().getTemplate();
+							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
+								HistoGraphicsTemplate template = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet().getTemplate();
 								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] {
 										Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath(), template.getDefaultFileName());
 								fileDialog.open();
@@ -753,13 +750,13 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
-									Settings.getInstance().getGraphicsTemplatePath(), null, SWT.SINGLE);
+							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] {
+									Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath(), null, SWT.SINGLE);
 							String templateFileName = fileDialog.getFileName();
 							if (templateFileName != null && templateFileName.length() > 4) {
 								MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
 								if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
-									TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet();
+									TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
 									HistoGraphicsTemplate template = trailRecordSet.getTemplate();
 									template.setHistoFileName(templateFileName);
 									template.load();

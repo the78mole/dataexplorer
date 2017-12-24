@@ -34,7 +34,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import gde.GDE;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
-import gde.ui.DataExplorer.HistoExplorer;
 import gde.ui.SWTResourceManager;
 
 /**

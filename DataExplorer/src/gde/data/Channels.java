@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.ChannelTypes;
+import gde.histo.ui.HistoExplorer;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;

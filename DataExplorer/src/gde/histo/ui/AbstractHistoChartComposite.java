@@ -45,7 +45,6 @@ import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.ui.DataExplorer.HistoExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.GraphicsUtils;
 import gde.utils.StringHelper;
@@ -102,11 +101,10 @@ public abstract class AbstractHistoChartComposite extends Composite {
 
 	public AbstractHistoChartComposite(Composite parent, int style) {
 		super(parent, style);
-		trailRecordSet = this.channels.getActiveChannel() != null ? this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet() : null;
 	}
 
 	protected TrailRecordSet retrieveTrailRecordSet() {
-		return this.channels.getActiveChannel() != null ? this.application.getPresentHistoExplorer().getHistoSet().getTrailRecordSet() : null;
+		return this.channels.getActiveChannel() != null ? this.application.getPresentHistoExplorer().getTrailRecordSet() : null;
 	}
 
 	/**

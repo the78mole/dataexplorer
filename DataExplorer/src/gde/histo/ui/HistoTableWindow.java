@@ -66,7 +66,6 @@ import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.ui.DataExplorer.HistoExplorer;
 import gde.ui.SWTResourceManager;
 
 /**
@@ -267,7 +266,7 @@ public class HistoTableWindow extends CTabItem {
 				}
 
 				TrailRecordSet trailRecordSet = Channels.getInstance().getActiveChannel() != null //
-						? trailRecordSet = presentHistoExplorer.getHistoSet().getTrailRecordSet() //
+						? trailRecordSet = presentHistoExplorer.getTrailRecordSet() //
 						: null;
 				int rowNumber = HistoTableWindow.this.dataTable.indexOf(HistoTableWindow.this.cursor.getRow()); // 0-based
 				int columnNumber = HistoTableWindow.this.cursor.getColumn(); // 0-based
@@ -300,7 +299,7 @@ public class HistoTableWindow extends CTabItem {
 		this.dataTable.addListener(SWT.SetData, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				TrailRecordSet trailRecordSet = presentHistoExplorer.getHistoSet().getTrailRecordSet();
+				TrailRecordSet trailRecordSet = presentHistoExplorer.getTrailRecordSet();
 				if (trailRecordSet.size() > 0) {
 					TableItem item = (TableItem) event.item;
 					Vector<TrailRecord> currentRecords = trailRecordSet.getVisibleAndDisplayableRecordsForTable();
@@ -408,7 +407,7 @@ public class HistoTableWindow extends CTabItem {
 	}
 
 	public boolean isHeaderTextValid() {
-		String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(presentHistoExplorer.getHistoSet().getTrailRecordSet());
+		String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(presentHistoExplorer.getTrailRecordSet());
 		if (tableHeaderRow.length == this.dataTable.getColumnCount() - 2) {
 			boolean isValid = true;
 			for (int i = 0; i < tableHeaderRow.length; i++) {
@@ -423,7 +422,7 @@ public class HistoTableWindow extends CTabItem {
 
 	public boolean isRowTextAndTrailValid() {
 		boolean isValid = false;
-		TrailRecordSet trailRecordSet = presentHistoExplorer.getHistoSet().getTrailRecordSet();
+		TrailRecordSet trailRecordSet = presentHistoExplorer.getTrailRecordSet();
 		for (int j = 0; j < this.dataTable.getItems().length; j++) {
 			TableItem tableItem = this.dataTable.getItems()[j];
 			int index = HistoTableWindow.this.dataTable.indexOf(tableItem);

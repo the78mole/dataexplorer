@@ -813,6 +813,7 @@ public class SettingsDialog extends Dialog {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									SettingsDialog.log.log(Level.FINEST, "histoActive.widgetSelected, event=" + evt); //$NON-NLS-1$
+									SettingsDialog.this.settings.setHistoActive(SettingsDialog.this.histoActive.getSelection());
 									SettingsDialog.this.application.setHisto(SettingsDialog.this.histoActive.getSelection());
 								}
 							});
