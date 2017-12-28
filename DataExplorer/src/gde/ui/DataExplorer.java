@@ -2272,8 +2272,7 @@ public class DataExplorer extends Composite {
 	 * @param enabled
 	 */
 	public void setMeasurementActive(String recordKey, boolean enabled) {
-		this.histoExplorer.ifPresent(h -> h.setMeasurementActive(recordKey, enabled));
-
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordKey);
 		boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
 		RecordSet recordSet = isGraphicsTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
 		if (recordSet != null && recordSet.containsKey(recordKey)) {
@@ -2304,8 +2303,6 @@ public class DataExplorer extends Composite {
 	 */
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordKey);
-		this.histoExplorer.ifPresent(h -> h.setDeltaMeasurementActive(recordKey, enabled));
-
 		boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
 		RecordSet recordSet = isGraphicsTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
 		if (recordSet != null && recordSet.containsKey(recordKey)) {

@@ -96,7 +96,7 @@ public class CurveSelectorContextMenu {
 		this.axisEndValuesDialog = new AxisEndValuesDialog(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 	}
 
-	public void createMenu(final Menu popupmenu) {
+	public void createMenu(Menu popupmenu) {
 		this.menu = popupmenu;
 		try {
 			popupmenu.addMenuListener(new MenuListener() {
@@ -1278,15 +1278,23 @@ public class CurveSelectorContextMenu {
 	 * @param isActive
 	 * @param tmpRecordNameMeasurement
 	 */
-	public void setMeasurement(final String tmpRecordNameMeasurement, final boolean isActive) {
+	public void setMeasurement(String tmpRecordNameMeasurement, boolean isActive) {
 		if (isMeasurementWhileNameChanged(tmpRecordNameMeasurement) || isActive) {
-			CurveSelectorContextMenu.this.application.setMeasurementActive(tmpRecordNameMeasurement, true);
+			setMeasurementActive(tmpRecordNameMeasurement, true);
 			CurveSelectorContextMenu.this.simpleMeasure.setSelection(true);
 			CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
 		}
 		else {
-			CurveSelectorContextMenu.this.application.setMeasurementActive(tmpRecordNameMeasurement, false);
+			setMeasurementActive(tmpRecordNameMeasurement, false);
 			CurveSelectorContextMenu.this.application.setStatusMessage(GDE.STRING_EMPTY);
+		}
+	}
+
+	private void setMeasurementActive(String tmpRecordNameMeasurement, boolean enabled) {
+		if (this.isTypeHisto) {
+			this.application.getPresentHistoExplorer().setMeasurementActive(tmpRecordNameMeasurement, enabled);
+		} else {
+			this.application.setMeasurementActive(tmpRecordNameMeasurement, enabled);
 		}
 	}
 
@@ -1295,15 +1303,24 @@ public class CurveSelectorContextMenu {
 	 * @param isActive
 	 * @param tmpRecordNameKey
 	 */
-	public void setDeltaMeasurement(final String tmpRecordNameKey, final boolean isActive) {
+	public void setDeltaMeasurement(String tmpRecordNameKey, boolean isActive) {
 		if (isMeasurementWhileNameChanged(tmpRecordNameKey) || isActive) {
-			CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(tmpRecordNameKey, true);
+			setDeltaMeasurementActive(tmpRecordNameKey, true);
 			CurveSelectorContextMenu.this.deltaMeasure.setSelection(true);
 			CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
 		}
 		else {
-			CurveSelectorContextMenu.this.application.setDeltaMeasurementActive(tmpRecordNameKey, false);
+			setDeltaMeasurementActive(tmpRecordNameKey, false);
 			CurveSelectorContextMenu.this.application.setStatusMessage(GDE.STRING_EMPTY);
 		}
 	}
+
+	private void setDeltaMeasurementActive(String tmpRecordNameMeasurement, boolean enabled) {
+		if (this.isTypeHisto) {
+			this.application.getPresentHistoExplorer().setDeltaMeasurementActive(tmpRecordNameMeasurement, enabled);
+		} else {
+			this.application.setDeltaMeasurementActive(tmpRecordNameMeasurement, enabled);
+		}
+	}
+
 }

@@ -90,7 +90,7 @@ public final class HistoSelectorComposite extends Composite {
 
 		this.popupmenu = new Menu(DataExplorer.getInstance().getShell(), SWT.POP_UP);
 		this.contextMenu = new CurveSelectorContextMenu();
-		this.contextMenu.createMenu(HistoSelectorComposite.this.popupmenu);
+		this.contextMenu.createMenu(this.popupmenu);
 
 		initGUI();
 	}
