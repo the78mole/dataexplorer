@@ -151,14 +151,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	protected double							minDisplayValue;																					// min value in device units, correspond to draw area
 	protected double							maxDisplayValue;																					// max value in device units, correspond to draw area
 
-	// measurement
-	boolean												isMeasurementMode					= false;
-	boolean												isDeltaMeasurementMode		= false;
-
-// protected CommonRecord(int initialCapacity) {
-// super(initialCapacity);
-// }
-
 	/**
 	 * this constructor will create an vector to hold data points in case the initial capacity is > 0
 	 * @param newDevice
@@ -818,38 +810,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	 */
 	public double getMaxDisplayValue() {
 		return this.maxDisplayValue;
-	}
-
-	/**
-	 * @return the isMeasurementMode
-	 */
-	@Override
-	public boolean isMeasurementMode() {
-		return this.isMeasurementMode;
-	}
-
-	/**
-	 * @param enabled the isMeasurementMode to set
-	 */
-	@Override
-	public void setMeasurementMode(boolean enabled) {
-		this.isMeasurementMode = enabled;
-	}
-
-	/**
-	 * @return the isDeltaMeasurementMode
-	 */
-	@Override
-	public boolean isDeltaMeasurementMode() {
-		return this.isDeltaMeasurementMode;
-	}
-
-	/**
-	 * @param enabled the isDeltaMeasurementMode to set
-	 */
-	@Override
-	public void setDeltaMeasurementMode(boolean enabled) {
-		this.isDeltaMeasurementMode = enabled;
 	}
 
 	/**

@@ -114,14 +114,6 @@ public abstract class AbstractRecord extends Vector<Integer> implements IRecord 
 	 */
 	public abstract String getFormattedScaleValue(double finalValue);
 
-	public abstract boolean isMeasurementMode();
-
-	public abstract void setMeasurementMode(boolean enabled);
-
-	public abstract boolean isDeltaMeasurementMode();
-
-	public abstract void setDeltaMeasurementMode(boolean enabled);
-
 	public abstract int getNumberScaleTicks();
 
 	public abstract void setNumberScaleTicks(int newNumberScaleTicks);

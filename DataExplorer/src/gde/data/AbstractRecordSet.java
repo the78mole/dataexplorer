@@ -279,9 +279,6 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 */
 	protected Vector<? extends AbstractRecord>	displayRecords;
 
-	// measurement
-	protected String														recordKeyMeasurement						= GDE.STRING_EMPTY;
-
 	protected double														maxValue												= Integer.MIN_VALUE;
 	protected double														minValue												= Integer.MAX_VALUE;
 
@@ -543,88 +540,6 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 */
 	public void setMinValue(double newMinValue) {
 		this.minValue = newMinValue;
-	}
-
-	/**
-	 * @param recordKey the key which record should be measured
-	 * @param enabled the boolean value to set
-	 */
-	public void setMeasurementMode(String recordKey, boolean enabled) {
-		AbstractRecord record = this.get(recordKey);
-		if (record != null) {
-			record.setMeasurementMode(enabled);
-			if (enabled) {
-				AbstractRecord oldRecord = this.get(this.recordKeyMeasurement);
-				if (oldRecord != null && !oldRecord.equals(record)) {
-					oldRecord.setMeasurementMode(false);
-					oldRecord.setDeltaMeasurementMode(false);
-				}
-				this.recordKeyMeasurement = recordKey;
-				record.setDeltaMeasurementMode(false);
-			}
-		}
-	}
-
-	/**
-	 * @param recordKey the key which record should be measured
-	 * @param enabled the boolean value to set
-	 */
-	public void setDeltaMeasurementMode(String recordKey, boolean enabled) {
-		AbstractRecord record = this.get(recordKey);
-		if (record != null) {
-			record.setDeltaMeasurementMode(enabled);
-			if (enabled) {
-				AbstractRecord oldRecord = this.get(this.recordKeyMeasurement);
-				if (oldRecord != null && !oldRecord.equals(record)) {
-					oldRecord.setMeasurementMode(false);
-					oldRecord.setDeltaMeasurementMode(false);
-				}
-				this.recordKeyMeasurement = recordKey;
-				record.setMeasurementMode(false);
-			}
-		}
-	}
-
-	/**
-	 * Clear measurement modes if any.
-	 */
-	public void clearMeasurementModes() {
-		AbstractRecord record = this.get(this.recordKeyMeasurement);
-		if (record != null) {
-			record.setMeasurementMode(false);
-			record.setDeltaMeasurementMode(false);
-		}
-	}
-
-	/**
-	 * @param recordKey the key which record should be measured
-	 * @return the isMeasurementMode
-	 */
-	public boolean isMeasurementMode(String recordKey) {
-		return this.get(recordKey) != null ? this.get(recordKey).isMeasurementMode() : false;
-	}
-
-	/**
-	 * @param recordKey the key which record should be measured
-	 * @return the isDeltaMeasurementMode
-	 */
-	public boolean isDeltaMeasurementMode(String recordKey) {
-		return this.get(recordKey) != null ? this.get(recordKey).isDeltaMeasurementMode() : false;
-	}
-
-	/**
-	 * Reset the record set in viewpoint of measurement.
-	 */
-	public void resetMeasurement() {
-		this.setMeasurementMode(this.recordKeyMeasurement, false);
-		this.setDeltaMeasurementMode(this.recordKeyMeasurement, false);
-	}
-
-	/**
-	 * @return the recordKeyMeasurement
-	 */
-	public String getRecordKeyMeasurement() {
-		return this.recordKeyMeasurement;
 	}
 
 	/**

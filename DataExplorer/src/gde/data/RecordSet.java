@@ -110,6 +110,7 @@ public final class RecordSet extends AbstractRecordSet {
 	int														changeCounter									= 0;																					// indicates change in general
 
 	private GroupTransitions			histoTransitions;
+	private String								recordKeyMeasurement					= GDE.STRING_EMPTY;
 
 	/**
 	 * record set data buffers according the size of given names array, where
@@ -1845,5 +1846,87 @@ public final class RecordSet extends AbstractRecordSet {
 	@SuppressWarnings("unchecked")
 	public Collection<Record> getValues() {
 		return (Collection<Record>) (Collection<?>) values();
+	}
+
+	/**
+	 * @param recordKey the key which record should be measured
+	 * @param enabled the boolean value to set
+	 */
+	public void setMeasurementMode(String recordKey, boolean enabled) {
+		Record record = this.get(recordKey);
+		if (record != null) {
+			record.setMeasurementMode(enabled);
+			if (enabled) {
+				Record oldRecord = this.get(this.recordKeyMeasurement);
+				if (oldRecord != null && !oldRecord.equals(record)) {
+					oldRecord.setMeasurementMode(false);
+					oldRecord.setDeltaMeasurementMode(false);
+				}
+				this.recordKeyMeasurement = recordKey;
+				record.setDeltaMeasurementMode(false);
+			}
+		}
+	}
+
+	/**
+	 * @param recordKey the key which record should be measured
+	 * @param enabled the boolean value to set
+	 */
+	public void setDeltaMeasurementMode(String recordKey, boolean enabled) {
+		Record record = this.get(recordKey);
+		if (record != null) {
+			record.setDeltaMeasurementMode(enabled);
+			if (enabled) {
+				Record oldRecord = this.get(this.recordKeyMeasurement);
+				if (oldRecord != null && !oldRecord.equals(record)) {
+					oldRecord.setMeasurementMode(false);
+					oldRecord.setDeltaMeasurementMode(false);
+				}
+				this.recordKeyMeasurement = recordKey;
+				record.setMeasurementMode(false);
+			}
+		}
+	}
+
+	/**
+	 * Clear measurement modes if any.
+	 */
+	public void clearMeasurementModes() {
+		Record record = this.get(this.recordKeyMeasurement);
+		if (record != null) {
+			record.setMeasurementMode(false);
+			record.setDeltaMeasurementMode(false);
+		}
+	}
+
+	/**
+	 * @param recordKey the key which record should be measured
+	 * @return the isMeasurementMode
+	 */
+	public boolean isMeasurementMode(String recordKey) {
+		return this.get(recordKey) != null ? this.get(recordKey).isMeasurementMode() : false;
+	}
+
+	/**
+	 * @param recordKey the key which record should be measured
+	 * @return the isDeltaMeasurementMode
+	 */
+	public boolean isDeltaMeasurementMode(String recordKey) {
+		return this.get(recordKey) != null ? this.get(recordKey).isDeltaMeasurementMode() : false;
+	}
+
+	/**
+	 * Reset the record set in viewpoint of measurement.
+	 */
+	public void resetMeasurement() {
+		this.setMeasurementMode(this.recordKeyMeasurement, false);
+		this.setDeltaMeasurementMode(this.recordKeyMeasurement, false);
+	}
+
+	/**
+	 * @return the recordKeyMeasurement
+	 */
+	public String getRecordKeyMeasurement() {
+		return this.recordKeyMeasurement;
 	}
 }

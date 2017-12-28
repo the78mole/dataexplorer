@@ -1952,34 +1952,18 @@ public class Record extends AbstractRecord {
 					+ " : maxScaleValue/maxZoomScaleValue = " + this.maxScaleValue + "/" + newMaxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	/**
-	 * @return the isMeasurementMode
-	 */
-	@Override
 	public boolean isMeasurementMode() {
 		return this.isMeasurementMode;
 	}
 
-	/**
-	 * @param enabled the isMeasurementMode to set
-	 */
-	@Override
 	public void setMeasurementMode(boolean enabled) {
 		this.isMeasurementMode = enabled;
 	}
 
-	/**
-	 * @return the isDeltaMeasurementMode
-	 */
-	@Override
 	public boolean isDeltaMeasurementMode() {
 		return this.isDeltaMeasurementMode;
 	}
 
-	/**
-	 * @param enabled the isDeltaMeasurementMode to set
-	 */
-	@Override
 	public void setDeltaMeasurementMode(boolean enabled) {
 		this.isDeltaMeasurementMode = enabled;
 	}
