@@ -161,15 +161,6 @@ public class CurveSelectorContextMenu {
 									CurveSelectorContextMenu.this.axisEndValues.setText(Messages.getString(MessageIds.GDE_MSGT0084));
 								}
 
-								// check if record switched and measurement mode needs to be reset
-								if (!CurveSelectorContextMenu.this.recordSet.isMeasurementMode(CurveSelectorContextMenu.this.recordNameMeasurement)
-										&& !CurveSelectorContextMenu.this.recordSet.isDeltaMeasurementMode(CurveSelectorContextMenu.this.recordNameMeasurement)) {
-									CurveSelectorContextMenu.this.recordNameMeasurement = GDE.STRING_BLANK;
-									CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
-									CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
-
-								}
-
 								// compare window has fixed defined scale end values
 								if (CurveSelectorContextMenu.this.isTypeCompare) {
 									CurveSelectorContextMenu.this.smoothAtCurrentDropItem.setEnabled(false);
@@ -1249,7 +1240,7 @@ public class CurveSelectorContextMenu {
 	}
 
 	/**
-	 * check measurement record name and reset if changed
+	 * check measurement record name
 	 */
 	boolean isMeasurementWhileNameChanged(String tmpRecordNameMeasurement) {
 		boolean isChanged = false;
@@ -1259,7 +1250,6 @@ public class CurveSelectorContextMenu {
 			this.application.setStatusMessage(GDE.STRING_EMPTY);
 			isChanged = true;
 		}
-		this.recordNameMeasurement = tmpRecordNameMeasurement;
 		return isChanged;
 	}
 
@@ -1280,11 +1270,13 @@ public class CurveSelectorContextMenu {
 	 */
 	public void setMeasurement(String tmpRecordNameMeasurement, boolean isActive) {
 		if (isMeasurementWhileNameChanged(tmpRecordNameMeasurement) || isActive) {
+			this.recordNameMeasurement = tmpRecordNameMeasurement;
 			setMeasurementActive(tmpRecordNameMeasurement, true);
 			CurveSelectorContextMenu.this.simpleMeasure.setSelection(true);
 			CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
 		}
 		else {
+			this.recordNameMeasurement = GDE.STRING_BLANK;
 			setMeasurementActive(tmpRecordNameMeasurement, false);
 			CurveSelectorContextMenu.this.application.setStatusMessage(GDE.STRING_EMPTY);
 		}
@@ -1305,11 +1297,13 @@ public class CurveSelectorContextMenu {
 	 */
 	public void setDeltaMeasurement(String tmpRecordNameKey, boolean isActive) {
 		if (isMeasurementWhileNameChanged(tmpRecordNameKey) || isActive) {
+			this.recordNameMeasurement = tmpRecordNameKey;
 			setDeltaMeasurementActive(tmpRecordNameKey, true);
 			CurveSelectorContextMenu.this.deltaMeasure.setSelection(true);
 			CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
 		}
 		else {
+			this.recordNameMeasurement = GDE.STRING_BLANK;
 			setDeltaMeasurementActive(tmpRecordNameKey, false);
 			CurveSelectorContextMenu.this.application.setStatusMessage(GDE.STRING_EMPTY);
 		}
