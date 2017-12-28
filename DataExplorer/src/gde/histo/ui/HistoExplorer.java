@@ -114,7 +114,6 @@ public class HistoExplorer {
 	 * Does nothing if the histoActive setting is false.
 	 */
 	public synchronized void resetHisto() {
-		log.fine(() -> String.format("isHistoActive=%b", settings.isHistoActive())); //$NON-NLS-1$
 		resetWindowHeaderAndMeasurement(histoGraphicsTabItem);
 		resetWindowHeaderAndMeasurement(histoSummaryTabItem);
 		updateHistoTabs(RebuildStep.A_HISTOSET, true);
@@ -337,10 +336,7 @@ public class HistoExplorer {
 	 * Clear measurement pointer of visible tab window.
 	 */
 	public void clearMeasurementModes() {
-		if (isHistoChartWindowVisible()) {
-			histoSet.getTrailRecordSet().clearMeasurementModes();
-			((AbstractHistoChartWindow) displayTab.getSelection()).getGraphicsComposite().cleanMeasurement();
-		}
+		((AbstractHistoChartWindow) displayTab.getSelection()).getGraphicsComposite().cleanMeasurement();
 	}
 
 	/**
@@ -349,7 +345,6 @@ public class HistoExplorer {
 	public void setMeasurementActive(String recordKey, boolean enabled) {
 		TrailRecordSet trailRecordSet = histoSet.getTrailRecordSet();
 		if (isHistoChartWindowVisible() && trailRecordSet.containsKey(recordKey)) {
-			trailRecordSet.setMeasurementMode(recordKey, enabled);
 			AbstractHistoChartWindow chartWindow = (AbstractHistoChartWindow) displayTab.getSelection();
 			chartWindow.getGraphicsComposite().cleanMeasurement();
 			if (enabled) {
@@ -370,7 +365,6 @@ public class HistoExplorer {
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
 		TrailRecordSet trailRecordSet = histoSet.getTrailRecordSet();
 		if (isHistoChartWindowVisible() && trailRecordSet.containsKey(recordKey)) {
-			trailRecordSet.setDeltaMeasurementMode(recordKey, enabled);
 			AbstractHistoChartWindow chartWindow = (AbstractHistoChartWindow) displayTab.getSelection();
 			chartWindow.getGraphicsComposite().cleanMeasurement();
 			if (enabled) {

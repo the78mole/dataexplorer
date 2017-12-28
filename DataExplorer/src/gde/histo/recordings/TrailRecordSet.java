@@ -80,7 +80,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		LINK_PATH, FILE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, RECORDSET_ORDINAL, GPS_LOCATION
 	};
 
-	protected final static String CHART_WEIGHT = "_chartWeight"; // weight of the charts (graphics or summary boxplot)
+	protected final static String CHART_WEIGHT = "Tab_chartWeight"; // weight of the charts (graphics or summary boxplot)
 
 	/**
 	 * Collect input data for the trail recordset and subordinate objects.
@@ -728,7 +728,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				}
 			}
 			if (Settings.getInstance().isSmartStatistics()) { // only smart statistics supports multiple charts
-				int[] chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS;
+				int[] chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS.clone();
 				for (int i = 0; i < chartWeights.length; i++) {
 					chartWeights[i] = Integer.parseInt(this.template.getProperty(TrailRecordSet.CHART_WEIGHT + i, String.valueOf(HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i])));
 				}

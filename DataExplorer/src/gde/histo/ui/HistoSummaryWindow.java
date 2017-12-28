@@ -23,6 +23,7 @@ import java.util.Arrays;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
@@ -182,6 +183,57 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 	public void clearHeaderAndComment() {
 		this.graphicsComposite.clearHeaderAndComment();
 		this.summaryComposite.clearHeaderAndComment();
+	}
+
+	@Override
+	public void enableGraphicsScale(boolean enabled) {
+		this.graphicsComposite.enableGraphicsScale(enabled);
+		this.summaryComposite.enableGraphicsScale(enabled);
+	}
+
+	@Override
+	public void setCurveAreaBackground(Color curveAreaBackground) {
+		this.graphicsComposite.curveAreaBackground = curveAreaBackground;
+		this.graphicsComposite.graphicCanvas.redraw();
+		this.summaryComposite.curveAreaBackground = curveAreaBackground;
+		this.summaryComposite.graphicCanvas.redraw();
+	}
+
+	@Override
+	public void setCurveAreaBorderColor(Color borderColor) {
+		this.graphicsComposite.curveAreaBorderColor = borderColor;
+		this.graphicsComposite.graphicCanvas.redraw();
+		this.summaryComposite.curveAreaBorderColor = borderColor;
+		this.summaryComposite.graphicCanvas.redraw();
+	}
+
+	@Override
+	public void setSurroundingBackground(Color surroundingBackground) {
+		this.graphicsComposite.surroundingBackground = surroundingBackground;
+		this.graphicsComposite.setBackground(surroundingBackground);
+		this.graphicsComposite.graphicsHeader.setBackground(surroundingBackground);
+		this.graphicsComposite.recordSetComment.setBackground(surroundingBackground);
+		this.graphicsComposite.doRedrawGraphics();
+		this.summaryComposite.surroundingBackground = surroundingBackground;
+		this.summaryComposite.setBackground(surroundingBackground);
+		this.summaryComposite.graphicsHeader.setBackground(surroundingBackground);
+		this.summaryComposite.recordSetComment.setBackground(surroundingBackground);
+		this.summaryComposite.doRedrawGraphics();
+	}
+
+	/**
+	 * Enable curve selector which relect to the sash form weights using the column widths.
+	 */
+	@Override
+	public void enableCurveSelector(boolean enabled) {
+		this.isCurveSelectorEnabled = enabled;
+		this.graphicsComposite.setCurveSelectorEnabled(enabled);
+		this.summaryComposite.setCurveSelectorEnabled(enabled);
+		if (enabled) {
+			setSashFormWeights(this.curveSelectorComposite.getCompositeWidth());
+		} else {
+			setSashFormWeights(0);
+		}
 	}
 
 }

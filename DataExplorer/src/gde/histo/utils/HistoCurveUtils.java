@@ -64,6 +64,20 @@ public final class HistoCurveUtils {
 	private final static Settings	settings		= Settings.getInstance();
 
 	/**
+	 * Draw the vertical fences.
+	 */
+	public static void drawCurveAreaBorders(GC gc, Rectangle bounds, Color borderColor) {
+		gc.setLineWidth(1);
+		gc.setLineStyle(SWT.LINE_SOLID);
+		gc.setForeground(borderColor);
+
+		int xMax = bounds.x + bounds.width;
+		int y0 = bounds.y + bounds.height;
+		gc.drawLine(bounds.x - 1, bounds.y - 1, bounds.x - 1, y0); // left fence
+		gc.drawLine(xMax + 1, bounds.y - 1, xMax + 1, y0); // right fence
+	}
+
+	/**
 	 * Draw horizontal (curve) grid lines according the vector prepared during daring specified curve scale.
 	 * @param recordSet
 	 * @param gc the graphics context to be used

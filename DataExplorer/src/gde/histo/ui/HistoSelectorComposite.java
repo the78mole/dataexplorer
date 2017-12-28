@@ -122,9 +122,9 @@ public final class HistoSelectorComposite extends Composite {
 			this.curveSelectorHeader.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0671));
 			this.curveSelectorHeader.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 			this.curveSelectorHeader.pack();
-			this.initialSelectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8;
+			this.initialSelectorHeaderWidth = this.curveSelectorHeader.getSize().x + 8; // ET +8 don't know why
 			FormData curveSelectorHeaderLData = new FormData();
-			curveSelectorHeaderLData.width = this.initialSelectorHeaderWidth;
+			// ET don't know why curveSelectorHeaderLData.width = this.initialSelectorHeaderWidth;
 			curveSelectorHeaderLData.height = AbstractHistoChartWindow.HEADER_ROW_HEIGHT;
 			curveSelectorHeaderLData.left = new FormAttachment(0, 1000, GDE.IS_WINDOWS ? 6 : 0);
 			curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 0);
@@ -166,11 +166,11 @@ public final class HistoSelectorComposite extends Composite {
 			FormData chartSelectorLData = new FormData();
 			chartSelectorLData.width = 26;
 			chartSelectorLData.height = 26;
-			chartSelectorLData.left = new FormAttachment(0, 1000, this.initialSelectorHeaderWidth);
+			chartSelectorLData.left = new FormAttachment(curveSelectorHeader);
 			chartSelectorLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
 			this.chartSelector.setLayoutData(chartSelectorLData);
 			this.chartSelector.setImage(SWTResourceManager.getImage("gde/resource/moveToNext.png")); //$NON-NLS-1$
-			this.chartSelector.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0899));
+			this.chartSelector.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0899, GDE.MOD1_MOD3));
 			this.chartSelector.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
@@ -185,7 +185,7 @@ public final class HistoSelectorComposite extends Composite {
 			FormData smartSelectorLData = new FormData();
 			smartSelectorLData.width = 26;
 			smartSelectorLData.height = 26;
-			smartSelectorLData.left = new FormAttachment(0, 1000, this.initialSelectorHeaderWidth + 26 * 3);
+			smartSelectorLData.left = new FormAttachment(chartSelector, 26 / 2);
 			smartSelectorLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
 			this.smartSelector.setLayoutData(smartSelectorLData);
 			this.smartSelector.setImage(SWTResourceManager.getImage("gde/resource/smartSetting.png")); //$NON-NLS-1$
@@ -209,8 +209,8 @@ public final class HistoSelectorComposite extends Composite {
 			saveTemplateLData.left = new FormAttachment(smartSelector, -1);
 			saveTemplateLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
 			this.saveTemplate.setLayoutData(saveTemplateLData);
-			this.saveTemplate.setImage(SWTResourceManager.getImage("gde/resource/saveTemplate.png")); //$NON-NLS-1$
-			this.saveTemplate.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0884));
+			this.saveTemplate.setImage(SWTResourceManager.getImage("gde/resource/saveTemplate.png"));  //$NON-NLS-1$
+			this.saveTemplate.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0884, GDE.MOD1));
 			this.saveTemplate.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {

@@ -127,11 +127,8 @@ public final class HistoGraphicsTemplate extends Properties {
 		this.isSaved = newValue;
 	}
 
-	public String getNewFileName() {
-		return this.histoFileName;
-	}
-
 	public void setHistoFileName(String fileName) {
+		log.log(FINE, "fileName=", fileName);
 		this.histoFileName = fileName;
 	}
 

@@ -438,13 +438,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		canvasImageGC.fillRectangle(this.curveAreaBounds);
 		canvasImageGC.setBackground(this.surroundingBackground);
 
-		// draw draw area bounding
-		canvasImageGC.setForeground(this.curveAreaBorderColor);
-
-		int xMax = curveAreaBounds.x + curveAreaBounds.width;
-		int y0 = curveAreaBounds.y + curveAreaBounds.height;
-		canvasImageGC.drawLine(curveAreaBounds.x - 1, curveAreaBounds.y - 1, curveAreaBounds.x - 1, y0); // left fence
-		canvasImageGC.drawLine(xMax + 1, curveAreaBounds.y - 1, xMax + 1, y0); // right fence
+		HistoCurveUtils.drawCurveAreaBorders(canvasImageGC, curveAreaBounds, curveAreaBorderColor);
 
 		// initialize early in order to avoid problems in mouse move events
 		this.timeLine.initialize(trailRecordSet, this.curveAreaBounds.width);
