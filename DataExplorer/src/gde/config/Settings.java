@@ -179,7 +179,13 @@ public class Settings extends Properties {
 	final static String							IS_FIRST_RECORDSET_CHOICE				= "is_first_recordset_choice";																																		//$NON-NLS-1$
 	final static String							WARNING_COUNT_CSV								= "warning_count_csv";																																						//$NON-NLS-1$
 	final static String							WARNING_COUNT_INDEX							= "warning_count_index";																																					//$NON-NLS-1$
+	final static String							WARNING_LEVEL										= "warning_level";																																								//$NON-NLS-1$
+	final static String							IS_CANONICAL_QUANTILES					= "is_canonical_quantiles";																															//$NON-NLS-1$
+	final static String							IS_SYMMETRIC_TOLERANCE_INTERVAL	= "is_symmetric_tolerance_interval";																															//$NON-NLS-1$
+	final static String							OUTLIER_TOLERANCE_SPREAD				= "outlier_tolerance_spread";																																			//$NON-NLS-1$
+	final static String							SUMMARY_SCALE_SPREAD						= "summary_scale_spread";																																					//$NON-NLS-1$
 	final static String							IS_SUMMARY_BOX_VISIBLE					= "is_summary_box_visible";																																				//$NON-NLS-1$
+	final static String							IS_SUMMARY_SPREAD_VISIBLE				= "is_summary_spread_visible";																																		//$NON-NLS-1$
 	final static String							IS_SUMMARY_SPOTS_VISIBLE				= "is_summary_spots_visible";																																			//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
@@ -261,6 +267,8 @@ public class Settings extends Properties {
 	public static final String			HISTO_EXCLUSIONS_DIR_NAME				= ".gdeignore";																																										//$NON-NLS-1$
 	public static final String			GPS_LOCATIONS_DIR_NAME					= "Locations";																																										//$NON-NLS-1$
 	public static final String			GPS_API_URL											= "http://maps.googleapis.com/maps/api/geocode/xml?latlng=";																			//$NON-NLS-1$
+	public static final String			HISTO_INCLUSIONS_FILE_NAME			= ".gdeinclude";																																										//$NON-NLS-1$
+	public static final String			HISTO_INCLUSIONS_DIR_NAME				= ".gdeinclude";																																										//$NON-NLS-1$
 
 	private static double[]					SAMPLING_TIMESPANS							= new double[] { 10., 5., 1., .5, .1, .05, .001 };
 	private static String[]					WARNING_COUNT_VALUES						= new String[] { "2", "3", "5", "8" };
@@ -792,7 +800,13 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_FIRST_RECORDSET_CHOICE, isFirstRecordSetChoice())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WARNING_COUNT_CSV, getWarningCountCsv())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WARNING_COUNT_INDEX, getWarningCountIndex())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WARNING_LEVEL, getWarningLevel())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CANONICAL_QUANTILES, isCanonicalQuantiles())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SYMMETRIC_TOLERANCE_INTERVAL, isSymmetricToleranceInterval())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OUTLIER_TOLERANCE_SPREAD, getOutlierToleranceSpread())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SUMMARY_SCALE_SPREAD, getSummaryScaleSpread())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_BOX_VISIBLE, isSummaryBoxVisible())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_SPREAD_VISIBLE, isSummarySpreadVisible())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_SPOTS_VISIBLE, isSummarySpotsVisible())); //$NON-NLS-1$
 
 			this.writer.flush();
@@ -2513,7 +2527,7 @@ public class Settings extends Properties {
 	 * @return three boxplot graphics sizes as localized texts
 	 */
 	public static String[] getBoxplotScaleNomenclatures() {
-		return Messages.getString(MessageIds.GDE_MSGT0802).split(GDE.STRING_COMMA);
+		return Messages.getString(MessageIds.GDE_MSGT0802).split(GDE.STRING_CSV_SEPARATOR);
 	}
 
 	/**
@@ -2542,7 +2556,7 @@ public class Settings extends Properties {
 	 * @return four boxplot size adaptation levels as localized texts ranging from none to large. the adaptation is based on the log duration.
 	 */
 	public static String[] getBoxplotSizeAdaptationNomenclatures() {
-		return Messages.getString(MessageIds.GDE_MSGT0803).split(GDE.STRING_COMMA);
+		return Messages.getString(MessageIds.GDE_MSGT0803).split(GDE.STRING_CSV_SEPARATOR);
 	}
 
 	/**
@@ -2571,7 +2585,7 @@ public class Settings extends Properties {
 	 * @return six spreading labels starting with 0 to 5 for the history x axis
 	 */
 	public static String[] getXAxisSpreadGradeNomenclatures() {
-		return Messages.getString(MessageIds.GDE_MSGT0823).split(GDE.STRING_COMMA);
+		return Messages.getString(MessageIds.GDE_MSGT0823).split(GDE.STRING_CSV_SEPARATOR);
 	}
 
 	/**
@@ -3008,23 +3022,23 @@ public class Settings extends Properties {
 	 * @return the list with the permitted numbers of logs for warning analysis
 	 */
 	public String getWarningCountCsv() {
-		String list = String.valueOf(this.getProperty(Settings.WARNING_COUNT_CSV, String.join(",", WARNING_COUNT_VALUES)));
+		String list = String.valueOf(this.getProperty(Settings.WARNING_COUNT_CSV, String.join(GDE.STRING_CSV_SEPARATOR, WARNING_COUNT_VALUES)));
 		return list;
 	}
 
 	private int[] getWarningCountValues() {
-		String[] items = getWarningCountCsv().split(",");
+		String[] items = getWarningCountCsv().split(GDE.STRING_CSV_SEPARATOR);
 		if (items.length != WARNING_COUNT_VALUES.length) {
-			setWarningCountCsv(String.join(",", Arrays.asList(WARNING_COUNT_VALUES)));
+			setWarningCountCsv(String.join(GDE.STRING_CSV_SEPARATOR, Arrays.asList(WARNING_COUNT_VALUES)));
 		}
-		return Arrays.stream(getWarningCountCsv().split(",")).mapToInt(v -> Integer.valueOf(v)).toArray();
+		return Arrays.stream(items).mapToInt(v -> Integer.valueOf(v)).toArray();
 	}
 
 	/**
-	 * @return the index number set by the user which is used for history log selection (default is 1)
+	 * @return the index number set by the user which is used for history log selection (default is 0)
 	 */
 	public int getWarningCountIndex() {
-		return Integer.valueOf(this.getProperty(Settings.WARNING_COUNT_INDEX, String.valueOf(1)));
+		return Integer.valueOf(this.getProperty(Settings.WARNING_COUNT_INDEX, String.valueOf(0)));
 	}
 
 	/**
@@ -3039,20 +3053,90 @@ public class Settings extends Properties {
 	 */
 	public int getWarningCount(int index) {
 		int[] warningCountValues = getWarningCountValues();
-		int realIndex = index > 0 && index < warningCountValues.length ? index : 1;
+		int realIndex = index >= 0 && index < warningCountValues.length ? index : 1;
 		return Integer.valueOf(warningCountValues[realIndex]);
 	}
 
 
 	/**
-	 * @param uintValue the number of of most recent logs which is analyzed for warnings
+	 * @param uintValue the number of most recent logs which is analyzed for warnings
 	 */
 	public void setWarningCountIndex(String uintValue) {
 		this.setProperty(Settings.WARNING_COUNT_INDEX, String.valueOf(uintValue));
 	}
 
 	/**
-	 * @param enabled true if the summary graphics show all spots; false shows the most recent spots
+	 * @return the warning level set by the user (default 0 is far warnings only -> red; -1 is no warning)
+	 */
+	public int getWarningLevel() {
+		return Integer.valueOf(this.getProperty(Settings.WARNING_LEVEL, String.valueOf(0)));
+	}
+
+	/**
+	 * @param uintValue the warning level set by the user (0 is far warnings only -> red; -1 is no warning)
+	 */
+	public void setWarningLevel(String uintValue) {
+		this.setProperty(Settings.WARNING_LEVEL, String.valueOf(uintValue));
+	}
+
+	/**
+	 * @param enabled true if all quantile calculations base on a uniform interquantile range without zero detection
+	 */
+	public void setCanonicalQuantiles(boolean enabled) {
+		this.setProperty(Settings.IS_CANONICAL_QUANTILES, String.valueOf(enabled));
+	}
+
+	/**
+	 * @return true if all quantile calculations base on a uniform interquantile range without zero detection
+	 */
+	public boolean isCanonicalQuantiles() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_CANONICAL_QUANTILES, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param enabled true if the lower and upper quantile tolerance is equal and forms a uniform interquantile range
+	 */
+	public void setSymmetricToleranceInterval(boolean enabled) {
+		this.setProperty(Settings.IS_SYMMETRIC_TOLERANCE_INTERVAL, String.valueOf(enabled));
+	}
+
+	/**
+	 * @return true if the lower and upper quantile tolerance is equal and forms a uniform interquantile range
+	 */
+	public boolean isSymmetricToleranceInterval() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_SYMMETRIC_TOLERANCE_INTERVAL, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @return the spread factor for vault outliers based on the tolerance interval (-> increase for less outliers)
+	 */
+	public int getOutlierToleranceSpread() {
+		return Integer.valueOf(this.getProperty(Settings.OUTLIER_TOLERANCE_SPREAD, String.valueOf(99999)));
+	}
+
+	/**
+	 * @param uintValue the spread factor for vault outliers based on the tolerance interval (default 9 -> increase for less outliers)
+	 */
+	public void setOutlierToleranceSpread(String uintValue) {
+		this.setProperty(Settings.OUTLIER_TOLERANCE_SPREAD, String.valueOf(uintValue));
+	}
+
+	/**
+	 * @return the spread factor based on the tolerance interval (default 9 -> increase for showing more outliers)
+	 */
+	public int getSummaryScaleSpread() {
+		return Integer.valueOf(this.getProperty(Settings.SUMMARY_SCALE_SPREAD, String.valueOf(9)));
+	}
+
+	/**
+	 * @param uintValue the spread factor based on the tolerance interval (default 9 -> increase for showing more outliers)
+	 */
+	public void setSummaryScaleSpread(String uintValue) {
+		this.setProperty(Settings.SUMMARY_SCALE_SPREAD, String.valueOf(uintValue));
+	}
+
+	/**
+	 * @param enabled true if the summary graphics shows the boxplot
 	 */
 	public void setSummaryBoxVisible(boolean enabled) {
 		this.setProperty(Settings.IS_SUMMARY_BOX_VISIBLE, String.valueOf(enabled));
@@ -3063,6 +3147,20 @@ public class Settings extends Properties {
 	 */
 	public boolean isSummaryBoxVisible() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_SUMMARY_BOX_VISIBLE, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param enabled true if the summary graphics shows the distribution ranges M +- 2 SD
+	 */
+	public void setSummarySpreadVisible(boolean enabled) {
+		this.setProperty(Settings.IS_SUMMARY_SPREAD_VISIBLE, String.valueOf(enabled));
+	}
+
+	/**
+	 * @return true if the summary graphics shows the distribution ranges M +- 2 SD
+	 */
+	public boolean isSummarySpreadVisible() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_SUMMARY_SPREAD_VISIBLE, "false")); //$NON-NLS-1$
 	}
 
 	/**

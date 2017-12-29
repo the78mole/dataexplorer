@@ -248,8 +248,8 @@ public final class HistoSelectorComposite extends Composite {
 						public void widgetSelected(SelectionEvent event) {
 							log.fine("selectorCombos.SelectionListener, event=" + event); //$NON-NLS-1$
 							Combo combo = (Combo) event.getSource();
-							record.getTrailSelector().setTrailTextSelectedIndex(combo.getSelectionIndex());
-							HistoSelectorComposite.this.presentHistoExplorer.updateHistoTabs(record.getName(), true);
+							recordSet.refillRecord(record, combo.getSelectionIndex());
+							HistoSelectorComposite.this.presentHistoExplorer.updateHistoTabs(false, false);
 						}
 					});
 					if (record.isVisible()) {

@@ -141,7 +141,7 @@ import gde.utils.WebBrowser;
 public class DataExplorer extends Composite {
 
 	/**
-	 * Extends the main application class of DataExplorer.
+	 * Supplement for the main application class of DataExplorer.
 	 * @author Thomas Eickert (USER)
 	 */
 	public class HistoExplorer {
@@ -157,18 +157,17 @@ public class DataExplorer extends Composite {
 		private HistoSet						histoSet;
 		private boolean							isCurveSurveyVisible;
 
-		/**
-		 *
-		 */
 		public HistoExplorer(CTabFolder displayTab) {
 			this.displayTab = displayTab;
 
 			this.settings.setHistoActive(true);
 			this.histoSet = new HistoSet();
+		}
 
-			if (this.histoGraphicsTabItem != null) resetGraphicsWindowHeaderAndMeasurement();
-			if (this.histoSummaryTabItem != null) resetSummaryWindowHeaderAndMeasurement();
-
+		/**
+		 * Build and fill the tabs.
+		 */
+		public void initHisto() {
 			int positionG = this.displayTab.getItems().length < DataExplorer.TAB_INDEX_HISTO_GRAPHIC ? this.displayTab.getItems().length
 					: DataExplorer.TAB_INDEX_HISTO_GRAPHIC;
 			this.histoGraphicsTabItem = HistoGraphicsWindow.create(this.displayTab, SWT.NONE, positionG);
@@ -681,7 +680,8 @@ public class DataExplorer extends Composite {
 	StatusBar											statusBar;
 	int														progessPercentage									= 0;
 	boolean												isDeviceDialogModal;
-	int														tabSelectedIndex;																																							// use for identifying the last selected tab
+	int														tabSelectedIndex;																																							// use for identifying
+																																																															// the last selected tab
 
 	SettingsDialog								settingsDialog;
 	HelpInfoDialog								helpDialog;
@@ -697,15 +697,19 @@ public class DataExplorer extends Composite {
 	Thread												writeTmpFileThread;
 	boolean												isTmpWriteStop										= false;
 
-	boolean												isCurveSelectorEnabled						= true;																											// always enabled during startup - there is no setting. So true is mandatory.
+	boolean												isCurveSelectorEnabled						= true;																											// always enabled during
+																																																															// startup - there is no
+																																																															// setting. So true is
+																																																															// mandatory.
 	boolean												isRecordCommentVisible						= false;
-	boolean												isCurveSurveyVisible							= false;
 	boolean												isGraphicsHeaderVisible						= false;
 	boolean												isObjectWindowVisible							= false;
 
 	int														openYesNoMessageDialogAsyncValue	= -1;
 
-	DropTarget										target;																																												// = new DropTarget(dropTable, operations);
+	DropTarget										target;																																												// = new
+																																																															// DropTarget(dropTable,
+																																																															// operations);
 
 	final FileTransfer						fileTransfer											= FileTransfer.getInstance();
 	Transfer[]										types															= new Transfer[] { this.fileTransfer };
@@ -1331,10 +1335,11 @@ public class DataExplorer extends Composite {
 	public synchronized void setHisto(boolean isActive) {
 		if (isActive) {
 			HistoExplorer tmpHistoExplorer = new HistoExplorer(displayTab);
+			this.histoExplorer = Optional.of(tmpHistoExplorer);
+			tmpHistoExplorer.initHisto();
 			tmpHistoExplorer.enableCurveSelector(this.isCurveSelectorEnabled);
 			tmpHistoExplorer.enableGraphicsHeader(this.isGraphicsHeaderVisible);
 			tmpHistoExplorer.enableRecordSetComment(this.isRecordCommentVisible);
-			this.histoExplorer = Optional.of(tmpHistoExplorer);
 		} else {
 			this.histoExplorer = Optional.empty();
 		}
@@ -2782,7 +2787,7 @@ public class DataExplorer extends Composite {
 	 */
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordKey);
-		this.histoExplorer.ifPresent(h -> h.setMeasurementActive(recordKey, enabled));
+		this.histoExplorer.ifPresent(h -> h.setDeltaMeasurementActive(recordKey, enabled));
 
 		boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
 		RecordSet recordSet = isGraphicsTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
@@ -3242,8 +3247,8 @@ public class DataExplorer extends Composite {
 			this.graphicsTabItem.setCurveAreaBorderColor(borderColor);
 		}
 		else if (tabItemIndex > 0) if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.COMPARE)) {
-				this.settings.setCurveCompareBorderColor(borderColor);
-				this.compareTabItem.setCurveAreaBorderColor(borderColor);
+			this.settings.setCurveCompareBorderColor(borderColor);
+			this.compareTabItem.setCurveAreaBorderColor(borderColor);
 		}
 		else if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.UTIL)) {
 			this.settings.setUtilityCurvesBorderColor(borderColor);
@@ -3251,7 +3256,7 @@ public class DataExplorer extends Composite {
 		}
 		else {
 			this.histoExplorer.ifPresent(h -> h.setBorderColor(borderColor));
-		}
+			}
 	}
 
 	/**
@@ -3656,43 +3661,43 @@ public class DataExplorer extends Composite {
 			MessageBox messageDialog = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
 			messageDialog.setText(GDE.NAME_LONG);
 			messageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGI0052)
-			//				+ Messages.getString(MessageIds.GDE_MSGI0056, this.settings.getLocale().equals(Locale.GERMAN)
-			//				? new String[] {
-			//					"1)  Korrektur der initialen Messwert-Synchronisation\n",
-			//					"2)  Korrektur vom Junsi iCharger 206, 208, 306, 3010 konstanten Zeitschritt auf 2 Sekunden\n",
-			//					"3)  Korrektur des Problems bei mehrfachen kopieren der Grafik in die Zwischenablage\n",
-			//					"4)  Korrektur der JLog2 Kontext sensitiven Hilfeseite Auswahl\n",
-			//					"5)  Korrektur des JLog2 Konfigurationsdialoges - Sicherungsknopf wurde nicht aktiviert\n",
-			//					"6)  Korrektur des Fehlers beim Laden der Farben von der OSD-Datei\n",
-			//					"7)  CSV2SerialAdapter - Fehlender Status wird jetzt als Fehler erkannt\n",
-			//					"8)  HoTTAdapter - Korrektur der Einlesealgorithmus bei ausgewählter Kanalinformation und Empfänger\n",
-			//					"9)  HoTTAdapter* - Anpassung der Käpazitätsfilter an die aktuelle Leistung (ESC, GAM, EAM)\n",
-			//					"10) HoTTAdapter* - Anpassung des Stromfilters beim ESC",
-			//					"11) HoTTAdapter2* - Korrektur der Skalensynchronisationsreferenz in der Konfiguration Kanäle und MotorControl\n",
-			//					"12) GPS-Logger* - GPX-Export ermöglicht z.B. Garmin Virb\n",
-			//					"13) UniLog2 - Korrektur fehlender M-Link Werte aus der Logdatei\n",
-			//					"14) UniLog2 - Korrektur des Vehaltens bei Veränderung der Symbole und Einheiten bei M-Link Werten\n",
-			//					"15) Junsi iCharger 4010 Duo Unterstützung hinzugefügt (lesen von der SD-Karte)\n",
-			//					"16) Linux CDC ACM Geräte als ttyACM* serieller Port hinzugefügt\n"
-			//			}
-			//			: new String[] {
-			//					"1)  fix initial synchronization of measurements\n",
-			//					"2)  fix Junsi iCharger 206, 208, 306, 3010 constant time step to 2 seconds\n",
-			//					"3)  fix problem while copy graphics into clip board several time in sequence\n",
-			//					"4)  fix JLog2 context help page selection\n",
+			// + Messages.getString(MessageIds.GDE_MSGI0056, this.settings.getLocale().equals(Locale.GERMAN)
+			// ? new String[] {
+			// "1) Korrektur der initialen Messwert-Synchronisation\n",
+			// "2) Korrektur vom Junsi iCharger 206, 208, 306, 3010 konstanten Zeitschritt auf 2 Sekunden\n",
+			// "3) Korrektur des Problems bei mehrfachen kopieren der Grafik in die Zwischenablage\n",
+			// "4) Korrektur der JLog2 Kontext sensitiven Hilfeseite Auswahl\n",
+			// "5) Korrektur des JLog2 Konfigurationsdialoges - Sicherungsknopf wurde nicht aktiviert\n",
+			// "6) Korrektur des Fehlers beim Laden der Farben von der OSD-Datei\n",
+			// "7) CSV2SerialAdapter - Fehlender Status wird jetzt als Fehler erkannt\n",
+			// "8) HoTTAdapter - Korrektur der Einlesealgorithmus bei ausgewählter Kanalinformation und Empfänger\n",
+			// "9) HoTTAdapter* - Anpassung der Käpazitätsfilter an die aktuelle Leistung (ESC, GAM, EAM)\n",
+			// "10) HoTTAdapter* - Anpassung des Stromfilters beim ESC",
+			// "11) HoTTAdapter2* - Korrektur der Skalensynchronisationsreferenz in der Konfiguration Kanäle und MotorControl\n",
+			// "12) GPS-Logger* - GPX-Export ermöglicht z.B. Garmin Virb\n",
+			// "13) UniLog2 - Korrektur fehlender M-Link Werte aus der Logdatei\n",
+			// "14) UniLog2 - Korrektur des Vehaltens bei Veränderung der Symbole und Einheiten bei M-Link Werten\n",
+			// "15) Junsi iCharger 4010 Duo Unterstützung hinzugefügt (lesen von der SD-Karte)\n",
+			// "16) Linux CDC ACM Geräte als ttyACM* serieller Port hinzugefügt\n"
+			// }
+			// : new String[] {
+			// "1) fix initial synchronization of measurements\n",
+			// "2) fix Junsi iCharger 206, 208, 306, 3010 constant time step to 2 seconds\n",
+			// "3) fix problem while copy graphics into clip board several time in sequence\n",
+			// "4) fix JLog2 context help page selection\n",
 			//					"5)  fix JLog2 configuration dialog - set drop downs to editable false since this event wasn't handled and does not activate save button\n",
-			//					"6)  fix error not loading color from OSD file some colors (1,1,1)\n",
-			//					"7)  CSV2SerialAdapter - fix error handling of missing status\n",
-			//					"8)  HoTTAdapter - fix receiver only with channels times 10 error\n",
-			//					"9)  HoTTAdapter* - adapt capacity filter according actual power\n",
-			//					"10) HoTTAdapter* - adapt current filter\n",
-			//					"11) HoTTAdapter2* - correct scale sync reference in configuration Channels and SpeedControl\n",
-			//					"12) GPS-Logger* - enable GPX export (Garmin Virb)\n",
-			//					"13) UniLog2 - fix missing parsing of M-Link data\n",
-			//					"14) UniLog2 - fix configuration of symbol and unit for M-Link measurements\n",
-			//					"15) add Junsi iCharger 4010 Duo support (read log from SD storage)\n",
-			//					"16) add port enumeration ttyACM* Linux CDC ACM devices\n"
-			//			})
+			// "6) fix error not loading color from OSD file some colors (1,1,1)\n",
+			// "7) CSV2SerialAdapter - fix error handling of missing status\n",
+			// "8) HoTTAdapter - fix receiver only with channels times 10 error\n",
+			// "9) HoTTAdapter* - adapt capacity filter according actual power\n",
+			// "10) HoTTAdapter* - adapt current filter\n",
+			// "11) HoTTAdapter2* - correct scale sync reference in configuration Channels and SpeedControl\n",
+			// "12) GPS-Logger* - enable GPX export (Garmin Virb)\n",
+			// "13) UniLog2 - fix missing parsing of M-Link data\n",
+			// "14) UniLog2 - fix configuration of symbol and unit for M-Link measurements\n",
+			// "15) add Junsi iCharger 4010 Duo support (read log from SD storage)\n",
+			// "16) add port enumeration ttyACM* Linux CDC ACM devices\n"
+			// })
 			);
 			if (SWT.YES == messageDialog.open()) {
 				new Thread("Download") {
