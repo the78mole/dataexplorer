@@ -95,7 +95,7 @@ import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.ui.HistoExplorer;
-import gde.histo.ui.HistoGraphicsWindow;
+import gde.histo.ui.HistoSummaryWindow;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -147,6 +147,7 @@ public class DataExplorer extends Composite {
 	public final static Color			COLOR_GREY												= SWTResourceManager.getColor(SWT.COLOR_GRAY);
 	public final static Color			COLOR_CANVAS_YELLOW								= SWTResourceManager.getColor(250, 249, 211);
 	public final static Color			COLOR_BLUE												= SWTResourceManager.getColor(SWT.COLOR_BLUE);
+	public final static Color			COLOR_LIGHT_BLUE									= SWTResourceManager.getColor(239, 239, 255);
 	public final static Color			COLOR_DARK_GREEN									= SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
 	public final static Color			COLOR_BLACK												= SWTResourceManager.getColor(SWT.COLOR_BLACK);
 	public final static Color			COLOR_RED													= SWTResourceManager.getColor(SWT.COLOR_RED);
@@ -340,8 +341,7 @@ public class DataExplorer extends Composite {
 					log.log(Level.OFF, "Statusbar created");
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -363,11 +363,10 @@ public class DataExplorer extends Composite {
 				@Override
 				public void run() {
 					try {
-						DeviceSerialPortImpl.listConfiguredSerialPorts(DataExplorer.this.settings.doPortAvailabilityCheck(),
-								DataExplorer.this.settings.isSerialPortBlackListEnabled() ? DataExplorer.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
-								DataExplorer.this.settings.isSerialPortWhiteListEnabled() ? DataExplorer.this.settings.getSerialPortWhiteList() : new Vector<String>());
-					}
-					catch (Throwable t) {
+						DeviceSerialPortImpl.listConfiguredSerialPorts(DataExplorer.this.settings.doPortAvailabilityCheck(), DataExplorer.this.settings.isSerialPortBlackListEnabled()
+								? DataExplorer.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY, DataExplorer.this.settings.isSerialPortWhiteListEnabled()
+										? DataExplorer.this.settings.getSerialPortWhiteList() : new Vector<String>());
+					} catch (Throwable t) {
 						log.log(java.util.logging.Level.WARNING, t.getMessage(), t);
 					}
 				}
@@ -375,21 +374,23 @@ public class DataExplorer extends Composite {
 
 			this.isDeviceDialogModal = this.settings.isDeviceDialogsModal();
 
-			if (this.settings.getWindow().width < 600) this.settings.setWindow(new Point(this.settings.getWindow().x, this.settings.getWindow().y), new Point(600, this.settings.getWindow().height));
-			if (this.settings.getWindow().height < 400) this.settings.setWindow(new Point(this.settings.getWindow().x, this.settings.getWindow().y), new Point(this.settings.getWindow().width, 400));
+			if (this.settings.getWindow().width < 600) this.settings.setWindow(new Point(this.settings.getWindow().x,
+					this.settings.getWindow().y), new Point(600, this.settings.getWindow().height));
+			if (this.settings.getWindow().height < 400) this.settings.setWindow(new Point(this.settings.getWindow().x,
+					this.settings.getWindow().y), new Point(this.settings.getWindow().width, 400));
 			if (this.settings.isWindowMaximized()) {
 				GDE.shell.setLocation(this.settings.getWindow().x, this.settings.getWindow().y);
 				GDE.shell.setSize(this.settings.getWindow().width, this.settings.getWindow().height);
 				GDE.shell.setMaximized(true);
-			}
-			else {
+			} else {
 				Rectangle displayBounds = GDE.display.getBounds();
-				if (this.settings.getWindow().x < displayBounds.x || this.settings.getWindow().x > (displayBounds.width + displayBounds.x) // check location x,y inside display bounds
+				if (this.settings.getWindow().x < displayBounds.x || this.settings.getWindow().x > (displayBounds.width + displayBounds.x) // check location
+																																																																		// x,y inside
+																																																																		// display bounds
 						|| this.settings.getWindow().y < displayBounds.y || this.settings.getWindow().y > (displayBounds.height + displayBounds.y)) {
 					GDE.shell.setLocation(50, 50);
 					GDE.shell.setSize(this.settings.getWindow().width, this.settings.getWindow().height);
-				}
-				else {
+				} else {
 					GDE.shell.setBounds(this.settings.getWindow());
 				}
 			}
@@ -426,7 +427,8 @@ public class DataExplorer extends Composite {
 			GDE.shell.addControlListener(new ControlListener() {
 				@Override
 				public void controlResized(ControlEvent controlevent) {
-					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
+					if (log.isLoggable(Level.FINEST))
+						log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					DataExplorer.application.settings.setWindowMaximized(GDE.shell.getMaximized());
 					if (!DataExplorer.application.settings.isWindowMaximized()) {
 						DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
@@ -435,7 +437,8 @@ public class DataExplorer extends Composite {
 
 				@Override
 				public void controlMoved(ControlEvent controlevent) {
-					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
+					if (log.isLoggable(Level.FINEST))
+						log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					if (!GDE.shell.getMaximized()) DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
 				}
 			});
@@ -453,8 +456,7 @@ public class DataExplorer extends Composite {
 							String[] messages = errorMessage.split(GDE.STRING_SEMICOLON);
 							messageDialog.setText(messages[0]);
 							messageDialog.setMessage(messages[1]);
-						}
-						else {
+						} else {
 							messageDialog.setText(GDE.NAME_LONG);
 							messageDialog.setMessage(errorMessage);
 						}
@@ -477,8 +479,7 @@ public class DataExplorer extends Composite {
 			while (!GDE.shell.isDisposed()) {
 				if (!GDE.display.readAndDispatch()) GDE.display.sleep();
 			}
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			log.log(Level.SEVERE, t.getMessage(), t);
 			t.printStackTrace(System.err);
 		}
@@ -506,12 +507,10 @@ public class DataExplorer extends Composite {
 				rootLogger.addHandler(logHandler);
 				logHandler.setFormatter(lf);
 				logHandler.setLevel(Level.ALL);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-		else {
+		} else {
 			logHandler = new ConsoleHandler();
 			rootLogger.addHandler(logHandler);
 			logHandler.setFormatter(lf);
@@ -571,15 +570,15 @@ public class DataExplorer extends Composite {
 									port.closeUsbPort(null);
 								else
 									port.close(); // serial port
-							}
-							catch (Exception e) {
+							} catch (Exception e) {
 								log.log(Level.WARNING, e.getMessage(), e);
 							}
 							DataExplorer.application.getActiveDevice().storeDeviceProperties();
 						}
 					}
 
-					if (DataExplorer.application.getDeviceDialog() != null && !DataExplorer.application.getDeviceDialog().isDisposed()) {// if a device tool box is open, dispose it
+					if (DataExplorer.application.getDeviceDialog() != null && !DataExplorer.application.getDeviceDialog().isDisposed()) {// if a device tool box
+																																																																// is open, dispose it
 						DataExplorer.application.getDeviceDialog().forceDispose();
 					}
 
@@ -621,7 +620,8 @@ public class DataExplorer extends Composite {
 						Point statusBarSize = DataExplorer.this.statusComposite.getSize();
 						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "statusBar.size = " + statusBarSize); //$NON-NLS-1$
 						DataExplorer.this.displayTab.setBounds(0, menuCoolBarSize.y + fillerSize.y, shellSize.x, shellSize.y - menuCoolBarSize.y - statusBarSize.y - fillerSize.y);
-						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "displayTab.bounds = " + DataExplorer.this.displayTab.getBounds()); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE))
+							log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "displayTab.bounds = " + DataExplorer.this.displayTab.getBounds()); //$NON-NLS-1$
 					}
 				}
 			});
@@ -636,28 +636,22 @@ public class DataExplorer extends Composite {
 							DataExplorer.this.graphicsTabItem.setSashFormWeights(DataExplorer.this.graphicsTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
 						else
 							DataExplorer.this.graphicsTabItem.setSashFormWeights(0);
-					}
-					else if (isRecordSetVisible(GraphicsType.COMPARE) && DataExplorer.this.compareTabItem != null) {
+					} else if (isRecordSetVisible(GraphicsType.COMPARE) && DataExplorer.this.compareTabItem != null) {
 						DataExplorer.this.compareTabItem.setSashFormWeights(DataExplorer.this.compareTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
-					}
-					else if (isRecordSetVisible(GraphicsType.UTIL) && DataExplorer.this.utilGraphicsTabItem != null) {
+					} else if (isRecordSetVisible(GraphicsType.UTIL) && DataExplorer.this.utilGraphicsTabItem != null) {
 						DataExplorer.this.utilGraphicsTabItem.setSashFormWeights(DataExplorer.this.utilGraphicsTabItem.getCurveSelectorComposite().getSelectorColumnWidth());
-					} else {
-						DataExplorer.this.histoExplorer.ifPresent(h -> h.paintControl(evt));
 					}
 					if (DataExplorer.this.objectDescriptionTabItem != null) {
 						if (DataExplorer.this.objectDescriptionTabItem.isVisible()) {
 							if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "displayTab.focusGained " + evt); //$NON-NLS-1$
 							DataExplorer.this.isObjectWindowVisible = true;
-						}
-						else if (DataExplorer.this.isObjectWindowVisible) {
+						} else if (DataExplorer.this.isObjectWindowVisible) {
 							if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "displayTab.focusLost " + evt); //$NON-NLS-1$
 							DataExplorer.this.checkSaveObjectData();
 							DataExplorer.this.isObjectWindowVisible = false;
 						}
 					}
-					if (log.isLoggable(Level.FINE) && DataExplorer.this.displayTab != null && DataExplorer.this.filler != null && DataExplorer.this.menuCoolBar != null
-							&& DataExplorer.this.statusComposite != null && getSize().y != 0) {
+					if (log.isLoggable(Level.FINE) && DataExplorer.this.displayTab != null && DataExplorer.this.filler != null && DataExplorer.this.menuCoolBar != null && DataExplorer.this.statusComposite != null && getSize().y != 0) {
 						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "filler.size = " + DataExplorer.this.filler.getSize()); //$NON-NLS-1$
 						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "menuCoolBar.size = " + DataExplorer.this.menuCoolBar.getSize()); //$NON-NLS-1$
 						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "shellClient.size = " + new Point(getClientArea().width, getClientArea().height)); //$NON-NLS-1$
@@ -673,36 +667,33 @@ public class DataExplorer extends Composite {
 					int tabPreviousIndex = DataExplorer.this.tabSelectedIndex;
 					int tabSelectionIndex = tabFolder.getSelectionIndex();
 					DataExplorer.this.tabSelectedIndex = tabFolder.getSelectionIndex();
-					try {
-						if (log.isLoggable(Level.OFF))
-							log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "old=" + tabPreviousIndex + " new=" + tabSelectionIndex + " addSelectionListener, event=" + evt); //$NON-NLS-1$
-
-						if (tabFolder.getItem(tabPreviousIndex) instanceof HistoGraphicsWindow) {
-							DataExplorer.this.setStatusMessage(GDE.STRING_EMPTY);
+					if (DataExplorer.this.histoExplorer.isPresent()) {
+						try {
+							if (log.isLoggable(Level.FINER))
+								log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "old=" + tabPreviousIndex + " new=" + tabSelectionIndex + " addSelectionListener, event=" + evt); //$NON-NLS-1$
+							if (tabFolder.getItem(tabPreviousIndex) instanceof HistoSummaryWindow) {
+								DataExplorer.this.setStatusMessage(GDE.STRING_EMPTY);
+							}
+						} catch (Exception e) {
+							log.log(Level.WARNING, e.getMessage(), e);
 						}
-					}
-					catch (Exception e) {
-						log.log(Level.WARNING, e.getMessage(), e);
 					}
 
 					if (tabSelectionIndex == 0) {
 						DataExplorer.this.menuToolBar.enableScopePointsCombo(true);
 						DataExplorer.this.enableZoomMenuButtons(true);
 						DataExplorer.this.updateGraphicsWindow();
-					}
-					else if (tabSelectionIndex > 0) {
+					} else if (tabSelectionIndex > 0) {
 						if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.COMPARE)) {
 							DataExplorer.this.menuToolBar.enableScopePointsCombo(false);
 							DataExplorer.this.enableZoomMenuButtons(true);
 							DataExplorer.this.updateGraphicsWindow();
-						}
-						else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
+						} else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
 							DataExplorer.this.menuToolBar.enableScopePointsCombo(false);
 							DataExplorer.this.enableZoomMenuButtons(false);
 							DataExplorer.this.updateGraphicsWindow();
-						}
-						else {
-							DataExplorer.this.histoExplorer.ifPresent(h -> h.widgetSelected(evt));
+						} else {
+							DataExplorer.this.histoExplorer.ifPresent(h -> h.updateVisibleTab(evt));
 						}
 					}
 				}
@@ -716,8 +707,7 @@ public class DataExplorer extends Composite {
 					if (event.detail == DND.DROP_DEFAULT) {
 						if ((event.operations & DND.DROP_COPY) != 0) {
 							event.detail = DND.DROP_COPY;
-						}
-						else {
+						} else {
 							event.detail = DND.DROP_NONE;
 						}
 					}
@@ -737,8 +727,7 @@ public class DataExplorer extends Composite {
 					if (event.detail == DND.DROP_DEFAULT) {
 						if ((event.operations & DND.DROP_COPY) != 0) {
 							event.detail = DND.DROP_COPY;
-						}
-						else {
+						} else {
 							event.detail = DND.DROP_NONE;
 						}
 					}
@@ -757,11 +746,9 @@ public class DataExplorer extends Composite {
 							if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "dropped file = " + filePath); //$NON-NLS-1$
 							if (filePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
 								DataExplorer.this.fileHandler.openOsdFile(filePath);
-							}
-							else if (filePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
+							} else if (filePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
 								DataExplorer.this.fileHandler.openLovFile(filePath);
-							}
-							else {
+							} else {
 								application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0022));
 							}
 						}
@@ -796,7 +783,6 @@ public class DataExplorer extends Composite {
 				this.menuBar.setGraphicsHeaderMenuItemSelection(this.isGraphicsHeaderVisible);
 				this.enableGraphicsHeader(this.isGraphicsHeaderVisible);
 			}
-			this.histoExplorer.ifPresent(h -> h.restoreWindowsSettings(this.menuBar));
 
 			this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this);
 
@@ -825,8 +811,7 @@ public class DataExplorer extends Composite {
 			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) {
 				this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this);
 				this.deviceSelectionDialog.open();
-			}
-			else {
+			} else {
 				// channels HashMap will filled with empty records matching the active device, the dummy content is replaced
 				this.deviceSelectionDialog.setupDevice();
 			}
@@ -836,8 +821,7 @@ public class DataExplorer extends Composite {
 					this.fileHandler.openOsdFile(inputFilePath);
 				else if (inputFilePath.endsWith(GDE.FILE_ENDING_LOV)) this.fileHandler.openLovFile(inputFilePath);
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 		}
@@ -858,6 +842,7 @@ public class DataExplorer extends Composite {
 			tmpHistoExplorer.enableGraphicsHeader(this.isGraphicsHeaderVisible);
 			tmpHistoExplorer.enableRecordSetComment(this.isRecordCommentVisible);
 		} else {
+			this.histoExplorer.ifPresent(h -> h.disposeHisto());
 			this.histoExplorer = Optional.empty();
 		}
 	}
@@ -869,8 +854,7 @@ public class DataExplorer extends Composite {
 		if (this.statisticsTabItem != null && !this.statisticsTabItem.isDisposed()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.statisticsTabItem.updateStatisticsData(true);
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -896,8 +880,7 @@ public class DataExplorer extends Composite {
 		final Channel activeChannel = this.channels != null ? this.channels.getActiveChannel() : null;
 		final RecordSet activeRecordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 
-		if (activeRecordSet != null && activeRecordSet.getRecordDataSize(true) > 0 && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()
-				&& activeRecordSet.getName().equals(requestingRecordSetName) && activeRecordSet.getDevice().isTableTabRequested()) {
+		if (activeRecordSet != null && activeRecordSet.getRecordDataSize(true) > 0 && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed() && activeRecordSet.getName().equals(requestingRecordSetName) && activeRecordSet.getDevice().isTableTabRequested()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				if (forceClean) {
 					// DataExplorer.this.dataTableTabItem.setAbsoluteDateTime(false);
@@ -905,8 +888,7 @@ public class DataExplorer extends Composite {
 				}
 				DataExplorer.this.dataTableTabItem.setRowCount(activeRecordSet.getRecordDataSize(true));
 				DataExplorer.this.dataTableTabItem.updateTopIndex();
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -919,16 +901,14 @@ public class DataExplorer extends Composite {
 					}
 				});
 			}
-		}
-		else {
+		} else {
 			if (activeRecordSet == null || requestingRecordSetName.equals(GDE.STRING_EMPTY)) {
 				if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 					if (this.dataTableTabItem != null) {
 						// this.dataTableTabItem.setHeader();
 						this.dataTableTabItem.cleanTable();
 					}
-				}
-				else {
+				} else {
 					GDE.display.asyncExec(new Runnable() {
 
 						@Override
@@ -952,8 +932,7 @@ public class DataExplorer extends Composite {
 		if (this.digitalTabItem != null && !this.digitalTabItem.isDisposed()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.digitalTabItem.update(true);
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -971,8 +950,7 @@ public class DataExplorer extends Composite {
 		if (this.digitalTabItem != null && !this.digitalTabItem.isDisposed()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.digitalTabItem.updateChilds();
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -990,8 +968,7 @@ public class DataExplorer extends Composite {
 		if (this.analogTabItem != null && !this.analogTabItem.isDisposed()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.analogTabItem.update(true);
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -1009,8 +986,7 @@ public class DataExplorer extends Composite {
 		if (this.analogTabItem != null && !this.analogTabItem.isDisposed()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.analogTabItem.updateChilds();
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -1036,8 +1012,7 @@ public class DataExplorer extends Composite {
 		if (this.cellVoltageTabItem != null && !this.cellVoltageTabItem.isDisposed()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.cellVoltageTabItem.getCellVoltageMainComposite().redraw();
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -1055,8 +1030,7 @@ public class DataExplorer extends Composite {
 		if (this.cellVoltageTabItem != null && !this.cellVoltageTabItem.isDisposed()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.cellVoltageTabItem.updateChilds();
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -1074,8 +1048,7 @@ public class DataExplorer extends Composite {
 		if (this.cellVoltageTabItem != null && !this.cellVoltageTabItem.isDisposed()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.cellVoltageTabItem.updateVoltageLimitsSelection();
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -1093,8 +1066,7 @@ public class DataExplorer extends Composite {
 		if (this.fileCommentTabItem != null) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.fileCommentTabItem.update();
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -1112,8 +1084,7 @@ public class DataExplorer extends Composite {
 		if (this.objectDescriptionTabItem != null && !this.objectDescriptionTabItem.isDisposed()) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.objectDescriptionTabItem.update();
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -1130,8 +1101,7 @@ public class DataExplorer extends Composite {
 	public void cleanHeaderAndCommentInGraphicsWindow() {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			this.graphicsTabItem.clearHeaderAndComment();
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -1148,8 +1118,7 @@ public class DataExplorer extends Composite {
 	public void setStatusMessage(final String message, final int swtColor) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			this.statusBar.setMessage(message, swtColor);
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -1163,8 +1132,7 @@ public class DataExplorer extends Composite {
 		if (this.statusBar != null) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.statusBar.setMessage(message);
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -1200,8 +1168,7 @@ public class DataExplorer extends Composite {
 
 						this.taskBarItem.setProgress(percentage);
 					}
-				}
-				else {
+				} else {
 					GDE.display.asyncExec(new Runnable() {
 						@Override
 						public void run() {
@@ -1239,8 +1206,7 @@ public class DataExplorer extends Composite {
 	public int getProgressPercentage() {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			this.progessPercentage = this.statusBar.getProgressPercentage();
-		}
-		else { // if the percentage is not up to date it will updated later
+		} else { // if the percentage is not up to date it will updated later
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -1335,8 +1301,7 @@ public class DataExplorer extends Composite {
 			this.activeDevice.setPort(newPort);
 			this.settings.setActiveDevice(this.activeDevice.getName() + GDE.STRING_SEMICOLON + this.activeDevice.getManufacturer() + GDE.STRING_SEMICOLON + this.activeDevice.getPort());
 			this.updateTitleBar(this.getObjectKey(), this.activeDevice.getName(), this.activeDevice.getPort());
-		}
-		else {
+		} else {
 			this.deviceSelectionDialog.getActiveConfig().setPort(newPort);
 			this.updateTitleBar(this.getObjectKey(), this.settings.getActiveDevice(), this.settings.getSerialPort());
 		}
@@ -1386,15 +1351,14 @@ public class DataExplorer extends Composite {
 				this.enableDeviceSwitchButtons(true);
 			else
 				this.enableDeviceSwitchButtons(false);
-		}
-		else { // no device
+		} else { // no device
 			this.settings.setActiveDevice(Settings.EMPTY_SIGNATURE);
 			this.updateTitleBar(this.getObjectKey(), Messages.getString(MessageIds.GDE_MSGI0023), GDE.STRING_EMPTY);
 			this.activeDevice = null;
 			this.channels.cleanup();
 			this.enableDeviceSwitchButtons(false);
 			// remove Histo tabs at this place because setupDevice is not called if all devices are removed
-			this.setHisto(false); // todo check if the histo is enabled if we set another active device lateron
+			this.setHisto(false);
 		}
 
 		// cleanup device specific utility graphics tab item
@@ -1413,10 +1377,10 @@ public class DataExplorer extends Composite {
 	public void updateTitleBar(final String objectName, final String deviceName, final String devicePort) {
 		StringBuilder sb = new StringBuilder().append(GDE.NAME_LONG);
 		String separator = "  -  "; //$NON-NLS-1$
-		String actualFileName = (this.channels != null && this.channels.getActiveChannel() != null) ? this.channels.getActiveChannel().getFileName() : null;
+		String actualFileName = (this.channels != null && this.channels.getActiveChannel() != null) ? this.channels.getActiveChannel().getFileName()
+				: null;
 		if (actualFileName != null && actualFileName.length() > 4) sb.append(separator).append(actualFileName);
-		if (objectName != null && objectName.length() > 0 && !(actualFileName != null && actualFileName.length() > 4 && actualFileName.contains(objectName))
-				&& !objectName.startsWith(Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0]))
+		if (objectName != null && objectName.length() > 0 && !(actualFileName != null && actualFileName.length() > 4 && actualFileName.contains(objectName)) && !objectName.startsWith(Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0]))
 			sb.append(separator).append(objectName);
 		if (deviceName != null && deviceName.length() > 0) sb.append(separator).append(deviceName);
 		if (devicePort != null && devicePort.length() > 0) sb.append(separator).append(devicePort);
@@ -1424,8 +1388,7 @@ public class DataExplorer extends Composite {
 
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			GDE.shell.setText(headerText);
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -1440,8 +1403,7 @@ public class DataExplorer extends Composite {
 		if (actualDevice != null) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				updateTitleBar(this.getObjectKey(), actualDevice.getName(), actualDevice.getPort());
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -1458,8 +1420,7 @@ public class DataExplorer extends Composite {
 			messageDialog.setText(GDE.NAME_LONG);
 			messageDialog.setMessage(message);
 			messageDialog.open();
-		}
-		else {
+		} else {
 			GDE.display.syncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -1479,8 +1440,7 @@ public class DataExplorer extends Composite {
 			messageDialog.setText(GDE.NAME_LONG);
 			messageDialog.setMessage(message);
 			messageDialog.open();
-		}
-		else {
+		} else {
 			GDE.display.syncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -1607,7 +1567,8 @@ public class DataExplorer extends Composite {
 	 * @return the object key, if device oriented an empty string will be returned
 	 */
 	public String getObjectKey() {
-		return this.menuToolBar != null ? this.menuToolBar.isObjectoriented() ? this.menuToolBar.getActiveObjectKey() : GDE.STRING_EMPTY : GDE.STRING_EMPTY;
+		return this.menuToolBar != null ? this.menuToolBar.isObjectoriented() ? this.menuToolBar.getActiveObjectKey() : GDE.STRING_EMPTY
+				: GDE.STRING_EMPTY;
 	}
 
 	/**
@@ -1628,8 +1589,7 @@ public class DataExplorer extends Composite {
 					if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 						this.menuToolBar.selectObjectKey(searchSelectionIndex);
 						this.channels.getActiveChannel().setObjectKey(newObjectKey);
-					}
-					else {
+					} else {
 						final int selectionIndex = searchSelectionIndex;
 						GDE.display.asyncExec(new Runnable() {
 							@Override
@@ -1667,8 +1627,7 @@ public class DataExplorer extends Composite {
 	public void setObjectList(final String[] newObjectKeyList, final String newObjectKey) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			this.menuToolBar.setObjectList(newObjectKeyList, newObjectKey);
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -1707,8 +1666,7 @@ public class DataExplorer extends Composite {
 
 			this.menuToolBar.enableChannelActions(enabled);
 			this.menuToolBar.enableRecordSetActions(enabled);
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -1790,8 +1748,7 @@ public class DataExplorer extends Composite {
 				if (!extension.equals(GDE.FILE_ENDING_STAR_STAR)) {
 					tmpExt.add(extension); // lower case is default
 					tmpExt.add(extension.toUpperCase());
-				}
-				else
+				} else
 					tmpExt.add(GDE.FILE_ENDING_STAR);
 			}
 			extensions = tmpExt.toArray(new String[1]);
@@ -1919,8 +1876,7 @@ public class DataExplorer extends Composite {
 			this.isUpdateAllTabs[0] = false;
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.doUpdateAllTabs(force, redrawCurveSelector);
-			}
-			else {
+			} else {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -1940,8 +1896,7 @@ public class DataExplorer extends Composite {
 		if (force) {
 			this.updateDigitalWindow();
 			this.updateAnalogWindow();
-		}
-		else {
+		} else {
 			this.updateDigitalWindowChilds();
 			this.updateAnalogWindowChilds();
 		}
@@ -1949,8 +1904,7 @@ public class DataExplorer extends Composite {
 		this.updateFileCommentWindow();
 		if (this.getActiveRecordSet() != null) {
 			this.updateDataTable(this.getActiveRecordSet().getName(), force);
-		}
-		else {
+		} else {
 			DataExplorer.this.updateDataTable(GDE.STRING_EMPTY, force);
 		}
 		this.isUpdateAllTabs[0] = true;
@@ -1973,8 +1927,7 @@ public class DataExplorer extends Composite {
 				int tabSelectionIndex = this.displayTab.getSelectionIndex();
 				if (tabSelectionIndex == 0) { // graphics tab is always the first one
 					this.graphicsTabItem.redrawGraphics(refreshCurveSelector);
-				}
-				else if (tabSelectionIndex > 0) {
+				} else if (tabSelectionIndex > 0) {
 					if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.COMPARE)) {
 						this.compareTabItem.redrawGraphics(refreshCurveSelector);
 					} else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
@@ -1984,8 +1937,7 @@ public class DataExplorer extends Composite {
 					}
 				}
 			}
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -2020,13 +1972,13 @@ public class DataExplorer extends Composite {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			this.graphicsTabItem.updateCurveSelectorTable();
 			if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) this.compareTabItem.updateCurveSelectorTable();
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					DataExplorer.this.graphicsTabItem.updateCurveSelectorTable();
-					if (DataExplorer.this.compareTabItem != null && !DataExplorer.this.compareTabItem.isDisposed()) DataExplorer.this.compareTabItem.updateCurveSelectorTable();
+					if (DataExplorer.this.compareTabItem != null && !DataExplorer.this.compareTabItem.isDisposed())
+						DataExplorer.this.compareTabItem.updateCurveSelectorTable();
 				}
 			});
 		}
@@ -2086,11 +2038,13 @@ public class DataExplorer extends Composite {
 	}
 
 	public RecordSet getCompareSet() {
-		return this.compareSet == null ? this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1, GraphicsType.COMPARE) : this.compareSet;
+		return this.compareSet == null ? this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1, GraphicsType.COMPARE)
+				: this.compareSet;
 	}
 
 	public RecordSet getUtilitySet() {
-		return this.utilitySet == null ? this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.UTILITY_RECORD_SET, 1, GraphicsType.UTIL) : this.utilitySet;
+		return this.utilitySet == null ? this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.UTILITY_RECORD_SET, 1, GraphicsType.UTIL)
+				: this.utilitySet;
 	}
 
 	public GraphicsWindow getUtilGraphicsWindow(String tabName) {
@@ -2144,8 +2098,7 @@ public class DataExplorer extends Composite {
 	public void resetGraphicsWindowZoomAndMeasurement() {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			this.graphicsTabItem.setModeState(GraphicsMode.RESET);
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -2165,13 +2118,12 @@ public class DataExplorer extends Composite {
 		if (isRecordSetVisible(GraphicsType.NORMAL)) {
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "graphicsWindow.getGraphicCanvas().isVisible() == true"); //$NON-NLS-1$
 			setGraphicsWindowMode(graphicsMode, enabled);
-		}
-		else if (isRecordSetVisible(GraphicsType.COMPARE) && graphicsMode != GraphicsMode.SCOPE) {
+		} else if (isRecordSetVisible(GraphicsType.COMPARE) && graphicsMode != GraphicsMode.SCOPE) {
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "compareWindow.getGraphicCanvas().isVisible() == true"); //$NON-NLS-1$
 			setCompareWindowMode(graphicsMode, enabled);
-		}
-		else if (isRecordSetVisible(GraphicsType.UTIL)) {
-			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "utilityWindow.getGraphicCanvas().isVisible() == true, it does not have a supported graphics mode"); //$NON-NLS-1$
+		} else if (isRecordSetVisible(GraphicsType.UTIL)) {
+			if (log.isLoggable(Level.FINE))
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "utilityWindow.getGraphicCanvas().isVisible() == true, it does not have a supported graphics mode"); //$NON-NLS-1$
 		}
 	}
 
@@ -2247,16 +2199,13 @@ public class DataExplorer extends Composite {
 	 * clear measurement pointer of visible tab window.
 	 */
 	public void clearMeasurementModes() {
-		this.histoExplorer.ifPresent(h -> h.clearMeasurementModes());
-
 		boolean isGraphicsTypeNormal = isRecordSetVisible(GraphicsType.NORMAL);
 		RecordSet recordSet = isGraphicsTypeNormal ? Channels.getInstance().getActiveChannel().getActiveRecordSet() : this.compareSet;
 		if (recordSet != null) {
 			if (isGraphicsTypeNormal) {
 				recordSet.clearMeasurementModes();
 				this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
-				}
-				else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
+			} else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
 				recordSet = DataExplorer.application.getCompareSet();
 				if (recordSet != null) {
 					recordSet.clearMeasurementModes();
@@ -2282,8 +2231,7 @@ public class DataExplorer extends Composite {
 					this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsMode.MEASURE, false);
 				else
 					this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
-			}
-			else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
+			} else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
 				recordSet = DataExplorer.application.getCompareSet();
 				if (recordSet != null && recordSet.containsKey(recordKey)) {
 					recordSet.setMeasurementMode(recordKey, enabled);
@@ -2312,8 +2260,7 @@ public class DataExplorer extends Composite {
 					this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsMode.MEASURE_DELTA, false);
 				else
 					this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
-			}
-			else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
+			} else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
 				recordSet = DataExplorer.application.getCompareSet();
 				if (recordSet != null && recordSet.containsKey(recordKey)) {
 					recordSet.setDeltaMeasurementMode(recordKey, enabled);
@@ -2347,8 +2294,7 @@ public class DataExplorer extends Composite {
 	public void setCursor(final Cursor newCursor) {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			DataExplorer.application.getParent().setCursor(newCursor);
-		}
-		else {
+		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -2369,15 +2315,13 @@ public class DataExplorer extends Composite {
 			if (this.statusBar != null) {
 				if (isOpenStatus) {
 					this.statusBar.setSerialPortConnected();
-				}
-				else {
+				} else {
 					this.statusBar.setSerialPortDisconnected();
 					this.statusBar.setSerialRxOff();
 					this.statusBar.setSerialTxOff();
 				}
 			}
-		}
-		else {
+		} else {
 			if (DataExplorer.this.statusBar != null) {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
@@ -2386,8 +2330,7 @@ public class DataExplorer extends Composite {
 						DataExplorer.this.menuToolBar.setPortConnected(isOpenStatus);
 						if (isOpenStatus) {
 							DataExplorer.this.statusBar.setSerialPortConnected();
-						}
-						else {
+						} else {
 							DataExplorer.this.statusBar.setSerialPortDisconnected();
 							DataExplorer.this.statusBar.setSerialRxOff();
 							DataExplorer.this.statusBar.setSerialTxOff();
@@ -2410,13 +2353,11 @@ public class DataExplorer extends Composite {
 				this.helpDialog = new HelpInfoDialog(GDE.shell, SWT.NONE);
 			}
 			this.helpDialog.open(deviceName, fileName, SWT.NONE, false);
-		}
-		catch (Error e) {
+		} catch (Error e) {
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using OS registered web browser"); //$NON-NLS-1$
 			WebBrowser.openURL(deviceName, fileName);
 			application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0025));
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + t.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + t.getMessage());
 		}
 	}
@@ -2433,13 +2374,11 @@ public class DataExplorer extends Composite {
 				this.helpDialog = new HelpInfoDialog(GDE.shell, SWT.NONE);
 			}
 			this.helpDialog.open(deviceName, fileName, SWT.NONE, extractBase);
-		}
-		catch (Error e) {
+		} catch (Error e) {
 			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "using OS registered web browser"); //$NON-NLS-1$
 			WebBrowser.openURL(deviceName, fileName);
 			application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0025));
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + t.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + t.getMessage());
 		}
 	}
@@ -2500,12 +2439,12 @@ public class DataExplorer extends Composite {
 	public void checkUpdateFileComment() {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 			if (this.fileCommentTabItem != null && this.fileCommentTabItem.isFileCommentChanged()) this.fileCommentTabItem.setFileComment();
-		}
-		else { // if the percentage is not up to date it will updated later
+		} else { // if the percentage is not up to date it will updated later
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					if (DataExplorer.this.fileCommentTabItem != null && DataExplorer.this.fileCommentTabItem.isFileCommentChanged()) DataExplorer.this.fileCommentTabItem.setFileComment();
+					if (DataExplorer.this.fileCommentTabItem != null && DataExplorer.this.fileCommentTabItem.isFileCommentChanged())
+						DataExplorer.this.fileCommentTabItem.setFileComment();
 				}
 			});
 		}
@@ -2523,13 +2462,14 @@ public class DataExplorer extends Composite {
 	 */
 	public void checkUpdateRecordSetComment() {
 		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			if (this.graphicsTabItem != null && this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged()) this.graphicsTabItem.getGraphicsComposite().updateRecordSetComment();
-		}
-		else { // if the percentage is not up to date it will updated later
+			if (this.graphicsTabItem != null && this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged())
+				this.graphicsTabItem.getGraphicsComposite().updateRecordSetComment();
+		} else { // if the percentage is not up to date it will updated later
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					if (DataExplorer.this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged()) DataExplorer.this.graphicsTabItem.getGraphicsComposite().updateRecordSetComment();
+					if (DataExplorer.this.graphicsTabItem.getGraphicsComposite().isRecordCommentChanged())
+						DataExplorer.this.graphicsTabItem.getGraphicsComposite().updateRecordSetComment();
 				}
 			});
 		}
@@ -2556,8 +2496,8 @@ public class DataExplorer extends Composite {
 	 * return statistics window content as image
 	 */
 	public Image getGraphicsTabContentAsImage() {
-		return this.isRecordSetVisible(GraphicsType.COMPARE) ? this.compareTabItem.getContentAsImage()
-				: this.isRecordSetVisible(GraphicsType.COMPARE) ? this.utilGraphicsTabItem.getContentAsImage() : this.graphicsTabItem.getContentAsImage();
+		return this.isRecordSetVisible(GraphicsType.COMPARE) ? this.compareTabItem.getContentAsImage() : this.isRecordSetVisible(GraphicsType.COMPARE)
+				? this.utilGraphicsTabItem.getContentAsImage() : this.graphicsTabItem.getContentAsImage();
 	}
 
 	/**
@@ -2625,35 +2565,25 @@ public class DataExplorer extends Composite {
 		int tabSelectionIndex = this.displayTab.getSelectionIndex();
 		if (tabSelectionIndex == 0) {
 			graphicsImage = this.graphicsTabItem.getContentAsImage();
-		}
-		else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof StatisticsWindow) {
+		} else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof StatisticsWindow) {
 			graphicsImage = this.statisticsTabItem.getContentAsImage();
-		}
-		else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof DataTableWindow) {
+		} else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof DataTableWindow) {
 			graphicsImage = this.dataTableTabItem.getContentAsImage();
-		}
-		else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
+		} else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
 			graphicsImage = this.digitalTabItem.getContentAsImage();
-		}
-		else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof AnalogWindow) {
+		} else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof AnalogWindow) {
 			graphicsImage = this.analogTabItem.getContentAsImage();
-		}
-		else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof CellVoltageWindow) {
+		} else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof CellVoltageWindow) {
 			graphicsImage = this.cellVoltageTabItem.getContentAsImage();
-		}
-		else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof FileCommentWindow) {
+		} else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof FileCommentWindow) {
 			graphicsImage = this.fileCommentTabItem.getContentAsImage();
-		}
-		else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof ObjectDescriptionWindow) {
+		} else if (DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof ObjectDescriptionWindow) {
 			graphicsImage = this.objectDescriptionTabItem.getContentAsImage();
-		}
-		else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.COMPARE)) {
+		} else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.COMPARE)) {
 			graphicsImage = this.compareTabItem.getContentAsImage();
-		}
-		else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
+		} else if ((DataExplorer.this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && DataExplorer.this.isRecordSetVisible(GraphicsType.UTIL)) {
 			graphicsImage = this.utilGraphicsTabItem.getContentAsImage();
-		}
-		else {
+		} else {
 			Optional<Image> histoImage = this.histoExplorer.flatMap(h -> h.getContentAsImage());
 			if (histoImage.isPresent()) {
 				graphicsImage = histoImage.get();
@@ -2712,40 +2642,31 @@ public class DataExplorer extends Composite {
 		if (tabSelectionIndex == 0) {
 			this.settings.setGraphicsCurveAreaBackground(innerAreaBackground);
 			this.graphicsTabItem.setCurveAreaBackground(innerAreaBackground);
-		}
-		else if (tabSelectionIndex > 0) if (this.displayTab.getItem(tabSelectionIndex) instanceof StatisticsWindow) {
+		} else if (tabSelectionIndex > 0) if (this.displayTab.getItem(tabSelectionIndex) instanceof StatisticsWindow) {
 			this.settings.setSatisticsInnerAreaBackground(innerAreaBackground);
 			this.statisticsTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
+		} else if (this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
 			this.settings.setDigitalInnerAreaBackground(innerAreaBackground);
 			this.digitalTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof AnalogWindow) {
+		} else if (this.displayTab.getItem(tabSelectionIndex) instanceof AnalogWindow) {
 			this.settings.setAnalogInnerAreaBackground(innerAreaBackground);
 			this.analogTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof CellVoltageWindow) {
+		} else if (this.displayTab.getItem(tabSelectionIndex) instanceof CellVoltageWindow) {
 			this.settings.setCellVoltageInnerAreaBackground(innerAreaBackground);
 			this.cellVoltageTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof FileCommentWindow) {
+		} else if (this.displayTab.getItem(tabSelectionIndex) instanceof FileCommentWindow) {
 			this.settings.setFileCommentInnerAreaBackground(innerAreaBackground);
 			this.fileCommentTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof ObjectDescriptionWindow) {
+		} else if (this.displayTab.getItem(tabSelectionIndex) instanceof ObjectDescriptionWindow) {
 			this.settings.setObjectDescriptionInnerAreaBackground(innerAreaBackground);
 			this.objectDescriptionTabItem.setInnerAreaBackground(innerAreaBackground);
-		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.COMPARE)) {
+		} else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.COMPARE)) {
 			this.settings.setCompareCurveAreaBackground(innerAreaBackground);
 			this.compareTabItem.setCurveAreaBackground(innerAreaBackground);
-		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.UTIL)) {
+		} else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.UTIL)) {
 			this.settings.setUtilityCurveAreaBackground(innerAreaBackground);
 			this.utilGraphicsTabItem.setCurveAreaBackground(innerAreaBackground);
-		}
-		else {
+		} else {
 			this.histoExplorer.ifPresent(h -> h.setInnerAreaBackground(innerAreaBackground));
 		}
 	}
@@ -2759,16 +2680,14 @@ public class DataExplorer extends Composite {
 		if (tabItemIndex == 0) {
 			this.settings.setCurveGraphicsBorderColor(borderColor);
 			this.graphicsTabItem.setCurveAreaBorderColor(borderColor);
-		}
-		else if (tabItemIndex > 0) if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.COMPARE)) {
+		} else if (tabItemIndex > 0)
+			if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.COMPARE)) {
 			this.settings.setCurveCompareBorderColor(borderColor);
 			this.compareTabItem.setCurveAreaBorderColor(borderColor);
-		}
-		else if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.UTIL)) {
+			} else if ((this.displayTab.getItem(tabItemIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.UTIL)) {
 			this.settings.setUtilityCurvesBorderColor(borderColor);
 			this.utilGraphicsTabItem.setCurveAreaBorderColor(borderColor);
-		}
-		else {
+			} else {
 			this.histoExplorer.ifPresent(h -> h.setBorderColor(borderColor));
 			}
 	}
@@ -2780,8 +2699,7 @@ public class DataExplorer extends Composite {
 	public void setTabFontSize(int tabSelectionIndex, int newFonSize) {
 		if (tabSelectionIndex == 0) {
 			// actual no special font size adaption enabled
-		}
-		else if (tabSelectionIndex > 0) {
+		} else if (tabSelectionIndex > 0) {
 			if (this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
 				// this.settings.setDigitalDisplayFontSize(newFonSize); actual no pesistens enabled
 				this.digitalTabItem.setDigitalDisplayFontSize(newFonSize);
@@ -2799,40 +2717,31 @@ public class DataExplorer extends Composite {
 		if (tabSelectionIndex == 0) {
 			this.settings.setGraphicsSurroundingBackground(surroundingBackground);
 			this.graphicsTabItem.setSurroundingBackground(surroundingBackground);
-		}
-		else if (tabSelectionIndex > 0) if (this.displayTab.getItem(tabSelectionIndex) instanceof StatisticsWindow) {
+		} else if (tabSelectionIndex > 0) if (this.displayTab.getItem(tabSelectionIndex) instanceof StatisticsWindow) {
 			this.settings.setSatisticsSurroundingAreaBackground(surroundingBackground);
 			this.statisticsTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
+		} else if (this.displayTab.getItem(tabSelectionIndex) instanceof DigitalWindow) {
 			this.settings.setDigitalSurroundingAreaBackground(surroundingBackground);
 			this.digitalTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof AnalogWindow) {
+		} else if (this.displayTab.getItem(tabSelectionIndex) instanceof AnalogWindow) {
 			this.settings.setAnalogSurroundingAreaBackground(surroundingBackground);
 			this.analogTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof CellVoltageWindow) {
+		} else if (this.displayTab.getItem(tabSelectionIndex) instanceof CellVoltageWindow) {
 			this.settings.setCellVoltageSurroundingAreaBackground(surroundingBackground);
 			this.cellVoltageTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof FileCommentWindow) {
+		} else if (this.displayTab.getItem(tabSelectionIndex) instanceof FileCommentWindow) {
 			this.settings.setFileCommentSurroundingAreaBackground(surroundingBackground);
 			this.fileCommentTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if (this.displayTab.getItem(tabSelectionIndex) instanceof ObjectDescriptionWindow) {
+		} else if (this.displayTab.getItem(tabSelectionIndex) instanceof ObjectDescriptionWindow) {
 			this.settings.setObjectDescriptionSurroundingAreaBackground(surroundingBackground);
 			this.objectDescriptionTabItem.setSurroundingAreaBackground(surroundingBackground);
-		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.COMPARE)) {
+		} else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.COMPARE)) {
 			this.settings.setCompareSurroundingBackground(surroundingBackground);
 			this.compareTabItem.setSurroundingBackground(surroundingBackground);
-		}
-		else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.UTIL)) {
+		} else if ((this.displayTab.getItem(tabSelectionIndex) instanceof GraphicsWindow) && this.isRecordSetVisible(GraphicsType.UTIL)) {
 			this.settings.setUtilitySurroundingBackground(surroundingBackground);
 			this.utilGraphicsTabItem.setSurroundingBackground(surroundingBackground);
-		}
-		else {
+		} else {
 			this.histoExplorer.ifPresent(h -> h.setSurroundingBackground(surroundingBackground));
 		}
 	}
@@ -2857,8 +2766,7 @@ public class DataExplorer extends Composite {
 				this.dataTableTabItem = new DataTableWindow(this.displayTab, SWT.NONE, 2);
 				this.dataTableTabItem.create();
 			}
-		}
-		else {
+		} else {
 			if (this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()) {
 				this.dataTableTabItem.dispose();
 				this.dataTableTabItem = null;
@@ -2877,8 +2785,7 @@ public class DataExplorer extends Composite {
 				this.digitalTabItem = new DigitalWindow(this.displayTab, SWT.NONE, position);
 				this.digitalTabItem.create();
 			}
-		}
-		else {
+		} else {
 			if (this.digitalTabItem != null && !this.digitalTabItem.isDisposed()) {
 				this.digitalTabItem.dispose();
 				this.digitalTabItem = null;
@@ -2898,8 +2805,7 @@ public class DataExplorer extends Composite {
 				this.analogTabItem = new AnalogWindow(this.displayTab, SWT.NONE, position);
 				this.analogTabItem.create();
 			}
-		}
-		else {
+		} else {
 			if (this.analogTabItem != null && !this.analogTabItem.isDisposed()) {
 				this.analogTabItem.dispose();
 				this.analogTabItem = null;
@@ -2922,8 +2828,7 @@ public class DataExplorer extends Composite {
 				this.cellVoltageTabItem = new CellVoltageWindow(this.displayTab, SWT.NONE, position);
 				this.cellVoltageTabItem.create();
 			}
-		}
-		else {
+		} else {
 			if (this.cellVoltageTabItem != null && !this.cellVoltageTabItem.isDisposed()) {
 				this.cellVoltageTabItem.dispose();
 				this.cellVoltageTabItem = null;
@@ -2962,8 +2867,7 @@ public class DataExplorer extends Composite {
 					}
 				}
 			}
-		}
-		else {
+		} else {
 			if (this.objectDescriptionTabItem != null) {
 				this.objectDescriptionTabItem.dispose();
 				this.objectDescriptionTabItem = null;
@@ -2987,12 +2891,11 @@ public class DataExplorer extends Composite {
 	public GraphicsWindow setUtilGraphicsWindowVisible(boolean visible, String tabName) {
 		if (visible) {
 			if (this.utilGraphicsTabItem == null || this.utilGraphicsTabItem.isDisposed()) {
-				this.utilGraphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsType.UTIL, tabName.length() < 3 ? Messages.getString(MessageIds.GDE_MSGT0282) : tabName,
-						this.displayTab.getItemCount());
+				this.utilGraphicsTabItem = new GraphicsWindow(this.displayTab, SWT.NONE, GraphicsType.UTIL, tabName.length() < 3
+						? Messages.getString(MessageIds.GDE_MSGT0282) : tabName, this.displayTab.getItemCount());
 				this.utilGraphicsTabItem.create();
 			}
-		}
-		else {
+		} else {
 			if (this.utilGraphicsTabItem != null) {
 				this.utilGraphicsTabItem.dispose();
 				this.utilGraphicsTabItem = null;
@@ -3010,8 +2913,7 @@ public class DataExplorer extends Composite {
 				tab.dispose();
 			}
 			this.customTabItems.clear();
-		}
-		else {
+		} else {
 			this.customTabItems.add(customDeviceTabItem);
 		}
 	}
@@ -3048,8 +2950,7 @@ public class DataExplorer extends Composite {
 	public ObjectData getActiveObject() {
 		if (this.objectDescriptionTabItem != null && !this.objectDescriptionTabItem.isDisposed()) {
 			return this.objectDescriptionTabItem.getObject();
-		}
-		else {
+		} else {
 			return null;
 		}
 	}
@@ -3145,22 +3046,20 @@ public class DataExplorer extends Composite {
 							if (DataExplorer.this.channels.getActiveChannel() != null && DataExplorer.this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_CONFIG) {
 								if (DataExplorer.this.channels.getActiveChannel().getActiveRecordSet() != null)
 									OsdReaderWriter.write(tmpFilePath + GDE.FILE_ENDING_DOT_OSD, DataExplorer.this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
-							}
-							else
-								for (int i = 1; i <= DataExplorer.this.channels.size() && DataExplorer.this.channels.getActiveChannel().getActiveRecordSet() != null; ++i) {
+							} else
+								for (int i = 1; i <= DataExplorer.this.channels.size() && DataExplorer.this.channels.getActiveChannel().getActiveRecordSet() != null;
+										++i) {
 									if (DataExplorer.this.channels.get(i).size() > 0)
 										OsdReaderWriter.write(tmpFilePath + "_" + i + GDE.FILE_ENDING_DOT_OSD, DataExplorer.this.channels.get(i), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 								}
-						}
-						catch (Exception e) {
+						} catch (Exception e) {
 							log.log(Level.WARNING, e.getMessage(), e);
 						}
 					}
 				}
 			};
 			this.writeTmpFileThread.start();
-		}
-		else {
+		} else {
 			this.isTmpWriteStop = true;
 		}
 	}
@@ -3199,7 +3098,8 @@ public class DataExplorer extends Composite {
 			// "2) fix Junsi iCharger 206, 208, 306, 3010 constant time step to 2 seconds\n",
 			// "3) fix problem while copy graphics into clip board several time in sequence\n",
 			// "4) fix JLog2 context help page selection\n",
-			//					"5)  fix JLog2 configuration dialog - set drop downs to editable false since this event wasn't handled and does not activate save button\n",
+			// "5) fix JLog2 configuration dialog - set drop downs to editable false since this event wasn't handled and does not activate save
+			// button\n",
 			// "6) fix error not loading color from OSD file some colors (1,1,1)\n",
 			// "7) CSV2SerialAdapter - fix error handling of missing status\n",
 			// "8) HoTTAdapter - fix receiver only with channels times 10 error\n",
@@ -3248,8 +3148,7 @@ public class DataExplorer extends Composite {
 											message.setMessage(Messages.getString(MessageIds.GDE_MSGI0055, new String[] { command }));
 											message.open();
 										}
-									}
-									else {
+									} else {
 										MessageBox message = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_INFORMATION);
 										message.setText(GDE.NAME_LONG);
 										message.setMessage(Messages.getString(MessageIds.GDE_MSGI0053));
@@ -3260,8 +3159,7 @@ public class DataExplorer extends Composite {
 									}
 								}
 							});
-						}
-						catch (Exception e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}

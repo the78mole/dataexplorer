@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -93,17 +94,30 @@ public class HistoExplorer {
 		updateHistoTabs(RebuildStep.A_HISTOSET, true);
 	}
 
+	public void disposeHisto() {
+// if (this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed()) {
+// this.dataTableTabItem.dispose();
+// this.dataTableTabItem = null;
+// }
+		for (AbstractChartWindow chartWindow : chartTabItems) {
+			chartWindow.dispose();
+		}
+		chartTabItems.clear();
+		for (HistoTableWindow tableWindow : tableTabItems) {
+			tableWindow.dispose();
+		}
+		tableTabItems.clear();
+	}
+
 	/**
 	 * Rebuilds the contents of the histo windows.
 	 * Does nothing if the histoActive setting is false.
 	 */
 	public synchronized void resetHisto() {
 		log.fine(() -> String.format("isHistoActive=%b", settings.isHistoActive())); //$NON-NLS-1$
-		if (settings.isHistoActive()) {
-			resetGraphicsWindowHeaderAndMeasurement();
-			resetSummaryWindowHeaderAndMeasurement();
-			updateHistoTabs(RebuildStep.A_HISTOSET, true);
-		}
+		resetWindowHeaderAndMeasurement(histoGraphicsTabItem);
+		resetWindowHeaderAndMeasurement(histoSummaryTabItem);
+		updateHistoTabs(RebuildStep.A_HISTOSET, true);
 	}
 
 	/**
@@ -255,36 +269,18 @@ public class HistoExplorer {
 	}
 
 	/**
-	 * reset the histo graphics window measurement pointer including table and header
+	 * Reset the window measurement pointer including table and header.
 	 */
-	private void resetGraphicsWindowHeaderAndMeasurement() {
+	private void resetWindowHeaderAndMeasurement(AbstractHistoChartWindow tabItem) {
 		if (Thread.currentThread().getId() == application.getThreadId()) {
-			histoGraphicsTabItem.clearHeaderAndComment();
-			histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
+			tabItem.clearHeaderAndComment();
+			tabItem.getGraphicsComposite().cleanMeasurement();
 		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					histoGraphicsTabItem.clearHeaderAndComment();
-					histoGraphicsTabItem.getGraphicsComposite().cleanMeasurement();
-				}
-			});
-		}
-	}
-
-	/**
-	 * reset the histo summary window measurement pointer including table and header
-	 */
-	private void resetSummaryWindowHeaderAndMeasurement() {
-		if (Thread.currentThread().getId() == application.getThreadId()) {
-			histoSummaryTabItem.clearHeaderAndComment();
-			histoSummaryTabItem.getGraphicsComposite().cleanMeasurement();
-		} else {
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					histoSummaryTabItem.clearHeaderAndComment();
-					histoSummaryTabItem.getGraphicsComposite().cleanMeasurement();
+					tabItem.clearHeaderAndComment();
+					tabItem.getGraphicsComposite().cleanMeasurement();
 				}
 			});
 		}
@@ -298,7 +294,7 @@ public class HistoExplorer {
 		isCurveSurveyVisible = enabled;
 	}
 
-	public void paintControl(PaintEvent evt) {
+	public void setSashFormWeights(PaintEvent evt) {
 		if (isHistoChartWindowVisible()) {
 			AbstractHistoChartWindow chartWindow = ((AbstractHistoChartWindow) displayTab.getSelection());
 			if (chartWindow.isCurveSelectorEnabled())
@@ -308,13 +304,11 @@ public class HistoExplorer {
 		}
 	}
 
-	public void widgetSelected(SelectionEvent evt) {
-		CTabFolder tabFolder = (CTabFolder) evt.widget;
-		int tabSelectionIndex = tabFolder.getSelectionIndex();
+	public void updateVisibleTab(SelectionEvent evt) {
 		if (isHistoChartWindowVisible()) {
 			log.log(Level.FINER, "HistoChartWindow in displayTab.widgetSelected, event=", evt); //$NON-NLS-1$
 			updateHistoTabs(histoSet.getRebuildStepInvisibleTab(), true); // saves some time compared to HistoSet.RebuildStep.E_USER_INTERFACE
-		} else if (displayTab.getItem(tabSelectionIndex) instanceof HistoTableWindow) {
+		} else if (isHistoTableWindowVisible()) {
 			log.log(Level.FINER, "HistoTableWindow in displayTab.widgetSelected, event=", evt); //$NON-NLS-1$
 			updateHistoTabs(HistoSet.RebuildStep.E_USER_INTERFACE, true); // ensures rebuild after trails change or record selector change
 		}
@@ -328,16 +322,17 @@ public class HistoExplorer {
 		}
 	}
 
+	/**
+	 * Redraw if visible window.
+	 */
 	public void updateGraphicsWindow(boolean refreshCurveSelector) {
-		if ((displayTab.getSelection() instanceof HistoSummaryWindow)) {
-			histoSummaryTabItem.redrawGraphics(refreshCurveSelector);
-		} else if ((displayTab.getSelection() instanceof HistoGraphicsWindow)) {
-			histoGraphicsTabItem.redrawGraphics(refreshCurveSelector);
+		if ((displayTab.getSelection() instanceof AbstractHistoChartWindow)) {
+			((AbstractHistoChartWindow) displayTab.getSelection()).redrawGraphics(refreshCurveSelector);
 		}
 	}
 
 	/**
-	 * clear measurement pointer of visible tab window.
+	 * Clear measurement pointer of visible tab window.
 	 */
 	public void clearMeasurementModes() {
 		if (isHistoChartWindowVisible()) {
@@ -347,9 +342,7 @@ public class HistoExplorer {
 	}
 
 	/**
-	 * switch application into measurement mode for the visible record set using selected record
-	 * @param recordKey
-	 * @param enabled
+	 * Switch application into measurement mode for the visible record set using selected record.
 	 */
 	public void setMeasurementActive(String recordKey, boolean enabled) {
 		TrailRecordSet trailRecordSet = histoSet.getTrailRecordSet();
@@ -357,19 +350,20 @@ public class HistoExplorer {
 			trailRecordSet.setMeasurementMode(recordKey, enabled);
 			AbstractHistoChartWindow chartWindow = (AbstractHistoChartWindow) displayTab.getSelection();
 			chartWindow.getGraphicsComposite().cleanMeasurement();
-			TrailRecord trailRecord = trailRecordSet.get(recordKey);
-			if (enabled && !trailRecord.isVisible()) {
-				chartWindow.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
-				chartWindow.getGraphicsComposite().redrawGraphics();
+			if (enabled) {
+				TrailRecord trailRecord = trailRecordSet.get(recordKey);
+				if (trailRecord.isVisible()) {
+					chartWindow.getGraphicsComposite().drawMeasurePointer(trailRecord, HistoGraphicsMode.MEASURE);
+				} else {
+					chartWindow.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
+					chartWindow.getGraphicsComposite().redrawGraphics();
+				}
 			}
-			if (enabled) chartWindow.getGraphicsComposite().drawMeasurePointer(trailRecord, HistoGraphicsMode.MEASURE);
 		}
 	}
 
 	/**
-	 * switch application into delta measurement mode for visible record set using selected record
-	 * @param recordKey
-	 * @param enabled
+	 * Switch application into delta measurement mode for visible record set using selected record.
 	 */
 	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
 		TrailRecordSet trailRecordSet = histoSet.getTrailRecordSet();
@@ -377,18 +371,20 @@ public class HistoExplorer {
 			trailRecordSet.setDeltaMeasurementMode(recordKey, enabled);
 			AbstractHistoChartWindow chartWindow = (AbstractHistoChartWindow) displayTab.getSelection();
 			chartWindow.getGraphicsComposite().cleanMeasurement();
-			TrailRecord trailRecord = trailRecordSet.get(recordKey);
-			if (enabled && !trailRecord.isVisible()) {
-				chartWindow.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
-				chartWindow.getGraphicsComposite().redrawGraphics();
+			if (enabled) {
+				TrailRecord trailRecord = trailRecordSet.get(recordKey);
+				if (trailRecord.isVisible()) {
+					chartWindow.getGraphicsComposite().drawMeasurePointer(trailRecord, HistoGraphicsMode.MEASURE_DELTA);
+				} else {
+					chartWindow.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
+					chartWindow.getGraphicsComposite().redrawGraphics();
+				}
 			}
-			if (enabled) chartWindow.getGraphicsComposite().drawMeasurePointer(trailRecord, HistoGraphicsMode.MEASURE_DELTA);
 		}
 	}
 
 	/**
-	 * set the inner area background color
-	 * @param innerAreaBackground the innerAreaBackground to set
+	 * Set the inner area background color.
 	 */
 	public void setInnerAreaBackground(Color innerAreaBackground) {
 		settings.setObjectDescriptionInnerAreaBackground(innerAreaBackground);
@@ -397,8 +393,7 @@ public class HistoExplorer {
 	}
 
 	/**
-	 * set the border color (for curve graphics the curve area border color, ...)
-	 * @param borderColor the borderColor to set
+	 * Set the border color (for curve graphics the curve area border color, ...).
 	 */
 	public void setBorderColor(Color borderColor) {
 		settings.setCurveGraphicsBorderColor(borderColor);
@@ -407,8 +402,7 @@ public class HistoExplorer {
 	}
 
 	/**
-	 * set the surrounding area background color (for curve graphics, the area surrounding the curve area, ...)
-	 * @param surroundingBackground the surroundingBackground to set
+	 * Set the surrounding area background color (for curve graphics, the area surrounding the curve area, ...).
 	 */
 	public void setSurroundingBackground(Color surroundingBackground) {
 		settings.setUtilitySurroundingBackground(surroundingBackground);
@@ -440,16 +434,15 @@ public class HistoExplorer {
 	}
 
 	/**
-	 * get tabulator content as image
+	 * Get tabulator content as image.
 	 */
 	public Optional<Image> getContentAsImage() {
 		Image graphicsImage = null;
-		if (displayTab.getSelection() instanceof HistoGraphicsWindow) {
-			graphicsImage = histoGraphicsTabItem.getContentAsImage();
-		} else if (displayTab.getSelection() instanceof HistoSummaryWindow) {
-			graphicsImage = histoSummaryTabItem.getContentAsImage();
-		} else if (displayTab.getSelection() instanceof HistoTableWindow) {
-			graphicsImage = histoTableTabItem.getContentAsImage();
+		CTabItem window = displayTab.getSelection();
+		if (isHistoChartWindowVisible()) {
+			graphicsImage = ((AbstractHistoChartWindow) window).getContentAsImage();
+		} else if (isHistoTableWindowVisible()) {
+			graphicsImage = ((HistoTableWindow) window).getContentAsImage();
 		}
 		return Optional.ofNullable(graphicsImage);
 	}
