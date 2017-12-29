@@ -851,7 +851,7 @@ public class MenuBar {
 					this.graphicsCurveSurveyMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
 					this.graphicsCurveSurveyMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0876));
 					if (!GDE.IS_OS_ARCH_ARM) this.graphicsCurveSurveyMenuItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0877));
-					this.graphicsCurveSurveyMenuItem.setSelection(false);
+					this.graphicsCurveSurveyMenuItem.setSelection(settings.isCurveSurvey());
 					this.graphicsCurveSurveyMenuItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
