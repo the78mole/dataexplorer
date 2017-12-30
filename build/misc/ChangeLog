@@ -4,10 +4,13 @@ Version 3.3.2 - xx yyy 2017
 * fix illegal formatting option in ParameterControl used for Graupner UDP charger
 * fix HoTTAdapter wrong data block number detection
 * add initial support for Junsi iCharger 106B
+* fix empty template file name if user cancels loading a template
 History analysis
 * Enhance initial vertical lines positions in delta measurement mode
 * Fix histo table column values for non-reversed timestamp sequence
 * Fix table entries for GPS location which are not shown sometimes
+* Fix unchecked curve survey after restart
+* Fix rare exceptions in histo graphics
 * Enhance performance
 	-- redraw graphics
 	-- scan log file folders

@@ -744,24 +744,26 @@ public class MenuBar {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
 									Settings.getInstance().getGraphicsTemplatePath(), null, SWT.SINGLE);
-							if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
-								TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
-								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
-								template.setHistoFileName(fileDialog.getFileName());
-								MenuBar.log.log(Level.FINE, "templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
-								template.load();
-								trailRecordSet.applyTemplate(true);
-								DataExplorer.getInstance().updateHistoGraphicsWindow(true);
-							}
-							else {
-								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
-								GraphicsTemplate template = activeChannel.getTemplate();
-								template.setNewFileName(fileDialog.getFileName());
-								MenuBar.log.log(Level.FINE, "templateFilePath = " + fileDialog.getFileName()); //$NON-NLS-1$
-								template.load();
-								if (activeChannel.getActiveRecordSet() != null) {
-									activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName(), true);
-									activeChannel.getActiveRecordSet().setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+							String templateFileName = fileDialog.getFileName();
+							if (templateFileName != null && templateFileName.length() > 4) {
+								MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
+								if (MenuBar.this.application.isHistoGraphicsWindowVisible()) {
+									TrailRecordSet trailRecordSet = DataExplorer.getInstance().getHistoSet().getTrailRecordSet();
+									HistoGraphicsTemplate template = trailRecordSet.getTemplate();
+									template.setHistoFileName(templateFileName);
+									template.load();
+									trailRecordSet.applyTemplate(true);
+									DataExplorer.getInstance().updateHistoGraphicsWindow(true);
+								}
+								else {
+									Channel activeChannel = MenuBar.this.channels.getActiveChannel();
+									GraphicsTemplate template = activeChannel.getTemplate();
+									template.setNewFileName(templateFileName);
+									template.load();
+									if (activeChannel.getActiveRecordSet() != null) {
+										activeChannel.applyTemplate(activeChannel.getActiveRecordSet().getName(), true);
+										activeChannel.getActiveRecordSet().setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
+									}
 								}
 							}
 						}
