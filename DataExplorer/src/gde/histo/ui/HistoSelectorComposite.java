@@ -73,7 +73,7 @@ public final class HistoSelectorComposite extends Composite {
 	final CurveSelectorContextMenu	contextMenu;
 
 	private Button									curveSelectorHeader;
-	private Button									chartSelector, smartSelector;
+	private Button									chartSelector, smartSelector, saveTemplate;
 	private int											initialSelectorHeaderWidth;
 	private int											selectorColumnWidth;
 	private Table										curveSelectorTable;
@@ -175,18 +175,7 @@ public final class HistoSelectorComposite extends Composite {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					log.fine(() -> "chartSelector.widgetSelected, event=" + evt); //$NON-NLS-1$
-					HistoSelectorComposite.this.presentHistoExplorer.clearMeasurementModes();
-					for (TableItem tableItem : HistoSelectorComposite.this.curveSelectorTable.getItems()) {
-						if (tableItem.getChecked()) {
-							// avoid phantom measurements with invisible curves
-							String recordName = getTableItemRecord(tableItem).getName();
-							if (getParentWindow().isMeasureRecord(recordName)) {
-								HistoSelectorComposite.this.contextMenu.setMeasurement(recordName, false);
-								HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(recordName, false);
-							}
-						}
-					}
-					HistoSelectorComposite.this.presentHistoExplorer.scrollSummaryChart();
+					scrollCompositeAndClearMeasuring();
 					HistoSelectorComposite.this.presentHistoExplorer.updateHistoChartWindow(false);
 				}
 			});
@@ -207,7 +196,26 @@ public final class HistoSelectorComposite extends Composite {
 				public void widgetSelected(SelectionEvent evt) {
 					log.fine(() -> "smartSelector.widgetSelected, event=" + evt); //$NON-NLS-1$
 					Settings.getInstance().setSmartStatistics(smartSelector.getSelection());
+					scrollCompositeAndClearMeasuring();
 					DataExplorer.getInstance().getPresentHistoExplorer().updateHistoTabs(true, true);
+				}
+			});
+		}
+		{
+			this.saveTemplate = new Button(this, SWT.PUSH | SWT.LEFT | SWT.TRANSPARENT);
+			FormData saveTemplateLData = new FormData();
+			saveTemplateLData.width = 26;
+			saveTemplateLData.height = 26;
+			saveTemplateLData.left = new FormAttachment(smartSelector, -1);
+			saveTemplateLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
+			this.saveTemplate.setLayoutData(saveTemplateLData);
+			this.saveTemplate.setImage(SWTResourceManager.getImage("gde/resource/saveTemplate.png")); //$NON-NLS-1$
+			this.saveTemplate.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0884));
+			this.saveTemplate.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent evt) {
+					log.fine(() -> "saveTemplate.widgetSelected, event=" + evt); //$NON-NLS-1$
+					DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet().saveTemplate();
 				}
 			});
 		}
@@ -430,6 +438,21 @@ public final class HistoSelectorComposite extends Composite {
 		} else {
 			return new Rectangle(1, 1, 1, 1);
 		}
+	}
+
+	public void scrollCompositeAndClearMeasuring() {
+		presentHistoExplorer.clearMeasurementModes();
+		for (TableItem tableItem : curveSelectorTable.getItems()) {
+			if (tableItem.getChecked()) {
+				// avoid phantom measurements with invisible curves
+				String recordName = getTableItemRecord(tableItem).getName();
+				if (getParentWindow().isMeasureRecord(recordName)) {
+					contextMenu.setMeasurement(recordName, false);
+					contextMenu.setDeltaMeasurement(recordName, false);
+				}
+			}
+		}
+		HistoSelectorComposite.this.getParentWindow().scrollSummaryComposite();
 	}
 
 	private AbstractHistoChartWindow getParentWindow() {

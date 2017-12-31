@@ -66,4 +66,9 @@ public final class HistoGraphicsWindow extends AbstractHistoChartWindow {
 		// not required for this chart type
 	}
 
+	@Override
+	public void scrollSummaryComposite() {
+		// not required for this chart type
+	}
+
 }

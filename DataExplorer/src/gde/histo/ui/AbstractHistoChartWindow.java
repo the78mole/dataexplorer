@@ -282,4 +282,9 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 		return graphicsComposite.getMeasureRecord().map(r -> r.getName().equals(recordKeyName)).orElse(false);
 	}
 
+	/**
+	 * Select the next graph or alternatively restore to full vertical size.
+	 */
+	public abstract void scrollSummaryComposite();
+
 }

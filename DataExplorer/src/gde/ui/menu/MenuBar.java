@@ -92,6 +92,7 @@ public class MenuBar {
 	MenuItem										nextChannelConfigItem;
 	MenuItem										prevRecordSetItem;
 	MenuItem										nextRecordSetItem;
+	MenuItem										nextChartItem;
 	Menu												viewMenu;
 	MenuItem										viewMenuItem;
 	private MenuItem						suppressModeItem;
@@ -661,7 +662,8 @@ public class MenuBar {
 				this.graphicsMenuItem.setMenu(this.graphicsMenu);
 				{
 					this.saveDefaultGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
-					this.saveDefaultGraphicsTemplateItem.setText(Messages.getString(MessageIds.GDE_MSGT0034));
+					this.saveDefaultGraphicsTemplateItem.setText(Messages.getString(MessageIds.GDE_MSGT0034, GDE.MOD1));
+					this.saveDefaultGraphicsTemplateItem.setAccelerator(SWT.MOD1 + SWT.SHIFT + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0034));
 					this.saveDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -951,6 +953,25 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "nextRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.getMenuToolBar().nextRecord.notifyListeners(SWT.Selection, new Event());
+						}
+					});
+				}
+				{
+					new MenuItem(this.viewMenu, SWT.SEPARATOR);
+				}
+				{
+					this.nextChartItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.nextChartItem.setText(Messages.getString(MessageIds.GDE_MSGT0900, GDE.MOD1_MOD3));
+					if (!GDE.IS_OS_ARCH_ARM) this.nextChartItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0901));
+					this.nextChartItem.setAccelerator(SWT.MOD1 + SWT.MOD3 + SWT.PAGE_DOWN);
+					this.nextChartItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "nextChartItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.this.application.getHistoExplorer().ifPresent(h -> {
+								h.scrollSummaryCompositeAndClearMeasuring();
+								h.updateHistoChartWindow(false);
+							});
 						}
 					});
 				}

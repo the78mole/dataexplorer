@@ -159,8 +159,10 @@ public class HistoExplorer {
 	 * Set the next graph into the window or alternatively restore to full vertical size.
 	 * Does not support redrawing.
 	 */
-	public void scrollSummaryChart() {
-		((HistoSummaryWindow) displayTab.getSelection()).scrollSummaryChart();
+	public void scrollSummaryCompositeAndClearMeasuring() {
+		if (isHistoChartWindowVisible()) {
+			((AbstractHistoChartWindow) displayTab.getSelection()).getCurveSelectorComposite().scrollCompositeAndClearMeasuring();
+		}
 	}
 
 	/**

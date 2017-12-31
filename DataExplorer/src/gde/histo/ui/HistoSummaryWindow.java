@@ -18,6 +18,8 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
+import java.util.Arrays;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.SashForm;
@@ -40,7 +42,7 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 	private static final String			$CLASS_NAME						= HistoSummaryWindow.class.getName();
 	private static final Logger			log										= Logger.getLogger($CLASS_NAME);
 
-	public static final int[]				DEFAULT_CHART_WEIGHTS	= new int[] { 0, 10000 };							// 2nd chart is the default chart
+	public static final int[]				DEFAULT_CHART_WEIGHTS	= new int[] {0, 10000};							// 2nd chart is the default chart
 
 	protected SashForm							compositeSashForm;
 	protected HistoSummaryComposite	summaryComposite;
@@ -60,7 +62,7 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 		window.summaryComposite = new HistoSummaryComposite(window.compositeSashForm); // at the top
 		window.graphicsComposite = new HistoGraphicsComposite(window.compositeSashForm);
 		window.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
-		window.compositeSashForm.setWeights(DEFAULT_CHART_WEIGHTS);
+		window.compositeSashForm.setWeights(DEFAULT_CHART_WEIGHTS.clone());
 
 		window.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		window.setText(Messages.getString(MessageIds.GDE_MSGT0883));
@@ -87,12 +89,11 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 		composite.setFixedGraphicCanvas(-1, -1);
 	}
 
-	/**
-	 * Set the next graph into the window or alternatively restore to full vertical size.
-	 */
-	public void scrollSummaryChart() {
+	@Override
+	public void scrollSummaryComposite() {
 		if (Settings.getInstance().isSmartStatistics()) {
-			if (compositeSashForm.getWeights()[0] < compositeSashForm.getWeights()[1]) {
+			int sumWeights = Arrays.stream(compositeSashForm.getWeights()).sum();
+			if (compositeSashForm.getWeights()[0] / sumWeights < compositeSashForm.getWeights()[1] / sumWeights) {
 				compositeSashForm.setWeights(new int[] { 10000, 0 });
 			} else {
 				compositeSashForm.setWeights(new int[] { 0, 10000 });
@@ -106,7 +107,7 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 	 * Set the graphics chart into the window without redrawing.
 	 */
 	protected void setDefaultChart() {
-		compositeSashForm.setWeights(DEFAULT_CHART_WEIGHTS);
+		compositeSashForm.setWeights(DEFAULT_CHART_WEIGHTS.clone());
 	}
 
 	public int[] getChartWeights() {
