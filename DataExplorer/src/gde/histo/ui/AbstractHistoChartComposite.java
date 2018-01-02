@@ -23,9 +23,9 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
 import java.util.Date;
-import java.util.Optional;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -377,20 +377,10 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	protected abstract void drawCurveArea(int dataScaleWidth);
 
 	/**
-	 * Clean everything related to the measurement.
-	 */
-	public abstract void cleanMeasurement();
-
-	/**
 	 * Draw the pointer for measurement modes.
 	 * Select only valid timestamps on the x axis.
 	 */
 	public abstract void drawMeasurePointer(TrailRecord trailRecord, HistoGraphicsMode mode);
-
-	/**
-	 * @return the measuring record if measuring is active
-	 */
-	public abstract Optional<TrailRecord> getMeasureRecord();
 
 	public void setCurveSelectorEnabled(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
@@ -408,6 +398,23 @@ public abstract class AbstractHistoChartComposite extends Composite {
 		tmpyPos = constrainToRange(tmpyPos, 0, this.curveAreaBounds.height);
 		if (log.isLoggable(FINER)) log.log(FINER, "out xPos = " + tmpxPos + " yPos = " + tmpyPos); //$NON-NLS-1$ //$NON-NLS-2$
 		return new Point(tmpxPos, tmpyPos);
+	}
+
+	protected AbstractHistoChartWindow getParentWindow() {
+		Composite grandParent = getParent().getParent();
+		if (grandParent instanceof CTabFolder) {
+			return (AbstractHistoChartWindow) ((CTabFolder) grandParent).getSelection();
+		} else {
+			return (AbstractHistoChartWindow) ((CTabFolder) grandParent.getParent()).getSelection();
+		}
+	}
+
+	protected AbstractHistoChartComposite getPresentGraphicsComposite() {
+		return getParentWindow().graphicsComposite;
+	}
+
+	protected HistoGraphicsMeasurement getPresentMeasuring() {
+		return getParentWindow().graphicsMeasurement.get();
 	}
 
 }

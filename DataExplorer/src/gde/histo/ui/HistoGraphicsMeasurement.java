@@ -29,6 +29,7 @@ import gde.GDE;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSetFormatter;
+import gde.histo.utils.HistoTimeLine;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -49,14 +50,14 @@ public final class HistoGraphicsMeasurement {
 		/** Single measurement mode is active */
 		MEASURE {
 			@Override
-			void setMode(HistoGraphicsComposite hgc) {
-				hgc.graphicsMeasurement.isLeftMouseMeasure = true;
-				hgc.graphicsMeasurement.isRightMouseMeasure = false;
+			void setMode(AbstractHistoChartComposite hgc) {
+				hgc.getPresentMeasuring().isLeftMouseMeasure = true;
+				hgc.getPresentMeasuring().isRightMouseMeasure = false;
 			}
 
 			@Override
-			void drawMeasurement(HistoGraphicsComposite hgc, long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
-				HistoGraphicsMeasurement hgm = hgc.graphicsMeasurement;
+			void drawMeasurement(AbstractHistoChartComposite hgc, long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
+				HistoGraphicsMeasurement hgm = hgc.getPresentMeasuring();
 
 				hgm.curveSurvey.setPosMeasure(hgc.curveAreaBounds, timestampMeasureNew_ms);
 
@@ -68,8 +69,8 @@ public final class HistoGraphicsMeasurement {
 			}
 
 			@Override
-			void drawLeftMeasurement(HistoGraphicsComposite hgc, long timestamp_ms) {
-				HistoGraphicsMeasurement hgm = hgc.graphicsMeasurement;
+			void drawLeftMeasurement(AbstractHistoChartComposite hgc, long timestamp_ms) {
+				HistoGraphicsMeasurement hgm = hgc.getPresentMeasuring();
 				long startTime = new Date().getTime();
 				hgm.curveSurvey.cleanMeasurementPointer(hgc.canvasImage);
 
@@ -83,28 +84,28 @@ public final class HistoGraphicsMeasurement {
 			}
 
 			@Override
-			void drawRightMeasurement(HistoGraphicsComposite hgc, long timestamp_ms) {
+			void drawRightMeasurement(AbstractHistoChartComposite hgc, long timestamp_ms) {
 			}
 
 			@Override
-			void drawInitialMeasurement(HistoGraphicsComposite hgc) {
-				long timestampMeasureNew_ms = hgc.timeLine.getAdjacentTimestamp(hgc.curveAreaBounds.width / 4);
+			void drawInitialMeasurement(AbstractHistoChartComposite hgc) {
+				long timestampMeasureNew_ms = ((HistoGraphicsComposite) hgc).timeLine.getAdjacentTimestamp(hgc.curveAreaBounds.width / 4);
 				long timestampDeltaNew_ms = timestampMeasureNew_ms; // is not required for single measurement
-				hgc.graphicsMeasurement.drawMeasurement(timestampMeasureNew_ms, timestampDeltaNew_ms);
+				hgc.getPresentMeasuring().drawMeasurement(timestampMeasureNew_ms, timestampDeltaNew_ms);
 			}
 		},
 
 		/** delta measurement mode is active */
 		MEASURE_DELTA {
 			@Override
-			void setMode(HistoGraphicsComposite hgc) {
-				hgc.graphicsMeasurement.isLeftMouseMeasure = false;
-				hgc.graphicsMeasurement.isRightMouseMeasure = true;
+			void setMode(AbstractHistoChartComposite hgc) {
+				hgc.getPresentMeasuring().isLeftMouseMeasure = false;
+				hgc.getPresentMeasuring().isRightMouseMeasure = true;
 			}
 
 			@Override
-			void drawMeasurement(HistoGraphicsComposite hgc, long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
-				HistoGraphicsMeasurement hgm = hgc.graphicsMeasurement;
+			void drawMeasurement(AbstractHistoChartComposite hgc, long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
+				HistoGraphicsMeasurement hgm = hgc.getPresentMeasuring();
 				hgm.curveSurvey.setPosMeasure(hgc.curveAreaBounds, timestampMeasureNew_ms);
 				hgm.curveSurvey.setPosDelta(hgc.curveAreaBounds, timestampDeltaNew_ms);
 
@@ -116,8 +117,8 @@ public final class HistoGraphicsMeasurement {
 			}
 
 			@Override
-			void drawLeftMeasurement(HistoGraphicsComposite hgc, long timestamp_ms) {
-				HistoGraphicsMeasurement hgm = hgc.graphicsMeasurement;
+			void drawLeftMeasurement(AbstractHistoChartComposite hgc, long timestamp_ms) {
+				HistoGraphicsMeasurement hgm = hgc.getPresentMeasuring();
 				long startTime = new Date().getTime();
 				hgm.curveSurvey.cleanMeasurementPointer(hgc.canvasImage);
 
@@ -131,8 +132,8 @@ public final class HistoGraphicsMeasurement {
 			}
 
 			@Override
-			void drawRightMeasurement(HistoGraphicsComposite hgc, long timestamp_ms) {
-				HistoGraphicsMeasurement hgm = hgc.graphicsMeasurement;
+			void drawRightMeasurement(AbstractHistoChartComposite hgc, long timestamp_ms) {
+				HistoGraphicsMeasurement hgm = hgc.getPresentMeasuring();
 				long startTime = new Date().getTime();
 				hgm.curveSurvey.cleanMeasurementPointer(hgc.canvasImage);
 
@@ -146,14 +147,15 @@ public final class HistoGraphicsMeasurement {
 			}
 
 			@Override
-			void drawInitialMeasurement(HistoGraphicsComposite hgc) {
-				if (hgc.timeLine.getScalePositions().size() > 1) {
-					int margin = hgc.curveAreaBounds.width / (hgc.timeLine.getScalePositions().size() + 1);
-					long timestampMeasureNew_ms = hgc.timeLine.getAdjacentTimestamp(margin);
-// long timestampDeltaNew_ms = hgc.timeLine.getAdjacentTimestamp(hgc.curveAreaBounds.width - margin);
-					long timestampDeltaNew_ms = hgc.timeLine.getAdjacentTimestamp(hgc.curveAreaBounds.width * 2 / 3);
+			void drawInitialMeasurement(AbstractHistoChartComposite hgc) {
+				HistoTimeLine timeLine = ((HistoGraphicsComposite) hgc).timeLine;
+				if (timeLine.getScalePositions().size() > 1) {
+					int margin = hgc.curveAreaBounds.width / (timeLine.getScalePositions().size() + 1);
+					long timestampMeasureNew_ms = timeLine.getAdjacentTimestamp(margin);
+					// long timestampDeltaNew_ms = hgc.timeLine.getAdjacentTimestamp(hgc.curveAreaBounds.width - margin);
+					long timestampDeltaNew_ms = timeLine.getAdjacentTimestamp(hgc.curveAreaBounds.width * 2 / 3);
 
-					hgc.graphicsMeasurement.drawMeasurement(timestampMeasureNew_ms, timestampDeltaNew_ms);
+					hgc.getPresentMeasuring().drawMeasurement(timestampMeasureNew_ms, timestampDeltaNew_ms);
 				}
 			}
 		};
@@ -161,45 +163,52 @@ public final class HistoGraphicsMeasurement {
 		/**
 		 * Set graphics window measurement mode.
 		 */
-		abstract void setMode(HistoGraphicsComposite graphicsComposite);
+		abstract void setMode(AbstractHistoChartComposite graphicsComposite);
 
 		/**
 		 * Perform the UI activities required for a measurement.
 		 */
-		abstract void drawMeasurement(HistoGraphicsComposite hgc, long timestampMeasureNew_ms, long timestampDeltaNew_ms);
+		abstract void drawMeasurement(AbstractHistoChartComposite hgc, long timestampMeasureNew_ms, long timestampDeltaNew_ms);
 
 		/**
 		 * Perform the UI activities for the first measurement timestamp.
 		 * In case of delta measurement: the timestamp which is initially on the left.
 		 */
-		abstract void drawLeftMeasurement(HistoGraphicsComposite hgc, long timestamp_ms);
+		abstract void drawLeftMeasurement(AbstractHistoChartComposite hgc, long timestamp_ms);
 
 		/**
 		 * Perform the UI activities for the second measurement timestamp used for delta measurement.
 		 */
-		abstract void drawRightMeasurement(HistoGraphicsComposite hgc, long timestamp_ms);
+		abstract void drawRightMeasurement(AbstractHistoChartComposite hgc, long timestamp_ms);
 
 		/**
 		 * Perform the UI activities in case the measurement mode is changed.
 		 */
-		abstract void drawInitialMeasurement(HistoGraphicsComposite hgc);
+		abstract void drawInitialMeasurement(AbstractHistoChartComposite hgc);
 
 		private static String getSelectedMeasurementsAsTable(AbstractHistoChartComposite hgc, long timestamp_ms) {
 			hgc.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD)); //$NON-NLS-1$
 			return TrailRecordSetFormatter.getSelectedMeasurementsAsTable(timestamp_ms);
 		}
 
+		static HistoGraphicsMode getMode(boolean isDeltaMeasuring) {
+			if (isDeltaMeasuring) {
+				return HistoGraphicsMode.MEASURE_DELTA;
+			} else {
+				return HistoGraphicsMode.MEASURE;
+			}
+		}
 	};
 
-	boolean																isLeftMouseMeasure	= false;
-	boolean																isRightMouseMeasure	= false;
+	boolean																		isLeftMouseMeasure	= false;
+	boolean																		isRightMouseMeasure	= false;
 
-	private final HistoGraphicsComposite	graphicsComposite;
-	private final TrailRecord							trailRecord;
-	private final CurveSurvey							curveSurvey;
+	private final AbstractHistoChartComposite	graphicsComposite;
+	private final TrailRecord									trailRecord;
+	private final CurveSurvey									curveSurvey;
 
-	private GC														canvasGC;
-	private HistoGraphicsMode							mode;
+	private GC																canvasGC;
+	private HistoGraphicsMode									mode;
 
 	public HistoGraphicsMeasurement(HistoGraphicsComposite graphicsComposite, TrailRecord trailRecord) {
 		this.graphicsComposite = graphicsComposite;

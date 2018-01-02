@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.swt.SWT;
@@ -511,19 +510,9 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 	}
 
 	@Override
-	public void cleanMeasurement() {
-	}
-
-	@Override
 	public void drawMeasurePointer(TrailRecord trailRecord, HistoGraphicsMode mode) {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public Optional<TrailRecord> getMeasureRecord() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

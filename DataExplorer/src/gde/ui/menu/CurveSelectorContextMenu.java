@@ -41,7 +41,6 @@ import gde.data.AbstractRecordSet;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
-import gde.histo.ui.HistoExplorer;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -1284,7 +1283,7 @@ public class CurveSelectorContextMenu {
 
 	private void setMeasurementActive(String tmpRecordNameMeasurement, boolean enabled) {
 		if (this.isTypeHisto) {
-			this.application.getPresentHistoExplorer().setMeasurementActive(tmpRecordNameMeasurement, enabled);
+			this.application.getPresentHistoExplorer().getActiveHistoChartTabItem().setMeasurementActive(tmpRecordNameMeasurement, enabled, false);
 		} else {
 			this.application.setMeasurementActive(tmpRecordNameMeasurement, enabled);
 		}
@@ -1311,7 +1310,7 @@ public class CurveSelectorContextMenu {
 
 	private void setDeltaMeasurementActive(String tmpRecordNameMeasurement, boolean enabled) {
 		if (this.isTypeHisto) {
-			this.application.getPresentHistoExplorer().setDeltaMeasurementActive(tmpRecordNameMeasurement, enabled);
+			this.application.getPresentHistoExplorer().getActiveHistoChartTabItem().setMeasurementActive(tmpRecordNameMeasurement, enabled, true);
 		} else {
 			this.application.setDeltaMeasurementActive(tmpRecordNameMeasurement, enabled);
 		}

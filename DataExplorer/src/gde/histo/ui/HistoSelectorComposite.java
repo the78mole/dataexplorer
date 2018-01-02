@@ -143,8 +143,8 @@ public final class HistoSelectorComposite extends Composite {
 								// avoid phantom measurements with invisible curves
 								String recordName = getTableItemRecord(tableItem).getName();
 								if (getParentWindow().isMeasureRecord(recordName)) {
-									HistoSelectorComposite.this.contextMenu.setMeasurement(recordName, false);
-									HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(recordName, false);
+									contextMenu.setMeasurement(recordName, false);
+									contextMenu.setDeltaMeasurement(recordName, false);
 								}
 								toggleRecordSelection(tableItem, false, false);
 							}
@@ -244,8 +244,8 @@ public final class HistoSelectorComposite extends Composite {
 						String recordName = getTableItemRecord(eventItem).getName();
 						if (!eventItem.getChecked() && (Boolean) eventItem.getData(DataExplorer.OLD_STATE) //
 								&& getParentWindow().isMeasureRecord(recordName)) {
-							HistoSelectorComposite.this.contextMenu.setMeasurement(recordName, false);
-							HistoSelectorComposite.this.contextMenu.setDeltaMeasurement(recordName, false);
+							contextMenu.setMeasurement(recordName, false);
+							contextMenu.setDeltaMeasurement(recordName, false);
 						}
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, eventItem.getData(DataExplorer.RECORD_NAME));
 						HistoSelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);

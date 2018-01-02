@@ -83,16 +83,14 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	final HistoTimeLine					timeLine		= new HistoTimeLine();
 
 	/** composite size - control resized */
-	Point												oldSize			= new Point(0, 0);
+	private Point								oldSize			= new Point(0, 0);
 
 	// mouse actions
-	int													xDown				= 0;
-	int													xUp					= 0;
-	int													xLast				= 0;
-	int													yDown				= 0;
-	int													yUp					= 0;
-
-	HistoGraphicsMeasurement		graphicsMeasurement;
+	private int									xDown				= 0;
+	private int									xUp					= 0;
+	private int									xLast				= 0;
+	private int									yDown				= 0;
+	private int									yUp					= 0;
 
 	HistoGraphicsComposite(SashForm useParent) {
 		super(useParent, SWT.NONE);
@@ -289,9 +287,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 			// changed curve selection may change the scale end values
 			trailRecordSet.syncScaleOfSyncableRecords();
 
-			if (this.graphicsMeasurement != null) {
-				this.graphicsMeasurement.drawMeasurement();
-			}
+			getParentWindow().graphicsMeasurement.ifPresent(m -> m.drawMeasurement());
 		} else
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 
@@ -305,32 +301,10 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		// draw full graph at first because the curve area might change (due to new new scales)
 		drawAreaPaintControl();
 
-		this.graphicsMeasurement = new HistoGraphicsMeasurement(this, trailRecord);
-		this.setModeState(mode);
+		this.getParentWindow().graphicsMeasurement = Optional.of(new HistoGraphicsMeasurement(this, trailRecord));
+		this.getParentWindow().setModeState(mode);
 
 		mode.drawInitialMeasurement(this);
-	}
-
-	@Override
-	public void cleanMeasurement() {
-		if (this.graphicsMeasurement != null) {
-			this.graphicsMeasurement.cleanMeasurement();
-
-			this.graphicsMeasurement = null;
-		}
-	}
-
-	@Override
-	public Optional<TrailRecord> getMeasureRecord() {
-		return graphicsMeasurement != null ? Optional.of(graphicsMeasurement.getTrailRecord()) : Optional.empty();
-	}
-
-	/**
-	 * Set graphics window measurement mode.
-	 * @param mode
-	 */
-	public void setModeState(HistoGraphicsMode mode) {
-		this.graphicsMeasurement.setModeState(mode);
 	}
 
 	/**
@@ -356,12 +330,12 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 			} else
 				this.graphicCanvas.setToolTipText(null);
 
-			if (this.graphicsMeasurement != null) {
+			getParentWindow().graphicsMeasurement.ifPresent(m -> {
 				if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
-					this.graphicsMeasurement.processMouseDownMove(this.timeLine.getAdjacentTimestamp(point.x));
+					m.processMouseDownMove(this.timeLine.getAdjacentTimestamp(point.x));
 				} else
-					this.graphicsMeasurement.processMouseUpMove(point.x);
-			}
+					m.processMouseUpMove(point.x);
+			});
 		}
 	}
 
@@ -377,23 +351,21 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 			this.yDown = point.y;
 
 			if (evt.button == 1) {
-				if (this.graphicsMeasurement != null) {
-					this.graphicsMeasurement.processMouseDownAction(this.xDown);
-				}
-			} else if (evt.button == 3) { // right button
-				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
-				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
-				if (this.xDown > 0 && this.xDown < this.curveAreaBounds.width) {
-					Map<DataTag, String> dataTags = trailRecordSet.getDataTags(trailRecordSet //
-							.getIndex(timeLine.getAdjacentTimestamp(this.xDown))); // is already relative to curve area
-					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
-					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
-					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
-				} else {
-					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
-					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
-					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
-				}
+				getParentWindow().graphicsMeasurement.ifPresent(m -> m.processMouseDownAction(this.xDown));
+			}
+		} else if (evt.button == 3) { // right button
+			popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
+			popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
+			if (this.xDown > 0 && this.xDown < this.curveAreaBounds.width) {
+				Map<DataTag, String> dataTags = trailRecordSet.getDataTags(trailRecordSet //
+						.getIndex(timeLine.getAdjacentTimestamp(this.xDown))); // is already relative to curve area
+				popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
+				popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
+				popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
+			} else {
+				popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
+				popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
+				popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 			}
 		}
 	}
@@ -410,9 +382,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 			this.yUp = point.y;
 
 			if (evt.button == 1) {
-				if (this.graphicsMeasurement != null) {
-					this.graphicsMeasurement.processMouseUpAction();
-				}
+				getParentWindow().graphicsMeasurement.ifPresent(m -> m.processMouseUpAction());
 			}
 		}
 	}
@@ -573,5 +543,4 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
 		return numberTickMarks;
 	}
-
 }

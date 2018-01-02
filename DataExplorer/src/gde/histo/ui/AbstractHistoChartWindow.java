@@ -22,6 +22,8 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.WARNING;
 
+import java.util.Optional;
+
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
@@ -32,6 +34,9 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
+import gde.histo.recordings.TrailRecord;
+import gde.histo.recordings.TrailRecordSet;
+import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
@@ -67,6 +72,8 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 		}
 		return new ImageData(inputImageData.width, inputImageData.height, inputImageData.depth, inputImageData.palette, outBytesPerLine, outDataBytes);
 	}
+
+	Optional<HistoGraphicsMeasurement>		graphicsMeasurement			= Optional.empty();
 
 	protected final HistoExplorer					presentHistoExplorer		= DataExplorer.getInstance().getPresentHistoExplorer();
 
@@ -279,12 +286,54 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	 * @return true if there is a measuring record with this name
 	 */
 	public boolean isMeasureRecord(String recordKeyName) {
-		return graphicsComposite.getMeasureRecord().map(r -> r.getName().equals(recordKeyName)).orElse(false);
+		return getMeasureRecord().map(r -> r.getName().equals(recordKeyName)).orElse(false);
 	}
 
 	/**
 	 * Select the next graph or alternatively restore to full vertical size.
 	 */
 	public abstract void scrollSummaryComposite();
+
+	/**
+	 * Switch application into measurement mode for the visible record set using the selected record.
+	 */
+	public void setMeasurementActive(String recordKey, boolean enabled, boolean isDeltaMeasuring) {
+		setMeasurementActive(recordKey, enabled, HistoGraphicsMode.getMode(isDeltaMeasuring));
+	}
+
+	/**
+	 * Switch application into measurement mode for the visible record set using the selected record.
+	 */
+	private void setMeasurementActive(String recordKey, boolean enabled, HistoGraphicsMode graphicsMode) {
+		TrailRecordSet trailRecordSet = presentHistoExplorer.getTrailRecordSet();
+		if (presentHistoExplorer.isHistoChartWindowVisible() && trailRecordSet.containsKey(recordKey)) {
+			cleanMeasurement();
+			if (enabled) {
+				TrailRecord trailRecord = trailRecordSet.get(recordKey);
+				if (trailRecord.isVisible()) {
+					getGraphicsComposite().drawMeasurePointer(trailRecord, graphicsMode);
+				} else {
+					getCurveSelectorComposite().setRecordSelection(trailRecord, true);
+					getGraphicsComposite().redrawGraphics();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Clean everything related to the measurement.
+	 */
+	public void cleanMeasurement() {
+		graphicsMeasurement.ifPresent(m -> m.cleanMeasurement());
+		graphicsMeasurement = Optional.empty();
+	}
+
+	public Optional<TrailRecord> getMeasureRecord() {
+		return graphicsMeasurement.map(m -> m.getTrailRecord());
+	}
+
+	public void setModeState(HistoGraphicsMode mode) {
+		graphicsMeasurement.ifPresent(m -> m.setModeState(mode));
+	}
 
 }

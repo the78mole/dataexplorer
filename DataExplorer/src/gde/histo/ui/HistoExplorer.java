@@ -41,9 +41,7 @@ import gde.config.Settings;
 import gde.histo.datasources.HistoSet;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.recordings.TrailDataTags;
-import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
-import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -275,13 +273,13 @@ public class HistoExplorer {
 	private void resetWindowHeaderAndMeasurement(AbstractHistoChartWindow tabItem) {
 		if (Thread.currentThread().getId() == application.getThreadId()) {
 			tabItem.clearHeaderAndComment();
-			tabItem.getGraphicsComposite().cleanMeasurement();
+			tabItem.cleanMeasurement();
 		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
 					tabItem.clearHeaderAndComment();
-					tabItem.getGraphicsComposite().cleanMeasurement();
+					tabItem.cleanMeasurement();
 				}
 			});
 		}
@@ -336,47 +334,7 @@ public class HistoExplorer {
 	 * Clear measurement pointer of visible tab window.
 	 */
 	public void clearMeasurementModes() {
-		((AbstractHistoChartWindow) displayTab.getSelection()).getGraphicsComposite().cleanMeasurement();
-	}
-
-	/**
-	 * Switch application into measurement mode for the visible record set using selected record.
-	 */
-	public void setMeasurementActive(String recordKey, boolean enabled) {
-		TrailRecordSet trailRecordSet = histoSet.getTrailRecordSet();
-		if (isHistoChartWindowVisible() && trailRecordSet.containsKey(recordKey)) {
-			AbstractHistoChartWindow chartWindow = (AbstractHistoChartWindow) displayTab.getSelection();
-			chartWindow.getGraphicsComposite().cleanMeasurement();
-			if (enabled) {
-				TrailRecord trailRecord = trailRecordSet.get(recordKey);
-				if (trailRecord.isVisible()) {
-					chartWindow.getGraphicsComposite().drawMeasurePointer(trailRecord, HistoGraphicsMode.MEASURE);
-				} else {
-					chartWindow.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
-					chartWindow.getGraphicsComposite().redrawGraphics();
-				}
-			}
-		}
-	}
-
-	/**
-	 * Switch application into delta measurement mode for visible record set using selected record.
-	 */
-	public void setDeltaMeasurementActive(String recordKey, boolean enabled) {
-		TrailRecordSet trailRecordSet = histoSet.getTrailRecordSet();
-		if (isHistoChartWindowVisible() && trailRecordSet.containsKey(recordKey)) {
-			AbstractHistoChartWindow chartWindow = (AbstractHistoChartWindow) displayTab.getSelection();
-			chartWindow.getGraphicsComposite().cleanMeasurement();
-			if (enabled) {
-				TrailRecord trailRecord = trailRecordSet.get(recordKey);
-				if (trailRecord.isVisible()) {
-					chartWindow.getGraphicsComposite().drawMeasurePointer(trailRecord, HistoGraphicsMode.MEASURE_DELTA);
-				} else {
-					chartWindow.getCurveSelectorComposite().setRecordSelection(trailRecord, true);
-					chartWindow.getGraphicsComposite().redrawGraphics();
-				}
-			}
-		}
+		((AbstractHistoChartWindow) displayTab.getSelection()).cleanMeasurement();
 	}
 
 	/**
@@ -474,6 +432,14 @@ public class HistoExplorer {
 
 	public HistoSummaryWindow getHistoSummaryTabItem() {
 		return (HistoSummaryWindow) this.histoSummaryTabItem;
+	}
+
+	/**
+	 * @return a visible histo chart window
+	 * @throws error if the window is not visible
+	 */
+	public AbstractHistoChartWindow getActiveHistoChartTabItem() {
+		return (AbstractHistoChartWindow) this.displayTab.getSelection();
 	}
 
 }
