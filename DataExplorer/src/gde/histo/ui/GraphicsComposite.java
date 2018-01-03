@@ -27,9 +27,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
@@ -56,8 +56,8 @@ import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionFormatter;
 import gde.histo.recordings.TrailRecord;
+import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
-import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.ui.menu.HistoTabAreaContextMenu;
 import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuOnDemand;
 import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuType;
@@ -76,14 +76,11 @@ import gde.utils.StringHelper;
  * Curves for the histo graphics window.
  * @author Thomas Eickert
  */
-public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
-	private final static String	$CLASS_NAME	= HistoGraphicsComposite.class.getName();
+public final class GraphicsComposite extends AbstractChartComposite {
+	private final static String	$CLASS_NAME	= GraphicsComposite.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	final HistoTimeLine					timeLine		= new HistoTimeLine();
-
-	/** composite size - control resized */
-	private Point								oldSize			= new Point(0, 0);
+	private final HistoTimeLine	timeLine		= new HistoTimeLine();
 
 	// mouse actions
 	private int									xDown				= 0;
@@ -92,8 +89,8 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	private int									yDown				= 0;
 	private int									yUp					= 0;
 
-	HistoGraphicsComposite(SashForm useParent) {
-		super(useParent, SWT.NONE);
+	GraphicsComposite(SashForm useParent, CTabItem parentWindow) {
+		super(useParent, parentWindow, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
 
 		// get the background colors
@@ -191,7 +188,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 				@Override
 				public void mouseExit(MouseEvent evt) {
 					log.finest(() -> "graphicCanvas.mouseExit, event=" + evt); //$NON-NLS-1$
-					HistoGraphicsComposite.this.graphicCanvas.setCursor(DataExplorer.getInstance().getCursor());
+					GraphicsComposite.this.graphicCanvas.setCursor(DataExplorer.getInstance().getCursor());
 				}
 			});
 			this.graphicCanvas.addMouseListener(new MouseAdapter() {
@@ -263,7 +260,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	/**
 	 * Draw the containing records and sets the comment.
 	 */
-	private void drawAreaPaintControl() {
+	public void drawAreaPaintControl() {
 		long startTime = new Date().getTime();
 		// Get the canvas and its dimensions
 		this.canvasBounds = this.graphicCanvas.getClientArea();
@@ -279,15 +276,16 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		this.canvasGC = new GC(this.graphicCanvas);
 
 		setRecordSetCommentStandard();
+		windowActor.setStatusMessage(GDE.STRING_EMPTY);
 
-		trailRecordSet = retrieveTrailRecordSet();
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			drawCurves();
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 			// changed curve selection may change the scale end values
 			trailRecordSet.syncScaleOfSyncableRecords();
 
-			getParentWindow().graphicsMeasurement.ifPresent(m -> m.drawMeasurement());
+			windowActor.drawMeasuring();
 		} else
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 
@@ -296,23 +294,13 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 	}
 
-	@Override
-	public void drawMeasurePointer(TrailRecord trailRecord, HistoGraphicsMode mode) {
-		// draw full graph at first because the curve area might change (due to new new scales)
-		drawAreaPaintControl();
-
-		this.getParentWindow().graphicsMeasurement = Optional.of(new HistoGraphicsMeasurement(this, trailRecord));
-		this.getParentWindow().setModeState(mode);
-
-		mode.drawInitialMeasurement(this);
-	}
-
 	/**
 	 * @param evt
 	 */
 	void mouseMoveAction(MouseEvent evt) {
 		if (Channels.getInstance().getActiveChannel() == null) return;
 
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0 && this.canvasImage != null) {
 			Point point = checkCurveBounds(evt.x, evt.y);
 
@@ -330,13 +318,13 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 			} else
 				this.graphicCanvas.setToolTipText(null);
 
-			getParentWindow().graphicsMeasurement.ifPresent(m -> {
-				if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
-					m.processMouseDownMove(this.timeLine.getAdjacentTimestamp(point.x));
-				} else
-					m.processMouseUpMove(point.x);
-			});
+			if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
+				windowActor.processMouseDownMove(this.timeLine.getAdjacentTimestamp(point.x));
+			} else {
+				windowActor.processMouseUpMove(point);
+			}
 		}
+
 	}
 
 	/**
@@ -345,13 +333,14 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	void mouseDownAction(MouseEvent evt) {
 		if (Channels.getInstance().getActiveChannel() == null) return;
 
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			Point point = checkCurveBounds(evt.x, evt.y);
 			this.xDown = point.x;
 			this.yDown = point.y;
 
 			if (evt.button == 1) {
-				getParentWindow().graphicsMeasurement.ifPresent(m -> m.processMouseDownAction(this.xDown));
+				windowActor.processMouseDownAction(point);
 			}
 		} else if (evt.button == 3) { // right button
 			popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
@@ -376,15 +365,21 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	void mouseUpAction(MouseEvent evt) {
 		if (Channels.getInstance().getActiveChannel() == null) return;
 
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			Point point = checkCurveBounds(evt.x, evt.y);
 			this.xUp = point.x;
 			this.yUp = point.y;
 
 			if (evt.button == 1) {
-				getParentWindow().graphicsMeasurement.ifPresent(m -> m.processMouseUpAction());
+				windowActor.processMouseUpAction(point);
 			}
 		}
+	}
+
+	@Override
+	protected void setFixedGraphicCanvas(Rectangle realBounds) {
+		// not supported
 	}
 
 	@Override
@@ -403,8 +398,9 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		canvasImageGC.drawLine(xMax + 1, curveAreaBounds.y - 1, xMax + 1, y0); // right fence
 
 		// initialize early in order to avoid problems in mouse move events
-		this.timeLine.initialize(trailRecordSet, this.curveAreaBounds.width);
-		this.timeLine.drawTimeLine(canvasImageGC, curveAreaBounds.x, y0);
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
+		this.timeLine.initialize(trailRecordSet, curveAreaBounds);
+		this.timeLine.drawTimeLine(canvasImageGC);
 
 		long startTime = new Date().getTime();
 		drawTrailRecordSet(dataScaleWidth);
@@ -417,10 +413,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 	 * Support multiple curves for one single item.
 	 */
 	private void drawTrailRecordSet(int dataScaleWidth) {
-		int x0 = curveAreaBounds.x;
-		int y0 = curveAreaBounds.y + curveAreaBounds.height;
-		int width = curveAreaBounds.width;
-		int height = curveAreaBounds.height;
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 
 		// check for activated horizontal grid
 		boolean isCurveGridEnabled = trailRecordSet.getValueGridType() > 0;
@@ -439,7 +432,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 					actualRecord.getName(), actualRecord.isVisible(), actualRecord.isDisplayable(), actualRecord.isScaleSynced(), actualRecord.isScaleVisible()));
 			int[] numberTickMarks = setRecordDisplayValues(actualRecord);
 			if (actualRecord.isScaleVisible())
-				HistoCurveUtils.drawHistoScale(actualRecord, canvasImageGC, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, numberTickMarks);
+				HistoCurveUtils.drawHistoScale(actualRecord, canvasImageGC, curveAreaBounds, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, numberTickMarks);
 
 			if (isCurveGridEnabled && actualRecord.getOrdinal() == trailRecordSet.getValueGridRecordOrdinal()) // check for activated horizontal grid
 				HistoCurveUtils.drawCurveGrid(trailRecordSet, canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
@@ -447,12 +440,12 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 			if (isActualRecordEnabled) {
 				// gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 				// gc.drawRectangle(x0, y0-height, width, height);
-				canvasImageGC.setClipping(x0 - 1, y0 - height - 1, width + 2, height + 2);
+				canvasImageGC.setClipping(curveAreaBounds.x - 1, curveAreaBounds.y - 1, curveAreaBounds.width + 2, curveAreaBounds.height + 2);
 				if (actualRecord.getTrailSelector().isTrailSuite()) {
-					HistoCurveUtils.drawHistoSuite(actualRecord, canvasImageGC, x0, y0, width, height, timeLine);
+					HistoCurveUtils.drawHistoSuite(actualRecord, canvasImageGC, curveAreaBounds, timeLine);
 				} else {
 					// CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet());
-					HistoCurveUtils.drawHistoCurve(actualRecord, canvasImageGC, x0, y0, width, height, timeLine);
+					HistoCurveUtils.drawHistoCurve(actualRecord, canvasImageGC, curveAreaBounds, timeLine);
 				}
 				canvasImageGC.setClipping(canvasBounds);
 			}
@@ -464,6 +457,7 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		// calculate number of curve scales, left and right side
 		int numberCurvesRight = 0;
 		int numberCurvesLeft = 0;
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
 			TrailRecord tmpRecord = trailRecordSet.getRecordsSortedForDisplay()[i];
 			if (tmpRecord != null && tmpRecord.isScaleVisible()) {
@@ -542,5 +536,25 @@ public final class HistoGraphicsComposite extends AbstractHistoChartComposite {
 		record.setMinMaxScaleValue(yMinValueDisplay, yMaxValueDisplay);
 		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
 		return numberTickMarks;
+	}
+
+	public void setMeasuringActive(Measure measure) {
+		// draw full graph at first because the curve area might have changed (due to new new scales)
+		drawAreaPaintControl();
+
+		measuring = new GraphicsMeasuring(this, measure);
+		measuring.drawMeasuring();
+	}
+
+	/**
+	 * Reset the graphic area and comment.
+	 */
+	public void cleanMeasuring() {
+		measuring.cleanMeasuring();
+		measuring = null;
+	}
+
+	public HistoTimeLine getTimeLine() {
+		return this.timeLine;
 	}
 }

@@ -23,9 +23,10 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -39,10 +40,8 @@ import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.Channels;
-import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
-import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
+import gde.histo.ui.AbstractChartWindow.WindowActor;
 import gde.histo.ui.menu.HistoTabAreaContextMenu;
 import gde.log.Logger;
 import gde.messages.MessageIds;
@@ -56,24 +55,22 @@ import gde.utils.StringHelper;
  * Histo chart drawing area base class.
  * @author Thomas Eickert (USER)
  */
-public abstract class AbstractHistoChartComposite extends Composite {
-	private final static String				$CLASS_NAME							= HistoSummaryComposite.class.getName();
-	private final static Logger				log											= Logger.getLogger($CLASS_NAME);
+public abstract class AbstractChartComposite extends Composite {
+	private final static String				$CLASS_NAME					= SummaryComposite.class.getName();
+	private final static Logger				log									= Logger.getLogger($CLASS_NAME);
 
-	protected final static int				DEFAULT_TOP_GAP					= 5;																		// space on top of the curves
-	protected final static int				DEFAULT_SIDE_GAP				= 10;																		// space at the leftmost and rightmost graphics
-	protected final static int				DEFAULT_BOTTOM_GAP			= 20;																		// space at the bottom of the plots for the scale
-	protected final static int				DEFAULT_HEADER_GAP			= 5;
-	protected final static int				DEFAULT_COMMENT_GAP			= 5;
+	protected final static int				DEFAULT_TOP_GAP			= 5;																// space on top of the curves
+	protected final static int				DEFAULT_SIDE_GAP		= 10;																// space at the leftmost and rightmost graphics
+	protected final static int				DEFAULT_BOTTOM_GAP	= 20;																// space at the bottom of the plots for the scale
+	protected final static int				DEFAULT_HEADER_GAP	= 5;
+	protected final static int				DEFAULT_COMMENT_GAP	= 5;
 
-	protected final static int				ZERO_CANVAS_HEIGHT			= 11;																		// minimize if smart statistics is not active
+	protected final static int				ZERO_CANVAS_HEIGHT	= 11;																// minimize if smart statistics is not active
 
-	protected final DataExplorer			application							= DataExplorer.getInstance();
-	protected final HistoExplorer			presentHistoExplorer		= DataExplorer.getInstance().getPresentHistoExplorer();
-	protected final Settings					settings								= Settings.getInstance();
-	protected final Channels					channels								= Channels.getInstance();
+	protected final DataExplorer			application					= DataExplorer.getInstance();
+	protected final Settings					settings						= Settings.getInstance();
 
-	protected TrailRecordSet					trailRecordSet;
+	protected final WindowActor				windowActor;
 
 	protected Menu										popupmenu;
 	protected HistoTabAreaContextMenu	contextMenu;
@@ -86,21 +83,24 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	protected Text										recordSetComment;
 	protected Text										xScale;
 	protected Canvas									graphicCanvas;
-	int																headerHeight						= 0;
-	int																headerGap								= 0;
-	int																commentHeight						= 0;
-	int																commentGap							= 0;
-	int																xScaleHeight						= 0;
+	int																headerHeight				= 0;
+	int																headerGap						= 0;
+	int																commentHeight				= 0;
+	int																commentGap					= 0;
+	int																xScaleHeight				= 0;
 	protected String									graphicsHeaderText;
 
 	protected Rectangle								canvasBounds;
 	protected Image										canvasImage;
 	protected GC											canvasImageGC;
 	protected GC											canvasGC;
-	protected Rectangle								curveAreaBounds					= new Rectangle(0, 0, 1, 1);
-	protected int											fixedCanvasY						= -1;
-	protected int											fixedCanvasHeight				= -1;
-	protected boolean									isCurveSelectorEnabled	= true;
+	protected Rectangle								curveAreaBounds			= new Rectangle(0, 0, 1, 1);
+	protected int											fixedCanvasY				= -1;
+	protected int											fixedCanvasHeight		= -1;
+
+	/** composite size - control resized */
+	protected Point										oldSize							= new Point(0, 0);
+	protected AbstractMeasuring				measuring;
 
 	/**
 	 * Returns the value nearest to {@code value} which is within the closed range {@code [min..max]}.
@@ -121,12 +121,13 @@ public abstract class AbstractHistoChartComposite extends Composite {
 		return Math.min(Math.max(value, min), max);
 	}
 
-	public AbstractHistoChartComposite(Composite parent, int style) {
+	public AbstractChartComposite(Composite parent, CTabItem parentWindow, int style) {
 		super(parent, style);
+		this.windowActor = ((AbstractChartWindow) parentWindow).windowActor;
 	}
 
 	protected TrailRecordSet retrieveTrailRecordSet() {
-		return this.channels.getActiveChannel() != null ? this.application.getPresentHistoExplorer().getTrailRecordSet() : null;
+		return windowActor.getTrailRecordSet();
 	}
 
 	/**
@@ -136,11 +137,8 @@ public abstract class AbstractHistoChartComposite extends Composite {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			doRedrawGraphics();
 		} else {
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					doRedrawGraphics();
-				}
+			GDE.display.asyncExec(() -> {
+				doRedrawGraphics();
 			});
 		}
 	}
@@ -176,7 +174,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	public void enableGraphicsHeader(boolean enabled) {
 		if (enabled) {
 			this.headerGap = DEFAULT_HEADER_GAP;
-			this.headerHeight = AbstractHistoChartWindow.HEADER_ROW_HEIGHT - DEFAULT_TOP_GAP;
+			this.headerHeight = AbstractChartWindow.HEADER_ROW_HEIGHT - DEFAULT_TOP_GAP;
 		} else {
 			this.headerGap = DEFAULT_HEADER_GAP;
 			this.headerHeight = 0;
@@ -211,13 +209,11 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	}
 
 	public void clearHeaderAndComment() {
-		if (this.channels.getActiveChannel() != null) {
-			this.recordSetComment.setText(GDE.STRING_EMPTY);
-			this.recordSetComment.setToolTipText(GDE.STRING_EMPTY);
-			this.graphicsHeader.setText(GDE.STRING_EMPTY);
-			this.graphicsHeaderText = null;
-			updateCaptions();
-		}
+		this.recordSetComment.setText(GDE.STRING_EMPTY);
+		this.recordSetComment.setToolTipText(GDE.STRING_EMPTY);
+		this.graphicsHeader.setText(GDE.STRING_EMPTY);
+		this.graphicsHeaderText = null;
+		updateCaptions();
 	}
 
 	public synchronized void updateCaptions() {
@@ -251,6 +247,11 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	}
 
 	/**
+	 * Option to set a graphics area with position and size not depending on the header and the comment (e.g. summary graphics)
+	 */
+	protected abstract void setFixedGraphicCanvas(Rectangle realBounds);
+
+	/**
 	 * @param fixedY is the constant left upper position or -1 in case of a flexible value
 	 * @param fixedHeight is the constant height or -1 in case of a flexible height
 	 */
@@ -266,7 +267,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	public Image getGraphicsPrintImage() {
 		Image graphicsImage = null;
 		int graphicsHeight = 30 + this.canvasBounds.height + 40;
-		trailRecordSet = retrieveTrailRecordSet();
+		TrailRecordSet trailRecordSet = windowActor.getTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			if (this.canvasImage != null) this.canvasImage.dispose();
 			this.canvasImage = new Image(GDE.display, this.canvasBounds);
@@ -306,6 +307,7 @@ public abstract class AbstractHistoChartComposite extends Composite {
 		curveAreaBounds = defineCurveAreaBounds(dataScaleWidth, defineNumberLeftRightScales());
 		log.off(() -> "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startInitTime)));
 
+		TrailRecordSet trailRecordSet = windowActor.getTrailRecordSet();
 		if (trailRecordSet.getTimeStepSize() > 0) {
 			trailRecordSet.setDrawAreaBounds(curveAreaBounds);
 			drawCurveArea(dataScaleWidth);
@@ -377,16 +379,6 @@ public abstract class AbstractHistoChartComposite extends Composite {
 	protected abstract void drawCurveArea(int dataScaleWidth);
 
 	/**
-	 * Draw the pointer for measurement modes.
-	 * Select only valid timestamps on the x axis.
-	 */
-	public abstract void drawMeasurePointer(TrailRecord trailRecord, HistoGraphicsMode mode);
-
-	public void setCurveSelectorEnabled(boolean enabled) {
-		this.isCurveSelectorEnabled = enabled;
-	}
-
-	/**
 	 * Check input x,y value against curve are bounds and correct to bound if required.
 	 * @param Point containing corrected x,y position value
 	 */
@@ -400,21 +392,8 @@ public abstract class AbstractHistoChartComposite extends Composite {
 		return new Point(tmpxPos, tmpyPos);
 	}
 
-	protected AbstractHistoChartWindow getParentWindow() {
-		Composite grandParent = getParent().getParent();
-		if (grandParent instanceof CTabFolder) {
-			return (AbstractHistoChartWindow) ((CTabFolder) grandParent).getSelection();
-		} else {
-			return (AbstractHistoChartWindow) ((CTabFolder) grandParent.getParent()).getSelection();
-		}
-	}
-
-	protected AbstractHistoChartComposite getPresentGraphicsComposite() {
-		return getParentWindow().graphicsComposite;
-	}
-
-	protected HistoGraphicsMeasurement getPresentMeasuring() {
-		return getParentWindow().graphicsMeasurement.get();
+	public Optional<AbstractMeasuring> getMeasuring() {
+		return Optional.ofNullable(this.measuring);
 	}
 
 }

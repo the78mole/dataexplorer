@@ -19,11 +19,15 @@
 package gde.histo.ui;
 
 import java.util.Arrays;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
@@ -39,30 +43,29 @@ import gde.ui.SWTResourceManager;
  * The drawing canvas holds multiple charts.
  * @author Thomas Eickert
  */
-public final class HistoSummaryWindow extends AbstractHistoChartWindow {
-	private static final String			$CLASS_NAME						= HistoSummaryWindow.class.getName();
-	private static final Logger			log										= Logger.getLogger($CLASS_NAME);
+public final class HistoSummaryWindow extends AbstractChartWindow {
+	private static final String	$CLASS_NAME						= HistoSummaryWindow.class.getName();
+	private static final Logger	log										= Logger.getLogger($CLASS_NAME);
 
-	public static final int[]				DEFAULT_CHART_WEIGHTS	= new int[] {0, 10000};							// 2nd chart is the default chart
+	public static final int[]		DEFAULT_CHART_WEIGHTS	= new int[] { 0, 10000 };							// 2nd chart is the default chart
 
-	protected SashForm							compositeSashForm;
-	protected HistoSummaryComposite	summaryComposite;
+	protected SashForm					compositeSashForm;
 
 	protected HistoSummaryWindow(CTabFolder currentDisplayTab, int style, int index) {
 		super(currentDisplayTab, style, index);
 	}
 
-	public static AbstractHistoChartWindow create(CTabFolder dataTab, int style, int position) {
+	public static AbstractChartWindow create(CTabFolder dataTab, int style, int position) {
 		HistoSummaryWindow window = new HistoSummaryWindow(dataTab, style, position);
 
 		window.graphicSashForm = new SashForm(window.tabFolder, SWT.HORIZONTAL);
 		window.setControl(window.graphicSashForm);
-
-		window.curveSelectorComposite = new HistoSelectorComposite(window.graphicSashForm);
+		window.curveSelectorComposite = new SelectorComposite(window.graphicSashForm, window);
 		window.compositeSashForm = new SashForm(window.graphicSashForm, SWT.VERTICAL);
-		window.summaryComposite = new HistoSummaryComposite(window.compositeSashForm); // at the top
-		window.graphicsComposite = new HistoGraphicsComposite(window.compositeSashForm);
 		window.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
+
+		new SummaryComposite(window.compositeSashForm, window); // at the top
+		new GraphicsComposite(window.compositeSashForm, window);
 		window.compositeSashForm.setWeights(DEFAULT_CHART_WEIGHTS.clone());
 
 		window.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
@@ -71,23 +74,8 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 	}
 
 	@Override
-	public AbstractHistoChartComposite getGraphicsComposite() {
-		return this.graphicsComposite;
-	}
-
-	@Override
-	protected void setFixedGraphicCanvas(AbstractHistoChartComposite composite) {
-		Rectangle realBounds = this.curveSelectorComposite.getRealBounds();
-		if (Settings.getInstance().isSmartStatistics()) {
-			int heightWithScale = realBounds.height + composite.getXScaleHeight() + AbstractHistoChartComposite.DEFAULT_TOP_GAP;
-			composite.setFixedGraphicCanvas(realBounds.y - AbstractHistoChartComposite.DEFAULT_TOP_GAP, heightWithScale);
-		} else {
-			composite.setFixedGraphicCanvas(realBounds.y - AbstractHistoChartComposite.DEFAULT_TOP_GAP, AbstractHistoChartComposite.ZERO_CANVAS_HEIGHT);
-		}
-	}
-
-	protected void resetFixedGraphicCanvas(AbstractHistoChartComposite composite) {
-		composite.setFixedGraphicCanvas(-1, -1);
+	public AbstractChartComposite getGraphicsComposite() {
+		return getFirstGraphics().orElseThrow(UnsupportedOperationException::new);
 	}
 
 	@Override
@@ -119,7 +107,7 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			compositeSashForm.setWeights(chartWeights);
 		} else {
-			GDE.display.asyncExec((Runnable) () -> {
+			GDE.display.asyncExec(() -> {
 				this.compositeSashForm.setWeights(chartWeights);
 			});
 		}
@@ -134,91 +122,78 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 			if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
 			if (!Settings.getInstance().isSmartStatistics()) setDefaultChart();
 
-			{
-				resetFixedGraphicCanvas(graphicsComposite);
-				graphicsComposite.doRedrawGraphics();
-				graphicsComposite.updateCaptions();
-			}
-			{
-				setFixedGraphicCanvas(summaryComposite);
-				summaryComposite.doRedrawGraphics();
-				summaryComposite.updateCaptions();
-			}
+			getChartStream().forEach(c -> {
+				c.setFixedGraphicCanvas(curveSelectorComposite.getRealBounds());
+				c.doRedrawGraphics();
+				c.updateCaptions();
+			});
 		} else {
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
-					if (!Settings.getInstance().isSmartStatistics()) setDefaultChart();
+			GDE.display.asyncExec(() -> {
+				if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
+				if (!Settings.getInstance().isSmartStatistics()) setDefaultChart();
 
-					{
-						resetFixedGraphicCanvas(graphicsComposite);
-						graphicsComposite.doRedrawGraphics();
-						graphicsComposite.updateCaptions();
-					}
-					{
-						setFixedGraphicCanvas(summaryComposite);
-						summaryComposite.doRedrawGraphics();
-						summaryComposite.updateCaptions();
-					}
-				}
-
+				getChartStream().forEach(c -> {
+					c.setFixedGraphicCanvas(curveSelectorComposite.getRealBounds());
+					c.doRedrawGraphics();
+					c.updateCaptions();
+				});
 			});
 		}
 	}
 
 	@Override
 	public void enableGraphicsHeader(boolean enabled) {
-		this.graphicsComposite.enableGraphicsHeader(enabled);
-		this.summaryComposite.enableGraphicsHeader(enabled);
+		getChartStream().forEach(c -> {
+			c.enableGraphicsHeader(enabled);
+		});
 	}
 
 	@Override
 	public void enableRecordSetComment(boolean enabled) {
-		this.graphicsComposite.enableRecordSetComment(enabled);
-		this.summaryComposite.enableRecordSetComment(enabled);
+		getChartStream().forEach(c -> {
+			c.enableRecordSetComment(enabled);
+		});
 	}
 
 	@Override
 	public void clearHeaderAndComment() {
-		this.graphicsComposite.clearHeaderAndComment();
-		this.summaryComposite.clearHeaderAndComment();
+		getChartStream().forEach(c -> {
+			c.clearHeaderAndComment();
+		});
 	}
 
 	@Override
 	public void enableGraphicsScale(boolean enabled) {
-		this.graphicsComposite.enableGraphicsScale(enabled);
-		this.summaryComposite.enableGraphicsScale(enabled);
+		getChartStream().forEach(c -> {
+			c.enableGraphicsScale(enabled);
+		});
 	}
 
 	@Override
 	public void setCurveAreaBackground(Color curveAreaBackground) {
-		this.graphicsComposite.curveAreaBackground = curveAreaBackground;
-		this.graphicsComposite.graphicCanvas.redraw();
-		this.summaryComposite.curveAreaBackground = curveAreaBackground;
-		this.summaryComposite.graphicCanvas.redraw();
+		getChartStream().forEach(c -> {
+			c.curveAreaBackground = curveAreaBackground;
+			c.graphicCanvas.redraw();
+		});
 	}
 
 	@Override
 	public void setCurveAreaBorderColor(Color borderColor) {
-		this.graphicsComposite.curveAreaBorderColor = borderColor;
-		this.graphicsComposite.graphicCanvas.redraw();
-		this.summaryComposite.curveAreaBorderColor = borderColor;
-		this.summaryComposite.graphicCanvas.redraw();
+		getChartStream().forEach(c -> {
+			c.curveAreaBorderColor = borderColor;
+			c.graphicCanvas.redraw();
+		});
 	}
 
 	@Override
 	public void setSurroundingBackground(Color surroundingBackground) {
-		this.graphicsComposite.surroundingBackground = surroundingBackground;
-		this.graphicsComposite.setBackground(surroundingBackground);
-		this.graphicsComposite.graphicsHeader.setBackground(surroundingBackground);
-		this.graphicsComposite.recordSetComment.setBackground(surroundingBackground);
-		this.graphicsComposite.doRedrawGraphics();
-		this.summaryComposite.surroundingBackground = surroundingBackground;
-		this.summaryComposite.setBackground(surroundingBackground);
-		this.summaryComposite.graphicsHeader.setBackground(surroundingBackground);
-		this.summaryComposite.recordSetComment.setBackground(surroundingBackground);
-		this.summaryComposite.doRedrawGraphics();
+		getChartStream().forEach(c -> {
+			c.surroundingBackground = surroundingBackground;
+			c.setBackground(surroundingBackground);
+			c.graphicsHeader.setBackground(surroundingBackground);
+			c.recordSetComment.setBackground(surroundingBackground);
+			c.doRedrawGraphics();
+		});
 	}
 
 	/**
@@ -227,13 +202,65 @@ public final class HistoSummaryWindow extends AbstractHistoChartWindow {
 	@Override
 	public void enableCurveSelector(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
-		this.graphicsComposite.setCurveSelectorEnabled(enabled);
-		this.summaryComposite.setCurveSelectorEnabled(enabled);
 		if (enabled) {
 			setSashFormWeights(this.curveSelectorComposite.getCompositeWidth());
 		} else {
 			setSashFormWeights(0);
 		}
+	}
+
+	public Optional<SummaryComposite> getFirstSummary() {
+		return Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof SummaryComposite).map(c -> (SummaryComposite) c).findFirst();
+	}
+
+	public Optional<GraphicsComposite> getFirstGraphics() {
+		return Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof GraphicsComposite).map(c -> (GraphicsComposite) c).findFirst();
+	}
+
+	public AbstractChartComposite[] getCharts() {
+		return (AbstractChartComposite[]) Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof AbstractChartComposite).map(c -> (AbstractChartComposite) c).toArray();
+	}
+
+	public Stream<AbstractChartComposite> getChartStream() {
+		return Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof AbstractChartComposite).map(c -> (AbstractChartComposite) c);
+	}
+
+	/**
+	 * Update graphics window header and description.
+	 */
+	@Override
+	@Deprecated
+	public void updateCaptions() {
+		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
+			getChartStream().forEach(c -> {
+				c.updateCaptions();
+			});
+		} else {
+			GDE.display.asyncExec(() -> {
+				getChartStream().forEach(c -> {
+					c.updateCaptions();
+				});
+			});
+		}
+	}
+
+	/**
+	 * Create visible tab window content as image.
+	 * @return image with content
+	 */
+	@Override
+	public Image getContentAsImage() {
+		Rectangle bounds = this.graphicSashForm.getClientArea();
+		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
+		GC imageGC = new GC(tabContentImage);
+		this.graphicSashForm.print(imageGC);
+		if (GDE.IS_MAC) {
+			Image graphics = this.getGraphicsComposite().getGraphicsPrintImage();
+			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(graphics.getImageData())), bounds.width - graphics.getBounds().width, 0);
+		}
+		imageGC.dispose();
+
+		return tabContentImage;
 	}
 
 }

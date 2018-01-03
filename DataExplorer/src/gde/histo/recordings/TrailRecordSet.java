@@ -569,7 +569,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * The sort order conforms to the record insertion order.
 	 */
 	@Override
-	public void updateVisibleAndDisplayableRecordsForTable() {
+	public synchronized void updateVisibleAndDisplayableRecordsForTable() {
 		this.visibleAndDisplayableRecords.removeAllElements();
 		this.displayRecords.removeAllElements();
 

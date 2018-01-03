@@ -28,15 +28,15 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Point;
 
 import gde.GDE;
+import gde.data.Channels;
+import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
-import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
@@ -45,8 +45,8 @@ import gde.ui.SWTResourceManager;
  * Histo chart window base class.
  * @author Thomas Eickert
  */
-public abstract class AbstractHistoChartWindow extends CTabItem {
-	private final static String	$CLASS_NAME				= AbstractHistoChartWindow.class.getName();
+public abstract class AbstractChartWindow extends CTabItem {
+	private final static String	$CLASS_NAME				= AbstractChartWindow.class.getName();
 	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
 	protected static final int	SELECTOR_WIDTH		= 117;
@@ -55,7 +55,84 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	 */
 	protected static final int	HEADER_ROW_HEIGHT	= 33;
 
-	private static ImageData flipHorizontal(ImageData inputImageData) {
+	/**
+	 * Mediator class for access by window composites.
+	 */
+	class WindowActor {
+
+		void clearMeasuring() {
+			measure.ifPresent(mm -> {
+				((GraphicsComposite) AbstractChartWindow.this.getGraphicsComposite()).cleanMeasuring();
+				DataExplorer.getInstance().setStatusMessage(GDE.STRING_EMPTY);
+				AbstractChartWindow.this.measure = Optional.empty();
+			});
+		}
+
+		void drawMeasuring() {
+			measure.ifPresent(mm -> getGraphicsComposite().getMeasuring().ifPresent(m -> m.drawMeasuring()));
+		}
+
+		void processMouseDownMove(long adjacentTimestamp_ms) {
+			measure.ifPresent(mm -> getGraphicsComposite().getMeasuring().ifPresent(m -> m.processMouseDownMove(adjacentTimestamp_ms)));
+		}
+
+		void processMouseUpMove(Point point) {
+			measure.ifPresent(mm -> getGraphicsComposite().getMeasuring().ifPresent(m -> m.processMouseUpMove(point)));
+		}
+
+		void processMouseDownAction(Point point) {
+			measure.ifPresent(mm -> getGraphicsComposite().getMeasuring().ifPresent(m -> m.processMouseDownAction(point)));
+		}
+
+		void processMouseUpAction(Point point) {
+			measure.ifPresent(mm -> getGraphicsComposite().getMeasuring().ifPresent(m -> m.processMouseUpAction(point)));
+		}
+
+		void setStatusMessage(String message) {
+			DataExplorer.getInstance().setStatusMessage(message);
+		}
+
+		/**
+		 * Update any visible histo tab.
+		 * @param createRecordSet true creates the recordset from the histo vaults; false uses the existing recordset
+		 * @param rebuildTrails true refills the recordset and keeps the selector settings; false only rebuilds the UI
+		 */
+		void updateHistoTabs(boolean createRecordSet, boolean rebuildTrails) {
+			DataExplorer.getInstance().getPresentHistoExplorer().updateHistoTabs(false, false);
+		}
+
+		void setChartSashFormWeights(SelectorComposite composite) {
+			int compositeWidth = isCurveSelectorEnabled ? composite.getCompositeWidth() : 0;
+			setSashFormWeights(compositeWidth);
+		}
+
+		void updateChartWindow(boolean redrawCurveSelector) {
+			updateWindow(redrawCurveSelector);
+		}
+
+		HistoSet getHistoSet() {
+			return DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet();
+		}
+
+		TrailRecordSet getTrailRecordSet() {
+			return Channels.getInstance().getActiveChannel() != null ? DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet() : null;
+
+		}
+
+		boolean isCurveSelectorEnabled() {
+			return isCurveSelectorEnabled;
+		}
+
+		boolean isMeasureRecord(String recordKeyName) {
+			return AbstractChartWindow.this.isMeasureRecord(recordKeyName);
+		}
+
+		void scrollSummaryComposite() {
+			scrollSummaryComposite();
+		}
+	}
+
+	protected static ImageData flipHorizontal(ImageData inputImageData) {
 		int bytesPerPixel = inputImageData.bytesPerLine / inputImageData.width;
 		int outBytesPerLine = inputImageData.width * bytesPerPixel;
 		byte[] outDataBytes = new byte[inputImageData.data.length];
@@ -73,70 +150,33 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 		return new ImageData(inputImageData.width, inputImageData.height, inputImageData.depth, inputImageData.palette, outBytesPerLine, outDataBytes);
 	}
 
-	Optional<HistoGraphicsMeasurement>		graphicsMeasurement			= Optional.empty();
+	protected final WindowActor	windowActor;
+	protected final CTabFolder	tabFolder;
 
-	protected final HistoExplorer					presentHistoExplorer		= DataExplorer.getInstance().getPresentHistoExplorer();
+	protected SashForm					graphicSashForm;
+	protected SelectorComposite	curveSelectorComposite;
+	protected boolean						isCurveSelectorEnabled	= true;
 
-	protected final CTabFolder						tabFolder;
+	private int[]								sashFormWeights					= new int[] { 100, 1000 };
+	private Optional<Measure>		measure									= Optional.empty();
 
-	protected SashForm										graphicSashForm;
-	protected HistoSelectorComposite			curveSelectorComposite;
-	protected AbstractHistoChartComposite	graphicsComposite;
-	protected boolean											isCurveSelectorEnabled	= true;
-	private int[]													sashFormWeights					= new int[] { 100, 1000 };
-
-	protected AbstractHistoChartWindow(CTabFolder parent, int style, int index) {
+	protected AbstractChartWindow(CTabFolder parent, int style, int index) {
 		super(parent, style, index);
 		SWTResourceManager.registerResourceUser(this);
 		this.tabFolder = parent;
+		this.windowActor = new WindowActor();
 	}
 
 	/**
 	 * Redraw the graphics canvas as well as the curve selector table.
 	 */
-	public void redrawGraphics(final boolean redrawCurveSelector) {
-		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
-			if (redrawCurveSelector) this.curveSelectorComposite.doUpdateCurveSelectorTable();
-			setFixedGraphicCanvas(graphicsComposite);
-
-			this.graphicsComposite.doRedrawGraphics();
-			this.graphicsComposite.updateCaptions();
-		} else {
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (redrawCurveSelector) AbstractHistoChartWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
-					setFixedGraphicCanvas(graphicsComposite);
-
-					AbstractHistoChartWindow.this.graphicsComposite.doRedrawGraphics();
-					AbstractHistoChartWindow.this.graphicsComposite.updateCaptions();
-				}
-
-			});
-		}
-	}
-
-	/**
-	 * Option to set a graphics area with position and size not depending on the header and the comment (e.g. summary graphics)
-	 */
-	protected abstract void setFixedGraphicCanvas(AbstractHistoChartComposite composite);
+	public abstract void redrawGraphics(final boolean redrawCurveSelector);
 
 	/**
 	 * Update graphics window header and description.
 	 */
 	@Deprecated
-	public void updateCaptions() {
-		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
-			this.graphicsComposite.updateCaptions();
-		} else {
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					AbstractHistoChartWindow.this.graphicsComposite.updateCaptions();
-				}
-			});
-		}
-	}
+	public abstract void updateCaptions();
 
 	/**
 	 * Method to update the curves displayed in the curve selector panel.
@@ -146,11 +186,8 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			this.curveSelectorComposite.doUpdateCurveSelectorTable();
 		} else {
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					AbstractHistoChartWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
-				}
+			GDE.display.asyncExec(() -> {
+				AbstractChartWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
 			});
 		}
 	}
@@ -196,23 +233,15 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 		return this.graphicSashForm;
 	}
 
-	public boolean isVisible() {
-		return this.graphicsComposite.isVisible();
-	}
+	public abstract void enableRecordSetComment(boolean enabled);
 
-	public void enableRecordSetComment(boolean enabled) {
-		this.graphicsComposite.enableRecordSetComment(enabled);
-	}
+	public abstract void clearHeaderAndComment();
 
-	public void clearHeaderAndComment() {
-		this.graphicsComposite.clearHeaderAndComment();
-	}
-
-	public HistoSelectorComposite getCurveSelectorComposite() {
+	public SelectorComposite getCurveSelectorComposite() {
 		return this.curveSelectorComposite;
 	}
 
-	public abstract AbstractHistoChartComposite getGraphicsComposite();
+	public abstract AbstractChartComposite getGraphicsComposite();
 
 	public boolean isActiveCurveSelectorContextMenu() {
 		return this.curveSelectorComposite.contextMenu.isActive();
@@ -222,45 +251,17 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	 * Create visible tab window content as image.
 	 * @return image with content
 	 */
-	public Image getContentAsImage() {
-		Rectangle bounds = this.graphicSashForm.getClientArea();
-		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
-		GC imageGC = new GC(tabContentImage);
-		this.graphicSashForm.print(imageGC);
-		if (GDE.IS_MAC) {
-			Image graphics = this.graphicsComposite.getGraphicsPrintImage();
-			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(graphics.getImageData())), bounds.width - graphics.getBounds().width, 0);
-		}
-		imageGC.dispose();
+	public abstract Image getContentAsImage();
 
-		return tabContentImage;
-	}
+	public abstract void enableGraphicsHeader(boolean enabled);
 
-	public void enableGraphicsHeader(boolean enabled) {
-		this.graphicsComposite.enableGraphicsHeader(enabled);
-	}
+	public abstract void enableGraphicsScale(boolean enabled);
 
-	public void enableGraphicsScale(boolean enabled) {
-		this.graphicsComposite.enableGraphicsScale(enabled);
-	}
+	public abstract void setCurveAreaBackground(Color curveAreaBackground);
 
-	public void setCurveAreaBackground(Color curveAreaBackground) {
-		this.graphicsComposite.curveAreaBackground = curveAreaBackground;
-		this.graphicsComposite.graphicCanvas.redraw();
-	}
+	public abstract void setCurveAreaBorderColor(Color borderColor);
 
-	public void setCurveAreaBorderColor(Color borderColor) {
-		this.graphicsComposite.curveAreaBorderColor = borderColor;
-		this.graphicsComposite.graphicCanvas.redraw();
-	}
-
-	public void setSurroundingBackground(Color surroundingBackground) {
-		this.graphicsComposite.surroundingBackground = surroundingBackground;
-		this.graphicsComposite.setBackground(surroundingBackground);
-		this.graphicsComposite.graphicsHeader.setBackground(surroundingBackground);
-		this.graphicsComposite.recordSetComment.setBackground(surroundingBackground);
-		this.graphicsComposite.doRedrawGraphics();
-	}
+	public abstract void setSurroundingBackground(Color surroundingBackground);
 
 	/**
 	 * @return true if selector is enabled
@@ -274,12 +275,44 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 	 */
 	public void enableCurveSelector(boolean enabled) {
 		this.isCurveSelectorEnabled = enabled;
-		this.graphicsComposite.setCurveSelectorEnabled(enabled);
 		if (enabled) {
 			setSashFormWeights(this.curveSelectorComposite.getCompositeWidth());
 		} else {
 			setSashFormWeights(0);
 		}
+	}
+
+	/**
+	 * Select the next graph or alternatively restore to full vertical size.
+	 */
+	public abstract void scrollSummaryComposite();
+
+	/**
+	 * Switch window into measurement mode for the selected record.
+	 */
+	public void setMeasurementActive(String recordKey, boolean enabled, boolean isDeltaMeasuring) {
+		TrailRecordSet trailRecordSet = windowActor.getTrailRecordSet();
+		if (windowActor.getTrailRecordSet().containsKey(recordKey)) {
+			cleanMeasuring();
+			if (enabled) {
+				TrailRecord trailRecord = trailRecordSet.get(recordKey);
+				curveSelectorComposite.setRecordSelection(trailRecord, true);
+				Measure tmpMeasuring = new Measure(isDeltaMeasuring, trailRecord);
+				measure = Optional.of(tmpMeasuring);
+				((GraphicsComposite) getGraphicsComposite()).setMeasuringActive(tmpMeasuring);
+			}
+		}
+	}
+
+	/**
+	 * Clean everything related to the measurement.
+	 */
+	public void cleanMeasuring() {
+		windowActor.clearMeasuring();
+	}
+
+	public Optional<TrailRecord> getMeasureRecord() {
+		return measure.map(m -> m.measureRecord);
 	}
 
 	/**
@@ -289,51 +322,10 @@ public abstract class AbstractHistoChartWindow extends CTabItem {
 		return getMeasureRecord().map(r -> r.getName().equals(recordKeyName)).orElse(false);
 	}
 
-	/**
-	 * Select the next graph or alternatively restore to full vertical size.
-	 */
-	public abstract void scrollSummaryComposite();
-
-	/**
-	 * Switch application into measurement mode for the visible record set using the selected record.
-	 */
-	public void setMeasurementActive(String recordKey, boolean enabled, boolean isDeltaMeasuring) {
-		setMeasurementActive(recordKey, enabled, HistoGraphicsMode.getMode(isDeltaMeasuring));
-	}
-
-	/**
-	 * Switch application into measurement mode for the visible record set using the selected record.
-	 */
-	private void setMeasurementActive(String recordKey, boolean enabled, HistoGraphicsMode graphicsMode) {
-		TrailRecordSet trailRecordSet = presentHistoExplorer.getTrailRecordSet();
-		if (presentHistoExplorer.isHistoChartWindowVisible() && trailRecordSet.containsKey(recordKey)) {
-			cleanMeasurement();
-			if (enabled) {
-				TrailRecord trailRecord = trailRecordSet.get(recordKey);
-				if (trailRecord.isVisible()) {
-					getGraphicsComposite().drawMeasurePointer(trailRecord, graphicsMode);
-				} else {
-					getCurveSelectorComposite().setRecordSelection(trailRecord, true);
-					getGraphicsComposite().redrawGraphics();
-				}
-			}
+	public void updateWindow(boolean redrawCurveSelector) {
+		if (!isActiveCurveSelectorContextMenu()) {
+			redrawGraphics(redrawCurveSelector);
 		}
-	}
-
-	/**
-	 * Clean everything related to the measurement.
-	 */
-	public void cleanMeasurement() {
-		graphicsMeasurement.ifPresent(m -> m.cleanMeasurement());
-		graphicsMeasurement = Optional.empty();
-	}
-
-	public Optional<TrailRecord> getMeasureRecord() {
-		return graphicsMeasurement.map(m -> m.getTrailRecord());
-	}
-
-	public void setModeState(HistoGraphicsMode mode) {
-		graphicsMeasurement.ifPresent(m -> m.setModeState(mode));
 	}
 
 }

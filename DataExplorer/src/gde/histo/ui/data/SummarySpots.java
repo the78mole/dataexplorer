@@ -111,18 +111,16 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		}
 	}
 
-	public static List<Integer> defineGrid(TrailRecordSet recordSet, boolean innerOnly) {
+	public List<Integer> defineGrid(TrailRecordSet recordSet, boolean innerOnly) {
 		List<Integer> grid = new ArrayList<>();
-		int stripNetX0 = recordSet.getDrawAreaBounds().x + Density.MEDIUM.markerWidth / 2;
-		int tmpWidth = recordSet.getDrawAreaBounds().width - Density.MEDIUM.markerWidth; // half left and right gap for overlapping elements
-		double xStep = tmpWidth / 10.;
+		double xStep = (stripNetWidth + 1) / 10.; // + 1 for a smaller right gap
 		if (innerOnly) {
 			for (int i = 1; i < 10; i++) {
-				grid.add((stripNetX0 + (int) (xStep * i)));
+				grid.add((stripNetX0 + (int) (xStep * i + .5)));
 			}
 		} else {
 			for (int i = 0; i < 11; i++) {
-				grid.add((stripNetX0 + (int) (xStep * i)));
+				grid.add((stripNetX0 + (int) (xStep * i + .5)));
 			}
 		}
 		return grid;
@@ -152,16 +150,15 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		this.record = record;
 	}
 
-	public void initialize(int newStripHeight, Density newDensity) {
+	public void initialize(Rectangle drawStripBounds, Density newDensity) {
 		clear();
 
-		stripHeight = newStripHeight;
+		stripHeight = drawStripBounds.height;
 		elementWidth = newDensity.markerWidth;
 
-		Rectangle drawAreaBounds = record.getParent().getDrawAreaBounds();
 		// elements
-		stripNetX0 = drawAreaBounds.x + elementWidth / 2;
-		int tmpWidth = drawAreaBounds.width - elementWidth; // half left and right gap for overlapping elements
+		stripNetX0 = drawStripBounds.x + elementWidth / 2;
+		int tmpWidth = drawStripBounds.width - elementWidth; // half left and right gap for overlapping elements
 		stripNetWidth = tmpWidth - tmpWidth % elementWidth; // additional right gap because of x position delta (is the elements size)
 
 		double decodedScaleMin = defineDecodedScaleMin();
@@ -246,15 +243,20 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		return resultXPositions;
 	}
 
-	public void drawRecentMarkers(GC gc, int stripY0) {
-		drawMarkers(gc, defineXPositions(Settings.getInstance().getWarningCount()), stripY0, DataExplorer.COLOR_RED);
+	public void drawRecentMarkers(GC gc, Rectangle drawStripBounds) {
+		drawMarkers(gc, defineXPositions(Settings.getInstance().getWarningCount()), drawStripBounds, DataExplorer.COLOR_RED);
 	}
 
-	public void drawAllMarkers(GC gc, int stripY0) {
-		drawMarkers(gc, getXPositions(), stripY0, DataExplorer.COLOR_GREY);
+	/**
+	 * Draw the summary marker points using given rectangle for display.
+	 * @param gc
+	 * @param drawStripBounds holds the drawing area strip based on the upper left position
+	 */
+	public void drawAllMarkers(GC gc, Rectangle drawStripBounds) {
+		drawMarkers(gc, getXPositions(), drawStripBounds, DataExplorer.COLOR_GREY);
 	}
 
-	private void drawMarkers(GC gc, TreeMap<Integer, PosMarkers> tmpXPositions, int stripY0, Color color) {
+	private void drawMarkers(GC gc, TreeMap<Integer, PosMarkers> tmpXPositions, Rectangle drawStripBounds, Color color) {
 		gc.setLineWidth(1);
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setForeground(color);
@@ -266,8 +268,8 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 			int upperLimit = (tukeyXPositions[UPPER_WHISKER.ordinal()] / elementWidth + 1) * elementWidth; // ceiling
 			int actualWidth = xEntry.getKey() < lowerLimit || xEntry.getKey() > upperLimit ? elementWidth * 2 : elementWidth;
 
-			int xPosOffset = record.getParent().getDrawAreaBounds().x - actualWidth / 2 + 1;
-			int yPosOffset = stripY0 - actualWidth / 2 + 1;
+			int xPosOffset = stripNetX0 - elementWidth / 2 - actualWidth / 2 + 1;
+			int yPosOffset = drawStripBounds.y - actualWidth / 2 + 1;
 			for (Integer yPos : xEntry.getValue().yPositions) {
 				gc.fillRectangle(xEntry.getKey() + xPosOffset, yPos + yPosOffset, actualWidth, actualWidth);
 				if (log.isLoggable(FINEST)) log.log(FINEST, String.format("x=%d y=%d", xEntry.getKey() + xPosOffset, yPos + yPosOffset));

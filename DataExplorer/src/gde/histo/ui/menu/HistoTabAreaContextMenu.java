@@ -43,6 +43,7 @@ import gde.config.Settings;
 import gde.histo.datasources.DirectoryScanner.SourceDataSet;
 import gde.histo.exclusions.ExclusionActivity;
 import gde.histo.recordings.TrailRecordSet;
+import gde.histo.ui.HistoExplorer;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -57,11 +58,12 @@ import gde.utils.FileUtils;
  * @author Thomas Eickert (USER)
  */
 public class HistoTabAreaContextMenu {
-	private final static String	$CLASS_NAME	= HistoTabAreaContextMenu.class.getName();
-	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME						= HistoTabAreaContextMenu.class.getName();
+	private final static Logger	log										= Logger.getLogger($CLASS_NAME);
 
-	private final DataExplorer	application	= DataExplorer.getInstance();
-	private final Settings			settings		= Settings.getInstance();
+	private final DataExplorer	application						= DataExplorer.getInstance();
+	private final HistoExplorer	presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
+	private final Settings			settings							= Settings.getInstance();
 
 	MenuItem										curveSelectionItem;
 	MenuItem										displayGraphicsHeaderItem;
@@ -77,7 +79,7 @@ public class HistoTabAreaContextMenu {
 	MenuItem										partialTableItem;
 	MenuItem										editTableItem;
 	MenuItem										setDigitalFontItem;
-	protected boolean						isCreated		= false;
+	protected boolean						isCreated							= false;
 
 	private MenuItem						fileName, openRecordSetItem, deleteFileItem, openFolderItem, hideItem;
 	private Menu								hideMenu;
@@ -222,6 +224,7 @@ public class HistoTabAreaContextMenu {
 				// ignore
 			}
 		});
+
 		if (!isCreated) {
 			{
 				fileName = new MenuItem(popupMenu, SWT.None);
@@ -263,13 +266,13 @@ public class HistoTabAreaContextMenu {
 								if (application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0071, new Object[] {
 										file.getAbsolutePath() })) == SWT.YES) {
 									FileUtils.deleteFile(file.getPath());
-									application.getPresentHistoExplorer().resetHisto();
+									presentHistoExplorer.resetHisto();
 								}
 							} else {
 								if (application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0050, new Object[] {
 										file.getAbsolutePath() })) == SWT.YES) {
 									FileUtils.deleteFile(file.getPath());
-									application.getPresentHistoExplorer().resetHisto();
+									presentHistoExplorer.resetHisto();
 								}
 							}
 						}
@@ -314,7 +317,7 @@ public class HistoTabAreaContextMenu {
 						settings.setSuppressMode(true);
 						application.getMenuBar().getSuppressModeItem().setSelection(true);
 
-						application.getPresentHistoExplorer().updateHistoTabs(false, true);
+						presentHistoExplorer.updateHistoTabs(false, true);
 					}
 				});
 			}
@@ -331,7 +334,7 @@ public class HistoTabAreaContextMenu {
 						settings.setSuppressMode(true);
 						application.getMenuBar().getSuppressModeItem().setSelection(true);
 
-						application.getPresentHistoExplorer().updateHistoTabs(false, true);
+						presentHistoExplorer.updateHistoTabs(false, true);
 					}
 				});
 			}
@@ -345,10 +348,10 @@ public class HistoTabAreaContextMenu {
 					public void widgetSelected(SelectionEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 						String dataFilePath = (String) popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString());
-						Path path = dataFilePath != null ? Paths.get(dataFilePath.toString()).getParent(): null;
+						Path path = dataFilePath != null ? Paths.get(dataFilePath.toString()).getParent() : null;
 						ExclusionActivity.clearExcludeLists(path);
 
-						application.getPresentHistoExplorer().resetHisto();
+						presentHistoExplorer.resetHisto();
 					}
 				});
 			}
@@ -372,7 +375,7 @@ public class HistoTabAreaContextMenu {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "boxplotItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 						boolean selection = boxplotItem.getSelection();
 						settings.setSummaryBoxVisible(selection);
-						application.getPresentHistoExplorer().updateHistoTabs(false, false);
+						presentHistoExplorer.updateHistoTabs(false, false);
 					}
 				});
 			}
@@ -387,7 +390,7 @@ public class HistoTabAreaContextMenu {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "spotsItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 						boolean selection = spotsItem.getSelection();
 						settings.setSummarySpotsVisible(selection);
-						application.getPresentHistoExplorer().updateHistoTabs(false, false);
+						presentHistoExplorer.updateHistoTabs(false, false);
 					}
 				});
 			}
@@ -407,7 +410,7 @@ public class HistoTabAreaContextMenu {
 					public void widgetSelected(SelectionEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem0.widgetSelected, event=" + evt); //$NON-NLS-1$
 						setWarningCountIndex(0);
-						application.getPresentHistoExplorer().updateHistoTabs(false, false);
+						presentHistoExplorer.updateHistoTabs(false, false);
 					}
 				});
 			}
@@ -419,7 +422,7 @@ public class HistoTabAreaContextMenu {
 					public void widgetSelected(SelectionEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem1.widgetSelected, event=" + evt); //$NON-NLS-1$
 						setWarningCountIndex(1);
-						application.getPresentHistoExplorer().updateHistoTabs(false, false);
+						presentHistoExplorer.updateHistoTabs(false, false);
 					}
 				});
 			}
@@ -431,7 +434,7 @@ public class HistoTabAreaContextMenu {
 					public void widgetSelected(SelectionEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem2.widgetSelected, event=" + evt); //$NON-NLS-1$
 						setWarningCountIndex(2);
-						application.getPresentHistoExplorer().updateHistoTabs(false, false);
+						presentHistoExplorer.updateHistoTabs(false, false);
 					}
 				});
 			}
@@ -443,7 +446,7 @@ public class HistoTabAreaContextMenu {
 					public void widgetSelected(SelectionEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem3.widgetSelected, event=" + evt); //$NON-NLS-1$
 						setWarningCountIndex(3);
-						application.getPresentHistoExplorer().updateHistoTabs(false, false);
+						presentHistoExplorer.updateHistoTabs(false, false);
 					}
 				});
 			}
@@ -460,115 +463,123 @@ public class HistoTabAreaContextMenu {
 						settings.setSuppressMode(suppressModeItem.getSelection());
 						application.getMenuBar().getSuppressModeItem().setSelection(suppressModeItem.getSelection());
 
-						application.getPresentHistoExplorer().resetHisto();
+						presentHistoExplorer.resetHisto();
 					}
 				});
 			}
+			{
+				curveSelectionItem = new MenuItem(popupMenu, SWT.CHECK);
+				curveSelectionItem.setText(Messages.getString(MessageIds.GDE_MSGT0040));
+				curveSelectionItem.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						HistoTabAreaContextMenu.log.log(Level.FINEST, "curveSelectionItem action performed! " + e); //$NON-NLS-1$
+						boolean selection = curveSelectionItem.getSelection();
+						application.enableCurveSelector(selection);
+						application.getMenuBar().getCurveSelectionMenuItem().setSelection(selection);
+						presentHistoExplorer.updateHistoTabs(false, false);
+					}
+				});
+			}
+			{
+				displayGraphicsHeaderItem = new MenuItem(popupMenu, SWT.CHECK);
+				displayGraphicsHeaderItem.setText(Messages.getString(MessageIds.GDE_MSGT0041));
+				displayGraphicsHeaderItem.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						HistoTabAreaContextMenu.log.log(Level.FINEST, "toggleViewGraphicsHeaderItem action performed! " + e); //$NON-NLS-1$
+						boolean selection = displayGraphicsHeaderItem.getSelection();
+						application.getMenuBar().getGraphicsHeaderMenuItem().setSelection(selection);
+						application.enableGraphicsHeader(selection);
+						presentHistoExplorer.updateHistoTabs(false, false);
+					}
+				});
+			}
+			{
+				displayGraphicsCommentItem = new MenuItem(popupMenu, SWT.CHECK);
+				displayGraphicsCommentItem.setText(Messages.getString(MessageIds.GDE_MSGT0042));
+				if (!GDE.IS_OS_ARCH_ARM) displayGraphicsCommentItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0878));
+				displayGraphicsCommentItem.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						HistoTabAreaContextMenu.log.log(Level.FINEST, "toggleViewGraphicsCommentItem action performed! " + e); //$NON-NLS-1$
+						boolean selection = displayGraphicsCommentItem.getSelection();
+						application.getMenuBar().getRecordCommentMenuItem().setSelection(selection);
+						application.enableRecordSetComment(selection);
+						presentHistoExplorer.updateHistoTabs(false, false);
+					}
+				});
+			}
+			{
+				displayGraphicsCurveSurvey = new MenuItem(popupMenu, SWT.CHECK);
+				displayGraphicsCurveSurvey.setText(Messages.getString(MessageIds.GDE_MSGT0876));
+				if (!GDE.IS_OS_ARCH_ARM) displayGraphicsCurveSurvey.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0877));
+				displayGraphicsCurveSurvey.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						HistoTabAreaContextMenu.log.log(Level.FINEST, "displayGraphicsCurveSurvey action performed! " + e); //$NON-NLS-1$
+						boolean selection = displayGraphicsCurveSurvey.getSelection();
+						application.getMenuBar().getGraphicsCurveSurveyMenuItem().setSelection(selection);
+						presentHistoExplorer.enableCurveSurvey(selection);
+						presentHistoExplorer.updateHistoTabs(false, false);
+					}
+				});
+				separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);
+			}
+			{
+				copyTabItem = new MenuItem(popupMenu, SWT.PUSH);
+				copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026).substring(0, Messages.getString(MessageIds.GDE_MSGT0026).lastIndexOf('\t')));
+				copyTabItem.addListener(SWT.Selection, new Listener() {
 
-			curveSelectionItem = new MenuItem(popupMenu, SWT.CHECK);
-			curveSelectionItem.setText(Messages.getString(MessageIds.GDE_MSGT0040));
-			curveSelectionItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					HistoTabAreaContextMenu.log.log(Level.FINEST, "curveSelectionItem action performed! " + e); //$NON-NLS-1$
-					boolean selection = curveSelectionItem.getSelection();
-					application.enableCurveSelector(selection);
-					application.getMenuBar().getCurveSelectionMenuItem().setSelection(selection);
-					application.getPresentHistoExplorer().updateHistoTabs(false, false);
-				}
-			});
-			displayGraphicsHeaderItem = new MenuItem(popupMenu, SWT.CHECK);
-			displayGraphicsHeaderItem.setText(Messages.getString(MessageIds.GDE_MSGT0041));
-			displayGraphicsHeaderItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					HistoTabAreaContextMenu.log.log(Level.FINEST, "toggleViewGraphicsHeaderItem action performed! " + e); //$NON-NLS-1$
-					boolean selection = displayGraphicsHeaderItem.getSelection();
-					application.getMenuBar().getGraphicsHeaderMenuItem().setSelection(selection);
-					application.enableGraphicsHeader(selection);
-					application.getPresentHistoExplorer().updateHistoTabs(false, false);
-				}
-			});
-			displayGraphicsCommentItem = new MenuItem(popupMenu, SWT.CHECK);
-			displayGraphicsCommentItem.setText(Messages.getString(MessageIds.GDE_MSGT0042));
-			if (!GDE.IS_OS_ARCH_ARM) displayGraphicsCommentItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0878));
-			displayGraphicsCommentItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					HistoTabAreaContextMenu.log.log(Level.FINEST, "toggleViewGraphicsCommentItem action performed! " + e); //$NON-NLS-1$
-					boolean selection = displayGraphicsCommentItem.getSelection();
-					application.getMenuBar().getRecordCommentMenuItem().setSelection(selection);
-					application.enableRecordSetComment(selection);
-					application.getPresentHistoExplorer().updateHistoTabs(false, false);
-				}
-			});
-
-			displayGraphicsCurveSurvey = new MenuItem(popupMenu, SWT.CHECK);
-			displayGraphicsCurveSurvey.setText(Messages.getString(MessageIds.GDE_MSGT0876));
-			if (!GDE.IS_OS_ARCH_ARM) displayGraphicsCurveSurvey.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0877));
-			displayGraphicsCurveSurvey.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					HistoTabAreaContextMenu.log.log(Level.FINEST, "displayGraphicsCurveSurvey action performed! " + e); //$NON-NLS-1$
-					boolean selection = displayGraphicsCurveSurvey.getSelection();
-					application.getMenuBar().getGraphicsCurveSurveyMenuItem().setSelection(selection);
-					application.getPresentHistoExplorer().enableCurveSurvey(selection);
-					application.getPresentHistoExplorer().updateHistoTabs(false, false);
-				}
-			});
-			separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);
-
-			copyTabItem = new MenuItem(popupMenu, SWT.PUSH);
-			copyTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0026).substring(0, Messages.getString(MessageIds.GDE_MSGT0026).lastIndexOf('\t')));
-			copyTabItem.addListener(SWT.Selection, new Listener() {
-
-				@Override
-				public void handleEvent(Event e) {
-					HistoTabAreaContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
-					application.copyTabContentAsImage();
-				}
-			});
-
-			copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
-			copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027).substring(0, Messages.getString(MessageIds.GDE_MSGT0027).lastIndexOf('\t')));
-			copyPrintImageItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(Event e) {
-					HistoTabAreaContextMenu.log.log(Level.FINEST, "copyPrintImageItem action performed! " + e); //$NON-NLS-1$
-					application.copyGraphicsPrintImage();
-				}
-			});
-
+					@Override
+					public void handleEvent(Event e) {
+						HistoTabAreaContextMenu.log.log(Level.FINEST, "copyTabItem action performed! " + e); //$NON-NLS-1$
+						application.copyTabContentAsImage();
+					}
+				});
+			}
+			{
+				copyPrintImageItem = new MenuItem(popupMenu, SWT.PUSH);
+				copyPrintImageItem.setText(Messages.getString(MessageIds.GDE_MSGT0027).substring(0, Messages.getString(MessageIds.GDE_MSGT0027).lastIndexOf('\t')));
+				copyPrintImageItem.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						HistoTabAreaContextMenu.log.log(Level.FINEST, "copyPrintImageItem action performed! " + e); //$NON-NLS-1$
+						application.copyGraphicsPrintImage();
+					}
+				});
+			}
 			if (type == TabMenuType.HISTOTABLE) {
-				//
-				// {
-				separatorCopy = new MenuItem(popupMenu, SWT.SEPARATOR);
-				outherAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
-				outherAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0462));
-				outherAreaColorItem.addListener(SWT.Selection, new Listener() {
-					@Override
-					public void handleEvent(Event e) {
-						HistoTabAreaContextMenu.log.log(Level.FINEST, "outherAreaColorItem action performed! " + e); //$NON-NLS-1$
-						RGB rgb = application.openColorDialog();
-						if (rgb != null) {
-							application.setSurroundingBackground(application.getTabSelectionIndex(), SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+				{
+					separatorCopy = new MenuItem(popupMenu, SWT.SEPARATOR);
+					outherAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
+					outherAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0462));
+					outherAreaColorItem.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(Event e) {
+							HistoTabAreaContextMenu.log.log(Level.FINEST, "outherAreaColorItem action performed! " + e); //$NON-NLS-1$
+							RGB rgb = application.openColorDialog();
+							if (rgb != null) {
+								application.setSurroundingBackground(application.getTabSelectionIndex(), SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							}
 						}
-					}
-				});
-				innerAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
-				innerAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0463));
-				innerAreaColorItem.addListener(SWT.Selection, new Listener() {
-					@Override
-					public void handleEvent(Event e) {
-						HistoTabAreaContextMenu.log.log(Level.FINEST, "innerAreaColorItem action performed! " + e); //$NON-NLS-1$
-						RGB rgb = application.openColorDialog();
-						if (rgb != null) {
-							application.setInnerAreaBackground(application.getTabSelectionIndex(), SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+					});
+				}
+				{
+					innerAreaColorItem = new MenuItem(popupMenu, SWT.PUSH);
+					innerAreaColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0463));
+					innerAreaColorItem.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(Event e) {
+							HistoTabAreaContextMenu.log.log(Level.FINEST, "innerAreaColorItem action performed! " + e); //$NON-NLS-1$
+							RGB rgb = application.openColorDialog();
+							if (rgb != null) {
+								application.setInnerAreaBackground(application.getTabSelectionIndex(), SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));
+							}
 						}
-					}
-				});
+					});
+				}
 			}
-
 			if (type.isHistoChart()) {
 				borderColorItem = new MenuItem(popupMenu, SWT.PUSH);
 				borderColorItem.setText(Messages.getString(MessageIds.GDE_MSGT0464));
@@ -585,40 +596,45 @@ public class HistoTabAreaContextMenu {
 			}
 
 			if (type == TabMenuType.HISTOTABLE) {
-				dateTimeItem = new MenuItem(popupMenu, SWT.CHECK);
-				dateTimeItem.setText(Messages.getString(MessageIds.GDE_MSGT0436));
-				dateTimeItem.setSelection(Settings.getInstance().isTimeFormatAbsolute());
-				dateTimeItem.addListener(SWT.Selection, new Listener() {
-					@Override
-					public void handleEvent(Event e) {
-						HistoTabAreaContextMenu.log.log(Level.FINEST, "dateTimeItem action performed! " + e); //$NON-NLS-1$
-						application.setAbsoluteDateTime(dateTimeItem.getSelection());
-					}
-				});
-				editTableItem = new MenuItem(popupMenu, SWT.CHECK);
-				editTableItem.setText(Messages.getString(MessageIds.GDE_MSGT0731));
-				editTableItem.setSelection(Settings.getInstance().isDataTableEditable());
-				editTableItem.addListener(SWT.Selection, new Listener() {
-					@Override
-					public void handleEvent(Event e) {
-						HistoTabAreaContextMenu.log.log(Level.FINEST, "editTableItem action performed! " + e); //$NON-NLS-1$
-						Settings.getInstance().setDataTableEditable(editTableItem.getSelection());
-					}
-				});
-				partialTableItem = new MenuItem(popupMenu, SWT.CHECK);
-				partialTableItem.setText(Messages.getString(MessageIds.GDE_MSGT0704));
-				partialTableItem.setSelection(Settings.getInstance().isPartialDataTable());
-				partialTableItem.addListener(SWT.Selection, new Listener() {
-					@Override
-					public void handleEvent(Event e) {
-						HistoTabAreaContextMenu.log.log(Level.FINEST, "partialTableItem action performed! " + e); //$NON-NLS-1$
-						Settings.getInstance().setPartialDataTable(partialTableItem.getSelection());
-						application.updateAllTabs(true, false);
-						application.getPresentHistoExplorer().updateHistoTabs(false, false);
-					}
-				});
+				{
+					dateTimeItem = new MenuItem(popupMenu, SWT.CHECK);
+					dateTimeItem.setText(Messages.getString(MessageIds.GDE_MSGT0436));
+					dateTimeItem.setSelection(Settings.getInstance().isTimeFormatAbsolute());
+					dateTimeItem.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(Event e) {
+							HistoTabAreaContextMenu.log.log(Level.FINEST, "dateTimeItem action performed! " + e); //$NON-NLS-1$
+							application.setAbsoluteDateTime(dateTimeItem.getSelection());
+						}
+					});
+				}
+				{
+					editTableItem = new MenuItem(popupMenu, SWT.CHECK);
+					editTableItem.setText(Messages.getString(MessageIds.GDE_MSGT0731));
+					editTableItem.setSelection(Settings.getInstance().isDataTableEditable());
+					editTableItem.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(Event e) {
+							HistoTabAreaContextMenu.log.log(Level.FINEST, "editTableItem action performed! " + e); //$NON-NLS-1$
+							Settings.getInstance().setDataTableEditable(editTableItem.getSelection());
+						}
+					});
+				}
+				{
+					partialTableItem = new MenuItem(popupMenu, SWT.CHECK);
+					partialTableItem.setText(Messages.getString(MessageIds.GDE_MSGT0704));
+					partialTableItem.setSelection(Settings.getInstance().isPartialDataTable());
+					partialTableItem.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(Event e) {
+							HistoTabAreaContextMenu.log.log(Level.FINEST, "partialTableItem action performed! " + e); //$NON-NLS-1$
+							Settings.getInstance().setPartialDataTable(partialTableItem.getSelection());
+							application.updateAllTabs(true, false);
+							presentHistoExplorer.updateHistoTabs(false, false);
+						}
+					});
+				}
 			}
-
 			isCreated = true;
 		}
 
@@ -661,9 +677,6 @@ public class HistoTabAreaContextMenu {
 		if (setDigitalFontItem != null) setDigitalFontItem.setEnabled(enabled);
 	}
 
-	/**
-	 * @param newIndex
-	 */
 	private void setWarningCountIndex(int newIndex) {
 		settings.setWarningCountIndex(String.valueOf(newIndex));
 		warningCountItem0.setSelection(newIndex == 0);

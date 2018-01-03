@@ -35,6 +35,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
@@ -61,15 +62,14 @@ import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionFormatter;
 import gde.histo.recordings.TrailRecord;
+import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
-import gde.histo.ui.HistoGraphicsMeasurement.HistoGraphicsMode;
 import gde.histo.ui.data.SummarySpots;
 import gde.histo.ui.data.SummarySpots.Density;
 import gde.histo.ui.menu.HistoTabAreaContextMenu;
 import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuOnDemand;
 import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuType;
 import gde.histo.utils.HistoCurveUtils;
-import gde.histo.utils.HistoTimeLine;
 import gde.log.Level;
 import gde.log.Logger;
 import gde.messages.MessageIds;
@@ -83,16 +83,11 @@ import gde.utils.StringHelper;
  * Curves for the histo summary window.
  * @author Thomas Eickert
  */
-public final class HistoSummaryComposite extends AbstractHistoChartComposite {
-	private static final String	$CLASS_NAME	= HistoSummaryComposite.class.getName();
+public final class SummaryComposite extends AbstractChartComposite {
+	private static final String	$CLASS_NAME	= SummaryComposite.class.getName();
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	private static final int		unkGap			= 2;
-
-	private final HistoTimeLine	timeLine		= new HistoTimeLine();
-
-	/** composite size - control resized */
-	Point												oldSize			= new Point(0, 0);
 
 	// mouse actions
 	int													xDown				= 0;
@@ -101,10 +96,8 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 	int													yDown				= 0;
 	int													yUp					= 0;
 
-	HistoGraphicsMeasurement		graphicsMeasurement;
-
-	HistoSummaryComposite(SashForm useParent) {
-		super(useParent, SWT.NONE);
+	SummaryComposite(SashForm useParent, CTabItem parentWindow) {
+		super(useParent, parentWindow, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
 
 		// get the background colors
@@ -164,7 +157,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 					{ // getBaseTexts
 						StringBuilder sb = new StringBuilder();
 						String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
-						for (Entry<DirectoryType, Path> directoryEntry : presentHistoExplorer.getHistoSet().getValidatedDirectories().entrySet()) {
+						for (Entry<DirectoryType, Path> directoryEntry : windowActor.getHistoSet().getValidatedDirectories().entrySet()) {
 							String fileName = directoryEntry.getValue().getFileName().toString();
 							String truncatedPath = fileName.length() > 22 ? fileName.substring(0, 22) + ellipsisText : fileName;
 							sb.append(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK).append(truncatedPath);
@@ -202,7 +195,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 				@Override
 				public void mouseExit(MouseEvent evt) {
 					log.finest(() -> "graphicCanvas.mouseExit, event=" + evt); //$NON-NLS-1$
-					HistoSummaryComposite.this.graphicCanvas.setCursor(DataExplorer.getInstance().getCursor());
+					SummaryComposite.this.graphicCanvas.setCursor(DataExplorer.getInstance().getCursor());
 				}
 			});
 			this.graphicCanvas.addMouseListener(new MouseAdapter() {
@@ -282,16 +275,14 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 
 		setRecordSetCommentStandard();
 
-		trailRecordSet = retrieveTrailRecordSet();
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			drawCurves();
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 			// changed curve selection may change the scale end values
 			trailRecordSet.syncScaleOfSyncableRecords();
 
-			if (this.graphicsMeasurement != null) {
-				this.graphicsMeasurement.drawMeasurement();
-			}
+			windowActor.drawMeasuring();
 		} else
 			this.canvasGC.drawImage(this.canvasImage, 0, 0);
 
@@ -300,12 +291,10 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
 	}
 
-	/**
-	 * @param evt
-	 */
 	void mouseMoveAction(MouseEvent evt) {
 		if (Channels.getInstance().getActiveChannel() == null) return;
 
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0 && this.canvasImage != null) {
 			Point point = checkCurveBounds(evt.x, evt.y);
 
@@ -325,12 +314,10 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 			} else
 				this.graphicCanvas.setToolTipText(null);
 
-			if (this.graphicsMeasurement != null) {
-				if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
-					this.graphicsMeasurement.processMouseDownMove(this.timeLine.getAdjacentTimestamp(point.x));
-				} else
-					this.graphicsMeasurement.processMouseUpMove(point.x);
-			}
+			if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
+// windowActor.processMouseDownMove(this.timeLine.getAdjacentTimestamp(point.x));
+			} else
+				windowActor.processMouseUpMove(point);
 		}
 	}
 
@@ -339,6 +326,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 	 * @return the record identified by the mouse position or null
 	 */
 	private TrailRecord getVisibleDisplayRecord(Point point) {
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet == null) return null; // graphics data have not been determined yet
 
 		int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
@@ -365,6 +353,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 	 * @return the recordset timestamp indices of the log data identified by the mouse position or an empty list
 	 */
 	private List<Integer> getSnappedIndices(Point point) {
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet == null) return new ArrayList<>(); // graphics data have not been determined yet
 
 		TrailRecord record = getVisibleDisplayRecord(point);
@@ -384,15 +373,14 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 	void mouseDownAction(MouseEvent evt) {
 		if (Channels.getInstance().getActiveChannel() == null) return;
 
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			Point point = checkCurveBounds(evt.x, evt.y);
 			this.xDown = point.x;
 			this.yDown = point.y;
 
 			if (evt.button == 1) {
-				if (this.graphicsMeasurement != null) {
-					this.graphicsMeasurement.processMouseDownAction(this.xDown);
-				}
+				windowActor.processMouseDownAction(point);
 			} else if (evt.button == 3) { // right button
 				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
 				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
@@ -418,16 +406,25 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 	void mouseUpAction(MouseEvent evt) {
 		if (Channels.getInstance().getActiveChannel() == null) return;
 
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			Point point = checkCurveBounds(evt.x, evt.y);
 			this.xUp = point.x;
 			this.yUp = point.y;
 
 			if (evt.button == 1) {
-				if (this.graphicsMeasurement != null) {
-					this.graphicsMeasurement.processMouseUpAction();
-				}
+				windowActor.processMouseUpAction(point);
 			}
+		}
+	}
+
+	@Override
+	protected void setFixedGraphicCanvas(Rectangle realBounds) {
+		if (Settings.getInstance().isSmartStatistics()) {
+			int heightWithScale = realBounds.height + getXScaleHeight() + AbstractChartComposite.DEFAULT_TOP_GAP;
+			setFixedGraphicCanvas(realBounds.y - AbstractChartComposite.DEFAULT_TOP_GAP, heightWithScale);
+		} else {
+			setFixedGraphicCanvas(realBounds.y - AbstractChartComposite.DEFAULT_TOP_GAP, AbstractChartComposite.ZERO_CANVAS_HEIGHT);
 		}
 	}
 
@@ -439,11 +436,12 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 
 		HistoCurveUtils.drawCurveAreaBorders(canvasImageGC, curveAreaBounds, curveAreaBorderColor);
 
-		// initialize early in order to avoid problems in mouse move events
-		this.timeLine.initialize(trailRecordSet, this.curveAreaBounds.width);
+// // initialize early in order to avoid problems in mouse move events
+// TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
+// this.timeLine.initialize(trailRecordSet, this.curveAreaBounds.width);
 
 		long startTime = new Date().getTime();
-		if (fixedCanvasHeight > AbstractHistoChartComposite.ZERO_CANVAS_HEIGHT) drawTrailRecordSet(dataScaleWidth);
+		if (fixedCanvasHeight > AbstractChartComposite.ZERO_CANVAS_HEIGHT) drawTrailRecordSet(dataScaleWidth);
 		log.fine(() -> "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startTime)));
 	}
 
@@ -458,15 +456,14 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 		boolean isPartialDataTable = settings.isPartialDataTable();
 		boolean isSummaryBoxVisible = settings.isSummaryBoxVisible();
 		boolean isSummarySpotsVisible = settings.isSummarySpotsVisible();
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 
 		trailRecordSet.updateSyncRecordScale();
 		trailRecordSet.updateAndSyncSummaryMinMax();
 
-		final Density density = Density.toDensity(trailRecordSet.getDrawAreaBounds().width, trailRecordSet.getTimeStepSize());
+		final Density density = Density.toDensity(curveAreaBounds.width, trailRecordSet.getTimeStepSize());
 		final int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
-
-		boolean isCurveGridEnabled = trailRecordSet.getValueGridType() > 0;
-		if (isCurveGridEnabled) HistoCurveUtils.drawSummaryGrid(trailRecordSet, canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
+		log.fine(() -> "curve area bounds = " + curveAreaBounds.toString());
 
 		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
@@ -474,24 +471,26 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 					record.getName(), record.isVisible(), record.isDisplayable(), record.isScaleSynced(), record.isScaleVisible()));
 			setRecordDisplayValues(record);
 
-			SummarySpots summarySpots = record.getSummarySpots();
-			summarySpots.initialize(stripHeight, density);
+			Rectangle drawStripBounds = new Rectangle(curveAreaBounds.x, curveAreaBounds.y + stripHeight * i + unkGap, curveAreaBounds.width, stripHeight);
+			log.finer(() -> record.getName() + "  x0=" + curveAreaBounds.x + " y0=" + drawStripBounds.y + " width=" + curveAreaBounds.width + " height=" + stripHeight + " dataScaleWidth=" + dataScaleWidth);
 
-			int stripY0 = curveAreaBounds.y + stripHeight * i + unkGap;
+			SummarySpots summarySpots = record.getSummarySpots();
+			summarySpots.initialize(drawStripBounds, density);
+
 			double decodedScaleMin = summarySpots.defineDecodedScaleMin();
 			double decodedScaleMax = summarySpots.defineDecodedScaleMax();
 
-			HistoCurveUtils.drawChannelItemScale(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
-					isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, !isCurveSelectorEnabled);
+			HistoCurveUtils.drawChannelItemScale(record, canvasImageGC, drawStripBounds, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+					isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, !windowActor.isCurveSelectorEnabled());
 			if (record.isVisible() || !isPartialDataTable) {
 				if (isSummaryBoxVisible)
-					HistoCurveUtils.drawChannelItemBoxplot(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+					HistoCurveUtils.drawChannelItemBoxplot(record, canvasImageGC, drawStripBounds, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
 							isDrawNumbersInRecordColor, isSpaceBelow(i));
 
-				if (isSummarySpotsVisible) summarySpots.drawAllMarkers(canvasImageGC, stripY0);
-				summarySpots.drawRecentMarkers(canvasImageGC, stripY0);
+				if (isSummarySpotsVisible) summarySpots.drawAllMarkers(canvasImageGC, drawStripBounds);
+				summarySpots.drawRecentMarkers(canvasImageGC, drawStripBounds);
 			}
-			HistoCurveUtils.drawChannelItemWarnings(record, canvasImageGC, stripY0, stripHeight, dataScaleWidth);
+			HistoCurveUtils.drawChannelItemWarnings(record, canvasImageGC, drawStripBounds, dataScaleWidth);
 			canvasImageGC.setBackground(this.surroundingBackground);
 		}
 	}
@@ -501,18 +500,13 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 	 * @return true if there is no record drawn below the current record
 	 */
 	private boolean isSpaceBelow(int displayOrdinal) {
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		int nextOrdinal = displayOrdinal + 1;
 		if (nextOrdinal < trailRecordSet.getDisplayRecords().size()) {
 			TrailRecord nextRecord = trailRecordSet.getDisplayRecords().get(nextOrdinal);
 			return !nextRecord.isVisible() && settings.isPartialDataTable();
 		} else
 			return true;
-	}
-
-	@Override
-	public void drawMeasurePointer(TrailRecord trailRecord, HistoGraphicsMode mode) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -560,7 +554,7 @@ public final class HistoSummaryComposite extends AbstractHistoChartComposite {
 	protected void setRecordSetCommentStandard() {
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		if (settings.isSmartStatistics()) {
-			this.recordSetComment.setText(presentHistoExplorer.getHistoSet().getDirectoryScanStatistics());
+			this.recordSetComment.setText(windowActor.getHistoSet().getDirectoryScanStatistics());
 		} else {
 			this.recordSetComment.setText("supported only for smart statistics");
 		}

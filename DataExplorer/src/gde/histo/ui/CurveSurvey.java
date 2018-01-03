@@ -63,7 +63,7 @@ public final class CurveSurvey {
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	public enum LineMark {
-		MEASURE_CROSS(1, SWT.COLOR_BLACK, SWT.LINE_DASH, null), //
+		MEASURE_CROSS(1, SWT.COLOR_DARK_GREEN, SWT.LINE_DASH, null), //
 		DELTA_CROSS(1, SWT.COLOR_BLUE, SWT.LINE_DASH, null), //
 		DIAG_LINE(1, SWT.COLOR_DARK_YELLOW, SWT.LINE_DOT, new int[] { 5, 2 }), //
 		AVG_LINE(2, null, SWT.LINE_DASH, null), //
@@ -481,19 +481,19 @@ public final class CurveSurvey {
 	 * @param trailRecord
 	 */
 	private void drawCurveSurvey() {
-		HistoGraphicsMapper mapper = new HistoGraphicsMapper(this.trailRecord);
+		int height = timeLine.getCurveAreaBounds().height;
 
 		if (!this.recordSection.isBoundedParabola()) { // hide these curves for better overview whenever a parabola is shown
-			int yBoundedAvg = mapper.getVerticalDisplayPos(this.recordSection.getBoundedAvgValue());
+			int yBoundedAvg = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, this.recordSection.getBoundedAvgValue());
 			this.linePainter.drawAverageLine(yBoundedAvg, this.xPosMeasure, this.xPosDelta - this.xPosMeasure);
 
-			int yRegressionPosMeasure = mapper.getVerticalDisplayPos(this.recordSection.getBoundedSlopeValue(this.timestampMeasure_ms));
-			int yRegressionPosDelta = mapper.getVerticalDisplayPos(this.recordSection.getBoundedSlopeValue(this.timestampDelta_ms));
+			int yRegressionPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, this.recordSection.getBoundedSlopeValue(this.timestampMeasure_ms));
+			int yRegressionPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, this.recordSection.getBoundedSlopeValue(this.timestampDelta_ms));
 			this.linePainter.drawLinearRegressionLine(this.xPosMeasure, yRegressionPosMeasure, this.xPosDelta, yRegressionPosDelta);
 		} else {
 			List<Spot<Integer>> points = new ArrayList<>();
 			for (Spot<Double> entry : this.recordSection.getBoundedParabolaValues()) {
-				points.add(new Spot<Integer>(this.timeLine.getXPosTimestamp((long) entry.x().doubleValue()), mapper.getVerticalDisplayPos(entry.y())));
+				points.add(new Spot<Integer>(this.timeLine.getXPosTimestamp((long) entry.x().doubleValue()), HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, entry.y())));
 			}
 			log.finer(() -> "values " + Arrays.toString(points.toArray()));
 			this.linePainter.drawRegressionParabolaLine(points);
@@ -503,7 +503,7 @@ public final class CurveSurvey {
 			double[] values = this.recordSection.getBoundedBoxplotValues();
 			int[] yPosBoxplot = new int[values.length];
 			for (int i = 0; i < values.length; i++) {
-				yPosBoxplot[i] = mapper.getVerticalDisplayPos(values[i]);
+				yPosBoxplot[i] = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, values[i]);
 			}
 			this.linePainter.drawBoxplot(xPosMidBounds, yPosBoxplot);
 		}
@@ -536,18 +536,18 @@ public final class CurveSurvey {
 	 * @param timeStampMeasure_ms is a valid time stamp
 	 */
 	public void setPosMeasure(Rectangle curveAreaBounds, long timeStampMeasure_ms) {
-		HistoGraphicsMapper mapper = new HistoGraphicsMapper(this.trailRecord);
+		int height = timeLine.getCurveAreaBounds().height;
 
 		boolean isNullAcceptable = false; // do not allow positioning on timestamps with null values
 		this.curveAreaBounds = curveAreaBounds;
 
 		long timestampMeasureNew_ms = timeStampMeasure_ms;
-		int yPosMeasureNew = mapper.getVerticalDisplayPos(this.trailRecord.getParent().getIndex(timeStampMeasure_ms));
+		int yPosMeasureNew = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, trailRecord.getParent().getIndex(timeStampMeasure_ms));
 		if (!isNullAcceptable && yPosMeasureNew == Integer.MIN_VALUE) {
 			log.fine(() -> String.format("timestampMeasure_ms=%d search first non-null value from the left", timeStampMeasure_ms)); //$NON-NLS-1$
 			int i = -1;
 			while (yPosMeasureNew == Integer.MIN_VALUE) {
-				yPosMeasureNew = mapper.getVerticalDisplayPos(++i);
+				yPosMeasureNew = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, ++i);
 			}
 			timestampMeasureNew_ms = this.trailRecord.getParent().getDisplayTimeStamp_ms(i);
 		}
@@ -566,18 +566,18 @@ public final class CurveSurvey {
 	 * @param timeStampDelta_ms is a valid time stamp
 	 */
 	public void setPosDelta(Rectangle curveAreaBounds, long timeStampDelta_ms) {
-		HistoGraphicsMapper mapper = new HistoGraphicsMapper(this.trailRecord);
+		int height = timeLine.getCurveAreaBounds().height;
 
 		boolean isNullAcceptable = false; // do not allow positioning on timestamps with null values
 		this.curveAreaBounds = curveAreaBounds;
 
 		long timestampDeltaNew_ms = timeStampDelta_ms;
-		int yPosDeltaNew = mapper.getVerticalDisplayPos(this.trailRecord.getParent().getIndex(timeStampDelta_ms));
+		int yPosDeltaNew = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, trailRecord.getParent().getIndex(timeStampDelta_ms));
 		if (!isNullAcceptable && yPosDeltaNew == Integer.MIN_VALUE) {
 			log.fine(() -> String.format("timestampDelta_ms=%d search first non-null value from the right", timeStampDelta_ms)); //$NON-NLS-1$
 			int i = this.trailRecord.getParent().getTimeStepSize();
 			while (yPosDeltaNew == Integer.MIN_VALUE) {
-				yPosDeltaNew = mapper.getVerticalDisplayPos(--i);
+				yPosDeltaNew = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, --i);
 			}
 			timestampDeltaNew_ms = this.trailRecord.getParent().getDisplayTimeStamp_ms(i);
 		}

@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -56,7 +57,7 @@ import gde.utils.LocalizedDateTime.DateTimePattern;
 /**
  * Draw time line with tick marks and numbers.
  * Support logarithmic distances and elaborate x-axis point placement based on box width and number of points.
- * @author Thomas Eickert
+ * @author Thomas Eickert (USER)
  */
 public final class HistoTimeLine {
 	private final static String						$CLASS_NAME			= HistoTimeLine.class.getName();
@@ -102,6 +103,10 @@ public final class HistoTimeLine {
 	 */
 	private Density												density;
 	/**
+	 * Chart region defined by the full timescale length and the y axis height
+	 */
+	private Rectangle curveAreaBounds;
+	/**
 	 * number of pixels for the timescale length (includes left/right margins and the chart region)
 	 */
 	private int														width;
@@ -123,9 +128,10 @@ public final class HistoTimeLine {
 	 * @param newTrailRecordSet any recordset object (no trail recordset required)
 	 * @param newWidth number of pixels for the timescale length including left/right margins for boxplots
 	 */
-	public synchronized void initialize(TrailRecordSet newTrailRecordSet, int newWidth) {
+	public synchronized void initialize(TrailRecordSet newTrailRecordSet, Rectangle curveAreaBounds) {
 		this.trailRecordSet = newTrailRecordSet;
-		this.width = newWidth;
+		this.curveAreaBounds = curveAreaBounds;
+		this.width = curveAreaBounds.width;
 		setRelativeScale();
 		defineDensity();
 		setScalePositions();
@@ -141,13 +147,14 @@ public final class HistoTimeLine {
 	 * Draw the time line for the standard x-axis and the logarithmic distance axis.
 	 * Respect left/right margin, i.e. uses the chart region only.
 	 * @param gc graphics context
-	 * @param y0 start point in y horizontal direction
-	 * @param x0 start point in x vertical direction
 	 */
-	public void drawTimeLine(GC gc, int x0, int y0) {
+	public void drawTimeLine(GC gc) {
 		gc.setLineWidth(1);
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setForeground(DataExplorer.COLOR_BLACK);
+
+		int x0 = curveAreaBounds.x;
+		int y0 = curveAreaBounds.y + curveAreaBounds.height;
 		gc.drawLine(x0 - 1, y0, x0 + this.width + 1, y0);
 		log.fine(() -> String.format("time line - x0=%d y0=%d - width=%d", x0, y0, this.width)); //$NON-NLS-1$
 
@@ -513,6 +520,10 @@ public final class HistoTimeLine {
 
 	public Density getDensity() {
 		return this.density;
+	}
+
+	public Rectangle getCurveAreaBounds() {
+		return this.curveAreaBounds;
 	}
 
 }

@@ -21,6 +21,10 @@ package gde.histo.ui;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.log.Logger;
@@ -33,9 +37,10 @@ import gde.ui.SWTResourceManager;
  * Histo graphics window as a sash form of a curve selection table and a drawing canvas.
  * @author Thomas Eickert
  */
-public final class HistoGraphicsWindow extends AbstractHistoChartWindow {
-	private final static String	$CLASS_NAME	= HistoGraphicsWindow.class.getName();
-	final static Logger					log					= Logger.getLogger($CLASS_NAME);
+public final class HistoGraphicsWindow extends AbstractChartWindow {
+	private final static String				$CLASS_NAME	= HistoGraphicsWindow.class.getName();
+	final static Logger								log					= Logger.getLogger($CLASS_NAME);
+	protected AbstractChartComposite	graphicsComposite;
 
 	private HistoGraphicsWindow(CTabFolder currentDisplayTab, int style, int index) {
 		super(currentDisplayTab, style, index);
@@ -47,28 +52,115 @@ public final class HistoGraphicsWindow extends AbstractHistoChartWindow {
 		window.graphicSashForm = new SashForm(window.tabFolder, SWT.HORIZONTAL);
 		window.setControl(window.graphicSashForm);
 
-		window.curveSelectorComposite = new HistoSelectorComposite(window.graphicSashForm);
-		window.graphicsComposite = new HistoGraphicsComposite(window.graphicSashForm);
+		window.curveSelectorComposite = new SelectorComposite(window.graphicSashForm, window);
+		window.graphicsComposite = new GraphicsComposite(window.graphicSashForm, window);
 		window.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
 
 		window.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		window.setText(Messages.getString(MessageIds.GDE_MSGT0792));
 		return window;
-}
-
-	@Override
-	public AbstractHistoChartComposite getGraphicsComposite() {
-		return this.graphicsComposite;
 	}
 
 	@Override
-	protected void setFixedGraphicCanvas(AbstractHistoChartComposite composite) {
-		// not required for this chart type
+	public AbstractChartComposite getGraphicsComposite() {
+		return this.graphicsComposite;
 	}
 
 	@Override
 	public void scrollSummaryComposite() {
 		// not required for this chart type
+	}
+
+	@Override
+	public void redrawGraphics(final boolean redrawCurveSelector) {
+		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
+			if (redrawCurveSelector) this.curveSelectorComposite.doUpdateCurveSelectorTable();
+
+			this.graphicsComposite.doRedrawGraphics();
+			this.graphicsComposite.updateCaptions();
+		} else {
+			GDE.display.asyncExec(() -> {
+				if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
+
+				graphicsComposite.doRedrawGraphics();
+				graphicsComposite.updateCaptions();
+			});
+		}
+	}
+
+	/**
+	 * Update graphics window header and description.
+	 */
+	@Override
+	@Deprecated
+	public void updateCaptions() {
+		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
+			this.graphicsComposite.updateCaptions();
+		} else {
+			GDE.display.asyncExec(() -> {
+				graphicsComposite.updateCaptions();
+			});
+		}
+	}
+
+	@Override
+	public void enableRecordSetComment(boolean enabled) {
+		this.graphicsComposite.enableRecordSetComment(enabled);
+	}
+
+	@Override
+	public void clearHeaderAndComment() {
+		this.graphicsComposite.clearHeaderAndComment();
+	}
+
+	/**
+	 * Create visible tab window content as image.
+	 * @return image with content
+	 */
+	@Override
+	public Image getContentAsImage() {
+		Rectangle bounds = this.graphicSashForm.getClientArea();
+		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
+		GC imageGC = new GC(tabContentImage);
+		this.graphicSashForm.print(imageGC);
+		if (GDE.IS_MAC) {
+			Image graphics = this.graphicsComposite.getGraphicsPrintImage();
+			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(graphics.getImageData())), bounds.width - graphics.getBounds().width, 0);
+		}
+		imageGC.dispose();
+
+		return tabContentImage;
+	}
+
+	@Override
+	public void enableGraphicsHeader(boolean enabled) {
+		this.graphicsComposite.enableGraphicsHeader(enabled);
+	}
+
+	@Override
+	public void enableGraphicsScale(boolean enabled) {
+		this.graphicsComposite.enableGraphicsScale(enabled);
+	}
+
+	@Override
+	public void setCurveAreaBackground(Color curveAreaBackground) {
+		this.graphicsComposite.curveAreaBackground = curveAreaBackground;
+		this.graphicsComposite.graphicCanvas.redraw();
+	}
+
+	@Override
+	public void setCurveAreaBorderColor(Color borderColor) {
+		this.graphicsComposite.curveAreaBorderColor = borderColor;
+		this.graphicsComposite.graphicCanvas.redraw();
+	}
+
+	@Override
+	public void setSurroundingBackground(Color surroundingBackground) {
+		this.graphicsComposite.surroundingBackground = surroundingBackground;
+		this.graphicsComposite.setBackground(surroundingBackground);
+		this.graphicsComposite.graphicsHeader.setBackground(surroundingBackground);
+		this.graphicsComposite.recordSetComment.setBackground(surroundingBackground);
+		this.graphicsComposite.doRedrawGraphics();
 	}
 
 }
