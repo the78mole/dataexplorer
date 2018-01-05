@@ -1277,6 +1277,7 @@ public class CurveSelectorContextMenu {
 		else {
 			this.recordNameMeasurement = GDE.STRING_BLANK;
 			setMeasurementActive(tmpRecordNameMeasurement, false);
+			CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
 			CurveSelectorContextMenu.this.application.setStatusMessage(GDE.STRING_EMPTY);
 		}
 	}
@@ -1304,6 +1305,7 @@ public class CurveSelectorContextMenu {
 		else {
 			this.recordNameMeasurement = GDE.STRING_BLANK;
 			setDeltaMeasurementActive(tmpRecordNameKey, false);
+			CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
 			CurveSelectorContextMenu.this.application.setStatusMessage(GDE.STRING_EMPTY);
 		}
 	}
