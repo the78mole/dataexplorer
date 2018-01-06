@@ -28,7 +28,6 @@ import java.util.Vector;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -260,8 +259,6 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	protected String														description											= GDE.STRING_EMPTY;
 
 	protected boolean														hasDisplayableData							= false;
-	protected Rectangle													drawAreaBounds;
-
 	// current drop, shadow point vector to mark data points capable to be smoothed
 	protected boolean														isSmoothAtCurrentDrop						= false;
 	protected Vector<Integer[]>									currentDropShadow								= new Vector<>(0);
@@ -540,22 +537,6 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 */
 	public void setMinValue(double newMinValue) {
 		this.minValue = newMinValue;
-	}
-
-	/**
-	 * @return the curveBounds, this is the area where curves are drawn
-	 */
-	public Rectangle getDrawAreaBounds() {
-		return this.drawAreaBounds;
-	}
-
-	/**
-	 * Define the area where curves are drawn (clipping, image).
-	 * @param newDrawAreaBounds the curveBounds to set
-	 */
-	public void setDrawAreaBounds(Rectangle newDrawAreaBounds) {
-		this.drawAreaBounds = newDrawAreaBounds;
-		log.finest(() -> "drawAreaBounds = " + this.drawAreaBounds); //$NON-NLS-1$
 	}
 
 	/**

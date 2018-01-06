@@ -74,6 +74,7 @@ public final class RecordSet extends AbstractRecordSet {
 	int														fileDataBytes									= 0;																																																										//number of bytes containing all records data
 	long													fileDataPointer								= 0;																																																										//file pointer where the data of this record begins
 	int														xScaleStep										= 0;																																																										// steps in x direction to draw the curves, normally 1
+	Rectangle											drawAreaBounds;
 
 	// for compare set x min/max and y max (time) might be different
 	boolean												isCompareSet									= false;
@@ -1928,5 +1929,21 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	public String getRecordKeyMeasurement() {
 		return this.recordKeyMeasurement;
+	}
+
+	/**
+	 * @return the curveBounds, this is the area where curves are drawn
+	 */
+	public Rectangle getDrawAreaBounds() {
+		return this.drawAreaBounds;
+	}
+
+	/**
+	 * Define the area where curves are drawn (clipping, image).
+	 * @param newDrawAreaBounds the curveBounds to set
+	 */
+	public void setDrawAreaBounds(Rectangle newDrawAreaBounds) {
+		this.drawAreaBounds = newDrawAreaBounds;
+		log.finest(() -> "drawAreaBounds = " + this.drawAreaBounds); //$NON-NLS-1$
 	}
 }

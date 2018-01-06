@@ -309,7 +309,6 @@ public abstract class AbstractChartComposite extends Composite {
 
 		TrailRecordSet trailRecordSet = windowActor.getTrailRecordSet();
 		if (trailRecordSet.getTimeStepSize() > 0) {
-			trailRecordSet.setDrawAreaBounds(curveAreaBounds);
 			drawCurveArea(dataScaleWidth);
 		}
 	}
