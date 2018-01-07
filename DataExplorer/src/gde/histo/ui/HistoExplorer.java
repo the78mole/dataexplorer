@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
-import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -105,7 +104,9 @@ public class HistoExplorer {
 	 * Does nothing if the histoActive setting is false.
 	 */
 	public synchronized void resetHisto() {
-		chartTabItems.stream().forEach(c -> resetWindowHeaderAndMeasuring(c));
+		for (AbstractChartWindow c : chartTabItems) {
+			resetWindowHeaderAndMeasuring(c);
+		}
 		updateHistoTabs(RebuildStep.A_HISTOSET, true);
 	}
 
@@ -123,24 +124,27 @@ public class HistoExplorer {
 	public synchronized void updateHistoTableWindow(boolean forceClean) {
 		if (displayTab != null && !(displayTab.getSelection() instanceof HistoTableWindow)) return;
 
-		GDE.display.asyncExec(() -> {
-			tableTabItems.stream().forEach(t -> {
-				if (forceClean || !t.isRowTextAndTrailValid() || !t.isHeaderTextValid()) {
-					t.setHeader();
-				}
-				TrailRecordSet trailRecordSet = histoSet.getTrailRecordSet();
-				if (trailRecordSet != null) {
-					int tableRowCount = trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
-					if (settings.isDisplayTags()) {
-						TrailDataTags dataTags = trailRecordSet.getDataTags();
-						dataTags.defineActiveDisplayTags();
-						if (dataTags.getActiveDisplayTags() != null) {
-							tableRowCount += dataTags.getActiveDisplayTags().size();
-						}
+		GDE.display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				for (HistoTableWindow c : tableTabItems) {
+					if (forceClean || !c.isRowTextAndTrailValid() || !c.isHeaderTextValid()) {
+						c.setHeader();
 					}
-					t.setRowCount(tableRowCount);
+					TrailRecordSet trailRecordSet = histoSet.getTrailRecordSet();
+					if (trailRecordSet != null) {
+						int tableRowCount = trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
+						if (settings.isDisplayTags()) {
+							TrailDataTags dataTags = trailRecordSet.getDataTags();
+							dataTags.defineActiveDisplayTags();
+							if (dataTags.getActiveDisplayTags() != null) {
+								tableRowCount += dataTags.getActiveDisplayTags().size();
+							}
+						}
+						c.setRowCount(tableRowCount);
+					}
 				}
-			});
+			}
 		});
 
 	}
@@ -151,7 +155,7 @@ public class HistoExplorer {
 	 */
 	public void scrollSummaryComposite() {
 		if (isHistoChartWindowVisible()) {
-			((AbstractChartWindow) displayTab.getSelection()).getCurveSelectorComposite().scrollCompositeAndClearMeasuring();
+			((AbstractChartWindow) displayTab.getSelection()).scrollComposite();
 		}
 	}
 
@@ -168,10 +172,13 @@ public class HistoExplorer {
 				chartWindow.redrawGraphics(redrawCurveSelector);
 			}
 		} else {
-			GDE.display.asyncExec(() -> {
-				AbstractChartWindow chartWindow = (AbstractChartWindow) displayTab.getSelection();
-				if (!chartWindow.isActiveCurveSelectorContextMenu()) {
-					chartWindow.redrawGraphics(redrawCurveSelector);
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					AbstractChartWindow chartWindow = (AbstractChartWindow) displayTab.getSelection();
+					if (!chartWindow.isActiveCurveSelectorContextMenu()) {
+						chartWindow.redrawGraphics(redrawCurveSelector);
+					}
 				}
 			});
 		}
@@ -205,13 +212,16 @@ public class HistoExplorer {
 				}
 			}
 		} else {
-			GDE.display.asyncExec(() -> {
-				if (isHistoChartWindowVisible() || isHistoTableWindowVisible()) {
-					Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
-					try {
-						rebuilThread.start();
-					} catch (RuntimeException e) {
-						log.log(Level.WARNING, e.getMessage(), e);
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (isHistoChartWindowVisible() || isHistoTableWindowVisible()) {
+						Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
+						try {
+							rebuilThread.start();
+						} catch (RuntimeException e) {
+							log.log(Level.WARNING, e.getMessage(), e);
+						}
 					}
 				}
 			});
@@ -251,9 +261,12 @@ public class HistoExplorer {
 			tabItem.clearHeaderAndComment();
 			tabItem.cleanMeasuring();
 		} else {
-			GDE.display.asyncExec(() -> {
-				tabItem.clearHeaderAndComment();
-				tabItem.cleanMeasuring();
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					tabItem.clearHeaderAndComment();
+					tabItem.cleanMeasuring();
+				}
 			});
 		}
 	}
@@ -289,7 +302,9 @@ public class HistoExplorer {
 	 */
 	public void setInnerAreaBackground(Color innerAreaBackground) {
 		settings.setObjectDescriptionInnerAreaBackground(innerAreaBackground);
-		chartTabItems.stream().forEach(c -> c.setCurveAreaBackground(innerAreaBackground));
+		for (AbstractChartWindow c : chartTabItems) {
+			c.setCurveAreaBackground(innerAreaBackground);
+		}
 	}
 
 	/**
@@ -297,7 +312,9 @@ public class HistoExplorer {
 	 */
 	public void setBorderColor(Color borderColor) {
 		settings.setCurveGraphicsBorderColor(borderColor);
-		chartTabItems.stream().forEach(c -> c.setCurveAreaBorderColor(borderColor));
+		for (AbstractChartWindow c : chartTabItems) {
+			c.setCurveAreaBorderColor(borderColor);
+		}
 	}
 
 	/**
@@ -305,27 +322,34 @@ public class HistoExplorer {
 	 */
 	public void setSurroundingBackground(Color surroundingBackground) {
 		settings.setUtilitySurroundingBackground(surroundingBackground);
-		chartTabItems.stream().forEach(c -> c.setSurroundingBackground(surroundingBackground));
+		for (AbstractChartWindow c : chartTabItems) {
+			c.setSurroundingBackground(surroundingBackground);
+		}
 	}
 
 	public void enableGraphicsHeader(boolean enabled) {
-		chartTabItems.stream().forEach(c -> c.enableGraphicsHeader(enabled));
+		for (AbstractChartWindow c : chartTabItems) {
+			c.enableGraphicsHeader(enabled);
+		}
 	}
 
 	public void enableRecordSetComment(boolean enabled) {
-		chartTabItems.stream().forEach(c -> c.enableRecordSetComment(enabled));
+		for (AbstractChartWindow c : chartTabItems) {
+			c.enableRecordSetComment(enabled);
+		}
 	}
 
 	public void enableCurveSelector(boolean enabled) {
-		chartTabItems.stream().forEach(c -> c.enableCurveSelector(enabled));
+		for (AbstractChartWindow c : chartTabItems) {
+			c.enableCurveSelector(enabled);
+		}
 	}
 
 	/**
 	 * @return the canvasImage alias graphics window for the visible tab.
 	 */
 	public Optional<Image> getGraphicsPrintImage() {
-		return isHistoChartWindowVisible() ? Optional.of(((AbstractChartWindow) displayTab.getSelection()).getGraphicsComposite().getGraphicsPrintImage())
-				: Optional.empty();
+		return isHistoChartWindowVisible() ? Optional.of(((AbstractChartWindow) displayTab.getSelection()).getGraphicsPrintImage()) : Optional.empty();
 	}
 
 	/**
@@ -333,11 +357,10 @@ public class HistoExplorer {
 	 */
 	public Optional<Image> getContentAsImage() {
 		Image graphicsImage = null;
-		CTabItem window = displayTab.getSelection();
 		if (isHistoChartWindowVisible()) {
-			graphicsImage = ((AbstractChartWindow) window).getContentAsImage();
+			graphicsImage = ((AbstractChartWindow) displayTab.getSelection()).getContentAsImage();
 		} else if (isHistoTableWindowVisible()) {
-			graphicsImage = ((HistoTableWindow) window).getContentAsImage();
+			graphicsImage = ((HistoTableWindow) displayTab.getSelection()).getContentAsImage();
 		}
 		return Optional.ofNullable(graphicsImage);
 	}

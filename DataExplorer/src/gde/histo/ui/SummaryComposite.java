@@ -23,16 +23,16 @@ import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.SEVERE;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
@@ -45,8 +45,6 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
@@ -58,17 +56,22 @@ import org.eclipse.swt.widgets.Text;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channels;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
-import gde.histo.exclusions.ExclusionFormatter;
+import gde.histo.exclusions.ExclusionData;
+import gde.histo.exclusions.InclusionData;
 import gde.histo.recordings.TrailRecord;
+import gde.histo.recordings.TrailRecordFormatter;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
+import gde.histo.recordings.TrailRecordSet.Outliers;
+import gde.histo.recordings.TrailRecordSetFormatter;
 import gde.histo.ui.data.SummarySpots;
 import gde.histo.ui.data.SummarySpots.Density;
-import gde.histo.ui.menu.HistoTabAreaContextMenu;
-import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuOnDemand;
-import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuType;
+import gde.histo.ui.menu.AbstractTabAreaContextMenu.TabMenuOnDemand;
+import gde.histo.ui.menu.ChartTabAreaContextMenu;
+import gde.histo.ui.menu.ChartTabAreaContextMenu.SummaryWarning;
 import gde.histo.utils.HistoCurveUtils;
 import gde.log.Level;
 import gde.log.Logger;
@@ -87,14 +90,38 @@ public final class SummaryComposite extends AbstractChartComposite {
 	private static final String	$CLASS_NAME	= SummaryComposite.class.getName();
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private static final int		unkGap			= 2;
+	static final int						UNK_GAP			= 2;
 
-	// mouse actions
-	int													xDown				= 0;
-	int													xUp					= 0;
-	int													xLast				= 0;
-	int													yDown				= 0;
-	int													yUp					= 0;
+	private VolatileComment			volatileComment;
+
+	/**
+	 * Comment caching.
+	 * The comment text and tooltip remains active for a defined number of drawing actions.
+	 */
+	private class VolatileComment {
+		final String	textLines;
+		final String	toolTip;
+		int						remainingAccessCounter;
+
+		private VolatileComment(String textLines, String toolTip, int accessCounter) {
+			this.textLines = textLines;
+			this.toolTip = toolTip;
+			this.remainingAccessCounter = accessCounter;
+		}
+
+		private String getTextLines() {
+			if (--remainingAccessCounter < 0) throw new UnsupportedOperationException();
+			return remainingAccessCounter >= 0 ? this.textLines : GDE.STRING_EMPTY;
+		}
+
+		private String getToolTip() {
+			return remainingAccessCounter > 0 ? this.toolTip : GDE.STRING_EMPTY;
+		}
+
+		private boolean isAvailable() {
+			return remainingAccessCounter > 0;
+		}
+	}
 
 	SummaryComposite(SashForm useParent, CTabItem parentWindow) {
 		super(useParent, parentWindow, SWT.NONE);
@@ -106,7 +133,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		this.curveAreaBorderColor = this.settings.getGraphicsCurvesBorderColor();
 
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-		this.contextMenu = new HistoTabAreaContextMenu();
+		this.contextMenu = new ChartTabAreaContextMenu();
 
 		init();
 
@@ -118,7 +145,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		this.setDragDetect(false);
 		this.setBackground(this.surroundingBackground);
 
-		this.contextMenu.createMenu(this.popupmenu, TabMenuType.HISTOSUMMARY);
+		this.contextMenu.createMenu(this.popupmenu);
 
 		// help lister does not get active on Composite as well as on Canvas
 		this.addListener(SWT.Resize, new Listener() {
@@ -249,46 +276,9 @@ public final class SummaryComposite extends AbstractChartComposite {
 	 */
 	private void drawAreaPaintControl(PaintEvent evt) {
 		log.finest(() -> "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
+		long nanoTime = System.nanoTime();
 		drawAreaPaintControl();
-	}
-
-	/**
-	 * Draw the containing records and sets the comment.
-	 */
-	private void drawAreaPaintControl() {
-		long startTime = new Date().getTime();
-		// Get the canvas and its dimensions
-		this.canvasBounds = this.graphicCanvas.getClientArea();
-		log.finer(() -> "canvas size = " + this.canvasBounds); //$NON-NLS-1$
-
-		// redefine the bounds, e.g. in case of resizing
-		setComponentBounds();
-
-		if (this.canvasImage != null) this.canvasImage.dispose();
-		this.canvasImage = new Image(GDE.display, this.canvasBounds);
-		this.canvasImageGC = new GC(this.canvasImage); // SWTResourceManager.getGC(this.canvasImage);
-		this.canvasImageGC.setBackground(this.surroundingBackground);
-		this.canvasImageGC.fillRectangle(this.canvasBounds);
-		this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		// get gc for other drawing operations
-		this.canvasGC = new GC(this.graphicCanvas);
-
-		setRecordSetCommentStandard();
-
-		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
-			drawCurves();
-			this.canvasGC.drawImage(this.canvasImage, 0, 0);
-			// changed curve selection may change the scale end values
-			trailRecordSet.syncScaleOfSyncableRecords();
-
-			windowActor.drawMeasuring();
-		} else
-			this.canvasGC.drawImage(this.canvasImage, 0, 0);
-
-		this.canvasGC.dispose();
-		this.canvasImageGC.dispose();
-		log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+		log.time(() -> "drawTime=" + StringHelper.getFormatedTime("ss:SSS", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime)));
 	}
 
 	void mouseMoveAction(MouseEvent evt) {
@@ -300,19 +290,33 @@ public final class SummaryComposite extends AbstractChartComposite {
 
 			this.graphicCanvas.setCursor(this.application.getCursor());
 			List<Integer> snappedIndices = getSnappedIndices(point);
-			if (!snappedIndices.isEmpty()) {
+			TrailRecord record = getDisplayRecord(point);
+			if (point.x > 0 && point.x < curveAreaBounds.width && !snappedIndices.isEmpty()) {
 				this.graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_CROSS));
-
-				Stream<String> fileNames = snappedIndices.stream().sorted(Comparator.reverseOrder()) //
-						.map(i -> Paths.get(trailRecordSet.getDataTags(i).get(DataTag.FILE_PATH))) //
-						.map(p -> p.getFileName().toString());
-				String text = String.join("\n", (Iterable<String>) fileNames::iterator);
+				String text = TrailRecordSetFormatter.getFileNameLines(snappedIndices);
+				if (snappedIndices.size() == 1) {
+					TrailRecordFormatter formatter = new TrailRecordFormatter(record);
+					ExtendedVault vault = trailRecordSet.getPickedVaults().getVault(snappedIndices.get(0));
+					String outliers = Arrays.stream(record.getVaultOutliers(vault)).mapToObj(o -> formatter.getScaleValue(o)).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
+					String scraps = Arrays.stream(record.getVaultScraps(vault)).mapToObj(o -> formatter.getScaleValue(o)).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
+					if (!outliers.isEmpty()) text += "\n o " + outliers;
+					if (!scraps.isEmpty()) text += "\n s " + scraps;
+				}
 				if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText()))) {
 					log.log(Level.FINEST, "", text);
 					this.graphicCanvas.setToolTipText(text);
 				}
-			} else
-				this.graphicCanvas.setToolTipText(null);
+			} else {
+				if (point.x == 0 && record != null && record.getSummary().getMinMaxWarning()[0] != null) { // left scale warnings
+					String hintForClick = GDE.STRING_NEW_LINE + Messages.getString(MessageIds.GDE_MSGT0914);
+					this.graphicCanvas.setToolTipText(new TrailRecordFormatter(record).defineFormattedMinWarning() + hintForClick);
+				} else if (point.x == curveAreaBounds.width && record != null && record.getSummary().getMinMaxWarning()[1] != null) { // right
+					String hintForClick = GDE.STRING_NEW_LINE + Messages.getString(MessageIds.GDE_MSGT0914);
+					this.graphicCanvas.setToolTipText(new TrailRecordFormatter(record).defineFormattedMaxWarning() + hintForClick);
+				} else {
+					this.graphicCanvas.setToolTipText(null);
+				}
+			}
 
 			if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
 // windowActor.processMouseDownMove(this.timeLine.getAdjacentTimestamp(point.x));
@@ -322,21 +326,20 @@ public final class SummaryComposite extends AbstractChartComposite {
 	}
 
 	/**
-	 * @param point is the mouse coordinate relative and restricted to the curve area bounds
+	 * @param point is the mouse coordinate relative and corrected to the curve area bounds
 	 * @return the record identified by the mouse position or null
 	 */
-	private TrailRecord getVisibleDisplayRecord(Point point) {
+	private TrailRecord getDisplayRecord(Point point) {
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet == null) return null; // graphics data have not been determined yet
+		if (trailRecordSet.getDisplayRecords() == null || trailRecordSet.getDisplayRecords().isEmpty()) return null; // concurrent activity
 
 		int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
-		int stripWidth = curveAreaBounds.width;
 		int xPos = point.x;
-		int yPos = point.y - unkGap;
+		int yPos = point.y; // todo - UNK_GAP;
 		log.finest(() -> String.format("x=%d y=%d  stripXPos=%d  stripYPos=%d  stripHeight=%d", //
 				point.x, point.y, xPos, yPos, stripHeight));
-		if (yPos < 0 || yPos >= stripHeight * trailRecordSet.getDisplayRecords().size() - 1 //
-				|| xPos <= 0 || xPos >= stripWidth) // not in drawing area
+		if (yPos < 0 || yPos >= stripHeight * trailRecordSet.getDisplayRecords().size() - 1) // below or above the drawing area
 			return null;
 
 		int displayOrdinal = Math.min(yPos / stripHeight, trailRecordSet.getDisplayRecords().size() - 1);
@@ -345,7 +348,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		TrailRecord record = trailRecordSet.getDisplayRecords().get(displayOrdinal);
 		log.finest(() -> String.format("x=%d y=%d  displayOrdinal=%d  record=%s", //
 				point.x, point.y, displayOrdinal, record.getName()));
-		return record.isVisible() ? record : null;
+		return record;
 	}
 
 	/**
@@ -355,35 +358,42 @@ public final class SummaryComposite extends AbstractChartComposite {
 	private List<Integer> getSnappedIndices(Point point) {
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet == null) return new ArrayList<>(); // graphics data have not been determined yet
+		if (trailRecordSet.getDisplayRecords() == null || trailRecordSet.getDisplayRecords().isEmpty()) return new ArrayList<>(); // concurrent activity
 
-		TrailRecord record = getVisibleDisplayRecord(point);
-		if (record == null) return new ArrayList<>(); // mouse not pointing to a visible record
+		TrailRecord record = getDisplayRecord(point);
+		if (record == null || (!record.isVisible() && settings.isPartialDataTable())) return new ArrayList<>(); // mouse not pointing to a visible record
 
 		int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
-		int stripYPos = (point.y - unkGap) % stripHeight;
+		int stripYPos = (point.y - UNK_GAP) % stripHeight;
 
-		List<Integer> snappedIndexes = record.getSummarySpots().getSnappedIndexes(point.x, stripYPos);
+		List<Integer> snappedIndexes = record.getSummary().getSummarySpots().getSnappedIndexes(point.x, stripYPos);
 		log.log(FINER, "", Arrays.toString(snappedIndexes.toArray()));
 		return snappedIndexes;
 	}
 
-	/**
-	 * @param evt
-	 */
 	void mouseDownAction(MouseEvent evt) {
 		if (Channels.getInstance().getActiveChannel() == null) return;
 
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			Point point = checkCurveBounds(evt.x, evt.y);
-			this.xDown = point.x;
-			this.yDown = point.y;
+
+			TrailRecord record = getDisplayRecord(point);
+			if (point.x == 0 && record != null && record.getSummary().getMinMaxWarning()[0] != null) { // left scale warnings
+				changeChartAsPerWarning(record, 0);
+			} else if (point.x == curveAreaBounds.width && record != null && record.getSummary().getMinMaxWarning()[1] != null) { // right
+				changeChartAsPerWarning(record, 1);
+			}
 
 			if (evt.button == 1) {
 				windowActor.processMouseDownAction(point);
 			} else if (evt.button == 3) { // right button
 				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
-				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
+				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
+				Path dataPath = application.getPresentHistoExplorer().getHistoSet().getValidatedDirectories().get(DirectoryType.DATA);
+				String[] includedRecordNames = InclusionData.getInstance(dataPath).getIncludedRecordNames();
+				SummaryWarning summaryWarning = new SummaryWarning(dataPath, record != null ? record.getName() : GDE.STRING_EMPTY, includedRecordNames);
+				popupmenu.setData(TabMenuOnDemand.SUMMARY_WARNING.name(), summaryWarning);
 
 				List<Integer> snappedIndices = getSnappedIndices(point);
 				if (snappedIndices.size() == 1) {
@@ -392,12 +402,37 @@ public final class SummaryComposite extends AbstractChartComposite {
 					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
 					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
 				} else {
-					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
-					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
-					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
+					if (point.x == 0 && record != null && record.getSummary().getMinMaxWarning()[0] != null) { // left scale warnings
+						Outliers outlier = record.getSummary().getMinMaxWarning()[0];
+						ExtendedVault vault = record.getParent().getPickedVaults().getVault(outlier.getIndices().get(0));
+						popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
+						popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
+						popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
+					} else if (point.x == curveAreaBounds.width && record != null && record.getSummary().getMinMaxWarning()[1] != null) { // right
+						Outliers outlier = record.getSummary().getMinMaxWarning()[1];
+						ExtendedVault vault = record.getParent().getPickedVaults().getVault(outlier.getIndices().get(0));
+						popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
+						popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
+						popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
+					} else {
+						popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
+						popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
+						popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
+					}
 				}
 			}
 		}
+
+	}
+
+	/**
+	 * @param actionType is 0 for a change after clicking on the left (min) side of the chart
+	 */
+	private void changeChartAsPerWarning(TrailRecord record, int actionType) {
+		TrailRecordFormatter recordFormatter = new TrailRecordFormatter(record);
+		volatileComment = new VolatileComment(recordFormatter.defineMinMaxWarningText(), Messages.getString(MessageIds.GDE_MSGT0909), 3);
+		windowActor.setTrailVisible(record, record.getSummary().getMinMaxWarning()[actionType].getSelectIndex());
+		windowActor.updateHistoTabs(false, false);
 	}
 
 	/**
@@ -409,8 +444,6 @@ public final class SummaryComposite extends AbstractChartComposite {
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			Point point = checkCurveBounds(evt.x, evt.y);
-			this.xUp = point.x;
-			this.yUp = point.y;
 
 			if (evt.button == 1) {
 				windowActor.processMouseUpAction(point);
@@ -436,13 +469,35 @@ public final class SummaryComposite extends AbstractChartComposite {
 
 		HistoCurveUtils.drawCurveAreaBorders(canvasImageGC, curveAreaBounds, curveAreaBorderColor);
 
-// // initialize early in order to avoid problems in mouse move events
-// TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-// this.timeLine.initialize(trailRecordSet, this.curveAreaBounds.width);
-
 		long startTime = new Date().getTime();
 		if (fixedCanvasHeight > AbstractChartComposite.ZERO_CANVAS_HEIGHT) drawTrailRecordSet(dataScaleWidth);
 		log.fine(() -> "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startTime)));
+	}
+
+	@Override
+	protected void defineLayoutParams() {
+		// initialize early in order to avoid problems in mouse move events
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
+
+		trailRecordSet.updateSyncSummaryScale();
+		if (trailRecordSet.getDisplayRecords() == null || trailRecordSet.getDisplayRecords().isEmpty()) return; // concurrent activity
+
+		Density density = Density.toDensity(curveAreaBounds.width, trailRecordSet.getTimeStepSize());
+		int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
+		log.fine(() -> "curve area bounds = " + curveAreaBounds.toString());
+
+		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
+			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
+			if (record.isVisible()) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
+					record.getName(), record.isVisible(), record.isDisplayable(), record.isScaleSynced(), record.isScaleVisible()));
+			setRecordDisplayValues(record);
+
+			Rectangle drawStripBounds = new Rectangle(curveAreaBounds.x, curveAreaBounds.y + stripHeight * i + UNK_GAP, curveAreaBounds.width, stripHeight);
+			log.finer(() -> record.getName() + "  x0=" + curveAreaBounds.x + " y0=" + drawStripBounds.y + " width=" + curveAreaBounds.width + " height=" + stripHeight);
+
+			SummarySpots summarySpots = record.getSummary().getSummarySpots();
+			summarySpots.initialize(drawStripBounds, density);
+		}
 	}
 
 	/**
@@ -455,42 +510,39 @@ public final class SummaryComposite extends AbstractChartComposite {
 		boolean isDrawNumbersInRecordColor = settings.isDrawNumbersInRecordColor();
 		boolean isPartialDataTable = settings.isPartialDataTable();
 		boolean isSummaryBoxVisible = settings.isSummaryBoxVisible();
+		boolean isSummarySpreadVisible = settings.isSummarySpreadVisible();
 		boolean isSummarySpotsVisible = settings.isSummarySpotsVisible();
+		boolean isCurveSelector = windowActor.isCurveSelectorEnabled();
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-
-		trailRecordSet.updateSyncRecordScale();
-		trailRecordSet.updateAndSyncSummaryMinMax();
-
-		final Density density = Density.toDensity(curveAreaBounds.width, trailRecordSet.getTimeStepSize());
-		final int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
-		log.fine(() -> "curve area bounds = " + curveAreaBounds.toString());
+		Path dataDir = application.getPresentHistoExplorer().getHistoSet().getValidatedDirectories().get(DirectoryType.DATA);
+		Optional<InclusionData> inclusionData = InclusionData.getExistingInstance(dataDir, trailRecordSet.getRecordNames());
+		List<String> exclusiveNames = Arrays.asList(inclusionData.map(d -> d.getIncludedRecordNames(trailRecordSet.getRecordNames())).orElse(new String[0]));
 
 		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
-			if (record.isVisible()) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
-					record.getName(), record.isVisible(), record.isDisplayable(), record.isScaleSynced(), record.isScaleVisible()));
-			setRecordDisplayValues(record);
+			SummarySpots summarySpots = record.getSummary().getSummarySpots();
 
-			Rectangle drawStripBounds = new Rectangle(curveAreaBounds.x, curveAreaBounds.y + stripHeight * i + unkGap, curveAreaBounds.width, stripHeight);
-			log.finer(() -> record.getName() + "  x0=" + curveAreaBounds.x + " y0=" + drawStripBounds.y + " width=" + curveAreaBounds.width + " height=" + stripHeight + " dataScaleWidth=" + dataScaleWidth);
+			double decodedScaleMin = record.getSummary().defineScaleMin();
+			double decodedScaleMax = record.getSummary().defineScaleMax();
 
-			SummarySpots summarySpots = record.getSummarySpots();
-			summarySpots.initialize(drawStripBounds, density);
+			HistoCurveUtils.drawChannelItemScale(record, canvasImageGC, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+					isDrawScaleInRecordColor, isDrawNumbersInRecordColor);
+			if (exclusiveNames.contains(record.getName()))
+				HistoCurveUtils.drawChannelItemWarnMarker(record, canvasImageGC, dataScaleWidth, isDrawNumbersInRecordColor);
+			if (record.size() == 0) continue; // nothing to display
 
-			double decodedScaleMin = summarySpots.defineDecodedScaleMin();
-			double decodedScaleMax = summarySpots.defineDecodedScaleMax();
-
-			HistoCurveUtils.drawChannelItemScale(record, canvasImageGC, drawStripBounds, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
-					isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, !windowActor.isCurveSelectorEnabled());
 			if (record.isVisible() || !isPartialDataTable) {
-				if (isSummaryBoxVisible)
-					HistoCurveUtils.drawChannelItemBoxplot(record, canvasImageGC, drawStripBounds, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
-							isDrawNumbersInRecordColor, isSpaceBelow(i));
-
-				if (isSummarySpotsVisible) summarySpots.drawAllMarkers(canvasImageGC, drawStripBounds);
-				summarySpots.drawRecentMarkers(canvasImageGC, drawStripBounds);
+				if (isSummarySpreadVisible) HistoCurveUtils.drawChannelItemSpread(record, canvasImageGC);
+				if (!isCurveSelector && record.isVisible()) HistoCurveUtils.drawChannelItemText(record, canvasImageGC, isDrawNameInRecordColor);
+				if (isSummaryBoxVisible) HistoCurveUtils.drawChannelItemBoxplot(record, canvasImageGC, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+						isDrawNumbersInRecordColor, isSpaceBelow(i));
+				if (isSummarySpotsVisible) summarySpots.drawMarkers(canvasImageGC);
+				summarySpots.drawRecentMarkers(canvasImageGC);
 			}
-			HistoCurveUtils.drawChannelItemWarnings(record, canvasImageGC, drawStripBounds, dataScaleWidth);
+			boolean isDefaultOrExclusiveWarning = inclusionData.map(d -> d.isIncluded(record.getName())).orElse(true);
+			if (isDefaultOrExclusiveWarning && !HistoSet.isGpsCoordinates(record)) {
+				HistoCurveUtils.drawChannelItemWarnings(record, canvasImageGC, dataScaleWidth);
+			}
 			canvasImageGC.setBackground(this.surroundingBackground);
 		}
 	}
@@ -554,11 +606,29 @@ public final class SummaryComposite extends AbstractChartComposite {
 	protected void setRecordSetCommentStandard() {
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		if (settings.isSmartStatistics()) {
-			this.recordSetComment.setText(windowActor.getHistoSet().getDirectoryScanStatistics());
+			if (volatileComment == null || !volatileComment.isAvailable()) {
+				this.recordSetComment.setText(windowActor.getHistoSet().getDirectoryScanStatistics());
+				this.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0896));
+			} else {
+				this.recordSetComment.setText(volatileComment.getTextLines());
+				this.recordSetComment.setToolTipText(volatileComment.getToolTip());
+				if (!volatileComment.isAvailable()) volatileComment = null; // heap gc
+			}
 		} else {
-			this.recordSetComment.setText("supported only for smart statistics");
+			this.recordSetComment.setText("supported for smart statistics only");
+			this.recordSetComment.setToolTipText("supported for smart statistics only");
 		}
-		this.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0896));
+	}
+
+	@Override
+	public void setMeasuringActive(Measure measure) {
+		measuring = new SummaryMeasuring(this, measure);
+		if (this.canvasBounds == null) return; // fixed window size
+		// draw full graph at first because the curve area might have changed (due to new new scales)
+		drawAreaPaintControl();
+
+		if (this.canvasBounds.height == 0) return; // fixed window size
+		measuring.drawMeasuring();
 	}
 
 }

@@ -33,14 +33,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.utils.SecureHash;
 import gde.log.Logger;
+import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 
 /**
@@ -116,6 +118,20 @@ public final class ExclusionData extends Properties {
 		}
 	}
 
+	/**
+	 * @return the exclusion information for the trusses excluded from the history
+	 */
+	public static String[] getExcludedTrusses() {
+		return DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths().stream().distinct() //
+				.map(p -> {
+					String key = p.getFileName().toString();
+					String property = getInstance(p.getParent()).getProperty(key);
+					return (property.isEmpty() ? key : key + GDE.STRING_BLANK_COLON_BLANK + property);
+				}) //
+				.sorted(Collections.reverseOrder()) //
+				.toArray(String[]::new);
+	}
+
 	private ExclusionData(Path newDataFileDir) {
 		super();
 		this.dataFileDir = newDataFileDir;
@@ -124,12 +140,9 @@ public final class ExclusionData extends Properties {
 
 	@Override
 	public synchronized String toString() {
-		StringBuilder sb = new StringBuilder();
-		for (String excludedKey : new TreeSet<String>(this.stringPropertyNames())) {
-			sb.append(GDE.STRING_NEW_LINE).append(excludedKey);
-			if (!getProperty(excludedKey).isEmpty()) sb.append(GDE.STRING_BLANK_COLON_BLANK).append(getProperty(excludedKey));
-		}
-		return sb.length() > 0 ? sb.substring(1) : GDE.STRING_EMPTY;
+		return this.stringPropertyNames().stream().sorted() //
+				.map(k -> getProperty(k).isEmpty() ? k : k + GDE.STRING_BLANK_COLON_BLANK + getProperty(k)) //
+				.collect(Collectors.joining(GDE.STRING_NEW_LINE));
 	}
 
 	@Override
@@ -162,7 +175,7 @@ public final class ExclusionData extends Properties {
 			if (this.getProperty(dataFileName).isEmpty() || this.getProperty(dataFileName).contains(recordsetBaseName))
 				return this.getProperty(dataFileName);
 			else
-				return super.setProperty(dataFileName, this.getProperty(dataFileName) + GDE.STRING_COMMA_BLANK + recordsetBaseName);
+				return super.setProperty(dataFileName, this.getProperty(dataFileName) + GDE.STRING_BLANK_PLUS_BLANK + recordsetBaseName);
 		}
 	}
 
@@ -181,8 +194,7 @@ public final class ExclusionData extends Properties {
 						log.log(SEVERE, e.getLocalizedMessage(), e);
 				}
 			}
-		}
-		if (takeUserDir) {
+		} else {
 			Path exclusionsDir = getUserExclusionsDir();
 			FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
 			String fileName = SecureHash.sha1(this.dataFileDir.toString());
@@ -191,7 +203,6 @@ public final class ExclusionData extends Properties {
 					this.load(reader);
 				} catch (Throwable e) {
 					log.log(SEVERE, e.getMessage(), e);
-					e.printStackTrace();
 				}
 			}
 		}
@@ -222,8 +233,7 @@ public final class ExclusionData extends Properties {
 					else
 						log.log(SEVERE, e.getMessage(), e);
 				}
-			}
-			if (takeUserDir) {
+			} else {
 				FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
 				String fileName = SecureHash.sha1(this.dataFileDir.toString());
 				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exclusionsDir.resolve(fileName).toFile()),
@@ -231,7 +241,6 @@ public final class ExclusionData extends Properties {
 					this.store(writer, this.dataFileDir.toString());
 				} catch (Throwable e) {
 					log.log(SEVERE, e.getMessage(), e);
-					e.printStackTrace();
 				}
 			}
 		} else

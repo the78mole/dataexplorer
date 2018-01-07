@@ -27,6 +27,7 @@ import gde.device.MeasurementType;
 import gde.device.StatisticsType;
 import gde.device.TrailDisplayType;
 import gde.device.TrailTypes;
+import gde.device.TrailVisibilityType;
 import gde.ui.DataExplorer;
 
 /**
@@ -66,14 +67,14 @@ public final class MeasurementTrailSelector extends TrailSelector {
 	private boolean[] getApplicablePrimitiveTrails() {
 		final boolean[] applicablePrimitiveTrails;
 		Optional<TrailDisplayType> trailDisplay = trailRecord.channelItem.getTrailDisplay();
-		if (trailDisplay.map(x -> x.getDefaultTrail()).map(x -> x.isSuite()).orElse(false)) throw new UnsupportedOperationException(
+		if (trailDisplay.map(TrailDisplayType::getDefaultTrail).map(TrailTypes::isSuite).orElse(false)) throw new UnsupportedOperationException(
 				"suite trail must not be a device measurement default");
 
 		boolean isSmartStatistics = this.settings.isSmartStatistics();
-		boolean hideAllTrails = trailDisplay.map(x -> x.isDiscloseAll()).orElse(false);
+		boolean hideAllTrails = trailDisplay.map(TrailDisplayType::isDiscloseAll).orElse(false);
 		if (hideAllTrails) {
 			applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
-			trailDisplay.ifPresent(x -> x.getExposed().stream().map(z -> z.getTrail()) //
+			trailDisplay.ifPresent(x -> x.getExposed().stream().map(TrailVisibilityType::getTrail) //
 					.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
 					.forEach(t -> applicablePrimitiveTrails[t.ordinal()] = true));
 		} else {
@@ -83,14 +84,14 @@ public final class MeasurementTrailSelector extends TrailSelector {
 					.filter(t -> !t.isTriggered()).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
 					.forEach(t -> applicablePrimitiveTrails[t.ordinal()] = true);
 			// set visible and reset hidden trails based on device settlement settings
-			trailDisplay.ifPresent(x -> x.getDisclosed().stream().map(z -> z.getTrail()) //
+			trailDisplay.ifPresent(x -> x.getDisclosed().stream().map(TrailVisibilityType::getTrail) //
 					.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
 					.forEach(t -> applicablePrimitiveTrails[t.ordinal()] = false));
 		}
 
 		// set at least one trail if no trail is applicable
 		if (!hasTrueValues(applicablePrimitiveTrails))
-			applicablePrimitiveTrails[trailDisplay.map(x -> x.getDefaultTrail()).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
+			applicablePrimitiveTrails[trailDisplay.map(TrailDisplayType::getDefaultTrail).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
 		log.finer(() -> this.trailRecord.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
 		return applicablePrimitiveTrails;
 	}

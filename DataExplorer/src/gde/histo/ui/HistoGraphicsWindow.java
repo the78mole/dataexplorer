@@ -18,6 +18,8 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
+import java.util.Optional;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.SashForm;
@@ -40,6 +42,7 @@ import gde.ui.SWTResourceManager;
 public final class HistoGraphicsWindow extends AbstractChartWindow {
 	private final static String				$CLASS_NAME	= HistoGraphicsWindow.class.getName();
 	final static Logger								log					= Logger.getLogger($CLASS_NAME);
+
 	protected AbstractChartComposite	graphicsComposite;
 
 	private HistoGraphicsWindow(CTabFolder currentDisplayTab, int style, int index) {
@@ -62,8 +65,13 @@ public final class HistoGraphicsWindow extends AbstractChartWindow {
 	}
 
 	@Override
-	public AbstractChartComposite getGraphicsComposite() {
-		return this.graphicsComposite;
+	protected GraphicsComposite getGraphicsComposite() {
+		return (GraphicsComposite) this.graphicsComposite;
+	}
+
+	@Override
+	protected Optional<SummaryComposite> getSummaryComposite() {
+		return Optional.empty();
 	}
 
 	@Override
@@ -79,11 +87,14 @@ public final class HistoGraphicsWindow extends AbstractChartWindow {
 			this.graphicsComposite.doRedrawGraphics();
 			this.graphicsComposite.updateCaptions();
 		} else {
-			GDE.display.asyncExec(() -> {
-				if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
 
-				graphicsComposite.doRedrawGraphics();
-				graphicsComposite.updateCaptions();
+					graphicsComposite.doRedrawGraphics();
+					graphicsComposite.updateCaptions();
+				}
 			});
 		}
 	}
@@ -97,8 +108,11 @@ public final class HistoGraphicsWindow extends AbstractChartWindow {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			this.graphicsComposite.updateCaptions();
 		} else {
-			GDE.display.asyncExec(() -> {
-				graphicsComposite.updateCaptions();
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					graphicsComposite.updateCaptions();
+				}
 			});
 		}
 	}
@@ -161,6 +175,11 @@ public final class HistoGraphicsWindow extends AbstractChartWindow {
 		this.graphicsComposite.graphicsHeader.setBackground(surroundingBackground);
 		this.graphicsComposite.recordSetComment.setBackground(surroundingBackground);
 		this.graphicsComposite.doRedrawGraphics();
+	}
+
+	@Override
+	public AbstractChartComposite[] getCharts() {
+		return new AbstractChartComposite[] { graphicsComposite };
 	}
 
 }

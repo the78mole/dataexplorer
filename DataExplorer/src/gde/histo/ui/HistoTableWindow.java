@@ -21,8 +21,10 @@ package gde.histo.ui;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.FINEST;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -53,15 +55,15 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.histo.datasources.HistoSet;
-import gde.histo.exclusions.ExclusionFormatter;
+import gde.histo.exclusions.ExclusionData;
 import gde.histo.recordings.HistoTableMapper;
 import gde.histo.recordings.HistoTableMapper.DisplayTag;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
-import gde.histo.ui.menu.HistoTabAreaContextMenu;
-import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuOnDemand;
-import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuType;
+import gde.histo.ui.menu.AbstractTabAreaContextMenu;
+import gde.histo.ui.menu.AbstractTabAreaContextMenu.TabMenuOnDemand;
+import gde.histo.ui.menu.TableTabAreaContextMenu;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -73,24 +75,24 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public class HistoTableWindow extends CTabItem {
-	private final static String						$CLASS_NAME						= HistoTableWindow.class.getName();
-	private final static Logger						log										= Logger.getLogger($CLASS_NAME);
+	private final static String								$CLASS_NAME						= HistoTableWindow.class.getName();
+	private final static Logger								log										= Logger.getLogger($CLASS_NAME);
 
-	private static final int							TEXT_EXTENT_FACTOR		= 6;
+	private static final int									TEXT_EXTENT_FACTOR		= 6;
 
-	private final HistoExplorer						presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
-	private final Channels								channels							= Channels.getInstance();
-	private final Settings								settings							= Settings.getInstance();
+	private final HistoExplorer								presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
+	private final Channels										channels							= Channels.getInstance();
+	private final Settings										settings							= Settings.getInstance();
 
-	private final CTabFolder							tabFolder;
-	private final Menu										popupmenu;
-	private final HistoTabAreaContextMenu	contextMenu;
+	private final CTabFolder									tabFolder;
+	private final Menu												popupmenu;
+	private final AbstractTabAreaContextMenu	contextMenu;
 
-	private Table													dataTable;
-	private TableColumn										recordsColumn;
-	private TableCursor										cursor;
-	private Vector<Integer>								rowVector							= new Vector<Integer>(2);
-	private Vector<Integer>								topindexVector				= new Vector<Integer>(2);
+	private Table															dataTable;
+	private TableColumn												recordsColumn;
+	private TableCursor												cursor;
+	private Vector<Integer>										rowVector							= new Vector<Integer>(2);
+	private Vector<Integer>										topindexVector				= new Vector<Integer>(2);
 
 	private HistoTableWindow(CTabFolder dataTab, int style, int position) {
 		super(dataTab, style, position);
@@ -101,7 +103,7 @@ public class HistoTableWindow extends CTabItem {
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0793));
 
 		this.popupmenu = new Menu(DataExplorer.getInstance().getShell(), SWT.POP_UP);
-		this.contextMenu = new HistoTabAreaContextMenu();
+		this.contextMenu = new TableTabAreaContextMenu();
 	}
 
 	public static HistoTableWindow create(CTabFolder dataTab, int style, int position) {
@@ -283,7 +285,7 @@ public class HistoTableWindow extends CTabItem {
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
 				}
-				HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
+				HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
 				log.finer(() -> "DataTag.FILE_PATH=" + HistoTableWindow.this.popupmenu.getData(TabMenuOnDemand.DATA_FILE_PATH.name())); //$NON-NLS-1$
 			}
 		});
@@ -377,7 +379,7 @@ public class HistoTableWindow extends CTabItem {
 				}
 			}
 		});
-		this.contextMenu.createMenu(this.popupmenu, TabMenuType.HISTOTABLE);
+		this.contextMenu.createMenu(this.popupmenu);
 		this.cursor.setMenu(this.popupmenu);
 	}
 

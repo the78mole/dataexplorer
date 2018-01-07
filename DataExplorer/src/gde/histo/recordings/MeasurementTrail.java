@@ -19,15 +19,20 @@
 
 package gde.histo.recordings;
 
+import java.util.Arrays;
+
+import gde.data.Record.DataType;
 import gde.device.MeasurementType;
+import gde.histo.cache.DataTypes;
 import gde.histo.cache.ExtendedVault;
+import gde.histo.datasources.HistoSet;
 
 /**
  * Trail records containing measurement values.
  * @author Thomas Eickert (USER)
  */
 public final class MeasurementTrail extends TrailRecord {
-	private final static long		serialVersionUID	= 110124007964748556L;
+	private final static long serialVersionUID = 110124007964748556L;
 
 	/**
 	 * @param newOrdinal
@@ -62,6 +67,34 @@ public final class MeasurementTrail extends TrailRecord {
 	@Override
 	public Integer getVaultPoint(ExtendedVault vault, int trailOrdinal) {
 		return vault.getMeasurementPoint(this.getOrdinal(), trailOrdinal);
+	}
+
+	@Override
+	public boolean hasVaultOutliers(ExtendedVault vault) {
+		return vault.hasMeasurementOutliers(this.getOrdinal());
+	}
+
+	@Override
+	public boolean hasVaultScraps(ExtendedVault vault) {
+		return vault.hasMeasurementScraps(this.getOrdinal());
+	}
+
+	@Override
+	public double[] getVaultOutliers(ExtendedVault vault) {
+		int[] points = vault.getMeasurementOutliers(this.getOrdinal());
+		return Arrays.stream(points).mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.)).toArray();
+	}
+
+	@Override
+	public double[] getVaultScraps(ExtendedVault vault) {
+		int[] points = vault.getMeasurementScraps(this.getOrdinal());
+		return Arrays.stream(points).mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.)).toArray();
+	}
+
+	@Override
+	public DataType getVaultDataType(ExtendedVault vault) {
+		DataTypes dataType = vault.getMeasurementDataType(this.getOrdinal());
+		return dataType != null ? DataTypes.toDataType(dataType) : null;
 	}
 
 }

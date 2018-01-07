@@ -21,9 +21,6 @@ package gde.histo.ui;
 
 import org.eclipse.swt.graphics.Point;
 
-import gde.histo.recordings.TrailRecord;
-import gde.histo.recordings.TrailRecordCutter;
-
 /**
  * Measure one single timestep or a time delta interactively.
  * @author Thomas Eickert (USER)
@@ -65,25 +62,5 @@ public abstract class AbstractMeasuring {
 	 * Reset the identified vertical line.
 	 */
 	public abstract void processMouseUpAction(Point point);
-
-	public boolean isDeltaMeasure() {
-		return measure.isDeltaMeasure;
-	}
-
-	public TrailRecord getTrailRecord() {
-		return measure.measureRecord;
-	}
-
-	public long getTimestampMeasure_ms() {
-		return measure.timestampMeasure_ms;
-	}
-
-	public long getTimestampDelta_ms() {
-		return measure.timestampDelta_ms;
-	}
-
-	public TrailRecordCutter getRecordSection() {
-		return measure.recordSection;
-	}
 
 }

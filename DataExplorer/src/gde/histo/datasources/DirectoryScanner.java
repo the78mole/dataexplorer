@@ -378,7 +378,7 @@ public final class DirectoryScanner {
 		public boolean load(String desiredRecordSetName) {
 			if (!FileUtils.checkFileExist(path.toString())) return false;
 
-			if (path.endsWith(GDE.FILE_ENDING_DOT_OSD)) {
+			if (path.toString().endsWith(GDE.FILE_ENDING_DOT_OSD)) {
 				new FileHandler().openOsdFile(path.toString(), desiredRecordSetName);
 				return true;
 			} else if (device instanceof IHistoDevice) {

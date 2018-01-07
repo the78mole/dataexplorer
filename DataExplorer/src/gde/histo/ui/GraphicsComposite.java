@@ -23,10 +23,13 @@ import static java.util.logging.Level.SEVERE;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
@@ -39,8 +42,6 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
@@ -54,16 +55,14 @@ import gde.config.Settings;
 import gde.data.Channels;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
-import gde.histo.exclusions.ExclusionFormatter;
+import gde.histo.exclusions.ExclusionData;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.DataTag;
-import gde.histo.ui.menu.HistoTabAreaContextMenu;
-import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuOnDemand;
-import gde.histo.ui.menu.HistoTabAreaContextMenu.TabMenuType;
+import gde.histo.ui.menu.AbstractTabAreaContextMenu.TabMenuOnDemand;
+import gde.histo.ui.menu.ChartTabAreaContextMenu;
 import gde.histo.utils.HistoCurveUtils;
 import gde.histo.utils.HistoTimeLine;
-import gde.log.Level;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -82,13 +81,6 @@ public final class GraphicsComposite extends AbstractChartComposite {
 
 	private final HistoTimeLine	timeLine		= new HistoTimeLine();
 
-	// mouse actions
-	private int									xDown				= 0;
-	private int									xUp					= 0;
-	private int									xLast				= 0;
-	private int									yDown				= 0;
-	private int									yUp					= 0;
-
 	GraphicsComposite(SashForm useParent, CTabItem parentWindow) {
 		super(useParent, parentWindow, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
@@ -99,7 +91,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		this.curveAreaBorderColor = this.settings.getGraphicsCurvesBorderColor();
 
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
-		this.contextMenu = new HistoTabAreaContextMenu();
+		this.contextMenu = new ChartTabAreaContextMenu();
 
 		init();
 
@@ -111,7 +103,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		this.setDragDetect(false);
 		this.setBackground(this.surroundingBackground);
 
-		this.contextMenu.createMenu(this.popupmenu, TabMenuType.HISTOGRAPHICS);
+		this.contextMenu.createMenu(this.popupmenu);
 
 		// help lister does not get active on Composite as well as on Canvas
 		this.addListener(SWT.Resize, new Listener() {
@@ -254,44 +246,9 @@ public final class GraphicsComposite extends AbstractChartComposite {
 	 */
 	private void drawAreaPaintControl(PaintEvent evt) {
 		log.finest(() -> "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
+		long nanoTime = System.nanoTime();
 		drawAreaPaintControl();
-	}
-
-	/**
-	 * Draw the containing records and sets the comment.
-	 */
-	public void drawAreaPaintControl() {
-		long startTime = new Date().getTime();
-		// Get the canvas and its dimensions
-		this.canvasBounds = this.graphicCanvas.getClientArea();
-		log.log(Level.FINER, "canvas size = ", this.canvasBounds); //$NON-NLS-1$
-
-		if (this.canvasImage != null) this.canvasImage.dispose();
-		this.canvasImage = new Image(GDE.display, this.canvasBounds);
-		this.canvasImageGC = new GC(this.canvasImage); // SWTResourceManager.getGC(this.canvasImage);
-		this.canvasImageGC.setBackground(this.surroundingBackground);
-		this.canvasImageGC.fillRectangle(this.canvasBounds);
-		this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		// get gc for other drawing operations
-		this.canvasGC = new GC(this.graphicCanvas);
-
-		setRecordSetCommentStandard();
-		windowActor.setStatusMessage(GDE.STRING_EMPTY);
-
-		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
-			drawCurves();
-			this.canvasGC.drawImage(this.canvasImage, 0, 0);
-			// changed curve selection may change the scale end values
-			trailRecordSet.syncScaleOfSyncableRecords();
-
-			windowActor.drawMeasuring();
-		} else
-			this.canvasGC.drawImage(this.canvasImage, 0, 0);
-
-		this.canvasGC.dispose();
-		this.canvasImageGC.dispose();
-		log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
+		log.time(() -> "drawTime=" + StringHelper.getFormatedTime("ss:SSS", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime)));
 	}
 
 	/**
@@ -336,25 +293,23 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			Point point = checkCurveBounds(evt.x, evt.y);
-			this.xDown = point.x;
-			this.yDown = point.y;
 
 			if (evt.button == 1) {
 				windowActor.processMouseDownAction(point);
-			}
-		} else if (evt.button == 3) { // right button
-			popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
-			popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), ExclusionFormatter.getExcludedTrussesAsText());
-			if (this.xDown > 0 && this.xDown < this.curveAreaBounds.width) {
-				Map<DataTag, String> dataTags = trailRecordSet.getDataTags(trailRecordSet //
-						.getIndex(timeLine.getAdjacentTimestamp(this.xDown))); // is already relative to curve area
-				popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
-				popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
-				popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
-			} else {
-				popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
-				popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
-				popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
+			} else if (evt.button == 3) { // right button
+				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
+				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
+				if (point.x > 0 && point.x < this.curveAreaBounds.width) {
+					Map<DataTag, String> dataTags = trailRecordSet.getDataTags(trailRecordSet //
+							.getIndex(timeLine.getAdjacentTimestamp(point.x))); // is already relative to curve area
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
+					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
+				} else {
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
+					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
+				}
 			}
 		}
 	}
@@ -368,8 +323,6 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (this.canvasImage != null && trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			Point point = checkCurveBounds(evt.x, evt.y);
-			this.xUp = point.x;
-			this.yUp = point.y;
 
 			if (evt.button == 1) {
 				windowActor.processMouseUpAction(point);
@@ -397,15 +350,30 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		canvasImageGC.drawLine(curveAreaBounds.x - 1, curveAreaBounds.y - 1, curveAreaBounds.x - 1, y0); // left fence
 		canvasImageGC.drawLine(xMax + 1, curveAreaBounds.y - 1, xMax + 1, y0); // right fence
 
-		// initialize early in order to avoid problems in mouse move events
-		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-		this.timeLine.initialize(trailRecordSet, curveAreaBounds);
 		this.timeLine.drawTimeLine(canvasImageGC);
 
 		long startTime = new Date().getTime();
 		drawTrailRecordSet(dataScaleWidth);
-		log.fine(() -> "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() //$NON-NLS-1$ //$NON-NLS-2$
-				- startTime)));
+		log.fine(() -> "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startTime)));
+	}
+
+	/**
+	 *
+	 */
+	@Override
+	protected void defineLayoutParams() {
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
+		this.timeLine.initialize(trailRecordSet, curveAreaBounds);
+
+		// sync scales are used for suites (e.g. boxplot) AND synced records
+		trailRecordSet.updateSyncGraphicsScale();
+		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
+			TrailRecord actualRecord = trailRecordSet.getRecordsSortedForDisplay()[i];
+			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
+			if (isActualRecordEnabled) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
+					actualRecord.getName(), actualRecord.isVisible(), actualRecord.isDisplayable(), actualRecord.isScaleSynced(), actualRecord.isScaleVisible()));
+			setRecordDisplayValues(actualRecord);
+		}
 	}
 
 	/**
@@ -423,16 +391,13 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		boolean isDrawNameInRecordColor = settings.isDrawNameInRecordColor();
 		boolean isDrawNumbersInRecordColor = settings.isDrawNumbersInRecordColor();
 
-		// sync scales are used for suites (e.g. boxplot) AND synced records
-		trailRecordSet.updateSyncRecordScale(); // should be better done in case of trail selection
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
 			TrailRecord actualRecord = trailRecordSet.getRecordsSortedForDisplay()[i];
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			if (isActualRecordEnabled) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
 					actualRecord.getName(), actualRecord.isVisible(), actualRecord.isDisplayable(), actualRecord.isScaleSynced(), actualRecord.isScaleVisible()));
-			int[] numberTickMarks = setRecordDisplayValues(actualRecord);
 			if (actualRecord.isScaleVisible())
-				HistoCurveUtils.drawHistoScale(actualRecord, canvasImageGC, curveAreaBounds, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, numberTickMarks);
+				HistoCurveUtils.drawHistoScale(actualRecord, canvasImageGC, curveAreaBounds, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
 
 			if (isCurveGridEnabled && actualRecord.getOrdinal() == trailRecordSet.getValueGridRecordOrdinal()) // check for activated horizontal grid
 				HistoCurveUtils.drawCurveGrid(trailRecordSet, canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
@@ -473,11 +438,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		return numberLeftRightScales;
 	}
 
-	/**
-	 * @param record
-	 * @return the number of ticks {numberTicks, numberMiniTicks}
-	 */
-	private int[] setRecordDisplayValues(TrailRecord record) { // todo simplify the implementation
+	private void setRecordDisplayValues(TrailRecord record) { // todo simplify the implementation
 		int[] numberTickMarks = new int[] { 10, 5 };
 
 		// (yMaxValue - yMinValue) defines the area to be used for the curve
@@ -535,26 +496,22 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		}
 		record.setMinMaxScaleValue(yMinValueDisplay, yMaxValueDisplay);
 		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
-		return numberTickMarks;
+		record.getGraphics().setNumberTickMarks(numberTickMarks);
 	}
 
+	@Override
 	public void setMeasuringActive(Measure measure) {
+		measuring = new GraphicsMeasuring(this, measure);
+		if (this.canvasBounds == null) return; // fixed window size
 		// draw full graph at first because the curve area might have changed (due to new new scales)
 		drawAreaPaintControl();
 
-		measuring = new GraphicsMeasuring(this, measure);
+		// if (this.canvasBounds.height == 0) return; // fixed window size
 		measuring.drawMeasuring();
-	}
-
-	/**
-	 * Reset the graphic area and comment.
-	 */
-	public void cleanMeasuring() {
-		measuring.cleanMeasuring();
-		measuring = null;
 	}
 
 	public HistoTimeLine getTimeLine() {
 		return this.timeLine;
 	}
+
 }

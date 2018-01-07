@@ -55,7 +55,7 @@ public final class ScoregroupTrailSelector extends TrailSelector {
 	}
 
 	@Override
-	protected void setExtremumOrdinals() {
+	protected void setExtremumIndices() {
 		List<ScoreType> scoreTypes = ((ScoreGroupType) trailRecord.channelItem).getScore();
 		// find the score labels with a name containing min/max
 		int index4Min = -1, index4Max = -1;
@@ -63,10 +63,10 @@ public final class ScoregroupTrailSelector extends TrailSelector {
 			if (scoreTypes.get(i).getLabel().name().contains("MIN")) index4Min = i;
 			if (scoreTypes.get(i).getLabel().name().contains("MAX")) index4Max = i;
 		}
-		if (index4Min != -1 && index4Max != -1) {
-			extremumOrdinals = new int[] { index4Min, index4Max };
+		if (index4Min == -1 || index4Max == -1) {
+			extremumIndices = new int[] { 0, 0 };
 		} else {
-			extremumOrdinals = new int[] { 0, 0 };
+			extremumIndices = new int[] { index4Min, index4Max };
 		}
 	}
 

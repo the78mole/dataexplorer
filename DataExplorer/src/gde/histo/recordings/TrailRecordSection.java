@@ -19,14 +19,16 @@
 
 package gde.histo.recordings;
 
-import static gde.histo.utils.ElaborateTukeyQuantile.CLOSE_OUTLIER_LIMIT;
-import static gde.histo.utils.ElaborateTukeyQuantile.INTER_QUARTILE_SIGMA;
+import static gde.histo.utils.ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR;
+import static gde.histo.utils.UniversalQuantile.CLOSE_OUTLIER_LIMIT;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import gde.GDE;
+import gde.histo.utils.ElementaryQuantile;
 import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
 import gde.histo.utils.Spot;
@@ -37,23 +39,30 @@ import gde.log.Logger;
  * Define a view on a section of the trail record.
  * @author Thomas Eickert
  */
-public final class TrailRecordCutter {
-	private final static String											$CLASS_NAME	= TrailRecordCutter.class.getName();
+public final class TrailRecordSection {
+	private final static String											$CLASS_NAME	= TrailRecordSection.class.getName();
 	private final static Logger											log					= Logger.getLogger($CLASS_NAME);
 
 	private final TrailRecord												trailrecord;
+	private final long															lowestTimeStamp_ms;
+	private final long															topTimeStamp_ms;
 	private final SingleResponseRegression<Double>	regression;
-	private final UniversalQuantile<Double>					quantile;
+	private final ElementaryQuantile<Double>				quantile;
+	private final int[]															indexFirstLast;
 
-	public TrailRecordCutter(TrailRecord trailrecord, long timeStamp1_ms, long timeStamp2_ms) {
+	public TrailRecordSection(TrailRecord trailrecord, long timeStamp1_ms, long timeStamp2_ms) {
+		if (timeStamp1_ms <= 0 || timeStamp2_ms <= 0) throw new IllegalArgumentException();
 		this.trailrecord = trailrecord;
+		this.lowestTimeStamp_ms = Math.min(timeStamp1_ms, timeStamp2_ms);
+		this.topTimeStamp_ms = Math.max(timeStamp1_ms, timeStamp2_ms);
 
-		List<Spot<Double>> subPoints = trailrecord.getSubPoints(timeStamp1_ms, timeStamp2_ms);
+		this.indexFirstLast = trailrecord.defineRangeIndices(timeStamp1_ms, timeStamp2_ms);
+		List<Spot<Double>> subPoints = trailrecord.getSubPoints(indexFirstLast[0], indexFirstLast[1] + 1);
 		if (!subPoints.isEmpty()) {
-			this.quantile = new UniversalQuantile<>(subPoints); // take all points for display
+			this.quantile = new ElementaryQuantile<Double>(subPoints); // take all points for display
 
-			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, INTER_QUARTILE_SIGMA,
-					CLOSE_OUTLIER_LIMIT); // todo check if removing such close outliers is correct
+			// todo check if removing such close outliers is correct
+			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, INTER_QUARTILE_SIGMA_FACTOR, CLOSE_OUTLIER_LIMIT);
 
 			// eliminate Tukey outliers for regression
 			List<Double> outliers = tmpQuantile.getOutliers();
@@ -65,9 +74,7 @@ public final class TrailRecordCutter {
 			this.regression = new SingleResponseRegression<>(subPoints, RegressionType.QUADRATIC);
 			log.finer(() -> String.format("xAxisSize=%d regressionRealSize=%d starts at %tF %tR", //
 					this.quantile.getSize(), this.regression.getRealSize(), new Date(timeStamp1_ms), new Date(timeStamp1_ms)));
-		} else
-
-		{
+		} else {
 			this.regression = null;
 			this.quantile = null;
 		}
@@ -126,6 +133,27 @@ public final class TrailRecordCutter {
 	 */
 	public String getFormattedBoundsSlope() {
 		return new TrailRecordFormatter(this.trailrecord).getScaleValue(this.regression.getSlope() * GDE.ONE_HOUR_MS * 24 * 365 / 12);
+	}
+
+	public long getLowestTimeStamp_ms() {
+		return this.lowestTimeStamp_ms;
+	}
+
+	public long getTopTimeStamp_ms() {
+		return this.topTimeStamp_ms;
+	}
+
+	public boolean isSectionTimeStamp(long timeStamp_ms) {
+		return timeStamp_ms >= this.lowestTimeStamp_ms && timeStamp_ms <= this.topTimeStamp_ms;
+	}
+
+	public int[] getIndexFirstLast() {
+		return this.indexFirstLast;
+	}
+
+	@Override
+	public String toString() {
+		return "[lowestTimeStamp_ms=" + this.lowestTimeStamp_ms + ", topTimeStamp_ms=" + this.topTimeStamp_ms + ", indexFirstLast=" + Arrays.toString(this.indexFirstLast) + ", trailrecord=" + this.trailrecord + " ]";
 	}
 
 }

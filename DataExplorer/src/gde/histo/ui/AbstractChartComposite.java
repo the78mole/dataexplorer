@@ -22,8 +22,8 @@ package gde.histo.ui;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
-import java.util.Date;
 import java.util.Optional;
+import java.util.logging.Level;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
@@ -42,65 +42,67 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.AbstractChartWindow.WindowActor;
-import gde.histo.ui.menu.HistoTabAreaContextMenu;
+import gde.histo.ui.menu.AbstractTabAreaContextMenu;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.GraphicsUtils;
-import gde.utils.StringHelper;
 
 /**
  * Histo chart drawing area base class.
  * @author Thomas Eickert (USER)
  */
 public abstract class AbstractChartComposite extends Composite {
-	private final static String				$CLASS_NAME					= SummaryComposite.class.getName();
-	private final static Logger				log									= Logger.getLogger($CLASS_NAME);
+	private final static String						$CLASS_NAME					= AbstractChartComposite.class.getName();
+	private final static Logger						log									= Logger.getLogger($CLASS_NAME);
 
-	protected final static int				DEFAULT_TOP_GAP			= 5;																// space on top of the curves
-	protected final static int				DEFAULT_SIDE_GAP		= 10;																// space at the leftmost and rightmost graphics
-	protected final static int				DEFAULT_BOTTOM_GAP	= 20;																// space at the bottom of the plots for the scale
-	protected final static int				DEFAULT_HEADER_GAP	= 5;
-	protected final static int				DEFAULT_COMMENT_GAP	= 5;
+	protected final static int						DEFAULT_TOP_GAP			= 5;																			// on top of the curves
+	protected final static int						DEFAULT_SIDE_GAP		= 10;																			// at the leftmost and rightmost graphics
+	protected final static int						DEFAULT_BOTTOM_GAP	= 20;																			// at the bottom of the plots for the scale
+	protected final static int						DEFAULT_HEADER_GAP	= 5;
+	protected final static int						DEFAULT_COMMENT_GAP	= 5;
 
-	protected final static int				ZERO_CANVAS_HEIGHT	= 11;																// minimize if smart statistics is not active
+	protected final static int						ZERO_CANVAS_HEIGHT	= 11;																			// minimize if smart statistics is not active
 
-	protected final DataExplorer			application					= DataExplorer.getInstance();
-	protected final Settings					settings						= Settings.getInstance();
+	protected final DataExplorer					application					= DataExplorer.getInstance();
+	protected final Settings							settings						= Settings.getInstance();
 
-	protected final WindowActor				windowActor;
+	protected final WindowActor						windowActor;
 
-	protected Menu										popupmenu;
-	protected HistoTabAreaContextMenu	contextMenu;
+	protected Menu												popupmenu;
+	protected AbstractTabAreaContextMenu	contextMenu;
 
-	protected Color										curveAreaBackground;
-	protected Color										surroundingBackground;
-	protected Color										curveAreaBorderColor;
+	protected Color												curveAreaBackground;
+	protected Color												surroundingBackground;
+	protected Color												curveAreaBorderColor;
 
-	protected Text										graphicsHeader;
-	protected Text										recordSetComment;
-	protected Text										xScale;
-	protected Canvas									graphicCanvas;
-	int																headerHeight				= 0;
-	int																headerGap						= 0;
-	int																commentHeight				= 0;
-	int																commentGap					= 0;
-	int																xScaleHeight				= 0;
-	protected String									graphicsHeaderText;
+	protected Text												graphicsHeader;
+	protected Text												recordSetComment;
+	protected Text												xScale;
+	protected Canvas											graphicCanvas;
+	int																		headerHeight				= 0;
+	int																		headerGap						= 0;
+	int																		commentHeight				= 0;
+	int																		commentGap					= 0;
+	int																		xScaleHeight				= 0;
+	protected String											graphicsHeaderText;
 
-	protected Rectangle								canvasBounds;
-	protected Image										canvasImage;
-	protected GC											canvasImageGC;
-	protected GC											canvasGC;
-	protected Rectangle								curveAreaBounds			= new Rectangle(0, 0, 1, 1);
-	protected int											fixedCanvasY				= -1;
-	protected int											fixedCanvasHeight		= -1;
+	/**
+	 * Holds multiple sash children.
+	 */
+	protected Rectangle										canvasBounds;
+	protected Image												canvasImage;
+	protected GC													canvasImageGC;
+	protected GC													canvasGC;
+	protected Rectangle										curveAreaBounds			= new Rectangle(0, 0, 1, 1);
+	protected int													fixedCanvasY				= -1;
+	protected int													fixedCanvasHeight		= -1;
 
 	/** composite size - control resized */
-	protected Point										oldSize							= new Point(0, 0);
-	protected AbstractMeasuring				measuring;
+	protected Point												oldSize							= new Point(0, 0);
+	protected AbstractMeasuring						measuring;
 
 	/**
 	 * Returns the value nearest to {@code value} which is within the closed range {@code [min..max]}.
@@ -137,8 +139,11 @@ public abstract class AbstractChartComposite extends Composite {
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			doRedrawGraphics();
 		} else {
-			GDE.display.asyncExec(() -> {
-				doRedrawGraphics();
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					doRedrawGraphics();
+				}
 			});
 		}
 	}
@@ -148,7 +153,7 @@ public abstract class AbstractChartComposite extends Composite {
 	 */
 	protected synchronized void doRedrawGraphics() {
 		if (!GDE.IS_LINUX) { // old code changed due to Mountain Lion refresh problems
-			log.off(() -> "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update"); //$NON-NLS-1$
+			log.finer(() -> "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update"); //$NON-NLS-1$
 			Point size = this.graphicCanvas.getSize();
 			this.graphicCanvas.redraw(5, 5, 5, 5, true); // image based - let OS handle the update
 			this.graphicCanvas.redraw(size.x - 5, 5, 5, 5, true);
@@ -232,18 +237,18 @@ public abstract class AbstractChartComposite extends Composite {
 		int width = graphicsBounds.width;
 		int height = this.headerHeight;
 		this.graphicsHeader.setBounds(x, y, width, height);
-		log.finer(() -> "recordSetHeader.setBounds " + this.graphicsHeader.getBounds()); //$NON-NLS-1$
+		log.log(Level.FINER, "recordSetHeader.setBounds " + this.graphicsHeader.getBounds()); //$NON-NLS-1$
 
 		y = this.fixedCanvasY < 0 ? this.headerGap + this.headerHeight : this.fixedCanvasY;
 		height = this.fixedCanvasHeight < 0 ? graphicsBounds.height - (this.headerGap + this.commentGap + this.commentHeight + this.headerHeight)
 				: this.fixedCanvasHeight + this.headerGap + DEFAULT_BOTTOM_GAP;
 		this.graphicCanvas.setBounds(x, y, width, height);
-		log.finer(() -> "graphicCanvas.setBounds " + this.graphicCanvas.getBounds()); //$NON-NLS-1$
+		log.log(Level.FINER, "graphicCanvas.setBounds ", this.graphicCanvas.getBounds()); //$NON-NLS-1$
 
 		y += height + this.commentGap;
 		height = this.commentHeight;
 		this.recordSetComment.setBounds(20, y, width - 40, height - 5);
-		log.finer(() -> "recordSetComment.setBounds " + this.recordSetComment.getBounds()); //$NON-NLS-1$
+		log.log(Level.FINER, "recordSetComment.setBounds " + this.recordSetComment.getBounds()); //$NON-NLS-1$
 	}
 
 	/**
@@ -259,6 +264,7 @@ public abstract class AbstractChartComposite extends Composite {
 		this.fixedCanvasY = fixedY;
 		this.fixedCanvasHeight = fixedHeight;
 		log.finer(() -> "y = " + fixedY + "  height = " + fixedHeight); //$NON-NLS-1$
+		setComponentBounds();
 	}
 
 	/**
@@ -302,15 +308,14 @@ public abstract class AbstractChartComposite extends Composite {
 	 * Draw the record graphs with their scales and define the curve area.
 	 */
 	protected void drawCurves() {
-		long startInitTime = new Date().getTime();
+		// changed curve selection may change the scale end values
+		windowActor.getTrailRecordSet().syncScaleOfSyncableRecords();
+
 		int dataScaleWidth = defineDataScaleWidth();
 		curveAreaBounds = defineCurveAreaBounds(dataScaleWidth, defineNumberLeftRightScales());
-		log.off(() -> "draw init time   =  " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startInitTime)));
+		defineLayoutParams(); // initialize early in order to avoid problems in mouse move events
 
-		TrailRecordSet trailRecordSet = windowActor.getTrailRecordSet();
-		if (trailRecordSet.getTimeStepSize() > 0) {
-			drawCurveArea(dataScaleWidth);
-		}
+		drawCurveArea(dataScaleWidth);
 	}
 
 	/**
@@ -394,5 +399,54 @@ public abstract class AbstractChartComposite extends Composite {
 	public Optional<AbstractMeasuring> getMeasuring() {
 		return Optional.ofNullable(this.measuring);
 	}
+
+	public abstract void setMeasuringActive(Measure measure);
+
+	/**
+	 * Reset the graphic area and comment.
+	 */
+	public void cleanMeasuring() {
+		measuring.cleanMeasuring();
+		measuring = null;
+	}
+
+	/**
+	 * Draw the containing records and sets the comment.
+	 */
+	public void drawAreaPaintControl() {
+		// Get the canvas and its dimensions
+		this.canvasBounds = this.graphicCanvas.getClientArea();
+
+		if (this.canvasImage != null) this.canvasImage.dispose();
+		this.canvasImage = new Image(GDE.display, this.canvasBounds);
+		this.canvasImageGC = new GC(this.canvasImage); // SWTResourceManager.getGC(this.canvasImage);
+		this.canvasImageGC.setBackground(this.surroundingBackground);
+		this.canvasImageGC.fillRectangle(this.canvasBounds);
+		this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		// get gc for other drawing operations
+		this.canvasGC = new GC(this.graphicCanvas);
+
+		setRecordSetCommentStandard();
+		windowActor.setStatusMessage(GDE.STRING_EMPTY);
+
+		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
+		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
+			drawCurves();
+			this.canvasGC.drawImage(this.canvasImage, 0, 0);
+
+			this.canvasGC.dispose();
+			if (measuring != null) measuring.drawMeasuring();
+		} else {
+			this.canvasGC.drawImage(this.canvasImage, 0, 0);
+			this.canvasGC.dispose();
+		}
+
+		this.canvasImageGC.dispose();
+	}
+
+	/**
+	 * Make drawing independent from layout data creation.
+	 */
+	protected abstract void defineLayoutParams();
 
 }

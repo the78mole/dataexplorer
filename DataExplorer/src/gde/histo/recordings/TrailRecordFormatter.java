@@ -19,16 +19,20 @@
 
 package gde.histo.recordings;
 
-import gde.GDE;
-import gde.device.IDevice;
-import gde.device.TrailTypes;
-import gde.histo.datasources.HistoSet;
-import gde.log.Logger;
-import gde.ui.DataExplorer;
-import gde.utils.StringHelper;
-
 import java.text.DecimalFormat;
 import java.util.Vector;
+import java.util.stream.Collectors;
+
+import gde.GDE;
+import gde.device.TrailTypes;
+import gde.histo.datasources.HistoSet;
+import gde.histo.recordings.TrailRecord.Summary;
+import gde.histo.recordings.TrailRecordSet.Outliers;
+import gde.histo.ui.data.SummarySpots.OutlierWarning;
+import gde.log.Logger;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.utils.StringHelper;
 
 /**
  * Output formatting based on trailRecord data.
@@ -47,8 +51,6 @@ public final class TrailRecordFormatter {
 
 	/**
 	 * Define category based on the magnitude and the delta span of the values.
-	 * @param value1
-	 * @param value2
 	 */
 	private static DecimalFormat getDecimalFormat(double value1, double value2) {
 		DecimalFormat df = new DecimalFormat();
@@ -85,12 +87,10 @@ public final class TrailRecordFormatter {
 		return df;
 	}
 
-	private final IDevice			device	= DataExplorer.getInstance().getActiveDevice();
-
-	private final TrailRecord	trailRecord;
+	private final TrailRecord	record;
 
 	public TrailRecordFormatter(TrailRecord trailRecord) {
-		this.trailRecord = trailRecord;
+		this.record = trailRecord;
 	}
 
 	/**
@@ -101,7 +101,7 @@ public final class TrailRecordFormatter {
 		DecimalFormat df = new DecimalFormat();
 		switch (newNumberFormat) {
 		case -1:
-			df = getDecimalFormat(this.trailRecord.getMaxScaleValue(), this.trailRecord.getMinScaleValue());
+			df = getDecimalFormat(this.record.getMaxScaleValue(), this.record.getMinScaleValue());
 			break;
 		case 0:
 			df.applyPattern("0"); //$NON-NLS-1$
@@ -126,8 +126,8 @@ public final class TrailRecordFormatter {
 	 * @return decimal formatted value
 	 */
 	public String getRangeValue(double finalValue, double range) {
-		if (this.device.isGPSCoordinates(this.trailRecord)) {
-			if (this.trailRecord.getUnit().endsWith("'")) //$NON-NLS-1$
+		if (HistoSet.isGpsCoordinates(this.record)) {
+			if (this.record.getUnit().endsWith("'")) //$NON-NLS-1$
 				return StringHelper.getFormatedWithMinutes("%2d %04.1f", finalValue); //$NON-NLS-1$
 			else
 				return getDecimalFormat(finalValue, finalValue + range).format(finalValue);
@@ -140,13 +140,13 @@ public final class TrailRecordFormatter {
 	 * @return decimal formatted value based on record's format
 	 */
 	public String getScaleValue(double finalValue) {
-		if (this.device.isGPSCoordinates(this.trailRecord)) {
-			if (this.trailRecord.getUnit().endsWith("'")) //$NON-NLS-1$
+		if (HistoSet.isGpsCoordinates(this.record)) {
+			if (this.record.getUnit().endsWith("'")) //$NON-NLS-1$
 				return StringHelper.getFormatedWithMinutes("%2d %04.1f", finalValue); //$NON-NLS-1$
 			else
-				return this.trailRecord.getDecimalFormat().format(finalValue);
+				return this.record.getDecimalFormat().format(finalValue);
 		} else
-			return this.trailRecord.getDecimalFormat().format(finalValue);
+			return this.record.getDecimalFormat().format(finalValue);
 	}
 
 	/**
@@ -171,7 +171,7 @@ public final class TrailRecordFormatter {
 	 * @return the translated and formatted and truncated value also for GPS coordinates
 	 */
 	private String getTruncatedTableValue(int suiteOrdinal, int index, int length) {
-		return trunc(getTableValue(this.trailRecord.getSuiteRecords().get(suiteOrdinal).get(index) / 1000.), length);
+		return trunc(getTableValue(this.record.getSuiteRecords().get(suiteOrdinal).get(index) / 1000.), length);
 	}
 
 	/**
@@ -180,7 +180,7 @@ public final class TrailRecordFormatter {
 	 * @return the translated and decimal formatted value at the given index or a standard string in case of a null value
 	 */
 	public String getMeasureValue(int index) {
-		final Vector<Integer> points = this.trailRecord.getPoints();
+		final Vector<Integer> points = this.record.getPoints();
 
 		if (points.elementAt(index) != null) {
 			return getTableValue(points.elementAt(index) / 1000.);
@@ -194,15 +194,15 @@ public final class TrailRecordFormatter {
 	 */
 	public String getTableValue(double value) {
 		final String formattedValue;
-		if (this.device.isGPSCoordinates(this.trailRecord)) {
+		if (HistoSet.isGpsCoordinates(this.record)) {
 			// if (this.getDataType() == DataType.GPS_LATITUDE etc ???
-			if (this.trailRecord.getUnit().endsWith("'")) { //$NON-NLS-1$
-				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", HistoSet.decodeVaultValue(this.trailRecord, value)).trim(); //$NON-NLS-1$
+			if (this.record.getUnit().endsWith("'")) { //$NON-NLS-1$
+				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", HistoSet.decodeVaultValue(this.record, value)).trim(); //$NON-NLS-1$
 			} else {
-				formattedValue = String.format("%8.6f", HistoSet.decodeVaultValue(this.trailRecord, value)); //$NON-NLS-1$
+				formattedValue = String.format("%8.6f", HistoSet.decodeVaultValue(this.record, value)); //$NON-NLS-1$
 			}
 		} else {
-			formattedValue = this.trailRecord.getDecimalFormat().format(HistoSet.decodeVaultValue(this.trailRecord, value));
+			formattedValue = this.record.getDecimalFormat().format(HistoSet.decodeVaultValue(this.record, value));
 		}
 		return formattedValue;
 	}
@@ -212,7 +212,87 @@ public final class TrailRecordFormatter {
 	 * @return the formatted value also for GPS coordinates
 	 */
 	public String getTableValue(int index) {
-		return getTableValue(this.trailRecord.elementAt(index) / 1000.);
+		return getTableValue(this.record.elementAt(index) / 1000.);
+	}
+
+	public String defineFormattedMinWarning() {
+		Summary summary = record.getSummary();
+		Outliers outliers = summary.getMinMaxWarning()[0];
+		if (outliers == null) {
+			return new String();
+		} else if (outliers.getWarningType() == OutlierWarning.WHISKER) {
+			double formatComparisonValue = summary.defineScaleMax() - summary.defineScaleMin();
+			String values = outliers.getDecodedValues().stream() //
+					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
+			String fileNames = outliers.getIndices().stream().map(i -> record.getParent().getPickedVaults().getVault(i)) //
+					.map(v -> v.getLogFileAsPath().getFileName().toString()).collect(Collectors.joining(", "));
+			return outliers.getSelectText() //
+					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getFarLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) //
+					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
+		} else {
+			double formatComparisonValue = summary.defineScaleMax() - summary.defineScaleMin();
+			String values = outliers.getDecodedValues().stream() //
+					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
+			String fileNames = outliers.getIndices().stream().map(i -> record.getParent().getPickedVaults().getVault(i)) //
+					.map(v -> v.getLogFileAsPath().getFileName().toString()).collect(Collectors.joining(", "));
+			return outliers.getSelectText() //
+					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getFarLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) //
+					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
+		}
+	}
+
+	public String defineFormattedMaxWarning() {
+		Summary summary = record.getSummary();
+		Outliers outliers = summary.getMinMaxWarning()[1];
+		if (outliers == null) {
+			return new String();
+		} else if (outliers.getWarningType() == OutlierWarning.WHISKER) {
+			double formatComparisonValue = summary.defineScaleMax() - summary.defineScaleMin();
+			String values = outliers.getDecodedValues().stream() //
+					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
+			String fileNames = outliers.getIndices().stream().map(i -> record.getParent().getPickedVaults().getVault(i)) //
+					.map(v -> v.getLogFileAsPath().getFileName().toString()).collect(Collectors.joining(", "));
+			return outliers.getSelectText() //
+					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getFarLimit(), formatComparisonValue) //
+					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
+		} else {
+			double formatComparisonValue = summary.defineScaleMax() - summary.defineScaleMin();
+			String values = outliers.getDecodedValues().stream() //
+					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
+			String fileNames = outliers.getIndices().stream().map(i -> record.getParent().getPickedVaults().getVault(i)) //
+					.map(v -> v.getLogFileAsPath().getFileName().toString()).collect(Collectors.joining(", "));
+			return outliers.getSelectText() //
+					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getFarLimit(), formatComparisonValue) //
+					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
+		}
+	}
+
+	/**
+	 * @return the text information about all warnings for the record
+	 */
+	public String defineMinMaxWarningText() {
+		Summary summary = record.getSummary();
+		String textLine1 = "", textLine2 = "";
+		final String fileNameInitializer = Messages.getString(MessageIds.GDE_MSGT0908);
+		final String minMaxSeparator = "   >---<   ";
+		String lineInitializer = record.getNameReplacement() + "   ";
+		if (summary.getMinMaxWarning()[0] != null) { // left scale warnings
+			if (summary.getMinMaxWarning()[0].getWarningType() == OutlierWarning.FAR)
+				textLine1 = lineInitializer + defineFormattedMinWarning().replace("\n", fileNameInitializer);
+			else
+				textLine2 = lineInitializer + defineFormattedMinWarning().replace("\n", fileNameInitializer);
+		}
+		if (summary.getMinMaxWarning()[1] != null) { // right
+			lineInitializer = "                    " + lineInitializer;
+			if (summary.getMinMaxWarning()[1].getWarningType() == OutlierWarning.FAR) {
+				textLine1 = textLine1.isEmpty() ? lineInitializer + defineFormattedMaxWarning().replace("\n", fileNameInitializer)
+						: textLine1 + minMaxSeparator + defineFormattedMaxWarning().replace("\n", fileNameInitializer);
+			} else {
+				textLine2 = textLine2.isEmpty() ? lineInitializer + defineFormattedMaxWarning().replace("\n", fileNameInitializer)
+						: textLine2 + minMaxSeparator + defineFormattedMaxWarning().replace("\n", fileNameInitializer);
+			}
+		}
+		return textLine1 + "\n" + textLine2;
 	}
 
 }

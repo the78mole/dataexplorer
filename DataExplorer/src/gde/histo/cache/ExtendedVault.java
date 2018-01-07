@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import gde.GDE;
@@ -84,7 +85,8 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	public static String getVaultsDirectoryName() {
 		final String d = SHA1_DELIMITER;
 		String tmpSubDirectoryLongKey = GDE.VERSION + d + getActiveDeviceKey() + d + application.getActiveChannelNumber() //
-				+ d + settings.getSamplingTimespan_ms() + d + settings.getMinmaxQuantileDistance() + d + settings.getAbsoluteTransitionLevel();
+				+ d + settings.getSamplingTimespan_ms() + d + settings.getMinmaxQuantileDistance() + d + settings.getAbsoluteTransitionLevel() //
+				+ d + settings.isCanonicalQuantiles() + d + settings.isSymmetricToleranceInterval() + d + settings.getOutlierToleranceSpread();
 		return SecureHash.sha1(tmpSubDirectoryLongKey);
 
 	}
@@ -270,6 +272,66 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	}
 
 	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	 * @return the points or an empty array if the measurement does not exist or has no outliers
+	 */
+	public int[] getMeasurementOutliers(int measurementOrdinal) {
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			String points = this.getMeasurements().get(measurementOrdinal).getOutlierPoints();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt).toArray();
+		}
+		return new int[0];
+	}
+
+	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	 * @return the points or an empty array if the measurement does not exist or has no outliers
+	 */
+	public int[] getMeasurementScraps(int measurementOrdinal) {
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			String points = this.getMeasurements().get(measurementOrdinal).getScrappedPoints();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt).toArray();
+		}
+		return new int[0];
+	}
+
+	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	 * @return false if the measurement does not exist or has no outliers
+	 */
+	public boolean hasMeasurementOutliers(int measurementOrdinal) {
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			return this.getMeasurements().get(measurementOrdinal).getOutlierPoints() != null;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	 * @return the cache data type or null if the measurement does not exist in the vault
+	 */
+	public DataTypes getMeasurementDataType(int measurementOrdinal) {
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			return this.getMeasurements().get(measurementOrdinal).dataType;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	 * @return false if the measurement does not exist or has no scrapped points
+	 */
+	public boolean hasMeasurementScraps(int measurementOrdinal) {
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			return this.getMeasurements().get(measurementOrdinal).getScrappedPoints() != null;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * @param settlementId may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
 	 * @return empty in case of unavailable settlementId
 	 */
@@ -288,6 +350,62 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 					? this.getSettlements().get(settlementId).getTrails().get(trailOrdinal).value : null;
 		} else {
 			return null;
+		}
+	}
+
+	/**
+	 * @param settlementId may specify an ordinal which is not present in the vault
+	 * @return the points or an empty array if the settlement does not exist or has no outliers
+	 */
+	public int[] getSettlementOutlierPoints(int settlementId) {
+		if (this.getMeasurements().containsKey(settlementId)) {
+			String points = this.getMeasurements().get(settlementId).getOutlierPoints();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt).toArray();
+		}
+		return new int[0];
+	}
+
+	/**
+	 * @param settlementId may specify an ordinal which is not present in the vault
+	 * @return the points or an empty array if the settlement does not exist or has no outliers
+	 */
+	public int[] getSettlementScrappedPoints(int settlementId) {
+		if (this.getMeasurements().containsKey(settlementId)) {
+			String points = this.getMeasurements().get(settlementId).getScrappedPoints();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt).toArray();
+		}
+		return new int[0];
+	}
+
+	/**
+	 * @param settlementId may specify an ordinal which is not present in the vault
+	 * @return false if the settlement does not exist or has no outliers
+	 */
+	public boolean hasSettlementOutliers(int settlementId) {
+		if (this.getSettlements().containsKey(settlementId)) {
+			return this.getSettlements().get(settlementId).getOutlierPoints() != null;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * @param settlementId may specify an ordinal which is not present in the vault
+	 * @return false if the settlement does not exist or has no scrapped points
+	 */
+	public boolean hasSettlementScraps(int settlementId) {
+		if (this.getSettlements().containsKey(settlementId)) {
+			return this.getSettlements().get(settlementId).getScrappedPoints() != null;
+		} else {
+			return false;
+		}
+	}
+
+	public DataTypes getSettlementDataType(int settlementId) {
+		if (this.getMeasurements().containsKey(settlementId)) {
+			return this.getSettlements().get(settlementId).dataType;
+		} else {
+			throw new UnsupportedOperationException("attribute is mandatory");
 		}
 	}
 

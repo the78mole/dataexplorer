@@ -20,7 +20,6 @@ package gde.histo.ui;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -74,8 +73,13 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 	}
 
 	@Override
-	public AbstractChartComposite getGraphicsComposite() {
-		return getFirstGraphics().orElseThrow(UnsupportedOperationException::new);
+	protected GraphicsComposite getGraphicsComposite() {
+		return Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof GraphicsComposite).map(c -> (GraphicsComposite) c).findFirst().orElseThrow(UnsupportedOperationException::new);
+	}
+
+	@Override
+	protected Optional<SummaryComposite> getSummaryComposite() {
+		return Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof SummaryComposite).map(c -> (SummaryComposite) c).findFirst();
 	}
 
 	@Override
@@ -107,8 +111,11 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			compositeSashForm.setWeights(chartWeights);
 		} else {
-			GDE.display.asyncExec(() -> {
-				this.compositeSashForm.setWeights(chartWeights);
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					HistoSummaryWindow.this.compositeSashForm.setWeights(chartWeights);
+				}
 			});
 		}
 	}
@@ -122,78 +129,81 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 			if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
 			if (!Settings.getInstance().isSmartStatistics()) setDefaultChart();
 
-			getChartStream().forEach(c -> {
+			for (AbstractChartComposite c : getCharts()) {
 				c.setFixedGraphicCanvas(curveSelectorComposite.getRealBounds());
 				c.doRedrawGraphics();
 				c.updateCaptions();
-			});
+			}
 		} else {
-			GDE.display.asyncExec(() -> {
-				if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
-				if (!Settings.getInstance().isSmartStatistics()) setDefaultChart();
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
+					if (!Settings.getInstance().isSmartStatistics()) setDefaultChart();
 
-				getChartStream().forEach(c -> {
-					c.setFixedGraphicCanvas(curveSelectorComposite.getRealBounds());
-					c.doRedrawGraphics();
-					c.updateCaptions();
-				});
+					for (AbstractChartComposite c : getCharts()) {
+						c.setFixedGraphicCanvas(curveSelectorComposite.getRealBounds());
+						c.doRedrawGraphics();
+						c.updateCaptions();
+					}
+				}
 			});
 		}
 	}
 
 	@Override
 	public void enableGraphicsHeader(boolean enabled) {
-		getChartStream().forEach(c -> {
+		for (AbstractChartComposite c : getCharts()) {
 			c.enableGraphicsHeader(enabled);
-		});
+		}
 	}
 
 	@Override
 	public void enableRecordSetComment(boolean enabled) {
-		getChartStream().forEach(c -> {
+		for (AbstractChartComposite c : getCharts()) {
 			c.enableRecordSetComment(enabled);
-		});
+		}
 	}
 
 	@Override
 	public void clearHeaderAndComment() {
-		getChartStream().forEach(c -> {
+		for (AbstractChartComposite c : getCharts()) {
 			c.clearHeaderAndComment();
-		});
+		}
 	}
 
 	@Override
 	public void enableGraphicsScale(boolean enabled) {
-		getChartStream().forEach(c -> {
+		for (AbstractChartComposite c : getCharts()) {
 			c.enableGraphicsScale(enabled);
-		});
+		}
 	}
 
 	@Override
 	public void setCurveAreaBackground(Color curveAreaBackground) {
-		getChartStream().forEach(c -> {
+		for (AbstractChartComposite c : getCharts()) {
 			c.curveAreaBackground = curveAreaBackground;
 			c.graphicCanvas.redraw();
-		});
+		}
 	}
 
 	@Override
 	public void setCurveAreaBorderColor(Color borderColor) {
-		getChartStream().forEach(c -> {
+		for (AbstractChartComposite c : getCharts()) {
 			c.curveAreaBorderColor = borderColor;
 			c.graphicCanvas.redraw();
-		});
+		}
 	}
 
 	@Override
 	public void setSurroundingBackground(Color surroundingBackground) {
-		getChartStream().forEach(c -> {
+		for (AbstractChartComposite c : getCharts()) {
 			c.surroundingBackground = surroundingBackground;
 			c.setBackground(surroundingBackground);
 			c.graphicsHeader.setBackground(surroundingBackground);
 			c.recordSetComment.setBackground(surroundingBackground);
 			c.doRedrawGraphics();
-		});
+		}
 	}
 
 	/**
@@ -209,20 +219,10 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 		}
 	}
 
-	public Optional<SummaryComposite> getFirstSummary() {
-		return Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof SummaryComposite).map(c -> (SummaryComposite) c).findFirst();
-	}
-
-	public Optional<GraphicsComposite> getFirstGraphics() {
-		return Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof GraphicsComposite).map(c -> (GraphicsComposite) c).findFirst();
-	}
-
+	@Override
 	public AbstractChartComposite[] getCharts() {
-		return (AbstractChartComposite[]) Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof AbstractChartComposite).map(c -> (AbstractChartComposite) c).toArray();
-	}
-
-	public Stream<AbstractChartComposite> getChartStream() {
-		return Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof AbstractChartComposite).map(c -> (AbstractChartComposite) c);
+		return Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof AbstractChartComposite).map(c -> (AbstractChartComposite) c) //
+				.toArray(AbstractChartComposite[]::new);
 	}
 
 	/**
@@ -232,14 +232,17 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 	@Deprecated
 	public void updateCaptions() {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
-			getChartStream().forEach(c -> {
+			for (AbstractChartComposite c : getCharts()) {
 				c.updateCaptions();
-			});
+			}
 		} else {
-			GDE.display.asyncExec(() -> {
-				getChartStream().forEach(c -> {
-					c.updateCaptions();
-				});
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					for (AbstractChartComposite c : getCharts()) {
+						c.updateCaptions();
+					}
+				}
 			});
 		}
 	}

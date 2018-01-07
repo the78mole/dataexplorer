@@ -19,23 +19,12 @@
 
 package gde.histo.recordings;
 
-import static gde.histo.datasources.HistoSet.SUMMARY_OUTLIER_RANGE_FACTOR;
-import static gde.histo.datasources.HistoSet.SUMMARY_OUTLIER_SIGMA;
-
+import gde.data.Record.DataType;
 import gde.device.ScoreGroupType;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.HistoSet;
-import gde.histo.utils.UniversalQuantile;
+import gde.log.Level;
 import gde.log.Logger;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.DoubleSummaryStatistics;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 
 /**
  * Trail records containing score values.
@@ -86,46 +75,62 @@ public final class ScoregroupTrail extends TrailRecord {
 	 */
 	@Override // reason is trail record suites with a master record without point values and minValue/maxValue != 0 in case of empty records
 	public boolean hasReasonableData() {
-		return this.size() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE //
-				&& (summaryMin == null && summaryMax == null || !HistoSet.fuzzyEquals(summaryMin, summaryMax));
-	}
-
-	@Override
-	protected double[] defineSummaryExtrema() {
-		List<Double> decodedMinimums = new ArrayList<>();
-		List<Double> decodedMaximums = new ArrayList<>();
-
-		List<Integer> scoreOrdinals = getScoregroup().getScore().stream().map(s -> s.getTrailOrdinal()) //
-				.collect(Collectors.toList());
-		// todo check why parallelStream() in the next statement results in sporadic unmatched length of decodedMax/Min
-		getParent().getHistoVaults().values().stream().flatMap(Collection::stream).forEach(v -> {
-			// determine the min and max of all score entries in the score group of this vault
-			Stream<Integer> scoregroupPoints = scoreOrdinals.stream().map(t -> getVaultPoint(v, t));
-			DoubleSummaryStatistics stats = scoregroupPoints.map(i -> HistoSet.decodeVaultValue(this, i / 1000.)) //
-					.collect(Collectors.summarizingDouble(Double::doubleValue));
-			decodedMinimums.add(stats.getMin());
-			decodedMaximums.add(stats.getMax());
-		});
-		log.finer(() -> getName() + "  decodedMinimums=" + Arrays.toString(decodedMinimums.toArray()) + "  decodedMaximums=" + Arrays.toString(decodedMaximums.toArray()));
-		UniversalQuantile<Double> minQuantile = new UniversalQuantile<>(decodedMinimums, true, //
-				SUMMARY_OUTLIER_SIGMA, SUMMARY_OUTLIER_RANGE_FACTOR);
-		UniversalQuantile<Double> maxQuantile = new UniversalQuantile<>(decodedMaximums, true, //
-				SUMMARY_OUTLIER_SIGMA, SUMMARY_OUTLIER_RANGE_FACTOR);
-
-		double[] result = new double[] { minQuantile.getQuartile0(), maxQuantile.getQuartile4() };
-		log.finer(() -> getName() + " " + Arrays.toString(result));
+		boolean result;
+		if (this.size() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE) {
+			result = true;
+		} else {
+			log.log(Level.OFF, "\n >>>>>>>>   case found!  <<<<<<<< \n");
+			double[] extrema = defineExtrema(); // todo check if required
+			result = !HistoSet.fuzzyEquals(extrema[0], extrema[1]) || !HistoSet.fuzzyEquals(extrema[0], 0.);
+			throw new UnsupportedOperationException();
+		}
 		return result;
 	}
 
 	@Override
+	protected double[] defineRecentMinMax(int limit ) {
+		return getParent().getPickedVaults().defineRecentScoreMinMax(getName(), getScoregroup(), limit);
+	}
+
+	@Override
+	protected double[] defineExtrema() {
+		return getParent().getPickedVaults().defineScoreExtrema(getName(), getScoregroup());
+	}
+
+	@Override
 	protected Integer[] getExtremumTrailPoints(ExtendedVault vault) {
-		int[] extremumScoreOrdinals = this.trailSelector.getExtremumOrdinals();
+		int[] extremumScoreOrdinals = this.trailSelector.getExtremumTrailsOrdinals();
 		if (extremumScoreOrdinals[0] == extremumScoreOrdinals[1]) { // let's spare some processing time
 			Integer vaultPoint = getVaultPoint(vault, extremumScoreOrdinals[0]);
 			return new Integer[] { vaultPoint, vaultPoint };
 		} else {
 			return new Integer[] { getVaultPoint(vault, extremumScoreOrdinals[0]), getVaultPoint(vault, extremumScoreOrdinals[1]) };
 		}
+	}
+
+	@Override
+	public boolean hasVaultOutliers(ExtendedVault vault) {
+		return false;
+	}
+
+	@Override
+	public boolean hasVaultScraps(ExtendedVault vault) {
+		return false;
+	}
+
+	@Override
+	public double[] getVaultScraps(ExtendedVault vault) {
+		return new double[0];
+	}
+
+	@Override
+	public double[] getVaultOutliers(ExtendedVault vault) {
+		return new double[0];
+	}
+
+	@Override
+	public DataType getVaultDataType(ExtendedVault vault) {
+		return DataType.DEFAULT;
 	}
 
 }

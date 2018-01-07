@@ -26,6 +26,7 @@ import java.util.Optional;
 import gde.device.SettlementType;
 import gde.device.TrailDisplayType;
 import gde.device.TrailTypes;
+import gde.device.TrailVisibilityType;
 
 /**
  * Handle the trail type assignment to a trailRecord.
@@ -38,7 +39,7 @@ public final class SettlementTrailSelector extends TrailSelector {
 
 	@Override
 	public void setApplicableTrails() {
-		if (trailRecord.channelItem.getTrailDisplay().map(x -> x.getDefaultTrail()).map(x -> x.isSuite()).orElse(false))
+		if (trailRecord.channelItem.getTrailDisplay().map(TrailDisplayType::getDefaultTrail).map(TrailTypes::isSuite).orElse(false))
 			throw new UnsupportedOperationException("suite trail must not be a device settlement default");
 		final boolean[] applicablePrimitiveTrails = getApplicablePrimitiveTrails();
 
@@ -66,7 +67,7 @@ public final class SettlementTrailSelector extends TrailSelector {
 		Optional<TrailDisplayType> trailDisplay = trailRecord.channelItem.getTrailDisplay();
 
 		// set quantile-based non-suite trail types : triggered value sum are CURRENTLY not supported
-		if (!trailDisplay.map(x -> x.isDiscloseAll()).orElse(false)) {
+		if (!trailDisplay.map(TrailDisplayType::isDiscloseAll).orElse(false)) {
 			if (((SettlementType) trailRecord.channelItem).getEvaluation().getTransitionAmount() == null)
 				TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == this.settings.isSmartStatistics()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 			else
@@ -74,8 +75,8 @@ public final class SettlementTrailSelector extends TrailSelector {
 		}
 
 		// set visible and reset hidden trails based on device settlement settings
-		trailDisplay.ifPresent(x -> x.getExposed().stream().map(z -> z.getTrail()).filter(y -> !y.isSuite()).forEach(y -> applicablePrimitiveTrails[y.ordinal()] = true));
-		trailDisplay.ifPresent(x -> x.getDisclosed().stream().map(z -> z.getTrail()).filter(y -> !y.isSuite()).forEach(y -> applicablePrimitiveTrails[y.ordinal()] = false));
+		trailDisplay.ifPresent(x -> x.getExposed().stream().map(TrailVisibilityType::getTrail).filter(y -> !y.isSuite()).forEach(y -> applicablePrimitiveTrails[y.ordinal()] = true));
+		trailDisplay.ifPresent(x -> x.getDisclosed().stream().map(TrailVisibilityType::getTrail).filter(y -> !y.isSuite()).forEach(y -> applicablePrimitiveTrails[y.ordinal()] = false));
 
 		// set at least one trail if no trail is applicable
 		boolean hasApplicablePrimitiveTrails = false;
@@ -84,7 +85,7 @@ public final class SettlementTrailSelector extends TrailSelector {
 			if (hasApplicablePrimitiveTrails) break;
 		}
 		if (!hasApplicablePrimitiveTrails)
-			applicablePrimitiveTrails[trailDisplay.map(x -> x.getDefaultTrail()).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
+			applicablePrimitiveTrails[trailDisplay.map(TrailDisplayType::getDefaultTrail).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
 		log.finer(() -> this.trailRecord.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
 		return applicablePrimitiveTrails;
 	}

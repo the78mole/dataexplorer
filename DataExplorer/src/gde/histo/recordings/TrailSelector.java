@@ -20,6 +20,7 @@
 package gde.histo.recordings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.device.TrailDisplayType;
 import gde.device.TrailTypes;
+import gde.device.TrailVisibilityType;
 import gde.device.resource.DeviceXmlResource;
 import gde.log.Logger;
 
@@ -35,7 +37,7 @@ import gde.log.Logger;
  * Handle the trail type assignment to a trailRecord.
  * @author Thomas Eickert (USER)
  */
-public abstract class TrailSelector { // todo consider integrating the selector classes in the trail record  classes
+public abstract class TrailSelector { // todo consider integrating the selector classes in the trail record classes
 	private static final String				$CLASS_NAME							= TrailSelector.class.getName();
 	protected static final Logger			log											= Logger.getLogger($CLASS_NAME);
 
@@ -57,17 +59,12 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 	 */
 	protected List<Integer>						applicableTrailsOrdinals;
 	/**
-	 * The ordinal numbers which hold the extremum values or alternatively the first trail in the channel item
+	 * The selectIndex numbers which hold the extremum values or alternatively the first trail in the channel item
 	 */
-	protected int[]										extremumOrdinals				= null;
+	protected int[]										extremumIndices					= null;
 
 	protected TrailSelector(TrailRecord trailRecord) {
 		this.trailRecord = trailRecord;
-	}
-
-	@Override
-	public String toString() {
-		return String.format("selected trail for %22s type='%-11s' ordinal=%d", this.trailRecord.getName(), this.getTrailText(), this.getTrailTextSelectedIndex()); //$NON-NLS-1$
 	}
 
 	/**
@@ -136,35 +133,54 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 	}
 
 	/**
-	 * @return the ordinal numbers which hold the extremum values after outlier elimination
+	 * @return the ordinal numbers of the trail types resp. score labels which hold the extremum values after outlier elimination
 	 */
-	public int[] getExtremumOrdinals() {
-		if (extremumOrdinals == null) setExtremumOrdinals();
-		return extremumOrdinals;
+	public int[] getExtremumTrailsOrdinals() {
+		if (extremumIndices == null) setExtremumIndices();
+		return new int[] { this.applicableTrailsOrdinals.get(extremumIndices[0]), this.applicableTrailsOrdinals.get(extremumIndices[1]) };
 	}
 
-	protected void setExtremumOrdinals() {
-		int ordinalMin = -1, ordinalMax = -1;
-		for (Integer trailOrdinal : this.applicableTrailsOrdinals) {
-			if (trailOrdinal == TrailTypes.MIN.ordinal()) {
-				ordinalMin = trailOrdinal;
-			} else if (trailOrdinal == TrailTypes.MAX.ordinal()) {
-				ordinalMax = trailOrdinal;
+	/**
+	 * @return the trail texts resp. score label texts which hold the extremum values after outlier elimination
+	 */
+	public String[] getExtremumTrailsTexts() {
+		if (extremumIndices == null) setExtremumIndices();
+		return new String[] { applicableTrailsTexts.get(extremumIndices[0]), applicableTrailsTexts.get(extremumIndices[1]) };
+	}
+
+	/**
+	 * @return the select index numbers of the trail texts which hold the extremum values after outlier elimination
+	 */
+	public int[] getExtremumTrailsIndices() {
+		if (extremumIndices == null) setExtremumIndices();
+		return extremumIndices;
+	}
+
+	/**
+	 * Take Q0/Q4 if available to support outlier elimination.
+	 */
+	protected void setExtremumIndices() {
+		int indexMin = -1, indexMax = -1;
+		for (int i = 0; i < this.applicableTrailsOrdinals.size(); i++) {
+			if (this.applicableTrailsOrdinals.get(i) == TrailTypes.Q0.ordinal()) {
+				indexMin = i;
+			} else if (this.applicableTrailsOrdinals.get(i) == TrailTypes.Q4.ordinal()) {
+				indexMax = i;
 			}
 		}
-		if (ordinalMin == -1 || ordinalMax == -1) {
-			for (Integer trailOrdinal : this.applicableTrailsOrdinals) {
-				if (trailOrdinal == TrailTypes.Q0.ordinal()) {
-					ordinalMin = trailOrdinal;
-				} else if (trailOrdinal == TrailTypes.Q4.ordinal()) {
-					ordinalMax = trailOrdinal;
+		if (indexMin == -1 || indexMax == -1) {
+			for (int i = 0; i < this.applicableTrailsOrdinals.size(); i++) {
+				if (this.applicableTrailsOrdinals.get(i) == TrailTypes.MIN.ordinal()) {
+					indexMin = i;
+				} else if (this.applicableTrailsOrdinals.get(i) == TrailTypes.MAX.ordinal()) {
+					indexMax = i;
 				}
 			}
 		}
-		if (ordinalMin != -1 && ordinalMax != -1) {
-			extremumOrdinals = new int[] { ordinalMin, ordinalMax };
+		if (indexMin == -1 || indexMax == -1) {
+			extremumIndices = new int[] { 0, 0 };
 		} else {
-			extremumOrdinals = new int[] { this.applicableTrailsOrdinals.get(0), this.applicableTrailsOrdinals.get(0) };
+			extremumIndices = new int[] { indexMin, indexMax };
 		}
 	}
 
@@ -176,14 +192,14 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 		Optional<TrailDisplayType> trailDisplay = trailRecord.channelItem.getTrailDisplay();
 		if (trailDisplay.isPresent()) {
 			final List<TrailTypes> displayTrails;
-			boolean hideAllTrails = trailDisplay.map(x -> x.isDiscloseAll()).orElse(false);
+			boolean hideAllTrails = trailDisplay.map(TrailDisplayType::isDiscloseAll).orElse(false);
 			if (hideAllTrails) {
-				displayTrails = trailDisplay.map(x -> x.getExposed().stream().map(y -> y.getTrail()) //
-						.filter(t -> t.isSuite()).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
+				displayTrails = trailDisplay.map(x -> x.getExposed().stream().map(TrailVisibilityType::getTrail) //
+						.filter(TrailTypes::isSuite).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
 						.collect(Collectors.toList())).orElse(new ArrayList<TrailTypes>());
 			} else {
-				List<TrailTypes> disclosedTrails = trailDisplay.map(x -> x.getDisclosed().stream().map(y -> y.getTrail()) //
-						.filter(t -> t.isSuite()).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
+				List<TrailTypes> disclosedTrails = trailDisplay.map(x -> x.getDisclosed().stream().map(TrailVisibilityType::getTrail) //
+						.filter(TrailTypes::isSuite).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
 						.collect(Collectors.toList())).orElse(new ArrayList<TrailTypes>());
 				displayTrails = TrailTypes.getSuites().stream() //
 						.filter(t -> !disclosedTrails.contains(t)).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
@@ -201,6 +217,11 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 				}
 			}
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "TrailSelector [" + this.trailRecord.getName() + " trailTextSelectedIndex=" + this.trailTextSelectedIndex + " " + this.getTrailText() + ", applicableTrailsTexts=" + this.applicableTrailsTexts + ", applicableTrailsOrdinals=" + this.applicableTrailsOrdinals + ", extremumIndices=" + Arrays.toString(this.extremumIndices) + "]";
 	}
 
 }

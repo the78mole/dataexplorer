@@ -19,8 +19,11 @@
 
 package gde.histo.recordings;
 
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -34,13 +37,13 @@ import gde.utils.LocalizedDateTime.DateTimePattern;
 import gde.utils.StringHelper;
 
 /**
- *
+ * Formatting methods.
  * @author Thomas Eickert (USER)
  */
 public final class TrailRecordSetFormatter {
 
-	private final static Settings	settings		= Settings.getInstance();
-	private final static Channels	channels		= Channels.getInstance();
+	private final static Settings	settings	= Settings.getInstance();
+	private final static Channels	channels	= Channels.getInstance();
 
 	public static String getSelectedMeasurementsAsTable(long timestamp_ms) {
 		Properties displayProps = settings.getMeasurementDisplayProperties();
@@ -56,8 +59,9 @@ public final class TrailRecordSetFormatter {
 					sb.append(GDE.STRING_OR).append(String.format("%-10s", displayProps.getProperty(record.getName()))); //$NON-NLS-1$
 				else {
 					final String unit = GDE.STRING_LEFT_BRACKET + record.getUnit() + GDE.STRING_RIGHT_BRACKET;
-					final String name = record.getName().substring(0, record.getName().length() >= 10 - unit.length() ? 10 - unit.length() : record.getName().length());
-					final String format = "%-" + (10 - unit.length()) + "s%" + unit.length() + "s";  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					final String name = record.getName().substring(0, record.getName().length() >= 10 - unit.length() ? 10 - unit.length()
+							: record.getName().length());
+					final String format = "%-" + (10 - unit.length()) + "s%" + unit.length() + "s"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					sb.append(GDE.STRING_OR).append(String.format(format, name, unit));
 				}
 			}
@@ -71,10 +75,16 @@ public final class TrailRecordSetFormatter {
 				sb.append(GDE.STRING_OR).append(String.format("%.10s", StringHelper.center(new TrailRecordFormatter(record).getMeasureValue(index), 10))); //$NON-NLS-1$
 			}
 			return sb.append(GDE.STRING_OR).toString();
-		}
-		else {
+		} else {
 			return GDE.STRING_EMPTY;
 		}
+	}
+
+	public static String getFileNameLines(List<Integer> indices) {
+		return indices.stream().sorted() //
+				.map(i -> Paths.get(getTrailRecordSet().getDataTags(i).get(DataTag.FILE_PATH))) //
+				.map(p -> p.getFileName().toString()) //
+				.collect(Collectors.joining(GDE.STRING_NEW_LINE));
 	}
 
 	private static TrailRecordSet getTrailRecordSet() {

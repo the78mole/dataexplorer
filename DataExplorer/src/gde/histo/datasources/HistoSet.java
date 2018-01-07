@@ -28,7 +28,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import gde.config.Settings;
-import gde.data.AbstractRecord;
+import gde.data.Record;
+import gde.data.Record.DataType;
 import gde.device.DeviceConfiguration;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
@@ -36,6 +37,7 @@ import gde.exception.NotSupportedFileFormatException;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.exclusions.ExclusionData;
+import gde.histo.exclusions.InclusionData;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.log.Level;
@@ -50,36 +52,34 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert
  */
 public final class HistoSet {
-	private final static String				$CLASS_NAME										= HistoSet.class.getName();
-	private final static Logger				log														= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME										= HistoSet.class.getName();
+	private final static Logger	log														= Logger.getLogger($CLASS_NAME);
 
-	private static final double				TOLERANCE											= .000000001;
+	private static final double	TOLERANCE											= .000000001;
 
-	private static final DataExplorer	application										= DataExplorer.getInstance();
-
-	private final HistoSetCollector		histoSetCollector;
+	private final VaultPicker		vaultPicker;
 
 	/**
 	 * We allow 1 lower and 1 upper outlier for a log with 740 measurements
 	 */
-	public static final double				OUTLIER_SIGMA_DEFAULT					= 3.;
+	public static final double	OUTLIER_SIGMA_DEFAULT					= 3.;
 	/**
 	 * Specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
 	 * Tolerance interval: <em>TI = &plusmn; z * &sigma; with z >= 0</em><br>
 	 * Outliers are identified only if they lie beyond this limit.
 	 */
-	public static final double				OUTLIER_RANGE_FACTOR_DEFAULT	= 2.;
+	public static final double	OUTLIER_RANGE_FACTOR_DEFAULT	= 2.;
 	/**
 	 * Outlier detection for the summary graphics.
 	 * We allow 1 outlier for 6 vaults.
 	 */
-	public static final double				SUMMARY_OUTLIER_SIGMA					= 1.36;
+	public static final double	SUMMARY_OUTLIER_SIGMA					= 1.36;
 	/**
 	 * Specifies the outlier distance limit ODL from the tolerance interval (<em>ODL = &rho; * TI with &rho; > 0</em>).<br>
 	 * Tolerance interval: <em>TI = &plusmn; z * &sigma; with z >= 0</em><br>
 	 * Outliers are identified only if they lie beyond this limit.
 	 */
-	public static final double				SUMMARY_OUTLIER_RANGE_FACTOR	= 9.;
+	public static final double	SUMMARY_OUTLIER_RANGE_FACTOR	= 9.;
 
 	/**
 	 * Defines the first step during rebuilding the histoset data.
@@ -137,24 +137,19 @@ public final class HistoSet {
 	 */
 	public static double decodeVaultValue(TrailRecord record, double value) {
 		final double newValue;
-		if (application.getActiveDevice().isGPSCoordinates(record)) {
+		switch (record.getDataType()) {
+		case GPS_LATITUDE:
+		case GPS_LONGITUDE:
 			newValue = value / 1000.;
-		} else {
-			switch (record.getDataType()) {
-			// lat and lon only required if isGPSCoordinates is not implemented
-			case GPS_LATITUDE:
-			case GPS_LONGITUDE:
-				newValue = value / 1000.;
-				break;
+			break;
 
-			default:
-				double factor = record.getFactor(); // != 1 if a unit translation is required
-				double offset = record.getOffset(); // != 0 if a unit translation is required
-				double reduction = record.getReduction(); // != 0 if a unit translation is required
+		default:
+			double factor = record.getFactor(); // != 1 if a unit translation is required
+			double offset = record.getOffset(); // != 0 if a unit translation is required
+			double reduction = record.getReduction(); // != 0 if a unit translation is required
 
-				newValue = (value - reduction) * factor + offset;
-				break;
-			}
+			newValue = (value - reduction) * factor + offset;
+			break;
 		}
 		log.fine(() -> "for " + record.getName() + " in value = " + value + " out value = " + newValue);
 		return newValue;
@@ -166,19 +161,14 @@ public final class HistoSet {
 	 */
 	public static double decodeDeltaValue(TrailRecord record, double value) {
 		double newValue = 0;
-		if (application.getActiveDevice().isGPSCoordinates(record)) {
-			newValue = value / 1000.0;
-		} else {
-			switch (record.getDataType()) {
-			// lat and lon only required if isGPSCoordinates is not implemented
-			case GPS_LATITUDE:
-			case GPS_LONGITUDE:
-				newValue = value / 1000.;
-				break;
+		switch (record.getDataType()) {
+		case GPS_LATITUDE:
+		case GPS_LONGITUDE:
+			newValue = value / 1000.;
+			break;
 
-			default:
-				newValue = value * record.getFactor();
-			}
+		default:
+			newValue = value * record.getFactor();
 		}
 		return newValue;
 	}
@@ -187,19 +177,17 @@ public final class HistoSet {
 	 * Reverse translate a measured value into a normalized histo vault value.</br>
 	 * Data types might require a special normalization (e.g. GPS coordinates).
 	 * This is the equivalent of {@code device.reverseTranslateValue} for data dedicated to the histo vault.
-	 * It determines the represented value
-	 * from a calculated trail value (e.g. a calculated scale end value).
 	 * @return the normalized histo vault value (as a multiplied int for fractional digits support)
 	 */
-	public static double encodeVaultValue(AbstractRecord record, double value) {
+	public static double encodeVaultValue(Record record, double value) {
 		final double newValue;
 		if (DataExplorer.getInstance().getActiveDevice().isGPSCoordinates(record)) {
 			newValue = value * 1000.;
 		} else {
 			switch (record.getDataType()) {
-			// lat and lon only required if isGPSCoordinates is not implemented
 			case GPS_LATITUDE:
 			case GPS_LONGITUDE:
+				// this might be obsolete as isGPSCoordinates should do the job
 				newValue = value * 1000.;
 				break;
 
@@ -214,6 +202,30 @@ public final class HistoSet {
 		}
 		log.fine(() -> "for " + record.getName() + " in value = " + value + " out value = " + newValue);
 		return newValue;
+	}
+
+	/**
+	 * Reverse translate a calculated trail value (e.g. a calculated scale end value) into a normalized histo vault value.
+	 * @return the normalized histo vault value (as a multiplied int for fractional digits support)
+	 */
+	public static double encodeVaultValue(TrailRecord record, double value) {
+		final double newValue;
+		if (isGpsCoordinates(record)) {
+			newValue = value * 1000.;
+		} else {
+			double factor = record.getFactor(); // != 1 if a unit translation is required
+			double offset = record.getOffset(); // != 0 if a unit translation is required
+			double reduction = record.getReduction(); // != 0 if a unit translation is required
+
+			newValue = (value - offset) / factor + reduction;
+		}
+		log.fine(() -> "for " + record.getName() + " in value = " + value + " out value = " + newValue);
+		return newValue;
+
+	}
+
+	public static boolean isGpsCoordinates(TrailRecord record) {
+		return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LONGITUDE;
 	}
 
 	/**
@@ -294,14 +306,20 @@ public final class HistoSet {
 		ExclusionData.deleteExclusionsDirectory(dataPaths);
 	}
 
+	public synchronized static void cleanInclusionData() {
+		ArrayList<Path> dataPaths = new ArrayList<Path>();
+		dataPaths.add(Paths.get(Settings.getInstance().getDataFilePath()));
+		InclusionData.deleteInclusionsDirectory(dataPaths);
+	}
+
 	/**
 	 * collect the strongest rebuild action which was not performed (e.g. tab was not selected)
 	 */
 	private RebuildStep rebuildStepInvisibleTab = HistoSet.RebuildStep.E_USER_INTERFACE;
 
 	public HistoSet() {
-		this.histoSetCollector = new HistoSetCollector();
-		this.histoSetCollector.initialize();
+		this.vaultPicker = new VaultPicker();
+		this.vaultPicker.initialize();
 	}
 
 	/**
@@ -315,16 +333,16 @@ public final class HistoSet {
 	 */
 	public synchronized boolean rebuild4Screening(RebuildStep rebuildStep, boolean isWithUi) //
 			throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
-		return this.histoSetCollector.rebuild4Screening(rebuildStep, isWithUi);
+		return this.vaultPicker.rebuild4Screening(rebuildStep, isWithUi);
 	}
 
 	public void rebuild4Test(Path filePath, TreeMap<String, DeviceConfiguration> devices) //
 			throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
-		this.histoSetCollector.rebuild4Test(filePath, devices);
+		this.vaultPicker.rebuild4Test(filePath, devices);
 	}
 
 	public TrailRecordSet getTrailRecordSet() {
-		return this.histoSetCollector.getTrailRecordSet();
+		return this.vaultPicker.getTrailRecordSet();
 	}
 
 	/**
@@ -334,8 +352,8 @@ public final class HistoSet {
 	public void setRebuildStepInvisibleTabs(RebuildStep rebuildStep, boolean isRebuilt) {
 		RebuildStep performedRebuildStep = isRebuilt ? RebuildStep.B_HISTOVAULTS : rebuildStep;
 		// determine the maximum rebuild priority from the past updates
-		RebuildStep maximumRebuildStep = this.getRebuildStepInvisibleTab().scopeOfWork > performedRebuildStep.scopeOfWork ? this.getRebuildStepInvisibleTab()
-				: performedRebuildStep;
+		RebuildStep maximumRebuildStep = this.getRebuildStepInvisibleTab().scopeOfWork > performedRebuildStep.scopeOfWork
+				? this.getRebuildStepInvisibleTab() : performedRebuildStep;
 		// the invisible tabs need subscribe a redraw only if there was a rebuild with a higher priority than the standard file check request
 		this.rebuildStepInvisibleTab = maximumRebuildStep.scopeOfWork > this.getRebuildStepInvisibleTab().scopeOfWork ? RebuildStep.E_USER_INTERFACE
 				: RebuildStep.F_FILE_CHECK;
@@ -352,15 +370,15 @@ public final class HistoSet {
 	 * @return the validatedDirectories which hold the history recordsets
 	 */
 	public Map<DirectoryType, Path> getValidatedDirectories() {
-		return this.histoSetCollector.getValidatedDirectories();
+		return this.vaultPicker.getValidatedDirectories();
 	}
 
 	/**
 	 * @return the paths which have been ignored on a file basis or suppressed on a recordset basis
 	 */
 	public List<Path> getExcludedPaths() {
-		List<Path> result = this.histoSetCollector.getExcludedFiles();
-		for (ExtendedVault vault : this.histoSetCollector.getSuppressedTrusses()) {
+		List<Path> result = this.vaultPicker.getExcludedFiles();
+		for (ExtendedVault vault : this.vaultPicker.getSuppressedTrusses()) {
 			result.add(vault.getLogFileAsPath());
 		}
 		return result;
@@ -368,12 +386,12 @@ public final class HistoSet {
 
 	public String getDirectoryScanStatistics() {
 		return Messages.getString(MessageIds.GDE_MSGI0064, //
-				new Object[] { String.format("%,d", this.histoSetCollector.getDirectoryFilesCount()), //
-						String.format("%,d", this.histoSetCollector.getMatchingFilesCount()), //
-						String.format("%.2f", this.histoSetCollector.getRecordSetBytesSum() / 1024 / 1024.), //
-						String.format("%.2f", this.histoSetCollector.getElapsedTime_ms() / 1000.), //
-						String.format("%,d", this.histoSetCollector.getTrussesCount() + this.histoSetCollector.getSuppressedTrusses().size()), //
-						String.format("%,d", this.histoSetCollector.getTimeStepSize()) });
+				new Object[] { String.format("%,d", this.vaultPicker.getDirectoryFilesCount()), //
+						String.format("%,d", this.vaultPicker.getMatchingFilesCount()), //
+						String.format("%.2f", this.vaultPicker.getRecordSetBytesSum() / 1024 / 1024.), //
+						String.format("%.2f", this.vaultPicker.getElapsedTime_ms() / 1000.), //
+						String.format("%,d", this.vaultPicker.getTrussesCount() + this.vaultPicker.getSuppressedTrusses().size()), //
+						String.format("%,d", this.vaultPicker.getTimeStepSize()) });
 
 	}
 

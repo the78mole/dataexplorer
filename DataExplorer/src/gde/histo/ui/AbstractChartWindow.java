@@ -23,6 +23,7 @@ import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.WARNING;
 
 import java.util.Optional;
+import java.util.logging.Level;
 
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -62,14 +63,42 @@ public abstract class AbstractChartWindow extends CTabItem {
 
 		void clearMeasuring() {
 			measure.ifPresent(mm -> {
-				((GraphicsComposite) AbstractChartWindow.this.getGraphicsComposite()).cleanMeasuring();
+				for (AbstractChartComposite c : getCharts()) {
+					c.cleanMeasuring();
+					if (c instanceof SummaryComposite) { // cleaning the summary composite is not implemented
+						log.log(Level.OFF, "started");
+						c.drawAreaPaintControl(); // todo check if erasing lines like in CurveSurvey is appropriate
+					}
+				}
 				DataExplorer.getInstance().setStatusMessage(GDE.STRING_EMPTY);
-				AbstractChartWindow.this.measure = Optional.empty();
+				measure = Optional.empty();
 			});
 		}
 
+		void setMeasuringActive(String recordKey, boolean enabled, boolean isDeltaMeasuring) {
+			if (Channels.getInstance().getActiveChannel() == null) return;
+
+			TrailRecordSet trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet();
+			if (windowActor.getTrailRecordSet().containsKey(recordKey)) {
+				windowActor.clearMeasuring();
+				if (enabled) {
+					TrailRecord trailRecord = trailRecordSet.get(recordKey);
+					curveSelectorComposite.setRecordSelection(trailRecord);
+					Measure tmpMeasuring = new Measure(isDeltaMeasuring, trailRecord);
+					measure = Optional.of(tmpMeasuring);
+					for (AbstractChartComposite c : getCharts()) {
+						c.setMeasuringActive(tmpMeasuring);
+					}
+				}
+			}
+		}
+
 		void drawMeasuring() {
-			measure.ifPresent(mm -> getGraphicsComposite().getMeasuring().ifPresent(m -> m.drawMeasuring()));
+			measure.ifPresent(mm -> {
+				for (AbstractChartComposite c : getCharts()) {
+					c.getMeasuring().ifPresent(m -> m.drawMeasuring());
+				}
+			});
 		}
 
 		void processMouseDownMove(long adjacentTimestamp_ms) {
@@ -85,7 +114,11 @@ public abstract class AbstractChartWindow extends CTabItem {
 		}
 
 		void processMouseUpAction(Point point) {
-			measure.ifPresent(mm -> getGraphicsComposite().getMeasuring().ifPresent(m -> m.processMouseUpAction(point)));
+			measure.ifPresent(mm -> {
+				getGraphicsComposite().getMeasuring().ifPresent(m -> m.processMouseUpAction(point));
+				log.log(Level.OFF, "started");
+				getSummaryComposite().ifPresent(s -> s.drawAreaPaintControl());
+			});
 		}
 
 		void setStatusMessage(String message) {
@@ -98,16 +131,20 @@ public abstract class AbstractChartWindow extends CTabItem {
 		 * @param rebuildTrails true refills the recordset and keeps the selector settings; false only rebuilds the UI
 		 */
 		void updateHistoTabs(boolean createRecordSet, boolean rebuildTrails) {
-			DataExplorer.getInstance().getPresentHistoExplorer().updateHistoTabs(false, false);
+			DataExplorer.getInstance().getPresentHistoExplorer().updateHistoTabs(createRecordSet, rebuildTrails);
+		}
+
+		void saveTemplate() {
+			DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet().saveTemplate();
 		}
 
 		void setChartSashFormWeights(SelectorComposite composite) {
 			int compositeWidth = isCurveSelectorEnabled ? composite.getCompositeWidth() : 0;
-			setSashFormWeights(compositeWidth);
+			AbstractChartWindow.this.setSashFormWeights(compositeWidth);
 		}
 
 		void updateChartWindow(boolean redrawCurveSelector) {
-			updateWindow(redrawCurveSelector);
+			AbstractChartWindow.this.updateWindow(redrawCurveSelector);
 		}
 
 		HistoSet getHistoSet() {
@@ -128,7 +165,11 @@ public abstract class AbstractChartWindow extends CTabItem {
 		}
 
 		void scrollSummaryComposite() {
-			scrollSummaryComposite();
+			AbstractChartWindow.this.scrollSummaryComposite();
+		}
+
+		public void setTrailVisible(TrailRecord record, int selectIndex) {
+			curveSelectorComposite.setRecordSelection(record, selectIndex);
 		}
 	}
 
@@ -153,12 +194,18 @@ public abstract class AbstractChartWindow extends CTabItem {
 	protected final WindowActor	windowActor;
 	protected final CTabFolder	tabFolder;
 
+	/**
+	 * Righthand side of the chart.
+	 */
 	protected SashForm					graphicSashForm;
+	/**
+	 * Lefthand side of the chart.
+	 */
 	protected SelectorComposite	curveSelectorComposite;
 	protected boolean						isCurveSelectorEnabled	= true;
 
 	private int[]								sashFormWeights					= new int[] { 100, 1000 };
-	private Optional<Measure>		measure									= Optional.empty();
+	protected Optional<Measure>	measure									= Optional.empty();
 
 	protected AbstractChartWindow(CTabFolder parent, int style, int index) {
 		super(parent, style, index);
@@ -186,8 +233,11 @@ public abstract class AbstractChartWindow extends CTabItem {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			this.curveSelectorComposite.doUpdateCurveSelectorTable();
 		} else {
-			GDE.display.asyncExec(() -> {
-				AbstractChartWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					AbstractChartWindow.this.curveSelectorComposite.doUpdateCurveSelectorTable();
+				}
 			});
 		}
 	}
@@ -237,11 +287,9 @@ public abstract class AbstractChartWindow extends CTabItem {
 
 	public abstract void clearHeaderAndComment();
 
-	public SelectorComposite getCurveSelectorComposite() {
-		return this.curveSelectorComposite;
-	}
+	protected abstract AbstractChartComposite getGraphicsComposite();
 
-	public abstract AbstractChartComposite getGraphicsComposite();
+	protected abstract Optional<? extends AbstractChartComposite> getSummaryComposite();
 
 	public boolean isActiveCurveSelectorContextMenu() {
 		return this.curveSelectorComposite.contextMenu.isActive();
@@ -287,27 +335,22 @@ public abstract class AbstractChartWindow extends CTabItem {
 	 */
 	public abstract void scrollSummaryComposite();
 
+	public void scrollComposite() {
+		windowActor.scrollSummaryComposite();
+	}
+
 	/**
 	 * Switch window into measurement mode for the selected record.
 	 */
 	public void setMeasurementActive(String recordKey, boolean enabled, boolean isDeltaMeasuring) {
-		TrailRecordSet trailRecordSet = windowActor.getTrailRecordSet();
-		if (windowActor.getTrailRecordSet().containsKey(recordKey)) {
-			cleanMeasuring();
-			if (enabled) {
-				TrailRecord trailRecord = trailRecordSet.get(recordKey);
-				curveSelectorComposite.setRecordSelection(trailRecord, true);
-				Measure tmpMeasuring = new Measure(isDeltaMeasuring, trailRecord);
-				measure = Optional.of(tmpMeasuring);
-				((GraphicsComposite) getGraphicsComposite()).setMeasuringActive(tmpMeasuring);
-			}
-		}
+		windowActor.setMeasuringActive(recordKey, enabled, isDeltaMeasuring);
 	}
 
 	/**
 	 * Clean everything related to the measurement.
 	 */
 	public void cleanMeasuring() {
+		curveSelectorComposite.resetContextMenuMeasuring();
 		windowActor.clearMeasuring();
 	}
 
@@ -328,4 +371,12 @@ public abstract class AbstractChartWindow extends CTabItem {
 		}
 	}
 
+	public abstract AbstractChartComposite[] getCharts();
+
+	/**
+	 * @return the graphic window content as image
+	 */
+	public Image getGraphicsPrintImage() {
+		return getGraphicsComposite().getGraphicsPrintImage();
+	}
 }

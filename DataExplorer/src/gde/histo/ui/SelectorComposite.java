@@ -65,8 +65,8 @@ public final class SelectorComposite extends Composite {
 	private final static Logger			log											= Logger.getLogger($CLASS_NAME);
 
 	private static final int				TEXT_EXTENT_FACTOR			= 6;
-	private static final int				XADDITION_CHARTSELECTOR	= 11;
 	private static final int				YGAP_CHARTSELECTOR			= 2;
+	private static final int				COMBO_COLUMN_ORDINAL		= 1;
 
 	private final Menu							popupmenu;
 	final CurveSelectorContextMenu	contextMenu;
@@ -110,8 +110,8 @@ public final class SelectorComposite extends Composite {
 		this.addHelpListener(new HelpListener() {
 			@Override
 			public void helpRequested(HelpEvent evt) {
-				log.log(FINEST, "helpRequested ", evt); //$NON-NLS-1$
-				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_41.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(FINEST, "helpRequested ", evt);
+				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_41.html");
 			}
 		});
 		{
@@ -132,18 +132,13 @@ public final class SelectorComposite extends Composite {
 			this.curveSelectorHeader.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.fine(() -> "curveSelectorHeader.widgetSelected, event=" + evt); //$NON-NLS-1$
-					windowActor.clearMeasuring();
+					log.fine(() -> "curveSelectorHeader.widgetSelected, event=" + evt);
 					if (!SelectorComposite.this.curveSelectorHeader.getSelection()) {
+						resetContextMenuMeasuring();
+						windowActor.clearMeasuring();
 						// use this check button to deselect all selected curves
 						for (TableItem tableItem : SelectorComposite.this.curveSelectorTable.getItems()) {
 							if (tableItem.getChecked()) {
-								// avoid phantom measurements with invisible curves
-								String recordName = getTableItemRecord(tableItem).getName();
-								if (windowActor.isMeasureRecord(recordName)) {
-									contextMenu.setMeasurement(recordName, false);
-									contextMenu.setDeltaMeasurement(recordName, false);
-								}
 								toggleRecordSelection(tableItem, false, false);
 							}
 						}
@@ -167,14 +162,14 @@ public final class SelectorComposite extends Composite {
 			chartSelectorLData.left = new FormAttachment(curveSelectorHeader);
 			chartSelectorLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
 			this.chartSelector.setLayoutData(chartSelectorLData);
-			this.chartSelector.setImage(SWTResourceManager.getImage("gde/resource/moveToNext.png")); //$NON-NLS-1$
-			this.chartSelector.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0899, GDE.MOD1_MOD3));
+			this.chartSelector.setImage(SWTResourceManager.getImage("gde/resource/moveToNext.png"));
+			this.chartSelector.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0899, GDE.MOD1));
 			this.chartSelector.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.fine(() -> "chartSelector.widgetSelected, event=" + evt); //$NON-NLS-1$
-					scrollCompositeAndClearMeasuring();
-					windowActor.updateChartWindow(false);
+					log.fine(() -> "chartSelector.widgetSelected, event=" + evt);
+					windowActor.scrollSummaryComposite();
+					// windowActor.updateChartWindow(false);
 				}
 			});
 		}
@@ -186,16 +181,18 @@ public final class SelectorComposite extends Composite {
 			smartSelectorLData.left = new FormAttachment(chartSelector, 26 / 2);
 			smartSelectorLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
 			this.smartSelector.setLayoutData(smartSelectorLData);
-			this.smartSelector.setImage(SWTResourceManager.getImage("gde/resource/smartSetting.png")); //$NON-NLS-1$
+			this.smartSelector.setImage(SWTResourceManager.getImage("gde/resource/smartSetting.png"));
 			this.smartSelector.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0898));
 			this.smartSelector.setSelection(Settings.getInstance().isSmartStatistics());
 			this.smartSelector.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.fine(() -> "smartSelector.widgetSelected, event=" + evt); //$NON-NLS-1$
+					log.fine(() -> "smartSelector.widgetSelected, event=" + evt);
 					Settings.getInstance().setSmartStatistics(smartSelector.getSelection());
-					scrollCompositeAndClearMeasuring();
-					DataExplorer.getInstance().getPresentHistoExplorer().updateHistoTabs(true, true);
+					resetContextMenuMeasuring();
+					windowActor.clearMeasuring();
+					windowActor.scrollSummaryComposite();
+					windowActor.updateHistoTabs(true, true);
 				}
 			});
 		}
@@ -207,13 +204,13 @@ public final class SelectorComposite extends Composite {
 			saveTemplateLData.left = new FormAttachment(smartSelector, -1);
 			saveTemplateLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
 			this.saveTemplate.setLayoutData(saveTemplateLData);
-			this.saveTemplate.setImage(SWTResourceManager.getImage("gde/resource/saveTemplate.png")); //$NON-NLS-1$
+			this.saveTemplate.setImage(SWTResourceManager.getImage("gde/resource/saveTemplate.png"));
 			this.saveTemplate.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0884, GDE.MOD1));
 			this.saveTemplate.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.fine(() -> "saveTemplate.widgetSelected, event=" + evt); //$NON-NLS-1$
-					DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet().saveTemplate();
+					log.fine(() -> "saveTemplate.widgetSelected, event=" + evt);
+					windowActor.saveTemplate();
 				}
 			});
 		}
@@ -234,16 +231,19 @@ public final class SelectorComposite extends Composite {
 			this.curveSelectorTable.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					log.fine(() -> "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
+					log.fine(() -> "curveSelectorTable.widgetSelected, event=" + evt);
 					if (evt != null && evt.item != null) {
 						final TableItem eventItem = (TableItem) evt.item;
 						// avoid phantom measurements with invisible curves
-						log.finer(() -> "checked/Old=" + eventItem.getChecked() + eventItem.getData(DataExplorer.OLD_STATE)); //$NON-NLS-1$
+						log.finer(() -> "checked/Old=" + eventItem.getChecked() + eventItem.getData(DataExplorer.OLD_STATE));
 						String recordName = getTableItemRecord(eventItem).getName();
 						if (!eventItem.getChecked() && (Boolean) eventItem.getData(DataExplorer.OLD_STATE) //
 								&& windowActor.isMeasureRecord(recordName)) {
-							contextMenu.setMeasurement(recordName, false);
-							contextMenu.setDeltaMeasurement(recordName, false);
+							if (windowActor.isMeasureRecord(recordName)) {
+								contextMenu.setMeasurement(recordName, false);
+								contextMenu.setDeltaMeasurement(recordName, false);
+							}
+							windowActor.clearMeasuring();
 						}
 						SelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, eventItem.getData(DataExplorer.RECORD_NAME));
 						SelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);
@@ -301,14 +301,14 @@ public final class SelectorComposite extends Composite {
 					this.editors[i] = new TableEditor(this.curveSelectorTable);
 					selectorCombos[i] = new Combo(this.curveSelectorTable, SWT.READ_ONLY);
 					this.editors[i].grabHorizontal = true;
-					this.editors[i].setEditor(selectorCombos[i], item, 1);
+					this.editors[i].setEditor(selectorCombos[i], item, COMBO_COLUMN_ORDINAL);
 					selectorCombos[i].setItems(record.getTrailSelector().getApplicableTrailsTexts().toArray(new String[0]));
 					selectorCombos[i].setText(record.getTrailSelector().getTrailText());
 					selectorCombos[i].setToolTipText(!record.getLabel().isEmpty() ? record.getLabel() : Messages.getString(MessageIds.GDE_MSGT0748));
 					selectorCombos[i].addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent event) {
-							log.fine("selectorCombos.SelectionListener, event=" + event); //$NON-NLS-1$
+							log.fine("selectorCombos.SelectionListener, event=" + event);
 							Combo combo = (Combo) event.getSource();
 							recordSet.refillRecord(record, combo.getSelectionIndex());
 							windowActor.updateHistoTabs(false, false);
@@ -327,7 +327,7 @@ public final class SelectorComposite extends Composite {
 			}
 			this.selectorColumnWidth = itemWidth;
 			this.curveTypeColumnWidth = itemWidth2;
-			log.fine(() -> "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
+			log.fine(() -> "curveSelectorTable width = " + this.selectorColumnWidth);
 		}
 		this.tableCurveTypeColumn.setWidth(this.curveTypeColumnWidth);
 		if (this.oldSelectorColumnWidth != this.selectorColumnWidth) {
@@ -340,7 +340,7 @@ public final class SelectorComposite extends Composite {
 		}
 		windowActor.setChartSashFormWeights(this);
 
-		log.fine(() -> "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
+		log.fine(() -> "curveSelectorTable width = " + this.selectorColumnWidth);
 	}
 
 	/**
@@ -368,15 +368,53 @@ public final class SelectorComposite extends Composite {
 		}
 	}
 
-	public void setRecordSelection(TrailRecord activeRecord, boolean isVisible) {
-		final TableItem tableItem = Arrays.stream(this.curveSelectorTable.getItems()).filter(c -> ((String) c.getData(DataExplorer.RECORD_NAME)).equals(activeRecord.getName())).findFirst().orElseThrow(UnsupportedOperationException::new);
-		tableItem.setChecked(isVisible);
-		if (activeRecord != null) setRecordSelection(activeRecord, isVisible, tableItem);
+	/**
+	 * Scan all visible records and clear the context menu entries related with measuring.
+	 */
+	public void resetContextMenuMeasuring() {
+		for (TableItem tableItem : SelectorComposite.this.curveSelectorTable.getItems()) {
+			if (tableItem.getChecked()) {
+				TrailRecord record = getTableItemRecord(tableItem);
+				if (record != null) {
+					// avoid phantom measurements with invisible curves
+					String recordName = record.getName();
+					if (windowActor.isMeasureRecord(recordName)) {
+						contextMenu.setMeasurement(recordName, false);
+						contextMenu.setDeltaMeasurement(recordName, false);
+					}
+				}
+			}
+		}
+	}
+
+	public void setRecordSelection(TrailRecord activeRecord) {
+		final TableItem tableItem = Arrays.stream(this.curveSelectorTable.getItems()) //
+				.filter(c -> ((String) c.getData(DataExplorer.RECORD_NAME)).equals(activeRecord.getName())).findFirst().orElseThrow(UnsupportedOperationException::new);
+		tableItem.setChecked(true);
+		setRecordSelection(activeRecord, true, tableItem);
+	}
+
+	public void setRecordSelection(TrailRecord activeRecord, int selectIndex) {
+		int displayIndex = -1;
+		for (int i = 0; i < this.curveSelectorTable.getItems().length; i++) {
+			TableItem tableItem2 = this.curveSelectorTable.getItems()[i];
+			if (((String) tableItem2.getData(DataExplorer.RECORD_NAME)).equals(activeRecord.getName())) {
+				displayIndex = i;
+				break;
+			}
+		}
+		TableItem tableItem = this.curveSelectorTable.getItems()[displayIndex];
+		tableItem.setChecked(true);
+		setRecordSelection(activeRecord, true, tableItem);
+
+		Combo selectorCombo = (Combo) this.editors[displayIndex].getEditor();
+		selectorCombo.select(selectIndex);
+		windowActor.getTrailRecordSet().refillRecord(activeRecord, selectorCombo.getSelectionIndex());
 	}
 
 	private void setRecordSelection(TrailRecord activeRecord, boolean isVisible, final TableItem tableItem) {
 		// activeRecord.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-		log.fine(() -> "isVisible old= " + activeRecord.isVisible()); //$NON-NLS-1$
+		log.fine(() -> "isVisible old= " + activeRecord.isVisible());
 		if (isVisible) {
 			activeRecord.setVisible(true);
 			// activeRecord.setDisplayable(true);
@@ -405,11 +443,11 @@ public final class SelectorComposite extends Composite {
 		TrailRecord activeRecord = getTableItemRecord(item);
 		if (!isTableSelection || item.getChecked() != (Boolean) item.getData(DataExplorer.OLD_STATE)) {
 			isToggled = true;
-			log.fine(() -> "selection state changed= " + activeRecord.getName()); //$NON-NLS-1$
+			log.fine(() -> "selection state changed= " + activeRecord.getName());
 			// get newest timestamp and newest recordSet within this entry (both collections are in descending order)
 			if (activeRecord != null) {
 				setRecordSelection(activeRecord, isTableSelection && item.getChecked() || forceVisible, item);
-				log.fine(() -> "isVisible= " + activeRecord.isVisible()); //$NON-NLS-1$
+				log.fine(() -> "isVisible= " + activeRecord.isVisible());
 			}
 		}
 		return isToggled;
@@ -436,21 +474,6 @@ public final class SelectorComposite extends Composite {
 		} else {
 			return new Rectangle(1, 1, 1, 1);
 		}
-	}
-
-	public void scrollCompositeAndClearMeasuring() {
-		windowActor.clearMeasuring();
-		for (TableItem tableItem : curveSelectorTable.getItems()) {
-			if (tableItem.getChecked()) {
-				// avoid phantom measurements with invisible curves
-				String recordName = getTableItemRecord(tableItem).getName();
-				if (windowActor.isMeasureRecord(recordName)) {
-					contextMenu.setMeasurement(recordName, false);
-					contextMenu.setDeltaMeasurement(recordName, false);
-				}
-			}
-		}
-		windowActor.scrollSummaryComposite();
 	}
 
 }

@@ -33,7 +33,7 @@ import gde.device.MeasurementPropertyTypes;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.SettlementType;
-import gde.histo.utils.UniversalQuantile;
+import gde.histo.utils.ElementaryQuantile;
 import gde.log.Logger;
 
 /**
@@ -44,22 +44,22 @@ import gde.log.Logger;
  * @author Thomas Eickert
  */
 public final class SettlementRecord extends Vector<Integer> {
-	private static final String					$CLASS_NAME										= SettlementRecord.class.getName();
-	private static final long						serialVersionUID							= 6130190003229390899L;
-	private static final Logger					log														= Logger.getLogger($CLASS_NAME);
+	private static final String					$CLASS_NAME							= SettlementRecord.class.getName();
+	private static final long						serialVersionUID				= 6130190003229390899L;
+	private static final Logger					log											= Logger.getLogger($CLASS_NAME);
 
-	private static final int						INITIAL_RECORD_CAPACITY				= 22;
-	private static final String					BELOW_LIMIT										= MeasurementPropertyTypes.BELOW_LIMIT.value();
-	private static final String					BEYOND_LIMIT									= MeasurementPropertyTypes.BEYOND_LIMIT.value();
+	private static final int						INITIAL_RECORD_CAPACITY	= 22;
+	private static final String					BELOW_LIMIT							= MeasurementPropertyTypes.BELOW_LIMIT.value();
+	private static final String					BEYOND_LIMIT						= MeasurementPropertyTypes.BEYOND_LIMIT.value();
 
 	private final SettlementType				settlement;
 
 	private final RecordSet							parent;
 	private final int										logChannelNumber;
-	String															name;																																					// measurement name Höhe
+	String															name;																																		// measurement name Höhe
 
-	List<PropertyType>									properties										= new ArrayList<>();														// offset, factor, reduction, ...
-	private UniversalQuantile<Integer>	quantile											= null;
+	List<PropertyType>									properties							= new ArrayList<>();														// offset, factor, reduction, ...
+	private ElementaryQuantile<Integer>	quantile								= null;
 
 	/**
 	 * Creates a vector to hold data points.
@@ -263,7 +263,8 @@ public final class SettlementRecord extends Vector<Integer> {
 	 * Does not support settlements based on GPS-longitude or GPS-latitude.
 	 * @return double of settlement dependent value
 	 */
-	public double reverseTranslateValue(double value) { // todo support settlements based on GPS-longitude or GPS-latitude with a base class common for Record, TrailRecord and Settlement
+	public double reverseTranslateValue(double value) { // todo support settlements based on GPS-longitude or GPS-latitude with a base class common for
+																											// Record, TrailRecord and Settlement
 		double newValue = (value - this.getOffset()) / this.getFactor() + this.getReduction();
 		log.finer(() -> "for " + this.name + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
@@ -277,9 +278,9 @@ public final class SettlementRecord extends Vector<Integer> {
 		return this.settlement;
 	}
 
-	public UniversalQuantile<Integer> getQuantile() {
+	public ElementaryQuantile<Integer> getQuantile() {
 		if (this.quantile == null) {
-			this.quantile = new UniversalQuantile<>(this, true);
+			this.quantile = new ElementaryQuantile<>(this, true);
 		}
 		return this.quantile;
 	}

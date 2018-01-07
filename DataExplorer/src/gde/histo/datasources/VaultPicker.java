@@ -19,15 +19,15 @@
 
 package gde.histo.datasources;
 
-import static gde.histo.datasources.HistoSetCollector.LoadProgress.CACHED;
-import static gde.histo.datasources.HistoSetCollector.LoadProgress.DONE;
-import static gde.histo.datasources.HistoSetCollector.LoadProgress.INITIALIZED;
-import static gde.histo.datasources.HistoSetCollector.LoadProgress.MATCHED;
-import static gde.histo.datasources.HistoSetCollector.LoadProgress.PATHS_VERIFIED;
-import static gde.histo.datasources.HistoSetCollector.LoadProgress.RECORDED;
-import static gde.histo.datasources.HistoSetCollector.LoadProgress.RESTORED;
-import static gde.histo.datasources.HistoSetCollector.LoadProgress.SCANNED;
-import static gde.histo.datasources.HistoSetCollector.LoadProgress.STARTED;
+import static gde.histo.datasources.VaultPicker.LoadProgress.CACHED;
+import static gde.histo.datasources.VaultPicker.LoadProgress.DONE;
+import static gde.histo.datasources.VaultPicker.LoadProgress.INITIALIZED;
+import static gde.histo.datasources.VaultPicker.LoadProgress.MATCHED;
+import static gde.histo.datasources.VaultPicker.LoadProgress.PATHS_VERIFIED;
+import static gde.histo.datasources.VaultPicker.LoadProgress.RECORDED;
+import static gde.histo.datasources.VaultPicker.LoadProgress.RESTORED;
+import static gde.histo.datasources.VaultPicker.LoadProgress.SCANNED;
+import static gde.histo.datasources.VaultPicker.LoadProgress.STARTED;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.WARNING;
 
@@ -68,8 +68,8 @@ import gde.ui.DataExplorer;
  * Convert the source files into a trail recordSet required for the history tabs.
  * @author Thomas Eickert (USER)
  */
-public final class HistoSetCollector {
-	private static final String							$CLASS_NAME					= HistoSetCollector.class.getName();
+public final class VaultPicker {
+	private static final String							$CLASS_NAME					= VaultPicker.class.getName();
 	private static final Logger							log									= Logger.getLogger($CLASS_NAME);
 
 	/**
@@ -129,7 +129,7 @@ public final class HistoSetCollector {
 	/**
 	 * Sorted by recordSet startTimeStamp in reverse order; each timestamp may hold multiple vaults.
 	 */
-	private final TreeMap<Long, List<ExtendedVault>>	histoVaults					= new TreeMap<>(Collections.reverseOrder());
+	private final TreeMap<Long, List<ExtendedVault>>	pickedVaults					= new TreeMap<>(Collections.reverseOrder());
 
 	/**
 	 * Excluded vaults via ignore lists
@@ -259,7 +259,7 @@ public final class HistoSetCollector {
 		}
 	}
 
-	public HistoSetCollector() {
+	public VaultPicker() {
 		this.directoryScanner = new DirectoryScanner();
 	}
 
@@ -274,10 +274,10 @@ public final class HistoSetCollector {
 	 */
 	public synchronized void initialize() {
 		// deep clear in order to reduce memory consumption prior to garbage collection
-		for (List<ExtendedVault> timestampHistoVaults : histoVaults.values()) {
+		for (List<ExtendedVault> timestampHistoVaults : pickedVaults.values()) {
 			timestampHistoVaults.clear();
 		}
-		this.histoVaults.clear();
+		this.pickedVaults.clear();
 		this.suppressedVaults.clear();
 
 		this.readFilesCount = 0;
@@ -338,7 +338,7 @@ public final class HistoSetCollector {
 			}
 		}
 		{
-			this.trailRecordSet = TrailRecordSet.createRecordSet(this.histoVaults);
+			this.trailRecordSet = TrailRecordSet.createRecordSet(this.pickedVaults);
 			this.trailRecordSet.initializeFromVaults();
 		}
 	}
@@ -404,8 +404,8 @@ public final class HistoSetCollector {
 						int jobSize = trussJobs.values().parallelStream().mapToInt(c -> c.size()).sum();
 						progress.ifPresent((p) -> p.reInit(RESTORED, jobSize, CACHE_BENEFIT));
 						loadVaultsFromCache(trussJobs, progress);
-						int totalEstimatedEffort = this.histoVaults.size() + CACHE_BENEFIT * (jobSize - this.histoVaults.size());
-						double timeQuotaDone = this.histoVaults.size() / totalEstimatedEffort;
+						int totalEstimatedEffort = this.pickedVaults.size() + CACHE_BENEFIT * (jobSize - this.pickedVaults.size());
+						double timeQuotaDone = this.pickedVaults.size() / totalEstimatedEffort;
 						int progressPercentageDone = (int) ((CACHED.endPercentage - MATCHED.endPercentage) * timeQuotaDone);
 						progress.ifPresent((
 								p) -> p.set(Math.max(DataExplorer.application.getProgressPercentage(), MATCHED.endPercentage + progressPercentageDone)));
@@ -443,13 +443,13 @@ public final class HistoSetCollector {
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.C_TRAILRECORDSET)) {
 				long nanoTime = System.nanoTime();
-				this.trailRecordSet = TrailRecordSet.createRecordSet(this.histoVaults);
+				this.trailRecordSet = TrailRecordSet.createRecordSet(this.pickedVaults);
 				this.trailRecordSet.initializeFromVaults();
 				this.trailRecordSet.applyTemplate(true); // needs reasonable data
 				if (this.recordSetBytesSum > 0) {
 					long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 					log.fine(() -> String.format("%,5d timeSteps  to TrailRecordSet  time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
-							this.histoVaults.size(), micros / 1000, this.histoVaults.size() > 0 ? this.histoVaults.size() * 1000000 / micros : 0));
+							this.pickedVaults.size(), micros / 1000, this.pickedVaults.size() > 0 ? this.pickedVaults.size() * 1000000 / micros : 0));
 				}
 			} else if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA)) { // saves some time compared to the logic above
 				this.trailRecordSet.refillRecordSet();
@@ -458,7 +458,7 @@ public final class HistoSetCollector {
 
 			this.elapsedTime_us = (int) ((System.nanoTime() - startNanoTime + 500000) / 1000);
 			log.time(() -> String.format("%,5d timeSteps  total              time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
-					this.histoVaults.size(), elapsedTime_us / 1000, this.histoVaults.size() * 1000000 / this.elapsedTime_us, (int) (this.recordSetBytesSum / 1.024 / 1.024 / this.elapsedTime_us)));
+					this.pickedVaults.size(), elapsedTime_us / 1000, this.pickedVaults.size() * 1000000 / this.elapsedTime_us, (int) (this.recordSetBytesSum / 1.024 / 1.024 / this.elapsedTime_us)));
 			return realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA);
 		} finally {
 			progress.ifPresent((p) -> p.set(DONE));
@@ -494,7 +494,7 @@ public final class HistoSetCollector {
 	 */
 	private void loadVaultsFromCache(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress) throws IOException {
 		long nanoTime = System.nanoTime();
-		int tmpHistoSetsSize = this.histoVaults.size();
+		int tmpHistoSetsSize = this.pickedVaults.size();
 		for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromCache(trussJobs, progress)) {
 			if (!histoVault.isTruss()) {
 				putVault(histoVault);
@@ -503,7 +503,7 @@ public final class HistoSetCollector {
 				log.info(() -> String.format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLogFilePath()));
 			}
 		}
-		int loadCount = this.histoVaults.size() - tmpHistoSetsSize;
+		int loadCount = this.pickedVaults.size() - tmpHistoSetsSize;
 		if (loadCount > 0) {
 			long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 			log.time(() -> String.format("%,5d vaults     load from cache    time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
@@ -534,7 +534,7 @@ public final class HistoSetCollector {
 	 */
 	private List<ExtendedVault> removeSuppressedHistoVaults() {
 		List<ExtendedVault> removed = new ArrayList<>();
-		this.histoVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
+		this.pickedVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
 			if (ExclusionData.isExcluded(v.getLogFileAsPath(), v.getLogRecordsetBaseName())) {
 				log.info(() -> String.format("discarded as per exclusion list   %s %s   %s", //$NON-NLS-1$
 						v.getLogFilePath(), v.getLogRecordsetBaseName(), v.getStartTimeStampFormatted()));
@@ -542,9 +542,9 @@ public final class HistoSetCollector {
 			}
 		});
 		for (ExtendedVault vault : removed) {
-			List<ExtendedVault> vaultList = this.histoVaults.get(vault.getLogStartTimestamp_ms());
+			List<ExtendedVault> vaultList = this.pickedVaults.get(vault.getLogStartTimestamp_ms());
 			vaultList.remove(vault);
-			if (vaultList.isEmpty()) this.histoVaults.remove(vault.getLogStartTimestamp_ms());
+			if (vaultList.isEmpty()) this.pickedVaults.remove(vault.getLogStartTimestamp_ms());
 		}
 		return removed;
 	}
@@ -595,9 +595,9 @@ public final class HistoSetCollector {
 	 * @param histoVault
 	 */
 	public void putVault(ExtendedVault histoVault) {
-		List<ExtendedVault> timeStampHistoVaults = this.histoVaults.get(histoVault.getLogStartTimestamp_ms());
+		List<ExtendedVault> timeStampHistoVaults = this.pickedVaults.get(histoVault.getLogStartTimestamp_ms());
 		if (timeStampHistoVaults == null) {
-			this.histoVaults.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<ExtendedVault>());
+			this.pickedVaults.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<ExtendedVault>());
 		}
 		timeStampHistoVaults.add(histoVault);
 		log.finer(() -> String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$

@@ -153,6 +153,15 @@ public enum DataTypes {
     	throw new IllegalArgumentException(v.name());
     }
 
+    public static DataType toDataType(DataTypes vaultDataType) {
+    	for (DataType recordDataType: DataType.values()) {
+    		if (recordDataType.name().equals(vaultDataType.name())) {
+    			return recordDataType;
+    		}
+    	}
+    	throw new IllegalArgumentException(vaultDataType.name());
+    }
+
 		public static List<DataTypes> getAsList() {
 			List<DataTypes> dataTypes = new ArrayList<DataTypes>();
 			for (DataTypes type : VALUES) {

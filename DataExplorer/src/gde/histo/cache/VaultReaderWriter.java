@@ -23,7 +23,7 @@ import static java.util.logging.Level.SEVERE;
 
 import gde.config.Settings;
 import gde.histo.datasources.DirectoryScanner.SourceDataSet;
-import gde.histo.datasources.HistoSetCollector.ProgressManager;
+import gde.histo.datasources.VaultPicker.ProgressManager;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;

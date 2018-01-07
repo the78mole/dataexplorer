@@ -25,18 +25,15 @@ import static gde.histo.utils.HistoTimeLine.Density.LOW;
 import static gde.histo.utils.HistoTimeLine.Density.MEDIUM;
 import static java.util.logging.Level.FINER;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
@@ -60,13 +57,17 @@ import gde.utils.LocalizedDateTime.DateTimePattern;
  * @author Thomas Eickert (USER)
  */
 public final class HistoTimeLine {
-	private final static String						$CLASS_NAME			= HistoTimeLine.class.getName();
-	private final static Logger						log							= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME	= HistoTimeLine.class.getName();
+	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private final Settings								settings				= Settings.getInstance();
+	/**
+	 * Maximum distance from an x axis position for snapping the nearest adjacent position (value is a number of pixels).
+	 */
+	private final static int		X_TOLERANCE	= 20;
 
-	private final TreeMap<Long, Integer>	scalePositions	= new TreeMap<>(Collections.reverseOrder());
-
+	/**
+	 * Degree of population on the x -axis.
+	 */
 	enum Density {
 		EXTREME(4), HIGH(8), MEDIUM(10), LOW(16);
 
@@ -97,50 +98,262 @@ public final class HistoTimeLine {
 		}
 	}
 
-	private TrailRecordSet								trailRecordSet;
 	/**
-	 * degree of population on the x -axis
+	 * X axis positions in reversed order of timestamps.
 	 */
-	private Density												density;
+	public static final class ScalePositions {
+		private final TreeMap<Long, Integer> scalePositions;
+
+		/**
+		 * Take the timeline width and calculates the pixel positions of the timestamp values.
+		 * Left and right margins are left free for boxplots.
+		 * In case of few timestamps the left and right margins will be increased.
+		 */
+		public static ScalePositions createScalePositions(Density density, int width, TimeScale relativeTimeScale) {
+			int leftMargin;
+			int rightMargin;
+			if (Settings.getInstance().isXAxisLogarithmicDistance() || density == Density.LOW || relativeTimeScale.size() <= 2) {
+				// bigger margins present the data in a more harmonic manner
+				int remainingWidthPerItem = (width - density.boxWidth) / relativeTimeScale.size();
+				if (remainingWidthPerItem > 2 * Density.LOW.boxWidth)
+					// in case of few items: placing the items acc to the average distance is more harmonic than using the double box size
+					leftMargin = rightMargin = width / (relativeTimeScale.size() + 1);
+				else
+					leftMargin = rightMargin = (density.getScaledBoxWidth()) / 2; // minimum distance equal to boxWidth assumed
+			} else {
+				leftMargin = rightMargin = (density.getScaledBoxWidth()) / 2; // minimum distance equal to boxWidth assumed
+			}
+			int netWidth = width - leftMargin - rightMargin;
+			log.finer(() -> String.format("width = %4d|leftMargin = %4d|rightMargin = %4d|netWidth = %4d", //
+					width, leftMargin, rightMargin, netWidth));
+
+			TreeMap<Long, Integer> newScalePositions = new TreeMap<>(Collections.reverseOrder());
+			for (Entry<Long, Double> entry : relativeTimeScale.entrySet()) {
+				newScalePositions.put(entry.getKey(), leftMargin + (int) (entry.getValue() * netWidth));
+				log.finest(() -> "timeStamp = " + entry.getKey() + " position = " + newScalePositions.get(entry.getKey()));
+			}
+			return new ScalePositions(newScalePositions);
+		}
+
+		private ScalePositions(TreeMap<Long, Integer> scalePositions) {
+			this.scalePositions = scalePositions;
+		}
+
+		public int get(long scaleTimeStamp_ms) {
+			return scalePositions.get(scaleTimeStamp_ms);
+		}
+
+		/**
+		 * @return in reversed order
+		 */
+		public Set<Entry<Long, Integer>> entrySet() {
+			return scalePositions.entrySet();
+		}
+
+		public int size() {
+			return scalePositions.size();
+		}
+	}
+
+	/**
+	 * Map histoset timestamps to x-axis positions.
+	 */
+	private static final class TimeScale {
+		private final TreeMap<Long, Double>							timeScale;
+		private final BiFunction<Long, Double, Double>	putter;
+
+		double																					runningSum	= 0.;
+		double																					runningMin	= Double.MAX_VALUE;
+
+		public TimeScale() {
+			this(true);
+		}
+
+		public TimeScale(boolean isXAxisReversed) {
+			if (isXAxisReversed) {
+				this.timeScale = new TreeMap<Long, Double>(Collections.reverseOrder());
+				this.putter = (scaleTimeStamp_ms, position) -> this.timeScale.put(scaleTimeStamp_ms, position);
+			} else {
+				this.timeScale = new TreeMap<Long, Double>();
+				// value is based on descending order and must be transformed (e.g. a lefthand value becomes a righthand value)
+				this.putter = (scaleTimeStamp_ms, position) -> this.timeScale.put(scaleTimeStamp_ms, 1. - position);
+			}
+		}
+
+		public long getLeftMostTimeStamp_ms() {
+			return timeScale.firstKey();
+		}
+
+		public long getRightMostTimeStamp_ms() {
+			return timeScale.lastKey();
+		}
+
+		public Double put(long scaleTimeStamp_ms, double distance) {
+			runningSum += distance;
+			runningMin = Math.min(runningMin, distance);
+			return putter.apply(scaleTimeStamp_ms, distance);
+		}
+
+		public Double putRunningSum(long scaleTimeStamp_ms, double distance) {
+			runningSum += distance;
+			return putter.apply(scaleTimeStamp_ms, runningSum);
+		}
+
+		/**
+		 * @return in reversed order
+		 */
+		public Set<Entry<Long, Double>> entrySet() {
+			return timeScale.entrySet();
+		}
+
+		public int size() {
+			return timeScale.size();
+		}
+
+		@Override
+		public String toString() {
+			return "TimeScale [timeScaleSize=" + this.timeScale.size() + ", runningSum=" + this.runningSum + ", runningMin=" + this.runningMin + "]";
+		}
+	}
+
+	/**
+	 * Access to timestamps by x axis position (naturalOrder).
+	 */
+	private static final class ScaleTimeStamps {
+
+		private final TreeMap<Integer, List<Long>> scaleTimeStamps_ms;
+
+		public ScaleTimeStamps(ScalePositions scalePositions) {
+			this.scaleTimeStamps_ms = defineScaleTimeStamps_ms(scalePositions);
+		}
+
+		/**
+		 * Create the map for optimized access to timestamps by x axis position.
+		 * Optimized for naturally ordered x positions and timestamps ordered based on the user's x axis order setting.
+		 */
+		private TreeMap<Integer, List<Long>> defineScaleTimeStamps_ms(ScalePositions scalePositions) {
+			TreeMap<Integer, List<Long>> scaleTimeStamps = new TreeMap<Integer, List<Long>>();
+			if (Settings.getInstance().isXAxisReversed()) {
+				Entry<Integer, List<Long>> previous = null;
+				for (Entry<Long, Integer> entry : scalePositions.entrySet()) { // TreeMap is reversed
+					if (previous == null || entry.getValue() != previous.getKey()) {
+						scaleTimeStamps.put(entry.getValue(), new ArrayList<Long>());
+						previous = scaleTimeStamps.lastEntry();
+					}
+					previous.getValue().add(entry.getKey()); // results in a reverse timeStamp order (decreasing timestamps)
+				}
+			} else {
+				Entry<Integer, List<Long>> previous = null;
+				for (Entry<Long, Integer> entry : scalePositions.entrySet()) { // TreeMap is reversed
+					if (previous == null || entry.getValue() != previous.getKey()) {
+						scaleTimeStamps.put(entry.getValue(), new ArrayList<Long>());
+						previous = scaleTimeStamps.firstEntry(); // due to decreasing x axis positions in the scalePositions map
+					}
+					previous.getValue().add(0, entry.getKey()); // results in a natural timeStamp order
+				}
+			}
+			return scaleTimeStamps;
+		}
+
+		public Long getSnappedTimeStamp_ms(int xPos) {
+			Long timeStamp_ms = null;
+
+			final Entry<Integer, List<Long>> lowerEntry = scaleTimeStamps_ms.lowerEntry(xPos);
+			if (lowerEntry == null) {
+				Entry<Integer, List<Long>> ceilingEntry = scaleTimeStamps_ms.ceilingEntry(xPos);
+				if (ceilingEntry == null) throw new UnsupportedOperationException("an empty scale is not allowed");
+				timeStamp_ms = ceilingEntry.getValue().get(0);
+			} else {
+				if (xPos == lowerEntry.getKey())
+					timeStamp_ms = lowerEntry.getValue().get(0); // take the first timeStamp for simplicity reasons
+				else {
+					Entry<Integer, List<Long>> ceilingEntry = scaleTimeStamps_ms.ceilingEntry(xPos);
+					if (ceilingEntry == null) {
+						; // one single entry but grabbing it makes no sense
+					} else {
+						if (xPos <= lowerEntry.getKey() + X_TOLERANCE || xPos >= ceilingEntry.getKey() - X_TOLERANCE) {
+							timeStamp_ms = xPos <= (ceilingEntry.getKey() + lowerEntry.getKey()) / 2 //
+									? lowerEntry.getValue().get(lowerEntry.getValue().size() - 1) //
+									: ceilingEntry.getValue().get(0);
+						} else
+							; // midst in the distance but too far away
+					}
+				}
+			}
+			return timeStamp_ms;
+		}
+
+		public long getAdjacentTimeStamp_ms(int xPos) {
+			final long timeStamp_ms;
+
+			final Entry<Integer, List<Long>> lowerEntry = this.scaleTimeStamps_ms.lowerEntry(xPos);
+			if (lowerEntry == null) {
+				Entry<Integer, List<Long>> ceilingEntry = this.scaleTimeStamps_ms.ceilingEntry(xPos);
+				if (ceilingEntry == null) throw new UnsupportedOperationException(" an empty scale is not allowed");
+				timeStamp_ms = ceilingEntry.getValue().get(0);
+			} else {
+				if (xPos == lowerEntry.getKey()) {
+					timeStamp_ms = lowerEntry.getValue().get(0); // take the first timeStamp for simplicity reasons
+				} else {
+					Entry<Integer, List<Long>> ceilingEntry = this.scaleTimeStamps_ms.ceilingEntry(xPos);
+					if (ceilingEntry == null) {
+						timeStamp_ms = lowerEntry.getValue().get(lowerEntry.getValue().size() - 1);
+					} else {
+						timeStamp_ms = xPos <= (ceilingEntry.getKey() + lowerEntry.getKey()) / 2 //
+								? lowerEntry.getValue().get(lowerEntry.getValue().size() - 1) //
+								: ceilingEntry.getValue().get(0);
+					}
+				}
+			}
+			return timeStamp_ms;
+		}
+
+		public int getScaleTimeStampsSum_ms() {
+			return scaleTimeStamps_ms.entrySet().parallelStream().mapToInt(c -> c.getValue().size()).sum();
+		}
+
+		public int size() {
+			return scaleTimeStamps_ms.size();
+		}
+
+	}
+
+	private final Settings	settings	= Settings.getInstance();
+
+	private TrailRecordSet	trailRecordSet;
 	/**
 	 * Chart region defined by the full timescale length and the y axis height
 	 */
-	private Rectangle curveAreaBounds;
+	private Rectangle				curveAreaBounds;
 	/**
 	 * number of pixels for the timescale length (includes left/right margins and the chart region)
 	 */
-	private int														width;
-	/**
-	 * define the corners of the chart region
-	 */
-	private long													leftmostTimeStamp, rightmostTimeStamp;
-	/**
-	 * maps histoset timestamps to x-axis with range 0 to 1
-	 */
-	private TreeMap<Long, Double>					relativeTimeScale;
-	/**
-	 * access timestamps by x axis position (naturalOrder)
-	 */
-	private TreeMap<Integer, List<Long>>	scaleTimeStamps_ms	= new TreeMap<Integer, List<Long>>();
+	private int							width;
+
+	private TimeScale				relativeTimeScale;
+	private Density					density;
+	private ScalePositions	scalePositions;
+	private ScaleTimeStamps	scaleTimeStamps;
 
 	/**
 	 * Take the timeline width and calculates the x-axis pixel positions for the timestamp values.
 	 * @param newTrailRecordSet any recordset object (no trail recordset required)
-	 * @param newWidth number of pixels for the timescale length including left/right margins for boxplots
+	 * @param newCurveAreaBounds number of pixels for the timescale length including left/right margins for boxplots
 	 */
-	public synchronized void initialize(TrailRecordSet newTrailRecordSet, Rectangle curveAreaBounds) {
+	public synchronized void initialize(TrailRecordSet newTrailRecordSet, Rectangle newCurveAreaBounds) {
 		this.trailRecordSet = newTrailRecordSet;
-		this.curveAreaBounds = curveAreaBounds;
-		this.width = curveAreaBounds.width;
-		setRelativeScale();
-		defineDensity();
-		setScalePositions();
+		this.curveAreaBounds = newCurveAreaBounds;
+		this.width = newCurveAreaBounds.width;
+		this.relativeTimeScale = defineRelativeScale();
+		this.density = defineDensity();
+		this.scalePositions = ScalePositions.createScalePositions(this.density, this.width, this.relativeTimeScale);
+		this.scaleTimeStamps = null;
 	}
 
 	@Override
 	public String toString() {
-		int scaleTimeStampsSum_ms = this.scaleTimeStamps_ms.entrySet().parallelStream().mapToInt(c -> c.getValue().size()).sum();
-		return String.format("width=%d  leftmostTimeStamp = %,d  rightmostTimeStamp = %,d  density=%s scalePositionsSize=%d scaleTimeStamps_ms=%d", this.width, this.leftmostTimeStamp, this.rightmostTimeStamp, this.density.toString(), this.scaleTimeStamps_ms.size(), scaleTimeStampsSum_ms);
+		return String.format("width=%d  leftmostTimeStamp = %,d  rightmostTimeStamp = %,d  density=%s scalePositionsSize=%d scaleTimeStamps_ms=%d", //
+				this.width, this.relativeTimeScale.getLeftMostTimeStamp_ms(), this.relativeTimeScale.getRightMostTimeStamp_ms(), this.density.toString(), this.scaleTimeStamps.size(), scaleTimeStamps.getScaleTimeStampsSum_ms());
 	}
 
 	/**
@@ -159,7 +372,7 @@ public final class HistoTimeLine {
 		log.fine(() -> String.format("time line - x0=%d y0=%d - width=%d", x0, y0, this.width)); //$NON-NLS-1$
 
 		// calculate the maximum time to be displayed and define the corresponding label format
-		final DateTimePattern timeFormat = getScaleFormat(this.trailRecordSet.getLeftmostTimeStamp_ms() - this.trailRecordSet.getRightmostTimeStamp_ms());
+		final DateTimePattern timeFormat = getScaleFormat(this.trailRecordSet.getTopTimeStamp_ms() - this.trailRecordSet.getLowestTimeStamp_ms());
 
 		String timeLineDescription;
 		Point pt; // to calculate the space required to draw the time values
@@ -176,7 +389,7 @@ public final class HistoTimeLine {
 		} else {
 			throw new UnsupportedOperationException();
 		}
-		long sampleTimeStamp_ms = trailRecordSet.getTimeStepSize() == 0 ? 11 : trailRecordSet.getLeftmostTimeStamp_ms();
+		long sampleTimeStamp_ms = trailRecordSet.getTimeStepSize() == 0 ? 11 : trailRecordSet.getTopTimeStamp_ms();
 		pt = gc.textExtent(LocalizedDateTime.getFormatedTime(timeFormat, sampleTimeStamp_ms)); // $NON-NLS-1$
 		GraphicsUtils.drawTimeLineText(timeLineDescription, (x0 + this.width / 2), y0 + pt.y * 5 / 2 + 2, gc, SWT.HORIZONTAL);
 		drawTickMarks(gc, x0, y0, pt, timeFormat);
@@ -193,7 +406,7 @@ public final class HistoTimeLine {
 
 		long totalTime_month = TimeUnit.DAYS.convert(totalDisplayTime_ms, TimeUnit.MILLISECONDS) / 30;
 		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(this.leftmostTimeStamp); // start year
+		cal.setTimeInMillis(this.relativeTimeScale.getLeftMostTimeStamp_ms()); // start year
 		if (totalTime_month < 12 && Calendar.getInstance().get(Calendar.YEAR) == cal.get(Calendar.YEAR)) {
 			// starts in the current year
 			if (this.density == EXTREME)
@@ -221,150 +434,83 @@ public final class HistoTimeLine {
 	/**
 	 * @return list holding the timestamps and pixel positions (leftmost: 0, rightmost: width)
 	 */
-	public TreeMap<Long, Integer> getScalePositions() {
+	public ScalePositions getScalePositions() {
 		return this.scalePositions;
-	}
-
-	/**
-	 * Take the timeline width and calculates the pixel positions of the timestamp values.
-	 * Left and right margins are left free for boxplots.
-	 * In case of few timestamps the left and right margins will be increased.
-	 */
-	public void setScalePositions() {
-		this.scalePositions.clear();
-		this.scaleTimeStamps_ms.clear();
-		int leftMargin;
-		int rightMargin;
-		if (this.settings.isXAxisLogarithmicDistance() || this.density == Density.LOW || this.relativeTimeScale.size() <= 2) {
-			// bigger margins present the data in a more harmonic manner
-			int remainingWidthPerItem = (this.width - this.density.boxWidth) / this.relativeTimeScale.size();
-			if (remainingWidthPerItem > 2 * Density.LOW.boxWidth)
-				// in case of few items: placing the items acc to the average distance is more harmonic than using the double box size
-				leftMargin = rightMargin = this.width / (this.relativeTimeScale.size() + 1);
-			else
-				leftMargin = rightMargin = (this.density.getScaledBoxWidth()) / 2; // minimum distance equal to boxWidth assumed
-		} else {
-			leftMargin = rightMargin = (this.density.getScaledBoxWidth()) / 2; // minimum distance equal to boxWidth assumed
-		}
-		int netWidth = this.width - leftMargin - rightMargin;
-		log.finer(() -> String.format("width = %4d|leftMargin = %4d|rightMargin = %4d|netWidth = %4d", //
-				this.width, leftMargin, rightMargin, netWidth));
-
-		for (Entry<Long, Double> entry : this.relativeTimeScale.entrySet()) {
-			this.scalePositions.put(entry.getKey(), leftMargin + (int) (entry.getValue() * netWidth));
-			log.finest(() -> "timeStamp = " + entry.getKey() + " position = " + this.scalePositions.get( //$NON-NLS-1$ //$NON-NLS-2$
-					entry.getKey()));
-		}
 	}
 
 	/**
 	 * Calculate the relative position on the timescale based on isReversed and isTimeframeAdjustment.
 	 * (leftmost: 0, rightmost: 1)
 	 */
-	@SuppressWarnings({ "unused", "serial" })
-	private void setRelativeScale() {
+	@SuppressWarnings({ "unused" })
+	private TimeScale defineRelativeScale() {
+		TimeScale result;
 		long maxVerifiedTimeStamp = -1; // first timeStamp maximumTimeStamp which is the first one due to descending order
 
-		LinkedHashMap<Long, Long> applicableDistances = new LinkedHashMap<>();
-		double applicableDistancesSum = 0;
+		TimeScale applicableDistances = new TimeScale();
 		{// pass 1: build distances list and distances sum for all timestamps in the timestamp sliding window
-			log.log(FINER, "", this); //$NON-NLS-1$
 			long lastTimeStamp = 0;
 			for (int i = 0; i < this.trailRecordSet.getTimeStepSize(); i++) {
 				long currentTimeStamp = ((long) this.trailRecordSet.getTime_ms(i));
-				if (log.isLoggable(FINER)) {
-					ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currentTimeStamp), ZoneId.systemDefault());
-					log.log(FINER, "timestamp = " + currentTimeStamp + "  " + zdt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)); //$NON-NLS-1$ //$NON-NLS-2$
-				}
 				if (lastTimeStamp != 0) {
-					long currentDistance = lastTimeStamp - currentTimeStamp;
+					double currentDistance = lastTimeStamp - currentTimeStamp;
 					applicableDistances.put(currentTimeStamp, currentDistance);
-					applicableDistancesSum += currentDistance;
 				} else {
 					maxVerifiedTimeStamp = currentTimeStamp;
 				}
 				lastTimeStamp = currentTimeStamp;
 			}
-			if (log.isLoggable(FINER))
-				log.log(FINER, "applicableDistancesSum = " + applicableDistancesSum + " number of distances = " + applicableDistances.size()); //$NON-NLS-1$ //$NON-NLS-2$
+			log.finer(() -> "applicableDistancesSum=" + applicableDistances.runningSum + " number of distances=" + applicableDistances.size());
 		}
 		{// pass 2: build the relative timeScale list from relative distances
-			if (this.settings.isXAxisReversed()) {
-				this.relativeTimeScale = new TreeMap<Long, Double>(Collections.reverseOrder());
-				this.relativeTimeScale.put(maxVerifiedTimeStamp, 0.); // highest timestamp is at the leftmost position
-			} else {
-				this.relativeTimeScale = new TreeMap<Long, Double>() {
-					/**
-					 * value is based on descending order and must be transformed
-					 * (e.g. a lefthand value becomes a righthand value)
-					 */
-					@Override
-					public Double put(Long key, Double value) {
-						return super.put(key, 1. - value);
-					}
-				};
-				this.relativeTimeScale.put(maxVerifiedTimeStamp, 0.); // highest timestamp is at the rightmost position
-			}
-		}
-		{
+			result = new TimeScale(this.settings.isXAxisReversed());
+			result.put(maxVerifiedTimeStamp, 0.); // highest timestamp is at the leftmost or rightmost position
 			@SuppressWarnings("unused")
 			final boolean isNaturalTimescale = false;
 			if (isNaturalTimescale == true) {
 				// true is not used anymore:
 				// use 'non-logarithmic' with a spread ordinal of zero which results in values very close to the natural timescale
 				// build final relative TimeScale List --- this a simple version illustrating the calculation baseline
-				double relativeTimeScaleSum = 0.;
-				for (Entry<Long, Long> entry : applicableDistances.entrySet()) {
-					double relativeDistance = entry.getValue() / applicableDistancesSum;
-					// relativeDistances.add(relativeDistance);
-					relativeTimeScaleSum += relativeDistance;
-					this.relativeTimeScale.put(entry.getKey(), relativeTimeScaleSum);
-					log.finest(() -> "relativeTimeScale = " + entry.getValue()); //$NON-NLS-1$
+				for (Entry<Long, Double> entry : applicableDistances.entrySet()) {
+					double relativeDistance = entry.getValue() / applicableDistances.runningSum;
+					result.putRunningSum(entry.getKey(), relativeDistance);
 				}
-				log.log(FINER, "relativeTimeScaleSum = ", relativeTimeScaleSum); //$NON-NLS-1$
+				log.log(FINER, "relativeTimeScaleSum=", result.runningSum);
 			} else {
 				// pass 2.1: build normalized distances List
-				LinkedHashMap<Long, Double> normalizedDistances = new LinkedHashMap<>();
-				double normalizedDistancesMin = 0.;
-				double normalizedDistancesSum = 0.;
-				for (Entry<Long, Long> entry : applicableDistances.entrySet()) {
-					double normalizedDistance;
-					if (this.settings.isXAxisLogarithmicDistance()) {
-						normalizedDistance = entry.getValue() != 0 ? Math.log(entry.getValue() / applicableDistancesSum) : 0;
-					} else {
-						normalizedDistance = entry.getValue() / applicableDistancesSum;
-					}
+				TimeScale normalizedDistances = new TimeScale();
+				for (Entry<Long, Double> entry : applicableDistances.entrySet()) {
+					double normalizedDistance = this.settings.isXAxisLogarithmicDistance() //
+							? entry.getValue() != 0 ? Math.log(entry.getValue() / applicableDistances.runningSum) : 0 //
+							: entry.getValue() / applicableDistances.runningSum;
 					normalizedDistances.put(entry.getKey(), normalizedDistance);
-					normalizedDistancesMin = Math.min(normalizedDistancesMin, normalizedDistance);
-					normalizedDistancesSum += normalizedDistance;
-					log.finest(() -> "normalizedDistance=" + normalizedDistance); //$NON-NLS-1$
 				}
-				log.log(FINER, "normalizedDistancesSum=", normalizedDistancesSum); //$NON-NLS-1$
+				log.log(FINER, "normalizedDistancesSum=", normalizedDistances.runningSum);
 
 				// pass 2.2: take logDistanceMin as a reference and scale to the final position range which is 0 to 1
 				// high spread values result in a rather equidistant placement of timesteps (distant timestamps move close together which
 				// results in more space for timesteps with small distances)
 				// so we get reasonable adjustments for spreadValues from 0 to 5
 				double logBaseDivisor = Math.log(1 + Math.pow(10, this.settings.getXAxisSpreadOrdinal() - 3));
-				double scaleConstant = normalizedDistancesSum / logBaseDivisor + (1 - normalizedDistancesMin / logBaseDivisor) * normalizedDistances.size();
-				double relativeTimeScaleSum = 0.;
+				double scaleConstant = normalizedDistances.runningSum / logBaseDivisor + (1 - normalizedDistances.runningMin / logBaseDivisor) * normalizedDistances.size();
 				for (Entry<Long, Double> entry2 : normalizedDistances.entrySet()) {
-					double relativeDistance = (1. + (entry2.getValue() - normalizedDistancesMin) / logBaseDivisor) / scaleConstant;
-					relativeTimeScaleSum += relativeDistance;
-					this.relativeTimeScale.put(entry2.getKey(), relativeTimeScaleSum);
-					log.finest(() -> "relativeTimeScale=" + this.relativeTimeScale.get(entry2.getKey())); //$NON-NLS-1$
+					double relativeDistance = (1. + (entry2.getValue() - normalizedDistances.runningMin) / logBaseDivisor) / scaleConstant;
+					result.putRunningSum(entry2.getKey(), relativeDistance);
 				}
-				log.log(FINER, "relativeTimeScaleSum=", relativeTimeScaleSum); //$NON-NLS-1$
+				log.log(FINER, "relativeTimeScaleSum=", result.runningSum);
 			}
 		}
+		return result;
 	}
 
 	/**
 	 * Calculate a density indicator based on the current width and the boxplot element scaled sizes
 	 * without width amplitude settings.
 	 * Does not take elements which have a distance less than one pixel and will be thus positioned at the same place.
+	 * @return
 	 */
-	private void defineDensity() {
+	private Density defineDensity() {
+		Density result;
 		List<Double> relativeDistances = new ArrayList<>();
 		Entry<Long, Double> lastEntry = null;
 		for (Entry<Long, Double> entry : this.relativeTimeScale.entrySet()) {
@@ -381,7 +527,7 @@ public final class HistoTimeLine {
 			lastEntry = entry;
 		}
 		if (relativeDistances.size() < 3)
-			this.density = LOW;
+			result = LOW;
 		else {
 			Collections.sort(relativeDistances);
 			// a high distanceQuantile value indicates that there is plenty of space between the x-axis points
@@ -390,17 +536,18 @@ public final class HistoTimeLine {
 			int absoluteDistance = (int) (this.width * distanceQuantile + .5);
 			// use the box size as a standard of comparison
 			if (absoluteDistance > LOW.boxWidth)
-				this.density = LOW;
+				result = LOW;
 			else if (absoluteDistance > MEDIUM.boxWidth)
-				this.density = MEDIUM;
+				result = MEDIUM;
 			else if (absoluteDistance > HIGH.boxWidth)
-				this.density = HIGH;
+				result = HIGH;
 			else
-				this.density = EXTREME;
+				result = EXTREME;
 			log.fine(() -> String.format("absoluteDistance=%d  boxType=%s   relativeDistancesMin=%f relativeDistancesMax=%f", //$NON-NLS-1$
 					absoluteDistance, this.density.toString(), relativeDistances.get(0), relativeDistances.get(relativeDistances.size() - 1)));
 		}
 		log.log(FINER, "", this); //$NON-NLS-1$
+		return result;
 	}
 
 	private void drawTickMarks(GC gc, int x0, int y0, Point pt, DateTimePattern timeFormat) {
@@ -437,30 +584,8 @@ public final class HistoTimeLine {
 	 * @return the time stamp of the trail recordset which is the closest one to xPos --- or null if xPos is too far away
 	 */
 	public Long getSnappedTimestamp(int xPos) {
-		final int xPosTolerance = 20;
-		Long timeStamp_ms = null;
-
-		if (this.scaleTimeStamps_ms.isEmpty()) setScaleTimeStamps_ms();
-
-		final Entry<Integer, List<Long>> lowerEntry = this.scaleTimeStamps_ms.lowerEntry(xPos);
-		if (lowerEntry != null && xPos == lowerEntry.getKey())
-			timeStamp_ms = lowerEntry.getValue().get(0); // take the first timeStamp for simplicity reasons
-		else {
-			Entry<Integer, List<Long>> ceilingEntry = this.scaleTimeStamps_ms.ceilingEntry(xPos);
-			if (ceilingEntry == null && lowerEntry == null)
-				throw new UnsupportedOperationException("an empty scale is not allowed");
-			else if (ceilingEntry == null)
-				timeStamp_ms = lowerEntry.getValue().get(lowerEntry.getValue().size() - 1);
-			else if (lowerEntry == null)
-				timeStamp_ms = ceilingEntry.getValue().get(0);
-			else if (xPos > lowerEntry.getKey() + xPosTolerance && xPos < ceilingEntry.getKey() - xPosTolerance)
-				timeStamp_ms = null; // midst in the distance but too far away
-			else
-				timeStamp_ms = lowerEntry != null && xPos <= (ceilingEntry.getKey() + lowerEntry.getKey()) / 2 //
-						? lowerEntry.getValue().get(lowerEntry.getValue().size() - 1) //
-						: ceilingEntry.getValue().get(0);
-		}
-		return timeStamp_ms;
+		if (this.scaleTimeStamps == null) this.scaleTimeStamps = new ScaleTimeStamps(this.scalePositions);
+		return this.scaleTimeStamps.getSnappedTimeStamp_ms(xPos);
 	}
 
 	/**
@@ -468,54 +593,8 @@ public final class HistoTimeLine {
 	 * @return the time stamp of the trail recordset which is the closest one to xPos
 	 */
 	public long getAdjacentTimestamp(int xPos) {
-		long timeStamp_ms;
-
-		if (this.scaleTimeStamps_ms.isEmpty()) setScaleTimeStamps_ms();
-
-		final Entry<Integer, List<Long>> lowerEntry = this.scaleTimeStamps_ms.lowerEntry(xPos);
-		if (lowerEntry != null && xPos == lowerEntry.getKey())
-			timeStamp_ms = lowerEntry.getValue().get(0); // take the first timeStamp for simplicity reasons
-		else {
-			final Entry<Integer, List<Long>> ceilingEntry = this.scaleTimeStamps_ms.ceilingEntry(xPos);
-			if (ceilingEntry == null && lowerEntry == null)
-				throw new UnsupportedOperationException(" an empty scale is not allowed");
-			else if (ceilingEntry == null)
-				timeStamp_ms = lowerEntry.getValue().get(lowerEntry.getValue().size() - 1);
-			else
-				timeStamp_ms = lowerEntry != null && xPos <= (ceilingEntry.getKey() + lowerEntry.getKey()) / 2//
-						? lowerEntry.getValue().get(lowerEntry.getValue().size() - 1)//
-						: ceilingEntry.getValue().get(0);
-		}
-		return timeStamp_ms;
-	}
-
-	/**
-	 * Create the map for optimized access to timestamps by x axis position.
-	 * Optimized for naturally ordered x positions and timestamps ordered based on the user's x axis order setting.
-	 */
-	private void setScaleTimeStamps_ms() {
-		this.scaleTimeStamps_ms.clear();
-		if (this.settings.isXAxisReversed()) {
-			Entry<Integer, List<Long>> previous = null;
-			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed
-				log.finest(() -> String.format("xPos=%d  entryValue=%d", entry.getValue(), entry.getKey())); //$NON-NLS-1$
-				if (previous == null || entry.getValue() != previous.getKey()) {
-					this.scaleTimeStamps_ms.put(entry.getValue(), new ArrayList<Long>());
-					previous = this.scaleTimeStamps_ms.lastEntry();
-				}
-				previous.getValue().add(entry.getKey()); // results in a reverse timeStamp order (decreasing timestamps)
-			}
-		} else {
-			Entry<Integer, List<Long>> previous = null;
-			for (Entry<Long, Integer> entry : this.getScalePositions().entrySet()) { // TreeMap is reversed
-				log.finest(() -> String.format("xPos=%d  entryValue=%d", entry.getValue(), entry.getKey())); //$NON-NLS-1$
-				if (previous == null || entry.getValue() != previous.getKey()) {
-					this.scaleTimeStamps_ms.put(entry.getValue(), new ArrayList<Long>());
-					previous = this.scaleTimeStamps_ms.firstEntry(); // due to decreasing x axis positions in the scalePositions map
-				}
-				previous.getValue().add(0, entry.getKey()); // results in a natural timeStamp order
-			}
-		}
+		if (this.scaleTimeStamps == null) this.scaleTimeStamps = new ScaleTimeStamps(this.scalePositions);
+		return scaleTimeStamps.getAdjacentTimeStamp_ms(xPos);
 	}
 
 	public Density getDensity() {

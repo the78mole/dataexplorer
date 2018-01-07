@@ -98,7 +98,7 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 	}
 
 	public String toCsvString() {
-		return this.format.format(this.latitude) + GDE.STRING_COMMA + this.format.format(this.longitude);
+		return this.format.format(this.latitude) + GDE.STRING_CSV_SEPARATOR + this.format.format(this.longitude);
 	}
 
 	/**

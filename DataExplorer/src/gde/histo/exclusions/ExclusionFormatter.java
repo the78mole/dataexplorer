@@ -19,9 +19,7 @@
 
 package gde.histo.exclusions;
 
-import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.ui.DataExplorer;
@@ -36,24 +34,13 @@ public final class ExclusionFormatter {
 	 * @return the exclusion information for the trusses excluded from the history
 	 */
 	public static String getExcludedTrussesAsText() {
-		Set<String> exclusionTexts = new HashSet<>();
-		for (Path path : DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths()) {
-			exclusionTexts.add(getFormattedProperty(ExclusionData.getInstance(path.getParent()),path.getFileName().toString()));
-		}
-
-		StringBuilder sb = new StringBuilder();
-		for (String text : exclusionTexts) {
-			sb.append(GDE.STRING_NEW_LINE).append(text);
-		}
-		return sb.length() > 0 ? sb.substring(1) : GDE.STRING_EMPTY;
-	}
-
-	/**
-	 * @param key is the data file name of the vault / truss
-	 * @return the formated key value pair ('0199_2015-11-8.bin' or '0199_2015-11-8.bin : recordsetname')
-	 */
-	private static String getFormattedProperty(ExclusionData fileExclusionData, String key) {
-		return fileExclusionData.getProperty(key).isEmpty() ? key : key + GDE.STRING_BLANK_COLON_BLANK + fileExclusionData.getProperty(key);
+		return DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths().stream().distinct() //
+				.map(p -> {
+					String key = p.getFileName().toString();
+					String property = ExclusionData.getInstance(p.getParent()).getProperty(key);
+					return (property.isEmpty() ? key : key + GDE.STRING_BLANK_COLON_BLANK + property);
+				}) //
+				.collect(Collectors.joining("\n"));
 	}
 
 }

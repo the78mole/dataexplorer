@@ -19,13 +19,22 @@
 
 package gde.histo.recordings;
 
+import static gde.histo.utils.ElementaryQuantile.BoxplotItems.LOWER_WHISKER;
+import static gde.histo.utils.ElementaryQuantile.BoxplotItems.LQT;
+import static gde.histo.utils.ElementaryQuantile.BoxplotItems.QUARTILE1;
+import static gde.histo.utils.ElementaryQuantile.BoxplotItems.QUARTILE3;
+import static gde.histo.utils.ElementaryQuantile.BoxplotItems.UPPER_WHISKER;
+import static gde.histo.utils.ElementaryQuantile.BoxplotItems.UQT;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.WARNING;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +42,8 @@ import java.util.Objects;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -42,6 +53,7 @@ import gde.config.Settings;
 import gde.data.AbstractRecord;
 import gde.data.AbstractRecordSet;
 import gde.data.Record;
+import gde.data.Record.DataType;
 import gde.data.TimeSteps;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
@@ -54,9 +66,14 @@ import gde.histo.cache.ExtendedVault;
 import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.datasources.HistoSet;
 import gde.histo.gpslocations.GpsCluster;
+import gde.histo.recordings.TrailRecord.Summary;
 import gde.histo.ui.HistoExplorer;
 import gde.histo.ui.HistoSummaryWindow;
+import gde.histo.ui.data.SummarySpots.OutlierWarning;
+import gde.histo.utils.ElementaryQuantile;
 import gde.histo.utils.GpsCoordinate;
+import gde.histo.utils.UniversalQuantile;
+import gde.log.Level;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
@@ -91,106 +108,27 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		@SuppressWarnings("hiding")
 		private final Logger log = Logger.getLogger(RecordingsCollector.class.getName());
 
-		RecordingsCollector() {
-			super();
-		}
-
 		/**
 		 * Set time steps for the trail recordset and the data points for all trail records.
 		 * Every record takes the selected trail type / score data from the history vault and populates its data.
 		 */
 		void addVaults() {
-			for (Map.Entry<Long, List<ExtendedVault>> entry : histoVaults.entrySet()) {
+			for (Map.Entry<Long, List<ExtendedVault>> entry : pickedVaults.initialVaults.entrySet()) {
 				for (ExtendedVault histoVault : entry.getValue()) {
-					addVaultHeader(histoVault);
-				}
-			}
-
-			for (String recordName : getRecordNames()) {
-				addVaults(recordName);
-			}
-		}
-
-		private void addVaultHeader(ExtendedVault histoVault) {
-			int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
-			durations_mm.add(duration_mm);
-			if (!timeStep_ms.addRaw(histoVault.getLogStartTimestamp_ms() * 10)) {
-				log.warning(() -> String.format("Duplicate recordSet  startTimeStamp %,d  %s", histoVault.getLogStartTimestamp_ms(), histoVault.getLogFilePath())); //$NON-NLS-1$
-			}
-
-			dataTags.add(histoVault);
-		}
-
-		/**
-		 * Set the data points for one single trail record.
-		 * The record takes the selected trail type / score data from the trail record vault and populates its data.
-		 * @param recordName
-		 */
-		private synchronized void addVaults(String recordName) {
-			TrailRecord trailRecord = get(recordName);
-			trailRecord.clear();
-			if (!trailRecord.getTrailSelector().isTrailSuite()) {
-				histoVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
-					trailRecord.addElement(trailRecord.getVaultPoint(v, trailRecord.getTrailSelector().getTrailOrdinal()));
-				});
-			} else {
-				trailRecord.setSuite(histoVaults.size());
-				histoVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
-					addVaultToSuite(v, trailRecord);
-				});
-			}
-			log.finer(() -> " " + trailRecord.getTrailSelector());
-		}
-
-		/**
-		 * Take those data points from the histo vault which are assigned to the selected trail type.
-		 * Supports trail suites.
-		 */
-		private void addVaultToSuite(ExtendedVault histoVault, TrailRecord trailRecord) {
-			TrailSelector trailSelector = trailRecord.getTrailSelector();
-			List<TrailTypes> suiteMembers = trailSelector.getTrailType().getSuiteMembers();
-
-			if (trailSelector.getTrailType().isBoxPlot()) {
-				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
-				for (int i = 0; i < trailSelector.getTrailType().getSuiteMembers().size(); i++) {
-					suiteRecords.get(i).addElement(trailRecord.getVaultPoint(histoVault, suiteMembers.get(i).ordinal()));
-				}
-			} else {
-				int tmpSummationFactor = 0;
-				int masterPoint = 0; // this is the base value for adding or subtracting standard deviations
-
-				SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
-				for (int i = 0; i < suiteMembers.size(); i++) {
-					Integer point = trailRecord.getVaultPoint(histoVault, suiteMembers.get(i).ordinal());
-					if (point == null) {
-						suiteRecords.get(i).addElement(null);
-					} else {
-						tmpSummationFactor = getSummationFactor(suiteMembers.get(i), tmpSummationFactor);
-						if (tmpSummationFactor == 0)
-							masterPoint = point; // use in the next iteration if summation is necessary, e.g. avg+2*sd
-						else
-							point = masterPoint + tmpSummationFactor * point * 2;
-
-						suiteRecords.get(i).addElement(point);
+					int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
+					durations_mm.add(duration_mm);
+					if (!timeStep_ms.addRaw(histoVault.getLogStartTimestamp_ms() * 10)) {
+						log.warning(() -> String.format("Duplicate recordSet  startTimeStamp %,d  %s", histoVault.getLogStartTimestamp_ms(), histoVault.getLogFilePath())); //$NON-NLS-1$
 					}
-					if (log.isLoggable(FINER)) log.log(FINER, String.format(" %s trail %3d  %s  %d minVal=%d maxVal=%d", trailRecord.getName(), //$NON-NLS-1$
-							trailSelector.getTrailOrdinal(), histoVault.getLogFilePath(), point, suiteRecords.get(i).getMinRecordValue(), suiteRecords.get(i).getMaxRecordValue()));
+					pickedVaults.addToIndex(histoVault);
+
+					dataTags.add(histoVault);
 				}
 			}
-			log.log(FINER, " ", trailSelector);
-		}
 
-		/**
-		 * Support adding / subtracting trail values from a preceding suite master record.
-		 * @param trailType
-		 * @param previousFactor the summation factor from the last iteration
-		 * @return the alternating -1/+1 factor for summation trail types; 0 otherwise
-		 */
-		private int getSummationFactor(TrailTypes trailType, int previousFactor) {
-			if (trailType.isAlienValue()) {
-				return previousFactor == 0 ? -1 : previousFactor * -1;
-			} else {
-				return 0;
+			for (String recordName : recordNames) {
+				TrailRecord trailRecord = get(recordName);
+				trailRecord.initializeFromVaults(pickedVaults.initialVaults);
 			}
 		}
 
@@ -201,30 +139,17 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		void setGpsLocationsTags() {
 			// locate the GPS coordinates records
 			TrailRecord latitudeRecord = null, longitudeRecord = null;
-			for (String recordName : getRecordNames()) { // todo fill HistoVault's DataType and access via DataType without hard coded measurement names
-				if (recordName.toLowerCase().contains("latitud")) //$NON-NLS-1$
-					latitudeRecord = get(recordName);
-				else if (recordName.toLowerCase().contains("longitud")) //$NON-NLS-1$
-					longitudeRecord = get(recordName);
+			for (TrailRecord trailRecord : TrailRecordSet.this.getValues()) {
+				if ( trailRecord.getDataType() == DataType.GPS_LATITUDE)
+					latitudeRecord = trailRecord;
+				else if ( trailRecord.getDataType() == DataType.GPS_LONGITUDE)
+					longitudeRecord = trailRecord;
 				if (latitudeRecord != null && longitudeRecord != null) break;
 			}
 
-			GpsCluster gpsCluster = new GpsCluster();
 			if (latitudeRecord != null && longitudeRecord != null) {
 				// provide GPS coordinates for clustering which is the prerequisite for adding the location to dataGpsLocations
-				for (Map.Entry<Long, List<ExtendedVault>> entry : histoVaults.entrySet()) {
-					for (ExtendedVault histoVault : entry.getValue()) {
-						Integer latitudePoint = histoVault.getMeasurementPoint(latitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
-						Integer longitudePoint = histoVault.getMeasurementPoint(longitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
-
-						if (latitudePoint != null && longitudePoint != null) {
-							gpsCluster.add(new GpsCoordinate(HistoSet.decodeVaultValue(latitudeRecord, latitudePoint / 1000.),
-									HistoSet.decodeVaultValue(longitudeRecord, longitudePoint / 1000.)));
-						} else {
-							gpsCluster.add(null); // this keeps the sequence in parallel with the vaults sequence
-						}
-					}
-				}
+				GpsCluster gpsCluster = pickedVaults.defineGpsAverages(latitudeRecord, longitudeRecord);
 				// populate the GPS locations list for subsequently filling the histo table
 				if (gpsCluster.parallelStream().filter(Objects::nonNull).count() > 0) {
 					Thread gpsLocationsThread = new Thread((Runnable) () -> setGpsLocationTags(gpsCluster), "setGpsLocationTags"); //$NON-NLS-1$
@@ -300,21 +225,399 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	}
 
-	private final HistoExplorer												presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
+	public final class PickedVaults {
+		@SuppressWarnings("hiding")
+		private final Logger															log						= Logger.getLogger(PickedVaults.class.getName());
+
+		/**
+		 * Data source for this recordset.
+		 * Sorted by recordSet startTimeStamp in reverse order.
+		 */
+		private final TreeMap<Long, List<ExtendedVault>>	initialVaults;
+		/**
+		 * Reference list for accessing vaults by index.
+		 * Same set of vaults as {@code histoVaults}.
+		 * Sorted by recordSet startTimeStamp in reverse order.
+		 */
+		private final List<ExtendedVault>									indexedVaults	= new ArrayList<>();
+		// todo use indexedVaults instead of initialVaults in internal methods (performance)
+
+		public PickedVaults(TreeMap<Long, List<ExtendedVault>> initialVaults) {
+			this.initialVaults = initialVaults;
+		}
+
+		void clear() {
+			indexedVaults.clear();
+		}
+
+		boolean addToIndex(ExtendedVault vault) {
+			return indexedVaults.add(vault);
+		}
+
+		/**
+		 * @return the vault at the timestep index position
+		 */
+		public ExtendedVault getVault(int index) {
+			return indexedVaults.get(index);
+		}
+
+		/**
+		 * @return a GPS location coordinates list
+		 */
+		GpsCluster defineGpsAverages(TrailRecord latitudeRecord, TrailRecord longitudeRecord) {
+			GpsCluster gpsCluster = new GpsCluster();
+			// provide GPS coordinates for clustering which is the prerequisite for adding the location to dataGpsLocations
+			for (Map.Entry<Long, List<ExtendedVault>> entry : initialVaults.entrySet()) {
+				for (ExtendedVault histoVault : entry.getValue()) {
+					Integer latitudePoint = histoVault.getMeasurementPoint(latitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
+					Integer longitudePoint = histoVault.getMeasurementPoint(longitudeRecord.getOrdinal(), TrailTypes.Q2.ordinal());
+
+					if (latitudePoint != null && longitudePoint != null) {
+						gpsCluster.add(new GpsCoordinate(HistoSet.decodeVaultValue(latitudeRecord, latitudePoint / 1000.),
+								HistoSet.decodeVaultValue(longitudeRecord, longitudePoint / 1000.)));
+					} else {
+						gpsCluster.add(null); // this keeps the sequence in parallel with the vaults sequence
+					}
+				}
+			}
+			return gpsCluster;
+		}
+
+		/**
+		 * Determine the outliers of the category which is the most significant.
+		 * This means: The result holds far outliers OR close outliers in case no far outliers are present.
+		 * @param logLimit is the maximum number of the most recent logs which is checked for warnings
+		 * @return the array of outliers warning objects which may hold null values
+		 */
+		public Outliers[] defineMinMaxWarning(String recordName, int logLimit) {
+			Outliers minWarning = null;
+			Outliers maxWarning = null;
+
+			double[][] minMaxQuantiles = defineExtremumQuantiles(get(recordName));
+			double minWhiskerLimit = minMaxQuantiles[0][QUARTILE1.ordinal()];
+			double maxWhiskerLimit = minMaxQuantiles[1][QUARTILE3.ordinal()];
+			double closeMinOutlierLimit = minMaxQuantiles[0][LOWER_WHISKER.ordinal()];
+			double closeMaxOutlierLimit = minMaxQuantiles[1][UPPER_WHISKER.ordinal()];
+			double farMinOutlierLimit = minMaxQuantiles[0][QUARTILE1.ordinal()] - 3. * 2. * minMaxQuantiles[0][LQT.ordinal()];
+			double farMaxOutlierLimit = minMaxQuantiles[1][QUARTILE3.ordinal()] + 3. * 2. * minMaxQuantiles[1][UQT.ordinal()];
+			int[] extremumIndices = get(recordName).trailSelector.getExtremumTrailsIndices();
+			String[] selectText = get(recordName).trailSelector.getExtremumTrailsTexts();
+			int warningLevel = settings.getWarningLevel();
+			if (warningLevel == -1) return new Outliers[] { null, null };
+
+			int actualLimit = logLimit >= 0 && logLimit < indexedVaults.size() ? logLimit : indexedVaults.size();
+			Iterator<ExtendedVault> iterator = indexedVaults.stream().iterator();
+			for (int i = 0; i < actualLimit; i++) {
+				ExtendedVault vault = iterator.next();
+				Integer[] minMaxTrailPoints = getExtremumTrailPoints(vault, get(recordName));
+				if (minMaxTrailPoints[0] == null || minMaxTrailPoints[1] == null) continue;
+
+				double tmpMinValue = HistoSet.decodeVaultValue(get(recordName), minMaxTrailPoints[0] / 1000.0);
+				if (HistoSet.fuzzyCompare(tmpMinValue, farMinOutlierLimit) < 0) {
+					if (minWarning == null || minWarning.getWarningType() == OutlierWarning.CLOSE || minWarning.getWarningType() == OutlierWarning.WHISKER) {
+						// discard lower category warnings
+						minWarning = new Outliers(OutlierWarning.FAR, farMinOutlierLimit, closeMinOutlierLimit, extremumIndices[0], selectText[0]);
+					}
+					minWarning.add(tmpMinValue, i);
+				} else if (OutlierWarning.CLOSE.isIncluded(warningLevel) && HistoSet.fuzzyCompare(tmpMinValue, closeMinOutlierLimit) < 0) {
+					if (minWarning == null || minWarning.getWarningType() == OutlierWarning.WHISKER) {
+						minWarning = new Outliers(OutlierWarning.CLOSE, farMinOutlierLimit, closeMinOutlierLimit, extremumIndices[0], selectText[0]);
+						minWarning.add(tmpMinValue, i);
+					} else if (minWarning.getWarningType() == OutlierWarning.CLOSE) {
+						minWarning.add(tmpMinValue, i);
+					} else {
+						; // discard close warning if far warnings are already present
+					}
+				} else if (OutlierWarning.WHISKER.isIncluded(warningLevel) && HistoSet.fuzzyCompare(tmpMinValue, minWhiskerLimit) < 0) {
+					if (minWarning == null) {
+						minWarning = new Outliers(OutlierWarning.WHISKER, farMinOutlierLimit, closeMinOutlierLimit, extremumIndices[0], selectText[0]);
+						minWarning.add(tmpMinValue, i);
+					} else if (minWarning.getWarningType() == OutlierWarning.WHISKER) {
+						minWarning.add(tmpMinValue, i);
+					} else {
+						; // discard warning if far or close warnings are already present
+					}
+				}
+				double tmpMaxValue = HistoSet.decodeVaultValue(get(recordName), minMaxTrailPoints[1] / 1000.);
+				if (HistoSet.fuzzyCompare(tmpMaxValue, farMaxOutlierLimit) > 0) {
+					if (maxWarning == null || maxWarning.getWarningType() == OutlierWarning.CLOSE || maxWarning.getWarningType() == OutlierWarning.WHISKER) {
+						maxWarning = new Outliers(OutlierWarning.FAR, farMaxOutlierLimit, closeMaxOutlierLimit, extremumIndices[1], selectText[1]);
+					}
+					maxWarning.add(tmpMaxValue, i);
+				} else if (OutlierWarning.CLOSE.isIncluded(warningLevel) && HistoSet.fuzzyCompare(tmpMaxValue, closeMaxOutlierLimit) > 0) {
+					if (maxWarning == null || maxWarning.getWarningType() == OutlierWarning.WHISKER) {
+						maxWarning = new Outliers(OutlierWarning.CLOSE, farMaxOutlierLimit, closeMaxOutlierLimit, extremumIndices[1], selectText[1]);
+						maxWarning.add(tmpMaxValue, i);
+					} else if (maxWarning.getWarningType() == OutlierWarning.CLOSE) {
+						maxWarning.add(tmpMaxValue, i);
+					}
+				} else if (OutlierWarning.WHISKER.isIncluded(warningLevel) && HistoSet.fuzzyCompare(tmpMaxValue, maxWhiskerLimit) > 0) {
+					if (maxWarning == null) {
+						maxWarning = new Outliers(OutlierWarning.WHISKER, farMaxOutlierLimit, closeMaxOutlierLimit, extremumIndices[1], selectText[1]);
+						maxWarning.add(tmpMaxValue, i);
+					} else if (maxWarning.getWarningType() == OutlierWarning.WHISKER) {
+						maxWarning.add(tmpMaxValue, i);
+					}
+				}
+			}
+			return new Outliers[] { minWarning, maxWarning };
+		}
+
+		/**
+		 * @return the points for the q0/q4 respective min/max trails; for score groups w/o min/max scores take the first score
+		 */
+		protected Integer[] getExtremumTrailPoints(ExtendedVault vault, TrailRecord record) {
+			int[] extremumOrdinals = record.trailSelector.getExtremumTrailsOrdinals();
+			return new Integer[] { record.getVaultPoint(vault, extremumOrdinals[0]), record.getVaultPoint(vault, extremumOrdinals[1]) };
+		}
+
+		/**
+		 * @return the extended tukey tolerance arrays for the min/max trails or for score groups w/o min/max scores take the first score
+		 */
+		protected double[][] defineExtremumQuantiles(TrailRecord record) {
+			int[] extremumOrdinals = record.trailSelector.getExtremumTrailsOrdinals();
+			Stream<Integer> pointMinimums = initialVaults.values().parallelStream().flatMap(List::stream).map(v -> record.getVaultPoint(v, extremumOrdinals[0]));
+			List<Double> decodedMinimums = pointMinimums.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(record, i / 1000.)).collect(Collectors.toList());
+			ElementaryQuantile<Double> minQuantile = new ElementaryQuantile<>(decodedMinimums, true);
+
+			Stream<Integer> pointMaximums = initialVaults.values().parallelStream().flatMap(List::stream).map(v -> record.getVaultPoint(v, extremumOrdinals[1]));
+			List<Double> decodedMaximums = pointMaximums.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(record, i / 1000.)).collect(Collectors.toList());
+			ElementaryQuantile<Double> maxQuantile = new ElementaryQuantile<>(decodedMaximums, true);
+
+			return new double[][] { minQuantile.getTukeyWithQuartileTolerances(), maxQuantile.getTukeyWithQuartileTolerances() };
+		}
+
+		/**
+		 * @return the max/minValues from the most recent logs
+		 */
+		double[] defineRecentStandardMinMax(String recordName, int limit) {
+			TrailRecord record = get(recordName);
+			double[] decodedMinMaxValues = new double[] { Double.MAX_VALUE, -Double.MAX_VALUE };
+
+			initialVaults.values().stream().flatMap(Collection::stream).limit(limit).forEach(v -> {
+				Integer tmpPoint;
+				if ((tmpPoint = record.getVaultPoint(v, TrailTypes.MIN.ordinal())) != null)
+					decodedMinMaxValues[0] = Math.min(decodedMinMaxValues[0], HistoSet.decodeVaultValue(record, tmpPoint / 1000.));
+				if ((tmpPoint = record.getVaultPoint(v, TrailTypes.MAX.ordinal())) != null)
+					decodedMinMaxValues[1] = Math.max(decodedMinMaxValues[1], HistoSet.decodeVaultValue(record, tmpPoint / 1000.));
+			});
+
+			if (decodedMinMaxValues[0] == Double.MAX_VALUE || decodedMinMaxValues[1] == -Double.MAX_VALUE) {
+				return new double[] { 0., 0. };
+			} else {
+				return decodedMinMaxValues;
+			}
+
+		}
+
+		/**
+		 * @return the max/minValues based on q0/q4
+		 */
+		double[] defineStandardExtrema(String recordName) {
+			TrailRecord record = get(recordName);
+			List<Double> decodedMinValues = new ArrayList<>();
+			List<Double> decodedLowValues = new ArrayList<>();
+			List<Double> decodedHighValues = new ArrayList<>();
+			List<Double> decodedMaxValues = new ArrayList<>();
+			initialVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
+				Integer tmpPoint;
+				if ((tmpPoint = record.getVaultPoint(v, TrailTypes.MIN.ordinal())) != null)
+					decodedMinValues.add(HistoSet.decodeVaultValue(record, tmpPoint / 1000.));
+				if ((tmpPoint = record.getVaultPoint(v, TrailTypes.Q0.ordinal())) != null)
+					decodedLowValues.add(HistoSet.decodeVaultValue(record, tmpPoint / 1000.));
+				if ((tmpPoint = record.getVaultPoint(v, TrailTypes.Q4.ordinal())) != null)
+					decodedHighValues.add(HistoSet.decodeVaultValue(record, tmpPoint / 1000.));
+				if ((tmpPoint = record.getVaultPoint(v, TrailTypes.MAX.ordinal())) != null)
+					decodedMaxValues.add(HistoSet.decodeVaultValue(record, tmpPoint / 1000.));
+			});
+
+			if (decodedLowValues.isEmpty() || decodedHighValues.isEmpty()) {
+				return new double[] { 0., 0. };
+			} else {
+				double[] result = getExtrema(recordName, decodedLowValues, decodedHighValues);
+
+				// corrections in cases when the whiskers are not within the scale
+				double lowerWhisker = new ElementaryQuantile<>(decodedMinValues, true).getQuantileLowerWhisker();
+				if (lowerWhisker < result[0]) {
+					result[0] = Math.min(lowerWhisker, result[0]);
+					log.log(Level.FINER, "lower corrected to ", lowerWhisker);
+				}
+				double upperWhisker = new ElementaryQuantile<>(decodedMaxValues, true).getQuantileUpperWhisker();
+				if (upperWhisker > result[1]) {
+					result[1] = Math.max(upperWhisker, result[1]);
+					log.log(Level.FINER, "upper corrected to ", upperWhisker);
+				}
+				return result;
+			}
+		}
+
+		private double[] getExtrema(String recordName, List<Double> decodedLowValues, List<Double> decodedHighValues) {
+			ElementaryQuantile<Double> minQuantile = new ElementaryQuantile<>(decodedLowValues, true);
+			ElementaryQuantile<Double> maxQuantile = new ElementaryQuantile<>(decodedHighValues, true);
+			int scaleSpread = settings.getSummaryScaleSpread();
+			double scaleMin = minQuantile.getExtremumFromRange(UniversalQuantile.INTER_QUARTILE_SIGMA_FACTOR, -scaleSpread);
+			double scaleMax = maxQuantile.getExtremumFromRange(UniversalQuantile.INTER_QUARTILE_SIGMA_FACTOR, scaleSpread);
+			double[] result = new double[] { Math.min(minQuantile.getQuantileLowerWhisker(), scaleMin),
+					Math.max(maxQuantile.getQuantileUpperWhisker(), scaleMax) };
+			log.finer(() -> recordName + " Quantile.Size=" + decodedLowValues.size() + "/" + decodedHighValues.size() + Arrays.toString(result));
+			return result;
+		}
+
+		/**
+		 * @return the max/minValues from the most recent logs for trails with a different number range than the measurement values
+		 */
+		double[] defineRecentAlienMinMax(String recordName, TrailTypes trailType, int limit) {
+			Stream<Integer> alienPoints = initialVaults.values().parallelStream().flatMap(Collection::stream) //
+					.limit(limit).map(v -> get(recordName).getVaultPoint(v, trailType.ordinal()));
+			DoubleSummaryStatistics decodedAliens = alienPoints.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(get(recordName), i / 1000.))//
+					.collect(Collectors.summarizingDouble((Double::doubleValue)));
+			if (decodedAliens.getCount() == 0) {
+				return new double[] { 0., 0. };
+			} else {
+				return new double[] { decodedAliens.getMin(), decodedAliens.getMax() };
+			}
+		}
+
+		/**
+		 * @return the min/max values for trails with a different number range than the measurement values (e.g. SD, counters)
+		 */
+		double[] defineAlienExtrema(String recordName, TrailTypes trailType) {
+			Stream<Integer> alienPoints = initialVaults.values().parallelStream().flatMap(Collection::stream).map(v -> get(recordName).getVaultPoint(v, trailType.ordinal()));
+			List<Double> decodedAliens = alienPoints.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(get(recordName), i / 1000.)).collect(Collectors.toList());
+			if (decodedAliens.isEmpty()) {
+				return new double[] { 0., 0. };
+			} else {
+				return getExtrema(recordName, decodedAliens, decodedAliens);
+			}
+		}
+
+		/**
+		 * @return the max/minValues from the most recent logs and all scoregroup members
+		 */
+		public double[] defineRecentScoreMinMax(String recordName, ScoreGroupType scoregroup, int limit) {
+			double[] minMaxValues = new double[] { Double.MAX_VALUE, -Double.MAX_VALUE };
+
+			List<Integer> scoreOrdinals = scoregroup.getScore().stream().map(s -> s.getTrailOrdinal()) //
+					.collect(Collectors.toList());
+			initialVaults.values().stream().flatMap(Collection::stream).limit(limit).forEach(v -> {
+				// determine the min and max of all score entries in the score group of this vault
+				Stream<Integer> scoregroupPoints = scoreOrdinals.stream().map(t -> get(recordName).getVaultPoint(v, t));
+				DoubleSummaryStatistics stats = scoregroupPoints.map(i -> HistoSet.decodeVaultValue(get(recordName), i / 1000.)) //
+						.collect(Collectors.summarizingDouble(Double::doubleValue));
+				minValue = Math.min(minValue, stats.getMin());
+				maxValue = Math.max(maxValue, stats.getMax());
+			});
+
+			if (minMaxValues[0] == -Double.MAX_VALUE || minMaxValues[1] == Double.MIN_VALUE) {
+				return new double[] { 0., 0. };
+			} else {
+				return minMaxValues;
+			}
+		}
+
+		/**
+		 * @return the max/minValues from all scoregroup members
+		 */
+		public double[] defineScoreExtrema(String recordName, ScoreGroupType scoregroup) {
+			List<Double> decodedLowValues = new ArrayList<>();
+			List<Double> decodedHighValues = new ArrayList<>();
+
+			List<Integer> scoreOrdinals = scoregroup.getScore().stream().map(s -> s.getTrailOrdinal()) //
+					.collect(Collectors.toList());
+			initialVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
+				// determine the min and max of all score entries in the score group of this vault
+				Stream<Integer> scoregroupPoints = scoreOrdinals.stream().map(t -> get(recordName).getVaultPoint(v, t));
+				DoubleSummaryStatistics stats = scoregroupPoints.map(i -> HistoSet.decodeVaultValue(get(recordName), i / 1000.)) //
+						.collect(Collectors.summarizingDouble(Double::doubleValue));
+				decodedLowValues.add(stats.getMin());
+				decodedHighValues.add(stats.getMax());
+			});
+			log.finer(() -> getName() + "  decodedMinimums=" + Arrays.toString(decodedLowValues.toArray()) + "  decodedMaximums=" + Arrays.toString(decodedHighValues.toArray()));
+
+			return getExtrema(recordName, decodedLowValues, decodedHighValues);
+		}
+
+		@Override
+		public String toString() {
+			return "[initialVaults=" + this.initialVaults.size() + ", indexedVaults=" + this.indexedVaults.size() + "]";
+		}
+
+	}
+
+	/**
+	 * Outliers data related to a warning category.
+	 * Please note:</br>
+	 * Vaults may hold an additional set of exceptional outliers beyond the far outlier category.
+	 * Those outliers are not element of the recordset and of this outliers object.
+	 */
+	public final class Outliers {
+		private final OutlierWarning	warningType;
+		private final double					farLimit;
+		private final double					closeLimit;
+		private final List<Double>		decodedValues	= new ArrayList<>();
+		private final List<Integer>		indices				= new ArrayList<>();
+		private final int							selectIndex;
+		private final String					selectText;
+
+		public Outliers(OutlierWarning warningType, double farLimit, double closeLimit, int selectIndex, String selectText) {
+			this.warningType = warningType;
+			this.farLimit = farLimit;
+			this.closeLimit = closeLimit;
+			this.selectIndex = selectIndex;
+			this.selectText = selectText;
+		}
+
+		public boolean add(double decodedValue, int index) {
+			this.indices.add(index);
+			return decodedValues.add(decodedValue);
+		}
+
+		public OutlierWarning getWarningType() {
+			return this.warningType;
+		}
+
+		public double getFarLimit() {
+			return this.farLimit;
+		}
+
+		public double getCloseLimit() {
+			return this.closeLimit;
+		}
+
+		public List<Double> getDecodedValues() {
+			return this.decodedValues;
+		}
+
+		public List<Integer> getIndices() {
+			return this.indices;
+		}
+
+		public int getSelectIndex() {
+			return this.selectIndex;
+		}
+
+		public String getSelectText() {
+			return this.selectText;
+		}
+
+		@Override
+		public String toString() {
+			String values = Arrays.toString(this.decodedValues.toArray(new Double[0]));
+			return this.warningType.toString() + " farLimit/closeLimit/values=" + this.farLimit + "/" + this.closeLimit + "/" + values;
+		}
+	}
+
+	private final HistoExplorer					presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
 
 	/**
 	 * Holds the view configuration.
 	 */
-	private final HistoGraphicsTemplate								template;
+	private final HistoGraphicsTemplate	template;
 
-	private final List<Integer>												durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
-	private final TrailDataTags												dataTags							= new TrailDataTags();
+	private final PickedVaults					pickedVaults;
 
-	/**
-	 * Data source for this recordset.
-	 * Sorted by recordSet startTimeStamp in reverse order.
-	 */
-	private final TreeMap<Long, List<ExtendedVault>>	histoVaults;
+	private final List<Integer>					durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
+	private final TrailDataTags					dataTags							= new TrailDataTags();
 
 	/**
 	 * Hold trail records for measurements, settlements and scores.
@@ -324,10 +627,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @param timeSteps
 	 */
 	private TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames, TimeSteps timeSteps,
-			TreeMap<Long, List<ExtendedVault>> histoVaults) {
+			TreeMap<Long, List<ExtendedVault>> pickedVaults) {
 		super(useDevice, channelNumber, "Trail", recordNames, timeSteps); //$NON-NLS-1$
 		String deviceSignature = useDevice.getName() + GDE.STRING_UNDER_BAR + channelNumber;
-		this.histoVaults = histoVaults;
+		this.pickedVaults = new PickedVaults(pickedVaults);
 		this.template = new HistoGraphicsTemplate(deviceSignature);
 		if (this.template != null) this.template.load();
 
@@ -342,13 +645,13 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * based on device xml settings.
 	 * @return a trail record set containing all trail records (empty) as specified
 	 */
-	public static synchronized TrailRecordSet createRecordSet(TreeMap<Long, List<ExtendedVault>> histoVaults) {
+	public static synchronized TrailRecordSet createRecordSet(TreeMap<Long, List<ExtendedVault>> pickedVaults) {
 		IDevice device = DataExplorer.application.getActiveDevice();
 		int channelConfigNumber = DataExplorer.application.getActiveChannelNumber();
 		String[] names = device.getDeviceConfiguration().getMeasurementSettlementScoregroupNames(channelConfigNumber);
 		TimeSteps timeSteps = new TimeSteps(-1, INITIAL_RECORD_CAPACITY);
 
-		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names, timeSteps, histoVaults);
+		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names, timeSteps, pickedVaults);
 		printRecordNames("createRecordSet() " + newTrailRecordSet.getName() + " - ", newTrailRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 		List<MeasurementType> channelMeasurements = device.getDeviceConfiguration().getChannelMeasuremts(channelConfigNumber);
 		LinkedHashMap<Integer, SettlementType> channelSettlements = device.getDeviceConfiguration().getChannel(channelConfigNumber).getSettlements();
@@ -436,17 +739,14 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Rebuild the record based on a new trail selection.
 	 */
 	public synchronized void refillRecord(TrailRecord record, int trailTextIndex) {
-		record.clear();
 		record.getTrailSelector().setTrailTextSelectedIndex(trailTextIndex);
-		RecordingsCollector collector = new RecordingsCollector();
-		collector.addVaults(record.getName());
+		record.initializeFromVaults(this.pickedVaults.initialVaults);
 	}
 
 	/**
 	 * Build data contents after building the records list.
 	 */
 	public synchronized void initializeFromVaults() {
-		// setting all data in this create procedure and the synchronized keyword makes this method thread safe
 		RecordingsCollector collector = new RecordingsCollector();
 		collector.defineTrailTypes();
 		collector.addVaults();
@@ -495,7 +795,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Set the sync max/min values for visible records inclusive referenced suite records.
 	 * Update the scale values from sync record if visible.
 	 */
-	public void updateSyncRecordScale() {
+	public synchronized void updateSyncGraphicsScale() {
 		for (TrailRecord actualRecord : getVisibleAndDisplayableRecords()) {
 			log.finer(() -> "set scale base value " + actualRecord.getName() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
 			actualRecord.setSyncMaxMinValue();
@@ -528,10 +828,13 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Update the display records to enable drawing of the summary graphics.
 	 * Needs not to check suite records because the summary max/min values comprise all suite members.
 	 */
-	public void updateAndSyncSummaryMinMax() {
+	public synchronized void updateSyncSummaryScale() {
+		int recencyLimit = settings.getWarningCount();
 		for (TrailRecord actualRecord : getDisplayRecords()) {
-			actualRecord.setSummaryMinMax();
-			log.finer(() -> actualRecord.getName() + "   summaryMin = " + actualRecord.summaryMin + "; summaryMax = " + actualRecord.summaryMax); //$NON-NLS-1$ //$NON-NLS-2$
+			Summary summary = actualRecord.getSummary();
+			summary.clear();
+			summary.setSyncMinMax(recencyLimit);
+			log.finer(() -> actualRecord.getName() + "   summaryMin = " + summary.syncMin + "  summaryMax=" + summary.syncMax);
 		}
 
 		// update the min/max values for synced records
@@ -540,26 +843,32 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			double tmpMin = Double.MAX_VALUE;
 			double tmpMax = -Double.MAX_VALUE;
 			for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
-				if (syncRecord.summaryMin != null && syncRecord.summaryMax != null) {
+				Summary summary = syncRecord.getSummary();
+				// exclude records with special trails from synchronizing
+				if (syncRecord.getTrailSelector().getTrailType().isAlienValue()) continue;
+
+				if (summary.syncMin != null && summary.syncMax != null) {
 					isAffected = true;
-					tmpMin = Math.min(tmpMin, syncRecord.summaryMin);
-					tmpMax = Math.max(tmpMax, syncRecord.summaryMax);
-					if (log.isLoggable(FINER)) log.log(FINER, syncRecord.getName() + " tmpMin  = " + tmpMin + "; tmpMax  = " + tmpMax); //$NON-NLS-1$ //$NON-NLS-2$
+					tmpMin = Math.min(tmpMin, summary.syncMin);
+					tmpMax = Math.max(tmpMax, summary.syncMax);
+					if (log.isLoggable(FINER)) log.log(FINER, syncRecord.getName() + " tmpMin  = " + tmpMin + "; tmpMax  = " + tmpMax);
 				}
 			}
 
 			// now we have the max/min values over all sync records of the current sync group
 			if (tmpMin == Double.MAX_VALUE || tmpMax == -Double.MAX_VALUE) {
 				for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
-					syncRecord.resetSummaryMinMax();
+					if (syncRecord.getTrailSelector().getTrailType().isAlienValue()) continue;
+					syncRecord.getSummary().resetSyncMinMax();
 				}
 			} else {
 				for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
-					syncRecord.setSummaryMinMax(tmpMin, tmpMax);
+					if (syncRecord.getTrailSelector().getTrailType().isAlienValue()) continue;
+					syncRecord.getSummary().setSyncMinMax(tmpMin, tmpMax);
 				}
 			}
 			if (isAffected && log.isLoggable(FINER)) {
-				log.log(FINER, this.get((int) syncRecordsEntry.getKey()).getSyncMasterName() + "; syncMin = " + tmpMin + "; syncMax = " + tmpMax); //$NON-NLS-1$ //$NON-NLS-2$
+				log.log(FINER, this.get((int) syncRecordsEntry.getKey()).getSyncMasterName() + "; syncMin = " + tmpMin + "; syncMax = " + tmpMax);
 			}
 		}
 	}
@@ -625,6 +934,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			get(recordName).clear();
 		}
 		this.durations_mm.clear();
+		this.pickedVaults.indexedVaults.clear();
 
 		this.dataTags.clear();
 	}
@@ -634,7 +944,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Sorted according display requirement, grid record first, syncMasterRecords second, all remaining.
 	 * @return all measurement records and settlement / score records based on display settings
 	 */
-	public TrailRecord[] getRecordsSortedForDisplay() {
+	public synchronized TrailRecord[] getRecordsSortedForDisplay() {
 		Vector<TrailRecord> resultRecords = new Vector<>();
 		// add the record with horizontal grid
 		for (TrailRecord record : this.getDisplayRecords()) {
@@ -776,11 +1086,11 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return this.dataTags.getByIndex(index);
 	}
 
-	public long getLeftmostTimeStamp_ms() {
+	public long getTopTimeStamp_ms() {
 		return this.timeStep_ms.firstElement() / 10;
 	}
 
-	public long getRightmostTimeStamp_ms() {
+	public long getLowestTimeStamp_ms() {
 		return this.timeStep_ms.lastElement() / 10;
 	}
 
@@ -811,8 +1121,8 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return (Vector<TrailRecord>) this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
 	}
 
-	public TreeMap<Long, List<ExtendedVault>> getHistoVaults() {
-		return this.histoVaults;
+	public PickedVaults getPickedVaults() {
+		return this.pickedVaults;
 	}
 
 	@SuppressWarnings("unchecked")
