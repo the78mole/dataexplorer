@@ -128,8 +128,8 @@ public class HistoExplorer {
 	/**
 	 * updates (redraws) the histo table if visible.
 	 */
-	public synchronized void updateHistoTableWindow(final boolean forceClean) {
-		if (!(displayTab.getSelection() instanceof HistoTableWindow)) return;
+	public synchronized void updateHistoTableWindow(boolean forceClean) {
+		if (displayTab != null && !(displayTab.getSelection() instanceof HistoTableWindow)) return;
 
 		GDE.display.asyncExec(new Runnable() {
 			@Override

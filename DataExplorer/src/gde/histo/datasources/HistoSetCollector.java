@@ -31,23 +31,6 @@ import static gde.histo.datasources.HistoSetCollector.LoadProgress.STARTED;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.WARNING;
 
-import gde.GDE;
-import gde.device.DeviceConfiguration;
-import gde.device.ScoreLabelTypes;
-import gde.exception.DataInconsitsentException;
-import gde.exception.DataTypeException;
-import gde.exception.NotSupportedFileFormatException;
-import gde.histo.cache.ExtendedVault;
-import gde.histo.cache.VaultCollector;
-import gde.histo.cache.VaultReaderWriter;
-import gde.histo.datasources.DirectoryScanner.DirectoryType;
-import gde.histo.datasources.DirectoryScanner.SourceDataSet;
-import gde.histo.datasources.HistoSet.RebuildStep;
-import gde.histo.exclusions.ExclusionData;
-import gde.histo.recordings.TrailRecordSet;
-import gde.log.Logger;
-import gde.ui.DataExplorer;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -64,6 +47,22 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import gde.GDE;
+import gde.device.DeviceConfiguration;
+import gde.device.ScoreLabelTypes;
+import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
+import gde.exception.NotSupportedFileFormatException;
+import gde.histo.cache.ExtendedVault;
+import gde.histo.cache.VaultCollector;
+import gde.histo.cache.VaultReaderWriter;
+import gde.histo.datasources.DirectoryScanner.DirectoryType;
+import gde.histo.datasources.DirectoryScanner.SourceDataSet;
+import gde.histo.datasources.HistoSet.RebuildStep;
+import gde.histo.exclusions.ExclusionData;
+import gde.histo.recordings.TrailRecordSet;
+import gde.log.Logger;
+import gde.ui.DataExplorer;
 
 /**
  * Convert the source files into a trail recordSet required for the history tabs.
@@ -297,7 +296,7 @@ public final class HistoSetCollector {
 
 		List<SourceDataSet> sourceFiles = this.directoryScanner.readSourceFiles4Test(filePath);
 		this.readFilesCount = sourceFiles.size();
-		List<VaultCollector> trusses = getTrusses(sourceFiles, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+		List<VaultCollector> trusses = getTrusses(sourceFiles, devices);
 		removeSuppressed(trusses);
 		log.info(() -> String.format("%04d files selected", trusses.size())); //$NON-NLS-1$
 

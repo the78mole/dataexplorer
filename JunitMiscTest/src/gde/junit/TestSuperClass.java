@@ -15,7 +15,7 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
-****************************************************************************************/
+ ****************************************************************************************/
 package gde.junit;
 
 import java.io.File;
@@ -54,6 +54,7 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.CurveUtils;
 import gde.utils.TimeLine;
+
 import junit.framework.TestCase;
 
 public class TestSuperClass extends TestCase {
@@ -71,7 +72,35 @@ public class TestSuperClass extends TestCase {
 			: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;
 
 	protected enum DataSource {
-		SETTINGS, TESTDATA, INDIVIDUAL
+		SETTINGS {
+			@Override
+			Path getDataPath(Path subPath) {
+				return Paths.get(Settings.getInstance().getDataFilePath()).resolve(subPath);
+			}
+		}, TESTDATA {
+			@Override
+			Path getDataPath(Path subPath) {
+				String srcDataPath = getLoaderPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				if (srcDataPath.endsWith("bin/")) { // running inside eclipse
+					srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
+				}
+				else if (srcDataPath.indexOf("classes") > -1) { // ET running inside eclipse in Debug mode
+					srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
+				}
+				else {
+					srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf("build")) + "DataFilesTestSamples/" + GDE.NAME_LONG;
+				}
+				//return Paths.get(srcDataPath).resolve(subPath); Error because of leading slash: /C:/Users/USER/git/dataexplorer/DataFilesTestSamples/DataExplorer // this.dataPath = Paths.get(srcDataPath).resolve(subPath).toFile();
+				return (new File(srcDataPath)).toPath().resolve(subPath);
+			}
+		}, INDIVIDUAL {
+			@Override
+			Path getDataPath(Path subPath) {
+				return subPath;
+			}
+		};
+
+		abstract Path getDataPath(Path subPath);
 	};
 
 	final TimeLine												timeLine					= new TimeLine();
@@ -135,6 +164,7 @@ public class TestSuperClass extends TestCase {
 		this.settings.setPartialDataTable(false);
 		this.settings.setTimeFormat("relativ");
 
+		this.application.setHisto(true);
 		setHistoSettings();
 
 		File file = new File(this.settings.getDevicesPath());
@@ -211,7 +241,7 @@ public class TestSuperClass extends TestCase {
 		String className = selectedDeviceName.contains(GDE.STRING_DOT) ? selectedDeviceName // full
 				// qualified
 				: "gde.device." //$NON-NLS-1$
-						+ selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName;
+					+ selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName;
 		try {
 			// String className = "gde.device.DefaultDeviceDialog";
 			// log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
@@ -495,7 +525,7 @@ public class TestSuperClass extends TestCase {
 	 *
 	 * @return
 	 */
-	protected String getLoaderPath() {
+	protected static String getLoaderPath() {
 		return GDE.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 	}
 
@@ -504,20 +534,10 @@ public class TestSuperClass extends TestCase {
 		boolean isDataPathConfigured = new File(this.settings.getDataFilePath()).getPath() != GDE.FILE_SEPARATOR_UNIX;
 
 		if (settingsPropertiesExist && isDataPathConfigured) {
-			this.dataPath = new File(this.settings.getDataFilePath());
+			this.dataPath = DataSource.SETTINGS.getDataPath(Paths.get("")).toFile();
 		}
 		else {
-			String srcDataPath = this.getLoaderPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-			if (srcDataPath.endsWith("bin/")) { // running inside eclipse
-				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
-			}
-			else if (srcDataPath.indexOf("classes") > -1) { // ET running inside eclipse in Debug mode
-				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
-			}
-			else {
-				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf("build")) + "DataFilesTestSamples/" + GDE.NAME_LONG;
-			}
-			this.dataPath = new File(srcDataPath); /// usr/src/dataexplorer-2.23-src/build/target/<os_arch>/DataExplorer/DataExplorer.jar
+			this.dataPath = DataSource.TESTDATA.getDataPath(Paths.get("")).toFile();
 		}
 
 		this.settings.setDataFilePath(this.dataPath.getPath());
@@ -526,29 +546,7 @@ public class TestSuperClass extends TestCase {
 	}
 
 	protected File setDataPath(DataSource dataSource, Path subPath) {
-		boolean settingsPropertiesExist = new File(this.settings.getSettingsFilePath()).exists();
-		boolean isDataPathConfigured = new File(this.settings.getDataFilePath()).getPath() != GDE.FILE_SEPARATOR_UNIX;
-
-		if (dataSource == DataSource.SETTINGS && settingsPropertiesExist && isDataPathConfigured) {
-			this.dataPath = Paths.get(this.settings.getDataFilePath()).resolve(subPath).toFile();
-		}
-		else if (dataSource == DataSource.TESTDATA) {
-			String srcDataPath = this.getLoaderPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-			if (srcDataPath.endsWith("bin/")) { // running inside eclipse
-				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
-			}
-			else if (srcDataPath.indexOf("classes") > -1) { // ET running inside eclipse in Debug mode
-				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
-			}
-			else {
-				srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf("build")) + "DataFilesTestSamples/" + GDE.NAME_LONG;
-			}
-			// this.dataPath = Paths.get(srcDataPath).resolve(subPath).toFile(); Error because of leading slash: /C:/Users/USER/git/dataexplorer/DataFilesTestSamples/DataExplorer // this.dataPath = Paths.get(srcDataPath).resolve(subPath).toFile();
-			this.dataPath = (new File(srcDataPath)).toPath().resolve(subPath).toFile();
-		}
-		else if (dataSource == DataSource.INDIVIDUAL) {
-			this.dataPath = subPath.toFile();
-		}
+		this.dataPath = dataSource.getDataPath(subPath).toFile();
 
 		this.settings.setDataFilePath(this.dataPath.getPath());
 		System.out.println("this.dataPath = " + this.dataPath.getPath());

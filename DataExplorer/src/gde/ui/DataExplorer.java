@@ -837,10 +837,12 @@ public class DataExplorer extends Composite {
 		if (isActive) {
 			HistoExplorer tmpHistoExplorer = new HistoExplorer(displayTab);
 			this.histoExplorer = Optional.of(tmpHistoExplorer);
-			tmpHistoExplorer.initHisto();
-			tmpHistoExplorer.enableCurveSelector(this.isCurveSelectorEnabled);
-			tmpHistoExplorer.enableGraphicsHeader(this.isGraphicsHeaderVisible);
-			tmpHistoExplorer.enableRecordSetComment(this.isRecordCommentVisible);
+			if (displayTab != null) { // JUnit
+				tmpHistoExplorer.initHisto();
+				tmpHistoExplorer.enableCurveSelector(this.isCurveSelectorEnabled);
+				tmpHistoExplorer.enableGraphicsHeader(this.isGraphicsHeaderVisible);
+				tmpHistoExplorer.enableRecordSetComment(this.isRecordCommentVisible);
+			}
 		} else {
 			this.histoExplorer.ifPresent(h -> h.disposeHisto());
 			this.histoExplorer = Optional.empty();
