@@ -969,7 +969,7 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "nextChartItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.getHistoExplorer().ifPresent(h -> {
-								h.scrollSummaryCompositeAndClearMeasuring();
+								h.scrollSummaryComposite();
 								h.updateHistoChartWindow(false);
 							});
 						}
