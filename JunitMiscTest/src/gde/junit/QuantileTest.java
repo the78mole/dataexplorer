@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import gde.histo.utils.ElementaryQuantile;
 import gde.histo.utils.Quantile;
 import gde.histo.utils.Quantile.Fixings;
 import gde.histo.utils.Spot;
@@ -47,7 +48,9 @@ public class QuantileTest extends TestSuperClass {
 	private final static int		performanceTestLoops				= 100;
 
 	private Quantile						quantile;
-	private final Integer[]			recordArray									= { 99999, -99999, null, 0, null, 8, 10, 25, 49, 50, 51, 75, 99, 100, 101, 134, 175, -5 };	// Size = 18
+	private final Integer[]			recordArray									= { 99999, -99999, null, 0, null, 8, 10, 25, 49, 50, 51, 75, 99, 100, 101, 134, 175, -5 };	// Size
+																																																																											// =
+																																																																											// 18
 	private final double				q0Zeros2Null								= -99999.;																																									// minimum
 	private final double				q1Zeros2Null								= 10.;																																											// 25%
 	private final double				q2Zeros2Null								= 51.;																																											// median
@@ -92,11 +95,78 @@ public class QuantileTest extends TestSuperClass {
 	}
 
 	public void testIqrNull() {
-		Double[] values = new Double[] {1.,1.,1.,1.,1.,1.,1.,7.};
-		UniversalQuantile<Double> quantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, true, false);
-		assertEquals("outlierSize=" + quantile.getOutliers().size(), quantile.getOutliers().size(), 0);
-		assertEquals("IQR=" + quantile.getInterQuartileRange(), quantile.getInterQuartileRange(), 0.);
-		System.out.println("Outliers : "+ quantile.getOutliersCsv());
+		boolean isCanonical = this.settings.isCanonicalQuantiles();
+		boolean isSymmetric = this.settings.isSymmetricToleranceInterval();
+		System.out.println(" >>> 1st pass : Prevent outlier by tolerance interval based on SD in case of zero IQR");
+		{
+			Double[] values = new Double[] { 1., 1., 1., 1., 1., 1., 1., 7. };
+			{
+				this.settings.setCanonicalQuantiles(true);
+				this.settings.setSymmetricToleranceInterval(true);
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
+				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
+				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
+				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
+				assertEquals("Canonical IQR", 0., iQR);
+				System.out.println("Canonical Outliers : " + dQuantile.getOutliersCsv());
+			}
+			{
+				this.settings.setCanonicalQuantiles(false);
+				this.settings.setSymmetricToleranceInterval(true);
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
+				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
+				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
+				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
+				assertEquals("Zero-optimized IQR", 2.86, iQR, .01);
+				System.out.println("Zero-optimized Outliers : " + dQuantile.getOutliersCsv());
+			}
+			{
+				this.settings.setCanonicalQuantiles(false);
+				this.settings.setSymmetricToleranceInterval(true);
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 99., 99., new ArrayList<>());
+				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
+				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
+				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
+				assertEquals("Asymmetric tolerance interval" + iQR, 2.86, iQR, .01);
+				System.out.println("Asymmetric tolerance interval Outliers : " + dQuantile.getOutliersCsv());
+			}
+		}
+		System.out.println(" >>> 2nd pass : Prevent outlier by asymmetric tolerance interval");
+		{
+			Double[] values = new Double[] { .9, .9, 1., 1., 1., 1., 2., 15. };
+			{
+				this.settings.setCanonicalQuantiles(true);
+				this.settings.setSymmetricToleranceInterval(true);
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
+				assertEquals("outlierSize", 1, dQuantile.getOutliers().size());
+				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
+				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
+				assertEquals("Canonical IQR", 0.1, iQR, .00001);
+				System.out.println("Canonical Outliers : " + dQuantile.getOutliersCsv());
+			}
+			{
+				this.settings.setCanonicalQuantiles(false);
+				this.settings.setSymmetricToleranceInterval(true);
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
+				assertEquals("outlierSize", 1, dQuantile.getOutliers().size());
+				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
+				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
+				assertEquals("Zero-optimized IQR", 0.1, iQR, .00001);
+				System.out.println("Zero-optimized Outliers : " + dQuantile.getOutliersCsv());
+			}
+			{
+				this.settings.setCanonicalQuantiles(false);
+				this.settings.setSymmetricToleranceInterval(true);
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 99., 99., new ArrayList<>());
+				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
+				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
+				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
+				assertEquals("Asymmetric tolerance interval", .825, iQR, .00001);
+				System.out.println("Asymmetric tolerance interval Outliers : " + dQuantile.getOutliersCsv());
+			}
+		}
+		this.settings.setCanonicalQuantiles(isCanonical);
+		this.settings.setSymmetricToleranceInterval(isSymmetric);
 	}
 
 	public void testSortPerformance() {
@@ -140,8 +210,7 @@ public class QuantileTest extends TestSuperClass {
 					quantileArray.getSigmaRunningOBS();
 					nanoTimeSigmaDouble += System.nanoTime();
 				}
-				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
-						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 				nanoTime = System.nanoTime();
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
@@ -155,8 +224,7 @@ public class QuantileTest extends TestSuperClass {
 					quantileArray.getSigmaFigure();
 					nanoTimeSigmaDouble += System.nanoTime();
 				}
-				log.log(Level.INFO, "ms Stream -> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
-						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				log.log(Level.INFO, "ms Stream -> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 				nanoTime = System.nanoTime();
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
@@ -170,8 +238,7 @@ public class QuantileTest extends TestSuperClass {
 					quantileArray.getSigmaFigure();
 					nanoTimeSigmaDouble += System.nanoTime();
 				}
-				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
-						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 			}
 		}
 		{
@@ -205,8 +272,7 @@ public class QuantileTest extends TestSuperClass {
 					quantileArray.getSigmaRunningOBS();
 					nanoTimeSigmaDouble += System.nanoTime();
 				}
-				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(2 * (System.nanoTime() - nanoTime)) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt)
-						+ "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(2 * (System.nanoTime() - nanoTime)) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 				nanoTime = System.nanoTime();
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
@@ -220,8 +286,7 @@ public class QuantileTest extends TestSuperClass {
 					quantileArray.getSigmaFigure();
 					nanoTimeSigmaDouble += System.nanoTime();
 				}
-				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(2 * (System.nanoTime() - nanoTime)) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt)
-						+ "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(2 * (System.nanoTime() - nanoTime)) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 			}
 		}
 		{
@@ -254,8 +319,7 @@ public class QuantileTest extends TestSuperClass {
 					genericArray.getSigmaRunningOBS();
 					nanoTimeSigmaDouble += System.nanoTime();
 				}
-				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
-						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 				nanoTime = System.nanoTime();
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
@@ -269,8 +333,7 @@ public class QuantileTest extends TestSuperClass {
 					genericArray.getSigmaFigure();
 					nanoTimeSigmaDouble += System.nanoTime();
 				}
-				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
-						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 			}
 		}
 		{
@@ -308,8 +371,7 @@ public class QuantileTest extends TestSuperClass {
 					genericArray.getSigmaRunningOBS();
 					nanoTimeSigmaDouble += System.nanoTime();
 				}
-				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
-						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				log.log(Level.INFO, "ms noStream> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 				nanoTime = System.nanoTime();
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
@@ -323,8 +385,7 @@ public class QuantileTest extends TestSuperClass {
 					genericArray.getSigmaFigure();
 					nanoTimeSigmaDouble += System.nanoTime();
 				}
-				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble "
-						+ TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
+				log.log(Level.INFO, "ms opt  ---> " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + "    sigmaInt " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaInt) + "    sigmaDouble " + TimeUnit.NANOSECONDS.toMillis(nanoTimeSigmaDouble));
 			}
 		}
 	}

@@ -228,6 +228,9 @@ public class TestSuperClass extends TestCase {
 		this.settings.setAbsoluteTransitionLevel("999"); // results in default value
 		this.settings.setSuppressMode(false);
 		this.settings.setSubDirectoryLevelMax("5");
+		this.settings.setCanonicalQuantiles(true);
+		this.settings.setSymmetricToleranceInterval(true);
+		this.settings.setOutlierToleranceSpread("9");
 	}
 
 	/**
