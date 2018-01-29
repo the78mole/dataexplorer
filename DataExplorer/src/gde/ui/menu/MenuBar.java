@@ -961,9 +961,9 @@ public class MenuBar {
 				}
 				{
 					this.nextChartItem = new MenuItem(this.viewMenu, SWT.PUSH);
-					this.nextChartItem.setText(Messages.getString(MessageIds.GDE_MSGT0900, GDE.MOD1_MOD3));
+					this.nextChartItem.setText(Messages.getString(MessageIds.GDE_MSGT0900, GDE.MOD1));
 					if (!GDE.IS_OS_ARCH_ARM) this.nextChartItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0901));
-					this.nextChartItem.setAccelerator(SWT.MOD1 + SWT.MOD3 + SWT.PAGE_DOWN);
+					this.nextChartItem.setAccelerator(SWT.MOD1 + SWT.SHIFT + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0900));
 					this.nextChartItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
