@@ -134,7 +134,7 @@ public class Record extends AbstractRecord {
 
 	TriggerRange									tmpTriggerRange						= null;
 	Vector<TriggerRange>					triggerRanges							= null;
-	List<PropertyType>						properties								= new ArrayList<PropertyType>();																																																				// offset, factor, reduction, ...
+	List<PropertyType>						properties								= new ArrayList<PropertyType>();				// offset, factor, reduction, ...
 	boolean												isPositionLeft						= true;
 	Color													color											= DataExplorer.COLOR_BLACK;
 	int														lineWidth									= 1;
@@ -143,33 +143,33 @@ public class Record extends AbstractRecord {
 	protected boolean							isStartpointZero					= false;
 	protected boolean							isStartEndDefined					= false;
 	protected DecimalFormat				df;
-	protected int									numberFormat							= -1;																																																																		// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
-	protected int									maxValue									= 0;																																																																		// max value of the curve
-	protected int									minValue									= 0;																																																																		// min value of the curve
-	protected double							maxScaleValue							= this.maxValue;																																																												// overwrite calculated boundaries
+	protected int									numberFormat							= -1;																		// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
+	protected int									maxValue									= 0;																		// max value of the curve
+	protected int									minValue									= 0;																		// min value of the curve
+	protected double							maxScaleValue							= this.maxValue;												// overwrite calculated boundaries
 	protected double							minScaleValue							= this.minValue;
 	DataType											dataType									= Record.DataType.DEFAULT;
 
 	// synchronize
-	protected int									syncMaxValue							= 0;																																																																		// max value of the curve if synced
-	protected int									syncMinValue							= 0;																																																																		// min value of the curve if synced
+	protected int									syncMaxValue							= 0;																		// max value of the curve if synced
+	protected int									syncMinValue							= 0;																		// min value of the curve if synced
 
 	// scope view
-	int														scopeMin									= 0;																																																																		// min value of the curve within scope display area
-	int														scopeMax									= 0;																																																																		// max value of the curve within scope display area
+	int														scopeMin									= 0;																		// min value of the curve within scope display area
+	int														scopeMax									= 0;																		// max value of the curve within scope display area
 
 	// statistics trigger
 	int														maxValueTriggered					= Integer.MIN_VALUE;																																																										// max value of the curve, according a set trigger level if any
 	int														minValueTriggered					= Integer.MAX_VALUE;																																																										// min value of the curve, according a set trigger level if any
-	int														avgValue									= Integer.MIN_VALUE;																																																										// avarage value (avg = sum(xi)/n)
+	int														avgValue									= Integer.MIN_VALUE;										// avarage value (avg = sum(xi)/n)
 	int														sigmaValue								= Integer.MIN_VALUE;																																																										// sigma value of data, according a set trigger level if any
-	int														avgValueTriggered					= Integer.MIN_VALUE;																																																										// avarage value (avg = sum(xi)/n)
+	int														avgValueTriggered					= Integer.MIN_VALUE;										// avarage value (avg = sum(xi)/n)
 	int														sigmaValueTriggered				= Integer.MIN_VALUE;																																																										// sigma value of data, according a set trigger level if any
 
 	double												drawLimit_ms							= Integer.MAX_VALUE;																																																										// above this limit the record will not be drawn (compareSet with different records)
-	double												zoomTimeOffset						= 0;																																																																		// time where the zoom area begins
+	double												zoomTimeOffset						= 0;																		// time where the zoom area begins
 	int														zoomOffset								= 0;																																																																		// number of measurements point until zoom area begins approximation only
-	double												drawTimeWidth							= 0;																																																																		// all or zoomed area time width
+	double												drawTimeWidth							= 0;																		// all or zoomed area time width
 	double												tmpMaxZoomScaleValue			= this.maxScaleValue;
 	double												tmpMinZoomScaleValue			= this.minScaleValue;
 	double												maxZoomScaleValue					= this.maxScaleValue;
@@ -202,20 +202,20 @@ public class Record extends AbstractRecord {
 	public final static String		SYMBOL										= "_symbol";																																																														// active means this measurement can be red from device, other wise its calculated //$NON-NLS-1$
 	public final static String		IS_ACTIVE									= "_isActive";																																																													// active means this measurement can be red from device, other wise its calculated //$NON-NLS-1$
 	public final static String		IS_DIPLAYABLE							= "_isDisplayable";																																																											// true for all active records, true for passive records when data calculated //$NON-NLS-1$
-	public final static String		IS_VISIBLE								= "_isVisible";																																																													// defines if data are displayed  //$NON-NLS-1$
+	public final static String		IS_VISIBLE								= "_isVisible";													// defines if data are displayed //$NON-NLS-1$
 	public final static String		IS_POSITION_LEFT					= "_isPositionLeft";																																																										// defines the side where the axis id displayed  //$NON-NLS-1$
 	public final static String		COLOR											= "_color";																																																															// defines which color is used to draw the curve //$NON-NLS-1$
-	public final static String		LINE_WITH									= "_lineWidth";																																							//$NON-NLS-1$
-	public final static String		LINE_STYLE								= "_lineStyle";																																							//$NON-NLS-1$
-	public final static String		IS_ROUND_OUT							= "_isRoundOut";																																																												// defines if axis values are rounded //$NON-NLS-1$
+	public final static String		LINE_WITH									= "_lineWidth";													//$NON-NLS-1$
+	public final static String		LINE_STYLE								= "_lineStyle";													//$NON-NLS-1$
+	public final static String		IS_ROUND_OUT							= "_isRoundOut";												// defines if axis values are rounded //$NON-NLS-1$
 	public final static String		IS_START_POINT_ZERO				= "_isStartpointZero";																																																									// defines if axis value starts at zero //$NON-NLS-1$
 	public final static String		IS_START_END_DEFINED			= "_isStartEndDefined";																																																									// defines that explicit end values are defined for axis //$NON-NLS-1$
-	public final static String		NUMBER_FORMAT							= "_numberFormat";																																					//$NON-NLS-1$
-	public final static String		MAX_VALUE									= "_maxValue";																																							//$NON-NLS-1$
-	public final static String		DEFINED_MAX_VALUE					= "_defMaxValue";																																																												// overwritten max value //$NON-NLS-1$
-	public final static String		MIN_VALUE									= "_minValue";																																							//$NON-NLS-1$
-	public final static String		DEFINED_MIN_VALUE					= "_defMinValue";																																																												// overwritten min value //$NON-NLS-1$
-	public final static String		DATA_TYPE									= "_dataType";																																																													// data type of record //$NON-NLS-1$
+	public final static String		NUMBER_FORMAT							= "_numberFormat";											//$NON-NLS-1$
+	public final static String		MAX_VALUE									= "_maxValue";													//$NON-NLS-1$
+	public final static String		DEFINED_MAX_VALUE					= "_defMaxValue";												// overwritten max value //$NON-NLS-1$
+	public final static String		MIN_VALUE									= "_minValue";													//$NON-NLS-1$
+	public final static String		DEFINED_MIN_VALUE					= "_defMinValue";												// overwritten min value //$NON-NLS-1$
+	public final static String		DATA_TYPE									= "_dataType";													// data type of record //$NON-NLS-1$
 
 	public final static String[]	propertyKeys							= new String[] { NAME, UNIT, SYMBOL,		//
 			IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE,				//
@@ -223,8 +223,8 @@ public class Record extends AbstractRecord {
 			NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE, DATA_TYPE };
 
 	public final static int				TYPE_AXIS_END_VALUES			= 0;																																																																		// defines axis end values types like isRoundout, isStartpointZero, isStartEndDefined
-	public final static int				TYPE_AXIS_NUMBER_FORMAT		= 1;																																																																		// defines axis scale values format
-	public final static int				TYPE_AXIS_SCALE_POSITION	= 2;																																																																		// defines axis scale position left or right
+	public final static int				TYPE_AXIS_NUMBER_FORMAT		= 1;																		// defines axis scale values format
+	public final static int				TYPE_AXIS_SCALE_POSITION	= 2;																		// defines axis scale position left or right
 
 	public enum DataType { // some data types require in some situation special execution algorithm
 		DEFAULT("default"), // all normal measurement values which do not require special handling
@@ -272,6 +272,46 @@ public class Record extends AbstractRecord {
 			}
 			return dataTypeValues;
 		}
+
+		public static DataType getBestGuess(Record record) {
+			if (record.getDataType() == DataType.DEFAULT) {
+				DataType guess = guess(record.getName());
+				return guess != null ? guess : DataType.DEFAULT;
+			} else {
+				return record.getDataType();
+			}
+		}
+
+		public static DataType guess(String name) {
+			DataType dataType = null;
+			if (isLatitude(name)) {
+				dataType = Record.DataType.GPS_LATITUDE;
+			} else if (isLongitude(name)) {
+				dataType = Record.DataType.GPS_LONGITUDE;
+			} else if (isHeight(name)) {
+				dataType = Record.DataType.GPS_ALTITUDE;
+			} else if (isSpeed(name)) {
+				dataType = Record.DataType.SPEED;
+			}
+			return dataType;
+		}
+
+		public static boolean isSpeed(String name) {
+			return name.toUpperCase().contains("GPS") && (name.toLowerCase().contains("speed") || name.toLowerCase().contains("geschw"));
+		}
+
+		public static boolean isHeight(String name) {
+			return (name.toUpperCase().contains("GPS") || name.toUpperCase().contains("ABS")) && (name.toLowerCase().contains("hoehe") || name.toLowerCase().contains("höhe") || name.toLowerCase().contains("height") || name.toLowerCase().contains("alt"));
+		}
+
+		public static boolean isLongitude(String name) {
+			return name.equalsIgnoreCase("Longitude") || name.contains("GPS_Long") || name.equalsIgnoreCase("Längengrad") || name.equalsIgnoreCase("Laengengrad") || name.toLowerCase().contains("delka");
+		}
+
+		public static boolean isLatitude(String name) {
+			return name.equalsIgnoreCase("Latitude") || name.contains("GPS_Lat") || name.equalsIgnoreCase("Breitengrad") || name.toLowerCase().contains("sirka");
+		}
+
 	};
 
 	/**
@@ -2536,15 +2576,7 @@ public class Record extends AbstractRecord {
 	 * @return
 	 */
 	public void setDataType() {
-		if (this.name.equalsIgnoreCase("Latitude") || this.name.contains("GPS_Lat") || this.name.equalsIgnoreCase("Breitengrad") || this.name.toLowerCase().contains("sirka"))
-			this.dataType = Record.DataType.GPS_LATITUDE;
-		else if (this.name.equalsIgnoreCase("Longitude") || this.name.contains("GPS_Long") || this.name.equalsIgnoreCase("Längengrad") || this.name.equalsIgnoreCase("Laengengrad")
-				|| this.name.toLowerCase().contains("delka"))
-			this.dataType = Record.DataType.GPS_LONGITUDE;
-		else if ((this.name.toUpperCase().contains("GPS") || this.name.toUpperCase().contains("ABS"))
-				&& (this.name.toLowerCase().contains("hoehe") || this.name.toLowerCase().contains("höhe") || this.name.toLowerCase().contains("height") || this.name.toLowerCase().contains("alt")))
-			this.dataType = Record.DataType.GPS_ALTITUDE;
-		else if (this.name.toUpperCase().contains("GPS") && (this.name.toLowerCase().contains("speed") || this.name.toLowerCase().contains("geschw"))) this.dataType = Record.DataType.SPEED;
+		this.dataType = DataType.guess(this.name);
 	}
 
 	/**
