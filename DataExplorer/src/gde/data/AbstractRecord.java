@@ -24,11 +24,13 @@ import java.util.Vector;
 
 import org.eclipse.swt.graphics.Color;
 
+import gde.data.Record.DataType;
+
 /**
  * Supports all classes which access both the Records class and the TrailRecords class.
  * @author Thomas Eickert (USER)
  */
-public abstract class AbstractRecord extends Vector<Integer> implements IRecord {
+public abstract class AbstractRecord extends Vector<Integer> {
 	private static final long serialVersionUID = 3212164037419263272L;
 
 	protected AbstractRecord() {
@@ -52,11 +54,11 @@ public abstract class AbstractRecord extends Vector<Integer> implements IRecord 
 
 	public abstract double getReduction();
 
-	@Override
 	public abstract int getOrdinal();
 
-	@Override
 	public abstract String getName();
+
+	public abstract DataType getDataType();
 
 	public abstract boolean isVisible();
 
