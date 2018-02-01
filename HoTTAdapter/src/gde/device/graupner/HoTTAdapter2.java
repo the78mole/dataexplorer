@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.data.Channel;
+import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.ChannelPropertyTypes;
@@ -728,7 +729,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	 * @return
 	 */
 	@Override
-	public boolean isGPSCoordinates(Record record) {
+	public boolean isGPSCoordinates(IRecord record) {
 		//15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 		final int latOrdinal = 15, lonOrdinal = 16;
 		return record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal;

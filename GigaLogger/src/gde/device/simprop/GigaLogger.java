@@ -38,6 +38,7 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
@@ -269,7 +270,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	 * @return true if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 */
 	@Override
-	public boolean isGPSCoordinates(Record record) {
+	public boolean isGPSCoordinates(IRecord record) {
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
