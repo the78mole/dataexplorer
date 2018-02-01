@@ -54,7 +54,6 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.ChannelPropertyTypes;
@@ -1496,7 +1495,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @return true if the record is a latitude or longitude record
 	 */
 	@Override
-	public boolean isGPSCoordinates(IRecord record) {
+	public boolean isGPSCoordinates(Record record) {
 		if (this.application.getActiveChannelNumber() == 3) {
 			// 0=RXSQ, 1=Latitude, 2=Longitude
 			return record.getOrdinal() == 1 || record.getOrdinal() == 2;

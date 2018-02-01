@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-
+    
     Copyright (c) 2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.wb;
@@ -37,7 +37,6 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.Record.DataType;
 import gde.data.RecordSet;
@@ -78,8 +77,8 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException
-	 * @throws FileNotFoundException
+	 * @throws JAXBException 
+	 * @throws FileNotFoundException 
 	 */
 	public CSV2SerialAdapter(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -95,7 +94,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
 				if (!isFileIO) isFileIO = format.getInputType() == InputTypes.FILE_IO;
 			}
-			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance
+			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1706), Messages.getString(MessageIds.GDE_MSGT1705));
 			}
 			else { //InputTypes.FILE_IO
@@ -123,7 +122,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
 				if (!isFileIO) isFileIO = format.getInputType() == InputTypes.FILE_IO;
 			}
-			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance
+			if (isSerialIO) { //InputTypes.SERIAL_IO has higher relevance  
 				this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, Messages.getString(MessageIds.GDE_MSGT1706), Messages.getString(MessageIds.GDE_MSGT1705));
 			}
 			else { //InputTypes.FILE_IO
@@ -147,7 +146,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber
+	 * @param channelNumber 
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
@@ -156,7 +155,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
 	public int getLovDataByteSize() {
 		return 69; // sometimes first 4 bytes give the length of data + 4 bytes for number
@@ -171,7 +170,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException
+	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
@@ -245,12 +244,12 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException
+	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
@@ -299,7 +298,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	 * @return true if if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 */
 	@Override
-	public boolean isGPSCoordinates(IRecord record) {
+	public boolean isGPSCoordinates(Record record) {
 		return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LONGITUDE;
 	}
 
@@ -441,7 +440,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview
+	 * where some curves are hided for better overview 
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -469,7 +468,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			}
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$
+				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -484,8 +483,8 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread,
-	 * target is to make sure all data point not coming from device directly are available and can be displayed
+	 * for calculation which requires more effort or is time consuming it can call a background thread, 
+	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//add implementation where data point are calculated
@@ -533,7 +532,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
-	 * as example a file selection dialog could be opened to import serialized ASCII data
+	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
 		if (this.isSerialIO) {
@@ -703,7 +702,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				exportFileName = new FileHandler().exportFileKMZ(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE),
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED),
 						activeRecordSet.findRecordOrdinalByUnit(new String[] { "m/s" }), //climb
-						activeRecordSet.findRecordOrdinalByUnit(new String[] { "km" }), //distance
+						activeRecordSet.findRecordOrdinalByUnit(new String[] { "km" }), //distance 
 						-1, //azimuth
 						true, isExportTmpDir);
 			}
@@ -723,7 +722,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1710), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE),
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED), activeRecordSet.findRecordOrdinalByUnit(new String[] { "m/s" }), //climb
-						activeRecordSet.findRecordOrdinalByUnit(new String[] { "km" }), //distance
+						activeRecordSet.findRecordOrdinalByUnit(new String[] { "km" }), //distance 
 						-1, //azimuth
 						type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 			}
@@ -731,7 +730,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
@@ -741,7 +740,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				//GPGGA	0=latitude 1=longitude  2=altitudeAbs
+				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 
 				containsGPSdata = activeRecordSet.containsGPSdata();
 				if (!containsGPSdata) {
 					containsGPSdata = (activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE) >= 0) && (activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE) >= 0);

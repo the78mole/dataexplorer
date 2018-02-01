@@ -39,7 +39,6 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
@@ -71,8 +70,8 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException
-	 * @throws FileNotFoundException
+	 * @throws JAXBException 
+	 * @throws FileNotFoundException 
 	 */
 	public DataVario(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -130,7 +129,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to gde config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber
+	 * @param channelNumber 
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
@@ -139,7 +138,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
 	public int getLovDataByteSize() {
 		return 0;  // sometimes first 4 bytes give the length of data + 4 bytes for number
@@ -148,7 +147,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview
+	 * where some curves are hided for better overview 
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -163,20 +162,20 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
-			record = recordSet.get(i);
+			record = recordSet.get(i);		
 			measurement = this.getMeasurement(channelConfigNumber, i);
 			log.log(Level.FINE, record.getName() + " = " + measurementNames[i]); //$NON-NLS-1$
-
+			
 			// update active state and displayable state if configuration switched with other names
 			if (record.isActive() != measurement.isActive()) {
 				record.setActive(measurement.isActive());
 				record.setVisible(measurement.isActive());
 				record.setDisplayable(measurement.isActive());
 				log.log(Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
-			}
+			}	
 			if(includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData() && measurement.isActive());
-				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$
+				log.log(Level.FINE, record.getName() + " ! hasReasonableData "); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -191,8 +190,8 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread,
-	 * target is to make sure all data point not coming from device directly are available and can be displayed
+	 * for calculation which requires more effort or is time consuming it can call a background thread, 
+	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		Record recordLatitude = recordSet.get(8);
@@ -203,7 +202,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			//13=tripLength 14=distance 15=azimuth 16=directionStart
 			int recordSize = recordLatitude.realSize();
 			int startAltitude = recordAlitude.get(0); // using this as start point might be sense less if the GPS data has no 3D-fix
-			//check GPS latitude and longitude
+			//check GPS latitude and longitude				
 			int indexGPS = 0;
 			int i = 0;
 			for (; i < recordSize; ++i) {
@@ -213,7 +212,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 					break;
 				}
 			}
-			startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation
+			startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
 
 			GPSHelper.calculateValues(this, recordSet, 8, 7, 9, startAltitude, 13, 14, 15, 16);
 			this.application.updateStatisticsData();
@@ -236,11 +235,11 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	public String[] getUsedPropertyKeys() {
 		return new String[] {IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION};
 	}
-
+	
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
-	 * as example a file selection dialog could be opened to import serialized ASCII data
+	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
 		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT1800));
@@ -259,14 +258,14 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
 						}
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-
+						
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
 								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
-								CSVSerialDataReaderWriter.read(selectedImportFile, DataVario.this, recordNameExtend, channelConfigNumber,
-										new DataParser(DataVario.this.getDataBlockTimeUnitFactor(),
-												DataVario.this.getDataBlockLeader(), DataVario.this.getDataBlockSeparator().value(),
+								CSVSerialDataReaderWriter.read(selectedImportFile, DataVario.this, recordNameExtend, channelConfigNumber, 
+										new DataParser(DataVario.this.getDataBlockTimeUnitFactor(), 
+												DataVario.this.getDataBlockLeader(), DataVario.this.getDataBlockSeparator().value(), 
 												DataVario.this.getDataBlockCheckSumType(), DataVario.this.getDataBlockSize(InputTypes.FILE_IO)));
 							}
 							catch (Throwable e) {
@@ -282,17 +281,17 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		};
 		reader.start();
 	}
-
+	
 	/**
 	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
 	public int[] getCellVoltageOrdinals() {
-		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, ....
+		// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
 		return new int[] {0, 3};
 	}
-
+	
 
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
@@ -303,7 +302,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException
+	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
@@ -313,7 +312,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-
+				
 		try {
 			for (int i = 0; i < recordDataSize; i++) {
 				setDataLineStartAndLength(dataBuffer, startLength);
@@ -355,7 +354,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			}
 		}
 		int crlfPos = refStartLength[0] = startPos;
-
+		
 		for (; crlfPos < dataBuffer.length; ++crlfPos) {
 			if (dataBuffer[crlfPos] == 0x0D)
 				if(dataBuffer[crlfPos+1] == 0X0A) break; //0d0a (CRLF)
@@ -369,21 +368,21 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		//noop due to previous parsed CSV data
 		return points;
 	}
-
+	
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException
+	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
@@ -393,7 +392,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1,1);
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-
+		
 		int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 		byte[] timeStampBuffer = new byte[timeStampBufferSize];
 		if(!recordSet.isTimeStepConstant()) {
@@ -404,23 +403,23 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 			}
 		}
 		log.log(Level.FINE, timeStamps.size() + " timeStamps = " + timeStamps.toString()); //$NON-NLS-1$
-
+		
 		for (int i = 0; i < recordDataSize; i++) {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize+timeStampBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i*dataBufferSize+timeStampBufferSize, convertBuffer, 0, dataBufferSize);
-
+			
 			//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
 			//13=tripLength 14=distance 15=azimuth 16=directionStart
 			for (int j = 0; j < points.length; j++) {
 				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8) + ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
 			}
-
-			if(recordSet.isTimeStepConstant())
+			
+			if(recordSet.isTimeStepConstant()) 
 				recordSet.addPoints(points);
 			else
 				recordSet.addNoneCalculationRecordsPoints(points, timeStamps.get(i)/10.0);
 
-
+			
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*5000)/recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
@@ -431,9 +430,9 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	 * @return true if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 */
 	@Override
-	public boolean isGPSCoordinates(IRecord record) {
-		if (record.getOrdinal() == 7 || record.getOrdinal() == 8) {
-			// 7=GPS-Länge 8=GPS-Breite
+	public boolean isGPSCoordinates(Record record) {
+		if (record.getOrdinal() == 7 || record.getOrdinal() == 8) { 
+			// 7=GPS-Länge 8=GPS-Breite 
 			return true;
 		}
 		return false;
@@ -468,7 +467,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		catch (RuntimeException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return dataTableRow;
+		return dataTableRow;		
 	}
 
 	/**
@@ -503,7 +502,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		}
 
 		double newValue = 0;
-		if (record.getOrdinal() == 7 || record.getOrdinal() == 8) { // 7=GPS-Länge 8=GPS-Breite
+		if (record.getOrdinal() == 7 || record.getOrdinal() == 8) { // 7=GPS-Länge 8=GPS-Breite 
 			int grad = ((int)(value / 1000));
 			double minuten = (value - (grad*1000.0))/10.0;
 			newValue = grad + minuten/60.0;
@@ -547,7 +546,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		}
 
 		double newValue = 0;
-		if (record.getOrdinal() == 7 || record.getOrdinal() == 8) { // 7=GPS-Länge 8=GPS-Breite
+		if (record.getOrdinal() == 7 || record.getOrdinal() == 8) { // 7=GPS-Länge 8=GPS-Breite 
 			int grad = (int)value;
 			double minuten =  (value - grad*1.0) * 60.0;
 			newValue = (grad + minuten/100.0)*1000.0;
@@ -558,17 +557,17 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
-
+	
 	/**
-	 * This function allows to register a custom CTabItem to the main application tab folder to display device
+	 * This function allows to register a custom CTabItem to the main application tab folder to display device 
 	 * specific curve calculated from point combinations or other specific dialog
-	 * As default the function should return null which stands for no device custom tab item.
+	 * As default the function should return null which stands for no device custom tab item.  
 	 */
 	@Override
 	public CTabItem getUtilityDeviceTabItem() {
 		return new VarioToolTabItem(this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount(), this, true);
 	}
-
+	
 	/**
 	 * update the file menu by adding two new entries to export KML/GPX files
 	 * @param exportMenue
@@ -576,7 +575,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	public void updateFileMenu(Menu exportMenue) {
 		MenuItem											convertKMZ3DRelativeItem;
 		MenuItem											convertKMZ3DAbsoluteItem;
-
+		
 		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
 
@@ -618,14 +617,14 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		//13=tripLength 14=distance 15=azimuth 16=directionStart
 		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1859), 7, 8, 9, 10, 11, 13, 15, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
-
+	
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
 	public boolean isActualRecordSetWithGpsData() {
-		boolean containsGPSdata = false;
+		boolean containsGPSdata = false; 
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
@@ -635,7 +634,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		}
 		return containsGPSdata;
 	}
-
+	
 	/**
 	 * export a file of the actual channel/record set
 	 * @return full qualified file path depending of the file ending type
@@ -668,7 +667,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 
 		return this.kmzMeasurementOrdinal;
 	}
-
+	
 	/**
 	 * @return the translated latitude and longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W, baroAlt, gpsAlt} for GPS devices only
 	 */
@@ -680,7 +679,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		Record recordLongitude = recordSet.get(7);
 		Record baroAlitude = recordSet.get(1);
 		Record gpsAlitude = recordSet.get(9);
-
+		
 		return String.format("%02d%05d%s%03d%05d%s%c%05d%05d", 																																														//$NON-NLS-1$
 				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
 				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$
@@ -709,7 +708,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 		//record set don't need to adapted, since missing measurements will be calculated
 		return recordKeys;
 	}
-
+	
 	/**
 	 * update the file import menu by adding new entry to import device specific files
 	 * @param importMenue
@@ -717,7 +716,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 	public void updateFileImportMenu(Menu importMenue) {
 		MenuItem importDeviceLogItem;
 
-		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);

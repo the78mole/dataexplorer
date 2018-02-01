@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-
+    
     Copyright (c) 2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.igc;
@@ -36,7 +36,6 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
@@ -60,14 +59,14 @@ import gde.utils.QuasiLinearRegression;
  */
 public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	final static Logger						log	= Logger.getLogger(IGCAdapter.class.getName());
-
+	
 	protected final DataExplorer				application;
 	protected final Channels						channels;
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException
-	 * @throws FileNotFoundException
+	 * @throws JAXBException 
+	 * @throws FileNotFoundException 
 	 */
 	public IGCAdapter(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -115,7 +114,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber
+	 * @param channelNumber 
 	 * @return converted configuration data
 	 */
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
@@ -124,10 +123,10 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
 	public int getLovDataByteSize() {
-		return -1;
+		return -1;  
 	}
 
 	/**
@@ -139,7 +138,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException
+	 * @throws DataInconsitsentException 
 	 */
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		//device specific implementation required
@@ -151,7 +150,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {		
 		//device specific implementation required
 		return points;
 	}
@@ -160,12 +159,12 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException
+	 * @throws DataInconsitsentException 
 	 */
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
@@ -186,7 +185,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8) + ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
 			}
 
-			recordSet.addNoneCalculationRecordsPoints(points,
+			recordSet.addNoneCalculationRecordsPoints(points, 
 						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8)	+ ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
@@ -199,8 +198,8 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	 * @return true if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 */
 	@Override
-	public boolean isGPSCoordinates(IRecord record) {
-		return record.getOrdinal() == 0 || record.getOrdinal() == 1; // 0=GPS-latitude 1=GPS-longitude
+	public boolean isGPSCoordinates(Record record) {
+		return record.getOrdinal() == 0 || record.getOrdinal() == 1; // 0=GPS-latitude 1=GPS-longitude 
 	}
 
 	/**
@@ -257,7 +256,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 
 		//0=latitude 1=longitude  2=altitudeAbs 3=height
 		double newValue = 0;
-		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
 			int grad = ((int) (value / 1000));
 			double minuten = (value - (grad * 1000.0)) / 10.0;
 			newValue = grad + minuten / 60.0;
@@ -297,7 +296,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 
 		//0=latitude 1=longitude  2=altitudeAbs 3=height
 		double newValue = 0;
-		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
 			int grad = (int) value;
 			double minuten = (value - grad * 1.0) * 60.0;
 			newValue = (grad + minuten / 100.0) * 1000.0;
@@ -312,7 +311,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview
+	 * where some curves are hided for better overview 
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
@@ -328,7 +327,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
-				log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$
+				log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -343,14 +342,14 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread,
-	 * target is to make sure all data point not coming from device directly are available and can be displayed
+	 * for calculation which requires more effort or is time consuming it can call a background thread, 
+	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
 		if (recordSet.isRaw() && recordSet.isRecalculation()) {
 			// 0=Longitude, 1=Latitude, 2=Altitude(baro), 3=Altitude(GPS), 4=Climb
-			// calculate the values required
+			// calculate the values required		
 			Record slopeRecord = recordSet.get(4);//2=Steigrate
 			slopeRecord.setDisplayable(false);
 			PropertyType property = slopeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
@@ -369,12 +368,12 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 		this.application.updateStatisticsData();
-	}
+	}	
 
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
-	 * as example a file selection dialog could be opened to import serialized ASCII data
+	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void open_closeCommPort() {
 		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT1750));
@@ -387,13 +386,13 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 					for (String tmpFileName : fd.getFileNames()) {
 						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
-
+						
 						if (fd.getFileName().length() > 4) {
 							try {
 								//distinguish between short and long IGC file name
 								int fileNameLength = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT)).length();
 								String  recordNameExtend;
-								if (fileNameLength == 8) { //short name
+								if (fileNameLength == 8) { //short name 
 									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 									try {
 										Integer.parseInt(recordNameExtend);
@@ -470,7 +469,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
@@ -513,7 +512,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 		//0=latitude 1=longitude  2=altitudeAbs 3=height
 		return -1;
 	}
-
+		
 	/**
 	 * @return the translated latitude and longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W} for GPS devices only
 	 */
@@ -524,13 +523,13 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 		Record recordLongitude = recordSet.get(1);
 		Record baroAlitude = recordSet.get(2);
 		Record gpsAlitude = recordSet.get(3);
-
+		
 		return String.format("%02d%05d%s%03d%05d%s%c%05d%05d", 																																														//$NON-NLS-1$
 				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$ //$NON-NLS-2$
 				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$ //$NON-NLS-2$
 				fixValidity, Double.valueOf(baroAlitude.get(index) / 10000.0 + startAltitude + offsetAltitude).intValue(), Double.valueOf(gpsAlitude.get(index) / 1000.0 + offsetAltitude).intValue());
 	}
-
+	
 	/**
 	 * update the file import menu by adding new entry to import device specific files
 	 * @param importMenue
@@ -538,7 +537,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileImportMenu(Menu importMenue) {
 		MenuItem importDeviceLogItem;
 
-		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);

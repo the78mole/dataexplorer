@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.data.Channel;
-import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
@@ -30,8 +29,8 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException
-	 * @throws FileNotFoundException
+	 * @throws JAXBException 
+	 * @throws FileNotFoundException 
 	 */
 	public HoTTViewer(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -93,17 +92,17 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 			});
 		}
 	}
-
+	
 	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException
+	 * @throws DataInconsitsentException 
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
@@ -114,7 +113,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 		//laps calculation init begin
-//		final int pointsPerInterval = 15; //fix odd number of points used for calculation
+//		final int pointsPerInterval = 15; //fix odd number of points used for calculation 
 //		final int lapsPointDelta = pointsPerInterval/2; //15/2 = 7
 //		long filterLapMinTime_ms = 12000; //5 seconds time minimum time space between laps
 //    double lapStartTime_ms = 0;
@@ -126,14 +125,14 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 //    int lastRxdbm = 0;
 //    int absorptionLevel = 7;
     //labs calculation init end
-
+    
 		int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 		int index = 0;
 		for (int i = 0; i < recordDataSize; i++) {
 			index = i * dataBufferSize + timeStampBufferSize;
 			if (log.isLoggable(Level.FINER))
 				log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
-
+			
 			for (int j = 0; j < points.length; j++) {
 				points[j] = (((dataBuffer[0 + (j * 4) + index] & 0xff) << 24) + ((dataBuffer[1 + (j * 4) + index] & 0xff) << 16) + ((dataBuffer[2 + (j * 4) + index] & 0xff) << 8) + ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
 			}
@@ -142,8 +141,8 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 //				points[26] = (lastRxdbm*absorptionLevel + points[26])/(absorptionLevel+1);
 //				lastRxdbm = points[26];
 //			}
-
-			recordSet.addNoneCalculationRecordsPoints(points,
+			
+			recordSet.addNoneCalculationRecordsPoints(points, 
 						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8)	+ ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
 //			if (recordSet.size() >= 27) {
@@ -194,9 +193,9 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 //	 */
 //	protected void smoothAndDifferentiate(final RecordSet activeRecordSet, final int sourceRecordOrdinal, final int targetRecordOrdinal, final int position) {
 //
-//		final int pointsPerInterval = 15; //fix number of points used for calculation
+//		final int pointsPerInterval = 15; //fix number of points used for calculation 
 //		final int pointInterval = 1; 			// fix number of points where the calculation will result in values, rest is overlap
-//		final int frontPadding = (pointsPerInterval - pointInterval) / 2; // (15-3)/2 |------...------|
+//		final int frontPadding = (pointsPerInterval - pointInterval) / 2; // (15-3)/2 |------...------|		
 //		final int startPosition = position - pointsPerInterval;
 //
 //		try {
@@ -208,7 +207,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 //				//int modCounter = pointInterval; //(numberDataPoints - (pointsPerInterval - pointInterval)) / pointInterval;
 //				//log.log(Level.FINE, "numberDataPoints = " + numberDataPoints + " modCounter = " + modCounter + " frontPadding = " + frontPadding); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 //				// calculate avg x == time step in msec
-//				double avgX = timeStep_sec; // timeStepsPerInterval * time_ms / 1000.0 / timeStepsPerInterval;
+//				double avgX = timeStep_sec; // timeStepsPerInterval * time_ms / 1000.0 / timeStepsPerInterval; 
 //				// (xi - avgX)*(xi - avgX)
 //				double ssXX = 0.0;
 //				for (int i = 1; i <= pointsPerInterval; i++) {
@@ -271,7 +270,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 				int ordinal = record.getOrdinal();
 				//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 				//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
-				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
+				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 				//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 				if (ordinal >= 0 && ordinal <= 5){
 					dataTableRow[index + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
@@ -289,7 +288,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 	}
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
@@ -301,24 +300,24 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 			if (activeRecordSet != null) {
 				//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 				//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
-				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
+				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 				//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 				containsGPSdata = activeRecordSet.get(22).hasReasonableData() && activeRecordSet.get(23).hasReasonableData();
 			}
 		}
 		return containsGPSdata;
 	}
-
+	
 	/**
 	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 * @param record
 	 * @return
 	 */
 	@Override
-	public boolean isGPSCoordinates(IRecord record) {
+	public boolean isGPSCoordinates(Record record) {
 		//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
-		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
+		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 		final int latOrdinal = 22, lonOrdinal = 23;
 		return record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal;
@@ -331,7 +330,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 	public Integer getGPS2KMZMeasurementOrdinal() {
 		//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
-		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
+		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 		if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
 			return 7;
@@ -352,7 +351,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
 				//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 				//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
-				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
+				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 				//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
 				final int latOrdinal = 22, lonOrdinal = 23, altOrdinal = 6, climbOrdinal = 3;
@@ -370,7 +369,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 	public void export2KMZ3D(int type) {
 		//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
-		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
+		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 		final int latOrdinal = 22, lonOrdinal = 23, altOrdinal = 6, climbOrdinal = 3, speedOrdinal = 7;
 		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2403), lonOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, -1, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
@@ -384,7 +383,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 	public void export2GPX(final boolean isGarminExtension) {
 		//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
-		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
+		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 		if (isGarminExtension)
 			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 	22, 23, 6, 7, -1, -1, -1, -1, new int[] {-1,-1,-1});
@@ -403,7 +402,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 
 		//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
-		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
+		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 		final int latOrdinal = 22, lonOrdinal = 23;
 		if (record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal) { //13=Latitude, 14=Longitude
@@ -436,7 +435,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 
 		//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
-		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
+		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 		final int latOrdinal = 22, lonOrdinal = 23;
 		if (record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal) { // 13=Latitude, 14=Longitude
@@ -455,21 +454,21 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread,
-	 * target is to make sure all data point not coming from device directly are available and can be displayed
+	 * for calculation which requires more effort or is time consuming it can call a background thread, 
+	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 
 		//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
-		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
+		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2, 
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
 		recordSet.syncScaleOfSyncableRecords();
 		this.application.updateStatisticsData();
 		this.updateVisibilityStatus(recordSet, true);
 		this.application.getActiveChannel().setFileDescription(recordSet.getFormatedTime_sec(0, true).trim().split(GDE.STRING_BLANK)[0]);
-
+		
 //    // start laps calculation
 //    String[] measurements = recordSet.getActiveRecordNames(); //0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 //    int regressionInterval = 6; //5 seconds interval used for first linear regression
@@ -481,8 +480,8 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 //    catch (Exception e) {
 //        log.log(Level.WARNING, e.getMessage(), e);
 //    }
-//
-//    regressionInterval = 3; //5 seconds interval used for first linear regression
+//   
+//    regressionInterval = 3; //5 seconds interval used for first linear regression       
 //    this.calculationThread = new LinearRegression(recordSet, measurements[1], measurements[2], regressionInterval); //tmp VPack is source, Strenght is temporary target
 //    try {
 //        this.calculationThread.start();
@@ -498,7 +497,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 //    int lapTime = 0;
 //    Record laps = recordSet.get(3); //RXSQ this is target for the laps
 //    Record smoothedAndDiffRxdbm = recordSet.get(2); //this record contains the last stored smoothed data
-//
+//   
 //    int i = 0;
 //    for (; i < smoothedAndDiffRxdbm.realSize(); i++) { //skip time to start lap calculation
 //        laps.set(i, lapTime);

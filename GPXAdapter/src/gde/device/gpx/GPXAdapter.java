@@ -44,7 +44,6 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
@@ -344,7 +343,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	 * @return true if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 */
 	@Override
-	public boolean isGPSCoordinates(IRecord record) {
+	public boolean isGPSCoordinates(Record record) {
 		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) {
 			// 0=GPS-latitude 1=GPS-longitude
 			return true;

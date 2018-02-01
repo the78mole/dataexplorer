@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-
+    
     Copyright (c) 2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.nmea;
@@ -38,7 +38,6 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
@@ -73,8 +72,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * constructor using properties file
-	 * @throws JAXBException
-	 * @throws FileNotFoundException
+	 * @throws JAXBException 
+	 * @throws FileNotFoundException 
 	 */
 	public NMEAAdapter(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
@@ -115,7 +114,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * @param lov2osdMap reference to the map where the key mapping has to be put
 	 * @return lov2osdMap same reference as input parameter
 	 */
-	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
 		// ...
 		return lov2osdMap;
@@ -125,19 +123,17 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * convert record LogView config data to GDE config keys into records section
 	 * @param header reference to header data, contain all key value pairs
 	 * @param lov2osdMap reference to the map where the key mapping
-	 * @param channelNumber
+	 * @param channelNumber 
 	 * @return converted configuration data
 	 */
-	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
 		// ...
 		return ""; //$NON-NLS-1$
 	}
 
 	/**
-	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device
+	 * get LogView data bytes size, as far as known modulo 16 and depends on the bytes received from device 
 	 */
-	@Override
 	public int getLovDataByteSize() {
 		return 0; // sometimes first 4 bytes give the length of data + 4 bytes for number
 	}
@@ -151,9 +147,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException
+	 * @throws DataInconsitsentException 
 	 */
-	@Override
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		// prepare the serial CSV data parser
 		NMEAParser data = new NMEAParser(this.getDataBlockLeader(), this.getDataBlockSeparator().value(), this.getDataBlockCheckSumType(), Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)), this,
@@ -206,7 +201,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * @param points pointer to integer array to be filled with converted data
 	 * @param dataBuffer byte arrax with the data to be converted
 	 */
-	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		//noop due to previous parsed CSV data
 		return points;
@@ -216,14 +210,13 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user
+	 * since this is a long term operation the progress bar should be updated to signal business to user 
 	 * @param recordSet
 	 * @param dataBuffer
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException
+	 * @throws DataInconsitsentException 
 	 */
-	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
@@ -270,9 +263,9 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * @return true if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 */
 	@Override
-	public boolean isGPSCoordinates(IRecord record) {
-		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) {
-			// 0=GPS-latitude 1=GPS-longitude
+	public boolean isGPSCoordinates(Record record) {
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { 
+			// 0=GPS-latitude 1=GPS-longitude 
 			return true;
 		}
 		return false;
@@ -281,7 +274,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
-	@Override
 	public String[] prepareDataTableRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
 			int index = 0;
@@ -315,7 +307,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	@Override
 	public double translateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -324,7 +315,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 		double newValue = 0;
-		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
 			int grad = ((int)(value / 1000));
 			double minuten = (value - (grad*1000.0))/10.0;
 			newValue = grad + minuten/60.0;
@@ -341,7 +332,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
 	 */
-	@Override
 	public double reverseTranslateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double offset = record.getOffset(); // != 0 if a unit translation is required
@@ -350,7 +340,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
 		double newValue = 0;
-		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude
+		if (record.getOrdinal() == 0 || record.getOrdinal() == 1) { // 0=GPS-latitude 1=GPS-longitude 
 			int grad = (int)value;
 			double minuten =  (value - grad*1.0) * 60.0;
 			newValue = (grad + minuten/100.0)*1000.0;
@@ -365,12 +355,11 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * check and update visibility status of all records according the available device configuration
 	 * this function must have only implementation code if the device implementation supports different configurations
-	 * where some curves are hided for better overview
+	 * where some curves are hided for better overview 
 	 * example: if device supports voltage, current and height and no sensors are connected to voltage and current
 	 * it makes less sense to display voltage and current curves, if only height has measurement data
 	 * at least an update of the graphics window should be included at the end of this method
 	 */
-	@Override
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 		int channelConfigNumber = recordSet.getChannelConfigNumber();
 		int displayableCounter = 0;
@@ -398,7 +387,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData() && (measurement.isActive() || measurement.isCalculation()));
 				if (log.isLoggable(Level.FINE))
-					log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$
+					log.log(Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
@@ -416,10 +405,9 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
-	 * for calculation which requires more effort or is time consuming it can call a background thread,
-	 * target is to make sure all data point not coming from device directly are available and can be displayed
+	 * for calculation which requires more effort or is time consuming it can call a background thread, 
+	 * target is to make sure all data point not coming from device directly are available and can be displayed 
 	 */
-	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 		//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
@@ -432,7 +420,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		Record recordAlitudeRelative = recordSet.get(9);
 		try { //calculate 9=altitudeRel
 			recordAlitudeRelative.clear();
-			//check GPS latitude and longitude
+			//check GPS latitude and longitude				
 			int indexGPS = 0;
 			int i = 0;
 			for (; i < recordSize; ++i) {
@@ -444,7 +432,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 				recordAlitudeRelative.add(0);
 			}
 			recordAlitudeRelative.add(0);
-			startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation
+			startAltitude = recordAlitude.get(indexGPS); //set initial altitude to enable absolute altitude calculation 		
 			for (; i < recordSize; ++i) {
 				recordAlitudeRelative.add((recordAlitude.get(i) - startAltitude));
 			}
@@ -460,7 +448,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		//calculate 11=tripLength 12=distance 13=azimuth 14=directionStart
 		GPSHelper.calculateValues(this, recordSet, 0, 1, 2, startAltitude, 11, 12, 13, 14);
 
-
+		
 		Record recordClimb = recordSet.get(10);
 		try {//calculate 10=climb
 
@@ -471,7 +459,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 				int regressionInterval = (int) (property != null ? Double.parseDouble(property.getValue().trim()) : 3);
 				//this.calculationThread = new QuasiLinearRegression(recordSet, recordAlitude.getName(), recordClimb.getName(), regressionInterval);
 				new LinearRegression(recordSet, recordAlitude.getName(), recordClimb.getName(), regressionInterval).start();
-			}
+			}			
 		}
 		catch (RuntimeException e) {
 			log.log(Level.WARNING, e.getMessage(), e);
@@ -481,10 +469,10 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 
-		this.application.updateStatisticsData();
+		this.application.updateStatisticsData();	
 		this.updateVisibilityStatus(recordSet, true);
 	}
-
+	
 	/**
 	 * @return the dialog
 	 */
@@ -498,7 +486,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	 * - the property keys are used to filter serialized properties form OSD data file
 	 * @return [offset, factor, reduction, number_cells, prop_n100W, ...]
 	 */
-	@Override
 	public String[] getUsedPropertyKeys() {
 		return new String[] { IDevice.OFFSET, IDevice.FACTOR, IDevice.REDUCTION };
 	}
@@ -506,9 +493,8 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
-	 * as example a file selection dialog could be opened to import serialized ASCII data
+	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
-	@Override
 	public void open_closeCommPort() {
 		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2100));
 
@@ -562,7 +548,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT2105));
 			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
@@ -572,7 +557,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2106));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
@@ -582,7 +566,6 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT2107));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
@@ -602,7 +585,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
 	 * set value of -1 to suppress this measurement
 	 */
 	@Override
@@ -652,7 +635,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 
 		return this.kmzMeasurementOrdinal != null ? this.kmzMeasurementOrdinal : -1;
 	}
-
+	
 	/**
 	 * @return the translated latitude and longitude to IGC latitude {DDMMmmmN/S, DDDMMmmmE/W} for GPS devices only
 	 */
@@ -663,13 +646,13 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 		Record recordLatitude = recordSet.get(0);
 		Record recordLongitude = recordSet.get(1);
 		Record gpsAlitude = recordSet.get(2);
-
+		
 		return String.format("%02d%05d%s%03d%05d%s%c%05.0f%05.0f", 																																														//$NON-NLS-1$
 				recordLatitude.get(index) / 1000000, Double.valueOf(recordLatitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLatitude.get(index) > 0 ? "N" : "S",//$NON-NLS-1$
 				recordLongitude.get(index) / 1000000, Double.valueOf(recordLongitude.get(index) % 1000000 / 10.0 + 0.5).intValue(), recordLongitude.get(index) > 0 ? "E" : "W",//$NON-NLS-1$
 				fixValidity, 0.0, gpsAlitude.get(index) / 1000.0 + offsetAltitude);
 	}
-
+	
 	/**
 	 * update the file import menu by adding new entry to import device specific files
 	 * @param importMenue
@@ -677,14 +660,13 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileImportMenu(Menu importMenue) {
 		MenuItem importDeviceLogItem;
 
-		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+		if (importMenue.getItem(importMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {			
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
 			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2108, GDE.MOD1));
 			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT2108));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event e) {
 					log.log(java.util.logging.Level.FINEST, "importDeviceLogItem action performed! " + e); //$NON-NLS-1$
 					open_closeCommPort();

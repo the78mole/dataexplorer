@@ -36,7 +36,6 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.Record.DataType;
 import gde.data.RecordSet;
@@ -466,7 +465,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	 * @return
 	 */
 	@Override
-	public boolean isGPSCoordinates(IRecord record) {
+	public boolean isGPSCoordinates(Record record) {
 		return (record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LONGITUDE) && record.getName().startsWith("Rx");
 	}
 

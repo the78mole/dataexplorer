@@ -24,7 +24,6 @@ import java.util.List;
 import org.eclipse.swt.custom.CTabItem;
 
 import gde.comm.IDeviceCommPort;
-import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.exception.DataInconsitsentException;
@@ -1031,7 +1030,7 @@ public interface IDevice {
 	 * @param record
 	 * @return true if the record is a latitude or longitude record
 	 */
-	public boolean isGPSCoordinates(IRecord record);
+	public boolean isGPSCoordinates(Record record);
 
 	/**
 	 * query the measurement ordinal of the first Lithium cell for cell voltage display

@@ -48,7 +48,6 @@ import org.eclipse.swt.custom.CTabItem;
 import gde.GDE;
 import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
-import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.resource.DeviceXmlResource;
@@ -2515,7 +2514,7 @@ public class DeviceConfiguration {
 	 * @param record
 	 * @return
 	 */
-	public boolean isGPSCoordinates(IRecord record) {
+	public boolean isGPSCoordinates(Record record) {
 		return false;
 	}
 
@@ -2661,9 +2660,8 @@ public class DeviceConfiguration {
 	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
 			int index = 0;
-			Vector<Record> records = (Vector<Record>) recordSet.getVisibleAndDisplayableRecordsForTable();
-			for (final Record record : records) {
-				if (isGPSCoordinates((IRecord) record)) {
+			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+				if (isGPSCoordinates(record)) {
 					int grad = record.realGet(rowIndex) / 1000000;
 					double minuten = record.realGet(rowIndex) % 1000000 / 10000.0;
 					dataTableRow[index + 1] = String.format("%02.6f", grad + minuten / 100.); //$NON-NLS-1$
