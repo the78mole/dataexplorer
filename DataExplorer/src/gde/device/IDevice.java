@@ -880,8 +880,17 @@ public interface IDevice {
 			newValue = value / 1000.0;
 		}
 		else {
+			switch (record.getDataType()) {
+			// lat and lon only required if isGPSCoordinates is not implemented
+			case GPS_LATITUDE:
+			case GPS_LONGITUDE:
+				newValue = value / 1000.;
+				break;
+
+			default:
 				newValue = value * record.getFactor();
 			}
+		}
 		return newValue;
 	}
 
