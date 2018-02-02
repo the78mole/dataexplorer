@@ -22,6 +22,7 @@ package gde.histo.recordings;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,7 @@ import gde.histo.cache.ExtendedVault;
 import gde.histo.gpslocations.GeoCodes;
 import gde.histo.gpslocations.GpsCluster;
 import gde.histo.recordings.HistoTableMapper.DisplayTag;
-import gde.histo.recordings.TrailRecordSet.DataTag;
+import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.histo.utils.GpsCoordinate;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -41,10 +42,14 @@ import gde.ui.DataExplorer;
  * Tags corresponding to timestep entries.
  * @author Thomas Eickert (USER)
  */
-public final class TrailDataTags extends HashMap<DataTag, List<String>> {
-	private final static String	$CLASS_NAME							= TrailDataTags.class.getName();
+public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
+	private static final String	$CLASS_NAME							= TrailDataTags.class.getName();
 	private static final long		serialVersionUID				= -1091858232851684060L;
-	private final static Logger	log											= Logger.getLogger($CLASS_NAME);
+	private static final Logger	log											= Logger.getLogger($CLASS_NAME);
+
+	public enum DataTag {
+		LINK_PATH, FILE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, RECORDSET_ORDINAL, GPS_LOCATION
+	};
 
 	private final List<String>	dataLinkPaths						= new ArrayList<String>();
 	private final List<String>	dataFilePaths						= new ArrayList<String>();
@@ -60,6 +65,7 @@ public final class TrailDataTags extends HashMap<DataTag, List<String>> {
 	private EnumSet<DisplayTag>	activeDisplayTags				= null;
 
 	public TrailDataTags() {
+		super(DataTag.class);
 		this.put(DataTag.LINK_PATH, this.dataLinkPaths);
 		this.put(DataTag.FILE_PATH, this.dataFilePaths);
 		this.put(DataTag.CHANNEL_NUMBER, this.dataChannelNumbers);

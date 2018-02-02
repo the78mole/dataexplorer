@@ -58,9 +58,9 @@ import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.recordings.HistoTableMapper;
 import gde.histo.recordings.HistoTableMapper.DisplayTag;
+import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
-import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.ui.menu.AbstractTabAreaContextMenu;
 import gde.histo.ui.menu.AbstractTabAreaContextMenu.TabMenuOnDemand;
 import gde.histo.ui.menu.TableTabAreaContextMenu;
@@ -75,8 +75,8 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public class HistoTableWindow extends CTabItem {
-	private final static String								$CLASS_NAME						= HistoTableWindow.class.getName();
-	private final static Logger								log										= Logger.getLogger($CLASS_NAME);
+	private static final String								$CLASS_NAME						= HistoTableWindow.class.getName();
+	private static final Logger								log										= Logger.getLogger($CLASS_NAME);
 
 	private static final int									TEXT_EXTENT_FACTOR		= 6;
 
@@ -89,7 +89,6 @@ public class HistoTableWindow extends CTabItem {
 	private final AbstractTabAreaContextMenu	contextMenu;
 
 	private Table															dataTable;
-	private TableColumn												recordsColumn;
 	private TableCursor												cursor;
 	private Vector<Integer>										rowVector							= new Vector<Integer>(2);
 	private Vector<Integer>										topindexVector				= new Vector<Integer>(2);
@@ -452,14 +451,14 @@ public class HistoTableWindow extends CTabItem {
 		setRowCount(0); // ET required for Listener firing on setRowCount(xyz)
 
 		String recordTitle = Messages.getString(MessageIds.GDE_MSGT0749);
-		this.recordsColumn = new TableColumn(this.dataTable, SWT.CENTER);
-		this.recordsColumn.setWidth((int) (recordTitle.length() * TEXT_EXTENT_FACTOR * 15 / 10.));
-		this.recordsColumn.setText(recordTitle);
+		TableColumn recordsColumn = new TableColumn(this.dataTable, SWT.CENTER);
+		recordsColumn.setWidth((int) (recordTitle.length() * TEXT_EXTENT_FACTOR * 15 / 10.));
+		recordsColumn.setText(recordTitle);
 
 		String curveTypeHeader = Messages.getString(MessageIds.GDE_MSGT0828);
-		this.recordsColumn = new TableColumn(this.dataTable, SWT.LEFT);
-		this.recordsColumn.setWidth((int) (curveTypeHeader.length() * TEXT_EXTENT_FACTOR * 15 / 10.));
-		this.recordsColumn.setText(curveTypeHeader);
+		recordsColumn = new TableColumn(this.dataTable, SWT.LEFT);
+		recordsColumn.setWidth((int) (curveTypeHeader.length() * TEXT_EXTENT_FACTOR * 15 / 10.));
+		recordsColumn.setText(curveTypeHeader);
 
 		// set the data columns of the new header line
 		Channel activeChannel = this.channels.getActiveChannel();

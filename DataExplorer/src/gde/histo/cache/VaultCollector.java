@@ -44,6 +44,7 @@ import gde.device.TransitionCalculusType;
 import gde.device.TransitionFigureType;
 import gde.histo.datasources.DirectoryScanner.SourceDataSet;
 import gde.histo.datasources.HistoSet;
+import gde.histo.device.IHistoDevice;
 import gde.histo.settlements.AmountEvaluator;
 import gde.histo.settlements.CalculusEvaluator;
 import gde.histo.settlements.FigureEvaluator;
@@ -76,10 +77,12 @@ public final class VaultCollector {
 	 * @param fileVersion is the version of the log origin file
 	 * @param logRecordSetSize is the number of recordsets in the log origin file
 	 * @param logRecordsetBaseName the base name without recordset number
+	 * @param providesReaderSettings true is a file reader capable to deliver different measurement values based on device settings
 	 */
-	public VaultCollector(String objectDirectory, File file, int fileVersion, int logRecordSetSize, String logRecordsetBaseName) {
+	public VaultCollector(String objectDirectory, File file, int fileVersion, int logRecordSetSize, String logRecordsetBaseName, //
+			boolean providesReaderSettings) {
 		this(objectDirectory, file, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, "native", file.lastModified(), //$NON-NLS-1$
-				DataExplorer.getInstance().getActiveChannelNumber(), objectDirectory);
+				DataExplorer.getInstance().getActiveChannelNumber(), objectDirectory, providesReaderSettings);
 	}
 
 	/**
@@ -93,11 +96,16 @@ public final class VaultCollector {
 	 * @param logDeviceName
 	 * @param logChannelNumber may differ from UI settings in case of channel mix
 	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
+	 * @param providesReaderSettings true is a file reader capable to deliver different measurement values based on device settings
 	 */
 	public VaultCollector(String objectDirectory, File file, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal,
-			String logRecordsetBaseName, String logDeviceName, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
+			String logRecordsetBaseName, String logDeviceName, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey, //
+			boolean providesReaderSettings) {
+		String readerSettings = providesReaderSettings && application.getActiveDevice() instanceof IHistoDevice
+				? ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
 		this.vault = new ExtendedVault(objectDirectory, file.toPath(), file.lastModified(), file.length(), fileVersion, logRecordSetSize,
-				logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, logStartTimestamp_ms, logChannelNumber, logObjectKey);
+				logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, logStartTimestamp_ms, logChannelNumber, logObjectKey, //
+				readerSettings);
 	}
 
 	@Override
@@ -123,10 +131,8 @@ public final class VaultCollector {
 				transitions.add4Channel(this.vault.logChannelNumber);
 
 				LinkedHashMap<String, SettlementRecord> histoSettlements;
-				if (transitions.getTransitionsCount() > 0) {
-					histoSettlements = determineSettlements(recordSet, transitions);
-					setSettlements(histoSettlements);
-				}
+				histoSettlements = determineSettlements(recordSet, transitions);
+				setSettlements(histoSettlements);
 			}
 
 			scorePoints[ScoreLabelTypes.DURATION_MM.ordinal()] = (int) (recordSet.getMaxTime_ms() / 60000. * 1000. + .5);
@@ -177,31 +183,28 @@ public final class VaultCollector {
 
 		for (SettlementType settlementType : device.getDeviceConfiguration().getChannel(this.vault.logChannelNumber).getSettlements().values()) {
 			if (settlementType.getEvaluation() != null) {
+				SettlementRecord record = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
+				histoSettlements.put(settlementType.getName(), record);
+				if (transitions.isEmpty()) continue;
+
 				final TransitionFigureType transitionFigureType = settlementType.getEvaluation().getTransitionFigure();
 				final TransitionAmountType transitionAmountType = settlementType.getEvaluation().getTransitionAmount();
 				final TransitionCalculusType calculationType = settlementType.getEvaluation().getTransitionCalculus();
-
 				if (transitionFigureType != null) {
-					SettlementRecord record = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
 					FigureEvaluator evaluator = new FigureEvaluator(record);
 					for (Transition transition : transitions.get(transitionFigureType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}
-					histoSettlements.put(settlementType.getName(), record);
 				} else if (transitionAmountType != null) {
-					SettlementRecord record = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
 					AmountEvaluator evaluator = new AmountEvaluator(record);
 					for (Transition transition : transitions.get(transitionAmountType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}
-					histoSettlements.put(settlementType.getName(), record);
 				} else if (calculationType != null) {
-					SettlementRecord record = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
 					CalculusEvaluator evaluator = new CalculusEvaluator(record);
 					for (Transition transition : transitions.get(calculationType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}
-					histoSettlements.put(settlementType.getName(), record);
 				} else {
 					throw new UnsupportedOperationException();
 				}

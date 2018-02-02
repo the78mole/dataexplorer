@@ -393,7 +393,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			if (channel != null) {
 				VaultCollector vaultCollector = new VaultCollector(objectDirectory, file, osdHeader.getFileVersion(), osdRecordSets.size(), i,
 						osdRecordSet.getBaseName(), osdHeader.getDeviceName(), osdRecordSet.getEnhancedStartTimestamp_ms(), channel.getNumber(),
-						osdHeader.getLogObjectKey());
+						osdHeader.getLogObjectKey(), false);
 				trusses.add(vaultCollector);
 			}
 		}

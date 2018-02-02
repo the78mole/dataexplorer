@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channels;
-import gde.histo.recordings.TrailRecordSet.DataTag;
+import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -42,8 +42,8 @@ import gde.utils.StringHelper;
  */
 public final class TrailRecordSetFormatter {
 
-	private final static Settings	settings	= Settings.getInstance();
-	private final static Channels	channels	= Channels.getInstance();
+	private static final Settings	settings	= Settings.getInstance();
+	private static final Channels	channels	= Channels.getInstance();
 
 	public static String getSelectedMeasurementsAsTable(long timestamp_ms) {
 		Properties displayProps = settings.getMeasurementDisplayProperties();

@@ -65,6 +65,7 @@ import gde.histo.cache.ExtendedVault;
 import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.datasources.HistoSet;
 import gde.histo.gpslocations.GpsCluster;
+import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.histo.recordings.TrailRecord.GraphicsTemplate;
 import gde.histo.recordings.TrailRecord.Summary;
 import gde.histo.ui.HistoExplorer;
@@ -93,11 +94,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	public static final String	BASE_NAME_SEPARATOR	= " | ";
 
-	public enum DataTag {
-		LINK_PATH, FILE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, RECORDSET_ORDINAL, GPS_LOCATION
-	};
-
-	protected final static String CHART_WEIGHT = "Tab_chartWeight"; // weight of the charts (graphics or summary boxplot)
+	protected static final String CHART_WEIGHT = "Tab_chartWeight"; // weight of the charts (graphics or summary boxplot)
 
 	/**
 	 * Collect input data for the trail recordset and subordinate objects.
@@ -140,10 +137,9 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			// locate the GPS coordinates records
 			TrailRecord latitudeRecord = null, longitudeRecord = null;
 			for (TrailRecord trailRecord : TrailRecordSet.this.getValues()) {
-				if ( trailRecord.getDataType() == DataType.GPS_LATITUDE)
+				if (trailRecord.getDataType() == DataType.GPS_LATITUDE)
 					latitudeRecord = trailRecord;
-				else if ( trailRecord.getDataType() == DataType.GPS_LONGITUDE)
-					longitudeRecord = trailRecord;
+				else if (trailRecord.getDataType() == DataType.GPS_LONGITUDE) longitudeRecord = trailRecord;
 				if (latitudeRecord != null && longitudeRecord != null) break;
 			}
 

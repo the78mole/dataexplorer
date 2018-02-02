@@ -47,7 +47,6 @@ import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
-import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.device.IHistoDevice;
@@ -156,7 +155,7 @@ public final class DirectoryScanner {
 	 * File types supported by the history.
 	 */
 	public static class SourceDataSet {
-		private final IDevice device = DataExplorer.getInstance().getActiveDevice();
+		private final IDevice			device	= DataExplorer.getInstance().getActiveDevice();
 
 		private final Path				path;
 		private final DataSetType	dataSetType;
@@ -164,7 +163,7 @@ public final class DirectoryScanner {
 		/** Use {@code getFile} only */
 		private File							file;
 
-		private enum DataSetType {
+		public enum DataSetType {
 			OSD {
 				@Override
 				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile) throws IOException,
@@ -188,9 +187,15 @@ public final class DirectoryScanner {
 				}
 
 				@Override
-				List<ExtendedVault> readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
+				void readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
 						DataInconsitsentException, DataTypeException {
-					return HistoOsdReaderWriter.readVaults(filePath, trusses);
+					HistoOsdReaderWriter.readVaults(filePath, trusses);
+				}
+
+				@Override
+				public
+				boolean providesReaderSettings() {
+					return false;
 				}
 			},
 			BIN {
@@ -199,7 +204,8 @@ public final class DirectoryScanner {
 						NotSupportedFileFormatException {
 					String objectDirectory = dataFile.getObjectKey(deviceConfigurations);
 					String recordSetBaseName = DataExplorer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend(dataFile.getFile().getName());
-					VaultCollector truss = new VaultCollector(objectDirectory, dataFile.getFile(), 0, Channels.getInstance().size(), recordSetBaseName);
+					VaultCollector truss = new VaultCollector(objectDirectory, dataFile.getFile(), 0, Channels.getInstance().size(), recordSetBaseName,
+							providesReaderSettings());
 					truss.setSourceDataSet(dataFile);
 					if (isValidObject(truss))
 						return new ArrayList<>(Arrays.asList(truss));
@@ -212,9 +218,15 @@ public final class DirectoryScanner {
 				}
 
 				@Override
-				List<ExtendedVault> readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
+				void readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
 						DataInconsitsentException, DataTypeException {
-					return ((IHistoDevice) DataExplorer.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses);
+					((IHistoDevice) DataExplorer.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses);
+				}
+
+				@Override
+				public
+				boolean providesReaderSettings() {
+					return true;
 				}
 			},
 			LOG { // was not merged with bin - we expect differences in the future
@@ -225,9 +237,15 @@ public final class DirectoryScanner {
 				}
 
 				@Override
-				List<ExtendedVault> readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
+				void readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
 						DataInconsitsentException, DataTypeException {
-					return BIN.readVaults(filePath, trusses);
+					BIN.readVaults(filePath, trusses);
+				}
+
+				@Override
+				public
+				boolean providesReaderSettings() {
+					return true;
 				}
 			};
 
@@ -244,10 +262,14 @@ public final class DirectoryScanner {
 			 * Promote trusses into vaults by reading the source file.
 			 * @param dataFile
 			 * @param trusses lists the requested vaults
-			 * @return the fully populated vaults
 			 */
-			abstract List<ExtendedVault> readVaults(Path dataFile, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
+			abstract void readVaults(Path dataFile, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
 					DataInconsitsentException, DataTypeException;
+
+			/**
+			 * @returns true is a file reader capable to deliver different measurement values based on device settings
+			 */
+			public abstract boolean providesReaderSettings();
 
 			/**
 			 * @param extension of the file w/o dot
@@ -366,9 +388,9 @@ public final class DirectoryScanner {
 			return this.dataSetType;
 		}
 
-		public List<ExtendedVault> readVaults(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
+		public void readVaults(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
 				DataInconsitsentException, DataTypeException {
-			return dataSetType.readVaults(path, trusses);
+			dataSetType.readVaults(path, trusses);
 		}
 
 		/**

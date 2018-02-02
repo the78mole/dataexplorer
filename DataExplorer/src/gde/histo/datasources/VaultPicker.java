@@ -46,6 +46,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import gde.GDE;
 import gde.device.DeviceConfiguration;
@@ -129,7 +130,7 @@ public final class VaultPicker {
 	/**
 	 * Sorted by recordSet startTimeStamp in reverse order; each timestamp may hold multiple vaults.
 	 */
-	private final TreeMap<Long, List<ExtendedVault>>	pickedVaults					= new TreeMap<>(Collections.reverseOrder());
+	private final TreeMap<Long, List<ExtendedVault>>	pickedVaults				= new TreeMap<>(Collections.reverseOrder());
 
 	/**
 	 * Excluded vaults via ignore lists
@@ -225,14 +226,7 @@ public final class VaultPicker {
 		 * @param increment is the value added to the counter
 		 */
 		public void countInLoop(int increment) {
-			setInLoop(this.counter + increment);
-		}
-
-		/**
-		 * Method option for calling in every loop.
-		 * @param newCounter
-		 */
-		public void setInLoop(int newCounter) {
+			int newCounter = this.counter + increment;
 			if (this.progressCycle <= 0)
 				throw new UnsupportedOperationException();
 			else if (newCounter % this.stepSize == 0) {
@@ -307,7 +301,7 @@ public final class VaultPicker {
 
 			// step: put cached vaults into the histoSet map and reduce workload map
 			int trussJobsSize = trussJobs.size();
-			for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromCache(trussJobs, Optional.empty())) {
+			for (ExtendedVault histoVault : VaultReaderWriter.loadFromCaches(trussJobs, Optional.empty())) {
 				if (!histoVault.isTruss()) {
 					putVault(histoVault);
 					this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
@@ -316,25 +310,27 @@ public final class VaultPicker {
 			log.info(() -> String.format("trussJobs loaded from cache = %d", trussJobsSize - trussJobs.size())); //$NON-NLS-1$
 
 			// step: transform log files for the truss jobs into vaults and put them into the histoSet map
-			ArrayList<ExtendedVault> newVaults = new ArrayList<>();
+			int loadCount = 0;
 			for (Map.Entry<Path, List<VaultCollector>> pathEntry : trussJobs.entrySet()) {
 				try {
-					for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromFile(pathEntry.getKey(), pathEntry.getValue())) {
+					VaultReaderWriter.loadFromFile(pathEntry.getKey(), pathEntry.getValue());
+					for (VaultCollector vaultCollector : pathEntry.getValue()) {
+						ExtendedVault histoVault = vaultCollector.getVault();
 						if (!histoVault.isTruss()) {
 							putVault(histoVault);
 							this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 						}
-						newVaults.add(histoVault);
+						loadCount++;
 					}
 				} catch (Exception e) {
 					throw new UnsupportedOperationException(pathEntry.getKey().toString(), e);
 				}
 			}
-			log.info(() -> String.format("trussJobs loaded from file  = %d", newVaults.size())); //$NON-NLS-1$
+			log.log(Level.INFO, "trussJobs loaded from file=", loadCount);
 
 			// step: save vaults in the file system
-			if (newVaults.size() > 0) {
-				VaultReaderWriter.storeVaultsInCache(newVaults);
+			if (loadCount > 0) {
+				VaultReaderWriter.storeInCaches(trussJobs);
 			}
 		}
 		{
@@ -411,25 +407,26 @@ public final class VaultPicker {
 								p) -> p.set(Math.max(DataExplorer.application.getProgressPercentage(), MATCHED.endPercentage + progressPercentageDone)));
 					}
 					final long recordSetBytesCachedSum = this.recordSetBytesSum;
-					ArrayList<ExtendedVault> newVaults;
 					{// step: transform log files from workload map into vaults and put them into the histoSet map
 						long nanoTime = System.nanoTime();
-						newVaults = loadVaultsFromFiles(trussJobs, progress);
-						if (newVaults.size() > 0) {
+						loadVaultsFromFiles(trussJobs, progress);
+						long loadCount = trussJobs.values().parallelStream().flatMap(Collection::stream).count();
+						if (loadCount > 0) {
 							long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 							log.time(() -> String.format("%,5d recordsets create from files  time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
-									newVaults.size(), micros / 1000, newVaults.size() * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
+									loadCount, micros / 1000, loadCount * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
 						}
 					}
 					{// step: save vaults in the file system
 						long nanoTime = System.nanoTime(), cacheSize_B = 0;
-						if (newVaults.size() > 0) {
-							cacheSize_B = VaultReaderWriter.storeVaultsInCache(newVaults);
+						long loadCount = trussJobs.values().parallelStream().flatMap(Collection::stream).count();
+						if (loadCount > 0) {
+							cacheSize_B = VaultReaderWriter.storeInCaches(trussJobs);
 						}
 						if (cacheSize_B > 0) {
 							long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 							log.time(() -> String.format("%,5d recordsets store in cache     time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
-									newVaults.size(), micros / 1000, newVaults.size() * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
+									loadCount, micros / 1000, loadCount * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
 						}
 					}
 				}
@@ -459,34 +456,33 @@ public final class VaultPicker {
 			this.elapsedTime_us = (int) ((System.nanoTime() - startNanoTime + 500000) / 1000);
 			log.time(() -> String.format("%,5d timeSteps  total              time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
 					this.pickedVaults.size(), elapsedTime_us / 1000, this.pickedVaults.size() * 1000000 / this.elapsedTime_us, (int) (this.recordSetBytesSum / 1.024 / 1.024 / this.elapsedTime_us)));
-			return realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA);
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			progress.ifPresent((p) -> p.set(DONE));
 		}
+		return realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA);
 	}
 
 	/**
 	 * @param trussJobs is the list of trusses which must be read
-	 * @return the list containing the vaults read from the original logs
 	 */
-	private ArrayList<ExtendedVault> loadVaultsFromFiles(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress) {
-		ArrayList<ExtendedVault> newVaults;
-		newVaults = new ArrayList<>();
+	private void loadVaultsFromFiles(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress) {
 		int remainingJobSize = trussJobs.values().parallelStream().mapToInt(c -> c.size()).sum();
 		progress.ifPresent((p) -> p.reInit(CACHED, remainingJobSize, 1));
 		for (Map.Entry<Path, List<VaultCollector>> trussJobsEntry : trussJobs.entrySet()) {
-			for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromFile(trussJobsEntry.getKey(), trussJobsEntry.getValue())) {
+			VaultReaderWriter.loadFromFile(trussJobsEntry.getKey(), trussJobsEntry.getValue());
+			for (VaultCollector vaultCollector : trussJobsEntry.getValue()) {
+				ExtendedVault histoVault = vaultCollector.getVault();
 				if (!histoVault.isTruss()) {
 					putVault(histoVault);
 					this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 				} else {
 					log.info(() -> String.format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLogFilePath()));
 				}
-				newVaults.add(histoVault);
 			}
 			progress.ifPresent((p) -> p.countInLoop(trussJobsEntry.getValue().size()));
 		}
-		return newVaults;
 	}
 
 	/**
@@ -495,7 +491,7 @@ public final class VaultPicker {
 	private void loadVaultsFromCache(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress) throws IOException {
 		long nanoTime = System.nanoTime();
 		int tmpHistoSetsSize = this.pickedVaults.size();
-		for (ExtendedVault histoVault : VaultReaderWriter.loadVaultsFromCache(trussJobs, progress)) {
+		for (ExtendedVault histoVault : VaultReaderWriter.loadFromCaches(trussJobs, progress)) {
 			if (!histoVault.isTruss()) {
 				putVault(histoVault);
 				this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());

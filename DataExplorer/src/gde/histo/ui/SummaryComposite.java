@@ -61,10 +61,10 @@ import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.exclusions.InclusionData;
+import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordFormatter;
 import gde.histo.recordings.TrailRecordSet;
-import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.recordings.TrailRecordSet.Outliers;
 import gde.histo.recordings.TrailRecordSetFormatter;
 import gde.histo.ui.data.SummarySpots;
@@ -490,7 +490,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
 			if (record.isVisible()) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
 					record.getName(), record.isVisible(), record.isDisplayable(), record.isScaleSynced(), record.isScaleVisible()));
-			setRecordDisplayValues(record);
+			//setRecordDisplayValues(record);
 
 			Rectangle drawStripBounds = new Rectangle(curveAreaBounds.x, curveAreaBounds.y + stripHeight * i + UNK_GAP, curveAreaBounds.width, stripHeight);
 			log.finer(() -> record.getName() + "  x0=" + curveAreaBounds.x + " y0=" + drawStripBounds.y + " width=" + curveAreaBounds.width + " height=" + stripHeight);

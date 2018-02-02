@@ -21,13 +21,6 @@ package gde.histo.cache;
 
 import static java.util.logging.Level.SEVERE;
 
-import gde.config.Settings;
-import gde.histo.datasources.DirectoryScanner.SourceDataSet;
-import gde.histo.datasources.VaultPicker.ProgressManager;
-import gde.log.Logger;
-import gde.ui.DataExplorer;
-import gde.utils.FileUtils;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -41,13 +34,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.histo.datasources.DirectoryScanner.SourceDataSet;
+import gde.histo.datasources.VaultPicker.ProgressManager;
+import gde.histo.device.IHistoDevice;
+import gde.log.Logger;
+import gde.ui.DataExplorer;
+import gde.utils.FileUtils;
 
 /**
  * File system access for vaults and trusses.
@@ -62,22 +67,16 @@ public final class VaultReaderWriter {
 
 	/**
 	 * Read file and populate the vault from the recordset.
-	 * @return the vaults extracted from the file based on the input trusses
 	 */
-	public static List<ExtendedVault> loadVaultsFromFile(Path filePath, List<VaultCollector> trusses) {
-		List<ExtendedVault> histoVaults = null;
-
+	public static void loadFromFile(Path filePath, List<VaultCollector> trusses) {
 		try {
 			SourceDataSet dataSet = new SourceDataSet(filePath);
-			histoVaults = dataSet.readVaults(trusses);
+			dataSet.readVaults(trusses);
 		} catch (Exception e) {
-			histoVaults = new ArrayList<ExtendedVault>();
 			log.log(SEVERE, e.getMessage(), e);
 			log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //$NON-NLS-1$
 					application.getActiveDevice().getName(), application.getActiveChannelNumber(), filePath));
 		}
-
-		return histoVaults;
 	}
 
 	/**
@@ -86,11 +85,24 @@ public final class VaultReaderWriter {
 	 * @return the vaults and trusses loaded from the cache
 	 * @throws IOException during opening or traversing the zip file
 	 */
-	public static synchronized List<ExtendedVault> loadVaultsFromCache(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress) //
+	public static synchronized List<ExtendedVault> loadFromCaches(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress) //
 			throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
-		List<ExtendedVault> vaults = new ArrayList<>();
+		Path osdCacheFilePath = ExtendedVault.getVaultsFolder(GDE.STRING_EMPTY);
+		List<ExtendedVault> vaults = loadFromCachePath(trussJobs, progress, osdCacheFilePath);
 
-		Path cacheFilePath = ExtendedVault.getVaultsFolder();
+		String readerSettings = application.getActiveDevice() instanceof IHistoDevice
+				? ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
+		Path nativeCacheFilePath = ExtendedVault.getVaultsFolder(readerSettings);
+		if (!nativeCacheFilePath.equals(osdCacheFilePath)) {
+			List<ExtendedVault> nativeVaults = loadFromCachePath(trussJobs, progress, nativeCacheFilePath);
+			vaults.addAll(nativeVaults);
+		}
+		return vaults;
+	}
+
+	private static List<ExtendedVault> loadFromCachePath(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress,
+			Path cacheFilePath) throws IOException, ZipException {
+		List<ExtendedVault> vaults = new ArrayList<>();
 		if (settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
 			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
 				Iterator<Map.Entry<Path, List<VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
@@ -148,14 +160,44 @@ public final class VaultReaderWriter {
 	 * @return the full size (in bytes) of the cache directory
 	 * @throws IOException
 	 */
-	public static long storeVaultsInCache(List<ExtendedVault> newVaults) throws IOException {
-		Path cacheFilePath = ExtendedVault.getVaultsFolder();
+	public static long storeInCaches(Map<Path, List<VaultCollector>> trussJobs) throws IOException {
+		long[] bytes = { 0 };
+		Map<SourceDataSet, List<VaultCollector>> groupedJobs = trussJobs.values().parallelStream().flatMap(Collection::parallelStream).collect(Collectors.groupingBy(VaultCollector::getSourceDataSet));
+// for (Entry<SourceDataSet, List<VaultCollector>> e : groupedJobs.entrySet()) {
+// boolean providesReaderSettings = e.getKey().getDataSetType().providesReaderSettings();
+// String readerSettings = providesReaderSettings ? ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv() :
+// GDE.STRING_EMPTY;
+// Path cacheFilePath = ExtendedVault.getVaultsFolder(readerSettings);
+// storeInCachePath(e.getValue(), cacheFilePath);
+// bytes[0] += Files.walk(cacheFilePath).mapToLong(p -> p.toFile().length()).sum();
+// }
+		groupedJobs.entrySet().stream().forEach(e -> {
+			boolean providesReaderSettings = e.getKey().getDataSetType().providesReaderSettings();
+			String readerSettings = providesReaderSettings && application.getActiveDevice() instanceof IHistoDevice
+					? ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
+			Path cacheFilePath = ExtendedVault.getVaultsFolder(readerSettings);
+			try {
+				storeInCachePath(e.getValue(), cacheFilePath);
+				bytes[0] += Files.walk(cacheFilePath).mapToLong(p -> p.toFile().length()).sum();
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
+			}
+		});
+		return bytes[0];
+	}
+
+	/**
+	 * Get the zip file name from the history vault class and add all histoset vaults to this file.
+	 * @throws IOException
+	 */
+	private static void storeInCachePath(List<VaultCollector> newVaults, Path cacheFilePath) throws IOException {
 		if (settings.isZippedCache()) {
 			// use a zip file system because it supports adding files in contrast to the standard procedure using a ZipOutputStream
 			Map<String, String> env = new HashMap<String, String>();
 			env.put("create", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 			try (FileSystem zipFileSystem = FileSystems.newFileSystem(URI.create("jar:" + cacheFilePath.toUri()), env)) { //$NON-NLS-1$
-				for (ExtendedVault histoVault : newVaults) {
+				for (VaultCollector vaultCollector : newVaults) {
+					ExtendedVault histoVault = vaultCollector.getVault();
 					// name the file inside the zip file
 					Path filePath = zipFileSystem.getPath(histoVault.getVaultFileName().toString());
 					if (!FileUtils.checkFileExist(filePath.toString())) {
@@ -169,7 +211,8 @@ public final class VaultReaderWriter {
 			}
 		} else {
 			FileUtils.checkDirectoryAndCreate(cacheFilePath.toString());
-			for (ExtendedVault histoVault : newVaults) {
+			for (VaultCollector vaultCollector : newVaults) {
+				ExtendedVault histoVault = vaultCollector.getVault();
 				Path filePath = cacheFilePath.resolve(histoVault.getVaultFileName());
 				try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
 					VaultProxy.store(histoVault, outputStream);
@@ -178,6 +221,5 @@ public final class VaultReaderWriter {
 				}
 			}
 		}
-		return cacheFilePath.toFile().length();
 	}
 }

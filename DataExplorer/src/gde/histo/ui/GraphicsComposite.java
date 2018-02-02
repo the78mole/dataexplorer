@@ -56,9 +56,9 @@ import gde.data.Channels;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionData;
+import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
-import gde.histo.recordings.TrailRecordSet.DataTag;
 import gde.histo.ui.menu.AbstractTabAreaContextMenu.TabMenuOnDemand;
 import gde.histo.ui.menu.ChartTabAreaContextMenu;
 import gde.histo.utils.HistoCurveUtils;
@@ -76,8 +76,8 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert
  */
 public final class GraphicsComposite extends AbstractChartComposite {
-	private final static String	$CLASS_NAME	= GraphicsComposite.class.getName();
-	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME	= GraphicsComposite.class.getName();
+	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	private final HistoTimeLine	timeLine		= new HistoTimeLine();
 

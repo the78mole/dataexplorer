@@ -24,7 +24,7 @@ import java.util.function.BiFunction;
 
 import gde.config.Settings;
 import gde.device.TrailTypes;
-import gde.histo.recordings.TrailRecordSet.DataTag;
+import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.LocalizedDateTime;
