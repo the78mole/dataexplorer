@@ -88,9 +88,9 @@ import gde.utils.WaitTimer;
 public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoDevice {
 	final static Logger											log																= Logger.getLogger(HoTTAdapter.class.getName());
 
-	final static String											SENSOR_COUNT											= "SensorCount";																																																			//$NON-NLS-1$
-	final static String											LOG_COUNT													= "LogCount";																																																					//$NON-NLS-1$
-	final static String											FILE_PATH													= "FilePath";																																																					//$NON-NLS-1$
+	final static String											SENSOR_COUNT											= "SensorCount";																													//$NON-NLS-1$
+	final static String											LOG_COUNT													= "LogCount";																															//$NON-NLS-1$
+	final static String											FILE_PATH													= "FilePath";																															//$NON-NLS-1$
 	final static Map<String, RecordSet>			recordSets												= new HashMap<String, RecordSet>();
 
 	// HoTT sensor bytes 19200 Baud protocol
@@ -242,7 +242,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	static double								latitudeToleranceFactor				= 90.0;
 	static double								longitudeToleranceFactor			= 25.0;
 
-	protected UniversalSampler						histoRandomSample;
+	protected UniversalSampler	histoRandomSample;
 
 	/**
 	 * constructor using properties file
@@ -315,6 +315,16 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
 		HoTTAdapter.longitudeToleranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0
 				? Double.parseDouble(this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 25.0;
+	}
+
+	/**
+	 * Collect the settings relevant for the values inserted in the histo vault.
+	 * @return the settings which determine the measurement values returned by the reader
+	 */
+	@Override
+	public String getReaderSettingsCsv() {
+		final String d = GDE.STRING_CSV_SEPARATOR;
+		return isFilterEnabled + d + isTolerateSignChangeLatitude + d + isTolerateSignChangeLongitude + d + latitudeToleranceFactor + d + longitudeToleranceFactor;
 	}
 
 	/**
@@ -879,7 +889,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		if (this.histoRandomSample != null) {
 			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", recordSet.getChannelConfigName(), recordDataSize, //$NON-NLS-1$
-					this.histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), this.histoRandomSample.getOverSamplingCount()));
+						this.histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), this.histoRandomSample.getOverSamplingCount()));
 		}
 		recordSet.syncScaleOfSyncableRecords();
 	}
@@ -1050,7 +1060,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				else if (channel == 6 && ordinal == 22) { //Channels warning
 					dataTableRow[index + 1] = record.realGet(rowIndex) == 0
 							? GDE.STRING_EMPTY
-									: String.format("'%c'", ((record.realGet(rowIndex) / 1000)+64));
+							: String.format("'%c'", ((record.realGet(rowIndex) / 1000) + 64));
 				}
 				else {
 					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
@@ -1176,6 +1186,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 */
+	@Override
 	public void calculateInactiveRecords(RecordSet recordSet) {
 		if (recordSet.getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude 3=Height
 			// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
@@ -1637,7 +1648,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public CTabItem getMdlTabItem() {
 		Object inst = null;
 		try {
-			//loading MDLViewer running into trouble since it fails copying Arial.ttf
+			// loading MDLViewer running into trouble since it fails copying Arial.ttf
 			final File fontFile = new File(System.getProperty("java.io.tmpdir"), "Arial.ttf"); //$NON-NLS-1$ //$NON-NLS-2$
 			InputStream is = getClass().getResourceAsStream("/Arial.ttf");
 			try {
@@ -1701,7 +1712,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 */
 	protected void runLabsCalculation(final RecordSet recordSet, final int channelNumber, final int ordinalSourceRx_dbm, final int ordinalSmoothRx_dbm, final int ordinalDiffRx_dbm,
 			final int ordinalLabsRx_dbm, final int ordinalSourceDist, final int ordinalDiffDist, final int ordinalLapsDistance) {
-		//laps calculation init begin
+		// laps calculation init begin
 		Record recordSourceRx_dbm = recordSet.get(ordinalSourceRx_dbm);
 		Record recordSmoothRx_dbm = recordSet.get(ordinalSmoothRx_dbm);
 		Record recordDiffRx_dbm = recordSet.get(ordinalDiffRx_dbm);
@@ -1709,11 +1720,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		Record recordDistanceStart = recordSet.get(ordinalSourceDist);
 		Record recordDiffDistance = recordSet.get(ordinalDiffDist);
 		Record recordLapsDistance = recordSet.get(ordinalLapsDistance);
-		//adjustable variables
+		// adjustable variables
 		int absorptionLevel = 70;
-		long filterStartTime = 0;//wait 15 seconds before starting lab counting
-		long filterMaxTime = 300000;//300 seconds = 5 min window for lab counting
-		long filterLapMinTime_ms = 5000; //5 seconds time minimum time space between laps
+		long filterStartTime = 0;// wait 15 seconds before starting lab counting
+		long filterMaxTime = 300000;// 300 seconds = 5 min window for lab counting
+		long filterLapMinTime_ms = 5000; // 5 seconds time minimum time space between laps
 		int filterMinDeltaRxDbm = 3;
 		int filterMinDeltaDist = 20;
 		if (this.getMeasurementPropertyValue(channelNumber, ordinalLabsRx_dbm, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
@@ -1749,7 +1760,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			}
 		}
 		if (recordSourceRx_dbm != null && recordSmoothRx_dbm != null && recordDiffRx_dbm != null && recordLapsRx_dbm != null) {
-			//temporary variables
+			// temporary variables
 			double lastLapTimeStamp_ms = 0;
 			int lapTime = 0;
 			int lastRxDbmValue = 0;
@@ -1758,7 +1769,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			boolean isLapEvent = false;
 			int localRxDbmMin = 0;
 
-			//prepare smoothed Rx dbm
+			// prepare smoothed Rx dbm
 			for (int i = 0; i < recordSourceRx_dbm.realSize(); ++i) {
 				if (recordSourceRx_dbm.get(i) == 0)
 					recordSmoothRx_dbm.set(i, lastRxdbm);
@@ -1767,7 +1778,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				lastRxdbm = recordSmoothRx_dbm.get(i);
 
 			}
-			//smooth and calculate differentiation
+			// smooth and calculate differentiation
 			CalculationThread thread = new LinearRegression(recordSet, recordSmoothRx_dbm.getName(), recordDiffRx_dbm.getName(), 2);
 			thread.start();
 			try {
@@ -1779,11 +1790,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			for (int i = 0; i < recordDiffRx_dbm.realSize(); ++i) {
 				if (recordDiffRx_dbm.getTime_ms(i) > filterStartTime && recordDiffRx_dbm.getTime_ms(i) < (filterStartTime + filterMaxTime)) { //check start time before starting lab counting
 
-					if ((recordDiffRx_dbm.getTime_ms(i) - lastLapTimeStamp_ms) > filterLapMinTime_ms) { //check minimal time between lap events
+					if ((recordDiffRx_dbm.getTime_ms(i) - lastLapTimeStamp_ms) > filterLapMinTime_ms) { // check minimal time between lap events
 
 						if ((recordSmoothRx_dbm.get(i) / 1000 - localRxDbmMin) > filterMinDeltaRxDbm) { // check minimal Rx dbm difference
 
-							if (lastRxDbmValue > 0 && recordDiffRx_dbm.get(i) <= 0) { //lap event detected
+							if (lastRxDbmValue > 0 && recordDiffRx_dbm.get(i) <= 0) { // lap event detected
 								isLapEvent = true;
 								if (lastLapTimeStamp_ms != 0) {
 									log.log(Level.FINE, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0)); //$NON-NLS-1$
@@ -1798,12 +1809,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0)); //$NON-NLS-1$
 									}
 								}
-								if (isLapEvent && lapTime == 0) { //first lap start
+								if (isLapEvent && lapTime == 0) { // first lap start
 									recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
 								}
 
-								localRxDbmMin = 0; //reset local min value of Rx dbm
-							} //end lap event detected
+								localRxDbmMin = 0; // reset local min value of Rx dbm
+							} // end lap event detected
 							else if (lapTime == 0)
 								if (isLapEvent)
 									recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
@@ -1811,7 +1822,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 									recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms);
 							else
 								recordLapsRx_dbm.set(i, lapTime);
-						} //end check minimal Rx dbm difference
+						} // end check minimal Rx dbm difference
 						else if (lapTime == 0)
 							if (isLapEvent)
 								recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
@@ -1819,7 +1830,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 								recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms);
 						else
 							recordLapsRx_dbm.set(i, lapTime);
-					} //end check minimal time between lap events
+					} // end check minimal time between lap events
 					else if (lapTime == 0)
 						if (isLapEvent)
 							recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
@@ -1829,10 +1840,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						recordLapsRx_dbm.set(i, lapTime);
 
 					// find a local minimal value of Rx dbm
-					if (lastRxDbmValue < 0 && recordDiffRx_dbm.get(i) >= 0) { //local minimum Rx dbm detected
+					if (lastRxDbmValue < 0 && recordDiffRx_dbm.get(i) >= 0) { // local minimum Rx dbm detected
 						if (recordSmoothRx_dbm.get(i) / 1000 < localRxDbmMin) localRxDbmMin = recordSmoothRx_dbm.get(i) / 1000;
 					}
-				} //end check start time before starting lab counting
+				} // end check start time before starting lab counting
 				else if (recordDiffRx_dbm.getTime_ms(i) > (filterStartTime + filterMaxTime))
 					recordLapsRx_dbm.set(i, 0);
 				else
@@ -1840,10 +1851,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 				lastRxDbmValue = recordDiffRx_dbm.get(i);
 			}
-			//labs calculation end
+			// labs calculation end
 		}
 		if (recordDistanceStart != null && recordDistanceStart.hasReasonableData() && recordDiffDistance != null && recordLapsDistance != null) {
-			//temporary variables
+			// temporary variables
 			double lastLapTimeStamp_ms = 0;
 			int lapTime = 0;
 			int lastDistanceValue = 0;
@@ -1851,7 +1862,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			boolean isLapEvent = false;
 			int localDistMax = 0;
 
-			//smooth and calculate differentiation
+			// smooth and calculate differentiation
 			CalculationThread thread = new LinearRegression(recordSet, recordDistanceStart.getName(), recordDiffDistance.getName(), 4);
 			thread.start();
 			try {
@@ -1863,11 +1874,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			for (int i = 0; i < recordDiffDistance.realSize(); ++i) {
 				if (recordDiffDistance.getTime_ms(i) > filterStartTime && recordDiffDistance.getTime_ms(i) < (filterStartTime + filterMaxTime)) { //check start time before starting lab counting
 
-					if ((recordDiffDistance.getTime_ms(i) - lastLapTimeStamp_ms) > filterLapMinTime_ms) { //check minimal time between lap events
+					if ((recordDiffDistance.getTime_ms(i) - lastLapTimeStamp_ms) > filterLapMinTime_ms) { // check minimal time between lap events
 
-						if ((localDistMax - recordDistanceStart.get(i) / 1000) > filterMinDeltaDist) { //check minimal distance difference
+						if ((localDistMax - recordDistanceStart.get(i) / 1000) > filterMinDeltaDist) { // check minimal distance difference
 
-							if (lastDistanceValue < 0 && recordDiffDistance.get(i) >= 0) { //lap event detected
+							if (lastDistanceValue < 0 && recordDiffDistance.get(i) >= 0) { // lap event detected
 								isLapEvent = true;
 								if (lastLapTimeStamp_ms != 0) {
 									log.log(Level.FINE, String.format("Lap time in sec %03.1f", (recordSet.getTime_ms(i) - lastLapTimeStamp_ms) / 1000.0)); //$NON-NLS-1$
@@ -1882,11 +1893,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 										recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + String.format(Locale.ENGLISH, "  -   %02d  %.1f sec", ++lapCount, lapTime / 1000.0)); //$NON-NLS-1$
 									}
 								}
-								if (isLapEvent && lapTime == 0) //first lap start
+								if (isLapEvent && lapTime == 0) // first lap start
 									recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
 
-								localDistMax = 0; //reset local distance maximum
-							} //end lap event detected
+								localDistMax = 0; // reset local distance maximum
+							} // end lap event detected
 							else if (lapTime == 0)
 								if (isLapEvent)
 									recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
@@ -1894,7 +1905,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 									recordLapsDistance.set(i, (int) filterLapMinTime_ms);
 							else
 								recordLapsDistance.set(i, lapTime);
-						} //end check minimal distance difference
+						} // end check minimal distance difference
 						else if (lapTime == 0)
 							if (isLapEvent)
 								recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
@@ -1902,7 +1913,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 								recordLapsDistance.set(i, (int) filterLapMinTime_ms);
 						else
 							recordLapsDistance.set(i, lapTime);
-					} //end check minimal time between lap events
+					} // end check minimal time between lap events
 					else if (lapTime == 0)
 						if (isLapEvent)
 							recordLapsDistance.set(i, (int) filterLapMinTime_ms / 2);
@@ -1911,11 +1922,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					else
 						recordLapsDistance.set(i, lapTime);
 
-					//find local distance maximum
-					if (lastDistanceValue > 0 && recordDiffDistance.get(i) <= 0) { //local maximum distance detected
+					// find local distance maximum
+					if (lastDistanceValue > 0 && recordDiffDistance.get(i) <= 0) { // local maximum distance detected
 						if (recordDistanceStart.get(i) / 1000 > localDistMax) localDistMax = recordDistanceStart.get(i) / 1000;
 					}
-				} //end check start time before starting lab counting
+				} // end check start time before starting lab counting
 				else if (recordDiffDistance.getTime_ms(i) > (filterStartTime + filterMaxTime))
 					recordLapsDistance.set(i, 0);
 				else
@@ -1924,7 +1935,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				lastDistanceValue = recordDiffDistance.get(i);
 			}
 		}
-		recordSet.setSaved(true); //adding description will set unsaved reason
+		recordSet.setSaved(true); // adding description will set unsaved reason
 	}
 
 }

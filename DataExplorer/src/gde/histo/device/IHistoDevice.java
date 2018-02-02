@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
+import gde.GDE;
 import gde.data.RecordSet;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
@@ -87,4 +88,11 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 */
 	public void calculateInactiveRecords(RecordSet recordSet);
 
+	/**
+	 * Collect the settings relevant for the values inserted in the histo vault.
+	 * @return the settings which determine the measurement values returned by the reader
+	 */
+	public default String getReaderSettingsCsv() {
+		return GDE.STRING_EMPTY;
+	}
 }
