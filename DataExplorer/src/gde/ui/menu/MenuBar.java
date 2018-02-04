@@ -669,7 +669,9 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
-								MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet().saveTemplate();
+								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
+								trailRecordSet.getTemplate().setHistoFileName(trailRecordSet.getTemplate().getDefaultHistoFileName());
+								trailRecordSet.saveTemplate();
 							}
 							else {
 								MenuBar.this.channels.getActiveChannel().saveTemplate();
@@ -688,7 +690,7 @@ public class MenuBar {
 							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
 								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
 								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
-								template.setHistoFileName(template.getDefaultFileName());
+								template.setHistoFileName(template.getDefaultHistoFileName());
 								template.load();
 								trailRecordSet.applyTemplate(true);
 								MenuBar.this.application.getPresentHistoExplorer().updateHistoChartWindow(true);
