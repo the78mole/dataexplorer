@@ -5,20 +5,53 @@ Version 3.3.2 - xx yyy 2017
 * fix HoTTAdapter wrong data block number detection
 * add initial support for Junsi iCharger 106B
 * fix empty template file name if user cancels loading a template
+* fix some issues when adding / editing object keys
+* context menu texts (graphics / data table tabs)
+
 History analysis
-* Enhance initial vertical lines positions in delta measurement mode
-* Fix histo table column values for non-reversed timestamp sequence
-* Fix table entries for GPS location which are not shown sometimes
-* Fix unchecked curve survey after restart
-* Fix rare exceptions in histo graphics
-* Enhance performance
-	-- redraw graphics
-	-- scan log file folders
-	-- read osd / bin
-	-- switch channel
-* Prepare histo kernel for forthcoming *.log files
-* Fix creating empty directories in case of unknown objects or devices
-* Enhance history module code base segregration from the application kernel 
+	* New summary chart in the history graphics window
+	* Enhance graphics template support
+	 	>> new default templates per object key
+	 	>> new histo templates format: pls load, check and re-save user histo templates!
+	 	>> show a non-default template name in the status bar
+	 	>> fix record mapping for the default graphics template 
+	 	>> fix saving the last template instead of saving the default
+	 	>> fix empty template file name if user cancels loading a template
+	* Enhance graphics chart
+	 	>> background colors selection
+	 	>> initial vertical lines positions in delta measurement mode
+	 	>> fix non-replaced measuring record names in recordset comment / status text
+	 	>> fix unlimited scale for cell voltages if some logs do not hold cell voltages
+	 	>> fix rare boxplot whisker length deviations
+	 	>> fix missing timescale entries in case of many entries
+	* Enhance folder scanning for log files
+		>> new supplementary folder for import files and archived files
+		>> new properties entries for external or network folders
+	* Fix table issues
+	 	>> column values for non-reversed timestamp sequence
+	 	>> GPS location was not shown sometimes
+	* Enhance UI
+	  	>> make object key adding / editing more intuitive
+	  	>> new tool tip texts
+	 	>> new key shortcuts
+	 	>> new menu entries
+	 	>> fix unchecked curve survey menu entry after restart
+	* Fix processing issues
+	 	>> rare value differences for HoTT module log analysis and device settings changes
+	 	>> values for channel items with relative data (based on first log value)
+	 	>> log data caching in case of user changes to device settings
+	 	>> rare exceptions in histo graphics
+	 	>> creating empty directories in case of unknown objects or devices
+	* New columns for settlement values in the data table tab (optional)
+	* Enhance performance
+	 	>> redraw graphics
+	 	>> avoid double synchronizing of scales
+	 	>> scan log file folders
+	 	>> read osd / bin
+	 	>> switch channel
+	* Enhance coding
+	 	>> prepare histo kernel for forthcoming *.log files
+	 	>> enhance history module code base segregation from the application kernel 
 
 Version 3.3.1 - 17 Oct 2017
 * fix retrieving working state from XML (iCharger and others) 
