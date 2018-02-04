@@ -64,8 +64,10 @@ import gde.data.RecordSet;
 import gde.device.DataTypes;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
+import gde.device.SettlementType;
 import gde.device.TransitionGroupType;
 import gde.device.resource.DeviceXmlResource;
+import gde.histo.transitions.TransitionTableMapper;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -161,7 +163,7 @@ public class DataTableWindow extends CTabItem {
 					text.addFocusListener(new FocusListener() {
 						@Override
 						public void focusLost(FocusEvent fe) {
-							//System.out.println("focus lost");
+							// System.out.println("focus lost");
 							DataTableWindow.this.settings.setDataTableEditable(false);
 							if (!setEditedRecordPoint(row, column)) DataTableWindow.this.cursor.getRow().setText(column, origText);
 							text.dispose();
@@ -169,19 +171,19 @@ public class DataTableWindow extends CTabItem {
 
 						@Override
 						public void focusGained(FocusEvent arg0) {
-							//System.out.println("focus gained");
+							// System.out.println("focus gained");
 						}
 					});
 					text.addKeyListener(new KeyListener() {
 
 						@Override
 						public void keyReleased(KeyEvent ke) {
-							//System.out.println("key released");
+							// System.out.println("key released");
 						}
 
 						@Override
 						public void keyPressed(KeyEvent ke) {
-							//System.out.println("key pressed");
+							// System.out.println("key pressed");
 							if (ke.character == SWT.CR) {
 								row.setText(column, ((Text) editor.getEditor()).getText());
 								DataTableWindow.this.settings.setDataTableEditable(false);
@@ -234,10 +236,10 @@ public class DataTableWindow extends CTabItem {
 						break;
 					}
 				}
-				//else if (event.stateMask == SWT.MOD2) {
-				//selection of multiple rows (Shift+Arrow Up/Down) require DataTableWindow.this.cursor.setVisible(false);
-				//afterwards dataTable.keyReleased handles selection movement
-				//}
+				// else if (event.stateMask == SWT.MOD2) {
+				// selection of multiple rows (Shift+Arrow Up/Down) require DataTableWindow.this.cursor.setVisible(false);
+				// afterwards dataTable.keyReleased handles selection movement
+				// }
 				else if (((event.stateMask & SWT.MOD2) != 0) && ((event.stateMask & SWT.MOD1) != 0)) {
 					switch (event.keyCode) {
 					case SWT.HOME:
@@ -263,12 +265,12 @@ public class DataTableWindow extends CTabItem {
 					}
 				}
 
-				//setSelection() doesn't fire a widgetSelected() event, so we need manually update the vector
-				//System.out.println("cursor.keyReleased " + (event.stateMask & SWT.MOD1) + " - " + event.keyCode );
+				// setSelection() doesn't fire a widgetSelected() event, so we need manually update the vector
+				// System.out.println("cursor.keyReleased " + (event.stateMask & SWT.MOD1) + " - " + event.keyCode );
 				if (DataTableWindow.this.cursor.getRow() != null && (((event.stateMask & SWT.MOD1) == 0 && event.character != 'c') || ((event.stateMask & SWT.MOD1) == 0 && event.character != 'a'))) {
 					updateVector(DataTableWindow.this.dataTable.indexOf(DataTableWindow.this.cursor.getRow()), DataTableWindow.this.dataTable.getTopIndex());
 
-					//select the table row, after repositioning cursor (HOME/END)
+					// select the table row, after repositioning cursor (HOME/END)
 					DataTableWindow.this.dataTable.setSelection(new TableItem[] { DataTableWindow.this.cursor.getRow() });
 				}
 			}
@@ -310,22 +312,22 @@ public class DataTableWindow extends CTabItem {
 			@Override
 			public void keyPressed(KeyEvent event) {
 				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) DataTableWindow.log.log(java.util.logging.Level.FINEST, "cursor.keyPressed " + event); //$NON-NLS-1$
-				//System.out.println("cursor.keyPressed " + (event.stateMask & SWT.MOD1) + " - " + event.keyCode );
+				// System.out.println("cursor.keyPressed " + (event.stateMask & SWT.MOD1) + " - " + event.keyCode );
 				if (DataTableWindow.this.cursor.getRow() != null && !(event.stateMask == SWT.MOD1 && event.keyCode != 0x99) && !(event.stateMask == SWT.MOD1 && event.keyCode != 0x97)
 						&& event.keyCode != SWT.MOD1) {
-					//select the table row where the cursor get moved to
+					// select the table row where the cursor get moved to
 					DataTableWindow.this.dataTable.setSelection(new TableItem[] { DataTableWindow.this.cursor.getRow() });
 				}
 				else if (DataTableWindow.this.cursor.getRow() != null && (event.stateMask & SWT.MOD1) == SWT.MOD1 && event.keyCode == 0x61) {
-					//System.out.println("select all");
+					// System.out.println("select all");
 					DataTableWindow.this.dataTable.setSelection(DataTableWindow.this.dataTable.getItems());
 				}
-				//to enable multi selection the cursor needs to be set invisible, if the cursor is invisible the dataTable key listener takes effect
-				//the cursor should be set to invisible only when shift key is pressed, not while shift is pressed in combination with others
+				// to enable multi selection the cursor needs to be set invisible, if the cursor is invisible the dataTable key listener takes effect
+				// the cursor should be set to invisible only when shift key is pressed, not while shift is pressed in combination with others
 				if (event.keyCode == SWT.MOD2 && ((event.stateMask & SWT.MOD2) == 0) && ((event.stateMask & SWT.MOD1) == 0) && ((event.stateMask & SWT.MOD3) == 0)) {
 					DataTableWindow.this.cursor.setVisible(false);
 					if (DataTableWindow.this.cursor.getRow() != null) {
-						//reset previous (multiple) selection table row(s)
+						// reset previous (multiple) selection table row(s)
 						DataTableWindow.this.dataTable.setSelection(new TableItem[] { DataTableWindow.this.cursor.getRow() });
 					}
 				}
@@ -386,7 +388,7 @@ public class DataTableWindow extends CTabItem {
 
 				DataTableWindow.this.cursor.setVisible(true);
 
-				//calling setFocus(releases table key listener and take over to cursor key listener again
+				// calling setFocus(releases table key listener and take over to cursor key listener again
 				DataTableWindow.this.cursor.setFocus();
 			}
 
@@ -395,7 +397,7 @@ public class DataTableWindow extends CTabItem {
 				if (DataTableWindow.log.isLoggable(java.util.logging.Level.FINEST)) DataTableWindow.log.log(java.util.logging.Level.FINEST, ("dataTable.keyReleased, keycode: " + event.keyCode));
 				if (event.keyCode == SWT.MOD2 && DataTableWindow.this.rowVector.size() > 0) {
 					int rowIndex = DataTableWindow.this.rowVector.get(DataTableWindow.this.rowVector.size() - 1) + this.selectionFlowIndex;
-					//check table bounds reached
+					// check table bounds reached
 					rowIndex = rowIndex < 0 ? 0 : rowIndex > DataTableWindow.this.dataTable.getItems().length - 1 ? DataTableWindow.this.dataTable.getItems().length - 1 : rowIndex;
 
 					updateVector(rowIndex, DataTableWindow.this.dataTable.getTopIndex());
@@ -487,6 +489,15 @@ public class DataTableWindow extends CTabItem {
 					}
 				}
 				if (this.settings.isHistoActive() && this.settings.isDataTableTransitions()) {
+					TransitionTableMapper mapper = new TransitionTableMapper(DataTableWindow.this.application.getActiveRecordSet());
+					for (SettlementType settlementType : mapper.defineActiveAndDisplayableSettlements().values()) {
+						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+						String recordName = this.xmlResource.getReplacement(settlementType.getName());
+						StringBuilder sb = new StringBuilder();
+						sb.append(recordName).append(GDE.STRING_BLANK_LEFT_BRACKET).append(settlementType.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
+						column.setWidth(sb.length() > 11 ? 11 * extentFactor : sb.length() * extentFactor);
+						column.setText(sb.toString());
+					}
 					IDevice device = this.application.getActiveDevice();
 					HashMap<Integer, TransitionGroupType> transitionGroups = device.getDeviceConfiguration().getChannel(this.channels.getActiveChannelNumber()).getTransitionGroups();
 					for (Entry<Integer, TransitionGroupType> transitionGroupEntry : transitionGroups.entrySet()) {
