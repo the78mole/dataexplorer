@@ -37,17 +37,18 @@ import gde.log.Logger;
  * @author Thomas Eickert
  */
 public final class HistoGraphicsTemplate extends Properties {
-	final static String	$CLASS_NAME				= HistoGraphicsTemplate.class.getName();
-	final static Logger	log								= Logger.getLogger($CLASS_NAME);
-	static final long		serialVersionUID	= 2088159376716311896L;
+	final static String		$CLASS_NAME				= HistoGraphicsTemplate.class.getName();
+	final static Logger		log								= Logger.getLogger($CLASS_NAME);
+	static final long			serialVersionUID	= 2088159376716311896L;
 
-	private boolean			isAvailable				= false;
-	private boolean			isSaved						= false;																// indicates if template is saved to file
-	private String			defaultFileName;
-	private String			histoFileName;
-	private String			currentFileFilePath;
-	private String			templatePath;
-	private String			templateFilePath;
+	private boolean				isAvailable				= false;
+	private boolean				isSaved						= false;																// indicates if template is saved to file
+	private final String	defaultFileName;
+	private String				histoFileName;
+	private String				currentFileFilePath;
+	private final String	templatePath;
+	private final String	templateFilePath;
+	private final String	defaultHistoFileName;
 
 	/**
 	 * Constructor using the application home path and the device signature as initialization parameter.
@@ -59,7 +60,8 @@ public final class HistoGraphicsTemplate extends Properties {
 		this.templatePath = Settings.getInstance().getGraphicsTemplatePath();
 		this.defaultFileName = deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
 		this.templateFilePath = this.defaultFileName;
-		this.setHistoFileName(deviceSignature + "H" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4));
+		this.defaultHistoFileName = deviceSignature + "H" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
+		this.setHistoFileName(defaultHistoFileName);
 		log.log(FINE, "Histo graphics template file is ", this.templateFilePath); //$NON-NLS-1$
 	}
 
@@ -130,6 +132,14 @@ public final class HistoGraphicsTemplate extends Properties {
 	public void setHistoFileName(String fileName) {
 		log.log(FINE, "fileName=", fileName);
 		this.histoFileName = fileName;
+	}
+
+	public String getHistoFileName() {
+		return this.histoFileName;
+	}
+
+	public String getDefaultHistoFileName() {
+		return this.defaultHistoFileName;
 	}
 
 	public String getCurrentFilePath() {

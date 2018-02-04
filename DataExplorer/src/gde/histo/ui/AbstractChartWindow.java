@@ -22,6 +22,7 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.WARNING;
 
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -35,6 +36,7 @@ import org.eclipse.swt.graphics.Point;
 
 import gde.GDE;
 import gde.data.Channels;
+import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
@@ -70,7 +72,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 						c.drawAreaPaintControl(); // todo check if erasing lines like in CurveSurvey is appropriate
 					}
 				}
-				DataExplorer.getInstance().setStatusMessage(GDE.STRING_EMPTY);
+				setStatusMessage(GDE.STRING_EMPTY);
 				measure = Optional.empty();
 			});
 		}
@@ -122,7 +124,13 @@ public abstract class AbstractChartWindow extends CTabItem {
 		}
 
 		void setStatusMessage(String message) {
-			DataExplorer.getInstance().setStatusMessage(message);
+			String tmpMessage = new String(message);
+			if (message.isEmpty() && !measure.isPresent()) {
+				HistoGraphicsTemplate template = getTrailRecordSet().getTemplate();
+				if (!Paths.get(template.getCurrentFilePath()).getFileName().toString().equals(template.getDefaultHistoFileName()))
+					tmpMessage = template.getHistoFileName();
+			}
+			DataExplorer.getInstance().setStatusMessage(tmpMessage);
 		}
 
 		/**
