@@ -25,6 +25,8 @@ import static java.util.logging.Level.WARNING;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
@@ -41,14 +43,14 @@ public final class HistoGraphicsTemplate extends Properties {
 	final static Logger		log								= Logger.getLogger($CLASS_NAME);
 	static final long			serialVersionUID	= 2088159376716311896L;
 
-	private boolean				isAvailable				= false;
-	private boolean				isSaved						= false;																// indicates if template is saved to file
-	private final String	defaultFileName;
-	private String				histoFileName;
-	private String				currentFileFilePath;
-	private final String	templatePath;
 	private final String	templateFilePath;
 	private final String	defaultHistoFileName;
+	private final String	defaultFileName;
+
+	private String				histoFileName;
+
+	private boolean				isAvailable				= false;
+	private boolean				isSaved						= false;																// indicates if template is saved to file
 
 	/**
 	 * Constructor using the application home path and the device signature as initialization parameter.
@@ -57,7 +59,6 @@ public final class HistoGraphicsTemplate extends Properties {
 	 * @param deviceSignature - device signature as String (Picolario_K1)
 	 */
 	public HistoGraphicsTemplate(String deviceSignature) {
-		this.templatePath = Settings.getInstance().getGraphicsTemplatePath();
 		this.defaultFileName = deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
 		this.templateFilePath = this.defaultFileName;
 		this.defaultHistoFileName = deviceSignature + "H" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
@@ -79,19 +80,18 @@ public final class HistoGraphicsTemplate extends Properties {
 	 */
 	public void load() {
 		try {
-			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + this.histoFileName;
-			File file = new File(this.currentFileFilePath);
-			if (file.exists() && !file.isDirectory()) {
+			File file = getCurrentFilePath().toFile();
+			if (file.exists()) {
 				// histo template is already available
 			} else {
-				file = new File(this.templatePath + GDE.FILE_SEPARATOR_UNIX + this.defaultFileName);
+				file = Paths.get(Settings.getInstance().getGraphicsTemplatePath(), this.defaultFileName).toFile();
 			}
 			log.log(FINE, "opening template file ", file.getAbsolutePath()); //$NON-NLS-1$
 			try (FileInputStream stream = new FileInputStream(file)) {
 				this.loadFromXML(stream);
 			}
 			this.isAvailable = true;
-			log.log(FINE, "template file successful loaded ", this.currentFileFilePath); //$NON-NLS-1$
+			log.log(FINE, "template file successful loaded ", getCurrentFilePath()); //$NON-NLS-1$
 		} catch (InvalidPropertiesFormatException e) {
 			log.log(SEVERE, e.getMessage(), e);
 		} catch (Exception e) {
@@ -105,16 +105,14 @@ public final class HistoGraphicsTemplate extends Properties {
 	public void store() {
 		try {
 			// check if templatePath exist, else create directory
-			File tmpPath = new File(this.templatePath);
+			File tmpPath = getCurrentFilePath().getParent().toFile();
 			if (!tmpPath.exists()) {
 				if (!tmpPath.mkdir()) {
 					log.log(WARNING, "failed to create ", tmpPath);
 				}
 			}
 
-			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + ((this.histoFileName != null && this.histoFileName.equals(GDE.STRING_EMPTY) || this.histoFileName == null)
-					? this.defaultFileName : this.histoFileName);
-			try (FileOutputStream stream = new FileOutputStream(new File(this.currentFileFilePath))) {
+			try (FileOutputStream stream = new FileOutputStream(getCurrentFilePath().toFile())) {
 				this.storeToXML(stream, "-- DataExplorer Histo GraphicsTemplate --"); //$NON-NLS-1$
 			}
 			this.isSaved = true;
@@ -142,8 +140,9 @@ public final class HistoGraphicsTemplate extends Properties {
 		return this.defaultHistoFileName;
 	}
 
-	public String getCurrentFilePath() {
-		return this.currentFileFilePath;
+	public Path getCurrentFilePath() {
+		String currentFileName = histoFileName == null || histoFileName.equals(GDE.STRING_EMPTY) ? defaultFileName : histoFileName;
+		return Paths.get(Settings.getInstance().getGraphicsTemplatePath(), currentFileName);
 	}
 
 	/**

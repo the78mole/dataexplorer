@@ -22,7 +22,6 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.WARNING;
 
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -126,9 +125,11 @@ public abstract class AbstractChartWindow extends CTabItem {
 		void setStatusMessage(String message) {
 			String tmpMessage = new String(message);
 			if (message.isEmpty() && !measure.isPresent()) {
-				HistoGraphicsTemplate template = getTrailRecordSet().getTemplate();
-				if (!Paths.get(template.getCurrentFilePath()).getFileName().toString().equals(template.getDefaultHistoFileName()))
-					tmpMessage = template.getHistoFileName();
+				if (getTrailRecordSet() != null) {
+					HistoGraphicsTemplate template = getTrailRecordSet().getTemplate();
+					if (!template.getCurrentFilePath().getFileName().toString().equals(template.getDefaultHistoFileName()))
+						tmpMessage = template.getHistoFileName();
+				}
 			}
 			DataExplorer.getInstance().setStatusMessage(tmpMessage);
 		}
@@ -143,7 +144,9 @@ public abstract class AbstractChartWindow extends CTabItem {
 		}
 
 		void saveTemplate() {
-			DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet().saveTemplate();
+			TrailRecordSet trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet();
+			trailRecordSet.getTemplate().setHistoFileName(trailRecordSet.getTemplate().getDefaultHistoFileName());
+			trailRecordSet.saveTemplate();
 		}
 
 		void setChartSashFormWeights(SelectorComposite composite) {
