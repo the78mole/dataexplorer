@@ -716,15 +716,15 @@ public class MenuBar {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
 							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
-								HistoGraphicsTemplate template = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet().getTemplate();
+								TrailRecordSet trailRecordSet = application.getPresentHistoExplorer().getTrailRecordSet();
 								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] {
-										Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath(), template.getDefaultFileName());
+										Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath(), trailRecordSet.getTemplate().getDefaultFileName());
 								fileDialog.open();
 								String templateFileName = fileDialog.getFileName();
 								if (templateFileName != null && templateFileName.length() > 4) {
 									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
-									template.setHistoFileName(templateFileName);
-									template.store();
+									trailRecordSet.getTemplate().setHistoFileName(templateFileName);
+									trailRecordSet.saveTemplate();
 								}
 							}
 							else {
