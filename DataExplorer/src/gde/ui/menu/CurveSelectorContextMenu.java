@@ -1263,6 +1263,16 @@ public class CurveSelectorContextMenu {
 	}
 
 	/**
+	 * Uncheck the measuring menu entries.
+	 */
+	public void resetMeasuring() {
+			this.recordNameMeasurement = GDE.STRING_BLANK;
+			CurveSelectorContextMenu.this.simpleMeasure.setSelection(false);
+			CurveSelectorContextMenu.this.deltaMeasure.setSelection(false);
+			CurveSelectorContextMenu.this.application.setStatusMessage(GDE.STRING_EMPTY);
+		}
+
+	/**
 	 * perform all activities as if the menu item was toggled.
 	 * @param isActive
 	 * @param tmpRecordNameMeasurement

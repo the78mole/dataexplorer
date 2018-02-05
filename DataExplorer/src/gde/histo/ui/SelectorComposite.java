@@ -379,8 +379,7 @@ public final class SelectorComposite extends Composite {
 					// avoid phantom measurements with invisible curves
 					String recordName = record.getName();
 					if (windowActor.isMeasureRecord(recordName)) {
-						contextMenu.setMeasurement(recordName, false);
-						contextMenu.setDeltaMeasurement(recordName, false);
+						contextMenu.resetMeasuring();
 					}
 				}
 			}
