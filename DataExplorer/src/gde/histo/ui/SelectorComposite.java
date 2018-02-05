@@ -427,6 +427,7 @@ public final class SelectorComposite extends Composite {
 			tableItem.setData(DataExplorer.OLD_STATE, false);
 		}
 		activeRecord.getParent().syncScaleOfSyncableRecords();
+		activeRecord.getParent().setDisplayable();
 		activeRecord.getParent().updateVisibleAndDisplayableRecordsForTable();
 	}
 

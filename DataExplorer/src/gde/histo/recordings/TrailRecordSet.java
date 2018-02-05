@@ -87,14 +87,14 @@ import gde.ui.SWTResourceManager;
  */
 public final class TrailRecordSet extends AbstractRecordSet {
 	@SuppressWarnings("hiding")
-	private static final String	$CLASS_NAME					= TrailRecordSet.class.getName();
-	private static final long		serialVersionUID		= -1580283867987273535L;
+	private static final String		$CLASS_NAME					= TrailRecordSet.class.getName();
+	private static final long			serialVersionUID		= -1580283867987273535L;
 	@SuppressWarnings("hiding")
-	private static final Logger	log									= Logger.getLogger($CLASS_NAME);
+	private static final Logger		log									= Logger.getLogger($CLASS_NAME);
 
-	public static final String	BASE_NAME_SEPARATOR	= " | ";
+	public static final String		BASE_NAME_SEPARATOR	= " | ";
 
-	protected static final String CHART_WEIGHT = "Tab_chartWeight"; // weight of the charts (graphics or summary boxplot)
+	protected static final String	CHART_WEIGHT				= "Tab_chartWeight";							// weight of the charts (graphics or summary boxplot)
 
 	/**
 	 * Collect input data for the trail recordset and subordinate objects.
@@ -384,7 +384,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 
 		/**
-		 * @return the max/minValues from the most recent logs
+		 * @return the min/maxValues from the most recent logs
 		 */
 		double[] defineRecentStandardMinMax(String recordName, int limit) {
 			TrailRecord record = get(recordName);
@@ -407,7 +407,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 
 		/**
-		 * @return the max/minValues based on q0/q4
+		 * @return the lower/upper values based on q0/q4
 		 */
 		double[] defineStandardExtrema(String recordName) {
 			TrailRecord record = get(recordName);
@@ -460,7 +460,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 
 		/**
-		 * @return the max/minValues from the most recent logs for trails with a different number range than the measurement values
+		 * @return the lower/upper values from the most recent logs for trails with a different number range than the measurement values
 		 */
 		double[] defineRecentAlienMinMax(String recordName, TrailTypes trailType, int limit) {
 			Stream<Integer> alienPoints = initialVaults.values().parallelStream().flatMap(Collection::stream) //
@@ -475,7 +475,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 
 		/**
-		 * @return the min/max values for trails with a different number range than the measurement values (e.g. SD, counters)
+		 * @return the lower/upper values for trails with a different number range than the measurement values (e.g. SD, counters)
 		 */
 		double[] defineAlienExtrema(String recordName, TrailTypes trailType) {
 			Stream<Integer> alienPoints = initialVaults.values().parallelStream().flatMap(Collection::stream).map(v -> get(recordName).getVaultPoint(v, trailType.ordinal()));
@@ -488,7 +488,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 
 		/**
-		 * @return the max/minValues from the most recent logs and all scoregroup members
+		 * @return the min/maxValues from the most recent logs and all scoregroup members
 		 */
 		public double[] defineRecentScoreMinMax(String recordName, ScoreGroupType scoregroup, int limit) {
 			double[] minMaxValues = new double[] { Double.MAX_VALUE, -Double.MAX_VALUE };
@@ -512,7 +512,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 
 		/**
-		 * @return the max/minValues from all scoregroup members
+		 * @return the lower/upper values from all scoregroup members
 		 */
 		public double[] defineScoreExtrema(String recordName, ScoreGroupType scoregroup) {
 			List<Double> decodedLowValues = new ArrayList<>();
@@ -888,12 +888,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		// get by insertion order
 		for (Map.Entry<String, AbstractRecord> entry : this.entrySet()) {
 			final TrailRecord record = (TrailRecord) entry.getValue();
-			if (record.isAllowedBySetting()) {
-				if (record.isActive() && record.hasReasonableData()) {
-					getDisplayRecords().add(record);
-					if (record.isVisible()) // only selected records get displayed
-						getVisibleAndDisplayableRecords().add(record);
-				}
+			if (record.isDisplayable()) {
+				getDisplayRecords().add(record);
+				if (record.isVisible()) // only selected records get displayed
+					getVisibleAndDisplayableRecords().add(record);
 			}
 		}
 	}
@@ -1051,6 +1049,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			// ET 29.06.2017 this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 			log.fine(() -> "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
 			if (doUpdateVisibilityStatus) {
+				setDisplayable();
 				updateVisibleAndDisplayableRecordsForTable();
 			}
 		}

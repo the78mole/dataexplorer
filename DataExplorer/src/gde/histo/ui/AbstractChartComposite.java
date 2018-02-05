@@ -365,6 +365,13 @@ public abstract class AbstractChartComposite extends Composite {
 	}
 
 	/**
+	 * @return the height for a full view or -1 if there is no fixed height
+	 */
+	public int getFixedTotalHeight() {
+		return DEFAULT_TOP_GAP + headerHeight + DEFAULT_HEADER_GAP + fixedCanvasHeight + DEFAULT_COMMENT_GAP + commentHeight + DEFAULT_BOTTOM_GAP;
+	}
+
+	/**
 	 * @return the height of the scales with description or legend and scale text
 	 */
 	public int getXScaleHeight() {

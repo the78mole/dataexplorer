@@ -478,7 +478,9 @@ public final class SummaryComposite extends AbstractChartComposite {
 	protected void defineLayoutParams() {
 		// initialize early in order to avoid problems in mouse move events
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-
+		for (TrailRecord record : trailRecordSet.getValues()) {
+			record.resetSummary();
+		}
 		trailRecordSet.updateSyncSummaryScale();
 		if (trailRecordSet.getDisplayRecords() == null || trailRecordSet.getDisplayRecords().isEmpty()) return; // concurrent activity
 

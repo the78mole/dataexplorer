@@ -21,8 +21,11 @@ package gde.histo.settlements;
 import static java.util.logging.Level.FINE;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Vector;
 
 import gde.GDE;
@@ -33,6 +36,7 @@ import gde.device.MeasurementPropertyTypes;
 import gde.device.ObjectFactory;
 import gde.device.PropertyType;
 import gde.device.SettlementType;
+import gde.histo.transitions.Transition;
 import gde.histo.utils.ElementaryQuantile;
 import gde.log.Logger;
 
@@ -56,9 +60,17 @@ public final class SettlementRecord extends Vector<Integer> {
 
 	private final RecordSet							parent;
 	private final int										logChannelNumber;
-	String															name;																																		// measurement name Höhe
+	private final String								name;																																		// measurement name Höhe
 
-	List<PropertyType>									properties							= new ArrayList<>();														// offset, factor, reduction, ...
+	/**
+	 * Full translated value list.</br>
+	 * Key is the timestamp index.</br>
+	 * (Is persistent due to a small number of values compared to the record objects.)
+	 */
+	private final Map<Integer, Double>	translatedValues				= new LinkedHashMap<>();
+	private final List<Transition>			transitions							= new ArrayList<>();
+
+	private List<PropertyType>					properties							= new ArrayList<>();														// offset, factor, reduction, ...
 	private ElementaryQuantile<Integer>	quantile								= null;
 
 	/**
@@ -98,6 +110,7 @@ public final class SettlementRecord extends Vector<Integer> {
 	}
 
 	@Override
+	@Deprecated // use add with transition
 	public synchronized boolean add(Integer e) {
 		double translateValue = translateValue(e / 1000.0);
 		if (translateValue > getBeyondLimit()) {
@@ -107,6 +120,21 @@ public final class SettlementRecord extends Vector<Integer> {
 			log.warning(() -> String.format("discard below value=%f", translateValue) + this); //$NON-NLS-1$
 			return false;
 		} else {
+			return super.add(e);
+		}
+	}
+
+	public synchronized boolean add(Integer e, Transition transition) {
+		double translatedValue = translateValue(e / 1000.0);
+		if (translatedValue > getBeyondLimit()) {
+			log.warning(() -> String.format("discard beyond value=%f", translatedValue) + this); //$NON-NLS-1$
+			return false;
+		} else if (translatedValue < getBelowLimit()) {
+			log.warning(() -> String.format("discard below value=%f", translatedValue) + this); //$NON-NLS-1$
+			return false;
+		} else {
+			transitions.add(transition);
+			translatedValues.put(transition.getThresholdStartIndex(), translatedValue);
 			return super.add(e);
 		}
 	}
@@ -223,17 +251,18 @@ public final class SettlementRecord extends Vector<Integer> {
 	}
 
 	/**
-	 * @return all the translated record values including nulls (do not consider zoom, scope, ...)
+	 * @return all the translated settlement values which hold values only for the transition timestamps
 	 */
-	public Vector<Double> getTranslatedValues() {
-		Vector<Double> translatedValues = new Vector<>();
-		for (Integer value : this) { // loops without calling the overridden getter
-			if (value != null)
-				translatedValues.add(this.translateValue(value / 1000.));
-			else
-				translatedValues.add(null);
-		}
-		return translatedValues;
+	public Collection<Double> getTranslatedValues() {
+		return translatedValues.values();
+	}
+
+	/**
+	 * @param index
+	 * @return the translated settlement value or null for timestamps without transition
+	 */
+	public Double getTranslatedValue(int index) {
+		return translatedValues.get(index);
 	}
 
 	public RecordSet getParent() {
@@ -252,7 +281,7 @@ public final class SettlementRecord extends Vector<Integer> {
 	 * Does not support settlements based on GPS-longitude or GPS-latitude.
 	 * @return double of device dependent value
 	 */
-	private double translateValue(double value) {
+	public double translateValue(double value) {
 		double newValue = (value - this.getReduction()) * this.getFactor() + this.getOffset();
 		log.finer(() -> "for " + this.name + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;

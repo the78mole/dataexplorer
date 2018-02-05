@@ -102,7 +102,7 @@ public final class SettlementCollector {
 			throw new UnsupportedOperationException();
 		}
 		// add to settlement record
-		histoSettlement.add(reverseTranslatedResult);
+		histoSettlement.add(reverseTranslatedResult, transition);
 		log.fine(() -> String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  figureType=%s", histoSettlement.getName(), (int) histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) //$NON-NLS-1$
 				, reverseTranslatedResult, transitionFigure.getFigureType()));
 	}
@@ -163,7 +163,7 @@ public final class SettlementCollector {
 			throw new UnsupportedOperationException();
 		}
 		// add to settlement record
-		histoSettlement.add(reverseTranslatedResult);
+		histoSettlement.add(reverseTranslatedResult, transition);
 		log.fine(() -> String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  amountType=%s", //$NON-NLS-1$
 				histoSettlement.getName(), (int) histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1), reverseTranslatedResult, transitionAmount.getAmountType()));
 	}
@@ -220,7 +220,7 @@ public final class SettlementCollector {
 			}
 			// add to settlement record --- no recordgroup zero ratios which often occur for discharge logs from UDP60
 			boolean isNeglectableRatioValue = recordGroup.getSize() > 1 && reverseTranslatedResult == 0.0 && (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE);
-			if (!isNeglectableRatioValue) histoSettlement.add(reverseTranslatedResult);
+			if (!isNeglectableRatioValue) histoSettlement.add(reverseTranslatedResult, transition);
 			log.fine(() -> String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", histoSettlement.getName(), (int) histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1) //$NON-NLS-1$
 					, reverseTranslatedResult, calculus.getCalculusType()));
 		}

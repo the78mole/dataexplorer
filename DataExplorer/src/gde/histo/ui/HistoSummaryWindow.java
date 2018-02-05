@@ -31,7 +31,6 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -43,8 +42,8 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public final class HistoSummaryWindow extends AbstractChartWindow {
-	private static final String	$CLASS_NAME						= HistoSummaryWindow.class.getName();
-	private static final Logger	log										= Logger.getLogger($CLASS_NAME);
+	// private static final String	$CLASS_NAME						= HistoSummaryWindow.class.getName();
+	// private static final Logger	log										= Logger.getLogger($CLASS_NAME);
 
 	public static final int[]		DEFAULT_CHART_WEIGHTS	= new int[] { 0, 10000 };							// 2nd chart is the default chart
 
@@ -85,11 +84,16 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 	@Override
 	public void scrollSummaryComposite() {
 		if (Settings.getInstance().isSmartStatistics()) {
-			int sumWeights = Arrays.stream(compositeSashForm.getWeights()).sum();
-			if (compositeSashForm.getWeights()[0] / sumWeights < compositeSashForm.getWeights()[1] / sumWeights) {
-				compositeSashForm.setWeights(new int[] { 10000, 0 });
+			int fixedTotalHeight = getSummaryComposite().orElseGet(null).getFixedTotalHeight();
+			int actualHeight = Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof AbstractChartComposite) //
+					.mapToInt(c -> c.getBounds().height).sum();
+			int summaryWeight = fixedTotalHeight < actualHeight ? fixedTotalHeight * 1000 / actualHeight : 1000;
+			if (compositeSashForm.getWeights()[0] == summaryWeight) {
+				compositeSashForm.setWeights(new int[] { 0, 1000 });
+			} else if (compositeSashForm.getWeights()[0] == 0) {
+				compositeSashForm.setWeights(new int[] { 1000, 0 });
 			} else {
-				compositeSashForm.setWeights(new int[] { 0, 10000 });
+				compositeSashForm.setWeights(new int[] { summaryWeight, 1000 - summaryWeight });
 			}
 		} else {
 			setDefaultChart();

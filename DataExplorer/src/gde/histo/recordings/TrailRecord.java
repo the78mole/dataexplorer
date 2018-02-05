@@ -290,26 +290,20 @@ public abstract class TrailRecord extends CommonRecord {
 	 */
 	public static final class Graphics { // todo class might be better independent from TrailRecord
 
-		boolean						isDisplayable;
-
 		// synchronize
-		protected int			syncMaxValue			= 0;		// max value of the curve if synced
-		protected int			syncMinValue			= 0;		// min value of the curve if synced
+		protected int			syncMaxValue			= Integer.MAX_VALUE;	// max value of the curve if synced
+		protected int			syncMinValue			= Integer.MIN_VALUE;	// min value of the curve if synced
 
 		// display the record
 		double						displayScaleFactorTime;
 		protected double	displayScaleFactorValue;
-		protected double	syncMasterFactor	= 1.0;	// synchronized scale and different measurement factors
-		protected double	minDisplayValue;					// min value in device units, correspond to draw area
-		protected double	maxDisplayValue;					// max value in device units, correspond to draw area
+		protected double	syncMasterFactor	= 1.0;								// synchronized scale and different measurement factors
+		protected double	minDisplayValue;												// min value in device units, correspond to draw area
+		protected double	maxDisplayValue;												// max value in device units, correspond to draw area
 
 		int								numberScaleTicks	= 0;
 
 		private int[]			numberTickMarks;
-
-		public Graphics(boolean isActiveValue) {
-			this.isDisplayable = isActiveValue ? true : false;
-		}
 
 	}
 
@@ -340,12 +334,12 @@ public abstract class TrailRecord extends CommonRecord {
 		 * Determine and set the q0/q4 max/minValues for the summary window from this record.
 		 */
 		public void setSyncMinMax(int recencyLimit) {
-			double[] minMax = defineExtrema();
+			double[] lowerUpper = defineExtrema();
 			double[] recentMinMax = defineRecentMinMax(recencyLimit);
-			if (minMax.length == 0) {
+			if (lowerUpper.length == 0) {
 				resetSyncMinMax();
 			} else {
-				setSyncMinMax(Math.min(minMax[0], recentMinMax[0]), Math.max(minMax[1], recentMinMax[1]));
+				setSyncMinMax(Math.min(lowerUpper[0], recentMinMax[0]), Math.max(lowerUpper[1], recentMinMax[1]));
 			}
 		}
 
@@ -408,6 +402,8 @@ public abstract class TrailRecord extends CommonRecord {
 	protected double											factor				= Double.MIN_VALUE;
 	protected double											offset				= Double.MIN_VALUE;
 	protected double											reduction			= Double.MIN_VALUE;
+
+	protected boolean											isDisplayable;
 
 	protected TrailSelector								trailSelector;
 	protected ElementaryQuantile<Double>	quantile;
@@ -594,7 +590,7 @@ public abstract class TrailRecord extends CommonRecord {
 		if (log.isLoggable(Level.FINER))
 			log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.getAbstractParent().isOneOfSyncableRecord(getName()));
 		return isScaleSyncMaster() ? this.getAbstractParent().isOneSyncableVisible(this.ordinal)
-				: !this.getAbstractParent().isOneOfSyncableRecord(getName()) && template.isVisible && graphics.isDisplayable;
+				: !this.getAbstractParent().isOneOfSyncableRecord(getName()) && template.isVisible && this.isDisplayable;
 	}
 
 	@Override
@@ -697,6 +693,7 @@ public abstract class TrailRecord extends CommonRecord {
 
 	@Override
 	public void setSyncMinMax(int newMin, int newMax) {
+		if (newMin == Integer.MIN_VALUE && newMax == Integer.MAX_VALUE) return; // for compatibility with initSyncedScales
 		graphics.syncMinValue = newMin;
 		graphics.syncMaxValue = newMax;
 		log.finer(() -> getName() + " syncMinValue=" + newMin + " syncMaxValue=" + newMax);
@@ -724,12 +721,12 @@ public abstract class TrailRecord extends CommonRecord {
 	 * Update the displayable record information in this record set.
 	 */
 	public void setDisplayable() {
-		this.graphics.isDisplayable = isActive() && isAllowedBySetting() && hasReasonableData();
+		this.isDisplayable = isActive() && isAllowedBySetting() && hasReasonableData();
 	}
 
 	@Override
 	public boolean isDisplayable() {
-		return graphics.isDisplayable;
+		return this.isDisplayable;
 	}
 
 	@Override
@@ -1077,11 +1074,19 @@ public abstract class TrailRecord extends CommonRecord {
 		collector.setUnifiedDataType(histoVaults);
 	}
 
+	public void resetGraphics() {
+		this.graphics = new Graphics();
+	}
+
 	public Graphics getGraphics() {
 		if (graphics == null) {
-			graphics = new Graphics(channelItem.isActive());
+			graphics = new Graphics();
 		}
 		return this.graphics;
+	}
+
+	public void resetSummary() {
+		this.summary = new Summary(new SummarySpots(this));
 	}
 
 	public Summary getSummary() {

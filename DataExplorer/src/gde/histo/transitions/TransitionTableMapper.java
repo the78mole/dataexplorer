@@ -20,12 +20,26 @@
 package gde.histo.transitions;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import gde.data.RecordSet;
+import gde.device.ChannelType;
+import gde.device.IDevice;
+import gde.device.SettlementType;
+import gde.device.TransitionAmountType;
+import gde.device.TransitionCalculusType;
+import gde.device.TransitionFigureType;
 import gde.device.TransitionGroupType;
+import gde.histo.settlements.AmountEvaluator;
+import gde.histo.settlements.CalculusEvaluator;
+import gde.histo.settlements.FigureEvaluator;
+import gde.histo.settlements.SettlementRecord;
+import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -34,22 +48,51 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert (USER)
  */
 public final class TransitionTableMapper {
+	private static final String	$CLASS_NAME	= TransitionTableMapper.class.getName();
+	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
+
+	private final DataExplorer	application	= DataExplorer.application;
+	private final IDevice				device			= DataExplorer.application.getActiveDevice();
+
+	private final RecordSet			recordSet;
+	private final ChannelType		channel;
+
+	public TransitionTableMapper(RecordSet recordSet) {
+		this.recordSet = recordSet;
+		this.channel = device.getDeviceConfiguration().getChannel(recordSet.getChannelConfigNumber());
+	}
+
+	public static synchronized String[] getExtendedRow(RecordSet recordSet, int index, String[] dataTableRow) {
+		return new TransitionTableMapper(recordSet).defineRowWithSettlements(index, dataTableRow);
+	}
 
 	/**
 	 * @param index
 	 * @param dataTableRow
-	 * @return the row with additional columns for the transitions groups
+	 * @return the row with additional columns for the active settlements with reasonable data
 	 */
-	public static synchronized String[] getExtendedRow(RecordSet recordSet, int index, String[] dataTableRow) {
+	public synchronized String[] defineRowWithSettlements(int index, String[] dataTableRow) {
+		LinkedHashMap<Integer, SettlementType> settlementTypes = defineActiveAndDisplayableSettlements();
+		HashMap<Integer, TransitionGroupType> transitionGroups = channel.getTransitionGroups();
 		int tableColumnsSize = recordSet.getVisibleAndDisplayableRecordsForTable().size() + 1;
-		HashMap<Integer, TransitionGroupType> transitionGroups = DataExplorer.application.getActiveDevice().getDeviceConfiguration().getChannel(recordSet.getChannelConfigNumber()).getTransitionGroups();
-		String[] tableRow = Arrays.copyOf(dataTableRow, tableColumnsSize + transitionGroups.size());
+		String[] tableRow = Arrays.copyOf(dataTableRow, tableColumnsSize + settlementTypes.size() + transitionGroups.size());
+
+		GroupTransitions histoTransitions = recordSet.getHistoTransitions();
+		LinkedHashMap<String, SettlementRecord> settlements = determineSettlements(histoTransitions, settlementTypes.values());
 
 		int columnIndex = tableColumnsSize;
+		for (SettlementRecord settlementRecord : settlements.values()) {
+			Double value = settlementRecord.getTranslatedValue(index);
+			if (value != null) {
+				tableRow[columnIndex] = String.format("%.3f", value);
+			}
+			columnIndex++;
+		}
+
 		for (Entry<Integer, TransitionGroupType> transitionsGroupsEntry : transitionGroups.entrySet()) {
-			TreeMap<Long, Transition> transitions = recordSet.getHistoTransitions().get(transitionsGroupsEntry.getKey());
-			if (transitions != null) {
-				Transition transition = transitions.get((long) recordSet.getTime_ms(index));
+			TreeMap<Long, Transition> groupTransitions = recordSet.getHistoTransitions().get(transitionsGroupsEntry.getKey());
+			if (groupTransitions != null) {
+				Transition transition = groupTransitions.get((long) recordSet.getTime_ms(index));
 				if (transition != null) {
 					tableRow[columnIndex] = Integer.toString(transition.getTransitionType().getTransitionId());
 				}
@@ -57,6 +100,75 @@ public final class TransitionTableMapper {
 			columnIndex++;
 		}
 		return tableRow;
+	}
+
+	/**
+	 * @return the settlementTypes with reasonable data (key is settlementId)
+	 */
+	public LinkedHashMap<Integer, SettlementType> defineActiveAndDisplayableSettlements() {
+		LinkedHashMap<Integer, SettlementType> channelSettlements = new LinkedHashMap<>(channel.getSettlements());
+		for (Iterator<Entry<Integer, SettlementType>> iterator = channelSettlements.entrySet().iterator(); iterator.hasNext();) {
+			Entry<Integer, SettlementType> entry = iterator.next();
+			if (entry.getValue().isActive() && hasTransitions(entry.getValue())) {
+
+			} else {
+				iterator.remove();
+			}
+		}
+		log.finer(() -> "settlementTypes.size=" + channel.getSettlements().size() + " size=" + channelSettlements.size());
+		return channelSettlements;
+	}
+
+	private boolean hasTransitions(SettlementType settlementType) {
+		GroupTransitions histoTransitions = recordSet.getHistoTransitions();
+		int transitionGroupId = settlementType.getEvaluation().getTransitionCalculus().getTransitionGroupId();
+		TreeMap<Long, Transition> groupTransitions = histoTransitions.get(transitionGroupId);
+		if (groupTransitions != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean hasReasonableData(SettlementType settlementType) {
+		throw new UnsupportedOperationException("not yet implemented");
+	}
+
+	/**
+	 * @return the calculated settlements calculated from transitions (key is the name of the settlementType)
+	 */
+	private LinkedHashMap<String, SettlementRecord> determineSettlements(GroupTransitions transitions, Collection<SettlementType> settlementTypes) {
+		LinkedHashMap<String, SettlementRecord> histoSettlements = new LinkedHashMap<String, SettlementRecord>();
+		for (SettlementType settlementType : settlementTypes) {
+			if (settlementType.getEvaluation() != null) {
+				SettlementRecord record = new SettlementRecord(settlementType, recordSet, application.getActiveChannelNumber());
+				histoSettlements.put(settlementType.getName(), record);
+				if (transitions.isEmpty()) continue;
+
+				TransitionFigureType transitionFigureType = settlementType.getEvaluation().getTransitionFigure();
+				TransitionAmountType transitionAmountType = settlementType.getEvaluation().getTransitionAmount();
+				TransitionCalculusType calculationType = settlementType.getEvaluation().getTransitionCalculus();
+				if (transitionFigureType != null) {
+					FigureEvaluator evaluator = new FigureEvaluator(record);
+					for (Transition transition : transitions.get(transitionFigureType.getTransitionGroupId()).values()) {
+						evaluator.addFromTransition(transition);
+					}
+				} else if (transitionAmountType != null) {
+					AmountEvaluator evaluator = new AmountEvaluator(record);
+					for (Transition transition : transitions.get(transitionAmountType.getTransitionGroupId()).values()) {
+						evaluator.addFromTransition(transition);
+					}
+				} else if (calculationType != null) {
+					CalculusEvaluator evaluator = new CalculusEvaluator(record);
+					for (Transition transition : transitions.get(calculationType.getTransitionGroupId()).values()) {
+						evaluator.addFromTransition(transition);
+					}
+				} else {
+					throw new UnsupportedOperationException();
+				}
+			}
+		}
+		return histoSettlements;
 	}
 
 }

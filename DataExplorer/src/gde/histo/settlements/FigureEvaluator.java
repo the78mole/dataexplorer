@@ -61,7 +61,7 @@ public final class FigureEvaluator {
 			throw new UnsupportedOperationException();
 		}
 		// add to settlement record
-		this.histoSettlement.add(reverseTranslatedResult);
+		this.histoSettlement.add(reverseTranslatedResult, transition);
 		log.fine(() -> String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  figureType=%s", //$NON-NLS-1$
 				this.histoSettlement.getName(), (int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1), reverseTranslatedResult, transitionFigure.getFigureType()));
 	}

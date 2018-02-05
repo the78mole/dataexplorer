@@ -49,7 +49,7 @@ public final class TransitionCollector {
 	 * Identify all transitions for the recordset and channel.
 	 * Take all transition types defined for the channel.
 	 * remove transition duplicates or overlapping transitions in all transition groups.
-	 * @param logChannelNumber
+	 * @return the multimap holding all transitions (key is thresholdStartTimestamp_ms) per transitionGroupId (key)
 	 */
 	public static Map<Integer, TreeMap<Long, Transition>> add4Channel(RecordSet recordSet, int logChannelNumber) {
 		Map<Integer, TreeMap<Long, Transition>> transitionContainer = new HashMap<>();
@@ -90,7 +90,7 @@ public final class TransitionCollector {
 	/**
 	 * @param recordSet
 	 * @param transitionType
-	 * @return
+	 * @return the identified transitions with the key thresholdStartTimestamp_ms
 	 */
 	private static TreeMap<Long, Transition> findTransitions(RecordSet recordSet, TransitionType transitionType) {
 		final TreeMap<Long, Transition> transitionsFromRecord;
@@ -142,11 +142,13 @@ public final class TransitionCollector {
 	/**
 	 * @param transitionsFromRecord
 	 * @param groupTransitions
-	 * @return the merged transitions with existing transitions for the current group and class
+	 * @return the merged transitions with existing transitions for the current group and class</br>
+	 *         key is thresholdStartTimestamp_ms
+	 *
 	 */
-	private static TreeMap<Long, Transition> getSuperiorTransitions(final TreeMap<Long, Transition> transitionsFromRecord,
-			final TreeMap<Long, Transition> groupTransitions) {
-		final TreeMap<Long, Transition> newTransitions;
+	private static TreeMap<Long, Transition> getSuperiorTransitions(TreeMap<Long, Transition> transitionsFromRecord,
+			TreeMap<Long, Transition> groupTransitions) {
+		TreeMap<Long, Transition> newTransitions;
 		newTransitions = new TreeMap<>(transitionsFromRecord);
 		if (!groupTransitions.isEmpty()) {
 			// identify transitions with the same threshold startTimeStamp

@@ -100,7 +100,7 @@ public final class AmountEvaluator {
 			throw new UnsupportedOperationException();
 		}
 		// add to settlement record
-		this.histoSettlement.add(reverseTranslatedResult);
+		this.histoSettlement.add(reverseTranslatedResult, transition);
 		if (log.isLoggable(FINE)) log.log(FINE, String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  amountType=%s", //$NON-NLS-1$
 				this.histoSettlement.getName(), (int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1), reverseTranslatedResult, transitionAmount.getAmountType()));
 	}

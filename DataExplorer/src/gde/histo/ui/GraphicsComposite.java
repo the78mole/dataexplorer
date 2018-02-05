@@ -364,7 +364,9 @@ public final class GraphicsComposite extends AbstractChartComposite {
 	protected void defineLayoutParams() {
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		this.timeLine.initialize(trailRecordSet, curveAreaBounds);
-
+		for (TrailRecord record : trailRecordSet.getValues()) {
+			record.resetGraphics();
+		}
 		// sync scales are used for suites (e.g. boxplot) AND synced records
 		trailRecordSet.updateSyncGraphicsScale();
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {

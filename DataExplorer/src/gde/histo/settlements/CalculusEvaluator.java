@@ -482,7 +482,7 @@ public final class CalculusEvaluator {
 				throw new UnsupportedOperationException();
 			}
 
-			this.histoSettlement.add(reverseTranslatedResult);
+			this.histoSettlement.add(reverseTranslatedResult, transition);
 			log.fine(() -> String.format("%s: timeStamp_ms=%d  reverseTranslatedResult=%d  calcType=%s", this.histoSettlement.getName(), //$NON-NLS-1$
 					(int) this.histoSettlement.getParent().getTime_ms(transition.getThresholdEndIndex() + 1), reverseTranslatedResult, calculusType));
 		}

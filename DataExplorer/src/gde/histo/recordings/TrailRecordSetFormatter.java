@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channels;
+import gde.device.resource.DeviceXmlResource;
 import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -53,15 +54,16 @@ public final class TrailRecordSetFormatter {
 
 			StringBuilder sb = new StringBuilder().append(String.format("%-11.11s", Messages.getString(MessageIds.GDE_MSGT0799))); //$NON-NLS-1$
 			sb.append(GDE.STRING_OR).append(String.format("%-16s", Messages.getString(MessageIds.GDE_MSGT0652))); //$NON-NLS-1$
+			DeviceXmlResource xmlResource = DeviceXmlResource.getInstance();
 			for (int i = 0; i < records.size(); i++) {
 				TrailRecord record = records.get(i);
 				if (displayProps.getProperty(record.getName()) != null)
 					sb.append(GDE.STRING_OR).append(String.format("%-10s", displayProps.getProperty(record.getName()))); //$NON-NLS-1$
 				else {
-					final String unit = GDE.STRING_LEFT_BRACKET + record.getUnit() + GDE.STRING_RIGHT_BRACKET;
-					final String name = record.getName().substring(0, record.getName().length() >= 10 - unit.length() ? 10 - unit.length()
-							: record.getName().length());
-					final String format = "%-" + (10 - unit.length()) + "s%" + unit.length() + "s"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					String unit = GDE.STRING_LEFT_BRACKET + record.getUnit() + GDE.STRING_RIGHT_BRACKET;
+					String replacedName = xmlResource.getReplacement(record.getName());
+					String name = replacedName.substring(0, replacedName.length() >= 10 - unit.length() ? 10 - unit.length() : replacedName.length());
+					String format = "%-" + (10 - unit.length()) + "s%" + unit.length() + "s"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					sb.append(GDE.STRING_OR).append(String.format(format, name, unit));
 				}
 			}

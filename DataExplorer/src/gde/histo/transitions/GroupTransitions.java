@@ -26,6 +26,7 @@ import gde.data.RecordSet;
 
 /**
  * Collect transitions per transition group.
+ * Multimap holding all transitions (key is thresholdStartTimestamp_ms) per transitionGroupId (key).
  * @author Thomas Eickert (USER)
  */
 public final class GroupTransitions extends HashMap<Integer, TreeMap<Long, Transition>> {

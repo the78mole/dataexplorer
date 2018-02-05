@@ -176,7 +176,7 @@ public final class VaultCollector {
 	/**
 	 * @param recordSet
 	 * @param transitions
-	 * @return the calculated settlements calculated from transitions.
+	 * @return the calculated settlements calculated from transitions (key is the name of the settlementType)
 	 */
 	private LinkedHashMap<String, SettlementRecord> determineSettlements(RecordSet recordSet, GroupTransitions transitions) {
 		LinkedHashMap<String, SettlementRecord> histoSettlements = new LinkedHashMap<String, SettlementRecord>();
@@ -210,7 +210,6 @@ public final class VaultCollector {
 				}
 			}
 		}
-
 		return histoSettlements;
 	}
 

@@ -89,15 +89,15 @@ public class HistoExplorer {
 	}
 
 	public void disposeHisto() {
-			for (AbstractChartWindow chartWindow : chartTabItems) {
-				chartWindow.dispose();
-			}
-			chartTabItems.clear();
-			for (HistoTableWindow tableWindow : tableTabItems) {
-				tableWindow.dispose();
-			}
-			tableTabItems.clear();
+		for (AbstractChartWindow chartWindow : chartTabItems) {
+			chartWindow.dispose();
 		}
+		chartTabItems.clear();
+		for (HistoTableWindow tableWindow : tableTabItems) {
+			tableWindow.dispose();
+		}
+		tableTabItems.clear();
+	}
 
 	/**
 	 * Rebuilds the contents of the histo windows.
@@ -203,6 +203,8 @@ public class HistoExplorer {
 
 	private void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
 		if (Thread.currentThread().getId() == application.getThreadId()) {
+			log.log(Level.FINER, "initial size=", getTrailRecordSet() != null
+					? getTrailRecordSet().getDisplayRecords().size() + "  " + getTrailRecordSet().getVisibleAndDisplayableRecords().size() : "0   0");
 			if (isHistoChartWindowVisible() || isHistoTableWindowVisible()) {
 				Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 				try {
@@ -211,6 +213,8 @@ public class HistoExplorer {
 					log.log(Level.WARNING, e.getMessage(), e);
 				}
 			}
+			log.log(Level.FINER, "rebuild size=", getTrailRecordSet() != null
+					? getTrailRecordSet().getDisplayRecords().size() + "  " + getTrailRecordSet().getVisibleAndDisplayableRecords().size() : "0   0");
 		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
@@ -234,7 +238,10 @@ public class HistoExplorer {
 			isRebuilt = histoSet.rebuild4Screening(rebuildStep, isWithUi);
 
 			if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
-				if (histoSet.getTrailRecordSet() != null) histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
+				if (histoSet.getTrailRecordSet() != null) {
+					histoSet.getTrailRecordSet().setDisplayable();
+					histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
+				}
 				updateHistoChartWindow(true);
 				updateHistoTableWindow(rebuildStep.scopeOfWork >= RebuildStep.E_USER_INTERFACE.scopeOfWork);
 			}
@@ -399,8 +406,8 @@ public class HistoExplorer {
 	}
 
 	/**
-	 * @return a visible histo chart window
-	 * @throws error if the window is not visible
+	 * @return a visible histo chart window>/br>
+	 * throws Exception if the window is not visible
 	 */
 	public AbstractChartWindow getActiveHistoChartTabItem() {
 		return (AbstractChartWindow) this.displayTab.getSelection();

@@ -22,6 +22,7 @@ package gde.histo.ui;
 import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
+import gde.device.resource.DeviceXmlResource;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordFormatter;
 import gde.histo.recordings.TrailRecordSection;
@@ -39,19 +40,21 @@ import gde.utils.LocalizedDateTime.DateTimePattern;
  * Supports delta measuring with two timestamps or simple measuring with identical timestamps.
  */
 public class Measure {
-	private final static String			$CLASS_NAME	= Measure.class.getName();
-	private final static Logger			log					= Logger.getLogger($CLASS_NAME);
+	private final static String							$CLASS_NAME	= Measure.class.getName();
+	private final static Logger							log					= Logger.getLogger($CLASS_NAME);
+
+	private static final DeviceXmlResource	xmlResource	= DeviceXmlResource.getInstance();
 
 	/**
 	 * Standard drawing area for initializing the measuring timestamps.
 	 */
-	private final static Rectangle	BOUNDS			= new Rectangle(0, 0, 999, 99);
+	private final static Rectangle					BOUNDS			= new Rectangle(0, 0, 999, 99);
 
-	final boolean										isDeltaMeasure;
-	final TrailRecord								measureRecord;
-	private long										timestampMeasure_ms;
-	private long										timestampDelta_ms;
-	private TrailRecordSection			recordSection;
+	final boolean														isDeltaMeasure;
+	final TrailRecord												measureRecord;
+	private long														timestampMeasure_ms;
+	private long														timestampDelta_ms;
+	private TrailRecordSection							recordSection;
 
 	Measure(boolean isDeltaMeasuring, TrailRecord measuringRecord) {
 		this.isDeltaMeasure = isDeltaMeasuring;
@@ -122,7 +125,8 @@ public class Measure {
 		String unitText = measureRecord.getUnit();
 		String avgText = getRecordSection().getFormattedBoundsAvg();
 		String slopeText = getRecordSection().getFormattedBoundsSlope();
-		return Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { measureRecord.getName(), unitText, deltaText,
+		String recordName = xmlResource.getReplacement(measureRecord.getName());
+		return Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { recordName, unitText, deltaText,
 				LocalizedDateTime.getFormatedDistance(timestampMeasure_ms, timestampDelta_ms) }) + Messages.getString(MessageIds.GDE_MSGT0879, new Object[] {
 						unitText, avgText, unitText, slopeText });
 	}
@@ -130,7 +134,8 @@ public class Measure {
 	public String getDeltaStandardStatusMessage() {
 		String deltaText = getRecordSection().getFormattedBoundsDelta();
 		String unitText = measureRecord.getUnit();
-		return Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { measureRecord.getName(), unitText, deltaText,
+		String recordName = xmlResource.getReplacement(measureRecord.getName());
+		return Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { recordName, unitText, deltaText,
 				LocalizedDateTime.getFormatedDistance(timestampMeasure_ms, timestampDelta_ms) });
 	}
 
@@ -139,17 +144,20 @@ public class Measure {
 		String unitText = measureRecord.getUnit();
 		String avgText = getRecordSection().getFormattedBoundsAvg();
 		String slopeText = getRecordSection().getFormattedBoundsSlope();
-		return Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { measureRecord.getName(), deltaText, unitText,
+		String recordName = xmlResource.getReplacement(measureRecord.getName());
+		return Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { recordName, deltaText, unitText,
 				LocalizedDateTime.getFormatedDistance(timestampMeasure_ms, timestampDelta_ms) }) + Messages.getString(MessageIds.GDE_MSGT0879, new Object[] {
 						unitText, avgText, unitText, slopeText });
 	}
 
 	public String getNoRecordsStatusMessage() {
-		return Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { measureRecord.getName(), GDE.STRING_STAR });
+		String recordName = xmlResource.getReplacement(measureRecord.getName());
+		return Messages.getString(MessageIds.GDE_MSGT0848, new Object[] { recordName, GDE.STRING_STAR });
 	}
 
 	public String getMeasureStatusMessage() {
-		return Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { measureRecord.getName(), new TrailRecordFormatter(
+		String recordName = xmlResource.getReplacement(measureRecord.getName());
+		return Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { recordName, new TrailRecordFormatter(
 				measureRecord).getMeasureValue(measureRecord.getParent().getIndex(timestampMeasure_ms)), measureRecord.getUnit(),
 				LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmmss, timestampMeasure_ms) });
 	}
