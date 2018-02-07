@@ -27,10 +27,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -50,6 +54,7 @@ import gde.histo.utils.ElementaryQuantile;
 import gde.histo.utils.Spot;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 import gde.utils.MathUtils;
 
 /**
@@ -59,11 +64,129 @@ import gde.utils.MathUtils;
  * @author Thomas Eickert
  */
 public abstract class TrailRecord extends CommonRecord {
-	private final static String		$CLASS_NAME					= TrailRecord.class.getName();
-	private final static long			serialVersionUID		= 110124007964748556L;
-	private final static Logger		log									= Logger.getLogger($CLASS_NAME);
+	private final static String		$CLASS_NAME				= TrailRecord.class.getName();
+	private final static long			serialVersionUID	= 110124007964748556L;
+	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
 
-	protected final static String	TRAIL_TEXT_ORDINAL	= "_trailTextOrdinal";					// reference to the selected trail //$NON-NLS-1$
+	public final static String[]	propertyKeys			= new String[] { GraphicsTemplate.NAME, GraphicsTemplate.UNIT, GraphicsTemplate.SYMBOL,
+			GraphicsTemplate.IS_ACTIVE, GraphicsTemplate.IS_VISIBLE, GraphicsTemplate.IS_POSITION_LEFT, GraphicsTemplate.COLOR, GraphicsTemplate.LINE_WIDTH,
+			GraphicsTemplate.LINE_STYLE, GraphicsTemplate.IS_ROUND_OUT, GraphicsTemplate.IS_START_POINT_ZERO, GraphicsTemplate.IS_START_END_DEFINED,
+			GraphicsTemplate.NUMBER_FORMAT, GraphicsTemplate.MAX_VALUE, GraphicsTemplate.DEFINED_MAX_VALUE, GraphicsTemplate.MIN_VALUE,
+			GraphicsTemplate.DEFINED_MIN_VALUE };
+
+	public static class GraphicsTemplate {
+
+		public final static String		NAME											= "_name";
+		public final static String		UNIT											= "_unit";
+		public final static String		SYMBOL										= "_symbol";
+		public final static String		IS_ACTIVE									= "_isActive";							// active means this measurement can be read
+																																												// from device, otherwise its calculated
+		public final static String		IS_VISIBLE								= "_isVisible";							// defines if record is visible
+		public final static String		IS_POSITION_LEFT					= "_isPositionLeft";				// defines the side where the axis id displayed
+		public final static String		COLOR											= "_color";									// defines which color is used to draw the curve
+		public final static String		LINE_WIDTH								= "_lineWidth";
+		public final static String		LINE_STYLE								= "_lineStyle";
+		public final static String		IS_ROUND_OUT							= "_isRoundOut";						// defines if axis values are rounded
+		public final static String		IS_START_POINT_ZERO				= "_isStartpointZero";			// defines if axis value starts at zero
+		public final static String		IS_START_END_DEFINED			= "_isStartEndDefined";			// defines that explicit end values are
+																																												// defined for axis
+		public final static String		NUMBER_FORMAT							= "_numberFormat";
+		public final static String		MAX_VALUE									= "_maxValue";
+		public final static String		DEFINED_MAX_VALUE					= "_defMaxValue";						// overwritten max value
+		public final static String		MIN_VALUE									= "_minValue";
+		public final static String		DEFINED_MIN_VALUE					= "_defMinValue";						// overwritten min value
+
+		public final static int				TYPE_AXIS_END_VALUES			= 0;												// defines axis end values types like isRoundout, etc
+		public final static int				TYPE_AXIS_NUMBER_FORMAT		= 1;												// defines axis scale values format
+		public final static int				TYPE_AXIS_SCALE_POSITION	= 2;												// defines axis scale position left or right
+
+		protected final static String	TRAIL_TEXT_ORDINAL				= "_trailTextOrdinal";			// reference to the selected trail
+
+		boolean												isVisible									= true;
+		boolean												isPositionLeft						= true;
+		Color													color											= DataExplorer.COLOR_BLACK;
+		int														lineWidth									= 1;
+		int														lineStyle									= SWT.LINE_SOLID;
+		boolean												isRoundOut								= false;
+		boolean												isStartpointZero					= false;
+		boolean												isStartEndDefined					= false;
+		DecimalFormat									df												= new DecimalFormat("0.0");
+		int														numberFormat							= -1;												// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
+		double												maxScaleValue							= 0.;												// overwrite calculated boundaries
+		double												minScaleValue							= 0.;
+
+		/**
+		 * Method to initialize scale position defaults.
+		 */
+		public void setPositionLeft(int recordOrdinal) {
+			this.isPositionLeft = recordOrdinal % 2 == 0;
+		}
+
+		/**
+		 * Method to initialize color defaults.
+		 */
+		public void setColorDefaults(int recordOrdinal) {
+			switch (recordOrdinal) {
+			case 0:
+				this.color = SWTResourceManager.getColor(0, 0, 255); // (SWT.COLOR_BLUE));
+				break;
+			case 1:
+				this.color = SWTResourceManager.getColor(0, 128, 0); // SWT.COLOR_DARK_GREEN));
+				break;
+			case 2:
+				this.color = SWTResourceManager.getColor(128, 0, 0); // (SWT.COLOR_DARK_RED));
+				break;
+			case 3:
+				this.color = SWTResourceManager.getColor(255, 0, 255); // (SWT.COLOR_MAGENTA));
+				break;
+			case 4:
+				this.color = SWTResourceManager.getColor(64, 0, 64); // (SWT.COLOR_CYAN));
+				break;
+			case 5:
+				this.color = SWTResourceManager.getColor(0, 128, 128); // (SWT.COLOR_DARK_YELLOW));
+				break;
+			case 6:
+				this.color = SWTResourceManager.getColor(128, 128, 0);
+				break;
+			case 7:
+				this.color = SWTResourceManager.getColor(128, 0, 128);
+				break;
+			case 8:
+				this.color = SWTResourceManager.getColor(0, 128, 255);
+				break;
+			case 9:
+				this.color = SWTResourceManager.getColor(128, 255, 0);
+				break;
+			case 10:
+				this.color = SWTResourceManager.getColor(255, 0, 128);
+				break;
+			case 11:
+				this.color = SWTResourceManager.getColor(0, 64, 128);
+				break;
+			case 12:
+				this.color = SWTResourceManager.getColor(64, 128, 0);
+				break;
+			case 13:
+				this.color = SWTResourceManager.getColor(128, 0, 64);
+				break;
+			case 14:
+				this.color = SWTResourceManager.getColor(128, 64, 0);
+				break;
+			case 15:
+				this.color = SWTResourceManager.getColor(0, 128, 64);
+				break;
+			default:
+				Random rand = new Random();
+				this.color = SWTResourceManager.getColor(rand.nextInt() & 0xff, rand.nextInt() & 0xff, rand.nextInt() & 0xff);
+				break;
+			}
+		}
+
+	}
+
+	protected final Settings					settings	= Settings.getInstance();
+
+	protected final GraphicsTemplate	template	= new GraphicsTemplate();
 
 	/**
 	 * Collect input data for the trail record and subordinate objects.
@@ -163,16 +286,27 @@ public abstract class TrailRecord extends CommonRecord {
 	/**
 	 * Data for the life cycle of a graphics composite drawing.
 	 */
-	public final class Graphics { // todo class might be better independent from TrailRecord
+	public static final class Graphics { // todo class might be better independent from TrailRecord
 
-		private int[] numberTickMarks;
+		boolean						isDisplayable;
 
-		public int[] getNumberTickMarks() {
-			return this.numberTickMarks;
-		}
+		// synchronize
+		protected int			syncMaxValue			= 0;		// max value of the curve if synced
+		protected int			syncMinValue			= 0;		// min value of the curve if synced
 
-		public void setNumberTickMarks(int[] numberTickMarks) {
-			this.numberTickMarks = numberTickMarks;
+		// display the record
+		double						displayScaleFactorTime;
+		protected double	displayScaleFactorValue;
+		protected double	syncMasterFactor	= 1.0;	// synchronized scale and different measurement factors
+		protected double	minDisplayValue;					// min value in device units, correspond to draw area
+		protected double	maxDisplayValue;					// max value in device units, correspond to draw area
+
+		int								numberScaleTicks	= 0;
+
+		private int[]			numberTickMarks;
+
+		public Graphics(boolean isActiveValue) {
+			this.isDisplayable = isActiveValue ? true : false;
 		}
 
 	}
@@ -392,8 +526,8 @@ public abstract class TrailRecord extends CommonRecord {
 
 	@Override // reason: formatting of values <= 100 with decimal places; define category based on maxValueAbs AND minValueAbs
 	public void setNumberFormat(int newNumberFormat) {
-		this.numberFormat = newNumberFormat;
-		this.df = new TrailRecordFormatter(this).getDecimalFormat(newNumberFormat);
+		template.numberFormat = newNumberFormat;
+		template.df = new TrailRecordFormatter(this).getDecimalFormat(newNumberFormat);
 
 	}
 
@@ -409,30 +543,30 @@ public abstract class TrailRecord extends CommonRecord {
 
 	@Override
 	public double getMaxScaleValue() {
-		return this.maxScaleValue;
+		return template.maxScaleValue;
 	}
 
 	@Override
 	public double getMinScaleValue() {
-		return this.minScaleValue;
+		return template.minScaleValue;
 	}
 
 	@Override
 	public void setMinMaxScaleValue(double minScaleValue, double maxScaleValue) {
-		this.minScaleValue = minScaleValue;
-		this.maxScaleValue = maxScaleValue;
+		template.minScaleValue = minScaleValue;
+		template.maxScaleValue = maxScaleValue;
 		log.fine(() -> getName() + " minScaleValue = " + minScaleValue + "; maxScaleValue = " + minScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
 	public void setSyncedMinMaxDisplayValues(double newMinValue, double newMaxValue) {
-		this.minDisplayValue = HistoSet.decodeVaultValue(this, newMinValue);
-		this.maxDisplayValue = HistoSet.decodeVaultValue(this, newMaxValue);
+		graphics.minDisplayValue = HistoSet.decodeVaultValue(this, newMinValue);
+		graphics.maxDisplayValue = HistoSet.decodeVaultValue(this, newMaxValue);
 
 		if (this.getParent().isOneOfSyncableRecord(this.name)) {
 			for (TrailRecord record : this.getParent().getScaleSyncedRecords(this.getParent().getSyncMasterRecordOrdinal(this.name))) {
-				record.minDisplayValue = this.minDisplayValue;
-				record.maxDisplayValue = this.maxDisplayValue;
+				record.graphics.minDisplayValue = graphics.minDisplayValue;
+				record.graphics.maxDisplayValue = graphics.maxDisplayValue;
 			}
 		}
 		log.fine(getName() + getName() + " yMinValue = " + newMinValue + "; yMaxValue = " + newMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
@@ -482,7 +616,15 @@ public abstract class TrailRecord extends CommonRecord {
 
 	@Override
 	public double getDisplayScaleFactorValue() {
-		return this.displayScaleFactorValue;
+		return graphics.displayScaleFactorValue;
+	}
+
+	public int[] getNumberTickMarks() {
+		return graphics.numberTickMarks;
+	}
+
+	public void setNumberTickMarks(int[] numberTickMarks) {
+		graphics.numberTickMarks = numberTickMarks;
 	}
 
 	/**
@@ -495,27 +637,66 @@ public abstract class TrailRecord extends CommonRecord {
 			int suiteMinValue = suiteRecords.getSuiteMinValue();
 			int tmpMaxValue = suiteMaxValue == suiteMinValue ? suiteMaxValue + 100 : suiteMaxValue;
 			int tmpMinValue = suiteMaxValue == suiteMinValue ? suiteMinValue - 100 : suiteMinValue;
-			syncMaxValue = (int) (tmpMaxValue * getSyncMasterFactor());
-			syncMinValue = (int) (tmpMinValue * getSyncMasterFactor());
+			graphics.syncMaxValue = (int) (tmpMaxValue * getSyncMasterFactor());
+			graphics.syncMinValue = (int) (tmpMinValue * getSyncMasterFactor());
 		} else {
-			syncMaxValue = (int) (getMaxValue() * getSyncMasterFactor());
-			syncMinValue = (int) (getMinValue() * getSyncMasterFactor());
+			graphics.syncMaxValue = (int) (getMaxValue() * getSyncMasterFactor());
+			graphics.syncMinValue = (int) (getMinValue() * getSyncMasterFactor());
 		}
 		log.finer(() -> getName() + "  syncMin = " + getSyncMinValue() + "; syncMax = " + getSyncMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
 	public int getSyncMinValue() {
-		return this.syncMinValue == this.syncMaxValue ? this.syncMinValue - 100 : this.syncMinValue;
+		return graphics.syncMinValue == graphics.syncMaxValue ? graphics.syncMinValue - 100 : graphics.syncMinValue;
 	}
 
 	@Override
 	public int getSyncMaxValue() {
-		return this.syncMaxValue == this.syncMinValue ? this.syncMaxValue + 100 : this.syncMaxValue;
+		return graphics.syncMaxValue == graphics.syncMinValue ? graphics.syncMaxValue + 100 : graphics.syncMaxValue;
 	}
 
 	public double getSyncMasterFactor() {
-		return this.syncMasterFactor;
+		return graphics.syncMasterFactor;
+	}
+
+	public GraphicsTemplate getTemplate() {
+		return this.template;
+	}
+
+	@Override
+	public boolean isVisible() {
+		return this.template.isVisible;
+	}
+
+	@Override
+	public void setVisible(boolean enabled) {
+		this.template.isVisible = enabled;
+	}
+
+	@Override
+	public boolean isPositionLeft() {
+		return this.template.isPositionLeft;
+	}
+
+	@Override
+	public void setPositionLeft(boolean enabled) {
+		this.template.isPositionLeft = enabled;
+	}
+
+	@Override
+	public Color getColor() {
+		return this.template.color;
+	}
+
+	@Override
+	public String getRGB() {
+		return String.format("%d, %d,%d", this.template.color.getRed(), this.template.color.getGreen(), this.template.color.getBlue());
+	}
+
+	@Override
+	public void setColor(Color newColor) {
+		this.template.color = newColor;
 	}
 
 	/**
@@ -532,27 +713,27 @@ public abstract class TrailRecord extends CommonRecord {
 	 * @return the template value which is passed through
 	 */
 	public boolean isRealRoundOut() {
-		return this.isRoundOut;
+		return template.isRoundOut;
 	}
 
 	@Override
 	public void setRoundOut(boolean enabled) {
-		this.isRoundOut = enabled;
+		template.isRoundOut = enabled;
 	}
 
 	@Override
 	public boolean isStartpointZero() {
-		return this.isStartpointZero;
+		return template.isStartpointZero;
 	}
 
 	@Override
 	public void setStartpointZero(boolean enabled) {
-		this.isStartpointZero = enabled;
+		template.isStartpointZero = enabled;
 	}
 
 	@Override // reason is missing zoom mode
 	public boolean isStartEndDefined() {
-		return this.isStartEndDefined;
+		return template.isStartEndDefined;
 	}
 
 	/**
@@ -563,14 +744,40 @@ public abstract class TrailRecord extends CommonRecord {
 	 */
 	@Override // reason is unused channelConfigKey
 	public void setStartEndDefined(boolean enabled, double newMinScaleValue, double newMaxScaleValue) {
-		this.isStartEndDefined = enabled;
+		log.finer(() -> this.name + " enabled=" + enabled + " newMinScaleValue=" + newMinScaleValue + " newMaxScaleValue=" + newMaxScaleValue);
+		template.isStartEndDefined = enabled;
 		if (enabled) {
-			this.maxScaleValue = this.maxDisplayValue = newMaxScaleValue;
-			this.minScaleValue = this.minDisplayValue = newMinScaleValue;
+			template.maxScaleValue = graphics.maxDisplayValue = newMaxScaleValue;
+			template.minScaleValue = graphics.minDisplayValue = newMinScaleValue;
 		} else {
-			this.maxScaleValue = HistoSet.decodeVaultValue(this, this.maxValue / 1000.0);
-			this.minScaleValue = HistoSet.decodeVaultValue(this, this.minValue / 1000.0);
+			template.maxScaleValue = HistoSet.decodeVaultValue(this, this.maxValue / 1000.0);
+			template.minScaleValue = HistoSet.decodeVaultValue(this, this.minValue / 1000.0);
 		}
+	}
+
+	@Override
+	public int getLineWidth() {
+		return this.template.lineWidth;
+	}
+
+	@Override
+	public void setLineWidth(int newLineWidth) {
+		this.template.lineWidth = newLineWidth;
+	}
+
+	@Override
+	public int getLineStyle() {
+		return this.template.lineStyle;
+	}
+
+	@Override
+	public void setLineStyle(int newLineStyle) {
+		this.template.lineStyle = newLineStyle;
+	}
+
+	@Override
+	public int getNumberFormat() {
+		return this.template.numberFormat;
 	}
 
 	/**
@@ -686,12 +893,17 @@ public abstract class TrailRecord extends CommonRecord {
 
 	@Override
 	public DecimalFormat getRealDf() {
-		return this.df;
+		return template.df;
 	}
 
 	@Override
 	public void setRealDf(DecimalFormat realDf) {
-		this.df = realDf;
+		template.df = realDf;
+	}
+
+	public void setColorDefaultsAndPosition(int recordOrdinal) {
+		template.setColorDefaults(recordOrdinal);
+		template.setPositionLeft(recordOrdinal);
 	}
 
 	public IChannelItem getChannelItem() {
@@ -789,7 +1001,7 @@ public abstract class TrailRecord extends CommonRecord {
 
 	public Graphics getGraphics() {
 		if (graphics == null) {
-			graphics = new Graphics();
+			graphics = new Graphics(channelItem.isActive());
 		}
 		return this.graphics;
 	}
@@ -813,4 +1025,5 @@ public abstract class TrailRecord extends CommonRecord {
 	public abstract boolean hasVaultScraps(ExtendedVault vault);
 
 	public abstract DataType getVaultDataType(ExtendedVault vault);
+
 }

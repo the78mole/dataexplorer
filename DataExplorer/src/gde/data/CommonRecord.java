@@ -23,9 +23,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
@@ -39,117 +37,52 @@ import gde.device.PropertyType;
 import gde.device.StatisticsType;
 import gde.log.Level;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 /**
  * Supports the GDE kernel record class and the history trail record class.
  * @author Thomas Eickert (USER)
  */
 public abstract class CommonRecord extends AbstractRecord {
-	private static final String		$CLASS_NAME								= CommonRecord.class.getName();
-	private static final long			serialVersionUID					= 26031957;
-	private static final Logger		log												= Logger.getLogger($CLASS_NAME);
+	private static final String		$CLASS_NAME				= CommonRecord.class.getName();
+	private static final long			serialVersionUID	= 26031957;
+	private static final Logger		log								= Logger.getLogger($CLASS_NAME);
 
-	public final static String		NAME											= "_name";											// active means this measurement can be red //$NON-NLS-1$
-																																													// from device, other wise its calculated
-	public final static String		UNIT											= "_unit";											// active means this measurement can be red //$NON-NLS-1$
-																																													// from device, other wise its calculated
-	public final static String		SYMBOL										= "_symbol";										// active means this measurement can be red //$NON-NLS-1$
-																																													// from device, other wise its calculated
-	public final static String		IS_ACTIVE									= "_isActive";									// active means this measurement can be red //$NON-NLS-1$
-																																													// from device, other wise its calculated
-	public final static String		IS_DIPLAYABLE							= "_isDisplayable";							// true for all active records, true for //$NON-NLS-1$
-																																													// passive records when data calculated
-	public final static String		IS_VISIBLE								= "_isVisible";									// defines if data are displayed //$NON-NLS-1$
-	public final static String		IS_POSITION_LEFT					= "_isPositionLeft";						// defines the side where the axis id //$NON-NLS-1$
-																																													// displayed
-	public final static String		COLOR											= "_color";											// defines which color is used to draw the //$NON-NLS-1$
-																																													// curve
-	public final static String		LINE_WITH									= "_lineWidth";									//$NON-NLS-1$
-	public final static String		LINE_STYLE								= "_lineStyle";									//$NON-NLS-1$
-	public final static String		IS_ROUND_OUT							= "_isRoundOut";								// defines if axis values are rounded //$NON-NLS-1$
-	public final static String		IS_START_POINT_ZERO				= "_isStartpointZero";					// defines if axis value starts at zero //$NON-NLS-1$
-	public final static String		IS_START_END_DEFINED			= "_isStartEndDefined";					// defines that explicit end values are //$NON-NLS-1$
-																																													// defined for axis
-	public final static String		NUMBER_FORMAT							= "_numberFormat";							//$NON-NLS-1$
-	public final static String		MAX_VALUE									= "_maxValue";									//$NON-NLS-1$
-	public final static String		DEFINED_MAX_VALUE					= "_defMaxValue";								// overwritten max value //$NON-NLS-1$
-	public final static String		MIN_VALUE									= "_minValue";									//$NON-NLS-1$
-	public final static String		DEFINED_MIN_VALUE					= "_defMinValue";								// overwritten min value //$NON-NLS-1$
-	public final static String		DATA_TYPE									= "_dataType";									// data type of record //$NON-NLS-1$
+	protected final Settings					settings					= Settings.getInstance();
 
-	public final static String[]	propertyKeys							= new String[] { NAME,					//
-			UNIT, SYMBOL, IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT,								//
-			COLOR, LINE_WITH, LINE_STYLE, IS_ROUND_OUT, IS_START_POINT_ZERO,										//
-			IS_START_END_DEFINED, NUMBER_FORMAT,																								//
-			MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE, DATA_TYPE };
-
-	public final static int				TYPE_AXIS_END_VALUES			= 0;														// defines axis end values types like isRoundout,
-																																													// isStartpointZero, isStartEndDefined
-	public final static int				TYPE_AXIS_NUMBER_FORMAT		= 1;														// defines axis scale values format
-	public final static int				TYPE_AXIS_SCALE_POSITION	= 2;														// defines axis scale position left or right
-
-	protected final Settings			settings									= Settings.getInstance();
-
-// record fields
-//
-// this variables are used to make a record selfcontained within compare set
-	String												channelConfigKey;																					// used as channelConfigKey
-	String												keyName;
+	// record fields
+	//
+	// this variables are used to make a record selfcontained within compare set
+	String														channelConfigKey;														// used as channelConfigKey
+	String														keyName;
 	/**
 	 * for each measurement point in compare set, where time step of measurement points might be individual
 	 */
-	TimeSteps											timeStep_ms								= null;
-	protected IDevice							device;
+	TimeSteps													timeStep_ms				= null;
+	protected IDevice									device;
 	/**
 	 * is referencing the source position of the record ordinal relative to the initial
 	 * device measurement configuration and used to find specific properties
 	 */
-	protected int									ordinal;
+	protected int											ordinal;
 
-	protected AbstractRecordSet		parent;
+	protected AbstractRecordSet				parent;
 
 	// core fields
-	protected String							name;																											// measurement name Höhe
-	String												unit;																											// unit [m]
-	String												symbol;																										// symbol h
-	String												description								= GDE.STRING_BLANK;							// only set if copied into compare set
-	protected Boolean							isActive;
-	boolean												isDisplayable;
-	boolean												isVisible									= true;
-	StatisticsType								statistics								= null;
+	protected String									name;																				// measurement name Höhe
+	String														unit;																				// unit [m]
+	String														symbol;																			// symbol h
+	String														description				= GDE.STRING_BLANK;				// only set if copied into compare set
+	protected Boolean									isActive;
+	DataType													dataType					= Record.DataType.DEFAULT;
+	StatisticsType										statistics				= null;
 
-	List<PropertyType>						properties								= new ArrayList<>();						// offset, factor, reduction, ...
-	boolean												isPositionLeft						= true;
-	Color													color											= DataExplorer.COLOR_BLACK;
-	int														lineWidth									= 1;
-	int														lineStyle									= SWT.LINE_SOLID;
-	protected boolean							isRoundOut								= false;
-	protected boolean							isStartpointZero					= false;
-	protected boolean							isStartEndDefined					= false;
-	protected DecimalFormat				df;
-	protected int									numberFormat							= -1;														// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
-	protected int									maxValue									= 0;														// max value of the curve
-	protected int									minValue									= 0;														// min value of the curve
-	protected double							maxScaleValue							= this.maxValue;								// overwrite calculated boundaries
-	protected double							minScaleValue							= this.minValue;
-	DataType											dataType									= Record.DataType.DEFAULT;
+	List<PropertyType>								properties				= new ArrayList<>();			// offset, factor, reduction, ...
 
-	// synchronize
-	protected int									syncMaxValue							= 0;														// max value of the curve if synced
-	protected int									syncMinValue							= 0;														// min value of the curve if synced
+	protected int											maxValue					= 0;											// max value of the curve
+	protected int											minValue					= 0;											// min value of the curve
 
-	int														numberScaleTicks					= 0;
-
-	// display the record
-	int														avgValue									= Integer.MIN_VALUE;						// avarage value (avg = sum(xi)/n)
-	int														sigmaValue								= Integer.MIN_VALUE;						// sigma value of data, according a set trigger level if any
-	double												displayScaleFactorTime;
-	protected double							displayScaleFactorValue;
-	protected double							syncMasterFactor					= 1.0;													// synchronized scale and different measurement factors
-	protected double							minDisplayValue;																					// min value in device units, correspond to draw area
-	protected double							maxDisplayValue;																					// max value in device units, correspond to draw area
+	int																avgValue					= Integer.MIN_VALUE;			// avarage value (avg = sum(xi)/n)
+	int																sigmaValue				= Integer.MIN_VALUE;			// sigma value of data, according a set trigger level if any
 
 	/**
 	 * this constructor will create an vector to hold data points in case the initial capacity is > 0
@@ -178,8 +111,6 @@ public abstract class CommonRecord extends AbstractRecord {
 		this.statistics = newStatistic;
 
 		this.initializeProperties(this, newProperties);
-
-		this.df = new DecimalFormat("0.0"); //$NON-NLS-1$
 	}
 
 	/**
@@ -199,74 +130,6 @@ public abstract class CommonRecord extends AbstractRecord {
 		for (PropertyType property : newProperties) {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%20s - %s = %s", recordRef.name, property.getName(), property.getValue()));
 			this.properties.add(property.clone());
-		}
-	}
-
-	/**
-	 * Method to initialize color and scale position defaults
-	 * @param recordOrdinal
-	 */
-	public void setColorDefaultsAndPosition(int recordOrdinal) {
-		// set color defaults
-		switch (recordOrdinal) {
-		case 0: // erste Kurve
-			this.color = SWTResourceManager.getColor(0, 0, 255); // (SWT.COLOR_BLUE));
-			break;
-		case 1: // zweite Kurve
-			this.color = SWTResourceManager.getColor(0, 128, 0); // SWT.COLOR_DARK_GREEN));
-			break;
-		case 2: // dritte Kurve
-			this.color = SWTResourceManager.getColor(128, 0, 0); // (SWT.COLOR_DARK_RED));
-			break;
-		case 3: // vierte Kurve
-			this.color = SWTResourceManager.getColor(255, 0, 255); // (SWT.COLOR_MAGENTA));
-			break;
-		case 4: // fünfte Kurve
-			this.color = SWTResourceManager.getColor(64, 0, 64); // (SWT.COLOR_CYAN));
-			break;
-		case 5: // sechste Kurve
-			this.color = SWTResourceManager.getColor(0, 128, 128); // (SWT.COLOR_DARK_YELLOW));
-			break;
-		case 6: // Kurve
-			this.color = SWTResourceManager.getColor(128, 128, 0);
-			break;
-		case 7: // Kurve
-			this.color = SWTResourceManager.getColor(128, 0, 128);
-			break;
-		case 8: // Kurve
-			this.color = SWTResourceManager.getColor(0, 128, 255);
-			break;
-		case 9: // Kurve
-			this.color = SWTResourceManager.getColor(128, 255, 0);
-			break;
-		case 10: // Kurve
-			this.color = SWTResourceManager.getColor(255, 0, 128);
-			break;
-		case 11: // Kurve
-			this.color = SWTResourceManager.getColor(0, 64, 128);
-			break;
-		case 12: // Kurve
-			this.color = SWTResourceManager.getColor(64, 128, 0);
-			break;
-		case 13: // Kurve
-			this.color = SWTResourceManager.getColor(128, 0, 64);
-			break;
-		case 14: // Kurve
-			this.color = SWTResourceManager.getColor(128, 64, 0);
-			break;
-		case 15: // Kurve
-			this.color = SWTResourceManager.getColor(0, 128, 64);
-			break;
-		default:
-			Random rand = new Random();
-			this.color = SWTResourceManager.getColor(rand.nextInt() & 0xff, rand.nextInt() & 0xff, rand.nextInt() & 0xff); // (SWT.COLOR_GREEN));
-			break;
-		}
-		// set position defaults
-		if (recordOrdinal % 2 == 0) {
-			this.setPositionLeft(true); // position left
-		} else {
-			this.setPositionLeft(false); // position right
 		}
 	}
 
@@ -470,16 +333,6 @@ public abstract class CommonRecord extends AbstractRecord {
 			this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
-	@Override
-	public boolean isVisible() {
-		return this.isVisible;
-	}
-
-	@Override
-	public void setVisible(boolean enabled) {
-		this.isVisible = enabled;
-	}
-
 	public abstract int getMaxValue();
 
 	public abstract int getMinValue();
@@ -539,6 +392,16 @@ public abstract class CommonRecord extends AbstractRecord {
 			log.log(Level.WARNING, String.format("%s - %20s: size = %d - indesx = %d", this.parent.name, this.name, super.size(), index));
 			return super.size() != 0 ? super.get(index - 1) : 0;
 		}
+	}
+
+	@Override
+	public boolean isVisible() {
+		return this.isVisible;
+	}
+
+	@Override
+	public void setVisible(boolean enabled) {
+		this.isVisible = enabled;
 	}
 
 	@Override

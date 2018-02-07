@@ -496,7 +496,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		}
 		record.setMinMaxScaleValue(yMinValueDisplay, yMaxValueDisplay);
 		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
-		record.getGraphics().setNumberTickMarks(numberTickMarks);
+		record.setNumberTickMarks(numberTickMarks);
 	}
 
 	@Override
