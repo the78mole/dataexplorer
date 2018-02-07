@@ -732,7 +732,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		RecordingsCollector collector = new RecordingsCollector();
 		collector.addVaults();
 		collector.setGpsLocationsTags();
-		syncScaleOfSyncableRecords();
 	}
 
 	/**
@@ -751,7 +750,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		collector.defineTrailTypes();
 		collector.addVaults();
 		collector.setGpsLocationsTags();
-		syncScaleOfSyncableRecords();
 	}
 
 	/**
