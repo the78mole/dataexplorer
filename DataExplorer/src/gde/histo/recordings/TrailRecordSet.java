@@ -874,7 +874,16 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	/**
-	 * Update the collection of visible and displayable records in this record set.
+	 * Update the displayable record information in this record set.
+	 */
+	public void setDisplayable() {
+		for (TrailRecord record : this.getValues()) {
+			record.setDisplayable();
+		}
+	}
+
+	/**
+	 * Update the collections of displayable records in this record set.
 	 * The sort order conforms to the record insertion order.
 	 */
 	@Override
@@ -887,7 +896,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			final TrailRecord record = (TrailRecord) entry.getValue();
 			if (record.isAllowedBySetting()) {
 				if (record.isActive() && record.hasReasonableData()) {
-					record.setDisplayable(true);
 					getDisplayRecords().add(record);
 					if (record.isVisible()) // only selected records get displayed
 						getVisibleAndDisplayableRecords().add(record);
@@ -1009,15 +1017,15 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				r = Integer.parseInt(color.split(GDE.STRING_COMMA)[0].trim());
 				g = Integer.parseInt(color.split(GDE.STRING_COMMA)[1].trim());
 				b = Integer.parseInt(color.split(GDE.STRING_COMMA)[2].trim());
-				recordTemplate.color =SWTResourceManager.getColor(r, g, b);
-				recordTemplate.lineWidth= Integer.parseInt(this.template.getProperty(i + GraphicsTemplate.LINE_WIDTH, "1"));
-				recordTemplate.lineStyle=Integer.parseInt(this.template.getProperty(i + GraphicsTemplate.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID));
-				recordTemplate.isRoundOut=Boolean.parseBoolean(this.template.getProperty(i + GraphicsTemplate.IS_ROUND_OUT, "false"));
-				recordTemplate.isStartpointZero=Boolean.parseBoolean(this.template.getProperty(i + GraphicsTemplate.IS_START_POINT_ZERO, "false"));
+				recordTemplate.color = SWTResourceManager.getColor(r, g, b);
+				recordTemplate.lineWidth = Integer.parseInt(this.template.getProperty(i + GraphicsTemplate.LINE_WIDTH, "1"));
+				recordTemplate.lineStyle = Integer.parseInt(this.template.getProperty(i + GraphicsTemplate.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID));
+				recordTemplate.isRoundOut = Boolean.parseBoolean(this.template.getProperty(i + GraphicsTemplate.IS_ROUND_OUT, "false"));
+				recordTemplate.isStartpointZero = Boolean.parseBoolean(this.template.getProperty(i + GraphicsTemplate.IS_START_POINT_ZERO, "false"));
 				record.setStartEndDefined(Boolean.parseBoolean(this.template.getProperty(i + GraphicsTemplate.IS_START_END_DEFINED, "false")), //
 						Double.parseDouble(this.template.getProperty(i + GraphicsTemplate.DEFINED_MIN_VALUE, "0")), //
 						Double.parseDouble(this.template.getProperty(i + GraphicsTemplate.DEFINED_MAX_VALUE, "0")));
-				recordTemplate.numberFormat=Integer.parseInt(this.template.getProperty(i + GraphicsTemplate.NUMBER_FORMAT, "-1"));
+				recordTemplate.numberFormat = Integer.parseInt(this.template.getProperty(i + GraphicsTemplate.NUMBER_FORMAT, "-1"));
 				// time grid
 				// color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 				// r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();

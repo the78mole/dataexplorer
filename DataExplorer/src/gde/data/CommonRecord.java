@@ -19,12 +19,9 @@
 
 package gde.data;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -49,11 +46,6 @@ public abstract class CommonRecord extends AbstractRecord {
 
 	protected final Settings					settings					= Settings.getInstance();
 
-	// record fields
-	//
-	// this variables are used to make a record selfcontained within compare set
-	String														channelConfigKey;														// used as channelConfigKey
-	String														keyName;
 	/**
 	 * for each measurement point in compare set, where time step of measurement points might be individual
 	 */
@@ -107,7 +99,6 @@ public abstract class CommonRecord extends AbstractRecord {
 		this.symbol = newSymbol;
 		this.unit = newUnit;
 		this.isActive = isActiveValue;
-		this.isDisplayable = isActiveValue ? true : false;
 		this.statistics = newStatistic;
 
 		this.initializeProperties(this, newProperties);
@@ -341,13 +332,6 @@ public abstract class CommonRecord extends AbstractRecord {
 
 	public abstract int getSyncMinValue();
 
-	@Override
-	public void setSyncMinMax(int newMin, int newMax) {
-		this.syncMinValue = newMin;
-		this.syncMaxValue = newMax;
-		log.finer(() -> getName() + " syncMinValue=" + newMin + " syncMaxValue=" + newMax);
-	}
-
 	public int getRealMaxValue() {
 		return this.maxValue;
 	}
@@ -395,111 +379,8 @@ public abstract class CommonRecord extends AbstractRecord {
 	}
 
 	@Override
-	public boolean isVisible() {
-		return this.isVisible;
-	}
-
-	@Override
-	public void setVisible(boolean enabled) {
-		this.isVisible = enabled;
-	}
-
-	@Override
-	public boolean isPositionLeft() {
-		return this.isPositionLeft;
-	}
-
-	@Override
-	public void setPositionLeft(boolean enabled) {
-		this.isPositionLeft = enabled;
-	}
-
-	@Override
-	public Color getColor() {
-		return this.color;
-	}
-
-	public String getRGB() {
-		return String.format("%d, %d,%d", this.color.getRed(), this.color.getGreen(), this.color.getBlue());
-	}
-
-	@Override
-	public void setColor(Color newColor) {
-		this.color = newColor;
-	}
-
-	@Override
-	public abstract boolean isRoundOut();
-
-	@Override
-	public abstract void setRoundOut(boolean enabled);
-
-	@Override
-	public abstract boolean isStartpointZero();
-
-	@Override
-	public abstract void setStartpointZero(boolean enabled);
-
-	@Override
-	public abstract boolean isStartEndDefined();
-
-	/**
-	 * sets the min-max values as displayed 4.0 - 200.5
-	 * @param enabled
-	 * @param newMinScaleValue
-	 * @param newMaxScaleValue
-	 */
-	@Override
-	public abstract void setStartEndDefined(boolean enabled, double newMinScaleValue, double newMaxScaleValue);
-
-	public abstract void setMinMaxScaleValue(double newMinScaleValue, double newMaxScaleValue);
-
-	@Override
-	public int getLineWidth() {
-		return this.lineWidth;
-	}
-
-	@Override
-	public void setLineWidth(int newLineWidth) {
-		this.lineWidth = newLineWidth;
-	}
-
-	@Override
-	public int getLineStyle() {
-		return this.lineStyle;
-	}
-
-	@Override
-	public void setLineStyle(int newLineStyle) {
-		this.lineStyle = newLineStyle;
-	}
-
-	@Override
-	public int getNumberFormat() {
-		return this.numberFormat;
-	}
-
-	@Override
-	public abstract void setNumberFormat(int newNumberFormat);
-
-	@Override
 	public AbstractRecordSet getAbstractParent() {
 		return this.parent;
-	}
-
-	/**
-	 * @return the isDisplayable
-	 */
-	@Override
-	public boolean isDisplayable() {
-		return this.isDisplayable;
-	}
-
-	/**
-	 * @param enabled the isDisplayable to set
-	 */
-	public void setDisplayable(boolean enabled) {
-		this.isDisplayable = enabled;
 	}
 
 	/**
@@ -591,30 +472,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	}
 
 	/**
-	 * @return the decimal format used by this record
-	 */
-	public DecimalFormat getDecimalFormat() {
-		if (this.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, this.isScaleSynced() + " - " + this.getAbstractParent().getSyncMasterRecordOrdinal(getName()));
-		return this.isScaleSynced() ? this.getAbstractParent().get(this.getAbstractParent().getSyncMasterRecordOrdinal(getName())).getRealDf() : this.df;
-	}
-
-	/**
-	 * @return the keyName
-	 */
-	public String getKeyName() {
-		return this.keyName;
-	}
-
-	/**
-	 * @param newKeyName the keyName to set
-	 */
-	public void setKeyName(String newKeyName) {
-		this.keyName = newKeyName;
-	}
-
-	/**
 	 * get the device to calculate or retrieve measurement properties, this property is hold local to be independent
 	 * @return the device
 	 */
@@ -632,64 +489,11 @@ public abstract class CommonRecord extends AbstractRecord {
 	public abstract String getFormattedScaleValue(double finalValue);
 
 	/**
-	 * @return the displayScaleFactorValue
-	 */
-	public double getDisplayScaleFactorValue() {
-		return this.displayScaleFactorValue;
-	}
-
-	/**
-	 * @param drawAreaHeight - used to calculate the displayScaleFactorValue to set
-	 */
-	public void setDisplayScaleFactorValue(int drawAreaHeight) {
-		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		AbstractRecordSet abstractParent = this.getAbstractParent();
-		if (abstractParent.isOneOfSyncableRecord(getName()) && this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(getName())).getFactor() != 1) {
-			this.syncMasterFactor = this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(getName())).getFactor();
-			this.displayScaleFactorValue = this.displayScaleFactorValue * this.syncMasterFactor;
-		}
-		if (log.isLoggable(Level.FINER))
-			log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", //$NON-NLS-1$
-					drawAreaHeight, this.displayScaleFactorValue, (this.maxDisplayValue - this.minDisplayValue)));
-
-	}
-
-	/**
 	 * Set the values in all synced records.
 	 * @param newMinValue is the minimum record point divided by 1000
 	 * @param newMaxValue is the maximum record point divided by 1000
 	 */
 	public abstract void setSyncedMinMaxDisplayValues(double newMinValue, double newMaxValue);
-
-	/**
-	 * @return the minDisplayValue
-	 */
-	public double getMinDisplayValue() {
-		return this.minDisplayValue;
-	}
-
-	/**
-	 * @return the maxDisplayValue
-	 */
-	public double getMaxDisplayValue() {
-		return this.maxDisplayValue;
-	}
-
-	/**
-	 * @return the parentName
-	 */
-	public String getChannelConfigKey() {
-		if (this.channelConfigKey == null || this.channelConfigKey.length() < 1) this.channelConfigKey = this.parent.getChannelConfigName();
-
-		return this.channelConfigKey;
-	}
-
-	/**
-	 * @param newChannelConfigKey the channelConfigKey to set
-	 */
-	public void setChannelConfigKey(String newChannelConfigKey) {
-		this.channelConfigKey = newChannelConfigKey;
-	}
 
 	/**
 	 * reset the min-max-values to enable new settings after re-calculation
@@ -707,22 +511,6 @@ public abstract class CommonRecord extends AbstractRecord {
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "setMinMax :  " + newMin + "," + newMax); //$NON-NLS-1$ //$NON-NLS-2$
 		this.maxValue = newMax;
 		this.minValue = newMin;
-	}
-
-	/**
-	 * @return the numberScaleTicks
-	 */
-	@Override
-	public int getNumberScaleTicks() {
-		return this.numberScaleTicks;
-	}
-
-	/**
-	 * @param newNumberScaleTicks the numberScaleTicks to set
-	 */
-	@Override
-	public void setNumberScaleTicks(int newNumberScaleTicks) {
-		this.numberScaleTicks = newNumberScaleTicks;
 	}
 
 	/**
@@ -798,17 +586,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	 */
 	public boolean isScaleSyncMaster() {
 		return this.getAbstractParent().scaleSyncedRecords.containsKey(this.ordinal);
-	}
-
-	/**
-	 * @return true if the record is the scale sync master
-	 */
-	@Override
-	public boolean isScaleVisible() {
-		if (log.isLoggable(Level.FINER))
-			log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.getAbstractParent().isOneOfSyncableRecord(getName()));
-		return isScaleSyncMaster() ? this.getAbstractParent().isOneSyncableVisible(this.ordinal)
-				: !this.getAbstractParent().isOneOfSyncableRecord(getName()) && this.isVisible && this.isDisplayable;
 	}
 
 	/**

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
@@ -38,6 +39,7 @@ import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.AbstractRecordSet;
 import gde.data.CommonRecord;
 import gde.data.Record.DataType;
 import gde.device.IChannelItem;
@@ -551,25 +553,10 @@ public abstract class TrailRecord extends CommonRecord {
 		return template.minScaleValue;
 	}
 
-	@Override
 	public void setMinMaxScaleValue(double minScaleValue, double maxScaleValue) {
 		template.minScaleValue = minScaleValue;
 		template.maxScaleValue = maxScaleValue;
 		log.fine(() -> getName() + " minScaleValue = " + minScaleValue + "; maxScaleValue = " + minScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	@Override
-	public void setSyncedMinMaxDisplayValues(double newMinValue, double newMaxValue) {
-		graphics.minDisplayValue = HistoSet.decodeVaultValue(this, newMinValue);
-		graphics.maxDisplayValue = HistoSet.decodeVaultValue(this, newMaxValue);
-
-		if (this.getParent().isOneOfSyncableRecord(this.name)) {
-			for (TrailRecord record : this.getParent().getScaleSyncedRecords(this.getParent().getSyncMasterRecordOrdinal(this.name))) {
-				record.graphics.minDisplayValue = graphics.minDisplayValue;
-				record.graphics.maxDisplayValue = graphics.maxDisplayValue;
-			}
-		}
-		log.fine(getName() + getName() + " yMinValue = " + newMinValue + "; yMaxValue = " + newMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -604,7 +591,10 @@ public abstract class TrailRecord extends CommonRecord {
 	 */
 	@Override // reason are the histo display settings which hide records
 	public boolean isScaleVisible() {
-		return super.isScaleVisible();
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, this.name + " isScaleSyncMaster=" + isScaleSyncMaster() + " isOneOfSyncableRecord=" + this.getAbstractParent().isOneOfSyncableRecord(getName()));
+		return isScaleSyncMaster() ? this.getAbstractParent().isOneSyncableVisible(this.ordinal)
+				: !this.getAbstractParent().isOneOfSyncableRecord(getName()) && template.isVisible && graphics.isDisplayable;
 	}
 
 	@Override
@@ -614,9 +604,68 @@ public abstract class TrailRecord extends CommonRecord {
 // return this.parent.timeStep_ms.getTime_ms(index);
 	}
 
-	@Override
 	public double getDisplayScaleFactorValue() {
 		return graphics.displayScaleFactorValue;
+	}
+
+	/**
+	 * @param drawAreaHeight - used to calculate the displayScaleFactorValue to set
+	 */
+	public void setDisplayScaleFactorValue(int drawAreaHeight) {
+		graphics.displayScaleFactorValue = (1.0 * drawAreaHeight) / (graphics.maxDisplayValue - graphics.minDisplayValue);
+		AbstractRecordSet abstractParent = this.getAbstractParent();
+		if (abstractParent.isOneOfSyncableRecord(getName()) && this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(getName())).getFactor() != 1) {
+			graphics.syncMasterFactor = this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(getName())).getFactor();
+			graphics.displayScaleFactorValue = graphics.displayScaleFactorValue * graphics.syncMasterFactor;
+		}
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", //$NON-NLS-1$
+					drawAreaHeight, graphics.displayScaleFactorValue, (graphics.maxDisplayValue - graphics.minDisplayValue)));
+
+	}
+
+	@Override
+	public void setSyncedMinMaxDisplayValues(double newMinValue, double newMaxValue) {
+		graphics.minDisplayValue = HistoSet.decodeVaultValue(this, newMinValue);
+		graphics.maxDisplayValue = HistoSet.decodeVaultValue(this, newMaxValue);
+
+		if (this.getParent().isOneOfSyncableRecord(this.name)) {
+			for (TrailRecord record : this.getParent().getScaleSyncedRecords(this.getParent().getSyncMasterRecordOrdinal(this.name))) {
+				record.graphics.minDisplayValue = graphics.minDisplayValue;
+				record.graphics.maxDisplayValue = graphics.maxDisplayValue;
+			}
+		}
+		log.fine(getName() + getName() + " yMinValue = " + newMinValue + "; yMaxValue = " + newMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	/**
+	 * @return the minDisplayValue
+	 */
+	public double getMinDisplayValue() {
+		return graphics.minDisplayValue;
+	}
+
+	/**
+	 * @return the maxDisplayValue
+	 */
+	public double getMaxDisplayValue() {
+		return graphics.maxDisplayValue;
+	}
+
+	/**
+	 * @return the numberScaleTicks
+	 */
+	@Override
+	public int getNumberScaleTicks() {
+		return graphics.numberScaleTicks;
+	}
+
+	/**
+	 * @param newNumberScaleTicks the numberScaleTicks to set
+	 */
+	@Override
+	public void setNumberScaleTicks(int newNumberScaleTicks) {
+		graphics.numberScaleTicks = newNumberScaleTicks;
 	}
 
 	public int[] getNumberTickMarks() {
@@ -647,6 +696,13 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	@Override
+	public void setSyncMinMax(int newMin, int newMax) {
+		graphics.syncMinValue = newMin;
+		graphics.syncMaxValue = newMax;
+		log.finer(() -> getName() + " syncMinValue=" + newMin + " syncMaxValue=" + newMax);
+	}
+
+	@Override
 	public int getSyncMinValue() {
 		return graphics.syncMinValue == graphics.syncMaxValue ? graphics.syncMinValue - 100 : graphics.syncMinValue;
 	}
@@ -662,6 +718,18 @@ public abstract class TrailRecord extends CommonRecord {
 
 	public GraphicsTemplate getTemplate() {
 		return this.template;
+	}
+
+	/**
+	 * Update the displayable record information in this record set.
+	 */
+	public void setDisplayable() {
+		this.graphics.isDisplayable = isActive() && isAllowedBySetting() && hasReasonableData();
+	}
+
+	@Override
+	public boolean isDisplayable() {
+		return graphics.isDisplayable;
 	}
 
 	@Override
@@ -689,9 +757,8 @@ public abstract class TrailRecord extends CommonRecord {
 		return this.template.color;
 	}
 
-	@Override
 	public String getRGB() {
-		return String.format("%d, %d,%d", this.template.color.getRed(), this.template.color.getGreen(), this.template.color.getBlue());
+		return this.template.color.getRed() + GDE.STRING_CSV_SEPARATOR + this.template.color.getGreen() + GDE.STRING_CSV_SEPARATOR + this.template.color.getBlue();
 	}
 
 	@Override
@@ -899,6 +966,17 @@ public abstract class TrailRecord extends CommonRecord {
 	@Override
 	public void setRealDf(DecimalFormat realDf) {
 		template.df = realDf;
+	}
+
+	/**
+	 * @return the decimal format used by this record
+	 */
+	public DecimalFormat getDecimalFormat() {
+		if (template.numberFormat == -1) this.setNumberFormat(-1); // update the number format to actual automatic formating
+		if (log.isLoggable(Level.FINE))
+			log.log(Level.FINE, this.isScaleSynced() + " - " + this.getAbstractParent().getSyncMasterRecordOrdinal(getName()));
+		return this.isScaleSynced() ? this.getAbstractParent().get(this.getAbstractParent().getSyncMasterRecordOrdinal(getName())).getRealDf()
+				: template.df;
 	}
 
 	public void setColorDefaultsAndPosition(int recordOrdinal) {
