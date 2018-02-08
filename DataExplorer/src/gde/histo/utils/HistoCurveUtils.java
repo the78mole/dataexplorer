@@ -39,6 +39,8 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.AbstractRecordSet;
+import gde.data.RecordSet;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.PointArray;
@@ -52,10 +54,12 @@ import gde.histo.ui.SummaryComposite.Summary;
 import gde.histo.ui.data.SummarySpots;
 import gde.histo.ui.data.SummarySpots.OutlierWarning;
 import gde.histo.utils.HistoTimeLine.Density;
+import gde.log.Level;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.GraphicsUtils;
+import gde.utils.MathUtils;
 
 /**
  * Draw curves.
@@ -436,8 +440,7 @@ public final class HistoCurveUtils {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); // xPos = x0
 			log.fine(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); // yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			int[] numberTickMarks = record.getNumberTickMarks();
-			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, record.getMinScaleValue(), record.getMaxScaleValue(), ticklength, numberTickMarks[1], gap, isPositionLeft, numberTickMarks[0], isDrawNumbersInRecordColor);
+			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, record.getMinScaleValue(), record.getMaxScaleValue(), ticklength, gap, isPositionLeft, isDrawNumbersInRecordColor);
 			log.finest(() -> "drawText x = " + (xPos - pt.y - 15)); // xPosition Text Spannung [] //$NON-NLS-1$
 			if (isDrawNameInRecordColor)
 				gc.setForeground(record.getColor());
@@ -447,15 +450,122 @@ public final class HistoCurveUtils {
 		} else {
 			int xPos = x0 + 1 + width + positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); // yMax
-			log.off(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); // yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			int[] numberTickMarks = record.getNumberTickMarks();
-			log.off(() -> record.getName() + " numberTickMarks=" + Arrays.toString(numberTickMarks));
-			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, record.getMinScaleValue(), record.getMaxScaleValue(), ticklength, numberTickMarks[1], gap, isPositionLeft, numberTickMarks[0], isDrawNumbersInRecordColor);
+			log.fine(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height));
+			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, record.getMinScaleValue(), record.getMaxScaleValue(), ticklength, gap, isPositionLeft, isDrawNumbersInRecordColor);
 			if (isDrawNameInRecordColor)
 				gc.setForeground(record.getColor());
 			else
 				gc.setForeground(DataExplorer.COLOR_BLACK);
 			GraphicsUtils.drawTextCentered(graphText, (xPos + scaleWidthSpace - pt.y - 5), y0 / 2 + (y0 - height), gc, SWT.UP);
+		}
+	}
+
+	/**
+	 * draws tick marks to a scale in vertical direction (plus 90 degrees)
+	 * @param record
+	 * @param gc graphics context
+	 * @param y0 start point in y horizontal direction
+	 * @param x0 start point in x vertical direction
+	 * @param height in points where the ticks should be drawn
+	 * @param minValue the number where the scale should start to count
+	 * @param maxValue the number where the scale should start to count, endNumber - startNumber -> number of ticks drawn
+	 * @param ticklength of the main ticks
+	 * @param gap distance between ticks and the number scale
+	 * @param isPositionLeft position of to be drawn scale
+	 * @param isDrawNumbersInRecordColor
+	 */
+	private static void drawVerticalTickMarks(TrailRecord record, GC gc, int x0, int y0, int height, double minValue, double maxValue, //
+			int ticklength, int gap, boolean isPositionLeft, boolean isDrawNumbersInRecordColor) {
+		gc.setForeground(DataExplorer.COLOR_BLACK);
+
+		final int yTop = y0 - height + 1;
+		final double deltaScale = (maxValue - minValue);
+		final int numberTicks, miniticks;
+		final double deltaScaleValue, minScaleValue, maxScaleValue;
+		{
+			int maxNumberTicks = height / 25 >= 2 ? height / 25 : 1;
+			Object[] roundResult = MathUtils.adaptRounding(minValue, maxValue, true, maxNumberTicks);
+			if (record.isStartEndDefined()) {
+				minScaleValue = minValue;
+				maxScaleValue = maxValue;
+				numberTicks = (Integer) roundResult[2];
+				miniticks = (Integer) roundResult[3];
+				deltaScaleValue = (maxScaleValue - minScaleValue);
+			} else {
+				minScaleValue = (Double) roundResult[0];
+				maxScaleValue = (Double) roundResult[1];
+				numberTicks = (Integer) roundResult[2];
+				miniticks = (Integer) roundResult[3];
+				deltaScaleValue = (maxScaleValue - minScaleValue);
+			}
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, String.format("deltaScaleValue = %10.6f - deltaScale = %10.6f", deltaScaleValue, deltaScale));
+		}
+		// prepare grid vector
+		Vector<Integer> horizontalGrid = new Vector<Integer>();
+		AbstractRecordSet recordSet = record.getAbstractParent();
+		boolean isBuildGridVector = recordSet.getValueGridType() != RecordSet.VALUE_GRID_NONE && recordSet.getValueGridRecordOrdinal() == record.getOrdinal();
+
+		int dist = 10;
+		if (!isPositionLeft) {
+			ticklength = ticklength * -1; // mirror drawing direction
+			gap = gap * -1;
+			dist = dist * -1;
+		}
+
+		gc.setLineWidth(1);
+		if (numberTicks > 1) {
+			double deltaMainTickValue = deltaScaleValue / numberTicks; // deltaScale / numberTicks;
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, String.format("minScaleValue = %10.6f; maxScaleValue = %10.6f; deltaMainTickValue = %10.6f", minScaleValue, maxScaleValue, deltaMainTickValue));
+			double deltaMainTickPixel = deltaScaleValue / deltaScale * height / numberTicks; // height / numberTicks;
+			double deltaPosMini = deltaMainTickPixel / miniticks;
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("numberTicks = %d; deltaMainTickPixel = %10.6f; deltaPosMini = %10.6f", numberTicks, deltaMainTickPixel, deltaPosMini));
+			// draw mini ticks below first main tick
+			double yTickPositionMin = y0 - (Math.abs(minScaleValue - minValue) * (height / deltaScale)); //new Double(y0 - i * deltaMainTickPixel).intValue();
+			for (int j = 1; j < miniticks; j++) {
+				int yPosMini = (int) (yTickPositionMin + (j * deltaPosMini));
+				if (yPosMini >= y0) break;
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "yTickPosition=" + yTickPositionMin + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
+				gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
+			}
+			// draw main ticks and mini ticks
+			for (int i = 0; i <= numberTicks; i++) {
+				// draw the main scale, length = 5 and gap to scale = 2
+				int yTickPosition = (int) (yTickPositionMin - i * deltaMainTickPixel);
+				gc.drawLine(x0, yTickPosition, x0 - ticklength, yTickPosition);
+				if (isBuildGridVector) horizontalGrid.add(yTickPosition);
+				// draw the sub scale according number of miniTicks
+				for (int j = 1; j < miniticks && i < numberTicks; j++) {
+					int yPosMini = yTickPosition - (int) (j * deltaPosMini);
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "yTickPosition=" + yTickPosition + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
+					gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
+				}
+				// draw numbers to the scale
+				if (isDrawNumbersInRecordColor) gc.setForeground(record.getColor());
+				else gc.setForeground(DataExplorer.COLOR_BLACK);
+				GraphicsUtils.drawTextCentered(record.getFormattedScaleValue(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
+				gc.setForeground(DataExplorer.COLOR_BLACK);
+			}
+			// draw mini ticks above first main tick
+			double yTickPositionMax = yTickPositionMin - numberTicks * deltaMainTickPixel;
+			for (double j = 1; j < miniticks; j++) {
+				int yPosMini = (int) (yTickPositionMax - (j * deltaPosMini));
+				if (yPosMini < yTop - 1) break;
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "yTickPosition=" + yTickPositionMax + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
+				gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
+			}
+		}
+		else {
+			int yTickPosition = (int) (y0 - height / 2.0);
+			gc.drawLine(x0, yTickPosition, x0 - ticklength, yTickPosition);
+			if (isDrawNumbersInRecordColor) gc.setForeground(record.getColor());
+			else gc.setForeground(DataExplorer.COLOR_BLACK);
+			GraphicsUtils.drawTextCentered(record.getFormattedScaleValue((minScaleValue + minScaleValue) / 2.0), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
+			if (isBuildGridVector) horizontalGrid.add(yTickPosition);
+		}
+		if (isBuildGridVector) {
+			recordSet.setValueGrid(horizontalGrid);
 		}
 	}
 

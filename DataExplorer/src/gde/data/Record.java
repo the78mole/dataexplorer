@@ -2165,7 +2165,6 @@ public class Record extends AbstractRecord {
 	/**
 	 * @return the numberScaleTicks
 	 */
-	@Override
 	public int getNumberScaleTicks() {
 		return this.numberScaleTicks;
 	}
@@ -2173,7 +2172,6 @@ public class Record extends AbstractRecord {
 	/**
 	 * @param newNumberScaleTicks the numberScaleTicks to set
 	 */
-	@Override
 	public void setNumberScaleTicks(int newNumberScaleTicks) {
 		this.numberScaleTicks = newNumberScaleTicks;
 	}
