@@ -116,10 +116,6 @@ public abstract class AbstractRecord extends Vector<Integer> {
 	 */
 	public abstract String getFormattedScaleValue(double finalValue);
 
-	public abstract int getNumberScaleTicks();
-
-	public abstract void setNumberScaleTicks(int newNumberScaleTicks);
-
 	/**
 	 * @return true if the record is the scale sync master and is visible
 	 */
@@ -140,7 +136,5 @@ public abstract class AbstractRecord extends Vector<Integer> {
 	 * @return the ordinal number of the sync master record or -1 if the record scale is not synchronized
 	 */
 	public abstract int getSyncMasterRecordOrdinal();
-
-	public abstract void setSyncMinMax(int newMin, int newMax);
 
 }

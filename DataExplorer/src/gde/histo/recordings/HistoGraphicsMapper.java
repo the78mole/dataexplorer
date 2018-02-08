@@ -26,6 +26,7 @@ import java.util.List;
 import org.eclipse.swt.graphics.Point;
 
 import gde.histo.datasources.HistoSet;
+import gde.histo.ui.GraphicsComposite.Graphics;
 import gde.histo.utils.HistoTimeLine;
 import gde.log.Logger;
 
@@ -41,32 +42,34 @@ public final class HistoGraphicsMapper {
 	 * Query the values for display.
 	 * @return the display point x axis value and multiple y axis values; null if the trail record value is null
 	 */
-	public static List<PointArray> getSuiteDisplayPoints(TrailRecord trailRecord, HistoTimeLine timeLine) {
+	public static List<PointArray> getSuiteDisplayPoints(Graphics graphics, HistoTimeLine timeLine) {
 		List<PointArray> suitePoints = new ArrayList<>();
+		TrailRecord trailRecord = graphics.getTrailRecord();
 		int firstOrdinal = trailRecord.getTrailSelector().getTrailType().getSuiteMasterIndex();
 		for (int i = 0; i < timeLine.getScalePositions().size(); i++) {
 			if (trailRecord.getSuiteRecords().getSuiteValue(firstOrdinal, i) != null)
-				suitePoints.add(getSuiteDisplayPoints(trailRecord, timeLine, i));
+				suitePoints.add(getSuiteDisplayPoints(graphics, timeLine, i));
 			else
 				suitePoints.add(null);
 		}
 		return suitePoints;
 	}
 
-	private static PointArray getSuiteDisplayPoints(TrailRecord trailRecord, HistoTimeLine timeLine, int index) {
+	private static PointArray getSuiteDisplayPoints(Graphics graphics, HistoTimeLine timeLine, int index) {
 		int x0 = timeLine.getCurveAreaBounds().x;
 		int y0 = timeLine.getCurveAreaBounds().height + timeLine.getCurveAreaBounds().y;
+		TrailRecord trailRecord = graphics.getTrailRecord();
 		int suiteSize = trailRecord.getTrailSelector().getTrailType().getSuiteMembers().size();
 		PointArray pointArray = new PointArray(suiteSize);
 		pointArray.setX(x0 + timeLine.getScalePositions().get((long) trailRecord.getParent().getTime_ms(index)));
 
-		double yOffset = getYOffset(trailRecord);
+		double yOffset = getYOffset(graphics);
 		SuiteRecords suiteRecords = trailRecord.getSuiteRecords();
 		for (int j = 0; j < suiteSize; j++) {
 			Integer value = suiteRecords.getSuiteValue(j, index);
 			if (value != null) {
 				double decodedValue = HistoSet.decodeVaultValue(trailRecord, value / 1000.0);
-				pointArray.setY(j, y0 - (int) ((decodedValue - yOffset) * trailRecord.getDisplayScaleFactorValue()));
+				pointArray.setY(j, y0 - (int) ((decodedValue - yOffset) * graphics.getDisplayScaleFactorValue()));
 			}
 		}
 		log.finer(() -> pointArray.toString());
@@ -78,18 +81,19 @@ public final class HistoGraphicsMapper {
 	 * @param timeLine
 	 * @return point time, value; null if the trail record value is null
 	 */
-	public static Point[] getDisplayPoints(TrailRecord trailRecord, HistoTimeLine timeLine) {
+	public static Point[] getDisplayPoints(Graphics graphics, HistoTimeLine timeLine) {
+		TrailRecord trailRecord = graphics.getTrailRecord();
 		int x0 = timeLine.getCurveAreaBounds().x;
 		int y0 = timeLine.getCurveAreaBounds().height + timeLine.getCurveAreaBounds().y;
 
-		double yOffset = getYOffset(trailRecord);
+		double yOffset = getYOffset(graphics);
 		Point[] points = new Point[trailRecord.realSize()];
 		for (int i = 0; i < trailRecord.realSize(); i++) {
 			Integer value = trailRecord.elementAt(i);
 			if (value != null) {
 				double decodedValue = HistoSet.decodeVaultValue(trailRecord, value / 1000.0);
 				points[i] = new Point(x0 + timeLine.getScalePositions().get((long) trailRecord.getParent().getTime_ms(i)),
-						y0 - (int) ((decodedValue - yOffset) * trailRecord.getDisplayScaleFactorValue()));
+						y0 - (int) ((decodedValue - yOffset) * graphics.getDisplayScaleFactorValue()));
 			}
 		}
 		log.finer(() -> Arrays.toString(points));
@@ -100,25 +104,27 @@ public final class HistoGraphicsMapper {
 	 * @param index
 	 * @return yPos in pixel (with top@0 and bottom@drawAreaBounds.height) or Integer.MIN_VALUE if the index value is null
 	 */
-	public static int getVerticalDisplayPos(TrailRecord trailRecord, int height, int index) {
+	public static int getVerticalDisplayPos(Graphics graphics, int height, int index) {
 		int verticalDisplayPos = Integer.MIN_VALUE;
-		Integer value = trailRecord.getPoints().elementAt(index);
+		TrailRecord record = graphics.getTrailRecord();
+		Integer value = record.getPoints().elementAt(index);
 		if (value != null) {
-			double decodedValue = HistoSet.decodeVaultValue(trailRecord, value / 1000.0);
-			verticalDisplayPos = height - (int) ((decodedValue - getYOffset(trailRecord)) * trailRecord.getDisplayScaleFactorValue());
+			double decodedValue = HistoSet.decodeVaultValue(record, value / 1000.0);
+			verticalDisplayPos = height - (int) ((decodedValue - getYOffset(graphics)) * graphics.getDisplayScaleFactorValue());
 		}
 		return verticalDisplayPos;
 	}
 
-	public static int getVerticalDisplayPos(TrailRecord trailRecord, int height, double decodedValue) {
+	public static int getVerticalDisplayPos(Graphics graphics, int height, double decodedValue) {
 		int verticalDisplayPos;
-		verticalDisplayPos = height - (int) ((decodedValue - getYOffset(trailRecord)) * trailRecord.getDisplayScaleFactorValue());
+		TrailRecord record = graphics.getTrailRecord();
+		verticalDisplayPos = height - (int) ((decodedValue - getYOffset(graphics)) * graphics.getDisplayScaleFactorValue());
 		log.finer(() -> String.format("translatedValue=%f yPos=%d", decodedValue, verticalDisplayPos)); //$NON-NLS-1$
 		return verticalDisplayPos;
 	}
 
-	private static double getYOffset(TrailRecord trailRecord) {
-		return trailRecord.getMinDisplayValue() * 1 / trailRecord.getSyncMasterFactor();
+	private static double getYOffset(Graphics graphics) {
+		return graphics.getMinDisplayValue() * 1 / graphics.getSyncMasterFactor();
 	}
 
 }

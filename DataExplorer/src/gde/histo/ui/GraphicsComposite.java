@@ -25,10 +25,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.eclipse.swt.SWT;
@@ -52,6 +55,7 @@ import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.AbstractRecordSet;
 import gde.data.Channels;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
@@ -79,7 +83,142 @@ public final class GraphicsComposite extends AbstractChartComposite {
 	private static final String	$CLASS_NAME	= GraphicsComposite.class.getName();
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private final HistoTimeLine	timeLine		= new HistoTimeLine();
+	/**
+	 * Data for the life cycle of a graphics composite drawing.
+	 */
+	public static final class Graphics implements IChartData {
+
+		private final TrailRecord				trailRecord;
+		private final GraphicsComposite	parent;
+
+		// synchronize
+		protected int										syncMaxValue			= Integer.MAX_VALUE;	// max value of the curve if synced
+		protected int										syncMinValue			= Integer.MIN_VALUE;	// min value of the curve if synced
+
+		// display the record
+		double													displayScaleFactorTime;
+		protected double								displayScaleFactorValue;
+		protected double								syncMasterFactor	= 1.0;								// synchronized scale and different measurement factors
+		protected double								minDisplayValue;												// min value in device units, correspond to draw area
+		protected double								maxDisplayValue;												// max value in device units, correspond to draw area
+
+		int															numberScaleTicks	= 0;
+
+		private int[]										numberTickMarks;
+
+		public Graphics(TrailRecord trailRecord, GraphicsComposite parent) {
+			this.trailRecord = trailRecord;
+			this.parent = parent;
+		}
+
+		public double getDisplayScaleFactorValue() {
+			return this.displayScaleFactorValue;
+		}
+
+		/**
+		 * @param drawAreaHeight - used to calculate the displayScaleFactorValue to set
+		 */
+		public void setDisplayScaleFactorValue(int drawAreaHeight) {
+			displayScaleFactorValue = (1.0 * drawAreaHeight) / (maxDisplayValue - minDisplayValue);
+			AbstractRecordSet abstractParent = trailRecord.getAbstractParent();
+			if (abstractParent.isOneOfSyncableRecord(trailRecord.getName()) && trailRecord.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(trailRecord.getName())).getFactor() != 1) {
+				syncMasterFactor = trailRecord.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(trailRecord.getName())).getFactor();
+				displayScaleFactorValue = displayScaleFactorValue * syncMasterFactor;
+			}
+			if (log.isLoggable(Level.FINER))
+				log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", //$NON-NLS-1$
+						drawAreaHeight, displayScaleFactorValue, (maxDisplayValue - minDisplayValue)));
+
+		}
+
+		public double getMinDisplayValue() {
+			return this.minDisplayValue;
+		}
+
+		public double getMaxDisplayValue() {
+			return this.maxDisplayValue;
+		}
+
+		public int getNumberScaleTicks() {
+			return this.numberScaleTicks;
+		}
+
+		public void setNumberScaleTicks(int newNumberScaleTicks) {
+			this.numberScaleTicks = newNumberScaleTicks;
+		}
+
+		public int[] getNumberTickMarks() {
+			return this.numberTickMarks;
+		}
+
+		public void setNumberTickMarks(int[] numberTickMarks) {
+			this.numberTickMarks = numberTickMarks;
+		}
+
+		public void setSyncedMinMaxDisplayValues(double newMinValue, double newMaxValue) {
+			this.minDisplayValue = HistoSet.decodeVaultValue(trailRecord, newMinValue);
+			this.maxDisplayValue = HistoSet.decodeVaultValue(trailRecord, newMaxValue);
+
+			TrailRecordSet trailRecordset = trailRecord.getParent();
+			if (trailRecordset.isOneOfSyncableRecord(trailRecord.getName())) {
+				for (TrailRecord record : trailRecordset.getScaleSyncedRecords(trailRecordset.getSyncMasterRecordOrdinal(trailRecord.getName()))) {
+					parent.getGraphics(record).minDisplayValue = this.minDisplayValue;
+					parent.getGraphics(record).maxDisplayValue = this.maxDisplayValue;
+				}
+			}
+			log.fine(trailRecord.getName() + " yMinValue = " + newMinValue + "; yMaxValue = " + newMaxValue);
+		}
+
+		/**
+		 * Take the current max/minValues form this record and recalculate the synced max/minValues.
+		 * Support suites.
+		 */
+		public void setSyncMaxMinValue() {
+			if (trailRecord.getTrailSelector().isTrailSuite()) {
+				int suiteMaxValue = trailRecord.getSuiteRecords().getSuiteMaxValue();
+				int suiteMinValue = trailRecord.getSuiteRecords().getSuiteMinValue();
+				int tmpMaxValue = suiteMaxValue == suiteMinValue ? suiteMaxValue + 100 : suiteMaxValue;
+				int tmpMinValue = suiteMaxValue == suiteMinValue ? suiteMinValue - 100 : suiteMinValue;
+				this.syncMaxValue = (int) (tmpMaxValue * getSyncMasterFactor());
+				this.syncMinValue = (int) (tmpMinValue * getSyncMasterFactor());
+			} else {
+				this.syncMaxValue = (int) (trailRecord.getMaxValue() * getSyncMasterFactor());
+				this.syncMinValue = (int) (trailRecord.getMinValue() * getSyncMasterFactor());
+			}
+			log.finer(() -> trailRecord.getName() + "  syncMin = " + this.getSyncMinValue() + "; syncMax = " + this.getSyncMaxValue());
+		}
+
+		public void setSyncMinMax(int newMin, int newMax) {
+			if (newMin == Integer.MIN_VALUE && newMax == Integer.MAX_VALUE) return; // for compatibility with initSyncedScales
+			this.syncMinValue = newMin;
+			this.syncMaxValue = newMax;
+			log.finer(() -> trailRecord.getName() + " syncMinValue=" + newMin + " syncMaxValue=" + newMax);
+		}
+
+		public int getSyncMinValue() {
+			return this.syncMinValue == this.syncMaxValue ? this.syncMinValue - 100 : this.syncMinValue;
+		}
+
+		public int getSyncMaxValue() {
+			return this.syncMaxValue == this.syncMinValue ? this.syncMaxValue + 100 : this.syncMaxValue;
+		}
+
+		public double getSyncMasterFactor() {
+			return this.syncMasterFactor;
+		}
+
+		@Override
+		public TrailRecord getTrailRecord() {
+			return this.trailRecord;
+		}
+
+	}
+
+	private final HistoTimeLine					timeLine	= new HistoTimeLine();
+	/**
+	 * Key is the record name.
+	 */
+	private final Map<String, Graphics>	chartData	= new LinkedHashMap<>();
 
 	GraphicsComposite(SashForm useParent, CTabItem parentWindow) {
 		super(useParent, parentWindow, SWT.NONE);
@@ -364,11 +503,12 @@ public final class GraphicsComposite extends AbstractChartComposite {
 	protected void defineLayoutParams() {
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		this.timeLine.initialize(trailRecordSet, curveAreaBounds);
+		this.chartData.clear();
 		for (TrailRecord record : trailRecordSet.getValues()) {
-			record.resetGraphics();
+			this.chartData.put(record.getName(), new Graphics(record, this));
 		}
 		// sync scales are used for suites (e.g. boxplot) AND synced records
-		trailRecordSet.updateSyncGraphicsScale();
+		trailRecordSet.updateSyncGraphicsScale(this);
 		for (int i = 0; i < trailRecordSet.getRecordsSortedForDisplay().length; i++) {
 			TrailRecord actualRecord = trailRecordSet.getRecordsSortedForDisplay()[i];
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
@@ -399,7 +539,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 			if (isActualRecordEnabled) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
 					actualRecord.getName(), actualRecord.isVisible(), actualRecord.isDisplayable(), actualRecord.isScaleSynced(), actualRecord.isScaleVisible()));
 			if (actualRecord.isScaleVisible())
-				HistoCurveUtils.drawHistoScale(actualRecord, canvasImageGC, curveAreaBounds, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
+				HistoCurveUtils.drawHistoScale(getGraphics(actualRecord), canvasImageGC, curveAreaBounds, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
 
 			if (isCurveGridEnabled && actualRecord.getOrdinal() == trailRecordSet.getValueGridRecordOrdinal()) // check for activated horizontal grid
 				HistoCurveUtils.drawCurveGrid(trailRecordSet, canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
@@ -409,10 +549,10 @@ public final class GraphicsComposite extends AbstractChartComposite {
 				// gc.drawRectangle(x0, y0-height, width, height);
 				canvasImageGC.setClipping(curveAreaBounds.x - 1, curveAreaBounds.y - 1, curveAreaBounds.width + 2, curveAreaBounds.height + 2);
 				if (actualRecord.getTrailSelector().isTrailSuite()) {
-					HistoCurveUtils.drawHistoSuite(actualRecord, canvasImageGC, curveAreaBounds, timeLine);
+					HistoCurveUtils.drawHistoSuite(this.getGraphics(actualRecord), canvasImageGC, curveAreaBounds, timeLine);
 				} else {
 					// CurveUtils.drawCurve(actualRecord, gc, x0, y0, width, height, recordSet.isCompareSet());
-					HistoCurveUtils.drawHistoCurve(actualRecord, canvasImageGC, curveAreaBounds, timeLine);
+					HistoCurveUtils.drawHistoCurve(this.getGraphics(actualRecord), canvasImageGC, curveAreaBounds, timeLine);
 				}
 				canvasImageGC.setClipping(canvasBounds);
 			}
@@ -444,8 +584,8 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		int[] numberTickMarks = new int[] { 10, 5 };
 
 		// (yMaxValue - yMinValue) defines the area to be used for the curve
-		double yMaxValue = record.getSyncMaxValue() / 1000.0;
-		double yMinValue = record.getSyncMinValue() / 1000.0;
+		double yMaxValue = getGraphics(record).getSyncMaxValue() / 1000.0;
+		double yMinValue = getGraphics(record).getSyncMinValue() / 1000.0;
 		if (log.isLoggable(FINE)) log.log(FINE, "unmodified yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// yMinValueDisplay and yMaxValueDisplay used for scales and adapted values device and measure unit dependent
@@ -497,8 +637,8 @@ public final class GraphicsComposite extends AbstractChartComposite {
 			}
 		}
 		record.setMinMaxScaleValue(yMinValueDisplay, yMaxValueDisplay);
-		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
-		record.setNumberTickMarks(numberTickMarks);
+		getGraphics(record).setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
+		getGraphics(record).setNumberTickMarks(numberTickMarks);
 	}
 
 	@Override
@@ -516,10 +656,17 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		return this.timeLine;
 	}
 
+	public Map<String, Graphics> getChartData() {
+		return this.chartData;
+	}
+
 	@Override
 	public IChartData getChartData(TrailRecord trailRecord) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.chartData.get(trailRecord.getName());
+	}
+
+	public Graphics getGraphics(TrailRecord record) {
+		return this.chartData.get(record.getName());
 	}
 
 }

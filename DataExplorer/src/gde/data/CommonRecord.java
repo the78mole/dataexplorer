@@ -328,10 +328,6 @@ public abstract class CommonRecord extends AbstractRecord {
 
 	public abstract int getMinValue();
 
-	public abstract int getSyncMaxValue();
-
-	public abstract int getSyncMinValue();
-
 	public int getRealMaxValue() {
 		return this.maxValue;
 	}
@@ -405,18 +401,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	}
 
 	/**
-	 * @return the maxScaleValue
-	 */
-	@Override
-	public abstract double getMaxScaleValue();
-
-	/**
-	 * @return the minScaleValue
-	 */
-	@Override
-	public abstract double getMinScaleValue();
-
-	/**
 	 * return the number of milliseconds since January 1, 1970, 00:00:00 GMT represented by the start date time of this record (set)
 	 * @return time stamp of the date and time when the record starts
 	 */
@@ -487,13 +471,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	 */
 	@Override
 	public abstract String getFormattedScaleValue(double finalValue);
-
-	/**
-	 * Set the values in all synced records.
-	 * @param newMinValue is the minimum record point divided by 1000
-	 * @param newMaxValue is the maximum record point divided by 1000
-	 */
-	public abstract void setSyncedMinMaxDisplayValues(double newMinValue, double newMaxValue);
 
 	/**
 	 * reset the min-max-values to enable new settings after re-calculation

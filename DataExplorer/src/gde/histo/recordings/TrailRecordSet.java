@@ -66,7 +66,8 @@ import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.datasources.HistoSet;
 import gde.histo.gpslocations.GpsCluster;
 import gde.histo.recordings.TrailDataTags.DataTag;
-import gde.histo.recordings.TrailRecord.GraphicsTemplate;
+import gde.histo.recordings.TrailRecord.ChartTemplate;
+import gde.histo.ui.GraphicsComposite;
 import gde.histo.ui.HistoExplorer;
 import gde.histo.ui.HistoSummaryWindow;
 import gde.histo.ui.SummaryComposite.Summary;
@@ -198,7 +199,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		private void applyTemplateTrailData(TrailRecord record) {
 			TrailSelector trailSelector = record.getTrailSelector();
 			if (template != null && template.isAvailable()) {
-				String property = template.getProperty(record.getOrdinal() + GraphicsTemplate.TRAIL_TEXT_ORDINAL);
+				String property = template.getProperty(record.getOrdinal() + ChartTemplate.TRAIL_TEXT_ORDINAL);
 				if (property != null) {
 					int propertyValue = Integer.parseInt(property);
 					if (propertyValue >= 0 && propertyValue < trailSelector.getApplicableTrailsTexts().size()) {
@@ -788,11 +789,12 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Update referenced records to enable drawing of the curve, set min/max.
 	 * Set the sync max/min values for visible records inclusive referenced suite records.
 	 * Update the scale values from sync record if visible.
+	 * @param graphicsComposite
 	 */
-	public synchronized void updateSyncGraphicsScale() {
+	public synchronized void updateSyncGraphicsScale(GraphicsComposite graphicsComposite) {
 		for (TrailRecord actualRecord : getVisibleAndDisplayableRecords()) {
 			log.finer(() -> "set scale base value " + actualRecord.getName() + " isScaleSynced=" + actualRecord.isScaleSynced()); //$NON-NLS-1$
-			actualRecord.setSyncMaxMinValue();
+			graphicsComposite.getGraphics(actualRecord).setSyncMaxMinValue();
 		}
 
 		for (Map.Entry<Integer, Vector<TrailRecord>> syncRecordsEntry : this.getScaleSyncedRecords().entrySet()) {
@@ -802,8 +804,8 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
 				if (syncRecord.isVisible() && syncRecord.isDisplayable()) {
 					isAffected = true;
-					tmpMin = Math.min(tmpMin, syncRecord.getSyncMinValue());
-					tmpMax = Math.max(tmpMax, syncRecord.getSyncMaxValue());
+					tmpMin = Math.min(tmpMin, graphicsComposite.getGraphics(syncRecord).getSyncMinValue());
+					tmpMax = Math.max(tmpMax, graphicsComposite.getGraphics(syncRecord).getSyncMaxValue());
 					if (log.isLoggable(FINER)) log.log(FINER, syncRecord.getName() + " tmpMin  = " + tmpMin / 1000.0 + "; tmpMax  = " + tmpMax / 1000.0); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
@@ -971,21 +973,21 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	public void saveTemplate() {
 		for (int i = 0; i < this.size(); ++i) {
 			TrailRecord record = this.get(i);
-			GraphicsTemplate recordTemplate = record.getTemplate();
-			this.template.setProperty(i + GraphicsTemplate.IS_VISIBLE, String.valueOf(recordTemplate.isVisible));
-			this.template.setProperty(i + GraphicsTemplate.IS_POSITION_LEFT, String.valueOf(recordTemplate.isPositionLeft));
+			ChartTemplate recordTemplate = record.getTemplate();
+			this.template.setProperty(i + ChartTemplate.IS_VISIBLE, String.valueOf(recordTemplate.isVisible));
+			this.template.setProperty(i + ChartTemplate.IS_POSITION_LEFT, String.valueOf(recordTemplate.isPositionLeft));
 			Color color = recordTemplate.color;
-			this.template.setProperty(i + GraphicsTemplate.COLOR, color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue);
-			this.template.setProperty(i + GraphicsTemplate.LINE_WIDTH, String.valueOf(recordTemplate.lineWidth));
-			this.template.setProperty(i + GraphicsTemplate.LINE_STYLE, String.valueOf(recordTemplate.lineStyle));
-			this.template.setProperty(i + GraphicsTemplate.IS_ROUND_OUT, String.valueOf(recordTemplate.isRoundOut));
-			this.template.setProperty(i + GraphicsTemplate.IS_START_POINT_ZERO, String.valueOf(recordTemplate.isStartpointZero));
-			this.template.setProperty(i + GraphicsTemplate.NUMBER_FORMAT, String.valueOf(recordTemplate.numberFormat));
-			this.template.setProperty(i + GraphicsTemplate.IS_START_END_DEFINED, String.valueOf(recordTemplate.isStartEndDefined));
-			this.template.setProperty(i + GraphicsTemplate.DEFINED_MAX_VALUE, String.valueOf(recordTemplate.maxScaleValue));
-			this.template.setProperty(i + GraphicsTemplate.DEFINED_MIN_VALUE, String.valueOf(recordTemplate.minScaleValue));
+			this.template.setProperty(i + ChartTemplate.COLOR, color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue);
+			this.template.setProperty(i + ChartTemplate.LINE_WIDTH, String.valueOf(recordTemplate.lineWidth));
+			this.template.setProperty(i + ChartTemplate.LINE_STYLE, String.valueOf(recordTemplate.lineStyle));
+			this.template.setProperty(i + ChartTemplate.IS_ROUND_OUT, String.valueOf(recordTemplate.isRoundOut));
+			this.template.setProperty(i + ChartTemplate.IS_START_POINT_ZERO, String.valueOf(recordTemplate.isStartpointZero));
+			this.template.setProperty(i + ChartTemplate.NUMBER_FORMAT, String.valueOf(recordTemplate.numberFormat));
+			this.template.setProperty(i + ChartTemplate.IS_START_END_DEFINED, String.valueOf(recordTemplate.isStartEndDefined));
+			this.template.setProperty(i + ChartTemplate.DEFINED_MAX_VALUE, String.valueOf(recordTemplate.maxScaleValue));
+			this.template.setProperty(i + ChartTemplate.DEFINED_MIN_VALUE, String.valueOf(recordTemplate.minScaleValue));
 
-			this.template.setProperty(i + GraphicsTemplate.TRAIL_TEXT_ORDINAL, String.valueOf(record.getTrailSelector().getTrailTextSelectedIndex()));
+			this.template.setProperty(i + ChartTemplate.TRAIL_TEXT_ORDINAL, String.valueOf(record.getTrailSelector().getTrailTextSelectedIndex()));
 		}
 		int[] chartWeights = presentHistoExplorer.getHistoSummaryTabItem().getChartWeights();
 		for (int i = 0; i < chartWeights.length; i++) {
@@ -1004,23 +1006,23 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			boolean isHorizontalGridOrdinalSet = false;
 			for (int i = 0; i < this.size(); ++i) {
 				TrailRecord record = this.get(i);
-				GraphicsTemplate recordTemplate = record.getTemplate();
-				recordTemplate.isVisible = Boolean.parseBoolean(this.template.getProperty(i + GraphicsTemplate.IS_VISIBLE, "false"));
-				recordTemplate.isPositionLeft = Boolean.parseBoolean(this.template.getProperty(i + GraphicsTemplate.IS_POSITION_LEFT, "true"));
+				ChartTemplate recordTemplate = record.getTemplate();
+				recordTemplate.isVisible = Boolean.parseBoolean(this.template.getProperty(i + ChartTemplate.IS_VISIBLE, "false"));
+				recordTemplate.isPositionLeft = Boolean.parseBoolean(this.template.getProperty(i + ChartTemplate.IS_POSITION_LEFT, "true"));
 				int r, g, b;
-				String color = this.template.getProperty(i + GraphicsTemplate.COLOR, record.getRGB());
+				String color = this.template.getProperty(i + ChartTemplate.COLOR, record.getRGB());
 				r = Integer.parseInt(color.split(GDE.STRING_COMMA)[0].trim());
 				g = Integer.parseInt(color.split(GDE.STRING_COMMA)[1].trim());
 				b = Integer.parseInt(color.split(GDE.STRING_COMMA)[2].trim());
 				recordTemplate.color = SWTResourceManager.getColor(r, g, b);
-				recordTemplate.lineWidth = Integer.parseInt(this.template.getProperty(i + GraphicsTemplate.LINE_WIDTH, "1"));
-				recordTemplate.lineStyle = Integer.parseInt(this.template.getProperty(i + GraphicsTemplate.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID));
-				recordTemplate.isRoundOut = Boolean.parseBoolean(this.template.getProperty(i + GraphicsTemplate.IS_ROUND_OUT, "false"));
-				recordTemplate.isStartpointZero = Boolean.parseBoolean(this.template.getProperty(i + GraphicsTemplate.IS_START_POINT_ZERO, "false"));
-				record.setStartEndDefined(Boolean.parseBoolean(this.template.getProperty(i + GraphicsTemplate.IS_START_END_DEFINED, "false")), //
-						Double.parseDouble(this.template.getProperty(i + GraphicsTemplate.DEFINED_MIN_VALUE, "0")), //
-						Double.parseDouble(this.template.getProperty(i + GraphicsTemplate.DEFINED_MAX_VALUE, "0")));
-				recordTemplate.numberFormat = Integer.parseInt(this.template.getProperty(i + GraphicsTemplate.NUMBER_FORMAT, "-1"));
+				recordTemplate.lineWidth = Integer.parseInt(this.template.getProperty(i + ChartTemplate.LINE_WIDTH, "1"));
+				recordTemplate.lineStyle = Integer.parseInt(this.template.getProperty(i + ChartTemplate.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID));
+				recordTemplate.isRoundOut = Boolean.parseBoolean(this.template.getProperty(i + ChartTemplate.IS_ROUND_OUT, "false"));
+				recordTemplate.isStartpointZero = Boolean.parseBoolean(this.template.getProperty(i + ChartTemplate.IS_START_POINT_ZERO, "false"));
+				record.setStartEndDefined(Boolean.parseBoolean(this.template.getProperty(i + ChartTemplate.IS_START_END_DEFINED, "false")), //
+						Double.parseDouble(this.template.getProperty(i + ChartTemplate.DEFINED_MIN_VALUE, "0")), //
+						Double.parseDouble(this.template.getProperty(i + ChartTemplate.DEFINED_MAX_VALUE, "0")));
+				recordTemplate.numberFormat = Integer.parseInt(this.template.getProperty(i + ChartTemplate.NUMBER_FORMAT, "-1"));
 				// time grid
 				// color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 				// r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();

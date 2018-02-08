@@ -40,6 +40,7 @@ import gde.config.Settings;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSection;
+import gde.histo.ui.GraphicsComposite.Graphics;
 import gde.histo.utils.HistoTimeLine;
 import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
@@ -378,24 +379,26 @@ public final class CurveSurvey {
 
 	}
 
-	private final Settings			settings		= Settings.getInstance();
+	private final Settings					settings		= Settings.getInstance();
 
-	private final HistoTimeLine	timeLine;
-	private final TrailRecord		trailRecord;
-	private final Measure				measure;
+	private final GraphicsComposite	graphicsComposite;
+	private final HistoTimeLine			timeLine;
+	private final TrailRecord				trailRecord;
+	private final Measure						measure;
 
-	private LinePainter					linePainter;
-	private GC									canvasGC;
+	private LinePainter							linePainter;
+	private GC											canvasGC;
 
-	private int									xPosMeasure	= Integer.MIN_VALUE;
-	private int									yPosMeasure	= Integer.MIN_VALUE;
-	private int									xPosDelta		= Integer.MIN_VALUE;
-	private int									yPosDelta		= Integer.MIN_VALUE;
+	private int											xPosMeasure	= Integer.MIN_VALUE;
+	private int											yPosMeasure	= Integer.MIN_VALUE;
+	private int											xPosDelta		= Integer.MIN_VALUE;
+	private int											yPosDelta		= Integer.MIN_VALUE;
 
-	public CurveSurvey(GC canvasGC, HistoTimeLine timeLine, Measure measure) {
+	public CurveSurvey(GC canvasGC, GraphicsComposite graphicsComposite, Measure measure) {
 		this.canvasGC = canvasGC;
 		this.trailRecord = measure.measureRecord;
-		this.timeLine = timeLine;
+		this.graphicsComposite = graphicsComposite;
+		this.timeLine = graphicsComposite.getTimeLine();
 		this.measure = measure;
 	}
 
@@ -458,18 +461,19 @@ public final class CurveSurvey {
 		int height = timeLine.getCurveAreaBounds().height;
 		TrailRecordSection recordSection = measure.getRecordSection();
 
+		Graphics graphics = graphicsComposite.getGraphics(trailRecord);
 		if (!recordSection.isBoundedParabola()) { // hide these curves for better overview whenever a parabola is shown
-			int yBoundedAvg = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, recordSection.getBoundedAvgValue());
+			int yBoundedAvg = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, recordSection.getBoundedAvgValue());
 			this.linePainter.drawAverageLine(yBoundedAvg, this.xPosMeasure, this.xPosDelta - this.xPosMeasure);
 
-			int yRegressionPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, recordSection.getBoundedSlopeValue(measure.getTimestampMeasure_ms()));
-			int yRegressionPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, recordSection.getBoundedSlopeValue(measure.getTimestampDelta_ms()));
+			int yRegressionPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, recordSection.getBoundedSlopeValue(measure.getTimestampMeasure_ms()));
+			int yRegressionPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, recordSection.getBoundedSlopeValue(measure.getTimestampDelta_ms()));
 			this.linePainter.drawLinearRegressionLine(this.xPosMeasure, yRegressionPosMeasure, this.xPosDelta, yRegressionPosDelta);
 		} else {
 			List<Spot<Integer>> points = new ArrayList<>();
 			for (Spot<Double> entry : recordSection.getBoundedParabolaValues()) {
 				points.add(new Spot<Integer>(this.timeLine.getXPosTimestamp((long) entry.x().doubleValue()),
-						HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, entry.y())));
+						HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, entry.y())));
 			}
 			log.finer(() -> "values " + Arrays.toString(points.toArray()));
 			this.linePainter.drawRegressionParabolaLine(points);
@@ -479,7 +483,7 @@ public final class CurveSurvey {
 			double[] values = recordSection.getBoundedBoxplotValues();
 			int[] yPosBoxplot = new int[values.length];
 			for (int i = 0; i < values.length; i++) {
-				yPosBoxplot[i] = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, values[i]);
+				yPosBoxplot[i] = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, values[i]);
 			}
 			this.linePainter.drawBoxplot(xPosMidBounds, yPosBoxplot);
 		}
@@ -515,7 +519,8 @@ public final class CurveSurvey {
 	public void setMeasurePosition() {
 		int height = timeLine.getCurveAreaBounds().height;
 		xPosMeasure = timeLine.getXPosTimestamp(measure.getTimestampMeasure_ms());
-		yPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, trailRecord.getParent().getIndex(measure.getTimestampMeasure_ms()));
+		Graphics graphics = graphicsComposite.getGraphics(trailRecord);
+		yPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, trailRecord.getParent().getIndex(measure.getTimestampMeasure_ms()));
 		log.off(() -> String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", measure.getTimestampMeasure_ms(), this.xPosMeasure, this.yPosMeasure));
 	}
 
@@ -525,7 +530,8 @@ public final class CurveSurvey {
 	public void setDeltaPosition() {
 		int height = timeLine.getCurveAreaBounds().height;
 		xPosDelta = timeLine.getXPosTimestamp(measure.getTimestampDelta_ms());
-		yPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(trailRecord, height, trailRecord.getParent().getIndex(measure.getTimestampDelta_ms()));
+		Graphics graphics = graphicsComposite.getGraphics(trailRecord);
+		yPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, trailRecord.getParent().getIndex(measure.getTimestampDelta_ms()));
 		log.fine(() -> String.format("timestampDelta_ms=%d xPosDelta=%d yPosDelta=%d", measure.getTimestampDelta_ms(), this.xPosDelta, this.yPosDelta));
 	}
 

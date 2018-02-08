@@ -18,7 +18,6 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
-import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.SEVERE;
 
@@ -30,7 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -96,7 +94,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 	/**
 	 * Data for the life cycle of a summary composite drawing.
 	 */
-	public final class Summary implements IChartData {
+	public static final class Summary implements IChartData {
 		private final Logger				log			= Logger.getLogger(Summary.class.getName());
 
 		private final TrailRecord		trailRecord;
@@ -191,7 +189,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 	/**
 	 * Key is the record name.
 	 */
-	private final Map<String, Summary>	summaryData	= new LinkedHashMap<>();
+	private final Map<String, Summary>	chartData	= new LinkedHashMap<>();
 
 	private VolatileComment							volatileComment;
 
@@ -383,7 +381,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 	}
 
 	public Summary getSummary(TrailRecord record) {
-		return summaryData.get(record.getName());
+		return chartData.get(record.getName());
 	}
 
 	void mouseMoveAction(MouseEvent evt) {
@@ -583,11 +581,11 @@ public final class SummaryComposite extends AbstractChartComposite {
 	protected void defineLayoutParams() {
 		// initialize early in order to avoid problems in mouse move events
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-		this.summaryData.clear();
+		this.chartData.clear();
 		for (TrailRecord record : trailRecordSet.getValues()) {
-			this.summaryData.put(record.getName(), new Summary(record));
+			this.chartData.put(record.getName(), new Summary(record));
 		}
-		trailRecordSet.updateSyncSummaryScale(this.summaryData);
+		trailRecordSet.updateSyncSummaryScale(this.chartData);
 		if (trailRecordSet.getDisplayRecords() == null || trailRecordSet.getDisplayRecords().isEmpty()) return; // concurrent activity
 
 		Density density = Density.toDensity(curveAreaBounds.width, trailRecordSet.getTimeStepSize());
@@ -598,7 +596,6 @@ public final class SummaryComposite extends AbstractChartComposite {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
 			if (record.isVisible()) log.fine(() -> String.format("record=%s  isVisible=%b isDisplayable=%b isScaleVisible=%b", //$NON-NLS-1$
 					record.getName(), record.isVisible(), record.isDisplayable(), record.isScaleSynced(), record.isScaleVisible()));
-			// setRecordDisplayValues(record);
 
 			Rectangle drawStripBounds = new Rectangle(curveAreaBounds.x, curveAreaBounds.y + stripHeight * i + UNK_GAP, curveAreaBounds.width, stripHeight);
 			log.finer(() -> record.getName() + "  x0=" + curveAreaBounds.x + " y0=" + drawStripBounds.y + " width=" + curveAreaBounds.width + " height=" + stripHeight);
@@ -674,42 +671,6 @@ public final class SummaryComposite extends AbstractChartComposite {
 		return new int[] { 1, 1 };
 	}
 
-	private void setRecordDisplayValues(TrailRecord record) { // todo simplify the implementation
-		// (yMaxValue - yMinValue) defines the area to be used for the curve
-		// point values divided by 1000
-		double yMaxValue = record.getSyncMaxValue() / 1000.0;
-		double yMinValue = record.getSyncMinValue() / 1000.0;
-		if (log.isLoggable(FINE)) log.log(FINE, "unmodified yMinValue=" + yMinValue + "; yMaxValue=" + yMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
-
-		// yMinValueDisplay and yMaxValueDisplay used for scales and adapted values device and measure unit dependent
-		double yMinValueDisplay = yMinValue, yMaxValueDisplay = yMaxValue;
-
-		if (!record.getTrailSelector().isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
-			; // in case of an empty record leave the values unchanged
-		else {
-			yMinValueDisplay = HistoSet.decodeVaultValue(record, yMinValue);
-			yMaxValueDisplay = HistoSet.decodeVaultValue(record, yMaxValue);
-		}
-		if (log.isLoggable(FINE)) log.log(FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-
-		double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
-		if (Math.abs(deltaValueDisplay) < .0001) { // equal value disturbs the scaling algorithm
-			yMaxValueDisplay = MathUtils.roundUp(yMaxValueDisplay, deltaValueDisplay); // max
-			yMinValueDisplay = MathUtils.roundDown(yMinValueDisplay, deltaValueDisplay); // min
-			Object[] roundResult = MathUtils.adaptRounding(yMinValueDisplay, yMaxValueDisplay, false, curveAreaBounds.height / 25 >= 3
-					? curveAreaBounds.height / 25 : 2);
-			yMinValueDisplay = (Double) roundResult[0];
-			yMaxValueDisplay = (Double) roundResult[1];
-			yMinValue = HistoSet.encodeVaultValue(record, yMinValueDisplay);
-			yMaxValue = HistoSet.encodeVaultValue(record, yMaxValueDisplay);
-			if (log.isLoggable(FINE)) log.log(FINE, String.format("rounded yMinValue = %5.3f - yMaxValue = %5.3f", yMinValue, yMaxValue)); //$NON-NLS-1$
-			if (log.isLoggable(FINE)) log.log(FINE, "rounded -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		record.setMinMaxScaleValue(yMinValueDisplay, yMaxValueDisplay);
-		record.setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
-	}
-
 	@Override
 	protected void setRecordSetCommentStandard() {
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -739,12 +700,12 @@ public final class SummaryComposite extends AbstractChartComposite {
 		measuring.drawMeasuring();
 	}
 
-	public Map<String, Summary> getSummaryData() {
-		return this.summaryData;
+	public Map<String, Summary> getChartData() {
+		return this.chartData;
 	}
 
 	@Override
 	public IChartData getChartData(TrailRecord trailRecord) {
-		return this.summaryData.get(trailRecord.getName());
+		return this.chartData.get(trailRecord.getName());
 	}
 }

@@ -46,6 +46,8 @@ import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordFormatter;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.Outliers;
+import gde.histo.ui.GraphicsComposite.Graphics;
+import gde.histo.ui.IChartData;
 import gde.histo.ui.SummaryComposite.Summary;
 import gde.histo.ui.data.SummarySpots;
 import gde.histo.ui.data.SummarySpots.OutlierWarning;
@@ -393,7 +395,7 @@ public final class HistoCurveUtils {
 
 	/**
 	 * Draw the data graph scale using gives rectangle for display.
-	 * @param record
+	 * @param graphics
 	 * @param gc
 	 * @param curveAreaBounds
 	 * @param scaleWidthSpace
@@ -401,8 +403,9 @@ public final class HistoCurveUtils {
 	 * @param isDrawNameInRecordColor
 	 * @param isDrawNumbersInRecordColor
 	 */
-	public static void drawHistoScale(TrailRecord record, GC gc, Rectangle curveAreaBounds, int scaleWidthSpace, boolean isDrawScaleInRecordColor,
+	public static void drawHistoScale(IChartData graphics, GC gc, Rectangle curveAreaBounds, int scaleWidthSpace, boolean isDrawScaleInRecordColor,
 			boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
+		TrailRecord record = graphics.getTrailRecord();
 		int x0 = curveAreaBounds.x;
 		int y0 = curveAreaBounds.y + curveAreaBounds.height;
 		int width = curveAreaBounds.width;
@@ -459,27 +462,28 @@ public final class HistoCurveUtils {
 	/**
 	 * Draw single curve.
 	 * Support logarithmic distances and elaborate x-axis point placement based on box width and number of points.
-	 * @param record
+	 * @param graphics
 	 * @param gc
 	 * @param curveAreaBounds
 	 * @param timeLine
 	 */
-	public static void drawHistoCurve(TrailRecord record, GC gc, Rectangle curveAreaBounds, HistoTimeLine timeLine) {
+	public static void drawHistoCurve(Graphics graphics, GC gc, Rectangle curveAreaBounds, HistoTimeLine timeLine) {
+		TrailRecord trailRecord = graphics.getTrailRecord();
 		// set line properties according adjustment
-		gc.setForeground(record.getColor());
-		gc.setLineWidth(record.getLineWidth());
-		gc.setLineStyle(record.getLineStyle());
+		gc.setForeground(trailRecord.getColor());
+		gc.setLineWidth(trailRecord.getLineWidth());
+		gc.setLineStyle(trailRecord.getLineStyle());
 
 		// record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
-		record.setDisplayScaleFactorValue(curveAreaBounds.height);
+		graphics.setDisplayScaleFactorValue(curveAreaBounds.height);
 
 		StringBuffer sb = new StringBuffer(); // logging purpose
 
 		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-		Point[] points = HistoGraphicsMapper.getDisplayPoints(record, timeLine);
+		Point[] points = HistoGraphicsMapper.getDisplayPoints(graphics, timeLine);
 
 		Point newPoint, oldPoint = null;
-		int displayableSize = record.size();
+		int displayableSize = trailRecord.size();
 		log.fine(() -> "displayableSize = " + displayableSize); //$NON-NLS-1$
 		for (int j = 0; j < points.length && j <= displayableSize && displayableSize >= 1; j++) {
 			if ((newPoint = points[j]) != null) { // in case of a suite the master triggers the display of all trails
@@ -497,14 +501,15 @@ public final class HistoCurveUtils {
 	/**
 	 * Draw multiple curves (e.g. trails for min, max, avg).
 	 * Support logarithmic distances and elaborate x-axis point placement based on box width and number of points.
-	 * @param record holds display properties and the reference to the suite trail records but no data
+	 * @param graphics holds display properties and the reference to the suite trail records
 	 * @param gc
 	 * @param curveAreaBounds
 	 * @param timeLine
 	 */
-	public static void drawHistoSuite(TrailRecord record, GC gc, Rectangle curveAreaBounds, HistoTimeLine timeLine) {
+	public static void drawHistoSuite(Graphics graphics, GC gc, Rectangle curveAreaBounds, HistoTimeLine timeLine) {
+		TrailRecord record = graphics.getTrailRecord();
 		log.fine(() -> String.format("MinScaleValue=%f   MaxScaleValue=%f   MinDisplayValue=%f   MaxDisplayValue=%f", record.getMinScaleValue(), //$NON-NLS-1$
-				record.getMaxScaleValue(), record.getMinDisplayValue(), record.getMaxDisplayValue()));
+				record.getMaxScaleValue(), graphics.getMinDisplayValue(), graphics.getMaxDisplayValue()));
 
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
@@ -513,11 +518,11 @@ public final class HistoCurveUtils {
 
 		// int xScaleFactor = 1; // x-axis scaling not supported
 		// record.setDisplayScaleFactorTime(xScaleFactor);
-		record.setDisplayScaleFactorValue(curveAreaBounds.height);
+		graphics.setDisplayScaleFactorValue(curveAreaBounds.height);
 		if (record.getTrailSelector().isBoxPlotSuite()) {
-			drawBoxPlot(record, gc, timeLine);
+			drawBoxPlot(graphics, gc, timeLine);
 		} else if (record.getTrailSelector().isRangePlotSuite()) {
-			drawRangePlot(record, gc, timeLine);
+			drawRangePlot(graphics, gc, timeLine);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -528,10 +533,10 @@ public final class HistoCurveUtils {
 	 * @param gc
 	 * @param timeLine
 	 */
-	public static void drawRangePlot(TrailRecord record, GC gc, HistoTimeLine timeLine) {
+	public static void drawRangePlot(Graphics graphics, GC gc, HistoTimeLine timeLine) {
 		StringBuffer sb = new StringBuffer(); // logging purpose
 		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-		List<PointArray> suitePoints = HistoGraphicsMapper.getSuiteDisplayPoints(record, timeLine);
+		List<PointArray> suitePoints = HistoGraphicsMapper.getSuiteDisplayPoints(graphics, timeLine);
 		PointArray oldPoints = null;
 
 		for (PointArray pointArray : suitePoints) {
@@ -573,10 +578,11 @@ public final class HistoCurveUtils {
 	 * @param gc
 	 * @param timeLine
 	 */
-	public static void drawBoxPlot(TrailRecord record, GC gc, HistoTimeLine timeLine) {
+	public static void drawBoxPlot(Graphics graphics, GC gc, HistoTimeLine timeLine) {
 		StringBuffer sb = new StringBuffer(); // logging purpose
-		List<PointArray> suitePoints = HistoGraphicsMapper.getSuiteDisplayPoints(record, timeLine);
+		List<PointArray> suitePoints = HistoGraphicsMapper.getSuiteDisplayPoints(graphics, timeLine);
 
+		TrailRecord record = graphics.getTrailRecord();
 		List<Integer> durations_mm = record.getParent().getDurations_mm();
 		double averageDuration = durations_mm.parallelStream().mapToDouble(d -> d).average().getAsDouble();
 		Iterator<Integer> durationIterator = durations_mm.iterator();

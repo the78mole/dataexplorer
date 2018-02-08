@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
@@ -39,7 +38,6 @@ import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.AbstractRecordSet;
 import gde.data.CommonRecord;
 import gde.data.Record.DataType;
 import gde.device.IChannelItem;
@@ -69,13 +67,13 @@ public abstract class TrailRecord extends CommonRecord {
 	private final static long			serialVersionUID	= 110124007964748556L;
 	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
 
-	public final static String[]	propertyKeys			= new String[] { GraphicsTemplate.NAME, GraphicsTemplate.UNIT, GraphicsTemplate.SYMBOL,
-			GraphicsTemplate.IS_ACTIVE, GraphicsTemplate.IS_VISIBLE, GraphicsTemplate.IS_POSITION_LEFT, GraphicsTemplate.COLOR, GraphicsTemplate.LINE_WIDTH,
-			GraphicsTemplate.LINE_STYLE, GraphicsTemplate.IS_ROUND_OUT, GraphicsTemplate.IS_START_POINT_ZERO, GraphicsTemplate.IS_START_END_DEFINED,
-			GraphicsTemplate.NUMBER_FORMAT, GraphicsTemplate.MAX_VALUE, GraphicsTemplate.DEFINED_MAX_VALUE, GraphicsTemplate.MIN_VALUE,
-			GraphicsTemplate.DEFINED_MIN_VALUE };
+	public final static String[]	propertyKeys			= new String[] { ChartTemplate.NAME, ChartTemplate.UNIT, ChartTemplate.SYMBOL,
+			ChartTemplate.IS_ACTIVE, ChartTemplate.IS_VISIBLE, ChartTemplate.IS_POSITION_LEFT, ChartTemplate.COLOR, ChartTemplate.LINE_WIDTH,
+			ChartTemplate.LINE_STYLE, ChartTemplate.IS_ROUND_OUT, ChartTemplate.IS_START_POINT_ZERO, ChartTemplate.IS_START_END_DEFINED,
+			ChartTemplate.NUMBER_FORMAT, ChartTemplate.MAX_VALUE, ChartTemplate.DEFINED_MAX_VALUE, ChartTemplate.MIN_VALUE,
+			ChartTemplate.DEFINED_MIN_VALUE };
 
-	public static class GraphicsTemplate {
+	public static class ChartTemplate {
 
 		public final static String		NAME											= "_name";
 		public final static String		UNIT											= "_unit";
@@ -185,9 +183,9 @@ public abstract class TrailRecord extends CommonRecord {
 
 	}
 
-	protected final Settings					settings	= Settings.getInstance();
+	protected final Settings			settings	= Settings.getInstance();
 
-	protected final GraphicsTemplate	template	= new GraphicsTemplate();
+	protected final ChartTemplate	template	= new ChartTemplate();
 
 	/**
 	 * Collect input data for the trail record and subordinate objects.
@@ -284,28 +282,6 @@ public abstract class TrailRecord extends CommonRecord {
 		}
 	}
 
-	/**
-	 * Data for the life cycle of a graphics composite drawing.
-	 */
-	public static final class Graphics { // todo class might be better independent from TrailRecord
-
-		// synchronize
-		protected int			syncMaxValue			= Integer.MAX_VALUE;	// max value of the curve if synced
-		protected int			syncMinValue			= Integer.MIN_VALUE;	// min value of the curve if synced
-
-		// display the record
-		double						displayScaleFactorTime;
-		protected double	displayScaleFactorValue;
-		protected double	syncMasterFactor	= 1.0;								// synchronized scale and different measurement factors
-		protected double	minDisplayValue;												// min value in device units, correspond to draw area
-		protected double	maxDisplayValue;												// max value in device units, correspond to draw area
-
-		int								numberScaleTicks	= 0;
-
-		private int[]			numberTickMarks;
-
-	}
-
 	protected final DeviceXmlResource			xmlResource		= DeviceXmlResource.getInstance();
 
 	protected final IChannelItem					channelItem;
@@ -323,8 +299,8 @@ public abstract class TrailRecord extends CommonRecord {
 
 	protected TrailSelector								trailSelector;
 	protected ElementaryQuantile<Double>	quantile;
-	protected Graphics										graphics;
-	protected IChartData											summary;
+	protected IChartData									graphics;
+	protected IChartData									summary;
 
 	protected TrailRecord(IChannelItem channelItem, int newOrdinal, TrailRecordSet parentTrail, int initialCapacity) {
 		super(DataExplorer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
@@ -516,120 +492,7 @@ public abstract class TrailRecord extends CommonRecord {
 // return this.parent.timeStep_ms.getTime_ms(index);
 	}
 
-	public double getDisplayScaleFactorValue() {
-		return graphics.displayScaleFactorValue;
-	}
-
-	/**
-	 * @param drawAreaHeight - used to calculate the displayScaleFactorValue to set
-	 */
-	public void setDisplayScaleFactorValue(int drawAreaHeight) {
-		graphics.displayScaleFactorValue = (1.0 * drawAreaHeight) / (graphics.maxDisplayValue - graphics.minDisplayValue);
-		AbstractRecordSet abstractParent = this.getAbstractParent();
-		if (abstractParent.isOneOfSyncableRecord(getName()) && this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(getName())).getFactor() != 1) {
-			graphics.syncMasterFactor = this.getFactor() / abstractParent.get(abstractParent.getSyncMasterRecordOrdinal(getName())).getFactor();
-			graphics.displayScaleFactorValue = graphics.displayScaleFactorValue * graphics.syncMasterFactor;
-		}
-		if (log.isLoggable(Level.FINER))
-			log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", //$NON-NLS-1$
-					drawAreaHeight, graphics.displayScaleFactorValue, (graphics.maxDisplayValue - graphics.minDisplayValue)));
-
-	}
-
-	@Override
-	public void setSyncedMinMaxDisplayValues(double newMinValue, double newMaxValue) {
-		graphics.minDisplayValue = HistoSet.decodeVaultValue(this, newMinValue);
-		graphics.maxDisplayValue = HistoSet.decodeVaultValue(this, newMaxValue);
-
-		if (this.getParent().isOneOfSyncableRecord(this.name)) {
-			for (TrailRecord record : this.getParent().getScaleSyncedRecords(this.getParent().getSyncMasterRecordOrdinal(this.name))) {
-				record.graphics.minDisplayValue = graphics.minDisplayValue;
-				record.graphics.maxDisplayValue = graphics.maxDisplayValue;
-			}
-		}
-		log.fine(getName() + getName() + " yMinValue = " + newMinValue + "; yMaxValue = " + newMaxValue); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	/**
-	 * @return the minDisplayValue
-	 */
-	public double getMinDisplayValue() {
-		return graphics.minDisplayValue;
-	}
-
-	/**
-	 * @return the maxDisplayValue
-	 */
-	public double getMaxDisplayValue() {
-		return graphics.maxDisplayValue;
-	}
-
-	/**
-	 * @return the numberScaleTicks
-	 */
-	@Override
-	public int getNumberScaleTicks() {
-		return graphics.numberScaleTicks;
-	}
-
-	/**
-	 * @param newNumberScaleTicks the numberScaleTicks to set
-	 */
-	@Override
-	public void setNumberScaleTicks(int newNumberScaleTicks) {
-		graphics.numberScaleTicks = newNumberScaleTicks;
-	}
-
-	public int[] getNumberTickMarks() {
-		return graphics.numberTickMarks;
-	}
-
-	public void setNumberTickMarks(int[] numberTickMarks) {
-		graphics.numberTickMarks = numberTickMarks;
-	}
-
-	/**
-	 * Take the current max/minValues form this record and recalculate the synced max/minValues.
-	 * Support suites.
-	 */
-	public void setSyncMaxMinValue() {
-		if (getTrailSelector().isTrailSuite()) {
-			int suiteMaxValue = suiteRecords.getSuiteMaxValue();
-			int suiteMinValue = suiteRecords.getSuiteMinValue();
-			int tmpMaxValue = suiteMaxValue == suiteMinValue ? suiteMaxValue + 100 : suiteMaxValue;
-			int tmpMinValue = suiteMaxValue == suiteMinValue ? suiteMinValue - 100 : suiteMinValue;
-			graphics.syncMaxValue = (int) (tmpMaxValue * getSyncMasterFactor());
-			graphics.syncMinValue = (int) (tmpMinValue * getSyncMasterFactor());
-		} else {
-			graphics.syncMaxValue = (int) (getMaxValue() * getSyncMasterFactor());
-			graphics.syncMinValue = (int) (getMinValue() * getSyncMasterFactor());
-		}
-		log.finer(() -> getName() + "  syncMin = " + getSyncMinValue() + "; syncMax = " + getSyncMaxValue()); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	@Override
-	public void setSyncMinMax(int newMin, int newMax) {
-		if (newMin == Integer.MIN_VALUE && newMax == Integer.MAX_VALUE) return; // for compatibility with initSyncedScales
-		graphics.syncMinValue = newMin;
-		graphics.syncMaxValue = newMax;
-		log.finer(() -> getName() + " syncMinValue=" + newMin + " syncMaxValue=" + newMax);
-	}
-
-	@Override
-	public int getSyncMinValue() {
-		return graphics.syncMinValue == graphics.syncMaxValue ? graphics.syncMinValue - 100 : graphics.syncMinValue;
-	}
-
-	@Override
-	public int getSyncMaxValue() {
-		return graphics.syncMaxValue == graphics.syncMinValue ? graphics.syncMaxValue + 100 : graphics.syncMaxValue;
-	}
-
-	public double getSyncMasterFactor() {
-		return graphics.syncMasterFactor;
-	}
-
-	public GraphicsTemplate getTemplate() {
+	public ChartTemplate getTemplate() {
 		return this.template;
 	}
 
@@ -952,6 +815,7 @@ public abstract class TrailRecord extends CommonRecord {
 	public Outliers[] defineMinMaxWarning(int logLimit) {
 		return getParent().getPickedVaults().defineMinMaxWarning(name, logLimit);
 	}
+
 	/**
 	 * @return all the decoded record values including nulls
 	 */
@@ -997,17 +861,6 @@ public abstract class TrailRecord extends CommonRecord {
 		RecordCollector collector = new RecordCollector();
 		collector.addVaults(histoVaults);
 		collector.setUnifiedDataType(histoVaults);
-	}
-
-	public void resetGraphics() {
-		this.graphics = new Graphics();
-	}
-
-	public Graphics getGraphics() {
-		if (graphics == null) {
-			graphics = new Graphics();
-		}
-		return this.graphics;
 	}
 
 	/**

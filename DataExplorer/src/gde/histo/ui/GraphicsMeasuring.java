@@ -163,14 +163,14 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 		}
 	};
 
-	boolean																isLeftMouseMeasure	= false;
-	boolean																isRightMouseMeasure	= false;
+	boolean													isLeftMouseMeasure	= false;
+	boolean													isRightMouseMeasure	= false;
 
-	private final AbstractChartComposite	graphicsComposite;
-	private final CurveSurvey							curveSurvey;
+	private final GraphicsComposite	graphicsComposite;
+	private final CurveSurvey				curveSurvey;
 
-	private GC														canvasGC;
-	private MeasuringMode									mode;
+	private GC											canvasGC;
+	private MeasuringMode						mode;
 
 	public GraphicsMeasuring(GraphicsComposite graphicsComposite, Measure measure) {
 		super(measure);
@@ -178,7 +178,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 		this.mode = MeasuringMode.getMode(measure.isDeltaMeasure);
 		this.mode.setMode(this);
 
-		this.curveSurvey = new CurveSurvey(this.canvasGC, graphicsComposite.getTimeLine(), measure);
+		this.curveSurvey = new CurveSurvey(this.canvasGC, graphicsComposite, measure);
 		this.curveSurvey.initialize();
 		this.curveSurvey.setMeasurePosition();
 		this.curveSurvey.setDeltaPosition();
@@ -244,7 +244,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 
 		if (this.isLeftMouseMeasure) {
 			int height = graphicsComposite.curveAreaBounds.height;
-			int yPosMeasureNew = HistoGraphicsMapper.getVerticalDisplayPos(measure.measureRecord, height, measure.measureRecord.getParent().getIndex(timestamp_ms));
+			int yPosMeasureNew = HistoGraphicsMapper.getVerticalDisplayPos(graphicsComposite.getGraphics(measure.measureRecord), height, measure.measureRecord.getParent().getIndex(timestamp_ms));
 			if (this.curveSurvey.isNewMeasureSpot(timestamp_ms, yPosMeasureNew)) {
 				curveSurvey.cleanMeasurementPointer(graphicsComposite.canvasImage);
 
@@ -254,7 +254,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 			}
 		} else if (this.isRightMouseMeasure) {
 			int height = graphicsComposite.curveAreaBounds.height;
-			int yPosDeltaNew = HistoGraphicsMapper.getVerticalDisplayPos(measure.measureRecord, height, measure.measureRecord.getParent().getIndex(timestamp_ms));
+			int yPosDeltaNew = HistoGraphicsMapper.getVerticalDisplayPos(graphicsComposite.getGraphics(measure.measureRecord), height, measure.measureRecord.getParent().getIndex(timestamp_ms));
 			if (this.curveSurvey.isNewDeltaSpot(timestamp_ms, yPosDeltaNew)) {
 				curveSurvey.cleanMeasurementPointer(graphicsComposite.canvasImage);
 
