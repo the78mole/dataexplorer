@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -94,8 +93,8 @@ public final class SummaryComposite extends AbstractChartComposite {
 	/**
 	 * Data for the life cycle of a summary composite drawing.
 	 */
-	public static final class Summary implements IChartData {
-		private final Logger				log			= Logger.getLogger(Summary.class.getName());
+	public static final class SummaryLayout extends AbstractChartLayout {
+		private final Logger				log			= Logger.getLogger(SummaryLayout.class.getName());
 
 		private final TrailRecord		trailRecord;
 		private final SummarySpots	summarySpots;
@@ -106,7 +105,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 
 		private Outliers[]					warningMinMaxValues;
 
-		public Summary(TrailRecord trailRecord) {
+		public SummaryLayout(TrailRecord trailRecord) {
 			this.trailRecord = trailRecord;
 			this.summarySpots = new SummarySpots(this);
 		}
@@ -179,25 +178,22 @@ public final class SummaryComposite extends AbstractChartComposite {
 			return summarySpots;
 		}
 
-		@Override
 		public TrailRecord getTrailRecord() {
 			return this.trailRecord;
+		}
+
+		@Override
+		public String toString() {
+			return "SummaryLayout [trailRecordSize=" + this.trailRecord.size() + ", syncMax=" + this.syncMax + ", syncMin=" + this.syncMin + ", warningMinMaxValues=" + Arrays.toString(this.warningMinMaxValues) + "]";
 		}
 
 	}
 
 	/**
-	 * Key is the record name.
-	 */
-	private final Map<String, Summary>	chartData	= new LinkedHashMap<>();
-
-	private VolatileComment							volatileComment;
-
-	/**
 	 * Comment caching.
 	 * The comment text and tooltip remains active for a defined number of drawing actions.
 	 */
-	private class VolatileComment {
+	private static class VolatileComment {
 		final String	textLines;
 		final String	toolTip;
 		int						remainingAccessCounter;
@@ -221,6 +217,10 @@ public final class SummaryComposite extends AbstractChartComposite {
 			return remainingAccessCounter > 0;
 		}
 	}
+
+	private final AbstractChartData	chartData	= new AbstractChartData();
+
+	private VolatileComment					volatileComment;
 
 	SummaryComposite(SashForm useParent, CTabItem parentWindow) {
 		super(useParent, parentWindow, SWT.NONE);
@@ -380,10 +380,6 @@ public final class SummaryComposite extends AbstractChartComposite {
 		log.time(() -> "drawTime=" + StringHelper.getFormatedTime("ss:SSS", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime)));
 	}
 
-	public Summary getSummary(TrailRecord record) {
-		return chartData.get(record.getName());
-	}
-
 	void mouseMoveAction(MouseEvent evt) {
 		if (Channels.getInstance().getActiveChannel() == null) return;
 
@@ -410,12 +406,12 @@ public final class SummaryComposite extends AbstractChartComposite {
 					this.graphicCanvas.setToolTipText(text);
 				}
 			} else {
-				if (point.x == 0 && record != null && getSummary(record).getMinMaxWarning()[0] != null) { // left scale warnings
+				if (point.x == 0 && record != null && getChartData(record).getMinMaxWarning()[0] != null) { // left scale warnings
 					String hintForClick = GDE.STRING_NEW_LINE + Messages.getString(MessageIds.GDE_MSGT0914);
-					this.graphicCanvas.setToolTipText(new TrailRecordFormatter(record).defineFormattedMinWarning(this.getSummary(record)) + hintForClick);
-				} else if (point.x == curveAreaBounds.width && record != null && getSummary(record).getMinMaxWarning()[1] != null) { // right
+					this.graphicCanvas.setToolTipText(new TrailRecordFormatter(record).defineFormattedMinWarning(this.getChartData(record)) + hintForClick);
+				} else if (point.x == curveAreaBounds.width && record != null && getChartData(record).getMinMaxWarning()[1] != null) { // right
 					String hintForClick = GDE.STRING_NEW_LINE + Messages.getString(MessageIds.GDE_MSGT0914);
-					this.graphicCanvas.setToolTipText(new TrailRecordFormatter(record).defineFormattedMaxWarning(this.getSummary(record)) + hintForClick);
+					this.graphicCanvas.setToolTipText(new TrailRecordFormatter(record).defineFormattedMaxWarning(this.getChartData(record)) + hintForClick);
 				} else {
 					this.graphicCanvas.setToolTipText(null);
 				}
@@ -469,7 +465,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
 		int stripYPos = (point.y - UNK_GAP) % stripHeight;
 
-		List<Integer> snappedIndexes = getSummary(record).getSummarySpots().getSnappedIndexes(point.x, stripYPos);
+		List<Integer> snappedIndexes = getChartData(record).getSummarySpots().getSnappedIndexes(point.x, stripYPos);
 		log.log(FINER, "", Arrays.toString(snappedIndexes.toArray()));
 		return snappedIndexes;
 	}
@@ -482,9 +478,9 @@ public final class SummaryComposite extends AbstractChartComposite {
 			Point point = checkCurveBounds(evt.x, evt.y);
 
 			TrailRecord record = getDisplayRecord(point);
-			if (point.x == 0 && record != null && getSummary(record).getMinMaxWarning()[0] != null) { // left scale warnings
+			if (point.x == 0 && record != null && getChartData(record).getMinMaxWarning()[0] != null) { // left scale warnings
 				changeChartAsPerWarning(record, 0);
-			} else if (point.x == curveAreaBounds.width && record != null && getSummary(record).getMinMaxWarning()[1] != null) { // right
+			} else if (point.x == curveAreaBounds.width && record != null && getChartData(record).getMinMaxWarning()[1] != null) { // right
 				changeChartAsPerWarning(record, 1);
 			}
 
@@ -505,14 +501,14 @@ public final class SummaryComposite extends AbstractChartComposite {
 					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
 					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
 				} else {
-					if (point.x == 0 && record != null && getSummary(record).getMinMaxWarning()[0] != null) { // left scale warnings
-						Outliers outlier = getSummary(record).getMinMaxWarning()[0];
+					if (point.x == 0 && record != null && getChartData(record).getMinMaxWarning()[0] != null) { // left scale warnings
+						Outliers outlier = getChartData(record).getMinMaxWarning()[0];
 						ExtendedVault vault = record.getParent().getPickedVaults().getVault(outlier.getIndices().get(0));
 						popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
 						popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
 						popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
-					} else if (point.x == curveAreaBounds.width && record != null && getSummary(record).getMinMaxWarning()[1] != null) { // right
-						Outliers outlier = getSummary(record).getMinMaxWarning()[1];
+					} else if (point.x == curveAreaBounds.width && record != null && getChartData(record).getMinMaxWarning()[1] != null) { // right
+						Outliers outlier = getChartData(record).getMinMaxWarning()[1];
 						ExtendedVault vault = record.getParent().getPickedVaults().getVault(outlier.getIndices().get(0));
 						popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
 						popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
@@ -533,8 +529,9 @@ public final class SummaryComposite extends AbstractChartComposite {
 	 */
 	private void changeChartAsPerWarning(TrailRecord record, int actionType) {
 		TrailRecordFormatter recordFormatter = new TrailRecordFormatter(record);
-		volatileComment = new VolatileComment(recordFormatter.defineMinMaxWarningText(this.getSummary(record)), Messages.getString(MessageIds.GDE_MSGT0909), 3);
-		windowActor.setTrailVisible(record, getSummary(record).getMinMaxWarning()[actionType].getSelectIndex());
+		volatileComment = new VolatileComment(recordFormatter.defineMinMaxWarningText(this.getChartData(record)),
+				Messages.getString(MessageIds.GDE_MSGT0909), 3);
+		windowActor.setTrailVisible(record, getChartData(record).getMinMaxWarning()[actionType].getSelectIndex());
 		windowActor.updateHistoTabs(false, false);
 	}
 
@@ -583,7 +580,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		this.chartData.clear();
 		for (TrailRecord record : trailRecordSet.getValues()) {
-			this.chartData.put(record.getName(), new Summary(record));
+			this.chartData.put(record.getName(), new SummaryLayout(record));
 		}
 		trailRecordSet.updateSyncSummaryScale(this.chartData);
 		if (trailRecordSet.getDisplayRecords() == null || trailRecordSet.getDisplayRecords().isEmpty()) return; // concurrent activity
@@ -600,7 +597,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 			Rectangle drawStripBounds = new Rectangle(curveAreaBounds.x, curveAreaBounds.y + stripHeight * i + UNK_GAP, curveAreaBounds.width, stripHeight);
 			log.finer(() -> record.getName() + "  x0=" + curveAreaBounds.x + " y0=" + drawStripBounds.y + " width=" + curveAreaBounds.width + " height=" + stripHeight);
 
-			SummarySpots summarySpots = getSummary(record).getSummarySpots();
+			SummarySpots summarySpots = getChartData(record).getSummarySpots();
 			summarySpots.initialize(drawStripBounds, density);
 		}
 	}
@@ -625,28 +622,29 @@ public final class SummaryComposite extends AbstractChartComposite {
 
 		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
-			SummarySpots summarySpots = getSummary(record).getSummarySpots();
+			SummarySpots summarySpots = getChartData(record).getSummarySpots();
 
-			double decodedScaleMin = getSummary(record).defineScaleMin();
-			double decodedScaleMax = getSummary(record).defineScaleMax();
+			double decodedScaleMin = getChartData(record).defineScaleMin();
+			double decodedScaleMax = getChartData(record).defineScaleMax();
 
-			HistoCurveUtils.drawChannelItemScale(getSummary(record), canvasImageGC, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+			HistoCurveUtils.drawChannelItemScale(getChartData(record), canvasImageGC, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
 					isDrawScaleInRecordColor, isDrawNumbersInRecordColor);
 			if (exclusiveNames.contains(record.getName()))
-				HistoCurveUtils.drawChannelItemWarnMarker(getSummary(record), canvasImageGC, dataScaleWidth, isDrawNumbersInRecordColor);
+				HistoCurveUtils.drawChannelItemWarnMarker(getChartData(record), canvasImageGC, dataScaleWidth, isDrawNumbersInRecordColor);
 			if (record.size() == 0) continue; // nothing to display
 
 			if (record.isVisible() || !isPartialDataTable) {
-				if (isSummarySpreadVisible) HistoCurveUtils.drawChannelItemSpread(getSummary(record).getSummarySpots(), canvasImageGC);
-				if (!isCurveSelector && record.isVisible()) HistoCurveUtils.drawChannelItemText(getSummary(record), canvasImageGC, isDrawNameInRecordColor);
-				if (isSummaryBoxVisible) HistoCurveUtils.drawChannelItemBoxplot(getSummary(record), canvasImageGC, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
-						isDrawNumbersInRecordColor, isSpaceBelow(i));
+				if (isSummarySpreadVisible) HistoCurveUtils.drawChannelItemSpread(getChartData(record).getSummarySpots(), canvasImageGC);
+				if (!isCurveSelector && record.isVisible()) HistoCurveUtils.drawChannelItemText(getChartData(record), canvasImageGC, isDrawNameInRecordColor);
+				if (isSummaryBoxVisible)
+					HistoCurveUtils.drawChannelItemBoxplot(getChartData(record), canvasImageGC, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+							isDrawNumbersInRecordColor, isSpaceBelow(i));
 				if (isSummarySpotsVisible) summarySpots.drawMarkers(canvasImageGC);
 				summarySpots.drawRecentMarkers(canvasImageGC);
 			}
 			boolean isDefaultOrExclusiveWarning = inclusionData.map(d -> d.isIncluded(record.getName())).orElse(true);
 			if (isDefaultOrExclusiveWarning && !HistoSet.isGpsCoordinates(record)) {
-				HistoCurveUtils.drawChannelItemWarnings(getSummary(record), canvasImageGC, dataScaleWidth);
+				HistoCurveUtils.drawChannelItemWarnings(getChartData(record), canvasImageGC, dataScaleWidth);
 			}
 			canvasImageGC.setBackground(this.surroundingBackground);
 		}
@@ -700,12 +698,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		measuring.drawMeasuring();
 	}
 
-	public Map<String, Summary> getChartData() {
-		return this.chartData;
-	}
-
-	@Override
-	public IChartData getChartData(TrailRecord trailRecord) {
-		return this.chartData.get(trailRecord.getName());
+	public SummaryLayout getChartData(TrailRecord trailRecord) {
+		return (SummaryLayout) this.chartData.get(trailRecord.getName());
 	}
 }

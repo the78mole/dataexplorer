@@ -48,7 +48,6 @@ import gde.device.resource.DeviceXmlResource;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecordSet.Outliers;
-import gde.histo.ui.IChartData;
 import gde.histo.utils.ElementaryQuantile;
 import gde.histo.utils.Spot;
 import gde.log.Logger;
@@ -62,24 +61,24 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public abstract class TrailRecord extends CommonRecord {
-	private final static String		$CLASS_NAME				= TrailRecord.class.getName();
-	private final static long			serialVersionUID	= 110124007964748556L;
-	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME				= TrailRecord.class.getName();
+	private final static long		serialVersionUID	= 110124007964748556L;
+	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
 	public static class ChartTemplate {
 
-		boolean												isVisible									= true;
-		boolean												isPositionLeft						= true;
-		Color													color											= DataExplorer.COLOR_BLACK;
-		int														lineWidth									= 1;
-		int														lineStyle									= SWT.LINE_SOLID;
-		boolean												isRoundOut								= false;
-		boolean												isStartpointZero					= false;
-		boolean												isStartEndDefined					= false;
-		DecimalFormat									df												= new DecimalFormat("0.0");
-		int														numberFormat							= -1;												// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
-		double												maxScaleValue							= 0.;												// overwrite calculated boundaries
-		double												minScaleValue							= 0.;
+		boolean				isVisible					= true;
+		boolean				isPositionLeft		= true;
+		Color					color							= DataExplorer.COLOR_BLACK;
+		int						lineWidth					= 1;
+		int						lineStyle					= SWT.LINE_SOLID;
+		boolean				isRoundOut				= false;
+		boolean				isStartpointZero	= false;
+		boolean				isStartEndDefined	= false;
+		DecimalFormat	df								= new DecimalFormat("0.0");
+		int						numberFormat			= -1;												// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
+		double				maxScaleValue			= 0.;												// overwrite calculated boundaries
+		double				minScaleValue			= 0.;
 
 		/**
 		 * Method to initialize scale position defaults.
@@ -264,8 +263,6 @@ public abstract class TrailRecord extends CommonRecord {
 
 	protected TrailSelector								trailSelector;
 	protected ElementaryQuantile<Double>	quantile;
-	protected IChartData									graphics;
-	protected IChartData									summary;
 
 	protected TrailRecord(IChannelItem channelItem, int newOrdinal, TrailRecordSet parentTrail, int initialCapacity) {
 		super(DataExplorer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
@@ -319,8 +316,6 @@ public abstract class TrailRecord extends CommonRecord {
 	public void clear() {
 		this.suiteRecords.clear();
 		this.quantile = null;
-		this.graphics = null;
-		this.summary = null;
 		super.clear();
 	}
 
@@ -338,6 +333,31 @@ public abstract class TrailRecord extends CommonRecord {
 	@Override
 	public int realSize() {
 		return super.realSize();
+	}
+
+	/**
+	 * Support Names replacement which is required for TrailRecords as they do not hold the replacement as a record name.
+	 */
+	@Override // reason is replacement for record names
+	public String getSyncMasterName() {
+		StringBuilder sb = new StringBuilder().append(this.getNameReplacement().split(GDE.STRING_BLANK)[0]);
+
+		Vector<TrailRecord> syncedChildren = this.getParent().getScaleSyncedRecords().get(this.ordinal);
+		if (syncedChildren == null) throw new UnsupportedOperationException();
+		if (syncedChildren.firstElement().getNameReplacement().split(GDE.STRING_BLANK).length > 1) {
+			sb.append(GDE.STRING_BLANK);
+			String[] splitName = syncedChildren.firstElement().getNameReplacement().split(GDE.STRING_BLANK);
+			sb.append(splitName.length > 1 ? splitName[1] : GDE.STRING_STAR);
+			sb.append(GDE.STRING_DOT).append(GDE.STRING_DOT);
+			String trailer = GDE.STRING_STAR;
+			for (TrailRecord tmpRecord : syncedChildren) {
+				if (tmpRecord.isDisplayable() && tmpRecord.size() > 1) trailer = tmpRecord.getNameReplacement();
+			}
+			sb.append(trailer.split(GDE.STRING_BLANK).length > 1 ? trailer.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
+		} else {
+			sb.append(GDE.STRING_MESSAGE_CONCAT).append(syncedChildren.lastElement().getNameReplacement());
+		}
+		return sb.toString();
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.

@@ -244,7 +244,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 
 		if (this.isLeftMouseMeasure) {
 			int height = graphicsComposite.curveAreaBounds.height;
-			int yPosMeasureNew = HistoGraphicsMapper.getVerticalDisplayPos(graphicsComposite.getGraphics(measure.measureRecord), height, measure.measureRecord.getParent().getIndex(timestamp_ms));
+			int yPosMeasureNew = HistoGraphicsMapper.getVerticalDisplayPos(graphicsComposite.getChartData(measure.measureRecord), height, measure.measureRecord.getParent().getIndex(timestamp_ms));
 			if (this.curveSurvey.isNewMeasureSpot(timestamp_ms, yPosMeasureNew)) {
 				curveSurvey.cleanMeasurementPointer(graphicsComposite.canvasImage);
 
@@ -254,7 +254,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 			}
 		} else if (this.isRightMouseMeasure) {
 			int height = graphicsComposite.curveAreaBounds.height;
-			int yPosDeltaNew = HistoGraphicsMapper.getVerticalDisplayPos(graphicsComposite.getGraphics(measure.measureRecord), height, measure.measureRecord.getParent().getIndex(timestamp_ms));
+			int yPosDeltaNew = HistoGraphicsMapper.getVerticalDisplayPos(graphicsComposite.getChartData(measure.measureRecord), height, measure.measureRecord.getParent().getIndex(timestamp_ms));
 			if (this.curveSurvey.isNewDeltaSpot(timestamp_ms, yPosDeltaNew)) {
 				curveSurvey.cleanMeasurementPointer(graphicsComposite.canvasImage);
 

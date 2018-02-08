@@ -27,7 +27,7 @@ import gde.GDE;
 import gde.device.TrailTypes;
 import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecordSet.Outliers;
-import gde.histo.ui.SummaryComposite.Summary;
+import gde.histo.ui.SummaryComposite.SummaryLayout;
 import gde.histo.ui.data.SummarySpots.OutlierWarning;
 import gde.log.Logger;
 import gde.messages.MessageIds;
@@ -215,7 +215,7 @@ public final class TrailRecordFormatter {
 		return getTableValue(this.record.elementAt(index) / 1000.);
 	}
 
-	public String defineFormattedMinWarning(Summary summary) {
+	public String defineFormattedMinWarning(SummaryLayout summary) {
 		Outliers outliers = summary.getMinMaxWarning()[0];
 		if (outliers == null) {
 			return new String();
@@ -240,7 +240,7 @@ public final class TrailRecordFormatter {
 		}
 	}
 
-	public String defineFormattedMaxWarning(Summary summary) {
+	public String defineFormattedMaxWarning(SummaryLayout summary) {
 		Outliers outliers = summary.getMinMaxWarning()[1];
 		if (outliers == null) {
 			return new String();
@@ -268,7 +268,7 @@ public final class TrailRecordFormatter {
 	/**
 	 * @return the text information about all warnings for the record
 	 */
-	public String defineMinMaxWarningText(Summary summary) {
+	public String defineMinMaxWarningText(SummaryLayout summary) {
 		String textLine1 = "", textLine2 = "";
 		final String fileNameInitializer = Messages.getString(MessageIds.GDE_MSGT0908);
 		final String minMaxSeparator = "   >---<   ";

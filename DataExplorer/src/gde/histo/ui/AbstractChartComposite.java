@@ -22,6 +22,8 @@ package gde.histo.ui;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -40,7 +42,6 @@ import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.AbstractChartWindow.WindowActor;
 import gde.histo.ui.menu.AbstractTabAreaContextMenu;
@@ -56,19 +57,46 @@ import gde.utils.GraphicsUtils;
  * @author Thomas Eickert (USER)
  */
 public abstract class AbstractChartComposite extends Composite {
-	private final static String						$CLASS_NAME					= AbstractChartComposite.class.getName();
-	private final static Logger						log									= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME					= AbstractChartComposite.class.getName();
+	private final static Logger	log									= Logger.getLogger($CLASS_NAME);
 
-	protected final static int						DEFAULT_TOP_GAP			= 5;																			// on top of the curves
-	protected final static int						DEFAULT_SIDE_GAP		= 10;																			// at the leftmost and rightmost graphics
-	protected final static int						DEFAULT_BOTTOM_GAP	= 20;																			// at the bottom of the plots for the scale
-	protected final static int						DEFAULT_HEADER_GAP	= 5;
-	protected final static int						DEFAULT_COMMENT_GAP	= 5;
+	protected final static int	DEFAULT_TOP_GAP			= 5;																			// on top of the curves
+	protected final static int	DEFAULT_SIDE_GAP		= 10;																			// at the leftmost and rightmost graphics
+	protected final static int	DEFAULT_BOTTOM_GAP	= 20;																			// at the bottom of the plots for the scale
+	protected final static int	DEFAULT_HEADER_GAP	= 5;
+	protected final static int	DEFAULT_COMMENT_GAP	= 5;
 
-	protected final static int						ZERO_CANVAS_HEIGHT	= 11;																			// minimize if smart statistics is not active
+	protected final static int	ZERO_CANVAS_HEIGHT	= 11;																			// minimize if smart statistics is not active
 
-	protected final DataExplorer					application					= DataExplorer.getInstance();
-	protected final Settings							settings						= Settings.getInstance();
+	/**
+	 * Layout data for the life cycle of a chart.
+	 * Members of the chartData classes.
+	 */
+	protected static class AbstractChartLayout {
+	}
+
+	/**
+	 * Map holding layout data assigned to records.
+	 */
+	public static class AbstractChartData {
+
+		private final Map<String, AbstractChartLayout> chartData = new LinkedHashMap<>();
+
+		public void clear() {
+			chartData.clear();
+		}
+
+		public AbstractChartLayout get(String recordName) {
+			return chartData.get(recordName);
+		}
+
+		public AbstractChartLayout put(String recordName, AbstractChartLayout chartLayout) {
+			return chartData.put(recordName, chartLayout);
+		}
+	}
+
+	protected final DataExplorer					application				= DataExplorer.getInstance();
+	protected final Settings							settings					= Settings.getInstance();
 
 	protected final WindowActor						windowActor;
 
@@ -83,11 +111,11 @@ public abstract class AbstractChartComposite extends Composite {
 	protected Text												recordSetComment;
 	protected Text												xScale;
 	protected Canvas											graphicCanvas;
-	int																		headerHeight				= 0;
-	int																		headerGap						= 0;
-	int																		commentHeight				= 0;
-	int																		commentGap					= 0;
-	int																		xScaleHeight				= 0;
+	int																		headerHeight			= 0;
+	int																		headerGap					= 0;
+	int																		commentHeight			= 0;
+	int																		commentGap				= 0;
+	int																		xScaleHeight			= 0;
 	protected String											graphicsHeaderText;
 
 	/**
@@ -97,12 +125,12 @@ public abstract class AbstractChartComposite extends Composite {
 	protected Image												canvasImage;
 	protected GC													canvasImageGC;
 	protected GC													canvasGC;
-	protected Rectangle										curveAreaBounds			= new Rectangle(0, 0, 1, 1);
-	protected int													fixedCanvasY				= -1;
-	protected int													fixedCanvasHeight		= -1;
+	protected Rectangle										curveAreaBounds		= new Rectangle(0, 0, 1, 1);
+	protected int													fixedCanvasY			= -1;
+	protected int													fixedCanvasHeight	= -1;
 
 	/** composite size - control resized */
-	protected Point												oldSize							= new Point(0, 0);
+	protected Point												oldSize						= new Point(0, 0);
 	protected AbstractMeasuring						measuring;
 
 	/**
@@ -456,7 +484,5 @@ public abstract class AbstractChartComposite extends Composite {
 	 * Make drawing independent from layout data creation.
 	 */
 	protected abstract void defineLayoutParams();
-
-	public abstract IChartData getChartData(TrailRecord trailRecord);
 
 }

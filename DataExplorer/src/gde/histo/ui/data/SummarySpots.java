@@ -29,9 +29,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -46,9 +47,7 @@ import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet.Outliers;
 import gde.histo.ui.Measure;
-import gde.histo.ui.SummaryComposite.Summary;
-import gde.histo.ui.data.SummarySpots.Density;
-import gde.histo.ui.data.SummarySpots.PosMarkers;
+import gde.histo.ui.SummaryComposite.SummaryLayout;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -143,6 +142,152 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		}
 	}
 
+	/**
+	 * The displayable marker objects at the x position.
+	 * Key is the x axis position with a step distance defined by the element size.
+	 * A marker object is a list which holds the record indices assigned to this x position.
+	 */
+	public static final class MarkerPositions {
+		private final TreeMap<Integer, PosMarkers> markerPositions = new TreeMap<>();
+
+		public void clear() {
+			markerPositions.clear();
+		}
+
+		public PosMarkers put(int xDrawer, PosMarkers posMarkers) {
+			return markerPositions.put(xDrawer, posMarkers);
+		}
+
+		public PosMarkers get(int xDrawer) {
+			return markerPositions.get(xDrawer);
+		}
+
+		public boolean isEmpty() {
+			return markerPositions.isEmpty();
+		}
+
+		public Set<Entry<Integer, PosMarkers>> entrySet() {
+			return markerPositions.entrySet();
+		}
+
+		public void putAll(MarkerPositions newPositions) {
+			markerPositions.putAll(newPositions.markerPositions);
+		}
+
+		@Override
+		public String toString() {
+			return "MarkerPositions [markerPositionSize=" + this.markerPositions.size() + "markerPositions=" + this.markerPositions + "]";
+		}
+	}
+
+	/**
+	 * Graph elements for an x axis position in the summary record row.
+	 * The value is the record's data point index in order to get a back reference to the vault data.
+	 */
+	public static final class PosMarkers implements Iterable<Integer> {
+		private final Logger				log								= Logger.getLogger(PosMarkers.class.getName());
+
+		private final List<Integer>	recordIndices			= new ArrayList<>();
+		/**
+		 * The mid of the drawing strip is 9 pixels and zero is above the mid.
+		 */
+		private final List<Integer>	yPositions				= new ArrayList<>();
+
+		private final int						elementWidth;
+		private final int						yStep;
+		private final int						stripHeight;
+		private final int						halfDrawingHeight;
+
+		private int									cycleNumber				= 0;																						// number of fully populated element columns
+		private int									nextRelativeYPos	= 0;																						// lower corner of a 2x2 element
+
+		PosMarkers(int stripHeight, int elementWidth) {
+			this.stripHeight = stripHeight;
+			this.elementWidth = elementWidth;
+			this.yStep = elementWidth + 1;
+			this.halfDrawingHeight = (stripHeight - 1) / 2; // leave at least one pixel at the top of the strip
+		}
+
+		/**
+		 * @return the trail record index of this element
+		 */
+		public Integer get(int index) {
+			return recordIndices.get(index);
+		}
+
+		/**
+		 * @param recordIndex is the record's data point index or null for markers which are not drawn
+		 */
+		public boolean add(Integer recordIndex) {
+			int yPosition = recordIndex == null ? null : -nextRelativeYPos + halfDrawingHeight + 0; // add 0 pixel for a little shift to the bottom
+			yPositions.add(yPosition);
+
+			// the next position is one step towards the outer border and alternates from the lower half to the upper half
+			if ((size() - 1) % 2 == 0 && nextRelativeYPos != 0) {
+				nextRelativeYPos = -Math.abs(nextRelativeYPos); // lower half
+			} else {
+				nextRelativeYPos = Math.abs(nextRelativeYPos) + yStep; // upper half
+			}
+			// check if the next element exceeds the upper half border
+			if (nextRelativeYPos > halfDrawingHeight - elementWidth / 2) {
+				cycleNumber += 1;
+				// shift the next position downwards from the center line or start at the center line again
+				nextRelativeYPos = yStep - cycleNumber % yStep - 1;
+			}
+			log.log(Level.FINEST, "" + size(), String.format(" cycleNumber=%d nextRelativeYPos=%d", cycleNumber, nextRelativeYPos));
+			return recordIndices.add(recordIndex);
+		}
+
+		/**
+		 * Replace the values at the index with null.
+		 */
+		public Integer setToNull(int index) {
+			yPositions.set(index, null);
+			return recordIndices.set(index, null);
+		}
+
+		@Override
+		public PosMarkers clone() {
+			PosMarkers newPosMarkers = new PosMarkers(stripHeight, elementWidth);
+			newPosMarkers.cycleNumber = cycleNumber;
+			newPosMarkers.nextRelativeYPos = nextRelativeYPos;
+			newPosMarkers.recordIndices.addAll(this.recordIndices);
+			newPosMarkers.yPositions.addAll(this.yPositions);
+			return newPosMarkers;
+		}
+
+		public List<Integer> getYPositions() {
+			return this.yPositions;
+		}
+
+		@Override
+		public Iterator<Integer> iterator() {
+			return recordIndices.listIterator();
+		}
+
+		public int size() {
+			return recordIndices.size();
+		}
+
+		public Stream<Integer> stream() {
+			return recordIndices.stream();
+		}
+
+		public List<Integer> toList() {
+			return recordIndices;
+		}
+
+		@Override
+		public String toString() {
+			return "PosMarkers [recordIndices=" + this.recordIndices + ", yStep=" + this.yStep + ", stripHeight=" + this.stripHeight + ", cycleNumber=" + this.cycleNumber + ", nextRelativeYPos=" + this.nextRelativeYPos + "]";
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "[record=" + this.record.getName() + ", warningMinMax=" + Arrays.toString(this.warningMinMaxValues) + ", xPositions=" + this.xPositions + " ]";
+	}
+
 	public List<Integer> defineGrid(boolean innerOnly) {
 		List<Integer> grid = new ArrayList<>();
 		double xStep = (stripNetWidth + 1) / 10.; // + 1 for a smaller right gap
@@ -158,33 +303,33 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		return grid;
 	}
 
-	public final Summary												summary;
-	public final TrailRecord										record;
+	public final SummaryLayout		summary;
+	public final TrailRecord			record;
 
-	private Rectangle														drawStripBounds;
-	private int																	elementWidth;
+	private Rectangle							drawStripBounds;
+	private int										elementWidth;
 
-	private int																	stripNetX0;														// start pos for the first marker
-	private int																	stripNetWidth;												// relative start pos for the LAST marker
+	private int										stripNetX0;																	// start pos for the first marker
+	private int										stripNetWidth;															// relative start pos for the LAST marker
 
-	private double															xValueScaleFactor;
-	private double															xValueOffset;
-	private double															xPointScaleFactor;
-	private double															xPointOffset;
+	private double								xValueScaleFactor;
+	private double								xValueOffset;
+	private double								xPointScaleFactor;
+	private double								xPointOffset;
 
 	/**
 	 * The displayable marker objects at the x position.
 	 * Key is the x axis position with a step distance defined by the element size.
 	 * A marker object is a list which holds the record indices assigned to this x position.
 	 */
-	private final TreeMap<Integer, PosMarkers>	xPositions					= new TreeMap<>();
+	private final MarkerPositions	xPositions					= new MarkerPositions();
 	/**
 	 * Levels for the min warning and the max warning.
 	 * Null means no warning.
 	 */
-	public Outliers[]														warningMinMaxValues	= null;
+	public Outliers[]							warningMinMaxValues	= null;
 
-	public SummarySpots(Summary summary) {
+	public SummarySpots(SummaryLayout summary) {
 		this.summary = summary;
 		this.record = summary.getTrailRecord();
 	}
@@ -219,9 +364,9 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	 * @return the markers at the x position.<br/>
 	 *         A marker object is a list which holds the record indices assigned to this xAxisPosition.
 	 */
-	private TreeMap<Integer, PosMarkers> defineXPositions(int limit) {
+	private MarkerPositions defineXPositions(int limit) {
 		log.finest(() -> record.getName() + "  limit=" + limit);
-		TreeMap<Integer, PosMarkers> resultXPositions = new TreeMap<>();
+		MarkerPositions resultXPositions = new MarkerPositions();
 
 		final Vector<Integer> tmpRecord;
 		if (record.getTrailSelector().isTrailSuite()) {
@@ -239,7 +384,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 				log.finest(() -> "xPos=" + xPos);
 				PosMarkers posMarkers = resultXPositions.get(xDrawer);
 				if (posMarkers == null) {
-					posMarkers = new PosMarkers(drawStripBounds.height);
+					posMarkers = new PosMarkers(drawStripBounds.height, elementWidth);
 					resultXPositions.put(xDrawer, posMarkers);
 				}
 				posMarkers.add(i);
@@ -438,14 +583,14 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	 * Draw markers and skip PosMarkers elements with null values.
 	 * Enlarged outliers.
 	 */
-	private void drawScalableMarkers(GC gc, TreeMap<Integer, PosMarkers> tmpXPositions, Color color) {
+	private void drawScalableMarkers(GC gc, MarkerPositions markerPositions, Color color) {
 		gc.setLineWidth(1);
 		gc.setLineStyle(SWT.LINE_SOLID);
 		gc.setForeground(color);
 		gc.setBackground(color);
 
 		int[] tukeyXPositions = defineTukeyXPositions();
-		for (Map.Entry<Integer, PosMarkers> xEntry : tmpXPositions.entrySet()) {
+		for (Map.Entry<Integer, PosMarkers> xEntry : markerPositions.entrySet()) {
 			int lowerLimit = tukeyXPositions[LOWER_WHISKER.ordinal()] / elementWidth * elementWidth; // floor
 			int upperLimit = (tukeyXPositions[UPPER_WHISKER.ordinal()] / elementWidth + 1) * elementWidth; // ceiling
 			int actualWidth = xEntry.getKey() < lowerLimit || xEntry.getKey() > upperLimit ? elementWidth * 2 : elementWidth;
@@ -502,8 +647,8 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	}
 
 	private List<Integer> getSnappedIndexes(int stripXPos) {
-		int index = stripXPos - stripXPos % elementWidth;
-		PosMarkers posMarkers = xPositions.get(index);
+		int xDrawer = stripXPos - stripXPos % elementWidth;
+		PosMarkers posMarkers = xPositions.get(xDrawer);
 		log.log(Level.FINER, "stripXPos=", stripXPos);
 		return posMarkers != null ? posMarkers.toList() : new ArrayList<>();
 	}
@@ -548,109 +693,4 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		}
 	}
 
-	/**
-	 * Graph elements for an x axis position in the summary record row.
-	 * The value is the record's data point index in order to get a back reference to the vault data.
-	 */
-	public class PosMarkers implements Iterable<Integer> {
-		private final Logger				log								= Logger.getLogger(PosMarkers.class.getName());
-
-		private final List<Integer>	recordIndices			= new ArrayList<>();
-		/**
-		 * The mid of the drawing strip is 9 pixels and zero is above the mid.
-		 */
-		private final List<Integer>	yPositions				= new ArrayList<>();
-
-		private final int						yStep							= elementWidth + 1;
-
-		private final int						stripHeight;
-		private final int						halfDrawingHeight;
-
-		private int									cycleNumber				= 0;																						// number of fully populated element columns
-		private int									nextRelativeYPos	= 0;																						// lower corner of a 2x2 element
-
-		PosMarkers(int stripHeight) {
-			this.stripHeight = stripHeight;
-			halfDrawingHeight = (stripHeight - 1) / 2; // leave at least one pixel at the top of the strip
-		}
-
-		/**
-		 * @return the trail record index of this element
-		 */
-		public Integer get(int index) {
-			return recordIndices.get(index);
-		}
-
-		/**
-		 * @param recordIndex is the record's data point index or null for markers which are not drawn
-		 */
-		public boolean add(Integer recordIndex) {
-			int yPosition = recordIndex == null ? null : -nextRelativeYPos + halfDrawingHeight + 0; // add 0 pixel for a little shift to the bottom
-			yPositions.add(yPosition);
-
-			// the next position is one step towards the outer border and alternates from the lower half to the upper half
-			if ((size() - 1) % 2 == 0 && nextRelativeYPos != 0) {
-				nextRelativeYPos = -Math.abs(nextRelativeYPos); // lower half
-			} else {
-				nextRelativeYPos = Math.abs(nextRelativeYPos) + yStep; // upper half
-			}
-			// check if the next element exceeds the upper half border
-			if (nextRelativeYPos > halfDrawingHeight - elementWidth / 2) {
-				cycleNumber += 1;
-				// shift the next position downwards from the center line or start at the center line again
-				nextRelativeYPos = yStep - cycleNumber % yStep - 1;
-			}
-			log.log(Level.FINEST, "" + size(), String.format(" cycleNumber=%d nextRelativeYPos=%d", cycleNumber, nextRelativeYPos));
-			return recordIndices.add(recordIndex);
-		}
-
-		/**
-		 * Replace the values at the index with null.
-		 */
-		public Integer setToNull(int index) {
-			yPositions.set(index, null);
-			return recordIndices.set(index, null);
-		}
-
-		@Override
-		public PosMarkers clone() {
-			PosMarkers newPosMarkers = new PosMarkers(stripHeight);
-			newPosMarkers.cycleNumber = cycleNumber;
-			newPosMarkers.nextRelativeYPos = nextRelativeYPos;
-			newPosMarkers.recordIndices.addAll(this.recordIndices);
-			newPosMarkers.yPositions.addAll(this.yPositions);
-			return newPosMarkers;
-		}
-
-		public List<Integer> getYPositions() {
-			return this.yPositions;
-		}
-
-		@Override
-		public Iterator<Integer> iterator() {
-			return recordIndices.listIterator();
-		}
-
-		public int size() {
-			return recordIndices.size();
-		}
-
-		public Stream<Integer> stream() {
-			return recordIndices.stream();
-		}
-
-		public List<Integer> toList() {
-			return recordIndices;
-		}
-
-		@Override
-		public String toString() {
-			return "PosMarkers [recordIndices=" + this.recordIndices + ", yStep=" + this.yStep + ", stripHeight=" + this.stripHeight + ", cycleNumber=" + this.cycleNumber + ", nextRelativeYPos=" + this.nextRelativeYPos + "]";
-		}
-	}
-
-	@Override
-	public String toString() {
-		return "[record=" + this.record.getName() + ", warningMinMax=" + Arrays.toString(this.warningMinMaxValues) + ", xPositions=" + this.xPositions + " ]";
-	}
 }

@@ -40,7 +40,7 @@ import gde.config.Settings;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSection;
-import gde.histo.ui.GraphicsComposite.Graphics;
+import gde.histo.ui.GraphicsComposite.GraphicsLayout;
 import gde.histo.utils.HistoTimeLine;
 import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
@@ -56,6 +56,11 @@ import gde.ui.SWTResourceManager;
 public final class CurveSurvey {
 	private final static String	$CLASS_NAME	= CurveSurvey.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
+
+	/**
+	 * Maximum cursor distance from an x axis position for snapping the timeline position (value is a number of pixels).
+	 */
+	private static final int X_TOLERANCE = 1;
 
 	public enum LineMark {
 		MEASURE_CROSS(1, SWT.COLOR_DARK_GREEN, SWT.LINE_DASH, null), //
@@ -377,6 +382,11 @@ public final class CurveSurvey {
 			return boxWidth + boxWidth * (Settings.getInstance().getBoxplotScaleOrdinal() - 1) / 2;
 		}
 
+		@Override
+		public String toString() {
+			return "LinePainter [offSetX=" + this.offSetX + ", offSetY=" + this.offSetY + ", width=" + this.width + ", height=" + this.height + ", yLowerLimit=" + this.yLowerLimit + ", yUpperLimit=" + this.yUpperLimit + ", xLeftLimit=" + this.xLeftLimit + ", xRightLimit=" + this.xRightLimit + ", getBoxWidth()=" + this.getBoxWidth() + "]";
+		}
+
 	}
 
 	private final Settings					settings		= Settings.getInstance();
@@ -461,19 +471,19 @@ public final class CurveSurvey {
 		int height = timeLine.getCurveAreaBounds().height;
 		TrailRecordSection recordSection = measure.getRecordSection();
 
-		Graphics graphics = graphicsComposite.getGraphics(trailRecord);
+		GraphicsLayout graphicsData = graphicsComposite.getChartData(trailRecord);
 		if (!recordSection.isBoundedParabola()) { // hide these curves for better overview whenever a parabola is shown
-			int yBoundedAvg = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, recordSection.getBoundedAvgValue());
+			int yBoundedAvg = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, recordSection.getBoundedAvgValue());
 			this.linePainter.drawAverageLine(yBoundedAvg, this.xPosMeasure, this.xPosDelta - this.xPosMeasure);
 
-			int yRegressionPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, recordSection.getBoundedSlopeValue(measure.getTimestampMeasure_ms()));
-			int yRegressionPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, recordSection.getBoundedSlopeValue(measure.getTimestampDelta_ms()));
+			int yRegressionPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, recordSection.getBoundedSlopeValue(measure.getTimestampMeasure_ms()));
+			int yRegressionPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, recordSection.getBoundedSlopeValue(measure.getTimestampDelta_ms()));
 			this.linePainter.drawLinearRegressionLine(this.xPosMeasure, yRegressionPosMeasure, this.xPosDelta, yRegressionPosDelta);
 		} else {
 			List<Spot<Integer>> points = new ArrayList<>();
 			for (Spot<Double> entry : recordSection.getBoundedParabolaValues()) {
 				points.add(new Spot<Integer>(this.timeLine.getXPosTimestamp((long) entry.x().doubleValue()),
-						HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, entry.y())));
+						HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, entry.y())));
 			}
 			log.finer(() -> "values " + Arrays.toString(points.toArray()));
 			this.linePainter.drawRegressionParabolaLine(points);
@@ -483,7 +493,7 @@ public final class CurveSurvey {
 			double[] values = recordSection.getBoundedBoxplotValues();
 			int[] yPosBoxplot = new int[values.length];
 			for (int i = 0; i < values.length; i++) {
-				yPosBoxplot[i] = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, values[i]);
+				yPosBoxplot[i] = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, values[i]);
 			}
 			this.linePainter.drawBoxplot(xPosMidBounds, yPosBoxplot);
 		}
@@ -519,8 +529,8 @@ public final class CurveSurvey {
 	public void setMeasurePosition() {
 		int height = timeLine.getCurveAreaBounds().height;
 		xPosMeasure = timeLine.getXPosTimestamp(measure.getTimestampMeasure_ms());
-		Graphics graphics = graphicsComposite.getGraphics(trailRecord);
-		yPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, trailRecord.getParent().getIndex(measure.getTimestampMeasure_ms()));
+		GraphicsLayout graphicsData = graphicsComposite.getChartData(trailRecord);
+		yPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, trailRecord.getParent().getIndex(measure.getTimestampMeasure_ms()));
 		log.off(() -> String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", measure.getTimestampMeasure_ms(), this.xPosMeasure, this.yPosMeasure));
 	}
 
@@ -530,8 +540,8 @@ public final class CurveSurvey {
 	public void setDeltaPosition() {
 		int height = timeLine.getCurveAreaBounds().height;
 		xPosDelta = timeLine.getXPosTimestamp(measure.getTimestampDelta_ms());
-		Graphics graphics = graphicsComposite.getGraphics(trailRecord);
-		yPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(graphics, height, trailRecord.getParent().getIndex(measure.getTimestampDelta_ms()));
+		GraphicsLayout graphicsData = graphicsComposite.getChartData(trailRecord);
+		yPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, trailRecord.getParent().getIndex(measure.getTimestampDelta_ms()));
 		log.fine(() -> String.format("timestampDelta_ms=%d xPosDelta=%d yPosDelta=%d", measure.getTimestampDelta_ms(), this.xPosDelta, this.yPosDelta));
 	}
 
@@ -548,7 +558,7 @@ public final class CurveSurvey {
 	 * @return true if the x position is close to the vertical line
 	 */
 	public boolean isNearMeasureLine(int xPos) {
-		return this.xPosMeasure + 1 >= xPos && this.xPosMeasure - 1 <= xPos;
+		return this.xPosMeasure + X_TOLERANCE >= xPos && this.xPosMeasure - X_TOLERANCE <= xPos;
 	}
 
 	/**
@@ -570,6 +580,11 @@ public final class CurveSurvey {
 
 	public void setCanvasGC(GC canvasGC) {
 		this.canvasGC = canvasGC;
+	}
+
+	@Override
+	public String toString() {
+		return "CurveSurvey [xPosMeasure=" + this.xPosMeasure + ", yPosMeasure=" + this.yPosMeasure + ", xPosDelta=" + this.xPosDelta + ", yPosDelta=" + this.yPosDelta + "]";
 	}
 
 }

@@ -32,7 +32,6 @@ import gde.config.Settings;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSetFormatter;
-import gde.histo.ui.SummaryComposite.Summary;
 import gde.histo.ui.data.SummarySpots;
 import gde.histo.ui.data.SummarySpots.Density;
 import gde.log.Logger;
@@ -172,27 +171,19 @@ public final class SummaryMeasuring extends AbstractMeasuring {
 	boolean																isLeftMouseMeasure	= false;
 	boolean																isRightMouseMeasure	= false;
 
-	private final AbstractChartComposite	summaryComposite;
+	private final SummaryComposite	summaryComposite;
 	private final CurveSurvey							curveSurvey;																	// todo decide if Summary Survey class is required
 
 	private GC														canvasGC;
 	private MeasuringMode									mode;
 
-	public SummaryMeasuring(AbstractChartComposite summaryComposite, Measure measure) {
+	public SummaryMeasuring(SummaryComposite summaryComposite, Measure measure) {
 		super(measure);
 		this.summaryComposite = summaryComposite;
 		this.mode = MeasuringMode.getMode(measure.isDeltaMeasure);
 		this.mode.setMode(this);
 
-		this.curveSurvey = null; // todo decide about initial timestamps and curve survey
-// long[] initialTimestamps_ms = this.mode.defineInitialTimestamps_ms(this.summaryComposite);
-// measure.setTimestampMeasure_ms(initialTimestamps_ms[0]);
-// measure.setTimestampDelta_ms(initialTimestamps_ms[1]);
-//
-// this.curveSurvey = new CurveSurvey(this.canvasGC, summaryComposite.getTimeLine(), measure);
-// this.curveSurvey.initialize();
-// this.curveSurvey.setMeasurePosition();
-// this.curveSurvey.setDeltaPosition();
+		this.curveSurvey = null;
 	}
 
 	/**
@@ -242,7 +233,7 @@ public final class SummaryMeasuring extends AbstractMeasuring {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
 			Rectangle drawStripBounds = new Rectangle(hgc.curveAreaBounds.x, hgc.curveAreaBounds.y + stripHeight * i + SummaryComposite.UNK_GAP,
 					hgc.curveAreaBounds.width, stripHeight);
-			SummarySpots summarySpots = ((Summary) summaryComposite.getChartData(record)).getSummarySpots();
+			SummarySpots summarySpots = summaryComposite.getChartData(record).getSummarySpots();
 			summarySpots.initialize(drawStripBounds, density);
 
 			if (record.isVisible() || !isPartialDataTable) {

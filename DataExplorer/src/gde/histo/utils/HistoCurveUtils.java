@@ -48,9 +48,8 @@ import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordFormatter;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSet.Outliers;
-import gde.histo.ui.GraphicsComposite.Graphics;
-import gde.histo.ui.IChartData;
-import gde.histo.ui.SummaryComposite.Summary;
+import gde.histo.ui.GraphicsComposite.GraphicsLayout;
+import gde.histo.ui.SummaryComposite.SummaryLayout;
 import gde.histo.ui.data.SummarySpots;
 import gde.histo.ui.data.SummarySpots.OutlierWarning;
 import gde.histo.utils.HistoTimeLine.Density;
@@ -177,7 +176,7 @@ public final class HistoCurveUtils {
 	 * @param decodedScaleMax is the value corresponding to the right border (xPos = width)
 	 * @param isDrawNumbersInRecordColor
 	 */
-	public static void drawChannelItemBoxplot(Summary summary, GC gc, int scaleWidthSpace, double decodedScaleMin, double decodedScaleMax,
+	public static void drawChannelItemBoxplot(SummaryLayout summary, GC gc, int scaleWidthSpace, double decodedScaleMin, double decodedScaleMax,
 			boolean isDrawNumbersInRecordColor, boolean isDrawNumbers) {
 		TrailRecordFormatter recordFormatter = new TrailRecordFormatter(summary.getTrailRecord());
 		List<String> scaleTexts = Arrays.asList(new String[] { summary.getTrailRecord().getFormattedScaleValue(decodedScaleMin),
@@ -279,7 +278,7 @@ public final class HistoCurveUtils {
 	 * @param gc
 	 * @param scaleWidthSpace is the width of the left / right scale in pixels
 	 */
-	public static void drawChannelItemWarnings(Summary summary, GC gc, int scaleWidthSpace) {
+	public static void drawChannelItemWarnings(SummaryLayout summary, GC gc, int scaleWidthSpace) {
 		Rectangle drawStripBounds = summary.getSummarySpots().getDrawStripBounds();
 		int x0 = drawStripBounds.x;
 		int width = drawStripBounds.width;
@@ -317,7 +316,7 @@ public final class HistoCurveUtils {
 	 * @param decodedScaleMax is the value corresponding to the right border (xPos = width)
 	 * @param isDrawNumbersInRecordColor
 	 */
-	public static void drawChannelItemScale(Summary summary, GC gc, int scaleWidthSpace, double decodedScaleMin, double decodedScaleMax,
+	public static void drawChannelItemScale(SummaryLayout summary, GC gc, int scaleWidthSpace, double decodedScaleMin, double decodedScaleMax,
 			boolean isDrawScaleInRecordColor, boolean isDrawNumbersInRecordColor) {
 		SummarySpots summarySpots = summary.getSummarySpots();
 		Rectangle drawStripBounds = summarySpots.getDrawStripBounds();
@@ -352,7 +351,7 @@ public final class HistoCurveUtils {
 
 	}
 
-	public static void drawChannelItemWarnMarker(Summary summary, GC gc, int scaleWidthSpace, boolean isDrawNumbersInRecordColor) {
+	public static void drawChannelItemWarnMarker(SummaryLayout summary, GC gc, int scaleWidthSpace, boolean isDrawNumbersInRecordColor) {
 		SummarySpots summarySpots = summary.getSummarySpots();
 		Rectangle drawStripBounds = summarySpots.getDrawStripBounds();
 		int x0 = drawStripBounds.x;
@@ -372,7 +371,7 @@ public final class HistoCurveUtils {
 	 * @param gc
 	 * @param isDrawNameInRecordColor
 	 */
-	public static void drawChannelItemText(Summary summary, GC gc, boolean isDrawNameInRecordColor) {
+	public static void drawChannelItemText(SummaryLayout summary, GC gc, boolean isDrawNameInRecordColor) {
 		SummarySpots summarySpots = summary.getSummarySpots();
 		Rectangle drawStripBounds = summarySpots.getDrawStripBounds();
 		int x0 = drawStripBounds.x;
@@ -380,7 +379,8 @@ public final class HistoCurveUtils {
 		int yPos = drawStripBounds.y + drawStripBounds.height / 2 - 1;
 
 		TrailRecord trailRecord = summary.getTrailRecord();
-		String graphText = DeviceXmlResource.getInstance().getReplacement(trailRecord.isScaleSyncMaster() ? trailRecord.getSyncMasterName() : trailRecord.getName());
+		String graphText = DeviceXmlResource.getInstance().getReplacement(trailRecord.isScaleSyncMaster() ? trailRecord.getSyncMasterName()
+				: trailRecord.getName());
 		if (trailRecord.getSymbol() != null && trailRecord.getSymbol().length() > 0) graphText = graphText + "   " + trailRecord.getSymbol();
 		if (trailRecord.getUnit() != null && trailRecord.getUnit().length() > 0) graphText = graphText + "   [" + trailRecord.getUnit() + "]";
 
@@ -399,7 +399,7 @@ public final class HistoCurveUtils {
 
 	/**
 	 * Draw the data graph scale using gives rectangle for display.
-	 * @param graphics
+	 * @param graphicsData
 	 * @param gc
 	 * @param curveAreaBounds
 	 * @param scaleWidthSpace
@@ -407,9 +407,9 @@ public final class HistoCurveUtils {
 	 * @param isDrawNameInRecordColor
 	 * @param isDrawNumbersInRecordColor
 	 */
-	public static void drawHistoScale(IChartData graphics, GC gc, Rectangle curveAreaBounds, int scaleWidthSpace, boolean isDrawScaleInRecordColor,
+	public static void drawHistoScale(GraphicsLayout graphicsData, GC gc, Rectangle curveAreaBounds, int scaleWidthSpace, boolean isDrawScaleInRecordColor,
 			boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
-		TrailRecord record = graphics.getTrailRecord();
+		TrailRecord record = graphicsData.getTrailRecord();
 		int x0 = curveAreaBounds.x;
 		int y0 = curveAreaBounds.y + curveAreaBounds.height;
 		int width = curveAreaBounds.width;
@@ -520,9 +520,11 @@ public final class HistoCurveUtils {
 				log.log(Level.FINE, String.format("minScaleValue = %10.6f; maxScaleValue = %10.6f; deltaMainTickValue = %10.6f", minScaleValue, maxScaleValue, deltaMainTickValue));
 			double deltaMainTickPixel = deltaScaleValue / deltaScale * height / numberTicks; // height / numberTicks;
 			double deltaPosMini = deltaMainTickPixel / miniticks;
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("numberTicks = %d; deltaMainTickPixel = %10.6f; deltaPosMini = %10.6f", numberTicks, deltaMainTickPixel, deltaPosMini));
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, String.format("numberTicks = %d; deltaMainTickPixel = %10.6f; deltaPosMini = %10.6f", numberTicks, deltaMainTickPixel, deltaPosMini));
 			// draw mini ticks below first main tick
-			double yTickPositionMin = y0 - (Math.abs(minScaleValue - minValue) * (height / deltaScale)); //new Double(y0 - i * deltaMainTickPixel).intValue();
+			double yTickPositionMin = y0 - (Math.abs(minScaleValue - minValue) * (height / deltaScale)); // new Double(y0 - i *
+																																																		// deltaMainTickPixel).intValue();
 			for (int j = 1; j < miniticks; j++) {
 				int yPosMini = (int) (yTickPositionMin + (j * deltaPosMini));
 				if (yPosMini >= y0) break;
@@ -542,8 +544,10 @@ public final class HistoCurveUtils {
 					gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 				}
 				// draw numbers to the scale
-				if (isDrawNumbersInRecordColor) gc.setForeground(record.getColor());
-				else gc.setForeground(DataExplorer.COLOR_BLACK);
+				if (isDrawNumbersInRecordColor)
+					gc.setForeground(record.getColor());
+				else
+					gc.setForeground(DataExplorer.COLOR_BLACK);
 				GraphicsUtils.drawTextCentered(record.getFormattedScaleValue(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 				gc.setForeground(DataExplorer.COLOR_BLACK);
 			}
@@ -555,12 +559,13 @@ public final class HistoCurveUtils {
 				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "yTickPosition=" + yTickPositionMax + ", xPosMini=" + yPosMini); //$NON-NLS-1$ //$NON-NLS-2$
 				gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 			}
-		}
-		else {
+		} else {
 			int yTickPosition = (int) (y0 - height / 2.0);
 			gc.drawLine(x0, yTickPosition, x0 - ticklength, yTickPosition);
-			if (isDrawNumbersInRecordColor) gc.setForeground(record.getColor());
-			else gc.setForeground(DataExplorer.COLOR_BLACK);
+			if (isDrawNumbersInRecordColor)
+				gc.setForeground(record.getColor());
+			else
+				gc.setForeground(DataExplorer.COLOR_BLACK);
 			GraphicsUtils.drawTextCentered(record.getFormattedScaleValue((minScaleValue + minScaleValue) / 2.0), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 			if (isBuildGridVector) horizontalGrid.add(yTickPosition);
 		}
@@ -572,25 +577,25 @@ public final class HistoCurveUtils {
 	/**
 	 * Draw single curve.
 	 * Support logarithmic distances and elaborate x-axis point placement based on box width and number of points.
-	 * @param graphics
+	 * @param graphicsData
 	 * @param gc
 	 * @param curveAreaBounds
 	 * @param timeLine
 	 */
-	public static void drawHistoCurve(Graphics graphics, GC gc, Rectangle curveAreaBounds, HistoTimeLine timeLine) {
-		TrailRecord trailRecord = graphics.getTrailRecord();
+	public static void drawHistoCurve(GraphicsLayout graphicsData, GC gc, Rectangle curveAreaBounds, HistoTimeLine timeLine) {
+		TrailRecord trailRecord = graphicsData.getTrailRecord();
 		// set line properties according adjustment
 		gc.setForeground(trailRecord.getColor());
 		gc.setLineWidth(trailRecord.getLineWidth());
 		gc.setLineStyle(trailRecord.getLineStyle());
 
 		// record.setDisplayScaleFactorTime(1);// x-axis scaling not supported
-		graphics.setDisplayScaleFactorValue(curveAreaBounds.height);
+		graphicsData.setDisplayScaleFactorValue(curveAreaBounds.height);
 
 		StringBuffer sb = new StringBuffer(); // logging purpose
 
 		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-		Point[] points = HistoGraphicsMapper.getDisplayPoints(graphics, timeLine);
+		Point[] points = HistoGraphicsMapper.getDisplayPoints(graphicsData, timeLine);
 
 		Point newPoint, oldPoint = null;
 		int displayableSize = trailRecord.size();
@@ -611,15 +616,15 @@ public final class HistoCurveUtils {
 	/**
 	 * Draw multiple curves (e.g. trails for min, max, avg).
 	 * Support logarithmic distances and elaborate x-axis point placement based on box width and number of points.
-	 * @param graphics holds display properties and the reference to the suite trail records
+	 * @param graphicsData holds display properties and the reference to the suite trail records
 	 * @param gc
 	 * @param curveAreaBounds
 	 * @param timeLine
 	 */
-	public static void drawHistoSuite(Graphics graphics, GC gc, Rectangle curveAreaBounds, HistoTimeLine timeLine) {
-		TrailRecord record = graphics.getTrailRecord();
+	public static void drawHistoSuite(GraphicsLayout graphicsData, GC gc, Rectangle curveAreaBounds, HistoTimeLine timeLine) {
+		TrailRecord record = graphicsData.getTrailRecord();
 		log.fine(() -> String.format("MinScaleValue=%f   MaxScaleValue=%f   MinDisplayValue=%f   MaxDisplayValue=%f", record.getMinScaleValue(), //$NON-NLS-1$
-				record.getMaxScaleValue(), graphics.getMinDisplayValue(), graphics.getMaxDisplayValue()));
+				record.getMaxScaleValue(), graphicsData.getMinDisplayValue(), graphicsData.getMaxDisplayValue()));
 
 		// set line properties according adjustment
 		gc.setForeground(record.getColor());
@@ -628,11 +633,11 @@ public final class HistoCurveUtils {
 
 		// int xScaleFactor = 1; // x-axis scaling not supported
 		// record.setDisplayScaleFactorTime(xScaleFactor);
-		graphics.setDisplayScaleFactorValue(curveAreaBounds.height);
+		graphicsData.setDisplayScaleFactorValue(curveAreaBounds.height);
 		if (record.getTrailSelector().isBoxPlotSuite()) {
-			drawBoxPlot(graphics, gc, timeLine);
+			drawBoxPlot(graphicsData, gc, timeLine);
 		} else if (record.getTrailSelector().isRangePlotSuite()) {
-			drawRangePlot(graphics, gc, timeLine);
+			drawRangePlot(graphicsData, gc, timeLine);
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -643,10 +648,10 @@ public final class HistoCurveUtils {
 	 * @param gc
 	 * @param timeLine
 	 */
-	public static void drawRangePlot(Graphics graphics, GC gc, HistoTimeLine timeLine) {
+	public static void drawRangePlot(GraphicsLayout graphicsData, GC gc, HistoTimeLine timeLine) {
 		StringBuffer sb = new StringBuffer(); // logging purpose
 		// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
-		List<PointArray> suitePoints = HistoGraphicsMapper.getSuiteDisplayPoints(graphics, timeLine);
+		List<PointArray> suitePoints = HistoGraphicsMapper.getSuiteDisplayPoints(graphicsData, timeLine);
 		PointArray oldPoints = null;
 
 		for (PointArray pointArray : suitePoints) {
@@ -688,11 +693,11 @@ public final class HistoCurveUtils {
 	 * @param gc
 	 * @param timeLine
 	 */
-	public static void drawBoxPlot(Graphics graphics, GC gc, HistoTimeLine timeLine) {
+	public static void drawBoxPlot(GraphicsLayout graphicsData, GC gc, HistoTimeLine timeLine) {
 		StringBuffer sb = new StringBuffer(); // logging purpose
-		List<PointArray> suitePoints = HistoGraphicsMapper.getSuiteDisplayPoints(graphics, timeLine);
+		List<PointArray> suitePoints = HistoGraphicsMapper.getSuiteDisplayPoints(graphicsData, timeLine);
 
-		TrailRecord record = graphics.getTrailRecord();
+		TrailRecord record = graphicsData.getTrailRecord();
 		List<Integer> durations_mm = record.getParent().getDurations_mm();
 		double averageDuration = durations_mm.parallelStream().mapToDouble(d -> d).average().getAsDouble();
 		Iterator<Integer> durationIterator = durations_mm.iterator();
