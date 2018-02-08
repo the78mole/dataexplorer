@@ -29,9 +29,9 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -46,6 +46,9 @@ import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet.Outliers;
 import gde.histo.ui.Measure;
+import gde.histo.ui.SummaryComposite.Summary;
+import gde.histo.ui.data.SummarySpots.Density;
+import gde.histo.ui.data.SummarySpots.PosMarkers;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -155,6 +158,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		return grid;
 	}
 
+	public final Summary												summary;
 	public final TrailRecord										record;
 
 	private Rectangle														drawStripBounds;
@@ -180,8 +184,9 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	 */
 	public Outliers[]														warningMinMaxValues	= null;
 
-	public SummarySpots(TrailRecord record) {
-		this.record = record;
+	public SummarySpots(Summary summary) {
+		this.summary = summary;
+		this.record = summary.getTrailRecord();
 	}
 
 	public void initialize(Rectangle newDrawStripBounds, Density newDensity) {
@@ -196,8 +201,8 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		int tmpWidth = newDrawStripBounds.width - elementWidth; // half left and right gap for overlapping elements
 		stripNetWidth = tmpWidth - tmpWidth % elementWidth; // additional right gap because of x position delta (is the elements size)
 
-		double decodedScaleMin = record.getSummary().defineScaleMin();
-		double decodedScaleMax = record.getSummary().defineScaleMax();
+		double decodedScaleMin = summary.defineScaleMin();
+		double decodedScaleMax = summary.defineScaleMax();
 
 		xValueScaleFactor = stripNetWidth / (decodedScaleMax - decodedScaleMin);
 		xValueOffset = decodedScaleMin * xValueScaleFactor - .5;

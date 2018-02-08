@@ -67,9 +67,9 @@ import gde.histo.datasources.HistoSet;
 import gde.histo.gpslocations.GpsCluster;
 import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.histo.recordings.TrailRecord.GraphicsTemplate;
-import gde.histo.recordings.TrailRecord.Summary;
 import gde.histo.ui.HistoExplorer;
 import gde.histo.ui.HistoSummaryWindow;
+import gde.histo.ui.SummaryComposite.Summary;
 import gde.histo.ui.data.SummarySpots.OutlierWarning;
 import gde.histo.utils.ElementaryQuantile;
 import gde.histo.utils.GpsCoordinate;
@@ -821,14 +821,15 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	/**
 	 * Update the display records to enable drawing of the summary graphics.
 	 * Needs not to check suite records because the summary max/min values comprise all suite members.
+	 * @param summaryData holds all data required for painting with key recordName
 	 */
-	public synchronized void updateSyncSummaryScale() {
+	public synchronized void updateSyncSummaryScale(Map<String, Summary> summaryData) {
 		int recencyLimit = settings.getWarningCount();
 		for (TrailRecord actualRecord : getDisplayRecords()) {
-			Summary summary = actualRecord.getSummary();
+			Summary summary = summaryData.get(actualRecord.getName());
 			summary.clear();
 			summary.setSyncMinMax(recencyLimit);
-			log.finer(() -> actualRecord.getName() + "   summaryMin = " + summary.syncMin + "  summaryMax=" + summary.syncMax);
+			log.finer(() -> actualRecord.getName() + "   summaryMin = " + summary.getSyncMin() + "  summaryMax=" + summary.getSyncMax());
 		}
 
 		// update the min/max values for synced records
@@ -837,14 +838,14 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			double tmpMin = Double.MAX_VALUE;
 			double tmpMax = -Double.MAX_VALUE;
 			for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
-				Summary summary = syncRecord.getSummary();
+				Summary summary = summaryData.get(syncRecord.getName());
 				// exclude records with special trails from synchronizing
 				if (syncRecord.getTrailSelector().getTrailType().isAlienValue()) continue;
 
-				if (summary.syncMin != null && summary.syncMax != null) {
+				if (summary.isSyncMinMaxDefined()) {
 					isAffected = true;
-					tmpMin = Math.min(tmpMin, summary.syncMin);
-					tmpMax = Math.max(tmpMax, summary.syncMax);
+					tmpMin = Math.min(tmpMin, summary.getSyncMin());
+					tmpMax = Math.max(tmpMax, summary.getSyncMax());
 					if (log.isLoggable(FINER)) log.log(FINER, syncRecord.getName() + " tmpMin  = " + tmpMin + "; tmpMax  = " + tmpMax);
 				}
 			}
@@ -853,12 +854,14 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			if (tmpMin == Double.MAX_VALUE || tmpMax == -Double.MAX_VALUE) {
 				for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
 					if (syncRecord.getTrailSelector().getTrailType().isAlienValue()) continue;
-					syncRecord.getSummary().resetSyncMinMax();
+					Summary summary = summaryData.get(syncRecord.getName());
+					summary.resetSyncMinMax();
 				}
 			} else {
 				for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
 					if (syncRecord.getTrailSelector().getTrailType().isAlienValue()) continue;
-					syncRecord.getSummary().setSyncMinMax(tmpMin, tmpMax);
+					Summary summary = summaryData.get(syncRecord.getName());
+					summary.setSyncMinMax(tmpMin, tmpMax);
 				}
 			}
 			if (isAffected && log.isLoggable(FINER)) {

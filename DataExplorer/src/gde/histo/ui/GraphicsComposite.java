@@ -516,4 +516,10 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		return this.timeLine;
 	}
 
+	@Override
+	public IChartData getChartData(TrailRecord trailRecord) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

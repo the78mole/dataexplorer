@@ -88,12 +88,12 @@ public final class ScoregroupTrail extends TrailRecord {
 	}
 
 	@Override
-	protected double[] defineRecentMinMax(int limit ) {
+	public double[] defineRecentMinMax(int limit ) {
 		return getParent().getPickedVaults().defineRecentScoreMinMax(getName(), getScoregroup(), limit);
 	}
 
 	@Override
-	protected double[] defineExtrema() {
+	public double[] defineExtrema() {
 		return getParent().getPickedVaults().defineScoreExtrema(getName(), getScoregroup());
 	}
 

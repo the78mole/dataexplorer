@@ -32,6 +32,7 @@ import gde.config.Settings;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.recordings.TrailRecordSetFormatter;
+import gde.histo.ui.SummaryComposite.Summary;
 import gde.histo.ui.data.SummarySpots;
 import gde.histo.ui.data.SummarySpots.Density;
 import gde.log.Logger;
@@ -241,7 +242,7 @@ public final class SummaryMeasuring extends AbstractMeasuring {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
 			Rectangle drawStripBounds = new Rectangle(hgc.curveAreaBounds.x, hgc.curveAreaBounds.y + stripHeight * i + SummaryComposite.UNK_GAP,
 					hgc.curveAreaBounds.width, stripHeight);
-			SummarySpots summarySpots = record.getSummary().getSummarySpots();
+			SummarySpots summarySpots = ((Summary) summaryComposite.getChartData(record)).getSummarySpots();
 			summarySpots.initialize(drawStripBounds, density);
 
 			if (record.isVisible() || !isPartialDataTable) {
@@ -266,15 +267,15 @@ public final class SummaryMeasuring extends AbstractMeasuring {
 
 		log.finer(() -> "canvasGC=" + canvasGC + " curveSurvey=" + curveSurvey + " height=" + summaryComposite.graphicCanvas.getBounds().height);
 		// if (this.summaryComposite.graphicCanvas.getBounds().height != 0) { // canvas was not yet drawn
-			if (curveSurvey != null) { // required if this chart was not yet displayed
-				this.canvasGC = new GC(this.summaryComposite.graphicCanvas);
-				this.curveSurvey.setCanvasGC(this.canvasGC);
+		if (curveSurvey != null) { // required if this chart was not yet displayed
+			this.canvasGC = new GC(this.summaryComposite.graphicCanvas);
+			this.curveSurvey.setCanvasGC(this.canvasGC);
 
-				this.curveSurvey.cleanMeasurementPointer(this.summaryComposite.canvasImage);
-				this.canvasGC.dispose();
-				throw new UnsupportedOperationException();
-			}
-//		}
+			this.curveSurvey.cleanMeasurementPointer(this.summaryComposite.canvasImage);
+			this.canvasGC.dispose();
+			throw new UnsupportedOperationException();
+		}
+// }
 		this.summaryComposite.setRecordSetCommentStandard();
 	}
 

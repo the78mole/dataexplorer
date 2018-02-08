@@ -51,13 +51,12 @@ import gde.device.resource.DeviceXmlResource;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecordSet.Outliers;
-import gde.histo.ui.data.SummarySpots;
+import gde.histo.ui.IChartData;
 import gde.histo.utils.ElementaryQuantile;
 import gde.histo.utils.Spot;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
-import gde.utils.MathUtils;
 
 /**
  * Hold histo data points of one measurement or settlement; score points are a third option.
@@ -307,89 +306,6 @@ public abstract class TrailRecord extends CommonRecord {
 
 	}
 
-	/**
-	 * Data for the life cycle of a summary composite drawing.
-	 */
-	public final class Summary { // todo class might be better independent from TrailRecord
-		private final Logger				log			= Logger.getLogger(Summary.class.getName());
-
-		private final SummarySpots	summarySpots;
-
-		// summary min/max only depend on the vault q0/q4 values; a synced record has synced min/max values in these fields
-		Double											syncMax	= null;
-		Double											syncMin	= null;
-
-		private Outliers[]					warningMinMaxValues;
-
-		public Summary(SummarySpots summarySpots) {
-			this.summarySpots = summarySpots;
-		}
-
-		public void clear() {
-			warningMinMaxValues = null;
-			resetSyncMinMax();
-		}
-
-		/**
-		 * Determine and set the q0/q4 max/minValues for the summary window from this record.
-		 */
-		public void setSyncMinMax(int recencyLimit) {
-			double[] lowerUpper = defineExtrema();
-			double[] recentMinMax = defineRecentMinMax(recencyLimit);
-			if (lowerUpper.length == 0) {
-				resetSyncMinMax();
-			} else {
-				setSyncMinMax(Math.min(lowerUpper[0], recentMinMax[0]), Math.max(lowerUpper[1], recentMinMax[1]));
-			}
-		}
-
-		public double defineScaleMin() { // todo consider caching
-			log.finer(() -> "'" + getName() + "'  syncSummaryMin=" + getSyncMin() + " syncSummaryMax=" + getSyncMax());
-			return MathUtils.floorStepwise(getSyncMin(), getSyncMax() - getSyncMin());
-		}
-
-		public double defineScaleMax() { // todo consider caching
-			return MathUtils.ceilStepwise(getSyncMax(), getSyncMax() - getSyncMin());
-		}
-
-		public Outliers[] getMinMaxWarning() {
-			if (warningMinMaxValues == null) {
-				warningMinMaxValues = getParent().getPickedVaults().defineMinMaxWarning(getName(), Settings.getInstance().getWarningCount());
-			}
-			return warningMinMaxValues;
-		}
-
-		/**
-		 * @return true if the record or the suite contains reasonable min max data
-		 */
-		public boolean hasReasonableMinMax() {
-			return syncMin == null && syncMax == null || !HistoSet.fuzzyEquals(syncMin, syncMax);
-		}
-
-		public void setSyncMinMax(double newMin, double newMax) {
-			syncMin = newMin;
-			syncMax = newMax;
-			log.finer(() -> getName() + " syncSummaryMin=" + newMin + " syncSummaryMax=" + newMax);
-		}
-
-		public void resetSyncMinMax() {
-			syncMin = syncMax = null;
-		}
-
-		private Double getSyncMax() {
-			return syncMax != null ? syncMax : 0.;
-		}
-
-		private double getSyncMin() {
-			return syncMin != null ? syncMin : 0.;
-		}
-
-		public SummarySpots getSummarySpots() {
-			return summarySpots;
-		}
-
-	}
-
 	protected final DeviceXmlResource			xmlResource		= DeviceXmlResource.getInstance();
 
 	protected final IChannelItem					channelItem;
@@ -408,7 +324,7 @@ public abstract class TrailRecord extends CommonRecord {
 	protected TrailSelector								trailSelector;
 	protected ElementaryQuantile<Double>	quantile;
 	protected Graphics										graphics;
-	protected Summary											summary;
+	protected IChartData											summary;
 
 	protected TrailRecord(IChannelItem channelItem, int newOrdinal, TrailRecordSet parentTrail, int initialCapacity) {
 		super(DataExplorer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
@@ -1009,7 +925,7 @@ public abstract class TrailRecord extends CommonRecord {
 		}
 	}
 
-	protected double[] defineRecentMinMax(int limit) {
+	public double[] defineRecentMinMax(int limit) {
 		TrailTypes trailType = getTrailSelector().getTrailType();
 		if (trailType.isAlienValue()) {
 			return getParent().getPickedVaults().defineRecentAlienMinMax(getName(), trailType, limit);
@@ -1018,7 +934,7 @@ public abstract class TrailRecord extends CommonRecord {
 		}
 	}
 
-	protected double[] defineExtrema() { // todo consider caching this result
+	public double[] defineExtrema() { // todo consider caching this result
 		TrailTypes trailType = getTrailSelector().getTrailType();
 		if (trailType.isAlienValue()) {
 			return getParent().getPickedVaults().defineAlienExtrema(getName(), trailType);
@@ -1027,6 +943,15 @@ public abstract class TrailRecord extends CommonRecord {
 		}
 	}
 
+	/**
+	 * Determine the outliers of the category which is the most significant.
+	 * This means: The result holds far outliers OR close outliers in case no far outliers are present.
+	 * @param logLimit is the maximum number of the most recent logs which is checked for warnings
+	 * @return the array of outliers warning objects which may hold null values
+	 */
+	public Outliers[] defineMinMaxWarning(int logLimit) {
+		return getParent().getPickedVaults().defineMinMaxWarning(name, logLimit);
+	}
 	/**
 	 * @return all the decoded record values including nulls
 	 */
@@ -1083,17 +1008,6 @@ public abstract class TrailRecord extends CommonRecord {
 			graphics = new Graphics();
 		}
 		return this.graphics;
-	}
-
-	public void resetSummary() {
-		this.summary = new Summary(new SummarySpots(this));
-	}
-
-	public Summary getSummary() {
-		if (summary == null) {
-			summary = new Summary(new SummarySpots(this));
-		}
-		return this.summary;
 	}
 
 	/**

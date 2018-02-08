@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.AbstractChartWindow.WindowActor;
 import gde.histo.ui.menu.AbstractTabAreaContextMenu;
@@ -455,5 +456,7 @@ public abstract class AbstractChartComposite extends Composite {
 	 * Make drawing independent from layout data creation.
 	 */
 	protected abstract void defineLayoutParams();
+
+	public abstract IChartData getChartData(TrailRecord trailRecord);
 
 }

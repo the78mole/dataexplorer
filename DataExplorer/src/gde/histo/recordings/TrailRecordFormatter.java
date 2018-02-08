@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 import gde.GDE;
 import gde.device.TrailTypes;
 import gde.histo.datasources.HistoSet;
-import gde.histo.recordings.TrailRecord.Summary;
 import gde.histo.recordings.TrailRecordSet.Outliers;
+import gde.histo.ui.SummaryComposite.Summary;
 import gde.histo.ui.data.SummarySpots.OutlierWarning;
 import gde.log.Logger;
 import gde.messages.MessageIds;
@@ -215,8 +215,7 @@ public final class TrailRecordFormatter {
 		return getTableValue(this.record.elementAt(index) / 1000.);
 	}
 
-	public String defineFormattedMinWarning() {
-		Summary summary = record.getSummary();
+	public String defineFormattedMinWarning(Summary summary) {
 		Outliers outliers = summary.getMinMaxWarning()[0];
 		if (outliers == null) {
 			return new String();
@@ -241,8 +240,7 @@ public final class TrailRecordFormatter {
 		}
 	}
 
-	public String defineFormattedMaxWarning() {
-		Summary summary = record.getSummary();
+	public String defineFormattedMaxWarning(Summary summary) {
 		Outliers outliers = summary.getMinMaxWarning()[1];
 		if (outliers == null) {
 			return new String();
@@ -270,26 +268,25 @@ public final class TrailRecordFormatter {
 	/**
 	 * @return the text information about all warnings for the record
 	 */
-	public String defineMinMaxWarningText() {
-		Summary summary = record.getSummary();
+	public String defineMinMaxWarningText(Summary summary) {
 		String textLine1 = "", textLine2 = "";
 		final String fileNameInitializer = Messages.getString(MessageIds.GDE_MSGT0908);
 		final String minMaxSeparator = "   >---<   ";
 		String lineInitializer = record.getNameReplacement() + "   ";
 		if (summary.getMinMaxWarning()[0] != null) { // left scale warnings
 			if (summary.getMinMaxWarning()[0].getWarningType() == OutlierWarning.FAR)
-				textLine1 = lineInitializer + defineFormattedMinWarning().replace("\n", fileNameInitializer);
+				textLine1 = lineInitializer + defineFormattedMinWarning(summary).replace("\n", fileNameInitializer);
 			else
-				textLine2 = lineInitializer + defineFormattedMinWarning().replace("\n", fileNameInitializer);
+				textLine2 = lineInitializer + defineFormattedMinWarning(summary).replace("\n", fileNameInitializer);
 		}
 		if (summary.getMinMaxWarning()[1] != null) { // right
 			lineInitializer = "                    " + lineInitializer;
 			if (summary.getMinMaxWarning()[1].getWarningType() == OutlierWarning.FAR) {
-				textLine1 = textLine1.isEmpty() ? lineInitializer + defineFormattedMaxWarning().replace("\n", fileNameInitializer)
-						: textLine1 + minMaxSeparator + defineFormattedMaxWarning().replace("\n", fileNameInitializer);
+				textLine1 = textLine1.isEmpty() ? lineInitializer + defineFormattedMaxWarning(summary).replace("\n", fileNameInitializer)
+						: textLine1 + minMaxSeparator + defineFormattedMaxWarning(summary).replace("\n", fileNameInitializer);
 			} else {
-				textLine2 = textLine2.isEmpty() ? lineInitializer + defineFormattedMaxWarning().replace("\n", fileNameInitializer)
-						: textLine2 + minMaxSeparator + defineFormattedMaxWarning().replace("\n", fileNameInitializer);
+				textLine2 = textLine2.isEmpty() ? lineInitializer + defineFormattedMaxWarning(summary).replace("\n", fileNameInitializer)
+						: textLine2 + minMaxSeparator + defineFormattedMaxWarning(summary).replace("\n", fileNameInitializer);
 			}
 		}
 		return textLine1 + "\n" + textLine2;
