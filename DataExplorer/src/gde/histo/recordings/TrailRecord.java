@@ -555,8 +555,8 @@ public abstract class TrailRecord extends CommonRecord {
 		log.finer(() -> this.name + " enabled=" + enabled + " newMinScaleValue=" + newMinScaleValue + " newMaxScaleValue=" + newMaxScaleValue);
 		template.isStartEndDefined = enabled;
 		if (enabled) {
-			template.maxScaleValue = graphics.maxDisplayValue = newMaxScaleValue;
-			template.minScaleValue = graphics.minDisplayValue = newMinScaleValue;
+			template.maxScaleValue = newMaxScaleValue;
+			template.minScaleValue = newMinScaleValue;
 		} else {
 			template.maxScaleValue = HistoSet.decodeVaultValue(this, this.maxValue / 1000.0);
 			template.minScaleValue = HistoSet.decodeVaultValue(this, this.minValue / 1000.0);
@@ -751,6 +751,12 @@ public abstract class TrailRecord extends CommonRecord {
 		} else {
 			return -1;
 		}
+	}
+
+	@Override
+	@Deprecated // histo relies on building the layout information from scratch on for each display cycle
+	public void setSyncMinMax(int newMin, int newMax) {
+		log.finer(() -> "  DEPRECATED    " + getName() + " syncMinValue=" + newMin + " syncMaxValue=" + newMax);
 	}
 
 	public double[] defineRecentMinMax(int limit) {

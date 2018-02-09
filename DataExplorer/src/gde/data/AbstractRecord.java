@@ -137,4 +137,6 @@ public abstract class AbstractRecord extends Vector<Integer> {
 	 */
 	public abstract int getSyncMasterRecordOrdinal();
 
+	public abstract void setSyncMinMax(int newMin, int newMax);
+
 }

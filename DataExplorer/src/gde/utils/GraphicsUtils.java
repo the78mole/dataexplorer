@@ -219,8 +219,7 @@ public class GraphicsUtils {
 		boolean isHorizontal = (style & SWT.HORIZONTAL) == SWT.HORIZONTAL;
 		if (isHorizontal) { // draw the horizontally image onto the original GC
 			gc.drawImage(stringImage, x, y);
-		}
-		else { // draw the image vertically onto the original GC
+		} else { // draw the image vertically onto the original GC
 			drawVerticalImage(stringImage, x, y, gc, style, string);
 		}
 		stringGc.dispose();

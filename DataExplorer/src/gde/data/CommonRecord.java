@@ -40,41 +40,41 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public abstract class CommonRecord extends AbstractRecord {
-	private static final String		$CLASS_NAME				= CommonRecord.class.getName();
-	private static final long			serialVersionUID	= 26031957;
-	private static final Logger		log								= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME				= CommonRecord.class.getName();
+	private static final long		serialVersionUID	= 26031957;
+	private static final Logger	log								= Logger.getLogger($CLASS_NAME);
 
-	protected final Settings					settings					= Settings.getInstance();
+	protected final Settings		settings					= Settings.getInstance();
 
 	/**
 	 * for each measurement point in compare set, where time step of measurement points might be individual
 	 */
-	TimeSteps													timeStep_ms				= null;
-	protected IDevice									device;
+	TimeSteps										timeStep_ms				= null;
+	protected IDevice						device;
 	/**
 	 * is referencing the source position of the record ordinal relative to the initial
 	 * device measurement configuration and used to find specific properties
 	 */
-	protected int											ordinal;
+	protected int								ordinal;
 
-	protected AbstractRecordSet				parent;
+	protected AbstractRecordSet	parent;
 
 	// core fields
-	protected String									name;																				// measurement name Höhe
-	String														unit;																				// unit [m]
-	String														symbol;																			// symbol h
-	String														description				= GDE.STRING_BLANK;				// only set if copied into compare set
-	protected Boolean									isActive;
-	DataType													dataType					= Record.DataType.DEFAULT;
-	StatisticsType										statistics				= null;
+	protected String						name;																							// measurement name Höhe
+	String											unit;																							// unit [m]
+	String											symbol;																						// symbol h
+	String											description				= GDE.STRING_BLANK;							// only set if copied into compare set
+	protected Boolean						isActive;
+	DataType										dataType					= Record.DataType.DEFAULT;
+	StatisticsType							statistics				= null;
 
-	List<PropertyType>								properties				= new ArrayList<>();			// offset, factor, reduction, ...
+	List<PropertyType>					properties				= new ArrayList<>();						// offset, factor, reduction, ...
 
-	protected int											maxValue					= 0;											// max value of the curve
-	protected int											minValue					= 0;											// min value of the curve
+	protected int								maxValue					= 0;														// max value of the curve
+	protected int								minValue					= 0;														// min value of the curve
 
-	int																avgValue					= Integer.MIN_VALUE;			// avarage value (avg = sum(xi)/n)
-	int																sigmaValue				= Integer.MIN_VALUE;			// sigma value of data, according a set trigger level if any
+	int													avgValue					= Integer.MIN_VALUE;						// avarage value (avg = sum(xi)/n)
+	int													sigmaValue				= Integer.MIN_VALUE;						// sigma value of data, according a set trigger level if any
 
 	/**
 	 * this constructor will create an vector to hold data points in case the initial capacity is > 0
@@ -597,6 +597,11 @@ public abstract class CommonRecord extends AbstractRecord {
 	 */
 	public void setDataType(Record.DataType newDataType) {
 		this.dataType = newDataType;
+	}
+
+	@Override
+	public String toString() {
+		return "CommonRecord [ordinal=" + this.ordinal + ", name=" + this.name +  ", realSize=" + this.realSize() + ", isActive=" + this.isActive + ", dataType=" + this.dataType + ", maxValue=" + this.maxValue + ", minValue=" + this.minValue + ", avgValue=" + this.avgValue + ", sigmaValue=" + this.sigmaValue + "]";
 	}
 
 }

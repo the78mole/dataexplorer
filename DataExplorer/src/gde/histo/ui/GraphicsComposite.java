@@ -109,6 +109,10 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		public Graphics(TrailRecord trailRecord, GraphicsComposite parent) {
 			this.trailRecord = trailRecord;
 			this.parent = parent;
+			if (trailRecord.isStartEndDefined()) {
+				maxDisplayValue = trailRecord.getMaxScaleValue();
+				minDisplayValue = trailRecord.getMinScaleValue();
+			}
 		}
 
 		public double getDisplayScaleFactorValue() {
