@@ -1567,7 +1567,7 @@ public final class RecordSet extends AbstractRecordSet {
 	@Override
 	public void syncScaleOfSyncableRecords() {
 		if (this.isCompareSet) return;
-		this.scaleSyncedRecords.initSyncedScales();
+		this.scaleSyncedRecords.initSyncedScales(this);
 	}
 
 	/**

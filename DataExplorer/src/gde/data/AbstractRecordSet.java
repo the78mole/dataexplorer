@@ -59,7 +59,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 */
 	protected SyncedRecords<? extends AbstractRecord>	scaleSyncedRecords			= new SyncedRecords<>(2);
 
-	public class SyncedRecords<T extends AbstractRecord> extends HashMap<Integer, Vector<T>> {
+	public static class SyncedRecords<T extends AbstractRecord> extends HashMap<Integer, Vector<T>> {
 		private final static long	serialVersionUID	= -1231656159005000097L;
 		@SuppressWarnings("hiding")
 		private final Logger			log								= Logger.getLogger(SyncedRecords.class.getName());
@@ -117,16 +117,16 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 		 * Set axis end values, number format and scale position.
 		 * Support settlements.
 		 */
-		public void initSyncedScales() {
+		public void initSyncedScales(AbstractRecordSet recordSet) {
 			clear();
 
-			for (int i = 0; i < AbstractRecordSet.this.size(); i++) {
+			for (int i = 0; i < recordSet.size(); i++) {
 				@SuppressWarnings("unchecked")
-				T tmpRecord = (T) AbstractRecordSet.this.get(i);
+				T tmpRecord = (T) recordSet.get(i);
 				int syncMasterRecordOrdinal = tmpRecord.getSyncMasterRecordOrdinal();
 				if (syncMasterRecordOrdinal >= 0) {
 					@SuppressWarnings("unchecked")
-					T syncMasterRecord = (T) AbstractRecordSet.this.get(syncMasterRecordOrdinal);
+					T syncMasterRecord = (T) recordSet.get(syncMasterRecordOrdinal);
 					if (get(syncMasterRecordOrdinal) == null) {
 						put(syncMasterRecordOrdinal, new Vector<T>());
 						get(syncMasterRecordOrdinal).add(syncMasterRecord);
@@ -667,7 +667,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * Synchronize scales according device properties.
 	 */
 	public void syncScaleOfSyncableRecords() {
-		this.scaleSyncedRecords.initSyncedScales();
+		this.scaleSyncedRecords.initSyncedScales(this);
 	}
 
 	/**

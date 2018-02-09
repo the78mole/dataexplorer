@@ -546,7 +546,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Vaults may hold an additional set of exceptional outliers beyond the far outlier category.
 	 * Those outliers are not element of the recordset and of this outliers object.
 	 */
-	public final class Outliers {
+	public static final class Outliers {
 		private final OutlierWarning	warningType;
 		private final double					farLimit;
 		private final double					closeLimit;
@@ -781,7 +781,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 */
 	@Override
 	public void syncScaleOfSyncableRecords() {
-		this.scaleSyncedRecords.initSyncedScales();
+		this.scaleSyncedRecords.initSyncedScales(this);
 	}
 
 	/**
