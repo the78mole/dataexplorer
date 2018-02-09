@@ -20,20 +20,18 @@
 package gde.histo.transitions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 
 import gde.data.RecordSet;
 import gde.device.ChannelType;
 import gde.device.TransitionClassTypes;
 import gde.device.TransitionGroupType;
 import gde.device.TransitionType;
+import gde.histo.transitions.GroupTransitions.TransitionChronicle;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 
@@ -51,31 +49,31 @@ public final class TransitionCollector {
 	 * remove transition duplicates or overlapping transitions in all transition groups.
 	 * @return the multimap holding all transitions (key is thresholdStartTimestamp_ms) per transitionGroupId (key)
 	 */
-	public static Map<Integer, TreeMap<Long, Transition>> add4Channel(RecordSet recordSet, int logChannelNumber) {
-		Map<Integer, TreeMap<Long, Transition>> transitionContainer = new HashMap<>();
+	public static GroupTransitions add4Channel(RecordSet recordSet, int logChannelNumber) {
+		GroupTransitions groupTransitions = new GroupTransitions();
 
 		final ChannelType channelType = DataExplorer.application.getActiveDevice().getDeviceConfiguration().getChannel(logChannelNumber);
 		for (TransitionType transitionType : channelType.getTransitions().values()) {
-			final TreeMap<Long, Transition> transitionsFromRecord = findTransitions(recordSet, transitionType);
+			TransitionChronicle transitionsFromRecord = findTransitions(recordSet, transitionType);
 			if (!transitionsFromRecord.isEmpty()) {
 				log.fine(() -> String.format("%d  transitionCount=%d", transitionType.getTransitionId(), 999)); //$NON-NLS-1$
 
 				// assign the transitions to all transition groups which have a mapping to this transition type
 				Iterable<TransitionGroupType> iterable = channelType.getTransitionGroups().values().stream().filter(group -> group.getTransitionMapping().stream().anyMatch(mapping -> mapping.getTransitionId() == transitionType.getTransitionId()))::iterator;
 				for (TransitionGroupType transitionGroupType : iterable) {
-					if (!transitionContainer.containsKey(transitionGroupType.getTransitionGroupId())) {
+					if (!groupTransitions.containsKey(transitionGroupType.getTransitionGroupId())) {
 						// build the container
-						transitionContainer.put(transitionGroupType.getTransitionGroupId(), new TreeMap<Long, Transition>());
+						groupTransitions.put(transitionGroupType.getTransitionGroupId(), new TransitionChronicle());
 					}
-					final TreeMap<Long, Transition> groupTransitions = transitionContainer.get(transitionGroupType.getTransitionGroupId());
+					TransitionChronicle transitionChronicle = groupTransitions.get(transitionGroupType.getTransitionGroupId());
 
 					// merge the new transitions with existing transitions for the current group and class
-					groupTransitions.putAll(getSuperiorTransitions(transitionsFromRecord, groupTransitions));
+					transitionChronicle.putAll(getSuperiorTransitions(transitionsFromRecord, transitionChronicle));
 
 					// eliminate duplicate transitions
-					List<Long> duplicates = getDuplicates(groupTransitions);
+					List<Long> duplicates = getDuplicates(transitionChronicle);
 					for (long timeStamp_ms : duplicates) {
-						groupTransitions.remove(timeStamp_ms);
+						transitionChronicle.remove(timeStamp_ms);
 					}
 					if (!duplicates.isEmpty()) {
 						log.fine(() -> String.format("%d  removals due to general overlap:  duplicatesSize=%d", transitionType.getTransitionId(), duplicates.size())); //$NON-NLS-1$
@@ -84,7 +82,7 @@ public final class TransitionCollector {
 			}
 		}
 
-		return transitionContainer;
+		return groupTransitions;
 	}
 
 	/**
@@ -92,8 +90,8 @@ public final class TransitionCollector {
 	 * @param transitionType
 	 * @return the identified transitions with the key thresholdStartTimestamp_ms
 	 */
-	private static TreeMap<Long, Transition> findTransitions(RecordSet recordSet, TransitionType transitionType) {
-		final TreeMap<Long, Transition> transitionsFromRecord;
+	private static TransitionChronicle findTransitions(RecordSet recordSet, TransitionType transitionType) {
+		TransitionChronicle transitionsFromRecord;
 
 		if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
 			PeakAnalyzer histoTransitions = new PeakAnalyzer(recordSet);
@@ -113,14 +111,14 @@ public final class TransitionCollector {
 
 	/**
 	 * Prioritize shorter transitions because this will increase the probability for additional transitions.
-	 * @param groupTransitions
+	 * @param transitionChronicle
 	 * @return transitions which overlap in the reference and threshold phases
 	 */
-	private static List<Long> getDuplicates(final TreeMap<Long, Transition> groupTransitions) {
+	private static List<Long> getDuplicates(TransitionChronicle transitionChronicle) {
 		List<Long> duplicates;
 		duplicates = new ArrayList<Long>();
 		Entry<Long, Transition> previousTransitionEntry = null;
-		for (Entry<Long, Transition> transitionEntry : groupTransitions.entrySet()) {
+		for (Entry<Long, Transition> transitionEntry : transitionChronicle.entrySet()) {
 			if (previousTransitionEntry != null) {
 				Entry<Long, Transition> inferiorTransitionEntry = getInferiorTransition(previousTransitionEntry, transitionEntry).orElse(null);
 				if (inferiorTransitionEntry == null)
@@ -140,29 +138,25 @@ public final class TransitionCollector {
 	}
 
 	/**
-	 * @param transitionsFromRecord
-	 * @param groupTransitions
-	 * @return the merged transitions with existing transitions for the current group and class</br>
-	 *         key is thresholdStartTimestamp_ms
-	 *
+	 * @param transitionChronicle1
+	 * @param transitionChronicle2
+	 * @return the merged transitions with existing transitions for the current group and class
 	 */
-	private static TreeMap<Long, Transition> getSuperiorTransitions(TreeMap<Long, Transition> transitionsFromRecord,
-			TreeMap<Long, Transition> groupTransitions) {
-		TreeMap<Long, Transition> newTransitions;
-		newTransitions = new TreeMap<>(transitionsFromRecord);
-		if (!groupTransitions.isEmpty()) {
+	private static TransitionChronicle getSuperiorTransitions(TransitionChronicle transitionChronicle1, TransitionChronicle transitionChronicle2) {
+		TransitionChronicle newTransitions = new TransitionChronicle(transitionChronicle1);
+		if (!transitionChronicle2.isEmpty()) {
 			// identify transitions with the same threshold startTimeStamp
 			Set<Long> intersection = new HashSet<Long>(newTransitions.keySet()); // use the copy constructor because the keyset is only a view on the map
-			intersection.retainAll(groupTransitions.keySet());
+			intersection.retainAll(transitionChronicle2.keySet());
 			// discard transitions with the same timestamp
 			for (long thresholdStartTimeStamp_ms : intersection) {
 				// check which one of the conflicting transitions is inferior and remove it from its parent map
 				final Entry<Long, Transition> newTransition = newTransitions.ceilingEntry(thresholdStartTimeStamp_ms);
-				getInferiorTransition(groupTransitions.ceilingEntry(thresholdStartTimeStamp_ms), transitionsFromRecord.ceilingEntry(thresholdStartTimeStamp_ms)).ifPresent(x -> {
+				getInferiorTransition(transitionChronicle2.ceilingEntry(thresholdStartTimeStamp_ms), transitionChronicle1.ceilingEntry(thresholdStartTimeStamp_ms)).ifPresent(x -> {
 					if (newTransition.equals(x))
 						newTransitions.remove(thresholdStartTimeStamp_ms);
 					else
-						groupTransitions.remove(thresholdStartTimeStamp_ms);
+						transitionChronicle2.remove(thresholdStartTimeStamp_ms);
 				});
 			}
 			if (!intersection.isEmpty()) {

@@ -25,13 +25,12 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.FINEST;
 
-import java.util.TreeMap;
-
 import gde.GDE;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
 import gde.device.TransitionType;
+import gde.histo.transitions.GroupTransitions.TransitionChronicle;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 
@@ -40,7 +39,9 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert (USER)
  */
 public final class SlopeAnalyzer extends AbstractAnalyzer {
+	@SuppressWarnings("hiding")
 	final static String			$CLASS_NAME	= SlopeAnalyzer.class.getName();
+	@SuppressWarnings("hiding")
 	final static Logger			log					= Logger.getLogger($CLASS_NAME);
 
 	private final RecordSet	recordSet;
@@ -57,7 +58,7 @@ public final class SlopeAnalyzer extends AbstractAnalyzer {
 	 * @param transitionType
 	 * @return all transitions with the key thresholdStartTimestamp_ms
 	 */
-	public TreeMap<Long, Transition> findTransitions(Record record, TransitionType transitionType) {
+	public TransitionChronicle findTransitions(Record record, TransitionType transitionType) {
 		this.triggerState = WAITING;
 		initializeDeques(record, transitionType);
 
@@ -69,11 +70,10 @@ public final class SlopeAnalyzer extends AbstractAnalyzer {
 	 * @param transitionType
 	 * @return all transitions with the key thresholdStartTimestamp_ms
 	 */
-	private TreeMap<Long, Transition> findSlopeTransitions(Record record, TransitionType transitionType) {
-		TreeMap<Long, Transition> transitions;
+	private TransitionChronicle findSlopeTransitions(Record record, TransitionType transitionType) {
+		TransitionChronicle transitions = new TransitionChronicle();
 		IDevice device = DataExplorer.application.getActiveDevice();
 
-		transitions = new TreeMap<Long, Transition>();
 		LevelChecker levelChecker = new LevelChecker(record, transitionType);
 		for (int i = 0; i < record.realSize(); i++) {
 			if (record.elementAt(i) == null) break;

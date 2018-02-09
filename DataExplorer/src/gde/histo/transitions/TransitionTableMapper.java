@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import gde.data.RecordSet;
 import gde.device.ChannelType;
@@ -39,6 +38,7 @@ import gde.histo.settlements.AmountEvaluator;
 import gde.histo.settlements.CalculusEvaluator;
 import gde.histo.settlements.FigureEvaluator;
 import gde.histo.settlements.SettlementRecord;
+import gde.histo.transitions.GroupTransitions.TransitionChronicle;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 
@@ -90,9 +90,9 @@ public final class TransitionTableMapper {
 		}
 
 		for (Entry<Integer, TransitionGroupType> transitionsGroupsEntry : transitionGroups.entrySet()) {
-			TreeMap<Long, Transition> groupTransitions = recordSet.getHistoTransitions().get(transitionsGroupsEntry.getKey());
-			if (groupTransitions != null) {
-				Transition transition = groupTransitions.get((long) recordSet.getTime_ms(index));
+			TransitionChronicle transitionChronicle = recordSet.getHistoTransitions().get(transitionsGroupsEntry.getKey());
+			if (transitionChronicle != null) {
+				Transition transition = transitionChronicle.get((long) recordSet.getTime_ms(index));
 				if (transition != null) {
 					tableRow[columnIndex] = Integer.toString(transition.getTransitionType().getTransitionId());
 				}
@@ -122,8 +122,8 @@ public final class TransitionTableMapper {
 	private boolean hasTransitions(SettlementType settlementType) {
 		GroupTransitions histoTransitions = recordSet.getHistoTransitions();
 		int transitionGroupId = settlementType.getEvaluation().getTransitionCalculus().getTransitionGroupId();
-		TreeMap<Long, Transition> groupTransitions = histoTransitions.get(transitionGroupId);
-		if (groupTransitions != null) {
+		TransitionChronicle transitionChronicle = histoTransitions.get(transitionGroupId);
+		if (transitionChronicle != null) {
 			return true;
 		} else {
 			return false;

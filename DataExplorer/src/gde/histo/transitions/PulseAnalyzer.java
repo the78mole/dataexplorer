@@ -26,13 +26,12 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.FINEST;
 
-import java.util.TreeMap;
-
 import gde.GDE;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
 import gde.device.TransitionType;
+import gde.histo.transitions.GroupTransitions.TransitionChronicle;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 
@@ -60,7 +59,7 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 	 * @param transitionType
 	 * @return all transitions with the key thresholdStartTimestamp_ms
 	 */
-	public TreeMap<Long, Transition> findTransitions(Record record, TransitionType transitionType) {
+	public TransitionChronicle findTransitions(Record record, TransitionType transitionType) {
 		this.triggerState = WAITING;
 		initializeDeques(record, transitionType);
 
@@ -72,11 +71,10 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 	 * @param transitionType
 	 * @return all transitions with the key thresholdStartTimestamp_ms
 	 */
-	private TreeMap<Long, Transition> findPulseTransitions(Record record, TransitionType transitionType) {
-		TreeMap<Long, Transition> transitions;
+	private TransitionChronicle findPulseTransitions(Record record, TransitionType transitionType) {
+		TransitionChronicle transitions = new TransitionChronicle();
 		IDevice device = DataExplorer.application.getActiveDevice();
 
-		transitions = new TreeMap<Long, Transition>();
 		LevelChecker levelChecker = new LevelChecker(record, transitionType);
 		for (int i = 0; i < record.realSize(); i++) {
 			if (record.elementAt(i) == null) break;

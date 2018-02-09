@@ -19,7 +19,11 @@
 
 package gde.histo.transitions;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import gde.data.RecordSet;
@@ -29,15 +33,84 @@ import gde.data.RecordSet;
  * Multimap holding all transitions (key is thresholdStartTimestamp_ms) per transitionGroupId (key).
  * @author Thomas Eickert (USER)
  */
-public final class GroupTransitions extends HashMap<Integer, TreeMap<Long, Transition>> {
-	private static final long		serialVersionUID	= 4194776523408560821L;
+public final class GroupTransitions {
 
-	private final RecordSet			recordSet;
-	private final int						recordDataSize;
+	/**
+	 * Timeline of identified transitions.
+	 */
+	public static final class TransitionChronicle {
+		private final TreeMap<Long, Transition> transitionChronicle;
+
+		public TransitionChronicle() {
+			this.transitionChronicle = new TreeMap<>();
+		}
+
+		public TransitionChronicle(TransitionChronicle transitionChronicle) {
+			this.transitionChronicle = new TreeMap<>(transitionChronicle.transitionChronicle);
+		}
+
+		public Transition get(long thresholdStartTimestamp_ms) {
+			return transitionChronicle.get(thresholdStartTimestamp_ms);
+		}
+
+		public Transition put(long thresholdStartTimestamp_ms, Transition transition) {
+			return transitionChronicle.put(thresholdStartTimestamp_ms, transition);
+		}
+
+		public boolean isEmpty() {
+			return transitionChronicle.isEmpty();
+		}
+
+		public Collection<? extends Long> keySet() {
+			return transitionChronicle.keySet();
+		}
+
+		public Entry<Long, Transition> ceilingEntry(long thresholdStartTimeStamp_ms) {
+			return transitionChronicle.ceilingEntry(thresholdStartTimeStamp_ms);
+		}
+
+		public Transition remove(long thresholdStartTimeStamp_ms) {
+			return transitionChronicle.remove(thresholdStartTimeStamp_ms);
+		}
+
+		public Set<Entry<Long, Transition>> entrySet() {
+			return transitionChronicle.entrySet();
+		}
+
+		public Collection<Transition> values() {
+			return transitionChronicle.values();
+		}
+
+		@Override
+		public String toString() {
+			return "TransitionChronicle [transitionChronicleSize=" + this.transitionChronicle.size() + ", transitionChronicle=" + this.transitionChronicle + "]";
+		}
+	}
+
+	private final Map<Integer, TransitionChronicle>	groupTransitions	= new HashMap<>();
+
+	private final RecordSet													recordSet;
+	private final int																recordDataSize;
 
 	public GroupTransitions(RecordSet recordSet) {
 		this.recordSet = recordSet;
 		this.recordDataSize = recordSet.getRecordDataSize(true);
+	}
+
+	public void clear() {
+		groupTransitions.clear();
+	}
+
+	public boolean isEmpty() {
+		return groupTransitions.isEmpty();
+	}
+
+	public TransitionChronicle get(int transitionGroupId) {
+		return groupTransitions.get(transitionGroupId);
+	}
+
+	public TransitionChronicle put(int transitionGroupId, TransitionChronicle transitions) {
+		return groupTransitions.put(transitionGroupId, transitions);
 	}
 
 	/**
@@ -46,17 +119,21 @@ public final class GroupTransitions extends HashMap<Integer, TreeMap<Long, Trans
 	 * @param logChannelNumber
 	 */
 	public void add4Channel(int logChannelNumber) {
-		this.putAll(TransitionCollector.add4Channel(this.recordSet, logChannelNumber));
+		groupTransitions.putAll(TransitionCollector.add4Channel(this.recordSet, logChannelNumber));
 	}
 
 	/**
 	 * @return the total number of transitions over all groups
 	 */
 	public long getTransitionsCount() {
-		return this.values().parallelStream().count();
+		return groupTransitions.values().parallelStream().count();
 	}
 
 	public int getRecordDataSize() {
 		return this.recordDataSize;
+	}
+
+	public boolean containsKey(int transitionGroupId) {
+		return groupTransitions.containsKey(transitionGroupId);
 	}
 }

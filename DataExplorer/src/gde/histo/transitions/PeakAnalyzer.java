@@ -26,14 +26,13 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.FINEST;
 
-import java.util.TreeMap;
-
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
 import gde.device.TransitionType;
+import gde.histo.transitions.GroupTransitions.TransitionChronicle;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 
@@ -43,11 +42,11 @@ import gde.ui.DataExplorer;
  */
 public final class PeakAnalyzer extends AbstractAnalyzer {
 	@SuppressWarnings("hiding")
-	final static String			$CLASS_NAME	= PeakAnalyzer.class.getName();
+	final static String	$CLASS_NAME	= PeakAnalyzer.class.getName();
 	@SuppressWarnings("hiding")
-	final static Logger			log					= Logger.getLogger($CLASS_NAME);
+	final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private final RecordSet	recordSet;
+	private final RecordSet recordSet;
 
 	public PeakAnalyzer(RecordSet recordSet) {
 		this.recordSet = recordSet;
@@ -61,7 +60,7 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 	 * @param transitionType
 	 * @return all transitions with the key thresholdStartTimestamp_ms
 	 */
-	public TreeMap<Long, Transition> findTransitions(Record record, TransitionType transitionType) {
+	public TransitionChronicle findTransitions(Record record, TransitionType transitionType) {
 		this.triggerState = TriggerState.WAITING;
 		initializeDeques(record, transitionType);
 
@@ -73,11 +72,10 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 	 * @param transitionType
 	 * @return all transitions with the key thresholdStartTimestamp_ms
 	 */
-	private TreeMap<Long, Transition> findPeakTransitions(Record record, TransitionType transitionType) {
-		TreeMap<Long, Transition> transitions;
+	private TransitionChronicle findPeakTransitions(Record record, TransitionType transitionType) {
+		TransitionChronicle transitions = new TransitionChronicle();
 		IDevice device = DataExplorer.application.getActiveDevice();
 
-		transitions = new TreeMap<Long, Transition>();
 		LevelChecker levelChecker = new LevelChecker(record, transitionType);
 		int samplingTimespan_ms = Settings.getInstance().getSamplingTimespan_ms();
 		for (int i = 0; i < record.realSize(); i++) {
@@ -109,7 +107,7 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 					this.triggerState = RECOVERING;
 					this.recoveryDeque.initialize(i);
 					this.recoveryDeque.addLast(translatedValue, timeStamp_100ns);
-					log.finer(() -> Integer.toString(transitionType.getTransitionId())+ this);
+					log.finer(() -> Integer.toString(transitionType.getTransitionId()) + this);
 				} else if (!this.thresholdDeque.isAddableInTimePeriod(timeStamp_100ns)) {
 					this.triggerState = WAITING;
 					log.log(FINER, " isThresholdTimeExceeded ", this); //$NON-NLS-1$
@@ -134,7 +132,7 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 								this.thresholdDeque.size(), this.recoveryDeque.startIndex, this.recoveryDeque.size(), record, transitionType);
 						transitions.put(transition.getThresholdStartTimeStamp_ms(), transition);
 						log.log(FINE, GDE.STRING_GREATER, transition);
-						log.finer(() -> Integer.toString(transitionType.getTransitionId())+ this);
+						log.finer(() -> Integer.toString(transitionType.getTransitionId()) + this);
 						this.thresholdDeque.clear();
 						this.referenceDeque.initialize(this.recoveryDeque.startIndex);
 						this.referenceDeque.addLastByMoving(this.recoveryDeque);
@@ -143,7 +141,7 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 						log.warning(() -> String.format("%d trigger security check provoked a fallback %s: translatedValue=%f  thresholdAverage=%f", //$NON-NLS-1$
 								transitionType.getTransitionId(), this.thresholdDeque.getFormatedDuration(this.thresholdDeque.size() - 1), translatedValue, this.thresholdDeque.getAverageValue()));
 						this.triggerState = WAITING;
-						log.finer(() -> Integer.toString(transitionType.getTransitionId())+ this);
+						log.finer(() -> Integer.toString(transitionType.getTransitionId()) + this);
 						this.referenceDeque.addLastByMoving(this.thresholdDeque);
 						this.referenceDeque.addLastByMoving(this.recoveryDeque);
 						// referenceStartIndex is not modified by jitters
