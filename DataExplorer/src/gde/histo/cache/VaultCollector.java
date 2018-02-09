@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -52,6 +51,7 @@ import gde.histo.settlements.SettlementRecord;
 import gde.histo.transitions.GroupTransitions;
 import gde.histo.transitions.Transition;
 import gde.histo.transitions.TransitionCollector;
+import gde.histo.transitions.TransitionTableMapper.SettlementRecords;
 import gde.histo.utils.UniversalQuantile;
 import gde.log.Level;
 import gde.log.Logger;
@@ -129,9 +129,7 @@ public final class VaultCollector {
 
 			{
 				GroupTransitions transitions = TransitionCollector.defineTransitions(recordSet,this.vault.logChannelNumber);
-
-				LinkedHashMap<String, SettlementRecord> histoSettlements;
-				histoSettlements = determineSettlements(recordSet, transitions);
+				SettlementRecords histoSettlements = determineSettlements(recordSet, transitions);
 				setSettlements(histoSettlements);
 			}
 
@@ -178,8 +176,8 @@ public final class VaultCollector {
 	 * @param transitions
 	 * @return the calculated settlements calculated from transitions (key is the name of the settlementType)
 	 */
-	private LinkedHashMap<String, SettlementRecord> determineSettlements(RecordSet recordSet, GroupTransitions transitions) {
-		LinkedHashMap<String, SettlementRecord> histoSettlements = new LinkedHashMap<String, SettlementRecord>();
+	private SettlementRecords determineSettlements(RecordSet recordSet, GroupTransitions transitions) {
+		SettlementRecords histoSettlements = new SettlementRecords();
 
 		for (SettlementType settlementType : device.getDeviceConfiguration().getChannel(this.vault.logChannelNumber).getSettlements().values()) {
 			if (settlementType.getEvaluation() != null) {
@@ -363,12 +361,12 @@ public final class VaultCollector {
 		UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), true, true, false);
 		if (!quantile.getOutliers().isEmpty()) {
 			HashSet<Double> outlierSet = new HashSet<Double>(quantile.getOutliers());
-			String outlierCsv = outlierSet.stream().map(v -> encodeMeasurementValue(record, v)).map(p -> String.valueOf(p)).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+			String outlierCsv = outlierSet.stream().map(v -> encodeMeasurementValue(record, v)).map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
 			entryPoints.setOutlierPoints(outlierCsv);
 			log.log(Level.FINE, record.getName() + "  outliers=" + Arrays.toString(quantile.getOutliers().toArray()));
 		}
 		if (!quantile.getConstantScraps().isEmpty()) {
-			String scrappedCsv = quantile.getConstantScraps().stream().map(v -> encodeMeasurementValue(record, v)).map(p -> String.valueOf(p)).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+			String scrappedCsv = quantile.getConstantScraps().stream().map(v -> encodeMeasurementValue(record, v)).map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
 			entryPoints.setScrappedPoints(scrappedCsv);
 			log.log(Level.FINE, record.getName() + "  scrappedValues=", Arrays.toString(quantile.getConstantScraps().toArray()));
 		}
@@ -398,7 +396,7 @@ public final class VaultCollector {
 	 * Add the settlements points from the histo settlements to the vault.
 	 * @param histoSettlements
 	 */
-	private void setSettlements(LinkedHashMap<String, SettlementRecord> histoSettlements) {
+	private void setSettlements(SettlementRecords histoSettlements) {
 		for (Entry<String, SettlementRecord> entry : histoSettlements.entrySet()) {
 			SettlementRecord record = entry.getValue();
 			SettlementType settlementType = record.getSettlement();
@@ -413,12 +411,12 @@ public final class VaultCollector {
 				UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), true, true, false);
 				if (!quantile.getOutliers().isEmpty()) {
 					HashSet<Double> outlierSet = new HashSet<Double>(quantile.getOutliers());
-					String outlierCsv = outlierSet.stream().map(v -> encodeSettlementValue(record, v)).map(p -> String.valueOf(p)).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+					String outlierCsv = outlierSet.stream().map(v -> encodeSettlementValue(record, v)).map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
 					entryPoints.setOutlierPoints(outlierCsv);
 					log.log(Level.FINE, record.getName() + "  outliers=" + Arrays.toString(quantile.getOutliers().toArray()));
 				}
 				if (!quantile.getConstantScraps().isEmpty()) {
-					String scrappedCsv = quantile.getConstantScraps().stream().map(v -> encodeSettlementValue(record, v)).map(p -> String.valueOf(p)).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+					String scrappedCsv = quantile.getConstantScraps().stream().map(v -> encodeSettlementValue(record, v)).map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
 					entryPoints.setScrappedPoints(scrappedCsv);
 					log.log(Level.FINE, record.getName() + "  scrappedValues=", Arrays.toString(quantile.getConstantScraps().toArray()));
 				}
@@ -478,7 +476,7 @@ public final class VaultCollector {
 	 * Does not support settlements based on GPS-longitude or GPS-latitude.
 	 * @return double of settlement dependent value
 	 */
-	public int encodeSettlementValue(SettlementRecord record, double value) {
+	private int encodeSettlementValue(SettlementRecord record, double value) {
 		// todo harmonize encodeVaultValue methods later
 		// todo support settlements based on GPS-longitude or GPS-latitude with a base class common for Record and SettlementRecord
 		double newValue = (value - record.getOffset()) / record.getFactor() + record.getReduction();

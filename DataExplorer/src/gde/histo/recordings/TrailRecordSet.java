@@ -90,12 +90,12 @@ import gde.ui.SWTResourceManager;
  */
 public final class TrailRecordSet extends AbstractRecordSet {
 	@SuppressWarnings("hiding")
-	private static final String		$CLASS_NAME					= TrailRecordSet.class.getName();
-	private static final long			serialVersionUID		= -1580283867987273535L;
+	private static final String	$CLASS_NAME					= TrailRecordSet.class.getName();
+	private static final long		serialVersionUID		= -1580283867987273535L;
 	@SuppressWarnings("hiding")
-	private static final Logger		log									= Logger.getLogger($CLASS_NAME);
+	private static final Logger	log									= Logger.getLogger($CLASS_NAME);
 
-	public static final String		BASE_NAME_SEPARATOR	= " | ";
+	public static final String	BASE_NAME_SEPARATOR	= " | ";
 
 	/**
 	 * Collect input data for the trail recordset and subordinate objects.
@@ -1090,8 +1090,8 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return this.dataTags;
 	}
 
-	public Map<DataTag, String> getDataTags(int index) {
-		return this.dataTags.getByIndex(index);
+	public String getDataTagText(int index, DataTag dataTag) {
+		return this.dataTags.getText(index, dataTag);
 	}
 
 	public long getTopTimeStamp_ms() {
@@ -1129,8 +1129,15 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return (Vector<TrailRecord>) this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
 	}
 
-	public PickedVaults getPickedVaults() {
+	PickedVaults getPickedVaults() {
 		return this.pickedVaults;
+	}
+
+	/**
+	 * @return the vault at the timestep index position
+	 */
+	public ExtendedVault getVault(int index) {
+		return this.pickedVaults.indexedVaults.get(index);
 	}
 
 	@SuppressWarnings("unchecked")

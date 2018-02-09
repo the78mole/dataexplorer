@@ -20,38 +20,49 @@
 package gde.histo.recordings;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import gde.device.TrailTypes;
 
 /**
  * Suite records for trail records.
  * Used if a suite trail type is selected the trail record.
- * Key: 0-based, corresponds to the suite members index of the trail type
  * @author Thomas Eickert
  */
-public final class SuiteRecords extends HashMap<Integer, SuiteRecord> {
-	private static final long serialVersionUID = -5963216308453730035L;
+public final class SuiteRecords {
 
-	public SuiteRecords() {
+	Map<Integer, SuiteRecord> suiteRecords = new HashMap<>();
+
+	public void clear() {
+		suiteRecords.clear();
+	}
+
+	/**
+	 * @param memberIndex is 0-based and corresponds to the suite members index of the trail type
+	 */
+	public SuiteRecord get(int memberIndex) {
+		return suiteRecords.get(memberIndex);
+	}
+
+	/**
+	 * @param memberIndex is 0-based and corresponds to the suite members index of the trail type
+	 * @param suiteRecord
+	 */
+	public SuiteRecord put(int memberIndex, SuiteRecord suiteRecord) {
+		return suiteRecords.put(memberIndex, suiteRecord);
 	}
 
 	public int getSuiteMaxValue() {
-		return this.values().parallelStream().mapToInt(s -> s.getMaxRecordValue()).max().orElseThrow(() -> new UnsupportedOperationException());
+		return suiteRecords.values().parallelStream().mapToInt(SuiteRecord::getMaxRecordValue).max().orElseThrow(UnsupportedOperationException::new);
 	}
 
 	public int getSuiteMinValue() {
-		return this.values().parallelStream().mapToInt(s -> s.getMinRecordValue()).min().orElseThrow(() -> new UnsupportedOperationException());
-	}
-
-	@Deprecated
-	@Override // reason is potential mix-up of suite size with the record point size of suite records
-	public int size() {
-		throw new UnsupportedOperationException();
+		return suiteRecords.values().parallelStream().mapToInt(SuiteRecord::getMinRecordValue).min().orElseThrow(UnsupportedOperationException::new);
 	}
 
 	public int realSize() {
 		int result = 0;
-		for (SuiteRecord suiteRecord : this.values()) {
+		for (SuiteRecord suiteRecord : suiteRecords.values()) {
 			result = suiteRecord.size();
 			break;
 		}
@@ -59,16 +70,16 @@ public final class SuiteRecords extends HashMap<Integer, SuiteRecord> {
 	}
 
 	public int getSuiteLength() {
-		return super.size();
+		return suiteRecords.size();
 	}
 
 	/**
-	 * @param suiteOrdinal
+	 * @param memberIndex is 0-based and corresponds to the suite members index of the trail type
 	 * @param index
 	 * @return the point value at the index position of the suite record identified by the suite ordinal
 	 */
-	public Integer getSuiteValue(int suiteOrdinal, int index) {
-		return this.get(suiteOrdinal).elementAt(index);
+	public Integer getSuiteValue(int memberIndex, int index) {
+		return suiteRecords.get(memberIndex).elementAt(index);
 	}
 
 	/**
@@ -78,6 +89,11 @@ public final class SuiteRecords extends HashMap<Integer, SuiteRecord> {
 	 */
 	public boolean isNullValue(TrailTypes trailType, int index) {
 		return getSuiteValue(trailType.getSuiteMasterIndex(), index) == null;
+	}
+
+	@Override
+	public String toString() {
+		return "SuiteRecords [getSuiteMaxValue()=" + this.getSuiteMaxValue() + ", getSuiteMinValue()=" + this.getSuiteMinValue() + ", realSize()=" + this.realSize() + ", getSuiteLength()=" + this.getSuiteLength() + "]";
 	}
 
 }

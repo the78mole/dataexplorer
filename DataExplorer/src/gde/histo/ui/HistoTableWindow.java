@@ -22,7 +22,6 @@ import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.FINEST;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -278,11 +277,11 @@ public class HistoTableWindow extends CTabItem {
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 				} else {
-					Map<DataTag, String> dataTags = trailRecordSet.getDataTags().getByIndex(columnNumber - 2);
+					int index = columnNumber - 2;
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
-					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
-					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
-					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
+					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.LINK_PATH));
+					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.FILE_PATH));
+					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), trailRecordSet.getDataTagText(index, DataTag.RECORDSET_BASE_NAME));
 				}
 				HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
 				log.finer(() -> "DataTag.FILE_PATH=" + HistoTableWindow.this.popupmenu.getData(TabMenuOnDemand.DATA_FILE_PATH.name())); //$NON-NLS-1$

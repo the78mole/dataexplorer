@@ -49,6 +49,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.histo.datasources.DirectoryScanner.SourceDataSet;
 import gde.histo.datasources.VaultPicker.ProgressManager;
+import gde.histo.datasources.VaultPicker.TrussJobs;
 import gde.histo.device.IHistoDevice;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -85,7 +86,7 @@ public final class VaultReaderWriter {
 	 * @return the vaults and trusses loaded from the cache
 	 * @throws IOException during opening or traversing the zip file
 	 */
-	public static synchronized List<ExtendedVault> loadFromCaches(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress) //
+	public static synchronized List<ExtendedVault> loadFromCaches(TrussJobs trussJobs, Optional<ProgressManager> progress) //
 			throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
 		Path osdCacheFilePath = ExtendedVault.getVaultsFolder(GDE.STRING_EMPTY);
 		List<ExtendedVault> vaults = loadFromCachePath(trussJobs, progress, osdCacheFilePath);
@@ -100,7 +101,7 @@ public final class VaultReaderWriter {
 		return vaults;
 	}
 
-	private static List<ExtendedVault> loadFromCachePath(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress,
+	private static List<ExtendedVault> loadFromCachePath(TrussJobs trussJobs, Optional<ProgressManager> progress,
 			Path cacheFilePath) throws IOException, ZipException {
 		List<ExtendedVault> vaults = new ArrayList<>();
 		if (settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
@@ -160,7 +161,7 @@ public final class VaultReaderWriter {
 	 * @return the full size (in bytes) of the cache directory
 	 * @throws IOException
 	 */
-	public static long storeInCaches(Map<Path, List<VaultCollector>> trussJobs) throws IOException {
+	public static long storeInCaches(TrussJobs trussJobs) throws IOException {
 		long[] bytes = { 0 };
 		Map<SourceDataSet, List<VaultCollector>> groupedJobs = trussJobs.values().parallelStream().flatMap(Collection::parallelStream).collect(Collectors.groupingBy(VaultCollector::getSourceDataSet));
 // for (Entry<SourceDataSet, List<VaultCollector>> e : groupedJobs.entrySet()) {
@@ -178,7 +179,7 @@ public final class VaultReaderWriter {
 			Path cacheFilePath = ExtendedVault.getVaultsFolder(readerSettings);
 			try {
 				storeInCachePath(e.getValue(), cacheFilePath);
-				bytes[0] += Files.walk(cacheFilePath).mapToLong(p -> p.toFile().length()).sum();
+				bytes[0] += Files.walk(cacheFilePath).map(Path::toFile).mapToLong(File::length).sum();
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
 			}

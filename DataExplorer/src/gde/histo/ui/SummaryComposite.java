@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +52,10 @@ import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.Channel;
 import gde.data.Channels;
+import gde.data.ObjectData;
+import gde.device.IDevice;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.HistoSet;
@@ -193,10 +195,15 @@ public final class SummaryComposite extends AbstractChartComposite {
 	 * Comment caching.
 	 * The comment text and tooltip remains active for a defined number of drawing actions.
 	 */
-	private static class VolatileComment {
-		final String	textLines;
-		final String	toolTip;
-		int						remainingAccessCounter;
+	private static final class VolatileComment {
+		private final DataExplorer	application1	= DataExplorer.getInstance();
+		private final IDevice				device				= application1.getActiveDevice();
+		private final Channel				channel				= application1.getActiveChannel();
+		private final ObjectData		object				= application1.getActiveObject();
+
+		private final String				textLines;
+		private final String				toolTip;
+		private int									remainingAccessCounter;
 
 		private VolatileComment(String textLines, String toolTip, int accessCounter) {
 			this.textLines = textLines;
@@ -214,7 +221,17 @@ public final class SummaryComposite extends AbstractChartComposite {
 		}
 
 		private boolean isAvailable() {
-			return remainingAccessCounter > 0;
+			if (remainingAccessCounter > 0) {
+				boolean isSameChart = device.equals(application1.getActiveDevice()) && channel.equals(application1.getActiveChannel()) && object.equals(application1.getActiveObject());
+				return isSameChart;
+			} else
+				return false;
+		}
+
+		@Override
+		public String toString() {
+			boolean isSameChart = device.equals(application1.getActiveDevice()) && channel.equals(application1.getActiveChannel()) && object.equals(application1.getActiveObject());
+			return "VolatileComment [textLines=" + this.textLines + ", toolTip=" + this.toolTip + ", remainingAccessCounter=" + this.remainingAccessCounter + ", isSameChart=" + isSameChart + "]";
 		}
 	}
 
@@ -395,7 +412,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 				String text = TrailRecordSetFormatter.getFileNameLines(snappedIndices);
 				if (snappedIndices.size() == 1) {
 					TrailRecordFormatter formatter = new TrailRecordFormatter(record);
-					ExtendedVault vault = trailRecordSet.getPickedVaults().getVault(snappedIndices.get(0));
+					ExtendedVault vault = trailRecordSet.getVault(snappedIndices.get(0));
 					String outliers = Arrays.stream(record.getVaultOutliers(vault)).mapToObj(o -> formatter.getScaleValue(o)).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
 					String scraps = Arrays.stream(record.getVaultScraps(vault)).mapToObj(o -> formatter.getScaleValue(o)).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
 					if (!outliers.isEmpty()) text += "\n o " + outliers;
@@ -496,20 +513,20 @@ public final class SummaryComposite extends AbstractChartComposite {
 
 				List<Integer> snappedIndices = getSnappedIndices(point);
 				if (snappedIndices.size() == 1) {
-					Map<DataTag, String> dataTags = trailRecordSet.getDataTags(snappedIndices.get(0));
-					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
-					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
-					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
+					Integer index = snappedIndices.get(0);
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.LINK_PATH));
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.FILE_PATH));
+					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), trailRecordSet.getDataTagText(index, DataTag.RECORDSET_BASE_NAME));
 				} else {
 					if (point.x == 0 && record != null && getChartData(record).getMinMaxWarning()[0] != null) { // left scale warnings
 						Outliers outlier = getChartData(record).getMinMaxWarning()[0];
-						ExtendedVault vault = record.getParent().getPickedVaults().getVault(outlier.getIndices().get(0));
+						ExtendedVault vault = record.getParent().getVault(outlier.getIndices().get(0));
 						popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
 						popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
 						popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
 					} else if (point.x == curveAreaBounds.width && record != null && getChartData(record).getMinMaxWarning()[1] != null) { // right
 						Outliers outlier = getChartData(record).getMinMaxWarning()[1];
-						ExtendedVault vault = record.getParent().getPickedVaults().getVault(outlier.getIndices().get(0));
+						ExtendedVault vault = record.getParent().getVault(outlier.getIndices().get(0));
 						popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
 						popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
 						popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());

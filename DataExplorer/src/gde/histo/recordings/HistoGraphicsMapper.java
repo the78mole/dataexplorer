@@ -39,6 +39,49 @@ public final class HistoGraphicsMapper {
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	/**
+	 * Data points of multiple measurements or lines or curves.
+	 */
+	public static final class PointArray {
+
+		private int									x;																					// x value of the curve
+		private final Integer[]			y;																					// y values of the curve
+
+		public PointArray(int ySize) {
+			this.y = new Integer[ySize];
+		}
+
+		public int getX() {
+			return this.x;
+		}
+
+		public void setX(int x) {
+			this.x = x;
+		}
+
+		public Integer[] getY() {
+			return this.y;
+		}
+
+		public void setY(int index, Integer value) {
+			this.y[index] = value;
+		}
+
+		/**
+		 * @param suiteOrdinal
+		 * @return the point value of the suite member
+		 */
+		public Integer getY(int suiteOrdinal) {
+			return this.getY()[suiteOrdinal];
+		}
+
+		@Override
+		public String toString() {
+			return "PointArray [x=" + this.x + ", y=" + Arrays.toString(this.y) + "]";
+		}
+
+	}
+
+	/**
 	 * Query the values for display.
 	 * @return the display point x axis value and multiple y axis values; null if the trail record value is null
 	 */

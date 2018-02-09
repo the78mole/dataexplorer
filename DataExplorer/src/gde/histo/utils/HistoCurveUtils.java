@@ -43,7 +43,7 @@ import gde.data.AbstractRecordSet;
 import gde.data.RecordSet;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.recordings.HistoGraphicsMapper;
-import gde.histo.recordings.PointArray;
+import gde.histo.recordings.HistoGraphicsMapper.PointArray;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordFormatter;
 import gde.histo.recordings.TrailRecordSet;

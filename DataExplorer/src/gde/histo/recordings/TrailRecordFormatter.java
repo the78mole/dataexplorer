@@ -19,17 +19,18 @@
 
 package gde.histo.recordings;
 
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.device.TrailTypes;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecordSet.Outliers;
 import gde.histo.ui.SummaryComposite.SummaryLayout;
 import gde.histo.ui.data.SummarySpots.OutlierWarning;
-import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.StringHelper;
@@ -39,8 +40,8 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public final class TrailRecordFormatter {
-	private final static String	$CLASS_NAME	= TrailRecordFormatter.class.getName();
-	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
+	// private final static String	$CLASS_NAME	= TrailRecordFormatter.class.getName();
+	// private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * Performant replacement for String.format("%.8s", ss)
@@ -223,8 +224,8 @@ public final class TrailRecordFormatter {
 			double formatComparisonValue = summary.defineScaleMax() - summary.defineScaleMin();
 			String values = outliers.getDecodedValues().stream() //
 					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
-			String fileNames = outliers.getIndices().stream().map(i -> record.getParent().getPickedVaults().getVault(i)) //
-					.map(v -> v.getLogFileAsPath().getFileName().toString()).collect(Collectors.joining(", "));
+			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
+					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
 			return outliers.getSelectText() //
 					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getFarLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) //
 					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
@@ -232,8 +233,8 @@ public final class TrailRecordFormatter {
 			double formatComparisonValue = summary.defineScaleMax() - summary.defineScaleMin();
 			String values = outliers.getDecodedValues().stream() //
 					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
-			String fileNames = outliers.getIndices().stream().map(i -> record.getParent().getPickedVaults().getVault(i)) //
-					.map(v -> v.getLogFileAsPath().getFileName().toString()).collect(Collectors.joining(", "));
+			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
+					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
 			return outliers.getSelectText() //
 					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getFarLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) //
 					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
@@ -248,8 +249,8 @@ public final class TrailRecordFormatter {
 			double formatComparisonValue = summary.defineScaleMax() - summary.defineScaleMin();
 			String values = outliers.getDecodedValues().stream() //
 					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
-			String fileNames = outliers.getIndices().stream().map(i -> record.getParent().getPickedVaults().getVault(i)) //
-					.map(v -> v.getLogFileAsPath().getFileName().toString()).collect(Collectors.joining(", "));
+			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
+					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
 			return outliers.getSelectText() //
 					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getFarLimit(), formatComparisonValue) //
 					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
@@ -257,8 +258,8 @@ public final class TrailRecordFormatter {
 			double formatComparisonValue = summary.defineScaleMax() - summary.defineScaleMin();
 			String values = outliers.getDecodedValues().stream() //
 					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
-			String fileNames = outliers.getIndices().stream().map(i -> record.getParent().getPickedVaults().getVault(i)) //
-					.map(v -> v.getLogFileAsPath().getFileName().toString()).collect(Collectors.joining(", "));
+			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
+					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
 			return outliers.getSelectText() //
 					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getFarLimit(), formatComparisonValue) //
 					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;

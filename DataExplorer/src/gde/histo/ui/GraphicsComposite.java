@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -409,8 +408,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 			if (point.x > 0 && point.y > this.curveAreaBounds.height - this.curveAreaBounds.y) {
 				Long timestamp_ms = this.timeLine.getSnappedTimestamp(point.x);
 				String text = timestamp_ms != null
-						? Paths.get(trailRecordSet.getDataTags().getByIndex(trailRecordSet.getIndex(timestamp_ms)).get(DataTag.FILE_PATH)).getFileName().toString()
-						: null;
+						? Paths.get(trailRecordSet.getDataTagText(trailRecordSet.getIndex(timestamp_ms), DataTag.FILE_PATH)).getFileName().toString() : null;
 				if (text != null) {
 					if (this.graphicCanvas.getToolTipText() == null || !(text.equals(this.graphicCanvas.getToolTipText())))
 						this.graphicCanvas.setToolTipText(text);
@@ -444,11 +442,10 @@ public final class GraphicsComposite extends AbstractChartComposite {
 				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
 				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
 				if (point.x > 0 && point.x < this.curveAreaBounds.width) {
-					Map<DataTag, String> dataTags = trailRecordSet.getDataTags(trailRecordSet //
-							.getIndex(timeLine.getAdjacentTimestamp(point.x))); // is already relative to curve area
-					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), dataTags.get(DataTag.LINK_PATH));
-					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), dataTags.get(DataTag.FILE_PATH));
-					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), dataTags.get(DataTag.RECORDSET_BASE_NAME));
+					int index = trailRecordSet.getIndex(timeLine.getAdjacentTimestamp(point.x));
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.LINK_PATH));
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.FILE_PATH));
+					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), trailRecordSet.getDataTagText(index, DataTag.RECORDSET_BASE_NAME));
 				} else {
 					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
 					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);

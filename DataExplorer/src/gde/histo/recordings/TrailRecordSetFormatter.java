@@ -19,7 +19,9 @@
 
 package gde.histo.recordings;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
@@ -42,9 +44,10 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public final class TrailRecordSetFormatter {
+	private static final int			MAX_TOOLTIP_LINES	= 33;
 
-	private static final Settings	settings	= Settings.getInstance();
-	private static final Channels	channels	= Channels.getInstance();
+	private static final Settings	settings					= Settings.getInstance();
+	private static final Channels	channels					= Channels.getInstance();
 
 	public static String getSelectedMeasurementsAsTable(long timestamp_ms) {
 		Properties displayProps = settings.getMeasurementDisplayProperties();
@@ -70,7 +73,7 @@ public final class TrailRecordSetFormatter {
 			sb.append(GDE.STRING_OR).append(GDE.LINE_SEPARATOR);
 
 			final int index = trailRecordSet.getIndex(timestamp_ms);
-			sb.append(String.format("%-11.11s", trailRecordSet.getDataTags().getByIndex(index).get(DataTag.RECORDSET_BASE_NAME))); //$NON-NLS-1$
+			sb.append(String.format("%-11.11s", trailRecordSet.getDataTagText(index, DataTag.RECORDSET_BASE_NAME)));
 			sb.append(GDE.STRING_OR).append(String.format("%-16s", LocalizedDateTime.getFormatedTime(DateTimePattern.yyyyMMdd_HHmm, timestamp_ms)).substring(0, 16)); //$NON-NLS-1$
 			for (int i = 0; i < records.size(); i++) {
 				TrailRecord record = records.get(i);
@@ -83,10 +86,12 @@ public final class TrailRecordSetFormatter {
 	}
 
 	public static String getFileNameLines(List<Integer> indices) {
-		return indices.stream().sorted() //
-				.map(i -> Paths.get(getTrailRecordSet().getDataTags(i).get(DataTag.FILE_PATH))) //
-				.map(p -> p.getFileName().toString()) //
-				.collect(Collectors.joining(GDE.STRING_NEW_LINE));
+		String fileNameLines = indices.stream() //
+				.map(i -> Paths.get(getTrailRecordSet().getDataTagText(i, DataTag.FILE_PATH))) //
+				.map(Path::getFileName).map(Path::toString) //
+				.sorted(Comparator.reverseOrder()).limit(MAX_TOOLTIP_LINES).collect(Collectors.joining(GDE.STRING_NEW_LINE));
+		String suffix = indices.size() > MAX_TOOLTIP_LINES ? GDE.STRING_NEW_LINE + GDE.STRING_ELLIPSIS : "";
+		return fileNameLines + suffix;
 	}
 
 	private static TrailRecordSet getTrailRecordSet() {

@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
@@ -83,8 +84,8 @@ public final class VaultPicker {
 	private enum DuplicateHandling {
 		KEEP {
 			@Override
-			Map<Path, List<VaultCollector>> getTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException {
-				final Map<Path, List<VaultCollector>> resultMap = new HashMap<>();
+			TrussJobs getTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException {
+				TrussJobs resultMap = new TrussJobs();
 				for (VaultCollector truss : trusses) {
 					addTruss(resultMap, truss);
 				}
@@ -94,8 +95,8 @@ public final class VaultPicker {
 
 		DISCARD {
 			@Override
-			Map<Path, List<VaultCollector>> getTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException {
-				final Map<Path, List<VaultCollector>> resultMap = new HashMap<>();
+			TrussJobs getTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException {
+				TrussJobs resultMap = new TrussJobs();
 				final Set<ExtendedVault> trusses4StartTimes = new HashSet<>();
 
 				for (VaultCollector truss : trusses) {
@@ -114,9 +115,9 @@ public final class VaultPicker {
 		 * Determine the vaults which are required for the data access.
 		 * @return trussJobs with the actual path (not the link file path) and a map of vault skeletons (trusses)
 		 */
-		abstract Map<Path, List<VaultCollector>> getTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException;
+		abstract TrussJobs getTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException;
 
-		private static void addTruss(final Map<Path, List<VaultCollector>> resultMap, VaultCollector truss) {
+		private static void addTruss(TrussJobs resultMap, VaultCollector truss) {
 			Path path = truss.getVault().getLogFileAsPath();
 			List<VaultCollector> list = resultMap.get(path);
 			if (list == null) resultMap.put(path, list = new ArrayList<>());
@@ -172,10 +173,41 @@ public final class VaultPicker {
 	}
 
 	/**
-	 * Supports progress bars in loops and a simple progress bar setting.
-	 * @author Thomas Eickert (USER)
+	 * Holds trusses (vault skeletons) which are bound for reading into a full vault.
 	 */
-	public class ProgressManager {
+	public static final class TrussJobs {
+
+		private Map<Path, List<VaultCollector>> trussJobs = new HashMap<>();
+
+		public void clear() {
+			trussJobs.clear();
+		}
+
+		public List<VaultCollector> get(Path path) {
+			return trussJobs.get(path);
+		}
+
+		public List<VaultCollector> put(Path path, List<VaultCollector> directoryJobs) {
+			return trussJobs.put(path, directoryJobs);
+		}
+
+		public Set<Entry<Path, List<VaultCollector>>> entrySet() {
+			return trussJobs.entrySet();
+		}
+
+		public Collection<List<VaultCollector>> values() {
+			return trussJobs.values();
+		}
+
+		public int size() {
+			return trussJobs.size();
+		}
+	}
+
+	/**
+	 * Supports progress bars in loops and a simple progress bar setting.
+	 */
+	public static final class ProgressManager {
 
 		private final DataExplorer	presenter			= DataExplorer.getInstance();
 		private final String				sThreadId			= String.format("%06d", Thread.currentThread().getId());	//$NON-NLS-1$
@@ -296,7 +328,7 @@ public final class VaultPicker {
 
 		{
 			// step: build the workload map consisting of the cache key and the file path
-			Map<Path, List<VaultCollector>> trussJobs = DUPLICATE_HANDLING.getTrussJobs(trusses);
+			TrussJobs trussJobs = DUPLICATE_HANDLING.getTrussJobs(trusses);
 			log.info(() -> String.format("trussJobs to load total     = %d", trussJobs.size())); //$NON-NLS-1$
 
 			// step: put cached vaults into the histoSet map and reduce workload map
@@ -391,7 +423,7 @@ public final class VaultPicker {
 				progress.ifPresent((p) -> p.set(SCANNED));
 
 				if (!trusses.isEmpty()) {
-					Map<Path, List<VaultCollector>> trussJobs;
+					TrussJobs trussJobs;
 					{ // step: read from paths and identify duplicates
 						trussJobs = defineTrussJobs(trusses);
 						progress.ifPresent((p) -> p.set(MATCHED));
@@ -457,7 +489,7 @@ public final class VaultPicker {
 			log.time(() -> String.format("%,5d timeSteps  total              time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
 					this.pickedVaults.size(), elapsedTime_us / 1000, this.pickedVaults.size() * 1000000 / this.elapsedTime_us, (int) (this.recordSetBytesSum / 1.024 / 1.024 / this.elapsedTime_us)));
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage(), e);
 		} finally {
 			progress.ifPresent((p) -> p.set(DONE));
 		}
@@ -467,7 +499,7 @@ public final class VaultPicker {
 	/**
 	 * @param trussJobs is the list of trusses which must be read
 	 */
-	private void loadVaultsFromFiles(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress) {
+	private void loadVaultsFromFiles(TrussJobs trussJobs, Optional<ProgressManager> progress) {
 		int remainingJobSize = trussJobs.values().parallelStream().mapToInt(c -> c.size()).sum();
 		progress.ifPresent((p) -> p.reInit(CACHED, remainingJobSize, 1));
 		for (Map.Entry<Path, List<VaultCollector>> trussJobsEntry : trussJobs.entrySet()) {
@@ -488,7 +520,7 @@ public final class VaultPicker {
 	/**
 	 * @param trussJobs is the job list which is worked on and reduced for each vault found in the cache
 	 */
-	private void loadVaultsFromCache(Map<Path, List<VaultCollector>> trussJobs, Optional<ProgressManager> progress) throws IOException {
+	private void loadVaultsFromCache(TrussJobs trussJobs, Optional<ProgressManager> progress) throws IOException {
 		long nanoTime = System.nanoTime();
 		int tmpHistoSetsSize = this.pickedVaults.size();
 		for (ExtendedVault histoVault : VaultReaderWriter.loadFromCaches(trussJobs, progress)) {
@@ -510,8 +542,8 @@ public final class VaultPicker {
 	/**
 	 * @return the jobs determined from the paths after duplicates elimination
 	 */
-	private Map<Path, List<VaultCollector>> defineTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException {
-		Map<Path, List<VaultCollector>> trussJobs;
+	private TrussJobs defineTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException {
+		TrussJobs trussJobs;
 		long nanoTime = System.nanoTime();
 		// step: build the workload map consisting of the cache key and the file path
 		trussJobs = DUPLICATE_HANDLING.getTrussJobs(trusses);

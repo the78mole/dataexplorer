@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,9 +42,9 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert (USER)
  */
 public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
-	private static final String	$CLASS_NAME							= TrailDataTags.class.getName();
-	private static final long		serialVersionUID				= -1091858232851684060L;
-	private static final Logger	log											= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME				= TrailDataTags.class.getName();
+	private static final long		serialVersionUID	= -1091858232851684060L;
+	private static final Logger	log								= Logger.getLogger($CLASS_NAME);
 
 	public enum DataTag {
 		LINK_PATH, FILE_PATH, CHANNEL_NUMBER, RECTIFIED_OBJECTKEY, RECORDSET_BASE_NAME, RECORDSET_ORDINAL, GPS_LOCATION
@@ -111,18 +110,27 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 	}
 
 	/**
-	 * @param index
 	 * @return the dataTags
 	 */
 	public Map<DataTag, String> getByIndex(int index) {
 		if (index >= 0) {
-			HashMap<DataTag, String> dataTags4Index = new HashMap<>();
-			for (java.util.Map.Entry<DataTag, List<String>> logTagEntry : this.entrySet()) {
+			Map<DataTag, String> dataTags4Index = new EnumMap<>(DataTag.class);
+			for (Entry<DataTag, List<String>> logTagEntry : this.entrySet()) {
 				if (logTagEntry.getValue().size() > 0) dataTags4Index.put(logTagEntry.getKey(), logTagEntry.getValue().get(index));
 			}
 			return dataTags4Index;
 		} else
-			return new HashMap<DataTag, String>();
+			return new EnumMap<DataTag, String>(DataTag.class);
+	}
+
+	/**
+	 * @return the dataTag value
+	 */
+	public String getText(int index, DataTag dataTag) {
+		if (index >= 0) {
+			return this.get(dataTag).get(index);
+		} else
+			throw new IllegalArgumentException();
 	}
 
 	/**

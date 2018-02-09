@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import gde.data.RecordSet;
 import gde.device.ChannelType;
@@ -51,6 +52,64 @@ public final class TransitionTableMapper {
 	private static final String	$CLASS_NAME	= TransitionTableMapper.class.getName();
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
+	public static final class SettlementTypes {
+		private final LinkedHashMap<Integer, SettlementType> settlementTypes;
+
+		public SettlementTypes(LinkedHashMap<Integer, SettlementType> settlements) {
+			this.settlementTypes = new LinkedHashMap<>(settlements);
+		}
+
+		public SettlementType get(int settlementId) {
+			return settlementTypes.get(settlementId);
+		}
+
+		public SettlementType put(int settlementId, SettlementType settlementType) {
+			return settlementTypes.put(settlementId, settlementType);
+		}
+
+		public Set<Entry<Integer, SettlementType>> entrySet() {
+			return settlementTypes.entrySet();
+		}
+
+		public int size() {
+			return settlementTypes.size();
+		}
+
+		public Collection<SettlementType> values() {
+			return settlementTypes.values();
+		}
+
+		@Override
+		public String toString() {
+			return "SettlementTypes [settlementTypes=" + this.settlementTypes + ", size()=" + this.size() + "]";
+		}
+	}
+
+	public static final class SettlementRecords {
+		private final LinkedHashMap<String, SettlementRecord> settlementRecords = new LinkedHashMap<>();
+
+		public SettlementRecord get(String settlementName) {
+			return settlementRecords.get(settlementName);
+		}
+
+		public SettlementRecord put(String settlementName, SettlementRecord settlementType) {
+			return settlementRecords.put(settlementName, settlementType);
+		}
+
+		public Collection<SettlementRecord> values() {
+			return settlementRecords.values();
+		}
+
+		public Set<Entry<String, SettlementRecord>> entrySet() {
+			return settlementRecords.entrySet();
+		}
+
+		@Override
+		public String toString() {
+			return "SettlementRecords [settlementRecords=" + this.settlementRecords + ", size()=" + this.settlementRecords.size() + "]";
+		}
+	}
+
 	private final DataExplorer	application	= DataExplorer.application;
 	private final IDevice				device			= DataExplorer.application.getActiveDevice();
 
@@ -72,13 +131,13 @@ public final class TransitionTableMapper {
 	 * @return the row with additional columns for the active settlements with reasonable data
 	 */
 	public synchronized String[] defineRowWithSettlements(int index, String[] dataTableRow) {
-		LinkedHashMap<Integer, SettlementType> settlementTypes = defineActiveAndDisplayableSettlements();
+		SettlementTypes settlementTypes = defineActiveAndDisplayableSettlements();
 		HashMap<Integer, TransitionGroupType> transitionGroups = channel.getTransitionGroups();
 		int tableColumnsSize = recordSet.getVisibleAndDisplayableRecordsForTable().size() + 1;
 		String[] tableRow = Arrays.copyOf(dataTableRow, tableColumnsSize + settlementTypes.size() + transitionGroups.size());
 
 		GroupTransitions histoTransitions = recordSet.getHistoTransitions();
-		LinkedHashMap<String, SettlementRecord> settlements = determineSettlements(histoTransitions, settlementTypes.values());
+		SettlementRecords settlements = determineSettlements(histoTransitions, settlementTypes.values());
 
 		int columnIndex = tableColumnsSize;
 		for (SettlementRecord settlementRecord : settlements.values()) {
@@ -105,8 +164,8 @@ public final class TransitionTableMapper {
 	/**
 	 * @return the settlementTypes with reasonable data (key is settlementId)
 	 */
-	public LinkedHashMap<Integer, SettlementType> defineActiveAndDisplayableSettlements() {
-		LinkedHashMap<Integer, SettlementType> channelSettlements = new LinkedHashMap<>(channel.getSettlements());
+	public SettlementTypes defineActiveAndDisplayableSettlements() {
+		SettlementTypes channelSettlements = new SettlementTypes(channel.getSettlements());
 		for (Iterator<Entry<Integer, SettlementType>> iterator = channelSettlements.entrySet().iterator(); iterator.hasNext();) {
 			Entry<Integer, SettlementType> entry = iterator.next();
 			if (entry.getValue().isActive() && hasTransitions(entry.getValue())) {
@@ -130,15 +189,11 @@ public final class TransitionTableMapper {
 		}
 	}
 
-	private boolean hasReasonableData(SettlementType settlementType) {
-		throw new UnsupportedOperationException("not yet implemented");
-	}
-
 	/**
 	 * @return the calculated settlements calculated from transitions (key is the name of the settlementType)
 	 */
-	private LinkedHashMap<String, SettlementRecord> determineSettlements(GroupTransitions transitions, Collection<SettlementType> settlementTypes) {
-		LinkedHashMap<String, SettlementRecord> histoSettlements = new LinkedHashMap<String, SettlementRecord>();
+	private SettlementRecords determineSettlements(GroupTransitions transitions, Collection<SettlementType> settlementTypes) {
+		SettlementRecords histoSettlements = new SettlementRecords();
 		for (SettlementType settlementType : settlementTypes) {
 			if (settlementType.getEvaluation() != null) {
 				SettlementRecord record = new SettlementRecord(settlementType, recordSet, application.getActiveChannelNumber());
