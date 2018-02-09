@@ -52,6 +52,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.AbstractRecord;
 import gde.data.AbstractRecordSet;
+import gde.data.Record;
 import gde.data.Record.DataType;
 import gde.data.TimeSteps;
 import gde.device.IDevice;
@@ -94,8 +95,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	private static final Logger		log									= Logger.getLogger($CLASS_NAME);
 
 	public static final String		BASE_NAME_SEPARATOR	= " | ";
-
-	protected static final String	CHART_WEIGHT				= "Tab_chartWeight";							// weight of the charts (graphics or summary boxplot)
 
 	/**
 	 * Collect input data for the trail recordset and subordinate objects.
@@ -199,7 +198,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		private void applyTemplateTrailData(TrailRecord record) {
 			TrailSelector trailSelector = record.getTrailSelector();
 			if (template != null && template.isAvailable()) {
-				String property = template.getProperty(record.getOrdinal() + ChartTemplate.TRAIL_TEXT_ORDINAL);
+				String property = template.getProperty(record.getOrdinal() + Record.TRAIL_TEXT_ORDINAL);
 				if (property != null) {
 					int propertyValue = Integer.parseInt(property);
 					if (propertyValue >= 0 && propertyValue < trailSelector.getApplicableTrailsTexts().size()) {
@@ -974,24 +973,24 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		for (int i = 0; i < this.size(); ++i) {
 			TrailRecord record = this.get(i);
 			ChartTemplate recordTemplate = record.getTemplate();
-			this.template.setProperty(i + ChartTemplate.IS_VISIBLE, String.valueOf(recordTemplate.isVisible));
-			this.template.setProperty(i + ChartTemplate.IS_POSITION_LEFT, String.valueOf(recordTemplate.isPositionLeft));
+			this.template.setProperty(i + Record.IS_VISIBLE, String.valueOf(recordTemplate.isVisible));
+			this.template.setProperty(i + Record.IS_POSITION_LEFT, String.valueOf(recordTemplate.isPositionLeft));
 			Color color = recordTemplate.color;
-			this.template.setProperty(i + ChartTemplate.COLOR, color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue);
-			this.template.setProperty(i + ChartTemplate.LINE_WIDTH, String.valueOf(recordTemplate.lineWidth));
-			this.template.setProperty(i + ChartTemplate.LINE_STYLE, String.valueOf(recordTemplate.lineStyle));
-			this.template.setProperty(i + ChartTemplate.IS_ROUND_OUT, String.valueOf(recordTemplate.isRoundOut));
-			this.template.setProperty(i + ChartTemplate.IS_START_POINT_ZERO, String.valueOf(recordTemplate.isStartpointZero));
-			this.template.setProperty(i + ChartTemplate.NUMBER_FORMAT, String.valueOf(recordTemplate.numberFormat));
-			this.template.setProperty(i + ChartTemplate.IS_START_END_DEFINED, String.valueOf(recordTemplate.isStartEndDefined));
-			this.template.setProperty(i + ChartTemplate.DEFINED_MAX_VALUE, String.valueOf(recordTemplate.maxScaleValue));
-			this.template.setProperty(i + ChartTemplate.DEFINED_MIN_VALUE, String.valueOf(recordTemplate.minScaleValue));
+			this.template.setProperty(i + Record.COLOR, color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue);
+			this.template.setProperty(i + Record.LINE_WITH, String.valueOf(recordTemplate.lineWidth));
+			this.template.setProperty(i + Record.LINE_STYLE, String.valueOf(recordTemplate.lineStyle));
+			this.template.setProperty(i + Record.IS_ROUND_OUT, String.valueOf(recordTemplate.isRoundOut));
+			this.template.setProperty(i + Record.IS_START_POINT_ZERO, String.valueOf(recordTemplate.isStartpointZero));
+			this.template.setProperty(i + Record.NUMBER_FORMAT, String.valueOf(recordTemplate.numberFormat));
+			this.template.setProperty(i + Record.IS_START_END_DEFINED, String.valueOf(recordTemplate.isStartEndDefined));
+			this.template.setProperty(i + Record.DEFINED_MAX_VALUE, String.valueOf(recordTemplate.maxScaleValue));
+			this.template.setProperty(i + Record.DEFINED_MIN_VALUE, String.valueOf(recordTemplate.minScaleValue));
 
-			this.template.setProperty(i + ChartTemplate.TRAIL_TEXT_ORDINAL, String.valueOf(record.getTrailSelector().getTrailTextSelectedIndex()));
+			this.template.setProperty(i + Record.TRAIL_TEXT_ORDINAL, String.valueOf(record.getTrailSelector().getTrailTextSelectedIndex()));
 		}
 		int[] chartWeights = presentHistoExplorer.getHistoSummaryTabItem().getChartWeights();
 		for (int i = 0; i < chartWeights.length; i++) {
-			this.template.setProperty(TrailRecordSet.CHART_WEIGHT + i, String.valueOf(chartWeights[i]));
+			this.template.setProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(chartWeights[i]));
 		}
 		this.template.store();
 		log.fine(() -> "creating histo graphics template file in " + this.template.getCurrentFilePath()); //$NON-NLS-1$
@@ -1007,22 +1006,22 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (int i = 0; i < this.size(); ++i) {
 				TrailRecord record = this.get(i);
 				ChartTemplate recordTemplate = record.getTemplate();
-				recordTemplate.isVisible = Boolean.parseBoolean(this.template.getProperty(i + ChartTemplate.IS_VISIBLE, "false"));
-				recordTemplate.isPositionLeft = Boolean.parseBoolean(this.template.getProperty(i + ChartTemplate.IS_POSITION_LEFT, "true"));
+				recordTemplate.isVisible = Boolean.parseBoolean(this.template.getProperty(i + Record.IS_VISIBLE, "false"));
+				recordTemplate.isPositionLeft = Boolean.parseBoolean(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"));
 				int r, g, b;
-				String color = this.template.getProperty(i + ChartTemplate.COLOR, record.getRGB());
+				String color = this.template.getProperty(i + Record.COLOR, record.getRGB());
 				r = Integer.parseInt(color.split(GDE.STRING_COMMA)[0].trim());
 				g = Integer.parseInt(color.split(GDE.STRING_COMMA)[1].trim());
 				b = Integer.parseInt(color.split(GDE.STRING_COMMA)[2].trim());
 				recordTemplate.color = SWTResourceManager.getColor(r, g, b);
-				recordTemplate.lineWidth = Integer.parseInt(this.template.getProperty(i + ChartTemplate.LINE_WIDTH, "1"));
-				recordTemplate.lineStyle = Integer.parseInt(this.template.getProperty(i + ChartTemplate.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID));
-				recordTemplate.isRoundOut = Boolean.parseBoolean(this.template.getProperty(i + ChartTemplate.IS_ROUND_OUT, "false"));
-				recordTemplate.isStartpointZero = Boolean.parseBoolean(this.template.getProperty(i + ChartTemplate.IS_START_POINT_ZERO, "false"));
-				record.setStartEndDefined(Boolean.parseBoolean(this.template.getProperty(i + ChartTemplate.IS_START_END_DEFINED, "false")), //
-						Double.parseDouble(this.template.getProperty(i + ChartTemplate.DEFINED_MIN_VALUE, "0")), //
-						Double.parseDouble(this.template.getProperty(i + ChartTemplate.DEFINED_MAX_VALUE, "0")));
-				recordTemplate.numberFormat = Integer.parseInt(this.template.getProperty(i + ChartTemplate.NUMBER_FORMAT, "-1"));
+				recordTemplate.lineWidth = Integer.parseInt(this.template.getProperty(i + Record.LINE_WITH, "1"));
+				recordTemplate.lineStyle = Integer.parseInt(this.template.getProperty(i + Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID));
+				recordTemplate.isRoundOut = Boolean.parseBoolean(this.template.getProperty(i + Record.IS_ROUND_OUT, "false"));
+				recordTemplate.isStartpointZero = Boolean.parseBoolean(this.template.getProperty(i + Record.IS_START_POINT_ZERO, "false"));
+				record.setStartEndDefined(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), //
+						Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")), //
+						Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "0")));
+				recordTemplate.numberFormat = Integer.parseInt(this.template.getProperty(i + Record.NUMBER_FORMAT, "-1"));
 				// time grid
 				// color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
 				// r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
@@ -1047,7 +1046,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			if (Settings.getInstance().isSmartStatistics()) { // only smart statistics supports multiple charts
 				int[] chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS.clone();
 				for (int i = 0; i < chartWeights.length; i++) {
-					chartWeights[i] = Integer.parseInt(this.template.getProperty(TrailRecordSet.CHART_WEIGHT + i, String.valueOf(HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i])));
+					chartWeights[i] = Integer.parseInt(this.template.getProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i])));
 				}
 				presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(chartWeights);
 			}

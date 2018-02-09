@@ -37,7 +37,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
-import gde.config.Settings;
 import gde.data.CommonRecord;
 import gde.data.Record.DataType;
 import gde.device.IChannelItem;
@@ -67,39 +66,7 @@ public abstract class TrailRecord extends CommonRecord {
 	private final static long			serialVersionUID	= 110124007964748556L;
 	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
 
-	public final static String[]	propertyKeys			= new String[] { ChartTemplate.NAME, ChartTemplate.UNIT, ChartTemplate.SYMBOL,
-			ChartTemplate.IS_ACTIVE, ChartTemplate.IS_VISIBLE, ChartTemplate.IS_POSITION_LEFT, ChartTemplate.COLOR, ChartTemplate.LINE_WIDTH,
-			ChartTemplate.LINE_STYLE, ChartTemplate.IS_ROUND_OUT, ChartTemplate.IS_START_POINT_ZERO, ChartTemplate.IS_START_END_DEFINED,
-			ChartTemplate.NUMBER_FORMAT, ChartTemplate.MAX_VALUE, ChartTemplate.DEFINED_MAX_VALUE, ChartTemplate.MIN_VALUE,
-			ChartTemplate.DEFINED_MIN_VALUE };
-
 	public static class ChartTemplate {
-
-		public final static String		NAME											= "_name";
-		public final static String		UNIT											= "_unit";
-		public final static String		SYMBOL										= "_symbol";
-		public final static String		IS_ACTIVE									= "_isActive";							// active means this measurement can be read
-																																												// from device, otherwise its calculated
-		public final static String		IS_VISIBLE								= "_isVisible";							// defines if record is visible
-		public final static String		IS_POSITION_LEFT					= "_isPositionLeft";				// defines the side where the axis id displayed
-		public final static String		COLOR											= "_color";									// defines which color is used to draw the curve
-		public final static String		LINE_WIDTH								= "_lineWidth";
-		public final static String		LINE_STYLE								= "_lineStyle";
-		public final static String		IS_ROUND_OUT							= "_isRoundOut";						// defines if axis values are rounded
-		public final static String		IS_START_POINT_ZERO				= "_isStartpointZero";			// defines if axis value starts at zero
-		public final static String		IS_START_END_DEFINED			= "_isStartEndDefined";			// defines that explicit end values are
-																																												// defined for axis
-		public final static String		NUMBER_FORMAT							= "_numberFormat";
-		public final static String		MAX_VALUE									= "_maxValue";
-		public final static String		DEFINED_MAX_VALUE					= "_defMaxValue";						// overwritten max value
-		public final static String		MIN_VALUE									= "_minValue";
-		public final static String		DEFINED_MIN_VALUE					= "_defMinValue";						// overwritten min value
-
-		public final static int				TYPE_AXIS_END_VALUES			= 0;												// defines axis end values types like isRoundout, etc
-		public final static int				TYPE_AXIS_NUMBER_FORMAT		= 1;												// defines axis scale values format
-		public final static int				TYPE_AXIS_SCALE_POSITION	= 2;												// defines axis scale position left or right
-
-		protected final static String	TRAIL_TEXT_ORDINAL				= "_trailTextOrdinal";			// reference to the selected trail
 
 		boolean												isVisible									= true;
 		boolean												isPositionLeft						= true;
@@ -183,9 +150,7 @@ public abstract class TrailRecord extends CommonRecord {
 
 	}
 
-	protected final Settings			settings	= Settings.getInstance();
-
-	protected final ChartTemplate	template	= new ChartTemplate();
+	protected final ChartTemplate template = new ChartTemplate();
 
 	/**
 	 * Collect input data for the trail record and subordinate objects.
@@ -275,10 +240,10 @@ public abstract class TrailRecord extends CommonRecord {
 			DataType tmpDataType = dataTypes.size() == 1 ? dataTypes.get(0) : DataType.DEFAULT;
 
 			if (tmpDataType == DataType.DEFAULT) {
-				DataType guess = DataType.guess(TrailRecord.this.getName());
+				DataType guess = DataType.guess(getName());
 				if (guess != null) tmpDataType = guess;
 			}
-			TrailRecord.this.setDataType(tmpDataType);
+			setDataType(tmpDataType);
 		}
 	}
 

@@ -217,11 +217,13 @@ public class Record extends AbstractRecord {
 	public final static String		MIN_VALUE									= "_minValue";													//$NON-NLS-1$
 	public final static String		DEFINED_MIN_VALUE					= "_defMinValue";												// overwritten min value //$NON-NLS-1$
 	public final static String		DATA_TYPE									= "_dataType";													// data type of record //$NON-NLS-1$
+	public final static String		TRAIL_TEXT_ORDINAL				= "_trailTextOrdinal";									// histo: reference to the selected trail
 
 	public final static String[]	propertyKeys							= new String[] { NAME, UNIT, SYMBOL,		//
 			IS_ACTIVE, IS_DIPLAYABLE, IS_VISIBLE, IS_POSITION_LEFT, COLOR, LINE_WITH, LINE_STYLE,				//
 			IS_ROUND_OUT, IS_START_POINT_ZERO, IS_START_END_DEFINED,																		//
-			NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE, DATA_TYPE };
+			NUMBER_FORMAT, MAX_VALUE, DEFINED_MAX_VALUE, MIN_VALUE, DEFINED_MIN_VALUE, DATA_TYPE, 			//
+			TRAIL_TEXT_ORDINAL };
 
 	public final static int				TYPE_AXIS_END_VALUES			= 0;																																																																		// defines axis end values types like isRoundout, isStartpointZero, isStartEndDefined
 	public final static int				TYPE_AXIS_NUMBER_FORMAT		= 1;																		// defines axis scale values format

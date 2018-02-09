@@ -305,6 +305,8 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	protected Color															timeGridColor										= DataExplorer.COLOR_GREY;
 	protected int																timeGridLineStyle								= SWT.LINE_DOT;
 
+	protected static final String								CHART_WEIGHT							= "RecordSet__chartWeight";									// histo: weight of the charts
+																																																										// (graphics or summary)
 	@Deprecated
 	protected static final String								VALUE_GRID_RECORD					= "RecordSet_horizontalGridRecord";					//$NON-NLS-1$
 	protected static final String								VALUE_GRID_RECORD_ORDINAL	= "RecordSet_horizontalGridRecordOrdinal";	//$NON-NLS-1$
