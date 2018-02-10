@@ -81,6 +81,10 @@ public final class GroupTransitions {
 			return transitionChronicle.values();
 		}
 
+		public void putAll(TransitionChronicle newTransitions) {
+			transitionChronicle.putAll(newTransitions.transitionChronicle);
+		}
+
 		@Override
 		public String toString() {
 			return "TransitionChronicle [transitionChronicleSize=" + this.transitionChronicle.size() + ", transitionChronicle=" + this.transitionChronicle + "]";
@@ -97,8 +101,9 @@ public final class GroupTransitions {
 		this.recordDataSize = recordSet.getRecordDataSize(true);
 	}
 
-	public void clear() {
-		groupTransitions.clear();
+	public boolean isGatheringMode(RecordSet currentRecordSet) {
+		if (!currentRecordSet.equals(this.recordSet)) throw new IllegalArgumentException();
+		return this.recordDataSize != currentRecordSet.getRecordDataSize(true);
 	}
 
 	public boolean isEmpty() {
@@ -111,26 +116,6 @@ public final class GroupTransitions {
 
 	public TransitionChronicle put(int transitionGroupId, TransitionChronicle transitions) {
 		return groupTransitions.put(transitionGroupId, transitions);
-	}
-
-	/**
-	 * Identify all transitions for the recordset and channel.
-	 * Remove transition duplicates or overlapping transitions in all transition groups.
-	 * @param logChannelNumber
-	 */
-	public void add4Channel(int logChannelNumber) {
-		groupTransitions.putAll(TransitionCollector.add4Channel(this.recordSet, logChannelNumber));
-	}
-
-	/**
-	 * @return the total number of transitions over all groups
-	 */
-	public long getTransitionsCount() {
-		return groupTransitions.values().parallelStream().count();
-	}
-
-	public int getRecordDataSize() {
-		return this.recordDataSize;
 	}
 
 	public boolean containsKey(int transitionGroupId) {

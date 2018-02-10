@@ -39,6 +39,7 @@ import gde.device.TriggerType;
 import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.histo.transitions.GroupTransitions;
+import gde.histo.transitions.TransitionCollector;
 import gde.histo.transitions.TransitionTableMapper;
 import gde.io.LogViewReader;
 import gde.io.OsdReaderWriter;
@@ -450,10 +451,9 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @return the transitions identified for this recordset
 	 */
 	public GroupTransitions getHistoTransitions() {
-		boolean isOutdated = this.histoTransitions != null && this.histoTransitions.getRecordDataSize() != this.getRecordDataSize(true);
+		boolean isOutdated = this.histoTransitions != null && this.histoTransitions.isGatheringMode(this);
 		if (this.histoTransitions == null || isOutdated) {
-			this.histoTransitions = new GroupTransitions(this);
-			this.histoTransitions.add4Channel(this.channels.getActiveChannelNumber());
+			this.histoTransitions = TransitionCollector.defineTransitions(this, this.channels.getActiveChannelNumber());
 		}
 		return this.histoTransitions;
 	}
@@ -572,7 +572,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	public Record[] getRecordsSortedForDisplay() {
 		Vector<Record> displayRecords = new Vector<Record>();
-		//add the record with horizontal grid
+		// add the record with horizontal grid
 		for (Record record : this.getValues()) {
 			if (record.size() > 0 && record.ordinal == this.valueGridRecordOrdinal) displayRecords.add(record);
 		}

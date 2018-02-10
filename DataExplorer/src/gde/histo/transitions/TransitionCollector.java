@@ -46,11 +46,11 @@ public final class TransitionCollector {
 	/**
 	 * Identify all transitions for the recordset and channel.
 	 * Take all transition types defined for the channel.
-	 * remove transition duplicates or overlapping transitions in all transition groups.
+	 * Remove transition duplicates or overlapping transitions in all transition groups.
 	 * @return the multimap holding all transitions (key is thresholdStartTimestamp_ms) per transitionGroupId (key)
 	 */
-	public static GroupTransitions add4Channel(RecordSet recordSet, int logChannelNumber) {
-		GroupTransitions groupTransitions = new GroupTransitions();
+	public static GroupTransitions defineTransitions(RecordSet recordSet, int logChannelNumber) {
+		final GroupTransitions groupTransitions = new GroupTransitions(recordSet);
 
 		final ChannelType channelType = DataExplorer.application.getActiveDevice().getDeviceConfiguration().getChannel(logChannelNumber);
 		for (TransitionType transitionType : channelType.getTransitions().values()) {
@@ -138,25 +138,25 @@ public final class TransitionCollector {
 	}
 
 	/**
-	 * @param transitionChronicle1
-	 * @param transitionChronicle2
+	 * @param newChronicle
+	 * @param baseChronicle is reduced by inferior transitions compared to new chronicle
 	 * @return the merged transitions with existing transitions for the current group and class
 	 */
-	private static TransitionChronicle getSuperiorTransitions(TransitionChronicle transitionChronicle1, TransitionChronicle transitionChronicle2) {
-		TransitionChronicle newTransitions = new TransitionChronicle(transitionChronicle1);
-		if (!transitionChronicle2.isEmpty()) {
+	private static TransitionChronicle getSuperiorTransitions(TransitionChronicle newChronicle, TransitionChronicle baseChronicle) {
+		TransitionChronicle newTransitions = new TransitionChronicle(newChronicle);
+		if (!baseChronicle.isEmpty()) {
 			// identify transitions with the same threshold startTimeStamp
 			Set<Long> intersection = new HashSet<Long>(newTransitions.keySet()); // use the copy constructor because the keyset is only a view on the map
-			intersection.retainAll(transitionChronicle2.keySet());
+			intersection.retainAll(baseChronicle.keySet());
 			// discard transitions with the same timestamp
 			for (long thresholdStartTimeStamp_ms : intersection) {
 				// check which one of the conflicting transitions is inferior and remove it from its parent map
 				final Entry<Long, Transition> newTransition = newTransitions.ceilingEntry(thresholdStartTimeStamp_ms);
-				getInferiorTransition(transitionChronicle2.ceilingEntry(thresholdStartTimeStamp_ms), transitionChronicle1.ceilingEntry(thresholdStartTimeStamp_ms)).ifPresent(x -> {
+				getInferiorTransition(baseChronicle.ceilingEntry(thresholdStartTimeStamp_ms), newChronicle.ceilingEntry(thresholdStartTimeStamp_ms)).ifPresent(x -> {
 					if (newTransition.equals(x))
 						newTransitions.remove(thresholdStartTimeStamp_ms);
 					else
-						transitionChronicle2.remove(thresholdStartTimeStamp_ms);
+						baseChronicle.remove(thresholdStartTimeStamp_ms); // todo removal should not be done in a method parameter object
 				});
 			}
 			if (!intersection.isEmpty()) {

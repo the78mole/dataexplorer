@@ -51,6 +51,7 @@ import gde.histo.settlements.FigureEvaluator;
 import gde.histo.settlements.SettlementRecord;
 import gde.histo.transitions.GroupTransitions;
 import gde.histo.transitions.Transition;
+import gde.histo.transitions.TransitionCollector;
 import gde.histo.utils.UniversalQuantile;
 import gde.log.Level;
 import gde.log.Logger;
@@ -127,8 +128,7 @@ public final class VaultCollector {
 			setMeasurementPoints(recordSet, isSampled);
 
 			{
-				GroupTransitions transitions = new GroupTransitions(recordSet);
-				transitions.add4Channel(this.vault.logChannelNumber);
+				GroupTransitions transitions = TransitionCollector.defineTransitions(recordSet,this.vault.logChannelNumber);
 
 				LinkedHashMap<String, SettlementRecord> histoSettlements;
 				histoSettlements = determineSettlements(recordSet, transitions);
