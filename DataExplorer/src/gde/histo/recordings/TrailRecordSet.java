@@ -54,6 +54,7 @@ import gde.data.AbstractRecord;
 import gde.data.AbstractRecordSet;
 import gde.data.Record;
 import gde.data.Record.DataType;
+import gde.data.RecordSet;
 import gde.data.TimeSteps;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
@@ -126,6 +127,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 			for (String recordName : recordNames) {
 				TrailRecord trailRecord = get(recordName);
+				applyTemplateTrailData(trailRecord);
 				trailRecord.initializeFromVaults(pickedVaults.initialVaults);
 			}
 		}
@@ -186,7 +188,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (String trailRecordName : trailRecordNames) {
 				TrailRecord trailRecord = get(trailRecordName);
 				trailRecord.setApplicableTrailTypes();
-				applyTemplateTrailData(trailRecord);
 			}
 		}
 
@@ -199,15 +200,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		private void applyTemplateTrailData(TrailRecord record) {
 			TrailSelector trailSelector = record.getTrailSelector();
 			if (template != null && template.isAvailable()) {
-				String property = template.getProperty(record.getOrdinal() + Record.TRAIL_TEXT_ORDINAL);
-				if (property != null) {
-					int propertyValue = Integer.parseInt(property);
-					if (propertyValue >= 0 && propertyValue < trailSelector.getApplicableTrailsTexts().size()) {
-						trailSelector.setTrailTextSelectedIndex(propertyValue);
-					} else { // the property value points to a trail which does not exist
-						trailSelector.setMostApplicableTrailTextOrdinal();
-					}
-				} else { // the property might miss because of a new measurement / settlement
+				int trailTextOrdinal = Integer.parseInt(template.getRecordProperty(record.getName(), Record.TRAIL_TEXT_ORDINAL, "-1"));
+				if (trailTextOrdinal >= 0 && trailTextOrdinal < trailSelector.getApplicableTrailsTexts().size()) {
+					trailSelector.setTrailTextSelectedIndex(trailTextOrdinal);
+				} else { // the property value points to a trail which does not exist
 					trailSelector.setMostApplicableTrailTextOrdinal();
 				}
 			} else {
@@ -625,11 +621,11 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 */
 	private TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames, TimeSteps timeSteps,
 			TreeMap<Long, List<ExtendedVault>> pickedVaults) {
-		super(useDevice, channelNumber, "Trail", recordNames, timeSteps); //$NON-NLS-1$
+		super(useDevice, channelNumber, useDevice.getName() + GDE.STRING_UNDER_BAR + channelNumber, recordNames, timeSteps);
 		String deviceSignature = useDevice.getName() + GDE.STRING_UNDER_BAR + channelNumber;
 		this.pickedVaults = new PickedVaults(pickedVaults);
 		this.template = new HistoGraphicsTemplate(deviceSignature);
-		if (this.template != null) this.template.load();
+		this.template.load();
 
 		this.visibleAndDisplayableRecords = new Vector<TrailRecord>();
 		this.displayRecords = new Vector<TrailRecord>();
@@ -768,12 +764,33 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		return (TrailRecord) super.put(recordName, record);
 	}
 
-	/**
-	 * @return the horizontalGridRecord ordinal
-	 */
 	@Override
+	@Deprecated // use getValueGridRecordName() or isValueGridRecord(..) instead
 	public int getValueGridRecordOrdinal() {
-		return this.valueGridRecordOrdinal;
+		return Arrays.asList(recordNames).indexOf(getValueGridRecordName());
+	}
+
+	@Override
+	@Deprecated // use setValueGridRecordName() instead
+	public void setValueGridRecordOrdinal(int newValueGridRecordOrdinal) {
+		setValueGridRecordName(recordNames[newValueGridRecordOrdinal]);
+	}
+
+	public boolean isValueGridRecord(TrailRecord record) {
+		return this.valueGridRecordName.equals(record.getName());
+	}
+
+	public String getValueGridRecordName() {
+		return this.valueGridRecordName;
+	}
+
+	/**
+	 * @param newValueGridRecordName of the horizontal grid record name to set
+	 */
+	public void setValueGridRecordName(String newValueGridRecordName) {
+		String tmpName = newValueGridRecordName;
+		if (!this.keySet().contains(newValueGridRecordName)) tmpName = recordNames[0];
+		this.valueGridRecordName = this.isOneOfSyncableRecord(tmpName) ? recordNames[this.getSyncMasterRecordOrdinal(tmpName)] : tmpName;
 	}
 
 	/**
@@ -953,48 +970,60 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		Vector<TrailRecord> resultRecords = new Vector<>();
 		// add the record with horizontal grid
 		for (TrailRecord record : this.getDisplayRecords()) {
-			if (record.getOrdinal() == this.getValueGridRecordOrdinal()) resultRecords.add(record);
+			if (isValueGridRecord(record)) resultRecords.add(record);
 		}
 		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
 		for (TrailRecord record : this.getDisplayRecords()) {
-			if (record.getOrdinal() != this.getValueGridRecordOrdinal() && record.isScaleSyncMaster()) resultRecords.add(record);
+			if (!isValueGridRecord(record) && record.isScaleSyncMaster()) resultRecords.add(record);
 		}
 		// add all others
 		for (TrailRecord record : this.getDisplayRecords()) {
-			if (record.getOrdinal() != this.getValueGridRecordOrdinal() && !record.isScaleSyncMaster()) resultRecords.add(record);
+			if (!isValueGridRecord(record) && !record.isScaleSyncMaster()) resultRecords.add(record);
 		}
 
 		return resultRecords.toArray(new TrailRecord[resultRecords.size()]);
 	}
 
 	/**
-	 * Save the histo graphics definition into template file.
+	 * Save the histo graphics definition into a histo template file.
 	 */
 	public void saveTemplate() {
-		for (int i = 0; i < this.size(); ++i) {
-			TrailRecord record = this.get(i);
+		for (TrailRecord record : this.getValues()) {
 			ChartTemplate recordTemplate = record.getTemplate();
-			this.template.setProperty(i + Record.IS_VISIBLE, String.valueOf(recordTemplate.isVisible));
-			this.template.setProperty(i + Record.IS_POSITION_LEFT, String.valueOf(recordTemplate.isPositionLeft));
+			template.setRecordProperty(record.getName(), Record.IS_VISIBLE, String.valueOf(recordTemplate.isVisible));
+			template.setRecordProperty(record.getName(), Record.IS_POSITION_LEFT, String.valueOf(recordTemplate.isPositionLeft));
 			Color color = recordTemplate.color;
-			this.template.setProperty(i + Record.COLOR, color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue);
-			this.template.setProperty(i + Record.LINE_WITH, String.valueOf(recordTemplate.lineWidth));
-			this.template.setProperty(i + Record.LINE_STYLE, String.valueOf(recordTemplate.lineStyle));
-			this.template.setProperty(i + Record.IS_ROUND_OUT, String.valueOf(recordTemplate.isRoundOut));
-			this.template.setProperty(i + Record.IS_START_POINT_ZERO, String.valueOf(recordTemplate.isStartpointZero));
-			this.template.setProperty(i + Record.NUMBER_FORMAT, String.valueOf(recordTemplate.numberFormat));
-			this.template.setProperty(i + Record.IS_START_END_DEFINED, String.valueOf(recordTemplate.isStartEndDefined));
-			this.template.setProperty(i + Record.DEFINED_MAX_VALUE, String.valueOf(recordTemplate.maxScaleValue));
-			this.template.setProperty(i + Record.DEFINED_MIN_VALUE, String.valueOf(recordTemplate.minScaleValue));
+			template.setRecordProperty(record.getName(), Record.COLOR, color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue);
+			template.setRecordProperty(record.getName(), Record.LINE_WITH, String.valueOf(recordTemplate.lineWidth));
+			template.setRecordProperty(record.getName(), Record.LINE_STYLE, String.valueOf(recordTemplate.lineStyle));
+			template.setRecordProperty(record.getName(), Record.IS_ROUND_OUT, String.valueOf(recordTemplate.isRoundOut));
+			template.setRecordProperty(record.getName(), Record.IS_START_POINT_ZERO, String.valueOf(recordTemplate.isStartpointZero));
+			template.setRecordProperty(record.getName(), Record.NUMBER_FORMAT, String.valueOf(recordTemplate.numberFormat));
+			template.setRecordProperty(record.getName(), Record.IS_START_END_DEFINED, String.valueOf(recordTemplate.isStartEndDefined));
+			template.setRecordProperty(record.getName(), Record.DEFINED_MAX_VALUE, String.valueOf(recordTemplate.maxScaleValue));
+			template.setRecordProperty(record.getName(), Record.DEFINED_MIN_VALUE, String.valueOf(recordTemplate.minScaleValue));
 
-			this.template.setProperty(i + Record.TRAIL_TEXT_ORDINAL, String.valueOf(record.getTrailSelector().getTrailTextSelectedIndex()));
+			// this template property comes directly from the record (see applyTemplate)
+			template.setRecordProperty(record.getName(), Record.TRAIL_TEXT_ORDINAL, String.valueOf(record.getTrailSelector().getTrailTextSelectedIndex()));
 		}
+		// curve grid
+		Color color = getValueGridColor();
+		String rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
+		template.setProperty(RecordSet.VALUE_GRID_COLOR, rgb);
+		template.setProperty(RecordSet.VALUE_GRID_LINE_STYLE, Integer.valueOf(getValueGridLineStyle()).toString());
+		template.setProperty(RecordSet.VALUE_GRID_TYPE, Integer.valueOf(getValueGridType()).toString());
+
+		if (get(getValueGridRecordName()) != null) {
+			template.setProperty(RecordSet.VALUE_GRID_RECORD_NAME, getValueGridRecordName());
+		}
+
 		int[] chartWeights = presentHistoExplorer.getHistoSummaryTabItem().getChartWeights();
 		for (int i = 0; i < chartWeights.length; i++) {
-			this.template.setProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(chartWeights[i]));
+			template.setProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(chartWeights[i]));
 		}
-		this.template.store();
-		log.fine(() -> "creating histo graphics template file in " + this.template.getCurrentFilePath()); //$NON-NLS-1$
+		template.setCommentSuffix(name + " " + description);
+		template.store();
+		log.fine(() -> "creating histo graphics template file in " + template.getCurrentFilePath());
 	}
 
 	/**
@@ -1002,57 +1031,54 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @param doUpdateVisibilityStatus example: if the histo data do not hold data for this record it makes no sense to display the curve.
 	 */
 	public void applyTemplate(boolean doUpdateVisibilityStatus) {
-		if (this.template != null && this.template.isAvailable()) {
-			boolean isHorizontalGridOrdinalSet = false;
-			for (int i = 0; i < this.size(); ++i) {
-				TrailRecord record = this.get(i);
+		if (template != null && template.isAvailable()) {
+			for (TrailRecord record : getValues()) {
 				ChartTemplate recordTemplate = record.getTemplate();
-				recordTemplate.isVisible = Boolean.parseBoolean(this.template.getProperty(i + Record.IS_VISIBLE, "false"));
-				recordTemplate.isPositionLeft = Boolean.parseBoolean(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"));
+				recordTemplate.isVisible = Boolean.parseBoolean(template.getRecordProperty(record.getName(), Record.IS_VISIBLE, "false"));
+				recordTemplate.isPositionLeft = Boolean.parseBoolean(template.getRecordProperty(record.getName(), Record.IS_POSITION_LEFT, "true"));
 				int r, g, b;
-				String color = this.template.getProperty(i + Record.COLOR, record.getRGB());
+				String color = template.getRecordProperty(record.getName(), Record.COLOR, record.getRGB());
 				r = Integer.parseInt(color.split(GDE.STRING_COMMA)[0].trim());
 				g = Integer.parseInt(color.split(GDE.STRING_COMMA)[1].trim());
 				b = Integer.parseInt(color.split(GDE.STRING_COMMA)[2].trim());
 				recordTemplate.color = SWTResourceManager.getColor(r, g, b);
-				recordTemplate.lineWidth = Integer.parseInt(this.template.getProperty(i + Record.LINE_WITH, "1"));
-				recordTemplate.lineStyle = Integer.parseInt(this.template.getProperty(i + Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID));
-				recordTemplate.isRoundOut = Boolean.parseBoolean(this.template.getProperty(i + Record.IS_ROUND_OUT, "false"));
-				recordTemplate.isStartpointZero = Boolean.parseBoolean(this.template.getProperty(i + Record.IS_START_POINT_ZERO, "false"));
-				record.setStartEndDefined(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), //
-						Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")), //
-						Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "0")));
-				recordTemplate.numberFormat = Integer.parseInt(this.template.getProperty(i + Record.NUMBER_FORMAT, "-1"));
-				// time grid
-				// color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-				// r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-				// g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-				// b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
-				// recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
-				// recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY +
-				// SWT.LINE_DOT)).intValue());
-				// recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				if (!isHorizontalGridOrdinalSet && record.isVisible()) { // set curve grid to the first visible record
-					color = this.template.getProperty(AbstractRecordSet.VALUE_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-					r = Integer.parseInt(color.split(GDE.STRING_COMMA)[0].trim());
-					g = Integer.parseInt(color.split(GDE.STRING_COMMA)[1].trim());
-					b = Integer.parseInt(color.split(GDE.STRING_COMMA)[2].trim());
-					this.setValueGridColor(SWTResourceManager.getColor(r, g, b));
-					this.setValueGridLineStyle(Integer.parseInt(this.template.getProperty(AbstractRecordSet.VALUE_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)));
-					this.setValueGridType(Integer.parseInt(this.template.getProperty(AbstractRecordSet.VALUE_GRID_TYPE, "0"))); //$NON-NLS-1$
-					this.setValueGridRecordOrdinal(record.getOrdinal()); // initial use top score trail record
-					isHorizontalGridOrdinalSet = true;
-				}
+				recordTemplate.lineWidth = Integer.parseInt(template.getRecordProperty(record.getName(), Record.LINE_WITH, "1"));
+				recordTemplate.lineStyle = Integer.parseInt(template.getRecordProperty(record.getName(), Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID));
+				recordTemplate.isRoundOut = Boolean.parseBoolean(template.getRecordProperty(record.getName(), Record.IS_ROUND_OUT, "false"));
+				recordTemplate.isStartpointZero = Boolean.parseBoolean(template.getRecordProperty(record.getName(), Record.IS_START_POINT_ZERO, "false"));
+				record.setStartEndDefined(Boolean.parseBoolean(template.getRecordProperty(record.getName(), Record.IS_START_END_DEFINED, "false")), //
+						Double.parseDouble(template.getRecordProperty(record.getName(), Record.DEFINED_MIN_VALUE, "0")), //
+						Double.parseDouble(template.getRecordProperty(record.getName(), Record.DEFINED_MAX_VALUE, "0")));
+				recordTemplate.numberFormat = Integer.parseInt(template.getRecordProperty(record.getName(), Record.NUMBER_FORMAT, "-1"));
+
+				// this template property is required before applying the template
+				// recordTemplate.trailTextOrdinal = Integer.parseInt(template.getRecordProperty(record.getName(), Record.TRAIL_TEXT_ORDINAL, "-1"));
+			}
+			{
+				String color = template.getProperty(AbstractRecordSet.VALUE_GRID_COLOR, "128,128,128");
+				int r, g, b;
+				r = Integer.parseInt(color.split(GDE.STRING_COMMA)[0].trim());
+				g = Integer.parseInt(color.split(GDE.STRING_COMMA)[1].trim());
+				b = Integer.parseInt(color.split(GDE.STRING_COMMA)[2].trim());
+				setValueGridColor(SWTResourceManager.getColor(r, g, b));
+				setValueGridLineStyle(Integer.parseInt(template.getProperty(AbstractRecordSet.VALUE_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)));
+				setValueGridType(Integer.parseInt(template.getProperty(AbstractRecordSet.VALUE_GRID_TYPE, "0")));
+
+				// default use first visible
+				String gridDefaultRecordName = this.getValues().stream().filter(t -> t.isVisible()).findFirst().orElse(get(0)).getName();
+				String gridRecordName = template.getProperty(AbstractRecordSet.VALUE_GRID_RECORD_NAME, gridDefaultRecordName);
+				TrailRecord gridRecord = get(gridRecordName);
+				setValueGridRecordName(gridRecord != null && gridRecord.isVisible() ? gridRecordName : gridDefaultRecordName);
 			}
 			if (Settings.getInstance().isSmartStatistics()) { // only smart statistics supports multiple charts
 				int[] chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS.clone();
 				for (int i = 0; i < chartWeights.length; i++) {
-					chartWeights[i] = Integer.parseInt(this.template.getProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i])));
+					chartWeights[i] = Integer.parseInt(template.getProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i])));
 				}
 				presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(chartWeights);
 			}
-			// ET 29.06.2017 this.setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
-			log.fine(() -> "applied histo graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
+			log.fine(() -> "applied histo graphics template file " + template.getCurrentFilePath());
+
 			if (doUpdateVisibilityStatus) {
 				setDisplayable();
 				updateVisibleAndDisplayableRecordsForTable();

@@ -246,6 +246,7 @@ public final class SelectorComposite extends Composite {
 							windowActor.clearMeasuring();
 						}
 						SelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, eventItem.getData(DataExplorer.RECORD_NAME));
+						SelectorComposite.this.popupmenu.setData(DataExplorer.NAME_REPLACEMENT, eventItem.getData(DataExplorer.NAME_REPLACEMENT));
 						SelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);
 						if (toggleRecordSelection(eventItem, true, false)) {
 							windowActor.updateChartWindow(false);
@@ -296,6 +297,7 @@ public final class SelectorComposite extends Composite {
 					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
 					item.setForeground(record.getColor());
 					item.setData(DataExplorer.RECORD_NAME, record.getName());
+					item.setData(DataExplorer.NAME_REPLACEMENT, record.getNameReplacement());
 					item.setText(record.getNameReplacement().intern());
 
 					this.editors[i] = new TableEditor(this.curveSelectorTable);

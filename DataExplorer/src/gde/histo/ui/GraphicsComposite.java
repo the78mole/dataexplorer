@@ -543,7 +543,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 			if (actualRecord.isScaleVisible())
 				HistoCurveUtils.drawHistoScale(getChartData(actualRecord), canvasImageGC, curveAreaBounds, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor);
 
-			if (isCurveGridEnabled && actualRecord.getOrdinal() == trailRecordSet.getValueGridRecordOrdinal()) // check for activated horizontal grid
+			if (isCurveGridEnabled && trailRecordSet.isValueGridRecord(actualRecord)) // check for activated horizontal grid
 				HistoCurveUtils.drawCurveGrid(trailRecordSet, canvasImageGC, curveAreaBounds, settings.getGridDashStyle());
 
 			if (isActualRecordEnabled) {

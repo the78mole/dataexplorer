@@ -39,7 +39,6 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.AbstractRecordSet;
 import gde.data.RecordSet;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.recordings.HistoGraphicsMapper;
@@ -169,7 +168,7 @@ public final class HistoCurveUtils {
 
 	/**
 	 * Draw the summary boxplot elements using given rectangle for display.
-	 * @param summary.getTrailRecord()
+	 * @param summary
 	 * @param gc
 	 * @param scaleWidthSpace is the width of the left / right scale in pixels
 	 * @param decodedScaleMin is the value corresponding to the left border (xPos = 0)
@@ -367,9 +366,6 @@ public final class HistoCurveUtils {
 
 	/**
 	 * Draw the record description using given rectangle for display.
-	 * @param summary.getTrailRecord()
-	 * @param gc
-	 * @param isDrawNameInRecordColor
 	 */
 	public static void drawChannelItemText(SummaryLayout summary, GC gc, boolean isDrawNameInRecordColor) {
 		SummarySpots summarySpots = summary.getSummarySpots();
@@ -379,8 +375,8 @@ public final class HistoCurveUtils {
 		int yPos = drawStripBounds.y + drawStripBounds.height / 2 - 1;
 
 		TrailRecord trailRecord = summary.getTrailRecord();
-		String graphText = DeviceXmlResource.getInstance().getReplacement(trailRecord.isScaleSyncMaster() ? trailRecord.getSyncMasterName()
-				: trailRecord.getName());
+		String graphText = trailRecord.isScaleSyncMaster() ? trailRecord.getSyncMasterName()
+				: DeviceXmlResource.getInstance().getReplacement(trailRecord.getName());
 		if (trailRecord.getSymbol() != null && trailRecord.getSymbol().length() > 0) graphText = graphText + "   " + trailRecord.getSymbol();
 		if (trailRecord.getUnit() != null && trailRecord.getUnit().length() > 0) graphText = graphText + "   [" + trailRecord.getUnit() + "]";
 
@@ -399,16 +395,10 @@ public final class HistoCurveUtils {
 
 	/**
 	 * Draw the data graph scale using gives rectangle for display.
-	 * @param graphicsData
-	 * @param gc
-	 * @param curveAreaBounds
-	 * @param scaleWidthSpace
-	 * @param isDrawScaleInRecordColor
-	 * @param isDrawNameInRecordColor
-	 * @param isDrawNumbersInRecordColor
+	 * @param scaleWidthSpace is the width of the left / right scale in pixels
 	 */
-	public static void drawHistoScale(GraphicsLayout graphicsData, GC gc, Rectangle curveAreaBounds, int scaleWidthSpace, boolean isDrawScaleInRecordColor,
-			boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
+	public static void drawHistoScale(GraphicsLayout graphicsData, GC gc, Rectangle curveAreaBounds, int scaleWidthSpace,
+			boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
 		TrailRecord record = graphicsData.getTrailRecord();
 		int x0 = curveAreaBounds.x;
 		int y0 = curveAreaBounds.y + curveAreaBounds.height;
@@ -417,7 +407,7 @@ public final class HistoCurveUtils {
 		log.finer(() -> record.getName() + "  x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
 
-		String graphText = DeviceXmlResource.getInstance().getReplacement(record.isScaleSyncMaster() ? record.getSyncMasterName() : record.getName());
+		String graphText = record.isScaleSyncMaster() ? record.getSyncMasterName() : DeviceXmlResource.getInstance().getReplacement(record.getName());
 		if (record.getSymbol() != null && record.getSymbol().length() > 0) graphText = graphText + "   " + record.getSymbol();
 		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -503,8 +493,8 @@ public final class HistoCurveUtils {
 		}
 		// prepare grid vector
 		Vector<Integer> horizontalGrid = new Vector<Integer>();
-		AbstractRecordSet recordSet = record.getAbstractParent();
-		boolean isBuildGridVector = recordSet.getValueGridType() != RecordSet.VALUE_GRID_NONE && recordSet.getValueGridRecordOrdinal() == record.getOrdinal();
+		TrailRecordSet recordSet = record.getParent();
+		boolean isBuildGridVector = recordSet.getValueGridType() != RecordSet.VALUE_GRID_NONE && recordSet.isValueGridRecord(record);
 
 		int dist = 10;
 		if (!isPositionLeft) {
