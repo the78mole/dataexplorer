@@ -139,6 +139,7 @@ public class DataExplorer extends Composite {
 	final HashMap<String, String>	extensionFilterMap								= new HashMap<String, String>();
 
 	public final static String		RECORD_NAME												= "recordName";																							//$NON-NLS-1$
+	public final static String		NAME_REPLACEMENT									= "nameReplacement";																				//$NON-NLS-1$
 	public final static String		CURVE_SELECTION_ITEM							= "curveSelectedItem";																			//$NON-NLS-1$
 	public final static String		OLD_STATE													= "oldState";																								//$NON-NLS-1$
 
@@ -2615,7 +2616,7 @@ public class DataExplorer extends Composite {
 	 * @param tabFilter is filter predicate for one or more tab items
 	 */
 	public void selectTab(Predicate<? super CTabItem> tabFilter) {
-		this.displayTab.setSelection(Arrays.stream(this.getTabFolder().getItems()).filter(tabFilter).findFirst().orElseThrow(() -> new UnsupportedOperationException()));
+		this.displayTab.setSelection(Arrays.stream(this.getTabFolder().getItems()).filter(tabFilter).findFirst().orElseThrow(UnsupportedOperationException::new));
 		this.displayTab.showSelection();
 	}
 

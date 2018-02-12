@@ -41,6 +41,7 @@ import gde.data.AbstractRecordSet;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.histo.recordings.TrailRecord;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -107,6 +108,7 @@ public class CurveSelectorContextMenu {
 						CurveSelectorContextMenu.log.log(java.util.logging.Level.FINER, CurveSelectorContextMenu.this.selectedItem.toString());
 						if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 							CurveSelectorContextMenu.this.recordNameKey = (String) popupmenu.getData(DataExplorer.RECORD_NAME);
+							String recordNameUi = (String) popupmenu.getData(DataExplorer.NAME_REPLACEMENT) == null ? CurveSelectorContextMenu.this.recordNameKey : (String) popupmenu.getData(DataExplorer.NAME_REPLACEMENT);
 							CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
 							CurveSelectorContextMenu.this.isTypeCompare = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.COMPARE);
 							CurveSelectorContextMenu.this.isTypeUtility = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.UTIL);
@@ -119,7 +121,7 @@ public class CurveSelectorContextMenu {
 								if (CurveSelectorContextMenu.this.recordNameKey != null && CurveSelectorContextMenu.this.recordNameKey.length() > 1) {
 									CurveSelectorContextMenu.this.actualRecord = CurveSelectorContextMenu.this.recordSet.get(CurveSelectorContextMenu.this.recordNameKey);
 									if (CurveSelectorContextMenu.this.actualRecord != null) {
-										CurveSelectorContextMenu.this.recordName.setText(">>>>  " + CurveSelectorContextMenu.this.recordNameKey + "  <<<<"); //$NON-NLS-1$ //$NON-NLS-2$
+										CurveSelectorContextMenu.this.recordName.setText(">>>>  " + recordNameUi + "  <<<<"); //$NON-NLS-1$ //$NON-NLS-2$
 										CurveSelectorContextMenu.this.lineVisible.setText(Messages.getString(MessageIds.GDE_MSGT0085));
 										CurveSelectorContextMenu.this.isRecordVisible = CurveSelectorContextMenu.this.actualRecord.isVisible();
 										CurveSelectorContextMenu.this.lineVisible.setSelection(CurveSelectorContextMenu.this.isRecordVisible);
@@ -916,8 +918,9 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						CurveSelectorContextMenu.this.valueGridRecordName
-								.setText(Messages.getString(MessageIds.GDE_MSGT0118) + CurveSelectorContextMenu.this.recordSet.get(CurveSelectorContextMenu.this.recordSet.getValueGridRecordOrdinal()).getName());
+						AbstractRecord abstractRecord = CurveSelectorContextMenu.this.recordSet.get(CurveSelectorContextMenu.this.recordSet.getValueGridRecordOrdinal());
+						String recordNameUi = abstractRecord instanceof TrailRecord ? ((TrailRecord) abstractRecord).getNameReplacement() : abstractRecord.getName();
+						CurveSelectorContextMenu.this.valueGridRecordName.setText(Messages.getString(MessageIds.GDE_MSGT0118) + recordNameUi);
 						int gridType = CurveSelectorContextMenu.this.recordSet.getValueGridType();
 						switch (gridType) {
 						case RecordSet.VALUE_GRID_EVERY:
