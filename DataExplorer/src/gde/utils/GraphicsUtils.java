@@ -28,7 +28,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
-import gde.data.AbstractRecordSet;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.log.Level;
@@ -87,7 +86,7 @@ public class GraphicsUtils {
 
 		// prepare grid vector
 		Vector<Integer> horizontalGrid = new Vector<Integer>();
-		AbstractRecordSet recordSet = record.getAbstractParent();
+		RecordSet recordSet = record.getParent();
 		boolean isBuildGridVector = recordSet.getValueGridType() != RecordSet.VALUE_GRID_NONE && recordSet.getValueGridRecordOrdinal() == record.getOrdinal();
 
 		if (record.getNumberScaleTicks() != numberTicks) {

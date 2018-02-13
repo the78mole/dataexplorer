@@ -90,9 +90,6 @@ public final class RecordSet extends AbstractRecordSet {
 	int														scopeModeOffset;																														// defines the offset in record pixel
 	int														scopeModeSize;																																																																				// defines the number of record pixels to be displayed
 
-	int[]													voltageLimits									= CellVoltageValues.getVoltageLimits();																																									// voltage limits for LiXx cells, initial LiPo
-	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";									// each main tickmark //$NON-NLS-1$
-
 	// boolean isSyncRecordSelected = false;
 	// public static final String SYNC_RECORD_SELECTED = "Syncable_record_selected";
 

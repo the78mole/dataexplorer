@@ -37,6 +37,7 @@ import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.CellVoltageValues;
 import gde.utils.StringHelper;
 
 /**
@@ -231,6 +232,11 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 			return false;
 		}
 
+		@Override
+		public String toString() {
+			return "SyncedRecords [isOneSyncableVisible()=" + this.isOneSyncableVisible() + ", size()=" + this.size() + ", keySet()=" + this.keySet() + "]";
+		}
+
 	}
 
 	/**
@@ -266,6 +272,9 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 
 	protected boolean														isSmoothVoltageCurve						= false;
 	public static final String									SMOOTH_VOLTAGE_CURVE						= "RecordSet_smoothVoltageCurve";						//$NON-NLS-1$
+
+	int[]													voltageLimits									= CellVoltageValues.getVoltageLimits();																																									// voltage limits for LiXx cells, initial LiPo
+	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";									// each main tickmark //$NON-NLS-1$
 
 	/**
 	 * display in data table.
@@ -305,11 +314,12 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	protected Color															timeGridColor										= DataExplorer.COLOR_GREY;
 	protected int																timeGridLineStyle								= SWT.LINE_DOT;
 
-	protected static final String								CHART_WEIGHT							= "RecordSet__chartWeight";									// histo: weight of the charts
+	protected static final String								CHART_WEIGHT							= "RecordSet_chartWeight";									// histo: weight of the charts
 																																																										// (graphics or summary)
 	@Deprecated
 	protected static final String								VALUE_GRID_RECORD					= "RecordSet_horizontalGridRecord";					//$NON-NLS-1$
 	protected static final String								VALUE_GRID_RECORD_ORDINAL	= "RecordSet_horizontalGridRecordOrdinal";	//$NON-NLS-1$
+	protected static final String								VALUE_GRID_RECORD_NAME		= "RecordSet_horizontalGridRecordName";			// histo: replace ordinal
 	protected static final String								VALUE_GRID_TYPE						= "RecordSet_horizontalGridType";						//$NON-NLS-1$
 	protected static final String								VALUE_GRID_COLOR					= "RecordSet_horizontalGridColor";					//$NON-NLS-1$
 	protected static final String								VALUE_GRID_LINE_STYLE			= "RecordSet_horizontalGridLineStyle";			//$NON-NLS-1$
@@ -327,6 +337,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * recordNames[horizontalGridRecord]
 	 */
 	protected int																valueGridRecordOrdinal		= -1;
+	protected String														valueGridRecordName				= "";																				// histo: replace ordinal
 
 	/**
 	 * Special record set data buffers according the size of given names array, where the name is the key to access the data buffer used to hold
@@ -714,6 +725,11 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 
 	public String getDescription() {
 		return this.description;
+	}
+
+	@Override
+	public String toString() {
+		return "AbstractRecordSet [realSize=" + this.realSize() + ", hasDisplayableData=" + this.hasDisplayableData + ", visibleAndDisplayableRecordSize=" + this.visibleAndDisplayableRecords.size() + ", displayRecordSize=" + this.displayRecords.size() + ", maxValue=" + this.maxValue + ", minValue=" + this.minValue + "]";
 	}
 
 }
