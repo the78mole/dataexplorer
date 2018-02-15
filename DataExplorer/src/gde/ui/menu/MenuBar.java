@@ -19,6 +19,8 @@
 package gde.ui.menu;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -97,7 +99,7 @@ public class MenuBar {
 	MenuItem										viewMenuItem;
 	private MenuItem						suppressModeItem, partialTableMenuItem;
 	Menu												graphicsMenu;
-	MenuItem										graphicsMenuItem, saveDefaultGraphicsTemplateItem, restoreDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem;
+	MenuItem										graphicsMenuItem, saveDefaultGraphicsTemplateItem, restoreDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem, objectTemplatesItem;
 	MenuItem										csvExportMenuItem1, csvExportMenuItem2, csvExportMenuItem3;
 	MenuItem										nextDeviceMenuItem;
 	MenuItem										prevDeviceMenuItem;
@@ -668,7 +670,7 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
+							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoWindowVisible()).orElse(false)) {
 								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
 								trailRecordSet.getTemplate().setHistoFileName(trailRecordSet.getTemplate().getDefaultHistoFileName());
 								trailRecordSet.saveTemplate();
@@ -683,11 +685,12 @@ public class MenuBar {
 					this.restoreDefaultGraphicsTemplateItem = new MenuItem(this.graphicsMenu, SWT.PUSH);
 					this.restoreDefaultGraphicsTemplateItem.setText(Messages.getString(MessageIds.GDE_MSGT0195, GDE.MOD1));
 					this.restoreDefaultGraphicsTemplateItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0195));
+					if (!GDE.IS_OS_ARCH_ARM) this.restoreDefaultGraphicsTemplateItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0884));
 					this.restoreDefaultGraphicsTemplateItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreDefaultGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
+							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoWindowVisible()).orElse(false)) {
 								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
 								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
 								template.setHistoFileName(template.getDefaultHistoFileName());
@@ -717,10 +720,12 @@ public class MenuBar {
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
-							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
+							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoWindowVisible()).orElse(false)) {
 								TrailRecordSet trailRecordSet = application.getPresentHistoExplorer().getTrailRecordSet();
-								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] {
-										Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath(), trailRecordSet.getTemplate().getDefaultFileName());
+								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
+								Path targetFilePath = template.getTargetFilePath();
+								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
+										targetFilePath.getParent().toString(), targetFilePath.getFileName().toString());
 								fileDialog.open();
 								String templateFileName = fileDialog.getFileName();
 								if (templateFileName != null && templateFileName.length() > 4) {
@@ -754,20 +759,26 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "restoreGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] {
-									Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath(), null, SWT.SINGLE);
-							String templateFileName = fileDialog.getFileName();
-							if (templateFileName != null && templateFileName.length() > 4) {
-								MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
-								if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false)) {
-									TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
-									HistoGraphicsTemplate template = trailRecordSet.getTemplate();
-									template.setHistoFileName(templateFileName);
-									template.load();
+							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoWindowVisible()).orElse(false)) {
+								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
+								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
+								Path targetFilePath = template.getTargetFilePath();
+								FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
+										targetFilePath.getParent().toString(), targetFilePath.getFileName().toString(), SWT.SINGLE);
+								String templateFileName = fileDialog.getFileName();
+								if (templateFileName != null && templateFileName.length() > 4) {
+									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
+									// allow loading whatever file the user requests
+									template.load(Paths.get(fileDialog.getFilterPath(),templateFileName));
 									trailRecordSet.applyTemplate(true);
 									MenuBar.this.application.getPresentHistoExplorer().updateHistoChartWindow(true);
 								}
-								else {
+							} else {
+								FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] {
+										Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath(), null, SWT.SINGLE);
+								String templateFileName = fileDialog.getFileName();
+								if (templateFileName != null && templateFileName.length() > 4) {
+									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
 									Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 									GraphicsTemplate template = activeChannel.getTemplate();
 									template.setNewFileName(templateFileName);
@@ -777,6 +788,27 @@ public class MenuBar {
 										activeChannel.getActiveRecordSet().setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 									}
 								}
+							}
+						}
+					});
+				}
+				{
+					new MenuItem(this.graphicsMenu, SWT.SEPARATOR);
+				}
+				{
+					this.objectTemplatesItem = new MenuItem(this.graphicsMenu, SWT.CHECK);
+					this.objectTemplatesItem.setText(Messages.getString(MessageIds.GDE_MSGT0920));
+					if (!GDE.IS_OS_ARCH_ARM) this.objectTemplatesItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0921));
+					this.objectTemplatesItem.setSelection(MenuBar.this.settings.isObjectTemplatesActive());
+					this.objectTemplatesItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "objectTemplatesItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.this.settings.setObjectTemplatesActive(MenuBar.this.objectTemplatesItem.getSelection());
+							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoWindowVisible()).orElse(false)) {
+								MenuBar.this.application.getPresentHistoExplorer().resetHisto();
+							} else {
+								// not implemented for kernel graphics
 							}
 						}
 					});
