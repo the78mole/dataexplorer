@@ -35,7 +35,6 @@ import org.eclipse.swt.graphics.Point;
 
 import gde.GDE;
 import gde.data.Channels;
-import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
@@ -97,7 +96,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 		void drawMeasuring() {
 			measure.ifPresent(mm -> {
 				for (AbstractChartComposite c : getCharts()) {
-					c.getMeasuring().ifPresent(m -> m.drawMeasuring());
+					c.getMeasuring().ifPresent(AbstractMeasuring::drawMeasuring);
 				}
 			});
 		}
@@ -118,7 +117,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 			measure.ifPresent(mm -> {
 				getGraphicsComposite().getMeasuring().ifPresent(m -> m.processMouseUpAction(point));
 				log.log(Level.OFF, "started");
-				getSummaryComposite().ifPresent(s -> s.drawAreaPaintControl());
+				getSummaryComposite().ifPresent(AbstractChartComposite::drawAreaPaintControl);
 			});
 		}
 
@@ -126,9 +125,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 			String tmpMessage = new String(message);
 			if (message.isEmpty() && !measure.isPresent()) {
 				if (getTrailRecordSet() != null) {
-					HistoGraphicsTemplate template = getTrailRecordSet().getTemplate();
-					if (!template.getCurrentFilePath().getFileName().toString().equals(template.getDefaultHistoFileName()))
-						tmpMessage = template.getHistoFileName();
+					tmpMessage = getTrailRecordSet().getTemplate().getFilePathMessage();
 				}
 			}
 			DataExplorer.getInstance().setStatusMessage(tmpMessage);
@@ -373,7 +370,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 	 * @return true if there is a measuring record with this name
 	 */
 	public boolean isMeasureRecord(String recordKeyName) {
-		return getMeasureRecord().map(r -> r.getName().equals(recordKeyName)).orElse(false);
+		return getMeasureRecord().map(TrailRecord::getName).map(r -> r.equals(recordKeyName)).orElse(false);
 	}
 
 	public void updateWindow(boolean redrawCurveSelector) {

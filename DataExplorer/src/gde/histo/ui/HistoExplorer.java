@@ -192,6 +192,10 @@ public class HistoExplorer {
 		return displayTab.getSelection() instanceof HistoTableWindow;
 	}
 
+	public boolean isHistoWindowVisible() {
+		return displayTab.getSelection() instanceof AbstractChartWindow || displayTab.getSelection() instanceof HistoTableWindow;
+	}
+
 	/**
 	 * update any visible histo tab.
 	 * @param createRecordSet true creates the recordset from the histo vaults; false uses the existing recordset
@@ -205,7 +209,7 @@ public class HistoExplorer {
 		if (Thread.currentThread().getId() == application.getThreadId()) {
 			log.log(Level.FINER, "initial size=", getTrailRecordSet() != null
 					? getTrailRecordSet().getDisplayRecords().size() + "  " + getTrailRecordSet().getVisibleAndDisplayableRecords().size() : "0   0");
-			if (isHistoChartWindowVisible() || isHistoTableWindowVisible()) {
+			if (isHistoWindowVisible()) {
 				Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 				try {
 					rebuilThread.start();
@@ -219,7 +223,7 @@ public class HistoExplorer {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					if (isHistoChartWindowVisible() || isHistoTableWindowVisible()) {
+					if (isHistoWindowVisible()) {
 						Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
 						try {
 							rebuilThread.start();
@@ -414,7 +418,7 @@ public class HistoExplorer {
 
 	/**
 	 * @return a visible histo chart window>/br>
-	 * throws Exception if the window is not visible
+	 *         throws Exception if the window is not visible
 	 */
 	public AbstractChartWindow getActiveHistoChartTabItem() {
 		return (AbstractChartWindow) this.displayTab.getSelection();

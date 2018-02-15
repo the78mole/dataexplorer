@@ -56,7 +56,8 @@ import gde.data.Record;
 import gde.data.Record.DataType;
 import gde.data.RecordSet;
 import gde.data.TimeSteps;
-import gde.device.IDevice;
+import gde.device.ChannelType;
+import gde.device.DeviceConfiguration;
 import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.ScoreGroupType;
@@ -600,33 +601,34 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 	}
 
-	private final HistoExplorer					presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
+	private final HistoExplorer	presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
+
+	private final PickedVaults	pickedVaults;
+
+	private final List<Integer>	durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
+	private final TrailDataTags	dataTags							= new TrailDataTags();
 
 	/**
 	 * Holds the view configuration.
 	 */
-	private final HistoGraphicsTemplate	template;
-
-	private final PickedVaults					pickedVaults;
-
-	private final List<Integer>					durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
-	private final TrailDataTags					dataTags							= new TrailDataTags();
+	private HistoGraphicsTemplate		template;
 
 	/**
 	 * Hold trail records for measurements, settlements and scores.
-	 * @param useDevice the instance of the device
-	 * @param channelNumber the channel number to be used
 	 * @param recordNames
 	 * @param timeSteps
+	 * @param pickedVaults
 	 */
-	private TrailRecordSet(IDevice useDevice, int channelNumber, String[] recordNames, TimeSteps timeSteps,
-			TreeMap<Long, List<ExtendedVault>> pickedVaults) {
-		super(useDevice, channelNumber, useDevice.getName() + GDE.STRING_UNDER_BAR + channelNumber, recordNames, timeSteps);
-		String deviceSignature = useDevice.getName() + GDE.STRING_UNDER_BAR + channelNumber;
+	private TrailRecordSet(String[] recordNames, TimeSteps timeSteps, TreeMap<Long, List<ExtendedVault>> pickedVaults) {
+		super(DataExplorer.application.getActiveDevice(), DataExplorer.application.getActiveChannelNumber(), //
+				DataExplorer.application.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + DataExplorer.application.getActiveChannelNumber(), //
+				recordNames, timeSteps);
 		this.pickedVaults = new PickedVaults(pickedVaults);
-		this.template = new HistoGraphicsTemplate(deviceSignature);
-		this.template.load();
-
+		{
+			String deviceSignature = this.device.getName() + GDE.STRING_UNDER_BAR + DataExplorer.application.getActiveChannelNumber();
+			this.template = HistoGraphicsTemplate.createGraphicsTemplate(deviceSignature, DataExplorer.application.getObjectKey());
+			this.template.load();
+		}
 		this.visibleAndDisplayableRecords = new Vector<TrailRecord>();
 		this.displayRecords = new Vector<TrailRecord>();
 		log.fine(() -> " TrailRecordSet(IDevice, int, RecordSet"); //$NON-NLS-1$
@@ -639,16 +641,17 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @return a trail record set containing all trail records (empty) as specified
 	 */
 	public static synchronized TrailRecordSet createRecordSet(TreeMap<Long, List<ExtendedVault>> pickedVaults) {
-		IDevice device = DataExplorer.application.getActiveDevice();
-		int channelConfigNumber = DataExplorer.application.getActiveChannelNumber();
-		String[] names = device.getDeviceConfiguration().getMeasurementSettlementScoregroupNames(channelConfigNumber);
+		DeviceConfiguration configuration = DataExplorer.application.getActiveDevice().getDeviceConfiguration();
+
 		TimeSteps timeSteps = new TimeSteps(-1, INITIAL_RECORD_CAPACITY);
 
-		TrailRecordSet newTrailRecordSet = new TrailRecordSet(device, channelConfigNumber, names, timeSteps, pickedVaults);
-		printRecordNames("createRecordSet() " + newTrailRecordSet.getName() + " - ", newTrailRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
-		List<MeasurementType> channelMeasurements = device.getDeviceConfiguration().getChannelMeasuremts(channelConfigNumber);
-		LinkedHashMap<Integer, SettlementType> channelSettlements = device.getDeviceConfiguration().getChannel(channelConfigNumber).getSettlements();
-		LinkedHashMap<Integer, ScoreGroupType> channelScoreGroups = device.getDeviceConfiguration().getChannel(channelConfigNumber).getScoreGroups();
+		String[] names = configuration.getMeasurementSettlementScoregroupNames(DataExplorer.application.getActiveChannelNumber());
+		TrailRecordSet newTrailRecordSet = new TrailRecordSet(names, timeSteps, pickedVaults);
+
+		ChannelType channelType = configuration.getChannel(DataExplorer.application.getActiveChannelNumber());
+		List<MeasurementType> channelMeasurements = channelType.getMeasurement();
+		LinkedHashMap<Integer, SettlementType> channelSettlements = channelType.getSettlements();
+		LinkedHashMap<Integer, ScoreGroupType> channelScoreGroups = channelType.getScoreGroups();
 
 		{// display section 0: look for scores at the top - scores' ordinals start after measurements + settlements due to GraphicsTemplate
 			// compatibility
@@ -680,7 +683,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 		{// display section 2: all measurements
 			for (int i = 0; i < channelMeasurements.size(); i++) {
-				MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
+				MeasurementType measurement = DataExplorer.application.getActiveDevice().getMeasurement(DataExplorer.application.getActiveChannelNumber(), i);
 				TrailRecord tmpRecord = new MeasurementTrail(i, measurement, newTrailRecordSet, INITIAL_RECORD_CAPACITY); // ordinal starts at 0
 				newTrailRecordSet.put(measurement.getName(), tmpRecord);
 				tmpRecord.setColorDefaultsAndPosition(i);
@@ -1023,7 +1026,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 		template.setCommentSuffix(name + " " + description);
 		template.store();
-		log.fine(() -> "creating histo graphics template file in " + template.getCurrentFilePath());
+		log.fine(() -> "creating histo graphics template file in " + template.getTargetFilePath());
 	}
 
 	/**
@@ -1077,7 +1080,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				}
 				presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(chartWeights);
 			}
-			log.fine(() -> "applied histo graphics template file " + template.getCurrentFilePath());
+			log.fine(() -> "applied histo graphics template file " + template.getTargetFilePath());
 
 			if (doUpdateVisibilityStatus) {
 				setDisplayable();
@@ -1087,7 +1090,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	public HistoGraphicsTemplate getTemplate() {
-		return this.template;
+		return this.template;// todo support family template
 	}
 
 	/**
