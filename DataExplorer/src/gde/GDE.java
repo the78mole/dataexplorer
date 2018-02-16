@@ -245,7 +245,6 @@ public class GDE {
 	public static final String[]						MOD1															= new String[] { GDE.IS_MAC ? "\u00E6" : Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Strg" : "Ctrl" };
 	public static final String[]						MOD2															= new String[] { Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Umschalt" : "Shift" };
 	public static final String[]						MOD3															= new String[] { "Alt" };
-	public static final String[]						MOD1_MOD3													= new String[] { GDE.IS_MAC ? "\u00E6" : Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Strg" : "Ctrl", "Alt" };
 
 	public static int												WIDGET_FONT_SIZE;
 	public final static String							WIDGET_FONT_NAME									= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : GDE.IS_MAC ? "Lucida Grande" : "Sans Serif";																		//$NON-NLS-1$ //$NON-NLS-2$
