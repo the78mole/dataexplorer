@@ -25,6 +25,7 @@ import static gde.ui.DataExplorer.TAB_INDEX_HISTO_TABLE;
 import static java.util.logging.Level.SEVERE;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.histo.datasources.HistoSet;
 import gde.histo.datasources.HistoSet.RebuildStep;
+import gde.histo.datasources.SupplementObjectFolder;
 import gde.histo.recordings.TrailDataTags;
 import gde.histo.recordings.TrailRecordSet;
 import gde.log.Level;
@@ -69,6 +71,8 @@ public class HistoExplorer {
 
 		this.settings.setHistoActive(true);
 		this.histoSet = new HistoSet();
+
+		new SupplementObjectFolder().checkAndCreate(Paths.get(settings.getDataFilePath()));
 	}
 
 	/**
@@ -104,11 +108,14 @@ public class HistoExplorer {
 	 * Does nothing if the histoActive setting is false.
 	 */
 	public synchronized void resetHisto() {
+
 		for (AbstractChartWindow c : chartTabItems) {
 			resetWindowHeaderAndMeasuring(c);
 		}
 		updateHistoTabs(RebuildStep.A_HISTOSET, true);
-	}
+
+		new SupplementObjectFolder().checkAndCreate(Paths.get(settings.getDataFilePath()));
+}
 
 	/**
 	 * @return true if the trail recordset data are available

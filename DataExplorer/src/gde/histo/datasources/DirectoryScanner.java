@@ -21,22 +21,30 @@ package gde.histo.datasources;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.OFF;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -63,23 +71,163 @@ import gde.utils.OperatingSystemHelper;
  * @author Thomas Eickert (USER)
  */
 public final class DirectoryScanner {
-	private final static String							$CLASS_NAME								= DirectoryScanner.class.getName();
-	private final static Logger							log												= Logger.getLogger($CLASS_NAME);
+	private final static String		$CLASS_NAME	= DirectoryScanner.class.getName();
+	private final static Logger		log					= Logger.getLogger($CLASS_NAME);
 
-	private static List<Integer>						channelMixConfigNumbers;
-	private static long											minStartTimeStamp_ms;
-	private static boolean									isValidatedObjectKey;
+	private static List<Integer>	channelMixConfigNumbers;
+	private static long						minStartTimeStamp_ms;
+	private static boolean				isValidatedObjectKey;
 
-	private final DataExplorer							application								= DataExplorer.getInstance();
-	private final Settings									settings									= Settings.getInstance();
+	/**
+	 * Detect valid sub paths.
+	 */
+	private static final class SourceFolders {
 
-	private IDevice													validatedDevice						= null;
-	private Channel													validatedChannel					= null;
-	private List<String>										validatedImportExtentions	= new ArrayList<>();
+		/**
+		 * Designed to hold all folder paths feeding the file scanning steps.
+		 * Supports an equality check comparing the current paths to an older path map.
+		 */
+		private final Map<DirectoryType, List<Path>> folders = new EnumMap<DirectoryType, List<Path>>(DirectoryType.class) {
+			private static final long serialVersionUID = -8624409377603884008L;
 
-	private final Map<DirectoryType, Path>	validatedDirectories			= new LinkedHashMap<>();
-	private final LongAdder									nonWorkableCount					= new LongAdder();
-	private final List<Path>								excludedFiles							= new ArrayList<>();
+			/**
+			 * @return true if the keys are equal and the lists hold the same path strings in arbitrary order
+			 */
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj) return true;
+				if (obj == null) return false;
+				if (getClass() != obj.getClass()) return false;
+				@SuppressWarnings("unchecked") // reason is anonymous class
+				Map<DirectoryType, List<Path>> that = (Map<DirectoryType, List<Path>>) obj;
+				boolean hasSameDirectoryTypes = keySet().equals(that.keySet());
+				if (hasSameDirectoryTypes) {
+					boolean isEqual = true;
+					for (Entry<DirectoryType, List<Path>> entry : entrySet()) {
+						HashSet<Path> thisSet = new HashSet<>(entry.getValue());
+						HashSet<Path> thatSet = new HashSet<>(that.get(entry.getKey()));
+						isEqual &= thisSet.equals(thatSet);
+						if (!isEqual) break;
+					}
+					log.log(Level.OFF, "isEqual=", isEqual);
+					return isEqual;
+				} else {
+					return false;
+				}
+			}
+		};
+
+		/**
+		 * Determine the valid directory paths from all log sources.
+		 * The result depends on the active device and object.
+		 */
+		void defineDirectories(EnumSet<DirectoryType> directoryTypes) throws IOException {
+			folders.clear();
+			for (DirectoryType directoryType : directoryTypes) {
+				List<Path> currentPaths = defineCurrentPaths(directoryType);
+				currentPaths.addAll(defineExtraPaths(directoryType));
+				folders.put(directoryType, currentPaths);
+			}
+		}
+
+		void defineDirectories4Test(Path filePath) {
+			List<Path> paths = new ArrayList<>();
+			Path tmpPath = filePath == null ? DirectoryType.DATA.getDataSetPath() : filePath;
+			paths.add(tmpPath);
+			folders.put(DirectoryType.DATA, paths);
+		}
+
+		private void removeDoubleDirectories() {
+			// no, because the same directory might contribute different file types to the screening
+		}
+
+		/**
+		 * Determine the valid directory paths from the currently defined working / import directory.
+		 * The result depends on the active device and object.
+		 * @return the list with 0 .. n entries
+		 */
+		private List<Path> defineCurrentPaths(DirectoryType directoryType) {
+			List<Path> newPaths = new ArrayList<Path>();
+			if (DataExplorer.getInstance().getActiveObject() == null) {
+				Path deviceSubPath = directoryType.getActiveDeviceSubPath();
+				Path rootPath = deviceSubPath != null ? directoryType.getBasePath().resolve(deviceSubPath) : directoryType.getBasePath();
+				newPaths.add(rootPath);
+			} else {
+				Path basePath = directoryType.getBasePath();
+				if (basePath == null) {
+					// an unavailable path results in no files found
+				} else {
+					String objectKey = DataExplorer.getInstance().getObjectKey();
+					try {
+						newPaths = Files.walk(basePath).filter(Files::isDirectory) //
+								.filter(p -> p.getFileName().equals(Paths.get(objectKey))).collect(Collectors.toList());
+					} catch (IOException e) {
+						log.log(Level.SEVERE, e.getMessage(), e);
+					}
+				}
+			}
+			return newPaths;
+		}
+
+		/**
+		 * Determine the valid directory paths from the supplementary working / import directories.
+		 * They are defined in the DataExplorer properties.
+		 * The result depends on the active device and object.
+		 * @return the list with 0 .. n entries
+		 */
+		private List<Path> defineExtraPaths(DirectoryType directoryType) {
+			List<Path> newPaths = new ArrayList<Path>();
+			// todo implement
+			return newPaths;
+		}
+
+		public Set<Entry<DirectoryType, List<Path>>> entrySet() {
+			return folders.entrySet();
+		}
+
+		public Collection<List<Path>> values() {
+			return folders.values();
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((this.folders == null) ? 0 : this.folders.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (obj == null) return false;
+			if (getClass() != obj.getClass()) return false;
+			SourceFolders other = (SourceFolders) obj;
+			if (this.folders == null) {
+				if (other.folders != null) return false;
+			} else if (!this.folders.equals(other.folders)) return false;
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "" + this.folders;
+		}
+	}
+
+	private final DataExplorer						application								= DataExplorer.getInstance();
+	private final Settings								settings									= Settings.getInstance();
+
+	private IDevice												validatedDevice						= null;
+	private Channel												validatedChannel					= null;
+	private List<String>									validatedImportExtentions	= new ArrayList<>();
+
+	private final LongAdder								nonWorkableCount					= new LongAdder();
+	private final List<Path>							excludedFiles							= new ArrayList<>();
+
+	private final EnumSet<DirectoryType>	validatedDirectoryTypes		= EnumSet.noneOf(DirectoryType.class);
+
+	private SourceFolders									validatedFolders;
 
 	/**
 	 * Data sources supported by the history including osd link files.
@@ -87,8 +235,19 @@ public final class DirectoryScanner {
 	public enum DirectoryType {
 		DATA {
 			@Override
+			public Path getBasePath() {
+				String dataFilePath = Settings.getInstance().getDataFilePath();
+				return dataFilePath == null || dataFilePath.isEmpty() ? null : Paths.get(dataFilePath);
+			}
+
+			@Override
+			public Path getActiveDeviceSubPath() {
+				return Paths.get(getPureDeviceName());
+			}
+
+			@Override
 			public Path getDataSetPath() {
-				String subPathData = DataExplorer.getInstance().getActiveObject() == null ? getPureDeviceName() : DataExplorer.getInstance().getObjectKey();
+				String subPathData = application.getActiveObject() == null ? getPureDeviceName() : application.getObjectKey();
 				return Paths.get(Settings.getInstance().getDataFilePath()).resolve(subPathData);
 			}
 
@@ -96,22 +255,39 @@ public final class DirectoryScanner {
 			public List<String> getDataSetExtensions() {
 				List<String> result = new ArrayList<>();
 				result.add(GDE.FILE_ENDING_OSD);
-				if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice && Settings.getInstance().getSearchDataPathImports()) {
-					result.addAll(((IHistoDevice) DataExplorer.getInstance().getActiveDevice()).getSupportedImportExtentions());
+				if (device instanceof IHistoDevice && Settings.getInstance().getSearchDataPathImports()) {
+					result.addAll(((IHistoDevice) device).getSupportedImportExtentions());
 				}
 				return result;
 			}
 		},
 		IMPORT {
 			@Override
-			public Path getDataSetPath() {
-				if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice && Settings.getInstance().getSearchImportPath()) {
-					Path importDir = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getImportBaseDir();
+			public Path getBasePath() {
+				if (application.getActiveDevice() instanceof IHistoDevice && Settings.getInstance().getSearchImportPath()) {
+					Path importDir = application.getActiveDevice().getDeviceConfiguration().getImportBaseDir();
 					if (importDir == null) {
 						return null;
 					} else {
-						String subPathImport = DataExplorer.getInstance().getActiveObject() == null ? GDE.STRING_EMPTY
-								: DataExplorer.getInstance().getObjectKey();
+						return importDir;
+					}
+				} else
+					return null;
+			}
+
+			@Override
+			public Path getActiveDeviceSubPath() {
+				return null; // native files are not segregated by devices
+			}
+
+			@Override
+			public Path getDataSetPath() {
+				if (device instanceof IHistoDevice && Settings.getInstance().getSearchImportPath()) {
+					Path importDir = device.getDeviceConfiguration().getImportBaseDir();
+					if (importDir == null) {
+						return null;
+					} else {
+						String subPathImport = application.getActiveObject() == null ? GDE.STRING_EMPTY : application.getObjectKey();
 						Path importPath = importDir.resolve(subPathImport);
 						return !importPath.equals(DirectoryType.DATA.getDataSetPath()) ? importPath : null;
 					}
@@ -121,12 +297,25 @@ public final class DirectoryScanner {
 
 			@Override
 			public List<String> getDataSetExtensions() {
-				if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice && Settings.getInstance().getSearchImportPath())
-					return ((IHistoDevice) DataExplorer.getInstance().getActiveDevice()).getSupportedImportExtentions();
+				if (device instanceof IHistoDevice && Settings.getInstance().getSearchImportPath())
+					return ((IHistoDevice) device).getSupportedImportExtentions();
 				else
 					return new ArrayList<>();
 			}
 		};
+
+		private final static DataExplorer	application	= DataExplorer.getInstance();
+		private final static IDevice			device			= DataExplorer.getInstance().getActiveDevice();
+
+		/**
+		 * @return the current directory path independent from object / device or null
+		 */
+		public abstract Path getBasePath();
+
+		/**
+		 * @return the sub path for finding files assigned to the device or null
+		 */
+		public abstract Path getActiveDeviceSubPath();
 
 		/**
 		 * @return the current directory path which depends on the object and the device or null
@@ -187,14 +376,13 @@ public final class DirectoryScanner {
 				}
 
 				@Override
-				void readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
-						DataInconsitsentException, DataTypeException {
+				void readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException,
+						DataTypeException {
 					HistoOsdReaderWriter.readVaults(filePath, trusses);
 				}
 
 				@Override
-				public
-				boolean providesReaderSettings() {
+				public boolean providesReaderSettings() {
 					return false;
 				}
 			},
@@ -218,14 +406,13 @@ public final class DirectoryScanner {
 				}
 
 				@Override
-				void readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
-						DataInconsitsentException, DataTypeException {
+				void readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException,
+						DataTypeException {
 					((IHistoDevice) DataExplorer.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses);
 				}
 
 				@Override
-				public
-				boolean providesReaderSettings() {
+				public boolean providesReaderSettings() {
 					return true;
 				}
 			},
@@ -237,14 +424,13 @@ public final class DirectoryScanner {
 				}
 
 				@Override
-				void readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
-						DataInconsitsentException, DataTypeException {
+				void readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException,
+						DataTypeException {
 					BIN.readVaults(filePath, trusses);
 				}
 
 				@Override
-				public
-				boolean providesReaderSettings() {
+				public boolean providesReaderSettings() {
 					return true;
 				}
 			};
@@ -388,8 +574,8 @@ public final class DirectoryScanner {
 			return this.dataSetType;
 		}
 
-		public void readVaults(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
-				DataInconsitsentException, DataTypeException {
+		public void readVaults(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException, DataInconsitsentException,
+				DataTypeException {
 			dataSetType.readVaults(path, trusses);
 		}
 
@@ -429,9 +615,9 @@ public final class DirectoryScanner {
 	public synchronized void initialize() {
 		this.validatedDevice = null;
 		this.validatedChannel = null;
+		this.validatedFolders = null;
 
 		this.validatedImportExtentions.clear();
-		this.validatedDirectories.clear();
 	}
 
 	/**
@@ -440,13 +626,8 @@ public final class DirectoryScanner {
 	public List<SourceDataSet> readSourceFiles4Test(Path filePath) throws IOException, NotSupportedFileFormatException {
 		this.initialize();
 
-		if (filePath == null)
-			this.validatedDirectories.put(DirectoryType.DATA, DirectoryType.DATA.getDataSetPath());
-		else
-			this.validatedDirectories.put(DirectoryType.DATA, filePath);
-
-		Path dataDir = this.validatedDirectories.get(DirectoryType.DATA);
-		FileUtils.checkDirectoryAndCreate(dataDir.toString());
+		validatedFolders.defineDirectories4Test(filePath);
+		validatedFolders.values().parallelStream().flatMap(List::stream).forEach(p -> FileUtils.checkDirectoryAndCreate(p.toString()));
 
 		return readSourceFiles();
 	}
@@ -462,21 +643,22 @@ public final class DirectoryScanner {
 	public synchronized boolean validateHistoFilePaths(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
 		IDevice lastDevice = this.validatedDevice;
 		Channel lastChannel = this.validatedChannel;
-		Path lastHistoDataDir = this.validatedDirectories.get(DirectoryType.DATA);
-		Path lastHistoImportDir = this.validatedDirectories.get(DirectoryType.IMPORT);
+		SourceFolders lastFolders = this.validatedFolders;
 		List<String> lastImportExtentions = this.validatedImportExtentions;
 
 		{ // determine validated values
 			this.validatedDevice = this.application.getActiveDevice();
 			this.validatedChannel = this.application.getActiveChannel();
 
-			this.validatedDirectories.clear();
-			this.validatedDirectories.put(DirectoryType.DATA, DirectoryType.DATA.getDataSetPath());
+			this.validatedDirectoryTypes.clear();
+			this.validatedDirectoryTypes.add(DirectoryType.DATA);
 			this.validatedImportExtentions = DirectoryType.IMPORT.getDataSetExtensions();
 			Path importPath = DirectoryType.IMPORT.getDataSetPath();
 			if (!this.validatedImportExtentions.isEmpty() && importPath != null) {
-				this.validatedDirectories.put(DirectoryType.IMPORT, importPath);
+				this.validatedDirectoryTypes.add(DirectoryType.IMPORT);
 			}
+			this.validatedFolders = new SourceFolders();
+			this.validatedFolders.defineDirectories(validatedDirectoryTypes); // *
 		}
 
 		boolean isFirstCall = lastDevice == null;
@@ -484,9 +666,10 @@ public final class DirectoryScanner {
 		isChange = isChange || (lastDevice != null ? !lastDevice.getName().equals(this.validatedDevice.getName()) : this.validatedDevice != null);
 		isChange = isChange || (lastChannel != null ? !lastChannel.getChannelConfigKey().equals(this.validatedChannel.getChannelConfigKey())
 				: this.validatedChannel != null);
-		isChange = isChange || (lastHistoDataDir != null ? !lastHistoDataDir.equals(this.validatedDirectories.get(DirectoryType.DATA)) : true);
-		isChange = isChange || (lastHistoImportDir != null ? !lastHistoImportDir.equals(this.validatedDirectories.get(DirectoryType.IMPORT))
-				: this.validatedDirectories.containsKey(DirectoryType.IMPORT));
+
+		isChange = isChange || (lastFolders != null ? !lastFolders.equals(this.validatedFolders) : true);
+		log.log(OFF, "isChange=", isChange + "  lastFolders.equals=" + (lastFolders != null ? !lastFolders.equals(this.validatedFolders) : true));
+
 		isChange = isChange || !lastImportExtentions.containsAll(this.validatedImportExtentions) || !this.validatedImportExtentions.containsAll(lastImportExtentions);
 		log.log(FINE, "isChange=", isChange); //$NON-NLS-1$
 
@@ -497,7 +680,7 @@ public final class DirectoryScanner {
 	 * Use file name extension lists and ignore file lists to determine the files required for the data access.
 	 * @return the log files from all validated directories matching the validated extensions
 	 */
-	public List<SourceDataSet> readSourceFiles() throws FileNotFoundException {
+	public List<SourceDataSet> readSourceFiles() {
 		channelMixConfigNumbers = this.application.getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers();
 		minStartTimeStamp_ms = LocalDate.now().minusMonths(this.settings.getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		isValidatedObjectKey = this.settings.getValidatedObjectKey(this.application.getObjectKey()).isPresent();
@@ -506,13 +689,18 @@ public final class DirectoryScanner {
 		nonWorkableCount.reset();
 		excludedFiles.clear();
 
-		for (Entry<DirectoryType, Path> entry : this.validatedDirectories.entrySet()) {
-			Path dir = entry.getValue();
-			if (FileUtils.checkDirectoryExist(dir.toString())) {
-				result.addAll(getFileListing(dir.toFile(), this.settings.getSubDirectoryLevelMax(), entry.getKey().getDataSetExtensions()));
-			} else {
-				log.log(FINE, "histoDir not found in ", dir); //$NON-NLS-1$
-			}
+		for (Entry<DirectoryType, List<Path>> entry : this.validatedFolders.entrySet()) {
+			List<SourceDataSet> sourceDataSets = entry.getValue().stream() //
+					.map(p -> {
+						try {
+							return getFileListing(p.toFile(), this.settings.getSubDirectoryLevelMax(), entry.getKey().getDataSetExtensions());
+						} catch (FileNotFoundException e) {
+							log.log(Level.SEVERE, e.getMessage(), e);
+							return new ArrayList<SourceDataSet>();
+						}
+					}) //
+					.flatMap(List::stream).collect(Collectors.toList());
+			result.addAll(sourceDataSets);
 		}
 		return result;
 	}
@@ -553,8 +741,22 @@ public final class DirectoryScanner {
 		return result;
 	}
 
-	public Map<DirectoryType, Path> getValidatedDirectories() {
-		return this.validatedDirectories;
+	public int getValidatedFoldersCount() {
+		if (validatedFolders != null) {
+				return (int) validatedFolders.values().parallelStream().flatMap(Collection::parallelStream).count();
+		} else {
+			return 0;
+		}
+	}
+
+	public Map<DirectoryType, Path> getValidatedDirectories() { // todo find solution for many paths
+		Map<DirectoryType, Path> truncatedResult = new EnumMap<>(DirectoryType.class);
+		if (validatedFolders != null) {
+			for (Entry<DirectoryType, List<Path>> e : validatedFolders.entrySet()) {
+				truncatedResult.put(e.getKey(), e.getValue().get(0));
+			}
+		}
+		return truncatedResult;
 	}
 
 	/**
