@@ -466,8 +466,9 @@ public class MenuToolBar {
 									MenuToolBar.this.objectSelectCombo.setEditable(false);
 									MenuToolBar.this.deviceObjectToolBar.setFocus();
 									String newObjKey = MenuToolBar.this.objectSelectCombo.getText();
-									log.log(Level.FINE, "newObjKey = "  + newObjKey); //$NON-NLS-1$
-									MenuToolBar.this.processNewOrChangedObjectKey(newObjKey, true);
+									log.log(Level.FINE, "newObjKey = " + newObjKey); //$NON-NLS-1$
+									boolean isEditMode = MenuToolBar.this.editObject.getSelection(); // editObjectButton or newObjectbutton
+									processNewOrChangedObjectKey(newObjKey, isEditMode);
 
 									MenuToolBar.this.oldObjectKey = null;
 									MenuToolBar.this.newObject.setSelection(false);
@@ -495,12 +496,14 @@ public class MenuToolBar {
 							log.log(Level.FINEST, "newObject.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuToolBar.this.editObject.getSelection()) {
 								MenuToolBar.this.editObject.setSelection(false);
+								MenuToolBar.this.newObject.setSelection(false);
 								// discard edited object
 								MenuToolBar.this.oldObjectKey = null;
 								MenuToolBar.this.objectSelectCombo.setItems(MenuToolBar.this.settings.getObjectList());
 								MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.isObjectoriented ? 1 : 0);
 								MenuToolBar.this.objectSelectCombo.setEditable(false);
 							} else if (MenuToolBar.this.newObject.getSelection()) {
+								MenuToolBar.this.oldObjectKey = MenuToolBar.this.objectSelectCombo.getItems()[MenuToolBar.this.objectSelectCombo.getSelectionIndex()];
 								Vector<String> tmpObjects = new Vector<String>();
 								for (String tmpObject : MenuToolBar.this.settings.getObjectList()) {
 									tmpObjects.add(tmpObject);
@@ -513,8 +516,17 @@ public class MenuToolBar {
 								MenuToolBar.this.objectSelectCombo.setFocus();
 								// begin here text can be edited -> key listener
 							} else {
-								MenuToolBar.this.oldObjectKey = null;
 								MenuToolBar.this.objectSelectCombo.setEditable(false);
+								MenuToolBar.this.deviceObjectToolBar.setFocus();
+								String newObjKey = MenuToolBar.this.objectSelectCombo.getText();
+								log.log(Level.FINE, "newObjKey = " + newObjKey); //$NON-NLS-1$
+								processNewOrChangedObjectKey(newObjKey, false);
+
+								MenuToolBar.this.oldObjectKey = null;
+								MenuToolBar.this.newObject.setSelection(false);
+								MenuToolBar.this.editObject.setSelection(false);
+								MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getText();
+								MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.activeObjectKey, MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 							}
 						}
 					});
@@ -575,6 +587,7 @@ public class MenuToolBar {
 							log.log(Level.FINEST, "editObject.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (MenuToolBar.this.newObject.getSelection()) {
 								MenuToolBar.this.newObject.setSelection(false);
+								MenuToolBar.this.editObject.setSelection(false);
 								// discard new object
 								MenuToolBar.this.oldObjectKey = null;
 								MenuToolBar.this.objectSelectCombo.setItems(MenuToolBar.this.settings.getObjectList());
@@ -586,8 +599,17 @@ public class MenuToolBar {
 								MenuToolBar.this.objectSelectCombo.setFocus();
 								// begin here text can be edited -> key listener
 							} else {
-								MenuToolBar.this.oldObjectKey = null;
 								MenuToolBar.this.objectSelectCombo.setEditable(false);
+								MenuToolBar.this.deviceObjectToolBar.setFocus();
+								String newObjKey = MenuToolBar.this.objectSelectCombo.getText();
+								log.log(Level.FINE, "newObjKey = " + newObjKey); //$NON-NLS-1$
+								processNewOrChangedObjectKey(newObjKey, true);
+
+								MenuToolBar.this.oldObjectKey = null;
+								MenuToolBar.this.newObject.setSelection(false);
+								MenuToolBar.this.editObject.setSelection(false);
+								MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getText();
+								MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.activeObjectKey, MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 							}
 						}
 					});
@@ -1645,7 +1667,7 @@ public class MenuToolBar {
 		if (!isDuplicateKey && newObjKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH && isObjectKeyConsistentWithDevices(newObjKey)) {
 			String[] tmpObjects = MenuToolBar.this.objectSelectCombo.getItems();
 			int selectionIndex = 0;
-			if (MenuToolBar.this.oldObjectKey == null)  { // new object key
+			if (!isEditMode) { // new object key
 				for (; selectionIndex < tmpObjects.length; selectionIndex++) {
 					if (tmpObjects[selectionIndex].equals(GDE.STRING_EMPTY)) {
 						tmpObjects[selectionIndex] = newObjKey;
@@ -1682,6 +1704,7 @@ public class MenuToolBar {
 				}
 			}
 			MenuToolBar.this.setObjectList(tmpObjects, newObjKey);
+			MenuToolBar.this.objectSelectCombo.select(selectionIndex);
 
 			if (selectionIndex >= 1) {
 				MenuToolBar.this.deleteObject.setEnabled(true);
@@ -1698,6 +1721,11 @@ public class MenuToolBar {
 			}
 			MenuToolBar.this.objectSelectCombo.setItems(tmpObjectKeys.toArray(new String[1]));
 			MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.isObjectoriented ? 1 : 0);
+			if (MenuToolBar.this.isObjectoriented && MenuToolBar.this.oldObjectKey != null && !MenuToolBar.this.oldObjectKey.isEmpty()) {
+				MenuToolBar.this.objectSelectCombo.setText(MenuToolBar.this.oldObjectKey);
+			} else {
+				MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.isObjectoriented ? 1 : 0);
+			}
 			MenuToolBar.this.application.setObjectDescriptionTabVisible(MenuToolBar.this.isObjectoriented);
 			MenuToolBar.this.application.updateObjectDescriptionWindow();
 		}
