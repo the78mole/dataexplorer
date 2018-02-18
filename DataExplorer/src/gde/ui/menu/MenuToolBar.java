@@ -517,7 +517,7 @@ public class MenuToolBar {
 										}
 										MenuToolBar.this.application.updateObjectDescriptionWindow();
 										new ObjectKeyScanner(newObjKey).start();
-									}
+										}
 									else { // undefined newObjectKey
 										Vector<String> tmpObjectKeys = new Vector<String>();
 										for (String objectKey : MenuToolBar.this.objectSelectCombo.getItems()) {
@@ -528,6 +528,9 @@ public class MenuToolBar {
 										MenuToolBar.this.application.setObjectDescriptionTabVisible(MenuToolBar.this.isObjectoriented);
 										MenuToolBar.this.application.updateObjectDescriptionWindow();
 									}
+									MenuToolBar.this.oldObjectKey = null;
+									MenuToolBar.this.newObject.setSelection(false);
+									MenuToolBar.this.editObject.setSelection(false);
 									MenuToolBar.this.activeObjectKey = MenuToolBar.this.objectSelectCombo.getText();
 									MenuToolBar.this.application.updateTitleBar(MenuToolBar.this.activeObjectKey, MenuToolBar.this.application.getActiveDevice().getName(), MenuToolBar.this.application.getActiveDevice().getPort());
 								}
@@ -541,7 +544,7 @@ public class MenuToolBar {
 					objectSelectComboSep.setControl(this.objectSelectComposite);
 				}
 				{
-					this.newObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
+					this.newObject = new ToolItem(this.deviceObjectToolBar, SWT.CHECK);
 					this.newObject.setImage(SWTResourceManager.getImage("gde/resource/NewObj.gif")); //$NON-NLS-1$
 					this.newObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0202));
 					this.newObject.setHotImage(SWTResourceManager.getImage("gde/resource/NewObjHot.gif")); //$NON-NLS-1$
@@ -549,17 +552,29 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "newObject.widgetSelected, event=" + evt); //$NON-NLS-1$
-							Vector<String> tmpObjects = new Vector<String>();
-							for (String tmpObject : MenuToolBar.this.settings.getObjectList()) {
-								tmpObjects.add(tmpObject);
+							if (MenuToolBar.this.editObject.getSelection()) {
+								MenuToolBar.this.editObject.setSelection(false);
+								// discard edited object
+								MenuToolBar.this.oldObjectKey = null;
+								MenuToolBar.this.objectSelectCombo.setItems(MenuToolBar.this.settings.getObjectList());
+								MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.isObjectoriented ? 1 : 0);
+								MenuToolBar.this.objectSelectCombo.setEditable(false);
+							} else if (MenuToolBar.this.newObject.getSelection()) {
+								Vector<String> tmpObjects = new Vector<String>();
+								for (String tmpObject : MenuToolBar.this.settings.getObjectList()) {
+									tmpObjects.add(tmpObject);
+								}
+								tmpObjects.add(GDE.STRING_EMPTY);
+								MenuToolBar.this.application.setObjectDescriptionTabVisible(true);
+								MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1])); // "None", "ASW-27", "AkkuSubC_1", "" });
+								MenuToolBar.this.objectSelectCombo.select(tmpObjects.size() - 1);
+								MenuToolBar.this.objectSelectCombo.setEditable(true);
+								MenuToolBar.this.objectSelectCombo.setFocus();
+								// begin here text can be edited -> key listener
+							} else {
+								MenuToolBar.this.oldObjectKey = null;
+								MenuToolBar.this.objectSelectCombo.setEditable(false);
 							}
-							tmpObjects.add(GDE.STRING_EMPTY);
-							MenuToolBar.this.application.setObjectDescriptionTabVisible(true);
-							MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1])); // "None", "ASW-27", "AkkuSubC_1", "" });
-							MenuToolBar.this.objectSelectCombo.select(tmpObjects.size() - 1);
-							MenuToolBar.this.objectSelectCombo.setEditable(true);
-							MenuToolBar.this.objectSelectCombo.setFocus();
-							// begin here text can be edited -> key listener
 						}
 					});
 				}
@@ -608,7 +623,7 @@ public class MenuToolBar {
 					});
 				}
 				{
-					this.editObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
+					this.editObject = new ToolItem(this.deviceObjectToolBar, SWT.CHECK);
 					this.editObject.setImage(SWTResourceManager.getImage("gde/resource/EditObj.gif")); //$NON-NLS-1$
 					this.editObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0204));
 					this.editObject.setHotImage(SWTResourceManager.getImage("gde/resource/EditObjHot.gif")); //$NON-NLS-1$
@@ -617,11 +632,21 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "editObject.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuToolBar.this.objectSelectCombo.getSelectionIndex() > 0) {
+							if (MenuToolBar.this.newObject.getSelection()) {
+								MenuToolBar.this.newObject.setSelection(false);
+								// discard new object
+								MenuToolBar.this.oldObjectKey = null;
+								MenuToolBar.this.objectSelectCombo.setItems(MenuToolBar.this.settings.getObjectList());
+								MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.isObjectoriented ? 1 : 0);
+								MenuToolBar.this.objectSelectCombo.setEditable(false);
+							} else if (MenuToolBar.this.editObject.getSelection() && MenuToolBar.this.objectSelectCombo.getSelectionIndex() > 0) {
 								MenuToolBar.this.oldObjectKey = MenuToolBar.this.objectSelectCombo.getItems()[MenuToolBar.this.objectSelectCombo.getSelectionIndex()];
 								MenuToolBar.this.objectSelectCombo.setEditable(true);
 								MenuToolBar.this.objectSelectCombo.setFocus();
 								// begin here text can be edited -> key listener
+							} else {
+								MenuToolBar.this.oldObjectKey = null;
+								MenuToolBar.this.objectSelectCombo.setEditable(false);
 							}
 						}
 					});
