@@ -187,6 +187,8 @@ public class Settings extends Properties {
 	final static String							IS_SUMMARY_BOX_VISIBLE					= "is_summary_box_visible";																																				//$NON-NLS-1$
 	final static String							IS_SUMMARY_SPREAD_VISIBLE				= "is_summary_spread_visible";																																		//$NON-NLS-1$
 	final static String							IS_SUMMARY_SPOTS_VISIBLE				= "is_summary_spots_visible";																																			//$NON-NLS-1$
+	final static String							DATA_FOLDERS_CSV								= "data_folders_csv";																																							//$NON-NLS-1$
+	final static String							IMPORT_FOLDERS_CSV							= "import_folders_csv";																																						//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -808,6 +810,8 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_BOX_VISIBLE, isSummaryBoxVisible())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_SPREAD_VISIBLE, isSummarySpreadVisible())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_SPOTS_VISIBLE, isSummarySpotsVisible())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_FOLDERS_CSV, getDataFoldersCsv())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IMPORT_FOLDERS_CSV, getImportFoldersCsv())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -3031,7 +3035,7 @@ public class Settings extends Properties {
 		if (items.length != WARNING_COUNT_VALUES.length) {
 			setWarningCountCsv(String.join(GDE.STRING_CSV_SEPARATOR, Arrays.asList(WARNING_COUNT_VALUES)));
 		}
-		return Arrays.stream(items).mapToInt(v -> Integer.valueOf(v)).toArray();
+		return Arrays.stream(items).mapToInt(Integer::valueOf).toArray();
 	}
 
 	/**
@@ -3189,6 +3193,36 @@ public class Settings extends Properties {
 	 */
 	public boolean isObjectTemplatesActive() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_OBJECT_TEMPLATES_ACTIVE, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param csvValues holds the list of folder paths
+	 */
+	public void setDataFoldersCsv(String csvValues) {
+		this.setProperty(Settings.DATA_FOLDERS_CSV, String.valueOf(csvValues));
+	}
+
+	/**
+	 * @return the list of folder paths
+	 */
+	public String getDataFoldersCsv() {
+		String list = String.valueOf(this.getProperty(Settings.DATA_FOLDERS_CSV, ""));
+		return list;
+	}
+
+	/**
+	 * @param csvValues holds the list of folder paths
+	 */
+	public void setImportFoldersCsv(String csvValues) {
+		this.setProperty(Settings.IMPORT_FOLDERS_CSV, String.valueOf(csvValues));
+	}
+
+	/**
+	 * @return the list of folder paths
+	 */
+	public String getImportFoldersCsv() {
+		String list = String.valueOf(this.getProperty(Settings.IMPORT_FOLDERS_CSV, ""));
+		return list;
 	}
 
 }

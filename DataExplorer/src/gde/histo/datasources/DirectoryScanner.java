@@ -45,6 +45,7 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -157,16 +158,22 @@ public final class DirectoryScanner {
 				if (basePath == null) {
 					// an unavailable path results in no files found
 				} else {
-					String objectKey = DataExplorer.getInstance().getObjectKey();
-					try {
-						newPaths = Files.walk(basePath).filter(Files::isDirectory) //
-								.filter(p -> p.getFileName().equals(Paths.get(objectKey))).collect(Collectors.toList());
-					} catch (IOException e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
-					}
+					newPaths = defineObjectPaths(basePath);
 				}
 			}
 			return newPaths;
+		}
+
+		private List<Path> defineObjectPaths(Path basePath) {
+			List<Path> result = new ArrayList<Path>();
+			String objectKey = DataExplorer.getInstance().getObjectKey();
+			try {
+				result = Files.walk(basePath).filter(Files::isDirectory) //
+						.filter(p -> p.getFileName().equals(Paths.get(objectKey))).collect(Collectors.toList());
+			} catch (IOException e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+			}
+			return result;
 		}
 
 		/**
@@ -176,9 +183,9 @@ public final class DirectoryScanner {
 		 * @return the list with 0 .. n entries
 		 */
 		private List<Path> defineExtraPaths(DirectoryType directoryType) {
-			List<Path> newPaths = new ArrayList<Path>();
-			// todo implement
-			return newPaths;
+			Stream<Path> supplementFoldersStream = directoryType.getSupplementFolders();
+			return supplementFoldersStream.map(p -> defineObjectPaths(p)) //
+					.flatMap(List::stream).collect(Collectors.toList());
 		}
 
 		public Set<Entry<DirectoryType, List<Path>>> entrySet() {
@@ -260,6 +267,12 @@ public final class DirectoryScanner {
 				}
 				return result;
 			}
+
+			@Override
+			public Stream<Path> getSupplementFolders() {
+				return Arrays.stream(Settings.getInstance().getDataFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+						.map(p -> Paths.get(p));
+			}
 		},
 		IMPORT {
 			@Override
@@ -302,6 +315,12 @@ public final class DirectoryScanner {
 				else
 					return new ArrayList<>();
 			}
+
+			@Override
+			public Stream<Path> getSupplementFolders() {
+				return Arrays.stream(Settings.getInstance().getImportFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+						.map(p -> Paths.get(p));
+			}
 		};
 
 		private final static DataExplorer	application	= DataExplorer.getInstance();
@@ -326,6 +345,8 @@ public final class DirectoryScanner {
 		 * @return the supported file extensions or an empty list
 		 */
 		public abstract List<String> getDataSetExtensions();
+
+		public abstract Stream<Path> getSupplementFolders();
 
 		/**
 		 * Special directory handling for MC3000 and Q200 supporting battery sets but store data in normal device folder.
