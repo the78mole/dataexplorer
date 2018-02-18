@@ -249,12 +249,12 @@ public final class DirectoryScanner {
 
 			@Override
 			public Path getActiveDeviceSubPath() {
-				return Paths.get(getPureDeviceName());
+				return Paths.get(DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getPureDeviceName());
 			}
 
 			@Override
 			public Path getDataSetPath() {
-				String subPathData = application.getActiveObject() == null ? getPureDeviceName() : application.getObjectKey();
+				String subPathData = application.getActiveObject() == null ? device.getDeviceConfiguration().getPureDeviceName() : application.getObjectKey();
 				return Paths.get(Settings.getInstance().getDataFilePath()).resolve(subPathData);
 			}
 
@@ -347,18 +347,6 @@ public final class DirectoryScanner {
 		public abstract List<String> getDataSetExtensions();
 
 		public abstract Stream<Path> getSupplementFolders();
-
-		/**
-		 * Special directory handling for MC3000 and Q200 supporting battery sets but store data in normal device folder.
-		 * @return the device name stripped by the 'set' extension for devices supporting battery sets
-		 */
-		private static String getPureDeviceName() {
-			String pureDeviceName = DataExplorer.getInstance().getActiveDevice().getName();
-			if (pureDeviceName.endsWith("-Set")) { // MC3000-Set -> MC3000, Q200-Set -> Q200 //$NON-NLS-1$
-				pureDeviceName = pureDeviceName.substring(0, pureDeviceName.length() - 4);
-			}
-			return pureDeviceName;
-		}
 	}
 
 	/**

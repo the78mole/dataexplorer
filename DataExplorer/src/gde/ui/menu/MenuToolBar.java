@@ -21,6 +21,7 @@ package gde.ui.menu;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -467,7 +468,7 @@ public class MenuToolBar {
 									String newObjKey = MenuToolBar.this.objectSelectCombo.getText();
 									log.log(Level.FINE, "newObjKey = " + newObjKey); //$NON-NLS-1$
 									boolean isDuplicateKey = Arrays.asList(MenuToolBar.this.objectSelectCombo.getItems()).stream().anyMatch(x -> x.equalsIgnoreCase(newObjKey));
-									if (!isDuplicateKey && newObjKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
+									if (!isDuplicateKey && newObjKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH  && isObjectKeyConsistentWithDevices(newObjKey)) {
 										String[] tmpObjects = MenuToolBar.this.objectSelectCombo.getItems();
 										int selectionIndex = 0;
 										if (MenuToolBar.this.oldObjectKey == null) { // new object key
@@ -1495,6 +1496,18 @@ public class MenuToolBar {
 	 */
 	public String getCoolBarSizes() {
 			return this.toolBarSizes.toString();
+	}
+
+	/**
+	 * check the object key against the device names and ask for replacement
+	 * @param newObjectKey
+	 * @return true if the object key harmonizes with device names
+	 */
+	private boolean isObjectKeyConsistentWithDevices(String newObjectKey) {
+		for (Entry<String, DeviceConfiguration> entry : DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().entrySet()) {
+			if (entry.getKey().equals(newObjectKey) || entry.getValue().getPureDeviceName().equals(newObjectKey)) return false;
+		}
+		return true;
 	}
 
 	/**
