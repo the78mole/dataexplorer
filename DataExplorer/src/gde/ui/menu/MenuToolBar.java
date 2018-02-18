@@ -579,6 +579,10 @@ public class MenuToolBar {
 								String delObjectKey = tmpObjects.elementAt(currentIndex);
 								tmpObjects.remove(currentIndex);
 								MenuToolBar.this.objectSelectCombo.setItems(tmpObjects.toArray(new String[1])); // "None", "ASW-27", "AkkuSubC_1", "" });
+								if (delObjectKey.trim().isEmpty()) {
+									MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.isObjectoriented ? 1 : 0);
+									return; // otherwise we will purge the entire working directory
+								}
 								currentIndex = currentIndex >= 2 ? currentIndex - 1 : tmpObjects.size() > 1 ? 1 : 0;
 								MenuToolBar.this.objectSelectCombo.select(currentIndex);
 								FileUtils.deleteDirectory(MenuToolBar.this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + delObjectKey);
