@@ -19,6 +19,7 @@
 ****************************************************************************************/
 package gde.ui.menu;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -465,7 +466,8 @@ public class MenuToolBar {
 									MenuToolBar.this.deviceObjectToolBar.setFocus();
 									String newObjKey = MenuToolBar.this.objectSelectCombo.getText();
 									log.log(Level.FINE, "newObjKey = " + newObjKey); //$NON-NLS-1$
-									if (newObjKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
+									boolean isDuplicateKey = Arrays.asList(MenuToolBar.this.objectSelectCombo.getItems()).stream().anyMatch(x -> x.equalsIgnoreCase(newObjKey));
+									if (!isDuplicateKey && newObjKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
 										String[] tmpObjects = MenuToolBar.this.objectSelectCombo.getItems();
 										int selectionIndex = 0;
 										if (MenuToolBar.this.oldObjectKey == null) { // new object key
