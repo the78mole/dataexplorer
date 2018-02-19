@@ -466,68 +466,9 @@ public class MenuToolBar {
 									MenuToolBar.this.objectSelectCombo.setEditable(false);
 									MenuToolBar.this.deviceObjectToolBar.setFocus();
 									String newObjKey = MenuToolBar.this.objectSelectCombo.getText();
-									log.log(Level.FINE, "newObjKey = " + newObjKey); //$NON-NLS-1$
-									boolean isDuplicateKey = Arrays.asList(MenuToolBar.this.objectSelectCombo.getItems()).stream().anyMatch(x -> x.equalsIgnoreCase(newObjKey));
-									if (!isDuplicateKey && newObjKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH  && isObjectKeyConsistentWithDevices(newObjKey)) {
-										String[] tmpObjects = MenuToolBar.this.objectSelectCombo.getItems();
-										int selectionIndex = 0;
-										if (MenuToolBar.this.oldObjectKey == null) { // new object key
-											for (; selectionIndex < tmpObjects.length; selectionIndex++) {
-												if (tmpObjects[selectionIndex].equals(GDE.STRING_EMPTY)) {
-													tmpObjects[selectionIndex] = newObjKey;
-													break;
-												}
-											}
-											checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
-										}
-										else { //rename object key
-											log.log(Level.FINE, "oldObjectKey = " + MenuToolBar.this.oldObjectKey); //$NON-NLS-1$
-											if (MenuToolBar.this.oldObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
-												checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
+									log.log(Level.FINE, "newObjKey = "  + newObjKey); //$NON-NLS-1$
+									MenuToolBar.this.processNewOrChangedObjectKey(newObjKey, true);
 
-												// query if new object key should be used to modify all existing data files with the new corrected one
-												int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0048, new String[] {MenuToolBar.this.oldObjectKey, newObjKey}));
-												if (answer == SWT.YES) {
-													OsdReaderWriter.updateObjectKey(MenuToolBar.this.oldObjectKey, newObjKey);
-													MenuToolBar.this.application.updateCurrentObjectData(newObjKey);
-												}
-
-												//query for old directory deletion
-												answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031));
-												if (answer == SWT.YES)
-													FileUtils.deleteDirectory(MenuToolBar.this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX  + MenuToolBar.this.oldObjectKey);
-
-												//replace modified object key
-												for (; selectionIndex < tmpObjects.length; selectionIndex++) {
-													if (tmpObjects[selectionIndex].equals(MenuToolBar.this.oldObjectKey)) {
-														tmpObjects[selectionIndex] = newObjKey;
-														break;
-													}
-												}
-												MenuToolBar.this.oldObjectKey = null;
-											}
-										}
-										MenuToolBar.this.setObjectList(tmpObjects, newObjKey);
-
-										if (selectionIndex >= 1) {
-											MenuToolBar.this.deleteObject.setEnabled(true);
-											MenuToolBar.this.editObject.setEnabled(true);
-											MenuToolBar.this.isObjectoriented = true;
-											MenuToolBar.this.activeObjectKey = newObjKey;
-										}
-										MenuToolBar.this.application.updateObjectDescriptionWindow();
-										new ObjectKeyScanner(newObjKey).start();
-										}
-									else { // undefined newObjectKey
-										Vector<String> tmpObjectKeys = new Vector<String>();
-										for (String objectKey : MenuToolBar.this.objectSelectCombo.getItems()) {
-											if (objectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) tmpObjectKeys.add(objectKey);
-										}
-										MenuToolBar.this.objectSelectCombo.setItems(tmpObjectKeys.toArray(new String[1]));
-										MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.isObjectoriented ? 1 : 0);
-										MenuToolBar.this.application.setObjectDescriptionTabVisible(MenuToolBar.this.isObjectoriented);
-										MenuToolBar.this.application.updateObjectDescriptionWindow();
-									}
 									MenuToolBar.this.oldObjectKey = null;
 									MenuToolBar.this.newObject.setSelection(false);
 									MenuToolBar.this.editObject.setSelection(false);
@@ -1693,6 +1634,72 @@ public class MenuToolBar {
 					MenuToolBar.this.googleEarthConfigToolItem.setEnabled(MenuToolBar.this.application.getActiveDevice().isActualRecordSetWithGpsData() && MenuToolBar.this.application.getActiveDevice().getGPS2KMZMeasurementOrdinal() >= 0);
 				}
 			});
+		}
+	}
+
+	/**
+	 * Extracted from the Combo KeyListener for use by CheckButtons
+	 */
+	private void processNewOrChangedObjectKey(String newObjKey, boolean isEditMode) {
+		boolean isDuplicateKey = Arrays.asList(MenuToolBar.this.objectSelectCombo.getItems()).stream().anyMatch(x -> x.equalsIgnoreCase(newObjKey));
+		if (!isDuplicateKey && newObjKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH && isObjectKeyConsistentWithDevices(newObjKey)) {
+			String[] tmpObjects = MenuToolBar.this.objectSelectCombo.getItems();
+			int selectionIndex = 0;
+			if (MenuToolBar.this.oldObjectKey == null)  { // new object key
+				for (; selectionIndex < tmpObjects.length; selectionIndex++) {
+					if (tmpObjects[selectionIndex].equals(GDE.STRING_EMPTY)) {
+						tmpObjects[selectionIndex] = newObjKey;
+						break;
+					}
+				}
+				checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
+			} else  { // rename object key
+				log.log(Level.FINE, "oldObjectKey = " + MenuToolBar.this.oldObjectKey); //$NON-NLS-1$
+				if (MenuToolBar.this.oldObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
+					checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
+
+					// query if new object key should be used to modify all existing data files with the new corrected one
+					int answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0048, new String[] {
+							MenuToolBar.this.oldObjectKey, newObjKey }));
+					if (answer == SWT.YES) {
+						OsdReaderWriter.updateObjectKey(MenuToolBar.this.oldObjectKey, newObjKey);
+						MenuToolBar.this.application.updateCurrentObjectData(newObjKey);
+					}
+
+					// query for old directory deletion
+					answer = MenuToolBar.this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031));
+					if (answer == SWT.YES)
+						FileUtils.deleteDirectory(MenuToolBar.this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + MenuToolBar.this.oldObjectKey);
+
+					// replace modified object key
+					for (; selectionIndex < tmpObjects.length; selectionIndex++) {
+						if (tmpObjects[selectionIndex].equals(MenuToolBar.this.oldObjectKey)) {
+							tmpObjects[selectionIndex] = newObjKey;
+							break;
+						}
+					}
+					MenuToolBar.this.oldObjectKey = null;
+				}
+			}
+			MenuToolBar.this.setObjectList(tmpObjects, newObjKey);
+
+			if (selectionIndex >= 1) {
+				MenuToolBar.this.deleteObject.setEnabled(true);
+				MenuToolBar.this.editObject.setEnabled(true);
+				MenuToolBar.this.isObjectoriented = true;
+				MenuToolBar.this.activeObjectKey = newObjKey;
+			}
+			MenuToolBar.this.application.updateObjectDescriptionWindow();
+			new ObjectKeyScanner(newObjKey).start();
+		} else { // undefined newObjectKey
+			Vector<String> tmpObjectKeys = new Vector<String>();
+			for (String objectKey : MenuToolBar.this.objectSelectCombo.getItems()) {
+				if (objectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) tmpObjectKeys.add(objectKey);
+			}
+			MenuToolBar.this.objectSelectCombo.setItems(tmpObjectKeys.toArray(new String[1]));
+			MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.isObjectoriented ? 1 : 0);
+			MenuToolBar.this.application.setObjectDescriptionTabVisible(MenuToolBar.this.isObjectoriented);
+			MenuToolBar.this.application.updateObjectDescriptionWindow();
 		}
 	}
 }
