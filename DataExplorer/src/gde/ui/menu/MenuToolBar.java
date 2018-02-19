@@ -465,7 +465,7 @@ public class MenuToolBar {
 									MenuToolBar.this.deviceObjectToolBar.setFocus();
 									String newObjKey = MenuToolBar.this.objectSelectCombo.getText();
 									log.log(Level.FINE, "newObjKey = " + newObjKey); //$NON-NLS-1$
-									if (newObjKey.length() >= 1) {
+									if (newObjKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
 										String[] tmpObjects = MenuToolBar.this.objectSelectCombo.getItems();
 										int selectionIndex = 0;
 										if (MenuToolBar.this.oldObjectKey == null) { // new object key
@@ -479,7 +479,7 @@ public class MenuToolBar {
 										}
 										else { //rename object key
 											log.log(Level.FINE, "oldObjectKey = " + MenuToolBar.this.oldObjectKey); //$NON-NLS-1$
-											if (MenuToolBar.this.oldObjectKey.length() >= 1) {
+											if (MenuToolBar.this.oldObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
 												checkChannelForObjectKeyMissmatch(selectionIndex, newObjKey);
 
 												// query if new object key should be used to modify all existing data files with the new corrected one
@@ -518,7 +518,7 @@ public class MenuToolBar {
 									else { // undefined newObjectKey
 										Vector<String> tmpObjectKeys = new Vector<String>();
 										for (String objectKey : MenuToolBar.this.objectSelectCombo.getItems()) {
-											if (objectKey.length() >=1 ) tmpObjectKeys.add(objectKey);
+											if (objectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) tmpObjectKeys.add(objectKey);
 										}
 										MenuToolBar.this.objectSelectCombo.setItems(tmpObjectKeys.toArray(new String[1]));
 										MenuToolBar.this.objectSelectCombo.select(MenuToolBar.this.isObjectoriented ? 1 : 0);
@@ -1508,8 +1508,8 @@ public class MenuToolBar {
 				if (answer == SWT.YES) { //replace existing objectkey in channel
 					activeChannel.setObjectKey(newObjectKey);
 					String updateFileDescription = activeChannel.getFileDescription();
-					if (channelObjKey.length() > 1 && updateFileDescription.contains(channelObjKey)) {
-						if (newObjectKey.length() > 1) {
+					if (channelObjKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH && updateFileDescription.contains(channelObjKey)) {
+						if (newObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
 							updateFileDescription = updateFileDescription.substring(0, updateFileDescription.indexOf(channelObjKey)) + newObjectKey
 									+ updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey) + channelObjKey.length());
 						}
@@ -1518,7 +1518,7 @@ public class MenuToolBar {
 									+ updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey) + channelObjKey.length());
 						}
 					}
-					else if (newObjectKey.length() > 1) {
+					else if (newObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
 						updateFileDescription = updateFileDescription + GDE.STRING_BLANK + newObjectKey;
 					}
 					activeChannel.setFileDescription(updateFileDescription);

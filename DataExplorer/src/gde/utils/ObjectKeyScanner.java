@@ -99,7 +99,7 @@ public class ObjectKeyScanner extends Thread {
 		try {
 			String objectKeyDirPath = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + this.objectKey;
 
-			if (this.objectKey.length() > 1) { // use exact defined object key
+			if (this.objectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) { // use exact defined object key
 				String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 				//check directory and cleanup if already exist
 				FileUtils.checkDirectoryAndCreate(objectKeyDirPath);
@@ -174,7 +174,7 @@ public class ObjectKeyScanner extends Thread {
 								if (actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) { // this is not a link
 									log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
 									String foundObjectKey = OsdReaderWriter.getHeader(file.getCanonicalPath()).get(GDE.OBJECT_KEY);
-									if (foundObjectKey != null && foundObjectKey.length() > 1) { // is a valid object key
+									if (foundObjectKey != null && foundObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) { // is a valid object key
 										if (!this.objectKeys.contains(foundObjectKey)) {
 											log.log(Level.FINE, "found new object key " + foundObjectKey); //$NON-NLS-1$
 											this.objectKeys.add(foundObjectKey);

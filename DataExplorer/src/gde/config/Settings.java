@@ -1035,7 +1035,7 @@ public class Settings extends Properties {
 		//check for invalid object key
 		Vector<String> tmpObjectVector = new Vector<String>();
 		for (String objectKey : activeObjectList) {
-			if (objectKey.length() > 1) tmpObjectVector.add(objectKey.trim());
+			if (objectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) tmpObjectVector.add(objectKey.trim());
 		}
 		activeObjectList = tmpObjectVector.toArray(new String[1]);
 
@@ -1051,7 +1051,7 @@ public class Settings extends Properties {
 	public int getActiveObjectIndex() {
 		Vector<String> tmpObjectVector = new Vector<String>();
 		for (String objectKey : this.getObjectList()) {
-			if (objectKey.length() > 1) tmpObjectVector.add(objectKey);
+			if (objectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) tmpObjectVector.add(objectKey);
 		}
 		int index = tmpObjectVector.indexOf(this.getProperty(Settings.ACTIVE_OBJECT, Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0]).trim());
 		return index < 0 ? 0 : index;
