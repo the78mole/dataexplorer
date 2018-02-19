@@ -1035,7 +1035,8 @@ public class Settings extends Properties {
 		//check for invalid object key
 		Vector<String> tmpObjectVector = new Vector<String>();
 		for (String objectKey : activeObjectList) {
-			if (objectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) tmpObjectVector.add(objectKey.trim());
+			boolean isDuplicateKey = tmpObjectVector.stream().anyMatch(x -> x.equalsIgnoreCase(objectKey));
+			if (!isDuplicateKey && objectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) tmpObjectVector.add(objectKey.trim());
 		}
 		activeObjectList = tmpObjectVector.toArray(new String[1]);
 
