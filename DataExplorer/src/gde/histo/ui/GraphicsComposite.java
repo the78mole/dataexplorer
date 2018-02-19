@@ -21,12 +21,10 @@ package gde.histo.ui;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.SEVERE;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -55,7 +53,7 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.AbstractRecordSet;
 import gde.data.Channels;
-import gde.histo.datasources.DirectoryScanner.DirectoryType;
+import gde.histo.datasources.DirectoryScanner.SourceFolders;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.recordings.TrailDataTags.DataTag;
@@ -279,21 +277,12 @@ public final class GraphicsComposite extends AbstractChartComposite {
 			this.graphicsHeader.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {
-					log.finer(() -> "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
-					String headerText = GDE.STRING_EMPTY;
-					String toolTipText = GDE.STRING_EMPTY;
-					{ // getBaseTexts
-						StringBuilder sb = new StringBuilder();
-						String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
-						for (Entry<DirectoryType, Path> directoryEntry : DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getValidatedDirectories().entrySet()) {
-							String fileName = directoryEntry.getValue().getFileName().toString();
-							String truncatedPath = fileName.length() > 22 ? fileName.substring(0, 22) + ellipsisText : fileName;
-							sb.append(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK).append(truncatedPath);
-							toolTipText += GDE.STRING_NEW_LINE + directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + directoryEntry.getValue().toString();
-						}
-						headerText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
-						if (!toolTipText.isEmpty()) toolTipText = toolTipText.substring(1);
-					}
+					log.finer(() -> "graphicsHeader.paintControl, event=" + evt); //$NON-NLS-1$
+					SourceFolders sourceFolders = DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getSourceFolders();
+					String headerText = sourceFolders != null //
+							? sourceFolders.getTruncatedFileNamesCsv().replace(GDE.STRING_CSV_SEPARATOR, GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK) : "";
+					String toolTipText = sourceFolders != null //
+							? sourceFolders.getDecoratedPathsCsv().replaceAll(GDE.STRING_CSV_SEPARATOR, GDE.STRING_NEW_LINE) : "";
 					if (!headerText.equals(graphicsHeaderText)) {
 						graphicsHeaderText = headerText;
 						graphicsHeader.setText(headerText);

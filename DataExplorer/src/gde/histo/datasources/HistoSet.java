@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import gde.config.Settings;
@@ -35,7 +34,7 @@ import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
 import gde.histo.cache.ExtendedVault;
-import gde.histo.datasources.DirectoryScanner.DirectoryType;
+import gde.histo.datasources.DirectoryScanner.SourceFolders;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.exclusions.InclusionData;
 import gde.histo.recordings.TrailRecord;
@@ -366,11 +365,8 @@ public final class HistoSet {
 		return rebuildStepInvisibleTab;
 	}
 
-	/**
-	 * @return the validatedDirectories which hold the history recordsets
-	 */
-	public Map<DirectoryType, Path> getValidatedDirectories() {
-		return this.vaultPicker.getValidatedDirectories();
+	public SourceFolders getSourceFolders() {
+		return this.vaultPicker.getSourceFolders();
 	}
 
 	/**

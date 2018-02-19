@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -57,7 +56,7 @@ import gde.data.Channels;
 import gde.data.ObjectData;
 import gde.device.IDevice;
 import gde.histo.cache.ExtendedVault;
-import gde.histo.datasources.DirectoryScanner.DirectoryType;
+import gde.histo.datasources.DirectoryScanner.SourceFolders;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.exclusions.InclusionData;
@@ -294,21 +293,12 @@ public final class SummaryComposite extends AbstractChartComposite {
 			this.graphicsHeader.addPaintListener(new PaintListener() {
 				@Override
 				public void paintControl(PaintEvent evt) {
-					log.finer(() -> "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
-					String headerText = GDE.STRING_EMPTY;
-					String toolTipText = GDE.STRING_EMPTY;
-					{ // getBaseTexts
-						StringBuilder sb = new StringBuilder();
-						String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
-						for (Entry<DirectoryType, Path> directoryEntry : windowActor.getHistoSet().getValidatedDirectories().entrySet()) {
-							String fileName = directoryEntry.getValue().getFileName().toString();
-							String truncatedPath = fileName.length() > 22 ? fileName.substring(0, 22) + ellipsisText : fileName;
-							sb.append(GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK).append(truncatedPath);
-							toolTipText += GDE.STRING_NEW_LINE + directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + directoryEntry.getValue().toString();
-						}
-						headerText = sb.length() >= 3 ? sb.substring(3) : GDE.STRING_EMPTY;
-						if (!toolTipText.isEmpty()) toolTipText = toolTipText.substring(1);
-					}
+					log.finer(() -> "graphicsHeader.paintControl, event=" + evt); //$NON-NLS-1$
+					SourceFolders sourceFolders = DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getSourceFolders();
+					String headerText = sourceFolders != null //
+							? sourceFolders.getTruncatedFileNamesCsv().replace(GDE.STRING_CSV_SEPARATOR, GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK) : "";
+					String toolTipText = sourceFolders != null //
+							? sourceFolders.getDecoratedPathsCsv().replaceAll(GDE.STRING_CSV_SEPARATOR, GDE.STRING_NEW_LINE) : "";
 					if (!headerText.equals(graphicsHeaderText)) {
 						graphicsHeaderText = headerText;
 						graphicsHeader.setText(headerText);
@@ -506,7 +496,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 			} else if (evt.button == 3) { // right button
 				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
 				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
-				Path dataPath = application.getPresentHistoExplorer().getHistoSet().getValidatedDirectories().get(DirectoryType.DATA);
+				Path dataPath = application.getPresentHistoExplorer().getHistoSet().getSourceFolders().getWorkingDataPath();
 				String[] includedRecordNames = InclusionData.getInstance(dataPath).getIncludedRecordNames();
 				SummaryWarning summaryWarning = new SummaryWarning(dataPath, record != null ? record.getName() : GDE.STRING_EMPTY, includedRecordNames);
 				popupmenu.setData(TabMenuOnDemand.SUMMARY_WARNING.name(), summaryWarning);
@@ -633,7 +623,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		boolean isSummarySpotsVisible = settings.isSummarySpotsVisible();
 		boolean isCurveSelector = windowActor.isCurveSelectorEnabled();
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-		Path dataDir = application.getPresentHistoExplorer().getHistoSet().getValidatedDirectories().get(DirectoryType.DATA);
+		Path dataDir = application.getPresentHistoExplorer().getHistoSet().getSourceFolders().getWorkingDataPath();
 		Optional<InclusionData> inclusionData = InclusionData.getExistingInstance(dataDir, trailRecordSet.getRecordNames());
 		List<String> exclusiveNames = Arrays.asList(inclusionData.map(d -> d.getIncludedRecordNames(trailRecordSet.getRecordNames())).orElse(new String[0]));
 

@@ -62,6 +62,7 @@ import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.ScoreGroupType;
 import gde.device.ScoreLabelTypes;
+import gde.device.ScoreType;
 import gde.device.SettlementType;
 import gde.device.TrailTypes;
 import gde.histo.cache.ExtendedVault;
@@ -287,7 +288,12 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			Outliers minWarning = null;
 			Outliers maxWarning = null;
 
+			int warningLevel = settings.getWarningLevel();
+			if (warningLevel == -1) return new Outliers[] { null, null };
+
 			double[][] minMaxQuantiles = defineExtremumQuantiles(get(recordName));
+			if (minMaxQuantiles.length == 0) return new Outliers[] { null, null };
+
 			double minWhiskerLimit = minMaxQuantiles[0][QUARTILE1.ordinal()];
 			double maxWhiskerLimit = minMaxQuantiles[1][QUARTILE3.ordinal()];
 			double closeMinOutlierLimit = minMaxQuantiles[0][LOWER_WHISKER.ordinal()];
@@ -296,8 +302,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			double farMaxOutlierLimit = minMaxQuantiles[1][QUARTILE3.ordinal()] + 3. * 2. * minMaxQuantiles[1][UQT.ordinal()];
 			int[] extremumIndices = get(recordName).trailSelector.getExtremumTrailsIndices();
 			String[] selectText = get(recordName).trailSelector.getExtremumTrailsTexts();
-			int warningLevel = settings.getWarningLevel();
-			if (warningLevel == -1) return new Outliers[] { null, null };
 
 			int actualLimit = logLimit >= 0 && logLimit < indexedVaults.size() ? logLimit : indexedVaults.size();
 			Iterator<ExtendedVault> iterator = indexedVaults.stream().iterator();
@@ -378,7 +382,11 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			List<Double> decodedMaximums = pointMaximums.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(record, i / 1000.)).collect(Collectors.toList());
 			ElementaryQuantile<Double> maxQuantile = new ElementaryQuantile<>(decodedMaximums, true);
 
-			return new double[][] { minQuantile.getTukeyWithQuartileTolerances(), maxQuantile.getTukeyWithQuartileTolerances() };
+			if (!decodedMinimums.isEmpty() && !decodedMaximums.isEmpty()) {
+				return new double[][] { minQuantile.getTukeyWithQuartileTolerances(), maxQuantile.getTukeyWithQuartileTolerances() };
+			} else {
+				return new double[0][0];
+			}
 		}
 
 		/**
@@ -491,7 +499,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		public double[] defineRecentScoreMinMax(String recordName, ScoreGroupType scoregroup, int limit) {
 			double[] minMaxValues = new double[] { Double.MAX_VALUE, -Double.MAX_VALUE };
 
-			List<Integer> scoreOrdinals = scoregroup.getScore().stream().map(s -> s.getTrailOrdinal()) //
+			List<Integer> scoreOrdinals = scoregroup.getScore().stream().map(ScoreType::getTrailOrdinal) //
 					.collect(Collectors.toList());
 			initialVaults.values().stream().flatMap(Collection::stream).limit(limit).forEach(v -> {
 				// determine the min and max of all score entries in the score group of this vault
@@ -516,7 +524,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			List<Double> decodedLowValues = new ArrayList<>();
 			List<Double> decodedHighValues = new ArrayList<>();
 
-			List<Integer> scoreOrdinals = scoregroup.getScore().stream().map(s -> s.getTrailOrdinal()) //
+			List<Integer> scoreOrdinals = scoregroup.getScore().stream().map(ScoreType::getTrailOrdinal) //
 					.collect(Collectors.toList());
 			initialVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
 				// determine the min and max of all score entries in the score group of this vault
@@ -601,17 +609,17 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 	}
 
-	private final HistoExplorer	presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
+	private final HistoExplorer		presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
 
-	private final PickedVaults	pickedVaults;
+	private final PickedVaults		pickedVaults;
 
-	private final List<Integer>	durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
-	private final TrailDataTags	dataTags							= new TrailDataTags();
+	private final List<Integer>		durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
+	private final TrailDataTags		dataTags							= new TrailDataTags();
 
 	/**
 	 * Holds the view configuration.
 	 */
-	private HistoGraphicsTemplate		template;
+	private HistoGraphicsTemplate	template;
 
 	/**
 	 * Hold trail records for measurements, settlements and scores.
@@ -1068,7 +1076,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				setValueGridType(Integer.parseInt(template.getProperty(AbstractRecordSet.VALUE_GRID_TYPE, "0")));
 
 				// default use first visible
-				String gridDefaultRecordName = this.getValues().stream().filter(t -> t.isVisible()).findFirst().orElse(get(0)).getName();
+				String gridDefaultRecordName = this.getValues().stream().filter(TrailRecord::isVisible).findFirst().orElse(get(0)).getName();
 				String gridRecordName = template.getProperty(AbstractRecordSet.VALUE_GRID_RECORD_NAME, gridDefaultRecordName);
 				TrailRecord gridRecord = get(gridRecordName);
 				setValueGridRecordName(gridRecord != null && gridRecord.isVisible() ? gridRecordName : gridDefaultRecordName);

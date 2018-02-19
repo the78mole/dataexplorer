@@ -58,8 +58,8 @@ import gde.exception.NotSupportedFileFormatException;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.cache.VaultReaderWriter;
-import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.DirectoryScanner.SourceDataSet;
+import gde.histo.datasources.DirectoryScanner.SourceFolders;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.recordings.TrailRecordSet;
@@ -322,7 +322,7 @@ public final class VaultPicker {
 
 		List<SourceDataSet> sourceFiles = this.directoryScanner.readSourceFiles4Test(filePath);
 		this.readFilesCount = sourceFiles.size();
-		List<VaultCollector> trusses = getTrusses(sourceFiles, devices);
+		List<VaultCollector> trusses = getTrusses(sourceFiles, devices, false);
 		removeSuppressed(trusses);
 		log.info(() -> String.format("%04d files selected", trusses.size())); //$NON-NLS-1$
 
@@ -399,10 +399,11 @@ public final class VaultPicker {
 				boolean isHistoFilePathsValid = this.directoryScanner.validateHistoFilePaths(rebuildStep);
 				if (!isHistoFilePathsValid) {
 					realRebuildStep = RebuildStep.B_HISTOVAULTS;
-				} else { // histo record sets are ready to use
-					log.time(() -> String.format("  %3d file paths verified           time=%,6d [ms]", //$NON-NLS-1$
-							this.directoryScanner.getValidatedDirectories().size(), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime + 500000)));
+				} else {
+					// histo record sets are ready to use
 				}
+				log.time(() -> String.format("  %3d file paths verified           time=%,6d [ms]", //$NON-NLS-1$
+						this.directoryScanner.getValidatedFoldersCount(), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime + 500000)));
 			}
 			progress.ifPresent((p) -> p.set(PATHS_VERIFIED));
 
@@ -411,7 +412,7 @@ public final class VaultPicker {
 				List<VaultCollector> trusses;
 				{
 					List<SourceDataSet> sourceFiles = this.directoryScanner.readSourceFiles();
-					trusses = getTrusses(sourceFiles, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices());
+					trusses = getTrusses(sourceFiles, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices(), directoryScanner.isSlowFolderAccess());
 					this.suppressedVaults = removeSuppressed(trusses);
 					this.readFilesCount = sourceFiles.size();
 					this.readTrussesCount = trusses.size();
@@ -429,7 +430,7 @@ public final class VaultPicker {
 						progress.ifPresent((p) -> p.set(MATCHED));
 					}
 					{// step: put cached vaults into the histoSet map and reduce workload map
-						int jobSize = trussJobs.values().parallelStream().mapToInt(c -> c.size()).sum();
+						int jobSize = trussJobs.values().parallelStream().mapToInt(List::size).sum();
 						progress.ifPresent((p) -> p.reInit(RESTORED, jobSize, CACHE_BENEFIT));
 						loadVaultsFromCache(trussJobs, progress);
 						int totalEstimatedEffort = this.pickedVaults.size() + CACHE_BENEFIT * (jobSize - this.pickedVaults.size());
@@ -500,7 +501,7 @@ public final class VaultPicker {
 	 * @param trussJobs is the list of trusses which must be read
 	 */
 	private void loadVaultsFromFiles(TrussJobs trussJobs, Optional<ProgressManager> progress) {
-		int remainingJobSize = trussJobs.values().parallelStream().mapToInt(c -> c.size()).sum();
+		int remainingJobSize = trussJobs.values().parallelStream().mapToInt(List::size).sum();
 		progress.ifPresent((p) -> p.reInit(CACHED, remainingJobSize, 1));
 		for (Map.Entry<Path, List<VaultCollector>> trussJobsEntry : trussJobs.entrySet()) {
 			VaultReaderWriter.loadFromFile(trussJobsEntry.getKey(), trussJobsEntry.getValue());
@@ -547,7 +548,7 @@ public final class VaultPicker {
 		long nanoTime = System.nanoTime();
 		// step: build the workload map consisting of the cache key and the file path
 		trussJobs = DUPLICATE_HANDLING.getTrussJobs(trusses);
-		int jobSize = trussJobs.values().parallelStream().mapToInt(c -> c.size()).sum();
+		int jobSize = trussJobs.values().parallelStream().mapToInt(List::size).sum();
 		if (jobSize > 0) {
 			long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 			log.finer(() -> String.format("%,5d trusses    job check          time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
@@ -601,11 +602,11 @@ public final class VaultPicker {
 	 * Determine trusses in the osd files and in the native files (if supported by the device).
 	 * @param sourceFiles for osd reader (possibly link files) or for import
 	 */
-	private List<VaultCollector> getTrusses(List<SourceDataSet> sourceFiles, TreeMap<String, DeviceConfiguration> deviceConfigurations)
-			throws IOException, NotSupportedFileFormatException {
+	private List<VaultCollector> getTrusses(List<SourceDataSet> sourceFiles, TreeMap<String, DeviceConfiguration> deviceConfigurations,
+			boolean isSlowFileAccess) throws IOException, NotSupportedFileFormatException {
 		List<VaultCollector> result = new ArrayList<>();
 		for (SourceDataSet sourceFile : sourceFiles) {
-			List<VaultCollector> trusses = sourceFile.getTrusses(deviceConfigurations);
+			List<VaultCollector> trusses = sourceFile.getTrusses(deviceConfigurations, isSlowFileAccess);
 			if (!trusses.isEmpty()) {
 				for (VaultCollector truss : trusses) {
 					result.add(truss);
@@ -666,8 +667,8 @@ public final class VaultPicker {
 		return this.directoryScanner.getExcludedFiles();
 	}
 
-	public Map<DirectoryType, Path> getValidatedDirectories() {
-		return this.directoryScanner.getValidatedDirectories();
+	public SourceFolders getSourceFolders() {
+		return this.directoryScanner.getSourceFolders();
 	}
 
 	public int getDirectoryFilesCount() {

@@ -24,7 +24,6 @@ import static gde.ui.DataExplorer.TAB_INDEX_HISTO_SUMMARY;
 import static gde.ui.DataExplorer.TAB_INDEX_HISTO_TABLE;
 import static java.util.logging.Level.SEVERE;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,7 +114,7 @@ public class HistoExplorer {
 		updateHistoTabs(RebuildStep.A_HISTOSET, true);
 
 		new SupplementObjectFolder().checkAndCreate(Paths.get(settings.getDataFilePath()));
-}
+	}
 
 	/**
 	 * @return true if the trail recordset data are available
@@ -257,12 +256,9 @@ public class HistoExplorer {
 				updateHistoTableWindow(rebuildStep.scopeOfWork >= RebuildStep.E_USER_INTERFACE.scopeOfWork);
 			}
 			if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS && histoSet.getTrailRecordSet().getTimeStepSize() == 0) {
-				StringBuilder sb = new StringBuilder();
-				for (Path path : histoSet.getValidatedDirectories().values()) {
-					sb.append(path.toString()).append(GDE.STRING_NEW_LINE);
-				}
 				String objectOrDevice = application.getObjectKey().isEmpty() ? application.getActiveDevice().getName() : application.getObjectKey();
-				application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, sb.toString() }));
+				String pathText = histoSet.getSourceFolders().getDecoratedPathsCsv().replace(GDE.STRING_CSV_SEPARATOR, GDE.STRING_NEW_LINE) + GDE.STRING_NEW_LINE;
+				application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, pathText }));
 			}
 			histoSet.setRebuildStepInvisibleTabs(rebuildStep, isRebuilt);
 		} catch (Exception e) {
@@ -394,21 +390,21 @@ public class HistoExplorer {
 	 * return the first histo graphics window content as image
 	 */
 	public Image getHistoGraphicsContentAsImage() {
-		return chartTabItems.stream().filter(c -> c instanceof HistoGraphicsWindow).findFirst().map(c -> c.getContentAsImage()).orElseThrow(UnsupportedOperationException::new);
+		return chartTabItems.stream().filter(c -> c instanceof HistoGraphicsWindow).findFirst().map(AbstractChartWindow::getContentAsImage).orElseThrow(UnsupportedOperationException::new);
 	}
 
 	/**
 	 * return the first histo summary window content as image
 	 */
 	public Image getHistoSummaryContentAsImage() {
-		return chartTabItems.stream().filter(c -> c instanceof HistoSummaryWindow).findFirst().map(c -> c.getContentAsImage()).orElseThrow(UnsupportedOperationException::new);
+		return chartTabItems.stream().filter(c -> c instanceof HistoSummaryWindow).findFirst().map(AbstractChartWindow::getContentAsImage).orElseThrow(UnsupportedOperationException::new);
 	}
 
 	/**
 	 * return the histo table window content as image
 	 */
 	public Image getHistoTableContentAsImage() {
-		return tableTabItems.stream().findFirst().map(c -> c.getContentAsImage()).orElseThrow(UnsupportedOperationException::new);
+		return tableTabItems.stream().findFirst().map(HistoTableWindow::getContentAsImage).orElseThrow(UnsupportedOperationException::new);
 	}
 
 	public HistoSet getHistoSet() {
