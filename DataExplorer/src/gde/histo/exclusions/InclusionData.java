@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.histo.datasources.DirectoryScanner;
 import gde.histo.utils.SecureHash;
 import gde.log.Logger;
 import gde.utils.FileUtils;
@@ -62,10 +63,10 @@ public final class InclusionData extends Properties {
 	private final Path						dataDir;
 
 	/**
-	 * @param newDataDir
-	 * @return the instance which is only created anew if the data file directory has changed
+	 * @return the instance which is only created anew if the primary directory has changed
 	 */
-	public static InclusionData getInstance(Path newDataDir) {
+	public static InclusionData getInstance() {
+		Path newDataDir = DirectoryScanner.getPrimaryFolder();
 		if (currentInstance == null || !currentInstance.dataDir.equals(newDataDir)) {
 			currentInstance = new InclusionData(newDataDir);
 		}
@@ -86,7 +87,7 @@ public final class InclusionData extends Properties {
 	 * @return true if any inclusions for this directory are active
 	 */
 	public boolean hasIncludedRecords(String[] recordNames) {
-		return !stringPropertyNames().isEmpty() && Arrays.stream(recordNames).anyMatch(s -> stringPropertyNames().contains(s));
+		return !stringPropertyNames().isEmpty() && Arrays.stream(recordNames).anyMatch(stringPropertyNames()::contains);
 	}
 
 	/**
@@ -127,8 +128,8 @@ public final class InclusionData extends Properties {
 	@Override
 	public synchronized String toString() {
 		return this.stringPropertyNames().stream() //
-				.sorted(Comparator.comparing(k -> getProperty(k))) //
-				.map(k -> getProperty(k).isEmpty() ? k : k + GDE.STRING_BLANK_COLON_BLANK + getProperty(k)) //
+				.sorted(Comparator.comparing(this::getProperty)).map(this::getProperty) //
+				.map(k -> k.isEmpty() ? k : k + GDE.STRING_BLANK_COLON_BLANK + k) //
 				.collect(Collectors.joining(","));
 	}
 
@@ -234,16 +235,16 @@ public final class InclusionData extends Properties {
 	/**
 	 * @return the names of the records with warnings activated
 	 */
-	public String[] getIncludedRecordNames() {
-		return InclusionData.getInstance(dataDir).stringPropertyNames().toArray(new String[0]);
+	public static String[] getIncludedRecordNames() {
+		return InclusionData.getInstance().stringPropertyNames().toArray(new String[0]);
 	}
 
 	/**
 	 * @return the names of the records with warnings activated
 	 */
-	public String[] getIncludedRecordNames(String[] validRecordNames) {
-		Set<String> propertyNames = InclusionData.getInstance(dataDir).stringPropertyNames();
-		return Arrays.stream(validRecordNames).filter(s -> propertyNames.contains(s)).toArray(String[]::new);
+	public static String[] getIncludedRecordNames(String[] validRecordNames) {
+		Set<String> propertyNames = InclusionData.getInstance().stringPropertyNames();
+		return Arrays.stream(validRecordNames).filter(propertyNames::contains).toArray(String[]::new);
 	}
 
 }

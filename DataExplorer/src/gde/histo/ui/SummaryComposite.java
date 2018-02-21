@@ -56,6 +56,7 @@ import gde.data.Channels;
 import gde.data.ObjectData;
 import gde.device.IDevice;
 import gde.histo.cache.ExtendedVault;
+import gde.histo.datasources.DirectoryScanner;
 import gde.histo.datasources.DirectoryScanner.SourceFolders;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionData;
@@ -130,13 +131,19 @@ public final class SummaryComposite extends AbstractChartComposite {
 			}
 		}
 
-		public double defineScaleMin() { // todo consider caching
+		public double[] defineScaleMinMax() { // todo consider caching
 			log.finer(() -> "'" + trailRecord.getName() + "'  syncSummaryMin=" + getSyncMin() + " syncSummaryMax=" + getSyncMax());
-			return MathUtils.floorStepwise(getSyncMin(), getSyncMax() - getSyncMin());
-		}
-
-		public double defineScaleMax() { // todo consider caching
-			return MathUtils.ceilStepwise(getSyncMax(), getSyncMax() - getSyncMin());
+			double minValue = getSyncMin();
+			double maxValue = getSyncMax();
+			double deltaValueDisplay = maxValue - minValue;
+			if (Math.abs(deltaValueDisplay) < .0001) { // equal value disturbs the scaling algorithm
+				maxValue = maxValue + maxValue / 20.;
+				minValue = minValue - minValue / 20.;
+			}
+			double[] tmpMinMax = new double[] { MathUtils.floorStepwise(minValue, maxValue - minValue), //
+					MathUtils.ceilStepwise(maxValue, maxValue - minValue) };
+			log.finer(() -> "'" + trailRecord.getName() + "'  tmpMin=" + tmpMinMax[0] + " tmpMax=" + tmpMinMax[1]);
+			return tmpMinMax;
 		}
 
 		public Outliers[] getMinMaxWarning() {
@@ -403,8 +410,8 @@ public final class SummaryComposite extends AbstractChartComposite {
 				if (snappedIndices.size() == 1) {
 					TrailRecordFormatter formatter = new TrailRecordFormatter(record);
 					ExtendedVault vault = trailRecordSet.getVault(snappedIndices.get(0));
-					String outliers = Arrays.stream(record.getVaultOutliers(vault)).mapToObj(o -> formatter.getScaleValue(o)).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
-					String scraps = Arrays.stream(record.getVaultScraps(vault)).mapToObj(o -> formatter.getScaleValue(o)).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
+					String outliers = Arrays.stream(record.getVaultOutliers(vault)).mapToObj(formatter::getScaleValue).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
+					String scraps = Arrays.stream(record.getVaultScraps(vault)).mapToObj(formatter::getScaleValue).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
 					if (!outliers.isEmpty()) text += "\n o " + outliers;
 					if (!scraps.isEmpty()) text += "\n s " + scraps;
 				}
@@ -496,8 +503,8 @@ public final class SummaryComposite extends AbstractChartComposite {
 			} else if (evt.button == 3) { // right button
 				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
 				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
-				Path dataPath = application.getPresentHistoExplorer().getHistoSet().getSourceFolders().getWorkingDataPath();
-				String[] includedRecordNames = InclusionData.getInstance(dataPath).getIncludedRecordNames();
+				Path dataPath = DirectoryScanner.getPrimaryFolder();
+				String[] includedRecordNames = InclusionData.getIncludedRecordNames();
 				SummaryWarning summaryWarning = new SummaryWarning(dataPath, record != null ? record.getName() : GDE.STRING_EMPTY, includedRecordNames);
 				popupmenu.setData(TabMenuOnDemand.SUMMARY_WARNING.name(), summaryWarning);
 
@@ -623,18 +630,15 @@ public final class SummaryComposite extends AbstractChartComposite {
 		boolean isSummarySpotsVisible = settings.isSummarySpotsVisible();
 		boolean isCurveSelector = windowActor.isCurveSelectorEnabled();
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-		Path dataDir = application.getPresentHistoExplorer().getHistoSet().getSourceFolders().getWorkingDataPath();
-		Optional<InclusionData> inclusionData = InclusionData.getExistingInstance(dataDir, trailRecordSet.getRecordNames());
-		List<String> exclusiveNames = Arrays.asList(inclusionData.map(d -> d.getIncludedRecordNames(trailRecordSet.getRecordNames())).orElse(new String[0]));
+		Optional<InclusionData> inclusionData = InclusionData.getExistingInstance(DirectoryScanner.getPrimaryFolder(), trailRecordSet.getRecordNames());
+		List<String> exclusiveNames = Arrays.asList(inclusionData.map(d -> InclusionData.getIncludedRecordNames(trailRecordSet.getRecordNames())).orElse(new String[0]));
 
 		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
 			SummarySpots summarySpots = getChartData(record).getSummarySpots();
+			double[] decodedScaleMinMax = getChartData(record).defineScaleMinMax();
 
-			double decodedScaleMin = getChartData(record).defineScaleMin();
-			double decodedScaleMax = getChartData(record).defineScaleMax();
-
-			HistoCurveUtils.drawChannelItemScale(getChartData(record), canvasImageGC, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+			HistoCurveUtils.drawChannelItemScale(getChartData(record), canvasImageGC, dataScaleWidth, decodedScaleMinMax[0], decodedScaleMinMax[1], //
 					isDrawScaleInRecordColor, isDrawNumbersInRecordColor);
 			if (exclusiveNames.contains(record.getName()))
 				HistoCurveUtils.drawChannelItemWarnMarker(getChartData(record), canvasImageGC, dataScaleWidth, isDrawNumbersInRecordColor);
@@ -644,7 +648,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 				if (isSummarySpreadVisible) HistoCurveUtils.drawChannelItemSpread(getChartData(record).getSummarySpots(), canvasImageGC);
 				if (!isCurveSelector && record.isVisible()) HistoCurveUtils.drawChannelItemText(getChartData(record), canvasImageGC, isDrawNameInRecordColor);
 				if (isSummaryBoxVisible)
-					HistoCurveUtils.drawChannelItemBoxplot(getChartData(record), canvasImageGC, dataScaleWidth, decodedScaleMin, decodedScaleMax, //
+					HistoCurveUtils.drawChannelItemBoxplot(getChartData(record), canvasImageGC, dataScaleWidth, decodedScaleMinMax[0], decodedScaleMinMax[1], //
 							isDrawNumbersInRecordColor, isSpaceBelow(i));
 				if (isSummarySpotsVisible) summarySpots.drawMarkers(canvasImageGC);
 				summarySpots.drawRecentMarkers(canvasImageGC);

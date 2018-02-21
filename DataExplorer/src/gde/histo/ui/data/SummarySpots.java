@@ -346,14 +346,12 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		int tmpWidth = newDrawStripBounds.width - elementWidth; // half left and right gap for overlapping elements
 		stripNetWidth = tmpWidth - tmpWidth % elementWidth; // additional right gap because of x position delta (is the elements size)
 
-		double decodedScaleMin = summary.defineScaleMin();
-		double decodedScaleMax = summary.defineScaleMax();
+		double[] decodedScaleMinMax = summary.defineScaleMinMax();
+		xValueScaleFactor = stripNetWidth / (decodedScaleMinMax[1] - decodedScaleMinMax[0]);
+		xValueOffset = decodedScaleMinMax[0] * xValueScaleFactor - .5;
 
-		xValueScaleFactor = stripNetWidth / (decodedScaleMax - decodedScaleMin);
-		xValueOffset = decodedScaleMin * xValueScaleFactor - .5;
-
-		xPointScaleFactor = HistoSet.decodeDeltaValue(record, 1. / 1000.) / ((decodedScaleMax - decodedScaleMin) / stripNetWidth);
-		xPointOffset = HistoSet.encodeVaultValue(record, decodedScaleMin) * 1000. * xPointScaleFactor - .5;
+		xPointScaleFactor = HistoSet.decodeDeltaValue(record, 1. / 1000.) / ((decodedScaleMinMax[1] - decodedScaleMinMax[0]) / stripNetWidth);
+		xPointOffset = HistoSet.encodeVaultValue(record, decodedScaleMinMax[0]) * 1000. * xPointScaleFactor - .5;
 
 		int positionsLimit = Settings.getInstance().isSummarySpotsVisible() ? -1 : Settings.getInstance().getWarningCount();
 		xPositions.putAll(defineXPositions(positionsLimit));
@@ -590,7 +588,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		gc.setBackground(color);
 
 		int[] tukeyXPositions = defineTukeyXPositions();
-		for (Map.Entry<Integer, PosMarkers> xEntry : markerPositions.entrySet()) {
+		markerPositions.entrySet().stream().filter(x -> x.getKey() >= 0 && x.getKey() <= stripNetWidth).forEach(xEntry -> {
 			int lowerLimit = tukeyXPositions[LOWER_WHISKER.ordinal()] / elementWidth * elementWidth; // floor
 			int upperLimit = (tukeyXPositions[UPPER_WHISKER.ordinal()] / elementWidth + 1) * elementWidth; // ceiling
 			int actualWidth = xEntry.getKey() < lowerLimit || xEntry.getKey() > upperLimit ? elementWidth * 2 : elementWidth;
@@ -603,7 +601,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 				gc.fillRectangle(xEntry.getKey() + xPosOffset, yPos + yPosOffset, actualWidth, actualWidth);
 				if (log.isLoggable(FINEST)) log.log(FINEST, String.format("x=%d y=%d", xEntry.getKey() + xPosOffset, yPos + yPosOffset));
 			}
-		}
+		});
 	}
 
 	/**

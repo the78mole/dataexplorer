@@ -19,10 +19,8 @@
 
 package gde.histo.datasources;
 
-import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.OFF;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -85,6 +83,13 @@ public final class DirectoryScanner {
 	private static boolean				isValidatedObjectKey;
 
 	/**
+	 * @return the data folder residing in the top level working directory (data path + object key resp device)
+	 */
+	public static Path getPrimaryFolder() {
+		return DirectoryType.DATA.getDataSetPath();
+	}
+
+	/**
 	 * Detect valid sub paths.
 	 */
 	public static final class SourceFolders {
@@ -93,10 +98,10 @@ public final class DirectoryScanner {
 		 * Designed to hold all folder paths feeding the file scanning steps.
 		 * Supports an equality check comparing the current paths to an older path map.
 		 */
-		private final Map<DirectoryType, List<Path>> folders = new EnumMap<DirectoryType, List<Path>>(DirectoryType.class) {
-			private static final long serialVersionUID = -8624409377603884008L;
+		private final Map<DirectoryType, List<Path>>	folders							= new EnumMap<DirectoryType, List<Path>>(DirectoryType.class) {
+																																				private static final long serialVersionUID = -8624409377603884008L;
 
-			/**
+      /**
 			 * @return true if the keys are equal and the lists hold the same path strings in
 			 *         arbitrary order
 			 */
@@ -124,7 +129,10 @@ public final class DirectoryScanner {
 			}
 		};
 
-		private boolean																isSlowFolderAccess	= false;																																				// slow file system access
+		private boolean																isSlowFolderAccess	= false;																																																												// slow
+																																																																																																			// file
+																																																																																																			// system
+																																																																																																			// access
 
 		/**
 		 * Read some directory modified dates from the source folders and determine a file access speed indicator.
@@ -135,10 +143,10 @@ public final class DirectoryScanner {
 				Path rootPath = directoryType.getBasePath();
 				String modifiedCsv = "";
 				try {
-					modifiedCsv = Files.walk(rootPath).filter(Files::isDirectory).limit(3).map(p -> Long.toString(p.toFile().lastModified())).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+					modifiedCsv = Files.walk(rootPath).filter(Files::isDirectory).limit(3).map(Path::toFile) //
+							.mapToLong(File::lastModified).mapToObj(Long::toString).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					log.log(Level.SEVERE, e.getMessage(), e);
 				}
 				log.log(FINEST, "modifiedCsv=", modifiedCsv);
 				long millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime);
@@ -147,12 +155,11 @@ public final class DirectoryScanner {
 				modifiedCsv = supplementFoldersStream.map(new Function<Path, String>() {
 					@Override
 					public String apply(Path p1) {
-						if (p1.toFile().exists())
-						try {
-							return Files.walk(p1).filter(Files::isDirectory).limit(3).map(p -> Long.toString(p.toFile().lastModified())).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+						if (p1.toFile().exists()) try {
+							return Files.walk(p1).filter(Files::isDirectory).limit(3).map(Path::toFile) //
+									.mapToLong(File::lastModified).mapToObj(Long::toString).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							log.log(Level.SEVERE, e.getMessage(), e);
 						}
 						return "";
 					}
@@ -235,7 +242,7 @@ public final class DirectoryScanner {
 		 */
 		private List<Path> defineExtraPaths(DirectoryType directoryType) {
 			Stream<Path> supplementFoldersStream = directoryType.getSupplementFolders();
-			return supplementFoldersStream.map(p -> defineObjectPaths(p)) //
+			return supplementFoldersStream.map(this::defineObjectPaths) //
 					.flatMap(List::stream).collect(Collectors.toList());
 		}
 
@@ -272,22 +279,6 @@ public final class DirectoryScanner {
 			return "" + this.folders;
 		}
 
-		/**
-		 * @return the data folder residing in the top level working directory ("primary folder") or an empty path
-		 */
-		public Path getWorkingDataPath() {
-			if (folders.get(DirectoryType.DATA) != null) {
-				List<Path> rootPaths = folders.get(DirectoryType.DATA).parallelStream() //
-						.filter(p -> p.startsWith(Paths.get(Settings.getInstance().getDataFilePath()))) //
-						.filter(p -> p.relativize(Paths.get(Settings.getInstance().getDataFilePath())).getNameCount() == 1) //
-						.limit(2).collect(Collectors.toList());
-				if (rootPaths.size() != 1) throw new UnsupportedOperationException();
-				return rootPaths.get(0);
-			} else {
-				return Paths.get("");
-			}
-		}
-
 		public int getFoldersCount() {
 			return (int) values().parallelStream().flatMap(Collection::parallelStream).count();
 		}
@@ -297,12 +288,9 @@ public final class DirectoryScanner {
 		 */
 		public String getTruncatedFileNamesCsv() {
 			String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
-			return folders.values().stream().flatMap(Collection::stream) //
-					.map(p -> {
-						String fileName = p.getFileName().toString();
-						String truncatedPath = fileName.length() > 22 ? fileName.substring(0, 22) + ellipsisText : fileName;
-						return truncatedPath;
-					}).distinct().collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+			return folders.values().stream().flatMap(Collection::stream).map(Path::getFileName).map(Path::toString) //
+					.map(s -> s.length() > 22 ? s.substring(0, 22) + ellipsisText : s) //
+					.distinct().collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
 		}
 
 		/**
@@ -311,9 +299,9 @@ public final class DirectoryScanner {
 		public String getDecoratedPathsCsv() {
 			List<String> directoryTypeTexts = new ArrayList<>();
 			for (Entry<DirectoryType, List<Path>> directoryEntry : folders.entrySet()) {
-				String text = directoryEntry.getValue().stream().map(p -> {
-					return directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + p.toString();
-				}).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+				String text = directoryEntry.getValue().stream().map(Path::toString) //
+						.map(p -> directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + p) //
+						.collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
 				directoryTypeTexts.add(text);
 			}
 			return directoryTypeTexts.stream().collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
@@ -353,7 +341,9 @@ public final class DirectoryScanner {
 
 			@Override
 			public Path getDataSetPath() {
-				String subPathData = application.getActiveObject() == null ? device.getDeviceConfiguration().getPureDeviceName() : application.getObjectKey();
+				String subPathData = application.getActiveObject() == null
+						? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getPureDeviceName() //
+						: application.getObjectKey();
 				return Paths.get(Settings.getInstance().getDataFilePath()).resolve(subPathData);
 			}
 
@@ -361,8 +351,8 @@ public final class DirectoryScanner {
 			public List<String> getDataSetExtensions() {
 				List<String> result = new ArrayList<>();
 				result.add(GDE.FILE_ENDING_OSD);
-				if (device instanceof IHistoDevice && Settings.getInstance().getSearchDataPathImports()) {
-					result.addAll(((IHistoDevice) device).getSupportedImportExtentions());
+				if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice && Settings.getInstance().getSearchDataPathImports()) {
+					result.addAll(((IHistoDevice) DataExplorer.getInstance().getActiveDevice()).getSupportedImportExtentions());
 				}
 				return result;
 			}
@@ -371,11 +361,17 @@ public final class DirectoryScanner {
 			public Stream<Path> getSupplementFolders() {
 				try {
 					return Arrays.stream(Settings.getInstance().getDataFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
-							.map(p -> Paths.get(p.trim()));
+							.map(String::trim).map(Paths::get);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					return Stream.empty();
 				}
+			}
+
+			@Override
+			public boolean isActive() {
+				boolean isEmptyPath = getDataSetPath().equals(Paths.get(""));
+				return !isEmptyPath || getSupplementFolders().filter(p -> !p.equals(Paths.get(""))).anyMatch(e -> true);
 			}
 		},
 		IMPORT {
@@ -399,8 +395,8 @@ public final class DirectoryScanner {
 
 			@Override
 			public Path getDataSetPath() {
-				if (device instanceof IHistoDevice && Settings.getInstance().getSearchImportPath()) {
-					Path importDir = device.getDeviceConfiguration().getImportBaseDir();
+				if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice && Settings.getInstance().getSearchImportPath()) {
+					Path importDir = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getImportBaseDir();
 					if (importDir == null) {
 						return null;
 					} else {
@@ -414,8 +410,8 @@ public final class DirectoryScanner {
 
 			@Override
 			public List<String> getDataSetExtensions() {
-				if (device instanceof IHistoDevice && Settings.getInstance().getSearchImportPath())
-					return ((IHistoDevice) device).getSupportedImportExtentions();
+				if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice && Settings.getInstance().getSearchImportPath())
+					return ((IHistoDevice) DataExplorer.getInstance().getActiveDevice()).getSupportedImportExtentions();
 				else
 					return new ArrayList<>();
 			}
@@ -424,16 +420,27 @@ public final class DirectoryScanner {
 			public Stream<Path> getSupplementFolders() {
 				try {
 					return Arrays.stream(Settings.getInstance().getImportFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
-							.map(p -> Paths.get(p.trim()));
+							.map(String::trim).map(Paths::get);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					return Stream.empty();
 				}
 			}
+
+			@Override
+			public boolean isActive() {
+				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtensions().isEmpty() + " SupplementFolders.exist=" + getSupplementFolders().filter(p -> !p.equals(Paths.get(""))).anyMatch(e -> true) + " dataSetPath=" + getDataSetPath());
+				if (getDataSetExtensions().isEmpty()) {
+					return false;
+				} else {
+					Path dataSetPath = getDataSetPath();
+					boolean isValidPath = dataSetPath != null && !dataSetPath.equals(Paths.get(""));
+					return isValidPath || getSupplementFolders().filter(p -> !p.equals(Paths.get(""))).anyMatch(e -> true);
+				}
+			}
 		};
 
-		private final static DataExplorer	application	= DataExplorer.getInstance();
-		private final static IDevice			device			= DataExplorer.getInstance().getActiveDevice();
+		private final static DataExplorer application = DataExplorer.getInstance();
 
 		/**
 		 * @return the current directory path independent from object / device or null
@@ -454,6 +461,11 @@ public final class DirectoryScanner {
 		 * @return the supported file extensions or an empty list
 		 */
 		public abstract List<String> getDataSetExtensions();
+
+		/**
+		 * @return true if the prerequisites for the directory type are fulfilled
+		 */
+		public abstract boolean isActive();
 
 		public abstract Stream<Path> getSupplementFolders();
 	}
@@ -480,7 +492,14 @@ public final class DirectoryScanner {
 					if (actualFile != null) {
 						String linkPath = !dataFile.getFile().equals(actualFile) ? dataFile.getFile().getAbsolutePath() : GDE.STRING_EMPTY;
 						String objectDirectory = dataFile.getObjectKey(deviceConfigurations);
-						for (VaultCollector truss : HistoOsdReaderWriter.readTrusses(actualFile, objectDirectory)) {
+						List<VaultCollector> trussList;
+						try {
+							trussList = HistoOsdReaderWriter.readTrusses(actualFile, objectDirectory);
+						} catch (FileNotFoundException e) { // link file points to non existent file
+							log.log(Level.SEVERE, e.getMessage(), e);
+							trussList = new ArrayList<>();
+						}
+						for (VaultCollector truss : trussList) {
 							truss.getVault().setLogLinkPath(linkPath);
 							truss.setSourceDataSet(dataFile);
 							if (isValidObject(truss)) trusses.add(truss);
@@ -562,8 +581,8 @@ public final class DirectoryScanner {
 			 * @param isSlowFolderAccess
 			 * @return the vault skeletons delivered by the source file based on the current device (and channel and object in case of bin files)
 			 */
-			abstract List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile, boolean isSlowFolderAccess)
-					throws IOException, NotSupportedFileFormatException;
+			abstract List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile,
+					boolean isSlowFolderAccess) throws IOException, NotSupportedFileFormatException;
 
 			/**
 			 * Promote trusses into vaults by reading the source file.
@@ -748,8 +767,10 @@ public final class DirectoryScanner {
 	public List<SourceDataSet> readSourceFiles4Test(Path filePath) throws IOException, NotSupportedFileFormatException {
 		this.initialize();
 
+		validatedFolders = new SourceFolders();
 		validatedFolders.defineDirectories4Test(filePath);
-		validatedFolders.values().parallelStream().flatMap(List::stream).forEach(p -> FileUtils.checkDirectoryAndCreate(p.toString()));
+		validatedFolders.values().parallelStream().flatMap(List::stream).map(Path::toString) //
+				.forEach(FileUtils::checkDirectoryAndCreate);
 
 		return readSourceFiles();
 	}
@@ -773,12 +794,10 @@ public final class DirectoryScanner {
 			this.validatedChannel = this.application.getActiveChannel();
 
 			this.validatedDirectoryTypes.clear();
-			this.validatedDirectoryTypes.add(DirectoryType.DATA);
-			this.validatedImportExtentions = DirectoryType.IMPORT.getDataSetExtensions();
-			Path importPath = DirectoryType.IMPORT.getDataSetPath();
-			if (!this.validatedImportExtentions.isEmpty() && importPath != null) {
-				this.validatedDirectoryTypes.add(DirectoryType.IMPORT);
+			for (DirectoryType directoryType : DirectoryType.values()) {
+				if (directoryType.isActive()) this.validatedDirectoryTypes.add(directoryType);
 			}
+
 			this.validatedFolders = new SourceFolders();
 			this.isSlowFolderAccess = this.validatedFolders.isSlowFolderAccess(validatedDirectoryTypes);
 			this.validatedFolders.defineDirectories(validatedDirectoryTypes); // *
@@ -789,12 +808,8 @@ public final class DirectoryScanner {
 		isChange = isChange || (lastDevice != null ? !lastDevice.getName().equals(this.validatedDevice.getName()) : this.validatedDevice != null);
 		isChange = isChange || (lastChannel != null ? !lastChannel.getChannelConfigKey().equals(this.validatedChannel.getChannelConfigKey())
 				: this.validatedChannel != null);
-
 		isChange = isChange || (lastFolders != null ? !lastFolders.equals(this.validatedFolders) : true);
-		log.log(OFF, "isChange=", isChange + "  lastFolders.equals=" + (lastFolders != null ? !lastFolders.equals(this.validatedFolders) : true));
-
 		isChange = isChange || !lastImportExtentions.containsAll(this.validatedImportExtentions) || !this.validatedImportExtentions.containsAll(lastImportExtentions);
-		log.log(FINE, "isChange=", isChange); //$NON-NLS-1$
 
 		return !isChange;
 	}

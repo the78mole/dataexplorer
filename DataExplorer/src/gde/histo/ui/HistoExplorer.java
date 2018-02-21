@@ -111,6 +111,7 @@ public class HistoExplorer {
 		for (AbstractChartWindow c : chartTabItems) {
 			resetWindowHeaderAndMeasuring(c);
 		}
+		histoSet.initialize();
 		updateHistoTabs(RebuildStep.A_HISTOSET, true);
 
 		new SupplementObjectFolder().checkAndCreate(Paths.get(settings.getDataFilePath()));

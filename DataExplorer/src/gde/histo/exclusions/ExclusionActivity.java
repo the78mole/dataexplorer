@@ -19,13 +19,8 @@
 
 package gde.histo.exclusions;
 
-import static java.util.logging.Level.FINE;
-
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
 
-import gde.log.Logger;
 import gde.ui.DataExplorer;
 
 /**
@@ -33,26 +28,15 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert (USER)
  */
 public final class ExclusionActivity {
-	private final static String	$CLASS_NAME	= ExclusionActivity.class.getName();
-	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	/**
-	 * Delete the exclusion files belonging to the directories with ignored files.
+	 * Delete the exclusion file belonging to the primary directory.
 	 * The exclusion information is deleted in any case, e.g. if the suppress mode is currently OFF.
-	 * @param defaultPath
 	 */
-	public static void clearExcludeLists(Path defaultPath) {
+	public static void clearExcludeLists() {
 		if (!DataExplorer.getInstance().getHistoExplorer().isPresent()) throw new UnsupportedOperationException();
 
-		Set<Path> exclusionDirectories = new HashSet<>();
-		if (defaultPath != null) exclusionDirectories.add(defaultPath);
-		for (Path path : DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths()) {
-			exclusionDirectories.add(path.getParent());
-		}
-		for (Path ignorePath : exclusionDirectories) {
-			ExclusionData.getInstance(ignorePath).delete();
-			log.log(FINE, "deleted : ", ignorePath); //$NON-NLS-1$
-		}
+		ExclusionData.getInstance().delete();
 	}
 
 	/**
@@ -60,7 +44,7 @@ public final class ExclusionActivity {
 	 * @param recordsetBaseName empty string sets ignore to the file in total
 	 */
 	public static synchronized void setExcludeRecordSet(Path filePath, String recordsetBaseName) {
-		final ExclusionData fileExclusionData = ExclusionData.getInstance(filePath.getParent());
+		final ExclusionData fileExclusionData = ExclusionData.getInstance();
 		if (recordsetBaseName.isEmpty())
 			fileExclusionData.setProperty((filePath.getFileName().toString()));
 		else

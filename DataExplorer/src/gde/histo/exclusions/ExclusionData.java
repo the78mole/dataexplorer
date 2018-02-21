@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.histo.datasources.DirectoryScanner;
 import gde.histo.utils.SecureHash;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -61,10 +62,10 @@ public final class ExclusionData extends Properties {
 	private final Path						dataFileDir;
 
 	/**
-	 * @param newDataFileDir
-	 * @return the instance which is only created anew if the data file directory has changed
+	 * @return the instance which is only created anew if the primary directory has changed
 	 */
-	public static ExclusionData getInstance(Path newDataFileDir) {
+	public static ExclusionData getInstance() {
+		Path newDataFileDir = DirectoryScanner.getPrimaryFolder();
 		if (currentInstance == null || !currentInstance.dataFileDir.equals(newDataFileDir)) {
 			currentInstance = new ExclusionData(newDataFileDir);
 		}
@@ -76,7 +77,7 @@ public final class ExclusionData extends Properties {
 	 */
 	public static boolean isExcluded(Path dataFilePath) {
 		if (Settings.getInstance().isSuppressMode()) {
-			String exclusionValue = getInstance(dataFilePath.getParent()).getProperty(dataFilePath.getFileName().toString());
+			String exclusionValue = getInstance().getProperty(dataFilePath.getFileName().toString());
 			boolean result = exclusionValue != null && exclusionValue.isEmpty();
 			if (result) log.log(FINE, "file excluded ", dataFilePath); //$NON-NLS-1$
 			return result;
@@ -92,7 +93,7 @@ public final class ExclusionData extends Properties {
 		if (recordsetBaseName.isEmpty()) throw new UnsupportedOperationException();
 
 		if (Settings.getInstance().isSuppressMode()) {
-			String exclusionValue = getInstance(dataFilePath.getParent()).getProperty(dataFilePath.getFileName().toString());
+			String exclusionValue = getInstance().getProperty(dataFilePath.getFileName().toString());
 			boolean result = exclusionValue != null && (exclusionValue.isEmpty() || exclusionValue.contains(recordsetBaseName));
 			if (result) log.fine(() -> String.format("recordset excluded %s %s", dataFilePath.toString(), recordsetBaseName)); //$NON-NLS-1$
 			return result;
@@ -119,16 +120,17 @@ public final class ExclusionData extends Properties {
 	}
 
 	/**
+	 * Determine the exclusions which are active for the current channel.
 	 * @return the exclusion information for the trusses excluded from the history
 	 */
 	public static String[] getExcludedTrusses() {
-		return DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths().stream().distinct() //
+		return DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths().stream() //
 				.map(p -> {
 					String key = p.getFileName().toString();
-					String property = getInstance(p.getParent()).getProperty(key);
+					String property = getInstance().getProperty(key);
 					return (property.isEmpty() ? key : key + GDE.STRING_BLANK_COLON_BLANK + property);
 				}) //
-				.sorted(Collections.reverseOrder()) //
+				.distinct().sorted(Collections.reverseOrder()) //
 				.toArray(String[]::new);
 	}
 
@@ -140,8 +142,8 @@ public final class ExclusionData extends Properties {
 
 	@Override
 	public synchronized String toString() {
-		return this.stringPropertyNames().stream().sorted() //
-				.map(k -> getProperty(k).isEmpty() ? k : k + GDE.STRING_BLANK_COLON_BLANK + getProperty(k)) //
+		return this.stringPropertyNames().stream().sorted().map(this::getProperty) //
+				.map(k -> k.isEmpty() ? k : k + GDE.STRING_BLANK_COLON_BLANK + getProperty(k)) //
 				.collect(Collectors.joining(GDE.STRING_NEW_LINE));
 	}
 
@@ -249,6 +251,7 @@ public final class ExclusionData extends Properties {
 
 	public void delete() {
 		Path exclusionsDir = getUserExclusionsDir();
+		log.log(FINE, "deleted : ", exclusionsDir);
 		FileUtils.deleteFile(this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toString());
 		String fileName = SecureHash.sha1(this.dataFileDir.toString());
 		FileUtils.deleteFile(this.dataFileDir.resolve(exclusionsDir.resolve(fileName)).toString());

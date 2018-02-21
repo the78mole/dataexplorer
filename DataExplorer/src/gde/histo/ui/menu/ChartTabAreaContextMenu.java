@@ -140,8 +140,8 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				} else {
 					setCoreEnabled(true);
 					setTrackEnabled(true);
-					trackItem.setEnabled(warning.map(w -> w.isValid()).orElse(true));
-					isExclusiveWarning.setEnabled(warning.map(w -> w.isValid()).orElse(false));
+					trackItem.setEnabled(warning.map(SummaryWarning::isValid).orElse(true));
+					isExclusiveWarning.setEnabled(warning.map(SummaryWarning::isValid).orElse(false));
 
 					setColorEnabled(true);
 
@@ -158,9 +158,12 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 						setDataPathItems(popupMenu, Paths.get(dataFilePath));
 					}
 				}
-				isExclusiveWarning.setText(Messages.getString(MessageIds.GDE_MSGT0915) + warning.map(w -> w.getDisplayRecordName()).orElse(GDE.STRING_EMPTY));
-				isExclusiveWarning.setSelection(warning.map(w -> w.isExclusiveRecord()).orElse(false));
-				String warningList = warning.map(w -> w.getDisplayNames() + GDE.STRING_NEW_LINE).orElse(GDE.STRING_EMPTY);
+				isExclusiveWarning.setText(Messages.getString(MessageIds.GDE_MSGT0915) + warning.map(SummaryWarning::getDisplayRecordName).orElse(GDE.STRING_EMPTY));
+				isExclusiveWarning.setSelection(warning.map(SummaryWarning::isExclusiveRecord).orElse(false));
+				String warningList = warning.map(w -> {
+					String includedNames = w.getDisplayNames();
+					return includedNames.isEmpty() ? includedNames : includedNames + GDE.STRING_NEW_LINE;
+				}).orElse(GDE.STRING_EMPTY);
 				if (!GDE.IS_OS_ARCH_ARM) clearExclusiveWarnings.setToolTipText(warningList + Messages.getString(MessageIds.GDE_MSGT0918));
 				if (!GDE.IS_OS_ARCH_ARM) trackItem.setToolTipText(warningList + Messages.getString(MessageIds.GDE_MSGT0891));
 
@@ -368,7 +371,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "isEclusiveWarning.widgetSelected, event=" + evt);
 					warning.ifPresent(w -> {
-						InclusionData inclusionData = InclusionData.getInstance(w.dataPath);
+						InclusionData inclusionData = InclusionData.getInstance();
 						if (isExclusiveWarning.getSelection()) {
 							inclusionData.setProperty(w.recordName);
 						} else {
@@ -389,7 +392,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "isEclusiveWarning.widgetSelected, event=" + evt);
 					warning.ifPresent(w -> {
-						InclusionData.getInstance(w.dataPath).delete();
+						InclusionData.getInstance().delete();
 						presentHistoExplorer.updateHistoTabs(false, false);
 					});
 				}

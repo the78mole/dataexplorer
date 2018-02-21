@@ -319,10 +319,10 @@ public abstract class AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "hideMenuFileItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 					String dataFilePath = (String) popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString());
-					Path path = dataFilePath != null ? Paths.get(dataFilePath.toString()).getParent() : null;
-					ExclusionActivity.clearExcludeLists(path);
-
-					presentHistoExplorer.resetHisto();
+					if (dataFilePath != null) {
+						ExclusionActivity.clearExcludeLists();
+						presentHistoExplorer.resetHisto();
+					}
 				}
 			});
 		}

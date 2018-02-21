@@ -56,7 +56,7 @@ public final class HistoSet {
 
 	private static final double	TOLERANCE											= .000000001;
 
-	private final VaultPicker		vaultPicker;
+	private VaultPicker		vaultPicker;
 
 	/**
 	 * We allow 1 lower and 1 upper outlier for a log with 740 measurements
@@ -317,6 +317,13 @@ public final class HistoSet {
 	private RebuildStep rebuildStepInvisibleTab = HistoSet.RebuildStep.E_USER_INTERFACE;
 
 	public HistoSet() {
+		initialize();
+	}
+
+	/**
+	 *
+	 */
+	public void initialize() {
 		this.vaultPicker = new VaultPicker();
 		this.vaultPicker.initialize();
 	}
