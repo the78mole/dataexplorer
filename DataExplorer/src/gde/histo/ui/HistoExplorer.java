@@ -285,6 +285,13 @@ public class HistoExplorer {
 		settings.setCurveSurvey(enabled);
 	}
 
+	/**
+	 * Reduce visible measurements based on the curve selector.
+	 */
+	public void enablePartialDataTable(boolean enabled) {
+		settings.setPartialDataTable(enabled);
+	}
+
 	public void updateVisibleTab(SelectionEvent evt) {
 		if (isHistoChartWindowVisible()) {
 			log.log(Level.FINER, "HistoChartWindow in displayTab.widgetSelected, event=", evt); //$NON-NLS-1$

@@ -95,7 +95,7 @@ public class MenuBar {
 	MenuItem										nextChartItem;
 	Menu												viewMenu;
 	MenuItem										viewMenuItem;
-	private MenuItem						suppressModeItem;
+	private MenuItem						suppressModeItem, partialTableMenuItem;
 	Menu												graphicsMenu;
 	MenuItem										graphicsMenuItem, saveDefaultGraphicsTemplateItem, restoreDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem;
 	MenuItem										csvExportMenuItem1, csvExportMenuItem2, csvExportMenuItem3;
@@ -878,6 +878,23 @@ public class MenuBar {
 					});
 				}
 				{
+					this.partialTableMenuItem = new MenuItem(this.viewMenu, SWT.CHECK);
+					this.partialTableMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0704));
+					if (!GDE.IS_OS_ARCH_ARM) this.partialTableMenuItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0705));
+					this.partialTableMenuItem.setSelection(settings.isPartialDataTable());
+					this.partialTableMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "partialTableMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.this.application.getHistoExplorer().ifPresent(h -> {
+								h.enablePartialDataTable(MenuBar.this.partialTableMenuItem.getSelection());
+								h.updateHistoChartWindow(MenuBar.this.partialTableMenuItem.getSelection());
+								h.updateHistoTableWindow(MenuBar.this.partialTableMenuItem.getSelection());
+							});
+						}
+					});
+				}
+				{
 					new MenuItem(this.viewMenu, SWT.SEPARATOR);
 				}
 				{
@@ -1367,7 +1384,6 @@ public class MenuBar {
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "widgetArmed, event=" + e); //$NON-NLS-1$
 		}
 	};
-
 	static MenuItem getItem(Menu menu, int id) {
 		MenuItem[] items = menu.getItems();
 		for (MenuItem item : items) {
@@ -1414,5 +1430,13 @@ public class MenuBar {
 
 	public void setGraphicsCurveSurveyMenuItem(MenuItem graphicsCurveSurveyMenuItem) {
 		this.graphicsCurveSurveyMenuItem = graphicsCurveSurveyMenuItem;
+	}
+
+	public MenuItem getPartialTableMenuItem() {
+		return partialTableMenuItem;
+	}
+
+	public void setPartialTableMenuItem(MenuItem partialTableMenuItem) {
+		this.partialTableMenuItem = partialTableMenuItem;
 	}
 }

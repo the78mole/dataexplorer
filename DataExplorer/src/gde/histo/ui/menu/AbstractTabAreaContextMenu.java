@@ -162,7 +162,9 @@ public abstract class AbstractTabAreaContextMenu {
 				@Override
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "partialTableItem action performed! " + e); //$NON-NLS-1$
-					Settings.getInstance().setPartialDataTable(partialTableItem.getSelection());
+					boolean selection = partialTableItem.getSelection();
+					application.getMenuBar().getPartialTableMenuItem().setSelection(selection);
+					presentHistoExplorer.enablePartialDataTable(selection);
 					presentHistoExplorer.updateHistoTabs(false, false);
 				}
 			});
@@ -352,6 +354,7 @@ public abstract class AbstractTabAreaContextMenu {
 		displayGraphicsHeaderItem.setSelection(application.getMenuBar().getGraphicsHeaderMenuItem().getSelection());
 		displayGraphicsCommentItem.setSelection(application.getMenuBar().getRecordCommentMenuItem().getSelection());
 		displayGraphicsCurveSurvey.setSelection(application.getMenuBar().getGraphicsCurveSurveyMenuItem().getSelection());
+		partialTableItem.setSelection(application.getMenuBar().getPartialTableMenuItem().getSelection());
 
 		String excludedList = (String) popupMenu.getData(TabMenuOnDemand.EXCLUDED_LIST.toString());
 		if (excludedList == null) excludedList = GDE.STRING_EMPTY;
