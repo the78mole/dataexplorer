@@ -121,7 +121,7 @@ public final class DirectoryScanner {
 						isEqual &= thisSet.equals(thatSet);
 						if (!isEqual) break;
 					}
-					log.log(Level.OFF, "isEqual=", isEqual);
+					log.log(Level.FINEST, "isEqual=", isEqual);
 					return isEqual;
 				} else {
 					return false;
@@ -141,6 +141,8 @@ public final class DirectoryScanner {
 			long startNanoTime = System.nanoTime();
 			for (DirectoryType directoryType : directoryTypes) {
 				Path rootPath = directoryType.getBasePath();
+				if (rootPath == null) continue;
+
 				String modifiedCsv = "";
 				try {
 					modifiedCsv = Files.walk(rootPath).filter(Files::isDirectory).limit(3).map(Path::toFile) //
@@ -228,7 +230,7 @@ public final class DirectoryScanner {
 				result = Files.walk(basePath).filter(Files::isDirectory) //
 						.filter(p -> p.getFileName().equals(Paths.get(objectKey))).collect(Collectors.toList());
 			} catch (IOException e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
+				log.log(Level.SEVERE, e.getMessage(), " is not accessible : " + e.getClass());
 			}
 			if (isSlowFolderAccess) DataExplorer.getInstance().setStatusMessage("");
 			return result;
@@ -370,8 +372,8 @@ public final class DirectoryScanner {
 
 			@Override
 			public boolean isActive() {
-				boolean isEmptyPath = getDataSetPath().equals(Paths.get(""));
-				return !isEmptyPath || getSupplementFolders().filter(p -> !p.equals(Paths.get(""))).anyMatch(e -> true);
+				// the DataSetPath is always a valid path
+				return true;
 			}
 		},
 		IMPORT {
@@ -420,7 +422,7 @@ public final class DirectoryScanner {
 			public Stream<Path> getSupplementFolders() {
 				try {
 					return Arrays.stream(Settings.getInstance().getImportFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
-							.map(String::trim).map(Paths::get);
+							.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					return Stream.empty();
@@ -429,13 +431,11 @@ public final class DirectoryScanner {
 
 			@Override
 			public boolean isActive() {
-				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtensions().isEmpty() + " SupplementFolders.exist=" + getSupplementFolders().filter(p -> !p.equals(Paths.get(""))).anyMatch(e -> true) + " dataSetPath=" + getDataSetPath());
+				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtensions().isEmpty() + " SupplementFolders.exist=" + getSupplementFolders().anyMatch(e -> true) + " dataSetPath=" + getDataSetPath());
 				if (getDataSetExtensions().isEmpty()) {
 					return false;
 				} else {
-					Path dataSetPath = getDataSetPath();
-					boolean isValidPath = dataSetPath != null && !dataSetPath.equals(Paths.get(""));
-					return isValidPath || getSupplementFolders().filter(p -> !p.equals(Paths.get(""))).anyMatch(e -> true);
+					return getDataSetPath() != null || getSupplementFolders().anyMatch(e -> true);
 				}
 			}
 		};
@@ -453,7 +453,8 @@ public final class DirectoryScanner {
 		public abstract Path getActiveDeviceSubPath();
 
 		/**
-		 * @return the current directory path which depends on the object and the device or null
+		 * @return the current directory path which depends on the object and the device</br>
+		 *         or null if the device does not support imports or if the import path is empty
 		 */
 		public abstract Path getDataSetPath();
 
