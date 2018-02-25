@@ -22,13 +22,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -61,10 +58,10 @@ import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.xml.sax.SAXParseException;
 
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
+import gde.config.DeviceConfigurations;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -136,7 +133,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	CCombo																deviceSelectCombo;
 	CTabFolder														settingsTabFolder;
 
-	TreeMap<String, DeviceConfiguration>	deviceConfigurations;
+	DeviceConfigurations									deviceConfigurations;
 	Vector<String>												activeDevices;
 	final DataExplorer										application;
 	final Settings												settings;
@@ -164,60 +161,15 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			if (!file.exists()) throw new FileNotFoundException(this.settings.getDevicesPath());
 			String[] files = file.list();
 
-			this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
-			this.activeDevices = new Vector<String>(2, 1);
-			initialize(files);
+			this.deviceConfigurations = new DeviceConfigurations(files, this.activeDeviceName);
+			this.activeDevices = this.deviceConfigurations.getActiveDevices();
+			this.selectedActiveDeviceConfig = this.deviceConfigurations.getSelectedActiveDeviceConfig();
 			if (this.selectedActiveDeviceConfig == null) this.application.setActiveDevice(null);
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			currentApplication.openMessageDialog(this.dialogShell, Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
-	}
-
-	/**
-	 * goes through the existing INI files and set active flagged devices into active devices list.
-	 * Fills the DeviceConfigurations list.
-	 */
-	public void initialize(String[] files){
-		DeviceConfiguration devConfig;
-
-		for (int i = 0; files != null && i < files.length; i++) {
-			try {
-				// loop through all device properties XML and check if device used
-				if (files[i].endsWith(GDE.FILE_ENDING_DOT_XML)) {
-					String deviceKey = files[i].substring(0, files[i].length() - 4);
-					devConfig = new DeviceConfiguration(this.settings.getDevicesPath() + GDE.FILE_SEPARATOR_UNIX + files[i]);
-					if (devConfig.getName().equals(this.activeDeviceName) && devConfig.isUsed()) { // define the active device after re-start
-						this.selectedActiveDeviceConfig = devConfig;
-					}
-					// add the active once into the active device vector
-					if (devConfig.isUsed() && !this.activeDevices.contains(devConfig.getName())) this.activeDevices.add(devConfig.getName());
-
-					// store all device configurations in a map
-					String keyString;
-					if (devConfig.getName() != null)
-						keyString = devConfig.getName();
-					else {
-						devConfig.setName(deviceKey);
-						keyString = deviceKey;
-					}
-					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, deviceKey + GDE.STRING_MESSAGE_CONCAT + keyString);
-					this.deviceConfigurations.put(keyString, devConfig);
-				}
-			}
-			catch (JAXBException e) {
-				log.log(Level.WARNING, files[i], e);
-				if (e.getLinkedException() instanceof SAXParseException) {
-					SAXParseException spe = (SAXParseException) e.getLinkedException();
-					GDE.setInitError(Messages.getString(MessageIds.GDE_MSGW0038, new String[] { spe.getSystemId().replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK), spe.getLocalizedMessage() }));
-				}
-			}
-			catch (Exception e) {
-				log.log(Level.WARNING, e.getMessage(), e);
-			}
-		}
-		log.log(Level.TIME, "device init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
 	}
 
 	public void open() {
@@ -1207,6 +1159,13 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * @return the devices
 	 */
 	public TreeMap<String, DeviceConfiguration> getDevices() {
+		return this.deviceConfigurations.getAllConfigurations();
+	}
+
+	/**
+	 * @return the deviceConfigurations
+	 */
+	public DeviceConfigurations getDeviceConfigurations() {
 		return this.deviceConfigurations;
 	}
 

@@ -84,6 +84,7 @@ import org.eclipse.swt.widgets.TaskItem;
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
 import gde.comm.IDeviceCommPort;
+import gde.config.DeviceConfigurations;
 import gde.config.Settings;
 import gde.data.AbstractRecordSet;
 import gde.data.Channel;
@@ -232,6 +233,7 @@ public class DataExplorer extends Composite {
 
 	final FileTransfer						fileTransfer											= FileTransfer.getInstance();
 	Transfer[]										types															= new Transfer[] { this.fileTransfer };
+	private DeviceConfigurations	deviceConfigurations							= null;
 
 	/**
 	 * main application class constructor
@@ -1118,6 +1120,18 @@ public class DataExplorer extends Composite {
 
 	public DeviceSelectionDialog getDeviceSelectionDialog() {
 		return this.deviceSelectionDialog;
+	}
+
+	public DeviceConfigurations getDeviceConfigurations() {
+		if (this.deviceConfigurations == null) {
+			if (this.deviceSelectionDialog != null) {
+				this.deviceConfigurations = getDeviceSelectionDialog().getDeviceConfigurations();
+			} else {
+				File file = new File(Settings.getInstance().getDevicesPath());
+				this.deviceConfigurations = new DeviceConfigurations(file.list());
+			}
+		}
+		return this.deviceConfigurations;
 	}
 
 	public void setStatusMessage(final String message, final int swtColor) {
