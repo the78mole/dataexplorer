@@ -19,12 +19,15 @@
 
 package gde.config;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
@@ -156,5 +159,25 @@ public final class DeviceConfigurations {
 	 */
 	public DeviceConfiguration getSelectedActiveDeviceConfig() {
 		return this.selectedActiveDeviceConfig;
+	}
+
+	/**
+	 * @return the supported lowercase file extensions (e.g. '.bin') or an empty set
+	 */
+	public Set<String>  getValidLogExtentions() {
+		Set<String> result = getImportExtentions();
+		result.add(GDE.FILE_ENDING_DOT_OSD);
+		return result;
+	}
+
+	/**
+	 * @return the supported lowercase file extensions (e.g. '.bin') or an empty set
+	 */
+	public Set<String>  getImportExtentions() {
+		Set<String> extentions = this.configs.values().parallelStream() //
+				.map(c -> Arrays.asList(c.getDataBlockPreferredFileExtention().split(GDE.STRING_CSV_SEPARATOR))).flatMap(Collection::stream) //
+				.map(s-> s.substring(s.lastIndexOf(GDE.STRING_DOT))).map(e-> e.toLowerCase()) //
+				.collect(Collectors.toSet());
+		return extentions;
 	}
 }
