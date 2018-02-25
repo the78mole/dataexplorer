@@ -96,7 +96,7 @@ public class HistoSetTest extends TestSuperClass { // TODO for junit tests in ge
 							for (Entry<Integer, Channel> channelEntry : this.channels.entrySet()) {
 								this.channels.setActiveChannelNumber(channelEntry.getKey());
 
-								histoSet.rebuild4Test(sourcePath, this.deviceConfigurations);
+								histoSet.rebuild4Test(sourcePath);
 								int tmpSize = histoSet.getTrailRecordSet().getTimeStepSize();
 								if (tmpSize > 0) {
 									System.out.println(String.format("%40.44s channelNumber=%2d  histoSetSize==%,11d", //

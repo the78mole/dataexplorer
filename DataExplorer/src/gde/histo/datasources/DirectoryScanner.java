@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Function;
@@ -49,10 +48,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import gde.GDE;
+import gde.config.DeviceConfigurations;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
@@ -459,7 +458,7 @@ public final class DirectoryScanner {
 		public abstract Path getDataSetPath();
 
 		/**
-		 * @return the supported file extensions or an empty list
+		 * @return the supported file extensions (e.g. '*.bin') or an empty list
 		 */
 		public abstract List<String> getDataSetExtensions();
 
@@ -486,13 +485,13 @@ public final class DirectoryScanner {
 		public enum DataSetType {
 			OSD {
 				@Override
-				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile, boolean isSlowFolderAccess)
+				List<VaultCollector> getTrusses(SourceDataSet dataFile, boolean isSlowFolderAccess)
 						throws IOException, NotSupportedFileFormatException {
 					List<VaultCollector> trusses = new ArrayList<>();
 					File actualFile = dataFile.getActualFile();
 					if (actualFile != null) {
 						String linkPath = !dataFile.getFile().equals(actualFile) ? dataFile.getFile().getAbsolutePath() : GDE.STRING_EMPTY;
-						String objectDirectory = dataFile.getObjectKey(deviceConfigurations);
+						String objectDirectory = dataFile.getObjectKey();
 						List<VaultCollector> trussList;
 						try {
 							trussList = HistoOsdReaderWriter.readTrusses(actualFile, objectDirectory);
@@ -526,10 +525,10 @@ public final class DirectoryScanner {
 			},
 			BIN {
 				@Override
-				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile, boolean isSlowFolderAccess)
+				List<VaultCollector> getTrusses(SourceDataSet dataFile, boolean isSlowFolderAccess)
 						throws IOException, NotSupportedFileFormatException {
 					if (isSlowFolderAccess) DataExplorer.getInstance().setStatusMessage("get file properties    " + dataFile.path.toString());
-					String objectDirectory = dataFile.getObjectKey(deviceConfigurations);
+					String objectDirectory = dataFile.getObjectKey();
 					String recordSetBaseName = DataExplorer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend(dataFile.getFile().getName());
 					VaultCollector truss = new VaultCollector(objectDirectory, dataFile.getFile(), 0, Channels.getInstance().size(), recordSetBaseName,
 							providesReaderSettings());
@@ -558,9 +557,9 @@ public final class DirectoryScanner {
 			},
 			LOG { // was not merged with bin - we expect differences in the future
 				@Override
-				List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile, boolean isSlowFolderAccess)
+				List<VaultCollector> getTrusses(SourceDataSet dataFile, boolean isSlowFolderAccess)
 						throws IOException, NotSupportedFileFormatException {
-					return BIN.getTrusses(deviceConfigurations, dataFile, isSlowFolderAccess);
+					return BIN.getTrusses(dataFile, isSlowFolderAccess);
 				}
 
 				@Override
@@ -582,7 +581,7 @@ public final class DirectoryScanner {
 			 * @param isSlowFolderAccess
 			 * @return the vault skeletons delivered by the source file based on the current device (and channel and object in case of bin files)
 			 */
-			abstract List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, SourceDataSet dataFile,
+			abstract List<VaultCollector> getTrusses(SourceDataSet dataFile,
 					boolean isSlowFolderAccess) throws IOException, NotSupportedFileFormatException;
 
 			/**
@@ -702,14 +701,15 @@ public final class DirectoryScanner {
 		 * @param deviceConfigurations
 		 * @return the file directory name if it is not a device directory or an empty string
 		 */
-		private String getObjectKey(TreeMap<String, DeviceConfiguration> deviceConfigurations) {
+		private String getObjectKey() {
 			String dirName = path.getParent().getFileName().toString();
-			return !deviceConfigurations.containsKey(dirName) ? dirName : GDE.STRING_EMPTY;
+			DeviceConfigurations deviceConfigurations = DataExplorer.getInstance().getDeviceConfigurations();
+			return !deviceConfigurations.contains(dirName) ? dirName : GDE.STRING_EMPTY;
 		}
 
-		List<VaultCollector> getTrusses(TreeMap<String, DeviceConfiguration> deviceConfigurations, boolean isSlowFolderAccess) throws IOException,
+		List<VaultCollector> getTrusses(boolean isSlowFolderAccess) throws IOException,
 				NotSupportedFileFormatException {
-			return dataSetType.getTrusses(deviceConfigurations, this, isSlowFolderAccess);
+			return dataSetType.getTrusses(this, isSlowFolderAccess);
 		}
 
 		public DataSetType getDataSetType() {

@@ -50,7 +50,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import gde.GDE;
-import gde.device.DeviceConfiguration;
 import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
@@ -293,7 +292,6 @@ public final class VaultPicker {
 	public String toString() {
 		String result = String.format("totalTrussesCount=%,d  availableVaultsCount=%,d recordSetBytesSum=%,d elapsedTime_ms=%,d", //
 				this.getTrussesCount(), this.getTimeStepSize(), this.recordSetBytesSum, this.getElapsedTime_ms());
-		log.log(Level.OFF, "evaluated " + result);
 		return result;
 	}
 
@@ -315,20 +313,17 @@ public final class VaultPicker {
 		this.elapsedTime_us = 0;
 
 		this.trailRecordSet = null;
-
-		log.finer(() -> "finer(() done" + this.toString());
-		log.log(FINER, "log(FINER done", this);
-		log.log(FINER, "param", " done" + this);
+		log.log(FINER, "done", this);
 	}
 
-	public void rebuild4Test(Path filePath, TreeMap<String, DeviceConfiguration> devices)//
+	public void rebuild4Test(Path filePath)//
 			throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
 
 		initialize();
 
 		List<SourceDataSet> sourceFiles = this.directoryScanner.readSourceFiles4Test(filePath);
 		this.readFilesCount = sourceFiles.size();
-		List<VaultCollector> trusses = getTrusses(sourceFiles, devices, false);
+		List<VaultCollector> trusses = getTrusses(sourceFiles, false);
 		removeSuppressed(trusses);
 		log.info(() -> String.format("%04d files selected", trusses.size())); //$NON-NLS-1$
 
@@ -418,7 +413,7 @@ public final class VaultPicker {
 				List<VaultCollector> trusses;
 				{
 					List<SourceDataSet> sourceFiles = this.directoryScanner.readSourceFiles();
-					trusses = getTrusses(sourceFiles, DataExplorer.getInstance().getDeviceSelectionDialog().getDevices(), directoryScanner.isSlowFolderAccess());
+					trusses = getTrusses(sourceFiles, directoryScanner.isSlowFolderAccess());
 					this.suppressedVaults = removeSuppressed(trusses);
 					this.readFilesCount = sourceFiles.size();
 					this.readTrussesCount = trusses.size();
@@ -608,11 +603,11 @@ public final class VaultPicker {
 	 * Determine trusses in the osd files and in the native files (if supported by the device).
 	 * @param sourceFiles for osd reader (possibly link files) or for import
 	 */
-	private List<VaultCollector> getTrusses(List<SourceDataSet> sourceFiles, TreeMap<String, DeviceConfiguration> deviceConfigurations,
-			boolean isSlowFileAccess) throws IOException, NotSupportedFileFormatException {
+	private List<VaultCollector> getTrusses(List<SourceDataSet> sourceFiles, boolean isSlowFileAccess) throws IOException,
+			NotSupportedFileFormatException {
 		List<VaultCollector> result = new ArrayList<>();
 		for (SourceDataSet sourceFile : sourceFiles) {
-			List<VaultCollector> trusses = sourceFile.getTrusses(deviceConfigurations, isSlowFileAccess);
+			List<VaultCollector> trusses = sourceFile.getTrusses(isSlowFileAccess);
 			if (!trusses.isEmpty()) {
 				for (VaultCollector truss : trusses) {
 					result.add(truss);

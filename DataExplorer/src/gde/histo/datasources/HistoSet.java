@@ -24,12 +24,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.Record.DataType;
-import gde.device.DeviceConfiguration;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
@@ -342,9 +340,9 @@ public final class HistoSet {
 		return this.vaultPicker.rebuild4Screening(rebuildStep, isWithUi);
 	}
 
-	public void rebuild4Test(Path filePath, TreeMap<String, DeviceConfiguration> devices) //
+	public void rebuild4Test(Path filePath) //
 			throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
-		this.vaultPicker.rebuild4Test(filePath, devices);
+		this.vaultPicker.rebuild4Test(filePath);
 	}
 
 	public TrailRecordSet getTrailRecordSet() {
