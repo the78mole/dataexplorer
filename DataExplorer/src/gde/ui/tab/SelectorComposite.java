@@ -258,7 +258,7 @@ public class SelectorComposite extends Composite {
 	 * executes the update of the curve selector table
 	 */
 	public synchronized void doUpdateCurveSelectorTable() {
-		SelectorComposite.this.application.updateAllTabs(true, false);
+		this.application.updateAllTabs(true, false);
 		int itemWidth = this.initialSelectorHeaderWidth;
 		RecordSet recordSet = null;
 		switch (this.graphicsType) {
