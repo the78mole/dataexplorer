@@ -13,26 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.dialog;
-
-import gde.GDE;
-import gde.comm.DeviceSerialPortImpl;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.exception.NotSupportedException;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -78,6 +62,22 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.xml.sax.SAXParseException;
+
+import gde.GDE;
+import gde.comm.DeviceSerialPortImpl;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.exception.NotSupportedException;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 /**
  * Dialog class to select the device to be used
@@ -160,7 +160,14 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.legacyDeviceNames.put("PichlerP60", "PichlerP60 50W");
 
 		try {
-			initialize();
+			File file = new File(this.settings.getDevicesPath());
+			if (!file.exists()) throw new FileNotFoundException(this.settings.getDevicesPath());
+			String[] files = file.list();
+
+			this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
+			this.activeDevices = new Vector<String>(2, 1);
+			initialize(files);
+			if (this.selectedActiveDeviceConfig == null) this.application.setActiveDevice(null);
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -169,17 +176,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 * goes through the existing INI files and set active flagged devices into active devices list
-	 * @throws FileNotFoundException 
+	 * goes through the existing INI files and set active flagged devices into active devices list.
+	 * Fills the DeviceConfigurations list.
 	 */
-	public void initialize() throws FileNotFoundException {
-
-		File file = new File(this.settings.getDevicesPath());
-		if (!file.exists()) throw new FileNotFoundException(this.settings.getDevicesPath());
-		String[] files = file.list();
+	public void initialize(String[] files){
 		DeviceConfiguration devConfig;
-		this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
-		this.activeDevices = new Vector<String>(2, 1);
 
 		for (int i = 0; files != null && i < files.length; i++) {
 			try {
@@ -193,7 +194,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					// add the active once into the active device vector
 					if (devConfig.isUsed() && !this.activeDevices.contains(devConfig.getName())) this.activeDevices.add(devConfig.getName());
 
-					// store all device configurations in a map					
+					// store all device configurations in a map
 					String keyString;
 					if (devConfig.getName() != null)
 						keyString = devConfig.getName();
@@ -217,7 +218,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			}
 		}
 		log.log(Level.TIME, "device init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
-		if (this.selectedActiveDeviceConfig == null) this.application.setActiveDevice(null);
 	}
 
 	public void open() {
@@ -232,6 +232,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.setSize(566, 644);
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0189));
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					switch (event.detail) {
 					case SWT.TRAVERSE_ESCAPE:
@@ -243,12 +244,14 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				}
 			});
 			this.dialogShell.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 					DeviceSelectionDialog.this.application.openHelpDialog(GDE.STRING_EMPTY, "HelpInfo_2.html"); //$NON-NLS-1$
 				}
 			});
 			this.dialogShell.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					// update device configurations if required
@@ -264,6 +267,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 
 					GDE.display.asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							handleAutoOpenAfterClose();
 						}
@@ -501,6 +505,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								this.portSettingsGroup.setText(Messages.getString(MessageIds.GDE_MSGT0166));
 								this.portSettingsGroup.setBounds(12, 409, 524, 115);
 								this.portSettingsGroup.addPaintListener(new PaintListener() {
+									@Override
 									public void paintControl(PaintEvent evt) {
 										log.log(Level.FINEST, "portSettingsGroup.paintControl, event=" + evt); //$NON-NLS-1$
 										if (!DeviceSelectionDialog.this.portSettingsGroup.isDisposed()) {
@@ -749,7 +754,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											if (DeviceSelectionDialog.this.activeDevices.size() >= 1) {
 												DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
 												//open message box to hint dummy device driver or udev
-												if (deviceName.contains("MC3000") || deviceName.contains("Q200")) { 
+												if (deviceName.contains("MC3000") || deviceName.contains("Q200")) {
 													if (GDE.IS_LINUX)
 														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0057));
 													else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0058));
@@ -827,7 +832,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 					}
 				});
 			}
-			initializeUI(); // update all the entries according active device configuration			
+			initializeUI(); // update all the entries according active device configuration
 			updateAvailablePorts();
 			this.dialogShell.setLocation(getParent().toDisplay(100, 10));
 			this.dialogShell.open();
@@ -843,7 +848,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void updateDeviceSelectionTable() {
 		if (!this.isDisposed()) {
@@ -1038,8 +1043,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
-	 * @throws NotSupportedException 
+	 * method to setup new device, this might called using this dialog or a menu item where device is switched
+	 * @throws NotSupportedException
 	 */
 	public void setupDevice(String newDeviceName) throws NotSupportedException {
 		newDeviceName = exchangeLegacyDeviceNames(newDeviceName);
@@ -1071,7 +1076,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 * method to setup new device, this might called using this dialog or a menu item where device is switched 
+	 * method to setup new device, this might called using this dialog or a menu item where device is switched
 	 */
 	public void setupDevice() {
 		IDevice previousActiveDevice = this.application.getActiveDevice();
@@ -1161,7 +1166,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			String msg = e.getClass().getSimpleName() + GDE.STRING_BLANK + e.getMessage() + GDE.LINE_SEPARATOR + Messages.getString(MessageIds.GDE_MSGE0040, new String[] { className });
 			this.application.openMessageDialog(this.dialogShell, msg);
 
-			// in-activate and remove failed device (XML) from potential devices list 
+			// in-activate and remove failed device (XML) from potential devices list
 			this.selectedActiveDeviceConfig.setUsed(false);
 			this.selectedActiveDeviceConfig.storeDeviceProperties();
 			selectedDeviceName = this.selectedActiveDeviceConfig.getName();
@@ -1251,6 +1256,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									DeviceSelectionDialog.this.settings.isSerialPortWhiteListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
 							if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
 								GDE.display.syncExec(new Runnable() {
+									@Override
 									public void run() {
 										if (!DeviceSelectionDialog.this.dialogShell.isDisposed() && DeviceSelectionDialog.this.selectedActiveDeviceConfig != null) {
 											if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
@@ -1284,7 +1290,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 * query the number of configured active devices 
+	 * query the number of configured active devices
 	 * @return number of active devices
 	 */
 	public int getNumberOfActiveDevices() {
