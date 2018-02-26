@@ -71,14 +71,15 @@ public class HistoExplorer {
 
 		this.settings.setHistoActive(true);
 		this.histoSet = new HistoSet();
-
-		new SupplementObjectFolder().checkAndCreate(Paths.get(settings.getDataFilePath()));
 	}
 
 	/**
 	 * Build and fill the tabs.
 	 */
 	public void initHisto() {
+		SupplementObjectFolder supplementObjectFolder = new SupplementObjectFolder(Paths.get(settings.getDataFilePath()));
+		supplementObjectFolder.updateLogMirror();
+
 		int tabLength = displayTab.getItems().length;
 		int positionG = tabLength < TAB_INDEX_HISTO_GRAPHIC ? tabLength : TAB_INDEX_HISTO_GRAPHIC;
 		chartTabItems.add(HistoGraphicsWindow.create(displayTab, SWT.NONE, positionG));
@@ -108,14 +109,14 @@ public class HistoExplorer {
 	 * Does nothing if the histoActive setting is false.
 	 */
 	public synchronized void resetHisto() {
+		SupplementObjectFolder supplementObjectFolder = new SupplementObjectFolder(Paths.get(settings.getDataFilePath()));
+		supplementObjectFolder.updateLogMirror();
 
 		for (AbstractChartWindow c : chartTabItems) {
 			resetWindowHeaderAndMeasuring(c);
 		}
 		histoSet.initialize();
 		updateHistoTabs(RebuildStep.A_HISTOSET, true);
-
-		new SupplementObjectFolder().checkAndCreate(Paths.get(settings.getDataFilePath()));
 	}
 
 	/**

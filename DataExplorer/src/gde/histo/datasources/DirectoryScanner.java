@@ -97,41 +97,39 @@ public final class DirectoryScanner {
 		 * Designed to hold all folder paths feeding the file scanning steps.
 		 * Supports an equality check comparing the current paths to an older path map.
 		 */
-		private final Map<DirectoryType, List<Path>>	folders							= new EnumMap<DirectoryType, List<Path>>(DirectoryType.class) {
-																																				private static final long serialVersionUID = -8624409377603884008L;
+		private final Map<DirectoryType, List<Path>>	folders							=																				// split-> better automatic formatting
+				new EnumMap<DirectoryType, List<Path>>(DirectoryType.class) {
+					private static final long serialVersionUID = -8624409377603884008L;
 
-      /**
-			 * @return true if the keys are equal and the lists hold the same path strings in
-			 *         arbitrary order
-			 */
-			@Override
-			public boolean equals(Object obj) {
-				if (this == obj) return true;
-				if (obj == null) return false;
-				if (getClass() != obj.getClass()) return false;
-				@SuppressWarnings("unchecked") // reason is anonymous class
-				Map<DirectoryType, List<Path>> that = (Map<DirectoryType, List<Path>>) obj;
-				boolean hasSameDirectoryTypes = keySet().equals(that.keySet());
-				if (hasSameDirectoryTypes) {
-					boolean isEqual = true;
-					for (Entry<DirectoryType, List<Path>> entry : entrySet()) {
-						HashSet<Path> thisSet = new HashSet<>(entry.getValue());
-						HashSet<Path> thatSet = new HashSet<>(that.get(entry.getKey()));
-						isEqual &= thisSet.equals(thatSet);
-						if (!isEqual) break;
+					/**
+					 * @return true if the keys are equal and the lists hold the same path strings in
+					 *         arbitrary order
+					 */
+					@Override
+					public boolean equals(Object obj) {
+						if (this == obj) return true;
+						if (obj == null) return false;
+						if (getClass() != obj.getClass()) return false;
+						@SuppressWarnings("unchecked")																																		// reason is anonymous class
+						Map<DirectoryType, List<Path>> that = (Map<DirectoryType, List<Path>>) obj;
+						boolean hasSameDirectoryTypes = keySet().equals(that.keySet());
+						if (hasSameDirectoryTypes) {
+							boolean isEqual = true;
+							for (Entry<DirectoryType, List<Path>> entry : entrySet()) {
+								HashSet<Path> thisSet = new HashSet<>(entry.getValue());
+								HashSet<Path> thatSet = new HashSet<>(that.get(entry.getKey()));
+								isEqual &= thisSet.equals(thatSet);
+								if (!isEqual) break;
+							}
+							log.log(Level.FINEST, "isEqual=", isEqual);
+							return isEqual;
+						} else {
+							return false;
+						}
 					}
-					log.log(Level.FINEST, "isEqual=", isEqual);
-					return isEqual;
-				} else {
-					return false;
-				}
-			}
-		};
+				};
 
-		private boolean																isSlowFolderAccess	= false;																																																												// slow
-																																																																																																			// file
-																																																																																																			// system
-																																																																																																			// access
+		private boolean																isSlowFolderAccess	= false;																// slow file system access
 
 		/**
 		 * Read some directory modified dates from the source folders and determine a file access speed indicator.
@@ -183,7 +181,9 @@ public final class DirectoryScanner {
 			folders.clear();
 			for (DirectoryType directoryType : directoryTypes) {
 				List<Path> currentPaths = defineCurrentPaths(directoryType);
-				currentPaths.addAll(defineExtraPaths(directoryType));
+				if (DataExplorer.getInstance().isObjectoriented()) {
+					currentPaths.addAll(defineExtraPaths(directoryType, DataExplorer.getInstance().getObjectKey()));
+				}
 				folders.put(directoryType, currentPaths);
 			}
 		}
@@ -215,19 +215,18 @@ public final class DirectoryScanner {
 				if (basePath == null) {
 					// an unavailable path results in no files found
 				} else {
-					newPaths = defineObjectPaths(basePath);
+					newPaths = defineObjectPaths(basePath, DataExplorer.getInstance().getObjectKey());
 				}
 			}
 			return newPaths;
 		}
 
-		private List<Path> defineObjectPaths(Path basePath) {
-			if (isSlowFolderAccess) DataExplorer.getInstance().setStatusMessage("find object folders in " + basePath.toString());
+		private List<Path> defineObjectPaths(Path basePath, String objectKey) {
 			List<Path> result = new ArrayList<Path>();
-			String objectKey = DataExplorer.getInstance().getObjectKey();
+			Stream<String> objectKeys = Stream.of(objectKey);
+			if (isSlowFolderAccess) DataExplorer.getInstance().setStatusMessage("find object folders in " + basePath.toString());
 			try {
-				result = Files.walk(basePath).filter(Files::isDirectory) //
-						.filter(p -> p.getFileName().equals(Paths.get(objectKey))).collect(Collectors.toList());
+				result = defineObjectPathsSilently(basePath, objectKeys).collect(Collectors.toList());
 			} catch (IOException e) {
 				log.log(Level.SEVERE, e.getMessage(), " is not accessible : " + e.getClass());
 			}
@@ -241,9 +240,9 @@ public final class DirectoryScanner {
 		 * The result depends on the active device and object.
 		 * @return the list with 0 .. n entries
 		 */
-		private List<Path> defineExtraPaths(DirectoryType directoryType) {
+		private List<Path> defineExtraPaths(DirectoryType directoryType, String objectKey) {
 			Stream<Path> supplementFoldersStream = directoryType.getSupplementFolders();
-			return supplementFoldersStream.map(this::defineObjectPaths) //
+			return supplementFoldersStream.map(p -> defineObjectPaths(p, objectKey)) //
 					.flatMap(List::stream).collect(Collectors.toList());
 		}
 
@@ -307,6 +306,17 @@ public final class DirectoryScanner {
 			}
 			return directoryTypeTexts.stream().collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
 		}
+	}
+
+	/**
+	 * @param basePath is any path
+	 * @return the paths to all folders with the name of the active object (or all object key folders if not object oriented)
+	 */
+	public static Stream<Path> defineObjectPathsSilently(Path basePath, Stream<String> objectKeys) throws IOException {
+		List<String> lowerCaseKeys = objectKeys.map(String::toLowerCase).collect(Collectors.toList());
+		Stream<Path> result = Files.walk(basePath).filter(Files::isDirectory) //
+				.filter(p -> lowerCaseKeys.contains(p.getFileName().toString().toLowerCase()));
+		return result;
 	}
 
 	private final DataExplorer						application								= DataExplorer.getInstance();
@@ -474,8 +484,6 @@ public final class DirectoryScanner {
 	 * File types supported by the history.
 	 */
 	public static class SourceDataSet {
-		private final IDevice			device	= DataExplorer.getInstance().getActiveDevice();
-
 		private final Path				path;
 		private final DataSetType	dataSetType;
 
@@ -485,8 +493,7 @@ public final class DirectoryScanner {
 		public enum DataSetType {
 			OSD {
 				@Override
-				List<VaultCollector> getTrusses(SourceDataSet dataFile, boolean isSlowFolderAccess)
-						throws IOException, NotSupportedFileFormatException {
+				List<VaultCollector> getTrusses(SourceDataSet dataFile, boolean isSlowFolderAccess) throws IOException, NotSupportedFileFormatException {
 					List<VaultCollector> trusses = new ArrayList<>();
 					File actualFile = dataFile.getActualFile();
 					if (actualFile != null) {
@@ -522,10 +529,32 @@ public final class DirectoryScanner {
 				public boolean providesReaderSettings() {
 					return false;
 				}
+
+				@Override
+				public File getActualFile(File file) throws IOException {
+					long startMillis = System.currentTimeMillis();
+					File actualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(file.toPath().toString()));
+					// getLinkContainedFilePath may have long response times in case of an unavailable network resources
+					// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
+					if (file.equals(actualFile) && (System.currentTimeMillis() - startMillis > 555) || !file.exists()) {
+						log.warning(() -> String.format("Dead OSD link %s pointing to %s", file, actualFile)); //$NON-NLS-1$
+						if (!file.delete()) {
+							log.warning(() -> String.format("could not delete link file ", file)); //$NON-NLS-1$
+						}
+						return null;
+					}
+					return actualFile;
+				}
+
+				@Override
+				public boolean loadFile(Path path, String desiredRecordSetName) {
+					new FileHandler().openOsdFile(path.toString(), desiredRecordSetName);
+					return true;
+				}
 			},
 			BIN {
 				@Override
-				List<VaultCollector> getTrusses(SourceDataSet dataFile, boolean isSlowFolderAccess)
+				List<VaultCollector> getTrusses(SourceDataSet dataFile, boolean isSlowFolderAccess) //
 						throws IOException, NotSupportedFileFormatException {
 					if (isSlowFolderAccess) DataExplorer.getInstance().setStatusMessage("get file properties    " + dataFile.path.toString());
 					String objectDirectory = dataFile.getObjectKey();
@@ -554,10 +583,27 @@ public final class DirectoryScanner {
 				public boolean providesReaderSettings() {
 					return true;
 				}
+
+				@Override
+				public File getActualFile(File file) throws IOException {
+					return file;
+				}
+
+				@Override
+				public boolean loadFile(Path path, String desiredRecordSetName) {
+					if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice) {
+						List<String> validatedImportExtentions = ((IHistoDevice) DataExplorer.getInstance().getActiveDevice()).getSupportedImportExtentions();
+						if (!validatedImportExtentions.isEmpty() && SourceDataSet.isWorkableFile(path, validatedImportExtentions)) {
+							((IHistoDevice) DataExplorer.getInstance().getActiveDevice()).importDeviceData(path);
+							return true;
+						}
+					}
+					return false;
+				}
 			},
 			LOG { // was not merged with bin - we expect differences in the future
 				@Override
-				List<VaultCollector> getTrusses(SourceDataSet dataFile, boolean isSlowFolderAccess)
+				List<VaultCollector> getTrusses(SourceDataSet dataFile, boolean isSlowFolderAccess) //
 						throws IOException, NotSupportedFileFormatException {
 					return BIN.getTrusses(dataFile, isSlowFolderAccess);
 				}
@@ -572,6 +618,16 @@ public final class DirectoryScanner {
 				public boolean providesReaderSettings() {
 					return true;
 				}
+
+				@Override
+				public File getActualFile(File file) throws IOException {
+					return file;
+				}
+
+				@Override
+				public boolean loadFile(Path path, String desiredRecordSetName) {
+					return BIN.loadFile(path, desiredRecordSetName);
+				}
 			};
 
 			/**
@@ -581,8 +637,8 @@ public final class DirectoryScanner {
 			 * @param isSlowFolderAccess
 			 * @return the vault skeletons delivered by the source file based on the current device (and channel and object in case of bin files)
 			 */
-			abstract List<VaultCollector> getTrusses(SourceDataSet dataFile,
-					boolean isSlowFolderAccess) throws IOException, NotSupportedFileFormatException;
+			abstract List<VaultCollector> getTrusses(SourceDataSet dataFile, boolean isSlowFolderAccess) //
+					throws IOException, NotSupportedFileFormatException;
 
 			/**
 			 * Promote trusses into vaults by reading the source file.
@@ -596,6 +652,19 @@ public final class DirectoryScanner {
 			 * @returns true is a file reader capable to deliver different measurement values based on device settings
 			 */
 			public abstract boolean providesReaderSettings();
+
+			/**
+			 * Adds support for link files pointing to data files.
+			 * Deletes a link file if the data file does not exist.
+			 * @return the data file (differs from {@code file} in case of a link file)
+			 */
+			public abstract File getActualFile(File file) throws IOException;
+
+			/**
+			 * @param desiredRecordSetName
+			 * @return true if the file was opened or imported
+			 */
+			public abstract boolean loadFile(Path path, String desiredRecordSetName);
 
 			/**
 			 * @param extension of the file w/o dot
@@ -682,19 +751,8 @@ public final class DirectoryScanner {
 		 * Deletes a link file if the data file does not exist.
 		 * @return the data file (differs from {@code file} in case of a link file)
 		 */
-		private File getActualFile() throws IOException {
-			long startMillis = System.currentTimeMillis();
-			File actualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(path.toString()));
-			// getLinkContainedFilePath may have long response times in case of an unavailable network resources
-			// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
-			if (getFile().equals(actualFile) && (System.currentTimeMillis() - startMillis > 555) || !getFile().exists()) {
-				log.warning(() -> String.format("Dead OSD link %s pointing to %s", getFile(), actualFile)); //$NON-NLS-1$
-				if (!getFile().delete()) {
-					log.warning(() -> String.format("could not delete link file ", getFile())); //$NON-NLS-1$
-				}
-				return null;
-			}
-			return actualFile;
+		public File getActualFile() throws IOException {
+			return dataSetType.getActualFile(getFile());
 		}
 
 		/**
@@ -707,8 +765,8 @@ public final class DirectoryScanner {
 			return !deviceConfigurations.contains(dirName) ? dirName : GDE.STRING_EMPTY;
 		}
 
-		List<VaultCollector> getTrusses(boolean isSlowFolderAccess) throws IOException,
-				NotSupportedFileFormatException {
+		List<VaultCollector> getTrusses(boolean isSlowFolderAccess) //
+				throws IOException, NotSupportedFileFormatException {
 			return dataSetType.getTrusses(this, isSlowFolderAccess);
 		}
 
@@ -728,17 +786,7 @@ public final class DirectoryScanner {
 		public boolean load(String desiredRecordSetName) {
 			if (!FileUtils.checkFileExist(path.toString())) return false;
 
-			if (path.toString().endsWith(GDE.FILE_ENDING_DOT_OSD)) {
-				new FileHandler().openOsdFile(path.toString(), desiredRecordSetName);
-				return true;
-			} else if (device instanceof IHistoDevice) {
-				List<String> validatedImportExtentions = ((IHistoDevice) device).getSupportedImportExtentions();
-				if (!validatedImportExtentions.isEmpty() && SourceDataSet.isWorkableFile(path, validatedImportExtentions)) {
-					((IHistoDevice) device).importDeviceData(path);
-					return true;
-				}
-			}
-			return false;
+			return dataSetType.loadFile(path, desiredRecordSetName);
 		}
 
 		public Path getPath() {
