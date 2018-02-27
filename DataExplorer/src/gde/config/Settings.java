@@ -1360,7 +1360,7 @@ public class Settings extends Properties {
 	 * @return boolean value if data table display selected records from graphics
 	 */
 	public boolean isPartialDataTable() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_PARTIAL_DATA_TABLE, "false").trim()); //$NON-NLS-1$
+		return Boolean.valueOf(this.getProperty(Settings.IS_PARTIAL_DATA_TABLE, "true").trim()); //$NON-NLS-1$
 	}
 
 	/**
