@@ -76,6 +76,8 @@ import gde.config.Settings;
 import gde.device.CommaSeparatorTypes;
 import gde.device.DecimalSeparatorTypes;
 import gde.device.DeviceConfiguration;
+import gde.histo.datasources.SupplementObjectFolder;
+import gde.histo.ui.HistoExplorer;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -179,8 +181,9 @@ public class SettingsDialog extends Dialog {
 	Button															scanObjectKeysButton;
 	Button															cleanObjectReferecesButton;
 	Button															removeMimeAssocButton;
+	Button															createObjectsFromDirectoriesButton, importLogsButton;
 	Group																histoToolsGroup;
-	Button															createObjectsFromDirectoriesButton, importLogsButton, clearHistoCacheButton;
+	Button															clearHistoCacheButton, clearSupplementFoldersButton;
 	Group																miscDiagGroup;
 	Button															resourceConsumptionButton, cleanSettingsButton;
 	Button															assocMimeTypeButton;
@@ -390,7 +393,7 @@ public class SettingsDialog extends Dialog {
 											SettingsDialog.log.log(Level.FINE, "default directory from directoy dialog = " + defaultDataDirectory); //$NON-NLS-1$
 											SettingsDialog.this.settings.setDataFilePath(defaultDataDirectory);
 											SettingsDialog.this.defaultDataPath.setText(defaultDataDirectory);
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.resetHisto());
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
 										}
 									}
 								});
@@ -1186,7 +1189,7 @@ public class SettingsDialog extends Dialog {
 										if (!this.trimmedInitialText.equals(SettingsDialog.this.histoRetrospectMonths.getText().trim())) {
 											SettingsDialog.log.log(Level.FINEST, "setText=" + SettingsDialog.this.settings.getRetrospectMonths()); //$NON-NLS-1$
 											SettingsDialog.this.histoRetrospectMonths.setText(String.format("  %9d", SettingsDialog.this.settings.getRetrospectMonths()));
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.resetHisto());
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
 										}
 									}
 
@@ -1213,7 +1216,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchDataPathImports.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchDataPathImports(SettingsDialog.this.histoSearchDataPathImports.getSelection());
-										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.resetHisto());
+										SettingsDialog.this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
 									}
 								});
 							}
@@ -1232,7 +1235,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSearchImportPath.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSearchImportPath(SettingsDialog.this.histoSearchImportPath.getSelection());
-										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.resetHisto());
+										SettingsDialog.this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
 									}
 								});
 							}
@@ -1260,7 +1263,7 @@ public class SettingsDialog extends Dialog {
 											SettingsDialog.log.log(Level.FINEST, "histoIgnoreLogObjectKey.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setFilesWithOtherObject(SettingsDialog.this.histoIgnoreLogObjectKey.getSelection());
 											SettingsDialog.this.settings.setFilesWithoutObject(SettingsDialog.this.histoIgnoreLogObjectKey.getSelection());
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.resetHisto());
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
 										}
 									});
 								}
@@ -1293,7 +1296,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSubdirectoryLevel.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSubDirectoryLevelMax(SettingsDialog.this.histoSubdirectoryLevel.getText().trim());
-										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.resetHisto());
+										SettingsDialog.this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
 									}
 								});
 							}
@@ -1335,7 +1338,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoSamplingTimespan_ms.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setSamplingTimespan_ms(SettingsDialog.this.histoSamplingTimespan_ms.getText().trim());
-										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.resetHisto());
+										SettingsDialog.this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
 									}
 								});
 							}
@@ -1354,7 +1357,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "histoChannelMix.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setChannelMix(SettingsDialog.this.histoChannelMix.getSelection());
-										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.resetHisto());
+										SettingsDialog.this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
 									}
 								});
 							}
@@ -1870,6 +1873,23 @@ public class SettingsDialog extends Dialog {
 										SettingsDialog.log.log(Level.FINEST, "clearHistoCacheButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.resetHistolocations();
 										SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.settings.resetHistoCache());
+									}
+								});
+							}
+							{
+								this.clearSupplementFoldersButton = new Button(this.histoToolsGroup, SWT.PUSH | SWT.CENTER);
+								this.clearSupplementFoldersButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.clearSupplementFoldersButton.setText(Messages.getString(MessageIds.GDE_MSGT0922));
+								this.clearSupplementFoldersButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0923, new Object[] { SupplementObjectFolder.getObjectsPath().toString() }));
+								RowData clearSupplementFoldersButtonLData = new RowData();
+								clearSupplementFoldersButtonLData.width = 180;
+								clearSupplementFoldersButtonLData.height = 30;
+								this.clearSupplementFoldersButton.setLayoutData(clearSupplementFoldersButtonLData);
+								this.clearSupplementFoldersButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "clearSupplementFoldersButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.application.openMessageDialog(SupplementObjectFolder.resetFolders());
 									}
 								});
 							}

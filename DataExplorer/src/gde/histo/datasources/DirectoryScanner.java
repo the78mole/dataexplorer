@@ -19,7 +19,6 @@
 
 package gde.histo.datasources;
 
-import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.INFO;
 
 import java.io.File;
@@ -42,7 +41,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -74,8 +72,15 @@ import gde.utils.OperatingSystemHelper;
  * @author Thomas Eickert (USER)
  */
 public final class DirectoryScanner {
-	private final static String		$CLASS_NAME	= DirectoryScanner.class.getName();
-	private final static Logger		log					= Logger.getLogger($CLASS_NAME);
+	private final static String		$CLASS_NAME						= DirectoryScanner.class.getName();
+	private final static Logger		log										= Logger.getLogger($CLASS_NAME);
+
+	/**
+	 * Average elapsed time per identified folder during folder scan.</br>
+	 * local drive: 13,5 to 16 ms/folder </br>
+	 * but the full data drive scan may take up to 400 ms.
+	 */
+	private final static int			SLOW_FOLDER_LIMIT_MS	= 99;
 
 	private static List<Integer>	channelMixConfigNumbers;
 	private static long						minStartTimeStamp_ms;
@@ -97,8 +102,8 @@ public final class DirectoryScanner {
 		 * Designed to hold all folder paths feeding the file scanning steps.
 		 * Supports an equality check comparing the current paths to an older path map.
 		 */
-		private final Map<DirectoryType, List<Path>>	folders							=																				// split-> better automatic formatting
-				new EnumMap<DirectoryType, List<Path>>(DirectoryType.class) {
+		private final Map<DirectoryType, Set<Path>>	folders							=																				// split-> better automatic formatting
+				new EnumMap<DirectoryType, Set<Path>>(DirectoryType.class) {
 					private static final long serialVersionUID = -8624409377603884008L;
 
 					/**
@@ -115,7 +120,7 @@ public final class DirectoryScanner {
 						boolean hasSameDirectoryTypes = keySet().equals(that.keySet());
 						if (hasSameDirectoryTypes) {
 							boolean isEqual = true;
-							for (Entry<DirectoryType, List<Path>> entry : entrySet()) {
+							for (Entry<DirectoryType, Set<Path>> entry : entrySet()) {
 								HashSet<Path> thisSet = new HashSet<>(entry.getValue());
 								HashSet<Path> thatSet = new HashSet<>(that.get(entry.getKey()));
 								isEqual &= thisSet.equals(thatSet);
@@ -129,67 +134,39 @@ public final class DirectoryScanner {
 					}
 				};
 
-		private boolean																isSlowFolderAccess	= false;																// slow file system access
-
 		/**
-		 * Read some directory modified dates from the source folders and determine a file access speed indicator.
+		 * File access speed indicator. True is slow file system access.
+		 * Simple algorithm.
 		 */
-		boolean isSlowFolderAccess(EnumSet<DirectoryType> directoryTypes) {
-			long startNanoTime = System.nanoTime();
-			for (DirectoryType directoryType : directoryTypes) {
-				Path rootPath = directoryType.getBasePath();
-				if (rootPath == null) continue;
-
-				String modifiedCsv = "";
-				try {
-					modifiedCsv = Files.walk(rootPath).filter(Files::isDirectory).limit(3).map(Path::toFile) //
-							.mapToLong(File::lastModified).mapToObj(Long::toString).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
-				} catch (IOException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
-				log.log(FINEST, "modifiedCsv=", modifiedCsv);
-				long millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime);
-				log.log(FINEST, "", millis);
-				Stream<Path> supplementFoldersStream = directoryType.getSupplementFolders();
-				modifiedCsv = supplementFoldersStream.map(new Function<Path, String>() {
-					@Override
-					public String apply(Path p1) {
-						if (p1.toFile().exists()) try {
-							return Files.walk(p1).filter(Files::isDirectory).limit(3).map(Path::toFile) //
-									.mapToLong(File::lastModified).mapToObj(Long::toString).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
-						} catch (IOException e) {
-							log.log(Level.SEVERE, e.getMessage(), e);
-						}
-						return "";
-					}
-				}).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
-				log.log(FINEST, "modifiedCsv=", modifiedCsv);
-				millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime);
-				log.log(FINEST, "", millis);
-			}
-			long millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime);
-			log.log(FINEST, "", millis);
-			isSlowFolderAccess = millis > 99;
-			return isSlowFolderAccess;
-		}
+		private boolean																isSlowFolderAccess	= false;
 
 		/**
 		 * Determine the valid directory paths from all log sources.
 		 * The result depends on the active device and object.
+		 * @return true if the file access is estimated as slow (due to network folders, ...)
 		 */
-		void defineDirectories(EnumSet<DirectoryType> directoryTypes) throws IOException {
+		boolean defineDirectories(EnumSet<DirectoryType> directoryTypes) throws IOException {
+			long nanoTime = System.nanoTime();
 			folders.clear();
 			for (DirectoryType directoryType : directoryTypes) {
-				List<Path> currentPaths = defineCurrentPaths(directoryType);
+				Set<Path> currentPaths = defineCurrentPaths(directoryType);
+				log.log(Level.FINE, directoryType.toString(), currentPaths);
 				if (DataExplorer.getInstance().isObjectoriented()) {
-					currentPaths.addAll(defineExtraPaths(directoryType, DataExplorer.getInstance().getObjectKey()));
+					Set<Path> externalObjectPaths = defineExternalObjectPaths(directoryType, DataExplorer.getInstance().getObjectKey());
+					currentPaths.addAll(externalObjectPaths);
+					log.log(Level.FINE, directoryType.toString(), externalObjectPaths);
 				}
 				folders.put(directoryType, currentPaths);
 			}
+			long foldersCount = folders.values().stream().flatMap(Collection::stream).count();
+			long elapsed_ms = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime);
+			boolean slowFolderAccess = elapsed_ms / (foldersCount + 3) > SLOW_FOLDER_LIMIT_MS; // +3 for initial overhead (data path)
+			log.fine(() -> "slowFolderAccess=" + slowFolderAccess + "  numberOfFolders=" + foldersCount + " in " + elapsed_ms + " [ms]");
+			return slowFolderAccess;
 		}
 
 		void defineDirectories4Test(Path filePath) {
-			List<Path> paths = new ArrayList<>();
+			Set<Path> paths = new HashSet<>();
 			Path tmpPath = filePath == null ? DirectoryType.DATA.getDataSetPath() : filePath;
 			paths.add(tmpPath);
 			folders.put(DirectoryType.DATA, paths);
@@ -204,8 +181,8 @@ public final class DirectoryScanner {
 		 * The result depends on the active device and object.
 		 * @return the list with 0 .. n entries
 		 */
-		private List<Path> defineCurrentPaths(DirectoryType directoryType) {
-			List<Path> newPaths = new ArrayList<Path>();
+		private Set<Path> defineCurrentPaths(DirectoryType directoryType) {
+			Set<Path> newPaths = new HashSet<>();
 			if (DataExplorer.getInstance().getActiveObject() == null) {
 				Path deviceSubPath = directoryType.getActiveDeviceSubPath();
 				Path rootPath = deviceSubPath != null ? directoryType.getBasePath().resolve(deviceSubPath) : directoryType.getBasePath();
@@ -221,12 +198,12 @@ public final class DirectoryScanner {
 			return newPaths;
 		}
 
-		private List<Path> defineObjectPaths(Path basePath, String objectKey) {
-			List<Path> result = new ArrayList<Path>();
+		private Set<Path> defineObjectPaths(Path basePath, String objectKey) {
+			Set<Path> result = new HashSet<Path>();
 			Stream<String> objectKeys = Stream.of(objectKey);
 			if (isSlowFolderAccess) DataExplorer.getInstance().setStatusMessage("find object folders in " + basePath.toString());
 			try {
-				result = defineObjectPathsSilently(basePath, objectKeys).collect(Collectors.toList());
+				result = defineObjectPathsSilently(basePath, objectKeys).collect(Collectors.toSet());
 			} catch (IOException e) {
 				log.log(Level.SEVERE, e.getMessage(), " is not accessible : " + e.getClass());
 			}
@@ -235,22 +212,22 @@ public final class DirectoryScanner {
 		}
 
 		/**
-		 * Determine the valid directory paths from the supplementary working / import directories.
+		 * Determine the object directory paths from the external directories (data / import).
 		 * They are defined in the DataExplorer properties.
 		 * The result depends on the active device and object.
 		 * @return the list with 0 .. n entries
 		 */
-		private List<Path> defineExtraPaths(DirectoryType directoryType, String objectKey) {
-			Stream<Path> supplementFoldersStream = directoryType.getSupplementFolders();
-			return supplementFoldersStream.map(p -> defineObjectPaths(p, objectKey)) //
-					.flatMap(List::stream).collect(Collectors.toList());
+		private Set<Path> defineExternalObjectPaths(DirectoryType directoryType, String objectKey) {
+			Stream<Path> externalBaseDirs = directoryType.getExternalBaseDirs();
+			return externalBaseDirs.map(p -> defineObjectPaths(p, objectKey)) //
+					.flatMap(Set::stream).collect(Collectors.toSet());
 		}
 
-		public Set<Entry<DirectoryType, List<Path>>> entrySet() {
+		Set<Entry<DirectoryType, Set<Path>>> entrySet() {
 			return folders.entrySet();
 		}
 
-		public Collection<List<Path>> values() {
+		Collection<Set<Path>> values() {
 			return folders.values();
 		}
 
@@ -279,7 +256,7 @@ public final class DirectoryScanner {
 			return "" + this.folders;
 		}
 
-		public int getFoldersCount() {
+		int getFoldersCount() {
 			return (int) values().parallelStream().flatMap(Collection::parallelStream).count();
 		}
 
@@ -298,7 +275,7 @@ public final class DirectoryScanner {
 		 */
 		public String getDecoratedPathsCsv() {
 			List<String> directoryTypeTexts = new ArrayList<>();
-			for (Entry<DirectoryType, List<Path>> directoryEntry : folders.entrySet()) {
+			for (Entry<DirectoryType, Set<Path>> directoryEntry : folders.entrySet()) {
 				String text = directoryEntry.getValue().stream().map(Path::toString) //
 						.map(p -> directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + p) //
 						.collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
@@ -369,10 +346,10 @@ public final class DirectoryScanner {
 			}
 
 			@Override
-			public Stream<Path> getSupplementFolders() {
+			public Stream<Path> getExternalBaseDirs() {
 				try {
 					return Arrays.stream(Settings.getInstance().getDataFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
-							.map(String::trim).map(Paths::get);
+							.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
 					return Stream.empty();
@@ -428,7 +405,7 @@ public final class DirectoryScanner {
 			}
 
 			@Override
-			public Stream<Path> getSupplementFolders() {
+			public Stream<Path> getExternalBaseDirs() {
 				try {
 					return Arrays.stream(Settings.getInstance().getImportFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
 							.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get);
@@ -440,11 +417,11 @@ public final class DirectoryScanner {
 
 			@Override
 			public boolean isActive() {
-				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtensions().isEmpty() + " SupplementFolders.exist=" + getSupplementFolders().anyMatch(e -> true) + " dataSetPath=" + getDataSetPath());
+				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtensions().isEmpty() + " ExternalFolders.exist=" + getExternalBaseDirs().anyMatch(e -> true) + " dataSetPath=" + getDataSetPath());
 				if (getDataSetExtensions().isEmpty()) {
 					return false;
 				} else {
-					return getDataSetPath() != null || getSupplementFolders().anyMatch(e -> true);
+					return getDataSetPath() != null || getExternalBaseDirs().anyMatch(e -> true);
 				}
 			}
 		};
@@ -477,13 +454,13 @@ public final class DirectoryScanner {
 		 */
 		public abstract boolean isActive();
 
-		public abstract Stream<Path> getSupplementFolders();
+		public abstract Stream<Path> getExternalBaseDirs();
 	}
 
 	/**
 	 * File types supported by the history.
 	 */
-	public static class SourceDataSet {
+	public static final class SourceDataSet {
 		private final Path				path;
 		private final DataSetType	dataSetType;
 
@@ -536,6 +513,7 @@ public final class DirectoryScanner {
 					File actualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(file.toPath().toString()));
 					// getLinkContainedFilePath may have long response times in case of an unavailable network resources
 					// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
+					log.log(Level.FINER, "time_ms=", System.currentTimeMillis() - startMillis);
 					if (file.equals(actualFile) && (System.currentTimeMillis() - startMillis > 555) || !file.exists()) {
 						log.warning(() -> String.format("Dead OSD link %s pointing to %s", file, actualFile)); //$NON-NLS-1$
 						if (!file.delete()) {
@@ -818,7 +796,7 @@ public final class DirectoryScanner {
 
 		validatedFolders = new SourceFolders();
 		validatedFolders.defineDirectories4Test(filePath);
-		validatedFolders.values().parallelStream().flatMap(List::stream).map(Path::toString) //
+		validatedFolders.values().parallelStream().flatMap(Set::stream).map(Path::toString) //
 				.forEach(FileUtils::checkDirectoryAndCreate);
 
 		return readSourceFiles();
@@ -848,8 +826,7 @@ public final class DirectoryScanner {
 			}
 
 			this.validatedFolders = new SourceFolders();
-			this.isSlowFolderAccess = this.validatedFolders.isSlowFolderAccess(validatedDirectoryTypes);
-			this.validatedFolders.defineDirectories(validatedDirectoryTypes); // *
+			this.isSlowFolderAccess = this.validatedFolders.defineDirectories(validatedDirectoryTypes);
 		}
 
 		boolean isFirstCall = lastDevice == null;
@@ -876,7 +853,7 @@ public final class DirectoryScanner {
 		nonWorkableCount.reset();
 		excludedFiles.clear();
 
-		for (Entry<DirectoryType, List<Path>> entry : this.validatedFolders.entrySet()) {
+		for (Entry<DirectoryType, Set<Path>> entry : this.validatedFolders.entrySet()) {
 			List<SourceDataSet> sourceDataSets = entry.getValue().stream() //
 					.map(p -> {
 						try {

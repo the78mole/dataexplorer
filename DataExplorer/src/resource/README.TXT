@@ -5,7 +5,7 @@
 APPLICABILITY
 
 	History analysis module; log file source directories; object keys; native log
-	files 
+	files; supplementary object directories 
 	    
                 
 OVERVIEW
@@ -15,10 +15,13 @@ OVERVIEW
 	corresponds to an object folder placed in the working directory ('Settings > 
 	Data path'). 
 	
-	Most users hold the native log files (e.g. *.bin) in other folders.
+	Native log files (e.g. *.bin) are kept in other folders by most users.
 	  
 	This document gives you the information to integrate native log files kept in 
-	arbitrary directories, external drives or network drives.
+	arbitrary directories, external drives or network drives:
+	* Copy manually (option A, B)
+	* Access external directories (option C)
+	* Mirror logs from external directories (option D)
 	 
 	
 DETAILS
@@ -58,8 +61,8 @@ DETAILS
  
 	C)	External object directories
 
-	The DataExplorer properties file ('DataExplorer.properties') supports entries 
-	for including additional log file paths in the history analysis.
+	Access to additional log file paths in the history analysis is supported via 
+	entries in the DataExplorer properties file ('DataExplorer.properties').
 	
 	Example:
 	
@@ -68,12 +71,36 @@ DETAILS
 	
 	Please note the slash for universal directory paths (URI).
 	
-	The import directories are scanned if the current device supports imports. Only 
-	files with valid import extensions become part of the history.  
+	The import directories are scanned for object folders if the current device 
+	supports imports. Only files with valid import extensions become part of the 
+	history.  
+
+
+	D) Mirroring object directories
+	
+	Some users prefer to mirror log files into the _SupplementObjectDirs directory
+	located in the DataExplorer working directory. The DataExplorer properties file 
+	('DataExplorer.properties') holds the log file source directory path.
+	
+	Example:
+	
+		mirror_source_folders_csv =	 F:/Logs/ImportObjectDirs,//SERVER01/Logs
+	
+	Please note:
+	* use the slash for universal directory paths (URI)
+	* mirroring a working directory ('data path') of an additional DataExplorer 
+	  instance is supported (e.g. a dedicated PC for loader logs) 
+	
+	The source directories are scanned for object folders during the DataExplorer 
+	startup phase. New files will be copied without further notice. 
+	
+	Be aware of the wizard 'Settings > Maintenance > Clear supplement folder'. It
+	deletes all mirror copies and manual file copies. 
 
 
 REMARKS
 
+ 	* Applies to the DataExplorer history functions only.
  	* In any case you have to create the objects in the DataExplorer menu tool bar.
  	  Be aware of the wizard: 'Settings > Maintenance > Create objects'
  	  It searches the data path (working directory) for populated object 

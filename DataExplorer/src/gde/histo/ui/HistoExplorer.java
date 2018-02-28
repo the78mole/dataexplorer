@@ -24,7 +24,6 @@ import static gde.ui.DataExplorer.TAB_INDEX_HISTO_SUMMARY;
 import static gde.ui.DataExplorer.TAB_INDEX_HISTO_TABLE;
 import static java.util.logging.Level.SEVERE;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -77,8 +76,8 @@ public class HistoExplorer {
 	 * Build and fill the tabs.
 	 */
 	public void initHisto() {
-		SupplementObjectFolder supplementObjectFolder = new SupplementObjectFolder(Paths.get(settings.getDataFilePath()));
-		supplementObjectFolder.updateLogMirror();
+		SupplementObjectFolder.checkAndCreate();
+		SupplementObjectFolder.updateLogMirror();
 
 		int tabLength = displayTab.getItems().length;
 		int positionG = tabLength < TAB_INDEX_HISTO_GRAPHIC ? tabLength : TAB_INDEX_HISTO_GRAPHIC;
@@ -109,8 +108,8 @@ public class HistoExplorer {
 	 * Does nothing if the histoActive setting is false.
 	 */
 	public synchronized void resetHisto() {
-		SupplementObjectFolder supplementObjectFolder = new SupplementObjectFolder(Paths.get(settings.getDataFilePath()));
-		supplementObjectFolder.updateLogMirror();
+		SupplementObjectFolder.checkAndCreate();
+		SupplementObjectFolder.updateLogMirror();
 
 		for (AbstractChartWindow c : chartTabItems) {
 			resetWindowHeaderAndMeasuring(c);

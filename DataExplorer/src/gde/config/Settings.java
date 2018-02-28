@@ -104,9 +104,9 @@ public class Settings extends Properties {
 	public static final String			EMPTY_SIGNATURE									= Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY;
 	static final String							UNIX_PORT_DEV_TTY								= "/dev/tty";																																											//$NON-NLS-1$
 	static final String							WINDOWS_PORT_COM								= "COM";																																													//$NON-NLS-1$
-	static final String							PERMISSION_555									= "555";																																													//$NON-NLS-1$
-	static final String							PATH_RESOURCE										= "resource/";																																										//$NON-NLS-1$
-	static final String							PATH_RESOURCE_TEMPLATE					= "resource/template/";																																						//$NON-NLS-1$
+	public static final String			PERMISSION_555									= "555";																																													//$NON-NLS-1$
+	public static final String			PATH_RESOURCE										= "resource/";																																										//$NON-NLS-1$
+	public static final String			PATH_RESOURCE_TEMPLATE					= "resource/template/";																																						//$NON-NLS-1$
 
 	final static String							HEADER_TEXT											= "# -- DataExplorer Settings File -- ";																													//$NON-NLS-1$
 	final static String							DEVICE_BLOCK										= "#[Actual-Device-Port-Settings]";																																// Picolario;Renschler;COM2 //$NON-NLS-1$
@@ -189,6 +189,7 @@ public class Settings extends Properties {
 	final static String							IS_SUMMARY_SPOTS_VISIBLE				= "is_summary_spots_visible";																																			//$NON-NLS-1$
 	final static String							DATA_FOLDERS_CSV								= "data_folders_csv";																																							//$NON-NLS-1$
 	final static String							IMPORT_FOLDERS_CSV							= "import_folders_csv";																																						//$NON-NLS-1$
+	final static String							MIRROR_SOURCE_FOLDERS_CSV				= "mirror_source_folders_csv";																																		//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -812,6 +813,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_SPOTS_VISIBLE, isSummarySpotsVisible())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_FOLDERS_CSV, getDataFoldersCsv())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IMPORT_FOLDERS_CSV, getImportFoldersCsv())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MIRROR_SOURCE_FOLDERS_CSV, getMirrorSourceFoldersCsv())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -3220,6 +3222,21 @@ public class Settings extends Properties {
 	 */
 	public String getImportFoldersCsv() {
 		String list = String.valueOf(this.getProperty(Settings.IMPORT_FOLDERS_CSV, ""));
+		return list;
+	}
+
+	/**
+	 * @param csvValues holds the list of folder paths for object folder file mirroring
+	 */
+	public void setMirrorSourceFoldersCsv(String csvValues) {
+		this.setProperty(Settings.MIRROR_SOURCE_FOLDERS_CSV, String.valueOf(csvValues));
+	}
+
+	/**
+	 * @return the list of folder paths for object folder file mirroring
+	 */
+	public String getMirrorSourceFoldersCsv() {
+		String list = String.valueOf(this.getProperty(Settings.MIRROR_SOURCE_FOLDERS_CSV, ""));
 		return list;
 	}
 
