@@ -82,6 +82,8 @@ import gde.histo.utils.GpsCoordinate;
 import gde.histo.utils.UniversalQuantile;
 import gde.log.Level;
 import gde.log.Logger;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
@@ -1035,6 +1037,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		template.setCommentSuffix(name + " " + description);
 		template.store();
 		log.fine(() -> "creating histo graphics template file in " + template.getTargetFilePath());
+		DataExplorer.getInstance().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0922, new String[] {template.getHistoFileName()}));
 	}
 
 	/**
@@ -1089,6 +1092,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(chartWeights);
 			}
 			log.fine(() -> "applied histo graphics template file " + template.getTargetFilePath());
+			DataExplorer.getInstance().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0923, new String[] {template.getHistoFileName()}));
 
 			if (doUpdateVisibilityStatus) {
 				setDisplayable();

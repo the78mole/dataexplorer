@@ -65,7 +65,7 @@ public final class SelectorComposite extends Composite {
 	private final static Logger			log											= Logger.getLogger($CLASS_NAME);
 
 	private static final int				TEXT_EXTENT_FACTOR			= 6;
-	private static final int				YGAP_CHARTSELECTOR			= 2;
+	private static final int				YGAP_CHARTSELECTOR			= GDE.IS_MAC ? 0 : 2;
 	private static final int				COMBO_COLUMN_ORDINAL		= 1;
 
 	private final Menu							popupmenu;
@@ -157,8 +157,8 @@ public final class SelectorComposite extends Composite {
 		{
 			this.chartSelector = new Button(this, SWT.PUSH | SWT.LEFT | SWT.TRANSPARENT);
 			FormData chartSelectorLData = new FormData();
-			chartSelectorLData.width = 26;
-			chartSelectorLData.height = 26;
+			chartSelectorLData.width = GDE.IS_MAC ? 33 : 26;
+			chartSelectorLData.height = GDE.IS_MAC ? 33 : 26;
 			chartSelectorLData.left = new FormAttachment(curveSelectorHeader);
 			chartSelectorLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
 			this.chartSelector.setLayoutData(chartSelectorLData);
@@ -176,8 +176,8 @@ public final class SelectorComposite extends Composite {
 		{
 			this.smartSelector = new Button(this, SWT.TOGGLE | SWT.LEFT | SWT.TRANSPARENT);
 			FormData smartSelectorLData = new FormData();
-			smartSelectorLData.width = 26;
-			smartSelectorLData.height = 26;
+			smartSelectorLData.width = GDE.IS_MAC ? 33 : 26;
+			smartSelectorLData.height = GDE.IS_MAC ? 33 : 26;
 			smartSelectorLData.left = new FormAttachment(chartSelector, 26 / 2);
 			smartSelectorLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
 			this.smartSelector.setLayoutData(smartSelectorLData);
@@ -199,8 +199,8 @@ public final class SelectorComposite extends Composite {
 		{
 			this.saveTemplate = new Button(this, SWT.PUSH | SWT.LEFT | SWT.TRANSPARENT);
 			FormData saveTemplateLData = new FormData();
-			saveTemplateLData.width = 26;
-			saveTemplateLData.height = 26;
+			saveTemplateLData.width = GDE.IS_MAC ? 33 : 26;
+			saveTemplateLData.height = GDE.IS_MAC ? 33 : 26;
 			saveTemplateLData.left = new FormAttachment(smartSelector, -1);
 			saveTemplateLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
 			this.saveTemplate.setLayoutData(saveTemplateLData);
