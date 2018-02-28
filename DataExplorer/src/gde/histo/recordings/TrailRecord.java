@@ -564,6 +564,11 @@ public abstract class TrailRecord extends CommonRecord {
 		return template.isStartEndDefined;
 	}
 
+	@Override
+	public void setStartEndDefined(boolean enabled) { //TODO ET check if correct
+		template.isStartEndDefined = enabled;		
+	}
+
 	/**
 	 * sets the min-max values as displayed 4.0 - 200.5
 	 * @param enabled
@@ -581,6 +586,16 @@ public abstract class TrailRecord extends CommonRecord {
 			template.maxScaleValue = HistoSet.decodeVaultValue(this, this.maxValue / 1000.0);
 			template.minScaleValue = HistoSet.decodeVaultValue(this, this.minValue / 1000.0);
 		}
+	}
+
+	@Override
+	public void setMinScaleValue(double newMinScaleValue) { //TODO ET check if correct
+			template.minScaleValue = newMinScaleValue;
+	}
+
+	@Override
+	public void setMaxScaleValue(double newMaxScaleValue) { //TODO ET check if correct
+			template.maxScaleValue = newMaxScaleValue;
 	}
 
 	@Override

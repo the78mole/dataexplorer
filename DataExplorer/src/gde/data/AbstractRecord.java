@@ -80,6 +80,12 @@ public abstract class AbstractRecord extends Vector<Integer> {
 
 	public abstract void setStartpointZero(boolean enabled);
 
+	public abstract void setStartEndDefined(boolean enabled);
+
+	public abstract void setMaxScaleValue(double newMaxScaleValue);
+
+	public abstract void setMinScaleValue(double newMinScaleValue);
+
 	public abstract boolean isStartEndDefined();
 
 	/**

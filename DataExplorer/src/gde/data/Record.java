@@ -877,7 +877,7 @@ public class Record extends AbstractRecord {
 	public void setSyncMinMax(int newMin, int newMax) {
 		this.syncMinValue = newMin;
 		this.syncMaxValue = newMax;
-		log.finer(() -> getName() + " syncMinValue=" + newMin + " syncMaxValue=" + newMax);
+		if (log.isLoggable(Level.FINER)) log.finer(() -> getName() + " syncMinValue=" + newMin + " syncMaxValue=" + newMax);
 	}
 
 	public int getRealMaxValue() {
@@ -1195,6 +1195,11 @@ public class Record extends AbstractRecord {
 		return this.parent.isZoomMode ? true : this.isStartEndDefined;
 	}
 
+	@Override
+	public void setStartEndDefined(boolean enabled) {
+		this.isStartEndDefined = enabled;		
+	}
+
 	/**
 	 * sets the min-max values as displayed 4.0 - 200.5
 	 * @param enabled
@@ -1214,6 +1219,7 @@ public class Record extends AbstractRecord {
 		}
 	}
 
+	@Override
 	public void setMinScaleValue(double newMinScaleValue) {
 		if (this.parent.isZoomMode)
 			this.minZoomScaleValue = newMinScaleValue;
@@ -1221,6 +1227,7 @@ public class Record extends AbstractRecord {
 			this.minScaleValue = newMinScaleValue;
 	}
 
+	@Override
 	public void setMaxScaleValue(double newMaxScaleValue) {
 		if (this.parent.isZoomMode)
 			this.maxZoomScaleValue = newMaxScaleValue;
@@ -1854,7 +1861,7 @@ public class Record extends AbstractRecord {
 		this.tmpMaxZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
 		this.minZoomScaleValue = tmpMinZoomScaleValue < this.minScaleValue ? this.minScaleValue : tmpMinZoomScaleValue;
 		this.maxZoomScaleValue = tmpMaxZoomScaleValue > this.maxScaleValue ? this.maxScaleValue : tmpMaxZoomScaleValue;
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " - minZoomScaleValue = " + this.minZoomScaleValue + "  maxZoomScaleValue = " + this.maxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, this.name + " - minZoomScaleValue = " + this.minZoomScaleValue + "  maxZoomScaleValue = " + this.maxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -2596,5 +2603,4 @@ public class Record extends AbstractRecord {
 			return -1;
 		}
 	}
-
 }

@@ -140,14 +140,14 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 							// sort while add
 							get(syncMasterRecordOrdinal).add(Math.abs(i - syncMasterRecordOrdinal), tmpRecord);
 
-						syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_END_VALUES);
-						syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
-						syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_SCALE_POSITION);
-						log.finer(() -> "add " + tmpRecord.getName()); //$NON-NLS-1$
+						this.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_END_VALUES);
+						this.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
+						this.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_SCALE_POSITION);
+						if (log.isLoggable(Level.FINER)) log.finer(() -> "add " + tmpRecord.getName()); //$NON-NLS-1$
 					}
 				}
 			}
-			if (log.isLoggable(FINE)) {
+			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder();
 				for (Integer syncRecordOrdinal : this.keySet()) {
 					sb.append(GDE.STRING_NEW_LINE).append(syncRecordOrdinal).append(GDE.STRING_COLON);
@@ -155,7 +155,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 						sb.append(tmpRecord.getName()).append(GDE.STRING_SEMICOLON);
 					}
 				}
-				log.log(FINE, sb.toString());
+				log.log(Level.FINE, sb.toString());
 			}
 		}
 
@@ -176,10 +176,12 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 							synchronized (tmpRecord) {
 								tmpRecord.setRoundOut(tmpIsRoundout);
 								tmpRecord.setStartpointZero(tmpIsStartpointZero);
-								tmpRecord.setStartEndDefined(tmpIsStartEndDefined, minScaleValue, maxScaleValue);
+								tmpRecord.setStartEndDefined(tmpIsStartEndDefined);
+								tmpRecord.setMinScaleValue(minScaleValue);
+								tmpRecord.setMaxScaleValue(maxScaleValue);
 							}
-							log.log(Level.FINER, String.format("%s minScaleValue=%.2f maxScaleValue=%.2f", //
-									tmpRecord.getName(), tmpRecord.getMinScaleValue(), tmpRecord.getMaxScaleValue()));
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%d %s minScaleValue=%.2f maxScaleValue=%.2f isStartEndDefined=%b", //
+									syncRecordOrdinal, tmpRecord.getName(), tmpRecord.getMinScaleValue(), tmpRecord.getMaxScaleValue(), tmpIsStartEndDefined));
 						}
 						break;
 					case Record.TYPE_AXIS_NUMBER_FORMAT:
