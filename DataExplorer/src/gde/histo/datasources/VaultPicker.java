@@ -291,8 +291,10 @@ public final class VaultPicker {
 
 	@Override
 	public String toString() {
-		return String.format("totalTrussesCount=%,d  availableVaultsCount=%,d recordSetBytesSum=%,d elapsedTime_ms=%,d", //$NON-NLS-1$
+		String result = String.format("totalTrussesCount=%,d  availableVaultsCount=%,d recordSetBytesSum=%,d elapsedTime_ms=%,d", //
 				this.getTrussesCount(), this.getTimeStepSize(), this.recordSetBytesSum, this.getElapsedTime_ms());
+		log.log(Level.OFF, "evaluated " + result);
+		return result;
 	}
 
 	/**
@@ -313,6 +315,10 @@ public final class VaultPicker {
 		this.elapsedTime_us = 0;
 
 		this.trailRecordSet = null;
+
+		log.finer(() -> "finer(() done" + this.toString());
+		log.log(FINER, "log(FINER done", this);
+		log.log(FINER, "param", " done" + this);
 	}
 
 	public void rebuild4Test(Path filePath, TreeMap<String, DeviceConfiguration> devices)//
