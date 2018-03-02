@@ -225,6 +225,10 @@ public abstract class AbstractChartWindow extends CTabItem {
 		this.windowActor = new WindowActor();
 	}
 
+	public void resetStatusMessage() {
+		windowActor.setStatusMessage("");
+	}
+
 	/**
 	 * Redraw the graphics canvas as well as the curve selector table.
 	 */

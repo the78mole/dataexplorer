@@ -732,9 +732,11 @@ public class MenuBar {
 									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
 									trailRecordSet.getTemplate().setHistoFileName(templateFileName);
 									trailRecordSet.saveTemplate();
+									if (MenuBar.this.application.getPresentHistoExplorer().isHistoChartWindowVisible()) {
+										MenuBar.this.application.getPresentHistoExplorer().getActiveHistoChartTabItem().resetStatusMessage();
+									}
 								}
-							}
-							else {
+							}	else {
 								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 								if (activeChannel != null) {
 									GraphicsTemplate template = activeChannel.getTemplate();
