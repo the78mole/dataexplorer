@@ -829,6 +829,8 @@ public class DataExplorer extends Composite {
 		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "call GDE.shell.layout()"); //$NON-NLS-1$
 		GDE.shell.layout();
 		this.updateLogger();
+		
+		this.setHisto(Settings.getInstance().isHistoActive());
 	}
 
 	/**

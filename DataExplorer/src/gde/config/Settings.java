@@ -1615,7 +1615,6 @@ public class Settings extends Properties {
 			java.util.logging.Level globalLogLevel = java.util.logging.Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "WARNING").trim()); //$NON-NLS-1$
 			setIndividualLogLevel("gde.ui", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.data", globalLogLevel); //$NON-NLS-1$
-			setIndividualLogLevel("gde.histocache", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.config", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.device", globalLogLevel); //$NON-NLS-1$
 			setIndividualLogLevel("gde.utils", globalLogLevel); //$NON-NLS-1$
@@ -1633,7 +1632,6 @@ public class Settings extends Properties {
 			setGlobalLogLevel(java.util.logging.Level.parse(getProperty(Settings.GLOBAL_LOG_LEVEL, "WARNING").trim())); //$NON-NLS-1$
 			setIndividualLogLevel("gde.ui", getLogLevel(Settings.UI_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.data", getLogLevel(Settings.DATA_LOG_LEVEL)); //$NON-NLS-1$
-			setIndividualLogLevel("gde.histocache", getLogLevel(Settings.DATA_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.config", getLogLevel(Settings.CONFIG_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.device", getLogLevel(Settings.DEVICE_LOG_LEVEL)); //$NON-NLS-1$
 			setIndividualLogLevel("gde.utils", getLogLevel(Settings.UTILS_LOG_LEVEL)); //$NON-NLS-1$

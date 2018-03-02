@@ -210,7 +210,6 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.application.getActiveDevice().setLastChannelNumber(channelNumber);
 				if (this.application.getHistoExplorer().isPresent() != Settings.getInstance().isHistoActive()) {
 					// this case may exist during DE startup
-					this.application.setHisto(Settings.getInstance().isHistoActive());
 				} else if (Settings.getInstance().isHistoActive()) {
 					this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
 				}
