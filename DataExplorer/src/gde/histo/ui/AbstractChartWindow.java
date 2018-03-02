@@ -33,6 +33,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 
+import com.sun.istack.internal.Nullable;
+
 import gde.GDE;
 import gde.data.Channels;
 import gde.histo.datasources.HistoSet;
@@ -159,6 +161,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 			return DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet();
 		}
 
+		@Nullable
 		TrailRecordSet getTrailRecordSet() {
 			return Channels.getInstance().getActiveChannel() != null ? DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet() : null;
 

@@ -42,6 +42,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import com.sun.istack.internal.Nullable;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.recordings.TrailRecord;
@@ -459,9 +461,10 @@ public final class SelectorComposite extends Composite {
 	 * @param item
 	 * @return the record of the record represented by the table item
 	 */
+	@Nullable
 	private TrailRecord getTableItemRecord(TableItem item) {
 		TrailRecordSet trailRecordSet = windowActor.getTrailRecordSet();
-		return trailRecordSet.get(item.getData(DataExplorer.RECORD_NAME));
+		return trailRecordSet != null ? trailRecordSet.get(item.getData(DataExplorer.RECORD_NAME)) : null;
 	}
 
 	/**
