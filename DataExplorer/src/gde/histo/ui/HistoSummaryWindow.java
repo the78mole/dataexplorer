@@ -28,9 +28,13 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.log.Level;
+import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -42,8 +46,8 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public final class HistoSummaryWindow extends AbstractChartWindow {
-	// private static final String	$CLASS_NAME						= HistoSummaryWindow.class.getName();
-	// private static final Logger	log										= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME						= HistoSummaryWindow.class.getName();
+	private static final Logger	log										= Logger.getLogger($CLASS_NAME);
 
 	public static final int[]		DEFAULT_CHART_WEIGHTS	= new int[] { 0, 10000 };							// 2nd chart is the default chart
 
@@ -62,9 +66,16 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 		window.compositeSashForm = new SashForm(window.graphicSashForm, SWT.VERTICAL);
 		window.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
 
-		new SummaryComposite(window.compositeSashForm, window); // at the top
+		SummaryComposite summaryComposite = new SummaryComposite(window.compositeSashForm, window); // at the top
 		new GraphicsComposite(window.compositeSashForm, window);
 		window.compositeSashForm.setWeights(DEFAULT_CHART_WEIGHTS.clone());
+		summaryComposite.addListener(SWT.Resize, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				HistoSummaryWindow.log.log(Level.FINEST, "height=", summaryComposite.getBounds().height);
+				window.curveSelectorComposite.setVerticalBarVisible(window.compositeSashForm.getWeights()[0] == 0);
+			}
+		});
 
 		window.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		window.setText(Messages.getString(MessageIds.GDE_MSGT0883));
@@ -89,11 +100,11 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 					.mapToInt(c -> c.getBounds().height).sum();
 			int summaryWeight = fixedTotalHeight < actualHeight ? fixedTotalHeight * 1000 / actualHeight : 1000;
 			if (compositeSashForm.getWeights()[0] == summaryWeight) {
-				compositeSashForm.setWeights(new int[] { 0, 1000 });
+				resizeCompositeSashForm(new int[] { 0, 1000 });
 			} else if (compositeSashForm.getWeights()[0] == 0) {
-				compositeSashForm.setWeights(new int[] { 1000, 0 });
+				resizeCompositeSashForm(new int[] { 1000, 0 });
 			} else {
-				compositeSashForm.setWeights(new int[] { summaryWeight, 1000 - summaryWeight });
+				resizeCompositeSashForm(new int[] { summaryWeight, 1000 - summaryWeight });
 			}
 		} else {
 			setDefaultChart();
@@ -104,7 +115,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 	 * Set the graphics chart into the window without redrawing.
 	 */
 	protected void setDefaultChart() {
-		compositeSashForm.setWeights(DEFAULT_CHART_WEIGHTS.clone());
+		resizeCompositeSashForm(DEFAULT_CHART_WEIGHTS.clone());
 	}
 
 	public int[] getChartWeights() {
@@ -113,15 +124,20 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 
 	public void setChartWeights(int[] chartWeights) {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
-			compositeSashForm.setWeights(chartWeights);
+			resizeCompositeSashForm(chartWeights);
 		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					HistoSummaryWindow.this.compositeSashForm.setWeights(chartWeights);
+					HistoSummaryWindow.this.resizeCompositeSashForm(chartWeights);
 				}
 			});
 		}
+	}
+
+	private void resizeCompositeSashForm(int[] chartWeights) {
+		compositeSashForm.setWeights(chartWeights);
+		curveSelectorComposite.setVerticalBarVisible(chartWeights[0] == 0);
 	}
 
 	/**

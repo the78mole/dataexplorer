@@ -472,13 +472,18 @@ public final class SelectorComposite extends Composite {
 	 */
 	public Rectangle getRealBounds() {
 		if (this.curveSelectorTable.getItemCount() > 0) {
+			Rectangle firstRowBounds = this.curveSelectorTable.getItem(0).getBounds();
 			Rectangle lastRowBounds = this.curveSelectorTable.getItem(this.curveSelectorTable.getItemCount() - 1).getBounds();
 			int headerHeight = this.curveSelectorTable.getLocation().y;
 
-			return new Rectangle(getBounds().x, headerHeight, getBounds().width, lastRowBounds.y + lastRowBounds.height);
+			return new Rectangle(getBounds().x, headerHeight, getBounds().width, lastRowBounds.y + lastRowBounds.height - firstRowBounds.y);
 		} else {
 			return new Rectangle(1, 1, 1, 1);
 		}
 	}
 
+	public void setVerticalBarVisible(boolean visible) {
+		if (!visible) curveSelectorTable.setTopIndex(0);
+		this.curveSelectorTable.getVerticalBar().setVisible(visible);
+	}
 }
