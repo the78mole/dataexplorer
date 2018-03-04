@@ -232,7 +232,7 @@ public class Settings extends Properties {
 	public final static String			IS_PARTIAL_DATA_TABLE						= "is_partial_data_table";																																				//$NON-NLS-1$
 	public final static String			IS_DATA_TABLE_EDITABLE					= "is_data_table_editable";																																				//$NON-NLS-1$
 	public final static String			GLOBAL_LOG_LEVEL								= "global_log_level";																																							//$NON-NLS-1$
-	public final static String			UI_LOG_LEVEL										= "ui_log_leve";																																									//$NON-NLS-1$
+	public final static String			UI_LOG_LEVEL										= "ui_log_level";																																									//$NON-NLS-1$
 	public final static String			DEVICE_LOG_LEVEL								= "device_log_level";																																							//$NON-NLS-1$
 	public final static String			DATA_LOG_LEVEL									= "data_log_level";																																								//$NON-NLS-1$
 	public final static String			CONFIG_LOG_LEVEL								= "config_log_level";																																							//$NON-NLS-1$
