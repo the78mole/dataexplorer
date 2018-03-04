@@ -7,6 +7,7 @@ Version 3.3.2 - xx yyy 2017
 * fix some issues when adding / editing object keys
 * fix wrong interpretation and display of geo-coordinates received as degree with decimal digits
 * fix parsing error with values coming with comma as separator to decimal places
+* fix setting of time grid building new template
 * context menu texts (graphics / data table tabs)
 * add initial support for Junsi iCharger 106B
 * add initial support for ELV WDE (Wetter-Daten-Empfänger)

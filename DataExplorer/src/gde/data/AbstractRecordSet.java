@@ -505,7 +505,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 		try {
 			return this.get(this.recordNames[recordOrdinal]);
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
+			log.log(Level.WARNING, e.getMessage(), e);
 			return super.size() > 0 ? this.get(0) : null;
 		}
 	}

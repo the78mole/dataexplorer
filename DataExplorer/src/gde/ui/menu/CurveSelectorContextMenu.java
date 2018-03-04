@@ -102,14 +102,14 @@ public class CurveSelectorContextMenu {
 			popupmenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuShown(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "popupmenu MenuListener.menuShown " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "popupmenu MenuListener.menuShown " + evt); //$NON-NLS-1$
 					CurveSelectorContextMenu.this.selectedItem = (TableItem) popupmenu.getData(DataExplorer.CURVE_SELECTION_ITEM);
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						CurveSelectorContextMenu.log.log(java.util.logging.Level.FINER, CurveSelectorContextMenu.this.selectedItem.toString());
+						CurveSelectorContextMenu.log.finer(() -> CurveSelectorContextMenu.this.selectedItem.toString());
 						if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 							CurveSelectorContextMenu.this.recordNameKey = (String) popupmenu.getData(DataExplorer.RECORD_NAME);
 							String recordNameUi = (String) popupmenu.getData(DataExplorer.NAME_REPLACEMENT) == null ? CurveSelectorContextMenu.this.recordNameKey : (String) popupmenu.getData(DataExplorer.NAME_REPLACEMENT);
-							CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, "===>>" + CurveSelectorContextMenu.this.recordNameKey);
+							CurveSelectorContextMenu.log.fine(() -> "===>>" + CurveSelectorContextMenu.this.recordNameKey);
 							CurveSelectorContextMenu.this.isTypeCompare = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.COMPARE);
 							CurveSelectorContextMenu.this.isTypeUtility = CurveSelectorContextMenu.this.application.isRecordSetVisible(GraphicsType.UTIL);
 							CurveSelectorContextMenu.this.isTypeHisto = CurveSelectorContextMenu.this.application.getHistoExplorer().map(h -> h.isHistoChartWindowVisible()).orElse(false);
@@ -196,13 +196,13 @@ public class CurveSelectorContextMenu {
 
 				@Override
 				public void menuHidden(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "popupmenu MenuListener.menuHidden " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "popupmenu MenuListener.menuHidden " + evt); //$NON-NLS-1$
 				}
 			});
 			popupmenu.addListener(SWT.FocusOut, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "widgetDisposed Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "widgetDisposed Action performed! " + e); //$NON-NLS-1$
 					CurveSelectorContextMenu.this.menu.setData(DataExplorer.RECORD_NAME, null);
 					CurveSelectorContextMenu.this.menu.setData(DataExplorer.CURVE_SELECTION_ITEM, null);
 				}
@@ -216,7 +216,7 @@ public class CurveSelectorContextMenu {
 			this.lineVisible.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "lineVisible selected evt=" + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "lineVisible selected evt=" + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null) {
 						boolean checked = CurveSelectorContextMenu.this.lineVisible.getSelection();
 						CurveSelectorContextMenu.this.actualRecord.setVisible(checked);
@@ -233,7 +233,7 @@ public class CurveSelectorContextMenu {
 			this.lineColor.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINER, "lineColor performed! " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finer(() -> "lineColor performed! " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						CurveSelectorContextMenu.this.isActiveColorDialog = true;
 						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
@@ -256,7 +256,7 @@ public class CurveSelectorContextMenu {
 			this.lineWidthMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuShown(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "lineWidthMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "lineWidthMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.actualRecord != null && CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						int width = CurveSelectorContextMenu.this.actualRecord.getLineWidth();
 						switch (width) {
@@ -286,7 +286,7 @@ public class CurveSelectorContextMenu {
 
 				@Override
 				public void menuHidden(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "lineWidthMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "lineWidthMenu MenuListener " + evt); //$NON-NLS-1$
 				}
 			});
 
@@ -296,7 +296,7 @@ public class CurveSelectorContextMenu {
 			this.lineWidthMenuItem1.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, Messages.getString(MessageIds.GDE_MSGT0089) + e);
+					CurveSelectorContextMenu.log.finest(() -> Messages.getString(MessageIds.GDE_MSGT0089) + e);
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setLineWidth(1);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
@@ -313,7 +313,7 @@ public class CurveSelectorContextMenu {
 			this.lineWidthMenuItem2.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, Messages.getString(MessageIds.GDE_MSGT0091) + e);
+					CurveSelectorContextMenu.log.finest(() -> Messages.getString(MessageIds.GDE_MSGT0091) + e);
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setLineWidth(2);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
@@ -330,7 +330,7 @@ public class CurveSelectorContextMenu {
 			this.lineWidthMenuItem3.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, Messages.getString(MessageIds.GDE_MSGT0093) + e);
+					CurveSelectorContextMenu.log.finest(() -> Messages.getString(MessageIds.GDE_MSGT0093) + e);
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setLineWidth(3);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
@@ -349,7 +349,7 @@ public class CurveSelectorContextMenu {
 			this.lineTypeMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuShown(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "lineTypeMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "lineTypeMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.actualRecord != null && CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						int type = CurveSelectorContextMenu.this.actualRecord.getLineStyle();
 						switch (type) {
@@ -379,7 +379,7 @@ public class CurveSelectorContextMenu {
 
 				@Override
 				public void menuHidden(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "lineTypeMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "lineTypeMenu MenuListener " + evt); //$NON-NLS-1$
 				}
 			});
 
@@ -389,7 +389,7 @@ public class CurveSelectorContextMenu {
 			this.lineTypeMenuItem1.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "lineTypeMenuItem1 " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "lineTypeMenuItem1 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setLineStyle(SWT.LINE_SOLID);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
@@ -406,7 +406,7 @@ public class CurveSelectorContextMenu {
 			this.lineTypeMenuItem2.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "lineTypeMenuItem2 " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "lineTypeMenuItem2 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setLineStyle(SWT.LINE_DASH);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
@@ -423,7 +423,7 @@ public class CurveSelectorContextMenu {
 			this.lineTypeMenuItem3.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "lineTypeMenuItem3 " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "lineTypeMenuItem3 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setLineStyle(SWT.LINE_DOT);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
@@ -440,7 +440,7 @@ public class CurveSelectorContextMenu {
 			this.smoothAtCurrentDropItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "smoothAtCurrentDropItem selected evt=" + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "smoothAtCurrentDropItem selected evt=" + e); //$NON-NLS-1$
 					if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet != null) {
 						boolean checked = CurveSelectorContextMenu.this.smoothAtCurrentDropItem.getSelection();
 						((RecordSet) CurveSelectorContextMenu.this.recordSet).setSmoothAtCurrentDrop(checked);
@@ -455,7 +455,7 @@ public class CurveSelectorContextMenu {
 			this.smoothVoltageCurveItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "smoothVoltageCurveItem selected evt=" + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "smoothVoltageCurveItem selected evt=" + e); //$NON-NLS-1$
 					if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet != null) {
 						boolean checked = CurveSelectorContextMenu.this.smoothVoltageCurveItem.getSelection();
 						((RecordSet) CurveSelectorContextMenu.this.recordSet).setSmoothVoltageCurve(checked);
@@ -473,7 +473,7 @@ public class CurveSelectorContextMenu {
 			this.axisEndValuesMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuShown(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisEndValuesMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisEndValuesMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.actualRecord != null && CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						boolean isRounded = CurveSelectorContextMenu.this.actualRecord.isRoundOut();
 						boolean isStart0 = CurveSelectorContextMenu.this.actualRecord.isStartpointZero();
@@ -488,7 +488,7 @@ public class CurveSelectorContextMenu {
 
 				@Override
 				public void menuHidden(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisEndValuesMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisEndValuesMenu MenuListener " + evt); //$NON-NLS-1$
 				}
 			});
 
@@ -498,7 +498,7 @@ public class CurveSelectorContextMenu {
 			this.axisEndAuto.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisEndAuto.SelectionListener = " + e);
+					CurveSelectorContextMenu.log.finest(() -> "axisEndAuto.SelectionListener = " + e);
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setStartpointZero(false);
 						CurveSelectorContextMenu.this.axisEndRound.setSelection(false);
@@ -517,7 +517,7 @@ public class CurveSelectorContextMenu {
 			this.axisEndRound.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisEndRound.SelectionListener = " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisEndRound.SelectionListener = " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						if (CurveSelectorContextMenu.this.axisEndRound.getSelection()) { // true
 							CurveSelectorContextMenu.this.axisEndAuto.setSelection(false);
@@ -543,7 +543,7 @@ public class CurveSelectorContextMenu {
 			this.axisStarts0.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisStarts0 " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisStarts0 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						if (CurveSelectorContextMenu.this.axisStarts0.getSelection()) { // true
 							CurveSelectorContextMenu.this.actualRecord.setStartpointZero(true);
@@ -567,7 +567,7 @@ public class CurveSelectorContextMenu {
 			this.axisEndManual.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisEndManual Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisEndManual Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.isActiveEnValueDialog = true;
 						CurveSelectorContextMenu.this.axisEndManual.setSelection(true);
@@ -597,7 +597,7 @@ public class CurveSelectorContextMenu {
 			this.axisNumberFormatMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuShown(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisNumberFormatMenu MenuListener.menuShown " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisNumberFormatMenu MenuListener.menuShown " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						int format = CurveSelectorContextMenu.this.actualRecord.getNumberFormat();
 						switch (format) {
@@ -643,7 +643,7 @@ public class CurveSelectorContextMenu {
 
 				@Override
 				public void menuHidden(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisNumberFormatMenu MenuListener.menuHidden " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisNumberFormatMenu MenuListener.menuHidden " + evt); //$NON-NLS-1$
 				}
 			});
 
@@ -652,7 +652,7 @@ public class CurveSelectorContextMenu {
 			this.axisNumberFormatAuto.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisNumberFormatAuto " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisNumberFormatAuto " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setNumberFormat(-1);
 						CurveSelectorContextMenu.this.actualRecord.getAbstractParent().syncMasterSlaveRecords(CurveSelectorContextMenu.this.actualRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
@@ -667,7 +667,7 @@ public class CurveSelectorContextMenu {
 			this.axisNumberFormat0.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisNumberFormat0 " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisNumberFormat0 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setNumberFormat(0);
 						CurveSelectorContextMenu.this.actualRecord.getAbstractParent().syncMasterSlaveRecords(CurveSelectorContextMenu.this.actualRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
@@ -682,7 +682,7 @@ public class CurveSelectorContextMenu {
 			this.axisNumberFormat1.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisNumberFormat1 " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisNumberFormat1 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setNumberFormat(1);
 						CurveSelectorContextMenu.this.actualRecord.getAbstractParent().syncMasterSlaveRecords(CurveSelectorContextMenu.this.actualRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
@@ -697,7 +697,7 @@ public class CurveSelectorContextMenu {
 			this.axisNumberFormat2.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisNumberFormat2 " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisNumberFormat2 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setNumberFormat(2);
 						CurveSelectorContextMenu.this.actualRecord.getAbstractParent().syncMasterSlaveRecords(CurveSelectorContextMenu.this.actualRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
@@ -712,7 +712,7 @@ public class CurveSelectorContextMenu {
 			this.axisNumberFormat3.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisNumberFormat3 " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisNumberFormat3 " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setNumberFormat(3);
 						CurveSelectorContextMenu.this.actualRecord.getAbstractParent().syncMasterSlaveRecords(CurveSelectorContextMenu.this.actualRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
@@ -730,7 +730,7 @@ public class CurveSelectorContextMenu {
 			this.axisPositionMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuShown(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisPositionMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisPositionMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.actualRecord != null && CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						boolean isLeft = CurveSelectorContextMenu.this.actualRecord.isPositionLeft();
 						if (isLeft) {
@@ -746,7 +746,7 @@ public class CurveSelectorContextMenu {
 
 				@Override
 				public void menuHidden(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisPositionMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisPositionMenu MenuListener " + evt); //$NON-NLS-1$
 				}
 			});
 
@@ -755,7 +755,7 @@ public class CurveSelectorContextMenu {
 			this.axisPositionLeft.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisPositionLeft Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisPositionLeft Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setPositionLeft(true);
 						CurveSelectorContextMenu.this.actualRecord.getAbstractParent().syncMasterSlaveRecords(CurveSelectorContextMenu.this.actualRecord, Record.TYPE_AXIS_SCALE_POSITION);
@@ -770,7 +770,7 @@ public class CurveSelectorContextMenu {
 			this.axisPositionRight.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "axisPositionRight Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "axisPositionRight Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.actualRecord.setPositionLeft(false);
 						CurveSelectorContextMenu.this.actualRecord.getAbstractParent().syncMasterSlaveRecords(CurveSelectorContextMenu.this.actualRecord, Record.TYPE_AXIS_SCALE_POSITION);
@@ -790,7 +790,7 @@ public class CurveSelectorContextMenu {
 			this.timeGridMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuShown(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "timeGridMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "timeGridMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						int gridType = CurveSelectorContextMenu.this.isTypeHisto ? RecordSet.TIME_GRID_NONE : ((RecordSet) CurveSelectorContextMenu.this.recordSet).getTimeGridType();
 						switch (gridType) {
@@ -815,7 +815,7 @@ public class CurveSelectorContextMenu {
 
 				@Override
 				public void menuHidden(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "timeGridMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "timeGridMenu MenuListener " + evt); //$NON-NLS-1$
 				}
 			});
 
@@ -824,7 +824,7 @@ public class CurveSelectorContextMenu {
 			this.timeGridOff.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "timeGridOff Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "timeGridOff Action performed! " + e); //$NON-NLS-1$
 					if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet != null) {
 						((RecordSet) CurveSelectorContextMenu.this.recordSet).setTimeGridType(RecordSet.TIME_GRID_NONE);
 						// ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
@@ -841,9 +841,9 @@ public class CurveSelectorContextMenu {
 			this.timeGridMain.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "timeGridMain Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "timeGridMain Action performed! " + e); //$NON-NLS-1$
 					if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
-						((RecordSet) CurveSelectorContextMenu.this.recordSet).setTimeGridType(RecordSet.TIME_GRID_NONE);
+						((RecordSet) CurveSelectorContextMenu.this.recordSet).setTimeGridType(RecordSet.TIME_GRID_MAIN);
 						// ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
@@ -860,9 +860,9 @@ public class CurveSelectorContextMenu {
 			this.timeGridMod60.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "timeGridMod60 Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "timeGridMod60 Action performed! " + e); //$NON-NLS-1$
 					if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
-						((RecordSet) CurveSelectorContextMenu.this.recordSet).setTimeGridType(RecordSet.TIME_GRID_NONE);
+						((RecordSet) CurveSelectorContextMenu.this.recordSet).setTimeGridType(RecordSet.TIME_GRID_MOD60);
 						// ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
 
@@ -879,7 +879,7 @@ public class CurveSelectorContextMenu {
 			this.timeGridColor.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "timeGridColor Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "timeGridColor Action performed! " + e); //$NON-NLS-1$
 					if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
@@ -916,36 +916,39 @@ public class CurveSelectorContextMenu {
 			this.valueGridMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuShown(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "horizontalGridMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						AbstractRecord abstractRecord = CurveSelectorContextMenu.this.recordSet.get(CurveSelectorContextMenu.this.recordSet.getValueGridRecordOrdinal());
-						String recordNameUi = abstractRecord instanceof TrailRecord ? ((TrailRecord) abstractRecord).getNameReplacement() : abstractRecord.getName();
-						CurveSelectorContextMenu.this.valueGridRecordName.setText(Messages.getString(MessageIds.GDE_MSGT0118) + recordNameUi);
-						int gridType = CurveSelectorContextMenu.this.recordSet.getValueGridType();
-						switch (gridType) {
-						case RecordSet.VALUE_GRID_EVERY:
-							CurveSelectorContextMenu.this.valueGridOff.setSelection(false);
-							CurveSelectorContextMenu.this.valueGridEveryTick.setSelection(true);
-							CurveSelectorContextMenu.this.valueGridEverySecond.setSelection(false);
-							break;
-						case RecordSet.VALUE_GRID_SECOND:
-							CurveSelectorContextMenu.this.valueGridOff.setSelection(false);
-							CurveSelectorContextMenu.this.valueGridEveryTick.setSelection(false);
-							CurveSelectorContextMenu.this.valueGridEverySecond.setSelection(true);
-							break;
-						case RecordSet.VALUE_GRID_NONE:
-						default:
-							CurveSelectorContextMenu.this.valueGridOff.setSelection(true);
-							CurveSelectorContextMenu.this.valueGridEveryTick.setSelection(false);
-							CurveSelectorContextMenu.this.valueGridEverySecond.setSelection(false);
-							break;
+						int selectedValueGridOrdinal = CurveSelectorContextMenu.this.recordSet.getValueGridRecordOrdinal();
+						if (selectedValueGridOrdinal >= 0) {
+							AbstractRecord abstractRecord = CurveSelectorContextMenu.this.recordSet.get(selectedValueGridOrdinal);
+							String recordNameUi = abstractRecord instanceof TrailRecord ? ((TrailRecord) abstractRecord).getNameReplacement() : abstractRecord.getName();
+							CurveSelectorContextMenu.this.valueGridRecordName.setText(Messages.getString(MessageIds.GDE_MSGT0118) + recordNameUi);
+							int gridType = CurveSelectorContextMenu.this.recordSet.getValueGridType();
+							switch (gridType) {
+							case RecordSet.VALUE_GRID_EVERY:
+								CurveSelectorContextMenu.this.valueGridOff.setSelection(false);
+								CurveSelectorContextMenu.this.valueGridEveryTick.setSelection(true);
+								CurveSelectorContextMenu.this.valueGridEverySecond.setSelection(false);
+								break;
+							case RecordSet.VALUE_GRID_SECOND:
+								CurveSelectorContextMenu.this.valueGridOff.setSelection(false);
+								CurveSelectorContextMenu.this.valueGridEveryTick.setSelection(false);
+								CurveSelectorContextMenu.this.valueGridEverySecond.setSelection(true);
+								break;
+							case RecordSet.VALUE_GRID_NONE:
+							default:
+								CurveSelectorContextMenu.this.valueGridOff.setSelection(true);
+								CurveSelectorContextMenu.this.valueGridEveryTick.setSelection(false);
+								CurveSelectorContextMenu.this.valueGridEverySecond.setSelection(false);
+								break;
+							}
 						}
 					}
 				}
 
 				@Override
 				public void menuHidden(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "horizontalGridMenu MenuListener " + evt); //$NON-NLS-1$
 				}
 			});
 
@@ -958,7 +961,7 @@ public class CurveSelectorContextMenu {
 			this.valueGridOff.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridOff Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "horizontalGridOff Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.recordSet.setValueGridType(RecordSet.VALUE_GRID_NONE);
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
@@ -977,7 +980,7 @@ public class CurveSelectorContextMenu {
 			this.valueGridEveryTick.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridMain Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "horizontalGridMain Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.recordSet.setValueGridType(RecordSet.VALUE_GRID_EVERY);
 						CurveSelectorContextMenu.this.recordSet.setValueGridRecordOrdinal(
@@ -1000,7 +1003,7 @@ public class CurveSelectorContextMenu {
 			this.valueGridEverySecond.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridMod60 Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "horizontalGridMod60 Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						CurveSelectorContextMenu.this.recordSet.setValueGridType(RecordSet.VALUE_GRID_SECOND);
 						CurveSelectorContextMenu.this.recordSet.setValueGridRecordOrdinal(CurveSelectorContextMenu.this.actualRecord.getOrdinal());
@@ -1022,7 +1025,7 @@ public class CurveSelectorContextMenu {
 			this.valueGridColor.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "horizontalGridColor Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "horizontalGridColor Action performed! " + e); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.recordSet != null && CurveSelectorContextMenu.this.actualRecord != null) {
 						RGB rgb = CurveSelectorContextMenu.this.application.openColorDialog();
 						if (rgb != null) {
@@ -1063,7 +1066,7 @@ public class CurveSelectorContextMenu {
 			this.measurementMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuShown(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "measurementMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "measurementMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
 						CurveSelectorContextMenu.this.measurementRecordName.setText(Messages.getString(MessageIds.GDE_MSGT0124) + CurveSelectorContextMenu.this.recordNameMeasurement);
 					}
@@ -1071,7 +1074,7 @@ public class CurveSelectorContextMenu {
 
 				@Override
 				public void menuHidden(MenuEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "measurementMenu MenuListener " + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "measurementMenu MenuListener " + evt); //$NON-NLS-1$
 				}
 			});
 
@@ -1084,7 +1087,7 @@ public class CurveSelectorContextMenu {
 			this.simpleMeasure.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "measure.widgetSelected, event=" + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "measure.widgetSelected, event=" + evt); //$NON-NLS-1$
 					setMeasurement(CurveSelectorContextMenu.this.recordNameKey, CurveSelectorContextMenu.this.simpleMeasure.getSelection());
 				}
 
@@ -1094,7 +1097,7 @@ public class CurveSelectorContextMenu {
 			this.deltaMeasure.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "deltaMeasure.widgetSelected, event=" + evt); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "deltaMeasure.widgetSelected, event=" + evt); //$NON-NLS-1$
 					setDeltaMeasurement(CurveSelectorContextMenu.this.recordNameKey, CurveSelectorContextMenu.this.deltaMeasure.getSelection());
 				}
 			});
@@ -1106,7 +1109,7 @@ public class CurveSelectorContextMenu {
 			this.copyCurveCompare.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "copyCurveCompare Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "copyCurveCompare Action performed! " + e); //$NON-NLS-1$
 					CurveSelectorContextMenu.this.application.createCompareWindowTabItem(); // if ot already exist
 					String copyFromRecordKey = (String) popupmenu.getData(DataExplorer.RECORD_NAME);
 					RecordSet copyFromRecordSet = Channels.getInstance().getActiveChannel().getActiveRecordSet();
@@ -1147,7 +1150,7 @@ public class CurveSelectorContextMenu {
 							if (newRecordMaxTime_ms > maxRecordTime_ms) {
 								compareSet.setCompareSetMaxScaleTime_ms(newRecordMaxTime_ms);
 								maxRecordTime_ms = newRecordMaxTime_ms;
-								CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, "adapt compareSet maxRecordTime_sec = " + TimeLine.getFomatedTimeWithUnit(maxRecordTime_ms)); //$NON-NLS-1$
+								CurveSelectorContextMenu.log.fine(() -> "adapt compareSet maxRecordTime_sec = " + TimeLine.getFomatedTimeWithUnit(newRecordMaxTime_ms)); //$NON-NLS-1$
 
 								// new added record exceed size of existing, existing needs draw limit to be updated and to be padded
 								for (Entry<String, AbstractRecord> tmpRecordEntry : compareSet.entrySet()) {
@@ -1180,13 +1183,12 @@ public class CurveSelectorContextMenu {
 
 							double oldMinValue = compareSet.getMinValue();
 							double oldMaxValue = compareSet.getMaxValue();
-							CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, String.format("scale values from compare set min=%.3f max=%.3f", oldMinValue, oldMaxValue)); //$NON-NLS-1$
+							CurveSelectorContextMenu.log.fine(() -> String.format("scale values from compare set min=%.3f max=%.3f", compareSet.getMinValue(), compareSet.getMaxValue())); //$NON-NLS-1$
 							for (int i = 0; i < compareSet.size(); i++) {
 								Record record = (Record) recordSet.get(i);
 								double newMinValue = record.getMinScaleValue();
 								double newMaxValue = record.getMaxScaleValue();
-								CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE,
-										String.format("scale values from record (" + record.getName() + ") to be checked min=%.3f max=%.3f", newMinValue, newMaxValue)); //$NON-NLS-1$ //$NON-NLS-2$
+								CurveSelectorContextMenu.log.fine(() ->	String.format("scale values from record (" + record.getName() + ") to be checked min=%.3f max=%.3f", newMinValue, newMaxValue)); //$NON-NLS-1$ //$NON-NLS-2$
 
 								if (newMinValue < oldMinValue) {
 									compareSet.setMinValue(newMinValue); // store new min value into record set
@@ -1216,7 +1218,7 @@ public class CurveSelectorContextMenu {
 			this.cleanCurveCompare.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
-					CurveSelectorContextMenu.log.log(java.util.logging.Level.FINEST, "cleanCurveCompare Action performed! " + e); //$NON-NLS-1$
+					CurveSelectorContextMenu.log.finest(() -> "cleanCurveCompare Action performed! " + e); //$NON-NLS-1$
 					RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
 					compareSet.clear();
 					CurveSelectorContextMenu.this.application.updateCompareWindow();
@@ -1265,7 +1267,7 @@ public class CurveSelectorContextMenu {
 	 */
 	public boolean isActive() {
 		boolean isActive = (this.menu != null && this.menu.isVisible()) || this.isActiveEnValueDialog || this.isActiveColorDialog;
-		CurveSelectorContextMenu.log.log(java.util.logging.Level.FINE, "isActive = " + isActive);
+		CurveSelectorContextMenu.log.fine(() -> "isActive = " + isActive);
 		return isActive;
 	}
 
