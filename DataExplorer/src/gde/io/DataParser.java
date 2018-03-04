@@ -143,10 +143,10 @@ public class DataParser extends NMEAParser {
 				this.time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - this.start_time_ms; // Seconds * 1000 = msec			
 		}
 
-		for (int i = 0; i < this.valueSize; i++) {
-			strValue = strValues[i + 3].trim();
+		for (int i = 0; i < this.valueSize && i < strValues.length - 4; i++) {
+			strValue = strValues[i + 3].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT);
 			try {
-				double tmpValue = strValue.length() > 0 ? Double.parseDouble(strValue.trim()) : 0.0;
+				double tmpValue = strValue.length() > 0 ? Double.parseDouble(strValue) : 0.0;
 				if (this.isMultiply1000 && tmpValue < Integer.MAX_VALUE / 1000 && tmpValue > Integer.MIN_VALUE / 1000)
 					this.values[i] = (int) (tmpValue * 1000); // enable 3 positions after decimal place
 				else // needs special processing within IDevice.translateValue(), IDevice.reverseTranslateValue()

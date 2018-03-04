@@ -286,7 +286,7 @@ public class CSVReaderWriter {
 						continue;
 					}
 					String[] dataStr = line.split(GDE.STRING_EMPTY + separator);
-					String data = dataStr[0].trim().replace(',', '.');
+					String data = dataStr[0].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT);
 					if (data.contains(GDE.STRING_COLON)) {
 						int hour = Integer.parseInt(data.substring(0, 2));
 						int minute = Integer.parseInt(data.substring(3, 5));
@@ -306,9 +306,9 @@ public class CSVReaderWriter {
 						// decimal time value
 						time_ms = Integer.valueOf(data).intValue();
 
-					for (int i = 0; i < updateRecordNames.length; i++) { // only iterate over record names found in file
+					for (int i = 0; i < updateRecordNames.length && i < dataStr.length - 1; i++) { // only iterate over record names found in file
 						try {
-							data = dataStr[i + 1].trim().replace(',', '.').replace(GDE.STRING_BLANK, GDE.STRING_EMPTY);
+							data = dataStr[i + 1].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT).replace(GDE.STRING_BLANK, GDE.STRING_EMPTY);
 						}
 						catch (Exception e) {
 							data = "0";
@@ -327,7 +327,7 @@ public class CSVReaderWriter {
 								points[i] = Double.valueOf(Double.valueOf(data) * 1000.0).intValue();
 							}
 							catch (NumberFormatException e) {
-								points[i] = 0;
+								//points[i] = 0;  //ignore and keep last value
 							}
 							break;
 						}
