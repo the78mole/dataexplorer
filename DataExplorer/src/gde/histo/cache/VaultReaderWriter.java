@@ -164,14 +164,6 @@ public final class VaultReaderWriter {
 	public static long storeInCaches(TrussJobs trussJobs) throws IOException {
 		long[] bytes = { 0 };
 		Map<SourceDataSet, List<VaultCollector>> groupedJobs = trussJobs.values().parallelStream().flatMap(Collection::parallelStream).collect(Collectors.groupingBy(VaultCollector::getSourceDataSet));
-// for (Entry<SourceDataSet, List<VaultCollector>> e : groupedJobs.entrySet()) {
-// boolean providesReaderSettings = e.getKey().getDataSetType().providesReaderSettings();
-// String readerSettings = providesReaderSettings ? ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv() :
-// GDE.STRING_EMPTY;
-// Path cacheFilePath = ExtendedVault.getVaultsFolder(readerSettings);
-// storeInCachePath(e.getValue(), cacheFilePath);
-// bytes[0] += Files.walk(cacheFilePath).mapToLong(p -> p.toFile().length()).sum();
-// }
 		groupedJobs.entrySet().stream().forEach(e -> {
 			boolean providesReaderSettings = e.getKey().getDataSetType().providesReaderSettings();
 			String readerSettings = providesReaderSettings && application.getActiveDevice() instanceof IHistoDevice
@@ -195,31 +187,30 @@ public final class VaultReaderWriter {
 		if (settings.isZippedCache()) {
 			// use a zip file system because it supports adding files in contrast to the standard procedure using a ZipOutputStream
 			Map<String, String> env = new HashMap<String, String>();
-			env.put("create", "true"); //$NON-NLS-1$ //$NON-NLS-2$
-			try (FileSystem zipFileSystem = FileSystems.newFileSystem(URI.create("jar:" + cacheFilePath.toUri()), env)) { //$NON-NLS-1$
-				for (VaultCollector vaultCollector : newVaults) {
-					ExtendedVault histoVault = vaultCollector.getVault();
-					// name the file inside the zip file
-					Path filePath = zipFileSystem.getPath(histoVault.getVaultFileName().toString());
-					if (!FileUtils.checkFileExist(filePath.toString())) {
-						try (BufferedOutputStream zipOutputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
-							VaultProxy.store(histoVault, zipOutputStream);
-						} catch (Exception e) {
-							log.log(SEVERE, e.getMessage(), e);
-						}
-					}
-				}
+			env.put("create", "true");
+			try (FileSystem zipFileSystem = FileSystems.newFileSystem(URI.create("jar:" + cacheFilePath.toUri()), env)) {
+				Path cacheBaseDirPath = zipFileSystem.getPath("");
+				storeInVaultFileSystem(newVaults, cacheBaseDirPath);
 			}
 		} else {
-			FileUtils.checkDirectoryAndCreate(cacheFilePath.toString());
-			for (VaultCollector vaultCollector : newVaults) {
-				ExtendedVault histoVault = vaultCollector.getVault();
-				Path filePath = cacheFilePath.resolve(histoVault.getVaultFileName());
-				try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
-					VaultProxy.store(histoVault, outputStream);
-				} catch (Exception e) {
-					log.log(SEVERE, e.getMessage(), e);
-				}
+			Path cacheBaseDirPath = cacheFilePath;
+			FileUtils.checkDirectoryAndCreate(cacheBaseDirPath.toString());
+			storeInVaultFileSystem(newVaults, cacheBaseDirPath);
+		}
+	}
+
+	/**
+	 * @param newVaults
+	 * @param cacheBaseDirPath
+	 */
+	private static void storeInVaultFileSystem(List<VaultCollector> newVaults, Path cacheBaseDirPath) {
+		for (VaultCollector vaultCollector : newVaults) {
+			ExtendedVault histoVault = vaultCollector.getVault();
+			Path filePath = cacheBaseDirPath.resolve(histoVault.getVaultFileName());
+			try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
+				VaultProxy.store(histoVault, outputStream);
+			} catch (Exception e) {
+				log.log(SEVERE, e.getMessage(), e);
 			}
 		}
 	}
