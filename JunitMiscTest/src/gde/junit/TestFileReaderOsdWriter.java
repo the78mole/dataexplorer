@@ -711,6 +711,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 		try {
 			LogViewReader.putDeviceMap("pulsar 3", "Pulsar3"); //add Pulsar3 since it adds its entry by plugin jar
+			LogViewReader.putDeviceMap("junsi icharger 106b+", "iCharger106B"); //add iCharger106b since its adding entry by plugin
 			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
 
 			for (File file : files) {
