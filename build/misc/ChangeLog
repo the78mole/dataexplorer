@@ -11,6 +11,7 @@ Version 3.3.2 - xx yyy 2017
 * context menu texts (graphics / data table tabs)
 * add initial support for Junsi iCharger 106B
 * add initial support for ELV WDE (Wetter-Daten-Empfänger)
+* add initial support for a generic CSV import (using Tesla Battery sample CSV file as source)
 
 History analysis
 	* New summary chart in the history graphics window
