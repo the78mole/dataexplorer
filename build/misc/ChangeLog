@@ -3,10 +3,13 @@ Development history / change log, please read from bottom up
 Version 3.3.2 - xx yyy 2017
 * fix illegal formatting option in ParameterControl used for Graupner UDP charger
 * fix HoTTAdapter wrong data block number detection
-* add initial support for Junsi iCharger 106B
 * fix empty template file name if user cancels loading a template
 * fix some issues when adding / editing object keys
+* fix wrong interpretation and display of geo-coordinates received as degree with decimal digits
+* fix parsing error with values coming with comma as separator to decimal places
 * context menu texts (graphics / data table tabs)
+* add initial support for Junsi iCharger 106B
+* add initial support for ELV WDE (Wetter-Daten-Empfänger)
 
 History analysis
 	* New summary chart in the history graphics window

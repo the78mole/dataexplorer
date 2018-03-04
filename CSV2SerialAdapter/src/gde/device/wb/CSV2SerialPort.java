@@ -19,6 +19,7 @@
 package gde.device.wb;
 
 import gde.comm.DeviceCommPort;
+import gde.comm.IDeviceCommPort;
 import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.exception.TimeOutException;
@@ -33,7 +34,7 @@ import java.util.logging.Logger;
  * eStation serial port implementation
  * @author Winfried Brügmann
  */
-public class CSV2SerialPort extends DeviceCommPort {
+public class CSV2SerialPort extends DeviceCommPort implements IDeviceCommPort {
 	final static String	$CLASS_NAME			= CSV2SerialPort.class.getName();
 	final static Logger	log							= Logger.getLogger(CSV2SerialPort.$CLASS_NAME);
 
@@ -133,14 +134,14 @@ public class CSV2SerialPort extends DeviceCommPort {
 			//System.out.println(startIndex + " - " + this.tmpData.length + " - " + endIndex);
 			System.arraycopy(this.tmpData, 0, this.data, 0, this.tmpData.length);
 			System.arraycopy(this.answer, startIndex, this.data, this.tmpData.length, endIndex - startIndex);
-			if (CSV2SerialPort.log.isLoggable(Level.FINE)) {
+			if (CSV2SerialPort.log.isLoggable(Level.OFF)) {
 				StringBuilder sb = new StringBuilder();
 				for (byte b : this.data) {
 					sb.append((char) b);
 				}
 				while (sb.length() > 5 && (sb.charAt(sb.length() - 1) == '\n' || sb.charAt(sb.length() - 1) == '\r'))
 					sb.deleteCharAt(sb.length() - 1);
-				CSV2SerialPort.log.logp(Level.FINE, CSV2SerialPort.$CLASS_NAME, $METHOD_NAME, sb.toString());
+				CSV2SerialPort.log.logp(Level.OFF, CSV2SerialPort.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 			return this.data;
 		}
