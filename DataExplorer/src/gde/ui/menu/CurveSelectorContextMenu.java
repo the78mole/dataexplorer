@@ -135,8 +135,9 @@ public class CurveSelectorContextMenu {
 										}
 										CurveSelectorContextMenu.this.isSmoothVoltageCurve = CurveSelectorContextMenu.this.actualRecord.getAbstractParent().isSmoothVoltageCurve();
 										CurveSelectorContextMenu.this.smoothVoltageCurveItem.setSelection(CurveSelectorContextMenu.this.isSmoothVoltageCurve);
-										// WBrueg the condition "Ultra" has no background in my opinion
+										//enable voltage curve smoothing for special charge types only supported by Graupner Ultra... devices
 										if (!CurveSelectorContextMenu.this.isTypeHisto && CurveSelectorContextMenu.this.recordSet.getDevice().getName().startsWith("Ultra")) {
+											CurveSelectorContextMenu.this.smoothVoltageCurveItem.setEnabled(true);
 										}
 										else {
 											CurveSelectorContextMenu.this.smoothVoltageCurveItem.setEnabled(false);
