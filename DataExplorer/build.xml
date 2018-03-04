@@ -48,6 +48,7 @@
 		<mkdir dir="build" />
 		<javac destdir="${module.output}" classpathref="compile.classpath" compiler="javac1.7" encoding="UTF-8" debug="true" includeantruntime="false">
 			<src path="src" />
+			<compilerarg value="-XDignore.symbol.file"/>
 		</javac>
 		<copy todir="${module.output}">
 			<fileset dir="${basedir}/src/" includes="gde/resource/**/*" excludes="**/.cvsignore" />
