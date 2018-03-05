@@ -40,8 +40,10 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public final class TrailRecordFormatter {
-	// private final static String	$CLASS_NAME	= TrailRecordFormatter.class.getName();
-	// private final static Logger	log					= Logger.getLogger($CLASS_NAME);
+	// private final static String $CLASS_NAME = TrailRecordFormatter.class.getName();
+	// private final static Logger log = Logger.getLogger($CLASS_NAME);
+
+	private final int TRAIL_TEXT_MAX_LENGTH = 13;
 
 	/**
 	 * Performant replacement for String.format("%.8s", ss)
@@ -88,7 +90,7 @@ public final class TrailRecordFormatter {
 		return df;
 	}
 
-	private final TrailRecord	record;
+	private final TrailRecord record;
 
 	public TrailRecordFormatter(TrailRecord trailRecord) {
 		this.record = trailRecord;
@@ -220,26 +222,34 @@ public final class TrailRecordFormatter {
 		Outliers outliers = summary.getMinMaxWarning()[0];
 		if (outliers == null) {
 			return new String();
-		} else if (outliers.getWarningType() == OutlierWarning.WHISKER) {
-			double[] decodedScaleMinMax = summary.defineScaleMinMax();
-			double formatComparisonValue = decodedScaleMinMax[1] - decodedScaleMinMax[0];
-			String values = outliers.getDecodedValues().stream() //
-					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
-			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
-					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
-			return outliers.getSelectText() //
-					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getFarLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) //
-					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
 		} else {
-			double[] decodedScaleMinMax = summary.defineScaleMinMax();
-			double formatComparisonValue = decodedScaleMinMax[1] - decodedScaleMinMax[0];
-			String values = outliers.getDecodedValues().stream() //
-					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
-			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
-					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
-			return outliers.getSelectText() //
-					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getFarLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) //
-					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
+			if (outliers.getWarningType() == OutlierWarning.WHISKER) {
+				double[] decodedScaleMinMax = summary.defineScaleMinMax();
+				double formatComparisonValue = decodedScaleMinMax[1] - decodedScaleMinMax[0];
+				String values = outliers.getDecodedValues().stream() //
+						.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
+				String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
+						.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString) //
+						.distinct().collect(Collectors.joining(", "));
+				String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
+						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
+				return outputText + " !" //
+						+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getFarLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) //
+						+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
+			} else {
+				double[] decodedScaleMinMax = summary.defineScaleMinMax();
+				double formatComparisonValue = decodedScaleMinMax[1] - decodedScaleMinMax[0];
+				String values = outliers.getDecodedValues().stream() //
+						.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
+				String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
+						.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString) //
+						.distinct().collect(Collectors.joining(", "));
+				String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
+						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
+				return outputText + " !" //
+						+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getFarLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) //
+						+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
+			}
 		}
 	}
 
@@ -251,20 +261,26 @@ public final class TrailRecordFormatter {
 			double[] decodedScaleMinMax = summary.defineScaleMinMax();
 			double formatComparisonValue = decodedScaleMinMax[1] - decodedScaleMinMax[0];
 			String values = outliers.getDecodedValues().stream() //
-					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
+					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
 			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
-					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
-			return outliers.getSelectText() //
+					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString) //
+					.distinct().collect(Collectors.joining(", "));
+			String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
+					? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
+			return outputText + " !" //
 					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getFarLimit(), formatComparisonValue) //
 					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
 		} else {
 			double[] decodedScaleMinMax = summary.defineScaleMinMax();
 			double formatComparisonValue = decodedScaleMinMax[1] - decodedScaleMinMax[0];
 			String values = outliers.getDecodedValues().stream() //
-					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(","));
+					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
 			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
-					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString).collect(Collectors.joining(", "));
-			return outliers.getSelectText() //
+					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString) //
+					.distinct().collect(Collectors.joining(", "));
+			String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
+					? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
+			return outputText + " !" //
 					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getFarLimit(), formatComparisonValue) //
 					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
 		}
@@ -277,7 +293,8 @@ public final class TrailRecordFormatter {
 		String textLine1 = "", textLine2 = "";
 		final String fileNameInitializer = Messages.getString(MessageIds.GDE_MSGT0908);
 		final String minMaxSeparator = "   >---<   ";
-		String lineInitializer = record.getNameReplacement() + "   ";
+		String lineInitializer = record.getNameReplacement().length() > TRAIL_TEXT_MAX_LENGTH
+				? record.getNameReplacement().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS + " > " : record.getNameReplacement() + " > ";
 		if (summary.getMinMaxWarning()[0] != null) { // left scale warnings
 			if (summary.getMinMaxWarning()[0].getWarningType() == OutlierWarning.FAR)
 				textLine1 = lineInitializer + defineFormattedMinWarning(summary).replace("\n", fileNameInitializer);
