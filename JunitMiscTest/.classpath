@@ -35,5 +35,9 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Weatronic-Telemetry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/WStechVario"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Devo-Telemetry"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CSVImport"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Pulsar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/S32"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/UniTrend"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

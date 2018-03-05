@@ -80,6 +80,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".csv")
 						&& !(file.getPath().toLowerCase().contains("csv2serialadapter") 
 								|| file.getPath().toLowerCase().contains("gigalogger")
+								|| file.getPath().toLowerCase().contains("tesla")
 								|| file.getPath().toLowerCase().contains("mc3000")
 								|| file.getPath().toLowerCase().contains("space pro") 
 								|| file.getPath().toLowerCase().contains("asw")
@@ -226,6 +227,76 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						activeChannel.setSaved(true);
 
 						RecordSet recordSet = gde.device.robbe.CSVReaderWriter.read(';', file.getAbsolutePath(), "csv test");
+
+						if (recordSet != null) {
+							activeChannel.setActiveRecordSet(recordSet);
+							activeChannel.applyTemplate(recordSet.getName(), true);
+							//device.makeInActiveDisplayable(recordSet);
+							drawCurves(recordSet, 1024, 768);
+						}
+
+						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
+						new File(tmpDir1).mkdirs();
+						String absolutFilePath = tmpDir1 + file.getName();
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
+						System.out.println("writing as   : " + absolutFilePath);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						failures.put(file.getAbsolutePath(), e);
+					}
+				}
+			}
+
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
+	/**
+	 * test reading CSV generic import files from device directory and writes OSD files to %TEMP%\Write_1_OSD
+	 * all consistent files must red without failures
+	 */
+	public final void testCsvImportOsdWriter() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		this.setDataPath(); //set the dataPath variable
+
+		try {
+			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
+
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && file.getPath().toLowerCase().contains("tesla")) {
+					System.out.println("working with : " + file);
+
+					try {
+						//System.out.println("file.getPath() = " + file.getPath());
+						String deviceName = "Tesla";
+						//System.out.println("deviceName = " + deviceName);
+						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+						if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
+
+						IDevice device = this.getInstanceOfDevice(deviceConfig);
+						this.application.setActiveDeviceWoutUI(device);
+
+						setupDataChannels(device);
+
+						this.channels.setActiveChannelNumber(1);
+						Channel activeChannel = this.channels.getActiveChannel();
+						activeChannel.setFileName(file.getAbsolutePath());
+						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
+						activeChannel.setSaved(true);
+
+						RecordSet recordSet = gde.device.csv.CSVReaderWriter.read(deviceConfig.getDataBlockSeparator().value().charAt(0), file.getAbsolutePath(), "csv test");
 
 						if (recordSet != null) {
 							activeChannel.setActiveRecordSet(recordSet);
@@ -1371,7 +1442,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
 		try {
-			String logDir = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "HoTTAdapter_Problem" + GDE.FILE_SEPARATOR;
+			boolean isHoTTAdapterProblemDirectory = new File(this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "HoTTAdapter_Problem").exists();
+			String logDir = isHoTTAdapterProblemDirectory 
+				? this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "HoTTAdapter_Problem" + GDE.FILE_SEPARATOR 
+				: this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "HoTTAdapter" + GDE.FILE_SEPARATOR ;
 			List<File> files = FileUtils.getFileListing(new File(logDir), 2);
 
 			for (File file : files) {
@@ -1426,7 +1500,6 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 					}
 				}
 			}
-
 		}
 		catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -1448,7 +1521,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
 		try {
-			String logDir = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "HoTTAdapter_Problem" + GDE.FILE_SEPARATOR;
+			boolean isHoTTAdapterProblemDirectory = new File(this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "HoTTAdapter_Problem").exists();
+			String logDir = isHoTTAdapterProblemDirectory 
+				? this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "HoTTAdapter_Problem" + GDE.FILE_SEPARATOR 
+				: this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "HoTTAdapter" + GDE.FILE_SEPARATOR ;
 			List<File> files = FileUtils.getFileListing(new File(logDir), 2);
 
 			for (File file : files) {
@@ -1503,7 +1579,6 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 					}
 				}
 			}
-
 		}
 		catch (FileNotFoundException e) {
 			e.printStackTrace();
