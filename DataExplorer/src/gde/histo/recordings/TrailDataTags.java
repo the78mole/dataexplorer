@@ -154,13 +154,14 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 				if (this.get(DataTag.GPS_LOCATION).isEmpty()) resultTags.remove(DisplayTag.GPS_LOCATION);
 			}
 			{
+				Path directoryName = Paths.get(this.get(DataTag.FILE_PATH).get(0)).getParent().getFileName();
 				Path directoryPath = Paths.get(this.get(DataTag.FILE_PATH).get(0)).getParent();
 				Path basePath = directoryPath.getParent();
 				boolean sameDirectory = true;
 				boolean sameBase = true;
 				for (String filePath : this.get(DataTag.FILE_PATH)) {
 					Path path = Paths.get(filePath);
-					if (!path.getParent().equals(directoryPath)) sameDirectory = false;
+					if (!path.getParent().getFileName().equals(directoryName)) sameDirectory = false;
 					if (!path.getParent().getParent().equals(basePath)) sameBase = false;
 					if (!sameDirectory && !sameBase) break;
 				}
