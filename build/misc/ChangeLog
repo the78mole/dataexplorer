@@ -29,12 +29,14 @@ History analysis
 	 	>> fix unlimited scale for cell voltages if some logs do not hold cell voltages
 	 	>> fix rare boxplot whisker length deviations
 	 	>> fix missing timescale entries in case of many entries
-	* Enhance folder scanning for log files
+	* New remote log file access
 		>> new supplementary folder for import files and archived files
-		>> new properties entries for external or network folders
+		>> new log file mirroring for offline use
+		>> new properties entries for external or network folders or mirror source folders
 	* Fix table issues
 	 	>> column values for non-reversed timestamp sequence
 	 	>> GPS location was not shown sometimes
+	 	>> row 'Directory paths' now shows abbreviated paths
 	* Enhance UI
 	  	>> make object key adding / editing more intuitive
 	  	>> new tool tip texts
