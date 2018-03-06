@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -171,20 +172,20 @@ public class HistoExplorer {
 	 * @param redrawCurveSelector
 	 */
 	public void updateHistoChartWindow(boolean redrawCurveSelector) {
-		if (!(displayTab.getSelection() instanceof AbstractChartWindow)) return;
-
 		if (Thread.currentThread().getId() == application.getThreadId()) {
-			AbstractChartWindow chartWindow = (AbstractChartWindow) displayTab.getSelection();
-			if (!chartWindow.isActiveCurveSelectorContextMenu()) {
-				chartWindow.redrawGraphics(redrawCurveSelector);
+			CTabItem activeTab = displayTab.getSelection();
+			if (!(activeTab instanceof AbstractChartWindow)) return;
+			if (!((AbstractChartWindow) activeTab).isActiveCurveSelectorContextMenu()) {
+				((AbstractChartWindow) activeTab).redrawGraphics(redrawCurveSelector);
 			}
 		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					AbstractChartWindow chartWindow = (AbstractChartWindow) displayTab.getSelection();
-					if (!chartWindow.isActiveCurveSelectorContextMenu()) {
-						chartWindow.redrawGraphics(redrawCurveSelector);
+					CTabItem activeTab = displayTab.getSelection();
+					if (!(activeTab instanceof AbstractChartWindow)) return;
+					if (!((AbstractChartWindow) activeTab).isActiveCurveSelectorContextMenu()) {
+						((AbstractChartWindow) activeTab).redrawGraphics(redrawCurveSelector);
 					}
 				}
 			});
