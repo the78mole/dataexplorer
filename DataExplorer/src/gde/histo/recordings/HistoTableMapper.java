@@ -19,12 +19,17 @@
 
 package gde.histo.recordings;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 import gde.config.Settings;
 import gde.device.TrailTypes;
 import gde.histo.recordings.TrailDataTags.DataTag;
+import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.LocalizedDateTime;
@@ -35,6 +40,8 @@ import gde.utils.LocalizedDateTime.DateTimePattern;
  * @author Thomas Eickert (USER)
  */
 public final class HistoTableMapper {
+	private static final String	$CLASS_NAME	= HistoTableMapper.class.getName();
+	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	public enum DisplayTag {
 		FILE_NAME {
@@ -51,8 +58,10 @@ public final class HistoTableMapper {
 		DIRECTORY_NAME {
 			@Override
 			String[] getTableTagRow(TrailRecordSet trailRecordSet) {
-				BiFunction<TrailDataTags, Integer, String> scoreFunction = (t, i) -> Paths.get(t.get(DataTag.FILE_PATH).get(i)) //
-						.getParent().getFileName().toString();
+				BiFunction<TrailDataTags, Integer, String> scoreFunction = (t, i) -> {
+					DataTag tag = t.get(DataTag.LINK_PATH).get(i).isEmpty() ? DataTag.FILE_PATH : DataTag.LINK_PATH;
+					return Paths.get(t.get(tag).get(i)).getParent().getFileName().toString();
+				};
 				String[] dataTableRow = getTagRowWithValues(trailRecordSet, scoreFunction);
 
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0839);
@@ -63,14 +72,52 @@ public final class HistoTableMapper {
 		BASE_PATH {
 			@Override
 			String[] getTableTagRow(TrailRecordSet trailRecordSet) {
-				BiFunction<TrailDataTags, Integer, String> scoreFunction = (t, i) -> Paths.get(t.get(DataTag.FILE_PATH).get(i)) //
-						.getParent().toString();
+				Path commonRelativePath = defineCommonRelativePath(trailRecordSet.getDataTags());
+				BiFunction<TrailDataTags, Integer, String> scoreFunction = (t, i) -> {
+					DataTag tag = t.get(DataTag.LINK_PATH).get(i).isEmpty() ? DataTag.FILE_PATH : DataTag.LINK_PATH;
+					Path fullPath = Paths.get(t.get(tag).get(i));
+					Path fullRelativePath = fullPath.subpath(0, fullPath.getNameCount()); // strip the root component
+					// strip the common start path from all columns
+					return commonRelativePath.relativize(fullRelativePath).getParent().toString();
+				};
 				String[] dataTableRow = getTagRowWithValues(trailRecordSet, scoreFunction);
 
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0840);
 				return dataTableRow;
 			}
 
+			/**
+			 * @return the start path which is identical for all tags
+			 */
+			private Path defineCommonRelativePath(TrailDataTags dataTags) {
+				Path[] grippPaths = new Path[dataTags.get(DataTag.FILE_PATH).size()];
+				List<Path> gripPaths = new ArrayList<>();
+				int minNameCount = Integer.MAX_VALUE;
+				for (int i = 0; i < grippPaths.length; i++) {
+					DataTag tag = dataTags.get(DataTag.LINK_PATH).get(i).isEmpty() ? DataTag.FILE_PATH : DataTag.LINK_PATH;
+					grippPaths[i] = Paths.get(dataTags.get(tag).get(i));
+					minNameCount = Math.min(minNameCount, grippPaths[i].getNameCount());
+				}
+
+				int minPathLength = minNameCount;
+				Path commonRelativePath = Stream.of(grippPaths) //
+						.map(p -> p.subpath(0, minPathLength)).distinct() //
+						.reduce((p1, p2) -> getCommonStartPath(p1, p2)).orElse(Paths.get(""));
+				log.finer(() -> "commonRelativePath=" + commonRelativePath + " " + gripPaths);
+				return commonRelativePath;
+			}
+
+			/**
+			 * @return the longest common start path of two paths as a relative path or empty path
+			 */
+			private Path getCommonStartPath(Path path1, Path path2) {
+				int minNameCount = Math.min(path1.getNameCount(), path2.getNameCount());
+				for (int j = minNameCount; j > 0; j--) {
+					Path candidate = path1.subpath(0, j);
+					if (candidate.equals(path2.subpath(0, j))) return candidate;
+				}
+				return Paths.get("");
+			}
 		},
 		CHANNEL_NUMBER {
 			@Override
@@ -148,7 +195,6 @@ public final class HistoTableMapper {
 			}
 			return dataTableRow;
 		}
-
 	}
 
 	/**
