@@ -565,8 +565,8 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	@Override
-	public void setStartEndDefined(boolean enabled) { //TODO ET check if correct
-		template.isStartEndDefined = enabled;		
+	public void setStartEndDefined(boolean enabled) {
+		template.isStartEndDefined = enabled;
 	}
 
 	/**
@@ -589,12 +589,12 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	@Override
-	public void setMinScaleValue(double newMinScaleValue) { //TODO ET check if correct
+	public void setMinScaleValue(double newMinScaleValue) {
 			template.minScaleValue = newMinScaleValue;
 	}
 
 	@Override
-	public void setMaxScaleValue(double newMaxScaleValue) { //TODO ET check if correct
+	public void setMaxScaleValue(double newMaxScaleValue) {
 			template.maxScaleValue = newMaxScaleValue;
 	}
 

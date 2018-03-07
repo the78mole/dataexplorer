@@ -1098,7 +1098,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	public HistoGraphicsTemplate getTemplate() {
-		return this.template;// todo support family template
+		return this.template;
 	}
 
 	/**

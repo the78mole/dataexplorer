@@ -19,169 +19,38 @@
 
 package gde.histo.ui;
 
-import java.util.Date;
-
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Text;
 
-import gde.GDE;
 import gde.config.Settings;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
-import gde.histo.recordings.TrailRecordSetFormatter;
 import gde.histo.ui.data.SummarySpots;
 import gde.histo.ui.data.SummarySpots.Density;
 import gde.log.Logger;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
 
 /**
  * Summary measuring activity mapper for mouse movements and other UI actions from menus, checkboxes etc.
  * @author Thomas Eickert (USER)
  */
 public final class SummaryMeasuring extends AbstractMeasuring {
-	private final static String	$CLASS_NAME	= SummaryMeasuring.class.getName();
-	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
+	private final static String			$CLASS_NAME					= SummaryMeasuring.class.getName();
+	private final static Logger			log									= Logger.getLogger($CLASS_NAME);
 
-	public enum MeasuringMode { // todo check if implementing this class is appropriate
+	private final Settings					settings						= Settings.getInstance();
 
-		/** Single measurement mode is active */
-		MEASURE {
-			@Override
-			void setMode(SummaryMeasuring graphicsMeasuring) {
-				graphicsMeasuring.isLeftMouseMeasure = true;
-				graphicsMeasuring.isRightMouseMeasure = false;
-			}
-
-			@Override
-			void drawMeasurement(SummaryMeasuring hgm) {
-				AbstractChartComposite hgc = hgm.summaryComposite;
-
-				String statusMessage = hgm.curveSurvey.drawMeasurementGraphics();
-				hgc.windowActor.setStatusMessage(statusMessage);
-
-				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc.recordSetComment, hgm.measure.getTimestampMeasure_ms()));
-				hgc.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0897));
-			}
-
-			@Override
-			void drawLeftMeasurement(SummaryMeasuring hgm) {
-				AbstractChartComposite hgc = hgm.summaryComposite;
-				long startTime = new Date().getTime();
-				String statusMessage = hgm.curveSurvey.drawMeasurementGraphics();
-				hgc.windowActor.setStatusMessage(statusMessage);
-
-				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc.recordSetComment, hgm.measure.getTimestampMeasure_ms()));
-				hgc.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0897));
-				log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-			}
-
-			@Override
-			void drawRightMeasurement(SummaryMeasuring hgm) {
-				// simple measure has only a left measurement
-			}
-		},
-
-		/** delta measurement mode is active */
-		MEASURE_DELTA {
-			@Override
-			void setMode(SummaryMeasuring graphicsMeasuring) {
-				graphicsMeasuring.isLeftMouseMeasure = false;
-				graphicsMeasuring.isRightMouseMeasure = true;
-			}
-
-			@Override
-			void drawMeasurement(SummaryMeasuring hgm) {
-				AbstractChartComposite hgc = hgm.summaryComposite;
-
-				String statusMessage = hgm.curveSurvey.drawDeltaMeasurementGraphics();
-				hgc.windowActor.setStatusMessage(statusMessage);
-
-				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc.recordSetComment, hgm.measure.getTimestampMeasure_ms()));
-				hgc.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0897));
-			}
-
-			@Override
-			void drawLeftMeasurement(SummaryMeasuring hgm) {
-				AbstractChartComposite hgc = hgm.summaryComposite;
-				long startTime = new Date().getTime();
-				String statusMessage = hgm.curveSurvey.drawDeltaMeasurementGraphics();
-				hgc.windowActor.setStatusMessage(statusMessage);
-
-				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc.recordSetComment, hgm.measure.getTimestampMeasure_ms()));
-				hgc.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0897));
-				log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-			}
-
-			@Override
-			void drawRightMeasurement(SummaryMeasuring hgm) {
-				AbstractChartComposite hgc = hgm.summaryComposite;
-				long startTime = new Date().getTime();
-				String statusMessage = hgm.curveSurvey.drawDeltaMeasurementGraphics();
-				hgc.windowActor.setStatusMessage(statusMessage);
-
-				hgc.recordSetComment.setText(getSelectedMeasurementsAsTable(hgc.recordSetComment, hgm.measure.getTimestampMeasure_ms()));
-				hgc.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0897));
-				log.time(() -> "draw time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-			}
-		};
-
-		/**
-		 * Set graphics window measurement mode.
-		 */
-		abstract void setMode(SummaryMeasuring graphicsMeasuring);
-
-		/**
-		 * Perform the UI activities required for a measurement.
-		 */
-		abstract void drawMeasurement(SummaryMeasuring hgm);
-
-		/**
-		 * Perform the UI activities for the first measurement timestamp.
-		 * In case of delta measurement: the timestamp which is initially on the left.
-		 */
-		abstract void drawLeftMeasurement(SummaryMeasuring hgm);
-
-		/**
-		 * Perform the UI activities for the second measurement timestamp used for delta measurement.
-		 */
-		abstract void drawRightMeasurement(SummaryMeasuring hgm);
-
-		private static String getSelectedMeasurementsAsTable(Text recordSetComment, long timestamp_ms) {
-			recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD));
-			return TrailRecordSetFormatter.getSelectedMeasurementsAsTable(timestamp_ms);
-		}
-
-		static MeasuringMode getMode(boolean isDeltaMeasuring) {
-			if (isDeltaMeasuring) {
-				return MeasuringMode.MEASURE_DELTA;
-			} else {
-				return MeasuringMode.MEASURE;
-			}
-		}
-	};
-
-	private final Settings								settings						= Settings.getInstance();
-
-	boolean																isLeftMouseMeasure	= false;
-	boolean																isRightMouseMeasure	= false;
+	boolean													isLeftMouseMeasure	= false;
+	boolean													isRightMouseMeasure	= false;
 
 	private final SummaryComposite	summaryComposite;
-	private final CurveSurvey							curveSurvey;																	// todo decide if Summary Survey class is required
+	private final CurveSurvey				curveSurvey;
 
-	private GC														canvasGC;
-	private MeasuringMode									mode;
+	private GC											canvasGC;
 
 	public SummaryMeasuring(SummaryComposite summaryComposite, Measure measure) {
 		super(measure);
 		this.summaryComposite = summaryComposite;
-		this.mode = MeasuringMode.getMode(measure.isDeltaMeasure);
-		this.mode.setMode(this);
 
 		this.curveSurvey = null;
 	}
