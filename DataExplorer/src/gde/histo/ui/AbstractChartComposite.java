@@ -420,7 +420,7 @@ public abstract class AbstractChartComposite extends Composite {
 
 	/**
 	 * Check input x,y value against curve are bounds and correct to bound if required.
-	 * @param Point containing corrected x,y position value
+	 * @return Point containing corrected x,y position value
 	 */
 	protected Point checkCurveBounds(int xPos, int yPos) {
 		log.finer(() -> "in  xPos = " + xPos + " yPos = " + yPos); //$NON-NLS-1$ //$NON-NLS-2$
@@ -430,6 +430,20 @@ public abstract class AbstractChartComposite extends Composite {
 		tmpyPos = constrainToRange(tmpyPos, 0, this.curveAreaBounds.height);
 		if (log.isLoggable(FINER)) log.log(FINER, "out xPos = " + tmpxPos + " yPos = " + tmpyPos); //$NON-NLS-1$ //$NON-NLS-2$
 		return new Point(tmpxPos, tmpyPos);
+	}
+
+	/**
+	 * @return true if the x position is on the left border
+	 */
+	protected boolean isBeyondLeftBounds(int xPos) {
+		return xPos < this.curveAreaBounds.x;
+	}
+
+	/**
+	 * @return true if the x position is on the right border
+	 */
+	protected boolean isBeyondRightBounds(int xPos) {
+		return xPos > this.curveAreaBounds.x + this.curveAreaBounds.width;
 	}
 
 	public Optional<AbstractMeasuring> getMeasuring() {

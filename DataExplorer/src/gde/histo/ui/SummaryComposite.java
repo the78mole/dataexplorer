@@ -509,29 +509,28 @@ public final class SummaryComposite extends AbstractChartComposite {
 				popupmenu.setData(TabMenuOnDemand.SUMMARY_WARNING.name(), summaryWarning);
 
 				List<Integer> snappedIndices = getSnappedIndices(point);
-				if (snappedIndices.size() == 1) {
+				if (isBeyondLeftBounds(evt.x) && record != null && getChartData(record).getMinMaxWarning()[0] != null) { // left scale warnings
+					Outliers outlier = getChartData(record).getMinMaxWarning()[0];
+					ExtendedVault vault = record.getParent().getVault(outlier.getIndices().get(0));
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
+					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
+				} else if (isBeyondRightBounds(evt.x) && record != null && getChartData(record).getMinMaxWarning()[1] != null) { // right
+					Outliers outlier = getChartData(record).getMinMaxWarning()[1];
+					ExtendedVault vault = record.getParent().getVault(outlier.getIndices().get(0));
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
+					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
+				} else if (snappedIndices.size() == 1) { // in the curve area over a single log
+					log.log(Level.OFF, "snappedIndices.size() == 1");
 					Integer index = snappedIndices.get(0);
 					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.LINK_PATH));
 					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.FILE_PATH));
 					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), trailRecordSet.getDataTagText(index, DataTag.RECORDSET_BASE_NAME));
 				} else {
-					if (point.x == 0 && record != null && getChartData(record).getMinMaxWarning()[0] != null) { // left scale warnings
-						Outliers outlier = getChartData(record).getMinMaxWarning()[0];
-						ExtendedVault vault = record.getParent().getVault(outlier.getIndices().get(0));
-						popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
-						popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
-						popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
-					} else if (point.x == curveAreaBounds.width && record != null && getChartData(record).getMinMaxWarning()[1] != null) { // right
-						Outliers outlier = getChartData(record).getMinMaxWarning()[1];
-						ExtendedVault vault = record.getParent().getVault(outlier.getIndices().get(0));
-						popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
-						popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
-						popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
-					} else {
-						popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
-						popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
-						popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
-					}
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), GDE.STRING_EMPTY);
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), GDE.STRING_EMPTY);
+					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), GDE.STRING_EMPTY);
 				}
 			}
 		}
