@@ -91,18 +91,18 @@ public final class VaultReaderWriter {
 		Path osdCacheFilePath = ExtendedVault.getVaultsFolder(GDE.STRING_EMPTY);
 		List<ExtendedVault> vaults = loadFromCachePath(trussJobs, progress, osdCacheFilePath);
 
-		String readerSettings = application.getActiveDevice() instanceof IHistoDevice
-				? ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
-		Path nativeCacheFilePath = ExtendedVault.getVaultsFolder(readerSettings);
-		if (!nativeCacheFilePath.equals(osdCacheFilePath)) {
-			List<ExtendedVault> nativeVaults = loadFromCachePath(trussJobs, progress, nativeCacheFilePath);
-			vaults.addAll(nativeVaults);
+		if (application.getActiveDevice() instanceof IHistoDevice) {
+			String readerSettings = ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv();
+			if (!readerSettings.isEmpty()) {
+				List<ExtendedVault> nativeVaults = loadFromCachePath(trussJobs, progress, ExtendedVault.getVaultsFolder(readerSettings));
+				vaults.addAll(nativeVaults);
+			}
 		}
 		return vaults;
 	}
 
-	private static List<ExtendedVault> loadFromCachePath(TrussJobs trussJobs, Optional<ProgressManager> progress,
-			Path cacheFilePath) throws IOException, ZipException {
+	private static List<ExtendedVault> loadFromCachePath(TrussJobs trussJobs, Optional<ProgressManager> progress, Path cacheFilePath)
+			throws IOException, ZipException {
 		List<ExtendedVault> vaults = new ArrayList<>();
 		if (settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
 			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
