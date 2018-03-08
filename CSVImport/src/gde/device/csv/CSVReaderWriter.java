@@ -202,7 +202,7 @@ public class CSVReaderWriter {
 		RecordSet recordSet = null;
 		long inputFileSize = new File(filePath).length();
 		int progressLineLength = Math.abs(CSVReaderWriter.application.getActiveDevice().getDataBlockSize(InputTypes.FILE_IO));
-		BufferedReader reader; // to read the data
+		BufferedReader reader = null; // to read the data
 		IDevice device = CSVReaderWriter.application.getActiveDevice();
 		Channel activeChannel = null;
 
@@ -277,6 +277,9 @@ public class CSVReaderWriter {
 				// now get all data   0; 14,780;  0,598;  1,000;  8,838;  0,002
 				String[] updateRecordNames = recordSet.getRecordNames();
 				int[] points = new int[updateRecordNames.length];
+				if (points.length != recordSet.realSize()) {
+					throw new DataInconsitsentException(String.format("mismatch recordSet size to detected point size\n%s \n%s", StringHelper.arrayToString(recordSet.getRecordNames()), StringHelper.arrayToString(updateRecordNames)));
+				}
 				int lineNumber = 0;
 				while ((line = reader.readLine()) != null) {
 					++lineNumber;
@@ -375,6 +378,7 @@ public class CSVReaderWriter {
 			throw new IOException(Messages.getString(MessageIds.GDE_MSGW0012, new Object[] { filePath }));
 		}
 		finally {
+			if (reader != null) reader.close();
 			if (CSVReaderWriter.application.getStatusBar() != null) {
 				CSVReaderWriter.application.setProgress(100, sThreadId);
 				CSVReaderWriter.application.setStatusMessage(GDE.STRING_EMPTY);
