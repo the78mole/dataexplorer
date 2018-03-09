@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.gpslocations.GeoCodes;
 import gde.histo.gpslocations.GpsCluster;
@@ -148,21 +149,17 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 	 */
 	public void defineActiveDisplayTags() {
 		EnumSet<DisplayTag> resultTags = EnumSet.allOf(DisplayTag.class);
+		if (this.get(DataTag.GPS_LOCATION).isEmpty()) resultTags.remove(DisplayTag.GPS_LOCATION);
 
-		if (!this.get(DataTag.FILE_PATH).isEmpty()) {
+		if (!this.get(DataTag.FILE_PATH).isEmpty() && Settings.getInstance().isPartialDataTable()) {
 			{
-				if (this.get(DataTag.GPS_LOCATION).isEmpty()) resultTags.remove(DisplayTag.GPS_LOCATION);
-			}
-			{
-				Path directoryName = Paths.get(this.get(DataTag.FILE_PATH).get(0)).getParent().getFileName();
-				Path directoryPath = Paths.get(this.get(DataTag.FILE_PATH).get(0)).getParent();
-				Path basePath = directoryPath.getParent();
+				Path directoryPath = Paths.get(this.get(getSourcePathTag(0)).get(0)).getParent();
 				boolean sameDirectory = true;
 				boolean sameBase = true;
-				for (String filePath : this.get(DataTag.FILE_PATH)) {
-					Path path = Paths.get(filePath);
-					if (!path.getParent().getFileName().equals(directoryName)) sameDirectory = false;
-					if (!path.getParent().getParent().equals(basePath)) sameBase = false;
+				for (int i = 0; i < this.get(DataTag.FILE_PATH).size(); i++) {
+					Path path = Paths.get(this.get(getSourcePathTag(i)).get(i));
+					if (!path.getParent().getFileName().equals(directoryPath.getFileName())) sameDirectory = false;
+					if (!path.getParent().getParent().equals(directoryPath.getParent())) sameBase = false;
 					if (!sameDirectory && !sameBase) break;
 				}
 				if (sameDirectory) resultTags.remove(DisplayTag.DIRECTORY_NAME);
@@ -190,9 +187,17 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 				}
 				if (sameObject) resultTags.remove(DisplayTag.RECTIFIED_OBJECTKEY);
 			}
-			this.activeDisplayTags = resultTags;
 		}
+		this.activeDisplayTags = resultTags;
 		log.finer(() -> "activeDisplayTags.size()=" + resultTags.size()); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param index points to the record and / or time scale element
+	 * @return the data tag which defines the access to the link path or file path
+	 */
+	public DataTag getSourcePathTag(int index) {
+		return this.get(DataTag.LINK_PATH).get(index).isEmpty() || !DataExplorer.getInstance().isObjectoriented() ? DataTag.FILE_PATH : DataTag.LINK_PATH;
 	}
 
 	public List<String> getDataGpsLocations() {

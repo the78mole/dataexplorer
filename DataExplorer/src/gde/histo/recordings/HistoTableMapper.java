@@ -29,9 +29,11 @@ import java.util.stream.Stream;
 import gde.config.Settings;
 import gde.device.TrailTypes;
 import gde.histo.recordings.TrailDataTags.DataTag;
+import gde.log.Level;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
+import gde.ui.DataExplorer;
 import gde.utils.LocalizedDateTime;
 import gde.utils.LocalizedDateTime.DateTimePattern;
 
@@ -59,8 +61,8 @@ public final class HistoTableMapper {
 			@Override
 			String[] getTableTagRow(TrailRecordSet trailRecordSet) {
 				BiFunction<TrailDataTags, Integer, String> scoreFunction = (t, i) -> {
-					DataTag tag = t.get(DataTag.LINK_PATH).get(i).isEmpty() ? DataTag.FILE_PATH : DataTag.LINK_PATH;
-					return Paths.get(t.get(tag).get(i)).getParent().getFileName().toString();
+					Path fullPath = Paths.get(t.get(t.getSourcePathTag(i)).get(i));
+					return fullPath.getParent().getFileName().toString();
 				};
 				String[] dataTableRow = getTagRowWithValues(trailRecordSet, scoreFunction);
 
@@ -74,11 +76,17 @@ public final class HistoTableMapper {
 			String[] getTableTagRow(TrailRecordSet trailRecordSet) {
 				Path commonRelativePath = defineCommonRelativePath(trailRecordSet.getDataTags());
 				BiFunction<TrailDataTags, Integer, String> scoreFunction = (t, i) -> {
-					DataTag tag = t.get(DataTag.LINK_PATH).get(i).isEmpty() ? DataTag.FILE_PATH : DataTag.LINK_PATH;
-					Path fullPath = Paths.get(t.get(tag).get(i));
+					Path fullPath = Paths.get(t.get(t.getSourcePathTag(i)).get(i));
 					Path fullRelativePath = fullPath.subpath(0, fullPath.getNameCount()); // strip the root component
+					log.fine(() -> "commonRelativePath=" + commonRelativePath + "  fullRelativePath=" + fullRelativePath);
 					// strip the common start path from all columns
-					return commonRelativePath.relativize(fullRelativePath).getParent().toString();
+					Path relativePath = commonRelativePath.relativize(fullRelativePath);
+					log.log(Level.FINER, "relativePath.getNameCount=", relativePath.getNameCount());
+					if (DataExplorer.getInstance().isObjectoriented()) {
+						return relativePath.getNameCount() > 2 ? relativePath.getParent().getParent().toString() : commonRelativePath.getFileName().toString();
+					} else {
+						return relativePath.getNameCount() > 1 ? relativePath.getParent().toString() : commonRelativePath.getParent().getFileName().toString();
+					}
 				};
 				String[] dataTableRow = getTagRowWithValues(trailRecordSet, scoreFunction);
 
@@ -94,8 +102,7 @@ public final class HistoTableMapper {
 				List<Path> gripPaths = new ArrayList<>();
 				int minNameCount = Integer.MAX_VALUE;
 				for (int i = 0; i < grippPaths.length; i++) {
-					DataTag tag = dataTags.get(DataTag.LINK_PATH).get(i).isEmpty() ? DataTag.FILE_PATH : DataTag.LINK_PATH;
-					grippPaths[i] = Paths.get(dataTags.get(tag).get(i));
+					grippPaths[i] = Paths.get(dataTags.get(dataTags.getSourcePathTag(i)).get(i));
 					minNameCount = Math.min(minNameCount, grippPaths[i].getNameCount());
 				}
 
