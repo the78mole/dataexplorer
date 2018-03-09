@@ -242,17 +242,15 @@ public class HoTTbinReader {
 					sensorCount = 1;
 				}
 				else {
-					if (position > 64 * 4000) {
-						// 64 byte = 0.01 seconds for 40 seconds maximum sensor scan
-						// time (40 / 0.01 = 6000)
-						position = 64 * 4000;
-					}
-
+					position = position <= 64 ? 64 : position;
 					data_in.skip(position - 64);
-					for (int i = 0; i < NUMBER_LOG_RECORDS_TO_SCAN; i++) {
+					for (int i = 0; i < NUMBER_LOG_RECORDS_TO_SCAN && data_in.available() >= 64; i++) {
 						data_in.read(buffer);
-						if (HoTTbinReader.log.isLoggable(Level.FINER)) HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
-
+						if (HoTTbinReader.log.isLoggable(Level.FINER)) {
+							HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+							HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, String.format("SensorByte  %02X", buffer[7]));
+						}
+			
 						switch (buffer[7]) {
 						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.VARIO.name()).append(GDE.STRING_COMMA);
