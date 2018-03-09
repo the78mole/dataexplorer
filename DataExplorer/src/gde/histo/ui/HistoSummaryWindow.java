@@ -78,7 +78,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 		});
 
 		window.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-		window.setText(Messages.getString(MessageIds.GDE_MSGT0883));
+		window.setText(Messages.getString(MessageIds.GDE_MSGT0792));
 		return window;
 	}
 

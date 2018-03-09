@@ -161,9 +161,9 @@ public class DataExplorer extends Composite {
 	public final static int				TAB_INDEX_CELL_VOLTAGE						= 4;
 	public final static int				TAB_INDEX_COMPARE									= 5;
 	public final static int				TAB_INDEX_COMMENT									= 6;
-	public final static int				TAB_INDEX_HISTO_GRAPHIC						= 7;
-	public final static int				TAB_INDEX_HISTO_SUMMARY						= 8;
-	public final static int				TAB_INDEX_HISTO_TABLE							= 9;
+	public final static int				TAB_INDEX_HISTO_SUMMARY						= 7;
+	public final static int				TAB_INDEX_HISTO_TABLE							= 8;
+	public final static int				TAB_INDEX_HISTO_GRAPHIC						= 9;
 
 	public final static String		COMPARE_RECORD_SET								= "compare_set";																						//$NON-NLS-1$
 	public final static String		UTILITY_RECORD_SET								= "utility_set";																						//$NON-NLS-1$
@@ -831,7 +831,7 @@ public class DataExplorer extends Composite {
 		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "call GDE.shell.layout()"); //$NON-NLS-1$
 		GDE.shell.layout();
 		this.updateLogger();
-		
+
 		this.setHisto(Settings.getInstance().isHistoActive());
 	}
 

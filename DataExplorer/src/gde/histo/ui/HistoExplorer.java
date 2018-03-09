@@ -19,7 +19,6 @@
 
 package gde.histo.ui;
 
-import static gde.ui.DataExplorer.TAB_INDEX_HISTO_GRAPHIC;
 import static gde.ui.DataExplorer.TAB_INDEX_HISTO_SUMMARY;
 import static gde.ui.DataExplorer.TAB_INDEX_HISTO_TABLE;
 import static java.util.logging.Level.SEVERE;
@@ -80,9 +79,6 @@ public class HistoExplorer {
 		SupplementObjectFolder.updateLogMirror();
 
 		int tabLength = displayTab.getItems().length;
-		int positionG = tabLength < TAB_INDEX_HISTO_GRAPHIC ? tabLength : TAB_INDEX_HISTO_GRAPHIC;
-		chartTabItems.add(HistoGraphicsWindow.create(displayTab, SWT.NONE, positionG));
-
 		int positionS = tabLength < TAB_INDEX_HISTO_SUMMARY ? tabLength : TAB_INDEX_HISTO_SUMMARY;
 		chartTabItems.add(HistoSummaryWindow.create(displayTab, SWT.NONE, positionS));
 
