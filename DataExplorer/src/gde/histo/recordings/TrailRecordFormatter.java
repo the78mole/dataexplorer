@@ -229,7 +229,7 @@ public final class TrailRecordFormatter {
 				String values = outliers.getDecodedValues().stream() //
 						.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
 				String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
-						.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString) //
+						.map(ExtendedVault::getLoadFileAsPath).map(Path::getFileName).map(Path::toString) //
 						.distinct().collect(Collectors.joining(", "));
 				String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
 						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
@@ -242,7 +242,7 @@ public final class TrailRecordFormatter {
 				String values = outliers.getDecodedValues().stream() //
 						.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
 				String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
-						.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString) //
+						.map(ExtendedVault::getLoadFileAsPath).map(Path::getFileName).map(Path::toString) //
 						.distinct().collect(Collectors.joining(", "));
 				String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
 						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
@@ -263,7 +263,7 @@ public final class TrailRecordFormatter {
 			String values = outliers.getDecodedValues().stream() //
 					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
 			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
-					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString) //
+					.map(ExtendedVault::getLoadFileAsPath).map(Path::getFileName).map(Path::toString) //
 					.distinct().collect(Collectors.joining(", "));
 			String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
 					? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
@@ -276,7 +276,7 @@ public final class TrailRecordFormatter {
 			String values = outliers.getDecodedValues().stream() //
 					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
 			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
-					.map(ExtendedVault::getLogFileAsPath).map(Path::getFileName).map(Path::toString) //
+					.map(ExtendedVault::getLoadFileAsPath).map(Path::getFileName).map(Path::toString) //
 					.distinct().collect(Collectors.joining(", "));
 			String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
 					? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();

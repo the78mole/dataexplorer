@@ -122,7 +122,7 @@ public final class VaultReaderWriter {
 								log.log(SEVERE, e.getMessage(), e);
 							}
 
-							if (histoVault != null) vaults.add(histoVault.getExtendedVault());
+							if (histoVault != null) vaults.add(ExtendedVault.createExtendedVault(histoVault, truss));
 							trussesIterator.remove();
 						}
 					}
@@ -146,7 +146,7 @@ public final class VaultReaderWriter {
 							log.log(SEVERE, e.getMessage(), e);
 						}
 
-						if (histoVault != null) vaults.add(histoVault.getExtendedVault());
+						if (histoVault != null) vaults.add(ExtendedVault.createExtendedVault(histoVault, truss));
 						trussesIterator.remove();
 					}
 				}

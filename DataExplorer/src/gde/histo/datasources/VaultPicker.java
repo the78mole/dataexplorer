@@ -117,7 +117,7 @@ public final class VaultPicker {
 		abstract TrussJobs getTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException;
 
 		private static void addTruss(TrussJobs resultMap, VaultCollector truss) {
-			Path path = truss.getVault().getLogFileAsPath();
+			Path path = truss.getVault().getLoadFileAsPath();
 			List<VaultCollector> list = resultMap.get(path);
 			if (list == null) resultMap.put(path, list = new ArrayList<>());
 
@@ -512,7 +512,7 @@ public final class VaultPicker {
 					putVault(histoVault);
 					this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 				} else {
-					log.info(() -> String.format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLogFilePath()));
+					log.info(() -> String.format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLoadFilePath()));
 				}
 			}
 			progress.ifPresent((p) -> p.countInLoop(trussJobsEntry.getValue().size()));
@@ -530,7 +530,7 @@ public final class VaultPicker {
 				putVault(histoVault);
 				this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 			} else {
-				log.info(() -> String.format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLogFilePath()));
+				log.info(() -> String.format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLoadFilePath()));
 			}
 		}
 		int loadCount = this.pickedVaults.size() - tmpHistoSetsSize;
@@ -565,9 +565,9 @@ public final class VaultPicker {
 	private List<ExtendedVault> removeSuppressedHistoVaults() {
 		List<ExtendedVault> removed = new ArrayList<>();
 		this.pickedVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
-			if (ExclusionData.isExcluded(v.getLogFileAsPath(), v.getLogRecordsetBaseName())) {
+			if (ExclusionData.isExcluded(v.getLoadFileAsPath(), v.getLogRecordsetBaseName())) {
 				log.info(() -> String.format("discarded as per exclusion list   %s %s   %s", //$NON-NLS-1$
-						v.getLogFilePath(), v.getLogRecordsetBaseName(), v.getStartTimeStampFormatted()));
+						v.getLoadFilePath(), v.getLogRecordsetBaseName(), v.getStartTimeStampFormatted()));
 				removed.add(v);
 			}
 		});
@@ -588,9 +588,9 @@ public final class VaultPicker {
 		int totalSize = vaults.size();
 		for (Iterator<VaultCollector> iterator = vaults.iterator(); iterator.hasNext();) {
 			ExtendedVault vault = iterator.next().getVault();
-			if (ExclusionData.isExcluded(vault.getLogFileAsPath(), vault.getLogRecordsetBaseName())) {
+			if (ExclusionData.isExcluded(vault.getLoadFileAsPath(), vault.getLogRecordsetBaseName())) {
 				log.info(() -> String.format("discarded as per exclusion list   %s %s   %s", //$NON-NLS-1$
-						vault.getLogFilePath(), vault.getLogRecordsetBaseName(), vault.getStartTimeStampFormatted()));
+						vault.getLoadFilePath(), vault.getLogRecordsetBaseName(), vault.getStartTimeStampFormatted()));
 				iterator.remove();
 				removed.add(vault);
 			}
@@ -631,7 +631,7 @@ public final class VaultPicker {
 		}
 		timeStampHistoVaults.add(histoVault);
 		log.finer(() -> String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
-				histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLogFilePath()));
+				histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLoadFilePath()));
 	}
 
 	/**

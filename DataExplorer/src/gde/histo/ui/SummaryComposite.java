@@ -512,14 +512,14 @@ public final class SummaryComposite extends AbstractChartComposite {
 				if (isBeyondLeftBounds(evt.x) && record != null && getChartData(record).getMinMaxWarning()[0] != null) { // left scale warnings
 					Outliers outlier = getChartData(record).getMinMaxWarning()[0];
 					ExtendedVault vault = record.getParent().getVault(outlier.getIndices().get(0));
-					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
-					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLoadLinkPath());
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLoadFilePath());
 					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
 				} else if (isBeyondRightBounds(evt.x) && record != null && getChartData(record).getMinMaxWarning()[1] != null) { // right
 					Outliers outlier = getChartData(record).getMinMaxWarning()[1];
 					ExtendedVault vault = record.getParent().getVault(outlier.getIndices().get(0));
-					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLogLinkPath());
-					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLogFilePath());
+					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLoadLinkPath());
+					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLoadFilePath());
 					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
 				} else if (snappedIndices.size() == 1) { // in the curve area over a single log
 					log.log(Level.OFF, "snappedIndices.size() == 1");

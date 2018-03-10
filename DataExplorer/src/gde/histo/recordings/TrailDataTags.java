@@ -35,6 +35,7 @@ import gde.histo.gpslocations.GpsCluster;
 import gde.histo.recordings.HistoTableMapper.DisplayTag;
 import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.histo.utils.GpsCoordinate;
+import gde.log.Level;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 
@@ -86,8 +87,9 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 	}
 
 	public void add(ExtendedVault histoVault) {
-		this.dataLinkPaths.add(histoVault.getLogLinkPath().intern());
-		this.dataFilePaths.add(histoVault.getLogFilePath().intern());
+		log.log(Level.OFF, histoVault.getLoadLinkPath().toString(), "   " + histoVault.getLoadFilePath().toString());
+		this.dataLinkPaths.add(histoVault.getLoadLinkPath().toString());
+		this.dataFilePaths.add(histoVault.getLoadFilePath().toString());
 		this.dataChannelNumbers.add(String.valueOf(histoVault.getLogChannelNumber()).intern());
 		this.dataRectifiedObjectKeys.add(histoVault.getRectifiedObjectKey().intern());
 		this.dataRecordsetBaseNames.add(histoVault.getLogRecordsetBaseName().intern());

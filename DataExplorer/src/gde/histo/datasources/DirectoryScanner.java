@@ -115,7 +115,7 @@ public final class DirectoryScanner {
 						if (this == obj) return true;
 						if (obj == null) return false;
 						if (getClass() != obj.getClass()) return false;
-						@SuppressWarnings("unchecked")																																		// reason is anonymous class
+						@SuppressWarnings("unchecked")																																	// reason is anonymous class
 						Map<DirectoryType, List<Path>> that = (Map<DirectoryType, List<Path>>) obj;
 						boolean hasSameDirectoryTypes = keySet().equals(that.keySet());
 						if (hasSameDirectoryTypes) {
@@ -138,7 +138,7 @@ public final class DirectoryScanner {
 		 * File access speed indicator. True is slow file system access.
 		 * Simple algorithm.
 		 */
-		private boolean																isSlowFolderAccess	= false;
+		private boolean															isSlowFolderAccess	= false;
 
 		/**
 		 * Determine the valid directory paths from all log sources.
@@ -464,18 +464,19 @@ public final class DirectoryScanner {
 		private final Path				path;
 		private final DataSetType	dataSetType;
 
-		/** Use {@code getFile} only */
+		/** Use {@code getFile} only; is a link file or a real source file */
 		private File							file;
+		/** Is the real source file because {@source file} might be link file */
+		private File							actualFile;
 
 		public enum DataSetType {
 			OSD {
 				@Override
-				List<VaultCollector> getTrusses(SourceDataSet dataFile, boolean isSlowFolderAccess) throws IOException, NotSupportedFileFormatException {
+				List<VaultCollector> getTrusses(SourceDataSet sourceDataSet, boolean isSlowFolderAccess) throws IOException, NotSupportedFileFormatException {
 					List<VaultCollector> trusses = new ArrayList<>();
-					File actualFile = dataFile.getActualFile();
+					File actualFile = sourceDataSet.getActualFile();
 					if (actualFile != null) {
-						String linkPath = !dataFile.getFile().equals(actualFile) ? dataFile.getFile().getAbsolutePath() : GDE.STRING_EMPTY;
-						String objectDirectory = dataFile.getObjectKey();
+						String objectDirectory = sourceDataSet.getObjectKey();
 						List<VaultCollector> trussList;
 						try {
 							trussList = HistoOsdReaderWriter.readTrusses(actualFile, objectDirectory);
@@ -484,8 +485,9 @@ public final class DirectoryScanner {
 							trussList = new ArrayList<>();
 						}
 						for (VaultCollector truss : trussList) {
-							truss.getVault().setLogLinkPath(linkPath);
-							truss.setSourceDataSet(dataFile);
+							truss.getVault().setLoadLinkPath(Paths.get(sourceDataSet.getLinkPath()));
+							truss.getVault().setLogLinkPath(sourceDataSet.getLinkPath());
+							truss.setSourceDataSet(sourceDataSet);
 							if (isValidObject(truss)) trusses.add(truss);
 						}
 					}
@@ -730,7 +732,16 @@ public final class DirectoryScanner {
 		 * @return the data file (differs from {@code file} in case of a link file)
 		 */
 		public File getActualFile() throws IOException {
-			return dataSetType.getActualFile(getFile());
+			if (this.actualFile == null) this.actualFile = dataSetType.getActualFile(getFile());
+			return this.actualFile;
+		}
+
+		/**
+		 * @return the path to the link file if the actual file does not hold the data
+		 */
+		String getLinkPath() {
+			String linkPath = !getFile().equals(actualFile) ? getFile().getAbsolutePath() : GDE.STRING_EMPTY;
+			return linkPath;
 		}
 
 		/**

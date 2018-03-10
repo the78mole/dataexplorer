@@ -112,7 +112,7 @@ public final class VaultCollector {
 	@Override
 	public String toString() {
 		return String.format("logChannelNumber=%d  logRecordSetOrdinal=%d  startTimestamp=%s  %s", //$NON-NLS-1$
-				this.vault.getLogChannelNumber(), this.vault.getLogRecordSetOrdinal(), this.vault.getStartTimeStampFormatted(), this.vault.getLogFilePath());
+				this.vault.getLogChannelNumber(), this.vault.getLogRecordSetOrdinal(), this.vault.getStartTimeStampFormatted(), this.vault.getLoadFilePath());
 	}
 
 	/**
@@ -160,7 +160,7 @@ public final class VaultCollector {
 			entryPoints.setTrails(new HashMap<Integer, PointType>());
 
 			if (!record.hasReasonableData()) {
-				log.fine(() -> String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLogFilePath())); //$NON-NLS-1$
+				log.fine(() -> String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLoadFilePath())); //$NON-NLS-1$
 			} else {
 				if (measurementType.getStatistics() != null) { // this creates trail types mismatch : && record.hasReasonableData()) {
 					setTrailStatisticsPoints(entryPoints, record, recordSet);
@@ -488,7 +488,7 @@ public final class VaultCollector {
 				&& !(this.vault.logDeviceName.startsWith("HoTTViewer") && device.getName().equals("HoTTViewer"))) { //$NON-NLS-1$ //$NON-NLS-2$
 			// HoTTViewer V3 -> HoTTViewerAdapter
 			log.info(() -> String.format("%s candidate found for wrong device '%-11s' in %s  %s", //$NON-NLS-1$
-					this.vault.getLogFileExtension(), this.vault.getLogDeviceName(), this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
+					this.vault.getLoadFileExtension(), this.vault.getLogDeviceName(), this.vault.getLoadFilePath(), this.vault.getStartTimeStampFormatted()));
 			return false;
 		} else
 			return true;
@@ -497,7 +497,7 @@ public final class VaultCollector {
 	public boolean isConsistentChannel(List<Integer> channelMixConfigNumbers) {
 		if (!channelMixConfigNumbers.contains(this.vault.logChannelNumber)) {
 			log.fine(() -> String.format("%s candidate for invalid channel  %d '%-11s' in %s  %s", //$NON-NLS-1$
-					this.vault.getLogFileExtension(), this.vault.getLogChannelNumber(), this.vault.getRectifiedObjectKey(), this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
+					this.vault.getLoadFileExtension(), this.vault.getLogChannelNumber(), this.vault.getRectifiedObjectKey(), this.vault.getLoadFilePath(), this.vault.getStartTimeStampFormatted()));
 			return false;
 		} else
 			return true;
@@ -506,7 +506,7 @@ public final class VaultCollector {
 	public boolean isConsistentStartTimeStamp(long minStartTimeStamp_ms) {
 		if (this.vault.getLogStartTimestamp_ms() < minStartTimeStamp_ms) {
 			log.fine(() -> String.format("%s candidate out of time range      '%-11s' in %s  %s", //$NON-NLS-1$
-					this.vault.getLogFileExtension(), this.vault.getRectifiedObjectKey(), this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
+					this.vault.getLoadFileExtension(), this.vault.getRectifiedObjectKey(), this.vault.getLoadFilePath(), this.vault.getStartTimeStampFormatted()));
 			return false;
 		} else
 			return true;
@@ -516,15 +516,15 @@ public final class VaultCollector {
 		boolean isValidObject = false;
 		if (this.application.getActiveObject() != null && !isValidatedObjectKey) {
 			log.info(() -> String.format("%s candidate found for empty object '%-11s' in %s  %s", //$NON-NLS-1$
-					this.vault.getLogFileExtension(), this.vault.getLogObjectKey(), this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
+					this.vault.getLoadFileExtension(), this.vault.getLogObjectKey(), this.vault.getLoadFilePath(), this.vault.getStartTimeStampFormatted()));
 			isValidObject = this.settings.getFilesWithoutObject();
 		} else if (this.application.getActiveObject() != null && !isValidatedObjectKey) {
 			log.info(() -> String.format("%s candidate found for wrong object '%-11s' in %s  %s", //$NON-NLS-1$
-					this.vault.getLogFileExtension(), this.vault.getRectifiedObjectKey(), this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
+					this.vault.getLoadFileExtension(), this.vault.getRectifiedObjectKey(), this.vault.getLoadFilePath(), this.vault.getStartTimeStampFormatted()));
 			isValidObject = this.settings.getFilesWithOtherObject();
 		} else if (this.application.getActiveObject() == null || isValidatedObjectKey) {
 			log.fine(() -> String.format("%s candidate found for object       '%-11s' in %s  %s", //$NON-NLS-1$
-					this.vault.getLogFileExtension(), this.vault.getRectifiedObjectKey(), this.vault.getLogFilePath(), this.vault.getStartTimeStampFormatted()));
+					this.vault.getLoadFileExtension(), this.vault.getRectifiedObjectKey(), this.vault.getLoadFilePath(), this.vault.getStartTimeStampFormatted()));
 			isValidObject = true;
 		}
 		return isValidObject;

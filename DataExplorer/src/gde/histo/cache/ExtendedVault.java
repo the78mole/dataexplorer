@@ -154,6 +154,21 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	}
 
 	/**
+	 * @param histoVault
+	 * @param truss is the vault skeleton with the base data for the new recordset
+	 * @return the extended vault created form the parameters
+	 */
+	public static ExtendedVault createExtendedVault(HistoVault histoVault, VaultCollector truss) {
+		return new ExtendedVault(histoVault, truss.getVault().loadLinkPath, truss.getVault().loadFilePath, truss.getVault().loadObjectDirectory);
+	}
+
+	// parameters for the current loading activity
+	private final Path		loadFilePath;					// source file
+	private final String	loadObjectDirectory;	// ???
+
+	private Path					loadLinkPath;					// link to the source file
+
+	/**
 	 * @param objectDirectory validated object key
 	 * @param filePath file name + lastModified + file length are a simple solution for getting a SHA-1 hash from the file contents
 	 * @param fileLastModified_ms
@@ -171,6 +186,10 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	public ExtendedVault(String objectDirectory, Path filePath, long fileLastModified_ms, long fileLength, int fileVersion, int logRecordSetSize,
 			int logRecordSetOrdinal, String logRecordSetBaseName, String logDeviceName, long logStartTimestamp_ms, int logChannelNumber,
 			String logObjectKey, String vaultReaderSettings) {
+		this.loadFilePath = filePath;
+		this.loadObjectDirectory = objectDirectory;
+		this.loadLinkPath = Paths.get("");
+
 		this.vaultDataExplorerVersion = GDE.VERSION;
 		this.vaultDeviceKey = getActiveDeviceKey();
 		this.vaultDeviceName = application.getActiveDevice().getName();
@@ -209,7 +228,12 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * Convert into extended vault via shallow copy.
 	 * @param histoVault
 	 */
-	public ExtendedVault(HistoVault histoVault) {
+	private ExtendedVault(HistoVault histoVault, Path loadLinkPath, Path loadFilePath, String loadObjectDirectory) {
+		this.loadFilePath = loadFilePath;
+		this.loadObjectDirectory = loadObjectDirectory;
+
+		this.loadLinkPath = loadLinkPath;
+
 		this.vaultName = histoVault.vaultName;
 		this.vaultDirectory = histoVault.vaultDirectory;
 		this.vaultCreatedMs = histoVault.vaultCreatedMs;
@@ -254,8 +278,8 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		sb.append("logChannelNumber=").append(this.logChannelNumber).append(d);
 		sb.append("logObjectKey=").append(this.logObjectKey).append(d);
 		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(d);
-		sb.append(this.logLinkPath).append(d);
-		sb.append(this.logFilePath).append(d);
+		sb.append(this.loadLinkPath).append(d);
+		sb.append(this.loadFilePath).append(d);
 		sb.append("vaultDirectory=").append(this.vaultDirectory);
 		return sb.toString();
 	}
@@ -442,17 +466,17 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		return StringHelper.getFormatedTime(timestampFormat, this.logStartTimestampMs); // $NON-NLS-1$
 	}
 
-	public String getLogFileExtension() {
+	public String getLoadFileExtension() {
 		String extension = "";
-		int i = this.logFilePath.lastIndexOf('.');
+		int i = this.loadFilePath.toString().lastIndexOf('.');
 		if (i > 0) {
-			extension = this.logFilePath.substring(i + 1);
+			extension = this.loadFilePath.toString().substring(i + 1);
 		}
 		return extension;
 	}
 
-	public Path getLogFileAsPath() {
-		return Paths.get(this.logFilePath);
+	public Path getLoadFileAsPath() {
+		return this.loadFilePath;
 	}
 
 	/**
@@ -470,7 +494,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @return the non-validated object key or alternatively (if empty) the non-validated object directory
 	 */
 	public String getRectifiedObjectKey() {
-		return this.logObjectKey.isEmpty() ? this.logObjectDirectory : this.logObjectKey;
+		return this.logObjectKey.isEmpty() ? this.loadObjectDirectory : this.logObjectKey;
 	}
 
 	/**
@@ -520,6 +544,22 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 
 	public static String getSha1Delimiter() {
 		return SHA1_DELIMITER;
+	}
+
+	public String getLoadFilePath() {
+		return this.loadFilePath.toString();
+	}
+
+	public Path getLoadLinkPath() {
+		return this.loadLinkPath;
+	}
+
+	public void setLoadLinkPath(Path loadLinkPath) {
+		this.loadLinkPath = loadLinkPath;
+	}
+
+	public String getLoadObjectDirectory() {
+		return this.loadObjectDirectory;
 	}
 
 }

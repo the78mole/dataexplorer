@@ -208,7 +208,7 @@ public abstract class TrailRecord extends CommonRecord {
 						suiteRecords.get(i).addElement(point);
 					}
 					if (log.isLoggable(FINER))
-						log.log(FINER, String.format(" %s trail %3d  %s  %d minVal=%d maxVal=%d", getName(), trailSelector.getTrailOrdinal(), histoVault.getLogFilePath(), point, suiteRecords.get(i).getMinRecordValue(), suiteRecords.get(i).getMaxRecordValue()));
+						log.log(FINER, String.format(" %s trail %3d  %s  %d minVal=%d maxVal=%d", getName(), trailSelector.getTrailOrdinal(), histoVault.getLoadFilePath(), point, suiteRecords.get(i).getMinRecordValue(), suiteRecords.get(i).getMaxRecordValue()));
 				}
 			}
 			log.log(FINER, " ", trailSelector);

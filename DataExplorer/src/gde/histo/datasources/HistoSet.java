@@ -380,7 +380,7 @@ public final class HistoSet {
 	public List<Path> getExcludedPaths() {
 		List<Path> result = this.vaultPicker.getExcludedFiles();
 		for (ExtendedVault vault : this.vaultPicker.getSuppressedTrusses()) {
-			result.add(vault.getLogFileAsPath());
+			result.add(vault.getLoadFileAsPath());
 		}
 		return result;
 	}

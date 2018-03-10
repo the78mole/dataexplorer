@@ -133,8 +133,8 @@ public class HistoVault {
 	protected String														vaultName;
 	@XmlElement(required = true)
 	protected String														vaultDirectory;
-    @XmlElement(required = true)
-    protected String vaultReaderSettings;
+  @XmlElement(required = true)
+  protected String 														vaultReaderSettings;
 	@XmlElement(name = "vaultCreated_ms")
 	protected long															vaultCreatedMs;
 	@XmlElement(required = true)
@@ -148,12 +148,14 @@ public class HistoVault {
 	protected String														vaultObjectKey;
 	@XmlElement(name = "vaultSamplingTimespan_ms")
 	protected long															vaultSamplingTimespanMs;
+  @Deprecated // replaced by loadLinkPath -> remains in the vault for information purposes only
 	@XmlElement(required = true)
-	protected String logLinkPath;
+	protected String 														logLinkPath;
 	@XmlElement(required = true)
 	protected String														logFilePath;
 	protected long															logFileLastModified;
 	protected long															logFileLength;
+  @Deprecated // replaced by loadObjectDirectory -> remains in the vault for information purposes only
 	@XmlElement(required = true)
 	protected String														logObjectDirectory;
 	protected int																logFileVersion;
@@ -404,6 +406,7 @@ public class HistoVault {
      *     {@link String }
      *
      */
+  @Deprecated // replaced by loadLinkPath -> remains in the vault for information purposes only
     public String getLogLinkPath() {
         return logLinkPath;
     }
@@ -416,6 +419,7 @@ public class HistoVault {
      *     {@link String }
      *
      */
+  @Deprecated // replaced by loadFilePath -> remains in the vault for information purposes only
     public void setLogLinkPath(String value) {
         this.logLinkPath = value;
     }
@@ -428,6 +432,7 @@ public class HistoVault {
 	 *     {@link String }
 	 *
 	 */
+    @Deprecated // replaced by loadFilePath -> remains in the vault for information purposes only
 	public String getLogFilePath() {
 		return logFilePath;
 	}
@@ -440,7 +445,8 @@ public class HistoVault {
 	 *     {@link String }
 	 *
 	 */
-	public void setLogFilePath(String value) {
+    @Deprecated // replaced by loadFilePath
+  public void setLogFilePath(String value) {
 		this.logFilePath = value;
 	}
 
@@ -484,6 +490,7 @@ public class HistoVault {
 	 *     {@link String }
 	 *
 	 */
+  @Deprecated // replaced by loadObjectDirectory -> remains in the vault for information purposes only
 	public String getLogObjectDirectory() {
 		return logObjectDirectory;
 	}
@@ -496,6 +503,7 @@ public class HistoVault {
 	   *     {@link String }
 	   *
 	   */
+  @Deprecated // replaced by loadObjectDirectory -> remains in the vault for information purposes only
 	public void setLogObjectDirectory(String value) {
 		this.logObjectDirectory = value;
 	}
@@ -729,10 +737,6 @@ public class HistoVault {
 	}
 
 	/* non JAXB members : start */
-
-	public ExtendedVault getExtendedVault() {
-	 return new ExtendedVault(this);
-	}
 
 	/**
 	 * @return context singleton (creating the context is slow)

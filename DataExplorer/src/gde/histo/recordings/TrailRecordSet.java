@@ -119,7 +119,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 					int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
 					durations_mm.add(duration_mm);
 					if (!timeStep_ms.addRaw(histoVault.getLogStartTimestamp_ms() * 10)) {
-						log.warning(() -> String.format("Duplicate recordSet  startTimeStamp %,d  %s", histoVault.getLogStartTimestamp_ms(), histoVault.getLogFilePath())); //$NON-NLS-1$
+						log.warning(() -> String.format("Duplicate recordSet  startTimeStamp %,d  %s", histoVault.getLogStartTimestamp_ms(), histoVault.getLoadFilePath())); //$NON-NLS-1$
 					}
 					pickedVaults.addToIndex(histoVault);
 

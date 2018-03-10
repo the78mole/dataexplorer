@@ -1031,7 +1031,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException {
 		List<ExtendedVault> histoVaults = new ArrayList<>();
 		for (VaultCollector truss : trusses) {
-			if (truss.getVault().getLogFilePath().equals(filePath.toString())) {
+			if (truss.getVault().getLoadFilePath().equals(filePath.toString())) {
 				log.log(Level.INFO, "start ", filePath); //$NON-NLS-1$
 				// add aggregated measurement and settlement points and score points to the truss
 				HoTTbinHistoReader.read(truss);
