@@ -21,19 +21,14 @@ package gde.histo.recordings;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BiFunction;
-import java.util.stream.Stream;
 
 import gde.config.Settings;
 import gde.device.TrailTypes;
 import gde.histo.recordings.TrailDataTags.DataTag;
-import gde.log.Level;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.utils.LocalizedDateTime;
 import gde.utils.LocalizedDateTime.DateTimePattern;
 
@@ -74,56 +69,20 @@ public final class HistoTableMapper {
 		BASE_PATH {
 			@Override
 			String[] getTableTagRow(TrailRecordSet trailRecordSet) {
-				Path commonRelativePath = defineCommonRelativePath(trailRecordSet.getDataTags());
 				BiFunction<TrailDataTags, Integer, String> scoreFunction = (t, i) -> {
 					Path fullPath = Paths.get(t.get(t.getSourcePathTag(i)).get(i));
-					Path fullRelativePath = fullPath.subpath(0, fullPath.getNameCount()); // strip the root component
-					log.fine(() -> "commonRelativePath=" + commonRelativePath + "  fullRelativePath=" + fullRelativePath);
-					// strip the common start path from all columns
-					Path relativePath = commonRelativePath.relativize(fullRelativePath);
-					log.log(Level.FINER, "relativePath.getNameCount=", relativePath.getNameCount());
-					if (DataExplorer.getInstance().isObjectoriented()) {
-						return relativePath.getNameCount() > 2 ? relativePath.getParent().getParent().toString() : commonRelativePath.getFileName().toString();
+					if (fullPath.getNameCount() > 4) {
+						return fullPath.subpath(fullPath.getNameCount() - 5, fullPath.getNameCount() - 2).toString();
+					} else if (fullPath.getNameCount() > 2) {
+						return fullPath.getParent().getParent().toString(); // preserves the drive letter which subpath absorbs
 					} else {
-						return relativePath.getNameCount() > 1 ? relativePath.getParent().toString() : commonRelativePath.getParent().getFileName().toString();
+						return "";
 					}
 				};
 				String[] dataTableRow = getTagRowWithValues(trailRecordSet, scoreFunction);
 
 				dataTableRow[1] = Messages.getString(MessageIds.GDE_MSGT0840);
 				return dataTableRow;
-			}
-
-			/**
-			 * @return the start path which is identical for all tags
-			 */
-			private Path defineCommonRelativePath(TrailDataTags dataTags) {
-				Path[] grippPaths = new Path[dataTags.get(DataTag.FILE_PATH).size()];
-				List<Path> gripPaths = new ArrayList<>();
-				int minNameCount = Integer.MAX_VALUE;
-				for (int i = 0; i < grippPaths.length; i++) {
-					grippPaths[i] = Paths.get(dataTags.get(dataTags.getSourcePathTag(i)).get(i));
-					minNameCount = Math.min(minNameCount, grippPaths[i].getNameCount());
-				}
-
-				int minPathLength = minNameCount;
-				Path commonRelativePath = Stream.of(grippPaths) //
-						.map(p -> p.subpath(0, minPathLength)).distinct() //
-						.reduce((p1, p2) -> getCommonStartPath(p1, p2)).orElse(Paths.get(""));
-				log.finer(() -> "commonRelativePath=" + commonRelativePath + " " + gripPaths);
-				return commonRelativePath;
-			}
-
-			/**
-			 * @return the longest common start path of two paths as a relative path or empty path
-			 */
-			private Path getCommonStartPath(Path path1, Path path2) {
-				int minNameCount = Math.min(path1.getNameCount(), path2.getNameCount());
-				for (int j = minNameCount; j > 0; j--) {
-					Path candidate = path1.subpath(0, j);
-					if (candidate.equals(path2.subpath(0, j))) return candidate;
-				}
-				return Paths.get("");
 			}
 		},
 		CHANNEL_NUMBER {
