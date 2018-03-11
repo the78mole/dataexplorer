@@ -14,8 +14,8 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright (c) 2011,2012,2013,2014,2015,2016,2017 Winfried Bruegmann
-    					2016,2017 Thomas Eickert
+    Copyright (c) 2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
+    					2016,2017,2018 Thomas Eickert
 ****************************************************************************************/
 package gde.device.graupner;
 

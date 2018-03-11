@@ -12,6 +12,7 @@ Version 3.3.2 - xx yyy 2017
 * add initial support for Junsi iCharger 106B
 * add initial support for ELV WDE (Wetter-Daten-Empfänger)
 * add initial support for a generic CSV import (using Tesla Battery sample CSV file as source)
+* copyright update
 
 History analysis
 	* New summary chart in the history graphics window
