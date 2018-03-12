@@ -151,7 +151,7 @@ public final class SupplementObjectFolder {
 				if (i[0] < PATHS_MESSAGE_LINES) {
 					sb.append(GDE.STRING_NEW_LINE).append(GDE.STRING_BLANK).append(objectsPath.relativize(p));
 				} else if (i[0] == PATHS_MESSAGE_LINES) {
-					sb.append(GDE.STRING_NEW_LINE).append(GDE.STRING_BLANK).append(p.relativize(objectsPath)).append(GDE.STRING_NEW_LINE).append(GDE.STRING_ELLIPSIS);
+					sb.append(GDE.STRING_NEW_LINE).append(GDE.STRING_BLANK).append(objectsPath.relativize(p)).append(GDE.STRING_NEW_LINE).append(GDE.STRING_ELLIPSIS);
 				}
 			});
 
