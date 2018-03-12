@@ -189,26 +189,24 @@ public final class VaultReaderWriter {
 			Map<String, String> env = new HashMap<String, String>();
 			env.put("create", "true");
 			try (FileSystem zipFileSystem = FileSystems.newFileSystem(URI.create("jar:" + cacheFilePath.toUri()), env)) {
-				Path cacheBaseDirPath = zipFileSystem.getPath("");
-				storeInVaultFileSystem(newVaults, cacheBaseDirPath);
+				for (VaultCollector vaultCollector : newVaults) {
+					ExtendedVault histoVault = vaultCollector.getVault();
+					storeInVaultFileSystem(histoVault, zipFileSystem.getPath(histoVault.getVaultFileName().toString()));
+				}
 			}
 		} else {
-			Path cacheBaseDirPath = cacheFilePath;
-			FileUtils.checkDirectoryAndCreate(cacheBaseDirPath.toString());
-			storeInVaultFileSystem(newVaults, cacheBaseDirPath);
+			FileUtils.checkDirectoryAndCreate(cacheFilePath.toString());
+			for (VaultCollector vaultCollector : newVaults) {
+				ExtendedVault histoVault = vaultCollector.getVault();
+				storeInVaultFileSystem(histoVault, cacheFilePath.resolve(histoVault.getVaultFileName()));
+			}
 		}
 	}
 
-	/**
-	 * @param newVaults
-	 * @param cacheBaseDirPath
-	 */
-	private static void storeInVaultFileSystem(List<VaultCollector> newVaults, Path cacheBaseDirPath) {
-		for (VaultCollector vaultCollector : newVaults) {
-			ExtendedVault histoVault = vaultCollector.getVault();
-			Path filePath = cacheBaseDirPath.resolve(histoVault.getVaultFileName());
-			try (BufferedOutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(filePath, StandardOpenOption.CREATE_NEW))) {
-				VaultProxy.store(histoVault, outputStream);
+	private static void storeInVaultFileSystem(ExtendedVault histoVault, Path cacheBaseDirPath) {
+		if (!FileUtils.checkFileExist(cacheBaseDirPath.toString())) {
+			try (BufferedOutputStream zipOutputStream = new BufferedOutputStream(Files.newOutputStream(cacheBaseDirPath, StandardOpenOption.CREATE_NEW))) {
+				VaultProxy.store(histoVault, zipOutputStream);
 			} catch (Exception e) {
 				log.log(SEVERE, e.getMessage(), e);
 			}
