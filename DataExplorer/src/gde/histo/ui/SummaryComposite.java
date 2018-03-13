@@ -522,7 +522,6 @@ public final class SummaryComposite extends AbstractChartComposite {
 					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLoadFilePath());
 					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
 				} else if (snappedIndices.size() == 1) { // in the curve area over a single log
-					log.log(Level.OFF, "snappedIndices.size() == 1");
 					Integer index = snappedIndices.get(0);
 					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.LINK_PATH));
 					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.FILE_PATH));

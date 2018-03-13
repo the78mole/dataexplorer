@@ -248,7 +248,7 @@ public final class SupplementObjectFolder {
 			result = DirectoryScanner.defineObjectPathsSilently(externalBaseDir, Settings.getInstance().getRealObjectKeys().stream()) //
 					.collect(Collectors.toList());
 			for (Path path : result) {
-				log.log(Level.OFF, "sourcePath=", path);
+				log.log(Level.FINER, "sourcePath=", path);
 				Path relativeSubPath = externalBaseDir.relativize(path);
 				copyDirectoryFiles(path, targetBaseDir.resolve(relativeSubPath));
 			}

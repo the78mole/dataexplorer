@@ -531,7 +531,7 @@ public final class CurveSurvey {
 		xPosMeasure = timeLine.getXPosTimestamp(measure.getTimestampMeasure_ms());
 		GraphicsLayout graphicsData = graphicsComposite.getChartData(trailRecord);
 		yPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, trailRecord.getParent().getIndex(measure.getTimestampMeasure_ms()));
-		log.off(() -> String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", measure.getTimestampMeasure_ms(), this.xPosMeasure, this.yPosMeasure));
+		log.finer(() -> String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", measure.getTimestampMeasure_ms(), this.xPosMeasure, this.yPosMeasure));
 	}
 
 	/**

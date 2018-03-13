@@ -137,31 +137,14 @@ public final class HistoCurveUtils {
 			int xWidth = xPositions[2] - xPositions[1];
 			int xPos = xPositions[1] - xWidth;
 			int xPosClipping = Math.max(1, xPositions[1] + HALF_MID_GAP);
-			// int xWidthClipping;
-			// if (xPositions[1] + HALF_MID_GAP <= 0) {
-			// xWidthClipping = Math.min(drawStripBounds.width, xWidth - HALF_MID_GAP);
-			// } else if (xPositions[1] + HALF_MID_GAP > drawStripBounds.width) {
-			// xWidthClipping = 0;
-			// } else if (xPositions[1] + xWidth - HALF_MID_GAP <= drawStripBounds.width) {
-			// xWidthClipping = xWidth - HALF_MID_GAP;
-			// } else {
-			// xWidthClipping = drawStripBounds.width - xPositions[1] - HALF_MID_GAP;
-			// }
-			// boolean startsBeyondLeft=xPositions[1] + HALF_MID_GAP <= 0;
-			// boolean endsWithinRight=xPositions[1] + xWidth - HALF_MID_GAP <= drawStripBounds.width;
 			boolean endsBeyondRight = xPositions[2] > drawStripBounds.width;
 			int xWidthClipping = Math.max(0, endsBeyondRight ? drawStripBounds.width - Math.max(0, xPositions[1] + HALF_MID_GAP)
 					: Math.min(drawStripBounds.width, xWidth - HALF_MID_GAP));
-			// log.log(Level.OFF, "" + xWidthClipping +" " + tmpWidthClipping);
 			log.finest(() -> "xPosRight=" + xPos + " xWidthRight=" + xWidth + " xPosClipping=" + xPosClipping + " xWidthClipping=" + xWidthClipping);
 			gc.setClipping(drawStripBounds.x + xPosClipping, drawStripBounds.y, xWidthClipping, drawStripBounds.height);
 			gc.fillOval(drawStripBounds.x + xPos, yPos, xWidth * 2, yHeight);
 			gc.setClipping((Rectangle) null);
 		}
-		// draw avg line
-		// gc.setForeground(DataExplorer.COLOR_RED);
-		// gc.setLineWidth(1);
-		// gc.drawLine(drawStripBounds.x + xPositions[1], yPos, drawStripBounds.x + xPositions[1], yPos + yHeight);
 
 		gc.setBackground(background);
 	}

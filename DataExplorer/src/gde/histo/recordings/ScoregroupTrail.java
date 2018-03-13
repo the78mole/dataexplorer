@@ -22,8 +22,6 @@ package gde.histo.recordings;
 import gde.data.Record.DataType;
 import gde.device.ScoreGroupType;
 import gde.histo.cache.ExtendedVault;
-import gde.histo.datasources.HistoSet;
-import gde.log.Level;
 import gde.log.Logger;
 
 /**
@@ -70,21 +68,9 @@ public final class ScoregroupTrail extends TrailRecord {
 		return vault.getScorePoint(trailOrdinal);
 	}
 
-	/**
-	 * @return true if the record or the suite contains reasonable data which can be displayed
-	 */
-	@Override // reason is trail record suites with a master record without point values and minValue/maxValue != 0 in case of empty records
+	@Override
 	public boolean hasReasonableData() {
-		boolean result;
-		if (this.size() > 0 && this.minValue != Integer.MAX_VALUE && this.maxValue != Integer.MIN_VALUE) {
-			result = true;
-		} else {
-			log.log(Level.OFF, "\n >>>>>>>>   case found!  <<<<<<<< \n");
-			double[] extrema = defineExtrema(); // todo check if required
-			result = !HistoSet.fuzzyEquals(extrema[0], extrema[1]) || !HistoSet.fuzzyEquals(extrema[0], 0.);
-			throw new UnsupportedOperationException();
-		}
-		return result;
+		return true;
 	}
 
 	@Override

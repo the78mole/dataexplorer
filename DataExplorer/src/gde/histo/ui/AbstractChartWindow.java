@@ -118,7 +118,6 @@ public abstract class AbstractChartWindow extends CTabItem {
 		void processMouseUpAction(Point point) {
 			measure.ifPresent(mm -> {
 				getGraphicsComposite().getMeasuring().ifPresent(m -> m.processMouseUpAction(point));
-				log.log(Level.OFF, "started");
 				getSummaryComposite().ifPresent(AbstractChartComposite::drawAreaPaintControl);
 			});
 		}
