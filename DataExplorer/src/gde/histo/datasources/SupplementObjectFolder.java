@@ -114,18 +114,13 @@ public final class SupplementObjectFolder {
 		if (mirrorUpdate_ms + MIRROR_CYCLE_MS > System.currentTimeMillis()) return;
 
 		mirrorUpdate_ms = System.currentTimeMillis();
-		GDE.display.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				SupplementObjectFolder instance = new SupplementObjectFolder();
-				Thread rebuildThread = new Thread((Runnable) () -> instance.rebuildLogMirror(), "rebuildLogMirror");
-				try {
-					rebuildThread.start();
-				} catch (RuntimeException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
-			}
-		});
+		SupplementObjectFolder instance = new SupplementObjectFolder();
+		Thread rebuildThread = new Thread(() -> instance.rebuildLogMirror(), "rebuildLogMirror");
+		try {
+			rebuildThread.start();
+		} catch (RuntimeException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
 	}
 
 	/**
