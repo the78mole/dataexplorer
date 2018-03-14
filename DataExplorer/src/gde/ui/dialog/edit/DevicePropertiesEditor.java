@@ -13,36 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.dialog.edit;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.device.CheckSumTypes;
-import gde.device.CommaSeparatorTypes;
-import gde.device.DataBlockType;
-import gde.device.DataTypes;
-import gde.device.DesktopPropertyTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.DeviceTypes;
-import gde.device.FormatTypes;
-import gde.device.InputTypes;
-import gde.device.LineEndingTypes;
-import gde.device.MeasurementPropertyTypes;
-import gde.device.ObjectFactory;
-import gde.device.PropertyType;
-import gde.device.TimeUnitTypes;
-import gde.log.Level;
-import gde.log.LogFormatter;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.ui.dialog.HelpInfoDialog;
-import gde.utils.FileUtils;
-import gde.utils.StringHelper;
 
 import java.io.File;
 import java.util.Locale;
@@ -91,8 +65,34 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.xml.sax.SAXParseException;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.device.CheckSumTypes;
+import gde.device.CommaSeparatorTypes;
+import gde.device.DataBlockType;
+import gde.device.DataTypes;
+import gde.device.DesktopPropertyTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.DeviceTypes;
+import gde.device.FormatTypes;
+import gde.device.InputTypes;
+import gde.device.LineEndingTypes;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.ObjectFactory;
+import gde.device.PropertyType;
+import gde.device.TimeUnitTypes;
+import gde.log.Level;
+import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.ui.dialog.HelpInfoDialog;
+import gde.utils.FileUtils;
+import gde.utils.StringHelper;
+
 /**
- * Dialog class enable to edit existing and create new device property files 
+ * Dialog class enable to edit existing and create new device property files
  * @author Winfried Brügmann
  */
 public class DevicePropertiesEditor extends Composite {
@@ -264,7 +264,8 @@ public class DevicePropertiesEditor extends Composite {
 			DevicePropertiesEditor.dialogShell.setMinimumSize(shellBounds.width, shellBounds.height+20);
 			DevicePropertiesEditor.dialogShell.open();
 			DevicePropertiesEditor.dialogShell.addListener(SWT.Traverse, new Listener() {
-	      public void handleEvent(Event event) {
+	      @Override
+				public void handleEvent(Event event) {
 	        switch (event.detail) {
 	        case SWT.TRAVERSE_ESCAPE:
 	        	DevicePropertiesEditor.dialogShell.close();
@@ -340,13 +341,15 @@ public class DevicePropertiesEditor extends Composite {
 			this.setLayout(new FormLayout());
 			this.setSize(680, 500);
 			FormData fd = new FormData();
-			this.addHelpListener(new HelpListener() {			
+			this.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "composite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			});
 			this.getShell().addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (DevicePropertiesEditor.this.deviceConfig != null && DevicePropertiesEditor.this.deviceConfig.isChangePropery()) {
@@ -814,6 +817,7 @@ public class DevicePropertiesEditor extends Composite {
 							this.timeBaseTimeStepText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 							this.timeBaseTimeStepText.setBounds(322, 184, 60, 20);
 							this.timeBaseTimeStepText.addVerifyListener(new VerifyListener() {
+								@Override
 								public void verifyText(VerifyEvent evt) {
 									log.log(java.util.logging.Level.FINEST, "timeBaseTimeStepText.verifyText, event=" + evt); //$NON-NLS-1$
 									evt.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, evt.text);
@@ -908,7 +912,7 @@ public class DevicePropertiesEditor extends Composite {
 									tabItem.dispose();
 									int itemCount = DevicePropertiesEditor.this.channelConfigInnerTabFolder.getItemCount();
 									if (itemCount > 1) DevicePropertiesEditor.this.channelConfigInnerTabFolder.getItem(itemCount - 1).setShowClose(true);
-									
+
 									DevicePropertiesEditor.this.enableSaveButton(true);
 								}
 							});
@@ -1117,7 +1121,8 @@ public class DevicePropertiesEditor extends Composite {
 			this.dataBlockComposite = new Composite(this.tabFolder, SWT.NONE);
 			this.dataBlockComposite.setLayout(null);
 			this.dataBlockTabItem.setControl(this.dataBlockComposite);
-			this.dataBlockComposite.addHelpListener(new HelpListener() {			
+			this.dataBlockComposite.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "dataBlockComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_datablock"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1134,7 +1139,7 @@ public class DevicePropertiesEditor extends Composite {
 				this.dataBlockRequiredGroup.setLayout(null);
 				this.dataBlockRequiredGroup.setText(Messages.getString(MessageIds.GDE_MSGT0517));
 				this.dataBlockRequiredGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.dataBlockRequiredGroup.setBounds(50, 80, 270, 260);
+				this.dataBlockRequiredGroup.setBounds(20, 80, 270, 260);
 				{
 					this.dataBlockInputLabel = new Label(this.dataBlockRequiredGroup, SWT.RIGHT);
 					this.dataBlockInputLabel.setText(Messages.getString(MessageIds.GDE_MSGT0601));
@@ -1276,6 +1281,7 @@ public class DevicePropertiesEditor extends Composite {
 						}
 					});
 					this.dataBlockSizeText1.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "dataBlockSizeText.verifyText, event=" + evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -1300,6 +1306,7 @@ public class DevicePropertiesEditor extends Composite {
 						}
 					});
 					this.dataBlockSizeText2.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "dataBlockSizeText.verifyText, event=" + evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -1415,7 +1422,7 @@ public class DevicePropertiesEditor extends Composite {
 				this.dataBlockOptionalGroup.setLayout(null);
 				this.dataBlockOptionalGroup.setText(Messages.getString(MessageIds.GDE_MSGT0522));
 				this.dataBlockOptionalGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.dataBlockOptionalGroup.setBounds(330, 80, 300, 170);
+				this.dataBlockOptionalGroup.setBounds(300, 80, 360, 170);
 				{
 					this.dataBlockCheckSumFormatButton = new Button(this.dataBlockOptionalGroup, SWT.CHECK | SWT.RIGHT);
 					this.dataBlockCheckSumFormatButton.setText(Messages.getString(MessageIds.GDE_MSGT0466));
@@ -1516,7 +1523,7 @@ public class DevicePropertiesEditor extends Composite {
 				{
 					this.preferredDataLocationText = new Text(this.dataBlockOptionalGroup, SWT.BORDER | SWT.SCROLL_LINE);
 					this.preferredDataLocationText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-					this.preferredDataLocationText.setBounds(140, GDE.IS_MAC_COCOA ? 85 : 100, 150, 20);
+					this.preferredDataLocationText.setBounds(140, GDE.IS_MAC_COCOA ? 85 : 100, 210, 20);
 					this.preferredDataLocationText.setEnabled(false);
 					this.preferredDataLocationText.addKeyListener(new KeyAdapter() {
 						@Override
@@ -1530,6 +1537,7 @@ public class DevicePropertiesEditor extends Composite {
 						}
 					});
 					this.preferredDataLocationText.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "preferredDataLocationText.verifyText, event=" + evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.STRING, evt.text);
@@ -1565,7 +1573,7 @@ public class DevicePropertiesEditor extends Composite {
 			{
 				this.preferredFileExtensionText = new Text(this.dataBlockOptionalGroup, SWT.BORDER);
 				this.preferredFileExtensionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.preferredFileExtensionText.setBounds(140, GDE.IS_MAC_COCOA ? 115 : 130, 50, 20);
+				this.preferredFileExtensionText.setBounds(140, GDE.IS_MAC_COCOA ? 115 : 130, 90, 20);
 				this.preferredFileExtensionText.setEnabled(false);
 				this.preferredFileExtensionText.addKeyListener(new KeyAdapter() {
 					@Override
@@ -1579,6 +1587,7 @@ public class DevicePropertiesEditor extends Composite {
 					}
 				});
 				this.preferredFileExtensionText.addVerifyListener(new VerifyListener() {
+					@Override
 					public void verifyText(VerifyEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "preferredFileExtensionText.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.STRING, evt.text);
@@ -1607,7 +1616,8 @@ public class DevicePropertiesEditor extends Composite {
 			this.stateComposite = new Composite(this.tabFolder, SWT.NONE);
 			this.stateComposite.setLayout(null);
 			this.stateTabItem.setControl(this.stateComposite);
-			this.stateComposite.addHelpListener(new HelpListener() {			
+			this.stateComposite.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "stateComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_state"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1693,7 +1703,7 @@ public class DevicePropertiesEditor extends Composite {
 	private String getDevicesPath() {
 		String applHomePath = GDE.STRING_EMPTY;
 		if (GDE.IS_WINDOWS) {
-			applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + GDE.FILE_SEPARATOR_UNIX).replace("\\", GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$ 
+			applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + GDE.FILE_SEPARATOR_UNIX).replace("\\", GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else if (GDE.IS_LINUX) {
 			applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "." + GDE.NAME_LONG + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
@@ -1726,7 +1736,8 @@ public class DevicePropertiesEditor extends Composite {
 		initializeDeviceProperties();
 		//DeviceType end
 
-		GDE.display.asyncExec( new Runnable() {		
+		GDE.display.asyncExec( new Runnable() {
+			@Override
 			public void run() {
 				try {
 					if (DevicePropertiesEditor.dialogShell != null && !DevicePropertiesEditor.dialogShell.isDisposed()) {
@@ -1879,7 +1890,7 @@ public class DevicePropertiesEditor extends Composite {
 								DevicePropertiesEditor.this.deviceConfig.getDesktopProperty(DesktopPropertyTypes.UTILITY_GRAPHICS_TAB));
 						//DesktopType end
 					}
-					
+
 					//reset possible changes detected by cleanup initial state
 					DevicePropertiesEditor.this.deviceConfig.setChangePropery(false);
 					DevicePropertiesEditor.this.enableSaveButton(false);
@@ -1931,7 +1942,7 @@ public class DevicePropertiesEditor extends Composite {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void initializeDeviceProperties() {
 		DevicePropertiesEditor.this.deviceFileNameText.setText(DevicePropertiesEditor.this.devicePropertiesFileName);
@@ -1948,14 +1959,14 @@ public class DevicePropertiesEditor extends Composite {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void initializeTimeBase() {
 		DevicePropertiesEditor.this.timeBaseTimeStepText.setText(String.format("%.1f", DevicePropertiesEditor.this.timeStep_ms)); //$NON-NLS-1$
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void initializeDataBlock() {
 		DevicePropertiesEditor.this.dataBlockInputCombo1.select(DevicePropertiesEditor.this.dataBlockInputType1 == InputTypes.FILE_IO ? 0 : 1);
