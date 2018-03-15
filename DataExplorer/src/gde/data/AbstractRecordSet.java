@@ -19,8 +19,6 @@
 
 package gde.data;
 
-import static java.util.logging.Level.FINE;
-
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -316,6 +314,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	protected Color															timeGridColor										= DataExplorer.COLOR_GREY;
 	protected int																timeGridLineStyle								= SWT.LINE_DOT;
 
+	protected static final String								SMART_STATISTICS					= "RecordSet_smartStatistics";							// histo: Quantiles
 	protected static final String								CHART_WEIGHT							= "RecordSet_chartWeight";									// histo: weight of the charts
 																																																										// (graphics or summary)
 	@Deprecated

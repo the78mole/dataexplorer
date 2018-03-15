@@ -45,7 +45,6 @@ import org.eclipse.swt.widgets.TableItem;
 import com.sun.istack.internal.Nullable;
 
 import gde.GDE;
-import gde.config.Settings;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.AbstractChartWindow.WindowActor;
@@ -176,7 +175,7 @@ public final class SelectorComposite extends Composite {
 			});
 		}
 		{
-			this.smartSelector = new Button(this, SWT.TOGGLE | SWT.LEFT | SWT.TRANSPARENT);
+			this.smartSelector = new Button(this, SWT.PUSH | SWT.LEFT | SWT.TRANSPARENT);
 			FormData smartSelectorLData = new FormData();
 			smartSelectorLData.width = GDE.IS_WINDOWS ? 26 : 33;
 			smartSelectorLData.height = GDE.IS_WINDOWS ? 26 : 33;
@@ -185,14 +184,13 @@ public final class SelectorComposite extends Composite {
 			this.smartSelector.setLayoutData(smartSelectorLData);
 			this.smartSelector.setImage(SWTResourceManager.getImage("gde/resource/smartSetting.png"));
 			this.smartSelector.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0898));
-			this.smartSelector.setSelection(Settings.getInstance().isSmartStatistics());
 			this.smartSelector.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					log.fine(() -> "smartSelector.widgetSelected, event=" + evt);
-					Settings.getInstance().setSmartStatistics(smartSelector.getSelection());
 					resetContextMenuMeasuring();
 					windowActor.clearMeasuring();
+					windowActor.getTrailRecordSet().setSmartStatistics(!windowActor.getTrailRecordSet().isSmartStatistics());
 					windowActor.scrollSummaryComposite();
 					windowActor.updateHistoTabs(true, true);
 				}

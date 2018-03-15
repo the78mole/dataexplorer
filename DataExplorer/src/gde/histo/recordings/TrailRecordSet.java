@@ -49,7 +49,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
-import gde.config.Settings;
 import gde.data.AbstractRecord;
 import gde.data.AbstractRecordSet;
 import gde.data.Record;
@@ -1028,6 +1027,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			template.setProperty(RecordSet.VALUE_GRID_RECORD_NAME, getValueGridRecordName());
 		}
 
+		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(settings.isSmartStatistics()));
 		int[] chartWeights = presentHistoExplorer.getHistoSummaryTabItem().getChartWeights();
 		for (int i = 0; i < chartWeights.length; i++) {
 			template.setProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(chartWeights[i]));
@@ -1081,13 +1081,17 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				TrailRecord gridRecord = get(gridRecordName);
 				setValueGridRecordName(gridRecord != null && gridRecord.isVisible() ? gridRecordName : gridDefaultRecordName);
 			}
-			if (Settings.getInstance().isSmartStatistics()) { // only smart statistics supports multiple charts
-				int[] chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS.clone();
+			settings.setSmartStatistics(Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true")));
+			int[] chartWeights;
+			if (settings.isSmartStatistics()) { // only smart statistics supports multiple charts
+				chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS.clone();
 				for (int i = 0; i < chartWeights.length; i++) {
 					chartWeights[i] = Integer.parseInt(template.getProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i])));
 				}
-				presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(chartWeights);
+			} else {
+				chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS;
 			}
+			presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(chartWeights);
 			log.fine(() -> "applied histo graphics template file " + template.getTargetFilePath());
 
 			if (doUpdateVisibilityStatus) {
@@ -1099,6 +1103,22 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	public HistoGraphicsTemplate getTemplate() {
 		return this.template;
+	}
+
+	/**
+	 * @return boolean true if the history analysis contains quantile values instead of legacy statistics
+	 */
+	public boolean isSmartStatistics() {
+		return Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true"));
+	}
+
+	/**
+	 * Set true if the history analysis contains quantile values instead of legacy statistics
+	 */
+	public void setSmartStatistics(boolean isActive) {
+		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(isActive));
+		template.store();
+		settings.setSmartStatistics(isActive);
 	}
 
 	/**
