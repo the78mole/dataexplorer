@@ -724,19 +724,20 @@ public class MenuBar {
 								TrailRecordSet trailRecordSet = application.getPresentHistoExplorer().getTrailRecordSet();
 								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
 								Path targetFilePath = template.getTargetFilePath();
-								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
-										targetFilePath.getParent().toString(), targetFilePath.getFileName().toString());
-								fileDialog.open();
-								String templateFileName = fileDialog.getFileName();
-								if (templateFileName != null && templateFileName.length() > 4) {
-									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
-									trailRecordSet.getTemplate().setHistoFileName(templateFileName);
-									trailRecordSet.saveTemplate();
-									if (MenuBar.this.application.getPresentHistoExplorer().isHistoChartWindowVisible()) {
-										MenuBar.this.application.getPresentHistoExplorer().getActiveHistoChartTabItem().resetStatusMessage();
+								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] {
+										Settings.GRAPHICS_TEMPLATES_EXTENSION }, targetFilePath.getParent().toString(), targetFilePath.getFileName().toString());
+								if (fileDialog.open() != null) {
+									String templateFileName = fileDialog.getFileName();
+									if (templateFileName != null && templateFileName.length() > 4) {
+										MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
+										trailRecordSet.getTemplate().setHistoFileName(templateFileName);
+										trailRecordSet.saveTemplate();
+										if (MenuBar.this.application.getPresentHistoExplorer().isHistoChartWindowVisible()) {
+											MenuBar.this.application.getPresentHistoExplorer().getActiveHistoChartTabItem().resetStatusMessage();
+										}
 									}
 								}
-							}	else {
+							} else {
 								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 								if (activeChannel != null) {
 									GraphicsTemplate template = activeChannel.getTemplate();
@@ -765,15 +766,17 @@ public class MenuBar {
 								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
 								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
 								Path targetFilePath = template.getTargetFilePath();
-								FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
-										targetFilePath.getParent().toString(), targetFilePath.getFileName().toString(), SWT.SINGLE);
-								String templateFileName = fileDialog.getFileName();
-								if (templateFileName != null && templateFileName.length() > 4) {
-									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$
-									// allow loading whatever file the user requests
-									template.load(Paths.get(fileDialog.getFilterPath(),templateFileName));
-									trailRecordSet.applyTemplate(true);
-									MenuBar.this.application.getPresentHistoExplorer().updateHistoChartWindow(true);
+								String filePath = MenuBar.this.application.prepareFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] {
+										Settings.GRAPHICS_TEMPLATES_EXTENSION }, targetFilePath.getParent().toString(), targetFilePath.getFileName().toString(), SWT.SINGLE) //
+										.open();
+								if (filePath != null) {
+									Path templateFilePath = Paths.get(filePath);
+									if (templateFilePath.getFileName().toString().length() > 4) {
+										// allow loading whatever file the user requests
+										template.load(templateFilePath);
+										trailRecordSet.applyTemplate(true);
+										MenuBar.this.application.getPresentHistoExplorer().updateHistoChartWindow(true);
+									}
 								}
 							} else {
 								FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] {

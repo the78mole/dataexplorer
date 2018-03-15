@@ -1737,6 +1737,23 @@ public class DataExplorer extends Composite {
 		this.menuToolBar.updateGoogleEarthToolItem();
 	}
 
+	public FileDialog prepareFileOpenDialog(String name, String[] extensions, String path, String fileName, int addStyle) {
+		final String $METHOD_NAME = "fileOpenDialogPath"; //$NON-NLS-1$
+		FileDialog fileOpenDialog = new FileDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);
+		if (path != null) {
+			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
+		}
+		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
+		fileOpenDialog.setText(name);
+		fileOpenDialog.setFileName(fileName == null ? GDE.STRING_EMPTY : fileName);
+		if (extensions != null) {
+			adaptFilter(fileOpenDialog, extensions);
+		}
+		if (path != null) fileOpenDialog.setFilterPath(path);
+		return fileOpenDialog;
+	}
+
 	public FileDialog openFileOpenDialog(String name, String[] extensions, String path, String fileName, int addStyle) {
 		final String $METHOD_NAME = "openFileOpenDialog"; //$NON-NLS-1$
 		FileDialog fileOpenDialog = new FileDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);

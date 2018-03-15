@@ -226,6 +226,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 				clear();
 				load(filePath.toFile());
 				currentFilePath = filePath;
+				setHistoFileName(filePath.getFileName().toString());
 				this.isAvailable = true;
 			} catch (InvalidPropertiesFormatException e) {
 				log.log(SEVERE, e.getMessage(), e);
