@@ -99,7 +99,8 @@ public class MenuBar {
 	MenuItem										viewMenuItem;
 	private MenuItem						suppressModeItem, partialTableMenuItem;
 	Menu												graphicsMenu;
-	MenuItem										graphicsMenuItem, saveDefaultGraphicsTemplateItem, restoreDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem, objectTemplatesItem;
+	MenuItem										graphicsMenuItem, saveDefaultGraphicsTemplateItem, restoreDefaultGraphicsTemplateItem, saveAsGraphicsTemplateItem, restoreGraphicsTemplateItem;
+	MenuItem										objectTemplatesItem, smartStatisticsItem;
 	MenuItem										csvExportMenuItem1, csvExportMenuItem2, csvExportMenuItem3;
 	MenuItem										nextDeviceMenuItem;
 	MenuItem										prevDeviceMenuItem;
@@ -818,6 +819,26 @@ public class MenuBar {
 						}
 					});
 				}
+				{
+					this.smartStatisticsItem = new MenuItem(this.graphicsMenu, SWT.CHECK);
+					this.smartStatisticsItem.setText(Messages.getString(MessageIds.GDE_MSGT0885));
+					if (!GDE.IS_OS_ARCH_ARM) this.smartStatisticsItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0886));
+					this.smartStatisticsItem.setSelection(false);
+					this.smartStatisticsItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "smartStatisticsItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoWindowVisible()).orElse(false)) {
+								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
+								trailRecordSet.setSmartStatistics(MenuBar.this.smartStatisticsItem.getSelection());
+								MenuBar.this.application.getPresentHistoExplorer().updateHistoTabs(false, true);
+							} else {
+								// not implemented for kernel graphics
+								MenuBar.this.objectTemplatesItem.setSelection(false);
+							}
+						}
+					});
+				}
 			}
 		}
 		{
@@ -1475,5 +1496,9 @@ public class MenuBar {
 
 	public void setPartialTableMenuItem(MenuItem partialTableMenuItem) {
 		this.partialTableMenuItem = partialTableMenuItem;
+	}
+
+	public MenuItem getSmartStatisticsItem() {
+		return this.smartStatisticsItem;
 	}
 }

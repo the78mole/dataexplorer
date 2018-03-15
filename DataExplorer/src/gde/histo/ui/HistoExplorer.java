@@ -425,4 +425,21 @@ public class HistoExplorer {
 		return (AbstractChartWindow) this.displayTab.getSelection();
 	}
 
+	/**
+	 * Set menu items for the history analysis.
+	 */
+	public void updateHistoMenuItems() {
+		final boolean isSmartStatistics = getTrailRecordSet().isSmartStatistics();
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			this.application.getMenuBar().getSmartStatisticsItem().setSelection(isSmartStatistics);
+		} else {
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					application.getMenuBar().getSmartStatisticsItem().setSelection(isSmartStatistics);
+				}
+			});
+		}
+	}
+
 }

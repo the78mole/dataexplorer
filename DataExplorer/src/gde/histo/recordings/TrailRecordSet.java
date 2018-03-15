@@ -1072,6 +1072,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				TrailRecord gridRecord = get(gridRecordName);
 				setValueGridRecordName(gridRecord != null && gridRecord.isVisible() ? gridRecordName : gridDefaultRecordName);
 			}
+			setSmartStatistics(Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true")));
 			int[] chartWeights;
 			if (isSmartStatistics()) { // only smart statistics supports multiple charts
 				chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS.clone();
@@ -1108,6 +1109,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	public void setSmartStatistics(boolean isActive) {
 		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(isActive));
 		template.store();
+		application.getPresentHistoExplorer().updateHistoMenuItems();
 	}
 
 	/**
