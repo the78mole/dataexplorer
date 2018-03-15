@@ -565,7 +565,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 
 	@Override
 	protected void setFixedGraphicCanvas(Rectangle realBounds) {
-		if (Settings.getInstance().isSmartStatistics()) {
+		if (retrieveTrailRecordSet().isSmartStatistics()) {
 			int heightWithScale = realBounds.height + getXScaleHeight() + AbstractChartComposite.DEFAULT_TOP_GAP;
 			setFixedGraphicCanvas(realBounds.y - AbstractChartComposite.DEFAULT_TOP_GAP, heightWithScale);
 		} else {
@@ -681,7 +681,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 	@Override
 	protected void setRecordSetCommentStandard() {
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		if (settings.isSmartStatistics()) {
+		if (retrieveTrailRecordSet().isSmartStatistics()) {
 			if (volatileComment == null || !volatileComment.isAvailable()) {
 				this.recordSetComment.setText(windowActor.getHistoSet().getDirectoryScanStatistics());
 				this.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0896));

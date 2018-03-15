@@ -728,16 +728,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	/**
-	 * Rebuild data contents except building the records list.
-	 */
-	public synchronized void refillRecordSet() {
-		cleanup();
-		RecordingsCollector collector = new RecordingsCollector();
-		collector.addVaults();
-		collector.setGpsLocationsTags();
-	}
-
-	/**
 	 * Rebuild the record based on a new trail selection.
 	 */
 	public synchronized void refillRecord(TrailRecord record, int trailTextIndex) {
@@ -749,6 +739,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Build data contents after building the records list.
 	 */
 	public synchronized void initializeFromVaults() {
+		cleanup();
 		RecordingsCollector collector = new RecordingsCollector();
 		collector.defineTrailTypes();
 		collector.addVaults();
@@ -1027,7 +1018,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			template.setProperty(RecordSet.VALUE_GRID_RECORD_NAME, getValueGridRecordName());
 		}
 
-		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(settings.isSmartStatistics()));
+		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(isSmartStatistics()));
 		int[] chartWeights = presentHistoExplorer.getHistoSummaryTabItem().getChartWeights();
 		for (int i = 0; i < chartWeights.length; i++) {
 			template.setProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(chartWeights[i]));
@@ -1081,9 +1072,8 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				TrailRecord gridRecord = get(gridRecordName);
 				setValueGridRecordName(gridRecord != null && gridRecord.isVisible() ? gridRecordName : gridDefaultRecordName);
 			}
-			settings.setSmartStatistics(Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true")));
 			int[] chartWeights;
-			if (settings.isSmartStatistics()) { // only smart statistics supports multiple charts
+			if (isSmartStatistics()) { // only smart statistics supports multiple charts
 				chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS.clone();
 				for (int i = 0; i < chartWeights.length; i++) {
 					chartWeights[i] = Integer.parseInt(template.getProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i])));
@@ -1118,7 +1108,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	public void setSmartStatistics(boolean isActive) {
 		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(isActive));
 		template.store();
-		settings.setSmartStatistics(isActive);
 	}
 
 	/**

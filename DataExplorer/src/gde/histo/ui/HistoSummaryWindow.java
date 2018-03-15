@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import gde.GDE;
-import gde.config.Settings;
 import gde.log.Level;
 import gde.log.Logger;
 import gde.messages.MessageIds;
@@ -94,7 +93,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 
 	@Override
 	public void scrollSummaryComposite() {
-		if (Settings.getInstance().isSmartStatistics()) {
+		if (windowActor.getTrailRecordSet().isSmartStatistics()) {
 			int fixedTotalHeight = getSummaryComposite().orElseGet(null).getFixedTotalHeight();
 			int actualHeight = Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof AbstractChartComposite) //
 					.mapToInt(c -> c.getBounds().height).sum();
@@ -147,7 +146,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 	public void redrawGraphics(final boolean redrawCurveSelector) {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
-			if (!Settings.getInstance().isSmartStatistics()) setDefaultChart();
+			if (!windowActor.getTrailRecordSet().isSmartStatistics()) setDefaultChart();
 
 			for (AbstractChartComposite c : getCharts()) {
 				c.setFixedGraphicCanvas(curveSelectorComposite.getRealBounds());
@@ -159,7 +158,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 				@Override
 				public void run() {
 					if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
-					if (!Settings.getInstance().isSmartStatistics()) setDefaultChart();
+					if (!windowActor.getTrailRecordSet().isSmartStatistics()) setDefaultChart();
 
 					for (AbstractChartComposite c : getCharts()) {
 						c.setFixedGraphicCanvas(curveSelectorComposite.getRealBounds());

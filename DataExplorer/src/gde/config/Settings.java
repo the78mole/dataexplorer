@@ -149,7 +149,6 @@ public class Settings extends Properties {
 	final static String							DISPLAY_DENSITY_FONT_CORRECT		= "display_density_font_correction";																															//$NON-NLS-1$
 
 	final static String							IS_HISTO_ACTIVE									= "is_histo_active";																																							//$NON-NLS-1$
-	final static String							IS_SMART_STATISTICS							= "is_smart_statistics";																																					//$NON-NLS-1$
 	final static String							BOXPLOT_SCALE_ORDINAL						= "boxplot_scale_ordinal";																																				//$NON-NLS-1$
 	final static String							BOXPLOT_SIZE_ADAPTATION_ORDINAL	= "boxplot_size_adaptation_ordinal";																															//$NON-NLS-1$
 	final static String							X_SPREAD_GRADE_ORDINAL					= "x_spread_grade_ordinal";																																				//$NON-NLS-1$
@@ -190,6 +189,7 @@ public class Settings extends Properties {
 	final static String							DATA_FOLDERS_CSV								= "data_folders_csv";																																							//$NON-NLS-1$
 	final static String							IMPORT_FOLDERS_CSV							= "import_folders_csv";																																						//$NON-NLS-1$
 	final static String							MIRROR_SOURCE_FOLDERS_CSV				= "mirror_source_folders_csv";																																		//$NON-NLS-1$
+	final static String							IS_SOURCE_FILE_LISTENER_ACTIVE	= "is_source_file_listener_active";																																//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -773,7 +773,6 @@ public class Settings extends Properties {
 
 			this.writer.write(String.format("%s\n", Settings.HISTO_BLOCK)); // [Histo Settings] //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_HISTO_ACTIVE, isHistoActive())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SMART_STATISTICS, isSmartStatistics())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SCALE_ORDINAL, getBoxplotScaleOrdinal())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, getBoxplotSizeAdaptationOrdinal())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.X_SPREAD_GRADE_ORDINAL, getXAxisSpreadOrdinal())); //$NON-NLS-1$
@@ -814,6 +813,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_FOLDERS_CSV, getDataFoldersCsv())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IMPORT_FOLDERS_CSV, getImportFoldersCsv())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MIRROR_SOURCE_FOLDERS_CSV, getMirrorSourceFoldersCsv())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SOURCE_FILE_LISTENER_ACTIVE, isSourceFileListenerActive())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -2513,21 +2513,6 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * set boolean value if the history analysis contains quantile values instead on the legacy statistics
-	 * @param isActive
-	 */
-	public void setSmartStatistics(boolean isActive) {
-		this.setProperty(Settings.IS_SMART_STATISTICS, String.valueOf(isActive));
-	}
-
-	/**
-	 * @return boolean true if the history analysis contains quantile values instead on the legacy statistics
-	 */
-	public boolean isSmartStatistics() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_SMART_STATISTICS, "true")); //$NON-NLS-1$
-	}
-
-	/**
 	 * @return three boxplot graphics sizes as localized texts
 	 */
 	public static String[] getBoxplotScaleNomenclatures() {
@@ -3240,4 +3225,18 @@ public class Settings extends Properties {
 		return list;
 	}
 
+	/**
+	 * @param enabled true if the histo source file paths are monitored by a file watcher
+	 */
+	public void setSourceFileListenerActive(boolean enabled) {
+		this.setProperty(Settings.IS_SOURCE_FILE_LISTENER_ACTIVE, String.valueOf(enabled));
+	}
+
+	/**
+	 * @return true if the histo source file paths are monitored by a file watcher
+	 */
+	public boolean isSourceFileListenerActive() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_SOURCE_FILE_LISTENER_ACTIVE, "false"));
+	}
 }
+

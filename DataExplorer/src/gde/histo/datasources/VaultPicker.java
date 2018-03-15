@@ -472,18 +472,18 @@ public final class VaultPicker {
 				this.suppressedVaults.addAll(removeSuppressedHistoVaults());
 			}
 
+			long nanoTime = System.nanoTime();
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.C_TRAILRECORDSET)) {
-				long nanoTime = System.nanoTime();
 				this.trailRecordSet = TrailRecordSet.createRecordSet(this.pickedVaults);
 				this.trailRecordSet.initializeFromVaults();
 				this.trailRecordSet.applyTemplate(true); // needs reasonable data
-				if (this.recordSetBytesSum > 0) {
-					long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
-					log.fine(() -> String.format("%,5d timeSteps  to TrailRecordSet  time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
-							this.pickedVaults.size(), micros / 1000, this.pickedVaults.size() > 0 ? this.pickedVaults.size() * 1000000 / micros : 0));
-				}
 			} else if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA)) { // saves some time compared to the logic above
-				this.trailRecordSet.refillRecordSet();
+				this.trailRecordSet.initializeFromVaults();
+			}
+			if (this.recordSetBytesSum > 0) {
+				long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
+				log.fine(() -> String.format("%,5d timeSteps  to TrailRecordSet  time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
+						this.pickedVaults.size(), micros / 1000, this.pickedVaults.size() > 0 ? this.pickedVaults.size() * 1000000 / micros : 0));
 			}
 			progress.ifPresent((p) -> p.set(RECORDED));
 

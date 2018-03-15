@@ -143,7 +143,6 @@ public class SettingsDialog extends Dialog {
 	Button															histoDisplayScores;
 	Button															histoDisplayTags;
 	Group																histoBoxplot;
-	Button															histoSmartStatistics;
 	CLabel															histoBoxplotScaleLabel;
 	CCombo															histoBoxplotScale;
 	CLabel															histoBoxplotSizeAdaptationLabel;
@@ -926,26 +925,8 @@ public class SettingsDialog extends Dialog {
 								this.histoBoxplot.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.histoBoxplot.setText(Messages.getString(MessageIds.GDE_MSGT0795));
 								{
-									this.histoSmartStatistics = new Button(this.histoBoxplot, SWT.CHECK);
-									FormData formData = new FormData();
-									formData.left = new FormAttachment(0, 5);
-									this.histoSmartStatistics.setLayoutData(formData);
-									this.histoSmartStatistics.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.histoSmartStatistics.setText(Messages.getString(MessageIds.GDE_MSGT0800));
-									this.histoSmartStatistics.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0801));
-									this.histoSmartStatistics.setSelection(this.settings.isSmartStatistics());
-									this.histoSmartStatistics.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											SettingsDialog.log.log(Level.FINEST, "histoSmartStatistics.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setSmartStatistics(SettingsDialog.this.histoSmartStatistics.getSelection());
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(true, true));										}
-									});
-								}
-								{
 									this.histoBoxplotScaleLabel = new CLabel(this.histoBoxplot, SWT.NONE);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoSmartStatistics, 5);
 									this.histoBoxplotScaleLabel.setLayoutData(formData);
 									this.histoBoxplotScaleLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.histoBoxplotScaleLabel.setBounds(10, GDE.IS_MAC_COCOA ? 8 : 20, 120, 20);
@@ -955,7 +936,6 @@ public class SettingsDialog extends Dialog {
 								{
 									this.histoBoxplotScale = new CCombo(this.histoBoxplot, SWT.BORDER | SWT.CENTER);
 									FormData formData = new FormData();
-									formData.top = new FormAttachment(this.histoSmartStatistics, 5);
 									formData.right = new FormAttachment(100, -5);
 									formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 									formData.width = GDE.IS_LINUX ? 80 : 70;

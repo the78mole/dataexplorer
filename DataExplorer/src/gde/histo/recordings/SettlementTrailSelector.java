@@ -69,7 +69,7 @@ public final class SettlementTrailSelector extends TrailSelector {
 		// set quantile-based non-suite trail types : triggered value sum are CURRENTLY not supported
 		if (!trailDisplay.map(TrailDisplayType::isDiscloseAll).orElse(false)) {
 			if (((SettlementType) trailRecord.channelItem).getEvaluation().getTransitionAmount() == null)
-				TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == this.settings.isSmartStatistics()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
+				TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == trailRecord.getParent().isSmartStatistics()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 			else
 				throw new UnsupportedOperationException("TransitionAmount not implemented"); //$NON-NLS-1$
 		}

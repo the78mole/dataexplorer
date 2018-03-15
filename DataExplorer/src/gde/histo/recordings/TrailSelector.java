@@ -187,22 +187,20 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 	public abstract void setApplicableTrails();
 
 	protected void setApplicableSuiteTrails() {
-		boolean isSmartStatistics = this.settings.isSmartStatistics();
-
 		Optional<TrailDisplayType> trailDisplay = trailRecord.channelItem.getTrailDisplay();
 		if (trailDisplay.isPresent()) {
 			final List<TrailTypes> displayTrails;
 			boolean hideAllTrails = trailDisplay.map(TrailDisplayType::isDiscloseAll).orElse(false);
 			if (hideAllTrails) {
 				displayTrails = trailDisplay.map(x -> x.getExposed().stream().map(TrailVisibilityType::getTrail) //
-						.filter(TrailTypes::isSuite).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
+						.filter(TrailTypes::isSuite).filter(t -> t.isSmartStatistics() == this.trailRecord.getParent().isSmartStatistics()) //
 						.collect(Collectors.toList())).orElse(new ArrayList<TrailTypes>());
 			} else {
 				List<TrailTypes> disclosedTrails = trailDisplay.map(x -> x.getDisclosed().stream().map(TrailVisibilityType::getTrail) //
-						.filter(TrailTypes::isSuite).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
+						.filter(TrailTypes::isSuite).filter(t -> t.isSmartStatistics() == this.trailRecord.getParent().isSmartStatistics()) //
 						.collect(Collectors.toList())).orElse(new ArrayList<TrailTypes>());
 				displayTrails = TrailTypes.getSuites().stream() //
-						.filter(t -> !disclosedTrails.contains(t)).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
+						.filter(t -> !disclosedTrails.contains(t)).filter(t -> t.isSmartStatistics() == this.trailRecord.getParent().isSmartStatistics()) //
 						.collect(Collectors.toList());
 			}
 			for (TrailTypes suiteTrailType : displayTrails) {
@@ -211,7 +209,7 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 			}
 		} else {
 			for (TrailTypes suiteTrailType : TrailTypes.getSuites()) {
-				if (suiteTrailType.isSmartStatistics() == isSmartStatistics) {
+				if (suiteTrailType.isSmartStatistics() == this.trailRecord.getParent().isSmartStatistics()) {
 					this.applicableTrailsOrdinals.add(suiteTrailType.ordinal());
 					this.applicableTrailsTexts.add(suiteTrailType.getDisplayName().intern());
 				}

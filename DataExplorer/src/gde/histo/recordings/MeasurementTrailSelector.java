@@ -70,22 +70,21 @@ public final class MeasurementTrailSelector extends TrailSelector {
 		if (trailDisplay.map(TrailDisplayType::getDefaultTrail).map(TrailTypes::isSuite).orElse(false)) throw new UnsupportedOperationException(
 				"suite trail must not be a device measurement default");
 
-		boolean isSmartStatistics = this.settings.isSmartStatistics();
 		boolean hideAllTrails = trailDisplay.map(TrailDisplayType::isDiscloseAll).orElse(false);
 		if (hideAllTrails) {
 			applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
 			trailDisplay.ifPresent(x -> x.getExposed().stream().map(TrailVisibilityType::getTrail) //
-					.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
+					.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == trailRecord.getParent().isSmartStatistics()) //
 					.forEach(t -> applicablePrimitiveTrails[t.ordinal()] = true));
 		} else {
 			applicablePrimitiveTrails = getApplicableLegacyTrails();
 			// set non-suite trail types : triggered values like count/sum are not supported
 			TrailTypes.getPrimitives().stream() //
-					.filter(t -> !t.isTriggered()).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
+					.filter(t -> !t.isTriggered()).filter(t -> t.isSmartStatistics() == trailRecord.getParent().isSmartStatistics()) //
 					.forEach(t -> applicablePrimitiveTrails[t.ordinal()] = true);
 			// set visible and reset hidden trails based on device settlement settings
 			trailDisplay.ifPresent(x -> x.getDisclosed().stream().map(TrailVisibilityType::getTrail) //
-					.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == isSmartStatistics) //
+					.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == trailRecord.getParent().isSmartStatistics()) //
 					.forEach(t -> applicablePrimitiveTrails[t.ordinal()] = false));
 		}
 
@@ -111,7 +110,7 @@ public final class MeasurementTrailSelector extends TrailSelector {
 		final boolean[] applicablePrimitiveTrails;
 		applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
 		StatisticsType measurementStatistics = ((MeasurementType) trailRecord.channelItem).getStatistics();
-		if (!this.settings.isSmartStatistics()) {
+		if (trailRecord.getParent().isSmartStatistics()) {
 			if (measurementStatistics != null) {
 				if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 					applicablePrimitiveTrails[TrailTypes.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);

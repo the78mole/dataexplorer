@@ -696,7 +696,7 @@ public class MenuBar {
 								template.setHistoFileName(template.getDefaultHistoFileName());
 								template.load();
 								trailRecordSet.applyTemplate(true);
-								MenuBar.this.application.getPresentHistoExplorer().updateHistoChartWindow(true);
+								MenuBar.this.application.getPresentHistoExplorer().updateHistoTabs(false, true);;
 							}
 							else {
 								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
@@ -775,7 +775,7 @@ public class MenuBar {
 										// allow loading whatever file the user requests
 										template.load(templateFilePath);
 										trailRecordSet.applyTemplate(true);
-										MenuBar.this.application.getPresentHistoExplorer().updateHistoChartWindow(true);
+										MenuBar.this.application.getPresentHistoExplorer().updateHistoTabs(false, true);
 									}
 								}
 							} else {

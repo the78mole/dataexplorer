@@ -190,9 +190,12 @@ public final class SelectorComposite extends Composite {
 					log.fine(() -> "smartSelector.widgetSelected, event=" + evt);
 					resetContextMenuMeasuring();
 					windowActor.clearMeasuring();
-					windowActor.getTrailRecordSet().setSmartStatistics(!windowActor.getTrailRecordSet().isSmartStatistics());
-					windowActor.scrollSummaryComposite();
-					windowActor.updateHistoTabs(true, true);
+					{
+						boolean newSmartState = !windowActor.getTrailRecordSet().isSmartStatistics();
+						windowActor.getTrailRecordSet().setSmartStatistics(newSmartState);
+						if (newSmartState != true) windowActor.scrollSummaryComposite();
+					}
+					windowActor.updateHistoTabs(false, true);
 				}
 			});
 		}
