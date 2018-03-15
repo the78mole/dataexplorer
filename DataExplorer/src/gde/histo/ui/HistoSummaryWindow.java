@@ -106,15 +106,16 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 				resizeCompositeSashForm(new int[] { summaryWeight, 1000 - summaryWeight });
 			}
 		} else {
-			setDefaultChart();
+			setTemplateChart();
 		}
 	}
 
 	/**
 	 * Set the graphics chart into the window without redrawing.
 	 */
-	protected void setDefaultChart() {
-		resizeCompositeSashForm(DEFAULT_CHART_WEIGHTS.clone());
+	@Override
+	protected void setTemplateChart() {
+		resizeCompositeSashForm(windowActor.getTrailRecordSet().getChartWeights());
 	}
 
 	public int[] getChartWeights() {
@@ -146,7 +147,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 	public void redrawGraphics(final boolean redrawCurveSelector) {
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
-			if (!windowActor.getTrailRecordSet().isSmartStatistics()) setDefaultChart();
+			if (!windowActor.getTrailRecordSet().isSmartStatistics()) setTemplateChart();
 
 			for (AbstractChartComposite c : getCharts()) {
 				c.setFixedGraphicCanvas(curveSelectorComposite.getRealBounds());
@@ -158,7 +159,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 				@Override
 				public void run() {
 					if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
-					if (!windowActor.getTrailRecordSet().isSmartStatistics()) setDefaultChart();
+					if (!windowActor.getTrailRecordSet().isSmartStatistics()) setTemplateChart();
 
 					for (AbstractChartComposite c : getCharts()) {
 						c.setFixedGraphicCanvas(curveSelectorComposite.getRealBounds());

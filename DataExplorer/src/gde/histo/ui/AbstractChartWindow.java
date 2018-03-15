@@ -181,7 +181,11 @@ public abstract class AbstractChartWindow extends CTabItem {
 		public void setTrailVisible(TrailRecord record, int selectIndex) {
 			curveSelectorComposite.setRecordSelection(record, selectIndex);
 		}
-	}
+
+		void setTemplateChart() {
+			AbstractChartWindow.this.setTemplateChart();
+		}
+}
 
 	protected static ImageData flipHorizontal(ImageData inputImageData) {
 		int bytesPerPixel = inputImageData.bytesPerLine / inputImageData.width;
@@ -393,4 +397,12 @@ public abstract class AbstractChartWindow extends CTabItem {
 	public Image getGraphicsPrintImage() {
 		return getGraphicsComposite().getGraphicsPrintImage();
 	}
+
+	/**
+	 * Set the graphics chart into the window without redrawing.
+	 */
+	protected void setTemplateChart() {
+		// overwrite if function required
+	}
+
 }

@@ -1073,16 +1073,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				setValueGridRecordName(gridRecord != null && gridRecord.isVisible() ? gridRecordName : gridDefaultRecordName);
 			}
 			setSmartStatistics(Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true")));
-			int[] chartWeights;
-			if (isSmartStatistics()) { // only smart statistics supports multiple charts
-				chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS.clone();
-				for (int i = 0; i < chartWeights.length; i++) {
-					chartWeights[i] = Integer.parseInt(template.getProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i])));
-				}
-			} else {
-				chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS;
-			}
-			presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(chartWeights);
+			presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(getChartWeights());
 			log.fine(() -> "applied histo graphics template file " + template.getTargetFilePath());
 
 			if (doUpdateVisibilityStatus) {
@@ -1090,10 +1081,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				updateVisibleAndDisplayableRecordsForTable();
 			}
 		}
-	}
-
-	public HistoGraphicsTemplate getTemplate() {
-		return this.template;
 	}
 
 	/**
@@ -1110,6 +1097,26 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(isActive));
 		template.store();
 		application.getPresentHistoExplorer().updateHistoMenuItems();
+	}
+
+	/**
+	 * @return the template chart weights for graphs with multiple charts
+	 */
+	public int[] getChartWeights() {
+		int[] chartWeights;
+		if (isSmartStatistics()) { // only smart statistics supports multiple charts
+			chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS.clone();
+			for (int i = 0; i < chartWeights.length; i++) {
+				chartWeights[i] = Integer.parseInt(template.getProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i])));
+			}
+		} else {
+			chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS;
+		}
+		return chartWeights;
+	}
+
+	public HistoGraphicsTemplate getTemplate() {
+		return this.template;
 	}
 
 	/**
