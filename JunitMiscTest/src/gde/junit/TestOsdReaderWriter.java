@@ -88,17 +88,18 @@ public class TestOsdReaderWriter extends TestSuperClass {
 								}
 							}
 							
-							String absolutFilePath = tmpDir1 + file.getName();
-							if (absolutFilePath.contains("_lov")) //exclude LogView files
-								continue;
-							absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_abs.csv";
-							System.out.println("writing as   : " + absolutFilePath);
-							CSVReaderWriter.write(';', activeChannel.getActiveRecordSet() != null ? activeChannel.getActiveRecordSet().getName() : "DummyRecord", absolutFilePath, false, "UTF-8");
-
-							absolutFilePath = tmpDir1 + file.getName();
-							absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_raw.csv";
-							System.out.println("writing as   : " + absolutFilePath);
-							CSVReaderWriter.write(';', activeChannel.getActiveRecordSet() != null ? activeChannel.getActiveRecordSet().getName() : "DummyRecord", absolutFilePath, true, "ISO-8859-1");
+							if (activeChannel.getActiveRecordSet() != null) {
+								String absolutFilePath = tmpDir1 + file.getName();
+								if (absolutFilePath.contains("_lov")) //exclude LogView files
+									continue;
+								absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_abs.csv";
+								System.out.println("writing as   : " + absolutFilePath);
+								CSVReaderWriter.write(';', activeChannel.getActiveRecordSet().getName(), absolutFilePath, false, "UTF-8");
+								absolutFilePath = tmpDir1 + file.getName();
+								absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_raw.csv";
+								System.out.println("writing as   : " + absolutFilePath);
+								CSVReaderWriter.write(';', activeChannel.getActiveRecordSet().getName(), absolutFilePath, true, "ISO-8859-1");
+							}
 						}
 					}
 					catch (Exception e) {
