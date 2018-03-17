@@ -105,7 +105,7 @@
                 <property  type="Integer" value="6" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Spannung M</name>
+                <name>voltage M</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -113,7 +113,7 @@
                 <property description="factor to measurement value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Spannung M_min</name>
+                <name>voltage M_min</name>
                 <symbol>Umin</symbol>
                 <unit>V</unit>
                 <active>true</active>
@@ -137,7 +137,7 @@
                 <property  type="Integer" value="11" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>KapazitätM</name>
+                <name>capacity M</name>
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
@@ -145,7 +145,7 @@
                 <property description="factor to measurement value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>PowerM</name>
+                <name>power M</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
@@ -185,7 +185,7 @@
                 <property  type="Integer" value="17" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>TemperaturM</name>
+                <name>temperature M</name>
                 <symbol>TM</symbol>
                 <unit>°C</unit>
                 <active>true</active>
@@ -193,7 +193,7 @@
                 <property description="factor to measurement value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>TemperaturM_max</name>
+                <name>temperature M_max</name>
                 <symbol>TMmax</symbol>
                 <unit>°C</unit>
                 <active>true</active>
@@ -201,7 +201,7 @@
                 <property  type="Integer" value="19" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>Speed</name>
+                <name>speed</name>
                 <symbol>V</symbol>
                 <unit>km/h</unit>
                 <active>true</active>
@@ -209,7 +209,7 @@
                 <property description="factor to measurement value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
-                <name>Speed_max</name>
+                <name>speed max</name>
                 <symbol>Vmax</symbol>
                 <unit>km/h</unit>
                 <active>true</active>
