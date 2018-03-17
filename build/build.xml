@@ -588,6 +588,7 @@
 			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
+			<fileset file="build/lib/json-simple-1.1.1.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
 			<fileset file="build/lib/commons-lang3-3.2.1.jar" />
@@ -599,6 +600,7 @@
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
+			<fileset file="build/lib/json-simple-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
@@ -611,6 +613,7 @@
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
+			<fileset file="build/lib/json-simple-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
@@ -623,6 +626,7 @@
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
+			<fileset file="build/lib/json-simple-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
@@ -635,6 +639,7 @@
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
+			<fileset file="build/lib/json-simple-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
@@ -647,6 +652,7 @@
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />		
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
+			<fileset file="build/lib/json-simple-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
@@ -658,6 +664,7 @@
 			<fileset file="build/lib/MAC/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
+			<fileset file="build/lib/json-simple-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />

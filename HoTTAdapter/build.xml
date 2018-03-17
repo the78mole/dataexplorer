@@ -36,6 +36,7 @@
 		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
 		<pathelement location="../build/lib/RXTXcomm.jar" />
 		<pathelement location="../build/lib/usb-api-1.0.2.jar" />
+		<pathelement location="../build/lib/json-simple-1.1.1.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
 	</path>
 
@@ -67,7 +68,7 @@
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for Graupner Hott binary input data"/>
     		<!-- attribute name="Export-Service" value="gde.device.graupner.HoTTAdapter, gde.device.graupner.HoTTAdapter2, gde.device.graupner.HoTTAdapterM, gde.device.graupner.HoTTAdapter2M, gde.device.graupner.HoTTAdapterD"/ -->
-    		<attribute name="Export-Service" value="gde.device.graupner.HoTTAdapter, gde.device.graupner.HoTTAdapter2, gde.device.graupner.HoTTAdapterM, gde.device.graupner.HoTTAdapter2M, gde.device.graupner.HoTTAdapterX, gde.device.graupner.HoTTViewer"/>
+    		<attribute name="Export-Service" value="gde.device.graupner.GeniusWizard, gde.device.graupner.HoTTAdapter, gde.device.graupner.HoTTAdapter2, gde.device.graupner.HoTTAdapterM, gde.device.graupner.HoTTAdapter2M, gde.device.graupner.HoTTAdapterX, gde.device.graupner.HoTTViewer"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
