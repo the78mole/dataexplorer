@@ -439,7 +439,7 @@ public abstract class TrailRecord extends CommonRecord {
 	public boolean hasReasonableData() {
 		boolean hasReasonableData = false;
 		if (this.size() > 0) {
-			double[] extrema = defineExtrema();
+			double[] extrema = getParent().getPickedVaults().defineStandardExtrema(name);
 			hasReasonableData = !HistoSet.fuzzyEquals(extrema[0], extrema[1]) || !HistoSet.fuzzyEquals(extrema[0], 0.);
 			log.log(Level.FINE, name, hasReasonableData);
 		}
