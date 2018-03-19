@@ -38,6 +38,7 @@ import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
 import gde.data.CommonRecord;
+import gde.data.Record;
 import gde.data.Record.DataType;
 import gde.device.IChannelItem;
 import gde.device.IDevice;
@@ -46,6 +47,7 @@ import gde.device.PropertyType;
 import gde.device.TrailTypes;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.cache.ExtendedVault;
+import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.datasources.HistoSet;
 import gde.histo.recordings.TrailRecordSet.Outliers;
 import gde.histo.utils.ElementaryQuantile;
@@ -65,6 +67,9 @@ public abstract class TrailRecord extends CommonRecord {
 	private final static long		serialVersionUID	= 110124007964748556L;
 	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
 
+	/**
+	 * Provide the chart template properties.
+	 */
 	public static class ChartTemplate {
 
 		boolean				isVisible					= true;
@@ -79,6 +84,53 @@ public abstract class TrailRecord extends CommonRecord {
 		int						numberFormat			= -1;												// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
 		double				maxScaleValue			= 0.;												// overwrite calculated boundaries
 		double				minScaleValue			= 0.;
+
+		/**
+		 * @param template holds all values
+		 */
+		void saveTemplate(HistoGraphicsTemplate template, TrailRecord record) {
+			String recordName = record.getName();
+			template.setRecordProperty(recordName, Record.IS_VISIBLE, String.valueOf(isVisible));
+			template.setRecordProperty(recordName, Record.IS_POSITION_LEFT, String.valueOf(isPositionLeft));
+			template.setRecordProperty(recordName, Record.COLOR, color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue);
+			template.setRecordProperty(recordName, Record.LINE_WITH, String.valueOf(lineWidth));
+			template.setRecordProperty(recordName, Record.LINE_STYLE, String.valueOf(lineStyle));
+			template.setRecordProperty(recordName, Record.IS_ROUND_OUT, String.valueOf(isRoundOut));
+			template.setRecordProperty(recordName, Record.IS_START_POINT_ZERO, String.valueOf(isStartpointZero));
+			template.setRecordProperty(recordName, Record.NUMBER_FORMAT, String.valueOf(numberFormat));
+			template.setRecordProperty(recordName, Record.IS_START_END_DEFINED, String.valueOf(isStartEndDefined));
+			template.setRecordProperty(recordName, Record.DEFINED_MAX_VALUE, String.valueOf(maxScaleValue));
+			template.setRecordProperty(recordName, Record.DEFINED_MIN_VALUE, String.valueOf(minScaleValue));
+
+			// this template property comes directly from the record (see applyTemplate)
+			template.setRecordProperty(recordName, Record.TRAIL_TEXT_ORDINAL, String.valueOf(record.getTrailSelector().getTrailTextSelectedIndex()));
+		}
+
+		/**
+		 * @param template holds all values
+		 */
+		void applyTemplate(HistoGraphicsTemplate template, TrailRecord record) {
+			String recordName = record.getName();
+			isVisible = Boolean.parseBoolean(template.getRecordProperty(recordName, Record.IS_VISIBLE, "false"));
+			isPositionLeft = Boolean.parseBoolean(template.getRecordProperty(recordName, Record.IS_POSITION_LEFT, "true"));
+			int r, g, b;
+			String tmpColor = template.getRecordProperty(recordName, Record.COLOR, record.getRGB());
+			r = Integer.parseInt(tmpColor.split(GDE.STRING_COMMA)[0].trim());
+			g = Integer.parseInt(tmpColor.split(GDE.STRING_COMMA)[1].trim());
+			b = Integer.parseInt(tmpColor.split(GDE.STRING_COMMA)[2].trim());
+			color = SWTResourceManager.getColor(r, g, b);
+			lineWidth = Integer.parseInt(template.getRecordProperty(recordName, Record.LINE_WITH, "1"));
+			lineStyle = Integer.parseInt(template.getRecordProperty(recordName, Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID));
+			isRoundOut = Boolean.parseBoolean(template.getRecordProperty(recordName, Record.IS_ROUND_OUT, "false"));
+			isStartpointZero = Boolean.parseBoolean(template.getRecordProperty(recordName, Record.IS_START_POINT_ZERO, "false"));
+			record.setStartEndDefined(Boolean.parseBoolean(template.getRecordProperty(recordName, Record.IS_START_END_DEFINED, "false")), //
+					Double.parseDouble(template.getRecordProperty(recordName, Record.DEFINED_MIN_VALUE, "0")), //
+					Double.parseDouble(template.getRecordProperty(recordName, Record.DEFINED_MAX_VALUE, "0")));
+			numberFormat = Integer.parseInt(template.getRecordProperty(recordName, Record.NUMBER_FORMAT, "-1"));
+
+			// this template property is required before applying the template
+			// trailTextOrdinal = Integer.parseInt(template.getRecordProperty(record.recordName, Record.TRAIL_TEXT_ORDINAL, "-1"));
+		}
 
 		/**
 		 * Method to initialize scale position defaults.
@@ -146,7 +198,6 @@ public abstract class TrailRecord extends CommonRecord {
 				break;
 			}
 		}
-
 	}
 
 	protected final ChartTemplate template = new ChartTemplate();
@@ -477,10 +528,6 @@ public abstract class TrailRecord extends CommonRecord {
 // return this.parent.timeStep_ms.getTime_ms(index);
 	}
 
-	public ChartTemplate getTemplate() {
-		return this.template;
-	}
-
 	/**
 	 * Update the displayable record information in this record set.
 	 */
@@ -590,12 +637,12 @@ public abstract class TrailRecord extends CommonRecord {
 
 	@Override
 	public void setMinScaleValue(double newMinScaleValue) {
-			template.minScaleValue = newMinScaleValue;
+		template.minScaleValue = newMinScaleValue;
 	}
 
 	@Override
 	public void setMaxScaleValue(double newMaxScaleValue) {
-			template.maxScaleValue = newMaxScaleValue;
+		template.maxScaleValue = newMaxScaleValue;
 	}
 
 	@Override
@@ -881,5 +928,13 @@ public abstract class TrailRecord extends CommonRecord {
 	public abstract boolean hasVaultScraps(ExtendedVault vault);
 
 	public abstract DataType getVaultDataType(ExtendedVault vault);
+
+	public void applyTemplate() {
+		template.applyTemplate(getParent().getTemplate(), this);
+	}
+
+	public void saveTemplate() {
+		template.saveTemplate(getParent().getTemplate(), this);
+	}
 
 }

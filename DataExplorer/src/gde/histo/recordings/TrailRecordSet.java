@@ -69,7 +69,6 @@ import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.datasources.HistoSet;
 import gde.histo.gpslocations.GpsCluster;
 import gde.histo.recordings.TrailDataTags.DataTag;
-import gde.histo.recordings.TrailRecord.ChartTemplate;
 import gde.histo.ui.AbstractChartComposite.AbstractChartData;
 import gde.histo.ui.GraphicsComposite;
 import gde.histo.ui.HistoExplorer;
@@ -608,12 +607,12 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 	}
 
-	private final HistoExplorer		presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
+	private final HistoExplorer	presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
 
-	private final PickedVaults		pickedVaults;
+	private final PickedVaults	pickedVaults;
 
-	private final List<Integer>		durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
-	private final TrailDataTags		dataTags							= new TrailDataTags();
+	private final List<Integer>	durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
+	private final TrailDataTags	dataTags							= new TrailDataTags();
 
 	/**
 	 * Holds the view configuration.
@@ -990,22 +989,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 */
 	public void saveTemplate() {
 		for (TrailRecord record : this.getValues()) {
-			ChartTemplate recordTemplate = record.getTemplate();
-			template.setRecordProperty(record.getName(), Record.IS_VISIBLE, String.valueOf(recordTemplate.isVisible));
-			template.setRecordProperty(record.getName(), Record.IS_POSITION_LEFT, String.valueOf(recordTemplate.isPositionLeft));
-			Color color = recordTemplate.color;
-			template.setRecordProperty(record.getName(), Record.COLOR, color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue);
-			template.setRecordProperty(record.getName(), Record.LINE_WITH, String.valueOf(recordTemplate.lineWidth));
-			template.setRecordProperty(record.getName(), Record.LINE_STYLE, String.valueOf(recordTemplate.lineStyle));
-			template.setRecordProperty(record.getName(), Record.IS_ROUND_OUT, String.valueOf(recordTemplate.isRoundOut));
-			template.setRecordProperty(record.getName(), Record.IS_START_POINT_ZERO, String.valueOf(recordTemplate.isStartpointZero));
-			template.setRecordProperty(record.getName(), Record.NUMBER_FORMAT, String.valueOf(recordTemplate.numberFormat));
-			template.setRecordProperty(record.getName(), Record.IS_START_END_DEFINED, String.valueOf(recordTemplate.isStartEndDefined));
-			template.setRecordProperty(record.getName(), Record.DEFINED_MAX_VALUE, String.valueOf(recordTemplate.maxScaleValue));
-			template.setRecordProperty(record.getName(), Record.DEFINED_MIN_VALUE, String.valueOf(recordTemplate.minScaleValue));
-
-			// this template property comes directly from the record (see applyTemplate)
-			template.setRecordProperty(record.getName(), Record.TRAIL_TEXT_ORDINAL, String.valueOf(record.getTrailSelector().getTrailTextSelectedIndex()));
+			record.saveTemplate();
 		}
 		// curve grid
 		Color color = getValueGridColor();
@@ -1035,26 +1019,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	public void applyTemplate(boolean doUpdateVisibilityStatus) {
 		if (template != null && template.isAvailable()) {
 			for (TrailRecord record : getValues()) {
-				ChartTemplate recordTemplate = record.getTemplate();
-				recordTemplate.isVisible = Boolean.parseBoolean(template.getRecordProperty(record.getName(), Record.IS_VISIBLE, "false"));
-				recordTemplate.isPositionLeft = Boolean.parseBoolean(template.getRecordProperty(record.getName(), Record.IS_POSITION_LEFT, "true"));
-				int r, g, b;
-				String color = template.getRecordProperty(record.getName(), Record.COLOR, record.getRGB());
-				r = Integer.parseInt(color.split(GDE.STRING_COMMA)[0].trim());
-				g = Integer.parseInt(color.split(GDE.STRING_COMMA)[1].trim());
-				b = Integer.parseInt(color.split(GDE.STRING_COMMA)[2].trim());
-				recordTemplate.color = SWTResourceManager.getColor(r, g, b);
-				recordTemplate.lineWidth = Integer.parseInt(template.getRecordProperty(record.getName(), Record.LINE_WITH, "1"));
-				recordTemplate.lineStyle = Integer.parseInt(template.getRecordProperty(record.getName(), Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID));
-				recordTemplate.isRoundOut = Boolean.parseBoolean(template.getRecordProperty(record.getName(), Record.IS_ROUND_OUT, "false"));
-				recordTemplate.isStartpointZero = Boolean.parseBoolean(template.getRecordProperty(record.getName(), Record.IS_START_POINT_ZERO, "false"));
-				record.setStartEndDefined(Boolean.parseBoolean(template.getRecordProperty(record.getName(), Record.IS_START_END_DEFINED, "false")), //
-						Double.parseDouble(template.getRecordProperty(record.getName(), Record.DEFINED_MIN_VALUE, "0")), //
-						Double.parseDouble(template.getRecordProperty(record.getName(), Record.DEFINED_MAX_VALUE, "0")));
-				recordTemplate.numberFormat = Integer.parseInt(template.getRecordProperty(record.getName(), Record.NUMBER_FORMAT, "-1"));
-
-				// this template property is required before applying the template
-				// recordTemplate.trailTextOrdinal = Integer.parseInt(template.getRecordProperty(record.getName(), Record.TRAIL_TEXT_ORDINAL, "-1"));
+				record.applyTemplate();
 			}
 			{
 				String color = template.getProperty(AbstractRecordSet.VALUE_GRID_COLOR, "128,128,128");

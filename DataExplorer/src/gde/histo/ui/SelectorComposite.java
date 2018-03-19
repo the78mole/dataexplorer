@@ -150,8 +150,7 @@ public final class SelectorComposite extends Composite {
 							}
 						}
 					}
-					doUpdateCurveSelectorTable();
-					windowActor.updateChartWindow(false);
+					windowActor.updateChartWindow(true);
 				}
 			});
 		}
@@ -175,7 +174,7 @@ public final class SelectorComposite extends Composite {
 			});
 		}
 		{
-			this.smartSelector = new Button(this, SWT.PUSH | SWT.LEFT | SWT.TRANSPARENT);
+			this.smartSelector = new Button(this, SWT.TOGGLE | SWT.LEFT | SWT.TRANSPARENT);
 			FormData smartSelectorLData = new FormData();
 			smartSelectorLData.width = GDE.IS_WINDOWS ? 26 : 33;
 			smartSelectorLData.height = GDE.IS_WINDOWS ? 26 : 33;
@@ -183,14 +182,14 @@ public final class SelectorComposite extends Composite {
 			smartSelectorLData.top = new FormAttachment(0, 1000, YGAP_CHARTSELECTOR);
 			this.smartSelector.setLayoutData(smartSelectorLData);
 			this.smartSelector.setImage(SWTResourceManager.getImage("gde/resource/smartSetting.png"));
-			this.smartSelector.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0898));
+			this.smartSelector.setSelection(true);
 			this.smartSelector.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					log.fine(() -> "smartSelector.widgetSelected, event=" + evt);
 					resetContextMenuMeasuring();
 					windowActor.clearMeasuring();
-					windowActor.getTrailRecordSet().setSmartStatistics(!windowActor.getTrailRecordSet().isSmartStatistics());
+					windowActor.getTrailRecordSet().setSmartStatistics(smartSelector.getSelection());
 					windowActor.setTemplateChart();
 					windowActor.updateHistoTabs(false, true);
 				}
@@ -269,6 +268,12 @@ public final class SelectorComposite extends Composite {
 	 * Update of the curve selector table.
 	 */
 	public synchronized void doUpdateCurveSelectorTable() {
+		{
+			boolean smartStatistics = windowActor.getTrailRecordSet().isSmartStatistics();
+			this.chartSelector.setEnabled(smartStatistics);
+			this.smartSelector.setToolTipText(Messages.getString(smartStatistics ? MessageIds.GDE_MSGT0887 : MessageIds.GDE_MSGT0898, GDE.MOD1));
+			this.smartSelector.setSelection(smartStatistics);
+		}
 		this.curveSelectorTable.removeAll();
 		for (TableEditor editor : this.editors) {
 			if (editor != null) { // non displayable records

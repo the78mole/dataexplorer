@@ -821,8 +821,9 @@ public class MenuBar {
 				}
 				{
 					this.smartStatisticsItem = new MenuItem(this.graphicsMenu, SWT.CHECK);
-					this.smartStatisticsItem.setText(Messages.getString(MessageIds.GDE_MSGT0885));
-					if (!GDE.IS_OS_ARCH_ARM) this.smartStatisticsItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0886));
+					this.smartStatisticsItem.setText(Messages.getString(MessageIds.GDE_MSGT0885, GDE.MOD1));
+					if (!GDE.IS_OS_ARCH_ARM) this.smartStatisticsItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0886, GDE.MOD1));
+					this.smartStatisticsItem.setAccelerator(SWT.MOD1 + SWT.SHIFT + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0885));
 					this.smartStatisticsItem.setSelection(false);
 					this.smartStatisticsItem.addSelectionListener(new SelectionAdapter() {
 						@Override
