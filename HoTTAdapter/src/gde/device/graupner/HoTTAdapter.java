@@ -1624,19 +1624,20 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public boolean isMdlTabRequested() {
 		boolean rc = true;
 		try {
-			String className = "de.treichels.hott.HoTTDecoder";//$NON-NLS-1$
+			String className = "de.treichels.hott.mdlviewer.swt.Launcher";//$NON-NLS-1$
 			// log.log(Level.OFF, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class<?> c = loader.loadClass(className);
+			//Class c = Class.forName(className);
 			Constructor<?> constructor = c.getDeclaredConstructor();
 			if (constructor != null) {
 				constructor.newInstance();
 			} else {
-				HoTTAdapter.log.log(java.util.logging.Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
+				HoTTAdapter.log.log(java.util.logging.Level.OFF, "de.treichels.hott.mdlviewer.swt.Launcher can not be loaded"); //$NON-NLS-1$
 				rc = false;
 			}
 		} catch (final Throwable t) {
-			HoTTAdapter.log.log(java.util.logging.Level.OFF, "de.treichels.hott.HoTTDecoder can not be loaded"); //$NON-NLS-1$
+			HoTTAdapter.log.log(java.util.logging.Level.OFF, "de.treichels.hott.mdlviewer.swt.Launcher can not be loaded"); //$NON-NLS-1$
 			rc = false;
 		}
 		return rc;
@@ -1652,7 +1653,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			final File fontFile = new File(System.getProperty("java.io.tmpdir"), "Arial.ttf"); //$NON-NLS-1$ //$NON-NLS-2$
 			InputStream is = getClass().getResourceAsStream("/Arial.ttf");
 			try {
-				if (!fontFile.exists() || fontFile.length() == 0) Files.copy(is, fontFile.getAbsoluteFile().toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+				if (!fontFile.exists() || fontFile.length() == 0) 
+					Files.copy(is, fontFile.getAbsoluteFile().toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 			} catch (final IOException e) {
 				throw new RuntimeException(e);
 			} finally {
@@ -1665,7 +1667,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				}
 			}
 
-			String className = "gde.mdl.ui.MdlTabItem";//$NON-NLS-1$
+			String className = "de.treichels.hott.mdlviewer.swt.MdlTabItem";//$NON-NLS-1$
 			HoTTAdapter.log.log(java.util.logging.Level.OFF, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class<?> c = loader.loadClass(className);
