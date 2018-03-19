@@ -946,8 +946,8 @@ public class MenuBar {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "partialTableMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.getHistoExplorer().ifPresent(h -> {
 								h.enablePartialDataTable(MenuBar.this.partialTableMenuItem.getSelection());
-								h.updateHistoChartWindow(MenuBar.this.partialTableMenuItem.getSelection());
-								h.updateHistoTableWindow(MenuBar.this.partialTableMenuItem.getSelection());
+								h.updateHistoChartWindow(MenuBar.this.graphicsCurveSurveyMenuItem.getSelection());
+								h.updateHistoTableWindow(true);
 							});
 						}
 					});

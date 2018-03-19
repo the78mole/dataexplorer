@@ -48,7 +48,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 	private static final String	$CLASS_NAME						= HistoSummaryWindow.class.getName();
 	private static final Logger	log										= Logger.getLogger($CLASS_NAME);
 
-	public static final int[]		DEFAULT_CHART_WEIGHTS	= new int[] { 0, 10000 };							// 2nd chart is the default chart
+	public static final int[]		DEFAULT_CHART_WEIGHTS	= new int[] { 0, 1000 };							// 2nd chart is the default chart
 
 	protected SashForm					compositeSashForm;
 
