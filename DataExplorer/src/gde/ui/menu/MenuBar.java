@@ -94,7 +94,7 @@ public class MenuBar {
 	MenuItem										nextChannelConfigItem;
 	MenuItem										prevRecordSetItem;
 	MenuItem										nextRecordSetItem;
-	MenuItem										nextChartItem;
+	MenuItem										nextChartItem, refreshItem;
 	Menu												viewMenu;
 	MenuItem										viewMenuItem;
 	private MenuItem						suppressModeItem, partialTableMenuItem;
@@ -1049,6 +1049,21 @@ public class MenuBar {
 							MenuBar.this.application.getHistoExplorer().ifPresent(h -> {
 								h.scrollSummaryComposite();
 								h.updateHistoChartWindow(false);
+							});
+						}
+					});
+				}
+				{
+					this.refreshItem = new MenuItem(this.viewMenu, SWT.PUSH);
+					this.refreshItem.setText(Messages.getString(MessageIds.GDE_MSGT0925, GDE.MOD1));
+					if (!GDE.IS_OS_ARCH_ARM) this.refreshItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0926));
+					this.refreshItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0925));
+					this.refreshItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "refreshItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.this.application.getHistoExplorer().ifPresent(h -> {
+								h.resetHisto();
 							});
 						}
 					});

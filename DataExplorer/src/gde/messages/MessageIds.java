@@ -1,4 +1,4 @@
-/************************************************************************************** 
+/**************************************************************************************
   	This file is part of GNU DataExplorer.
 
 		GNU DataExplorer is free software: you can redistribute it and/or modify
@@ -14,15 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
-Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann 
+Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.messages;
 
-/** 
- * @author Winfried Brügmann 
- * Do not edit, MessageIds are generated from messages.properties 
- */ 
-public class MessageIds { 
+/**
+ * @author Winfried Brügmann
+ * Do not edit, MessageIds are generated from messages.properties
+ */
+public class MessageIds {
 
 	public final static String	GDE_MSGE0001 = "GDE_MSGE0001";
 	public final static String	GDE_MSGE0002 = "GDE_MSGE0002";
@@ -1096,8 +1096,12 @@ public class MessageIds {
 	public final static String	GDE_MSGT0922 = "GDE_MSGT0922";
 	public final static String	GDE_MSGT0923 = "GDE_MSGT0923";
 	public final static String	GDE_MSGT0924 = "GDE_MSGT0924";
+	public final static String	GDE_MSGT0925 = "GDE_MSGT0925";
+	public final static String	GDE_MSGT0926 = "GDE_MSGT0926";
+	public final static String	GDE_MSGT0927 = "GDE_MSGT0927";
+	public final static String	GDE_MSGT0928 = "GDE_MSGT0928";
+	public final static String	GDE_MSGT0929 = "GDE_MSGT0929";
 	public final static String	GDE_MSGT0950 = "GDE_MSGT0950";
 	public final static String	GDE_MSGT0951 = "GDE_MSGT0951";
 	public final static String	GDE_MSGT0952 = "GDE_MSGT0952";
-
  }
