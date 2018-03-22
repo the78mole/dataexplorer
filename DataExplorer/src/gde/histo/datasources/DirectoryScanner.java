@@ -52,8 +52,8 @@ import com.sun.istack.internal.Nullable;
 import gde.GDE;
 import gde.config.DeviceConfigurations;
 import gde.config.Settings;
-import gde.data.Channel;
 import gde.data.Channels;
+import gde.data.ObjectData;
 import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
@@ -84,7 +84,7 @@ public final class DirectoryScanner {
 	 * local drive: 13,5 to 16 ms/folder </br>
 	 * but the full data drive scan may take up to 400 ms.
 	 */
-	private final static int			SLOW_FOLDER_LIMIT_MS	= 99;
+	private final static int			SLOW_FOLDER_LIMIT_MS	= 222;
 
 	private static List<Integer>	channelMixConfigNumbers;
 	private static long						minStartTimeStamp_ms;
@@ -324,20 +324,20 @@ public final class DirectoryScanner {
 		return result;
 	}
 
-	private final DataExplorer									application								= DataExplorer.getInstance();
-	private final Settings											settings									= Settings.getInstance();
+	private final DataExplorer									application									= DataExplorer.getInstance();
+	private final Settings											settings										= Settings.getInstance();
 
-	private final LongAdder											nonWorkableCount					= new LongAdder();
-	private final List<Path>										excludedFiles							= new ArrayList<>();
-	private final EnumSet<DirectoryType>				validatedDirectoryTypes		= EnumSet.noneOf(DirectoryType.class);
+	private final LongAdder											nonWorkableCount						= new LongAdder();
+	private final List<Path>										excludedFiles								= new ArrayList<>();
+	private final EnumSet<DirectoryType>				validatedDirectoryTypes			= EnumSet.noneOf(DirectoryType.class);
 
 	private final CheckedPredicate<RebuildStep>	sourceValidator;
 
-	private IDevice															validatedDevice						= null;
-	private Channel															validatedChannel					= null;
-	private SourceFolders												validatedFolders					= null;
-	private List<String>												validatedImportExtentions	= new ArrayList<>();
-	private boolean															isSlowFolderAccess				= false;
+	private IDevice															validatedDevice							= null;
+	private String															validatedImportDataLocation	= GDE.STRING_EMPTY;  // for performance only
+	private ObjectData													validatedObject							= null; // for performance only
+	private SourceFolders												validatedFolders						= null;
+	private boolean															isSlowFolderAccess					= false;
 
 	/**
 	 * Data sources supported by the history including osd link files.
@@ -451,10 +451,15 @@ public final class DirectoryScanner {
 				} else {
 					return getDataSetPath() != null || getExternalBaseDirs().anyMatch(e -> true);
 				}
-			}
+			};
 		};
 
-		private final static DataExplorer application = DataExplorer.getInstance();
+		/**
+		 * Use this instead of values() to avoid repeatedly cloning actions.
+		 */
+		public static final DirectoryType[]	VALUES			= values();
+
+		private final static DataExplorer		application	= DataExplorer.getInstance();
 
 		/**
 		 * @return the current directory path independent from object / device
@@ -863,11 +868,13 @@ public final class DirectoryScanner {
 	 */
 	public synchronized void initialize() {
 		this.validatedDevice = null;
-		this.validatedChannel = null;
+		this.validatedImportDataLocation = null;
+		this.validatedObject = null;
 		this.validatedFolders = null;
+		this.isSlowFolderAccess = false;
 
-		this.validatedImportExtentions.clear();
-	}
+		this.validatedDirectoryTypes.clear();
+}
 
 	/**
 	 * Re- Initializes the source log paths watcher.
@@ -940,7 +947,7 @@ public final class DirectoryScanner {
 		if (watchDir == null || !isValid) {
 			initializeWatchDir(validatedFolders.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
 		}
-		log.log(Level.OFF, "hasChangedLogFile=", watchDir.hasChangedLogFiles());
+		log.log(Level.OFF, "hasChangedLogFiles=", watchDir.hasChangedLogFiles());
 		isValid = isValid && !watchDir.hasChangedLogFilesThenReset();
 
 		return isValid;
@@ -953,30 +960,49 @@ public final class DirectoryScanner {
 	 * @return true if the list of file paths has already been valid
 	 */
 	public synchronized boolean validateHistoFilePaths(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
-		IDevice lastDevice = this.validatedDevice;
-		Channel lastChannel = this.validatedChannel;
-		SourceFolders lastFolders = this.validatedFolders;
-		List<String> lastImportExtentions = this.validatedImportExtentions;
-
-		{ // determine validated values
-			this.validatedDevice = this.application.getActiveDevice();
-			this.validatedChannel = this.application.getActiveChannel();
-
-			this.validatedDirectoryTypes.clear();
-			for (DirectoryType directoryType : DirectoryType.values()) {
-				if (directoryType.isActive()) this.validatedDirectoryTypes.add(directoryType);
-			}
-
-			this.validatedFolders = new SourceFolders();
-			this.isSlowFolderAccess = this.validatedFolders.defineDirectories(validatedDirectoryTypes);
-		}
+		IDevice lastDevice = validatedDevice;
+		String lastImportDataLocations = validatedImportDataLocation;
+		// Set<String> lastImportExtentions = new HashSet<>(validatedImportExtentions);
+		EnumSet<DirectoryType> lastDirectoryTypes = EnumSet.copyOf(validatedDirectoryTypes);
+		ObjectData lastObject = validatedObject;
+		// Channel lastChannel = validatedChannel;
+		SourceFolders lastFolders = validatedFolders;
 
 		boolean isFirstCall = lastDevice == null;
 		boolean isChange = rebuildStep == RebuildStep.A_HISTOSET || isFirstCall;
-		isChange = isChange || !validatedDevice.equals(lastDevice);
-		isChange = isChange || !validatedChannel.equals(lastChannel);
-		isChange = isChange || !validatedFolders.equals(lastFolders);
-		isChange = isChange || !lastImportExtentions.containsAll(this.validatedImportExtentions) || !this.validatedImportExtentions.containsAll(lastImportExtentions);
+
+		{ // determine validated values
+			validatedDevice = application.getActiveDevice();
+			boolean isNewDevice = lastDevice != null && validatedDevice != null ? !lastDevice.getName().equals(validatedDevice.getName())
+					: validatedDevice != null;
+			isChange = isChange || isNewDevice;
+
+			validatedImportDataLocation = validatedDevice.getDeviceConfiguration().getDataBlockPreferredDataLocation();
+			isChange = isChange || !lastImportDataLocations.equals(validatedImportDataLocation);
+
+			// the import extentions do not have any influence on the validated folders list
+			// validatedImportExtentions.clear();
+			// validatedImportExtentions.addAll(Arrays.asList(validatedDevice.getDeviceConfiguration().getDataBlockPreferredFileExtention().split(GDE.STRING_COMMA)));
+			// isChange = isChange || !lastImportExtentions.equals(validatedImportExtentions);
+
+			validatedDirectoryTypes.clear();
+			validatedDirectoryTypes.addAll(Arrays.stream(DirectoryType.VALUES).filter(DirectoryType::isActive).collect(Collectors.toList()));
+			isChange = isChange || !lastDirectoryTypes.equals(validatedDirectoryTypes);
+
+			validatedObject = application.getActiveObject();
+			isChange = isChange || !lastObject.equals(validatedObject);
+
+			if (isChange) { // avoids costly directory scan
+				// the channel selection does not have any influence on the validated folders list
+				// validatedChannel = application.getActiveChannel();
+				// isChange = isChange || (lastChannel != null ? !lastChannel.getChannelConfigKey().equals(validatedChannel.getChannelConfigKey())
+				//		: validatedChannel != null);
+
+				this.validatedFolders = new SourceFolders();
+				this.isSlowFolderAccess = validatedFolders.defineDirectories(validatedDirectoryTypes);
+				isChange = isChange || (lastFolders != null ? !lastFolders.equals(validatedFolders) : true);
+			}
+		}
 
 		return !isChange;
 	}
