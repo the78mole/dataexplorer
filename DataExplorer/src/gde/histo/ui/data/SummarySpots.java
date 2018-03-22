@@ -234,7 +234,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 				// shift the next position downwards from the center line or start at the center line again
 				nextRelativeYPos = yStep - cycleNumber % yStep - 1;
 			}
-			log.log(Level.FINEST, "" + size(), String.format(" cycleNumber=%d nextRelativeYPos=%d", cycleNumber, nextRelativeYPos));
+			log.finest(() -> String.format("%d cycleNumber=%d nextRelativeYPos=%d", size(), cycleNumber, nextRelativeYPos));
 			return recordIndices.add(recordIndex);
 		}
 
@@ -346,7 +346,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		int tmpWidth = newDrawStripBounds.width - elementWidth; // half left and right gap for overlapping elements
 		stripNetWidth = tmpWidth - tmpWidth % elementWidth; // additional right gap because of x position delta (is the elements size)
 
-		double[] decodedScaleMinMax = summary.defineScaleMinMax();
+		double[] decodedScaleMinMax = summary.getScaleMinMax();
 		xValueScaleFactor = stripNetWidth / (decodedScaleMinMax[1] - decodedScaleMinMax[0]);
 		xValueOffset = decodedScaleMinMax[0] * xValueScaleFactor - .5;
 

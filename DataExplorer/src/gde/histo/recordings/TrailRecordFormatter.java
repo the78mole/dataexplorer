@@ -55,6 +55,13 @@ public final class TrailRecordFormatter {
 	/**
 	 * Define category based on the magnitude and the delta span of the values.
 	 */
+	public static DecimalFormat getDecimalFormat(double[] valuePair) {
+		return getDecimalFormat(valuePair[0], valuePair[1]);
+	}
+
+	/**
+	 * Define category based on the magnitude and the delta span of the values.
+	 */
 	private static DecimalFormat getDecimalFormat(double value1, double value2) {
 		DecimalFormat df = new DecimalFormat();
 		double rangeValue = Math.abs(value1 - value2);
@@ -125,17 +132,16 @@ public final class TrailRecordFormatter {
 
 	/**
 	 * @param finalValue is the value to be displayed (without applying a factor or GPS coordinates fraction correction)
-	 * @param range is the delta span which is used for determining the decimal places
 	 * @return decimal formatted value
 	 */
-	public String getRangeValue(double finalValue, double range) {
+	public String getSummaryValue(double finalValue, DecimalFormat decimalFormat) {
 		if (HistoSet.isGpsCoordinates(this.record)) {
-			if (this.record.getUnit().endsWith("'")) //$NON-NLS-1$
-				return StringHelper.getFormatedWithMinutes("%2d %04.1f", finalValue); //$NON-NLS-1$
+			if (this.record.getUnit().endsWith("'"))
+				return StringHelper.getFormatedWithMinutes("%2d %04.1f", finalValue);
 			else
-				return getDecimalFormat(finalValue, finalValue + range).format(finalValue);
+				return decimalFormat.format(finalValue);
 		} else
-			return getDecimalFormat(finalValue, finalValue + range).format(finalValue);
+			return decimalFormat.format(finalValue);
 	}
 
 	/**
@@ -223,31 +229,28 @@ public final class TrailRecordFormatter {
 		if (outliers == null) {
 			return new String();
 		} else {
+			DecimalFormat df = summary.getDecimalFormat();
 			if (outliers.getWarningType() == OutlierWarning.WHISKER) {
-				double[] decodedScaleMinMax = summary.defineScaleMinMax();
-				double formatComparisonValue = decodedScaleMinMax[1] - decodedScaleMinMax[0];
 				String values = outliers.getDecodedValues().stream() //
-						.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
+						.map(v -> getSummaryValue(v, df)).collect(Collectors.joining(", "));
 				String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
 						.map(ExtendedVault::getLoadFileAsPath).map(Path::getFileName).map(Path::toString) //
 						.distinct().collect(Collectors.joining(", "));
 				String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
 						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
 				return outputText + " !" //
-						+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getFarLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) //
+						+ Messages.getString(MessageIds.GDE_MSGT0906) + getSummaryValue(outliers.getFarLimit(), df) + "/" + getSummaryValue(outliers.getCloseLimit(), df) //
 						+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
 			} else {
-				double[] decodedScaleMinMax = summary.defineScaleMinMax();
-				double formatComparisonValue = decodedScaleMinMax[1] - decodedScaleMinMax[0];
 				String values = outliers.getDecodedValues().stream() //
-						.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
+						.map(v -> getSummaryValue(v, df)).collect(Collectors.joining(", "));
 				String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
 						.map(ExtendedVault::getLoadFileAsPath).map(Path::getFileName).map(Path::toString) //
 						.distinct().collect(Collectors.joining(", "));
 				String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
 						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
 				return outputText + " !" //
-						+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getFarLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) //
+						+ Messages.getString(MessageIds.GDE_MSGT0906) + getSummaryValue(outliers.getFarLimit(), df) + "/" + getSummaryValue(outliers.getCloseLimit(), df) //
 						+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
 			}
 		}
@@ -257,32 +260,31 @@ public final class TrailRecordFormatter {
 		Outliers outliers = summary.getMinMaxWarning()[1];
 		if (outliers == null) {
 			return new String();
-		} else if (outliers.getWarningType() == OutlierWarning.WHISKER) {
-			double[] decodedScaleMinMax = summary.defineScaleMinMax();
-			double formatComparisonValue = decodedScaleMinMax[1] - decodedScaleMinMax[0];
-			String values = outliers.getDecodedValues().stream() //
-					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
-			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
-					.map(ExtendedVault::getLoadFileAsPath).map(Path::getFileName).map(Path::toString) //
-					.distinct().collect(Collectors.joining(", "));
-			String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
-					? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
-			return outputText + " !" //
-					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getFarLimit(), formatComparisonValue) //
-					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
 		} else {
-			double[] decodedScaleMinMax = summary.defineScaleMinMax();
-			double formatComparisonValue = decodedScaleMinMax[1] - decodedScaleMinMax[0];
-			String values = outliers.getDecodedValues().stream() //
-					.map(v -> getRangeValue(v, formatComparisonValue)).collect(Collectors.joining(", "));
-			String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
-					.map(ExtendedVault::getLoadFileAsPath).map(Path::getFileName).map(Path::toString) //
-					.distinct().collect(Collectors.joining(", "));
-			String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
-					? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
-			return outputText + " !" //
-					+ Messages.getString(MessageIds.GDE_MSGT0906) + getRangeValue(outliers.getCloseLimit(), formatComparisonValue) + "/" + getRangeValue(outliers.getFarLimit(), formatComparisonValue) //
-					+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
+			DecimalFormat df = summary.getDecimalFormat();
+			if (outliers.getWarningType() == OutlierWarning.WHISKER) {
+				String values = outliers.getDecodedValues().stream() //
+						.map(v -> getSummaryValue(v, df)).collect(Collectors.joining(", "));
+				String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
+						.map(ExtendedVault::getLoadFileAsPath).map(Path::getFileName).map(Path::toString) //
+						.distinct().collect(Collectors.joining(", "));
+				String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
+						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
+				return outputText + " !" //
+						+ Messages.getString(MessageIds.GDE_MSGT0906) + getSummaryValue(outliers.getCloseLimit(), df) + "/" + getSummaryValue(outliers.getFarLimit(), df) //
+						+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
+			} else {
+				String values = outliers.getDecodedValues().stream() //
+						.map(v -> getSummaryValue(v, df)).collect(Collectors.joining(", "));
+				String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
+						.map(ExtendedVault::getLoadFileAsPath).map(Path::getFileName).map(Path::toString) //
+						.distinct().collect(Collectors.joining(", "));
+				String outputText = outliers.getSelectText().length() > TRAIL_TEXT_MAX_LENGTH
+						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
+				return outputText + " !" //
+						+ Messages.getString(MessageIds.GDE_MSGT0906) + getSummaryValue(outliers.getCloseLimit(), df) + "/" + getSummaryValue(outliers.getFarLimit(), df) //
+						+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
+			}
 		}
 	}
 
