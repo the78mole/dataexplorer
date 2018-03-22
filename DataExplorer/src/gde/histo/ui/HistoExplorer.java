@@ -211,7 +211,14 @@ public class HistoExplorer {
 	}
 
 	/**
-	 * update any visible histo tab.
+	 * Update any visible histo tab.
+	 */
+	public void updateHistoTabs() {
+		updateHistoTabs(RebuildStep.B_HISTOVAULTS, true);
+	}
+
+	/**
+	 * Minor update for any visible histo tab.
 	 * @param createRecordSet true creates the recordset from the histo vaults; false uses the existing recordset
 	 * @param rebuildTrails true refills the recordset and keeps the selector settings; false only rebuilds the UI
 	 */

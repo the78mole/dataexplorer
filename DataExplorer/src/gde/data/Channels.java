@@ -211,7 +211,7 @@ public class Channels extends HashMap<Integer, Channel> {
 				if (this.application.getHistoExplorer().isPresent() != Settings.getInstance().isHistoActive()) {
 					// this case may exist during DE startup
 				} else if (Settings.getInstance().isHistoActive()) {
-					this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
+					this.application.getHistoExplorer().ifPresent(HistoExplorer::updateHistoTabs);
 				}
 			}
 		} else

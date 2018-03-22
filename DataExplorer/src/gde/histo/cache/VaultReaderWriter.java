@@ -47,7 +47,7 @@ import java.util.zip.ZipFile;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.histo.datasources.DirectoryScanner.SourceDataSet;
+import gde.histo.datasources.SourceDataSetExplorer.SourceDataSet;
 import gde.histo.datasources.VaultPicker.ProgressManager;
 import gde.histo.datasources.VaultPicker.TrussJobs;
 import gde.histo.device.IHistoDevice;
