@@ -842,10 +842,9 @@ public final class DirectoryScanner {
 
 		boolean isFirstCall = lastDevice == null;
 		boolean isChange = rebuildStep == RebuildStep.A_HISTOSET || isFirstCall;
-		isChange = isChange || (lastDevice != null ? !lastDevice.getName().equals(this.validatedDevice.getName()) : this.validatedDevice != null);
-		isChange = isChange || (lastChannel != null ? !lastChannel.getChannelConfigKey().equals(this.validatedChannel.getChannelConfigKey())
-				: this.validatedChannel != null);
-		isChange = isChange || (lastFolders != null ? !lastFolders.equals(this.validatedFolders) : true);
+		isChange = isChange || !validatedDevice.equals(lastDevice);
+		isChange = isChange || !validatedChannel.equals(lastChannel);
+		isChange = isChange || !validatedFolders.equals(lastFolders);
 		isChange = isChange || !lastImportExtentions.containsAll(this.validatedImportExtentions) || !this.validatedImportExtentions.containsAll(lastImportExtentions);
 
 		return !isChange;
