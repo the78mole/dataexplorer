@@ -830,11 +830,12 @@ public class DataExplorer extends Composite {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 		}
-		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "call GDE.shell.layout()"); //$NON-NLS-1$
+		if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, $CLASS_NAME, $METHOD_NAME, "init to GDE.shell.layout() time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$
 		GDE.shell.layout();
 		this.updateLogger();
 
 		this.setHisto(Settings.getInstance().isHistoActive());
+		if (log.isLoggable(Level.OFF)) log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "postInitGui   done"); //$NON-NLS-1$
 	}
 
 	/**

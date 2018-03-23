@@ -65,6 +65,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
+import gde.utils.StringHelper;
 
 /**
  * @author Winfried Brügmann
@@ -244,9 +245,10 @@ public class GDE {
 
 	public static final String							BOOTSTRAP_LOG											= "/bootstrap.log";																																																					//$NON-NLS-1$
 	public static final String							ECLIPSE_STRING										= "ECLIPSE";																																																								//$NON-NLS-1$
-	public static final String[]						MOD1															= new String[] { GDE.IS_MAC ? "\u00E6" : Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Strg" : "Ctrl" };
-	public static final String[]						MOD2															= new String[] { Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Umschalt" : "Shift" };
-	public static final String[]						MOD3															= new String[] { "Alt" };
+
+	public static String[]									MOD1;
+	public static String[]									MOD2;
+	public static String[]									MOD3;
 
 	public static int												WIDGET_FONT_SIZE;
 	public final static String							WIDGET_FONT_NAME									= GDE.IS_WINDOWS ? "Microsoft Sans Serif" : GDE.IS_MAC ? "Lucida Grande" : "Sans Serif";																		//$NON-NLS-1$ //$NON-NLS-2$
@@ -366,6 +368,9 @@ public class GDE {
 
 	public final static Map<String, String>	deviceMap													= new HashMap<String, String>();
 	static { // initialize device mapping to enable opening files saved on android app
+		GDE.initLogger();
+		log.log(Level.INFO, "initLogger  done ");
+
 		GDE.deviceMap.put("HoTTViewerAdapter", "HoTTViewer"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("HoTTAdapter3", "HoTTAdapter2"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("GPS-Logger (UL)", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -380,6 +385,7 @@ public class GDE {
 	 */
 	public static void main(String[] args) {
 		final String $METHOD_NAME = "main"; //$NON-NLS-1$
+		log.log(Level.OFF, "main    start");
 		String inputFilePath = GDE.STRING_EMPTY;
 		try {
 			Display.setAppName(GDE.NAME_LONG);
@@ -395,21 +401,17 @@ public class GDE {
 			GDE.showSplash();
 			//Sleak sleak = new Sleak();
 			//sleak.open();
-			GDE.initLogger();
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, GDE.NAME_LONG + GDE.STRING_BLANK + GDE.VERSION);
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Screen resolution [dpi] = " + GDE.display.getDPI().y);
 
 			//build the main thread context classloader to enable dynamic plugin class loading
 			Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
-			//ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "class loader build, test it");
-			//Class c = loader.loadClass("org.eclipse.swt.widgets.Composite");
-			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, c.getProtectionDomain().getCodeSource().getLocation().toExternalForm());
-			//c = loader.loadClass("gde.ui.DataExplorer");
-			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Class object loaded successfully");
-			//Object o = c.getMethod("getInstance", new Class[0]).invoke(null, new Object[0]);
-			//log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Class instance loaded successfully");
 
+			GDE.MOD1 = new String[] { GDE.IS_MAC ? "\u00E6" : Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Strg" : "Ctrl" }; //$NON-NLS-1$ //$NON-NLS-2$
+			GDE.MOD2 = new String[] { Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Umschalt" : "Shift" }; //$NON-NLS-1$ //$NON-NLS-2$
+			GDE.MOD3 = new String[] { "Alt" }; //$NON-NLS-1$
+
+			log.log(Level.TIME, "init to start DataExplorer time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
 			DataExplorer application = DataExplorer.getInstance();
 			for (int i = 0; i < args.length; ++i) {
 				log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "commandline arg[" + i + "] = " + args[i]);//$NON-NLS-1$ //$NON-NLS-2$ $NON-NLS-2$

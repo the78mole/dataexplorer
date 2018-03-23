@@ -351,6 +351,7 @@ public class Settings extends Properties {
 		this.xsdThread = new Thread("xsdValidation") {
 			@Override
 			public void run() {
+				Settings.log.log(java.util.logging.Level.INFO, Settings.$CLASS_NAME, "xsdThread.run()");
 				// device properties context
 				try {
 					Settings.this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(Settings.this.xmlBasePath + Settings.DEVICE_PROPERTIES_XSD_NAME));
