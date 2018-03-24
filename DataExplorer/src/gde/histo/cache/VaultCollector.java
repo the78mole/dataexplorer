@@ -23,10 +23,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.data.Record;
@@ -126,7 +124,7 @@ public final class VaultCollector {
 			setMeasurementPoints(recordSet, isSampled);
 
 			{
-				GroupTransitions transitions = TransitionCollector.defineTransitions(recordSet,this.vault.logChannelNumber);
+				GroupTransitions transitions = TransitionCollector.defineTransitions(recordSet, this.vault.logChannelNumber);
 				SettlementRecords histoSettlements = determineSettlements(recordSet, transitions);
 				setSettlements(histoSettlements);
 			}
@@ -358,14 +356,13 @@ public final class VaultCollector {
 	private void setTrailPoints(CompartmentType entryPoints, Record record, boolean isSampled) {
 		UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), true, true, false);
 		if (!quantile.getOutliers().isEmpty()) {
-			HashSet<Double> outlierSet = new HashSet<Double>(quantile.getOutliers());
-			String outlierCsv = outlierSet.stream().map(v -> encodeMeasurementValue(record, v)).map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
-			entryPoints.setOutlierPoints(outlierCsv);
+			entryPoints.setOutlierPoints(//
+					quantile.getOutliers().stream().distinct().mapToInt(v -> encodeMeasurementValue(record, v)));
 			log.log(Level.FINE, record.getName() + "  outliers=" + Arrays.toString(quantile.getOutliers().toArray()));
 		}
 		if (!quantile.getConstantScraps().isEmpty()) {
-			String scrappedCsv = quantile.getConstantScraps().stream().map(v -> encodeMeasurementValue(record, v)).map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
-			entryPoints.setScrappedPoints(scrappedCsv);
+			entryPoints.setScrappedPoints( //
+					quantile.getConstantScraps().stream().distinct().mapToInt(v -> encodeMeasurementValue(record, v)));
 			log.log(Level.FINE, record.getName() + "  scrappedValues=", Arrays.toString(quantile.getConstantScraps().toArray()));
 		}
 
@@ -408,14 +405,13 @@ public final class VaultCollector {
 
 				UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), true, true, false);
 				if (!quantile.getOutliers().isEmpty()) {
-					HashSet<Double> outlierSet = new HashSet<Double>(quantile.getOutliers());
-					String outlierCsv = outlierSet.stream().map(v -> encodeSettlementValue(record, v)).map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
-					entryPoints.setOutlierPoints(outlierCsv);
+					entryPoints.setOutlierPoints(//
+							quantile.getOutliers().stream().distinct().mapToInt(v -> encodeSettlementValue(record, v)));
 					log.log(Level.FINE, record.getName() + "  outliers=" + Arrays.toString(quantile.getOutliers().toArray()));
 				}
 				if (!quantile.getConstantScraps().isEmpty()) {
-					String scrappedCsv = quantile.getConstantScraps().stream().map(v -> encodeSettlementValue(record, v)).map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
-					entryPoints.setScrappedPoints(scrappedCsv);
+					entryPoints.setScrappedPoints( //
+							quantile.getConstantScraps().stream().distinct().mapToInt(v -> encodeSettlementValue(record, v)));
 					log.log(Level.FINE, record.getName() + "  scrappedValues=", Arrays.toString(quantile.getConstantScraps().toArray()));
 				}
 

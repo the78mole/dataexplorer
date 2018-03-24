@@ -32,6 +32,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -930,9 +931,9 @@ public abstract class TrailRecord extends CommonRecord {
 	 */
 	public abstract boolean hasVaultOutliers(ExtendedVault vault);
 
-	public abstract double[] getVaultScraps(ExtendedVault vault);
+	public abstract DoubleStream getVaultScraps(ExtendedVault vault);
 
-	public abstract double[] getVaultOutliers(ExtendedVault vault);
+	public abstract DoubleStream getVaultOutliers(ExtendedVault vault);
 
 	public abstract boolean hasVaultScraps(ExtendedVault vault);
 

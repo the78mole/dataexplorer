@@ -19,7 +19,7 @@
 
 package gde.histo.recordings;
 
-import java.util.Arrays;
+import java.util.stream.DoubleStream;
 
 import gde.data.Record.DataType;
 import gde.device.MeasurementType;
@@ -80,15 +80,15 @@ public final class MeasurementTrail extends TrailRecord {
 	}
 
 	@Override
-	public double[] getVaultOutliers(ExtendedVault vault) {
-		int[] points = vault.getMeasurementOutliers(this.getOrdinal());
-		return Arrays.stream(points).mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.)).toArray();
+	public DoubleStream getVaultOutliers(ExtendedVault vault) {
+		return vault.getMeasurementOutliers(this.getOrdinal()) //
+				.mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.));
 	}
 
 	@Override
-	public double[] getVaultScraps(ExtendedVault vault) {
-		int[] points = vault.getMeasurementScraps(this.getOrdinal());
-		return Arrays.stream(points).mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.)).toArray();
+	public DoubleStream getVaultScraps(ExtendedVault vault) {
+		return vault.getMeasurementScraps(this.getOrdinal()) //
+				.mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.));
 	}
 
 	@Override

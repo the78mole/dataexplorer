@@ -26,6 +26,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
+import java.util.stream.IntStream;
+
+import com.sun.istack.internal.Nullable;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -164,7 +167,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 
 	// parameters for the current loading activity
 	private final Path		loadFilePath;					// source file
-	private final String	loadObjectDirectory;	// ???
+	private final String	loadObjectDirectory;	// differs from logObjectKey and vaultObjectKey
 
 	private Path					loadLinkPath;					// link to the source file
 
@@ -218,10 +221,10 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 
 		this.vaultReaderSettings = vaultReaderSettings;
 
-		log.finer(() -> String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetOrdinal=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s", //$NON-NLS-1$
-				objectDirectory, filePath.getFileName().toString(), logRecordSetBaseName, StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logFileLastModified), //$NON-NLS-1$
-				StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestampMs), logChannelNumber, logObjectKey)); //$NON-NLS-1$
-		log.finer(() -> String.format("vaultDirectory=%s  vaultName=%s", this.vaultDirectory, this.vaultName)); //$NON-NLS-1$
+		log.finer(() -> String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetOrdinal=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s", //
+				objectDirectory, filePath.getFileName().toString(), logRecordSetBaseName, StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logFileLastModified), //
+				StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestampMs), logChannelNumber, logObjectKey)); //
+		log.finer(() -> String.format("vaultDirectory=%s  vaultName=%s", this.vaultDirectory, this.vaultName)); //
 	}
 
 	/**
@@ -298,8 +301,9 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the
 	 *          meantime)
 	 * @param trailOrdinal
-	 * @return null in case of unavailable measurement or trail
+	 * @return the point value
 	 */
+	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
 	public Integer getMeasurementPoint(int measurementOrdinal, int trailOrdinal) {
 		if (this.getMeasurements().containsKey(measurementOrdinal)) {
 			return this.getMeasurements().get(measurementOrdinal).getTrails().containsKey(trailOrdinal)
@@ -311,26 +315,26 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 
 	/**
 	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	 * @return the points or an empty array if the measurement does not exist or has no outliers
+	 * @return the points
 	 */
-	public int[] getMeasurementOutliers(int measurementOrdinal) {
+	public IntStream getMeasurementOutliers(int measurementOrdinal) {
 		if (this.getMeasurements().containsKey(measurementOrdinal)) {
 			String points = this.getMeasurements().get(measurementOrdinal).getOutlierPoints();
-			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt).toArray();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
 		}
-		return new int[0];
+		return IntStream.empty();
 	}
 
 	/**
 	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	 * @return the points or an empty array if the measurement does not exist or has no outliers
+	 * @return the points
 	 */
-	public int[] getMeasurementScraps(int measurementOrdinal) {
+	public IntStream getMeasurementScraps(int measurementOrdinal) {
 		if (this.getMeasurements().containsKey(measurementOrdinal)) {
 			String points = this.getMeasurements().get(measurementOrdinal).getScrappedPoints();
-			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt).toArray();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
 		}
-		return new int[0];
+		return IntStream.empty();
 	}
 
 	/**
@@ -347,8 +351,9 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 
 	/**
 	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	 * @return the cache data type or null if the measurement does not exist in the vault
+	 * @return the cache data type
 	 */
+	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
 	public DataTypes getMeasurementDataType(int measurementOrdinal) {
 		if (this.getMeasurements().containsKey(measurementOrdinal)) {
 			return this.getMeasurements().get(measurementOrdinal).dataType;
@@ -380,8 +385,9 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	/**
 	 * @param settlementId may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
 	 * @param trailOrdinal
-	 * @return null in case of unavailable settlement or trail
+	 * @return the point value
 	 */
+	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
 	public Integer getSettlementPoint(int settlementId, int trailOrdinal) {
 		if (this.getSettlements().containsKey(settlementId)) {
 			return this.getSettlements().get(settlementId).getTrails().containsKey(trailOrdinal)
@@ -393,26 +399,26 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 
 	/**
 	 * @param settlementId may specify an ordinal which is not present in the vault
-	 * @return the points or an empty array if the settlement does not exist or has no outliers
+	 * @return the points
 	 */
-	public int[] getSettlementOutlierPoints(int settlementId) {
+	public IntStream getSettlementOutliers(int settlementId) {
 		if (this.getMeasurements().containsKey(settlementId)) {
 			String points = this.getMeasurements().get(settlementId).getOutlierPoints();
-			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt).toArray();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
 		}
-		return new int[0];
+		return IntStream.empty();
 	}
 
 	/**
 	 * @param settlementId may specify an ordinal which is not present in the vault
-	 * @return the points or an empty array if the settlement does not exist or has no outliers
+	 * @return the points
 	 */
-	public int[] getSettlementScrappedPoints(int settlementId) {
+	public IntStream getSettlementScraps(int settlementId) {
 		if (this.getMeasurements().containsKey(settlementId)) {
 			String points = this.getMeasurements().get(settlementId).getScrappedPoints();
-			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt).toArray();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
 		}
-		return new int[0];
+		return IntStream.empty();
 	}
 
 	/**
@@ -439,11 +445,12 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		}
 	}
 
+	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
 	public DataTypes getSettlementDataType(int settlementId) {
 		if (this.getSettlements().containsKey(settlementId)) {
 			return this.getSettlements().get(settlementId).dataType;
 		} else {
-			throw new UnsupportedOperationException("attribute is mandatory");
+			return null;
 		}
 	}
 
@@ -463,7 +470,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @return yyyy-MM-dd HH:mm:ss
 	 */
 	public String getStartTimeStampFormatted() {
-		return StringHelper.getFormatedTime(timestampFormat, this.logStartTimestampMs); // $NON-NLS-1$
+		return StringHelper.getFormatedTime(timestampFormat, this.logStartTimestampMs); //
 	}
 
 	public String getLoadFileExtension() {

@@ -8,6 +8,8 @@
 package gde.histo.cache;
 
 import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -93,8 +95,8 @@ public class CompartmentType {
 	 * Gets the value of the trails property.
 	 *
 	 * @return
-	 *     possible object is
-	 *     {@link PointsType }
+	 * 				possible object is
+	 *         {@link PointsType }
 	 *
 	 */
 	public HashMap<Integer, PointType> getTrails() {
@@ -108,8 +110,8 @@ public class CompartmentType {
 	 * Sets the value of the trails property.
 	 *
 	 * @param value
-	 *     allowed object is
-	 *     {@link PointsType }
+	 *          allowed object is
+	 *          {@link PointsType }
 	 *
 	 */
 	public void setTrails(HashMap<Integer, PointType> value) {
@@ -136,8 +138,8 @@ public class CompartmentType {
 	 * Gets the value of the text property.
 	 *
 	 * @return
-	 *     possible object is
-	 *     {@link String }
+	 * 				possible object is
+	 *         {@link String }
 	 *
 	 */
 	public String getText() {
@@ -148,84 +150,92 @@ public class CompartmentType {
 	 * Sets the value of the text property.
 	 *
 	 * @param value
-	 *     allowed object is
-	 *     {@link String }
+	 *          allowed object is
+	 *          {@link String }
 	 *
 	 */
 	public void setText(String value) {
 		this.text = value;
 	}
 
-    /**
-     * Gets the value of the dataType property.
-     *
-     * @return
-     *     possible object is
-     *     {@link DataTypes }
-     *
-     */
-    public DataTypes getDataType() {
-        return dataType;
-    }
+	/**
+	 * Gets the value of the dataType property.
+	 *
+	 * @return
+	 * 				possible object is
+	 *         {@link DataTypes }
+	 *
+	 */
+	public DataTypes getDataType() {
+		return dataType;
+	}
 
-    /**
-     * Sets the value of the dataType property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link DataTypes }
-     *
-     */
-    public void setDataType(DataTypes value) {
-        this.dataType = value;
-    }
+	/**
+	 * Sets the value of the dataType property.
+	 *
+	 * @param value
+	 *          allowed object is
+	 *          {@link DataTypes }
+	 *
+	 */
+	public void setDataType(DataTypes value) {
+		this.dataType = value;
+	}
 
-    /**
-     * Gets the value of the outlierPoints property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
-     */
-    public String getOutlierPoints() {
-        return outlierPoints;
-    }
+	/**
+	 * Gets the value of the outlierPoints property.
+	 *
+	 * @return
+	 * 				possible object is
+	 *         {@link String }
+	 *
+	 */
+	public String getOutlierPoints() {
+		return outlierPoints;
+	}
 
-    /**
-     * Sets the value of the outlierPoints property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
+	/**
+	 * Sets the value of the outlierPoints property.
+	 *
+	 * @param value
+	 *          allowed object is
+	 *          {@link String }
+	 *
+	 */
     public void setOutlierPoints(String value) {
-        this.outlierPoints = value;
-    }
+		this.outlierPoints = value;
+	}
 
-    /**
-     * Gets the value of the scrappedPoints property.
-     *
-     * @return
-     *     possible object is
-     *     {@link String }
-     *
-     */
-    public String getScrappedPoints() {
-        return scrappedPoints;
-    }
+	public void setOutlierPoints(IntStream values) {
+		this.outlierPoints = values.boxed().map(i -> String.valueOf(i)).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+	}
 
-    /**
-     * Sets the value of the scrappedPoints property.
-     *
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *
-     */
+	/**
+	 * Gets the value of the scrappedPoints property.
+	 *
+	 * @return
+	 * 				possible object is
+	 *         {@link String }
+	 *
+	 */
+	public String getScrappedPoints() {
+		return scrappedPoints;
+	}
+
+	/**
+	 * Sets the value of the scrappedPoints property.
+	 *
+	 * @param value
+	 *          allowed object is
+	 *          {@link String }
+	 *
+	 */
     public void setScrappedPoints(String value) {
-        this.scrappedPoints = value;
-    }
+		this.scrappedPoints = value;
+	}
+
+	public void setScrappedPoints(IntStream values) {
+		this.outlierPoints = values.boxed().map(i -> String.valueOf(i)).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+	}
 
 }

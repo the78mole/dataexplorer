@@ -19,6 +19,8 @@
 
 package gde.histo.recordings;
 
+import java.util.stream.DoubleStream;
+
 import gde.data.Record.DataType;
 import gde.device.ScoreGroupType;
 import gde.histo.cache.ExtendedVault;
@@ -105,13 +107,13 @@ public final class ScoregroupTrail extends TrailRecord {
 	}
 
 	@Override
-	public double[] getVaultScraps(ExtendedVault vault) {
-		return new double[0];
+	public DoubleStream  getVaultScraps(ExtendedVault vault) {
+		return DoubleStream.empty();
 	}
 
 	@Override
-	public double[] getVaultOutliers(ExtendedVault vault) {
-		return new double[0];
+	public DoubleStream  getVaultOutliers(ExtendedVault vault) {
+		return DoubleStream.empty();
 	}
 
 	@Override

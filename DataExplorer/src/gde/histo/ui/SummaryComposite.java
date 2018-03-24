@@ -434,8 +434,8 @@ public final class SummaryComposite extends AbstractChartComposite {
 				if (snappedIndices.size() == 1) {
 					TrailRecordFormatter formatter = new TrailRecordFormatter(record);
 					ExtendedVault vault = trailRecordSet.getVault(snappedIndices.get(0));
-					String outliers = Arrays.stream(record.getVaultOutliers(vault)).mapToObj(formatter::getScaleValue).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
-					String scraps = Arrays.stream(record.getVaultScraps(vault)).mapToObj(formatter::getScaleValue).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
+					String outliers = record.getVaultOutliers(vault).mapToObj(formatter::getScaleValue).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
+					String scraps = record.getVaultScraps(vault).mapToObj(formatter::getScaleValue).collect(Collectors.joining(GDE.STRING_BLANK_COLON_BLANK));
 					if (!outliers.isEmpty()) text += "\n o " + outliers;
 					if (!scraps.isEmpty()) text += "\n s " + scraps;
 				}

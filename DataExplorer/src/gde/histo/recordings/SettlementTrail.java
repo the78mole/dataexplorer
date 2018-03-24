@@ -19,7 +19,7 @@
 
 package gde.histo.recordings;
 
-import java.util.Arrays;
+import java.util.stream.DoubleStream;
 
 import gde.data.Record.DataType;
 import gde.device.SettlementType;
@@ -76,21 +76,21 @@ public final class SettlementTrail extends TrailRecord {
 	}
 
 	@Override
-	public double[] getVaultOutliers(ExtendedVault vault) {
-		int[] points = vault.getSettlementOutlierPoints(((SettlementType) this.channelItem).getSettlementId());
-		return Arrays.stream(points).mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.)).toArray();
+	public DoubleStream getVaultOutliers(ExtendedVault vault) {
+		return vault.getSettlementOutliers(((SettlementType) this.channelItem).getSettlementId()) //
+				.mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.));
 	}
 
 	@Override
-	public double[] getVaultScraps(ExtendedVault vault) {
-		int[] points = vault.getSettlementScrappedPoints(((SettlementType) this.channelItem).getSettlementId());
-		return Arrays.stream(points).mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.)).toArray();
+	public DoubleStream getVaultScraps(ExtendedVault vault) {
+		return vault.getSettlementScraps(((SettlementType) this.channelItem).getSettlementId()) //
+				.mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.));
 	}
 
 	@Override
 	public DataType getVaultDataType(ExtendedVault vault) {
-		return DataTypes.toDataType(vault.getSettlementDataType(((SettlementType) this.channelItem).getSettlementId()));
+		DataTypes dataType = vault.getSettlementDataType(((SettlementType) this.channelItem).getSettlementId());
+		return dataType != null ? DataTypes.toDataType(dataType) : null;
 	}
-
 
 }

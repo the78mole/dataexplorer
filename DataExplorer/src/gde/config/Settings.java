@@ -51,6 +51,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
+import java.util.stream.Stream;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -3026,11 +3027,11 @@ public class Settings extends Properties {
 	}
 
 	private int[] getWarningCountValues() {
-		String[] items = getWarningCountCsv().split(GDE.STRING_CSV_SEPARATOR);
-		if (items.length != WARNING_COUNT_VALUES.length) {
+		Stream<String> items = Arrays.stream(getWarningCountCsv().split(GDE.STRING_CSV_SEPARATOR));
+		if (items.count() != WARNING_COUNT_VALUES.length) {
 			setWarningCountCsv(String.join(GDE.STRING_CSV_SEPARATOR, Arrays.asList(WARNING_COUNT_VALUES)));
 		}
-		return Arrays.stream(items).mapToInt(Integer::valueOf).toArray();
+		return Arrays.stream(getWarningCountCsv().split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::valueOf).toArray();
 	}
 
 	/**
