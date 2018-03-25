@@ -165,10 +165,9 @@ public abstract class AbstractChartWindow extends CTabItem {
 			return DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet();
 		}
 
-		@Nullable
+		@Nullable // i.e. if rebuild thread is not finished
 		TrailRecordSet getTrailRecordSet() {
 			return Channels.getInstance().getActiveChannel() != null ? DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet() : null;
-
 		}
 
 		boolean isCurveSelectorEnabled() {

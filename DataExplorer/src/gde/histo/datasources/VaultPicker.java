@@ -49,6 +49,8 @@ import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import com.sun.istack.internal.Nullable;
+
 import gde.GDE;
 import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
@@ -653,6 +655,7 @@ public final class VaultPicker {
 		return this.elapsedTime_us / 1000;
 	}
 
+	@Nullable // i.e. if rebuild thread is not finished
 	public TrailRecordSet getTrailRecordSet() {
 		return this.trailRecordSet;
 	}

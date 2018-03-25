@@ -25,6 +25,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.istack.internal.Nullable;
+
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.Record.DataType;
@@ -345,6 +347,7 @@ public final class HistoSet {
 		this.vaultPicker.rebuild4Test(filePath);
 	}
 
+	@Nullable // i.e. if rebuild thread is not finished
 	public TrailRecordSet getTrailRecordSet() {
 		return this.vaultPicker.getTrailRecordSet();
 	}

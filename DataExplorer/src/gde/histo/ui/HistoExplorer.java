@@ -35,6 +35,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
+import com.sun.istack.internal.Nullable;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.datasources.DirectoryScanner;
@@ -89,7 +91,7 @@ public class HistoExplorer {
 		int positionT = tabLength < TAB_INDEX_HISTO_TABLE ? tabLength : TAB_INDEX_HISTO_TABLE;
 		tableTabItems.add(HistoTableWindow.create(displayTab, SWT.NONE, positionT));
 
-		updateHistoTabs(RebuildStep.A_HISTOSET, true);
+		if (application.getActiveChannel() != null) updateHistoTabs(RebuildStep.A_HISTOSET, true);
 	}
 
 	public void disposeHisto() {
@@ -218,6 +220,8 @@ public class HistoExplorer {
 	}
 
 	private void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
+		if (application.getActiveChannel() == null) return;
+
 		if (Thread.currentThread().getId() == application.getThreadId()) {
 			log.log(Level.FINER, "initial size=", getTrailRecordSet() != null
 					? getTrailRecordSet().getDisplayRecords().size() + "  " + getTrailRecordSet().getVisibleAndDisplayableRecords().size() : "0   0");
@@ -417,6 +421,7 @@ public class HistoExplorer {
 		return histoSet;
 	}
 
+	@Nullable // i.e. if rebuild thread is not finished
 	public TrailRecordSet getTrailRecordSet() {
 		return histoSet.getTrailRecordSet();
 	}
