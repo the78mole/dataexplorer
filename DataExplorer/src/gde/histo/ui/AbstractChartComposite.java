@@ -464,6 +464,8 @@ public abstract class AbstractChartComposite extends Composite {
 	 * Draw the containing records and sets the comment.
 	 */
 	public void drawAreaPaintControl() {
+		if (windowActor.getTrailRecordSet() == null) return;
+
 		// Get the canvas and its dimensions
 		this.canvasBounds = this.graphicCanvas.getClientArea();
 

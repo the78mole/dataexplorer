@@ -515,6 +515,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 	 */
 	private void drawTrailRecordSet(int dataScaleWidth) {
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
+		if (trailRecordSet == null) return;
 
 		// check for activated horizontal grid
 		boolean isCurveGridEnabled = trailRecordSet.getValueGridType() > 0;

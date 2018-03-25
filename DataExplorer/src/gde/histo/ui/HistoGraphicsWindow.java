@@ -81,6 +81,8 @@ public final class HistoGraphicsWindow extends AbstractChartWindow {
 
 	@Override
 	public void redrawGraphics(final boolean redrawCurveSelector) {
+		if (windowActor.getTrailRecordSet() == null) return ;
+
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			if (redrawCurveSelector) this.curveSelectorComposite.doUpdateCurveSelectorTable();
 
