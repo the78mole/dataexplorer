@@ -35,6 +35,8 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Properties;
 
+import com.sun.istack.internal.Nullable;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
@@ -333,15 +335,9 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	public abstract Path getTargetFilePath();
 
 	/**
-	 * @return the last load / store path or null
+	 * @return the path residual compared to the standard template path
 	 */
-	public Path getCurrentFilePath() {
-		return this.currentFilePath;
-	}
-
-	/**
-	 * @return the path residual compared to the standard template path or an empty path
-	 */
+	@Nullable // if there was no successful load / store
 	private Path getCurrentRelativeFilePath() {
 		if (currentFilePath == null) {
 			return Paths.get("");
@@ -395,8 +391,9 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	 * @param recordName
 	 * @param keyPostfix is one of the constant strings for record properties
 	 * @param value the value corresponding to key.
-	 * @return the previous value of the specified key in this property list, or null if it did not have one.
+	 * @return the previous value of the specified key in this property list
 	 */
+	@Nullable // if there was no previous value
 	public synchronized String setRecordProperty(String recordName, String keyPostfix, String value) {
 		return (String) super.setProperty(recordName + GDE.STRING_UNDER_BAR + keyPostfix, value);
 	}

@@ -242,7 +242,7 @@ public enum TrailTypes {
 				}
 			}
 		}
-		return null;
+		throw new IllegalArgumentException();
 	}
 
 	public static TrailTypes fromOrdinal(int ordinal) {
