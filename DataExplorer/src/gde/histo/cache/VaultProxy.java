@@ -79,7 +79,7 @@ public final class VaultProxy {
 
 	/**
 	 * @param fullQualifiedFileName is the vault path
-	 * @return the vault or null
+	 * @return the vault
 	 * @throws JAXBException
 	 */
 	public static HistoVault load(Path fullQualifiedFileName) throws JAXBException {
@@ -88,7 +88,7 @@ public final class VaultProxy {
 
 	/**
 	 * @param inputStream is a stream to the source path
-	 * @return the vault or null
+	 * @return the vault
 	 * @throws JAXBException
 	 */
 	public static HistoVault load(InputStream inputStream) throws JAXBException {

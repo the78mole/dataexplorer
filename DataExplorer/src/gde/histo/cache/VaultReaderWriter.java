@@ -118,12 +118,11 @@ public final class VaultReaderWriter {
 							HistoVault histoVault = null;
 							try {
 								histoVault = VaultProxy.load(new BufferedInputStream(zf.getInputStream(vaultName)));
+								vaults.add(ExtendedVault.createExtendedVault(histoVault, truss));
+								trussesIterator.remove();
 							} catch (Exception e) {
 								log.log(SEVERE, e.getMessage(), e);
 							}
-
-							if (histoVault != null) vaults.add(ExtendedVault.createExtendedVault(histoVault, truss));
-							trussesIterator.remove();
 						}
 					}
 					if (map.isEmpty()) trussJobsIterator.remove();
@@ -142,12 +141,11 @@ public final class VaultReaderWriter {
 						File vaultFile = cacheFilePath.resolve(truss.getVault().getVaultName()).toFile();
 						try (InputStream inputStream = new BufferedInputStream(new FileInputStream(vaultFile))) {
 							histoVault = VaultProxy.load(inputStream);
+							vaults.add(ExtendedVault.createExtendedVault(histoVault, truss));
+							trussesIterator.remove();
 						} catch (Exception e) {
 							log.log(SEVERE, e.getMessage(), e);
 						}
-
-						if (histoVault != null) vaults.add(ExtendedVault.createExtendedVault(histoVault, truss));
-						trussesIterator.remove();
 					}
 				}
 				if (map.isEmpty()) trussJobsIterator.remove();
