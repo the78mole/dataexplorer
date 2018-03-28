@@ -207,6 +207,7 @@ public class HistoExplorer {
 	}
 
 	public boolean isHistoWindowVisible() {
+		if (displayTab == null) return false;
 		return displayTab.getSelection() instanceof AbstractChartWindow || displayTab.getSelection() instanceof HistoTableWindow;
 	}
 
@@ -271,11 +272,6 @@ public class HistoExplorer {
 				}
 				updateHistoChartWindow(true);
 				updateHistoTableWindow(rebuildStep.scopeOfWork >= RebuildStep.E_USER_INTERFACE.scopeOfWork);
-			}
-			if (isWithUi && rebuildStep == RebuildStep.B_HISTOVAULTS && histoSet.getTrailRecordSet().getTimeStepSize() == 0) {
-				String objectOrDevice = application.getObjectKey().isEmpty() ? application.getActiveDevice().getName() : application.getObjectKey();
-				String pathText = histoSet.getSourceFolders().getDecoratedPathsCsv().replace(GDE.STRING_CSV_SEPARATOR, GDE.STRING_NEW_LINE) + GDE.STRING_NEW_LINE;
-				application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0066, new Object[] { objectOrDevice, pathText }));
 			}
 			histoSet.setRebuildStepInvisibleTabs(rebuildStep, isRebuilt);
 		} catch (Exception e) {
