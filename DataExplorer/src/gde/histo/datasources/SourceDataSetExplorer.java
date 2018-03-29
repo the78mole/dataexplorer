@@ -44,7 +44,6 @@ import gde.GDE;
 import gde.config.DeviceConfigurations;
 import gde.config.Settings;
 import gde.data.Channels;
-import gde.data.ObjectData;
 import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
@@ -77,7 +76,7 @@ public class SourceDataSetExplorer {
 		final List<Integer>	channelMixConfigNumbers	= DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers();
 		final long					minStartTimeStamp_ms		= LocalDate.now().minusMonths(Settings.getInstance().getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		// use criteria independent from UI for JUnit (replace isObjectoriented)
-		final ObjectData		activeObject						= DataExplorer.getInstance().getActiveObject();
+		final String				activeObjectKey					= Settings.getInstance().getActiveObjectKey();
 		final boolean				filesWithOtherObject		= Settings.getInstance().getFilesWithOtherObject();
 		final List<String>	realObjectKeys					= Settings.getInstance().getRealObjectKeys().stream().collect(Collectors.toList());
 
@@ -141,7 +140,7 @@ public class SourceDataSetExplorer {
 						return false;
 					}
 
-					if (trussCriteria.activeObject == null) {
+					if (trussCriteria.activeObjectKey.isEmpty()) {
 						if (!vault.getLogObjectKey().isEmpty()) return true;
 						// no object in the osd file is a undesirable case but the log is accepted in order to show all logs
 						log.info(() -> String.format("objectKey=%8s%,7d kiB %s", "empty", vault.getLoadFileAsPath().toFile().length() / 1024, vault.getLoadFileAsPath().toString()));
@@ -159,7 +158,7 @@ public class SourceDataSetExplorer {
 							log.info(() -> String.format("objectKey=%8s%,7d kiB %s", vault.getRectifiedObjectKey(), vault.getLoadFileAsPath().toFile().length() / 1024, vault.getLoadFileAsPath().toString()));
 							return false;
 						}
-						boolean consistentObjectKey = vault.getLogObjectKey().equalsIgnoreCase(trussCriteria.activeObject.getKey());
+						boolean consistentObjectKey = vault.getLogObjectKey().equalsIgnoreCase(trussCriteria.activeObjectKey);
 						if (!consistentObjectKey) {
 							// finally we found a log with a validated object key which does not correspond to the desired one
 							return false;
@@ -225,8 +224,8 @@ public class SourceDataSetExplorer {
 						log.info(() -> String.format("no match startTime%,7d kiB %s", vault.getLoadFileAsPath().toFile().length() / 1024, vault.getLoadFileAsPath().toString()));
 						return false;
 					}
-					if (trussCriteria.activeObject != null) {
-						boolean consistentObjectKey = vault.getLogObjectKey().equalsIgnoreCase(trussCriteria.activeObject.getKey());
+					if (!trussCriteria.activeObjectKey.isEmpty()) {
+						boolean consistentObjectKey = vault.getLogObjectKey().equalsIgnoreCase(trussCriteria.activeObjectKey);
 						if (!consistentObjectKey) {
 							if (trussCriteria.filesWithOtherObject) return true;
 							log.info(() -> String.format("objectKey=%8s%,7d kiB %s", vault.getRectifiedObjectKey(), vault.getLoadFileAsPath().toFile().length() / 1024, vault.getLoadFileAsPath().toString()));
