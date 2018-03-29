@@ -56,7 +56,6 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.ObjectData;
 import gde.device.IDevice;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.DirectoryScanner;
@@ -230,7 +229,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		private final DataExplorer	application1	= DataExplorer.getInstance();
 		private final IDevice				device				= application1.getActiveDevice();
 		private final Channel				channel				= application1.getActiveChannel();
-		private final ObjectData		object				= application1.getActiveObject();
+		private final String				objectKey			= Settings.getInstance().getActiveObjectKey();
 
 		private final String				textLines;
 		private final String				toolTip;
@@ -253,7 +252,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 
 		private boolean isExpired() {
 			if (remainingAccessCounter > 0) {
-				boolean isOtherChart = !device.equals(application1.getActiveDevice()) || !channel.equals(application1.getActiveChannel()) || !object.equals(application1.getActiveObject());
+				boolean isOtherChart = !device.equals(application1.getActiveDevice()) || !channel.equals(application1.getActiveChannel()) || !objectKey.equals(Settings.getInstance().getActiveObjectKey());
 				return isOtherChart;
 			} else
 				return true;
@@ -261,7 +260,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 
 		@Override
 		public String toString() {
-			boolean isSameChart = device.equals(application1.getActiveDevice()) && channel.equals(application1.getActiveChannel()) && object.equals(application1.getActiveObject());
+			boolean isSameChart = device.equals(application1.getActiveDevice()) && channel.equals(application1.getActiveChannel()) && objectKey.equals(Settings.getInstance().getActiveObjectKey());
 			return "VolatileComment [textLines=" + this.textLines + ", toolTip=" + this.toolTip + ", remainingAccessCounter=" + this.remainingAccessCounter + ", isSameChart=" + isSameChart + "]";
 		}
 	}

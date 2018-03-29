@@ -20,8 +20,8 @@
 package gde.histo.ui;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.data.Channel;
-import gde.data.ObjectData;
 import gde.device.IDevice;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -39,7 +39,7 @@ public class VolatileStatusMessage {
 	private final DataExplorer	application	= DataExplorer.getInstance();
 	private final IDevice				device			= application.getActiveDevice();
 	private final Channel				channel			= application.getActiveChannel();
-	private final ObjectData		object			= application.getActiveObject();
+	private final String				objectKey		= Settings.getInstance().getActiveObjectKey();
 
 	private final String				textLine;
 	private final int						color;
@@ -75,7 +75,7 @@ public class VolatileStatusMessage {
 
 	public boolean isExpired() {
 		if (remainingAccessCounter > 0) {
-			boolean isOtherChart = !device.equals(application.getActiveDevice()) || !channel.equals(application.getActiveChannel()) || !object.equals(application.getActiveObject());
+			boolean isOtherChart = !device.equals(application.getActiveDevice()) || !channel.equals(application.getActiveChannel()) || !objectKey.equals(Settings.getInstance().getActiveObjectKey());
 			return isOtherChart;
 		} else
 			return true;
@@ -83,7 +83,7 @@ public class VolatileStatusMessage {
 
 	@Override
 	public String toString() {
-		boolean isSameChart = device.equals(application.getActiveDevice()) && channel.equals(application.getActiveChannel()) && object.equals(application.getActiveObject());
+		boolean isSameChart = device.equals(application.getActiveDevice()) && channel.equals(application.getActiveChannel()) && objectKey.equals(Settings.getInstance().getActiveObjectKey());
 		return "VolatileStatusMessage [textLine=" + this.textLine + ", color=" + this.color + ", remainingAccessCounter=" + this.remainingAccessCounter + ", isSameChart=" + isSameChart + "]";
 	}
 }
