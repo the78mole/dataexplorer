@@ -45,7 +45,6 @@ import com.sun.istack.internal.Nullable;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
-import gde.data.ObjectData;
 import gde.device.IDevice;
 import gde.exception.NotSupportedFileFormatException;
 import gde.histo.datasources.HistoSet.RebuildStep;
@@ -101,7 +100,7 @@ public final class DirectoryScanner {
 		private IDevice												validatedDevice							= null;
 		private Channel												validatedChannel						= null;
 		private String												validatedImportDataLocation	= GDE.STRING_EMPTY;
-		private ObjectData										validatedObject							= null;
+		private String												validatedObjectKey					= GDE.STRING_EMPTY;
 
 		private SourceFolders									lastFolders									= null;
 		private SourceFolders									sourceFolders								= null;
@@ -117,9 +116,8 @@ public final class DirectoryScanner {
 			this.validatedDirectoryTypes.clear();
 
 			this.validatedDevice = null;
-			this.validatedObject = null;
 			this.validatedImportDataLocation = GDE.STRING_EMPTY;
-			this.validatedObject = null;
+			this.validatedObjectKey = GDE.STRING_EMPTY;
 
 			this.lastFolders = null;
 			this.sourceFolders = null;
@@ -141,7 +139,7 @@ public final class DirectoryScanner {
 			Channel lastChannel = validatedChannel;
 			String lastImportDataLocations = validatedImportDataLocation;
 			EnumSet<DirectoryType> lastDirectoryTypes = EnumSet.copyOf(validatedDirectoryTypes);
-			ObjectData lastObject = validatedObject;
+			String lastObjectKey = validatedObjectKey;
 
 			boolean isFirstCall = lastDevice == null;
 			isMajorChange = rebuildStep == RebuildStep.A_HISTOSET || isFirstCall;
@@ -160,8 +158,8 @@ public final class DirectoryScanner {
 			validatedDirectoryTypes.addAll(Arrays.stream(DirectoryType.VALUES).filter(DirectoryType::isActive).collect(Collectors.toList()));
 			isMajorChange = isMajorChange || !lastDirectoryTypes.equals(validatedDirectoryTypes);
 
-			validatedObject = DataExplorer.getInstance().getActiveObject();
-			isMajorChange = isMajorChange || lastObject != validatedObject; // simple compare because of deviceoriented
+			validatedObjectKey = Settings.getInstance().getActiveObjectKey();
+			isMajorChange = isMajorChange || !lastObjectKey.equals(validatedObjectKey);
 
 			if (isMajorChange) { // avoids costly directory scan and building directory file event listeners (WatchDir)
 				sourceFolders = new SourceFolders();
@@ -255,7 +253,7 @@ public final class DirectoryScanner {
 			for (DirectoryType directoryType : directoryTypes) {
 				Set<Path> currentPaths = defineCurrentPaths(directoryType);
 				log.log(Level.FINE, directoryType.toString(), currentPaths);
-				if (DataExplorer.getInstance().getActiveObject() != null) {
+				if (!Settings.getInstance().getActiveObjectKey().isEmpty()) {
 					Set<Path> externalObjectPaths = defineExternalObjectPaths(directoryType, activeObjectKey);
 					currentPaths.addAll(externalObjectPaths);
 					log.log(Level.FINE, directoryType.toString(), externalObjectPaths);
@@ -287,7 +285,7 @@ public final class DirectoryScanner {
 		 */
 		private Set<Path> defineCurrentPaths(DirectoryType directoryType) {
 			Set<Path> newPaths = new HashSet<>();
-			if (DataExplorer.getInstance().getActiveObject() == null) {
+			if (Settings.getInstance().getActiveObjectKey().isEmpty()) {
 				Path deviceSubPath = directoryType.getActiveDeviceSubPath();
 				Path rootPath = deviceSubPath != null ? directoryType.getBasePath().resolve(deviceSubPath) : directoryType.getBasePath();
 				newPaths.add(rootPath);
@@ -437,8 +435,7 @@ public final class DirectoryScanner {
 			@Override
 			public Path getDataSetPath() {
 				String activeObjectKey = Settings.getInstance().getActiveObjectKey();
-				String subPathData = activeObjectKey.isEmpty()
-						? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getPureDeviceName() //
+				String subPathData = activeObjectKey.isEmpty() ? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getPureDeviceName() //
 						: activeObjectKey;
 				return Paths.get(Settings.getInstance().getDataFilePath()).resolve(subPathData);
 			}
