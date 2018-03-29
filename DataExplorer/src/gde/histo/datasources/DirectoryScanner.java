@@ -250,12 +250,13 @@ public final class DirectoryScanner {
 		 */
 		public boolean defineDirectories(EnumSet<DirectoryType> directoryTypes) throws IOException {
 			long nanoTime = System.nanoTime();
+			String activeObjectKey = Settings.getInstance().getActiveObjectKey();
 			folders.clear();
 			for (DirectoryType directoryType : directoryTypes) {
 				Set<Path> currentPaths = defineCurrentPaths(directoryType);
 				log.log(Level.FINE, directoryType.toString(), currentPaths);
 				if (DataExplorer.getInstance().getActiveObject() != null) {
-					Set<Path> externalObjectPaths = defineExternalObjectPaths(directoryType, DataExplorer.getInstance().getObjectKey());
+					Set<Path> externalObjectPaths = defineExternalObjectPaths(directoryType, activeObjectKey);
 					currentPaths.addAll(externalObjectPaths);
 					log.log(Level.FINE, directoryType.toString(), externalObjectPaths);
 				}
@@ -295,7 +296,7 @@ public final class DirectoryScanner {
 				if (basePath == null) {
 					// an unavailable path results in no files found
 				} else {
-					newPaths = defineObjectPaths(basePath, DataExplorer.getInstance().getObjectKey());
+					newPaths = defineObjectPaths(basePath, Settings.getInstance().getActiveObjectKey());
 				}
 			}
 			return newPaths;
@@ -435,9 +436,10 @@ public final class DirectoryScanner {
 
 			@Override
 			public Path getDataSetPath() {
-				String subPathData = application.getActiveObject() == null
+				String activeObjectKey = Settings.getInstance().getActiveObjectKey();
+				String subPathData = activeObjectKey.isEmpty()
 						? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getPureDeviceName() //
-						: application.getObjectKey();
+						: activeObjectKey;
 				return Paths.get(Settings.getInstance().getDataFilePath()).resolve(subPathData);
 			}
 
@@ -496,8 +498,7 @@ public final class DirectoryScanner {
 					if (importDir == null) {
 						return null;
 					} else {
-						String subPathImport = application.getActiveObject() == null ? GDE.STRING_EMPTY : application.getObjectKey();
-						Path importPath = importDir.resolve(subPathImport);
+						Path importPath = importDir.resolve(Settings.getInstance().getActiveObjectKey());
 						return !importPath.equals(DirectoryType.DATA.getDataSetPath()) ? importPath : null;
 					}
 				} else

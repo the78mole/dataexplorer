@@ -49,6 +49,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.data.AbstractRecord;
 import gde.data.AbstractRecordSet;
 import gde.data.Record;
@@ -632,7 +633,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		this.pickedVaults = new PickedVaults(pickedVaults);
 		{
 			String deviceSignature = this.device.getName() + GDE.STRING_UNDER_BAR + DataExplorer.application.getActiveChannelNumber();
-			this.template = HistoGraphicsTemplate.createGraphicsTemplate(deviceSignature, DataExplorer.application.getObjectKey());
+			this.template = HistoGraphicsTemplate.createGraphicsTemplate(deviceSignature, Settings.getInstance().getActiveObjectKey());
 			this.template.load();
 		}
 		this.visibleAndDisplayableRecords = new Vector<TrailRecord>();

@@ -194,7 +194,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		this.vaultDeviceKey = getActiveDeviceKey();
 		this.vaultDeviceName = application.getActiveDevice().getName();
 		this.vaultChannelNumber = application.getActiveChannelNumber();
-		this.vaultObjectKey = application.getObjectKey();
+		this.vaultObjectKey = Settings.getInstance().getActiveObjectKey();
 		this.vaultSamplingTimespanMs = settings.getSamplingTimespan_ms();
 
 		this.logLinkPath = GDE.STRING_EMPTY;

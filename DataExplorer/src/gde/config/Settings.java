@@ -1095,6 +1095,15 @@ public class Settings extends Properties {
 	}
 
 	/**
+	 * @return the active object key or empty if deviceoriented
+	 */
+	public String getActiveObjectKey() {
+		String[] objectKeys = this.getProperty(Settings.OBJECT_LIST, Messages.getString(MessageIds.GDE_MSGT0200)).split(GDE.STRING_SEMICOLON);
+		objectKeys[0] = "";
+		return objectKeys[getActiveObjectIndex()];
+	}
+
+	/**
 	 * @return the settingsFilePath
 	 */
 	public String getSettingsFilePath() {

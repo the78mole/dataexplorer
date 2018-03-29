@@ -247,7 +247,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 			File file = getTargetFilePath().toFile();
 			if (!file.exists()) {
 				log.log(FINE, "convert legacy default template as a replacement for ", file.getAbsolutePath());
-				LegacyGraphicsTemplate template = new LegacyGraphicsTemplate(deviceSignature, DataExplorer.getInstance().getObjectKey());
+				LegacyGraphicsTemplate template = new LegacyGraphicsTemplate(deviceSignature, Settings.getInstance().getActiveObjectKey());
 				Path histoTemplateFilePath = template.storeAsHistoTemplate();
 				file = histoTemplateFilePath.toFile();
 
@@ -259,7 +259,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 				boolean isHistoTemplate = keySet().stream().map(String.class::cast).anyMatch(k -> k.indexOf(GDE.STRING_UNDER_BAR + GDE.STRING_UNDER_BAR) >= 0);
 				if (!isHistoTemplate) {
 					log.log(FINE, "convert template identified as legacy template ", file.getAbsolutePath());
-					LegacyGraphicsTemplate template = new LegacyGraphicsTemplate(file, deviceSignature, DataExplorer.getInstance().getObjectKey());
+					LegacyGraphicsTemplate template = new LegacyGraphicsTemplate(file, deviceSignature, Settings.getInstance().getActiveObjectKey());
 					Path histoTemplateFilePath = template.storeAsHistoTemplate();
 					file = histoTemplateFilePath.toFile();
 
