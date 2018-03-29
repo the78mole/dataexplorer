@@ -199,7 +199,7 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 	 * @return the data tag which defines the access to the link path or file path
 	 */
 	public DataTag getSourcePathTag(int index) {
-		return this.get(DataTag.LINK_PATH).get(index).isEmpty() || !DataExplorer.getInstance().isObjectoriented() ? DataTag.FILE_PATH : DataTag.LINK_PATH;
+		return this.get(DataTag.LINK_PATH).get(index).isEmpty() || Settings.getInstance().getActiveObjectKey().isEmpty() ? DataTag.FILE_PATH : DataTag.LINK_PATH;
 	}
 
 	public List<String> getDataGpsLocations() {
