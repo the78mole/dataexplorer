@@ -51,6 +51,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.XMLConstants;
@@ -180,7 +181,7 @@ public class Settings extends Properties {
 	final static String							WARNING_COUNT_CSV								= "warning_count_csv";																																						//$NON-NLS-1$
 	final static String							WARNING_COUNT_INDEX							= "warning_count_index";																																					//$NON-NLS-1$
 	final static String							WARNING_LEVEL										= "warning_level";																																								//$NON-NLS-1$
-	final static String							IS_CANONICAL_QUANTILES					= "is_canonical_quantiles";																															//$NON-NLS-1$
+	final static String							IS_CANONICAL_QUANTILES					= "is_canonical_quantiles";																																				//$NON-NLS-1$
 	final static String							IS_SYMMETRIC_TOLERANCE_INTERVAL	= "is_symmetric_tolerance_interval";																															//$NON-NLS-1$
 	final static String							OUTLIER_TOLERANCE_SPREAD				= "outlier_tolerance_spread";																																			//$NON-NLS-1$
 	final static String							SUMMARY_SCALE_SPREAD						= "summary_scale_spread";																																					//$NON-NLS-1$
@@ -271,8 +272,8 @@ public class Settings extends Properties {
 	public static final String			HISTO_EXCLUSIONS_DIR_NAME				= ".gdeignore";																																										//$NON-NLS-1$
 	public static final String			GPS_LOCATIONS_DIR_NAME					= "Locations";																																										//$NON-NLS-1$
 	public static final String			GPS_API_URL											= "http://maps.googleapis.com/maps/api/geocode/xml?latlng=";																			//$NON-NLS-1$
-	public static final String			HISTO_INCLUSIONS_FILE_NAME			= ".gdeinclude";																																										//$NON-NLS-1$
-	public static final String			HISTO_INCLUSIONS_DIR_NAME				= ".gdeinclude";																																										//$NON-NLS-1$
+	public static final String			HISTO_INCLUSIONS_FILE_NAME			= ".gdeinclude";																																									//$NON-NLS-1$
+	public static final String			HISTO_INCLUSIONS_DIR_NAME				= ".gdeinclude";																																									//$NON-NLS-1$
 
 	private static double[]					SAMPLING_TIMESPANS							= new double[] { 10., 5., 1., .5, .1, .05, .001 };
 	private static String[]					WARNING_COUNT_VALUES						= new String[] { "2", "3", "5", "8" };
@@ -920,14 +921,14 @@ public class Settings extends Properties {
 		Set<String> result = new HashSet<String>();
 		ArrayList<Path> dirPaths = getSourcePaths();
 
-		final Set<String> actualObjects = getRealObjectKeys();
+		final Set<String> lowerCaseObjectKeys = getRealObjectKeys().map(String::toLowerCase).collect(Collectors.toSet());
 		for (Path dirPath : dirPaths) {
 			if (!(dirPath == null || dirPath.toString().isEmpty())) {
 				try {
 					final File filePath = dirPath.toFile();
 					for (File file : FileUtils.getDirectories(filePath)) {
-						if (!devices.containsKey(file.getName()) && !actualObjects.stream().filter(s -> s.equalsIgnoreCase(file.getName())).findFirst().isPresent()) {
-							if (!FileUtils.getFileListing(file, Integer.MAX_VALUE).isEmpty()) {
+						if (!devices.containsKey(file.getName()) && !lowerCaseObjectKeys.contains(file.getName().toLowerCase())) {
+							if (file.listFiles().length > 0) {
 								result.add(file.getName());
 							}
 						}
@@ -1017,14 +1018,13 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @return the cloned object keys without the deviceoriented entry
+	 * @return the object keys without the deviceoriented entry
 	 */
-	public Set<String> getRealObjectKeys() {
-		String[] objectKeys = this.getProperty(Settings.OBJECT_LIST, Messages.getString(MessageIds.GDE_MSGT0200)).split(GDE.STRING_SEMICOLON);
-		Set<String> objectList = new HashSet<>(Arrays.asList(objectKeys));
+	public Stream<String> getRealObjectKeys() {
+		Stream<String> objectKeys = Arrays.stream(this.getProperty(Settings.OBJECT_LIST, Messages.getString(MessageIds.GDE_MSGT0200)).split(GDE.STRING_SEMICOLON));
 		String deviceOriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
-		objectList.remove(deviceOriented);
-		return objectList;
+		// the first element is always the device oriented entry; remove also double entries which may appear after language change
+		return objectKeys.distinct().skip(1).filter(s -> !s.equals(deviceOriented));
 	}
 
 	public String getObjectListAsString() {
@@ -3057,7 +3057,6 @@ public class Settings extends Properties {
 		return Integer.valueOf(warningCountValues[realIndex]);
 	}
 
-
 	/**
 	 * @param uintValue the number of most recent logs which is analyzed for warnings
 	 */
@@ -3250,4 +3249,3 @@ public class Settings extends Properties {
 		return Boolean.valueOf(this.getProperty(Settings.IS_SOURCE_FILE_LISTENER_ACTIVE, "false"));
 	}
 }
-

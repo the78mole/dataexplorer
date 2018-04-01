@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -1806,7 +1807,7 @@ public class SettingsDialog extends Dialog {
 											Collections.sort(objectCandidates, String.CASE_INSENSITIVE_ORDER);
 											if (SWT.OK == SettingsDialog.this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI0069, new Object[] { objectCandidates.toString() }))) {
 												// build a new object list consisting from existing objects and new objects
-												Set<String> objectListClone = SettingsDialog.this.settings.getRealObjectKeys();
+												Set<String> objectListClone = SettingsDialog.this.settings.getRealObjectKeys().collect(Collectors.toSet());
 												if (objectListClone.addAll(objectCandidates)) {
 													// ensure that all objects owns a directory
 													for (String tmpObjectKey : objectCandidates) {
@@ -2510,7 +2511,7 @@ public class SettingsDialog extends Dialog {
 					Collections.sort(objLnkSearch.getObsoleteObjectKeys(), String.CASE_INSENSITIVE_ORDER);
 					String message = Messages.getString(MessageIds.GDE_MSGI0063, new Object[] { objLnkSearch.getObsoleteObjectKeys() });
 					if (SWT.YES == SettingsDialog.this.application.openYesNoMessageDialogSync(message)) {
-						Set<String> realObjectKeys= Settings.getInstance().getRealObjectKeys();
+						List<String> realObjectKeys= Settings.getInstance().getRealObjectKeys().collect(Collectors.toList());
 						for (String tmpObjectKey : objLnkSearch.getObsoleteObjectKeys()) {
 							Path objectKeyDirPath = Paths.get(SettingsDialog.this.settings.getDataFilePath()).resolve(tmpObjectKey);
 							FileUtils.deleteDirectory(objectKeyDirPath.toString());

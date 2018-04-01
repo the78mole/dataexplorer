@@ -131,13 +131,12 @@ public final class SupplementObjectFolder {
 	public static String resetFolders() {
 		String message = "";
 		Path objectsPath = getObjectsPath();
-		int initialSize_MiB = (int) FileUtils.size(objectsPath) / 1024 / 1024;
+		int initialSize_MiB = (int) (FileUtils.size(objectsPath) / 1024 / 1024);
 
 		try {
-			Set<String> realObjectKeys = Settings.getInstance().getRealObjectKeys();
-			log.log(Level.FINE, "numberOfObjectKeys=", realObjectKeys.size());
+			Stream<String> realObjectKeys = Settings.getInstance().getRealObjectKeys();
 
-			Stream<Path> stream = DirectoryScanner.defineObjectPathsSilently(objectsPath, realObjectKeys.stream());
+			Stream<Path> stream = DirectoryScanner.defineObjectPathsSilently(objectsPath, realObjectKeys);
 			StringBuilder sb = new StringBuilder("  in ").append(objectsPath.toString()).append(GDE.STRING_BLANK_COLON_BLANK);
 			int[] i = new int[] { 0 };
 			stream.sorted(Comparator.reverseOrder()).forEach(p -> { // take the deeply nested folders first due to recursive delete
@@ -150,7 +149,7 @@ public final class SupplementObjectFolder {
 				}
 			});
 
-			int deletedSize_MiB = (int) FileUtils.size(objectsPath) / 1024 / 1024;
+			int deletedSize_MiB = (int) (FileUtils.size(objectsPath) / 1024 / 1024);
 			message = Messages.getString(MessageIds.GDE_MSGT0924, new Object[] { initialSize_MiB, deletedSize_MiB, sb.toString() });
 			log.log(Level.FINE, message);
 		} catch (Exception e) {
@@ -172,8 +171,8 @@ public final class SupplementObjectFolder {
 			long freeSpacePriorCopy_MiB) {
 		// todo check if using a property file is a better solution
 		long fileCounterPostCopy; // this figure might cost a lot of elapsed time: decide if better to remove entirely
-		try {
-			fileCounterPostCopy = Files.list(targetDir).count();
+		try (Stream<Path> stream = Files.list(targetDir)) {
+			fileCounterPostCopy = stream.count();
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			return;
@@ -240,7 +239,7 @@ public final class SupplementObjectFolder {
 
 		List<Path> result = new ArrayList<Path>();
 		try {
-			result = DirectoryScanner.defineObjectPathsSilently(externalBaseDir, Settings.getInstance().getRealObjectKeys().stream()) //
+			result = DirectoryScanner.defineObjectPathsSilently(externalBaseDir, Settings.getInstance().getRealObjectKeys()) //
 					.collect(Collectors.toList());
 			for (Path path : result) {
 				log.log(Level.FINER, "sourcePath=", path);
@@ -266,7 +265,9 @@ public final class SupplementObjectFolder {
 		final long fileCounterPriorCopy;
 		final long freeSpacePriorCopy_MiB = targetDir.getRoot().toFile().getFreeSpace() / 1024 / 1024;
 		if (targetDir.toFile().exists()) {
-			fileCounterPriorCopy = Files.list(targetDir).count();
+			try (Stream<Path> stream = Files.list(targetDir)) {
+				fileCounterPriorCopy = stream.count();
+			}
 		} else {
 			fileCounterPriorCopy = -1;
 		}
@@ -310,8 +311,10 @@ public final class SupplementObjectFolder {
 				if (copyCounter > 0) {
 					writeReportFile(srcDir, targetDir, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime + 500000), fileCounterPriorCopy, copyCounter, freeSpacePriorCopy_MiB);
 				} else if (fileCounterPriorCopy > 0) { // this is folder with previously copied files
-					boolean anyFiles = Files.list(targetDir).anyMatch(p -> !p.toFile().isDirectory());
-					if (anyFiles) appendReportFile(targetDir);
+					try (Stream<Path> stream = Files.list(targetDir)) {
+						boolean anyFiles = stream.anyMatch(p -> !p.toFile().isDirectory());
+						if (anyFiles) appendReportFile(targetDir);
+					}
 				}
 			}
 		}

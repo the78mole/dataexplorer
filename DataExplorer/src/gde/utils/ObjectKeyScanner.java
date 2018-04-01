@@ -21,7 +21,6 @@ package gde.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -234,7 +234,7 @@ public class ObjectKeyScanner extends Thread {
 					}
 				}
 				if (this.addToExistentKeys) {
-					Set<String> newObjectList = Settings.getInstance().getRealObjectKeys();
+					Set<String> newObjectList = Settings.getInstance().getRealObjectKeys().collect(Collectors.toSet());
 					if (newObjectList.addAll(this.objectKeys) || !newObjectList.equals(new HashSet<>(this.objectKeys))) {
 						this.application.setObjectList(newObjectList.toArray(new String[0]), this.settings.getActiveObject());
 						log.log(Level.FINE, "object list updated: ", newObjectList); //$NON-NLS-1$
@@ -260,7 +260,7 @@ public class ObjectKeyScanner extends Thread {
 	 */
 	private List<String> getObsoleteObjectKeys(File rootDirectory) throws FileNotFoundException {
 		// get current object key list as a basis for determining the obsolete object keys
-		List<String> resultObjectKeys = new ArrayList<>(this.settings.getRealObjectKeys());
+		List<String> resultObjectKeys = this.settings.getRealObjectKeys().collect(Collectors.toList());
 		Map<String, DeviceConfiguration> devices = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
 		resultObjectKeys.removeAll(this.settings.getObjectKeyNovelties(devices));
 

@@ -78,7 +78,7 @@ public class SourceDataSetExplorer {
 		// use criteria independent from UI for JUnit (replace isObjectoriented)
 		final String				activeObjectKey					= Settings.getInstance().getActiveObjectKey();
 		final boolean				filesWithOtherObject		= Settings.getInstance().getFilesWithOtherObject();
-		final List<String>	realObjectKeys					= Settings.getInstance().getRealObjectKeys().stream().collect(Collectors.toList());
+		final Set<String>		realObjectKeys					= Settings.getInstance().getRealObjectKeys().collect(Collectors.toSet());
 
 		@Override
 		public String toString() {
