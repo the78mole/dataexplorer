@@ -9,7 +9,7 @@
 <booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
 <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.sun.tools.xjc.XJCFacade"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="&quot;/home/winfried/workspaces/gnu/DataExplorer/src/resource/DeviceProperties_V31.xsd&quot; &#13;&#10;-d &quot;/home/winfried/workspaces/gnu/JAXB Generator/generated&quot; &#13;&#10;-p gde.device"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="&quot;/home/winfried/workspaces/gnu/DataExplorer/src/resource/DeviceProperties_V31.xsd&quot; &#13;&#10;-d &quot;/home/winfried/workspaces/gnu/JAXB Generator/generated&quot; &#13;&#10;-p gde.histo.cache"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="JAXB Generator"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DJAXB_HOME=&quot;/home/winfried/workspaces/gnu/JAXB Generator/jaxb-ri-20070917&quot;"/>
 </launchConfiguration>
