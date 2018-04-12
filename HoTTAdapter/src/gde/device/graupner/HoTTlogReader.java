@@ -430,7 +430,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		//pointsVarioMax = DataParser.parse2Short(buf1, 30) * 1000;
 		//pointsVarioMin = DataParser.parse2Short(buf1, 32) * 1000;
 		values[2] = (DataParser.parse2UnsignedShort(_buf, 34) - 30000) * 10;
-		HoTTbinReader.tmpClimb10 = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf , 38) - 30000) * 10 : DataParser.parse2UnsignedShort(_buf , 38) + 1000;
+		HoTTbinReader.tmpClimb10 = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf , 38) - 30000) * 10 : DataParser.parse2UnsignedShort(_buf , 38) * 1000;
 		values[3] = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf, 36) - 30000) * 10 : DataParser.parse2UnsignedShort(_buf, 36) * 1000;
 		values[4] = HoTTbinReader.tmpClimb10;
 		values[5] = (_buf[13] & 0xFF) * 1000;				//voltageRx
