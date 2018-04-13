@@ -493,6 +493,12 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 				HoTTlogReaderD.points[j+8] = valuesVario[j+1];
 			}
 			HoTTlogReaderD.points[128] = valuesVario[7]; //128=EventVario
+
+			//special test data of FBL receivers
+			//96=Test 00, 97=Test 01, 98=Test 02, ... , 108=Test 12
+			for (int j = 0; j < 13; j++) {
+				HoTTlogReaderD.points[j + 96] = valuesVario[j + 8];
+			}
 		}
 		//in 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature1, 
 		//in 7=Temperature2, 8=Voltage_min, 9=Current_max, 10=Revolution_max, 11=Temperature1_max, 12=Temperature2_max 13=Event
