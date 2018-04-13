@@ -35,6 +35,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,7 +61,10 @@ import org.w3c.dom.NodeList;
  */
 public class TelemetryData {
 	static Logger												log							= Logger.getLogger(TelemetryData.class.getName());
-
+  static final Charset WINDOWS_1250 = Charset.forName("Windows-1250");
+  static final Charset UTF_8 = Charset.forName("UTF-8");
+  static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
+  
 	/** Typ dat - 8 bitu */
 	public static final int							T_DATA8					= 0;
 	/** Typ dat - 16 bitu */
@@ -839,7 +844,7 @@ public class TelemetryData {
 			// Open the file that is the first
 			// command line parameter
 			FileInputStream fis = new FileInputStream(file);
-			InputStreamReader in = new InputStreamReader(fis, "windows-1250"); //$NON-NLS-1$
+			InputStreamReader in = new InputStreamReader(fis, "ISO-8859-1"); //$NON-NLS-1$
 
 			long inputFileSize = new File(file).length();
 			int progressLineLength = 0;
@@ -872,7 +877,7 @@ public class TelemetryData {
 					}
 				}
 
-				String arr[] = strLine.split(";"); //$NON-NLS-1$
+				String arr[] = strLine.replace("|", ";").split(";"); //$NON-NLS-1$
 				if (arr != null && arr.length > 0) {
 					parseLineParams(arr);
 				}
@@ -944,7 +949,13 @@ public class TelemetryData {
 				state = ST_DEVICE_ID;
 				break;
 			case ST_DEVICE_ID:
-				deviceId = Long.parseLong(param);
+				//device id sometimes ;42020    1; LiVa or | 0   0| Alarm: Cap..
+				try {
+					deviceId = Long.parseLong(!(param.startsWith(" ") && param.endsWith("0"))  ? param.replace(' ', '0') : param);
+				}
+				catch (NumberFormatException e) {
+					log.log(Level.WARNING, "skip | param = " + param);
+				}
 				state = ST_PARAM_NUM;
 				break;
 			case ST_PARAM_NUM:
@@ -994,7 +1005,8 @@ public class TelemetryData {
 				catch (NumberFormatException e) {
 					if (param.length() > 3 && this.startTimeStamp > 0) {
 						// String value, for instance an alarm
-						String message = TimeLine.getFomatedTimeWithUnit(timestamp) + " - " + param;
+						String utf8String = new String(param.getBytes(ISO_8859_1));
+						String message = TimeLine.getFomatedTimeWithUnit(timestamp) + " - " + utf8String;
 						TelemetryData.log.log(Level.WARNING, message);
 						if (DataExplorer.getInstance().getStatusBar() != null) DataExplorer.getInstance().setStatusMessage(message, SWT.COLOR_RED);
 						// Alarm:  Capacity
@@ -1005,7 +1017,7 @@ public class TelemetryData {
 							sensor = new TelemetrySensor(deviceId, label);
 							this.data.add(sensor);
 						}
-						label = param;
+						label = utf8String;
 						paramId = getParameterIdByName(sensor, label);
 						dataType = TelemetryData.T_DATA8;
 						if (TelemetryData.log.isLoggable(Level.FINE))
