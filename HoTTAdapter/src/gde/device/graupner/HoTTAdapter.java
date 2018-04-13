@@ -18,15 +18,12 @@
 ****************************************************************************************/
 package gde.device.graupner;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1649,24 +1646,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public CTabItem getMdlTabItem() {
 		Object inst = null;
 		try {
-			// loading MDLViewer running into trouble since it fails copying Arial.ttf
-			final File fontFile = new File(System.getProperty("java.io.tmpdir"), "Arial.ttf"); //$NON-NLS-1$ //$NON-NLS-2$
-			InputStream is = getClass().getResourceAsStream("/Arial.ttf");
-			try {
-				if (!fontFile.exists() || fontFile.length() == 0) 
-					Files.copy(is, fontFile.getAbsoluteFile().toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-			} catch (final IOException e) {
-				throw new RuntimeException(e);
-			} finally {
-				try {
-					if (is != null) {
-						is.close();
-					}
-				} catch (IOException ioe) {
-					System.out.println("Error while closing stream: " + ioe);
-				}
-			}
-
 			String className = "de.treichels.hott.mdlviewer.swt.MdlTabItem";//$NON-NLS-1$
 			HoTTAdapter.log.log(java.util.logging.Level.OFF, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
