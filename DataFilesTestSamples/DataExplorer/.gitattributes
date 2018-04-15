@@ -1,0 +1,6 @@
+**/*.csv binary
+**/*.CSV binary
+**/*.txt binary
+**/*.nmea binary
+**/*.dat binary
+**/*.DAT binary
