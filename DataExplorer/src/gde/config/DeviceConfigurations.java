@@ -35,7 +35,6 @@ import org.xml.sax.SAXParseException;
 
 import gde.GDE;
 import gde.device.DeviceConfiguration;
-import gde.histo.recordings.TrailRecordSet;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -47,7 +46,7 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public final class DeviceConfigurations {
-	private static final String													$CLASS_NAME									= TrailRecordSet.class.getName();
+	private static final String													$CLASS_NAME									= DeviceConfigurations.class.getName();
 	private static final Logger													log													= Logger.getLogger($CLASS_NAME);
 
 	private final Settings															settings										= Settings.getInstance();
@@ -64,15 +63,6 @@ public final class DeviceConfigurations {
 	public DeviceConfigurations(String[] files, String activeDeviceName) {
 		Objects.requireNonNull(activeDeviceName);
 		Objects.requireNonNull(files);
-
-		// wait until schema is setup
-		while (this.settings.isXsdThreadAlive()) {
-			try {
-				Thread.sleep(5);
-			} catch (InterruptedException e) {
-				// ignore
-			}
-		}
 
 		this.configs = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
 		this.activeDevices = new Vector<String>(2, 1);
