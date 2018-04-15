@@ -1,5 +1,5 @@
 Zeit [s];RSSI [dB];Spannung [V];Strom [A];Kapazitaet [Ah];Energie [Wh]
-#0.0:Modellname:LOGO_550 Akku:6S 5.00Ah TXE Version 3.1 Anzahl Fluege:3 Betriebsstunden:1:05:57 
+#0.0:Modellname:LOGO_550 Akku:6S 5.00Ah TXE Version 3.1 Anzahl Fluege:3 Betriebsstunden:1:05:57
 0.1;-1;25.1;0.1;0.00;0.01
 1.1;0;25.1;0.1;0.00;0.01
 2.1;-1;25.1;0.1;0.00;0.02

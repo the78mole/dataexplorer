@@ -1,6 +1,6 @@
 Temps [s];RSSI [dB];Tension [V];Courant [A];Capacite [Ah];Energie [Wh];Element 1 [V];Element 2 [V];Element 3 [V];Element 4 [V];Element 5 [V];Element 6 [V];Element 7 [V];Element 8 [V];Element 9 [V];Element 10 [V];Element 11 [V];Element 12 [V];BM2 Tension 1 [V];Temp. 1 Mot   [*C];Temp. 2 Amb   [*C];Temp. 3 Bat   [*C];Temp. 4 Reg   [*C]
 #Version 2.01
-#0.0:Nom du modele:YAK_____ Batterie:12S 5.20Ah TXE Version 3.3 Nombre de vols:66 Heures d'operation :9:22:47 
+#0.0:Nom du modele:YAK_____ Batterie:12S 5.20Ah TXE Version 3.3 Nombre de vols:66 Heures d'operation :9:22:47
 0.0;-8;50.2;0.3;0.00;0.02;4.17;4.18;4.21;4.21;4.21;4.21;4.19;4.20;4.19;4.21;4.19;4.20;7.96;21;20;21;23
 1.0;-9;50.2;0.3;0.00;0.02;4.17;4.18;4.21;4.21;4.20;4.21;4.19;4.20;4.19;4.21;4.19;4.21;7.96;21;20;21;23
 2.0;-9;50.2;0.3;0.00;0.08;4.17;4.18;4.21;4.21;4.21;4.21;4.19;4.19;4.19;4.21;4.19;4.20;7.96;21;20;21;23
