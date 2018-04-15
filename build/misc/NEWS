@@ -9,6 +9,7 @@ GNU DataExplorer - News - comes with version 3.3.2 - 15 Apr 2018
 	* fix parsing error with values coming with comma as separator to decimal places
 	* fix setting of time grid building new template
 	* fix circular UI update calls
+	* fix/tolerate Jeti new alarm protocol 
 	* enhance context menu texts (graphics / data table tabs)
 	* update MDLViewer plug-in to 9.3
 
@@ -39,6 +40,7 @@ GNU DataExplorer - News - comes with version 3.3.2 - 15 Apr 2018
 	* korrigiert Interpretation innerhalb von CSV-Dateien, wobei die Zahlen und Dezimalstellen durch Komma getrennt sind
 	* korrigiert setzen des Zeit-Grids beim Erstellen neuer Templates
 	* korrigiert zirkulare aufrufe von Oberflächen-Update-Aufrufen
+	* korrigiert/toleriert neues Jeti Alarmprotokoll in Log-Dateien
 	* Verbesserung des Kontext-Menüs Grafik/Datentabelle
 	* Update des MDLViewer Plug-ins auf 9.3
 	

@@ -11,6 +11,7 @@ Version 3.3.2 - 15 Apr 2018
 * fix parsing error with values coming with comma as separator to decimal places
 * fix setting of time grid building new template
 * fix circular UI update calls
+* fix/tolerate Jeti new alarm protocol 
 * context menu texts (graphics / data table tabs)
 * add initial support for Junsi iCharger 106B
 * add initial support for ELV WDE (Wetter-Daten-Empfänger)
