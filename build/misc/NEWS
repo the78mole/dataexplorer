@@ -1,42 +1,62 @@
-GNU DataExplorer - News - comes with version 3.3.1 - 17 Oct 2017
+GNU DataExplorer - News - comes with version 3.3.2 - 15 Apr 2018
 
 1) general corrections
-	* fix retrieving working state from XML (iCharger and others) 
-	* fix NullPointerException while KMZ export having a not completely initialized object
-	* fix object initialization using wrong object key
-	* fix serial connected iCharger live gatherer tolerating timeouts
-	* fix object update problem while removing objects
-	* fix GraphicsTemplate save problems
-	* reduce graphical display changes to force unsaved hint
-	* remove LogView files to be written as CSV export during junit test
-	* enhance Windows port enumeration for BT serial ports (enumeration falls back while BT switched on)
-2) HoTTAdapter*
-	* fix HoTTAdapter* GAM capacity filter null value
-	* add missing measurements (GAM,EAM) and events(preliminary use inverse bits)
-	* add inverse bit events and warning
-	* add initial support for new log data format (*.log)
-3) Pulsar3
-	* add initial support import of *.acp, live-data, import of LogView files
-4) Devo-Telemetry
-	* add initial support CSV import converted binary log data files
+	* fix illegal formatting option in ParameterControl used for Graupner UDP charger
+	* fix HoTTAdapter wrong data block number detection
+	* fix empty template file name if user cancels loading a template
+	* fix some issues when adding / editing object keys
+	* fix wrong interpretation and display of geo-coordinates received as degree with decimal digits
+	* fix parsing error with values coming with comma as separator to decimal places
+	* fix setting of time grid building new template
+	* fix circular UI update calls
+	* enhance context menu texts (graphics / data table tabs)
+	* update MDLViewer plug-in to 9.3
+
+2) added functionality
+	* add initial support for Junsi iCharger 106B
+	* add initial support for ELV WDE (Wetter-Daten-Empfänger)
+	* add initial support for a generic CSV import (using Tesla Battery sample CSV file as source)
+	* add initial support for Graupner GeniusWizard log files
+
+3) history analysis
+	* New summary chart in the history graphics window
+	* Enhance graphics template support
+	* Enhance graphics chart
+	* New remote log file access
+	* Fix table issues
+	* Enhance UI
+	* Fix processing issues
+	* New columns for settlement values in the data table tab (optional)
+	* Enhance performance
+	* Enhance coding
 
 1) allgemeine Korrekturen
-	* korrigiert Abfrage des Arbeitsstatus spezifiziert in XML (iCharger,....) 
-	* korrigiert NullPointerException beim KMZ Export und nicht komplett initialisiertem Objekt
-	* korrigiert Objekt-Initialisierung mit Verwendung von falschem Objektschlüssel
-	* korrigiert seriell angeschlossener iCharger Live-Datensammler toleriert jetzt Timeouts
-	* korrigiert Objekt-Aktualisierung beim Entfernen von Objekten
-	* korrigiert Grafikvorlage Sicherungsproblem
-	* Reduzierung von grafischen Anzeige-Änderungen, die eine Sicherungsnachfrage auslösen
-	* entferne LogView Dateien als CSV-Export während des Junis-Testlauf
-	* verbessert Auflistung von seriellen Ports unter Windows für Bluetooth virtuellen seriellen Ports
-2) HoTTAdapter*
-	* korrigiert HoTTAdapter* GAM Kapazitätsfilter mit Nullwerten
-	* fehlende Messwerte (GAM,EAM) Auswertung hinzugefügt
-	* Alarm-und Ereignis-Auswertung hinzugefügt
-	* initiale Unterstützung für neues Logdatenformat (*.log) hinzugefügt
-3) Pulsar3
-	* initiale Unterstützung für Import *.acp, Live-Aufnahme, Import LogView-Dateien
-4) Devo-Telemetry
-	* initiale Unterstützung für Import von CSV-Dateien nach Konvertierung der binären Logdaten
+	* korrigiert ungültige Formatierung beim ParameterControl verwendet Graupner UDP Ladegerät
+	* korrigiert falsche Datenblock-Nummernerkennung HoTTAdapter
+	* korrigiert leerer TemplateName wenn der Nutzer das Laden abbricht
+	* korrigiert hinzufügen/verändern von Objektschlüsseln
+	* korrigiert falsche Anzeige und Interpretation von Geo-Koordinaten mit Grad und Dezimalstellen
+	* korrigiert Interpretation innerhalb von CSV-Dateien, wobei die Zahlen und Dezimalstellen durch Komma getrennt sind
+	* korrigiert setzen des Zeit-Grids beim Erstellen neuer Templates
+	* korrigiert zirkulare aufrufe von Oberflächen-Update-Aufrufen
+	* Verbesserung des Kontext-Menüs Grafik/Datentabelle
+	* Update des MDLViewer Plug-ins auf 9.3
+	
+2) hinzugefügte Funktionalität
+	* initiale Unterstützung vom Junsi iCharger 106B
+	* initiale Unterstützung ELV WDE (Wetter-Daten-Empfänger)
+	* initiale Unterstützung generischen CSV-Import (Tesla Batterieprotokoll als Beispiel CSV-Datei)
+	* initiale Unterstützung der Graupner GeniusWizard Log-Dateien
+
+3) Historien-Analyse
+	* neues Überblick-Diagramm im Historien Grafik-Fenster
+	* verbesserte Grafik-Template Unterstützung
+	* verbessertes Grafik-Diagramm
+	* neuer Dateizugriff auf entfernte Dateien über Supplementary Ordner
+	* korrigierte Tabelleneinträge (Zeitstempel, GPS-Position, Ordnerpfad)
+	* verbessertes Aussehen/Anwendung (Objektschlüssel, Tool-Tips, Tastenkürzel, neue Menüeinträge,..)
+	* Prozess-Fehler beseitigt 
+	* Neue Spalte für berechnete Werte
+	* verbesserte Geschwindigkeit der Historienauswertung
+	* verbesserte Codierung
 	
