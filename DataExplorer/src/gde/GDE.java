@@ -367,9 +367,22 @@ public class GDE {
 	static final String											JAVA_EXT_DIR											= "java/ext/";																																																							//$NON-NLS-1$
 
 	public final static Map<String, String>	deviceMap													= new HashMap<String, String>();
+
+	private static Thread										settingsThread;
+
 	static { // initialize device mapping to enable opening files saved on android app
 		GDE.initLogger();
 		log.log(Level.INFO, "initLogger  done ");
+
+		GDE.settingsThread = new Thread("Settings async") {
+			@Override
+			public void run() {
+				log.log(Level.INFO, "Settings.getInstance  start");
+				Settings.getInstance();
+				log.log(Level.INFO, "Settings.getInstance  done ");
+			}
+		};
+		GDE.settingsThread.start();
 
 		GDE.deviceMap.put("HoTTViewerAdapter", "HoTTViewer"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("HoTTAdapter3", "HoTTAdapter2"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -390,9 +403,7 @@ public class GDE {
 		try {
 			Display.setAppName(GDE.NAME_LONG);
 			Display.setAppVersion(GDE.VERSION);
-			GDE.WIDGET_FONT_SIZE = (int) ((GDE.IS_LINUX ? 8 : 9) * Settings.getInstance().getFontDisplayDensityAdaptionFactor() * 96 / Display.getDefault().getDPI().y);
 
-			Settings.getInstance();
 			//DeviceData	data = new DeviceData();
 			//data.tracking = true;
 			GDE.display = Display.getDefault();
@@ -406,6 +417,11 @@ public class GDE {
 
 			//build the main thread context classloader to enable dynamic plugin class loading
 			Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
+
+			log.log(Level.OFF, "settingsThread.join() wait ");
+			GDE.settingsThread.join();
+
+			GDE.WIDGET_FONT_SIZE = (int) ((GDE.IS_LINUX ? 8 : 9) * Settings.getInstance().getFontDisplayDensityAdaptionFactor() * 96 / Display.getDefault().getDPI().y);
 
 			GDE.MOD1 = new String[] { GDE.IS_MAC ? "\u00E6" : Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Strg" : "Ctrl" }; //$NON-NLS-1$ //$NON-NLS-2$
 			GDE.MOD2 = new String[] { Settings.getInstance().getLocale().equals(Locale.GERMAN) ? "Umschalt" : "Shift" }; //$NON-NLS-1$ //$NON-NLS-2$
