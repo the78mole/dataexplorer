@@ -226,12 +226,12 @@ public final class SummaryComposite extends AbstractChartComposite {
 			return remainingAccessCounter > 0 ? this.toolTip : GDE.STRING_EMPTY;
 		}
 
-		private boolean isAvailable() {
+		private boolean isExpired() {
 			if (remainingAccessCounter > 0) {
-				boolean isSameChart = device.equals(application1.getActiveDevice()) && channel.equals(application1.getActiveChannel()) && object.equals(application1.getActiveObject());
-				return isSameChart;
+				boolean isOtherChart = !device.equals(application1.getActiveDevice()) || !channel.equals(application1.getActiveChannel()) || !object.equals(application1.getActiveObject());
+				return isOtherChart;
 			} else
-				return false;
+				return true;
 		}
 
 		@Override
@@ -682,13 +682,13 @@ public final class SummaryComposite extends AbstractChartComposite {
 	protected void setRecordSetCommentStandard() {
 		this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		if (retrieveTrailRecordSet().isSmartStatistics()) {
-			if (volatileComment == null || !volatileComment.isAvailable()) {
+			if (volatileComment == null || volatileComment.isExpired()) {
 				this.recordSetComment.setText(windowActor.getHistoSet().getDirectoryScanStatistics());
 				this.recordSetComment.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0896));
 			} else {
 				this.recordSetComment.setText(volatileComment.getTextLines());
 				this.recordSetComment.setToolTipText(volatileComment.getToolTip());
-				if (!volatileComment.isAvailable()) volatileComment = null; // heap gc
+				if (volatileComment.isExpired()) volatileComment = null; // heap gc
 			}
 		} else {
 			this.recordSetComment.setText("supported for smart statistics only");

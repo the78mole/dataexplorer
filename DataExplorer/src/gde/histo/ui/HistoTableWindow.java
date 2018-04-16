@@ -447,7 +447,7 @@ public class HistoTableWindow extends CTabItem {
 		for (TableColumn tableColumn : this.dataTable.getColumns()) {
 			tableColumn.dispose();
 		}
-		setRowCount(0); // ET required for Listener firing on setRowCount(xyz)
+		this.dataTable.setItemCount(0); // ET required for Listener firing on setRowCount(xyz)
 
 		String recordTitle = Messages.getString(MessageIds.GDE_MSGT0749);
 		TableColumn recordsColumn = new TableColumn(this.dataTable, SWT.CENTER);
@@ -486,6 +486,7 @@ public class HistoTableWindow extends CTabItem {
 	 * @param count of visible (!) record entries
 	 */
 	public void setRowCount(int count) {
+		DataExplorer.getInstance().getPresentHistoExplorer().paintVolatileStatusMessage();
 		this.dataTable.setItemCount(count);
 	}
 

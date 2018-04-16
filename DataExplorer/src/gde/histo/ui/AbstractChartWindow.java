@@ -122,14 +122,19 @@ public abstract class AbstractChartWindow extends CTabItem {
 			});
 		}
 
+		/**
+		 * Set the message if it complies with message priorities.
+		 */
 		void setStatusMessage(String message) {
-			String tmpMessage = new String(message);
-			if (message.isEmpty() && !measure.isPresent()) {
-				if (getTrailRecordSet() != null) {
-					tmpMessage = getTrailRecordSet().getTemplate().getFilePathMessage();
-				}
+			if (message.isEmpty() && !measure.isPresent() && getTrailRecordSet() != null && !getTrailRecordSet().getTemplate().getFilePathMessage().isEmpty()) {
+				// prioritize template data
+				DataExplorer.getInstance().setStatusMessage(getTrailRecordSet().getTemplate().getFilePathMessage());
+			} else if (!message.isEmpty() && measure.isPresent()) {
+				// prioritize measure data
+				DataExplorer.getInstance().setStatusMessage(message);
+			} else if (DataExplorer.getInstance().getPresentHistoExplorer().getVolatileStatusMessage() == null) {
+				DataExplorer.getInstance().setStatusMessage(message);
 			}
-			DataExplorer.getInstance().setStatusMessage(tmpMessage);
 		}
 
 		/**
@@ -185,7 +190,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 		void setTemplateChart() {
 			AbstractChartWindow.this.setTemplateChart();
 		}
-}
+	}
 
 	protected static ImageData flipHorizontal(ImageData inputImageData) {
 		int bytesPerPixel = inputImageData.bytesPerLine / inputImageData.width;

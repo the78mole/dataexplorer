@@ -501,6 +501,8 @@ public class DataExplorer extends Composite {
 
 		// cleanup out dated resources
 		FileUtils.cleanupPost();
+
+		this.histoExplorer.ifPresent(HistoExplorer::cleanup);
 	}
 
 	/**
@@ -1148,15 +1150,17 @@ public class DataExplorer extends Composite {
 	}
 
 	public void setStatusMessage(final String message, final int swtColor) {
-		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
-			this.statusBar.setMessage(message, swtColor);
-		} else {
-			GDE.display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					DataExplorer.this.statusBar.setMessage(message, swtColor);
-				}
-			});
+		if (this.statusBar != null) {
+			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+				this.statusBar.setMessage(message, swtColor);
+			} else {
+				GDE.display.asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						DataExplorer.this.statusBar.setMessage(message, swtColor);
+					}
+				});
+			}
 		}
 	}
 

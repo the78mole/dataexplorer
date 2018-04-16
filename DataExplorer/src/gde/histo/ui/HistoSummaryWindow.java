@@ -154,6 +154,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 				c.doRedrawGraphics();
 				c.updateCaptions();
 			}
+			DataExplorer.getInstance().getPresentHistoExplorer().paintVolatileStatusMessage();
 		} else {
 			GDE.display.asyncExec(new Runnable() {
 				@Override
@@ -166,6 +167,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 						c.doRedrawGraphics();
 						c.updateCaptions();
 					}
+					DataExplorer.getInstance().getPresentHistoExplorer().paintVolatileStatusMessage();
 				}
 			});
 		}

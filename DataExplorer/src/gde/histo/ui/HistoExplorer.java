@@ -37,6 +37,7 @@ import org.eclipse.swt.graphics.Image;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.histo.datasources.DirectoryScanner;
 import gde.histo.datasources.HistoSet;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.datasources.SupplementObjectFolder;
@@ -52,17 +53,20 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert (USER)
  */
 public class HistoExplorer {
-	static final String								$CLASS_NAME		= HistoExplorer.class.getName();
-	static final Logger								log						= Logger.getLogger($CLASS_NAME);
+	static final String								$CLASS_NAME							= HistoExplorer.class.getName();
+	static final Logger								log											= Logger.getLogger($CLASS_NAME);
 
-	private final DataExplorer				application		= DataExplorer.getInstance();
-	private final Settings						settings			= Settings.getInstance();
+	private final static int					VOLATILE_STATUS_CYCLES	= 3;														// number of redraws
+
+	private final DataExplorer				application							= DataExplorer.getInstance();
+	private final Settings						settings								= Settings.getInstance();
 
 	private final CTabFolder					displayTab;
 	private final HistoSet						histoSet;
 
-	private List<AbstractChartWindow>	chartTabItems	= new ArrayList<>();
-	private List<HistoTableWindow>		tableTabItems	= new ArrayList<>();
+	private VolatileStatusMessage			volatileStatusMessage		= null;
+	private List<AbstractChartWindow>	chartTabItems						= new ArrayList<>();
+	private List<HistoTableWindow>		tableTabItems						= new ArrayList<>();
 
 	public HistoExplorer(CTabFolder displayTab) {
 		this.displayTab = displayTab;
@@ -97,6 +101,8 @@ public class HistoExplorer {
 			tableWindow.dispose();
 		}
 		tableTabItems.clear();
+
+		cleanup();
 	}
 
 	/**
@@ -104,12 +110,14 @@ public class HistoExplorer {
 	 * Does nothing if the histoActive setting is false.
 	 */
 	public synchronized void resetHisto() {
+		DirectoryScanner.closeWatchDir();
 		SupplementObjectFolder.checkAndCreate();
 		SupplementObjectFolder.updateLogMirror();
 
 		for (AbstractChartWindow c : chartTabItems) {
 			resetWindowHeaderAndMeasuring(c);
 		}
+		volatileStatusMessage = null;
 		histoSet.initialize();
 		updateHistoTabs(RebuildStep.A_HISTOSET, true);
 	}
@@ -442,4 +450,41 @@ public class HistoExplorer {
 		}
 	}
 
+	public void cleanup() {
+		DirectoryScanner.closeWatchDir();
+	}
+
+	/**
+	 * The message has higher priority than standard status messages.
+	 * It is used for the next {@value #VOLATILE_STATUS_CYCLES} redraws.
+	 */
+	public void setVolatileStatusMessage(String message, int swtColor) {
+		if (volatileStatusMessage == null || !volatileStatusMessage.isIdentical(message, swtColor)) {
+			volatileStatusMessage = new VolatileStatusMessage(message, swtColor, VOLATILE_STATUS_CYCLES);
+			if (isHistoWindowVisible()) DataExplorer.getInstance().setStatusMessage(volatileStatusMessage.getTextLine(), volatileStatusMessage.getColor());
+		}
+	}
+
+	public VolatileStatusMessage getVolatileStatusMessage() {
+		return this.volatileStatusMessage;
+	}
+
+	/**
+	 * Use this at redraw to put a potential volatile message into the status line.
+	 */
+	public void paintVolatileStatusMessage() {
+		if (volatileStatusMessage != null && !volatileStatusMessage.isExpired()) {
+			String consumedTextLine = volatileStatusMessage.getTextLine();
+			DataExplorer.getInstance().setStatusMessage(consumedTextLine, volatileStatusMessage.getColor());
+			if (volatileStatusMessage.isExpired()) {
+				volatileStatusMessage = null; // heap garbage collection
+				if (isHistoTableWindowVisible()) {
+					// the table window does not paint or reset the status message
+					DataExplorer.getInstance().setStatusMessage("");
+				}
+			} else {
+				DataExplorer.getInstance().setStatusMessage(consumedTextLine, volatileStatusMessage.getColor());
+			}
+		}
+	}
 }
