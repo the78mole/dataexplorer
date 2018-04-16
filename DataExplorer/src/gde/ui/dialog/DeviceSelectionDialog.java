@@ -158,13 +158,13 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 		try {
 			File file = new File(this.settings.getDevicesPath());
-			if (!file.exists()) throw new FileNotFoundException(this.settings.getDevicesPath());
-			String[] files = file.list();
+			if (!file.exists()) throw new FileNotFoundException(this.settings.getDevicesPath()); // todo replace throw/catch with simple if
 
-			this.deviceConfigurations = new DeviceConfigurations(files, this.activeDeviceName);
+			this.deviceConfigurations = this.application.getDeviceConfigurations();
 			this.activeDevices = this.deviceConfigurations.getActiveDevices();
 			this.selectedActiveDeviceConfig = this.deviceConfigurations.getSelectedActiveDeviceConfig();
 			if (this.selectedActiveDeviceConfig == null) this.application.setActiveDevice(null);
+			log.log(Level.OFF, "DeviceSelectionDialog    initialized");
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -1160,13 +1160,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 */
 	public TreeMap<String, DeviceConfiguration> getDevices() {
 		return this.deviceConfigurations.getAllConfigurations();
-	}
-
-	/**
-	 * @return the deviceConfigurations
-	 */
-	public DeviceConfigurations getDeviceConfigurations() {
-		return this.deviceConfigurations;
 	}
 
 	/**

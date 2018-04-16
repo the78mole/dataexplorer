@@ -130,7 +130,6 @@ import gde.utils.WebBrowser;
  * @author Winfried Brügmann
  */
 public class DataExplorer extends Composite {
-
 	final static String	$CLASS_NAME	= DataExplorer.class.getName();
 	final static Logger	log					= Logger.getLogger(DataExplorer.class.getName());
 	{
@@ -217,23 +216,20 @@ public class DataExplorer extends Composite {
 	Thread												writeTmpFileThread;
 	boolean												isTmpWriteStop										= false;
 
-	boolean												isCurveSelectorEnabled						= true;																											// always enabled during
-																																																															// startup - there is no
-																																																															// setting. So true is
-																																																															// mandatory.
+	boolean												isCurveSelectorEnabled						= true;																											// always enabled during startup - there is no
+																																																															// setting. So true is mandatory.
 	boolean												isRecordCommentVisible						= false;
 	boolean												isGraphicsHeaderVisible						= false;
 	boolean												isObjectWindowVisible							= false;
 
 	int														openYesNoMessageDialogAsyncValue	= -1;
 
-	DropTarget										target;																																												// = new
-																																																															// DropTarget(dropTable,
-																																																															// operations);
+	DropTarget										target;																																												// = new DropTarget(dropTable, operations);
 
 	final FileTransfer						fileTransfer											= FileTransfer.getInstance();
 	Transfer[]										types															= new Transfer[] { this.fileTransfer };
 	private DeviceConfigurations	deviceConfigurations							= null;
+	private Thread								deviceConfigurationsThread				= null;
 
 	/**
 	 * main application class constructor
@@ -363,6 +359,18 @@ public class DataExplorer extends Composite {
 			// init settings
 			this.settings = Settings.getInstance();
 			log.logp(Level.INFO, $CLASS_NAME, $METHOD_NAME, this.settings.toString());
+
+			this.deviceConfigurationsThread  = new Thread("loadDeviceConfigurations") {
+				@Override
+				public void run() {
+					log.log(Level.OFF, "deviceConfigurationsThread    started");
+					File file = new File(Settings.getInstance().getDevicesPath());
+					if (file.exists())
+						DataExplorer.this.deviceConfigurations = new DeviceConfigurations(file.list(), Settings.getInstance().getActiveDevice());
+					log.log(Level.TIME, "deviceConfigurationsThread time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
+				}
+			};
+			this.deviceConfigurationsThread.start();
 
 			new Thread("updateAvailablePorts") {
 				@Override
@@ -814,7 +822,6 @@ public class DataExplorer extends Composite {
 			this.settings.startMigationThread();
 			// check configured device
 			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) {
-				this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this);
 				this.deviceSelectionDialog.open();
 			} else {
 				// channels HashMap will filled with empty records matching the active device, the dummy content is replaced
@@ -1127,8 +1134,11 @@ public class DataExplorer extends Composite {
 
 	public DeviceConfigurations getDeviceConfigurations() {
 		if (this.deviceConfigurations == null) {
-			if (this.deviceSelectionDialog != null) {
-				this.deviceConfigurations = getDeviceSelectionDialog().getDeviceConfigurations();
+			if (this.isDeviceConfigurationsThreadAlive()) {
+				try {
+					this.deviceConfigurationsThread.join();
+				} catch (InterruptedException e) {
+				}
 			} else {
 				File file = new File(Settings.getInstance().getDevicesPath());
 				this.deviceConfigurations = new DeviceConfigurations(file.list());
@@ -3182,6 +3192,13 @@ public class DataExplorer extends Composite {
 
 	public HistoExplorer getPresentHistoExplorer() {
 		return this.histoExplorer.orElseThrow(UnsupportedOperationException::new);
+	}
+
+	/**
+	 * @return true if the thread is alive
+	 */
+	public boolean isDeviceConfigurationsThreadAlive() {
+		return this.deviceConfigurationsThread != null ? this.deviceConfigurationsThread.isAlive() : false;
 	}
 
 }
