@@ -303,7 +303,7 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 		//if ((_buf[40] & 0xFF) == 0xFF) { // gyro receiver
 			//96=Test 00, 97=Test 01, 98=Test 02, ... , 108=Test 12
 			for (int i = 0, j = 0; i < 13; i++, j += 2) {
-				values[i + 8] = DataParser.parse2Short(_buf, 42 + j) * 1000;
+				values[i + 8] = DataParser.parse2Short(_buf, 40 + j) * 1000;
 			}
 		//}
 		if (log.isLoggable(Level.FINER)) {
