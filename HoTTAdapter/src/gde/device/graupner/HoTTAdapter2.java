@@ -250,26 +250,22 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			break;
 
 		case TYPE_19200_V4:
+			//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
+			tmpPackageLoss = DataParser.parse2Short(dataBuffer, 11);
+			tmpVoltageRx = (dataBuffer[6] & 0xFF);
+			tmpTemperatureRx = (dataBuffer[7] & 0xFF) - 20;
+			if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 120) {
+				points[0] = 0; //Rx->Tx PLoss
+				points[1] = (dataBuffer[9] & 0xFF) * 1000;
+				points[2] = (dataBuffer[5] & 0xFF) * 1000;
+				points[3] = tmpPackageLoss * 1000;
+				points[4] = (dataBuffer[13] & 0xFF) * 1000;
+				points[5] = (dataBuffer[8] & 0xFF) * 1000;
+				points[6] = tmpVoltageRx * 1000;
+				points[7] = tmpTemperatureRx * 1000;
+				points[8] = (dataBuffer[10] & 0xFF) * 1000;
+			}
 			switch (dataBuffer[1]) {
-			case HoTTAdapter2.SENSOR_TYPE_RECEIVER_19200:
-				if (dataBuffer.length == 17) {
-					//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 11);
-					tmpVoltageRx = (dataBuffer[6] & 0xFF);
-					tmpTemperatureRx = (dataBuffer[7] & 0xFF) - 20;
-					if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 120) {
-						points[0] = 0; //Rx->Tx PLoss
-						points[1] = (dataBuffer[9] & 0xFF) * 1000;
-						points[2] = (dataBuffer[5] & 0xFF) * 1000;
-						points[3] = tmpPackageLoss * 1000;
-						points[4] = (dataBuffer[13] & 0xFF) * 1000;
-						points[5] = (dataBuffer[8] & 0xFF) * 1000;
-						points[6] = tmpVoltageRx * 1000;
-						points[7] = tmpTemperatureRx * 1000;
-						points[8] = (dataBuffer[10] & 0xFF) * 1000;
-					}
-				}
-				break;
 
 			case HoTTAdapter2.SENSOR_TYPE_VARIO_19200:
 				if (dataBuffer.length == 57) {
@@ -334,14 +330,14 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						if (tmpVoltage > 0) {
 							for (int j = 0; j < 6; j++) {
 								tmpCellVoltage = (dataBuffer[16 + j] & 0xFF);
-								points[j + 29] = tmpCellVoltage > 0 ? tmpCellVoltage * 20 : points[j + 29];
+								points[j + 29] = tmpCellVoltage > 0 ? tmpCellVoltage * 1000 : points[j + 29];
 								if (points[j + 29] > 0) {
 									maxVotage = points[j + 29] > maxVotage ? points[j + 29] : maxVotage;
 									minVotage = points[j + 29] < minVotage ? points[j + 29] : minVotage;
 								}
 							}
 							//calculate balance on the fly
-							points[28] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
+							points[28] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
 						}
 						points[35] = DataParser.parse2Short(dataBuffer, 31) * 1000;
 						points[10] = tmpHeight * 1000;
@@ -377,14 +373,14 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						if (tmpVoltage > 0) {
 							for (int j = 0; j < 14; j++) {
 								tmpCellVoltage = (dataBuffer[16 + j] & 0xFF);
-								points[j + 51] = tmpCellVoltage > 0 ? tmpCellVoltage * 20 : points[j + 51];
+								points[j + 51] = tmpCellVoltage > 0 ? tmpCellVoltage * 1000 : points[j + 51];
 								if (points[j + 51] > 0) {
 									maxVotage = points[j + 51] > maxVotage ? points[j + 51] : maxVotage;
 									minVotage = points[j + 51] < minVotage ? points[j + 51] : minVotage;
 								}
 							}
 							//calculate balance on the fly
-							points[50] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 1000;
+							points[50] = (maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0) * 10;
 						}
 						points[10] = tmpHeight * 1000;
 						points[11] = (DataParser.parse2Short(dataBuffer, 44) - 30000) * 10;
@@ -393,7 +389,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						points[66] = tmpVoltage2 * 100;
 						points[67] = ((dataBuffer[34] & 0xFF) - 20) * 1000;
 						points[68] = ((dataBuffer[35] & 0xFF) - 20) * 1000;
-						points[69] = DataParser.parse2Short(dataBuffer, 58) * 1000;
+						points[69] = DataParser.parse2Short(dataBuffer, 47) * 1000;
 					}
 				}
 				break;

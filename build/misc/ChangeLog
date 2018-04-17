@@ -1,6 +1,7 @@
 Development history / change log, please read from bottom up
 
 Version 3.3.3 - xx yyy 2018
+* fix 19200 Baud protocol live data, skip Rx query while other sensors detected, Rx data in sensor data contained
 
 Version 3.3.2 - 15 Apr 2018
 * fix illegal formatting option in ParameterControl used for Graupner UDP charger

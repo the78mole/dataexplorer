@@ -506,7 +506,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		case TYPE_19200_V4:
 			switch (dataBuffer[1]) {
 			case HoTTAdapter.SENSOR_TYPE_RECEIVER_19200:
-				if (dataBuffer.length == 17) {
+				if (dataBuffer.length >= 17) {
 					// 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx, 8=VoltageRxMin
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 11);
 					tmpVoltageRx = (dataBuffer[6] & 0xFF);
@@ -645,7 +645,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						points[24] = tmpVoltage2 * 1000;
 						points[25] = (dataBuffer[34] & 0xFF) * 1000;
 						points[26] = (dataBuffer[35] & 0xFF) * 1000;
-						points[27] = DataParser.parse2Short(dataBuffer, 58) * 1000;
+						points[27] = DataParser.parse2Short(dataBuffer, 47) * 1000;
 					}
 				}
 				break;

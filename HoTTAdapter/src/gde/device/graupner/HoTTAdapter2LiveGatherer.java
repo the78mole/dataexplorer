@@ -219,7 +219,8 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 						}
 					}
 					else {
-						if (HoTTAdapter.isSensorType[0] == true) {
+						//query receiver only in case other sensors doesn't get detected
+						if (HoTTAdapter.isSensorType[0] == true && !(HoTTAdapter.isSensorType[1] || HoTTAdapter.isSensorType[2] || HoTTAdapter.isSensorType[3] || HoTTAdapter.isSensorType[4] || HoTTAdapter.isSensorType[5])) {
 							try {
 								//always gather receiver data first, anserRx are used to fill RXSQ, VoltageRx and TemperatureRx
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);

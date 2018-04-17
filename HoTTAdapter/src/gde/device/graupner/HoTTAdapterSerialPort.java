@@ -115,11 +115,21 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		try {
 			if (!HoTTAdapter.IS_SLAVE_MODE) {
 				this.write(HoTTAdapterSerialPort.QUERY_SENSOR_DATA);
-				this.read(tmp, HoTTAdapterSerialPort.READ_TIMEOUT_MS, false);
-				data[0] = HoTTAdapterSerialPort.ANSWER[0];
+				try {
+					this.read(tmp, HoTTAdapterSerialPort.READ_TIMEOUT_MS, false);
+          data[0] = tmp[0];
+				} catch (Exception e) { //receive single wire echo will sometimes fail
+					data[0] = HoTTAdapterSerialPort.ANSWER[0];
+          log.warning("failed ==> receive single wire echo 0x80");
+				}
 				WaitTimer.delay(4);
 				this.write(this.SENSOR_TYPE);
-				this.read(tmp, HoTTAdapterSerialPort.READ_TIMEOUT_MS, false);
+				try {
+					this.read(tmp, HoTTAdapterSerialPort.READ_TIMEOUT_MS, false);
+        } catch (Exception e) {
+          log.warning("failed ==> receive single wire echo sensor byte");
+          //ignore single wire echo
+				}
 				HoTTAdapterSerialPort.ANSWER[0] = this.SENSOR_TYPE[0];
 				data[1] = HoTTAdapterSerialPort.ANSWER[0];
 			}

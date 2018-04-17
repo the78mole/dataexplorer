@@ -316,7 +316,8 @@ public class HoTTAdapterLiveGatherer extends Thread {
 
 					}
 					else {
-						if (HoTTAdapter.isSensorType[0] == true) {
+						//query receiver only in case other sensors doesn't get detected
+						if (HoTTAdapter.isSensorType[0] == true && !(HoTTAdapter.isSensorType[1] || HoTTAdapter.isSensorType[2] || HoTTAdapter.isSensorType[3] || HoTTAdapter.isSensorType[4] || HoTTAdapter.isSensorType[5])) {
 							try {
 								//always gather receiver data first, anserRx are used to fill RXSQ, VoltageRx and TemperatureRx
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_19200);
@@ -334,7 +335,10 @@ public class HoTTAdapterLiveGatherer extends Thread {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
-								recordSetElectric.addPoints(this.device.convertDataBytes(pointsElectric, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
+								byte[] data = HoTTAdapterLiveGatherer.this.serialPort.getData(true);
+								recordSetElectric.addPoints(this.device.convertDataBytes(pointsElectric, data), System.nanoTime() / 1000000 - startTime);
+								data[1] = HoTTAdapter.SENSOR_TYPE_RECEIVER_19200;
+								recordSetReceiver.addPoints(this.device.convertDataBytes(pointsReceiver, data), System.nanoTime() / 1000000 - startTime);
 							}
 							catch (TimeOutException e) {
 								// ignore and go ahead gathering sensor data
@@ -346,7 +350,10 @@ public class HoTTAdapterLiveGatherer extends Thread {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GENERAL_19200);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
-								recordSetGeneral.addPoints(this.device.convertDataBytes(pointsGeneral, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
+								byte[] data = HoTTAdapterLiveGatherer.this.serialPort.getData(true);
+								recordSetElectric.addPoints(this.device.convertDataBytes(pointsElectric, data), System.nanoTime() / 1000000 - startTime);
+								data[1] = HoTTAdapter.SENSOR_TYPE_RECEIVER_19200;
+								recordSetReceiver.addPoints(this.device.convertDataBytes(pointsReceiver, data), System.nanoTime() / 1000000 - startTime);
 							}
 							catch (TimeOutException e) {
 								// ignore and go ahead gathering sensor data
@@ -358,7 +365,10 @@ public class HoTTAdapterLiveGatherer extends Thread {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
-								recordSetGeneral.addPoints(this.device.convertDataBytes(pointsMotorDriver, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
+								byte[] data = HoTTAdapterLiveGatherer.this.serialPort.getData(true);
+								recordSetMotorDriver.addPoints(this.device.convertDataBytes(pointsMotorDriver, data), System.nanoTime() / 1000000 - startTime);
+								data[1] = HoTTAdapter.SENSOR_TYPE_RECEIVER_19200;
+								recordSetReceiver.addPoints(this.device.convertDataBytes(pointsReceiver, data), System.nanoTime() / 1000000 - startTime);
 							}
 							catch (TimeOutException e) {
 								// ignore and go ahead gathering sensor data
@@ -370,7 +380,10 @@ public class HoTTAdapterLiveGatherer extends Thread {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_19200);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
-								recordSetGPS.addPoints(this.device.convertDataBytes(pointsGPS, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
+								byte[] data = HoTTAdapterLiveGatherer.this.serialPort.getData(true);
+								recordSetGPS.addPoints(this.device.convertDataBytes(pointsGPS, data), System.nanoTime() / 1000000 - startTime);
+								data[1] = HoTTAdapter.SENSOR_TYPE_RECEIVER_19200;
+								recordSetReceiver.addPoints(this.device.convertDataBytes(pointsReceiver, data), System.nanoTime() / 1000000 - startTime);
 							}
 							catch (TimeOutException e) {
 								// ignore and go ahead gathering sensor data
@@ -382,7 +395,10 @@ public class HoTTAdapterLiveGatherer extends Thread {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_VARIO_19200);
 								HoTTAdapterLiveGatherer.this.serialPort.getData(true);
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
-								recordSetVario.addPoints(this.device.convertDataBytes(pointsVario, HoTTAdapterLiveGatherer.this.serialPort.getData(true)), System.nanoTime() / 1000000 - startTime);
+								byte[] data = HoTTAdapterLiveGatherer.this.serialPort.getData(true);
+								recordSetVario.addPoints(this.device.convertDataBytes(pointsVario, data), System.nanoTime() / 1000000 - startTime);
+								data[1] = HoTTAdapter.SENSOR_TYPE_RECEIVER_19200;
+								recordSetReceiver.addPoints(this.device.convertDataBytes(pointsReceiver, data), System.nanoTime() / 1000000 - startTime);
 							}
 							catch (TimeOutException e) {
 								// ignore and go ahead gathering sensor data
