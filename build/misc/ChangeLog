@@ -6,12 +6,30 @@ Generic changes/fixes
 	* fix recursion synchronizing compare set while adding curve to compare set
 	* handle device base directory by interface method, default implementation, device specific implementation if required
 	* enhance calculation of synched scale label 
+	* Reduce DataExplorer startup duration
+	* Ask user for confirmation prior to purging an object key
 Device specific changes/fixes
 	* HoTTAdapter* add file selection hint for *.bin;*.log 
 	* S32 - fix factor to correct external temperatures
 	* S32_2 - initial release for S32 as version 2 displaying all measurement values on a single time line
 	* S32 - fix measurement synchronization references (need device XML replacement)
 	* S32 - fix external temperature factor according customer feedback
+
+History analysis
+	* Enhance UI
+		>> Add refresh menu item and shortcut
+		>> Add object key wizard (if accessing new directories) 
+		>> Remove MessageBox "No log files"
+		>> Fix importing from histo table with reversed x axis opens wrong file
+		>> Fix InvalidPathException@_SupplementObjectDirs
+		>> Fix wrong decimal places if switching from histo graphics to histo table
+	* Remove searching in the current import path (is obsolete due to remote log file support)
+	* Enhance performance
+	 	>> Memory cache for aggregated histo data 
+	 	>> Optimized directory scans for graphics refresh 
+	 	>> Code optimizations to avoid materialization
+	 	>> Remove syncing slave records for incomplete master records
+ 	* Support new file extensions separator
 
 Version 3.3.2 - 15 Apr 2018
 * fix illegal formatting option in ParameterControl used for Graupner UDP charger
