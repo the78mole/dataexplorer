@@ -152,7 +152,6 @@ public class Settings extends Properties {
 	final static String							X_SPREAD_GRADE_ORDINAL					= "x_spread_grade_ordinal";																																				//$NON-NLS-1$
 	final static String							IS_X_LOGARITHMIC_DISTANCE				= "is_x_logarithmic_distance";																																		//$NON-NLS-1$
 	final static String							IS_X_REVERSED										= "is_x_reversed";																																								//$NON-NLS-1$
-	final static String							SEARCH_IMPORT_PATH							= "search_import_path";																																						//$NON-NLS-1$
 	final static String							SEARCH_DATAPATH_IMPORTS					= "search_datapath_imports";																																			//$NON-NLS-1$
 	final static String							IS_CHANNEL_MIX									= "is_channel_mix";																																								//$NON-NLS-1$
 	final static String							SAMPLING_TIMESPAN_ORDINAL				= "sampling_timespan_ordinal";																																		//$NON-NLS-1$
@@ -778,7 +777,6 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_LOGARITHMIC_DISTANCE, isXAxisLogarithmicDistance())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_REVERSED, isXAxisReversed())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.RETROSPECT_MONTHS, getRetrospectMonths())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_IMPORT_PATH, getSearchImportPath())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_DATAPATH_IMPORTS, getSearchDataPathImports())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CHANNEL_MIX, isChannelMix())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SAMPLING_TIMESPAN_ORDINAL, getSamplingTimespanOrdinal())); //$NON-NLS-1$
@@ -2546,20 +2544,6 @@ public class Settings extends Properties {
 	 */
 	public boolean isXAxisReversed() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_X_REVERSED, "true")); //$NON-NLS-1$
-	}
-
-	/**
-	 * @param isActive true if files from the device import directory are read for the history
-	 */
-	public void setSearchImportPath(boolean isActive) {
-		this.setProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(isActive));
-	}
-
-	/**
-	 * @return true if files from the device import directory are read for the history
-	 */
-	public boolean getSearchImportPath() {
-		return Boolean.valueOf(this.getProperty(Settings.SEARCH_IMPORT_PATH, String.valueOf(true)));
 	}
 
 	/**

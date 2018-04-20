@@ -216,28 +216,6 @@ public class ObjectKeyCompliance {
 					.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get);
 			dirPaths.addAll(importFolders.collect(Collectors.toList()));
 		}
-		if (DataExplorer.getInstance().getActiveDevice() != null) {
-			String tmpImportDirPath = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredDataLocation();
-			if (Settings.getInstance().getSearchImportPath() && tmpImportDirPath != null && !tmpImportDirPath.trim().isEmpty() && !tmpImportDirPath.equals(GDE.FILE_SEPARATOR_UNIX)) {
-				Path path = Paths.get(tmpImportDirPath);
-				// ignore object if path ends with a valid object
-				String directoryName = path.getFileName().toString();
-				if (Settings.getInstance().getValidatedObjectKey(directoryName).isPresent())
-					path = path.getParent();
-				else {
-					// ignore device if path ends with a valid device
-					String directoryName2 = path.getFileName().toString();
-					if (DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent())
-						path = path.getParent();
-					else
-						// the directory is supposed to be a new object
-						path = path.getParent();
-					;
-				}
-				log.log(Level.FINE, "ImportBaseDir ", path); //$NON-NLS-1$
-				dirPaths.add(path);
-			}
-		}
 		return dirPaths;
 	}
 

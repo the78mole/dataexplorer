@@ -110,13 +110,9 @@ REMARKS
  	  names are identical to the DataExplorer object keys.
 	* Deleting object keys in the menu tool bar will not affect the supplementary
 	  folder or external object folders.
-	* For devices which support imports consider these settings:
-		-- Search the working directories for imports via
-		   'Settings > History > Screening > Include imports from data path'
+	* For devices which support imports consider this setting:
 		-- Search import folders via 
 		   'Settings > History > Screening > Search import path' 
-    * The default import folder is the last used import path (modified with the
-      current object key). This might spare an 'import_folders_csv' entry.
 	
 	
 WEB SITE

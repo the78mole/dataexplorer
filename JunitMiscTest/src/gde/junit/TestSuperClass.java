@@ -215,7 +215,6 @@ public class TestSuperClass extends TestCase {
 	private void setHistoSettings() {
 		this.settings.setHistoActive(true); // should not have any influence on junit tests
 		// the next lines only hold settings which do not control the GUI appearance
-		this.settings.setSearchImportPath(false);
 		this.settings.setSearchDataPathImports(true);
 		this.settings.setChannelMix(false);
 		this.settings.setSamplingTimespan_ms("2"); // this index corresponds to 1 sec

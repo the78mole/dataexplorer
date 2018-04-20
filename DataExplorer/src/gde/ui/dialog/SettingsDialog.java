@@ -20,7 +20,6 @@
 package gde.ui.dialog;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Map;
@@ -147,7 +146,6 @@ public class SettingsDialog extends Dialog {
 	CCombo															histoBoxplotSizeAdaptation;
 	CLabel															histoRetrospectLabel;
 	Text																histoRetrospectMonths;
-	Button															histoSearchImportPath;
 	Button															histoSearchDataPathImports;
 	Button															histoChannelMix;
 	Group																histoDisplayOption;
@@ -1199,32 +1197,13 @@ public class SettingsDialog extends Dialog {
 								});
 							}
 							{
-								this.histoSearchImportPath = new Button(this.histoScreening, SWT.CHECK);
-								FormData formData = new FormData();
-								formData.left = new FormAttachment(0, 5);
-								formData.top = new FormAttachment(this.histoSearchDataPathImports, 7);
-								this.histoSearchImportPath.setLayoutData(formData);
-								this.histoSearchImportPath.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.histoSearchImportPath.setText(Messages.getString(MessageIds.GDE_MSGT0824));
-								this.histoSearchImportPath.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0825));
-								this.histoSearchImportPath.setSelection(this.settings.getSearchImportPath());
-								this.histoSearchImportPath.addSelectionListener(new SelectionAdapter() {
-									@Override
-									public void widgetSelected(SelectionEvent evt) {
-										SettingsDialog.log.log(Level.FINEST, "histoSearchImportPath.widgetSelected, event=" + evt); //$NON-NLS-1$
-										SettingsDialog.this.settings.setSearchImportPath(SettingsDialog.this.histoSearchImportPath.getSelection());
-										SettingsDialog.this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
-									}
-								});
-							}
-							{
 								this.histoForceObject = new Group(this.histoScreening, SWT.NONE);
 								RowLayout histoForceObjectGroupRLayout = new RowLayout(SWT.HORIZONTAL);
 								histoForceObjectGroupRLayout.marginTop = 2;
 								histoForceObjectGroupRLayout.marginLeft = 2;
 								this.histoForceObject.setLayout(histoForceObjectGroupRLayout);
 								FormData formData = new FormData();
-								formData.top = new FormAttachment(this.histoSearchImportPath, 7);
+								formData.top = new FormAttachment(this.histoSearchDataPathImports, 7);
 								formData.width = 223;
 								this.histoForceObject.setLayoutData(formData);
 								this.histoForceObject.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1782,13 +1761,18 @@ public class SettingsDialog extends Dialog {
 								this.createObjectsFromDirectoriesButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.createObjectsFromDirectoriesButton.setText(Messages.getString(MessageIds.GDE_MSGT0836));
 								String toolTipExtension = String.format("\n%s \"%s\"", Messages.getString(MessageIds.GDE_MSGT0523), this.settings.getDataFilePath());
-								if (this.application.getActiveDevice() != null && this.settings.getSearchImportPath()) {
-									Path importPath = this.application.getActiveDevice().getDeviceConfiguration().getImportBaseDir();
-									if (importPath != null && !importPath.toString().isEmpty()) {
-										toolTipExtension += String.format("\n%s \"%s\"", Messages.getString(MessageIds.GDE_MSGT0846), importPath);
-									}
+								String dataPathLines = Arrays.stream(Settings.getInstance().getDataFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+										.map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.joining("\",\n  \""));
+								if (!dataPathLines.isEmpty()) {
+									toolTipExtension += String.format("\n%s \"%s\"", Messages.getString(MessageIds.GDE_MSGT0824), dataPathLines);
 								}
-								this.createObjectsFromDirectoriesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0837, new Object[] { toolTipExtension }));
+								String importPathLines = Arrays.stream(Settings.getInstance().getImportFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+										.map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.joining("\",\n  \""));
+								if (!importPathLines.isEmpty()) {
+									toolTipExtension += String.format("\n%s \"%s\"", Messages.getString(MessageIds.GDE_MSGT0825), importPathLines);
+								}
+								this.createObjectsFromDirectoriesButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0837, new Object[] {
+										toolTipExtension }));
 								RowData createObjectsFromDirectoriesButtonLData = new RowData();
 								createObjectsFromDirectoriesButtonLData.width = 180;
 								createObjectsFromDirectoriesButtonLData.height = 30;

@@ -95,19 +95,19 @@ public final class DirectoryScanner {
 	 */
 	public static final class SourceFoldersBuilder {
 
-		private final EnumSet<DirectoryType>	validatedDirectoryTypes			= EnumSet.noneOf(DirectoryType.class);
+		private final EnumSet<DirectoryType>	validatedDirectoryTypes	= EnumSet.noneOf(DirectoryType.class);
 
 		private IDevice												validatedDevice							= null;
 		private Channel												validatedChannel						= null;
 		private String												validatedImportDataLocation	= GDE.STRING_EMPTY;
-		private String												validatedObjectKey					= GDE.STRING_EMPTY;
+		private String												validatedObjectKey			= GDE.STRING_EMPTY;
 
-		private SourceFolders									lastFolders									= null;
-		private SourceFolders									sourceFolders								= null;
+		private SourceFolders									lastFolders							= null;
+		private SourceFolders									sourceFolders						= null;
 
-		private boolean												isSlowFolderAccess					= false;
-		private boolean												isMajorChange								= false;
-		private boolean												isChannelChangeOnly					= false;
+		private boolean												isSlowFolderAccess			= false;
+		private boolean												isMajorChange						= false;
+		private boolean												isChannelChangeOnly			= false;
 
 		/**
 		 * Re- initializes the class.
@@ -116,7 +116,6 @@ public final class DirectoryScanner {
 			this.validatedDirectoryTypes.clear();
 
 			this.validatedDevice = null;
-			this.validatedImportDataLocation = GDE.STRING_EMPTY;
 			this.validatedObjectKey = GDE.STRING_EMPTY;
 
 			this.lastFolders = null;
@@ -137,7 +136,6 @@ public final class DirectoryScanner {
 		public boolean validateAndBuild(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
 			IDevice lastDevice = validatedDevice;
 			Channel lastChannel = validatedChannel;
-			String lastImportDataLocations = validatedImportDataLocation;
 			EnumSet<DirectoryType> lastDirectoryTypes = EnumSet.copyOf(validatedDirectoryTypes);
 			String lastObjectKey = validatedObjectKey;
 
@@ -148,9 +146,6 @@ public final class DirectoryScanner {
 			boolean isNewDevice = lastDevice != null && validatedDevice != null ? !lastDevice.getName().equals(validatedDevice.getName())
 					: validatedDevice != null;
 			isMajorChange = isMajorChange || isNewDevice;
-
-			validatedImportDataLocation = validatedDevice.getDeviceConfiguration().getDataBlockPreferredDataLocation();
-			isMajorChange = isMajorChange || !lastImportDataLocations.equals(validatedImportDataLocation);
 
 			// the import extentions do not have any influence on the validated folders list
 
@@ -287,14 +282,15 @@ public final class DirectoryScanner {
 		 */
 		private Set<Path> defineCurrentPaths(DirectoryType directoryType) {
 			Set<Path> newPaths = new HashSet<>();
-			if (Settings.getInstance().getActiveObjectKey().isEmpty()) {
-				Path deviceSubPath = directoryType.getActiveDeviceSubPath();
-				Path rootPath = deviceSubPath != null ? directoryType.getBasePath().resolve(deviceSubPath) : directoryType.getBasePath();
-				newPaths.add(rootPath);
+
+			Path basePath = directoryType.getBasePath();
+			if (basePath == null) {
+				// an unavailable path results in no files found
 			} else {
-				Path basePath = directoryType.getBasePath();
-				if (basePath == null) {
-					// an unavailable path results in no files found
+				String activeObjectKey = Settings.getInstance().getActiveObjectKey();
+				if (activeObjectKey.isEmpty()) {
+					Path rootPath = directoryType.getActiveDeviceSubPath() != null ? basePath.resolve(directoryType.getActiveDeviceSubPath()) : basePath;
+					newPaths.add(rootPath);
 				} else {
 					newPaths = defineObjectPaths(basePath, Settings.getInstance().getActiveObjectKey());
 				}
@@ -462,15 +458,7 @@ public final class DirectoryScanner {
 			@Override
 			@Nullable
 			public Path getBasePath() {
-				if (application.getActiveDevice() instanceof IHistoDevice && Settings.getInstance().getSearchImportPath()) {
-					Path importDir = application.getActiveDevice().getDeviceConfiguration().getImportBaseDir();
-					if (importDir == null) {
-						return null;
-					} else {
-						return importDir;
-					}
-				} else
-					return null;
+				return null;
 			}
 
 			@Override
@@ -481,21 +469,12 @@ public final class DirectoryScanner {
 			@Override
 			@Nullable
 			public Path getDataSetPath() {
-				if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice && Settings.getInstance().getSearchImportPath()) {
-					Path importDir = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getImportBaseDir();
-					if (importDir == null) {
-						return null;
-					} else {
-						Path importPath = importDir.resolve(Settings.getInstance().getActiveObjectKey());
-						return !importPath.equals(DirectoryType.DATA.getDataSetPath()) ? importPath : null;
-					}
-				} else
-					return null;
+				return null;
 			}
 
 			@Override
 			public List<String> getDataSetExtensions() {
-				if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice && Settings.getInstance().getSearchImportPath())
+				if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice)
 					return ((IHistoDevice) DataExplorer.getInstance().getActiveDevice()).getSupportedImportExtentions();
 				else
 					return new ArrayList<>();
@@ -514,7 +493,7 @@ public final class DirectoryScanner {
 
 			@Override
 			public boolean isActive() {
-				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtensions().isEmpty() + " ExternalFolders.exist=" + getExternalBaseDirs().anyMatch(e -> true) + " dataSetPath=" + getDataSetPath());
+				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtensions().isEmpty() + " ExternalFolders.exist=" + getExternalBaseDirs().anyMatch(e -> true));
 				if (getDataSetExtensions().isEmpty()) {
 					return false;
 				} else {
