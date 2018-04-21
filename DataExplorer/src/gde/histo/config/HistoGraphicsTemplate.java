@@ -165,9 +165,9 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	 * @return an instance which conforms to the settings and the parameters
 	 */
 	public static HistoGraphicsTemplate createGraphicsTemplate(String deviceSignature, String objectKey) {
-		if (DataExplorer.getInstance().isObjectoriented() && Settings.getInstance().isObjectTemplatesActive()) {
+		if (!Settings.getInstance().getActiveObjectKey().isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
 			return new ObjectGraphicsTemplate(deviceSignature, objectKey);
-		} else if (!DataExplorer.getInstance().isObjectoriented() && Settings.getInstance().isObjectTemplatesActive()) {
+		} else if (Settings.getInstance().getActiveObjectKey().isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
 			return new ObjectGraphicsTemplate(deviceSignature, GDE.STRING_UNDER_BAR);
 		} else {
 			return new StandardGraphicsTemplate(deviceSignature);
