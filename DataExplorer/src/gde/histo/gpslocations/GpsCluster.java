@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.sun.istack.internal.Nullable;
+
 import gde.config.Settings;
 import gde.histo.utils.GpsCoordinate;
 import gde.log.Logger;
@@ -91,8 +93,9 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 		}
 
 		/**
-		 * @return the new random reference point for the next clustering step or null if the residuum does not contain elements
+		 * @return the new random reference point for the next clustering step
 		 */
+		@Nullable // if the residuum does not contain elements
 		public GpsCoordinate getResiduumReference() {
 			// select an arbitrary GPS coordinate with probability Square(Distance)
 			final double arbitrarySqDistance = Math.random() * this.relictSqDistanceSum;
@@ -107,20 +110,6 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 				}
 			}
 			return null;
-		}
-
-		/**
-		 * @return the items which have not been assigned to the new cluster
-		 */
-		public GpsCluster getResiduumItems() {
-			return this.relicts;
-		}
-
-		/**
-		 * @return the list of assigned GPS coordinates and the cluster which each individual is assigned to
-		 */
-		public Map<GpsCoordinate, GpsCluster> getIdentifiedClusters() {
-			return this.identifiedClusters;
 		}
 	}
 
@@ -197,9 +186,9 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 				// start analyzing the GPS coordinate list data
 				DistanceProcessor distanceProcessor = wip.parallelStream().collect(DistanceProcessor::new, DistanceProcessor::accept, DistanceProcessor::combine);
 				// add the newly assigned coordinates including their cluster assignment to the total assignment list
-				this.assignedClusters.putAll(distanceProcessor.getIdentifiedClusters());
+				this.assignedClusters.putAll(distanceProcessor.identifiedClusters);
 				// take the remaining GPS coordinate list for the next iteration and take also the optimized reference coordinate
-				wip = distanceProcessor.getResiduumItems();
+				wip = distanceProcessor.relicts;
 				this.setReference(distanceProcessor.getResiduumReference()); // the distance processor accesses this reference in the next iteration step
 				log.finer(() -> "number of clusters : " + this.getClusters().size() + "  new Cluster members : " + this.assignedClusters.size()); //$NON-NLS-1$ //$NON-NLS-2$
 			}

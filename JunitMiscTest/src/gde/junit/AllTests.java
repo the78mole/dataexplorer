@@ -33,11 +33,9 @@ public class AllTests {
 		suite.addTestSuite(JarInspectAndExportTest.class);
 		suite.addTestSuite(LogViewReaderTester.class);
 		suite.addTestSuite(TestQuadraticRegression.class);
+		suite.addTestSuite(ObjectKeyComplianceTest.class);
 		suite.addTestSuite(TestObjectKeyScanner.class);
 		suite.addTestSuite(CleanupTestTemp.class);
-		suite.addTestSuite(QuantileTest.class);
-		suite.addTestSuite(HistoSetTest.class);
-		suite.addTestSuite(GpsClusterTest.class);
 
 		//$JUnit-END$
 		return suite;

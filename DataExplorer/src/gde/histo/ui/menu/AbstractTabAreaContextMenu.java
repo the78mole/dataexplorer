@@ -212,7 +212,7 @@ public abstract class AbstractTabAreaContextMenu {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "openRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-					SourceDataSet sourceDataSet = new SourceDataSet(Paths.get((String) popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString())));
+					SourceDataSet sourceDataSet = SourceDataSet.createSourceDataSet(Paths.get((String) popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString())));
 					String recordSetName = popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString().split(Pattern.quote(TrailRecordSet.BASE_NAME_SEPARATOR))[0];
 					if (sourceDataSet.load(recordSetName)) {
 						application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL));

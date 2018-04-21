@@ -334,17 +334,11 @@ public final class HistoSet {
 	 * Disregard rebuild steps if histo file paths have changed which may occur if new files have been added by the user
 	 * or the device, channel or object was modified.
 	 * @param rebuildStep
-	 * @param isWithUi true allows actions on the user interface (progress bar, message boxes)
 	 * @return true if the HistoSet was rebuilt
 	 */
-	public synchronized boolean rebuild4Screening(RebuildStep rebuildStep, boolean isWithUi) //
+	public synchronized boolean rebuild4Screening(RebuildStep rebuildStep) //
 			throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
-		return this.vaultPicker.rebuild4Screening(rebuildStep, isWithUi);
-	}
-
-	public void rebuild4Test(Path filePath) //
-			throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
-		this.vaultPicker.rebuild4Test(filePath);
+		return this.vaultPicker.rebuild4Screening(rebuildStep);
 	}
 
 	@Nullable // i.e. if rebuild thread is not finished

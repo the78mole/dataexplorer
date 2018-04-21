@@ -199,8 +199,7 @@ public class DataExplorer extends Composite {
 	StatusBar											statusBar;
 	int														progessPercentage									= 0;
 	boolean												isDeviceDialogModal;
-	int														tabSelectedIndex;																																							// use for identifying
-																																																															// the last selected tab
+	int														tabSelectedIndex;																																							// use for identifying the last selected tab
 
 	SettingsDialog								settingsDialog;
 	HelpInfoDialog								helpDialog;
@@ -1342,6 +1341,32 @@ public class DataExplorer extends Composite {
 			this.updateTitleBar(this.getObjectKey(), this.settings.getActiveDevice(), this.settings.getSerialPort());
 		}
 	}
+
+	public void setEnvironmentWoutUI(Settings newSettings, IDevice device, int channelNumber) {
+		this.settings = newSettings;
+
+		if (!device.equals(this.activeDevice)) {
+			// device :
+			setActiveDeviceWoutUI(device);
+
+			// channels : from setupDataChannels
+			// objectKey : is not set because histo does not use it
+			this.channels = Channels.getInstance();
+			this.channels.cleanup();
+			String[] channelNames = new String[device.getChannelCount()];
+			// buildup new structure - set up the channels
+			for (int i = 1; i <= device.getChannelCount(); i++) {
+				Channel newChannel = new Channel(device.getChannelNameReplacement(i), device.getChannelTypes(i));
+				// newChannel.setObjectKey(objectKey);
+				this.channels.put(Integer.valueOf(i), newChannel);
+				channelNames[i - 1] = i + " : " + device.getChannelNameReplacement(i);
+			}
+			this.channels.setChannelNames(channelNames);
+		}
+
+		// channel :
+		this.channels.setActiveChannelNumber(channelNumber);
+}
 
 	public void initiateUnitTestEnvironment(IDevice device, Channels channels, String objectKey) {
 		// device :
@@ -3203,6 +3228,13 @@ public class DataExplorer extends Composite {
 	 */
 	public boolean isDeviceConfigurationsThreadAlive() {
 		return this.deviceConfigurationsThread != null ? this.deviceConfigurationsThread.isAlive() : false;
+	}
+
+	/**
+	 * @return true if the GUI was not initialized
+	 */
+	public boolean isWithUi() {
+		return this.menuToolBar != null;
 	}
 
 }

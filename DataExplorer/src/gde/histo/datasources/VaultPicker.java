@@ -39,7 +39,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -62,7 +61,6 @@ import gde.histo.cache.VaultCollector;
 import gde.histo.cache.VaultReaderWriter;
 import gde.histo.datasources.DirectoryScanner.SourceFolders;
 import gde.histo.datasources.HistoSet.RebuildStep;
-import gde.histo.datasources.SourceDataSetExplorer.SourceDataSet;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.recordings.TrailRecordSet;
 import gde.log.Logger;
@@ -140,18 +138,6 @@ public final class VaultPicker {
 	 * Excluded vaults via ignore lists
 	 */
 	private List<ExtendedVault>												suppressedVaults	= new ArrayList<>();
-	/**
-	 * Number of files which have been read for getting vaults
-	 */
-	private int																				readFilesCount			= 0;
-	/**
-	 * Number of files which have log data for the object, device, analysis timespan etc.
-	 */
-	private int																				matchingFilesCount	= 0;
-	/**
-	 * Number of trusses identified in the read files
-	 */
-	private int																				readTrussesCount;
 	/**
 	 * Size of all the histo files which have been read to build the histo recordsets
 	 */
@@ -307,7 +293,7 @@ public final class VaultPicker {
 
 	public VaultPicker() {
 		this.directoryScanner = new DirectoryScanner();
-		this.sourceDataSetExplorer = new SourceDataSetExplorer(directoryScanner);
+		this.sourceDataSetExplorer = new SourceDataSetExplorer(false);
 	}
 
 	@Override
@@ -328,9 +314,6 @@ public final class VaultPicker {
 		this.pickedVaults.clear();
 		this.suppressedVaults.clear();
 
-		this.readFilesCount = 0;
-		this.matchingFilesCount = 0;
-		this.readTrussesCount = 0;
 		this.recordSetBytesSum = 0;
 		this.elapsedTime_us = 0;
 
@@ -338,75 +321,18 @@ public final class VaultPicker {
 		log.log(FINER, "done", this);
 	}
 
-	public void rebuild4Test(Path filePath)//
-			throws IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
-
-		initialize();
-
-		List<SourceDataSet> sourceFiles = sourceDataSetExplorer.readSourceFiles4Test(filePath);
-		this.readFilesCount = sourceFiles.size();
-		List<VaultCollector> trusses = sourceDataSetExplorer.defineSelectedTrusses(sourceFiles);
-		removeSuppressed(trusses);
-		log.info(() -> String.format("%04d files selected", trusses.size())); //$NON-NLS-1$
-
-		{
-			// step: build the workload map consisting of the cache key and the file path
-			TrussJobs trussJobs = DUPLICATE_HANDLING.getTrussJobs(trusses);
-			log.info(() -> String.format("trussJobs to load total     = %d", trussJobs.size())); //$NON-NLS-1$
-
-			// step: put cached vaults into the histoSet map and reduce workload map
-			int trussJobsSize = trussJobs.size();
-			for (ExtendedVault histoVault : VaultReaderWriter.loadFromCaches(trussJobs, Optional.empty())) {
-				if (!histoVault.isTruss()) {
-					putVault(histoVault);
-					this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
-				}
-			}
-			log.info(() -> String.format("trussJobs loaded from cache = %d", trussJobsSize - trussJobs.size())); //$NON-NLS-1$
-
-			// step: transform log files for the truss jobs into vaults and put them into the histoSet map
-			int loadCount = 0;
-			for (Map.Entry<Path, List<VaultCollector>> pathEntry : trussJobs.entrySet()) {
-				try {
-					VaultReaderWriter.loadFromFile(pathEntry.getKey(), pathEntry.getValue());
-					for (VaultCollector vaultCollector : pathEntry.getValue()) {
-						ExtendedVault histoVault = vaultCollector.getVault();
-						if (!histoVault.isTruss()) {
-							putVault(histoVault);
-							this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
-						}
-						loadCount++;
-					}
-				} catch (Exception e) {
-					throw new UnsupportedOperationException(pathEntry.getKey().toString(), e);
-				}
-			}
-			log.log(Level.INFO, "trussJobs loaded from file=", loadCount);
-
-			// step: save vaults in the file system
-			if (loadCount > 0) {
-				VaultReaderWriter.storeInCaches(trussJobs);
-			}
-		}
-		{
-			this.trailRecordSet = TrailRecordSet.createRecordSet(this.pickedVaults);
-			this.trailRecordSet.initializeFromVaults();
-		}
-	}
-
 	/**
 	 * Determine the valid histo files and read the vaults from the log files or the cache.
 	 * Use the vaults to populate the trail recordset.
 	 * @param rebuildStep is the step type where the processing starts. The previous job types are omitted.
 	 *          May be augmented if the device, channel or object was modified.
-	 * @param isWithUi true allows actions on the user interface (progress bar, message boxes)
 	 * @return true if the trail recordSet was rebuilt
 	 */
-	public synchronized boolean rebuild4Screening(RebuildStep rebuildStep, boolean isWithUi) throws FileNotFoundException, IOException,
-			NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
+	public synchronized boolean rebuild4Screening(RebuildStep rebuildStep) throws FileNotFoundException, IOException, NotSupportedFileFormatException,
+			DataInconsitsentException, DataTypeException {
 		RebuildStep realRebuildStep = rebuildStep; // the rebuild step might be augmented during the screening procedure
 
-		Optional<ProgressManager> progress = isWithUi ? Optional.of(new ProgressManager()) : Optional.empty();
+		Optional<ProgressManager> progress = DataExplorer.getInstance().isWithUi() ? Optional.of(new ProgressManager()) : Optional.empty();
 		try {
 			long startNanoTime = System.nanoTime();
 			log.log(FINER, GDE.STRING_GREATER, rebuildStep);
@@ -427,25 +353,21 @@ public final class VaultPicker {
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.B_HISTOVAULTS)) {
 				initialize();
-				List<VaultCollector> trusses;
 				{
-					List<SourceDataSet> sourceFiles = sourceDataSetExplorer.listSourceFiles();
-					trusses = sourceDataSetExplorer.defineSelectedTrusses(sourceFiles);
-					suppressedVaults = removeSuppressed(trusses);
-					readFilesCount = sourceFiles.size();
-					readTrussesCount = trusses.size();
-					matchingFilesCount = (int) trusses.parallelStream().map(VaultCollector::getVault).map(ExtendedVault::getLoadFileAsPath).count();
+					sourceDataSetExplorer.setStatusMessages(directoryScanner.isSlowFolderAccess());
+					boolean reReadFiles = !directoryScanner.isChannelChangeOnly();
+					sourceDataSetExplorer.screen4Trusses(directoryScanner.getSourceFolders().getMap(), reReadFiles);
 
 					long millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime);
 					if (millis > 0) log.time(() -> String.format("%,5d trusses    select folders     time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
-							trusses.size(), millis, trusses.size() * 1000 / millis));
+							sourceDataSetExplorer.getTrusses().size(), millis, sourceDataSetExplorer.getTrusses().size() * 1000 / millis));
 				}
 				progress.ifPresent((p) -> p.set(SCANNED));
 
-				if (!trusses.isEmpty()) {
+				if (!sourceDataSetExplorer.getTrusses().isEmpty()) {
 					TrussJobs trussJobs;
 					{ // step: read from paths and identify duplicates
-						trussJobs = TrussJobs.createTrussJobs(trusses);
+						trussJobs = TrussJobs.createTrussJobs(sourceDataSetExplorer.getTrusses());
 						progress.ifPresent((p) -> p.set(MATCHED));
 					}
 					{// step: put cached vaults into the histoSet map and reduce workload map
@@ -473,22 +395,20 @@ public final class VaultPicker {
 						long nanoTime = System.nanoTime(), cacheSize_B = 0;
 						long loadCount = trussJobs.values().parallelStream().flatMap(Collection::stream).count();
 						if (loadCount > 0) {
-							cacheSize_B = VaultReaderWriter.storeInCaches(trussJobs);
-						}
-						if (cacheSize_B > 0) {
-							long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
-							log.time(() -> String.format("%,5d recordsets store in cache     time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
-									loadCount, micros / 1000, loadCount * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
+							cacheSize_B = VaultReaderWriter.getCacheSize();
+							VaultReaderWriter.storeInCaches(trussJobs);
+							if (VaultReaderWriter.getCacheSize() - cacheSize_B > 0) {
+								long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
+								log.time(() -> String.format("%,5d recordsets store in cache     time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
+										loadCount, micros / 1000, loadCount * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
+							}
 						}
 					}
 				}
 			}
 			progress.ifPresent((p) -> p.set(CACHED));
 
-			if (!realRebuildStep.isEqualOrBiggerThan(RebuildStep.B_HISTOVAULTS)) {
-				// the user may have added entries to the exclusion list
-				this.suppressedVaults.addAll(removeSuppressedHistoVaults());
-			}
+			this.suppressedVaults.addAll(removeSuppressedHistoVaults());
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.C_TRAILRECORDSET)) {
 				long nanoTime = System.nanoTime();
@@ -497,11 +417,15 @@ public final class VaultPicker {
 				this.trailRecordSet.applyTemplate(true); // needs reasonable data
 				if (this.recordSetBytesSum > 0) {
 					long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
-					log.fine(() -> String.format("%,5d timeSteps  to TrailRecordSet  time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
+					log.time(() -> String.format("%,5d timeSteps new TrailRecordSet  time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
 							this.pickedVaults.size(), micros / 1000, this.pickedVaults.size() > 0 ? this.pickedVaults.size() * 1000000 / micros : 0));
 				}
 			} else if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA)) { // saves some time compared to the logic above
+				long nanoTime = System.nanoTime();
 				this.trailRecordSet.initializeFromVaults();
+				long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
+				log.time(() -> String.format("%,5d timeSteps  to TrailRecordSet  time=%,6d [ms] :: per second:%5d", //
+						this.pickedVaults.size(), micros / 1000, this.pickedVaults.size() > 0 ? this.pickedVaults.size() * 1000000 / micros : 0));
 			}
 			progress.ifPresent((p) -> p.set(RECORDED));
 
@@ -562,6 +486,7 @@ public final class VaultPicker {
 
 	/**
 	 * Check the histo vaults list for suppressed vaults in order to cope with additional suppressions by the user.
+	 * Use ignore lists (for recordSets only) to determine the vaults which are required for the data access.
 	 * @return the suppressed vaults which have been detected in the vaults list
 	 */
 	private List<ExtendedVault> removeSuppressedHistoVaults() {
@@ -575,26 +500,6 @@ public final class VaultPicker {
 			List<ExtendedVault> vaultList = this.pickedVaults.get(vault.getLogStartTimestamp_ms());
 			vaultList.remove(vault);
 			if (vaultList.isEmpty()) this.pickedVaults.remove(vault.getLogStartTimestamp_ms());
-		}
-		log.fine(() -> String.format("%04d total trusses --- %04d excluded trusses", totalSize, removed.size()));
-		return removed;
-	}
-
-	/**
-	 * Use ignore lists (for recordSets only) to determine the vaults which are required for the data access.
-	 * @return the vaults which have been removed due to user exclusions
-	 */
-	private List<ExtendedVault> removeSuppressed(List<VaultCollector> vaults) {
-		List<ExtendedVault> removed = new ArrayList<>();
-		int totalSize = vaults.size();
-		for (Iterator<VaultCollector> iterator = vaults.iterator(); iterator.hasNext();) {
-			ExtendedVault vault = iterator.next().getVault();
-			if (ExclusionData.isExcluded(vault.getLoadFileAsPath(), vault.getLogRecordsetBaseName())) {
-				log.info(() -> String.format("discarded as per exclusion list   %s %s   %s", //$NON-NLS-1$
-						vault.getLoadFilePath(), vault.getLogRecordsetBaseName(), vault.getStartTimeStampFormatted()));
-				iterator.remove();
-				removed.add(vault);
-			}
 		}
 		log.fine(() -> String.format("%04d total trusses --- %04d excluded trusses", totalSize, removed.size()));
 		return removed;
@@ -617,7 +522,7 @@ public final class VaultPicker {
 	 * @return the total number of trusses identified in the files
 	 */
 	public int getTrussesCount() {
-		return this.readTrussesCount;
+		return this.sourceDataSetExplorer.getTrusses().size();
 	}
 
 	/**
@@ -653,18 +558,23 @@ public final class VaultPicker {
 	}
 
 	public int getDirectoryFilesCount() {
-		return this.readFilesCount + this.sourceDataSetExplorer.getNonWorkableCount() + this.sourceDataSetExplorer.getExcludedFiles().size();
+		return this.sourceDataSetExplorer.getSourceFiles().size() + this.sourceDataSetExplorer.getNonWorkableCount() + this.sourceDataSetExplorer.getExcludedFiles().size();
 	}
 
 	public int getReadFilesCount() {
-		return this.readFilesCount;
+		return this.sourceDataSetExplorer.getSourceFiles().size();
 	}
 
 	/**
+	 * <<<<<<< Upstream, based on nxt0020S1
 	 * @return the number of files which have log data for the object, device, analysis timespan etc.
+	 *         =======
+	 * @return the number of files which have log data for the object, device, analysis timespan etc.
+	 *         >>>>>>> 7f7a2db VaultPicker
 	 */
 	public int getMatchingFilesCount() {
-		return this.matchingFilesCount;
+		return (int) this.sourceDataSetExplorer.getTrusses().parallelStream() //
+				.map(VaultCollector::getVault).map(ExtendedVault::getLoadFileAsPath).count();
 	}
 
 }

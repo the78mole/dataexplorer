@@ -17,18 +17,19 @@
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 									2017,2018 Thomas Eickert
 ****************************************************************************************/
-package gde.junit;
+package gde.histo.gpslocations;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import gde.histo.gpslocations.GeoCodes;
-import gde.histo.gpslocations.GpsCluster;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import gde.histo.utils.GpsCoordinate;
 
-public class GpsClusterTest extends TestSuperClass {
-	//maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
-	//-> we have our own JunitTest project referenced hint is related if test code is part of each project only
+import junit.framework.TestCase;
+
+class GpsClusterTest extends TestCase {
 	private final static String	$CLASS_NAME	= GpsClusterTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -44,13 +45,15 @@ public class GpsClusterTest extends TestSuperClass {
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	@Override
+	@BeforeEach
 	public void setUp() throws Exception {
 		super.setUp();
 		log.setLevel(Level.INFO);
 		log.setUseParentHandlers(true);
 	}
 
-	public void testSingleMemberCluster() {
+	@Test
+	void testSingleMemberCluster() {
 		this.s21.toAngularCoordinate();
 		new GpsCoordinate(48.781970, 9.183130).toAngularCoordinate();
 		this.sts.toAngularCoordinate();
@@ -98,10 +101,11 @@ public class GpsClusterTest extends TestSuperClass {
 		this.gpsCluster.add(sts);
 		this.gpsCluster.add(ssa);
 		this.gpsCluster.setClusters();
-		assertEquals("S TwoMemberCluster", 3, this.gpsCluster.getClusters().size());
+		assertEquals("  TwoMemberCluster", 3, this.gpsCluster.getClusters().size());
 	}
 
-	public void testLocationFiles() {
+	@Test
+	void testLocationFiles() {
 		String location;
 		location = GeoCodes.getLocation(this.s21);
 		System.out.println(location);

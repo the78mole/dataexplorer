@@ -20,7 +20,6 @@
 package gde.histo.datasources;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -55,6 +54,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
+import gde.utils.ObjectKeyCompliance;
 
 /**
  * Access to history source directories.
@@ -187,6 +187,7 @@ public final class DirectoryScanner {
 			return this.isMajorChange;
 		}
 
+		@Deprecated
 		public void build4Test(Path filePath) {
 			sourceFolders = new SourceFolders();
 			sourceFolders.defineDirectories4Test(filePath);
@@ -267,6 +268,7 @@ public final class DirectoryScanner {
 			return slowFolderAccess;
 		}
 
+		@Deprecated
 		public void defineDirectories4Test(Path filePath) {
 			Set<Path> paths = new HashSet<>();
 			Path tmpPath = filePath == null ? DirectoryType.DATA.getDataSetPath() : filePath;
@@ -304,8 +306,8 @@ public final class DirectoryScanner {
 			Set<Path> result = new HashSet<Path>();
 			Stream<String> objectKeys = Stream.of(objectKey);
 			if (isSlowFolderAccess) DataExplorer.getInstance().setStatusMessage("find object folders in " + basePath.toString());
-			try {
-				result = defineObjectPathsSilently(basePath, objectKeys).collect(Collectors.toSet());
+			try (Stream<Path> objectPaths = ObjectKeyCompliance.defineObjectPaths(basePath, objectKeys)) {
+				result = objectPaths.collect(Collectors.toSet());
 			} catch (IOException e) {
 				log.log(Level.SEVERE, e.getMessage(), " is not accessible : " + e.getClass());
 			}
@@ -400,17 +402,6 @@ public final class DirectoryScanner {
 			}
 			return directoryTypeTexts.stream().collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
 		}
-	}
-
-	/**
-	 * @param basePath is any path
-	 * @return the paths to all folders with the name of the active object (or all object key folders if not object oriented)
-	 */
-	public static Stream<Path> defineObjectPathsSilently(Path basePath, Stream<String> objectKeys) throws IOException {
-		List<String> lowerCaseKeys = objectKeys.map(String::toLowerCase).collect(Collectors.toList());
-		Stream<Path> result = Files.walk(basePath).filter(Files::isDirectory) //
-				.filter(p -> lowerCaseKeys.contains(p.getFileName().toString().toLowerCase()));
-		return result;
 	}
 
 	private final SourceFoldersBuilder					sourceFoldersBuilder	= new SourceFoldersBuilder();
@@ -598,10 +589,11 @@ public final class DirectoryScanner {
 		Predicate<Path> workableFileDecider = new Predicate<Path>() {
 			@Override
 			public boolean test(Path filePath) {
-				return folders.entrySet().stream() //
+				Set<DirectoryType> directoryTypes = folders.entrySet().stream() //
 						.filter(e -> filePath.startsWith(e.getKey())) //
-						.map(e -> e.getValue()).flatMap(Set::stream) //
-						.anyMatch(d -> SourceDataSet.isWorkableFile(filePath, d));
+						.map(e -> e.getValue()).flatMap(Set::stream)//
+						.collect(Collectors.toSet());
+				return SourceDataSet.isWorkableFile(filePath, directoryTypes);
 			}
 		};
 
@@ -641,6 +633,8 @@ public final class DirectoryScanner {
 	public RebuildStep isValidated(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
 		if (sourceFileValidator.test(rebuildStep))
 			return rebuildStep;
+		else if (rebuildStep.isEqualOrBiggerThan(RebuildStep.B_HISTOVAULTS))
+			return rebuildStep;
 		else
 			return RebuildStep.B_HISTOVAULTS;
 	}
@@ -656,7 +650,7 @@ public final class DirectoryScanner {
 		if (watchDir == null || !isValid) {
 			initializeWatchDir(sourceFoldersBuilder.sourceFolders.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
 		}
-		log.log(Level.OFF, "hasChangedLogFiles=", watchDir.hasChangedLogFiles());
+		log.log(Level.FINER, "hasChangedLogFiles=", watchDir.hasChangedLogFiles());
 		return isValid && !watchDir.hasChangedLogFilesThenReset();
 
 	}
@@ -693,6 +687,7 @@ public final class DirectoryScanner {
 		return sourceFoldersBuilder.isChannelChangeOnly;
 	}
 
+	@Deprecated
 	public void build4Test(Path filePath) {
 		sourceFoldersBuilder.build4Test(filePath);
 	}

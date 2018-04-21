@@ -143,7 +143,7 @@ public final class WatchDir {
 			if (directoryNotification == null || directoryNotification.timerTask.scheduledExecutionTime() < System.currentTimeMillis() - 11) {
 				// get new instance if already executed or too close to the scheduled execution time
 				directoryNotification = new DirectoryNotification();
-				log.log(Level.OFF, "new instance created " + directoryNotification);
+				log.log(Level.FINE, "new instance created " + directoryNotification);
 				return true;
 			}
 			return false;

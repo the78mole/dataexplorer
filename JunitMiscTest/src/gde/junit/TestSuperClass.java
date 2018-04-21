@@ -222,7 +222,7 @@ public class TestSuperClass extends TestCase {
 		this.settings.setFilesWithoutObject(true);
 		this.settings.setFilesWithOtherObject(true);
 		this.settings.setRetrospectMonths("120"); // this is the current maximum value
-//		this.settings.setZippedCache(false); // keep the users setting in order not to delete any user cache entries
+//	this.settings.setZippedCache(false); // keep the users setting in order not to delete any user cache entries
 		this.settings.setAbsoluteTransitionLevel("999"); // results in default value
 		this.settings.setAbsoluteTransitionLevel("999"); // results in default value
 		this.settings.setSuppressMode(false);

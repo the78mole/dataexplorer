@@ -17,7 +17,7 @@
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 									2017,2018 Thomas Eickert
 ****************************************************************************************/
-package gde.junit;
+package gde.histo.utils;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -30,15 +30,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import gde.histo.utils.ElementaryQuantile;
-import gde.histo.utils.Quantile;
-import gde.histo.utils.Quantile.Fixings;
-import gde.histo.utils.Spot;
-import gde.histo.utils.UniversalQuantile;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
-public class QuantileTest extends TestSuperClass {
-	// maybe better to choose another directory structure: http://stackoverflow.com/a/2388285
-	// -> we have our own JunitTest project referenced hint is related if test code is part of each project only
+import gde.config.Settings;
+import gde.histo.utils.Quantile.Fixings;
+
+import junit.framework.TestCase;
+
+class QuantileTest extends TestCase {
 	private final static String	$CLASS_NAME									= QuantileTest.class.getName();
 	private final static Logger	log													= Logger.getLogger($CLASS_NAME);
 
@@ -74,6 +75,7 @@ public class QuantileTest extends TestSuperClass {
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@BeforeEach
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
@@ -81,7 +83,8 @@ public class QuantileTest extends TestSuperClass {
 		log.setUseParentHandlers(true);
 	}
 
-	public void testSigma() {
+	@Test
+	void testSigma() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
 		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS), 6, 9);
 		final double avg = this.quantile.getAvgFigure();
@@ -94,15 +97,16 @@ public class QuantileTest extends TestSuperClass {
 		assertEquals("getSigmaFigure=" + sigma, sigma, sigmaRunningOBS, DELTA);
 	}
 
-	public void testIqrNull() {
-		boolean isCanonical = this.settings.isCanonicalQuantiles();
-		boolean isSymmetric = this.settings.isSymmetricToleranceInterval();
+	@Test
+	void testIqrNull() {
+		Settings settings = Settings.getInstance();
+
 		System.out.println(" >>> 1st pass : Prevent outlier by tolerance interval based on SD in case of zero IQR");
 		{
 			Double[] values = new Double[] { 1., 1., 1., 1., 1., 1., 1., 7. };
 			{
-				this.settings.setCanonicalQuantiles(true);
-				this.settings.setSymmetricToleranceInterval(true);
+				settings.setCanonicalQuantiles(true);
+				settings.setSymmetricToleranceInterval(true);
 				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
 				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
@@ -111,8 +115,8 @@ public class QuantileTest extends TestSuperClass {
 				System.out.println("Canonical Outliers : " + dQuantile.getOutliersCsv());
 			}
 			{
-				this.settings.setCanonicalQuantiles(false);
-				this.settings.setSymmetricToleranceInterval(true);
+				settings.setCanonicalQuantiles(false);
+				settings.setSymmetricToleranceInterval(true);
 				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
 				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
@@ -121,8 +125,8 @@ public class QuantileTest extends TestSuperClass {
 				System.out.println("Zero-optimized Outliers : " + dQuantile.getOutliersCsv());
 			}
 			{
-				this.settings.setCanonicalQuantiles(false);
-				this.settings.setSymmetricToleranceInterval(true);
+				settings.setCanonicalQuantiles(false);
+				settings.setSymmetricToleranceInterval(true);
 				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 99., 99., new ArrayList<>());
 				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
@@ -135,8 +139,8 @@ public class QuantileTest extends TestSuperClass {
 		{
 			Double[] values = new Double[] { .9, .9, 1., 1., 1., 1., 2., 15. };
 			{
-				this.settings.setCanonicalQuantiles(true);
-				this.settings.setSymmetricToleranceInterval(true);
+				settings.setCanonicalQuantiles(true);
+				settings.setSymmetricToleranceInterval(true);
 				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
 				assertEquals("outlierSize", 1, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
@@ -145,8 +149,8 @@ public class QuantileTest extends TestSuperClass {
 				System.out.println("Canonical Outliers : " + dQuantile.getOutliersCsv());
 			}
 			{
-				this.settings.setCanonicalQuantiles(false);
-				this.settings.setSymmetricToleranceInterval(true);
+				settings.setCanonicalQuantiles(false);
+				settings.setSymmetricToleranceInterval(true);
 				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
 				assertEquals("outlierSize", 1, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
@@ -155,8 +159,8 @@ public class QuantileTest extends TestSuperClass {
 				System.out.println("Zero-optimized Outliers : " + dQuantile.getOutliersCsv());
 			}
 			{
-				this.settings.setCanonicalQuantiles(false);
-				this.settings.setSymmetricToleranceInterval(true);
+				settings.setCanonicalQuantiles(false);
+				settings.setSymmetricToleranceInterval(true);
 				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 99., 99., new ArrayList<>());
 				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
@@ -165,11 +169,11 @@ public class QuantileTest extends TestSuperClass {
 				System.out.println("Asymmetric tolerance interval Outliers : " + dQuantile.getOutliersCsv());
 			}
 		}
-		this.settings.setCanonicalQuantiles(isCanonical);
-		this.settings.setSymmetricToleranceInterval(isSymmetric);
 	}
 
-	public void testSortPerformance() {
+	@Tag("performance")
+	@Test
+	void testSortPerformance() {
 		// special double example : -zero
 		final Double d3 = -0d; // try this code with d3 = 0d; for comparison
 		if (d3 < 0d)
@@ -390,7 +394,8 @@ public class QuantileTest extends TestSuperClass {
 		}
 	}
 
-	public void testSampleZero2Null() {
+	@Test
+	void testSampleZero2Null() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
 		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS, Fixings.IS_SAMPLE), 6, 9);
 		assertEquals("q0SampleZeros2Null=" + q0SampleZeros2Null, q0SampleZeros2Null, this.quantile.getQuartile0(), DELTA);
@@ -402,7 +407,8 @@ public class QuantileTest extends TestSuperClass {
 		log.log(Level.INFO, " ---> " + this.quantile.getQuartile3());
 	}
 
-	public void testPopulationWithZerosForbiddenNulls() {
+	@Test
+	void testPopulationWithZerosForbiddenNulls() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
 		try {
 			this.quantile = new Quantile(record, EnumSet.noneOf(Fixings.class), 6, 9);
@@ -412,7 +418,8 @@ public class QuantileTest extends TestSuperClass {
 		}
 	}
 
-	public void testPopulationZero2Null() {
+	@Test
+	void testPopulationZero2Null() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
 		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS), 6, 9);
 		assertEquals("q0Zeros2Null=" + q0Zeros2Null, q0Zeros2Null, this.quantile.getQuartile0());
@@ -424,7 +431,8 @@ public class QuantileTest extends TestSuperClass {
 		log.log(Level.INFO, " ---> " + this.quantile.getQuartile3());
 	}
 
-	public void testQuantilesWhiskerZero2Null() {
+	@Test
+	void testQuantilesWhiskerZero2Null() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(recordArray));
 		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS), 6, 9);
 		assertEquals("qLowerWhiskerZeros2Null=" + qLowerWhiskerZeros2Null, qLowerWhiskerZeros2Null, this.quantile.getQuantileLowerWhisker(), DELTA);
@@ -433,7 +441,8 @@ public class QuantileTest extends TestSuperClass {
 		log.log(Level.INFO, " ---> " + this.quantile.getQuantileUpperWhisker());
 	}
 
-	public void testQuantilesAtSize1() {
+	@Test
+	void testQuantilesAtSize1() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(size1Array));
 		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS), 6, 9);
 		assertEquals("q0Zeros2Null=" + qxSize1Array, qxSize1Array, this.quantile.getQuartile0());
@@ -444,7 +453,8 @@ public class QuantileTest extends TestSuperClass {
 		assertEquals("q33PerCentZeros2Null=" + qxSize1Array, qxSize1Array, this.quantile.getQuantile(.33));
 	}
 
-	public void testQuantilesAtSize1ArrayNull() {
+	@Test
+	void testQuantilesAtSize1ArrayNull() {
 		Vector<Integer> record = new Vector<>(Arrays.asList(size1ArrayNull));
 		this.quantile = new Quantile(record, EnumSet.of(Fixings.REMOVE_NULLS, Fixings.REMOVE_ZEROS), 6, 9);
 		try {

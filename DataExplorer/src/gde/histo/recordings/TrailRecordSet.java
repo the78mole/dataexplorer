@@ -608,12 +608,12 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 	}
 
-	private final HistoExplorer	presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
+	private final HistoExplorer		presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
 
-	private final PickedVaults	pickedVaults;
+	private final PickedVaults		pickedVaults;
 
-	private final List<Integer>	durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
-	private final TrailDataTags	dataTags							= new TrailDataTags();
+	private final List<Integer>		durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
+	private final TrailDataTags		dataTags							= new TrailDataTags();
 
 	/**
 	 * Holds the view configuration.
@@ -1039,7 +1039,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				setValueGridRecordName(gridRecord != null && gridRecord.isVisible() ? gridRecordName : gridDefaultRecordName);
 			}
 			setSmartStatistics(Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true")));
-			presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(getChartWeights());
+			if (application.isWithUi()) presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(getChartWeights());
 			log.fine(() -> "applied histo graphics template file " + template.getTargetFilePath());
 
 			if (doUpdateVisibilityStatus) {
@@ -1062,7 +1062,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	public void setSmartStatistics(boolean isActive) {
 		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(isActive));
 		template.store();
-		application.getPresentHistoExplorer().updateHistoMenuItems();
+		if (application.isWithUi()) application.getPresentHistoExplorer().updateHistoMenuItems();
 	}
 
 	/**

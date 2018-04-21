@@ -52,6 +52,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
+import gde.utils.ObjectKeyCompliance;
 
 /**
  * Folder for additional object directories in the working directory.
@@ -71,7 +72,7 @@ public final class SupplementObjectFolder {
 	private static long					mirrorUpdate_ms			= System.currentTimeMillis() - MIRROR_CYCLE_MS;
 
 	public static void checkAndCreate() {
-		Path objectsPath = getObjectsPath();
+		Path objectsPath = getSupplementObjectsPath();
 		FileUtils.checkDirectoryAndCreate(objectsPath.toString());
 		FileUtils.extract(SupplementObjectFolder.class, README_NAME, Settings.PATH_RESOURCE, objectsPath.toString(), Settings.PERMISSION_555);
 	}
@@ -79,26 +80,37 @@ public final class SupplementObjectFolder {
 	/**
 	 * @return the directory based on the data path defined by the user which holds the accessible log files object folders
 	 */
-	public static Path getObjectsPath() {
+	public static Path getSupplementObjectsPath() {
 		return Paths.get(Settings.getInstance().getDataFilePath(), SUPPLEMENT_DIR_NAME);
 	}
 
 	/**
-	 * @param externalPath is a path with subdirectories ('E:\Logs')
-	 * @return the replacement path condensed to a single directory as a relative path ('E:_Logs')
+	 * @param externalPath is a non empty path with subdirectories ('E:\Logs')
+	 * @return the replacement path condensed to a single directory as a relative path ('E__Logs')
 	 */
-	private static Path getTargetBasePath(Path externalPath) {
+	static Path getTargetBasePath(Path externalPath) {
+		if (externalPath.toString().isEmpty()) throw new IllegalArgumentException("empty mirror property string");
+
 		String finalPath = externalPath.toString() //
 				.replaceAll(GDE.FILE_SEPARATOR_UNIX, GDE.STRING_UNDER_BAR) //
 				.replaceAll(Matcher.quoteReplacement(GDE.FILE_SEPARATOR_WINDOWS), GDE.STRING_UNDER_BAR) //
 				.replaceAll(GDE.STRING_COLON, GDE.STRING_UNDER_BAR);
-		log.fine(() -> "finalPath=" + finalPath + "  from " + externalPath.toString());
+		// force path starting with "__"
+		if (finalPath.substring(0, 1) != GDE.STRING_UNDER_BAR) finalPath = GDE.STRING_UNDER_BAR + finalPath;
+		if (finalPath.substring(1, 2) != GDE.STRING_UNDER_BAR) finalPath = GDE.STRING_UNDER_BAR + finalPath;
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "finalPath=" + finalPath + "  from " + externalPath.toString());
 		return Paths.get(finalPath);
 	}
 
+	/**
+	 * @return nonempty paths or an empty stream
+	 */
 	private static Stream<Path> getMirrorSourceFolders() {
+		String sourceFoldersCsv = Settings.getInstance().getMirrorSourceFoldersCsv();
+		if (sourceFoldersCsv.isEmpty()) return Stream.empty();
+
 		try {
-			return Arrays.stream(Settings.getInstance().getMirrorSourceFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+			return Arrays.stream(sourceFoldersCsv.split(GDE.STRING_CSV_SEPARATOR)) //
 					.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -124,20 +136,27 @@ public final class SupplementObjectFolder {
 	}
 
 	/**
+	 * Scan the mirror source folders.
+	 */
+	static void updateLogMirrorSync() {
+		SupplementObjectFolder instance = new SupplementObjectFolder();
+		instance.rebuildLogMirror();
+	}
+
+	/**
 	 * Delete all object folders.
 	 * Do not delete associated vaults for simplicity reasons.
 	 * @return a message for user notification with a maximum of {@value #PATHS_MESSAGE_LINES} folder paths
 	 */
 	public static String resetFolders() {
 		String message = "";
-		Path objectsPath = getObjectsPath();
+		Path objectsPath = getSupplementObjectsPath();
 		int initialSize_MiB = (int) (FileUtils.size(objectsPath) / 1024 / 1024);
 
-		try {
-			Stream<String> realObjectKeys = Settings.getInstance().getRealObjectKeys();
+		Stream<String> realObjectKeys = Settings.getInstance().getRealObjectKeys();
 
-			Stream<Path> stream = DirectoryScanner.defineObjectPathsSilently(objectsPath, realObjectKeys);
-			StringBuilder sb = new StringBuilder("  in ").append(objectsPath.toString()).append(GDE.STRING_BLANK_COLON_BLANK);
+		StringBuilder sb = new StringBuilder("  in ").append(objectsPath.toString()).append(GDE.STRING_BLANK_COLON_BLANK);
+		try (Stream<Path> stream = ObjectKeyCompliance.defineObjectPaths(objectsPath, realObjectKeys)) {
 			int[] i = new int[] { 0 };
 			stream.sorted(Comparator.reverseOrder()).forEach(p -> { // take the deeply nested folders first due to recursive delete
 				FileUtils.deleteDirectory(p.toString());
@@ -148,14 +167,15 @@ public final class SupplementObjectFolder {
 					sb.append(GDE.STRING_NEW_LINE).append(GDE.STRING_BLANK).append(objectsPath.relativize(p)).append(GDE.STRING_NEW_LINE).append(GDE.STRING_ELLIPSIS);
 				}
 			});
-
-			int deletedSize_MiB = (int) (FileUtils.size(objectsPath) / 1024 / 1024);
-			message = Messages.getString(MessageIds.GDE_MSGT0924, new Object[] { initialSize_MiB, deletedSize_MiB, sb.toString() });
-			log.log(Level.FINE, message);
+			// avoid windows file access errors in the size method below
+			Thread.sleep(11);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			message = "File access error";
+			return "File access error";
 		}
+		int deletedSize_MiB = (int) (FileUtils.size(objectsPath) / 1024 / 1024);
+		message = Messages.getString(MessageIds.GDE_MSGT0924, new Object[] { initialSize_MiB, deletedSize_MiB, sb.toString() });
+		log.log(Level.OFF, message);
 		return message;
 	}
 
@@ -213,7 +233,7 @@ public final class SupplementObjectFolder {
 		}
 	}
 
-	private final Path				supplementFolder	= getObjectsPath();
+	private final Path				supplementFolder	= getSupplementObjectsPath();
 	private final Set<String>	logFileExtentions	= DataExplorer.getInstance().getDeviceConfigurations().getValidLogExtentions();
 
 	/**
@@ -238,9 +258,8 @@ public final class SupplementObjectFolder {
 		Path targetBaseDir = supplementFolder.resolve(getTargetBasePath(externalBaseDir));
 
 		List<Path> result = new ArrayList<Path>();
-		try {
-			result = DirectoryScanner.defineObjectPathsSilently(externalBaseDir, Settings.getInstance().getRealObjectKeys()) //
-					.collect(Collectors.toList());
+		try (Stream<Path> objectPaths = ObjectKeyCompliance.defineObjectPaths(externalBaseDir, Settings.getInstance().getRealObjectKeys())) {
+			result = objectPaths.collect(Collectors.toList());
 			for (Path path : result) {
 				log.log(Level.FINER, "sourcePath=", path);
 				Path relativeSubPath = externalBaseDir.relativize(path);
@@ -288,8 +307,8 @@ public final class SupplementObjectFolder {
 				Path targetPath = targetDir.resolve(f.getFileName());
 				FileUtils.checkDirectoryAndCreate(targetDir.toString());
 				if (!targetPath.toFile().exists()) {
-					SourceDataSet sourceDataSet = new SourceDataSet(f.toFile());
-					if (sourceDataSet.getDataSetType() != null) { // check if supported by histo
+					SourceDataSet sourceDataSet = SourceDataSet.createSourceDataSet(f.toFile());
+					if (sourceDataSet != null) { // check if supported by histo
 						try {
 							File actualFile = sourceDataSet.getActualFile();
 							Files.copy(actualFile.toPath(), targetPath, options);

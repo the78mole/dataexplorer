@@ -36,13 +36,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.jar.JarEntry;
@@ -51,7 +48,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.XMLConstants;
@@ -914,101 +910,6 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * Scan the sub-directories in the data file and import file paths.
-	 * @return all non-empty sub-directories which neither represent devices nor objects
-	 */
-	public List<String> getObjectKeyNovelties(Map<String, DeviceConfiguration> devices) {
-		Set<String> result = new HashSet<String>();
-		ArrayList<Path> dirPaths = getSourcePaths();
-
-		final Set<String> lowerCaseObjectKeys = getRealObjectKeys().map(String::toLowerCase).collect(Collectors.toSet());
-		for (Path dirPath : dirPaths) {
-			if (!(dirPath == null || dirPath.toString().isEmpty())) {
-				try {
-					final File filePath = dirPath.toFile();
-					for (File file : FileUtils.getDirectories(filePath)) {
-						if (!devices.containsKey(file.getName()) && !lowerCaseObjectKeys.contains(file.getName().toLowerCase())) {
-							if (file.listFiles().length > 0) {
-								result.add(file.getName());
-							}
-						}
-					}
-				}
-				catch (FileNotFoundException e) {
-					log.log(Level.WARNING, e.getLocalizedMessage(), e);
-				}
-			}
-		}
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "object candidates=", result); //$NON-NLS-1$
-		return new ArrayList<String>(result);
-	}
-
-	/**
-	 * @return the valid paths for source files
-	 */
-	private ArrayList<Path> getSourcePaths() {
-		ArrayList<Path> dirPaths = new ArrayList<Path>();
-		{
-			final String dataFilePath = getDataFilePath();
-			if (dataFilePath != null && !dataFilePath.trim().isEmpty() && !dataFilePath.equals(GDE.FILE_SEPARATOR_UNIX)) {
-				dirPaths.add(Paths.get(dataFilePath));
-				log.log(Level.FINE, "data path ", dataFilePath); //$NON-NLS-1$
-			}
-		}
-		if (DataExplorer.getInstance().getActiveDevice() != null) {
-			String tmpImportDirPath = DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredDataLocation();
-			if (getSearchImportPath() && tmpImportDirPath != null && !tmpImportDirPath.trim().isEmpty() && !tmpImportDirPath.equals(GDE.FILE_SEPARATOR_UNIX)) {
-				Path path = Paths.get(tmpImportDirPath);
-				// ignore object if path ends with a valid object
-				String directoryName = path.getFileName().toString();
-				if (Settings.getInstance().getValidatedObjectKey(directoryName).isPresent())
-					path = path.getParent();
-				else {
-					// ignore device if path ends with a valid device
-					String directoryName2 = path.getFileName().toString();
-					if (DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent())
-						path = path.getParent();
-					else
-						// the directory is supposed to be a new object
-						path = path.getParent();
-					;
-				}
-				log.log(Level.FINE, "ImportBaseDir ", path); //$NON-NLS-1$
-				dirPaths.add(path);
-			}
-		}
-		return dirPaths;
-	}
-
-	/**
-	 * Scan the sub-directories in the data file and import file paths.
-	 * @return all non-empty sub-directories which do not represent devices
-	 */
-	public List<String> getObjectKeyCandidates(Map<String, DeviceConfiguration> devices) {
-		Set<String> result = new HashSet<String>();
-		ArrayList<Path> dirPaths = getSourcePaths();
-
-		for (Path dirPath : dirPaths) {
-			if (!(dirPath == null || dirPath.toString().isEmpty())) {
-				try {
-					final File filePath = dirPath.toFile();
-					for (File file : FileUtils.getDirectories(filePath)) {
-						if (!devices.containsKey(file.getName())) {
-							if (!FileUtils.getFileListing(file, Integer.MAX_VALUE).isEmpty()) {
-								result.add(file.getName());
-							}
-						}
-					}
-				}
-				catch (FileNotFoundException e) {
-					log.log(Level.WARNING, e.getLocalizedMessage(), e);
-				}
-			}
-		}
-		return new ArrayList<String>(result);
-	}
-
-	/**
 	 * @param objectKeyCandidate is supposed to be a valid object key
 	 * @return empty or the validated object key in the correct case sensitive format
 	 */
@@ -1102,6 +1003,13 @@ public class Settings extends Properties {
 		String[] objectKeys = this.getProperty(Settings.OBJECT_LIST, Messages.getString(MessageIds.GDE_MSGT0200)).split(GDE.STRING_SEMICOLON);
 		objectKeys[0] = "";
 		return objectKeys[getActiveObjectIndex()];
+	}
+
+	/**
+	 * @param newObjectKey is an arbitrary key (or device oriented fitting to the language) which is checked in the getter for conformity with the objects list
+	 */
+	public void setActiveObjectKey(String newObjectKey) {
+		this.setProperty(Settings.ACTIVE_OBJECT, newObjectKey);
 	}
 
 	/**

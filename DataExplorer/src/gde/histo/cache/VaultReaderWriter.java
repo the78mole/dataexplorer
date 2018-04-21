@@ -84,8 +84,8 @@ public final class VaultReaderWriter {
 	 */
 	public static void loadFromFile(Path filePath, List<VaultCollector> trusses) {
 		try {
-			SourceDataSet dataSet = new SourceDataSet(filePath);
-			dataSet.readVaults(trusses);
+			SourceDataSet dataSet = SourceDataSet.createSourceDataSet(filePath);
+			dataSet.readVaults(filePath, trusses);
 		} catch (Exception e) {
 			log.log(SEVERE, e.getMessage(), e);
 			log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //
@@ -183,25 +183,20 @@ public final class VaultReaderWriter {
 
 	/**
 	 * Get the zip file name from the history vault class and add all histoset vaults to this file.
-	 * @return the full size (in bytes) of the cache directory
-	 * @throws IOException
 	 */
-	public static long storeInCaches(TrussJobs trussJobs) throws IOException {
-		long[] bytes = { 0 };
+	public static void storeInCaches(TrussJobs trussJobs) throws IOException {
 		Map<SourceDataSet, List<VaultCollector>> groupedJobs = trussJobs.values().parallelStream().flatMap(Collection::parallelStream).collect(Collectors.groupingBy(VaultCollector::getSourceDataSet));
 		groupedJobs.entrySet().stream().forEach(e -> {
-			boolean providesReaderSettings = e.getKey().getDataSetType().providesReaderSettings();
+			boolean providesReaderSettings = e.getKey().providesReaderSettings();
 			String readerSettings = providesReaderSettings && application.getActiveDevice() instanceof IHistoDevice
 					? ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
 			Path cacheFilePath = ExtendedVault.getVaultsFolder(readerSettings);
-			try {
+			try  {
 				storeInCachePath(e.getValue(), cacheFilePath);
-				bytes[0] += Files.walk(cacheFilePath).map(Path::toFile).mapToLong(File::length).sum();
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
 			}
 		});
-		return bytes[0];
 	}
 
 	/**

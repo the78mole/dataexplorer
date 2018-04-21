@@ -107,8 +107,8 @@ public final class VaultCollector {
 
 	@Override
 	public String toString() {
-		return String.format("logChannelNumber=%d  logRecordSetOrdinal=%d  startTimestamp=%s  %s", //$NON-NLS-1$
-				this.vault.getLogChannelNumber(), this.vault.getLogRecordSetOrdinal(), this.vault.getStartTimeStampFormatted(), this.vault.getLoadFilePath());
+		return String.format("logChannelNumber=%d  logRecordSetOrdinal=%d  logObjectKey=%s  startTimestamp=%s  %s",
+				vault.getLogChannelNumber(), vault.getLogRecordSetOrdinal(), vault.getLogObjectKey(), vault.getStartTimeStampFormatted(), vault.getLoadFilePath());
 	}
 
 	/**

@@ -21,6 +21,7 @@ package gde.utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -45,16 +46,16 @@ import gde.ui.DataExplorer;
  * @author Winfried Brügmann
  */
 public class ObjectKeyScanner extends Thread {
-	final private static Logger	log					= Logger.getLogger(ObjectKeyScanner.class.getName());
+	final private static Logger		log									= Logger.getLogger(ObjectKeyScanner.class.getName());
 
-	final private DataExplorer	application	= DataExplorer.getInstance();
-	final private Settings			settings		= Settings.getInstance();
-	String											objectKey		= GDE.STRING_EMPTY;
-	//ET 20170511		boolean											searchForKeys			= false;
-	final boolean								addToExistentKeys;
-	final Vector<String>				objectKeys;
+	final private DataExplorer		application					= DataExplorer.getInstance();
+	final private Settings				settings						= Settings.getInstance();
+	String												objectKey						= GDE.STRING_EMPTY;
+	// ET 20170511 boolean searchForKeys = false;
+	final boolean									addToExistentKeys;
+	private final Vector<String>	objectKeys					= new Vector<>();
 
-	private List<String>				obsoleteObjectKeys;
+	private List<String>					obsoleteObjectKeys	= new ArrayList<>();
 
 	/**
 	 * constructor to create a object key scanner,
@@ -66,7 +67,6 @@ public class ObjectKeyScanner extends Thread {
 	public ObjectKeyScanner(boolean newAddToExistentKeys) {
 		super("objectKeyScanner");
 		this.addToExistentKeys = newAddToExistentKeys;
-		this.objectKeys = new Vector<String>();
 		if (DataExplorer.getInstance().getMenuToolBar() != null) {
 			for (String tmpObjKey : DataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
 				this.objectKeys.add(tmpObjKey);
@@ -85,7 +85,6 @@ public class ObjectKeyScanner extends Thread {
 		super("objectKeyScanner");
 		this.objectKey = newObjectKey;
 		this.addToExistentKeys = false;
-		this.objectKeys = new Vector<String>();
 		if (DataExplorer.getInstance().getMenuToolBar() != null) {
 			for (String tmpObjKey : DataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
 				this.objectKeys.add(tmpObjKey);
@@ -261,8 +260,8 @@ public class ObjectKeyScanner extends Thread {
 	private List<String> getObsoleteObjectKeys(File rootDirectory) throws FileNotFoundException {
 		// get current object key list as a basis for determining the obsolete object keys
 		List<String> resultObjectKeys = this.settings.getRealObjectKeys().collect(Collectors.toList());
-		Map<String, DeviceConfiguration> devices = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
-		resultObjectKeys.removeAll(this.settings.getObjectKeyNovelties(devices));
+		Map<String, DeviceConfiguration> devices = DataExplorer.getInstance().getDeviceConfigurations().getAllConfigurations();
+		resultObjectKeys.removeAll(ObjectKeyCompliance.defineObjectKeyNovelties(devices));
 
 		for (File dir : FileUtils.getDirectories(rootDirectory)) {
 			if (!FileUtils.getFileListing(dir, Integer.MAX_VALUE).isEmpty()) {

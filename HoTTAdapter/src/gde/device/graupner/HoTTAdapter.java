@@ -1035,7 +1035,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
 	 */
 	@Override
-	public List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException {
+	public List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException,
+			IOException, DataTypeException {
 		List<ExtendedVault> histoVaults = new ArrayList<>();
 
 		CheckedConsumer<VaultCollector> histoReader;

@@ -91,7 +91,7 @@ public class HistoExplorer {
 		int positionT = tabLength < TAB_INDEX_HISTO_TABLE ? tabLength : TAB_INDEX_HISTO_TABLE;
 		tableTabItems.add(HistoTableWindow.create(displayTab, SWT.NONE, positionT));
 
-		if (application.getActiveChannel() != null) updateHistoTabs(RebuildStep.A_HISTOSET, true);
+		if (application.getActiveChannel() != null) updateHistoTabs(RebuildStep.A_HISTOSET);
 	}
 
 	public void disposeHisto() {
@@ -121,7 +121,7 @@ public class HistoExplorer {
 		}
 		volatileStatusMessage = null;
 		histoSet.initialize();
-		updateHistoTabs(RebuildStep.A_HISTOSET, true);
+		updateHistoTabs(RebuildStep.A_HISTOSET);
 	}
 
 	/**
@@ -215,7 +215,7 @@ public class HistoExplorer {
 	 * Update any visible histo tab.
 	 */
 	public void updateHistoTabs() {
-		updateHistoTabs(RebuildStep.B_HISTOVAULTS, true);
+		updateHistoTabs(RebuildStep.B_HISTOVAULTS);
 	}
 
 	/**
@@ -224,17 +224,17 @@ public class HistoExplorer {
 	 * @param rebuildTrails true refills the recordset and keeps the selector settings; false only rebuilds the UI
 	 */
 	public void updateHistoTabs(boolean createRecordSet, boolean rebuildTrails) {
-		updateHistoTabs(createRecordSet ? RebuildStep.C_TRAILRECORDSET : rebuildTrails ? RebuildStep.D_TRAIL_DATA : RebuildStep.E_USER_INTERFACE, true);
+		updateHistoTabs(createRecordSet ? RebuildStep.C_TRAILRECORDSET : rebuildTrails ? RebuildStep.D_TRAIL_DATA : RebuildStep.E_USER_INTERFACE);
 	}
 
-	private void updateHistoTabs(RebuildStep rebuildStep, boolean isWithUi) {
+	private void updateHistoTabs(RebuildStep rebuildStep) {
 		if (application.getActiveChannel() == null) return;
 
 		if (Thread.currentThread().getId() == application.getThreadId()) {
 			log.log(Level.FINER, "initial size=", getTrailRecordSet() != null
 					? getTrailRecordSet().getDisplayRecords().size() + "  " + getTrailRecordSet().getVisibleAndDisplayableRecords().size() : "0   0");
 			if (isHistoWindowVisible()) {
-				Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
+				Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep), "rebuild4Screening"); //$NON-NLS-1$
 				try {
 					rebuilThread.start();
 				} catch (RuntimeException e) {
@@ -248,7 +248,7 @@ public class HistoExplorer {
 				@Override
 				public void run() {
 					if (isHistoWindowVisible()) {
-						Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep, isWithUi), "rebuild4Screening"); //$NON-NLS-1$
+						Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep), "rebuild4Screening"); //$NON-NLS-1$
 						try {
 							rebuilThread.start();
 						} catch (RuntimeException e) {
@@ -260,10 +260,10 @@ public class HistoExplorer {
 		}
 	}
 
-	public synchronized void rebuildHisto(RebuildStep rebuildStep, boolean isWithUi) {
+	public synchronized void rebuildHisto(RebuildStep rebuildStep) {
 		boolean isRebuilt = false;
 		try {
-			isRebuilt = histoSet.rebuild4Screening(rebuildStep, isWithUi);
+			isRebuilt = histoSet.rebuild4Screening(rebuildStep);
 
 			if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
 				if (histoSet.getTrailRecordSet() != null) {
@@ -276,7 +276,7 @@ public class HistoExplorer {
 			histoSet.setRebuildStepInvisibleTabs(rebuildStep, isRebuilt);
 		} catch (Exception e) {
 			log.log(SEVERE, e.getMessage(), e);
-			if (isWithUi) application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
+			if (application.isWithUi()) application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 		}
 	}
 
@@ -315,10 +315,10 @@ public class HistoExplorer {
 	public void updateVisibleTab(SelectionEvent evt) {
 		if (isHistoChartWindowVisible()) {
 			log.log(Level.FINER, "HistoChartWindow in displayTab.widgetSelected, event=", evt); //$NON-NLS-1$
-			updateHistoTabs(histoSet.getRebuildStepInvisibleTab(), true); // saves some time compared to HistoSet.RebuildStep.E_USER_INTERFACE
+			updateHistoTabs(histoSet.getRebuildStepInvisibleTab()); // saves some time compared to HistoSet.RebuildStep.E_USER_INTERFACE
 		} else if (isHistoTableWindowVisible()) {
 			log.log(Level.FINER, "HistoTableWindow in displayTab.widgetSelected, event=", evt); //$NON-NLS-1$
-			updateHistoTabs(HistoSet.RebuildStep.E_USER_INTERFACE, true); // ensures rebuild after trails change or record selector change
+			updateHistoTabs(HistoSet.RebuildStep.E_USER_INTERFACE); // ensures rebuild after trails change or record selector change
 		}
 	}
 
