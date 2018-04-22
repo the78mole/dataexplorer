@@ -19,8 +19,7 @@
 package gde.io;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -35,14 +34,14 @@ import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.ChannelTypes;
 import gde.device.IDevice;
-import gde.exception.DeclinedException;
-import gde.exception.NotSupportedFileFormatException;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.FileUtils;
+import gde.utils.ObjectKeyCompliance;
+import gde.utils.ObjectKeyScanner;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
 
@@ -236,14 +235,52 @@ public class FileHandler {
 			if (openFileDialog.getFileName().length() > 4) {
 				String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 
-				if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD))
+				if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
+					String directoryName = Paths.get(openFilePath).getParent().getFileName().toString();
+					if (isUpcomingObjectKey(directoryName)) createObjectKey(directoryName);
 					openOsdFile(openFilePath);
-				else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV))
+				} else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
+					String directoryName = Paths.get(openFilePath).getParent().getFileName().toString();
+					if (isUpcomingObjectKey(directoryName)) createObjectKey(directoryName);
 					openLovFile(openFilePath);
-				else
+				} else {
 					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0008) + openFilePath);
+				}
 			}
 		}
+	}
+
+	/**
+	 * Do everything to make the new object key available.
+	 */
+	public static void createObjectKey(String newObjectKey) {
+		ObjectKeyCompliance.addObjectKey(newObjectKey, Settings.getInstance().getObjectList());
+
+		DataExplorer.getInstance().getMenuToolBar().setObjectListElements();
+		DataExplorer.getInstance().setObjectDescriptionTabVisible(true);
+		DataExplorer.getInstance().updateObjectDescriptionWindow();
+
+		FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + newObjectKey);
+		new ObjectKeyScanner(newObjectKey).start();
+	}
+
+	/**
+	 * @return true if about object key creation (decided by the user or by application settings).
+	 */
+	public static boolean isUpcomingObjectKey(String directoryName) {
+		boolean objectQuery = Settings.getInstance().isHistoActive() && Settings.getInstance().isObjectQueryActive() //
+				&& directoryName.length() >= GDE.MIN_OBJECT_KEY_LENGTH //
+				&& !DataExplorer.getInstance().getDeviceConfigurations().contains(directoryName) //
+				&& !Settings.getInstance().getValidatedObjectKey(directoryName).isPresent();
+
+		if (DataExplorer.getInstance().isWithUi()) {
+			objectQuery = objectQuery && !DataExplorer.getInstance().getMenuToolBar().isObjectSelectorEditable();
+			if (objectQuery) {
+				int dialog = DataExplorer.getInstance().openYesNoMessageDialog(GDE.shell, Messages.getString(MessageIds.GDE_MSGT0929, new Object[] { directoryName }));
+				objectQuery = dialog != SWT.NO;
+			}
+		}
+		return objectQuery;
 	}
 
 	/**
@@ -260,10 +297,6 @@ public class FileHandler {
 	/**
 	 * open a DataExplorer file and load data into a cleaned device/channel
 	 * @param openFilePath
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws NotSupportedFileFormatException
-	 * @throws DeclinedException
 	 */
 	public void openOsdFile(String openFilePath) {
 		try {
@@ -475,10 +508,6 @@ public class FileHandler {
 	/**
 	 * open a LogView Data file and load data into a cleaned device/channel
 	 * @param openFilePath
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws NotSupportedFileFormatException
-	 * @throws DeclinedException
 	 */
 	public void openLovFile(final String openFilePath) {
 		try {

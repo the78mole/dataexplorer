@@ -166,7 +166,7 @@ public class SettingsDialog extends Dialog {
 	Group																timeZone;
 	Button															dateTimeUtcButton;
 	Group																fileOpenGroup;
-	Button															firstRecordSetButton;
+	Button															firstRecordSet, histoObjectQuery;
 	CTabItem														analysisTabItem;
 	CTabFolder													settingsTabFolder;
 	Slider															alphaSlider;
@@ -996,19 +996,37 @@ public class SettingsDialog extends Dialog {
 								this.fileOpenGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.fileOpenGroup.setText(Messages.getString(MessageIds.GDE_MSGT0880));
 								{
-									this.firstRecordSetButton = new Button(this.fileOpenGroup, SWT.CHECK);
+									this.firstRecordSet = new Button(this.fileOpenGroup, SWT.CHECK);
 									FormData formData = new FormData();
 									formData.left = new FormAttachment(0, 5);
-									this.firstRecordSetButton.setLayoutData(formData);
-									this.firstRecordSetButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.firstRecordSetButton.setText(Messages.getString(MessageIds.GDE_MSGT0881));
-									this.firstRecordSetButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0882));
-									this.firstRecordSetButton.setSelection(this.settings.isFirstRecordSetChoice());
-									this.firstRecordSetButton.addSelectionListener(new SelectionAdapter() {
+									this.firstRecordSet.setLayoutData(formData);
+									this.firstRecordSet.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.firstRecordSet.setText(Messages.getString(MessageIds.GDE_MSGT0881));
+									this.firstRecordSet.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0882));
+									this.firstRecordSet.setSelection(this.settings.isFirstRecordSetChoice());
+									this.firstRecordSet.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "firstRecordSetButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setFirstRecordSetChoice(SettingsDialog.this.firstRecordSetButton.getSelection());
+											SettingsDialog.this.settings.setFirstRecordSetChoice(SettingsDialog.this.firstRecordSet.getSelection());
+										}
+									});
+								}
+								{
+									this.histoObjectQuery = new Button(this.fileOpenGroup, SWT.CHECK);
+									FormData formData = new FormData();
+									formData.left = new FormAttachment(0, 5);
+									formData.top = new FormAttachment(this.firstRecordSet, 5);
+									this.histoObjectQuery.setLayoutData(formData);
+									this.histoObjectQuery.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.histoObjectQuery.setText(Messages.getString(MessageIds.GDE_MSGT0927));
+									this.histoObjectQuery.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0928));
+									this.histoObjectQuery.setSelection(this.settings.getFilesWithoutObject() && this.settings.getFilesWithOtherObject());
+									this.histoObjectQuery.addSelectionListener(new SelectionAdapter() {
+										@Override
+										public void widgetSelected(SelectionEvent evt) {
+											SettingsDialog.log.log(Level.FINEST, "histoObjectQueryButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											SettingsDialog.this.settings.setObjectQueryActive(SettingsDialog.this.histoObjectQuery.getSelection());
 										}
 									});
 								}

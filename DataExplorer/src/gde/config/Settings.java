@@ -187,6 +187,7 @@ public class Settings extends Properties {
 	final static String							IMPORT_FOLDERS_CSV							= "import_folders_csv";																																						//$NON-NLS-1$
 	final static String							MIRROR_SOURCE_FOLDERS_CSV				= "mirror_source_folders_csv";																																		//$NON-NLS-1$
 	final static String							IS_SOURCE_FILE_LISTENER_ACTIVE	= "is_source_file_listener_active";																																//$NON-NLS-1$
+	final static String							IS_OBJECT_QUERY_ACTIVE					= "is_object_query_active";																																				//$NON-NLS-1$
 
 	final static String							FILE_HISTORY_BLOCK							= "#[File-History-List]";																																					//$NON-NLS-1$
 	final static String							FILE_HISTORY_BEGIN							= "history_file_";																																								//$NON-NLS-1$
@@ -811,6 +812,7 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IMPORT_FOLDERS_CSV, getImportFoldersCsv())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MIRROR_SOURCE_FOLDERS_CSV, getMirrorSourceFoldersCsv())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SOURCE_FILE_LISTENER_ACTIVE, isSourceFileListenerActive())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_OBJECT_QUERY_ACTIVE, isObjectQueryActive())); //$NON-NLS-1$
 
 			this.writer.flush();
 			this.writer.close();
@@ -3139,5 +3141,19 @@ public class Settings extends Properties {
 	 */
 	public boolean isSourceFileListenerActive() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_SOURCE_FILE_LISTENER_ACTIVE, "false"));
+	}
+
+	/**
+	 * @param enabled true if a log file directory is checked for new object key candidate
+	 */
+	public void setObjectQueryActive(boolean enabled) {
+		this.setProperty(Settings.IS_OBJECT_QUERY_ACTIVE, String.valueOf(enabled));
+	}
+
+	/**
+	 * @return true if a log file directory is checked for new object key candidate
+	 */
+	public boolean isObjectQueryActive() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_OBJECT_QUERY_ACTIVE, "true"));
 	}
 }

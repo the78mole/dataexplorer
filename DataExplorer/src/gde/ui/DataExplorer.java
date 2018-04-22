@@ -22,6 +22,7 @@ package gde.ui;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,7 +30,6 @@ import java.util.Optional;
 import java.util.Vector;
 import java.util.function.Predicate;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
@@ -97,6 +97,7 @@ import gde.device.IDevice;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.ui.HistoExplorer;
 import gde.histo.ui.HistoSummaryWindow;
+import gde.io.FileHandler;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -517,7 +518,7 @@ public class DataExplorer extends Composite {
 
 		if (System.getProperty(GDE.ECLIPSE_STRING) == null) { // running outside eclipse
 			try {
-				logHandler = new FileHandler(this.settings.getLogFilePath(), 5000000, 3);
+				logHandler = new java.util.logging.FileHandler(this.settings.getLogFilePath(), 5000000, 3);
 				rootLogger.addHandler(logHandler);
 				logHandler.setFormatter(lf);
 				logHandler.setLevel(Level.ALL);
@@ -759,8 +760,12 @@ public class DataExplorer extends Composite {
 						for (String filePath : files) {
 							if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "dropped file = " + filePath); //$NON-NLS-1$
 							if (filePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
+								String directoryName = Paths.get(filePath).getParent().getFileName().toString();
+								if (directoryName.length() >= GDE.MIN_OBJECT_KEY_LENGTH && FileHandler.isUpcomingObjectKey(directoryName)) FileHandler.createObjectKey(directoryName);
 								DataExplorer.this.fileHandler.openOsdFile(filePath);
 							} else if (filePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
+								String directoryName = Paths.get(filePath).getParent().getFileName().toString();
+								if (directoryName.length() >= GDE.MIN_OBJECT_KEY_LENGTH && FileHandler.isUpcomingObjectKey(directoryName)) FileHandler.createObjectKey(directoryName);
 								DataExplorer.this.fileHandler.openLovFile(filePath);
 							} else {
 								application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0022));

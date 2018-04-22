@@ -117,18 +117,27 @@ public class ObjectKeyCompliance {
 	}
 
 	/**
-	 * @param newObjectKeys is the list of object keys with an empty placeholder for the new object key for transfer into the settings
+	 * @param newObjectKeys is the list of object keys for transfer into the settings
 	 */
-	public static void addObjectKey(String newObjKey, String[] newObjectKeys) {
-		// reverse loop - the placeholder is at the end
+	private static void replaceObjectKey(String oldObjKey, String newObjKey, String[] newObjectKeys) {
+		// reverse loop - the placeholder is at the end in case of add
 		int selectionIndex = newObjectKeys.length - 1;
 		for (; selectionIndex >= 0; selectionIndex--) {
-			if (newObjectKeys[selectionIndex].equals(GDE.STRING_EMPTY)) {
+			if (newObjectKeys[selectionIndex].equals(oldObjKey)) {
 				newObjectKeys[selectionIndex] = newObjKey;
 				break;
 			}
 		}
-		ObjectKeyCompliance.checkChannelForObjectKeyMissmatch(newObjKey);
+		Settings.getInstance().setObjectList(newObjectKeys, newObjKey);
+	}
+
+	/**
+	 * @param objectKeys is the list of object keys to be extended by the new object key for transfer into the settings
+	 */
+	public static void addObjectKey(String newObjKey, String[] objectKeys) {
+		String[] newObjectKeys = new String[objectKeys.length + 1];
+		System.arraycopy(objectKeys, 0, newObjectKeys, 0, objectKeys.length);
+		newObjectKeys[newObjectKeys.length - 1] = newObjKey;
 
 		Settings.getInstance().setObjectList(newObjectKeys, newObjKey);
 	}
@@ -147,23 +156,15 @@ public class ObjectKeyCompliance {
 			DataExplorer.getInstance().updateCurrentObjectData(newObjKey);
 		}
 
-		if (FileUtils.checkDirectoryExist(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey)) {
+		if (!oldObjKey.isEmpty() && FileUtils.checkDirectoryExist(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey)) {
 			// query for old directory deletion
 			if (!DataExplorer.getInstance().isWithUi() //
 					|| SWT.YES == DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031)))
 				FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey);
 		}
-		// replace modified object key
-		int selectionIndex = 0;
-		for (; selectionIndex < newObjectKeys.length; selectionIndex++) {
-			if (newObjectKeys[selectionIndex].equals(oldObjKey)) {
-				newObjectKeys[selectionIndex] = newObjKey;
-				break;
-			}
-		}
-		ObjectKeyCompliance.checkChannelForObjectKeyMissmatch(newObjKey);
+		replaceObjectKey(oldObjKey, newObjKey, newObjectKeys);
 
-		Settings.getInstance().setObjectList(newObjectKeys, newObjKey);
+		ObjectKeyCompliance.checkChannelForObjectKeyMissmatch(newObjKey);
 	}
 
 	/**
@@ -187,9 +188,11 @@ public class ObjectKeyCompliance {
 	public static void removeObjectKeys(List<String> obsoleteObjectKeys) {
 		List<String> realObjectKeys = Settings.getInstance().getRealObjectKeys().collect(Collectors.toList());
 		for (String tmpObjectKey : obsoleteObjectKeys) {
-			Path objectKeyDirPath = Paths.get(Settings.getInstance().getDataFilePath()).resolve(tmpObjectKey);
-			FileUtils.deleteDirectory(objectKeyDirPath.toString());
-			realObjectKeys.remove(objectKeyDirPath.getFileName().toString());
+  		if (!tmpObjectKey.isEmpty()) {
+				Path objectKeyDirPath = Paths.get(Settings.getInstance().getDataFilePath()).resolve(tmpObjectKey);
+				FileUtils.deleteDirectory(objectKeyDirPath.toString());
+			}
+			realObjectKeys.remove(tmpObjectKey);
 		}
 		Settings.getInstance().setObjectList(realObjectKeys.toArray(new String[0]), Settings.getInstance().getActiveObject());
 	}
@@ -299,8 +302,6 @@ public class ObjectKeyCompliance {
 
 	/**
 	 * Check the new key against an existing channel key and ask for replacement.
-	 * @param newObjectKey
-	 * @return false if the object key has changed and the user refuses to update it
 	 */
 	public static void checkChannelForObjectKeyMissmatch(String newObjectKey) {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();

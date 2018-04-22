@@ -22,8 +22,12 @@ package gde.junit;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import gde.GDE;
 import gde.messages.MessageIds;
@@ -58,7 +62,6 @@ public class ObjectKeyComplianceTest extends TestSuperClass {
 		Set<String> objectKeyCandidates = ObjectKeyCompliance.defineObjectKeyCandidates(application.getDeviceConfigurations().getAllConfigurations());
 		log.log(Level.FINER, "", objectKeyCandidates);
 		assertTrue("is valid object ", objectKeyCandidates.contains("TopSky"));
-		assertTrue("is valid object in subdirectory", objectKeyCandidates.contains("_ET_Exzerpt"));
 		assertFalse("is device ", objectKeyCandidates.contains("HoTTAdapter"));
 		assertFalse("is _SupplementObjectDirs  ", objectKeyCandidates.contains("_SupplementObjectDirs"));
 	}
@@ -70,7 +73,6 @@ public class ObjectKeyComplianceTest extends TestSuperClass {
 		log.log(Level.FINER, "", objectKeyKeyNovelties);
 		assertTrue("is valid object ", objectKeyKeyNovelties.contains("Porsche"));
 		assertFalse("is valid object ", objectKeyKeyNovelties.contains("TopSky"));
-		assertTrue("is valid object in subdirectory", objectKeyKeyNovelties.contains("_ET_Exzerpt"));
 		assertFalse("is device ", objectKeyKeyNovelties.contains("HoTTAdapter"));
 		assertFalse("is _SupplementObjectDirs  ", objectKeyKeyNovelties.contains("_SupplementObjectDirs"));
 	}
@@ -118,7 +120,20 @@ public class ObjectKeyComplianceTest extends TestSuperClass {
 		String deviceoriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
 		String[] objectKeys = new String[] { deviceoriented, "first", "2nd", "3rd", "" };
 
-		ObjectKeyCompliance.addObjectKey("1st", objectKeys);
+		ObjectKeyCompliance.renameObjectKey("", "1st", objectKeys);
 		assertTrue("object key added ", Arrays.equals(this.settings.getObjectList(), new String[] { deviceoriented, "1st", "2nd", "3rd", "first" }));
 	}
+
+	@Tag("performance")
+	@Test
+	public void testReadSourcePathsObjectKeysPerformance() {
+		for (int i = 0; i < 7; i++) {
+			long nanoTime = System.nanoTime();
+			Set<String> objectKeyCandidates = ObjectKeyCompliance.defineObjectKeyCandidates(application.getDeviceConfigurations().getAllConfigurations());
+
+			System.out.println(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " ms");
+			System.out.println(objectKeyCandidates);
+		}
+	}
+
 }

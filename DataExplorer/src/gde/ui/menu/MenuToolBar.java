@@ -1620,6 +1620,10 @@ public class MenuToolBar {
 		}
 	}
 
+	public boolean isObjectSelectorEditable() {
+		return this.objectSelectCombo.getEditable();
+	}
+
 	/**
 	 * Extracted from the Combo KeyListener for use by CheckButtons
 	 */
@@ -1627,7 +1631,7 @@ public class MenuToolBar {
 		boolean isDuplicateKey = Arrays.asList(MenuToolBar.this.objectSelectCombo.getItems()).stream().anyMatch(x -> x.equalsIgnoreCase(newObjKey));
 		if (!isDuplicateKey && newObjKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH && isObjectKeyConsistentWithDevices(newObjKey)) {
 			if (!isEditMode) { // new object key
-				ObjectKeyCompliance.addObjectKey(newObjKey, MenuToolBar.this.objectSelectCombo.getItems());
+				ObjectKeyCompliance.renameObjectKey(GDE.STRING_EMPTY, newObjKey, MenuToolBar.this.objectSelectCombo.getItems());
 			} else { // rename object key
 				log.log(Level.FINE, "oldObjectKey = " + MenuToolBar.this.oldObjectKey); //$NON-NLS-1$
 				if (MenuToolBar.this.oldObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
