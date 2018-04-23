@@ -107,6 +107,12 @@ public abstract class AbstractRecord extends Vector<Integer> {
 	public abstract int getNumberFormat();
 
 	public abstract void setNumberFormat(int newNumberFormat);
+	
+	/**
+	 * set instance value directly without logic
+	 * @param newNumberFormat
+	 */
+	public abstract void setNumberFormatDirect(int newNumberFormat);
 
 	public abstract AbstractRecordSet getAbstractParent();
 

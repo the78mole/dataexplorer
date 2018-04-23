@@ -1186,7 +1186,7 @@ public class CurveSelectorContextMenu {
 							double oldMaxValue = compareSet.getMaxValue();
 							CurveSelectorContextMenu.log.fine(() -> String.format("scale values from compare set min=%.3f max=%.3f", compareSet.getMinValue(), compareSet.getMaxValue())); //$NON-NLS-1$
 							for (int i = 0; i < compareSet.size(); i++) {
-								Record record = (Record) recordSet.get(i);
+								Record record = (Record) compareSet.get(i);
 								double newMinValue = record.getMinScaleValue();
 								double newMaxValue = record.getMaxScaleValue();
 								CurveSelectorContextMenu.log.fine(() ->	String.format("scale values from record (" + record.getName() + ") to be checked min=%.3f max=%.3f", newMinValue, newMaxValue)); //$NON-NLS-1$ //$NON-NLS-2$

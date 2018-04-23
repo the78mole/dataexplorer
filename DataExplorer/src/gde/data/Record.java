@@ -1260,6 +1260,15 @@ public class Record extends AbstractRecord {
 		return this.numberFormat;
 	}
 
+	/**
+	 * set instance value directly without logic
+	 * @param newNumberFormat
+	 */
+	@Override
+	public void setNumberFormatDirect(int newNumberFormat) {
+		this.numberFormat = newNumberFormat;
+	}
+
 	@Override
 	public void setNumberFormat(int newNumberFormat) {
 		this.numberFormat = newNumberFormat;

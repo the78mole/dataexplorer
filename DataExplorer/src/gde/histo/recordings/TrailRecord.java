@@ -450,6 +450,15 @@ public abstract class TrailRecord extends CommonRecord {
 		return this.reduction;
 	}
 
+	/**
+	 * set instance value directly without logic
+	 * @param newNumberFormat
+	 */
+	@Override
+	public void setNumberFormatDirect(int newNumberFormat) {
+		this.setNumberFormat(newNumberFormat);
+	}
+
 	@Override // reason: formatting of values <= 100 with decimal places; define category based on maxValueAbs AND minValueAbs
 	public void setNumberFormat(int newNumberFormat) {
 		template.numberFormat = newNumberFormat;

@@ -188,7 +188,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 						for (AbstractRecord tmpRecord : this.get(syncRecordOrdinal)) {
 							synchronized (tmpRecord) {
 								tmpRecord.setRealDf((DecimalFormat) tmpDf.clone());
-								tmpRecord.setNumberFormat(numberFormat);
+								tmpRecord.setNumberFormatDirect(numberFormat); //avoid recursion in compare set, replacement for record.numberformat=newValue
 							}
 						}
 						break;
