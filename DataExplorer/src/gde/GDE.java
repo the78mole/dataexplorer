@@ -236,7 +236,9 @@ public class GDE {
 	public static final String							FILE_ENDING_INI										= "ini";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_BIN										= "bin";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_LOG										= "log";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_TXT										= "txt";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_JML										= "jml";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_BIN_LOG								= "bin;*.log";																																																										//$NON-NLS-1$
 
 	public final static String							LINE_SEPARATOR										= System.getProperty("line.separator");																																											// is OS dependent //$NON-NLS-1$
 

@@ -257,8 +257,10 @@ public class DataExplorer extends Composite {
 		this.extensionFilterMap.put(GDE.FILE_ENDING_STAR, Messages.getString(GDE.IS_WINDOWS ? MessageIds.GDE_MSGT0216 : MessageIds.GDE_MSGT0676));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_INI, Messages.getString(MessageIds.GDE_MSGT0368));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_LOG, Messages.getString(MessageIds.GDE_MSGT0672));
-		this.extensionFilterMap.put(GDE.FILE_ENDING_BIN, Messages.getString(MessageIds.GDE_MSGT0672));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_JML, Messages.getString(MessageIds.GDE_MSGT0673));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_BIN, Messages.getString(MessageIds.GDE_MSGT0950));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_TXT, Messages.getString(MessageIds.GDE_MSGT0951));
+		this.extensionFilterMap.put(GDE.FILE_ENDING_BIN_LOG, Messages.getString(MessageIds.GDE_MSGT0952));
 	}
 
 	/**
