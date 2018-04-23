@@ -67,11 +67,8 @@ public class ObjectKeyScanner extends Thread {
 	public ObjectKeyScanner(boolean newAddToExistentKeys) {
 		super("objectKeyScanner");
 		this.addToExistentKeys = newAddToExistentKeys;
-		if (DataExplorer.getInstance().getMenuToolBar() != null) {
-			for (String tmpObjKey : DataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
-				this.objectKeys.add(tmpObjKey);
-			}
-			//this.setPriority(Thread.MIN_PRIORITY);
+		for (String tmpObjKey : this.settings.getObjectList()) {
+			this.objectKeys.add(tmpObjKey);
 		}
 	}
 
@@ -85,11 +82,8 @@ public class ObjectKeyScanner extends Thread {
 		super("objectKeyScanner");
 		this.objectKey = newObjectKey;
 		this.addToExistentKeys = false;
-		if (DataExplorer.getInstance().getMenuToolBar() != null) {
-			for (String tmpObjKey : DataExplorer.getInstance().getMenuToolBar().getObjectKeyList()) {
-				this.objectKeys.add(tmpObjKey);
-			}
-			//this.setPriority(Thread.MIN_PRIORITY);
+		for (String tmpObjKey : this.settings.getObjectList()) {
+			this.objectKeys.add(tmpObjKey);
 		}
 	}
 
