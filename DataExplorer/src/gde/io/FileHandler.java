@@ -255,8 +255,9 @@ public class FileHandler {
 	 */
 	public static void createObjectKey(String newObjectKey) {
 		ObjectKeyCompliance.addObjectKey(newObjectKey, Settings.getInstance().getObjectList());
+		ObjectKeyCompliance.checkChannelForObjectKeyMissmatch(newObjectKey);
 
-		DataExplorer.getInstance().getMenuToolBar().setObjectListElements();
+		DataExplorer.getInstance().getMenuToolBar().setObjectList(Settings.getInstance().getObjectList(), newObjectKey);
 		DataExplorer.getInstance().setObjectDescriptionTabVisible(true);
 		DataExplorer.getInstance().updateObjectDescriptionWindow();
 
@@ -441,6 +442,9 @@ public class FileHandler {
 			if (FileUtils.checkFileExist(osdFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0013, new Object[] { osdFilePath }))) {
 				return;
 			}
+
+			String directoryName = Paths.get(osdFilePath).getParent().getFileName().toString();
+			if (isUpcomingObjectKey(directoryName)) createObjectKey(directoryName);
 
 			try {
 				this.application.enableMenuActions(false);
