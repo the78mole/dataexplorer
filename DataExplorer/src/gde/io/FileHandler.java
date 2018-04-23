@@ -80,6 +80,9 @@ public class FileHandler {
 		if (csvFileDialog.getFileName().length() > 4) {
 			final String csvFilePath = csvFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
 
+			String directoryName = Paths.get(csvFilePath).getParent().getFileName().toString();
+			if (isUpcomingObjectKey(directoryName)) createObjectKey(directoryName);
+
 			try {
 				char listSeparator = deviceSetting.getListSeparator();
 				//check current device and switch if required
@@ -257,7 +260,7 @@ public class FileHandler {
 		ObjectKeyCompliance.addObjectKey(newObjectKey, Settings.getInstance().getObjectList());
 		ObjectKeyCompliance.checkChannelForObjectKeyMissmatch(newObjectKey);
 
-		DataExplorer.getInstance().getMenuToolBar().setObjectList(Settings.getInstance().getObjectList(), newObjectKey);
+		DataExplorer.getInstance().setObjectListElements();
 		DataExplorer.getInstance().setObjectDescriptionTabVisible(true);
 		DataExplorer.getInstance().updateObjectDescriptionWindow();
 
@@ -275,9 +278,10 @@ public class FileHandler {
 				&& !Settings.getInstance().getValidatedObjectKey(directoryName).isPresent();
 
 		if (DataExplorer.getInstance().isWithUi()) {
-			objectQuery = objectQuery && !DataExplorer.getInstance().getMenuToolBar().isObjectSelectorEditable();
+			objectQuery = objectQuery && !DataExplorer.getInstance().isObjectSelectorEditable();
 			if (objectQuery) {
-				int dialog = DataExplorer.getInstance().openYesNoMessageDialog(GDE.shell, Messages.getString(MessageIds.GDE_MSGT0929, new Object[] { directoryName }));
+				int dialog = DataExplorer.getInstance().openYesNoMessageDialogSync(Messages.getString(MessageIds.GDE_MSGT0929, new Object[] {
+						directoryName }));
 				objectQuery = dialog != SWT.NO;
 			}
 		}

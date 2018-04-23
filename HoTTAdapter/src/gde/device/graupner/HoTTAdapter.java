@@ -25,6 +25,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1290,6 +1291,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 							Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							// String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+
+							String directoryName = Paths.get(selectedImportFile).getParent().getFileName().toString();
+							if (FileHandler.isUpcomingObjectKey(directoryName)) FileHandler.createObjectKey(directoryName);
+
 							try {
 								if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
 									HoTTbinReader.read(selectedImportFile);

@@ -1704,6 +1704,39 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
+	 * set the object list elements synchronously
+	 */
+	public void setObjectListElements() {
+		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+			this.menuToolBar.setObjectListElements();
+		} else {
+			GDE.display.syncExec(new Runnable() {
+				@Override
+				public void run() {
+					DataExplorer.this.menuToolBar.setObjectListElements();
+				}
+			});
+		}
+	}
+
+	public boolean isObjectSelectorEditable() {
+		boolean objectSelectorEditable = true;
+		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+			objectSelectorEditable = DataExplorer.getInstance().getMenuToolBar().isObjectSelectorEditable();
+		} else { // if the percentage is not up to date it will updated later
+			boolean[] isObjectSelectorEditable = new boolean[] { true };
+			GDE.display.syncExec(new Runnable() {
+				@Override
+				public void run() {
+					isObjectSelectorEditable[0] = DataExplorer.getInstance().getMenuToolBar().isObjectSelectorEditable();
+				}
+			});
+			objectSelectorEditable = isObjectSelectorEditable[0];
+		}
+		return objectSelectorEditable;
+	}
+
+	/**
 	 * enable / disable the zoom menu buttons
 	 * @param enabled
 	 */

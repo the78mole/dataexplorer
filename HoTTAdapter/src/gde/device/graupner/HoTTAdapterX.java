@@ -19,6 +19,7 @@
 package gde.device.graupner;
 
 import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 
 import javax.xml.bind.JAXBException;
 
@@ -30,6 +31,7 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.graupner.hott.MessageIds;
 import gde.io.DataParser;
+import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.utils.FileUtils;
@@ -84,6 +86,10 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 							Integer channelConfigNumber = HoTTAdapterX.this.application.getActiveChannelNumber();
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+
+							String directoryName = Paths.get(selectedImportFile).getParent().getFileName().toString();
+							if (FileHandler.isUpcomingObjectKey(directoryName)) FileHandler.createObjectKey(directoryName);
+
 							try {
 								HoTTbinReaderX.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
 								if (!isInitialSwitched) {
@@ -157,7 +163,7 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 17);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 25);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 20000) { 
+					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 20000) {
 						points[9] = tmpVoltage * 1000;
 						points[10] = DataParser.parse2Short(dataBuffer, 19) * 1000;
 						points[11] = tmpCurrent * 1000;
@@ -208,7 +214,7 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 					}
 				}
 				break;
-				
+
 			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 				//0=Rx->Tx-PLoss, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin
 				//9=SpannungM, 10=SpannungM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
@@ -218,8 +224,8 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 18);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 20000) { 
-						points[9] = tmpVoltage * 1000; 
+					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 20000) {
+						points[9] = tmpVoltage * 1000;
 						points[10] = DataParser.parse2Short(dataBuffer, 12) * 1000;
 						points[11] = tmpCurrent * 1000;
 						points[12] = DataParser.parse2Short(dataBuffer, 16) * 1000;
