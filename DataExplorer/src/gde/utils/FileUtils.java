@@ -1662,7 +1662,8 @@ public class FileUtils {
 
 	/**
 	 * Attempts to calculate the size of a file or directory.
-	 * <p> Since the operation is non-atomic, the returned value may be inaccurate.
+	 * <p>
+	 * Since the operation is non-atomic, the returned value may be inaccurate.
 	 * However, this method is quick and does its best.
 	 * @see <a href="http://stackoverflow.com/a/19877372">Code example</a>
 	 */
@@ -1690,9 +1691,10 @@ public class FileUtils {
 					return FileVisitResult.CONTINUE;
 				}
 			});
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw new AssertionError("walkFileTree will not throw IOException if the FileVisitor does not");
+		} catch (Exception e) {
+			FileUtils.log.log(Level.WARNING, e.getMessage(), e);
 		}
 		return size.get();
 	}
