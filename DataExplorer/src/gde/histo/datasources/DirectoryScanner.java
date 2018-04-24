@@ -306,6 +306,8 @@ public final class DirectoryScanner {
 				result = objectPaths.collect(Collectors.toSet());
 			} catch (IOException e) {
 				log.log(Level.SEVERE, e.getMessage(), " is not accessible : " + e.getClass());
+			} catch (Exception e) {
+				log.log(Level.WARNING, e.getMessage(), e);
 			}
 			if (isSlowFolderAccess) DataExplorer.getInstance().setStatusMessage("");
 			return result;
