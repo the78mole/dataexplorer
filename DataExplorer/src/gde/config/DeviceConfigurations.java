@@ -165,7 +165,7 @@ public final class DeviceConfigurations {
 	 */
 	public Set<String>  getImportExtentions() {
 		Set<String> extentions = this.configs.values().parallelStream() //
-				.map(c -> Arrays.asList(c.getDataBlockPreferredFileExtention().split(GDE.STRING_COMMA))).flatMap(Collection::stream) //
+				.map(c -> Arrays.asList(c.getDataBlockPreferredFileExtention().split(GDE.REGEX_FILE_EXTENTION_SEPARATION))).flatMap(Collection::stream) //
 				.map(s-> s.substring(s.lastIndexOf(GDE.STRING_DOT))).map(e-> e.toLowerCase()) //
 				.collect(Collectors.toSet());
 		return extentions;

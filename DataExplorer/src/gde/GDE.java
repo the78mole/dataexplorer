@@ -119,6 +119,8 @@ public class GDE {
 	public final static long								ONE_HOUR_MS												= 1 * 60 * 60 * 1000;
 	public final static int									MIN_OBJECT_KEY_LENGTH							= 1;
 
+	public static final String							REGEX_FILE_EXTENTION_SEPARATION		= ",|;";																																																								//$NON-NLS-1$
+
 	public final static String							STRING_NEW_LINE										= "\n";																																																											// is OS dependent //$NON-NLS-1$
 	public final static String							STRING_RETURN											= "\r";																																																											// is OS dependent //$NON-NLS-1$
 	public static final String							STRING_MESSAGE_CONCAT							= " - ";																																																										//$NON-NLS-1$

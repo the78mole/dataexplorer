@@ -26,6 +26,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
@@ -240,6 +242,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	static double								longitudeToleranceFactor			= 25.0;
 
 	protected UniversalSampler	histoRandomSample;
+	protected List<String>			importExtentions							= null;
 
 	/**
 	 * constructor using properties file
@@ -977,24 +980,23 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		return importExtention;
 	}
 
+	private void setSupportedImportExtentions() {
+		if (isHistoImportSupported()) {
+			this.importExtentions = Arrays.stream(getDataBlockPreferredFileExtention().split(GDE.REGEX_FILE_EXTENTION_SEPARATION)) //
+					.map(s -> s.substring(s.lastIndexOf(GDE.STRING_DOT) + 1)).map(e -> e.toLowerCase()) //
+					.collect(Collectors.toList());
+		} else {
+			this.importExtentions = new ArrayList<>();
+		}
+	}
+
 	/**
 	 * @return the device's native file extentions if the device supports histo imports (e.g. 'bin' or 'log')
 	 */
 	@Override
 	public List<String> getSupportedImportExtentions() {
-		List<String> importExtentions = new ArrayList<>();
-		if (isHistoImportSupported()) {
-			String[] preferredFileExtentions = this.application.getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredFileExtention().split(GDE.STRING_COMMA);
-			if (preferredFileExtentions != null && preferredFileExtentions.length != 0) {
-				for (String preferredFileExtention : preferredFileExtentions) {
-					if (preferredFileExtention.endsWith(GDE.FILE_ENDING_BIN)) {
-						importExtentions.add(GDE.FILE_ENDING_BIN);
-						break;
-					}
-				}
-			}
-		}
-		return importExtentions;
+		if (this.importExtentions == null) setSupportedImportExtentions();
+		return this.importExtentions;
 	}
 
 	/**
@@ -1008,6 +1010,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of points"); //$NON-NLS-1$
 		int recordTimespan_ms = 10;
 		this.histoRandomSample = UniversalSampler.createSampler(channelNumber, maxPoints, minPoints, recordTimespan_ms);
+	}
+
+	/**
+	 * Extended consumer supporting exceptions.
+	 */
+	@FunctionalInterface
+	interface CheckedConsumer<T> {
+		void accept(T t) throws DataInconsitsentException, IOException, DataTypeException;
 	}
 
 	/**
@@ -1027,11 +1037,19 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	@Override
 	public List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException {
 		List<ExtendedVault> histoVaults = new ArrayList<>();
+
+		CheckedConsumer<VaultCollector> histoReader;
+		if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
+			histoReader = t -> HoTTbinHistoReader.read(t);
+		} else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+			histoReader = t -> { // todo implement HoTTlogHistoReader
+			};
+		} else {
+			throw new UnsupportedOperationException();
+		}
 		for (VaultCollector truss : trusses) {
 			if (truss.getVault().getLoadFilePath().equals(filePath.toString())) {
-				log.log(Level.INFO, "start ", filePath); //$NON-NLS-1$
-				// add aggregated measurement and settlement points and score points to the truss
-				HoTTbinHistoReader.read(truss);
+				histoReader.accept(truss);
 				histoVaults.add(truss.getVault());
 			} else
 				throw new UnsupportedOperationException("all trusses must carry the same logFilePath"); //$NON-NLS-1$
