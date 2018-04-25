@@ -63,7 +63,7 @@ public class S32_2 extends S32 implements IDevice {
 	 * as example a file selection dialog could be opened to import serialized ASCII data 
 	 */
 	public void importDeviceData() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT3800), SWT.SINGLE);
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT3800), SWT.MULTI);
 
 		Thread reader = new Thread("reader") { //$NON-NLS-1$
 			@Override
@@ -94,5 +94,14 @@ public class S32_2 extends S32 implements IDevice {
 			}
 		};
 		reader.start();
+	}
+
+	/**
+	 * query if the record set numbering should follow channel configuration numbering
+	 * @return true where devices does not distinguish between channels (for example Av4ms_FV_762)
+	 */
+	@Override
+	public boolean recordSetNumberFollowChannel() {
+		return false;
 	}
 }
