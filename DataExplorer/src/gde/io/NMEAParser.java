@@ -1617,5 +1617,13 @@ public class NMEAParser implements IDataParser {
 		}
 		return isSupported;
 	}
+
+	/**
+	 * @return true if all $2, $3 should be redirected to channel 1
+	 */
+	@Override
+	public boolean isRedirectChannel1() {
+		return false;
+	}
 	
 }

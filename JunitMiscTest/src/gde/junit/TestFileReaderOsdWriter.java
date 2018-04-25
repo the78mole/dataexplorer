@@ -1225,6 +1225,91 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 	}
 
 	/**
+	 * test reading CSV(.txt) S32 files in configured base directory (DataExplorer.properties and writes OSD files to %TEMP%\Write_1_OSD
+	 * all files must identical except time stamp
+	 */
+	public final void testS32_2TxtReaderOsdWriter() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		try {
+			this.setDataPath(); //set the dataPath variable
+			List<File> files = FileUtils.getFileListing(new File(this.dataPath.getAbsolutePath() + "/S32/"), 1);
+
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".txt") && !file.getAbsolutePath().toLowerCase().contains("config") 
+						&& !file.getAbsolutePath().toLowerCase().contains("version") && !file.getAbsolutePath().toLowerCase().contains("info")) {
+					System.out.println("working with : " + file);
+					
+					//System.out.println("file.getPath() = " + file.getPath());
+					String deviceName = "S32_2";
+					deviceName = deviceName.substring(1+deviceName.lastIndexOf(GDE.FILE_SEPARATOR));
+					//System.out.println("deviceName = " + deviceName);
+					DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+					if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
+
+						// CSV2SerialAdapter file
+						IDevice device = this.getInstanceOfDevice(deviceConfig);
+						this.application.setActiveDeviceWoutUI(device);
+
+						setupDataChannels(device);
+
+						this.channels.setActiveChannelNumber(1);
+						Channel activeChannel = this.channels.getActiveChannel();
+						activeChannel.setFileName(file.getAbsolutePath());
+						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
+						activeChannel.setSaved(true);
+
+						CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "RecordSet", 1, 
+								new DataParser(device.getDataBlockTimeUnitFactor(), 
+										device.getDataBlockLeader(), device.getDataBlockSeparator().value(), 
+										device.getDataBlockCheckSumType(), device.getDataBlockSize(InputTypes.FILE_IO)));
+						RecordSet recordSet = activeChannel.getActiveRecordSet();
+
+						if (recordSet != null) {
+							activeChannel.setActiveRecordSet(recordSet);
+							activeChannel.applyTemplate(recordSet.getName(), true);
+							//device.makeInActiveDisplayable(recordSet);
+							drawCurves(recordSet, 1024, 768);
+						}
+
+						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
+						new File(tmpDir1).mkdirs();
+						String absolutFilePath = tmpDir1 + file.getName();
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_txt.osd";
+						System.out.println("writing as   : " + absolutFilePath);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+				}
+			}
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+		catch (NotSupportedFileFormatException e) {
+			e.printStackTrace();
+		}
+		catch (DataInconsitsentException e) {
+			e.printStackTrace();
+		}
+		catch (DataTypeException e) {
+			e.printStackTrace();
+		}
+		catch (NotSupportedException e) {
+			e.printStackTrace();
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
+	/**
 	 * test reading CSV(.txt) JLog2 files in configured base directory (DataExplorer.properties and writes OSD files to %TEMP%\Write_1_OSD
 	 * all files must identical except time stamp
 	 */

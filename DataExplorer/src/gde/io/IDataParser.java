@@ -90,4 +90,11 @@ public interface IDataParser {
 	 * @return the channel/config number to locate the parsed data
 	 */
 	public int getChannelConfigNumber();
+	
+
+	/**
+	 * @return true if all $2, $3 should be redirected to channel 1
+	 */
+	public boolean isRedirectChannel1();
+
 }

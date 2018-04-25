@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  * All properties around the textual data in this line has to be specified in DataBlockType (type=TEXT, size number of values, separator=;, ...), refer to DeviceProperties_XY.XSD
  * @author Winfried Brügmann
  */
-public class DataParser extends NMEAParser {
+public class DataParser extends NMEAParser implements IDataParser {
 	static Logger			log										= Logger.getLogger(DataParser.class.getName());
 
 	protected int								start_time_ms					= Integer.MIN_VALUE;
@@ -47,6 +47,7 @@ public class DataParser extends NMEAParser {
 	protected final FormatTypes	checkSumFormatType;
 	protected final FormatTypes	dataFormatType;
 	protected final boolean			isMultiply1000;
+	protected final boolean			isRedirectChannel1;
 
 	/**
 	 * constructor to initialize required configuration parameter
@@ -64,6 +65,7 @@ public class DataParser extends NMEAParser {
 		this.checkSumFormatType = FormatTypes.BINARY; //checksum is build using contained values
 		this.dataFormatType = FormatTypes.VALUE; //dataBlockSize specifies the number of contained values
 		this.isMultiply1000 = true;
+		this.isRedirectChannel1 = false;
 	}
 
 	/**
@@ -84,6 +86,34 @@ public class DataParser extends NMEAParser {
 		this.checkSumFormatType = useCheckSumFormatType;
 		this.dataFormatType = useDataFormatType; //dataBlockSize specifies the number of contained values if FormatTypes.TEXT else FormatTypes.BINARY the contained byte size
 		this.isMultiply1000 = doMultiply1000;
+		this.isRedirectChannel1 = false;
+	}
+
+	/**
+	 * @return true if all $2, $3 should be redirected to channel 1
+	 */
+	@Override
+	public boolean isRedirectChannel1() {
+		return this.isRedirectChannel1;
+	}
+
+	/**
+	 * constructor to initialize required configuration parameter
+	 * assuming checkSumFormatType == FormatTypes.TEXT to checksum is build using contained values
+	 * dataFormatType == FormatTypes.TEXT where dataBlockSize specifies the number of contained values (file input)
+	 * @param useTimeFactor
+	 * @param useLeaderChar
+	 * @param useSeparator
+	 * @param useCheckSumType if null, no checksum calculation will occur
+	 * @param useDataSize
+	 */
+	public DataParser(int useTimeFactor, String useLeaderChar, String useSeparator, CheckSumTypes useCheckSumType, int useDataSize, boolean redirect2Channel1) {
+		super(useLeaderChar, useSeparator, useCheckSumType, useDataSize, DataExplorer.getInstance().getActiveDevice(), DataExplorer.getInstance().getActiveChannelNumber(), (short) 0);
+		this.timeFactor = useTimeFactor;
+		this.checkSumFormatType = FormatTypes.BINARY; //checksum is build using contained values
+		this.dataFormatType = FormatTypes.VALUE; //dataBlockSize specifies the number of contained values
+		this.isMultiply1000 = true;
+		this.isRedirectChannel1 = redirect2Channel1;
 	}
 
 	@Override
@@ -91,7 +121,7 @@ public class DataParser extends NMEAParser {
 		try {
 			String[] strValues = inputLine.split(this.separator); // {$1, 1, 0, 14780, 0,598, 1,000, 8,838, 22}
 			try {
-				this.channelConfigNumber = Integer.parseInt(strValues[0].substring(1).trim());
+				this.channelConfigNumber = this.isRedirectChannel1 ? 1 : Integer.parseInt(strValues[0].substring(1).trim());
 				this.valueSize = this.dataFormatType != null && this.dataFormatType == FormatTypes.BINARY 
 						? strValues.length - 4 
 						: this.dataFormatType != null && this.dataFormatType == FormatTypes.VALUE	&& this.dataBlockSize != 0 
@@ -124,7 +154,7 @@ public class DataParser extends NMEAParser {
 	@Override
 	public void parse(String inputLine, String[] strValues) throws DevicePropertiesInconsistenceException {
 		String strValue = strValues[0].trim().substring(1);
-		this.channelConfigNumber = Integer.parseInt(strValue);
+		this.channelConfigNumber = isRedirectChannel1 ? 1 : Integer.parseInt(strValue);
 
 		strValue = strValues[1].trim();
 		this.state = Integer.parseInt(strValue);

@@ -63,7 +63,7 @@ public class CSVSerialDataReaderWriter {
 	static String					lineSep	= GDE.LINE_SEPARATOR;
 	static DecimalFormat	df3			= new DecimalFormat("0.000"); //$NON-NLS-1$
 	static StringBuffer		sb;
-	
+		
 	final static DataExplorer				application	= DataExplorer.getInstance();
 	final static Channels						channels		= Channels.getInstance();
 
@@ -73,7 +73,7 @@ public class CSVSerialDataReaderWriter {
 	 * @param device
 	 * @param recordNameExtend
 	 * @param channelConfigNumber
-	 * @param isRaw
+	 * @param data pre-initialized parser
 	 * @return record set created
 	 * @throws NotSupportedFileFormatException 
 	 * @throws MissMatchDeviceException 
@@ -96,6 +96,10 @@ public class CSVSerialDataReaderWriter {
 		RecordSet channelRecordSet = null;
 		int lastRecordSetNumberOffset = 0;
 		Vector<RecordSet> createdRecordSets = new Vector<RecordSet>(1);
+		StringBuilder inputLineBuffer = new StringBuilder();
+		boolean isRedirect2Channel1 = data.isRedirectChannel1();
+		int endIndex = 0;
+		int dataBlockNumber = 1;
 
 		try {
 			if (channelConfigNumber == null)
@@ -168,7 +172,36 @@ public class CSVSerialDataReaderWriter {
 						continue;
 					}
 					
-					data.parse(line, lineNumber);
+					if (isRedirect2Channel1) {
+						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "number of values inputLineBuffer " + inputLineBuffer.toString().split(device.getDataBlockSeparator().value()).length);
+						if (line.startsWith("$1")) { //start new $1 segment
+							int numValues = dataBlockNumber == 2 ? 58 : dataBlockNumber == 3 ? 75 : Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)) - 25;
+							if (inputLineBuffer.toString().split(device.getDataBlockSeparator().value()).length > numValues) {
+								data.parse(inputLineBuffer.toString(), lineNumber);
+								endIndex = line.lastIndexOf(GDE.STRING_SEMICOLON, line.lastIndexOf(GDE.STRING_SEMICOLON) - 3);
+								inputLineBuffer = new StringBuilder().append(line.substring(0, endIndex));
+							}
+							else {
+								endIndex = line.lastIndexOf(GDE.STRING_SEMICOLON, line.lastIndexOf(GDE.STRING_SEMICOLON) - 3);
+								inputLineBuffer = new StringBuilder().append(line.substring(0, endIndex));
+								continue;
+							}
+						}
+						else {
+							try {
+								dataBlockNumber = line.charAt(1)-48;
+							}
+							catch (Exception e) {
+								dataBlockNumber = 1;
+							}
+							endIndex = line.lastIndexOf(GDE.STRING_SEMICOLON);
+							inputLineBuffer.append(line.substring(line.indexOf(device.getDataBlockSeparator().value(), 6), endIndex));
+							continue;
+						}
+					}
+					else { //normal behavior
+						data.parse(line, lineNumber);
+					}
 
 					try {
 						if (data.getChannelConfigNumber() > device.getChannelCount()) 
