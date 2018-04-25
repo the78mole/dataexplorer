@@ -198,6 +198,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
             </Measurement>
             <Measurement>
                 <name>EXT:Temp 2</name>
@@ -205,6 +206,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
                 <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -213,6 +215,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
                 <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
             </Measurement>
              <Measurement>

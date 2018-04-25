@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2012,2013,2014,2015,2016 Winfried Bruegmann
+    Copyright (c) 2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.r2prototyping;
 
@@ -52,7 +52,7 @@ import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 
 /**
- * Sample device class, used as template for new device implementations
+ * S32 device class as default 4 Channels with data 
  * @author Winfried Brügmann
  */
 public class S32 extends DeviceConfiguration implements IDevice {
@@ -496,7 +496,7 @@ public class S32 extends DeviceConfiguration implements IDevice {
 	public void open_closeCommPort() {
 		switch (application.getMenuBar().getSerialPortIconSet()) {
 		case DeviceCommPort.ICON_SET_IMPORT_CLOSE:
-			importDeviceData();
+			this.importDeviceData();
 			break;
 		}
 	}
