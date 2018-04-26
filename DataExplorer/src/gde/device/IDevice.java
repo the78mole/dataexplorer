@@ -1094,4 +1094,9 @@ public interface IDevice {
 	 * @return true|false, default is false and we have a constant measurement size defined in device XML
 	 */
 	public boolean isVariableMeasurementSize();
+	
+	/**
+	 * @return the preferred directory to search and store for device specific files, this enable for instance MC3000-Set to store all files as well in MC3000 directory
+	 */
+	public String getFileBaseDir();
 }

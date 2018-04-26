@@ -252,11 +252,7 @@ public class FileHandler {
 	private String getDevicePath() {
 		String devicePath = GDE.FILE_SEPARATOR_UNIX;
 		if (this.application.getActiveDevice() != null) {
-			if (this.application.getActiveDevice().getName().endsWith("-Set")) { // MC3000-Set -> MC3000, Q200-Set -> Q200
-				devicePath = GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName().substring(0, this.application.getActiveDevice().getName().length() - 4);
-			}
-			else
-				devicePath = GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName();
+			devicePath = GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getFileBaseDir();
 		}
 		return devicePath;
 	}

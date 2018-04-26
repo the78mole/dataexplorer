@@ -56,6 +56,14 @@ public class S32_2 extends S32 implements IDevice {
 	public S32_2(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 	}
+	
+	/**
+	 * implementation returning device name which is the default directory name to store OSD files as well to search for
+	 * @return the preferred directory to search and store for device specific files
+	 */
+	public String getFileBaseDir() {
+		return this.getClass().getSuperclass().getSimpleName();
+	}
 
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device

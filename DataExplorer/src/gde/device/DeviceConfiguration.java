@@ -2689,5 +2689,13 @@ public class DeviceConfiguration {
 		}
 		return dataTableRow;
 	}
+	
+	/**
+	 * default implementation returning device name which is the default directory name to store OSD files as well to search for
+	 * @return the preferred directory to search and store for device specific files, this enable for instance MC3000-Set to store all files as well in MC3000 directory
+	 */
+	public String getFileBaseDir() {
+		return this.getName();
+	}
 
 }

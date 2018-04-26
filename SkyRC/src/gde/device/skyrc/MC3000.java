@@ -1772,4 +1772,12 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 			return 0x00;
 		}
 	}
+	
+	/**
+	 * implementation returning device name which is the default directory name to store OSD files as well to search for
+	 * @return the preferred directory to search and store for device specific files
+	 */
+	public String getFileBaseDir() {
+		return this.getClass().getSimpleName();
+	}
 }
