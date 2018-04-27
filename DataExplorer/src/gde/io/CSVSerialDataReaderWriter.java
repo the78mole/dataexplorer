@@ -264,6 +264,7 @@ public class CSVSerialDataReaderWriter {
 							channelRecordSet = activeChannel.get(recordSetName);
 							createdRecordSets.add(channelRecordSet);
 							recordSetName = channelRecordSet.getName(); // cut/correct length
+							device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 						}
 						
 
