@@ -193,33 +193,34 @@
                 <property type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
-                <name>EXT:Temp 1</name>
+                <name>EXT:Temp ext_1</name>
                 <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
+                <property name="scale_sync_ref_ordinal" value="14" type="Integer"/>
             </Measurement>
             <Measurement>
-                <name>EXT:Temp 2</name>
+                <name>EXT:Temp ext_2</name>
                 <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
-                <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+                <property name="scale_sync_ref_ordinal" value="14" type="Integer"/>
             </Measurement>
             <Measurement>
-                <name>EXT:Temp 3</name>
+                <name>EXT:Temp ext_3</name>
                 <symbol>T</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
-                <property type="Integer" value="20" name="scale_sync_ref_ordinal"/>
+                <property name="scale_sync_ref_ordinal" value="14" type="Integer"/>
             </Measurement>
              <Measurement>
-                <name>EXT:RPM</name>
+                <name>EXT:RPM ext</name>
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
@@ -436,25 +437,27 @@
                 <active>true</active>
             </Measurement>
             <Measurement>
-                <name>Common:tFET  FET temperature</name>
+                <name>Common:tFET  FET_temperature</name>
                 <symbol>Tfet</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>HW4:tCAP lowESR caps temperature</name>
+                <name>HW4:tCAP_lowESR caps_temperature</name>
                 <symbol>Tcap</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer"/>
             </Measurement>
             <Measurement>
-                <name>HW4:tCAP lowESR caps temperature max</name>
+                <name>HW4:tCAP_lowESR caps_temperature_max</name>
                 <symbol>Tcapmx</symbol>
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="false"/>
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer"/>
             </Measurement>
         </Channel>
 		<Channel type="TYPE_CONFIG" name="Channels">
@@ -464,6 +467,7 @@
 				<unit>µsec</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 			</Measurement>
 			<Measurement>
 				<name>Ch 2</name>
@@ -471,6 +475,7 @@
 				<unit>µsec</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -479,6 +484,7 @@
 				<unit>µsec</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -487,6 +493,7 @@
 				<unit>µsec</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -495,6 +502,7 @@
 				<unit>µsec</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -503,6 +511,7 @@
 				<unit>µsec</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -511,6 +520,7 @@
 				<unit>µsec</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -519,6 +529,7 @@
 				<unit>µsec</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -527,6 +538,7 @@
 				<unit>µsec</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -535,6 +547,7 @@
 				<unit>µsec</unit>
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -543,6 +556,7 @@
 				<unit>µsec</unit>
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -551,6 +565,7 @@
 				<unit>µsec</unit>
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -559,6 +574,7 @@
 				<unit>µsec</unit>
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -567,6 +583,7 @@
 				<unit>µsec</unit>
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -575,6 +592,7 @@
 				<unit>µsec</unit>
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 			<Measurement>
@@ -583,6 +601,7 @@
 				<unit>µsec</unit>
 				<active>false</active>
 				<statistics sigma="false" avg="false" max="true" min="true" />
+                <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
 				<property  type="Integer" value="0" name="scale_sync_ref_ordinal" />
 			</Measurement>
 		</Channel>
