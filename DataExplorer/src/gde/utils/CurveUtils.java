@@ -161,7 +161,7 @@ public class CurveUtils {
 		boolean isPositionLeft = record.isPositionLeft();
 		int positionNumber = isCompareSet ? 0 : parent.getAxisPosition(recordName, isPositionLeft);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordName + " positionNumber = " + positionNumber); //$NON-NLS-1$
-		if (isDrawScaleInRecordColor) gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
+		if (isDrawScaleInRecordColor) gc.setForeground(record.isScaleSyncMaster() ? record.getSyncMasterColor() : record.getColor()); // draw the main scale line in same color as the curve
 		else gc.setForeground(DataExplorer.COLOR_BLACK);
 		if (isPositionLeft) {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;

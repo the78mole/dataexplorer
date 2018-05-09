@@ -5,6 +5,7 @@ Generic changes/fixes
 	* fix 19200 Baud protocol live data, skip Rx query while other sensors detected, Rx data in sensor data contained
 	* fix recursion synchronizing compare set while adding curve to compare set
 	* handle device base directory by interface method, default implementation, device specific implementation if required
+	* enhance calculation of synched scale label 
 Device specific changes/fixes
 	* HoTTAdapter* add file selection hint for *.bin;*.log 
 	* S32 - fix factor to correct external temperatures

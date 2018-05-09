@@ -35,7 +35,6 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.data.AbstractRecordSet.SyncedRecords;
 import gde.device.DataTypes;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
@@ -682,22 +681,39 @@ public class Record extends AbstractRecord {
 		return this.name;
 	}
 
+  /**
+   * @return the color of the first visible record with synced scale to match behavior of getSyncMasterName()
+   */
+  public Color getSyncMasterColor() {
+    Color color = this.color;
+      Vector<Record> scaleSyncedRecords = this.parent.getScaleSyncedRecords(this.ordinal);
+      for (final Record tmpRecord : scaleSyncedRecords) {
+          if (tmpRecord.isVisible && tmpRecord.isDisplayable && tmpRecord.realSize() > 1)
+              return tmpRecord.color;
+      }
+    return color;
+  }
+
+	/**
+	 * @return scale label of synchronized measurements according first and last selection
+	 */
 	public String getSyncMasterName() {
-		StringBuilder sb = new StringBuilder().append(this.name.split(GDE.STRING_BLANK)[0]);
-		SyncedRecords<Record> syncedRecords = this.getParent().getScaleSyncedRecords();
-		if (syncedRecords.get(this.ordinal) != null && syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK).length > 1) {
-			String[] splitName = syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK);
-			sb.append(GDE.STRING_BLANK);
-			sb.append(splitName.length > 1 ? syncedRecords.get(this.ordinal).firstElement().getName().split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
-			sb.append(GDE.STRING_DOT);
-			sb.append(GDE.STRING_DOT);
+		final StringBuilder sb = new StringBuilder();
+		Vector<Record> scaleSyncedRecords = this.parent.getScaleSyncedRecords(this.ordinal);
+		int numberVisibleDisplayable = 0;
+		for (final Record tmpRecord : scaleSyncedRecords) {
+			if (tmpRecord.isVisible && tmpRecord.isDisplayable && tmpRecord.realSize() > 1) {
+				if (sb.length() < 1) sb.append(tmpRecord.name); //add the name of first visible record
+				++numberVisibleDisplayable;
+			}
+		}
+		if (numberVisibleDisplayable > 1) {
+			sb.append(GDE.STRING_DOT).append(GDE.STRING_DOT);
 			String trailer = GDE.STRING_STAR;
-			for (Record tmpRecord : syncedRecords.get(this.ordinal)) {
-				if (tmpRecord.isDisplayable() && tmpRecord.realSize() > 1) trailer = tmpRecord.getName();
+			for (final Record tmpRecord : scaleSyncedRecords) {
+				if (tmpRecord.isDisplayable && tmpRecord.isVisible && tmpRecord.realSize() > 1) trailer = tmpRecord.name;
 			}
 			sb.append(trailer.split(GDE.STRING_BLANK).length > 1 ? trailer.split(GDE.STRING_BLANK)[1] : GDE.STRING_STAR);
-		} else {
-			sb.append(GDE.STRING_MESSAGE_CONCAT).append(syncedRecords.get(this.ordinal).lastElement().getName());
 		}
 		return sb.toString();
 	}
