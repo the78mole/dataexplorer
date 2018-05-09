@@ -198,7 +198,6 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="14" type="Integer"/>
             </Measurement>
             <Measurement>
@@ -207,7 +206,6 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="14" type="Integer"/>
             </Measurement>
             <Measurement>
@@ -216,7 +214,6 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="14" type="Integer"/>
             </Measurement>
             <Measurement>
@@ -305,49 +302,42 @@
                 <symbol>T/V</symbol>
                 <unit></unit>
                 <active>true</active>
-                <property name="factor" value="1.0" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>alarm_extern T/V_2</name>
                 <symbol>T/V</symbol>
                 <unit></unit>
                 <active>true</active>
-                <property name="factor" value="1.0" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>alarm_extern Temp_3</name>
                 <symbol>T</symbol>
                 <unit></unit>
                 <active>true</active>
-                <property name="factor" value="1.0" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>alarm_extern RPM</name>
                 <symbol>rpm ext</symbol>
                 <unit></unit>
                 <active>true</active>
-                <property name="factor" value="1.0" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>alarm_extern Speed</name>
                 <symbol>v ext</symbol>
                 <unit></unit>
                 <active>true</active>
-                <property name="factor" value="1.0" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>Pulse1:length</name>
                 <symbol>P1</symbol>
                 <unit>µsec</unit>
                 <active>true</active>
-                <property name="factor" value="1.0" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>Pulse2:length</name>
                 <symbol>P1</symbol>
                 <unit>µsec</unit>
                 <active>true</active>
-                <property name="factor" value="1.0" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>Volt1</name>

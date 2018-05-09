@@ -10,6 +10,7 @@ Device specific changes/fixes
 	* S32 - fix factor to correct external temperatures
 	* S32_2 - initial release for S32 as version 2 displaying all measurement values on a single time line
 	* S32 - fix measurement synchronization references (need device XML replacement)
+	* S32 - fix external temperature factor according customer feedback
 
 Version 3.3.2 - 15 Apr 2018
 * fix illegal formatting option in ParameterControl used for Graupner UDP charger
