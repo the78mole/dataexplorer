@@ -199,6 +199,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property name="scale_sync_ref_ordinal" value="14" type="Integer"/>
+                <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>EXT:Temp ext_2</name>
@@ -207,6 +208,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property name="scale_sync_ref_ordinal" value="14" type="Integer"/>
+                <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>EXT:Temp ext_3</name>
@@ -215,6 +217,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
                 <property name="scale_sync_ref_ordinal" value="14" type="Integer"/>
+                <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
              <Measurement>
                 <name>EXT:RPM ext</name>
@@ -223,6 +226,7 @@
                 <active>true</active>
                 <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
+                 <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
              <Measurement>
                 <name>EXT:RPM min</name>
@@ -231,6 +235,7 @@
                 <active>true</active>
                 <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
+                <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
              <Measurement>
                 <name>EXT:RPM max</name>
@@ -239,6 +244,7 @@
                 <active>true</active>
                 <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
+                <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
              <Measurement>
                 <name>EXT:Gspeed</name>
@@ -246,6 +252,7 @@
                 <unit>km/h</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
              <Measurement>
                 <name>EXT:Pspeed</name>
@@ -253,6 +260,7 @@
                 <unit>km/h</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
+                <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
              <Measurement>
                 <name>EXT:AllSpeed max</name>
@@ -260,6 +268,7 @@
                 <unit>km/h</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="false" max="true" min="false"/>
+                <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>alarm_voltage BEC</name>

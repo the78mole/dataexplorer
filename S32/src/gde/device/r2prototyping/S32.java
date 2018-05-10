@@ -453,6 +453,7 @@ public class S32 extends DeviceConfiguration implements IDevice {
 		if (log.isLoggable(Level.FINER))
 			log.log(Level.FINER, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
 		recordSet.setConfiguredDisplayable(displayableCounter);
+		recordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**
