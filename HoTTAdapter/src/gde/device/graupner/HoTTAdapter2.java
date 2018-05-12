@@ -1709,8 +1709,14 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			if (truss.getVault().getLoadFilePath().equals(filePath.toString())) {
 				log.log(Level.INFO, "start ", filePath); //$NON-NLS-1$
 				// add aggregated measurement and settlement points and score points to the truss
-				HoTTbinHistoReader2.read(truss);
-				histoVaults.add(truss.getVault());
+				if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
+					HoTTbinHistoReader2.read(truss);
+					histoVaults.add(truss.getVault());
+				} else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+					// todo implement HoTTlogHistoReader
+				} else {
+					throw new UnsupportedOperationException();
+				}
 			}
 			else
 				throw new UnsupportedOperationException("all trusses must carry the same logFilePath");
