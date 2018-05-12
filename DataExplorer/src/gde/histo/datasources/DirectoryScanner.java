@@ -530,7 +530,7 @@ public final class DirectoryScanner {
 		public abstract Path getDataSetPath();
 
 		/**
-		 * @return the supported file extensions (e.g. '*.bin') or an empty list
+		 * @return the supported file extensions (e.g. 'bin') or an empty list
 		 */
 		public abstract List<String> getDataSetExtensions();
 
