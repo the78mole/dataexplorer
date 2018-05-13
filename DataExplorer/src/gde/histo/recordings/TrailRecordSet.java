@@ -1137,7 +1137,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	@SuppressWarnings("unchecked")
-	public SyncedRecords<TrailRecord> getScaleSyncedRecords() {
+	private SyncedRecords<TrailRecord> getScaleSyncedRecords() {
 		return (SyncedRecords<TrailRecord>) this.scaleSyncedRecords;
 	}
 

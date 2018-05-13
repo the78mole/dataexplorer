@@ -1213,7 +1213,7 @@ public class Record extends AbstractRecord {
 
 	@Override
 	public void setStartEndDefined(boolean enabled) {
-		this.isStartEndDefined = enabled;		
+		this.isStartEndDefined = enabled;
 	}
 
 	/**
@@ -1886,7 +1886,7 @@ public class Record extends AbstractRecord {
 		this.tmpMaxZoomScaleValue = this.getVerticalDisplayPointScaleValue(zoomBounds.height + zoomBounds.y, this.parent.drawAreaBounds);
 		this.minZoomScaleValue = tmpMinZoomScaleValue < this.minScaleValue ? this.minScaleValue : tmpMinZoomScaleValue;
 		this.maxZoomScaleValue = tmpMaxZoomScaleValue > this.maxScaleValue ? this.maxScaleValue : tmpMaxZoomScaleValue;
-		if (log.isLoggable(Level.FINER)) 
+		if (log.isLoggable(Level.FINER))
 			log.log(Level.FINER, this.name + " - minZoomScaleValue = " + this.minZoomScaleValue + "  maxZoomScaleValue = " + this.maxZoomScaleValue); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -1940,7 +1940,7 @@ public class Record extends AbstractRecord {
 		}
 
 		if (this.getAbstractParent().isOneOfSyncableRecord(this.name)) {
-			for (Record record : this.getParent().getScaleSyncedRecords().get(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
+			for (Record record : this.getParent().getScaleSyncedRecords(this.getAbstractParent().getSyncMasterRecordOrdinal(this.name))) {
 				record.minDisplayValue = this.minDisplayValue;
 				record.maxDisplayValue = this.maxDisplayValue;
 			}

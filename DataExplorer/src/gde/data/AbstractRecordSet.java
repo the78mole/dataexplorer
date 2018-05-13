@@ -708,9 +708,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	/**
 	 * @return the Vector containing the slave records sync by the master name
 	 */
-	public Vector<? extends AbstractRecord> getScaleSyncedRecords(int syncMasterRecordOrdinal) {
-		return this.scaleSyncedRecords.get(syncMasterRecordOrdinal);
-	}
+	public abstract Vector<? extends AbstractRecord> getScaleSyncedRecords(int syncMasterRecordOrdinal);
 
 	public int realSize() {
 		return super.size();

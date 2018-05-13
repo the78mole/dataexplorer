@@ -1621,7 +1621,7 @@ public final class RecordSet extends AbstractRecordSet {
 	}
 
 	@SuppressWarnings("unchecked")
-	public SyncedRecords<Record> getScaleSyncedRecords() {
+	private SyncedRecords<Record> getScaleSyncedRecords() {
 		return (SyncedRecords<Record>) this.scaleSyncedRecords;
 	}
 

@@ -393,8 +393,7 @@ public abstract class TrailRecord extends CommonRecord {
 	@Override // reason is replacement for record names
 	public String getSyncMasterName() {
 		StringBuilder sb = new StringBuilder().append(this.getNameReplacement().split(GDE.STRING_BLANK)[0]);
-
-		Vector<TrailRecord> syncedChildren = this.getParent().getScaleSyncedRecords().get(this.ordinal);
+		Vector<TrailRecord> syncedChildren = this.getParent().getScaleSyncedRecords(this.ordinal);
 		if (syncedChildren == null) throw new UnsupportedOperationException();
 		if (syncedChildren.firstElement().getNameReplacement().split(GDE.STRING_BLANK).length > 1) {
 			sb.append(GDE.STRING_BLANK);
