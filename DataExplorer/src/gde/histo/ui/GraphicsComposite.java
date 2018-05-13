@@ -628,7 +628,6 @@ public final class GraphicsComposite extends AbstractChartComposite {
 					log.log(FINE, "scale starts at 0 -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
-		record.setMinMaxScaleValue(yMinValueDisplay, yMaxValueDisplay);
 		getChartData(record).setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
 		getChartData(record).setNumberTickMarks(numberTickMarks);
 	}
