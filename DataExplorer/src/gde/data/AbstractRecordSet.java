@@ -23,6 +23,7 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -138,11 +139,17 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 							// sort while add
 							get(syncMasterRecordOrdinal).add(Math.abs(i - syncMasterRecordOrdinal), tmpRecord);
 
-						this.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_END_VALUES);
-						this.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
-						this.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_SCALE_POSITION);
 						if (log.isLoggable(Level.FINER)) log.finer(() -> "add " + tmpRecord.getName()); //$NON-NLS-1$
 					}
+				}
+			}
+			for (int i = 0; i < recordSet.size(); i++) {
+				int syncMasterRecordOrdinal = recordSet.get(i).getSyncMasterRecordOrdinal();
+				if (syncMasterRecordOrdinal >= 0) {
+					AbstractRecord syncMasterRecord = recordSet.get(syncMasterRecordOrdinal);
+					this.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_END_VALUES);
+					this.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_NUMBER_FORMAT);
+					this.syncMasterSlaveRecords(syncMasterRecord, Record.TYPE_AXIS_SCALE_POSITION);
 				}
 			}
 			if (log.isLoggable(Level.FINE)) {
@@ -170,6 +177,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 						boolean tmpIsStartEndDefined = syncInputRecord.isStartEndDefined();
 						double minScaleValue = syncInputRecord.getMinScaleValue();
 						double maxScaleValue = syncInputRecord.getMaxScaleValue();
+						log.log(Level.FINER, "", this.get(syncRecordOrdinal).size() + " " + this.get(syncRecordOrdinal).stream().map(r -> r.getName()).collect(Collectors.joining(",")));
 						for (AbstractRecord tmpRecord : this.get(syncRecordOrdinal)) {
 							synchronized (tmpRecord) {
 								tmpRecord.setRoundOut(tmpIsRoundout);
