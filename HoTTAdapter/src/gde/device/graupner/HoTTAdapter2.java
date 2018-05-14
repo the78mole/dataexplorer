@@ -1009,7 +1009,10 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
-			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2416, GDE.MOD1));
+			String[] messageParams = new String[GDE.MOD1.length + 1];
+			System.arraycopy(GDE.MOD1, 0, messageParams, 1, GDE.MOD1.length);
+			messageParams[0] = this.getDeviceConfiguration().getDataBlockPreferredFileExtention();
+			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2416, messageParams));
 			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT2416));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
 				@Override
