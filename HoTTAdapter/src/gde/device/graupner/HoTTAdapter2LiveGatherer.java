@@ -13,10 +13,17 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -32,13 +39,6 @@ import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-
 /**
  * Thread implementation to gather data from HoTTAdapter device
  * @author Winfied Brügmann
@@ -47,7 +47,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 	final static Logger	logger	= Logger.getLogger(HoTTAdapter2LiveGatherer.class.getName());
 
 	/**
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HoTTAdapter2LiveGatherer(DataExplorer currentApplication, HoTTAdapter useDevice, HoTTAdapterSerialPort useSerialPort, HoTTAdapterDialog useDialog) throws Exception {
 		super(currentApplication, useDevice, useSerialPort, useDialog);
@@ -71,7 +71,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 				HoTTAdapter.isSensorType[i] = false;
 			}
 
-			//detect master slave mode, only in slave mode data are written to receive buffer without query 
+			//detect master slave mode, only in slave mode data are written to receive buffer without query
 			WaitTimer.delay(1000);
 			if (this.serialPort.cleanInputStream() > 2) {
 				HoTTAdapter.IS_SLAVE_MODE = true;
@@ -137,6 +137,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 			this.dialog.resetButtons();
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					HoTTAdapter2LiveGatherer.this.application.getDeviceSelectionDialog().open();
 				}
@@ -362,7 +363,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_115200);
 //							int dataLength = 0, dataLengthLast = 0;
 //							while (dataLengthLast != (dataLength = this.serialPort.getDataSize())) {
-//								System.out.println("dataLength = " + dataLength);							
+//								System.out.println("dataLength = " + dataLength);
 //								dataLengthLast = dataLength;
 //							}
 							for (int i = 0; i < 2 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
@@ -421,7 +422,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 				this.application.setStatusMessage(
 						Messages.getString(gde.messages.MessageIds.GDE_MSGW0045,
 								new Object[] { e.getClass().getSimpleName(), this.serialPort.getTimeoutErrors() + "; xferErrors = " + this.serialPort.getXferErrors() }), SWT.COLOR_RED);
-				WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS); //give time to settle 
+				WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS); //give time to settle
 			}
 			catch (IOException e) {
 				HoTTAdapter2LiveGatherer.logger.log(Level.WARNING, e.getMessage());
@@ -434,14 +435,16 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 					finalizeRecordSet(tmpRecordSet);
 				}
 			}
-			WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS); //make sure we have such a pause while receiving data even we have 
+			WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS); //make sure we have such a pause while receiving data even we have
 		}
 		for (RecordSet tmpRecordSet : HoTTAdapter.recordSets.values()) {
 			finalizeRecordSet(tmpRecordSet);
 		}
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
-				HoTTAdapter2LiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
+				String toolTipText = HoTTAdapter.getImportToolTip();
+				HoTTAdapter2LiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, toolTipText, toolTipText);
 			}
 		});
 		if (HoTTAdapter2LiveGatherer.logger.isLoggable(Level.FINE)) HoTTAdapter2LiveGatherer.logger.log(Level.FINE, "exit"); //$NON-NLS-1$

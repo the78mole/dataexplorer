@@ -161,6 +161,7 @@ public class GDE {
 	public static final String							STRING_GREATER										= ">";																																																											//$NON-NLS-1$
 	public static final String							STRING_ELLIPSIS										= "...";																																																								//$NON-NLS-1$
 	public static final String							STRING_CSV_SEPARATOR							= ",";																																																									//$NON-NLS-1$
+	public static final String							STRING_QUESTION_MARK					= "?";																																																									//$NON-NLS-1$
 
 	public static final String[]						STRING_ARRAY_TRUE_FALSE						= new String[] { "true", "false" };																																													//$NON-NLS-1$ //$NON-NLS-2$
 

@@ -261,7 +261,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		this.serialPort = this.application != null ? new HoTTAdapterSerialPort(this, this.application) : new HoTTAdapterSerialPort(this, null);
 		this.dialog = new HoTTAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
+			String toolTipText = HoTTAdapter.getImportToolTip();
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, toolTipText, toolTipText);
 			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
@@ -297,7 +298,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		this.serialPort = this.application != null ? new HoTTAdapterSerialPort(this, this.application) : new HoTTAdapterSerialPort(this, null);
 		this.dialog = new HoTTAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
+			String toolTipText = HoTTAdapter.getImportToolTip();
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, toolTipText, toolTipText);
 			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
@@ -1488,6 +1490,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			new MenuItem(importMenue, SWT.SEPARATOR);
 
 			importDeviceLogItem = new MenuItem(importMenue, SWT.PUSH);
+			String dataBlockPreferredFileExtention = this.getDeviceConfiguration().getDataBlockPreferredFileExtention();
 			importDeviceLogItem.setText(Messages.getString(MessageIds.GDE_MSGT2416, GDE.MOD1));
 			importDeviceLogItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT2416));
 			importDeviceLogItem.addListener(SWT.Selection, new Listener() {
@@ -1617,6 +1620,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 */
 	public static synchronized void setTextModusFilter(boolean isTextModusFilterEnabled) {
 		HoTTAdapter.isFilterTextModus = isTextModusFilterEnabled;
+	}
+
+	/**
+	 * @return the tooltip text for the import menu bar button
+	 */
+	public static String getImportToolTip() {
+		DeviceConfiguration hoTTConfiguration = DataExplorer.getInstance().getDeviceConfigurations().get("HoTTAdapter");
+		String fileExtentions = hoTTConfiguration != null ? hoTTConfiguration.getDataBlockPreferredFileExtention() : GDE.STRING_QUESTION_MARK;
+		return Messages.getString(MessageIds.GDE_MSGT2404, new Object[] { fileExtentions });
 	}
 
 	/**

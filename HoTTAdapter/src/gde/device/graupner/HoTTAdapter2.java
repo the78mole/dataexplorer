@@ -78,7 +78,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	public HoTTAdapter2(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
+			String toolTipText = HoTTAdapter.getImportToolTip();
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, toolTipText, toolTipText);
 			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
@@ -106,7 +107,8 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	public HoTTAdapter2(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		if (this.application.getMenuToolBar() != null) {
-			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
+			String toolTipText = HoTTAdapter.getImportToolTip();
+			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, toolTipText, toolTipText);
 			updateFileExportMenu(this.application.getMenuBar().getExportMenu());
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}

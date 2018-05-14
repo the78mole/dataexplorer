@@ -13,10 +13,18 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -67,7 +75,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	final HashMap<String, Double>	calcValues									= new HashMap<String, Double>();
 
 	/**
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public HoTTAdapterLiveGatherer(DataExplorer currentApplication, HoTTAdapter useDevice, HoTTAdapterSerialPort useSerialPort, HoTTAdapterDialog useDialog) throws Exception {
 		super("liveDataGatherer"); //$NON-NLS-1$
@@ -98,7 +106,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				HoTTAdapter.isSensorType[i] = false;
 			}
 
-			//detect master slave mode, only in slave mode data are written to receive buffer without query 
+			//detect master slave mode, only in slave mode data are written to receive buffer without query
 			WaitTimer.delay(1000);
 			if (this.serialPort.cleanInputStream() > 2) {
 				HoTTAdapter.IS_SLAVE_MODE = true;
@@ -164,6 +172,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 			this.dialog.resetButtons();
 			this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					HoTTAdapterLiveGatherer.this.application.getDeviceSelectionDialog().open();
 				}
@@ -611,7 +620,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 				this.application.setStatusMessage(
 						Messages.getString(gde.messages.MessageIds.GDE_MSGW0045,
 								new Object[] { e.getClass().getSimpleName(), this.serialPort.getTimeoutErrors() + "; xferErrors = " + this.serialPort.getXferErrors() }), SWT.COLOR_RED);
-				WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS); //give time to settle 
+				WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS); //give time to settle
 			}
 			catch (IOException e) {
 				HoTTAdapterLiveGatherer.log.log(Level.WARNING, e.getMessage());
@@ -624,14 +633,16 @@ public class HoTTAdapterLiveGatherer extends Thread {
 					finalizeRecordSet(recordSet);
 				}
 			}
-			WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS); //make sure we have such a pause while receiving data even we have 
+			WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS); //make sure we have such a pause while receiving data even we have
 		}
 		for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
 			finalizeRecordSet(recordSet);
 		}
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
-				HoTTAdapterLiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2404), Messages.getString(MessageIds.GDE_MSGT2404));
+				String toolTipText = HoTTAdapter.getImportToolTip();
+				HoTTAdapterLiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, toolTipText, toolTipText);
 			}
 		});
 		if (HoTTAdapterLiveGatherer.log.isLoggable(Level.FINE)) HoTTAdapterLiveGatherer.log.log(Level.FINE, "exit"); //$NON-NLS-1$
@@ -642,7 +653,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	 * @param sensor
 	 * @param recordSetNumber
 	 * @param recordSetNameExtend
-	 * 
+	 *
 	 */
 	public void switchRecordSetDisplay(HoTTAdapter.Sensor sensor, int recordSetNumber, String recordSetNameExtend) {
 		if (this.channels.getActiveChannelNumber() != sensor.ordinal() + 1) {
@@ -689,7 +700,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 	 * detect Sensor data, retrieves data only on not detected sensors driven by boolean[] isSensorType
 	 * @param isSensorType
 	 * @return points integer array of data points, to enable 3 decimal digits value is multiplied by 1000
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	void detectSensorType() throws Exception {
 
@@ -796,7 +807,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_GPS_19200);
 //						int dataLength = 0, dataLengthLast = 0;
 //						while (dataLengthLast != (dataLength = this.serialPort.getDataSize())) {
-//							System.out.println("dataLength = " + dataLength);							
+//							System.out.println("dataLength = " + dataLength);
 //							dataLengthLast = dataLength;
 //						}
 						this.serialPort.getData(false);
@@ -876,7 +887,7 @@ public class HoTTAdapterLiveGatherer extends Thread {
 						this.serialPort.getData(true);
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 						byte[] buffer = this.serialPort.getData(true);
-						HoTTAdapter.isSensorType[0] = (buffer[2] == 0x7C && buffer[15] == 0x7D); 
+						HoTTAdapter.isSensorType[0] = (buffer[2] == 0x7C && buffer[15] == 0x7D);
 						Thread.sleep(HoTTAdapter.QUERY_GAP_MS*5);
 					}
 					catch (Exception e) {
