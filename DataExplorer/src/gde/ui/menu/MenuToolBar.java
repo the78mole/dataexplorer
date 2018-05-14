@@ -90,7 +90,7 @@ public class MenuToolBar {
 	ToolItem						prevDeviceToolItem, nextDeviceToolItem;
 	Composite						objectSelectComposite;
 	CCombo							objectSelectCombo;
-	Point													objectSelectSize = new Point(200, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
+	Point								objectSelectSize = new Point(200, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
 	ToolItem						newObject, deleteObject, editObject;
 	String							oldObjectKey					= null;
 	boolean							isObjectoriented			= false;
@@ -540,7 +540,7 @@ public class MenuToolBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "deleteObject.widgetSelected, event=" + evt); //$NON-NLS-1$
-							if (MenuToolBar.this.objectSelectCombo.getSelectionIndex() > 0) {
+							if (MenuToolBar.this.objectSelectCombo.getSelectionIndex() > 0 && SWT.OK == MenuToolBar.this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGT0846))) {
 								ObjectKeyCompliance.removeObjectKey(MenuToolBar.this.objectSelectCombo.getItems(), MenuToolBar.this.objectSelectCombo.getSelectionIndex());
 								MenuToolBar.this.setObjectListElements();
 								MenuToolBar.this.newObject.setSelection(false);

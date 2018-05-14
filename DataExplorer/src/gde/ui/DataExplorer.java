@@ -2972,22 +2972,47 @@ public class DataExplorer extends Composite {
 	 * @param visible boolean value to set the object description tabulator visible
 	 */
 	public void setObjectDescriptionTabVisible(boolean visible) {
-		if (visible) {
-			if (this.objectDescriptionTabItem == null || this.objectDescriptionTabItem.isDisposed()) {
-				for (int i = 0; i < this.displayTab.getItemCount(); ++i) {
-					CTabItem tabItem = this.displayTab.getItems()[i];
-					if (tabItem instanceof FileCommentWindow) {
-						this.objectDescriptionTabItem = new ObjectDescriptionWindow(this.displayTab, SWT.NONE, i + 1);
-						this.objectDescriptionTabItem.create();
-						break;
+		if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
+			if (visible) {
+				if (this.objectDescriptionTabItem == null || this.objectDescriptionTabItem.isDisposed()) {
+					for (int i = 0; i < this.displayTab.getItemCount(); ++i) {
+						CTabItem tabItem = this.displayTab.getItems()[i];
+						if (tabItem instanceof FileCommentWindow) {
+							this.objectDescriptionTabItem = new ObjectDescriptionWindow(this.displayTab, SWT.NONE, i + 1);
+							this.objectDescriptionTabItem.create();
+							break;
+						}
 					}
+				}
+			} else {
+				if (this.objectDescriptionTabItem != null) {
+					this.objectDescriptionTabItem.dispose();
+					this.objectDescriptionTabItem = null;
 				}
 			}
 		} else {
-			if (this.objectDescriptionTabItem != null) {
-				this.objectDescriptionTabItem.dispose();
-				this.objectDescriptionTabItem = null;
-			}
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (visible) {
+						if (objectDescriptionTabItem == null || objectDescriptionTabItem.isDisposed()) {
+							for (int i = 0; i < displayTab.getItemCount(); ++i) {
+								CTabItem tabItem = displayTab.getItems()[i];
+								if (tabItem instanceof FileCommentWindow) {
+									objectDescriptionTabItem = new ObjectDescriptionWindow(displayTab, SWT.NONE, i + 1);
+									objectDescriptionTabItem.create();
+									break;
+								}
+							}
+						}
+					} else {
+						if (objectDescriptionTabItem != null) {
+							objectDescriptionTabItem.dispose();
+							objectDescriptionTabItem = null;
+						}
+					}
+				}
+			});
 		}
 	}
 
