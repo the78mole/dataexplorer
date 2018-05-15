@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -103,7 +104,7 @@ public class ObjectKeyCompliance {
 	/**
 	 * Add the object directories and add the key to the object key list.
 	 */
-	public static void addObjectKeys(Set<String> newObjectKeys) {
+	public static void addObjectKeys(Collection<String> newObjectKeys) {
 		// build a new object list consisting from existing objects and new objects
 		Set<String> objectListClone = Settings.getInstance().getRealObjectKeys().collect(Collectors.toSet());
 		if (objectListClone.addAll(newObjectKeys)) {
@@ -184,15 +185,16 @@ public class ObjectKeyCompliance {
 	}
 
 	/**
-	 * Delete the object directories and remove from the object key list.
+	 * Remove from the object key list.
+	 * Do not delete the object directories.
 	 */
-	public static void removeObjectKeys(List<String> obsoleteObjectKeys) {
+	public static void removeObjectKeys(Collection<String> obsoleteObjectKeys) {
 		List<String> realObjectKeys = Settings.getInstance().getRealObjectKeys().collect(Collectors.toList());
 		for (String tmpObjectKey : obsoleteObjectKeys) {
-  		if (!tmpObjectKey.isEmpty()) {
-				Path objectKeyDirPath = Paths.get(Settings.getInstance().getDataFilePath()).resolve(tmpObjectKey);
-				FileUtils.deleteDirectory(objectKeyDirPath.toString());
-			}
+			// if (!tmpObjectKey.isEmpty()) {
+			// Path objectKeyDirPath = Paths.get(Settings.getInstance().getDataFilePath()).resolve(tmpObjectKey);
+			// FileUtils.deleteDirectory(objectKeyDirPath.toString());
+			// }
 			realObjectKeys.remove(tmpObjectKey);
 		}
 		Settings.getInstance().setObjectList(realObjectKeys.toArray(new String[0]), Settings.getInstance().getActiveObject());
