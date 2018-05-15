@@ -200,7 +200,7 @@ public class ObjectKeyScanner extends Thread {
 				if (this.application.getMenuToolBar() != null) this.application.setProgress(progressPercentageLimit, sThreadId);
 				{ // createFileLinks: Take the object key list and create file links for all files assigned to object keys.
 					int progressPercentageStart = this.application.getProgressPercentage();
-					double progressStep = (100. - progressPercentageStart) / (this.objectKeys.size() + 1.);
+					double progressStep = (100. - progressPercentageStart) / this.objectKeys.size();
 
 					int j = 0;
 					Iterator<String> iterator = this.objectKeys.iterator();
