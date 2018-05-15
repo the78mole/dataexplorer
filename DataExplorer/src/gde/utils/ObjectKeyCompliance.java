@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -80,7 +81,7 @@ public class ObjectKeyCompliance {
 		try {
 			objLnkSearch.join();
 		} catch (InterruptedException e1) {
-			log.log(java.util.logging.Level.WARNING, e1.getMessage(), e1);
+			log.log(Level.WARNING, e1.getMessage(), e1);
 		}
 
 		if (!DataExplorer.getInstance().isWithUi()) {
@@ -270,16 +271,18 @@ public class ObjectKeyCompliance {
 				Path supplementObjectsPath = SupplementObjectFolder.getSupplementObjectsPath();
 				try (Stream<Path> stream = Files.walk(dirPath)) {
 					result = stream //
-							.filter(p -> !p.equals(dirPath)) // hasValidName
-							.filter(p -> !excludedLowerCaseNames.contains(p.getFileName().toString().toLowerCase())) // hasValidName
-							.filter(p -> !isSupplementMirrorRoot(p, supplementObjectsPath)) //
+							.filter(p -> !p.equals(dirPath)) // eliminate root
 							.filter(Files::isDirectory) //
+							.filter(p -> !isSupplementMirrorRoot(p, supplementObjectsPath)) // eliminate the roots but not their contents
+							.filter(p -> !excludedLowerCaseNames.contains(p.getFileName().toString().toLowerCase())) // hasValidName
 							.filter(p -> p.toFile().listFiles(new LogFileFilter()).length > 0) // hasLogFiles
 							// .peek(p -> System.out.println(p)) //
 							.map(Path::getFileName).map(Path::toString) //
 							.distinct().collect(Collectors.toList());
+				} catch (NoSuchFileException e) { // dir does not exist
+					log.log(Level.WARNING, "NoSuchFileException", dirPath);
 				} catch (IOException e) {
-					log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+					log.log(Level.WARNING, e.getMessage(), e);
 				}
 				directoryNames.addAll(result);
 			}
@@ -288,16 +291,18 @@ public class ObjectKeyCompliance {
 	}
 
 	/**
-	 * @return true if {@code directoryPath} is just below the {@code supplementObjectsPath} and is a mirror copy
+	 * @return true for mirror copy roots just below the {@code supplementObjectsPath}
 	 */
 	private static boolean isSupplementMirrorRoot(Path directoryPath, Path supplementObjectsPath) {
-		boolean isSupplementFolder = directoryPath.startsWith(supplementObjectsPath);
-		Path subPath = supplementObjectsPath.relativize(directoryPath);
-		if (isSupplementFolder && subPath.getNameCount() == 1) {
-			if (subPath.toString().length() <= 2) return false;
-			return subPath.toString().substring(0, 2).equals(GDE.STRING_UNDER_BAR + GDE.STRING_UNDER_BAR);
+		boolean result = false;
+		try {
+			Path subPath = supplementObjectsPath.relativize(directoryPath);
+			boolean isFirstLevelSupplement = directoryPath.startsWith(supplementObjectsPath) && subPath.getNameCount() == 1;
+			result = isFirstLevelSupplement && subPath.toString().length() > 2 && subPath.toString().substring(0, 2).equals(GDE.STRING_UNDER_BAR + GDE.STRING_UNDER_BAR);
+		} catch (IllegalArgumentException e) { // UNC windows path does not compare with standard windows path
+			log.log(Level.FINE, e.getMessage(), supplementObjectsPath + " <> other: " + directoryPath);
 		}
-		return false;
+		return result;
 	}
 
 	/**
