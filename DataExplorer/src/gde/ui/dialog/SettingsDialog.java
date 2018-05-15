@@ -1806,7 +1806,6 @@ public class SettingsDialog extends Dialog {
 											if (SWT.OK == SettingsDialog.this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI0069, //
 													new Object[] { objectCandidates.stream().sorted().collect(Collectors.toList()).toString() }))) {
 												ObjectKeyCompliance.addObjectKeys(objectCandidates);
-												ObjectKeyCompliance.rebuildObjectKeys();
 											}
 										}
 										else {
