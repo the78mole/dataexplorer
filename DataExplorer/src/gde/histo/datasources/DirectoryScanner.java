@@ -112,7 +112,7 @@ public final class DirectoryScanner {
 		/**
 		 * Re- initializes the class.
 		 */
-		public synchronized void initialize() {
+		public void initialize() {
 			this.validatedDirectoryTypes.clear();
 
 			this.validatedDevice = null;
@@ -556,7 +556,7 @@ public final class DirectoryScanner {
 	/**
 	 * Re- initializes the class.
 	 */
-	public synchronized void initialize() {
+	public void initialize() {
 		sourceFoldersBuilder.initialize();
 	}
 

@@ -918,7 +918,7 @@ public abstract class TrailRecord extends CommonRecord {
 	/**
 	 * (Re)Build the data contents.
 	 */
-	public synchronized void initializeFromVaults(TreeMap<Long, List<ExtendedVault>> histoVaults) {
+	public void initializeFromVaults(TreeMap<Long, List<ExtendedVault>> histoVaults) {
 		clear();
 		RecordCollector collector = new RecordCollector();
 		collector.addVaults(histoVaults);

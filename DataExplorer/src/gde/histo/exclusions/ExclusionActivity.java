@@ -43,7 +43,7 @@ public final class ExclusionActivity {
 	 * @param filePath
 	 * @param recordsetBaseName empty string sets ignore to the file in total
 	 */
-	public static synchronized void setExcludeRecordSet(Path filePath, String recordsetBaseName) {
+	public static void setExcludeRecordSet(Path filePath, String recordsetBaseName) {
 		final ExclusionData fileExclusionData = ExclusionData.getInstance();
 		if (recordsetBaseName.isEmpty())
 			fileExclusionData.setProperty((filePath.getFileName().toString()));

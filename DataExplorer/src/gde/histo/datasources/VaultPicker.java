@@ -306,7 +306,7 @@ public final class VaultPicker {
 	/**
 	 * Re- initializes the class.
 	 */
-	public synchronized void initialize() {
+	public void initialize() {
 		// deep clear in order to reduce memory consumption prior to garbage collection
 		for (List<ExtendedVault> timestampHistoVaults : pickedVaults.values()) {
 			timestampHistoVaults.clear();
@@ -328,7 +328,7 @@ public final class VaultPicker {
 	 *          May be augmented if the device, channel or object was modified.
 	 * @return true if the trail recordSet was rebuilt
 	 */
-	public synchronized boolean rebuild4Screening(RebuildStep rebuildStep) throws FileNotFoundException, IOException, NotSupportedFileFormatException,
+	public boolean rebuild4Screening(RebuildStep rebuildStep) throws FileNotFoundException, IOException, NotSupportedFileFormatException,
 			DataInconsitsentException, DataTypeException {
 		RebuildStep realRebuildStep = rebuildStep; // the rebuild step might be augmented during the screening procedure
 

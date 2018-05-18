@@ -168,7 +168,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		 * @param gpsCluster holds the GPS coordinates and the assignment to clusters; null coordinates are allowed
 		 * @param dataGpsLocations is an empty list as INPUT or GPS location strings for all vaults in the correct sequence as OUTPUT
 		 */
-		private synchronized void setGpsLocationTags(GpsCluster gpsCluster) {
+		private void setGpsLocationTags(GpsCluster gpsCluster) {
 			long nanoTime = System.nanoTime();
 			gpsCluster.setClusters();
 			if (gpsCluster.size() > 0) {
@@ -728,7 +728,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	/**
 	 * Rebuild the record based on a new trail selection.
 	 */
-	public synchronized void refillRecord(TrailRecord record, int trailTextIndex) {
+	public void refillRecord(TrailRecord record, int trailTextIndex) {
 		record.getTrailSelector().setTrailTextSelectedIndex(trailTextIndex);
 		record.initializeFromVaults(this.pickedVaults.initialVaults);
 	}
@@ -736,7 +736,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	/**
 	 * Build data contents after building the records list.
 	 */
-	public synchronized void initializeFromVaults() {
+	public void initializeFromVaults() {
 		cleanup();
 		RecordingsCollector collector = new RecordingsCollector();
 		collector.defineTrailTypes();

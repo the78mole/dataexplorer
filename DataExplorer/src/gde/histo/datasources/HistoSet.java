@@ -299,13 +299,13 @@ public final class HistoSet {
 	/**
 	 * Is thread safe with respect to concurrent rebuilds.
 	 */
-	public synchronized static void cleanExclusionData() {
+	public static void cleanExclusionData() {
 		ArrayList<Path> dataPaths = new ArrayList<Path>();
 		dataPaths.add(Paths.get(Settings.getInstance().getDataFilePath()));
 		ExclusionData.deleteExclusionsDirectory(dataPaths);
 	}
 
-	public synchronized static void cleanInclusionData() {
+	public static void cleanInclusionData() {
 		ArrayList<Path> dataPaths = new ArrayList<Path>();
 		dataPaths.add(Paths.get(Settings.getInstance().getDataFilePath()));
 		InclusionData.deleteInclusionsDirectory(dataPaths);
@@ -336,7 +336,7 @@ public final class HistoSet {
 	 * @param rebuildStep
 	 * @return true if the HistoSet was rebuilt
 	 */
-	public synchronized boolean rebuild4Screening(RebuildStep rebuildStep) //
+	public boolean rebuild4Screening(RebuildStep rebuildStep) //
 			throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException, DataTypeException {
 		return this.vaultPicker.rebuild4Screening(rebuildStep);
 	}
