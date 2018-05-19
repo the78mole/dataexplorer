@@ -1382,7 +1382,7 @@ public class DeviceConfiguration {
 	 * @return the number of measurements of a channel by given channel number
 	 */
 	public int getNumberOfMeasurements(int channelConfigNumber) {
-		return this.getChannel(channelConfigNumber).getMeasurement().size();
+		return this.getChannel(channelConfigNumber) != null ? this.getChannel(channelConfigNumber).getMeasurement().size() : 0;
 	}
 
 	/**

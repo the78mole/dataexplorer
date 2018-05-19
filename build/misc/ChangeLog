@@ -14,6 +14,7 @@ Device specific changes/fixes
 	* S32_2 - initial release for S32 as version 2 displaying all measurement values on a single time line
 	* S32 - fix measurement synchronization references (need device XML replacement)
 	* S32 - fix external temperature factor according customer feedback
+	* Ultramat* single channel charger - fix possible NullPointerException
 
 History analysis
 	* Enhance UI
