@@ -135,7 +135,7 @@ class SynchronousCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 	/**
 	 * The data segment.
 	 * Replaces Guava's segments, each of which was a specialized hash table.
-	 * */
+	 */
 	final Segment<K, V>											segments;
 
 	/** The concurrency level. */
@@ -280,14 +280,13 @@ class SynchronousCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 		 * Masks used to compute indices in the following table.
 		 */
 		static final int						ACCESS_MASK	= 1;
-		static final int						WRITE_MASK	= 2;											// ET no expiration, no refresh implemented
+		static final int						WRITE_MASK	= 2;													// ET no expiration, no refresh implemented
 		static final int						WEAK_MASK		= 4;											// ET no weak keys, no soft keys implemented - equivalence is based on standard 'equals' functions
 
 		/**
 		 * Look-up table for factories.
 		 */
-		static final EntryFactory[]	factories		= { STRONG, STRONG_ACCESS,
-		};
+		static final EntryFactory[]	factories		= { STRONG, STRONG_ACCESS };
 
 		static EntryFactory getFactory(@SuppressWarnings("unused") Strength keyStrength, boolean usesAccessQueue, boolean usesWriteQueue) {
 			int flags = (false ? WEAK_MASK : 0) // ET no weak keys, no soft keys implemented - equivalence is based on standard 'equals' functions
@@ -1409,10 +1408,12 @@ class SynchronousCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 			try {
 				ReferenceEntry<K, V> e = table.get(key);
 				long now = map.ticker.read();
-				V value = e.getValueReference().get();
-				if (value != null) {
-					recordRead(e, now);
-					return value;
+				if (e != null) {
+					V value = e.getValueReference().get();
+					if (value != null) {
+						recordRead(e, now);
+						return value;
+					}
 				}
 				return null;
 			} finally {
@@ -1627,7 +1628,6 @@ class SynchronousCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 				}
 			}
 		}
-
 
 		@Nullable
 		private boolean removeEntry(ReferenceEntry<K, V> e, RemovalCause cause) {
@@ -2291,49 +2291,49 @@ class SynchronousCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 	 *
 	 *   Iterator<Integer> powersOfTwo =
 	 *       new AbstractSequentialIterator<Integer>(1) {
-	 *         protected Integer computeNext(Integer previous) {
-	 *           return (previous == 1 << 30) ? null : previous * 2;
-	 *         }
+	 * 		protected Integer computeNext(Integer previous) {
+	 * 			return (previous == 1 << 30) ? null : previous * 2;
+	 * 		}
 	 *       };}</pre>
 	 *
 	 * @author Chris Povirk
 	 * @author Thomas Eickert (USER)
 	 */
 	abstract static class AbstractSequentialIterator<T> implements Iterator<T> {
-	  private T nextOrNull;
+		private T nextOrNull;
 
-	  /**
-	   * Creates a new iterator with the given first element, or, if {@code
-	   * firstOrNull} is null, creates a new empty iterator.
-	   */
-	  protected AbstractSequentialIterator(@Nullable T firstOrNull) {
-	    this.nextOrNull = firstOrNull;
-	  }
+		/**
+		 * Creates a new iterator with the given first element, or, if {@code
+		 * firstOrNull} is null, creates a new empty iterator.
+		 */
+		protected AbstractSequentialIterator(@Nullable T firstOrNull) {
+			this.nextOrNull = firstOrNull;
+		}
 
-	  /**
-	   * Returns the element that follows {@code previous}, or returns {@code null}
-	   * if no elements remain. This method is invoked during each call to
-	   * {@link #next()} in order to compute the result of a <i>future</i> call to
-	   * {@code next()}.
-	   */
-	  protected abstract T computeNext(T previous);
+		/**
+		 * Returns the element that follows {@code previous}, or returns {@code null}
+		 * if no elements remain. This method is invoked during each call to
+		 * {@link #next()} in order to compute the result of a <i>future</i> call to
+		 * {@code next()}.
+		 */
+		protected abstract T computeNext(T previous);
 
-	  @Override
-	  public final boolean hasNext() {
-	    return nextOrNull != null;
-	  }
+		@Override
+		public final boolean hasNext() {
+			return nextOrNull != null;
+		}
 
-	  @Override
-	  public final T next() {
-	    if (!hasNext()) {
-	      throw new NoSuchElementException();
-	    }
-	    try {
-	      return nextOrNull;
-	    } finally {
-	      nextOrNull = computeNext(nextOrNull);
-	    }
-	  }
+		@Override
+		public final T next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			try {
+				return nextOrNull;
+			} finally {
+				nextOrNull = computeNext(nextOrNull);
+			}
+		}
 	}
 
 	abstract class HashIterator<T> implements Iterator<T> {
@@ -2622,7 +2622,6 @@ class SynchronousCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 			return key != null && SynchronousCache.this.remove(key, e.getValue());
 		}
 	}
-
 
 	static class SynchronousManualCache<K, V> implements Cache<K, V>, Serializable {
 		final SynchronousCache<K, V> localCache;
