@@ -27,6 +27,7 @@ import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import gde.config.Settings;
@@ -37,11 +38,18 @@ import gde.config.Settings;
  */
 public final class VaultProxy {
 
+	private static final Path		path							= ExtendedVault.getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
+	private static Schema				vaultSchema;
+
 	private static Unmarshaller	jaxbUnmarshaller	= null;
 	private static Marshaller		jaxbMarshaller		= null;
 
-	public VaultProxy() {
-		;
+	{
+		try {
+			vaultSchema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(path.toFile());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -49,10 +57,9 @@ public final class VaultProxy {
 	 */
 	public static Unmarshaller getUnmarshaller() {
 		if (jaxbUnmarshaller == null) {
-			final Path path = ExtendedVault.getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
 			try {
 				jaxbUnmarshaller = HistoVault.getJaxbContext().createUnmarshaller();
-				jaxbUnmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(path.toFile()));
+				jaxbUnmarshaller.setSchema(vaultSchema);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -65,11 +72,10 @@ public final class VaultProxy {
 	 */
 	public static Marshaller getMarshaller() {
 		if (jaxbMarshaller == null) {
-			final Path path = ExtendedVault.getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
 			try {
 				jaxbMarshaller = HistoVault.getJaxbContext().createMarshaller();
 				jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-				jaxbMarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(path.toFile()));
+				jaxbMarshaller.setSchema(vaultSchema);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -111,6 +117,18 @@ public final class VaultProxy {
 	 */
 	public static void store(HistoVault newVault, OutputStream outputStream) throws JAXBException {
 		getMarshaller().marshal(newVault, outputStream);
+	}
+
+	/**
+	 * This load method takes 650 to 1261 ms for 137 vaults compared to 176 to 268 ms with the static load method.
+	 * @param inputStream is a stream to the source path
+	 * @return the vault
+	 */
+	@SuppressWarnings("static-method") // JAXB marshallers are not threadsafe
+	public HistoVault threadSafeLoad(InputStream inputStream) throws JAXBException {
+		Unmarshaller unmarshaller = HistoVault.getJaxbContext().createUnmarshaller();
+		unmarshaller.setSchema(vaultSchema);
+		return (HistoVault) unmarshaller.unmarshal(inputStream);
 	}
 
 }

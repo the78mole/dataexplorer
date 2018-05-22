@@ -29,10 +29,7 @@ import static java.util.logging.Level.SEVERE;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -77,7 +74,7 @@ public final class VaultReaderWriter {
 	private final static Settings										settings		= Settings.getInstance();
 
 	private final static Cache<String, HistoVault>	memoryCache	=																		//
-			CacheBuilder.newBuilder().maximumSize(4444).recordStats().build();													// key is the vaultName
+			CacheBuilder.newBuilder().maximumSize(4444).recordStats().build();															// key is the vaultName
 
 	/**
 	 * Read file and populate the vault from the recordset.
@@ -154,14 +151,14 @@ public final class VaultReaderWriter {
 				while (trussesIterator.hasNext()) {
 					progress.ifPresent((p) -> p.countInLoop(1));
 					VaultCollector truss = trussesIterator.next();
-					if (FileUtils.checkFileExist(cacheFilePath.resolve(truss.getVault().getVaultName()).toString())) {
+					String fileName = truss.getVault().getVaultName();
+					if (FileUtils.checkFileExist(cacheFilePath.resolve(fileName).toString())) {
 						HistoVault histoVault = null;
-						File vaultFile = cacheFilePath.resolve(truss.getVault().getVaultName()).toFile();
-						try (InputStream inputStream = new BufferedInputStream(new FileInputStream(vaultFile))) {
-							histoVault = memoryCache.get(truss.getVault().getVaultName(), new Callable<HistoVault>() {
+						try {
+							histoVault = memoryCache.get(fileName, new Callable<HistoVault>() {
 								@Override
 								public HistoVault call() throws Exception {
-									return VaultProxy.load(inputStream);
+									return VaultProxy.load(cacheFilePath.resolve(fileName));
 								}
 							});
 							vaults.add(ExtendedVault.createExtendedVault(histoVault, truss));
@@ -191,7 +188,7 @@ public final class VaultReaderWriter {
 			String readerSettings = providesReaderSettings && application.getActiveDevice() instanceof IHistoDevice
 					? ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
 			Path cacheFilePath = ExtendedVault.getVaultsFolder(readerSettings);
-			try  {
+			try {
 				storeInCachePath(e.getValue(), cacheFilePath);
 			} catch (Exception ex) {
 				throw new RuntimeException(ex);
