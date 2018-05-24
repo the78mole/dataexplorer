@@ -25,11 +25,10 @@ import java.util.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import gde.histo.base.BasicTestCase;
 import gde.histo.utils.GpsCoordinate;
 
-import junit.framework.TestCase;
-
-class GpsClusterTest extends TestCase {
+class GpsClusterTest extends BasicTestCase {
 	private final static String	$CLASS_NAME	= GpsClusterTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -106,6 +105,7 @@ class GpsClusterTest extends TestCase {
 
 	@Test
 	void testLocationFiles() {
+		log.log(Level.OFF, "dddd");
 		String location;
 		location = GeoCodes.getLocation(this.s21);
 		System.out.println(location);

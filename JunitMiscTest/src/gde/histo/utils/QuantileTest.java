@@ -35,11 +35,10 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import gde.config.Settings;
+import gde.histo.base.BasicTestCase;
 import gde.histo.utils.Quantile.Fixings;
 
-import junit.framework.TestCase;
-
-class QuantileTest extends TestCase {
+class QuantileTest extends BasicTestCase {
 	private final static String	$CLASS_NAME									= QuantileTest.class.getName();
 	private final static Logger	log													= Logger.getLogger($CLASS_NAME);
 
