@@ -105,7 +105,6 @@ class GpsClusterTest extends BasicTestCase {
 
 	@Test
 	void testLocationFiles() {
-		log.log(Level.OFF, "dddd");
 		String location;
 		location = GeoCodes.getLocation(this.s21);
 		System.out.println(location);

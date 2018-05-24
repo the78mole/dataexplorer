@@ -63,6 +63,7 @@ History analysis
 	 	>> Avoid multiple sha1 hashing
 	 	>> Remove method synchronizing keyword for methods not used in threads
  	* Support new file extensions separator
+ 	* Get geocodes from OpenStreetMap prioritized over Google (clear the location cache via the 'Clear cache' button)
 
 Version 3.3.2 - 15 Apr 2018
 * fix illegal formatting option in ParameterControl used for Graupner UDP charger
