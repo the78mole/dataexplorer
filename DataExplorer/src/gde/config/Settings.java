@@ -48,6 +48,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.logging.MemoryHandler;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.XMLConstants;
@@ -202,8 +203,10 @@ public class Settings extends Properties {
 	public final static String[]		LOGGING_LEVEL										= new String[] { "SEVERE", "WARNING", "TIME", "INFO", "FINE", "FINER", "FINEST" };								//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 
 	public final static String			ACTIVE_DEVICE										= "active_device";																																								//$NON-NLS-1$
+	public final static String			DEVICE_USE											= "device_use";																																										//$NON-NLS-1$
 	public final static String			OBJECT_LIST											= "object_list";																																									//$NON-NLS-1$
 	public final static String			ACTIVE_OBJECT										= "active_object";																																								//$NON-NLS-1$
+
 	public final static String			DATA_FILE_PATH									= "data_file_path";																																								//$NON-NLS-1$
 	public final static String			OBJECT_IMAGE_FILE_PATH					= "object_image_file_path";																																				//$NON-NLS-1$
 	public final static String			LIST_SEPARATOR									= "list_separator";																																								//$NON-NLS-1$
@@ -417,7 +420,6 @@ public class Settings extends Properties {
 											newConfig.setUsed(true);
 											if (oldConfig.getPort().length() > 1 && !oldConfig.getPort().startsWith("USB")) newConfig.setPort(oldConfig.getPort());
 											if (oldConfig.getDataBlockPreferredDataLocation().length() > 1) newConfig.setDataBlockPreferredDataLocation(oldConfig.getDataBlockPreferredDataLocation());
-											if (oldConfig.getLastChannelNumber() != 0) newConfig.setLastChannelNumber(oldConfig.getLastChannelNumber());
 
 											newConfig.storeDeviceProperties();
 											log.log(Level.OFF, "migrated device configuration " + newConfig.getName());
@@ -665,6 +667,7 @@ public class Settings extends Properties {
 
 			this.writer.write(String.format("%s\n", Settings.DEVICE_BLOCK)); // [Gerät] //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ACTIVE_DEVICE, this.getActiveDevice())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DEVICE_USE, this.getDeviceUseCsv())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_LIST, this.getObjectListAsString())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ACTIVE_OBJECT, this.getActiveObject())); //$NON-NLS-1$
 
@@ -3140,4 +3143,39 @@ public class Settings extends Properties {
 	public boolean isObjectQueryActive() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_OBJECT_QUERY_ACTIVE, "true"));
 	}
+
+	/**
+	 * @return the list of deviceName*lastUsedChannelOrdinal from the user choices (the first entry is the most recently used entry)
+	 */
+	public String getDeviceUseCsv() {
+		return String.valueOf(this.getProperty(Settings.DEVICE_USE, ""));
+	}
+
+	/**
+	 * @param csvValues is the list of deviceName*lastUsedChannelOrdinal from the user choices (the first entry is the most recently used entry)
+	 */
+	public void setDeviceUseCsv(String csvValues) {
+		this.setProperty(Settings.DEVICE_USE, String.valueOf(csvValues));
+	}
+
+	/**
+	 * (Re-)define the device's used channel ordinal.
+	 * @param channelNumber
+	 */
+	public void addDeviceUse(String deviceName, int channelNumber) {
+		String entry = deviceName + GDE.STRING_STAR + (channelNumber - 1);
+		Stream<String> remainingEntries = Arrays.stream(Settings.getInstance().getDeviceUseCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+				.filter(s -> !s.startsWith(deviceName + GDE.STRING_STAR)).filter(s -> !s.isEmpty());
+		this.setDeviceUseCsv(Stream.concat(Stream.of(entry), remainingEntries).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
+	}
+
+	/**
+	 * @return the last used channel number
+	 */
+	public int getLastUseChannelNumber(String deviceName) {
+		Optional<String> lastUseEntry = Arrays.stream(Settings.getInstance().getDeviceUseCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+				.filter(s -> s.startsWith(deviceName + GDE.STRING_STAR)).findFirst();
+		return lastUseEntry.map(s -> s.substring((deviceName + GDE.STRING_STAR).length())).map(Integer::parseInt).orElse(0) + 1;
+	}
+
 }

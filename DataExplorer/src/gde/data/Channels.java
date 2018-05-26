@@ -183,6 +183,7 @@ public class Channels extends HashMap<Integer, Channel> {
 					this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 				}
 				this.application.selectObjectKey(Channels.this.getActiveChannel().getObjectKey());
+				this.application.getActiveDevice().getDeviceConfiguration().setLastChannelNumber(channelNumber);
 			} else {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$
 			}

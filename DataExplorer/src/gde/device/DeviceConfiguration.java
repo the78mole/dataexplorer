@@ -2395,19 +2395,15 @@ public class DeviceConfiguration {
 	 * @return the last used channel number
 	 */
 	public int getLastChannelNumber() {
-		return this.deviceProps.getChannels().getLastUseOrdinal() + 1;
+		int channelNumber = this.settings.getLastUseChannelNumber(this.getName());
+		return channelNumber <= this.deviceProps.getChannels().channel.size() ? channelNumber : this.deviceProps.getChannels().channel.size();
 	}
 
 	/**
 	 * set the last used channel number (ordinal + 1 = channel number)
-	 * @return the last used channel number
 	 */
 	public void setLastChannelNumber(int channelNumber) {
-		if (this.deviceProps.getChannels().getLastUseOrdinal() != (channelNumber - 1) && channelNumber <= this.deviceProps.getChannels().channel.size()) {
-			this.isChangePropery = true;
-			this.deviceProps.getChannels().setLastUseOrdinal(channelNumber - 1);
-		}
-		this.storeDeviceProperties();
+		this.settings.addDeviceUse(this.getName(), channelNumber);
 	}
 
 	/**
