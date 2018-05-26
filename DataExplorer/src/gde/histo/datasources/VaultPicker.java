@@ -31,6 +31,7 @@ import static gde.histo.datasources.VaultPicker.LoadProgress.STARTED;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
 import java.io.FileNotFoundException;
@@ -47,7 +48,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import com.sun.istack.internal.Nullable;
@@ -178,7 +178,7 @@ public final class VaultPicker {
 			int jobSize = trussJobs.values().parallelStream().mapToInt(List::size).sum();
 			if (jobSize > 0) {
 				long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
-				log.finer(() -> String.format("%,5d trusses    job check          time=%,6d [ms] :: per second:%5d", //
+				log.finer(() -> format("%,5d trusses    job check          time=%,6d [ms] :: per second:%5d", //
 						jobSize, micros / 1000, trusses.size() * 1000000 / micros));
 			}
 			return trussJobs;
@@ -280,7 +280,7 @@ public final class VaultPicker {
 		 * @param percentage value (reset for 0 or bigger than 99)
 		 */
 		public void set(int percentage) {
-			this.presenter.setProgress(percentage, this.sThreadId);
+			presenter.setProgress(percentage, sThreadId);
 		}
 
 		/**
@@ -288,19 +288,19 @@ public final class VaultPicker {
 		 * @param loadProgress
 		 */
 		public void set(LoadProgress loadProgress) {
-			this.presenter.setProgress(loadProgress.endPercentage, this.sThreadId);
+			presenter.setProgress(loadProgress.endPercentage, sThreadId);
 		}
 	}
 
 	public VaultPicker() {
 		this.directoryScanner = new DirectoryScanner();
-		this.sourceDataSetExplorer = new SourceDataSetExplorer(false);
+		this.sourceDataSetExplorer = new SourceDataSetExplorer(this.directoryScanner.getSourceFolders(), false);
 	}
 
 	@Override
 	public String toString() {
 		String result = format("totalTrussesCount=%,d  availableVaultsCount=%,d recordSetBytesSum=%,d elapsedTime_ms=%,d", //
-				this.getTrussesCount(), this.getTimeStepSize(), this.recordSetBytesSum, this.getElapsedTime_ms());
+				getTrussesCount(), getTimeStepSize(), recordSetBytesSum, getElapsedTime_ms());
 		return result;
 	}
 
@@ -312,13 +312,13 @@ public final class VaultPicker {
 		for (List<ExtendedVault> timestampHistoVaults : pickedVaults.values()) {
 			timestampHistoVaults.clear();
 		}
-		this.pickedVaults.clear();
-		this.suppressedVaults.clear();
+		pickedVaults.clear();
+		suppressedVaults.clear();
 
-		this.recordSetBytesSum = 0;
-		this.elapsedTime_us = 0;
+		recordSetBytesSum = 0;
+		elapsedTime_us = 0;
 
-		this.trailRecordSet = null;
+		trailRecordSet = null;
 		log.log(FINER, "done", this);
 	}
 
@@ -340,14 +340,14 @@ public final class VaultPicker {
 			progress.ifPresent((p) -> p.set(STARTED));
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.A_HISTOSET)) {
-				this.directoryScanner.initialize();
+				directoryScanner.initialize();
 				log.fine(() -> format("directoryScanner      initialize"));
 			}
 			progress.ifPresent((p) -> p.set(INITIALIZED));
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.F_FILE_CHECK)) {
-				realRebuildStep = directoryScanner.isValidated(rebuildStep);
-				log.time(() -> format("  %3d file paths verified           time=%,6d [ms]", this.directoryScanner.getValidatedFoldersCount(), NANOSECONDS.toMillis(System.nanoTime() - startNanoTime + 500000)));
+				realRebuildStep = directoryScanner.isValidated(DataExplorer.getInstance().getActiveDevice(), rebuildStep);
+				log.time(() -> format("  %3d file paths verified           time=%,6d [ms]", directoryScanner.getValidatedFoldersCount(), NANOSECONDS.toMillis(System.nanoTime() - startNanoTime + 500000)));
 			}
 			progress.ifPresent((p) -> p.set(PATHS_VERIFIED));
 
@@ -374,13 +374,13 @@ public final class VaultPicker {
 						int jobSize = trussJobs.values().parallelStream().mapToInt(List::size).sum();
 						progress.ifPresent((p) -> p.reInit(RESTORED, jobSize, CACHE_BENEFIT));
 						loadVaultsFromCache(trussJobs, progress);
-						int totalEstimatedEffort = this.pickedVaults.size() + CACHE_BENEFIT * (jobSize - this.pickedVaults.size());
-						double timeQuotaDone = this.pickedVaults.size() / totalEstimatedEffort;
+						int totalEstimatedEffort = pickedVaults.size() + CACHE_BENEFIT * (jobSize - pickedVaults.size());
+						double timeQuotaDone = pickedVaults.size() / totalEstimatedEffort;
 						int progressPercentageDone = (int) ((CACHED.endPercentage - MATCHED.endPercentage) * timeQuotaDone);
 						progress.ifPresent((
 								p) -> p.set(Math.max(DataExplorer.application.getProgressPercentage(), MATCHED.endPercentage + progressPercentageDone)));
 					}
-					final long recordSetBytesCachedSum = this.recordSetBytesSum;
+					final long recordSetBytesCachedSum = recordSetBytesSum;
 					{// step: transform log files from workload map into vaults and put them into the histoSet map
 						long nanoTime = System.nanoTime();
 						loadVaultsFromFiles(trussJobs, progress);
@@ -406,7 +406,7 @@ public final class VaultPicker {
 			}
 			progress.ifPresent((p) -> p.set(CACHED));
 
-			this.suppressedVaults.addAll(removeSuppressedHistoVaults());
+			suppressedVaults.addAll(removeSuppressedHistoVaults());
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.C_TRAILRECORDSET)) {
 				long nanoTime = System.nanoTime();
@@ -415,8 +415,8 @@ public final class VaultPicker {
 				trailRecordSet.applyTemplate(true); // needs reasonable data
 				if (recordSetBytesSum > 0) {
 					long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
-					log.time(() -> format("%,5d timeSteps new TrailRecordSet  time=%,6d [ms] :: per second:%5d", pickedVaults.size(), micros / 1000, pickedVaults.size() > 0
-							? pickedVaults.size() * 1000000 / micros : 0));
+					log.time(() -> format("%,5d timeSteps new TrailRecordSet  time=%,6d [ms] :: per second:%5d", //
+							pickedVaults.size(), micros / 1000, pickedVaults.size() > 0 ? pickedVaults.size() * 1000000 / micros : 0));
 				}
 			} else if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA)) { // keeps the template in contrast to the logic above
 				long nanoTime = System.nanoTime();
@@ -431,7 +431,7 @@ public final class VaultPicker {
 			this.elapsedTime_us = (int) ((System.nanoTime() - startNanoTime + 500000) / 1000);
 			log.time(() -> format("%,5d timeSteps  total              time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", this.pickedVaults.size(), elapsedTime_us / 1000, this.pickedVaults.size() * 1000000 / this.elapsedTime_us, (int) (this.recordSetBytesSum / 1.024 / 1.024 / this.elapsedTime_us)));
 		} catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
+			log.log(SEVERE, e.getMessage(), e);
 		} finally {
 			progress.ifPresent((p) -> p.set(DONE));
 		}
@@ -450,7 +450,7 @@ public final class VaultPicker {
 				ExtendedVault histoVault = vaultCollector.getVault();
 				if (!histoVault.isTruss()) {
 					putVault(histoVault);
-					this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
+					recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 				} else {
 					log.info(() -> format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLoadFilePath()));
 				}
@@ -465,16 +465,16 @@ public final class VaultPicker {
 	private void loadVaultsFromCache(TrussJobs trussJobs, Optional<ProgressManager> progress) throws IOException {
 		long nanoTime = System.nanoTime();
 		long hitCount = VaultReaderWriter.getInnerCacheHitCount();
-		int tmpHistoSetsSize = this.pickedVaults.size();
+		int tmpHistoSetsSize = pickedVaults.size();
 		for (ExtendedVault histoVault : VaultReaderWriter.loadFromCaches(trussJobs, progress)) {
 			if (!histoVault.isTruss()) {
 				putVault(histoVault);
-				this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
+				recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 			} else {
 				log.info(() -> format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLoadFilePath()));
 			}
 		}
-		int loadCount = this.pickedVaults.size() - tmpHistoSetsSize;
+		int loadCount = pickedVaults.size() - tmpHistoSetsSize;
 		if (loadCount > 0) {
 			long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 			log.time(() -> format("%,5d/%,5d      vaults cached/hit  time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", loadCount, VaultReaderWriter.getInnerCacheHitCount() - hitCount, micros / 1000, loadCount * 1000000 / micros, (int) (this.recordSetBytesSum / 1.024 / 1.024 / micros)));
@@ -487,16 +487,17 @@ public final class VaultPicker {
 	 * @return the suppressed vaults which have been detected in the vaults list
 	 */
 	private List<ExtendedVault> removeSuppressedHistoVaults() {
-		long totalSize = this.pickedVaults.values().parallelStream().flatMap(Collection::stream).count();
-		List<ExtendedVault> removed = this.pickedVaults.values().parallelStream().flatMap(Collection::stream) //
-				.filter(v -> ExclusionData.isExcluded(v.getLoadFileAsPath(), v.getLogRecordsetBaseName())) //
+		long totalSize = pickedVaults.values().parallelStream().flatMap(Collection::stream).count();
+		ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder());
+		List<ExtendedVault> removed = pickedVaults.values().parallelStream().flatMap(Collection::stream) //
+				.filter(v -> exclusionData.isExcluded(v.getLoadFileAsPath(), v.getLogRecordsetBaseName())) //
 				.collect(Collectors.toList());
 		for (ExtendedVault vault : removed) {
 			log.info(() -> format("discarded as per exclusion list   %s %s   %s", //
 					vault.getLoadFilePath(), vault.getLogRecordsetBaseName(), vault.getStartTimeStampFormatted()));
-			List<ExtendedVault> vaultList = this.pickedVaults.get(vault.getLogStartTimestamp_ms());
+			List<ExtendedVault> vaultList = pickedVaults.get(vault.getLogStartTimestamp_ms());
 			vaultList.remove(vault);
-			if (vaultList.isEmpty()) this.pickedVaults.remove(vault.getLogStartTimestamp_ms());
+			if (vaultList.isEmpty()) pickedVaults.remove(vault.getLogStartTimestamp_ms());
 		}
 		log.fine(() -> format("%04d total trusses --- %04d excluded trusses", totalSize, removed.size()));
 		return removed;
@@ -506,9 +507,9 @@ public final class VaultPicker {
 	 * @param histoVault
 	 */
 	public void putVault(ExtendedVault histoVault) {
-		List<ExtendedVault> timeStampHistoVaults = this.pickedVaults.get(histoVault.getLogStartTimestamp_ms());
+		List<ExtendedVault> timeStampHistoVaults = pickedVaults.get(histoVault.getLogStartTimestamp_ms());
 		if (timeStampHistoVaults == null) {
-			this.pickedVaults.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<ExtendedVault>());
+			pickedVaults.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<ExtendedVault>());
 		}
 		timeStampHistoVaults.add(histoVault);
 		log.finer(() -> format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLoadFilePath()));
@@ -518,14 +519,14 @@ public final class VaultPicker {
 	 * @return the total number of trusses identified in the files
 	 */
 	public int getTrussesCount() {
-		return this.sourceDataSetExplorer.getTrusses().size();
+		return sourceDataSetExplorer.getTrusses().size();
 	}
 
 	/**
 	 * @return the number of timestamp entries
 	 */
 	public int getTimeStepSize() {
-		return this.getTrailRecordSet() != null ? this.getTrailRecordSet().getTimeStepSize() : 0;
+		return getTrailRecordSet() != null ? getTrailRecordSet().getTimeStepSize() : 0;
 	}
 
 	public int getElapsedTime_ms() {
@@ -554,7 +555,7 @@ public final class VaultPicker {
 	}
 
 	public int getDirectoryFilesCount() {
-		return this.sourceDataSetExplorer.getSourceFiles().size() + this.sourceDataSetExplorer.getNonWorkableCount() + this.sourceDataSetExplorer.getExcludedFiles().size();
+		return sourceDataSetExplorer.getSourceFiles().size() + sourceDataSetExplorer.getNonWorkableCount() + sourceDataSetExplorer.getExcludedFiles().size();
 	}
 
 	public int getReadFilesCount() {
@@ -565,7 +566,7 @@ public final class VaultPicker {
 	 * @return the number of files which have log data for the object, device, analysis timespan etc.
 	 */
 	public int getMatchingFilesCount() {
-		return (int) this.sourceDataSetExplorer.getTrusses().parallelStream() //
+		return (int) sourceDataSetExplorer.getTrusses().parallelStream() //
 				.map(VaultCollector::getVault).map(ExtendedVault::getLoadFileAsPath).count();
 	}
 

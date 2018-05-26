@@ -19,11 +19,15 @@
 
 package gde.histo.recordings;
 
+import java.util.Arrays;
 import java.util.stream.DoubleStream;
 
 import gde.data.Record.DataType;
+import gde.device.IChannelItem;
 import gde.device.ScoreGroupType;
 import gde.histo.cache.ExtendedVault;
+import gde.histo.cache.HistoVault;
+import gde.histo.guard.Guardian;
 import gde.log.Logger;
 
 /**
@@ -31,9 +35,9 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public final class ScoregroupTrail extends TrailRecord {
-	private final static String	$CLASS_NAME				= ScoregroupTrail.class.getName();
-	private final static long		serialVersionUID	= 110124007964748556L;
-	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME				= ScoregroupTrail.class.getName();
+	private static final long		serialVersionUID	= 110124007964748556L;
+	private static final Logger	log								= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * @param newOrdinal
@@ -41,7 +45,7 @@ public final class ScoregroupTrail extends TrailRecord {
 	 * @param parent
 	 * @param initialCapacity
 	 */
-	public ScoregroupTrail(int newOrdinal, ScoreGroupType scoreGroupType, TrailRecordSet parent, int initialCapacity) {
+	public ScoregroupTrail(int newOrdinal, IChannelItem scoreGroupType, TrailRecordSet parent, int initialCapacity) {
 		super(scoreGroupType, newOrdinal, parent, initialCapacity);
 		setTrailSelector();
 	}
@@ -66,11 +70,6 @@ public final class ScoregroupTrail extends TrailRecord {
 	}
 
 	@Override
-	public void setApplicableTrailTypes() {
-		getTrailSelector().setApplicableTrails();
-	}
-
-	@Override
 	public Integer getVaultPoint(ExtendedVault vault, int trailOrdinal) {
 		return vault.getScorePoint(trailOrdinal);
 	}
@@ -82,12 +81,12 @@ public final class ScoregroupTrail extends TrailRecord {
 
 	@Override
 	public double[] defineRecentMinMax(int limit ) {
-		return getParent().getPickedVaults().defineRecentScoreMinMax(getName(), getScoregroup(), limit);
+		return Guardian.defineScoreMinMax(Arrays.stream(getParent().getIndexedVaults()).limit(limit), getScoregroup());
 	}
 
 	@Override
 	public double[] defineExtrema() {
-		return getParent().getPickedVaults().defineScoreExtrema(getName(), getScoregroup());
+		return Guardian.defineScoreExtrema(Arrays.asList(getParent().getIndexedVaults()), getScoregroup());
 	}
 
 	@Override
@@ -122,7 +121,7 @@ public final class ScoregroupTrail extends TrailRecord {
 	}
 
 	@Override
-	public DataType getVaultDataType(ExtendedVault vault) {
+	public DataType getVaultDataType(HistoVault vault) {
 		return DataType.DEFAULT;
 	}
 

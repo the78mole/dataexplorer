@@ -19,18 +19,11 @@
 
 package gde.data;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.AbstractRecordSet.SyncedRecords;
 import gde.data.Record.DataType;
-import gde.device.DataTypes;
 import gde.device.IDevice;
-import gde.device.ObjectFactory;
-import gde.device.PropertyType;
 import gde.device.StatisticsType;
 import gde.log.Level;
 import gde.log.Logger;
@@ -68,8 +61,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	DataType										dataType					= Record.DataType.DEFAULT;
 	StatisticsType							statistics				= null;
 
-	List<PropertyType>					properties				= new ArrayList<>();						// offset, factor, reduction, ...
-
 	protected int								maxValue					= 0;														// max value of the curve
 	protected int								minValue					= 0;														// min value of the curve
 
@@ -89,7 +80,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	 * @param initialCapacity
 	 */
 	public CommonRecord(IDevice newDevice, int newOrdinal, String newName, String newSymbol, String newUnit, boolean isActiveValue,
-			StatisticsType newStatistic, List<PropertyType> newProperties, int initialCapacity) {
+			StatisticsType newStatistic, int initialCapacity) {
 		super(initialCapacity);
 		if (log.isLoggable(Level.FINE))
 			log.log(Level.FINE, newName + " Record(IDevice, int, String, String, String, boolean, StatisticsType, List<PropertyType>, int)"); //$NON-NLS-1$
@@ -100,8 +91,6 @@ public abstract class CommonRecord extends AbstractRecord {
 		this.unit = newUnit;
 		this.isActive = isActiveValue;
 		this.statistics = newStatistic;
-
-		this.initializeProperties(this, newProperties);
 	}
 
 	/**
@@ -109,19 +98,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	 */
 	protected CommonRecord(CommonRecord record) {
 		super(record);
-	}
-
-	/**
-	 * initialize properties, at least all record will have as default a factor, an offset and a reduction property
-	 * @param recordRef
-	 * @param newProperties
-	 */
-	private void initializeProperties(CommonRecord recordRef, List<PropertyType> newProperties) {
-		this.properties = this.properties != null ? this.properties : new ArrayList<PropertyType>(); // offset, factor, reduction, ...
-		for (PropertyType property : newProperties) {
-			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%20s - %s = %s", recordRef.name, property.getName(), property.getValue()));
-			this.properties.add(property.clone());
-		}
 	}
 
 	/**
@@ -200,128 +176,6 @@ public abstract class CommonRecord extends AbstractRecord {
 
 	public void setSymbol(String newSymbol) {
 		this.symbol = newSymbol;
-	}
-
-	/**
-	 * get a reference to the record properies (offset, factor, ...)
-	 * @return list containing the properties
-	 */
-	List<PropertyType> getProperties() {
-		return this.properties;
-	}
-
-	/**
-	 * replace the properties to enable channel/configuration switch
-	 * @param newProperties
-	 */
-	public void setProperties(List<PropertyType> newProperties) {
-		this.properties = new ArrayList<PropertyType>();
-		for (PropertyType property : newProperties) {
-			this.properties.add(property.clone());
-		}
-	}
-
-	/**
-	 * get property reference using given property type key (IDevice.OFFSET, ...)
-	 * @param propertyKey
-	 * @return PropertyType
-	 */
-	public PropertyType getProperty(String propertyKey) {
-		PropertyType property = null;
-		for (PropertyType propertyType : this.properties) {
-			if (propertyType.getName().equals(propertyKey)) {
-				property = propertyType;
-				break;
-			}
-		}
-		return property;
-	}
-
-	/**
-	 * create a property and return the reference
-	 * @param propertyKey
-	 * @param type
-	 * @return created property with associated propertyKey
-	 */
-	public PropertyType createProperty(String propertyKey, DataTypes type, Object value) {
-		ObjectFactory factory = new ObjectFactory();
-		PropertyType newProperty = factory.createPropertyType();
-		newProperty.setName(propertyKey);
-		newProperty.setType(type);
-		newProperty.setValue(GDE.STRING_EMPTY + value);
-		this.properties.add(newProperty);
-		return newProperty;
-	}
-
-	@Override
-	public double getFactor() {
-		double value = 1.0;
-		PropertyType property = this.getProperty(IDevice.FACTOR);
-		if (property != null)
-			value = Double.valueOf(property.getValue()).doubleValue();
-		else
-			try {
-				value = this.getDevice().getMeasurementFactor(this.getAbstractParent().parent.number, this.ordinal);
-			} catch (RuntimeException e) {
-				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
-			}
-		return value;
-	}
-
-	public void setFactor(double newValue) {
-		PropertyType property = this.getProperty(IDevice.FACTOR);
-		if (property != null)
-			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
-		else
-			this.createProperty(IDevice.FACTOR, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
-	}
-
-	@Override
-	public double getOffset() {
-		double value = 0.0;
-		PropertyType property = this.getProperty(IDevice.OFFSET);
-		if (property != null)
-			value = Double.valueOf(property.getValue()).doubleValue();
-		else
-			try {
-				value = this.getDevice().getMeasurementOffset(this.getAbstractParent().parent.number, this.ordinal);
-			} catch (RuntimeException e) {
-				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
-			}
-		return value;
-	}
-
-	public void setOffset(double newValue) {
-		PropertyType property = this.getProperty(IDevice.OFFSET);
-		if (property != null)
-			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
-		else
-			this.createProperty(IDevice.OFFSET, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
-	}
-
-	@Override
-	public double getReduction() {
-		double value = 0.0;
-		PropertyType property = this.getProperty(IDevice.REDUCTION);
-		if (property != null)
-			value = Double.valueOf(property.getValue()).doubleValue();
-		else {
-			try {
-				String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.getAbstractParent().parent.number, this.ordinal, IDevice.REDUCTION);
-				if (strValue != null && strValue.length() > 0) value = Double.valueOf(strValue.trim().replace(',', '.')).doubleValue();
-			} catch (RuntimeException e) {
-				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
-			}
-		}
-		return value;
-	}
-
-	public void setReduction(double newValue) {
-		PropertyType property = this.getProperty(IDevice.REDUCTION);
-		if (property != null)
-			property.setValue(String.format("%.4f", newValue)); //$NON-NLS-1$
-		else
-			this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
 	public abstract int getMaxValue();
@@ -576,28 +430,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	 * @return true if the record contained reasonable date which can be displayed
 	 */
 	public abstract boolean hasReasonableData();
-
-	/**
-	 * @return the dataType of this record
-	 */
-	@Override
-	public Record.DataType getDataType() {
-		return this.dataType == null ? DataType.DEFAULT : this.dataType;
-	}
-
-	/**
-	 * set the dataType of this record by evaluating its name
-	 */
-	public void setDataType() {
-		this.dataType = DataType.guess(this.name);
-	}
-
-	/**
-	 * set the dataType of this record
-	 */
-	public void setDataType(Record.DataType newDataType) {
-		this.dataType = newDataType;
-	}
 
 	@Override
 	public String toString() {

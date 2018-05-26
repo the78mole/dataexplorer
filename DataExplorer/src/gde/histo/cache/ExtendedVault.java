@@ -21,14 +21,10 @@ package gde.histo.cache;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.stream.IntStream;
-
-import com.sun.istack.internal.Nullable;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.device.IDevice;
 import gde.histo.utils.SecureHash;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -73,14 +69,21 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 *         channel number and some settings values
 	 */
 	public static String getVaultsDirectoryName(String vaultReaderSettings) {
-		final String d = SHA1_DELIMITER;
+		return getVaultsDirectoryName(application.getActiveDevice(), application.getActiveChannelNumber(), vaultReaderSettings);
+	}
 
-		String tmpSubDirectoryLongKey = GDE.VERSION + d + application.getActiveDevice().getDeviceConfiguration().getFileSha1Hash() + d + application.getActiveChannelNumber() //
-				+ d + settings.getSamplingTimespan_ms() + d + settings.getMinmaxQuantileDistance() + d + settings.getAbsoluteTransitionLevel() //
+	/**
+	 * @param vaultReaderSettings a non-empty string indicates that the file reader measurement values depend on device settings
+	 * @return directory or zip file name as a unique identifier encoding the data explorer version, the device xml file contents(sha1) plus
+	 *         channel number and some settings values
+	 */
+	public static String getVaultsDirectoryName(IDevice device, int channelNumber, String vaultReaderSettings) {
+		final String d = SHA1_DELIMITER;
+		String tmpSubDirectoryLongKey = GDE.VERSION + d + device.getDeviceConfiguration().getFileSha1Hash() + d + channelNumber //
+				+ d + settings.getDataFilePath() + d + settings.getSamplingTimespan_ms() + d + settings.getMinmaxQuantileDistance() + d + settings.getAbsoluteTransitionLevel() //
 				+ d + settings.isCanonicalQuantiles() + d + settings.isSymmetricToleranceInterval() + d + settings.getOutlierToleranceSpread() //
 				+ d + vaultReaderSettings;
 		return SecureHash.sha1(tmpSubDirectoryLongKey);
-
 	}
 
 	/**
@@ -237,198 +240,11 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(super.toString());
 		final String d = GDE.STRING_COMMA_BLANK;
-		sb.append(this.vaultName).append(d);
-		sb.append("isTruss=").append(isTruss()).append(d);
-		sb.append("logRecordSetOrdinal=").append(this.logRecordSetOrdinal).append(d);
-		sb.append("logRecordsetBaseName=").append(this.logRecordsetBaseName).append(d);
-		sb.append("logChannelNumber=").append(this.logChannelNumber).append(d);
-		sb.append("logObjectKey=").append(this.logObjectKey).append(d);
-		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(d);
 		sb.append(this.loadLinkPath).append(d);
 		sb.append(this.loadFilePath).append(d);
-		sb.append("vaultDirectory=").append(this.vaultDirectory);
 		return sb.toString();
-	}
-
-	/**
-	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the
-	 *          meantime)
-	 * @return empty in case of unavailable measurement
-	 */
-	public HashMap<Integer, PointType> getMeasurementPoints(int measurementOrdinal) {
-		return this.getMeasurements().containsKey(measurementOrdinal) ? new HashMap<Integer, PointType>()
-				: this.getMeasurements().get(measurementOrdinal).getTrails();
-	}
-
-	/**
-	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the
-	 *          meantime)
-	 * @param trailOrdinal
-	 * @return the point value
-	 */
-	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	public Integer getMeasurementPoint(int measurementOrdinal, int trailOrdinal) {
-		if (this.getMeasurements().containsKey(measurementOrdinal)) {
-			return this.getMeasurements().get(measurementOrdinal).getTrails().containsKey(trailOrdinal)
-					? this.getMeasurements().get(measurementOrdinal).getTrails().get(trailOrdinal).value : null;
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	 * @return the points
-	 */
-	public IntStream getMeasurementOutliers(int measurementOrdinal) {
-		if (this.getMeasurements().containsKey(measurementOrdinal)) {
-			String points = this.getMeasurements().get(measurementOrdinal).getOutlierPoints();
-			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
-		}
-		return IntStream.empty();
-	}
-
-	/**
-	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	 * @return the points
-	 */
-	public IntStream getMeasurementScraps(int measurementOrdinal) {
-		if (this.getMeasurements().containsKey(measurementOrdinal)) {
-			String points = this.getMeasurements().get(measurementOrdinal).getScrappedPoints();
-			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
-		}
-		return IntStream.empty();
-	}
-
-	/**
-	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	 * @return false if the measurement does not exist or has no outliers
-	 */
-	public boolean hasMeasurementOutliers(int measurementOrdinal) {
-		if (this.getMeasurements().containsKey(measurementOrdinal)) {
-			return this.getMeasurements().get(measurementOrdinal).getOutlierPoints() != null;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	 * @return the cache data type
-	 */
-	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	public DataTypes getMeasurementDataType(int measurementOrdinal) {
-		if (this.getMeasurements().containsKey(measurementOrdinal)) {
-			return this.getMeasurements().get(measurementOrdinal).dataType;
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	 * @return false if the measurement does not exist or has no scrapped points
-	 */
-	public boolean hasMeasurementScraps(int measurementOrdinal) {
-		if (this.getMeasurements().containsKey(measurementOrdinal)) {
-			return this.getMeasurements().get(measurementOrdinal).getScrappedPoints() != null;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * @param settlementId may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
-	 * @return empty in case of unavailable settlementId
-	 */
-	public HashMap<Integer, PointType> getSettlementPoints(int settlementId) {
-		return this.getSettlements().containsKey(settlementId) ? new HashMap<Integer, PointType>() : this.getSettlements().get(settlementId).getTrails();
-	}
-
-	/**
-	 * @param settlementId may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
-	 * @param trailOrdinal
-	 * @return the point value
-	 */
-	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	public Integer getSettlementPoint(int settlementId, int trailOrdinal) {
-		if (this.getSettlements().containsKey(settlementId)) {
-			return this.getSettlements().get(settlementId).getTrails().containsKey(trailOrdinal)
-					? this.getSettlements().get(settlementId).getTrails().get(trailOrdinal).value : null;
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * @param settlementId may specify an ordinal which is not present in the vault
-	 * @return the points
-	 */
-	public IntStream getSettlementOutliers(int settlementId) {
-		if (this.getMeasurements().containsKey(settlementId)) {
-			String points = this.getMeasurements().get(settlementId).getOutlierPoints();
-			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
-		}
-		return IntStream.empty();
-	}
-
-	/**
-	 * @param settlementId may specify an ordinal which is not present in the vault
-	 * @return the points
-	 */
-	public IntStream getSettlementScraps(int settlementId) {
-		if (this.getMeasurements().containsKey(settlementId)) {
-			String points = this.getMeasurements().get(settlementId).getScrappedPoints();
-			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
-		}
-		return IntStream.empty();
-	}
-
-	/**
-	 * @param settlementId may specify an ordinal which is not present in the vault
-	 * @return false if the settlement does not exist or has no outliers
-	 */
-	public boolean hasSettlementOutliers(int settlementId) {
-		if (this.getSettlements().containsKey(settlementId)) {
-			return this.getSettlements().get(settlementId).getOutlierPoints() != null;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * @param settlementId may specify an ordinal which is not present in the vault
-	 * @return false if the settlement does not exist or has no scrapped points
-	 */
-	public boolean hasSettlementScraps(int settlementId) {
-		if (this.getSettlements().containsKey(settlementId)) {
-			return this.getSettlements().get(settlementId).getScrappedPoints() != null;
-		} else {
-			return false;
-		}
-	}
-
-	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
-	public DataTypes getSettlementDataType(int settlementId) {
-		if (this.getSettlements().containsKey(settlementId)) {
-			return this.getSettlements().get(settlementId).dataType;
-		} else {
-			return null;
-		}
-	}
-
-	public HashMap<Integer, PointType> getScorePoints() {
-		return this.getScores();
-	}
-
-	/**
-	 * @param scoreLabelOrdinal
-	 * @return null in case of unavailable score
-	 */
-	public Integer getScorePoint(int scoreLabelOrdinal) {
-		return this.getScores().get(scoreLabelOrdinal).getValue();
 	}
 
 	/**
@@ -467,13 +283,6 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 */
 	public String getRectifiedObjectKey() {
 		return this.logObjectKey.isEmpty() ? this.loadObjectDirectory : this.logObjectKey;
-	}
-
-	/**
-	 * @return true if this is a vault skeleton only
-	 */
-	public boolean isTruss() {
-		return this.getMeasurements().isEmpty();
 	}
 
 	@Override

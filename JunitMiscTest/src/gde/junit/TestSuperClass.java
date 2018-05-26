@@ -20,7 +20,6 @@ package gde.junit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Constructor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -159,7 +158,7 @@ public class TestSuperClass extends TestCase {
 			Logger.getLogger("gde.junit.TestSuperClass").log(Level.WARNING, "Failed creation of " + this.tmpDir1 );
 		if (!new File(this.tmpDir2).exists() && !new File(this.tmpDir2).mkdirs())
 			Logger.getLogger("gde.junit.TestSuperClass").log(Level.WARNING, "Failed creation of " + this.tmpDir2 );
-}
+	}
 
 	/**
 	 * goes through the existing device properties files and set active flagged
@@ -242,29 +241,8 @@ public class TestSuperClass extends TestCase {
 	 */
 	protected IDevice getInstanceOfDevice(DeviceConfiguration selectedActiveDeviceConfig) {
 		IDevice newInst = null;
-		String selectedDeviceName = selectedActiveDeviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
-		// selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase()
-		// + selectedDeviceName.substring(1);
-		String className = selectedDeviceName.contains(GDE.STRING_DOT) ? selectedDeviceName // full
-				// qualified
-				: "gde.device." //$NON-NLS-1$
-					+ selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName;
 		try {
-			// String className = "gde.device.DefaultDeviceDialog";
-			// log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
-			ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			Class<?> c = loader.loadClass(className);
-			// Class c = Class.forName(className);
-			Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { String.class });
-			// log.log(Level.FINE, "constructor != null -> " + (constructor !=
-			// null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$
-			// //$NON-NLS-3$
-			if (constructor != null) {
-				newInst = (IDevice) constructor.newInstance(new Object[] { selectedActiveDeviceConfig.getPropertiesFileName() });
-			}
-			else
-				throw new NoClassDefFoundError(Messages.getString(MessageIds.GDE_MSGE0016));
-
+			newInst = selectedActiveDeviceConfig.defineInstanceOfDevice();
 		}
 		catch (NoClassDefFoundError e) {
 			e.printStackTrace();

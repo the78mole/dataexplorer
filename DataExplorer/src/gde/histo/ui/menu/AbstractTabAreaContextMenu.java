@@ -37,8 +37,8 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.histo.datasources.AbstractSourceDataSets.SourceDataSet;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
-import gde.histo.datasources.SourceDataSetExplorer.SourceDataSet;
 import gde.histo.exclusions.ExclusionActivity;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.HistoExplorer;
@@ -213,9 +213,9 @@ public abstract class AbstractTabAreaContextMenu {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "openRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-					SourceDataSet sourceDataSet = SourceDataSet.createSourceDataSet(Paths.get((String) popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString())));
+					SourceDataSet sourceDataSet = SourceDataSet.createSourceDataSet(Paths.get((String) popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString())), DataExplorer.getInstance().getActiveDevice());
 					String recordSetName = popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString().split(Pattern.quote(TrailRecordSet.BASE_NAME_SEPARATOR))[0];
-					if (sourceDataSet.load(recordSetName)) {
+					if (sourceDataSet != null && sourceDataSet.load(recordSetName)) {
 						application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL));
 						application.updateGraphicsWindow();
 					}
@@ -375,7 +375,7 @@ public abstract class AbstractTabAreaContextMenu {
 		String tmpFileName = dataPath.getFileName().toString();
 		String displayName = tmpFileName.length() > 22 ? GDE.STRING_ELLIPSIS + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName;
 		fileName.setText(">> " + displayName.toString() + GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString()) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
-		boolean isImport = DirectoryType.IMPORT.getDataSetExtensions().contains(SourceDataSet.getFileExtension(dataPath));
+		boolean isImport = DirectoryType.IMPORT.getDataSetExtensions(application.getActiveDevice()).contains(SourceDataSet.getFileExtension(dataPath));
 		openRecordSetItem.setText(Messages.getString(isImport ? MessageIds.GDE_MSGT0850 : MessageIds.GDE_MSGT0849));
 	}
 

@@ -15,7 +15,13 @@ import java.util.Optional;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+
+import gde.data.Record.DataType;
+import gde.histo.cache.HistoVault;
+import gde.histo.recordings.MeasurementTrailSelector;
+import gde.histo.recordings.TrailSelector;
 
 /**
  * <p>Java class for MeasurementType complex type.
@@ -65,8 +71,13 @@ public class MeasurementType implements IChannelItem {
 	protected Boolean							active;
 	protected StatisticsType			statistics;
 	protected List<PropertyType>	property;
-    protected TrailDisplayType trailDisplay;
+	protected TrailDisplayType		trailDisplay;
 	protected String							label;
+
+	@XmlTransient
+	protected int									measurementId = -1; //todo replace ordinal with measurementId in the device.xml
+	@XmlTransient
+	protected DataType						dataType;
 
 	/**
 	 * default constructor
@@ -315,10 +326,18 @@ public class MeasurementType implements IChannelItem {
 		this.label = value;
 	}
 
-  @Override
+	@Override
 	public String getChannelItemId() {
-    return "_" + name;
-}
+		return "_" + name;
+	}
+
+	/**
+	 * Gets the value of the measurementId property.
+	 *
+	 */
+	public int getMeasurementId() {
+		return measurementId;
+	}
 
 	/**
 	 * @param propertyKey
@@ -457,4 +476,46 @@ public class MeasurementType implements IChannelItem {
 			tmpProperty.setValue("" + factor); //$NON-NLS-1$
 		}
 	}
+
+	/**
+	 * get the SyncMaster ordinal value
+	 * @return the SyncMaster ordinal value, if property does not exist return -1
+	 */
+	@Override
+	public int getSyncMasterRecordOrdinal() {
+		int value = -1;
+		PropertyType tmpProperty = getProperty(IDevice.SYNC_ORDINAL);
+		if (tmpProperty != null) value = Integer.parseInt(tmpProperty.getValue());
+
+		return value;
+	}
+
+	@Override
+	public Integer getVaultPoint(HistoVault vault, int trailOrdinal) {
+		return vault.getMeasurementPoint(this.measurementId, trailOrdinal);
+	}
+
+	@Override
+	public void setDataType(DataType dataType) {
+		this.dataType = dataType;
+	}
+
+	@Override
+	public DataType getDataType() {
+		return this.dataType;
+	}
+
+	@Override
+	public TrailSelector createTrailSelector(String deviceName, int channelNumber, String recordName, boolean smartStatistics) {
+		return new MeasurementTrailSelector(deviceName, channelNumber, this, recordName, smartStatistics);
+	}
+
+	@Override
+	public String toString() {
+		final int maxLen = 10;
+		return "MeasurementType [name=" + this.name + ", active=" + this.active + ", statistics=" + this.statistics + ", property=" + (this.property != null
+				? this.property.subList(0, Math.min(this.property.size(), maxLen))
+				: null) + ", trailDisplay=" + this.trailDisplay + ", label=" + this.label + ", measurementId=" + this.measurementId + ", dataType=" + this.dataType + "]";
+	}
+
 }

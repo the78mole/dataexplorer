@@ -39,6 +39,7 @@ public interface IDevice {
 	public static final String	OFFSET							= MeasurementPropertyTypes.OFFSET.value();
 	public static final String	FACTOR							= MeasurementPropertyTypes.FACTOR.value();
 	public static final String	REDUCTION						= MeasurementPropertyTypes.REDUCTION.value();
+	public static final String	SYNC_ORDINAL				= MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value();
 
 	public static final int			MIN_FILENAME_LENGTH	= 4;
 
@@ -235,7 +236,7 @@ public interface IDevice {
 	/**
 	 * @return the serial port type, optional configure for the device
 	 */
-	//public SerialPortType getSerialPortType();
+	// public SerialPortType getSerialPortType();
 
 	/**
 	 * @return the port configured for the device, if SerialPortType is not defined in device specific XML a empty string will returned
@@ -273,12 +274,12 @@ public interface IDevice {
 	public ParityTypes getParity();
 
 	/**
-	 * @return  the DTR configuration of the device
+	 * @return the DTR configuration of the device
 	 */
 	public boolean isDTR();
 
 	/**
-	 * @return  the RTS configuration of the device
+	 * @return the RTS configuration of the device
 	 */
 	public boolean isRTS();
 
@@ -780,7 +781,6 @@ public interface IDevice {
 	 */
 	public String getRecordSetStemNameReplacement();
 
-
 	/**
 	 * query the state name used as record set name
 	 * @return getRecordSetStateName
@@ -831,7 +831,8 @@ public interface IDevice {
 	 * @param dataBuffer
 	 * @param doUpdateProgressBar
 	 */
-	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException;
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar)
+			throws DataInconsitsentException;
 
 	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
@@ -843,7 +844,8 @@ public interface IDevice {
 	 * @param recordDataSize
 	 * @param doUpdateProgressBar
 	 */
-	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException;
+	public void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar)
+			throws DataInconsitsentException;
 
 	/**
 	 * function to prepare a row of record set for export while translating available measurement values.
@@ -851,7 +853,7 @@ public interface IDevice {
 	 */
 	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex);
 
-		/**
+	/**
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */
@@ -877,8 +879,7 @@ public interface IDevice {
 		double newValue = 0;
 		if (isGPSCoordinates(record)) {
 			newValue = value / 1000.0;
-		}
-		else {
+		} else {
 			switch (record.getDataType()) {
 			// lat and lon only required if isGPSCoordinates is not implemented
 			case GPS_LATITUDE:
@@ -937,7 +938,7 @@ public interface IDevice {
 	 * method to modify open/close serial port menu toolbar button and device menu entry
 	 * this enable different naming instead open/close start/stop gathering data from device
 	 * and must be called within specific device constructor
-	 * @param useIconSet  DeviceSerialPort.ICON_SET_OPEN_CLOSE | DeviceSerialPort.ICON_SET_START_STOP
+	 * @param useIconSet DeviceSerialPort.ICON_SET_OPEN_CLOSE | DeviceSerialPort.ICON_SET_START_STOP
 	 * @param useToolTipOpen
 	 * @param useToolTipClose
 	 */
@@ -989,8 +990,8 @@ public interface IDevice {
 
 	/**
 	 * method to get the sorted active or in active record names as string array
-	 *  - records which does not have inactive or active flag are calculated from active or inactive
-	 *  - all records not calculated may have the active status and must be stored
+	 * - records which does not have inactive or active flag are calculated from active or inactive
+	 * - all records not calculated may have the active status and must be stored
 	 * @param channelConfigNumber
 	 * @param validMeasurementNames based on the current or any previous configuration
 	 * @return String[] containing record names
@@ -1094,9 +1095,14 @@ public interface IDevice {
 	 * @return true|false, default is false and we have a constant measurement size defined in device XML
 	 */
 	public boolean isVariableMeasurementSize();
-	
+
 	/**
-	 * @return the preferred directory to search and store for device specific files, this enable for instance MC3000-Set to store all files as well in MC3000 directory
+	 * @return the preferred directory to search and store for device specific files, this enable for instance MC3000-Set to store all files as
+	 *         well in MC3000 directory
 	 */
 	public String getFileBaseDir();
+
+	default String toStringOption() {
+		return "IDevice [name=" + getName() + ", isUsed=" + isUsed() + ", deviceGroup=" + getDeviceGroup() + ", channelCount=" + getChannelCount()+ "]";
+	}
 }

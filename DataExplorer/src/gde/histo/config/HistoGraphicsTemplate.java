@@ -41,6 +41,9 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
+import gde.histo.innercache.Cache;
+import gde.histo.innercache.CacheBuilder;
+import gde.histo.utils.SecureHash;
 import gde.log.Level;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -52,9 +55,12 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert
  */
 public abstract class HistoGraphicsTemplate extends Properties {
-	static final String	$CLASS_NAME				= HistoGraphicsTemplate.class.getName();
-	static final Logger	log								= Logger.getLogger($CLASS_NAME);
-	static final long		serialVersionUID	= 2088159376716311896L;
+	static final String																				$CLASS_NAME				= HistoGraphicsTemplate.class.getName();
+	static final Logger																				log								= Logger.getLogger($CLASS_NAME);
+	static final long																					serialVersionUID	= 2088159376716311896L;
+
+	private static final Cache<String, HistoGraphicsTemplate>	memoryCache				=																				//
+			CacheBuilder.newBuilder().maximumSize(444).recordStats().build();																								// key is the file Name
 
 	/**
 	 * Conversion into a skeleton histo template.
@@ -279,9 +285,16 @@ public abstract class HistoGraphicsTemplate extends Properties {
 
 	protected void loadFromXml(File file) throws IOException, InvalidPropertiesFormatException, FileNotFoundException {
 		log.log(FINE, "opening template file ", file.getAbsolutePath());
-		try (FileInputStream stream = new FileInputStream(file)) {
-			this.loadFromXML(stream);
-			log.log(FINE, "template file successful loaded ", file.getPath());
+		String fileName = SecureHash.sha1(file.toString());
+		Properties cachedInstance = memoryCache.getIfPresent(fileName);
+		if (cachedInstance == null) {
+			try (FileInputStream stream = new FileInputStream(file)) {
+				this.loadFromXML(stream);
+				memoryCache.put(fileName, this);
+				log.log(FINE, "template file successful loaded ", file.getPath());
+			}
+		} else {
+			this.putAll(cachedInstance);
 		}
 	}
 
@@ -301,6 +314,8 @@ public abstract class HistoGraphicsTemplate extends Properties {
 			}
 			try (FileOutputStream stream = new FileOutputStream(targetFilePath.toFile())) {
 				this.storeToXML(stream, "-- DataExplorer Histo GraphicsTemplate " + deviceSignature + " -- " + targetFilePath.getFileName().toString() + " " + ZonedDateTime.now().toInstant() + " -- " + commentSuffix);
+				String fileName = SecureHash.sha1(targetFilePath.toFile().toString());
+				memoryCache.put(fileName, this);
 			}
 			currentFilePath = targetFilePath;
 			this.isSaved = true;

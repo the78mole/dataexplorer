@@ -1449,7 +1449,7 @@ public class DeviceConfiguration {
 	 */
 	public void addMeasurement2Channel(int channelNumber, MeasurementType newMeasurementType) {
 		this.isChangePropery = true;
-		this.getChannel(channelNumber).measurement.add(newMeasurementType);
+		this.getChannel(channelNumber).getMeasurement().add(newMeasurementType);
 	}
 
 	/**
@@ -1460,7 +1460,7 @@ public class DeviceConfiguration {
 	@Deprecated
 	public void addMeasurement2Channel(String channelConfigKey, MeasurementType newMeasurementType) {
 		this.isChangePropery = true;
-		this.getChannel(channelConfigKey).measurement.add(newMeasurementType);
+		this.getChannel(channelConfigKey).getMeasurement().add(newMeasurementType);
 	}
 
 	/**
@@ -1470,7 +1470,7 @@ public class DeviceConfiguration {
 	 */
 	public void removeMeasurementFromChannel(int channelConfigNumber, MeasurementType removeMeasurementType) {
 		this.isChangePropery = true;
-		this.getChannel(channelConfigNumber).measurement.remove(removeMeasurementType);
+		this.getChannel(channelConfigNumber).getMeasurement().remove(removeMeasurementType);
 	}
 
 	/**
@@ -1481,7 +1481,7 @@ public class DeviceConfiguration {
 	@Deprecated
 	public void removeMeasurementFromChannel(String channelConfigKey, MeasurementType newMeasurementType) {
 		this.isChangePropery = true;
-		this.getChannel(channelConfigKey).measurement.remove(newMeasurementType);
+		this.getChannel(channelConfigKey).getMeasurement().remove(newMeasurementType);
 	}
 
 	/**
@@ -2639,12 +2639,12 @@ public class DeviceConfiguration {
 	 * Checks the channel mix setting.
 	 * @return the 1-based config numbers of those channels which carry identical measurement names compared to the channel identified by the param (result size >= 1)
 	 */
-	public List<Integer> getChannelMixConfigNumbers() {
+	public List<Integer> getChannelMixConfigNumbers(int channelNumber) {
 		final List<Integer> channelMixConfigNumbers;
 		if (this.settings.isChannelMix() && getDeviceGroup() == DeviceTypes.CHARGER)
-			channelMixConfigNumbers = getChannelBundle(DataExplorer.getInstance().getActiveChannelNumber());
+			channelMixConfigNumbers = getChannelBundle(channelNumber);
 		else
-			channelMixConfigNumbers = Arrays.asList(new Integer[] { DataExplorer.getInstance().getActiveChannelNumber() });
+			channelMixConfigNumbers = Arrays.asList(new Integer[] { channelNumber });
 		return channelMixConfigNumbers;
 	}
 

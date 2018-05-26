@@ -22,9 +22,11 @@ package gde.histo.recordings;
 import java.util.stream.DoubleStream;
 
 import gde.data.Record.DataType;
+import gde.device.IChannelItem;
 import gde.device.SettlementType;
 import gde.histo.cache.DataTypes;
 import gde.histo.cache.ExtendedVault;
+import gde.histo.cache.HistoVault;
 import gde.histo.datasources.HistoSet;
 
 /**
@@ -32,7 +34,7 @@ import gde.histo.datasources.HistoSet;
  * @author Thomas Eickert (USER)
  */
 public final class SettlementTrail extends TrailRecord {
-	private final static long serialVersionUID = 110124007964748556L;
+	private static final long serialVersionUID = 110124007964748556L;
 
 	/**
 	 * @param newOrdinal
@@ -40,7 +42,7 @@ public final class SettlementTrail extends TrailRecord {
 	 * @param parent
 	 * @param initialCapacity
 	 */
-	public SettlementTrail(int newOrdinal, SettlementType settlementType, TrailRecordSet parent, int initialCapacity) {
+	public SettlementTrail(int newOrdinal, IChannelItem settlementType, TrailRecordSet parent, int initialCapacity) {
 		super(settlementType, newOrdinal, parent, initialCapacity);
 		setTrailSelector();
 	}
@@ -58,11 +60,6 @@ public final class SettlementTrail extends TrailRecord {
 	@Override
 	public boolean isScaleVisible() {
 		return this.settings.isDisplaySettlements() && super.isScaleVisible();
-	}
-
-	@Override
-	public void setApplicableTrailTypes() {
-		getTrailSelector().setApplicableTrails();
 	}
 
 	@Override
@@ -93,7 +90,7 @@ public final class SettlementTrail extends TrailRecord {
 	}
 
 	@Override
-	public DataType getVaultDataType(ExtendedVault vault) {
+	public DataType getVaultDataType(HistoVault vault) {
 		DataTypes dataType = vault.getSettlementDataType(((SettlementType) this.channelItem).getSettlementId());
 		return dataType != null ? DataTypes.toDataType(dataType) : null;
 	}

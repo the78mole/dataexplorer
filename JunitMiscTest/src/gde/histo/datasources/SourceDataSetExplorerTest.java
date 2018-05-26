@@ -67,9 +67,9 @@ class SourceDataSetExplorerTest extends SuperTestCase {
 
 		DirectoryScanner directoryScanner = new DirectoryScanner();
 		try {
-			directoryScanner.isValidated(RebuildStep.F_FILE_CHECK);
+			directoryScanner.isValidated(application.getActiveDevice(), RebuildStep.F_FILE_CHECK);
 			log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
-			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(false);
+			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(directoryScanner.getSourceFolders(), false);
 			boolean reReadFiles = !directoryScanner.isChannelChangeOnly();
 			sourceDataSetExplorer.screen4Trusses(directoryScanner.getSourceFolders().getMap(), reReadFiles);
 
@@ -97,8 +97,8 @@ class SourceDataSetExplorerTest extends SuperTestCase {
 
 		DirectoryScanner directoryScanner = new DirectoryScanner();
 		try {
-			directoryScanner.isValidated(RebuildStep.F_FILE_CHECK);
-			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(false);
+			directoryScanner.isValidated(application.getActiveDevice(), RebuildStep.F_FILE_CHECK);
+			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(directoryScanner.getSourceFolders(), false);
 			boolean reReadFiles = !directoryScanner.isChannelChangeOnly();
 			sourceDataSetExplorer.screen4Trusses(directoryScanner.getSourceFolders().getMap(), reReadFiles);
 

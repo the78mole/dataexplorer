@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -856,9 +855,7 @@ public class FileUtils {
 	 * @throws ClassNotFoundException
 	 */
 	public static String findDeviceProjectDirectoryPath(DeviceConfiguration deviceConfig) throws MalformedURLException, URISyntaxException, ApplicationConfigurationException, ClassNotFoundException {
-		String deviceImplName = deviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
-		String className = deviceImplName.contains(GDE.STRING_DOT) ? deviceImplName // full qualified
-				: "gde.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$
+		String className = deviceConfig.getClassImplName();
 		if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
 		Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -880,23 +877,8 @@ public class FileUtils {
 	 */
 	public static String getJarFileNameOfDevice(DeviceConfiguration deviceConfig)
 			throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, NoClassDefFoundError {
-		String deviceJarFileName = null;
-		String deviceImplName = deviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
-		IDevice newInst = null;
-		String className = deviceImplName.contains(GDE.STRING_DOT) ? deviceImplName // full qualified
-				: "gde.device." + deviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$
-		if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		Class<?> c = loader.loadClass(className);
-		Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
-		if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		if (constructor != null) {
-			newInst = (IDevice) constructor.newInstance(new Object[] { deviceConfig });
-			deviceJarFileName = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
-		}
-		else
-			throw new NoClassDefFoundError(Messages.getString(MessageIds.GDE_MSGE0016));
-
+		IDevice newInst = deviceConfig.defineInstanceOfDevice();
+		String deviceJarFileName = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 		deviceJarFileName = deviceJarFileName.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		FileUtils.log.log(Level.WARNING, "deviceJarPath = " + deviceJarFileName); //$NON-NLS-1$
 

@@ -26,12 +26,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 
 import org.eclipse.swt.SWT;
@@ -42,16 +40,15 @@ import gde.data.CommonRecord;
 import gde.data.Record;
 import gde.data.Record.DataType;
 import gde.device.IChannelItem;
-import gde.device.IDevice;
-import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
-import gde.device.PropertyType;
 import gde.device.TrailTypes;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.cache.ExtendedVault;
+import gde.histo.cache.HistoVault;
 import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.datasources.HistoSet;
-import gde.histo.recordings.TrailRecordSet.Outliers;
+import gde.histo.guard.Guardian;
+import gde.histo.guard.Reminder;
 import gde.histo.utils.ElementaryQuantile;
 import gde.histo.utils.Spot;
 import gde.log.Logger;
@@ -65,9 +62,9 @@ import gde.ui.SWTResourceManager;
  * @author Thomas Eickert
  */
 public abstract class TrailRecord extends CommonRecord {
-	private final static String	$CLASS_NAME				= TrailRecord.class.getName();
-	private final static long		serialVersionUID	= 110124007964748556L;
-	private final static Logger	log								= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME				= TrailRecord.class.getName();
+	private static final long		serialVersionUID	= 110124007964748556L;
+	private static final Logger	log								= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * Provide the chart template properties.
@@ -282,22 +279,6 @@ public abstract class TrailRecord extends CommonRecord {
 			}
 		}
 
-		/**
-		 * Set the most specific common datatype of all vault entries.</br>
-		 * Pls note that the vaults may come from mixed sources (OSD files, native files) and that
-		 * device settings or rules for determining the datatype might have changed in the meantime.
-		 */
-		public void setUnifiedDataType(TreeMap<Long, List<ExtendedVault>> histoVaults) {
-			List<DataType> dataTypes = histoVaults.values().parallelStream().flatMap(Collection::stream).map(v -> getVaultDataType(v)) //
-					.filter(Objects::nonNull).distinct().limit(2).collect(Collectors.toList());
-			DataType tmpDataType = dataTypes.size() == 1 ? dataTypes.get(0) : DataType.DEFAULT;
-
-			if (tmpDataType == DataType.DEFAULT) {
-				DataType guess = DataType.guess(getName());
-				if (guess != null) tmpDataType = guess;
-			}
-			setDataType(tmpDataType);
-		}
 	}
 
 	protected final DeviceXmlResource			xmlResource		= DeviceXmlResource.getInstance();
@@ -309,10 +290,6 @@ public abstract class TrailRecord extends CommonRecord {
 	 */
 	protected final SuiteRecords					suiteRecords	= new SuiteRecords();
 
-	protected double											factor				= Double.MIN_VALUE;
-	protected double											offset				= Double.MIN_VALUE;
-	protected double											reduction			= Double.MIN_VALUE;
-
 	protected boolean											isDisplayable;
 
 	protected TrailSelector								trailSelector;
@@ -320,7 +297,7 @@ public abstract class TrailRecord extends CommonRecord {
 
 	protected TrailRecord(IChannelItem channelItem, int newOrdinal, TrailRecordSet parentTrail, int initialCapacity) {
 		super(DataExplorer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
-				channelItem.isActive(), null, channelItem.getProperty(), initialCapacity);
+				channelItem.isActive(), null, initialCapacity);
 		this.channelItem = channelItem;
 		this.parent = parentTrail;
 
@@ -446,41 +423,17 @@ public abstract class TrailRecord extends CommonRecord {
 
 	@Override // reason is translateValue which accesses the device for offset etc.
 	public double getFactor() {
-		if (this.factor == Double.MIN_VALUE) {
-			this.factor = 1.0;
-			PropertyType property = this.getProperty(IDevice.FACTOR);
-			if (property != null)
-				this.factor = Double.parseDouble(property.getValue());
-			else
-				this.factor = this.channelItem.getFactor();
-		}
-		return this.factor;
+		return this.channelItem.getFactor();
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
 	public double getOffset() {
-		if (this.offset == Double.MIN_VALUE) {
-			this.offset = 0.0;
-			PropertyType property = this.getProperty(IDevice.OFFSET);
-			if (property != null)
-				this.offset = Double.parseDouble(property.getValue());
-			else
-				this.offset = this.channelItem.getOffset();
-		}
-		return this.offset;
+		return this.channelItem.getOffset();
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.
 	public double getReduction() {
-		if (this.reduction == Double.MIN_VALUE) {
-			this.reduction = 0.0;
-			PropertyType property = this.getProperty(IDevice.REDUCTION);
-			if (property != null)
-				this.reduction = Double.parseDouble(property.getValue());
-			else
-				this.reduction = this.channelItem.getReduction();
-		}
-		return this.reduction;
+		return this.channelItem.getReduction();
 	}
 
 	/**
@@ -533,7 +486,7 @@ public abstract class TrailRecord extends CommonRecord {
 	public boolean hasReasonableData() {
 		boolean hasReasonableData = false;
 		if (this.size() > 0) {
-			double[] extrema = getParent().getPickedVaults().defineStandardExtrema(name);
+			double[] extrema = Guardian.defineStandardExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem);
 			hasReasonableData = !HistoSet.fuzzyEquals(extrema[0], extrema[1]) || !HistoSet.fuzzyEquals(extrema[0], 0.);
 			log.log(Level.FINE, name, hasReasonableData);
 		}
@@ -673,8 +626,8 @@ public abstract class TrailRecord extends CommonRecord {
 			template.maxScaleValue = newMaxScaleValue;
 			template.minScaleValue = newMinScaleValue;
 		} else {
-			template.maxScaleValue = HistoSet.decodeVaultValue(this, this.maxValue / 1000.0);
-			template.minScaleValue = HistoSet.decodeVaultValue(this, this.minValue / 1000.0);
+			template.maxScaleValue = HistoSet.decodeVaultValue(this.channelItem, this.maxValue / 1000.0);
+			template.minScaleValue = HistoSet.decodeVaultValue(this.channelItem, this.minValue / 1000.0);
 		}
 	}
 
@@ -746,7 +699,7 @@ public abstract class TrailRecord extends CommonRecord {
 		Vector<Integer> points = this.getPoints();
 		for (int i = fromIndex; i < toIndex; i++) {
 			if (points.elementAt(i) != null) {
-				result.add(new Spot<Double>(this.parent.getTime_ms(i), HistoSet.decodeVaultValue(this, points.elementAt(i) / 1000.)));
+				result.add(new Spot<Double>(this.parent.getTime_ms(i), HistoSet.decodeVaultValue(this.channelItem, points.elementAt(i) / 1000.)));
 			}
 		}
 		log.finer(() -> Arrays.toString(result.toArray()));
@@ -880,13 +833,6 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	/**
-	 * Analyze device configuration entries to find applicable trail types.
-	 * Build applicable trail type lists for display purposes.
-	 * Use device settings trigger texts for trigger trail types and score labels for score trail types; message texts otherwise.
-	 */
-	public abstract void setApplicableTrailTypes();
-
-	/**
 	 * @param vault
 	 * @param trailOrdinal is the requested trail ordinal number which may differ from the selected trail type (e.g. suites)
 	 * @return the point value
@@ -895,12 +841,7 @@ public abstract class TrailRecord extends CommonRecord {
 
 	@Override
 	public int getSyncMasterRecordOrdinal() {
-		final PropertyType syncProperty = getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
-		if (syncProperty != null && !syncProperty.getValue().isEmpty()) {
-			return Integer.parseInt(syncProperty.getValue());
-		} else {
-			return -1;
-		}
+		return channelItem.getSyncMasterRecordOrdinal();
 	}
 
 	@Override
@@ -912,18 +853,18 @@ public abstract class TrailRecord extends CommonRecord {
 	public double[] defineRecentMinMax(int limit) {
 		TrailTypes trailType = this.trailSelector.getTrailType();
 		if (trailType.isAlienValue()) {
-			return getParent().getPickedVaults().defineRecentAlienMinMax(getName(), trailType, limit);
+			return Guardian.defineAlienMinMax(Arrays.stream(getParent().getIndexedVaults()).limit(limit), this.channelItem, trailType);
 		} else {
-			return getParent().getPickedVaults().defineRecentStandardMinMax(getName(), limit);
+			return Guardian.defineStandardMinMax(Arrays.stream(getParent().getIndexedVaults()).limit(limit), this.channelItem);
 		}
 	}
 
 	public double[] defineExtrema() { // todo consider caching this result
 		TrailTypes trailType = this.trailSelector.getTrailType();
 		if (trailType.isAlienValue()) {
-			return getParent().getPickedVaults().defineAlienExtrema(getName(), trailType);
+			return Guardian.defineAlienExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem, trailType);
 		} else {
-			return getParent().getPickedVaults().defineStandardExtrema(getName());
+			return Guardian.defineStandardExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem);
 		}
 	}
 
@@ -933,8 +874,8 @@ public abstract class TrailRecord extends CommonRecord {
 	 * @param logLimit is the maximum number of the most recent logs which is checked for warnings
 	 * @return the array of outliers warning objects which may hold null values
 	 */
-	public Outliers[] defineMinMaxWarning(int logLimit) {
-		return getParent().getPickedVaults().defineMinMaxWarning(name, logLimit);
+	public Reminder[] defineMinMaxWarning(int logLimit) {
+		return Guardian.defineMinMaxReminder(getParent().getIndexedVaults(), this.channelItem, this.trailSelector, logLimit);
 	}
 
 	/**
@@ -951,7 +892,7 @@ public abstract class TrailRecord extends CommonRecord {
 		}
 
 		for (Integer value : record) { // loops without calling the overridden getter
-			if (value != null) decodedValues.add(HistoSet.decodeVaultValue(this, value / 1000.));
+			if (value != null) decodedValues.add(HistoSet.decodeVaultValue(this.channelItem, value / 1000.));
 		}
 		return decodedValues;
 	}
@@ -980,7 +921,6 @@ public abstract class TrailRecord extends CommonRecord {
 	public void initializeFromVaults(TreeMap<Long, List<ExtendedVault>> histoVaults) {
 		RecordCollector collector = new RecordCollector();
 		collector.addVaults(histoVaults);
-		collector.setUnifiedDataType(histoVaults);
 	}
 
 	/**
@@ -994,7 +934,15 @@ public abstract class TrailRecord extends CommonRecord {
 
 	public abstract boolean hasVaultScraps(ExtendedVault vault);
 
-	public abstract DataType getVaultDataType(ExtendedVault vault);
+	public abstract DataType getVaultDataType(HistoVault vault);
+
+	/**
+	 * @return the dataType of this record
+	 */
+	@Override
+	public Record.DataType getDataType() {
+		return channelItem.getUnifiedDataType();
+	}
 
 	public void applyTemplate() {
 		template.applyTemplate(getParent().getTemplate(), this);

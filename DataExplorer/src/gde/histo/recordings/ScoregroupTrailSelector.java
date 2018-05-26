@@ -22,6 +22,7 @@ package gde.histo.recordings;
 import java.util.ArrayList;
 import java.util.List;
 
+import gde.device.IChannelItem;
 import gde.device.ScoreGroupType;
 import gde.device.ScoreType;
 
@@ -34,13 +35,23 @@ public final class ScoregroupTrailSelector extends TrailSelector {
 		super(trailRecord);
 	}
 
+	/**
+	 * @param channelNumber is the 1-based device channel number
+	 * @param channelItem is a measurement / settlement / scoregroup in the device channel
+	 * @param recordName is the name of the data record which might differ from the device channel item name (e.g. Jeti)
+	 * @param smartStatistics true selects the smart trail types
+	 */
+	public ScoregroupTrailSelector(String deviceName, int channelNumber, IChannelItem channelItem, String recordName, boolean smartStatistics) {
+		super(deviceName, channelNumber, channelItem, recordName, smartStatistics);
+	}
+
 	@Override
 	public void setMostApplicableTrailTextOrdinal() {
 		setTrailTextSelectedIndex(0);
 	}
 
 	@Override
-	public void setApplicableTrails() {
+	protected void setApplicableTrails() {
 		// build applicable trail type lists for display purposes
 		this.applicableTrailsOrdinals = new ArrayList<Integer>();
 		this.applicableTrailsTexts = new ArrayList<String>();

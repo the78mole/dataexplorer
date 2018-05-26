@@ -42,16 +42,16 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.RecordSet;
 import gde.device.resource.DeviceXmlResource;
+import gde.histo.guard.Reminder;
+import gde.histo.guard.Reminder.ReminderType;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.HistoGraphicsMapper.PointArray;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordFormatter;
 import gde.histo.recordings.TrailRecordSet;
-import gde.histo.recordings.TrailRecordSet.Outliers;
 import gde.histo.ui.GraphicsComposite.GraphicsLayout;
 import gde.histo.ui.SummaryComposite.SummaryLayout;
 import gde.histo.ui.data.SummarySpots;
-import gde.histo.ui.data.SummarySpots.OutlierWarning;
 import gde.histo.utils.HistoTimeLine.Density;
 import gde.log.Level;
 import gde.log.Logger;
@@ -261,21 +261,21 @@ public final class HistoCurveUtils {
 		int xN = x0 + width + 1;
 		int yPos = drawStripBounds.y + drawStripBounds.height / 2 - 1;
 
-		Outliers[] minMaxWarning = summary.getMinMaxWarning();
+		Reminder[] minMaxWarning = summary.getMinMaxWarning();
 
 		if (minMaxWarning[0] != null) {
-			if (minMaxWarning[0].getWarningType() == OutlierWarning.FAR) {
+			if (minMaxWarning[0].getReminderType() == ReminderType.FAR) {
 				GraphicsUtils.drawImageCentered("gde/resource/caution_portrait.png", x0 - scaleWidthSpace * 9 / 10, yPos, gc);
-			} else if (minMaxWarning[0].getWarningType() == OutlierWarning.CLOSE) {
+			} else if (minMaxWarning[0].getReminderType() == ReminderType.CLOSE) {
 				GraphicsUtils.drawImageCentered("gde/resource/caution_portrait_yellow.png", x0 - scaleWidthSpace * 9 / 10, yPos, gc);
 			} else {
 				GraphicsUtils.drawImageCentered("gde/resource/caution_portrait_blue.png", x0 - scaleWidthSpace * 9 / 10, yPos, gc);
 			}
 		}
 		if (minMaxWarning[1] != null) {
-			if (minMaxWarning[1].getWarningType() == OutlierWarning.FAR) {
+			if (minMaxWarning[1].getReminderType() == ReminderType.FAR) {
 				GraphicsUtils.drawImageCentered("gde/resource/caution_portrait.png", xN + scaleWidthSpace * 9 / 10, yPos, gc);
-			} else if (minMaxWarning[1].getWarningType() == OutlierWarning.CLOSE) {
+			} else if (minMaxWarning[1].getReminderType() == ReminderType.CLOSE) {
 				GraphicsUtils.drawImageCentered("gde/resource/caution_portrait_yellow.png", xN + scaleWidthSpace * 9 / 10, yPos, gc);
 			} else {
 				GraphicsUtils.drawImageCentered("gde/resource/caution_portrait_blue.png", xN + scaleWidthSpace * 9 / 10, yPos, gc);
@@ -322,6 +322,10 @@ public final class HistoCurveUtils {
 
 	}
 
+	/**
+	 * Draw an inclusion indicator for marking a record being in the warning inclusion list.
+	 * @param scaleWidthSpace is the width of the left / right scale in pixels
+	 */
 	public static void drawChannelItemWarnMarker(SummaryLayout summary, GC gc, int scaleWidthSpace, boolean drawNumbersInRecordColor) {
 		SummarySpots summarySpots = summary.getSummarySpots();
 		Rectangle drawStripBounds = summarySpots.getDrawStripBounds();

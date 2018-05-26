@@ -23,14 +23,14 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -40,7 +40,9 @@ import java.util.stream.Collectors;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.histo.datasources.DirectoryScanner;
+import gde.histo.innercache.Cache;
+import gde.histo.innercache.CacheBuilder;
+import gde.histo.innercache.CacheStats;
 import gde.histo.utils.SecureHash;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -48,38 +50,28 @@ import gde.utils.FileUtils;
 
 /**
  * Excluding files from history analysis via user activity.
- * Is based on property files for each data directory.
- * Stores the exclusions property files in the user directory if the data directory is not accessible for writing.
+ * Is based on property files for the current primary folder.
+ * Stores the inclusions property files in the user directory or the primary folder.
  * @author Thomas Eickert
  */
 public final class ExclusionData extends Properties {
-	private final static String		$CLASS_NAME				= ExclusionData.class.getName();
-	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
-	private static final long			serialVersionUID	= -2477509505185819765L;
+	private static final String												$CLASS_NAME				= ExclusionData.class.getName();
+	private static final Logger												log								= Logger.getLogger($CLASS_NAME);
+	private static final long													serialVersionUID	= -2477509505185819765L;
 
-	private static ExclusionData	currentInstance;
+	private static final Cache<String, ExclusionData>	memoryCache				=																//
+			CacheBuilder.newBuilder().maximumSize(111).recordStats().build();																// key is the file Name
 
-	private final Path						dataFileDir;
-
-	/**
-	 * @return the instance which is only created anew if the primary directory has changed
-	 */
-	public static ExclusionData getInstance() {
-		Path newDataFileDir = DirectoryScanner.getPrimaryFolder();
-		if (currentInstance == null || !currentInstance.dataFileDir.equals(newDataFileDir)) {
-			currentInstance = new ExclusionData(newDataFileDir);
-		}
-		return currentInstance;
-	}
+	private final Path																activeFolder;
 
 	/**
 	 * @return true if an exclusion for all recordsets in the data file is active
 	 */
-	public static boolean isExcluded(Path dataFilePath) {
+	public boolean isExcluded(Path dataFilePath) {
 		if (Settings.getInstance().isSuppressMode()) {
-			String exclusionValue = getInstance().getProperty(dataFilePath.getFileName().toString());
+			String exclusionValue = getProperty(dataFilePath.getFileName().toString());
 			boolean result = exclusionValue != null && exclusionValue.isEmpty();
-			if (result) log.log(FINE, "file excluded ", dataFilePath); //$NON-NLS-1$
+			if (result) log.log(FINE, "file excluded ", dataFilePath);
 			return result;
 		} else {
 			return false;
@@ -89,13 +81,13 @@ public final class ExclusionData extends Properties {
 	/**
 	 * @return true if an exclusion for the recordset in the data file is active
 	 */
-	public static boolean isExcluded(Path dataFilePath, String recordsetBaseName) {
+	public boolean isExcluded(Path dataFilePath, String recordsetBaseName) {
 		if (recordsetBaseName.isEmpty()) throw new UnsupportedOperationException();
 
 		if (Settings.getInstance().isSuppressMode()) {
-			String exclusionValue = getInstance().getProperty(dataFilePath.getFileName().toString());
+			String exclusionValue = getProperty(dataFilePath.getFileName().toString());
 			boolean result = exclusionValue != null && (exclusionValue.isEmpty() || exclusionValue.contains(recordsetBaseName));
-			if (result) log.fine(() -> String.format("recordset excluded %s %s", dataFilePath.toString(), recordsetBaseName)); //$NON-NLS-1$
+			if (result) log.fine(() -> String.format("recordset excluded %s %s", dataFilePath.toString(), recordsetBaseName));
 			return result;
 		} else {
 			return false;
@@ -123,21 +115,36 @@ public final class ExclusionData extends Properties {
 	 * Determine the exclusions which are active for the current channel.
 	 * @return the exclusion information for the trusses excluded from the history
 	 */
-	public static String[] getExcludedTrusses() {
+	public String[] getExcludedTrusses() {
 		return DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths().stream() //
 				.map(p -> {
 					String key = p.getFileName().toString();
-					String property = getInstance().getProperty(key);
+					String property = getProperty(key);
 					return (property.isEmpty() ? key : key + GDE.STRING_BLANK_COLON_BLANK + property);
 				}) //
 				.distinct().sorted(Collections.reverseOrder()) //
 				.toArray(String[]::new);
 	}
 
-	private ExclusionData(Path newDataFileDir) {
+	/**
+	 * Use the singleton getInstance instead for calls by the legacy UI based on the settings (object key and active device name).
+	 * @param activeFolder is the current data files folder based on the object key and active device
+	 */
+	public ExclusionData(Path activeFolder) {
 		super();
-		this.dataFileDir = newDataFileDir;
-		load();
+		this.activeFolder = activeFolder;
+
+		String fileName = SecureHash.sha1(this.activeFolder.toString());
+		Properties cachedInstance = memoryCache.getIfPresent(fileName);
+		log.finer(() -> {
+			CacheStats stats = memoryCache.stats();
+			return String.format("evictionCount=%d  hitCount=%d  missCount=%d hitRate=%f missRate=%f", stats.evictionCount(), stats.hitCount(), stats.missCount(), stats.hitRate(), stats.missRate());
+		});
+		if (cachedInstance == null) {
+			load();
+		} else {
+			this.putAll(cachedInstance);
+		}
 	}
 
 	@Override
@@ -184,11 +191,13 @@ public final class ExclusionData extends Properties {
 	private void load() {
 		boolean takeUserDir = Settings.getInstance().isDataSettingsAtHomePath();
 		if (!takeUserDir) {
-			FileUtils.checkDirectoryAndCreate(this.dataFileDir.toString());
-			if (this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile().exists()) {
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
-						this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile()), "UTF-8"))) { //$NON-NLS-1$
+			FileUtils.checkDirectoryAndCreate(this.activeFolder.toString());
+			if (this.activeFolder.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile().exists()) {
+				try (Reader reader = new InputStreamReader(new FileInputStream(this.activeFolder.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile()),
+						"UTF-8")) {
+					String fileName = SecureHash.sha1(this.activeFolder.toString());
 					this.load(reader);
+					memoryCache.put(fileName, this);
 				} catch (Exception e) {
 					if (e instanceof FileNotFoundException)
 						takeUserDir = true; // supports write protected data drives
@@ -196,13 +205,15 @@ public final class ExclusionData extends Properties {
 						log.log(SEVERE, e.getLocalizedMessage(), e);
 				}
 			}
-		} else {
+		}
+		if (takeUserDir) {
 			Path exclusionsDir = getUserExclusionsDir();
 			FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
-			String fileName = SecureHash.sha1(this.dataFileDir.toString());
+			String fileName = SecureHash.sha1(this.activeFolder.toString());
 			if (exclusionsDir.resolve(fileName).toFile().exists()) {
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(exclusionsDir.resolve(fileName).toFile())))) {
+				try (Reader reader = new InputStreamReader(new FileInputStream(exclusionsDir.resolve(fileName).toFile()))) {
 					this.load(reader);
+					memoryCache.put(fileName, this);
 				} catch (Throwable e) {
 					log.log(SEVERE, e.getMessage(), e);
 				}
@@ -210,9 +221,6 @@ public final class ExclusionData extends Properties {
 		}
 	}
 
-	/**
-	 * @return
-	 */
 	private static Path getUserExclusionsDir() {
 		return Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
 	}
@@ -225,38 +233,44 @@ public final class ExclusionData extends Properties {
 		if (this.size() > 0) {
 			boolean takeUserDir = Settings.getInstance().isDataSettingsAtHomePath();
 			if (!takeUserDir) {
-				FileUtils.checkDirectoryAndCreate(this.dataFileDir.toString());
-				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-						this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile()), "UTF-8"))) { //$NON-NLS-1$
-					this.store(writer, this.dataFileDir.toString());
+				FileUtils.checkDirectoryAndCreate(this.activeFolder.toString());
+				try (Writer writer = new OutputStreamWriter(new FileOutputStream(this.activeFolder.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile()),
+						"UTF-8")) {
+					this.store(writer, this.activeFolder.toString());
+					String fileName = SecureHash.sha1(this.activeFolder.toString());
+					memoryCache.put(fileName, this);
 				} catch (Throwable e) {
 					if (e instanceof FileNotFoundException)
 						takeUserDir = true; // supports write protected data drives
 					else
 						log.log(SEVERE, e.getMessage(), e);
 				}
-			} else {
+			}
+			if (takeUserDir) {
 				FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
-				String fileName = SecureHash.sha1(this.dataFileDir.toString());
-				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exclusionsDir.resolve(fileName).toFile()),
-						"UTF-8"))) { //$NON-NLS-1$
-					this.store(writer, this.dataFileDir.toString());
+				String fileName = SecureHash.sha1(this.activeFolder.toString());
+				try (Writer writer = new OutputStreamWriter(new FileOutputStream(exclusionsDir.resolve(fileName).toFile()), "UTF-8")) {
+					this.store(writer, this.activeFolder.toString());
+					memoryCache.put(fileName, this);
 				} catch (Throwable e) {
 					log.log(SEVERE, e.getMessage(), e);
 				}
 			}
-		} else
+		} else {
 			delete();
+			String fileName = SecureHash.sha1(this.activeFolder.toString());
+			memoryCache.invalidate(fileName);
+		}
 	}
 
 	public void delete() {
 		Path exclusionsDir = getUserExclusionsDir();
 		log.log(FINE, "deleted : ", exclusionsDir);
-		FileUtils.deleteFile(this.dataFileDir.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toString());
-		String fileName = SecureHash.sha1(this.dataFileDir.toString());
-		FileUtils.deleteFile(this.dataFileDir.resolve(exclusionsDir.resolve(fileName)).toString());
+		FileUtils.deleteFile(this.activeFolder.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toString());
+		String fileName = SecureHash.sha1(this.activeFolder.toString());
+		FileUtils.deleteFile(this.activeFolder.resolve(exclusionsDir.resolve(fileName)).toString());
 
-		currentInstance = null;
+		memoryCache.invalidateAll();
 	}
 
 }

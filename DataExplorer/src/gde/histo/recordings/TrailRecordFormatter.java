@@ -28,9 +28,9 @@ import gde.GDE;
 import gde.device.TrailTypes;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.HistoSet;
-import gde.histo.recordings.TrailRecordSet.Outliers;
+import gde.histo.guard.Reminder;
+import gde.histo.guard.Reminder.ReminderType;
 import gde.histo.ui.SummaryComposite.SummaryLayout;
-import gde.histo.ui.data.SummarySpots.OutlierWarning;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.StringHelper;
@@ -225,12 +225,12 @@ public final class TrailRecordFormatter {
 	}
 
 	public String defineFormattedMinWarning(SummaryLayout summary) {
-		Outliers outliers = summary.getMinMaxWarning()[0];
+		Reminder outliers = summary.getMinMaxWarning()[0];
 		if (outliers == null) {
 			return new String();
 		} else {
 			DecimalFormat df = summary.getDecimalFormat();
-			if (outliers.getWarningType() == OutlierWarning.WHISKER) {
+			if (outliers.getReminderType() == ReminderType.WHISKER) {
 				String values = outliers.getDecodedValues().stream() //
 						.map(v -> getSummaryValue(v, df)).collect(Collectors.joining(", "));
 				String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
@@ -240,7 +240,7 @@ public final class TrailRecordFormatter {
 						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
 				return outputText + " !" //
 						+ Messages.getString(MessageIds.GDE_MSGT0906) + getSummaryValue(outliers.getFarLimit(), df) + "/" + getSummaryValue(outliers.getCloseLimit(), df) //
-						+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
+						+ outliers.getReminderType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
 			} else {
 				String values = outliers.getDecodedValues().stream() //
 						.map(v -> getSummaryValue(v, df)).collect(Collectors.joining(", "));
@@ -251,18 +251,18 @@ public final class TrailRecordFormatter {
 						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
 				return outputText + " !" //
 						+ Messages.getString(MessageIds.GDE_MSGT0906) + getSummaryValue(outliers.getFarLimit(), df) + "/" + getSummaryValue(outliers.getCloseLimit(), df) //
-						+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
+						+ outliers.getReminderType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
 			}
 		}
 	}
 
 	public String defineFormattedMaxWarning(SummaryLayout summary) {
-		Outliers outliers = summary.getMinMaxWarning()[1];
+		Reminder outliers = summary.getMinMaxWarning()[1];
 		if (outliers == null) {
 			return new String();
 		} else {
 			DecimalFormat df = summary.getDecimalFormat();
-			if (outliers.getWarningType() == OutlierWarning.WHISKER) {
+			if (outliers.getReminderType() == ReminderType.WHISKER) {
 				String values = outliers.getDecodedValues().stream() //
 						.map(v -> getSummaryValue(v, df)).collect(Collectors.joining(", "));
 				String fileNames = outliers.getIndices().stream().map(record.getParent()::getVault) //
@@ -272,7 +272,7 @@ public final class TrailRecordFormatter {
 						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
 				return outputText + " !" //
 						+ Messages.getString(MessageIds.GDE_MSGT0906) + getSummaryValue(outliers.getCloseLimit(), df) + "/" + getSummaryValue(outliers.getFarLimit(), df) //
-						+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
+						+ outliers.getReminderType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0911) + values + "\n" + fileNames;
 			} else {
 				String values = outliers.getDecodedValues().stream() //
 						.map(v -> getSummaryValue(v, df)).collect(Collectors.joining(", "));
@@ -283,7 +283,7 @@ public final class TrailRecordFormatter {
 						? outliers.getSelectText().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS : outliers.getSelectText();
 				return outputText + " !" //
 						+ Messages.getString(MessageIds.GDE_MSGT0906) + getSummaryValue(outliers.getCloseLimit(), df) + "/" + getSummaryValue(outliers.getFarLimit(), df) //
-						+ outliers.getWarningType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
+						+ outliers.getReminderType().localizedText() + Messages.getString(MessageIds.GDE_MSGT0907) + values + "\n" + fileNames;
 			}
 		}
 	}
@@ -298,14 +298,14 @@ public final class TrailRecordFormatter {
 		String lineInitializer = record.getNameReplacement().length() > TRAIL_TEXT_MAX_LENGTH
 				? record.getNameReplacement().substring(0, TRAIL_TEXT_MAX_LENGTH - 1) + GDE.STRING_ELLIPSIS + " > " : record.getNameReplacement() + " > ";
 		if (summary.getMinMaxWarning()[0] != null) { // left scale warnings
-			if (summary.getMinMaxWarning()[0].getWarningType() == OutlierWarning.FAR)
+			if (summary.getMinMaxWarning()[0].getReminderType() == ReminderType.FAR)
 				textLine1 = lineInitializer + defineFormattedMinWarning(summary).replace("\n", fileNameInitializer);
 			else
 				textLine2 = lineInitializer + defineFormattedMinWarning(summary).replace("\n", fileNameInitializer);
 		}
 		if (summary.getMinMaxWarning()[1] != null) { // right
 			lineInitializer = "                    " + lineInitializer;
-			if (summary.getMinMaxWarning()[1].getWarningType() == OutlierWarning.FAR) {
+			if (summary.getMinMaxWarning()[1].getReminderType() == ReminderType.FAR) {
 				textLine1 = textLine1.isEmpty() ? lineInitializer + defineFormattedMaxWarning(summary).replace("\n", fileNameInitializer)
 						: textLine1 + minMaxSeparator + defineFormattedMaxWarning(summary).replace("\n", fileNameInitializer);
 			} else {

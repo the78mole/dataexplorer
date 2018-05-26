@@ -29,6 +29,7 @@ import static java.util.logging.Level.SEVERE;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystem;
@@ -42,16 +43,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+
+import com.sun.istack.internal.Nullable;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.histo.datasources.SourceDataSetExplorer.SourceDataSet;
+import gde.histo.datasources.AbstractSourceDataSets.SourceDataSet;
 import gde.histo.datasources.VaultPicker.ProgressManager;
 import gde.histo.datasources.VaultPicker.TrussJobs;
 import gde.histo.device.IHistoDevice;
@@ -67,22 +71,22 @@ import gde.utils.FileUtils;
  * @author Thomas Eickert (USER)
  */
 public final class VaultReaderWriter {
-	private final static String											$CLASS_NAME	= VaultReaderWriter.class.getName();
-	private final static Logger											log					= Logger.getLogger($CLASS_NAME);
+	private static final String											$CLASS_NAME	= VaultReaderWriter.class.getName();
+	private static final Logger											log					= Logger.getLogger($CLASS_NAME);
 
-	private final static DataExplorer								application	= DataExplorer.getInstance();
-	private final static Settings										settings		= Settings.getInstance();
+	private static final DataExplorer								application	= DataExplorer.getInstance();
+	private static final Settings										settings		= Settings.getInstance();
 
-	private final static Cache<String, HistoVault>	memoryCache	=																		//
-			CacheBuilder.newBuilder().maximumSize(4444).recordStats().build();															// key is the vaultName
+	private static final Cache<String, HistoVault>	memoryCache	=																		//
+			CacheBuilder.newBuilder().maximumSize(4444).recordStats().build();													// key is the vaultName
 
 	/**
 	 * Read file and populate the vault from the recordset.
 	 */
 	public static void loadFromFile(Path filePath, List<VaultCollector> trusses) {
 		try {
-			SourceDataSet dataSet = SourceDataSet.createSourceDataSet(filePath);
-			dataSet.readVaults(filePath, trusses);
+			SourceDataSet dataSet = SourceDataSet.createSourceDataSet(filePath, DataExplorer.getInstance().getActiveDevice());
+			if (dataSet != null) dataSet.readVaults4Ui(filePath, trusses);
 		} catch (Exception e) {
 			log.log(SEVERE, e.getMessage(), e);
 			log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //
@@ -112,9 +116,11 @@ public final class VaultReaderWriter {
 	}
 
 	private static List<ExtendedVault> loadFromCachePath(TrussJobs trussJobs, Optional<ProgressManager> progress, Path cacheFilePath)
-			throws IOException, ZipException {
+			throws IOException {
 		List<ExtendedVault> vaults = new ArrayList<>();
-		if (settings.isZippedCache() && FileUtils.checkFileExist(cacheFilePath.toString())) {
+		if (!cacheFilePath.toFile().exists()) return vaults;
+
+		if (settings.isZippedCache()) {
 			try (ZipFile zf = new ZipFile(cacheFilePath.toFile())) { // closing the zip file closes all streams
 				Iterator<Map.Entry<Path, List<VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
 				while (trussJobsIterator.hasNext()) {
@@ -143,7 +149,7 @@ public final class VaultReaderWriter {
 					if (map.isEmpty()) trussJobsIterator.remove();
 				}
 			}
-		} else if (!settings.isZippedCache() && FileUtils.checkDirectoryExist(cacheFilePath.toString())) {
+		} else {
 			Iterator<Map.Entry<Path, List<VaultCollector>>> trussJobsIterator = trussJobs.entrySet().iterator();
 			while (trussJobsIterator.hasNext()) {
 				final List<VaultCollector> map = trussJobsIterator.next().getValue();
@@ -176,6 +182,86 @@ public final class VaultReaderWriter {
 			return String.format("evictionCount=%d  hitCount=%d  missCount=%d hitRate=%f missRate=%f", stats.evictionCount(), stats.hitCount(), stats.missCount(), stats.hitRate(), stats.missRate());
 		});
 		return vaults;
+	}
+
+	/**
+	 * @param cachePath defines the zip file holding the vaults or the vaults folder
+	 * @param extractor is the function for extracting the vault data
+	 * @return the extracted vault data after eliminating trusses
+	 * @throws IOException during opening or traversing the zip file
+	 */
+	public static List<Entry<String, String>> readVaultsIndices(Path cachePath, Function<HistoVault, Entry<String, String>> extractor)
+			throws IOException {
+		List<Entry<String, String>> vaultExtract = new ArrayList<>();
+		if (!cachePath.toFile().exists()) return vaultExtract;
+
+		final int MIN_FILE_LENGTH = 2048;
+		if (settings.isZippedCache()) {
+			try (ZipFile zf = new ZipFile(cachePath.toFile())) {
+				while (zf.entries().hasMoreElements()) {
+					ZipEntry entry = zf.entries().nextElement();
+					if (entry.getSize() <= MIN_FILE_LENGTH) continue;
+
+					try {
+						HistoVault histoVault = memoryCache.get(entry.getName(), () -> VaultProxy.load(zf.getInputStream(entry)));
+						vaultExtract.add(extractor.apply(histoVault));
+					} catch (Exception e) {
+						log.log(SEVERE, e.getMessage(), e);
+					}
+				}
+			}
+		} else {
+			List<File> dirListing = FileUtils.getFileListing(cachePath.toFile(), 0);
+			for (File file : dirListing) {
+				if (file.length() <= MIN_FILE_LENGTH) continue;
+
+				try {
+					HistoVault histoVault = memoryCache.get(file.getName(), () -> VaultProxy.load(cachePath.resolve(file.getName())));
+					vaultExtract.add(extractor.apply(histoVault));
+				} catch (Exception e) {
+					log.log(SEVERE, e.getMessage(), e);
+				}
+			}
+		}
+		log.fine(() -> {
+			CacheStats stats = memoryCache.stats();
+			return String.format("evictionCount=%d  hitCount=%d  missCount=%d hitRate=%f missRate=%f", stats.evictionCount(), stats.hitCount(), stats.missCount(), stats.hitRate(), stats.missRate());
+		});
+		return vaultExtract;
+	}
+
+	/**
+	 * @param cachePath defines the zip file holding the vaults or the vaults folder
+	 * @param fileName is the vault name
+	 * @return the extracted vault after eliminating trusses
+	 */
+	@Nullable
+	public static HistoVault readVault(Path cachePath, String fileName) {
+		final int MIN_FILE_LENGTH = 2048;
+		HistoVault histoVault = null;
+		if (settings.isZippedCache()) {
+			try (ZipFile zf = new ZipFile(cachePath.toFile())) {
+				if (zf.getEntry(fileName).getSize() <= MIN_FILE_LENGTH) return null;
+
+				histoVault = memoryCache.get(fileName, () -> VaultProxy.load(zf.getInputStream(zf.getEntry(fileName))));
+			} catch (Exception e) {
+				log.log(SEVERE, e.getMessage(), e);
+			}
+		} else {
+			File file = cachePath.resolve(fileName).toFile();
+			if (file.length() <= MIN_FILE_LENGTH) return null;
+
+			try {
+				histoVault = memoryCache.get(file.getName(), () -> VaultProxy.load(cachePath.resolve(file.getName())));
+			} catch (Exception e) {
+				log.log(SEVERE, e.getMessage(), e);
+			}
+		}
+		log.fine(() -> {
+			CacheStats stats = memoryCache.stats();
+			return String.format("evictionCount=%d  hitCount=%d  missCount=%d hitRate=%f missRate=%f", stats.evictionCount(), stats.hitCount(), stats.missCount(), stats.hitRate(), stats.missRate());
+		});
+		return histoVault;
 	}
 
 	/**

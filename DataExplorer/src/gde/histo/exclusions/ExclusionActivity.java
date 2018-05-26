@@ -21,10 +21,12 @@ package gde.histo.exclusions;
 
 import java.nio.file.Path;
 
+import gde.histo.datasources.DirectoryScanner;
 import gde.ui.DataExplorer;
 
 /**
  * Exclusion activity processing.
+ * Use this for UI activities only because it relies on the active device.
  * @author Thomas Eickert (USER)
  */
 public final class ExclusionActivity {
@@ -36,7 +38,8 @@ public final class ExclusionActivity {
 	public static void clearExcludeLists() {
 		if (!DataExplorer.getInstance().getHistoExplorer().isPresent()) throw new UnsupportedOperationException();
 
-		ExclusionData.getInstance().delete();
+		ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder());
+		exclusionData.delete();
 	}
 
 	/**
@@ -44,12 +47,12 @@ public final class ExclusionActivity {
 	 * @param recordsetBaseName empty string sets ignore to the file in total
 	 */
 	public static void setExcludeRecordSet(Path filePath, String recordsetBaseName) {
-		final ExclusionData fileExclusionData = ExclusionData.getInstance();
+		ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder());
 		if (recordsetBaseName.isEmpty())
-			fileExclusionData.setProperty((filePath.getFileName().toString()));
+			exclusionData.setProperty((filePath.getFileName().toString()));
 		else
-			fileExclusionData.addToProperty(filePath.getFileName().toString(), recordsetBaseName);
-		fileExclusionData.store();
+			exclusionData.addToProperty(filePath.getFileName().toString(), recordsetBaseName);
+		exclusionData.store();
 	}
 
 }

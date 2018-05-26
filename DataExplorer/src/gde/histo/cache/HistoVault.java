@@ -26,8 +26,10 @@
 package gde.histo.cache;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.stream.IntStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -37,6 +39,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.sun.istack.internal.Nullable;
+
+import gde.GDE;
 
 /**
  * aggregated history recordset data related to measurements, settlements and
@@ -731,12 +737,212 @@ public class HistoVault {
 	 *     {@link PointsType }
 	 *
 	 */
-
 	public void setScores(HashMap<Integer, PointType> value) {
 		this.scores = value;
 	}
 
 	/* non JAXB members : start */
+
+	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the
+	 *          meantime)
+	 * @return empty in case of unavailable measurement
+	 */
+	public HashMap<Integer, PointType> getMeasurementPoints(int measurementOrdinal) {
+		return this.getMeasurements().containsKey(measurementOrdinal) ? new HashMap<Integer, PointType>()
+				: this.getMeasurements().get(measurementOrdinal).getTrails();
+	}
+
+	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the
+	 *          meantime)
+	 * @param trailOrdinal
+	 * @return the point value
+	 */
+	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	public Integer getMeasurementPoint(int measurementOrdinal, int trailOrdinal) {
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			return this.getMeasurements().get(measurementOrdinal).getTrails().containsKey(trailOrdinal)
+					? this.getMeasurements().get(measurementOrdinal).getTrails().get(trailOrdinal).value : null;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	 * @return the points
+	 */
+	public IntStream getMeasurementOutliers(int measurementOrdinal) {
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			String points = this.getMeasurements().get(measurementOrdinal).getOutlierPoints();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
+		}
+		return IntStream.empty();
+	}
+
+	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	 * @return the points
+	 */
+	public IntStream getMeasurementScraps(int measurementOrdinal) {
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			String points = this.getMeasurements().get(measurementOrdinal).getScrappedPoints();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
+		}
+		return IntStream.empty();
+	}
+
+	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	 * @return false if the measurement does not exist or has no outliers
+	 */
+	public boolean hasMeasurementOutliers(int measurementOrdinal) {
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			return this.getMeasurements().get(measurementOrdinal).getOutlierPoints() != null;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	 * @return the cache data type
+	 */
+	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	public DataTypes getMeasurementDataType(int measurementOrdinal) {
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			return this.getMeasurements().get(measurementOrdinal).dataType;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * @param measurementOrdinal may specify an ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	 * @return false if the measurement does not exist or has no scrapped points
+	 */
+	public boolean hasMeasurementScraps(int measurementOrdinal) {
+		if (this.getMeasurements().containsKey(measurementOrdinal)) {
+			return this.getMeasurements().get(measurementOrdinal).getScrappedPoints() != null;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * @param settlementId may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
+	 * @return empty in case of unavailable settlementId
+	 */
+	public HashMap<Integer, PointType> getSettlementPoints(int settlementId) {
+		return this.getSettlements().containsKey(settlementId) ? new HashMap<Integer, PointType>() : this.getSettlements().get(settlementId).getTrails();
+	}
+
+	/**
+	 * @param settlementId may specify an ordinal which is not present in the vault (earlier osd file - measurements added in the meantime)
+	 * @param trailOrdinal
+	 * @return the point value
+	 */
+	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	public Integer getSettlementPoint(int settlementId, int trailOrdinal) {
+		if (this.getSettlements().containsKey(settlementId)) {
+			return this.getSettlements().get(settlementId).getTrails().containsKey(trailOrdinal)
+					? this.getSettlements().get(settlementId).getTrails().get(trailOrdinal).value : null;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * @param settlementId may specify an ordinal which is not present in the vault
+	 * @return the points
+	 */
+	public IntStream getSettlementOutliers(int settlementId) {
+		if (this.getMeasurements().containsKey(settlementId)) {
+			String points = this.getMeasurements().get(settlementId).getOutlierPoints();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
+		}
+		return IntStream.empty();
+	}
+
+	/**
+	 * @param settlementId may specify an ordinal which is not present in the vault
+	 * @return the points
+	 */
+	public IntStream getSettlementScraps(int settlementId) {
+		if (this.getMeasurements().containsKey(settlementId)) {
+			String points = this.getMeasurements().get(settlementId).getScrappedPoints();
+			if (points != null) return Arrays.stream(points.split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::parseInt);
+		}
+		return IntStream.empty();
+	}
+
+	/**
+	 * @param settlementId may specify an ordinal which is not present in the vault
+	 * @return false if the settlement does not exist or has no outliers
+	 */
+	public boolean hasSettlementOutliers(int settlementId) {
+		if (this.getSettlements().containsKey(settlementId)) {
+			return this.getSettlements().get(settlementId).getOutlierPoints() != null;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * @param settlementId may specify an ordinal which is not present in the vault
+	 * @return false if the settlement does not exist or has no scrapped points
+	 */
+	public boolean hasSettlementScraps(int settlementId) {
+		if (this.getSettlements().containsKey(settlementId)) {
+			return this.getSettlements().get(settlementId).getScrappedPoints() != null;
+		} else {
+			return false;
+		}
+	}
+
+	@Nullable // ordinal which is not present in the vault (earlier osd file - entries added in the meantime)
+	public DataTypes getSettlementDataType(int settlementId) {
+		if (this.getSettlements().containsKey(settlementId)) {
+			return this.getSettlements().get(settlementId).dataType;
+		} else {
+			return null;
+		}
+	}
+
+	public HashMap<Integer, PointType> getScorePoints() {
+		return this.getScores();
+	}
+
+	/**
+	 * @param scoreLabelOrdinal
+	 * @return null in case of unavailable score
+	 */
+	public Integer getScorePoint(int scoreLabelOrdinal) {
+		return this.getScores().get(scoreLabelOrdinal).getValue();
+	}
+
+	/**
+	 * @return true if this is a vault skeleton only
+	 */
+	public boolean isTruss() {
+		return this.getMeasurements().isEmpty();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		final String d = GDE.STRING_COMMA_BLANK;
+		sb.append(this.vaultName).append(d);
+		sb.append("isTruss=").append(isTruss()).append(d);
+		sb.append("logRecordSetOrdinal=").append(this.logRecordSetOrdinal).append(d);
+		sb.append("logRecordsetBaseName=").append(this.logRecordsetBaseName).append(d);
+		sb.append("logChannelNumber=").append(this.logChannelNumber).append(d);
+		sb.append("logObjectKey=").append(this.logObjectKey).append(d);
+		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(d);
+		sb.append("vaultDirectory=").append(this.vaultDirectory);
+		return sb.toString();
+	}
 
 	/**
 	 * @return context singleton (creating the context is slow)

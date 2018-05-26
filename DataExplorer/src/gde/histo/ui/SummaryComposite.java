@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -63,11 +62,11 @@ import gde.histo.datasources.DirectoryScanner.SourceFolders;
 import gde.histo.datasources.HistoSet;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.exclusions.InclusionData;
+import gde.histo.guard.Reminder;
 import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordFormatter;
 import gde.histo.recordings.TrailRecordSet;
-import gde.histo.recordings.TrailRecordSet.Outliers;
 import gde.histo.recordings.TrailRecordSetFormatter;
 import gde.histo.ui.data.SummarySpots;
 import gde.histo.ui.data.SummarySpots.Density;
@@ -95,7 +94,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 	static final int						UNK_GAP			= 2;
 
 	/**
-	 * Data for the life cycle of a summary composite drawing.
+	 * Record data for the life cycle of a summary composite drawing.
 	 */
 	public static final class SummaryLayout extends AbstractChartLayout {
 		private final Logger				log									= Logger.getLogger(SummaryLayout.class.getName());
@@ -107,7 +106,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		Double											syncMax							= null;
 		Double											syncMin							= null;
 
-		private Outliers[]					warningMinMaxValues	= null;
+		private Reminder[]					warningMinMaxValues	= null;
 		private double[]						scaleMinMaxValues		= null;
 		private DecimalFormat				decimalFormat				= null;
 
@@ -170,9 +169,9 @@ public final class SummaryComposite extends AbstractChartComposite {
 			return tmpMinMax;
 		}
 
-		public Outliers[] getMinMaxWarning() {
+		public Reminder[] getMinMaxWarning() {
 			if (warningMinMaxValues == null) {
-				warningMinMaxValues = trailRecord.defineMinMaxWarning(Settings.getInstance().getWarningCount());
+				warningMinMaxValues = trailRecord.defineMinMaxWarning(Settings.getInstance().getReminderCount());
 			}
 			return warningMinMaxValues;
 		}
@@ -527,21 +526,23 @@ public final class SummaryComposite extends AbstractChartComposite {
 				windowActor.processMouseDownAction(point);
 			} else if (evt.button == 3) { // right button
 				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
-				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
-				Path dataPath = DirectoryScanner.getPrimaryFolder();
-				String[] includedRecordNames = InclusionData.getIncludedRecordNames();
-				SummaryWarning summaryWarning = new SummaryWarning(dataPath, record != null ? record.getName() : GDE.STRING_EMPTY, includedRecordNames);
+				Path activeFolder = DirectoryScanner.getActiveFolder();
+				ExclusionData exclusionData = new ExclusionData(activeFolder);
+				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(exclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
+				InclusionData inclusionData = new InclusionData(activeFolder);
+				String[] includedRecordNames = inclusionData.getIncludedRecordNames();
+				SummaryWarning summaryWarning = new SummaryWarning(activeFolder, record != null ? record.getName() : GDE.STRING_EMPTY, includedRecordNames);
 				popupmenu.setData(TabMenuOnDemand.SUMMARY_WARNING.name(), summaryWarning);
 
 				List<Integer> snappedIndices = getSnappedIndices(point);
 				if (isBeyondLeftBounds(evt.x) && record != null && getChartData(record).getMinMaxWarning()[0] != null) { // left scale warnings
-					Outliers outlier = getChartData(record).getMinMaxWarning()[0];
+					Reminder outlier = getChartData(record).getMinMaxWarning()[0];
 					ExtendedVault vault = record.getParent().getVault(outlier.getIndices().get(0));
 					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLoadLinkPath());
 					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLoadFilePath());
 					popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), vault.getLogRecordsetBaseName());
 				} else if (isBeyondRightBounds(evt.x) && record != null && getChartData(record).getMinMaxWarning()[1] != null) { // right
-					Outliers outlier = getChartData(record).getMinMaxWarning()[1];
+					Reminder outlier = getChartData(record).getMinMaxWarning()[1];
 					ExtendedVault vault = record.getParent().getVault(outlier.getIndices().get(0));
 					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), vault.getLoadLinkPath());
 					popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), vault.getLoadFilePath());
@@ -653,8 +654,8 @@ public final class SummaryComposite extends AbstractChartComposite {
 		boolean isSummarySpotsVisible = settings.isSummarySpotsVisible();
 		boolean isCurveSelector = windowActor.isCurveSelectorEnabled();
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-		Optional<InclusionData> inclusionData = InclusionData.getExistingInstance(DirectoryScanner.getPrimaryFolder(), trailRecordSet.getRecordNames());
-		List<String> exclusiveNames = Arrays.asList(inclusionData.map(d -> InclusionData.getIncludedRecordNames(trailRecordSet.getRecordNames())).orElse(new String[0]));
+		InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder());
+		List<String> exclusiveNames = Arrays.asList(inclusionData.getIncludedRecordNames());
 
 		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
 			TrailRecord record = trailRecordSet.getDisplayRecords().get(i);
@@ -674,7 +675,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 				if (isSummarySpotsVisible) summarySpots.drawMarkers(canvasImageGC);
 				summarySpots.drawRecentMarkers(canvasImageGC);
 			}
-			boolean isDefaultOrExclusiveWarning = inclusionData.map(d -> d.isIncluded(record.getName())).orElse(true);
+			boolean isDefaultOrExclusiveWarning = exclusiveNames.isEmpty() || exclusiveNames.contains(record.getName());
 			if (isDefaultOrExclusiveWarning && !HistoSet.isGpsCoordinates(record)) {
 				HistoCurveUtils.drawChannelItemWarnings(summary, canvasImageGC, dataScaleWidth);
 			}

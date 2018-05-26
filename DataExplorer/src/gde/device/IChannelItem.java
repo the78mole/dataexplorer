@@ -22,6 +22,10 @@ package gde.device;
 import java.util.List;
 import java.util.Optional;
 
+import gde.data.Record.DataType;
+import gde.histo.cache.HistoVault;
+import gde.histo.recordings.TrailSelector;
+
 /**
  *
  * @author Thomas Eickert (USER)
@@ -46,9 +50,38 @@ public interface IChannelItem {
 
 	double getFactor();
 
+	int getSyncMasterRecordOrdinal();
+
 	List<PropertyType> getProperty();
 
 	Optional<TrailDisplayType> getTrailDisplay();
 
 	PropertyType getProperty(String propertyKey);
+
+	void setDataType(DataType dataType);
+
+	DataType getDataType();
+
+	/**
+	 * Set the most specific datatype.
+	 */
+	default DataType getUnifiedDataType() {
+		if (getDataType() == null || getDataType() == DataType.DEFAULT) {
+			DataType guess = DataType.guess(getName());
+			if (guess != null)
+				return guess;
+			else
+				return DataType.DEFAULT;
+		}
+		return getDataType();
+	}
+
+	/**
+	 * @param vault
+	 * @param trailOrdinal is the requested trail ordinal number which may differ from the selected trail type (e.g. suites)
+	 * @return the point value
+	 */
+	Integer getVaultPoint(HistoVault vault, int trailOrdinal);
+
+	TrailSelector createTrailSelector(String deviceName, int channelNumber, String recordName, boolean smartStatistics);
 }

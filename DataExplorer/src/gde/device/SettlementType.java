@@ -17,7 +17,13 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+
+import gde.data.Record.DataType;
+import gde.histo.cache.HistoVault;
+import gde.histo.recordings.SettlementTrailSelector;
+import gde.histo.recordings.TrailSelector;
 
 
 /**
@@ -73,6 +79,9 @@ public class SettlementType implements IChannelItem {
     protected String label;
     @XmlAttribute(required = true)
     protected int settlementId;
+
+  	@XmlTransient
+  	protected DataType						dataType;
 
     /**
      * Gets the value of the name property.
@@ -430,4 +439,45 @@ public class SettlementType implements IChannelItem {
 		}
 	}
 
- }
+	/**
+	 * get the SyncMaster ordinal value
+	 * @return the SyncMaster ordinal value, if property does not exist return -1
+	 */
+	@Override
+	public int getSyncMasterRecordOrdinal() {
+		int value = -1;
+		PropertyType tmpProperty = getProperty(IDevice.SYNC_ORDINAL);
+		if (tmpProperty != null) value = Integer.parseInt(tmpProperty.getValue());
+
+		return value;
+	}
+
+	@Override
+	public Integer getVaultPoint(HistoVault vault, int trailOrdinal) {
+		return vault.getSettlementPoint(this.settlementId, trailOrdinal);
+	}
+
+	@Override
+	public void setDataType(DataType dataType) {
+		this.dataType = dataType;
+	}
+
+	@Override
+	public DataType getDataType() {
+		return this.dataType;
+	}
+
+	@Override
+	public TrailSelector createTrailSelector(String deviceName, int channelNumber, String recordName, boolean smartStatistics) {
+		return new SettlementTrailSelector(deviceName, channelNumber, this, recordName, smartStatistics);
+	}
+
+	@Override
+	public String toString() {
+		final int maxLen = 10;
+		return "SettlementType [name=" + this.name + ", active=" + this.active + ", evaluation=" + this.evaluation + ", property=" + (this.property != null
+				? this.property.subList(0, Math.min(this.property.size(), maxLen))
+				: null) + ", trailDisplay=" + this.trailDisplay + ", label=" + this.label + ", settlementId=" + this.settlementId + ", dataType=" + this.dataType + "]";
+	}
+
+}

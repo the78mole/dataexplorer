@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import gde.GDE;
 import gde.device.resource.DeviceXmlResource;
+import gde.histo.datasources.DirectoryScanner;
 import gde.histo.exclusions.InclusionData;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -115,8 +116,8 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 
 				warning = Optional.ofNullable((SummaryWarning) popupMenu.getData(TabMenuOnDemand.SUMMARY_WARNING.toString()));
 				log.log(Level.FINEST, "", warning);
-				setWarningCountIndex(settings.getWarningCountIndex());
-				setWarningLevel(settings.getWarningLevel());
+				setWarningCountIndex(settings.getReminderCountIndex());
+				setWarningLevel(settings.getReminderLevel());
 				isExclusiveWarning.setText(Messages.getString(MessageIds.GDE_MSGT0915));
 				isExclusiveWarning.setSelection(false);
 
@@ -256,7 +257,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 		}
 		{
 			warningCountItem0 = new MenuItem(warningMenu, SWT.CHECK);
-			warningCountItem0.setText(String.valueOf(settings.getWarningCount(0)) + " logs");
+			warningCountItem0.setText(String.valueOf(settings.getReminderCount(0)) + " logs");
 			warningCountItem0.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
@@ -268,7 +269,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 		}
 		{
 			warningCountItem1 = new MenuItem(warningMenu, SWT.CHECK);
-			warningCountItem1.setText(String.valueOf(settings.getWarningCount(1)) + " logs");
+			warningCountItem1.setText(String.valueOf(settings.getReminderCount(1)) + " logs");
 			warningCountItem1.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
@@ -280,7 +281,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 		}
 		{
 			warningCountItem2 = new MenuItem(warningMenu, SWT.CHECK);
-			warningCountItem2.setText(String.valueOf(settings.getWarningCount(2)) + " logs");
+			warningCountItem2.setText(String.valueOf(settings.getReminderCount(2)) + " logs");
 			warningCountItem2.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
@@ -292,7 +293,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 		}
 		{
 			warningCountItem3 = new MenuItem(warningMenu, SWT.CHECK);
-			warningCountItem3.setText(String.valueOf(settings.getWarningCount(3)) + " logs");
+			warningCountItem3.setText(String.valueOf(settings.getReminderCount(3)) + " logs");
 			warningCountItem3.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
@@ -371,7 +372,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "isEclusiveWarning.widgetSelected, event=" + evt);
 					warning.ifPresent(w -> {
-						InclusionData inclusionData = InclusionData.getInstance();
+						InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder());
 						if (isExclusiveWarning.getSelection()) {
 							inclusionData.setProperty(w.recordName);
 						} else {
@@ -392,7 +393,8 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "isEclusiveWarning.widgetSelected, event=" + evt);
 					warning.ifPresent(w -> {
-						InclusionData.getInstance().delete();
+						InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder());
+						inclusionData.delete();
 						presentHistoExplorer.updateHistoTabs(false, false, true);
 					});
 				}
@@ -469,7 +471,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 	}
 
 	protected void setWarningCountIndex(int newIndex) {
-		settings.setWarningCountIndex(String.valueOf(newIndex));
+		settings.setReminderCountIndex(String.valueOf(newIndex));
 		warningCountItem0.setSelection(newIndex == 0);
 		warningCountItem1.setSelection(newIndex == 1);
 		warningCountItem2.setSelection(newIndex == 2);
@@ -477,7 +479,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 	}
 
 	protected void setWarningLevel(int newLevel) {
-		settings.setWarningLevel(String.valueOf(newLevel));
+		settings.setReminderLevel(String.valueOf(newLevel));
 		warningLevelNone.setSelection(newLevel == -1);
 		warningLevelItem0.setSelection(newLevel == 0);
 		warningLevelItem1.setSelection(newLevel == 1);

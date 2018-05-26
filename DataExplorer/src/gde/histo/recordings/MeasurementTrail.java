@@ -22,9 +22,11 @@ package gde.histo.recordings;
 import java.util.stream.DoubleStream;
 
 import gde.data.Record.DataType;
+import gde.device.IChannelItem;
 import gde.device.MeasurementType;
 import gde.histo.cache.DataTypes;
 import gde.histo.cache.ExtendedVault;
+import gde.histo.cache.HistoVault;
 import gde.histo.datasources.HistoSet;
 
 /**
@@ -32,7 +34,7 @@ import gde.histo.datasources.HistoSet;
  * @author Thomas Eickert (USER)
  */
 public final class MeasurementTrail extends TrailRecord {
-	private final static long serialVersionUID = 110124007964748556L;
+	private static final long serialVersionUID = 110124007964748556L;
 
 	/**
 	 * @param newOrdinal
@@ -40,7 +42,7 @@ public final class MeasurementTrail extends TrailRecord {
 	 * @param parent
 	 * @param initialCapacity
 	 */
-	public MeasurementTrail(int newOrdinal, MeasurementType measurementType, TrailRecordSet parent, int initialCapacity) {
+	public MeasurementTrail(int newOrdinal, IChannelItem measurementType, TrailRecordSet parent, int initialCapacity) {
 		super(measurementType, newOrdinal, parent, initialCapacity);
 		setTrailSelector();
 	}
@@ -62,11 +64,6 @@ public final class MeasurementTrail extends TrailRecord {
 	@Override // for clarity only
 	public boolean isScaleVisible() {
 		return super.isScaleVisible();
-	}
-
-	@Override
-	public void setApplicableTrailTypes() {
-		getTrailSelector().setApplicableTrails();
 	}
 
 	@Override
@@ -97,7 +94,7 @@ public final class MeasurementTrail extends TrailRecord {
 	}
 
 	@Override
-	public DataType getVaultDataType(ExtendedVault vault) {
+	public DataType getVaultDataType(HistoVault vault) {
 		DataTypes dataType = vault.getMeasurementDataType(this.getOrdinal());
 		return dataType != null ? DataTypes.toDataType(dataType) : null;
 	}

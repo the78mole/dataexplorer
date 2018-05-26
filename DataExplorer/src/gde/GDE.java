@@ -160,7 +160,7 @@ public class GDE {
 	public static final String							STRING_BLANK_AT_BLANK							= " @ ";																																																										//$NON-NLS-1$
 	public static final String							STRING_GREATER										= ">";																																																											//$NON-NLS-1$
 	public static final String							STRING_ELLIPSIS										= "...";																																																								//$NON-NLS-1$
-	public static final String							STRING_PARENT_DIR									= "..";																																																								//$NON-NLS-1$
+	public static final String							STRING_PARENT_DIR									= "..";																																																									//$NON-NLS-1$
 	public static final String							STRING_CSV_SEPARATOR							= ",";																																																									//$NON-NLS-1$
 	public static final String							STRING_CSV_QUOTE									= "\"";																																																									//$NON-NLS-1$
 	public static final String							STRING_DEVICE_ORIENTED_FOLDER			= "_";																																																									//$NON-NLS-1$

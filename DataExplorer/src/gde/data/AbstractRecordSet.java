@@ -317,9 +317,9 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 */
 	protected Vector<Integer>										timeGrid												= new Vector<Integer>();
 	protected Color															timeGridColor										= DataExplorer.COLOR_GREY;
-	protected int																timeGridLineStyle								= SWT.LINE_DOT;
+	protected int																timeGridLineStyle					= SWT.LINE_DOT;
 
-	protected static final String								SMART_STATISTICS					= "RecordSet_smartStatistics";							// histo: Quantiles
+	public static final String									SMART_STATISTICS					= "RecordSet_smartStatistics";							// histo: Quantiles
 	protected static final String								CHART_WEIGHT							= "RecordSet_chartWeight";									// histo: weight of the charts
 																																																										// (graphics or summary)
 	@Deprecated

@@ -44,13 +44,11 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import gde.config.Settings;
 import gde.histo.datasources.HistoSet;
+import gde.histo.guard.Reminder;
 import gde.histo.recordings.TrailRecord;
-import gde.histo.recordings.TrailRecordSet.Outliers;
 import gde.histo.ui.Measure;
 import gde.histo.ui.SummaryComposite.SummaryLayout;
 import gde.log.Logger;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
 /**
@@ -61,36 +59,6 @@ import gde.ui.DataExplorer;
 public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	private static final String	$CLASS_NAME	= SummarySpots.class.getName();
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
-
-	/**
-	 * Type of the outlier.
-	 */
-	public enum OutlierWarning {
-		FAR {
-			@Override
-			public String localizedText() {
-				return Messages.getString(MessageIds.GDE_MSGT0904);
-			}
-		},
-		CLOSE {
-			@Override
-			public String localizedText() {
-				return Messages.getString(MessageIds.GDE_MSGT0905);
-			}
-		},
-		WHISKER {
-			@Override
-			public String localizedText() {
-				return Messages.getString(MessageIds.GDE_MSGT0910);
-			}
-		};
-
-		public boolean isIncluded(int warningLevel) {
-			return warningLevel >= this.ordinal();
-		}
-
-		public abstract String localizedText();
-	}
 
 	public enum Density {
 		EXTREME(2), HIGH(3), MEDIUM(4), LOW(5);
@@ -327,7 +295,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	 * Levels for the min warning and the max warning.
 	 * Null means no warning.
 	 */
-	public Outliers[]							warningMinMaxValues	= null;
+	public Reminder[]							warningMinMaxValues	= null;
 
 	public SummarySpots(SummaryLayout summary) {
 		this.summary = summary;
@@ -353,7 +321,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		xPointScaleFactor = HistoSet.decodeDeltaValue(record, 1. / 1000.) / ((decodedScaleMinMax[1] - decodedScaleMinMax[0]) / stripNetWidth);
 		xPointOffset = HistoSet.encodeVaultValue(record, decodedScaleMinMax[0]) * 1000. * xPointScaleFactor - .5;
 
-		int positionsLimit = Settings.getInstance().isSummarySpotsVisible() ? -1 : Settings.getInstance().getWarningCount();
+		int positionsLimit = Settings.getInstance().isSummarySpotsVisible() ? -1 : Settings.getInstance().getReminderCount();
 		xPositions.putAll(defineXPositions(positionsLimit));
 	}
 
@@ -544,7 +512,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	}
 
 	public void drawRecentMarkers(GC gc) {
-		drawScalableMarkers(gc, defineXPositions(Settings.getInstance().getWarningCount()), DataExplorer.COLOR_RED);
+		drawScalableMarkers(gc, defineXPositions(Settings.getInstance().getReminderCount()), DataExplorer.COLOR_RED);
 	}
 
 	/**

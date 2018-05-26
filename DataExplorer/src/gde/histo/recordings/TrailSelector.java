@@ -43,6 +43,7 @@ public abstract class TrailSelector {
 
 	protected final DeviceXmlResource	xmlResource							= DeviceXmlResource.getInstance();
 
+	protected final String						deviceName;
 	protected final IChannelItem			channelItem;
 	protected final String						recordName;
 	protected final boolean						smartStatistics;
@@ -66,10 +67,27 @@ public abstract class TrailSelector {
 	protected int[]										extremumIndices					= null;
 
 	protected TrailSelector(TrailRecord trailRecord) {
+		this.deviceName = trailRecord.getDevice().getName();
 		this.channelItem = trailRecord.channelItem;
 		this.recordName = trailRecord.getName();
 		this.smartStatistics = trailRecord.getParent().isSmartStatistics();
 		this.channelConfigNumber = trailRecord.getParent().getChannelConfigNumber();
+		setApplicableTrails();
+	}
+
+	/**
+	 * @param channelNumber is the 1-based device channel number
+	 * @param channelItem is a measurement / settlement / scoregroup in the device channel
+	 * @param recordName is the name of the data record which might differ from the device channel item name (e.g. Jeti)
+	 * @param smartStatistics true selects the smart trail types
+	 */
+	protected TrailSelector(String deviceName, int channelNumber, IChannelItem channelItem, String recordName, boolean smartStatistics) {
+		this.deviceName = deviceName;
+		this.channelItem = channelItem;
+		this.recordName = recordName;
+		this.smartStatistics = smartStatistics;
+		this.channelConfigNumber = channelNumber;
+		setApplicableTrails();
 	}
 
 	/**
@@ -189,7 +207,7 @@ public abstract class TrailSelector {
 		}
 	}
 
-	public abstract void setApplicableTrails();
+	protected abstract void setApplicableTrails();
 
 	protected void setApplicableSuiteTrails() {
 		Optional<TrailDisplayType> trailDisplay = channelItem.getTrailDisplay();

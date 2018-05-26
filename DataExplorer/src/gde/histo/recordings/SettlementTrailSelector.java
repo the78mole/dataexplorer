@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import gde.device.IChannelItem;
 import gde.device.SettlementType;
 import gde.device.TrailDisplayType;
 import gde.device.TrailTypes;
@@ -37,8 +38,18 @@ public final class SettlementTrailSelector extends TrailSelector {
 		super(trailRecord);
 	}
 
+	/**
+	 * @param channelNumber is the 1-based device channel number
+	 * @param channelItem is a measurement / settlement / scoregroup in the device channel
+	 * @param recordName is the name of the data record which might differ from the device channel item name (e.g. Jeti)
+	 * @param smartStatistics true selects the smart trail types
+	 */
+	public SettlementTrailSelector(String deviceName, int channelNumber, IChannelItem channelItem, String recordName, boolean smartStatistics) {
+		super(deviceName, channelNumber, channelItem, recordName, smartStatistics);
+	}
+
 	@Override
-	public void setApplicableTrails() {
+	protected void setApplicableTrails() {
 		if (channelItem.getTrailDisplay().map(TrailDisplayType::getDefaultTrail).map(TrailTypes::isSuite).orElse(false))
 			throw new UnsupportedOperationException("suite trail must not be a device settlement default");
 		final boolean[] applicablePrimitiveTrails = getApplicablePrimitiveTrails();

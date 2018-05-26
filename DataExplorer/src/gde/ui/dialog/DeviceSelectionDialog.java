@@ -20,7 +20,6 @@ package gde.ui.dialog;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -1095,35 +1094,18 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 */
 	public IDevice getInstanceOfDevice() {
 		IDevice newInst = null;
-		String selectedDeviceName = this.selectedActiveDeviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
-		//selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
-		String className = selectedDeviceName.contains(GDE.STRING_DOT) ? selectedDeviceName // full qualified
-				: "gde.device." + this.selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." //$NON-NLS-1$
-						+ selectedDeviceName;
 		try {
-			//String className = "gde.device.DefaultDeviceDialog";
-			log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
-			ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			Class<?> c = loader.loadClass(className);
-			//Class c = Class.forName(className);
-			Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
-			log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			if (constructor != null) {
-				newInst = (IDevice) constructor.newInstance(new Object[] { this.selectedActiveDeviceConfig });
-			}
-			else
-				throw new ClassNotFoundException(Messages.getString(MessageIds.GDE_MSGE0016, new String[] { className }));
-
+			newInst = this.selectedActiveDeviceConfig.defineInstanceOfDevice();
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			String msg = e.getClass().getSimpleName() + GDE.STRING_BLANK + e.getMessage() + GDE.LINE_SEPARATOR + Messages.getString(MessageIds.GDE_MSGE0040, new String[] { className });
+			String msg = e.getClass().getSimpleName() + GDE.STRING_BLANK + e.getMessage() + GDE.LINE_SEPARATOR + Messages.getString(MessageIds.GDE_MSGE0040, new String[] { this.selectedActiveDeviceConfig.getClassImplName() });
 			this.application.openMessageDialog(this.dialogShell, msg);
 
 			// in-activate and remove failed device (XML) from potential devices list
 			this.selectedActiveDeviceConfig.setUsed(false);
 			this.selectedActiveDeviceConfig.storeDeviceProperties();
-			selectedDeviceName = this.selectedActiveDeviceConfig.getName();
+			String selectedDeviceName = this.selectedActiveDeviceConfig.getName();
 			this.activeDevices.remove(selectedDeviceName);
 			this.deviceConfigurations.remove(selectedDeviceName);
 			if (this.activeDevices.size() > 0) {

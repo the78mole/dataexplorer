@@ -173,9 +173,9 @@ public class Settings extends Properties {
 	final static String							SUBDIRECTORY_LEVEL_MAX					= "subdirectory_level_max";																																				//$NON-NLS-1$
 	final static String							IS_DATA_TABLE_TRANSITIONS				= "is_data_table_transitions";																																		//$NON-NLS-1$
 	final static String							IS_FIRST_RECORDSET_CHOICE				= "is_first_recordset_choice";																																		//$NON-NLS-1$
-	final static String							WARNING_COUNT_CSV								= "warning_count_csv";																																						//$NON-NLS-1$
-	final static String							WARNING_COUNT_INDEX							= "warning_count_index";																																					//$NON-NLS-1$
-	final static String							WARNING_LEVEL										= "warning_level";																																								//$NON-NLS-1$
+	final static String							REMINDER_COUNT_CSV							= "reminder_count_csv";																																						//$NON-NLS-1$
+	final static String							REMINDER_COUNT_INDEX						= "reminder_count_index";																																					//$NON-NLS-1$
+	final static String							REMINDER_LEVEL									= "reminder_level";																																								//$NON-NLS-1$
 	final static String							IS_CANONICAL_QUANTILES					= "is_canonical_quantiles";																																				//$NON-NLS-1$
 	final static String							IS_SYMMETRIC_TOLERANCE_INTERVAL	= "is_symmetric_tolerance_interval";																															//$NON-NLS-1$
 	final static String							OUTLIER_TOLERANCE_SPREAD				= "outlier_tolerance_spread";																																			//$NON-NLS-1$
@@ -272,9 +272,10 @@ public class Settings extends Properties {
 	public static final String			GPS_API_URL											= "http://maps.googleapis.com/maps/api/geocode/xml?latlng=";																			//$NON-NLS-1$
 	public static final String			HISTO_INCLUSIONS_FILE_NAME			= ".gdeinclude";																																									//$NON-NLS-1$
 	public static final String			HISTO_INCLUSIONS_DIR_NAME				= ".gdeinclude";																																									//$NON-NLS-1$
+	public final static String			HISTO_OBJECTS_DIR_NAME					= "Fleet";																																												//$NON-NLS-1$
 
 	private static double[]					SAMPLING_TIMESPANS							= new double[] { 10., 5., 1., .5, .1, .05, .001 };
-	private static String[]					WARNING_COUNT_VALUES						= new String[] { "2", "3", "5", "8" };
+	private static String[]					REMINDER_COUNT_VALUES						= new String[] { "2", "3", "5", "8" };
 
 	BufferedReader									reader;																																																														// to read the application settings
 	BufferedWriter									writer;																																																														// to write the application settings
@@ -801,9 +802,9 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SUBDIRECTORY_LEVEL_MAX, getSubDirectoryLevelMax())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATA_TABLE_TRANSITIONS, isDataTableTransitions())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_FIRST_RECORDSET_CHOICE, isFirstRecordSetChoice())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WARNING_COUNT_CSV, getWarningCountCsv())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WARNING_COUNT_INDEX, getWarningCountIndex())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WARNING_LEVEL, getWarningLevel())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.REMINDER_COUNT_CSV, getReminderCountCsv())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.REMINDER_COUNT_INDEX, getReminderCountIndex())); //$NON-NLS-1$
+			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.REMINDER_LEVEL, getReminderLevel())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CANONICAL_QUANTILES, isCanonicalQuantiles())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SYMMETRIC_TOLERANCE_INTERVAL, isSymmetricToleranceInterval())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OUTLIER_TOLERANCE_SPREAD, getOutlierToleranceSpread())); //$NON-NLS-1$
@@ -2903,70 +2904,70 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @param csvValues holds the list with the permitted numbers of logs for warning analysis
+	 * @param csvValues holds the list with the permitted numbers of logs for reminder analysis
 	 */
-	public void setWarningCountCsv(String csvValues) {
-		this.setProperty(Settings.IS_FIRST_RECORDSET_CHOICE, String.valueOf(csvValues));
+	public void setReminderCountCsv(String csvValues) {
+		this.setProperty(Settings.REMINDER_COUNT_CSV, String.valueOf(csvValues));
 	}
 
 	/**
-	 * @return the list with the permitted numbers of logs for warning analysis
+	 * @return the list with the permitted numbers of logs for reminder analysis
 	 */
-	public String getWarningCountCsv() {
-		String list = String.valueOf(this.getProperty(Settings.WARNING_COUNT_CSV, String.join(GDE.STRING_CSV_SEPARATOR, WARNING_COUNT_VALUES)));
+	public String getReminderCountCsv() {
+		String list = String.valueOf(this.getProperty(Settings.REMINDER_COUNT_CSV, String.join(GDE.STRING_CSV_SEPARATOR, REMINDER_COUNT_VALUES)));
 		return list;
 	}
 
-	private int[] getWarningCountValues() {
-		Stream<String> items = Arrays.stream(getWarningCountCsv().split(GDE.STRING_CSV_SEPARATOR));
-		if (items.count() != WARNING_COUNT_VALUES.length) {
-			setWarningCountCsv(String.join(GDE.STRING_CSV_SEPARATOR, Arrays.asList(WARNING_COUNT_VALUES)));
+	private int[] getReminderCountValues() {
+		Stream<String> items = Arrays.stream(getReminderCountCsv().split(GDE.STRING_CSV_SEPARATOR));
+		if (items.count() != REMINDER_COUNT_VALUES.length) {
+			setReminderCountCsv(String.join(GDE.STRING_CSV_SEPARATOR, Arrays.asList(REMINDER_COUNT_VALUES)));
 		}
-		return Arrays.stream(getWarningCountCsv().split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::valueOf).toArray();
+		return Arrays.stream(getReminderCountCsv().split(GDE.STRING_CSV_SEPARATOR)).mapToInt(Integer::valueOf).toArray();
 	}
 
 	/**
 	 * @return the index number set by the user which is used for history log selection (default is 0)
 	 */
-	public int getWarningCountIndex() {
-		return Integer.valueOf(this.getProperty(Settings.WARNING_COUNT_INDEX, String.valueOf(0)));
+	public int getReminderCountIndex() {
+		return Integer.valueOf(this.getProperty(Settings.REMINDER_COUNT_INDEX, String.valueOf(0)));
 	}
 
 	/**
-	 * @return the number of logs which is analyzed for warnings
+	 * @return the number of logs which is analyzed for reminders
 	 */
-	public int getWarningCount() {
-		return getWarningCount(getWarningCountIndex());
+	public int getReminderCount() {
+		return getReminderCount(getReminderCountIndex());
 	}
 
 	/**
-	 * @return the number of most recent logs which is analyzed for warnings
+	 * @return the number of most recent logs which is analyzed for reminders
 	 */
-	public int getWarningCount(int index) {
-		int[] warningCountValues = getWarningCountValues();
-		int realIndex = index >= 0 && index < warningCountValues.length ? index : 1;
-		return Integer.valueOf(warningCountValues[realIndex]);
+	public int getReminderCount(int index) {
+		int[] reminderCountValues = getReminderCountValues();
+		int realIndex = index >= 0 && index < reminderCountValues.length ? index : 1;
+		return Integer.valueOf(reminderCountValues[realIndex]);
 	}
 
 	/**
-	 * @param uintValue the number of most recent logs which is analyzed for warnings
+	 * @param uintValue the number of most recent logs which is analyzed for reminders
 	 */
-	public void setWarningCountIndex(String uintValue) {
-		this.setProperty(Settings.WARNING_COUNT_INDEX, String.valueOf(uintValue));
+	public void setReminderCountIndex(String uintValue) {
+		this.setProperty(Settings.REMINDER_COUNT_INDEX, String.valueOf(uintValue));
 	}
 
 	/**
-	 * @return the warning level set by the user (default 0 is far warnings only -> red; -1 is no warning)
+	 * @return the reminder level set by the user (default 0 is far reminders only -> red; -1 is no reminder)
 	 */
-	public int getWarningLevel() {
-		return Integer.valueOf(this.getProperty(Settings.WARNING_LEVEL, String.valueOf(0)));
+	public int getReminderLevel() {
+		return Integer.valueOf(this.getProperty(Settings.REMINDER_LEVEL, String.valueOf(0)));
 	}
 
 	/**
-	 * @param uintValue the warning level set by the user (0 is far warnings only -> red; -1 is no warning)
+	 * @param uintValue the reminder level set by the user (0 is far reminders only -> red; -1 is no reminder)
 	 */
-	public void setWarningLevel(String uintValue) {
-		this.setProperty(Settings.WARNING_LEVEL, String.valueOf(uintValue));
+	public void setReminderLevel(String uintValue) {
+		this.setProperty(Settings.REMINDER_LEVEL, String.valueOf(uintValue));
 	}
 
 	/**

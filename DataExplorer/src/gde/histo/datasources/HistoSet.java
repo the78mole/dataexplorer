@@ -30,6 +30,7 @@ import com.sun.istack.internal.Nullable;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.Record.DataType;
+import gde.device.IChannelItem;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
@@ -51,12 +52,12 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert
  */
 public final class HistoSet {
-	private final static String	$CLASS_NAME										= HistoSet.class.getName();
-	private final static Logger	log														= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME										= HistoSet.class.getName();
+	private static final Logger	log														= Logger.getLogger($CLASS_NAME);
 
 	private static final double	TOLERANCE											= .000000001;
 
-	private VaultPicker		vaultPicker;
+	private VaultPicker					vaultPicker;
 
 	/**
 	 * We allow 1 lower and 1 upper outlier for a log with 740 measurements
@@ -138,6 +139,74 @@ public final class HistoSet {
 	 * This is the equivalent of {@code device.translateValue} for data dedicated to the histo vault.
 	 * @return double of device dependent value
 	 */
+	public static double decodeVaultValue(IChannelItem channelItem, double value) {
+		final double newValue;
+		switch (channelItem.getUnifiedDataType()) {
+		case GPS_LATITUDE:
+		case GPS_LONGITUDE:
+			newValue = value / 1000.;
+			break;
+
+		default:
+			double factor = channelItem.getFactor(); // != 1 if a unit translation is required
+			double offset = channelItem.getOffset(); // != 0 if a unit translation is required
+			double reduction = channelItem.getReduction(); // != 0 if a unit translation is required
+			newValue = (value - reduction) * factor + offset;
+			break;
+		}
+		return newValue;
+	}
+
+	/**
+	 * This is the equivalent of {@code device.translateValue} for data dedicated to the histo vault.
+	 * @return the translated value for a value which represents a difference
+	 */
+	public static double decodeDeltaValue(IChannelItem channelItem, double value) {
+		double newValue = 0;
+		switch (channelItem.getUnifiedDataType()) {
+		case GPS_LATITUDE:
+		case GPS_LONGITUDE:
+			newValue = value / 1000.;
+			break;
+
+		default:
+			newValue = value * channelItem.getFactor();
+		}
+		return newValue;
+	}
+
+	/**
+	 * Reverse translate a measured value into a normalized histo vault value.</br>
+	 * Data types might require a special normalization (e.g. GPS coordinates).
+	 * This is the equivalent of {@code device.reverseTranslateValue} for data dedicated to the histo vault.
+	 * @return the normalized histo vault value (as a multiplied int for fractional digits support)
+	 */
+	public static double encodeVaultValue(IChannelItem channelItem, double value) {
+		final double newValue;
+		switch (channelItem.getUnifiedDataType()) {
+		case GPS_LATITUDE:
+		case GPS_LONGITUDE:
+			// this might be obsolete as isGPSCoordinates should do the job
+			newValue = value * 1000.;
+			break;
+
+		default:
+			double factor = channelItem.getFactor(); // != 1 if a unit translation is required
+			double offset = channelItem.getOffset(); // != 0 if a unit translation is required
+			double reduction = channelItem.getReduction(); // != 0 if a unit translation is required
+			newValue = (value - offset) / factor + reduction;
+			break;
+		}
+		return newValue;
+	}
+
+	/**
+	 * Translate a normalized histo vault value into to values represented. </br>
+	 * Data types might require a special normalization (e.g. GPS coordinates).
+	 * This is the equivalent of {@code device.translateValue} for data dedicated to the histo vault.
+	 * @return double of device dependent value
+	 */
+	@Deprecated // use method with IChannelItem parameter instead
 	public static double decodeVaultValue(TrailRecord record, double value) {
 		final double newValue;
 		switch (record.getDataType()) {
@@ -162,6 +231,7 @@ public final class HistoSet {
 	 * This is the equivalent of {@code device.translateValue} for data dedicated to the histo vault.
 	 * @return the translated value for a value which represents a difference
 	 */
+	@Deprecated // use method with IChannelItem parameter instead
 	public static double decodeDeltaValue(TrailRecord record, double value) {
 		double newValue = 0;
 		switch (record.getDataType()) {
@@ -182,6 +252,7 @@ public final class HistoSet {
 	 * This is the equivalent of {@code device.reverseTranslateValue} for data dedicated to the histo vault.
 	 * @return the normalized histo vault value (as a multiplied int for fractional digits support)
 	 */
+	@Deprecated // use method with IChannelItem parameter instead
 	public static double encodeVaultValue(Record record, double value) {
 		final double newValue;
 		if (DataExplorer.getInstance().getActiveDevice().isGPSCoordinates(record)) {
