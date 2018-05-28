@@ -118,6 +118,16 @@ public class HistoTestCase extends TestCase {
 	 *
 	 */
 	protected void setHistoSettings() {
+		// wait until schema is setup
+		while (this.settings.isXsdThreadAlive()) {
+			try {
+				Thread.sleep(5);
+			}
+			catch (InterruptedException e) {
+				// ignore
+			}
+		}
+
 		// the next lines only hold settings which do not control the GUI appearance
 		this.settings.setSearchDataPathImports(true);
 		this.settings.setChannelMix(false);
@@ -129,14 +139,14 @@ public class HistoTestCase extends TestCase {
 		this.settings.setAbsoluteTransitionLevel("999"); // results in default value
 		this.settings.setSuppressMode(false);
 		this.settings.setSubDirectoryLevelMax("5");
-		this.settings.setCanonicalQuantiles(true);
-		this.settings.setSymmetricToleranceInterval(true);
-		this.settings.setOutlierToleranceSpread("9");
+		this.settings.setCanonicalQuantiles(false);
+		this.settings.setSymmetricToleranceInterval(false);
+		this.settings.setOutlierToleranceSpread("99999");
 		this.settings.setSourceFileListenerActive(false);
 		this.settings.setDataFoldersCsv("");
 		this.settings.setImportFoldersCsv("");
 		this.settings.setMirrorSourceFoldersCsv("");
-
+		System.out.println("done");
 	}
 
 	/**
