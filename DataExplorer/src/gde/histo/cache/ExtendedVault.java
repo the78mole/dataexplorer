@@ -19,13 +19,10 @@
 
 package gde.histo.cache;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.stream.IntStream;
 
 import com.sun.istack.internal.Nullable;
@@ -54,19 +51,6 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	private static final DataExplorer	application			= DataExplorer.getInstance();
 	private static final Settings			settings				= Settings.getInstance();
 
-	/**
-	 * Criterion for the active device version key cache
-	 */
-	private static Path								activeDevicePath;
-	/**
-	 * Caches the version key for the active device which is calculated only if the device is changed by the user
-	 */
-	private static String							activeDeviceKey;
-	/**
-	 * Caches the version key for the active device which is calculated only if the device is changed by the user
-	 */
-	private static long								activeDeviceLastModified_ms;
-
 	public static Path getCacheDirectory() {
 		return Paths.get(settings.getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
 	}
@@ -91,7 +75,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	public static String getVaultsDirectoryName(String vaultReaderSettings) {
 		final String d = SHA1_DELIMITER;
 
-		String tmpSubDirectoryLongKey = GDE.VERSION + d + getActiveDeviceKey() + d + application.getActiveChannelNumber() //
+		String tmpSubDirectoryLongKey = GDE.VERSION + d + application.getActiveDevice().getDeviceConfiguration().getFileSha1Hash() + d + application.getActiveChannelNumber() //
 				+ d + settings.getSamplingTimespan_ms() + d + settings.getMinmaxQuantileDistance() + d + settings.getAbsoluteTransitionLevel() //
 				+ d + settings.isCanonicalQuantiles() + d + settings.isSymmetricToleranceInterval() + d + settings.getOutlierToleranceSpread() //
 				+ d + vaultReaderSettings;
@@ -139,24 +123,6 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	}
 
 	/**
-	 * Supports key caching which is essential for the system performance.
-	 * @return sha1 key as a unique identifier for the device xml file contents
-	 */
-	public static String getActiveDeviceKey() {
-		File file = new File(application.getActiveDevice().getPropertiesFileName());
-		if (activeDeviceKey == null || activeDevicePath == null || !activeDevicePath.equals(file.toPath()) || activeDeviceLastModified_ms != file.lastModified()) {
-			try {
-				activeDeviceKey = SecureHash.sha1(file);
-				activeDevicePath = file.toPath();
-				activeDeviceLastModified_ms = file.lastModified();
-			} catch (IOException e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
-			}
-		}
-		return activeDeviceKey;
-	}
-
-	/**
 	 * @param histoVault
 	 * @param truss is the vault skeleton with the base data for the new recordset
 	 * @return the extended vault created form the parameters
@@ -194,7 +160,6 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		this.loadLinkPath = Paths.get("");
 
 		this.vaultDataExplorerVersion = GDE.VERSION;
-		this.vaultDeviceKey = getActiveDeviceKey();
 		this.vaultDeviceName = application.getActiveDevice().getName();
 		this.vaultChannelNumber = application.getActiveChannelNumber();
 		this.vaultObjectKey = Settings.getInstance().getActiveObjectKey();

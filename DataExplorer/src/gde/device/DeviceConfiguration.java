@@ -51,6 +51,7 @@ import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.resource.DeviceXmlResource;
+import gde.histo.utils.SecureHash;
 import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
@@ -74,6 +75,7 @@ public class DeviceConfiguration {
 	private final Unmarshaller								unmarshaller;
 	private final Marshaller									marshaller;
 	private File															xmlFile;
+	private String														fileSha1Hash = GDE.STRING_EMPTY;
 	// XML JAXB representation
 	private JAXBElement<DevicePropertiesType>	elememt;
 	private DevicePropertiesType							deviceProps;
@@ -226,6 +228,7 @@ public class DeviceConfiguration {
 		this.unmarshaller = deviceConfig.unmarshaller;
 		this.marshaller = deviceConfig.marshaller;
 		this.xmlFile = deviceConfig.xmlFile;
+		this.fileSha1Hash = deviceConfig.fileSha1Hash;
 		this.elememt = deviceConfig.elememt;
 		this.deviceProps = deviceConfig.deviceProps;
 		this.device = deviceConfig.device;
@@ -246,6 +249,7 @@ public class DeviceConfiguration {
 	public void storeDeviceProperties() {
 		if (this.isChangePropery) {
 			try {
+				this.fileSha1Hash = GDE.STRING_EMPTY;
 				this.marshaller.marshal(this.elememt, new FileOutputStream(this.xmlFile));
 			}
 			catch (Throwable t) {
@@ -261,6 +265,7 @@ public class DeviceConfiguration {
 	 */
 	public void storeDeviceProperties(String fullQualifiedFileName) {
 		try {
+			this.fileSha1Hash = GDE.STRING_EMPTY;
 			this.marshaller.marshal(this.elememt, new FileOutputStream(fullQualifiedFileName));
 		}
 		catch (Throwable t) {
@@ -2689,13 +2694,30 @@ public class DeviceConfiguration {
 		}
 		return dataTableRow;
 	}
-	
+
 	/**
 	 * default implementation returning device name which is the default directory name to store OSD files as well to search for
 	 * @return the preferred directory to search and store for device specific files, this enable for instance MC3000-Set to store all files as well in MC3000 directory
 	 */
 	public String getFileBaseDir() {
 		return this.getName();
+	}
+
+	/**
+	 * @return sha1 key as a unique identifier for the device xml file contents
+	 */
+	public String getFileSha1Hash() {
+		if (this.fileSha1Hash.isEmpty()) setFileSha1Hash();
+		return this.fileSha1Hash;
+	}
+
+	private void setFileSha1Hash() {
+		try {
+			this.fileSha1Hash = SecureHash.sha1(this.xmlFile);
+		} catch (Exception e) {
+			this.fileSha1Hash = GDE.STRING_EMPTY;
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
 	}
 
 }
