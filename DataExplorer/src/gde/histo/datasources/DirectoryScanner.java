@@ -53,7 +53,6 @@ import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.utils.FileUtils;
 import gde.utils.ObjectKeyCompliance;
 
 /**
@@ -61,15 +60,15 @@ import gde.utils.ObjectKeyCompliance;
  * @author Thomas Eickert (USER)
  */
 public final class DirectoryScanner {
-	private final static String	$CLASS_NAME						= DirectoryScanner.class.getName();
-	private final static Logger	log										= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME						= DirectoryScanner.class.getName();
+	private static final Logger	log										= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * Average elapsed time per identified folder during folder scan.</br>
 	 * local drive: 13,5 to 16 ms/folder </br>
 	 * but the full data drive scan may take up to 400 ms.
 	 */
-	private final static int		SLOW_FOLDER_LIMIT_MS	= 222;
+	private static final int		SLOW_FOLDER_LIMIT_MS	= 222;
 
 	private static WatchDir			watchDir;
 	private static Thread				watchDirThread;
@@ -86,7 +85,10 @@ public final class DirectoryScanner {
 	 * @return the data folder residing in the top level working directory (data path + object key resp device)
 	 */
 	public static Path getPrimaryFolder() {
-		return DirectoryType.DATA.getDataSetPath();
+		String activeObjectKey = Settings.getInstance().getActiveObjectKey();
+		String subPathData = activeObjectKey.isEmpty() ? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getPureDeviceName() //
+				: activeObjectKey;
+		return Paths.get(Settings.getInstance().getDataFilePath()).resolve(subPathData);
 	}
 
 	/**
@@ -97,9 +99,8 @@ public final class DirectoryScanner {
 
 		private final EnumSet<DirectoryType>	validatedDirectoryTypes	= EnumSet.noneOf(DirectoryType.class);
 
-		private IDevice												validatedDevice							= null;
-		private Channel												validatedChannel						= null;
-		private String												validatedImportDataLocation	= GDE.STRING_EMPTY;
+		private IDevice												validatedDevice					= null;
+		private Channel												validatedChannel				= null;
 		private String												validatedObjectKey			= GDE.STRING_EMPTY;
 
 		private SourceFolders									lastFolders							= null;
@@ -182,13 +183,6 @@ public final class DirectoryScanner {
 			return this.isMajorChange;
 		}
 
-		@Deprecated
-		public void build4Test(Path filePath) {
-			sourceFolders = new SourceFolders();
-			sourceFolders.defineDirectories4Test(filePath);
-			sourceFolders.values().parallelStream().flatMap(Set::stream).map(Path::toString) //
-					.forEach(FileUtils::checkDirectoryAndCreate);
-		}
 	}
 
 	/**
@@ -261,14 +255,6 @@ public final class DirectoryScanner {
 			boolean slowFolderAccess = elapsed_ms / (foldersCount + 3) > SLOW_FOLDER_LIMIT_MS; // +3 for initial overhead (data path)
 			log.fine(() -> "slowFolderAccess=" + slowFolderAccess + "  numberOfFolders=" + foldersCount + " in " + elapsed_ms + " [ms]");
 			return slowFolderAccess;
-		}
-
-		@Deprecated
-		public void defineDirectories4Test(Path filePath) {
-			Set<Path> paths = new HashSet<>();
-			Path tmpPath = filePath == null ? DirectoryType.DATA.getDataSetPath() : filePath;
-			paths.add(tmpPath);
-			folders.put(DirectoryType.DATA, paths);
 		}
 
 		private void removeDoubleDirectories() {
@@ -422,14 +408,6 @@ public final class DirectoryScanner {
 			}
 
 			@Override
-			public Path getDataSetPath() {
-				String activeObjectKey = Settings.getInstance().getActiveObjectKey();
-				String subPathData = activeObjectKey.isEmpty() ? DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getPureDeviceName() //
-						: activeObjectKey;
-				return Paths.get(Settings.getInstance().getDataFilePath()).resolve(subPathData);
-			}
-
-			@Override
 			public List<String> getDataSetExtensions() {
 				List<String> result = new ArrayList<>();
 				result.add(GDE.FILE_ENDING_OSD);
@@ -469,12 +447,6 @@ public final class DirectoryScanner {
 			}
 
 			@Override
-			@Nullable
-			public Path getDataSetPath() {
-				return null;
-			}
-
-			@Override
 			public List<String> getDataSetExtensions() {
 				if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice)
 					return ((IHistoDevice) DataExplorer.getInstance().getActiveDevice()).getSupportedImportExtentions();
@@ -499,7 +471,7 @@ public final class DirectoryScanner {
 				if (getDataSetExtensions().isEmpty()) {
 					return false;
 				} else {
-					return getDataSetPath() != null || getExternalBaseDirs().anyMatch(e -> true);
+					return getExternalBaseDirs().anyMatch(e -> true);
 				}
 			};
 		};
@@ -507,9 +479,7 @@ public final class DirectoryScanner {
 		/**
 		 * Use this instead of values() to avoid repeatedly cloning actions.
 		 */
-		public static final DirectoryType[]	VALUES			= values();
-
-		private final static DataExplorer		application	= DataExplorer.getInstance();
+		public static final DirectoryType[] VALUES = values();
 
 		/**
 		 * @return the current directory path independent from object / device
@@ -522,12 +492,6 @@ public final class DirectoryScanner {
 		 */
 		@Nullable
 		public abstract Path getActiveDeviceSubPath();
-
-		/**
-		 * @return the current directory path which depends on the object and the device
-		 */
-		@Nullable // if the device does not support imports or if the import path is empty
-		public abstract Path getDataSetPath();
 
 		/**
 		 * @return the supported file extensions (e.g. 'bin') or an empty list
@@ -668,8 +632,4 @@ public final class DirectoryScanner {
 		return sourceFoldersBuilder.isChannelChangeOnly;
 	}
 
-	@Deprecated
-	public void build4Test(Path filePath) {
-		sourceFoldersBuilder.build4Test(filePath);
-	}
 }
