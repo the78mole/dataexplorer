@@ -1461,6 +1461,8 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 		points[5] = DataParser.parse2Short(dataBuffer[15], dataBuffer[14]) * 1000;
 		points[6] = DataParser.parse2Short(dataBuffer[17], dataBuffer[16]) * 1000;
 		points[7] = DataParser.parse2Short(dataBuffer[19], dataBuffer[18]) * 1000;
+		
+		points[8] = DataParser.parse2Short(dataBuffer[26], dataBuffer[25]) * 1000;
 
 		return points;
 	}

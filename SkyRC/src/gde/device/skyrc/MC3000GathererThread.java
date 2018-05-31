@@ -237,6 +237,11 @@ public class MC3000GathererThread extends Thread {
 								else if (this.isProgrammExecuting4)
 									points5[20] = points4[7];
 								
+								points5[21] = points1[8];
+								points5[22] = points2[8];
+								points5[23] = points3[8];
+								points5[24] = points4[8];
+								
 								String processName = Messages.getString(MessageIds.GDE_MSGT3630);
 								Channel slotChannel = this.channels.get(5);
 								if (slotChannel != null) {
@@ -261,6 +266,7 @@ public class MC3000GathererThread extends Thread {
 									}
 								}
 								if (recordSet5 != null) recordSet5.addPoints(points5);
+								
 								if (recordSet5 != null && (recordSet5.get(0).realSize() < 3 || recordSet5.get(0).realSize() % 10 == 0)) {
 									this.device.updateVisibilityStatus(recordSet5, true);
 								}

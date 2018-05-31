@@ -41,7 +41,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -98,14 +98,22 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
             </Measurement>
-            </Channel>
+            <Measurement>
+                <name>voltage avg</name>
+                <symbol>Ua</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="false" max="false" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
+            </Measurement>
+        </Channel>
         <Channel name="type_slot 2" type="TYPE_OUTLET">
             <Measurement>
                 <name>voltage</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -161,6 +169,14 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>voltage avg</name>
+                <symbol>Ua</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="false" max="false" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
             </Measurement>
         </Channel>
         <Channel name="type_slot 3" type="TYPE_OUTLET">
@@ -169,7 +185,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -225,6 +241,14 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>voltage avg</name>
+                <symbol>Ua</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="false" max="false" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
             </Measurement>
         </Channel>
         <Channel name="type_slot 4" type="TYPE_OUTLET">
@@ -233,7 +257,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -290,6 +314,14 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
             </Measurement>
+            <Measurement>
+                <name>voltage avg</name>
+                <symbol>Ua</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="false" max="false" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
+            </Measurement>
         </Channel>
         <Channel name="type_combination 5" type="TYPE_OUTLET">
             <Measurement>
@@ -297,7 +329,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -305,7 +337,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" />
             </Measurement>
@@ -314,7 +346,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" />
             </Measurement>
@@ -323,7 +355,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="0" type="Integer" />
             </Measurement>
@@ -468,7 +500,42 @@
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="12" type="Integer" />
             </Measurement>
-            </Channel>
+            <Measurement>
+                <name>voltage avg1</name>
+                <symbol>Ua</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="false" max="false" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
+            </Measurement>
+            <Measurement>
+                <name>voltage avg2</name>
+                <symbol>Ua</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="false" max="false" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
+                <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
+            </Measurement>
+            <Measurement>
+                <name>voltage avg3</name>
+                <symbol>Ua</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="false" max="false" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
+                <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
+            </Measurement>
+            <Measurement>
+                <name>voltage avg4</name>
+                <symbol>Ua</symbol>
+                <unit>V</unit>
+                <active>true</active>
+                <statistics min="false" max="false" avg="false" sigma="false"/>
+                <property name="factor" value="0.001" type="Double" description="factor to measurement value"/>
+                <property name="scale_sync_ref_ordinal" value="21" type="Integer" />
+            </Measurement>
+    	</Channel>
     </Channels>
     <Desktop>
         <property name="table_tab" value="true"/>
