@@ -293,9 +293,6 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 */
 	protected Vector<? extends AbstractRecord>	displayRecords;
 
-	protected double														maxValue												= Integer.MIN_VALUE;
-	protected double														minValue												= Integer.MAX_VALUE;
-
 	public static final String									TIME_STEP_MS										= "timeStep_ms";														//$NON-NLS-1$
 	public static final String									START_TIME_STAMP								= "startTimeStamp";													//$NON-NLS-1$
 	protected static final String								TIME														= "time";																		//$NON-NLS-1$
@@ -534,34 +531,6 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	}
 
 	/**
-	 * @return the maxValue
-	 */
-	public double getMaxValue() {
-		return this.maxValue;
-	}
-
-	/**
-	 * @param newMaxValue the maxValue to set
-	 */
-	public void setMaxValue(double newMaxValue) {
-		this.maxValue = newMaxValue;
-	}
-
-	/**
-	 * @return the minValue
-	 */
-	public double getMinValue() {
-		return this.minValue;
-	}
-
-	/**
-	 * @param newMinValue the minValue to set
-	 */
-	public void setMinValue(double newMinValue) {
-		this.minValue = newMinValue;
-	}
-
-	/**
 	 * @return the channel/configuration number
 	 */
 	public int getChannelConfigNumber() {
@@ -736,7 +705,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 
 	@Override
 	public String toString() {
-		return "AbstractRecordSet [realSize=" + this.realSize() + ", hasDisplayableData=" + this.hasDisplayableData + ", visibleAndDisplayableRecordSize=" + this.visibleAndDisplayableRecords.size() + ", displayRecordSize=" + this.displayRecords.size() + ", maxValue=" + this.maxValue + ", minValue=" + this.minValue + "]";
+		return "AbstractRecordSet [realSize=" + this.realSize() + ", hasDisplayableData=" + this.hasDisplayableData + ", visibleAndDisplayableRecordSize=" + this.visibleAndDisplayableRecords.size() + ", displayRecordSize=" + this.displayRecords.size() + "]";
 	}
 
 }

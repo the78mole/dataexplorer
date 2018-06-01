@@ -287,7 +287,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			Outliers minWarning = null;
 			Outliers maxWarning = null;
 
-			int warningLevel = settings.getWarningLevel();
+			int warningLevel = Settings.getInstance().getWarningLevel();
 			if (warningLevel == -1) return new Outliers[] { null, null };
 
 			double[][] minMaxQuantiles = defineExtremumQuantiles(get(recordName));
@@ -455,7 +455,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		private double[] getExtrema(String recordName, List<Double> decodedLowValues, List<Double> decodedHighValues) {
 			ElementaryQuantile<Double> minQuantile = new ElementaryQuantile<>(decodedLowValues, true);
 			ElementaryQuantile<Double> maxQuantile = new ElementaryQuantile<>(decodedHighValues, true);
-			int scaleSpread = settings.getSummaryScaleSpread();
+			int scaleSpread = Settings.getInstance().getSummaryScaleSpread();
 			double scaleMin = minQuantile.getExtremumFromRange(UniversalQuantile.INTER_QUARTILE_SIGMA_FACTOR, -scaleSpread);
 			double scaleMax = maxQuantile.getExtremumFromRange(UniversalQuantile.INTER_QUARTILE_SIGMA_FACTOR, scaleSpread);
 			double[] result = new double[] { Math.min(minQuantile.getQuantileLowerWhisker(), scaleMin),
@@ -505,8 +505,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				Stream<Integer> scoregroupPoints = scoreOrdinals.stream().map(t -> get(recordName).getVaultPoint(v, t));
 				DoubleSummaryStatistics stats = scoregroupPoints.map(i -> HistoSet.decodeVaultValue(get(recordName), i / 1000.)) //
 						.collect(Collectors.summarizingDouble(Double::doubleValue));
-				minValue = Math.min(minValue, stats.getMin());
-				maxValue = Math.max(maxValue, stats.getMax());
 			});
 
 			if (minMaxValues[0] == -Double.MAX_VALUE || minMaxValues[1] == Double.MIN_VALUE) {

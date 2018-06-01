@@ -77,6 +77,9 @@ public final class RecordSet extends AbstractRecordSet {
 	int														xScaleStep										= 0;																																																										// steps in x direction to draw the curves, normally 1
 	Rectangle											drawAreaBounds;
 
+	protected double														maxValue												= Integer.MIN_VALUE;
+	protected double														minValue												= Integer.MAX_VALUE;
+
 	// for compare set x min/max and y max (time) might be different
 	boolean												isCompareSet									= false;
 	boolean												isUtilitySet									= false;
@@ -1104,6 +1107,34 @@ public final class RecordSet extends AbstractRecordSet {
 			}
 		}
 		return size;
+	}
+
+	/**
+	 * @return the maxValue
+	 */
+	public double getMaxValue() {
+		return this.maxValue;
+	}
+
+	/**
+	 * @param newMaxValue the maxValue to set
+	 */
+	public void setMaxValue(double newMaxValue) {
+		this.maxValue = newMaxValue;
+	}
+
+	/**
+	 * @return the minValue
+	 */
+	public double getMinValue() {
+		return this.minValue;
+	}
+
+	/**
+	 * @param newMinValue the minValue to set
+	 */
+	public void setMinValue(double newMinValue) {
+		this.minValue = newMinValue;
 	}
 
 	/**
