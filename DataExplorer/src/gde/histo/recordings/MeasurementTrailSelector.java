@@ -51,13 +51,13 @@ public final class MeasurementTrailSelector extends TrailSelector {
 		for (int i = 0; i < applicablePrimitiveTrails.length; i++) {
 			if (applicablePrimitiveTrails[i]) {
 				this.applicableTrailsOrdinals.add(i);
-				this.applicableTrailsTexts.add(TrailTypes.VALUES[i].getDisplayNameWithTriggerText(trailRecord.channelItem).intern());
+				this.applicableTrailsTexts.add(TrailTypes.VALUES[i].getDisplayNameWithTriggerText(channelItem));
 			}
 		}
 
 		setApplicableSuiteTrails();
-		log.finer(() -> this.trailRecord.getName() + " texts " + this.applicableTrailsTexts); //$NON-NLS-1$
-		log.finer(() -> this.trailRecord.getName() + " ordinals " + this.applicableTrailsOrdinals); //$NON-NLS-1$
+		log.finer(() -> recordName + " texts " + this.applicableTrailsTexts);
+		log.finer(() -> recordName + " ordinals " + this.applicableTrailsOrdinals);
 	}
 
 	/**
@@ -66,7 +66,7 @@ public final class MeasurementTrailSelector extends TrailSelector {
 	 */
 	private boolean[] getApplicablePrimitiveTrails() {
 		final boolean[] applicablePrimitiveTrails;
-		Optional<TrailDisplayType> trailDisplay = trailRecord.channelItem.getTrailDisplay();
+		Optional<TrailDisplayType> trailDisplay = channelItem.getTrailDisplay();
 		if (trailDisplay.map(TrailDisplayType::getDefaultTrail).map(TrailTypes::isSuite).orElse(false)) throw new UnsupportedOperationException(
 				"suite trail must not be a device measurement default");
 
@@ -74,24 +74,24 @@ public final class MeasurementTrailSelector extends TrailSelector {
 		if (hideAllTrails) {
 			applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
 			trailDisplay.ifPresent(x -> x.getExposed().stream().map(TrailVisibilityType::getTrail) //
-					.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == trailRecord.getParent().isSmartStatistics()) //
+					.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == smartStatistics) //
 					.forEach(t -> applicablePrimitiveTrails[t.ordinal()] = true));
 		} else {
 			applicablePrimitiveTrails = getApplicableLegacyTrails();
 			// set non-suite trail types : triggered values like count/sum are not supported
 			TrailTypes.getPrimitives().stream() //
-					.filter(t -> !t.isTriggered()).filter(t -> t.isSmartStatistics() == trailRecord.getParent().isSmartStatistics()) //
+					.filter(t -> !t.isTriggered()).filter(t -> t.isSmartStatistics() == smartStatistics) //
 					.forEach(t -> applicablePrimitiveTrails[t.ordinal()] = true);
 			// set visible and reset hidden trails based on device settlement settings
 			trailDisplay.ifPresent(x -> x.getDisclosed().stream().map(TrailVisibilityType::getTrail) //
-					.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == trailRecord.getParent().isSmartStatistics()) //
+					.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == smartStatistics) //
 					.forEach(t -> applicablePrimitiveTrails[t.ordinal()] = false));
 		}
 
 		// set at least one trail if no trail is applicable
 		if (!hasTrueValues(applicablePrimitiveTrails))
 			applicablePrimitiveTrails[trailDisplay.map(TrailDisplayType::getDefaultTrail).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
-		log.finer(() -> this.trailRecord.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
+		log.finer(() -> recordName + " data " + Arrays.toString(applicablePrimitiveTrails));
 		return applicablePrimitiveTrails;
 	}
 
@@ -109,13 +109,13 @@ public final class MeasurementTrailSelector extends TrailSelector {
 	private boolean[] getApplicableLegacyTrails() {
 		final boolean[] applicablePrimitiveTrails;
 		applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
-		StatisticsType measurementStatistics = ((MeasurementType) trailRecord.channelItem).getStatistics();
-		if (trailRecord.getParent().isSmartStatistics()) {
+		StatisticsType measurementStatistics = ((MeasurementType) channelItem).getStatistics();
+		if (smartStatistics) {
 			if (measurementStatistics != null) {
 				if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 					applicablePrimitiveTrails[TrailTypes.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
 					if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-						StatisticsType referencedStatistics = DataExplorer.application.getActiveDevice().getMeasurementStatistic(this.trailRecord.getParent().getChannelConfigNumber(), measurementStatistics.getRatioRefOrdinal());
+						StatisticsType referencedStatistics = DataExplorer.application.getActiveDevice().getMeasurementStatistic(channelConfigNumber, measurementStatistics.getRatioRefOrdinal());
 						applicablePrimitiveTrails[TrailTypes.REAL_AVG_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isAvg();
 						applicablePrimitiveTrails[TrailTypes.REAL_MAX_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isMax();
 					}

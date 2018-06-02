@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import gde.GDE;
-import gde.config.Settings;
+import gde.device.IChannelItem;
 import gde.device.TrailDisplayType;
 import gde.device.TrailTypes;
 import gde.device.TrailVisibilityType;
@@ -37,14 +37,16 @@ import gde.log.Logger;
  * Handle the trail type assignment to a trailRecord.
  * @author Thomas Eickert (USER)
  */
-public abstract class TrailSelector { // todo consider integrating the selector classes in the trail record classes
+public abstract class TrailSelector {
 	private static final String				$CLASS_NAME							= TrailSelector.class.getName();
 	protected static final Logger			log											= Logger.getLogger($CLASS_NAME);
 
-	protected final Settings					settings								= Settings.getInstance();
 	protected final DeviceXmlResource	xmlResource							= DeviceXmlResource.getInstance();
 
-	protected final TrailRecord				trailRecord;
+	protected final IChannelItem			channelItem;
+	protected final String						recordName;
+	protected final boolean						smartStatistics;
+	protected final int								channelConfigNumber;
 
 	/**
 	 * User selection from applicable trails, is saved in the graphics template
@@ -64,7 +66,10 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 	protected int[]										extremumIndices					= null;
 
 	protected TrailSelector(TrailRecord trailRecord) {
-		this.trailRecord = trailRecord;
+		this.channelItem = trailRecord.channelItem;
+		this.recordName = trailRecord.getName();
+		this.smartStatistics = trailRecord.getParent().isSmartStatistics();
+		this.channelConfigNumber = trailRecord.getParent().getChannelConfigNumber();
 	}
 
 	/**
@@ -72,8 +77,8 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 	 */
 	public void setMostApplicableTrailTextOrdinal() {
 		int displaySequence = Integer.MAX_VALUE;
-		for (int i = 0; i < this.applicableTrailsOrdinals.size(); i++) {
-			int tmpDisplaySequence = (TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(i))).getDisplaySequence();
+		for (int i = 0; i < applicableTrailsOrdinals.size(); i++) {
+			int tmpDisplaySequence = (TrailTypes.fromOrdinal(applicableTrailsOrdinals.get(i))).getDisplaySequence();
 			if (tmpDisplaySequence < displaySequence) {
 				displaySequence = tmpDisplaySequence;
 				setTrailTextSelectedIndex(i);
@@ -97,7 +102,7 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 	 * @return display text for the trail (may have been modified due to special texts for triggers)
 	 */
 	public String getTrailText() {
-		return this.applicableTrailsTexts.size() == 0 ? GDE.STRING_EMPTY : this.applicableTrailsTexts.get(this.trailTextSelectedIndex);
+		return applicableTrailsTexts.size() == 0 ? GDE.STRING_EMPTY : applicableTrailsTexts.get(trailTextSelectedIndex);
 	}
 
 	public List<String> getApplicableTrailsTexts() {
@@ -137,7 +142,7 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 	 */
 	public int[] getExtremumTrailsOrdinals() {
 		if (extremumIndices == null) setExtremumIndices();
-		return new int[] { this.applicableTrailsOrdinals.get(extremumIndices[0]), this.applicableTrailsOrdinals.get(extremumIndices[1]) };
+		return new int[] { applicableTrailsOrdinals.get(extremumIndices[0]), applicableTrailsOrdinals.get(extremumIndices[1]) };
 	}
 
 	/**
@@ -161,18 +166,18 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 	 */
 	protected void setExtremumIndices() {
 		int indexMin = -1, indexMax = -1;
-		for (int i = 0; i < this.applicableTrailsOrdinals.size(); i++) {
-			if (this.applicableTrailsOrdinals.get(i) == TrailTypes.Q0.ordinal()) {
+		for (int i = 0; i < applicableTrailsOrdinals.size(); i++) {
+			if (applicableTrailsOrdinals.get(i) == TrailTypes.Q0.ordinal()) {
 				indexMin = i;
-			} else if (this.applicableTrailsOrdinals.get(i) == TrailTypes.Q4.ordinal()) {
+			} else if (applicableTrailsOrdinals.get(i) == TrailTypes.Q4.ordinal()) {
 				indexMax = i;
 			}
 		}
 		if (indexMin == -1 || indexMax == -1) {
-			for (int i = 0; i < this.applicableTrailsOrdinals.size(); i++) {
-				if (this.applicableTrailsOrdinals.get(i) == TrailTypes.MIN.ordinal()) {
+			for (int i = 0; i < applicableTrailsOrdinals.size(); i++) {
+				if (applicableTrailsOrdinals.get(i) == TrailTypes.MIN.ordinal()) {
 					indexMin = i;
-				} else if (this.applicableTrailsOrdinals.get(i) == TrailTypes.MAX.ordinal()) {
+				} else if (applicableTrailsOrdinals.get(i) == TrailTypes.MAX.ordinal()) {
 					indexMax = i;
 				}
 			}
@@ -187,31 +192,31 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 	public abstract void setApplicableTrails();
 
 	protected void setApplicableSuiteTrails() {
-		Optional<TrailDisplayType> trailDisplay = trailRecord.channelItem.getTrailDisplay();
+		Optional<TrailDisplayType> trailDisplay = channelItem.getTrailDisplay();
 		if (trailDisplay.isPresent()) {
 			final List<TrailTypes> displayTrails;
 			boolean hideAllTrails = trailDisplay.map(TrailDisplayType::isDiscloseAll).orElse(false);
 			if (hideAllTrails) {
 				displayTrails = trailDisplay.map(x -> x.getExposed().stream().map(TrailVisibilityType::getTrail) //
-						.filter(TrailTypes::isSuite).filter(t -> t.isSmartStatistics() == this.trailRecord.getParent().isSmartStatistics()) //
+						.filter(TrailTypes::isSuite).filter(t -> t.isSmartStatistics() == smartStatistics) //
 						.collect(Collectors.toList())).orElse(new ArrayList<TrailTypes>());
 			} else {
 				List<TrailTypes> disclosedTrails = trailDisplay.map(x -> x.getDisclosed().stream().map(TrailVisibilityType::getTrail) //
-						.filter(TrailTypes::isSuite).filter(t -> t.isSmartStatistics() == this.trailRecord.getParent().isSmartStatistics()) //
+						.filter(TrailTypes::isSuite).filter(t -> t.isSmartStatistics() == smartStatistics) //
 						.collect(Collectors.toList())).orElse(new ArrayList<TrailTypes>());
 				displayTrails = TrailTypes.getSuites().stream() //
-						.filter(t -> !disclosedTrails.contains(t)).filter(t -> t.isSmartStatistics() == this.trailRecord.getParent().isSmartStatistics()) //
+						.filter(t -> !disclosedTrails.contains(t)).filter(t -> t.isSmartStatistics() == smartStatistics) //
 						.collect(Collectors.toList());
 			}
 			for (TrailTypes suiteTrailType : displayTrails) {
-				this.applicableTrailsOrdinals.add(suiteTrailType.ordinal());
-				this.applicableTrailsTexts.add(suiteTrailType.getDisplayName().intern());
+				applicableTrailsOrdinals.add(suiteTrailType.ordinal());
+				applicableTrailsTexts.add(suiteTrailType.getDisplayName().intern());
 			}
 		} else {
 			for (TrailTypes suiteTrailType : TrailTypes.getSuites()) {
-				if (suiteTrailType.isSmartStatistics() == this.trailRecord.getParent().isSmartStatistics()) {
-					this.applicableTrailsOrdinals.add(suiteTrailType.ordinal());
-					this.applicableTrailsTexts.add(suiteTrailType.getDisplayName().intern());
+				if (suiteTrailType.isSmartStatistics() == smartStatistics) {
+					applicableTrailsOrdinals.add(suiteTrailType.ordinal());
+					applicableTrailsTexts.add(suiteTrailType.getDisplayName().intern());
 				}
 			}
 		}
@@ -219,7 +224,7 @@ public abstract class TrailSelector { // todo consider integrating the selector 
 
 	@Override
 	public String toString() {
-		return "TrailSelector [" + this.trailRecord.getName() + " trailTextSelectedIndex=" + this.trailTextSelectedIndex + " " + this.getTrailText() + ", applicableTrailsTexts=" + this.applicableTrailsTexts + ", applicableTrailsOrdinals=" + this.applicableTrailsOrdinals + ", extremumIndices=" + Arrays.toString(this.extremumIndices) + "]";
+		return "TrailSelector [" + recordName + " trailTextSelectedIndex=" + this.trailTextSelectedIndex + " " + this.getTrailText() + ", applicableTrailsTexts=" + this.applicableTrailsTexts + ", applicableTrailsOrdinals=" + this.applicableTrailsOrdinals + ", extremumIndices=" + Arrays.toString(this.extremumIndices) + "]";
 	}
 
 }

@@ -39,7 +39,7 @@ public final class SettlementTrailSelector extends TrailSelector {
 
 	@Override
 	public void setApplicableTrails() {
-		if (trailRecord.channelItem.getTrailDisplay().map(TrailDisplayType::getDefaultTrail).map(TrailTypes::isSuite).orElse(false))
+		if (channelItem.getTrailDisplay().map(TrailDisplayType::getDefaultTrail).map(TrailTypes::isSuite).orElse(false))
 			throw new UnsupportedOperationException("suite trail must not be a device settlement default");
 		final boolean[] applicablePrimitiveTrails = getApplicablePrimitiveTrails();
 
@@ -54,8 +54,8 @@ public final class SettlementTrailSelector extends TrailSelector {
 		}
 
 		setApplicableSuiteTrails();
-		log.finer(() -> this.trailRecord.getName() + " texts " + this.applicableTrailsTexts); //$NON-NLS-1$
-		log.finer(() -> this.trailRecord.getName() + " ordinals " + this.applicableTrailsOrdinals); //$NON-NLS-1$
+		log.finer(() -> recordName + " texts " + this.applicableTrailsTexts);
+		log.finer(() -> recordName + " ordinals " + this.applicableTrailsOrdinals);
 	}
 
 	/**
@@ -64,12 +64,12 @@ public final class SettlementTrailSelector extends TrailSelector {
 	 */
 	public boolean[] getApplicablePrimitiveTrails() {
 		boolean[] applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
-		Optional<TrailDisplayType> trailDisplay = trailRecord.channelItem.getTrailDisplay();
+		Optional<TrailDisplayType> trailDisplay = channelItem.getTrailDisplay();
 
 		// set quantile-based non-suite trail types : triggered value sum are CURRENTLY not supported
 		if (!trailDisplay.map(TrailDisplayType::isDiscloseAll).orElse(false)) {
-			if (((SettlementType) trailRecord.channelItem).getEvaluation().getTransitionAmount() == null)
-				TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == trailRecord.getParent().isSmartStatistics()).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
+			if (((SettlementType) channelItem).getEvaluation().getTransitionAmount() == null)
+				TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == smartStatistics).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
 			else
 				throw new UnsupportedOperationException("TransitionAmount not implemented"); //$NON-NLS-1$
 		}
@@ -86,7 +86,7 @@ public final class SettlementTrailSelector extends TrailSelector {
 		}
 		if (!hasApplicablePrimitiveTrails)
 			applicablePrimitiveTrails[trailDisplay.map(TrailDisplayType::getDefaultTrail).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
-		log.finer(() -> this.trailRecord.getName() + " data " + Arrays.toString(applicablePrimitiveTrails)); //$NON-NLS-1$
+		log.finer(() -> recordName + " data " + Arrays.toString(applicablePrimitiveTrails));
 		return applicablePrimitiveTrails;
 	}
 

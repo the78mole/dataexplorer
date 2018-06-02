@@ -45,18 +45,18 @@ public final class ScoregroupTrailSelector extends TrailSelector {
 		this.applicableTrailsOrdinals = new ArrayList<Integer>();
 		this.applicableTrailsTexts = new ArrayList<String>();
 		// if (this.trailRecord.channelItem != null) {
-		List<ScoreType> scoreTypes = ((ScoreGroupType) trailRecord.channelItem).getScore();
+		List<ScoreType> scoreTypes = ((ScoreGroupType) channelItem).getScore();
 		for (int i = 0; i < scoreTypes.size(); i++) {
 			this.applicableTrailsOrdinals.add(scoreTypes.get(i).getTrailOrdinal());
 			this.applicableTrailsTexts.add(getDeviceXmlReplacement(scoreTypes.get(i).getValue()));
 		}
-		log.finer(() -> this.trailRecord.getName() + " score "); //$NON-NLS-1$
+		log.finer(() -> recordName + " score ");
 		// }
 	}
 
 	@Override
 	protected void setExtremumIndices() {
-		List<ScoreType> scoreTypes = ((ScoreGroupType) trailRecord.channelItem).getScore();
+		List<ScoreType> scoreTypes = ((ScoreGroupType) channelItem).getScore();
 		// find the score labels with a name containing min/max
 		int index4Min = -1, index4Max = -1;
 		for (int i = 0; i < this.applicableTrailsOrdinals.size(); i++) {
