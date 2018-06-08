@@ -1231,12 +1231,12 @@ public class SettingsDialog extends Dialog {
 									this.histoIgnoreLogObjectKey.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.histoIgnoreLogObjectKey.setText(Messages.getString(MessageIds.GDE_MSGT0796));
 									this.histoIgnoreLogObjectKey.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0797));
-									this.histoIgnoreLogObjectKey.setSelection(this.settings.getFilesWithOtherObject());
+									this.histoIgnoreLogObjectKey.setSelection(this.settings.getIgnoreLogObjectKey());
 									this.histoIgnoreLogObjectKey.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoIgnoreLogObjectKey.widgetSelected, event=" + evt); //$NON-NLS-1$
-											SettingsDialog.this.settings.setFilesWithOtherObject(SettingsDialog.this.histoIgnoreLogObjectKey.getSelection());
+											SettingsDialog.this.settings.setIgnoreLogObjectKey(SettingsDialog.this.histoIgnoreLogObjectKey.getSelection());
 											SettingsDialog.this.application.getHistoExplorer().ifPresent(HistoExplorer::resetHisto);
 										}
 									});

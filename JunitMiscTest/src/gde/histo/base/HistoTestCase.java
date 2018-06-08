@@ -122,7 +122,7 @@ public class HistoTestCase extends TestCase {
 		this.settings.setSearchDataPathImports(true);
 		this.settings.setChannelMix(false);
 		this.settings.setSamplingTimespan_ms("2"); // this index corresponds to 1 sec
-		this.settings.setFilesWithOtherObject(true);
+		this.settings.setIgnoreLogObjectKey(true);
 		this.settings.setRetrospectMonths("120"); // this is the current maximum value
 		this.settings.setZippedCache(false);
 		this.settings.setAbsoluteTransitionLevel("999"); // results in default value

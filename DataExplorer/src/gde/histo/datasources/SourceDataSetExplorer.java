@@ -79,12 +79,12 @@ public class SourceDataSetExplorer {
 		final long					minStartTimeStamp_ms		= LocalDate.now().minusMonths(Settings.getInstance().getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		// use criteria independent from UI for JUnit (replace isObjectoriented)
 		final String				activeObjectKey					= Settings.getInstance().getActiveObjectKey();
-		final boolean				filesWithOtherObject		= Settings.getInstance().getFilesWithOtherObject();
+		final boolean				ignoreLogObjectKey			= Settings.getInstance().getIgnoreLogObjectKey();
 		final Set<String>		realObjectKeys					= Settings.getInstance().getRealObjectKeys().collect(Collectors.toSet());
 
 		@Override
 		public String toString() {
-			return "TrussCriteria [channelMixConfigNumbers=" + this.channelMixConfigNumbers + ", minStartTimeStamp_ms=" + this.minStartTimeStamp_ms + ", filesWithOtherObject=" + this.filesWithOtherObject + ", realObjectKeys=" + this.realObjectKeys + "]";
+			return "TrussCriteria [channelMixConfigNumbers=" + this.channelMixConfigNumbers + ", minStartTimeStamp_ms=" + this.minStartTimeStamp_ms + ", filesWithOtherObject=" + this.ignoreLogObjectKey + ", realObjectKeys=" + this.realObjectKeys + "]";
 		}
 	}
 
@@ -140,8 +140,7 @@ public class SourceDataSetExplorer {
 				return new OsdDataSet(absolutePath);
 			else if (DataExplorer.getInstance().getActiveDevice() instanceof IHistoDevice) {
 				List<String> importExtentions = ((IHistoDevice) DataExplorer.getInstance().getActiveDevice()).getSupportedImportExtentions();
-				if (importExtentions.contains(extension))
-					return new ImportDataSet(absolutePath); // todo implement logDataSet and native HottLogReader
+				if (importExtentions.contains(extension)) return new ImportDataSet(absolutePath); // todo implement logDataSet and native HottLogReader
 			}
 			return null;
 		}
@@ -337,13 +336,13 @@ public class SourceDataSetExplorer {
 				log.info(() -> String.format("objectKey=%8s%,7d kiB %s", "empty", vault.getLoadFileAsPath().toFile().length() / 1024, vault.getLoadFileAsPath().toString()));
 			} else {
 				if (vault.getLogObjectKey().isEmpty()) {
-					if (trussCriteria.filesWithOtherObject) return true;
+					if (trussCriteria.ignoreLogObjectKey) return true;
 					log.info(() -> String.format("objectKey:%8s%,7d kiB %s", "empty", vault.getLoadFileAsPath().toFile().length() / 1024, vault.getLoadFileAsPath().toString()));
 					return false;
 				}
 				boolean matchingObjectKey = trussCriteria.realObjectKeys.stream().anyMatch(s -> s.equalsIgnoreCase(vault.getLogObjectKey().trim()));
 				if (!matchingObjectKey) {
-					if (trussCriteria.filesWithOtherObject) return true;
+					if (trussCriteria.ignoreLogObjectKey) return true;
 					boolean matchingObjectDirectory = trussCriteria.realObjectKeys.stream().anyMatch(s -> s.equalsIgnoreCase(vault.getLoadObjectDirectory()));
 					if (matchingObjectDirectory) return true;
 					log.info(() -> String.format("objectKey=%8s%,7d kiB %s", vault.getRectifiedObjectKey(), vault.getLoadFileAsPath().toFile().length() / 1024, vault.getLoadFileAsPath().toString()));
@@ -454,7 +453,7 @@ public class SourceDataSetExplorer {
 			if (!trussCriteria.activeObjectKey.isEmpty()) {
 				boolean consistentObjectKey = vault.getLogObjectKey().equalsIgnoreCase(trussCriteria.activeObjectKey);
 				if (!consistentObjectKey) {
-					if (trussCriteria.filesWithOtherObject) return true;
+					if (trussCriteria.ignoreLogObjectKey) return true;
 					log.info(() -> String.format("objectKey=%8s%,7d kiB %s", vault.getRectifiedObjectKey(), vault.getLoadFileAsPath().toFile().length() / 1024, vault.getLoadFileAsPath().toString()));
 					return false;
 				}
