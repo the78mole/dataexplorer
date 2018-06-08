@@ -218,7 +218,6 @@ public class TestSuperClass extends TestCase {
 		this.settings.setSearchDataPathImports(true);
 		this.settings.setChannelMix(false);
 		this.settings.setSamplingTimespan_ms("2"); // this index corresponds to 1 sec
-		this.settings.setFilesWithoutObject(true);
 		this.settings.setFilesWithOtherObject(true);
 		this.settings.setRetrospectMonths("120"); // this is the current maximum value
 //	this.settings.setZippedCache(false); // keep the users setting in order not to delete any user cache entries

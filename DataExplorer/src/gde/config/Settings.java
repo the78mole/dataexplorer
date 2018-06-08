@@ -155,7 +155,6 @@ public class Settings extends Properties {
 	final static String							SEARCH_DATAPATH_IMPORTS					= "search_datapath_imports";																																			//$NON-NLS-1$
 	final static String							IS_CHANNEL_MIX									= "is_channel_mix";																																								//$NON-NLS-1$
 	final static String							SAMPLING_TIMESPAN_ORDINAL				= "sampling_timespan_ordinal";																																		//$NON-NLS-1$
-	final static String							FILES_WITHOUT_OBJECT						= "files_without_object";																																					//$NON-NLS-1$
 	final static String							FILES_WITH_OTHER_OBJECT					= "files_with_other_object";																																			//$NON-NLS-1$
 	final static String							RETROSPECT_MONTHS								= "retrospect_months";																																						//$NON-NLS-1$
 	final static String							IS_ZIPPED_CACHE									= "zipped_cache";																																									//$NON-NLS-1$
@@ -781,7 +780,6 @@ public class Settings extends Properties {
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_DATAPATH_IMPORTS, getSearchDataPathImports())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CHANNEL_MIX, isChannelMix())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SAMPLING_TIMESPAN_ORDINAL, getSamplingTimespanOrdinal())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.FILES_WITHOUT_OBJECT, getFilesWithoutObject())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.FILES_WITH_OTHER_OBJECT, getFilesWithOtherObject())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ZIPPED_CACHE, isZippedCache())); //$NON-NLS-1$
 			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MINMAX_QUANTILE_DISTANCE, getMinmaxQuantileDistance())); //$NON-NLS-1$
@@ -2616,20 +2614,6 @@ public class Settings extends Properties {
 	 */
 	public int getSamplingTimespanOrdinal() {
 		return Integer.parseInt(this.getProperty(Settings.SAMPLING_TIMESPAN_ORDINAL, String.valueOf(2)));
-	}
-
-	/**
-	 * @param value true if the history should select files in the object directory which do not hold the object key internally
-	 */
-	public void setFilesWithoutObject(boolean value) {
-		this.setProperty(Settings.FILES_WITHOUT_OBJECT, String.valueOf(value));
-	}
-
-	/**
-	 * @return true if the history should select files in the object directory which do not hold the object key internally
-	 */
-	public boolean getFilesWithoutObject() {
-		return Boolean.valueOf(this.getProperty(Settings.FILES_WITHOUT_OBJECT, "true")); //$NON-NLS-1$
 	}
 
 	/**
