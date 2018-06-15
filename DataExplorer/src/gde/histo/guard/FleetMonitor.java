@@ -66,18 +66,18 @@ public final class FleetMonitor {
 
 	static final class ObjectSummary {
 
-		String						objectKey;
-		String						vaultDeviceName;
+		String					objectKey;
+		String					vaultDeviceName;
 
-		int								vaultCount					= 0;
-		long							minFileLastModified	= Long.MAX_VALUE;
-		long							maxFileLastModified	= 0;
-		long							minStartTimestampMs	= Long.MAX_VALUE;
-		long							maxStartTimestampMs	= 0;
-		int								minDuration_MM			= Integer.MAX_VALUE;
-		int								maxDuration_MM			= 0;
-		ReminderType[]	minReminders					= new ReminderType[] { ReminderType.NONE, ReminderType.NONE };
-		ReminderType[]	maxReminders					= new ReminderType[] { ReminderType.NONE, ReminderType.NONE };
+		int							vaultCount					= 0;
+		long						minFileLastModified	= Long.MAX_VALUE;
+		long						maxFileLastModified	= 0;
+		long						minStartTimestampMs	= Long.MAX_VALUE;
+		long						maxStartTimestampMs	= 0;
+		int							minDuration_MM			= Integer.MAX_VALUE;
+		int							maxDuration_MM			= 0;
+		ReminderType[]	minReminders				= new ReminderType[] { ReminderType.NONE, ReminderType.NONE };
+		ReminderType[]	maxReminders				= new ReminderType[] { ReminderType.NONE, ReminderType.NONE };
 
 		/**
 		 * Supports arbitrary selection of vaults, e.g. mixed channels
@@ -133,7 +133,7 @@ public final class FleetMonitor {
 			}
 
 			String deviceSignature = deviceName + GDE.STRING_UNDER_BAR + channelNumber;
-			HistoGraphicsTemplate template = HistoGraphicsTemplate.createGraphicsTemplate(deviceSignature, objectKey);
+			HistoGraphicsTemplate template = HistoGraphicsTemplate.createReadonlyTemplate(deviceSignature, objectKey);
 			template.load();
 			boolean smartStatistics = Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true"));
 

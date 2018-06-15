@@ -43,9 +43,10 @@ public final class ObjectGraphicsTemplate extends HistoGraphicsTemplate {
 	/**
 	 * Constructor using the application home path and the device signature as initialization parameter.
 	 * @param deviceSignature - device signature as String (Picolario_K1)
+	 * @param noNewFile true suppresses the object template file creation
 	 */
-	protected ObjectGraphicsTemplate(String deviceSignature, String objectFolderName) {
-		super(deviceSignature);
+	protected ObjectGraphicsTemplate(String deviceSignature, String objectFolderName, boolean noNewFile) {
+		super(deviceSignature, noNewFile);
 		this.objectFolderName = objectFolderName;
 	}
 
@@ -57,7 +58,8 @@ public final class ObjectGraphicsTemplate extends HistoGraphicsTemplate {
 
 	/**
 	 * Load the properties from the object template file.
-	 * Alternatively browse the default path for a valid file.
+	 * Alternatively browse the default path for a valid file and
+	 * copy this file in the object template directory (except the readonly attribute is set).
 	 */
 	@Override
 	public void load() {

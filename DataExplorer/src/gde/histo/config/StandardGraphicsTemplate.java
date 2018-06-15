@@ -35,8 +35,8 @@ public class StandardGraphicsTemplate extends HistoGraphicsTemplate {
 	/**
 	 * @see gde.histo.config.HistoGraphicsTemplate
 	 */
-	protected StandardGraphicsTemplate(String deviceSignature) {
-		super(deviceSignature);
+	protected StandardGraphicsTemplate(String deviceSignature, boolean noNewFile) {
+		super(deviceSignature, noNewFile);
 	}
 
 	@Override
