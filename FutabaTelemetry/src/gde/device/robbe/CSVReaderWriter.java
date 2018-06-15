@@ -258,6 +258,12 @@ public class CSVReaderWriter {
 						record.setDataType(Record.DataType.GPS_LONGITUDE);
 					else if (record.getUnit().contains("°") && record.getUnit().contains("'") && (record.getName().toLowerCase().contains("lat") || record.getName().toLowerCase().contains("breit")))
 						record.setDataType(Record.DataType.GPS_LATITUDE);
+					
+					MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, tmpRecordNames[i]);
+					measurement.setName(tmpRecordNames[i]);
+					measurement.setSymbol(tmpRecordSymbols[i]);
+					measurement.setUnit(tmpRecordUnits[i]);
 				}
 
 				//correct data and start time
@@ -317,9 +323,14 @@ public class CSVReaderWriter {
 						switch (recordSet.get(i).getDataType()) {
 						case GPS_LONGITUDE:
 						case GPS_LATITUDE:
-							points[i] = Double.valueOf(
-									data.replace("E", GDE.STRING_EMPTY).replace("W", GDE.STRING_DASH).replace("N", GDE.STRING_EMPTY).replace("S", GDE.STRING_DASH).replace(GDE.STRING_COLON, GDE.STRING_EMPTY)
-											.replace(GDE.STRING_DOT, GDE.STRING_EMPTY)).intValue();
+							try {
+								points[i] = Double.valueOf(
+										data.replace("E", GDE.STRING_EMPTY).replace("W", GDE.STRING_DASH).replace("N", GDE.STRING_EMPTY).replace("S", GDE.STRING_DASH).replace(GDE.STRING_COLON, GDE.STRING_EMPTY)
+												.replace(GDE.STRING_DOT, GDE.STRING_EMPTY)).intValue();
+							}
+							catch (NumberFormatException e1) {
+								points[i] = 0; //GPS coordinate does not exist "---"
+							}
 							break;
 
 						default:
