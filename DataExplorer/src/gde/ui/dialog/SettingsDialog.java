@@ -1021,7 +1021,7 @@ public class SettingsDialog extends Dialog {
 									this.histoObjectQuery.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.histoObjectQuery.setText(Messages.getString(MessageIds.GDE_MSGT0927));
 									this.histoObjectQuery.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0928));
-									this.histoObjectQuery.setSelection(this.settings.getFilesWithoutObject() && this.settings.getFilesWithOtherObject());
+									this.histoObjectQuery.setSelection(this.settings.isObjectQueryActive());
 									this.histoObjectQuery.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
