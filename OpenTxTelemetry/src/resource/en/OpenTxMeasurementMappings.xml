@@ -39,7 +39,7 @@ if this file need more mapping just add the mapping and please provide this info
   <entry key="Cell 12">CellVoltage 12 [V]</entry>
   <entry key="Current">Current [A]</entry>
   <entry key="Consumption">Capacity [mAh]</entry>
-  <entry key="Vfas">Vfas [-]</entry>
+  <entry key="Vfas">Voltage [V]</entry>
   <entry key="AccelX">Accel X [m/sec]</entry>
   <entry key="AccelY">Accel Y [m/sec]</entry>
   <entry key="AccelZ">Accel Z [m/sec]</entry>
@@ -47,5 +47,15 @@ if this file need more mapping just add the mapping and please provide this info
   <entry key="Ele">Elevator [msec]</entry>
   <entry key="Thr">Throttle [msec]</entry>
   <entry key="Ail">Aileron [msec]</entry>
+  <entry key="VSpd">Climb [m/s]</entry>
+  <entry key="RxBt">VoltageRx [V]</entry>
+  <entry key="TxBat">VoltageTx [V]</entry>
+  <entry key="VFAS">Voltage [V]</entry>
+  <entry key="Curr">Current [A]</entry>
+  <entry key="Tmp2">Temperature2 [°C]</entry>
+  <entry key="TFET">TemperatureFET [°C]</entry>
+  <entry key="TBEC">TemperatureBEC [°C]</entry>
+  <entry key="PWM">PWM [%]</entry>
+  <entry key="Cels">CellsVoltage [V]</entry>
 </properties>
 

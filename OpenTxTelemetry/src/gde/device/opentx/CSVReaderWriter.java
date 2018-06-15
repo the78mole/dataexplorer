@@ -291,32 +291,32 @@ public class CSVReaderWriter {
 					int day = Integer.parseInt(data.substring(8, 10));
 
 					data = dataStr[1].trim();
-						int hour = Integer.parseInt(data.substring(0, 2));
-						int minute = Integer.parseInt(data.substring(3, 5));
-						int second = Integer.parseInt(data.substring(6, 8));
-						int millis = Integer.parseInt(data.substring(9, 12));
+					int hour = Integer.parseInt(data.substring(0, 2));
+					int minute = Integer.parseInt(data.substring(3, 5));
+					int second = Integer.parseInt(data.substring(6, 8));
+					int millis = Integer.parseInt(data.substring(9, 12));
 
-						Calendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
-						long timeStamp = calendar.getTimeInMillis() + millis;
+					Calendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
+					long timeStamp = calendar.getTimeInMillis() + millis;
 
-						if (lastTimeStamp < timeStamp) {
-							time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));
-							lastTimeStamp = timeStamp;
-							if (startTimeStamp == 0) {
-								startTimeStamp = timeStamp;
-								recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129)
-										+ new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp));
-								recordSet.setStartTimeStamp(startTimeStamp);
-								activeChannel.setFileDescription((new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp)).substring(0, 10) + activeChannel.getFileDescription().substring(10));
-							}
+					if (lastTimeStamp < timeStamp) {
+						time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));
+						lastTimeStamp = timeStamp;
+						if (startTimeStamp == 0) {
+							startTimeStamp = timeStamp;
+							recordSet.setRecordSetDescription(
+									device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp));
+							recordSet.setStartTimeStamp(startTimeStamp);
+							activeChannel.setFileDescription((new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp)).substring(0, 10) + activeChannel.getFileDescription().substring(10));
 						}
-						else
-							continue;
+					}
+					else
+						continue;
 
-						List<String> tmpIndexList = StringHelper.stringToList(fileHeader.get(GDE.CSV_DATA_IGNORE_INDEX), separator);
-					for (int i = 0,j = 0; i < updateRecordNames.length; i++,j++) { // only iterate over record names found in file
-						while (tmpIndexList.size() > 0 && j+2 == Integer.valueOf(tmpIndexList.get(0))) {
-							tmpIndexList = tmpIndexList.subList(1, tmpIndexList.size());
+					List<String> skipIndexList = fileHeader.get(GDE.CSV_DATA_IGNORE_INDEX) != null ? StringHelper.stringToList(fileHeader.get(GDE.CSV_DATA_IGNORE_INDEX), separator) : new ArrayList<String>();
+					for (int i = 0, j = 0; i < updateRecordNames.length; i++, j++) { // only iterate over record names found in file
+						while (skipIndexList.size() > 0 && j + 2 == Integer.valueOf(skipIndexList.get(0))) {
+							skipIndexList = skipIndexList.subList(1, skipIndexList.size());
 							++j;
 						}
 						try {
@@ -329,9 +329,9 @@ public class CSVReaderWriter {
 						switch (recordSet.get(i).getDataType()) {
 						case GPS_LONGITUDE:
 						case GPS_LATITUDE:
-							points[i] = data.contains(GDE.STRING_MINUS) ? 0 : Double.valueOf(
-									data.replace("E", GDE.STRING_EMPTY).replace("W", GDE.STRING_DASH).replace("N", GDE.STRING_EMPTY).replace("S", GDE.STRING_DASH).replace(GDE.STRING_COLON, GDE.STRING_EMPTY)
-											.replace(GDE.STRING_DOT, GDE.STRING_EMPTY)).intValue();
+							points[i] = data.contains(GDE.STRING_MINUS) ? 0
+									: Double.valueOf(data.replace("E", GDE.STRING_EMPTY).replace("W", GDE.STRING_DASH).replace("N", GDE.STRING_EMPTY).replace("S", GDE.STRING_DASH)
+											.replace(GDE.STRING_COLON, GDE.STRING_EMPTY).replace(GDE.STRING_DOT, GDE.STRING_EMPTY)).intValue();
 							break;
 
 						default:
@@ -347,8 +347,8 @@ public class CSVReaderWriter {
 					recordSet.addPoints(points, time_ms);
 
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
-					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
-					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
+					int progress = (int) (lineNumber * 100 / (inputFileSize / progressLineLength));
+					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) {
 						application.setProgress(progress, sThreadId);
 						try {
 							Thread.sleep(2);
