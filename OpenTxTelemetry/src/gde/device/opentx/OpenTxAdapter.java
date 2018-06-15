@@ -63,11 +63,12 @@ import gde.utils.FileUtils;
  * Futaba telemetry data adapter device implementation class
  */
 public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
-	final static Logger			log					= Logger.getLogger(OpenTxAdapter.class.getName());
-	final static Properties	properties	= new Properties();
+	final static Logger				log					= Logger.getLogger(OpenTxAdapter.class.getName());
+	final static Properties		properties	= new Properties();
 
-	final DataExplorer			application;
-	final Channels					channels;
+	final DataExplorer				application;
+	final Channels						channels;
+	final OpenTxAdapterDialog	dialog;
 
 	/**
 	 * @param xmlFileName
@@ -81,6 +82,7 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.dialog = new OpenTxAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3303), Messages.getString(MessageIds.GDE_MSGT3303));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
@@ -102,6 +104,7 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.dialog = new OpenTxAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3303), Messages.getString(MessageIds.GDE_MSGT3303));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
@@ -120,6 +123,7 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
+		this.dialog = new OpenTxAdapterDialog(this.application.getShell(), this);
 		if (this.application.getMenuToolBar() != null) {
 			this.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT3303), Messages.getString(MessageIds.GDE_MSGT3303));
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
@@ -211,6 +215,14 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 				}
 			});
 		}
+	}
+
+	/**
+	 * @return the dialog
+	 */
+	@Override
+	public OpenTxAdapterDialog getDialog() {
+		return this.dialog;
 	}
 
 	/**

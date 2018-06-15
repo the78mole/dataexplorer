@@ -15,7 +15,7 @@ Device specific changes/fixes
 	* S32 - fix measurement synchronization references (need device XML replacement)
 	* S32 - fix external temperature factor according customer feedback
 	* Ultramat* single channel charger - fix possible NullPointerException
-	* OpenTx-Telemetry - fix potential exception, add some more mapping parameter
+	* OpenTx-Telemetry - fix potential exception, add some more mapping parameter, enable visualization control and help
 
 History analysis
 	* Enhance UI

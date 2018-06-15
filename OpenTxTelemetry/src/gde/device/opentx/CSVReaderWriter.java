@@ -159,7 +159,7 @@ public class CSVReaderWriter {
 
 		List<String> ignoreIndexList = new ArrayList<String>();
 		for (int i = 2; i < headerLineArray.length; i++) {
-			if (headerLineArray[i].contains("Date") || headerLineArray[i].contains("Time")) {
+			if (headerLineArray[i].contains("Date") || headerLineArray[i].contains("Time") || headerLineArray[i].contains("LSW")) { //GPS Time, GPS Date, LSW hex value
 				ignoreIndexList.add(GDE.STRING_EMPTY + i);
 				header.put(GDE.CSV_DATA_IGNORE_INDEX, StringHelper.listToString(ignoreIndexList, separator));
 				continue;
@@ -266,6 +266,12 @@ public class CSVReaderWriter {
 						record.setDataType(Record.DataType.GPS_LONGITUDE);
 					else if (record.getUnit().contains("°") && record.getUnit().contains("'") && (record.getName().toLowerCase().contains("lat") || record.getName().toLowerCase().contains("breit")))
 						record.setDataType(Record.DataType.GPS_LATITUDE);
+					
+					MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, tmpRecordNames[i]);
+					measurement.setName(tmpRecordNames[i]);
+					measurement.setSymbol(tmpRecordSymbols[i]);
+					measurement.setUnit(tmpRecordUnits[i]);
 				}
 
 				long startTimeStamp = 0;
