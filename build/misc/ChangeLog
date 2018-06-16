@@ -30,8 +30,11 @@ History analysis
 	* Enhance performance
 	 	>> Memory cache for aggregated histo data 
 	 	>> Optimized directory scans for graphics refresh 
+	 	>> Avoid multiple vault re-reading from the source log files
 	 	>> Code optimizations to avoid materialization
 	 	>> Remove syncing slave records for incomplete master records
+	 	>> Avoid multiple sha1 hashing
+	 	>> Remove method synchronizing keyword for methods not used in threads
  	* Support new file extensions separator
 
 Version 3.3.2 - 15 Apr 2018
