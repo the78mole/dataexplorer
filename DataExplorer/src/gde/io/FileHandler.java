@@ -41,7 +41,6 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyCompliance;
-import gde.utils.ObjectKeyScanner;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
 
@@ -80,12 +79,12 @@ public class FileHandler {
 		if (csvFileDialog.getFileName().length() > 4) {
 			final String csvFilePath = csvFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
 
-			String directoryName = Paths.get(csvFilePath).getParent().getFileName().toString();
-			if (isUpcomingObjectKey(directoryName)) createObjectKey(directoryName);
+			String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(csvFilePath));
+			if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 
 			try {
 				char listSeparator = deviceSetting.getListSeparator();
-				//check current device and switch if required
+				// check current device and switch if required
 				String fileDeviceName = CSVReaderWriter.getHeader(listSeparator, csvFilePath).get(GDE.DEVICE_NAME);
 				String activeDeviceName = this.application.getActiveDevice().getName();
 				if (!activeDeviceName.equals(fileDeviceName)) { // different device in file
@@ -100,7 +99,7 @@ public class FileHandler {
 				activeDevice.updateVisibilityStatus(activeRecordSet, true);
 				this.application.getActiveChannel().applyTemplate(activeRecordSet.getName(), true);
 
-				//write filename after import to record description
+				// write filename after import to record description
 				activeRecordSet.descriptionAppendFilename(csvFileDialog.getFileName());
 			}
 			catch (Exception e) {
@@ -239,53 +238,18 @@ public class FileHandler {
 				String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 
 				if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
-					String directoryName = Paths.get(openFilePath).getParent().getFileName().toString();
-					if (isUpcomingObjectKey(directoryName)) createObjectKey(directoryName);
+					String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(openFilePath));
+					if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 					openOsdFile(openFilePath);
 				} else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
-					String directoryName = Paths.get(openFilePath).getParent().getFileName().toString();
-					if (isUpcomingObjectKey(directoryName)) createObjectKey(directoryName);
+					String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(openFilePath));
+					if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 					openLovFile(openFilePath);
 				} else {
 					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0008) + openFilePath);
 				}
 			}
 		}
-	}
-
-	/**
-	 * Do everything to make the new object key available.
-	 */
-	public static void createObjectKey(String newObjectKey) {
-		ObjectKeyCompliance.addObjectKey(newObjectKey, Settings.getInstance().getObjectList());
-		ObjectKeyCompliance.checkChannelForObjectKeyMissmatch(newObjectKey);
-
-		DataExplorer.getInstance().setObjectListElements();
-		DataExplorer.getInstance().setObjectDescriptionTabVisible(true);
-		DataExplorer.getInstance().updateObjectDescriptionWindow();
-
-		FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + newObjectKey);
-		new ObjectKeyScanner(newObjectKey).start();
-	}
-
-	/**
-	 * @return true if about object key creation (decided by the user or by application settings).
-	 */
-	public static boolean isUpcomingObjectKey(String directoryName) {
-		boolean objectQuery = Settings.getInstance().isHistoActive() && Settings.getInstance().isObjectQueryActive() //
-				&& directoryName.length() >= GDE.MIN_OBJECT_KEY_LENGTH //
-				&& !DataExplorer.getInstance().getDeviceConfigurations().contains(directoryName) //
-				&& !Settings.getInstance().getValidatedObjectKey(directoryName).isPresent();
-
-		if (DataExplorer.getInstance().isWithUi()) {
-			objectQuery = objectQuery && !DataExplorer.getInstance().isObjectSelectorEditable();
-			if (objectQuery) {
-				int dialog = DataExplorer.getInstance().openYesNoMessageDialogSync(Messages.getString(MessageIds.GDE_MSGT0929, new Object[] {
-						directoryName }));
-				objectQuery = dialog != SWT.NO;
-			}
-		}
-		return objectQuery;
 	}
 
 	/**
@@ -307,7 +271,7 @@ public class FileHandler {
 		try {
 			boolean existAsObjectLinkFile = true;
 			openFilePath = OperatingSystemHelper.getLinkContainedFilePath(openFilePath); // check if windows link
-			//check current device and switch if required
+			// check current device and switch if required
 			HashMap<String, String> osdHeader = OsdReaderWriter.getHeader(openFilePath);
 			String fileDeviceName = osdHeader.get(GDE.DEVICE_NAME);
 			// check and switch device, if required
@@ -315,7 +279,7 @@ public class FileHandler {
 			if (activeDevice == null || !activeDevice.getName().equals(fileDeviceName)) { // new device in file
 				this.application.getDeviceSelectionDialog().setupDevice(GDE.deviceMap.get(fileDeviceName) == null ? fileDeviceName : GDE.deviceMap.get(fileDeviceName));
 			}
-			//only switch object key, if application is object oriented
+			// only switch object key, if application is object oriented
 			String objectkey = osdHeader.get(GDE.OBJECT_KEY);
 			if (this.application.isObjectoriented() && objectkey != null && !objectkey.equals(GDE.STRING_EMPTY)) {
 				existAsObjectLinkFile = FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectkey);
@@ -447,8 +411,8 @@ public class FileHandler {
 				return;
 			}
 
-			String directoryName = Paths.get(osdFilePath).getParent().getFileName().toString();
-			if (isUpcomingObjectKey(directoryName)) createObjectKey(directoryName);
+			String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(osdFilePath));
+			if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 
 			try {
 				this.application.enableMenuActions(false);
@@ -519,7 +483,7 @@ public class FileHandler {
 	 */
 	public void openLovFile(final String openFilePath) {
 		try {
-			//check current device and switch if required
+			// check current device and switch if required
 			HashMap<String, String> lovHeader = LogViewReader.getHeader(openFilePath);
 			String fileDeviceName = lovHeader.get(GDE.DEVICE_NAME);
 			String activeDeviceName = this.application.getActiveDevice().getName();

@@ -50,6 +50,7 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
+import gde.utils.ObjectKeyCompliance;
 import gde.utils.WaitTimer;
 
 /**
@@ -820,8 +821,8 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 
-							String directoryName = Paths.get(selectedImportFile).getParent().getFileName().toString();
-							if (FileHandler.isUpcomingObjectKey(directoryName)) FileHandler.createObjectKey(directoryName);
+							String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(selectedImportFile));
+							if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 
 							try {
 								if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {

@@ -97,7 +97,6 @@ import gde.device.IDevice;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.ui.HistoExplorer;
 import gde.histo.ui.HistoSummaryWindow;
-import gde.io.FileHandler;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -121,6 +120,7 @@ import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.ui.tab.ObjectDescriptionWindow;
 import gde.ui.tab.StatisticsWindow;
 import gde.utils.FileUtils;
+import gde.utils.ObjectKeyCompliance;
 import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
@@ -760,12 +760,12 @@ public class DataExplorer extends Composite {
 						for (String filePath : files) {
 							if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "dropped file = " + filePath); //$NON-NLS-1$
 							if (filePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
-								String directoryName = Paths.get(filePath).getParent().getFileName().toString();
-								if (directoryName.length() >= GDE.MIN_OBJECT_KEY_LENGTH && FileHandler.isUpcomingObjectKey(directoryName)) FileHandler.createObjectKey(directoryName);
+								String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(filePath));
+								if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 								DataExplorer.this.fileHandler.openOsdFile(filePath);
 							} else if (filePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
-								String directoryName = Paths.get(filePath).getParent().getFileName().toString();
-								if (directoryName.length() >= GDE.MIN_OBJECT_KEY_LENGTH && FileHandler.isUpcomingObjectKey(directoryName)) FileHandler.createObjectKey(directoryName);
+								String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(filePath));
+								if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 								DataExplorer.this.fileHandler.openLovFile(filePath);
 							} else {
 								application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0022));

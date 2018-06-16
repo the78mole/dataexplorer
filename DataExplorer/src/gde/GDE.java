@@ -117,7 +117,7 @@ public class GDE {
 	public final static int									SIZE_BYTES_LONG										= Long.SIZE / 8;																																																						// 64 bits / 8 bits per byte
 	public final static int									SIZE_UTF_SIGNATURE								= 2;																																																												// 2 byte UTF line header
 	public final static long								ONE_HOUR_MS												= 1 * 60 * 60 * 1000;
-	public final static int									MIN_OBJECT_KEY_LENGTH							= 1;
+	public final static int									MIN_OBJECT_KEY_LENGTH							= 2;
 
 	public static final String							REGEX_FILE_EXTENTION_SEPARATION		= ",|;";																																																								//$NON-NLS-1$
 
@@ -160,6 +160,7 @@ public class GDE {
 	public static final String							STRING_BLANK_AT_BLANK							= " @ ";																																																										//$NON-NLS-1$
 	public static final String							STRING_GREATER										= ">";																																																											//$NON-NLS-1$
 	public static final String							STRING_ELLIPSIS										= "...";																																																								//$NON-NLS-1$
+	public static final String							STRING_PARENT_DIR									= "..";																																																								//$NON-NLS-1$
 	public static final String							STRING_CSV_SEPARATOR							= ",";																																																									//$NON-NLS-1$
 	public static final String							STRING_QUESTION_MARK					= "?";																																																									//$NON-NLS-1$
 

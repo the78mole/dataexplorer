@@ -201,6 +201,47 @@ public class ObjectKeyCompliance {
 	}
 
 	/**
+	 * Do everything to make the new object key available.
+	 */
+	public static void createObjectKey(String newObjectKey) {
+		ObjectKeyCompliance.addObjectKey(newObjectKey, Settings.getInstance().getObjectList());
+		ObjectKeyCompliance.checkChannelForObjectKeyMissmatch(newObjectKey);
+
+		DataExplorer.getInstance().setObjectListElements();
+		DataExplorer.getInstance().setObjectDescriptionTabVisible(true);
+		DataExplorer.getInstance().updateObjectDescriptionWindow();
+
+		FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + newObjectKey);
+		new ObjectKeyScanner(newObjectKey).start();
+	}
+
+	/**
+	 * @return an unknown object key candidate derived from the file path or an empty string
+	 */
+	public static String getUpcomingObjectKey(Path filePath) {
+		String upcomingObjectKey = GDE.STRING_EMPTY;
+		if (DataExplorer.getInstance().isWithUi()) {
+			Path fileSubPath;
+			try {
+				fileSubPath = Paths.get(Settings.getInstance().getDataFilePath()).relativize(filePath);
+			} catch (Exception e) {
+				return upcomingObjectKey;
+			}
+			if (fileSubPath.getNameCount() < 1) return upcomingObjectKey;
+			String directoryName = fileSubPath.subpath(0, 1).toString();
+			if (directoryName.length() < GDE.MIN_OBJECT_KEY_LENGTH || GDE.STRING_PARENT_DIR.equals(directoryName)) return upcomingObjectKey;
+
+			if (Settings.getInstance().isHistoActive() && Settings.getInstance().isObjectQueryActive() //
+					&& !DataExplorer.getInstance().isObjectSelectorEditable() //
+					&& !DataExplorer.getInstance().getDeviceConfigurations().contains(directoryName) //
+					&& !Settings.getInstance().getValidatedObjectKey(directoryName).isPresent()) {
+				if (SWT.NO != DataExplorer.getInstance().openYesNoMessageDialogSync(Messages.getString(MessageIds.GDE_MSGT0929, new Object[] { directoryName }))) upcomingObjectKey = directoryName;
+			}
+		}
+		return upcomingObjectKey;
+	}
+
+	/**
 	 * @return the valid paths for source files
 	 */
 	private static ArrayList<Path> getSourcePaths() {

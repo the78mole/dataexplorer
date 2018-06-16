@@ -31,10 +31,10 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.graupner.hott.MessageIds;
 import gde.io.DataParser;
-import gde.io.FileHandler;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.utils.FileUtils;
+import gde.utils.ObjectKeyCompliance;
 import gde.utils.WaitTimer;
 
 /**
@@ -87,8 +87,8 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 
-							String directoryName = Paths.get(selectedImportFile).getParent().getFileName().toString();
-							if (FileHandler.isUpcomingObjectKey(directoryName)) FileHandler.createObjectKey(directoryName);
+							String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(selectedImportFile));
+							if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 
 							try {
 								HoTTbinReaderX.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
