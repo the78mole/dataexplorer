@@ -22,15 +22,14 @@ package gde.histo.config;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.InvalidPropertiesFormatException;
 
+import gde.DataAccess;
 import gde.GDE;
-import gde.config.Settings;
 
 /**
  * Supports individual device channel templates for objects in sub directories.
@@ -42,18 +41,17 @@ public final class ObjectGraphicsTemplate extends HistoGraphicsTemplate {
 
 	/**
 	 * Constructor using the application home path and the device signature as initialization parameter.
-	 * @param deviceSignature - device signature as String (Picolario_K1)
-	 * @param noNewFile true suppresses the object template file creation
+	 * @param suppressNewFile true suppresses the object template file creation
 	 */
-	protected ObjectGraphicsTemplate(String deviceSignature, String objectFolderName, boolean noNewFile) {
-		super(deviceSignature, noNewFile);
+	protected ObjectGraphicsTemplate(String deviceName, int channelNumber, String objectFolderName, boolean suppressNewFile) {
+		super(deviceName, channelNumber, suppressNewFile);
 		this.objectFolderName = objectFolderName;
 	}
 
 	@Override
-	public Path getTargetFilePath() {
+	public Path getTargetFileSubPath() {
 		String fileName = histoFileName == null || histoFileName.equals(GDE.STRING_EMPTY) ? defaultHistoFileName : histoFileName;
-		return Paths.get(Settings.getInstance().getGraphicsTemplatePath(), objectFolderName, fileName);
+		return Paths.get(objectFolderName, fileName);
 	}
 
 	/**
@@ -63,15 +61,14 @@ public final class ObjectGraphicsTemplate extends HistoGraphicsTemplate {
 	 */
 	@Override
 	public void load() {
-		File file = getTargetFilePath().toFile();
 		try {
-			currentFilePath = null;
-			if (!file.exists()) {
+			if (!DataAccess.getInstance().existsGraphicsTemplate(getTargetFileSubPath())) {
 				super.load();
 			} else {
+				currentFilePathFragment = null;
 				this.clear();
-				loadFromXml(file);
-				currentFilePath = file.toPath();
+				loadFromXml(getTargetFileSubPath());
+				currentFilePathFragment = getTargetFileSubPath();
 			}
 			this.isAvailable = true;
 		} catch (InvalidPropertiesFormatException e) {
@@ -87,18 +84,10 @@ public final class ObjectGraphicsTemplate extends HistoGraphicsTemplate {
 	@Override
 	public void store() {
 		try {
-			currentFilePath = null;
-			Path targetFilePath = getTargetFilePath();
-			File tmpPath = targetFilePath.getParent().toFile();
-			if (!tmpPath.exists()) {
-				if (!tmpPath.mkdir()) {
-					log.log(WARNING, "failed to create ", tmpPath);
-				}
+			try (OutputStream stream = DataAccess.getInstance().getGraphicsTemplateOutputStream(getTargetFileSubPath())) {
+				this.storeToXML(stream, "-- DataExplorer ObjectGraphicsTemplate " + objectFolderName + "/" + getTargetFileSubPath().getFileName().toString() + " " + ZonedDateTime.now().toInstant() + " -- " + commentSuffix);
 			}
-			try (FileOutputStream stream = new FileOutputStream(targetFilePath.toFile())) {
-				this.storeToXML(stream, "-- DataExplorer ObjectGraphicsTemplate " + deviceSignature + GDE.STRING_UNDER_BAR + objectFolderName + " -- " + targetFilePath.getFileName().toString() + " " + ZonedDateTime.now().toInstant() + " -- " + commentSuffix);
-			}
-			currentFilePath = targetFilePath;
+			currentFilePathFragment = getTargetFileSubPath();
 			this.isSaved = true;
 		} catch (InvalidPropertiesFormatException e) {
 			log.log(SEVERE, e.getMessage(), e);

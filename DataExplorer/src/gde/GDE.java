@@ -93,13 +93,22 @@ public class GDE {
 	public final static String							CLEAN_SETTINGS_WHILE_SHUTDOWN			= "CLEAN_SETTINGS_WHILE_SHUTDOWN";
 	public final static String							TEMP_FILE_STEM										= "~TempFile";
 
+	public static final String							EXECUTION_ENV											= System.getenv("AWS_EXECUTION_ENV");																														//$NON-NLS-1$
 	public static final boolean							IS_WINDOWS												= System.getProperty("os.name").toLowerCase().startsWith("windows");																												//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean							IS_LINUX													= System.getProperty("os.name").toLowerCase().startsWith("linux");																													//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean							IS_MAC														= System.getProperty("os.name").toLowerCase().startsWith("mac");																														//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean							IS_MAC_COCOA											= GDE.IS_MAC && System.getProperty("DO_NOT_USE_COCOA") == null && SWT.getPlatform().toLowerCase().startsWith("cocoa");			//$NON-NLS-1$ //$NON-NLS-2$
 	public static final boolean							IS_ARCH_DATA_MODEL_64							= System.getProperty("sun.arch.data.model").equals("64");																																		//$NON-NLS-1$ //$NON-NLS-2$
-	public static final boolean							IS_OS_ARCH_ARM										= System.getProperty("os.arch").toLowerCase().startsWith("arm");																																		//$NON-NLS-1$ //$NON-NLS-2$
+	public static final boolean							IS_OS_ARCH_ARM										= System.getProperty("os.arch").toLowerCase().startsWith("arm");																														//$NON-NLS-1$ //$NON-NLS-2$
 
+	/** Depends on the Operating System type. Is empty if no valid OS. */
+	public static final String							APPL_HOME_PATH										= GDE.IS_WINDOWS
+			? (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG).replace("\\", GDE.FILE_SEPARATOR_UNIX)																																									//
+			: GDE.IS_LINUX ? System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "." + GDE.NAME_LONG																																															//
+					: GDE.IS_MAC ? System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG										//
+							: "";
+
+	public static final String							SETTINGS_FILE_PATH								= GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + ".properties";																							//$NON-NLS-1$
 
 	public static final String							STRING_BASE_PACKAGE								= "gde";																																																										//$NON-NLS-1$
 

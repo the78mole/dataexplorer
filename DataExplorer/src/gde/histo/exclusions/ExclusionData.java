@@ -24,9 +24,7 @@ import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -38,6 +36,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import gde.DataAccess;
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.innercache.Cache;
@@ -51,7 +50,7 @@ import gde.utils.FileUtils;
 /**
  * Excluding files from history analysis via user activity.
  * Is based on property files for the current primary folder.
- * Stores the inclusions property files in the user directory or the primary folder.
+ * Stores the exclusions property files in the user directory.
  * @author Thomas Eickert
  */
 public final class ExclusionData extends Properties {
@@ -62,6 +61,10 @@ public final class ExclusionData extends Properties {
 	private static final Cache<String, ExclusionData>	memoryCache				=																//
 			CacheBuilder.newBuilder().maximumSize(111).recordStats().build();																// key is the file Name
 
+	/**
+	 * Criterion the define the properties file name.
+	 * Does not define the path for accessing the file.
+	 */
 	private final Path																activeFolder;
 
 	/**
@@ -99,7 +102,7 @@ public final class ExclusionData extends Properties {
 	 * @param dataDirectories
 	 */
 	public static void deleteExclusionsDirectory(List<Path> dataDirectories) {
-		FileUtils.deleteDirectory(getUserExclusionsDir().toString());
+		FileUtils.deleteDirectory(Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_EXCLUSIONS_DIR_NAME).toString());
 		for (Path dataPath : dataDirectories) {
 			try {
 				for (File file : FileUtils.getFileListing(dataPath.toFile(), Integer.MAX_VALUE, Settings.HISTO_EXCLUSIONS_FILE_NAME)) {
@@ -189,72 +192,32 @@ public final class ExclusionData extends Properties {
 	}
 
 	private void load() {
-		boolean takeUserDir = Settings.getInstance().isDataSettingsAtHomePath();
-		if (!takeUserDir) {
-			FileUtils.checkDirectoryAndCreate(this.activeFolder.toString());
-			if (this.activeFolder.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile().exists()) {
-				try (Reader reader = new InputStreamReader(new FileInputStream(this.activeFolder.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile()),
-						"UTF-8")) {
-					String fileName = SecureHash.sha1(this.activeFolder.toString());
-					this.load(reader);
-					memoryCache.put(fileName, this);
-				} catch (Exception e) {
-					if (e instanceof FileNotFoundException)
-						takeUserDir = true; // supports write protected data drives
-					else
-						log.log(SEVERE, e.getLocalizedMessage(), e);
-				}
+		Path exclusionsDir = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_EXCLUSIONS_DIR_NAME);
+		FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
+		String fileName = SecureHash.sha1(this.activeFolder.toString());
+		if (DataAccess.getInstance().existsExclusionFile(fileName)) {
+			try (Reader reader = new InputStreamReader(DataAccess.getInstance().getExclusionsInputStream(fileName))) {
+				this.load(reader);
+				memoryCache.put(fileName, this);
+			} catch (Throwable e) {
+				log.log(SEVERE, e.getMessage(), e);
 			}
 		}
-		if (takeUserDir) {
-			Path exclusionsDir = getUserExclusionsDir();
-			FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
-			String fileName = SecureHash.sha1(this.activeFolder.toString());
-			if (exclusionsDir.resolve(fileName).toFile().exists()) {
-				try (Reader reader = new InputStreamReader(new FileInputStream(exclusionsDir.resolve(fileName).toFile()))) {
-					this.load(reader);
-					memoryCache.put(fileName, this);
-				} catch (Throwable e) {
-					log.log(SEVERE, e.getMessage(), e);
-				}
-			}
-		}
-	}
-
-	private static Path getUserExclusionsDir() {
-		return Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_EXCLUSIONS_DIR_NAME);
 	}
 
 	/**
 	 * Write the file if excludes are defined, else delete the file.
 	 */
 	public void store() {
-		Path exclusionsDir = getUserExclusionsDir();
+		Path exclusionsDir = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_EXCLUSIONS_DIR_NAME);
 		if (this.size() > 0) {
-			boolean takeUserDir = Settings.getInstance().isDataSettingsAtHomePath();
-			if (!takeUserDir) {
-				FileUtils.checkDirectoryAndCreate(this.activeFolder.toString());
-				try (Writer writer = new OutputStreamWriter(new FileOutputStream(this.activeFolder.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toFile()),
-						"UTF-8")) {
-					this.store(writer, this.activeFolder.toString());
-					String fileName = SecureHash.sha1(this.activeFolder.toString());
-					memoryCache.put(fileName, this);
-				} catch (Throwable e) {
-					if (e instanceof FileNotFoundException)
-						takeUserDir = true; // supports write protected data drives
-					else
-						log.log(SEVERE, e.getMessage(), e);
-				}
-			}
-			if (takeUserDir) {
-				FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
-				String fileName = SecureHash.sha1(this.activeFolder.toString());
-				try (Writer writer = new OutputStreamWriter(new FileOutputStream(exclusionsDir.resolve(fileName).toFile()), "UTF-8")) {
-					this.store(writer, this.activeFolder.toString());
-					memoryCache.put(fileName, this);
-				} catch (Throwable e) {
-					log.log(SEVERE, e.getMessage(), e);
-				}
+			FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
+			String fileName = SecureHash.sha1(this.activeFolder.toString());
+			try (Writer writer = new OutputStreamWriter(DataAccess.getInstance().getExclusionsOutputStream(fileName), "UTF-8")) {
+				this.store(writer, this.activeFolder.toString());
+				memoryCache.put(fileName, this);
+			} catch (Throwable e) {
+				log.log(SEVERE, e.getMessage(), e);
 			}
 		} else {
 			delete();
@@ -264,12 +227,8 @@ public final class ExclusionData extends Properties {
 	}
 
 	public void delete() {
-		Path exclusionsDir = getUserExclusionsDir();
-		log.log(FINE, "deleted : ", exclusionsDir);
-		FileUtils.deleteFile(this.activeFolder.resolve(Settings.HISTO_EXCLUSIONS_FILE_NAME).toString());
 		String fileName = SecureHash.sha1(this.activeFolder.toString());
-		FileUtils.deleteFile(this.activeFolder.resolve(exclusionsDir.resolve(fileName)).toString());
-
+		DataAccess.getInstance().deleteExclusionFile(fileName);
 		memoryCache.invalidateAll();
 	}
 

@@ -238,7 +238,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		super(DataExplorer.application.getActiveDevice(), DataExplorer.application.getActiveChannelNumber(), //
 				DataExplorer.application.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + DataExplorer.application.getActiveChannelNumber(), //
 				recordNames, timeSteps);
-		this.template = HistoGraphicsTemplate.createGraphicsTemplate(this.device.getName(), Settings.getInstance().getActiveObjectKey());
+		this.template = HistoGraphicsTemplate.createGraphicsTemplate(this.device.getName(), DataExplorer.application.getActiveChannelNumber(), Settings.getInstance().getActiveObjectKey());
 		this.template.load();
 
 		this.visibleAndDisplayableRecords = new Vector<TrailRecord>();
@@ -622,7 +622,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 		template.setCommentSuffix(name + " " + description);
 		template.store();
-		log.fine(() -> "creating histo graphics template file in " + template.getTargetFilePath());
+		log.fine(() -> "creating histo graphics template file in " + template.getTargetFileSubPath());
 	}
 
 	/**
@@ -652,7 +652,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			}
 			setSmartStatistics(Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true")));
 			if (application.isWithUi()) presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(getChartWeights());
-			log.fine(() -> "applied histo graphics template file " + template.getTargetFilePath());
+			log.fine(() -> "applied histo graphics template file " + template.getTargetFileSubPath());
 
 			if (doUpdateVisibilityStatus) {
 				setDisplayable();

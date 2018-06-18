@@ -22,24 +22,26 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.sun.istack.internal.Nullable;
 
+import gde.DataAccess;
+import gde.DataAccess.LocalAccess;
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.IDevice;
+import gde.device.DeviceConfiguration;
 import gde.device.MeasurementType;
 import gde.histo.innercache.Cache;
 import gde.histo.innercache.CacheBuilder;
@@ -68,49 +70,36 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	protected static final class ConvertedLegacyTemplate extends Properties {
 		private static final long						serialVersionUID	= -4459032385846145309L;
 
-		private final String								legacyFileName;
-		private final String								templatePath;
+		private final Path									legacyFileSubPath;
 
 		private final HistoGraphicsTemplate	convertedTemplate;
-		private final List<MeasurementType>	channelMeasurements;
 
 		/**
 		 * Access to the default graphics template file used by the legacy kernel.
-		 * @param deviceSignature - device signature as String (Picolario_K1) used for composing the file name.
 		 * @param objectKey
 		 */
-		ConvertedLegacyTemplate(String deviceSignature, String objectKey) {
-			this.templatePath = Settings.getInstance().getGraphicsTemplatePath();
-			this.legacyFileName = deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
+		ConvertedLegacyTemplate(String deviceName, int channelNumber, String objectKey) {
+			String deviceSignature = deviceName + GDE.STRING_UNDER_BAR + channelNumber;
+			this.legacyFileSubPath = Paths.get(deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4));
 			log.log(Level.FINE, "from signature ", this);
 
-			this.convertedTemplate = HistoGraphicsTemplate.createGraphicsTemplate(deviceSignature, objectKey);
+			this.convertedTemplate = HistoGraphicsTemplate.createGraphicsTemplate(deviceName, channelNumber, objectKey);
 			this.convertedTemplate.setHistoFileName(deviceSignature + "H" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4));
-
-			IDevice device = DataExplorer.application.getActiveDevice();
-			int channelConfigNumber = DataExplorer.application.getActiveChannelNumber();
-			channelMeasurements = device.getDeviceConfiguration().getChannelMeasuremts(channelConfigNumber);
 		}
 
 		/**
 		 * Access to any graphics template file used by the legacy kernel.
-		 * @param file
-		 * @param deviceSignature - device signature as String (Picolario_K1)
+		 * @param fileSubPath based on the standard roaming template folder
 		 * @param objectKey
 		 */
-		public ConvertedLegacyTemplate(File file, String deviceSignature, String objectKey) {
-			this.templatePath = file.toPath().getParent().toString();
-			this.legacyFileName = file.toPath().getFileName().toString();
+		public ConvertedLegacyTemplate(Path fileSubPath, String deviceName, int channelNumber, String objectKey) {
+			this.legacyFileSubPath = fileSubPath;
 			log.log(Level.FINE, "from file ", this);
 
-			this.convertedTemplate = HistoGraphicsTemplate.createGraphicsTemplate(deviceSignature, objectKey);
-			String pureFileName = legacyFileName.substring(0, legacyFileName.lastIndexOf("."));
+			this.convertedTemplate = HistoGraphicsTemplate.createGraphicsTemplate(deviceName, channelNumber, objectKey);
+			String pureFileName = fileSubPath.getFileName().toString().substring(0, fileSubPath.getFileName().toString().lastIndexOf("."));
 			if (pureFileName.endsWith("H")) pureFileName = pureFileName.substring(0, pureFileName.length() - 1); // might result in conversion in situ
 			this.convertedTemplate.setHistoFileName(pureFileName + "cnvH" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4));
-
-			IDevice device = DataExplorer.application.getActiveDevice();
-			int channelConfigNumber = DataExplorer.application.getActiveChannelNumber();
-			channelMeasurements = device.getDeviceConfiguration().getChannelMeasuremts(channelConfigNumber);
 		}
 
 		/**
@@ -118,17 +107,20 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		 * @return the converted histo graphics template
 		 */
 		HistoGraphicsTemplate convertToHistoTemplate() throws FileNotFoundException, IOException {
-			File templateFile = Paths.get(templatePath, legacyFileName).toFile();
-			try (FileInputStream stream = new FileInputStream(templateFile)) {
+			try (InputStream stream = DataAccess.getInstance().getGraphicsTemplateInputStream(legacyFileSubPath)) {
 				loadFromXML(stream);
 			}
+
+			DeviceConfiguration configuration = DataExplorer.application.getDeviceConfigurations().get(convertedTemplate.deviceName);
+			List<MeasurementType> channelMeasurements = configuration.getChannelMeasuremts(convertedTemplate.channelNumber);
 			try {
-				entrySet().stream().forEach(p -> convertedTemplate.setProperty(getPrefixedName((String) p.getKey()), (String) p.getValue()));
+				for (Map.Entry<Object, Object> entry : entrySet()) {
+					convertedTemplate.setProperty(getPrefixedName((String) entry.getKey(), channelMeasurements), (String) entry.getValue());
+				}
 			} catch (Exception e) {
 				log.log(SEVERE, e.getMessage(), e);
 			}
-
-			convertedTemplate.setCommentSuffix(templateFile.toPath().getFileName().toString() + " " + Instant.ofEpochMilli(templateFile.lastModified()));
+			convertedTemplate.setCommentSuffix(legacyFileSubPath.getFileName().toString() + " " + Instant.ofEpochMilli(DataAccess.getInstance().getGraphicsTemplateLastModified(legacyFileSubPath)));
 			return convertedTemplate;
 		}
 
@@ -137,7 +129,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		 * @return the prefixed key.</br>
 		 *         Examples: {@code Tx__isVisible} , {@code RecordSet_horizontalGridColor}
 		 */
-		private String getPrefixedName(String key) {
+		private String getPrefixedName(String key, List<MeasurementType> channelMeasurements) {
 			log.log(FINE, "key=", key);
 			String[] splitKey = key.split(GDE.STRING_UNDER_BAR);
 			String prefixedName;
@@ -160,25 +152,24 @@ public abstract class HistoGraphicsTemplate extends Properties {
 
 		@Override
 		public synchronized String toString() {
-			return "DefaultGraphicsTemplate [fileName=" + this.legacyFileName + ", templatePath=" + this.templatePath + "]";
+			return "DefaultGraphicsTemplate [legacyFileSubPath=" + this.legacyFileSubPath + "]";
 		}
 	}
 
 	/**
 	 * Use as file name the device signature with suffix "H".
 	 * For object related templates use a sub directory.
-	 * @param deviceSignature - device signature as String (Picolario_K1)
-	 * @param objectKey
+	 * @param objectKey is an existing object key or empty for 'device oriented'
 	 * @return an instance which conforms to the settings and the parameters
 	 */
-	public static HistoGraphicsTemplate createGraphicsTemplate(String deviceSignature, String objectKey) {
-		boolean tmpNoNewFile = false;
-		if (!Settings.getInstance().getActiveObjectKey().isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
-			return new ObjectGraphicsTemplate(deviceSignature, objectKey, tmpNoNewFile);
-		} else if (Settings.getInstance().getActiveObjectKey().isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
-			return new ObjectGraphicsTemplate(deviceSignature, GDE.STRING_DEVICE_ORIENTED_FOLDER, tmpNoNewFile);
+	public static HistoGraphicsTemplate createGraphicsTemplate(String deviceName, int channelNumber, String objectKey) {
+		boolean tmpSuppressNewFile = false;
+		if (!objectKey.isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
+			return new ObjectGraphicsTemplate(deviceName, channelNumber, objectKey, tmpSuppressNewFile);
+		} else if (objectKey.isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
+			return new ObjectGraphicsTemplate(deviceName, channelNumber, GDE.STRING_DEVICE_ORIENTED_FOLDER, tmpSuppressNewFile);
 		} else {
-			return new StandardGraphicsTemplate(deviceSignature, tmpNoNewFile);
+			return new StandardGraphicsTemplate(deviceName, channelNumber, tmpSuppressNewFile);
 		}
 	}
 
@@ -186,27 +177,27 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	 * Create and populate the template from an existing template file.
 	 * Search first for the object template directory a histo template (suffix "H").
 	 * Fall back to a pure device template if not available.
-	 * @param deviceSignature - device signature as String (Picolario_K1)
-	 * @param objectKey
+	 * @param objectKey is an existing object key or empty for 'device oriented'
 	 * @return an instance which conforms to the settings and the parameters
 	 */
-	public static HistoGraphicsTemplate createReadonlyTemplate(String deviceSignature, String objectKey) {
-		boolean tmpNoNewFile = true;
-		if (!Settings.getInstance().getActiveObjectKey().isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
-			return new ObjectGraphicsTemplate(deviceSignature, objectKey, tmpNoNewFile);
-		} else if (Settings.getInstance().getActiveObjectKey().isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
-			return new ObjectGraphicsTemplate(deviceSignature, GDE.STRING_DEVICE_ORIENTED_FOLDER, tmpNoNewFile);
+	public static HistoGraphicsTemplate createReadonlyTemplate(String deviceName, int channelNumber, String objectKey) {
+		boolean tmpSuppressNewFile = true;
+		if (!objectKey.isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
+			return new ObjectGraphicsTemplate(deviceName, channelNumber, objectKey, tmpSuppressNewFile);
+		} else if (objectKey.isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
+			return new ObjectGraphicsTemplate(deviceName, channelNumber, GDE.STRING_DEVICE_ORIENTED_FOLDER, tmpSuppressNewFile);
 		} else {
-			return new StandardGraphicsTemplate(deviceSignature, tmpNoNewFile);
+			return new StandardGraphicsTemplate(deviceName, channelNumber, tmpSuppressNewFile);
 		}
 	}
 
-	protected final boolean	noNewFile;
-	protected final String	deviceSignature;
+	protected final boolean	suppressNewFile;
+	protected final String	deviceName;
+	protected final int			channelNumber;
 	protected final String	defaultHistoFileName;
 	protected final String	defaultFileName;
 
-	protected Path					currentFilePath;
+	protected Path					currentFilePathFragment;
 	protected String				histoFileName;
 
 	protected boolean				isAvailable		= false;
@@ -217,12 +208,13 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	 * Create and populate the template from an existing template file.
 	 * Search first for a histo template file (suffix "H") in the object template directory.
 	 * Create histo template file if not available.
-	 * @param deviceSignature - device signature as String (Picolario_K1)
-	 * @param noNewFile true suppresses the object template file creation
+	 * @param suppressNewFile true suppresses the object template file creation
 	 */
-	protected HistoGraphicsTemplate(String deviceSignature, boolean noNewFile) {
-		this.noNewFile = noNewFile;
-		this.deviceSignature = deviceSignature;
+	protected HistoGraphicsTemplate(String deviceName, int channelNumber, boolean suppressNewFile) {
+		this.suppressNewFile = suppressNewFile;
+		this.deviceName = deviceName;
+		this.channelNumber = channelNumber;
+		String deviceSignature = deviceName + GDE.STRING_UNDER_BAR + channelNumber;
 		this.defaultFileName = deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
 		this.defaultHistoFileName = deviceSignature + "H" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
 		this.setHistoFileName(defaultHistoFileName);
@@ -244,19 +236,28 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	/**
 	 * Load using standard procedures if the file path directory is equal to the target directory (based on object settings).
 	 * Otherwise try loading w/o fall back to a default file and w/o conversion from legacy format.
+	 * Support file system roaming sources only!
 	 * @param filePath is any path but is preferably an xml properties file in the same directory as the target directory
 	 */
-	public void load(Path filePath) {
-		if (filePath.getParent().equals(getTargetFilePath().getParent())) {
+	public void loadAlien(Path filePath) {
+		Path fileSubPath = null;
+		try {
+			Path tmpSubPath = Paths.get(GDE.APPL_HOME_PATH, Settings.GRAPHICS_TEMPLATES_DIR_NAME).relativize(filePath);
+			fileSubPath = tmpSubPath.toString().startsWith(GDE.STRING_PARENT_DIR) ? null : tmpSubPath;
+		} catch (Exception e) {
+			fileSubPath = null;
+		}
+		if (fileSubPath != null && fileSubPath.getNameCount() > 0 && fileSubPath.getParent().equals(getTargetFileSubPath().getParent())) {
 			setHistoFileName(filePath.getFileName().toString());
 			load();
 		} else {
 			// might result in template entries which are not usable (this rubbish remains even if the file is saved)
-			try {
-				currentFilePath = null;
+			try (InputStream stream = ((LocalAccess) DataAccess.getInstance()).getAlienTemplateInputStream(filePath.toFile())) {
+				currentFilePathFragment = null;
 				clear();
-				loadFromXml(filePath.toFile());
-				currentFilePath = filePath;
+				this.loadFromXML(stream);
+				log.log(FINE, "alien file loaded successfully", filePath);
+				currentFilePathFragment = filePath;
 				setHistoFileName(filePath.getFileName().toString());
 				this.isAvailable = true;
 			} catch (InvalidPropertiesFormatException e) {
@@ -274,37 +275,40 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	 */
 	public void load() {
 		try {
-			currentFilePath = null;
-			File file = getTargetFilePath().toFile();
-			if (!file.exists()) {
-				if (this.noNewFile) {
-					file = Paths.get(Settings.getInstance().getGraphicsTemplatePath(), defaultFileName).toFile();
+			currentFilePathFragment = null;
+			Path fileSubPath = getTargetFileSubPath();
+			if (!DataAccess.getInstance().existsGraphicsTemplate(fileSubPath)) {
+				if (this.suppressNewFile) {
+					fileSubPath = Paths.get(defaultFileName);
+
 					clear();
-					loadFromXml(file);
+					loadFromXml(fileSubPath);
 				} else {
-					log.log(FINE, "convert legacy default template and store as a replacement for ", file.getAbsolutePath());
-					ConvertedLegacyTemplate template = new ConvertedLegacyTemplate(deviceSignature, Settings.getInstance().getActiveObjectKey());
+					log.log(FINE, "convert legacy default template and store as a replacement for ", fileSubPath);
+					String objectKey = fileSubPath.getNameCount() > 1 ? fileSubPath.getName(0).toString() : GDE.STRING_EMPTY;
+					ConvertedLegacyTemplate template = new ConvertedLegacyTemplate(deviceName, channelNumber, objectKey);
 					HistoGraphicsTemplate convertedTemplate = template.convertToHistoTemplate();
 					convertedTemplate.store();
-					file = convertedTemplate.getTargetFilePath().toFile();
+					fileSubPath = convertedTemplate.getTargetFileSubPath();
 
 					clear();
 					putAll(convertedTemplate);
 				}
 			} else {
 				clear();
-				loadFromXml(file);
+				loadFromXml(fileSubPath);
 				boolean isHistoTemplate = keySet().stream().map(String.class::cast).anyMatch(k -> k.indexOf(GDE.STRING_UNDER_BAR + GDE.STRING_UNDER_BAR) >= 0);
 				if (!isHistoTemplate) {
-					log.log(FINE, "convert template identified as legacy template without storing ", file.getAbsolutePath());
-					ConvertedLegacyTemplate template = new ConvertedLegacyTemplate(file, deviceSignature, Settings.getInstance().getActiveObjectKey());
+					log.log(FINE, "convert template identified as legacy template without storing ", fileSubPath);
+					String objectKey = fileSubPath.getNameCount() > 1 ? fileSubPath.getName(0).toString() : GDE.STRING_EMPTY;
+					ConvertedLegacyTemplate template = new ConvertedLegacyTemplate(fileSubPath, deviceName, channelNumber, objectKey);
 					HistoGraphicsTemplate convertedTemplate = template.convertToHistoTemplate();
 
 					clear();
 					putAll(convertedTemplate);
 				}
 			}
-			currentFilePath = file.toPath();
+			currentFilePathFragment = fileSubPath;
 			this.isAvailable = true;
 		} catch (InvalidPropertiesFormatException e) {
 			log.log(SEVERE, e.getMessage(), e);
@@ -313,15 +317,15 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		}
 	}
 
-	protected void loadFromXml(File file) throws IOException, InvalidPropertiesFormatException, FileNotFoundException {
-		log.log(FINE, "opening template file ", file.getAbsolutePath());
-		String fileName = SecureHash.sha1(file.toString());
+	protected void loadFromXml(Path fileSubPath) throws IOException, InvalidPropertiesFormatException, FileNotFoundException {
+		log.log(FINE, "opening template file ", fileSubPath);
+		String fileName = SecureHash.sha1(fileSubPath.toString());
 		Properties cachedInstance = memoryCache.getIfPresent(fileName);
 		if (cachedInstance == null) {
-			try (FileInputStream stream = new FileInputStream(file)) {
+			try (InputStream stream = DataAccess.getInstance().getGraphicsTemplateInputStream(fileSubPath)) {
 				this.loadFromXML(stream);
 				memoryCache.put(fileName, this);
-				log.log(FINE, "template file successful loaded ", file.getPath());
+				log.log(FINE, "template file successful loaded ", fileSubPath);
 			}
 		} else {
 			this.putAll(cachedInstance);
@@ -333,21 +337,14 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	 */
 	public void store() {
 		try {
-			currentFilePath = null;
-			// check if templatePath exist, else create directory
-			Path targetFilePath = getTargetFilePath();
-			File tmpPath = targetFilePath.getParent().toFile();
-			if (!tmpPath.exists()) {
-				if (!tmpPath.mkdir()) {
-					log.log(WARNING, "failed to create ", tmpPath);
-				}
-			}
-			try (FileOutputStream stream = new FileOutputStream(targetFilePath.toFile())) {
-				this.storeToXML(stream, "-- DataExplorer Histo GraphicsTemplate " + deviceSignature + " -- " + targetFilePath.getFileName().toString() + " " + ZonedDateTime.now().toInstant() + " -- " + commentSuffix);
-				String fileName = SecureHash.sha1(targetFilePath.toFile().toString());
+			currentFilePathFragment = null;
+			try (OutputStream stream = DataAccess.getInstance().getGraphicsTemplateOutputStream(getTargetFileSubPath())) {
+				String deviceSignature = deviceName + GDE.STRING_UNDER_BAR + channelNumber;
+				this.storeToXML(stream, "-- DataExplorer Histo GraphicsTemplate " + deviceSignature + " -- " + getTargetFileSubPath().getFileName().toString() + " " + ZonedDateTime.now().toInstant() + " -- " + commentSuffix);
+				String fileName = SecureHash.sha1(getTargetFileSubPath().toString());
 				memoryCache.put(fileName, this);
 			}
-			currentFilePath = targetFilePath;
+			currentFilePathFragment = getTargetFileSubPath();
 			this.isSaved = true;
 		} catch (InvalidPropertiesFormatException e) {
 			log.log(SEVERE, e.getMessage(), e);
@@ -374,32 +371,13 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	}
 
 	/**
-	 * @return the file path (templates for objects in sub directories)
+	 * @return the file subPath based on the standard template directory
 	 */
-	public abstract Path getTargetFilePath();
-
-	/**
-	 * @return the path residual compared to the standard template path
-	 */
-	@Nullable // if there was no successful load / store
-	private Path getCurrentRelativeFilePath() {
-		if (currentFilePath == null) {
-			return Paths.get("");
-		} else {
-			Path relativePath;
-			try {
-				relativePath = Paths.get(Settings.getInstance().getGraphicsTemplatePath()).relativize(currentFilePath);
-			} catch (IllegalArgumentException e) {
-				relativePath = Paths.get("");
-			}
-			return relativePath;
-		}
-	}
+	public abstract Path getTargetFileSubPath();
 
 	public String getFilePathMessage() {
-		Path relativeFilePath = getCurrentRelativeFilePath();
-		if (relativeFilePath != null && !relativeFilePath.getFileName().toString().equals(getDefaultHistoFileName())) {
-			return relativeFilePath.toString();
+		if (currentFilePathFragment != null && !currentFilePathFragment.getFileName().toString().equals(getDefaultHistoFileName())) {
+			return currentFilePathFragment.toString();
 		} else {
 			return "";
 		}

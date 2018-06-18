@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import gde.GDE;
-import gde.config.Settings;
 
 /**
  * Standard template in the standard template path.
@@ -35,14 +34,14 @@ public class StandardGraphicsTemplate extends HistoGraphicsTemplate {
 	/**
 	 * @see gde.histo.config.HistoGraphicsTemplate
 	 */
-	protected StandardGraphicsTemplate(String deviceSignature, boolean noNewFile) {
-		super(deviceSignature, noNewFile);
+	protected StandardGraphicsTemplate(String deviceName, int channelNumber, boolean suppressNewFile) {
+		super(deviceName,  channelNumber, suppressNewFile);
 	}
 
 	@Override
-	public Path getTargetFilePath() {
+	public Path getTargetFileSubPath() {
 		String fileName = histoFileName == null || histoFileName.equals(GDE.STRING_EMPTY) ? defaultFileName : histoFileName;
-		return Paths.get(Settings.getInstance().getGraphicsTemplatePath(), fileName);
+		return Paths.get(fileName);
 	}
 
 }

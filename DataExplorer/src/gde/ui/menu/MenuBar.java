@@ -727,9 +727,8 @@ public class MenuBar {
 									&& MenuBar.this.application.getPresentHistoExplorer().hasRecords()) {
 								TrailRecordSet trailRecordSet = application.getPresentHistoExplorer().getTrailRecordSet();
 								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
-								Path targetFilePath = template.getTargetFilePath();
 								FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] {
-										Settings.GRAPHICS_TEMPLATES_EXTENSION }, targetFilePath.getParent().toString(), targetFilePath.getFileName().toString());
+										Settings.GRAPHICS_TEMPLATES_EXTENSION }, template.getTargetFileSubPath().getParent().toString(), template.getTargetFileSubPath().getFileName().toString());
 								if (fileDialog.open() != null) {
 									String templateFileName = fileDialog.getFileName();
 									if (templateFileName != null && templateFileName.length() > 4) {
@@ -770,15 +769,14 @@ public class MenuBar {
 									&& MenuBar.this.application.getPresentHistoExplorer().hasRecords()) {
 								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
 								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
-								Path targetFilePath = template.getTargetFilePath();
 								String filePath = MenuBar.this.application.prepareFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] {
-										Settings.GRAPHICS_TEMPLATES_EXTENSION }, targetFilePath.getParent().toString(), targetFilePath.getFileName().toString(), SWT.SINGLE) //
+										Settings.GRAPHICS_TEMPLATES_EXTENSION }, template.getTargetFileSubPath().getParent().toString(), template.getTargetFileSubPath().getFileName().toString(), SWT.SINGLE) //
 										.open();
 								if (filePath != null) {
 									Path templateFilePath = Paths.get(filePath);
 									if (templateFilePath.getFileName().toString().length() > 4) {
 										// allow loading whatever file the user requests
-										template.load(templateFilePath);
+										template.loadAlien(templateFilePath);
 										trailRecordSet.applyTemplate(true);
 										MenuBar.this.application.getPresentHistoExplorer().updateHistoTabs(false, true, true);
 									}

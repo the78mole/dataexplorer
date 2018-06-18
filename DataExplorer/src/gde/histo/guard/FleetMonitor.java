@@ -19,7 +19,6 @@
 
 package gde.histo.guard;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +32,6 @@ import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import gde.GDE;
 import gde.config.Settings;
 import gde.data.AbstractRecordSet;
 import gde.data.Record;
@@ -41,7 +39,7 @@ import gde.device.IChannelItem;
 import gde.device.IDevice;
 import gde.device.ScoreLabelTypes;
 import gde.histo.cache.HistoVault;
-import gde.histo.cache.VaultReaderWriter;
+import gde.histo.cache.SimpleVaultReader;
 import gde.histo.config.HistoGraphicsTemplate;
 import gde.histo.datasources.DirectoryScanner.DirectoryType;
 import gde.histo.datasources.SourceDataSetChecker;
@@ -132,8 +130,7 @@ public final class FleetMonitor {
 				oS.maxDuration_MM = Math.max(oS.maxDuration_MM, v.getScores().get(ScoreLabelTypes.DURATION_MM.ordinal()).getValue());
 			}
 
-			String deviceSignature = deviceName + GDE.STRING_UNDER_BAR + channelNumber;
-			HistoGraphicsTemplate template = HistoGraphicsTemplate.createReadonlyTemplate(deviceSignature, objectKey);
+			HistoGraphicsTemplate template = HistoGraphicsTemplate.createReadonlyTemplate(deviceName, channelNumber, objectKey);
 			template.load();
 			boolean smartStatistics = Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true"));
 
@@ -217,7 +214,6 @@ public final class FleetMonitor {
 		DetailSelector detailSelector = DetailSelector.createDeviceNameFilter(usedDevices.keySet());
 		Function<ObjectVaultIndexEntry, String> classifier = e -> e.vaultDeviceName;
 		TreeMap<String, List<VaultKeyPair>> vaultKeys = objectVaultIndex.selectGroupedVaultKeys(objectKey, detailSelector, classifier);
-		Path cacheDir = Settings.getInstance().getHistoCacheDirectory();
 		for (Entry<String, List<VaultKeyPair>> e : vaultKeys.entrySet()) {
 			IDevice device = usedDevices.get(e.getKey());
 			EnumSet<DirectoryType> directoryTypes = DirectoryType.getValidDirectoryTypes(device);
@@ -225,7 +221,7 @@ public final class FleetMonitor {
 			List<HistoVault> vaults = new ArrayList<>();
 			for (VaultKeyPair p : e.getValue()) {
 				if (p == null) continue;
-				HistoVault vault = VaultReaderWriter.readVault(cacheDir.resolve(p.getKey()), p.getValue());
+				HistoVault vault = SimpleVaultReader.readVault(p.getKey(), p.getValue());
 				SourceDataSetChecker checker = new SourceDataSetChecker(device, directoryTypes, vault.getLogChannelNumber(), objectKey);
 				if (checker.isValidVault(vault)) vaults.add(vault);
 			}

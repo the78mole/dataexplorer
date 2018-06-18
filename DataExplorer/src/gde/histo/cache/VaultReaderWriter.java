@@ -51,8 +51,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import com.sun.istack.internal.Nullable;
-
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.datasources.AbstractSourceDataSets.SourceDataSet;
@@ -228,40 +226,6 @@ public final class VaultReaderWriter {
 			return String.format("evictionCount=%d  hitCount=%d  missCount=%d hitRate=%f missRate=%f", stats.evictionCount(), stats.hitCount(), stats.missCount(), stats.hitRate(), stats.missRate());
 		});
 		return vaultExtract;
-	}
-
-	/**
-	 * @param cachePath defines the zip file holding the vaults or the vaults folder
-	 * @param fileName is the vault name
-	 * @return the extracted vault after eliminating trusses
-	 */
-	@Nullable
-	public static HistoVault readVault(Path cachePath, String fileName) {
-		final int MIN_FILE_LENGTH = 2048;
-		HistoVault histoVault = null;
-		if (settings.isZippedCache()) {
-			try (ZipFile zf = new ZipFile(cachePath.toFile())) {
-				if (zf.getEntry(fileName).getSize() <= MIN_FILE_LENGTH) return null;
-
-				histoVault = memoryCache.get(fileName, () -> VaultProxy.load(zf.getInputStream(zf.getEntry(fileName))));
-			} catch (Exception e) {
-				log.log(SEVERE, e.getMessage(), e);
-			}
-		} else {
-			File file = cachePath.resolve(fileName).toFile();
-			if (file.length() <= MIN_FILE_LENGTH) return null;
-
-			try {
-				histoVault = memoryCache.get(file.getName(), () -> VaultProxy.load(cachePath.resolve(file.getName())));
-			} catch (Exception e) {
-				log.log(SEVERE, e.getMessage(), e);
-			}
-		}
-		log.fine(() -> {
-			CacheStats stats = memoryCache.stats();
-			return String.format("evictionCount=%d  hitCount=%d  missCount=%d hitRate=%f missRate=%f", stats.evictionCount(), stats.hitCount(), stats.missCount(), stats.hitRate(), stats.missRate());
-		});
-		return histoVault;
 	}
 
 	/**

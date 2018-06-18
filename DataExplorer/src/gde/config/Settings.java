@@ -20,15 +20,12 @@
 package gde.config;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -64,10 +61,10 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.xml.sax.SAXException;
 
+import gde.DataAccess;
 import gde.GDE;
 import gde.device.DeviceConfiguration;
 import gde.exception.ApplicationConfigurationException;
-import gde.histo.datasources.HistoSet;
 import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
@@ -165,7 +162,6 @@ public class Settings extends Properties {
 	final static String							IS_DISPLAY_SETTLEMENTS					= "is_display_settlements";																																				//$NON-NLS-1$
 	final static String							IS_DISPLAY_SCORES								= "is_display_scores";																																						//$NON-NLS-1$
 	final static String							IS_DISPLAY_TAGS									= "is_display_tags";																																							//$NON-NLS-1$
-	final static String							IS_DATA_SETTINGS_AT_HOME_PATH		= "is_data_settings_at_home_path";																																//$NON-NLS-1$
 	final static String							IS_SUPPRESS_MODE								= "is_suppress_mode";																																							//$NON-NLS-1$
 	final static String							IS_CURVE_SURVEY									= "is_curve_survey";																																							//$NON-NLS-1$
 	final static String							GPS_LOCATION_RADIUS							= "gps_location_radius";																																					//$NON-NLS-1$
@@ -277,9 +273,6 @@ public class Settings extends Properties {
 	private static double[]					SAMPLING_TIMESPANS							= new double[] { 10., 5., 1., .5, .1, .05, .001 };
 	private static String[]					REMINDER_COUNT_VALUES						= new String[] { "2", "3", "5", "8" };
 
-	BufferedReader									reader;																																																														// to read the application settings
-	BufferedWriter									writer;																																																														// to write the application settings
-
 	boolean													isDevicePropertiesUpdated				= false;
 	// boolean isDevicePropertiesReplaced = false;
 	boolean													isGraphicsTemplateUpdated				= false;
@@ -330,21 +323,9 @@ public class Settings extends Properties {
 	private Settings() throws SAXException, JAXBException {
 		final String $METHOD_NAME = "Settings"; //$NON-NLS-1$
 
-		if (GDE.IS_WINDOWS) {
-			this.applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG).replace("\\", GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
-			this.settingsFilePath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + ".properties"; //$NON-NLS-1$
-		}
-		else if (GDE.IS_LINUX) {
-			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "." + GDE.NAME_LONG; //$NON-NLS-1$ //$NON-NLS-2$
-			this.settingsFilePath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + ".properties"; //$NON-NLS-1$
-		}
-		// OPET - start - add
-		else if (GDE.IS_MAC) {
-			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG; //$NON-NLS-1$ //$NON-NLS-2$
-			this.settingsFilePath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + ".properties"; //$NON-NLS-1$
-		}
-		// OPET - end
-		else {
+		this.applHomePath = GDE.APPL_HOME_PATH;
+		this.settingsFilePath = GDE.SETTINGS_FILE_PATH; // todo remove the settingsFilePath field in the next refactoring step
+		if (GDE.APPL_HOME_PATH.isEmpty()) {
 			Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGW0001));
 		}
 
@@ -633,10 +614,8 @@ public class Settings extends Properties {
 	 */
 	void load() {
 		final String $METHOD_NAME = "load"; //$NON-NLS-1$
-		try {
-			this.reader = new BufferedReader(new InputStreamReader(new FileInputStream(this.settingsFilePath), "UTF-8")); //$NON-NLS-1$
-			this.load(this.reader);
-			this.reader.close();
+		try (Reader reader = DataAccess.getInstance().getSettingsReader()) {
+			this.load(reader);
 
 			// update file history
 			for (int i = 0; i < 9; i++) {
@@ -659,167 +638,159 @@ public class Settings extends Properties {
 	 */
 	public void store() {
 		final String $METHOS_NAME = "store()"; //$NON-NLS-1$
-		try {
-			File tmpFilePath = new File(this.settingsFilePath);
-			if (!tmpFilePath.exists()) {
-				if (!tmpFilePath.createNewFile()) Settings.log.logp(java.util.logging.Level.WARNING, Settings.$CLASS_NAME, $METHOS_NAME, "failed creating " + this.settingsFilePath);
-			}
-			this.writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.settingsFilePath), "UTF-8")); //$NON-NLS-1$
+		try (Writer writer = DataAccess.getInstance().getSettingsWriter()) {
+			writer.write(String.format("%s\n", Settings.HEADER_TEXT)); //$NON-NLS-1$
 
-			this.writer.write(String.format("%s\n", Settings.HEADER_TEXT)); //$NON-NLS-1$
+			writer.write(String.format("%s\n", Settings.DEVICE_BLOCK)); // [Gerät] //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.ACTIVE_DEVICE, this.getActiveDevice())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DEVICE_USE, this.getDeviceUseCsv())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_LIST, this.getObjectListAsString())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.ACTIVE_OBJECT, this.getActiveObject())); //$NON-NLS-1$
 
-			this.writer.write(String.format("%s\n", Settings.DEVICE_BLOCK)); // [Gerät] //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ACTIVE_DEVICE, this.getActiveDevice())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DEVICE_USE, this.getDeviceUseCsv())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_LIST, this.getObjectListAsString())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ACTIVE_OBJECT, this.getActiveObject())); //$NON-NLS-1$
+			writer.write(String.format("%s\n", Settings.WINDOW_BLOCK)); // [Fenster Einstellungen] //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.WINDOW_MAXIMIZED, this.isWindowMaximized)); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.WINDOW_LEFT, this.window.x)); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.WINDOW_TOP, this.window.y)); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.WINDOW_WIDTH, this.window.width)); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.WINDOW_HEIGHT, this.window.height)); //$NON-NLS-1$
 
-			this.writer.write(String.format("%s\n", Settings.WINDOW_BLOCK)); // [Fenster Einstellungen] //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WINDOW_MAXIMIZED, this.isWindowMaximized)); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WINDOW_LEFT, this.window.x)); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WINDOW_TOP, this.window.y)); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WINDOW_WIDTH, this.window.width)); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WINDOW_HEIGHT, this.window.height)); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.COOLBAR_ORDER, this.cbOrder)); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.COOLBAR_WRAPS, this.cbWraps)); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.COOLBAR_SIZES, this.cbSizes)); //$NON-NLS-1$
 
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COOLBAR_ORDER, this.cbOrder)); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COOLBAR_WRAPS, this.cbWraps)); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COOLBAR_SIZES, this.cbSizes)); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.RECORD_COMMENT_VISIBLE, isRecordCommentVisible())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_HEADER_VISIBLE, isGraphicsHeaderVisible())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DISPLAY_DENSITY_FONT_CORRECT, getFontDisplayDensityAdaptionFactor())); //$NON-NLS-1$
 
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.RECORD_COMMENT_VISIBLE, isRecordCommentVisible())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_HEADER_VISIBLE, isGraphicsHeaderVisible())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DISPLAY_DENSITY_FONT_CORRECT, getFontDisplayDensityAdaptionFactor())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_DASH_STYLE, getGridDashStyleAsString())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_HOR_TYPE, getGridCompareWindowHorizontalType())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_HOR_COLOR, getGridCompareWindowHorizontalColorStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_VER_TYPE, getGridCompareWindowVerticalType())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_VER_COLOR, getGridCompareWindowVerticalColorStr())); //$NON-NLS-1$
 
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_DASH_STYLE, getGridDashStyleAsString())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_HOR_TYPE, getGridCompareWindowHorizontalType())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_HOR_COLOR, getGridCompareWindowHorizontalColorStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_VER_TYPE, getGridCompareWindowVerticalType())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_VER_COLOR, getGridCompareWindowVerticalColorStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_AREA_BACKGROUND, getGraphicsCurveAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_SURROUND_BACKGRD, getGraphicsSurroundingBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_BORDER_COLOR, getGraphicsCurvesBorderColorStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_SCALE_COLOR, isDrawScaleInRecordColor())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_NAME_COLOR, isDrawNameInRecordColor())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_NUMBERS_COLOR, isDrawNumbersInRecordColor())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_AREA_BACKGROUND, getCompareCurveAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_SURROUND_BACKGRD, getCompareSurroundingBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_BORDER_COLOR, getCurveCompareBorderColorStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_COMPARE_CHANNELCONFIG, isCurveCompareChannelConfigName())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILITY_AREA_BACKGROUND, getUtilityCurveAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILITY_SURROUND_BACKGRD, getUtilitySurroundingBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILITY_BORDER_COLOR, getUtilityCurvesBorderColorStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.STATISTICS_INNER_BACKGROUND, getStatisticsInnerAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.STATISTICS_SURROUND_BACKGRD, getStatisticsSurroundingAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.ANALOG_INNER_BACKGROUND, getAnalogInnerAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.ANALOG_SURROUND_BACKGRD, getAnalogSurroundingAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DIGITAL_INNER_BACKGROUND, getDigitalInnerAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DIGITAL_SURROUND_BACKGRD, getDigitalSurroundingAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.CELL_VOLTAGE_INNER_BACKGROUND, getCellVoltageInnerAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.CELL_VOLTAGE_SURROUND_BACKGRD, getCellVoltageSurroundingAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_COMMENT_INNER_BACKGROUND, getFileCommentInnerAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_COMMENT_SURROUND_BACKGRD, getFileCommentSurroundingAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_DESC_INNER_BACKGROUND, getObjectDescriptionInnerAreaBackgroundStr())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_DESC_SURROUND_BACKGRD, getObjectDescriptionSurroundingAreaBackgroundStr())); //$NON-NLS-1$
 
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_AREA_BACKGROUND, getGraphicsCurveAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_SURROUND_BACKGRD, getGraphicsSurroundingBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_BORDER_COLOR, getGraphicsCurvesBorderColorStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_SCALE_COLOR, isDrawScaleInRecordColor())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_NAME_COLOR, isDrawNameInRecordColor())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_NUMBERS_COLOR, isDrawNumbersInRecordColor())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_AREA_BACKGROUND, getCompareCurveAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_SURROUND_BACKGRD, getCompareSurroundingBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_BORDER_COLOR, getCurveCompareBorderColorStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_COMPARE_CHANNELCONFIG, isCurveCompareChannelConfigName())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILITY_AREA_BACKGROUND, getUtilityCurveAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILITY_SURROUND_BACKGRD, getUtilitySurroundingBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILITY_BORDER_COLOR, getUtilityCurvesBorderColorStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.STATISTICS_INNER_BACKGROUND, getStatisticsInnerAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.STATISTICS_SURROUND_BACKGRD, getStatisticsSurroundingAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ANALOG_INNER_BACKGROUND, getAnalogInnerAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ANALOG_SURROUND_BACKGRD, getAnalogSurroundingAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DIGITAL_INNER_BACKGROUND, getDigitalInnerAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DIGITAL_SURROUND_BACKGRD, getDigitalSurroundingAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.CELL_VOLTAGE_INNER_BACKGROUND, getCellVoltageInnerAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.CELL_VOLTAGE_SURROUND_BACKGRD, getCellVoltageSurroundingAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_COMMENT_INNER_BACKGROUND, getFileCommentInnerAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_COMMENT_SURROUND_BACKGRD, getFileCommentSurroundingAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_DESC_INNER_BACKGROUND, getObjectDescriptionInnerAreaBackgroundStr())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_DESC_SURROUND_BACKGRD, getObjectDescriptionSurroundingAreaBackgroundStr())); //$NON-NLS-1$
-
-			this.writer.write(String.format("%s\n", Settings.FILE_HISTORY_BLOCK)); // [Datei History Liste] //$NON-NLS-1$
+			writer.write(String.format("%s\n", Settings.FILE_HISTORY_BLOCK)); // [Datei History Liste] //$NON-NLS-1$
 			for (int i = 0; i < 9 && i < this.fileHistory.size(); i++) {
 				if (this.fileHistory.get(i) == null) break;
-				this.writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_HISTORY_BEGIN + i, this.fileHistory.get(i))); //$NON-NLS-1$
+				writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_HISTORY_BEGIN + i, this.fileHistory.get(i))); //$NON-NLS-1$
 			}
 
-			this.writer.write(String.format("%s\n", Settings.APPL_BLOCK)); // [Programmeinstellungen] //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_FILE_PATH, getDataFilePath())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_IMAGE_FILE_PATH, getObjectImageFilePath())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_DATA_FILE_NAME_LEADER, getUsageDateAsFileNameLeader())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_OBJECT_KEY_IN_FILE_NAME, getUsageObjectKeyInFileName())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.WRITE_TMP_FILES, getUsageWritingTmpFiles())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ALPHA_BLENDING_VALUE, getDialogAlphaValue())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.APLHA_BLENDING_ENABLED, isDeviceDialogAlphaEnabled())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.KEEP_IMPORT_DIR_OBJECT_RELATED, isDeviceImportDirectoryObjectRelated())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GLOBAL_PORT, isGlobalSerialPort())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GLOBAL_PORT_NAME, getSerialPort())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_BLUETOOTH_DEVICES, isSkipBluetoothDevices())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DO_PORT_AVAILABLE_TEST, doPortAvailabilityCheck())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_PORT_BLACKLIST, isSerialPortBlackListEnabled())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.PORT_BLACKLIST, getSerialPortBlackList())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_PORT_WHITELIST, isSerialPortWhiteListEnabled())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.PORT_WHITELIST, getSerialPortWhiteListString())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DEVICE_DIALOG_USE_MODAL, isDeviceDialogsModal())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DEVICE_DIALOG_ON_TOP, isDeviceDialogsOnTop())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.AUTO_OPEN_TOOL_BOX, isAutoOpenToolBox())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LOCALE_IN_USE, getLocale().getLanguage())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LOCALE_CHANGED, getLocaleChanged())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.TIME_FORMAT_IN_USE, getTimeFormat())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DESKTOP_SHORTCUT_CREATED, this.isDesktopShortcutCreated())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_APPL_REGISTERED, this.isApplicationRegistered())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_LOCK_UUCP_HINTED, this.isLockUucpHinted())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LAST_UPDATE_CHECK, StringHelper.getDate())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_OBJECT_TEMPLATES_ACTIVE, isObjectTemplatesActive())); //$NON-NLS-1$
+			writer.write(String.format("%s\n", Settings.APPL_BLOCK)); // [Programmeinstellungen] //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_FILE_PATH, getDataFilePath())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.OBJECT_IMAGE_FILE_PATH, getObjectImageFilePath())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_DATA_FILE_NAME_LEADER, getUsageDateAsFileNameLeader())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.USE_OBJECT_KEY_IN_FILE_NAME, getUsageObjectKeyInFileName())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.WRITE_TMP_FILES, getUsageWritingTmpFiles())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.ALPHA_BLENDING_VALUE, getDialogAlphaValue())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.APLHA_BLENDING_ENABLED, isDeviceDialogAlphaEnabled())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.KEEP_IMPORT_DIR_OBJECT_RELATED, isDeviceImportDirectoryObjectRelated())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GLOBAL_PORT, isGlobalSerialPort())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GLOBAL_PORT_NAME, getSerialPort())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_BLUETOOTH_DEVICES, isSkipBluetoothDevices())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DO_PORT_AVAILABLE_TEST, doPortAvailabilityCheck())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_PORT_BLACKLIST, isSerialPortBlackListEnabled())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.PORT_BLACKLIST, getSerialPortBlackList())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_PORT_WHITELIST, isSerialPortWhiteListEnabled())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.PORT_WHITELIST, getSerialPortWhiteListString())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DEVICE_DIALOG_USE_MODAL, isDeviceDialogsModal())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DEVICE_DIALOG_ON_TOP, isDeviceDialogsOnTop())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.AUTO_OPEN_TOOL_BOX, isAutoOpenToolBox())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.LOCALE_IN_USE, getLocale().getLanguage())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.LOCALE_CHANGED, getLocaleChanged())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.TIME_FORMAT_IN_USE, getTimeFormat())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DESKTOP_SHORTCUT_CREATED, this.isDesktopShortcutCreated())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_APPL_REGISTERED, this.isApplicationRegistered())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_LOCK_UUCP_HINTED, this.isLockUucpHinted())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.LAST_UPDATE_CHECK, StringHelper.getDate())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_OBJECT_TEMPLATES_ACTIVE, isObjectTemplatesActive())); //$NON-NLS-1$
 			// charger specials
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_REDUCE_CHARGE_DISCHARGE, this.isReduceChargeDischarge())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ALL_IN_ONE_RECORDSET, this.isContinuousRecordSet())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_PARTIAL_DATA_TABLE, this.isPartialDataTable())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_REDUCE_CHARGE_DISCHARGE, this.isReduceChargeDischarge())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ALL_IN_ONE_RECORDSET, this.isContinuousRecordSet())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_PARTIAL_DATA_TABLE, this.isPartialDataTable())); //$NON-NLS-1$
 
-			this.writer.write(String.format("%s\n", Settings.TABLE_BLOCK)); // [Tabellen Einstellungen] //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.LIST_SEPARATOR, getListSeparator())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DECIMAL_SEPARATOR, getDecimalSeparator())); //$NON-NLS-1$
+			writer.write(String.format("%s\n", Settings.TABLE_BLOCK)); // [Tabellen Einstellungen] //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.LIST_SEPARATOR, getListSeparator())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DECIMAL_SEPARATOR, getDecimalSeparator())); //$NON-NLS-1$
 
-			this.writer.write(String.format("%s\n", Settings.LOGGING_BLOCK)); // [Logging Einstellungen] //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GLOBAL_LOG_LEVEL, isGlobalLogLevel())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GLOBAL_LOG_LEVEL, getLogLevel(Settings.GLOBAL_LOG_LEVEL))); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.UI_LOG_LEVEL, getLogLevel(Settings.UI_LOG_LEVEL))); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DEVICE_LOG_LEVEL, getLogLevel(Settings.DEVICE_LOG_LEVEL))); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_LOG_LEVEL, getLogLevel(Settings.DATA_LOG_LEVEL))); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.CONFIG_LOG_LEVEL, getLogLevel(Settings.CONFIG_LOG_LEVEL))); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILS_LOG_LEVEL, getLogLevel(Settings.UTILS_LOG_LEVEL))); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_IO_LOG_LEVEL, getLogLevel(Settings.FILE_IO_LOG_LEVEL))); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SERIAL_IO_LOG_LEVEL, getLogLevel(Settings.SERIAL_IO_LOG_LEVEL))); //$NON-NLS-1$
+			writer.write(String.format("%s\n", Settings.LOGGING_BLOCK)); // [Logging Einstellungen] //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GLOBAL_LOG_LEVEL, isGlobalLogLevel())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GLOBAL_LOG_LEVEL, getLogLevel(Settings.GLOBAL_LOG_LEVEL))); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.UI_LOG_LEVEL, getLogLevel(Settings.UI_LOG_LEVEL))); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DEVICE_LOG_LEVEL, getLogLevel(Settings.DEVICE_LOG_LEVEL))); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_LOG_LEVEL, getLogLevel(Settings.DATA_LOG_LEVEL))); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.CONFIG_LOG_LEVEL, getLogLevel(Settings.CONFIG_LOG_LEVEL))); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILS_LOG_LEVEL, getLogLevel(Settings.UTILS_LOG_LEVEL))); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_IO_LOG_LEVEL, getLogLevel(Settings.FILE_IO_LOG_LEVEL))); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.SERIAL_IO_LOG_LEVEL, getLogLevel(Settings.SERIAL_IO_LOG_LEVEL))); //$NON-NLS-1$
 
-			this.writer.write(String.format("%s\n", Settings.HISTO_BLOCK)); // [Histo Settings] //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_HISTO_ACTIVE, isHistoActive())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SCALE_ORDINAL, getBoxplotScaleOrdinal())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, getBoxplotSizeAdaptationOrdinal())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.X_SPREAD_GRADE_ORDINAL, getXAxisSpreadOrdinal())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_LOGARITHMIC_DISTANCE, isXAxisLogarithmicDistance())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_REVERSED, isXAxisReversed())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.RETROSPECT_MONTHS, getRetrospectMonths())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_DATAPATH_IMPORTS, getSearchDataPathImports())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CHANNEL_MIX, isChannelMix())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SAMPLING_TIMESPAN_ORDINAL, getSamplingTimespanOrdinal())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IGNORE_LOG_OBJECT_KEY, getIgnoreLogObjectKey())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ZIPPED_CACHE, isZippedCache())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MINMAX_QUANTILE_DISTANCE, getMinmaxQuantileDistance())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.ABSOLUTE_TRANSITION_LEVEL, getAbsoluteTransitionLevel())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATETIME_UTC, isDateTimeUtc())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_SETTLEMENTS, isDisplaySettlements())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_SCORES, isDisplayScores())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_TAGS, isDisplayTags())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATA_SETTINGS_AT_HOME_PATH, isDataSettingsAtHomePath())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUPPRESS_MODE, isSuppressMode())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CURVE_SURVEY, isCurveSurvey())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_LOCATION_RADIUS, getGpsLocationRadius())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_ADDRESS_TYPE, getGpsAddressType())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SUBDIRECTORY_LEVEL_MAX, getSubDirectoryLevelMax())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATA_TABLE_TRANSITIONS, isDataTableTransitions())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_FIRST_RECORDSET_CHOICE, isFirstRecordSetChoice())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.REMINDER_COUNT_CSV, getReminderCountCsv())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.REMINDER_COUNT_INDEX, getReminderCountIndex())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.REMINDER_LEVEL, getReminderLevel())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CANONICAL_QUANTILES, isCanonicalQuantiles())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SYMMETRIC_TOLERANCE_INTERVAL, isSymmetricToleranceInterval())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.OUTLIER_TOLERANCE_SPREAD, getOutlierToleranceSpread())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.SUMMARY_SCALE_SPREAD, getSummaryScaleSpread())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_BOX_VISIBLE, isSummaryBoxVisible())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_SPREAD_VISIBLE, isSummarySpreadVisible())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_SPOTS_VISIBLE, isSummarySpotsVisible())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_FOLDERS_CSV, getDataFoldersCsv())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IMPORT_FOLDERS_CSV, getImportFoldersCsv())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.MIRROR_SOURCE_FOLDERS_CSV, getMirrorSourceFoldersCsv())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SOURCE_FILE_LISTENER_ACTIVE, isSourceFileListenerActive())); //$NON-NLS-1$
-			this.writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_OBJECT_QUERY_ACTIVE, isObjectQueryActive())); //$NON-NLS-1$
+			writer.write(String.format("%s\n", Settings.HISTO_BLOCK)); // [Histo Settings] //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_HISTO_ACTIVE, isHistoActive())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SCALE_ORDINAL, getBoxplotScaleOrdinal())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.BOXPLOT_SIZE_ADAPTATION_ORDINAL, getBoxplotSizeAdaptationOrdinal())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.X_SPREAD_GRADE_ORDINAL, getXAxisSpreadOrdinal())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_LOGARITHMIC_DISTANCE, isXAxisLogarithmicDistance())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_X_REVERSED, isXAxisReversed())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.RETROSPECT_MONTHS, getRetrospectMonths())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.SEARCH_DATAPATH_IMPORTS, getSearchDataPathImports())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CHANNEL_MIX, isChannelMix())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.SAMPLING_TIMESPAN_ORDINAL, getSamplingTimespanOrdinal())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IGNORE_LOG_OBJECT_KEY, getIgnoreLogObjectKey())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ZIPPED_CACHE, isZippedCache())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.MINMAX_QUANTILE_DISTANCE, getMinmaxQuantileDistance())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.ABSOLUTE_TRANSITION_LEVEL, getAbsoluteTransitionLevel())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATETIME_UTC, isDateTimeUtc())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_SETTLEMENTS, isDisplaySettlements())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_SCORES, isDisplayScores())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DISPLAY_TAGS, isDisplayTags())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUPPRESS_MODE, isSuppressMode())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CURVE_SURVEY, isCurveSurvey())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.GPS_LOCATION_RADIUS, getGpsLocationRadius())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.SUBDIRECTORY_LEVEL_MAX, getSubDirectoryLevelMax())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATA_TABLE_TRANSITIONS, isDataTableTransitions())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_FIRST_RECORDSET_CHOICE, isFirstRecordSetChoice())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.REMINDER_COUNT_CSV, getReminderCountCsv())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.REMINDER_COUNT_INDEX, getReminderCountIndex())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.REMINDER_LEVEL, getReminderLevel())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_CANONICAL_QUANTILES, isCanonicalQuantiles())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SYMMETRIC_TOLERANCE_INTERVAL, isSymmetricToleranceInterval())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.OUTLIER_TOLERANCE_SPREAD, getOutlierToleranceSpread())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.SUMMARY_SCALE_SPREAD, getSummaryScaleSpread())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_BOX_VISIBLE, isSummaryBoxVisible())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_SPREAD_VISIBLE, isSummarySpreadVisible())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SUMMARY_SPOTS_VISIBLE, isSummarySpotsVisible())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.DATA_FOLDERS_CSV, getDataFoldersCsv())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IMPORT_FOLDERS_CSV, getImportFoldersCsv())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.MIRROR_SOURCE_FOLDERS_CSV, getMirrorSourceFoldersCsv())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SOURCE_FILE_LISTENER_ACTIVE, isSourceFileListenerActive())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_OBJECT_QUERY_ACTIVE, isObjectQueryActive())); //$NON-NLS-1$
 
-			this.writer.flush();
-			this.writer.close();
+			writer.flush();
+			writer.close();
 		}
 		catch (IOException e) {
 			Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, $METHOS_NAME, e.getMessage(), e);
@@ -936,12 +907,19 @@ public class Settings extends Properties {
 		return this.getProperty(Settings.OBJECT_LIST, Messages.getString(MessageIds.GDE_MSGT0200));
 	}
 
+	/**
+	 * @return the objects for UI purposes (the first entry is 'deviceoriented' or the translated equivalent)
+	 */
 	public String[] getObjectList() {
 		String[] objectKeys = this.getProperty(Settings.OBJECT_LIST, Messages.getString(MessageIds.GDE_MSGT0200)).split(GDE.STRING_SEMICOLON);
 		objectKeys[0] = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
 		return objectKeys;
 	}
 
+	/**
+	 * @param activeObjectList are the objects for UI purposes (the first entry is 'deviceoriented' or the translated equivalent)
+	 * @param newActiveObjectIndex related to {@code activeObjectList}
+	 */
 	public void setObjectList(String[] activeObjectList, int newActiveObjectIndex) {
 		String activeObjectKey = activeObjectList[0];
 		try {
@@ -954,39 +932,45 @@ public class Settings extends Properties {
 		setObjectList(activeObjectList, activeObjectKey);
 	}
 
-	public void setObjectList(String[] activeObjectList, String newObjectKey) {
+	/**
+	 * @param objectList are the unsorted object names with or without the device oriented entry
+	 * @param activeObject is an object name (supports an empty string or any 'deviceoriented' string)
+	 */
+	public void setObjectList(String[] objectList, String activeObject) {
 		// keep object oriented out of the sorting game
-		boolean startsWithDeviceOriented = activeObjectList[0].startsWith(Messages.getString(MessageIds.GDE_MSGT0200).substring(0, 10));
+		boolean startsWithDeviceOriented = objectList[0].startsWith(Messages.getString(MessageIds.GDE_MSGT0200).substring(0, 10));
 		if (startsWithDeviceOriented) {
-			String[] tmpObjectKeys = new String[activeObjectList.length - 1];
-			System.arraycopy(activeObjectList, 1, tmpObjectKeys, 0, activeObjectList.length - 1);
+			String[] tmpObjectKeys = new String[objectList.length - 1];
+			System.arraycopy(objectList, 1, tmpObjectKeys, 0, objectList.length - 1);
 			Arrays.sort(tmpObjectKeys, String.CASE_INSENSITIVE_ORDER);
-			System.arraycopy(tmpObjectKeys, 0, activeObjectList, 1, activeObjectList.length - 1);
+			System.arraycopy(tmpObjectKeys, 0, objectList, 1, objectList.length - 1);
 		}
 		else {
-			Arrays.sort(activeObjectList, String.CASE_INSENSITIVE_ORDER);
-			String[] tmpObjectKeys = new String[activeObjectList.length + 1];
+			Arrays.sort(objectList, String.CASE_INSENSITIVE_ORDER);
+			String[] tmpObjectKeys = new String[objectList.length + 1];
 			tmpObjectKeys[0] = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
-			System.arraycopy(activeObjectList, 0, tmpObjectKeys, 1, activeObjectList.length);
-			activeObjectList = tmpObjectKeys;
+			System.arraycopy(objectList, 0, tmpObjectKeys, 1, objectList.length);
+			objectList = tmpObjectKeys;
 		}
 		// check for invalid object key
 		Vector<String> tmpObjectVector = new Vector<String>();
-		for (String objectKey : activeObjectList) {
+		for (String objectKey : objectList) {
 			boolean isDuplicateKey = tmpObjectVector.stream().anyMatch(x -> x.equalsIgnoreCase(objectKey));
 			if (!isDuplicateKey && objectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) tmpObjectVector.add(objectKey.trim());
 		}
-		activeObjectList = tmpObjectVector.toArray(new String[1]);
 
 		// find the active object index within sorted array
 		StringBuffer sb = new StringBuffer();
-		for (String element : activeObjectList) {
+		for (String element : tmpObjectVector) {
 			sb.append(element).append(GDE.STRING_SEMICOLON);
 		}
 		this.setProperty(Settings.OBJECT_LIST, sb.toString());
-		this.setProperty(Settings.ACTIVE_OBJECT, newObjectKey);
+		this.setProperty(Settings.ACTIVE_OBJECT, activeObject);
 	}
 
+	/**
+	 * @return the index based on the object list (or 0 if no match)
+	 */
 	public int getActiveObjectIndex() {
 		Vector<String> tmpObjectVector = new Vector<String>();
 		for (String objectKey : this.getObjectList()) {
@@ -996,6 +980,9 @@ public class Settings extends Properties {
 		return index < 0 ? 0 : index;
 	}
 
+	/**
+	 * @return the object for UI purposes (might be 'deviceoriented' or the translated equivalent)
+	 */
 	public String getActiveObject() {
 		return getObjectList()[getActiveObjectIndex()];
 	}
@@ -1010,7 +997,7 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @param newObjectKey is an arbitrary key (or device oriented fitting to the language) which is checked in the getter for conformity with the objects list
+	 * @param newObjectKey is an object name (supports an empty string or any 'deviceoriented' string) which is checked in the getter for conformity with the objects list
 	 */
 	public void setActiveObjectKey(String newObjectKey) {
 		this.setProperty(Settings.ACTIVE_OBJECT, newObjectKey);
@@ -2315,15 +2302,7 @@ public class Settings extends Properties {
 	}
 
 	public void startMigationThread() {
-		if (this.migrationThread != null) {
-			this.migrationThread.run();
-			try {
-				this.migrationThread.join();
-			}
-			catch (InterruptedException e) {
-				Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, "migrationThread.run()", e.getMessage(), e);
-			}
-		}
+		if (this.migrationThread != null) this.migrationThread.run();
 	}
 
 	/**
@@ -2777,23 +2756,6 @@ public class Settings extends Properties {
 	}
 
 	/**
-	 * @param isDataSettingsAtHomePath true if the history data settings are stored in the user's home path (not in the data path)
-	 */
-	public void setDataSettingsAtHomePath(boolean isDataSettingsAtHomePath) {
-		if (this.isDataSettingsAtHomePath() != isDataSettingsAtHomePath) {
-			HistoSet.cleanExclusionData();
-			this.setProperty(Settings.IS_DATA_SETTINGS_AT_HOME_PATH, String.valueOf(isDataSettingsAtHomePath));
-		}
-	}
-
-	/**
-	 * @return true if the history data settings are stored in the user's home path (not in the data path)
-	 */
-	public boolean isDataSettingsAtHomePath() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_DATA_SETTINGS_AT_HOME_PATH, "true")); //$NON-NLS-1$
-	}
-
-	/**
 	 * @param isSuppressMode true if ignoring recordsets in the history is active
 	 */
 	public void setSuppressMode(boolean isSuppressMode) {
@@ -2833,26 +2795,6 @@ public class Settings extends Properties {
 	 */
 	public void setGpsLocationRadius(double doubleValue) {
 		this.setProperty(Settings.GPS_LOCATION_RADIUS, String.valueOf(doubleValue));
-	}
-
-	/**
-	 * @return the GPS address type (default is the 2nd entry)
-	 */
-	public GeoCodeGoogle getGpsAddressType() {
-		return GeoCodeGoogle.valueOf(this.getProperty(Settings.GPS_ADDRESS_TYPE, String.valueOf(GeoCodeGoogle.STREET_ADDRESS)));
-	}
-
-	/**
-	 * @param geoCodeGoogleText
-	 */
-	public void setGpsAddressType(String geoCodeGoogleText) {
-		try {
-			final GeoCodeGoogle ordinal = GeoCodeGoogle.valueOf(geoCodeGoogleText);
-			this.setProperty(Settings.GPS_ADDRESS_TYPE, ordinal.name());
-		}
-		catch (Exception e) {
-			this.setProperty(Settings.GPS_ADDRESS_TYPE, GeoCodeGoogle.VALUES[1].name());
-		}
 	}
 
 	/**
