@@ -402,7 +402,7 @@ public final class HistoCurveUtils {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); // xPos = x0
 			log.fine(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); // yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, record.getMinScaleValue(), record.getMaxScaleValue(), ticklength, gap, isPositionLeft, drawNumbersInRecordColor);
+			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, graphicsData.getMinDisplayValue(), graphicsData.getMaxDisplayValue(), ticklength, gap, isPositionLeft, drawNumbersInRecordColor);
 			log.finest(() -> "drawText x = " + (xPos - pt.y - 15)); // xPosition Text Spannung [] //$NON-NLS-1$
 			if (drawNameInRecordColor)
 				gc.setForeground(record.getColor());
@@ -413,7 +413,7 @@ public final class HistoCurveUtils {
 			int xPos = x0 + 1 + width + positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); // yMax
 			log.fine(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height));
-			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, record.getMinScaleValue(), record.getMaxScaleValue(), ticklength, gap, isPositionLeft, drawNumbersInRecordColor);
+			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, graphicsData.getMinDisplayValue(), graphicsData.getMaxDisplayValue(), ticklength, gap, isPositionLeft, drawNumbersInRecordColor);
 			if (drawNameInRecordColor)
 				gc.setForeground(record.getColor());
 			else

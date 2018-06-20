@@ -22,6 +22,8 @@ package gde.histo.ui;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -92,6 +94,24 @@ public abstract class AbstractChartComposite extends Composite {
 
 		public AbstractChartLayout put(String recordName, AbstractChartLayout chartLayout) {
 			return chartData.put(recordName, chartLayout);
+		}
+
+		@Override
+		public String toString() {
+			final int maxLen = 10;
+			return "AbstractChartData [chartData=" + (this.chartData != null ? this.toString(this.chartData.entrySet(), maxLen) : null) + "]";
+		}
+
+		private String toString(Collection<?> collection, int maxLen) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("[");
+			int i = 0;
+			for (Iterator<?> iterator = collection.iterator(); iterator.hasNext() && i < maxLen; i++) {
+				if (i > 0) builder.append(", ");
+				builder.append(iterator.next());
+			}
+			builder.append("]");
+			return builder.toString();
 		}
 	}
 
