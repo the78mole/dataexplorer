@@ -51,9 +51,8 @@ public class ObjectKeyScanner extends Thread {
 	final private DataExplorer		application					= DataExplorer.getInstance();
 	final private Settings				settings						= Settings.getInstance();
 	String												objectKey						= GDE.STRING_EMPTY;
-	// ET 20170511 boolean searchForKeys = false;
+
 	final boolean									addToExistentKeys;
-	private final Vector<String>	objectKeys					= new Vector<>();
 
 	private List<String>					obsoleteObjectKeys	= new ArrayList<>();
 
@@ -67,9 +66,6 @@ public class ObjectKeyScanner extends Thread {
 	public ObjectKeyScanner(boolean newAddToExistentKeys) {
 		super("objectKeyScanner");
 		this.addToExistentKeys = newAddToExistentKeys;
-		for (String tmpObjKey : this.settings.getObjectList()) {
-			this.objectKeys.add(tmpObjKey);
-		}
 	}
 
 	/**
@@ -82,9 +78,6 @@ public class ObjectKeyScanner extends Thread {
 		super("objectKeyScanner");
 		this.objectKey = newObjectKey;
 		this.addToExistentKeys = false;
-		for (String tmpObjKey : this.settings.getObjectList()) {
-			this.objectKeys.add(tmpObjKey);
-		}
 	}
 
 	@Override
@@ -94,21 +87,7 @@ public class ObjectKeyScanner extends Thread {
 
 			if (this.objectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) { // use exact defined object key
 				String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-				//check directory and cleanup if already exist
 				FileUtils.checkDirectoryAndCreate(objectKeyDirPath);
-
-				// check if object key known (settings)
-				String[] objectList = this.settings.getObjectList();
-				boolean isKnown = true;
-				for (String objectName : objectList) {
-					if (!objectName.equals(this.objectKey)) {
-						isKnown = false;
-						break;
-					}
-				}
-				if (!isKnown && !this.objectKeys.contains(this.objectKey)) {
-					this.objectKeys.add(this.objectKey);
-				}
 
 				//scan all data files for object key
 				List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()), 1);
@@ -150,11 +129,10 @@ public class ObjectKeyScanner extends Thread {
 
 				final File rootDirectory = new File(this.settings.getDataFilePath());
 				log.log(Level.FINE, "this.settings.getDataFilePath() = " + rootDirectory.toString());
-				this.objectKeys.clear();
+				Vector<String> objectKeys = new Vector<>();
 				HashMap<String, Vector<File>> objectFilesMap = new HashMap<String, Vector<File>>();
 				{
 					int fileCounter = 0;
-					//ET 20170511				if (this.searchForKeys) {
 					List<File> files = FileUtils.getFileListing(rootDirectory, 1);
 					final int progressDistance = 50;
 					double progressStep = (99. - this.application.getProgressPercentage()) / (files.size() + 1.) * progressDistance;
@@ -168,9 +146,9 @@ public class ObjectKeyScanner extends Thread {
 									log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
 									String foundObjectKey = OsdReaderWriter.getHeader(file.getCanonicalPath()).get(GDE.OBJECT_KEY);
 									if (foundObjectKey != null && foundObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) { // is a valid object key
-										if (!this.objectKeys.contains(foundObjectKey)) {
+										if (!objectKeys.contains(foundObjectKey)) {
 											log.log(Level.FINE, "found new object key " + foundObjectKey); //$NON-NLS-1$
-											this.objectKeys.add(foundObjectKey);
+											objectKeys.add(foundObjectKey);
 											Vector<File> tmpObjectFiles = new Vector<File>();
 											tmpObjectFiles.add(file);
 											objectFilesMap.put(foundObjectKey, tmpObjectFiles);
@@ -195,15 +173,15 @@ public class ObjectKeyScanner extends Thread {
 							log.log(Level.WARNING, t.getLocalizedMessage(), t);
 						}
 					}
-					log.log(Level.FINE, "scanned " + fileCounter + " files for object key , foundKeysSize=" + this.objectKeys.size()); //$NON-NLS-1$ //$NON-NLS-2$
+					log.log(Level.FINE, "scanned " + fileCounter + " files for object key , foundKeysSize=" + objectKeys.size()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				if (this.application.getMenuToolBar() != null) this.application.setProgress(progressPercentageLimit, sThreadId);
 				{ // createFileLinks: Take the object key list and create file links for all files assigned to object keys.
 					int progressPercentageStart = this.application.getProgressPercentage();
-					double progressStep = (100. - progressPercentageStart) / this.objectKeys.size();
+					double progressStep = (100. - progressPercentageStart) / objectKeys.size();
 
 					int j = 0;
-					Iterator<String> iterator = this.objectKeys.iterator();
+					Iterator<String> iterator = objectKeys.iterator();
 					//iterate all found object keys
 					while (iterator.hasNext()) {
 						String tmpObjKey = iterator.next();
@@ -228,7 +206,7 @@ public class ObjectKeyScanner extends Thread {
 				}
 				if (this.addToExistentKeys) {
 					Set<String> newObjectList = Settings.getInstance().getRealObjectKeys().collect(Collectors.toSet());
-					if (newObjectList.addAll(this.objectKeys) || !newObjectList.equals(new HashSet<>(this.objectKeys))) {
+					if (newObjectList.addAll(objectKeys) || !newObjectList.equals(new HashSet<>(objectKeys))) {
 						this.application.setObjectList(newObjectList.toArray(new String[0]), this.settings.getActiveObject());
 						log.log(Level.FINE, "object list updated: ", newObjectList); //$NON-NLS-1$
 					}
@@ -236,7 +214,7 @@ public class ObjectKeyScanner extends Thread {
 					this.obsoleteObjectKeys = getObsoleteObjectKeys(rootDirectory);
 				}
 				else {
-					this.application.setObjectList(this.objectKeys.toArray(new String[0]), this.settings.getActiveObject());
+					this.application.setObjectList(objectKeys.toArray(new String[0]), this.settings.getActiveObject());
 				}
 				if (this.application.getMenuToolBar() != null) this.application.setProgress(100, sThreadId);
 			}
@@ -276,27 +254,6 @@ public class ObjectKeyScanner extends Thread {
 		}
 		log.log(Level.INFO, "obsoleteObjectKeys: ", resultObjectKeys); //$NON-NLS-1$
 		return resultObjectKeys;
-	}
-
-	//	/**
-	//	 * @param newObjectKey the objectKey to set
-	//	 */
-	//	public void setObjectKey(String newObjectKey) {
-	//		this.objectKey = newObjectKey;
-	//	}
-	//
-	//	/**
-	//	 * @param enable the searchForKeys to set
-	//	 */
-	//	public void setSearchForKeys(boolean enable) {
-	//		this.searchForKeys = enable;
-	//	}
-	//
-	/**
-	 * @return object key list found during scan
-	 */
-	public String[] getObjectList() {
-		return this.objectKeys.toArray(new String[0]);
 	}
 
 	/**
