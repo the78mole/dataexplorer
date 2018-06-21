@@ -47,6 +47,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.swt.custom.CTabItem;
 
+import gde.DataAccess;
 import gde.GDE;
 import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
@@ -73,11 +74,8 @@ public class DeviceConfiguration {
 	private final Settings										settings;
 	final DeviceXmlResource										xmlResource								= DeviceXmlResource.getInstance();
 
-	// JAXB XML environment
-	private final Unmarshaller								unmarshaller;
-	private final Marshaller									marshaller;
-	private File															xmlFile;
-	private String														fileSha1Hash = GDE.STRING_EMPTY;
+	private Path															xmlFile;
+	private String														fileSha1Hash							= GDE.STRING_EMPTY;
 	// XML JAXB representation
 	private JAXBElement<DevicePropertiesType>	elememt;
 	private DevicePropertiesType							deviceProps;
@@ -168,20 +166,17 @@ public class DeviceConfiguration {
 		}
 	}
 
-	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>)
 	public DeviceConfiguration(String xmlFileName) throws FileNotFoundException, JAXBException {
-
-		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
+		this.xmlFile = Paths.get(xmlFileName);
+		if (!(xmlFile.toFile().exists())) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
 
 		this.settings = Settings.getInstance();
 
-		while (this.settings.isXsdThreadAlive() || this.settings.getUnmarshaller() == null) {
+		while (this.settings.isXsdThreadPending()) {
 			WaitTimer.delay(5);
 		}
-		this.unmarshaller = this.settings.getUnmarshaller();
-		this.marshaller = this.settings.getMarshaller();
 
-		this.elememt = (JAXBElement<DevicePropertiesType>) this.unmarshaller.unmarshal(this.xmlFile);
+		this.elememt = this.settings.getDeviceSerialization().getTopElement(this.xmlFile.toString());
 		this.deviceProps = this.elememt.getValue();
 		this.device = this.deviceProps.getDevice();
 		this.serialPort = this.deviceProps.getSerialPort();
@@ -197,18 +192,16 @@ public class DeviceConfiguration {
 
 	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>)
 	public DeviceConfiguration(String xmlFileName, Unmarshaller tmpUnmarshaller) throws FileNotFoundException, JAXBException {
-
-		if (!(this.xmlFile = new File(xmlFileName)).exists()) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
+		this.xmlFile = Paths.get(xmlFileName);
+		if (!(xmlFile.toFile().exists())) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
 
 		this.settings = Settings.getInstance();
 
-		while (this.settings.isXsdThreadAlive() || this.settings.getUnmarshaller() == null) {
+		while (this.settings.isXsdThreadPending()) {
 			WaitTimer.delay(5);
 		}
-		this.unmarshaller = tmpUnmarshaller;
-		this.marshaller = null;
 
-		this.elememt = (JAXBElement<DevicePropertiesType>) this.unmarshaller.unmarshal(this.xmlFile);
+		this.elememt = (JAXBElement<DevicePropertiesType>) tmpUnmarshaller.unmarshal(this.xmlFile.toFile());
 		this.deviceProps = this.elememt.getValue();
 		this.device = this.deviceProps.getDevice();
 		this.serialPort = this.deviceProps.getSerialPort();
@@ -227,8 +220,6 @@ public class DeviceConfiguration {
 	 */
 	public DeviceConfiguration(DeviceConfiguration deviceConfig) {
 		this.settings = deviceConfig.settings;
-		this.unmarshaller = deviceConfig.unmarshaller;
-		this.marshaller = deviceConfig.marshaller;
 		this.xmlFile = deviceConfig.xmlFile;
 		this.fileSha1Hash = deviceConfig.fileSha1Hash;
 		this.elememt = deviceConfig.elememt;
@@ -246,13 +237,42 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * Use this for roaming data sources support via the DataAccess class.
+	 * @param xmlFileSubPath is a relative path based on the roaming folder
+	 */
+	public DeviceConfiguration(Path xmlFileSubPath) throws FileNotFoundException, JAXBException {
+		this.xmlFile = Paths.get(GDE.APPL_HOME_PATH).resolve(xmlFileSubPath);
+		if (!(DataAccess.getInstance().existsDeviceXml(xmlFileSubPath))) throw new FileNotFoundException(
+				Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileSubPath.toString());
+
+		this.settings = Settings.getInstance();
+
+		while (this.settings.isXsdThreadPending()) {
+			WaitTimer.delay(5);
+		}
+
+		this.elememt = this.settings.getDeviceSerialization().getTopElement(xmlFileSubPath);
+		this.deviceProps = this.elememt.getValue();
+		this.device = this.deviceProps.getDevice();
+		this.serialPort = this.deviceProps.getSerialPort();
+		this.usbPort = this.deviceProps.getUsbPort();
+		this.dataBlock = this.deviceProps.getDataBlock();
+		this.state = this.deviceProps.getState();
+		this.timeBase = this.deviceProps.getTimeBase();
+		this.desktop = this.deviceProps.getDesktop();
+		this.isChangePropery = false;
+
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
+	}
+
+	/**
 	 * writes updated device properties XML
 	 */
 	public void storeDeviceProperties() {
 		if (this.isChangePropery) {
 			try {
 				this.fileSha1Hash = GDE.STRING_EMPTY;
-				this.marshaller.marshal(this.elememt, new FileOutputStream(this.xmlFile));
+				this.settings.getDeviceSerialization().marshall(this.elememt, this.xmlFile);
 			}
 			catch (Throwable t) {
 				log.log(Level.SEVERE, t.getMessage(), t);
@@ -268,7 +288,7 @@ public class DeviceConfiguration {
 	public void storeDeviceProperties(String fullQualifiedFileName) {
 		try {
 			this.fileSha1Hash = GDE.STRING_EMPTY;
-			this.marshaller.marshal(this.elememt, new FileOutputStream(fullQualifiedFileName));
+			this.settings.getDeviceSerialization().marshall(this.elememt, Paths.get(fullQualifiedFileName));
 		}
 		catch (Throwable t) {
 			log.log(Level.SEVERE, t.getMessage(), t);
@@ -337,7 +357,7 @@ public class DeviceConfiguration {
 	}
 
 	public String getPropertiesFileName() {
-		return this.xmlFile.getAbsolutePath();
+		return this.xmlFile.toAbsolutePath().toString();
 	}
 
 	/**
@@ -951,7 +971,7 @@ public class DeviceConfiguration {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] { this.xmlFile.getName() }));
+			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] { this.xmlFile.getFileName().toString() }));
 		}
 		return dataBlockSize;
 	}
@@ -1161,7 +1181,7 @@ public class DeviceConfiguration {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] { this.xmlFile.getName() }));
+			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] { this.xmlFile.getFileName().toString() }));
 		}
 		return "*.*";
 	}
@@ -2301,7 +2321,7 @@ public class DeviceConfiguration {
 	 * method to modify open/close serial port menu toolbar button and device menu entry
 	 * this enable different naming instead open/close start/stop gathering data from device
 	 * and must be called within specific device constructor
-	 * @param useIconSet  DeviceSerialPort.ICON_SET_OPEN_CLOSE | DeviceSerialPort.ICON_SET_START_STOP | DeviceSerialPort.ICON_SET_IMPORT_CLOSE
+	 * @param useIconSet DeviceSerialPort.ICON_SET_OPEN_CLOSE | DeviceSerialPort.ICON_SET_START_STOP | DeviceSerialPort.ICON_SET_IMPORT_CLOSE
 	 * @param useToolTipOpen
 	 * @param useToolTipClose
 	 */
@@ -2396,8 +2416,8 @@ public class DeviceConfiguration {
 	 * @return recordSetStemName
 	 */
 	public String getRecordSetStemName() {
-		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " +this.getStateType().getProperty().get(0).getName()
-				: Messages.getString(MessageIds.GDE_MSGT0272)	: Messages.getString(MessageIds.GDE_MSGT0272);
+		return this.getStateType() != null ? this.getStateType().getProperty() != null ? ") " + this.getStateType().getProperty().get(0).getName()
+				: Messages.getString(MessageIds.GDE_MSGT0272) : Messages.getString(MessageIds.GDE_MSGT0272);
 	}
 
 	/**
@@ -2513,8 +2533,8 @@ public class DeviceConfiguration {
 
 	/**
 	 * method to get the sorted active or in active record names as string array
-	 *  - records which does not have inactive or active flag are calculated from active or inactive
-	 *  - all records not calculated may have the active status and must be stored
+	 * - records which does not have inactive or active flag are calculated from active or inactive
+	 * - all records not calculated may have the active status and must be stored
 	 * @param channelConfigNumber
 	 * @param validMeasurementNames based on the current or any previous configuration
 	 * @return String[] containing record names
@@ -2530,10 +2550,10 @@ public class DeviceConfiguration {
 			if (!measurement.isCalculation()) { // active or inactive
 				tmpCalculationRecords.add(validMeasurementNames[i]);
 			}
-			//else
-			//	System.out.println(measurement.getName());
+			// else
+			// System.out.println(measurement.getName());
 		}
-		//assume attached records are calculations like DataVario
+		// assume attached records are calculations like DataVario
 		while (tmpCalculationRecords.size() > deviceDataBlockSize) {
 			tmpCalculationRecords.remove(deviceDataBlockSize);
 		}
@@ -2549,15 +2569,15 @@ public class DeviceConfiguration {
 	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
 	 */
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
-		//check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
+		// check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
-		if ((recordKeys.length - fileRecordsProperties.length) > 0) { //events ...
+		if ((recordKeys.length - fileRecordsProperties.length) > 0) { // events ...
 			int i = 0;
 			for (; i < fileRecordsProperties.length; ++i) {
 				cleanedRecordNames.add(recordKeys[i]);
 			}
-			//cleanup recordSet
+			// cleanup recordSet
 			for (; i < recordKeys.length; ++i) {
 				recordSet.remove(recordKeys[i]);
 			}
@@ -2744,6 +2764,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * Roaming data sources support via the DataAccess class.
 	 * @return sha1 key as a unique identifier for the device xml file contents
 	 */
 	public String getFileSha1Hash() {
@@ -2752,8 +2773,9 @@ public class DeviceConfiguration {
 	}
 
 	private void setFileSha1Hash() {
+		Path fileSubPath = Paths.get(GDE.APPL_HOME_PATH).relativize(this.xmlFile);
 		try {
-			this.fileSha1Hash = SecureHash.sha1(this.xmlFile);
+			this.fileSha1Hash = SecureHash.sha1(DataAccess.getInstance().getDeviceXmlInputStream(fileSubPath));
 		} catch (Exception e) {
 			this.fileSha1Hash = GDE.STRING_EMPTY;
 			log.log(Level.SEVERE, e.getMessage(), e);

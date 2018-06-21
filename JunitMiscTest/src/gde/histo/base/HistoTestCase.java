@@ -119,7 +119,7 @@ public class HistoTestCase extends TestCase {
 	 */
 	protected void setHistoSettings() {
 		// wait until schema is setup
-		while (this.settings.isXsdThreadAlive()) {
+		while (this.settings.isXsdThreadPending()) {
 			try {
 				Thread.sleep(5);
 			}

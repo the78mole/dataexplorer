@@ -104,7 +104,7 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 		for (GpsCoordinate gpsCoordinate : gpsCluster) {
 			// preserve the correct vaults sequence
 			if (gpsCoordinate != null)
-				tmpGpsLocations.add(GeoCodes.getLocation(gpsCluster.getAssignedClusters().get(gpsCoordinate).getCenter()));
+				tmpGpsLocations.add(GeoCodes.getOrAcquireLocation(gpsCluster.getAssignedClusters().get(gpsCoordinate).getCenter()));
 			else
 				tmpGpsLocations.add(GDE.STRING_EMPTY);
 		}

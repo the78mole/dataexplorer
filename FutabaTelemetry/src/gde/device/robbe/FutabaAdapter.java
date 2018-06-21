@@ -18,13 +18,10 @@
 ****************************************************************************************/
 package gde.device.robbe;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -39,6 +36,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+import gde.DataAccess;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -134,22 +132,13 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * read special properties to enable configuration to specific GPX extent values
-	 * @throws FileNotFoundException
 	 */
 	private void readProperties() {
-		String preopertyFilePath = Settings.getInstance().getApplHomePath() + "/Mapping/FutabaMeasurementMappings.xml"; //$NON-NLS-1$
-		try {
-			if (!new File(preopertyFilePath).exists()) {
-				File path = new File(Settings.getInstance().getApplHomePath() + "/Mapping"); //$NON-NLS-1$
-				if (!path.exists() && !path.isDirectory()) path.mkdir();
-				//extract initial property files
-				FileUtils.extract(this.getClass(), "FutabaMeasurementMappings.xml", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			}
-			BufferedInputStream stream = new BufferedInputStream(new FileInputStream(preopertyFilePath));
+		DataAccess.getInstance().checkMappingFileAndCreate(this.getClass(), "FutabaMeasurementMappings.xml");
+		try (InputStream stream = DataAccess.getInstance().getMappingInputStream("FutabaMeasurementMappings.xml")) {
 			FutabaAdapter.properties.loadFromXML(stream);
-			stream.close();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
+			String preopertyFilePath = Settings.MAPPINGS_DIR_NAME + GDE.FILE_SEPARATOR_UNIX + "FutabaMeasurementMappings.xml"; //$NON-NLS-1$
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE3300, new String[] { preopertyFilePath }));
 		}
 	}
@@ -191,6 +180,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZ3DRelativeItem.setText(Messages.getString(MessageIds.GDE_MSGT3311));
 			convertKMZ3DRelativeItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "convertKMZ3DRelativeItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_RELATIVE);
@@ -200,6 +190,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT3312));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_ABSOLUTE);
@@ -209,6 +200,7 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 			convertKMZDAbsoluteItem = new MenuItem(exportMenue, SWT.PUSH);
 			convertKMZDAbsoluteItem.setText(Messages.getString(MessageIds.GDE_MSGT3313));
 			convertKMZDAbsoluteItem.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event e) {
 					log.log(Level.FINEST, "convertKMZDAbsoluteItem action performed! " + e); //$NON-NLS-1$
 					export2KMZ3D(DeviceConfiguration.HEIGHT_CLAMPTOGROUND);

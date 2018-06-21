@@ -23,21 +23,30 @@ package gde;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Locale;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import com.sun.istack.internal.Nullable;
 
@@ -46,6 +55,8 @@ import gde.histo.cache.HistoVault;
 import gde.histo.cache.VaultProxy;
 import gde.log.Level;
 import gde.log.Logger;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
 import gde.utils.FileUtils;
 
 /**
@@ -53,8 +64,10 @@ import gde.utils.FileUtils;
  * @author Thomas Eickert (USER)
  */
 public abstract class DataAccess {
+	private static final String	$CLASS_NAME				= DataAccess.class.getName();
+	private static final Logger	log								= Logger.getLogger($CLASS_NAME);
 
-	private static final int MIN_VAULT_LENGTH = 2048;
+	private static final int		MIN_VAULT_LENGTH	= 2048;
 
 	public static class LocalAccess extends DataAccess {
 		private static final String	$CLASS_NAME	= LocalAccess.class.getName();
@@ -203,7 +216,7 @@ public abstract class DataAccess {
 		@Override
 		@Nullable
 		public HistoVault getVault(String folderName, String fileName) {
-			final Path cachePath = Settings.getInstance().getHistoCacheDirectory().resolve(folderName);
+			Path cachePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, folderName);
 			HistoVault histoVault = null;
 			if (Settings.getInstance().isZippedCache()) {
 				try (ZipFile zf = new ZipFile(cachePath.toFile())) {
@@ -224,6 +237,144 @@ public abstract class DataAccess {
 				}
 			}
 			return histoVault;
+		}
+
+		@Override
+		public boolean existsDeviceXml(Path fileSubPath) {
+			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH).resolve(fileSubPath);
+			return targetFilePath.toFile().exists();
+		}
+
+		@Override
+		public InputStream getDeviceXsdInputStream() throws FileNotFoundException {
+			String xmlBasePath = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + GDE.FILE_SEPARATOR_UNIX;
+			Path targetFilePath = Paths.get(xmlBasePath, Settings.DEVICE_PROPERTIES_XSD_NAME);
+			return new FileInputStream(targetFilePath.toFile());
+		}
+
+		@Override
+		public InputStream getDeviceXmlInputStream(Path fileSubPath) throws FileNotFoundException {
+			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH).resolve(fileSubPath);
+			return new FileInputStream(targetFilePath.toFile());
+		}
+
+		public InputStream getDeviceXsdMigrationStream(int versionNumber) throws FileNotFoundException {
+			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
+			Path targetFilePath = migratePropertyPath.resolve("/DeviceProperties_V" + versionNumber + GDE.FILE_ENDING_DOT_XSD);
+			return new FileInputStream(targetFilePath.toFile());
+		}
+
+		public boolean existsDeviceMigrationFolder(int versionNumber) {
+			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
+			return migratePropertyPath.toFile().exists();
+		}
+
+		public List<File> getDeviceXmls(int versionNumber) throws FileNotFoundException {
+			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
+			return FileUtils.getFileListing(migratePropertyPath.toFile(), 1, GDE.FILE_ENDING_DOT_XML);
+		}
+
+		@Override
+		public InputStream getGeoCodeInputStream(String geoFileName) throws FileNotFoundException {
+			Path filePath = Paths.get(GDE.APPL_HOME_PATH, Settings.GPS_LOCATIONS_DIR_NAME, geoFileName);
+			return new FileInputStream(filePath.toFile());
+		}
+
+		public InputStream getHttpsInputStream(URL requestUrl) throws IOException {
+			HttpsURLConnection conn = (HttpsURLConnection) requestUrl.openConnection();
+			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+			InputStream httpInputStream = conn.getInputStream();
+			return httpInputStream;
+		}
+
+		public FileOutputStream getGeoCodeOutputStream(String geoFileName) throws FileNotFoundException {
+			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.GPS_LOCATIONS_DIR_NAME, geoFileName);
+			return new FileOutputStream(targetFilePath.toString());
+		}
+
+		@Override
+		public boolean existsGeoCodeFile(String geoFileName) {
+			Path filePath = Paths.get(GDE.APPL_HOME_PATH, Settings.GPS_LOCATIONS_DIR_NAME, geoFileName);
+			return FileUtils.checkFileExist(filePath.toString());
+		}
+
+		@Override
+		public void deleteGeoCodeFile(String geoFileName) {
+			Path filePath = Paths.get(GDE.APPL_HOME_PATH, Settings.GPS_LOCATIONS_DIR_NAME, geoFileName);
+			FileUtils.deleteFile(filePath.toString());
+		}
+
+		@Override
+		public List<File> getGeoCodeFiles() throws FileNotFoundException {
+			Path locationsPath = Paths.get(GDE.APPL_HOME_PATH, Settings.GPS_LOCATIONS_DIR_NAME);
+			return FileUtils.getFileListing(locationsPath.toFile(), 0);
+		}
+
+		/**
+		 * @return true if files were actually deleted
+		 */
+		public boolean resetHistolocations() {
+			Path locationsPath = Paths.get(GDE.APPL_HOME_PATH, Settings.GPS_LOCATIONS_DIR_NAME);
+			if (FileUtils.checkDirectoryExist(locationsPath.toString())) {
+				FileUtils.deleteDirectory(locationsPath.toString());
+				log.log(Level.CONFIG, "histo geo locations deleted"); //$NON-NLS-1$
+				return true;
+			} else
+				return false;
+		}
+
+		/**
+		 * @return true if the folder already exists
+		 */
+		public boolean checkAndCreateHistoLocations() {
+			return FileUtils.checkDirectoryAndCreate(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.GPS_LOCATIONS_DIR_NAME);
+		}
+
+		public String resetHistoCache() {
+			Path cachePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
+			int initialSize_KiB = (int) FileUtils.size(cachePath) / 1024;
+			FileUtils.deleteDirectory(cachePath.toString());
+			FileUtils.checkDirectoryAndCreate(cachePath.toString());
+			int deletedSize_KiB = (int) FileUtils.size(cachePath) / 1024;
+			FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, cachePath.toString(), Settings.PERMISSION_555);
+			String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, deletedSize_KiB, cachePath });
+			log.log(Level.CONFIG, message);
+			return message;
+		}
+
+		@Override
+		public boolean existsCacheDirectory(String directoryName) {
+			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH , Settings.HISTO_CACHE_ENTRIES_DIR_NAME , directoryName);
+			return cacheDirectoryPath.toFile().exists();
+		}
+
+		@Override
+		public InputStream getCacheXsdInputStream() throws FileNotFoundException {
+			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH , Settings.HISTO_CACHE_ENTRIES_DIR_NAME, Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
+			return new FileInputStream(targetFilePath.toFile());
+		}
+
+		@Override
+		public ZipInputStream getCacheZipInputStream(String directoryName) throws ZipException, IOException {
+			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH , Settings.HISTO_CACHE_ENTRIES_DIR_NAME , directoryName);
+			return new ZipInputStream(new FileInputStream(cacheDirectoryPath.toFile()));
+		}
+
+		@Override
+		public InputStream getMappingInputStream(String fileName) throws FileNotFoundException {
+			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.MAPPINGS_DIR_NAME, fileName);
+			return new BufferedInputStream(new FileInputStream(targetFilePath.toFile()));
+		}
+
+		@Override
+		public void checkMappingFileAndCreate(Class<?>  sourceClass, String fileName) {
+			File path = new File(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.MAPPINGS_DIR_NAME);
+			Path targetFilePath = Paths.get(path.toString() + GDE.FILE_SEPARATOR_UNIX + fileName);
+			if (!targetFilePath.toFile().exists()) {
+				if (!path.exists() && !path.isDirectory()) path.mkdir();
+				//extract initial property files
+				FileUtils.extract(sourceClass, fileName, Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 
 	}
@@ -314,9 +465,41 @@ public abstract class DataAccess {
 	public abstract void deleteExclusionFile(String fileName);
 
 	/**
-	 * @return the vault retrieved from the file system if it exceeds the minumum file size
+	 * @return the vault retrieved from the file system if it exceeds the minimum file size
 	 */
 	@Nullable
 	public abstract HistoVault getVault(String folderName, String fileName);
+
+	/**
+	 * @param fileSubPath is a relative path based on the roaming folder
+	 * @return true if the file exists
+	 */
+	public abstract boolean existsDeviceXml(Path fileSubPath);
+
+	public abstract InputStream getDeviceXsdInputStream() throws FileNotFoundException;
+
+	/**
+	 * @param fileSubPath is a relative path based on the roaming folder
+	 * @return the inputStream for a device properties file
+	 */
+	public abstract InputStream getDeviceXmlInputStream(Path fileSubPath) throws FileNotFoundException;
+
+	public abstract InputStream getGeoCodeInputStream(String geoFileName) throws FileNotFoundException;
+
+	public abstract boolean existsGeoCodeFile(String geoFileName);
+
+	public abstract void deleteGeoCodeFile(String geoFileName);
+
+	public abstract List<File> getGeoCodeFiles() throws FileNotFoundException;
+
+	public abstract boolean existsCacheDirectory(String directoryName);
+
+	public abstract InputStream getCacheXsdInputStream() throws FileNotFoundException;
+
+	public abstract ZipInputStream getCacheZipInputStream(String directoryName) throws ZipException, IOException;
+
+	public abstract InputStream getMappingInputStream(String fileName) throws FileNotFoundException;
+
+	public abstract void checkMappingFileAndCreate(Class<?> sourceClass, String fileName);
 
 }

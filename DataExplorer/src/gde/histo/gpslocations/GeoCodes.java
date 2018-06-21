@@ -22,20 +22,18 @@ import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.WARNING;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
 
-import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -46,12 +44,13 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
+import gde.DataAccess;
+import gde.DataAccess.LocalAccess;
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.utils.GpsCoordinate;
 import gde.log.Level;
 import gde.log.Logger;
-import gde.utils.FileUtils;
 
 /**
  * Gives access to geocode data based on reverse GPS geocode APIs.
@@ -77,61 +76,69 @@ public final class GeoCodes {
 	private static final class GeoFiles {
 
 		/**
-		 * @return the file closest to the GPS coordinate - it might not exist in the file system in case of missing internet access
+		 * @return the file closest to the GPS coordinate or an empty string
 		 */
-		static File getGeoFile(GpsCoordinate gpsCoordinate) throws FileNotFoundException {
-			List<File> files = FileUtils.getFileListing(settings.getHistoLocationsDirectory().toFile(), 0);
-			log.finer(() -> String.format("%04d files found in locationsDir %s", files.size(), settings.getHistoLocationsDirectory().toString())); //$NON-NLS-1$
+		static String getGeoFileName(GpsCoordinate gpsCoordinate) throws FileNotFoundException {
+			List<String> files = getGeoFileNames();
 
-			final Comparator<File> distanceComparator = (File f1, File f2) -> Double.compare(new GpsCoordinate(
-					f1.getName()).getDistance(gpsCoordinate), (new GpsCoordinate(f2.getName()).getDistance(gpsCoordinate)));
-			final Predicate<File> minDistanceFilter = f -> (new GpsCoordinate(
-					f.getName())).getDistance(gpsCoordinate) < GeoCodes.settings.getGpsLocationRadius();
-			File closestFile = files.parallelStream().filter(minDistanceFilter).min(distanceComparator).orElseGet(() -> aquireValidatedGeoData(gpsCoordinate));
-			log.log(Level.FINER, "closestFile", closestFile.getName());
+			final Comparator<String> distanceComparator = (String f1, String f2) -> Double.compare(new GpsCoordinate(
+					f1).getDistance(gpsCoordinate), (new GpsCoordinate(f2).getDistance(gpsCoordinate)));
+			final Predicate<String> minDistanceFilter = f -> (new GpsCoordinate(f)).getDistance(gpsCoordinate) < GeoCodes.settings.getGpsLocationRadius();
+			String closestFile = files.parallelStream().filter(minDistanceFilter).min(distanceComparator).orElse(GDE.STRING_EMPTY);
+			log.log(Level.FINER, "closestFile", closestFile);
 			return closestFile;
+		}
+
+		public static List<String> getGeoFileNames() throws FileNotFoundException {
+			List<String> fileNames = new ArrayList<>();
+			for (File file : DataAccess.getInstance().getGeoCodeFiles()) {
+				fileNames.add(file.getName());
+			}
+			log.finer(() -> String.format("%04d files found in locationsDir %s", fileNames.size(), Settings.GPS_LOCATIONS_DIR_NAME));
+			return fileNames;
 		}
 
 		/**
 		 * Access the geocode providers and return the first result which was validated.
-		 * @return the file corresponding to the GPS coordinate - it does not exist in the file system in any case
+		 * @return the file name corresponding to the GPS coordinate - it does not exist in the file system in any case
 		 */
-		private static File aquireValidatedGeoData(GpsCoordinate gpsCoordinate) {
-			File geoFile = getGeoCodePath(gpsCoordinate).toFile();
+		private static String acquireValidatedGeoData(GpsCoordinate gpsCoordinate) {
+			String geoFileName = getGeoCodeFileName(gpsCoordinate);
 			for (GeoCodeProvider geoCodeProvider : GeoCodeProvider.RANKED_VALUES) {
 				loadGeoData(gpsCoordinate, geoCodeProvider);
-				if (FileUtils.checkFileExist(geoFile.getPath())) {
-					try (InputStream inputStream = new FileInputStream(geoFile)) {
+				if (DataAccess.getInstance().existsGeoCodeFile(geoFileName)) {
+					try (InputStream inputStream = DataAccess.getInstance().getGeoCodeInputStream(geoFileName)) {
 						Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
 						XPath xpath = XPathFactory.newInstance().newXPath();
 						if (geoCodeProvider.isResponseOk(doc, xpath) || geoCodeProvider.isResponseZero(doc, xpath)) {
 							break;
 						} else {
-							FileUtils.deleteFile(geoFile.getPath());
-							log.log(FINER, "Empty file deleted", geoFile.getPath());
+							DataAccess.getInstance().deleteGeoCodeFile(geoFileName);
+							log.log(FINER, "Empty file deleted", geoFileName);
 						}
 					} catch (Exception e) {
-						FileUtils.deleteFile(geoFile.getPath());
+						DataAccess.getInstance().deleteGeoCodeFile(geoFileName);
 						log.log(WARNING, "File deleted after IO / parser exception", e.getMessage());
 					}
 				}
 			}
-			return geoFile;
+			return geoFileName;
 		}
 
 		/**
 		 * Read the file from the internet and store in the geocodes cache.
 		 */
 		private static void loadGeoData(GpsCoordinate gpsCoordinate, GeoCodeProvider geoCodeProvider) {
+			if (GDE.EXECUTION_ENV != null) return;
+
 			long milliTime = System.currentTimeMillis();
-			Path geoData = getGeoCodePath(gpsCoordinate);
-			FileUtils.checkDirectoryAndCreate(geoData.getParent().toString());
+			String geoCodeFileName = getGeoCodeFileName(gpsCoordinate);
+			((LocalAccess) DataAccess.getInstance()).checkAndCreateHistoLocations();
 			try {
-				HttpsURLConnection conn = (HttpsURLConnection) geoCodeProvider.getRequestUrl(gpsCoordinate).openConnection();
-				conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
-				try (InputStream inputStream = conn.getInputStream();
+				URL requestUrl = geoCodeProvider.getRequestUrl(gpsCoordinate);
+				try (InputStream inputStream = ((LocalAccess) DataAccess.getInstance()).getHttpsInputStream(requestUrl);
 						ReadableByteChannel readableByteChannel = java.nio.channels.Channels.newChannel(inputStream);
-						FileOutputStream fileOutputStream = new FileOutputStream(geoData.toString())) {
+						FileOutputStream fileOutputStream = ((LocalAccess) DataAccess.getInstance()).getGeoCodeOutputStream(geoCodeFileName.toString())) {
 					fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, 1 << 20); // limit 1 MB
 					log.time(() -> "http read in " + (System.currentTimeMillis() - milliTime) + " ms!  gpsCoordinate=" + gpsCoordinate.toCsvString());
 				} catch (Exception e1) {
@@ -145,8 +152,8 @@ public final class GeoCodes {
 		/**
 		 * @return the geocode cache file path
 		 */
-		private static Path getGeoCodePath(GpsCoordinate gpsCoordinate) {
-			return settings.getHistoLocationsDirectory().resolve(gpsCoordinate.toAngularCoordinate());
+		private static String getGeoCodeFileName(GpsCoordinate gpsCoordinate) {
+			return gpsCoordinate.toAngularCoordinate();
 		}
 
 	}
@@ -154,28 +161,35 @@ public final class GeoCodes {
 	/**
 	 * @return an empty string or the formatted address of the GPS location, e.g. 73441 Bopfingen, Germany
 	 */
-	public static String getLocation(GpsCoordinate gpsCoordinate) {
+	public static String getOrAcquireLocation(GpsCoordinate gpsCoordinate) {
+		if (GDE.EXECUTION_ENV != null) return GDE.STRING_EMPTY;
+
 		String location = GDE.STRING_EMPTY;
-		FileUtils.checkDirectoryAndCreate(settings.getHistoLocationsDirectory().toString());
+		((LocalAccess) DataAccess.getInstance()).checkAndCreateHistoLocations();
 		try {
-			File geoFile = GeoFiles.getGeoFile(gpsCoordinate);
-			if (FileUtils.checkFileExist(geoFile.getPath()))
-				location = getLocation(geoFile);
-			else
-				log.log(WARNING, "geoCode file not found");
+			String geoFileName = GeoFiles.getGeoFileName(gpsCoordinate);
+			if (((LocalAccess) DataAccess.getInstance()).existsGeoCodeFile(geoFileName)) {
+				location = getLocation(geoFileName);
+			} else {
+				geoFileName = GeoFiles.acquireValidatedGeoData(gpsCoordinate);
+				if (((LocalAccess) DataAccess.getInstance()).existsGeoCodeFile(geoFileName)) {
+					location = getLocation(geoFileName);
+				} else {
+					log.log(WARNING, "geoCode file not found");
+				}
+			}
 		} catch (FileNotFoundException e) {
 			log.log(WARNING, e.getMessage(), e);
 		}
 		return location;
-
 	}
 
 	/**
 	 * @return the formatted address of the GPS location, e.g. 73441 Bopfingen, Germany
 	 */
-	private static String getLocation(File file) {
+	private static String getLocation(String fileName) {
 		String location = GDE.STRING_EMPTY;
-		try (InputStream inputStream = new FileInputStream(file)) {
+		try (InputStream inputStream = DataAccess.getInstance().getGeoCodeInputStream(fileName)) {
 			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
 			GeoCodeProvider geoCodeProvider = GeoCodeProvider.get(doc);
 			XPath xpath = XPathFactory.newInstance().newXPath();
@@ -188,7 +202,7 @@ public final class GeoCodes {
 		return location;
 	}
 
-	enum GeoCodeProvider {
+	public enum GeoCodeProvider {
 		GOOGLE_API(1, "GeocodeResponse") {
 			@Override
 			URL getRequestUrl(GpsCoordinate gpsCoordinate) {
@@ -281,7 +295,7 @@ public final class GeoCodes {
 		}
 
 		static final GeoCodeProvider	VALUES[]				= values();
-		static final GeoCodeProvider	RANKED_VALUES[]	= Arrays.stream(values())																//
+		static final GeoCodeProvider	RANKED_VALUES[]	= Arrays.stream(values())											//
 				.sorted((p1, p2) -> Integer.compare(p1.rank, p2.rank)).toArray(GeoCodeProvider[]::new);
 
 		/**

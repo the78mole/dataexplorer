@@ -39,6 +39,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import gde.DataAccess;
+import gde.DataAccess.LocalAccess;
 import gde.GDE;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
@@ -90,7 +92,7 @@ public class HistoSetTest extends SuperTestCase {
 
 		List<Long> elapsed_sec = new ArrayList<>();
 		long totalVaultsCount = 0;
-		this.settings.resetHistoCache();
+		((LocalAccess) DataAccess.getInstance()).resetHistoCache();
 		for (int i = 0; i < 2; i++) { // run twice for cache effects measuring
 			long nanoTime = System.nanoTime();
 			try {
@@ -195,7 +197,7 @@ public class HistoSetTest extends SuperTestCase {
 
 		List<Long> elapsed_sec = new ArrayList<>();
 		long totalVaultsCount = 0;
-		this.settings.resetHistoCache();
+		((LocalAccess) DataAccess.getInstance()).resetHistoCache();
 		for (int i = 0; i < 2; i++) { // run twice for cache effects measuring
 			long nanoTime = System.nanoTime();
 			try {
@@ -259,7 +261,7 @@ public class HistoSetTest extends SuperTestCase {
 
 		List<Long> elapsed_sec = new ArrayList<>();
 		long totalVaultsCount = 0;
-		this.settings.resetHistoCache();
+		((LocalAccess) DataAccess.getInstance()).resetHistoCache();
 		for (int i = 0; i < 2; i++) { // run twice for cache effects measuring
 			long nanoTime = System.nanoTime();
 			try {

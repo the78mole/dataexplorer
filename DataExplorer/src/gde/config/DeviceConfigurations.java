@@ -19,6 +19,7 @@
 
 package gde.config;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -85,7 +86,7 @@ public final class DeviceConfigurations {
 				// loop through all device properties XML and check if device used
 				if (files[i].endsWith(GDE.FILE_ENDING_DOT_XML)) {
 					String deviceKey = files[i].substring(0, files[i].length() - 4);
-					devConfig = new DeviceConfiguration(this.settings.getDevicesPath() + GDE.FILE_SEPARATOR_UNIX + files[i]);
+					devConfig = new DeviceConfiguration(Paths.get(Settings.DEVICE_PROPERTIES_DIR_NAME, files[i]));
 					if (devConfig.getName().equals(activeDeviceName) && devConfig.isUsed()) { // define the active device after re-start
 						selectedActiveDeviceConfig = devConfig;
 					}

@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 import gde.config.Settings;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.SourceFolders.DirectoryType;
+import gde.histo.datasources.VaultChecker.TrussCriteria;
 import gde.histo.exclusions.ExclusionData;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -46,7 +47,7 @@ import gde.ui.DataExplorer;
  * Avoid rebuilding if a choice of basic criteria did not change.
  * @author Thomas Eickert (USER)
  */
-public class SourceDataSetExplorer extends AbstractSourceDataSets {
+public class SourceDataSetExplorer extends AbstractSourceDataSet {
 	private static final String	$CLASS_NAME	= SourceDataSetExplorer.class.getName();
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -99,7 +100,7 @@ public class SourceDataSetExplorer extends AbstractSourceDataSets {
 				ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder());
 				for (File file : Arrays.asList(filesAndDirs)) {
 					if (file.isFile()) {
-						SourceDataSet originFile = SourceDataSet.createSourceDataSet(file.toPath(), DataExplorer.getInstance().getActiveDevice());
+						SourceDataSet originFile = AbstractSourceDataSet.createSourceDataSet(file.toPath(), DataExplorer.getInstance().getActiveDevice());
 						if (originFile != null && originFile.isWorkableFile(directoryTypes, sourceFolders)) {
 							if (!exclusionData.isExcluded(file.toPath())) {
 								result.add(originFile);

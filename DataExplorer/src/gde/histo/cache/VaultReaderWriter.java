@@ -29,13 +29,13 @@ import static java.util.logging.Level.SEVERE;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,17 +43,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.histo.datasources.AbstractSourceDataSets.SourceDataSet;
+import gde.histo.datasources.AbstractSourceDataSet;
+import gde.histo.datasources.AbstractSourceDataSet.SourceDataSet;
 import gde.histo.datasources.VaultPicker.ProgressManager;
 import gde.histo.datasources.VaultPicker.TrussJobs;
 import gde.histo.device.IHistoDevice;
@@ -83,7 +82,7 @@ public final class VaultReaderWriter {
 	 */
 	public static void loadFromFile(Path filePath, List<VaultCollector> trusses) {
 		try {
-			SourceDataSet dataSet = SourceDataSet.createSourceDataSet(filePath, DataExplorer.getInstance().getActiveDevice());
+			SourceDataSet dataSet = AbstractSourceDataSet.createSourceDataSet(filePath, DataExplorer.getInstance().getActiveDevice());
 			if (dataSet != null) dataSet.readVaults4Ui(filePath, trusses);
 		} catch (Exception e) {
 			log.log(SEVERE, e.getMessage(), e);
@@ -100,13 +99,13 @@ public final class VaultReaderWriter {
 	 */
 	public static synchronized List<ExtendedVault> loadFromCaches(TrussJobs trussJobs, Optional<ProgressManager> progress) //
 			throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
-		Path osdCacheFilePath = ExtendedVault.getVaultsFolder(GDE.STRING_EMPTY);
+		Path osdCacheFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, ExtendedVault.getVaultsDirectoryName(GDE.STRING_EMPTY));
 		List<ExtendedVault> vaults = loadFromCachePath(trussJobs, progress, osdCacheFilePath);
 
 		if (application.getActiveDevice() instanceof IHistoDevice) {
 			String readerSettings = ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv();
 			if (!readerSettings.isEmpty()) {
-				List<ExtendedVault> nativeVaults = loadFromCachePath(trussJobs, progress, ExtendedVault.getVaultsFolder(readerSettings));
+				List<ExtendedVault> nativeVaults = loadFromCachePath(trussJobs, progress, Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, ExtendedVault.getVaultsDirectoryName(readerSettings)));
 				vaults.addAll(nativeVaults);
 			}
 		}
@@ -183,52 +182,6 @@ public final class VaultReaderWriter {
 	}
 
 	/**
-	 * @param cachePath defines the zip file holding the vaults or the vaults folder
-	 * @param extractor is the function for extracting the vault data
-	 * @return the extracted vault data after eliminating trusses
-	 * @throws IOException during opening or traversing the zip file
-	 */
-	public static List<Entry<String, String>> readVaultsIndices(Path cachePath, Function<HistoVault, Entry<String, String>> extractor)
-			throws IOException {
-		List<Entry<String, String>> vaultExtract = new ArrayList<>();
-		if (!cachePath.toFile().exists()) return vaultExtract;
-
-		final int MIN_FILE_LENGTH = 2048;
-		if (settings.isZippedCache()) {
-			try (ZipFile zf = new ZipFile(cachePath.toFile())) {
-				while (zf.entries().hasMoreElements()) {
-					ZipEntry entry = zf.entries().nextElement();
-					if (entry.getSize() <= MIN_FILE_LENGTH) continue;
-
-					try {
-						HistoVault histoVault = memoryCache.get(entry.getName(), () -> VaultProxy.load(zf.getInputStream(entry)));
-						vaultExtract.add(extractor.apply(histoVault));
-					} catch (Exception e) {
-						log.log(SEVERE, e.getMessage(), e);
-					}
-				}
-			}
-		} else {
-			List<File> dirListing = FileUtils.getFileListing(cachePath.toFile(), 0);
-			for (File file : dirListing) {
-				if (file.length() <= MIN_FILE_LENGTH) continue;
-
-				try {
-					HistoVault histoVault = memoryCache.get(file.getName(), () -> VaultProxy.load(cachePath.resolve(file.getName())));
-					vaultExtract.add(extractor.apply(histoVault));
-				} catch (Exception e) {
-					log.log(SEVERE, e.getMessage(), e);
-				}
-			}
-		}
-		log.fine(() -> {
-			CacheStats stats = memoryCache.stats();
-			return String.format("evictionCount=%d  hitCount=%d  missCount=%d hitRate=%f missRate=%f", stats.evictionCount(), stats.hitCount(), stats.missCount(), stats.hitRate(), stats.missRate());
-		});
-		return vaultExtract;
-	}
-
-	/**
 	 * Get the zip file name from the history vault class and add all histoset vaults to this file.
 	 */
 	public static void storeInCaches(TrussJobs trussJobs) throws IOException {
@@ -237,7 +190,7 @@ public final class VaultReaderWriter {
 			boolean providesReaderSettings = e.getKey().providesReaderSettings();
 			String readerSettings = providesReaderSettings && application.getActiveDevice() instanceof IHistoDevice
 					? ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
-			Path cacheFilePath = ExtendedVault.getVaultsFolder(readerSettings);
+			Path cacheFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, ExtendedVault.getVaultsDirectoryName(readerSettings));
 			try {
 				storeInCachePath(e.getValue(), cacheFilePath);
 			} catch (Exception ex) {
@@ -285,7 +238,7 @@ public final class VaultReaderWriter {
 	 * @return the size of the cache in bytes
 	 */
 	public static long getCacheSize() {
-		Path directory = Settings.getInstance().getHistoCacheDirectory();
+		Path directory = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
 		return FileUtils.size(directory);
 	}
 

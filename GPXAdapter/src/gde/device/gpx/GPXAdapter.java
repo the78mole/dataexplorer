@@ -18,12 +18,9 @@
 ****************************************************************************************/
 package gde.device.gpx;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -39,6 +36,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+import gde.DataAccess;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -124,22 +122,12 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * read special properties to enable configuration to specific GPX extent values
-	 * @throws FileNotFoundException
 	 */
 	private void readProperties() {
-		String preopertyFilePath = Settings.getInstance().getApplHomePath() + "/Mapping/GPXAdapter.properties"; //$NON-NLS-1$
-		try {
-			if (!new File(preopertyFilePath).exists()) {
-				File path = new File(Settings.getInstance().getApplHomePath() + "/Mapping"); //$NON-NLS-1$
-				if (!path.exists() && !path.isDirectory())
-					path.mkdir();
-				//extract initial property files
-				FileUtils.extract(this.getClass(), "GPXAdapter.properties", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			}
+		DataAccess.getInstance().checkMappingFileAndCreate(this.getClass(), "GPXAdapter.properties");
+		try (InputStream stream = DataAccess.getInstance().getMappingInputStream("GPXAdapter.properties")) {
 			Properties properties = new Properties();
-			BufferedInputStream stream = new BufferedInputStream(new FileInputStream(preopertyFilePath));
 			properties.load(stream);
-			stream.close();
 
 			for (String propertyName : properties.stringPropertyNames()) {
 				if (propertyName.startsWith("unit")) { //$NON-NLS-1$
@@ -175,6 +163,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (Exception e) {
+			String preopertyFilePath = Settings.MAPPINGS_DIR_NAME + GDE.FILE_SEPARATOR_UNIX + "GPXAdapter.properties"; //$NON-NLS-1$
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW1776, new String[] {preopertyFilePath}));
 		}
 	}

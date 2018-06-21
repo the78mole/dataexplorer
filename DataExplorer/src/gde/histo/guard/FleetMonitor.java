@@ -33,16 +33,14 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import gde.config.Settings;
-import gde.data.AbstractRecordSet;
-import gde.data.Record;
 import gde.device.IChannelItem;
 import gde.device.IDevice;
 import gde.device.ScoreLabelTypes;
 import gde.histo.cache.HistoVault;
 import gde.histo.cache.SimpleVaultReader;
 import gde.histo.config.HistoGraphicsTemplate;
-import gde.histo.datasources.SourceDataSetChecker;
 import gde.histo.datasources.SourceFolders.DirectoryType;
+import gde.histo.datasources.VaultChecker;
 import gde.histo.device.ChannelItems;
 import gde.histo.exclusions.InclusionData;
 import gde.histo.guard.ObjectVaultIndex.DetailSelector;
@@ -132,7 +130,7 @@ public final class FleetMonitor {
 
 			HistoGraphicsTemplate template = HistoGraphicsTemplate.createReadonlyTemplate(deviceName, channelNumber, objectKey);
 			template.load();
-			boolean smartStatistics = Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true"));
+			boolean smartStatistics = Boolean.parseBoolean(template.getProperty(HistoGraphicsTemplate.SMART_STATISTICS, "true"));
 
 			InclusionData inclusionData = new InclusionData(Paths.get(Settings.getInstance().getDataFilePath(), objectKey));
 
@@ -140,7 +138,7 @@ public final class FleetMonitor {
 			ReminderType[] maxReminders = new ReminderType[] { ReminderType.NONE, ReminderType.NONE };
 			int logLimit = Settings.getInstance().getReminderCount();
 			BiConsumer<Integer, IChannelItem> channelItemAction = (idx, itm) -> {
-				boolean isActive = Boolean.parseBoolean(template.getRecordProperty(itm.getName(), Record.IS_ACTIVE, "true")); // todo recordName Jeti
+				boolean isActive = Boolean.parseBoolean(template.getRecordProperty(itm.getName(), HistoGraphicsTemplate.IS_ACTIVE, "true")); // todo recordName Jeti
 				boolean isIncluded = inclusionData.isIncluded(itm.getName(), true); // todo recordName Jeti
 				if (!isActive || !isIncluded) return;
 
@@ -217,17 +215,16 @@ public final class FleetMonitor {
 		for (Entry<String, List<VaultKeyPair>> e : vaultKeys.entrySet()) {
 			IDevice device = usedDevices.get(e.getKey());
 			EnumSet<DirectoryType> directoryTypes = DirectoryType.getValidDirectoryTypes(device);
+			VaultChecker checker = new VaultChecker(device, directoryTypes, objectKey);
 
-			List<HistoVault> vaults = new ArrayList<>();
-			for (VaultKeyPair p : e.getValue()) {
-				if (p == null) continue;
-				HistoVault vault = SimpleVaultReader.readVault(p.getKey(), p.getValue());
-				SourceDataSetChecker checker = new SourceDataSetChecker(device, directoryTypes, vault.getLogChannelNumber(), objectKey);
-				if (checker.isValidVault(vault)) vaults.add(vault);
+			List<HistoVault> allVaults = SimpleVaultReader.readVaults(e.getValue());
+			List<HistoVault> validVaults = new ArrayList<>();
+			for (HistoVault vault : allVaults) {
+				if (checker.isValidVault(vault)) validVaults.add(vault);
 			}
-			log.log(Level.OFF, "vaults size=", vaults.size());
+			log.log(Level.OFF, "valid vaults size=", validVaults.size());
 
-			summaries.add(ObjectSummary.createObjectSummary(objectKey, device.getName(), vaults));
+			summaries.add(ObjectSummary.createObjectSummary(objectKey, device.getName(), validVaults));
 		}
 		log.off(() -> summaries.toString());
 		return summaries;

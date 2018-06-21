@@ -20,7 +20,6 @@
 package gde.histo.guard;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
@@ -49,7 +48,7 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.HistoVault;
-import gde.histo.cache.VaultReaderWriter;
+import gde.histo.cache.SimpleVaultReader;
 import gde.histo.device.IHistoDevice;
 import gde.histo.exclusions.ExclusionData;
 import gde.log.Level;
@@ -128,7 +127,7 @@ public final class ObjectVaultIndex {
 	/**
 	 * The keys for accessing vaults are the directory name and the file name.
 	 */
-	static class VaultKeyPair extends SimpleImmutableEntry<String, String> {
+	public static class VaultKeyPair extends SimpleImmutableEntry<String, String> {
 		private static final long serialVersionUID = 8937538273315451095L;
 
 		/**
@@ -434,8 +433,8 @@ public final class ObjectVaultIndex {
 	 * Reads all vaults and builds the fleet directory.
 	 */
 	public void rebuild() {
-		File[] currentDirectories = selectCacheDirectories();
-		objectVaultMap.storeIndex(readIndex(currentDirectories));
+		List<String> cacheDirectoryNames = defineCacheDirectoryNames();
+		objectVaultMap.storeIndex(readIndex(cacheDirectoryNames));
 		log.off(() -> "Fleet directory      size=" + getFleetDirectory().toFile().listFiles().length);
 	}
 
@@ -460,7 +459,7 @@ public final class ObjectVaultIndex {
 		for (Entry<String, DeviceConfiguration> string : allConfigurations.entrySet()) {
 			if (result.contains(string.getKey())) {
 				try {
-					existingDevices.put(string.getKey(), string.getValue().defineInstanceOfDevice());
+					existingDevices.put(string.getKey(), string.getValue().getAsDevice());
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "device instance exception", e);
 				}
@@ -518,24 +517,12 @@ public final class ObjectVaultIndex {
 	}
 
 	/**
-	 * @return the vault directories which fit to the current settings
-	 */
-	private File[] selectCacheDirectories() {
-		FileUtils.checkDirectoryAndCreate(ExtendedVault.getCacheDirectory().toString());
-		List<String> cacheDirectoryNames = defineCacheDirectoryNames();
-		FilenameFilter filter = (dir, name) -> cacheDirectoryNames.contains(name);
-		File[] files = ExtendedVault.getCacheDirectory().toFile().listFiles(filter);
-		log.off(() -> "vaultDirectories selected=" + files.length + "  from " + cacheDirectoryNames.size() + " device specific cache directories");
-		return files;
-	}
-
-	/**
 	 * @return the current vault directory names based on settings etc.
 	 */
 	private List<String> defineCacheDirectoryNames(String deviceName) {
 		List<String> result = new ArrayList<>();
 		try {
-			IDevice device = DataExplorer.getInstance().getDeviceConfigurations().get(deviceName).defineInstanceOfDevice();
+			IDevice device = DataExplorer.getInstance().getDeviceConfigurations().get(deviceName).getAsDevice();
 
 			List<String> validReaderSettings = new ArrayList<>();
 			validReaderSettings.add(GDE.STRING_EMPTY);
@@ -568,11 +555,11 @@ public final class ObjectVaultIndex {
 	/**
 	 * @return the list of vault index data with key objectKey
 	 */
-	private Map<String, List<String>> readIndex(File[] cacheDirectories) {
+	private Map<String, List<String>> readIndex(List<String> cacheDirectoryNames) {
 		Map<String, List<String>> objectKeyMap = new HashMap<>();
 		try {
-			for (File file : cacheDirectories) {
-				List<Entry<String, String>> vaultIndices = VaultReaderWriter.readVaultsIndices(file.toPath(), ObjectVaultIndexEntry.objectIndexExtractor());
+			for (String directoryName : cacheDirectoryNames) {
+				List<Entry<String, String>> vaultIndices = SimpleVaultReader.readVaultsIndices(directoryName, ObjectVaultIndexEntry.objectIndexExtractor());
 				for (Entry<String, String> e : vaultIndices) {
 					String objectKey = e.getKey().isEmpty() ? "leer" : e.getKey(); // todo replace leer
 					if (objectKeyMap.get(objectKey) == null) {

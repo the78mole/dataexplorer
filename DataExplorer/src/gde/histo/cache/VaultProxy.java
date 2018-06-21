@@ -27,10 +27,11 @@ import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import gde.config.Settings;
+import gde.DataAccess;
 
 /**
  * Vaults IO operations with marshaller / unmarshaller caching.
@@ -38,7 +39,6 @@ import gde.config.Settings;
  */
 public final class VaultProxy {
 
-	private static final Path		path							= ExtendedVault.getCacheDirectory().resolve(Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
 	private static Schema				vaultSchema;
 
 	private static Unmarshaller	jaxbUnmarshaller	= null;
@@ -46,7 +46,8 @@ public final class VaultProxy {
 
 	{
 		try {
-			vaultSchema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(path.toFile());
+			StreamSource xsdStreamSource = new StreamSource(DataAccess.getInstance().getCacheXsdInputStream());
+			vaultSchema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(xsdStreamSource);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

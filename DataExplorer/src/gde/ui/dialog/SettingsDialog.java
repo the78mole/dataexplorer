@@ -20,6 +20,7 @@
 package gde.ui.dialog;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Map;
@@ -67,6 +68,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import gde.DataAccess;
+import gde.DataAccess.LocalAccess;
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
@@ -1828,7 +1831,7 @@ public class SettingsDialog extends Dialog {
 								this.clearHistoCacheButton = new Button(this.histoToolsGroup, SWT.PUSH | SWT.CENTER);
 								this.clearHistoCacheButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.clearHistoCacheButton.setText(Messages.getString(MessageIds.GDE_MSGT0829));
-								this.clearHistoCacheButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0830, new Object[] { this.settings.getHistoCacheDirectory().toString() }));
+								this.clearHistoCacheButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0830, new Object[] { Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME).toString() }));
 								RowData clearHistoCacheButtonLData = new RowData();
 								clearHistoCacheButtonLData.width = 180;
 								clearHistoCacheButtonLData.height = 30;
@@ -1837,8 +1840,8 @@ public class SettingsDialog extends Dialog {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "clearHistoCacheButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-										SettingsDialog.this.settings.resetHistolocations();
-										SettingsDialog.this.application.openMessageDialog(SettingsDialog.this.settings.resetHistoCache());
+										((LocalAccess) DataAccess.getInstance()).resetHistolocations();
+										SettingsDialog.this.application.openMessageDialog(((LocalAccess) DataAccess.getInstance()).resetHistoCache());
 									}
 								});
 							}

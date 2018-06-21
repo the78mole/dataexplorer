@@ -22,7 +22,6 @@ package gde.histo.config;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
@@ -83,17 +82,8 @@ public final class ObjectGraphicsTemplate extends HistoGraphicsTemplate {
 	 */
 	@Override
 	public void store() {
-		try {
-			try (OutputStream stream = DataAccess.getInstance().getGraphicsTemplateOutputStream(getTargetFileSubPath())) {
-				this.storeToXML(stream, "-- DataExplorer ObjectGraphicsTemplate " + objectFolderName + "/" + getTargetFileSubPath().getFileName().toString() + " " + ZonedDateTime.now().toInstant() + " -- " + commentSuffix);
-			}
-			currentFilePathFragment = getTargetFileSubPath();
-			this.isSaved = true;
-		} catch (InvalidPropertiesFormatException e) {
-			log.log(SEVERE, e.getMessage(), e);
-		} catch (Exception e) {
-			log.log(WARNING, e.getMessage(), e);
-		}
+		String propertiesComment = "-- DataExplorer ObjectGraphicsTemplate " + objectFolderName + "/" + getTargetFileSubPath().getFileName().toString() + " " + ZonedDateTime.now().toInstant() + " -- " + commentSuffix;
+		super.store(propertiesComment);
 	}
 
 }

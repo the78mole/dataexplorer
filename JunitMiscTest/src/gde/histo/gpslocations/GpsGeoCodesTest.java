@@ -51,7 +51,7 @@ class GpsGeoCodesTest extends BasicTestCase {
 		Random random = new Random();
 		double lat = random.nextFloat() * 20. + 40.; // Napoli to Stockholm
 		double lon = random.nextFloat() * 20.; // Greenwich to Krakow
-		String location = GeoCodes.getLocation(new GpsCoordinate(lat, lon));
+		String location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(lat, lon));
 		System.out.println(location);
 		assertNotEquals("  location", "", location);
 	}
@@ -59,13 +59,13 @@ class GpsGeoCodesTest extends BasicTestCase {
 	@Test
 	void testLocationFiles() {
 		String location;
-		location = GeoCodes.getLocation(new GpsCoordinate(0., 179.)); // pure ocean
+		location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(0., 179.)); // pure ocean
 		System.out.println(location);
 		assertEquals("  location", "", location);
-		location = GeoCodes.getLocation(new GpsCoordinate(48.8696877, 10.3573054)); // 73441 Bopfingen, Germany (via Google)
+		location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(48.8696877, 10.3573054)); // 73441 Bopfingen, Germany (via Google)
 		System.out.println(location);
 		assertTrue("  location", location.contains("Heidmühle, Bopfingen, Verwaltungsgemeinschaft Bopfingen, Ostalbkreis, Regierungsbezirk Stuttgart, Baden-Württemberg, 73441, Deutschland"));
-		location = GeoCodes.getLocation(new GpsCoordinate(45.0064253, 14.3965299));
+		location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(45.0064253, 14.3965299));
 		System.out.println(location);
 		assertEquals("  location", "D100, Vodice, Primorsko-goranska županija, 51557, Hrvatska", location);
 	}

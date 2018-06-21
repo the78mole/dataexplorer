@@ -18,12 +18,9 @@
 ****************************************************************************************/
 package gde.device.weatronic;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -31,6 +28,7 @@ import javax.xml.bind.JAXBException;
 
 import org.eclipse.swt.widgets.FileDialog;
 
+import gde.DataAccess;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -114,22 +112,13 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 
 	/**
 	 * read special properties to enable configuration to specific GPX extent values
-	 * @throws FileNotFoundException
 	 */
 	private void readProperties() {
-		String preopertyFilePath = Settings.getInstance().getApplHomePath() + "/Mapping/WeatronicSynchronizationMappings.xml"; //$NON-NLS-1$
-		try {
-			if (!new File(preopertyFilePath).exists()) {
-				File path = new File(Settings.getInstance().getApplHomePath() + "/Mapping"); //$NON-NLS-1$
-				if (!path.exists() && !path.isDirectory()) path.mkdir();
-				//extract initial property files
-				FileUtils.extract(this.getClass(), "WeatronicSynchronizationMappings.xml", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), "555"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			}
-			BufferedInputStream stream = new BufferedInputStream(new FileInputStream(preopertyFilePath));
+		DataAccess.getInstance().checkMappingFileAndCreate(this.getClass(), "WeatronicSynchronizationMappings.xml");
+		try (InputStream stream = DataAccess.getInstance().getMappingInputStream("WeatronicSynchronizationMappings.xml")) {
 			WeatronicAdapter.properties.loadFromXML(stream);
-			stream.close();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
+			String preopertyFilePath = Settings.MAPPINGS_DIR_NAME + GDE.FILE_SEPARATOR_UNIX + "WeatronicSynchronizationMappings.xml"; //$NON-NLS-1$
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE3700, new String[] { preopertyFilePath }));
 		}
 	}

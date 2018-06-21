@@ -47,10 +47,6 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	private static final DataExplorer	application			= DataExplorer.getInstance();
 	private static final Settings			settings				= Settings.getInstance();
 
-	public static Path getCacheDirectory() {
-		return Paths.get(settings.getApplHomePath(), Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
-	}
-
 	/**
 	 * @param newVaultsDirectoryName directory or zip file name
 	 * @param vaultReaderSettings a non-empty string indicates that the file reader measurement values depend on device settings
@@ -84,14 +80,6 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 				+ d + settings.isCanonicalQuantiles() + d + settings.isSymmetricToleranceInterval() + d + settings.getOutlierToleranceSpread() //
 				+ d + vaultReaderSettings;
 		return SecureHash.sha1(tmpSubDirectoryLongKey);
-	}
-
-	/**
-	 * @param vaultReaderSettings a non-empty string indicates that the file reader measurement values depend on device settings
-	 * @return the path to the directory or zip file
-	 */
-	public static Path getVaultsFolder(String vaultReaderSettings) {
-		return getCacheDirectory().resolve(getVaultsDirectoryName(vaultReaderSettings));
 	}
 
 	/**

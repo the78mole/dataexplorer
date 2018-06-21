@@ -38,7 +38,7 @@ import gde.device.TrailTypes;
 import gde.device.TransitionAmountType;
 import gde.device.TransitionCalculusType;
 import gde.device.TransitionFigureType;
-import gde.histo.datasources.AbstractSourceDataSets.SourceDataSet;
+import gde.histo.datasources.AbstractSourceDataSet.SourceDataSet;
 import gde.histo.datasources.HistoSet;
 import gde.histo.device.IHistoDevice;
 import gde.histo.settlements.AmountEvaluator;

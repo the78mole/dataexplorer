@@ -36,7 +36,7 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.device.IDevice;
 import gde.exception.NotSupportedFileFormatException;
-import gde.histo.datasources.AbstractSourceDataSets.SourceDataSet;
+import gde.histo.datasources.AbstractSourceDataSet.SourceDataSet;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.datasources.SourceFolders.DirectoryType;
 import gde.log.Logger;
@@ -211,7 +211,7 @@ public final class DirectoryScanner {
 						.filter(e -> filePath.startsWith(e.getKey())) //
 						.map(e -> e.getValue()).flatMap(Set::stream)//
 						.collect(Collectors.toSet());
-				SourceDataSet sourceDataSet = SourceDataSet.createSourceDataSet(filePath, device);
+				SourceDataSet sourceDataSet = AbstractSourceDataSet.createSourceDataSet(filePath, device);
 				return sourceDataSet != null && sourceDataSet.isWorkableFile(directoryTypes, sourceFolders);
 			}
 		};

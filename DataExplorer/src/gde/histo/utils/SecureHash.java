@@ -19,9 +19,8 @@
 
 package gde.histo.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -39,9 +38,8 @@ public final class SecureHash {
 	 */
 	public static String sha1(String input) {
 		StringBuilder sb = new StringBuilder();
-		byte[] hashBytes = null;
 		try {
-			hashBytes = MessageDigest.getInstance("SHA1").digest(input.getBytes()); //$NON-NLS-1$
+			byte[] hashBytes = MessageDigest.getInstance("SHA1").digest(input.getBytes());
 			if (hashBytes != null) {
 				for (byte hashByte : hashBytes) {
 					sb.append(Integer.toString((hashByte & 0xff) + 0x100, 16).substring(1));
@@ -54,30 +52,26 @@ public final class SecureHash {
 	}
 
 	/**
-	 * @param file
+	 * @param inputStream is the stream which is consumed but NOT closed
 	 * @return the file's full data SHA1 checksum
 	 * @throws IOException
 	 * @see <a href=" http://www.sha1-online.com/sha1-java/">Code example</a>
 	 */
-	public static String sha1(File file) throws IOException {
+	public static String sha1(InputStream inputStream) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		MessageDigest sha1Digest = null;
 		try {
 			sha1Digest = MessageDigest.getInstance("SHA1"); //$NON-NLS-1$
 
-			byte[] hashBytes = null;
-			try (FileInputStream fis = new FileInputStream(file)) {
-				byte[] data = new byte[8192]; // most file systems are configured to use block sizes of 4096 or 8192
-				int read = 0;
-				while ((read = fis.read(data)) != -1) {
-					sha1Digest.update(data, 0, read);
-				}
-				hashBytes = sha1Digest.digest();
+			byte[] data = new byte[8192]; // most file systems are configured to use block sizes of 4096 or 8192
+			int read = 0;
+			while ((read = inputStream.read(data)) != -1) {
+				sha1Digest.update(data, 0, read);
 			}
+			byte[] hashBytes = sha1Digest.digest();
 			for (byte hashByte : hashBytes) {
 				sb.append(Integer.toString((hashByte & 0xff) + 0x100, 16).substring(1));
 			}
-
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}

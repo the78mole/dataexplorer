@@ -19,13 +19,12 @@
 ****************************************************************************************/
 package gde.config;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.Thread.State;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -37,7 +36,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.TreeMap;
 import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -48,13 +46,7 @@ import java.util.logging.MemoryHandler;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
@@ -62,9 +54,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.xml.sax.SAXException;
 
 import gde.DataAccess;
+import gde.DataAccess.LocalAccess;
 import gde.GDE;
-import gde.device.DeviceConfiguration;
-import gde.exception.ApplicationConfigurationException;
 import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
@@ -74,7 +65,6 @@ import gde.ui.SWTResourceManager;
 import gde.utils.FileUtils;
 import gde.utils.RecordSetNameComparator;
 import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
 
 /**
  * Settings class will read and write/update application settings, like window size and default path ....
@@ -86,15 +76,6 @@ public class Settings extends Properties {
 	final static String							$CLASS_NAME											= Settings.class.getName();
 
 	private static Settings					instance												= null;																																														// singelton
-
-	// JAXB XML environment
-	Schema													schema;
-	JAXBContext											jc;
-	Unmarshaller										unmarshaller;
-	Marshaller											marshaller;
-	String													xmlBasePath;
-	Thread													xsdThread;
-	Thread													migrationThread;
 
 	public static final String			EMPTY														= "---";																																													//$NON-NLS-1$
 	public static final String			EMPTY_SIGNATURE									= Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY;
@@ -198,6 +179,9 @@ public class Settings extends Properties {
 	final static String							SERIAL_LOG_FILE									= "serial.log";																																										//$NON-NLS-1$
 	public final static String[]		LOGGING_LEVEL										= new String[] { "SEVERE", "WARNING", "TIME", "INFO", "FINE", "FINER", "FINEST" };								//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 
+	public final static String				MAPPINGS_DIR_NAME								= "Mapping";																																											//$NON-NLS-1$
+	public final static String				MEASUREMENT_DISPLAY_FILE				= "MeasurementDisplayProperties.xml";																															//$NON-NLS-1$
+
 	public final static String			ACTIVE_DEVICE										= "active_device";																																								//$NON-NLS-1$
 	public final static String			DEVICE_USE											= "device_use";																																										//$NON-NLS-1$
 	public final static String			OBJECT_LIST											= "object_list";																																									//$NON-NLS-1$
@@ -273,6 +257,11 @@ public class Settings extends Properties {
 	private static double[]					SAMPLING_TIMESPANS							= new double[] { 10., 5., 1., .5, .1, .05, .001 };
 	private static String[]					REMINDER_COUNT_VALUES						= new String[] { "2", "3", "5", "8" };
 
+	private final DeviceSerialization	deviceSerialization;
+	private final Thread							xsdThread;
+
+	private Thread										migrationThread;
+
 	boolean													isDevicePropertiesUpdated				= false;
 	// boolean isDevicePropertiesReplaced = false;
 	boolean													isGraphicsTemplateUpdated				= false;
@@ -283,8 +272,6 @@ public class Settings extends Properties {
 	String													cbOrder;
 	private String									cbWraps;
 	String													cbSizes;
-	String													settingsFilePath;																																																									// full qualified path to settings file
-	String													applHomePath;																																																											// default path to application home directory
 	Comparator<String>							comparator											= new RecordSetNameComparator();																																	//used to sort object key list
 	Properties											measurementProperties						= new Properties();
 
@@ -318,170 +305,78 @@ public class Settings extends Properties {
 	 * singleton private constructor
 	 * @throws SAXException
 	 * @throws JAXBException
-	 * @throws ApplicationConfigurationException
 	 */
 	private Settings() throws SAXException, JAXBException {
 		final String $METHOD_NAME = "Settings"; //$NON-NLS-1$
 
-		this.applHomePath = GDE.APPL_HOME_PATH;
-		this.settingsFilePath = GDE.SETTINGS_FILE_PATH; // todo remove the settingsFilePath field in the next refactoring step
 		if (GDE.APPL_HOME_PATH.isEmpty()) {
 			Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGW0001));
 		}
-
-		this.xmlBasePath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + GDE.FILE_SEPARATOR_UNIX;
-		this.xsdThread = new Thread("xsdValidation") {
-			@Override
-			public void run() {
-				Settings.log.log(java.util.logging.Level.INFO, Settings.$CLASS_NAME, "xsdThread.run()");
-				// device properties context
-				try {
-					Settings.this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(Settings.this.xmlBasePath + Settings.DEVICE_PROPERTIES_XSD_NAME));
-					Settings.this.jc = JAXBContext.newInstance("gde.device"); //$NON-NLS-1$
-					Settings.this.unmarshaller = Settings.this.jc.createUnmarshaller();
-					Settings.this.unmarshaller.setSchema(Settings.this.schema);
-					Settings.this.marshaller = Settings.this.jc.createMarshaller();
-					Settings.this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.valueOf(true));
-					Settings.this.marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, Settings.DEVICE_PROPERTIES_XSD_NAME);
-					Settings.log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "schema factory setup time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				catch (Exception e) {
-					Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, "xsdThread.run()", e.getMessage(), e);
-				}
-				log.log(Level.TIME, "xsdValidationThread time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
-			}
-		};
+		this.deviceSerialization = new DeviceSerialization();
+		this.xsdThread = deviceSerialization.createXsdThread();
 
 		this.load();
 
-		// check existence of application home directory, check XSD version, copy all device XML+XSD and image files
-		FileUtils.checkDirectoryAndCreate(this.applHomePath);
-		String devicePropertiesTargetpath = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME;
-		devicePropertiesTargetpath = devicePropertiesTargetpath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
-		if (!FileUtils.checkDirectoryAndCreate(devicePropertiesTargetpath, Settings.DEVICE_PROPERTIES_XSD_NAME)) {
-			FileUtils.extract(this.getClass(), Settings.DEVICE_PROPERTIES_XSD_NAME, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555);
-			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true, true);
-			this.isDevicePropertiesUpdated = true;
-		}
-		else { // execute every time application starts to enable update from added plug-in
-			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true, true);
+		if (GDE.EXECUTION_ENV == null) {
+			// check existence of application home directory, check XSD version, copy all device XML+XSD and image files
+			FileUtils.checkDirectoryAndCreate(GDE.APPL_HOME_PATH);
+			String devicePropertiesTargetpath = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME;
+			devicePropertiesTargetpath = devicePropertiesTargetpath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
+			if (!FileUtils.checkDirectoryAndCreate(devicePropertiesTargetpath, Settings.DEVICE_PROPERTIES_XSD_NAME)) {
+				FileUtils.extract(this.getClass(), Settings.DEVICE_PROPERTIES_XSD_NAME, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555);
+				updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true, true);
+				this.isDevicePropertiesUpdated = true;
+			}
+			else { // execute every time application starts to enable update from added plug-in
+				updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, true, true);
+			}
 		}
 
 		this.readMeasurementDiplayProperties();
 
-		// locale settings has been changed, replacement of device property files required
-		if (this.getLocaleChanged()) {
-			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, false, false);
+		if (GDE.EXECUTION_ENV == null) {
+			// locale settings has been changed, replacement of device property files required
+			if (this.getLocaleChanged()) {
+				String devicePropertiesTargetpath = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME;
+				devicePropertiesTargetpath = devicePropertiesTargetpath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
+				updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, false, false);
+				// this.isDevicePropertiesReplaced = true;
+			}
+
+			if (this.isDevicePropertiesUpdated) { // check if previous devices exist and migrate device usage, default import directory, ....
+				this.migrationThread = deviceSerialization.createMigrationThread();
+			}
+
+			String templateDirectory = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.GRAPHICS_TEMPLATES_DIR_NAME;
+			if (!FileUtils.checkDirectoryAndCreate(templateDirectory, Settings.GRAPHICS_TEMPLATES_XSD_NAME)) {
+				FileUtils.extract(this.getClass(), Settings.GRAPHICS_TEMPLATES_XSD_NAME, Settings.PATH_RESOURCE, templateDirectory, Settings.PERMISSION_555);
+				this.isGraphicsTemplateUpdated = true;
+			}
+			checkDeviceTemplates(templateDirectory + GDE.FILE_SEPARATOR_UNIX);
+
+			String histoCacheDirectory = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.HISTO_CACHE_ENTRIES_DIR_NAME;
+			if (!FileUtils.checkDirectoryAndCreate(histoCacheDirectory, Settings.HISTO_CACHE_ENTRIES_XSD_NAME)) {
+				((LocalAccess) DataAccess.getInstance()).resetHistoCache();
+				this.isHistocacheTemplateUpdated = true;
+			}
+
+			FileUtils.checkDirectoryAndCreate(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_PATH);
+
+			this.isWindowMaximized = Boolean.parseBoolean(this.getProperty(Settings.WINDOW_MAXIMIZED, "false"));
+
+			if (this.getProperty(Settings.WINDOW_LEFT) != null && this.getProperty(Settings.WINDOW_TOP) != null && this.getProperty(Settings.WINDOW_WIDTH) != null
+					&& this.getProperty(Settings.WINDOW_HEIGHT) != null) {
+				this.window = new Rectangle(new Integer(this.getProperty(Settings.WINDOW_LEFT).trim()).intValue(), new Integer(this.getProperty(Settings.WINDOW_TOP).trim()).intValue(),
+						new Integer(this.getProperty(Settings.WINDOW_WIDTH).trim()).intValue(), new Integer(this.getProperty(Settings.WINDOW_HEIGHT).trim()).intValue());
+			}
+			else
+				this.window = new Rectangle(50, 50, 950, 600);
 		}
-
-		if (this.isDevicePropertiesUpdated) { // check if previous devices exist and migrate device usage, default import directory, ....
-			this.migrationThread = new Thread("migration") {
-				@Override
-				public void run() {
-					int lastVersion = Integer.valueOf(GDE.DEVICE_PROPERTIES_XSD_VERSION.substring(GDE.DEVICE_PROPERTIES_XSD_VERSION.lastIndexOf("_V") + 2)) - 1;
-					for (int i = lastVersion; i >= 10; i--) {
-						String migratePropertyPath = Settings.this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + i;
-						if (new File(migratePropertyPath).exists()) {
-							log.log(Level.INFO, "previous devices exist, migrate from " + migratePropertyPath);
-							try {
-								while (Settings.this.isXsdThreadAlive() || Settings.this.getUnmarshaller() == null) {
-									WaitTimer.delay(7);
-								}
-
-								Unmarshaller tmpUnmarshaller = JAXBContext.newInstance("gde.device").createUnmarshaller();//$NON-NLS-1$
-								tmpUnmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(migratePropertyPath + "/DeviceProperties_V" + i + GDE.FILE_ENDING_DOT_XSD)));
-								TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
-								List<File> deviceProperties = FileUtils.getFileListing(new File(migratePropertyPath), 1);
-								for (File file : deviceProperties) {
-									if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_DOT_XML)) {
-										DeviceConfiguration oldConfig = new DeviceConfiguration(file.getAbsolutePath(), tmpUnmarshaller);
-										DeviceConfiguration newConfig = actualConfigurations.get(oldConfig.getName());
-										if (oldConfig.isUsed() && newConfig != null) {
-											newConfig.setUsed(true);
-											if (oldConfig.getPort().length() > 1 && !oldConfig.getPort().startsWith("USB")) newConfig.setPort(oldConfig.getPort());
-											if (oldConfig.getDataBlockPreferredDataLocation().length() > 1) newConfig.setDataBlockPreferredDataLocation(oldConfig.getDataBlockPreferredDataLocation());
-
-											newConfig.storeDeviceProperties();
-											log.log(Level.OFF, "migrated device configuration " + newConfig.getName());
-										}
-									}
-								}
-							}
-							catch (Exception e) {
-								Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, "xsdThread.run()", e.getMessage(), e);
-							}
-							break;
-						}
-					}
-					log.log(Level.TIME, "migrationThread time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
-				}
-			};
-		}
-
-		String templateDirectory = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.GRAPHICS_TEMPLATES_DIR_NAME;
-		if (!FileUtils.checkDirectoryAndCreate(templateDirectory, Settings.GRAPHICS_TEMPLATES_XSD_NAME)) {
-			FileUtils.extract(this.getClass(), Settings.GRAPHICS_TEMPLATES_XSD_NAME, Settings.PATH_RESOURCE, templateDirectory, Settings.PERMISSION_555);
-			this.isGraphicsTemplateUpdated = true;
-		}
-		checkDeviceTemplates(templateDirectory + GDE.FILE_SEPARATOR_UNIX);
-
-		String histoCacheDirectory = this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.HISTO_CACHE_ENTRIES_DIR_NAME;
-		if (!FileUtils.checkDirectoryAndCreate(histoCacheDirectory, Settings.HISTO_CACHE_ENTRIES_XSD_NAME)) {
-			resetHistoCache();
-			this.isHistocacheTemplateUpdated = true;
-		}
-
-		FileUtils.checkDirectoryAndCreate(this.applHomePath + GDE.FILE_SEPARATOR_UNIX + "Logs"); //$NON-NLS-1$
-
-		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, String.format("settingsFilePath = %s", this.settingsFilePath)); //$NON-NLS-1$
-
-		this.isWindowMaximized = Boolean.parseBoolean(this.getProperty(Settings.WINDOW_MAXIMIZED, "false"));
-
-		if (this.getProperty(Settings.WINDOW_LEFT) != null && this.getProperty(Settings.WINDOW_TOP) != null && this.getProperty(Settings.WINDOW_WIDTH) != null
-				&& this.getProperty(Settings.WINDOW_HEIGHT) != null) {
-			this.window = new Rectangle(new Integer(this.getProperty(Settings.WINDOW_LEFT).trim()).intValue(), new Integer(this.getProperty(Settings.WINDOW_TOP).trim()).intValue(),
-					new Integer(this.getProperty(Settings.WINDOW_WIDTH).trim()).intValue(), new Integer(this.getProperty(Settings.WINDOW_HEIGHT).trim()).intValue());
-		}
-		else
-			this.window = new Rectangle(50, 50, 950, 600);
 
 		this.setProperty(Settings.LOCALE_CHANGED, "false"); //$NON-NLS-1$
 
 		//move to end of constructor since it requires initialized settings!
 		this.xsdThread.start(); // wait to start the thread until the device XMLs are getting updated, local switch comes with the same XSD
-	}
-
-	public Path getHistoCacheDirectory() {
-		return Paths.get(this.applHomePath, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
-	}
-
-	public Path getHistoLocationsDirectory() {
-		return Paths.get(this.applHomePath, Settings.GPS_LOCATIONS_DIR_NAME);
-	}
-
-	public String resetHistoCache() {
-		final String $METHOD_NAME = "resetHistoCache"; //$NON-NLS-1$
-		int initialSize_KiB = (int) FileUtils.size(getHistoCacheDirectory()) / 1024;
-		FileUtils.deleteDirectory(getHistoCacheDirectory().toString());
-		FileUtils.checkDirectoryAndCreate(getHistoCacheDirectory().toString());
-		int deletedSize_KiB = (int) FileUtils.size(getHistoCacheDirectory()) / 1024;
-		FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, getHistoCacheDirectory().toString(), Settings.PERMISSION_555);
-		String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, deletedSize_KiB, getHistoCacheDirectory() });
-		Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, message);
-		return message;
-	}
-
-	/**
-	 * @return true if files were actually deleted
-	 */
-	public boolean resetHistolocations() {
-		if (FileUtils.checkDirectoryExist(getHistoLocationsDirectory().toString())) {
-			FileUtils.deleteDirectory(getHistoLocationsDirectory().toString());
-			Settings.log.log(java.util.logging.Level.CONFIG, "histo geo locations deleted"); //$NON-NLS-1$
-			return true;
-		}
-		else
-			return false;
 	}
 
 	/**
@@ -520,11 +415,11 @@ public class Settings extends Properties {
 				}
 			}
 		}
-		File path = new File(this.getApplHomePath() + "/Mapping/"); //$NON-NLS-1$
-		String propertyFilePath = this.getApplHomePath() + "/Mapping/MeasurementDisplayProperties.xml"; //$NON-NLS-1$
+		File path = new File(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.MAPPINGS_DIR_NAME);
+		String propertyFilePath = path.toString() + GDE.FILE_SEPARATOR_UNIX + Settings.MEASUREMENT_DISPLAY_FILE;
 		if (existCheck) {
 			if (!FileUtils.checkFileExist(propertyFilePath))
-				FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$
+				FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555);
 		}
 		else {
 			if (FileUtils.checkFileExist(propertyFilePath)) {
@@ -536,7 +431,7 @@ public class Settings extends Properties {
 					// ignore
 				}
 			}
-			FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$
+			FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555);
 		}
 	}
 
@@ -579,25 +474,13 @@ public class Settings extends Properties {
 
 	/**
 	 * read special properties to enable configuration to specific GPX extent values
-	 * @throws FileNotFoundException
 	 */
 	private void readMeasurementDiplayProperties() {
 		final String $METHOD_NAME = "readMeasurementDiplayProperties"; //$NON-NLS-1$
-		String propertyFilePath = this.getApplHomePath() + "/Mapping/MeasurementDisplayProperties.xml"; //$NON-NLS-1$
-		try {
-			if (!new File(propertyFilePath).exists()) {
-				File path = new File(this.getApplHomePath() + "/Mapping"); //$NON-NLS-1$
-				if (!path.exists() && !path.isDirectory()) path.mkdir();
-				// extract initial property files
-				FileUtils.extract(this.getClass(), "MeasurementDisplayProperties.xml", Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-						Settings.PERMISSION_555);
-			}
-			// BufferedInputStream stream = new BufferedReader(new InputStreamReader(new FileInputStream(propertyFilePath), "UTF-8")); //$NON-NLS-1$
-			BufferedInputStream stream = new BufferedInputStream(new FileInputStream(new File(propertyFilePath)));
+		DataAccess.getInstance().checkMappingFileAndCreate(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE);
+		try (InputStream stream = DataAccess.getInstance().getMappingInputStream(Settings.MEASUREMENT_DISPLAY_FILE)) {
 			this.measurementProperties.loadFromXML(stream);
-			stream.close();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage());
 		}
 	}
@@ -1007,28 +890,28 @@ public class Settings extends Properties {
 	 * @return the settingsFilePath
 	 */
 	public String getSettingsFilePath() {
-		return this.settingsFilePath.trim();
+		return GDE.SETTINGS_FILE_PATH;
 	}
 
 	/**
 	 * @return the applHomePath
 	 */
 	public String getApplHomePath() {
-		return this.applHomePath.trim();
+		return GDE.APPL_HOME_PATH;
 	}
 
 	/**
 	 * @return the devicesFilePath
 	 */
 	public String getDevicesPath() {
-		return this.applHomePath.trim() + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME;
+		return GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME;
 	}
 
 	/**
 	 * @return the graphicsTemplatePath
 	 */
 	public String getGraphicsTemplatePath() {
-		return this.applHomePath.trim() + GDE.FILE_SEPARATOR_UNIX + Settings.GRAPHICS_TEMPLATES_DIR_NAME;
+		return GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.GRAPHICS_TEMPLATES_DIR_NAME;
 	}
 
 	/**
@@ -1036,15 +919,15 @@ public class Settings extends Properties {
 	 */
 	public String getLogFilePath() {
 		final String $METHOD_NAME = "getLogFilePath"; //$NON-NLS-1$
-		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "applHomePath = " + this.applHomePath); //$NON-NLS-1$
-		return this.applHomePath.trim() + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_FILE;
+		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "applHomePath = " + GDE.APPL_HOME_PATH); //$NON-NLS-1$
+		return GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_FILE;
 	}
 
 	/**
 	 * @return the log file path for the serial trace logs
 	 */
 	public String getSerialLogFilePath() {
-		return this.applHomePath.trim() + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.SERIAL_LOG_FILE;
+		return GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.SERIAL_LOG_FILE;
 	}
 
 	/**
@@ -1627,18 +1510,8 @@ public class Settings extends Properties {
 		return Boolean.valueOf(this.getProperty(Settings.DEVICE_DIALOG_ON_TOP, "false").trim()); //$NON-NLS-1$
 	}
 
-	/**
-	 * @return the unmarshaller
-	 */
-	public Unmarshaller getUnmarshaller() {
-		return this.unmarshaller;
-	}
-
-	/**
-	 * @return the marshaller
-	 */
-	public Marshaller getMarshaller() {
-		return this.marshaller;
+	public DeviceSerialization getDeviceSerialization() {
+		return this.deviceSerialization;
 	}
 
 	/**
@@ -2292,6 +2165,13 @@ public class Settings extends Properties {
 		int g = new Integer(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
 		int b = new Integer(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
 		return SWTResourceManager.getColor(r, g, b);
+	}
+
+	/**
+	 * @return true if the xsdThread has not yet finished
+	 */
+	public boolean isXsdThreadPending() {
+		return this.xsdThread == null || this.xsdThread.getState() != State.TERMINATED;
 	}
 
 	/**

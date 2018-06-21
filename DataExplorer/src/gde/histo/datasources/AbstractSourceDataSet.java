@@ -23,33 +23,30 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.sun.istack.internal.Nullable;
 
 import gde.GDE;
 import gde.config.DeviceConfigurations;
-import gde.config.Settings;
 import gde.data.Channels;
 import gde.device.IDevice;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
-import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.HistoVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.SourceFolders.DirectoryType;
+import gde.histo.datasources.VaultChecker.TrussCriteria;
 import gde.histo.device.IHistoDevice;
 import gde.histo.io.HistoOsdReaderWriter;
+import gde.histo.utils.PathUtils;
 import gde.io.FileHandler;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
@@ -60,103 +57,28 @@ import gde.utils.OperatingSystemHelper;
  * Exploring and checking source data sets (log files) on a file and vault attribute level.
  * @author Thomas Eickert (USER)
  */
-public class AbstractSourceDataSets {
-	private static final String	$CLASS_NAME	= AbstractSourceDataSets.class.getName();
+public abstract class AbstractSourceDataSet {
+	private static final String	$CLASS_NAME	= AbstractSourceDataSet.class.getName();
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
-
-	/**
-	 * Holds the selection criteria for trusses (vault skeletons) applicable prior to reading the full vault.
-	 */
-	protected static final class TrussCriteria {
-		final List<Integer>	channelMixConfigNumbers;
-		final long					minStartTimeStamp_ms;
-		final String				activeObjectKey;
-		final boolean				ignoreLogObjectKey;
-		final Set<String>		realObjectKeys;
-
-		public static TrussCriteria createUiBasedTrussCriteria() {
-			return new TrussCriteria(DataExplorer.getInstance().getActiveDevice(), DataExplorer.getInstance().getActiveChannelNumber(),
-					Settings.getInstance().getActiveObjectKey());
-		}
-
-		public static TrussCriteria createTrussCriteria(IDevice device, int channelNumber, String objectKey) {
-			return new TrussCriteria(device, channelNumber, objectKey);
-		}
-
-		private TrussCriteria(IDevice device, int channelNumber, String objectKey) {
-			channelMixConfigNumbers = device.getDeviceConfiguration().getChannelMixConfigNumbers(channelNumber);
-			minStartTimeStamp_ms = LocalDate.now().minusMonths(Settings.getInstance().getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-			activeObjectKey = objectKey;
-			ignoreLogObjectKey = Settings.getInstance().getIgnoreLogObjectKey();
-			realObjectKeys = Settings.getInstance().getRealObjectKeys().collect(Collectors.toSet());
-		}
-
-		@Override
-		public String toString() {
-			return "TrussCriteria [channelMixConfigNumbers=" + this.channelMixConfigNumbers + ", minStartTimeStamp_ms=" + this.minStartTimeStamp_ms + ", filesWithOtherObject=" + this.ignoreLogObjectKey + ", realObjectKeys=" + this.realObjectKeys + "]";
-		}
-	}
 
 	/**
 	 * File types supported by the history.
 	 */
 	public static abstract class SourceDataSet {
 		@SuppressWarnings("hiding")
-		private static final Logger	log										= Logger.getLogger(SourceDataSet.class.getName());
+		private static final Logger	log	= Logger.getLogger(SourceDataSet.class.getName());
 
-		protected final Path		filePath;
-		protected final IDevice	device;
+		protected final Path				filePath;
+		protected final IDevice			device;
 
 		/** Use {@code getFile} only; is a link file or a real source file */
-		private File						file;
+		private File								file;
 
 		/**
 		 * @return true if the current device supports both directory type and file extension
 		 */
 		public boolean isWorkableFile(Set<DirectoryType> directoryTypes, SourceFolders sourceFolders) {
-			if (!isSupported()) {
-				log.log(Level.INFO, "not a loadable type           ", filePath);
-				return false;
-			}
-			if (!sourceFolders.isMatchingPath(filePath)) {
-				log.log(Level.OFF, "not a matching file path      ", filePath);
-				return false;
-			}
-			for (DirectoryType directoryType : directoryTypes) {
-				if (directoryType.getDataSetExtensions(device).contains(getFileExtension(filePath))) {
-					return true;
-				}
-			}
-			log.log(Level.INFO, "not a valid extension         ", filePath);
-			return false;
-		}
-
-		/**
-		 * @return the lower case extension without dot
-		 */
-		public static String getFileExtension(Path path) {
-			String fileName = path.getFileName().toString();
-			String extension = fileName.toString().substring(fileName.lastIndexOf('.') + 1).toLowerCase();
-			if (extension.equals(fileName)) extension = GDE.STRING_EMPTY;
-			return extension;
-		}
-
-		/**
-		 * @param filePath is a file path
-		 * @return null if the file is not supported
-		 */
-		@Nullable
-		public static SourceDataSet createSourceDataSet(Path filePath, IDevice device) {
-			String extension = getFileExtension(filePath);
-			if (extension.equals(GDE.FILE_ENDING_OSD))
-				return new OsdDataSet(filePath, device);
-			else if (device instanceof IHistoDevice) {
-				List<String> importExtentions = ((IHistoDevice) device).getSupportedImportExtentions();
-				if (importExtentions.contains(extension)) {
-					return new ImportDataSet(filePath, device); // todo implement logDataSet and native HottLogReader
-				}
-			}
-			return null;
+			return VaultChecker.isWorkableDataSet(device, filePath, directoryTypes, sourceFolders);
 		}
 
 		/**
@@ -188,11 +110,6 @@ public class AbstractSourceDataSets {
 		 * @return the data file (differs from {@code file} in case of a link file)
 		 */
 		public abstract File getActualFile() throws IOException;
-
-		/**
-		 * @return true if the device supports loading the file and if settings do not prohibit loading
-		 */
-		public abstract boolean isSupported();
 
 		/**
 		 * @param desiredRecordSetName
@@ -242,7 +159,6 @@ public class AbstractSourceDataSets {
 		 */
 		public boolean load(String desiredRecordSetName) {
 			if (!FileUtils.checkFileExist(filePath.toString())) return false;
-			if (!isSupported()) return false;
 
 			loadFile(filePath, desiredRecordSetName);
 			return true;
@@ -319,59 +235,7 @@ public class AbstractSourceDataSets {
 
 		@Override
 		public boolean isValidDeviceChannelObjectAndStart(TrussCriteria trussCriteria, HistoVault vault) {
-			if (device != null && !vault.getLogDeviceName().equals(device.getName()) //
-			// HoTTViewer V3 -> HoTTViewerAdapter
-					&& !(vault.getLogDeviceName().startsWith("HoTTViewer") && device.getName().equals("HoTTViewer"))) {
-				log.log(Level.INFO, vault instanceof ExtendedVault //
-						? String.format("no match device   %,7d kiB %s", ((ExtendedVault) vault).getLoadFileAsPath().toFile().length() / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
-						: String.format("no match device  %s", vault.getLogFilePath()));
-				return false;
-			}
-			if (!trussCriteria.channelMixConfigNumbers.contains(vault.getLogChannelNumber())) {
-				log.log(Level.INFO, vault instanceof ExtendedVault //
-						? String.format("no match channel%2d%,7d kiB %s", vault.getLogChannelNumber(), ((ExtendedVault) vault).getLoadFileAsPath().toFile().length() / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
-						: String.format("no match channel  %s", vault.getLogFilePath()));
-				return false;
-			}
-			if (vault.getLogStartTimestamp_ms() < trussCriteria.minStartTimeStamp_ms) {
-				log.log(Level.INFO, vault instanceof ExtendedVault //
-						? String.format("no match startTime%,7d kiB %s", ((ExtendedVault) vault).getLoadFileAsPath().toFile().length() / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
-						: String.format("no match startTime  %s", vault.getLogFilePath()));
-				return false;
-			}
-
-			if (trussCriteria.activeObjectKey.isEmpty()) {
-				if (!vault.getLogObjectKey().isEmpty()) return true;
-				// no object in the osd file is a undesirable case but the log is accepted in order to show all logs
-				log.log(Level.INFO, vault instanceof ExtendedVault //
-						? String.format("no match objectKey=%8s%,7d kiB %s", "empty", ((ExtendedVault) vault).getLoadFileAsPath().toFile().length() / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
-						: String.format("no match objectKey  %s", vault.getLogFilePath()));
-			} else {
-				if (vault.getLogObjectKey().isEmpty()) {
-					if (trussCriteria.ignoreLogObjectKey) return true;
-					log.log(Level.INFO, vault instanceof ExtendedVault //
-							? String.format("no match objectKey=%8s%,7d kiB %s", "empty", ((ExtendedVault) vault).getLoadFileAsPath().toFile().length() / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
-							: String.format("no match objectKey  %s", vault.getLogFilePath()));
-					return false;
-				}
-				boolean matchingObjectKey = trussCriteria.realObjectKeys.stream().anyMatch(s -> s.equalsIgnoreCase(vault.getLogObjectKey().trim()));
-				if (!matchingObjectKey) {
-					if (trussCriteria.ignoreLogObjectKey) return true;
-					String objectDirectory = vault instanceof ExtendedVault ? ((ExtendedVault) vault).getLoadObjectDirectory() : vault.getLogObjectDirectory();
-					boolean matchingObjectDirectory = trussCriteria.realObjectKeys.stream().anyMatch(s -> s.equalsIgnoreCase(objectDirectory));
-					if (matchingObjectDirectory) return true;
-					log.log(Level.INFO, vault instanceof ExtendedVault //
-							? String.format("no match objectKey=%8s%,7d kiB %s", ((ExtendedVault) vault).getRectifiedObjectKey(), ((ExtendedVault) vault).getLoadFileAsPath().toFile().length() / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
-							: String.format("no match objectKey  %s", vault.getLogFilePath()));
-					return false;
-				}
-				boolean consistentObjectKey = vault.getLogObjectKey().equalsIgnoreCase(trussCriteria.activeObjectKey);
-				if (!consistentObjectKey) {
-					// finally we found a log with a validated object key which does not correspond to the desired one
-					return false;
-				}
-			}
-			return true;
+			return VaultChecker.matchDeviceChannelObjectAndStart(device, trussCriteria, vault);
 		}
 
 		@Override
@@ -425,11 +289,6 @@ public class AbstractSourceDataSets {
 		}
 
 		@Override
-		public boolean isSupported() {
-			return true;
-		}
-
-		@Override
 		public void loadFile(Path tmpPath, String desiredRecordSetName) {
 			new FileHandler().openOsdFile(tmpPath.toString(), desiredRecordSetName);
 		}
@@ -438,7 +297,7 @@ public class AbstractSourceDataSets {
 
 	private static final class ImportDataSet extends SourceDataSet {
 		@SuppressWarnings("hiding")
-		private static final Logger	log										= Logger.getLogger(ImportDataSet.class.getName());
+		private static final Logger log = Logger.getLogger(ImportDataSet.class.getName());
 
 		protected ImportDataSet(Path filePath, IDevice device) {
 			super(filePath, device);
@@ -456,23 +315,7 @@ public class AbstractSourceDataSets {
 
 		@Override
 		public boolean isValidDeviceChannelObjectAndStart(TrussCriteria trussCriteria, HistoVault vault) {
-			if (vault.getLogStartTimestamp_ms() < trussCriteria.minStartTimeStamp_ms) {
-				log.log(Level.INFO, vault instanceof ExtendedVault //
-						? String.format("no match startTime%,7d kiB %s", ((ExtendedVault) vault).getLoadFileAsPath().toFile().length() / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
-						: String.format("no match startTime  %s", vault.getLogFilePath()));
-				return false;
-			}
-			if (!trussCriteria.activeObjectKey.isEmpty()) {
-				boolean consistentObjectKey = vault.getLogObjectKey().equalsIgnoreCase(trussCriteria.activeObjectKey);
-				if (!consistentObjectKey) {
-					if (trussCriteria.ignoreLogObjectKey) return true;
-					log.log(Level.INFO, vault instanceof ExtendedVault //
-							? String.format("no match objectKey=%8s%,7d kiB %s", ((ExtendedVault) vault).getRectifiedObjectKey(), ((ExtendedVault) vault).getLoadFileAsPath().toFile().length() / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
-							: String.format("no match objectKey  %s", vault.getLogFilePath()));
-					return false;
-				}
-			}
-			return true;
+			return VaultChecker.matchObjectAndStart(trussCriteria, vault);
 		}
 
 		@Override
@@ -497,14 +340,27 @@ public class AbstractSourceDataSets {
 		}
 
 		@Override
-		public boolean isSupported() {
-			return device instanceof IHistoDevice;
-		}
-
-		@Override
 		public void loadFile(Path tmpPath, String desiredRecordSetName) {
 			((IHistoDevice) device).importDeviceData(tmpPath);
 		}
+	}
+
+	/**
+	 * @param filePath is a file path
+	 * @return null if the file is not supported
+	 */
+	@Nullable
+	public static SourceDataSet createSourceDataSet(Path filePath, IDevice device) {
+		String extension = PathUtils.getFileExtension(filePath);
+		if (extension.equals(GDE.FILE_ENDING_OSD))
+			return new OsdDataSet(filePath, device);
+		else if (device instanceof IHistoDevice) {
+			List<String> importExtentions = ((IHistoDevice) device).getSupportedImportExtentions();
+			if (importExtentions.contains(extension)) {
+				return new ImportDataSet(filePath, device); // todo implement logDataSet and native HottLogReader
+			}
+		}
+		return null;
 	}
 
 	protected final SourceFolders	sourceFolders;
@@ -515,16 +371,8 @@ public class AbstractSourceDataSets {
 	/**
 	 *
 	 */
-	protected AbstractSourceDataSets(SourceFolders sourceFolders) {
+	protected AbstractSourceDataSet(SourceFolders sourceFolders) {
 		this.sourceFolders = sourceFolders;
-	}
-
-	public void initSourceFolders(IDevice device) {
-		try {
-			sourceFolders.defineDirectories(device, false);
-		} catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-		}
 	}
 
 }

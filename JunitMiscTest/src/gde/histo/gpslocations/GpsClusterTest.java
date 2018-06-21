@@ -106,39 +106,39 @@ class GpsClusterTest extends BasicTestCase {
 	@Test
 	void testLocationFiles() {
 		String location;
-		location = GeoCodes.getLocation(this.s21);
+		location = GeoCodes.getOrAcquireLocation(this.s21);
 		System.out.println(location);
-		location = GeoCodes.getLocation(this.s21_E);
+		location = GeoCodes.getOrAcquireLocation(this.s21_E);
 		System.out.println(location);
-		location = GeoCodes.getLocation(this.sts);
+		location = GeoCodes.getOrAcquireLocation(this.sts);
 		System.out.println(location);
-		location = GeoCodes.getLocation(this.ssa);
+		location = GeoCodes.getOrAcquireLocation(this.ssa);
 		System.out.println(location);
-		location = GeoCodes.getLocation(this.chi);
+		location = GeoCodes.getOrAcquireLocation(this.chi);
 		System.out.println(location);
-		location = GeoCodes.getLocation(this.nkv);
+		location = GeoCodes.getOrAcquireLocation(this.nkv);
 		System.out.println(location);
 		this.gpsCluster = new GpsCluster();
 		this.gpsCluster.add(s21);
 		this.gpsCluster.add(sts);
 		this.gpsCluster.add(ssa);
-		location = GeoCodes.getLocation(this.gpsCluster.getCenter());
+		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter());
 		System.out.println("center of S21, sts, ssa : " + location);
 		this.gpsCluster = new GpsCluster();
 		this.gpsCluster.add(s21);
 		this.gpsCluster.add(ssa);
-		location = GeoCodes.getLocation(this.gpsCluster.getCenter());
+		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter());
 		System.out.println("center of S21, ssa : " + location);
 		this.gpsCluster = new GpsCluster();
 		this.gpsCluster.add(s21);
 		this.gpsCluster.add(ssa);
 		this.gpsCluster.add(chi);
-		location = GeoCodes.getLocation(this.gpsCluster.getCenter());
+		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter());
 		System.out.println("center of S21, ssa, chi : " + location);
 		this.gpsCluster = new GpsCluster();
 		this.gpsCluster.add(s21);
 		this.gpsCluster.add(chi);
-		location = GeoCodes.getLocation(this.gpsCluster.getCenter());
+		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter());
 		System.out.println("center of S21, chi : " + location + "    " + this.gpsCluster.getCenter().toCsvString());
 	}
 }

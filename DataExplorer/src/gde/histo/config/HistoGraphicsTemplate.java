@@ -64,6 +64,19 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	private static final Cache<String, HistoGraphicsTemplate>	memoryCache				=																				//
 			CacheBuilder.newBuilder().maximumSize(444).recordStats().build();																								// key is the file Name
 
+	// constants to make the histo template consumer classes independent from the RecordSet / Record classes.
+
+	/**
+	 * This measurement can be read from the device, otherwise it is calculated.
+	 * Replaces the Record class constant.
+	 */
+	public final static String																IS_ACTIVE					= "_isActive";
+	/**
+	 * Quantiles.
+	 * Replaces the AbstractRecordSet class constant.
+	 */
+	public static final String																SMART_STATISTICS	= "RecordSet_smartStatistics";
+
 	/**
 	 * Conversion into a skeleton histo template.
 	 */
@@ -336,11 +349,16 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	 * Store the properties to the histo template file.
 	 */
 	public void store() {
+		String deviceSignature = deviceName + GDE.STRING_UNDER_BAR + channelNumber;
+		String propertiesComment = "-- DataExplorer Histo GraphicsTemplate " + deviceSignature + " -- " + getTargetFileSubPath().getFileName().toString() + " " + ZonedDateTime.now().toInstant() + " -- " + commentSuffix;
+		store(propertiesComment);
+	}
+
+	protected void store(String propertiesComment) {
 		try {
 			currentFilePathFragment = null;
 			try (OutputStream stream = DataAccess.getInstance().getGraphicsTemplateOutputStream(getTargetFileSubPath())) {
-				String deviceSignature = deviceName + GDE.STRING_UNDER_BAR + channelNumber;
-				this.storeToXML(stream, "-- DataExplorer Histo GraphicsTemplate " + deviceSignature + " -- " + getTargetFileSubPath().getFileName().toString() + " " + ZonedDateTime.now().toInstant() + " -- " + commentSuffix);
+				this.storeToXML(stream, propertiesComment);
 				String fileName = SecureHash.sha1(getTargetFileSubPath().toString());
 				memoryCache.put(fileName, this);
 			}
