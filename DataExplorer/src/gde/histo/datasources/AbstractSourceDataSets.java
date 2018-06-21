@@ -47,8 +47,7 @@ import gde.exception.NotSupportedFileFormatException;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.HistoVault;
 import gde.histo.cache.VaultCollector;
-import gde.histo.datasources.DirectoryScanner.DirectoryType;
-import gde.histo.datasources.DirectoryScanner.SourceFolders;
+import gde.histo.datasources.SourceFolders.DirectoryType;
 import gde.histo.device.IHistoDevice;
 import gde.histo.io.HistoOsdReaderWriter;
 import gde.io.FileHandler;
@@ -522,7 +521,7 @@ public class AbstractSourceDataSets {
 
 	public void initSourceFolders(IDevice device) {
 		try {
-			sourceFolders.defineDirectories(device);
+			sourceFolders.defineDirectories(device, false);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}

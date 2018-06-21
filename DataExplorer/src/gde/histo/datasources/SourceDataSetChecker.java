@@ -24,8 +24,7 @@ import java.util.EnumSet;
 
 import gde.device.IDevice;
 import gde.histo.cache.HistoVault;
-import gde.histo.datasources.DirectoryScanner.DirectoryType;
-import gde.histo.datasources.DirectoryScanner.SourceFolders;
+import gde.histo.datasources.SourceFolders.DirectoryType;
 import gde.log.Logger;
 
 /**
@@ -44,7 +43,7 @@ public final class SourceDataSetChecker extends AbstractSourceDataSets {
 	 * @param directoryTypes may hold the import directory type as well
 	 */
 	public SourceDataSetChecker(IDevice device, EnumSet<DirectoryType> directoryTypes, int channelNumber, String objectKey) {
-		super(new SourceFolders());
+		super(new SourceFolders(objectKey));
 		this.device = device;
 		this.validDirectoryTypes = directoryTypes;
 		this.trussCriteria = TrussCriteria.createTrussCriteria(device, channelNumber, objectKey);

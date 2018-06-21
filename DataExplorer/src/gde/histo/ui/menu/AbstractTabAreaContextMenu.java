@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.datasources.AbstractSourceDataSets.SourceDataSet;
-import gde.histo.datasources.DirectoryScanner.DirectoryType;
+import gde.histo.datasources.SourceFolders.DirectoryType;
 import gde.histo.exclusions.ExclusionActivity;
 import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.HistoExplorer;

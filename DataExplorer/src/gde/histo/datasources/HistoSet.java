@@ -35,7 +35,6 @@ import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
 import gde.histo.cache.ExtendedVault;
-import gde.histo.datasources.DirectoryScanner.SourceFolders;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.exclusions.InclusionData;
 import gde.histo.recordings.TrailRecord;

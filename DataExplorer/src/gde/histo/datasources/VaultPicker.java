@@ -60,7 +60,6 @@ import gde.exception.NotSupportedFileFormatException;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.cache.VaultReaderWriter;
-import gde.histo.datasources.DirectoryScanner.SourceFolders;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.exclusions.ExclusionData;
 import gde.histo.recordings.TrailRecordSet;

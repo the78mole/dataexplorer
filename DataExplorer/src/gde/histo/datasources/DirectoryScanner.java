@@ -22,24 +22,14 @@ package gde.histo.datasources;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import com.sun.istack.internal.Nullable;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -48,12 +38,9 @@ import gde.device.IDevice;
 import gde.exception.NotSupportedFileFormatException;
 import gde.histo.datasources.AbstractSourceDataSets.SourceDataSet;
 import gde.histo.datasources.HistoSet.RebuildStep;
-import gde.histo.device.IHistoDevice;
+import gde.histo.datasources.SourceFolders.DirectoryType;
 import gde.log.Logger;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gde.utils.ObjectKeyCompliance;
 
 /**
  * Access to history source directories.
@@ -107,12 +94,16 @@ public final class DirectoryScanner {
 
 		private SourceFolders									sourceFolders						= null;
 
+		/**
+		 * File access speed indicator. True is slow file system access.
+		 * Simple algorithm.
+		 */
 		private boolean												isSlowFolderAccess			= false;
 		private boolean												isMajorChange						= false;
 		private boolean												isChannelChangeOnly			= false;
 
 		public SourceFoldersBuilder() {
-			 this.sourceFolders = new SourceFolders();
+			 this.sourceFolders = new SourceFolders(Settings.getInstance().getActiveObjectKey());
 		}
 
 		/**
@@ -161,7 +152,12 @@ public final class DirectoryScanner {
 
 			// avoid costly directory scan and building directory file event listeners (WatchDir)
 			if (isMajorChange) {
-				isSlowFolderAccess = sourceFolders.defineDirectories(validatedDevice);
+				long nanoTime = System.nanoTime();
+				sourceFolders.defineDirectories(validatedDevice, isSlowFolderAccess);
+				long foldersCount = sourceFolders.values().stream().flatMap(Collection::stream).count();
+				long elapsed_ms = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime);
+				isSlowFolderAccess = elapsed_ms / (foldersCount + 3) > SLOW_FOLDER_LIMIT_MS; // +3 for initial overhead (data path)
+				log.fine(() -> "slowFolderAccess=" + isSlowFolderAccess + "  numberOfFolders=" + foldersCount + " in " + elapsed_ms + " [ms]");
 			}
 
 			// the channel selection does not have any influence on the validated folders list
@@ -180,353 +176,8 @@ public final class DirectoryScanner {
 
 	}
 
-	/**
-	 * Detect valid sub paths.
-	 */
-	public static final class SourceFolders {
-		@SuppressWarnings("hiding")
-		private static final Logger	log										= Logger.getLogger(SourceFolders.class.getName());
-
-		/**
-		 * Designed to hold all folder paths feeding the file scanning steps.
-		 * Supports an equality check comparing the current paths to an older path map.
-		 */
-		private final Map<DirectoryType, Set<Path>>	folders							=									// formatting
-				new EnumMap<DirectoryType, Set<Path>>(DirectoryType.class) {
-					private static final long serialVersionUID = -8624409377603884008L;
-
-					/**
-					 * @return true if the keys are equal and the sets hold the same path strings
-					 */
-					@Override
-					public boolean equals(Object obj) {
-						if (this == obj) return true;
-						if (obj == null) return false;
-						if (getClass() != obj.getClass()) return false;
-						@SuppressWarnings("unchecked")																						// reason is anonymous class
-						Map<DirectoryType, Set<Path>> that = (Map<DirectoryType, Set<Path>>) obj;
-						boolean hasSameDirectoryTypes = keySet().equals(that.keySet());
-						if (hasSameDirectoryTypes) {
-							boolean isEqual = true;
-							for (Entry<DirectoryType, Set<Path>> entry : entrySet()) {
-								Set<Path> thisSet = entry.getValue();
-								Set<Path> thatSet = that.get(entry.getKey());
-								isEqual &= thisSet.equals(thatSet);
-								if (!isEqual) break;
-							}
-							log.log(Level.FINEST, "isEqual=", isEqual);
-							return isEqual;
-						} else {
-							return false;
-						}
-					}
-				};
-
-		/**
-		 * File access speed indicator. True is slow file system access.
-		 * Simple algorithm.
-		 */
-		private boolean															isSlowFolderAccess	= false;
-
-		public SourceFolders() {
-			super();
-		}
-
-		/**
-		 * Determine the valid directory paths from all log sources.
-		 * The result depends on the active device and object.
-		 * @return true if the file access is estimated as slow (due to network folders, ...)
-		 */
-		public boolean defineDirectories(IDevice device) throws IOException {
-			long nanoTime = System.nanoTime();
-			String activeObjectKey = Settings.getInstance().getActiveObjectKey();
-			folders.clear();
-			for (DirectoryType directoryType : DirectoryType.getValidDirectoryTypes(device)) {
-				Set<Path> currentPaths = defineCurrentPaths(device, directoryType);
-				if (!Settings.getInstance().getActiveObjectKey().isEmpty()) {
-					Set<Path> externalObjectPaths = defineExternalObjectPaths(directoryType, activeObjectKey);
-					currentPaths.addAll(externalObjectPaths);
-					log.log(Level.FINE, directoryType.toString(), externalObjectPaths);
-				}
-				log.log(Level.FINE, directoryType.toString(), currentPaths);
-				folders.put(directoryType, currentPaths);
-			}
-			long foldersCount = folders.values().stream().flatMap(Collection::stream).count();
-			long elapsed_ms = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime);
-			boolean slowFolderAccess = elapsed_ms / (foldersCount + 3) > SLOW_FOLDER_LIMIT_MS; // +3 for initial overhead (data path)
-			log.fine(() -> "slowFolderAccess=" + slowFolderAccess + "  numberOfFolders=" + foldersCount + " in " + elapsed_ms + " [ms]");
-			return slowFolderAccess;
-		}
-
-		private void removeDoubleDirectories() {
-			// no, because the same directory might contribute different file types to the screening
-		}
-
-		/**
-		 * Determine the valid directory paths from the currently defined working / import directory.
-		 * The result depends on the active device and object.
-		 * @return the list with 0 .. n entries
-		 */
-		private Set<Path> defineCurrentPaths(IDevice device, DirectoryType directoryType) {
-			Set<Path> newPaths = new HashSet<>();
-
-			Path basePath = directoryType.getBasePath();
-			if (basePath == null) {
-				// an unavailable path results in no files found
-			} else {
-				String activeObjectKey = Settings.getInstance().getActiveObjectKey();
-				if (activeObjectKey.isEmpty()) {
-					Path rootPath = directoryType.getDeviceSubPath(device) != null ? basePath.resolve(directoryType.getDeviceSubPath(device)) : basePath;
-					newPaths.add(rootPath);
-				} else {
-					newPaths = defineObjectPaths(basePath, Settings.getInstance().getActiveObjectKey());
-				}
-			}
-			return newPaths;
-		}
-
-		private Set<Path> defineObjectPaths(Path basePath, String objectKey) {
-			Set<Path> result = new HashSet<Path>();
-			Stream<String> objectKeys = Stream.of(objectKey);
-			if (isSlowFolderAccess) DataExplorer.getInstance().setStatusMessage("find object folders in " + basePath.toString());
-			try (Stream<Path> objectPaths = ObjectKeyCompliance.defineObjectPaths(basePath, objectKeys)) {
-				result = objectPaths.collect(Collectors.toSet());
-			} catch (IOException e) {
-				log.log(Level.SEVERE, e.getMessage(), " is not accessible : " + e.getClass());
-			} catch (Exception e) {
-				log.log(Level.WARNING, e.getMessage(), e);
-			}
-			if (isSlowFolderAccess) DataExplorer.getInstance().setStatusMessage("");
-			return result;
-		}
-
-		/**
-		 * Determine the object directory paths from the external directories (data / import).
-		 * They are defined in the DataExplorer properties.
-		 * The result depends on the active device and object.
-		 * @return the list with 0 .. n entries
-		 */
-		private Set<Path> defineExternalObjectPaths(DirectoryType directoryType, String objectKey) {
-			Stream<Path> externalBaseDirs = directoryType.getExternalBaseDirs();
-			return externalBaseDirs.map(p -> defineObjectPaths(p, objectKey)) //
-					.flatMap(Set::stream).collect(Collectors.toSet());
-		}
-
-		public Set<Entry<DirectoryType, Set<Path>>> entrySet() {
-			return folders.entrySet();
-		}
-
-		public Collection<Set<Path>> values() {
-			return folders.values();
-		}
-
-		public Map<Path, Set<DirectoryType>> getMap() { // todo change folders to Map<Path, Set<DirectoryType>>
-			Map<Path, Set<DirectoryType>> result = new HashMap<>();
-			for (Entry<DirectoryType, Set<Path>> entry : folders.entrySet()) {
-				for (Path path : entry.getValue()) {
-					Set<DirectoryType> set = result.get(path);
-					if (set == null) {
-						set = EnumSet.noneOf(DirectoryType.class);
-						result.put(path, set);
-					}
-					set.add(entry.getKey());
-				}
-			}
-			return result;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((this.folders == null) ? 0 : this.folders.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) return true;
-			if (obj == null) return false;
-			if (getClass() != obj.getClass()) return false;
-			SourceFolders other = (SourceFolders) obj;
-			if (this.folders == null) {
-				if (other.folders != null) return false;
-			} else if (!this.folders.equals(other.folders)) return false;
-			return true;
-		}
-
-		@Override
-		public String toString() {
-			return "" + this.folders;
-		}
-
-		public int getFoldersCount() {
-			return (int) values().parallelStream().flatMap(Collection::parallelStream).count();
-		}
-
-		/**
-		 * @return the rightmost folder names, e.g. 'FS14 | MiniEllipse'
-		 */
-		public String getTruncatedFileNamesCsv() {
-			String ellipsisText = Messages.getString(MessageIds.GDE_MSGT0864);
-			return folders.values().stream().flatMap(Collection::stream).map(Path::getFileName).map(Path::toString) //
-					.map(s -> s.length() > 22 ? s.substring(0, 22) + ellipsisText : s) //
-					.distinct().collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
-		}
-
-		/**
-		 * @return the full paths with prefix directory type, e.g. 'DATA: E:\User\Logs\FS14'
-		 */
-		public String getDecoratedPathsCsv() {
-			List<String> directoryTypeTexts = new ArrayList<>();
-			for (Entry<DirectoryType, Set<Path>> directoryEntry : folders.entrySet()) {
-				String text = directoryEntry.getValue().stream().map(Path::toString) //
-						.map(p -> directoryEntry.getKey().toString() + GDE.STRING_BLANK_COLON_BLANK + p) //
-						.collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
-				directoryTypeTexts.add(text);
-			}
-			return directoryTypeTexts.stream().collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
-		}
-
-		public boolean isMatchingPath(Path sourceFile) {
-			int nameCountMax = Settings.getInstance().getSubDirectoryLevelMax() + 1;
-			Map<Path, Set<DirectoryType>> pathMap = getMap();
-			for (Path path : pathMap.keySet()) {
-				try {
-					if (path.relativize(sourceFile).getNameCount() <= nameCountMax) return true;
-				} catch (Exception e) {
-					// path hat no common starter
-				}
-			}
-			return false;
-		}
-	}
-
 	private final SourceFoldersBuilder											sourceFoldersBuilder	= new SourceFoldersBuilder();
 	private final CheckedBiPredicate<IDevice, RebuildStep>	sourceFileValidator;
-
-	/**
-	 * Data sources supported by the history including osd link files.
-	 */
-	public enum DirectoryType {
-		DATA {
-			@Override
-			public Path getBasePath() {
-				String dataFilePath = Settings.getInstance().getDataFilePath();
-				return dataFilePath == null || dataFilePath.isEmpty() ? null : Paths.get(dataFilePath);
-			}
-
-			@Override
-			public Path getDeviceSubPath(IDevice device) {
-				return Paths.get(device.getDeviceConfiguration().getPureDeviceName());
-			}
-
-			@Override
-			public List<String> getDataSetExtensions(IDevice device) {
-				List<String> result = new ArrayList<>();
-				result.add(GDE.FILE_ENDING_OSD);
-				if (device instanceof IHistoDevice && Settings.getInstance().getSearchDataPathImports()) {
-					result.addAll(((IHistoDevice) device).getSupportedImportExtentions());
-				}
-				return result;
-			}
-
-			@Override
-			public Stream<Path> getExternalBaseDirs() {
-				try {
-					return Arrays.stream(Settings.getInstance().getDataFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
-							.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get);
-				} catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					return Stream.empty();
-				}
-			}
-
-			@Override
-			public boolean isActive(IDevice device) {
-				// the DataSetPath is always a valid path
-				return true;
-			}
-		},
-		IMPORT {
-			@Override
-			@Nullable
-			public Path getBasePath() {
-				return null;
-			}
-
-			@Override
-			public Path getDeviceSubPath(IDevice device) {
-				return null; // native files are not segregated by devices
-			}
-
-			@Override
-			public List<String> getDataSetExtensions(IDevice device) {
-				if (device instanceof IHistoDevice)
-					return ((IHistoDevice) device).getSupportedImportExtentions();
-				else
-					return new ArrayList<>();
-			}
-
-			@Override
-			public Stream<Path> getExternalBaseDirs() {
-				try {
-					return Arrays.stream(Settings.getInstance().getImportFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
-							.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get);
-				} catch (Exception e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-					return Stream.empty();
-				}
-			}
-
-			@Override
-			public boolean isActive(IDevice device) {
-				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtensions(device).isEmpty() + " ExternalFolders.exist=" + getExternalBaseDirs().anyMatch(e -> true));
-				if (getDataSetExtensions(device).isEmpty()) {
-					return false;
-				} else {
-					return getExternalBaseDirs().anyMatch(e -> true);
-				}
-			};
-		};
-
-		/**
-		 * Use this instead of values() to avoid repeatedly cloning actions.
-		 */
-		public static final DirectoryType[] VALUES = values();
-
-		public static EnumSet<DirectoryType> getValidDirectoryTypes(IDevice device) {
-			EnumSet<DirectoryType> directoryTypes = EnumSet.noneOf(DirectoryType.class);
-			for (DirectoryType directoryType : VALUES) {
-				if (directoryType.isActive(device)) directoryTypes.add(directoryType);
-			}
-			return directoryTypes;
-		}
-
-		/**
-		 * @return the current directory path independent from object / device
-		 */
-		@Nullable
-		public abstract Path getBasePath();
-
-		/**
-		 * @return the sub path for finding files assigned to the device
-		 */
-		@Nullable
-		public abstract Path getDeviceSubPath(IDevice device);
-
-		/**
-		 * @return the supported file extensions (e.g. 'bin') or an empty list
-		 */
-		public abstract List<String> getDataSetExtensions(IDevice device);
-
-		/**
-		 * @return true if the prerequisites for the directory type are fulfilled
-		 */
-		public abstract boolean isActive(IDevice device);
-
-		public abstract Stream<Path> getExternalBaseDirs();
-	}
 
 	public DirectoryScanner() {
 		// define if the log paths are checked for any changed / new / deleted files

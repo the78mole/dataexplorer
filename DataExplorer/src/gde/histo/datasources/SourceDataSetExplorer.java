@@ -36,8 +36,7 @@ import java.util.stream.Collectors;
 
 import gde.config.Settings;
 import gde.histo.cache.VaultCollector;
-import gde.histo.datasources.DirectoryScanner.DirectoryType;
-import gde.histo.datasources.DirectoryScanner.SourceFolders;
+import gde.histo.datasources.SourceFolders.DirectoryType;
 import gde.histo.exclusions.ExclusionData;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
