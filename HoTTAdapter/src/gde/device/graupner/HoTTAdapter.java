@@ -1851,13 +1851,20 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						else
 							recordLapsRx_dbm.set(i, lapTime);
 					} // end check minimal time between lap events
-					else if (lapTime == 0)
+					else if (lapTime == 0) {
 						if (isLapEvent)
 							recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms / 2);
 						else
 							recordLapsRx_dbm.set(i, (int) filterLapMinTime_ms);
-					else
-						recordLapsRx_dbm.set(i, lapTime);
+					}
+					else {
+						try {
+							recordLapsRx_dbm.set(i, lapTime);
+						}
+						catch (ArrayIndexOutOfBoundsException e) {
+							log.log(Level.SEVERE, String.format("index %d out of range in recordLapsRx_dbm with length %d", i, recordLapsRx_dbm.realSize()));
+						}
+					}
 
 					// find a local minimal value of Rx dbm
 					if (lastRxDbmValue < 0 && recordDiffRx_dbm.get(i) >= 0) { // local minimum Rx dbm detected

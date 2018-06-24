@@ -225,26 +225,23 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			break;
 
 		case TYPE_19200_V4:
-			switch (dataBuffer[1]) {
-			case HoTTAdapterD.SENSOR_TYPE_RECEIVER_19200:
-				if (dataBuffer.length == 17) {
-					//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx
-					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 11);
-					tmpVoltageRx = (dataBuffer[6] & 0xFF);
-					tmpTemperatureRx = (dataBuffer[7] & 0xFF) - 20;
-					if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 120) {
-						points[0] = 0; // seams not part of live data ?? (dataBuffer[15] & 0xFF) * 1000;
-						points[1] = (dataBuffer[9] & 0xFF) * 1000;
-						points[2] = (dataBuffer[5] & 0xFF) * 1000;
-						points[3] = tmpPackageLoss * 1000;
-						points[4] = (dataBuffer[13] & 0xFF) * 1000;
-						points[5] = (dataBuffer[8] & 0xFF) * 1000;
-						points[6] = tmpVoltageRx * 1000;
-						points[7] = tmpTemperatureRx * 1000;
-					}
-				}
-				break;
+			//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
+			tmpPackageLoss = DataParser.parse2Short(dataBuffer, 11);
+			tmpVoltageRx = (dataBuffer[6] & 0xFF);
+			tmpTemperatureRx = (dataBuffer[7] & 0xFF) - 20;
+			if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 120) {
+				points[0] = 0; //Rx->Tx PLoss
+				points[1] = (dataBuffer[9] & 0xFF) * 1000;
+				points[2] = (dataBuffer[5] & 0xFF) * 1000;
+				points[3] = tmpPackageLoss * 1000;
+				points[4] = (dataBuffer[13] & 0xFF) * 1000;
+				points[5] = (dataBuffer[8] & 0xFF) * 1000;
+				points[6] = tmpVoltageRx * 1000;
+				points[7] = tmpTemperatureRx * 1000;
+				points[8] = (dataBuffer[10] & 0xFF) * 1000;
+			}
 
+			switch (dataBuffer[1]) {
 			case HoTTAdapterD.SENSOR_TYPE_VARIO_19200:
 				if (dataBuffer.length == 57) {
 					//0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
