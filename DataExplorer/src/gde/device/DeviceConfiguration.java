@@ -22,6 +22,8 @@ package gde.device;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -362,6 +364,48 @@ public class DeviceConfiguration {
 	 */
 	public String getDeviceImplName() {
 		return this.device.getName().getImplementation() == null ? this.device.getName().getValue() : this.device.getName().getImplementation();
+	}
+
+	/**
+	 * @return the class name with special characters stripped off
+	 */
+	public String getClassImplName() {
+		String deviceImplName = this.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
+		return deviceImplName.contains(GDE.STRING_DOT) ? deviceImplName // full qualified
+				: "gde.device." + getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + GDE.STRING_DOT + deviceImplName; //$NON-NLS-1$
+	}
+
+	/**
+	 * Use to convert this instance into a device object by reloading the device properties file.
+	 * @return the device instance by using the class loader
+	 */
+	public IDevice defineInstanceOfDevice() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, NoClassDefFoundError {
+		String className = this.getClassImplName();
+		// String className = "gde.device.DefaultDeviceDialog";
+		// log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		Class<?> c = loader.loadClass(className);
+		// Class c = Class.forName(className);
+		Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { String.class });
+	  // log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		if (constructor != null) {
+			return (IDevice) constructor.newInstance(new Object[] { this.getPropertiesFileName() });
+		}
+		else
+			throw new NoClassDefFoundError(Messages.getString(MessageIds.GDE_MSGE0016));
+	}
+
+	/**
+	 * Use to convert this instance into a device object without reloading from the device properties file.
+	 * @return the device instance by using the class loader
+	 */
+	public IDevice getAsDevice() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, NoClassDefFoundError {
+		Class<?> currentClass = Thread.currentThread().getContextClassLoader().loadClass(this.getClassImplName());
+		Constructor<?> constructor = currentClass.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
+		if (constructor != null) {
+			return (IDevice) constructor.newInstance(new Object[] { this });
+		} else
+			throw new NoClassDefFoundError(Messages.getString(MessageIds.GDE_MSGE0016));
 	}
 
 	/**

@@ -20,7 +20,6 @@
 package gde.histo.base;
 
 import java.io.FileNotFoundException;
-import java.lang.reflect.Constructor;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -73,23 +72,8 @@ public class SuperTestCase extends HistoTestCase {
 	 */
 	protected IDevice getInstanceOfDevice(DeviceConfiguration selectedActiveDeviceConfig) {
 		IDevice newInst = null;
-		String selectedDeviceName = selectedActiveDeviceConfig.getDeviceImplName().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY);
-		// selectedDeviceName = selectedDeviceName.substring(0, 1).toUpperCase() + selectedDeviceName.substring(1);
-		String className = selectedDeviceName.contains(GDE.STRING_DOT) ? selectedDeviceName // full qualified
-				: "gde.device." + selectedActiveDeviceConfig.getManufacturer().toLowerCase().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY).replace(GDE.STRING_DASH, GDE.STRING_EMPTY) + "." + selectedDeviceName;
 		try {
-			// String className = "gde.device.DefaultDeviceDialog";
-			// log.log(Level.FINE, "loading Class " + className); //$NON-NLS-1$
-			ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			Class<?> c = loader.loadClass(className);
-			// Class c = Class.forName(className);
-			Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { String.class });
-			// log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false"));
-			if (constructor != null) {
-				newInst = (IDevice) constructor.newInstance(new Object[] { selectedActiveDeviceConfig.getPropertiesFileName() });
-			} else
-				throw new NoClassDefFoundError(Messages.getString(MessageIds.GDE_MSGE0016));
-
+			newInst = selectedActiveDeviceConfig.getAsDevice();
 		} catch (NoClassDefFoundError e) {
 			e.printStackTrace();
 		} catch (Exception e) {
