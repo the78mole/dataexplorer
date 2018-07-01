@@ -33,6 +33,7 @@
 	<property name="module.output" location="classes"/>
 
 	<path id="compile.classpath">
+		<pathelement location="../build/lib/gson-2.8.5.jar" />
 		<pathelement location="../build/lib/RXTXcomm.jar" />
 		<pathelement location="../build/lib/usb4java-1.2.0.jar" />
 		<pathelement location="../build/lib/usb-api-1.0.2.jar" />
@@ -89,6 +90,26 @@
  	    	<fileset dir="src" includes="**/*.reg"/>
  	    	<fileset dir="src" includes="**/*.desktop"/>
  	    	<fileset dir="src" includes="**/*.directory"/>
+	    </jar>
+	</target>
+
+	<target name="nonui_package" depends="compile">
+		<echo message="Building using ${os.name} ${os.arch}" />
+		<tstamp>
+		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
+		</tstamp>
+		<manifest file="src/META-INF/MANIFEST.MF">
+    		<attribute name="Implementation-Version" value="${version.num}"/>
+			<attribute name="Created-By" value="${user.name}"/>
+			<attribute name="Built-Date" value="${TODAY}"/> 
+			<attribute name="Main-Class" value="gde.GDE"/>
+			<attribute name="Class-Path" value="java/ext/commons-lang3-3.2.1.jar"/>
+   		</manifest>
+ 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}NonUi-${version.num}.jar" compress="true" >
+	       	<fileset dir="${module.output}" includes="**/*.class"/>
+ 	    	<fileset dir="src" includes="**/*.properties"/>
+ 	    	<fileset dir="src" includes="**/*.xsd"/>
+ 	    	<fileset dir="src" includes="**/*.xml"/>
 	    </jar>
 	</target>
 

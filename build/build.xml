@@ -404,6 +404,43 @@
 		<ant antfile="build.xml" target="package" dir="Devo-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="CSVImport" inheritall="true" />
 		<!-- add new device here -->
+		<ant antfile="build.xml" target="nonui_package" dir="DataExplorer" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="Picolario" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="AkkuMaster" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="Simulator" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="UniLog" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="eStation" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="VC800" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="LiPoWatch" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="CSV2SerialAdapter" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="WStechVario" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="QC-Copter" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="GPS-Logger" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="NMEA-Adapter" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="UltramatUDP" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="HoTTAdapter" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="UniLog2" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="iCharger" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="FlightRecorder" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="JLog2" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="S32" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="JetiAdapter" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="IGCAdapter" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="GPXAdapter" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="IISI-Cockpit V2" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="FutabaTelemetry" inheritall="true" />
+		<!-- ant antfile="build.xml" target="nonui_package" dir="PowerLab" inheritall="true" / -->
+		<ant antfile="build.xml" target="nonui_package" dir="Polaron" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="OpenTxTelemetry" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="Akkumatik" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="GigaLogger" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="SkyRC" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="Weatronic-Telemetry" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="UniTrend" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="Pulsar" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="Devo-Telemetry" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="CSVImport" inheritall="true" />
+		<!-- add new device here -->
 	</target>
 
 	<fileset dir="${basedir}">
@@ -452,7 +489,7 @@
 		<!-- programm directory -->
 		<copy file="build/misc/DataExplorer32.exe" tofile="${output.windows32.program}/DataExplorer.exe" />
 		<copy todir="${output.windows32.program}" flatten="yes">
-			<fileset file="DataExplorer/build/*.jar" />
+			<fileset file="DataExplorer/build/*.jar" excludes="**/*NonUi*.jar" />
 			<fileset file="build/misc/DevicePropertiesEditor.exe" />
 			<!--
             <fileset file="build/misc/DataExplorer.ico" />
@@ -462,14 +499,14 @@
 			<fileset file="DataExplorer/src/WinHelper32.dll" />
 		</copy>
 		<copy todir="${output.windows32.program.devices}" flatten="yes">
-			<fileset dir="${basedir}">
+			<fileset dir="${basedir}" excludes="**/*NonUi*.jar">
 				<patternset refid="DE_PLUGIN_JARS" />
 			</fileset>
 		</copy>
 
 		<copy file="build/misc/DataExplorer64.exe" tofile="${output.windows64.program}/DataExplorer.exe" />
 		<copy todir="${output.windows64.program}" flatten="yes">
-			<fileset file="DataExplorer/build/*.jar" />
+			<fileset file="DataExplorer/build/*.jar" excludes="**/*NonUi*.jar" />
 			<fileset file="build/misc/DevicePropertiesEditor.exe" />
 			<!--
             <fileset file="build/misc/DataExplorer.ico" />
@@ -479,7 +516,7 @@
 			<fileset file="DataExplorer/src/WinHelper64.dll" />
 		</copy>
 		<copy todir="${output.windows64.program.devices}" flatten="yes">
-			<fileset dir="${basedir}">
+			<fileset dir="${basedir}" excludes="**/*NonUi*.jar">
 				<patternset refid="DE_PLUGIN_JARS" />
 			</fileset>
 		</copy>
