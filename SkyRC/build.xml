@@ -50,7 +50,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation SKYRC MC3000 charger device using USB communication"/>
-    		<attribute name="Export-Service" value="gde.device.skyrc.MC3000, gde.device.skyrc.MC3000-Set, gde.device.skyrc.Q200, gde.device.skyrc.Q200-Set, gde.device.skyrc.D100, gde.device.skyrc.D100-Set, gde.device.skyrc.HitexX1Red"/>
+    		<attribute name="Export-Service" value="gde.device.skyrc.MC3000, gde.device.skyrc.MC3000-Set, gde.device.skyrc.Q200, gde.device.skyrc.Q200-Set, gde.device.skyrc.D100, gde.device.skyrc.D100-Set, gde.device.skyrc.HitecX1Red"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
