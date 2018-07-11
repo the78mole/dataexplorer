@@ -439,9 +439,16 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 						points[11] = tmpClimb10 * 10;
 					}
 					//96=Test 00, 97=Test 01, 98=Test 02, ... , 108=Test 12
-					for (int i = 0, j = 0; i < 13; i++, j += 2) {
-						points[i + 96] = DataParser.parse2Short(dataBuffer, (22 + j)) * 1000;
+					for (int i = 23; i < 49; ++i) {
+						if (dataBuffer[i] == 0x20)
+								dataBuffer[i] = 00;
 					}
+					for (int i = 0, j = 0; i < 10; i++, j += 2) {
+						points[i + 96] = DataParser.parse2Short(dataBuffer, 28 + j) * 1000;					
+					}
+					points[106] = DataParser.parse2Short(dataBuffer[48], dataBuffer[23]) * 1000;
+					points[107] = DataParser.parse2Short(dataBuffer[24], dataBuffer[25]) * 1000;
+					//points[108] can not be evaluated due to missing space
 				}
 				break;
 
