@@ -226,7 +226,7 @@ public class SourceFolders {
 	 * The result depends on the active device and object.
 	 * @param slowFolderAccessMessage
 	 */
-	public void defineDirectories(IDevice device, boolean slowFolderAccessMessage) {
+	public void defineDirectories(IDevice device, boolean slowFolderAccessMessage) { // todo replace with signaler
 		folders.clear();
 		for (DirectoryType directoryType : DirectoryType.getValidDirectoryTypes(device)) {
 			if (slowFolderAccessMessage) DataExplorer.getInstance().setStatusMessage("find object folders in " + directoryType.getBasePath().toString());

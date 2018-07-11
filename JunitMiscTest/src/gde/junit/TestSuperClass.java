@@ -38,7 +38,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import gde.Analyzer;
 import gde.GDE;
+import gde.TestAnalyzer;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -64,6 +66,7 @@ public class TestSuperClass extends TestCase {
 		GDE.shell = new Shell(GDE.display);
 	}
 
+	final TestAnalyzer	analyzer		= (TestAnalyzer) Analyzer.getInstance();
 	final DataExplorer	application	= DataExplorer.getInstance();
 	final Channels			channels		= Channels.getInstance();
 	final Settings			settings		= Settings.getInstance();
@@ -275,7 +278,7 @@ public class TestSuperClass extends TestCase {
 			}
 			this.channels.setChannelNames(channelNames);
 		}
-		this.application.initiateUnitTestEnvironment(activeDevice, this.channels, "");
+		this.analyzer.initiateUnitTestEnvironment(activeDevice, this.channels, "");
 	}
 
 	/**
@@ -294,11 +297,11 @@ public class TestSuperClass extends TestCase {
 		DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 		if (deviceConfig == null) new UnsupportedOperationException("deviceConfig == null");
 		IDevice device = this.getInstanceOfDevice(deviceConfig);
-		this.application.setActiveDeviceWoutUI(device);
+		this.analyzer.setActiveDevice(device);
 
 		setupDataChannels(device);
 
-		this.application.initiateUnitTestEnvironment(device, this.channels, activeObjectKey);
+		this.analyzer.initiateUnitTestEnvironment(device, this.channels, activeObjectKey);
 	}
 
 	/**

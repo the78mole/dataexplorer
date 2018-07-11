@@ -38,7 +38,6 @@ import gde.histo.datasources.SourceFolders.DirectoryType;
 import gde.histo.device.IHistoDevice;
 import gde.histo.utils.PathUtils;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Check vaults without Ui, i.e. active device, channel, object.
@@ -57,11 +56,6 @@ public final class VaultChecker {
 		final String				activeObjectKey;
 		final boolean				ignoreLogObjectKey;
 		final Set<String>		realObjectKeys;
-
-		public static TrussCriteria createUiBasedTrussCriteria() {
-			return new TrussCriteria(DataExplorer.getInstance().getActiveDevice(), DataExplorer.getInstance().getActiveChannelNumber(),
-					Settings.getInstance().getActiveObjectKey());
-		}
 
 		public static TrussCriteria createTrussCriteria(IDevice device, int channelNumber, String objectKey) {
 			return new TrussCriteria(device, channelNumber, objectKey);

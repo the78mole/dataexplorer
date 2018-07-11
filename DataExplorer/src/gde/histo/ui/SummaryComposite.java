@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.sun.istack.internal.Nullable;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -60,7 +61,7 @@ import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.DirectoryScanner;
 import gde.histo.datasources.HistoSet;
 import gde.histo.datasources.SourceFolders;
-import gde.histo.exclusions.ExclusionData;
+import gde.histo.exclusions.ExclusionActivity;
 import gde.histo.exclusions.InclusionData;
 import gde.histo.guard.Reminder;
 import gde.histo.recordings.TrailDataTags.DataTag;
@@ -225,9 +226,8 @@ public final class SummaryComposite extends AbstractChartComposite {
 	 * The comment text and tooltip remains active for a defined number of drawing actions.
 	 */
 	private static final class VolatileComment {
-		private final DataExplorer	application1	= DataExplorer.getInstance();
-		private final IDevice				device				= application1.getActiveDevice();
-		private final Channel				channel				= application1.getActiveChannel();
+		private final IDevice				device				= Analyzer.getInstance().getActiveDevice();
+		private final Channel				channel				= Analyzer.getInstance().getActiveChannel();
 		private final String				objectKey			= Settings.getInstance().getActiveObjectKey();
 
 		private final String				textLines;
@@ -251,7 +251,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 
 		private boolean isExpired() {
 			if (remainingAccessCounter > 0) {
-				boolean isOtherChart = !device.equals(application1.getActiveDevice()) || !channel.equals(application1.getActiveChannel()) || !objectKey.equals(Settings.getInstance().getActiveObjectKey());
+				boolean isOtherChart = !device.equals(Analyzer.getInstance().getActiveDevice()) || !channel.equals(Analyzer.getInstance().getActiveChannel()) || !objectKey.equals(Settings.getInstance().getActiveObjectKey());
 				return isOtherChart;
 			} else
 				return true;
@@ -259,7 +259,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 
 		@Override
 		public String toString() {
-			boolean isSameChart = device.equals(application1.getActiveDevice()) && channel.equals(application1.getActiveChannel()) && objectKey.equals(Settings.getInstance().getActiveObjectKey());
+			boolean isSameChart = device.equals(Analyzer.getInstance().getActiveDevice()) && channel.equals(Analyzer.getInstance().getActiveChannel()) && objectKey.equals(Settings.getInstance().getActiveObjectKey());
 			return "VolatileComment [textLines=" + this.textLines + ", toolTip=" + this.toolTip + ", remainingAccessCounter=" + this.remainingAccessCounter + ", isSameChart=" + isSameChart + "]";
 		}
 	}
@@ -527,8 +527,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 			} else if (evt.button == 3) { // right button
 				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
 				Path activeFolder = DirectoryScanner.getActiveFolder();
-				ExclusionData exclusionData = new ExclusionData(activeFolder);
-				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(exclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
+				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionActivity.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
 				InclusionData inclusionData = new InclusionData(activeFolder);
 				String[] includedRecordNames = inclusionData.getIncludedRecordNames();
 				SummaryWarning summaryWarning = new SummaryWarning(activeFolder, record != null ? record.getName() : GDE.STRING_EMPTY, includedRecordNames);

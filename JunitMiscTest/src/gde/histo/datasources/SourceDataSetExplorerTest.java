@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.histo.base.SuperTestCase;
 import gde.histo.datasources.HistoSet.RebuildStep;
@@ -67,7 +68,7 @@ class SourceDataSetExplorerTest extends SuperTestCase {
 
 		DirectoryScanner directoryScanner = new DirectoryScanner();
 		try {
-			directoryScanner.isValidated(application.getActiveDevice(), RebuildStep.F_FILE_CHECK);
+			directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
 			log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
 			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(directoryScanner.getSourceFolders(), false);
 			boolean reReadFiles = !directoryScanner.isChannelChangeOnly();
@@ -97,7 +98,7 @@ class SourceDataSetExplorerTest extends SuperTestCase {
 
 		DirectoryScanner directoryScanner = new DirectoryScanner();
 		try {
-			directoryScanner.isValidated(application.getActiveDevice(), RebuildStep.F_FILE_CHECK);
+			directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
 			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(directoryScanner.getSourceFolders(), false);
 			boolean reReadFiles = !directoryScanner.isChannelChangeOnly();
 			sourceDataSetExplorer.screen4Trusses(directoryScanner.getSourceFolders().getMap(), reReadFiles);

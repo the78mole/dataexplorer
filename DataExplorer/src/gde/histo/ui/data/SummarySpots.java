@@ -49,7 +49,7 @@ import gde.histo.recordings.TrailRecord;
 import gde.histo.ui.Measure;
 import gde.histo.ui.SummaryComposite.SummaryLayout;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
  * Graph element data belonging to a record row in the summary graph.
@@ -59,6 +59,14 @@ import gde.ui.DataExplorer;
 public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	private static final String	$CLASS_NAME	= SummarySpots.class.getName();
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
+
+	public final static Color			COLOR_GREY												= SWTResourceManager.getColor(SWT.COLOR_GRAY);
+	public final static Color			COLOR_CANVAS_YELLOW								= SWTResourceManager.getColor(250, 249, 211);
+	public final static Color			COLOR_BLUE												= SWTResourceManager.getColor(SWT.COLOR_BLUE);
+	public final static Color			COLOR_LIGHT_BLUE									= SWTResourceManager.getColor(239, 239, 255);
+	public final static Color			COLOR_DARK_GREEN									= SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
+	public final static Color			COLOR_BLACK												= SWTResourceManager.getColor(SWT.COLOR_BLACK);
+	public final static Color			COLOR_RED													= SWTResourceManager.getColor(SWT.COLOR_RED);
 
 	public enum Density {
 		EXTREME(2), HIGH(3), MEDIUM(4), LOW(5);
@@ -508,18 +516,18 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 	}
 
 	public void drawMarkers(GC gc, Measure measure) {
-		drawMarkers(gc, defineXPositions(measure), DataExplorer.COLOR_BLUE);
+		drawMarkers(gc, defineXPositions(measure), COLOR_BLUE);
 	}
 
 	public void drawRecentMarkers(GC gc) {
-		drawScalableMarkers(gc, defineXPositions(Settings.getInstance().getReminderCount()), DataExplorer.COLOR_RED);
+		drawScalableMarkers(gc, defineXPositions(Settings.getInstance().getReminderCount()), COLOR_RED);
 	}
 
 	/**
 	 * Draw the summary marker points using given rectangle for display.
 	 */
 	public void drawMarkers(GC gc) {
-		drawScalableMarkers(gc, xPositions, DataExplorer.COLOR_GREY);
+		drawScalableMarkers(gc, xPositions, COLOR_GREY);
 	}
 
 	/**
@@ -587,16 +595,16 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 
 		gc.setLineWidth(1);
 		gc.setLineStyle(SWT.LINE_DASH);
-		gc.setForeground(DataExplorer.COLOR_DARK_GREEN);
-		gc.setBackground(DataExplorer.COLOR_DARK_GREEN);
+		gc.setForeground(COLOR_DARK_GREEN);
+		gc.setBackground(COLOR_DARK_GREEN);
 		if (startFirstLastPoints[0] != null && endFirstLastPoints[0] != null) {
 			gc.drawLine(endFirstLastPoints[0].x + xPosOffset, endFirstLastPoints[0].y + endYPosOffset //
 					, startFirstLastPoints[0].x + xPosOffset, startFirstLastPoints[0].y + startYPosOffset);
 		}
 
 		if (measure.isDeltaMeasure()) {
-			gc.setForeground(DataExplorer.COLOR_BLUE);
-			gc.setBackground(DataExplorer.COLOR_BLUE);
+			gc.setForeground(COLOR_BLUE);
+			gc.setBackground(COLOR_BLUE);
 			if (startFirstLastPoints[1] != null && endFirstLastPoints[1] != null) {
 				gc.drawLine(endFirstLastPoints[1].x + xPosOffset, endFirstLastPoints[1].y + endYPosOffset //
 						, startFirstLastPoints[1].x + xPosOffset, startFirstLastPoints[1].y + startYPosOffset);

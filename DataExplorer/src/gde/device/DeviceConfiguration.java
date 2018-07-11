@@ -971,7 +971,7 @@ public class DeviceConfiguration {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] { this.xmlFile.getFileName().toString() }));
+			DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] { this.xmlFile.getFileName().toString() }));
 		}
 		return dataBlockSize;
 	}
@@ -1181,7 +1181,7 @@ public class DeviceConfiguration {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			DataExplorer.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] { this.xmlFile.getFileName().toString() }));
+			DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0052, new String[] { this.xmlFile.getFileName().toString() }));
 		}
 		return "*.*";
 	}

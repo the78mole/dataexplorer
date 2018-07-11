@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.data.RecordSet;
 import gde.device.ScoreLabelTypes;
@@ -114,7 +115,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		final String $METHOD_NAME = "read";
 		File file = HoTTbinHistoReader2.filePath.toFile();
 		HashMap<String, String> header = null;
-		HoTTAdapter2 device = (HoTTAdapter2) HoTTbinHistoReader2.application.getActiveDevice();
+		HoTTAdapter2 device = (HoTTAdapter2) Analyzer.getInstance().getActiveDevice();
 		boolean isChannelsChannel = device.channels.getActiveChannelNumber() == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1; // instead of HoTTAdapter setting
 		long numberDatablocks = file.length() / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && !isChannelsChannel ? 10 : 1);
 		tmpRecordSet = RecordSet.createRecordSet(truss.getVault().getLogRecordsetBaseName(), device, HoTTbinHistoReader2.application.getActiveChannelNumber(), true, true, false);
@@ -166,7 +167,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 	*/
 	private static UniversalSampler readSingle(InputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws DataInconsitsentException, IOException {
 		final String $METHOD_NAME = "readSingle";
-		HoTTAdapter2 device = (HoTTAdapter2) HoTTbinHistoReader2.application.getActiveDevice();
+		HoTTAdapter2 device = (HoTTAdapter2) Analyzer.getInstance().getActiveDevice();
 		int activeChannelNumber = device.channels.getActiveChannelNumber();
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
@@ -503,7 +504,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 	*/
 	private static UniversalSampler readMultiple(InputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readMultiple";
-		HoTTAdapter2 device = (HoTTAdapter2) HoTTbinReader.application.getActiveDevice();
+		HoTTAdapter2 device = (HoTTAdapter2) Analyzer.getInstance().getActiveDevice();
 		int activeChannelNumber = device.channels.getActiveChannelNumber();
 		boolean isReceiverData = false;
 		boolean isVarioData = false;

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.CalculusTypes;
@@ -42,7 +43,6 @@ import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
 import gde.histo.utils.UniversalQuantile;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Collect settlement data for the trail recordset and subordinate objects.
@@ -321,7 +321,7 @@ public final class CalculusEvaluator {
 			// determine the direction of the peak or pulse or slope
 			final boolean isPositiveDirection = isPositiveTransition();
 
-			final IDevice device = DataExplorer.application.getActiveDevice();
+			final IDevice device = Analyzer.getInstance().getActiveDevice();
 			final Settings settings = Settings.getInstance();
 			final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty()
@@ -434,7 +434,7 @@ public final class CalculusEvaluator {
 	public CalculusEvaluator(SettlementRecord newHistoSettlement) {
 		this.histoSettlement = newHistoSettlement;
 		this.calculus = newHistoSettlement.getSettlement().getEvaluation().getTransitionCalculus();
-		this.logChannel = DataExplorer.application.getActiveDevice().getDeviceConfiguration().getChannel(newHistoSettlement.getLogChannelNumber());
+		this.logChannel = Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getChannel(newHistoSettlement.getLogChannelNumber());
 		this.recordGroup = new RecordGroup(newHistoSettlement, this.logChannel.getReferenceGroupById(this.calculus.getReferenceGroupId()));
 		log.log(FINEST, GDE.STRING_GREATER, this.calculus);
 	}

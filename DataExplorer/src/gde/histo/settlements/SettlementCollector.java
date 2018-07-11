@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Record;
@@ -50,7 +51,6 @@ import gde.histo.utils.SingleResponseRegression;
 import gde.histo.utils.SingleResponseRegression.RegressionType;
 import gde.histo.utils.UniversalQuantile;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Collect settlement data for the trail recordset and subordinate objects.
@@ -113,7 +113,7 @@ public final class SettlementCollector {
 	 * @param transition
 	 */
 	private static void addAmount(SettlementRecord histoSettlement, Transition transition) {
-		IDevice device = DataExplorer.application.getActiveDevice();
+		IDevice device = Analyzer.getInstance().getActiveDevice();
 		TransitionAmountType transitionAmount = histoSettlement.getSettlement().getEvaluation().getTransitionAmount();
 		log.log(FINE, GDE.STRING_GREATER, transitionAmount);
 		final Record record = histoSettlement.getParent().get(histoSettlement.getParent().getRecordNames()[transitionAmount.getRefOrdinal()]);
@@ -176,7 +176,7 @@ public final class SettlementCollector {
 	private static void addCalculus(SettlementRecord histoSettlement, Transition transition) {
 		TransitionCalculusType calculus = histoSettlement.getSettlement().getEvaluation().getTransitionCalculus();
 		log.log(FINEST, GDE.STRING_GREATER, calculus);
-		final ChannelType logChannel = DataExplorer.application.getActiveDevice().getDeviceConfiguration().getChannel(histoSettlement.getLogChannelNumber());
+		final ChannelType logChannel = Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getChannel(histoSettlement.getLogChannelNumber());
 		final RecordGroup recordGroup = new RecordGroup(histoSettlement, logChannel.getReferenceGroupById(calculus.getReferenceGroupId()));
 		if (recordGroup.hasReasonableData()) {
 			final int reverseTranslatedResult;
@@ -237,7 +237,7 @@ public final class SettlementCollector {
 	 */
 	private static double calculateLevelDelta(RecordGroup recordGroup, DeltaBasisTypes deltaBasis, LevelingTypes leveling, Transition transition) {
 		double deltaValue = 0.;
-		IDevice device = DataExplorer.application.getActiveDevice();
+		IDevice device = Analyzer.getInstance().getActiveDevice();
 
 		// determine the direction of the peak or pulse or slope
 		final boolean isPositiveDirection = isPositiveTransition(recordGroup, transition);

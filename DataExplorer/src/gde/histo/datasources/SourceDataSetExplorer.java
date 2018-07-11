@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import gde.Analyzer;
 import gde.config.Settings;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.SourceFolders.DirectoryType;
@@ -100,7 +101,7 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 				ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder());
 				for (File file : Arrays.asList(filesAndDirs)) {
 					if (file.isFile()) {
-						SourceDataSet originFile = AbstractSourceDataSet.createSourceDataSet(file.toPath(), DataExplorer.getInstance().getActiveDevice());
+						SourceDataSet originFile = AbstractSourceDataSet.createSourceDataSet(file.toPath(), Analyzer.getInstance().getActiveDevice());
 						if (originFile != null && originFile.isWorkableFile(directoryTypes, sourceFolders)) {
 							if (!exclusionData.isExcluded(file.toPath())) {
 								result.add(originFile);
@@ -151,9 +152,9 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 		// a channel change without any additional criterion change can use the existent list of files for reading the trusses (performance)
 		if (doListFiles) listFiles(pathsWithPermissions);
 
-		TrussCriteria trussCriteria = TrussCriteria.createUiBasedTrussCriteria();
+		TrussCriteria trussCriteria = TrussCriteria.createTrussCriteria(Analyzer.getInstance().getActiveDevice(), Analyzer.getInstance().getActiveChannel().getNumber(), Settings.getInstance().getActiveObjectKey());
 		trusses = sourceDataSets.parallelStream() //
-				.flatMap(d -> d.defineTrusses(trussCriteria, signaler, DataExplorer.getInstance().getActiveDevice())) //
+				.flatMap(d -> d.defineTrusses(trussCriteria, signaler, Analyzer.getInstance().getActiveDevice())) //
 				.collect(Collectors.toList());
 		signaler.accept("");
 	}

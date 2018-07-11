@@ -35,6 +35,7 @@ import java.util.stream.DoubleStream;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.data.CommonRecord;
 import gde.data.Record;
@@ -52,7 +53,6 @@ import gde.histo.guard.Reminder;
 import gde.histo.utils.ElementaryQuantile;
 import gde.histo.utils.Spot;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 
 /**
@@ -73,7 +73,7 @@ public abstract class TrailRecord extends CommonRecord {
 
 		boolean				isVisible					= true;
 		boolean				isPositionLeft		= true;
-		Color					color							= DataExplorer.COLOR_BLACK;
+		Color					color							= SWTResourceManager.getColor(SWT.COLOR_BLACK);
 		int						lineWidth					= 1;
 		int						lineStyle					= SWT.LINE_SOLID;
 		boolean				isRoundOut				= false;
@@ -296,7 +296,7 @@ public abstract class TrailRecord extends CommonRecord {
 	protected ElementaryQuantile<Double>	quantile;
 
 	protected TrailRecord(IChannelItem channelItem, int newOrdinal, TrailRecordSet parentTrail, int initialCapacity) {
-		super(DataExplorer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
+		super(Analyzer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
 				channelItem.isActive(), null, initialCapacity);
 		this.channelItem = channelItem;
 		this.parent = parentTrail;

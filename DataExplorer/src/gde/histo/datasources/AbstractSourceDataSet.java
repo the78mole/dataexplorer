@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import com.sun.istack.internal.Nullable;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.DeviceConfigurations;
 import gde.data.Channels;
@@ -49,7 +50,6 @@ import gde.histo.io.HistoOsdReaderWriter;
 import gde.histo.utils.PathUtils;
 import gde.io.FileHandler;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.OperatingSystemHelper;
 
@@ -132,7 +132,7 @@ public abstract class AbstractSourceDataSet {
 		 */
 		protected String getObjectKey() {
 			String dirName = filePath.getParent().getFileName().toString();
-			DeviceConfigurations deviceConfigurations = DataExplorer.getInstance().getDeviceConfigurations();
+			DeviceConfigurations deviceConfigurations = Analyzer.getInstance().getDeviceConfigurations();
 			return !deviceConfigurations.contains(dirName) ? dirName : GDE.STRING_EMPTY;
 		}
 
@@ -140,8 +140,6 @@ public abstract class AbstractSourceDataSet {
 		 * @return the trusses or an empty stream
 		 */
 		public Stream<VaultCollector> defineTrusses(TrussCriteria trussCriteria, Consumer<String> signaler, IDevice uiDevice) {
-			if (!uiDevice.equals(DataExplorer.getInstance().getActiveDevice())) throw new IllegalArgumentException("method applicable for legacy UI only");
-
 			signaler.accept("get file properties    " + filePath.toString());
 			return getTrusses4Ui().stream().filter(t -> isValidDeviceChannelObjectAndStart(trussCriteria, t.getVault()));
 		}
@@ -306,7 +304,7 @@ public abstract class AbstractSourceDataSet {
 		@Override
 		public List<VaultCollector> getTrusses4Ui() {
 			String objectDirectory = getObjectKey();
-			String recordSetBaseName = DataExplorer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend();
+			String recordSetBaseName = Analyzer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend();
 			VaultCollector truss = new VaultCollector(objectDirectory, getFile(), 0, Channels.getInstance().size(), recordSetBaseName,
 					providesReaderSettings());
 			truss.setSourceDataSet(this);
@@ -321,7 +319,7 @@ public abstract class AbstractSourceDataSet {
 		@Override
 		public void readVaults4Ui(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
 				DataInconsitsentException, DataTypeException {
-			((IHistoDevice) DataExplorer.application.getActiveDevice()).getRecordSetFromImportFile(filePath, trusses);
+			((IHistoDevice) Analyzer.getInstance().getActiveDevice()).getRecordSetFromImportFile(filePath, trusses);
 		}
 
 		@Override

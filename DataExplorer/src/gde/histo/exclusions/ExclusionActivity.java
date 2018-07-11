@@ -20,6 +20,7 @@
 package gde.histo.exclusions;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import gde.histo.datasources.DirectoryScanner;
 import gde.ui.DataExplorer;
@@ -55,4 +56,13 @@ public final class ExclusionActivity {
 		exclusionData.store();
 	}
 
+	/**
+	 * Determine the exclusions which are active for the current channel.
+	 * @return the exclusion information for the trusses excluded from the history
+	 */
+	public static String[] getExcludedTrusses() {
+		ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder());
+		List<Path> excludedPaths = DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths();
+		return exclusionData.getExcludedTrusses(excludedPaths);
+	}
 }

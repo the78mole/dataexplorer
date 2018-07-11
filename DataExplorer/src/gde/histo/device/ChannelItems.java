@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import gde.Analyzer;
 import gde.device.ChannelType;
 import gde.device.DeviceConfiguration;
 import gde.device.IChannelItem;
@@ -30,7 +31,6 @@ import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.ScoreGroupType;
 import gde.device.SettlementType;
-import gde.ui.DataExplorer;
 
 /**
  *
@@ -46,7 +46,7 @@ public final class ChannelItems {
 	 * @param channelNumber
 	 */
 	public ChannelItems(String deviceName, int channelNumber) {
-		deviceConfiguration = DataExplorer.getInstance().getDeviceConfigurations().get(deviceName);
+		deviceConfiguration = Analyzer.getInstance().getDeviceConfigurations().get(deviceName);
 		channelType = deviceConfiguration.getChannel(channelNumber);
 	}
 

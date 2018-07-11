@@ -53,9 +53,8 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.histo.datasources.DirectoryScanner;
 import gde.histo.datasources.HistoSet;
-import gde.histo.exclusions.ExclusionData;
+import gde.histo.exclusions.ExclusionActivity;
 import gde.histo.recordings.HistoTableMapper;
 import gde.histo.recordings.HistoTableMapper.DisplayTag;
 import gde.histo.recordings.TrailDataTags.DataTag;
@@ -284,8 +283,7 @@ public class HistoTableWindow extends CTabItem {
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.DATA_FILE_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.FILE_PATH));
 					HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.RECORDSET_BASE_NAME.name(), trailRecordSet.getDataTagText(index, DataTag.RECORDSET_BASE_NAME));
 				}
-				ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder());
-				HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(exclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
+				HistoTableWindow.this.popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionActivity.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
 				log.finer(() -> "DataTag.FILE_PATH=" + HistoTableWindow.this.popupmenu.getData(TabMenuOnDemand.DATA_FILE_PATH.name())); //$NON-NLS-1$
 			}
 		});

@@ -13,10 +13,17 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.Channel;
@@ -27,16 +34,8 @@ import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.ui.menu.MenuToolBar;
 import gde.utils.StringHelper;
-
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.logging.Logger;
 
 /**
  * Class to read Graupner HoTT binary data as saved on SD-Cards X-8N radios
@@ -68,7 +67,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 	/**
 	 * read complete file data and display the first found record set
 	 * @param filePath
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static synchronized void read(String filePath) throws Exception {
 		HoTTbinReader.sensorSignature = new StringBuilder().append(GDE.STRING_LEFT_BRACKET).append(HoTTAdapter.Sensor.RECEIVER.name()).append(GDE.STRING_COMMA);
@@ -76,7 +75,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			HoTTAdapter.isSensorType[i] = false;
 		}
 		boolean isHoTTV2 = true;
-		
+
 		File inputFile = new File(filePath);
 		FileInputStream file_input = new FileInputStream(inputFile);
 		DataInputStream data_in = new DataInputStream(file_input);
@@ -94,16 +93,16 @@ public class HoTTbinReaderX extends HoTTbinReader {
 					}
 					data_in.close();
 					data_in = null;
-					
+
 					if (isHoTTV2)
 						readSingle(inputFile);
 					else {
-						DataExplorer.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
+						HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
 						throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
 					}
 				}
 				else {
-					DataExplorer.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
+					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
 					throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
 				}
 			}
@@ -122,8 +121,8 @@ public class HoTTbinReaderX extends HoTTbinReader {
 	/**
 	* read log data according to version 0
 	* @param file
-	* @throws IOException 
-	* @throws DataInconsitsentException 
+	* @throws IOException
+	* @throws DataInconsitsentException
 	*/
 	static void readSingle(File file) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readSingle";
@@ -140,7 +139,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		//9=SpannungM, 10=SpannungM_min, 11=CurrentM, 12=CurrentM_max, 13=CapacityM, 14=PowerM, 15=RevolutionM, 16=RevolutionM_max
 		//17=Temperature, 18=Temperature_max, 19=TemperatureM, 20=TemperatureM_max, 21=Speed, 22=Speed_max
 		//23=VoltageExt, 24=VoltageExt_min, 25=TemperatureExt, 26=TemperatureExt_max
-		HoTTbinReaderX.recordSetReceiver = null; 
+		HoTTbinReaderX.recordSetReceiver = null;
 		HoTTbinReaderX.recordSetChannel = null; //0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 10=Ch 8
 		HoTTbinReaderX.points_1 = new int[device.getNumberOfMeasurements(1)];
 		HoTTbinReaderX.pointsChannel = new int[15];
@@ -226,7 +225,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 					if (HoTTbinReaderX.buf[3] != 0 && HoTTbinReaderX.buf[4] != 0) { //buf 3, 4, tx,rx
 						HoTTAdapter.reverseChannelPackageLossCounter.add(1);
 						HoTTbinReaderX.points_1[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
-						//create and fill sensor specific data record sets 
+						//create and fill sensor specific data record sets
 						if (HoTTbinReaderX.logx.isLoggable(Level.FINER))
 							HoTTbinReaderX.logx.logp(Level.FINER, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReaderX.buf[7] }, 1) + GDE.STRING_MESSAGE_CONCAT
 									+ StringHelper.printBinary(HoTTbinReaderX.buf[7], false));
@@ -317,7 +316,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 								parseAddReceiver(HoTTbinReaderX.buf1, HoTTbinReaderX.buf2, HoTTbinReaderX.buf4, HoTTbinReaderX.bufD);
 								break;
 							case 02: //ESC 1
-								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false) 
+								if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false)
 									HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
 								HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] = true;
 								parseESC(HoTTbinReaderX.buf3, HoTTbinReaderX.buf4, HoTTbinReaderX.buf5, HoTTbinReaderX.buf6, HoTTbinReaderX.buf7, HoTTbinReaderX.buf8, HoTTbinReaderX.buf9, HoTTbinReaderX.bufA);
@@ -341,9 +340,9 @@ public class HoTTbinReaderX extends HoTTbinReader {
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 						HoTTbinReaderX.points_1[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 
-						++countPackageLoss; // add up lost packages in telemetry data 
+						++countPackageLoss; // add up lost packages in telemetry data
 						++HoTTbinReaderX.countLostPackages;
-						//HoTTbinReaderX.points_1[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+						//HoTTbinReaderX.points_1[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0);
 
 						if (HoTTAdapter.isChannelsChannelEnabled) {
 							parseAddChannel(HoTTbinReaderX.buf);
@@ -459,7 +458,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			HoTTbinReaderX.points_1[6] = (_buf2[18] & 0xFF) * 1000;
 			HoTTbinReaderX.points_1[7] = (_buf2[20] & 0xFF) * 1000;
 			HoTTbinReaderX.points_1[8] = (_buf2[19] & 0xFF) * 1000;
-			
+
 			HoTTbinReaderX.points_1[23] = (_buf4[17] & 0xFF) * 1000;
 			HoTTbinReaderX.points_1[24] = (_buf4[19] & 0xFF) * 1000;
 			HoTTbinReaderX.points_1[25] = (_buf4[18] & 0xFF) * 1000;
@@ -494,7 +493,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 
 		HoTTbinReaderX.recordSetChannel.addPoints(HoTTbinReaderX.pointsChannel, HoTTbinReaderX.timeStep_ms);
 	}
-	
+
 	/**
 	 * parse the buffered data from buffer 3 to A and add points to record set
 	 * @param _buf3
@@ -523,7 +522,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			HoTTbinReaderX.points_1[9] = HoTTbinReader.tmpVoltage * 1000;
 			HoTTbinReaderX.points_1[10] = DataParser.parse2Short(_buf5, 18) * 1000;
 			HoTTbinReaderX.points_1[11] = HoTTbinReader.tmpCurrent * 1000;
-			HoTTbinReaderX.points_1[12] = DataParser.parse2Short(_buf7, 18) * 1000;	
+			HoTTbinReaderX.points_1[12] = DataParser.parse2Short(_buf7, 18) * 1000;
 			HoTTbinReaderX.points_1[14] = Double.valueOf(HoTTbinReaderX.points_1[9] / 1000.0 * HoTTbinReaderX.points_1[11] / 100.0).intValue();
 			if (!HoTTAdapter.isFilterEnabled
 					|| (HoTTbinReader.tmpCapacity != 0 && Math.abs(HoTTbinReader.tmpCapacity) <= (HoTTbinReaderX.points_1[13] / 1000 + HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2))) {

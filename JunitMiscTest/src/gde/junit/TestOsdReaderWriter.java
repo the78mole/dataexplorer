@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.junit;
@@ -68,7 +68,7 @@ public class TestOsdReaderWriter extends TestSuperClass {
 							System.out.println(fileDeviceName + " working with : " + file);
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 							IDevice device = this.getInstanceOfDevice(deviceConfig);
-							this.application.setActiveDeviceWoutUI(device);
+							this.analyzer.setActiveDevice(device);
 
 							setupDataChannels(device);
 
@@ -89,7 +89,7 @@ public class TestOsdReaderWriter extends TestSuperClass {
 									drawCurves(recordSet, 1024, 768);
 								}
 							}
-							
+
 							if (activeChannel.getActiveRecordSet() != null) {
 								String absolutFilePath = this.tmpDir1 + file.getName();
 								if (absolutFilePath.contains("_lov")) //exclude LogView files
@@ -126,7 +126,7 @@ public class TestOsdReaderWriter extends TestSuperClass {
 
 	/**
 	 * test reading OSD files from directories used by GDE application and writes OSD files to %TEMP%\Write_1_OSD
-	 * all consistent files must red without failures, 
+	 * all consistent files must red without failures,
 	 * the written files might different due to code updates (add/change properties)
 	 */
 	public final void testOsdReaderOsdWriter() {
@@ -144,13 +144,13 @@ public class TestOsdReaderWriter extends TestSuperClass {
 						if (filePath.equals(OperatingSystemHelper.getLinkContainedFilePath(filePath))) {
 							HashMap<String, String> fileHeader = OsdReaderWriter.getHeader(file.getAbsolutePath());
 							String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
-							if(this.legacyDeviceNames.get(fileDeviceName) != null) 
-								fileDeviceName = this.legacyDeviceNames.get(fileDeviceName); 
+							if(this.legacyDeviceNames.get(fileDeviceName) != null)
+								fileDeviceName = this.legacyDeviceNames.get(fileDeviceName);
 							if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu") || fileDeviceName.contains("HoTTAdapter3") || fileDeviceName.contains("HoTTAdapterD"))
 								continue;
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 							IDevice device = this.getInstanceOfDevice(deviceConfig);
-							this.application.setActiveDeviceWoutUI(device);
+							this.analyzer.setActiveDevice(device);
 							System.out.println(fileDeviceName + ": working with : " + file);
 
 							setupDataChannels(device);
@@ -229,7 +229,7 @@ public class TestOsdReaderWriter extends TestSuperClass {
 							continue;
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
 						IDevice device = this.getInstanceOfDevice(deviceConfig);
-						this.application.setActiveDeviceWoutUI(device);
+						this.analyzer.setActiveDevice(device);
 						System.out.println(fileDeviceName + ": working with : " + file);
 
 						setupDataChannels(device);

@@ -138,6 +138,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	/**
 	 * @return array with channel names
 	 */
+	@Deprecated
 	public String getChannelNamesToString() {
 		StringBuilder sb = new StringBuilder();
 		for (String channelName : this.application.getMenuToolBar().getChannelSelectCombo().getItems()) {

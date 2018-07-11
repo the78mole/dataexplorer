@@ -44,13 +44,13 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.datasources.AbstractSourceDataSet.SourceDataSet;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyCompliance;
 
@@ -234,7 +234,7 @@ public final class SupplementObjectFolder {
 	}
 
 	private final Path				supplementFolder	= getSupplementObjectsPath();
-	private final Set<String>	logFileExtentions	= DataExplorer.getInstance().getDeviceConfigurations().getValidLogExtentions();
+	private final Set<String>	logFileExtentions	= Analyzer.getInstance().getDeviceConfigurations().getValidLogExtentions();
 
 	/**
 	 * Creates the base folder for additional logs which are created by other systems (computers, RC transmitters, etc).
@@ -307,7 +307,7 @@ public final class SupplementObjectFolder {
 				Path targetPath = targetDir.resolve(f.getFileName());
 				FileUtils.checkDirectoryAndCreate(targetDir.toString());
 				if (!targetPath.toFile().exists()) {
-					SourceDataSet sourceDataSet = AbstractSourceDataSet.createSourceDataSet(f, DataExplorer.getInstance().getActiveDevice());
+					SourceDataSet sourceDataSet = AbstractSourceDataSet.createSourceDataSet(f, Analyzer.getInstance().getActiveDevice());
 					if (sourceDataSet != null) { // check if supported by histo
 						try {
 							File actualFile = sourceDataSet.getActualFile();

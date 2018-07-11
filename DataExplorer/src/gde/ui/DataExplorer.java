@@ -83,10 +83,11 @@ import org.eclipse.swt.widgets.TaskItem;
 
 import com.sun.istack.internal.Nullable;
 
+import gde.Analyzer;
+import gde.Explorer;
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
 import gde.comm.IDeviceCommPort;
-import gde.config.DeviceConfigurations;
 import gde.config.Settings;
 import gde.data.AbstractRecordSet;
 import gde.data.Channel;
@@ -169,12 +170,11 @@ public class DataExplorer extends Composite {
 	public final static String		COMPARE_RECORD_SET								= "compare_set";																						//$NON-NLS-1$
 	public final static String		UTILITY_RECORD_SET								= "utility_set";																						//$NON-NLS-1$
 
-	public static DataExplorer		application												= null;
+	private static DataExplorer		application												= null;
 
 	gde.io.FileHandler						fileHandler;
 	CTabFolder										displayTab;
 	Settings											settings;
-	IDevice												activeDevice											= null;
 	Menu													menu;
 	Label													filler;
 	MenuBar												menuBar;
@@ -207,7 +207,6 @@ public class DataExplorer extends Composite {
 	HelpInfoDialog								helpDialog;
 	DeviceSelectionDialog					deviceSelectionDialog;
 
-	Channels											channels;
 	RecordSet											compareSet;
 	RecordSet											utilitySet;
 	Optional<HistoExplorer>				histoExplorer											= Optional.empty();
@@ -229,8 +228,13 @@ public class DataExplorer extends Composite {
 
 	final FileTransfer						fileTransfer											= FileTransfer.getInstance();
 	Transfer[]										types															= new Transfer[] { this.fileTransfer };
-	private DeviceConfigurations	deviceConfigurations							= null;
-	private Thread								deviceConfigurationsThread				= null;
+
+	private final Analyzer							analyzer;
+
+	/**
+	 * update all visualization windows
+	 */
+	private boolean								isUpdateAllTabs										= true;
 
 	/**
 	 * main application class constructor
@@ -240,6 +244,7 @@ public class DataExplorer extends Composite {
 	 */
 	private DataExplorer() {
 		super(GDE.shell, SWT.NONE);
+		analyzer = Analyzer.getInstance();
 		this.threadId = Thread.currentThread().getId();
 
 		this.extensionFilterMap.put(GDE.FILE_ENDING_OSD, Messages.getString(MessageIds.GDE_MSGT0139));
@@ -268,6 +273,10 @@ public class DataExplorer extends Composite {
 			application = new DataExplorer();
 		}
 		return DataExplorer.application;
+	}
+
+	public static boolean isInitialized() {
+		return DataExplorer.application != null;
 	}
 
 	/**
@@ -361,21 +370,6 @@ public class DataExplorer extends Composite {
 			this.settings = Settings.getInstance();
 			log.logp(Level.INFO, $CLASS_NAME, $METHOD_NAME, this.settings.toString());
 
-			this.deviceConfigurationsThread  = new Thread("loadDeviceConfigurations") {
-				@Override
-				public void run() {
-					log.log(Level.INFO, "deviceConfigurationsThread    started");
-					File file = new File(Settings.getInstance().getDevicesPath());
-					if (file.exists()) {
-						DataExplorer.this.deviceConfigurations = new DeviceConfigurations(file.list(), Settings.getInstance().getActiveDevice());
-					}
-					log.log(Level.TIME, "deviceConfigurationsThread time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
-				}
-			};
-			if (!this.settings.isDevicePropertiesUpdated()) {
-				this.deviceConfigurationsThread.start();
-			}
-
 			new Thread("updateAvailablePorts") {
 				@Override
 				public void run() {
@@ -416,7 +410,7 @@ public class DataExplorer extends Composite {
 			this.fileHandler = new gde.io.FileHandler();
 			this.initGUI();
 
-			this.channels = Channels.getInstance(this);
+			((Explorer) this.analyzer).setChannels(Channels.getInstance(this));
 			// this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1);
 			// this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.UTILITY_RECORD_SET, 1);
 
@@ -825,18 +819,13 @@ public class DataExplorer extends Composite {
 				this.settings.setProperty(Settings.IS_LOCK_UUCP_HINTED, "true"); //$NON-NLS-1$
 			}
 
-			// wait for possible migration and delay opening for migration
-			if (this.settings.isDevicePropertiesUpdated()) {
-				this.settings.startMigationThread();
-				this.deviceConfigurationsThread.start();
-				this.deviceConfigurationsThread.join();
-				this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this); //re-initialize to handle updates due to migration
-			}
-
 			// check initial application settings
 			if (!this.settings.isOK()) {
 				this.openSettingsDialog();
 			}
+
+			// wait for possible migration and delay opening for migration
+			this.settings.startMigationThread();
 
 			// check configured device
 			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) {
@@ -911,7 +900,7 @@ public class DataExplorer extends Composite {
 	 * @param requestingRecordSetName
 	 */
 	public synchronized void updateDataTable(String requestingRecordSetName, final boolean forceClean) {
-		final Channel activeChannel = this.channels != null ? this.channels.getActiveChannel() : null;
+		final Channel activeChannel = this.analyzer.getActiveChannel();
 		final RecordSet activeRecordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 
 		if (activeRecordSet != null && activeRecordSet.getRecordDataSize(true) > 0 && this.dataTableTabItem != null && !this.dataTableTabItem.isDisposed() && activeRecordSet.getName().equals(requestingRecordSetName) && activeRecordSet.getDevice().isTableTabRequested()) {
@@ -1149,21 +1138,6 @@ public class DataExplorer extends Composite {
 		return this.deviceSelectionDialog;
 	}
 
-	public DeviceConfigurations getDeviceConfigurations() {
-		if (this.deviceConfigurations == null) {
-			if (this.isDeviceConfigurationsThreadAlive()) {
-				try {
-					this.deviceConfigurationsThread.join();
-				} catch (InterruptedException e) {
-				}
-			} else {
-				File file = new File(Settings.getInstance().getDevicesPath());
-				this.deviceConfigurations = new DeviceConfigurations(file.list());
-			}
-		}
-		return this.deviceConfigurations;
-	}
-
 	public void setStatusMessage(final String message, final int swtColor) {
 		if (this.statusBar != null) {
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
@@ -1333,7 +1307,7 @@ public class DataExplorer extends Composite {
 	}
 
 	public IDevice getActiveDevice() {
-		return this.activeDevice;
+		return this.analyzer.getActiveDevice();
 	}
 
 	public void openDeviceDialog() {
@@ -1348,69 +1322,13 @@ public class DataExplorer extends Composite {
 	}
 
 	public void setGloabalSerialPort(String newPort) {
-		if (this.activeDevice != null) {
-			this.activeDevice.setPort(newPort);
-			this.settings.setActiveDevice(this.activeDevice.getName() + GDE.STRING_SEMICOLON + this.activeDevice.getManufacturer() + GDE.STRING_SEMICOLON + this.activeDevice.getPort());
-			this.updateTitleBar(this.getObjectKey(), this.activeDevice.getName(), this.activeDevice.getPort());
+		if (this.getActiveDevice() != null) {
+			this.getActiveDevice().setPort(newPort);
+			this.settings.setActiveDevice(this.getActiveDevice().getName() + GDE.STRING_SEMICOLON + this.getActiveDevice().getManufacturer() + GDE.STRING_SEMICOLON + this.getActiveDevice().getPort());
+			this.updateTitleBar(this.getObjectKey(), this.getActiveDevice().getName(), this.getActiveDevice().getPort());
 		} else {
 			this.deviceSelectionDialog.getActiveConfig().setPort(newPort);
 			this.updateTitleBar(this.getObjectKey(), this.settings.getActiveDevice(), this.settings.getSerialPort());
-		}
-	}
-
-	public void setEnvironmentWoutUI(Settings newSettings, IDevice device, int channelNumber) {
-		this.settings = newSettings;
-
-		if (!device.equals(this.activeDevice)) {
-			// device :
-			setActiveDeviceWoutUI(device);
-
-			// channels : from setupDataChannels
-			// objectKey : is not set because histo does not use it
-			this.channels = Channels.getInstance();
-			this.channels.cleanup();
-			String[] channelNames = new String[device.getChannelCount()];
-			// buildup new structure - set up the channels
-			for (int i = 1; i <= device.getChannelCount(); i++) {
-				Channel newChannel = new Channel(device.getChannelNameReplacement(i), device.getChannelTypes(i));
-				// newChannel.setObjectKey(objectKey);
-				this.channels.put(Integer.valueOf(i), newChannel);
-				channelNames[i - 1] = i + " : " + device.getChannelNameReplacement(i);
-			}
-			this.channels.setChannelNames(channelNames);
-		}
-
-		// channel :
-		this.channels.setActiveChannelNumber(channelNumber);
-}
-
-	public void initiateUnitTestEnvironment(IDevice device, Channels channels, String objectKey) {
-		// device :
-		setActiveDeviceWoutUI(device);
-
-		// channel : from setupDataChannels
-		this.channels = Channels.getInstance();
-		this.channels.cleanup();
-		String[] channelNames = new String[device.getChannelCount()];
-		// buildup new structure - set up the channels
-		for (int i = 1; i <= device.getChannelCount(); i++) {
-			Channel newChannel = new Channel(device.getChannelNameReplacement(i), device.getChannelTypes(i));
-			// newChannel.setObjectKey(this.application.getObjectKey()); now in application.selectObjectKey
-			this.channels.put(Integer.valueOf(i), newChannel);
-			channelNames[i - 1] = i + " : " + device.getChannelNameReplacement(i);
-		}
-		this.channels.setChannelNames(channelNames);
-
-		selectObjectKey(objectKey);
-	}
-
-	/**
-	 * set the active device in main settings
-	 * @param device
-	 */
-	public void setActiveDeviceWoutUI(IDevice device) {
-		if (device != null) {
-			this.activeDevice = device;
 		}
 	}
 
@@ -1420,7 +1338,9 @@ public class DataExplorer extends Composite {
 	 */
 	public void setActiveDevice(IDevice device) {
 		if (device != null) {
-			if (this.activeDevice == null || !this.activeDevice.getName().equals(device.getName())) this.activeDevice = device;
+			if (this.getActiveDevice() == null || !this.getActiveDevice().getName().equals(device.getName())) {
+				this.analyzer.setActiveDevice(device);
+			}
 			// do always update, the port might be changed
 			this.settings.setActiveDevice(device.getName() + GDE.STRING_SEMICOLON + device.getManufacturer() + GDE.STRING_SEMICOLON + device.getPort());
 			this.updateTitleBar(this.getObjectKey(), device.getName(), device.getPort());
@@ -1428,11 +1348,13 @@ public class DataExplorer extends Composite {
 				this.enableDeviceSwitchButtons(true);
 			else
 				this.enableDeviceSwitchButtons(false);
-		} else { // no device
+		}
+		else { // no device
 			this.settings.setActiveDevice(Settings.EMPTY_SIGNATURE);
 			this.updateTitleBar(this.getObjectKey(), Messages.getString(MessageIds.GDE_MSGI0023), GDE.STRING_EMPTY);
-			this.activeDevice = null;
-			this.channels.cleanup();
+			IDevice nullDevice = null;
+			this.analyzer.setActiveDevice(nullDevice);
+			this.analyzer.getChannels().cleanup();
 			this.enableDeviceSwitchButtons(false);
 			// remove Histo tabs at this place because setupDevice is not called if all devices are removed
 			this.setHisto(false);
@@ -1454,7 +1376,7 @@ public class DataExplorer extends Composite {
 	public void updateTitleBar(final String objectName, final String deviceName, final String devicePort) {
 		StringBuilder sb = new StringBuilder().append(GDE.NAME_LONG);
 		String separator = "  -  "; //$NON-NLS-1$
-		String actualFileName = (this.channels != null && this.channels.getActiveChannel() != null) ? this.channels.getActiveChannel().getFileName()
+		String actualFileName = (this.analyzer.getActiveChannel() != null) ? this.analyzer.getActiveChannel().getFileName()
 				: null;
 		if (actualFileName != null && actualFileName.length() > 4) sb.append(separator).append(actualFileName);
 		if (objectName != null && objectName.length() > 0 && !(actualFileName != null && actualFileName.length() > 4 && actualFileName.contains(objectName)) && !objectName.startsWith(Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0]))
@@ -1618,7 +1540,7 @@ public class DataExplorer extends Composite {
 	}
 
 	public DeviceDialog getDeviceDialog() {
-		return this.activeDevice != null ? this.activeDevice.getDialog() : null;
+		return this.getActiveDevice() != null ? this.getActiveDevice().getDialog() : null;
 	}
 
 	public MenuBar getMenuBar() {
@@ -1659,21 +1581,21 @@ public class DataExplorer extends Composite {
 	 * @return the object keys, if there are no object key defined return an empty string array
 	 */
 	public void selectObjectKey(final String newObjectKey) {
-		if (this.settings != null && !this.channels.getActiveChannel().getObjectKey().equals(newObjectKey)) {
+		if (this.settings != null && !this.analyzer.getChannels().getActiveChannel().getObjectKey().equals(newObjectKey)) {
 			String[] objectKeys = this.settings.getObjectList();
 			for (int searchSelectionIndex = 0; searchSelectionIndex < objectKeys.length; ++searchSelectionIndex) {
 				if (newObjectKey.equals(objectKeys[searchSelectionIndex])) {
-					log.fine(() -> String.format("channel number %d - actual object key %s", this.channels.getActiveChannel().getNumber(), this.channels.getActiveChannel().getObjectKey()));
+					log.fine(() -> String.format("channel number %d - actual object key %s", this.analyzer.getChannels().getActiveChannel().getNumber(), this.analyzer.getChannels().getActiveChannel().getObjectKey()));
 					if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 						this.menuToolBar.selectObjectKey(searchSelectionIndex);
-						this.channels.getActiveChannel().setObjectKey(newObjectKey);
+						this.analyzer.getActiveChannel().setObjectKey(newObjectKey);
 					} else {
 						final int selectionIndex = searchSelectionIndex;
 						GDE.display.syncExec(new Runnable() {
 							@Override
 							public void run() {
 								DataExplorer.this.menuToolBar.selectObjectKey(selectionIndex);
-								DataExplorer.this.channels.getActiveChannel().setObjectKey(newObjectKey);
+								DataExplorer.this.analyzer.getActiveChannel().setObjectKey(newObjectKey);
 							}
 						});
 					}
@@ -1796,9 +1718,9 @@ public class DataExplorer extends Composite {
 	 * @param activeChannel to be set
 	 */
 	public void updateChannelSelector(int activeChannel) {
-		String[] channelNames = new String[this.channels.size()];
+		String[] channelNames = new String[this.analyzer.getChannels().size()];
 		for (int i = 0; i < channelNames.length; i++) {
-			channelNames[i] = this.channels.get(i + 1).getName();
+			channelNames[i] = this.analyzer.getChannels().get(i + 1).getName();
 		}
 		CCombo channelSelect = this.menuToolBar.getChannelSelectCombo();
 		channelSelect.setItems(channelNames); // "K1: Kanal 1", "K2: Kanal 2", "K3: Kanal 3", "K4: Kanal 4"
@@ -1810,7 +1732,7 @@ public class DataExplorer extends Composite {
 	 * @param activeRecord to be set
 	 */
 	public void updateRecordSelector(int activeRecord) {
-		Channel activeChannel = this.channels.getActiveChannel();
+		Channel activeChannel = this.analyzer.getActiveChannel();
 		if (activeChannel != null) {
 			String[] recordNames = activeChannel.getRecordSetNames();
 			if (recordNames != null && recordNames.length > 0 && recordNames[0] != null) {
@@ -1993,15 +1915,10 @@ public class DataExplorer extends Composite {
 		updateAllTabs(force, true);
 	}
 
-	/**
-	 * update all visualization windows
-	 */
-	final boolean[] isUpdateAllTabs = new boolean[] { true };
-
 	public void updateAllTabs(final boolean force, final boolean redrawCurveSelector) {
 		// log.log(Level.OFF, "updateAllTabs entry " + this.isUpdateAllTabs[0]);
-		if (this.isUpdateAllTabs[0]) {
-			this.isUpdateAllTabs[0] = false;
+		if (this.isUpdateAllTabs) {
+			this.isUpdateAllTabs = false;
 			if (Thread.currentThread().getId() == DataExplorer.application.getThreadId()) {
 				this.doUpdateAllTabs(force, redrawCurveSelector);
 			} else {
@@ -2035,7 +1952,7 @@ public class DataExplorer extends Composite {
 		} else {
 			DataExplorer.this.updateDataTable(GDE.STRING_EMPTY, force);
 		}
-		this.isUpdateAllTabs[0] = true;
+		this.isUpdateAllTabs = true;
 	}
 
 	/**
@@ -2878,7 +2795,7 @@ public class DataExplorer extends Composite {
 	public void setAbsoluteDateTime(boolean enable) {
 		this.dataTableTabItem.setAbsoluteDateTime(enable);
 		this.dataTableTabItem.setHeader();
-		Channel activeChannel = this.channels != null ? this.channels.getActiveChannel() : null;
+		Channel activeChannel = this.analyzer.getActiveChannel();
 		RecordSet activeRecordSet = activeChannel != null ? activeChannel.getActiveRecordSet() : null;
 		if (activeRecordSet != null) {
 			this.dataTableTabItem.setRowCount(activeRecordSet.getRecordDataSize(true));
@@ -3114,21 +3031,18 @@ public class DataExplorer extends Composite {
 	 */
 	public RecordSet getActiveRecordSet() {
 		RecordSet activeRecordSet = null;
-		Channel activeChannnel = this.channels != null ? this.channels.getActiveChannel() : null;
+		Channel activeChannnel = this.analyzer.getActiveChannel();
 		if (activeChannnel != null) activeRecordSet = activeChannnel.getActiveRecordSet();
 
 		return activeRecordSet;
 	}
 
 	/**
-	 * @return the number of the active channel or null
+	 * @return the number of the active channel or 1
 	 */
-	public Integer getActiveChannelNumber() {
-		Integer activeChannelNumber = 1;
-		if (this.channels != null) {
-			Channel activeChannnel = this.channels.getActiveChannel();
-			if (activeChannnel != null) activeChannelNumber = activeChannnel.getNumber();
-		}
+	public int getActiveChannelNumber() {
+		int activeChannelNumber = 1;
+		if (this.analyzer != null && this.analyzer.getActiveChannel() != null) activeChannelNumber = this.analyzer.getActiveChannel().getNumber();
 		return activeChannelNumber;
 	}
 
@@ -3136,7 +3050,7 @@ public class DataExplorer extends Composite {
 	 * @return the active channel or null
 	 */
 	public Channel getActiveChannel() {
-		return this.channels.getActiveChannel();
+		return this.analyzer.getActiveChannel();
 	}
 
 	/**
@@ -3197,14 +3111,14 @@ public class DataExplorer extends Composite {
 
 							String tmpFilePath = DataExplorer.this.settings.getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + GDE.TEMP_FILE_STEM;
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "attempt to save a temporary file(s)");
-							if (DataExplorer.this.channels.getActiveChannel() != null && DataExplorer.this.channels.getActiveChannel().getType() == ChannelTypes.TYPE_CONFIG) {
-								if (DataExplorer.this.channels.getActiveChannel().getActiveRecordSet() != null)
-									OsdReaderWriter.write(tmpFilePath + GDE.FILE_ENDING_DOT_OSD, DataExplorer.this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+							if (DataExplorer.this.analyzer.getActiveChannel() != null && DataExplorer.this.analyzer.getActiveChannel().getType() == ChannelTypes.TYPE_CONFIG) {
+								if (DataExplorer.this.analyzer.getActiveChannel().getActiveRecordSet() != null)
+									OsdReaderWriter.write(tmpFilePath + GDE.FILE_ENDING_DOT_OSD, DataExplorer.this.analyzer.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 							} else
-								for (int i = 1; i <= DataExplorer.this.channels.size() && DataExplorer.this.channels.getActiveChannel().getActiveRecordSet() != null;
+								for (int i = 1; i <= DataExplorer.this.analyzer.getChannels().size() && DataExplorer.this.analyzer.getActiveChannel().getActiveRecordSet() != null;
 										++i) {
-									if (DataExplorer.this.channels.get(i).size() > 0)
-										OsdReaderWriter.write(tmpFilePath + "_" + i + GDE.FILE_ENDING_DOT_OSD, DataExplorer.this.channels.get(i), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+									if (DataExplorer.this.analyzer.getChannels().get(i).size() > 0)
+										OsdReaderWriter.write(tmpFilePath + "_" + i + GDE.FILE_ENDING_DOT_OSD, DataExplorer.this.analyzer.getChannels().get(i), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 								}
 						} catch (Exception e) {
 							log.log(Level.WARNING, e.getMessage(), e);
@@ -3297,20 +3211,6 @@ public class DataExplorer extends Composite {
 
 	public HistoExplorer getPresentHistoExplorer() {
 		return this.histoExplorer.orElseThrow(UnsupportedOperationException::new);
-	}
-
-	/**
-	 * @return true if the thread is alive
-	 */
-	public boolean isDeviceConfigurationsThreadAlive() {
-		return this.deviceConfigurationsThread != null ? this.deviceConfigurationsThread.isAlive() : false;
-	}
-
-	/**
-	 * @return true if the GUI was not initialized
-	 */
-	public boolean isWithUi() {
-		return this.menuToolBar != null;
 	}
 
 }

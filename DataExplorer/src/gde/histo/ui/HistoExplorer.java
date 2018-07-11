@@ -37,6 +37,7 @@ import org.eclipse.swt.graphics.Image;
 
 import com.sun.istack.internal.Nullable;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.datasources.DirectoryScanner;
@@ -91,7 +92,7 @@ public class HistoExplorer {
 		int positionT = tabLength < TAB_INDEX_HISTO_TABLE ? tabLength : TAB_INDEX_HISTO_TABLE;
 		tableTabItems.add(HistoTableWindow.create(displayTab, SWT.NONE, positionT));
 
-		if (application.getActiveChannel() != null) updateHistoTabs(RebuildStep.A_HISTOSET);
+		if (Analyzer.getInstance().getActiveChannel() != null) updateHistoTabs(RebuildStep.A_HISTOSET);
 	}
 
 	public void disposeHisto() {
@@ -228,7 +229,7 @@ public class HistoExplorer {
 	}
 
 	private void updateHistoTabs(RebuildStep rebuildStep) {
-		if (application.getActiveChannel() == null) return;
+		if (Analyzer.getInstance().getActiveChannel() == null) return;
 
 		if (Thread.currentThread().getId() == application.getThreadId()) {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "initial size=", getTrailRecordSet() != null
@@ -277,7 +278,7 @@ public class HistoExplorer {
 			histoSet.setRebuildStepInvisibleTabs(rebuildStep, isRebuilt);
 		} catch (Exception e) {
 			log.log(SEVERE, e.getMessage(), e);
-			if (application.isWithUi()) application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
+			if (Analyzer.getInstance().isWithUi()) application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 		}
 	}
 

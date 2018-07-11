@@ -79,7 +79,7 @@ public class GDE {
 	final static String											$CLASS_NAME												= GDE.class.getName();
 	public final static long								StartTime													= new Date().getTime();
 	public static Handler										logHandler												= null;
-	public static Display										display;
+	public static Display										display														= null;
 	public static Shell											shell;
 
 	// ****** begin global constants section *******

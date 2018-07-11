@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 
 import com.sun.istack.internal.Nullable;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
@@ -332,7 +333,7 @@ public final class VaultPicker {
 			DataInconsitsentException, DataTypeException {
 		RebuildStep realRebuildStep = rebuildStep; // the rebuild step might be augmented during the screening procedure
 
-		Optional<ProgressManager> progress = DataExplorer.getInstance().isWithUi() ? Optional.of(new ProgressManager()) : Optional.empty();
+		Optional<ProgressManager> progress = Analyzer.getInstance().isWithUi() ? Optional.of(new ProgressManager()) : Optional.empty();
 		try {
 			long startNanoTime = System.nanoTime();
 			log.log(FINER, GDE.STRING_GREATER, rebuildStep);
@@ -345,7 +346,7 @@ public final class VaultPicker {
 			progress.ifPresent((p) -> p.set(INITIALIZED));
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.F_FILE_CHECK)) {
-				realRebuildStep = directoryScanner.isValidated(DataExplorer.getInstance().getActiveDevice(), rebuildStep);
+				realRebuildStep = directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), rebuildStep);
 				log.time(() -> format("  %3d file paths verified           time=%,6d [ms]", directoryScanner.getValidatedFoldersCount(), NANOSECONDS.toMillis(System.nanoTime() - startNanoTime + 500000)));
 			}
 			progress.ifPresent((p) -> p.set(PATHS_VERIFIED));
@@ -377,7 +378,7 @@ public final class VaultPicker {
 						double timeQuotaDone = pickedVaults.size() / totalEstimatedEffort;
 						int progressPercentageDone = (int) ((CACHED.endPercentage - MATCHED.endPercentage) * timeQuotaDone);
 						progress.ifPresent((
-								p) -> p.set(Math.max(DataExplorer.application.getProgressPercentage(), MATCHED.endPercentage + progressPercentageDone)));
+								p) -> p.set(Math.max(DataExplorer.getInstance().getProgressPercentage(), MATCHED.endPercentage + progressPercentageDone)));
 					}
 					final long recordSetBytesCachedSum = recordSetBytesSum;
 					{// step: transform log files from workload map into vaults and put them into the histoSet map

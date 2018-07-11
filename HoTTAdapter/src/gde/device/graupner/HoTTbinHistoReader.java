@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.data.RecordSet;
 import gde.device.ScoreLabelTypes;
@@ -116,7 +117,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		final String $METHOD_NAME = "read"; //$NON-NLS-1$
 		File file = HoTTbinHistoReader.filePath.toFile();
 		HashMap<String, String> header = null;
-		HoTTAdapter device = (HoTTAdapter) HoTTbinHistoReader.application.getActiveDevice();
+		HoTTAdapter device = (HoTTAdapter) Analyzer.getInstance().getActiveDevice();
 		if (HoTTbinHistoReader.log.isLoggable(Level.FINE))
 			HoTTbinHistoReader.log.logp(Level.FINE, HoTTbinHistoReader.$CLASS_NAME, $METHOD_NAME, " recordSetBaseName=" + truss.getVault().getLogRecordsetBaseName()); //$NON-NLS-1$
 
@@ -203,7 +204,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		HoTTbinHistoReader.isJustParsed = false;
 		int countPackageLoss = 0;
 		UniversalSampler histoRandomSample = null;
-		HoTTAdapter device = (HoTTAdapter) HoTTbinHistoReader.application.getActiveDevice();
+		HoTTAdapter device = (HoTTAdapter) Analyzer.getInstance().getActiveDevice();
 		int activeChannelNumber = device.channels.getActiveChannelNumber(); // HoTTbinHistoReader.application.getActiveChannel().getNumber();
 
 		if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
@@ -626,7 +627,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		// HoTTbinHistoReader.blockSequenceCheck = new Vector<Byte>();
 		int countPackageLoss = 0;
 		UniversalSampler histoRandomSample = null;
-		HoTTAdapter device = (HoTTAdapter) HoTTbinHistoReader.application.getActiveDevice();
+		HoTTAdapter device = (HoTTAdapter) Analyzer.getInstance().getActiveDevice();
 		int activeChannelNumber = device.channels.getActiveChannelNumber(); // HoTTbinHistoReader.application.getActiveChannel().getNumber();
 		if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetReceiver = tmpRecordSet;

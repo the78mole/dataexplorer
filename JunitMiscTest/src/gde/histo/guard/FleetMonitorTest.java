@@ -29,13 +29,12 @@ import org.junit.jupiter.api.Test;
 import gde.histo.base.HistoTestCase;
 import gde.histo.datasources.HistoSetTest;
 import gde.histo.guard.FleetMonitor.ObjectSummary;
-import gde.ui.DataExplorer;
 
 /**
  *
  * @author Thomas Eickert (USER)
  */
-public class FleetMonitorTest extends HistoTestCase {
+class FleetMonitorTest extends HistoTestCase {
 	private final static String	$CLASS_NAME	= HistoSetTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -55,7 +54,7 @@ public class FleetMonitorTest extends HistoTestCase {
 	 */
 	@Test
 	void testDefineOverview() {
-		DataExplorer.getInstance().getDeviceConfigurations(); // get now because lazy loading will disturb response times
+		this.analyzer.getDeviceConfigurations(); // get now because lazy loading will disturb response times
 		FleetMonitor fleetMonitor = new FleetMonitor(false);
 		log.log(Level.OFF, "FleetMonitor initialized");
 		List<ObjectSummary> overview = fleetMonitor.defineOverview("KwikFly");

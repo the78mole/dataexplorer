@@ -42,6 +42,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
@@ -53,7 +54,6 @@ import gde.histo.device.IHistoDevice;
 import gde.histo.exclusions.ExclusionData;
 import gde.log.Level;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 
 /**
@@ -290,13 +290,11 @@ public final class ObjectVaultIndex {
 			return indices;
 		}
 
-		public String[] selectDeviceNames(String[] objectKeys, DetailSelector detailSelector) {
+		public Set<String> selectDeviceNames(String[] objectKeys, DetailSelector detailSelector) {
 			Set<ObjectVaultIndexEntry> vaultIndexes = selectVaultIndexes(objectKeys, detailSelector);
-			String[] deviceNames = new String[vaultIndexes.size()];
-			int i = 0;
+			Set<String> deviceNames = new HashSet<>();
 			for (ObjectVaultIndexEntry idx : vaultIndexes) {
-				deviceNames[i] = idx.vaultDeviceName;
-				i++;
+				deviceNames.add(idx.vaultDeviceName);
 			}
 			return deviceNames;
 		}
@@ -452,17 +450,16 @@ public final class ObjectVaultIndex {
 	 * @return the devices used in the vault index selection
 	 */
 	public HashMap<String, IDevice> selectExistingDevices(String[] objectKeys) {
-		List<String> result = Arrays.asList(objectVaultMap.selectDeviceNames(objectKeys, DetailSelector.createEmptyFilter()));
+		Set<String> indexedDeviceNames = objectVaultMap.selectDeviceNames(objectKeys, DetailSelector.createEmptyFilter());
 
 		HashMap<String, IDevice> existingDevices = new HashMap<>();
-		Map<String, DeviceConfiguration> allConfigurations = DataExplorer.getInstance().getDeviceConfigurations().getAllConfigurations();
-		for (Entry<String, DeviceConfiguration> string : allConfigurations.entrySet()) {
-			if (result.contains(string.getKey())) {
-				try {
-					existingDevices.put(string.getKey(), string.getValue().getAsDevice());
-				} catch (Exception e) {
-					log.log(Level.SEVERE, "device instance exception", e);
-				}
+		Map<String, DeviceConfiguration> allConfigurations = Analyzer.getInstance().getDeviceConfigurations().getAllConfigurations();
+		for (String deviceName : indexedDeviceNames) {
+			try {
+				IDevice device = allConfigurations.get(deviceName).getAsDevice();
+				existingDevices.put(deviceName, device);
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "device instance exception", e);
 			}
 		}
 		log.log(Level.OFF, "Selected      size=", existingDevices.size());
@@ -522,7 +519,7 @@ public final class ObjectVaultIndex {
 	private List<String> defineCacheDirectoryNames(String deviceName) {
 		List<String> result = new ArrayList<>();
 		try {
-			IDevice device = DataExplorer.getInstance().getDeviceConfigurations().get(deviceName).getAsDevice();
+			IDevice device = Analyzer.getInstance().getDeviceConfigurations().get(deviceName).getAsDevice();
 
 			List<String> validReaderSettings = new ArrayList<>();
 			validReaderSettings.add(GDE.STRING_EMPTY);
@@ -544,7 +541,7 @@ public final class ObjectVaultIndex {
 	 */
 	private List<String> defineCacheDirectoryNames() {
 		List<String> result = new ArrayList<>();
-		Collection<String> deviceNames = DataExplorer.getInstance().getDeviceConfigurations().getAllConfigurations().keySet();
+		Collection<String> deviceNames = Analyzer.getInstance().getDeviceConfigurations().getAllConfigurations().keySet();
 		for (String deviceName : deviceNames) {
 			result.addAll(defineCacheDirectoryNames(deviceName));
 		}

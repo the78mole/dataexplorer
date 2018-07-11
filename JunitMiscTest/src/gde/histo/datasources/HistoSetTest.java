@@ -48,7 +48,6 @@ import gde.histo.base.SuperTestCase;
 import gde.histo.cache.VaultReaderWriter;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.recordings.TrailDataTags.DataTag;
-import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyCompliance;
 
@@ -84,7 +83,7 @@ public class HistoSetTest extends SuperTestCase {
 		assertTrue(FileUtils.checkDirectoryExist(settings.getDataFilePath()));
 
 		// take the non-device directories in the data path as object keys
-		Set<String> objectKeys = ObjectKeyCompliance.defineObjectKeyCandidates(application.getDeviceConfigurations().getAllConfigurations());
+		Set<String> objectKeys = ObjectKeyCompliance.defineObjectKeyCandidates(analyzer.getDeviceConfigurations().getAllConfigurations());
 		objectKeys.add(""); // empty string for 'device oriented'
 		this.settings.setObjectList(objectKeys.toArray(new String[0]), 0);
 
@@ -97,7 +96,7 @@ public class HistoSetTest extends SuperTestCase {
 			long nanoTime = System.nanoTime();
 			try {
 				totalVaultsCount = 0;
-				for (Entry<String, DeviceConfiguration> deviceEntry : application.getDeviceConfigurations().getAllConfigurations().entrySet()) {
+				for (Entry<String, DeviceConfiguration> deviceEntry : analyzer.getDeviceConfigurations().getAllConfigurations().entrySet()) {
 					IDevice device = setDevice(deviceEntry.getKey());
 					if (device != null) {
 						System.out.println(device.getName());
@@ -124,7 +123,7 @@ public class HistoSetTest extends SuperTestCase {
 		}
 
 		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports()
-				? DataExplorer.getInstance().getDeviceConfigurations().getValidLogExtentions() : Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
+				? analyzer.getDeviceConfigurations().getValidLogExtentions() : Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
 		long logFilesCount = getLogFilesCount(new File(settings.getDataFilePath()), 99, validLogExtentions);
 		long cacheSize = VaultReaderWriter.getCacheSize();
 		System.out.println(String.format("* elapsed times for %s with%,5d files resulting in%,6d vaults  @%d object keys and isZippedCache=%b", //
@@ -189,7 +188,7 @@ public class HistoSetTest extends SuperTestCase {
 		assertTrue(FileUtils.checkDirectoryExist(settings.getDataFilePath()));
 
 		// take the non-device directories in the data path as object keys
-		Set<String> objectKeys = ObjectKeyCompliance.defineObjectKeyCandidates(application.getDeviceConfigurations().getAllConfigurations());
+		Set<String> objectKeys = ObjectKeyCompliance.defineObjectKeyCandidates(analyzer.getDeviceConfigurations().getAllConfigurations());
 		objectKeys.add(""); // empty string for 'device oriented'
 		this.settings.setObjectList(objectKeys.toArray(new String[0]), 0);
 
@@ -227,7 +226,7 @@ public class HistoSetTest extends SuperTestCase {
 		}
 
 		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports()
-				? DataExplorer.getInstance().getDeviceConfigurations().getValidLogExtentions() : Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
+				? analyzer.getDeviceConfigurations().getValidLogExtentions() : Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
 		long logFilesCount = getLogFilesCount(new File(settings.getDataFilePath()), 99, validLogExtentions);
 		long cacheSize = VaultReaderWriter.getCacheSize();
 		System.out.println(String.format("* " + deviceName + " elapsed times for %s with%,5d files resulting in%,6d vaults  @%d object keys and isZippedCache=%b", //
@@ -253,7 +252,7 @@ public class HistoSetTest extends SuperTestCase {
 		assertTrue(FileUtils.checkDirectoryExist(settings.getDataFilePath()));
 
 		// take the non-device directories in the data path as object keys
-		Set<String> objectKeys = ObjectKeyCompliance.defineObjectKeyCandidates(application.getDeviceConfigurations().getAllConfigurations());
+		Set<String> objectKeys = ObjectKeyCompliance.defineObjectKeyCandidates(analyzer.getDeviceConfigurations().getAllConfigurations());
 		objectKeys.add(""); // empty string for 'device oriented'
 		this.settings.setObjectList(objectKeys.toArray(new String[0]), 0);
 
@@ -292,7 +291,7 @@ public class HistoSetTest extends SuperTestCase {
 		}
 
 		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports()
-				? DataExplorer.getInstance().getDeviceConfigurations().getValidLogExtentions() : Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
+				? analyzer.getDeviceConfigurations().getValidLogExtentions() : Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
 		long logFilesCount = getLogFilesCount(new File(settings.getDataFilePath()), 99, validLogExtentions);
 		long cacheSize = VaultReaderWriter.getCacheSize();
 		System.out.println(String.format(" elapsed times for %s with%,5d files resulting in%,6d vaults  @%d object keys and isZippedCache=%b", //
@@ -318,7 +317,7 @@ public class HistoSetTest extends SuperTestCase {
 		if (this.legacyDeviceNames.get(fileDeviceName) != null) deviceName = this.legacyDeviceNames.get(fileDeviceName);
 		if (deviceName.toLowerCase().contains("hottviewer") || deviceName.toLowerCase().contains("mpu")) return null; // iCharger308DUO
 																																																									// gde.device.UsbPortType missing
-		DeviceConfiguration deviceConfig = application.getDeviceConfigurations().get(deviceName);
+		DeviceConfiguration deviceConfig = analyzer.getDeviceConfigurations().get(deviceName);
 		if (deviceConfig == null) return null;
 		IDevice device = this.getInstanceOfDevice(deviceConfig);
 

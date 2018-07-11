@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -52,7 +53,6 @@ import gde.histo.transitions.TransitionTableMapper.SettlementRecords;
 import gde.histo.utils.UniversalQuantile;
 import gde.log.Level;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Supports the data collection for a serializable histo vault.
@@ -62,8 +62,7 @@ public final class VaultCollector {
 	final private static String	$CLASS_NAME	= VaultCollector.class.getName();
 	final private static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private final DataExplorer	application	= DataExplorer.getInstance();
-	private final IDevice				device			= DataExplorer.getInstance().getActiveDevice();
+	private final IDevice				device			= Analyzer.getInstance().getActiveDevice();
 
 	private ExtendedVault				vault;
 	private SourceDataSet				sourceDataSet;
@@ -79,7 +78,7 @@ public final class VaultCollector {
 	public VaultCollector(String objectDirectory, File file, int fileVersion, int logRecordSetSize, String logRecordsetBaseName, //
 			boolean providesReaderSettings) {
 		this(objectDirectory, file, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, "native", file.lastModified(), //$NON-NLS-1$
-				DataExplorer.getInstance().getActiveChannelNumber(), objectDirectory, providesReaderSettings);
+				Analyzer.getInstance().getActiveChannel().getNumber(), objectDirectory, providesReaderSettings);
 	}
 
 	/**
@@ -98,8 +97,8 @@ public final class VaultCollector {
 	public VaultCollector(String objectDirectory, File file, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal,
 			String logRecordsetBaseName, String logDeviceName, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey, //
 			boolean providesReaderSettings) {
-		String readerSettings = providesReaderSettings && application.getActiveDevice() instanceof IHistoDevice
-				? ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
+		String readerSettings = providesReaderSettings && Analyzer.getInstance().getActiveDevice() instanceof IHistoDevice
+				? ((IHistoDevice) Analyzer.getInstance().getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
 		this.vault = new ExtendedVault(objectDirectory, file.toPath(), file.lastModified(), file.length(), fileVersion, logRecordSetSize,
 				logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, logStartTimestamp_ms, logChannelNumber, logObjectKey, //
 				readerSettings);

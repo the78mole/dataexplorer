@@ -137,7 +137,7 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 									
 				}
 				else {
-					DataExplorer.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
+					GeniusWizardLogReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
 					throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
 				}
 			}

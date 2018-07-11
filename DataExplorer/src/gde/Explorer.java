@@ -19,30 +19,24 @@
 
 package gde;
 
+import gde.data.Channels;
 import gde.log.Logger;
 
 /**
- *
+ * Kernel for analyzing logging data.
+ * Use this with the integrated DataExplorer UI.
  * @author Thomas Eickert (USER)
  */
-public class AwsExplorer implements IExplorer{
-	private static final String	$CLASS_NAME	= AwsExplorer.class.getName();
+public class Explorer extends Analyzer {
+	private static final String	$CLASS_NAME	= Explorer.class.getName();
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private final DataAccess			dataAccess;
-
-	/**
-	 *
-	 */
-	public AwsExplorer() {
-		this.dataAccess = null;
+	Explorer() {
+		super();
 	}
-	/**
-	 * @return the roaming data sources support
-	 */
-	@Override
-	public DataAccess getDataAccess() {
-		return this.dataAccess;
+
+	public void setChannels(Channels channels) {
+		this.channels = channels;
 	}
 
 }

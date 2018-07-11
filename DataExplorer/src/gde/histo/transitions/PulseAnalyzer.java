@@ -26,6 +26,7 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.FINEST;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -33,7 +34,6 @@ import gde.device.IDevice;
 import gde.device.TransitionType;
 import gde.histo.transitions.GroupTransitions.TransitionChronicle;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Analyze a record for transitions defined in the device channel settings.
@@ -73,7 +73,7 @@ public final class PulseAnalyzer extends AbstractAnalyzer {
 	 */
 	private TransitionChronicle findPulseTransitions(Record record, TransitionType transitionType) {
 		TransitionChronicle transitions = new TransitionChronicle();
-		IDevice device = DataExplorer.application.getActiveDevice();
+		IDevice device = Analyzer.getInstance().getActiveDevice();
 
 		LevelChecker levelChecker = new LevelChecker(record, transitionType);
 		for (int i = 0; i < record.realSize(); i++) {

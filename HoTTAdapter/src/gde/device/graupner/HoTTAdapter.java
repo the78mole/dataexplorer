@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
@@ -1555,7 +1556,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @return the tooltip text for the import menu bar button
 	 */
 	public static String getImportToolTip() {
-		DeviceConfiguration hoTTConfiguration = DataExplorer.getInstance().getDeviceConfigurations().get("HoTTAdapter");
+		DeviceConfiguration hoTTConfiguration = Analyzer.getInstance().getDeviceConfigurations().get("HoTTAdapter");
 		String fileExtentions = hoTTConfiguration != null ? hoTTConfiguration.getDataBlockPreferredFileExtention() : GDE.STRING_QUESTION_MARK;
 		return Messages.getString(MessageIds.GDE_MSGT2404, new Object[] { fileExtentions });
 	}

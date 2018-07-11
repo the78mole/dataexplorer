@@ -19,12 +19,12 @@
 
 package gde.histo.ui;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.device.IDevice;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Status message text caching.
@@ -36,9 +36,8 @@ public class VolatileStatusMessage {
 	@SuppressWarnings("unused")
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private final DataExplorer	application	= DataExplorer.getInstance();
-	private final IDevice				device			= application.getActiveDevice();
-	private final Channel				channel			= application.getActiveChannel();
+	private final IDevice				device			= Analyzer.getInstance().getActiveDevice();
+	private final Channel				channel			= Analyzer.getInstance().getActiveChannel();
 	private final String				objectKey		= Settings.getInstance().getActiveObjectKey();
 
 	private final String				textLine;
@@ -75,7 +74,7 @@ public class VolatileStatusMessage {
 
 	public boolean isExpired() {
 		if (remainingAccessCounter > 0) {
-			boolean isOtherChart = !device.equals(application.getActiveDevice()) || !channel.equals(application.getActiveChannel()) || !objectKey.equals(Settings.getInstance().getActiveObjectKey());
+			boolean isOtherChart = !device.equals(Analyzer.getInstance().getActiveDevice()) || !channel.equals(Analyzer.getInstance().getActiveChannel()) || !objectKey.equals(Settings.getInstance().getActiveObjectKey());
 			return isOtherChart;
 		} else
 			return true;
@@ -83,7 +82,7 @@ public class VolatileStatusMessage {
 
 	@Override
 	public String toString() {
-		boolean isSameChart = device.equals(application.getActiveDevice()) && channel.equals(application.getActiveChannel()) && objectKey.equals(Settings.getInstance().getActiveObjectKey());
+		boolean isSameChart = device.equals(Analyzer.getInstance().getActiveDevice()) && channel.equals(Analyzer.getInstance().getActiveChannel()) && objectKey.equals(Settings.getInstance().getActiveObjectKey());
 		return "VolatileStatusMessage [textLine=" + this.textLine + ", color=" + this.color + ", remainingAccessCounter=" + this.remainingAccessCounter + ", isSameChart=" + isSameChart + "]";
 	}
 }

@@ -33,6 +33,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
@@ -234,7 +235,7 @@ public class ObjectKeyScanner extends Thread {
 	private List<String> getObsoleteObjectKeys(File rootDirectory) throws FileNotFoundException {
 		// get current object key list as a basis for determining the obsolete object keys
 		List<String> resultObjectKeys = this.settings.getRealObjectKeys().collect(Collectors.toList());
-		Map<String, DeviceConfiguration> devices = DataExplorer.getInstance().getDeviceConfigurations().getAllConfigurations();
+		Map<String, DeviceConfiguration> devices = Analyzer.getInstance().getDeviceConfigurations().getAllConfigurations();
 		resultObjectKeys.removeAll(ObjectKeyCompliance.defineObjectKeyNovelties(devices));
 
 		for (File dir : FileUtils.getDirectories(rootDirectory)) {

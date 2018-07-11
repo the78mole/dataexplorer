@@ -59,7 +59,7 @@ public class ObjectKeyComplianceTest extends TestSuperClass {
 		this.settings.setDataFoldersCsv("/testDir1");
 		this.settings.setImportFoldersCsv("/testDir2");
 
-		Set<String> objectKeyCandidates = ObjectKeyCompliance.defineObjectKeyCandidates(application.getDeviceConfigurations().getAllConfigurations());
+		Set<String> objectKeyCandidates = ObjectKeyCompliance.defineObjectKeyCandidates(analyzer.getDeviceConfigurations().getAllConfigurations());
 		log.log(Level.FINER, "", objectKeyCandidates);
 		assertTrue("is valid object ", objectKeyCandidates.contains("TopSky"));
 		assertFalse("is device ", objectKeyCandidates.contains("HoTTAdapter"));
@@ -69,7 +69,7 @@ public class ObjectKeyComplianceTest extends TestSuperClass {
 	public void testObjectKeyNovelties() {
 		this.settings.setDataFilePath(DataSource.TESTDATA.getDataPath(Paths.get("_ET_Exzerpt")).toString());
 
-		Set<String> objectKeyKeyNovelties = ObjectKeyCompliance.defineObjectKeyNovelties(application.getDeviceConfigurations().getAllConfigurations());
+		Set<String> objectKeyKeyNovelties = ObjectKeyCompliance.defineObjectKeyNovelties(analyzer.getDeviceConfigurations().getAllConfigurations());
 		log.log(Level.FINER, "", objectKeyKeyNovelties);
 		assertTrue("is valid object ", objectKeyKeyNovelties.contains("Porsche"));
 		assertFalse("is valid object ", objectKeyKeyNovelties.contains("TopSky"));
@@ -82,7 +82,7 @@ public class ObjectKeyComplianceTest extends TestSuperClass {
 		this.settings.setDataFoldersCsv("");
 		this.settings.setImportFoldersCsv("");
 
-		Set<String> objectKeyCandidates = ObjectKeyCompliance.defineObjectKeyCandidates(application.getDeviceConfigurations().getAllConfigurations());
+		Set<String> objectKeyCandidates = ObjectKeyCompliance.defineObjectKeyCandidates(analyzer.getDeviceConfigurations().getAllConfigurations());
 		objectKeyCandidates.add("TestEt");
 		this.settings.setObjectList(objectKeyCandidates.toArray(new String[0]), 0);
 
@@ -129,7 +129,7 @@ public class ObjectKeyComplianceTest extends TestSuperClass {
 	public void testReadSourcePathsObjectKeysPerformance() {
 		for (int i = 0; i < 7; i++) {
 			long nanoTime = System.nanoTime();
-			Set<String> objectKeyCandidates = ObjectKeyCompliance.defineObjectKeyCandidates(application.getDeviceConfigurations().getAllConfigurations());
+			Set<String> objectKeyCandidates = ObjectKeyCompliance.defineObjectKeyCandidates(analyzer.getDeviceConfigurations().getAllConfigurations());
 
 			System.out.println(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " ms");
 			System.out.println(objectKeyCandidates);

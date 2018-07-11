@@ -59,6 +59,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
 import gde.config.DeviceConfigurations;
@@ -160,7 +161,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			File file = new File(this.settings.getDevicesPath());
 			if (!file.exists()) throw new FileNotFoundException(this.settings.getDevicesPath()); // todo replace throw/catch with simple if
 
-			this.deviceConfigurations = this.application.getDeviceConfigurations();
+			this.deviceConfigurations = Analyzer.getInstance().getDeviceConfigurations();
 			this.activeDevices = this.deviceConfigurations.getActiveDevices();
 			log.log(Level.INFO, String.format("active Device = %s activeDevices = %s", this.activeDeviceName, this.activeDevices.toString()));
 			this.selectedActiveDeviceConfig = this.deviceConfigurations.getSelectedActiveDeviceConfig();

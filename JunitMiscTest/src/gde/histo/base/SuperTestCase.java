@@ -94,11 +94,11 @@ public class SuperTestCase extends HistoTestCase {
 		if (fileDeviceName.toLowerCase().contains("charger308duo") || fileDeviceName.toLowerCase().contains("charger308duo")) {
 			System.out.println("skip fileDeviceName=" + fileDeviceName);
 		}
-		DeviceConfiguration deviceConfig = this.application.getDeviceConfigurations().get(fileDeviceName);
+		DeviceConfiguration deviceConfig = this.analyzer.getDeviceConfigurations().get(fileDeviceName);
 		if (deviceConfig == null) new UnsupportedOperationException("deviceConfig == null");
 		IDevice device = this.getInstanceOfDevice(deviceConfig);
 
-		this.application.setEnvironmentWoutUI(settings, device, activeChannelNumber);
+		this.analyzer.setEnvironmentWoutUI(settings, device, activeChannelNumber);
 
 		// object : in Settings only - not in channel because not used in histo
 		this.settings.setActiveObjectKey(activeObjectKey);
@@ -111,7 +111,7 @@ public class SuperTestCase extends HistoTestCase {
 	 * @param activeObjectKey is an object key which exists in the settings or an empty string for deviceoriented
 	 */
 	protected void setDeviceChannelObject(IDevice device, int activeChannelNumber, String activeObjectKey) {
-		this.application.setEnvironmentWoutUI(settings, device, activeChannelNumber);
+		this.analyzer.setEnvironmentWoutUI(settings, device, activeChannelNumber);
 
 		// object : in Settings only - not in channel because not used in histo
 		this.settings.setActiveObjectKey(activeObjectKey);

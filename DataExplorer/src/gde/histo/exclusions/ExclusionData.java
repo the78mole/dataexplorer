@@ -44,7 +44,6 @@ import gde.histo.innercache.CacheBuilder;
 import gde.histo.innercache.CacheStats;
 import gde.histo.utils.SecureHash;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 
 /**
@@ -118,8 +117,8 @@ public final class ExclusionData extends Properties {
 	 * Determine the exclusions which are active for the current channel.
 	 * @return the exclusion information for the trusses excluded from the history
 	 */
-	public String[] getExcludedTrusses() {
-		return DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths().stream() //
+	public String[] getExcludedTrusses(List<Path> excludedPaths) {
+		return excludedPaths.stream() //
 				.map(p -> {
 					String key = p.getFileName().toString();
 					String property = getProperty(key);

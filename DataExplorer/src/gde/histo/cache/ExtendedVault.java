@@ -22,12 +22,12 @@ package gde.histo.cache;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
 import gde.histo.utils.SecureHash;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
 /**
@@ -44,7 +44,6 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	private static final String				SHA1_DELIMITER	= ",";
 	private static final String				timestampFormat	= "yyyy-MM-dd HH:mm:ss";
 
-	private static final DataExplorer	application			= DataExplorer.getInstance();
 	private static final Settings			settings				= Settings.getInstance();
 
 	/**
@@ -65,7 +64,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 *         channel number and some settings values
 	 */
 	public static String getVaultsDirectoryName(String vaultReaderSettings) {
-		return getVaultsDirectoryName(application.getActiveDevice(), application.getActiveChannelNumber(), vaultReaderSettings);
+		return getVaultsDirectoryName(Analyzer.getInstance().getActiveDevice(), Analyzer.getInstance().getActiveChannel().getNumber(), vaultReaderSettings);
 	}
 
 	/**
@@ -151,8 +150,8 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		this.loadLinkPath = Paths.get("");
 
 		this.vaultDataExplorerVersion = GDE.VERSION;
-		this.vaultDeviceName = application.getActiveDevice().getName();
-		this.vaultChannelNumber = application.getActiveChannelNumber();
+		this.vaultDeviceName = Analyzer.getInstance().getActiveDevice().getName();
+		this.vaultChannelNumber = Analyzer.getInstance().getActiveChannel().getNumber();
 		this.vaultObjectKey = Settings.getInstance().getActiveObjectKey();
 		this.vaultSamplingTimespanMs = settings.getSamplingTimespan_ms();
 

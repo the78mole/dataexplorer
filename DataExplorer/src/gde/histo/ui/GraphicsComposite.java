@@ -53,10 +53,9 @@ import gde.GDE;
 import gde.config.Settings;
 import gde.data.AbstractRecordSet;
 import gde.data.Channels;
-import gde.histo.datasources.DirectoryScanner;
 import gde.histo.datasources.HistoSet;
 import gde.histo.datasources.SourceFolders;
-import gde.histo.exclusions.ExclusionData;
+import gde.histo.exclusions.ExclusionActivity;
 import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
@@ -430,8 +429,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 				windowActor.processMouseDownAction(point);
 			} else if (evt.button == 3) { // right button
 				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
-				ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder());
-				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(exclusionData.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
+				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionActivity.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
 				if (point.x > 0 && point.x < this.curveAreaBounds.width) {
 					int index = trailRecordSet.getIndex(timeLine.getAdjacentTimestamp(point.x));
 					popupmenu.setData(TabMenuOnDemand.DATA_LINK_PATH.name(), trailRecordSet.getDataTagText(index, DataTag.LINK_PATH));

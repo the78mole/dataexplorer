@@ -25,8 +25,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.Thread.State;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -179,8 +177,8 @@ public class Settings extends Properties {
 	final static String							SERIAL_LOG_FILE									= "serial.log";																																										//$NON-NLS-1$
 	public final static String[]		LOGGING_LEVEL										= new String[] { "SEVERE", "WARNING", "TIME", "INFO", "FINE", "FINER", "FINEST" };								//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 
-	public final static String				MAPPINGS_DIR_NAME								= "Mapping";																																											//$NON-NLS-1$
-	public final static String				MEASUREMENT_DISPLAY_FILE				= "MeasurementDisplayProperties.xml";																															//$NON-NLS-1$
+	public final static String			MAPPINGS_DIR_NAME								= "Mapping";																																											//$NON-NLS-1$
+	public final static String			MEASUREMENT_DISPLAY_FILE				= "MeasurementDisplayProperties.xml";																															//$NON-NLS-1$
 
 	public final static String			ACTIVE_DEVICE										= "active_device";																																								//$NON-NLS-1$
 	public final static String			DEVICE_USE											= "device_use";																																										//$NON-NLS-1$
@@ -745,26 +743,6 @@ public class Settings extends Properties {
 
 	public void setActiveDevice(String activeDeviceString) {
 		this.setProperty(Settings.ACTIVE_DEVICE, activeDeviceString.trim());
-	}
-
-	/**
-	 * @return standard data directory path with trailing device and / or object stripped off
-	 */
-	@Deprecated
-	public Path getDataBaseDir() {
-		Path path = null;
-		String tmpDataDirPath = getDataFilePath();
-		if (!(tmpDataDirPath == null || tmpDataDirPath.trim().isEmpty() || tmpDataDirPath.equals(GDE.FILE_SEPARATOR_UNIX))) {
-			path = Paths.get(tmpDataDirPath);
-			// ignore object if path ends with a valid object
-			String directoryName = path.getFileName().toString();
-			path = getValidatedObjectKey(directoryName).isPresent() ? path.getParent() : path;
-			// ignore device if path ends with a valid device
-			String directoryName2 = path.getFileName().toString();
-			path = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;
-		}
-		log.log(Level.INFO, "DataBaseDir " + path); //$NON-NLS-1$
-		return path;
 	}
 
 	/**

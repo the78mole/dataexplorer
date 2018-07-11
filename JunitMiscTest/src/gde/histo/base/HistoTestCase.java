@@ -30,7 +30,9 @@ import java.util.logging.Logger;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import gde.Analyzer;
 import gde.GDE;
+import gde.TestAnalyzer;
 import gde.config.Settings;
 import gde.log.LogFormatter;
 import gde.ui.DataExplorer;
@@ -38,7 +40,7 @@ import gde.ui.DataExplorer;
 import junit.framework.TestCase;
 
 /**
- * Provide the DataExplorer settings.
+ * Provide the DataExplorer settings without integrated UI.
  * @author Thomas Eickert (USER)
  */
 public class HistoTestCase extends TestCase {
@@ -82,10 +84,12 @@ public class HistoTestCase extends TestCase {
 		public abstract Path getDataPath(String string);
 	}
 
-	protected final DataExplorer	application	= DataExplorer.getInstance();
+	protected final TestAnalyzer	analyzer		= (TestAnalyzer) Analyzer.getInstance();
+	protected final DataExplorer	application	= DataExplorer.getInstance();																					// todo delete because it should
+																																																									// hold only UI related objects
 	protected final Settings			settings		= Settings.getInstance();
-	protected final String				tmpDir			= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR) ? System.getProperty("java.io.tmpdir")
-			: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;
+	protected final String				tmpDir			= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR)		//
+			? System.getProperty("java.io.tmpdir") : System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;
 
 	Handler												ch					= new ConsoleHandler();
 	LogFormatter									lf					= new LogFormatter();
@@ -110,7 +114,7 @@ public class HistoTestCase extends TestCase {
 		this.settings.setDataFilePath(DataSource.TESTDATA.getDataPath("_ET_Exzerpt").toString());
 
 		// set histo settings now because SearchImportPath might influence the object list
-		this.application.setHisto(true);
+		this.application.setHisto(true); // todo should be required only in the SuperTestCase
 		setHistoSettings();
 	}
 
@@ -122,8 +126,7 @@ public class HistoTestCase extends TestCase {
 		while (this.settings.isXsdThreadPending()) {
 			try {
 				Thread.sleep(5);
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				// ignore
 			}
 		}

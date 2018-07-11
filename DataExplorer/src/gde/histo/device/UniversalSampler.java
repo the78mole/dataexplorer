@@ -24,11 +24,11 @@ import static java.util.logging.Level.FINER;
 import java.util.Arrays;
 import java.util.Random;
 
+import gde.Analyzer;
 import gde.config.Settings;
 import gde.device.TransitionClassTypes;
 import gde.device.TransitionType;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Randomized measurements sampling based on a constant sampling timespan which also supports a 100% sampling.<br>
@@ -78,7 +78,7 @@ public final class UniversalSampler {
 
 		// find the maximum sampling timespan
 		int proposedTimespan_ms = Settings.getInstance().getSamplingTimespan_ms();
-		for (TransitionType transitionType : DataExplorer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelType(channelNumber).getTransitions().values()) {
+		for (TransitionType transitionType : Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelType(channelNumber).getTransitions().values()) {
 			if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
 				// ensure that the peak consists of at least 2 measurements
 				if (transitionType.getPeakMinimumTimeMsec() == null)

@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -40,7 +41,6 @@ import gde.histo.datasources.AbstractSourceDataSet.SourceDataSet;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.datasources.SourceFolders.DirectoryType;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Access to history source directories.
@@ -72,7 +72,7 @@ public final class DirectoryScanner {
 	 * @return the data folder residing in the top level working directory (data path + object key resp device)
 	 */
 	public static Path getActiveFolder() {
-		IDevice device = DataExplorer.getInstance().getActiveDevice();
+		IDevice device = Analyzer.getInstance().getActiveDevice();
 		String activeObjectKey = Settings.getInstance().getActiveObjectKey();
 		String subPathData = activeObjectKey.isEmpty() ? device.getDeviceConfiguration().getPureDeviceName() : activeObjectKey;
 		return Paths.get(Settings.getInstance().getDataFilePath()).resolve(subPathData);
@@ -161,7 +161,7 @@ public final class DirectoryScanner {
 			}
 
 			// the channel selection does not have any influence on the validated folders list
-			validatedChannel = DataExplorer.getInstance().getActiveChannel();
+			validatedChannel = Analyzer.getInstance().getActiveChannel();
 			isChannelChangeOnly = !isMajorChange && RebuildStep.B_HISTOVAULTS.isEqualOrBiggerThan(rebuildStep) && !lastChannel.equals(validatedChannel);
 			isMajorChange = isMajorChange || !lastChannel.equals(validatedChannel);
 			return true;

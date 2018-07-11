@@ -40,6 +40,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.swt.SWT;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -64,7 +65,7 @@ public class ObjectKeyCompliance {
 	 * FilenameFilter based on valid log file extensions including those from all devices.
 	 */
 	private static final class LogFileFilter implements FilenameFilter {
-		private final Set<String> validLogExtentions = DataExplorer.getInstance().getDeviceConfigurations().getValidLogExtentions();
+		private final Set<String> validLogExtentions = Analyzer.getInstance().getDeviceConfigurations().getValidLogExtentions();
 
 		@Override
 		public boolean accept(File dir, String name) {
@@ -85,7 +86,7 @@ public class ObjectKeyCompliance {
 			log.log(Level.WARNING, e1.getMessage(), e1);
 		}
 
-		if (!DataExplorer.getInstance().isWithUi()) {
+		if (!Analyzer.getInstance().isWithUi()) {
 			removeObjectKeys(objLnkSearch.getObsoleteObjectKeys());
 		} else {
 			if (!objLnkSearch.getObsoleteObjectKeys().isEmpty()) {
@@ -150,7 +151,7 @@ public class ObjectKeyCompliance {
 	public static void renameObjectKey(String oldObjKey, String newObjKey, String[] newObjectKeys) {
 		if (!oldObjKey.isEmpty()) {
 			int answer = SWT.YES;
-			if (DataExplorer.getInstance().isWithUi()) {
+			if (Analyzer.getInstance().isWithUi()) {
 				// query if new object key should be used to modify all existing data files with the new corrected one
 				answer = DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0048, new String[] { oldObjKey, newObjKey }));
 			}
@@ -159,11 +160,9 @@ public class ObjectKeyCompliance {
 				DataExplorer.getInstance().updateCurrentObjectData(newObjKey);
 				new ObjectKeyScanner(newObjKey).start();
 			}
-
 			if (FileUtils.checkDirectoryExist(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey)) {
 				// query for old directory deletion
-				if (!DataExplorer.getInstance().isWithUi() //
-						|| SWT.YES == DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031)))
+				if (!Analyzer.getInstance().isWithUi() || SWT.YES == DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031)))
 					FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey);
 			}
 		}
@@ -225,7 +224,7 @@ public class ObjectKeyCompliance {
 	 */
 	public static String getUpcomingObjectKey(Path filePath) {
 		String upcomingObjectKey = GDE.STRING_EMPTY;
-		if (DataExplorer.getInstance().isWithUi()) {
+		if (Analyzer.getInstance().isWithUi()) {
 			Path fileSubPath;
 			try {
 				fileSubPath = Paths.get(Settings.getInstance().getDataFilePath()).relativize(filePath);
@@ -238,7 +237,7 @@ public class ObjectKeyCompliance {
 
 			if (Settings.getInstance().isHistoActive() && Settings.getInstance().isObjectQueryActive() //
 					&& !DataExplorer.getInstance().isObjectSelectorEditable() //
-					&& !DataExplorer.getInstance().getDeviceConfigurations().contains(directoryName) //
+					&& !Analyzer.getInstance().getDeviceConfigurations().contains(directoryName) //
 					&& !Settings.getInstance().getValidatedObjectKey(directoryName).isPresent()) {
 				if (SWT.NO != DataExplorer.getInstance().openYesNoMessageDialogSync(Messages.getString(MessageIds.GDE_MSGT0929, new Object[] { directoryName }))) upcomingObjectKey = directoryName;
 			}
@@ -364,7 +363,7 @@ public class ObjectKeyCompliance {
 			// check if selected key matches the existing object key or is new for this channel
 			if (!newObjectKey.equals(channelObjKey)) { // channel has a key
 				int answer = SWT.YES;
-				if (DataExplorer.getInstance().isWithUi()) {
+				if (Analyzer.getInstance().isWithUi()) {
 					answer = DataExplorer.getInstance().getActiveRecordSet() == null ? SWT.YES
 							: (DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGT0205, new Object[] { channelObjKey,
 									newObjectKey })));

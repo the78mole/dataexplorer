@@ -27,6 +27,7 @@ import java.util.List;
 
 import com.sun.istack.internal.Nullable;
 
+import gde.Analyzer;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.Record.DataType;
@@ -43,7 +44,6 @@ import gde.log.Level;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 
 /**
  * Facade of the history module.
@@ -254,7 +254,7 @@ public final class HistoSet {
 	@Deprecated // use method with IChannelItem parameter instead
 	public static double encodeVaultValue(Record record, double value) {
 		final double newValue;
-		if (DataExplorer.getInstance().getActiveDevice().isGPSCoordinates(record)) {
+		if (Analyzer.getInstance().getActiveDevice().isGPSCoordinates(record)) {
 			newValue = value * 1000.;
 		} else {
 			switch (record.getDataType()) {

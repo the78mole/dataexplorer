@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Record;
@@ -35,7 +36,6 @@ import gde.device.TransitionClassTypes;
 import gde.device.TransitionType;
 import gde.device.TransitionValueTypes;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
 /**
@@ -483,8 +483,8 @@ public class AbstractAnalyzer {
 			this.isDeltaFactor = this.transitionType.getValueType() == TransitionValueTypes.DELTA_FACTOR;
 			this.isDeltaValue = this.transitionType.getValueType() == TransitionValueTypes.DELTA_VALUE;
 
-			double translatedMaxValue = DataExplorer.application.getActiveDevice().translateValue(transitionRecord, transitionRecord.getMaxValue() / 1000.);
-			double translatedMinValue = DataExplorer.application.getActiveDevice().translateValue(transitionRecord, transitionRecord.getMinValue() / 1000.);
+			double translatedMaxValue = Analyzer.getInstance().getActiveDevice().translateValue(transitionRecord, transitionRecord.getMaxValue() / 1000.);
+			double translatedMinValue = Analyzer.getInstance().getActiveDevice().translateValue(transitionRecord, transitionRecord.getMinValue() / 1000.);
 
 			this.absoluteDelta = Settings.getInstance().getAbsoluteTransitionLevel() * (translatedMaxValue - translatedMinValue);
 			this.translatedThresholdValue = transitionType.getThresholdValue();

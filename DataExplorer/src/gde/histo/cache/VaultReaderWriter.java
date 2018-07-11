@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.datasources.AbstractSourceDataSet;
@@ -60,7 +61,6 @@ import gde.histo.innercache.Cache;
 import gde.histo.innercache.CacheBuilder;
 import gde.histo.innercache.CacheStats;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 
 /**
@@ -71,7 +71,6 @@ public final class VaultReaderWriter {
 	private static final String											$CLASS_NAME	= VaultReaderWriter.class.getName();
 	private static final Logger											log					= Logger.getLogger($CLASS_NAME);
 
-	private static final DataExplorer								application	= DataExplorer.getInstance();
 	private static final Settings										settings		= Settings.getInstance();
 
 	private static final Cache<String, HistoVault>	memoryCache	=																		//
@@ -82,12 +81,12 @@ public final class VaultReaderWriter {
 	 */
 	public static void loadFromFile(Path filePath, List<VaultCollector> trusses) {
 		try {
-			SourceDataSet dataSet = AbstractSourceDataSet.createSourceDataSet(filePath, DataExplorer.getInstance().getActiveDevice());
+			SourceDataSet dataSet = AbstractSourceDataSet.createSourceDataSet(filePath, Analyzer.getInstance().getActiveDevice());
 			if (dataSet != null) dataSet.readVaults4Ui(filePath, trusses);
 		} catch (Exception e) {
 			log.log(SEVERE, e.getMessage(), e);
 			log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //
-					application.getActiveDevice().getName(), application.getActiveChannelNumber(), filePath));
+					Analyzer.getInstance().getActiveDevice().getName(), Analyzer.getInstance().getActiveChannel().getNumber(), filePath));
 		}
 	}
 
@@ -102,8 +101,8 @@ public final class VaultReaderWriter {
 		Path osdCacheFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, ExtendedVault.getVaultsDirectoryName(GDE.STRING_EMPTY));
 		List<ExtendedVault> vaults = loadFromCachePath(trussJobs, progress, osdCacheFilePath);
 
-		if (application.getActiveDevice() instanceof IHistoDevice) {
-			String readerSettings = ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv();
+		if (Analyzer.getInstance().getActiveDevice() instanceof IHistoDevice) {
+			String readerSettings = ((IHistoDevice) Analyzer.getInstance().getActiveDevice()).getReaderSettingsCsv();
 			if (!readerSettings.isEmpty()) {
 				List<ExtendedVault> nativeVaults = loadFromCachePath(trussJobs, progress, Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, ExtendedVault.getVaultsDirectoryName(readerSettings)));
 				vaults.addAll(nativeVaults);
@@ -188,8 +187,8 @@ public final class VaultReaderWriter {
 		Map<SourceDataSet, List<VaultCollector>> groupedJobs = trussJobs.values().parallelStream().flatMap(Collection::parallelStream).collect(Collectors.groupingBy(VaultCollector::getSourceDataSet));
 		groupedJobs.entrySet().stream().forEach(e -> {
 			boolean providesReaderSettings = e.getKey().providesReaderSettings();
-			String readerSettings = providesReaderSettings && application.getActiveDevice() instanceof IHistoDevice
-					? ((IHistoDevice) application.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
+			String readerSettings = providesReaderSettings && Analyzer.getInstance().getActiveDevice() instanceof IHistoDevice
+					? ((IHistoDevice) Analyzer.getInstance().getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
 			Path cacheFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, ExtendedVault.getVaultsDirectoryName(readerSettings));
 			try {
 				storeInCachePath(e.getValue(), cacheFilePath);

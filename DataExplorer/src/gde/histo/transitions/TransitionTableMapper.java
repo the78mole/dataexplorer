@@ -27,9 +27,9 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import gde.Analyzer;
 import gde.data.RecordSet;
 import gde.device.ChannelType;
-import gde.device.IDevice;
 import gde.device.SettlementType;
 import gde.device.TransitionAmountType;
 import gde.device.TransitionCalculusType;
@@ -41,7 +41,6 @@ import gde.histo.settlements.FigureEvaluator;
 import gde.histo.settlements.SettlementRecord;
 import gde.histo.transitions.GroupTransitions.TransitionChronicle;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Transition data mapping for the table tab.
@@ -110,15 +109,12 @@ public final class TransitionTableMapper {
 		}
 	}
 
-	private final DataExplorer	application	= DataExplorer.application;
-	private final IDevice				device			= DataExplorer.application.getActiveDevice();
-
-	private final RecordSet			recordSet;
-	private final ChannelType		channel;
+	private final RecordSet		recordSet;
+	private final ChannelType	channel;
 
 	public TransitionTableMapper(RecordSet recordSet) {
 		this.recordSet = recordSet;
-		this.channel = device.getDeviceConfiguration().getChannel(recordSet.getChannelConfigNumber());
+		this.channel = Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getChannel(recordSet.getChannelConfigNumber());
 	}
 
 	public static synchronized String[] getExtendedRow(RecordSet recordSet, int index, String[] dataTableRow) {
@@ -212,7 +208,7 @@ public final class TransitionTableMapper {
 		SettlementRecords histoSettlements = new SettlementRecords();
 		for (SettlementType settlementType : settlementTypes) {
 			if (settlementType.getEvaluation() != null) {
-				SettlementRecord record = new SettlementRecord(settlementType, recordSet, application.getActiveChannelNumber());
+				SettlementRecord record = new SettlementRecord(settlementType, recordSet, Analyzer.getInstance().getActiveChannel().getNumber());
 				histoSettlements.put(settlementType.getName(), record);
 				if (transitions.isEmpty()) continue;
 

@@ -21,6 +21,7 @@ package gde.histo.settlements;
 
 import static java.util.logging.Level.FINE;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.data.Record;
 import gde.device.AmountTypes;
@@ -28,7 +29,6 @@ import gde.device.IDevice;
 import gde.device.TransitionAmountType;
 import gde.histo.transitions.Transition;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Collect settlement data for the trail recordset and subordinate objects.
@@ -50,7 +50,7 @@ public final class AmountEvaluator {
 	 * @param transition
 	 */
 	public void addFromTransition(Transition transition) {
-		IDevice device = DataExplorer.application.getActiveDevice();
+		IDevice device = Analyzer.getInstance().getActiveDevice();
 		TransitionAmountType transitionAmount = this.histoSettlement.getSettlement().getEvaluation().getTransitionAmount();
 		log.log(FINE, GDE.STRING_GREATER, transitionAmount);
 		final Record record = this.histoSettlement.getParent().get(this.histoSettlement.getParent().getRecordNames()[transitionAmount.getRefOrdinal()]);

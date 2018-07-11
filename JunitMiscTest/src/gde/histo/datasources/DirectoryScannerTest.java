@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.histo.base.SuperTestCase;
 import gde.histo.datasources.HistoSet.RebuildStep;
@@ -86,10 +87,10 @@ class DirectoryScannerTest extends SuperTestCase {
 
 			DirectoryScanner directoryScanner = new DirectoryScanner();
 			try {
-				RebuildStep realRebuildStep = directoryScanner.isValidated(application.getActiveDevice(), RebuildStep.F_FILE_CHECK);
+				RebuildStep realRebuildStep = directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
 				log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
 				assertEquals("rebuildStep after first scan    : ", RebuildStep.B_HISTOVAULTS, realRebuildStep);
-				assertEquals("rebuildStep 2nd scan w/o change : ", RebuildStep.F_FILE_CHECK, directoryScanner.isValidated(application.getActiveDevice(), RebuildStep.F_FILE_CHECK));
+				assertEquals("rebuildStep 2nd scan w/o change : ", RebuildStep.F_FILE_CHECK, directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK));
 
 				Path path = directoryScanner.getSourceFolders().values().stream().flatMap(Collection::stream).findFirst().orElse(Paths.get(""));
 				List<File> fileListing = FileUtils.getFileListing(path.toFile(), 1);
@@ -101,7 +102,7 @@ class DirectoryScannerTest extends SuperTestCase {
 				Thread.sleep(WatchDir.DELAY * 11 / 10); // wait 10% longer than the DELAY
 
 				// this is the actual test for watching osd files
-				assertEquals("rebuildStep", (boolean) sourceFileListenerActive, RebuildStep.B_HISTOVAULTS == directoryScanner.isValidated(application.getActiveDevice(), RebuildStep.F_FILE_CHECK));
+				assertEquals("rebuildStep", (boolean) sourceFileListenerActive, RebuildStep.B_HISTOVAULTS == directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK));
 
 				// copy to extension osd because this is the only one captured by WatchDir with all user settings
 				File fileCopyBin = fileListing.get(0).toPath().getParent().resolve("UnitTest.bin").toFile();
@@ -112,7 +113,7 @@ class DirectoryScannerTest extends SuperTestCase {
 
 				// this is the actual test for watching bin files
 				boolean supportsBinListener = searchDataPathImports && isBinSupported && sourceFileListenerActive;
-				assertEquals("rebuildStep", supportsBinListener, RebuildStep.B_HISTOVAULTS == directoryScanner.isValidated(application.getActiveDevice(), RebuildStep.F_FILE_CHECK));
+				assertEquals("rebuildStep", supportsBinListener, RebuildStep.B_HISTOVAULTS == directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK));
 			} catch (Exception e) {
 				e.printStackTrace();
 				fail("directory not accessible");
@@ -138,7 +139,7 @@ class DirectoryScannerTest extends SuperTestCase {
 
 		DirectoryScanner directoryScanner = new DirectoryScanner();
 		try {
-			directoryScanner.isValidated(application.getActiveDevice(), RebuildStep.F_FILE_CHECK);
+			directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
 			log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
 
 			// this is the actual test
@@ -165,7 +166,7 @@ class DirectoryScannerTest extends SuperTestCase {
 
 		DirectoryScanner directoryScanner = new DirectoryScanner();
 		try {
-			directoryScanner.isValidated(application.getActiveDevice(), RebuildStep.F_FILE_CHECK);
+			directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
 			log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
 			assertEquals("source folders size    : ", numberOfDirectories, directoryScanner.getSourceFolders().getMap().size());
 		} catch (Exception e) {
@@ -185,7 +186,7 @@ class DirectoryScannerTest extends SuperTestCase {
 	void testElapsed() {
 		settings.setSearchDataPathImports(true);
 		// take the non-device directories in the data path as object keys
-		Set<String> objectKeys = ObjectKeyCompliance.defineObjectKeyCandidates(application.getDeviceConfigurations().getAllConfigurations());
+		Set<String> objectKeys = ObjectKeyCompliance.defineObjectKeyCandidates(analyzer.getDeviceConfigurations().getAllConfigurations());
 		objectKeys.add(""); // empty string for 'device oriented'
 		this.settings.setObjectList(objectKeys.toArray(new String[0]), 0);
 
@@ -194,14 +195,14 @@ class DirectoryScannerTest extends SuperTestCase {
 			long nanoTime = System.nanoTime();
 			settings.setSourceFileListenerActive(b);
 
-			application.getDeviceConfigurations().getAllConfigurations().entrySet().stream().forEach(device -> {
+			analyzer.getDeviceConfigurations().getAllConfigurations().entrySet().stream().forEach(device -> {
 				for (String objectKey : objectKeys) {
 					// take the same instance of the scanner in order to get the performance optimization for channel switching
 					DirectoryScanner directoryScanner = new DirectoryScanner();
 					for (int i = 1; i <= device.getValue().getChannelCount(); i++) {
 						setDeviceChannelObject(device.getKey(), i, objectKey);
 						try {
-							directoryScanner.isValidated(application.getActiveDevice(), RebuildStep.F_FILE_CHECK);
+							directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
 							log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -215,6 +216,6 @@ class DirectoryScannerTest extends SuperTestCase {
 			elapsed_sec.add(TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - nanoTime));
 		});
 		log.log(Level.OFF, String.format("%d sec = %d+%d sec @%3d objects *%3d devices", //
-				elapsed_sec.get(0) + elapsed_sec.get(1), elapsed_sec.get(0), elapsed_sec.get(1), ObjectKeyCompliance.defineObjectKeyCandidates(application.getDeviceConfigurations().getAllConfigurations()).size(), application.getDeviceConfigurations().getAllConfigurations().size()));
+				elapsed_sec.get(0) + elapsed_sec.get(1), elapsed_sec.get(0), elapsed_sec.get(1), ObjectKeyCompliance.defineObjectKeyCandidates(analyzer.getDeviceConfigurations().getAllConfigurations()).size(), analyzer.getDeviceConfigurations().getAllConfigurations().size()));
 	}
 }

@@ -37,6 +37,7 @@ import java.util.Properties;
 
 import com.sun.istack.internal.Nullable;
 
+import gde.Analyzer;
 import gde.DataAccess;
 import gde.DataAccess.LocalAccess;
 import gde.GDE;
@@ -48,7 +49,6 @@ import gde.histo.innercache.CacheBuilder;
 import gde.histo.utils.SecureHash;
 import gde.log.Level;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Histo graphics visualization, store, restore.
@@ -124,7 +124,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 				loadFromXML(stream);
 			}
 
-			DeviceConfiguration configuration = DataExplorer.application.getDeviceConfigurations().get(convertedTemplate.deviceName);
+			DeviceConfiguration configuration = Analyzer.getInstance().getDeviceConfigurations().get(convertedTemplate.deviceName);
 			List<MeasurementType> channelMeasurements = configuration.getChannelMeasuremts(convertedTemplate.channelNumber);
 			try {
 				for (Map.Entry<Object, Object> entry : entrySet()) {

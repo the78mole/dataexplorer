@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.AbstractRecord;
@@ -235,10 +236,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @param timeSteps
 	 */
 	private TrailRecordSet(String[] recordNames, TimeSteps timeSteps) {
-		super(DataExplorer.application.getActiveDevice(), DataExplorer.application.getActiveChannelNumber(), //
-				DataExplorer.application.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + DataExplorer.application.getActiveChannelNumber(), //
+		super(Analyzer.getInstance().getActiveDevice(), Analyzer.getInstance().getActiveChannel().getNumber(), //
+				Analyzer.getInstance().getActiveDevice().getName() + GDE.STRING_UNDER_BAR + Analyzer.getInstance().getActiveChannel().getNumber(), //
 				recordNames, timeSteps);
-		this.template = HistoGraphicsTemplate.createGraphicsTemplate(this.device.getName(), DataExplorer.application.getActiveChannelNumber(), Settings.getInstance().getActiveObjectKey());
+		this.template = HistoGraphicsTemplate.createGraphicsTemplate(this.device.getName(), Analyzer.getInstance().getActiveChannel().getNumber(), Settings.getInstance().getActiveObjectKey());
 		this.template.load();
 
 		this.visibleAndDisplayableRecords = new Vector<TrailRecord>();
@@ -258,11 +259,11 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @return a trail record set containing all trail records (empty) as specified
 	 */
 	public static synchronized TrailRecordSet createRecordSet() {
-		DeviceConfiguration configuration = DataExplorer.application.getActiveDevice().getDeviceConfiguration();
+		DeviceConfiguration configuration = Analyzer.getInstance().getActiveDevice().getDeviceConfiguration();
 
 		TimeSteps timeSteps = new TimeSteps(-1, INITIAL_RECORD_CAPACITY);
 
-		String[] names = configuration.getMeasurementSettlementScoregroupNames(DataExplorer.application.getActiveChannelNumber());
+String[] names = configuration.getMeasurementSettlementScoregroupNames(Analyzer.getInstance().getActiveChannel().getNumber());
 		TrailRecordSet newTrailRecordSet = new TrailRecordSet(names, timeSteps);
 
 		BiConsumer<Integer, IChannelItem> measurementAction = (idx, itm) -> {
@@ -284,8 +285,8 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			log.fine(() -> "added scoregroup record for " + itm.getName() + " - " + idx);
 		};
 
-		ChannelItems channelItems = new ChannelItems(DataExplorer.application.getActiveDevice().getName(),
-				DataExplorer.application.getActiveChannelNumber());
+		ChannelItems channelItems = new ChannelItems(Analyzer.getInstance().getActiveDevice().getName(),
+				Analyzer.getInstance().getActiveChannel().getNumber());
 		channelItems.processItems(measurementAction, settlementAction, scoreGroupAction);
 		newTrailRecordSet.get(0).setColor(SWTResourceManager.getColor(0, 0, 0)); // top score group entry, set color to black
 
@@ -651,7 +652,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				setValueGridRecordName(gridRecord != null && gridRecord.isVisible() ? gridRecordName : gridDefaultRecordName);
 			}
 			setSmartStatistics(Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true")));
-			if (application.isWithUi()) presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(getChartWeights());
+			if (Analyzer.getInstance().isWithUi()) presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(getChartWeights());
 			log.fine(() -> "applied histo graphics template file " + template.getTargetFileSubPath());
 
 			if (doUpdateVisibilityStatus) {
@@ -673,7 +674,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 */
 	public void setSmartStatistics(boolean isActive) {
 		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(isActive));
-		if (application.isWithUi()) application.getPresentHistoExplorer().updateHistoMenuItems();
+		if (Analyzer.getInstance().isWithUi()) application.getPresentHistoExplorer().updateHistoMenuItems();
 	}
 
 	/**

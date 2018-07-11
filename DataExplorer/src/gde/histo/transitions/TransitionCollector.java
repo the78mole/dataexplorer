@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import gde.Analyzer;
 import gde.data.RecordSet;
 import gde.device.ChannelType;
 import gde.device.TransitionClassTypes;
@@ -33,7 +34,6 @@ import gde.device.TransitionGroupType;
 import gde.device.TransitionType;
 import gde.histo.transitions.GroupTransitions.TransitionChronicle;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Collect the transitions from a recordset.
@@ -52,7 +52,7 @@ public final class TransitionCollector {
 	public static GroupTransitions defineTransitions(RecordSet recordSet, int logChannelNumber) {
 		final GroupTransitions groupTransitions = new GroupTransitions(recordSet);
 
-		final ChannelType channelType = DataExplorer.application.getActiveDevice().getDeviceConfiguration().getChannel(logChannelNumber);
+		final ChannelType channelType = Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getChannel(logChannelNumber);
 		for (TransitionType transitionType : channelType.getTransitions().values()) {
 			TransitionChronicle transitionsFromRecord = findTransitions(recordSet, transitionType);
 			if (!transitionsFromRecord.isEmpty()) {

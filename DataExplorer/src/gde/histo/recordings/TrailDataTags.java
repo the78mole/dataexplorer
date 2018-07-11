@@ -27,6 +27,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.cache.ExtendedVault;
@@ -37,7 +38,6 @@ import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.histo.utils.GpsCoordinate;
 import gde.log.Level;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Tags corresponding to timestep entries.
@@ -171,7 +171,7 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 				String channelNumber = this.get(DataTag.CHANNEL_NUMBER).get(0);
 				boolean sameChannel = true;
 				for (String tmp : this.get(DataTag.CHANNEL_NUMBER)) {
-					if (!tmp.equals(channelNumber) || DataExplorer.application.getActiveChannelNumber() != Integer.parseInt(tmp)) {
+					if (!tmp.equals(channelNumber) || Analyzer.getInstance().getActiveChannel().getNumber() != Integer.parseInt(tmp)) {
 						sameChannel = false;
 						break;
 					}

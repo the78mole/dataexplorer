@@ -172,7 +172,7 @@ public class HoTTbinReader {
 					file_input = null;
 					return getFileInfo(outputFile);
 				}
-				DataExplorer.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
+				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
 				throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
 			}
 			else if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_LOG) && new String(buffer).startsWith("FILE TAG IDVER")) {

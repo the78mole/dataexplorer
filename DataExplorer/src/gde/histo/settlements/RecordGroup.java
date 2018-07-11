@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import gde.Analyzer;
 import gde.data.Record;
 import gde.device.MeasurementMappingType;
 import gde.device.ReferenceGroupType;
 import gde.device.ReferenceRuleTypes;
 import gde.histo.utils.Spot;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Perform the aggregation of translated record values.
@@ -77,7 +77,7 @@ public final class RecordGroup {
 		double result = 0;
 		for (int i = 0; i < this.records.length; i++) {
 			Record record = this.records[i];
-			final double translatedValue = DataExplorer.application.getActiveDevice().translateValue(record, record.getRealMaxValue() / 1000.);
+			final double translatedValue = Analyzer.getInstance().getActiveDevice().translateValue(record, record.getRealMaxValue() / 1000.);
 			result = calculateAggregate(result, i, translatedValue);
 		}
 		return result;
@@ -90,7 +90,7 @@ public final class RecordGroup {
 		double result = 0;
 		for (int i = 0; i < this.records.length; i++) {
 			Record record = this.records[i];
-			final double translatedValue = DataExplorer.application.getActiveDevice().translateValue(record, record.getRealMinValue() / 1000.);
+			final double translatedValue = Analyzer.getInstance().getActiveDevice().translateValue(record, record.getRealMinValue() / 1000.);
 			result = calculateAggregate(result, i, translatedValue);
 		}
 		return result;
@@ -108,7 +108,7 @@ public final class RecordGroup {
 				result = null;
 				break;
 			} else {
-				final double translatedValue = DataExplorer.application.getActiveDevice().translateValue(record, record.elementAt(index) / 1000.);
+				final double translatedValue = Analyzer.getInstance().getActiveDevice().translateValue(record, record.elementAt(index) / 1000.);
 				result = calculateAggregate(result, i, translatedValue);
 			}
 		}
