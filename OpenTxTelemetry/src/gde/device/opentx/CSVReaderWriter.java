@@ -245,15 +245,14 @@ public class CSVReaderWriter {
 					activeChannel = CSVReaderWriter.channels.getActiveChannel();
 				}
 
-				String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend;
 				String[] tmpRecordNames = fileHeader.get(GDE.CSV_DATA_HEADER_MEASUREMENTS).split(GDE.STRING_SEMICOLON);
 				String[] tmpRecordUnits = fileHeader.get(GDE.CSV_DATA_HEADER_UNITS).split(GDE.STRING_SEMICOLON);
 				String[] tmpRecordSymbols = new String[tmpRecordNames.length];
 				for (int i = 0; i < tmpRecordNames.length; i++) {
 					tmpRecordSymbols[i] = GDE.STRING_EMPTY;
 				}
-				recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), tmpRecordNames, tmpRecordSymbols, tmpRecordUnits, device.getTimeStep_ms(), true, true, true);
-				recordSetName = recordSet.getName(); // cut length
+				recordSet = createRecordSet(recordSetNameExtend, device, activeChannel, tmpRecordNames, tmpRecordUnits, tmpRecordSymbols);
+				String recordSetName = recordSet.getName(); // cut length
 
 				//find GPS related records and try to assign data type
 				for (int i = 0; i < recordSet.size(); i++) {
@@ -306,6 +305,22 @@ public class CSVReaderWriter {
 					long timeStamp = calendar.getTimeInMillis() + millis;
 
 					if (lastTimeStamp < timeStamp) {
+						if (timeStamp - lastTimeStamp > 1000) {
+							System.out.println("time diff = " + (timeStamp - lastTimeStamp));
+							System.out.println("record entries = " + (recordSet.get(0).size()));
+							if (recordSet.get(0).size() > 100) {
+								recordSet.setSaved(true);
+								activeChannel.put(recordSetName, recordSet);
+								activeChannel.setActiveRecordSet(recordSetName);
+								activeChannel.applyTemplate(recordSetName, true);
+								if (CSVReaderWriter.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+							}
+
+							recordSet = createRecordSet(recordSetNameExtend, device, activeChannel, tmpRecordNames, tmpRecordUnits, tmpRecordSymbols);
+							recordSetName = recordSet.getName(); // cut length
+							lastTimeStamp = startTimeStamp = 0;
+						}
+						
 						time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));
 						lastTimeStamp = timeStamp;
 						if (startTimeStamp == 0) {
@@ -313,6 +328,7 @@ public class CSVReaderWriter {
 							recordSet.setRecordSetDescription(
 									device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp));
 							recordSet.setStartTimeStamp(startTimeStamp);
+							recordSet.descriptionAppendFilename(filePath);
 							activeChannel.setFileDescription((new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp)).substring(0, 10) + activeChannel.getFileDescription().substring(10));
 						}
 					}
@@ -398,6 +414,22 @@ public class CSVReaderWriter {
 			}
 		}
 
+		return recordSet;
+	}
+
+	/**
+	 * create a new recordSet - time gap occured 
+	 * @param recordSetNameExtend
+	 * @param device
+	 * @param activeChannel
+	 * @param tmpRecordNames
+	 * @param tmpRecordUnits
+	 * @param tmpRecordSymbols
+	 * @return
+	 */
+	private static RecordSet createRecordSet(String recordSetNameExtend, IDevice device, Channel activeChannel, String[] tmpRecordNames, String[] tmpRecordUnits, String[] tmpRecordSymbols) {
+		String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend;
+		RecordSet recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), tmpRecordNames, tmpRecordSymbols, tmpRecordUnits, device.getTimeStep_ms(), true, true, true);
 		return recordSet;
 	}
 

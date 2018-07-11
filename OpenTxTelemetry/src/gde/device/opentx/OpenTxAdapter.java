@@ -593,7 +593,6 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 							try {
 								RecordSet activeRecordSet = CSVReaderWriter.read(OpenTxAdapter.this.getDataBlockSeparator().value().charAt(0), selectedImportFile, OpenTxAdapter.this.getRecordSetStemNameReplacement());
 								OpenTxAdapter.this.updateVisibilityStatus(activeRecordSet, true);
-								activeRecordSet.descriptionAppendFilename(selectedImportFile);
 							}
 							catch (Throwable e) {
 								OpenTxAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);

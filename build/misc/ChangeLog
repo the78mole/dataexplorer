@@ -16,6 +16,7 @@ Device specific changes/fixes
 	* S32 - fix external temperature factor according customer feedback
 	* Ultramat* single channel charger - fix possible NullPointerException
 	* OpenTx-Telemetry - fix potential exception, add some more mapping parameter, enable visualization control and help
+	* OpenTx-Telemetry - split log according time entries into separate record sets
 	* Futaba-Telemetry - fix parsing exception "---", enable visualization control and help
 	* Futaba-Telemetry - fix EOFException saving OSD with record set different real size
 	* Hitec X1 Red - add initial support (alpha)
