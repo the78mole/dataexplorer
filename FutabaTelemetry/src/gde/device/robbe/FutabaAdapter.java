@@ -701,4 +701,30 @@ public class FutabaAdapter extends DeviceConfiguration implements IDevice {
 				findRecordByType(activeRecordSet, Record.DataType.GPS_LATITUDE), findRecordByType(activeRecordSet, Record.DataType.GPS_ALTITUDE), findRecordByUnit(activeRecordSet, "km/h"),
 				findRecordByUnit(activeRecordSet, "m/s"), findRecordByUnit(activeRecordSet, "km"), -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		//check record entries in file contained record properties which are not contained in actual configuration
+		String[] recordKeys = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		int numberRecordSetEntries = recordSet.realSize();
+		if ((numberRecordSetEntries - fileRecordsProperties.length) > 0) { 
+			for (int i = 0; i < fileRecordsProperties.length; ++i) {
+				cleanedRecordNames.add(recordKeys[i]);
+			}
+			//cleanup recordSet
+			for (int i = fileRecordsProperties.length; i < numberRecordSetEntries; ++i) {
+				recordSet.remove(recordKeys[i]);
+			}
+			recordKeys = cleanedRecordNames.toArray(new String[1]);
+		}
+		return recordKeys;
+	}
 }

@@ -17,6 +17,7 @@ Device specific changes/fixes
 	* Ultramat* single channel charger - fix possible NullPointerException
 	* OpenTx-Telemetry - fix potential exception, add some more mapping parameter, enable visualization control and help
 	* Futaba-Telemetry - fix parsing exception "---", enable visualization control and help
+	* Futaba-Telemetry - fix EOFException saving OSD with record set different real size
 
 History analysis
 	* Enhance UI
