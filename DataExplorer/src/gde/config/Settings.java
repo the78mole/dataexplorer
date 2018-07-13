@@ -58,7 +58,6 @@ import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.FileUtils;
 import gde.utils.RecordSetNameComparator;
@@ -712,9 +711,9 @@ public class Settings extends Properties {
 		this.cbSizes = StringHelper.pointArrayToString(sizes);
 	}
 
-	public int[] getCoolBarOrder() {
+	public int[] getCoolBarOrder(String defaultCoolBarSizes) {
 		int[] intOrder = StringHelper.stringToIntArray(this.getProperty(Settings.COOLBAR_ORDER, "0;1;2;3;4").trim()); //$NON-NLS-1$
-		int coolBarSize = this.getCoolBarSizes().length;
+		int coolBarSize = this.getCoolBarSizes(defaultCoolBarSizes).length;
 		if (intOrder.length != coolBarSize) {
 			StringBuffer sb = new StringBuffer();
 			for (int i = 0; i < coolBarSize; i++) {
@@ -729,8 +728,8 @@ public class Settings extends Properties {
 		return StringHelper.stringToIntArray(this.getProperty(Settings.COOLBAR_WRAPS, "0;3").trim()); //$NON-NLS-1$
 	}
 
-	public Point[] getCoolBarSizes() {
-		return StringHelper.stringToPointArray(this.getProperty(Settings.COOLBAR_SIZES, DataExplorer.getInstance().getMenuToolBar().getCoolBarSizes()).trim());
+	public Point[] getCoolBarSizes(String defaultCoolBarSizes) {
+		return StringHelper.stringToPointArray(this.getProperty(Settings.COOLBAR_SIZES, defaultCoolBarSizes).trim());
 	}
 
 	public List<String> getFileHistory() {

@@ -320,7 +320,7 @@ public class DataExplorer extends Composite {
 				this.menuToolBar = new MenuToolBar(this, this.menuCoolBar);
 				this.menuToolBar.create();
 				// restore cool bar items position and wrap
-				this.menuCoolBar.setItemLayout(this.settings.getCoolBarOrder(), this.settings.getCoolBarWraps(), this.settings.getCoolBarSizes());
+				this.menuCoolBar.setItemLayout(this.settings.getCoolBarOrder(DataExplorer.getInstance().getMenuToolBar().getCoolBarSizes()), this.settings.getCoolBarWraps(), this.settings.getCoolBarSizes(DataExplorer.getInstance().getMenuToolBar().getCoolBarSizes()));
 			}
 			{ // begin main tab display
 				this.displayTab = new CTabFolder(this, SWT.BORDER);
