@@ -110,7 +110,7 @@ public final class MeasurementTrailSelector extends TrailSelector {
 		final boolean[] applicablePrimitiveTrails;
 		applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
 		StatisticsType measurementStatistics = ((MeasurementType) channelItem).getStatistics();
-		if (smartStatistics) {
+		if (!smartStatistics) {
 			if (measurementStatistics != null) {
 				if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 					applicablePrimitiveTrails[TrailTypes.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
