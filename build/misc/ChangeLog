@@ -21,6 +21,7 @@ Device specific changes/fixes
 	* Futaba-Telemetry - fix parsing exception "---", enable visualization control and help
 	* Futaba-Telemetry - fix EOFException saving OSD with record set different real size
 	* Hitec X1 Red - add initial support (alpha)
+	* WSTech DataVario - replace German description with supposed key
 
 History analysis
 	* Enhance UI
