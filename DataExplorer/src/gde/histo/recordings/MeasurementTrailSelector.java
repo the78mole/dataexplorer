@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import gde.GDE;
 import gde.device.MeasurementType;
 import gde.device.StatisticsType;
 import gde.device.TrailDisplayType;
@@ -35,6 +36,9 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert
  */
 public final class MeasurementTrailSelector extends TrailSelector {
+
+	private String	triggerScaleRawText	= GDE.STRING_EMPTY;
+	private String	triggerScaleUnit		= GDE.STRING_EMPTY;
 
 	public MeasurementTrailSelector(TrailRecord trailRecord) {
 		super(trailRecord);
@@ -109,23 +113,72 @@ public final class MeasurementTrailSelector extends TrailSelector {
 	private boolean[] getApplicableLegacyTrails() {
 		final boolean[] applicablePrimitiveTrails;
 		applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
-		StatisticsType measurementStatistics = ((MeasurementType) channelItem).getStatistics();
-		if (!smartStatistics) {
-			if (measurementStatistics != null) {
-				if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
-					applicablePrimitiveTrails[TrailTypes.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
-					if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-						StatisticsType referencedStatistics = DataExplorer.application.getActiveDevice().getMeasurementStatistic(channelConfigNumber, measurementStatistics.getRatioRefOrdinal());
-						applicablePrimitiveTrails[TrailTypes.REAL_AVG_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isAvg();
-						applicablePrimitiveTrails[TrailTypes.REAL_MAX_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isMax();
-					}
-				}
-				applicablePrimitiveTrails[TrailTypes.REAL_TIME_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1);
-				applicablePrimitiveTrails[TrailTypes.REAL_COUNT_TRIGGERED.ordinal()] = (measurementStatistics.isCountByTrigger() != null);
+		if (!smartStatistics && ((MeasurementType) channelItem).getStatistics() != null) {
+			StatisticsType measurementStatistics = ((MeasurementType) channelItem).getStatistics();
+			if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
+				applicablePrimitiveTrails[TrailTypes.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
 			}
+			if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
+				StatisticsType referencedStatistics = DataExplorer.getInstance().getActiveDevice().getMeasurementStatistic(channelConfigNumber, measurementStatistics.getRatioRefOrdinal());
+				applicablePrimitiveTrails[TrailTypes.REAL_AVG_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isAvg();
+				applicablePrimitiveTrails[TrailTypes.REAL_MAX_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isMax();
+			}
+			applicablePrimitiveTrails[TrailTypes.REAL_TIME_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1);
+			applicablePrimitiveTrails[TrailTypes.REAL_COUNT_TRIGGERED.ordinal()] = (measurementStatistics.isCountByTrigger() != null);
 			// applicablePrimitiveTrails[TrailTypes.REAL_SUM.ordinal()] = false; // in settlements only
 		}
 		return applicablePrimitiveTrails;
 	}
 
+	/**
+	 * Select the trail record (or the suite if applicable) if the selection has changed.
+	 * @param value position / index of the trail type in the current list of applicable trails
+	 */
+	@Override // reason is trigger texts
+	public void setTrailTextSelectedIndex(int value) {
+		this.trailTextSelectedIndex = value;
+		setTriggerScaleTexts(getTrailType());
+	}
+
+	protected void setTriggerScaleTexts(TrailTypes trailType) {
+		if (!smartStatistics || ((MeasurementType) channelItem).getStatistics() == null) {
+			StatisticsType measurementStatistics = ((MeasurementType) channelItem).getStatistics();
+			if (trailType == TrailTypes.REAL_SUM_TRIGGERED //
+					&& measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1 && measurementStatistics.getSumByTriggerRefOrdinal() != null) {
+				this.triggerScaleRawText = measurementStatistics.getSumTriggerText();
+				this.triggerScaleUnit = channelItem.getUnit();
+			} else if ((trailType == TrailTypes.REAL_AVG_RATIO_TRIGGERED || trailType == TrailTypes.REAL_MAX_RATIO_TRIGGERED) //
+					&& measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
+				this.triggerScaleRawText = measurementStatistics.getRatioText();
+				this.triggerScaleUnit = GDE.STRING_SLASH + channelItem.getUnit();
+			} else if (trailType == TrailTypes.REAL_TIME_SUM_TRIGGERED //
+					&& measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
+				this.triggerScaleRawText = measurementStatistics.getSumTriggerTimeText();
+				this.triggerScaleUnit = "sec";
+			} else if (trailType == TrailTypes.REAL_COUNT_TRIGGERED //
+					&& measurementStatistics.isCountByTrigger() != null) {
+				this.triggerScaleRawText = measurementStatistics.getCountTriggerText();
+				this.triggerScaleUnit = "1";
+			}
+		} else {
+			this.triggerScaleRawText = GDE.STRING_EMPTY;
+			this.triggerScaleUnit = GDE.STRING_EMPTY;
+		}
+	}
+
+	/**
+	 * Trigger values (e.g. text_trigger_motor_sum) require individual scale texts.
+	 * @return the scale text prior to XML replacement
+	 */
+	public String getTriggerScaleRawText() {
+		return this.triggerScaleRawText;
+	}
+
+	/**
+	 * Trigger values (e.g. text_trigger_count) require individual scale units.
+	 * @return the scale unit text or the denominator in case of a trigger ratio (prefixed by '/')
+	 */
+	public String getTriggerScaleUnit() {
+		return this.triggerScaleUnit;
+	}
 }

@@ -379,46 +379,32 @@ public final class HistoCurveUtils {
 		log.finer(() -> record.getName() + "  x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
 
-		String graphText = record.isScaleSyncMaster() ? record.getSyncMasterName() : DeviceXmlResource.getInstance().getReplacement(record.getName());
-		if (record.getSymbol() != null && record.getSymbol().length() > 0) graphText = graphText + "   " + record.getSymbol();
-		if (record.getUnit() != null && record.getUnit().length() > 0) graphText = graphText + "   [" + record.getUnit() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-
 		// adapt number space calculation to real displayed max number
 		Point pt = gc.textExtent("000,00"); //$NON-NLS-1$
 		int ticklength = 5;
 		int gap = 10;
 
-		// prepare axis position
 		gc.setLineWidth(2);
 		gc.setLineStyle(SWT.LINE_SOLID);
-		boolean isPositionLeft = record.isPositionLeft();
-		int positionNumber = record.getParent().getAxisPosition(record.getName(), isPositionLeft);
-		log.fine(() -> record.getName() + " positionNumber = " + positionNumber); //$NON-NLS-1$
-		if (drawScaleInRecordColor)
-			gc.setForeground(record.getColor()); // draw the main scale line in same color as the curve
-		else
-			gc.setForeground(DataExplorer.COLOR_BLACK);
-		if (isPositionLeft) {
+		gc.setForeground(drawScaleInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK);
+		if (record.isPositionLeft()) {
+			int positionNumber = record.getParent().getAxisPosition(record.getName(), record.isPositionLeft());
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); // xPos = x0
 			log.fine(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); // yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, graphicsData.getMinDisplayValue(), graphicsData.getMaxDisplayValue(), ticklength, gap, isPositionLeft, drawNumbersInRecordColor);
-			log.finest(() -> "drawText x = " + (xPos - pt.y - 15)); // xPosition Text Spannung [] //$NON-NLS-1$
-			if (drawNameInRecordColor)
-				gc.setForeground(record.getColor());
-			else
-				gc.setForeground(DataExplorer.COLOR_BLACK);
-			GraphicsUtils.drawTextCentered(graphText, (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
+			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, graphicsData.getMinDisplayValue(), graphicsData.getMaxDisplayValue(), ticklength, gap, record.isPositionLeft(), drawNumbersInRecordColor);
+
+			gc.setForeground(drawNameInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK);
+			GraphicsUtils.drawTextCentered(record.getScaleText(), (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
 		} else {
+			int positionNumber = record.getParent().getAxisPosition(record.getName(), record.isPositionLeft());
 			int xPos = x0 + 1 + width + positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0 + 1, xPos, y0 - height - 1); // yMax
 			log.fine(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height));
-			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, graphicsData.getMinDisplayValue(), graphicsData.getMaxDisplayValue(), ticklength, gap, isPositionLeft, drawNumbersInRecordColor);
-			if (drawNameInRecordColor)
-				gc.setForeground(record.getColor());
-			else
-				gc.setForeground(DataExplorer.COLOR_BLACK);
-			GraphicsUtils.drawTextCentered(graphText, (xPos + scaleWidthSpace - pt.y - 5), y0 / 2 + (y0 - height), gc, SWT.UP);
+			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, graphicsData.getMinDisplayValue(), graphicsData.getMaxDisplayValue(), ticklength, gap, record.isPositionLeft(), drawNumbersInRecordColor);
+
+			gc.setForeground(drawNameInRecordColor ? record.getColor() : DataExplorer.COLOR_BLACK);
+			GraphicsUtils.drawTextCentered(record.getScaleText(), (xPos + scaleWidthSpace - pt.y - 5), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
 	}
 

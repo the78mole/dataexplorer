@@ -23,6 +23,7 @@ Device specific changes/fixes
 
 History analysis
 	* Enhance UI
+		>> Add support for triggered values (e.g. motor runtime height)
 		>> Add refresh menu item and shortcut
 		>> Add object key wizard (if accessing new directories) 
 		>> Remove MessageBox "No log files"

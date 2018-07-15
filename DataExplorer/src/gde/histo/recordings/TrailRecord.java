@@ -44,6 +44,7 @@ import gde.data.Record.DataType;
 import gde.device.IChannelItem;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
+import gde.device.MeasurementType;
 import gde.device.PropertyType;
 import gde.device.TrailTypes;
 import gde.device.resource.DeviceXmlResource;
@@ -82,8 +83,8 @@ public abstract class TrailRecord extends CommonRecord {
 		boolean				isStartpointZero	= false;
 		boolean				isStartEndDefined	= false;
 		DecimalFormat	df								= new DecimalFormat("0.0");
-		int						numberFormat			= -1;												// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
-		double				maxScaleValue			= 0.;												// overwrite calculated boundaries
+		int						numberFormat			= -1;																						// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
+		double				maxScaleValue			= 0.;																						// overwrite calculated boundaries
 		double				minScaleValue			= 0.;
 
 		/**
@@ -409,6 +410,37 @@ public abstract class TrailRecord extends CommonRecord {
 			sb.append(GDE.STRING_MESSAGE_CONCAT).append(syncedChildren.lastElement().getNameReplacement());
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Support triggered (calculated) statistics values.
+	 * @return the graphics scale description including the symbol and the unit
+	 */
+	public String getScaleText() {
+		String graphText;
+		if (isScaleSyncMaster()) {
+			graphText = getSyncMasterName();
+			graphText += getSymbol() != null && getSymbol().length() > 0 ? "   " + getSymbol() : "";
+			graphText += getUnit() != null && getUnit().length() > 0 ? "   [" + getUnit() + "]" : "   []";
+		} else {
+			String triggerScaleRawText = GDE.STRING_EMPTY;
+			String triggerScaleUnit = GDE.STRING_EMPTY;
+			if (getTrailSelector().getTrailType().isTriggered()) {
+				triggerScaleRawText = ((MeasurementTrailSelector) getTrailSelector()).getTriggerScaleRawText();
+				triggerScaleUnit = ((MeasurementTrailSelector) getTrailSelector()).getTriggerScaleUnit();
+				if (!triggerScaleUnit.isEmpty() && triggerScaleUnit.startsWith(GDE.STRING_SLASH)) {
+					TrailRecord referencedRatioRecord = getParent().get(((int) ((MeasurementType) getChannelItem()).getStatistics().getRatioRefOrdinal()));
+					triggerScaleUnit = referencedRatioRecord.getUnit() + triggerScaleUnit;
+				}
+			}
+
+			graphText = triggerScaleRawText.isEmpty() ? DeviceXmlResource.getInstance().getReplacement(getName())
+					: DeviceXmlResource.getInstance().getReplacement(triggerScaleRawText);
+			graphText += getSymbol() != null && getSymbol().length() > 0 && triggerScaleRawText.isEmpty() ? "   " + getSymbol() : "";
+			graphText += getUnit() != null && getUnit().length() > 0 && triggerScaleRawText.isEmpty() ? "   [" + getUnit() + "]"
+					: "   [" + triggerScaleUnit + "]";
+		}
+		return graphText;
 	}
 
 	@Override // reason is translateValue which accesses the device for offset etc.

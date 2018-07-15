@@ -91,7 +91,7 @@ public abstract class TrailSelector {
 	}
 
 	/**
-	 * Build the suite of trail records if the selection has changed.
+	 * Select the trail record (or the suite if applicable) if the selection has changed.
 	 * @param value position / index of the trail type in the current list of applicable trails
 	 */
 	public void setTrailTextSelectedIndex(int value) {
