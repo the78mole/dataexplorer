@@ -305,7 +305,8 @@ public class GraphicsWindow extends CTabItem {
 		this.graphicSashForm.print(imageGC);
 		if (GDE.IS_MAC) {
 			Image graphics = this.graphicsComposite.getGraphicsPrintImage();
-			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(this.graphicsComposite.getGraphicsPrintImage().getImageData())), bounds.width - graphics.getBounds().width, 0);
+			if (graphics != null)
+				imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(this.graphicsComposite.getGraphicsPrintImage().getImageData())), bounds.width - graphics.getBounds().width, 0);
 		}
 		imageGC.dispose();
 
