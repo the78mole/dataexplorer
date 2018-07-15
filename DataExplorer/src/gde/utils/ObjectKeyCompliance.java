@@ -353,7 +353,7 @@ public class ObjectKeyCompliance {
 	 */
 	public static void checkChannelForObjectKeyMissmatch(String newObjectKey) {
 		Channel activeChannel = Channels.getInstance().getActiveChannel();
-		if (activeChannel != null && !activeChannel.getObjectKey().isEmpty()) {
+		if (activeChannel != null) {
 			String channelObjKey = activeChannel.getObjectKey();
 
 			// check if selected key matches the existing object key or is new for this channel
@@ -371,9 +371,9 @@ public class ObjectKeyCompliance {
 						if (newObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
 							updateFileDescription = updateFileDescription.substring(0, updateFileDescription.indexOf(channelObjKey)) + newObjectKey + updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey) + channelObjKey.length());
 						} else { // newObjectKey = ""
-							updateFileDescription = updateFileDescription.substring(0, updateFileDescription.indexOf(channelObjKey) - 1) + updateFileDescription.substring(updateFileDescription.indexOf(channelObjKey) + channelObjKey.length());
+							updateFileDescription = updateFileDescription.substring(0, updateFileDescription.indexOf(channelObjKey) - 1) + updateFileDescription.substring(updateFileDescription.lastIndexOf(channelObjKey) + channelObjKey.length());
 						}
-					} else if (newObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) {
+					} else if (newObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH && !updateFileDescription.contains(newObjectKey)) {
 						updateFileDescription = updateFileDescription + GDE.STRING_BLANK + newObjectKey;
 					}
 					activeChannel.setFileDescription(updateFileDescription);

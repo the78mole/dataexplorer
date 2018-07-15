@@ -8,6 +8,7 @@ Generic changes/fixes
 	* enhance calculation of synched scale label 
 	* Reduce DataExplorer startup duration
 	* Ask user for confirmation prior to purging an object key
+	* fix channel object key handling, channels of type outlet (chargers) might have different object key, update object selector accordingly
 Device specific changes/fixes
 	* HoTTAdapter* add file selection hint for *.bin;*.log 
 	* S32 - fix factor to correct external temperatures

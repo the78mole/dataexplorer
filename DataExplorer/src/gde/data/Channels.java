@@ -169,10 +169,12 @@ public class Channels extends HashMap<Integer, Channel> {
 
 		if (!(channelNumber > this.keySet().size())) {
 			if (channelNumber != this.getActiveChannelNumber() || this.getActiveChannel().getActiveRecordSet() == null) {
-				// switching the channel may change the current object key
 				String currentObjectKey = Channels.this.getActiveChannel().getObjectKey();
 				this.setActiveChannelNumber(channelNumber);
-				Channels.this.getActiveChannel().setObjectKey(currentObjectKey);
+				if (this.getActiveChannel().getType() == ChannelTypes.TYPE_CONFIG) {
+					// switching the channel may change the current object key
+					Channels.this.getActiveChannel().setObjectKey(currentObjectKey);
+				}
 				this.application.getMenuToolBar().updateChannelToolItems();
 				if (recordSetKey == null || recordSetKey.length() < 1)
 					this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getLastActiveRecordSetName());

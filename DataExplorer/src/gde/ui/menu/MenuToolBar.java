@@ -46,6 +46,7 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
+import gde.device.ChannelTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
@@ -100,7 +101,7 @@ public class MenuToolBar {
 	ToolItem						zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, scopePointsComboSep;
 	Composite						scopePointsComposite;
 	CCombo							scopePointsCombo;
-	Point													scopePointsComboSize = new Point(70, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
+	Point								scopePointsComboSize = new Point(70, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
 	static final int		leadFill							= 4 + (GDE.IS_WINDOWS == true ? 0 : 3);
 	static final int		trailFill							= 4 + (GDE.IS_WINDOWS == true ? 0 : 3);
 	boolean							isScopePointsCombo		= true;
@@ -118,8 +119,8 @@ public class MenuToolBar {
 	ToolItem						nextChannel, prevChannel, prevRecord, nextRecord, separator, deleteRecord, editRecord;
 	Composite						channelSelectComposite, recordSelectComposite;
 	CCombo							channelSelectCombo, recordSelectCombo;
-	Point													channelSelectSize = new Point(180, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
-	Point													recordSelectSize = new Point(260, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
+	Point								channelSelectSize = new Point(180, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
+	Point								recordSelectSize = new Point(260, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
 
 	CoolItem						helpCoolItem;
 	ToolBar							helpToolBar;
@@ -1161,7 +1162,7 @@ public class MenuToolBar {
 			this.channelSelectCombo.setItems(new String[] { GDE.STRING_EMPTY });
 		}
 		this.channelSelectCombo.select(activeChannelNumber); // kanalCombo.setText("K1: Kanal 1");
-		updateChannelToolItems();
+		this.updateChannelToolItems();
 	}
 
 	/**
@@ -1273,6 +1274,9 @@ public class MenuToolBar {
 					this.prevChannel.setEnabled(true);
 				}
 			}
+		}
+		if (this.application.getActiveChannel() != null && this.application.getActiveChannel().getType() == ChannelTypes.TYPE_OUTLET) { // update is needed for type outlet only
+			this.updateObjectSelector();
 		}
 	}
 
