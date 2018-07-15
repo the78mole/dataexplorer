@@ -93,6 +93,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 
 	@Override
 	public void scrollSummaryComposite() {
+		if (windowActor.getTrailRecordSet() == null) return ;
 		if (windowActor.getTrailRecordSet().isSmartStatistics()) {
 			int fixedTotalHeight = getSummaryComposite().orElseGet(null).getFixedTotalHeight();
 			int actualHeight = Arrays.stream(this.compositeSashForm.getChildren()).filter(c -> c instanceof AbstractChartComposite) //
@@ -115,6 +116,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 	 */
 	@Override
 	protected void setTemplateChart() {
+		if (windowActor.getTrailRecordSet() == null) return ;
 		resizeCompositeSashForm(windowActor.getTrailRecordSet().getChartWeights());
 	}
 
@@ -145,10 +147,10 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 	 */
 	@Override
 	public void redrawGraphics(final boolean redrawCurveSelector) {
-		if (windowActor.getTrailRecordSet() == null) return ;
 
 		if (Thread.currentThread().getId() == DataExplorer.getInstance().getThreadId()) {
 			if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
+			if (windowActor.getTrailRecordSet() == null) return ;
 			if (!windowActor.getTrailRecordSet().isSmartStatistics()) setTemplateChart();
 
 			for (AbstractChartComposite c : getCharts()) {
@@ -162,6 +164,7 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 				@Override
 				public void run() {
 					if (redrawCurveSelector) curveSelectorComposite.doUpdateCurveSelectorTable();
+					if (windowActor.getTrailRecordSet() == null) return ;
 					if (!windowActor.getTrailRecordSet().isSmartStatistics()) setTemplateChart();
 
 					for (AbstractChartComposite c : getCharts()) {

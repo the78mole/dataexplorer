@@ -268,6 +268,8 @@ public final class SelectorComposite extends Composite {
 	 * Update of the curve selector table.
 	 */
 	public synchronized void doUpdateCurveSelectorTable() {
+		if (windowActor.getTrailRecordSet() == null) return ;
+
 		{
 			boolean smartStatistics = windowActor.getTrailRecordSet().isSmartStatistics();
 			this.chartSelector.setEnabled(smartStatistics);
@@ -401,6 +403,8 @@ public final class SelectorComposite extends Composite {
 	}
 
 	public void setRecordSelection(TrailRecord activeRecord, int selectIndex) {
+		if (windowActor.getTrailRecordSet() == null) return ;
+
 		int displayIndex = -1;
 		for (int i = 0; i < this.curveSelectorTable.getItems().length; i++) {
 			TableItem tableItem2 = this.curveSelectorTable.getItems()[i];
@@ -466,6 +470,8 @@ public final class SelectorComposite extends Composite {
 	 */
 	@Nullable
 	private TrailRecord getTableItemRecord(TableItem item) {
+		if (windowActor.getTrailRecordSet() == null) return null;
+
 		TrailRecordSet trailRecordSet = windowActor.getTrailRecordSet();
 		return trailRecordSet != null ? trailRecordSet.get(item.getData(DataExplorer.RECORD_NAME)) : null;
 	}
