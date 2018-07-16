@@ -83,8 +83,8 @@ public abstract class TrailRecord extends CommonRecord {
 		boolean				isStartpointZero	= false;
 		boolean				isStartEndDefined	= false;
 		DecimalFormat	df								= new DecimalFormat("0.0");
-		int						numberFormat			= -1;																						// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
-		double				maxScaleValue			= 0.;																						// overwrite calculated boundaries
+		int						numberFormat			= -1;												// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
+		double				maxScaleValue			= 0.;												// overwrite calculated boundaries
 		double				minScaleValue			= 0.;
 
 		/**
@@ -850,6 +850,23 @@ public abstract class TrailRecord extends CommonRecord {
 
 	public IChannelItem getChannelItem() {
 		return this.channelItem;
+	}
+
+	/**
+	 * @param trailTextOrdinal is the ordinal of the applicable trail texts or a negative number (take the prioritized trail type from
+	 *          applicable trails)
+	 */
+	public void setSelectedTrail(int trailTextOrdinal) {
+		if (trailTextOrdinal >= 0 && trailTextOrdinal < trailSelector.getApplicableTrailsTexts().size()) {
+			trailSelector.setTrailTextSelectedIndex(trailTextOrdinal);
+		} else {
+			trailSelector.setMostApplicableTrailTextOrdinal();
+		}
+		if (trailSelector.getTrailTextSelectedIndex() < 0) {
+			log.info(() -> String.format("%s : no trail types identified" + name)); //$NON-NLS-1$
+		} else {
+			log.log(FINER, "", trailSelector); //$NON-NLS-1$
+		}
 	}
 
 	/**

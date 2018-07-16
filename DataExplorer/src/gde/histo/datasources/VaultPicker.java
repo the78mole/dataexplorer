@@ -28,6 +28,8 @@ import static gde.histo.datasources.VaultPicker.LoadProgress.RECORDED;
 import static gde.histo.datasources.VaultPicker.LoadProgress.RESTORED;
 import static gde.histo.datasources.VaultPicker.LoadProgress.SCANNED;
 import static gde.histo.datasources.VaultPicker.LoadProgress.STARTED;
+import static java.lang.String.format;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.WARNING;
 
@@ -45,7 +47,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -176,7 +177,7 @@ public final class VaultPicker {
 			trussJobs = DUPLICATE_HANDLING.getTrussJobs(trusses);
 			int jobSize = trussJobs.values().parallelStream().mapToInt(List::size).sum();
 			if (jobSize > 0) {
-				long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
+				long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 				log.finer(() -> String.format("%,5d trusses    job check          time=%,6d [ms] :: per second:%5d", //
 						jobSize, micros / 1000, trusses.size() * 1000000 / micros));
 			}
@@ -216,7 +217,7 @@ public final class VaultPicker {
 	public static final class ProgressManager {
 
 		private final DataExplorer	presenter			= DataExplorer.getInstance();
-		private final String				sThreadId			= String.format("%06d", Thread.currentThread().getId());	//$NON-NLS-1$
+		private final String				sThreadId			= format("%06d", Thread.currentThread().getId());
 
 		private double							progressCycle	= 0.;
 		private int									progressStart	= 0;
@@ -247,15 +248,15 @@ public final class VaultPicker {
 		 * @param newStepSize defines the number of counts which are required before the bar is updated again (performance)
 		 */
 		public void reInit(int newEndPercentage, int newTotalCount, int newStepSize) {
-			this.progressStart = this.presenter.getProgressPercentage();
-			this.stepSize = newStepSize;
-			this.counter = 0;
+			progressStart = presenter.getProgressPercentage();
+			stepSize = newStepSize;
+			counter = 0;
 			if (newTotalCount == 0) {
-				this.presenter.setProgress(newEndPercentage, this.sThreadId);
-				this.progressCycle = 0.;
+				presenter.setProgress(newEndPercentage, sThreadId);
+				progressCycle = 0.;
 			} else {
-				this.presenter.setProgress(this.progressStart, this.sThreadId);
-				this.progressCycle = (newEndPercentage - this.progressStart) / (double) newTotalCount;
+				presenter.setProgress(progressStart, sThreadId);
+				progressCycle = (newEndPercentage - progressStart) / (double) newTotalCount;
 			}
 		}
 
@@ -264,12 +265,12 @@ public final class VaultPicker {
 		 * @param increment is the value added to the counter
 		 */
 		public void countInLoop(int increment) {
-			int newCounter = this.counter + increment;
-			if (this.progressCycle <= 0)
+			int newCounter = counter + increment;
+			if (progressCycle <= 0)
 				throw new UnsupportedOperationException();
-			else if (newCounter % this.stepSize == 0) {
-				this.counter = newCounter;
-				this.presenter.setProgress((int) (newCounter * this.stepSize * this.progressCycle + this.progressStart), this.sThreadId);
+			else if (newCounter % stepSize == 0) {
+				counter = newCounter;
+				presenter.setProgress((int) (newCounter * stepSize * progressCycle + progressStart), sThreadId);
 			} else
 				; // progress is set if stepSize is reached
 		}
@@ -298,7 +299,7 @@ public final class VaultPicker {
 
 	@Override
 	public String toString() {
-		String result = String.format("totalTrussesCount=%,d  availableVaultsCount=%,d recordSetBytesSum=%,d elapsedTime_ms=%,d", //
+		String result = format("totalTrussesCount=%,d  availableVaultsCount=%,d recordSetBytesSum=%,d elapsedTime_ms=%,d", //
 				this.getTrussesCount(), this.getTimeStepSize(), this.recordSetBytesSum, this.getElapsedTime_ms());
 		return result;
 	}
@@ -340,14 +341,13 @@ public final class VaultPicker {
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.A_HISTOSET)) {
 				this.directoryScanner.initialize();
-				log.fine(() -> String.format("directoryScanner      initialize")); //$NON-NLS-1$
+				log.fine(() -> format("directoryScanner      initialize"));
 			}
 			progress.ifPresent((p) -> p.set(INITIALIZED));
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.F_FILE_CHECK)) {
 				realRebuildStep = directoryScanner.isValidated(rebuildStep);
-				log.time(() -> String.format("  %3d file paths verified           time=%,6d [ms]", //$NON-NLS-1$
-						this.directoryScanner.getValidatedFoldersCount(), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime + 500000)));
+				log.time(() -> format("  %3d file paths verified           time=%,6d [ms]", this.directoryScanner.getValidatedFoldersCount(), NANOSECONDS.toMillis(System.nanoTime() - startNanoTime + 500000)));
 			}
 			progress.ifPresent((p) -> p.set(PATHS_VERIFIED));
 
@@ -358,9 +358,9 @@ public final class VaultPicker {
 					boolean reReadFiles = !directoryScanner.isChannelChangeOnly();
 					sourceDataSetExplorer.screen4Trusses(directoryScanner.getSourceFolders().getMap(), reReadFiles);
 
-					long millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanoTime);
-					if (millis > 0) log.time(() -> String.format("%,5d trusses    select folders     time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
-							sourceDataSetExplorer.getTrusses().size(), millis, sourceDataSetExplorer.getTrusses().size() * 1000 / millis));
+					long millis = NANOSECONDS.toMillis(System.nanoTime() - startNanoTime);
+					if (millis > 0)
+						log.time(() -> format("%,5d trusses    select folders     time=%,6d [ms] :: per second:%5d", sourceDataSetExplorer.getTrusses().size(), millis, sourceDataSetExplorer.getTrusses().size() * 1000 / millis));
 				}
 				progress.ifPresent((p) -> p.set(SCANNED));
 
@@ -386,9 +386,8 @@ public final class VaultPicker {
 						loadVaultsFromFiles(trussJobs, progress);
 						long loadCount = trussJobs.values().parallelStream().flatMap(Collection::stream).count();
 						if (loadCount > 0) {
-							long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
-							log.time(() -> String.format("%,5d recordsets create from files  time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
-									loadCount, micros / 1000, loadCount * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
+							long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
+							log.time(() -> format("%,5d recordsets create from files  time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", loadCount, micros / 1000, loadCount * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
 						}
 					}
 					{// step: save vaults in the file system
@@ -398,9 +397,8 @@ public final class VaultPicker {
 							cacheSize_B = VaultReaderWriter.getCacheSize();
 							VaultReaderWriter.storeInCaches(trussJobs);
 							if (VaultReaderWriter.getCacheSize() - cacheSize_B > 0) {
-								long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
-								log.time(() -> String.format("%,5d recordsets store in cache     time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
-										loadCount, micros / 1000, loadCount * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
+								long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
+								log.time(() -> format("%,5d recordsets store in cache     time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", loadCount, micros / 1000, loadCount * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
 							}
 						}
 					}
@@ -412,26 +410,25 @@ public final class VaultPicker {
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.C_TRAILRECORDSET)) {
 				long nanoTime = System.nanoTime();
-				this.trailRecordSet = TrailRecordSet.createRecordSet();
-				this.trailRecordSet.initializeFromVaults(this.pickedVaults);
-				this.trailRecordSet.applyTemplate(true); // needs reasonable data
-				if (this.recordSetBytesSum > 0) {
-					long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
-					log.time(() -> String.format("%,5d timeSteps new TrailRecordSet  time=%,6d [ms] :: per second:%5d", //$NON-NLS-1$
-							this.pickedVaults.size(), micros / 1000, this.pickedVaults.size() > 0 ? this.pickedVaults.size() * 1000000 / micros : 0));
+				trailRecordSet = TrailRecordSet.createRecordSet();
+				trailRecordSet.initializeFromVaults(pickedVaults);
+				trailRecordSet.applyTemplate(true); // needs reasonable data
+				if (recordSetBytesSum > 0) {
+					long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
+					log.time(() -> format("%,5d timeSteps new TrailRecordSet  time=%,6d [ms] :: per second:%5d", pickedVaults.size(), micros / 1000, pickedVaults.size() > 0
+							? pickedVaults.size() * 1000000 / micros : 0));
 				}
-			} else if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA)) { // saves some time compared to the logic above
+			} else if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA)) { // keeps the template in contrast to the logic above
 				long nanoTime = System.nanoTime();
-				this.trailRecordSet.initializeFromVaults(this.pickedVaults);
-				long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
-				log.time(() -> String.format("%,5d timeSteps  to TrailRecordSet  time=%,6d [ms] :: per second:%5d", //
-						this.pickedVaults.size(), micros / 1000, this.pickedVaults.size() > 0 ? this.pickedVaults.size() * 1000000 / micros : 0));
+				trailRecordSet.refillFromVaults(pickedVaults);
+				long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
+				log.time(() -> format("%,5d timeSteps  to TrailRecordSet  time=%,6d [ms] :: per second:%5d", //
+						pickedVaults.size(), micros / 1000, pickedVaults.size() > 0 ? pickedVaults.size() * 1000000 / micros : 0));
 			}
 			progress.ifPresent((p) -> p.set(RECORDED));
 
 			this.elapsedTime_us = (int) ((System.nanoTime() - startNanoTime + 500000) / 1000);
-			log.time(() -> String.format("%,5d timeSteps  total              time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
-					this.pickedVaults.size(), elapsedTime_us / 1000, this.pickedVaults.size() * 1000000 / this.elapsedTime_us, (int) (this.recordSetBytesSum / 1.024 / 1.024 / this.elapsedTime_us)));
+			log.time(() -> format("%,5d timeSteps  total              time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", this.pickedVaults.size(), elapsedTime_us / 1000, this.pickedVaults.size() * 1000000 / this.elapsedTime_us, (int) (this.recordSetBytesSum / 1.024 / 1.024 / this.elapsedTime_us)));
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		} finally {
@@ -454,7 +451,7 @@ public final class VaultPicker {
 					putVault(histoVault);
 					this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 				} else {
-					log.info(() -> String.format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLoadFilePath()));
+					log.info(() -> format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLoadFilePath()));
 				}
 			}
 			progress.ifPresent((p) -> p.countInLoop(trussJobsEntry.getValue().size()));
@@ -473,14 +470,13 @@ public final class VaultPicker {
 				putVault(histoVault);
 				this.recordSetBytesSum += histoVault.getScorePoint(ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal());
 			} else {
-				log.info(() -> String.format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLoadFilePath()));
+				log.info(() -> format("vault has no log data %,7d kiB %s", histoVault.getLogFileLength() / 1024, histoVault.getLoadFilePath()));
 			}
 		}
 		int loadCount = this.pickedVaults.size() - tmpHistoSetsSize;
 		if (loadCount > 0) {
-			long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
-			log.time(() -> String.format("%,5d/%,5d      vaults cached/hit  time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", //$NON-NLS-1$
-					loadCount, VaultReaderWriter.getInnerCacheHitCount() - hitCount, micros / 1000, loadCount * 1000000 / micros, (int) (this.recordSetBytesSum / 1.024 / 1.024 / micros)));
+			long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
+			log.time(() -> format("%,5d/%,5d      vaults cached/hit  time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", loadCount, VaultReaderWriter.getInnerCacheHitCount() - hitCount, micros / 1000, loadCount * 1000000 / micros, (int) (this.recordSetBytesSum / 1.024 / 1.024 / micros)));
 		}
 	}
 
@@ -495,13 +491,13 @@ public final class VaultPicker {
 				.filter(v -> ExclusionData.isExcluded(v.getLoadFileAsPath(), v.getLogRecordsetBaseName())) //
 				.collect(Collectors.toList());
 		for (ExtendedVault vault : removed) {
-			log.info(() -> String.format("discarded as per exclusion list   %s %s   %s", //
+			log.info(() -> format("discarded as per exclusion list   %s %s   %s", //
 					vault.getLoadFilePath(), vault.getLogRecordsetBaseName(), vault.getStartTimeStampFormatted()));
 			List<ExtendedVault> vaultList = this.pickedVaults.get(vault.getLogStartTimestamp_ms());
 			vaultList.remove(vault);
 			if (vaultList.isEmpty()) this.pickedVaults.remove(vault.getLogStartTimestamp_ms());
 		}
-		log.fine(() -> String.format("%04d total trusses --- %04d excluded trusses", totalSize, removed.size()));
+		log.fine(() -> format("%04d total trusses --- %04d excluded trusses", totalSize, removed.size()));
 		return removed;
 	}
 
@@ -514,8 +510,7 @@ public final class VaultPicker {
 			this.pickedVaults.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<ExtendedVault>());
 		}
 		timeStampHistoVaults.add(histoVault);
-		log.finer(() -> String.format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", //$NON-NLS-1$
-				histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLoadFilePath()));
+		log.finer(() -> format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLoadFilePath()));
 	}
 
 	/**
@@ -566,11 +561,7 @@ public final class VaultPicker {
 	}
 
 	/**
-	 * <<<<<<< Upstream, based on nxt0020S1
 	 * @return the number of files which have log data for the object, device, analysis timespan etc.
-	 *         =======
-	 * @return the number of files which have log data for the object, device, analysis timespan etc.
-	 *         >>>>>>> 7f7a2db VaultPicker
 	 */
 	public int getMatchingFilesCount() {
 		return (int) this.sourceDataSetExplorer.getTrusses().parallelStream() //

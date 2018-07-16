@@ -186,31 +186,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			}
 		}
 
-		/**
-		 * Apply the data source information (= comboBox setting) from the graphics template definition to a record set.
-		 * Look for trail type and score information in the histo graphics template.
-		 * Take the prioritized trail type from applicable trails if no template setting is available.
-		 * @param record
-		 */
-		void applyTemplateTrailData(TrailRecord record) {
-			TrailSelector trailSelector = record.getTrailSelector();
-			if (template != null && template.isAvailable()) {
-				int trailTextOrdinal = Integer.parseInt(template.getRecordProperty(record.getName(), Record.TRAIL_TEXT_ORDINAL, "-1"));
-				if (trailTextOrdinal >= 0 && trailTextOrdinal < trailSelector.getApplicableTrailsTexts().size()) {
-					trailSelector.setTrailTextSelectedIndex(trailTextOrdinal);
-				} else { // the property value points to a trail which does not exist
-					trailSelector.setMostApplicableTrailTextOrdinal();
-				}
-			} else {
-				trailSelector.setMostApplicableTrailTextOrdinal();
-			}
-			if (trailSelector.getTrailTextSelectedIndex() < 0) {
-				log.info(() -> String.format("%s : no trail types identified" + record.getName())); //$NON-NLS-1$
-			} else {
-				log.log(FINER, "", trailSelector); //$NON-NLS-1$
-			}
-		}
-
 	}
 
 	public final class PickedVaults {
@@ -727,6 +702,25 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	/**
+	 * Refill data contents and keep the template data including trails.
+	 * @param newPickedVaults
+	 */
+	public void refillFromVaults(TreeMap<Long, List<ExtendedVault>> newPickedVaults) {
+		this.pickedVaults = new PickedVaults(newPickedVaults);
+
+		cleanup();
+		RecordingsCollector collector = new RecordingsCollector();
+		collector.addVaultsToRecordSet();
+
+		for (String recordName : recordNames) {
+			TrailRecord trailRecord = get(recordName);
+			trailRecord.clear();
+			trailRecord.initializeFromVaults(pickedVaults.initialVaults);
+		}
+		collector.setGpsLocationsTags();
+	}
+
+	/**
 	 * Build data contents after building the records list.
 	 * @param newPickedVaults
 	 */
@@ -741,7 +735,10 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		for (String recordName : recordNames) {
 			TrailRecord trailRecord = get(recordName);
 			trailRecord.clear();
-			collector.applyTemplateTrailData(trailRecord);
+			// Apply the data source information (= comboBox setting) from the graphics template definition to a record set.
+			int trailTextOrdinal = template != null && template.isAvailable()
+					? Integer.parseInt(template.getRecordProperty(recordName, Record.TRAIL_TEXT_ORDINAL, "-1")) : -1;
+			trailRecord.setSelectedTrail(trailTextOrdinal);
 			trailRecord.initializeFromVaults(pickedVaults.initialVaults);
 		}
 		collector.setGpsLocationsTags();
