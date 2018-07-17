@@ -19,8 +19,11 @@
 
 package gde.histo.datasources;
 
+import static java.util.logging.Level.SEVERE;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -28,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -38,9 +42,7 @@ import gde.GDE;
 import gde.config.DeviceConfigurations;
 import gde.data.Channels;
 import gde.device.IDevice;
-import gde.exception.DataInconsitsentException;
-import gde.exception.DataTypeException;
-import gde.exception.NotSupportedFileFormatException;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.HistoVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.SourceFolders.DirectoryType;
@@ -148,8 +150,7 @@ public abstract class AbstractSourceDataSet {
 		 * Promote trusses into vaults by reading the source file.
 		 * @param trusses lists the requested vaults
 		 */
-		public abstract void readVaults4Ui(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
-				DataInconsitsentException, DataTypeException;
+		public abstract void readVaults4Ui(Path sourcePath, List<VaultCollector> trusses);
 
 		/**
 		 * @param desiredRecordSetName is a valid recordsetName or empty
@@ -216,8 +217,8 @@ public abstract class AbstractSourceDataSet {
 			List<VaultCollector> trusses = new ArrayList<>();
 			if (getActualFile() != null) {
 				String objectDirectory = getObjectKey();
-				try {
-					trusses = HistoOsdReaderWriter.readTrusses(getActualFile(), objectDirectory);
+				try (InputStream sourceInputStream = Analyzer.getInstance().getDataAccess().getSourceInputStream(getActualFile().toPath());) {
+					trusses = HistoOsdReaderWriter.readTrusses(sourceInputStream, getActualFile().toPath(), objectDirectory);
 				} catch (Exception e) {
 					// link file points to non existent file
 					log.log(Level.SEVERE, e.getMessage(), e);
@@ -237,9 +238,14 @@ public abstract class AbstractSourceDataSet {
 		}
 
 		@Override
-		public void readVaults4Ui(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
-				DataInconsitsentException, DataTypeException {
-			HistoOsdReaderWriter.readVaults(filePath, trusses);
+		public void readVaults4Ui(Path sourcePath, List<VaultCollector> trusses) {
+			try (InputStream sourceInputStream = Analyzer.getInstance().getDataAccess().getSourceInputStream(sourcePath);) {
+				HistoOsdReaderWriter.readVaults(Analyzer.getInstance().getDataAccess().getSourceInputStream(sourcePath), trusses, sourcePath.toFile().length());
+			} catch (Exception e) {
+				log.log(SEVERE, e.getMessage(), e);
+				log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //
+						Analyzer.getInstance().getActiveDevice().getName(), Analyzer.getInstance().getActiveChannel().getNumber(), sourcePath));
+			}
 		}
 
 		@Override
@@ -305,7 +311,7 @@ public abstract class AbstractSourceDataSet {
 		public List<VaultCollector> getTrusses4Ui() {
 			String objectDirectory = getObjectKey();
 			String recordSetBaseName = Analyzer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend();
-			VaultCollector truss = new VaultCollector(objectDirectory, getFile(), 0, Channels.getInstance().size(), recordSetBaseName,
+			VaultCollector truss = new VaultCollector(objectDirectory, getFile().toPath(), 0, Channels.getInstance().size(), recordSetBaseName,
 					providesReaderSettings());
 			truss.setSourceDataSet(this);
 			return new ArrayList<>(Arrays.asList(truss));
@@ -317,9 +323,25 @@ public abstract class AbstractSourceDataSet {
 		}
 
 		@Override
-		public void readVaults4Ui(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
-				DataInconsitsentException, DataTypeException {
-			((IHistoDevice) Analyzer.getInstance().getActiveDevice()).getRecordSetFromImportFile(filePath, trusses);
+		public void readVaults4Ui(Path sourcePath, List<VaultCollector> trusses) {
+			if (trusses.isEmpty()) throw new IllegalArgumentException("at least one trusses entry is required");
+			List<ExtendedVault> histoVaults = new ArrayList<>();
+
+			String loadFilePath = trusses.get(0).getVault().getLoadFilePath();
+			for (VaultCollector truss : trusses) {
+				if (truss.getVault().getLoadFilePath().equals(loadFilePath)) {
+					Supplier<InputStream> inputStream = () -> Analyzer.getInstance().getDataAccess().getSourceInputStream(sourcePath) ;
+					try  {
+						((IHistoDevice) Analyzer.getInstance().getActiveDevice()).getRecordSetFromImportFile(inputStream, truss);
+					} catch (Exception e) {
+						log.log(SEVERE, e.getMessage(), e);
+						log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //
+								Analyzer.getInstance().getActiveDevice().getName(), Analyzer.getInstance().getActiveChannel().getNumber(), sourcePath));
+					}
+					histoVaults.add(truss.getVault());
+				} else
+					throw new UnsupportedOperationException("all trusses must carry the same logFilePath");
+			}
 		}
 
 		@Override

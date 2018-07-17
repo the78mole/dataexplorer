@@ -45,9 +45,9 @@ public class HoTTbinReaderX extends HoTTbinReader {
 	final static String	$CLASS_NAMEX	= HoTTbinReaderX.class.getName();
 	final static Logger	logx					= Logger.getLogger(HoTTbinReaderX.$CLASS_NAMEX);
 
-	static int[] points_1;
-	final static int headerSize = 27;
-	final static int footerSize = 323;
+	static int[]				points_1;
+	final static int		headerSize		= 27;
+	final static int		footerSize		= 323;
 
 	/**
 	 * convert from RF_RXSQ to strength using lookup table
@@ -167,7 +167,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		int countPackageLoss = 0;
 		int lapTimes = 99;
 		long numberDatablocks = (fileSize - headerSize - footerSize) / HoTTbinReaderX.dataBlockSize;
-		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;

@@ -20,6 +20,7 @@
 package gde.histo.cache;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -69,21 +70,21 @@ public final class VaultCollector {
 
 	/**
 	 * @param objectDirectory validated object key
-	 * @param file is the bin origin file (not a link file)
+	 * @param sourcePath is the bin origin file (not a link file)
 	 * @param fileVersion is the version of the log origin file
 	 * @param logRecordSetSize is the number of recordsets in the log origin file
 	 * @param logRecordsetBaseName the base name without recordset number
 	 * @param providesReaderSettings true is a file reader capable to deliver different measurement values based on device settings
 	 */
-	public VaultCollector(String objectDirectory, File file, int fileVersion, int logRecordSetSize, String logRecordsetBaseName, //
+	public VaultCollector(String objectDirectory, Path sourcePath, int fileVersion, int logRecordSetSize, String logRecordsetBaseName, //
 			boolean providesReaderSettings) {
-		this(objectDirectory, file, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, "native", file.lastModified(), //$NON-NLS-1$
+		this(objectDirectory, sourcePath, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, "native", sourcePath.toFile().lastModified(),
 				Analyzer.getInstance().getActiveChannel().getNumber(), objectDirectory, providesReaderSettings);
 	}
 
 	/**
 	 * @param objectDirectory validated object key
-	 * @param file is the log origin file (not a link file)
+	 * @param sourcePath is the log origin file (not a link file)
 	 * @param fileVersion is the version of the log origin file
 	 * @param logRecordSetSize is the number of recordsets in the log origin file
 	 * @param logRecordSetOrdinal identifies multiple recordsets in one single file (0-based)
@@ -94,20 +95,20 @@ public final class VaultCollector {
 	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
 	 * @param providesReaderSettings true is a file reader capable to deliver different measurement values based on device settings
 	 */
-	public VaultCollector(String objectDirectory, File file, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal,
+	public VaultCollector(String objectDirectory, Path sourcePath, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal,
 			String logRecordsetBaseName, String logDeviceName, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey, //
 			boolean providesReaderSettings) {
 		String readerSettings = providesReaderSettings && Analyzer.getInstance().getActiveDevice() instanceof IHistoDevice
 				? ((IHistoDevice) Analyzer.getInstance().getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
-		this.vault = new ExtendedVault(objectDirectory, file.toPath(), file.lastModified(), file.length(), fileVersion, logRecordSetSize,
+		File file = sourcePath.toFile();
+		this.vault = new ExtendedVault(objectDirectory, sourcePath, file.lastModified(), file.length(), fileVersion, logRecordSetSize,
 				logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, logStartTimestamp_ms, logChannelNumber, logObjectKey, //
 				readerSettings);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("logChannelNumber=%d  logRecordSetOrdinal=%d  logObjectKey=%s  startTimestamp=%s  %s",
-				vault.getLogChannelNumber(), vault.getLogRecordSetOrdinal(), vault.getLogObjectKey(), vault.getStartTimeStampFormatted(), vault.getLoadFilePath());
+		return String.format("logChannelNumber=%d  logRecordSetOrdinal=%d  logObjectKey=%s  startTimestamp=%s  %s", vault.getLogChannelNumber(), vault.getLogRecordSetOrdinal(), vault.getLogObjectKey(), vault.getStartTimeStampFormatted(), vault.getLoadFilePath());
 	}
 
 	/**

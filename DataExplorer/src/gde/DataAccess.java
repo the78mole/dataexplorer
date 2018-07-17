@@ -40,6 +40,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.zip.ZipException;
@@ -305,9 +306,15 @@ public abstract class DataAccess {
 		}
 
 		@Override
-		public List<File> getGeoCodeFiles() throws FileNotFoundException {
+		public List<String> getGeoCodeFolderList() throws FileNotFoundException {
 			Path locationsPath = Paths.get(GDE.APPL_HOME_PATH, Settings.GPS_LOCATIONS_DIR_NAME);
-			return FileUtils.getFileListing(locationsPath.toFile(), 0);
+			List<File> fileListing = FileUtils.getFileListing(locationsPath.toFile(), 0);
+
+			List<String> fileNames = new ArrayList<>();
+			for (File file : fileListing) {
+				fileNames.add(file.getName());
+			}
+			return fileNames;
 		}
 
 		/**
@@ -374,6 +381,16 @@ public abstract class DataAccess {
 				if (!path.exists() && !path.isDirectory()) path.mkdir();
 				//extract initial property files
 				FileUtils.extract(sourceClass, fileName, Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
+
+		@Override
+		@Nullable
+		public InputStream getSourceInputStream(Path fittedFilePath) {
+			try {
+				return new FileInputStream(fittedFilePath.toFile());
+			} catch (FileNotFoundException e) {
+				throw new IllegalArgumentException("invalid path " + fittedFilePath);
 			}
 		}
 
@@ -490,7 +507,7 @@ public abstract class DataAccess {
 
 	public abstract void deleteGeoCodeFile(String geoFileName);
 
-	public abstract List<File> getGeoCodeFiles() throws FileNotFoundException;
+	public abstract List<String> getGeoCodeFolderList() throws FileNotFoundException;
 
 	public abstract boolean existsCacheDirectory(String directoryName);
 
@@ -501,5 +518,11 @@ public abstract class DataAccess {
 	public abstract InputStream getMappingInputStream(String fileName) throws FileNotFoundException;
 
 	public abstract void checkMappingFileAndCreate(Class<?> sourceClass, String fileName);
+
+	/**
+	 * @param fittedFilePath is a customized path (full path for local file system access or relative path for other data sources)
+	 * @return the input stream for a logging source file (osd, bin , ...)
+	 */
+	public abstract InputStream getSourceInputStream(Path fittedFilePath);
 
 }

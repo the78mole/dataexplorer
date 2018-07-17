@@ -20,16 +20,14 @@ package gde.device.graupner;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Vector;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -53,10 +51,10 @@ import gde.device.MeasurementPropertyTypes;
 import gde.device.graupner.hott.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
-import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.device.IHistoDevice;
 import gde.histo.device.UniversalSampler;
+import gde.histo.utils.PathUtils;
 import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.log.Level;
@@ -1721,33 +1719,20 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	 * since this is a long term operation the progress bar should be updated to signal business to user.
 	 * collects life data if device setting |isLiveDataActive| is true.
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param filePath
-	 * @param trusses referencing a subset of the record sets in the file
-	 * @throws DataInconsitsentException
-	 * @throws DataTypeException
-	 * @throws IOException
-	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
+	 * @param inputStream for loading the log data
+	 * @param truss references the requested vault for feeding with the results (vault might be without measurements, settlements and scores)
 	 */
 	@Override
-	public List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException {
-		List<ExtendedVault> histoVaults = new ArrayList<>();
-		for (VaultCollector truss : trusses) {
-			if (truss.getVault().getLoadFilePath().equals(filePath.toString())) {
-				log.log(Level.INFO, "start ", filePath); //$NON-NLS-1$
-				// add aggregated measurement and settlement points and score points to the truss
-				if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-					HoTTbinHistoReader2.read(truss);
-					histoVaults.add(truss.getVault());
-				} else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
-					// todo implement HoTTlogHistoReader
-				} else {
-					throw new UnsupportedOperationException();
-				}
-			}
-			else
-				throw new UnsupportedOperationException("all trusses must carry the same logFilePath");
+	public void getRecordSetFromImportFile(Supplier<InputStream> inputStream, VaultCollector truss) throws DataInconsitsentException,
+			IOException, DataTypeException {
+		String fileEnding = GDE.STRING_DOT + PathUtils.getFileExtension(truss.getVault().getLoadFilePath());
+		if (GDE.FILE_ENDING_DOT_BIN.equals(fileEnding)) {
+			HoTTbinHistoReader2.read(inputStream, truss);
+		} else if (GDE.FILE_ENDING_DOT_LOG.equals(fileEnding)) {
+			// todo implement HoTTlogHistoReader
+		} else {
+			throw new UnsupportedOperationException(truss.getVault().getLoadFilePath());
 		}
-		return histoVaults;
 	}
 
 }

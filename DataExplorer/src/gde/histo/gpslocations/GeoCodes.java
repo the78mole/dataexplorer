@@ -21,13 +21,11 @@ package gde.histo.gpslocations;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.WARNING;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.channels.ReadableByteChannel;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -90,10 +88,7 @@ public final class GeoCodes {
 		}
 
 		public static List<String> getGeoFileNames() throws FileNotFoundException {
-			List<String> fileNames = new ArrayList<>();
-			for (File file : DataAccess.getInstance().getGeoCodeFiles()) {
-				fileNames.add(file.getName());
-			}
+			List<String> fileNames = DataAccess.getInstance().getGeoCodeFolderList();
 			log.finer(() -> String.format("%04d files found in locationsDir %s", fileNames.size(), Settings.GPS_LOCATIONS_DIR_NAME));
 			return fileNames;
 		}
@@ -168,11 +163,11 @@ public final class GeoCodes {
 		((LocalAccess) DataAccess.getInstance()).checkAndCreateHistoLocations();
 		try {
 			String geoFileName = GeoFiles.getGeoFileName(gpsCoordinate);
-			if (((LocalAccess) DataAccess.getInstance()).existsGeoCodeFile(geoFileName)) {
+			if (DataAccess.getInstance().existsGeoCodeFile(geoFileName)) {
 				location = getLocation(geoFileName);
 			} else {
 				geoFileName = GeoFiles.acquireValidatedGeoData(gpsCoordinate);
-				if (((LocalAccess) DataAccess.getInstance()).existsGeoCodeFile(geoFileName)) {
+				if (DataAccess.getInstance().existsGeoCodeFile(geoFileName)) {
 					location = getLocation(geoFileName);
 				} else {
 					log.log(WARNING, "geoCode file not found");

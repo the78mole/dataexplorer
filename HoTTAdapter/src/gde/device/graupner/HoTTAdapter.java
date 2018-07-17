@@ -20,6 +20,7 @@ package gde.device.graupner;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -28,11 +29,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -65,10 +66,10 @@ import gde.device.graupner.hott.MessageIds;
 import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
-import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.device.IHistoDevice;
 import gde.histo.device.UniversalSampler;
+import gde.histo.utils.PathUtils;
 import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.log.Level;
@@ -92,6 +93,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	final static String											SENSOR_COUNT											= "SensorCount";																													//$NON-NLS-1$
 	final static String											LOG_COUNT													= "LogCount";																															//$NON-NLS-1$
 	final static String											FILE_PATH													= "FilePath";																															//$NON-NLS-1$
+	final static String											SD_FORMAT													= "SD_FORMAT";																															//$NON-NLS-1$
+	final static String											DETECTED_SENSOR										= "DETECTED SENSOR";																															//$NON-NLS-1$
 	final static Map<String, RecordSet>			recordSets												= new HashMap<String, RecordSet>();
 
 	// HoTT sensor bytes 19200 Baud protocol
@@ -958,35 +961,20 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * since this is a long term operation the progress bar should be updated to signal business to user.
 	 * collects life data if device setting |isLiveDataActive| is true.
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param filePath
-	 * @param trusses referencing a subset of the record sets in the file
-	 * @throws DataInconsitsentException
-	 * @throws DataTypeException
-	 * @throws IOException
-	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
+	 * @param inputStream for loading the log data
+	 * @param truss references the requested vault for feeding with the results (vault might be without measurements, settlements and scores)
 	 */
 	@Override
-	public List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException,
-			IOException, DataTypeException {
-		List<ExtendedVault> histoVaults = new ArrayList<>();
-
-		CheckedConsumer<VaultCollector> histoReader;
-		if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-			histoReader = t -> HoTTbinHistoReader.read(t);
-		} else if (filePath.toString().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
-			histoReader = t -> { // todo implement HoTTlogHistoReader
-			};
+	public void getRecordSetFromImportFile(Supplier<InputStream> inputStream, VaultCollector truss)
+			throws DataInconsitsentException, IOException, DataTypeException {
+		String fileEnding = GDE.STRING_DOT + PathUtils.getFileExtension(truss.getVault().getLoadFilePath());
+		if (GDE.FILE_ENDING_DOT_BIN.equals(fileEnding)) {
+			HoTTbinHistoReader.read(inputStream, truss);
+		} else if (GDE.FILE_ENDING_DOT_LOG.equals(fileEnding)) {
+			// todo implement HoTTlogHistoReader
 		} else {
-			throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException(truss.getVault().getLoadFilePath());
 		}
-		for (VaultCollector truss : trusses) {
-			if (truss.getVault().getLoadFilePath().equals(filePath.toString())) {
-				histoReader.accept(truss);
-				histoVaults.add(truss.getVault());
-			} else
-				throw new UnsupportedOperationException("all trusses must carry the same logFilePath"); //$NON-NLS-1$
-		}
-		return histoVaults;
 	}
 
 	/**

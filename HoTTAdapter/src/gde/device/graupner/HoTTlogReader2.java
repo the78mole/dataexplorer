@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
@@ -37,7 +37,7 @@ import gde.ui.menu.MenuToolBar;
 import gde.utils.StringHelper;
 
 /**
- * Class to read Graupner HoTT binary data as saved on SD-Cards 
+ * Class to read Graupner HoTT binary data as saved on SD-Cards
  * @author Winfried Brügmann
  */
 public class HoTTlogReader2 extends HoTTlogReader {
@@ -50,8 +50,8 @@ public class HoTTlogReader2 extends HoTTlogReader {
 	* read log data according to version 0
 	* @param file
 	* @param data_in
-	* @throws IOException 
-	* @throws DataInconsitsentException 
+	* @throws IOException
+	* @throws DataInconsitsentException
 	*/
 	public static synchronized void read(String filePath) throws Exception {
 		final String $METHOD_NAME = "read";
@@ -102,7 +102,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 		int countPackageLoss = 0;
 		int logDataOffset = Integer.valueOf(fileInfoHeader.get("LOG DATA OFFSET"));
 		long numberDatablocks = (fileSize - logDataOffset) / HoTTbinReader.dataBlockSize;
-		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(fileInfoHeader.get("LOG START TIME"), HoTTbinReader.getStartTimeStamp(file, numberDatablocks));
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(fileInfoHeader.get("LOG START TIME"), HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks));
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
@@ -130,8 +130,8 @@ public class HoTTlogReader2 extends HoTTlogReader {
 				if (log.isLoggable(Level.FINE)) {
 					log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
-				
-				//Ph(D)[4], Evt1(H)[5], Evt2(D)[6], Fch(D)[7], TXdBm(-D)[8], RXdBm(-D)[9], RfRcvRatio(D)[10], TrnRcvRatio(D)[11]				
+
+				//Ph(D)[4], Evt1(H)[5], Evt2(D)[6], Fch(D)[7], TXdBm(-D)[8], RXdBm(-D)[9], RfRcvRatio(D)[10], TrnRcvRatio(D)[11]
 				//STATUS : Ph(D)[4], Evt1(H)[5], Evt2(D)[6], Fch(D)[7], TXdBm(-D)[8], RXdBm(-D)[9], RfRcvRatio(D)[10], TrnRcvRatio(D)[11]
 				//S.INFOR : DEV(D)[22], CH(D)[23], SID(H)[24], WARN(H)[25]
 				//if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
@@ -143,7 +143,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 					}
 					reverseChannelPackageLossCounter.add(1);
 					HoTTlogReader2.points[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
-					//create and fill sensor specific data record sets 
+					//create and fill sensor specific data record sets
 					if (log.isLoggable(Level.FINEST)) {
 						log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME,
 								StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1) + GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader.buf[7], false));
@@ -161,9 +161,9 @@ public class HoTTlogReader2 extends HoTTlogReader {
 						System.arraycopy(valuesChannel, 3, HoTTlogReader2.points, 73, 20); //copy channel data and events, warning
 					}
 
-					switch ((byte) (HoTTbinReader.buf[26] & 0xFF)) { //actual sensor 
+					switch ((byte) (HoTTbinReader.buf[26] & 0xFF)) { //actual sensor
 					case HoTTAdapter.ANSWER_SENSOR_VARIO_19200:
-						isVarioData = parseVario(HoTTbinReader.buf, valuesVario, true);					
+						isVarioData = parseVario(HoTTbinReader.buf, valuesVario, true);
 						if (isVarioData && isReceiverData) {
 							migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber, valuesVario, valuesGPS, valuesGAM, valuesEAM, valuesESC);
 							isReceiverData = false;
@@ -225,7 +225,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 
 						reverseChannelPackageLossCounter.add(0);
 						HoTTlogReader2.points[0] = reverseChannelPackageLossCounter.getPercentage() * 1000;
-						countPackageLoss+=1; // add up lost packages in telemetry data 
+						countPackageLoss+=1; // add up lost packages in telemetry data
 
 						if (channelNumber == 4) {
 							parseChannel(HoTTbinReader.buf, valuesChannel, numberLogChannels);
@@ -284,7 +284,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 	public static void migrateAddPoints(boolean isVarioData, boolean isGPSData, boolean isGeneralData, boolean isElectricData, boolean isMotorDriverData, int channelNumber,
 			int[] valuesVario, int[] valuesGPS, int[] valuesGAM, int[] valuesEAM, int[] valuesESC)
 			throws DataInconsitsentException {
-		//receiver data gets integrated each cycle 
+		//receiver data gets integrated each cycle
 		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
 		//10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
 		//15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
@@ -295,7 +295,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 		//73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
 		//93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
 
-		//in 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 
+		//in 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14,
 		//in 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 27=RPM 28=MotorTime 29=Speed 30=Event
 		//out 46=Voltage E, 47=Current E, 48=Capacity E, 49=Power E, 50=Balance E, 51=CellVoltage E1, 52=CellVoltage E2 .... 64=CellVoltage E14, 65=Voltage E1, 66=Voltage E2, 67=Temperature E1, 68=Temperature E2 69=Revolution E 70=MotorTime 71=Speed 72=Event E
 		if (isElectricData) {
@@ -315,17 +315,17 @@ public class HoTTlogReader2 extends HoTTlogReader {
 		//in 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6,
 		//in 12=Revolution, 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		//in 21=Speed, 22=LowestCellVoltage, 23=LowestCellNumber, 24=Pressure, 24=Event
-		if (isGeneralData) {		
+		if (isGeneralData) {
 			//out 10=Height, 11=Climb 1, 12=Climb 3
-			for (int k = 0; !isVarioData && !isGPSData && k < 3; k++) { 
+			for (int k = 0; !isVarioData && !isGPSData && k < 3; k++) {
 				HoTTlogReader2.points[k+10] = valuesGAM[k+13];
 			}
 			//out 24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6, 35=Revolution G
-			for (int j = 0; j < 12; j++) { 
+			for (int j = 0; j < 12; j++) {
 				HoTTlogReader2.points[j+24] = valuesGAM[j+1];
 			}
 			//out 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G
-			for (int j = 0; !isVarioData && !isGPSData && j < 10; j++) { 
+			for (int j = 0; !isVarioData && !isGPSData && j < 10; j++) {
 				HoTTlogReader2.points[j+36] = valuesGAM[j+16];
 			}
 		}

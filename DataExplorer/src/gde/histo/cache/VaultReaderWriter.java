@@ -80,14 +80,8 @@ public final class VaultReaderWriter {
 	 * Read file and populate the vault from the recordset.
 	 */
 	public static void loadFromFile(Path filePath, List<VaultCollector> trusses) {
-		try {
-			SourceDataSet dataSet = AbstractSourceDataSet.createSourceDataSet(filePath, Analyzer.getInstance().getActiveDevice());
-			if (dataSet != null) dataSet.readVaults4Ui(filePath, trusses);
-		} catch (Exception e) {
-			log.log(SEVERE, e.getMessage(), e);
-			log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //
-					Analyzer.getInstance().getActiveDevice().getName(), Analyzer.getInstance().getActiveChannel().getNumber(), filePath));
-		}
+		SourceDataSet dataSet = AbstractSourceDataSet.createSourceDataSet(filePath, Analyzer.getInstance().getActiveDevice());
+		if (dataSet != null) dataSet.readVaults4Ui(filePath, trusses);
 	}
 
 	/**

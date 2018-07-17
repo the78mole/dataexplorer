@@ -13,10 +13,18 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.Channel;
@@ -29,16 +37,8 @@ import gde.messages.Messages;
 import gde.ui.menu.MenuToolBar;
 import gde.utils.StringHelper;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
 /**
- * Class to read Graupner HoTT binary data as saved on SD-Cards 
+ * Class to read Graupner HoTT binary data as saved on SD-Cards
  * @author Winfried Brügmann
  */
 public class HoTTbinReader2 extends HoTTbinReader {
@@ -50,7 +50,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	/**
 	 * read complete file data and display the first found record set
 	 * @param filePath
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static synchronized void read(String filePath) throws Exception {
 		HashMap<String, String> header = getFileInfo(new File(filePath));
@@ -67,8 +67,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	* read log data according to version 0
 	* @param file
 	* @param data_in
-	* @throws IOException 
-	* @throws DataInconsitsentException 
+	* @throws IOException
+	* @throws DataInconsitsentException
 	*/
 	static void readSingle(File file) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readSingle";
@@ -112,7 +112,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader.isTextModusSignaled = false;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
-		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		numberDatablocks = HoTTbinReader.isReceiverOnly && channelNumber != 4 ? numberDatablocks/10 : numberDatablocks;
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
@@ -141,9 +141,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader2.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.fourDigitsRunningNumber(HoTTbinReader.buf.length));
 					HoTTbinReader2.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
-				
+
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
-					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx		
+					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
 						if (HoTTbinReader2.log.isLoggable(Level.FINE))
 							HoTTbinReader2.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
@@ -175,7 +175,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 							isSensorData = true;
 						}
 
-						//create and fill sensor specific data record sets 
+						//create and fill sensor specific data record sets
 						switch ((byte) (HoTTbinReader.buf[7] & 0xFF)) {
 						case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
@@ -329,11 +329,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 						HoTTbinReader2.points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 
-						++countPackageLoss; // add up lost packages in telemetry data 
+						++countPackageLoss; // add up lost packages in telemetry data
 						++HoTTbinReader.countLostPackages;
-						//HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+						//HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0);
 
-						if (channelNumber == 4) {	
+						if (channelNumber == 4) {
 							parseChannel(HoTTbinReader.buf); //Channels
 							HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader.timeStep_ms);
 						}
@@ -377,8 +377,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	* read log data according to version 0
 	* @param file
 	* @param data_in
-	* @throws IOException 
-	* @throws DataInconsitsentException 
+	* @throws IOException
+	* @throws DataInconsitsentException
 	*/
 	static void readMultiple(File file) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readMultiple";
@@ -435,7 +435,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		//		HoTTbinReader.blockSequenceCheck		= new Vector<Byte>();
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
-		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
@@ -462,7 +462,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				if (HoTTbinReader2.log.isLoggable(Level.FINEST)) {
 					HoTTbinReader2.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(HoTTbinReader.buf, HoTTbinReader.buf.length));
 				}
-				
+
 				if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { //buf 3, 4, tx,rx
 						if (HoTTbinReader2.log.isLoggable(Level.FINE))
@@ -470,7 +470,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 						HoTTAdapter.reverseChannelPackageLossCounter.add(1);
 						HoTTbinReader2.points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
-						//create and fill sensor specific data record sets 
+						//create and fill sensor specific data record sets
 						if (HoTTbinReader2.log.isLoggable(Level.FINEST))
 							HoTTbinReader2.log.logp(Level.FINEST, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(new byte[] { HoTTbinReader.buf[7] }, 1)
 									+ GDE.STRING_MESSAGE_CONCAT + StringHelper.printBinary(HoTTbinReader.buf[7], false));
@@ -631,7 +631,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 							HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, HoTTbinReader.timeStep_ms);
 						}
 						HoTTbinReader2.isJustMigrated = false;
-						
+
 						//fill data block 0 to 4
 						if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
 							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
@@ -666,9 +666,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						HoTTAdapter.reverseChannelPackageLossCounter.add(0);
 						HoTTbinReader2.points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;
 
-						++countPackageLoss; // add up lost packages in telemetry data 
+						++countPackageLoss; // add up lost packages in telemetry data
 						++HoTTbinReader.countLostPackages;
-						//HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0); 
+						//HoTTbinReader2.points[0] = (int) (countPackageLoss*100.0 / ((HoTTbinReader2.timeStep_ms+10) / 10.0)*1000.0);
 
 						if (channelNumber == 4) {
 							parseChannel(HoTTbinReader.buf); //Channels
@@ -727,7 +727,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 */
 	public static void migrateAddPoints(boolean isVarioData, boolean isGPSData, boolean isGeneralData, boolean isElectricData, boolean isMotorDriverData, int channelNumber)
 			throws DataInconsitsentException {
-		//receiver data gets integrated each cycle 
+		//receiver data gets integrated each cycle
 		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
 		//10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
 		//15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
@@ -1050,8 +1050,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader2.points[4] = (_buf[3] & 0xFF) * -1000;
 		HoTTbinReader2.points[5] = (_buf[4] & 0xFF) * -1000;
 
-		HoTTbinReader2.points[73] = (DataParser.parse2UnsignedShort(_buf, 8) / 2) * 1000; 
-		HoTTbinReader2.points[74] = (DataParser.parse2UnsignedShort(_buf, 10) / 2) * 1000; 
+		HoTTbinReader2.points[73] = (DataParser.parse2UnsignedShort(_buf, 8) / 2) * 1000;
+		HoTTbinReader2.points[74] = (DataParser.parse2UnsignedShort(_buf, 10) / 2) * 1000;
 		HoTTbinReader2.points[75] = (DataParser.parse2UnsignedShort(_buf, 12) / 2) * 1000;
 		HoTTbinReader2.points[76] = (DataParser.parse2UnsignedShort(_buf, 14) / 2) * 1000;
 		HoTTbinReader2.points[77] = (DataParser.parse2UnsignedShort(_buf, 16) / 2) * 1000;

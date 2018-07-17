@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
@@ -40,7 +40,6 @@ import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.ui.menu.MenuToolBar;
 import gde.utils.StringHelper;
 
@@ -50,7 +49,7 @@ import gde.utils.StringHelper;
  */
 public class GeniusWizardLogReader extends HoTTbinReader {
 	final static String	$CLASS_NAMEX	= GeniusWizardLogReader.class.getName();
-	
+
 	final static String	PPRODUCT_NAME			= "product_name";
 	final static String	PPRODUCT_CODE			= "product_code";
 	final static String	PPRODUCT_VERSION	= "product_version";
@@ -58,7 +57,7 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 	final static String	LOG_DATA_COUNT		= "log_data_count";
 	final static String	LOG_DATA_OFFSET		= "log_data_offset";
 	final static String	LAP_DATA_SIZE			= "lap_data_size";
-	
+
 	final static int headerSize = 128;
 	final static Map<String, Object> header = new HashMap<String, Object>();
 	final static int logDataSize = 51;
@@ -69,7 +68,7 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 	/**
 	 * read complete file data and display the first found record set
 	 * @param filePath
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static synchronized void read(String filePath) throws Exception {
 
@@ -103,19 +102,19 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 					System.arraycopy(buffer, 49, logdatatype, 0, 4);
 					log.fine(() ->  String.format("logdatatype = %s", StringHelper.byte2Hex2CharString(logdatatype)));
 					header.put(LOG_DATA_TYPE, StringHelper.byte2Hex2CharString(logdatatype));
-					
+
 					byte[] logdatacount = new byte[4];
 					System.arraycopy(buffer, 53, logdatacount, 0, 4);
 					log.fine(() -> String.format("logdatacount = %d", DataParser.parse2Int(logdatacount, 0)));
 					header.put(LOG_DATA_COUNT, DataParser.parse2Int(logdatacount, 0));
 					header.put(LOG_DATA_OFFSET, inputFile.length() - (DataParser.parse2Int(logdatacount, 0) * logDataSize));
 					log.fine(() ->  String.format("logdataoffset = %d", header.get(LOG_DATA_OFFSET)));
-					
+
 					byte[] lapdatasize = new byte[4];
 					System.arraycopy(buffer, 57, lapdatasize, 0, 4);
 					log.fine(() ->  String.format("lapdatasize = %d", DataParser.parse2Int(lapdatasize, 0)));
 					header.put(LAP_DATA_SIZE, DataParser.parse2Int(lapdatasize, 0));
-					
+
 					if ((int)header.get(LAP_DATA_SIZE) > 0) { //TODO actually no samples with lap data available!
 						JSONParser parser = new JSONParser();
 						buffer = new byte[(int)header.get(LAP_DATA_SIZE)];
@@ -129,12 +128,12 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 						log.fine(() ->  "lap_value = " + json.get("lap_value"));
 						JSONArray labValues = (JSONArray) json.get("lap_value");
 						for (Object object : labValues) {
-							log.fine(() ->  object.toString());						
+							log.fine(() ->  object.toString());
 						}
 					}
-					
+
 					GeniusWizardLogReader.readSingle(new File(filePath));
-									
+
 				}
 				else {
 					GeniusWizardLogReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2408));
@@ -156,8 +155,8 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 	/**
 	* read log data according to version 0
 	* @param file
-	* @throws IOException 
-	* @throws DataInconsitsentException 
+	* @throws IOException
+	* @throws DataInconsitsentException
 	*/
 	static void readSingle(File file) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readSingle";
@@ -170,13 +169,13 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 		//String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
 		//0=Voltage 1=VoltageMin 2=Current 3=CurrentMax 4=RPM 5=RPM_Max 6=Capacity 7=Temp 8=TempMax 9=TempMoter 10=TempMoterMax 11=Throttle
-		GeniusWizardLogReader.recordSetESC = null; 
+		GeniusWizardLogReader.recordSetESC = null;
 		GeniusWizardLogReader.points = new int[device.getNumberOfMeasurements(1)];
 		double startLogTimeStamp_ms = 0, logTimeStamp_ms, lastLogTimeStamp_ms = 0;
 		int numTimeStamps = 0;
 		GeniusWizardLogReader.buf = new byte[logDataSize];
 		long numberDatablocks = (fileSize - headerSize - (int)header.get(GeniusWizardLogReader.LAP_DATA_SIZE)) / logDataSize;
-		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
@@ -207,32 +206,32 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 				if (GeniusWizardLogReader.log.isLoggable(Level.FINE)) {
 					GeniusWizardLogReader.log.logp(Level.FINE, GeniusWizardLogReader.$CLASS_NAMEX, $METHOD_NAME, StringHelper.byte2Hex4CharString(GeniusWizardLogReader.buf, GeniusWizardLogReader.buf.length));
 				}
-				
-				logTimeStamp_ms = DataParser.parse2Int(buf, 46) * 10.0; 
+
+				logTimeStamp_ms = DataParser.parse2Int(buf, 46) * 10.0;
 				if (logTimeStamp_ms != 0 && startLogTimeStamp_ms == 0)
 						startLogTimeStamp_ms = logTimeStamp_ms;
-				
+
 				//log.log(Level.OFF, "time = " + (logTimeStamp_ms-startLogTimeStamp_ms));
 				if (logTimeStamp_ms > lastLogTimeStamp_ms) {
 					GeniusWizardLogReader.recordSetESC.addPoints(device.convertDataBytes(points, buf), logTimeStamp_ms-startLogTimeStamp_ms);
 					lastLogTimeStamp_ms = logTimeStamp_ms;
 				}
 				else if (logTimeStamp_ms == lastLogTimeStamp_ms) {
-					if (GeniusWizardLogReader.application.getStatusBar() != null) 
+					if (GeniusWizardLogReader.application.getStatusBar() != null)
 						GeniusWizardLogReader.application.setStatusMessage(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2411, new Object[] { ++numTimeStamps }), SWT.COLOR_RED);
 					continue;
 				}
 				else {
 					if (numTimeStamps == 0)
-						if (GeniusWizardLogReader.application.getStatusBar() != null) 
+						if (GeniusWizardLogReader.application.getStatusBar() != null)
 							GeniusWizardLogReader.application.setStatusMessage(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2412), SWT.COLOR_RED);
 					else
-						if (GeniusWizardLogReader.application.getStatusBar() != null) 
+						if (GeniusWizardLogReader.application.getStatusBar() != null)
 							GeniusWizardLogReader.application.setStatusMessage(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2413, new Object[] {numTimeStamps}), SWT.COLOR_RED);
 					break;
 				}
 
-				if (menuToolBar != null && i % progressIndicator == 0) 
+				if (menuToolBar != null && i % progressIndicator == 0)
 					GeniusWizardLogReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
 			}
 

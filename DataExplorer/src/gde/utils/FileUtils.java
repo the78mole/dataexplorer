@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.utils;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -56,6 +57,7 @@ import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -1676,6 +1678,24 @@ public class FileUtils {
 			FileUtils.log.log(Level.WARNING, e.getMessage(), e);
 		}
 		return size.get();
+	}
+
+	/**
+	 * Wraps the input stream with ZIPInputStream if needed.
+	 * @param inputStream is a zip stream or a standard stream
+	 * @return a zip stream positioned on the first entry or the input stream (first read position)
+	 */
+	public static InputStream wrapIfZipStream(InputStream inputStream) throws IOException {
+		InputStream markableStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
+		markableStream.mark(999);
+
+		ZipInputStream zipInputStream = new ZipInputStream(markableStream);
+		if (zipInputStream.getNextEntry() != null) {
+			return zipInputStream;
+		} else {
+			markableStream.reset();
+			return markableStream;
+		}
 	}
 
 }

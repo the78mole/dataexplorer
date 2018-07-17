@@ -23,8 +23,6 @@ import static java.util.logging.Level.INFO;
 
 import java.io.DataInputStream;
 import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,8 +41,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import gde.GDE;
 import gde.data.AbstractRecordSet;
@@ -61,6 +57,7 @@ import gde.histo.device.IHistoDevice;
 import gde.histo.recordings.TrailRecordSet;
 import gde.io.OsdReaderWriter;
 import gde.log.Logger;
+import gde.utils.FileUtils;
 import gde.utils.StringHelper;
 
 /**
@@ -372,17 +369,18 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 
 	/**
 	 * Identify an enhanced value for the start timestamp.
-	 * @param file
+	 * @param fileStream is a zipped or standard filestream
+	 * @param sourcePath is the path corresponding to the fileStream and is put into the trusses
 	 * @param objectDirectory holds the validated object key from the parent directory or is empty
 	 * @return the vaults skeletons created from the recordsets (for valid channels in the current device only)
 	 */
-	public static List<VaultCollector> readTrusses(File file, String objectDirectory) throws IOException, NotSupportedFileFormatException {
+	public static List<VaultCollector> readTrusses(InputStream fileStream, Path sourcePath, String objectDirectory) throws IOException,
+			NotSupportedFileFormatException {
 		List<VaultCollector> trusses = new ArrayList<>();
 		final HeaderParser osdHeader;
 
-		InputStream inputStream = defineStream(file);
-		try (DataInputStream data_in = new DataInputStream(inputStream)) { // closes the inputStream also
-			HashMap<String, String> header = readHeader(file.toString(), data_in);
+		try (DataInputStream data_in = new DataInputStream(FileUtils.wrapIfZipStream(fileStream))) { // closes the inputStream also
+			HashMap<String, String> header = readHeader(sourcePath.toString(), data_in);
 			osdHeader = new HistoOsdReaderWriter().new HeaderParser(header);
 		}
 
@@ -391,33 +389,33 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			RecordSetParser osdRecordSet = osdRecordSets.get(i);
 			Channel channel = osdRecordSet.getChannel();
 			if (channel != null) {
-				VaultCollector vaultCollector = new VaultCollector(objectDirectory, file, osdHeader.getFileVersion(), osdRecordSets.size(), i,
+				VaultCollector vaultCollector = new VaultCollector(objectDirectory, sourcePath, osdHeader.getFileVersion(), osdRecordSets.size(), i,
 						osdRecordSet.getBaseName(), osdHeader.getDeviceName(), osdRecordSet.getEnhancedStartTimestamp_ms(), channel.getNumber(),
 						osdHeader.getLogObjectKey(), false);
 				trusses.add(vaultCollector);
 			}
 		}
-		log.fine(() -> " " + trusses.size() + " identified in " + file.getPath()); //$NON-NLS-1$
+		log.fine(() -> " " + trusses.size() + " identified in " + sourcePath); //$NON-NLS-1$
 		return trusses;
 	}
 
 	/**
 	 * Read histo record sets from one single file.
-	 * @param filePath
-	 * @param trusses referencing a subset of the recordsets in the file
+	 * @param fileStream
+	 * @param trusses holds a non-empty subset of the recordsets in the file
 	 * @return histo vault list (may contain trusses without measurements, settlements and scores)
 	 */
-	public static List<ExtendedVault> readVaults(Path filePath, List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException,
-			DataInconsitsentException {
+	public static List<ExtendedVault> readVaults(InputStream fileStream, List<VaultCollector> trusses, long fileLength) throws IOException,
+			NotSupportedFileFormatException, DataInconsitsentException {
+		if (trusses.isEmpty()) throw new IllegalArgumentException("at least one trusses entry is required");
 		List<ExtendedVault> histoVaults = new ArrayList<>();
 
 		// build list of requested recordset ordinals
 		List<Integer> recordSetOrdinals = trusses.stream().mapToInt(a -> a.getVault().getLogRecordSetOrdinal()).boxed().collect(Collectors.toList());
 
-		File file = filePath.toFile();
-		InputStream inputStream = defineStream(file);
+		InputStream inputStream = FileUtils.wrapIfZipStream(fileStream);
 		try (DataInputStream data_in = new DataInputStream(inputStream)) { // closes the inputStream also
-			final HashMap<String, String> header = readHeader(filePath.toString(), data_in);
+			final HashMap<String, String> header = readHeader(trusses.get(0).getVault().getLoadFilePath(), data_in);
 			final HeaderParser osdHeader = new HistoOsdReaderWriter().new HeaderParser(header);
 
 			long startTimeNs = System.nanoTime();
@@ -437,7 +435,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 
 					RecordSet histoRecordSet = constructRecordSet(data_in, osdRecordSet, vaultCollector.getVault());
 
-					final Integer[] scores = determineScores(osdRecordSet, elapsedStart_ns, histoRecordSet.getFileDataBytesSize(), file.length());
+					final Integer[] scores = determineScores(osdRecordSet, elapsedStart_ns, histoRecordSet.getFileDataBytesSize(), fileLength);
 					vaultCollector.promoteTruss(histoRecordSet, scores);
 
 					histoVaults.add(vaultCollector.getVault());
@@ -447,29 +445,9 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 				}
 			}
 			log.fine(() -> String.format("%d of%3d recordsets in%,7d ms  recordSetOrdinals=%s from %s", //$NON-NLS-1$
-					histoVaults.size(), osdHeader.getRecordSetSize(), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNs), recordSetOrdinals.toString(), filePath));
+					histoVaults.size(), osdHeader.getRecordSetSize(), TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNs), recordSetOrdinals.toString(), trusses.get(0).getVault().getLoadFilePath()));
 		}
 		return histoVaults;
-	}
-
-	/**
-	 * @return the zipInputStream or the FileInputStream
-	 */
-	private static InputStream defineStream(File file) throws FileNotFoundException, IOException {
-		InputStream inputStream;
-		{ // decide if we read a zipped file
-			@SuppressWarnings("resource") // is closed with the input stream
-			ZipInputStream zip_input = new ZipInputStream(new FileInputStream(file));
-			ZipEntry zip_entry = zip_input.getNextEntry();
-			if (zip_entry != null) {
-				inputStream = zip_input;
-			} else {
-				zip_input.close();
-				zip_input = null;
-				inputStream = new FileInputStream(file);
-			}
-		}
-		return inputStream;
 	}
 
 	/**

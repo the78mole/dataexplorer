@@ -19,15 +19,15 @@
 package gde.histo.device;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 import gde.GDE;
 import gde.data.RecordSet;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
-import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 
 /**
@@ -52,14 +52,13 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * Do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
 	 * Since this is a long term operation the progress bar should be updated to signal business to user.
 	 * Reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param filePath
-	 * @param trusses referencing a subset of the recordsets in the file
+	 * @param inputStream for loading the log data
+	 * @param truss references the requested vault for feeding with the results (vault might be without measurements, settlements and scores)
 	 * @throws DataInconsitsentException
 	 * @throws DataTypeException
 	 * @throws IOException
-	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
 	 */
-	List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException;
+	public void getRecordSetFromImportFile(Supplier<InputStream> inputStream, VaultCollector truss) throws DataInconsitsentException, IOException, DataTypeException;
 
 	/**
 	 * Add record data points from file stream to each measurement.

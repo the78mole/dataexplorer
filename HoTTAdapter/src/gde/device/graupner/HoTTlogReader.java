@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package gde.device.graupner;
 
@@ -74,7 +74,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		int countPackageLoss = 0;
 		int logDataOffset = Integer.valueOf(fileInfoHeader.get("LOG DATA OFFSET"));
 		long numberDatablocks = (fileSize - logDataOffset) / HoTTbinReader.dataBlockSize;
-		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(fileInfoHeader.get("LOG START TIME"), HoTTbinReader.getStartTimeStamp(file, numberDatablocks));
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(fileInfoHeader.get("LOG START TIME"), HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks));
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
@@ -159,7 +159,7 @@ public class HoTTlogReader extends HoTTbinReader {
 							HoTTbinReader.recordSetChannel.addPoints(HoTTbinReader.pointsChannel, HoTTbinReader.timeStep_ms);
 						}
 
-						switch ((byte) (HoTTbinReader.buf[26] & 0xFF)) { //actual sensor 
+						switch ((byte) (HoTTbinReader.buf[26] & 0xFF)) { //actual sensor
 						case HoTTAdapter.ANSWER_SENSOR_VARIO_19200:
 								// check if recordSetVario initialized, transmitter and receiver data always
 								// present, but not in the same data rate as signals
@@ -378,7 +378,7 @@ public class HoTTlogReader extends HoTTbinReader {
 			values[9] = (_buf[25] & 0x60) * 1000; //warning V,T only
 		else
 			values[9] = 0;
-		
+
 		if (log.isLoggable(Level.FINER)) {
 			//data bytes: 8=TXdBm(-D), 9=RXdBm(-D)
 			StringBuilder sb = new StringBuilder().append(String.format("Tx-dbm = -%d Rx-dbm = -%d", _buf[8], _buf[9]));
@@ -386,7 +386,7 @@ public class HoTTlogReader extends HoTTbinReader {
 				sb.append(String.format(" %6.3f", values[i] / 1000.0));
 			}
 			log.log(Level.FINER, sb.toString());
-		}		
+		}
 		return true;
 	}
 
@@ -401,9 +401,9 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[2] = _buf[9] * -1000;
 
 		for (int i = 0,j = 0; i < numberUsedChannels && i < 16; i++,j+=2) {
-			values[i + 3] = (DataParser.parse2UnsignedShort(_buf, (66 + j)) / 2) * 1000; 
+			values[i + 3] = (DataParser.parse2UnsignedShort(_buf, (66 + j)) / 2) * 1000;
 		}
-		//Ph(D)[4], Evt1(H)[5], Evt2(D)[6], Fch(D)[7], TXdBm(-D)[8], RXdBm(-D)[9], RfRcvRatio(D)[10], TrnRcvRatio(D)[11]				
+		//Ph(D)[4], Evt1(H)[5], Evt2(D)[6], Fch(D)[7], TXdBm(-D)[8], RXdBm(-D)[9], RfRcvRatio(D)[10], TrnRcvRatio(D)[11]
 		//STATUS : Ph(D)[4], Evt1(H)[5], Evt2(D)[6], Fch(D)[7], TXdBm(-D)[8], RXdBm(-D)[9], RfRcvRatio(D)[10], TrnRcvRatio(D)[11]
 		//S.INFOR : DEV(D)[22], CH(D)[23], SID(H)[24], WARN(H)[25]
 		values[19] = (_buf[5] & 0x01) * 100000; 	//power off
@@ -420,11 +420,11 @@ public class HoTTlogReader extends HoTTbinReader {
 	 * @param _buf
 	 */
 	protected static boolean parseVario(byte[] _buf, int[] values, boolean isHoTTAdapter2) {
-		//0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx 7=EventVario		
+		//0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx 7=EventVario
 		//10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
 		//sensor byte: 26=sensor byte
 		//27=inverseBits 28,29=altitude 30,31=altitude_max 32,33=altitude_min 34,35=climb1 36,37=climb3 38,39=climb10
-		values[0] = (_buf[16] & 0xFF) * 1000; 
+		values[0] = (_buf[16] & 0xFF) * 1000;
 		HoTTbinReader.tmpHeight = isHoTTAdapter2 ? DataParser.parse2Short(_buf, 28) - 500 : DataParser.parse2Short(_buf, 28);
 		values[1] = HoTTbinReader.tmpHeight * 1000;
 		//pointsVarioMax = DataParser.parse2Short(buf1, 30) * 1000;
@@ -436,7 +436,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[5] = (_buf[13] & 0xFF) * 1000;				//voltageRx
 		values[6] = ((_buf[14] & 0xFF) - 20) * 1000;//temperaturRx
 		values[7] = (_buf[27] & 0x3F) * 1000; 			//inverse event
-		
+
 		if (log.isLoggable(Level.FINER)) {
 			printSensorValues(_buf, values, 8);
 		}
@@ -455,7 +455,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		//27,28=InverseBits 29=moveDirection 30,31=speed 32,33,34,35,36=latitude 37,38,39,40,41=longitude 42,43=distanceStart 44,45=altitude
 		//46,47=climb1 48=climb3 49=#satellites 50=GPS-Fix 51=homeDirection 52,53=northVelocity 54=hAcc 55-58=GPStime 59,60=eastVelocity
 		//61=hAcc 62-65=freeChars 66=version
-		values[0] = (_buf[16] & 0xFF) * 1000; 
+		values[0] = (_buf[16] & 0xFF) * 1000;
 		HoTTbinReader.tmpHeight = isHoTTAdapter2 ? DataParser.parse2Short(_buf, 44) - 500 : DataParser.parse2Short(_buf, 44);
 		HoTTbinReader.tmpClimb1 = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf, 46) - 30000) : DataParser.parse2UnsignedShort(_buf, 46);
 		HoTTbinReader.tmpClimb3 = isHoTTAdapter2 ? (_buf[48] & 0xFF) - 120 : (_buf[48] & 0xFF);
@@ -481,7 +481,7 @@ public class HoTTlogReader extends HoTTbinReader {
 			//ignore;
 		}
 		values[14] = (_buf[27] & 0x0F) * 1000; //inverse event
-		
+
 		if (log.isLoggable(Level.FINER)) {
 			printSensorValues(_buf, values, 14);
 		}
@@ -498,7 +498,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		// 12=Revolution, 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel,
 		// 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		// 21=Speed, 22=LowestCellVoltage, 23=LowestCellNumber, 24=Pressure, 24=Event
-		values[0] = (_buf[16] & 0xFF) * 1000; 
+		values[0] = (_buf[16] & 0xFF) * 1000;
 		HoTTbinReader.tmpHeight = isHoTTAdapter2 ? DataParser.parse2Short(_buf, 46) - 500 : DataParser.parse2Short(_buf, 46);
 		HoTTbinReader.tmpClimb3 = isHoTTAdapter2 ? (_buf[50] & 0xFF) - 120 : (_buf[50] & 0xFF);
 		HoTTbinReader.tmpVoltage1 = DataParser.parse2Short(_buf, 35);
@@ -506,8 +506,8 @@ public class HoTTlogReader extends HoTTbinReader {
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf, 55);
 		//sensor byte: 26=sensor byte
 		//27,28=InverseBits 29=cell1, 30=cell2 31=cell3 32=cell4 33=cell5 34=cell6 35,36=voltage1 37,38=voltage2 39=temperature1 40=temperature2
-		//41=? 42,43=fuel 44,45=rpm 46,47=altitude 48,49=climb1 50=climb3 51,52=current 53,54=voltage 55,56=capacity 57,58=speed 
-		//59=cellVoltage_min 60=#cellVoltage_min 61,62=rpm2 63=#error 64=pressure 65=version		
+		//41=? 42,43=fuel 44,45=rpm 46,47=altitude 48,49=climb1 50=climb3 51,52=current 53,54=voltage 55,56=capacity 57,58=speed
+		//59=cellVoltage_min 60=#cellVoltage_min 61,62=rpm2 63=#error 64=pressure 65=version
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
 		values[1] = DataParser.parse2Short(_buf, 53) * 1000;
@@ -525,7 +525,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[12] = DataParser.parse2Short(_buf, 44) * 1000;
 		values[13] = HoTTbinReader.tmpHeight * 1000;
 		values[14] = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf, 48) - 30000) * 10 : (DataParser.parse2UnsignedShort(_buf, 48) * 1000);
-		values[15] = HoTTbinReader.tmpClimb3 * 1000;		
+		values[15] = HoTTbinReader.tmpClimb3 * 1000;
 		values[16] = DataParser.parse2Short(_buf, 42) * 1000;
 		values[17] = HoTTbinReader.tmpVoltage1 * 100;
 		values[18] = HoTTbinReader.tmpVoltage2 * 100;
@@ -536,7 +536,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[23] = (_buf[60] & 0xFF) * 1000; //cell number lowest cell voltage
 		values[24] = (_buf[64] & 0xFF) * 1000; //Pressure
 		values[25] = ((_buf[27] & 0xFF) + ((_buf[28] & 0x7F) << 8)) * 1000; //inverse event
-		
+
 		if (log.isLoggable(Level.FINER)) {
 			printSensorValues(_buf, values, 26);
 		}
@@ -549,13 +549,13 @@ public class HoTTlogReader extends HoTTbinReader {
 	 * @throws DataInconsitsentException
 	 */
 	protected static boolean parseEAM(byte[] _buf, int[] values, RecordSet recordSetEAM, boolean isHoTTAdapter2) throws DataInconsitsentException {
-		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 
+		//0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14,
 		//20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 27=RPM 28=MotorTime 29=Speed 30=Event
 		//sensor byte: 26=sensor byte
 		//27,28=InverseBits 29=cell1, 30=cell2 31=cell3 32=cell4 33=cell5 34=cell6 35=cell7 36=cell8 37=cell9 38=cell10 39=cell11 40=cell12 41=cell13 42=cell14
 		//43,44=voltage1 45,46=voltage2 47=temperature1 48=temperature2 49,50=altitude 51,52=current 53,54=voltage 55,56=capacity 57,58=climb1 59=climb3
 		//60,61=rpm 62,63=runtime>3A 64,65=speed
-		values[0] = (_buf[16] & 0xFF) * 1000; 
+		values[0] = (_buf[16] & 0xFF) * 1000;
 		HoTTbinReader.tmpHeight = isHoTTAdapter2 ? DataParser.parse2Short(_buf, 49) - 500 : DataParser.parse2Short(_buf, 49);
 		HoTTbinReader.tmpClimb3 = isHoTTAdapter2 ? (_buf[59] & 0xFF) - 120 : (_buf[59] & 0xFF);
 		HoTTbinReader.tmpVoltage1 = DataParser.parse2Short(_buf, 43);
@@ -605,7 +605,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		//sensor byte: 26=sensor byte
 		//27,28=InverseBits 29,30=voltageIn 31,32=voltageIn_min 33,34=capacity 35=temperature1 36=temperature1_max 37,38=current 39,40=current_max
 		//41,42=rpm 43,44=rpm_max 45=temperature2 46=temperature2_max
-		values[0] = (_buf[16] & 0xFF) * 1000; 
+		values[0] = (_buf[16] & 0xFF) * 1000;
 		HoTTbinReader.tmpVoltage = DataParser.parse2Short(_buf, 29);
 		HoTTbinReader.tmpCurrent = DataParser.parse2Short(_buf, 37);
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf, 33);

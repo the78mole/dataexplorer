@@ -18,14 +18,16 @@
 ****************************************************************************************/
 package gde.device.graupner;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -35,6 +37,8 @@ import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.sun.istack.internal.Nullable;
 
 import gde.GDE;
 import gde.data.Channel;
@@ -72,7 +76,8 @@ public class HoTTbinReader {
 	static long																	timeStep_ms;
 	static int[]																pointsReceiver, pointsEAM, pointsVario, pointsGPS, pointsChannel, pointsESC;
 	static int[]																pointsGAM;
-	static RecordSet														recordSetReceiver, recordSetGAM, recordSetEAM, recordSetVario, recordSetGPS, recordSetChannel, recordSetESC;
+	static RecordSet														recordSetReceiver, recordSetGAM, recordSetEAM, recordSetVario, recordSetGPS, recordSetChannel,
+			recordSetESC;
 	static int																	tmpVoltageRx								= 0;
 	static int																	tmpTemperatureRx						= 0;
 	static int																	tmpHeight										= 0;
@@ -107,192 +112,318 @@ public class HoTTbinReader {
 	static ReverseChannelPackageLossStatistics	lostPackages								= new ReverseChannelPackageLossStatistics();
 
 	/**
+	 * Individual settings for the SD Log container format ('GRAUPNER SD LOG').
+	 * @author Thomas Eickert (USER)
+	 */
+	public static class SdLogFormat {
+		private final String	starterText	= "GRAUPNER SD LOG";
+		private final int			headerSize;
+		private final int			footerSize;
+		private final int			dataBlockSize;
+
+		public SdLogFormat(int headerSize, int footerSize, int dataBlockSize) {
+			this.headerSize = headerSize;
+			this.footerSize = footerSize;
+			this.dataBlockSize = dataBlockSize;
+		}
+	}
+
+	/**
+	 * Adapt a data input stream to a SD Log container format ('GRAUPNER SD LOG').
+	 * Check the format basics.
+	 * @author Thomas Eickert (USER)
+	 */
+	public static class SdLogInputStream extends FilterInputStream {
+
+		private final SdLogFormat	sdLogFormat;
+		private final long				payloadSize;
+		private final long posMax;
+	  private long pos = 0;
+	  private long mark = 0;
+
+		/**
+		 * Create a <code>FilterInputStream</code> respecting the header and footer bytes of a SD log file.
+		 * Check the file format.
+		 * @param in is a markSupported input stream
+		 * @param fileLength is the length of the file which is represented by the <code>in</code> stream
+		 */
+		public SdLogInputStream(FilterInputStream in, long fileLength, SdLogFormat sdLogFormat) throws DataTypeException, IOException {
+			super(in);
+			this.sdLogFormat = sdLogFormat;
+			posMax = fileLength - sdLogFormat.footerSize - 1;
+			payloadSize = fileLength - sdLogFormat.headerSize - sdLogFormat.footerSize;
+			if (payloadSize < 0) throw new DataTypeException("file size less than header/footer size");
+
+			if (payloadSize % sdLogFormat.dataBlockSize != 0) throw new DataTypeException("data block size does not match");
+
+			if (!in.markSupported()) throw new DataTypeException("mark/reset not supported");
+
+			byte[] buffer = skipHeader();
+			if (!new String(buffer).startsWith(sdLogFormat.starterText)) throw new DataTypeException("starter text does not match");
+
+			if (!verifyHoTTFormat()) throw new DataTypeException("data block counter does not match");
+		}
+
+		protected boolean verifyHoTTFormat() throws IOException {
+			mark(1 + this.sdLogFormat.dataBlockSize * 4);
+			byte[] buffer;
+			boolean isHoTT = true;
+			buffer = new byte[this.sdLogFormat.dataBlockSize];
+			for (int i = 0; i < 4; i++) {
+				read(buffer);
+				if (buffer[0] != i + 1) {
+					isHoTT = false;
+					break;
+				}
+			}
+			reset();
+			return isHoTT;
+		}
+
+		@Override
+		public synchronized int read() throws IOException {
+			if (posMax - pos <= 0) return -1;
+			int b = in.read();
+			if (b >= 0) pos += 1;
+			return b;
+		}
+
+		@Override
+		public int read(byte b[]) throws IOException {
+			return read(b, 0, b.length);
+		}
+
+		@Override
+		public int read(byte b[], int off, int len) throws IOException {
+			long r = posMax - pos;
+			if (r <= 0) return -1;
+			int i = in.read(b, off, len);
+			if (i > r ) {
+				i = (int) r;
+			}
+			if (i > 0) pos += i;
+			return i;
+		}
+
+		@Override
+		public synchronized long skip(long n) throws IOException {
+			long i = in.skip(n);
+			if (i > 0) {
+				pos += i;
+			}
+			return i;
+		}
+
+		@Override
+		public synchronized void mark(int readlimit) {
+			in.mark(readlimit);
+			mark = pos;
+		}
+
+		@Override
+		public synchronized void reset() throws IOException {
+			in.reset();
+			pos = mark;
+		}
+
+		private byte[] skipHeader() throws IOException {
+			byte[] buffer = new byte[sdLogFormat.headerSize];
+			in.read(buffer);
+			return buffer;
+		}
+
+		/**
+		 * @return the number of bytes of the embedded payload data
+		 */
+		public long getPayloadSize() {
+			return this.payloadSize;
+		}
+
+	}
+
+	/**
 	 * get data file info data
 	 *
-	 * @param buffer, byte array containing the first 64 byte to analyze the header
-	 * @return hash map containing header data as string accessible by public  header keys
+	 * @return hash map containing header data as string accessible by public header keys
 	 * @throws IOException
 	 * @throws DataTypeException
-	 * @throws Exception
 	 */
 	public static HashMap<String, String> getFileInfo(File file) throws IOException, DataTypeException {
-		final String $METHOD_NAME = "getFileInfo";
-		FileInputStream file_input = null;
-		DataInputStream data_in = null;
+		HashMap<String, String> fileInfo = null;
+		try (FilterInputStream data_in = new BufferedInputStream(new FileInputStream(file))) {
+			fileInfo = HoTTbinReader.getFileInfo(data_in, file.getPath(), file.length());
+		}
+		return fileInfo;
+	}
+
+	/**
+	 * @param data_in is the input stream which is consumed but not closed
+	 * @param filePath
+	 * @param fileLength
+	 * @return a hash map containing header data as string accessible by public header keys
+	 */
+	@Nullable
+	private static HashMap<String, String> getFileInfoLog(FilterInputStream data_in, String filePath, long fileLength)
+			throws UnsupportedEncodingException, IOException {
+		HashMap<String, String> fileInfo = new HashMap<String, String>();
+		fileInfo.put(HoTTAdapter.SD_FORMAT, Boolean.toString(false));
+		fileInfo.put(HoTTAdapter.FILE_PATH, filePath);
+
+		data_in.reset();
+		data_in.mark(999);
 		byte[] buffer = new byte[64];
+		data_in.read(buffer);
+
+		// read header size
+		String preHeader = new String(buffer);
+		int indexOf = preHeader.indexOf("LOG DATA OFFSET : ");
+		if (indexOf > 10) {
+			int logDataOffset = Integer.valueOf(preHeader.substring(indexOf + 18, indexOf + 18 + 8));
+
+			data_in.reset();
+
+			StringBuilder sb = new StringBuilder();
+			String line;
+			BufferedReader reader = new BufferedReader(new InputStreamReader(data_in, "ISO-8859-1")); //$NON-NLS-1$
+			while ((line = reader.readLine()) != null && sb.append(line).append(GDE.STRING_NEW_LINE).length() < logDataOffset) {
+				if (line.contains(": ") && line.indexOf(GDE.STRING_COLON) > 5) {
+					String key = line.split(": ")[0].trim();
+					String value = null;
+					try {
+						value = line.split(": ")[1].trim();
+					}
+					catch (Exception e) {
+						// ignore and skip this entry
+					}
+					if (value != null) {
+						fileInfo.put(key, value);
+						if (log.isLoggable(Level.FINE))
+							log.log(Level.FINE, String.format("%16s : %s", line.split(": ")[0].trim(), fileInfo.get(line.split(": ")[0].trim())));
+					}
+				}
+			}
+			int sensorCount;
+			sensorCount = fileInfo.get(HoTTAdapter.DETECTED_SENSOR) != null ? fileInfo.get(HoTTAdapter.DETECTED_SENSOR).split(GDE.STRING_COMMA).length - 1 : 0;
+			fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
+			fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + ((fileLength - logDataOffset) / 78));
+		}
+		return fileInfo;
+	}
+
+	/**
+	 * Get data file info data.
+	 * Set the HoTTbinReader.sensorSignature.
+	 * @param data_in is the input stream which is consumed but not closed.
+	 * @return a hash map containing header data as string accessible by public header keys
+	 */
+	public static HashMap<String, String> getFileInfo(FilterInputStream data_in, String filePath, long fileLength) throws IOException, DataTypeException {
+		final HashMap<String, String> fileInfo;
+
+		data_in.mark(999);
+		byte[] buffer = new byte[64];
+		data_in.read(buffer);
+
+		if (filePath.endsWith(GDE.FILE_ENDING_BIN) && new String(buffer).startsWith("GRAUPNER SD LOG")) {
+			// begin evaluate for HoTTAdapterX files containing normal HoTT V4 sensor data
+			try {
+				SdLogFormat sdLogFormat = new SdLogFormat(HoTTbinReaderX.headerSize, HoTTbinReaderX.footerSize, 64);
+				SdLogInputStream sdLogInputStream = new SdLogInputStream(data_in, fileLength, sdLogFormat);
+				fileInfo = getFileInfo(sdLogInputStream, filePath, fileLength);
+			} catch (DataTypeException e) {
+				// includes diverse format exceptions
+			}
+			HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
+			throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
+		}
+		else if (filePath.endsWith(GDE.FILE_ENDING_LOG) && new String(buffer).startsWith("FILE TAG IDVER")) {
+			fileInfo = getFileInfoLog(data_in, filePath, fileLength);
+			if (fileInfo.get(HoTTAdapter.DETECTED_SENSOR) != null)
+				HoTTbinReader.sensorSignature.append(fileInfo.get(HoTTAdapter.DETECTED_SENSOR).substring(9));
+		}
+		else if (filePath.endsWith(GDE.FILE_ENDING_LOG)) {
+			HoTTbinReader.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW0021));
+			throw new DataTypeException(Messages.getString(MessageIds.GDE_MSGW0021));
+		} else { // *.log do not need a sensor scan.
+			long numberLogs = (fileLength / 64);
+			if (numberLogs < NUMBER_LOG_RECORDS_MIN) {
+				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2406));
+			}
+			else if (numberLogs < LOG_RECORD_SCAN_START + NUMBER_LOG_RECORDS_TO_SCAN) {
+				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
+				throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
+			}
+			fileInfo = getFileInfoBin(data_in, filePath, fileLength);
+		}
+		return fileInfo;
+	}
+
+	private static HashMap<String, String> getFileInfoBin(FilterInputStream data_in, String filePath, long fileLength) throws IOException {
+		for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
+			HoTTAdapter.isSensorType[i] = false;
+		}
+
 		HashMap<String, String> fileInfo;
 		int sensorCount = 0;
-		long numberLogs = (file.length() / 64);
 		HoTTbinReader.sensorSignature = new StringBuilder().append(GDE.STRING_LEFT_BRACKET).append(HoTTAdapter.Sensor.RECEIVER.name()).append(GDE.STRING_COMMA);
 
-		try {
-			fileInfo = new HashMap<String, String>();
-			fileInfo.put(HoTTAdapter.FILE_PATH, file.getPath());
-			file_input = new FileInputStream(file);
-			data_in = new DataInputStream(file_input);
+		fileInfo = new HashMap<String, String>();
+		fileInfo.put(HoTTAdapter.SD_FORMAT, Boolean.toString(data_in instanceof SdLogInputStream));
+		fileInfo.put(HoTTAdapter.FILE_PATH, filePath);
 
-			// begin evaluate for HoTTAdapterX files containing normal HoTT V4
-			// sensor data
-			data_in.read(buffer);
-
-			if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_BIN) && new String(buffer).startsWith("GRAUPNER SD LOG")) {
-				boolean isHoTTV4 = true;
-				data_in.close();
-				file_input = new FileInputStream(file);
-				data_in = new DataInputStream(file_input);
-				buffer = new byte[HoTTbinReaderX.headerSize];
-				data_in.read(buffer);
-				buffer = new byte[64];
-				for (int i = 0; i < 4; i++) {
-					data_in.read(buffer);
-					if (buffer[0] != i + 1)
-						isHoTTV4 = false;
-				}
-				data_in.close();
-				if (isHoTTV4) {
-					file_input = new FileInputStream(file);
-					data_in = new DataInputStream(file_input);
-					buffer = new byte[HoTTbinReaderX.headerSize];
-					File outputFile = new File(GDE.JAVA_IO_TMPDIR + GDE.FILE_SEPARATOR + "~" + file.getPath().substring(1 + file.getPath().lastIndexOf(GDE.FILE_SEPARATOR)));
-					FileOutputStream file_output = new FileOutputStream(outputFile);
-					DataOutputStream data_out = new DataOutputStream(file_output);
-					long fileSize = file.length() - HoTTbinReaderX.headerSize - HoTTbinReaderX.footerSize;
-					buffer = new byte[HoTTbinReaderX.headerSize];
-					data_in.read(buffer);
-					buffer = new byte[64];
-					for (int i = 0; i < fileSize / buffer.length; i++) {
-						if (buffer.length == data_in.read(buffer))
-							data_out.write(buffer);
-					}
-					data_out.close();
-					data_out = null;
-					data_in.close();
-					data_in = null;
-					file_input.close();
-					file_input = null;
-					return getFileInfo(outputFile);
-				}
-				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
-				throw new DataTypeException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2410));
-			}
-			else if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_LOG) && new String(buffer).startsWith("FILE TAG IDVER")) {
-				//read header size
-				String preHeader = new String(buffer);
-				int indexOf = preHeader.indexOf("LOG DATA OFFSET : ");
-				if (indexOf > 10) {
-					int logDataOffset = Integer.valueOf(preHeader.substring(indexOf+18, indexOf+18+8));
-					data_in.close();
-					data_in = null;
-					file_input.close();
-					file_input = null;
-					file_input = new FileInputStream(file);
-					BufferedReader reader;
-					StringBuilder sb = new StringBuilder();
-					String line;
-					reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "ISO-8859-1")); //$NON-NLS-1$
-					while ((line = reader.readLine()) != null && sb.append(line).append(GDE.STRING_NEW_LINE).length() < logDataOffset) {
-						if (line.contains(": ") && line.indexOf(GDE.STRING_COLON) > 5) {
-							String key = line.split(": ")[0].trim();
-							String value = null;
-							try {
-								value = line.split(": ")[1].trim();
-							}
-							catch (Exception e) {
-								// ignore and skip this entry
-							}
-							if (value != null) {
-								fileInfo.put(key, value);
-								if (log.isLoggable(Level.FINE))
-									log.log(Level.FINE, String.format("%16s : %s", line.split(": ")[0].trim(), fileInfo.get(line.split(": ")[0].trim())));
-							}
-						}
-					}
-					reader.close();
-					sensorCount = fileInfo.get("DETECTED SENSOR") != null ? fileInfo.get("DETECTED SENSOR").split(GDE.STRING_COMMA).length - 1 : 0;
-					fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
-					fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + ((file.length() - logDataOffset) / 78));
-					if (fileInfo.get("DETECTED SENSOR") != null)
-						HoTTbinReader.sensorSignature.append(fileInfo.get("DETECTED SENSOR").substring(9));
-				}
-			}
-			else if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_LOG) && data_in != null) {
-				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW0021));
-				throw new DataTypeException(Messages.getString(MessageIds.GDE_MSGW0021));
-			}
-
-				// end evaluate for HoTTAdapterX files containing normal HoTT V4 sensor data
-			if (data_in != null) { //*.log already closed data_in and do not need a sensor scan.
-				if (numberLogs < 7000) {
-					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2406));
-				}
-				else if (numberLogs < 5500) {
-					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
-					throw new IOException(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2407));
-				}
-				for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
-					HoTTAdapter.isSensorType[i] = false;
-				}
-				data_in.close();
-				file_input = new FileInputStream(file);
-				data_in = new DataInputStream(file_input);
-				data_in.read(buffer);
-				long position = (file.length() / 2) - ((NUMBER_LOG_RECORDS_TO_SCAN * 64) / 2);
-				position = position - position % 64;
-				if (position <= 0) {
-					sensorCount = 1;
-				}
-				else {
-					position = position <= 64 ? 64 : position;
-					data_in.skip(position - 64);
-					for (int i = 0; i < NUMBER_LOG_RECORDS_TO_SCAN && data_in.available() >= 64; i++) {
-						data_in.read(buffer);
-						if (HoTTbinReader.log.isLoggable(Level.FINER)) {
-							HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
-							HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, String.format("SensorByte  %02X", buffer[7]));
-						}
-
-						switch (buffer[7]) {
-						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.VARIO.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] = true;
-							break;
-						case HoTTAdapter.SENSOR_TYPE_GPS_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GPS.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] = true;
-							break;
-						case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GAM.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] = true;
-							break;
-						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.EAM.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] = true;
-							break;
-						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
-							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
-							HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] = true;
-							break;
-						}
-					}
-					for (boolean element : HoTTAdapter.isSensorType) {
-						if (element == true)
-							++sensorCount;
-					}
-				}
-				fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
-				fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
-			}
-			HoTTbinReader.sensorSignature.deleteCharAt(HoTTbinReader.sensorSignature.length() - 1).append(GDE.STRING_RIGHT_BRACKET);
-			if (HoTTbinReader.log.isLoggable(Level.FINE))
-				for (Entry<String, String> entry : fileInfo.entrySet()) {
-					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
-					HoTTbinReader.log.log(Level.FINE, file.getName() + " - " + "sensor count = " + sensorCount);
-				}
+		data_in.reset();
+		byte[] buffer = new byte[64];
+		data_in.read(buffer);
+		long position = (fileLength / 2) - ((NUMBER_LOG_RECORDS_TO_SCAN * 64) / 2);
+		position = position - position % 64;
+		if (position <= 0) {
+			sensorCount = 1;
 		}
-		finally {
-			if (data_in != null) data_in.close();
-			if (file_input != null) file_input.close();
+		else {
+			position = position <= 64 ? 64 : position;
+			data_in.skip(position - 64);
+			for (int i = 0; i < NUMBER_LOG_RECORDS_TO_SCAN && data_in.available() >= 64; i++) {
+				data_in.read(buffer);
+				if (HoTTbinReader.log.isLoggable(Level.FINER)) {
+					HoTTbinReader.log.log(Level.FINER, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+					HoTTbinReader.log.log(Level.FINER, String.format("SensorByte  %02X", buffer[7]));
+				}
+
+				switch (buffer[7]) {
+				case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+					if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.VARIO.name()).append(GDE.STRING_COMMA);
+					HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] = true;
+					break;
+				case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+					if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GPS.name()).append(GDE.STRING_COMMA);
+					HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()] = true;
+					break;
+				case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+					if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.GAM.name()).append(GDE.STRING_COMMA);
+					HoTTAdapter.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()] = true;
+					break;
+				case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+					if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.EAM.name()).append(GDE.STRING_COMMA);
+					HoTTAdapter.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()] = true;
+					break;
+				case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
+					if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
+					HoTTAdapter.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] = true;
+					break;
+				}
+			}
+			for (boolean element : HoTTAdapter.isSensorType) {
+				if (element == true)
+					++sensorCount;
+			}
 		}
+		fileInfo.put(HoTTAdapter.SENSOR_COUNT, GDE.STRING_EMPTY + sensorCount);
+		fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (fileLength / 64));
+		HoTTbinReader.sensorSignature.deleteCharAt(HoTTbinReader.sensorSignature.length() - 1).append(GDE.STRING_RIGHT_BRACKET);
+		if (HoTTbinReader.log.isLoggable(Level.FINE))
+			for (Entry<String, String> entry : fileInfo.entrySet()) {
+				HoTTbinReader.log.log(Level.FINE, entry.getKey() + " = " + entry.getValue());
+				HoTTbinReader.log.log(Level.FINE, Paths.get(filePath).getFileName().toString() + " - " + "sensor count = " + sensorCount);
+			}
 		return fileInfo;
 	}
 
@@ -323,19 +454,13 @@ public class HoTTbinReader {
 	 * @throws Exception
 	 */
 	public static synchronized void read(String filePath) throws Exception {
-		File file = null;
-		try {
-			HashMap<String, String> header = getFileInfo(new File(filePath));
+		HashMap<String, String> header = getFileInfo(new File(filePath));
 
-			if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
-				HoTTbinReader.isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
-				readSingle(file = new File(header.get(HoTTAdapter.FILE_PATH)));
-			}
-			else
-				readMultiple(file = new File(header.get(HoTTAdapter.FILE_PATH)));
-		}
-		finally {
-			if (file != null && file.getName().startsWith("~") && file.exists()) file.delete();
+		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
+			HoTTbinReader.isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
+			readSingle(new File(filePath));
+		} else {
+			readMultiple(new File(filePath));
 		}
 	}
 
@@ -389,7 +514,7 @@ public class HoTTbinReader {
 		boolean isWrongDataBlockNummerSignaled = false;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
-		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		numberDatablocks = HoTTbinReader.isReceiverOnly && !HoTTAdapter.isChannelsChannelEnabled ? numberDatablocks/10 : numberDatablocks;
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
@@ -485,7 +610,7 @@ public class HoTTbinReader {
 									// check if recordSetVario initialized, transmitter and receiver data always present, but not in the same data rate and signals
 									if (HoTTbinReader.recordSetVario == null) {
 										channel = HoTTbinReader.channels.get(2);
-									channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
+										channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
 											? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey()
 											: date);
 									recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK
@@ -524,7 +649,7 @@ public class HoTTbinReader {
 									// check if recordSetReceiver initialized, transmitter and receiver data always present, but not in the same data rate as signals
 									if (HoTTbinReader.recordSetGPS == null) {
 										channel = HoTTbinReader.channels.get(3);
-									channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
+										channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
 											? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey()
 											: date);
 										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GPS.value() + recordSetNameExtend;
@@ -565,7 +690,7 @@ public class HoTTbinReader {
 									// check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 									if (HoTTbinReader.recordSetGAM == null) {
 										channel = HoTTbinReader.channels.get(4);
-									channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
+										channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
 											? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey()
 											: date);
 										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.GAM.value() + recordSetNameExtend;
@@ -610,7 +735,7 @@ public class HoTTbinReader {
 									// check if recordSetGeneral initialized, transmitter and receiver data always present, but not in the same data rate and signals
 									if (HoTTbinReader.recordSetEAM == null) {
 										channel = HoTTbinReader.channels.get(5);
-									channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
+										channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
 											? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey()
 											: date);
 										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.EAM.value() + recordSetNameExtend;
@@ -655,7 +780,7 @@ public class HoTTbinReader {
 									// check if recordSetMotorDriver initialized, transmitter and receiver data always present, but not in the same data rate and signals
 									if (HoTTbinReader.recordSetESC == null) {
 										channel = HoTTbinReader.channels.get(7);
-									channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
+										channel.setFileDescription(HoTTbinReader.application.isObjectoriented()
 											? date + GDE.STRING_BLANK + HoTTbinReader.application.getObjectKey()
 											: date);
 										recordSetName = recordSetNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + HoTTAdapter.Sensor.ESC.value() + recordSetNameExtend;
@@ -853,7 +978,7 @@ public class HoTTbinReader {
 		HoTTbinReader.isTextModusSignaled = false;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
-		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file, numberDatablocks);
+		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
@@ -1225,8 +1350,8 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsReceiver[7] = (_buf[36] & 0xFF) * 1000;
 			HoTTbinReader.pointsReceiver[8] = (_buf[39] & 0xFF) * 1000;
 		}
-		if ((_buf[32] & 0x40) > 0 || (_buf[32] & 0x25) > 0 && HoTTbinReader.tmpTemperatureRx >= 70) //T = 70 - 20 = 50 lowest temperature warning
-			HoTTbinReader.pointsReceiver[9] = (_buf[32] & 0x65) * 1000; //warning E,V,T only
+		if ((_buf[32] & 0x40) > 0 || (_buf[32] & 0x25) > 0 && HoTTbinReader.tmpTemperatureRx >= 70) // T = 70 - 20 = 50 lowest temperature warning
+			HoTTbinReader.pointsReceiver[9] = (_buf[32] & 0x65) * 1000; // warning E,V,T only
 		else
 			HoTTbinReader.pointsReceiver[9] = 0;
 
@@ -1268,8 +1393,8 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsChannel[20] = (_buf[50] & 0x02) * 50000;
 		HoTTbinReader.pointsChannel[21] = (_buf[50] & 0x04) * 25000;
 		if (_buf[32] > 0 && _buf[32] < 27) {
-			HoTTbinReader.pointsChannel[22] = _buf[32] * 1000; //warning
-			log.log(Level.FINE, String.format("Warning %d occured at %s", HoTTbinReader.pointsChannel[22]/1000, StringHelper.getFormatedTime("HH:mm:ss.SSS", HoTTbinReader.timeStep_ms+HoTTbinReader.recordSetChannel.getStartTimeStamp())));
+			HoTTbinReader.pointsChannel[22] = _buf[32] * 1000; // warning
+			log.log(Level.FINE, String.format("Warning %d occured at %s", HoTTbinReader.pointsChannel[22] / 1000, StringHelper.getFormatedTime("HH:mm:ss.SSS", HoTTbinReader.timeStep_ms + HoTTbinReader.recordSetChannel.getStartTimeStamp())));
 		}
 		else
 			HoTTbinReader.pointsChannel[22] = 0;
@@ -1342,7 +1467,7 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsVario[5] = (_buf0[1] & 0xFF) * 1000;
 			HoTTbinReader.pointsVario[6] = (_buf0[2] & 0xFF) * 1000;
 		}
-		HoTTbinReader.pointsVario[7] = (_buf1[1] & 0x3F) * 1000; //inverse event
+		HoTTbinReader.pointsVario[7] = (_buf1[1] & 0x3F) * 1000; // inverse event
 
 		HoTTbinReader.isJustParsed = true;
 		return sdLogVersion;
@@ -1442,10 +1567,10 @@ public class HoTTbinReader {
 				HoTTbinReader.pointsGPS[13] = Integer.valueOf(String.format("%c", _buf3[4])) * 1000;
 			}
 			catch (NumberFormatException e1) {
-				//ignore;
+				// ignore;
 			}
 		}
-		HoTTbinReader.pointsGPS[14] = (_buf1[1] & 0x0F) * 1000; //inverse event
+		HoTTbinReader.pointsGPS[14] = (_buf1[1] & 0x0F) * 1000; // inverse event
 
 		HoTTbinReader.isJustParsed = true;
 	}
@@ -1523,10 +1648,10 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsGAM[19] = (_buf2[3] & 0xFF) * 1000;
 			HoTTbinReader.pointsGAM[20] = (_buf2[4] & 0xFF) * 1000;
 			// 21=Speed, 22=LowestCellVoltage, 23=LowestCellNumber, 24=Pressure, 24=Event
-			HoTTbinReader.pointsGAM[21] = DataParser.parse2Short(_buf4, 1) * 1000; //Speed [km/h
-			HoTTbinReader.pointsGAM[22] = (_buf4[3] & 0xFF) * 1000; //lowest cell voltage 124 = 2.48 V
-			HoTTbinReader.pointsGAM[23] = (_buf4[4] & 0xFF) * 1000; //cell number lowest cell voltage
-			HoTTbinReader.pointsGAM[24] = (_buf4[8] & 0xFF) * 1000; //Pressure
+			HoTTbinReader.pointsGAM[21] = DataParser.parse2Short(_buf4, 1) * 1000; // Speed [km/h
+			HoTTbinReader.pointsGAM[22] = (_buf4[3] & 0xFF) * 1000; // lowest cell voltage 124 = 2.48 V
+			HoTTbinReader.pointsGAM[23] = (_buf4[4] & 0xFF) * 1000; // cell number lowest cell voltage
+			HoTTbinReader.pointsGAM[24] = (_buf4[8] & 0xFF) * 1000; // Pressure
 		}
 		if ((_buf1[1] & 0xFF) + ((_buf1[2] & 0x7F) << 8) != 0)
 		HoTTbinReader.pointsGAM[25] = ((_buf1[1] & 0xFF) + ((_buf1[2] & 0x7F) << 8)) * 1000; //inverse event
@@ -1615,7 +1740,7 @@ public class HoTTbinReader {
 			HoTTbinReader.pointsEAM[28] = ((_buf4[6] & 0xFF) * 60 + (_buf4[7] & 0xFF)) * 1000; // motor time
 			HoTTbinReader.pointsEAM[29] = DataParser.parse2Short(_buf4, 8) * 1000; // speed
 		}
-		HoTTbinReader.pointsEAM[30] = ((_buf1[1] & 0xFF) + ((_buf1[2] & 0x7F) << 8)) * 1000; //inverse event
+		HoTTbinReader.pointsEAM[30] = ((_buf1[1] & 0xFF) + ((_buf1[2] & 0x7F) << 8)) * 1000; // inverse event
 
 		HoTTbinReader.isJustParsed = true;
 	}
@@ -1702,16 +1827,13 @@ public class HoTTbinReader {
 	}
 
 	/**
-	 * @param file
-	 * @param numberDatablocks
 	 * @return get a rectified start timestamp if the files's last modified timestamp does not correspond with the filename
 	 */
-	protected static long getStartTimeStamp(File file, long numberDatablocks) {
+	protected static long getStartTimeStamp(String fileName, long fileLastModified, long numberDatablocks) {
 		final long startTimeStamp;
-		String name = file.getName();
-		log.log(Level.FINE, "name=", name); //$NON-NLS-1$
+		log.log(Level.FINE, "name=", fileName); //$NON-NLS-1$
 		Pattern hoTTNamePattern = Pattern.compile("\\d{4}\\_\\d{4}-\\d{1,2}-\\d{1,2}"); //$NON-NLS-1$
-		Matcher hoTTMatcher = hoTTNamePattern.matcher(name);
+		Matcher hoTTMatcher = hoTTNamePattern.matcher(fileName);
 		if (hoTTMatcher.find()) {
 			String logName = hoTTMatcher.group();
 
@@ -1725,10 +1847,10 @@ public class HoTTbinReader {
 
 			// check if the zoned date is equal
 			GregorianCalendar lastModifiedDate = new GregorianCalendar();
-			lastModifiedDate.setTimeInMillis(file.lastModified() - numberDatablocks * 10);
-			if (year == lastModifiedDate.get(Calendar.YEAR) && month == lastModifiedDate.get(Calendar.MONTH)+1 && day == lastModifiedDate.get(Calendar.DAY_OF_MONTH)) {
+			lastModifiedDate.setTimeInMillis(fileLastModified - numberDatablocks * 10);
+			if (year == lastModifiedDate.get(Calendar.YEAR) && month == lastModifiedDate.get(Calendar.MONTH) + 1 && day == lastModifiedDate.get(Calendar.DAY_OF_MONTH)) {
 				startTimeStamp = lastModifiedDate.getTimeInMillis();
-				log.log(Level.FINE,	"lastModified=" + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", file.lastModified()) + " " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", lastModifiedDate.getTimeInMillis()));  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				log.log(Level.FINE, "lastModified=" + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", fileLastModified) + " " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", lastModifiedDate.getTimeInMillis())); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			else {
 				// spread the logCounter into steps of 10 minutes
@@ -1739,7 +1861,7 @@ public class HoTTbinReader {
 			}
 		}
 		else {
-			startTimeStamp = file.lastModified();
+			startTimeStamp = fileLastModified;
 		}
 		return startTimeStamp;
 	}
@@ -1754,9 +1876,9 @@ public class HoTTbinReader {
 		long startTimeStamp_ms = fileStartTimeStamp_ms;
 		String formattedFileStartTimeStamp = StringHelper.getFormatedTime("YYYY-MM-dd HH:mm:ss.SSS", fileStartTimeStamp_ms);
 
-		if (!formattedFileStartTimeStamp.contains(formattedLogStartTime)) {		//LOG START TIME  : 15:08:28
+		if (!formattedFileStartTimeStamp.contains(formattedLogStartTime)) { // LOG START TIME : 15:08:28
 
-			int year = Integer.parseInt(formattedFileStartTimeStamp.substring(0,4));
+			int year = Integer.parseInt(formattedFileStartTimeStamp.substring(0, 4));
 			int month = Integer.parseInt(formattedFileStartTimeStamp.substring(5, 7));
 			int day = Integer.parseInt(formattedFileStartTimeStamp.substring(8, 10));
 
