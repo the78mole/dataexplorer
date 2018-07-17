@@ -294,12 +294,12 @@ public final class VaultCollector {
 				StatisticsType referencedStatistics = device.getMeasurementStatistic(this.vault.getLogChannelNumber(), ratioRefOrdinal);
 				if (referencedRecord != null) {
 					if (referencedStatistics.isAvg()) {
-						double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(ratioRefOrdinal) / 1000.) //
+						double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(refOrdinal) / 1000.) //
 								/ device.translateDeltaValue(record, record.getSumTriggeredRange(refOrdinal) / 1000.);
 						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
-						entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
+						entryPoints.addPoint(TrailTypes.REAL_AVG_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
 					} else if (referencedStatistics.isMax()) {
-						double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(ratioRefOrdinal) / 1000.) //
+						double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(refOrdinal) / 1000.) //
 								/ device.translateDeltaValue(record, record.getSumTriggeredRange(refOrdinal) / 1000.);
 						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
 						entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
