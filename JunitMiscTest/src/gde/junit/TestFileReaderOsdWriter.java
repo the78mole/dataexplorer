@@ -110,7 +110,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						String line = reader.readLine();
 						boolean isCVS2SerialFormat = line.startsWith(deviceConfig.getDataBlockLeader()) && line.contains(deviceConfig.getDataBlockSeparator().value());
 						reader.close();
-					
+						
 						if (!isCVS2SerialFormat) {
 							HashMap<String, String> fileHeader = CSVReaderWriter.getHeader(';', file.getAbsolutePath());
 							String fileDeviceName = fileHeader.get(GDE.DEVICE_NAME);
@@ -369,12 +369,12 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
 						activeChannel.setSaved(true);
 
-						RecordSet recordSet = gde.device.opentx.CSVReaderWriter.read(',', file.getAbsolutePath(), "csv test");
+						RecordSet recordSet = gde.device.opentx.CSVReaderWriter.read(device.getDataBlockSeparator().value().charAt(0), file.getAbsolutePath(), "csv test");
+						device.updateVisibilityStatus(recordSet, true);
 
 						if (recordSet != null) {
 							activeChannel.setActiveRecordSet(recordSet);
 							activeChannel.applyTemplate(recordSet.getName(), true);
-							//device.makeInActiveDisplayable(recordSet);
 							drawCurves(recordSet, 1024, 768);
 						}
 
