@@ -412,8 +412,8 @@ public final class VaultPicker {
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.C_TRAILRECORDSET)) {
 				long nanoTime = System.nanoTime();
-				this.trailRecordSet = TrailRecordSet.createRecordSet(this.pickedVaults);
-				this.trailRecordSet.initializeFromVaults();
+				this.trailRecordSet = TrailRecordSet.createRecordSet();
+				this.trailRecordSet.initializeFromVaults(this.pickedVaults);
 				this.trailRecordSet.applyTemplate(true); // needs reasonable data
 				if (this.recordSetBytesSum > 0) {
 					long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
@@ -422,7 +422,7 @@ public final class VaultPicker {
 				}
 			} else if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA)) { // saves some time compared to the logic above
 				long nanoTime = System.nanoTime();
-				this.trailRecordSet.initializeFromVaults();
+				this.trailRecordSet.initializeFromVaults(this.pickedVaults);
 				long micros = TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 				log.time(() -> String.format("%,5d timeSteps  to TrailRecordSet  time=%,6d [ms] :: per second:%5d", //
 						this.pickedVaults.size(), micros / 1000, this.pickedVaults.size() > 0 ? this.pickedVaults.size() * 1000000 / micros : 0));

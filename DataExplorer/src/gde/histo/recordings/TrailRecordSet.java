@@ -112,7 +112,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		 * Set time steps for the trail recordset and the data points for all trail records.
 		 * Every record takes the selected trail type / score data from the history vault and populates its data.
 		 */
-		void addVaults() {
+		void addVaultsToRecordSet() {
 			for (Map.Entry<Long, List<ExtendedVault>> entry : pickedVaults.initialVaults.entrySet()) {
 				for (ExtendedVault histoVault : entry.getValue()) {
 					int duration_mm = histoVault.getScorePoint(ScoreLabelTypes.DURATION_MM.ordinal());
@@ -124,12 +124,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 					dataTags.add(histoVault);
 				}
-			}
-
-			for (String recordName : recordNames) {
-				TrailRecord trailRecord = get(recordName);
-				applyTemplateTrailData(trailRecord);
-				trailRecord.initializeFromVaults(pickedVaults.initialVaults);
 			}
 		}
 
@@ -198,7 +192,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		 * Take the prioritized trail type from applicable trails if no template setting is available.
 		 * @param record
 		 */
-		private void applyTemplateTrailData(TrailRecord record) {
+		void applyTemplateTrailData(TrailRecord record) {
 			TrailSelector trailSelector = record.getTrailSelector();
 			if (template != null && template.isAvailable()) {
 				int trailTextOrdinal = Integer.parseInt(template.getRecordProperty(record.getName(), Record.TRAIL_TEXT_ORDINAL, "-1"));
@@ -608,7 +602,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	private final HistoExplorer		presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
 
-	private final PickedVaults		pickedVaults;
+	private PickedVaults					pickedVaults;
 
 	private final List<Integer>		durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
 	private final TrailDataTags		dataTags							= new TrailDataTags();
@@ -622,13 +616,11 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Hold trail records for measurements, settlements and scores.
 	 * @param recordNames
 	 * @param timeSteps
-	 * @param pickedVaults
 	 */
-	private TrailRecordSet(String[] recordNames, TimeSteps timeSteps, TreeMap<Long, List<ExtendedVault>> pickedVaults) {
+	private TrailRecordSet(String[] recordNames, TimeSteps timeSteps) {
 		super(DataExplorer.application.getActiveDevice(), DataExplorer.application.getActiveChannelNumber(), //
 				DataExplorer.application.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + DataExplorer.application.getActiveChannelNumber(), //
 				recordNames, timeSteps);
-		this.pickedVaults = new PickedVaults(pickedVaults);
 		{
 			String deviceSignature = this.device.getName() + GDE.STRING_UNDER_BAR + DataExplorer.application.getActiveChannelNumber();
 			this.template = HistoGraphicsTemplate.createGraphicsTemplate(deviceSignature, Settings.getInstance().getActiveObjectKey());
@@ -645,13 +637,13 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * based on device xml settings.
 	 * @return a trail record set containing all trail records (empty) as specified
 	 */
-	public static synchronized TrailRecordSet createRecordSet(TreeMap<Long, List<ExtendedVault>> pickedVaults) {
+	public static synchronized TrailRecordSet createRecordSet() {
 		DeviceConfiguration configuration = DataExplorer.application.getActiveDevice().getDeviceConfiguration();
 
 		TimeSteps timeSteps = new TimeSteps(-1, INITIAL_RECORD_CAPACITY);
 
 		String[] names = configuration.getMeasurementSettlementScoregroupNames(DataExplorer.application.getActiveChannelNumber());
-		TrailRecordSet newTrailRecordSet = new TrailRecordSet(names, timeSteps, pickedVaults);
+		TrailRecordSet newTrailRecordSet = new TrailRecordSet(names, timeSteps);
 
 		ChannelType channelType = configuration.getChannel(DataExplorer.application.getActiveChannelNumber());
 		List<MeasurementType> channelMeasurements = channelType.getMeasurement();
@@ -730,17 +722,28 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 */
 	public void refillRecord(TrailRecord record, int trailTextIndex) {
 		record.getTrailSelector().setTrailTextSelectedIndex(trailTextIndex);
+		record.clear();
 		record.initializeFromVaults(this.pickedVaults.initialVaults);
 	}
 
 	/**
 	 * Build data contents after building the records list.
+	 * @param newPickedVaults
 	 */
-	public void initializeFromVaults() {
+	public void initializeFromVaults(TreeMap<Long, List<ExtendedVault>> newPickedVaults) {
+		this.pickedVaults = new PickedVaults(newPickedVaults);
+
 		cleanup();
 		RecordingsCollector collector = new RecordingsCollector();
 		collector.defineTrailTypes();
-		collector.addVaults();
+		collector.addVaultsToRecordSet();
+
+		for (String recordName : recordNames) {
+			TrailRecord trailRecord = get(recordName);
+			trailRecord.clear();
+			collector.applyTemplateTrailData(trailRecord);
+			trailRecord.initializeFromVaults(pickedVaults.initialVaults);
+		}
 		collector.setGpsLocationsTags();
 	}
 
@@ -945,15 +948,12 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	/**
-	 * Clears the data points in all records and in the time steps.
+	 * Reverts adding vaults data to the recordset.
 	 * Keeps initial capacities.
-	 * Does not clear any fields in the recordSet, the records or in timeStep.
+	 * Does not clear the records or any fields in the recordSet or in timeStep.
 	 */
 	public void cleanup() {
 		super.timeStep_ms.clear();
-		for (String recordName : super.getRecordNames()) {
-			get(recordName).clear();
-		}
 		this.durations_mm.clear();
 		this.pickedVaults.indexedVaults.clear();
 
