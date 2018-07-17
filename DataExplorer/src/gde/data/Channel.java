@@ -511,8 +511,9 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setValueGridColor(SWTResourceManager.getColor(r, g, b));
 				recordSet.setValueGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
 				recordSet.setValueGridType(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				if (recordSet.get(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, "-1")).intValue()).isVisible) {
-					recordSet.setValueGridRecordOrdinal(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, "-1")).intValue()); //$NON-NLS-1$
+				int gridRecordOrdinal = Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, "-1")).intValue();
+				if (gridRecordOrdinal >= 0 && gridRecordOrdinal < recordSet.realSize() && recordSet.get(gridRecordOrdinal).isVisible) {
+					recordSet.setValueGridRecordOrdinal(gridRecordOrdinal); //$NON-NLS-1$
 				}
 				else {
 					recordSet.setValueGridRecordOrdinal(findFirstVisibleRecord(recordSet));
