@@ -377,17 +377,19 @@ public class StatisticsWindow extends CTabItem {
 									StatisticsType referencedStatistics = device.getMeasurementStatistic(activeChannel.getNumber(), measurementStatistics.getRatioRefOrdinal());
 
 									if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
-										if (referencedStatistics.isAvg()) {
-											double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0)
-													/ device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
+										double summarizedValue = device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
+										if (referencedStatistics.isAvg() && summarizedValue != 0.0) {
+											double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0) / summarizedValue;
 											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
 											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 										}
-										else if (referencedStatistics.isMax()) {
-											double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0)
-													/ device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
+										else if (referencedStatistics.isMax() && summarizedValue != 0.0) {
+											double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0) / summarizedValue;
 											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
 											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
+										}
+										else {
+											sb.append("0 [").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 										}
 									}
 								}
