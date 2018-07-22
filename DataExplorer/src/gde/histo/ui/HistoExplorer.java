@@ -231,7 +231,7 @@ public class HistoExplorer {
 		if (application.getActiveChannel() == null) return;
 
 		if (Thread.currentThread().getId() == application.getThreadId()) {
-			log.log(Level.FINER, "initial size=", getTrailRecordSet() != null
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "initial size=", getTrailRecordSet() != null
 					? getTrailRecordSet().getDisplayRecords().size() + "  " + getTrailRecordSet().getVisibleAndDisplayableRecords().size() : "0   0");
 			if (isHistoWindowVisible()) {
 				Thread rebuilThread = new Thread((Runnable) () -> rebuildHisto(rebuildStep), "rebuild4Screening"); //$NON-NLS-1$
@@ -241,7 +241,7 @@ public class HistoExplorer {
 					log.log(Level.WARNING, e.getMessage(), e);
 				}
 			}
-			log.log(Level.FINER, "rebuild size=", getTrailRecordSet() != null
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "rebuild size=", getTrailRecordSet() != null
 					? getTrailRecordSet().getDisplayRecords().size() + "  " + getTrailRecordSet().getVisibleAndDisplayableRecords().size() : "0   0");
 		} else {
 			GDE.display.asyncExec(new Runnable() {
