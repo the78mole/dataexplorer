@@ -767,11 +767,6 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			}
 		}
 
-		System.out.println(tmpRecordSet.getName() + " - " + System.identityHashCode(tmpRecordSet));
-		for (int i = 0; i < tmpRecordSet.get(74).realSize(); i++) {
-			System.out.println("finish loop: " + i + " - " + tmpRecordSet.get(74).get(i));
-		}
-
 		if (doFullRead) {
 			final Integer[] scores = new Integer[ScoreLabelTypes.VALUES.length];
 			// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
@@ -816,10 +811,6 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 						String.format("lost:%,9d perMille:%,4d total:%,9d   lostMax_ms:%,4d lostAvg_ms=%,4d", countPackageLoss, //$NON-NLS-1$
 								(int) (countPackageLoss / tmpRecordSet.getTime_ms((int) fileLength / HoTTbinHistoReader2.dataBlockSize - 1) * 1000. * recordTimespan_ms),
 								fileLength / HoTTbinHistoReader2.dataBlockSize, HoTTbinReader.lostPackages.getMaxValue() * 10, (int) HoTTbinReader.lostPackages.getAvgValue() * 10));
-			}
-
-			for (int i = 0; i < tmpRecordSet.get(74).realSize(); i++) {
-				System.out.println("pre promote: " + i + " - " + tmpRecordSet.get(74).get(i));
 			}
 			
 			truss.promoteTruss(tmpRecordSet, scores);
