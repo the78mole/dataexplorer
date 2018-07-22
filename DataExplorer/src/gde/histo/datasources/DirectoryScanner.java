@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 
 import gde.Analyzer;
 import gde.GDE;
-import gde.config.Settings;
 import gde.data.Channel;
 import gde.device.IDevice;
 import gde.exception.NotSupportedFileFormatException;
@@ -64,18 +63,25 @@ public final class DirectoryScanner {
 	 * Extended predicate which supports IOException and NotSupportedFileFormatException.
 	 */
 	@FunctionalInterface
-	interface CheckedBiPredicate<T, U> {
-		boolean test(T t, U u) throws IOException, NotSupportedFileFormatException;
+	interface CheckedPredicate<U> {
+		boolean test(U u) throws IOException, NotSupportedFileFormatException;
 	}
 
 	/**
 	 * @return the data folder residing in the top level working directory (data path + object key resp device)
 	 */
-	public static Path getActiveFolder() {
-		IDevice device = Analyzer.getInstance().getActiveDevice();
-		String activeObjectKey = Settings.getInstance().getActiveObjectKey();
+	public static Path getActiveFolder4Ui() {
+		return new DirectoryScanner(Analyzer.getInstance()).getActiveFolder();
+	}
+
+	/**
+	 * @return the data folder residing in the top level working directory (data path + object key resp device)
+	 */
+	public Path getActiveFolder() {
+		IDevice device = analyzer.getActiveDevice();
+		String activeObjectKey = analyzer.getSettings().getActiveObjectKey();
 		String subPathData = activeObjectKey.isEmpty() ? device.getDeviceConfiguration().getPureDeviceName() : activeObjectKey;
-		return Paths.get(Settings.getInstance().getDataFilePath()).resolve(subPathData);
+		return Paths.get(analyzer.getSettings().getDataFilePath()).resolve(subPathData);
 	}
 
 	/**
@@ -84,9 +90,11 @@ public final class DirectoryScanner {
 	 */
 	private static final class SourceFoldersBuilder {
 		@SuppressWarnings("hiding")
-		private static final Logger	log										= Logger.getLogger(SourceFoldersBuilder.class.getName());
+		private static final Logger						log											= Logger.getLogger(SourceFoldersBuilder.class.getName());
 
 		private final EnumSet<DirectoryType>	validatedDirectoryTypes	= EnumSet.noneOf(DirectoryType.class);
+
+		private final Analyzer								analyzer;
 
 		private IDevice												validatedDevice					= null;
 		private Channel												validatedChannel				= null;
@@ -102,8 +110,9 @@ public final class DirectoryScanner {
 		private boolean												isMajorChange						= false;
 		private boolean												isChannelChangeOnly			= false;
 
-		public SourceFoldersBuilder() {
-			 this.sourceFolders = new SourceFolders(Settings.getInstance().getActiveObjectKey());
+		public SourceFoldersBuilder(Analyzer analyzer) {
+			this.analyzer = analyzer;
+			this.sourceFolders = new SourceFolders(analyzer.getSettings().getActiveObjectKey());
 		}
 
 		/**
@@ -127,7 +136,7 @@ public final class DirectoryScanner {
 		 * @param rebuildStep defines which steps during histo data collection are skipped
 		 * @return true if the criteria have changed since the last invocation of the directory scanner
 		 */
-		public boolean validateAndBuild(IDevice device, RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
+		public boolean validateAndBuild(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
 			IDevice lastDevice = validatedDevice;
 			Channel lastChannel = validatedChannel;
 			EnumSet<DirectoryType> lastDirectoryTypes = EnumSet.copyOf(validatedDirectoryTypes);
@@ -136,7 +145,7 @@ public final class DirectoryScanner {
 			boolean isFirstCall = lastDevice == null;
 			isMajorChange = rebuildStep == RebuildStep.A_HISTOSET || isFirstCall;
 
-			validatedDevice = device;
+			validatedDevice = analyzer.getActiveDevice();
 			boolean isNewDevice = lastDevice != null && validatedDevice != null ? !lastDevice.getName().equals(validatedDevice.getName())
 					: validatedDevice != null;
 			isMajorChange = isMajorChange || isNewDevice;
@@ -147,7 +156,7 @@ public final class DirectoryScanner {
 			validatedDirectoryTypes.addAll(DirectoryType.getValidDirectoryTypes(validatedDevice));
 			isMajorChange = isMajorChange || !lastDirectoryTypes.equals(validatedDirectoryTypes);
 
-			validatedObjectKey = Settings.getInstance().getActiveObjectKey();
+			validatedObjectKey = analyzer.getSettings().getActiveObjectKey();
 			isMajorChange = isMajorChange || !lastObjectKey.equals(validatedObjectKey);
 
 			// avoid costly directory scan and building directory file event listeners (WatchDir)
@@ -161,7 +170,7 @@ public final class DirectoryScanner {
 			}
 
 			// the channel selection does not have any influence on the validated folders list
-			validatedChannel = Analyzer.getInstance().getActiveChannel();
+			validatedChannel = analyzer.getActiveChannel();
 			isChannelChangeOnly = !isMajorChange && RebuildStep.B_HISTOVAULTS.isEqualOrBiggerThan(rebuildStep) && !lastChannel.equals(validatedChannel);
 			isMajorChange = isMajorChange || !lastChannel.equals(validatedChannel);
 			return true;
@@ -176,15 +185,18 @@ public final class DirectoryScanner {
 
 	}
 
-	private final SourceFoldersBuilder											sourceFoldersBuilder	= new SourceFoldersBuilder();
-	private final CheckedBiPredicate<IDevice, RebuildStep>	sourceFileValidator;
+	private final SourceFoldersBuilder					sourceFoldersBuilder;
+	private final Analyzer											analyzer;
+	private final CheckedPredicate<RebuildStep>	sourceFileValidator;
 
-	public DirectoryScanner() {
+	public DirectoryScanner(Analyzer analyzer) {
+		this.analyzer = analyzer;
+		this.sourceFoldersBuilder = new SourceFoldersBuilder(analyzer);
 		// define if the log paths are checked for any changed / new / deleted files
-		if (Settings.getInstance().isSourceFileListenerActive()) {
-			this.sourceFileValidator = (IDevice d, RebuildStep r) -> validateDirectoryFiles(d, r);
+		if (analyzer.getSettings().isSourceFileListenerActive()) {
+			this.sourceFileValidator = (RebuildStep r) -> validateDirectoryFiles(r);
 		} else {
-			this.sourceFileValidator = (IDevice d, RebuildStep r) -> validateDirectoryPaths(d, r);
+			this.sourceFileValidator = (RebuildStep r) -> validateDirectoryPaths(r);
 		}
 
 		initialize();
@@ -200,7 +212,7 @@ public final class DirectoryScanner {
 	/**
 	 * Re- Initializes the source log paths watcher.
 	 */
-	private void initializeWatchDir(IDevice device, List<Path> sourceLogPaths) {
+	private void initializeWatchDir(List<Path> sourceLogPaths) {
 		closeWatchDir();
 
 		SourceFolders sourceFolders = sourceFoldersBuilder.sourceFolders;
@@ -211,7 +223,7 @@ public final class DirectoryScanner {
 						.filter(e -> filePath.startsWith(e.getKey())) //
 						.map(e -> e.getValue()).flatMap(Set::stream)//
 						.collect(Collectors.toSet());
-				SourceDataSet sourceDataSet = AbstractSourceDataSet.createSourceDataSet(filePath, device);
+				SourceDataSet sourceDataSet = AbstractSourceDataSet.createSourceDataSet(filePath, analyzer);
 				return sourceDataSet != null && sourceDataSet.isWorkableFile(directoryTypes, sourceFolders);
 			}
 		};
@@ -249,8 +261,8 @@ public final class DirectoryScanner {
 	 * Use alternatively a path or files checker function which conforms to the DE settings.
 	 * @return the rebuild step conforming to the input value and the validation scan results
 	 */
-	public RebuildStep isValidated(IDevice device, RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
-		if (sourceFileValidator.test(device, rebuildStep))
+	public RebuildStep isValidated(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
+		if (sourceFileValidator.test(rebuildStep))
 			return rebuildStep;
 		else if (rebuildStep.isEqualOrBiggerThan(RebuildStep.B_HISTOVAULTS))
 			return rebuildStep;
@@ -262,24 +274,23 @@ public final class DirectoryScanner {
 	 * @param rebuildStep defines which steps during histo data collection are skipped
 	 * @return true if the list of source log directories has not changed and the directories did not send any events.
 	 */
-	private boolean validateDirectoryFiles(IDevice device, RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
-		sourceFoldersBuilder.validateAndBuild(device, rebuildStep);
+	private boolean validateDirectoryFiles(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
+		sourceFoldersBuilder.validateAndBuild(rebuildStep);
 		boolean isValid = !sourceFoldersBuilder.isMajorChange();
 
 		if (watchDir == null || !isValid) {
-			initializeWatchDir(device, sourceFoldersBuilder.sourceFolders.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
+			initializeWatchDir(sourceFoldersBuilder.sourceFolders.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
 		}
 		log.log(Level.FINER, "hasChangedLogFiles=", watchDir.hasChangedLogFiles());
 		return isValid && !watchDir.hasChangedLogFilesThenReset();
-
 	}
 
 	/**
 	 * @param rebuildStep defines which steps during histo data collection are skipped
 	 * @return true if the list of source log directories has not changed
 	 */
-	private boolean validateDirectoryPaths(IDevice device, RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
-		sourceFoldersBuilder.validateAndBuild(device, rebuildStep);
+	private boolean validateDirectoryPaths(RebuildStep rebuildStep) throws IOException, NotSupportedFileFormatException {
+		sourceFoldersBuilder.validateAndBuild(rebuildStep);
 		return !sourceFoldersBuilder.isMajorChange();
 	}
 

@@ -46,7 +46,6 @@ import gde.log.Level;
 import gde.log.Logger;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
 
 /**
  *
@@ -93,9 +92,7 @@ public class DeviceSerialization {
 					if (((LocalAccess) DataAccess.getInstance()).existsDeviceMigrationFolder(i)) {
 						log.log(Level.INFO, "previous devices exist, migrate from version " + i);
 						try (InputStream inputStream = ((LocalAccess) DataAccess.getInstance()).getDeviceXsdMigrationStream(i)) {
-							while (Settings.getInstance().isXsdThreadPending()) {
-								WaitTimer.delay(7);
-							}
+							Settings.getInstance().joinXsdThread(); //ok
 
 							Unmarshaller tmpUnmarshaller = JAXBContext.newInstance("gde.device").createUnmarshaller();//$NON-NLS-1$
 							tmpUnmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(inputStream)));

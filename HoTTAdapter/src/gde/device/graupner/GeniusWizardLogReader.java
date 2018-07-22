@@ -178,10 +178,9 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = GeniusWizardLogReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
-		if (menuToolBar != null) GeniusWizardLogReader.application.setProgress(0, sThreadId);
+		GDE.getUiNotification().setProgress(0);
 
 		try {
 			HoTTAdapter.recordSets.clear();
@@ -194,7 +193,7 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 			GeniusWizardLogReader.recordSetESC = channel.get(recordSetName);
 			GeniusWizardLogReader.recordSetESC.setRecordSetDescription(String.format("%s - %s %s\n%s", device.getName(), Messages.getString(MessageIds.GDE_MSGT0129), dateTime, header.get(GeniusWizardLogReader.PPRODUCT_NAME)));
 			GeniusWizardLogReader.recordSetESC.setStartTimeStamp(startTimeStamp_ms);
-			if (GeniusWizardLogReader.application.getMenuToolBar() != null) {
+			if (GDE.isWithUi()) {
 				channel.applyTemplate(recordSetName, false);
 			}
 
@@ -217,25 +216,22 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 					lastLogTimeStamp_ms = logTimeStamp_ms;
 				}
 				else if (logTimeStamp_ms == lastLogTimeStamp_ms) {
-					if (GeniusWizardLogReader.application.getStatusBar() != null)
-						GeniusWizardLogReader.application.setStatusMessage(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2411, new Object[] { ++numTimeStamps }), SWT.COLOR_RED);
+					GDE.getUiNotification().setStatusMessage(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2411, new Object[] { ++numTimeStamps }), SWT.COLOR_RED);
 					continue;
 				}
 				else {
 					if (numTimeStamps == 0)
-						if (GeniusWizardLogReader.application.getStatusBar() != null)
-							GeniusWizardLogReader.application.setStatusMessage(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2412), SWT.COLOR_RED);
+						GDE.getUiNotification().setStatusMessage(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2412), SWT.COLOR_RED);
 					else
-						if (GeniusWizardLogReader.application.getStatusBar() != null)
-							GeniusWizardLogReader.application.setStatusMessage(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2413, new Object[] {numTimeStamps}), SWT.COLOR_RED);
+						GDE.getUiNotification().setStatusMessage(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2413, new Object[] {numTimeStamps}), SWT.COLOR_RED);
 					break;
 				}
 
-				if (menuToolBar != null && i % progressIndicator == 0)
-					GeniusWizardLogReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+				if (i % progressIndicator == 0)
+					GDE.getUiNotification().setProgress((int) (i * 100 / numberDatablocks));
 			}
 
-			if (menuToolBar != null) {
+			if (GDE.isWithUi()) {
 				channel.applyTemplate(recordSetName, true);
 				//write filename after import to record description
 				GeniusWizardLogReader.recordSetESC.descriptionAppendFilename(file.getName());
@@ -243,7 +239,7 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
-				GeniusWizardLogReader.application.setProgress(100, sThreadId);
+				GDE.getUiNotification().setProgress(100);
 			}
 		}
 		finally {

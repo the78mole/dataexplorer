@@ -87,13 +87,12 @@ public class ObjectKeyScanner extends Thread {
 			String objectKeyDirPath = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + this.objectKey;
 
 			if (this.objectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) { // use exact defined object key
-				String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 				FileUtils.checkDirectoryAndCreate(objectKeyDirPath);
 
 				//scan all data files for object key
 				List<File> files = FileUtils.getFileListing(new File(this.settings.getDataFilePath()), 1);
 				final int progressDistance = 50;
-				double progressStep = (99. - this.application.getProgressPercentage()) / (files.size() + 1.) * progressDistance;
+				double progressStep = (99. - GDE.getUiNotification().getProgressPercentage()) / (files.size() + 1.) * progressDistance;
 				int i = 0;
 				for (File file : files) {
 					try {
@@ -108,7 +107,7 @@ public class ObjectKeyScanner extends Thread {
 								}
 							}
 						}
-						if (this.application.getMenuToolBar() != null && i % progressDistance == 0) this.application.setProgress((int) (i * progressStep), sThreadId);
+						if (i % progressDistance == 0) GDE.getUiNotification().setProgress((int) (i * progressStep));
 						i++;
 					}
 					catch (IOException e) {
@@ -121,11 +120,10 @@ public class ObjectKeyScanner extends Thread {
 						log.log(Level.WARNING, t.getLocalizedMessage(), t);
 					}
 				}
-				if (this.application.getMenuToolBar() != null) this.application.setProgress(100, sThreadId);
+				GDE.getUiNotification().setProgress(100);
 			}
 			else { // search for all available keys
 				log.log(Level.WARNING, "object key not set, actual object key = \"" + this.objectKey + "\" !"); //$NON-NLS-1$ //$NON-NLS-2$
-				String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 				final int progressPercentageLimit = 80;
 
 				final File rootDirectory = new File(this.settings.getDataFilePath());
@@ -136,7 +134,7 @@ public class ObjectKeyScanner extends Thread {
 					int fileCounter = 0;
 					List<File> files = FileUtils.getFileListing(rootDirectory, 1);
 					final int progressDistance = 50;
-					double progressStep = (99. - this.application.getProgressPercentage()) / (files.size() + 1.) * progressDistance;
+					double progressStep = (99. - GDE.getUiNotification().getProgressPercentage()) / (files.size() + 1.) * progressDistance;
 					int i = 0;
 					for (File file : files) {
 						try {
@@ -161,7 +159,7 @@ public class ObjectKeyScanner extends Thread {
 									}
 								}
 							}
-							if (this.application.getMenuToolBar() != null && i % progressDistance == 0) this.application.setProgress((int) (i * progressStep), sThreadId);
+							if (i % progressDistance == 0) GDE.getUiNotification().setProgress((int) (i * progressStep));
 							i++;
 						}
 						catch (IOException e) {
@@ -177,9 +175,9 @@ public class ObjectKeyScanner extends Thread {
 					if (log.isLoggable(Level.FINE)) 
 						log.log(Level.FINE, String.format("scanned %d files for object key, foundKeysSize = %d", fileCounter, objectKeys.size())); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				if (this.application.getMenuToolBar() != null) this.application.setProgress(progressPercentageLimit, sThreadId);
+				GDE.getUiNotification().setProgress(progressPercentageLimit);
 				{ // createFileLinks: Take the object key list and create file links for all files assigned to object keys.
-					int progressPercentageStart = this.application.getProgressPercentage();
+					int progressPercentageStart = GDE.getUiNotification().getProgressPercentage();
 					double progressStep = (100. - progressPercentageStart) / objectKeys.size();
 
 					int j = 0;
@@ -203,7 +201,7 @@ public class ObjectKeyScanner extends Thread {
 							}
 						}
 						j++;
-						if (this.application.getMenuToolBar() != null) this.application.setProgress(progressPercentageStart + (int) (j * progressStep), sThreadId);
+						GDE.getUiNotification().setProgress(progressPercentageStart + (int) (j * progressStep));
 					}
 				}
 				if (this.addToExistentKeys) {
@@ -219,7 +217,7 @@ public class ObjectKeyScanner extends Thread {
 				else {
 					this.application.setObjectList(objectKeys.toArray(new String[0]), this.settings.getActiveObject());
 				}
-				if (this.application.getMenuToolBar() != null) this.application.setProgress(100, sThreadId);
+				GDE.getUiNotification().setProgress(100);
 			}
 		}
 		catch (FileNotFoundException e) {

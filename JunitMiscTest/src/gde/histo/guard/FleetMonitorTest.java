@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import gde.histo.base.HistoTestCase;
+import gde.histo.base.NonUiTestCase;
 import gde.histo.datasources.HistoSetTest;
 import gde.histo.guard.FleetMonitor.ObjectSummary;
 
@@ -34,7 +34,7 @@ import gde.histo.guard.FleetMonitor.ObjectSummary;
  *
  * @author Thomas Eickert (USER)
  */
-class FleetMonitorTest extends HistoTestCase {
+class FleetMonitorTest extends NonUiTestCase {
 	private final static String	$CLASS_NAME	= HistoSetTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -55,9 +55,10 @@ class FleetMonitorTest extends HistoTestCase {
 	@Test
 	void testDefineOverview() {
 		this.analyzer.getDeviceConfigurations(); // get now because lazy loading will disturb response times
-		FleetMonitor fleetMonitor = new FleetMonitor(false);
-		log.log(Level.OFF, "FleetMonitor initialized");
+		FleetMonitor fleetMonitor = new FleetMonitor();
+		log.log(Level.FINER, "FleetMonitor initialized");
 		List<ObjectSummary> overview = fleetMonitor.defineOverview("KwikFly");
 		log.log(Level.OFF, "KwikFly  HoTTAdapter  number of overview records", overview.size());
+		assertFalse("no records found", overview.isEmpty());
 	}
 }

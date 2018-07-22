@@ -52,7 +52,7 @@ import gde.utils.FileUtils;
  * Stores the exclusions property files in the user directory.
  * @author Thomas Eickert
  */
-public final class ExclusionData extends Properties {
+public final class ExclusionData extends Properties { // todo solution for files with the same name - all of them are excluded!
 	private static final String												$CLASS_NAME				= ExclusionData.class.getName();
 	private static final Logger												log								= Logger.getLogger($CLASS_NAME);
 	private static final long													serialVersionUID	= -2477509505185819765L;
@@ -61,7 +61,7 @@ public final class ExclusionData extends Properties {
 			CacheBuilder.newBuilder().maximumSize(111).recordStats().build();																// key is the file Name
 
 	/**
-	 * Criterion the define the properties file name.
+	 * Criterion defining the exclusion file name.
 	 * Does not define the path for accessing the file.
 	 */
 	private final Path																activeFolder;
@@ -69,31 +69,23 @@ public final class ExclusionData extends Properties {
 	/**
 	 * @return true if an exclusion for all recordsets in the data file is active
 	 */
-	public boolean isExcluded(Path dataFilePath) {
-		if (Settings.getInstance().isSuppressMode()) {
-			String exclusionValue = getProperty(dataFilePath.getFileName().toString());
-			boolean result = exclusionValue != null && exclusionValue.isEmpty();
-			if (result) log.log(FINE, "file excluded ", dataFilePath);
-			return result;
-		} else {
-			return false;
-		}
+	public boolean isExcluded(String fileName) {
+		String exclusionValue = getProperty(fileName);
+		boolean result = exclusionValue != null && exclusionValue.isEmpty();
+		if (result) log.log(FINE, "file excluded ", fileName);
+		return result;
 	}
 
 	/**
 	 * @return true if an exclusion for the recordset in the data file is active
 	 */
-	public boolean isExcluded(Path dataFilePath, String recordsetBaseName) {
+	public boolean isExcluded(String fileName, String recordsetBaseName) {
 		if (recordsetBaseName.isEmpty()) throw new UnsupportedOperationException();
 
-		if (Settings.getInstance().isSuppressMode()) {
-			String exclusionValue = getProperty(dataFilePath.getFileName().toString());
-			boolean result = exclusionValue != null && (exclusionValue.isEmpty() || exclusionValue.contains(recordsetBaseName));
-			if (result) log.fine(() -> String.format("recordset excluded %s %s", dataFilePath.toString(), recordsetBaseName));
-			return result;
-		} else {
-			return false;
-		}
+		String exclusionValue = getProperty(fileName);
+		boolean result = exclusionValue != null && (exclusionValue.isEmpty() || exclusionValue.contains(recordsetBaseName));
+		if (result) log.fine(() -> String.format("recordset excluded %s %s", fileName, recordsetBaseName));
+		return result;
 	}
 
 	/**

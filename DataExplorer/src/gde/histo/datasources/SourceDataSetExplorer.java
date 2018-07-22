@@ -35,13 +35,12 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import gde.Analyzer;
-import gde.config.Settings;
+import gde.GDE;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.SourceFolders.DirectoryType;
 import gde.histo.datasources.VaultChecker.TrussCriteria;
 import gde.histo.exclusions.ExclusionData;
 import gde.log.Logger;
-import gde.ui.DataExplorer;
 
 /**
  * Read the log file listings from the source folders list.
@@ -49,8 +48,8 @@ import gde.ui.DataExplorer;
  * @author Thomas Eickert (USER)
  */
 public class SourceDataSetExplorer extends AbstractSourceDataSet {
-	private static final String	$CLASS_NAME	= SourceDataSetExplorer.class.getName();
-	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
+	private static final String				$CLASS_NAME				= SourceDataSetExplorer.class.getName();
+	private static final Logger				log								= Logger.getLogger($CLASS_NAME);
 
 	private final LongAdder						nonWorkableCount	= new LongAdder();
 	private final List<Path>					excludedFiles			= new ArrayList<>();
@@ -61,8 +60,9 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 	/**
 	 * @param isStatusMessagesActive true for status messages during file system access (advisable in case file system latencies)
 	 */
-	public SourceDataSetExplorer(SourceFolders sourceFolders, boolean isStatusMessagesActive) {
-		super(sourceFolders);
+	public SourceDataSetExplorer(Analyzer analyzer, SourceFolders sourceFolders, boolean isStatusMessagesActive) {
+		super(analyzer, sourceFolders);
+
 		setStatusMessages(isStatusMessagesActive);
 	}
 
@@ -75,7 +75,7 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 		nonWorkableCount.reset();
 		excludedFiles.clear();
 
-		int subDirectoryLevelMax = Settings.getInstance().getSubDirectoryLevelMax();
+		int subDirectoryLevelMax = analyzer.getSettings().getSubDirectoryLevelMax();
 		for (Entry<Path, Set<DirectoryType>> entry : pathsWithPermissions.entrySet()) {
 			try {
 				sourceDataSets.addAll(getFileListing(entry.getKey().toFile(), subDirectoryLevelMax, entry.getValue()));
@@ -98,12 +98,13 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 		if (rootDirectory.isDirectory() && rootDirectory.canRead()) {
 			File[] filesAndDirs = rootDirectory.listFiles();
 			if (filesAndDirs != null) {
-				ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder());
+				ExclusionData exclusionData = new ExclusionData(new DirectoryScanner(analyzer).getActiveFolder());
+				boolean isSuppressMode = analyzer.getSettings().isSuppressMode();
 				for (File file : Arrays.asList(filesAndDirs)) {
 					if (file.isFile()) {
-						SourceDataSet originFile = AbstractSourceDataSet.createSourceDataSet(file.toPath(), Analyzer.getInstance().getActiveDevice());
+						SourceDataSet originFile = AbstractSourceDataSet.createSourceDataSet(file.toPath(), analyzer);
 						if (originFile != null && originFile.isWorkableFile(directoryTypes, sourceFolders)) {
-							if (!exclusionData.isExcluded(file.toPath())) {
+							if (!isSuppressMode || !exclusionData.isExcluded(file.getName())) {
 								result.add(originFile);
 							} else {
 								excludedFiles.add(file.toPath());
@@ -152,9 +153,9 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 		// a channel change without any additional criterion change can use the existent list of files for reading the trusses (performance)
 		if (doListFiles) listFiles(pathsWithPermissions);
 
-		TrussCriteria trussCriteria = TrussCriteria.createTrussCriteria(Analyzer.getInstance().getActiveDevice(), Analyzer.getInstance().getActiveChannel().getNumber(), Settings.getInstance().getActiveObjectKey());
+		TrussCriteria trussCriteria = TrussCriteria.createTrussCriteria(analyzer);
 		trusses = sourceDataSets.parallelStream() //
-				.flatMap(d -> d.defineTrusses(trussCriteria, signaler, Analyzer.getInstance().getActiveDevice())) //
+				.flatMap(d -> d.defineTrusses(trussCriteria, signaler)) //
 				.collect(Collectors.toList());
 		signaler.accept("");
 	}
@@ -164,7 +165,7 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 	 */
 	public void setStatusMessages(boolean isActive) {
 		if (isActive)
-			signaler = s -> DataExplorer.getInstance().setStatusMessage(s);
+			signaler = s -> GDE.getUiNotification().setStatusMessage(s);
 		else
 			signaler = s -> {
 			};

@@ -29,9 +29,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import gde.Analyzer;
 import gde.GDE;
-import gde.config.Settings;
-import gde.device.IDevice;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.HistoVault;
 import gde.histo.datasources.SourceFolders.DirectoryType;
@@ -57,16 +56,16 @@ public final class VaultChecker {
 		final boolean				ignoreLogObjectKey;
 		final Set<String>		realObjectKeys;
 
-		public static TrussCriteria createTrussCriteria(IDevice device, int channelNumber, String objectKey) {
-			return new TrussCriteria(device, channelNumber, objectKey);
+		public static TrussCriteria createTrussCriteria(Analyzer analyzer) {
+			return new TrussCriteria(analyzer);
 		}
 
-		private TrussCriteria(IDevice device, int channelNumber, String objectKey) {
-			channelMixConfigNumbers = device.getDeviceConfiguration().getChannelMixConfigNumbers(channelNumber);
-			minStartTimeStamp_ms = LocalDate.now().minusMonths(Settings.getInstance().getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-			activeObjectKey = objectKey;
-			ignoreLogObjectKey = Settings.getInstance().getIgnoreLogObjectKey();
-			realObjectKeys = Settings.getInstance().getRealObjectKeys().collect(Collectors.toSet());
+		private TrussCriteria(Analyzer analyzer) {
+			channelMixConfigNumbers = analyzer.getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers(analyzer.getActiveChannel().getNumber());
+			minStartTimeStamp_ms = LocalDate.now().minusMonths(analyzer.getSettings().getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+			activeObjectKey = analyzer.getSettings().getActiveObjectKey();
+			ignoreLogObjectKey = analyzer.getSettings().getIgnoreLogObjectKey();
+			realObjectKeys = analyzer.getSettings().getRealObjectKeys().collect(Collectors.toSet());
 		}
 
 		@Override
@@ -78,13 +77,13 @@ public final class VaultChecker {
 	/**
 	 * @return true if the current device supports both directory type and file extension
 	 */
-	public static boolean isWorkableDataSet(IDevice device, Path logFilePath, Set<DirectoryType> directoryTypes, SourceFolders sourceFolders) {
+	public static boolean isWorkableDataSet(Path logFilePath, Set<DirectoryType> directoryTypes, SourceFolders sourceFolders, Analyzer analyzer) {
 		if (!sourceFolders.isMatchingPath(logFilePath)) {
-			log.log(Level.OFF, "not a matching file path      ", logFilePath);
+			log.log(Level.INFO, "not a matching file path      ", logFilePath);
 			return false;
 		}
 		for (DirectoryType directoryType : directoryTypes) {
-			if (directoryType.getDataSetExtensions(device).contains(PathUtils.getFileExtension(logFilePath.getFileName().toString()))) {
+			if (directoryType.getDataSetExtensions(analyzer.getActiveDevice()).contains(PathUtils.getFileExtension(logFilePath.getFileName().toString()))) {
 				return true;
 			}
 		}
@@ -93,14 +92,21 @@ public final class VaultChecker {
 	}
 
 	/**
+	 * @return true if the current device supports both directory type and file extension
+	 */
+	public boolean isWorkableDataSet(Path logFilePath, Set<DirectoryType> directoryTypes, SourceFolders sourceFolders) {
+		return VaultChecker.isWorkableDataSet(logFilePath, directoryTypes, sourceFolders, analyzer);
+	}
+
+	/**
 	 * @return true if the vault complies with the current device, object and start timestamp
 	 */
-	public static boolean isValidDeviceChannelObjectAndStart(IDevice device, TrussCriteria trussCriteria, HistoVault vault) {
+	public boolean isValidDeviceChannelObjectAndStart(HistoVault vault) {
 		String extension = PathUtils.getFileExtension(Paths.get(vault.getLogFilePath()));
 		if (extension.equals(GDE.FILE_ENDING_OSD))
-			return VaultChecker.matchDeviceChannelObjectAndStart(device, trussCriteria, vault);
-		else if (device instanceof IHistoDevice) {
-			return VaultChecker.matchObjectAndStart(trussCriteria, vault);
+			return matchDeviceChannelObjectAndStart(vault);
+		else if (analyzer.getActiveDevice() instanceof IHistoDevice) {
+			return matchObjectAndStart(vault);
 		} else {
 			return false;
 		}
@@ -126,10 +132,14 @@ public final class VaultChecker {
 		return true;
 	}
 
-	public static boolean matchDeviceChannelObjectAndStart(IDevice device, TrussCriteria trussCriteria, HistoVault vault) {
-		if (device != null && !vault.getLogDeviceName().equals(device.getName()) //
+	public boolean matchObjectAndStart(HistoVault vault) {
+		return VaultChecker.matchObjectAndStart(trussCriteria, vault);
+	}
+
+	public static boolean matchDeviceChannelObjectAndStart(Analyzer analyzer, TrussCriteria trussCriteria, HistoVault vault) {
+		if (analyzer.getActiveDevice() != null && !vault.getLogDeviceName().equals(analyzer.getActiveDevice().getName()) //
 		// HoTTViewer V3 -> HoTTViewerAdapter
-				&& !(vault.getLogDeviceName().startsWith("HoTTViewer") && device.getName().equals("HoTTViewer"))) {
+				&& !(vault.getLogDeviceName().startsWith("HoTTViewer") && analyzer.getActiveDevice().getName().equals("HoTTViewer"))) {
 			log.log(Level.INFO, vault instanceof ExtendedVault //
 					? String.format("no match device   %,7d kiB %s", ((ExtendedVault) vault).getLoadFileAsPath().toFile().length() / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
 					: String.format("no match device  %s", vault.getLogFilePath()));
@@ -182,7 +192,12 @@ public final class VaultChecker {
 		return true;
 	}
 
-	private final IDevice									device;
+	public boolean matchDeviceChannelObjectAndStart(HistoVault vault) {
+		return VaultChecker.matchDeviceChannelObjectAndStart(analyzer, trussCriteria, vault);
+	}
+
+	private final Analyzer								analyzer;
+	private final TrussCriteria trussCriteria;
 	private final EnumSet<DirectoryType>	validDirectoryTypes;
 	private final String									objectKey;
 	private final SourceFolders						sourceFolders;
@@ -190,12 +205,13 @@ public final class VaultChecker {
 	/**
 	 * @param directoryTypes may hold the import directory type as well
 	 */
-	public VaultChecker(IDevice device, EnumSet<DirectoryType> directoryTypes, String objectKey) {
-		this.device = device;
+	public VaultChecker(Analyzer analyzer, EnumSet<DirectoryType> directoryTypes, String objectKey) {
+		this.analyzer = analyzer;
+		this.trussCriteria = TrussCriteria.createTrussCriteria(analyzer); // todo redundant to analyzer
 		this.validDirectoryTypes = directoryTypes;
 		this.objectKey = objectKey;
 		this.sourceFolders = new SourceFolders(objectKey);
-		this.sourceFolders.defineDirectories(device, false);
+		this.sourceFolders.defineDirectories(analyzer.getActiveDevice(), false);
 	}
 
 	/**
@@ -203,9 +219,8 @@ public final class VaultChecker {
 	 */
 	public boolean isValidVault(HistoVault vault) {
 		Path logFilePath = Paths.get(vault.getLogFilePath());
-		if (VaultChecker.isWorkableDataSet(device, logFilePath, validDirectoryTypes, sourceFolders)) {
-			TrussCriteria trussCriteria = TrussCriteria.createTrussCriteria(device, vault.getLogChannelNumber(), objectKey);
-			return VaultChecker.isValidDeviceChannelObjectAndStart(device, trussCriteria, vault);
+		if (isWorkableDataSet(logFilePath, validDirectoryTypes, sourceFolders)) {
+			return isValidDeviceChannelObjectAndStart(vault);
 		} else {
 			return false;
 		}

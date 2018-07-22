@@ -46,7 +46,6 @@ import gde.histo.device.IHistoDevice;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.utils.ObjectKeyCompliance;
 
 /**
@@ -229,9 +228,9 @@ public class SourceFolders {
 	public void defineDirectories(IDevice device, boolean slowFolderAccessMessage) { // todo replace with signaler
 		folders.clear();
 		for (DirectoryType directoryType : DirectoryType.getValidDirectoryTypes(device)) {
-			if (slowFolderAccessMessage) DataExplorer.getInstance().setStatusMessage("find object folders in " + directoryType.getBasePath().toString());
+			if (slowFolderAccessMessage) GDE.getUiNotification().setStatusMessage("find object folders in " + directoryType.getBasePath().toString());
 			Set<Path> currentPaths = defineCurrentPaths(device, directoryType);
-			if (slowFolderAccessMessage) DataExplorer.getInstance().setStatusMessage("");
+			if (slowFolderAccessMessage) GDE.getUiNotification().setStatusMessage("");
 			if (!objectKey.isEmpty()) {
 				Set<Path> externalObjectPaths = defineExternalObjectPaths(directoryType);
 				currentPaths.addAll(externalObjectPaths);

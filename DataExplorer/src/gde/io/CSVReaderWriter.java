@@ -13,10 +13,25 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -38,21 +53,6 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.text.DecimalFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.logging.Logger;
-
 /**
  * Class to read and write comma separated value files
  * @author Winfried Brügmann
@@ -63,12 +63,12 @@ public class CSVReaderWriter {
 	static String					lineSep	= GDE.LINE_SEPARATOR;
 	static DecimalFormat	df3			= new DecimalFormat("0.000"); //$NON-NLS-1$
 	static StringBuffer		sb;
-	
+
 	final static DataExplorer						application	= DataExplorer.getInstance();
 	final static Channels								channels		= Channels.getInstance();
 
 	/**
-	 * read the first two line of CSV file and prepare a map with all available information 
+	 * read the first two line of CSV file and prepare a map with all available information
 	 * @param separator
 	 * @param filePath
 	 * @return map with GDE.DEVICE_NAME,GDE.CSV_DATA_HEADER,[GDE.CHANNEL_CONFIG_NAME]
@@ -100,11 +100,11 @@ public class CSVReaderWriter {
     	header.put(GDE.CSV_DATA_HEADER, line);
 
   		if (header.size() >= 1) {
-  			log.log(Level.FINE, GDE.DEVICE_NAME + header.get(GDE.DEVICE_NAME)); //$NON-NLS-1$
+  			log.log(Level.FINE, GDE.DEVICE_NAME + header.get(GDE.DEVICE_NAME));
  				log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + (header.get(GDE.CHANNEL_CONFIG_NAME) != null ? header.get(GDE.CHANNEL_CONFIG_NAME) : "" )); //$NON-NLS-1$
  				log.log(Level.FINE, GDE.CSV_DATA_HEADER + (header.get(GDE.CSV_DATA_HEADER) != null ? header.get(GDE.CSV_DATA_HEADER) : "")); //$NON-NLS-1$
   		}
-  		
+
   		else {
   			NotSupportedFileFormatException e = new NotSupportedFileFormatException("File does have required header information \"device_name[separator<channel/config_name>]\"");
   			log.log(Level.SEVERE, e.getMessage(), e);
@@ -130,7 +130,7 @@ public class CSVReaderWriter {
 	 * evaluate channel/configuartion and check units for absolute data
 	 * <ul>
 	 * <li>if the channel/configuration does not match device the first channel/configuration of the device will choosen
-	 * <li>if units of absolute data will not match a warning dialog will show all red measurements kesy with expected units 
+	 * <li>if units of absolute data will not match a warning dialog will show all red measurements kesy with expected units
 	 * </ul>
 	 * @param header
 	 */
@@ -141,7 +141,7 @@ public class CSVReaderWriter {
 		StringBuilder sb_units = new StringBuilder();
 		String subString;
 		boolean isRaw = false;
-		
+
 		String headerLine = header.get(GDE.CSV_DATA_HEADER);
 		while ((index = headerLine.indexOf('[', index+1)) != -1) {
 			if ((innerIndex = headerLine.indexOf(']', index+1)) != -1) {
@@ -155,8 +155,8 @@ public class CSVReaderWriter {
 			}
 			++index;
 		}
-		
-		// Spannung;Strom;Ladung; < Spannung;Strom;Ladung;Leistung;Energie; 	
+
+		// Spannung;Strom;Ladung; < Spannung;Strom;Ladung;Leistung;Energie;
 		String[] headerLineArray = headerLine.split(GDE.STRING_EMPTY+separator);
 		if(countAbs <= 1 && countRaw > 0 || (headerLineArray.length - 1)  < deviceConfig.getNumberOfMeasurements(1)) {
 			header.put(GDE.CSV_DATA_TYPE, GDE.CSV_DATA_TYPE_RAW);
@@ -167,11 +167,11 @@ public class CSVReaderWriter {
 			isRaw = false;
 		}
 		log.log(Level.FINE, GDE.CSV_DATA_TYPE + header.get(GDE.CSV_DATA_TYPE));
-		
+
 		String channelConfig = header.get(GDE.CHANNEL_CONFIG_NAME);
 		int channelNumber = channels.getChannelNumber(channelConfig);
-		if (channelConfig != null 
-				&& !channels.getActiveChannel().getChannelConfigKey().equals(channelConfig) 
+		if (channelConfig != null
+				&& !channels.getActiveChannel().getChannelConfigKey().equals(channelConfig)
 				&& channelNumber >= 1 && channelNumber <= deviceConfig.getChannelCount() ) {
 			channels.setActiveChannelNumber(channelNumber);
 		}
@@ -183,7 +183,7 @@ public class CSVReaderWriter {
 		header.put(GDE.CHANNEL_CONFIG_NAME, channelConfig);
 		header.put(GDE.CHANNEL_CONFIG_NUMBER, ""+channels.getActiveChannelNumber());
 		log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + header.get(GDE.CHANNEL_CONFIG_NUMBER) + " : " + header.get(GDE.CHANNEL_CONFIG_NAME));
-		
+
 		int match = 0; // check match of the measurement units, relevant for absolute csv data only
 		StringBuilder unitCompare = new StringBuilder().append(lineSep);
 		for (int i = 1; i < headerLineArray.length; i++) {
@@ -202,26 +202,25 @@ public class CSVReaderWriter {
 		if (!isRaw) {
 			log.log(Level.FINE, unitCompare.toString());
 			if (match != headerLineArray.length - 1) {
-				UnitCompareException e = new UnitCompareException(Messages.getString(MessageIds.GDE_MSGW0015, new Object[] {unitCompare.toString()})); // mismatch data header units //$NON-NLS-1$
+				UnitCompareException e = new UnitCompareException(Messages.getString(MessageIds.GDE_MSGW0015, new Object[] {unitCompare.toString()})); // mismatch data header units
 				log.log(Level.WARNING, e.getMessage());
 				application.openMessageDialogAsync(e.getMessage());
 			}
 		}
-				
+
 		return header;
 	}
 
 	/**
 	 * read the selected CSV file
 	 * @return record set created
-	 * @throws NotSupportedFileFormatException 
-	 * @throws MissMatchDeviceException 
-	 * @throws IOException 
-	 * @throws DataInconsitsentException 
-	 * @throws DataTypeException 
+	 * @throws NotSupportedFileFormatException
+	 * @throws MissMatchDeviceException
+	 * @throws IOException
+	 * @throws DataInconsitsentException
+	 * @throws DataTypeException
 	 */
 	public static RecordSet read(char separator, String filePath, String recordSetNameExtend, boolean isRaw) throws NotSupportedFileFormatException, MissMatchDeviceException, IOException, DataInconsitsentException, DataTypeException {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		String line = GDE.STRING_STAR;
 		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
@@ -234,34 +233,34 @@ public class CSVReaderWriter {
 			activeChannel = activeChannel == null ? channels.getActiveChannel() : activeChannel;
 
 			if (activeChannel != null) {
-				if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0134) + filePath);
+				GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0134) + filePath);
 				long time_ms = 0;
 
 				// check for device name and channel or configuration in first line
 				if (!application.getActiveDevice().getName().equals(fileHeader.get(GDE.DEVICE_NAME))) {
-					MissMatchDeviceException e = new MissMatchDeviceException(Messages.getString(MessageIds.GDE_MSGW0013, new Object[] {fileHeader.get(GDE.DEVICE_NAME)})); // mismatch device name 
+					MissMatchDeviceException e = new MissMatchDeviceException(Messages.getString(MessageIds.GDE_MSGW0013, new Object[] {fileHeader.get(GDE.DEVICE_NAME)})); // mismatch device name
 					log.log(Level.SEVERE, e.getMessage(), e);
 					throw e;
 				}
-				
-				fileHeader = CSVReaderWriter.evaluateType(separator, fileHeader, (DeviceConfiguration)device);			
+
+				fileHeader = CSVReaderWriter.evaluateType(separator, fileHeader, (DeviceConfiguration)device);
 				if (isRaw != fileHeader.get(GDE.CSV_DATA_TYPE).equals(GDE.CSV_DATA_TYPE_RAW)) {
 					throw new DataTypeException(Messages.getString(MessageIds.GDE_MSGW0014));
 				}
 				log.log(Level.FINE, "device name check ok, channel/configuration ok"); //$NON-NLS-1$
-				
+
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
 				while (!(((line = reader.readLine())!= null) && line.contains("[") && line.contains("]"))) {
 					// read until Zeit [sec];Spannung [---];Höhe [---]
 					// 						Zeit [s];Spannung [V];Strom [A];Ladung [mAh];Leistung [W];Energie [Wh]
 				}
 
-				if (application.getStatusBar() != null) {
+				if (GDE.isWithUi()) {
 					channels.switchChannel(activeChannel.getNumber(), GDE.STRING_EMPTY);
 					application.getMenuToolBar().updateChannelSelector();
 					activeChannel = channels.getActiveChannel();
 				}
-				
+
 				String recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 				String[] tmpRecordNames	=	fileHeader.get(GDE.CSV_DATA_HEADER_MEASUREMENTS).split(GDE.STRING_SEMICOLON);
 				String[] tmpRecordUnits = fileHeader.get(GDE.CSV_DATA_HEADER_UNITS).split(GDE.STRING_SEMICOLON);
@@ -290,11 +289,11 @@ public class CSVReaderWriter {
 				}
 				recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, true, true);
 				recordSetName = recordSet.getName(); // cut length
-				
+
 				// make all records displayable while absolute data
 				if (!isRaw) { // absolute
 					for (String recordKey : recordNames) {
-						recordSet.get(recordKey).setDisplayable(true); // all data available 
+						recordSet.get(recordKey).setDisplayable(true); // all data available
 					}
 				}
 				Date												date = null;
@@ -326,7 +325,7 @@ public class CSVReaderWriter {
 							date = calendar.getTime();
 							if (startTimeStamp == 0) startTimeStamp = timeStamp;
 						}
-						else 
+						else
 							continue;
 					}
 					else { // relative time HH:mm:ss:SSS
@@ -355,10 +354,10 @@ public class CSVReaderWriter {
 
 				activeChannel.put(recordSetName, recordSet);
 				activeChannel.setActiveRecordSet(recordSetName);
-				if (isRaw) 	
+				if (isRaw)
 					activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				activeChannel.applyTemplate(recordSetName, true);
-				if (application.getStatusBar() != null) {
+				if (GDE.isWithUi()) {
 					activeChannel.switchRecordSet(recordSetName);
 					application.updateAllTabs(true, true);
 				}
@@ -380,28 +379,27 @@ public class CSVReaderWriter {
 			throw new IOException(Messages.getString(MessageIds.GDE_MSGW0012, new Object[] {filePath}));
 		}
 		finally {
-			if (application.getStatusBar() != null) {
-				application.setProgress(100, sThreadId);
-				application.setStatusMessage(GDE.STRING_EMPTY);
+			GDE.getUiNotification().setProgress(100);
+			GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
+			if (GDE.isWithUi()) {
 				application.getMenuToolBar().updateChannelSelector();
 				application.getMenuToolBar().updateRecordSetSelectCombo();
 			}
 		}
-		
+
 		return recordSet;
 	}
 
 	/**
 	 * write data CVS file
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw, final String encoding) throws Exception {
 		BufferedWriter writer;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 
 		try {
-			if (application.getStatusBar() != null) application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] {GDE.FILE_ENDING_CSV, filePath}));
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), encoding)); 
+			GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] {GDE.FILE_ENDING_CSV, filePath}));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), encoding));
 			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
 			df3.setGroupingUsed(false);
@@ -412,16 +410,16 @@ public class CSVReaderWriter {
 			sb.append(device.getName()).append(separator).append(recordSet.getChannelConfigName()).append(lineSep);
 			writer.write(sb.toString());
 			log.log(Level.FINE, "written header line = " + sb.toString());  //$NON-NLS-1$
-			
+
 			sb = new StringBuffer();
-			sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; //$NON-NLS-1$
+			sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]";
 			// write the measurements signature
 			int i = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), record.getOrdinal());
 				log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 				if (isRaw) {
-					if (!measurement.isCalculation()) {	// only use active records for writing raw data 
+					if (!measurement.isCalculation()) {	// only use active records for writing raw data
 						sb.append(record.getName()).append(" [---]").append(separator);	 //$NON-NLS-1$
 						log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 					}
@@ -447,8 +445,8 @@ public class CSVReaderWriter {
 			int recordEntries = recordSet.getRecordDataSize(true);
 			boolean isTimeFormatAbsolute = Settings.getInstance().isTimeFormatAbsolute();
 			int progressCycle = 0;
-			if (application.getStatusBar() != null) application.setProgress(progressCycle, sThreadId);
-			
+			GDE.getUiNotification().setProgress(progressCycle);
+
 			for (i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
 				String[] row = recordSet.getDataTableRow(i, isTimeFormatAbsolute);
@@ -473,7 +471,7 @@ public class CSVReaderWriter {
 				}
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
 				writer.write(sb.toString());
-				if (application.getStatusBar() != null && i % 50 == 0) application.setProgress(((++progressCycle*5000)/recordEntries), sThreadId);
+				if (i % 50 == 0) GDE.getUiNotification().setProgress(((++progressCycle*5000)/recordEntries));
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "data line = " + sb.toString()); //$NON-NLS-1$
 			}
 			sb = null;
@@ -484,7 +482,7 @@ public class CSVReaderWriter {
 			writer.close();
 			writer = null;
 			//recordSet.setSaved(true);
-			if (application.getStatusBar() != null) application.setProgress(100, sThreadId);
+			GDE.getUiNotification().setProgress(100);
 		}
 		catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -492,10 +490,10 @@ public class CSVReaderWriter {
 		}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); 
+			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 		finally {
-			if (application.getStatusBar() != null) application.setStatusMessage(GDE.STRING_EMPTY);
+			GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
 		}
 
 	}

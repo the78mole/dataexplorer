@@ -35,9 +35,9 @@ import gde.log.Logger;
 
 /**
  * Kernel for analyzing logging data.
- * Loads all device configurations.
- * References the roaming data access.
- * Tracks the active device, its channels and the active channel.
+ * Loads the active flagged device configurations.
+ * References the settings and the roaming data access.
+ * Tracks the active device with its channels and the active channel.
  * @author Thomas Eickert (USER)
  */
 public abstract class Analyzer {
@@ -48,17 +48,18 @@ public abstract class Analyzer {
 
 	public static Analyzer getInstance() {
 		if (analyzer == null) {
-			if (GDE.display != null) {
-				analyzer = new Explorer();
-			} else if (GDE.EXECUTION_ENV == null) {
+			if (GDE.EXECUTION_ENV != null) {
+				analyzer = null; // todo
+			} else if (!GDE.isWithUi()) {
 				analyzer = new TestAnalyzer();
 			} else {
-				// todo
+				analyzer = new Explorer();
 			}
 		}
 		return analyzer;
 	}
 
+	protected final Settings				settings;
 	protected final DataAccess			dataAccess;
 	protected DeviceConfigurations	deviceConfigurations				= null;
 	protected Thread								deviceConfigurationsThread	= null;
@@ -67,18 +68,19 @@ public abstract class Analyzer {
 	protected Channels							channels										= null;
 
 	protected Analyzer() {
-		if (GDE.display != null) {
-			this.dataAccess = DataAccess.getInstance();
-		} else if (GDE.EXECUTION_ENV == null) {
+		this.settings = Settings.getInstance();
+		if (GDE.EXECUTION_ENV != null) {
+			this.dataAccess = null; // todo
+		} else if (!GDE.isWithUi()) {
 			this.dataAccess = DataAccess.getInstance();
 		} else {
-			this.dataAccess = null; // todo
+			this.dataAccess = DataAccess.getInstance();
 		}
 
 		this.deviceConfigurationsThread = new Thread("loadDeviceConfigurations") {
 			@Override
 			public void run() {
-				log.log(Level.OFF, "deviceConfigurationsThread    started");
+				log.log(Level.FINE, "deviceConfigurationsThread    started");
 				File file = new File(Settings.getInstance().getDevicesPath());
 				if (file.exists()) Analyzer.this.deviceConfigurations = new DeviceConfigurations(file.list(), Settings.getInstance().getActiveDevice());
 				log.log(Level.TIME, "deviceConfigurationsThread time =", new SimpleDateFormat("ss:SSS").format(new Date().getTime() - GDE.StartTime));
@@ -87,6 +89,22 @@ public abstract class Analyzer {
 		this.deviceConfigurationsThread.start();
 	}
 
+	/**
+	 * Hybrid singleton copy constructor.
+	 * Caution: NO deep copy for device and deviceConfigurations.
+	 */
+	protected Analyzer(Analyzer that) {
+		this.settings = new Settings(that.settings);
+		this.channels = new Channels(that.channels);
+
+		this.activeDevice = that.activeDevice;
+		this.dataAccess = that.dataAccess.clone();
+		if (this.deviceConfigurations == null) {
+			throw new UnsupportedOperationException("clone is requested befor the configurations are loaded");
+		} else {
+			this.deviceConfigurations = that.deviceConfigurations;
+		}
+	}
 	/**
 	 * @return the roaming data sources support
 	 */
@@ -132,18 +150,45 @@ public abstract class Analyzer {
 	}
 
 	/**
-	 * set the active device in main settings
-	 * @param device
+	 * Do not clean or rebuild the channels.
 	 */
 	public void setActiveDevice(IDevice device) {
 		this.activeDevice = device;
 	}
 
 	/**
-	 * @return true if the GUI was not initialized
+	 * @return the settings clone
 	 */
-	public boolean isWithUi() {
-		return this instanceof Explorer;
+	public Settings getSettings() {
+		return this.settings;
 	}
 
+	/**
+	 * Support multiple threads with different analyzer instances.
+	 * Use this if analyzer updates are not required or apply to the current thread only.
+	 * Be aware of the cloning performance impact.
+	 * @return the shallow / deep clone instance ({@link gde.Analyzer#Analyzer(Analyzer)})
+	 */
+	@Override
+	public abstract Analyzer clone();
+
+	public void joinDeviceConfigurationsThread() {
+		try {
+			while (this.deviceConfigurationsThread == null) {
+				Thread.sleep(22);
+			}
+			this.deviceConfigurationsThread.join();
+		} catch (InterruptedException e) {
+			log.log(Level.SEVERE, "deviceConfigurationsThread.run()", e);
+		}
+	}
+
+	@Override
+	public String toString() {
+		String deviceName = this.activeDevice != null ? this.activeDevice.getName() : "null";
+		int channelsSize = this.channels != null ? this.channels.size() : 0;
+		int channelNumber = this.getActiveChannel() != null ? this.getActiveChannel().getNumber() : -1;
+		return "Analyzer [activeDevice=" + deviceName + ", deviceConfigurationsSize=" + this.deviceConfigurations.getAllConfigurations().size() //
+				+ ", channelNumber=" + channelNumber + ", objectKey=" + this.getSettings().getActiveObjectKey() + ", channelsSize=" + channelsSize + "]";
+	}
 }

@@ -13,26 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
-
-import gde.GDE;
-import gde.data.Channels;
-import gde.data.ObjectData;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.IDevice;
-import gde.device.MeasurementPropertyTypes;
-import gde.device.PropertyType;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.GPSHelper;
-import gde.utils.StringHelper;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -52,13 +36,29 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 
+import gde.GDE;
+import gde.data.Channels;
+import gde.data.ObjectData;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.PropertyType;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.GPSHelper;
+import gde.utils.StringHelper;
+
 /**
  * Class to write KMz XML files
  * @author Winfried Brügmann
  */
 public class KMZWriter {
 	static Logger							log							= Logger.getLogger(KMZWriter.class.getName());
-	
+
 	static final String				ALTITUDE_ABSOLUTE					= "absolute";
 	static final String				ALTITUDE_RELATIVE2GROUND	= "relativeToGround";
 	static final String				ALTITUDE_CLAMP2GROUNDE		= "clampToGround";
@@ -83,7 +83,7 @@ public class KMZWriter {
 																						+ "\t\t<range>%d</range>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t\t<altitudeMode>relativeToGround</altitudeMode>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t</LookAt>" + GDE.LINE_SEPARATOR;				//$NON-NLS-1$
-	
+
 	static final String[]			icons					= {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"};
 	static final String				iconsdef 				= "\t<Style id=\"track-%s_n\">" + GDE.LINE_SEPARATOR
 																						+ "\t\t<IconStyle>" + GDE.LINE_SEPARATOR
@@ -118,7 +118,7 @@ public class KMZWriter {
 																						+ "\t\t\t<styleUrl>#track-%s_h</styleUrl>" + GDE.LINE_SEPARATOR
 																						+ "\t\t</Pair>" + GDE.LINE_SEPARATOR
 																						+ "\t</StyleMap>" + GDE.LINE_SEPARATOR;
-	
+
 	static final String				statistics 			= "\t<Folder>" + GDE.LINE_SEPARATOR
 																						+ "\t\t<name>%s</name>" + GDE.LINE_SEPARATOR
 																						+ "\t\t<Snippet maxLines=\"0\"></Snippet>" + GDE.LINE_SEPARATOR
@@ -137,7 +137,7 @@ public class KMZWriter {
 																						+ "\t\t\t<end>%sT%sZ</end>" + GDE.LINE_SEPARATOR
 																						+ "\t\t</TimeSpan>" + GDE.LINE_SEPARATOR
 																						+ "\t</Folder>" + GDE.LINE_SEPARATOR;
-	
+
 	static final String				pointsLeader		= "\t<Folder>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t\t<name>Data-Track</name>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t\t<visibility>0</visibility>" + GDE.LINE_SEPARATOR
@@ -170,7 +170,7 @@ public class KMZWriter {
 																						+ "\t\t\t\t<coordinates>%.7f,%.7f,%.0f</coordinates>" + GDE.LINE_SEPARATOR
 																						+ "\t\t\t</Point>" + GDE.LINE_SEPARATOR
 																						+ "\t\t</Placemark>" + GDE.LINE_SEPARATOR;
-	
+
 	static final String				emptyStyleMap		= "\t\t<StyleMap id=\"none\">" + GDE.LINE_SEPARATOR
 																					 	+ "\t\t\t<Pair>" + GDE.LINE_SEPARATOR
 																					 	+ "\t\t\t\t<key>normal</key>" + GDE.LINE_SEPARATOR
@@ -197,13 +197,13 @@ public class KMZWriter {
 																						+ "\t\t</Style>" + GDE.LINE_SEPARATOR;
 
 	static final String				pointsTrailer 	= "\t</Folder>" + GDE.LINE_SEPARATOR;
-	
-	
-	
+
+
+
 	static final String				speedHeader			= "\t<Folder>" + GDE.LINE_SEPARATOR
 																						+ "\t\t<name>%s-Track</name>" + GDE.LINE_SEPARATOR
 																						+ "\t\t<open>0</open>" + GDE.LINE_SEPARATOR;
-	
+
 	static final String				speedLeader			= "\t\t\t<Placemark>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t\t\t<name>gx:%s</name>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t\t\t<Style>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
@@ -226,7 +226,7 @@ public class KMZWriter {
 																						+ "\t\t\t</LineString>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t\t</Placemark>" + GDE.LINE_SEPARATOR;	//$NON-NLS-1$
 	static final String				speedFooter		= "\t</Folder>" + GDE.LINE_SEPARATOR;
-	
+
 	static final String				footer					= "</Document>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "</kml>" + GDE.LINE_SEPARATOR;																																																							//$NON-NLS-1$
 
@@ -252,7 +252,6 @@ public class KMZWriter {
 	 */
 	public static void write(String kmzFilePath, String kmlFileName, RecordSet recordSet, final int ordinalLongitude, final int ordinalLatitude, final int ordinalHeight, final int ordinalMeasurement, final int ordinalSlope, final int ordinalTripLength, final int ordinalAzimuth,
  final boolean isHeightRelative, boolean isClampToGround) throws Exception {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		StringBuilder sb = new StringBuilder();
 		double height0 = 0.0, altitudeDelta = 0.0;
 		long startTime = new Date().getTime();
@@ -260,7 +259,7 @@ public class KMZWriter {
 		IDevice device = DataExplorer.getInstance().getActiveDevice();
 
 		try {
-			if (KMZWriter.application.getStatusBar() != null) KMZWriter.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] { GDE.FILE_ENDING_KMZ, kmzFilePath }));
+			GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] { GDE.FILE_ENDING_KMZ, kmzFilePath }));
 			File targetFile = new File(kmzFilePath);
 			if (targetFile.exists()) {
 				if (!targetFile.delete()) log.log(Level.WARNING, kmzFilePath + " could not deleted!");
@@ -275,7 +274,7 @@ public class KMZWriter {
 			int realDataSize = recordSet.getRecordDataSize(true);
 			int dataSize = recordSet.getRecordDataSize(false);
 			int progressCycle = 0;
-			if (KMZWriter.application.getStatusBar() != null) KMZWriter.application.setProgress(progressCycle, sThreadId);
+			GDE.getUiNotification().setProgress(progressCycle);
 			final Record recordLongitude = recordSet.get(ordinalLongitude);
 			final Record recordLatitude = recordSet.get(ordinalLatitude);
 			final Record recordHeight = ordinalHeight < 0 ? null : recordSet.get(ordinalHeight).hasReasonableData() ? recordSet.get(ordinalHeight) : null;
@@ -283,7 +282,7 @@ public class KMZWriter {
 			final Record recordSlope = ordinalSlope < 0 ? null : recordSet.get(ordinalSlope).hasReasonableData() ? recordSet.get(ordinalSlope) : null;
 			final String measurementName = recordMeasurement != null ? recordMeasurement.getName() : GDE.STRING_EMPTY;
 			final String measurementUnit = recordMeasurement != null ? recordMeasurement.getUnit() : GDE.STRING_EMPTY;
-			
+
 			boolean isExtrude = false;
 			String randomColor = "";
 			if (application.isObjectoriented()) {
@@ -322,7 +321,7 @@ public class KMZWriter {
 					}
 				}
 			}
-			
+
 			if (recordLongitude == null || recordLatitude == null)
 				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0005, new Object[] { Messages.getString(MessageIds.GDE_MSGT0599), recordSet.getChannelConfigName() }));
 			if (recordHeight == null) {
@@ -338,7 +337,7 @@ public class KMZWriter {
 			Record recordTripLength = ordinalTripLength < 0 ? null : recordSet.get(ordinalTripLength);
 			Vector<Integer> recordAzimuth;
 			try {
-				if (ordinalAzimuth >= 0) 
+				if (ordinalAzimuth >= 0)
 					recordAzimuth = recordSet.get(ordinalAzimuth);
 				else
 					recordAzimuth = GPSHelper.calculateAzimuth(device, recordSet, ordinalLatitude, ordinalLongitude, ordinalHeight);
@@ -388,8 +387,8 @@ public class KMZWriter {
 						recordSetDescription = recordSetDescription.contains(GDE.STRING_NEW_LINE) ? recordSetDescription.split(GDE.STRING_NEW_LINE)[0] : recordSetDescription;
 						zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.position, recordSet.getName(),
 								recordSetDescription,
-								//recordSet.getRecordSetDescription().replace("<", "min").replace(">", "max"), 
-								dateString, new SimpleDateFormat("HH:mm:ss").format(date), 
+								//recordSet.getRecordSetDescription().replace("<", "min").replace(">", "max"),
+								dateString, new SimpleDateFormat("HH:mm:ss").format(date),
 								dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordLongitude.size() - 1)),
 								positionLongitude, positionLatitude, -50, 70, 1000).getBytes());
 						isPositionWritten = true;
@@ -494,21 +493,21 @@ public class KMZWriter {
 
 			//write track statistics
 			double height = !isClampToGround && recordHeight != null ? device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0 : 0;
-			zipWriter.write(String.format(Locale.ENGLISH, statistics, 
-					"Statistics", 
+			zipWriter.write(String.format(Locale.ENGLISH, statistics,
+					"Statistics",
 					recordTripLength == null ? 0 : device.translateValue(recordTripLength, recordTripLength.getMaxValue() / 1000.0),
-					height, 
-					recordHeight == null ? 0 : device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - height0, 	
+					height,
+					recordHeight == null ? 0 : device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - height0,
 					isHeightRelative ? "" : String.format("(%.0f)", (recordHeight == null ? 0.0f : device.translateValue(recordHeight, recordHeight.getMaxValue() / 1000.0) - height)),
-					measurementName, 
-					recordMeasurement == null ? 0 : device.translateValue(recordMeasurement, recordMeasurement.getMinValue() / 1000.0), 
-					measurementUnit, 
-					measurementName, 
-					recordMeasurement == null ? 0 : device.translateValue(recordMeasurement, recordMeasurement.getAvgValue() / 1000.0), 
+					measurementName,
+					recordMeasurement == null ? 0 : device.translateValue(recordMeasurement, recordMeasurement.getMinValue() / 1000.0),
 					measurementUnit,
-					measurementName, 
-					recordMeasurement == null ? 0 : device.translateValue(recordMeasurement, recordMeasurement.getMaxValue() / 1000.0), 
-					measurementUnit, 
+					measurementName,
+					recordMeasurement == null ? 0 : device.translateValue(recordMeasurement, recordMeasurement.getAvgValue() / 1000.0),
+					measurementUnit,
+					measurementName,
+					recordMeasurement == null ? 0 : device.translateValue(recordMeasurement, recordMeasurement.getMaxValue() / 1000.0),
+					measurementUnit,
 					dateString,
 					new SimpleDateFormat("HH:mm:ss").format(date), dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordLongitude.size() - 1)), dateString,
 					new SimpleDateFormat("HH:mm:ss").format(date), dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordLongitude.size() - 1))).getBytes());
@@ -525,27 +524,27 @@ public class KMZWriter {
 					int velocity = recordMeasurement == null ? 0 : (int) device.translateValue(recordMeasurement, recordMeasurement.get(i) / 1000.0);
 					if (recordMeasurement != null && !((velocity < measurementLowerLimit && velocityRange == 0) || (velocity >= measurementLowerLimit && velocity <= velocityUpperLimit && velocityRange == 1) || (velocity > velocityUpperLimit && velocityRange == 2))) {
 						velocityRange = switchColor(zipWriter, recordMeasurement, velocity, measurementLowerLimit, velocityUpperLimit, velocityColors, velocityRange, altitudeMode, isExtrude, randomColor);
-	
+
 						//re-write last coordinates
 //						height = device.translateValue(recordHeight, recordHeight.get(i - 1) / 1000.0) - height0;
 						// add data entries, translate according device and measurement unit
 //						sb.append(String.format(Locale.ENGLISH, "\t\t\t\t\t\t%.7f,", device.translateValue(recordLongitude, recordLongitude.get(i - 1) / 1000.0))) //$NON-NLS-1$
 //								.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLatitude, recordLatitude.get(i - 1) / 1000.0))) //$NON-NLS-1$
 //								.append(String.format(Locale.ENGLISH, "%.0f", height < 0 ? 0 : height)).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
-	
+
 						zipWriter.write(sb.toString().getBytes());
 					}
 					sb = new StringBuilder();
-	
+
 					height = recordHeight == null ? 0 : (device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0);
 					// add data entries, translate according device and measurement unit
 					sb.append(String.format(Locale.ENGLISH, "\t\t\t\t\t\t%.7f,", device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0))) //$NON-NLS-1$
 							.append(String.format(Locale.ENGLISH, "%.7f,", device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0))) //$NON-NLS-1$
 							.append(String.format(Locale.ENGLISH, "%.0f", height < 0 ? 0 : height)).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
-	
+
 					zipWriter.write(sb.toString().getBytes());
-	
-					if (KMZWriter.application.getStatusBar() != null && i % 50 == 0) KMZWriter.application.setProgress(((++progressCycle * 5000) / dataSize), sThreadId);
+
+					if (i % 50 == 0) GDE.getUiNotification().setProgress(((++progressCycle * 5000) / dataSize));
 					KMZWriter.log.log(java.util.logging.Level.FINER, "data line = " + sb.toString()); //$NON-NLS-1$
 					lastTimeStamp = timeStamp;
 				}
@@ -564,48 +563,48 @@ public class KMZWriter {
 					double slopeLast = i==0 ? slope : recordSlope == null ? 0 : device.translateValue(recordSlope, recordSlope.get(i-1) / 1000.0);
 					boolean isSlope0 = speed > 2 && ((slope <= 0 && slopeLast > 0) || (slope > 0 && slopeLast <= 0) || slope == 0);
 					height = recordHeight == null ? 0 : (device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) - height0);
-					zipWriter.write(String.format(Locale.ENGLISH, dataPoint, 
-							recordSet.getTime(i) / 1000 / 10, 
-							speed, 
+					zipWriter.write(String.format(Locale.ENGLISH, dataPoint,
+							recordSet.getTime(i) / 1000 / 10,
+							speed,
 							measurementUnit,
-							height, 
-							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), 
-							device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0), 
-							height, 
+							height,
+							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0),
+							device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0),
+							height,
 							measurementName,
-							speed, 
+							speed,
 							measurementUnit,
-							recordAzimuth.get(i) / 1000.0, 
+							recordAzimuth.get(i) / 1000.0,
 							dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(i)),
-							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0),	height, recordAzimuth.get(i) / 1000.0, 
+							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0),	height, recordAzimuth.get(i) / 1000.0,
 							dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(i)),
-							isSlope0 ? getTrackIcon(recordAzimuth.get(i) / 1000.0) : "none", 
+							isSlope0 ? getTrackIcon(recordAzimuth.get(i) / 1000.0) : "none",
 							altitudeMode,
-							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0), 
+							device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0), device.translateValue(recordLatitude, recordLatitude.get(i) / 1000.0),
 							height < 0 ? 0 : height).getBytes()); //correct visualization while height < 0
-					
+
 					lastTimeStamp = timeStamp;
 				}
 			}
 			zipWriter.write(pointsTrailer.getBytes());
-			
+
 			//write track icons style definition
 			for (int j = 0; j < icons.length; j++) {
 				zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.iconsdef, icons[j], (22.5*j), icons[j], (22.5*j), icons[j], icons[j], icons[j]).getBytes());
 			}
 			zipWriter.write(emptyStyleMap.getBytes());
-			
+
 			zipWriter.write(KMZWriter.footer.getBytes());
-			
+
 			zipWriter.closeEntry();
-			
+
 			// save the track icon
 			ImageLoader imageLoader = new ImageLoader();
 			imageLoader.data = new ImageData[] { SWTResourceManager.getImage("gde/resource/track.png").getImageData() };
 			zipWriter.putNextEntry(new ZipEntry("track.png"));
 			imageLoader.save(zipWriter, SWT.IMAGE_PNG);
 			zipWriter.closeEntry();
-			
+
 			zipWriter.flush();
 			zipWriter.close();
 			zipWriter = null;
@@ -619,7 +618,7 @@ public class KMZWriter {
 			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 		finally {
-			if (KMZWriter.application.getStatusBar() != null) KMZWriter.application.setStatusMessage(GDE.STRING_EMPTY);
+			GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
 			if (zipWriter != null) {
 				try {
 					zipWriter.close();
@@ -630,14 +629,12 @@ public class KMZWriter {
 				zipWriter = null;
 			}
 		}
-		if (KMZWriter.application.getStatusBar() != null) {
-			KMZWriter.application.setProgress(100, sThreadId);
-			KMZWriter.application.setStatusMessage(GDE.STRING_EMPTY);
-		}
+		GDE.getUiNotification().setProgress(100);
+		GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
 		if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "KML file = " + kmzFilePath + " written successfuly" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));//$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
+
 	/**
 	 * return the fitting icon to the given azimut value
 	 * @param tmpAzimuth
@@ -659,25 +656,25 @@ public class KMZWriter {
 			trackIcon = "track-" + icons[5];
 		else if (tmpAzimuth >= 123.75 && tmpAzimuth < 146.25)
 			trackIcon = "track-" + icons[6];
-		else if (tmpAzimuth >= 146.25 && tmpAzimuth < 168.75) 
+		else if (tmpAzimuth >= 146.25 && tmpAzimuth < 168.75)
 			trackIcon = "track-" + icons[7];
-		else if (tmpAzimuth >= 168.75 && tmpAzimuth < 191.25) 
+		else if (tmpAzimuth >= 168.75 && tmpAzimuth < 191.25)
 			trackIcon = "track-" + icons[8];
-		else if (tmpAzimuth >= 191.25 && tmpAzimuth < 213.75) 
+		else if (tmpAzimuth >= 191.25 && tmpAzimuth < 213.75)
 			trackIcon = "track-" + icons[9];
-		else if (tmpAzimuth >= 213.75 && tmpAzimuth < 236.25) 
+		else if (tmpAzimuth >= 213.75 && tmpAzimuth < 236.25)
 			trackIcon = "track-" + icons[10];
-		else if (tmpAzimuth >= 236.25 && tmpAzimuth < 258.75) 
+		else if (tmpAzimuth >= 236.25 && tmpAzimuth < 258.75)
 			trackIcon = "track-" + icons[11];
-		else if (tmpAzimuth >= 258.75 && tmpAzimuth < 281.25) 
+		else if (tmpAzimuth >= 258.75 && tmpAzimuth < 281.25)
 			trackIcon = "track-" + icons[12];
-		else if (tmpAzimuth >= 281.25 && tmpAzimuth < 303.75) 
+		else if (tmpAzimuth >= 281.25 && tmpAzimuth < 303.75)
 			trackIcon = "track-" + icons[13];
-		else if (tmpAzimuth >= 303.75 && tmpAzimuth < 326.25) 
+		else if (tmpAzimuth >= 303.75 && tmpAzimuth < 326.25)
 			trackIcon = "track-" + icons[14];
-		else if (tmpAzimuth >= 326.25 && tmpAzimuth < 348.75) 
+		else if (tmpAzimuth >= 326.25 && tmpAzimuth < 348.75)
 			trackIcon = "track-" + icons[15];
-		
+
 		return trackIcon;
 	}
 
@@ -688,7 +685,7 @@ public class KMZWriter {
 	 * @param actualValue
 	 * @param measurementLowerLimit
 	 * @param measurementUpperLimit
-	 * @param measurementColors {lowerLimitColor, withinLimitsColor, upperLimitColor) 
+	 * @param measurementColors {lowerLimitColor, withinLimitsColor, upperLimitColor)
 	 * @param velocityRange
 	 * @param altitudeMode
 	 * @param isExtrude

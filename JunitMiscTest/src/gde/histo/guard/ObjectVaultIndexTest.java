@@ -19,6 +19,7 @@
 
 package gde.histo.guard;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -28,7 +29,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import gde.histo.base.HistoTestCase;
+import gde.histo.base.NonUiTestCase;
 import gde.histo.datasources.HistoSetTest;
 import gde.histo.guard.ObjectVaultIndex.DetailSelector;
 
@@ -36,7 +37,7 @@ import gde.histo.guard.ObjectVaultIndex.DetailSelector;
  *
  * @author Thomas Eickert (USER)
  */
-class ObjectVaultIndexTest extends HistoTestCase {
+class ObjectVaultIndexTest extends NonUiTestCase {
 	private final static String	$CLASS_NAME	= HistoSetTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -57,8 +58,23 @@ class ObjectVaultIndexTest extends HistoTestCase {
 	@Test
 	void testRebuild() {
 		long nanoTime = System.nanoTime();
-		new ObjectVaultIndex().rebuild();
+		ObjectVaultIndex.rebuild();
 		System.out.println("elapsed=" + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " [ms]");
+		System.out.println("indexed object keys=" + ObjectVaultIndex.getIndexedObjectKeys().toString());
+		assertFalse("index is empty after rebuild", ObjectVaultIndex.getIndexedObjectKeys().isEmpty());
+	}
+
+	/**
+	 * Test method for {@link gde.histo.guard.ObjectVaultIndex#rebuild()}.
+	 */
+	@Test
+	void testSelectDeviceNames() {
+		ObjectVaultIndex.rebuild();
+
+		ObjectVaultIndex objectVaultIndex = new ObjectVaultIndex();
+		Set<String> usedDevices = objectVaultIndex.selectDeviceNames();
+		System.out.println("all vault devices=" + usedDevices.toString());
+		assertFalse("no device names in the fleet index directory", usedDevices.isEmpty());
 	}
 
 	/**
@@ -68,7 +84,7 @@ class ObjectVaultIndexTest extends HistoTestCase {
 	void testSelectVaults() throws Exception {
 		Stream.of(1, 2, 3, 4, 5).forEach(i -> {
 			long nanoTime = System.nanoTime();
-			DetailSelector detailSelector = DetailSelector.createEmptyFilter();
+			DetailSelector detailSelector = DetailSelector.createDummyFilter();
 			new ObjectVaultIndex().selectVaultKeys(detailSelector);
 			System.out.println("elapsed=" + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " [ms]");
 

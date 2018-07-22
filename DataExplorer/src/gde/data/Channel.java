@@ -513,7 +513,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				recordSet.setValueGridType(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
 				int gridRecordOrdinal = Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, "-1")).intValue();
 				if (gridRecordOrdinal >= 0 && gridRecordOrdinal < recordSet.realSize() && recordSet.get(gridRecordOrdinal).isVisible) {
-					recordSet.setValueGridRecordOrdinal(gridRecordOrdinal); //$NON-NLS-1$
+					recordSet.setValueGridRecordOrdinal(gridRecordOrdinal);
 				}
 				else {
 					recordSet.setValueGridRecordOrdinal(findFirstVisibleRecord(recordSet));
@@ -586,9 +586,11 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public synchronized void switchRecordSet(String recordSetName) {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("switching to record set threadId = %06d", Thread.currentThread().getId())); //$NON-NLS-1$
-		int percentage = this.application.getProgressPercentage();
-		if (percentage > 99 || percentage == 0)
-			this.application.setProgress(0, null);
+		if (GDE.isWithUi()) {
+			int percentage = this.application.getProgressPercentage();
+			if (percentage > 99 || percentage == 0)
+				this.application.setProgress(0, null);
+		}
 		final Channel activeChannel = this;
 		final String recordSetKey = recordSetName;
 		this.lastActiveRecordSet = this.get(recordSetKey);
@@ -754,7 +756,7 @@ public class Channel extends HashMap<String, RecordSet> {
 						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpRecordSetName needs data to loaded"); //$NON-NLS-1$
 						if (tmpRecordSet.fileDataSize != 0 && tmpRecordSet.fileDataPointer != 0) {
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "loading data ..."); //$NON-NLS-1$
-							tmpRecordSet.loadFileData(fullQualifiedFileName, this.application.getStatusBar() != null);
+							tmpRecordSet.loadFileData(fullQualifiedFileName, GDE.isWithUi());
 						}
 					}
 				}

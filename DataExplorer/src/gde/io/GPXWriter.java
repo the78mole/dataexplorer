@@ -13,21 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
-
-import gde.GDE;
-import gde.data.Channels;
-import gde.data.Record;
-import gde.data.RecordSet;
-import gde.device.IDevice;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.utils.StringHelper;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -41,8 +30,19 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+import gde.GDE;
+import gde.data.Channels;
+import gde.data.Record;
+import gde.data.RecordSet;
+import gde.device.IDevice;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
+
 /**
- * Class to read and write geo points exchange format data 
+ * Class to read and write geo points exchange format data
  * @author Winfried Brügmann
  */
 public class GPXWriter {
@@ -60,8 +60,8 @@ public class GPXWriter {
 
 	static final String				header_xml			= "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 	static final String				header_gpx			= "<gpx version=\"1.1\" creator=\"GNU DataExplorer\">" + GDE.LINE_SEPARATOR;	//$NON-NLS-1$
-	static final String				header_garmin		= "<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:gpxx=\"http://www.garmin.com/xmlschemas/GpxExtensions/v3\" xmlns:gpxtrkx=\"http://www.garmin.com/xmlschemas/TrackStatsExtension/v1\" xmlns:wptx1=\"http://www.garmin.com/xmlschemas/WaypointExtension/v1\" xmlns:gpxtpx=\"http://www.garmin.com/xmlschemas/TrackPointExtension/v1\" xmlns:gpxacc=\"http://www.garmin.com/xmlschemas/AccelerationExtension/v1\" creator=\"GNU DataExplorer\" version=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www8.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackStatsExtension/v1 http://www8.garmin.com/xmlschemas/TrackStatsExtension.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd http://www.garmin.com/xmlschemas/AccelerationExtension/v1 http://www.garmin.com/xmlschemas/AccelerationExtensionv1.xsd\">" + GDE.LINE_SEPARATOR; //$NON-NLS-1$ 	
-//static final String				header_garmin		= "<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:gpxacc=\"http://www.garmin.com/xmlschemas/AccelerationExtension/v1\" version=\"1.1\" creator=\"GNU DataExplorer\">" + GDE.LINE_SEPARATOR; //$NON-NLS-1$ 
+	static final String				header_garmin		= "<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:gpxx=\"http://www.garmin.com/xmlschemas/GpxExtensions/v3\" xmlns:gpxtrkx=\"http://www.garmin.com/xmlschemas/TrackStatsExtension/v1\" xmlns:wptx1=\"http://www.garmin.com/xmlschemas/WaypointExtension/v1\" xmlns:gpxtpx=\"http://www.garmin.com/xmlschemas/TrackPointExtension/v1\" xmlns:gpxacc=\"http://www.garmin.com/xmlschemas/AccelerationExtension/v1\" creator=\"GNU DataExplorer\" version=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www8.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackStatsExtension/v1 http://www8.garmin.com/xmlschemas/TrackStatsExtension.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd http://www.garmin.com/xmlschemas/AccelerationExtension/v1 http://www.garmin.com/xmlschemas/AccelerationExtensionv1.xsd\">" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
+//static final String				header_garmin		= "<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:gpxacc=\"http://www.garmin.com/xmlschemas/AccelerationExtension/v1\" version=\"1.1\" creator=\"GNU DataExplorer\">" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 
 	static final String				footer					= "</gpx>"  + GDE.LINE_SEPARATOR;
 
@@ -125,7 +125,7 @@ public class GPXWriter {
 	static final String				garmin_acc_ext 					= "          <gpxacc:accel offset=\"%d\" x=\"%.1f\" y=\"%.1f\" z=\"%.1f\" />" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 	static final String				garmin_acc_ext_end			= "        </gpxacc:AccelerationExtension>" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 
-		
+
 		static final String			extension					= "<%s>%.3f</%s>" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 		/* sample track point with Garmin extension
 	  <trkpt lat="38.855947041884065" lon="-94.797341292724013">
@@ -237,58 +237,56 @@ public class GPXWriter {
 		 * @param accelerationXYZ
 		 * @throws Exception
 		 */
-		public static void write(final String fullQualifiedPathName, final RecordSet recordSet, 
-				final int latitudeOrdinal, final int longitudeOrdinal, final int altitudeOrdinal, final int speedOrdinal, final int satellitesOrdinal, 
+		public static void write(final String fullQualifiedPathName, final RecordSet recordSet,
+				final int latitudeOrdinal, final int longitudeOrdinal, final int altitudeOrdinal, final int speedOrdinal, final int satellitesOrdinal,
 				final int hdopOrdinal, final int vdopOrdinal, final int pdodOrdinal,
 				final int[] accelerationXYZ) throws Exception {
-			String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 			long startTime = new Date().getTime();
 			IDevice device = DataExplorer.getInstance().getActiveDevice();
 			BufferedWriter writer = null;
-			
+
 			try {
 				HashMap<Integer, Boolean> usedOrdinals = new HashMap<Integer, Boolean>();
-				
+
 				final Record recordLongitude = recordSet.get(longitudeOrdinal);
 				usedOrdinals.put(longitudeOrdinal, true);
 				final Record recordLatitude = recordSet.get(latitudeOrdinal);
 				usedOrdinals.put(latitudeOrdinal, true);
 				final Record recordHeight = recordSet.get(altitudeOrdinal);
 				usedOrdinals.put(altitudeOrdinal, true);
-				final Record recordSpeed = recordSet.get(speedOrdinal); 
+				final Record recordSpeed = recordSet.get(speedOrdinal);
 				//usedOrdinals.put(speedOrdinal, true);
-				final Record recordSatellites = recordSet.get(satellitesOrdinal); 
+				final Record recordSatellites = recordSet.get(satellitesOrdinal);
 				if (recordSatellites != null) usedOrdinals.put(satellitesOrdinal, true);
-				final Record recordHDOP = recordSet.get(hdopOrdinal); 
+				final Record recordHDOP = recordSet.get(hdopOrdinal);
 				if (recordHDOP != null) usedOrdinals.put(hdopOrdinal, true);
-				final Record recordVDOP = recordSet.get(vdopOrdinal); 				 
+				final Record recordVDOP = recordSet.get(vdopOrdinal);
 				if (recordVDOP != null) usedOrdinals.put(vdopOrdinal, true);
-				final Record recordPDOP = recordSet.get(pdodOrdinal); 
+				final Record recordPDOP = recordSet.get(pdodOrdinal);
 				if (recordPDOP != null) usedOrdinals.put(pdodOrdinal, true);
 
-				final String dateString = new SimpleDateFormat("yyyy-MM-dd").format(recordSet.getStartTimeStamp()); 
+				final String dateString = new SimpleDateFormat("yyyy-MM-dd").format(recordSet.getStartTimeStamp());
 
-				if (GPXWriter.application.getStatusBar() != null) 
-					GPXWriter.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] { GDE.FILE_ENDING_GPX, fullQualifiedPathName }));
+				GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] { GDE.FILE_ENDING_GPX, fullQualifiedPathName }));
 				File targetFile = new File(fullQualifiedPathName);
 				if (targetFile.exists()) {
 					if (!targetFile.delete()) log.log(Level.WARNING, fullQualifiedPathName + " could not deleted!");
 					if (!targetFile.createNewFile()) log.log(Level.WARNING, fullQualifiedPathName + " could not created!");
 				}
 				writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fullQualifiedPathName), "UTF-8")); //$NON-NLS-1$
-	
+
 				writer.write(GPXWriter.header_xml);
 				if (accelerationXYZ != null && accelerationXYZ.length == 3)  //Garmin extension
 					writer.write(GPXWriter.header_garmin);
 				else
 					writer.write(GPXWriter.header_gpx);
-				
+
 				long lastTimeStep_sec = recordSet.getStartTimeStamp()/1000;
 				//long lastTimeStep_msec = recordSet.getStartTimeStamp();
 				long startTimeStep_msec = recordSet.getStartTimeStamp();
 				writer.write(String.format(Locale.getDefault(), GPXWriter.metadata, new SimpleDateFormat("yyyy-MM-dd").format(startTimeStep_msec), new SimpleDateFormat("HH:mm:ss").format(startTimeStep_msec)));
 				if (accelerationXYZ != null && accelerationXYZ.length == 3)  //Garmin extension
-					writer.write(String.format(Locale.getDefault(), GPXWriter.track_begin_garmin, 
+					writer.write(String.format(Locale.getDefault(), GPXWriter.track_begin_garmin,
 							new SimpleDateFormat("yyyy-MM-dd").format(startTimeStep_msec), new SimpleDateFormat("HH:mm:ss").format(startTimeStep_msec),
 							recordSet.getTime(recordSet.getRecordDataSize(true)-1)/1000, //seconds total time
 							recordSet.getTime(recordSet.getRecordDataSize(true)-1)/1000, //seconds moving time
@@ -298,15 +296,15 @@ public class GPXWriter {
 							(int)recordHeight.getMaxDisplayValue(), //maximum elevaltion
 							(int)recordHeight.getMinDisplayValue()  //maximum elevaltion
 							));
-				else	
+				else
 					writer.write(String.format(Locale.getDefault(), GPXWriter.track_begin, recordSet.getName(), recordSet.getRecordSetDescription().substring(0, recordSet.getRecordSetDescription().indexOf('\n'))));
-	
+
 				// write data
 				int realDataSize = recordSet.getRecordDataSize(true);
 				int dataSize = recordSet.getRecordDataSize(false);
 				int progressCycle = 0;
-				if (GPXWriter.application.getStatusBar() != null) GPXWriter.application.setProgress(progressCycle, sThreadId);
-				
+				GDE.getUiNotification().setProgress(progressCycle);
+
 				double positionLongitude = device.translateValue(recordLongitude, recordLongitude.realGet(0) / 1000.0);
 				double positionLatitude = device.translateValue(recordLongitude, recordLatitude.realGet(0) / 1000.0);
 				double altitude = device.translateValue(recordHeight, recordHeight.realGet(0) / 1000.0);
@@ -336,14 +334,14 @@ public class GPXWriter {
 						if (accelerationXYZ != null && accelerationXYZ.length == 3) {
 							writer.write(GPXWriter.garmin_acc_ext_begin);
 							//<acc:accel offset=\"%d\" x=\"%.1f\" y=\"%.1f\" z=\"%.1f\" />
-//							writer.write(String.format(Locale.getDefault(), GPXWriter.garmin_acc_ext, 
+//							writer.write(String.format(Locale.getDefault(), GPXWriter.garmin_acc_ext,
 //									((startTimeStep_msec + recordSet.getTime(i)/10) - lastTimeStep_msec),
 //									recordSet.get(accelerationXYZ[0]) != null ? recordSet.get(accelerationXYZ[0]).realGet(i) / 1000.0 : 0.0,
 //									recordSet.get(accelerationXYZ[1]) != null ? recordSet.get(accelerationXYZ[1]).realGet(i) / 1000.0 : 0.0,
 //									recordSet.get(accelerationXYZ[2]) != null ? recordSet.get(accelerationXYZ[2]).realGet(i) / 1000.0 : 0.0));
 							while (i < realDataSize && (startTimeStep_msec + recordSet.getTime(i)/10)/1000 <= lastTimeStep_sec) {
 								//<acc:accel offset=\"%d\" x=\"%.1f\" y=\"%.1f\" z=\"%.1f\" />
-								writer.write(String.format(Locale.getDefault(), GPXWriter.garmin_acc_ext, 
+								writer.write(String.format(Locale.getDefault(), GPXWriter.garmin_acc_ext,
 										((startTimeStep_msec + recordSet.getTime(i)/10) - lastTimeStep_sec*1000),
 										recordSet.get(accelerationXYZ[0]) != null ? recordSet.get(accelerationXYZ[0]).realGet(i) / 1000.0 : 0.0,
 										recordSet.get(accelerationXYZ[1]) != null ? recordSet.get(accelerationXYZ[1]).realGet(i) / 1000.0 : 0.0,
@@ -370,9 +368,9 @@ public class GPXWriter {
 							}
 						}
 						writer.write(GPXWriter.extension_end);
-						writer.write(GPXWriter.track_point_end);	
-						if (GPXWriter.application.getStatusBar() != null && i % 50 == 0) GPXWriter.application.setProgress(((++progressCycle * 5000) / dataSize), sThreadId);
-						if (i < realDataSize-1 && accelerationXYZ != null && accelerationXYZ.length == 3) 
+						writer.write(GPXWriter.track_point_end);
+						if (i % 50 == 0) GDE.getUiNotification().setProgress(((++progressCycle * 5000) / dataSize));
+						if (i < realDataSize-1 && accelerationXYZ != null && accelerationXYZ.length == 3)
 							lastTimeStep_sec = (startTimeStep_msec+recordSet.getTime(i+1)/10)/1000;
 //						if (i < realDataSize-1) lastTimeStep_msec = (startTimeStep_msec+recordSet.getTime(i+1)/10);
 
@@ -394,7 +392,7 @@ public class GPXWriter {
 				throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 			}
 			finally {
-				if (GPXWriter.application.getStatusBar() != null) GPXWriter.application.setStatusMessage(GDE.STRING_EMPTY);
+				GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
 				if (writer != null) {
 					try {
 						writer.close();
@@ -403,13 +401,11 @@ public class GPXWriter {
 						log.log(Level.WARNING, e.getMessage(), e);
 					}
 					writer = null;
-				}
 			}
-			if (GPXWriter.application.getStatusBar() != null) {
-				GPXWriter.application.setProgress(100, sThreadId);
-				GPXWriter.application.setStatusMessage(GDE.STRING_EMPTY);
-			}
-			if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "GPX file = " + fullQualifiedPathName + " written successfuly" //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		GDE.getUiNotification().setProgress(100);
+		GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
+		if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "GPX file = " + fullQualifiedPathName + " written successfuly" //$NON-NLS-1$ //$NON-NLS-2$
 					+ "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));//$NON-NLS-1$ //$NON-NLS-2$
 		}
 

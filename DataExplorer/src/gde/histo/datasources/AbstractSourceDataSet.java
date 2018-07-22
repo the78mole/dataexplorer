@@ -41,7 +41,6 @@ import gde.Analyzer;
 import gde.GDE;
 import gde.config.DeviceConfigurations;
 import gde.data.Channels;
-import gde.device.IDevice;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.HistoVault;
 import gde.histo.cache.VaultCollector;
@@ -71,7 +70,7 @@ public abstract class AbstractSourceDataSet {
 		private static final Logger	log	= Logger.getLogger(SourceDataSet.class.getName());
 
 		protected final Path				filePath;
-		protected final IDevice			device;
+		protected final Analyzer		analyzer;
 
 		/** Use {@code getFile} only; is a link file or a real source file */
 		private File								file;
@@ -80,15 +79,15 @@ public abstract class AbstractSourceDataSet {
 		 * @return true if the current device supports both directory type and file extension
 		 */
 		public boolean isWorkableFile(Set<DirectoryType> directoryTypes, SourceFolders sourceFolders) {
-			return VaultChecker.isWorkableDataSet(device, filePath, directoryTypes, sourceFolders);
+			return VaultChecker.isWorkableDataSet(filePath, directoryTypes, sourceFolders, analyzer);
 		}
 
 		/**
 		 * Determining the path is less costly than making a file from a path.
 		 */
-		protected SourceDataSet(Path filePath, IDevice device) {
+		protected SourceDataSet(Path filePath, Analyzer analyzer) {
 			this.filePath = filePath;
-			this.device = device;
+			this.analyzer = analyzer;
 		}
 
 		/**
@@ -134,14 +133,14 @@ public abstract class AbstractSourceDataSet {
 		 */
 		protected String getObjectKey() {
 			String dirName = filePath.getParent().getFileName().toString();
-			DeviceConfigurations deviceConfigurations = Analyzer.getInstance().getDeviceConfigurations();
+			DeviceConfigurations deviceConfigurations = analyzer.getDeviceConfigurations();
 			return !deviceConfigurations.contains(dirName) ? dirName : GDE.STRING_EMPTY;
 		}
 
 		/**
 		 * @return the trusses or an empty stream
 		 */
-		public Stream<VaultCollector> defineTrusses(TrussCriteria trussCriteria, Consumer<String> signaler, IDevice uiDevice) {
+		public Stream<VaultCollector> defineTrusses(TrussCriteria trussCriteria, Consumer<String> signaler) {
 			signaler.accept("get file properties    " + filePath.toString());
 			return getTrusses4Ui().stream().filter(t -> isValidDeviceChannelObjectAndStart(trussCriteria, t.getVault()));
 		}
@@ -208,8 +207,8 @@ public abstract class AbstractSourceDataSet {
 		protected File							actualFile						= null;
 		private boolean							isActualFileVerified	= false;
 
-		protected OsdDataSet(Path filePath, IDevice device) {
-			super(filePath, device);
+		protected OsdDataSet(Path filePath, Analyzer analyzer) {
+			super(filePath, analyzer);
 		}
 
 		@Override
@@ -217,8 +216,8 @@ public abstract class AbstractSourceDataSet {
 			List<VaultCollector> trusses = new ArrayList<>();
 			if (getActualFile() != null) {
 				String objectDirectory = getObjectKey();
-				try (InputStream sourceInputStream = Analyzer.getInstance().getDataAccess().getSourceInputStream(getActualFile().toPath());) {
-					trusses = HistoOsdReaderWriter.readTrusses(sourceInputStream, getActualFile().toPath(), objectDirectory);
+				try (InputStream sourceInputStream = analyzer.getDataAccess().getSourceInputStream(getActualFile().toPath());) {
+					trusses = HistoOsdReaderWriter.readTrusses(sourceInputStream, getActualFile().toPath(), objectDirectory, analyzer);
 				} catch (Exception e) {
 					// link file points to non existent file
 					log.log(Level.SEVERE, e.getMessage(), e);
@@ -234,17 +233,17 @@ public abstract class AbstractSourceDataSet {
 
 		@Override
 		public boolean isValidDeviceChannelObjectAndStart(TrussCriteria trussCriteria, HistoVault vault) {
-			return VaultChecker.matchDeviceChannelObjectAndStart(device, trussCriteria, vault);
+			return VaultChecker.matchDeviceChannelObjectAndStart(analyzer, trussCriteria, vault);
 		}
 
 		@Override
 		public void readVaults4Ui(Path sourcePath, List<VaultCollector> trusses) {
-			try (InputStream sourceInputStream = Analyzer.getInstance().getDataAccess().getSourceInputStream(sourcePath);) {
-				HistoOsdReaderWriter.readVaults(Analyzer.getInstance().getDataAccess().getSourceInputStream(sourcePath), trusses, sourcePath.toFile().length());
+			try (InputStream sourceInputStream = analyzer.getDataAccess().getSourceInputStream(sourcePath);) {
+				HistoOsdReaderWriter.readVaults(analyzer.getDataAccess().getSourceInputStream(sourcePath), trusses, analyzer);
 			} catch (Exception e) {
 				log.log(SEVERE, e.getMessage(), e);
 				log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //
-						Analyzer.getInstance().getActiveDevice().getName(), Analyzer.getInstance().getActiveChannel().getNumber(), sourcePath));
+						analyzer.getActiveDevice().getName(), analyzer.getActiveChannel().getNumber(), sourcePath));
 			}
 		}
 
@@ -303,16 +302,16 @@ public abstract class AbstractSourceDataSet {
 		@SuppressWarnings("hiding")
 		private static final Logger log = Logger.getLogger(ImportDataSet.class.getName());
 
-		protected ImportDataSet(Path filePath, IDevice device) {
-			super(filePath, device);
+		protected ImportDataSet(Path filePath, Analyzer analyzer) {
+			super(filePath, analyzer);
 		}
 
 		@Override
 		public List<VaultCollector> getTrusses4Ui() {
 			String objectDirectory = getObjectKey();
-			String recordSetBaseName = Analyzer.getInstance().getActiveChannel().getChannelConfigKey() + getRecordSetExtend();
+			String recordSetBaseName = analyzer.getActiveChannel().getChannelConfigKey() + getRecordSetExtend();
 			VaultCollector truss = new VaultCollector(objectDirectory, getFile().toPath(), 0, Channels.getInstance().size(), recordSetBaseName,
-					providesReaderSettings());
+					analyzer.getActiveDevice(), providesReaderSettings());
 			truss.setSourceDataSet(this);
 			return new ArrayList<>(Arrays.asList(truss));
 		}
@@ -330,13 +329,13 @@ public abstract class AbstractSourceDataSet {
 			String loadFilePath = trusses.get(0).getVault().getLoadFilePath();
 			for (VaultCollector truss : trusses) {
 				if (truss.getVault().getLoadFilePath().equals(loadFilePath)) {
-					Supplier<InputStream> inputStream = () -> Analyzer.getInstance().getDataAccess().getSourceInputStream(sourcePath) ;
-					try  {
-						((IHistoDevice) Analyzer.getInstance().getActiveDevice()).getRecordSetFromImportFile(inputStream, truss);
+					Supplier<InputStream> inputStream = () -> analyzer.getDataAccess().getSourceInputStream(sourcePath);
+					try {
+						((IHistoDevice) analyzer.getActiveDevice()).getRecordSetFromImportFile(inputStream, truss);
 					} catch (Exception e) {
 						log.log(SEVERE, e.getMessage(), e);
 						log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //
-								Analyzer.getInstance().getActiveDevice().getName(), Analyzer.getInstance().getActiveChannel().getNumber(), sourcePath));
+								analyzer.getActiveDevice().getName(), analyzer.getActiveChannel().getNumber(), sourcePath));
 					}
 					histoVaults.add(truss.getVault());
 				} else
@@ -361,7 +360,7 @@ public abstract class AbstractSourceDataSet {
 
 		@Override
 		public void loadFile(Path tmpPath, String desiredRecordSetName) {
-			((IHistoDevice) device).importDeviceData(tmpPath);
+			((IHistoDevice) analyzer.getActiveDevice()).importDeviceData(tmpPath);
 		}
 	}
 
@@ -370,19 +369,20 @@ public abstract class AbstractSourceDataSet {
 	 * @return null if the file is not supported
 	 */
 	@Nullable
-	public static SourceDataSet createSourceDataSet(Path filePath, IDevice device) {
+	public static SourceDataSet createSourceDataSet(Path filePath, Analyzer analyzer) {
 		String extension = PathUtils.getFileExtension(filePath);
 		if (extension.equals(GDE.FILE_ENDING_OSD))
-			return new OsdDataSet(filePath, device);
-		else if (device instanceof IHistoDevice) {
-			List<String> importExtentions = ((IHistoDevice) device).getSupportedImportExtentions();
+			return new OsdDataSet(filePath, analyzer);
+		else if (analyzer.getActiveDevice() instanceof IHistoDevice) {
+			List<String> importExtentions = ((IHistoDevice) analyzer.getActiveDevice()).getSupportedImportExtentions();
 			if (importExtentions.contains(extension)) {
-				return new ImportDataSet(filePath, device); // todo implement logDataSet and native HottLogReader
+				return new ImportDataSet(filePath, analyzer); // todo implement logDataSet and native HottLogReader
 			}
 		}
 		return null;
 	}
 
+	protected final Analyzer			analyzer;
 	protected final SourceFolders	sourceFolders;
 
 	protected Consumer<String>		signaler	= s -> {
@@ -391,7 +391,8 @@ public abstract class AbstractSourceDataSet {
 	/**
 	 *
 	 */
-	protected AbstractSourceDataSet(SourceFolders sourceFolders) {
+	protected AbstractSourceDataSet(Analyzer analyzer, SourceFolders sourceFolders) {
+		this.analyzer = analyzer;
 		this.sourceFolders = sourceFolders;
 	}
 

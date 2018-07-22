@@ -55,7 +55,6 @@ import gde.data.AbstractRecordSet;
 import gde.data.Channels;
 import gde.histo.datasources.HistoSet;
 import gde.histo.datasources.SourceFolders;
-import gde.histo.exclusions.ExclusionActivity;
 import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;

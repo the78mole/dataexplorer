@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import gde.Analyzer;
 import gde.GDE;
-import gde.histo.base.SuperTestCase;
+import gde.histo.base.NonUiTestCase;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -38,7 +38,7 @@ import gde.messages.Messages;
  *
  * @author Thomas Eickert (USER)
  */
-class SourceDataSetExplorerTest extends SuperTestCase {
+class SourceDataSetExplorerTest extends NonUiTestCase {
 	private final static String	$CLASS_NAME	= SourceDataSetExplorerTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -66,11 +66,11 @@ class SourceDataSetExplorerTest extends SuperTestCase {
 
 		setDeviceChannelObject(deviceName, 3, deviceoriented);
 
-		DirectoryScanner directoryScanner = new DirectoryScanner();
+		DirectoryScanner directoryScanner = new DirectoryScanner(Analyzer.getInstance());
 		try {
-			directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
+			directoryScanner.isValidated(RebuildStep.F_FILE_CHECK);
 			log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
-			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(directoryScanner.getSourceFolders(), false);
+			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(Analyzer.getInstance(), directoryScanner.getSourceFolders(), false);
 			boolean reReadFiles = !directoryScanner.isChannelChangeOnly();
 			sourceDataSetExplorer.screen4Trusses(directoryScanner.getSourceFolders().getMap(), reReadFiles);
 
@@ -96,10 +96,10 @@ class SourceDataSetExplorerTest extends SuperTestCase {
 
 		setDeviceChannelObject(deviceName, 3, deviceoriented);
 
-		DirectoryScanner directoryScanner = new DirectoryScanner();
+		DirectoryScanner directoryScanner = new DirectoryScanner(Analyzer.getInstance());
 		try {
-			directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
-			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(directoryScanner.getSourceFolders(), false);
+			directoryScanner.isValidated(RebuildStep.F_FILE_CHECK);
+			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(Analyzer.getInstance(), directoryScanner.getSourceFolders(), false);
 			boolean reReadFiles = !directoryScanner.isChannelChangeOnly();
 			sourceDataSetExplorer.screen4Trusses(directoryScanner.getSourceFolders().getMap(), reReadFiles);
 

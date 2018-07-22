@@ -652,7 +652,7 @@ String[] names = configuration.getMeasurementSettlementScoregroupNames(Analyzer.
 				setValueGridRecordName(gridRecord != null && gridRecord.isVisible() ? gridRecordName : gridDefaultRecordName);
 			}
 			setSmartStatistics(Boolean.parseBoolean(template.getProperty(AbstractRecordSet.SMART_STATISTICS, "true")));
-			if (Analyzer.getInstance().isWithUi()) presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(getChartWeights());
+			if (GDE.isWithUi()) presentHistoExplorer.getHistoSummaryTabItem().setChartWeights(getChartWeights());
 			log.fine(() -> "applied histo graphics template file " + template.getTargetFileSubPath());
 
 			if (doUpdateVisibilityStatus) {
@@ -674,7 +674,7 @@ String[] names = configuration.getMeasurementSettlementScoregroupNames(Analyzer.
 	 */
 	public void setSmartStatistics(boolean isActive) {
 		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(isActive));
-		if (Analyzer.getInstance().isWithUi()) application.getPresentHistoExplorer().updateHistoMenuItems();
+		if (GDE.isWithUi()) application.getPresentHistoExplorer().updateHistoMenuItems();
 	}
 
 	/**

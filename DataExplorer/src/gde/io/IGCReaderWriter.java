@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
@@ -65,7 +65,7 @@ public class IGCReaderWriter {
 
 	final public static char[]	igcShortDate			= new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
 			'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
-	
+
 	/**
 	 * query the filename in short IGC filename format
 	 * 2.5.1 Short file name style: YMDCXXXF.IGC
@@ -87,7 +87,7 @@ public class IGCReaderWriter {
 		char day = igcShortDate[Integer.parseInt(new SimpleDateFormat("dd", Locale.getDefault()).format(date))];
 		return String.format("%c%c%c%c%s%c.igc", year, month, day, manufacturersIGCCodeLetter, threeCharFnId, igcShortDate[sequenceNumber]);
 	}
-	
+
 	/**
 	 * query the filename in short IGC filename format
 	 * 2.5.2 Long file name style. This uses a full set of characters in each field, a hyphen separating each field,
@@ -110,15 +110,14 @@ public class IGCReaderWriter {
 	 * @param recordNameExtend
 	 * @param channelConfigNumber
 	 * @return record set created
-	 * @throws NotSupportedFileFormatException 
-	 * @throws MissMatchDeviceException 
-	 * @throws IOException 
-	 * @throws DataInconsitsentException 
-	 * @throws DataTypeException 
+	 * @throws NotSupportedFileFormatException
+	 * @throws MissMatchDeviceException
+	 * @throws IOException
+	 * @throws DataInconsitsentException
+	 * @throws DataTypeException
 	 */
 	public static RecordSet read(String filePath, IDevice device, String recordNameExtend, Integer channelConfigNumber) throws NotSupportedFileFormatException, IOException, DataInconsitsentException,
 			DataTypeException {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		String line = GDE.STRING_STAR, lastLine;
 		RecordSet recordSet = null;
 		BufferedReader reader; // to read the data
@@ -136,7 +135,7 @@ public class IGCReaderWriter {
 		boolean isGsentence = false;
 		String dllID = "XXX";
 		Vector<IgcExtension> extensions = new Vector<IgcExtension>();
-		if (IGCReaderWriter.application.getStatusBar() != null) IGCReaderWriter.application.setProgress(0, sThreadId);
+		GDE.getUiNotification().setProgress(0);
 
 		try {
 			if (channelConfigNumber == null)
@@ -145,24 +144,24 @@ public class IGCReaderWriter {
 				activeChannel = IGCReaderWriter.channels.get(channelConfigNumber);
 
 			if (activeChannel != null) {
-				if (IGCReaderWriter.application.getStatusBar() != null) IGCReaderWriter.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
+				GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
 				activeChannelConfigNumber = activeChannel.getNumber();
 
-				if (IGCReaderWriter.application.getStatusBar() != null) {
+				if (GDE.isWithUi()) {
 					IGCReaderWriter.channels.switchChannel(activeChannelConfigNumber, GDE.STRING_EMPTY);
 					IGCReaderWriter.application.getMenuToolBar().updateChannelSelector();
 					activeChannel = IGCReaderWriter.channels.getActiveChannel();
 				}
 				String recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
-				int dataBlockSize = Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)); // measurements size must not match data block size, there are some measurements which are result of calculation			
+				int dataBlockSize = Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)); // measurements size must not match data block size, there are some measurements which are result of calculation
 				log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize < dataBlockSize) {
 					dataBlockSize = measurementSize;
 				}
 
 				long approximateLines = inputFile.length() / 35; //B sentence is the most used one and has 35 bytes
-				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$						
+				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
 
 				//skip all lines which describe the hardware, pilot and plane, save as header
 				while ((line = reader.readLine()) == null || !line.startsWith(device.getDataBlockLeader())) {
@@ -218,7 +217,7 @@ public class IGCReaderWriter {
 						actualTimeStamp = new GregorianCalendar(year, month - 1, day, hour, minute, second).getTimeInMillis();
 
 						int progress = (int) (lineNumber * 100 / approximateLines);
-						if (IGCReaderWriter.application.getStatusBar() != null && progress % 5 == 0) IGCReaderWriter.application.setProgress(progress, sThreadId);
+						if (progress % 5 == 0) GDE.getUiNotification().setProgress(progress);
 
 						if (device.getStateType() == null) {
 							reader.close();
@@ -255,7 +254,7 @@ public class IGCReaderWriter {
 							activeChannel.get(recordSetName).setStartTimeStamp(actualTimeStamp);
 							activeChannel.setActiveRecordSet(recordSetName);
 							activeChannel.applyTemplate(recordSetName, true);
-							
+
 							int i=0;
 							for (IgcExtension extension : extensions) {
 							if (recordSet.realSize() < 5+i && !recordSet.get(5+i).getName().equals(extension.getThreeLetterCode()))
@@ -297,7 +296,7 @@ public class IGCReaderWriter {
 								height = values[3];
 							}
 							values[0] = latitude; // 5 digits after the decimal point only
-							values[1] = longitude; 
+							values[1] = longitude;
 							values[2] = altitude;
 							values[3] = height;
 
@@ -322,7 +321,7 @@ public class IGCReaderWriter {
 				while ((line = reader.readLine()) != null);
 
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
-				if (IGCReaderWriter.application.getStatusBar() != null)
+				if (GDE.isWithUi())
 					activeChannel.switchRecordSet(recordSetName);
 				else
 					activeChannel.setActiveRecordSet(recordSet);
@@ -333,7 +332,7 @@ public class IGCReaderWriter {
 
 				//write filename after import to record description
 				activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
-				
+
 				if (GDE.IS_WINDOWS && isGsentence && GDE.BIT_MODE.equals("32") && dllID.equalsIgnoreCase("XTT")) {
 					if (IGCDLL.loadIgcDll(dllID)) {
 						System.out.println("verification = " + IGCDLL.validateLog(filePath));
@@ -356,19 +355,17 @@ public class IGCReaderWriter {
 				activeChannel.setActiveRecordSet(recordSetName);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
-				if (IGCReaderWriter.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+				if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
 			}
 			// now display the error message
 			String msg = filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGE0045, new Object[] { e.getMessage(), lineNumber });
 			log.log(java.util.logging.Level.WARNING, msg, e);
-			if (IGCReaderWriter.application.getStatusBar() != null)
+			if (GDE.isWithUi())
 				IGCReaderWriter.application.openMessageDialog(msg);
 		}
 		finally {
-			if (IGCReaderWriter.application.getStatusBar() != null) {
-				IGCReaderWriter.application.setProgress(100, sThreadId);
-				IGCReaderWriter.application.setStatusMessage(GDE.STRING_EMPTY);
-			}
+			GDE.getUiNotification().setProgress(100);
+			GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
 		}
 
 		return recordSet;
@@ -402,19 +399,17 @@ public class IGCReaderWriter {
 			final int startAltitude) throws Exception {
 		BufferedWriter writer;
 		StringBuilder content = new StringBuilder().append(header);
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		long startTime = new Date().getTime();
 
 		try {
-			if (IGCReaderWriter.application.getStatusBar() != null)
-				IGCReaderWriter.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] { GDE.FILE_ENDING_IGC, igcFilePath }));
+			GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] { GDE.FILE_ENDING_IGC, igcFilePath }));
 
 			if (recordSet != null) {
 				int startIndex = GPSHelper.getStartIndexGPS(recordSet, ordinalLatitude, ordinalLongitude);
 				Record recordAlitude = recordSet.get(ordinalAltitude);
 				SimpleDateFormat sdf = new SimpleDateFormat("HHmmss"); //$NON-NLS-1$
 				int offsetHeight = (int) (startAltitude - device.translateValue(recordAlitude, recordAlitude.get(startIndex) / 1000.0));
-				char fixValidity = offsetHeight == 0 ? 'A' : 'V'; 
+				char fixValidity = offsetHeight == 0 ? 'A' : 'V';
 				long lastTimeStamp = -1, timeStamp;
 				long recordSetStartTimeStamp = recordSet.getStartTimeStamp();
 				log.log(Level.TIME, "start time stamp = " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", recordSetStartTimeStamp));
@@ -436,14 +431,14 @@ public class IGCReaderWriter {
 			writer.close();
 			writer = null;
 			//recordSet.setSaved(true);
-			if (IGCReaderWriter.application.getStatusBar() != null) IGCReaderWriter.application.setProgress(100, sThreadId);
+			GDE.getUiNotification().setProgress(100);
 		}
 		catch (RuntimeException e) {
 			IGCReaderWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
 			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 		finally {
-			if (IGCReaderWriter.application.getStatusBar() != null) IGCReaderWriter.application.setStatusMessage(GDE.STRING_EMPTY);
+			GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
 		}
 		if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "IGC file = " + igcFilePath + " written successfuly" //$NON-NLS-1$ //$NON-NLS-2$
 				+ "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));//$NON-NLS-1$ //$NON-NLS-2$

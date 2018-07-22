@@ -78,11 +78,9 @@ public class HoTTlogReader extends HoTTbinReader {
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
-		if (menuToolBar != null)
-			HoTTbinReader.application.setProgress(0, sThreadId);
+		GDE.getUiNotification().setProgress(0);
 
 		try {
 			HoTTAdapter.recordSets.clear();
@@ -278,8 +276,8 @@ public class HoTTlogReader extends HoTTbinReader {
 
 						HoTTbinReader.timeStep_ms += logTimeStep;// add time step from log record given in info header
 
-						if (menuToolBar != null && i % progressIndicator == 0)
-							HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+						if (i % progressIndicator == 0)
+							GDE.getUiNotification().setProgress((int) (i * 100 / numberDatablocks));
 
 						if (HoTTbinReader.isJustParsed && countPackageLoss > 0) {
 							HoTTbinReader.lostPackages.add(countPackageLoss);
@@ -320,7 +318,7 @@ public class HoTTlogReader extends HoTTbinReader {
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " //$NON-NLS-1$
 					+ StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$
 
-			if (menuToolBar != null) {
+			if (GDE.isWithUi()) {
 				for (RecordSet recordSet : HoTTAdapter.recordSets.values()) {
 					device.makeInActiveDisplayable(recordSet);
 					device.updateVisibilityStatus(recordSet, true);
@@ -331,7 +329,7 @@ public class HoTTlogReader extends HoTTbinReader {
 
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
-				HoTTbinReader.application.setProgress(100, sThreadId);
+				GDE.getUiNotification().setProgress(100);
 			}
 		}
 		finally {

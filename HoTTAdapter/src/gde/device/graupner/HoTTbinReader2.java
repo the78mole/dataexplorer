@@ -117,10 +117,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
-		if (menuToolBar != null) HoTTbinReader.application.setProgress(0, sThreadId);
+		GDE.getUiNotification().setProgress(0);
 
 		try {
 			//check if recordSet initialized, transmitter and receiver data always present, but not in the same data rate and signals
@@ -321,7 +320,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 						HoTTbinReader.timeStep_ms += 10; // add default time step from device of 10 msec
 
-						if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+						if (i % progressIndicator == 0) GDE.getUiNotification().setProgress((int) (i * 100 / numberDatablocks));
 					}
 					else { //skip empty block, but add time step
 						if (HoTTbinReader2.log.isLoggable(Level.FINE)) HoTTbinReader2.log.log(Level.FINE, "-->> Found tx=rx=0 dBm");
@@ -354,8 +353,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.log.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader2.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
-			if (menuToolBar != null) {
-				HoTTbinReader.application.setProgress(99, sThreadId);
+			if (GDE.isWithUi()) {
+				GDE.getUiNotification().setProgress(99);
 				device.updateVisibilityStatus(HoTTbinReader2.recordSet, true);
 				channel.applyTemplate(recordSetName, false);
 
@@ -364,7 +363,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
-				HoTTbinReader.application.setProgress(100, sThreadId);
+				GDE.getUiNotification().setProgress(100);
 			}
 		}
 		finally {
@@ -439,10 +438,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
-		if (menuToolBar != null) HoTTbinReader.application.setProgress(0, sThreadId);
+		GDE.getUiNotification().setProgress(0);
 
 		try {
 			//receiver data are always contained
@@ -658,7 +656,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 						HoTTbinReader.timeStep_ms += 10;// add default time step from log record of 10 msec
 
-						if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+						if (i % progressIndicator == 0) GDE.getUiNotification().setProgress((int) (i * 100 / numberDatablocks));
 					}
 					else { //skip empty block, but add time step
 						if (HoTTbinReader2.log.isLoggable(Level.FINE)) HoTTbinReader2.log.log(Level.FINE, "-->> Found tx=rx=0 dBm");
@@ -696,7 +694,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (menuToolBar != null) {
-				HoTTbinReader.application.setProgress(99, sThreadId);
+				GDE.getUiNotification().setProgress(99);
 				device.makeInActiveDisplayable(HoTTbinReader2.recordSet);
 				device.updateVisibilityStatus(HoTTbinReader2.recordSet, true);
 				channel.applyTemplate(recordSetName, false);
@@ -706,7 +704,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
-				HoTTbinReader.application.setProgress(100, sThreadId);
+				GDE.getUiNotification().setProgress(100);
 			}
 		}
 		finally {

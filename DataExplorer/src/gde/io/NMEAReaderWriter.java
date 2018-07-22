@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
@@ -50,7 +50,7 @@ import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
 /**
- * Class to read and write comma separated value files which simulates serial data 
+ * Class to read and write comma separated value files which simulates serial data
  * one data line consist of $1;1;0; 14780;  598;  1000;  8838;.....;0002;
  * where $recordSetNumber; stateNumber; timeStepSeconds; firstIntValue; secondIntValue; .....;checkSumIntValue;
  * All properties around the textual data in this line has to be specified in DataBlockType (type=TEXT, size number of values, separator=;, ...), refer to DeviceProperties_XY.XSD
@@ -74,15 +74,14 @@ public class NMEAReaderWriter {
 	 * @param recordNameExtend
 	 * @param channelConfigNumber
 	 * @return record set created
-	 * @throws NotSupportedFileFormatException 
-	 * @throws MissMatchDeviceException 
-	 * @throws IOException 
-	 * @throws DataInconsitsentException 
-	 * @throws DataTypeException 
+	 * @throws NotSupportedFileFormatException
+	 * @throws MissMatchDeviceException
+	 * @throws IOException
+	 * @throws DataInconsitsentException
+	 * @throws DataTypeException
 	 */
 	public static RecordSet read(String filePath, IDevice device, String recordNameExtend, Integer channelConfigNumber) throws NotSupportedFileFormatException, IOException, DataInconsitsentException,
 			DataTypeException {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		long startTime = System.nanoTime() / 1000000;
 		String line = GDE.STRING_STAR;
 		RecordSet recordSet = null;
@@ -95,26 +94,26 @@ public class NMEAReaderWriter {
 		long timeStamp = -1;
 		int lastProgress = 0;
 		File inputFile = new File(filePath);
-		if (NMEAReaderWriter.application.getStatusBar() != null) NMEAReaderWriter.application.setProgress(0, sThreadId);
+		GDE.getUiNotification().setProgress(0);
 
-		try {			
+		try {
 			if (channelConfigNumber == null)
 				activeChannel = NMEAReaderWriter.channels.getActiveChannel();
 			else
 				activeChannel = NMEAReaderWriter.channels.get(channelConfigNumber);
 
 			if (activeChannel != null) {
-				if (NMEAReaderWriter.application.getStatusBar() != null) NMEAReaderWriter.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
+				GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
 				activeChannelConfigNumber = activeChannel.getNumber();
 
-				if (NMEAReaderWriter.application.getStatusBar() != null) {
+				if (GDE.isWithUi()) {
 					NMEAReaderWriter.channels.switchChannel(activeChannelConfigNumber, GDE.STRING_EMPTY);
 					NMEAReaderWriter.application.getMenuToolBar().updateChannelSelector();
 					activeChannel = NMEAReaderWriter.channels.getActiveChannel();
 				}
 				recordSetName = (activeChannel.size() + 1) + ") " + recordSetNameExtend; //$NON-NLS-1$
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
-				int dataBlockSize = Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)); // measurements size must not match data block size, there are some measurements which are result of calculation			
+				int dataBlockSize = Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)); // measurements size must not match data block size, there are some measurements which are result of calculation
 				log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize < dataBlockSize) {
 					dataBlockSize = measurementSize;
@@ -146,16 +145,16 @@ public class NMEAReaderWriter {
 					}
 				}
 
-				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$		
+				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
 				Vector<String> lines = new Vector<String>();
 				//skip SM GPS-Logger setup sentence
-				while ((line = reader.readLine()) != null && 
-						(line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) 
+				while ((line = reader.readLine()) != null &&
+						(line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name())
 						|| line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name())
 						|| line.startsWith(device.getDataBlockLeader() + NMEA.UL2SETUP.name())
-						|| !line.startsWith(device.getDataBlockLeader()) 
+						|| !line.startsWith(device.getDataBlockLeader())
 						|| !data.isSupportedSentence(line.substring(1, line.indexOf(device.getDataBlockSeparator().value(), 2))))) {
-					if (line != null && (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name()) 
+					if (line != null && (line.startsWith(device.getDataBlockLeader() + NMEA.SETUP.name())
 							|| line.startsWith(device.getDataBlockLeader() + NMEA.GPSSETUP.name())
 							|| line.startsWith(device.getDataBlockLeader() + NMEA.UL2SETUP.name()))) {
 						Vector<String> setupLine = new Vector<String>();
@@ -206,8 +205,8 @@ public class NMEAReaderWriter {
 					}
 					data.parse(lines, lineNumber);
 					int progress = (int) (lineNumber*100/approximateLines);
-					if (NMEAReaderWriter.application.getStatusBar() != null && progress > lastProgress && progress % 5 == 0) {
-						NMEAReaderWriter.application.setProgress(progress, sThreadId);
+					if (progress > lastProgress && progress % 5 == 0) {
+						GDE.getUiNotification().setProgress(progress);
 						lastProgress = progress;
 						//System.out.println(progress);
 					}
@@ -217,8 +216,8 @@ public class NMEAReaderWriter {
 						lines.add(line);
 						signature = line.substring(0, 6);
 					}
-					
-					if (device.getStateType() == null) 
+
+					if (device.getStateType() == null)
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] { device.getPropertiesFileName() }));
 
 					try {
@@ -274,24 +273,24 @@ public class NMEAReaderWriter {
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				activeChannel.get(recordSetName).updateVisibleAndDisplayableRecordsForTable();
-				if (NMEAReaderWriter.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+				if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
 
 				reader.close();
 				reader = null;
-				
+
 				//write filename after import to record description
 				activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
 			}
 		}
 		catch (FileNotFoundException e) {
 			log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-			if (NMEAReaderWriter.application.getStatusBar() != null) {
+			if (GDE.isWithUi()) {
 				NMEAReaderWriter.application.openMessageDialog(e.getMessage());
 			}
 		}
 		catch (IOException e) {
 			log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
-			if (NMEAReaderWriter.application.getStatusBar() != null) {
+			if (GDE.isWithUi()) {
 				NMEAReaderWriter.application.openMessageDialog(e.getMessage());
 			}
 		}
@@ -302,20 +301,18 @@ public class NMEAReaderWriter {
 				activeChannel.setActiveRecordSet(recordSetName);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
-				if (NMEAReaderWriter.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+				if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
 			}
 			// now display the error message
 			String msg = filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGE0045, new Object[] { e.getMessage(), lineNumber });
 			log.log(java.util.logging.Level.WARNING, msg, e);
-			if (NMEAReaderWriter.application.getStatusBar() != null) {
+			if (GDE.isWithUi()) {
 				NMEAReaderWriter.application.openMessageDialog(msg);
 			}
 		}
 		finally {
-			if (NMEAReaderWriter.application.getStatusBar() != null) {
-				NMEAReaderWriter.application.setProgress(100, sThreadId);
-				NMEAReaderWriter.application.setStatusMessage(GDE.STRING_EMPTY);
-			}
+			GDE.getUiNotification().setProgress(100);
+			GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
 		}
 
 		if (log.isLoggable(Level.TIME))
@@ -325,7 +322,7 @@ public class NMEAReaderWriter {
 
 	//	/**
 	//	 * write data CVS file
-	//	 * @throws Exception 
+	//	 * @throws Exception
 	//	 */
 	//	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) throws Exception {
 	//		BufferedWriter writer;
@@ -344,7 +341,7 @@ public class NMEAReaderWriter {
 	//			sb.append(device.getName()).append(separator).append(recordSet.getChannelConfigName()).append(lineSep);
 	//			writer.write(sb.toString());
 	//			log.log(Level.FINE, "written header line = " + sb.toString());  //$NON-NLS-1$
-	//			
+	//
 	//			sb = new StringBuffer();
 	//			sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; //$NON-NLS-1$
 	//			// write the measurements signature
@@ -354,7 +351,7 @@ public class NMEAReaderWriter {
 	//				Record record = recordSet.get(recordNames[i]);
 	//				log.log(Level.FINEST, "append " + recordNames[i]); //$NON-NLS-1$
 	//				if (isRaw) {
-	//					if (!measurement.isCalculation()) {	// only use active records for writing raw data 
+	//					if (!measurement.isCalculation()) {	// only use active records for writing raw data
 	//						sb.append(recordNames[i]).append(" [---]").append(separator);	 //$NON-NLS-1$
 	//						log.log(Level.FINEST, "append " + recordNames[i]); //$NON-NLS-1$
 	//					}
@@ -416,7 +413,7 @@ public class NMEAReaderWriter {
 	//		}
 	//		catch (Exception e) {
 	//			log.log(Level.SEVERE, e.getMessage(), e);
-	//			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); 
+	//			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 	//		}
 	//		finally {
 	//			if (application.getStatusBar() != null) application.setStatusMessage(GDE.STRING_EMPTY);

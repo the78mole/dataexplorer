@@ -36,6 +36,8 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -44,14 +46,14 @@ import gde.DataAccess.LocalAccess;
 import gde.GDE;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
-import gde.histo.base.SuperTestCase;
+import gde.histo.base.NonUiTestCase;
 import gde.histo.cache.VaultReaderWriter;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyCompliance;
 
-public class HistoSetTest extends SuperTestCase {
+public class HistoSetTest extends NonUiTestCase {
 	private final static String	$CLASS_NAME	= HistoSetTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -67,13 +69,18 @@ public class HistoSetTest extends SuperTestCase {
 	}
 
 	/**
-	 *  ET 04.2017: elapsed times for DataFilesTestSamples/DataExplorer/_ET_Exzerpt with  171 files resulting in 1.645 vaults  @26 object keys and isZippedCache=false/true
- 	 *  - run 1  w/o vault cache 298/309 sec (15,4/1,8 MiB cache)
- 	 *  - run 2 with vault cache 165/161 sec (15,4/1,8 MiB cache)
-	 *  ET 04.2017: elapsed times for DataFilesTestSamples/DataExplorer/_ET_Exzerpt with  171 files resulting in   926 vaults  @26 object keys and isZippedCache=false/true (910 vault w/o duplicates)
- 	 *  - run 1  w/o vault cache 372 sec (17,2 MiB cache)
- 	 *  - run 2 with vault cache 231 sec (17,2 MiB cache)
+	 * ET 08.2018: elapsed times for DataFilesTestSamples/DataExplorer/_ET_Exzerpt with  182 files resulting in   491 vaults  @26 object keys and isZippedCache=false
+	 *   run 1  w/o vault cache 237 sec (16,0 MiB cache)
+	 *   run 2 with vault cache 100 sec (16,0 MiB cache)
+	 * ET 04.2017: elapsed times for DataFilesTestSamples/DataExplorer/_ET_Exzerpt with 171 files resulting in 1.645 vaults @26 object keys and isZippedCache=false/true
+	 * - run 1 w/o vault cache 298/309 sec (15,4/1,8 MiB cache)
+	 * - run 2 with vault cache 165/161 sec (15,4/1,8 MiB cache)
+	 * ET 04.2017: elapsed times for DataFilesTestSamples/DataExplorer/_ET_Exzerpt with 171 files resulting in 926 vaults @26 object keys and isZippedCache=false/true (910 vault w/o duplicates)
+	 * - run 1 w/o vault cache 372 sec (17,2 MiB cache)
+	 * - run 2 with vault cache 231 sec (17,2 MiB cache)
 	 */
+	@Tag("performance")
+	@Test
 	public void testHistoSet4All() {
 		this.settings.setSearchDataPathImports(true);
 
@@ -122,8 +129,8 @@ public class HistoSetTest extends SuperTestCase {
 			}
 		}
 
-		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports()
-				? analyzer.getDeviceConfigurations().getValidLogExtentions() : Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
+		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports() ? analyzer.getDeviceConfigurations().getValidLogExtentions()
+				: Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
 		long logFilesCount = getLogFilesCount(new File(settings.getDataFilePath()), 99, validLogExtentions);
 		long cacheSize = VaultReaderWriter.getCacheSize();
 		System.out.println(String.format("* elapsed times for %s with%,5d files resulting in%,6d vaults  @%d object keys and isZippedCache=%b", //
@@ -146,21 +153,26 @@ public class HistoSetTest extends SuperTestCase {
 	 * ET 12.2016: Win PC elapsed times for DataFilesTestSamples\DataExplorer with 144 files resulting in 223 vaults (using a zipped cache):
 	 * - 1st run w/o vault cache 72 sec
 	 * - 2nd run with vault cache 23 sec
-	 * ET 10.2017: Win PC elapsed times for DataFilesTestSamples\DataExplorer with 291 files resulting in 691 vaults (using a UN/zipped cache) including 73 bin files:
+	 * ET 10.2017: Win PC elapsed times for DataFilesTestSamples\DataExplorer with 291 files resulting in 691 vaults (using a UN/zipped cache)
+	 * including 73 bin files:
 	 * - 1st run w/o vault cache 230/225 sec (20,7 / 2,49 MiB cache)
 	 * - 2nd run with vault cache 56/56 sec
-	 * ET 03.2018: Win PC elapsed times for DataFilesTestSamples\DataExplorer\_ET_Exzerpt with 139 files resulting in 382 vaults (using a UN/zipped cache) including 58 bin files:
+	 * ET 03.2018: Win PC elapsed times for DataFilesTestSamples\DataExplorer\_ET_Exzerpt with 139 files resulting in 382 vaults (using a
+	 * UN/zipped cache) including 58 bin files:
 	 * - 1st run w/o vault cache 320/297 sec (25,1 / 3,16 MiB cache)
 	 * - 2nd run with vault cache 64/65 sec
-	 * ET 03.2018: Win PC elapsed times for DataFilesTestSamples\DataExplorer\_ET_Exzerpt with 139 files resulting in 382 vaults (using a UN/zipped cache) including 58 bin files:
+	 * ET 03.2018: Win PC elapsed times for DataFilesTestSamples\DataExplorer\_ET_Exzerpt with 139 files resulting in 382 vaults (using a
+	 * UN/zipped cache) including 58 bin files:
 	 * - 1st run w/o vault cache 238/290 sec (13,3 / 1,62 MiB cache)
 	 * - 2nd run with vault cache 65/68 sec
-	 * ET 04.2018: Win PC elapsed times for DataFilesTestSamples\DataExplorer\_ET_Exzerpt with 175 files resulting in 475 vaults (using a UN/zipped cache) including 58 bin files: @46 object keys
+	 * ET 04.2018: Win PC elapsed times for DataFilesTestSamples\DataExplorer\_ET_Exzerpt with 175 files resulting in 475 vaults (using a
+	 * UN/zipped cache) including 58 bin files: @46 object keys
 	 * - 1st run w/o vault cache 559/? sec (15,1 / ? MiB cache)
 	 * - 2nd run with vault cache 406/? sec
-   * ET 04.2018: Win PC elapsed times for DataFilesTestSamples/DataExplorer/_ET_Exzerpt with  175 files resulting in  475 vaults  @26 object keys and isZippedCache=false
-   * - run 1  w/o vault cache 174 sec (15,1 MiB cache)
-   * - run 2 with vault cache 38 sec (15,1 MiB cache)
+	 * ET 04.2018: Win PC elapsed times for DataFilesTestSamples/DataExplorer/_ET_Exzerpt with 175 files resulting in 475 vaults @26 object keys
+	 * and isZippedCache=false
+	 * - run 1 w/o vault cache 174 sec (15,1 MiB cache)
+	 * - run 2 with vault cache 38 sec (15,1 MiB cache)
 	 */
 	@Deprecated
 	public void testBuildHistoSet4TestSamples() {
@@ -168,13 +180,16 @@ public class HistoSetTest extends SuperTestCase {
 
 	/**
 	 * HoTTAdapter only for all channels.
-	 * ET 05.2018:  elapsed times for C:/Users/USER/git/dataexplorer/DataFilesTestSamples/DataExplorer/_ET_Exzerpt with  174 files resulting in   129 vaults  @25 object keys and isZippedCache=false
- 	 * - run 1  w/o vault cache 43 sec (3,1 MiB cache)
- 	 * - run 2 with vault cache 6 sec (3,1 MiB cache)
- 	 * HoTTAdapter2 elapsed times for C:/Users/USER/git/dataexplorer/DataFilesTestSamples/DataExplorer/_ET_Exzerpt with  174 files resulting in    50 vaults  @25 object keys and isZippedCache=false
- 	 *   run 1  w/o vault cache 18 sec (1,8 MiB cache)
- 	 *   run 2 with vault cache 7 sec (1,8 MiB cache)
+	 * ET 05.2018: elapsed times for C:/Users/USER/git/dataexplorer/DataFilesTestSamples/DataExplorer/_ET_Exzerpt with 174 files resulting in
+	 * 129 vaults @25 object keys and isZippedCache=false
+	 * - run 1 w/o vault cache 43 sec (3,1 MiB cache)
+	 * - run 2 with vault cache 6 sec (3,1 MiB cache)
+	 * HoTTAdapter2 elapsed times for C:/Users/USER/git/dataexplorer/DataFilesTestSamples/DataExplorer/_ET_Exzerpt with 174 files resulting in
+	 * 50 vaults @25 object keys and isZippedCache=false
+	 * run 1 w/o vault cache 18 sec (1,8 MiB cache)
+	 * run 2 with vault cache 7 sec (1,8 MiB cache)
 	 */
+	@Tag("performance")
 	@ParameterizedTest
 	@CsvSource({ //
 			"HoTTAdapter, 129", //
@@ -225,8 +240,8 @@ public class HistoSetTest extends SuperTestCase {
 			}
 		}
 
-		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports()
-				? analyzer.getDeviceConfigurations().getValidLogExtentions() : Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
+		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports() ? analyzer.getDeviceConfigurations().getValidLogExtentions()
+				: Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
 		long logFilesCount = getLogFilesCount(new File(settings.getDataFilePath()), 99, validLogExtentions);
 		long cacheSize = VaultReaderWriter.getCacheSize();
 		System.out.println(String.format("* " + deviceName + " elapsed times for %s with%,5d files resulting in%,6d vaults  @%d object keys and isZippedCache=%b", //
@@ -243,6 +258,8 @@ public class HistoSetTest extends SuperTestCase {
 		if (failures.size() > 0) fail(sb.toString());
 	}
 
+	@Tag("performance")
+	@Test
 	public void testHistoSet4OneHoTTObject() {
 		this.settings.setSearchDataPathImports(true);
 
@@ -290,8 +307,8 @@ public class HistoSetTest extends SuperTestCase {
 			}
 		}
 
-		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports()
-				? analyzer.getDeviceConfigurations().getValidLogExtentions() : Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
+		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports() ? analyzer.getDeviceConfigurations().getValidLogExtentions()
+				: Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
 		long logFilesCount = getLogFilesCount(new File(settings.getDataFilePath()), 99, validLogExtentions);
 		long cacheSize = VaultReaderWriter.getCacheSize();
 		System.out.println(String.format(" elapsed times for %s with%,5d files resulting in%,6d vaults  @%d object keys and isZippedCache=%b", //
@@ -318,9 +335,14 @@ public class HistoSetTest extends SuperTestCase {
 		if (deviceName.toLowerCase().contains("hottviewer") || deviceName.toLowerCase().contains("mpu")) return null; // iCharger308DUO
 																																																									// gde.device.UsbPortType missing
 		DeviceConfiguration deviceConfig = analyzer.getDeviceConfigurations().get(deviceName);
-		if (deviceConfig == null) return null;
-		IDevice device = this.getInstanceOfDevice(deviceConfig);
-
+		IDevice device = null;
+		if (deviceConfig != null) {
+			try {
+				device = deviceConfig.getAsDevice();
+			} catch (Exception e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+			}
+		}
 		return device;
 	}
 

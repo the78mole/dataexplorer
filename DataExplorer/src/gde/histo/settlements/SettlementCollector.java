@@ -56,6 +56,7 @@ import gde.log.Logger;
  * Collect settlement data for the trail recordset and subordinate objects.
  * @author Thomas Eickert (USER)
  */
+@Deprecated
 public final class SettlementCollector {
 	private final static String		$CLASS_NAME	= SettlementCollector.class.getName();
 	private final static Logger		log					= Logger.getLogger($CLASS_NAME);
@@ -495,7 +496,7 @@ public final class SettlementCollector {
 	 * @param transition
 	 * @return true if the transition has a positive peak / pulse or a positive slope
 	 */
-	public static boolean isPositiveTransition(RecordGroup recordGroup, Transition transition) {
+	private static boolean isPositiveTransition(RecordGroup recordGroup, Transition transition) {
 		final boolean isPositiveDirection;
 		{
 			if (transition.isSlope()) {

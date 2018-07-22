@@ -35,8 +35,17 @@ public class Explorer extends Analyzer {
 		super();
 	}
 
+	private Explorer(Explorer analyzer) {
+		super(analyzer);
+	}
+
 	public void setChannels(Channels channels) {
 		this.channels = channels;
+	}
+
+	@Override
+	public Explorer clone() {
+		return new Explorer(this);
 	}
 
 }

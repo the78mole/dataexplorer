@@ -23,7 +23,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -38,12 +37,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import gde.Analyzer;
-import gde.GDE;
-import gde.histo.base.SuperTestCase;
+import gde.histo.base.NonUiTestCase;
 import gde.histo.datasources.HistoSet.RebuildStep;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyCompliance;
 
@@ -51,7 +46,7 @@ import gde.utils.ObjectKeyCompliance;
  *
  * @author Thomas Eickert (USER)
  */
-class DirectoryScannerTest extends SuperTestCase {
+class DirectoryScannerTest extends NonUiTestCase {
 	private final static String	$CLASS_NAME	= DirectoryScannerTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -85,12 +80,12 @@ class DirectoryScannerTest extends SuperTestCase {
 
 			setDeviceChannelObject(deviceName, 1, "TopSky");
 
-			DirectoryScanner directoryScanner = new DirectoryScanner();
+			DirectoryScanner directoryScanner = new DirectoryScanner(analyzer);
 			try {
-				RebuildStep realRebuildStep = directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
+				RebuildStep realRebuildStep = directoryScanner.isValidated(RebuildStep.F_FILE_CHECK);
 				log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
 				assertEquals("rebuildStep after first scan    : ", RebuildStep.B_HISTOVAULTS, realRebuildStep);
-				assertEquals("rebuildStep 2nd scan w/o change : ", RebuildStep.F_FILE_CHECK, directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK));
+				assertEquals("rebuildStep 2nd scan w/o change : ", RebuildStep.F_FILE_CHECK, directoryScanner.isValidated(RebuildStep.F_FILE_CHECK));
 
 				Path path = directoryScanner.getSourceFolders().values().stream().flatMap(Collection::stream).findFirst().orElse(Paths.get(""));
 				List<File> fileListing = FileUtils.getFileListing(path.toFile(), 1);
@@ -102,7 +97,7 @@ class DirectoryScannerTest extends SuperTestCase {
 				Thread.sleep(WatchDir.DELAY * 11 / 10); // wait 10% longer than the DELAY
 
 				// this is the actual test for watching osd files
-				assertEquals("rebuildStep", (boolean) sourceFileListenerActive, RebuildStep.B_HISTOVAULTS == directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK));
+				assertEquals("rebuildStep", (boolean) sourceFileListenerActive, RebuildStep.B_HISTOVAULTS == directoryScanner.isValidated(RebuildStep.F_FILE_CHECK));
 
 				// copy to extension osd because this is the only one captured by WatchDir with all user settings
 				File fileCopyBin = fileListing.get(0).toPath().getParent().resolve("UnitTest.bin").toFile();
@@ -113,7 +108,7 @@ class DirectoryScannerTest extends SuperTestCase {
 
 				// this is the actual test for watching bin files
 				boolean supportsBinListener = searchDataPathImports && isBinSupported && sourceFileListenerActive;
-				assertEquals("rebuildStep", supportsBinListener, RebuildStep.B_HISTOVAULTS == directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK));
+				assertEquals("rebuildStep", supportsBinListener, RebuildStep.B_HISTOVAULTS == directoryScanner.isValidated(RebuildStep.F_FILE_CHECK));
 			} catch (Exception e) {
 				e.printStackTrace();
 				fail("directory not accessible");
@@ -127,19 +122,15 @@ class DirectoryScannerTest extends SuperTestCase {
 	 */
 	@ParameterizedTest
 	@CsvSource({ //
-			"deviceoriented, 1", //
+			"'', 1", //
 			"FS14, 1", //
 			"TopSky, 2" })
 	void testObjectDirs(String objectKey, int numberOfDirectories) {
-		String objectSelection = objectKey.equals("deviceoriented") ? Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0]
-				: objectKey;
-
-		settings.setObjectList(settings.getObjectList(), Arrays.asList(settings.getObjectList()).indexOf(objectSelection));
 		setDeviceChannelObject("HoTTAdapter", 1, objectKey);
 
-		DirectoryScanner directoryScanner = new DirectoryScanner();
+		DirectoryScanner directoryScanner = new DirectoryScanner(analyzer);
 		try {
-			directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
+			directoryScanner.isValidated(RebuildStep.F_FILE_CHECK);
 			log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
 
 			// this is the actual test
@@ -164,9 +155,9 @@ class DirectoryScannerTest extends SuperTestCase {
 
 		setDeviceChannelObject("HoTTAdapter", 1, "TopSky");
 
-		DirectoryScanner directoryScanner = new DirectoryScanner();
+		DirectoryScanner directoryScanner = new DirectoryScanner(analyzer);
 		try {
-			directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
+			directoryScanner.isValidated(RebuildStep.F_FILE_CHECK);
 			log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
 			assertEquals("source folders size    : ", numberOfDirectories, directoryScanner.getSourceFolders().getMap().size());
 		} catch (Exception e) {
@@ -198,11 +189,11 @@ class DirectoryScannerTest extends SuperTestCase {
 			analyzer.getDeviceConfigurations().getAllConfigurations().entrySet().stream().forEach(device -> {
 				for (String objectKey : objectKeys) {
 					// take the same instance of the scanner in order to get the performance optimization for channel switching
-					DirectoryScanner directoryScanner = new DirectoryScanner();
+					DirectoryScanner directoryScanner = new DirectoryScanner(analyzer);
 					for (int i = 1; i <= device.getValue().getChannelCount(); i++) {
 						setDeviceChannelObject(device.getKey(), i, objectKey);
 						try {
-							directoryScanner.isValidated(Analyzer.getInstance().getActiveDevice(), RebuildStep.F_FILE_CHECK);
+							directoryScanner.isValidated(RebuildStep.F_FILE_CHECK);
 							log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
 						} catch (Exception e) {
 							e.printStackTrace();

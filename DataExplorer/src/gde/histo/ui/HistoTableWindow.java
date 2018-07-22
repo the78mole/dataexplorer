@@ -54,7 +54,6 @@ import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.histo.datasources.HistoSet;
-import gde.histo.exclusions.ExclusionActivity;
 import gde.histo.recordings.HistoTableMapper;
 import gde.histo.recordings.HistoTableMapper.DisplayTag;
 import gde.histo.recordings.TrailDataTags.DataTag;

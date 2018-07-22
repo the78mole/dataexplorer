@@ -32,6 +32,7 @@ import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import gde.Analyzer;
 import gde.config.Settings;
 import gde.device.IChannelItem;
 import gde.device.IDevice;
@@ -189,14 +190,9 @@ public final class FleetMonitor {
 	}
 
 	/**
-	 * Initialize the objectVault index.
+	 *
 	 */
 	public FleetMonitor() {
-		new ObjectVaultIndex().rebuild();
-	}
-
-	FleetMonitor(boolean rebuildIndex) {
-		if (rebuildIndex) new ObjectVaultIndex().rebuild();
 	}
 
 	/**
@@ -207,7 +203,6 @@ public final class FleetMonitor {
 
 		ObjectVaultIndex objectVaultIndex = new ObjectVaultIndex(new String[] { objectKey });
 		Map<String, IDevice> usedDevices = objectVaultIndex.selectExistingDevices(new String[] { objectKey });
-		log.log(Level.OFF, "devices", usedDevices);
 
 		DetailSelector detailSelector = DetailSelector.createDeviceNameFilter(usedDevices.keySet());
 		Function<ObjectVaultIndexEntry, String> classifier = e -> e.vaultDeviceName;
@@ -215,7 +210,7 @@ public final class FleetMonitor {
 		for (Entry<String, List<VaultKeyPair>> e : vaultKeys.entrySet()) {
 			IDevice device = usedDevices.get(e.getKey());
 			EnumSet<DirectoryType> directoryTypes = DirectoryType.getValidDirectoryTypes(device);
-			VaultChecker checker = new VaultChecker(device, directoryTypes, objectKey);
+			VaultChecker checker = new VaultChecker(Analyzer.getInstance().clone(), directoryTypes, objectKey); // clone for thread safety
 
 			List<HistoVault> allVaults = SimpleVaultReader.readVaults(e.getValue());
 			List<HistoVault> validVaults = new ArrayList<>();

@@ -171,10 +171,9 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReaderX.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
-		if (menuToolBar != null) HoTTbinReaderX.application.setProgress(0, sThreadId);
+		GDE.getUiNotification().setProgress(0);
 
 		try {
 			HoTTAdapter.recordSets.clear();
@@ -327,7 +326,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 
 						HoTTbinReaderX.timeStep_ms += 3;// add default time step from device of 3 msec
 
-						if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReaderX.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+						if (i % progressIndicator == 0) GDE.getUiNotification().setProgress((int) (i * 100 / numberDatablocks));
 
 						if (HoTTbinReaderX.countLostPackages > 0) {
 							HoTTbinReaderX.lostPackages.add(HoTTbinReaderX.countLostPackages);
@@ -398,7 +397,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
-				HoTTbinReaderX.application.setProgress(100, sThreadId);
+				GDE.getUiNotification().setProgress(100);
 			}
 		}
 		finally {

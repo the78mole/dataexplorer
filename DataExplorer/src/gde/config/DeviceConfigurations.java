@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
@@ -36,6 +37,7 @@ import org.xml.sax.SAXParseException;
 
 import gde.GDE;
 import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -49,8 +51,6 @@ import gde.utils.StringHelper;
 public final class DeviceConfigurations {
 	private static final String													$CLASS_NAME									= DeviceConfigurations.class.getName();
 	private static final Logger													log													= Logger.getLogger($CLASS_NAME);
-
-	private final Settings															settings										= Settings.getInstance();
 
 	private final TreeMap<String, DeviceConfiguration>	configs;
 	private final Vector<String>												activeDevices;
@@ -164,11 +164,28 @@ public final class DeviceConfigurations {
 	/**
 	 * @return the supported lowercase file extensions (e.g. '.bin') or an empty set
 	 */
-	public Set<String>  getImportExtentions() {
+	public Set<String> getImportExtentions() {
 		Set<String> extentions = this.configs.values().parallelStream() //
 				.map(c -> Arrays.asList(c.getDataBlockPreferredFileExtention().split(GDE.REGEX_FILE_EXTENTION_SEPARATION))).flatMap(Collection::stream) //
 				.map(s-> s.substring(s.lastIndexOf(GDE.STRING_DOT))).map(e-> e.toLowerCase()) //
 				.collect(Collectors.toSet());
 		return extentions;
+	}
+
+	/**
+	 * @return a map with key device name and device
+	 */
+	public HashMap<String, IDevice> getAsDevices(Collection<String> deviceNames) {
+		HashMap<String, IDevice> existingDevices = new HashMap<>();
+		for (String deviceName : deviceNames) {
+			try {
+				IDevice device = configs.get(deviceName).getAsDevice();
+				existingDevices.put(deviceName, device);
+			} catch (Exception e) {
+				log.log(Level.SEVERE, "device instance exception", e);
+			}
+		}
+		log.log(Level.FINE, "Selected      size=", existingDevices.size());
+		return existingDevices;
 	}
 }

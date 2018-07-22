@@ -70,7 +70,6 @@ public class OsdReaderWriter {
 
 	final static DataExplorer	application	= DataExplorer.getInstance();
 	final static Channels			channels		= Channels.getInstance();
-	final static Settings			settings		= Settings.getInstance();
 
 	/**
 	 * Determine the record set for display.
@@ -98,7 +97,7 @@ public class OsdReaderWriter {
 		void setBestFit(int newChannelNumber, String newChannelName, String newRecordSetName) {
 			if (!this.isFixed) {
 				String newNameTrunk = newRecordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? newRecordSetName : newRecordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
-				if (settings.isFirstRecordSetChoice()) {
+				if (Settings.getInstance().isFirstRecordSetChoice()) {
 					// standard case
 					this.isFixed = true;
 					this.channelNumber = newChannelNumber;
@@ -122,7 +121,7 @@ public class OsdReaderWriter {
 					throw new UnsupportedOperationException("channel number does not match but the channel name does"); // ET for data conformity checks only  -  may be removed
 				}
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("isFixed isFirstRecordSetChoice=%b  recordSetNameTrunk=%-22s  channelNumber=%d  channelName=%-22s",
-						settings.isFirstRecordSetChoice(), this.recordSetNameTrunk, this.channelNumber, this.channelName));
+						Settings.getInstance().isFirstRecordSetChoice(), this.recordSetNameTrunk, this.channelNumber, this.channelName));
 			}
 		}
 
@@ -368,7 +367,7 @@ public class OsdReaderWriter {
 				channelConfig = channelConfig.contains(GDE.STRING_BLANK) ? channelConfig.split(GDE.STRING_BLANK)[0].trim() : channelConfig.trim();
 				//"Motor"
 
-				recordSet = buildRecordSet(recordSetName, channel.getNumber(), recordSetInfo, true);
+				recordSet = buildRecordSet(recordSetName, channel.getNumber(), recordSetInfo, true, OsdReaderWriter.application.getActiveDevice());
 				channel.put(recordSetName, recordSet);
 
 				if (!recordSetSelector.isBestFitFound()) recordSetSelector.setBestFit(channel.getNumber(), channelConfig, recordSetName);
@@ -407,7 +406,7 @@ public class OsdReaderWriter {
 					long startTime = new Date().getTime();
 					byte[] buffer = new byte[recordSet.getFileDataBytesSize()];
 					data_in.readFully(buffer);
-					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, application.getStatusBar() != null);
+					recordSet.getDevice().addDataBufferAsRawDataPoints(recordSet, buffer, recordDataSize, GDE.isWithUi());
 					recordSet.updateVisibleAndDisplayableRecordsForTable();
 					if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (new Date().getTime() - startTime)));
 
@@ -483,9 +482,8 @@ public class OsdReaderWriter {
 	 * @param adjustObjectKey defines if the channel's object key is updated by the settings objects key
 	 * @return the recordSet filled with basic data delivered by the params but without any values (points)
 	 */
-	protected static RecordSet buildRecordSet(String recordSetName, int channelNumber, HashMap<String, String> recordSetInfo, boolean adjustObjectKey) {
+	protected static RecordSet buildRecordSet(String recordSetName, int channelNumber, HashMap<String, String> recordSetInfo, boolean adjustObjectKey, IDevice device) {
 		RecordSet recordSet;
-		IDevice device = OsdReaderWriter.application.getActiveDevice();
 		String recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
 		String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 		String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
@@ -582,49 +580,6 @@ public class OsdReaderWriter {
 			recordSetsInfo.add(getRecordSetProperties(line));
 		}
 		return recordSetsInfo;
-	}
-
-	/**
-	 * determine channel number in file and access the device configuration.
-	 * @param channelConfig
-	 * @return
-	 */
-	protected static Channel getChannel(String channelConfig) {
-		Channel channel = null;
-		// String channelConfigKey;
-		// Channel currentChannel = channels.get(channels.getChannelNumber(channelConfig));
-		// 1.st try channelConfiguration not found
-		try { // get channel last digit and use as channel config ordinal : 'Channel/Configuration Name: 1 : Ausgang 1'
-			channel = channels.get(Integer.valueOf(channelConfig.substring(channelConfig.length() - 1)));
-			// channelConfigKey = channel.getChannelConfigKey();
-		}
-		catch (NumberFormatException e) {
-			// ignore and keep channel as null
-		}
-		catch (NullPointerException e) {
-			// ignore and keep channel as null
-		}
-		if (channel == null) { // 2.nd try channelConfiguration not found
-			try { // try to get channel startsWith configuration name : 'Channel/Configuration Name: 1 : Receiver'
-				channel = channels.get(Integer.valueOf(channelConfig.split(GDE.STRING_BLANK)[0]));
-				// channelConfigKey = channel.getChannelConfigKey();
-			}
-			catch (NullPointerException | NumberFormatException e) {
-				// ignore and keep channel as null
-			}
-		}
-		if (channel == null) { // 3.rd try channelConfiguration not found
-			// ET 20161121 reactivated for '2008_04-05_ASW27_Motor_Test_Akku_Vergleich.osd' and similar files
-			// do not rely on channel nomenclature
-			// "3 : Motor"
-			String channelConfigKey;
-			channelConfigKey = channelConfig.contains(GDE.STRING_COLON) ? channelConfig.split(GDE.STRING_COLON)[1].trim() : channelConfig.trim();
-			// "Motor 3"
-			channelConfigKey = channelConfigKey.contains(GDE.STRING_BLANK) ? channelConfigKey.split(GDE.STRING_BLANK)[0].trim() : channelConfigKey.trim();
-			// "Motor"
-			channel = channels.get(channels.getChannelNumber(channelConfigKey));
-		}
-		return channel;
 	}
 
 	/**
@@ -784,7 +739,7 @@ public class OsdReaderWriter {
 					if (recordSetChannel != null) {
 						RecordSet recordSet = recordSetChannel.get(recordSetNames[i]);
 						if (recordSet != null) {
-							if (!recordSet.hasDisplayableData()) recordSet.loadFileData(recordSetChannel.getFullQualifiedFileName(), application.getStatusBar() != null);
+							if (!recordSet.hasDisplayableData()) recordSet.loadFileData(recordSetChannel.getFullQualifiedFileName(), GDE.isWithUi());
 							String[] noneCalculationRecordNames = recordSet.getNoneCalculationRecordNames();
 							int sizeRecord = recordSizes.get(recordSetChannel.getNumber() + GDE.STRING_UNDER_BAR + recordSetNames[i]);
 							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, recordSetChannel.getNumber() + GDE.STRING_UNDER_BAR + recordSetNames[i] + "=" + sizeRecord);

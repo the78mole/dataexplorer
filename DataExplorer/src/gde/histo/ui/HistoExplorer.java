@@ -278,7 +278,7 @@ public class HistoExplorer {
 			histoSet.setRebuildStepInvisibleTabs(rebuildStep, isRebuilt);
 		} catch (Exception e) {
 			log.log(SEVERE, e.getMessage(), e);
-			if (Analyzer.getInstance().isWithUi()) application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
+			if (GDE.isWithUi()) application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0007) + e.getMessage());
 		}
 	}
 

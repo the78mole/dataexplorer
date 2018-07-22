@@ -1157,9 +1157,8 @@ public class LogReader {
 
 		LogReader.startTimeStamp_ms = 0;
 
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = LogReader.application.getMenuToolBar();
-		if (menuToolBar != null) LogReader.application.setProgress(0, sThreadId);
+		GDE.getUiNotification().setProgress(0);
 
 		try {
 			if (channelConfigNumber == null)
@@ -1168,10 +1167,8 @@ public class LogReader {
 				activeChannel = LogReader.channels.get(channelConfigNumber);
 
 			if (activeChannel != null) {
-				if (LogReader.application.getStatusBar() != null) {
-					LogReader.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
-					LogReader.application.setProgress(0, sThreadId);
-				}
+				GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
+				GDE.getUiNotification().setProgress(0);
 				LogReader.channels.setActiveChannelNumber(activeChannel.getNumber());
 
 				int logRecordCount = 0;
@@ -1193,7 +1190,7 @@ public class LogReader {
 					if (LogReader.startTimeStamp_ms == 0 && recordType == RecordType.DATA) LogReader.startTimeStamp_ms = timeStamp;
 
 					logRecord = logReader.new LogRecord(LogReader.buf_log_record, (logRecord == null ? null : logRecord.getRecordHeader()));
-					if (menuToolBar != null) LogReader.application.setProgress((int) (readByteCount * 100 / fileSize), sThreadId);
+					GDE.getUiNotification().setProgress((int) (readByteCount * 100 / fileSize));
 					logRecordCount += 1;
 				}
 
@@ -1214,7 +1211,7 @@ public class LogReader {
 				LogReader.log.logp(Level.TIME, LogReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (menuToolBar != null && LogReader.recordSet != null) {
-					LogReader.application.setProgress(99, sThreadId);
+					GDE.getUiNotification().setProgress(99);
 					String recordSetName = LogReader.recordSet.getName();
 					activeChannel = LogReader.application.getActiveChannel();
 					activeChannel.put(recordSetName, LogReader.recordSet);
@@ -1234,7 +1231,7 @@ public class LogReader {
 
 					menuToolBar.updateChannelSelector();
 					menuToolBar.updateRecordSetSelectCombo();
-					LogReader.application.setProgress(100, sThreadId);
+					GDE.getUiNotification().setProgress(100);
 				}
 			}
 		}

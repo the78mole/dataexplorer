@@ -36,7 +36,10 @@ public class TestAnalyzer extends Analyzer {
 
 	TestAnalyzer() {
 		super();
-		// TODO Auto-generated constructor stub
+	}
+
+	private TestAnalyzer(TestAnalyzer analyzer) {
+		super(analyzer);
 	}
 
 	public void initiateUnitTestEnvironment(IDevice device, Channels channels, String objectKey) {
@@ -95,6 +98,11 @@ public class TestAnalyzer extends Analyzer {
 		if (device != null) {
 			this.activeDevice = device;
 		}
+	}
+
+	@Override
+	public TestAnalyzer clone() {
+		return new TestAnalyzer(this);
 	}
 
 }

@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.elprog;
@@ -51,7 +51,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
 /**
- * Class to read and write comma separated value files which simulates serial data 
+ * Class to read and write comma separated value files which simulates serial data
  * one data line consist of $1;1;0; 14780;  598;  1000;  8838;.....;0002;
  * where $channelConfigNumber; stateNumber; timeStepSeconds; firstIntValue; secondIntValue; .....;checkSumIntValue;
  * All properties around the textual data in this line has to be specified in DataBlockType (type=TEXT, size number of values, separator=;, ...), refer to DeviceProperties_XY.XSD
@@ -63,7 +63,7 @@ public class CSVSerialDataReaderWriter {
 	static String					lineSep	= GDE.LINE_SEPARATOR;
 	static DecimalFormat	df3			= new DecimalFormat("0.000"); //$NON-NLS-1$
 	static StringBuffer		sb;
-	
+
 	final static DataExplorer				application	= DataExplorer.getInstance();
 	final static Channels						channels		= Channels.getInstance();
 
@@ -75,14 +75,13 @@ public class CSVSerialDataReaderWriter {
 	 * @param channelConfigNumber
 	 * @param isRaw
 	 * @return record set created
-	 * @throws NotSupportedFileFormatException 
-	 * @throws MissMatchDeviceException 
-	 * @throws IOException 
-	 * @throws DataInconsitsentException 
-	 * @throws DataTypeException 
+	 * @throws NotSupportedFileFormatException
+	 * @throws MissMatchDeviceException
+	 * @throws IOException
+	 * @throws DataInconsitsentException
+	 * @throws DataTypeException
 	 */
 	public static RecordSet read(String filePath, IDevice device, String recordNameExtend, Integer channelConfigNumber, IDataParser data) throws NotSupportedFileFormatException, IOException, DataInconsitsentException, DataTypeException {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		String line = GDE.STRING_STAR;
 		BufferedReader reader; // to read the data
 		Channel activeChannel = null;
@@ -106,12 +105,10 @@ public class CSVSerialDataReaderWriter {
 			activeChannelConfigNumber = channels.getActiveChannelNumber();
 
 			if (activeChannel != null) {
-				if (application.getStatusBar() != null) {
-					application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
-					application.setProgress(0, sThreadId);
-				}
+				GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
+				GDE.getUiNotification().setProgress(0);
 				activeChannelConfigNumber = activeChannel.getNumber();
-				
+
 //				if (application.getStatusBar() != null) {
 //					channels.switchChannel(activeChannelConfigNumber, GDE.STRING_EMPTY);
 //					application.getMenuToolBar().updateChannelSelector();
@@ -121,15 +118,15 @@ public class CSVSerialDataReaderWriter {
 					application.getDeviceSelectionDialog().setupDataChannels(device);
 				}
 
-				String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend; //$NON-NLS-1$
+				String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend;
 
-				//now get all data   
+				//now get all data
 				//#03C05____B4,00070,11625,06572,000,00064,00037,3879,0,3887,0,3880,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0,0000,0
 				//!060,057,059,000,000,000,000,000,000,000,000,000,000,000,000,000
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
-				int dataBlockSize = device.getDataBlockSize(InputTypes.FILE_IO); // measurements size must not match data block size, there are some measurements which are result of calculation			
+				int dataBlockSize = device.getDataBlockSize(InputTypes.FILE_IO); // measurements size must not match data block size, there are some measurements which are result of calculation
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
-				if (dataBlockSize < 0 && measurementSize > Math.abs(dataBlockSize))  
+				if (dataBlockSize < 0 && measurementSize > Math.abs(dataBlockSize))
 					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] {filePath}));
 
 				DataInputStream binReader    = new DataInputStream(new FileInputStream(new File(filePath)));
@@ -147,7 +144,7 @@ public class CSVSerialDataReaderWriter {
 				if (!lineEndingOcurred) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0042, new Object[] {chars, filePath}));
 
 				//check if balancer is connected and charging process will report cell internal resistance
-				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$	
+				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
 				String line1 = reader.readLine();
 				String line2 = reader.readLine();
 				if ((line1.startsWith("#") && line2.startsWith("!")) || (line2.startsWith("#") && line1.startsWith("!"))) {
@@ -156,11 +153,11 @@ public class CSVSerialDataReaderWriter {
 				reader.close();
 
 				long lastTimeStamp = 0;
-				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$	
-				
-				if (device.getStateType() == null) 
-					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] {device.getPropertiesFileName()})); 
-						
+				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
+
+				if (device.getStateType() == null)
+					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0043, new Object[] {device.getPropertiesFileName()}));
+
 				while ((line = reader.readLine()) != null) {
 					++lineNumber;
 					if (line.startsWith("!")) {
@@ -169,19 +166,19 @@ public class CSVSerialDataReaderWriter {
 					}
 					else {
 						data.parse(line, lineNumber);
-						if (isCellInternalResistance) 
+						if (isCellInternalResistance)
 							continue;
 					}
 
 					try {
-						if (data.getChannelConfigNumber() > device.getChannelCount()) 
+						if (data.getChannelConfigNumber() > device.getChannelCount())
 							continue; //skip data if not configured
 
 						activeChannelConfigNumber = device.recordSetNumberFollowChannel() ? data.getChannelConfigNumber() : activeChannelConfigNumber;
 						activeChannel = channels.get(activeChannelConfigNumber);
-						
+
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + activeChannelConfigNumber + " state = " + data.getState());
-						
+
 						recordSetNameExtend = device.getRecordSetStateNameReplacement(data.getState());
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
@@ -189,7 +186,7 @@ public class CSVSerialDataReaderWriter {
 						channelRecordSet = activeChannel.get(device.recordSetNumberFollowChannel() && activeChannel.getType() == ChannelTypes.TYPE_CONFIG ? activeChannel.getLastActiveRecordSetName() : recordSetName);
 					}
 					catch (Exception e) {
-						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0044, new Object[] {data.getState(), filePath, device.getPropertiesFileName()})); 
+						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0044, new Object[] {data.getState(), filePath, device.getPropertiesFileName()}));
 					}
 
 					// check if a record set matching for re-use is available and prepare a new if required
@@ -204,17 +201,17 @@ public class CSVSerialDataReaderWriter {
 								activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannelConfigNumber, true, false, true));
 								createdRecordSets.add(activeChannel.get(recordSetName));
 								recordSetName = channelRecordSet.getName(); // cut/correct length
-								
+
 								if (activeChannel.getType() == ChannelTypes.TYPE_CONFIG)
 									activeChannel.applyTemplate(recordSetName, false);
-								else 
+								else
 									activeChannel.applyTemplateBasics(recordSetName);
 							}
 							else {
 								channelRecordSet.checkAllDisplayable(); // raw import needs calculation of passive records
 								if (activeChannel.getType() == ChannelTypes.TYPE_CONFIG)
 									activeChannel.applyTemplate(recordSetName, false);
-								else 
+								else
 									activeChannel.applyTemplateBasics(recordSetName);
 								device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 							}
@@ -224,18 +221,18 @@ public class CSVSerialDataReaderWriter {
 							recordSetName = recordNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + recordSetNameExtend;
 							activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannelConfigNumber, true, false, true));
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
-							
+
 							if (activeChannel.getType() == ChannelTypes.TYPE_CONFIG)
 								activeChannel.applyTemplate(recordSetName, false);
-							else 
+							else
 								activeChannel.applyTemplateBasics(recordSetName);
-							
+
 							activeChannel.setActiveRecordSet(recordSetName);
 							channelRecordSet = activeChannel.get(recordSetName);
 							createdRecordSets.add(channelRecordSet);
 							recordSetName = channelRecordSet.getName(); // cut/correct length
 						}
-						
+
 
 						try {
 							isOutdated = Integer.parseInt(dateTime.split(GDE.STRING_DASH)[0]) <= 2000;
@@ -246,12 +243,12 @@ public class CSVSerialDataReaderWriter {
 
 						// make all records displayable while absolute data
 						for (String recordKey : device.getMeasurementNamesReplacements(activeChannelConfigNumber)) {
-							channelRecordSet.get(recordKey).setDisplayable(true); // all data available 
+							channelRecordSet.get(recordKey).setDisplayable(true); // all data available
 						}
-					
+
 						lastRecordSetNumberOffset = data.getRecordSetNumberOffset();
 					}
-					//add data only if 
+					//add data only if
 					if (data.getTime_ms() - lastTimeStamp >= 0) {
 						channelRecordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms());
 						data.setTimeResetEnabled(true);
@@ -259,8 +256,8 @@ public class CSVSerialDataReaderWriter {
 					}
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
 					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
-					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
-						application.setProgress(progress, sThreadId);
+					if (progress <= 90 && progress > GDE.getUiNotification().getProgressPercentage() && progress % 10 == 0) 	{
+						GDE.getUiNotification().setProgress(progress);
 						try {
 							Thread.sleep(2);
 						}
@@ -269,7 +266,7 @@ public class CSVSerialDataReaderWriter {
 						}
 					}
 				}
-				if (application.getStatusBar() != null) 	application.setProgress(100, sThreadId);
+				GDE.getUiNotification().setProgress(100);
 
 				Iterator<RecordSet> iterator = createdRecordSets.iterator();
 				while (iterator.hasNext()) {
@@ -292,11 +289,11 @@ public class CSVSerialDataReaderWriter {
 						tmpRecordSet.checkAllDisplayable(); // raw import needs calculation of passive records
 						device.updateVisibilityStatus(tmpRecordSet, true);
 					}
-					//write filename after import to record description			
+					//write filename after import to record description
 					tmpRecordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
 				}
-				
-				if (application.getStatusBar() != null) {
+
+				if (GDE.isWithUi()) {
 					if (createdRecordSets.size() == 1) {
 						channels.switchChannel(activeChannelConfigNumber, createdRecordSets.firstElement().getName());
 					}
@@ -327,7 +324,7 @@ public class CSVSerialDataReaderWriter {
 				activeChannel.setActiveRecordSet(recordSetName);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
-				if (application.getStatusBar() != null) 
+				if (GDE.isWithUi())
 					if (createdRecordSets.size() == 0) {
 						channels.switchChannel(1, GDE.STRING_EMPTY);
 					}
@@ -344,18 +341,16 @@ public class CSVSerialDataReaderWriter {
 			application.openMessageDialog(msg);
 		}
 		finally {
-			if (application.getStatusBar() != null) {
-				application.setStatusMessage(GDE.STRING_EMPTY);
-				application.setProgress(100, sThreadId);
-			}
+			GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
+			GDE.getUiNotification().setProgress(100);
 		}
-		
+
 		return channelRecordSet;
 	}
 
 //	/**
 //	 * write data CVS file
-//	 * @throws Exception 
+//	 * @throws Exception
 //	 */
 //	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) throws Exception {
 //		BufferedWriter writer;
@@ -374,7 +369,7 @@ public class CSVSerialDataReaderWriter {
 //			sb.append(device.getName()).append(separator).append(recordSet.getChannelConfigName()).append(lineSep);
 //			writer.write(sb.toString());
 //			log.log(Level.FINE, "written header line = " + sb.toString());  //$NON-NLS-1$
-//			
+//
 //			sb = new StringBuffer();
 //			sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]"; //$NON-NLS-1$
 //			// write the measurements signature
@@ -384,7 +379,7 @@ public class CSVSerialDataReaderWriter {
 //				Record record = recordSet.get(recordNames[i]);
 //				log.log(Level.FINEST, "append " + recordNames[i]); //$NON-NLS-1$
 //				if (isRaw) {
-//					if (!measurement.isCalculation()) {	// only use active records for writing raw data 
+//					if (!measurement.isCalculation()) {	// only use active records for writing raw data
 //						sb.append(recordNames[i]).append(" [---]").append(separator);	 //$NON-NLS-1$
 //						log.log(Level.FINEST, "append " + recordNames[i]); //$NON-NLS-1$
 //					}
@@ -446,7 +441,7 @@ public class CSVSerialDataReaderWriter {
 //		}
 //		catch (Exception e) {
 //			log.log(Level.SEVERE, e.getMessage(), e);
-//			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage()); 
+//			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 //		}
 //		finally {
 //			if (application.getStatusBar() != null) application.setStatusMessage(GDE.STRING_EMPTY);

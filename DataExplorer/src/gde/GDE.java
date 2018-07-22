@@ -77,10 +77,35 @@ import gde.utils.StringHelper;
 public class GDE {
 	public static final String							STRING_WITHIN_ECLIPSE							= "/classes/";
 	final static String											$CLASS_NAME												= GDE.class.getName();
+
+	public static class UiNotification {
+
+		private final DataExplorer application = DataExplorer.getInstance();
+
+		public int getProgressPercentage() {
+			return application.getProgressPercentage();
+		}
+
+		public void setProgress(int percentage) {
+			String sThreadId = String.format("%06d", Thread.currentThread().getId());
+			application.setProgress(percentage, sThreadId);
+		}
+
+		public void setStatusMessage(String message) {
+			application.setStatusMessage(message);
+		}
+
+		public void setStatusMessage(String message, int swtColor) {
+			application.setStatusMessage(message, swtColor);
+		}
+	}
+
 	public final static long								StartTime													= new Date().getTime();
 	public static Handler										logHandler												= null;
 	public static Display										display														= null;
 	public static Shell											shell;
+	/** use integrated UI */
+	private static boolean									isWithUi													= false;
 
 	// ****** begin global constants section *******
 	public static final String							VERSION														= "Version 3.3.3";																																																					//$NON-NLS-1$
@@ -384,6 +409,9 @@ public class GDE {
 
 	public final static Map<String, String>	deviceMap													= new HashMap<String, String>();
 
+	/** access to progrss bar and status message  */
+	public static UiNotification	uiNotification;
+
 	private static Thread										settingsThread;
 
 	static { // initialize device mapping to enable opening files saved on android app
@@ -393,6 +421,12 @@ public class GDE {
 		GDE.deviceMap.put("GPS-Logger (UL2)", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("GPS-Logger2 (UL)", "GPS-Logger2"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("GPS-Logger2 (UL2)", "GPS-Logger2"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Prepare for usage without main procedure, i.e. without integrated UI.
+		// Currently these DE UI objects are required during device instantiation.
+		// todo a better solution would be devices w/o UI support complemented by decorators for the device's UI functionality.
+		GDE.display = Display.getDefault();
+		GDE.shell = new Shell(GDE.display);
 	}
 
 	/**
@@ -401,10 +435,11 @@ public class GDE {
 	 */
 	public static void main(String[] args) {
 		final String $METHOD_NAME = "main"; //$NON-NLS-1$
+		log.log(Level.FINER, "main    start");
 		try {
 			GDE.initLogger();
 			log.log(Level.INFO, "initLogger  done ");
-			
+
 			GDE.settingsThread = new Thread("Settings async") {
 				@Override
 				public void run() {
@@ -413,14 +448,16 @@ public class GDE {
 				}
 			};
 			GDE.settingsThread.start();
-	
+
 			log.log(Level.INFO, "main start");
 			String inputFilePath = GDE.STRING_EMPTY;
-			
+
 			Display.setAppName(GDE.NAME_LONG);
 			Display.setAppVersion(GDE.VERSION);
 
-			//DeviceData	data = new DeviceData();
+			GDE.isWithUi = true;
+
+			// DeviceData data = new DeviceData();
 			//data.tracking = true;
 			GDE.display = Display.getDefault();
 			GDE.shell = GDE.display.getActiveShell() == null ? new Shell(GDE.display) : GDE.display.getActiveShell();
@@ -684,5 +721,30 @@ public class GDE {
 
 	public static void seStartupProgress(int percent) {
 		if (GDE.progBar != null && !GDE.progBar.isDisposed()) GDE.progBar.setSelection(percent);
+	}
+
+	public static boolean isWithUi() {
+		return isWithUi;
+	}
+
+	/**
+	 * @return the actor supporting a potential progress bar and status message
+	 */
+	public static UiNotification getUiNotification() {
+		if (GDE.uiNotification == null) {
+			//@formatter:off
+			GDE.uiNotification	= GDE.isWithUi ? new UiNotification() : new UiNotification() {
+														@Override
+														public int getProgressPercentage() { return 100; }
+														@Override
+														public void setProgress(int percentage) {}
+														@Override
+														public void setStatusMessage(String message) {}
+														@Override
+														public void setStatusMessage(String message, int swtColor) {}
+														};
+      //@formatter:on
+		}
+		return GDE.uiNotification;
 	}
 }

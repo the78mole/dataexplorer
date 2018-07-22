@@ -760,7 +760,7 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 			type = this.DISCHARGE_TYPE[processingType];
 			break;
 		case 6: //error
-			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGE3118) + String.format("%02d", processingType), SWT.COLOR_RED); //$NON-NLS-1$
+			GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGE3118) + String.format("%02d", processingType), SWT.COLOR_RED); //$NON-NLS-1$
 			break;
 		}
 		if (Polaron.log.isLoggable(java.util.logging.Level.FINE)) {

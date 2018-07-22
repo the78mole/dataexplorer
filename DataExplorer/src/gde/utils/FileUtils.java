@@ -100,7 +100,7 @@ public class FileUtils {
 			fis = new FileInputStream(in);
 			fos = new FileOutputStream(out);
 			inChannel = fis.getChannel();
-			outChannel= fos.getChannel();
+			outChannel = fos.getChannel();
 			inChannel.transferTo(0, inChannel.size(), outChannel);
 		}
 		catch (IOException e) {
@@ -165,7 +165,7 @@ public class FileUtils {
 		boolean exist = true;
 		int version = Integer.parseInt(versionFileName.substring(versionFileName.length() - 6, versionFileName.length() - 4));
 		File dir = new File(directory);
-		//initial case Device directory does ot exist
+		// initial case Device directory does ot exist
 		if (!dir.exists() && !dir.isDirectory()) {
 			exist = false;
 			if (!dir.mkdir()) FileUtils.log.log(Level.WARNING, "failed to create " + directory); //$NON-NLS-1$
@@ -205,6 +205,37 @@ public class FileUtils {
 	}
 
 	/**
+	 * check existence of a directory and delete underlying files
+	 * attention, this runs for structure up to 5 directory levels only
+	 * @return true; false if directory needs to be created or is not accessible
+	 */
+	public static boolean cleanDirectory(File dir) {
+		boolean exist = false;
+		if (dir.exists() && dir.isDirectory() && dir.canWrite()) {
+			exist = true;
+			try {
+				for (File file : FileUtils.getFileListing(dir, 5)) {
+					if (file.canWrite()) {
+						FileUtils.log.log(Level.FINE, file.getAbsolutePath() + " deletion " + file.delete()); //$NON-NLS-1$
+					} else {
+						FileUtils.log.log(Level.WARNING, "no delete permission on " + file.getAbsolutePath()); //$NON-NLS-1$
+					}
+				}
+				for (File directory : FileUtils.getDirListing(dir)) {
+					if (!(directory.canWrite() && deleteDirectory(directory.getAbsolutePath()))) {
+						FileUtils.log.log(Level.WARNING, "no delete permission on " + directory.getAbsolutePath()); //$NON-NLS-1$
+					}
+				}
+			} catch (FileNotFoundException e) {
+				throw new UnsupportedOperationException();
+			}
+		} else {
+			FileUtils.log.log(Level.WARNING, "directory does not exist or no delete permission on " + dir.getAbsolutePath()); //$NON-NLS-1$
+		}
+		return exist;
+	}
+
+	/**
 	 * check existence of a directory and delete underlying files as well as the directory
 	 * attention, this runs for structure up to 5 directory levels only
 	 * @param fullQualifiedDirectoryPath
@@ -217,19 +248,7 @@ public class FileUtils {
 			exist = true;
 
 			try {
-				for (File file : FileUtils.getFileListing(dir, 5)) {
-					if (file.canWrite()) {
-						FileUtils.log.log(Level.FINE, file.getAbsolutePath() + " deletion " + file.delete()); //$NON-NLS-1$
-					}
-					else {
-						FileUtils.log.log(Level.WARNING, "no delete permission on " + file.getAbsolutePath()); //$NON-NLS-1$
-					}
-				}
-				for (File directory : FileUtils.getDirListing(dir)) {
-					if (!(directory.canWrite() && deleteDirectory(directory.getAbsolutePath()))) {
-						FileUtils.log.log(Level.WARNING, "no delete permission on " + directory.getAbsolutePath()); //$NON-NLS-1$
-					}
-				}
+				FileUtils.cleanDirectory(dir);
 				FileUtils.log.log(Level.FINE, dir.getAbsolutePath() + " deletion " + dir.delete()); //$NON-NLS-1$
 			}
 			catch (Exception e) {
@@ -292,7 +311,7 @@ public class FileUtils {
 
 	/**
 	 * rename a file to given file extension
-	 *@return newFilePath
+	 * @return newFilePath
 	 */
 	public static String renameFile(String filePath, String extension) {
 		String resultFilePath = filePath;
@@ -352,7 +371,7 @@ public class FileUtils {
 				try {
 					String startSignature = fileName.substring(0, fileName.indexOf(GDE.STRING_STAR));
 					String endingSignature = fileName.substring(fileName.lastIndexOf(GDE.STRING_STAR) + 1);
-					List<File> fileList = FileUtils.getFileListingNoSort(new File(fileBasePath), 0); //no directories to be scanned here
+					List<File> fileList = FileUtils.getFileListingNoSort(new File(fileBasePath), 0); // no directories to be scanned here
 					for (File file : fileList) {
 						String tmpFileName = file.getName();
 						if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "evaluating " + tmpFileName); //$NON-NLS-1$
@@ -374,12 +393,12 @@ public class FileUtils {
 	/**
 	 * extract a file from source jar file to target file while replace a given placeholder key with a replacement
 	 * supported character set encoding :
-	 * US-ASCII 	Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode character set
-	 * ISO-8859-1   	ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1
-	 * UTF-8 	Eight-bit UCS Transformation Format
-	 * UTF-16BE 	Sixteen-bit UCS Transformation Format, big-endian byte order
-	 * UTF-16LE 	Sixteen-bit UCS Transformation Format, little-endian byte order
-	 * UTF-16 	Sixteen-bit UCS Transformation Format, byte order identified by an optional byte-order mark
+	 * US-ASCII Seven-bit ASCII, a.k.a. ISO646-US, a.k.a. the Basic Latin block of the Unicode character set
+	 * ISO-8859-1 ISO Latin Alphabet No. 1, a.k.a. ISO-LATIN-1
+	 * UTF-8 Eight-bit UCS Transformation Format
+	 * UTF-16BE Sixteen-bit UCS Transformation Format, big-endian byte order
+	 * UTF-16LE Sixteen-bit UCS Transformation Format, little-endian byte order
+	 * UTF-16 Sixteen-bit UCS Transformation Format, byte order identified by an optional byte-order mark
 	 * @param placeholderKey
 	 * @param replacement
 	 * @param jarFilePath
@@ -505,13 +524,13 @@ public class FileUtils {
 				if (os != null) os.close();
 			}
 			catch (IOException e1) {
-				//ignore
+				// ignore
 			}
 			try {
 				if (is != null) is.close();
 			}
 			catch (IOException e1) {
-				//ignore
+				// ignore
 			}
 		}
 		return isExtracted;
@@ -610,13 +629,13 @@ public class FileUtils {
 				if (os != null) os.close();
 			}
 			catch (IOException e1) {
-				//ignore
+				// ignore
 			}
 			try {
 				if (is != null) is.close();
 			}
 			catch (IOException e1) {
-				//ignore
+				// ignore
 			}
 		}
 	}
@@ -665,13 +684,13 @@ public class FileUtils {
 						if (os != null) os.close();
 					}
 					catch (IOException e1) {
-						//ignore
+						// ignore
 					}
 					try {
 						if (is != null) is.close();
 					}
 					catch (IOException e1) {
-						//ignore
+						// ignore
 					}
 				}
 			}
@@ -717,9 +736,9 @@ public class FileUtils {
 				String deviceJarPath = getJarFileNameOfDevice(deviceConfig);
 
 				// remove comment to test within eclipse, comment out the isStartedWithinEclipe block above
-				//				if (isStartedWithinEclipse) {
-				//					deviceJarPath = "c:\\Program Files\\DataExplorer\\devices\\Simulator.jar";
-				//				}
+				// if (isStartedWithinEclipse) {
+				// deviceJarPath = "c:\\Program Files\\DataExplorer\\devices\\Simulator.jar";
+				// }
 
 				String tmpDeviceJarPath = deviceJarPath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 				tmpDeviceJarPath = GDE.JAVA_IO_TMPDIR.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)
@@ -765,7 +784,7 @@ public class FileUtils {
 		byte[] buf = new byte[1024];
 		int len = 0;
 
-		//copy content to tmpDeviceJarPath
+		// copy content to tmpDeviceJarPath
 		while ((inEntry = in.getNextJarEntry()) != null) {
 			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "inEntry = " + inEntry.getName()); //$NON-NLS-1$
 			if (!inEntry.getName().equalsIgnoreCase(addJarEntryName) && !inEntry.getName().endsWith("MANIFEST.MF")) { //$NON-NLS-1$
@@ -779,7 +798,7 @@ public class FileUtils {
 		}
 		in.close();
 
-		//add new entry as image file
+		// add new entry as image file
 		JarEntry jarAddEntry = new JarEntry(addJarEntryName);
 		out.putNextEntry(jarAddEntry);
 		ImageLoader imageLoader = new ImageLoader();
@@ -806,7 +825,7 @@ public class FileUtils {
 	public static void updateFileInDeviceJar(DeviceConfiguration deviceConfig, String devicePropsFileName) {
 		String deviceJarPath = null;
 		String devicePropsFileNameResource = devicePropsFileName = devicePropsFileName.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		if (devicePropsFileNameResource.contains(GDE.FILE_SEPARATOR_UNIX)) { //seams full qualified, strip directory
+		if (devicePropsFileNameResource.contains(GDE.FILE_SEPARATOR_UNIX)) { // seams full qualified, strip directory
 			devicePropsFileNameResource = devicePropsFileNameResource.substring(devicePropsFileNameResource.lastIndexOf(GDE.FILE_SEPARATOR_UNIX), devicePropsFileNameResource.length());
 		}
 
@@ -884,7 +903,7 @@ public class FileUtils {
 		deviceJarFileName = deviceJarFileName.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		FileUtils.log.log(Level.WARNING, "deviceJarPath = " + deviceJarFileName); //$NON-NLS-1$
 
-		if (deviceJarFileName.endsWith(GDE.STRING_WITHIN_ECLIPSE)) { //stated within eclipse
+		if (deviceJarFileName.endsWith(GDE.STRING_WITHIN_ECLIPSE)) { // stated within eclipse
 			deviceJarFileName = deviceJarFileName.substring(0, deviceJarFileName.indexOf(GDE.STRING_WITHIN_ECLIPSE));
 			deviceJarFileName = deviceJarFileName.substring(deviceJarFileName.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
 		}
@@ -923,7 +942,7 @@ public class FileUtils {
 		byte[] buf = new byte[1024];
 		int len = 0;
 
-		//copy content to tmpDeviceJarPath
+		// copy content to tmpDeviceJarPath
 		while ((inEntry = in.getNextJarEntry()) != null) {
 			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "inEntry = " + inEntry.getName()); //$NON-NLS-1$
 			if (!inEntry.getName().equalsIgnoreCase(addJarEntryName) && !inEntry.getName().endsWith("MANIFEST.MF")) { //$NON-NLS-1$
@@ -937,7 +956,7 @@ public class FileUtils {
 		}
 		in.close();
 
-		//add new entry as image file
+		// add new entry as image file
 		JarEntry jarAddEntry = new JarEntry(addJarEntryName);
 		out.putNextEntry(jarAddEntry);
 		InputStream addIn = new FileInputStream(addJarFileName);
@@ -968,7 +987,7 @@ public class FileUtils {
 				@Override
 				public void run() {
 					for (String job : FileUtils.onExitRenameJar) {
-						//log.log(Level.INFO, "onExitRenameJar.job = " + job);
+						// log.log(Level.INFO, "onExitRenameJar.job = " + job);
 						String deviceJarPath = job.split("2")[0]; //$NON-NLS-1$
 						String tmpDeviceJarPath = job.split("2")[1]; //$NON-NLS-1$
 						try {
@@ -977,7 +996,7 @@ public class FileUtils {
 							String command = javaexec + " -classpath '" + classpath + "' gde.utils.FileUtils '" + deviceJarPath + "' '" + tmpDeviceJarPath + "'"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 							FileUtils.log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 
-							//new ProcessBuilder(java -classpath DataExplorer.jar gde.utils.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName")
+							// new ProcessBuilder(java -classpath DataExplorer.jar gde.utils.FileUtils sourceFullQualifiedFileName targetFullQualifiedFileName")
 							new ProcessBuilder(javaexec, "-classpath", classpath, "gde.utils.FileUtils", deviceJarPath, tmpDeviceJarPath).start(); //$NON-NLS-1$ //$NON-NLS-2$
 						}
 						catch (Throwable e) {
@@ -1018,11 +1037,11 @@ public class FileUtils {
 				catch (NumberFormatException e) {
 					FileUtils.log.log(Level.SEVERE, "Internal Error - permission not usable (" + unixPermissions + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "chmod 755 " + fileName);
+				// if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "chmod 755 " + fileName);
 				Runtime.getRuntime().exec(new String[] { "chmod", unixPermissions, fullQualifiedFilePath }).waitFor(); //$NON-NLS-1$
 			}
 			catch (Throwable e) {
-				//ignore
+				// ignore
 			}
 		}
 	}
@@ -1068,7 +1087,7 @@ public class FileUtils {
 			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
 				//jarPath = basePath + "build" + GDE.FILE_SEPARATOR_UNIX + "target" + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME; //$NON-NLS-1$ //$NON-NLS-2$
-				//targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
+				// targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
 				jarPath = basePath + "build" + "/target/" //$NON-NLS-1$ //$NON-NLS-2$
 						+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY) + System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE //$NON-NLS-1$ //$NON-NLS-2$
 						+ GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY) + "/devices"; //$NON-NLS-1$
@@ -1083,8 +1102,8 @@ public class FileUtils {
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
-				//jarPath = basePath + Settings.DEVICE_PROPERTIES_DIR_NAME;
-				//targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
+				// jarPath = basePath + Settings.DEVICE_PROPERTIES_DIR_NAME;
+				// targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
 				jarPath = basePath + "devices"; //$NON-NLS-1$
 			}
 			catch (Exception e) {
@@ -1182,7 +1201,7 @@ public class FileUtils {
 			if (start < versionStringLength) major = Integer.parseInt(version.substring(start, index));
 		}
 		catch (NumberFormatException e) {
-			//ignore
+			// ignore
 		}
 		start = ++index;
 		while (index < versionStringLength && Character.isDigit(version.charAt(index)))
@@ -1191,7 +1210,7 @@ public class FileUtils {
 			if (start < versionStringLength) minor = Integer.parseInt(version.substring(start, index));
 		}
 		catch (NumberFormatException e) {
-			//ignore
+			// ignore
 		}
 		start = ++index;
 		while (index < versionStringLength && Character.isDigit(version.charAt(index)))
@@ -1200,19 +1219,19 @@ public class FileUtils {
 			if (start < versionStringLength) micro = Integer.parseInt(version.substring(start, index));
 		}
 		catch (NumberFormatException e) {
-			//ignore
+			// ignore
 		}
 
 		return major * 100 + minor * 10 + micro;
 	}
 
 	/**
-	  * Recursively walk a directory tree and return a List of all files found.
-	  * @param rootDirectory is a valid directory
-	  * @param recursionDepth specifies the depth of recursion cycles
-	  * @return List<File> sorted using File.compareTo()
-	  * @throws FileNotFoundException
-	  */
+	 * Recursively walk a directory tree and return a List of all files found.
+	 * @param rootDirectory is a valid directory
+	 * @param recursionDepth specifies the depth of recursion cycles
+	 * @return List<File> sorted using File.compareTo()
+	 * @throws FileNotFoundException
+	 */
 	public static List<File> getFileListing(File rootDirectory, int recursionDepth) throws FileNotFoundException {
 		validateDirectory(rootDirectory);
 		List<File> result = getFileListingNoSort(rootDirectory, recursionDepth);
@@ -1221,13 +1240,13 @@ public class FileUtils {
 	}
 
 	/**
-	  * Recursively walk a directory tree and return a List of all files found.
-	  * @param rootDirectory is a valid directory
-	  * @param recursionDepth specifies the depth of recursion cycles
-	  * @param filter specifies a part of the filename
-	  * @return List<File> sorted using File.compareTo()
-	  * @throws FileNotFoundException
-	  */
+	 * Recursively walk a directory tree and return a List of all files found.
+	 * @param rootDirectory is a valid directory
+	 * @param recursionDepth specifies the depth of recursion cycles
+	 * @param filter specifies a part of the filename
+	 * @return List<File> sorted using File.compareTo()
+	 * @throws FileNotFoundException
+	 */
 	public static List<File> getFileListing(File rootDirectory, int recursionDepth, String filter) throws FileNotFoundException {
 		validateDirectory(rootDirectory);
 		List<File> result = getFileListingNoSort(rootDirectory, recursionDepth);
@@ -1241,10 +1260,10 @@ public class FileUtils {
 	}
 
 	/**
-	  * @param rootDirectory
-	  * @return unsorted list of directories without sub-level directories
-	  * @throws FileNotFoundException if the param is not a directory
-	  */
+	 * @param rootDirectory
+	 * @return unsorted list of directories without sub-level directories
+	 * @throws FileNotFoundException if the param is not a directory
+	 */
 	public static List<File> getDirectories(File rootDirectory) throws FileNotFoundException {
 		validateDirectory(rootDirectory);
 		List<File> result = new ArrayList<File>();
@@ -1263,11 +1282,11 @@ public class FileUtils {
 	}
 
 	/**
-	  * Recursively walk a directory tree and return a List of all files found.
-	  * @param rootDirectory is a valid directory
-	  * @return List<File> sorted using File.compareTo()
-	  * @throws FileNotFoundException
-	  */
+	 * Recursively walk a directory tree and return a List of all files found.
+	 * @param rootDirectory is a valid directory
+	 * @return List<File> sorted using File.compareTo()
+	 * @throws FileNotFoundException
+	 */
 	public static List<File> getDirListing(File rootDirectory) throws FileNotFoundException {
 		validateDirectory(rootDirectory);
 		List<File> result = getDirListingNoSort(rootDirectory);
@@ -1368,13 +1387,13 @@ public class FileUtils {
 			if (GDE.IS_WINDOWS) {
 				String[] commandArray = new String[] { "\"" + System.getProperty("sun.boot.library.path") + GDE.FILE_SEPARATOR + "java\"", "-classpath", jarFilePath, //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
 						"-D" + GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN + GDE.STRING_EQUAL + Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN)), "gde.utils.FileUtils" };//$NON-NLS-1$ //$NON-NLS-2$
-				//if (log.isLoggable(Level.FINE)) {
-				//	StringBuilder sb = new StringBuilder();
-				//	for (int i = 0; i < commandArray.length; i++) {
-				//		sb.append(commandArray[i]).append(GDE.STRING_BLANK);
-				//	}
-				//	log.log(Level.FINE, sb.toString());
-				//}
+				// if (log.isLoggable(Level.FINE)) {
+				// StringBuilder sb = new StringBuilder();
+				// for (int i = 0; i < commandArray.length; i++) {
+				// sb.append(commandArray[i]).append(GDE.STRING_BLANK);
+				// }
+				// log.log(Level.FINE, sb.toString());
+				// }
 				Runtime.getRuntime().exec(commandArray);
 			}
 			else
@@ -1390,26 +1409,26 @@ public class FileUtils {
 	 * main method to execute post execution cleanup, called by cleanupPost()
 	 */
 	public static void main(String[] args) {
-		//		if (Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN))) {
-		//			if (GDE.IS_WINDOWS) {
-		//				OperatingSystemHelper.removeDesktopLink();
-		//				FileUtils.cleanFiles(System.getenv("APPDATA") + GDE.FILE_SEPARATOR, new String[] {GDE.NAME_LONG});
-		//				OperatingSystemHelper.deregisterApplication();
-		//			}
-		//			else if (GDE.IS_LINUX) {
-		//				OperatingSystemHelper.removeDesktopLink();
-		//				OperatingSystemHelper.deregisterApplication();
-		//				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX, new String[] {GDE.STRING_DOT+GDE.NAME_LONG});
-		//			}
-		//			else if (GDE.IS_MAC) {
+		// if (Boolean.parseBoolean(System.getProperty(GDE.CLEAN_SETTINGS_WHILE_SHUTDOWN))) {
+		// if (GDE.IS_WINDOWS) {
+		// OperatingSystemHelper.removeDesktopLink();
+		// FileUtils.cleanFiles(System.getenv("APPDATA") + GDE.FILE_SEPARATOR, new String[] {GDE.NAME_LONG});
+		// OperatingSystemHelper.deregisterApplication();
+		// }
+		// else if (GDE.IS_LINUX) {
+		// OperatingSystemHelper.removeDesktopLink();
+		// OperatingSystemHelper.deregisterApplication();
+		// FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX, new String[] {GDE.STRING_DOT+GDE.NAME_LONG});
+		// }
+		// else if (GDE.IS_MAC) {
 		//				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX , new String[] {GDE.NAME_LONG});
-		//			}
-		//		}
-		//		if (GDE.IS_WINDOWS)
+		// }
+		// }
+		// if (GDE.IS_WINDOWS)
 		//			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "OSDE", "rxtxSerial.dll", "GDE", "WinHelper*.dll", "Register*.exe", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-		//		else if (GDE.IS_LINUX)
+		// else if (GDE.IS_LINUX)
 		//			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", "*register.sh", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		//		else if (GDE.IS_MAC)
+		// else if (GDE.IS_MAC)
 		//			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] {"bootstrap.log.lck", "GDE", GDE.FILE_ENDING_STAR_KMZ}); //$NON-NLS-1$ //$NON-NLS-2$
 
 		System.out.println("isUpdateAvailable = " + isUpdateAvailable()); //$NON-NLS-1$
@@ -1495,7 +1514,7 @@ public class FileUtils {
 	 * query device and object related import directory
 	 * @param device
 	 * @return device and object related import directory path
-	 * query the import data directory in dependency of search directory, object, etc
+	 *         query the import data directory in dependency of search directory, object, etc
 	 * @return
 	 */
 	public static FileDialog getImportDirectoryFileDialog(IDevice device, String dialogTitleMessage, String[] fileExtensions) {
@@ -1593,7 +1612,6 @@ public class FileUtils {
 	public static void downloadFile(URL url, String targetFileName) {
 		InputStream in = null;
 		FileOutputStream out = null;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		try {
 			URLConnection conn = url.openConnection();
 			conn.setDoOutput(true);
@@ -1608,7 +1626,7 @@ public class FileUtils {
 			int download = 0;
 			int lastDownloadProgress = -1;
 
-			DataExplorer.getInstance().setStatusMessage(Messages.getString(MessageIds.GDE_MSGI0054));
+			GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGI0054));
 			int progressStatus = 0;
 			while ((count = in.read(buffer)) > 0) {
 				out.write(buffer, 0, count);
@@ -1616,10 +1634,10 @@ public class FileUtils {
 				progressStatus = download * 100 / size;
 				if (lastDownloadProgress < progressStatus && progressStatus % 5 == 0) {
 					lastDownloadProgress = progressStatus;
-					DataExplorer.getInstance().setProgress(progressStatus, sThreadId);
+					GDE.getUiNotification().setProgress(progressStatus);
 				}
 			}
-			DataExplorer.getInstance().setStatusMessage("");
+			GDE.getUiNotification().setStatusMessage("");
 
 		}
 		catch (Exception e) {

@@ -584,7 +584,7 @@ public class FileHandler {
 				this.application.enableMenuActions(false);
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 
-				if (KMZWriter.application.getStatusBar() != null) KMZWriter.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] { GDE.FILE_ENDING_KMZ, kmzFilePath }));
+				GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] { GDE.FILE_ENDING_KMZ, kmzFilePath }));
 
 				String kmlFileName = this.getFileNameProposal(activeChannel.getActiveRecordSet().getName());
 				kmlFileName = kmlFileName != null && kmlFileName.contains(GDE.STRING_DOT) ? kmlFileName.substring(0, kmlFileName.indexOf(GDE.STRING_DOT)) : kmlFileName;
@@ -649,7 +649,6 @@ public class FileHandler {
 			}
 		}
 		kmzFilePath = fileName + GDE.FILE_ENDING_DOT_KMZ;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		if (kmzFilePath.length() > 4) {
 			try {
 				this.application.enableMenuActions(false);
@@ -665,7 +664,7 @@ public class FileHandler {
 			this.application.enableMenuActions(true);
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		}
-		if (KMZWriter.application.getStatusBar() != null) KMZWriter.application.setProgress(100, sThreadId);
+		GDE.getUiNotification().setProgress(100);
 		return kmzFilePath;
 	}
 

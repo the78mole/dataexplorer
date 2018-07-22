@@ -61,7 +61,6 @@ import gde.histo.cache.ExtendedVault;
 import gde.histo.datasources.DirectoryScanner;
 import gde.histo.datasources.HistoSet;
 import gde.histo.datasources.SourceFolders;
-import gde.histo.exclusions.ExclusionActivity;
 import gde.histo.exclusions.InclusionData;
 import gde.histo.guard.Reminder;
 import gde.histo.recordings.TrailDataTags.DataTag;
@@ -526,7 +525,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 				windowActor.processMouseDownAction(point);
 			} else if (evt.button == 3) { // right button
 				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
-				Path activeFolder = DirectoryScanner.getActiveFolder();
+				Path activeFolder = DirectoryScanner.getActiveFolder4Ui();
 				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionActivity.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
 				InclusionData inclusionData = new InclusionData(activeFolder);
 				String[] includedRecordNames = inclusionData.getIncludedRecordNames();
@@ -653,7 +652,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		boolean isSummarySpotsVisible = settings.isSummarySpotsVisible();
 		boolean isCurveSelector = windowActor.isCurveSelectorEnabled();
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-		InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder());
+		InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder4Ui());
 		List<String> exclusiveNames = Arrays.asList(inclusionData.getIncludedRecordNames());
 
 		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {

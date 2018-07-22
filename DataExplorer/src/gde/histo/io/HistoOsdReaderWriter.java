@@ -42,9 +42,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.data.AbstractRecordSet;
 import gde.data.Channel;
+import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.ChannelTypes;
@@ -140,7 +142,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		}
 	}
 
-	private class RecordSetParser {
+	private static class RecordSetParser {
 
 		private final HeaderParser						osdHeader;
 		private final HashMap<String, String>	recordSetInfo;
@@ -157,8 +159,46 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			recordSetProps = StringHelper.splitString(recordSetProperties, Record.DELIMITER, RecordSet.propertyKeys);
 		}
 
-		Channel getChannel() {
-			return HistoOsdReaderWriter.getChannel(recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME));
+		/**
+		 * determine channel number in file and access the device configuration.
+		 */
+		Channel getChannel(Channels channels) {
+			Channel channel = null;
+			String channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
+				// String channelConfigKey;
+				// Channel currentChannel = channels.get(channels.getChannelNumber(channelConfig));
+				// 1.st try channelConfiguration not found
+				try { // get channel last digit and use as channel config ordinal : 'Channel/Configuration Name: 1 : Ausgang 1'
+					channel = channels.get(Integer.valueOf(channelConfig.substring(channelConfig.length() - 1)));
+					// channelConfigKey = channel.getChannelConfigKey();
+				}
+				catch (NumberFormatException e) {
+					// ignore and keep channel as null
+				}
+				catch (NullPointerException e) {
+					// ignore and keep channel as null
+				}
+				if (channel == null) { // 2.nd try channelConfiguration not found
+					try { // try to get channel startsWith configuration name : 'Channel/Configuration Name: 1 : Receiver'
+						channel = channels.get(Integer.valueOf(channelConfig.split(GDE.STRING_BLANK)[0]));
+						// channelConfigKey = channel.getChannelConfigKey();
+					}
+					catch (NullPointerException | NumberFormatException e) {
+						// ignore and keep channel as null
+					}
+				}
+				if (channel == null) { // 3.rd try channelConfiguration not found
+					// ET 20161121 reactivated for '2008_04-05_ASW27_Motor_Test_Akku_Vergleich.osd' and similar files
+					// do not rely on channel nomenclature
+					// "3 : Motor"
+					String channelConfigKey;
+					channelConfigKey = channelConfig.contains(GDE.STRING_COLON) ? channelConfig.split(GDE.STRING_COLON)[1].trim() : channelConfig.trim();
+					// "Motor 3"
+					channelConfigKey = channelConfigKey.contains(GDE.STRING_BLANK) ? channelConfigKey.split(GDE.STRING_BLANK)[0].trim() : channelConfigKey.trim();
+					// "Motor"
+					channel = channels.get(channels.getChannelNumber(channelConfigKey));
+				}
+				return channel;
 		}
 
 		@SuppressWarnings("unused")
@@ -342,7 +382,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		}
 	}
 
-	private class RecordParser {
+	private static class RecordParser {
 
 		private final HashMap<String, String> recordProperties;
 
@@ -374,7 +414,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 	 * @param objectDirectory holds the validated object key from the parent directory or is empty
 	 * @return the vaults skeletons created from the recordsets (for valid channels in the current device only)
 	 */
-	public static List<VaultCollector> readTrusses(InputStream fileStream, Path sourcePath, String objectDirectory) throws IOException,
+	public static List<VaultCollector> readTrusses(InputStream fileStream, Path sourcePath, String objectDirectory, Analyzer analyzer) throws IOException,
 			NotSupportedFileFormatException {
 		List<VaultCollector> trusses = new ArrayList<>();
 		final HeaderParser osdHeader;
@@ -387,11 +427,10 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		final List<RecordSetParser> osdRecordSets = osdHeader.getOsdRecordSets();
 		for (int i = 0; i < osdRecordSets.size(); ++i) {
 			RecordSetParser osdRecordSet = osdRecordSets.get(i);
-			Channel channel = osdRecordSet.getChannel();
+			Channel channel = osdRecordSet.getChannel(analyzer.getChannels());
 			if (channel != null) {
 				VaultCollector vaultCollector = new VaultCollector(objectDirectory, sourcePath, osdHeader.getFileVersion(), osdRecordSets.size(), i,
-						osdRecordSet.getBaseName(), osdHeader.getDeviceName(), osdRecordSet.getEnhancedStartTimestamp_ms(), channel.getNumber(),
-						osdHeader.getLogObjectKey(), false);
+						osdRecordSet.getBaseName(), osdHeader.getDeviceName(), osdRecordSet.getEnhancedStartTimestamp_ms(), channel.getNumber(), osdHeader.getLogObjectKey());
 				trusses.add(vaultCollector);
 			}
 		}
@@ -405,7 +444,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 	 * @param trusses holds a non-empty subset of the recordsets in the file
 	 * @return histo vault list (may contain trusses without measurements, settlements and scores)
 	 */
-	public static List<ExtendedVault> readVaults(InputStream fileStream, List<VaultCollector> trusses, long fileLength) throws IOException,
+	public static List<ExtendedVault> readVaults(InputStream fileStream, List<VaultCollector> trusses, Analyzer analyzer) throws IOException,
 			NotSupportedFileFormatException, DataInconsitsentException {
 		if (trusses.isEmpty()) throw new IllegalArgumentException("at least one trusses entry is required");
 		List<ExtendedVault> histoVaults = new ArrayList<>();
@@ -433,15 +472,15 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 
 					final VaultCollector vaultCollector = trusses.get(trussesIndex);
 
-					RecordSet histoRecordSet = constructRecordSet(data_in, osdRecordSet, vaultCollector.getVault());
+					RecordSet histoRecordSet = constructRecordSet(data_in, osdRecordSet, vaultCollector.getVault(), analyzer);
 
-					final Integer[] scores = determineScores(osdRecordSet, elapsedStart_ns, histoRecordSet.getFileDataBytesSize(), fileLength);
+					final Integer[] scores = determineScores(osdRecordSet, elapsedStart_ns, histoRecordSet.getFileDataBytesSize(), vaultCollector.getVault().getLogFileLength());
 					vaultCollector.promoteTruss(histoRecordSet, scores);
 
 					histoVaults.add(vaultCollector.getVault());
 
 					log.finer(() -> String.format("|%s|  startTimeStamp=%s    recordDataSize=%,d  recordSetDataPointer=%,d", //$NON-NLS-1$
-							osdRecordSet.getChannel().getName(), vaultCollector.getVault().getStartTimeStampFormatted(), osdRecordSet.getRecordDataSize(), osdRecordSet.getDataPointer()));
+							osdRecordSet.getChannel(analyzer.getChannels()).getName(), vaultCollector.getVault().getStartTimeStampFormatted(), osdRecordSet.getRecordDataSize(), osdRecordSet.getDataPointer()));
 				}
 			}
 			log.fine(() -> String.format("%d of%3d recordsets in%,7d ms  recordSetOrdinals=%s from %s", //$NON-NLS-1$
@@ -480,11 +519,12 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 	 * @param data_in
 	 * @param osdRecordSet holds recordset meta data from the file header
 	 * @param truss is the vault skeleton with the base data for the new recordset
+	 * @param analyzer
 	 * @return the new recordset fully populated
 	 */
-	private static RecordSet constructRecordSet(DataInputStream data_in, RecordSetParser osdRecordSet, ExtendedVault truss) throws IOException,
+	private static RecordSet constructRecordSet(DataInputStream data_in, RecordSetParser osdRecordSet, ExtendedVault truss, Analyzer analyzer) throws IOException,
 			DataInconsitsentException {
-		RecordSet histoRecordSet = buildRecordSet(truss.getLogRecordsetBaseName(), truss.getLogChannelNumber(), osdRecordSet.recordSetInfo, false);
+		RecordSet histoRecordSet = buildRecordSet(truss.getLogRecordsetBaseName(), truss.getLogChannelNumber(), osdRecordSet.recordSetInfo, false, analyzer.getActiveDevice());
 
 		{// setDeserializedProperties does not take all possible solutions to set the timestamp
 			long enhancedStartTimestamp_ms = osdRecordSet.getEnhancedStartTimestamp_ms();
@@ -502,7 +542,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 
 		histoRecordSet.setFileDataPointerAndSize(osdRecordSet.getDataPointer(), recordDataSize, recordSetDataBytes);
 		log.fine(() -> String.format("%s recordDataSize=%,d  recordSetDataPointer=%,d  numberRecordAndTimeStamp=%,d", //$NON-NLS-1$
-				osdRecordSet.getChannel().getName(), recordDataSize, osdRecordSet.getDataPointer(), numberRecordAndTimeStamp));
+				osdRecordSet.getChannel(analyzer.getChannels()).getName(), recordDataSize, osdRecordSet.getDataPointer(), numberRecordAndTimeStamp));
 
 		final byte[] buffer = new byte[recordSetDataBytes];
 		data_in.readFully(buffer);

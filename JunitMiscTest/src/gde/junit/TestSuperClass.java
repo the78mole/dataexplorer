@@ -183,14 +183,7 @@ public class TestSuperClass extends TestCase {
 		this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
 
 		// wait until schema is setup
-		while (this.settings.isXsdThreadAlive()) {
-			try {
-				Thread.sleep(5);
-			}
-			catch (InterruptedException e) {
-				// ignore
-			}
-		}
+		this.settings.joinXsdThread();
 
 		for (int i = 0; files != null && i < files.length; i++) {
 			try {

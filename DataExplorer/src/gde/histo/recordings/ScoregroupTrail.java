@@ -61,12 +61,12 @@ public final class ScoregroupTrail extends TrailRecord {
 
 	@Override
 	protected boolean isAllowedBySetting() {
-		return this.settings.isDisplayScores();
+		return getParent().getAnalyzer().getSettings().isDisplayScores();
 	}
 
 	@Override
 	public boolean isScaleVisible() {
-		return this.settings.isDisplayScores() && super.isScaleVisible();
+		return getParent().getAnalyzer().getSettings().isDisplayScores() && super.isScaleVisible();
 	}
 
 	@Override

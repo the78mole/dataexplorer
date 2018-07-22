@@ -62,7 +62,6 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
 import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
 
 /**
  * Device Configuration class makes the parsed DeviceProperties XML accessible for the application
@@ -172,9 +171,7 @@ public class DeviceConfiguration {
 
 		this.settings = Settings.getInstance();
 
-		while (this.settings.isXsdThreadPending()) {
-			WaitTimer.delay(5);
-		}
+		this.settings.joinXsdThread();
 
 		this.elememt = this.settings.getDeviceSerialization().getTopElement(this.xmlFile.toString());
 		this.deviceProps = this.elememt.getValue();
@@ -197,9 +194,7 @@ public class DeviceConfiguration {
 
 		this.settings = Settings.getInstance();
 
-		while (this.settings.isXsdThreadPending()) {
-			WaitTimer.delay(5);
-		}
+		this.settings.joinXsdThread();
 
 		this.elememt = (JAXBElement<DevicePropertiesType>) tmpUnmarshaller.unmarshal(this.xmlFile.toFile());
 		this.deviceProps = this.elememt.getValue();
@@ -247,9 +242,7 @@ public class DeviceConfiguration {
 
 		this.settings = Settings.getInstance();
 
-		while (this.settings.isXsdThreadPending()) {
-			WaitTimer.delay(5);
-		}
+		this.settings.joinXsdThread();
 
 		this.elememt = this.settings.getDeviceSerialization().getTopElement(xmlFileSubPath);
 		this.deviceProps = this.elememt.getValue();

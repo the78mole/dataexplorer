@@ -68,7 +68,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 				for (AbstractChartComposite c : getCharts()) {
 					c.cleanMeasuring();
 					if (c instanceof SummaryComposite) { // cleaning the summary composite is not implemented
-						log.log(Level.OFF, "started");
+						log.log(Level.FINE, "started");
 						c.drawAreaPaintControl(); // todo check if erasing lines like in CurveSurvey is appropriate
 					}
 				}

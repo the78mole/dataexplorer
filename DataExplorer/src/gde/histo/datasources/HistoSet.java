@@ -21,14 +21,11 @@ package gde.histo.datasources;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.sun.istack.internal.Nullable;
 
 import gde.Analyzer;
-import gde.config.Settings;
 import gde.data.Record;
 import gde.data.Record.DataType;
 import gde.device.IChannelItem;
@@ -36,8 +33,6 @@ import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
 import gde.histo.cache.ExtendedVault;
-import gde.histo.exclusions.ExclusionData;
-import gde.histo.exclusions.InclusionData;
 import gde.histo.recordings.TrailRecord;
 import gde.histo.recordings.TrailRecordSet;
 import gde.log.Level;
@@ -368,21 +363,6 @@ public final class HistoSet {
 		} else {
 			return Boolean.compare(Double.isNaN(a), Double.isNaN(b));
 		}
-	}
-
-	/**
-	 * Is thread safe with respect to concurrent rebuilds.
-	 */
-	public static void cleanExclusionData() {
-		ArrayList<Path> dataPaths = new ArrayList<Path>();
-		dataPaths.add(Paths.get(Settings.getInstance().getDataFilePath()));
-		ExclusionData.deleteExclusionsDirectory(dataPaths);
-	}
-
-	public static void cleanInclusionData() {
-		ArrayList<Path> dataPaths = new ArrayList<Path>();
-		dataPaths.add(Paths.get(Settings.getInstance().getDataFilePath()));
-		InclusionData.deleteInclusionsDirectory(dataPaths);
 	}
 
 	/**

@@ -106,10 +106,9 @@ public class HoTTlogReader2 extends HoTTlogReader {
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
-		if (menuToolBar != null) HoTTbinReader.application.setProgress(0, sThreadId);
+		GDE.getUiNotification().setProgress(0);
 
 		try {
 			//receiver data are always contained
@@ -218,7 +217,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 
 					HoTTbinReader.timeStep_ms += logTimeStep;// add default time step from log record of 100 msec
 
-					if (menuToolBar != null && i % progressIndicator == 0) HoTTbinReader.application.setProgress((int) (i * 100 / numberDatablocks), sThreadId);
+					if (i % progressIndicator == 0) GDE.getUiNotification().setProgress((int) (i * 100 / numberDatablocks));
 				}
 					else { //skip empty block, but add time step
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "-->> Found tx=rx=0 dBm");
@@ -252,7 +251,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 			log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (menuToolBar != null) {
-				HoTTbinReader.application.setProgress(99, sThreadId);
+				GDE.getUiNotification().setProgress(99);
 				device.makeInActiveDisplayable(HoTTlogReader2.recordSet);
 				device.updateVisibilityStatus(HoTTlogReader2.recordSet, true);
 				channel.applyTemplate(recordSetName, false);
@@ -262,7 +261,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 
 				menuToolBar.updateChannelSelector();
 				menuToolBar.updateRecordSetSelectCombo();
-				HoTTbinReader.application.setProgress(100, sThreadId);
+				GDE.getUiNotification().setProgress(100);
 			}
 		}
 		finally {

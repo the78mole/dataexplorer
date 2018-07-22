@@ -27,10 +27,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -101,7 +101,7 @@ public class SimpleVaultReader {
 			HistoVault vault = SimpleVaultReader.readVault(p.getKey(), p.getValue());
 			vaults.add(vault);
 		}
-		log.log(Level.OFF, "vaults size=", vaults.size());
+		log.log(Level.FINE, "vaults size=", vaults.size());
 		return vaults;
 	}
 
@@ -125,17 +125,15 @@ public class SimpleVaultReader {
 
 	/**
 	 * @param directoryName defines the zip file holding the vaults or the vaults folder
-	 * @param extractor is the function for extracting the vault data
-	 * @return the extracted vault data after eliminating trusses
+	 * @param isZippedCache
+	 * @return the extracted vault indices (object key, index data) after eliminating small vault files
 	 * @throws IOException during opening or traversing the zip file
 	 */
-	public static List<Entry<String, String>> readVaultsIndices(String directoryName, Function<HistoVault, Entry<String, String>> extractor)
+	public static List<Entry<String, String>> readVaultsIndices(String directoryName, boolean isZippedCache)
 			throws IOException {
 		List<Entry<String, String>> vaultExtract = new ArrayList<>();
-		if (!DataAccess.getInstance().existsCacheDirectory(directoryName)) return vaultExtract;
-
 		final int MIN_FILE_LENGTH = 2048;
-		if (Settings.getInstance().isZippedCache()) {
+		if (isZippedCache) {
 			try (CloseIgnoringInputStream stream = new CloseIgnoringInputStream(DataAccess.getInstance().getCacheZipInputStream(directoryName))) {
 				ZipEntry entry;
 				while ((entry = stream.getNextEntry()) != null) {
@@ -143,7 +141,7 @@ public class SimpleVaultReader {
 
 					try {
 						HistoVault histoVault = memoryCache.get(entry.getName(), () -> VaultProxy.load(stream));
-						vaultExtract.add(extractor.apply(histoVault));
+						vaultExtract.add(new AbstractMap.SimpleImmutableEntry<String, String>(histoVault.getVaultObjectKey(), histoVault.toIndexEntry()));
 					} catch (Exception e) {
 						log.log(SEVERE, e.getMessage(), e);
 					}
@@ -159,7 +157,7 @@ public class SimpleVaultReader {
 
 				try {
 					HistoVault histoVault = memoryCache.get(file.getName(), () -> VaultProxy.load(new FileInputStream(file)));
-					vaultExtract.add(extractor.apply(histoVault));
+					vaultExtract.add(new AbstractMap.SimpleImmutableEntry<String, String>(histoVault.getVaultObjectKey(), histoVault.toIndexEntry()));
 				} catch (Exception e) {
 					log.log(SEVERE, e.getMessage(), e);
 				}
@@ -169,6 +167,12 @@ public class SimpleVaultReader {
 			CacheStats stats = memoryCache.stats();
 			return String.format("evictionCount=%d  hitCount=%d  missCount=%d hitRate=%f missRate=%f", stats.evictionCount(), stats.hitCount(), stats.missCount(), stats.hitRate(), stats.missRate());
 		});
+		if (log.isLoggable(Level.FINER)) {
+			for (Entry<String, String> entry : vaultExtract) {
+				log.log(Level.FINER, entry.getKey(), entry.getValue());
+			}
+		}
+		log.fine(() -> String.format( "%s : %s %d", vaultExtract.isEmpty() ? directoryName : vaultExtract.get(0).getKey() , directoryName , vaultExtract.size()));
 		return vaultExtract;
 	}
 

@@ -126,7 +126,7 @@ public final class SupplementObjectFolder {
 		if (mirrorUpdate_ms + MIRROR_CYCLE_MS > System.currentTimeMillis()) return;
 
 		mirrorUpdate_ms = System.currentTimeMillis();
-		SupplementObjectFolder instance = new SupplementObjectFolder();
+		SupplementObjectFolder instance = new SupplementObjectFolder(Analyzer.getInstance());
 		Thread rebuildThread = new Thread(() -> instance.rebuildLogMirror(), "rebuildLogMirror");
 		try {
 			rebuildThread.start();
@@ -139,7 +139,7 @@ public final class SupplementObjectFolder {
 	 * Scan the mirror source folders.
 	 */
 	static void updateLogMirrorSync() {
-		SupplementObjectFolder instance = new SupplementObjectFolder();
+		SupplementObjectFolder instance = new SupplementObjectFolder(Analyzer.getInstance());
 		instance.rebuildLogMirror();
 	}
 
@@ -175,7 +175,7 @@ public final class SupplementObjectFolder {
 		}
 		int deletedSize_MiB = (int) (FileUtils.size(objectsPath) / 1024 / 1024);
 		message = Messages.getString(MessageIds.GDE_MSGT0924, new Object[] { initialSize_MiB, deletedSize_MiB, sb.toString() });
-		log.log(Level.OFF, message);
+		log.log(Level.FINE, message);
 		return message;
 	}
 
@@ -233,13 +233,16 @@ public final class SupplementObjectFolder {
 		}
 	}
 
+	private final Analyzer		analyzer;
 	private final Path				supplementFolder	= getSupplementObjectsPath();
 	private final Set<String>	logFileExtentions	= Analyzer.getInstance().getDeviceConfigurations().getValidLogExtentions();
 
 	/**
 	 * Creates the base folder for additional logs which are created by other systems (computers, RC transmitters, etc).
+	 * @param analyzer
 	 */
-	private SupplementObjectFolder() {
+	private SupplementObjectFolder(Analyzer analyzer) {
+		this.analyzer = analyzer;
 		FileUtils.checkDirectoryAndCreate(this.supplementFolder.toString());
 	}
 
@@ -307,7 +310,7 @@ public final class SupplementObjectFolder {
 				Path targetPath = targetDir.resolve(f.getFileName());
 				FileUtils.checkDirectoryAndCreate(targetDir.toString());
 				if (!targetPath.toFile().exists()) {
-					SourceDataSet sourceDataSet = AbstractSourceDataSet.createSourceDataSet(f, Analyzer.getInstance().getActiveDevice());
+					SourceDataSet sourceDataSet = AbstractSourceDataSet.createSourceDataSet(f, analyzer);
 					if (sourceDataSet != null) { // check if supported by histo
 						try {
 							File actualFile = sourceDataSet.getActualFile();

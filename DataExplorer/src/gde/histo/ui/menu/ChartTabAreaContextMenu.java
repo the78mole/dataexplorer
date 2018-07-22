@@ -372,7 +372,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "isEclusiveWarning.widgetSelected, event=" + evt);
 					warning.ifPresent(w -> {
-						InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder());
+						InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder4Ui());
 						if (isExclusiveWarning.getSelection()) {
 							inclusionData.setProperty(w.recordName);
 						} else {
@@ -393,7 +393,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "isEclusiveWarning.widgetSelected, event=" + evt);
 					warning.ifPresent(w -> {
-						InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder());
+						InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder4Ui());
 						inclusionData.delete();
 						presentHistoExplorer.updateHistoTabs(false, false, true);
 					});

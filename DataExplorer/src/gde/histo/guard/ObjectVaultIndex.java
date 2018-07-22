@@ -20,13 +20,15 @@
 package gde.histo.guard;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,8 +46,8 @@ import java.util.function.Function;
 
 import gde.Analyzer;
 import gde.GDE;
+import gde.config.DeviceConfigurations;
 import gde.config.Settings;
-import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.HistoVault;
@@ -54,12 +56,10 @@ import gde.histo.device.IHistoDevice;
 import gde.histo.exclusions.ExclusionData;
 import gde.log.Level;
 import gde.log.Logger;
-import gde.utils.FileUtils;
 
 /**
- * Supports access to the vaults.
- * The index corresponds to the current property settings and device settings.
- * Uses a the fleet directory on the file system.
+ * Supports an index based access to the vaults.
+ * Rebuilding the index only takes vaults for the current property settings and device settings.
  * @author Thomas Eickert (USER)
  */
 public final class ObjectVaultIndex {
@@ -67,8 +67,9 @@ public final class ObjectVaultIndex {
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	/**
-	 * Implements the equals method in order to decide if two function objects represent the same query.
-	 * Use a best-fit create method as a prerequisite for function result caching.
+	 * Support custom filters for vault index attributes.
+	 * Provides selection result caching.
+	 * Use the equals method to decide if objects represent the same query.
 	 */
 	static class DetailSelector implements Function<ObjectVaultIndexEntry, Boolean> {
 
@@ -80,7 +81,7 @@ public final class ObjectVaultIndex {
 			return filterFunction.apply(t);
 		}
 
-		static DetailSelector createEmptyFilter() {
+		static DetailSelector createDummyFilter() {
 			return new DetailSelector(GDE.STRING_EMPTY, t -> true);
 		}
 
@@ -158,32 +159,28 @@ public final class ObjectVaultIndex {
 		private DetailSelector									lastDetailSelector	= null;
 
 		/**
-		 * Use this for retrieving the full index from the file system.
+		 * Use this for retrieving the full index from the vault index entries.
 		 */
 		public ObjectVaultMap() {
-			FilenameFilter filenameFilter = (dir, name) -> true;
-			this.indexMap = loadIndex(filenameFilter);
+			this.indexMap = loadIndex(s -> true);
 		}
 
 		/**
-		 * Use this for retrieving a partial index to reduce file system access.
+		 * Use this for retrieving a partial index to reduce vault index access.
 		 * @param objectKeys specifies the user's object key selection
 		 */
 		public ObjectVaultMap(String[] objectKeys) {
 			List<String> keys = Arrays.asList(objectKeys);
-			FilenameFilter filenameFilter = (dir, name) -> keys.contains(name);
-			this.indexMap = loadIndex(filenameFilter);
+			this.indexMap = loadIndex(s -> keys.contains(s));
 		}
 
 		/**
 		 * Recreate the fleet index directory.
 		 */
-		public void storeIndex(Map<String, List<String>> indexMap) {
-			String targetDir = getFleetDirectory().toString();
-			FileUtils.deleteDirectory(targetDir);
-			FileUtils.checkDirectoryAndCreate(targetDir);
-			indexMap.forEach((objectKey, list) -> {
-				try (FileWriter writer = new FileWriter(Paths.get(targetDir, objectKey).toFile())) {
+		public static void storeIndex(Map<String, List<String>> newIndexMap) {
+			newIndexMap.forEach((objectKey, list) -> {
+				try (OutputStream outputStream = Analyzer.getInstance().getDataAccess().getFleetOutputStream(Paths.get(objectKey));
+						Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream));) {
 					for (String str : list) {
 						writer.write(str + GDE.STRING_NEW_LINE);
 					}
@@ -191,23 +188,20 @@ public final class ObjectVaultIndex {
 					log.log(Level.SEVERE, "write", e);
 				}
 			});
-
-			this.indexMap.clear();
-			this.indexMap.putAll(indexMap);
+			log.off(() -> "objects: " + newIndexMap.keySet().toString());
+			log.off(() -> "objects count: " + newIndexMap.size() + "  total vaults: " + newIndexMap.values().stream().mapToLong(l -> l.size()).sum());
 		}
 
 		/**
 		 * @param objectSelector specifies the user's object key selection
-		 * @return the object key index portion from the file system
+		 * @return the object key index portion from the vault index entries
 		 */
-		private Map<String, List<String>> loadIndex(FilenameFilter filenameFilter) {
-			Map<String, List<String>> result = new HashMap<>();
-			Path fleetDirectory = getFleetDirectory();
-			FileUtils.checkDirectoryAndCreate(fleetDirectory.toString());
-			for (String fileName : fleetDirectory.toFile().list(filenameFilter)) {
-				Path path = fleetDirectory.resolve(fileName);
+		private Map<String, List<String>> loadIndex(Function<String, Boolean> objectSelector) {
+			Map<String, List<String>> objectIndexes = new HashMap<>();
+			for (String objectKey : Analyzer.getInstance().getDataAccess().getFleetObjectKeys(objectSelector)) {
 				ArrayList<String> indexList = new ArrayList<>();
-				try (BufferedReader br = new BufferedReader(new FileReader(path.toFile()))) {
+				try (InputStream inputStream = Analyzer.getInstance().getDataAccess().getFleetIntputStream(Paths.get(objectKey));
+						BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));) {
 					String line;
 					while ((line = br.readLine()) != null) {
 						if (!line.isEmpty()) {
@@ -217,10 +211,11 @@ public final class ObjectVaultIndex {
 				} catch (Exception e) {
 					log.log(Level.SEVERE, "read", e);
 				}
-				result.put(fileName, indexList);
+				objectIndexes.put(objectKey, indexList);
 			}
-			log.off(() -> "objects: " + result.size() + "  total vaults: " + result.values().stream().mapToLong(l -> l.size()).sum());
-			return result;
+			log.off(() -> "objects: " + objectIndexes.keySet().toString());
+			log.off(() -> "objects count: " + objectIndexes.size() + "  total vaults: " + objectIndexes.values().stream().mapToLong(l -> l.size()).sum());
+			return objectIndexes;
 		}
 
 		/**
@@ -246,59 +241,56 @@ public final class ObjectVaultIndex {
 
 		/**
 		 * @param objectKey
-		 * @param detailSelector
+		 * @param detailSelector specifies the valid vault index entries
 		 * @return the vault indices
 		 */
 		public Set<ObjectVaultIndexEntry> selectVaultIndexes(String objectKey, DetailSelector detailSelector) {
 			Set<ObjectVaultIndexEntry> indices = new HashSet<>();
-			Path dataFilePath = Paths.get(Settings.getInstance().getDataFilePath());
-			ExclusionData exclusionData = new ExclusionData(dataFilePath.resolve(objectKey));
+			Path activeFolder = Paths.get(Settings.getInstance().getDataFilePath()).resolve(objectKey);
+			ExclusionData exclusionData = new ExclusionData(activeFolder);
+			boolean isSuppressMode = Settings.getInstance().isSuppressMode();
 			for (Entry<String, List<String>> e : indexMap.entrySet()) {
 				if (!objectKey.equals(e.getKey())) continue;
 				String prefix = GDE.STRING_CSV_QUOTE + e.getKey() + GDE.STRING_CSV_QUOTE + GDE.STRING_CSV_SEPARATOR;
 				for (String indexCsv : e.getValue()) {
 					ObjectVaultIndexEntry idx = new ObjectVaultIndexEntry(prefix + indexCsv);
 					if (!detailSelector.apply(idx)) continue;
-					if (!exclusionData.isExcluded(Paths.get(idx.logFilePath))) indices.add(idx);
+					if (!isSuppressMode || !exclusionData.isExcluded(idx.getLogFileName())) indices.add(idx);
 				}
 			}
 			return indices;
 		}
 
 		/**
-		 * @param objectSelector
-		 * @param detailSelector
+		 * @param objectSelector specifies the user's object key selection
+		 * @param detailSelector specifies the valid vault index entries
 		 * @return the vault indices
 		 */
 		public Set<ObjectVaultIndexEntry> selectVaultIndexes(Function<String, Boolean> objectSelector, DetailSelector detailSelector) {
 			Path dataFilePath = Paths.get(Settings.getInstance().getDataFilePath());
 			Function<ObjectVaultIndexEntry, Boolean> isExcludedSelector = idx -> {
-				ExclusionData exclusionData = new ExclusionData(dataFilePath.resolve(idx.vaultObjectKey));
-				return exclusionData.isExcluded(Paths.get(idx.logFilePath));
+				Path activeFolder = dataFilePath.resolve(idx.vaultObjectKey);
+				ExclusionData exclusionData = new ExclusionData(activeFolder);
+				return exclusionData.isExcluded(idx.getLogFileName());
 			};
 
 			Set<ObjectVaultIndexEntry> indices = new HashSet<>();
+			boolean isSuppressMode = Settings.getInstance().isSuppressMode();
 			for (Entry<String, List<String>> e : indexMap.entrySet()) {
 				if (!objectSelector.apply(e.getKey())) continue;
 				String prefix = GDE.STRING_CSV_QUOTE + e.getKey() + GDE.STRING_CSV_QUOTE + GDE.STRING_CSV_SEPARATOR;
 				for (String indexCsv : e.getValue()) {
 					ObjectVaultIndexEntry idx = new ObjectVaultIndexEntry(prefix + indexCsv);
 					if (!detailSelector.apply(idx)) continue;
-					if (!isExcludedSelector.apply(idx)) indices.add(idx);
+					if (!isSuppressMode || !isExcludedSelector.apply(idx)) indices.add(idx);
 				}
 			}
 			return indices;
 		}
 
-		public Set<String> selectDeviceNames(String[] objectKeys, DetailSelector detailSelector) {
-			Set<ObjectVaultIndexEntry> vaultIndexes = selectVaultIndexes(objectKeys, detailSelector);
-			Set<String> deviceNames = new HashSet<>();
-			for (ObjectVaultIndexEntry idx : vaultIndexes) {
-				deviceNames.add(idx.vaultDeviceName);
-			}
-			return deviceNames;
+		public boolean isEmpty() {
+			return indexMap.isEmpty();
 		}
-
 	}
 
 	/**
@@ -327,18 +319,6 @@ public final class ObjectVaultIndex {
 		int													logChannelNumber;
 		long												logStartTimestampMs;
 		String											logFilePath;
-
-		static Function<HistoVault, Map.Entry<String, String>> objectIndexExtractor() {
-			return v -> {
-				final String d = GDE.STRING_CSV_SEPARATOR;
-				String readerSettings = v.getVaultReaderSettings().replace(GDE.STRING_CSV_SEPARATOR, GDE.STRING_UNDER_BAR);
-				String attributes = v.getVaultName() + d + v.getVaultDirectory() + d + readerSettings + d + v.getVaultCreated_ms() //
-						+ d + v.getVaultDataExplorerVersion() + d + v.getVaultDeviceKey() + d + v.getVaultDeviceName() + d + v.getVaultChannelNumber() + d + v.getVaultSamplingTimespan_ms() //
-						+ d + v.getLogFileLastModified() + d + v.getLogFileLength() + d + v.getLogRecordSetOrdinal() + d + v.getLogRecordsetBaseName() //
-						+ d + v.getLogChannelNumber() + d + v.getLogStartTimestamp_ms() + d + v.getLogFilePath();
-				return new AbstractMap.SimpleImmutableEntry<>(v.getVaultObjectKey(), attributes);
-			};
-		}
 
 		static Function<HistoVault, ObjectVaultIndexEntry> objectKeyExtractor() {
 			return v -> {
@@ -406,43 +386,118 @@ public final class ObjectVaultIndex {
 					+ d + this.logChannelNumber + d + this.logStartTimestampMs + d + this.logFilePath;
 		}
 
+		public String getLogFileName() {
+			return Paths.get(this.logFilePath).getFileName().toString();
+		}
 	}
 
-	public static Path getFleetDirectory() {
-		return Paths.get(Settings.getInstance().getApplHomePath(), Settings.HISTO_OBJECTS_DIR_NAME);
+	/**
+	 * Read all vaults and build the fleet index files.
+	 */
+	public static void rebuild() {
+		List<String> cacheDirectoryNames = defineCacheDirectoryNames();
+		Map<String, List<String>> objectKeyIndexMap = readIndex(cacheDirectoryNames);
+
+		Analyzer.getInstance().getDataAccess().deleteFleetObjects();
+		ObjectVaultMap.storeIndex(objectKeyIndexMap);
+		log.off(() -> "Fleet directory      size=" + Analyzer.getInstance().getDataAccess().getFleetObjectKeys(s -> true).size());
+	}
+
+	public static List<String> getIndexedObjectKeys() {
+		return Analyzer.getInstance().getDataAccess().getFleetObjectKeys(s -> true);
+	}
+
+	/**
+	 * @return the current vault directory names based on settings etc.
+	 */
+	private static List<String> defineCacheDirectoryNames(String deviceName) {
+		List<String> cacheDirectoryNames = new ArrayList<>();
+		try {
+			IDevice device = Analyzer.getInstance().getDeviceConfigurations().get(deviceName).getAsDevice();
+
+			List<String> validReaderSettings = new ArrayList<>();
+			validReaderSettings.add(GDE.STRING_EMPTY);
+			if (device instanceof IHistoDevice) validReaderSettings.add(((IHistoDevice) device).getReaderSettingsCsv());
+
+			for (String vaultReaderSettings : validReaderSettings) {
+				for (int j = 1; j <= device.getChannelCount(); j++) {
+					String directoryName = ExtendedVault.getVaultsDirectoryName(device, j, vaultReaderSettings);
+					cacheDirectoryNames.add(directoryName);
+				}
+			}
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "device instance exception", e);
+		}
+		log.off(() -> "Cache directory      size=" + cacheDirectoryNames.size() + " for device " + deviceName);
+		return cacheDirectoryNames;
+	}
+
+	/**
+	 * @return the current vault directory names based on settings etc.
+	 */
+	private static List<String> defineCacheDirectoryNames() {
+		List<String> cacheDirectoryNames = new ArrayList<>();
+		Collection<String> deviceNames = Analyzer.getInstance().getDeviceConfigurations().getAllConfigurations().keySet();
+		for (String deviceName : deviceNames) {
+			cacheDirectoryNames.addAll(defineCacheDirectoryNames(deviceName));
+		}
+		log.off(() -> "cache directories: " + cacheDirectoryNames.size() + "  from deviceNames: " + deviceNames.size());
+		return cacheDirectoryNames;
+	}
+
+	/**
+	 * @param cacheDirectoryNames are the vault directories to be indexed (is a subset due to obsolete directories)
+	 * @return the lists of vault index entries for all objects (key is objectKey)
+	 */
+	private static Map<String, List<String>> readIndex(List<String> cacheDirectoryNames) {
+		Map<String, List<String>> objectKeyMap = new HashMap<>();
+		try {
+			Analyzer analyzer = Analyzer.getInstance();
+			for (String directoryName : cacheDirectoryNames) {
+				if (analyzer.getDataAccess().existsCacheDirectory(directoryName)) {
+					List<Entry<String, String>> vaultIndices = SimpleVaultReader.readVaultsIndices(directoryName, analyzer.getSettings().isZippedCache());
+					for (Entry<String, String> e : vaultIndices) {
+						String objectKey = e.getKey().isEmpty() ? "leer" : e.getKey(); // todo replace leer
+						if (objectKeyMap.get(objectKey) == null) {
+							objectKeyMap.put(objectKey, new ArrayList<>());
+						}
+						objectKeyMap.get(objectKey).add(e.getValue());
+					}
+				}
+			}
+		} catch (IOException e) {
+			log.log(Level.SEVERE, "read", e);
+			return objectKeyMap;
+		}
+		log.off(() -> "objectKeys       selected=" + objectKeyMap.keySet().size() + "  " + new TreeSet<String>(objectKeyMap.keySet()).toString());
+		log.off(() -> "vaults           selected=" + objectKeyMap.values().parallelStream().mapToInt(l -> l.size()).sum());
+		return objectKeyMap;
 	}
 
 	private final ObjectVaultMap objectVaultMap;
 
 	/**
-	 *
+	 * Use this for full index access.
 	 */
 	public ObjectVaultIndex() {
 		objectVaultMap = new ObjectVaultMap();
 		log.log(Level.OFF, "vault key index loaded");
 	}
 
+	/**
+	 * @param objectKeys for selecting a vault index subset which is used for all methods
+	 */
 	public ObjectVaultIndex(String[] objectKeys) {
 		objectVaultMap = new ObjectVaultMap(objectKeys);
 		log.log(Level.OFF, "vault key index loaded for", objectKeys);
 	}
 
 	/**
-	 * Reads all vaults and builds the fleet directory.
-	 */
-	public void rebuild() {
-		List<String> cacheDirectoryNames = defineCacheDirectoryNames();
-		objectVaultMap.storeIndex(readIndex(cacheDirectoryNames));
-		log.off(() -> "Fleet directory      size=" + getFleetDirectory().toFile().listFiles().length);
-	}
-
-	/**
 	 * @param objectSelector specifies the user's object key selection
 	 * @return the object key entries in the vault index
 	 */
-	public String[] selectObjectKeys(Function<String, Boolean> objectSelector) {
-		FilenameFilter filter = (dir, name) -> objectSelector.apply(name);
-		return getFleetDirectory().toFile().list(filter);
+	public List<String> selectObjectKeys(Function<String, Boolean> objectSelector) {
+		return Analyzer.getInstance().getDataAccess().getFleetObjectKeys(objectSelector);
 	}
 
 	/**
@@ -450,20 +505,35 @@ public final class ObjectVaultIndex {
 	 * @return the devices used in the vault index selection
 	 */
 	public HashMap<String, IDevice> selectExistingDevices(String[] objectKeys) {
-		Set<String> indexedDeviceNames = objectVaultMap.selectDeviceNames(objectKeys, DetailSelector.createEmptyFilter());
-
-		HashMap<String, IDevice> existingDevices = new HashMap<>();
-		Map<String, DeviceConfiguration> allConfigurations = Analyzer.getInstance().getDeviceConfigurations().getAllConfigurations();
-		for (String deviceName : indexedDeviceNames) {
-			try {
-				IDevice device = allConfigurations.get(deviceName).getAsDevice();
-				existingDevices.put(deviceName, device);
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "device instance exception", e);
-			}
-		}
-		log.log(Level.OFF, "Selected      size=", existingDevices.size());
+		Set<String> indexedDeviceNames = selectDeviceNames(objectKeys, DetailSelector.createDummyFilter());
+		DeviceConfigurations deviceConfigurations = Analyzer.getInstance().getDeviceConfigurations();
+		HashMap<String, IDevice> existingDevices = deviceConfigurations.getAsDevices(indexedDeviceNames);
+		log.log(Level.FINER, "devices", existingDevices);
 		return existingDevices;
+	}
+
+	/**
+	 * @return the all device names from the index without device validation
+	 */
+	public Set<String> selectDeviceNames() {
+		Set<ObjectVaultIndexEntry> vaultIndexes = objectVaultMap.selectVaultIndexes(s -> true, DetailSelector.createDummyFilter());
+		Set<String> deviceNames = new HashSet<>();
+		for (ObjectVaultIndexEntry idx : vaultIndexes) {
+			deviceNames.add(idx.vaultDeviceName);
+		}
+		return deviceNames;
+	}
+
+	/**
+	 * @return the device names from the index corresponding to the selection criteria without device validation
+	 */
+	public Set<String> selectDeviceNames(String[] objectKeys, DetailSelector detailSelector) {
+		Set<ObjectVaultIndexEntry> vaultIndexes = objectVaultMap.selectVaultIndexes(objectKeys, detailSelector);
+		Set<String> deviceNames = new HashSet<>();
+		for (ObjectVaultIndexEntry idx : vaultIndexes) {
+			deviceNames.add(idx.vaultDeviceName);
+		}
+		return deviceNames;
 	}
 
 	/**
@@ -513,65 +583,8 @@ public final class ObjectVaultIndex {
 		return result;
 	}
 
-	/**
-	 * @return the current vault directory names based on settings etc.
-	 */
-	private List<String> defineCacheDirectoryNames(String deviceName) {
-		List<String> result = new ArrayList<>();
-		try {
-			IDevice device = Analyzer.getInstance().getDeviceConfigurations().get(deviceName).getAsDevice();
-
-			List<String> validReaderSettings = new ArrayList<>();
-			validReaderSettings.add(GDE.STRING_EMPTY);
-			if (device instanceof IHistoDevice) validReaderSettings.add(((IHistoDevice) device).getReaderSettingsCsv());
-
-			for (String vaultReaderSettings : validReaderSettings) {
-				for (int j = 1; j <= device.getChannelCount(); j++) {
-					result.add(ExtendedVault.getVaultsDirectoryName(device, j, vaultReaderSettings));
-				}
-			}
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "device instance exception", e);
-		}
-		return result;
+	public boolean isEmpty() {
+		// return objectVaultMap.isEmpty();
+		return true;
 	}
-
-	/**
-	 * @return the current vault directory names based on settings etc.
-	 */
-	private List<String> defineCacheDirectoryNames() {
-		List<String> result = new ArrayList<>();
-		Collection<String> deviceNames = Analyzer.getInstance().getDeviceConfigurations().getAllConfigurations().keySet();
-		for (String deviceName : deviceNames) {
-			result.addAll(defineCacheDirectoryNames(deviceName));
-		}
-		log.off(() -> "cache directories: " + result.size() + "  from deviceNames: " + deviceNames.size());
-		return result;
-	}
-
-	/**
-	 * @return the list of vault index data with key objectKey
-	 */
-	private Map<String, List<String>> readIndex(List<String> cacheDirectoryNames) {
-		Map<String, List<String>> objectKeyMap = new HashMap<>();
-		try {
-			for (String directoryName : cacheDirectoryNames) {
-				List<Entry<String, String>> vaultIndices = SimpleVaultReader.readVaultsIndices(directoryName, ObjectVaultIndexEntry.objectIndexExtractor());
-				for (Entry<String, String> e : vaultIndices) {
-					String objectKey = e.getKey().isEmpty() ? "leer" : e.getKey(); // todo replace leer
-					if (objectKeyMap.get(objectKey) == null) {
-						objectKeyMap.put(objectKey, new ArrayList<>());
-					}
-					objectKeyMap.get(objectKey).add(e.getValue());
-				}
-			}
-		} catch (IOException e) {
-			log.log(Level.SEVERE, "read", e);
-			return objectKeyMap;
-		}
-		log.off(() -> "objectKeys       selected=" + objectKeyMap.keySet().size() + "  " + new TreeSet<String>(objectKeyMap.keySet()).toString());
-		log.off(() -> "vaults           selected=" + objectKeyMap.values().parallelStream().mapToInt(l -> l.size()).sum());
-		return objectKeyMap;
-	}
-
 }

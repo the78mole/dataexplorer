@@ -13,10 +13,21 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.renschler;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Vector;
+import java.util.logging.Logger;
 
 import gde.GDE;
 import gde.data.Channel;
@@ -31,19 +42,8 @@ import gde.ui.DataExplorer;
 import gde.ui.menu.MenuToolBar;
 import gde.utils.StringHelper;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Vector;
-import java.util.logging.Logger;
-
 /**
- * Class to read and write geo points exchange format data 
+ * Class to read and write geo points exchange format data
  * @author Winfried Brügmann
  */
 public class Picolario2LogReader {
@@ -74,12 +74,10 @@ public class Picolario2LogReader {
 		int[] points = new int[device.getNumberOfMeasurements(1)];
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
 		boolean isOutdated = false;
-		
+
 		MenuToolBar menuToolBar = Picolario2LogReader.application.getMenuToolBar();
-		if (menuToolBar != null) {
-			Picolario2LogReader.application.setProgress(0, sThreadId);
-			Picolario2LogReader.application.setStatusMessage(Messages.getString(gde.device.renschler.MessageIds.GDE_MSGT1251) + filePath);
-		}
+		GDE.getUiNotification().setProgress(0);
+		GDE.getUiNotification().setStatusMessage(Messages.getString(gde.device.renschler.MessageIds.GDE_MSGT1251) + filePath);
 
 		try {
 			if (channelConfigNumber == null)
@@ -134,7 +132,7 @@ public class Picolario2LogReader {
 				points[2] = startValues[2] = DataParser.parse2Short(buffer, 0) * 1000; //0x052F = 1327 * 3.8 mV = 5.0 Volt
 				log.log(Level.FINE, String.format("start pressure = %d; start voltage = %d", startValues[1]/1000, startValues[2]/1000));
 				fileSize -= 4;
-				
+
 				recordSet = RecordSet.createRecordSet(recordSetName, device, channelConfigNumber, true, true, true);
 				activeChannel.put(recordSetName, recordSet);
 				recordSet = activeChannel.get(recordSetName);
@@ -156,7 +154,7 @@ public class Picolario2LogReader {
 					recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT	+ Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
 				}
 
-				if (application.getMenuToolBar() != null) {
+				if (GDE.isWithUi()) {
 					activeChannel.applyTemplate(recordSetName, false);
 				}
 				numReads = fileSize/numValues;
@@ -173,18 +171,18 @@ public class Picolario2LogReader {
 					Integer[] valuePoints = new Integer[numValues+1];
 					for (int i = 2; i <= buffer.length; i++) {
 						valuePoints[i] = points[i] += buffer[i-1] * 1000;
-					}				
+					}
 					valuePoints[1] = points[1] += buffer[0] * 1000;
 					valuePoints[0] = valuePoints[1];//pressure not corrected
-					
+
 					values.add(valuePoints);
 					//System.out.println(StringHelper.intArrayToString(valuePoints));
 				}
-				
-				do {					
+
+				do {
 					for (int i = 2; i <= buffer.length; i++) {
 						points[i] = values.get(integrationSize/2+1)[i];
-					}				
+					}
 					points[1] = 0;
 					for (int i = 0; i < values.size(); i++) {
 						if (i != integrationSize/2+1)
@@ -192,11 +190,11 @@ public class Picolario2LogReader {
 					}
 					//points[0] = values.get(integrationSize/2+1)[0];//pressure not corrected
 					points[0] = (int)(44330 * (1 - Math.pow(((points[1] / 100000.0) / 1013.25), 1/5.225)) * 1000); //height calculation
-					
+
 					Integer[] valuePoints = new Integer[numValues+1];
 					for (int i = 2; i <= buffer.length; i++) {
 						valuePoints[i] = values.lastElement()[i] + buffer[i-1] * 1000;
-					}				
+					}
 					valuePoints[1] = values.lastElement()[1] + buffer[0] * 1000;
 					valuePoints[0] = valuePoints[1];//pressure not corrected
 					values.add(valuePoints);
@@ -206,20 +204,20 @@ public class Picolario2LogReader {
 
 					recordSet.addPoints(points, timeStamp_ms);
 					timeStamp_ms += dataRate;
-					
-					if (menuToolBar != null && fileSize % 100 == 0) {
-						application.setProgress((int) (100 - fileSize/numValues * 100 / numReads), sThreadId);
+
+					if (fileSize % 100 == 0) {
+						GDE.getUiNotification().setProgress((int) (100 - fileSize/numValues * 100 / numReads));
 					}
 					fileSize -= numValues;
 				}
-				while (data_in.read(buffer) > 0);		
-				
+				while (data_in.read(buffer) > 0);
+
 				data_in.close();
 				data_in = null;
-								
-				if (menuToolBar != null) Picolario2LogReader.application.setProgress(100, sThreadId);
 
-				if (menuToolBar != null) {
+				GDE.getUiNotification().setProgress(100);
+
+				if (GDE.isWithUi()) {
 					Channels.getInstance().switchChannel(activeChannel.getName());
 					activeChannel.switchRecordSet(recordSetName);
 					device.updateVisibilityStatus(recordSet, true);
@@ -227,7 +225,7 @@ public class Picolario2LogReader {
 					menuToolBar.updateChannelSelector();
 					menuToolBar.updateRecordSetSelectCombo();
 				}
-				
+
 				//write filename after import to record description
 				recordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
 				log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
@@ -249,7 +247,7 @@ public class Picolario2LogReader {
 				activeChannel.setActiveRecordSet(recordSetName);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
-				if (Picolario2LogReader.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+				if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
 			}
 			// now display the error message
 			String msg = filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGE0045, new Object[] { e.getMessage(), lineNumber });
@@ -266,9 +264,7 @@ public class Picolario2LogReader {
 				}
 				data_in = null;
 			}
-			if (Picolario2LogReader.application.getStatusBar() != null) {
-				Picolario2LogReader.application.setStatusMessage(GDE.STRING_EMPTY);
-			}
+			GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
 		}
 
 		return recordSet;

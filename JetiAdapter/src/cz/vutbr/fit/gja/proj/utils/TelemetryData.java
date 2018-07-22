@@ -26,16 +26,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package cz.vutbr.fit.gja.proj.utils;
 
-import gde.device.jeti.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.utils.TimeLine;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,6 +49,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import gde.GDE;
+import gde.device.jeti.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.TimeLine;
+
 /**
  *
  * @author Martin Falticko
@@ -64,7 +64,7 @@ public class TelemetryData {
   static final Charset WINDOWS_1250 = Charset.forName("Windows-1250");
   static final Charset UTF_8 = Charset.forName("UTF-8");
   static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
-  
+
 	/** Typ dat - 8 bitu */
 	public static final int							T_DATA8					= 0;
 	/** Typ dat - 16 bitu */
@@ -167,7 +167,7 @@ public class TelemetryData {
 		}
 
 		/**
-		 * calculates the sigmaValue 
+		 * calculates the sigmaValue
 		 */
 		public void setSigmaValue() {
 			synchronized (this) {
@@ -280,7 +280,7 @@ public class TelemetryData {
 		}
 	};
 
-	/** 
+	/**
 	 * Info o zobrazene promenne
 	 */
 	public static class TelemetryVar implements Comparable<TelemetryVar> {
@@ -686,7 +686,7 @@ public class TelemetryData {
 
 	/**
 	 * query the name of the model contained in telemetry data
-	 * @return 
+	 * @return
 	 */
 	public String getModelName() {
 		return this.modelName;
@@ -754,9 +754,6 @@ public class TelemetryData {
 	 * @return
 	 */
 	boolean loadJML(String filename) {
-		DataExplorer application = DataExplorer.getInstance();
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-
 		try {
 			File file = new File(filename);
 
@@ -810,8 +807,8 @@ public class TelemetryData {
 					}
 				}
 				int progress = s * 100 / (sensors.getLength() * 2 / 3);
-				if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) {
-					application.setProgress(progress, sThreadId);
+				if (progress <= 90 && progress > GDE.getUiNotification().getProgressPercentage() && progress % 10 == 0) {
+					GDE.getUiNotification().setProgress(progress);
 					try {
 						Thread.sleep(2);
 					}
@@ -836,9 +833,6 @@ public class TelemetryData {
 	 * Nahraje soubor CSV. Vraci info o uspechu
 	 */
 	boolean loadCSV(String file) {
-		DataExplorer application = DataExplorer.getInstance();
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-
 		int line = 0;
 		try {
 			// Open the file that is the first
@@ -867,8 +861,8 @@ public class TelemetryData {
 
 				progressLineLength = progressLineLength > strLine.length() ? progressLineLength : strLine.length();
 				int progress = (int) (line * 100 / (inputFileSize / progressLineLength));
-				if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) {
-					application.setProgress(progress, sThreadId);
+				if (progress <= 90 && progress > GDE.getUiNotification().getProgressPercentage() && progress % 10 == 0) {
+					GDE.getUiNotification().setProgress(progress);
 					try {
 						Thread.sleep(2);
 					}
@@ -1008,7 +1002,7 @@ public class TelemetryData {
 						String utf8String = new String(param.getBytes(ISO_8859_1));
 						String message = TimeLine.getFomatedTimeWithUnit(timestamp) + " - " + utf8String;
 						TelemetryData.log.log(Level.WARNING, message);
-						if (DataExplorer.getInstance().getStatusBar() != null) DataExplorer.getInstance().setStatusMessage(message, SWT.COLOR_RED);
+						GDE.getUiNotification().setStatusMessage(message, SWT.COLOR_RED);
 						// Alarm:  Capacity
 						deviceId = 0; //force this even if there is a real Tx ID to enable sort in JetiDataReader
 						TelemetrySensor sensor = this.getSensor(deviceId);

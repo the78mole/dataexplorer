@@ -28,6 +28,6 @@ import org.junit.runner.RunWith;
  * @author Thomas Eickert (USER)
  */
 @RunWith(JUnitPlatform.class) // requires Junit 4 in the run configuration
-@SelectPackages({ "gde.histo.datasources", "gde.histo.gpslocations", "gde.histo.utils" })
+@SelectPackages({ "gde.histo.config", "gde.histo.datasources", "gde.histo.gpslocations", "gde.histo.guard", "gde.histo.utils" })
 public class HistoSuite {
 }

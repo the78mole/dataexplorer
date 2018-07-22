@@ -36,13 +36,18 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -62,6 +67,7 @@ import gde.utils.FileUtils;
 
 /**
  * Support the roaming data sources.
+ * Is a hybrid singleton supporting cloning.
  * @author Thomas Eickert (USER)
  */
 public abstract class DataAccess {
@@ -70,9 +76,16 @@ public abstract class DataAccess {
 
 	private static final int		MIN_VAULT_LENGTH	= 2048;
 
-	public static class LocalAccess extends DataAccess {
-		private static final String	$CLASS_NAME	= LocalAccess.class.getName();
-		private static final Logger	log					= Logger.getLogger($CLASS_NAME);
+	public final static class LocalAccess extends DataAccess {
+		@SuppressWarnings("hiding")
+		private static final Logger	log					= Logger.getLogger(LocalAccess.class.getName());
+
+		private LocalAccess() {
+		}
+
+		private LocalAccess(LocalAccess that) {
+			// nothing to clone
+		}
 
 		@Override
 		@Nullable
@@ -340,7 +353,7 @@ public abstract class DataAccess {
 		public String resetHistoCache() {
 			Path cachePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
 			int initialSize_KiB = (int) FileUtils.size(cachePath) / 1024;
-			FileUtils.deleteDirectory(cachePath.toString());
+			FileUtils.cleanDirectory(cachePath.toFile());
 			FileUtils.checkDirectoryAndCreate(cachePath.toString());
 			int deletedSize_KiB = (int) FileUtils.size(cachePath) / 1024;
 			FileUtils.extract(this.getClass(), Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, cachePath.toString(), Settings.PERMISSION_555);
@@ -351,19 +364,19 @@ public abstract class DataAccess {
 
 		@Override
 		public boolean existsCacheDirectory(String directoryName) {
-			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH , Settings.HISTO_CACHE_ENTRIES_DIR_NAME , directoryName);
+			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, directoryName);
 			return cacheDirectoryPath.toFile().exists();
 		}
 
 		@Override
 		public InputStream getCacheXsdInputStream() throws FileNotFoundException {
-			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH , Settings.HISTO_CACHE_ENTRIES_DIR_NAME, Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
+			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
 			return new FileInputStream(targetFilePath.toFile());
 		}
 
 		@Override
 		public ZipInputStream getCacheZipInputStream(String directoryName) throws ZipException, IOException {
-			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH , Settings.HISTO_CACHE_ENTRIES_DIR_NAME , directoryName);
+			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, directoryName);
 			return new ZipInputStream(new FileInputStream(cacheDirectoryPath.toFile()));
 		}
 
@@ -374,13 +387,14 @@ public abstract class DataAccess {
 		}
 
 		@Override
-		public void checkMappingFileAndCreate(Class<?>  sourceClass, String fileName) {
+		public void checkMappingFileAndCreate(Class<?> sourceClass, String fileName) {
 			File path = new File(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.MAPPINGS_DIR_NAME);
 			Path targetFilePath = Paths.get(path.toString() + GDE.FILE_SEPARATOR_UNIX + fileName);
 			if (!targetFilePath.toFile().exists()) {
 				if (!path.exists() && !path.isDirectory()) path.mkdir();
-				//extract initial property files
-				FileUtils.extract(sourceClass, fileName, Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" : "resource/de", path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$ //$NON-NLS-2$
+				// extract initial property files
+				FileUtils.extract(sourceClass, fileName, Locale.getDefault().equals(Locale.ENGLISH) ? "resource/en" //$NON-NLS-1$
+						: "resource/de", path.getAbsolutePath(), Settings.PERMISSION_555); //$NON-NLS-1$
 			}
 		}
 
@@ -392,6 +406,59 @@ public abstract class DataAccess {
 			} catch (FileNotFoundException e) {
 				throw new IllegalArgumentException("invalid path " + fittedFilePath);
 			}
+		}
+
+		@Override
+		public boolean deleteFleetObjects() {
+			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+			return FileUtils.cleanDirectory(targetDirPath.toFile());
+		}
+
+		@Override
+		public List<String> getFleetObjectKeys(Function<String, Boolean> objectKeyfilter) {
+			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+			FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
+			List<String> objectKeys;
+			try (Stream<String> stream = Files.list(targetDirPath).map(p -> targetDirPath.relativize(p)).map(Path::toString)) {
+				objectKeys = stream.filter(objectKeyfilter::apply).collect(Collectors.toList());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+			return objectKeys;
+		}
+
+		@Override
+		public FileInputStream getFleetIntputStream(Path fileSubPath) {
+			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+			FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
+			try {
+				return new FileInputStream(targetDirPath.resolve(fileSubPath).toFile());
+			} catch (FileNotFoundException e) {
+				throw new IllegalArgumentException("invalid path " + fileSubPath);
+			}
+		}
+
+		@Override
+		public FileOutputStream getFleetOutputStream(Path fileSubPath) {
+			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+			FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
+			try {
+				Files.createDirectories(targetDirPath);
+				return new FileOutputStream(targetDirPath.resolve(fileSubPath).toFile());
+			} catch (Exception e) {
+				throw new IllegalArgumentException("invalid path " + fileSubPath);
+			}
+		}
+
+		@Override
+		public synchronized LocalAccess clone() {
+			LocalAccess clone = null;
+			try {
+				clone = new LocalAccess(this);
+			} catch (Exception e) {
+				LocalAccess.log.log(Level.SEVERE, e.getMessage(), e);
+			}
+			return clone;
 		}
 
 	}
@@ -524,5 +591,37 @@ public abstract class DataAccess {
 	 * @return the input stream for a logging source file (osd, bin , ...)
 	 */
 	public abstract InputStream getSourceInputStream(Path fittedFilePath);
+
+	/**
+	 * @param fileSubPath is a relative path based on the roaming folder
+	 * @return the stream for a fleet index file after creating required directories
+	 */
+	public abstract FileOutputStream getFleetOutputStream(Path fileSubPath);
+
+	/**
+	 * @param fileSubPath is a relative path based on the roaming folder
+	 * @return the stream for a fleet index file after creating required directories
+	 */
+	public abstract FileInputStream getFleetIntputStream(Path fileSubPath);
+
+	/**
+	 * @return true if all fleet files are deleted
+	 */
+	public abstract boolean deleteFleetObjects();
+
+	/**
+	 * Search the fleet index entries.
+	 * @return the objectKeys corresponding to the objectKeyFilter
+	 */
+	public abstract List<String> getFleetObjectKeys(Function<String, Boolean> objectKeyFilter);
+
+	/**
+	 * Support multiple threads with different instances.
+	 * Use this if settings updates are not required or apply to the current thread only.
+	 * Be aware of the cloning performance impact.
+	 * @return the deep clone instance
+	 */
+	@Override
+	public abstract DataAccess clone();
 
 }

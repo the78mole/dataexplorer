@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -32,6 +31,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Vector;
@@ -65,14 +65,15 @@ import gde.utils.StringHelper;
 
 /**
  * Settings class will read and write/update application settings, like window size and default path ....
+ * Is a hybrid singleton supporting cloning.
  * @author Winfried Brügmann
  */
-public class Settings extends Properties {
+public final class Settings extends Properties {
 	private final static long				serialVersionUID								= 26031957;
 	final static Logger							log															= Logger.getLogger(Settings.class.getName());
 	final static String							$CLASS_NAME											= Settings.class.getName();
 
-	private static Settings					instance												= null;																																														// singelton
+	private static volatile Settings	instance											= null;																																														// singelton
 
 	public static final String			EMPTY														= "---";																																													//$NON-NLS-1$
 	public static final String			EMPTY_SIGNATURE									= Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY + GDE.STRING_SEMICOLON + Settings.EMPTY;
@@ -281,18 +282,21 @@ public class Settings extends Properties {
 	};
 
 	/**
-	 * a singleton needs a static method to get the instance of this calss
-	 * @return DataExplorer instance
+	 * a singleton needs a static method to get the instance of this calss.
+	 * Is synchronized because during startup additional requests for an instance might occur during Settings instantiation (new Settings() ).
+	 * The result would be multiple settings instances and data loss if any instance fields are modified.
+	 * ET 07.2018: Currently startup syncing is mandatory for calls by Analyzer, GDE and Junit.
+	 * @return the instance
 	 */
 	public static Settings getInstance() {
-		final String $METHOD_NAME = "getInstance"; //$NON-NLS-1$
 		if (Settings.instance == null) {
-			try {
-				Settings.instance = new Settings();
-				Settings.log.logp(Level.TIME, Settings.$CLASS_NAME, $METHOD_NAME, "init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			catch (Exception e) {
-				Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+			synchronized (Settings.class) {
+				try {
+					Settings.instance = new Settings();
+					Settings.log.log(Level.TIME, "init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
+				} catch (Exception e) {
+					Settings.log.log(Level.SEVERE, e.getMessage(), e);
+				}
 			}
 		}
 		return Settings.instance;
@@ -430,6 +434,40 @@ public class Settings extends Properties {
 			}
 			FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, Settings.PATH_RESOURCE + lang + GDE.FILE_SEPARATOR_UNIX, path.getAbsolutePath(), Settings.PERMISSION_555);
 		}
+	}
+
+	/**
+	 * Hybrid singleton copy constructor for a deep clone instance.
+	 * Support multiple threads with different Settings instances.
+	 * Use this if settings updates are not required or apply to the current thread only.
+	 * Be aware of the cloning performance impact.
+	 */
+	public Settings(Settings that)  {
+		for (Map.Entry<Object, Object> entry : that.entrySet()) {
+			this.put(entry.getKey(), entry.getValue()); // Strings only - do not require cloning
+		}
+
+		// final fields
+		this.xsdThread = that.xsdThread;
+		this.deviceSerialization = that.deviceSerialization;
+
+		// non-UI instance fields
+		this.migrationThread = that.migrationThread;
+
+		this.isDevicePropertiesUpdated = that.isDevicePropertiesUpdated;
+		this.isGraphicsTemplateUpdated = that.isGraphicsTemplateUpdated;
+		this.isHistocacheTemplateUpdated = that.isHistocacheTemplateUpdated;
+
+		// UI related instance fields
+		this.fileHistory = new ArrayList<>(that.fileHistory);
+
+		this.window = that.window;
+		this.isWindowMaximized = that.isWindowMaximized;
+		this.cbOrder = that.cbOrder;
+		this.cbWraps = that.cbWraps;
+		this.cbSizes = that.cbSizes;
+		this.comparator = that.comparator;
+		this.measurementProperties = (Properties) that.measurementProperties.clone();
 	}
 
 	/**
@@ -2144,18 +2182,12 @@ public class Settings extends Properties {
 		return SWTResourceManager.getColor(r, g, b);
 	}
 
-	/**
-	 * @return true if the xsdThread has not yet finished
-	 */
-	public boolean isXsdThreadPending() {
-		return this.xsdThread == null || this.xsdThread.getState() != State.TERMINATED;
-	}
-
-	/**
-	 * @return true if the xsdThread is alive
-	 */
-	public boolean isXsdThreadAlive() {
-		return this.xsdThread != null ? this.xsdThread.isAlive() : false;
+	public void joinXsdThread() {
+		try {
+			this.xsdThread.join();
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
 	}
 
 	public void startMigationThread() {

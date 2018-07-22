@@ -181,7 +181,6 @@ public class CSVReaderWriter {
 	 */
 	public static RecordSet read(char separator, String filePath, String recordSetNameExtend) throws NotSupportedFileFormatException, MissMatchDeviceException, IOException, DataInconsitsentException,
 			DataTypeException {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 		String line = GDE.STRING_STAR;
 		RecordSet recordSet = null;
 		int progressLineLength = Math.abs(CSVReaderWriter.application.getActiveDevice().getDataBlockSize(InputTypes.FILE_IO));
@@ -197,10 +196,8 @@ public class CSVReaderWriter {
 			activeChannel = activeChannel == null ? CSVReaderWriter.channels.getActiveChannel() : activeChannel;
 
 			if (activeChannel != null) {
-				if (CSVReaderWriter.application.getStatusBar() != null) {
-					CSVReaderWriter.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0134) + filePath);
-					application.setProgress(0, sThreadId);
-				}
+				GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0134) + filePath);
+				GDE.getUiNotification().setProgress(0);
 				int time_ms = 0;
 
 				// check for device name and channel or configuration in first line
@@ -219,7 +216,7 @@ public class CSVReaderWriter {
 					// 						Zeit [s];Spannung [V];Strom [A];Ladung [mAh];Leistung [W];Energie [Wh]
 				}
 
-				if (CSVReaderWriter.application.getStatusBar() != null) {
+				if (GDE.isWithUi()) {
 					CSVReaderWriter.channels.switchChannel(activeChannel.getNumber(), GDE.STRING_EMPTY);
 					CSVReaderWriter.application.getMenuToolBar().updateChannelSelector();
 					activeChannel = CSVReaderWriter.channels.getActiveChannel();
@@ -327,7 +324,7 @@ public class CSVReaderWriter {
 							}
 							catch (NumberFormatException e) {
 								if (!isParsingErrorLine) CSVReaderWriter.log.log(java.util.logging.Level.WARNING, Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] { lineNumber, line }));
-								CSVReaderWriter.application.setStatusMessage(Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] { lineNumber, line }), SWT.COLOR_RED);
+								GDE.getUiNotification().setStatusMessage(Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] { lineNumber, line }), SWT.COLOR_RED);
 								isParsingError = isParsingErrorLine = true;
 							}
 							break;
@@ -340,9 +337,7 @@ public class CSVReaderWriter {
 							}
 							catch (NumberFormatException e) {
 								if (!isParsingErrorLine) CSVReaderWriter.log.log(java.util.logging.Level.WARNING, Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] { lineNumber, line }));
-								if (CSVReaderWriter.application.getStatusBar() != null) {
-									CSVReaderWriter.application.setStatusMessage(Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] { lineNumber, line }), SWT.COLOR_RED);
-								}
+								GDE.getUiNotification().setStatusMessage(Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3200, new Object[] { lineNumber, line }), SWT.COLOR_RED);
 								isParsingError = isParsingErrorLine = true;
 							}
 							break;
@@ -352,8 +347,8 @@ public class CSVReaderWriter {
 
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
 					int progress = (int) (lineNumber*100/(inputFileSize/progressLineLength));
-					if (CSVReaderWriter.application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) 	{
-						CSVReaderWriter.application.setProgress(progress, sThreadId);
+					if (progress <= 90 && progress > GDE.getUiNotification().getProgressPercentage() && progress % 10 == 0) 	{
+						GDE.getUiNotification().setProgress(progress);
 						try {
 							Thread.sleep(2);
 						}
@@ -368,7 +363,7 @@ public class CSVReaderWriter {
 				activeChannel.put(recordSetName, recordSet);
 				activeChannel.setActiveRecordSet(recordSetName);
 				activeChannel.applyTemplate(recordSetName, true);
-				if (CSVReaderWriter.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+				if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
 				//activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 
 				reader.close();
@@ -388,9 +383,9 @@ public class CSVReaderWriter {
 			throw new IOException(Messages.getString(MessageIds.GDE_MSGW0012, new Object[] { filePath }));
 		}
 		finally {
-			if (CSVReaderWriter.application.getStatusBar() != null) {
-				CSVReaderWriter.application.setProgress(100, sThreadId);
-				CSVReaderWriter.application.setStatusMessage(isParsingError ? Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3201) : GDE.STRING_EMPTY, SWT.COLOR_RED);
+			GDE.getUiNotification().setProgress(100);
+			GDE.getUiNotification().setStatusMessage(isParsingError ? Messages.getString(gde.device.isler.MessageIds.GDE_MSGW3201) : GDE.STRING_EMPTY, SWT.COLOR_RED);
+			if (GDE.isWithUi()) {
 				CSVReaderWriter.application.getMenuToolBar().updateChannelSelector();
 				CSVReaderWriter.application.getMenuToolBar().updateRecordSetSelectCombo();
 			}
@@ -405,11 +400,9 @@ public class CSVReaderWriter {
 	 */
 	public static void write(char separator, String recordSetKey, String filePath, boolean isRaw) throws Exception {
 		BufferedWriter writer;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId());
 
 		try {
-			if (CSVReaderWriter.application.getStatusBar() != null)
-				CSVReaderWriter.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] { GDE.FILE_ENDING_CSV, filePath }));
+			GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] { GDE.FILE_ENDING_CSV, filePath }));
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
 			char decimalSeparator = Settings.getInstance().getDecimalSeparator();
 
@@ -448,7 +441,7 @@ public class CSVReaderWriter {
 			long startTime = new Date(recordSet.getTime(0)).getTime();
 			int recordEntries = recordSet.getRecordDataSize(true);
 			int progressCycle = 0;
-			if (CSVReaderWriter.application.getStatusBar() != null) CSVReaderWriter.application.setProgress(progressCycle, sThreadId);
+			GDE.getUiNotification().setProgress(progressCycle);
 			for (int i = 0; i < recordEntries; i++) {
 				CSVReaderWriter.sb = new StringBuffer();
 				String[] row = recordSet.getExportRow(i, true);
@@ -470,7 +463,7 @@ public class CSVReaderWriter {
 				}
 				CSVReaderWriter.sb.deleteCharAt(CSVReaderWriter.sb.length() - 1).append(CSVReaderWriter.lineSep);
 				writer.write(CSVReaderWriter.sb.toString());
-				if (CSVReaderWriter.application.getStatusBar() != null && i % 50 == 0) CSVReaderWriter.application.setProgress(((++progressCycle * 5000) / recordEntries), sThreadId);
+				if (i % 50 == 0) GDE.getUiNotification().setProgress(((++progressCycle * 5000) / recordEntries));
 				if (CSVReaderWriter.log.isLoggable(java.util.logging.Level.FINE)) CSVReaderWriter.log.log(java.util.logging.Level.FINE, "data line = " + CSVReaderWriter.sb.toString()); //$NON-NLS-1$
 			}
 			CSVReaderWriter.sb = null;
@@ -481,7 +474,7 @@ public class CSVReaderWriter {
 			writer.close();
 			writer = null;
 			//recordSet.setSaved(true);
-			if (CSVReaderWriter.application.getStatusBar() != null) CSVReaderWriter.application.setProgress(100, sThreadId);
+			GDE.getUiNotification().setProgress(100);
 		}
 		catch (IOException e) {
 			CSVReaderWriter.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
@@ -492,7 +485,7 @@ public class CSVReaderWriter {
 			throw new Exception(Messages.getString(MessageIds.GDE_MSGE0007) + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 		finally {
-			if (CSVReaderWriter.application.getStatusBar() != null) CSVReaderWriter.application.setStatusMessage(GDE.STRING_EMPTY);
+			GDE.getUiNotification().setStatusMessage(GDE.STRING_EMPTY);
 		}
 
 	}

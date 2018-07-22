@@ -32,7 +32,8 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
 /**
- * Channels class is a map where all possible channels of a device are collected, this is a application singleton
+ * Channels class is a map where all possible channels of a device are collected.
+ * Is a hybrid singleton supporting cloning.
  * @author Winfried Brügmann
  */
 public class Channels extends HashMap<Integer, Channel> {
@@ -45,6 +46,14 @@ public class Channels extends HashMap<Integer, Channel> {
 	int									activeChannelNumber			= 1;																					// default at least one channel must exist
 	String[]						channelNames						= new String[1];
 	final DataExplorer	application;
+
+	/**
+	 *  Threadsafe usage.
+	 *  Be aware of the mandatory setup.
+	 */
+	public static Channels createChannels() {
+		return new Channels(4);
+	}
 
 	/**
 	 *  getInstance returns the instance of this singleton, this may called during creation time of the application
@@ -83,6 +92,20 @@ public class Channels extends HashMap<Integer, Channel> {
 	private Channels(DataExplorer currentApplication, int initialCapacity) {
 		super(initialCapacity);
 		this.application = currentApplication;
+	}
+
+	/**
+	 * Hybrid singleton copy constructor.
+	 * Support multiple threads with different Channels instances.
+	 * Use if channels updates are not required or apply to the current thread only.
+	 * Be aware of the cloning performance impact.
+	 */
+	public Channels(Channels that) {
+		this(4);
+
+		// non-UI fields
+		this.activeChannelNumber = that.activeChannelNumber;
+		this.channelNames = that.channelNames.clone();
 	}
 
 	/**
@@ -300,4 +323,5 @@ public class Channels extends HashMap<Integer, Channel> {
 		}
 		return sb.toString();
 	}
+
 }

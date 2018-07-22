@@ -74,10 +74,12 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 */
 	public static String getVaultsDirectoryName(IDevice device, int channelNumber, String vaultReaderSettings) {
 		final String d = SHA1_DELIMITER;
-		String tmpSubDirectoryLongKey = GDE.VERSION + d + device.getDeviceConfiguration().getFileSha1Hash() + d + channelNumber //
+		String tmpSubDirectoryLongKey = GDE.VERSION_NUMBER + d + device.getDeviceConfiguration().getFileSha1Hash() + d + channelNumber //
 				+ d + settings.getDataFilePath() + d + settings.getSamplingTimespan_ms() + d + settings.getMinmaxQuantileDistance() + d + settings.getAbsoluteTransitionLevel() //
 				+ d + settings.isCanonicalQuantiles() + d + settings.isSymmetricToleranceInterval() + d + settings.getOutlierToleranceSpread() //
 				+ d + vaultReaderSettings;
+		if (device.getName().equals("HoTTAdapter"))
+		log.fine(() -> device.getName() + " " + SecureHash.sha1(tmpSubDirectoryLongKey) + " " + tmpSubDirectoryLongKey);
 		return SecureHash.sha1(tmpSubDirectoryLongKey);
 	}
 
@@ -118,6 +120,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @return the extended vault created form the parameters
 	 */
 	public static ExtendedVault createExtendedVault(HistoVault histoVault, VaultCollector truss) {
+		// todo check if the additional field loadLinkPath is required for file copies in multiple directories
 		return new ExtendedVault(histoVault, truss.getVault().loadLinkPath, truss.getVault().loadFilePath, truss.getVault().loadObjectDirectory);
 	}
 
@@ -136,27 +139,29 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @param logRecordSetSize is the number of recordsets in the log origin file
 	 * @param logRecordSetOrdinal identifies multiple recordsets in one single file (0-based)
 	 * @param logRecordSetBaseName the base name without recordset number
-	 * @param logStartTimestamp_ms of the log or recordset
 	 * @param logDeviceName
+	 * @param vaultDeviceKey identifies the device used for creating the vault
+	 * @param logStartTimestamp_ms of the log or recordset
 	 * @param logChannelNumber may differ from UI settings in case of channel mix
 	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
 	 * @param vaultReaderSettings a non-empty string indicates that the file reader measurement values depend on device settings
 	 */
 	public ExtendedVault(String objectDirectory, Path filePath, long fileLastModified_ms, long fileLength, int fileVersion, int logRecordSetSize,
-			int logRecordSetOrdinal, String logRecordSetBaseName, String logDeviceName, long logStartTimestamp_ms, int logChannelNumber,
-			String logObjectKey, String vaultReaderSettings) {
+			int logRecordSetOrdinal, String logRecordSetBaseName, String logDeviceName, String vaultDeviceKey, long logStartTimestamp_ms,
+			int logChannelNumber, String logObjectKey, String vaultReaderSettings) {
 		this.loadFilePath = filePath;
 		this.loadObjectDirectory = objectDirectory;
 		this.loadLinkPath = Paths.get("");
 
-		this.vaultDataExplorerVersion = GDE.VERSION;
+		this.vaultDataExplorerVersion = "" + GDE.VERSION_NUMBER;
 		this.vaultDeviceName = Analyzer.getInstance().getActiveDevice().getName();
+		this.vaultDeviceKey = vaultDeviceKey;
 		this.vaultChannelNumber = Analyzer.getInstance().getActiveChannel().getNumber();
 		this.vaultObjectKey = Settings.getInstance().getActiveObjectKey();
 		this.vaultSamplingTimespanMs = settings.getSamplingTimespan_ms();
 
 		this.logLinkPath = GDE.STRING_EMPTY;
-		this.logFilePath = filePath.toString(); // toString in order to avoid 'Object' during marshalling
+		this.logFilePath = filePath.toString().replace(GDE.FILE_SEPARATOR, GDE.FILE_SEPARATOR_UNIX); // toString to avoid 'Object' during marshalling
 		this.logFileLastModified = fileLastModified_ms;
 		this.logFileLength = fileLength;
 		this.logFileVersion = fileVersion;
@@ -248,6 +253,10 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 			extension = this.loadFilePath.toString().substring(i + 1);
 		}
 		return extension;
+	}
+
+	public String getLoadFileName() {
+		return this.loadFilePath.getFileName().toString();
 	}
 
 	public Path getLoadFileAsPath() {

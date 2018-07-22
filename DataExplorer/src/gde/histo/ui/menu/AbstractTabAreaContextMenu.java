@@ -41,8 +41,8 @@ import gde.config.Settings;
 import gde.histo.datasources.AbstractSourceDataSet;
 import gde.histo.datasources.AbstractSourceDataSet.SourceDataSet;
 import gde.histo.datasources.SourceFolders.DirectoryType;
-import gde.histo.exclusions.ExclusionActivity;
 import gde.histo.recordings.TrailRecordSet;
+import gde.histo.ui.ExclusionActivity;
 import gde.histo.ui.HistoExplorer;
 import gde.histo.utils.PathUtils;
 import gde.log.Level;
@@ -216,7 +216,7 @@ public abstract class AbstractTabAreaContextMenu {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "openRecordSetItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-					SourceDataSet sourceDataSet = AbstractSourceDataSet.createSourceDataSet(Paths.get((String) popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString())), Analyzer.getInstance().getActiveDevice());
+					SourceDataSet sourceDataSet = AbstractSourceDataSet.createSourceDataSet(Paths.get((String) popupMenu.getData(TabMenuOnDemand.DATA_FILE_PATH.toString())), Analyzer.getInstance());
 					String recordSetName = popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString().split(Pattern.quote(TrailRecordSet.BASE_NAME_SEPARATOR))[0];
 					if (sourceDataSet != null && sourceDataSet.load(recordSetName)) {
 						application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL));

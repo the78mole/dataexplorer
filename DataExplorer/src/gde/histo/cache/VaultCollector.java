@@ -74,12 +74,14 @@ public final class VaultCollector {
 	 * @param fileVersion is the version of the log origin file
 	 * @param logRecordSetSize is the number of recordsets in the log origin file
 	 * @param logRecordsetBaseName the base name without recordset number
+	 * @param device
 	 * @param providesReaderSettings true is a file reader capable to deliver different measurement values based on device settings
 	 */
 	public VaultCollector(String objectDirectory, Path sourcePath, int fileVersion, int logRecordSetSize, String logRecordsetBaseName, //
-			boolean providesReaderSettings) {
-		this(objectDirectory, sourcePath, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, "native", sourcePath.toFile().lastModified(),
-				Analyzer.getInstance().getActiveChannel().getNumber(), objectDirectory, providesReaderSettings);
+			IDevice device, boolean providesReaderSettings) {
+		this(objectDirectory, sourcePath, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, device.getName(),
+				device.getDeviceConfiguration().getFileSha1Hash(), sourcePath.toFile().lastModified(), Analyzer.getInstance().getActiveChannel().getNumber(),
+				objectDirectory, providesReaderSettings);
 	}
 
 	/**
@@ -89,21 +91,27 @@ public final class VaultCollector {
 	 * @param logRecordSetSize is the number of recordsets in the log origin file
 	 * @param logRecordSetOrdinal identifies multiple recordsets in one single file (0-based)
 	 * @param logRecordsetBaseName the base name without recordset number
-	 * @param logStartTimestamp_ms of the log or recordset
 	 * @param logDeviceName
+	 * @param logStartTimestamp_ms of the log or recordset
 	 * @param logChannelNumber may differ from UI settings in case of channel mix
 	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
-	 * @param providesReaderSettings true is a file reader capable to deliver different measurement values based on device settings
 	 */
 	public VaultCollector(String objectDirectory, Path sourcePath, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal,
-			String logRecordsetBaseName, String logDeviceName, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey, //
+			String logRecordsetBaseName, String logDeviceName, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
+		this(objectDirectory, sourcePath, fileVersion, logRecordSetSize, logRecordSetOrdinal, logRecordsetBaseName, //
+				logDeviceName, Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getFileSha1Hash(), //
+				logStartTimestamp_ms, logChannelNumber, objectDirectory, false);
+	}
+
+	private VaultCollector(String objectDirectory, Path sourcePath, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal,
+			String logRecordsetBaseName, String logDeviceName, String deviceKey, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey, //
 			boolean providesReaderSettings) {
 		String readerSettings = providesReaderSettings && Analyzer.getInstance().getActiveDevice() instanceof IHistoDevice
 				? ((IHistoDevice) Analyzer.getInstance().getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
 		File file = sourcePath.toFile();
 		this.vault = new ExtendedVault(objectDirectory, sourcePath, file.lastModified(), file.length(), fileVersion, logRecordSetSize,
-				logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, logStartTimestamp_ms, logChannelNumber, logObjectKey, //
-				readerSettings);
+				logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, deviceKey, //
+				logStartTimestamp_ms, logChannelNumber, logObjectKey, readerSettings);
 	}
 
 	@Override
@@ -303,8 +311,23 @@ public final class VaultCollector {
 							// multiply by 1000 -> all ratios are internally stored multiplied by thousand
 							entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
 						}
+//=======
+//			Integer ratioRefOrdinal = measurementStatistics.getRatioRefOrdinal();
+//			if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && ratioRefOrdinal != null) {
+//				Record referencedRecord = recordSet.get(ratioRefOrdinal.intValue());
+//				StatisticsType referencedStatistics = device.getMeasurementStatistic(this.vault.getLogChannelNumber(), ratioRefOrdinal);
+//				if (referencedRecord != null) {
+//					if (referencedStatistics.isAvg() && summarizedValue > 0.) {
+//						double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(refOrdinal) / 1000.) / summarizedValue;
+//						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
+//						entryPoints.addPoint(TrailTypes.REAL_AVG_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
+//					} else if (referencedStatistics.isMax() && summarizedValue > 0.) {
+//						double ratio = (device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(refOrdinal) / 1000.) - device.translateValue(referencedRecord, referencedRecord.getMinValueTriggered(refOrdinal) / 1000.)) / summarizedValue;
+//						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
+//						entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
+//>>>>>>> 5a57072 Fix vault device key
 					}
-				} 
+				}
 			}
 		}
 

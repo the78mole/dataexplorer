@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.jeti;
@@ -32,8 +32,6 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import cz.vutbr.fit.gja.proj.utils.TelemetryData;
-import cz.vutbr.fit.gja.proj.utils.TelemetryData.TelemetrySensor;
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -50,6 +48,9 @@ import gde.io.CSVSerialDataReaderWriter;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+
+import cz.vutbr.fit.gja.proj.utils.TelemetryData;
+import cz.vutbr.fit.gja.proj.utils.TelemetryData.TelemetrySensor;
 
 /**
  * Class to read Jeti sensor data using the TelemetryData class provided by Martin Falticko
@@ -73,11 +74,11 @@ public class JetiDataReader {
 	 * @param channelConfigNumber
 	 * @param isRaw
 	 * @return record set created
-	 * @throws NotSupportedFileFormatException 
-	 * @throws MissMatchDeviceException 
-	 * @throws IOException 
-	 * @throws DataInconsitsentException 
-	 * @throws DataTypeException 
+	 * @throws NotSupportedFileFormatException
+	 * @throws MissMatchDeviceException
+	 * @throws IOException
+	 * @throws DataInconsitsentException
+	 * @throws DataTypeException
 	 */
 	public static RecordSet read(String filePath, JetiAdapter device, String recordNameExtend, Integer channelConfigNumber, boolean isRaw) throws NotSupportedFileFormatException, IOException,
 			DataInconsitsentException, DataTypeException {
@@ -98,13 +99,11 @@ public class JetiDataReader {
 				activeChannel = JetiDataReader.channels.get(channelConfigNumber);
 
 			if (activeChannel != null) {
-				if (JetiDataReader.application.getStatusBar() != null) {
-					JetiDataReader.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
-					JetiDataReader.application.setProgress(0, sThreadId);
-				}
+				GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0594) + filePath);
+				GDE.getUiNotification().setProgress(0);
 				activeChannelConfigNumber = activeChannel.getNumber();
 
-				if (JetiDataReader.application.getStatusBar() != null) {
+				if (GDE.isWithUi()) {
 					JetiDataReader.channels.switchChannel(activeChannel.getNumber(), GDE.STRING_EMPTY);
 					JetiDataReader.application.getMenuToolBar().updateChannelSelector();
 					activeChannel = JetiDataReader.channels.getActiveChannel();
@@ -114,7 +113,7 @@ public class JetiDataReader {
 				//now get all data   $1;1;0; 14780;  598;  1000;  8838;  0002
 				//$recordSetNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
-				int dataBlockSize = device.getDataBlockSize(InputTypes.FILE_IO); // measurements size must not match data block size, there are some measurements which are result of calculation			
+				int dataBlockSize = device.getDataBlockSize(InputTypes.FILE_IO); // measurements size must not match data block size, there are some measurements which are result of calculation
 				JetiDataReader.log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize < Math.abs(dataBlockSize)) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] { filePath }));
 
@@ -171,7 +170,7 @@ public class JetiDataReader {
 					int index = 0;
 					Vector<String> vecRecordNames = new Vector<String>();
 					Map<Integer, Record.DataType> mapRecordType = new HashMap<Integer, Record.DataType>();
-					//add record exclude Tx 
+					//add record exclude Tx
 					for (TelemetrySensor telemetrySensor : recordSetData) {
 						if (telemetrySensor.getId() != 0) {
 							boolean isActualgps = false;
@@ -213,7 +212,7 @@ public class JetiDataReader {
 							}
 						}
 					}
-					//append Tx, alarms and events 
+					//append Tx, alarms and events
 					for (TelemetrySensor telemetrySensor : recordSetData) {
 						if (telemetrySensor.getId() == 0) {
 							for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
@@ -286,11 +285,9 @@ public class JetiDataReader {
 						index = 0;
 						//System.out.println();
 					}
-					if (JetiDataReader.application.getStatusBar() != null) {
-						JetiDataReader.application.setProgress(100, sThreadId);
+					GDE.getUiNotification().setProgress(100);
 						//if (application.getStatusBar().getMessage().length > 0)
 						//	isAlarmMEssageDisplayed = true;
-					}
 
 					activeChannel.setActiveRecordSet(recordSetName);
 					activeChannel.applyTemplate(recordSetName, true);
@@ -306,14 +303,14 @@ public class JetiDataReader {
 						activeChannel.get(recordSetName).setRecordSetDescription(
 								device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
 					}
-					//write filename after import to record description			
+					//write filename after import to record description
 					activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1));
-					activeChannel.get(recordSetName).setRecordSetDescription(Messages.getString(gde.device.jeti.MessageIds.GDE_MSGT2914, 
-							new String[]{activeChannel.get(recordSetName).getRecordSetDescription(), data.getModelName(), 
+					activeChannel.get(recordSetName).setRecordSetDescription(Messages.getString(gde.device.jeti.MessageIds.GDE_MSGT2914,
+							new String[]{activeChannel.get(recordSetName).getRecordSetDescription(), data.getModelName(),
 							String.format(Locale.getDefault(), "min=%.3f sec; max=%.3f sec; avg=%.3f sec; sigma=%.3f sec", data.getMinTimeStep()/1000.0, data.getMaxTimeStep()/1000.0, data.getAvgTimeStep()/1000.0, data.getSigmaTimeStep()/1000.0)}));
 					activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 					activeChannel.get(recordSetName).updateVisibleAndDisplayableRecordsForTable();
-					if (JetiDataReader.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+					if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
 				}
 			}
 		}
@@ -324,7 +321,7 @@ public class JetiDataReader {
 				activeChannel.setActiveRecordSet(recordSetName);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
-				if (JetiDataReader.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+				if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
 			}
 			// now display the error message
 			String msg = filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGE0045, new Object[] { e.getMessage(), lineNumber });

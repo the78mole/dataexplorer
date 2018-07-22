@@ -20,21 +20,25 @@
 package gde.histo.base;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-
 import gde.Analyzer;
 import gde.GDE;
 import gde.TestAnalyzer;
 import gde.config.Settings;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
 import gde.log.LogFormatter;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
 import junit.framework.TestCase;
@@ -43,13 +47,10 @@ import junit.framework.TestCase;
  * Provide the DataExplorer settings without integrated UI.
  * @author Thomas Eickert (USER)
  */
-public class HistoTestCase extends TestCase {
-	protected Logger rootLogger;
+public class NonUiTestCase extends TestCase {
+	protected Logger									rootLogger;
 
-	static {
-		GDE.display = Display.getDefault();
-		GDE.shell = new Shell(GDE.display);
-	}
+	protected HashMap<String, String>	legacyDeviceNames	= new HashMap<String, String>(2);
 
 	protected enum DataSource {
 		SETTINGS {
@@ -84,15 +85,14 @@ public class HistoTestCase extends TestCase {
 		public abstract Path getDataPath(String string);
 	}
 
-	protected final TestAnalyzer	analyzer		= (TestAnalyzer) Analyzer.getInstance();
-	protected final DataExplorer	application	= DataExplorer.getInstance();																					// todo delete because it should
-																																																									// hold only UI related objects
-	protected final Settings			settings		= Settings.getInstance();
-	protected final String				tmpDir			= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR)		//
+	protected final TestAnalyzer	analyzer	= (TestAnalyzer) Analyzer.getInstance();
+
+	protected final Settings			settings	= Settings.getInstance();
+	protected final String				tmpDir		= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR)		//
 			? System.getProperty("java.io.tmpdir") : System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;
 
-	Handler												ch					= new ConsoleHandler();
-	LogFormatter									lf					= new LogFormatter();
+	Handler												ch				= new ConsoleHandler();
+	LogFormatter									lf				= new LogFormatter();
 
 	@Override
 	protected void setUp() throws Exception {
@@ -111,11 +111,29 @@ public class HistoTestCase extends TestCase {
 
 		Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
 
+		this.initialize();
+
+		// add this two renamed device plug-ins to the list of legacy devices
+		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
+		this.legacyDeviceNames.put("QuadroControl", "QC-Copter");
+		this.legacyDeviceNames.put("PichlerP60", "PichlerP60 50W");
+	}
+
+	/**
+	 * Goes through the existing device properties files and set active flagged devices into active devices list.
+	 */
+	public void initialize() throws FileNotFoundException {
 		this.settings.setDataFilePath(DataSource.TESTDATA.getDataPath("_ET_Exzerpt").toString());
 
 		// set histo settings now because SearchImportPath might influence the object list
-		this.application.setHisto(true); // todo should be required only in the SuperTestCase
+		DataExplorer.getInstance().setHisto(true);
 		setHistoSettings();
+
+		String deviceoriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
+		this.settings.setObjectList(settings.getObjectList(), Arrays.asList(settings.getObjectList()).indexOf(deviceoriented));
+
+		this.settings.setPartialDataTable(false);
+		this.settings.setTimeFormat("relativ");
 	}
 
 	/**
@@ -123,21 +141,15 @@ public class HistoTestCase extends TestCase {
 	 */
 	protected void setHistoSettings() {
 		// wait until schema is setup
-		while (this.settings.isXsdThreadPending()) {
-			try {
-				Thread.sleep(5);
-			} catch (InterruptedException e) {
-				// ignore
-			}
-		}
+		this.settings.joinXsdThread();
 
 		// the next lines only hold settings which do not control the GUI appearance
 		this.settings.setSearchDataPathImports(true);
 		this.settings.setChannelMix(false);
 		this.settings.setSamplingTimespan_ms("2"); // this index corresponds to 1 sec
 		this.settings.setIgnoreLogObjectKey(true);
-		this.settings.setRetrospectMonths("120"); // this is the current maximum value
-		this.settings.setZippedCache(true);
+		this.settings.setRetrospectMonths("240"); // this is the current maximum value
+		this.settings.setZippedCache(false);
 		this.settings.setAbsoluteTransitionLevel("999"); // results in default value
 		this.settings.setAbsoluteTransitionLevel("999"); // results in default value
 		this.settings.setSuppressMode(false);
@@ -159,4 +171,43 @@ public class HistoTestCase extends TestCase {
 		return GDE.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 	}
 
+	/**
+	 * Emulate user GUI settings required for history tabs.
+	 * @param fileDeviceName
+	 * @param activeChannelNumber
+	 * @param activeObjectKey is an object key which exists in the settings or an empty string for deviceoriented
+	 */
+	protected void setDeviceChannelObject(String fileDeviceName, int activeChannelNumber, String activeObjectKey) {
+		// device : from setDevice
+		if (this.legacyDeviceNames.get(fileDeviceName) != null) fileDeviceName = this.legacyDeviceNames.get(fileDeviceName);
+		if (fileDeviceName.toLowerCase().contains("charger308duo") || fileDeviceName.toLowerCase().contains("charger308duo")) {
+			System.out.println("skip fileDeviceName=" + fileDeviceName);
+		}
+		DeviceConfiguration deviceConfig = analyzer.getDeviceConfigurations().get(fileDeviceName);
+		if (deviceConfig == null) new UnsupportedOperationException("deviceConfig == null");
+
+		IDevice device = null;
+		try {
+			device = deviceConfig.getAsDevice();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		this.analyzer.setEnvironmentWoutUI(settings, device, activeChannelNumber);
+
+		// object : in Settings only - not in channel because not used in histo
+		this.settings.setActiveObjectKey(activeObjectKey);
+	}
+
+	/**
+	 * Emulate user GUI settings required for history tabs.
+	 * @param device
+	 * @param activeChannelNumber
+	 * @param activeObjectKey is an object key which exists in the settings or an empty string for deviceoriented
+	 */
+	protected void setDeviceChannelObject(IDevice device, int activeChannelNumber, String activeObjectKey) {
+		this.analyzer.setEnvironmentWoutUI(settings, device, activeChannelNumber);
+
+		// object : in Settings only - not in channel because not used in histo
+		this.settings.setActiveObjectKey(activeObjectKey);
+	}
 }

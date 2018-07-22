@@ -1697,7 +1697,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			sb.append(String.format("recordSet.getNoneCalculationMeasurementNames.length = %d\n", this.getNoneCalculationMeasurementNames(recordSet.getChannelConfigNumber(), recordSet.getRecordNames()).length));
 			sb.append(String.format("recordSet.getRecordNames.length = %d\n", recordSet.getRecordNames().length));
 			log.log(Level.SEVERE, sb.toString());
-			if (this.application.getStatusBar() != null) this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE2402));
+			if (GDE.isWithUi()) this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE2402));
 		}
 		return recordKeys;
 	}

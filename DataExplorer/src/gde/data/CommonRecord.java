@@ -20,7 +20,6 @@
 package gde.data;
 
 import gde.GDE;
-import gde.config.Settings;
 import gde.data.AbstractRecordSet.SyncedRecords;
 import gde.data.Record.DataType;
 import gde.device.IDevice;
@@ -36,8 +35,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	private static final String	$CLASS_NAME				= CommonRecord.class.getName();
 	private static final long		serialVersionUID	= 26031957;
 	private static final Logger	log								= Logger.getLogger($CLASS_NAME);
-
-	protected final Settings		settings					= Settings.getInstance();
 
 	/**
 	 * for each measurement point in compare set, where time step of measurement points might be individual

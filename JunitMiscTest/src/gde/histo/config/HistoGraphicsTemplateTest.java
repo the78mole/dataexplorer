@@ -30,10 +30,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import gde.GDE;
 import gde.config.Settings;
-import gde.histo.base.HistoTestCase;
+import gde.histo.base.NonUiTestCase;
 import gde.utils.FileUtils;
 
-class HistoGraphicsTemplateTest extends HistoTestCase {
+class HistoGraphicsTemplateTest extends NonUiTestCase {
 	private final static String	$CLASS_NAME	= HistoGraphicsTemplateTest.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 

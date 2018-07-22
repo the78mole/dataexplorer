@@ -442,7 +442,7 @@ public class UltraDuoPlus80 extends Ultramat {
 			type = processingType != null && processingType.length() > 0 ? this.CURRENT_MODE[Integer.parseInt(processingType, 16)] : GDE.STRING_EMPTY;
 			break;
 		case 6: //error
-			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGE2218) + String.format("%02d", Integer.parseInt(processingType, 16)), SWT.COLOR_RED); //$NON-NLS-1$
+			GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGE2218) + String.format("%02d", Integer.parseInt(processingType, 16)), SWT.COLOR_RED); //$NON-NLS-1$
 			break;
 		}
 		if (log.isLoggable(Level.FINE)) {

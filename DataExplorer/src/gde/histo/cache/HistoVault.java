@@ -432,13 +432,12 @@ public class HistoVault {
 
     /**
 	 * Gets the value of the logFilePath property.
-	 *
+	 * Check out the LoadFilePath property of the ExtendedVault supporting multiple copies of the file.
 	 * @return
 	 *     possible object is
 	 *     {@link String }
 	 *
 	 */
-    @Deprecated // replaced by loadFilePath -> remains in the vault for information purposes only
 	public String getLogFilePath() {
 		return logFilePath;
 	}
@@ -451,7 +450,6 @@ public class HistoVault {
 	 *     {@link String }
 	 *
 	 */
-    @Deprecated // replaced by loadFilePath
   public void setLogFilePath(String value) {
 		this.logFilePath = value;
 	}
@@ -942,6 +940,16 @@ public class HistoVault {
 		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(d);
 		sb.append("vaultDirectory=").append(this.vaultDirectory);
 		return sb.toString();
+	}
+
+	public String toIndexEntry() {
+		final String d = GDE.STRING_CSV_SEPARATOR;
+		String readerSettings = vaultReaderSettings.replace(GDE.STRING_CSV_SEPARATOR, GDE.STRING_UNDER_BAR);
+		String attributes = vaultName + d + vaultDirectory + d + readerSettings + d + vaultCreatedMs //
+				+ d + vaultDataExplorerVersion + d + vaultDeviceKey + d + vaultDeviceName + d + vaultChannelNumber + d + vaultSamplingTimespanMs //
+				+ d + logFileLastModified + d + logFileLength + d + logRecordSetOrdinal + d + logRecordsetBaseName //
+				+ d + logChannelNumber + d + logStartTimestampMs + d + logFilePath;
+		return attributes;
 	}
 
 	/**
