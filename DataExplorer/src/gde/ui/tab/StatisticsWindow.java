@@ -384,7 +384,8 @@ public class StatisticsWindow extends CTabItem {
 											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 										}
 										else if (referencedStatistics.isMax() && summarizedValue != 0.0) {
-											double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0) / summarizedValue;
+											double ratio = (device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0) 
+													- device.translateValue(referencedRecord, referencedRecord.getMinValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0)) / summarizedValue;
 											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
 											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 										}

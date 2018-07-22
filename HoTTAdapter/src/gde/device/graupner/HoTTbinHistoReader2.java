@@ -555,6 +555,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 
 		// read all the data blocks from the file, parse only for the active channel
 		setTimeMarks(TimeMark.INITIATED);
+		tmpRecordSet.cleanup();
 		boolean doFullRead = initializeBlocks <= 0;
 		int initializeBlockLimit = initializeBlocks > 0 ? initializeBlocks : Integer.MAX_VALUE;
 		long fileLength = HoTTbinHistoReader2.filePath.toFile().length();
@@ -698,9 +699,11 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 					if (isReceiverData && (logCountVario > 0 || logCountGPS > 0 || logCountGAM > 0 || logCountEAM > 0 || logCountESC > 0)) {
 						setTimeMarks(TimeMark.READ);
 						boolean isValidSample = histoRandomSample.isValidSample(HoTTbinHistoReader2.points, HoTTbinHistoReader.timeStep_ms);
+						//System.out.println("orig: " + HoTTbinHistoReader2.points[74] + " - " + HoTTbinHistoReader.timeStep_ms);
 						setTimeMarks(TimeMark.REVIEWED);
 						if (isValidSample && doFullRead) {
 							tmpRecordSet.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
+							//System.out.println("samp: " + histoRandomSample.getSamplePoints()[74] + " - " + histoRandomSample.getSampleTimeStep_ms());
 							setTimeMarks(TimeMark.ADDED);
 							setTimeMarks(TimeMark.PICKED);
 						}
@@ -763,6 +766,12 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 				HoTTbinReader.isTextModusSignaled = true;
 			}
 		}
+
+		System.out.println(tmpRecordSet.getName() + " - " + System.identityHashCode(tmpRecordSet));
+		for (int i = 0; i < tmpRecordSet.get(74).realSize(); i++) {
+			System.out.println("finish loop: " + i + " - " + tmpRecordSet.get(74).get(i));
+		}
+
 		if (doFullRead) {
 			final Integer[] scores = new Integer[ScoreLabelTypes.VALUES.length];
 			// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
@@ -795,11 +804,13 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 			device.updateVisibilityStatus(tmpRecordSet, true);
 			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", tmpRecordSet.getChannelConfigName(), fileLength //$NON-NLS-1$
 					/ HoTTbinHistoReader2.dataBlockSize, histoRandomSample.getReadingCount(), tmpRecordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
+			
 			HoTTbinHistoReader2.setTimeMarks(TimeMark.FINISHED);
 			if (log.isLoggable(Level.TIME)) log.log(Level.TIME,
 					String.format("initiateTime: %,7d  readTime: %,7d  reviewTime: %,7d  addTime: %,7d  pickTime: %,7d  finishTime: %,7d", TimeUnit.NANOSECONDS.toMillis(initiateTime), //$NON-NLS-1$
 							TimeUnit.NANOSECONDS.toMillis(readTime), TimeUnit.NANOSECONDS.toMillis(reviewTime), TimeUnit.NANOSECONDS.toMillis(addTime), TimeUnit.NANOSECONDS.toMillis(pickTime),
 							TimeUnit.NANOSECONDS.toMillis(finishTime)));
+			
 			if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
 						String.format("lost:%,9d perMille:%,4d total:%,9d   lostMax_ms:%,4d lostAvg_ms=%,4d", countPackageLoss, //$NON-NLS-1$
@@ -807,6 +818,10 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 								fileLength / HoTTbinHistoReader2.dataBlockSize, HoTTbinReader.lostPackages.getMaxValue() * 10, (int) HoTTbinReader.lostPackages.getAvgValue() * 10));
 			}
 
+			for (int i = 0; i < tmpRecordSet.get(74).realSize(); i++) {
+				System.out.println("pre promote: " + i + " - " + tmpRecordSet.get(74).get(i));
+			}
+			
 			truss.promoteTruss(tmpRecordSet, scores);
 			// reduce memory consumption in advance to the garbage collection
 			tmpRecordSet.cleanup();

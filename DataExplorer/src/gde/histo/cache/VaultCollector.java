@@ -279,13 +279,14 @@ public final class VaultCollector {
 
 		Integer refOrdinal = measurementStatistics.getSumByTriggerRefOrdinal();
 		if (refOrdinal != null) {
-			double summarizedValue = device.translateDeltaValue(record, record.getSumTriggeredRange(refOrdinal) / 1000.);
+			int referencedSumTriggeredRange = record.getSumTriggeredRange(refOrdinal);
+			double summarizedValue = device.translateDeltaValue(record, referencedSumTriggeredRange / 1000.);
 			if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1 && summarizedValue > 0.) {
 				// Warning: Sum values do not sum correctly in case of offset != 0. Reason is summing up the offset multiple times.
 				if (isTriggerLevel) {
 					entryPoints.addPoint(TrailTypes.REAL_SUM_TRIGGERED, transmuteDelta(record, record.getSumTriggeredRange()));
 				} else {
-					entryPoints.addPoint(TrailTypes.REAL_SUM_TRIGGERED, transmuteDelta(record, record.getSumTriggeredRange(refOrdinal)));
+					entryPoints.addPoint(TrailTypes.REAL_SUM_TRIGGERED, transmuteDelta(record, referencedSumTriggeredRange));
 				}
 			}
 
@@ -299,7 +300,8 @@ public final class VaultCollector {
 						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
 						entryPoints.addPoint(TrailTypes.REAL_AVG_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
 					} else if (referencedStatistics.isMax() && summarizedValue > 0.) {
-						double ratio = device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(refOrdinal) / 1000.) / summarizedValue;
+						double ratio = (device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(refOrdinal) / 1000.) 
+								- device.translateValue(referencedRecord, referencedRecord.getMinValueTriggered(refOrdinal) / 1000.)) / summarizedValue;
 						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
 						entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
 					}

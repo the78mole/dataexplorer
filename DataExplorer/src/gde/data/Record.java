@@ -979,31 +979,34 @@ public class Record extends AbstractRecord {
 						}
 					}
 				}
-			}
-			if (log.isLoggable(Level.FINE)) {
+				if (log.isLoggable(Level.FINE)) {
+					if (this.triggerRanges != null) {
+						for (TriggerRange range : this.triggerRanges) {
+							log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.in)) + "), " + range.out + "(" //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
+									+ TimeLine.getFomatedTime(this.getTime_ms(range.out)) + ")"); //$NON-NLS-1$
+						}
+					} else
+						log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
+				}
+
 				if (this.triggerRanges != null) {
-					for (TriggerRange range : this.triggerRanges) {
-						log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.in)) + "), " + range.out + "(" //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
-								+ TimeLine.getFomatedTime(this.getTime_ms(range.out)) + ")"); //$NON-NLS-1$
+					// evaluate trigger ranges to meet minTimeSec requirement
+					for (TriggerRange range : (Vector<TriggerRange>) this.triggerRanges.clone()) {
+						if ((this.getTime_ms(range.out) - this.getTime_ms(range.in)) < this.getMinTriggerTimeSec() * 1000) this.triggerRanges.remove(range);
 					}
-				} else
-					log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
-			}
-			if (this.triggerRanges != null) {
-				// evaluate trigger ranges to meet minTimeSec requirement
-				for (TriggerRange range : (Vector<TriggerRange>) this.triggerRanges.clone()) {
-					if ((this.getTime_ms(range.out) - this.getTime_ms(range.in)) < this.getMinTriggerTimeSec() * 1000) this.triggerRanges.remove(range);
+					if (log.isLoggable(Level.FINE)) {
+						if (this.triggerRanges != null) {
+							log.log(Level.FINE, "evaluate trigger ranges to meet minTimeSec requirement");
+							for (TriggerRange range : this.triggerRanges) {
+								log.log(Level.FINE, this.name + " trigger range = " + range.in + " to " + range.out + " = " //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
+										+ TimeLine.getFomatedTime( this.getTime_ms(range.out) - this.getTime_ms(range.in) ) + " sec"); //$NON-NLS-1$
+							}
+						} else
+							log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
+					}
 				}
 			}
-			if (log.isLoggable(Level.FINE)) {
-				if (this.triggerRanges != null) {
-					for (TriggerRange range : this.triggerRanges) {
-						log.log(Level.FINE, this.name + " trigger range = " + range.in + "(" + TimeLine.getFomatedTime(this.getTime_ms(range.out)) + "), " + range.out + "(" //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
-								+ TimeLine.getFomatedTime(this.getTime_ms(range.in)) + ")"); //$NON-NLS-1$
-					}
-				} else
-					log.log(Level.FINE, this.name + " triggerRanges = null"); //$NON-NLS-1$
-			}
+
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, this.name + " minTriggered = " + this.minValueTriggered + " maxTriggered = " + this.maxValueTriggered); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
@@ -2278,15 +2281,16 @@ public class Record extends AbstractRecord {
 			StringBuilder sb = new StringBuilder();
 			if (this.triggerRanges != null) {
 				for (TriggerRange range : this.triggerRanges) {
+					long startValue = this.get(range.in);
 					for (int i = range.in; i < range.out; i++) {
-						sum += this.get(i);
+						sum += this.get(i) - startValue;
 						if (log.isLoggable(Level.FINER)) sb.append(this.realGet(i) / 1000.0).append(", "); //$NON-NLS-1$
 						numPoints++;
 					}
 					if (log.isLoggable(Level.FINER)) sb.append("\n"); //$NON-NLS-1$
 				}
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, sb.toString());
-				this.avgValueTriggered = numPoints > 0 ? Long.valueOf(sum / numPoints).intValue() : 0;
+				this.avgValueTriggered = numPoints > 1 ? Long.valueOf(sum / (numPoints - 1)).intValue() : 0;
 			}
 		}
 	}

@@ -10,7 +10,8 @@ Generic changes/fixes
 	* Ask user for confirmation prior to purging an object key
 	* fix channel object key handling, channels of type outlet (chargers) might have different object key, update object selector accordingly
 Device specific changes/fixes
-	* HoTTAdapter* add file selection hint for *.bin;*.log 
+	* HoTTAdapter* - add file selection hint for *.bin;*.log 
+	* HoTTAdapter2 - fix statistics calculation while capacity doesn't start at zero 
 	* S32 - fix factor to correct external temperatures
 	* S32_2 - initial release for S32 as version 2 displaying all measurement values on a single time line
 	* S32 - fix measurement synchronization references (need device XML replacement)
