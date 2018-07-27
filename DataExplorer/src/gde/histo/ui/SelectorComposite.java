@@ -235,20 +235,22 @@ public final class SelectorComposite extends Composite {
 						final TableItem eventItem = (TableItem) evt.item;
 						// avoid phantom measurements with invisible curves
 						log.finer(() -> "checked/Old=" + eventItem.getChecked() + eventItem.getData(DataExplorer.OLD_STATE));
-						String recordName = getTableItemRecord(eventItem).getName();
-						if (!eventItem.getChecked() && (Boolean) eventItem.getData(DataExplorer.OLD_STATE) //
-								&& windowActor.isMeasureRecord(recordName)) {
-							if (windowActor.isMeasureRecord(recordName)) {
-								contextMenu.setMeasurement(recordName, false);
-								contextMenu.setDeltaMeasurement(recordName, false);
+						if ( getTableItemRecord(eventItem) != null) {
+							String recordName = getTableItemRecord(eventItem).getName();
+							if (!eventItem.getChecked() && (Boolean) eventItem.getData(DataExplorer.OLD_STATE) //
+									&& windowActor.isMeasureRecord(recordName)) {
+								if (windowActor.isMeasureRecord(recordName)) {
+									contextMenu.setMeasurement(recordName, false);
+									contextMenu.setDeltaMeasurement(recordName, false);
+								}
+								windowActor.clearMeasuring();
 							}
-							windowActor.clearMeasuring();
-						}
-						SelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, eventItem.getData(DataExplorer.RECORD_NAME));
-						SelectorComposite.this.popupmenu.setData(DataExplorer.NAME_REPLACEMENT, eventItem.getData(DataExplorer.NAME_REPLACEMENT));
-						SelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);
-						if (toggleRecordSelection(eventItem, true, false)) {
-							windowActor.updateChartWindow(false);
+							SelectorComposite.this.popupmenu.setData(DataExplorer.RECORD_NAME, eventItem.getData(DataExplorer.RECORD_NAME));
+							SelectorComposite.this.popupmenu.setData(DataExplorer.NAME_REPLACEMENT, eventItem.getData(DataExplorer.NAME_REPLACEMENT));
+							SelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);
+							if (toggleRecordSelection(eventItem, true, false)) {
+								windowActor.updateChartWindow(false);
+							} 
 						}
 					}
 				}
