@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.data.RecordSet;
 import gde.exception.DataInconsitsentException;
@@ -47,7 +48,7 @@ public interface IHistoDevice { //todo merging with IDevice later
 	List<String> getSupportedImportExtentions();
 
 	/**
-	 * Create history recordSet and add record data size points from binary file to each measurement.
+	 * Create recordSet and add record data size points from binary file to each measurement.
 	 * It is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
 	 * Do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
 	 * Since this is a long term operation the progress bar should be updated to signal business to user.
@@ -68,8 +69,9 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * @param recordSet is the target object holding the records (curves) which include measurement curves and calculated curves
 	 * @param dataBuffer holds rows for each time step (i = recordDataSize) with measurement data (j = recordNamesLength equals the number of measurements)
 	 * @param recordDataSize is the number of time steps
+	 * @param analyzer defines the the requested device, channel, object
 	 */
-	void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] data_in, int recordDataSize, int[] maxPoints, int[] minPoints) throws DataInconsitsentException;
+	void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] data_in, int recordDataSize, int[] maxPoints, int[] minPoints, Analyzer analyzer) throws DataInconsitsentException;
 
 		/**
 	 * Import device specific *.bin data files

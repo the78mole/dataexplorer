@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import gde.Analyzer;
 import gde.data.Record.DataType;
 import gde.histo.cache.HistoVault;
 import gde.histo.recordings.MeasurementTrailSelector;
@@ -506,8 +507,8 @@ public class MeasurementType implements IChannelItem {
 	}
 
 	@Override
-	public TrailSelector createTrailSelector(String deviceName, int channelNumber, String recordName, boolean smartStatistics) {
-		return new MeasurementTrailSelector(deviceName, channelNumber, this, recordName, smartStatistics);
+	public TrailSelector createTrailSelector(Analyzer analyzer, String recordName, boolean smartStatistics) {
+		return new MeasurementTrailSelector(analyzer, this, recordName, smartStatistics);
 	}
 
 	@Override

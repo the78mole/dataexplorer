@@ -28,6 +28,8 @@ import java.util.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import gde.DataAccess;
+import gde.config.Settings;
 import gde.histo.base.BasicTestCase;
 import gde.histo.utils.GpsCoordinate;
 
@@ -48,24 +50,31 @@ class GpsGeoCodesTest extends BasicTestCase {
 
 	@Test
 	void testGetRandomLocation() {
+		double locationRadius = Settings.getInstance().getGpsLocationRadius();
+		DataAccess dataAccess = DataAccess.getInstance();
+
 		Random random = new Random();
 		double lat = random.nextFloat() * 20. + 40.; // Napoli to Stockholm
 		double lon = random.nextFloat() * 20.; // Greenwich to Krakow
-		String location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(lat, lon));
-		System.out.println(location);
-		assertNotEquals("  location", "", location);
+		String location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(lat, lon), locationRadius, dataAccess);
+		System.out.println("lat/lon : " + lat + "/" + lon + "   " + location);
+		assertNotEquals("lat/lon : " + lat + "/" + lon + "   location", "", location);
 	}
 
 	@Test
 	void testLocationFiles() {
+		double locationRadius = Settings.getInstance().getGpsLocationRadius();
+		DataAccess dataAccess = DataAccess.getInstance();
+
 		String location;
-		location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(0., 179.)); // pure ocean
+		location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(0., 179.), locationRadius, dataAccess); // pure ocean
 		System.out.println(location);
 		assertEquals("  location", "", location);
-		location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(48.8696877, 10.3573054)); // 73441 Bopfingen, Germany (via Google)
+		location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(48.8696877, 10.3573054), locationRadius, dataAccess); // 73441 Bopfingen, Germany (via
+																																																											// Google)
 		System.out.println(location);
 		assertTrue("  location", location.contains("Heidmühle, Bopfingen, Verwaltungsgemeinschaft Bopfingen, Ostalbkreis, Regierungsbezirk Stuttgart, Baden-Württemberg, 73441, Deutschland"));
-		location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(45.0064253, 14.3965299));
+		location = GeoCodes.getOrAcquireLocation(new GpsCoordinate(45.0064253, 14.3965299), locationRadius, dataAccess);
 		System.out.println(location);
 		assertEquals("  location", "D100, Vodice, Primorsko-goranska županija, 51557, Hrvatska", location);
 	}

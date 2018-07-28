@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Random;
 
 import gde.Analyzer;
-import gde.config.Settings;
 import gde.device.TransitionClassTypes;
 import gde.device.TransitionType;
 import gde.log.Logger;
@@ -54,6 +53,7 @@ public final class UniversalSampler {
 
 	private final int							pointsLength;																					// supports internal points array with more elements than the
 																																											// external points
+	private final Analyzer				analyzer;
 
 	private Candidate							lastCandidate;
 
@@ -71,14 +71,15 @@ public final class UniversalSampler {
 	 * @param minPoints measurement points with a length equal to the number of log measurement points
 	 * @param newRecordTimespan_ms log measurement rate
 	 */
-	private UniversalSampler(int channelNumber, int[] maxPoints, int[] minPoints, int newRecordTimespan_ms) {
+	private UniversalSampler(int channelNumber, int[] maxPoints, int[] minPoints, int newRecordTimespan_ms, Analyzer analyzer) {
 		if (maxPoints.length != minPoints.length) throw new IllegalArgumentException();
 
 		this.pointsLength = maxPoints.length;
+		this.analyzer = analyzer;
 
 		// find the maximum sampling timespan
-		int proposedTimespan_ms = Settings.getInstance().getSamplingTimespan_ms();
-		for (TransitionType transitionType : Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getChannelType(channelNumber).getTransitions().values()) {
+		int proposedTimespan_ms = this.analyzer.getSettings().getSamplingTimespan_ms();
+		for (TransitionType transitionType : this.analyzer.getActiveDevice().getDeviceConfiguration().getChannelType(channelNumber).getTransitions().values()) {
 			if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
 				// ensure that the peak consists of at least 2 measurements
 				if (transitionType.getPeakMinimumTimeMsec() == null)
@@ -111,18 +112,16 @@ public final class UniversalSampler {
 	 * @param channelNumber is the log channel number which may differ in case of channel mix
 	 * @param newPointsLength number of log measurement points
 	 * @param newRecordTimespan_ms log measurement rate
+	 * @param analyzer defines the the requested device, channel, object 
 	 * @return a new instance
 	 */
-	public static UniversalSampler createSampler(int channelNumber, int newPointsLength, int newRecordTimespan_ms) { // reading a binFile with 500K
-																																																										// records into a recordset takes
-																																																										// 45 to 15 s; reading the file
-																																																										// with 5k samples takes 0,60 to
-																																																										// 0,35 s which is 1% to 2,5%
+	public static UniversalSampler createSampler(int channelNumber, int newPointsLength, int newRecordTimespan_ms, Analyzer analyzer) {
+		// reading a binFile with 500K records into a recordset takes 45 to 15 s; reading the file with 5k samples takes 0,60 to 0,35 s which is 1% to 2,5%
 		int[] tmpMaxPoints = new int[newPointsLength];
 		int[] tmpMinPoints = new int[newPointsLength];
 		Arrays.fill(tmpMaxPoints, Integer.MIN_VALUE);
 		Arrays.fill(tmpMinPoints, Integer.MAX_VALUE);
-		return new UniversalSampler(channelNumber, tmpMaxPoints, tmpMinPoints, newRecordTimespan_ms);
+		return new UniversalSampler(channelNumber, tmpMaxPoints, tmpMinPoints, newRecordTimespan_ms, analyzer);
 	}
 
 	/**
@@ -130,15 +129,16 @@ public final class UniversalSampler {
 	 * @param maxPoints log measurement points with a length equal to the number of log measurement points
 	 * @param minPoints measurement points with a length equal to the number of log measurement points
 	 * @param newRecordTimespan_ms log measurement rate
+	 * @param analyzer defines the the requested device, channel, object 
 	 * @return a new instance
 	 */
-	public static UniversalSampler createSampler(int channelNumber, int[] maxPoints, int[] minPoints, int newRecordTimespan_ms) {
-		return new UniversalSampler(channelNumber, maxPoints, minPoints, newRecordTimespan_ms);
+	public static UniversalSampler createSampler(int channelNumber, int[] maxPoints, int[] minPoints, int newRecordTimespan_ms, Analyzer analyzer) {
+		return new UniversalSampler(channelNumber, maxPoints, minPoints, newRecordTimespan_ms, analyzer);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("pointsLength=%d  samplingTimespan_ms=%d userSamplingTimespan_ms=%d  readingCount=%d samplingCount=%d oversamplingCount=%d", this.pointsLength, this.samplingTimespan_ms, Settings.getInstance().getSamplingTimespan_ms(), this.readingCount, this.samplingCount, this.oversamplingCount);
+		return String.format("pointsLength=%d  samplingTimespan_ms=%d userSamplingTimespan_ms=%d  readingCount=%d samplingCount=%d oversamplingCount=%d", this.pointsLength, this.samplingTimespan_ms, this.analyzer.getSettings().getSamplingTimespan_ms(), this.readingCount, this.samplingCount, this.oversamplingCount);
 	}
 
 	/**

@@ -41,7 +41,6 @@ import org.eclipse.swt.graphics.Color;
 
 import gde.Analyzer;
 import gde.GDE;
-import gde.config.Settings;
 import gde.data.AbstractRecord;
 import gde.data.AbstractRecordSet;
 import gde.data.Record;
@@ -141,13 +140,16 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		 * Populate the GPS locations list if there are any GPS locations in this recordset.
 		 * Trigger refilling the histo table.
 		 * @param gpsCluster holds the GPS coordinates and the assignment to clusters; null coordinates are allowed
-		 * @param dataGpsLocations is an empty list as INPUT or GPS location strings for all vaults in the correct sequence as OUTPUT
 		 */
 		private void setGpsLocationTags(GpsCluster gpsCluster) {
 			long nanoTime = System.nanoTime();
-			gpsCluster.setClusters();
+			gpsCluster.setClusters(analyzer.getSettings().getGpsLocationRadius());
 			if (gpsCluster.size() > 0) {
-				getDataTags().add(gpsCluster);
+				List<String> gpsLocations = gpsCluster.defineGpsLocations(analyzer.getSettings().getGpsLocationRadius(), analyzer.getDataAccess());
+				// fill the data tags only if there is at least one GPS coordinate
+				if (gpsLocations.parallelStream().filter(s -> !s.isEmpty()).count() > 0) {
+					getDataTags().add(gpsLocations);
+				}
 				// refresh the histo table which might already have been painted without the GPS coordinates
 				if (getDataTags().getDataGpsLocations().size() > 0) {
 					if (GDE.isWithUi()) application.getPresentHistoExplorer().updateHistoTableWindow(false);
@@ -218,12 +220,14 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	}
 
+	private final Analyzer				analyzer;
+
 	private final HistoExplorer		presentHistoExplorer	= DataExplorer.getInstance().getPresentHistoExplorer();
+	private final List<Integer>		durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
+
+	private final TrailDataTags		dataTags;
 
 	private PickedVaults					pickedVaults;
-
-	private final List<Integer>		durations_mm					= new ArrayList<Integer>(INITIAL_RECORD_CAPACITY);
-	private final TrailDataTags		dataTags							= new TrailDataTags();
 
 	/**
 	 * Holds the view configuration.
@@ -235,11 +239,13 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @param recordNames
 	 * @param timeSteps
 	 */
-	private TrailRecordSet(String[] recordNames, TimeSteps timeSteps) {
-		super(Analyzer.getInstance().getActiveDevice(), Analyzer.getInstance().getActiveChannel().getNumber(), //
-				Analyzer.getInstance().getActiveDevice().getName() + GDE.STRING_UNDER_BAR + Analyzer.getInstance().getActiveChannel().getNumber(), //
+	private TrailRecordSet(Analyzer analyzer, String[] recordNames, TimeSteps timeSteps) {
+		super(analyzer.getActiveDevice(), analyzer.getActiveChannel().getNumber(), //
+				analyzer.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + analyzer.getActiveChannel().getNumber(), //
 				recordNames, timeSteps);
-		this.template = HistoGraphicsTemplate.createGraphicsTemplate(this.device.getName(), Analyzer.getInstance().getActiveChannel().getNumber(), Settings.getInstance().getActiveObjectKey());
+		this.analyzer = analyzer;
+		this.dataTags = new TrailDataTags();
+		this.template = HistoGraphicsTemplate.createGraphicsTemplate(analyzer);
 		this.template.load();
 
 		this.visibleAndDisplayableRecords = new Vector<TrailRecord>();
@@ -258,13 +264,13 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * based on device xml settings.
 	 * @return a trail record set containing all trail records (empty) as specified
 	 */
-	public static synchronized TrailRecordSet createRecordSet() {
-		DeviceConfiguration configuration = Analyzer.getInstance().getActiveDevice().getDeviceConfiguration();
+	public static synchronized TrailRecordSet createRecordSet(Analyzer analyzer) {
+		DeviceConfiguration configuration = analyzer.getActiveDevice().getDeviceConfiguration();
 
 		TimeSteps timeSteps = new TimeSteps(-1, INITIAL_RECORD_CAPACITY);
 
-String[] names = configuration.getMeasurementSettlementScoregroupNames(Analyzer.getInstance().getActiveChannel().getNumber());
-		TrailRecordSet newTrailRecordSet = new TrailRecordSet(names, timeSteps);
+		String[] names = configuration.getMeasurementSettlementScoregroupNames(analyzer.getActiveChannel().getNumber());
+		TrailRecordSet newTrailRecordSet = new TrailRecordSet(analyzer, names, timeSteps);
 
 		BiConsumer<Integer, IChannelItem> measurementAction = (idx, itm) -> {
 			TrailRecord tmpRecord = new MeasurementTrail(idx, itm, newTrailRecordSet, INITIAL_RECORD_CAPACITY);
@@ -285,8 +291,7 @@ String[] names = configuration.getMeasurementSettlementScoregroupNames(Analyzer.
 			log.fine(() -> "added scoregroup record for " + itm.getName() + " - " + idx);
 		};
 
-		ChannelItems channelItems = new ChannelItems(Analyzer.getInstance().getActiveDevice().getName(),
-				Analyzer.getInstance().getActiveChannel().getNumber());
+		ChannelItems channelItems = new ChannelItems(analyzer);
 		channelItems.processItems(measurementAction, settlementAction, scoreGroupAction);
 		newTrailRecordSet.get(0).setColor(SWTResourceManager.getColor(0, 0, 0)); // top score group entry, set color to black
 
@@ -455,7 +460,7 @@ String[] names = configuration.getMeasurementSettlementScoregroupNames(Analyzer.
 	 * @param summaryData holds all data required for painting with key recordName
 	 */
 	public synchronized void updateSyncSummaryScale(AbstractChartData summaryData) {
-		int recencyLimit = settings.getReminderCount();
+		int recencyLimit = analyzer.getSettings().getReminderCount();
 		for (TrailRecord actualRecord : getDisplayRecords()) {
 			SummaryLayout summary = (SummaryLayout) summaryData.get(actualRecord.getName());
 			summary.clear();
@@ -536,7 +541,7 @@ String[] names = configuration.getMeasurementSettlementScoregroupNames(Analyzer.
 	@SuppressWarnings("unchecked")
 	@Override
 	public Vector<TrailRecord> getVisibleAndDisplayableRecordsForTable() {
-		return (Vector<TrailRecord>) (this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.displayRecords);
+		return (Vector<TrailRecord>) (analyzer.getSettings().isPartialDataTable() ? this.visibleAndDisplayableRecords : this.displayRecords);
 	}
 
 	/**
@@ -736,7 +741,7 @@ String[] names = configuration.getMeasurementSettlementScoregroupNames(Analyzer.
 	}
 
 	public long getDisplayTimeStamp_ms(int index) {
-		if (this.settings.isXAxisReversed()) {
+		if (this.analyzer.getSettings().isXAxisReversed()) {
 			return this.timeStep_ms.get(index) / 10;
 		} else {
 			return this.timeStep_ms.get(this.timeStep_ms.size() - 1 - index) / 10;
@@ -779,6 +784,10 @@ String[] names = configuration.getMeasurementSettlementScoregroupNames(Analyzer.
 	 */
 	public HistoVault[] getIndexedVaults() {
 		return pickedVaults.indexedVaults;
+	}
+
+	public Analyzer getAnalyzer() {
+		return analyzer;
 	}
 
 }

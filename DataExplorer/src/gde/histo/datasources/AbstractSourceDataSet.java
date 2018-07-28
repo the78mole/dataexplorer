@@ -40,7 +40,6 @@ import com.sun.istack.internal.Nullable;
 import gde.Analyzer;
 import gde.GDE;
 import gde.config.DeviceConfigurations;
-import gde.data.Channels;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.HistoVault;
 import gde.histo.cache.VaultCollector;
@@ -310,8 +309,8 @@ public abstract class AbstractSourceDataSet {
 		public List<VaultCollector> getTrusses4Ui() {
 			String objectDirectory = getObjectKey();
 			String recordSetBaseName = analyzer.getActiveChannel().getChannelConfigKey() + getRecordSetExtend();
-			VaultCollector truss = new VaultCollector(objectDirectory, getFile().toPath(), 0, Channels.getInstance().size(), recordSetBaseName,
-					analyzer.getActiveDevice(), providesReaderSettings());
+			VaultCollector truss = new VaultCollector(objectDirectory, getFile().toPath(), 0, analyzer.getChannels().size(), recordSetBaseName,
+					analyzer, providesReaderSettings());
 			truss.setSourceDataSet(this);
 			return new ArrayList<>(Arrays.asList(truss));
 		}

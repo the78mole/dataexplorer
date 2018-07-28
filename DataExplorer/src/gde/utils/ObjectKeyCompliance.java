@@ -65,7 +65,7 @@ public class ObjectKeyCompliance {
 	 * FilenameFilter based on valid log file extensions including those from all devices.
 	 */
 	private static final class LogFileFilter implements FilenameFilter {
-		private final Set<String> validLogExtentions = Analyzer.getInstance().getDeviceConfigurations().getValidLogExtentions();
+		private final Set<String> validLogExtentions = Analyzer.getInstance().getDeviceConfigurations().getValidLogExtentions(); // ok
 
 		@Override
 		public boolean accept(File dir, String name) {
@@ -234,14 +234,16 @@ public class ObjectKeyCompliance {
 				return upcomingObjectKey;
 			}
 			if (fileSubPath.getNameCount() < 1) return upcomingObjectKey;
+
 			String directoryName = fileSubPath.subpath(0, 1).toString();
 			if (directoryName.length() < GDE.MIN_OBJECT_KEY_LENGTH || GDE.STRING_PARENT_DIR.equals(directoryName)) return upcomingObjectKey;
 
 			if (Settings.getInstance().isHistoActive() && Settings.getInstance().isObjectQueryActive() //
 					&& !DataExplorer.getInstance().isObjectSelectorEditable() //
-					&& !Analyzer.getInstance().getDeviceConfigurations().contains(directoryName) //
-					&& !Settings.getInstance().getValidatedObjectKey(directoryName).isPresent()) {
-				if (SWT.NO != DataExplorer.getInstance().openYesNoMessageDialogSync(Messages.getString(MessageIds.GDE_MSGT0929, new Object[] { directoryName }))) upcomingObjectKey = directoryName;
+					&& !Analyzer.getInstance().getDeviceConfigurations().contains(directoryName) // ok
+					&& !Settings.getInstance().getValidatedObjectKey(directoryName).isPresent()) { // ok
+				if (SWT.NO != DataExplorer.getInstance().openYesNoMessageDialogSync(Messages.getString(MessageIds.GDE_MSGT0929, new Object[] {
+						directoryName }))) upcomingObjectKey = directoryName;
 			}
 		}
 		return upcomingObjectKey;

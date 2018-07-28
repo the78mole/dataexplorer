@@ -312,7 +312,7 @@ public final class VaultPicker {
 	}
 
 	public VaultPicker() {
-		this.analyzer = Analyzer.getInstance();
+		this.analyzer = Analyzer.getInstance(); // ok
 		this.directoryScanner = new DirectoryScanner(this.analyzer);
 		this.sourceDataSetExplorer = new SourceDataSetExplorer(analyzer, this.directoryScanner.getSourceFolders(), false);
 	}
@@ -430,7 +430,7 @@ public final class VaultPicker {
 
 			if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.C_TRAILRECORDSET)) {
 				long nanoTime = System.nanoTime();
-				trailRecordSet = TrailRecordSet.createRecordSet();
+				trailRecordSet = TrailRecordSet.createRecordSet(analyzer);
 				trailRecordSet.initializeFromVaults(pickedVaults);
 				trailRecordSet.applyTemplate(true); // needs reasonable data
 				if (recordSetBytesSum > 0) {

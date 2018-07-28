@@ -429,7 +429,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			RecordSetParser osdRecordSet = osdRecordSets.get(i);
 			Channel channel = osdRecordSet.getChannel(analyzer.getChannels());
 			if (channel != null) {
-				VaultCollector vaultCollector = new VaultCollector(objectDirectory, sourcePath, osdHeader.getFileVersion(), osdRecordSets.size(), i,
+				VaultCollector vaultCollector = new VaultCollector(analyzer, objectDirectory, sourcePath, osdHeader.getFileVersion(), osdRecordSets.size(), i,
 						osdRecordSet.getBaseName(), osdHeader.getDeviceName(), osdRecordSet.getEnhancedStartTimestamp_ms(), channel.getNumber(), osdHeader.getLogObjectKey());
 				trusses.add(vaultCollector);
 			}
@@ -549,7 +549,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 
 		if (histoRecordSet.getDevice() instanceof IHistoDevice) {
 			Map<PointsType, int[]> extrema = getExtremumValues(osdRecordSet, noneCalculationMeasurementNames);
-			((IHistoDevice) histoRecordSet.getDevice()).addDataBufferAsRawDataPoints(histoRecordSet, buffer, recordDataSize, extrema.get(PointsType.MAX), extrema.get(PointsType.MIN));
+			((IHistoDevice) histoRecordSet.getDevice()).addDataBufferAsRawDataPoints(histoRecordSet, buffer, recordDataSize, extrema.get(PointsType.MAX), extrema.get(PointsType.MIN), analyzer);
 		} else {
 			histoRecordSet.getDevice().addDataBufferAsRawDataPoints(histoRecordSet, buffer, recordDataSize, false);
 		}

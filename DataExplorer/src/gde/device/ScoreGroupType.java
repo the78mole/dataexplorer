@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import gde.Analyzer;
 import gde.data.Record.DataType;
 import gde.histo.cache.HistoVault;
 import gde.histo.recordings.ScoregroupTrailSelector;
@@ -451,8 +452,8 @@ public class ScoreGroupType implements IChannelItem {
   	}
 
   	@Override
-  	public TrailSelector createTrailSelector(String deviceName, int channelNumber, String recordName, boolean smartStatistics) {
-  		return new ScoregroupTrailSelector(deviceName, channelNumber, this, recordName, smartStatistics);
+  	public TrailSelector createTrailSelector(Analyzer analyzer, String recordName, boolean smartStatistics) {
+  		return new ScoregroupTrailSelector(analyzer, this, recordName, smartStatistics);
   	}
 
 		@Override

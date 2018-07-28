@@ -27,15 +27,10 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-import gde.Analyzer;
-import gde.GDE;
 import gde.config.Settings;
 import gde.histo.cache.ExtendedVault;
-import gde.histo.gpslocations.GeoCodes;
-import gde.histo.gpslocations.GpsCluster;
 import gde.histo.recordings.HistoTableMapper.DisplayTag;
 import gde.histo.recordings.TrailDataTags.DataTag;
-import gde.histo.utils.GpsCoordinate;
 import gde.log.Level;
 import gde.log.Logger;
 
@@ -97,20 +92,11 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 	}
 
 	/**
-	 * @param gpsCluster
 	 */
-	public void add(GpsCluster gpsCluster) {
-		List<String> tmpGpsLocations = new ArrayList<String>();
-		for (GpsCoordinate gpsCoordinate : gpsCluster) {
-			// preserve the correct vaults sequence
-			if (gpsCoordinate != null)
-				tmpGpsLocations.add(GeoCodes.getOrAcquireLocation(gpsCluster.getAssignedClusters().get(gpsCoordinate).getCenter()));
-			else
-				tmpGpsLocations.add(GDE.STRING_EMPTY);
-		}
-		// fill the data tags only if there is at least one GPS coordinate
-		if (tmpGpsLocations.parallelStream().filter(s -> !s.isEmpty()).count() > 0) this.dataGpsLocations.addAll(tmpGpsLocations);
+	public void add(List<String> gpsLocations) {
+		this.dataGpsLocations.addAll(gpsLocations);
 	}
+
 
 	/**
 	 * @return the dataTags
@@ -139,9 +125,9 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 	/**
 	 * @return the tags which have been filled and carry non-redundant data
 	 */
-	public EnumSet<DisplayTag> getActiveDisplayTags() {
+	public EnumSet<DisplayTag> getActiveDisplayTags(int channelNumber) {
 		if (this.activeDisplayTags == null) {
-			defineActiveDisplayTags();
+			defineActiveDisplayTags(channelNumber);
 		}
 		return this.activeDisplayTags;
 	}
@@ -149,11 +135,11 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 	/**
 	 *
 	 */
-	public void defineActiveDisplayTags() {
+	public void defineActiveDisplayTags(int channelNumber) {
 		EnumSet<DisplayTag> resultTags = EnumSet.allOf(DisplayTag.class);
 		if (this.get(DataTag.GPS_LOCATION).isEmpty()) resultTags.remove(DisplayTag.GPS_LOCATION);
 
-		if (!this.get(DataTag.FILE_PATH).isEmpty() && Settings.getInstance().isPartialDataTable()) {
+		if (!this.get(DataTag.FILE_PATH).isEmpty() && Settings.getInstance().isPartialDataTable()) { // ok
 			{
 				Path directoryPath = Paths.get(this.get(getSourcePathTag(0)).get(0)).getParent();
 				boolean sameDirectory = true;
@@ -168,10 +154,10 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 				if (sameBase) resultTags.remove(DisplayTag.BASE_PATH);
 			}
 			{
-				String channelNumber = this.get(DataTag.CHANNEL_NUMBER).get(0);
+				String tagChannelNumber = this.get(DataTag.CHANNEL_NUMBER).get(0);
 				boolean sameChannel = true;
 				for (String tmp : this.get(DataTag.CHANNEL_NUMBER)) {
-					if (!tmp.equals(channelNumber) || Analyzer.getInstance().getActiveChannel().getNumber() != Integer.parseInt(tmp)) {
+					if (!tmp.equals(tagChannelNumber) || channelNumber != Integer.parseInt(tmp)) {
 						sameChannel = false;
 						break;
 					}
@@ -199,7 +185,7 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 	 * @return the data tag which defines the access to the link path or file path
 	 */
 	public DataTag getSourcePathTag(int index) {
-		return this.get(DataTag.LINK_PATH).get(index).isEmpty() || Settings.getInstance().getActiveObjectKey().isEmpty() ? DataTag.FILE_PATH : DataTag.LINK_PATH;
+		return this.get(DataTag.LINK_PATH).get(index).isEmpty() || Settings.getInstance().getActiveObjectKey().isEmpty() ? DataTag.FILE_PATH : DataTag.LINK_PATH; // ok
 	}
 
 	public List<String> getDataGpsLocations() {

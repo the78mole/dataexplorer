@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import gde.Analyzer;
 import gde.device.IChannelItem;
 import gde.device.SettlementType;
 import gde.device.TrailDisplayType;
@@ -39,13 +40,12 @@ public final class SettlementTrailSelector extends TrailSelector {
 	}
 
 	/**
-	 * @param channelNumber is the 1-based device channel number
 	 * @param channelItem is a measurement / settlement / scoregroup in the device channel
 	 * @param recordName is the name of the data record which might differ from the device channel item name (e.g. Jeti)
 	 * @param smartStatistics true selects the smart trail types
 	 */
-	public SettlementTrailSelector(String deviceName, int channelNumber, IChannelItem channelItem, String recordName, boolean smartStatistics) {
-		super(deviceName, channelNumber, channelItem, recordName, smartStatistics);
+	public SettlementTrailSelector(Analyzer analyzer, IChannelItem channelItem, String recordName, boolean smartStatistics) {
+		super(analyzer, channelItem, recordName, smartStatistics);
 	}
 
 	@Override

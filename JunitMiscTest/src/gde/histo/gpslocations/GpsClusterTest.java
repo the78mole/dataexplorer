@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import gde.DataAccess;
+import gde.config.Settings;
 import gde.histo.base.BasicTestCase;
 import gde.histo.utils.GpsCoordinate;
 
@@ -85,6 +87,8 @@ class GpsClusterTest extends BasicTestCase {
 		this.gpsCluster.add(ssa);
 		assertEquals("s21-sts-ssa center", new GpsCoordinate(46.494939, 10.373230), this.gpsCluster.getCenter());
 
+		double locationRadius = Settings.getInstance().getGpsLocationRadius();
+
 		this.gpsCluster = new GpsCluster();
 		this.gpsCluster.add(s21);
 		this.gpsCluster.add(ssa);
@@ -92,53 +96,56 @@ class GpsClusterTest extends BasicTestCase {
 		this.gpsCluster.add(nkv);
 		GpsCoordinate center1 = this.gpsCluster.getCenter();
 		assertEquals("center BW with New Zealand", new GpsCoordinate(19.359332, 115.308856), center1);
-		this.gpsCluster.setClusters(); // 1,9450991|95,4767329
+		this.gpsCluster.setClusters(locationRadius); // 1,9450991|95,4767329
 		assertEquals("SingleMemberClusters", 4, this.gpsCluster.getClusters().size());
 
 		this.gpsCluster = new GpsCluster();
 		this.gpsCluster.add(s21);
 		this.gpsCluster.add(sts);
 		this.gpsCluster.add(ssa);
-		this.gpsCluster.setClusters();
+		this.gpsCluster.setClusters(locationRadius);
 		assertEquals("  TwoMemberCluster", 3, this.gpsCluster.getClusters().size());
 	}
 
 	@Test
 	void testLocationFiles() {
+		double locationRadius = Settings.getInstance().getGpsLocationRadius();
+		DataAccess dataAccess = DataAccess.getInstance();
+
 		String location;
-		location = GeoCodes.getOrAcquireLocation(this.s21);
+		location = GeoCodes.getOrAcquireLocation(this.s21, locationRadius, dataAccess);
 		System.out.println(location);
-		location = GeoCodes.getOrAcquireLocation(this.s21_E);
+		location = GeoCodes.getOrAcquireLocation(this.s21_E, locationRadius, dataAccess);
 		System.out.println(location);
-		location = GeoCodes.getOrAcquireLocation(this.sts);
+		location = GeoCodes.getOrAcquireLocation(this.sts, locationRadius, dataAccess);
 		System.out.println(location);
-		location = GeoCodes.getOrAcquireLocation(this.ssa);
+		location = GeoCodes.getOrAcquireLocation(this.ssa, locationRadius, dataAccess);
 		System.out.println(location);
-		location = GeoCodes.getOrAcquireLocation(this.chi);
+		location = GeoCodes.getOrAcquireLocation(this.chi, locationRadius, dataAccess);
 		System.out.println(location);
-		location = GeoCodes.getOrAcquireLocation(this.nkv);
+		location = GeoCodes.getOrAcquireLocation(this.nkv, locationRadius, dataAccess);
 		System.out.println(location);
 		this.gpsCluster = new GpsCluster();
 		this.gpsCluster.add(s21);
 		this.gpsCluster.add(sts);
 		this.gpsCluster.add(ssa);
-		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter());
+		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter(), locationRadius, dataAccess);
 		System.out.println("center of S21, sts, ssa : " + location);
 		this.gpsCluster = new GpsCluster();
 		this.gpsCluster.add(s21);
 		this.gpsCluster.add(ssa);
-		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter());
+		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter(), locationRadius, dataAccess);
 		System.out.println("center of S21, ssa : " + location);
 		this.gpsCluster = new GpsCluster();
 		this.gpsCluster.add(s21);
 		this.gpsCluster.add(ssa);
 		this.gpsCluster.add(chi);
-		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter());
+		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter(), locationRadius, dataAccess);
 		System.out.println("center of S21, ssa, chi : " + location);
 		this.gpsCluster = new GpsCluster();
 		this.gpsCluster.add(s21);
 		this.gpsCluster.add(chi);
-		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter());
+		location = GeoCodes.getOrAcquireLocation(this.gpsCluster.getCenter(), locationRadius, dataAccess);
 		System.out.println("center of S21, chi : " + location + "    " + this.gpsCluster.getCenter().toCsvString());
 	}
 }

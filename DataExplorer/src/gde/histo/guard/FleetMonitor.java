@@ -78,6 +78,7 @@ public final class FleetMonitor {
 
 		/**
 		 * Supports arbitrary selection of vaults, e.g. mixed channels
+		 * Supports aggregation for objectKey + device.
 		 * @param vaults
 		 */
 		public static final ObjectSummary createObjectSummary(String objectKey, String deviceName, List<HistoVault> vaults) {
@@ -95,7 +96,8 @@ public final class FleetMonitor {
 			}
 			for (Entry<Integer, TreeSet<HistoVault>> e : channelVaults.entrySet()) {
 				HistoVault[] indexedVaults = e.getValue().toArray(new HistoVault[e.getValue().size()]);
-				ObjectSummary channelSummary = createChannelSummary(objectKey, deviceName, e.getKey(), indexedVaults);
+				// todo ObjectSummary channelSummary = createChannelSummary(objectKey, deviceName, e.getKey(), indexedVaults);
+				ObjectSummary channelSummary = createChannelSummary(Analyzer.getInstance().clone(), indexedVaults);
 				oS.vaultCount += channelSummary.vaultCount;
 				oS.minFileLastModified = Math.max(oS.minFileLastModified, channelSummary.minFileLastModified);
 				oS.maxFileLastModified = Math.max(oS.maxFileLastModified, channelSummary.maxFileLastModified);
@@ -115,10 +117,10 @@ public final class FleetMonitor {
 		 * Supports aggregation for objectKey + device + channel.
 		 * @param vaults in start timestamp reverse order
 		 */
-		private static final ObjectSummary createChannelSummary(String objectKey, String deviceName, int channelNumber, HistoVault[] indexedVaults) {
+		private static final ObjectSummary createChannelSummary(Analyzer analyzer, HistoVault[] indexedVaults) {
 			ObjectSummary oS = new ObjectSummary();
-			oS.objectKey = objectKey;
-			oS.vaultDeviceName = deviceName;
+			oS.objectKey = analyzer.getSettings().getActiveObjectKey();
+			oS.vaultDeviceName = analyzer.getActiveDevice().getName();
 			oS.vaultCount = indexedVaults.length;
 			for (HistoVault v : indexedVaults) {
 				oS.minFileLastModified = Math.min(oS.minFileLastModified, v.getLogFileLastModified());
@@ -129,11 +131,11 @@ public final class FleetMonitor {
 				oS.maxDuration_MM = Math.max(oS.maxDuration_MM, v.getScores().get(ScoreLabelTypes.DURATION_MM.ordinal()).getValue());
 			}
 
-			HistoGraphicsTemplate template = HistoGraphicsTemplate.createReadonlyTemplate(deviceName, channelNumber, objectKey);
+			HistoGraphicsTemplate template = HistoGraphicsTemplate.createReadonlyTemplate(analyzer);
 			template.load();
 			boolean smartStatistics = Boolean.parseBoolean(template.getProperty(HistoGraphicsTemplate.SMART_STATISTICS, "true"));
 
-			InclusionData inclusionData = new InclusionData(Paths.get(Settings.getInstance().getDataFilePath(), objectKey));
+			InclusionData inclusionData = new InclusionData(Paths.get(Settings.getInstance().getDataFilePath(), oS.objectKey));
 
 			ReminderType[] minReminders = new ReminderType[] { ReminderType.NONE, ReminderType.NONE };
 			ReminderType[] maxReminders = new ReminderType[] { ReminderType.NONE, ReminderType.NONE };
@@ -143,7 +145,7 @@ public final class FleetMonitor {
 				boolean isIncluded = inclusionData.isIncluded(itm.getName(), true); // todo recordName Jeti
 				if (!isActive || !isIncluded) return;
 
-				TrailSelector trailSelector = itm.createTrailSelector(deviceName, channelNumber, itm.getName(), smartStatistics); // todo recordName Jeti
+				TrailSelector trailSelector = itm.createTrailSelector(analyzer, itm.getName(), smartStatistics); // todo recordName Jeti
 				Reminder[] minMaxReminder = Guardian.defineMinMaxReminder(indexedVaults, itm, trailSelector, logLimit);
 				if (minMaxReminder[0] != null) {
 					minMaxReminder[0] = minMaxReminder[0];
@@ -161,7 +163,7 @@ public final class FleetMonitor {
 				}
 			};
 
-			ChannelItems channelItems = new ChannelItems(deviceName, channelNumber);
+			ChannelItems channelItems = new ChannelItems(analyzer);
 			channelItems.processItems(channelItemAction, channelItemAction, channelItemAction);
 			oS.minReminders = minReminders;
 			oS.maxReminders = maxReminders;

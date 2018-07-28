@@ -98,13 +98,14 @@ public final class VaultReaderWriter {
 	 */
 	public synchronized List<ExtendedVault> loadFromCaches(TrussJobs trussJobs) //
 			throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
-		Path osdCacheFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, ExtendedVault.getVaultsDirectoryName(GDE.STRING_EMPTY));
+		Path osdCacheFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, ExtendedVault.getVaultsDirectoryName(analyzer, GDE.STRING_EMPTY));
 		List<ExtendedVault> vaults = loadFromCachePath(trussJobs, progress, osdCacheFilePath);
 
 		if (analyzer.getActiveDevice() instanceof IHistoDevice) {
 			String readerSettings = ((IHistoDevice) analyzer.getActiveDevice()).getReaderSettingsCsv();
 			if (!readerSettings.isEmpty()) {
-				List<ExtendedVault> nativeVaults = loadFromCachePath(trussJobs, progress, Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, ExtendedVault.getVaultsDirectoryName(readerSettings)));
+				Path cacheFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, ExtendedVault.getVaultsDirectoryName(analyzer, readerSettings));
+				List<ExtendedVault> nativeVaults = loadFromCachePath(trussJobs, progress, cacheFilePath);
 				vaults.addAll(nativeVaults);
 			}
 		}
@@ -190,7 +191,8 @@ public final class VaultReaderWriter {
 			boolean providesReaderSettings = e.getKey().providesReaderSettings();
 			String readerSettings = providesReaderSettings && analyzer.getActiveDevice() instanceof IHistoDevice
 					? ((IHistoDevice) analyzer.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
-			Path cacheFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, ExtendedVault.getVaultsDirectoryName(readerSettings));
+			String vaultsDirectoryName = ExtendedVault.getVaultsDirectoryName(analyzer, readerSettings);
+			Path cacheFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, vaultsDirectoryName);
 			try {
 				storeInCachePath(e.getValue(), cacheFilePath);
 			} catch (Exception ex) {

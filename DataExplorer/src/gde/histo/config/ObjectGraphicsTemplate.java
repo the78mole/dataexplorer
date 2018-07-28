@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.InvalidPropertiesFormatException;
 
+import gde.Analyzer;
 import gde.DataAccess;
 import gde.GDE;
 
@@ -36,14 +37,15 @@ import gde.GDE;
  */
 public final class ObjectGraphicsTemplate extends HistoGraphicsTemplate {
 	private static final long	serialVersionUID	= -4197176848694996415L;
+
 	private final String			objectFolderName;
 
 	/**
 	 * Constructor using the application home path and the device signature as initialization parameter.
 	 * @param suppressNewFile true suppresses the object template file creation
 	 */
-	protected ObjectGraphicsTemplate(String deviceName, int channelNumber, String objectFolderName, boolean suppressNewFile) {
-		super(deviceName, channelNumber, suppressNewFile);
+	protected ObjectGraphicsTemplate(Analyzer analyzer, String objectFolderName, boolean suppressNewFile) {
+		super(analyzer, suppressNewFile);
 		this.objectFolderName = objectFolderName;
 	}
 

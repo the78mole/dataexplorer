@@ -151,9 +151,10 @@ public class HistoExplorer {
 						int tableRowCount = trailRecordSet.getVisibleAndDisplayableRecordsForTable().size();
 						if (settings.isDisplayTags()) {
 							TrailDataTags dataTags = trailRecordSet.getDataTags();
-							dataTags.defineActiveDisplayTags();
-							if (dataTags.getActiveDisplayTags() != null) {
-								tableRowCount += dataTags.getActiveDisplayTags().size();
+							int channelNumber = Analyzer.getInstance().getActiveChannel().getNumber();
+							dataTags.defineActiveDisplayTags(channelNumber);
+							if (dataTags.getActiveDisplayTags(channelNumber) != null) {
+								tableRowCount += dataTags.getActiveDisplayTags(channelNumber).size();
 							}
 						}
 						c.setRowCount(tableRowCount);

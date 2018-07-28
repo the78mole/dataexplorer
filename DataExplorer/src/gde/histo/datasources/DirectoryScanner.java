@@ -71,7 +71,7 @@ public final class DirectoryScanner {
 	 * @return the data folder residing in the top level working directory (data path + object key resp device)
 	 */
 	public static Path getActiveFolder4Ui() {
-		return new DirectoryScanner(Analyzer.getInstance()).getActiveFolder();
+		return new DirectoryScanner(Analyzer.getInstance()).getActiveFolder(); // ok
 	}
 
 	/**

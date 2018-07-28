@@ -178,37 +178,12 @@ public class TestSuperClass extends TestCase {
 
 		File file = new File(Settings.getDevicesPath());
 		if (!file.exists()) throw new FileNotFoundException(Settings.getDevicesPath());
-		String[] files = file.list();
-		DeviceConfiguration devConfig;
-		this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
 
 		// wait until schema is setup
 		this.settings.joinXsdThread();
 
-		for (int i = 0; files != null && i < files.length; i++) {
-			try {
-				// loop through all device properties XML and check if device used
-				if (files[i].endsWith(GDE.FILE_ENDING_DOT_XML)) {
-					String deviceKey = files[i].substring(0, files[i].length() - 4);
-					devConfig = new DeviceConfiguration(Settings.getDevicesPath() + GDE.FILE_SEPARATOR + files[i]);
-
-					// store all device configurations in a map
-					String keyString;
-					if (devConfig.getName() != null)
-						keyString = devConfig.getName();
-					else {
-						devConfig.setName(deviceKey);
-						keyString = deviceKey;
-					}
-					System.out.println(deviceKey + GDE.STRING_MESSAGE_CONCAT + keyString);
-					this.deviceConfigurations.put(keyString, devConfig);
-				}
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				fail(e.toString());
-			}
-		}
+		this.deviceConfigurations = this.analyzer.getDeviceConfigurations().getAllConfigurations();
+		System.out.println("number of device configurations = " + this.deviceConfigurations.size());
 	}
 
 	/**
@@ -512,7 +487,8 @@ public class TestSuperClass extends TestCase {
 
 	protected File setDataPath() {
 		boolean settingsPropertiesExist = new File(Settings.getSettingsFilePath()).exists();
-		boolean isDataPathConfigured = new File(this.settings.getDataFilePath()).getPath() != GDE.FILE_SEPARATOR_UNIX;
+		boolean undefinedDataPath = new File(this.settings.getDataFilePath()).getPath().equals(System.getProperty("user.home"));
+		boolean isDataPathConfigured = !undefinedDataPath;
 
 		if (settingsPropertiesExist && isDataPathConfigured) {
 			this.dataPath = DataSource.SETTINGS.getDataPath(Paths.get("")).toFile();

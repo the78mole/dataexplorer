@@ -197,25 +197,25 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 
 		if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetReceiver = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsReceiver.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsReceiver.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetChannel = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsChannel.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsChannel.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.VARIO.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetVario = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsVario.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsVario.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.GPS.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGPS = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsGPS.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsGPS.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.GAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGAM = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsGAM.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsGAM.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.EAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetEAM = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsEAM.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsEAM.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.ESC.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetESC = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsESC.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsESC.length, recordTimespan_ms, Analyzer.getInstance());
 		} else
 			throw new UnsupportedOperationException();
 
@@ -618,25 +618,25 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 		int activeChannelNumber = device.channels.getActiveChannelNumber(); // HoTTbinHistoReader.application.getActiveChannel().getNumber();
 		if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetReceiver = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsReceiver.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsReceiver.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetChannel = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsChannel.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsChannel.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.VARIO.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetVario = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsVario.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsVario.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.GPS.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGPS = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsGPS.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsGPS.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.GAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetGAM = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsGAM.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsGAM.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.EAM.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetEAM = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsEAM.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsEAM.length, recordTimespan_ms, Analyzer.getInstance());
 		} else if (activeChannelNumber == HoTTAdapter.Sensor.ESC.ordinal() + 1) {
 			HoTTbinHistoReader.recordSetESC = tmpRecordSet;
-			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsESC.length, recordTimespan_ms);
+			histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinHistoReader.pointsESC.length, recordTimespan_ms, Analyzer.getInstance());
 		} else
 			throw new UnsupportedOperationException();
 

@@ -25,7 +25,6 @@ import java.nio.file.Paths;
 import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
-import gde.device.IDevice;
 import gde.histo.utils.SecureHash;
 import gde.log.Logger;
 import gde.utils.StringHelper;
@@ -35,26 +34,14 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public final class ExtendedVault extends HistoVault implements Comparable<ExtendedVault> {
-	private static final String				$CLASS_NAME			= ExtendedVault.class.getName();
-	private static final Logger				log							= Logger.getLogger($CLASS_NAME);
+	private static final String		$CLASS_NAME			= ExtendedVault.class.getName();
+	private static final Logger		log							= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * For hashing combined keys.
 	 */
-	private static final String				SHA1_DELIMITER	= ",";
-	private static final String				timestampFormat	= "yyyy-MM-dd HH:mm:ss";
-
-	private static final Settings			settings				= Settings.getInstance();
-
-	/**
-	 * @param newVaultsDirectoryName directory or zip file name
-	 * @param vaultReaderSettings a non-empty string indicates that the file reader measurement values depend on device settings
-	 * @return true if the vault directory name conforms to current versions of the Data Explorer / device XML, to the current channel and to
-	 *         user settings (e.g. sampling timespan) and to various additional attributes
-	 */
-	public static boolean isValidDirectory(String newVaultsDirectoryName, String vaultReaderSettings) {
-		return newVaultsDirectoryName.equals(getVaultsDirectoryName(vaultReaderSettings));
-	}
+	private static final String		SHA1_DELIMITER	= ",";
+	private static final String		timestampFormat	= "yyyy-MM-dd HH:mm:ss";
 
 	/**
 	 * The vaults directory name is determined without any log file contents.
@@ -63,8 +50,8 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @return directory or zip file name as a unique identifier encoding the data explorer version, the device xml file contents(sha1) plus
 	 *         channel number and some settings values
 	 */
-	public static String getVaultsDirectoryName(String vaultReaderSettings) {
-		return getVaultsDirectoryName(Analyzer.getInstance().getActiveDevice(), Analyzer.getInstance().getActiveChannel().getNumber(), vaultReaderSettings);
+	public static String getVaultsDirectoryName(Analyzer analyzer, String vaultReaderSettings) {
+		return getVaultsDirectoryName(analyzer, analyzer.getActiveChannel().getNumber(), vaultReaderSettings);
 	}
 
 	/**
@@ -72,14 +59,14 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @return directory or zip file name as a unique identifier encoding the data explorer version, the device xml file contents(sha1) plus
 	 *         channel number and some settings values
 	 */
-	public static String getVaultsDirectoryName(IDevice device, int channelNumber, String vaultReaderSettings) {
+	public static String getVaultsDirectoryName(Analyzer analyzer, int channelNumber, String vaultReaderSettings) {
 		final String d = SHA1_DELIMITER;
-		String tmpSubDirectoryLongKey = GDE.VERSION_NUMBER + d + device.getDeviceConfiguration().getFileSha1Hash() + d + channelNumber //
+		Settings settings = analyzer.getSettings();
+		String tmpSubDirectoryLongKey = GDE.VERSION_NUMBER + d + analyzer.getActiveDevice().getDeviceConfiguration().getFileSha1Hash() + d + channelNumber //
 				+ d + settings.getDataFilePath() + d + settings.getSamplingTimespan_ms() + d + settings.getMinmaxQuantileDistance() + d + settings.getAbsoluteTransitionLevel() //
 				+ d + settings.isCanonicalQuantiles() + d + settings.isSymmetricToleranceInterval() + d + settings.getOutlierToleranceSpread() //
 				+ d + vaultReaderSettings;
-		if (device.getName().equals("HoTTAdapter"))
-		log.fine(() -> device.getName() + " " + SecureHash.sha1(tmpSubDirectoryLongKey) + " " + tmpSubDirectoryLongKey);
+		log.fine(() -> analyzer.getActiveDevice().getName() + " " + SecureHash.sha1(tmpSubDirectoryLongKey) + " " + tmpSubDirectoryLongKey);
 		return SecureHash.sha1(tmpSubDirectoryLongKey);
 	}
 
@@ -94,24 +81,10 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @return the file name as a unique identifier (sha1)
 	 */
 	public static String getVaultName(Path newLogFileName, long newFileLastModified_ms, long newFileLength, int newLogRecordSetOrdinal, //
-			String vaultReaderSettings) {
+			Analyzer analyzer, String vaultReaderSettings) {
 		final String d = SHA1_DELIMITER;
-		return SecureHash.sha1(getVaultsDirectoryName(vaultReaderSettings) + d + newLogFileName.getFileName() + d + newFileLastModified_ms //
+		return SecureHash.sha1(getVaultsDirectoryName(analyzer, vaultReaderSettings) + d + newLogFileName.getFileName() + d + newFileLastModified_ms //
 				+ d + newFileLength + d + newLogRecordSetOrdinal);
-	}
-
-	/**
-	 * @param newLogFileName file name + lastModified + newFileLength are a simple solution for getting a SHA-1 hash from the file contents
-	 * @param newFileLastModified_ms
-	 * @param newFileLength in bytes
-	 * @param newLogRecordSetOrdinal identifies multiple recordsets in one single file (0-based)
-	 * @return the path with filename as a unique identifier (sha1)
-	 */
-	public static Path getVaultRelativePath(Path newLogFileName, long newFileLastModified_ms, long newFileLength, int newLogRecordSetOrdinal, //
-			String vaultReaderSettings) {
-		// do not include as these attributes are determined after reading the histoset: logChannelNumber, logObjectKey, logStartTimestampMs
-		Path subDirectory = Paths.get(getVaultsDirectoryName(vaultReaderSettings));
-		return subDirectory.resolve(getVaultName(newLogFileName.getFileName(), newFileLastModified_ms, newFileLength, newLogRecordSetOrdinal, vaultReaderSettings));
 	}
 
 	/**
@@ -139,26 +112,24 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @param logRecordSetSize is the number of recordsets in the log origin file
 	 * @param logRecordSetOrdinal identifies multiple recordsets in one single file (0-based)
 	 * @param logRecordSetBaseName the base name without recordset number
-	 * @param logDeviceName
-	 * @param vaultDeviceKey identifies the device used for creating the vault
 	 * @param logStartTimestamp_ms of the log or recordset
 	 * @param logChannelNumber may differ from UI settings in case of channel mix
 	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
 	 * @param vaultReaderSettings a non-empty string indicates that the file reader measurement values depend on device settings
 	 */
 	public ExtendedVault(String objectDirectory, Path filePath, long fileLastModified_ms, long fileLength, int fileVersion, int logRecordSetSize,
-			int logRecordSetOrdinal, String logRecordSetBaseName, String logDeviceName, String vaultDeviceKey, long logStartTimestamp_ms,
-			int logChannelNumber, String logObjectKey, String vaultReaderSettings) {
+			int logRecordSetOrdinal, String logRecordSetBaseName,  String logDeviceName, Analyzer analyzer, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey,
+			String vaultReaderSettings) {
 		this.loadFilePath = filePath;
 		this.loadObjectDirectory = objectDirectory;
 		this.loadLinkPath = Paths.get("");
 
 		this.vaultDataExplorerVersion = "" + GDE.VERSION_NUMBER;
-		this.vaultDeviceName = Analyzer.getInstance().getActiveDevice().getName();
-		this.vaultDeviceKey = vaultDeviceKey;
-		this.vaultChannelNumber = Analyzer.getInstance().getActiveChannel().getNumber();
-		this.vaultObjectKey = Settings.getInstance().getActiveObjectKey();
-		this.vaultSamplingTimespanMs = settings.getSamplingTimespan_ms();
+		this.vaultDeviceName = analyzer.getActiveDevice().getName();
+		this.vaultDeviceKey = analyzer.getActiveDevice().getDeviceConfiguration().getFileSha1Hash();
+		this.vaultChannelNumber = analyzer.getActiveChannel().getNumber();
+		this.vaultObjectKey = analyzer.getSettings().getActiveObjectKey();
+		this.vaultSamplingTimespanMs = analyzer.getSettings().getSamplingTimespan_ms();
 
 		this.logLinkPath = GDE.STRING_EMPTY;
 		this.logFilePath = filePath.toString().replace(GDE.FILE_SEPARATOR, GDE.FILE_SEPARATOR_UNIX); // toString to avoid 'Object' during marshalling
@@ -175,8 +146,8 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		this.logObjectKey = logObjectKey;
 		this.logStartTimestampMs = logStartTimestamp_ms;
 
-		this.vaultDirectory = getVaultsDirectoryName(vaultReaderSettings);
-		this.vaultName = getVaultName(filePath, fileLastModified_ms, fileLength, logRecordSetOrdinal, vaultReaderSettings);
+		this.vaultDirectory = getVaultsDirectoryName(analyzer, vaultReaderSettings);
+		this.vaultName = getVaultName(filePath, fileLastModified_ms, fileLength, logRecordSetOrdinal, analyzer, vaultReaderSettings);
 		this.vaultCreatedMs = System.currentTimeMillis();
 
 		this.vaultReaderSettings = vaultReaderSettings;

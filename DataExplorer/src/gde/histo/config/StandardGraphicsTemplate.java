@@ -21,6 +21,7 @@ package gde.histo.config;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import gde.Analyzer;
 import gde.GDE;
 
 /**
@@ -34,8 +35,8 @@ public class StandardGraphicsTemplate extends HistoGraphicsTemplate {
 	/**
 	 * @see gde.histo.config.HistoGraphicsTemplate
 	 */
-	protected StandardGraphicsTemplate(String deviceName, int channelNumber, boolean suppressNewFile) {
-		super(deviceName,  channelNumber, suppressNewFile);
+	protected StandardGraphicsTemplate(Analyzer analyzer, boolean suppressNewFile) {
+		super(analyzer, suppressNewFile);
 	}
 
 	@Override

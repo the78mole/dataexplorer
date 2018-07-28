@@ -28,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.histo.base.NonUiTestCase;
@@ -58,9 +59,10 @@ class HistoGraphicsTemplateTest extends NonUiTestCase {
 
 		this.settings.setObjectList(new String[] { "first", "2nd" }, "first");
 		int channelNumber = 1;
+		Analyzer analyzer = Analyzer.getInstance().clone(); // todo channel???
 		HistoGraphicsTemplate template = readOnlyTemplate //
-				? HistoGraphicsTemplate.createReadonlyTemplate(deviceName, channelNumber, objectKey) //
-				: HistoGraphicsTemplate.createGraphicsTemplate(deviceName, channelNumber, objectKey);
+				? HistoGraphicsTemplate.createReadonlyTemplate(analyzer) //
+				: HistoGraphicsTemplate.createGraphicsTemplate(analyzer);
 		template.load();
 		File fileCreated = Paths.get(GDE.APPL_HOME_PATH, Settings.GRAPHICS_TEMPLATES_DIR_NAME, //
 				objectKey.isEmpty() ? GDE.STRING_DEVICE_ORIENTED_FOLDER : objectKey, //
@@ -72,7 +74,7 @@ class HistoGraphicsTemplateTest extends NonUiTestCase {
 			assertTrue("file created", fileCreated.exists());
 			long lastModified = fileCreated.lastModified();
 
-			HistoGraphicsTemplate existingTemplate = HistoGraphicsTemplate.createGraphicsTemplate(deviceName, channelNumber, objectKey);
+			HistoGraphicsTemplate existingTemplate = HistoGraphicsTemplate.createGraphicsTemplate(analyzer);
 			existingTemplate.load();
 			assertTrue("use existing file", lastModified == fileCreated.lastModified());
 

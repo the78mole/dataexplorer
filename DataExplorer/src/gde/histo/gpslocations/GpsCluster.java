@@ -25,12 +25,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import com.sun.istack.internal.Nullable;
 
-import gde.config.Settings;
+import gde.DataAccess;
+import gde.GDE;
 import gde.histo.utils.GpsCoordinate;
 import gde.log.Logger;
 
@@ -53,8 +54,7 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 	 * Provides both clustered and remaining GPS coordinates lists.
 	 * @author Thomas Eickert
 	 */
-	private class DistanceProcessor implements Consumer<GpsCoordinate> {
-		private final Settings									settings						= Settings.getInstance();
+	private class DistanceProcessor implements BiConsumer<GpsCoordinate, Double> {
 
 		private GpsCluster											clusteredItems			= new GpsCluster();
 		private Map<GpsCoordinate, GpsCluster>	identifiedClusters	= new HashMap<>();
@@ -63,7 +63,7 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 		private double													relictSqDistanceSum	= 0.;
 
 		@Override
-		public void accept(GpsCoordinate newGpsCoordinate) {
+		public void accept(GpsCoordinate newGpsCoordinate, Double gpsLocationRadius) {
 			if (GpsCluster.this.getReference() == newGpsCoordinate) { // == due to equals override
 				// a distance to myself is not useful
 				log.finest(() -> "add myself to the empty clusteredItems list" + this.clusteredItems.size()); //$NON-NLS-1$
@@ -72,8 +72,8 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 			} else {
 				final double distance = GpsCluster.this.getReference().getDistance(newGpsCoordinate);
 				log.finest(() -> String.format("ClusterRadius=%f  distance=%f  to %s", //$NON-NLS-1$
-						this.settings.getGpsLocationRadius(), distance, newGpsCoordinate));
-				if (distance <= this.settings.getGpsLocationRadius()) {
+						gpsLocationRadius, distance, newGpsCoordinate));
+				if (distance <= gpsLocationRadius) {
 					this.clusteredItems.add(newGpsCoordinate);
 					this.identifiedClusters.put(newGpsCoordinate, this.clusteredItems);
 				} else {
@@ -132,15 +132,15 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 			zAvg += (Math.sin(phi) - zAvg) / (i + 1);
 			log.log(FINER, "coordinate=", gpsCoordinate); //$NON-NLS-1$
 		}
-		final GpsCoordinate result;
+		final GpsCoordinate centerCoordinate;
 		if (Math.abs(xAvg) < 1.e-11 && Math.abs(yAvg) < 1.e-11 && Math.abs(zAvg) < 1.e-11)
-			result = new GpsCoordinate(51.477778, 0.); // center of the earth replaced by Greenwich
+			centerCoordinate = new GpsCoordinate(51.477778, 0.); // center of the earth replaced by Greenwich
 		else {
 			double hyp = Math.sqrt(xAvg * xAvg + yAvg * yAvg);
-			result = new GpsCoordinate(Math.toDegrees(Math.atan2(zAvg, hyp)), Math.toDegrees(Math.atan2(yAvg, xAvg)));
+			centerCoordinate = new GpsCoordinate(Math.toDegrees(Math.atan2(zAvg, hyp)), Math.toDegrees(Math.atan2(yAvg, xAvg)));
 		}
-		log.log(FINER, "result=", result); //$NON-NLS-1$
-		return result;
+		log.log(FINER, "result=", centerCoordinate); //$NON-NLS-1$
+		return centerCoordinate;
 	}
 
 	/**
@@ -160,21 +160,21 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 			zAvg += (Math.sin(phi) - zAvg) / (i + 1);
 			log.log(FINER, "coordinate=", gpsCoordinate); //$NON-NLS-1$
 		}
-		final GpsCoordinate result;
+		final GpsCoordinate centerCoordinate;
 		if (Math.abs(xAvg) < 1.e-11 && Math.abs(yAvg) < 1.e-11 && Math.abs(zAvg) < 1.e-11)
-			result = new GpsCoordinate(51.477778, 0.); // center of the earth replaced by Greenwich
+			centerCoordinate = new GpsCoordinate(51.477778, 0.); // center of the earth replaced by Greenwich
 		else {
 			double hyp = Math.sqrt(xAvg * xAvg + yAvg * yAvg);
-			result = new GpsCoordinate(Math.toDegrees(Math.atan2(zAvg, hyp)), Math.toDegrees(Math.atan2(yAvg, xAvg)));
+			centerCoordinate = new GpsCoordinate(Math.toDegrees(Math.atan2(zAvg, hyp)), Math.toDegrees(Math.atan2(yAvg, xAvg)));
 		}
-		log.log(FINER, "result=", result); //$NON-NLS-1$
-		return result;
+		log.log(FINER, "result=", centerCoordinate); //$NON-NLS-1$
+		return centerCoordinate;
 	}
 
 	/**
 	 * Determine clusters from the GPS coordinates collected up to now.
 	 */
-	public void setClusters() {
+	public void setClusters(double locationRadius) {
 		this.assignedClusters.clear();
 		GpsCluster wip = new GpsCluster(); // use work in process object in order not to remove items from this GpsCluster
 		for (GpsCoordinate cc : this) {
@@ -184,7 +184,7 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 			this.reference = wip.get(wip.size() / 2); // 'random' start location
 			while (wip.size() > 0) {
 				// start analyzing the GPS coordinate list data
-				DistanceProcessor distanceProcessor = wip.parallelStream().collect(DistanceProcessor::new, DistanceProcessor::accept, DistanceProcessor::combine);
+				DistanceProcessor distanceProcessor = wip.parallelStream().collect(DistanceProcessor::new, (dp, u) -> dp.accept(u, locationRadius), DistanceProcessor::combine);
 				// add the newly assigned coordinates including their cluster assignment to the total assignment list
 				this.assignedClusters.putAll(distanceProcessor.identifiedClusters);
 				// take the remaining GPS coordinate list for the next iteration and take also the optimized reference coordinate
@@ -193,6 +193,19 @@ public final class GpsCluster extends ArrayList<GpsCoordinate> {
 				log.finer(() -> "number of clusters : " + this.getClusters().size() + "  new Cluster members : " + this.assignedClusters.size()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
+	}
+
+	public List<String> defineGpsLocations(double gpsLocationRadius, DataAccess dataAccess) {
+		List<String> tmpGpsLocations = new ArrayList<String>();
+		for (GpsCoordinate gpsCoordinate : this) {
+			// preserve the correct vaults sequence
+			if (gpsCoordinate != null) {
+				GpsCoordinate centeredGpsCoordinate = getAssignedClusters().get(gpsCoordinate).getCenter();
+				tmpGpsLocations.add(GeoCodes.getOrAcquireLocation(centeredGpsCoordinate, gpsLocationRadius, dataAccess));
+			} else
+				tmpGpsLocations.add(GDE.STRING_EMPTY);
+		}
+		return tmpGpsLocations;
 	}
 
 	/**

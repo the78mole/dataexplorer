@@ -63,28 +63,28 @@ public final class VaultCollector {
 	final private static String	$CLASS_NAME	= VaultCollector.class.getName();
 	final private static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private final IDevice				device			= Analyzer.getInstance().getActiveDevice();
+	private final Analyzer			analyzer;
 
 	private ExtendedVault				vault;
 	private SourceDataSet				sourceDataSet;
 
 	/**
+	 * Use this for import files.
 	 * @param objectDirectory validated object key
 	 * @param sourcePath is the bin origin file (not a link file)
 	 * @param fileVersion is the version of the log origin file
 	 * @param logRecordSetSize is the number of recordsets in the log origin file
 	 * @param logRecordsetBaseName the base name without recordset number
-	 * @param device
 	 * @param providesReaderSettings true is a file reader capable to deliver different measurement values based on device settings
 	 */
 	public VaultCollector(String objectDirectory, Path sourcePath, int fileVersion, int logRecordSetSize, String logRecordsetBaseName, //
-			IDevice device, boolean providesReaderSettings) {
-		this(objectDirectory, sourcePath, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, device.getName(),
-				device.getDeviceConfiguration().getFileSha1Hash(), sourcePath.toFile().lastModified(), Analyzer.getInstance().getActiveChannel().getNumber(),
-				objectDirectory, providesReaderSettings);
+			Analyzer analyzer, boolean providesReaderSettings) {
+		this(objectDirectory, sourcePath, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, analyzer.getActiveDevice().getName(), analyzer, //
+				sourcePath.toFile().lastModified(), analyzer.getActiveChannel().getNumber(), objectDirectory, providesReaderSettings);
 	}
 
 	/**
+	 * Use this for log files which know about the device for recording (e.g. osd files).
 	 * @param objectDirectory validated object key
 	 * @param sourcePath is the log origin file (not a link file)
 	 * @param fileVersion is the version of the log origin file
@@ -96,21 +96,21 @@ public final class VaultCollector {
 	 * @param logChannelNumber may differ from UI settings in case of channel mix
 	 * @param logObjectKey may differ from UI settings (empty in OSD files, validated parent path for bin files)
 	 */
-	public VaultCollector(String objectDirectory, Path sourcePath, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal,
+	public VaultCollector(Analyzer analyzer, String objectDirectory, Path sourcePath, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal,
 			String logRecordsetBaseName, String logDeviceName, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey) {
-		this(objectDirectory, sourcePath, fileVersion, logRecordSetSize, logRecordSetOrdinal, logRecordsetBaseName, //
-				logDeviceName, Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getFileSha1Hash(), //
+		this(objectDirectory, sourcePath, fileVersion, logRecordSetSize, logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, analyzer, //
 				logStartTimestamp_ms, logChannelNumber, objectDirectory, false);
 	}
 
 	private VaultCollector(String objectDirectory, Path sourcePath, int fileVersion, int logRecordSetSize, int logRecordSetOrdinal,
-			String logRecordsetBaseName, String logDeviceName, String deviceKey, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey, //
-			boolean providesReaderSettings) {
-		String readerSettings = providesReaderSettings && Analyzer.getInstance().getActiveDevice() instanceof IHistoDevice
-				? ((IHistoDevice) Analyzer.getInstance().getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
+			String logRecordsetBaseName, String logDeviceName, Analyzer analyzer, //
+			long logStartTimestamp_ms, int logChannelNumber, String logObjectKey, boolean providesReaderSettings) {
+		this.analyzer = analyzer;
+		String readerSettings = providesReaderSettings && analyzer.getActiveDevice() instanceof IHistoDevice
+				? ((IHistoDevice) analyzer.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
 		File file = sourcePath.toFile();
 		this.vault = new ExtendedVault(objectDirectory, sourcePath, file.lastModified(), file.length(), fileVersion, logRecordSetSize,
-				logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, deviceKey, //
+				logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, analyzer, //
 				logStartTimestamp_ms, logChannelNumber, logObjectKey, readerSettings);
 	}
 
@@ -154,7 +154,7 @@ public final class VaultCollector {
 	 * @param isSampled
 	 */
 	private void setMeasurementPoints(RecordSet recordSet, boolean isSampled) {
-		List<MeasurementType> channelMeasurements = device.getChannelMeasuremts(this.vault.getLogChannelNumber());
+		List<MeasurementType> channelMeasurements = analyzer.getActiveDevice().getChannelMeasuremts(this.vault.getLogChannelNumber());
 		for (int i = 0; i < recordSet.getRecordNames().length; i++) {
 			MeasurementType measurementType = channelMeasurements.get(i);
 			Record record = recordSet.get(recordSet.getRecordNames()[i]);
@@ -183,7 +183,7 @@ public final class VaultCollector {
 	private SettlementRecords determineSettlements(RecordSet recordSet, GroupTransitions transitions) {
 		SettlementRecords histoSettlements = new SettlementRecords();
 
-		for (SettlementType settlementType : device.getDeviceConfiguration().getChannel(this.vault.logChannelNumber).getSettlements().values()) {
+		for (SettlementType settlementType : analyzer.getActiveDevice().getDeviceConfiguration().getChannel(this.vault.logChannelNumber).getSettlements().values()) {
 			if (settlementType.getEvaluation() != null) {
 				SettlementRecord record = new SettlementRecord(settlementType, recordSet, this.vault.logChannelNumber);
 				histoSettlements.put(settlementType.getName(), record);
@@ -222,7 +222,8 @@ public final class VaultCollector {
 	 * @param recordSet
 	 */
 	private void setTrailStatisticsPoints(CompartmentType entryPoints, Record record, RecordSet recordSet) {
-		StatisticsType measurementStatistics = this.device.getChannelMeasuremts(this.vault.getLogChannelNumber()).get(record.getOrdinal()).getStatistics();
+		IDevice device = analyzer.getActiveDevice();
+		StatisticsType measurementStatistics = device.getChannelMeasuremts(this.vault.getLogChannelNumber()).get(record.getOrdinal()).getStatistics();
 
 		entryPoints.addPoint(TrailTypes.REAL_FIRST, transmuteValue(record, record.elementAt(0)));
 		entryPoints.addPoint(TrailTypes.REAL_LAST, transmuteValue(record, record.elementAt(record.realSize() - 1)));
@@ -351,7 +352,7 @@ public final class VaultCollector {
 	 * @return a record value (point) transformed into the device independent histo vault value (point)
 	 */
 	private int transmuteValue(Record record, int value) {
-		return encodeMeasurementValue(record, device.translateValue(record, value / 1000.));
+		return encodeMeasurementValue(record, analyzer.getActiveDevice().translateValue(record, value / 1000.));
 	}
 
 	/**
@@ -359,7 +360,7 @@ public final class VaultCollector {
 	 * @return a record delta value transformed into the device independent histo vault value
 	 */
 	private int transmuteDelta(Record record, int deltaValue) {
-		return encodeMeasurementValue(record, device.translateDeltaValue(record, deltaValue / 1000.));
+		return encodeMeasurementValue(record, analyzer.getActiveDevice().translateDeltaValue(record, deltaValue / 1000.));
 	}
 
 	/**

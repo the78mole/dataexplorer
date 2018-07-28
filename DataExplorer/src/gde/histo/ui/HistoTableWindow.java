@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -308,7 +309,8 @@ public class HistoTableWindow extends CTabItem {
 						item.setText(HistoTableMapper.getTableRow(trailRecord));
 					} else if (HistoTableWindow.this.settings.isDisplayTags()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item) - currentRecords.size();
-						DisplayTag[] activeDisplayTags = trailRecordSet.getDataTags().getActiveDisplayTags().toArray(new DisplayTag[] {});
+						int channelNumber = Analyzer.getInstance().getActiveChannel().getNumber();
+						DisplayTag[] activeDisplayTags = trailRecordSet.getDataTags().getActiveDisplayTags(channelNumber).toArray(new DisplayTag[] {});
 						item.setText(HistoTableMapper.getTableTagRow(trailRecordSet, activeDisplayTags[index]));
 					}
 				}

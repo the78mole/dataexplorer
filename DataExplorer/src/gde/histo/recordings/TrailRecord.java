@@ -35,7 +35,6 @@ import java.util.stream.DoubleStream;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
-import gde.Analyzer;
 import gde.GDE;
 import gde.data.CommonRecord;
 import gde.data.Record;
@@ -296,7 +295,7 @@ public abstract class TrailRecord extends CommonRecord {
 	protected ElementaryQuantile<Double>	quantile;
 
 	protected TrailRecord(IChannelItem channelItem, int newOrdinal, TrailRecordSet parentTrail, int initialCapacity) {
-		super(Analyzer.getInstance().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
+		super(parentTrail.getAnalyzer().getActiveDevice(), newOrdinal, channelItem.getName(), channelItem.getSymbol(), channelItem.getUnit(),
 				channelItem.isActive(), null, initialCapacity);
 		this.channelItem = channelItem;
 		this.parent = parentTrail;

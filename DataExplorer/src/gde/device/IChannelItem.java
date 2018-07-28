@@ -22,6 +22,7 @@ package gde.device;
 import java.util.List;
 import java.util.Optional;
 
+import gde.Analyzer;
 import gde.data.Record.DataType;
 import gde.histo.cache.HistoVault;
 import gde.histo.recordings.TrailSelector;
@@ -83,5 +84,11 @@ public interface IChannelItem {
 	 */
 	Integer getVaultPoint(HistoVault vault, int trailOrdinal);
 
-	TrailSelector createTrailSelector(String deviceName, int channelNumber, String recordName, boolean smartStatistics);
+	/**
+	 * @param analyzer defines the the requested device, channel, object 
+	 * @param recordName
+	 * @param smartStatistics true if quantiles are active
+	 * @return the trail selector
+	 */
+	TrailSelector createTrailSelector(Analyzer analyzer, String recordName, boolean smartStatistics);
 }

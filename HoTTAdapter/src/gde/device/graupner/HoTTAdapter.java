@@ -900,12 +900,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @param recordDataSize is the number of time steps
 	 */
 	@Override
-	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, int[] maxPoints, int[] minPoints) throws DataInconsitsentException {
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, int[] maxPoints, int[] minPoints, Analyzer analyzer) throws DataInconsitsentException {
 		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of max/min points differs: " + maxPoints.length + "/" + minPoints.length); //$NON-NLS-1$
 
 		int[] points = new int[recordSet.size()]; // curve points for one single time step
 		int recordTimespan_ms = 10;
-		UniversalSampler histoRandomSample = UniversalSampler.createSampler(recordSet.getChannelConfigNumber(), maxPoints, minPoints, recordTimespan_ms);
+		UniversalSampler histoRandomSample = UniversalSampler.createSampler(recordSet.getChannelConfigNumber(), maxPoints, minPoints, recordTimespan_ms, analyzer);
 		IntBuffer intBuffer = ByteBuffer.wrap(dataBuffer).asIntBuffer(); // no performance penalty compared to familiar bit shifting solution
 		for (int i = 0, pointsLength = points.length; i < recordDataSize; i++) {
 			for (int j = 0, iOffset = i * pointsLength + recordDataSize; j < pointsLength; j++) {

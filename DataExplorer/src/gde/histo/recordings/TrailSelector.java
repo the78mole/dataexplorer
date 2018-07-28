@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.device.IChannelItem;
 import gde.device.TrailDisplayType;
@@ -48,6 +49,7 @@ public abstract class TrailSelector {
 	protected final String						recordName;
 	protected final boolean						smartStatistics;
 	protected final int								channelConfigNumber;
+	protected final Analyzer					analyzer;
 
 	/**
 	 * User selection from applicable trails, is saved in the graphics template
@@ -72,21 +74,25 @@ public abstract class TrailSelector {
 		this.recordName = trailRecord.getName();
 		this.smartStatistics = trailRecord.getParent().isSmartStatistics();
 		this.channelConfigNumber = trailRecord.getParent().getChannelConfigNumber();
+		this.analyzer = trailRecord.getParent().getAnalyzer();
+		if (!this.deviceName.equals(analyzer.getActiveDevice().getName())) throw new IllegalArgumentException(
+				"deviceName=" + this.deviceName + " != " + analyzer.getActiveDevice().getName()); // todo remove redundancy
+		if (this.channelConfigNumber != analyzer.getActiveChannel().getNumber()) throw new IllegalArgumentException(
+				"channelNumber=" + this.channelConfigNumber + " != " + analyzer.getActiveChannel().getNumber());
 		setApplicableTrails();
 	}
 
 	/**
-	 * @param channelNumber is the 1-based device channel number
-	 * @param channelItem is a measurement / settlement / scoregroup in the device channel
 	 * @param recordName is the name of the data record which might differ from the device channel item name (e.g. Jeti)
 	 * @param smartStatistics true selects the smart trail types
 	 */
-	protected TrailSelector(String deviceName, int channelNumber, IChannelItem channelItem, String recordName, boolean smartStatistics) {
-		this.deviceName = deviceName;
+	protected TrailSelector(Analyzer analyzer, IChannelItem channelItem, String recordName, boolean smartStatistics) {
+		this.deviceName = analyzer.getActiveDevice().getName();
 		this.channelItem = channelItem;
 		this.recordName = recordName;
 		this.smartStatistics = smartStatistics;
-		this.channelConfigNumber = channelNumber;
+		this.channelConfigNumber = analyzer.getActiveChannel().getNumber();
+		this.analyzer = analyzer;
 		setApplicableTrails();
 	}
 

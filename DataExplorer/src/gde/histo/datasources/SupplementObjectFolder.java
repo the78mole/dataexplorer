@@ -126,7 +126,7 @@ public final class SupplementObjectFolder {
 		if (mirrorUpdate_ms + MIRROR_CYCLE_MS > System.currentTimeMillis()) return;
 
 		mirrorUpdate_ms = System.currentTimeMillis();
-		SupplementObjectFolder instance = new SupplementObjectFolder(Analyzer.getInstance());
+		SupplementObjectFolder instance = new SupplementObjectFolder(Analyzer.getInstance()); // ok
 		Thread rebuildThread = new Thread(() -> instance.rebuildLogMirror(), "rebuildLogMirror");
 		try {
 			rebuildThread.start();
@@ -139,7 +139,7 @@ public final class SupplementObjectFolder {
 	 * Scan the mirror source folders.
 	 */
 	static void updateLogMirrorSync() {
-		SupplementObjectFolder instance = new SupplementObjectFolder(Analyzer.getInstance());
+		SupplementObjectFolder instance = new SupplementObjectFolder(Analyzer.getInstance()); //ok
 		instance.rebuildLogMirror();
 	}
 
@@ -235,7 +235,7 @@ public final class SupplementObjectFolder {
 
 	private final Analyzer		analyzer;
 	private final Path				supplementFolder	= getSupplementObjectsPath();
-	private final Set<String>	logFileExtentions	= Analyzer.getInstance().getDeviceConfigurations().getValidLogExtentions();
+	private final Set<String>	logFileExtentions;
 
 	/**
 	 * Creates the base folder for additional logs which are created by other systems (computers, RC transmitters, etc).
@@ -243,6 +243,7 @@ public final class SupplementObjectFolder {
 	 */
 	private SupplementObjectFolder(Analyzer analyzer) {
 		this.analyzer = analyzer;
+		this.logFileExtentions	= analyzer.getDeviceConfigurations().getValidLogExtentions();
 		FileUtils.checkDirectoryAndCreate(this.supplementFolder.toString());
 	}
 
