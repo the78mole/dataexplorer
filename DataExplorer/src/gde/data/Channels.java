@@ -22,9 +22,11 @@ package gde.data;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.ChannelTypes;
+import gde.device.IDevice;
 import gde.histo.ui.HistoExplorer;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -47,6 +49,8 @@ public class Channels extends HashMap<Integer, Channel> {
 	int									activeChannelNumber			= 1;																					// default at least one channel must exist
 	String[]						channelNames						= new String[1];
 	final DataExplorer	application;
+
+	private Analyzer		analyzer;
 
 	/**
 	 *  Threadsafe usage.
@@ -108,8 +112,10 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	public Channels(Channels that) {
 		this(4);
+		if (this.analyzer == null) throw new IllegalArgumentException("setup is missing");
 
 		// non-UI fields
+		this.analyzer = that.analyzer;
 		this.activeChannelNumber = that.activeChannelNumber;
 		this.channelNames = that.channelNames.clone();
 	}
@@ -193,6 +199,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * @param recordSetKey or empty string if switched to first record set
 	 */
 	public void switchChannel(int channelNumber, String recordSetKey) {
+		if (!GDE.isWithUi()) throw new UnsupportedOperationException("for use with internal UI only");
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "switching to channel " + channelNumber); //$NON-NLS-1$
 		this.application.checkUpdateFileComment();
 		this.application.checkUpdateRecordSetComment();
@@ -215,7 +222,7 @@ public class Channels extends HashMap<Integer, Channel> {
 					this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
 				}
 				this.application.selectObjectKey(Channels.this.getActiveChannel().getObjectKey());
-				this.application.getActiveDevice().getDeviceConfiguration().setLastChannelNumber(channelNumber);
+				Settings.getInstance().addDeviceUse(this.application.getActiveDevice().getDeviceConfiguration().getName(), channelNumber); // ok
 			} else {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$
 			}
@@ -241,9 +248,9 @@ public class Channels extends HashMap<Integer, Channel> {
 				this.application.updateAllTabs(true);
 
 				this.application.getActiveDevice().setLastChannelNumber(channelNumber);
-				if (this.application.getHistoExplorer().isPresent() != Settings.getInstance().isHistoActive()) {
+				if (this.application.getHistoExplorer().isPresent() != Settings.getInstance().isHistoActive()) { // ok
 					// this case may exist during DE startup
-				} else if (Settings.getInstance().isHistoActive()) {
+				} else if (Settings.getInstance().isHistoActive()) { // ok
 					this.application.getHistoExplorer().ifPresent(HistoExplorer::updateHistoTabs);
 				}
 			}
@@ -328,6 +335,30 @@ public class Channels extends HashMap<Integer, Channel> {
 			}
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Buildup new structure  - set up the channels with object key assignments.
+	 * todo might be better to do the setup during instantiation
+	 */
+	public void setupChannels(Analyzer analyzer) {
+		cleanup();
+
+		this.analyzer = analyzer;
+
+		IDevice device = analyzer.getActiveDevice();
+		int channelCount = device.getChannelCount();
+		this.channelNames = new String[channelCount];
+		for (int i = 1; i <= channelCount; i++) {
+			log.log(Level.FINE, "setting up channels = " + i); //$NON-NLS-1$
+
+			Channel newChannel = new Channel(device.getChannelNameReplacement(i), device.getChannelTypes(i));
+			newChannel.setObjectKey(analyzer.getSettings().getActiveObjectKey());
+			// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
+			put(Integer.valueOf(i), newChannel);
+			// do not call channel.applyTemplate here, there are no record sets
+			this.channelNames[i - 1] = i + " : " + device.getChannelNameReplacement(i);
+		}
 	}
 
 }

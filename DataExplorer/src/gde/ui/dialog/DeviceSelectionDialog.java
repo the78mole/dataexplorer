@@ -64,7 +64,6 @@ import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
 import gde.config.DeviceConfigurations;
 import gde.config.Settings;
-import gde.data.Channel;
 import gde.data.Channels;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
@@ -209,7 +208,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					// update device configurations if required
-					for (String deviceKey : DeviceSelectionDialog.this.deviceConfigurations.keySet().toArray(new String[0])) {
+					for (String deviceKey : DeviceSelectionDialog.this.deviceConfigurations.deviceNames().toArray(new String[0])) {
 						checkAndStoreDeviceConfiguration(deviceKey);
 					}
 					// initialize selected device
@@ -807,7 +806,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	private void updateDeviceSelectionTable() {
 		if (!this.isDisposed()) {
 			this.deviceTable.removeAll();
-			for (String deviceKey : this.deviceConfigurations.keySet()) {
+			for (String deviceKey : this.deviceConfigurations.deviceNames()) {
 				log.log(Level.FINE, deviceKey);
 				DeviceConfiguration config = this.deviceConfigurations.get(deviceKey);
 
@@ -1075,16 +1074,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		channels.cleanup();
 
 		if (activeDevice != null) {
-			// buildup new structure  - set up the channels
-			for (int i = 1; i <= activeDevice.getChannelCount(); i++) {
-				log.log(Level.FINE, "setting up channels = " + i); //$NON-NLS-1$
-
-				Channel newChannel = new Channel(activeDevice.getChannelNameReplacement(i), activeDevice.getChannelTypes(i));
-				newChannel.setObjectKey(this.application.getObjectKey());
-				// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
-				channels.put(Integer.valueOf(i), newChannel);
-				// do not call channel.applyTemplate here, there are no record sets
-			}
+			channels.setupChannels(Analyzer.getInstance());
 			channels.switchChannel(activeDevice.getLastChannelNumber(), GDE.STRING_EMPTY); // set " 1 : Ausgang" as default after device switch and update
 		}
 		this.application.setProgress(0, null);

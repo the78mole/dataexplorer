@@ -2459,6 +2459,7 @@ public class DeviceConfiguration {
 	/**
 	 * set the last used channel number (ordinal + 1 = channel number)
 	 */
+	@Deprecated // use settings.addDeviceUse without this deviation method
 	public void setLastChannelNumber(int channelNumber) {
 		this.settings.addDeviceUse(this.getName(), channelNumber);
 	}

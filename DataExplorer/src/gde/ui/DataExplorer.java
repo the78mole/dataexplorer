@@ -1584,7 +1584,8 @@ public class DataExplorer extends Composite {
 	}
 
 	/**
-	 * @return the object keys, if there are no object key defined return an empty string array
+	 * Set the active channel's object key (does not affect the settings).
+	 * {@code newObjectKey} must occur in the object key list.
 	 */
 	public void selectObjectKey(final String newObjectKey) {
 		if (this.settings != null && !this.analyzer.getChannels().getActiveChannel().getObjectKey().equals(newObjectKey)) {

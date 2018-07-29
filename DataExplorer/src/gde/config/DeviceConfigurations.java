@@ -45,6 +45,7 @@ import gde.utils.StringHelper;
 
 /**
  * Provide device lists and the selected device.
+ * Holds only devices with the usage flag in the device configuration xml file.
  * Moved from DeviceSelectionDialog with minimum changes.
  * @author Thomas Eickert (USER)
  */
@@ -70,7 +71,10 @@ public final class DeviceConfigurations {
 		this.initialize(files, activeDeviceName);
 	}
 
-	public Set<String> keySet() {
+	/**
+	 * @return the device names of devices with the usage flag in the device configuration xml file
+	 */
+	public Set<String> deviceNames() {
 		return this.configs.keySet();
 	}
 

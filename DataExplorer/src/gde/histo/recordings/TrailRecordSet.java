@@ -150,7 +150,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				getDataTags().add(gpsCluster);
 				// refresh the histo table which might already have been painted without the GPS coordinates
 				if (getDataTags().getDataGpsLocations().size() > 0) {
-					application.getPresentHistoExplorer().updateHistoTableWindow(false);
+					if (GDE.isWithUi()) application.getPresentHistoExplorer().updateHistoTableWindow(false);
 					log.finer(() -> "fill in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " ms!  GPS locations size=" + gpsCluster.getAssignedClusters().values().size()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
