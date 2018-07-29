@@ -13,15 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.device.IDevice;
-import gde.log.Level;
 
 import java.io.FileInputStream;
 import java.util.HashMap;
@@ -47,6 +42,11 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.device.IDevice;
+import gde.log.Level;
+
 /**
  * Class to manage SWT resources (Font, Color, Image and Cursor)
  * There are no restrictions on the use of this code.
@@ -63,7 +63,7 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SWTResourceManager {
 	private static Logger log = Logger.getLogger(SWTResourceManager.class.getName());
-	
+
 	static int accessCounter = 0;
 
 	static HashMap<String, Object> resources = new HashMap<String, Object>();
@@ -72,6 +72,7 @@ public class SWTResourceManager {
 	static SWTResourceManager instance = new SWTResourceManager();
 
 	private static DisposeListener disposeListener = new DisposeListener() {
+		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			users.remove(e.getSource());
 			if (widgets.get(e.getSource().getClass().getSimpleName()) != null) {
@@ -85,7 +86,7 @@ public class SWTResourceManager {
 			}
 			if (users.size() == 0)
 				dispose();
-			
+
 			//listResourceStatus(); // debug resource housekeeping
 		}
 	};
@@ -112,13 +113,13 @@ public class SWTResourceManager {
 		}
 		widget.addDisposeListener(disposeListener);
 	}
-	
+
 //	private static void checkAccess() {
 //		if (accessCounter++ % 10 == 0) {
 //			listStatus();
 //		}
 //	}
-	
+
 	public static void listResourceStatus(String callIdentifier) {
 		Iterator<String> it = resources.keySet().iterator();
 		log.log(Level.WARNING, callIdentifier + ": number collected resources = " + resources.size());
@@ -165,7 +166,7 @@ public class SWTResourceManager {
 		}
 		resources.clear();
 	}
-	
+
 
 	/**
 	 * use this method to debug context menu resource housekeeping, place a breakpoint at dispose implementation line
@@ -173,24 +174,25 @@ public class SWTResourceManager {
 	 * @param implClassName
 	 * @param shell
 	 * @param style
-	 * @return menu 
+	 * @return menu
 	 */
 	public static Menu getMenu(final String implClassName, Shell shell, int style) {
 		String name = "MENU:" + implClassName; //$NON-NLS-1$
-		if (resources.containsKey(name) && !((Menu)resources.get(name)).isDisposed()) 
+		if (resources.containsKey(name) && !((Menu)resources.get(name)).isDisposed())
 			return (Menu) resources.get(name);
 		if(resources.containsKey(name) && ((Menu)resources.get(name)).isDisposed())
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "menu isDisposed = " + implClassName); //$NON-NLS-1$
-		
+
 		Menu menu = new Menu(shell, style);
-		menu.addDisposeListener(new DisposeListener() {	
+		menu.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent disposeevent) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "menu.widgetDisposed " + implClassName); //$NON-NLS-1$
 				resources.remove(implClassName);
 			}
 		});
 		resources.put(implClassName, menu);
-		
+
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new menu created for " + implClassName); //$NON-NLS-1$
 		return menu;
 	}
@@ -274,7 +276,7 @@ public class SWTResourceManager {
 			img.setBackground(widget.getBackground());
 		return img;
 	}
-	
+
 	public static Image getImage(int x, int y) {
 		String key = "IMAGE:" + x + GDE.STRING_UNDER_BAR + y; //$NON-NLS-1$
 		try {
@@ -306,7 +308,7 @@ public class SWTResourceManager {
 	}
 
 	/**
-	 * create an image containing a icon at left hand side and a text 
+	 * create an image containing a icon at left hand side and a text
 	 * @param pt size of the image
 	 * @param imageURL image to be placed left hand side, image must fit the given size
 	 * @param text to be placed centered in the remaining space
@@ -317,7 +319,7 @@ public class SWTResourceManager {
 		try {
 			if (resources.containsKey(key))
 				return (Image) resources.get(key);
-			
+
 			Image buttonImage = SWTResourceManager.getImage(imageURL);
 			Image img = SWTResourceManager.getImage(pt.x, pt.y);
 			GC gc = new GC(img);
@@ -331,16 +333,16 @@ public class SWTResourceManager {
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new image created = " + key); //$NON-NLS-1$
 			resources.put(key, img);
 			return img;
-			
+
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			return null;
 		}
 	}
 
-	public static Image getRotatedImage(Image image, int style, String imgKey) {	
+	public static Image getRotatedImage(Image image, int style, String imgKey) {
 		Image resultImg = null;
-		
+
 		// Use the image's data to create a rotated image's data
 		ImageData sd = image.getImageData();
 		boolean up = (style & SWT.UP) == SWT.UP;
@@ -392,7 +394,7 @@ public class SWTResourceManager {
 			return null;
 		}
 	}
-	
+
 	public static Image getImage(ImageData imageData, String imgKey) {
 		String key = "IMAGE_DATA:" + imageData.height + GDE.STRING_UNDER_BAR + imageData.width + GDE.STRING_UNDER_BAR + imgKey ; //$NON-NLS-1$
 		try {
@@ -459,13 +461,18 @@ public class SWTResourceManager {
 		} catch (Exception e) {
 			try {
 				log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + tmpUrl + " not found");
-				Image img = new Image(Display.getDefault(), new FileInputStream(Settings.getInstance().getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX))));
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new image created = " + Settings.getInstance().getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX))); //$NON-NLS-1$
+				Image img = new Image(Display.getDefault(), new FileInputStream(Settings.getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX))));
+				if (log.isLoggable(Level.FINE))
+				 {
+					Settings.getInstance();
+					log.log(Level.FINE, "new image created = " + Settings.getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX))); //$NON-NLS-1$
+				}
 				resources.put(tmpUrl, img);
 				return img;
 			}
 			catch (Throwable t) {
-				log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + Settings.getInstance().getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+				Settings.getInstance();
+				log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + Settings.getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
 				log.log(Level.SEVERE, e.getMessage(), e);
 				return getImage(activeDeviceInstance, "resource/NoDevicePicture.jpg");
 			}
@@ -568,7 +575,7 @@ public class SWTResourceManager {
 //		resources.put(name, gc);
 //		return gc;
 //	}
-//	
+//
 //	public static GC getGC(Canvas canvas, String descriptorKey) {
 //		String name = "GC_CANVAS:" + descriptorKey; //$NON-NLS-1$
 //		if (resources.containsKey(name))

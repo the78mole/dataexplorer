@@ -42,7 +42,8 @@ public class Channels extends HashMap<Integer, Channel> {
 
 	static final int		CHANNEL_NAME_MIN_LENGTH	= 3;																					// 'GPS'
 
-	static Channels			channles								= null;
+	private static volatile Channels	channles	= null;
+
 	int									activeChannelNumber			= 1;																					// default at least one channel must exist
 	String[]						channelNames						= new String[1];
 	final DataExplorer	application;
@@ -59,19 +60,24 @@ public class Channels extends HashMap<Integer, Channel> {
 	 *  getInstance returns the instance of this singleton, this may called during creation time of the application
 	 *  therefore it is required to give the application instance as argument
 	 */
-	public static synchronized Channels getInstance(DataExplorer application) {
+	public static Channels getInstance(DataExplorer application) {
 		if (Channels.channles == null) {
-			Channels.channles = new Channels(application, 4);
+			synchronized (Channels.class) {
+				Channels.channles = new Channels(application, 4);
+			}
 		}
 		return Channels.channles;
 	}
 
 	/**
-	 *  getInstance returns the instance of this singleton
+	 * getInstance returns the instance of this singleton
 	 */
-	public static synchronized Channels getInstance() {
+	public static Channels getInstance() {
 		if (Channels.channles == null) {
 			Channels.channles = new Channels(4);
+			// synchronize now to avoid a performance penalty in case of frequent getInstance calls
+			synchronized (Channels.class) {
+			}
 		}
 		return Channels.channles;
 	}

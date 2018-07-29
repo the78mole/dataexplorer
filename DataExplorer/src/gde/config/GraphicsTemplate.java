@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.config;
@@ -23,14 +23,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import gde.GDE;
+import gde.log.Level;
 
 /**
  * CSlass managing graphics visualization, store, restore
- * @author Winfried Brügmann 
+ * @author Winfried Brügmann
  */
 public class GraphicsTemplate extends Properties {
 	static final long			serialVersionUID	= 260357;
@@ -41,7 +41,6 @@ public class GraphicsTemplate extends Properties {
 	String				defaultFileName;
 	String				selectedFileName;
 	String				currentFileFilePath;
-	String				templatePath;
 	String				templateFilePath;
 
 	/**
@@ -49,7 +48,6 @@ public class GraphicsTemplate extends Properties {
 	 * @param deviceSignature - device signature as String (Picolario_K1)
 	 */
 	public GraphicsTemplate(String deviceSignature) {
-		this.templatePath = Settings.getInstance().getGraphicsTemplatePath();
 		this.defaultFileName = deviceSignature + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4);
 		this.templateFilePath = this.defaultFileName;
 		log.log(Level.FINE, "graphics template file is " + this.templateFilePath); //$NON-NLS-1$
@@ -74,7 +72,7 @@ public class GraphicsTemplate extends Properties {
 	 */
 	public void load() {
 		try {
-			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
+			this.currentFileFilePath = Settings.getGraphicsTemplatePath() + GDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
 			log.log(Level.FINE, "opening template file " + this.currentFileFilePath); //$NON-NLS-1$
 			this.loadFromXML(new FileInputStream(new File(this.currentFileFilePath)));
 			this.isAvailable = true;
@@ -94,14 +92,14 @@ public class GraphicsTemplate extends Properties {
 	public void store() {
 		try {
 			// check if templatePath exist, else create directory
-			File tmpPath = new File(this.templatePath);
+			File tmpPath = new File(Settings.getGraphicsTemplatePath());
 			if (!tmpPath.exists()) {
 				if (!tmpPath.mkdir()) {
 					log.log(Level.WARNING, "failed to create " + tmpPath);
 				}
 			}
 
-			this.currentFileFilePath = this.templatePath + GDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName != null && this.selectedFileName.equals(GDE.STRING_EMPTY) || this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
+			this.currentFileFilePath = Settings.getGraphicsTemplatePath() + GDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName != null && this.selectedFileName.equals(GDE.STRING_EMPTY) || this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
 			this.storeToXML(new FileOutputStream(new File(this.currentFileFilePath)), "-- DataExplorer GraphicsTemplate --"); //$NON-NLS-1$
 			this.isSaved = true;
 			this.selectedFileName = null;

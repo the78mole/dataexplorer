@@ -18,18 +18,6 @@
 ****************************************************************************************/
 package gde.device.skyrc;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.device.DeviceDialog;
-import gde.device.skyrc.MC3000.SlotSettings;
-import gde.device.skyrc.MC3000.SystemSettings;
-import gde.device.skyrc.ProgramType.SetupData;
-import gde.log.Level;
-import gde.messages.Messages;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -77,6 +65,18 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.device.DeviceDialog;
+import gde.device.skyrc.MC3000.SlotSettings;
+import gde.device.skyrc.MC3000.SystemSettings;
+import gde.device.skyrc.ProgramType.SetupData;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 /**
  * Dialog class to enable visualization control
@@ -169,7 +169,7 @@ public class MC3000Dialog extends DeviceDialog {
 
 				Unmarshaller unmarshaller = this.jc.createUnmarshaller();
 				unmarshaller.setSchema(this.schema);
-				this.mc3000Setup = (MC3000Type) unmarshaller.unmarshal(new File(this.settings.getApplHomePath() + "/MC3000_Slot_Programs" + GDE.FILE_ENDING_DOT_XML)); //$NON-NLS-1$
+				this.mc3000Setup = (MC3000Type) unmarshaller.unmarshal(new File(Settings.getApplHomePath() + "/MC3000_Slot_Programs" + GDE.FILE_ENDING_DOT_XML)); //$NON-NLS-1$
 				int index = 0;
 				for (ProgramType prog : this.mc3000Setup.program) {
 					if (!prog.getName().contains(MC3000Dialog.NEW_PROG_NAME))
@@ -254,7 +254,7 @@ public class MC3000Dialog extends DeviceDialog {
 					@Override
 					public void helpRequested(HelpEvent evt) {
 						MC3000Dialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-						MC3000Dialog.this.application.openHelpDialog(MC3000Dialog.DEVICE_JAR_NAME, "HelpInfo.html"); //$NON-NLS-1$ 
+						MC3000Dialog.this.application.openHelpDialog(MC3000Dialog.DEVICE_JAR_NAME, "HelpInfo.html"); //$NON-NLS-1$
 					}
 				});
 				this.clipboard = new Clipboard(this.dialogShell.getDisplay());
@@ -303,7 +303,7 @@ public class MC3000Dialog extends DeviceDialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								MC3000Dialog.log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-								MC3000Dialog.this.application.openHelpDialog(MC3000Dialog.DEVICE_JAR_NAME, "HelpInfo.html"); //$NON-NLS-1$ 
+								MC3000Dialog.this.application.openHelpDialog(MC3000Dialog.DEVICE_JAR_NAME, "HelpInfo.html"); //$NON-NLS-1$
 							}
 						});
 					}
@@ -512,7 +512,7 @@ public class MC3000Dialog extends DeviceDialog {
 			MC3000Dialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 			if (e instanceof UsbException)
 				isBusyString = e.getMessage();
-			else 
+			else
 				isBusyString = Messages.getString(MessageIds.GDE_MSGW3601);
 		}
 		finally {
@@ -892,7 +892,7 @@ public class MC3000Dialog extends DeviceDialog {
 	//	}
 
 	/**
-	 * create minimal MC3000 XML data 
+	 * create minimal MC3000 XML data
 	 */
 	private void createMC3000Setup() {
 		this.mc3000Setup = new ObjectFactory().createMC3000Type();
@@ -917,7 +917,7 @@ public class MC3000Dialog extends DeviceDialog {
 			Marshaller marshaller = this.jc.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.valueOf(true));
 			marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, MC3000Dialog.MC3000_XSD);
-			marshaller.marshal(this.mc3000Setup, new FileOutputStream(new File(this.settings.getApplHomePath() + "/MC3000_Slot_Programs" + GDE.FILE_ENDING_DOT_XML))); //$NON-NLS-1$
+			marshaller.marshal(this.mc3000Setup, new FileOutputStream(new File(Settings.getApplHomePath() + "/MC3000_Slot_Programs" + GDE.FILE_ENDING_DOT_XML))); //$NON-NLS-1$
 			MC3000Dialog.log.log(Level.TIME, "write program setup XML time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.saveButton != null && !this.saveButton.isDisposed()) this.saveButton.setEnabled(false);
 		}

@@ -158,8 +158,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.legacyDeviceNames.put("PichlerP60", "PichlerP60 50W");
 
 		try {
-			File file = new File(this.settings.getDevicesPath());
-			if (!file.exists()) throw new FileNotFoundException(this.settings.getDevicesPath()); // todo replace throw/catch with simple if
+			File file = new File(Settings.getDevicesPath());
+			if (!file.exists()) throw new FileNotFoundException(Settings.getDevicesPath()); // todo replace throw/catch with simple if
 
 			this.deviceConfigurations = Analyzer.getInstance().getDeviceConfigurations();
 			this.activeDevices = this.deviceConfigurations.getActiveDevices();
@@ -894,7 +894,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			else {
 				IDevice selectedDevice = getInstanceOfDevice();
 				if (selectedDevice != null) {
-					log.log(Level.FINE, this.settings.getDevicesPath() + this.selectedActiveDeviceConfig.getImageFileName());
+					log.log(Level.FINE, Settings.getDevicesPath() + this.selectedActiveDeviceConfig.getImageFileName());
 					this.deviceCanvas.setBackgroundImage(SWTResourceManager.getImage(selectedDevice, "resource/" + this.selectedActiveDeviceConfig.getImageFileName()));
 					this.manufacturerName.setText(this.selectedActiveDeviceConfig.getManufacturer());
 					this.deviceText.setText(this.selectedActiveDeviceConfig.getName());

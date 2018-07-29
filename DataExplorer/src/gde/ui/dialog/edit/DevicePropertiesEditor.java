@@ -307,7 +307,7 @@ public class DevicePropertiesEditor extends Composite {
 
 		if (System.getProperty(GDE.ECLIPSE_STRING) == null) { // running outside eclipse
 			try {
-				logHandler = new FileHandler(this.settings.getLogFilePath(), 5000000, 3);
+				logHandler = new FileHandler(Settings.getLogFilePath(), 5000000, 3);
 				rootLogger.addHandler(logHandler);
 				logHandler.setFormatter(lf);
 				logHandler.setLevel(java.util.logging.Level.ALL);

@@ -722,7 +722,8 @@ public class MenuBar {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "saveGraphicsTemplateItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getInstance().getGraphicsTemplatePath()); //$NON-NLS-1$
+							Settings.getInstance();
+							MenuBar.log.log(Level.FINE, "templatePath = " + Settings.getGraphicsTemplatePath()); //$NON-NLS-1$
 							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoWindowVisible()).orElse(false) //
 									&& MenuBar.this.application.getPresentHistoExplorer().hasRecords()) {
 								TrailRecordSet trailRecordSet = application.getPresentHistoExplorer().getTrailRecordSet();
@@ -744,8 +745,9 @@ public class MenuBar {
 								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
 								if (activeChannel != null) {
 									GraphicsTemplate template = activeChannel.getTemplate();
+									Settings.getInstance();
 									FileDialog fileDialog = MenuBar.this.application.prepareFileSaveDialog(Messages.getString(MessageIds.GDE_MSGT0036), new String[] { Settings.GRAPHICS_TEMPLATES_EXTENSION },
-											Settings.getInstance().getGraphicsTemplatePath(), template.getDefaultFileName());
+											Settings.getGraphicsTemplatePath(), template.getDefaultFileName());
 									fileDialog.open();
 									String templateFileName = fileDialog.getFileName();
 									if (templateFileName != null && templateFileName.length() > 4) {
@@ -783,7 +785,7 @@ public class MenuBar {
 								}
 							} else {
 								FileDialog fileDialog = MenuBar.this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] {
-										Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getInstance().getGraphicsTemplatePath(), null, SWT.SINGLE);
+										Settings.GRAPHICS_TEMPLATES_EXTENSION }, Settings.getGraphicsTemplatePath(), null, SWT.SINGLE);
 								String templateFileName = fileDialog.getFileName();
 								if (templateFileName != null && templateFileName.length() > 4) {
 									MenuBar.log.log(Level.FINE, "templateFilePath = " + templateFileName); //$NON-NLS-1$

@@ -55,6 +55,10 @@ public abstract class Analyzer {
 			} else {
 				analyzer = new Explorer();
 			}
+			// synchronize now to avoid a performance penalty in case of frequent getInstance calls
+			synchronized (analyzer) {
+				analyzer.initialize();
+			}
 		}
 		return analyzer;
 	}
@@ -81,11 +85,15 @@ public abstract class Analyzer {
 			@Override
 			public void run() {
 				log.log(Level.FINE, "deviceConfigurationsThread    started");
-				File file = new File(Settings.getInstance().getDevicesPath());
+				Settings.getInstance();
+				File file = new File(Settings.getDevicesPath());
 				if (file.exists()) Analyzer.this.deviceConfigurations = new DeviceConfigurations(file.list(), Settings.getInstance().getActiveDevice());
 				log.log(Level.TIME, "deviceConfigurationsThread time =", new SimpleDateFormat("ss:SSS").format(new Date().getTime() - GDE.StartTime));
 			}
 		};
+	}
+
+	protected void initialize() {
 		this.deviceConfigurationsThread.start();
 	}
 
@@ -120,7 +128,7 @@ public abstract class Analyzer {
 				} catch (InterruptedException e) {
 				}
 			} else {
-				File file = new File(Settings.getInstance().getDevicesPath());
+				File file = new File(Settings.getDevicesPath());
 				this.deviceConfigurations = new DeviceConfigurations(file.list());
 			}
 		}

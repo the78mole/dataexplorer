@@ -176,8 +176,8 @@ public class TestSuperClass extends TestCase {
 		this.application.setHisto(true);
 		setHistoSettings();
 
-		File file = new File(this.settings.getDevicesPath());
-		if (!file.exists()) throw new FileNotFoundException(this.settings.getDevicesPath());
+		File file = new File(Settings.getDevicesPath());
+		if (!file.exists()) throw new FileNotFoundException(Settings.getDevicesPath());
 		String[] files = file.list();
 		DeviceConfiguration devConfig;
 		this.deviceConfigurations = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
@@ -190,7 +190,7 @@ public class TestSuperClass extends TestCase {
 				// loop through all device properties XML and check if device used
 				if (files[i].endsWith(GDE.FILE_ENDING_DOT_XML)) {
 					String deviceKey = files[i].substring(0, files[i].length() - 4);
-					devConfig = new DeviceConfiguration(this.settings.getDevicesPath() + GDE.FILE_SEPARATOR + files[i]);
+					devConfig = new DeviceConfiguration(Settings.getDevicesPath() + GDE.FILE_SEPARATOR + files[i]);
 
 					// store all device configurations in a map
 					String keyString;
@@ -511,7 +511,7 @@ public class TestSuperClass extends TestCase {
 	}
 
 	protected File setDataPath() {
-		boolean settingsPropertiesExist = new File(this.settings.getSettingsFilePath()).exists();
+		boolean settingsPropertiesExist = new File(Settings.getSettingsFilePath()).exists();
 		boolean isDataPathConfigured = new File(this.settings.getDataFilePath()).getPath() != GDE.FILE_SEPARATOR_UNIX;
 
 		if (settingsPropertiesExist && isDataPathConfigured) {

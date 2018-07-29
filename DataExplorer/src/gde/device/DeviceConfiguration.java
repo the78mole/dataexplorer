@@ -2714,7 +2714,7 @@ public class DeviceConfiguration {
 			path = Paths.get(tmpImportDirPath);
 			// ignore object if path ends with a valid object
 			String directoryName = path.getFileName().toString();
-			path = Settings.getInstance().getValidatedObjectKey(directoryName).isPresent() ? path.getParent() : path;
+			path = this.settings.getValidatedObjectKey(directoryName).isPresent() ? path.getParent() : path;
 			// ignore device if path ends with a valid device
 			String directoryName2 = path.getFileName().toString();
 			path = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;

@@ -20,7 +20,6 @@
 package gde.ui;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -170,7 +169,7 @@ public class DataExplorer extends Composite {
 	public final static String		COMPARE_RECORD_SET								= "compare_set";																						//$NON-NLS-1$
 	public final static String		UTILITY_RECORD_SET								= "utility_set";																						//$NON-NLS-1$
 
-	private static DataExplorer		application												= null;
+	private static volatile DataExplorer	application								= null;
 
 	gde.io.FileHandler						fileHandler;
 	CTabFolder										displayTab;
@@ -229,7 +228,7 @@ public class DataExplorer extends Composite {
 	final FileTransfer						fileTransfer											= FileTransfer.getInstance();
 	Transfer[]										types															= new Transfer[] { this.fileTransfer };
 
-	private final Analyzer							analyzer;
+	private Analyzer							analyzer;
 
 	/**
 	 * update all visualization windows
@@ -238,14 +237,17 @@ public class DataExplorer extends Composite {
 
 	/**
 	 * main application class constructor
-	 * @param parent
-	 * @param style
-	 * @throws MalformedURLException
 	 */
 	private DataExplorer() {
 		super(GDE.shell, SWT.NONE);
-		analyzer = Analyzer.getInstance();
 		this.threadId = Thread.currentThread().getId();
+	}
+
+	/**
+	 * main application class constructor
+	 */
+	private void initialize() {
+		analyzer = Analyzer.getInstance();
 
 		this.extensionFilterMap.put(GDE.FILE_ENDING_OSD, Messages.getString(MessageIds.GDE_MSGT0139));
 		this.extensionFilterMap.put(GDE.FILE_ENDING_LOV, Messages.getString(MessageIds.GDE_MSGT0140));
@@ -268,9 +270,13 @@ public class DataExplorer extends Composite {
 	/**
 	 * get the instance of singleton DataExplorer
 	 */
-	public static synchronized DataExplorer getInstance() {
+	public static DataExplorer getInstance() {
 		if (DataExplorer.application == null) {
-			application = new DataExplorer();
+			DataExplorer.application = new DataExplorer();
+			// synchronize now to avoid a performance penalty in case of frequent getInstance calls
+			synchronized (DataExplorer.application) {
+				DataExplorer.application.initialize();
+			}
 		}
 		return DataExplorer.application;
 	}
@@ -517,7 +523,7 @@ public class DataExplorer extends Composite {
 
 		if (System.getProperty(GDE.ECLIPSE_STRING) == null) { // running outside eclipse
 			try {
-				logHandler = new java.util.logging.FileHandler(this.settings.getLogFilePath(), 5000000, 3);
+				logHandler = new java.util.logging.FileHandler(Settings.getLogFilePath(), 5000000, 3);
 				rootLogger.addHandler(logHandler);
 				logHandler.setFormatter(lf);
 				logHandler.setLevel(Level.ALL);
@@ -3109,7 +3115,7 @@ public class DataExplorer extends Composite {
 
 							if (DataExplorer.this.isTmpWriteStop) break;
 
-							String tmpFilePath = DataExplorer.this.settings.getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + GDE.TEMP_FILE_STEM;
+							String tmpFilePath = Settings.getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + GDE.TEMP_FILE_STEM;
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "attempt to save a temporary file(s)");
 							if (DataExplorer.this.analyzer.getActiveChannel() != null && DataExplorer.this.analyzer.getActiveChannel().getType() == ChannelTypes.TYPE_CONFIG) {
 								if (DataExplorer.this.analyzer.getActiveChannel().getActiveRecordSet() != null)

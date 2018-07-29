@@ -438,7 +438,7 @@ public class SettingsDialog extends Dialog {
 								this.writeTmpFiles = new Button(this.fileOpenSaveDialogGroup, SWT.CHECK | SWT.LEFT);
 								this.writeTmpFiles.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.writeTmpFiles.setText(Messages.getString(MessageIds.GDE_MSGT0674));
-								this.writeTmpFiles.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0675, new String[] { this.settings.getApplHomePath() }));
+								this.writeTmpFiles.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0675, new String[] { Settings.getApplHomePath() }));
 								this.writeTmpFiles.setBounds(370, GDE.IS_MAC_COCOA || GDE.IS_LINUX ? 8 : 20, 95, 16);
 								this.writeTmpFiles.addSelectionListener(new SelectionAdapter() {
 									@Override

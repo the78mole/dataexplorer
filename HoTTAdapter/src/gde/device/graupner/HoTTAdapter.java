@@ -1609,7 +1609,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			if (constructor != null) {
 
 				// set directory where to start search for mdl files
-				System.setProperty("log.dir", Settings.getInstance().getLogFilePath().substring(0, Settings.getInstance().getLogFilePath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX))); //$NON-NLS-1$
+				System.setProperty("log.dir", Settings.getLogFilePath().substring(0, Settings.getLogFilePath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX))); //$NON-NLS-1$
 				HoTTAdapter.log.log(java.util.logging.Level.OFF, "log.dir =  " + System.getProperty("log.dir")); //$NON-NLS-1$ //$NON-NLS-2$
 				System.setProperty("mdl.dir", Settings.getInstance().getDataFilePath());//$NON-NLS-1$
 				HoTTAdapter.log.log(java.util.logging.Level.OFF, "mdl.dir =  " + System.getProperty("mdl.dir")); //$NON-NLS-1$ //$NON-NLS-2$

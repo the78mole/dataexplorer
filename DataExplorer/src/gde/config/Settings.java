@@ -52,7 +52,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.xml.sax.SAXException;
 
 import gde.DataAccess;
-import gde.DataAccess.LocalAccess;
 import gde.GDE;
 import gde.log.Level;
 import gde.log.LogFormatter;
@@ -283,16 +282,17 @@ public final class Settings extends Properties {
 
 	/**
 	 * a singleton needs a static method to get the instance of this calss.
-	 * Is synchronized because during startup additional requests for an instance might occur during Settings instantiation (new Settings() ).
+	 * Is synchronized because during startup additional requests for an instance might occur during Settings initialization.
 	 * The result would be multiple settings instances and data loss if any instance fields are modified.
-	 * ET 07.2018: Currently startup syncing is mandatory for calls by Analyzer, GDE and Junit.
 	 * @return the instance
 	 */
 	public static Settings getInstance() {
 		if (Settings.instance == null) {
-			synchronized (Settings.class) {
+			Settings.instance = new Settings();
+			// synchronize now to avoid a performance penalty in case of frequent getInstance calls
+			synchronized (Settings.instance) {
 				try {
-					Settings.instance = new Settings();
+					Settings.instance.initialize();
 					Settings.log.log(Level.TIME, "init time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
 				} catch (Exception e) {
 					Settings.log.log(Level.SEVERE, e.getMessage(), e);
@@ -304,18 +304,22 @@ public final class Settings extends Properties {
 
 	/**
 	 * singleton private constructor
-	 * @throws SAXException
-	 * @throws JAXBException
 	 */
-	private Settings() throws SAXException, JAXBException {
-		final String $METHOD_NAME = "Settings"; //$NON-NLS-1$
-
+	private Settings(){
 		if (GDE.APPL_HOME_PATH.isEmpty()) {
-			Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGW0001));
+			Settings.log.log(Level.SEVERE, Messages.getString(MessageIds.GDE_MSGW0001));
 		}
 		this.deviceSerialization = new DeviceSerialization();
 		this.xsdThread = deviceSerialization.createXsdThread();
+	}
 
+	/**
+	 * Singleton initialization loads the settings and the measurement display properties.
+	 * For the standard environment it updates or migrates the device XMLs.
+	 * @throws SAXException
+	 * @throws JAXBException
+	 */
+	private void initialize() throws SAXException, JAXBException {
 		this.load();
 
 		if (GDE.EXECUTION_ENV == null) {
@@ -357,7 +361,7 @@ public final class Settings extends Properties {
 
 			String histoCacheDirectory = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.HISTO_CACHE_ENTRIES_DIR_NAME;
 			if (!FileUtils.checkDirectoryAndCreate(histoCacheDirectory, Settings.HISTO_CACHE_ENTRIES_XSD_NAME)) {
-				((LocalAccess) DataAccess.getInstance()).resetHistoCache();
+				FileUtils.extract(Settings.class, Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, histoCacheDirectory, Settings.PERMISSION_555);
 				this.isHistocacheTemplateUpdated = true;
 			}
 
@@ -904,35 +908,35 @@ public final class Settings extends Properties {
 	/**
 	 * @return the settingsFilePath
 	 */
-	public String getSettingsFilePath() {
+	public static String getSettingsFilePath() {
 		return GDE.SETTINGS_FILE_PATH;
 	}
 
 	/**
 	 * @return the applHomePath
 	 */
-	public String getApplHomePath() {
+	public static String getApplHomePath() {
 		return GDE.APPL_HOME_PATH;
 	}
 
 	/**
 	 * @return the devicesFilePath
 	 */
-	public String getDevicesPath() {
+	public static String getDevicesPath() {
 		return GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME;
 	}
 
 	/**
 	 * @return the graphicsTemplatePath
 	 */
-	public String getGraphicsTemplatePath() {
+	public static String getGraphicsTemplatePath() {
 		return GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.GRAPHICS_TEMPLATES_DIR_NAME;
 	}
 
 	/**
 	 * @return the log file path
 	 */
-	public String getLogFilePath() {
+	public static String getLogFilePath() {
 		final String $METHOD_NAME = "getLogFilePath"; //$NON-NLS-1$
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "applHomePath = " + GDE.APPL_HOME_PATH); //$NON-NLS-1$
 		return GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_FILE;
@@ -941,7 +945,7 @@ public final class Settings extends Properties {
 	/**
 	 * @return the log file path for the serial trace logs
 	 */
-	public String getSerialLogFilePath() {
+	public static String getSerialLogFilePath() {
 		return GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.SERIAL_LOG_FILE;
 	}
 
@@ -1480,7 +1484,7 @@ public final class Settings extends Properties {
 			logger.setLevel(logLevel);
 			if (logLevel.intValue() < java.util.logging.Level.parse("WARNING").intValue()) { //$NON-NLS-1$
 				logger.setUseParentHandlers(false);
-				Handler fh = new FileHandler(this.getSerialLogFilePath(), 15000000, 3);
+				Handler fh = new FileHandler(Settings.getSerialLogFilePath(), 15000000, 3);
 				fh.setFormatter(new LogFormatter());
 				logger.addHandler(new MemoryHandler(fh, 5000000, logLevel));
 			}
@@ -3006,7 +3010,7 @@ public final class Settings extends Properties {
 	 */
 	public void addDeviceUse(String deviceName, int channelNumber) {
 		String entry = deviceName + GDE.STRING_STAR + (channelNumber - 1);
-		Stream<String> remainingEntries = Arrays.stream(Settings.getInstance().getDeviceUseCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+		Stream<String> remainingEntries = Arrays.stream(this.getDeviceUseCsv().split(GDE.STRING_CSV_SEPARATOR)) //
 				.filter(s -> !s.startsWith(deviceName + GDE.STRING_STAR)).filter(s -> !s.isEmpty());
 		this.setDeviceUseCsv(Stream.concat(Stream.of(entry), remainingEntries).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
 	}
@@ -3015,7 +3019,7 @@ public final class Settings extends Properties {
 	 * @return the last used channel number
 	 */
 	public int getLastUseChannelNumber(String deviceName) {
-		Optional<String> lastUseEntry = Arrays.stream(Settings.getInstance().getDeviceUseCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+		Optional<String> lastUseEntry = Arrays.stream(this.getDeviceUseCsv().split(GDE.STRING_CSV_SEPARATOR)) //
 				.filter(s -> s.startsWith(deviceName + GDE.STRING_STAR)).findFirst();
 		return lastUseEntry.map(s -> s.substring((deviceName + GDE.STRING_STAR).length())).map(Integer::parseInt).orElse(0) + 1;
 	}

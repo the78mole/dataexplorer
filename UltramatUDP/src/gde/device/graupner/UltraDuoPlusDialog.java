@@ -209,7 +209,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		Logger.getLogger(GDE.STRING_EMPTY).addHandler(ch);
 		Logger.getLogger(GDE.STRING_EMPTY).setLevel(Level.TIME);
 
-		String basePath = Settings.getInstance().getApplHomePath();
+		Settings.getInstance();
+		String basePath = Settings.getApplHomePath();
 		UltramatSerialPort serialPort = null;
 
 		try {
@@ -428,7 +429,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					try {
 						Unmarshaller unmarshaller = this.jc.createUnmarshaller();
 						unmarshaller.setSchema(this.schema);
-						this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(this.settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
+						this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(Settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
 								+ this.deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
 					}
 					catch (UnmarshalException e) {
@@ -544,7 +545,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 								catch (Exception e) {
 									e.printStackTrace();
 								}
-								saveConfigUDP(UltraDuoPlusDialog.this.settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
+								saveConfigUDP(Settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
 										+ UltraDuoPlusDialog.this.deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML);
 
 								UltraDuoPlusDialog.this.serialPort.write(UltramatSerialPort.RESET);
@@ -601,7 +602,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 							@Override
 							public void keyReleased(KeyEvent evt) {
 								UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
-								File oldConfigDataFile = new File(UltraDuoPlusDialog.this.settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
+								File oldConfigDataFile = new File(Settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
 										+ UltraDuoPlusDialog.this.deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML);
 								if (oldConfigDataFile.exists()) if (!oldConfigDataFile.delete()) UltraDuoPlusDialog.log.log(java.util.logging.Level.WARNING, "could not delete " + oldConfigDataFile.getName()); //$NON-NLS-1$
 								UltraDuoPlusDialog.this.deviceIdentifierName = (UltraDuoPlusDialog.this.userNameText.getText().trim() + UltraDuoPlusDialog.STRING_16_BLANK).substring(0, 16);
