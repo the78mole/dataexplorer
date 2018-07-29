@@ -129,6 +129,7 @@ public abstract class TrailRecord extends CommonRecord {
 					Double.parseDouble(template.getRecordProperty(recordName, Record.DEFINED_MIN_VALUE, "0")), //
 					Double.parseDouble(template.getRecordProperty(recordName, Record.DEFINED_MAX_VALUE, "0")));
 			numberFormat = Integer.parseInt(template.getRecordProperty(recordName, Record.NUMBER_FORMAT, "-1"));
+			df = new TrailRecordFormatter(record).getDecimalFormat(numberFormat);
 
 			// this template property is required before applying the template
 			// trailTextOrdinal = Integer.parseInt(template.getRecordProperty(record.recordName, Record.TRAIL_TEXT_ORDINAL, "-1"));
@@ -493,6 +494,7 @@ public abstract class TrailRecord extends CommonRecord {
 
 	@Override // reason: formatting of values <= 100 with decimal places; define category based on maxValueAbs AND minValueAbs
 	public void setNumberFormat(int newNumberFormat) {
+		log.log(Level.FINE, this.name, newNumberFormat);
 		template.numberFormat = newNumberFormat;
 		template.df = new TrailRecordFormatter(this).getDecimalFormat(newNumberFormat);
 
