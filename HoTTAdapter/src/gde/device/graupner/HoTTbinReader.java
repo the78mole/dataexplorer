@@ -59,7 +59,7 @@ public class HoTTbinReader {
 	final static String													$CLASS_NAME									= HoTTbinReader.class.getName();
 	final static Logger													log													= Logger.getLogger(HoTTbinReader.$CLASS_NAME);
 	// 64 byte = 0.01 seconds for 40 seconds maximum sensor scan time (40 / 0.01 = 4000)
-	protected static final int									LOG_RECORD_SCAN_START				= 4000;	
+	protected static final int									LOG_RECORD_SCAN_START				= 4000;
 	protected static final int									NUMBER_LOG_RECORDS_TO_SCAN	= 1500;
 	protected static final int									NUMBER_LOG_RECORDS_MIN			= 7000;
 
@@ -129,7 +129,7 @@ public class HoTTbinReader {
 			fileInfo = new HashMap<String, String>();
 			fileInfo.put(HoTTAdapter.FILE_PATH, file.getPath());
 			file_input = new FileInputStream(file);
-			data_in = new DataInputStream(file_input); 
+			data_in = new DataInputStream(file_input);
 
 			// begin evaluate for HoTTAdapterX files containing normal HoTT V4
 			// sensor data
@@ -189,7 +189,7 @@ public class HoTTbinReader {
 					BufferedReader reader;
 					StringBuilder sb = new StringBuilder();
 					String line;
-					reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "ISO-8859-1")); //$NON-NLS-1$	
+					reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "ISO-8859-1")); //$NON-NLS-1$
 					while ((line = reader.readLine()) != null && sb.append(line).append(GDE.STRING_NEW_LINE).length() < logDataOffset) {
 						if (line.contains(": ") && line.indexOf(GDE.STRING_COLON) > 5) {
 							String key = line.split(": ")[0].trim();
@@ -250,7 +250,7 @@ public class HoTTbinReader {
 							HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex4CharString(buffer, buffer.length));
 							HoTTbinReader.log.logp(Level.FINER, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, String.format("SensorByte  %02X", buffer[7]));
 						}
-			
+
 						switch (buffer[7]) {
 						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 							if (HoTTAdapter.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()] == false) HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.VARIO.name()).append(GDE.STRING_COMMA);
@@ -275,7 +275,7 @@ public class HoTTbinReader {
 						}
 					}
 					for (boolean element : HoTTAdapter.isSensorType) {
-						if (element == true) 
+						if (element == true)
 							++sensorCount;
 					}
 				}
@@ -283,11 +283,11 @@ public class HoTTbinReader {
 				fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (file.length() / 64));
 			}
 			HoTTbinReader.sensorSignature.deleteCharAt(HoTTbinReader.sensorSignature.length() - 1).append(GDE.STRING_RIGHT_BRACKET);
-			if (HoTTbinReader.log.isLoggable(Level.FINE)) 
+			if (HoTTbinReader.log.isLoggable(Level.FINE))
 				for (Entry<String, String> entry : fileInfo.entrySet()) {
 					HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, entry.getKey() + " = " + entry.getValue());
 					HoTTbinReader.log.log(Level.FINE, file.getName() + " - " + "sensor count = " + sensorCount);
-				} 
+				}
 		}
 		finally {
 			if (data_in != null) data_in.close();
@@ -722,7 +722,7 @@ public class HoTTbinReader {
 						HoTTbinReader.timeStep_ms += 10;
 						// reset buffer to avoid mixing data >> 20 Jul 14, not any longer required due to protocol change requesting next sensor data block
 						// HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
-					} 
+					}
 				}
 				else if (!HoTTbinReader.isTextModusSignaled) {
 					HoTTbinReader.isTextModusSignaled = true;
@@ -1066,7 +1066,7 @@ public class HoTTbinReader {
 								}
 							}
 
-							if (HoTTbinReader.log.isLoggable(Level.FINE)) 
+							if (HoTTbinReader.log.isLoggable(Level.FINE))
 								HoTTbinReader.log.logp(Level.FINE, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "logCountVario = " + logCountVario + " logCountGPS = "
 									+ logCountGPS + " logCountGeneral = " + logCountGeneral + " logCountElectric = " + logCountElectric + " logCountMotorDriver = " + logCountSpeedControl);
 							lastSensor = actualSensor;
@@ -1148,7 +1148,7 @@ public class HoTTbinReader {
 						}
 
 						HoTTbinReader.timeStep_ms += 10;
-						// reset buffer to avoid mixing data 
+						// reset buffer to avoid mixing data
 						// logCountVario = logCountGPS = logCountGeneral = logCountElectric = logCountSpeedControl = 0;
 					}
 				}
@@ -1267,11 +1267,11 @@ public class HoTTbinReader {
 		HoTTbinReader.pointsChannel[21] = (_buf[50] & 0x04) * 25000;
 		if (_buf[32] > 0 && _buf[32] < 27) {
 			HoTTbinReader.pointsChannel[22] = _buf[32] * 1000; //warning
-			log.log(Level.WARNING, String.format("Warning %d occured at %s", HoTTbinReader.pointsChannel[22]/1000, StringHelper.getFormatedTime("HH:mm:ss.SSS", HoTTbinReader.timeStep_ms+HoTTbinReader.recordSetChannel.getStartTimeStamp())));
+			log.log(Level.FINE, String.format("Warning %d occured at %s", HoTTbinReader.pointsChannel[22]/1000, StringHelper.getFormatedTime("HH:mm:ss.SSS", HoTTbinReader.timeStep_ms+HoTTbinReader.recordSetChannel.getStartTimeStamp())));
 		}
 		else
 			HoTTbinReader.pointsChannel[22] = 0;
-		
+
 		if (_buf[5] == 0x00) { // channel 9-12
 			HoTTbinReader.pointsChannel[11] = (DataParser.parse2UnsignedShort(_buf, 24) / 2) * 1000;
 			HoTTbinReader.pointsChannel[12] = (DataParser.parse2UnsignedShort(_buf, 26) / 2) * 1000;
@@ -1498,7 +1498,7 @@ public class HoTTbinReader {
 				HoTTbinReader.pointsGAM[3] = HoTTbinReader.tmpCapacity * 1000;
 			}
 			else {
-				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsGAM[3] / 1000)
+				HoTTbinReader.log.log(Level.FINE, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsGAM[3] / 1000)
 						+ " + " + (HoTTbinReader.pointsGAM[1] / 1000 * HoTTbinReader.pointsGAM[2] / 1000 / 2500 + 2));
 			}
 			HoTTbinReader.pointsGAM[4] = Double.valueOf(HoTTbinReader.pointsGAM[1] / 1000.0 * HoTTbinReader.pointsGAM[2]).intValue();
@@ -1581,7 +1581,7 @@ public class HoTTbinReader {
 				HoTTbinReader.pointsEAM[3] = HoTTbinReader.tmpCapacity * 1000;
 			}
 			else {
-				HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsEAM[3] / 1000)
+				HoTTbinReader.log.log(Level.FINE, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - " + (HoTTbinReader.pointsEAM[3] / 1000)
 						+ " + " + (HoTTbinReader.pointsEAM[1] / 1000 * HoTTbinReader.pointsEAM[2] / 1000 / 2500 + 2));
 			}
 			HoTTbinReader.pointsEAM[4] = Double.valueOf(HoTTbinReader.pointsEAM[1] / 1000.0 * HoTTbinReader.pointsEAM[2]).intValue(); // power U*I [W];
@@ -1662,7 +1662,7 @@ public class HoTTbinReader {
 				HoTTbinReader.pointsESC[3] = HoTTbinReader.tmpCapacity * 1000;
 			}
 			else {
-				if (HoTTbinReader.tmpCapacity != 0) HoTTbinReader.log.log(Level.WARNING, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - "
+				if (HoTTbinReader.tmpCapacity != 0) HoTTbinReader.log.log(Level.FINE, StringHelper.getFormatedTime("mm:ss.SSS", HoTTbinReader.timeStep_ms) + " - " + HoTTbinReader.tmpCapacity + " - "
 						+ (HoTTbinReader.pointsESC[3] / 1000) + " + " + (HoTTbinReader.tmpVoltage * HoTTbinReader.tmpCurrent / 2500 + 2));
 			}
 			HoTTbinReader.pointsESC[5] = HoTTbinReader.tmpRevolution * 1000;
@@ -1741,7 +1741,7 @@ public class HoTTbinReader {
 		}
 		return startTimeStamp;
 	}
-	
+
 	/**
 	 * check if file time stamp match log internal recorded start time and replace if required
 	 * @param formattedLogStartTime
@@ -1751,13 +1751,13 @@ public class HoTTbinReader {
 	protected static long getStartTimeStamp(String formattedLogStartTime, long fileStartTimeStamp_ms) {
 		long startTimeStamp_ms = fileStartTimeStamp_ms;
 		String formattedFileStartTimeStamp = StringHelper.getFormatedTime("YYYY-MM-dd HH:mm:ss.SSS", fileStartTimeStamp_ms);
-		
+
 		if (!formattedFileStartTimeStamp.contains(formattedLogStartTime)) {		//LOG START TIME  : 15:08:28
 
 			int year = Integer.parseInt(formattedFileStartTimeStamp.substring(0,4));
 			int month = Integer.parseInt(formattedFileStartTimeStamp.substring(5, 7));
 			int day = Integer.parseInt(formattedFileStartTimeStamp.substring(8, 10));
-			
+
 			int hour = Integer.parseInt(formattedLogStartTime.substring(0, 2));
 			int minute = Integer.parseInt(formattedLogStartTime.substring(3, 5));
 			int second = Integer.parseInt(formattedLogStartTime.substring(6, 8));
