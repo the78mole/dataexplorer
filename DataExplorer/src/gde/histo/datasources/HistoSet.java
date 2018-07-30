@@ -88,27 +88,31 @@ public final class HistoSet {
 		/**
 		 * starts from scratch on
 		 */
-		A_HISTOSET(5),
+		A_HISTOSET(6),
 		/**
 		 * starts building the histo vaults
 		 */
-		B_HISTOVAULTS(4),
+		B_HISTOVAULTS(5),
 		/**
 		 * starts building the trail recordset from the histo vaults
 		 */
-		C_TRAILRECORDSET(3),
+		C_TRAILRECORDSET(4),
 		/**
 		 * starts refreshing the trail data from the histo vaults
 		 */
-		D_TRAIL_DATA(2),
+		D_TRAIL_DATA(3),
 		/**
 		 * starts updating the graphics and table
 		 */
-		E_USER_INTERFACE(1),
+		E_USER_INTERFACE(2),
 		/**
 		 * starts with a file check only which decides which update activity is required --- not implemented
 		 */
-		F_FILE_CHECK(0);
+		F_FILE_CHECK(1),
+		/**
+		 * starts with a file check only which decides which update activity is required --- not implemented
+		 */
+		G_SELECTOR_COMBO(0);
 
 		/** zero is the lowest scopeOfWork. */
 		public final int					scopeOfWork;

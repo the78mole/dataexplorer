@@ -191,7 +191,7 @@ public final class SelectorComposite extends Composite {
 					windowActor.clearMeasuring();
 					windowActor.getTrailRecordSet().setSmartStatistics(smartSelector.getSelection());
 					windowActor.setTemplateChart();
-					windowActor.updateHistoTabs(true, true);
+					windowActor.updateHistoTabs(true, true, true);
 				}
 			});
 		}
@@ -319,10 +319,10 @@ public final class SelectorComposite extends Composite {
 					selectorCombos[i].addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent event) {
-							log.fine("selectorCombos.SelectionListener, event=" + event);
+							log.fine(() -> "selectorCombos.SelectionListener, event=" + event);
 							Combo combo = (Combo) event.getSource();
 							recordSet.refillRecord(record, combo.getSelectionIndex());
-							windowActor.updateHistoTabs(false, false);
+							windowActor.updateHistoTabs(false, false, false);
 						}
 					});
 					if (record.isVisible()) {

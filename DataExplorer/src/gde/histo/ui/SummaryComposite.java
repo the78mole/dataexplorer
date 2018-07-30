@@ -569,7 +569,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		volatileComment = new VolatileComment(recordFormatter.defineMinMaxWarningText(getChartData(record)), Messages.getString(MessageIds.GDE_MSGT0909),
 				3);
 		windowActor.setTrailVisible(record, getChartData(record).getMinMaxWarning()[actionType].getSelectIndex());
-		windowActor.updateHistoTabs(false, false);
+		windowActor.updateHistoTabs(false, false, false);
 	}
 
 	/**

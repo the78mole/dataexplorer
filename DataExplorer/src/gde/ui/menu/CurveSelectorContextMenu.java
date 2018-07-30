@@ -968,7 +968,7 @@ public class CurveSelectorContextMenu {
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						//if (!CurveSelectorContextMenu.this.isTypeHisto) ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-						CurveSelectorContextMenu.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+						CurveSelectorContextMenu.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 
 						if (CurveSelectorContextMenu.this.isTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.VALUE_GRID_NONE);
@@ -989,7 +989,7 @@ public class CurveSelectorContextMenu {
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						//if (!CurveSelectorContextMenu.this.isTypeHisto) ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-						CurveSelectorContextMenu.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+						CurveSelectorContextMenu.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 
 						if (CurveSelectorContextMenu.this.isTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.VALUE_GRID_EVERY);
@@ -1011,7 +1011,7 @@ public class CurveSelectorContextMenu {
 						if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 						//if (!CurveSelectorContextMenu.this.isTypeHisto) ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-						CurveSelectorContextMenu.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+						CurveSelectorContextMenu.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 
 						if (CurveSelectorContextMenu.this.isTypeCompare) {
 							CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalType(RecordSet.VALUE_GRID_SECOND);
@@ -1034,7 +1034,7 @@ public class CurveSelectorContextMenu {
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							//if (!CurveSelectorContextMenu.this.isTypeHisto) ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 							CurveSelectorContextMenu.this.application.updateGraphicsWindow();
-							CurveSelectorContextMenu.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+							CurveSelectorContextMenu.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 
 							if (CurveSelectorContextMenu.this.isTypeCompare) {
 								CurveSelectorContextMenu.this.settings.setGridCompareWindowHorizontalColor(SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue));

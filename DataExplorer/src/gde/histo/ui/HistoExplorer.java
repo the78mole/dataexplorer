@@ -223,8 +223,8 @@ public class HistoExplorer {
 	 * @param createRecordSet true creates the recordset from the histo vaults; false uses the existing recordset
 	 * @param rebuildTrails true refills the recordset and keeps the selector settings; false only rebuilds the UI
 	 */
-	public void updateHistoTabs(boolean createRecordSet, boolean rebuildTrails) {
-		updateHistoTabs(createRecordSet ? RebuildStep.C_TRAILRECORDSET : rebuildTrails ? RebuildStep.D_TRAIL_DATA : RebuildStep.E_USER_INTERFACE);
+	public void updateHistoTabs(boolean createRecordSet, boolean rebuildTrails, boolean updateSelector) {
+		updateHistoTabs(createRecordSet ? RebuildStep.C_TRAILRECORDSET : rebuildTrails ? RebuildStep.D_TRAIL_DATA : updateSelector ? RebuildStep.E_USER_INTERFACE : RebuildStep.G_SELECTOR_COMBO);
 	}
 
 	private void updateHistoTabs(RebuildStep rebuildStep) {
@@ -265,12 +265,13 @@ public class HistoExplorer {
 		try {
 			isRebuilt = histoSet.rebuild4Screening(rebuildStep);
 
-			if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE) {
+			if (isRebuilt || rebuildStep == RebuildStep.E_USER_INTERFACE || rebuildStep == RebuildStep.G_SELECTOR_COMBO) {
 				if (histoSet.getTrailRecordSet() != null) {
 					histoSet.getTrailRecordSet().setDisplayable();
 					histoSet.getTrailRecordSet().updateVisibleAndDisplayableRecordsForTable();
 				}
-				updateHistoChartWindow(true);
+				log.fine(() -> String.format("updateHistoChartWindow %b - updateHistoTableWindow %b", (rebuildStep != RebuildStep.G_SELECTOR_COMBO), (rebuildStep.scopeOfWork >= RebuildStep.E_USER_INTERFACE.scopeOfWork)));
+				updateHistoChartWindow(rebuildStep != RebuildStep.G_SELECTOR_COMBO);
 				updateHistoTableWindow(rebuildStep.scopeOfWork >= RebuildStep.E_USER_INTERFACE.scopeOfWork);
 			}
 			histoSet.setRebuildStepInvisibleTabs(rebuildStep, isRebuilt);

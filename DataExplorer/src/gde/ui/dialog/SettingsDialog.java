@@ -854,7 +854,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoReversed.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setXAxisReversed(SettingsDialog.this.histoReversed.getSelection());
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 										}
 									});
 								}
@@ -886,7 +886,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoSpreadGrade.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setXAxisSpreadGrade(SettingsDialog.this.histoSpreadGrade.getText().trim());
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 										}
 									});
 								}
@@ -905,7 +905,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoLogarithmicDistance.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setXAxisLogarithmicDistance(SettingsDialog.this.histoLogarithmicDistance.getSelection());
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 										}
 									});
 								}
@@ -946,7 +946,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoBoxplotScale.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setBoxplotScale(SettingsDialog.this.histoBoxplotScale.getText().trim());
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 										}
 									});
 								}
@@ -978,7 +978,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoBoxplotSizeAdaptation.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setBoxplotSizeAdaptation(SettingsDialog.this.histoBoxplotSizeAdaptation.getText().trim());
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 										}
 									});
 								}
@@ -1057,7 +1057,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "dateTimeUtcButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setDateTimeUtc(SettingsDialog.this.dateTimeUtcButton.getSelection());
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 										}
 									});
 								}
@@ -1088,7 +1088,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoDisplaySettlements.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setDisplaySettlements(SettingsDialog.this.histoDisplaySettlements.getSelection());
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 										}
 									});
 								}
@@ -1106,7 +1106,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoDisplayScores.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setDisplayScores(SettingsDialog.this.histoDisplayScores.getSelection());
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 										}
 									});
 								}
@@ -1124,7 +1124,7 @@ public class SettingsDialog extends Dialog {
 										public void widgetSelected(SelectionEvent evt) {
 											SettingsDialog.log.log(Level.FINEST, "histoDisplayTags.widgetSelected, event=" + evt); //$NON-NLS-1$
 											SettingsDialog.this.settings.setDisplayTags(SettingsDialog.this.histoDisplayTags.getSelection());
-											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+											SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 										}
 									});
 								}
@@ -1422,7 +1422,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "drawScaleInRecordColorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDrawScaleInRecordColor(SettingsDialog.this.drawScaleInRecordColorButton.getSelection());
-										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 									}
 								});
 							}
@@ -1441,7 +1441,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "drawNameInRecordColorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDrawNameInRecordColor(SettingsDialog.this.drawNameInRecordColorButton.getSelection());
-										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 									}
 								});
 							}
@@ -1460,7 +1460,7 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "drawNumbersInRecordColorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDrawNumbersInRecordColor(SettingsDialog.this.drawNumbersInRecordColorButton.getSelection());
-										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 									}
 								});
 							}
@@ -1538,7 +1538,7 @@ public class SettingsDialog extends Dialog {
 										SettingsDialog.log.log(Level.FINEST, "partialDataTableButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setPartialDataTable(SettingsDialog.this.partialDataTableButton.getSelection());
 										SettingsDialog.this.application.updateAllTabs(true, false);
-										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 									}
 								});
 							}

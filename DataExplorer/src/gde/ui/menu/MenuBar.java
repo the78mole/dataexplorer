@@ -697,7 +697,7 @@ public class MenuBar {
 								template.setHistoFileName(template.getDefaultHistoFileName());
 								template.load();
 								trailRecordSet.applyTemplate(true);
-								MenuBar.this.application.getPresentHistoExplorer().updateHistoTabs(false, true);;
+								MenuBar.this.application.getPresentHistoExplorer().updateHistoTabs(false, true, true);;
 							}
 							else {
 								Channel activeChannel = MenuBar.this.channels.getActiveChannel();
@@ -776,7 +776,7 @@ public class MenuBar {
 										// allow loading whatever file the user requests
 										template.load(templateFilePath);
 										trailRecordSet.applyTemplate(true);
-										MenuBar.this.application.getPresentHistoExplorer().updateHistoTabs(false, true);
+										MenuBar.this.application.getPresentHistoExplorer().updateHistoTabs(false, true, true);
 									}
 								}
 							} else {
@@ -832,7 +832,7 @@ public class MenuBar {
 							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoWindowVisible()).orElse(false)) {
 								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
 								trailRecordSet.setSmartStatistics(MenuBar.this.smartStatisticsItem.getSelection());
-								MenuBar.this.application.getPresentHistoExplorer().updateHistoTabs(false, true);
+								MenuBar.this.application.getPresentHistoExplorer().updateHistoTabs(false, true, true);
 							} else {
 								// not implemented for kernel graphics
 								MenuBar.this.objectTemplatesItem.setSelection(false);

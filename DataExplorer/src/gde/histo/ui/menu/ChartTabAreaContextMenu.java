@@ -212,7 +212,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "boxplotItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 					boolean selection = boxplotItem.getSelection();
 					settings.setSummaryBoxVisible(selection);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -227,7 +227,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "spreadItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 					boolean selection = spreadItem.getSelection();
 					settings.setSummarySpreadVisible(selection);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -242,7 +242,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "spotsItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 					boolean selection = spotsItem.getSelection();
 					settings.setSummarySpotsVisible(selection);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -262,7 +262,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem0.widgetSelected, event=" + evt); //$NON-NLS-1$
 					setWarningCountIndex(0);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -274,7 +274,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem1.widgetSelected, event=" + evt); //$NON-NLS-1$
 					setWarningCountIndex(1);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -286,7 +286,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem2.widgetSelected, event=" + evt); //$NON-NLS-1$
 					setWarningCountIndex(2);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -298,7 +298,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningCountItem3.widgetSelected, event=" + evt); //$NON-NLS-1$
 					setWarningCountIndex(3);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -318,7 +318,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningLevelNone.widgetSelected, event=" + evt);
 					setWarningLevel(-1);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -331,7 +331,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningLevelItem0.widgetSelected, event=" + evt);
 					setWarningLevel(0);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -344,7 +344,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningLevelItem1.widgetSelected, event=" + evt);
 					setWarningLevel(1);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -357,7 +357,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "warningLevelItem2.widgetSelected, event=" + evt);
 					setWarningLevel(2);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -378,7 +378,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 							inclusionData.deleteProperty(w.recordName);
 						}
 						inclusionData.store();
-						presentHistoExplorer.updateHistoTabs(false, false);
+						presentHistoExplorer.updateHistoTabs(false, false, true);
 					});
 				}
 			});
@@ -393,7 +393,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "isEclusiveWarning.widgetSelected, event=" + evt);
 					warning.ifPresent(w -> {
 						InclusionData.getInstance().delete();
-						presentHistoExplorer.updateHistoTabs(false, false);
+						presentHistoExplorer.updateHistoTabs(false, false, true);
 					});
 				}
 			});

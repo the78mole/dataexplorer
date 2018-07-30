@@ -142,8 +142,8 @@ public abstract class AbstractChartWindow extends CTabItem {
 		 * @param createRecordSet true creates the recordset from the histo vaults; false uses the existing recordset
 		 * @param rebuildTrails true refills the recordset and keeps the selector settings; false only rebuilds the UI
 		 */
-		void updateHistoTabs(boolean createRecordSet, boolean rebuildTrails) {
-			DataExplorer.getInstance().getPresentHistoExplorer().updateHistoTabs(createRecordSet, rebuildTrails);
+		void updateHistoTabs(boolean createRecordSet, boolean rebuildTrails, boolean updateSelector) {
+			DataExplorer.getInstance().getPresentHistoExplorer().updateHistoTabs(createRecordSet, rebuildTrails, updateSelector);
 		}
 
 		void saveTemplate() {

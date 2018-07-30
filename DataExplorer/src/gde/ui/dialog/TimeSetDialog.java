@@ -125,7 +125,7 @@ public class TimeSetDialog extends Dialog {
 							activeChannel.setFileDescription(description);
 						}
 						TimeSetDialog.this.application.updateAllTabs(true, true);
-						TimeSetDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false));
+						TimeSetDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 					}
 				}
 			});

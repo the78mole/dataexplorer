@@ -107,7 +107,7 @@ public abstract class AbstractTabAreaContextMenu {
 					boolean selection = curveSelectionItem.getSelection();
 					application.enableCurveSelector(selection);
 					application.getMenuBar().getCurveSelectionMenuItem().setSelection(selection);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -121,7 +121,7 @@ public abstract class AbstractTabAreaContextMenu {
 					boolean selection = displayGraphicsHeaderItem.getSelection();
 					application.getMenuBar().getGraphicsHeaderMenuItem().setSelection(selection);
 					application.enableGraphicsHeader(selection);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -136,7 +136,7 @@ public abstract class AbstractTabAreaContextMenu {
 					boolean selection = displayGraphicsCommentItem.getSelection();
 					application.getMenuBar().getRecordCommentMenuItem().setSelection(selection);
 					application.enableRecordSetComment(selection);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -151,7 +151,7 @@ public abstract class AbstractTabAreaContextMenu {
 					boolean selection = displayGraphicsCurveSurvey.getSelection();
 					application.getMenuBar().getGraphicsCurveSurveyMenuItem().setSelection(selection);
 					presentHistoExplorer.enableCurveSurvey(selection);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -166,7 +166,7 @@ public abstract class AbstractTabAreaContextMenu {
 					boolean selection = partialTableItem.getSelection();
 					application.getMenuBar().getPartialTableMenuItem().setSelection(selection);
 					presentHistoExplorer.enablePartialDataTable(selection);
-					presentHistoExplorer.updateHistoTabs(false, false);
+					presentHistoExplorer.updateHistoTabs(false, false, true);
 				}
 			});
 		}
@@ -290,7 +290,7 @@ public abstract class AbstractTabAreaContextMenu {
 					settings.setSuppressMode(true);
 					application.getMenuBar().getSuppressModeItem().setSelection(true);
 
-					presentHistoExplorer.updateHistoTabs(false, true);
+					presentHistoExplorer.updateHistoTabs(false, true, true);
 				}
 			});
 		}
@@ -307,7 +307,7 @@ public abstract class AbstractTabAreaContextMenu {
 					settings.setSuppressMode(true);
 					application.getMenuBar().getSuppressModeItem().setSelection(true);
 
-					presentHistoExplorer.updateHistoTabs(false, true);
+					presentHistoExplorer.updateHistoTabs(false, true, true);
 				}
 			});
 		}
