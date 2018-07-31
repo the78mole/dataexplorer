@@ -528,7 +528,7 @@ public class Q200 extends MC3000 implements IDevice {
 	 * @return true if channel # is active 
 	 */
 	public boolean isProcessing(final int outletNum, final byte[] channelBuffer, final byte[] dataBuffer) {
-		if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, "isProcessing = " + dataBuffer[4]);
+		if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, "isProcessing = " + (dataBuffer == null ? channelBuffer[4] == 0x01 : dataBuffer[4] == 0x01));
 		if (dataBuffer == null) // initial processing type query
 			return channelBuffer[4] == 0x01;
 		return dataBuffer[4] == 0x01 && (channelBuffer[5] == 4 || channelBuffer[5] == 5) && !this.isContinuousRecordSet() && this.settings.isReduceChargeDischarge() && this.getProcessSubType(channelBuffer, dataBuffer) == 2 

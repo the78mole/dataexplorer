@@ -581,7 +581,7 @@ public class HitecX1Red extends MC3000 implements IDevice {
 	 * @return true if channel # is active 
 	 */
 	public boolean isProcessing(final int outletNum, final byte[] channelBuffer, final byte[] dataBuffer) {
-		if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, outletNum + " isProcessing = " + (dataBuffer == null ? (channelBuffer[2] >= 0x01 && channelBuffer[2] <= 3) : (dataBuffer[4] >= 0x01 && dataBuffer[4] <= 3)));
+		if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, outletNum + " isProcessing = " + (dataBuffer == null ? channelBuffer[4] == 0x01 : dataBuffer[4] >= 0x01));
 		if (dataBuffer == null) // initial processing type query
 			return channelBuffer[4] == 0x01;
 		return dataBuffer[4] == 0x03 && !this.isContinuousRecordSet() && this.settings.isReduceChargeDischarge()
