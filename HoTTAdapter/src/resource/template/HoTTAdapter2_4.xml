@@ -708,7 +708,7 @@
 <entry key="105_numberFormat">1</entry>
 <entry key="6_lineStyle">1</entry>
 <entry key="77_isPositionLeft">false</entry>
-<entry key="69_lineStyle">3</entry>
+<entry key="69_lineStyle">1</entry>
 <entry key="74_isStartpointZero">false</entry>
 <entry key="94_color">255,34,45</entry>
 <entry key="85_defMaxValue">0.0</entry>
@@ -1054,7 +1054,7 @@
 <entry key="104_isRoundOut">false</entry>
 <entry key="45_isPositionLeft">false</entry>
 <entry key="64_lineStyle">1</entry>
-<entry key="49_lineStyle">3</entry>
+<entry key="49_lineStyle">1</entry>
 <entry key="41_color">128,128,0</entry>
 <entry key="76_color">128,128,0</entry>
 <entry key="71_isStartEndDefined">true</entry>
