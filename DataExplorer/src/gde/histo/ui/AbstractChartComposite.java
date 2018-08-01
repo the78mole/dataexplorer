@@ -168,7 +168,7 @@ public abstract class AbstractChartComposite extends Composite {
 	 * @see <a href="https://www.google.de/search?q=Guava 22.0">Guava 22.0</a>
 	 */
 	public static int constrainToRange(int value, int min, int max) { // todo move into gde.utils.MathUtils
-		if (min > max) throw new IllegalArgumentException();
+		if (min > max) throw new IllegalArgumentException(value + "  " + min +"/" + max);
 		return Math.min(Math.max(value, min), max);
 	}
 
@@ -405,7 +405,7 @@ public abstract class AbstractChartComposite extends Composite {
 		// calculate the vertical area available for plotting graphs
 		yMax = DEFAULT_TOP_GAP; // free gap on top of the curves
 		y0 = canvasBounds.height - yMax - getXScaleHeight();
-		height = y0 - yMax; // recalculate due to modulo 10 ??
+		height = Math.max(1, y0 - yMax); // WB ?? recalculate due to modulo 10 ??
 		log.finer(() -> "draw area x0=" + x0 + ", y0=" + y0 + ", xMax=" + xMax + ", yMax=" + yMax + ", width=" + width + ", height=" + height); //$NON-NLS-6$
 
 		Rectangle result = new Rectangle(x0, y0 - height, width, height);
