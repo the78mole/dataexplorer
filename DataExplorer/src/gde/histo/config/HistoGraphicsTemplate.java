@@ -169,7 +169,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		if (!Settings.getInstance().getActiveObjectKey().isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
 			return new ObjectGraphicsTemplate(deviceSignature, objectKey);
 		} else if (Settings.getInstance().getActiveObjectKey().isEmpty() && Settings.getInstance().isObjectTemplatesActive()) {
-			return new ObjectGraphicsTemplate(deviceSignature, GDE.STRING_UNDER_BAR);
+			return new ObjectGraphicsTemplate(deviceSignature, GDE.STRING_DEVICE_ORIENTED_FOLDER);
 		} else {
 			return new StandardGraphicsTemplate(deviceSignature);
 		}

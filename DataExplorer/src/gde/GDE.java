@@ -163,7 +163,7 @@ public class GDE {
 	public static final String							STRING_PARENT_DIR									= "..";																																																								//$NON-NLS-1$
 	public static final String							STRING_CSV_SEPARATOR							= ",";																																																									//$NON-NLS-1$
 	public static final String							STRING_CSV_QUOTE									= "\"";																																																									//$NON-NLS-1$
-	public static final String							STRING_DEVICE_ORIENTED_FOLDER			= "_deviceoriented";																																																									//$NON-NLS-1$
+	public static final String							STRING_DEVICE_ORIENTED_FOLDER			= "_";																																																									//$NON-NLS-1$
 	public static final String							STRING_QUESTION_MARK							= "?";																																																									//$NON-NLS-1$
 	public static final String							STRING_SLASH											= "/";																																																									//$NON-NLS-1$
 

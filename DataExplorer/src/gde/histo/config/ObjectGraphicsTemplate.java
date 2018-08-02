@@ -38,21 +38,21 @@ import gde.config.Settings;
  */
 public final class ObjectGraphicsTemplate extends HistoGraphicsTemplate {
 	private static final long	serialVersionUID	= -4197176848694996415L;
-	private final String			objectKey;
+	private final String			objectFolderName;
 
 	/**
 	 * Constructor using the application home path and the device signature as initialization parameter.
 	 * @param deviceSignature - device signature as String (Picolario_K1)
 	 */
-	protected ObjectGraphicsTemplate(String deviceSignature, String objectKey) {
+	protected ObjectGraphicsTemplate(String deviceSignature, String objectFolderName) {
 		super(deviceSignature);
-		this.objectKey = objectKey;
+		this.objectFolderName = objectFolderName;
 	}
 
 	@Override
 	public Path getTargetFilePath() {
 		String fileName = histoFileName == null || histoFileName.equals(GDE.STRING_EMPTY) ? defaultHistoFileName : histoFileName;
-		return Paths.get(Settings.getInstance().getGraphicsTemplatePath(), objectKey, fileName);
+		return Paths.get(Settings.getInstance().getGraphicsTemplatePath(), objectFolderName, fileName);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public final class ObjectGraphicsTemplate extends HistoGraphicsTemplate {
 				}
 			}
 			try (FileOutputStream stream = new FileOutputStream(targetFilePath.toFile())) {
-				this.storeToXML(stream, "-- DataExplorer ObjectGraphicsTemplate " + deviceSignature + GDE.STRING_UNDER_BAR + objectKey + " -- " + targetFilePath.getFileName().toString() + " " + ZonedDateTime.now().toInstant() + " -- " + commentSuffix);
+				this.storeToXML(stream, "-- DataExplorer ObjectGraphicsTemplate " + deviceSignature + GDE.STRING_UNDER_BAR + objectFolderName + " -- " + targetFilePath.getFileName().toString() + " " + ZonedDateTime.now().toInstant() + " -- " + commentSuffix);
 			}
 			currentFilePath = targetFilePath;
 			this.isSaved = true;
