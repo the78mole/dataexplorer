@@ -23,6 +23,7 @@ Device specific changes/fixes
 	* Futaba-Telemetry - fix EOFException saving OSD with record set different real size
 	* Hitec X1 Red - add initial support (alpha)
 	* WSTech DataVario - replace German description with supposed key
+	* UltraDuoPlus* - refine object key selection by memory name
 
 History analysis
 	* Enhance UI

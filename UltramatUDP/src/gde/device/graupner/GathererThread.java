@@ -407,7 +407,7 @@ public class GathererThread extends Thread {
 	 * @return object array with updated values {recordSet, recordSetKey}
 	 * @throws DataInconsitsentException
 	 */
-	private Object[] processDataChannel(int number, RecordSet recordSet, String recordSetKey, byte[] dataBuffer, int[] points)
+	private synchronized Object[] processDataChannel(int number, RecordSet recordSet, String recordSetKey, byte[] dataBuffer, int[] points)
 			throws DataInconsitsentException {
 		final String $METHOD_NAME = "processOutlet"; //$NON-NLS-1$
 		Object[] result = new Object[2];
@@ -465,7 +465,8 @@ public class GathererThread extends Thread {
 					if (batteryMemoryNumber > 0 && this.device.ultraDuoPlusSetup != null && this.device.ultraDuoPlusSetup.getMemory().get(batteryMemoryNumber) != null) {
 						String batteryMemoryName = this.device.ultraDuoPlusSetup.getMemory().get(this.device.getBatteryMemoryNumber(number, dataBuffer) - 1).getName();
 						description = description + GDE.STRING_MESSAGE_CONCAT + batteryMemoryName;
-						if (recordSetKey.startsWith("1)")) this.device.matchBatteryMemory2ObjectKey(batteryMemoryName); //$NON-NLS-1$
+						log.fine(() -> String.format("channel number %d - batterie memory name %s", channel.getNumber(), batteryMemoryName));
+						this.device.matchBatteryMemory2ObjectKey(batteryMemoryName);
 					}
 				}
 				catch (Exception e) {

@@ -1536,7 +1536,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 															String batteryMemoryName = UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory()
 																	.get(UltraDuoPlusDialog.this.device.getBatteryMemoryNumber(UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this.initialAnswerData) - 1).getName();
 															description = description + GDE.STRING_MESSAGE_CONCAT + batteryMemoryName;
-															if (recordSetKey.startsWith("1)")) UltraDuoPlusDialog.this.device.matchBatteryMemory2ObjectKey(batteryMemoryName); //$NON-NLS-1$
+															UltraDuoPlusDialog.this.device.matchBatteryMemory2ObjectKey(batteryMemoryName);
 														}
 													}
 													catch (Exception e) {
