@@ -100,7 +100,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 			this.convertedTemplate = HistoGraphicsTemplate.createGraphicsTemplate(deviceSignature, objectKey);
 			String pureFileName = legacyFileName.substring(0, legacyFileName.lastIndexOf("."));
 			if (pureFileName.endsWith("H")) pureFileName = pureFileName.substring(0, pureFileName.length() - 1); // might result in conversion in situ
-			this.convertedTemplate.setHistoFileName(pureFileName + "H" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4));
+			this.convertedTemplate.setHistoFileName(pureFileName + "cnvH" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(Settings.GRAPHICS_TEMPLATES_EXTENSION.length() - 4));
 
 			IDevice device = DataExplorer.application.getActiveDevice();
 			int channelConfigNumber = DataExplorer.application.getActiveChannelNumber();
@@ -108,10 +108,10 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		}
 
 		/**
-		 * Load the legacy graphics template and convert into a histo graphics template.
-		 * Appends "_TmpH" to the file name.
+		 * Load the legacy graphics template and convert.
+		 * @return the converted histo graphics template
 		 */
-		Path storeAsHistoTemplate() throws FileNotFoundException, IOException {
+		HistoGraphicsTemplate convertToHistoTemplate() throws FileNotFoundException, IOException {
 			File templateFile = Paths.get(templatePath, legacyFileName).toFile();
 			try (FileInputStream stream = new FileInputStream(templateFile)) {
 				loadFromXML(stream);
@@ -123,8 +123,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 			}
 
 			convertedTemplate.setCommentSuffix(templateFile.toPath().getFileName().toString() + " " + Instant.ofEpochMilli(templateFile.lastModified()));
-			convertedTemplate.store();
-			return convertedTemplate.getTargetFilePath();
+			return convertedTemplate;
 		}
 
 		/**
@@ -226,7 +225,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 			try {
 				currentFilePath = null;
 				clear();
-				load(filePath.toFile());
+				loadFromXml(filePath.toFile());
 				currentFilePath = filePath;
 				setHistoFileName(filePath.getFileName().toString());
 				this.isAvailable = true;
@@ -248,25 +247,25 @@ public abstract class HistoGraphicsTemplate extends Properties {
 			currentFilePath = null;
 			File file = getTargetFilePath().toFile();
 			if (!file.exists()) {
-				log.log(FINE, "convert legacy default template as a replacement for ", file.getAbsolutePath());
+				log.log(FINE, "convert legacy default template and store as a replacement for ", file.getAbsolutePath());
 				LegacyGraphicsTemplate template = new LegacyGraphicsTemplate(deviceSignature, Settings.getInstance().getActiveObjectKey());
-				Path histoTemplateFilePath = template.storeAsHistoTemplate();
-				file = histoTemplateFilePath.toFile();
+				HistoGraphicsTemplate convertedTemplate = template.convertToHistoTemplate();
+				convertedTemplate.store();
+				file = convertedTemplate.getTargetFilePath().toFile();
 
 				clear();
-				load(file);
+				putAll(convertedTemplate);
 			} else {
 				clear();
-				load(file);
+				loadFromXml(file);
 				boolean isHistoTemplate = keySet().stream().map(String.class::cast).anyMatch(k -> k.indexOf(GDE.STRING_UNDER_BAR + GDE.STRING_UNDER_BAR) >= 0);
 				if (!isHistoTemplate) {
-					log.log(FINE, "convert template identified as legacy template ", file.getAbsolutePath());
+					log.log(FINE, "convert template identified as legacy template without storing ", file.getAbsolutePath());
 					LegacyGraphicsTemplate template = new LegacyGraphicsTemplate(file, deviceSignature, Settings.getInstance().getActiveObjectKey());
-					Path histoTemplateFilePath = template.storeAsHistoTemplate();
-					file = histoTemplateFilePath.toFile();
+					HistoGraphicsTemplate convertedTemplate = template.convertToHistoTemplate();
 
 					clear();
-					load(file);
+					putAll(convertedTemplate);
 				}
 			}
 			currentFilePath = file.toPath();
@@ -278,7 +277,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		}
 	}
 
-	protected void load(File file) throws IOException, InvalidPropertiesFormatException, FileNotFoundException {
+	protected void loadFromXml(File file) throws IOException, InvalidPropertiesFormatException, FileNotFoundException {
 		log.log(FINE, "opening template file ", file.getAbsolutePath());
 		try (FileInputStream stream = new FileInputStream(file)) {
 			this.loadFromXML(stream);

@@ -190,6 +190,7 @@ public final class SelectorComposite extends Composite {
 					resetContextMenuMeasuring();
 					windowActor.clearMeasuring();
 					windowActor.getTrailRecordSet().setSmartStatistics(smartSelector.getSelection());
+					windowActor.getTrailRecordSet().getTemplate().store();
 					windowActor.setTemplateChart();
 					windowActor.updateHistoTabs(true, true, true);
 				}
@@ -250,7 +251,7 @@ public final class SelectorComposite extends Composite {
 							SelectorComposite.this.popupmenu.setData(DataExplorer.CURVE_SELECTION_ITEM, eventItem);
 							if (toggleRecordSelection(eventItem, true, false)) {
 								windowActor.updateChartWindow(false);
-							} 
+							}
 						}
 					}
 				}

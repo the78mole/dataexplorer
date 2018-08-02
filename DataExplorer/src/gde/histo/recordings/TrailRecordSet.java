@@ -971,7 +971,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
 		for (TrailRecord record : this.getDisplayRecords()) {
 			if (!isValueGridRecord(record) && record.isScaleSynced() && record.getSyncMasterRecordOrdinal() >= 0
-				&& !resultRecords.contains(record.getParent().get(record.getSyncMasterRecordOrdinal())) && record.getParent().isOneSyncableVisible(record.getSyncMasterRecordOrdinal())) 
+				&& !resultRecords.contains(record.getParent().get(record.getSyncMasterRecordOrdinal())) && record.getParent().isOneSyncableVisible(record.getSyncMasterRecordOrdinal()))
 				resultRecords.add(record.getParent().get(record.getSyncMasterRecordOrdinal()));
 		}
 		// add all others
@@ -1058,7 +1058,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 */
 	public void setSmartStatistics(boolean isActive) {
 		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(isActive));
-		template.store();
 		if (application.isWithUi()) application.getPresentHistoExplorer().updateHistoMenuItems();
 	}
 

@@ -832,6 +832,7 @@ public class MenuBar {
 							if (MenuBar.this.application.getHistoExplorer().map(h -> h.isHistoWindowVisible()).orElse(false)) {
 								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
 								trailRecordSet.setSmartStatistics(MenuBar.this.smartStatisticsItem.getSelection());
+								trailRecordSet.getTemplate().store();
 								MenuBar.this.application.getPresentHistoExplorer().updateHistoTabs(false, true, true);
 							} else {
 								// not implemented for kernel graphics
