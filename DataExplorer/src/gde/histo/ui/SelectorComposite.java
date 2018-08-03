@@ -190,9 +190,8 @@ public final class SelectorComposite extends Composite {
 					resetContextMenuMeasuring();
 					windowActor.clearMeasuring();
 					windowActor.getTrailRecordSet().setSmartStatistics(smartSelector.getSelection());
-					windowActor.getTrailRecordSet().getTemplate().store();
 					windowActor.setTemplateChart();
-					windowActor.updateHistoTabs(true, true, true);
+					windowActor.updateHistoTabs(false, true, true);
 				}
 			});
 		}

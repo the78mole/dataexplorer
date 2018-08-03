@@ -420,6 +420,7 @@ public final class VaultPicker {
 				}
 			} else if (realRebuildStep.isEqualOrBiggerThan(RebuildStep.D_TRAIL_DATA)) { // keeps the template in contrast to the logic above
 				long nanoTime = System.nanoTime();
+				trailRecordSet.initializeTrailSelectors();
 				trailRecordSet.refillFromVaults(pickedVaults);
 				long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 				log.time(() -> format("%,5d timeSteps  to TrailRecordSet  time=%,6d [ms] :: per second:%5d", //

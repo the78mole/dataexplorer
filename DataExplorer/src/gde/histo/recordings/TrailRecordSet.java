@@ -710,11 +710,15 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 		cleanup();
 		RecordingsCollector collector = new RecordingsCollector();
+		// re-define the valid trail types because the smart statistics setting might have changed
+		collector.defineTrailTypes();
 		collector.addVaultsToRecordSet();
 
 		for (String recordName : recordNames) {
 			TrailRecord trailRecord = get(recordName);
 			trailRecord.clear();
+			// Apply the data source information (= comboBox setting) from the graphics template definition to a record set.
+			trailRecord.setSelectedTrail();
 			trailRecord.initializeFromVaults(pickedVaults.initialVaults);
 		}
 		collector.setGpsLocationsTags();
@@ -742,6 +746,13 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			trailRecord.initializeFromVaults(pickedVaults.initialVaults);
 		}
 		collector.setGpsLocationsTags();
+	}
+
+	public void initializeTrailSelectors() {
+		for (String recordName : recordNames) {
+			TrailRecord trailRecord = get(recordName);
+			trailRecord.setTrailSelector();
+		}
 	}
 
 	/**

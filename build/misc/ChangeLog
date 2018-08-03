@@ -31,6 +31,7 @@ History analysis
 		>> Add refresh menu item and shortcut
 		>> Add object key wizard (if accessing new directories) 
 		>> Remove MessageBox "No log files"
+		>> Enhance toggling 'Smart values' by preserving the user selections
 		>> Fix importing from histo table with reversed x axis opens wrong file
 		>> Fix InvalidPathException@_SupplementObjectDirs
 		>> Fix wrong decimal places if switching from histo graphics to histo table
