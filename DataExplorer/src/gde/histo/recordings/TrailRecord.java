@@ -996,4 +996,6 @@ public abstract class TrailRecord extends CommonRecord {
 		template.saveTemplate(getParent().getTemplate(), this);
 	}
 
+	public abstract void setTrailSelector();
+
 }

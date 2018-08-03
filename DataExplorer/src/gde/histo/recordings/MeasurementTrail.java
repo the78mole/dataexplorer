@@ -42,6 +42,11 @@ public final class MeasurementTrail extends TrailRecord {
 	 */
 	public MeasurementTrail(int newOrdinal, MeasurementType measurementType, TrailRecordSet parent, int initialCapacity) {
 		super(measurementType, newOrdinal, parent, initialCapacity);
+		setTrailSelector();
+	}
+
+	@Override
+	public void setTrailSelector() {
 		this.trailSelector = new MeasurementTrailSelector(this);
 	}
 

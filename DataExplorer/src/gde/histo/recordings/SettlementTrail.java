@@ -42,6 +42,11 @@ public final class SettlementTrail extends TrailRecord {
 	 */
 	public SettlementTrail(int newOrdinal, SettlementType settlementType, TrailRecordSet parent, int initialCapacity) {
 		super(settlementType, newOrdinal, parent, initialCapacity);
+		setTrailSelector();
+	}
+
+	@Override
+	public void setTrailSelector() {
 		this.trailSelector = new SettlementTrailSelector(this);
 	}
 

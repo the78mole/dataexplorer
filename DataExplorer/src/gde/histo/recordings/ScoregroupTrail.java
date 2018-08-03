@@ -43,6 +43,11 @@ public final class ScoregroupTrail extends TrailRecord {
 	 */
 	public ScoregroupTrail(int newOrdinal, ScoreGroupType scoreGroupType, TrailRecordSet parent, int initialCapacity) {
 		super(scoreGroupType, newOrdinal, parent, initialCapacity);
+		setTrailSelector();
+	}
+
+	@Override
+	public void setTrailSelector() {
 		this.trailSelector = new ScoregroupTrailSelector(this);
 	}
 
