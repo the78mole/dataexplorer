@@ -235,8 +235,10 @@ public class CSVReaderWriter {
 				CSVReaderWriter.log.log(Level.FINE, "device name check ok, channel/configuration ok"); //$NON-NLS-1$
 
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
+				int lineNumber = 0;
 				while (!(line.startsWith("Date,Time")) && ((line = reader.readLine()) != null)) {
 					// read until Date,Time,SWR,RSSI,A1,A2,A3,A4,GPS Date,GPS Time,Long,Lat,Course,GPS Speed(kts),GPS Alt,Baro Alt(m),Vertical Speed,Air Speed(kts),Temp1,Temp2,RPM,Fuel,Cell volts,Cell 1,Cell 2,Cell 3,Cell 4,Cell 5,Cell 6,Cell 7,Cell 8,Cell 9,Cell 10,Cell 11,Cell 12,Current,Consumption,Vfas,AccelX,AccelY,AccelZ,Rud,Ele,Thr,Ail,S1,S2,S3,LS,RS,SA,SB,SC,SD,SE,SF,SG,SH
+					++lineNumber;
 				}
 
 				if (CSVReaderWriter.application.getStatusBar() != null) {
@@ -279,7 +281,6 @@ public class CSVReaderWriter {
 				// now get all data   0; 14,780;  0,598;  1,000;  8,838;  0,002
 				String[] updateRecordNames = recordSet.getRecordNames();
 				int[] points = new int[updateRecordNames.length];
-				int lineNumber = 0;
 				while ((line = reader.readLine()) != null) {
 					++lineNumber;
 					if (line.startsWith("#")) {
@@ -306,14 +307,15 @@ public class CSVReaderWriter {
 
 					if (lastTimeStamp < timeStamp) {
 						if (timeStamp - lastTimeStamp > 1000) {
-							System.out.println("time diff = " + (timeStamp - lastTimeStamp));
-							System.out.println("record entries = " + (recordSet.get(0).size()));
+							if (lastTimeStamp > 0)
+								log.log(Level.WARNING,  String.format("time differenze = %d msec, actual number record entries = %d (<100 remove)", (timeStamp - lastTimeStamp),  (recordSet.get(0).size())));
 							if (recordSet.get(0).size() > 100) {
 								recordSet.setSaved(true);
 								activeChannel.put(recordSetName, recordSet);
 								activeChannel.setActiveRecordSet(recordSetName);
 								activeChannel.applyTemplate(recordSetName, true);
-								if (CSVReaderWriter.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
+								device.updateVisibilityStatus(recordSet, true);
+								//if (CSVReaderWriter.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
 							}
 
 							recordSet = createRecordSet(recordSetNameExtend, device, activeChannel, tmpRecordNames, tmpRecordUnits, tmpRecordSymbols);
@@ -358,7 +360,11 @@ public class CSVReaderWriter {
 
 						default:
 							try {
-								points[i] = Double.valueOf(Double.valueOf(data) * 1000.0).intValue();
+								double value = Double.valueOf(data);
+								if (value <= Integer.MIN_VALUE/1000 || value >= Integer.MAX_VALUE/1000)
+									log.log(Level.WARNING, String.format("Check line %d, found misterious value %s", lineNumber, data));
+								else
+									points[i] = (int) (value * 1000.0);
 							}
 							catch (NumberFormatException e) {
 								points[i] = 0;
@@ -381,13 +387,20 @@ public class CSVReaderWriter {
 					}
 				}
 
-				recordSet.setSaved(true);
-
-				activeChannel.put(recordSetName, recordSet);
-				activeChannel.setActiveRecordSet(recordSetName);
-				activeChannel.applyTemplate(recordSetName, true);
-				if (CSVReaderWriter.application.getStatusBar() != null) activeChannel.switchRecordSet(recordSetName);
-				//				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
+				if (recordSet.get(0).size() > 100) {
+					recordSet.setSaved(true);
+					activeChannel.put(recordSetName, recordSet);
+					activeChannel.setActiveRecordSet(recordSetName);
+					activeChannel.applyTemplate(recordSetName, true);
+					device.updateVisibilityStatus(recordSet, true);
+				}
+				else {
+					activeChannel.remove(recordSetName);
+				}
+				
+				if (CSVReaderWriter.application.getStatusBar() != null) {
+					activeChannel.switchRecordSet(activeChannel.getRecordSetNames()[0]); //recordSetName);
+				}
 
 				reader.close();
 				reader = null;

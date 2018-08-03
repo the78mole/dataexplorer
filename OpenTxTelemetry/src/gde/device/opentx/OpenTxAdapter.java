@@ -42,7 +42,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
-import gde.data.AbstractRecord;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
@@ -320,6 +319,7 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		recordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**
@@ -709,11 +709,11 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
 	 */
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
-		//prevent duplicating names, replace by unique defaults
-		for (AbstractRecord tmpRecord: recordSet.values()) {
-			recordSet.replaceRecordName((Record)tmpRecord, String.format("%d????", tmpRecord.getOrdinal())); 
+			//prevent duplicating names, replace by unique defaults
+		for (String tmpRecordName : recordSet.getRecordNames()) {
+			Record tmpRecord = recordSet.get(tmpRecordName);
+			recordSet.replaceRecordName((Record) tmpRecord, String.format("%d????", tmpRecord.getOrdinal()));
 		}
-		
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
 		int numberRecordSetEntries = recordSet.realSize();
