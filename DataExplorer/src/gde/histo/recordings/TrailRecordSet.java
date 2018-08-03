@@ -696,7 +696,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Rebuild the record based on a new trail selection.
 	 */
 	public void refillRecord(TrailRecord record, int trailTextIndex) {
-		record.getTrailSelector().setTrailTextSelectedIndex(trailTextIndex);
+		record.setSelectedTrail(trailTextIndex);
 		record.clear();
 		record.initializeFromVaults(this.pickedVaults.initialVaults);
 	}

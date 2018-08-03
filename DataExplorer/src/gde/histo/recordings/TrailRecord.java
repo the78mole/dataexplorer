@@ -86,6 +86,7 @@ public abstract class TrailRecord extends CommonRecord {
 		int						numberFormat			= -1;												// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
 		double				maxScaleValue			= 0.;												// overwrite calculated boundaries
 		double				minScaleValue			= 0.;
+		int						trailTextOrdinal	= -1;
 
 		/**
 		 * @param template holds all values
@@ -104,8 +105,7 @@ public abstract class TrailRecord extends CommonRecord {
 			template.setRecordProperty(recordName, Record.DEFINED_MAX_VALUE, String.valueOf(maxScaleValue));
 			template.setRecordProperty(recordName, Record.DEFINED_MIN_VALUE, String.valueOf(minScaleValue));
 
-			// this template property comes directly from the record (see applyTemplate)
-			template.setRecordProperty(recordName, Record.TRAIL_TEXT_ORDINAL, String.valueOf(record.getTrailSelector().getTrailTextSelectedIndex()));
+			template.setRecordProperty(recordName, Record.TRAIL_TEXT_ORDINAL, String.valueOf(trailTextOrdinal));
 		}
 
 		/**
@@ -855,6 +855,14 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	/**
+	 * Set the trail based on the record's chart template settings.
+	 * Might finally set a different value if the smart statistics value has changed in the meantime.
+	 */
+	public void setSelectedTrail() {
+		setSelectedTrail(template.trailTextOrdinal);
+	}
+
+	/**
 	 * @param trailTextOrdinal is the ordinal of the applicable trail texts or a negative number (take the prioritized trail type from
 	 *          applicable trails)
 	 */
@@ -864,11 +872,11 @@ public abstract class TrailRecord extends CommonRecord {
 		} else {
 			trailSelector.setMostApplicableTrailTextOrdinal();
 		}
+		template.trailTextOrdinal = trailSelector.getTrailTextSelectedIndex();
 		if (trailSelector.getTrailTextSelectedIndex() < 0) {
 			log.info(() -> String.format("%s : no trail types identified" + name)); //$NON-NLS-1$
-		} else {
-			log.log(FINER, "", trailSelector); //$NON-NLS-1$
 		}
+		log.log(FINER, "", trailSelector);
 	}
 
 	/**
