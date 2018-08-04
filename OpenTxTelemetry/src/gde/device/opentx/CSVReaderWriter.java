@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import gde.GDE;
@@ -211,6 +212,7 @@ public class CSVReaderWriter {
 		BufferedReader reader; // to read the data
 		IDevice device = CSVReaderWriter.application.getActiveDevice();
 		Channel activeChannel = null;
+		Vector<String> createdRecordSets = new Vector<>();
 
 		try {
 			HashMap<String, String> fileHeader = CSVReaderWriter.getHeader(separator, filePath);
@@ -255,6 +257,7 @@ public class CSVReaderWriter {
 				}
 				recordSet = createRecordSet(recordSetNameExtend, device, activeChannel, tmpRecordNames, tmpRecordUnits, tmpRecordSymbols);
 				String recordSetName = recordSet.getName(); // cut length
+				createdRecordSets.add(recordSetName);
 
 				//find GPS related records and try to assign data type
 				for (int i = 0; i < recordSet.size(); i++) {
@@ -321,6 +324,8 @@ public class CSVReaderWriter {
 							recordSet = createRecordSet(recordSetNameExtend, device, activeChannel, tmpRecordNames, tmpRecordUnits, tmpRecordSymbols);
 							recordSetName = recordSet.getName(); // cut length
 							lastTimeStamp = startTimeStamp = 0;
+							if (!createdRecordSets.contains(recordSetName))
+								createdRecordSets.add(recordSetName);
 						}
 						
 						time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));
@@ -375,7 +380,7 @@ public class CSVReaderWriter {
 					recordSet.addPoints(points, time_ms);
 
 					progressLineLength = progressLineLength > line.length() ? progressLineLength : line.length();
-					int progress = (int) (lineNumber * 100 / (inputFileSize / progressLineLength));
+					int progress = progressLineLength > 0 && inputFileSize > 0 ? (int) (lineNumber * 100 / (inputFileSize / progressLineLength)) : 50;
 					if (application.getStatusBar() != null && progress <= 90 && progress > application.getProgressPercentage() && progress % 10 == 0) {
 						application.setProgress(progress, sThreadId);
 						try {
@@ -396,10 +401,13 @@ public class CSVReaderWriter {
 				}
 				else {
 					activeChannel.remove(recordSetName);
+					if (createdRecordSets.contains(recordSetName))
+						createdRecordSets.remove(recordSetName);
+
 				}
 				
 				if (CSVReaderWriter.application.getStatusBar() != null) {
-					activeChannel.switchRecordSet(activeChannel.getRecordSetNames()[0]); //recordSetName);
+					activeChannel.switchRecordSet(createdRecordSets.firstElement()); //recordSetName);
 				}
 
 				reader.close();
