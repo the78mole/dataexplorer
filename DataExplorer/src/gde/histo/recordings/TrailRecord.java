@@ -876,7 +876,7 @@ public abstract class TrailRecord extends CommonRecord {
 		if (trailSelector.getTrailTextSelectedIndex() < 0) {
 			log.info(() -> String.format("%s : no trail types identified" + name)); //$NON-NLS-1$
 		}
-		log.log(FINER, "", trailSelector);
+		log.finer(() -> String.format("%s", trailSelector.toString()));
 	}
 
 	/**
