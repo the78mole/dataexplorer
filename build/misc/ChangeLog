@@ -9,6 +9,7 @@ Generic changes/fixes
 	* Reduce DataExplorer startup duration
 	* Ask user for confirmation prior to purging an object key
 	* fix channel object key handling, channels of type outlet (chargers) might have different object key, update object selector accordingly
+	* fix unsaved reason entry for changed comment
 Device specific changes/fixes
 	* HoTTAdapter* - add file selection hint for *.bin;*.log 
 	* HoTTAdapter2 - fix statistics calculation while capacity doesn't start at zero 

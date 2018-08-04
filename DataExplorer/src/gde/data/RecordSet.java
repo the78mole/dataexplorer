@@ -107,7 +107,7 @@ public final class RecordSet extends AbstractRecordSet {
 	public final static String		UNSAVED_REASON_GRAPHICS				= Messages.getString(MessageIds.GDE_MSGT0130);
 	public final static String		UNSAVED_REASON_DATA						= Messages.getString(MessageIds.GDE_MSGT0131);
 	public final static String		UNSAVED_REASON_CONFIGURATION	= Messages.getString(MessageIds.GDE_MSGT0132);
-	public final static String		UNSAVED_REASON_COMMENT				= Messages.getString(MessageIds.GDE_MSGT0610);
+	public final static String		UNSAVED_REASON_COMMENT				= Messages.getString(MessageIds.GDE_MSGT0611);
 	Vector<String>								unsaveReasons									= new Vector<String>();
 	int														changeCounter									= 0;																					// indicates change in general
 
