@@ -344,7 +344,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			this.template.setProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, Boolean.toString(recordSet.isSmoothAtCurrentDrop()));
 			recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
 			//smooth voltage curve
-			this.template.setProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, Boolean.toString(recordSet.isSmoothAtCurrentDrop()));
+			this.template.setProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, Boolean.toString(recordSet.isSmoothVoltageCurve()));
 			recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
 			// time grid
 			Color color = recordSet.getColorTimeGrid();
