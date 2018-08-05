@@ -167,10 +167,11 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 								drawCurves(recordSet, 1024, 768);
 							}
 						}
+						
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -238,9 +239,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+						
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -308,9 +310,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+						
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -378,9 +381,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+						
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -448,9 +452,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+						
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -518,9 +523,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+						
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -599,9 +605,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+						
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_nmea.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -672,9 +679,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+						
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_txt.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -748,9 +756,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+						
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_csv.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -825,9 +834,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							}
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+						
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_lov.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -881,9 +891,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						activeChannel.setSaved(true);
 						//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+						
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_gpx.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -932,9 +943,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						activeChannel.setSaved(true);
 						//activeChannel.checkAndLoadData(); //perform this operation triggered by drawCurves
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+						
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_igc.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -967,8 +979,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
 		try {
-			String tmpDir1 = this.tmpDir + GDE.FILE_SEPARATOR + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-			List<File> files = FileUtils.getFileListing(new File(tmpDir1), 1);
+			if (!new File(this.tmpDir1).exists())
+				throw new FileNotFoundException(this.tmpDir1);
+			
+			List<File> files = FileUtils.getFileListing(new File(this.tmpDir1), 1);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && file.getName().toLowerCase().startsWith("log")) {
@@ -999,9 +1013,8 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							}
 						}
 
-						String tmpDir2 = this.tmpDir + "Write_2_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir2).mkdirs();
-						String absolutFilePath = tmpDir2 + file.getName();
+						new File(this.tmpDir2).mkdirs();
+						String absolutFilePath = this.tmpDir2 + file.getName();
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 					}
@@ -1112,9 +1125,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							}
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_txt.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -1187,9 +1201,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_txt.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -1272,9 +1287,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_txt.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -1356,9 +1372,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_dat.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -1426,9 +1443,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -1496,9 +1514,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -1576,9 +1595,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -1655,9 +1675,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -1731,9 +1752,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -1801,9 +1823,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_log.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
@@ -1872,9 +1895,10 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							drawCurves(recordSet, 1024, 768);
 						}
 
-						String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir1).mkdirs();
-						String absolutFilePath = tmpDir1 + file.getName();
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);

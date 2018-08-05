@@ -256,6 +256,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		recordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**

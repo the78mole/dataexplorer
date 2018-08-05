@@ -205,6 +205,7 @@ public class Picolario2 extends Picolario {
 		}
 		this.makeInActiveDisplayable(recordSet);
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		recordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**

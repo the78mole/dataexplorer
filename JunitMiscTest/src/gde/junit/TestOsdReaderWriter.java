@@ -51,8 +51,10 @@ public class TestOsdReaderWriter extends TestSuperClass {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
 		try {
-			String tmpDir1 = this.tmpDir + GDE.FILE_SEPARATOR + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-			List<File> files = FileUtils.getFileListing(new File(tmpDir1), 1);
+			if (!new File(this.tmpDir1).exists())
+				throw new FileNotFoundException(this.tmpDir1);
+
+			List<File> files = FileUtils.getFileListing(new File(this.tmpDir1), 1);
 
 			for (File file : files) {
 				String filePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
@@ -89,13 +91,13 @@ public class TestOsdReaderWriter extends TestSuperClass {
 							}
 							
 							if (activeChannel.getActiveRecordSet() != null) {
-								String absolutFilePath = tmpDir1 + file.getName();
+								String absolutFilePath = this.tmpDir1 + file.getName();
 								if (absolutFilePath.contains("_lov")) //exclude LogView files
 									continue;
 								absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_abs.csv";
 								System.out.println("writing as   : " + absolutFilePath);
 								CSVReaderWriter.write(';', activeChannel.getActiveRecordSet().getName(), absolutFilePath, false, "UTF-8");
-								absolutFilePath = tmpDir1 + file.getName();
+								absolutFilePath = this.tmpDir1 + file.getName();
 								absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_raw.csv";
 								System.out.println("writing as   : " + absolutFilePath);
 								CSVReaderWriter.write(';', activeChannel.getActiveRecordSet().getName(), absolutFilePath, true, "ISO-8859-1");
@@ -175,9 +177,10 @@ public class TestOsdReaderWriter extends TestSuperClass {
 								}
 							}
 
-							String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-							new File(tmpDir1).mkdirs();
-							String absolutFilePath = tmpDir1 + file.getName();
+							if (!new File(this.tmpDir1).exists())
+								throw new FileNotFoundException(this.tmpDir1);
+
+							String absolutFilePath = this.tmpDir1 + file.getName();
 							System.out.println("writing as   : " + absolutFilePath);
 							OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 						}
@@ -210,8 +213,10 @@ public class TestOsdReaderWriter extends TestSuperClass {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();
 
 		try {
-			String tmpDir1 = this.tmpDir + GDE.FILE_SEPARATOR + "Write_1_OSD" + GDE.FILE_SEPARATOR;
-			List<File> files = FileUtils.getFileListing(new File(tmpDir1), 1);
+			if (!new File(this.tmpDir1).exists())
+				throw new FileNotFoundException(this.tmpDir1);
+
+			List<File> files = FileUtils.getFileListing(new File(this.tmpDir1), 1);
 
 			for (File file : files) {
 				if (file.getAbsolutePath().toLowerCase().endsWith(".osd")) {
@@ -250,9 +255,8 @@ public class TestOsdReaderWriter extends TestSuperClass {
 							}
 						}
 
-						String tmpDir2 = this.tmpDir + "Write_2_OSD" + GDE.FILE_SEPARATOR;
-						new File(tmpDir2).mkdirs();
-						String absolutFilePath = tmpDir2 + file.getName();
+						new File(this.tmpDir2).mkdirs();
+						String absolutFilePath = this.tmpDir2 + file.getName();
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 					}

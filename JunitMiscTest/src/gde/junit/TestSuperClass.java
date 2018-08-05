@@ -70,7 +70,9 @@ public class TestSuperClass extends TestCase {
 	final Settings			settings		= Settings.getInstance();
 	final String				tmpDir			= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR) ? System.getProperty("java.io.tmpdir")
 			: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;
-
+	final String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
+	final String tmpDir2 = this.tmpDir + "Write_2_OSD" + GDE.FILE_SEPARATOR;
+	
 	protected enum DataSource {
 		SETTINGS {
 			@Override
@@ -152,7 +154,12 @@ public class TestSuperClass extends TestCase {
 		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
 		this.legacyDeviceNames.put("QuadroControl", "QC-Copter");
 		this.legacyDeviceNames.put("PichlerP60", "PichlerP60 50W");
-	}
+		
+		if (!new File(this.tmpDir1).mkdirs())
+			Logger.getLogger("gde.junit.TestSuperClass").log(Level.WARNING, "Failed creation of " + this.tmpDir1 );
+		if (!new File(this.tmpDir2).mkdirs())
+			Logger.getLogger("gde.junit.TestSuperClass").log(Level.WARNING, "Failed creation of " + this.tmpDir2 );
+}
 
 	/**
 	 * goes through the existing device properties files and set active flagged
