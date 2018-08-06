@@ -180,12 +180,28 @@ public final class TransitionTableMapper {
 
 	private boolean hasTransitions(SettlementType settlementType) {
 		GroupTransitions histoTransitions = recordSet.getHistoTransitions();
-		int transitionGroupId = settlementType.getEvaluation().getTransitionCalculus().getTransitionGroupId();
-		TransitionChronicle transitionChronicle = histoTransitions.get(transitionGroupId);
-		if (transitionChronicle != null) {
-			return true;
-		} else {
+		if (histoTransitions.isEmpty()) {
 			return false;
+		} else {
+			TransitionFigureType transitionFigureType = settlementType.getEvaluation().getTransitionFigure();
+			TransitionAmountType transitionAmountType = settlementType.getEvaluation().getTransitionAmount();
+			TransitionCalculusType calculationType = settlementType.getEvaluation().getTransitionCalculus();
+			final int transitionGroupId;
+			if (transitionFigureType != null) {
+				transitionGroupId = transitionFigureType.getTransitionGroupId();
+			} else if (transitionAmountType != null) {
+				transitionGroupId = transitionAmountType.getTransitionGroupId();
+			} else if (calculationType != null) {
+				transitionGroupId = calculationType.getTransitionGroupId();
+			} else {
+				throw new UnsupportedOperationException();
+			}
+			TransitionChronicle transitionChronicle = histoTransitions.get(transitionGroupId);
+			if (transitionChronicle != null) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 
