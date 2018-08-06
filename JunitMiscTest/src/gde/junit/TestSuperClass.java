@@ -72,7 +72,7 @@ public class TestSuperClass extends TestCase {
 			: System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;
 	final String tmpDir1 = this.tmpDir + "Write_1_OSD" + GDE.FILE_SEPARATOR;
 	final String tmpDir2 = this.tmpDir + "Write_2_OSD" + GDE.FILE_SEPARATOR;
-	
+
 	protected enum DataSource {
 		SETTINGS {
 			@Override
@@ -154,10 +154,10 @@ public class TestSuperClass extends TestCase {
 		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
 		this.legacyDeviceNames.put("QuadroControl", "QC-Copter");
 		this.legacyDeviceNames.put("PichlerP60", "PichlerP60 50W");
-		
-		if (!new File(this.tmpDir1).mkdirs())
+
+		if (!new File(this.tmpDir1).exists() && !new File(this.tmpDir1).mkdirs())
 			Logger.getLogger("gde.junit.TestSuperClass").log(Level.WARNING, "Failed creation of " + this.tmpDir1 );
-		if (!new File(this.tmpDir2).mkdirs())
+		if (!new File(this.tmpDir2).exists() && !new File(this.tmpDir2).mkdirs())
 			Logger.getLogger("gde.junit.TestSuperClass").log(Level.WARNING, "Failed creation of " + this.tmpDir2 );
 }
 
