@@ -647,7 +647,7 @@ public class ChannelType {
 		@Override
 		public LinkedHashMap<Integer, SettlementType> unmarshal(ChannelType.Settlements values) {
 			LinkedHashMap<Integer, SettlementType> map = new LinkedHashMap<Integer, SettlementType>();
-			if (values != null) {
+			if (values != null && values.settlement != null) {
 				for (SettlementType value : values.settlement)
 					map.put(value.settlementId, value);
 			}
@@ -670,7 +670,7 @@ public class ChannelType {
 		@Override
 		public HashMap<Integer, ReferenceGroupType> unmarshal(ChannelType.ReferenceGroups values) {
 			HashMap<Integer, ReferenceGroupType> map = new HashMap<Integer, ReferenceGroupType>();
-			if (values != null) {
+			if (values != null && values.referenceGroup != null) {
 				for (ReferenceGroupType value : values.referenceGroup)
 					map.put(value.referenceGroupId, value);
 			}
@@ -693,7 +693,7 @@ public class ChannelType {
 		@Override
 		public HashMap<Integer, TransitionGroupType> unmarshal(ChannelType.TransitionGroups values) {
 			HashMap<Integer, TransitionGroupType> map = new HashMap<Integer, TransitionGroupType>();
-			if (values != null) {
+			if (values != null && values.transitionGroup != null) {
 				for (TransitionGroupType value : values.transitionGroup)
 					map.put(value.transitionGroupId, value);
 			}
@@ -716,7 +716,7 @@ public class ChannelType {
 		@Override
 		public HashMap<Integer, TransitionType> unmarshal(ChannelType.Transitions values) {
 			HashMap<Integer, TransitionType> map = new HashMap<Integer, TransitionType>();
-			if (values != null) {
+			if (values != null && values.transition != null) {
 				for (TransitionType value : values.transition)
 					map.put(value.transitionId, value);
 			}
@@ -740,8 +740,10 @@ public class ChannelType {
 		@Override
 		public LinkedHashMap<Integer, ScoreGroupType> unmarshal(ChannelType.ScoreGroups values) {
 			LinkedHashMap<Integer, ScoreGroupType> map = new LinkedHashMap<Integer, ScoreGroupType>();
-			for (ScoreGroupType value : values.scoreGroup)
-				map.put(value.scoreGroupId, value);
+			if (values != null && values.scoreGroup != null) {
+				for (ScoreGroupType value : values.scoreGroup)
+					map.put(value.scoreGroupId, value);
+			}
 			return map;
 		}
 
