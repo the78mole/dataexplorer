@@ -1,16 +1,16 @@
 Development history / change log, please read from bottom up
 
-Version 3.3.3 - xx yyy 2018
+Version 3.3.3 - 10 Aug 2018
 Generic changes/fixes
-	* fix 19200 Baud protocol live data, skip Rx query while other sensors detected, Rx data in sensor data contained
 	* fix recursion synchronizing compare set while adding curve to compare set
-	* handle device base directory by interface method, default implementation, device specific implementation if required
+	* handle device base directory by interface method to enable device specific directories
 	* enhance calculation of synched scale label 
 	* Reduce DataExplorer startup duration
 	* Ask user for confirmation prior to purging an object key
 	* fix channel object key handling, channels of type outlet (chargers) might have different object key, update object selector accordingly
 	* fix unsaved reason entry for changed comment
 Device specific changes/fixes
+	* HoTTAdapter* - fix 19200 Baud protocol live data, skip Rx query while other sensors detected, Rx data in sensor data contained
 	* HoTTAdapter* - add file selection hint for *.bin;*.log 
 	* HoTTAdapter2 - fix statistics calculation while capacity doesn't start at zero 
 	* S32 - fix factor to correct external temperatures
@@ -22,7 +22,7 @@ Device specific changes/fixes
 	* OpenTx-Telemetry - split log according time entries into separate record sets
 	* Futaba-Telemetry - fix parsing exception "---", enable visualization control and help
 	* Futaba-Telemetry - fix EOFException saving OSD with record set different real size
-	* Hitec X1 Red - add initial support (alpha)
+	* Hitec X1 Red - add initial support (alpha), looking for user of this device interested collection data using DataExplorer
 	* WSTech DataVario - replace German description with supposed key
 	* UltraDuoPlus* - refine object key selection by memory name
 

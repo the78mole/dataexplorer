@@ -1,64 +1,95 @@
-GNU DataExplorer - News - comes with version 3.3.2 - 15 Apr 2018
+GNU DataExplorer - News - comes with version 3.3.3 - 10 Aug 2018
 
-1) general corrections
-	* fix illegal formatting option in ParameterControl used for Graupner UDP charger
-	* fix HoTTAdapter wrong data block number detection
-	* fix empty template file name if user cancels loading a template
-	* fix some issues when adding / editing object keys
-	* fix wrong interpretation and display of geo-coordinates received as degree with decimal digits
-	* fix parsing error with values coming with comma as separator to decimal places
-	* fix setting of time grid building new template
-	* fix circular UI update calls
-	* fix/tolerate Jeti new alarm protocol 
-	* enhance context menu texts (graphics / data table tabs)
-	* update MDLViewer plug-in to 9.3
+1) generic changes/fixes
+	* fix recursion synchronizing compare set while adding curve to compare set
+	* handle device base directory by interface method to enable device specific directories
+	* enhance calculation of synched scale label 
+	* Reduce DataExplorer startup duration
+	* Ask user for confirmation prior to purging an object key
+	* fix channel object key handling, channels of type outlet (chargers) might have different object key, update object selector accordingly
+	* fix unsaved reason entry for changed comment
 
-2) added functionality
-	* add initial support for Junsi iCharger 106B
-	* add initial support for ELV WDE (Wetter-Daten-Empfänger)
-	* add initial support for a generic CSV import (using Tesla Battery sample CSV file as source)
-	* add initial support for Graupner GeniusWizard log files
+2) device specific changes/fixes
+	* HoTTAdapter* - fix 19200 Baud protocol live data, skip Rx query while other sensors detected, Rx data in sensor data contained
+	* HoTTAdapter* - add file selection hint for *.bin;*.log 
+	* HoTTAdapter2 - fix statistics calculation while capacity doesn't start at zero 
+	* S32 - fix factor to correct external temperatures
+	* S32_2 - initial release for S32 as version 2 displaying all measurement values on a single time line
+	* S32 - fix measurement synchronization references (need device XML replacement)
+	* S32 - fix external temperature factor according customer feedback
+	* Ultramat* single channel charger - fix possible NullPointerException
+	* OpenTx-Telemetry - fix potential exception, add some more mapping parameter, enable visualization control and help
+	* OpenTx-Telemetry - split log according time entries into separate record sets
+	* Futaba-Telemetry - fix parsing exception "---", enable visualization control and help
+	* Futaba-Telemetry - fix EOFException saving OSD with record set different real size
+	* Hitec X1 Red - add initial support (alpha)
+	* WSTech DataVario - replace German description with supposed key
+	* UltraDuoPlus* - refine object key selection by memory name
 
 3) history analysis
-	* New summary chart in the history graphics window
-	* Enhance graphics template support
-	* Enhance graphics chart
-	* New remote log file access
-	* Fix table issues
 	* Enhance UI
-	* Fix processing issues
-	* New columns for settlement values in the data table tab (optional)
+		>> Add support for triggered values (e.g. motor runtime height)
+		>> Add refresh menu item and shortcut
+		>> Add object key wizard (if accessing new directories) 
+		>> Remove MessageBox "No log files"
+		>> Enhance toggling 'Smart values' by preserving the user selections
+		>> Fix importing from histo table with reversed x axis opens wrong file
+		>> Fix InvalidPathException@_SupplementObjectDirs
+		>> Fix wrong decimal places if switching from histo graphics to histo table
+	* Remove searching in the current import path (is obsolete due to remote log file support)
 	* Enhance performance
-	* Enhance coding
+	 	>> Memory cache for aggregated histo data 
+	 	>> Optimized directory scans for graphics refresh 
+	 	>> Avoid multiple vault re-reading from the source log files
+	 	>> Code optimizations to avoid materialization
+	 	>> Remove syncing slave records for incomplete master records
+	 	>> Avoid multiple sha1 hashing
+	 	>> Remove method synchronizing keyword for methods not used in threads
+ 	* Support new file extensions separator
 
-1) allgemeine Korrekturen
-	* korrigiert ungültige Formatierung beim ParameterControl verwendet Graupner UDP Ladegerät
-	* korrigiert falsche Datenblock-Nummernerkennung HoTTAdapter
-	* korrigiert leerer TemplateName wenn der Nutzer das Laden abbricht
-	* korrigiert hinzufügen/verändern von Objektschlüsseln
-	* korrigiert falsche Anzeige und Interpretation von Geo-Koordinaten mit Grad und Dezimalstellen
-	* korrigiert Interpretation innerhalb von CSV-Dateien, wobei die Zahlen und Dezimalstellen durch Komma getrennt sind
-	* korrigiert setzen des Zeit-Grids beim Erstellen neuer Templates
-	* korrigiert zirkulare aufrufe von Oberflächen-Update-Aufrufen
-	* korrigiert/toleriert neues Jeti Alarmprotokoll in Log-Dateien
-	* Verbesserung des Kontext-Menüs Grafik/Datentabelle
-	* Update des MDLViewer Plug-ins auf 9.3
-	
-2) hinzugefügte Funktionalität
-	* initiale Unterstützung vom Junsi iCharger 106B
-	* initiale Unterstützung ELV WDE (Wetter-Daten-Empfänger)
-	* initiale Unterstützung generischen CSV-Import (Tesla Batterieprotokoll als Beispiel CSV-Datei)
-	* initiale Unterstützung der Graupner GeniusWizard Log-Dateien
+1) allgemeine Korrekturen/Verbesserungen
+    * korrigiert Rekursion bei der Synchronisation von Kurvenvergleich Datensätzen beim hinzufügen neuer Datensätze
+    * ermögliche gerätespezifische Verzeichnisnamen über Interface-Methode, um Namensabweichungen Gerätenamen zu Verzeichnisnamen zu ermöglichen
+    * Berechnung der Skalenbeschiftung von synchronisierten Messwerten basiert nun auf der Selektion
+    * Startzeit des DataExplorers verkürzt
+    * Bei der Behandlung von Objektschlüsseln wir der Benutzer gefragt
+    * korrigierte Objektschlüsselbehandlung für Kanäle vom Typ Ausgang (Ladegeräte) und ermögliche verschiedenen Schlüssle pro Ausgang
+    * korrigierte Aussage bei der Anzeige der Änderungen bei geladenen Datensätzen
+
+
+2) gerätespezifische Korrekturen/Verbesserungen
+    * HoTTAdapter* - korrigiert 19200 Baud Protokoll "live data", überspring Rx Abfrage, weil die Rx Daten in allen Abfrageantworten enthalten sind
+    * HoTTAdapter* - Hinweis hinzugefügt für die Dateiauswahl für *.bin;*.log
+    * HoTTAdapter2 - korrigierte statische Berechnung über Trigger, wenn manche Werte, speziell Kapazität nicht bei Null anfängt
+    * S32 - korrigierter Faktor zur Korrektur von extern gemessenen Temperaturen
+    * S32_2 - initiale Freigabe eines S32 als Version 2 mit der Anzeige aller Daten auf eine einzigen Zeitlinie, die Trennung in verschiedenen Datensätze ist damit aufgehoben
+    * S32 - korrigierte Messwert-Sychronisations-Referenzen
+    * Ultramat* Ladegeräte mit einem Ausgang - korrigierter Code wegen auftretendem Fehler, der die Aufnahme-Funktion verhinderte
+    * OpenTx-Telemetry - korrigierter Code bezüglich Fehlerbehandlung, zusätzliche Mapping-Parameter, Visualisierungs-Kontrolle hinzugefügt
+    * OpenTx-Telemetry - teile Log in separate Datensätze pro Flug anhand des Zeitstempels
+    * Futaba-Telemetry - korrigierte Fehlerbahndlung bei Syntaxanalyse "---", Visualisierungs-Kontrolle hinzugefügt und Hilfe
+    * Futaba-Telemetry - korrigierte Fehlerbahndlung beim Sichern von OSD-Dateien, wenn Anzahl der Messwerte schwankt
+    * Hitec X1 Red - initiale Unterstützung hinzugefügt (alpha), suche Anwender mit diesem Gerät, die über den DataExplorer aufzeichnen wollen
+    * WSTech DataVario - deutsche Beschreibung mit dem dafür vorgesehenen Schlüssel ersetzt
+    * UltraDuoPlus* - verbesserte Objektschlüsselauswahl anhand des Batteriespeichernamens
 
 3) Historien-Analyse
-	* neues Überblick-Diagramm im Historien Grafik-Fenster
-	* verbesserte Grafik-Template Unterstützung
-	* verbessertes Grafik-Diagramm
-	* neuer Dateizugriff auf entfernte Dateien über Supplementary Ordner
-	* korrigierte Tabelleneinträge (Zeitstempel, GPS-Position, Ordnerpfad)
-	* verbessertes Aussehen/Anwendung (Objektschlüssel, Tool-Tips, Tastenkürzel, neue Menüeinträge,..)
-	* Prozess-Fehler beseitigt 
-	* Neue Spalte für berechnete Werte
-	* verbesserte Geschwindigkeit der Historienauswertung
-	* verbesserte Codierung
+    * Verbesserungen Benutzerschnittstelle
+        >> Unterstützung für Trigger abhängige Werte hinzugefügt (z.B. Motorlaufzeit, Kapazität/Höhenmeter,...)
+        >> Aktualisierung als Menüeintrag und Short-Cut hinzugefügt
+        >> Objektschlüssel-Assistent hinzugefügt (beim Zugriff auf neue Verzeichnisse)
+        >> Anzeige "keine Log-Dateien" entfernt
+        >> verbessertes Umschalten für 'Smart values' und beibehalten der Benutzer gewählten Anzeige
+        >> korrigierte Importfunktion bei Auswahl über die Tabellenansicht
+        >> korrigierte Fehlermeldung bei Verzeichnisfehler@_SupplementObjectDirs
+        >> korrigierte Dezimalstellen beim Umschalten zwischen Historien-Grafik und -Tabelle
+    * Suche im Importpfad entfernt (ist unnötig wegen Unterstützung von außerhalb liegenden Dateien)
+    * Verbesserte Geschwindigkeit
+         >> Zwischenspeicherung für bereits aufbereitete Daten
+         >> Optimierung von Verzeichnissuche für die grafische Aktualisierung
+         >> Verhinderung von Mehrfachlesen von Quell-Dateien
+         >> unnötige Synchronisation entfernt
+         >> Verhinderung von mehrfachem sha1 hashing
+         >> Methoden-Synchronisierung entfernt, für Funktionen außerhalb von Threads
+     * Unterstützung für neue Datei-Endung-Separierung
 	
