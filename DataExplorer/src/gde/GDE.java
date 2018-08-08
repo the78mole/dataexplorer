@@ -378,18 +378,6 @@ public class GDE {
 	private static Thread										settingsThread;
 
 	static { // initialize device mapping to enable opening files saved on android app
-		GDE.initLogger();
-		log.log(Level.INFO, "initLogger  done ");
-
-		GDE.settingsThread = new Thread("Settings async") {
-			@Override
-			public void run() {
-				log.log(Level.INFO, "Settings.getInstance() settingsAsyncThread.run()");
-				Settings.getInstance();
-			}
-		};
-		GDE.settingsThread.start();
-
 		GDE.deviceMap.put("HoTTViewerAdapter", "HoTTViewer"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("HoTTAdapter3", "HoTTAdapter2"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("GPS-Logger (UL)", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -404,7 +392,18 @@ public class GDE {
 	 */
 	public static void main(String[] args) {
 		final String $METHOD_NAME = "main"; //$NON-NLS-1$
-		log.log(Level.OFF, "main    start");
+		
+		GDE.initLogger();
+		GDE.settingsThread = new Thread("Settings async") {
+			@Override
+			public void run() {
+				log.log(Level.INFO, "Settings.getInstance() settingsAsyncThread.run()");
+				Settings.getInstance();
+			}
+		};
+		GDE.settingsThread.start();
+
+		log.log(Level.INFO, "main start");
 		String inputFilePath = GDE.STRING_EMPTY;
 		try {
 			Display.setAppName(GDE.NAME_LONG);
@@ -420,6 +419,8 @@ public class GDE {
 			//sleak.open();
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, GDE.NAME_LONG + GDE.STRING_BLANK + GDE.VERSION);
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Screen resolution [dpi] = " + GDE.display.getDPI().y);
+
+			log.log(Level.INFO, "initLogger  done ");
 
 			//build the main thread context classloader to enable dynamic plugin class loading
 			Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
