@@ -477,11 +477,13 @@ public class FileUtils {
 		File file = new File(targetDirectory + fileName);
 		try {
 			if (!file.exists()) {
+				if (file.createNewFile())
+					log.info(() -> String.format(">>>>>> created %s", file.getAbsolutePath()));
 				is = runtimeInstance.getClassLoader().getResourceAsStream(jarInternalSourceDirectory + fileName);
 				if (is != null) {
 					int read;
 					byte[] buffer = new byte[4096];
-					os = new FileOutputStream(targetDirectory + fileName);
+					os = new FileOutputStream(file);
 					while ((read = is.read(buffer)) != -1) {
 						os.write(buffer, 0, read);
 					}
@@ -490,6 +492,9 @@ public class FileUtils {
 					setAccessPermission(fileName, permissionsUNIX);
 
 					isExtracted = true;
+				}
+				else {
+					log.log(Level.SEVERE, String.format("extraction of %s%s failed!", jarInternalSourceDirectory, fileName));
 				}
 			}
 		}

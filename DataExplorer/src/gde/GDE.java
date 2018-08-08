@@ -392,20 +392,22 @@ public class GDE {
 	 */
 	public static void main(String[] args) {
 		final String $METHOD_NAME = "main"; //$NON-NLS-1$
-		
-		GDE.initLogger();
-		GDE.settingsThread = new Thread("Settings async") {
-			@Override
-			public void run() {
-				log.log(Level.INFO, "Settings.getInstance() settingsAsyncThread.run()");
-				Settings.getInstance();
-			}
-		};
-		GDE.settingsThread.start();
-
-		log.log(Level.INFO, "main start");
-		String inputFilePath = GDE.STRING_EMPTY;
 		try {
+			GDE.initLogger();
+			log.log(Level.INFO, "initLogger  done ");
+			
+			GDE.settingsThread = new Thread("Settings async") {
+				@Override
+				public void run() {
+					log.log(Level.INFO, "Settings.getInstance() settingsAsyncThread.run()");
+					Settings.getInstance();
+				}
+			};
+			GDE.settingsThread.start();
+	
+			log.log(Level.INFO, "main start");
+			String inputFilePath = GDE.STRING_EMPTY;
+			
 			Display.setAppName(GDE.NAME_LONG);
 			Display.setAppVersion(GDE.VERSION);
 
@@ -420,12 +422,10 @@ public class GDE {
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, GDE.NAME_LONG + GDE.STRING_BLANK + GDE.VERSION);
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "Screen resolution [dpi] = " + GDE.display.getDPI().y);
 
-			log.log(Level.INFO, "initLogger  done ");
-
 			//build the main thread context classloader to enable dynamic plugin class loading
 			Thread.currentThread().setContextClassLoader(GDE.getClassLoader());
 
-			log.log(Level.OFF, "settingsThread.join() wait ");
+			log.log(Level.INFO, "settingsThread.join() wait ");
 			GDE.settingsThread.join();
 
 			GDE.WIDGET_FONT_SIZE = (int) ((GDE.IS_LINUX ? 8 : 9) * Settings.getInstance().getFontDisplayDensityAdaptionFactor() * 96 / Display.getDefault().getDPI().y);

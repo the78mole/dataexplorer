@@ -387,12 +387,9 @@ public class Settings extends Properties {
 
 		this.readMeasurementDiplayProperties();
 
-		this.xsdThread.start(); // wait to start the thread until the device XMLs are getting updated, local switch comes with the same XSD
-
 		// locale settings has been changed, replacement of device property files required
 		if (this.getLocaleChanged()) {
 			updateDeviceProperties(devicePropertiesTargetpath + GDE.FILE_SEPARATOR_UNIX, false, false);
-			// this.isDevicePropertiesReplaced = true;
 		}
 
 		if (this.isDevicePropertiesUpdated) { // check if previous devices exist and migrate device usage, default import directory, ....
@@ -467,6 +464,9 @@ public class Settings extends Properties {
 			this.window = new Rectangle(50, 50, 950, 600);
 
 		this.setProperty(Settings.LOCALE_CHANGED, "false"); //$NON-NLS-1$
+
+		//move to end of constructor since it requires initialized settings!
+		this.xsdThread.start(); // wait to start the thread until the device XMLs are getting updated, local switch comes with the same XSD
 	}
 
 	public Path getHistoCacheDirectory() {
