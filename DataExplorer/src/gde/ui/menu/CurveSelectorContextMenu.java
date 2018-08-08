@@ -181,7 +181,7 @@ public class CurveSelectorContextMenu {
 								}
 
 								// disable clear, if nothing to clear
-								if (CurveSelectorContextMenu.this.application.getCompareSet().size() == 0) {
+								if (!CurveSelectorContextMenu.this.application.isWithCompareSet()) {
 									CurveSelectorContextMenu.this.cleanCurveCompare.setEnabled(false);
 								}
 							}
@@ -1123,17 +1123,18 @@ public class CurveSelectorContextMenu {
 					if (copyFromRecordSet != null && copyFromRecordKey != null) {
 						Record copyFromRecord = copyFromRecordSet.get(copyFromRecordKey);
 						if (copyFromRecord != null && copyFromRecord.isVisible()) {
-							RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
-							if (!compareSet.isEmpty() && !compareSet.get(compareSet.getFirstRecordName()).getUnit().equalsIgnoreCase(copyFromRecord.getUnit())) {
-								CurveSelectorContextMenu.this.application
-										.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0004, new Object[] { copyFromRecordKey + GDE.STRING_MESSAGE_CONCAT + compareSet.getFirstRecordName() }));
-								return;
-							}
-							if (compareSet.size() > 0) {
+							if (CurveSelectorContextMenu.this.application.isWithCompareSet()) {
+								RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
+								if (!compareSet.get(compareSet.getFirstRecordName()).getUnit().equalsIgnoreCase(copyFromRecord.getUnit())) {
+									CurveSelectorContextMenu.this.application
+											.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0004, new Object[] { copyFromRecordKey + GDE.STRING_MESSAGE_CONCAT + compareSet.getFirstRecordName() }));
+									return;
+								}
 								// while adding a new curve to compare set - reset the zoom mode
 								CurveSelectorContextMenu.this.application.setCompareWindowMode(GraphicsMode.RESET, false);
 							}
 
+							RecordSet compareSet = CurveSelectorContextMenu.this.application.getCompareSet();
 							String newRecordkey = CurveSelectorContextMenu.this.settings.isCurveCompareChannelConfigName()
 									? copyFromRecord.getChannelConfigKey() + GDE.STRING_UNDER_BAR + copyFromRecordKey + GDE.STRING_UNDER_BAR + compareSet.size()
 									: copyFromRecordKey + GDE.STRING_UNDER_BAR + compareSet.size();
@@ -1192,7 +1193,7 @@ public class CurveSelectorContextMenu {
 							double oldMaxValue = compareSet.getMaxValue();
 							CurveSelectorContextMenu.log.fine(() -> String.format("scale values from compare set min=%.3f max=%.3f", compareSet.getMinValue(), compareSet.getMaxValue())); //$NON-NLS-1$
 							for (int i = 0; i < compareSet.size(); i++) {
-								Record record = (Record) compareSet.get(i);
+								Record record = compareSet.get(i);
 								double newMinValue = record.getMinScaleValue();
 								double newMaxValue = record.getMaxScaleValue();
 								CurveSelectorContextMenu.log.fine(() ->	String.format("scale values from record (" + record.getName() + ") to be checked min=%.3f max=%.3f", newMinValue, newMaxValue)); //$NON-NLS-1$ //$NON-NLS-2$

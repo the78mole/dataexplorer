@@ -14,23 +14,33 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
+		Copyright 2017 Google Inc. (Guava Cache)
     Copyright (c) 2017,2018 Thomas Eickert
 ****************************************************************************************/
+/*
+ * Copyright (C) 2017 The Guava Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 
 package gde.histo.exclusions;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Level.WARNING;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -38,13 +48,11 @@ import java.util.stream.Collectors;
 
 import gde.DataAccess;
 import gde.GDE;
-import gde.config.Settings;
 import gde.histo.innercache.Cache;
 import gde.histo.innercache.CacheBuilder;
 import gde.histo.innercache.CacheStats;
 import gde.histo.utils.SecureHash;
 import gde.log.Logger;
-import gde.utils.FileUtils;
 
 /**
  * Excluding files from history analysis via user activity.
@@ -65,15 +73,16 @@ public final class ExclusionData extends Properties { // todo solution for files
 	 * Does not define the path for accessing the file.
 	 */
 	private final Path																activeFolder;
+	private final DataAccess													dataAccess;
 
 	/**
 	 * @return true if an exclusion for all recordsets in the data file is active
 	 */
 	public boolean isExcluded(String fileName) {
 		String exclusionValue = getProperty(fileName);
-		boolean result = exclusionValue != null && exclusionValue.isEmpty();
-		if (result) log.log(FINE, "file excluded ", fileName);
-		return result;
+		boolean isExcluded = exclusionValue != null && exclusionValue.isEmpty();
+		if (isExcluded) log.log(FINE, "file excluded ", fileName);
+		return isExcluded;
 	}
 
 	/**
@@ -83,26 +92,9 @@ public final class ExclusionData extends Properties { // todo solution for files
 		if (recordsetBaseName.isEmpty()) throw new UnsupportedOperationException();
 
 		String exclusionValue = getProperty(fileName);
-		boolean result = exclusionValue != null && (exclusionValue.isEmpty() || exclusionValue.contains(recordsetBaseName));
-		if (result) log.fine(() -> String.format("recordset excluded %s %s", fileName, recordsetBaseName));
-		return result;
-	}
-
-	/**
-	 * Deletes all exclusions property files from the user directory and the data directories.
-	 * @param dataDirectories
-	 */
-	public static void deleteExclusionsDirectory(List<Path> dataDirectories) {
-		FileUtils.deleteDirectory(Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_EXCLUSIONS_DIR_NAME).toString());
-		for (Path dataPath : dataDirectories) {
-			try {
-				for (File file : FileUtils.getFileListing(dataPath.toFile(), Integer.MAX_VALUE, Settings.HISTO_EXCLUSIONS_FILE_NAME)) {
-					FileUtils.deleteFile(file.getPath());
-				}
-			} catch (FileNotFoundException e) {
-				log.log(WARNING, e.getMessage(), e);
-			}
-		}
+		boolean isExcluded = exclusionValue != null && (exclusionValue.isEmpty() || exclusionValue.contains(recordsetBaseName));
+		if (isExcluded) log.fine(() -> String.format("recordset excluded %s %s", fileName, recordsetBaseName));
+		return isExcluded;
 	}
 
 	/**
@@ -124,9 +116,10 @@ public final class ExclusionData extends Properties { // todo solution for files
 	 * Use the singleton getInstance instead for calls by the legacy UI based on the settings (object key and active device name).
 	 * @param activeFolder is the current data files folder based on the object key and active device
 	 */
-	public ExclusionData(Path activeFolder) {
+	public ExclusionData(Path activeFolder, DataAccess dataAccess) {
 		super();
 		this.activeFolder = activeFolder;
+		this.dataAccess = dataAccess;
 
 		String fileName = SecureHash.sha1(this.activeFolder.toString());
 		Properties cachedInstance = memoryCache.getIfPresent(fileName);
@@ -142,14 +135,14 @@ public final class ExclusionData extends Properties { // todo solution for files
 	}
 
 	@Override
-	public synchronized String toString() {
+	public String toString() {
 		return this.stringPropertyNames().stream().sorted().map(this::getProperty) //
 				.map(k -> k.isEmpty() ? k : k + GDE.STRING_BLANK_COLON_BLANK + getProperty(k)) //
 				.collect(Collectors.joining(GDE.STRING_NEW_LINE));
 	}
 
 	@Override
-	public synchronized Object setProperty(String dataFileName, String recordsetBaseName) {
+	public Object setProperty(String dataFileName, String recordsetBaseName) {
 		if (recordsetBaseName.isEmpty()) throw new UnsupportedOperationException();
 
 		return super.setProperty(dataFileName, recordsetBaseName);
@@ -160,7 +153,7 @@ public final class ExclusionData extends Properties { // todo solution for files
 	 * @param dataFileName
 	 * @return the previous value which is a csv string
 	 */
-	public synchronized Object setProperty(String dataFileName) {
+	public Object setProperty(String dataFileName) {
 		return super.setProperty(dataFileName, GDE.STRING_EMPTY);
 	}
 
@@ -183,11 +176,10 @@ public final class ExclusionData extends Properties { // todo solution for files
 	}
 
 	private void load() {
-		Path exclusionsDir = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_EXCLUSIONS_DIR_NAME);
-		FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
+		dataAccess.ensureExclusionDirectory();
 		String fileName = SecureHash.sha1(this.activeFolder.toString());
-		if (DataAccess.getInstance().existsExclusionFile(fileName)) {
-			try (Reader reader = new InputStreamReader(DataAccess.getInstance().getExclusionsInputStream(fileName))) {
+		if (dataAccess.existsExclusionFile(fileName)) {
+			try (Reader reader = new InputStreamReader(dataAccess.getExclusionsInputStream(fileName))) {
 				this.load(reader);
 				memoryCache.put(fileName, this);
 			} catch (Throwable e) {
@@ -200,11 +192,10 @@ public final class ExclusionData extends Properties { // todo solution for files
 	 * Write the file if excludes are defined, else delete the file.
 	 */
 	public void store() {
-		Path exclusionsDir = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_EXCLUSIONS_DIR_NAME);
 		if (this.size() > 0) {
-			FileUtils.checkDirectoryAndCreate(exclusionsDir.toString());
+			dataAccess.ensureExclusionDirectory();
 			String fileName = SecureHash.sha1(this.activeFolder.toString());
-			try (Writer writer = new OutputStreamWriter(DataAccess.getInstance().getExclusionsOutputStream(fileName), "UTF-8")) {
+			try (Writer writer = new OutputStreamWriter(dataAccess.getExclusionsOutputStream(fileName), "UTF-8")) {
 				this.store(writer, this.activeFolder.toString());
 				memoryCache.put(fileName, this);
 			} catch (Throwable e) {
@@ -219,7 +210,7 @@ public final class ExclusionData extends Properties { // todo solution for files
 
 	public void delete() {
 		String fileName = SecureHash.sha1(this.activeFolder.toString());
-		DataAccess.getInstance().deleteExclusionFile(fileName);
+		dataAccess.deleteExclusionFile(fileName);
 		memoryCache.invalidateAll();
 	}
 

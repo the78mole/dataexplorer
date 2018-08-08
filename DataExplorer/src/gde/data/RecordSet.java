@@ -31,8 +31,8 @@ import java.util.regex.Pattern;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
+import gde.Analyzer;
 import gde.GDE;
-import gde.config.Settings;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.device.TriggerType;
@@ -64,6 +64,13 @@ public final class RecordSet extends AbstractRecordSet {
 	final static String						$CLASS_NAME										= RecordSet.class.getName();
 	final static long							serialVersionUID							= 26031957;
 	final static Logger						log														= Logger.getLogger(RecordSet.class.getName());
+
+	/**
+	 * start point of data hierarchy.
+	 */
+	protected final Channels			channels;
+	protected final IDevice				device;
+	protected final Channel				parent;
 
 	String[]											noneCalculationRecords				= new String[0];																																																				//records/measurements which are active or inactive
 	int														noneCalculationRecordsCount		= -1;																																																										//cached count or number of noneCalculationRecords, -1 means not initialized
@@ -108,6 +115,9 @@ public final class RecordSet extends AbstractRecordSet {
 	public final static String		UNSAVED_REASON_DATA						= Messages.getString(MessageIds.GDE_MSGT0131);
 	public final static String		UNSAVED_REASON_CONFIGURATION	= Messages.getString(MessageIds.GDE_MSGT0132);
 	public final static String		UNSAVED_REASON_COMMENT				= Messages.getString(MessageIds.GDE_MSGT0611);
+
+	private final Analyzer				analyzer;
+
 	Vector<String>								unsaveReasons									= new Vector<String>();
 	int														changeCounter									= 0;																					// indicates change in general
 
@@ -117,15 +127,20 @@ public final class RecordSet extends AbstractRecordSet {
 	/**
 	 * record set data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer
-	 * @param channelNumber the channel number to be used
-	 * @param newName for the records like "1) Laden"
+	 * @param channelNumber the channel number to be used (supports channel mix)
+	 * @param recordSetName
 	 * @param measurementNames array of the device supported measurement names
-	 * @param newTimeSteps
 	 * @param isRawValue specified if dependent values has been calculated
 	 * @param isFromFileValue specifies if the data are red from file and if not modified don't need to be saved
 	 */
-	private RecordSet(IDevice useDevice, int channelNumber, String newName, String[] measurementNames, TimeSteps newTimeSteps, boolean isRawValue, boolean isFromFileValue) {
-		super(useDevice, channelNumber, newName, measurementNames, newTimeSteps);
+	private RecordSet(Analyzer analyzer, int channelNumber, String recordSetName, String[] measurementNames, boolean isRawValue, boolean isFromFileValue) {
+		super(analyzer.getActiveDevice(), recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH), //
+				measurementNames, new TimeSteps(analyzer.getActiveDevice().getTimeStep_ms(), INITIAL_RECORD_CAPACITY));
+		this.analyzer = analyzer;
+		this.channels = analyzer.getChannels();
+		this.device = analyzer.getActiveDevice();
+
+		this.parent = this.channels.get(channelNumber);
 		this.isRaw = isRawValue;
 		this.isFromFile = isFromFileValue;
 		this.visibleAndDisplayableRecords = new Vector<Record>();
@@ -136,14 +151,18 @@ public final class RecordSet extends AbstractRecordSet {
 	/**
 	 * special record set data buffers according the size of given names array, where
 	 * the name is the key to access the data buffer used to hold compare able records (compare set)
-	 * @param useDevice the device
 	 * @param newChannelName the channel name or configuration name
 	 * @param newName for the records like "1) Laden"
 	 * @param newTimeStep_ms time in msec of device measures points
 	 * @param graphicsType
 	 */
-	public RecordSet(IDevice useDevice, String newChannelName, String newName, double newTimeStep_ms, GraphicsType graphicsType) {
-		super(DataExplorer.getInstance(), useDevice, newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30), new String[0]);
+	public RecordSet(Analyzer analyzer, String newChannelName, String newName, double newTimeStep_ms, GraphicsType graphicsType) {
+		super(analyzer.getActiveDevice(), newName.length() <= RecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30), new String[0]);
+		this.analyzer = analyzer;
+		this.channels = null;
+		this.device = analyzer.getActiveDevice();
+
+		this.parent = null;
 		// this.timeStep_ms = new TimeSteps(this.get(0), newTimeStep_ms);
 		this.isRaw = true;
 		this.isCompareSet = GraphicsType.COMPARE == graphicsType;
@@ -160,7 +179,12 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @param channelConfigurationNumber
 	 */
 	private RecordSet(RecordSet recordSet, int channelConfigurationNumber) {
-		super(recordSet, channelConfigurationNumber);
+		super(recordSet);
+		this.analyzer = recordSet.analyzer.clone();
+		this.channels = recordSet.channels;
+		this.device = recordSet.device;
+
+		this.parent = this.channels.get(channelConfigurationNumber);
 
 		// check if there is a miss match of measurement names and correction required
 		String[] oldRecordNames = recordSet.recordNames;
@@ -263,6 +287,11 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	private RecordSet(RecordSet recordSet, int dataIndex, boolean isFromBegin) {
 		super(recordSet, DeviceXmlResource.getInstance().getReplacements(recordSet.recordNames.clone())); // copy record names without possible syncableName
+		this.analyzer = recordSet.analyzer.clone();
+		this.channels = recordSet.channels;
+		this.device = recordSet.device;
+
+		this.parent = recordSet.parent;
 
 		// update child records
 		for (String recordKey : this.recordNames) {
@@ -453,7 +482,7 @@ public final class RecordSet extends AbstractRecordSet {
 	public GroupTransitions getHistoTransitions() {
 		boolean isOutdated = this.histoTransitions != null && this.histoTransitions.isGatheringMode(this);
 		if (this.histoTransitions == null || isOutdated) {
-			this.histoTransitions = TransitionCollector.defineTransitions(this, this.channels.getActiveChannelNumber());
+			this.histoTransitions = new TransitionCollector(this).defineTransitions(this.channels.getActiveChannelNumber());
 		}
 		return this.histoTransitions;
 	}
@@ -470,8 +499,9 @@ public final class RecordSet extends AbstractRecordSet {
 		dataTableRow[0] = this.getFormatedTime_sec(index, isAbsolute);
 		this.device.prepareDataTableRow(this, dataTableRow, index);
 
-		if (this.settings.isHistoActive() && this.settings.isDataTableTransitions()) {
-			return TransitionTableMapper.getExtendedRow(this, index, dataTableRow);
+		if (this.analyzer.getSettings().isHistoActive() && this.analyzer.getSettings().isDataTableTransitions()) {
+			String[] rowWithSettlements = new TransitionTableMapper(this, this.analyzer).defineRowWithSettlements(index, dataTableRow);
+			return rowWithSettlements;
 		} else
 			return dataTableRow;
 	}
@@ -608,9 +638,8 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
 	@SuppressWarnings("unchecked")
-	@Override
 	public Vector<Record> getVisibleAndDisplayableRecordsForTable() {
-		return (Vector<Record>) (this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.displayRecords);
+		return (Vector<Record>) (this.analyzer.getSettings().isPartialDataTable() ? this.visibleAndDisplayableRecords : this.displayRecords);
 	}
 
 	/**
@@ -814,21 +843,36 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @return a record set containing all records (empty) as specified
 	 */
 	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
-		recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+		Analyzer analyzer = Analyzer.getInstance();
+		analyzer.setActiveDevice(device); // todo remove this safety assignment
+		return createRecordSet(recordSetName, analyzer, channelConfigNumber, isRaw, isFromFile, adjustObjectKey);
+	}
 
-		String[] recordNames = device.getMeasurementNamesReplacements(channelConfigNumber);
+	/**
+	 * Use this constructor if a threadsafe operation is required.
+	 * @param channelNumber the channel number to be used (supports channel mix)
+	 * @param isRaw defines if the data needs translation using device specific properties
+	 * @param isFromFile defines if a configuration change must be recorded to signal changes
+	 * @param adjustObjectKey defines if the channel's object key is updated by the settings objects key
+	 * @return a record set containing all records (empty) as specified
+	 */
+	public static RecordSet createRecordSet(String recordSetName, Analyzer analyzer, int channelNumber, boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
+		String shortRecordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
+
+		IDevice device = analyzer.getActiveDevice();
+		String[] recordNames = device.getMeasurementNamesReplacements(channelNumber);
 		if (recordNames.length == 0) { // simple check for valid device and record names, as fall back use the config from the first channel/configuration
-			recordNames = device.getMeasurementNamesReplacements(channelConfigNumber = 1);
+			recordNames = device.getMeasurementNamesReplacements(channelNumber = 1);
 		}
 
 		String[] recordSymbols = new String[recordNames.length];
 		String[] recordUnits = new String[recordNames.length];
 		for (int i = 0; i < recordNames.length; i++) {
-			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
+			MeasurementType measurement = device.getMeasurement(channelNumber, i);
 			recordSymbols[i] = measurement.getSymbol();
 			recordUnits[i] = measurement.getUnit();
 		}
-		return createRecordSet(recordSetName, device, channelConfigNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), isRaw, isFromFile, adjustObjectKey);
+		return createRecordSet(shortRecordSetName, analyzer, channelNumber, recordNames, recordSymbols, recordUnits, isRaw, isFromFile, adjustObjectKey);
 	}
 
 	/**
@@ -847,16 +891,29 @@ public final class RecordSet extends AbstractRecordSet {
 	 * @param adjustObjectKey defines if the channel's object key is updated by the settings objects key
 	 * @return a record set containing all records (empty) as specified
 	 */
-	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits, double newTimeStep_ms,
-			boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
-		String tmpRecordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH);
-		TimeSteps timeSteps = new TimeSteps(device.getTimeStep_ms(), INITIAL_RECORD_CAPACITY);
+	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols,
+			String[] recordUnits, double newTimeStep_ms, boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
+		Analyzer analyzer = Analyzer.getInstance();
+		analyzer.setActiveDevice(device); // todo remove this safety assignment
+		return createRecordSet(recordSetName, analyzer, channelConfigNumber, recordNames, recordSymbols, recordUnits, isRaw, isFromFile, adjustObjectKey);
+	}
 
-		RecordSet newRecordSet = new RecordSet(device, channelConfigNumber, tmpRecordSetName, recordNames, timeSteps, isRaw, isFromFile);
+	/**
+	 * Use this constructor if a threadsafe operation is required.
+	 * @param channelNumber the channel number to be used (supports channel mix)
+	 * @param isRaw defines if the data needs translation using device specific properties
+	 * @param isFromFile defines if a configuration change must be recorded to signal changes
+	 * @param adjustObjectKey defines if the channel's object key is updated by the settings objects key
+	 * @return a record set containing all records (empty) as specified
+	 */
+	public static RecordSet createRecordSet(String recordSetName, Analyzer analyzer, int channelNumber, String[] recordNames, String[] recordSymbols, String[] recordUnits,
+			boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
+		RecordSet newRecordSet = new RecordSet(analyzer, channelNumber, recordSetName, recordNames, isRaw, isFromFile);
 		if (log.isLoggable(Level.FINE)) printRecordNames("createRecordSet() " + newRecordSet.name + " - ", newRecordSet.getRecordNames()); //$NON-NLS-1$ //$NON-NLS-2$
 
+		IDevice device = analyzer.getActiveDevice();
 		for (int i = 0; i < recordNames.length; i++) {
-			MeasurementType measurement = device.getMeasurement(channelConfigNumber, i);
+			MeasurementType measurement = device.getMeasurement(channelNumber, i);
 			Record tmpRecord = new Record(device, i, recordNames[i], recordSymbols[i], recordUnits[i], measurement.isActive(), measurement.getStatistics(), measurement.getProperty(),
 					INITIAL_RECORD_CAPACITY);
 			tmpRecord.setColorDefaultsAndPosition(i);
@@ -866,11 +923,11 @@ public final class RecordSet extends AbstractRecordSet {
 
 		if (adjustObjectKey) {
 			// check and update object key
-			DataExplorer application = DataExplorer.getInstance();
-			if (application != null && application.isObjectoriented()) {
-				Channel activeChannel = Channels.getInstance().getActiveChannel();
-				if (activeChannel != null && !activeChannel.getObjectKey().equals(Settings.getInstance().getActiveObject())) {
-					activeChannel.setObjectKey(Settings.getInstance().getActiveObject());
+			String activeObjectKey = analyzer.getSettings().getActiveObjectKey();
+			if (!activeObjectKey.isEmpty()) {
+				Channel activeChannel = analyzer.getActiveChannel();
+				if (activeChannel != null && !activeChannel.getObjectKey().equals(activeObjectKey)) {
+					activeChannel.setObjectKey(activeObjectKey);
 				}
 			}
 		}
@@ -891,11 +948,33 @@ public final class RecordSet extends AbstractRecordSet {
 	}
 
 	/**
+	 * @return the device
+	 */
+	@Override
+	public IDevice getDevice() {
+		return this.device != null ? this.device : this.analyzer.getActiveDevice();
+	}
+
+	/**
+	 * @return the channel/configuration number
+	 */
+	@Override
+	public int getChannelConfigNumber() {
+		return this.parent != null ? this.parent.number : 1; // compare set does not have a parent
+	}
+
+	/**
+	 * @return the channel (or) configuration name
+	 */
+	public String getChannelConfigName() {
+		return this.parent != null ? this.parent.channelConfigName : GDE.STRING_EMPTY;
+	}
+
+	/**
 	 * check if this record set is one of the just active channel in UI
 	 */
 	public boolean isChildOfActiveChannel() {
 		boolean isChild = false;
-		// Channels channels = Channels.getInstance();
 		RecordSet uiRecordSet = this.channels.getActiveChannel().get(this.name);
 		if (uiRecordSet == this) isChild = true;
 		return isChild;
@@ -1023,7 +1102,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 * check if all records from this record set are displayable, starts calculation if required by calling makeInActiveDisplayable()
 	 */
 	public void checkAllDisplayable() {
-		this.application.getActiveDevice().makeInActiveDisplayable(this);
+		this.analyzer.getActiveDevice().makeInActiveDisplayable(this);
 		this.isRecalculation = false;
 
 		// start a low prio tread to load other record set data
@@ -1263,10 +1342,10 @@ public final class RecordSet extends AbstractRecordSet {
 	public double getStartTime() {
 		double startTime = 0;
 		if (this.isZoomMode) {
-			startTime = (this.settings != null && this.settings.isTimeFormatAbsolute() && this.timeStep_ms != null) ? this.timeStep_ms.startTimeStamp_ms + this.get(0).zoomTimeOffset
+			startTime = (this.analyzer.getSettings() != null && this.analyzer.getSettings().isTimeFormatAbsolute() && this.timeStep_ms != null) ? this.timeStep_ms.startTimeStamp_ms + this.get(0).zoomTimeOffset
 					: this.get(0).zoomTimeOffset;
 		} else if (this.isScopeMode) {
-			startTime = (this.settings != null && this.settings.isTimeFormatAbsolute() && this.timeStep_ms != null)
+			startTime = (this.analyzer.getSettings() != null && this.analyzer.getSettings().isTimeFormatAbsolute() && this.timeStep_ms != null)
 					? this.timeStep_ms.startTimeStamp_ms + this.timeStep_ms.getTime_ms(this.scopeModeOffset + 1)
 					: this.timeStep_ms.getTime_ms(this.scopeModeOffset + 1);
 		}
@@ -1545,7 +1624,7 @@ public final class RecordSet extends AbstractRecordSet {
 			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
-			this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0002) + GDE.STRING_NEW_LINE + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0002) + GDE.STRING_NEW_LINE + e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}
 
@@ -1555,7 +1634,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	public boolean isCutLeftEdgeEnabled() {
 		try {
-			return this.application.isRecordSetVisible(GraphicsType.NORMAL) && this.isZoomMode && (this.get(0).zoomTimeOffset == 0);
+			return DataExplorer.getInstance().isRecordSetVisible(GraphicsType.NORMAL) && this.isZoomMode && (this.get(0).zoomTimeOffset == 0);
 		} catch (Exception e) {
 			return false;
 		}
@@ -1572,7 +1651,7 @@ public final class RecordSet extends AbstractRecordSet {
 		} catch (Exception e) {
 			return false;
 		}
-		return this.application.isRecordSetVisible(GraphicsType.NORMAL) && this.isZoomMode && (tmpRecord.zoomTimeOffset + tmpRecord.drawTimeWidth >= tmpRecord.getMaxTime_ms());
+		return DataExplorer.getInstance().isRecordSetVisible(GraphicsType.NORMAL) && this.isZoomMode && (tmpRecord.zoomTimeOffset + tmpRecord.drawTimeWidth >= tmpRecord.getMaxTime_ms());
 	}
 
 	/**
@@ -1723,7 +1802,7 @@ public final class RecordSet extends AbstractRecordSet {
 			}
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
-			this.application.openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
+			DataExplorer.getInstance().openMessageDialog(e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage());
 		}
 	}
 
@@ -1973,5 +2052,9 @@ public final class RecordSet extends AbstractRecordSet {
 	public void setDrawAreaBounds(Rectangle newDrawAreaBounds) {
 		this.drawAreaBounds = newDrawAreaBounds;
 		log.finest(() -> "drawAreaBounds = " + this.drawAreaBounds); //$NON-NLS-1$
+	}
+
+	public Analyzer getAnalyzer() {
+		return this.analyzer;
 	}
 }

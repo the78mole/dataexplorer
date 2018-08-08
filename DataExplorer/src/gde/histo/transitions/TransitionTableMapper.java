@@ -110,15 +110,13 @@ public final class TransitionTableMapper {
 	}
 
 	private final RecordSet		recordSet;
+	private final Analyzer		analyzer;
 	private final ChannelType	channel;
 
-	public TransitionTableMapper(RecordSet recordSet) {
+	public TransitionTableMapper(RecordSet recordSet, Analyzer analyzer) {
 		this.recordSet = recordSet;
-		this.channel = Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getChannel(recordSet.getChannelConfigNumber());
-	}
-
-	public static synchronized String[] getExtendedRow(RecordSet recordSet, int index, String[] dataTableRow) {
-		return new TransitionTableMapper(recordSet).defineRowWithSettlements(index, dataTableRow);
+		this.analyzer = analyzer;
+		this.channel = analyzer.getActiveDevice().getDeviceConfiguration().getChannel(recordSet.getChannelConfigNumber());
 	}
 
 	/**
@@ -208,7 +206,7 @@ public final class TransitionTableMapper {
 		SettlementRecords histoSettlements = new SettlementRecords();
 		for (SettlementType settlementType : settlementTypes) {
 			if (settlementType.getEvaluation() != null) {
-				SettlementRecord record = new SettlementRecord(settlementType, recordSet, Analyzer.getInstance().getActiveChannel().getNumber());
+				SettlementRecord record = new SettlementRecord(settlementType, recordSet, analyzer.getActiveChannel().getNumber());
 				histoSettlements.put(settlementType.getName(), record);
 				if (transitions.isEmpty()) continue;
 
@@ -221,12 +219,12 @@ public final class TransitionTableMapper {
 						evaluator.addFromTransition(transition);
 					}
 				} else if (transitionAmountType != null) {
-					AmountEvaluator evaluator = new AmountEvaluator(record);
+					AmountEvaluator evaluator = new AmountEvaluator(record, analyzer);
 					for (Transition transition : transitions.get(transitionAmountType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}
 				} else if (calculationType != null) {
-					CalculusEvaluator evaluator = new CalculusEvaluator(record);
+					CalculusEvaluator evaluator = new CalculusEvaluator(record, analyzer);
 					for (Transition transition : transitions.get(calculationType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}

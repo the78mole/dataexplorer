@@ -29,6 +29,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import gde.Analyzer;
+import gde.DataAccess;
 import gde.histo.base.NonUiTestCase;
 import gde.histo.datasources.HistoSetTest;
 import gde.histo.guard.ObjectVaultIndex.DetailSelector;
@@ -69,9 +71,10 @@ class ObjectVaultIndexTest extends NonUiTestCase {
 	 */
 	@Test
 	void testSelectDeviceNames() {
+		DataAccess dataAccess = Analyzer.getInstance().getDataAccess();
 		ObjectVaultIndex.rebuild();
 
-		ObjectVaultIndex objectVaultIndex = new ObjectVaultIndex();
+		ObjectVaultIndex objectVaultIndex = new ObjectVaultIndex(dataAccess);
 		Set<String> usedDevices = objectVaultIndex.selectDeviceNames();
 		System.out.println("all vault devices=" + usedDevices.toString());
 		assertFalse("no device names in the fleet index directory", usedDevices.isEmpty());
@@ -82,23 +85,24 @@ class ObjectVaultIndexTest extends NonUiTestCase {
 	 */
 	@Test
 	void testSelectVaults() throws Exception {
+		DataAccess dataAccess = Analyzer.getInstance().getDataAccess();
 		Stream.of(1, 2, 3, 4, 5).forEach(i -> {
 			long nanoTime = System.nanoTime();
 			DetailSelector detailSelector = DetailSelector.createDummyFilter();
-			new ObjectVaultIndex().selectVaultKeys(detailSelector);
+			new ObjectVaultIndex(dataAccess).selectVaultKeys(detailSelector);
 			System.out.println("elapsed=" + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " [ms]");
 
 			nanoTime = System.nanoTime();
-			new ObjectVaultIndex(new String[] { "Kult" }).selectVaultKeys(new String[] { "Kult" }, detailSelector);
+			new ObjectVaultIndex(new String[] { "Kult" }, dataAccess).selectVaultKeys(new String[] { "Kult" }, detailSelector);
 			System.out.println("selected strict elapsed=" + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " [ms]");
 
 			nanoTime = System.nanoTime();
-			new ObjectVaultIndex().selectVaultKeys(new String[] { "Kult" }, detailSelector);
+			new ObjectVaultIndex(dataAccess).selectVaultKeys(new String[] { "Kult" }, detailSelector);
 			System.out.println("selected       elapsed=" + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " [ms]");
 
 			nanoTime = System.nanoTime();
 			detailSelector = DetailSelector.createFunctionFilter(o -> o.logStartTimestampMs <= 1347111194000L);
-			new ObjectVaultIndex().selectVaultKeys(new String[] { "Kult" }, detailSelector);
+			new ObjectVaultIndex(dataAccess).selectVaultKeys(new String[] { "Kult" }, detailSelector);
 			System.out.println("selected                    elapsed=" + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " [ms]");
 		});
 	}

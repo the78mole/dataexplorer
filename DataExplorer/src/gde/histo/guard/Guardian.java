@@ -64,14 +64,14 @@ public final class Guardian {
 	 * @param logLimit is the maximum number of the most recent logs which is checked for reminders
 	 * @return the array of reminder objects which may hold null values
 	 */
-	public static Reminder[] defineMinMaxReminder(HistoVault[] indexedVaults, IChannelItem channelItem, TrailSelector trailSelector, int logLimit) {
-		double[][] minMaxQuantiles = Guardian.defineExtremumQuantiles(indexedVaults, channelItem, trailSelector.getExtremumTrailsOrdinals());
+	public static Reminder[] defineMinMaxReminder(HistoVault[] indexedVaults, IChannelItem channelItem, TrailSelector trailSelector, int logLimit, Settings settings) {
+		double[][] minMaxQuantiles = Guardian.defineExtremumQuantiles(indexedVaults, channelItem, trailSelector.getExtremumTrailsOrdinals(), settings);
 		if (minMaxQuantiles.length == 0) return new Reminder[] { null, null };
 
 		int[] extremumIndices = trailSelector.getExtremumTrailsIndices();
 		String[] extremumText = trailSelector.getExtremumTrailsTexts();
 
-		int reminderLevel = Settings.getInstance().getReminderLevel();
+		int reminderLevel = settings.getReminderLevel();
 		if (reminderLevel == -1) return new Reminder[] { null, null };
 		Reminder minReminder = null;
 		Reminder maxReminder = null;
@@ -143,7 +143,7 @@ public final class Guardian {
 	/**
 	 * @return the extended tukey tolerance arrays for the min/max trails or for score groups w/o min/max scores take the first score
 	 */
-	public static double[][] defineExtremumQuantiles(HistoVault[] vaults, IChannelItem channelItem, int[] extremumOrdinals) {
+	public static double[][] defineExtremumQuantiles(HistoVault[] vaults, IChannelItem channelItem, int[] extremumOrdinals, Settings settings) {
 		List<Double> decodedMinimums = new ArrayList<>();
 		List<Double> decodedMaximums = new ArrayList<>();
 		for (HistoVault v : vaults) {
@@ -154,8 +154,8 @@ public final class Guardian {
 			if (point == null) continue;
 			decodedMaximums.add(HistoSet.decodeVaultValue(channelItem, point / 1000.));
 		}
-		ElementaryQuantile<Double> minQuantile = new ElementaryQuantile<>(decodedMinimums, true);
-		ElementaryQuantile<Double> maxQuantile = new ElementaryQuantile<>(decodedMaximums, true);
+		ElementaryQuantile<Double> minQuantile = new ElementaryQuantile<>(decodedMinimums, true, settings);
+		ElementaryQuantile<Double> maxQuantile = new ElementaryQuantile<>(decodedMaximums, true, settings);
 
 		double[][] result;
 		if (!decodedMinimums.isEmpty() && !decodedMaximums.isEmpty()) {
@@ -190,7 +190,7 @@ public final class Guardian {
 	/**
 	 * @return the lower/upper values based on q0/q4
 	 */
-	public static double[] defineStandardExtrema(List<HistoVault> vaults, IChannelItem channelItem) {
+	public static double[] defineStandardExtrema(List<HistoVault> vaults, IChannelItem channelItem, Settings settings) {
 		List<Double> decodedMinValues = new ArrayList<>();
 		List<Double> decodedLowValues = new ArrayList<>();
 		List<Double> decodedHighValues = new ArrayList<>();
@@ -211,15 +211,15 @@ public final class Guardian {
 		if (decodedLowValues.isEmpty() || decodedHighValues.isEmpty()) {
 			result = new double[] { 0., 0. };
 		} else {
-			result = getExtrema(channelItem.getName(), decodedLowValues, decodedHighValues);
+			result = getExtrema(channelItem.getName(), decodedLowValues, decodedHighValues, settings);
 
 			// corrections in cases when the whiskers are not within the scale
-			double lowerWhisker = new ElementaryQuantile<>(decodedMinValues, true).getQuantileLowerWhisker();
+			double lowerWhisker = new ElementaryQuantile<>(decodedMinValues, true, settings).getQuantileLowerWhisker();
 			if (lowerWhisker < result[0]) {
 				result[0] = Math.min(lowerWhisker, result[0]);
 				log.log(Level.FINER, "lower corrected to ", lowerWhisker);
 			}
-			double upperWhisker = new ElementaryQuantile<>(decodedMaxValues, true).getQuantileUpperWhisker();
+			double upperWhisker = new ElementaryQuantile<>(decodedMaxValues, true, settings).getQuantileUpperWhisker();
 			if (upperWhisker > result[1]) {
 				result[1] = Math.max(upperWhisker, result[1]);
 				log.log(Level.FINER, "upper corrected to ", upperWhisker);
@@ -247,14 +247,14 @@ public final class Guardian {
 	/**
 	 * @return the lower/upper values for trails with a different number range than the measurement values (e.g. SD, counters)
 	 */
-	public static double[] defineAlienExtrema(List<HistoVault> vaults, IChannelItem channelItem, TrailTypes trailType) {
+	public static double[] defineAlienExtrema(List<HistoVault> vaults, IChannelItem channelItem, TrailTypes trailType, Settings settings) {
 		Stream<Integer> alienPoints = vaults.stream().map(v -> channelItem.getVaultPoint(v, trailType.ordinal()));
 		List<Double> decodedAliens = alienPoints.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(channelItem, i / 1000.)).collect(Collectors.toList());
 		double[] result;
 		if (decodedAliens.isEmpty()) {
 			result = new double[] { 0., 0. };
 		} else {
-			result = getExtrema(channelItem.getName(), decodedAliens, decodedAliens);
+			result = getExtrema(channelItem.getName(), decodedAliens, decodedAliens, settings);
 		}
 		return result;
 	}
@@ -287,7 +287,7 @@ public final class Guardian {
 	/**
 	 * @return the lower/upper values from all scoregroup members
 	 */
-	public static double[] defineScoreExtrema(List<HistoVault> vaults, ScoreGroupType scoregroup) {
+	public static double[] defineScoreExtrema(List<HistoVault> vaults, ScoreGroupType scoregroup, Settings settings) {
 		List<Double> decodedLowValues = new ArrayList<>();
 		List<Double> decodedHighValues = new ArrayList<>();
 
@@ -304,7 +304,7 @@ public final class Guardian {
 		;
 		log.finer(() -> scoregroup.getName() + "  decodedMinimums=" + Arrays.toString(decodedLowValues.toArray()) + "  decodedMaximums=" + Arrays.toString(decodedHighValues.toArray()));
 
-		double[] extrema = getExtrema(scoregroup.getName(), decodedLowValues, decodedHighValues);
+		double[] extrema = getExtrema(scoregroup.getName(), decodedLowValues, decodedHighValues, settings);
 		return extrema;
 	}
 
@@ -316,9 +316,9 @@ public final class Guardian {
 		return new Integer[] { channelItem.getVaultPoint(vault, extremumOrdinals[0]), channelItem.getVaultPoint(vault, extremumOrdinals[1]) };
 	}
 
-	private static double[] getExtrema(String recordName, List<Double> decodedLowValues, List<Double> decodedHighValues) {
-		ElementaryQuantile<Double> minQuantile = new ElementaryQuantile<>(decodedLowValues, true);
-		ElementaryQuantile<Double> maxQuantile = new ElementaryQuantile<>(decodedHighValues, true);
+	private static double[] getExtrema(String recordName, List<Double> decodedLowValues, List<Double> decodedHighValues, Settings settings) {
+		ElementaryQuantile<Double> minQuantile = new ElementaryQuantile<>(decodedLowValues, true, settings);
+		ElementaryQuantile<Double> maxQuantile = new ElementaryQuantile<>(decodedHighValues, true, settings);
 		int scaleSpread = Settings.getInstance().getSummaryScaleSpread();
 		double scaleMin = minQuantile.getExtremumFromRange(UniversalQuantile.INTER_QUARTILE_SIGMA_FACTOR, -scaleSpread);
 		double scaleMax = maxQuantile.getExtremumFromRange(UniversalQuantile.INTER_QUARTILE_SIGMA_FACTOR, scaleSpread);

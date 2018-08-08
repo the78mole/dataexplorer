@@ -48,16 +48,16 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public class ElementaryQuantile<T extends Number & Comparable<T>> {
-	private static final String	$CLASS_NAME										= ElementaryQuantile.class.getName();
-	private static final Logger	log														= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME									= ElementaryQuantile.class.getName();
+	private static final Logger	log													= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * This sigma value for the inner 50% of the population.<br>
 	 * Interquartile range <em>IQR = 0.25 < p < 0.75</em>
 	 */
-	public static final double	INTER_QUARTILE_SIGMA_FACTOR		= 0.674489694;
-	private final boolean				CANONICAL_QUANTILES						= Settings.getInstance().isCanonicalQuantiles();
-	private final boolean				SYMMETRIC_TOLERANCE_INTERVAL	= Settings.getInstance().isSymmetricToleranceInterval();
+	public static final double	INTER_QUARTILE_SIGMA_FACTOR	= 0.674489694;
+
+	private final Settings			settings;
 
 	/**
 	 * required for probability calculations from the population
@@ -68,9 +68,7 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 	 */
 	protected final List<T>			trunk;
 
-	private Double							sumFigure;
-	private Double							avgFigure;
-	private Double							sigmaFigure;
+	protected StatsHelper				statsHelper;
 
 	public enum BoxplotItems {
 		QUARTILE0, LOWER_WHISKER, QUARTILE1, QUARTILE2, QUARTILE3, UPPER_WHISKER, QUARTILE4, LQT, UQT
@@ -177,6 +175,10 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 		private double	varTimesN	= 0;
 		private int			count			= 0;
 
+		public double getSum() {
+			return avg * count;
+		}
+
 		public double getAvg() {
 			return count > 0 ? avg : 0;
 		}
@@ -212,28 +214,21 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 		}
 	}
 
-	/**
-	 * Is used for samples and supports complex objects.
-	 * @param population is taken as a sample (for the standard deviation)
-	 */
-	public ElementaryQuantile(Collection<Spot<T>> population) {
-		if (population == null || population.isEmpty()) throw new IllegalArgumentException("empty population");
-		this.trunk = new ArrayList<T>();
-		this.isSample = true;
-
-		for (Spot<T> spot : population) {
-			this.trunk.add(spot.y());
+	public static ElementaryQuantile<Double> createElementarySpotQuantile(Collection<Spot<Double>> population, Settings settings) {
+		List<Double> trunk = new ArrayList<>();
+		for (Spot<Double> spot : population) {
+			trunk.add(spot.y());
 		}
-		Collections.sort(this.trunk);
-		log.finest(() -> "" + population.size() + Arrays.toString(population.toArray()));
-		log.finest(() -> "" + this.trunk.size() + Arrays.toString(this.trunk.toArray()));
+		boolean isSample = true;
+		return new ElementaryQuantile<Double>(trunk, isSample, settings);
 	}
 
 	/**
 	 * @param population
 	 * @param isSample true calculates the sample standard deviation
 	 */
-	public ElementaryQuantile(List<T> population, boolean isSample) {
+	public ElementaryQuantile(List<T> population, boolean isSample, Settings settings) {
+		this.settings = settings;
 		this.trunk = population;
 		this.isSample = isSample;
 
@@ -243,10 +238,8 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 	}
 
 	public double getSumFigure() {
-		if (sumFigure == null) {
-			sumFigure = trunk.parallelStream().mapToDouble(T::doubleValue).sum();
-		}
-		return sumFigure;
+		if (statsHelper == null) setStats();
+		return statsHelper.getSum();
 	}
 
 	public double getAvgOBS() {
@@ -259,10 +252,8 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 	}
 
 	public double getAvgFigure() {
-		if (avgFigure == null) {
-			avgFigure = trunk.parallelStream().mapToDouble(T::doubleValue).average().getAsDouble();
-		}
-		return avgFigure;
+		if (statsHelper == null) setStats();
+		return statsHelper.getAvg();
 	}
 
 	public double getSigmaOBS() {
@@ -288,10 +279,12 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 	}
 
 	public double getSigmaFigure() {
-		if (sigmaFigure == null) {
-			sigmaFigure = trunk.parallelStream().mapToDouble(T::doubleValue).collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine).getSigma(isSample);
-		}
-		return sigmaFigure;
+		if (statsHelper == null) setStats();
+		return statsHelper.getSigma(isSample);
+	}
+
+	protected void setStats() {
+		statsHelper = trunk.parallelStream().mapToDouble(T::doubleValue).collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine);
 	}
 
 	/**
@@ -355,10 +348,10 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 		final double q1 = getQuantile(outlierProbability1);
 		final double q2 = getQuartile2();
 		final double q3 = getQuantile(1. - outlierProbability1);
-		if (CANONICAL_QUANTILES) {
+		if (settings.isCanonicalQuantiles()) {
 			double halfTolerance = (q3 - q1) / 2.;
 			return new double[] { halfTolerance, halfTolerance };
-		} else if (SYMMETRIC_TOLERANCE_INTERVAL) {
+		} else if (settings.isSymmetricToleranceInterval()) {
 			if (HistoSet.fuzzyEquals(q3 - q1, 0.)
 					// next line for keeping all event values
 					&& !HistoSet.fuzzyEquals(q3, 0.) && !HistoSet.fuzzyEquals(q1, 0.)) {

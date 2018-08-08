@@ -378,7 +378,7 @@ public abstract class AbstractTabAreaContextMenu {
 		String tmpFileName = dataPath.getFileName().toString();
 		String displayName = tmpFileName.length() > 22 ? GDE.STRING_ELLIPSIS + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName;
 		fileName.setText(">> " + displayName.toString() + GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString()) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
-		boolean isImport = DirectoryType.IMPORT.getDataSetExtensions(Analyzer.getInstance().getActiveDevice()).contains(PathUtils.getFileExtension(dataPath));
+		boolean isImport = DirectoryType.IMPORT.getDataSetExtensions(Analyzer.getInstance().getActiveDevice(), Analyzer.getInstance().getSettings()).contains(PathUtils.getFileExtension(dataPath));
 		openRecordSetItem.setText(Messages.getString(isImport ? MessageIds.GDE_MSGT0850 : MessageIds.GDE_MSGT0849));
 	}
 

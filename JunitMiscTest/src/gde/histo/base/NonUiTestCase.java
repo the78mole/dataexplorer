@@ -184,18 +184,9 @@ public class NonUiTestCase extends TestCase {
 			System.out.println("skip fileDeviceName=" + fileDeviceName);
 		}
 		DeviceConfiguration deviceConfig = analyzer.getDeviceConfigurations().get(fileDeviceName);
-		if (deviceConfig == null) new UnsupportedOperationException("deviceConfig == null");
+		if (deviceConfig == null) throw new UnsupportedOperationException("deviceConfig == null");
 
-		IDevice device = null;
-		try {
-			device = deviceConfig.getAsDevice();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		this.analyzer.setEnvironmentWoutUI(settings, device, activeChannelNumber);
-
-		// object : in Settings only - not in channel because not used in histo
-		this.settings.setActiveObjectKey(activeObjectKey);
+		this.analyzer.setArena(deviceConfig.getAsDevice(), activeChannelNumber, activeObjectKey);
 	}
 
 	/**
@@ -205,9 +196,7 @@ public class NonUiTestCase extends TestCase {
 	 * @param activeObjectKey is an object key which exists in the settings or an empty string for deviceoriented
 	 */
 	protected void setDeviceChannelObject(IDevice device, int activeChannelNumber, String activeObjectKey) {
-		this.analyzer.setEnvironmentWoutUI(settings, device, activeChannelNumber);
-
-		// object : in Settings only - not in channel because not used in histo
-		this.settings.setActiveObjectKey(activeObjectKey);
+		this.analyzer.setArena(device, activeChannelNumber, activeObjectKey);
 	}
+
 }

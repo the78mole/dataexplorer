@@ -98,7 +98,7 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 		if (rootDirectory.isDirectory() && rootDirectory.canRead()) {
 			File[] filesAndDirs = rootDirectory.listFiles();
 			if (filesAndDirs != null) {
-				ExclusionData exclusionData = new ExclusionData(new DirectoryScanner(analyzer).getActiveFolder());
+				ExclusionData exclusionData = new ExclusionData(new DirectoryScanner(analyzer).getActiveFolder(), analyzer.getDataAccess());
 				boolean isSuppressMode = analyzer.getSettings().isSuppressMode();
 				for (File file : Arrays.asList(filesAndDirs)) {
 					if (file.isFile()) {

@@ -39,9 +39,11 @@ public final class AmountEvaluator {
 	private final static Logger			log					= Logger.getLogger($CLASS_NAME);
 
 	private final SettlementRecord	histoSettlement;
+	private final Analyzer					analyzer;
 
-	public AmountEvaluator(SettlementRecord newHistoSettlement) {
+	public AmountEvaluator(SettlementRecord newHistoSettlement, Analyzer analyzer) {
 		this.histoSettlement = newHistoSettlement;
+		this.analyzer = analyzer;
 	}
 
 	/**
@@ -50,7 +52,7 @@ public final class AmountEvaluator {
 	 * @param transition
 	 */
 	public void addFromTransition(Transition transition) {
-		IDevice device = Analyzer.getInstance().getActiveDevice();
+		IDevice device = analyzer.getActiveDevice();
 		TransitionAmountType transitionAmount = this.histoSettlement.getSettlement().getEvaluation().getTransitionAmount();
 		log.log(FINE, GDE.STRING_GREATER, transitionAmount);
 		final Record record = this.histoSettlement.getParent().get(this.histoSettlement.getParent().getRecordNames()[transitionAmount.getRefOrdinal()]);

@@ -65,7 +65,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 
 	protected final Settings					settings			= Settings.getInstance();
 	protected final DataExplorer			application		= DataExplorer.getInstance();
-	protected final Channels					channels			= Channels.getInstance(application);
+	protected final Channels					channels			= Channels.getInstance();
 	protected final PulsarSerialPort	serialPort;
 	protected PulsarGathererThread		gathererThread;
 	protected boolean									isFileIO			= false;

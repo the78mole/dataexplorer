@@ -29,7 +29,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
-import gde.config.Settings;
 import gde.device.IDevice;
 import gde.log.Level;
 import gde.log.Logger;
@@ -248,18 +247,6 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	}
 
 	/**
-	 * pointer to main application.
-	 */
-	protected final DataExplorer								application;
-	/**
-	 * start point of data hierarchy.
-	 */
-	protected final Channels										channels;
-	protected final IDevice											device;
-	protected final Settings										settings												= Settings.getInstance();
-	protected final Channel											parent;
-
-	/**
 	 * 1)Flugaufzeichnung, 2)Laden, 3)Entladen, ..
 	 */
 	protected String														name;
@@ -348,18 +335,12 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	/**
 	 * Special record set data buffers according the size of given names array, where the name is the key to access the data buffer used to hold
 	 * compare able records (compare set).
-	 * @param application
 	 * @param useDevice the device
 	 * @param newName for the records like "1) Laden"
 	 * @param recordNames
 	 */
-	protected AbstractRecordSet(DataExplorer application, IDevice useDevice, String newName, String[] recordNames) {
+	protected AbstractRecordSet(IDevice useDevice, String newName, String[] recordNames) {
 		super();
-		this.application = application;
-		this.channels = null;
-		this.device = useDevice;
-
-		this.parent = null;
 		this.name = newName;
 		this.recordNames = recordNames;
 	}
@@ -372,18 +353,13 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * @param measurementNames array of the device supported measurement names
 	 * @param newTimeSteps
 	 */
-	protected AbstractRecordSet(IDevice useDevice, int channelNumber, String newName, String[] measurementNames, TimeSteps newTimeSteps) {
+	protected AbstractRecordSet(IDevice useDevice, String newName, String[] measurementNames, TimeSteps newTimeSteps) {
 		super(measurementNames.length);
-		this.application = DataExplorer.getInstance();
-		this.channels = Channels.getInstance();
-		this.device = useDevice;
-
-		this.parent = this.channels.get(channelNumber);
 		this.name = newName.length() <= AbstractRecordSet.MAX_NAME_LENGTH ? newName : newName.substring(0, 30);
 
 		this.recordNames = measurementNames.clone();
 		this.timeStep_ms = newTimeSteps;
-		this.description = (this.device != null ? this.device.getName() + GDE.STRING_MESSAGE_CONCAT
+		this.description = (useDevice != null ? useDevice.getName() + GDE.STRING_MESSAGE_CONCAT
 				: GDE.STRING_EMPTY) + DESCRIPTION_TEXT_LEAD + StringHelper.getDateAndTime();
 	}
 
@@ -391,15 +367,9 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * Copy constructor - used to copy a record set to another channel/configuration, where the configuration coming from the device properties
 	 * file.
 	 * @param recordSet
-	 * @param channelConfigurationNumber
 	 */
-	protected AbstractRecordSet(AbstractRecordSet recordSet, int channelConfigurationNumber) {
+	protected AbstractRecordSet(AbstractRecordSet recordSet) {
 		super(recordSet);
-		this.application = recordSet.application;
-		this.channels = recordSet.channels;
-		this.device = recordSet.device;
-
-		this.parent = this.channels.get(channelConfigurationNumber);
 		this.name = recordSet.name;
 	}
 
@@ -410,11 +380,6 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 */
 	protected AbstractRecordSet(AbstractRecordSet recordSet, String[] recordNames) {
 		super(recordSet);
-		this.application = recordSet.application;
-		this.channels = recordSet.channels;
-		this.device = recordSet.device;
-
-		this.parent = recordSet.parent;
 		this.name = recordSet.name.length() < MAX_NAME_LENGTH ? recordSet.name + GDE.STRING_UNDER_BAR
 				: recordSet.name.substring(0, MAX_NAME_LENGTH - 1) + GDE.STRING_UNDER_BAR;
 
@@ -434,13 +399,6 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 * Update the collection of visible and displayable records in this record set for table view
 	 */
 	public abstract void updateVisibleAndDisplayableRecordsForTable();
-
-	/**
-	 * @return visible and display able records (p.e. to build the partial data table)
-	 */
-	public Vector<? extends AbstractRecord> getVisibleAndDisplayableRecordsForTable() {
-		return this.settings.isPartialDataTable() ? this.visibleAndDisplayableRecords : this.displayRecords;
-	}
 
 	/**
 	 * @return visible and displayable records (p.e. to build the partial data table)
@@ -533,18 +491,9 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	/**
 	 * @return the channel/configuration number
 	 */
-	public int getChannelConfigNumber() {
-		return this.parent != null ? this.parent.number : 1; // compare set does not have a parent
-	}
+	public abstract int getChannelConfigNumber();
 
-	/**
-	 * @return the channel (or) configuration name
-	 */
-	public String getChannelConfigName() {
-		return this.parent != null ? this.parent.channelConfigName : GDE.STRING_EMPTY;
-	}
-
-	/**
+		/**
 	 * @return the horizontalGridRecord ordinal
 	 */
 	public abstract int getValueGridRecordOrdinal();
@@ -618,9 +567,7 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	/**
 	 * @return the device
 	 */
-	public IDevice getDevice() {
-		return this.device != null ? this.device : this.application.getActiveDevice();
-	}
+	public abstract IDevice getDevice();
 
 	/**
 	 * query boolean value to enable curve smoothing due to current drop

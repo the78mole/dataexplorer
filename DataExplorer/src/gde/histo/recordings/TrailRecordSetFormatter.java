@@ -27,11 +27,7 @@ import java.util.Properties;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import com.sun.istack.internal.Nullable;
-
 import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channels;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.messages.MessageIds;
@@ -48,13 +44,10 @@ import gde.utils.StringHelper;
 public final class TrailRecordSetFormatter {
 	private static final int			MAX_TOOLTIP_LINES	= 33;
 
-	private static final Settings	settings					= Settings.getInstance();
-	private static final Channels	channels					= Channels.getInstance();
-
 	public static String getSelectedMeasurementsAsTable(long timestamp_ms) {
-		Properties displayProps = settings.getMeasurementDisplayProperties();
-		TrailRecordSet trailRecordSet = getTrailRecordSet();
+		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
+			Properties displayProps = trailRecordSet.getAnalyzer().getSettings().getMeasurementDisplayProperties();
 			Vector<TrailRecord> records = trailRecordSet.getVisibleAndDisplayableRecords();
 
 			StringBuilder sb = new StringBuilder().append(String.format("%-11.11s", Messages.getString(MessageIds.GDE_MSGT0799))); //$NON-NLS-1$
@@ -88,7 +81,7 @@ public final class TrailRecordSetFormatter {
 	}
 
 	public static String getFileNameLines(List<Integer> indices) {
-		TrailRecordSet trailRecordSet = getTrailRecordSet();
+		TrailRecordSet trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet();
 		if (trailRecordSet != null) {
 			String fileNameLines = indices.stream().map(i -> trailRecordSet.getDataTagText(i, DataTag.FILE_PATH)) //
 					.map(Paths::get).map(Path::getFileName).map(Path::toString) //
@@ -98,15 +91,6 @@ public final class TrailRecordSetFormatter {
 		} else {
 			return "";
 		}
-	}
-
-	@Nullable
-	private static TrailRecordSet getTrailRecordSet() {
-		TrailRecordSet trailRecordSet = null;
-		if (channels.getActiveChannel() != null) {
-			trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet();
-		}
-		return trailRecordSet;
 	}
 
 }

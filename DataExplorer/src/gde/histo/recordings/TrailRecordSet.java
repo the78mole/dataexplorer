@@ -49,6 +49,7 @@ import gde.data.RecordSet;
 import gde.data.TimeSteps;
 import gde.device.DeviceConfiguration;
 import gde.device.IChannelItem;
+import gde.device.IDevice;
 import gde.device.ScoreLabelTypes;
 import gde.device.TrailTypes;
 import gde.histo.cache.ExtendedVault;
@@ -152,7 +153,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 				}
 				// refresh the histo table which might already have been painted without the GPS coordinates
 				if (getDataTags().getDataGpsLocations().size() > 0) {
-					if (GDE.isWithUi()) application.getPresentHistoExplorer().updateHistoTableWindow(false);
+					if (GDE.isWithUi()) DataExplorer.getInstance().getPresentHistoExplorer().updateHistoTableWindow(false);
 					log.finer(() -> "fill in " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime) + " ms!  GPS locations size=" + gpsCluster.getAssignedClusters().values().size()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
@@ -240,8 +241,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @param timeSteps
 	 */
 	private TrailRecordSet(Analyzer analyzer, String[] recordNames, TimeSteps timeSteps) {
-		super(analyzer.getActiveDevice(), analyzer.getActiveChannel().getNumber(), //
-				analyzer.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + analyzer.getActiveChannel().getNumber(), //
+		super(analyzer.getActiveDevice(), analyzer.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + analyzer.getActiveChannel().getNumber(), //
 				recordNames, timeSteps);
 		this.analyzer = analyzer;
 		this.dataTags = new TrailDataTags();
@@ -539,7 +539,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * @return visible and display able records (p.e. to build the partial data table)
 	 */
 	@SuppressWarnings("unchecked")
-	@Override
 	public Vector<TrailRecord> getVisibleAndDisplayableRecordsForTable() {
 		return (Vector<TrailRecord>) (analyzer.getSettings().isPartialDataTable() ? this.visibleAndDisplayableRecords : this.displayRecords);
 	}
@@ -614,17 +613,17 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		Color color = getValueGridColor();
 		String rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
 		template.setProperty(RecordSet.VALUE_GRID_COLOR, rgb);
-		template.setProperty(RecordSet.VALUE_GRID_LINE_STYLE, Integer.valueOf(getValueGridLineStyle()).toString());
-		template.setProperty(RecordSet.VALUE_GRID_TYPE, Integer.valueOf(getValueGridType()).toString());
+		template.setProperty(RecordSet.VALUE_GRID_LINE_STYLE, "" + getValueGridLineStyle());
+		template.setProperty(RecordSet.VALUE_GRID_TYPE, "" + getValueGridType());
 
 		if (get(getValueGridRecordName()) != null) {
 			template.setProperty(RecordSet.VALUE_GRID_RECORD_NAME, getValueGridRecordName());
 		}
 
-		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(isSmartStatistics()));
+		template.setProperty(AbstractRecordSet.SMART_STATISTICS, "" + isSmartStatistics());
 		int[] chartWeights = presentHistoExplorer.getHistoSummaryTabItem().getChartWeights();
 		for (int i = 0; i < chartWeights.length; i++) {
-			template.setProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(chartWeights[i]));
+			template.setProperty(AbstractRecordSet.CHART_WEIGHT + i, "" + chartWeights[i]);
 		}
 		template.setCommentSuffix(name + " " + description);
 		template.store();
@@ -678,8 +677,8 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	 * Set true if the history analysis contains quantile values instead of legacy statistics
 	 */
 	public void setSmartStatistics(boolean isActive) {
-		template.setProperty(AbstractRecordSet.SMART_STATISTICS, String.valueOf(isActive));
-		if (GDE.isWithUi()) application.getPresentHistoExplorer().updateHistoMenuItems();
+		template.setProperty(AbstractRecordSet.SMART_STATISTICS, "" + isActive);
+		if (GDE.isWithUi()) DataExplorer.getInstance().getPresentHistoExplorer().updateHistoMenuItems();
 	}
 
 	/**
@@ -690,7 +689,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		if (isSmartStatistics()) { // only smart statistics supports multiple charts
 			chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS.clone();
 			for (int i = 0; i < chartWeights.length; i++) {
-				chartWeights[i] = Integer.parseInt(template.getProperty(AbstractRecordSet.CHART_WEIGHT + i, String.valueOf(HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i])));
+				chartWeights[i] = Integer.parseInt(template.getProperty(AbstractRecordSet.CHART_WEIGHT + i, "" + HistoSummaryWindow.DEFAULT_CHART_WEIGHTS[i]));
 			}
 		} else {
 			chartWeights = HistoSummaryWindow.DEFAULT_CHART_WEIGHTS;
@@ -748,9 +747,24 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 	}
 
+	/**
+	 * @return the device
+	 */
+	@Override
+	public IDevice getDevice() {
+		return this.analyzer.getActiveDevice();
+	}
+
 	@Override
 	public int getChannelConfigNumber() {
-		return this.parent.getNumber();
+		return this.analyzer.getActiveChannel().getNumber();
+	}
+
+	/**
+	 * @return the channel (or) configuration name
+	 */
+	public String getChannelConfigName() {
+		return this.analyzer.getActiveChannel().getName();
 	}
 
 	@SuppressWarnings("unchecked")

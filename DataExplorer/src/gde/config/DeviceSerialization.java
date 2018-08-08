@@ -19,12 +19,10 @@
 
 package gde.config;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Date;
-import java.util.List;
 import java.util.TreeMap;
 
 import javax.xml.XMLConstants;
@@ -48,7 +46,7 @@ import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 
 /**
- *
+ * Supports access to device xml files.
  * @author Thomas Eickert (USER)
  */
 public class DeviceSerialization {
@@ -60,6 +58,10 @@ public class DeviceSerialization {
 	private Unmarshaller				unmarshaller;
 	private Marshaller					marshaller;
 
+	/**
+	 * Supported by the data access instance.
+	 * Not threadsafe due to JAXB un-/marshallers.
+	 */
 	public Thread createXsdThread() {
 		Thread xsdThread = new Thread("xsdValidation") {
 			@Override
@@ -83,6 +85,9 @@ public class DeviceSerialization {
 		return xsdThread;
 	}
 
+	/**
+	 * Not threadsafe due to JAXB un-/marshallers.
+	 */
 	public Thread createMigrationThread() {
 		Thread migrationThread = new Thread("migration") {
 			@Override
@@ -97,20 +102,17 @@ public class DeviceSerialization {
 							Unmarshaller tmpUnmarshaller = JAXBContext.newInstance("gde.device").createUnmarshaller();//$NON-NLS-1$
 							tmpUnmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(inputStream)));
 							TreeMap<String, DeviceConfiguration> actualConfigurations = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
-							List<File> deviceProperties = ((LocalAccess) DataAccess.getInstance()).getDeviceXmls(i);
-							for (File file : deviceProperties) {
-								if (file.getAbsolutePath().endsWith(GDE.FILE_ENDING_DOT_XML)) {
-									DeviceConfiguration oldConfig = new DeviceConfiguration(file.getAbsolutePath(), tmpUnmarshaller);
-									DeviceConfiguration newConfig = actualConfigurations.get(oldConfig.getName());
-									if (oldConfig.isUsed() && newConfig != null) {
-										newConfig.setUsed(true);
-										if (oldConfig.getPort().length() > 1 && !oldConfig.getPort().startsWith("USB")) newConfig.setPort(oldConfig.getPort());
-										if (oldConfig.getDataBlockPreferredDataLocation().length() > 1)
-											newConfig.setDataBlockPreferredDataLocation(oldConfig.getDataBlockPreferredDataLocation());
+							for (Path xmlFileSubPath : ((LocalAccess) DataAccess.getInstance()).getDeviceXmlSubPaths(i)) {
+								DeviceConfiguration oldConfig = new DeviceConfiguration(xmlFileSubPath, tmpUnmarshaller, Settings.getInstance());
+								DeviceConfiguration newConfig = actualConfigurations.get(oldConfig.getName());
+								if (oldConfig.isUsed() && newConfig != null) {
+									newConfig.setUsed(true);
+									if (oldConfig.getPort().length() > 1 && !oldConfig.getPort().startsWith("USB")) newConfig.setPort(oldConfig.getPort());
+									if (oldConfig.getDataBlockPreferredDataLocation().length() > 1)
+										newConfig.setDataBlockPreferredDataLocation(oldConfig.getDataBlockPreferredDataLocation());
 
-										newConfig.storeDeviceProperties();
-										log.log(Level.INFO, "migrated device configuration " + newConfig.getName());
-									}
+									newConfig.storeDeviceProperties();
+									log.log(Level.INFO, "migrated device configuration " + newConfig.getName());
 								}
 							}
 						} catch (Exception e) {
@@ -125,8 +127,23 @@ public class DeviceSerialization {
 	}
 
 	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>)
+	public JAXBElement<DevicePropertiesType> getTopElement(String xmlFilePath, Unmarshaller tmpUnmarshaller) throws JAXBException {
+		return (JAXBElement<DevicePropertiesType>) this.unmarshaller.unmarshal(((LocalAccess) DataAccess.getInstance()).getDeviceXmlInputStream(xmlFilePath));
+	}
+
+	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>)
 	public JAXBElement<DevicePropertiesType> getTopElement(String xmlFilePath) throws JAXBException {
-		return (JAXBElement<DevicePropertiesType>) this.unmarshaller.unmarshal(new File(xmlFilePath));
+		return getTopElement(xmlFilePath, this.unmarshaller);
+	}
+
+	/**
+	 * Use this for roaming data sources support via the DataAccess class.
+	 * @param fileSubPath is a relative path based on the roaming folder
+	 * @return the device xml header reference
+	 */
+	@SuppressWarnings({ "unchecked", "static-method" }) // cast to (JAXBElement<DevicePropertiesType>)
+	public JAXBElement<DevicePropertiesType> getTopElement(Path fileSubPath, Unmarshaller tmpUnmarshaller) throws JAXBException, FileNotFoundException {
+		return (JAXBElement<DevicePropertiesType>) tmpUnmarshaller.unmarshal(DataAccess.getInstance().getDeviceXmlInputStream(fileSubPath) );
 	}
 
 	/**
@@ -136,10 +153,14 @@ public class DeviceSerialization {
 	 */
 	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>)
 	public JAXBElement<DevicePropertiesType> getTopElement(Path fileSubPath) throws JAXBException, FileNotFoundException {
-		return (JAXBElement<DevicePropertiesType>) this.unmarshaller.unmarshal(DataAccess.getInstance().getDeviceXmlInputStream(fileSubPath) );
+		return getTopElement(fileSubPath, this.unmarshaller);
 	}
 
-	public void marshall(JAXBElement<DevicePropertiesType> element, Path xmlFile) throws JAXBException {
-		marshaller.marshal(element, xmlFile.toFile());
+	/**
+	 * Use this for roaming data sources support via the DataAccess class.
+	 * @param xmlFile points to a device xml file
+	 */
+	public void marshall(JAXBElement<DevicePropertiesType> element, String xmlFile) throws JAXBException {
+		marshaller.marshal(element, ((LocalAccess) DataAccess.getInstance()).getDeviceXmlOutputStream(xmlFile));
 	}
 }

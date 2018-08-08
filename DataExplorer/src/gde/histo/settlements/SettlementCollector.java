@@ -58,17 +58,23 @@ import gde.log.Logger;
  */
 @Deprecated
 public final class SettlementCollector {
-	private final static String		$CLASS_NAME	= SettlementCollector.class.getName();
-	private final static Logger		log					= Logger.getLogger($CLASS_NAME);
+	private final static String	$CLASS_NAME	= SettlementCollector.class.getName();
+	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private final static Settings	settings		= Settings.getInstance();
+	private final Analyzer			analyzer;
+	private final Settings			settings;
+
+	public SettlementCollector(Analyzer analyzer) {
+		this.analyzer = analyzer;
+		this.settings = analyzer.getSettings();
+	}
 
 	/**
 	 * Take histo transitions which are applicable and fetch trigger time steps and records from the parent.
 	 * Add settlement points according the evaluation rules.
 	 * @param transitions holds transitions identified for this settlement
 	 */
-	public static synchronized void addFromTransitions(SettlementRecord histoSettlement, Collection<Transition> transitions) {
+	public synchronized void addFromTransitions(SettlementRecord histoSettlement, Collection<Transition> transitions) {
 		EvaluationType evaluation = histoSettlement.getSettlement().getEvaluation();
 		for (Transition transition : transitions) {
 			if (evaluation.getTransitionFigure() != null) {
@@ -88,7 +94,7 @@ public final class SettlementCollector {
 	 * The timeSum and timeStep value has the unit seconds with 3 decimal places.
 	 * @param transition
 	 */
-	private static void addFigure(SettlementRecord histoSettlement, Transition transition) {
+	private void addFigure(SettlementRecord histoSettlement, Transition transition) {
 		TransitionFigureType transitionFigure = histoSettlement.getSettlement().getEvaluation().getTransitionFigure();
 		log.log(FINE, GDE.STRING_GREATER, transitionFigure);
 		final int reverseTranslatedResult;
@@ -113,8 +119,8 @@ public final class SettlementCollector {
 	 * Add single result value.
 	 * @param transition
 	 */
-	private static void addAmount(SettlementRecord histoSettlement, Transition transition) {
-		IDevice device = Analyzer.getInstance().getActiveDevice();
+	private void addAmount(SettlementRecord histoSettlement, Transition transition) {
+		IDevice device = analyzer.getActiveDevice();
 		TransitionAmountType transitionAmount = histoSettlement.getSettlement().getEvaluation().getTransitionAmount();
 		log.log(FINE, GDE.STRING_GREATER, transitionAmount);
 		final Record record = histoSettlement.getParent().get(histoSettlement.getParent().getRecordNames()[transitionAmount.getRefOrdinal()]);
@@ -174,11 +180,11 @@ public final class SettlementCollector {
 	 * Add single result value.
 	 * @param transition
 	 */
-	private static void addCalculus(SettlementRecord histoSettlement, Transition transition) {
+	private void addCalculus(SettlementRecord histoSettlement, Transition transition) {
 		TransitionCalculusType calculus = histoSettlement.getSettlement().getEvaluation().getTransitionCalculus();
 		log.log(FINEST, GDE.STRING_GREATER, calculus);
-		final ChannelType logChannel = Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getChannel(histoSettlement.getLogChannelNumber());
-		final RecordGroup recordGroup = new RecordGroup(histoSettlement, logChannel.getReferenceGroupById(calculus.getReferenceGroupId()));
+		final ChannelType logChannel = analyzer.getActiveDevice().getDeviceConfiguration().getChannel(histoSettlement.getLogChannelNumber());
+		final RecordGroup recordGroup = new RecordGroup(histoSettlement, logChannel.getReferenceGroupById(calculus.getReferenceGroupId()), analyzer);
 		if (recordGroup.hasReasonableData()) {
 			final int reverseTranslatedResult;
 			if (calculus.getCalculusType() == CalculusTypes.DELTA) {
@@ -200,7 +206,7 @@ public final class SettlementCollector {
 			} else if (calculus.getCalculusType() == CalculusTypes.RATIO || calculus.getCalculusType() == CalculusTypes.RATIO_PERMILLE) {
 				final double denominator = calculateLevelDelta(recordGroup, calculus.getDeltaBasis(), calculus.getLeveling(), transition);
 				final RecordGroup divisorRecordGroup = new RecordGroup(histoSettlement,
-						logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()));
+						logChannel.getReferenceGroupById(calculus.getReferenceGroupIdDivisor()), analyzer);
 				if (!divisorRecordGroup.hasReasonableData()) {
 					return;
 				}
@@ -236,9 +242,9 @@ public final class SettlementCollector {
 	 * @param transition holds the transition properties which are used to access the measurement data
 	 * @return peak spread value as translatedValue
 	 */
-	private static double calculateLevelDelta(RecordGroup recordGroup, DeltaBasisTypes deltaBasis, LevelingTypes leveling, Transition transition) {
+	private double calculateLevelDelta(RecordGroup recordGroup, DeltaBasisTypes deltaBasis, LevelingTypes leveling, Transition transition) {
 		double deltaValue = 0.;
-		IDevice device = Analyzer.getInstance().getActiveDevice();
+		IDevice device = analyzer.getActiveDevice();
 
 		// determine the direction of the peak or pulse or slope
 		final boolean isPositiveDirection = isPositiveTransition(recordGroup, transition);
@@ -438,7 +444,7 @@ public final class SettlementCollector {
 					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null) values.add(aggregatedValue);
 				}
-				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
+				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor, settings);
 				referenceExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
 				log.fine(() -> "reference " + Arrays.toString(values.toArray()));
 			}
@@ -449,9 +455,10 @@ public final class SettlementCollector {
 					Double aggregatedValue = recordGroup.getReal(j);
 					if (aggregatedValue != null) values.add(aggregatedValue);
 				}
-				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
+				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor, settings);
+				referenceExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
 				thresholdExtremum = tmpQuantile.getQuantile(isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance()
-						: SettlementCollector.settings.getMinmaxQuantileDistance());
+						: settings.getMinmaxQuantileDistance());
 				log.fine(() -> "threshold " + Arrays.toString(values.toArray()));
 			}
 			{
@@ -461,7 +468,8 @@ public final class SettlementCollector {
 						Double aggregatedValue = recordGroup.getReal(j);
 						if (aggregatedValue != null) values.add(aggregatedValue);
 					}
-					UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
+					UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor, settings);
+					referenceExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
 					recoveryExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
 					log.fine(() -> "recovery " + Arrays.toString(values.toArray()));
 				}

@@ -30,6 +30,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import gde.Analyzer;
 import gde.GDE;
+import gde.TestAnalyzer;
 import gde.config.Settings;
 import gde.histo.base.NonUiTestCase;
 import gde.utils.FileUtils;
@@ -51,30 +52,34 @@ class HistoGraphicsTemplateTest extends NonUiTestCase {
 
 	@ParameterizedTest
 	@CsvSource({ //
-			"CSV2Serial1, '', false", //
-			"CSV2Serial1, 3rd, false", //
-			"CSV2Serial1, 3rd, true" })
-	void testConvertIntoObjectTemplateAndLoad(String deviceName, String objectKey, boolean readOnlyTemplate) {
+			"CSV2Serial1, '', false", // create file in subfolder _
+			"CSV2Serial1, 3rd, false", // create file in the device oriented folder _   because the object does not exist
+			"CSV2Serial1, 2nd, false", // create file in the object folder 2nd
+			"CSV2Serial1, 3rd, true" }) // do not create a file but make the converted template available
+	void testConvertIntoObjectTemplateAndLoad(String deviceName, String objectKey, boolean transitoryTemplate) {
 		this.settings.setObjectTemplatesActive(true);
 
-		this.settings.setObjectList(new String[] { "first", "2nd" }, "first");
+		Analyzer analyzerClone = Analyzer.getInstance().clone();  // clone to prevent changing the object list
+		analyzerClone.getSettings().setObjectList(new String[] { "first", "2nd" }, "first");
 		int channelNumber = 1;
-		Analyzer analyzer = Analyzer.getInstance().clone(); // todo channel???
-		HistoGraphicsTemplate template = readOnlyTemplate //
-				? HistoGraphicsTemplate.createReadonlyTemplate(analyzer) //
-				: HistoGraphicsTemplate.createGraphicsTemplate(analyzer);
+		((TestAnalyzer) analyzerClone).setEnvironmentWoutUI(analyzerClone.getDeviceConfigurations().get(deviceName).getAsDevice(), channelNumber, objectKey);
+
+		HistoGraphicsTemplate template = transitoryTemplate //
+				? HistoGraphicsTemplate.createTransitoryTemplate(analyzerClone) //
+				: HistoGraphicsTemplate.createGraphicsTemplate(analyzerClone);
 		template.load();
 		File fileCreated = Paths.get(GDE.APPL_HOME_PATH, Settings.GRAPHICS_TEMPLATES_DIR_NAME, //
-				objectKey.isEmpty() ? GDE.STRING_DEVICE_ORIENTED_FOLDER : objectKey, //
+				objectKey.isEmpty() || objectKey.equals("3rd") ? GDE.STRING_DEVICE_ORIENTED_FOLDER : objectKey, //
 				"CSV2Serial1_1H.xml").toFile();
 
-		if (readOnlyTemplate) {
-			assertFalse("file creation skipped", fileCreated.exists());
+		if (transitoryTemplate) {
+			assertFalse("template not read", template.isEmpty());
+			assertFalse("file created: " + fileCreated, fileCreated.exists());
 		} else {
-			assertTrue("file created", fileCreated.exists());
+			assertTrue("file not created: " + fileCreated, fileCreated.exists());
 			long lastModified = fileCreated.lastModified();
 
-			HistoGraphicsTemplate existingTemplate = HistoGraphicsTemplate.createGraphicsTemplate(analyzer);
+			HistoGraphicsTemplate existingTemplate = HistoGraphicsTemplate.createGraphicsTemplate(analyzerClone);
 			existingTemplate.load();
 			assertTrue("use existing file", lastModified == fileCreated.lastModified());
 

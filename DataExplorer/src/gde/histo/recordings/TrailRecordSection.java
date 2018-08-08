@@ -59,10 +59,11 @@ public final class TrailRecordSection {
 		this.indexFirstLast = trailrecord.defineRangeIndices(timeStamp1_ms, timeStamp2_ms);
 		List<Spot<Double>> subPoints = trailrecord.getSubPoints(indexFirstLast[0], indexFirstLast[1] + 1);
 		if (!subPoints.isEmpty()) {
-			this.quantile = new ElementaryQuantile<Double>(subPoints); // take all points for display
+			this.quantile = ElementaryQuantile.createElementarySpotQuantile(subPoints, trailrecord.getParent().getAnalyzer().getSettings()); // take all points for display
 
 			// todo check if removing such close outliers is correct
-			UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(subPoints, INTER_QUARTILE_SIGMA_FACTOR, CLOSE_OUTLIER_LIMIT);
+			UniversalQuantile<Double> tmpQuantile = UniversalQuantile.createUniversalSpotQuantile(subPoints, INTER_QUARTILE_SIGMA_FACTOR, CLOSE_OUTLIER_LIMIT,
+					trailrecord.getParent().getAnalyzer().getSettings());
 
 			// eliminate Tukey outliers for regression
 			List<Double> outliers = tmpQuantile.getOutliers();

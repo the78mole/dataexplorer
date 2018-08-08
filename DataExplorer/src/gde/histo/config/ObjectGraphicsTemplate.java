@@ -28,7 +28,6 @@ import java.time.ZonedDateTime;
 import java.util.InvalidPropertiesFormatException;
 
 import gde.Analyzer;
-import gde.DataAccess;
 import gde.GDE;
 
 /**
@@ -63,7 +62,7 @@ public final class ObjectGraphicsTemplate extends HistoGraphicsTemplate {
 	@Override
 	public void load() {
 		try {
-			if (!DataAccess.getInstance().existsGraphicsTemplate(getTargetFileSubPath())) {
+			if (!analyzer.getDataAccess().existsGraphicsTemplate(getTargetFileSubPath())) {
 				super.load();
 			} else {
 				currentFilePathFragment = null;

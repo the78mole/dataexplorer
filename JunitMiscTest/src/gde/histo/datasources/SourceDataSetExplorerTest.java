@@ -28,11 +28,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import gde.Analyzer;
-import gde.GDE;
 import gde.histo.base.NonUiTestCase;
 import gde.histo.datasources.HistoSet.RebuildStep;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
 
 /**
  *
@@ -59,12 +56,12 @@ class SourceDataSetExplorerTest extends NonUiTestCase {
 	 */
 	@ParameterizedTest
 	@CsvSource({ //
-			"HoTTAdapter, 4", //
-			"UltraTrioPlus14, 2" })
-	public void testDefineTrusses(String deviceName, int numberOfDirectories) {
-		String deviceoriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
-
-		setDeviceChannelObject(deviceName, 3, deviceoriented);
+			"HoTTAdapter, 4, true", //
+			"UltraTrioPlus14, 6, true", //
+			"UltraTrioPlus14, 2, false" })
+	public void testDefineTrusses(String deviceName, int numberOfDirectories, boolean isChannelMix) {
+		Analyzer.getInstance().getSettings().setChannelMix(isChannelMix);
+		setDeviceChannelObject(deviceName, 3, "");
 
 		DirectoryScanner directoryScanner = new DirectoryScanner(Analyzer.getInstance());
 		try {
@@ -91,10 +88,9 @@ class SourceDataSetExplorerTest extends NonUiTestCase {
 			"HoTTAdapter, 4", //
 			"UltraTrioPlus14, 6" })
 	public void testDefineTrussesWithChannelMix(String deviceName, int numberOfDirectories) {
-		String deviceoriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
 		settings.setChannelMix(true);
 
-		setDeviceChannelObject(deviceName, 3, deviceoriented);
+		setDeviceChannelObject(deviceName, 3, "");
 
 		DirectoryScanner directoryScanner = new DirectoryScanner(Analyzer.getInstance());
 		try {

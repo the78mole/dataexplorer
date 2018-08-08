@@ -35,6 +35,7 @@ import javax.xml.bind.JAXBException;
 
 import org.xml.sax.SAXParseException;
 
+import gde.DataAccess;
 import gde.GDE;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
@@ -46,7 +47,7 @@ import gde.utils.StringHelper;
 /**
  * Provide device lists and the selected device.
  * Holds only devices with the usage flag in the device configuration xml file.
- * Moved from DeviceSelectionDialog with minimum changes.
+ * Not threadsafe due to device shallow copies and JAXB un-/marshallers.
  * @author Thomas Eickert (USER)
  */
 public final class DeviceConfigurations {
@@ -58,17 +59,9 @@ public final class DeviceConfigurations {
 
 	private DeviceConfiguration													selectedActiveDeviceConfig	= null;
 
-	public DeviceConfigurations(String[] files) {
-		this(files, "");
-	}
-
-	public DeviceConfigurations(String[] files, String activeDeviceName) {
-		Objects.requireNonNull(activeDeviceName);
-		Objects.requireNonNull(files);
-
+	public DeviceConfigurations() {
 		this.configs = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
-		this.activeDevices = new Vector<String>(2, 1);
-		this.initialize(files, activeDeviceName);
+		this.activeDevices = new Vector<String>(11, 11);
 	}
 
 	/**
@@ -79,18 +72,20 @@ public final class DeviceConfigurations {
 	}
 
 	/**
-	 * Goes through the existing INI files and set active flagged devices into active devices list.
+	 * Goes through the existing XML files and set active flagged devices into active devices list.
 	 * Fills the DeviceConfigurations list.
 	 */
-	public void initialize(String[] files, String activeDeviceName) {
-		DeviceConfiguration devConfig;
+	public void initialize(Settings settings, DataAccess dataAccess) {
+		String activeDeviceName = settings.getActiveDevice();
+		Objects.requireNonNull(activeDeviceName);
 
-		for (int i = 0; files != null && i < files.length; i++) {
+		DeviceConfiguration devConfig;
+		for (String file : dataAccess.getDeviceFolderList()) {
 			try {
 				// loop through all device properties XML and check if device used
-				if (files[i].endsWith(GDE.FILE_ENDING_DOT_XML)) {
-					String deviceKey = files[i].substring(0, files[i].length() - 4);
-					devConfig = new DeviceConfiguration(Paths.get(Settings.DEVICE_PROPERTIES_DIR_NAME, files[i]));
+				if (file.endsWith(GDE.FILE_ENDING_DOT_XML)) {
+					String deviceKey = file.substring(0, file.length() - 4);
+					devConfig = new DeviceConfiguration(Paths.get(Settings.DEVICE_PROPERTIES_DIR_NAME, file), settings);
 					if (devConfig.getName().equals(activeDeviceName) && devConfig.isUsed()) { // define the active device after re-start
 						selectedActiveDeviceConfig = devConfig;
 					}
@@ -109,7 +104,7 @@ public final class DeviceConfigurations {
 					this.configs.put(keyString, devConfig);
 				}
 			} catch (JAXBException e) {
-				log.log(Level.WARNING, files[i], e);
+				log.log(Level.WARNING, file, e);
 				if (e.getLinkedException() instanceof SAXParseException) {
 					SAXParseException spe = (SAXParseException) e.getLinkedException();
 					GDE.setInitError(Messages.getString(MessageIds.GDE_MSGW0038, new String[] {
@@ -159,7 +154,7 @@ public final class DeviceConfigurations {
 	/**
 	 * @return the supported lowercase file extensions (e.g. '.bin') or an empty set
 	 */
-	public Set<String>  getValidLogExtentions() {
+	public Set<String> getValidLogExtentions() {
 		Set<String> result = getImportExtentions();
 		result.add(GDE.FILE_ENDING_DOT_OSD);
 		return result;
@@ -171,7 +166,7 @@ public final class DeviceConfigurations {
 	public Set<String> getImportExtentions() {
 		Set<String> extentions = this.configs.values().parallelStream() //
 				.map(c -> Arrays.asList(c.getDataBlockPreferredFileExtention().split(GDE.REGEX_FILE_EXTENTION_SEPARATION))).flatMap(Collection::stream) //
-				.map(s-> s.substring(s.lastIndexOf(GDE.STRING_DOT))).map(e-> e.toLowerCase()) //
+				.map(s -> s.substring(s.lastIndexOf(GDE.STRING_DOT))).map(e -> e.toLowerCase()) //
 				.collect(Collectors.toSet());
 		return extentions;
 	}
@@ -182,14 +177,18 @@ public final class DeviceConfigurations {
 	public HashMap<String, IDevice> getAsDevices(Collection<String> deviceNames) {
 		HashMap<String, IDevice> existingDevices = new HashMap<>();
 		for (String deviceName : deviceNames) {
-			try {
-				IDevice device = configs.get(deviceName).getAsDevice();
-				existingDevices.put(deviceName, device);
-			} catch (Exception e) {
-				log.log(Level.SEVERE, "device instance exception", e);
-			}
+			existingDevices.put(deviceName, configs.get(deviceName).getAsDevice());
 		}
 		log.log(Level.FINE, "Selected      size=", existingDevices.size());
 		return existingDevices;
 	}
+
+	/**
+	 * @param deviceName is the name entry in the device configuration xml file
+	 * @return the cashed device configuration
+	 */
+	public DeviceConfiguration getConfiguration(String deviceName) {
+		return this.configs.get(deviceName);
+	}
+
 }

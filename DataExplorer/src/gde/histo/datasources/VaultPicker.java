@@ -49,6 +49,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import com.sun.istack.internal.Nullable;
@@ -89,7 +90,7 @@ public final class VaultPicker {
 			TrussJobs getTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException {
 				TrussJobs resultMap = new TrussJobs();
 				for (VaultCollector truss : trusses) {
-					addTruss(resultMap, truss);
+					resultMap.add(truss);
 				}
 				return resultMap;
 			}
@@ -107,7 +108,7 @@ public final class VaultPicker {
 						log.log(WARNING, "duplicate vault was discarded: ", truss);
 						continue;
 					}
-					addTruss(resultMap, truss);
+					resultMap.add(truss);
 				}
 				return resultMap;
 			}
@@ -119,13 +120,6 @@ public final class VaultPicker {
 		 */
 		abstract TrussJobs getTrussJobs(List<VaultCollector> trusses) throws IOException, NotSupportedFileFormatException;
 
-		private static void addTruss(TrussJobs resultMap, VaultCollector truss) {
-			Path path = truss.getVault().getLoadFileAsPath();
-			List<VaultCollector> list = resultMap.get(path);
-			if (list == null) resultMap.put(path, list = new ArrayList<>());
-
-			list.add(truss);
-		}
 	}
 
 	private final DirectoryScanner										directoryScanner;
@@ -166,6 +160,7 @@ public final class VaultPicker {
 
 	/**
 	 * Holds trusses (vault skeletons) which are bound for reading into a full vault.
+	 * Multimap implementation.
 	 */
 	public static final class TrussJobs {
 
@@ -196,8 +191,28 @@ public final class VaultPicker {
 			return trussJobs.get(path);
 		}
 
-		public List<VaultCollector> put(Path path, List<VaultCollector> directoryJobs) {
-			return trussJobs.put(path, directoryJobs);
+		public synchronized boolean remove(VaultCollector value) {
+			Path path = value.getVault().getLoadFileAsPath();
+			List<VaultCollector> trussList = trussJobs.get(path);
+			if (trussList == null) {
+				return false;
+			} else {
+				boolean removed = trussList.remove(value);
+				if (trussList.isEmpty()) trussJobs.remove(path);
+				return removed;
+			}
+		}
+
+		private List<VaultCollector> put(Path path, List<VaultCollector> trussList) {
+			return trussJobs.put(path, trussList);
+		}
+
+		public synchronized void add(VaultCollector truss) {
+			Path path = truss.getVault().getLoadFileAsPath();
+			List<VaultCollector> list = get(path);
+			if (list == null) put(path, list = new ArrayList<>());
+
+			list.add(truss);
 		}
 
 		public Set<Entry<Path, List<VaultCollector>>> entrySet() {
@@ -206,6 +221,19 @@ public final class VaultPicker {
 
 		public Collection<List<VaultCollector>> values() {
 			return trussJobs.values();
+		}
+
+		public HashMap<String, VaultCollector> getAsVaultNameMap() {
+			HashMap<String, VaultCollector> vaultNames = new HashMap<>();
+			for (Entry<Path, List<VaultCollector>> jobEntry : trussJobs.entrySet()) {
+				for (VaultCollector vaultCollector : jobEntry.getValue()) {
+					VaultCollector oldVaultCollector = vaultNames.put(vaultCollector.getVault().getVaultName(), vaultCollector);
+					if (oldVaultCollector != null) {
+						log.log(Level.WARNING, "duplicate vaultName " + vaultCollector.getVault().getVaultName(), oldVaultCollector.getVault().getLoadFilePath());
+					}
+				}
+			}
+			return vaultNames;
 		}
 
 		public int size() {
@@ -349,7 +377,7 @@ public final class VaultPicker {
 	 *          May be augmented if the device, channel or object was modified.
 	 * @return true if the trail recordSet was rebuilt
 	 */
-	public boolean rebuild4Screening(RebuildStep rebuildStep) throws FileNotFoundException, IOException, NotSupportedFileFormatException,
+	public synchronized boolean rebuild4Screening(RebuildStep rebuildStep) throws FileNotFoundException, IOException, NotSupportedFileFormatException,
 			DataInconsitsentException, DataTypeException {
 		RebuildStep realRebuildStep = rebuildStep; // the rebuild step might be augmented during the screening procedure
 
@@ -404,7 +432,7 @@ public final class VaultPicker {
 					{// step: transform log files from workload map into vaults and put them into the histoSet map
 						long nanoTime = System.nanoTime();
 						loadVaultsFromFiles(trussJobs, progress);
-						long loadCount = trussJobs.values().parallelStream().flatMap(Collection::stream).count();
+						long loadCount = trussJobs.values().parallelStream().mapToInt(Collection::size).sum();
 						if (loadCount > 0) {
 							long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 							log.time(() -> format("%,5d recordsets create from files  time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", loadCount, micros / 1000, loadCount * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
@@ -412,11 +440,11 @@ public final class VaultPicker {
 					}
 					{// step: save vaults in the file system
 						long nanoTime = System.nanoTime(), cacheSize_B = 0;
-						long loadCount = trussJobs.values().parallelStream().flatMap(Collection::stream).count();
+						long loadCount = trussJobs.values().parallelStream().mapToInt(Collection::size).sum();
 						if (loadCount > 0) {
-							cacheSize_B = VaultReaderWriter.getCacheSize();
+							cacheSize_B = analyzer.getDataAccess().getCacheSize();
 							new VaultReaderWriter(analyzer, Optional.empty()).storeInCaches(trussJobs);
-							if (VaultReaderWriter.getCacheSize() - cacheSize_B > 0) {
+							if (analyzer.getDataAccess().getCacheSize() - cacheSize_B > 0) {
 								long micros = NANOSECONDS.toMicros(System.nanoTime() - nanoTime);
 								log.time(() -> format("%,5d recordsets store in cache     time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", loadCount, micros / 1000, loadCount * 1000000 / micros, (int) ((this.recordSetBytesSum - recordSetBytesCachedSum) / 1.024 / 1.024 / micros)));
 							}
@@ -463,6 +491,8 @@ public final class VaultPicker {
 	 */
 	private void loadVaultsFromFiles(TrussJobs trussJobs, Optional<ProgressManager> progress) {
 		int remainingJobSize = trussJobs.values().parallelStream().mapToInt(List::size).sum();
+		if (remainingJobSize <= 0) return;
+
 		progress.ifPresent((p) -> p.reInit(CACHED, remainingJobSize, 1));
 		VaultReaderWriter vaultReaderWriter = new VaultReaderWriter(analyzer, Optional.empty());
 		for (Map.Entry<Path, List<VaultCollector>> trussJobsEntry : trussJobs.entrySet()) {
@@ -509,8 +539,8 @@ public final class VaultPicker {
 	 * @return the suppressed vaults which have been detected in the vaults list
 	 */
 	private List<ExtendedVault> removeSuppressedHistoVaults() {
-		long totalSize = pickedVaults.values().parallelStream().flatMap(Collection::stream).count();
-		ExclusionData exclusionData = new ExclusionData(new DirectoryScanner(analyzer).getActiveFolder());
+		long totalSize = pickedVaults.values().parallelStream().mapToInt(Collection::size).sum();
+		ExclusionData exclusionData = new ExclusionData(new DirectoryScanner(analyzer).getActiveFolder(), analyzer.getDataAccess());
 		List<ExtendedVault> removed = pickedVaults.values().parallelStream().flatMap(Collection::stream) //
 				.filter(v -> exclusionData.isExcluded(v.getLoadFileName(), v.getLogRecordsetBaseName())) //
 				.collect(Collectors.toList());

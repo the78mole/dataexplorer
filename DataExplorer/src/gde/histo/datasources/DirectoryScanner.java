@@ -27,6 +27,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -80,7 +81,7 @@ public final class DirectoryScanner {
 	public Path getActiveFolder() {
 		IDevice device = analyzer.getActiveDevice();
 		String activeObjectKey = analyzer.getSettings().getActiveObjectKey();
-		String subPathData = activeObjectKey.isEmpty() ? device.getDeviceConfiguration().getPureDeviceName() : activeObjectKey;
+		String subPathData = activeObjectKey.isEmpty() ? device.getDeviceConfiguration().getPureDeviceName(device.getName()) : activeObjectKey;
 		return Paths.get(analyzer.getSettings().getDataFilePath()).resolve(subPathData);
 	}
 
@@ -112,7 +113,7 @@ public final class DirectoryScanner {
 
 		public SourceFoldersBuilder(Analyzer analyzer) {
 			this.analyzer = analyzer;
-			this.sourceFolders = new SourceFolders(analyzer.getSettings().getActiveObjectKey());
+			this.sourceFolders = new SourceFolders(analyzer);
 		}
 
 		/**
@@ -153,7 +154,7 @@ public final class DirectoryScanner {
 			// the import extentions do not have any influence on the validated folders list
 
 			validatedDirectoryTypes.clear();
-			validatedDirectoryTypes.addAll(DirectoryType.getValidDirectoryTypes(validatedDevice));
+			validatedDirectoryTypes.addAll(DirectoryType.getValidDirectoryTypes(validatedDevice, analyzer.getSettings()));
 			isMajorChange = isMajorChange || !lastDirectoryTypes.equals(validatedDirectoryTypes);
 
 			validatedObjectKey = analyzer.getSettings().getActiveObjectKey();
@@ -162,8 +163,9 @@ public final class DirectoryScanner {
 			// avoid costly directory scan and building directory file event listeners (WatchDir)
 			if (isMajorChange) {
 				long nanoTime = System.nanoTime();
-				sourceFolders.defineDirectories(validatedDevice, isSlowFolderAccess);
-				long foldersCount = sourceFolders.values().stream().flatMap(Collection::stream).count();
+				Consumer<String> signaler = isSlowFolderAccess ? s -> GDE.getUiNotification().setStatusMessage(s) : s -> {};
+				sourceFolders.defineDirectories(signaler);
+				long foldersCount = sourceFolders.values().stream().mapToInt(Collection::size).sum();
 				long elapsed_ms = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime);
 				isSlowFolderAccess = elapsed_ms / (foldersCount + 3) > SLOW_FOLDER_LIMIT_MS; // +3 for initial overhead (data path)
 				log.fine(() -> "slowFolderAccess=" + isSlowFolderAccess + "  numberOfFolders=" + foldersCount + " in " + elapsed_ms + " [ms]");

@@ -56,16 +56,18 @@ public final class CalculusEvaluator {
 	 * The delta level is the difference of the levels in the reference / recovery phase compared to the threshold phase.
 	 * @author Thomas Eickert (USER)
 	 */
-	private class DeltaLevelCalculator {
+	private static class DeltaLevelCalculator {
 
-		DeltaBasisTypes	deltaBasis;
-		RecordGroup			tmpRecordGroup;
-		Transition			transition;
+		private final DeltaBasisTypes	deltaBasis;
+		private final RecordGroup			tmpRecordGroup;
+		private final Transition			transition;
+		private final Analyzer				analyzer;
 
-		public DeltaLevelCalculator(DeltaBasisTypes deltaBasis, RecordGroup tmpRecordGroup, Transition transition) {
+		public DeltaLevelCalculator(DeltaBasisTypes deltaBasis, RecordGroup tmpRecordGroup, Transition transition, Analyzer analyzer) {
 			this.deltaBasis = deltaBasis;
 			this.tmpRecordGroup = tmpRecordGroup;
 			this.transition = transition;
+			this.analyzer = analyzer;
 		}
 
 		/**
@@ -321,8 +323,8 @@ public final class CalculusEvaluator {
 			// determine the direction of the peak or pulse or slope
 			final boolean isPositiveDirection = isPositiveTransition();
 
-			final IDevice device = Analyzer.getInstance().getActiveDevice();
-			final Settings settings = Settings.getInstance();
+			final IDevice device = analyzer.getActiveDevice();
+			final Settings settings = analyzer.getSettings();
 			final ChannelPropertyType channelProperty = device.getDeviceConfiguration().getChannelProperty(ChannelPropertyTypes.OUTLIER_SIGMA);
 			final double sigmaFactor = channelProperty.getValue() != null && !channelProperty.getValue().isEmpty()
 					? Double.parseDouble(channelProperty.getValue()) : HistoSet.OUTLIER_SIGMA_DEFAULT;
@@ -336,7 +338,7 @@ public final class CalculusEvaluator {
 					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
 					if (aggregatedValue != null) values.add(aggregatedValue);
 				}
-				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
+				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor, settings);
 				referenceExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
 				log.fine(() -> "reference " + Arrays.toString(values.toArray()));
 			}
@@ -347,7 +349,7 @@ public final class CalculusEvaluator {
 					Double aggregatedValue = this.tmpRecordGroup.getReal(j);
 					if (aggregatedValue != null) values.add(aggregatedValue);
 				}
-				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
+				UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor, settings);
 				thresholdExtremum = tmpQuantile.getQuantile(isPositiveDirection ? 1. - settings.getMinmaxQuantileDistance()
 						: settings.getMinmaxQuantileDistance());
 				log.fine(() -> "threshold " + Arrays.toString(values.toArray()));
@@ -359,7 +361,7 @@ public final class CalculusEvaluator {
 						Double aggregatedValue = this.tmpRecordGroup.getReal(j);
 						if (aggregatedValue != null) values.add(aggregatedValue);
 					}
-					UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor);
+					UniversalQuantile<Double> tmpQuantile = new UniversalQuantile<>(values, true, sigmaFactor, outlierFactor, settings);
 					recoveryExtremum = tmpQuantile.getQuantile(probabilityCutPoint);
 					log.fine(() -> "recovery " + Arrays.toString(values.toArray()));
 				}
@@ -427,15 +429,17 @@ public final class CalculusEvaluator {
 	}
 
 	private final SettlementRecord				histoSettlement;
+	private final Analyzer								analyzer;
 	private final TransitionCalculusType	calculus;
 	private final ChannelType							logChannel;
 	private final RecordGroup							recordGroup;
 
-	public CalculusEvaluator(SettlementRecord newHistoSettlement) {
+	public CalculusEvaluator(SettlementRecord newHistoSettlement, Analyzer analyzer) {
 		this.histoSettlement = newHistoSettlement;
+		this.analyzer = analyzer;
 		this.calculus = newHistoSettlement.getSettlement().getEvaluation().getTransitionCalculus();
-		this.logChannel = Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getChannel(newHistoSettlement.getLogChannelNumber());
-		this.recordGroup = new RecordGroup(newHistoSettlement, this.logChannel.getReferenceGroupById(this.calculus.getReferenceGroupId()));
+		this.logChannel = analyzer.getActiveDevice().getDeviceConfiguration().getChannel(newHistoSettlement.getLogChannelNumber());
+		this.recordGroup = new RecordGroup(newHistoSettlement, this.logChannel.getReferenceGroupById(this.calculus.getReferenceGroupId()), analyzer);
 		log.log(FINEST, GDE.STRING_GREATER, this.calculus);
 	}
 
@@ -463,7 +467,7 @@ public final class CalculusEvaluator {
 			} else if (calculusType == CalculusTypes.RATIO || calculusType == CalculusTypes.RATIO_PERMILLE) {
 				double denominator = calculateLevelDelta(this.recordGroup, this.calculus.getLeveling(), transition);
 				RecordGroup divisorRecordGroup = new RecordGroup(this.histoSettlement,
-						this.logChannel.getReferenceGroupById(this.calculus.getReferenceGroupIdDivisor()));
+						this.logChannel.getReferenceGroupById(this.calculus.getReferenceGroupIdDivisor()), analyzer);
 				if (!divisorRecordGroup.hasReasonableData()) {
 					return;
 				}
@@ -500,7 +504,7 @@ public final class CalculusEvaluator {
 	private double calculateLevelDelta(RecordGroup tmpRecordGroup, LevelingTypes leveling, Transition transition) {
 		final double deltaValue;
 
-		DeltaLevelCalculator deltaLevelCalculator = new DeltaLevelCalculator(this.calculus.getDeltaBasis(), tmpRecordGroup, transition);
+		DeltaLevelCalculator deltaLevelCalculator = new DeltaLevelCalculator(this.calculus.getDeltaBasis(), tmpRecordGroup, transition, analyzer);
 
 		if (leveling == LevelingTypes.FIRST) {
 			deltaValue = deltaLevelCalculator.calcFirst();

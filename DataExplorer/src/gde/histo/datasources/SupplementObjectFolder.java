@@ -20,7 +20,6 @@
 package gde.histo.datasources;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -81,7 +80,7 @@ public final class SupplementObjectFolder {
 	 * @return the directory based on the data path defined by the user which holds the accessible log files object folders
 	 */
 	public static Path getSupplementObjectsPath() {
-		return Paths.get(Settings.getInstance().getDataFilePath(), SUPPLEMENT_DIR_NAME);
+		return Paths.get(Settings.getInstance().getDataFilePath(), SUPPLEMENT_DIR_NAME); // ok
 	}
 
 	/**
@@ -106,7 +105,7 @@ public final class SupplementObjectFolder {
 	 * @return nonempty paths or an empty stream
 	 */
 	private static Stream<Path> getMirrorSourceFolders() {
-		String sourceFoldersCsv = Settings.getInstance().getMirrorSourceFoldersCsv();
+		String sourceFoldersCsv = Settings.getInstance().getMirrorSourceFoldersCsv(); // ok
 		if (sourceFoldersCsv.isEmpty()) return Stream.empty();
 
 		try {
@@ -153,7 +152,7 @@ public final class SupplementObjectFolder {
 		Path objectsPath = getSupplementObjectsPath();
 		int initialSize_MiB = (int) (FileUtils.size(objectsPath) / 1024 / 1024);
 
-		Stream<String> realObjectKeys = Settings.getInstance().getRealObjectKeys();
+		Stream<String> realObjectKeys = Settings.getInstance().getRealObjectKeys(); // ok
 
 		StringBuilder sb = new StringBuilder("  in ").append(objectsPath.toString()).append(GDE.STRING_BLANK_COLON_BLANK);
 		try (Stream<Path> stream = ObjectKeyCompliance.defineObjectPaths(objectsPath, realObjectKeys)) {
@@ -262,7 +261,7 @@ public final class SupplementObjectFolder {
 		Path targetBaseDir = supplementFolder.resolve(getTargetBasePath(externalBaseDir));
 
 		List<Path> result = new ArrayList<Path>();
-		try (Stream<Path> objectPaths = ObjectKeyCompliance.defineObjectPaths(externalBaseDir, Settings.getInstance().getRealObjectKeys())) {
+		try (Stream<Path> objectPaths = ObjectKeyCompliance.defineObjectPaths(externalBaseDir, Settings.getInstance().getRealObjectKeys())) { // ok
 			result = objectPaths.collect(Collectors.toList());
 			for (Path path : result) {
 				log.log(Level.FINER, "sourcePath=", path);
@@ -314,8 +313,7 @@ public final class SupplementObjectFolder {
 					SourceDataSet sourceDataSet = AbstractSourceDataSet.createSourceDataSet(f, analyzer);
 					if (sourceDataSet != null) { // check if supported by histo
 						try {
-							File actualFile = sourceDataSet.getActualFile();
-							Files.copy(actualFile.toPath(), targetPath, options);
+							Files.copy(sourceDataSet.getActualFile(), targetPath, options);
 							copyCounter++;
 							log.log(Level.FINE, "copy done ", targetPath);
 						} catch (AccessDeniedException e) {

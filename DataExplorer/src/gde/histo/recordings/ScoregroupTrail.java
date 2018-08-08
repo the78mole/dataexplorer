@@ -80,13 +80,13 @@ public final class ScoregroupTrail extends TrailRecord {
 	}
 
 	@Override
-	public double[] defineRecentMinMax(int limit ) {
+	public double[] defineRecentMinMax(int limit) {
 		return Guardian.defineScoreMinMax(Arrays.stream(getParent().getIndexedVaults()).limit(limit), getScoregroup());
 	}
 
 	@Override
 	public double[] defineExtrema() {
-		return Guardian.defineScoreExtrema(Arrays.asList(getParent().getIndexedVaults()), getScoregroup());
+		return Guardian.defineScoreExtrema(Arrays.asList(getParent().getIndexedVaults()), getScoregroup(), getParent().getAnalyzer().getSettings());
 	}
 
 	@Override
@@ -111,12 +111,12 @@ public final class ScoregroupTrail extends TrailRecord {
 	}
 
 	@Override
-	public DoubleStream  getVaultScraps(ExtendedVault vault) {
+	public DoubleStream getVaultScraps(ExtendedVault vault) {
 		return DoubleStream.empty();
 	}
 
 	@Override
-	public DoubleStream  getVaultOutliers(ExtendedVault vault) {
+	public DoubleStream getVaultOutliers(ExtendedVault vault) {
 		return DoubleStream.empty();
 	}
 

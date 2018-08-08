@@ -21,7 +21,6 @@ package gde.histo.datasources;
 
 import static java.util.logging.Level.SEVERE;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -51,7 +50,6 @@ import gde.histo.utils.PathUtils;
 import gde.io.FileHandler;
 import gde.log.Logger;
 import gde.utils.FileUtils;
-import gde.utils.OperatingSystemHelper;
 
 /**
  * Exploring and checking source data sets (log files) on a file and vault attribute level.
@@ -65,14 +63,10 @@ public abstract class AbstractSourceDataSet {
 	 * File types supported by the history.
 	 */
 	public static abstract class SourceDataSet {
-		@SuppressWarnings("hiding")
-		private static final Logger	log	= Logger.getLogger(SourceDataSet.class.getName());
 
 		protected final Path				filePath;
 		protected final Analyzer		analyzer;
 
-		/** Use {@code getFile} only; is a link file or a real source file */
-		private File								file;
 
 		/**
 		 * @return true if the current device supports both directory type and file extension
@@ -107,19 +101,14 @@ public abstract class AbstractSourceDataSet {
 		/**
 		 * Adds support for link files pointing to data files.
 		 * Deletes a link file if the data file does not exist.
-		 * @return the data file (differs from {@code file} in case of a link file)
+		 * @return the data file (which differs in case of a link file)
 		 */
-		public abstract File getActualFile() throws IOException;
+		public abstract Path getActualFile() throws IOException;
 
 		/**
 		 * @param desiredRecordSetName
 		 */
 		public abstract void loadFile(Path tmpPath, String desiredRecordSetName);
-
-		public File getFile() {
-			if (file == null) file = filePath.toFile();
-			return file;
-		}
 
 		/**
 		 * @return the path to the link file if the actual file does not hold the data
@@ -203,7 +192,7 @@ public abstract class AbstractSourceDataSet {
 		private static final Logger	log										= Logger.getLogger(OsdDataSet.class.getName());
 
 		/** Is the real source file because {@source file} might be link file */
-		protected File							actualFile						= null;
+		protected Path							actualFile						= null;
 		private boolean							isActualFileVerified	= false;
 
 		protected OsdDataSet(Path filePath, Analyzer analyzer) {
@@ -215,8 +204,8 @@ public abstract class AbstractSourceDataSet {
 			List<VaultCollector> trusses = new ArrayList<>();
 			if (getActualFile() != null) {
 				String objectDirectory = getObjectKey();
-				try (InputStream sourceInputStream = analyzer.getDataAccess().getSourceInputStream(getActualFile().toPath());) {
-					trusses = HistoOsdReaderWriter.readTrusses(sourceInputStream, getActualFile().toPath(), objectDirectory, analyzer);
+				try (InputStream sourceInputStream = analyzer.getDataAccess().getSourceInputStream(getActualFile());) {
+					trusses = HistoOsdReaderWriter.readTrusses(sourceInputStream, getActualFile(), objectDirectory, analyzer);
 				} catch (Exception e) {
 					// link file points to non existent file
 					log.log(Level.SEVERE, e.getMessage(), e);
@@ -238,7 +227,7 @@ public abstract class AbstractSourceDataSet {
 		@Override
 		public void readVaults4Ui(Path sourcePath, List<VaultCollector> trusses) {
 			try (InputStream sourceInputStream = analyzer.getDataAccess().getSourceInputStream(sourcePath);) {
-				HistoOsdReaderWriter.readVaults(analyzer.getDataAccess().getSourceInputStream(sourcePath), trusses, analyzer);
+				HistoOsdReaderWriter.readVaults(sourceInputStream, trusses, analyzer);
 			} catch (Exception e) {
 				log.log(SEVERE, e.getMessage(), e);
 				log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //
@@ -253,7 +242,7 @@ public abstract class AbstractSourceDataSet {
 
 		@Override
 		@Nullable
-		public File getActualFile() {
+		public Path getActualFile() {
 			if (actualFile == null && !isActualFileVerified) {
 				setActualFile();
 			}
@@ -261,32 +250,16 @@ public abstract class AbstractSourceDataSet {
 		}
 
 		protected void setActualFile() {
-			long startMillis = System.currentTimeMillis();
-			try {
-				actualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(getFile().toPath().toString()));
-				// getLinkContainedFilePath may have long response times in case of an unavailable network resources
-				// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
-				log.log(Level.FINER, "time_ms=", System.currentTimeMillis() - startMillis);
-				if (getFile().equals(actualFile) && (System.currentTimeMillis() - startMillis > 555) || !getFile().exists()) {
-					log.warning(() -> String.format("Dead OSD link %s pointing to %s", getFile(), actualFile));
-					if (!getFile().delete()) {
-						log.warning(() -> String.format("could not delete link file ", getFile()));
-					}
-					actualFile = null;
-				}
-			} catch (Exception e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
-				actualFile = null;
-			}
+			actualFile = analyzer.getDataAccess().getActualSourceFile(filePath);
 			isActualFileVerified = true;
 		}
 
 		/**
-		 * @return the path to the link file if the actual file does not hold the data
+		 * @return the path to the link file if the actual file does not hold the data or an empty string otherwise
 		 */
 		@Override
 		public String getLinkPath() {
-			String linkPath = !getFile().equals(getActualFile()) ? getFile().getAbsolutePath() : GDE.STRING_EMPTY;
+			String linkPath = !filePath.toAbsolutePath().equals(getActualFile().toAbsolutePath()) ? filePath.toString() : GDE.STRING_EMPTY;
 			return linkPath;
 		}
 
@@ -309,7 +282,7 @@ public abstract class AbstractSourceDataSet {
 		public List<VaultCollector> getTrusses4Ui() {
 			String objectDirectory = getObjectKey();
 			String recordSetBaseName = analyzer.getActiveChannel().getChannelConfigKey() + getRecordSetExtend();
-			VaultCollector truss = new VaultCollector(objectDirectory, getFile().toPath(), 0, analyzer.getChannels().size(), recordSetBaseName,
+			VaultCollector truss = new VaultCollector(objectDirectory, filePath, 0, analyzer.getChannels().size(), recordSetBaseName,
 					analyzer, providesReaderSettings());
 			truss.setSourceDataSet(this);
 			return new ArrayList<>(Arrays.asList(truss));
@@ -348,8 +321,8 @@ public abstract class AbstractSourceDataSet {
 		}
 
 		@Override
-		public File getActualFile() throws IOException {
-			return getFile();
+		public Path getActualFile() throws IOException {
+			return filePath;
 		}
 
 		@Override
@@ -369,6 +342,7 @@ public abstract class AbstractSourceDataSet {
 	 */
 	@Nullable
 	public static SourceDataSet createSourceDataSet(Path filePath, Analyzer analyzer) {
+		log.log(Level.FINE, "started");
 		String extension = PathUtils.getFileExtension(filePath);
 		if (extension.equals(GDE.FILE_ENDING_OSD))
 			return new OsdDataSet(filePath, analyzer);

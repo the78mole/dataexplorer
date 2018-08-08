@@ -41,11 +41,13 @@ public final class RecordGroup {
 	private final static Logger				log					= Logger.getLogger($CLASS_NAME);
 
 	private final ReferenceGroupType	referenceGroupType;
-	private final Record[]						records;
 	private final SettlementRecord		settlementRecord;
+	private final Analyzer						analyzer;
+	private final Record[]						records;
 
-	public RecordGroup(SettlementRecord settlementRecord, ReferenceGroupType referenceGroupType) {
+	public RecordGroup(SettlementRecord settlementRecord, ReferenceGroupType referenceGroupType, Analyzer analyzer) {
 		this.settlementRecord = settlementRecord;
+		this.analyzer = analyzer;
 		this.referenceGroupType = referenceGroupType;
 		this.records = new Record[referenceGroupType.getMeasurementMapping().size() + referenceGroupType.getSettlementMapping().size()];
 
@@ -77,7 +79,7 @@ public final class RecordGroup {
 		double result = 0;
 		for (int i = 0; i < this.records.length; i++) {
 			Record record = this.records[i];
-			final double translatedValue = Analyzer.getInstance().getActiveDevice().translateValue(record, record.getRealMaxValue() / 1000.);
+			final double translatedValue = analyzer.getActiveDevice().translateValue(record, record.getRealMaxValue() / 1000.);
 			result = calculateAggregate(result, i, translatedValue);
 		}
 		return result;
@@ -90,7 +92,7 @@ public final class RecordGroup {
 		double result = 0;
 		for (int i = 0; i < this.records.length; i++) {
 			Record record = this.records[i];
-			final double translatedValue = Analyzer.getInstance().getActiveDevice().translateValue(record, record.getRealMinValue() / 1000.);
+			final double translatedValue = analyzer.getActiveDevice().translateValue(record, record.getRealMinValue() / 1000.);
 			result = calculateAggregate(result, i, translatedValue);
 		}
 		return result;
@@ -108,7 +110,7 @@ public final class RecordGroup {
 				result = null;
 				break;
 			} else {
-				final double translatedValue = Analyzer.getInstance().getActiveDevice().translateValue(record, record.elementAt(index) / 1000.);
+				final double translatedValue = analyzer.getActiveDevice().translateValue(record, record.elementAt(index) / 1000.);
 				result = calculateAggregate(result, i, translatedValue);
 			}
 		}

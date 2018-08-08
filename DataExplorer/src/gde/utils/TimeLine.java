@@ -13,21 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.utils;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.RecordSet;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.LocalizedDateTime.DateTimePattern;
-import gde.utils.LocalizedDateTime.DurationPattern;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,6 +28,17 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.RecordSet;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.LocalizedDateTime.DateTimePattern;
+import gde.utils.LocalizedDateTime.DurationPattern;
 
 /**
  * Utility class to draw time line with tick marks and numbers
@@ -73,12 +73,12 @@ public class TimeLine {
 	 */
 	public int[] getScaleMaxTimeNumber(double totalDisplayTime_ms) {
 		int factor = 10; // for the most cases (make factor 10 based to enable 0.5 by factor 5)
-		int format = TimeLine.TIME_LINE_MSEC; // the time format type 
+		int format = TimeLine.TIME_LINE_MSEC; // the time format type
 
 		if (TimeLine.log.isLoggable(Level.FINE)) TimeLine.log.log(Level.FINE, "totalDisplayTime_ms = " + totalDisplayTime_ms); //$NON-NLS-1$
 
-		long totalTime_msec = Double.valueOf(totalDisplayTime_ms).longValue();
-		long totalTime_sec = Double.valueOf(totalDisplayTime_ms / 1000.0).longValue();
+		long totalTime_msec = (long) totalDisplayTime_ms;
+		long totalTime_sec = (long) (totalDisplayTime_ms / 1000.0);
 		long totalTime_min = TimeUnit.MINUTES.convert(totalTime_sec, TimeUnit.SECONDS);
 		long totalTime_std = TimeUnit.HOURS.convert(totalTime_sec, TimeUnit.SECONDS);
 		long totalTime_days = TimeUnit.DAYS.convert(totalTime_sec, TimeUnit.SECONDS);
@@ -89,7 +89,7 @@ public class TimeLine {
 					"totalTime_std = " + totalTime_std + "; totalTime_min = " + totalTime_min + "; totalTime_sec = " + totalTime_sec + "; totalTime_ms = " + totalTime_msec + " - " + Integer.MAX_VALUE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		int maxTimeNumberFormated; // the biggest number in the scale to be displayed
 
-		boolean isTimeFormatAbsolute = DataExplorer.getInstance().getActiveRecordSet() != null && Settings.getInstance().isTimeFormatAbsolute() 
+		boolean isTimeFormatAbsolute = DataExplorer.getInstance().getActiveRecordSet() != null && Settings.getInstance().isTimeFormatAbsolute()
 				&& !DataExplorer.getInstance().getActiveRecordSet().isCompareSet()
 				&& !DataExplorer.getInstance().getActiveRecordSet().isZoomMode();
 
@@ -172,7 +172,7 @@ public class TimeLine {
 
 		if (TimeLine.log.isLoggable(Level.FINE))
 			TimeLine.log.log(Level.FINE, "timeLineText = " + this.timeLineText + " maxTimeNumber = " + maxTimeNumberFormated + " factor = " + factor); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		return new int[] { maxTimeNumberFormated, factor, format, Long.valueOf(totalTime_msec).intValue() };
+		return new int[] { maxTimeNumberFormated, factor, format, (int) totalTime_msec };
 	}
 
 	/**
@@ -238,7 +238,7 @@ public class TimeLine {
 		long offset = 0;
 		int timeDeltaValue = endTimeValue - startTimeValue;
 		if (TimeLine.log.isLoggable(Level.FINER))
-			TimeLine.log.log(Level.FINER, String.format("timeDelta = %s startTime = %s endTime = %s", timeDeltaValue, startTimeValue, endTimeValue)); //$NON-NLS-1$ 
+			TimeLine.log.log(Level.FINER, String.format("timeDelta = %s startTime = %s endTime = %s", timeDeltaValue, startTimeValue, endTimeValue)); //$NON-NLS-1$
 
 		if (TimeLine.log.isLoggable(Level.FINER))
 			TimeLine.log.log(Level.FINER, String.format("formatedDate = %s", StringHelper.getFormatedTime("YYYY-MM-dd HH:mm:ss.SSS", startTimeStamp))); //$NON-NLS-1$
@@ -560,10 +560,10 @@ public class TimeLine {
 			Vector<Integer> timeGrid = new Vector<Integer>();
 			boolean isBuildGridVector = recordSet.getTimeGridType() == RecordSet.TIME_GRID_MAIN;
 
-			for (int i = 0; isAbsoluteTime ? i < numberTicks : i <= numberTicks; i++) { // <= end of time scale tick 
+			for (int i = 0; isAbsoluteTime ? i < numberTicks : i <= numberTicks; i++) { // <= end of time scale tick
 				//draw the main scale ticks, length = 5 and gap to scale = 2
 				double xTickPosition = offset != 0 ? 1.0 * width * offset / deltaTime_ms + x0 + i * deltaTick : x0 + i * deltaTick;
-				int intXTickPosition = Double.valueOf(xTickPosition + 0.5).intValue();
+				int intXTickPosition = (int) (xTickPosition + 0.5);
 				if (intXTickPosition > x0 + width) break;
 				if (isBuildGridVector) timeGrid.add(intXTickPosition);
 				gc.drawLine(intXTickPosition, y0, intXTickPosition, y0 + ticklength);
@@ -572,13 +572,13 @@ public class TimeLine {
 				double deltaPosMini = deltaTick / miniticks;
 				for (int j = 1; j < miniticks && i < numberTicks; j++) {
 					double xMiniTickPos = (xTickPosition + j * deltaPosMini);
-					int intMiniTickPos = Double.valueOf(xMiniTickPos).intValue();
+					int intMiniTickPos = (int) xMiniTickPos;
 					if (TimeLine.log.isLoggable(Level.FINEST)) TimeLine.log.log(Level.FINEST, "intXTickPosition=" + intXTickPosition + ", width=" + width); //$NON-NLS-1$ //$NON-NLS-2$
 					if (intMiniTickPos < (x0 + width)) {
 						gc.drawLine(intMiniTickPos, y0, intMiniTickPos, y0 + ticklength / 2);
 					}
 				}
-				//draw values to time line	
+				//draw values to time line
 				if (isAbsoluteTime)
 					drawValues2Scale(gc, x0, y0, width, timeFormat, deltaTime_ms, ticklength, gap, pt, timeGrid, startTimeStamp, i, xTickPosition, intXTickPosition);
 				else
@@ -609,7 +609,7 @@ public class TimeLine {
 		String numberStr;
 		switch (timeFormat) {
 		case TimeLine.TIME_LINE_SEC_MIN: // 60 sec/min
-		case TimeLine.TIME_LINE_MIN_HRS: // 60 min/hrs  
+		case TimeLine.TIME_LINE_MIN_HRS: // 60 min/hrs
 			boolean isMod60 = (timeValue % 60) == 0;
 			double timeValue60 = isMod60 ? timeValue / 60 : timeValue % 60; // minute, hour
 			if (TimeLine.log.isLoggable(Level.FINER)) TimeLine.log.log(Level.FINER, "timeValue = " + timeValue + ", timeValue60 = " + timeValue60); //$NON-NLS-1$ //$NON-NLS-2$
@@ -705,77 +705,77 @@ public class TimeLine {
 		// prepare to make every minute or hour to bold
 		switch (timeFormat) {
 		case TimeLine.TIME_LINE_MSEC: // 1000 sec/min
-			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.ssSSS, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.ssSSS, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 			break;
 
 		case TimeLine.TIME_LINE_SEC: // 60 sec/min
-			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.mmssSSS, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.mmssSSS, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 			break;
 
 		default:
 		case TimeLine.TIME_LINE_SEC_MIN:
 		case TimeLine.TIME_LINE_MIN:
 		case TimeLine.TIME_LINE_MIN_HRS:
-			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.HHmmss, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.HHmmss, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 			break;
 
 		case TimeLine.TIME_LINE_HRS:
-			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.dd_HHmm, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.dd_HHmm, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 			break;
 
 		case TimeLine.TIME_LINE_DAYS: // 30 days/month
 		case TimeLine.TIME_LINE_DAYS_MONTH: // 30 days/month
-			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.MMdd_HH, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.MMdd_HH, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 			break;
 
 		case TimeLine.TIME_LINE_MONTH: // 30 days/month
 		case TimeLine.TIME_LINE_MONTH_YEARS: // 12 month/year
-			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.yyMMdd, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL); //$NON-NLS-1$						
+			GraphicsUtils.drawTextCentered(LocalizedDateTime.getFormatedTime(DateTimePattern.yyMMdd, timeValue.longValue()), intXTickPosition, y0 + ticklength + gap + pt.y / 2, gc, SWT.HORIZONTAL);
 			break;
 		}
 	}
 
 	/**
-	 * converts a given time in m_sec into time format used for time scale 
+	 * converts a given time in m_sec into time format used for time scale
 	 * @return converted time value
 	 */
 	public static int convertTimeInFormatNumber(double time_ms, int timeFormat) {
-		long time_sec = Double.valueOf(time_ms / 1000.0).longValue();
-		long time_min = TimeUnit.MINUTES.convert(time_sec, TimeUnit.SECONDS);
-		long time_std = TimeUnit.HOURS.convert(time_sec, TimeUnit.SECONDS);
-		long time_days = TimeUnit.DAYS.convert(time_sec, TimeUnit.SECONDS);
-		long time_month = TimeUnit.DAYS.convert(time_sec, TimeUnit.SECONDS) / 30;
-		long time_year = TimeUnit.DAYS.convert(time_sec, TimeUnit.SECONDS) / 365;
+		int time_sec = (int) (time_ms / 1000.0);
+		int time_min = (int) TimeUnit.MINUTES.convert(time_sec, TimeUnit.SECONDS);
+		int time_std = (int) TimeUnit.HOURS.convert(time_sec, TimeUnit.SECONDS);
+		int time_days = (int) TimeUnit.DAYS.convert(time_sec, TimeUnit.SECONDS);
+		int time_month = (int) TimeUnit.DAYS.convert(time_sec, TimeUnit.SECONDS) / 30;
+		int time_year = (int) TimeUnit.DAYS.convert(time_sec, TimeUnit.SECONDS) / 365;
 		if (TimeLine.log.isLoggable(Level.FINE))
 			TimeLine.log.log(Level.FINE, "time_std = " + time_std + "; time_min = " + time_min + "; time_sec = " + time_sec + "; time_ms = " + time_ms); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		int result;
 
 		switch (timeFormat) {
 		case TIME_LINE_YEARS:
-			result = Long.valueOf(time_year).intValue();
+			result = time_year;
 			break;
 		case TIME_LINE_MONTH_YEARS:
 		case TIME_LINE_MONTH:
-			result = Long.valueOf(time_month).intValue();
+			result = time_month;
 			break;
 		case TIME_LINE_DAYS_MONTH:
 		case TIME_LINE_DAYS:
-			result = Long.valueOf(time_days).intValue();
+			result = time_days;
 			break;
 		case TIME_LINE_HRS_DAYS:
 		case TIME_LINE_HRS:
-			result = Long.valueOf(time_std).intValue();
+			result = time_std;
 			break;
 		case TIME_LINE_MIN_HRS:
 		case TIME_LINE_MIN:
-			result = Long.valueOf(time_min).intValue();
+			result = time_min;
 			break;
 		case TIME_LINE_SEC_MIN:
 		case TIME_LINE_SEC:
-			result = Long.valueOf(time_sec).intValue();
+			result = time_sec;
 			break;
 		default: // TIME_LINE_MSEC
-			result = Double.valueOf(time_ms).intValue();
+			result = (int) time_ms;
 			break;
 		}
 		return result;
@@ -790,7 +790,7 @@ public class TimeLine {
 	public static String getFomatedTimeWithUnit(final double milliSeconds) {
 		String time = "0"; //$NON-NLS-1$
 		if (milliSeconds >= 0) {
-			long lSeconds = Double.valueOf(milliSeconds / 1000.0).longValue();
+			long lSeconds = (long) (milliSeconds / 1000.0);
 			long lMinutes = lSeconds / 60;
 			lSeconds %= 60;
 			long lHours = lMinutes / 60;
@@ -815,7 +815,7 @@ public class TimeLine {
 	public static String getFomatedTime(double milliSeconds) {
 		String time = "0"; //$NON-NLS-1$
 		if (milliSeconds >= 0) {
-			long lSeconds = Double.valueOf(milliSeconds / 1000.0).longValue();
+			long lSeconds = (long) (milliSeconds / 1000.0);
 			//milliSeconds %= 1000;
 			long lMinutes = lSeconds / 60;
 			lSeconds %= 60;

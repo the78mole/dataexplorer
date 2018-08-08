@@ -19,16 +19,14 @@
 
 package gde.histo.transitions;
 
-import static gde.histo.transitions.AbstractAnalyzer.TriggerState.RECOVERING;
-import static gde.histo.transitions.AbstractAnalyzer.TriggerState.TRIGGERED;
-import static gde.histo.transitions.AbstractAnalyzer.TriggerState.WAITING;
+import static gde.histo.transitions.AbstractDetector.TriggerState.RECOVERING;
+import static gde.histo.transitions.AbstractDetector.TriggerState.TRIGGERED;
+import static gde.histo.transitions.AbstractDetector.TriggerState.WAITING;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.FINEST;
 
-import gde.Analyzer;
 import gde.GDE;
-import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.IDevice;
@@ -40,15 +38,16 @@ import gde.log.Logger;
  * Analyze a record for transitions defined in the device channel settings.
  * @author Thomas Eickert (USER)
  */
-public final class PeakAnalyzer extends AbstractAnalyzer {
+public final class PeakDetector extends AbstractDetector {
 	@SuppressWarnings("hiding")
-	final static String	$CLASS_NAME	= PeakAnalyzer.class.getName();
+	final static String			$CLASS_NAME	= PeakDetector.class.getName();
 	@SuppressWarnings("hiding")
-	final static Logger	log					= Logger.getLogger($CLASS_NAME);
+	final static Logger			log					= Logger.getLogger($CLASS_NAME);
 
-	private final RecordSet recordSet;
+	private final RecordSet	recordSet;
 
-	public PeakAnalyzer(RecordSet recordSet) {
+	public PeakDetector(RecordSet recordSet) {
+		super(recordSet.getAnalyzer());
 		this.recordSet = recordSet;
 	}
 
@@ -74,10 +73,10 @@ public final class PeakAnalyzer extends AbstractAnalyzer {
 	 */
 	private TransitionChronicle findPeakTransitions(Record record, TransitionType transitionType) {
 		TransitionChronicle transitions = new TransitionChronicle();
-		IDevice device = Analyzer.getInstance().getActiveDevice();
+		IDevice device = analyzer.getActiveDevice();
 
 		LevelChecker levelChecker = new LevelChecker(record, transitionType);
-		int samplingTimespan_ms = Settings.getInstance().getSamplingTimespan_ms();
+		int samplingTimespan_ms = analyzer.getSettings().getSamplingTimespan_ms();
 		for (int i = 0; i < record.realSize(); i++) {
 			if (record.elementAt(i) == null) break;
 			if (log.isLoggable(FINER) && i > 0 && samplingTimespan_ms * 2 <= (long) (record.getTime_ms(i) - record.getTime_ms(i - 1)))

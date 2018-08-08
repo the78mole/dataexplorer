@@ -485,7 +485,7 @@ public abstract class TrailRecord extends CommonRecord {
 	public boolean hasReasonableData() {
 		boolean hasReasonableData = false;
 		if (this.size() > 0) {
-			double[] extrema = Guardian.defineStandardExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem);
+			double[] extrema = Guardian.defineStandardExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem, getParent().getAnalyzer().getSettings());
 			hasReasonableData = !HistoSet.fuzzyEquals(extrema[0], extrema[1]) || !HistoSet.fuzzyEquals(extrema[0], 0.);
 			log.log(Level.FINE, name, hasReasonableData);
 		}
@@ -861,9 +861,9 @@ public abstract class TrailRecord extends CommonRecord {
 	public double[] defineExtrema() { // todo consider caching this result
 		TrailTypes trailType = this.trailSelector.getTrailType();
 		if (trailType.isAlienValue()) {
-			return Guardian.defineAlienExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem, trailType);
+			return Guardian.defineAlienExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem, trailType, getParent().getAnalyzer().getSettings());
 		} else {
-			return Guardian.defineStandardExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem);
+			return Guardian.defineStandardExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem, getParent().getAnalyzer().getSettings());
 		}
 	}
 
@@ -874,7 +874,7 @@ public abstract class TrailRecord extends CommonRecord {
 	 * @return the array of outliers warning objects which may hold null values
 	 */
 	public Reminder[] defineMinMaxWarning(int logLimit) {
-		return Guardian.defineMinMaxReminder(getParent().getIndexedVaults(), this.channelItem, this.trailSelector, logLimit);
+		return Guardian.defineMinMaxReminder(getParent().getIndexedVaults(), this.channelItem, this.trailSelector, logLimit, getParent().getAnalyzer().getSettings());
 	}
 
 	/**
@@ -897,7 +897,7 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	protected void defineQuantile() {
-		quantile = new ElementaryQuantile<>(getDecodedNotNullValues(), true);
+		quantile = new ElementaryQuantile<>(getDecodedNotNullValues(), true, getParent().getAnalyzer().getSettings());
 		log.finest(() -> name + " size=" + quantile.getSize() + " UpperWhisker=" + quantile.getQuantileUpperWhisker());
 	}
 

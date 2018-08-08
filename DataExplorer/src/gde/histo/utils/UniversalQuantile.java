@@ -23,9 +23,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import gde.GDE;
@@ -34,38 +37,36 @@ import gde.histo.datasources.HistoSet;
 import gde.log.Logger;
 
 /**
- * Removes outliers (defined by the tolerance interval) and outcasts (dtermined in advance).
+ * Removes outliers (defined by the tolerance interval) and outcasts (determined in advance).
  * @author Thomas Eickert
  */
 public class UniversalQuantile<T extends Number & Comparable<T>> extends ElementaryQuantile<T> {
-	private static final String	$CLASS_NAME								= UniversalQuantile.class.getName();
-	private static final Logger	log												= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME					= UniversalQuantile.class.getName();
+	private static final Logger	log									= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * Values beyond this limit are outliers.<br>
 	 * Maximum whisker length <em>MWL = c * IQR</em>.
 	 */
-	public static final double	CLOSE_OUTLIER_LIMIT				= 1.5;
+	public static final double	CLOSE_OUTLIER_LIMIT	= 1.5;
 	/**
 	 * Outliers below this limit are close outliers, those beyond this limit are far outliers.<br>
 	 * Outlier distance limit <em>ODL = c * IQR</em>.
 	 */
-	public static final int			FAR_OUTLIER_LIMIT					= 3;
-
-	private static final int		OUTLIER_TOLERANCE_SPREAD	= Settings.getInstance().getOutlierToleranceSpread();
+	public static final int			FAR_OUTLIER_LIMIT		= 3;
 
 	/**
 	 * values to be eliminated from the population
 	 */
-	private final List<T>				outcasts;
+	private final Set<T>				outcasts;
 	/**
 	 * outlier and outcast members removed from the trunk
 	 */
-	private final List<T>				castaways									= new ArrayList<>();
+	private final List<T>				castaways						= new ArrayList<>();
 	/**
 	 * most frequent outlier candidates value within the ODL which are removed from in the trunk
 	 */
-	private final List<T>				constantScraps						= new ArrayList<>();
+	private final List<T>				constantScraps			= new ArrayList<>();
 
 	private T										firstValidElement;
 	private T										lastValidElement;
@@ -76,23 +77,13 @@ public class UniversalQuantile<T extends Number & Comparable<T>> extends Element
 	 * @param sigmaFactor specifies the confidence interval <em>CI = &plusmn; z * &sigma; with z >= 0</em>
 	 * @param outlierFactor specifies the outlier distance limit ODL from the confidence interval (<em>ODL = &rho; * CI with &rho; > 0</em>)
 	 */
-	public UniversalQuantile(List<Spot<T>> population, double sigmaFactor, double outlierFactor) {
-		super(new ArrayList<T>(), true);
-		if (population == null || population.isEmpty()) throw new IllegalArgumentException("empty population");
-		this.outcasts = new ArrayList<T>();
-
-		for (Spot<T> spot : population) {
-			this.trunk.add(spot.y());
+	public static UniversalQuantile<Double> createUniversalSpotQuantile(Collection<Spot<Double>> population, double sigmaFactor, double outlierFactor, Settings settings) {
+		List<Double> trunk = new ArrayList<>();
+		for (Spot<Double> spot : population) {
+			trunk.add(spot.y());
 		}
-
-		Collections.sort(this.trunk);
-		removeOutliers(sigmaFactor, outlierFactor, outlierFactor);
-
-		this.firstValidElement = population.get(0).y();
-		this.lastValidElement = population.get(population.size() - 1).y();
-
-		log.finest(() -> "" + population.size() + Arrays.toString(population.toArray()));
-		log.finest(() -> "" + this.trunk.size() + Arrays.toString(this.trunk.toArray()));
+		boolean isSample = true;
+		return new UniversalQuantile<Double>(trunk, isSample, sigmaFactor, outlierFactor, settings);
 	}
 
 	/**
@@ -103,9 +94,9 @@ public class UniversalQuantile<T extends Number & Comparable<T>> extends Element
 	 * @param removeConstantOutliers true removes constant outliers lie beyond 3 * CI, are the outmost value and occur with the highest
 	 *          frequency in this range
 	 */
-	public UniversalQuantile(Collection<T> population, boolean isSample, boolean removeCastaways, boolean removeConstantOutliers) {
-		this(population, isSample, INTER_QUARTILE_SIGMA_FACTOR, removeCastaways ? OUTLIER_TOLERANCE_SPREAD : 9999., //
-				removeConstantOutliers ? FAR_OUTLIER_LIMIT : removeCastaways ? OUTLIER_TOLERANCE_SPREAD : 9999., new ArrayList<>());
+	public UniversalQuantile(Collection<T> population, boolean isSample, boolean removeCastaways, boolean removeConstantOutliers, Settings settings) {
+		this(population, isSample, INTER_QUARTILE_SIGMA_FACTOR, removeCastaways ? settings.getOutlierToleranceSpread() : 9999., //
+				removeConstantOutliers ? FAR_OUTLIER_LIMIT : removeCastaways ? settings.getOutlierToleranceSpread() : 9999., new HashSet<>(), settings);
 	}
 
 	/**
@@ -115,8 +106,8 @@ public class UniversalQuantile<T extends Number & Comparable<T>> extends Element
 	 * @param sigmaFactor specifies the confidence interval <em>CI = &plusmn; z * &sigma; with z >= 0</em>
 	 * @param outlierFactor specifies the outlier distance limit ODL from the confidence interval (<em>ODL = &rho; * CI with &rho; > 0</em>)
 	 */
-	public UniversalQuantile(List<T> population, boolean isSample, double sigmaFactor, double outlierFactor) {
-		this(population, isSample, sigmaFactor, outlierFactor, outlierFactor, new ArrayList<>());
+	public UniversalQuantile(List<T> population, boolean isSample, double sigmaFactor, double outlierFactor, Settings settings) {
+		this(population, isSample, sigmaFactor, outlierFactor, outlierFactor, new HashSet<>(), settings);
 	}
 
 	/**
@@ -129,8 +120,8 @@ public class UniversalQuantile<T extends Number & Comparable<T>> extends Element
 	 * @param outcasts holds list members which are eliminated before the quantiles calculation
 	 */
 	public UniversalQuantile(Collection<T> population, boolean isSample, double sigmaFactor, double outlierFactor, double constantOutlierFactor,
-			List<T> outcasts) {
-		super(!outcasts.isEmpty() ? new ArrayList<T>() : new ArrayList<T>(population), isSample);
+			Set<T> outcasts, Settings settings) {
+		super(!outcasts.isEmpty() ? new ArrayList<T>() : new ArrayList<T>(population), isSample, settings);
 		this.outcasts = outcasts;
 		if (population == null || population.isEmpty()) throw new IllegalArgumentException("empty population");
 
@@ -189,7 +180,7 @@ public class UniversalQuantile<T extends Number & Comparable<T>> extends Element
 		if (HistoSet.fuzzyEquals(toleranceLowerUpper[0], 0.) || HistoSet.fuzzyEquals(toleranceLowerUpper[1], 0.)) return;
 
 		{
-			List<T> candidates = new ArrayList<>();
+			List<T> candidates = new ArrayList<>();  // allows specimen counts in contrast to a set
 			double nonOutlierRange = toleranceLowerUpper[0] * 2. * outlierFactor;
 			double nonConstantOutlierRange = toleranceLowerUpper[0] * 2. * constantOutlierFactor;
 			double q1WithOutliers = getQuantile(outlierProbability);
@@ -204,13 +195,12 @@ public class UniversalQuantile<T extends Number & Comparable<T>> extends Element
 				} else
 					break;
 			}
-			if (castaways.isEmpty() && !candidates.isEmpty()) {
-				Collections.sort(candidates);
-				removeConstantOutliers(candidates, candidates.get(0));
+			if (castaways.isEmpty() && candidates.size() > 2) { // remove only if a significant amount
+				if (removePrevalentValues(candidates.get(0), candidates)) constantScraps.add(candidates.get(0));
 			}
 		}
 		{
-			List<T> candidates = new ArrayList<>();
+			List<T> candidates = new ArrayList<>(); // allows specimen counts in contrast to a set
 			double nonOutlierRange = toleranceLowerUpper[1] * 2. * outlierFactor;
 			double nonConstantOutlierRange = toleranceLowerUpper[1] * 2. * constantOutlierFactor;
 			double q3WithOutliers = getQuantile(1. - outlierProbability);
@@ -225,9 +215,8 @@ public class UniversalQuantile<T extends Number & Comparable<T>> extends Element
 				} else
 					break;
 			}
-			if (castaways.isEmpty() && !candidates.isEmpty()) {
-				Collections.sort(candidates);
-				removeConstantOutliers(candidates, candidates.get(candidates.size() - 1));
+			if (castaways.isEmpty() && candidates.size() > 2) { // remove only if a significant amount
+				if (removePrevalentValues(candidates.get(0), candidates)) constantScraps.add(candidates.get(0));
 			}
 		}
 		if (trunk.isEmpty()) throw new UnsupportedOperationException("empty trunk");
@@ -235,25 +224,33 @@ public class UniversalQuantile<T extends Number & Comparable<T>> extends Element
 
 	/**
 	 * Constant outliers are supposed to originate from a technical origin.
-	 * @param candidates
-	 * @param scrappableCandidate is the extremum value which might be identified as outlier
+	 * The {@code scrappableCandidate} is a prevalent value if it is the most common in {@code candidates}.
+	 * @param scrappableCandidate is the value for removal
+	 * @param candidates holds a sublist from the trunk
+	 * @return true if at least one {@code scrappableCandidate} value was removed from the trunk
 	 */
-	private void removeConstantOutliers(List<T> candidates, T scrappableCandidate) {
-		log.finest(() -> candidates.stream().collect(Collectors.groupingBy(t -> t, Collectors.counting())).entrySet().toString());
+	private boolean removePrevalentValues(T scrappableCandidate, List<T> candidates) {
+		boolean[] toRemove = new boolean[] { false };
 
-		// get the most frequent value of all candidates
-		candidates.stream().collect(Collectors.groupingBy(t -> t, Collectors.counting())).entrySet() //
-				.stream().max(Comparator.comparing(Entry::getValue)) //
-				.ifPresent(e -> {
-					T mostFrequentValue = e.getKey();
-					if (scrappableCandidate.equals(mostFrequentValue) && e.getValue() > 1) {
-						constantScraps.add(scrappableCandidate);
-						// remove all entries with this value
-						List<T> coll = new ArrayList<>();
-						coll.add(scrappableCandidate);
-						trunk.removeAll(coll);
-					}
-				});
+		T halfWayValue = candidates.get(candidates.size() / 2);
+		toRemove[0] = scrappableCandidate.equals(halfWayValue);
+
+		if (!toRemove[0]) { // go the hard way
+			log.finest(() -> candidates.stream().collect(Collectors.groupingBy(t -> t, Collectors.counting())).entrySet().toString());
+			Optional<Entry<T, Long>> mostFrequentValueGroup = candidates.stream() //
+					.collect(Collectors.groupingBy(t -> t, Collectors.counting())).entrySet() //
+					.stream().max(Comparator.comparing(Entry::getValue));
+			mostFrequentValueGroup.ifPresent(e -> {
+				T mostFrequentValue = e.getKey();
+				toRemove[0] = scrappableCandidate.equals(mostFrequentValue) && e.getValue() > 1;
+			});
+		}
+
+		if (toRemove[0]) {
+			// remove all entries with this value
+			return trunk.removeAll(Collections.singleton(scrappableCandidate));
+		} else
+			return false;
 	}
 
 	/**

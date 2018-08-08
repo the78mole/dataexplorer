@@ -39,12 +39,13 @@ public class Explorer extends Analyzer {
 		super(analyzer);
 	}
 
-	public void setChannels(Channels channels) {
-		this.channels = channels;
+	public void setChannels() {
+		this.channels = Channels.getInstance();
 	}
 
 	@Override
 	public Explorer clone() {
+		joinDeviceConfigurationsThread();
 		return new Explorer(this);
 	}
 

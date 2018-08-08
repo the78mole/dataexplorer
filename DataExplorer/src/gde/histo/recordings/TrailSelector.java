@@ -32,6 +32,7 @@ import gde.device.TrailDisplayType;
 import gde.device.TrailTypes;
 import gde.device.TrailVisibilityType;
 import gde.device.resource.DeviceXmlResource;
+import gde.log.Level;
 import gde.log.Logger;
 
 /**
@@ -69,7 +70,7 @@ public abstract class TrailSelector {
 	protected int[]										extremumIndices					= null;
 
 	protected TrailSelector(TrailRecord trailRecord) {
-		this.deviceName = trailRecord.getDevice().getName();
+		this.deviceName = trailRecord.getParent().getDevice().getName();
 		this.channelItem = trailRecord.channelItem;
 		this.recordName = trailRecord.getName();
 		this.smartStatistics = trailRecord.getParent().isSmartStatistics();
@@ -138,7 +139,12 @@ public abstract class TrailSelector {
 	}
 
 	public TrailTypes getTrailType() {
-		return TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex));
+		if (this.trailTextSelectedIndex < 0) {
+			log.log(Level.SEVERE, "index not defined yet ", this.trailTextSelectedIndex);
+			throw new UnsupportedOperationException();
+		} else {
+			return TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex));
+		}
 	}
 
 	public boolean isTrailSuite() {

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.BiConsumer;
@@ -38,8 +39,9 @@ import gde.device.IChannelItem;
 import gde.device.IDevice;
 import gde.device.ScoreLabelTypes;
 import gde.histo.cache.HistoVault;
-import gde.histo.cache.SimpleVaultReader;
+import gde.histo.cache.VaultReaderWriter;
 import gde.histo.config.HistoGraphicsTemplate;
+import gde.histo.datasources.SourceFolders;
 import gde.histo.datasources.SourceFolders.DirectoryType;
 import gde.histo.datasources.VaultChecker;
 import gde.histo.device.ChannelItems;
@@ -131,11 +133,11 @@ public final class FleetMonitor {
 				oS.maxDuration_MM = Math.max(oS.maxDuration_MM, v.getScores().get(ScoreLabelTypes.DURATION_MM.ordinal()).getValue());
 			}
 
-			HistoGraphicsTemplate template = HistoGraphicsTemplate.createReadonlyTemplate(analyzer);
+			HistoGraphicsTemplate template = HistoGraphicsTemplate.createTransitoryTemplate(analyzer);
 			template.load();
 			boolean smartStatistics = Boolean.parseBoolean(template.getProperty(HistoGraphicsTemplate.SMART_STATISTICS, "true"));
 
-			InclusionData inclusionData = new InclusionData(Paths.get(Settings.getInstance().getDataFilePath(), oS.objectKey));
+			InclusionData inclusionData = new InclusionData(Paths.get(Settings.getInstance().getDataFilePath(), oS.objectKey), analyzer.getDataAccess());
 
 			ReminderType[] minReminders = new ReminderType[] { ReminderType.NONE, ReminderType.NONE };
 			ReminderType[] maxReminders = new ReminderType[] { ReminderType.NONE, ReminderType.NONE };
@@ -146,7 +148,7 @@ public final class FleetMonitor {
 				if (!isActive || !isIncluded) return;
 
 				TrailSelector trailSelector = itm.createTrailSelector(analyzer, itm.getName(), smartStatistics); // todo recordName Jeti
-				Reminder[] minMaxReminder = Guardian.defineMinMaxReminder(indexedVaults, itm, trailSelector, logLimit);
+				Reminder[] minMaxReminder = Guardian.defineMinMaxReminder(indexedVaults, itm, trailSelector, logLimit, Settings.getInstance());
 				if (minMaxReminder[0] != null) {
 					minMaxReminder[0] = minMaxReminder[0];
 					if (minMaxReminder[0].getReminderType().ordinal() > maxReminders[0].ordinal())
@@ -203,7 +205,7 @@ public final class FleetMonitor {
 	public List<ObjectSummary> defineOverview(String objectKey) {
 		List<ObjectSummary> summaries = new ArrayList<>();
 
-		ObjectVaultIndex objectVaultIndex = new ObjectVaultIndex(new String[] { objectKey });
+		ObjectVaultIndex objectVaultIndex = new ObjectVaultIndex(new String[] { objectKey }, Analyzer.getInstance().getDataAccess());
 		Map<String, IDevice> usedDevices = objectVaultIndex.selectExistingDevices(new String[] { objectKey });
 
 		DetailSelector detailSelector = DetailSelector.createDeviceNameFilter(usedDevices.keySet());
@@ -211,10 +213,15 @@ public final class FleetMonitor {
 		TreeMap<String, List<VaultKeyPair>> vaultKeys = objectVaultIndex.selectGroupedVaultKeys(objectKey, detailSelector, classifier);
 		for (Entry<String, List<VaultKeyPair>> e : vaultKeys.entrySet()) {
 			IDevice device = usedDevices.get(e.getKey());
-			EnumSet<DirectoryType> directoryTypes = DirectoryType.getValidDirectoryTypes(device);
-			VaultChecker checker = new VaultChecker(Analyzer.getInstance().clone(), directoryTypes, objectKey); // clone for thread safety
+			EnumSet<DirectoryType> directoryTypes = DirectoryType.getValidDirectoryTypes(device, Analyzer.getInstance().getSettings());
+			// todo + add object key to Analyzer
+			Analyzer analyzerClone = Analyzer.getInstance().clone();
+			VaultChecker checker = new VaultChecker(analyzerClone, directoryTypes); // clone for thread safety
 
-			List<HistoVault> allVaults = SimpleVaultReader.readVaults(e.getValue());
+			SourceFolders sourceFolders = new SourceFolders(analyzerClone);
+			sourceFolders.defineDirectories(s -> {
+			});
+			List<HistoVault> allVaults = new VaultReaderWriter(Analyzer.getInstance(), Optional.empty()).readVaults(e.getValue());
 			List<HistoVault> validVaults = new ArrayList<>();
 			for (HistoVault vault : allVaults) {
 				if (checker.isValidVault(vault)) validVaults.add(vault);

@@ -38,16 +38,24 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.io.Writer;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -64,6 +72,7 @@ import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.FileUtils;
+import gde.utils.OperatingSystemHelper;
 
 /**
  * Support the roaming data sources.
@@ -78,7 +87,7 @@ public abstract class DataAccess {
 
 	public final static class LocalAccess extends DataAccess {
 		@SuppressWarnings("hiding")
-		private static final Logger	log					= Logger.getLogger(LocalAccess.class.getName());
+		private static final Logger log = Logger.getLogger(LocalAccess.class.getName());
 
 		private LocalAccess() {
 		}
@@ -161,6 +170,12 @@ public abstract class DataAccess {
 		}
 
 		@Override
+		public boolean ensureExclusionDirectory() {
+			Path directoryPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_EXCLUSIONS_DIR_NAME);
+			return FileUtils.checkDirectoryAndCreate(directoryPath.toString());
+		}
+
+		@Override
 		public boolean existsExclusionFile(String fileName) {
 			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_EXCLUSIONS_DIR_NAME, fileName);
 			return targetFilePath.toFile().exists();
@@ -196,6 +211,12 @@ public abstract class DataAccess {
 		}
 
 		@Override
+		public boolean ensureInclusionDirectory() {
+			Path directoryPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_INCLUSIONS_DIR_NAME);
+			return FileUtils.checkDirectoryAndCreate(directoryPath.toString());
+		}
+
+		@Override
 		public boolean existsInclusionFile(String fileName) {
 			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_INCLUSIONS_DIR_NAME, fileName);
 			return targetFilePath.toFile().exists();
@@ -228,23 +249,56 @@ public abstract class DataAccess {
 		}
 
 		@Override
+		public String[] getCacheFolderList(String vaultDirectory, int minFileLength, boolean isZippedCache) {
+			Path cachePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, vaultDirectory);
+			if (!cachePath.toFile().exists()) return new String[0];
+
+			if (Settings.getInstance().isZippedCache()) {
+				List<String> vaultNames = new ArrayList<>();
+				try (ZipInputStream stream = dataAccess.getCacheZipInputStream(vaultDirectory)) {
+					ZipEntry entry;
+					while ((entry = stream.getNextEntry()) != null) {
+						if (entry.getSize() >= minFileLength) vaultNames.add(entry.getName());
+					}
+				} catch (Exception e) {
+					log.log(SEVERE, e.getMessage(), e);
+				}
+				return vaultNames.toArray(new String[vaultNames.size()]);
+			} else {
+				if (minFileLength <= 0) {
+					return cachePath.toFile().list();
+				} else {
+					List<String> vaultNames = new ArrayList<>();
+					try (DirectoryStream<Path> stream = Files.newDirectoryStream(cachePath)) {
+						for (Path path : stream) {
+							if (path.toFile().length() >= minFileLength) vaultNames.add(path.getFileName().toString());
+						}
+					} catch (Exception e) {
+						log.log(SEVERE, e.getMessage(), e);
+					}
+					return vaultNames.toArray(new String[vaultNames.size()]);
+				}
+			}
+		}
+
+		@Override
 		@Nullable
-		public HistoVault getVault(String folderName, String fileName) {
-			Path cachePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, folderName);
+		public HistoVault getCacheVault(String vaultDirectory, String vaultName, int minVaultLength, boolean isZippedCache) {
+			Path cachePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, vaultDirectory);
 			HistoVault histoVault = null;
 			if (Settings.getInstance().isZippedCache()) {
 				try (ZipFile zf = new ZipFile(cachePath.toFile())) {
-					if (zf.getEntry(fileName) != null && zf.getEntry(fileName).getSize() > MIN_VAULT_LENGTH) {
-						histoVault = VaultProxy.load(zf.getInputStream(zf.getEntry(fileName)));
+					if (zf.getEntry(vaultName) != null && zf.getEntry(vaultName).getSize() > minVaultLength) {
+						histoVault = VaultProxy.load(zf.getInputStream(zf.getEntry(vaultName)));
 					}
 				} catch (Exception e) {
 					log.log(SEVERE, e.getMessage(), e);
 				}
 			} else {
-				File file = cachePath.resolve(fileName).toFile();
-				if (file.length() > MIN_VAULT_LENGTH) {
+				File file = cachePath.resolve(vaultName).toFile();
+				if (file.length() > minVaultLength) {
 					try {
-						histoVault = VaultProxy.load(cachePath.resolve(file.getName()));
+						histoVault = VaultProxy.load(getCacheInputStream(vaultDirectory, file.getName()));
 					} catch (Exception e) {
 						log.log(SEVERE, e.getMessage(), e);
 					}
@@ -254,9 +308,24 @@ public abstract class DataAccess {
 		}
 
 		@Override
+		public String[] getDeviceFolderList() {
+			String xmlBasePath = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + GDE.FILE_SEPARATOR_UNIX;
+			File deviceFolder = new File(xmlBasePath);
+			if (!deviceFolder.exists()) {
+				return new String[0];
+			} else {
+				return deviceFolder.list();
+			}
+		}
+
+		@Override
 		public boolean existsDeviceXml(Path fileSubPath) {
 			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH).resolve(fileSubPath);
 			return targetFilePath.toFile().exists();
+		}
+
+		public boolean existsDeviceXml(String xmlFilePath) {
+			return new File(xmlFilePath).exists();
 		}
 
 		@Override
@@ -272,6 +341,32 @@ public abstract class DataAccess {
 			return new FileInputStream(targetFilePath.toFile());
 		}
 
+		@Nullable
+		public InputStream getDeviceXmlInputStream(String xmlFilePath) {
+			try {
+				return new FileInputStream(xmlFilePath);
+			} catch (FileNotFoundException e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+				return null;
+			}
+		}
+
+		@Override
+		public OutputStream getDeviceXmlOutputStream(Path fileSubPath) throws FileNotFoundException {
+			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH).resolve(fileSubPath);
+			return new FileOutputStream(targetFilePath.toFile());
+		}
+
+		@Nullable
+		public FileOutputStream getDeviceXmlOutputStream(String xmlFilePath) {
+			try {
+				return new FileOutputStream(xmlFilePath);
+			} catch (FileNotFoundException e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+				return null;
+			}
+		}
+
 		public InputStream getDeviceXsdMigrationStream(int versionNumber) throws FileNotFoundException {
 			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
 			Path targetFilePath = migratePropertyPath.resolve("/DeviceProperties_V" + versionNumber + GDE.FILE_ENDING_DOT_XSD);
@@ -283,9 +378,11 @@ public abstract class DataAccess {
 			return migratePropertyPath.toFile().exists();
 		}
 
-		public List<File> getDeviceXmls(int versionNumber) throws FileNotFoundException {
-			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
-			return FileUtils.getFileListing(migratePropertyPath.toFile(), 1, GDE.FILE_ENDING_DOT_XML);
+		public List<Path> getDeviceXmlSubPaths(int versionNumber) throws FileNotFoundException {
+			String folderName = Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber;
+			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + folderName);
+			List<File> fileList = FileUtils.getFileListing(migratePropertyPath.toFile(), 1, GDE.FILE_ENDING_DOT_XML);
+			return fileList.stream().map(f -> f.getName()).map(s -> Paths.get(folderName, s)).collect(Collectors.toList());
 		}
 
 		@Override
@@ -369,15 +466,58 @@ public abstract class DataAccess {
 		}
 
 		@Override
+		public boolean ensureCacheDirectory(String directoryName) {
+			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, directoryName);
+			return FileUtils.checkDirectoryAndCreate(cacheDirectoryPath.toString());
+		}
+
+		@Override
+		public boolean existsCacheVault(String directoryName, String fileName) {
+			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, directoryName);
+			return FileUtils.checkFileExist(cacheDirectoryPath.resolve(fileName).toString());
+		}
+
+		@Override
+		public long getCacheSize() {
+			Path cachePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
+			return FileUtils.size(cachePath);
+		}
+
+		@Override
 		public InputStream getCacheXsdInputStream() throws FileNotFoundException {
 			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, Settings.HISTO_CACHE_ENTRIES_XSD_NAME);
 			return new FileInputStream(targetFilePath.toFile());
 		}
 
 		@Override
+		public InputStream getCacheInputStream(String directoryName, String fileName) throws IOException {
+			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, directoryName);
+			return Files.newInputStream(cacheDirectoryPath.resolve(fileName), StandardOpenOption.CREATE_NEW);
+		}
+
+		@Override
 		public ZipInputStream getCacheZipInputStream(String directoryName) throws ZipException, IOException {
 			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, directoryName);
 			return new ZipInputStream(new FileInputStream(cacheDirectoryPath.toFile()));
+		}
+
+		@Override
+		public FileSystem getCacheZipFileSystem(String directoryName) throws IOException {
+			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, directoryName);
+			Map<String, String> env = new HashMap<String, String>();
+			env.put("create", "true");
+			return FileSystems.newFileSystem(URI.create("jar:" + cacheDirectoryPath.toUri()), env);
+		}
+
+		@Override
+		public OutputStream getCacheZipOutputStream(FileSystem fileSystem, String fileName) throws IOException {
+			return Files.newOutputStream(fileSystem.getPath(fileName), StandardOpenOption.CREATE_NEW);
+		}
+
+		@Override
+		public OutputStream getCacheOutputStream(String directoryName, String fileName) throws IOException {
+			Path cacheDirectoryPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, directoryName);
+			return Files.newOutputStream(cacheDirectoryPath.resolve(fileName), StandardOpenOption.CREATE_NEW);
 		}
 
 		@Override
@@ -399,6 +539,16 @@ public abstract class DataAccess {
 		}
 
 		@Override
+		public long getSourceLastModified(Path fittedFilePath) {
+			return fittedFilePath.toFile().lastModified();
+		}
+
+		@Override
+		public long getSourceLength(Path fittedFilePath) {
+			return fittedFilePath.toFile().length();
+		}
+
+		@Override
 		@Nullable
 		public InputStream getSourceInputStream(Path fittedFilePath) {
 			try {
@@ -406,6 +556,40 @@ public abstract class DataAccess {
 			} catch (FileNotFoundException e) {
 				throw new IllegalArgumentException("invalid path " + fittedFilePath);
 			}
+		}
+
+		public String[] getSourceFolderList(Path fittedFolderPath) {
+			File sourceFolder = fittedFolderPath.toFile();
+			if (!sourceFolder.exists()) {
+				return new String[0];
+			} else {
+				return sourceFolder.list();
+			}
+		}
+
+		@Override
+		@Nullable
+		public Path getActualSourceFile(Path fittedFilePath) {
+			long startMillis = System.currentTimeMillis();
+			File tmpActualFile = null;
+			try {
+				tmpActualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(fittedFilePath.toString()));
+				// getLinkContainedFilePath may have long response times in case of an unavailable network resources
+				// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
+				log.log(Level.FINER, "time_ms=", System.currentTimeMillis() - startMillis);
+				if (!fittedFilePath.toFile().exists()) throw new IllegalArgumentException("source file does not exist");
+
+				if (Files.isSameFile(fittedFilePath, tmpActualFile.toPath()) && (System.currentTimeMillis() - startMillis > 555)) {
+					log.log(Level.WARNING, "Dead OSD link " + fittedFilePath + " pointing to ", tmpActualFile);
+					if (!fittedFilePath.toFile().delete()) {
+						log.log(Level.WARNING, "could not delete link file ", fittedFilePath);
+					}
+					tmpActualFile = null;
+				}
+			} catch (Exception e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+			}
+			return tmpActualFile != null ? tmpActualFile.toPath() : null;
 		}
 
 		@Override
@@ -503,6 +687,12 @@ public abstract class DataAccess {
 	public abstract Reader getSettingsReader();
 
 	/**
+	 * Check if folder exists and create if required.
+	 * @return false if the directory did not exist
+	 */
+	public abstract boolean ensureInclusionDirectory();
+
+	/**
 	 * @param fileName to retrieve the object template from the standard directory
 	 * @return the outputStream for an exclusions file
 	 */
@@ -524,6 +714,12 @@ public abstract class DataAccess {
 	 * @param fileName of the inclusions file in the standard directory
 	 */
 	public abstract void deleteInclusionFile(String fileName);
+
+	/**
+	 * Check if folder exists and create if required.
+	 * @return false if the directory did not exist
+	 */
+	public abstract boolean ensureExclusionDirectory();
 
 	/**
 	 * @param fileName to retrieve the object template from the standard directory
@@ -549,10 +745,9 @@ public abstract class DataAccess {
 	public abstract void deleteExclusionFile(String fileName);
 
 	/**
-	 * @return the vault retrieved from the file system if it exceeds the minimum file size
+	 * @return an array with all device roaming folder entries
 	 */
-	@Nullable
-	public abstract HistoVault getVault(String folderName, String fileName);
+	public abstract String[] getDeviceFolderList();
 
 	/**
 	 * @param fileSubPath is a relative path based on the roaming folder
@@ -568,6 +763,12 @@ public abstract class DataAccess {
 	 */
 	public abstract InputStream getDeviceXmlInputStream(Path fileSubPath) throws FileNotFoundException;
 
+	/**
+	 * @param fileSubPath is a relative path based on the roaming folder
+	 * @return the inputStream for a device properties file
+	 */
+	public abstract OutputStream getDeviceXmlOutputStream(Path fileSubPath) throws FileNotFoundException;
+
 	public abstract InputStream getGeoCodeInputStream(String geoFileName) throws FileNotFoundException;
 
 	public abstract boolean existsGeoCodeFile(String geoFileName);
@@ -578,9 +779,57 @@ public abstract class DataAccess {
 
 	public abstract boolean existsCacheDirectory(String directoryName);
 
+	/**
+	 * Check if folder exists and create if required.
+	 * @param directoryName is the folder name
+	 * @return false if the directory did not exist
+	 */
+	public abstract boolean ensureCacheDirectory(String directoryName);
+
+	public abstract boolean existsCacheVault(String directoryName, String fileName);
+
+	/**
+	 * @return the size of the cache in bytes
+	 */
+	public abstract long getCacheSize();
+
 	public abstract InputStream getCacheXsdInputStream() throws FileNotFoundException;
 
 	public abstract ZipInputStream getCacheZipInputStream(String directoryName) throws ZipException, IOException;
+
+	/**
+	 * @param directoryName is the zip file name (i.e. the file holding the extension zip)
+	 * @return the zip file system
+	 */
+	public abstract FileSystem getCacheZipFileSystem(String directoryName) throws IOException;
+
+	/**
+	 * @param fileSystem is the zip file system based on the zip file
+	 * @param fileName is the name of the file to be created in the zip file system
+	 * @return an output stream for writing the file into the zip file
+	 */
+	public abstract OutputStream getCacheZipOutputStream(FileSystem fileSystem, String fileName) throws IOException;
+
+	public abstract OutputStream getCacheOutputStream(String directoryName, String fileName) throws IOException;
+
+	public abstract InputStream getCacheInputStream(String directoryName, String fileName) throws IOException;
+
+	/**
+	 * @param vaultDirectory is the folderName or zipFile name
+	 * @param minVaultLength is the lower limit of uncompressed bytes
+	 * @param isZippedCache true takes the {@code vaultDirectory} as a zip file
+	 * @return the file names without any order
+	 */
+	public abstract String[] getCacheFolderList(String vaultDirectory, int minVaultLength, boolean isZippedCache);
+
+	/**
+	 * @param vaultDirectory is the folderName or zipFile name
+	 * @param minVaultLength is the lower limit of uncompressed bytes
+	 * @param isZippedCache TODO
+	 * @return the vault retrieved from the file system if it exceeds the minimum file size
+	 */
+	@Nullable
+	public abstract HistoVault getCacheVault(String vaultDirectory, String vaultName, int minVaultLength, boolean isZippedCache);
 
 	public abstract InputStream getMappingInputStream(String fileName) throws FileNotFoundException;
 
@@ -588,9 +837,28 @@ public abstract class DataAccess {
 
 	/**
 	 * @param fittedFilePath is a customized path (full path for local file system access or relative path for other data sources)
+	 * @return the lastModified timestamp
+	 */
+	public abstract long getSourceLastModified(Path fittedFilePath);
+
+	/**
+	 * @param fittedFilePath is a customized path (full path for local file system access or relative path for other data sources)
+	 * @return the uncompressed length in bytes
+	 */
+	public abstract long getSourceLength(Path fittedFilePath);
+
+	/**
+	 * @param fittedFilePath is a customized path (full path for local file system access or relative path for other data sources)
 	 * @return the input stream for a logging source file (osd, bin , ...)
 	 */
 	public abstract InputStream getSourceInputStream(Path fittedFilePath);
+
+	/**
+	 * @param fittedFilePath is a customized path (full path for local file system access or relative path for other data sources).
+	 *          Points to a source log file or a link file.
+	 * @return the path pointing to the link target or the same path in case of a source log file or null if the {@code sourcePath} link is dead
+	 */
+	public abstract Path getActualSourceFile(Path fittedFilePath);
 
 	/**
 	 * @param fileSubPath is a relative path based on the roaming folder

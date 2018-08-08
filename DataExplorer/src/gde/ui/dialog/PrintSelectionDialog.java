@@ -187,7 +187,7 @@ public class PrintSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						PrintSelectionDialog.this.objectButton.setEnabled(isObjectOriented);
 						PrintSelectionDialog.this.objectButton.setSelection(isObjectOriented); // ET unclear why this line was set on comment
 
-						boolean isCopareWindowPrintable = PrintSelectionDialog.this.application.getCompareSet().size() > 0;
+						boolean isCopareWindowPrintable = PrintSelectionDialog.this.application.isWithCompareSet();
 						PrintSelectionDialog.this.curveCompareButton.setEnabled(isCopareWindowPrintable);
 						PrintSelectionDialog.this.curveCompareButton.setSelection(isCopareWindowPrintable); // ET unclear why this line was set on comment
 

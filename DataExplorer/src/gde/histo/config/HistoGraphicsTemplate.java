@@ -14,8 +14,23 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
+		Copyright 2017 Google Inc. (Guava Cache)
     Copyright (c) 2016,2017,2018 Thomas Eickert
 ****************************************************************************************/
+/*
+ * Copyright (C) 2017 The Guava Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package gde.histo.config;
 
 import static java.util.logging.Level.FINE;
@@ -38,7 +53,6 @@ import java.util.Properties;
 import com.sun.istack.internal.Nullable;
 
 import gde.Analyzer;
-import gde.DataAccess;
 import gde.DataAccess.LocalAccess;
 import gde.GDE;
 import gde.config.Settings;
@@ -120,20 +134,16 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		 * @return the converted histo graphics template
 		 */
 		HistoGraphicsTemplate convertToHistoTemplate() throws FileNotFoundException, IOException {
-			try (InputStream stream = DataAccess.getInstance().getGraphicsTemplateInputStream(legacyFileSubPath)) {
+			try (InputStream stream = convertedTemplate.analyzer.getDataAccess().getGraphicsTemplateInputStream(legacyFileSubPath)) {
 				loadFromXML(stream);
 			}
 
 			DeviceConfiguration configuration = convertedTemplate.analyzer.getDeviceConfigurations().get(convertedTemplate.analyzer.getActiveDevice().getName()); // ok
 			List<MeasurementType> channelMeasurements = configuration.getChannelMeasuremts(convertedTemplate.analyzer.getActiveChannel().getNumber());
-			try {
-				for (Map.Entry<Object, Object> entry : entrySet()) {
-					convertedTemplate.setProperty(getPrefixedName((String) entry.getKey(), channelMeasurements), (String) entry.getValue());
-				}
-			} catch (Exception e) {
-				log.log(SEVERE, e.getMessage(), e);
+			for (Map.Entry<Object, Object> entry : entrySet()) {
+				convertedTemplate.setProperty(getPrefixedName((String) entry.getKey(), channelMeasurements), (String) entry.getValue());
 			}
-			convertedTemplate.setCommentSuffix(legacyFileSubPath.getFileName().toString() + " " + Instant.ofEpochMilli(DataAccess.getInstance().getGraphicsTemplateLastModified(legacyFileSubPath)));
+			convertedTemplate.setCommentSuffix(legacyFileSubPath.getFileName().toString() + " " + Instant.ofEpochMilli(convertedTemplate.analyzer.getDataAccess().getGraphicsTemplateLastModified(legacyFileSubPath)));
 			return convertedTemplate;
 		}
 
@@ -164,7 +174,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		}
 
 		@Override
-		public synchronized String toString() {
+		public String toString() {
 			return "DefaultGraphicsTemplate [legacyFileSubPath=" + this.legacyFileSubPath + "]";
 		}
 	}
@@ -192,7 +202,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	 * Fall back to a pure device template if not available.
 	 * @return an instance which conforms to the settings and the parameters
 	 */
-	public static HistoGraphicsTemplate createReadonlyTemplate(Analyzer analyzer) {
+	public static HistoGraphicsTemplate createTransitoryTemplate(Analyzer analyzer) {
 		boolean tmpSuppressNewFile = true;
 		Settings settings = analyzer.getSettings();
 		if (!settings.getActiveObjectKey().isEmpty() && settings.isObjectTemplatesActive()) {
@@ -258,12 +268,12 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		} catch (Exception e) {
 			fileSubPath = null;
 		}
-		if (fileSubPath != null && fileSubPath.getNameCount() > 0 && fileSubPath.getParent().equals(getTargetFileSubPath().getParent())) {
+		if (fileSubPath != null && fileSubPath.getNameCount() > 1 && fileSubPath.getParent().equals(getTargetFileSubPath().getParent())) {
 			setHistoFileName(filePath.getFileName().toString());
 			load();
 		} else {
 			// might result in template entries which are not usable (this rubbish remains even if the file is saved)
-			try (InputStream stream = ((LocalAccess) DataAccess.getInstance()).getAlienTemplateInputStream(filePath.toFile())) {
+			try (InputStream stream = ((LocalAccess) analyzer.getDataAccess()).getAlienTemplateInputStream(filePath.toFile())) {
 				currentFilePathFragment = null;
 				clear();
 				this.loadFromXML(stream);
@@ -288,7 +298,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		try {
 			currentFilePathFragment = null;
 			Path fileSubPath = getTargetFileSubPath();
-			if (!DataAccess.getInstance().existsGraphicsTemplate(fileSubPath)) {
+			if (!analyzer.getDataAccess().existsGraphicsTemplate(fileSubPath)) {
 				if (this.suppressNewFile) {
 					fileSubPath = Paths.get(defaultFileName);
 
@@ -331,7 +341,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		String fileName = SecureHash.sha1(fileSubPath.toString());
 		Properties cachedInstance = memoryCache.getIfPresent(fileName);
 		if (cachedInstance == null) {
-			try (InputStream stream = DataAccess.getInstance().getGraphicsTemplateInputStream(fileSubPath)) {
+			try (InputStream stream = analyzer.getDataAccess().getGraphicsTemplateInputStream(fileSubPath)) {
 				this.loadFromXML(stream);
 				memoryCache.put(fileName, this);
 				log.log(FINE, "template file successful loaded ", fileSubPath);
@@ -353,7 +363,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	protected void store(String propertiesComment) {
 		try {
 			currentFilePathFragment = null;
-			try (OutputStream stream = DataAccess.getInstance().getGraphicsTemplateOutputStream(getTargetFileSubPath())) {
+			try (OutputStream stream = analyzer.getDataAccess().getGraphicsTemplateOutputStream(getTargetFileSubPath())) {
 				this.storeToXML(stream, propertiesComment);
 				String fileName = SecureHash.sha1(getTargetFileSubPath().toString());
 				memoryCache.put(fileName, this);
@@ -430,12 +440,12 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	 * @return the previous value of the specified key in this property list
 	 */
 	@Nullable // if there was no previous value
-	public synchronized String setRecordProperty(String recordName, String keyPostfix, String value) {
+	public String setRecordProperty(String recordName, String keyPostfix, String value) {
 		return (String) super.setProperty(recordName + GDE.STRING_UNDER_BAR + keyPostfix, value);
 	}
 
 	@Override
-	public synchronized String toString() {
+	public String toString() {
 		return "HistoGraphicsTemplate [defaultHistoFileName=" + this.defaultHistoFileName + ", defaultFileName=" + this.defaultFileName + ", histoFileName=" + this.histoFileName + ", commentSuffix=" + this.commentSuffix + "]";
 	}
 

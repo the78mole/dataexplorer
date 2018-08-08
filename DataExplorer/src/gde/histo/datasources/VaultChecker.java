@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +51,7 @@ public final class VaultChecker {
 	 * Holds the selection criteria for trusses (vault skeletons) or vaults.
 	 */
 	public static final class TrussCriteria {
-		final List<Integer>	channelMixConfigNumbers;
+		final List<Integer>	channelConfigNumbers;
 		final long					minStartTimeStamp_ms;
 		final String				activeObjectKey;
 		final boolean				ignoreLogObjectKey;
@@ -61,7 +62,9 @@ public final class VaultChecker {
 		}
 
 		private TrussCriteria(Analyzer analyzer) {
-			channelMixConfigNumbers = analyzer.getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers(analyzer.getActiveChannel().getNumber());
+			channelConfigNumbers = analyzer.getSettings().isChannelMix() //
+					? analyzer.getActiveDevice().getDeviceConfiguration().getChannelMixConfigNumbers(analyzer.getActiveChannel().getNumber()) //
+					: Collections.singletonList(analyzer.getActiveChannel().getNumber());
 			minStartTimeStamp_ms = LocalDate.now().minusMonths(analyzer.getSettings().getRetrospectMonths()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 			activeObjectKey = analyzer.getSettings().getActiveObjectKey();
 			ignoreLogObjectKey = analyzer.getSettings().getIgnoreLogObjectKey();
@@ -70,7 +73,7 @@ public final class VaultChecker {
 
 		@Override
 		public String toString() {
-			return "TrussCriteria [channelMixConfigNumbers=" + this.channelMixConfigNumbers + ", minStartTimeStamp_ms=" + this.minStartTimeStamp_ms + ", filesWithOtherObject=" + this.ignoreLogObjectKey + ", realObjectKeys=" + this.realObjectKeys + "]";
+			return "TrussCriteria [channelConfigNumbers=" + this.channelConfigNumbers + ", minStartTimeStamp_ms=" + this.minStartTimeStamp_ms + ", filesWithOtherObject=" + this.ignoreLogObjectKey + ", realObjectKeys=" + this.realObjectKeys + "]";
 		}
 	}
 
@@ -83,7 +86,7 @@ public final class VaultChecker {
 			return false;
 		}
 		for (DirectoryType directoryType : directoryTypes) {
-			if (directoryType.getDataSetExtensions(analyzer.getActiveDevice()).contains(PathUtils.getFileExtension(logFilePath.getFileName().toString()))) {
+			if (directoryType.getDataSetExtensions(analyzer.getActiveDevice(), analyzer.getSettings()).contains(PathUtils.getFileExtension(logFilePath.getFileName().toString()))) {
 				return true;
 			}
 		}
@@ -145,7 +148,7 @@ public final class VaultChecker {
 					: String.format("no match device  %s", vault.getLogFilePath()));
 			return false;
 		}
-		if (!trussCriteria.channelMixConfigNumbers.contains(vault.getLogChannelNumber())) {
+		if (!trussCriteria.channelConfigNumbers.contains(vault.getLogChannelNumber())) {
 			log.log(Level.INFO, vault instanceof ExtendedVault //
 					? String.format("no match channel%2d%,7d kiB %s", vault.getLogChannelNumber(), ((ExtendedVault) vault).getLoadFileAsPath().toFile().length() / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
 					: String.format("no match channel  %s", vault.getLogFilePath()));
@@ -199,19 +202,17 @@ public final class VaultChecker {
 	private final Analyzer								analyzer;
 	private final TrussCriteria trussCriteria;
 	private final EnumSet<DirectoryType>	validDirectoryTypes;
-	private final String									objectKey;
 	private final SourceFolders						sourceFolders;
 
 	/**
 	 * @param directoryTypes may hold the import directory type as well
 	 */
-	public VaultChecker(Analyzer analyzer, EnumSet<DirectoryType> directoryTypes, String objectKey) {
+	public VaultChecker(Analyzer analyzer, EnumSet<DirectoryType> directoryTypes) {
 		this.analyzer = analyzer;
 		this.trussCriteria = TrussCriteria.createTrussCriteria(analyzer); // todo redundant to analyzer
 		this.validDirectoryTypes = directoryTypes;
-		this.objectKey = objectKey;
-		this.sourceFolders = new SourceFolders(objectKey);
-		this.sourceFolders.defineDirectories(analyzer.getActiveDevice(), false);
+		this.sourceFolders = new SourceFolders(analyzer);
+		this.sourceFolders.defineDirectories(s -> {});
 	}
 
 	/**

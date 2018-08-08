@@ -39,19 +39,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 
 import gde.Analyzer;
+import gde.DataAccess;
 import gde.GDE;
 import gde.config.DeviceConfigurations;
 import gde.config.Settings;
 import gde.device.IDevice;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.HistoVault;
-import gde.histo.cache.SimpleVaultReader;
+import gde.histo.cache.VaultReaderWriter;
 import gde.histo.device.IHistoDevice;
 import gde.histo.exclusions.ExclusionData;
 import gde.log.Level;
@@ -148,6 +150,7 @@ public final class ObjectVaultIndex {
 		@SuppressWarnings("hiding")
 		private static final Logger							log									= Logger.getLogger(ObjectVaultMap.class.getName());
 
+		private final DataAccess								dataAccess;
 		/**
 		 * Key is the objectKey, the list holds the vault index attributes.
 		 */
@@ -161,7 +164,8 @@ public final class ObjectVaultIndex {
 		/**
 		 * Use this for retrieving the full index from the vault index entries.
 		 */
-		public ObjectVaultMap() {
+		public ObjectVaultMap(DataAccess dataAccess) {
+			this.dataAccess = dataAccess;
 			this.indexMap = loadIndex(s -> true);
 		}
 
@@ -169,7 +173,8 @@ public final class ObjectVaultIndex {
 		 * Use this for retrieving a partial index to reduce vault index access.
 		 * @param objectKeys specifies the user's object key selection
 		 */
-		public ObjectVaultMap(String[] objectKeys) {
+		public ObjectVaultMap(String[] objectKeys, DataAccess dataAccess) {
+			this.dataAccess = dataAccess;
 			List<String> keys = Arrays.asList(objectKeys);
 			this.indexMap = loadIndex(s -> keys.contains(s));
 		}
@@ -247,7 +252,7 @@ public final class ObjectVaultIndex {
 		public Set<ObjectVaultIndexEntry> selectVaultIndexes(String objectKey, DetailSelector detailSelector) {
 			Set<ObjectVaultIndexEntry> indices = new HashSet<>();
 			Path activeFolder = Paths.get(Settings.getInstance().getDataFilePath()).resolve(objectKey);
-			ExclusionData exclusionData = new ExclusionData(activeFolder);
+			ExclusionData exclusionData = new ExclusionData(activeFolder, dataAccess);
 			boolean isSuppressMode = Settings.getInstance().isSuppressMode();
 			for (Entry<String, List<String>> e : indexMap.entrySet()) {
 				if (!objectKey.equals(e.getKey())) continue;
@@ -270,7 +275,7 @@ public final class ObjectVaultIndex {
 			Path dataFilePath = Paths.get(Settings.getInstance().getDataFilePath());
 			Function<ObjectVaultIndexEntry, Boolean> isExcludedSelector = idx -> {
 				Path activeFolder = dataFilePath.resolve(idx.vaultObjectKey);
-				ExclusionData exclusionData = new ExclusionData(activeFolder);
+				ExclusionData exclusionData = new ExclusionData(activeFolder, dataAccess);
 				return exclusionData.isExcluded(idx.getLogFileName());
 			};
 
@@ -412,21 +417,16 @@ public final class ObjectVaultIndex {
 	 */
 	private static List<String> defineCacheDirectoryNames(String deviceName) {
 		List<String> cacheDirectoryNames = new ArrayList<>();
-		try {
-			IDevice device = Analyzer.getInstance().getDeviceConfigurations().get(deviceName).getAsDevice();
+		IDevice device = Analyzer.getInstance().getDeviceConfigurations().get(deviceName).getAsDevice();
+		List<String> validReaderSettings = new ArrayList<>();
+		validReaderSettings.add(GDE.STRING_EMPTY);
+		if (device instanceof IHistoDevice) validReaderSettings.add(((IHistoDevice) device).getReaderSettingsCsv());
 
-			List<String> validReaderSettings = new ArrayList<>();
-			validReaderSettings.add(GDE.STRING_EMPTY);
-			if (device instanceof IHistoDevice) validReaderSettings.add(((IHistoDevice) device).getReaderSettingsCsv());
-
-			for (String vaultReaderSettings : validReaderSettings) {
-				for (int j = 1; j <= device.getChannelCount(); j++) {
-					String directoryName = ExtendedVault.getVaultsDirectoryName(Analyzer.getInstance(), j, vaultReaderSettings);
-					cacheDirectoryNames.add(directoryName);
-				}
+		for (String vaultReaderSettings : validReaderSettings) {
+			for (int j = 1; j <= device.getChannelCount(); j++) {
+				String directoryName = ExtendedVault.getVaultDirectoryName(Analyzer.getInstance(), j, vaultReaderSettings);
+				cacheDirectoryNames.add(directoryName);
 			}
-		} catch (Exception e) {
-			log.log(Level.SEVERE, "device instance exception", e);
 		}
 		log.off(() -> "Cache directory      size=" + cacheDirectoryNames.size() + " for device " + deviceName);
 		return cacheDirectoryNames;
@@ -455,7 +455,7 @@ public final class ObjectVaultIndex {
 			Analyzer analyzer = Analyzer.getInstance();
 			for (String directoryName : cacheDirectoryNames) {
 				if (analyzer.getDataAccess().existsCacheDirectory(directoryName)) {
-					List<Entry<String, String>> vaultIndices = SimpleVaultReader.readVaultsIndices(directoryName, analyzer.getSettings().isZippedCache());
+					List<Entry<String, String>> vaultIndices = new VaultReaderWriter(analyzer, Optional.empty()).readVaultsIndices(directoryName);
 					for (Entry<String, String> e : vaultIndices) {
 						String objectKey = e.getKey().isEmpty() ? "leer" : e.getKey(); // todo replace leer
 						if (objectKeyMap.get(objectKey) == null) {
@@ -474,21 +474,24 @@ public final class ObjectVaultIndex {
 		return objectKeyMap;
 	}
 
-	private final ObjectVaultMap objectVaultMap;
+	private final ObjectVaultMap	objectVaultMap;
+	private final DataAccess			dataAccess;
 
 	/**
 	 * Use this for full index access.
 	 */
-	public ObjectVaultIndex() {
-		objectVaultMap = new ObjectVaultMap();
+	public ObjectVaultIndex(DataAccess dataAccess) {
+		this.dataAccess = dataAccess;
+		this.objectVaultMap = new ObjectVaultMap(dataAccess);
 		log.log(Level.OFF, "vault key index loaded");
 	}
 
 	/**
 	 * @param objectKeys for selecting a vault index subset which is used for all methods
 	 */
-	public ObjectVaultIndex(String[] objectKeys) {
-		objectVaultMap = new ObjectVaultMap(objectKeys);
+	public ObjectVaultIndex(String[] objectKeys, DataAccess dataAccess) {
+		this.dataAccess = dataAccess;
+		this.objectVaultMap = new ObjectVaultMap(objectKeys, dataAccess);
 		log.log(Level.OFF, "vault key index loaded for", objectKeys);
 	}
 

@@ -21,7 +21,6 @@ package gde.histo.cache;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBException;
@@ -45,8 +44,8 @@ public final class VaultProxy {
 	private static Marshaller		jaxbMarshaller		= null;
 
 	{
-		try {
-			StreamSource xsdStreamSource = new StreamSource(DataAccess.getInstance().getCacheXsdInputStream());
+		try (InputStream inputStream = DataAccess.getInstance().getCacheXsdInputStream()) { // ok
+			StreamSource xsdStreamSource = new StreamSource(inputStream);
 			vaultSchema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(xsdStreamSource);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -85,15 +84,6 @@ public final class VaultProxy {
 	}
 
 	/**
-	 * @param fullQualifiedFileName is the vault path
-	 * @return the vault
-	 * @throws JAXBException
-	 */
-	public static HistoVault load(Path fullQualifiedFileName) throws JAXBException {
-		return (HistoVault) getUnmarshaller().unmarshal(fullQualifiedFileName.toFile());
-	}
-
-	/**
 	 * @param inputStream is a stream to the source path
 	 * @return the vault
 	 * @throws JAXBException
@@ -104,11 +94,11 @@ public final class VaultProxy {
 
 	/**
 	 * @param newVault is the vault to be stored
-	 * @param fullQualifiedFileName is the vault path
+	 * @param outputStream is a stream to the target path
 	 * @throws JAXBException
 	 */
-	public static void store(HistoVault newVault, Path fullQualifiedFileName) throws JAXBException {
-		getMarshaller().marshal(newVault, fullQualifiedFileName.toFile());
+	public static void store(HistoVault newVault, OutputStream outputStream) throws JAXBException {
+		getMarshaller().marshal(newVault, outputStream);
 	}
 
 	/**
@@ -116,8 +106,10 @@ public final class VaultProxy {
 	 * @param outputStream is a stream to the target path
 	 * @throws JAXBException
 	 */
-	public static void store(HistoVault newVault, OutputStream outputStream) throws JAXBException {
-		getMarshaller().marshal(newVault, outputStream);
+	public static void threadSafeStore(HistoVault newVault, OutputStream outputStream) throws JAXBException {
+		Marshaller marshaller = HistoVault.getJaxbContext().createMarshaller();
+		marshaller.setSchema(vaultSchema);
+		marshaller.marshal(newVault, outputStream);
 	}
 
 	/**

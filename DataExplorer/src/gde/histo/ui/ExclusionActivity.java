@@ -22,6 +22,7 @@ package gde.histo.ui;
 import java.nio.file.Path;
 import java.util.List;
 
+import gde.Analyzer;
 import gde.histo.datasources.DirectoryScanner;
 import gde.histo.exclusions.ExclusionData;
 import gde.ui.DataExplorer;
@@ -40,7 +41,7 @@ public final class ExclusionActivity {
 	public static void clearExcludeLists() {
 		if (!DataExplorer.getInstance().getHistoExplorer().isPresent()) throw new UnsupportedOperationException();
 
-		ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder4Ui());
+		ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder4Ui(), Analyzer.getInstance().getDataAccess());
 		exclusionData.delete();
 	}
 
@@ -49,7 +50,7 @@ public final class ExclusionActivity {
 	 * @param recordsetBaseName empty string sets ignore to the file in total
 	 */
 	public static void setExcludeRecordSet(Path filePath, String recordsetBaseName) {
-		ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder4Ui());
+		ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder4Ui(), Analyzer.getInstance().getDataAccess());
 		if (recordsetBaseName.isEmpty())
 			exclusionData.setProperty((filePath.getFileName().toString()));
 		else
@@ -62,7 +63,7 @@ public final class ExclusionActivity {
 	 * @return the exclusion information for the trusses excluded from the history
 	 */
 	public static String[] getExcludedTrusses() {
-		ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder4Ui());
+		ExclusionData exclusionData = new ExclusionData(DirectoryScanner.getActiveFolder4Ui(), Analyzer.getInstance().getDataAccess());
 		List<Path> excludedPaths = DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getExcludedPaths();
 		return exclusionData.getExcludedTrusses(excludedPaths);
 	}

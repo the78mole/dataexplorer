@@ -524,7 +524,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 	 */
 	private static RecordSet constructRecordSet(DataInputStream data_in, RecordSetParser osdRecordSet, ExtendedVault truss, Analyzer analyzer) throws IOException,
 			DataInconsitsentException {
-		RecordSet histoRecordSet = buildRecordSet(truss.getLogRecordsetBaseName(), truss.getLogChannelNumber(), osdRecordSet.recordSetInfo, false, analyzer.getActiveDevice());
+		RecordSet histoRecordSet = buildRecordSet(truss.getLogRecordsetBaseName(), truss.getLogChannelNumber(), osdRecordSet.recordSetInfo, false, analyzer);
 
 		{// setDeserializedProperties does not take all possible solutions to set the timestamp
 			long enhancedStartTimestamp_ms = osdRecordSet.getEnhancedStartTimestamp_ms();

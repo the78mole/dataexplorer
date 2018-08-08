@@ -42,7 +42,6 @@ import gde.Analyzer;
 import gde.GDE;
 import gde.TestAnalyzer;
 import gde.config.Settings;
-import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -170,6 +169,8 @@ public class TestSuperClass extends TestCase {
 	 * @throws FileNotFoundException
 	 */
 	public void initialize() throws FileNotFoundException {
+		this.analyzer.setChannels(this.channels);
+
 		this.settings.setPartialDataTable(false);
 		this.settings.setTimeFormat("relativ");
 
@@ -197,7 +198,7 @@ public class TestSuperClass extends TestCase {
 		this.settings.setSamplingTimespan_ms("2"); // this index corresponds to 1 sec
 		this.settings.setIgnoreLogObjectKey(true);
 		this.settings.setRetrospectMonths("120"); // this is the current maximum value
-//	this.settings.setZippedCache(false); // keep the users setting in order not to delete any user cache entries
+// this.settings.setZippedCache(false); // keep the users setting in order not to delete any user cache entries
 		this.settings.setAbsoluteTransitionLevel("999"); // results in default value
 		this.settings.setAbsoluteTransitionLevel("999"); // results in default value
 		this.settings.setSuppressMode(false);
@@ -229,47 +230,19 @@ public class TestSuperClass extends TestCase {
 	 * copied and modified from DeviceSelectionDialog.setupDataChannels();
 	 *
 	 * @param activeDevice
-	 *            (IDevice is the abstract type)
+	 *          (IDevice is the abstract type)
 	 */
 	protected void setupDataChannels(IDevice activeDevice) {
-		// cleanup existing channels and record sets
-		this.channels.cleanup();
-
-		if (activeDevice != null) {
-			String[] channelNames = new String[activeDevice.getChannelCount()];
-			// buildup new structure - set up the channels
-			for (int i = 1; i <= activeDevice.getChannelCount(); i++) {
-				Channel newChannel = new Channel(activeDevice.getChannelNameReplacement(i), activeDevice.getChannelTypes(i));
-				newChannel.setObjectKey(this.application.getObjectKey());
-				this.channels.put(Integer.valueOf(i), newChannel);
-				channelNames[i - 1] = i + " : " + activeDevice.getChannelNameReplacement(i);
-			}
-			this.channels.setChannelNames(channelNames);
+		if (activeDevice == null) {
+			this.channels.cleanup();
+		} else {
+			// cleanup existing channels and record sets
+			TestAnalyzer analyzerClone = analyzer.clone();
+			analyzerClone.setActiveDevice(activeDevice);
+			analyzerClone.getSettings().setActiveObjectKey(this.application.getObjectKey());
+			this.channels.setupChannels(analyzerClone);
+			analyzerClone.initiateUnitTestEnvironment(activeDevice, this.channels, "");
 		}
-		this.analyzer.initiateUnitTestEnvironment(activeDevice, this.channels, "");
-	}
-
-	/**
-	 * reflect user GUI settings required for history tabs.
-	 * copied from 'setDevice', 'setupDataChannels'
-	 * @param activeDevice
-	 * @param activeChannelNumber
-	 * @param activeObjectKey
-	 */
-	protected void setupDeviceChannelObject(String fileDeviceName, int activeChannelNumber, String activeObjectKey) {
-		// device : from setDevice
-		if (this.legacyDeviceNames.get(fileDeviceName) != null) fileDeviceName = this.legacyDeviceNames.get(fileDeviceName);
-		if (fileDeviceName.toLowerCase().contains("charger308duo") || fileDeviceName.toLowerCase().contains("charger308duo")) {
-			System.out.println("skip fileDeviceName=" + fileDeviceName);
-		}
-		DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
-		if (deviceConfig == null) new UnsupportedOperationException("deviceConfig == null");
-		IDevice device = this.getInstanceOfDevice(deviceConfig);
-		this.analyzer.setActiveDevice(device);
-
-		setupDataChannels(device);
-
-		this.analyzer.initiateUnitTestEnvironment(device, this.channels, activeObjectKey);
 	}
 
 	/**
@@ -435,10 +408,10 @@ public class TestSuperClass extends TestCase {
 	 *
 	 * @param recordSet
 	 * @param gc
-	 *            the graphics context to be used
+	 *          the graphics context to be used
 	 * @param height
 	 * @param dash
-	 *            to be used for the custom line style
+	 *          to be used for the custom line style
 	 */
 	public void drawTimeGrid(RecordSet recordSet, GC gc, Rectangle bounds, int[] dash) {
 		gc.setLineWidth(1);
@@ -456,12 +429,12 @@ public class TestSuperClass extends TestCase {
 	 *
 	 * @param recordSet
 	 * @param gc
-	 *            the graphics context to be used
+	 *          the graphics context to be used
 	 * @param useOffsetY
-	 *            the offset in vertical direction
+	 *          the offset in vertical direction
 	 * @param width
 	 * @param dash
-	 *            to be used for the custom line style
+	 *          to be used for the custom line style
 	 */
 	private void drawCurveGrid(RecordSet recordSet, GC gc, int useOffSetY, int width, int[] dash) {
 		gc.setLineWidth(1);
@@ -496,14 +469,6 @@ public class TestSuperClass extends TestCase {
 		else {
 			this.dataPath = DataSource.TESTDATA.getDataPath(Paths.get("")).toFile();
 		}
-
-		this.settings.setDataFilePath(this.dataPath.getPath());
-		System.out.println("this.dataPath = " + this.dataPath.getPath());
-		return this.dataPath;
-	}
-
-	protected File setDataPath(DataSource dataSource, Path subPath) {
-		this.dataPath = dataSource.getDataPath(subPath).toFile();
 
 		this.settings.setDataFilePath(this.dataPath.getPath());
 		System.out.println("this.dataPath = " + this.dataPath.getPath());

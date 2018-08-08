@@ -19,13 +19,12 @@
 
 package gde.histo.transitions;
 
-import static gde.histo.transitions.AbstractAnalyzer.TriggerState.TRIGGERED;
-import static gde.histo.transitions.AbstractAnalyzer.TriggerState.WAITING;
+import static gde.histo.transitions.AbstractDetector.TriggerState.TRIGGERED;
+import static gde.histo.transitions.AbstractDetector.TriggerState.WAITING;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.FINEST;
 
-import gde.Analyzer;
 import gde.GDE;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -38,15 +37,16 @@ import gde.log.Logger;
  * Analyze a record for transitions defined in the device channel settings.
  * @author Thomas Eickert (USER)
  */
-public final class SlopeAnalyzer extends AbstractAnalyzer {
+public final class SlopeDetector extends AbstractDetector {
 	@SuppressWarnings("hiding")
-	final static String			$CLASS_NAME	= SlopeAnalyzer.class.getName();
+	final static String			$CLASS_NAME	= SlopeDetector.class.getName();
 	@SuppressWarnings("hiding")
 	final static Logger			log					= Logger.getLogger($CLASS_NAME);
 
 	private final RecordSet	recordSet;
 
-	public SlopeAnalyzer(RecordSet recordSet) {
+	public SlopeDetector(RecordSet recordSet) {
+		super(recordSet.getAnalyzer());
 		this.recordSet = recordSet;
 	}
 
@@ -72,7 +72,7 @@ public final class SlopeAnalyzer extends AbstractAnalyzer {
 	 */
 	private TransitionChronicle findSlopeTransitions(Record record, TransitionType transitionType) {
 		TransitionChronicle transitions = new TransitionChronicle();
-		IDevice device = Analyzer.getInstance().getActiveDevice();
+		IDevice device = analyzer.getActiveDevice();
 
 		LevelChecker levelChecker = new LevelChecker(record, transitionType);
 		for (int i = 0; i < record.realSize(); i++) {

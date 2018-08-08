@@ -24,7 +24,9 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -106,7 +108,8 @@ class QuantileTest extends BasicTestCase {
 			{
 				settings.setCanonicalQuantiles(true);
 				settings.setSymmetricToleranceInterval(true);
-				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true,
+						ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new HashSet<>(), settings);
 				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
 				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
@@ -116,7 +119,8 @@ class QuantileTest extends BasicTestCase {
 			{
 				settings.setCanonicalQuantiles(false);
 				settings.setSymmetricToleranceInterval(true);
-				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true,
+						ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new HashSet<>(), settings);
 				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
 				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
@@ -126,7 +130,8 @@ class QuantileTest extends BasicTestCase {
 			{
 				settings.setCanonicalQuantiles(false);
 				settings.setSymmetricToleranceInterval(true);
-				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 99., 99., new ArrayList<>());
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true,
+						ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 99., 99., new HashSet<>(), settings);
 				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
 				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
@@ -140,7 +145,8 @@ class QuantileTest extends BasicTestCase {
 			{
 				settings.setCanonicalQuantiles(true);
 				settings.setSymmetricToleranceInterval(true);
-				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true,
+						ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new HashSet<>(), settings);
 				assertEquals("outlierSize", 1, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
 				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
@@ -150,7 +156,8 @@ class QuantileTest extends BasicTestCase {
 			{
 				settings.setCanonicalQuantiles(false);
 				settings.setSymmetricToleranceInterval(true);
-				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new ArrayList<>());
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true,
+						ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 9., 9., new HashSet<>(), settings);
 				assertEquals("outlierSize", 1, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
 				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
@@ -160,7 +167,8 @@ class QuantileTest extends BasicTestCase {
 			{
 				settings.setCanonicalQuantiles(false);
 				settings.setSymmetricToleranceInterval(true);
-				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true, ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 99., 99., new ArrayList<>());
+				UniversalQuantile<Double> dQuantile = new UniversalQuantile<>(new Vector<>(Arrays.asList(values)), true,
+						ElementaryQuantile.INTER_QUARTILE_SIGMA_FACTOR, 99., 99., new HashSet<>(), settings);
 				assertEquals("outlierSize", 0, dQuantile.getOutliers().size());
 				double[] toleranceLowerUpper = dQuantile.getQuartileToleranceLowerUpper();
 				double iQR = toleranceLowerUpper[0] + toleranceLowerUpper[1];
@@ -173,6 +181,8 @@ class QuantileTest extends BasicTestCase {
 	@Tag("performance")
 	@Test
 	void testSortPerformance() {
+		Settings settings = Settings.getInstance();
+
 		// special double example : -zero
 		final Double d3 = -0d; // try this code with d3 = 0d; for comparison
 		if (d3 < 0d)
@@ -298,13 +308,13 @@ class QuantileTest extends BasicTestCase {
 			for (Integer value : record) {
 				arrayList.add(value != null ? value.doubleValue() : null);
 			}
-			List<Integer> iExclusions = new ArrayList<>();
+			Set<Integer> iExclusions = new HashSet<>();
 			iExclusions.add(null);
-			List<Double> dExclusions = new ArrayList<>();
+			Set<Double> dExclusions = new HashSet<>();
 			dExclusions.add(null);
-			UniversalQuantile<Integer> genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., 9., iExclusions);
-			UniversalQuantile<Double> genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., 9., dExclusions);
-			log.log(Level.INFO, ">>> Class GenericQuantile with Number <<<");
+			UniversalQuantile<Integer> genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., 9., iExclusions, settings);
+			UniversalQuantile<Double> genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., 9., dExclusions, settings);
+			log.log(Level.INFO, ">>> Class UniversalQuantile with Number <<<");
 			log.log(Level.INFO, "Avg   " + genericQuantile.getAvgFigure() + " bisher " + genericQuantile.getAvgOBS());
 			log.log(Level.INFO, "Sigma " + genericQuantile.getSigmaFigure() + " bisher " + genericQuantile.getSigmaRunningOBS());
 			log.log(Level.INFO, "Avg   " + genericArray.getAvgFigure() + " bisher " + genericArray.getAvgOBS());
@@ -313,8 +323,8 @@ class QuantileTest extends BasicTestCase {
 			for (int j = 0; j < 4; j++) {
 				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
 				for (int i = 0; i < performanceTestLoops / 2; i++) {
-					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., 9., iExclusions);
-					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., 9., dExclusions);
+					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., 9., iExclusions, settings);
+					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., 9., dExclusions, settings);
 					nanoTimeSigmaInt -= System.nanoTime();
 					genericQuantile.getSigmaRunningOBS();
 					nanoTimeSigmaInt += System.nanoTime();
@@ -327,8 +337,8 @@ class QuantileTest extends BasicTestCase {
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
 				for (int i = 0; i < performanceTestLoops / 2; i++) {
-					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., 9., iExclusions);
-					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., 9., dExclusions);
+					genericQuantile = new UniversalQuantile<>(recordList, false, 6., 9., 9., iExclusions, settings);
+					genericArray = new UniversalQuantile<>(arrayList, false, 6., 9., 9., dExclusions, settings);
 					nanoTimeSigmaInt -= System.nanoTime();
 					genericQuantile.getSigmaFigure();
 					nanoTimeSigmaInt += System.nanoTime();
@@ -354,22 +364,15 @@ class QuantileTest extends BasicTestCase {
 				}
 				counter++;
 			}
-			UniversalQuantile<Integer> genericQuantile = new UniversalQuantile<>(recordPoints, 6., 9.);
-			UniversalQuantile<Double> genericArray = new UniversalQuantile<>(arrayPoints, 6., 9.);
-			log.log(Level.INFO, ">>> Class GenericQuantile with Spot<Number> <<<");
-			log.log(Level.INFO, "Avg   " + genericQuantile.getAvgFigure() + " bisher " + genericQuantile.getAvgOBS());
-			log.log(Level.INFO, "Sigma " + genericQuantile.getSigmaFigure() + " bisher " + genericQuantile.getSigmaRunningOBS());
+			UniversalQuantile<Double> genericArray = UniversalQuantile.createUniversalSpotQuantile(arrayPoints, 6., 9., settings);
+			log.log(Level.INFO, ">>> Class UniversalQuantile with Spot<Double> <<<");
 			log.log(Level.INFO, "Avg   " + genericArray.getAvgFigure() + " bisher " + genericArray.getAvgOBS());
 			log.log(Level.INFO, "Sigma " + genericArray.getSigmaFigure() + " bisher " + genericArray.getSigmaRunningOBS());
 
 			for (int j = 0; j < 4; j++) {
 				long nanoTime = System.nanoTime(), nanoTimeSigmaInt = 0, nanoTimeSigmaDouble = 0;
 				for (int i = 0; i < performanceTestLoops / 2; i++) {
-					genericQuantile = new UniversalQuantile<>(recordPoints, 6., 9.);
-					genericArray = new UniversalQuantile<>(arrayPoints, 6., 9.);
-					nanoTimeSigmaInt -= System.nanoTime();
-					genericQuantile.getSigmaRunningOBS();
-					nanoTimeSigmaInt += System.nanoTime();
+					genericArray = UniversalQuantile.createUniversalSpotQuantile(arrayPoints, 6., 9., settings);
 					nanoTimeSigmaDouble -= System.nanoTime();
 					genericArray.getSigmaRunningOBS();
 					nanoTimeSigmaDouble += System.nanoTime();
@@ -379,11 +382,7 @@ class QuantileTest extends BasicTestCase {
 				nanoTimeSigmaInt = 0;
 				nanoTimeSigmaDouble = 0;
 				for (int i = 0; i < performanceTestLoops / 2; i++) {
-					genericQuantile = new UniversalQuantile<>(recordPoints, 6., 9.);
-					genericArray = new UniversalQuantile<>(arrayPoints, 6., 9.);
-					nanoTimeSigmaInt -= System.nanoTime();
-					genericQuantile.getSigmaFigure();
-					nanoTimeSigmaInt += System.nanoTime();
+					genericArray = UniversalQuantile.createUniversalSpotQuantile(arrayPoints, 6., 9., settings);
 					nanoTimeSigmaDouble -= System.nanoTime();
 					genericArray.getSigmaFigure();
 					nanoTimeSigmaDouble += System.nanoTime();

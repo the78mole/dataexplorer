@@ -30,7 +30,6 @@ import java.util.List;
 
 import gde.Analyzer;
 import gde.GDE;
-import gde.config.Settings;
 import gde.data.Record;
 import gde.device.TransitionClassTypes;
 import gde.device.TransitionType;
@@ -42,21 +41,16 @@ import gde.utils.StringHelper;
  * Analyze a record for transitions defined in the device channel settings.
  * @author Thomas Eickert (USER)
  */
-public class AbstractAnalyzer {
-	final static String					$CLASS_NAME								= AbstractAnalyzer.class.getName();
-	final static Logger					log												= Logger.getLogger($CLASS_NAME);
+public class AbstractDetector {
+	final static String				$CLASS_NAME	= AbstractDetector.class.getName();
+	final static Logger				log					= Logger.getLogger($CLASS_NAME);
 
-	/**
-	 * Cache settings value due to frequent access.
-	 */
-	private static final double	MINMAX_QUANTILE_DISTANCE	= Settings.getInstance().getMinmaxQuantileDistance();
+	protected SettlementDeque	referenceDeque;
+	protected SettlementDeque	thresholdDeque;
+	protected SettlementDeque	recoveryDeque;
 
-	protected SettlementDeque		referenceDeque;
-	protected SettlementDeque		thresholdDeque;
-	protected SettlementDeque		recoveryDeque;
-
-	protected TriggerState			previousTriggerState;
-	protected TriggerState			triggerState;
+	protected TriggerState		previousTriggerState;
+	protected TriggerState		triggerState;
 
 	protected enum TriggerState {
 		/**
@@ -369,11 +363,11 @@ public class AbstractAnalyzer {
 		 * @return NaN for empty deque or a leveled extremum value for comparisons, i.e. a more stable value than the extremum value
 		 */
 		public double getBenchmarkValue() {
-			if (MINMAX_QUANTILE_DISTANCE == 0.) {
+			if (minmaxQuantileDistance == 0.) {
 				// bypass deque sort
 				return this.extremeValue;
 			} else {
-				return this.isMinimumExtremum ? this.getQuantileValue(MINMAX_QUANTILE_DISTANCE) : this.getQuantileValue(1. - MINMAX_QUANTILE_DISTANCE);
+				return this.isMinimumExtremum ? this.getQuantileValue(minmaxQuantileDistance) : this.getQuantileValue(1. - minmaxQuantileDistance);
 			}
 		}
 
@@ -386,7 +380,7 @@ public class AbstractAnalyzer {
 			if (this.isEmpty()) {
 				return Double.NaN;
 			} else {
-				return this.isMinimumExtremum ? this.getQuantileValue(1. - MINMAX_QUANTILE_DISTANCE) : this.getQuantileValue(MINMAX_QUANTILE_DISTANCE);
+				return this.isMinimumExtremum ? this.getQuantileValue(1. - minmaxQuantileDistance) : this.getQuantileValue(minmaxQuantileDistance);
 			}
 		}
 
@@ -483,10 +477,10 @@ public class AbstractAnalyzer {
 			this.isDeltaFactor = this.transitionType.getValueType() == TransitionValueTypes.DELTA_FACTOR;
 			this.isDeltaValue = this.transitionType.getValueType() == TransitionValueTypes.DELTA_VALUE;
 
-			double translatedMaxValue = Analyzer.getInstance().getActiveDevice().translateValue(transitionRecord, transitionRecord.getMaxValue() / 1000.);
-			double translatedMinValue = Analyzer.getInstance().getActiveDevice().translateValue(transitionRecord, transitionRecord.getMinValue() / 1000.);
+			double translatedMaxValue = analyzer.getActiveDevice().translateValue(transitionRecord, transitionRecord.getMaxValue() / 1000.);
+			double translatedMinValue = analyzer.getActiveDevice().translateValue(transitionRecord, transitionRecord.getMinValue() / 1000.);
 
-			this.absoluteDelta = Settings.getInstance().getAbsoluteTransitionLevel() * (translatedMaxValue - translatedMinValue);
+			this.absoluteDelta = analyzer.getSettings().getAbsoluteTransitionLevel() * (translatedMaxValue - translatedMinValue);
 			this.translatedThresholdValue = transitionType.getThresholdValue();
 			this.translatedRecoveryValue = transitionType.getClassType() != TransitionClassTypes.SLOPE
 					? transitionType.getRecoveryValue().orElseThrow(() -> new UnsupportedOperationException(
@@ -499,16 +493,16 @@ public class AbstractAnalyzer {
 		 */
 		boolean isBeyondThresholdLevel(double translatedValue) {
 			final boolean isBeyond;
-			if (AbstractAnalyzer.this.referenceDeque.isEmpty()) {
+			if (AbstractDetector.this.referenceDeque.isEmpty()) {
 				isBeyond = false;
 			} else if (this.isDeltaFactor) {
-				final double baseValue = AbstractAnalyzer.this.referenceDeque.getBenchmarkValue();
+				final double baseValue = AbstractDetector.this.referenceDeque.getBenchmarkValue();
 				if (this.transitionType.isGreater())
 					isBeyond = translatedValue > baseValue + this.absoluteDelta && translatedValue > baseValue + this.transitionType.getThresholdValue() * Math.abs(baseValue);
 				else
 					isBeyond = translatedValue < baseValue - this.absoluteDelta && translatedValue < baseValue + this.transitionType.getThresholdValue() * Math.abs(baseValue);
 			} else if (this.isDeltaValue) {
-				final double baseValue = AbstractAnalyzer.this.referenceDeque.getBenchmarkValue();
+				final double baseValue = AbstractDetector.this.referenceDeque.getBenchmarkValue();
 				if (this.transitionType.isGreater())
 					isBeyond = translatedValue > baseValue + this.translatedThresholdValue;
 				else
@@ -529,11 +523,11 @@ public class AbstractAnalyzer {
 		boolean isBeyondRecoveryLevel(double translatedValue) {
 			final boolean isBeyond;
 			if (this.isDeltaFactor) {
-				final double baseValue = AbstractAnalyzer.this.referenceDeque.getBenchmarkValue();
+				final double baseValue = AbstractDetector.this.referenceDeque.getBenchmarkValue();
 				isBeyond = this.transitionType.isGreater() ? translatedValue < baseValue + this.transitionType.getRecoveryValue().orElse(null) * baseValue
 						: translatedValue > baseValue + this.transitionType.getRecoveryValue().orElse(null) * baseValue;
 			} else if (this.isDeltaValue) {
-				final double baseValue = AbstractAnalyzer.this.referenceDeque.getBenchmarkValue();
+				final double baseValue = AbstractDetector.this.referenceDeque.getBenchmarkValue();
 				isBeyond = this.transitionType.isGreater() ? translatedValue < baseValue + this.translatedRecoveryValue
 						: translatedValue > baseValue + this.translatedRecoveryValue;
 			} else {
@@ -541,6 +535,17 @@ public class AbstractAnalyzer {
 			}
 			return isBeyond;
 		}
+	}
+
+	protected final Analyzer	analyzer;
+	/**
+	 * Cache settings value due to frequent access.
+	 */
+	protected final double		minmaxQuantileDistance;
+
+	public AbstractDetector(Analyzer analyzer) {
+		this.analyzer = analyzer;
+		this.minmaxQuantileDistance = analyzer.getSettings().getMinmaxQuantileDistance();
 	}
 
 	@Override

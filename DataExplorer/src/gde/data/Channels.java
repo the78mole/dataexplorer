@@ -20,6 +20,7 @@
 package gde.data;
 
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import gde.Analyzer;
@@ -38,39 +39,25 @@ import gde.ui.DataExplorer;
  * Is a hybrid singleton supporting cloning.
  * @author Winfried Brügmann
  */
-public class Channels extends HashMap<Integer, Channel> {
-	final static long		serialVersionUID				= 26031957;
-	final static Logger	log											= Logger.getLogger(Channels.class.getName());
+public final class Channels extends HashMap<Integer, Channel> {
+	final static long									serialVersionUID				= 26031957;
+	final static Logger								log											= Logger.getLogger(Channels.class.getName());
 
-	static final int		CHANNEL_NAME_MIN_LENGTH	= 3;																					// 'GPS'
+	static final int									CHANNEL_NAME_MIN_LENGTH	= 3;																					// 'GPS'
 
-	private static volatile Channels	channles	= null;
+	private static volatile Channels	channles								= null;
 
-	int									activeChannelNumber			= 1;																					// default at least one channel must exist
-	String[]						channelNames						= new String[1];
-	final DataExplorer	application;
+	private int												activeChannelNumber			= 1;																					// default at least one channel must exist
+	private String[]									channelNames						= new String[1];
 
-	private Analyzer		analyzer;
+	private Analyzer									analyzer;
 
 	/**
-	 *  Threadsafe usage.
-	 *  Be aware of the mandatory setup.
+	 * Threadsafe usage.
+	 * Be aware of the mandatory setupChannels call.
 	 */
 	public static Channels createChannels() {
 		return new Channels(4);
-	}
-
-	/**
-	 *  getInstance returns the instance of this singleton, this may called during creation time of the application
-	 *  therefore it is required to give the application instance as argument
-	 */
-	public static Channels getInstance(DataExplorer application) {
-		if (Channels.channles == null) {
-			synchronized (Channels.class) {
-				Channels.channles = new Channels(application, 4);
-			}
-		}
-		return Channels.channles;
 	}
 
 	/**
@@ -92,16 +79,6 @@ public class Channels extends HashMap<Integer, Channel> {
 	 */
 	private Channels(int initialCapacity) {
 		super(initialCapacity);
-		this.application = DataExplorer.getInstance();
-	}
-
-	/**
-	 * singleton
-	 * @param initialCapacity
-	 */
-	private Channels(DataExplorer currentApplication, int initialCapacity) {
-		super(initialCapacity);
-		this.application = currentApplication;
 	}
 
 	/**
@@ -115,7 +92,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		if (this.analyzer == null) throw new IllegalArgumentException("setup is missing");
 
 		// non-UI fields
-		this.analyzer = that.analyzer;
+		this.analyzer  = that.analyzer;
 		this.activeChannelNumber = that.activeChannelNumber;
 		this.channelNames = that.channelNames.clone();
 	}
@@ -176,7 +153,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	@Deprecated
 	public String getChannelNamesToString() {
 		StringBuilder sb = new StringBuilder();
-		for (String channelName : this.application.getMenuToolBar().getChannelSelectCombo().getItems()) {
+		for (String channelName : DataExplorer.getInstance().getMenuToolBar().getChannelSelectCombo().getItems()) {
 			sb.append(channelName.split(GDE.STRING_COLON)[1]).append(", "); //$NON-NLS-1$
 		}
 		return sb.toString();
@@ -201,8 +178,9 @@ public class Channels extends HashMap<Integer, Channel> {
 	public void switchChannel(int channelNumber, String recordSetKey) {
 		if (!GDE.isWithUi()) throw new UnsupportedOperationException("for use with internal UI only");
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "switching to channel " + channelNumber); //$NON-NLS-1$
-		this.application.checkUpdateFileComment();
-		this.application.checkUpdateRecordSetComment();
+		DataExplorer application = DataExplorer.getInstance();
+		application.checkUpdateFileComment();
+		application.checkUpdateRecordSetComment();
 
 		if (!(channelNumber > this.keySet().size())) {
 			if (channelNumber != this.getActiveChannelNumber() || this.getActiveChannel().getActiveRecordSet() == null) {
@@ -212,22 +190,22 @@ public class Channels extends HashMap<Integer, Channel> {
 					// switching the channel may change the current object key
 					Channels.this.getActiveChannel().setObjectKey(currentObjectKey);
 				}
-				this.application.getMenuToolBar().updateChannelToolItems();
+				application.getMenuToolBar().updateChannelToolItems();
 				if (recordSetKey == null || recordSetKey.length() < 1)
 					this.getActiveChannel().setActiveRecordSet(this.getActiveChannel().getLastActiveRecordSetName());
 				else
 					this.getActiveChannel().setActiveRecordSet(recordSetKey);
 
 				if (this.getActiveChannel().type == ChannelTypes.TYPE_OUTLET) {
-					this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
+					application.updateTitleBar(application.getObjectKey(), application.getActiveDevice().getName(), application.getActiveDevice().getPort());
 				}
-				this.application.selectObjectKey(Channels.this.getActiveChannel().getObjectKey());
-				Settings.getInstance().addDeviceUse(this.application.getActiveDevice().getDeviceConfiguration().getName(), channelNumber); // ok
+				application.selectObjectKey(Channels.this.getActiveChannel().getObjectKey());
+				Settings.getInstance().addDeviceUse(application.getActiveDevice().getDeviceConfiguration().getName(), channelNumber); // ok
 			} else {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "nothing to do selected channel == active channel"); //$NON-NLS-1$
 			}
-			this.application.cleanHeaderAndCommentInGraphicsWindow();
-			// this.application.cleanHeaderAndCommentInHistoGraphicsWindow(); is done in setupHistoWindows
+			application.cleanHeaderAndCommentInGraphicsWindow();
+			// application.cleanHeaderAndCommentInHistoGraphicsWindow(); is done in setupHistoWindows
 			Channel activeChannel = this.getActiveChannel();
 			if (activeChannel != null) {
 				RecordSet recordSet = activeChannel.getActiveRecordSet();
@@ -239,23 +217,23 @@ public class Channels extends HashMap<Integer, Channel> {
 					if (recordSet.isRecalculation) recordSet.checkAllDisplayable(); // updates graphics window
 					recordSet.updateVisibleAndDisplayableRecordsForTable();
 				}
-				this.application.resetGraphicsWindowZoomAndMeasurement();
+				application.resetGraphicsWindowZoomAndMeasurement();
 				// update viewable
-				//this.application.getMenuToolBar().updateObjectSelector();
-				this.application.getMenuToolBar().updateChannelSelector();
-				this.application.getMenuToolBar().updateRecordSetSelectCombo();
-				this.application.updateMenusRegardingGPSData();
-				this.application.updateAllTabs(true);
+				// application.getMenuToolBar().updateObjectSelector();
+				application.getMenuToolBar().updateChannelSelector();
+				application.getMenuToolBar().updateRecordSetSelectCombo();
+				application.updateMenusRegardingGPSData();
+				application.updateAllTabs(true);
 
-				this.application.getActiveDevice().setLastChannelNumber(channelNumber);
-				if (this.application.getHistoExplorer().isPresent() != Settings.getInstance().isHistoActive()) { // ok
+				application.getActiveDevice().setLastChannelNumber(channelNumber);
+				if (application.getHistoExplorer().isPresent() != Settings.getInstance().isHistoActive()) { // ok
 					// this case may exist during DE startup
 				} else if (Settings.getInstance().isHistoActive()) { // ok
-					this.application.getHistoExplorer().ifPresent(HistoExplorer::updateHistoTabs);
+					application.getHistoExplorer().ifPresent(HistoExplorer::updateHistoTabs);
 				}
 			}
 		} else
-			this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW0006));
+			application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW0006));
 	}
 
 	/**
@@ -286,7 +264,7 @@ public class Channels extends HashMap<Integer, Channel> {
 		this.activeChannelNumber = 1; // default at least one channel must exist
 		this.channelNames = new String[1];
 		try {
-			Channel activeChannel = Channels.getInstance().getActiveChannel();
+			Channel activeChannel = this.getActiveChannel();
 			if (activeChannel != null) {
 				activeChannel.objectKey = GDE.STRING_EMPTY;
 				RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
@@ -342,7 +320,7 @@ public class Channels extends HashMap<Integer, Channel> {
 	 * todo might be better to do the setup during instantiation
 	 */
 	public void setupChannels(Analyzer analyzer) {
-		cleanup();
+		this.cleanup();
 
 		this.analyzer = analyzer;
 
@@ -352,13 +330,30 @@ public class Channels extends HashMap<Integer, Channel> {
 		for (int i = 1; i <= channelCount; i++) {
 			log.log(Level.FINE, "setting up channels = " + i); //$NON-NLS-1$
 
-			Channel newChannel = new Channel(device.getChannelNameReplacement(i), device.getChannelTypes(i));
+			Channel newChannel = new Channel(analyzer, device.getChannelNameReplacement(i), device.getChannelTypes(i));
 			newChannel.setObjectKey(analyzer.getSettings().getActiveObjectKey());
 			// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
 			put(Integer.valueOf(i), newChannel);
 			// do not call channel.applyTemplate here, there are no record sets
 			this.channelNames[i - 1] = i + " : " + device.getChannelNameReplacement(i);
 		}
+	}
+
+	/**
+	 * Use only if the outlet-channel/configuration in log dataset file does not match any existing.
+	 * @return the new channel
+	 */
+	public Channel addChannel(String channelConfigName, ChannelTypes channelType, Analyzer analyzer) {
+		Channel channel = new Channel(analyzer, channelConfigName, channelType);
+		// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
+		this.put(channel.getNumber(), channel);
+		Vector<String> newChannelNames = new Vector<String>();
+		for (String channelConfigKey : this.getChannelNames()) {
+			newChannelNames.add(channelConfigKey);
+		}
+		newChannelNames.add(channel.getNumber() + " : " + channelConfigName); //$NON-NLS-1$
+		this.setChannelNames(newChannelNames.toArray(new String[1]));
+		return channel;
 	}
 
 }

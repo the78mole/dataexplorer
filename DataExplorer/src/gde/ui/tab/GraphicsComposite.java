@@ -255,8 +255,8 @@ public class GraphicsComposite extends Composite {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "recordSetHeader.paintControl, event=" + evt); //$NON-NLS-1$
 					//System.out.println("width = " + GraphicsComposite.this.getSize().x);
 					if (GraphicsComposite.this.graphicsType == GraphicsType.UTIL) {
-						RecordSet utilitySet = GraphicsComposite.this.application.getUtilitySet();
-						if (utilitySet != null) {
+						if (GraphicsComposite.this.application.isWithUtilitySet()) {
+							RecordSet utilitySet = GraphicsComposite.this.application.getUtilitySet();
 							String tmpHeader = utilitySet.getRecordSetDescription();
 							if (GraphicsComposite.this.graphicsHeaderText == null || !tmpHeader.equals(GraphicsComposite.this.graphicsHeaderText)) {
 								GraphicsComposite.this.graphicsHeader.setText(GraphicsComposite.this.graphicsHeaderText = tmpHeader);
@@ -665,7 +665,7 @@ public class GraphicsComposite extends Composite {
 							if (GraphicsComposite.this.recordSetCommentText == null || !tmpDescription.equals(GraphicsComposite.this.recordSetCommentText)) {
 								GraphicsComposite.this.recordSetComment.setText(GraphicsComposite.this.recordSetCommentText = tmpDescription);
 							}
-							
+
 						}
 					}
 				}
@@ -722,13 +722,13 @@ public class GraphicsComposite extends Composite {
 		RecordSet recordSet = null;
 		switch (this.graphicsType) {
 		case COMPARE:
-			if (this.application.getCompareSet() != null && this.application.getCompareSet().size() > 0) {
+			if (this.application.isWithCompareSet()) {
 				recordSet = this.application.getCompareSet();
 			}
 			break;
 
 		case UTIL:
-			if (this.application.getUtilitySet() != null && this.application.getUtilitySet().size() > 0) {
+			if (this.application.isWithUtilitySet()) {
 				recordSet = this.application.getUtilitySet();
 			}
 			break;

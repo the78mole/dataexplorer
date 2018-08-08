@@ -423,7 +423,7 @@ public class MenuBar {
 							RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 							if (activeRecordSet != null) isRecordSetRelatedCopyable = activeRecordSet.size() > 0;
 						}
-						boolean isCompareSetCopyable = MenuBar.this.application.getCompareSet().size() > 0 && MenuBar.this.application.getTabSelectionIndex() == 6;
+						boolean isCompareSetCopyable = MenuBar.this.application.isWithCompareSet() && MenuBar.this.application.getTabSelectionIndex() == 6;
 
 						MenuBar.this.copyTabContentAsImageMenuItem.setEnabled(isRecordSetRelatedCopyable);
 						MenuBar.this.copyGraphicsPrintImageMenuItem.setEnabled((isRecordSetRelatedCopyable && MenuBar.this.application.getTabSelectionIndex() == 0) || isCompareSetCopyable);

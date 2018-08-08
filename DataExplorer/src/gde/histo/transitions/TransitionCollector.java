@@ -26,7 +26,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
-import gde.Analyzer;
 import gde.data.RecordSet;
 import gde.device.ChannelType;
 import gde.device.TransitionClassTypes;
@@ -43,16 +42,22 @@ public final class TransitionCollector {
 	private final static String	$CLASS_NAME	= TransitionCollector.class.getName();
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
+	private final RecordSet			recordSet;
+
+	public TransitionCollector(RecordSet recordSet) {
+		this.recordSet = recordSet;
+	}
+
 	/**
 	 * Identify all transitions for the recordset and channel.
 	 * Take all transition types defined for the channel.
 	 * Remove transition duplicates or overlapping transitions in all transition groups.
 	 * @return the multimap holding all transitions (key is thresholdStartTimestamp_ms) per transitionGroupId (key)
 	 */
-	public static GroupTransitions defineTransitions(RecordSet recordSet, int logChannelNumber) {
+	public GroupTransitions defineTransitions(int logChannelNumber) {
 		final GroupTransitions groupTransitions = new GroupTransitions(recordSet);
 
-		final ChannelType channelType = Analyzer.getInstance().getActiveDevice().getDeviceConfiguration().getChannel(logChannelNumber);
+		final ChannelType channelType = recordSet.getDevice().getDeviceConfiguration().getChannel(logChannelNumber);
 		for (TransitionType transitionType : channelType.getTransitions().values()) {
 			TransitionChronicle transitionsFromRecord = findTransitions(recordSet, transitionType);
 			if (!transitionsFromRecord.isEmpty()) {
@@ -90,17 +95,17 @@ public final class TransitionCollector {
 	 * @param transitionType
 	 * @return the identified transitions with the key thresholdStartTimestamp_ms
 	 */
-	private static TransitionChronicle findTransitions(RecordSet recordSet, TransitionType transitionType) {
+	private TransitionChronicle findTransitions(RecordSet recordSet, TransitionType transitionType) {
 		TransitionChronicle transitionsFromRecord;
 
 		if (transitionType.getClassType() == TransitionClassTypes.PEAK) {
-			PeakAnalyzer histoTransitions = new PeakAnalyzer(recordSet);
+			PeakDetector histoTransitions = new PeakDetector(recordSet);
 			transitionsFromRecord = histoTransitions.findTransitions(recordSet.get(recordSet.getRecordNames()[transitionType.getRefOrdinal()]), transitionType);
 		} else if (transitionType.getClassType() == TransitionClassTypes.PULSE) {
-			PulseAnalyzer histoTransitions = new PulseAnalyzer(recordSet);
+			PulseDetector histoTransitions = new PulseDetector(recordSet);
 			transitionsFromRecord = histoTransitions.findTransitions(recordSet.get(recordSet.getRecordNames()[transitionType.getRefOrdinal()]), transitionType);
 		} else if (transitionType.getClassType() == TransitionClassTypes.SLOPE) {
-			SlopeAnalyzer histoTransitions = new SlopeAnalyzer(recordSet);
+			SlopeDetector histoTransitions = new SlopeDetector(recordSet);
 			transitionsFromRecord = histoTransitions.findTransitions(recordSet.get(recordSet.getRecordNames()[transitionType.getRefOrdinal()]), transitionType);
 		} else {
 			throw new UnsupportedOperationException();
@@ -114,7 +119,7 @@ public final class TransitionCollector {
 	 * @param transitionChronicle
 	 * @return transitions which overlap in the reference and threshold phases
 	 */
-	private static List<Long> getDuplicates(TransitionChronicle transitionChronicle) {
+	private List<Long> getDuplicates(TransitionChronicle transitionChronicle) {
 		List<Long> duplicates;
 		duplicates = new ArrayList<Long>();
 		Entry<Long, Transition> previousTransitionEntry = null;
@@ -142,7 +147,7 @@ public final class TransitionCollector {
 	 * @param baseChronicle is reduced by inferior transitions compared to new chronicle
 	 * @return the merged transitions with existing transitions for the current group and class
 	 */
-	private static TransitionChronicle getSuperiorTransitions(TransitionChronicle newChronicle, TransitionChronicle baseChronicle) {
+	private TransitionChronicle getSuperiorTransitions(TransitionChronicle newChronicle, TransitionChronicle baseChronicle) {
 		TransitionChronicle newTransitions = new TransitionChronicle(newChronicle);
 		if (!baseChronicle.isEmpty()) {
 			// identify transitions with the same threshold startTimeStamp
@@ -173,7 +178,7 @@ public final class TransitionCollector {
 	 * @param entry2
 	 * @return the inferior transition in case of overlapping transitions
 	 */
-	private static Optional<Entry<Long, Transition>> getInferiorTransition(Entry<Long, Transition> entry1, Entry<Long, Transition> entry2) {
+	private Optional<Entry<Long, Transition>> getInferiorTransition(Entry<Long, Transition> entry1, Entry<Long, Transition> entry2) {
 		Optional<Entry<Long, Transition>> inferiorTransition = Optional.empty();
 
 		final Transition transition2 = entry2.getValue();

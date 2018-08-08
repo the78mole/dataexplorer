@@ -47,7 +47,6 @@ import gde.GDE;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.histo.base.NonUiTestCase;
-import gde.histo.cache.VaultReaderWriter;
 import gde.histo.datasources.HistoSet.RebuildStep;
 import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.utils.FileUtils;
@@ -69,6 +68,12 @@ public class HistoSetTest extends NonUiTestCase {
 	}
 
 	/**
+	 * ET 09.2018: elapsed times for DataFilesTestSamples/DataExplorer/_ET_Exzerpt with  182 files resulting in   406 vaults  @26 object keys and isZippedCache=false
+	 *   run 1  w/o vault cache 192 sec (8,5 MiB cache JSON)
+	 *   run 2 with vault cache 111 sec (8,5 MiB cache JSON)
+	 * ET 09.2018: elapsed times for DataFilesTestSamples/DataExplorer/_ET_Exzerpt with  182 files resulting in   406 vaults  @26 object keys and isZippedCache=false
+	 *   run 1  w/o vault cache 196 sec (12,0 MiB cache)
+	 *   run 2 with vault cache 102 sec (12,0 MiB cache)
 	 * ET 08.2018: elapsed times for DataFilesTestSamples/DataExplorer/_ET_Exzerpt with  182 files resulting in   491 vaults  @26 object keys and isZippedCache=false
 	 *   run 1  w/o vault cache 237 sec (16,0 MiB cache)
 	 *   run 2 with vault cache 100 sec (16,0 MiB cache)
@@ -109,7 +114,7 @@ public class HistoSetTest extends NonUiTestCase {
 						System.out.println(device.getName());
 						for (String objectKey : objectKeys) {
 							for (int j = 1; j <= device.getChannelCount(); j++) {
-								setDeviceChannelObject(device, j, objectKey);
+								this.analyzer.setArena(device, j, objectKey);
 
 								histoSet.rebuild4Screening(RebuildStep.A_HISTOSET);
 								int tmpSize = histoSet.getTrailRecordSet().getTimeStepSize();
@@ -132,7 +137,7 @@ public class HistoSetTest extends NonUiTestCase {
 		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports() ? analyzer.getDeviceConfigurations().getValidLogExtentions()
 				: Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
 		long logFilesCount = getLogFilesCount(new File(settings.getDataFilePath()), 99, validLogExtentions);
-		long cacheSize = VaultReaderWriter.getCacheSize();
+		long cacheSize = analyzer.getDataAccess().getCacheSize();
 		System.out.println(String.format("* elapsed times for %s with%,5d files resulting in%,6d vaults  @%d object keys and isZippedCache=%b", //
 				settings.getDataFilePath(), logFilesCount, totalVaultsCount, objectKeys.size(), settings.isZippedCache()));
 		for (int j = 0; j < elapsed_sec.size(); j++) {
@@ -221,7 +226,7 @@ public class HistoSetTest extends NonUiTestCase {
 					System.out.println(device.getName());
 					for (String objectKey : objectKeys) {
 						for (int j = 1; j <= device.getChannelCount(); j++) {
-							setDeviceChannelObject(device, j, objectKey);
+							this.analyzer.setArena(device, j, objectKey);
 
 							histoSet.rebuild4Screening(RebuildStep.A_HISTOSET);
 							int tmpSize = histoSet.getTrailRecordSet().getTimeStepSize();
@@ -243,7 +248,7 @@ public class HistoSetTest extends NonUiTestCase {
 		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports() ? analyzer.getDeviceConfigurations().getValidLogExtentions()
 				: Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
 		long logFilesCount = getLogFilesCount(new File(settings.getDataFilePath()), 99, validLogExtentions);
-		long cacheSize = VaultReaderWriter.getCacheSize();
+		long cacheSize = analyzer.getDataAccess().getCacheSize();
 		System.out.println(String.format("* " + deviceName + " elapsed times for %s with%,5d files resulting in%,6d vaults  @%d object keys and isZippedCache=%b", //
 				settings.getDataFilePath(), logFilesCount, totalVaultsCount, objectKeys.size(), settings.isZippedCache()));
 		for (int j = 0; j < elapsed_sec.size(); j++) {
@@ -288,7 +293,7 @@ public class HistoSetTest extends NonUiTestCase {
 				// for (String objectKey : objectKeys) {
 				String objectKey = "KwikFly";
 				for (int j = 1; j <= device.getChannelCount(); j++) {
-					setDeviceChannelObject(device, j, objectKey);
+					this.analyzer.setArena(device, j, objectKey);
 
 					histoSet.rebuild4Screening(RebuildStep.A_HISTOSET);
 					List<String> list = histoSet.getTrailRecordSet().getDataTags().get(DataTag.FILE_PATH);
@@ -310,7 +315,7 @@ public class HistoSetTest extends NonUiTestCase {
 		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports() ? analyzer.getDeviceConfigurations().getValidLogExtentions()
 				: Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
 		long logFilesCount = getLogFilesCount(new File(settings.getDataFilePath()), 99, validLogExtentions);
-		long cacheSize = VaultReaderWriter.getCacheSize();
+		long cacheSize = analyzer.getDataAccess().getCacheSize();
 		System.out.println(String.format(" elapsed times for %s with%,5d files resulting in%,6d vaults  @%d object keys and isZippedCache=%b", //
 				settings.getDataFilePath(), logFilesCount, totalVaultsCount, objectKeys.size(), settings.isZippedCache()));
 		for (int j = 0; j < elapsed_sec.size(); j++) {

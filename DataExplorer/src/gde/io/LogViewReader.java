@@ -29,9 +29,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -55,10 +55,10 @@ import gde.utils.StringHelper;
  * This class reads and writes LogView file format
  */
 public class LogViewReader {
-	final static Logger										log					= Logger.getLogger(LogViewReader.class.getName());
+	final static Logger					log					= Logger.getLogger(LogViewReader.class.getName());
 
 	final static DataExplorer		application	= DataExplorer.getInstance();
-	final static Channels 								channels 		= Channels.getInstance();
+	final static Channels 			channels 		= Channels.getInstance();
 	public static class LogViewDeviceMap extends HashMap<String, String> {
 		private static final long	serialVersionUID	= 1L;
 
@@ -229,15 +229,7 @@ public class LogViewReader {
 				if (channel == null) { // channelConfiguration not found
 					String msg = Messages.getString(MessageIds.GDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.GDE_MSGI0019) + "\n" + Messages.getString(MessageIds.GDE_MSGI0020);
 					DataExplorer.getInstance().openMessageDialogAsync(msg);
-					channel = new Channel(channelConfig, channelType);
-					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
-					channels.put(channel.getNumber(), channel);
-					Vector<String> newChannelNames = new Vector<String>();
-					for(String channelConfigKey : channels.getChannelNames()) {
-						newChannelNames.add(channelConfigKey);
-					}
-					newChannelNames.add(channel.getNumber() + GDE.STRING_BLANK_COLON_BLANK + channelConfig);
-					channels.setChannelNames(newChannelNames.toArray(new String[1]));
+					channel = channels.addChannel(channelConfig, channelType, Analyzer.getInstance());
 				}
 				recordSet = RecordSet.createRecordSet(recordSetName, device, channel.getNumber(), true, true, true);
 				//apply record sets properties
@@ -350,6 +342,7 @@ public class LogViewReader {
 			file_input = null;
 		}
 	}
+
 
 	/**
 	 * read record set data with given file seek pointer and record size

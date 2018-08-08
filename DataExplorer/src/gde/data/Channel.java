@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.GraphicsTemplate;
 import gde.config.Settings;
@@ -50,19 +51,19 @@ public class Channel extends HashMap<String, RecordSet> {
 	static final long							serialVersionUID	= 26031957;
 	static final Logger						log								= Logger.getLogger(Channel.class.getName());
 
+	private final Analyzer				analyzer;
 	final int											number;							// 1
-	String												channelConfigName;	// Ausgang
+	final String									channelConfigName;	// Ausgang
 	String												name;								// 1 : Ausgang
 	final ChannelTypes						type;								// ChannelTypes.TYPE_OUTLET or ChannelTypes.TYPE_CONFIG
-	GraphicsTemplate							template;						// graphics template holds view configuration
-	RecordSet											activeRecordSet;
-	RecordSet											lastActiveRecordSet;
+	private final GraphicsTemplate	template;						// graphics template holds view configuration
+	private RecordSet							activeRecordSet;
+	private RecordSet							lastActiveRecordSet;
 	String												objectKey	= GDE.STRING_EMPTY;
-	String 												fileName;
-	String												fileDescription		= StringHelper.getDate();
-	boolean												isSaved = false;
-	final DataExplorer						application;
-	final Channels								parent;
+	private String 								fileName;
+	private String								fileDescription;
+	private boolean								isSaved = false;
+	private final Channels				parent;
 	Comparator<String> 						comparator = new RecordSetNameComparator();
 
 	public final static String		UNSAVED_REASON_ADD_OBJECT_KEY	= Messages.getString(MessageIds.GDE_MSGT0400);
@@ -71,45 +72,22 @@ public class Channel extends HashMap<String, RecordSet> {
 
 
 	/**
-	 * constructor where channel configuration name is used with the channels.ordinal+1 to construct the channel name
+	 * constructor where channel configuration name is used with the channels.ordinal+1 to construct the channel name.
 	 * @param useChannelConfigName channelNumber 1 -> " 1 : Ausgang 1"
 	 */
-	public Channel(String useChannelConfigName, ChannelTypes channelType) {
-		super(1);
-		this.application = DataExplorer.getInstance();
-		this.parent = Channels.getInstance(this.application);
+	public Channel(Analyzer analyzer, String useChannelConfigName, ChannelTypes channelType) {
+		super(4);
+		this.analyzer = analyzer;
+		this.parent = analyzer.getChannels();
 		this.number = this.parent.size() + 1;
 		this.channelConfigName = useChannelConfigName;
 		this.name = GDE.STRING_BLANK + this.number + GDE.STRING_BLANK_COLON_BLANK + this.channelConfigName;
 		this.type = channelType;
 
-		String templateFileName = this.application.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + this.name.split(GDE.STRING_COLON)[0].trim();
+		String templateFileName = this.analyzer.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + this.name.split(GDE.STRING_COLON)[0].trim();
 		this.template = new GraphicsTemplate(templateFileName);
-		this.fileDescription = DataExplorer.getInstance().isObjectoriented()
-			? this.fileDescription + GDE.STRING_BLANK + this.application.getObjectKey() : this.fileDescription;
-	}
-
-	/**
-	 * constructor where channel configuration name is used with the channels.ordinal+1 to construct the channel name and a new record set will be added asap
-	 * @param useChannelConfigName
-	 * @param channelType
-	 * @param newRecordSet
-	 */
-	@Deprecated
-	public Channel(String useChannelConfigName, ChannelTypes channelType, RecordSet newRecordSet) {
-		super(1);
-		this.application = DataExplorer.getInstance();
-		this.parent = Channels.getInstance(this.application);
-		this.number = this.parent.size() + 1;
-		this.channelConfigName = useChannelConfigName;
-		this.name = GDE.STRING_BLANK + this.number + GDE.STRING_BLANK_COLON_BLANK + this.channelConfigName;
-		this.type = channelType;
-		this.put(newRecordSet.getName(), newRecordSet);
-
-		String templateFileName = this.application.getActiveDevice().getName() + GDE.STRING_UNDER_BAR + this.name.split(GDE.STRING_COLON)[0];
-		this.template = new GraphicsTemplate(templateFileName);
-		this.fileDescription = DataExplorer.getInstance().isObjectoriented()
-			? this.fileDescription + GDE.STRING_BLANK + this.application.getObjectKey() : this.fileDescription;
+		this.fileDescription = !this.analyzer.getSettings().getActiveObjectKey().isEmpty()
+				? StringHelper.getDate() + GDE.STRING_BLANK + this.analyzer.getSettings().getActiveObjectKey() : StringHelper.getDate();
 	}
 
 	/**
@@ -124,7 +102,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		}
 		else { // ChannelTypes.TYPE_CONFIG
 			size = 0;
-			Channels channels = Channels.getInstance();
+			Channels channels = this.analyzer.getChannels();
 			for (Integer channelNumber : this.parent.keySet()) {
 				size += channels.get(channelNumber)._size();
 			}
@@ -143,7 +121,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		}
 		else { // ChannelTypes.TYPE_CONFIG
 			size = 0;
-			Channels channels = Channels.getInstance();
+			Channels channels = this.analyzer.getChannels();
 			for (Integer channelNumber : this.parent.keySet()) {
 				size = channels.get(channelNumber)._size() > size ? channels.get(channelNumber)._size() : size;
 			}
@@ -225,7 +203,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			keys = this.keySet().toArray( new String[1]);
 		}
 		else { // ChannelTypes.TYPE_CONFIG
-			Channels channels = Channels.getInstance();
+			Channels channels = this.analyzer.getChannels();
 			Vector<String> namesVector = new Vector<String>();
 			synchronized (channels) {
 				for (int i = 1; i <= channels.size(); ++i) {
@@ -305,7 +283,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			}
 		}
 		else { // ChannelTypes.TYPE_CONFIG
-			Channels channels = Channels.getInstance();
+			Channels channels = this.analyzer.getChannels();
 			synchronized (channels) {
 				for (int i = 1; i <= channels.size(); ++i) {
 					for (String key : channels.get(i).getUnsortedRecordSetNames()) {
@@ -372,7 +350,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public void applyTemplateBasics(String recordSetKey) {
 		RecordSet recordSet = this.get(recordSetKey);
-		this.activeRecordSet = this.application.getActiveRecordSet();
+		this.activeRecordSet = this.analyzer.getActiveChannel() != null ? this.analyzer.getActiveChannel().getActiveRecordSet() : null;
 		if (recordSet != null) {
 			if (log.isLoggable(Level.FINE) && this.get(this.getLastActiveRecordSetName()) != null && this.get(recordSetKey) != null)
 				log.log(Level.FINE, "this.size() > 1 " + (this.size() > 1) + "; this.lastActiveRecordSet = " + this.getLastActiveRecordSetName() +  " - " + this.get(this.getLastActiveRecordSetName()).getChannelConfigNumber() + "!=" +  this.get(recordSetKey).getChannelConfigNumber());
@@ -456,8 +434,8 @@ public class Channel extends HashMap<String, RecordSet> {
 			}
 
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "applied graphics template file " + this.template.getCurrentFilePath()); //$NON-NLS-1$
-			if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
-				this.application.updateGraphicsWindow();
+			if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && GDE.isWithUi()) {
+				DataExplorer.getInstance().updateGraphicsWindow();
 			}
 		}
 	}
@@ -469,7 +447,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public void applyTemplate(String recordSetKey, boolean doUpdateVisibilityStatus) {
 		RecordSet recordSet = this.get(recordSetKey);
-		this.activeRecordSet = this.application.getActiveRecordSet();
+		this.activeRecordSet = this.analyzer.getActiveChannel() != null ? this.analyzer.getActiveChannel().getActiveRecordSet() : null;
 		if (recordSet != null) {
 			if (this.template != null) this.template.load();
 			int r, g, b;
@@ -523,8 +501,8 @@ public class Channel extends HashMap<String, RecordSet> {
 				if (doUpdateVisibilityStatus) {
 					recordSet.device.updateVisibilityStatus(recordSet, false);
 				}
-				if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && this.application.getMenuBar() != null) {
-					this.application.updateGraphicsWindow();
+				if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && GDE.isWithUi()) {
+					DataExplorer.getInstance().updateGraphicsWindow();
 				}
 			}
 		}
@@ -564,8 +542,8 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @param recordSetKey of the activeRecordSet to set
 	 */
 	public void setActiveRecordSet(String recordSetKey) {
-		this.application.checkUpdateFileComment();
-		this.application.checkUpdateRecordSetComment();
+		DataExplorer.getInstance().checkUpdateFileComment();
+		DataExplorer.getInstance().checkUpdateRecordSetComment();
 
 		RecordSet newActiveRecordSet = this.get(recordSetKey);
 		if (newActiveRecordSet != null) {
@@ -585,60 +563,59 @@ public class Channel extends HashMap<String, RecordSet> {
 	 * @param recordSetName p.e. "1) Laden"
 	 */
 	public synchronized void switchRecordSet(String recordSetName) {
+		if (!GDE.isWithUi()) throw new UnsupportedOperationException("for use with internal UI only");
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("switching to record set threadId = %06d", Thread.currentThread().getId())); //$NON-NLS-1$
-		if (GDE.isWithUi()) {
-			int percentage = this.application.getProgressPercentage();
-			if (percentage > 99 || percentage == 0)
-				this.application.setProgress(0, null);
-		}
-		final Channel activeChannel = this;
+		DataExplorer application = DataExplorer.getInstance();
+		int percentage = application.getProgressPercentage();
+		if (percentage > 99 || percentage == 0)
+			application.setProgress(0, null);
+
 		final String recordSetKey = recordSetName;
 		this.lastActiveRecordSet = this.get(recordSetKey);
-		if (Thread.currentThread().getId() == this.application.getThreadId()) {
-			updateForSwitchRecordSet(activeChannel, recordSetKey);
+		if (Thread.currentThread().getId() == application.getThreadId()) {
+			updateForSwitchRecordSet(application, recordSetKey);
 		}
 		else { // execute asynchronous
 			GDE.display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					updateForSwitchRecordSet(activeChannel, recordSetKey);
+					updateForSwitchRecordSet(application, recordSetKey);
 				}
 			});
 		}
 	}
 
 	/**
-	 * @param activeChannel
 	 * @param recordSetKey
 	 */
-	void updateForSwitchRecordSet(final Channel activeChannel, final String recordSetKey) {
+	private void updateForSwitchRecordSet(DataExplorer application, String recordSetKey) {
 		//reset old record set before switching
-		RecordSet oldRecordSet = activeChannel.getActiveRecordSet();
+		RecordSet oldRecordSet = this.getActiveRecordSet();
 		if (oldRecordSet != null) oldRecordSet.resetZoomAndMeasurement();
 
-		RecordSet recordSet = activeChannel.get(recordSetKey);
+		RecordSet recordSet = this.get(recordSetKey);
 		if (recordSet == null) { //activeChannel do not have this record set, try to switch
 			int channelNumber = this.findChannelOfRecordSet(recordSetKey);
 			if (channelNumber > 0) {
-				Channels.getInstance().switchChannel(channelNumber, recordSetKey);
-				recordSet = activeChannel.get(recordSetKey);
+				this.analyzer.getChannels().switchChannel(channelNumber, recordSetKey);
+				recordSet = this.get(recordSetKey);
 				if (recordSet != null && recordSet.isRecalculation)
 					recordSet.checkAllDisplayable();
 			}
 		}
 		else { // record  set exist
-			activeChannel.setActiveRecordSet(recordSetKey);
+			this.setActiveRecordSet(recordSetKey);
 			if (!recordSet.hasDisplayableData)
-				recordSet.loadFileData(activeChannel.getFullQualifiedFileName(), true);
+				recordSet.loadFileData(this.getFullQualifiedFileName(), true);
 			recordSet.resetZoomAndMeasurement();
-			this.application.resetGraphicsWindowZoomAndMeasurement();
+			application.resetGraphicsWindowZoomAndMeasurement();
 			if (recordSet.isRecalculation)
 				recordSet.checkAllDisplayable(); // updates graphics window
 
-			this.application.getMenuToolBar().updateRecordSetSelectCombo();
-			this.application.updateMenusRegardingGPSData();
-			this.application.cleanHeaderAndCommentInGraphicsWindow();
-			this.application.updateAllTabs(true);
+			application.getMenuToolBar().updateRecordSetSelectCombo();
+			application.updateMenusRegardingGPSData();
+			application.cleanHeaderAndCommentInGraphicsWindow();
+			application.updateAllTabs(true);
 		}
 	}
 
@@ -649,8 +626,8 @@ public class Channel extends HashMap<String, RecordSet> {
 	 */
 	public int findChannelOfRecordSet(String recordSetKey) {
 		int channelNumber = 0;
-		Channels channels = Channels.getInstance();
-		for (Integer tmpNumber : Channels.getInstance().keySet()) {
+		Channels channels = this.analyzer.getChannels();
+		for (Integer tmpNumber : channels.keySet()) {
 			Channel channel = channels.get(tmpNumber);
 			if (channel.get(recordSetKey) != null) {
 				channelNumber = tmpNumber.intValue();
@@ -683,7 +660,7 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	public void setFileName(String newFileName) {
 		if(this.type == ChannelTypes.TYPE_CONFIG) {
-			Channels channels = Channels.getInstance();
+			Channels channels = this.analyzer.getChannels();
 			for (int i = 1; i<= channels.getChannelNames().length; ++i) {
 				channels.get(i).fileName = newFileName;
 			}
@@ -691,7 +668,7 @@ public class Channel extends HashMap<String, RecordSet> {
 		else {
 			this.fileName = newFileName;
 		}
-		if (this.fileName != null && this.application.getActiveDevice() != null) this.application.updateTitleBar(this.application.getObjectKey(), this.application.getActiveDevice().getName(), this.application.getActiveDevice().getPort());
+		if (this.fileName != null && this.analyzer.getActiveDevice() != null) DataExplorer.getInstance().updateTitleBar(this.analyzer.getSettings().getActiveObjectKey(), this.analyzer.getActiveDevice().getName(), this.analyzer.getActiveDevice().getPort());
 	}
 
 
@@ -702,7 +679,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	public void setFileDescription(String newFileDescription) {
 		this.setUnsaved(RecordSet.UNSAVED_REASON_COMMENT);
 		this.fileDescription = newFileDescription;
-		this.application.updateGraphicsCaptions();
+		DataExplorer.getInstance().updateGraphicsCaptions();
 	}
 
 	public boolean isSaved() {
@@ -711,7 +688,7 @@ public class Channel extends HashMap<String, RecordSet> {
 
 	public void setSaved(boolean is_saved) {
 		if(this.type == ChannelTypes.TYPE_CONFIG) {
-			Channels channels = Channels.getInstance();
+			Channels channels = this.analyzer.getChannels();
 			for (int i = 1; i<= channels.getChannelNames().length; ++i) {
 				channels.get(i).isSaved = is_saved;
 			}
@@ -743,11 +720,11 @@ public class Channel extends HashMap<String, RecordSet> {
 		String fullQualifiedFileName = this.getFullQualifiedFileName();
 		for (String tmpRecordSetName : this.getRecordSetNames()) {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tmpRecordSetName = " + tmpRecordSetName); //$NON-NLS-1$
-			Channel activeChannel = Channels.getInstance().getActiveChannel();
+			Channel activeChannel = this.analyzer.getActiveChannel();
 			if (activeChannel != null) {
 				//if ChannelTypes.TYPE_OUTLET only record sets associated to that channel goes into one file
 				//if ChannelTypes.TYPE_CONFIG all record sets with different configurations goes into one file
-				Channel selectedChannel = activeChannel.getType().equals(ChannelTypes.TYPE_OUTLET) ? activeChannel : Channels.getInstance().get(this.findChannelOfRecordSet(tmpRecordSetName));
+				Channel selectedChannel = activeChannel.getType().equals(ChannelTypes.TYPE_OUTLET) ? activeChannel : this.analyzer.getChannels().get(this.findChannelOfRecordSet(tmpRecordSetName));
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "selectedChannel = " + (selectedChannel != null ? selectedChannel.getName() : "null")); //$NON-NLS-1$ //$NON-NLS-2$
 				if (selectedChannel != null) {
 					RecordSet tmpRecordSet = selectedChannel.get(tmpRecordSetName);
@@ -803,9 +780,9 @@ public class Channel extends HashMap<String, RecordSet> {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
-		return result;
+		int hashCode = super.hashCode();
+		hashCode = prime * hashCode + ((this.name == null) ? 0 : this.name.hashCode());
+		return hashCode;
 	}
 
 	@Override

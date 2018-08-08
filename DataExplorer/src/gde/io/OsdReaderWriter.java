@@ -34,12 +34,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -349,15 +349,7 @@ public class OsdReaderWriter {
 				if (channel == null) { // 3.rd try channelConfiguration not found
 					String msg = Messages.getString(MessageIds.GDE_MSGI0018, new Object[] { recordSetName }) + " " + Messages.getString(MessageIds.GDE_MSGI0019) + "\n" + Messages.getString(MessageIds.GDE_MSGI0020);
 					DataExplorer.getInstance().openMessageDialogAsync(msg);
-					channel = new Channel(channelConfig, channelType);
-					// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
-					channels.put(channel.getNumber(), channel);
-					Vector<String> newChannelNames = new Vector<String>();
-					for (String channelConfigKey : channels.getChannelNames()) {
-						newChannelNames.add(channelConfigKey);
-					}
-					newChannelNames.add(channel.getNumber() + " : " + channelConfig); //$NON-NLS-1$
-					channels.setChannelNames(newChannelNames.toArray(new String[1]));
+					channel = channels.addChannel(channelConfig, channelType, Analyzer.getInstance());
 				}
 				channels.setActiveChannelNumber(channel.getNumber());
 				OsdReaderWriter.application.selectObjectKey(objectKey); //calls channel.setObjectKey(objectKey);
@@ -367,7 +359,7 @@ public class OsdReaderWriter {
 				channelConfig = channelConfig.contains(GDE.STRING_BLANK) ? channelConfig.split(GDE.STRING_BLANK)[0].trim() : channelConfig.trim();
 				//"Motor"
 
-				recordSet = buildRecordSet(recordSetName, channel.getNumber(), recordSetInfo, true, OsdReaderWriter.application.getActiveDevice());
+				recordSet = buildRecordSet(recordSetName, channel.getNumber(), recordSetInfo, true, Analyzer.getInstance());
 				channel.put(recordSetName, recordSet);
 
 				if (!recordSetSelector.isBestFitFound()) recordSetSelector.setBestFit(channel.getNumber(), channelConfig, recordSetName);
@@ -477,16 +469,17 @@ public class OsdReaderWriter {
 	 *  - measurements are removed from the channel
 	 *  - measurementType objects are modified
 	 * @param recordSetName
-	 * @param channelNumber
+	 * @param channelNumber supporting channel mix which does not use the analyzer's channel number
 	 * @param recordSetInfo
 	 * @param adjustObjectKey defines if the channel's object key is updated by the settings objects key
 	 * @return the recordSet filled with basic data delivered by the params but without any values (points)
 	 */
-	protected static RecordSet buildRecordSet(String recordSetName, int channelNumber, HashMap<String, String> recordSetInfo, boolean adjustObjectKey, IDevice device) {
+	protected static RecordSet buildRecordSet(String recordSetName, int channelNumber, HashMap<String, String> recordSetInfo, boolean adjustObjectKey, Analyzer analyzer) {
 		RecordSet recordSet;
 		String recordSetComment = recordSetInfo.get(GDE.RECORD_SET_COMMENT);
 		String recordSetProperties = recordSetInfo.get(GDE.RECORD_SET_PROPERTIES);
 		String[] recordsProperties = StringHelper.splitString(recordSetInfo.get(GDE.RECORDS_PROPERTIES), Record.END_MARKER, GDE.RECORDS_PROPERTIES);
+		IDevice device = analyzer.getActiveDevice();
 		if (device.isVariableMeasurementSize()) {
 			//cleanup measurement, if count doesn't match
 			int existingNumberMeasurements = device.getDeviceConfiguration().getMeasurementNames(channelNumber).length;
@@ -507,10 +500,10 @@ public class OsdReaderWriter {
 				gdeMeasurement.setSymbol(recordSymbols[i] = recordProperties.get(Record.SYMBOL));
 				gdeMeasurement.setActive(Boolean.valueOf(recordProperties.get(Record.IS_ACTIVE)));
 			}
-			recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true, true);
+			recordSet = RecordSet.createRecordSet(recordSetName, analyzer, channelNumber, recordNames, recordSymbols, recordUnits, true, true, true);
 		}
 		else {
-			recordSet = RecordSet.createRecordSet(recordSetName, device, channelNumber, true, true, true);
+			recordSet = RecordSet.createRecordSet(recordSetName, analyzer, channelNumber, true, true, true);
 		}
 		recordSet.setRecordSetDescription(recordSetComment);
 

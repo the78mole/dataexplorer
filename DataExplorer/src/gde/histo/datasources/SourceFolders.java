@@ -33,12 +33,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.sun.istack.internal.Nullable;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
@@ -62,30 +64,29 @@ public class SourceFolders {
 	public enum DirectoryType {
 		DATA {
 			@Override
-			public Path getBasePath() {
-				String dataFilePath = Settings.getInstance().getDataFilePath();
+			public Path getBasePath(String dataFilePath) {
 				return dataFilePath == null || dataFilePath.isEmpty() ? null : Paths.get(dataFilePath);
 			}
 
 			@Override
 			public Path getDeviceSubPath(IDevice device) {
-				return Paths.get(device.getDeviceConfiguration().getPureDeviceName());
+				return Paths.get(device.getDeviceConfiguration().getPureDeviceName(device.getName()));
 			}
 
 			@Override
-			public List<String> getDataSetExtensions(IDevice device) {
+			public List<String> getDataSetExtensions(IDevice device, Settings settings) {
 				List<String> result = new ArrayList<>();
 				result.add(GDE.FILE_ENDING_OSD);
-				if (device instanceof IHistoDevice && Settings.getInstance().getSearchDataPathImports()) {
+				if (device instanceof IHistoDevice && settings.getSearchDataPathImports()) {
 					result.addAll(((IHistoDevice) device).getSupportedImportExtentions());
 				}
 				return result;
 			}
 
 			@Override
-			public Stream<Path> getExternalBaseDirs() {
+			public Stream<Path> getExternalBaseDirs(Settings settings) {
 				try {
-					return Arrays.stream(Settings.getInstance().getDataFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+					return Arrays.stream(settings.getDataFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
 							.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
@@ -94,7 +95,7 @@ public class SourceFolders {
 			}
 
 			@Override
-			public boolean isActive(IDevice device) {
+			public boolean isActive(IDevice device, Settings settings) {
 				// the DataSetPath is always a valid path
 				return true;
 			}
@@ -102,7 +103,7 @@ public class SourceFolders {
 		IMPORT {
 			@Override
 			@Nullable
-			public Path getBasePath() {
+			public Path getBasePath(String dataFilePath) {
 				return null;
 			}
 
@@ -112,7 +113,7 @@ public class SourceFolders {
 			}
 
 			@Override
-			public List<String> getDataSetExtensions(IDevice device) {
+			public List<String> getDataSetExtensions(IDevice device, Settings settings) {
 				if (device instanceof IHistoDevice)
 					return ((IHistoDevice) device).getSupportedImportExtentions();
 				else
@@ -120,9 +121,9 @@ public class SourceFolders {
 			}
 
 			@Override
-			public Stream<Path> getExternalBaseDirs() {
+			public Stream<Path> getExternalBaseDirs(Settings settings) {
 				try {
-					return Arrays.stream(Settings.getInstance().getImportFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+					return Arrays.stream(settings.getImportFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
 							.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get);
 				} catch (Exception e) {
 					log.log(Level.SEVERE, e.getMessage(), e);
@@ -131,12 +132,12 @@ public class SourceFolders {
 			}
 
 			@Override
-			public boolean isActive(IDevice device) {
-				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtensions(device).isEmpty() + " ExternalFolders.exist=" + getExternalBaseDirs().anyMatch(e -> true));
-				if (getDataSetExtensions(device).isEmpty()) {
+			public boolean isActive(IDevice device, Settings settings) {
+				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtensions(device, settings).isEmpty() + " ExternalFolders.exist=" + getExternalBaseDirs(settings).anyMatch(e -> true));
+				if (getDataSetExtensions(device, settings).isEmpty()) {
 					return false;
 				} else {
-					return getExternalBaseDirs().anyMatch(e -> true);
+					return getExternalBaseDirs(settings).anyMatch(e -> true);
 				}
 			};
 		};
@@ -146,19 +147,20 @@ public class SourceFolders {
 		 */
 		public static final DirectoryType[] VALUES = values();
 
-		public static EnumSet<DirectoryType> getValidDirectoryTypes(IDevice device) {
+		public static EnumSet<DirectoryType> getValidDirectoryTypes(IDevice device, Settings settings) {
 			EnumSet<DirectoryType> directoryTypes = EnumSet.noneOf(DirectoryType.class);
 			for (DirectoryType directoryType : VALUES) {
-				if (directoryType.isActive(device)) directoryTypes.add(directoryType);
+				if (directoryType.isActive(device, settings)) directoryTypes.add(directoryType);
 			}
 			return directoryTypes;
 		}
 
 		/**
+		 * @param dataFilePath
 		 * @return the current directory path independent from object / device
 		 */
 		@Nullable
-		public abstract Path getBasePath();
+		public abstract Path getBasePath(String dataFilePath);
 
 		/**
 		 * @return the sub path for finding files assigned to the device
@@ -167,16 +169,18 @@ public class SourceFolders {
 		public abstract Path getDeviceSubPath(IDevice device);
 
 		/**
+		 * @param settings TODO
 		 * @return the supported file extensions (e.g. 'bin') or an empty list
 		 */
-		public abstract List<String> getDataSetExtensions(IDevice device);
+		public abstract List<String> getDataSetExtensions(IDevice device, Settings settings);
 
 		/**
+		 * @param settings TODO
 		 * @return true if the prerequisites for the directory type are fulfilled
 		 */
-		public abstract boolean isActive(IDevice device);
+		public abstract boolean isActive(IDevice device, Settings settings);
 
-		public abstract Stream<Path> getExternalBaseDirs();
+		public abstract Stream<Path> getExternalBaseDirs(Settings settings);
 	}
 
 	/**
@@ -214,25 +218,28 @@ public class SourceFolders {
 				}
 			};
 
-	private final String												objectKey;
+	private final Analyzer											analyzer;
 
-	public SourceFolders(String objectKey) {
-		this.objectKey = objectKey;
+	public SourceFolders(Analyzer analyzer) {
+		this.analyzer = analyzer;
 	}
 
 	/**
 	 * Determine the valid directory paths from all log sources.
 	 * The result depends on the active device and object.
-	 * @param slowFolderAccessMessage
+	 * @param signaler is a status message setter
 	 */
-	public void defineDirectories(IDevice device, boolean slowFolderAccessMessage) { // todo replace with signaler
+	public void defineDirectories(Consumer<String> signaler) {
 		folders.clear();
-		for (DirectoryType directoryType : DirectoryType.getValidDirectoryTypes(device)) {
-			if (slowFolderAccessMessage) GDE.getUiNotification().setStatusMessage("find object folders in " + directoryType.getBasePath().toString());
-			Set<Path> currentPaths = defineCurrentPaths(device, directoryType);
-			if (slowFolderAccessMessage) GDE.getUiNotification().setStatusMessage("");
-			if (!objectKey.isEmpty()) {
-				Set<Path> externalObjectPaths = defineExternalObjectPaths(directoryType);
+		IDevice device = analyzer.getActiveDevice();
+		Settings settings = analyzer.getSettings();
+		for (DirectoryType directoryType : DirectoryType.getValidDirectoryTypes(device, settings)) {
+			signaler.accept("find object folders for " + directoryType);
+			Set<Path> currentPaths = defineCurrentPaths(directoryType);
+			signaler.accept("");
+			if (!settings.getActiveObjectKey().isEmpty()) {
+				Set<Path> externalObjectPaths = directoryType.getExternalBaseDirs(analyzer.getSettings()) //
+						.map(p -> defineObjectPaths(p)).flatMap(Set::stream).collect(Collectors.toSet());
 				currentPaths.addAll(externalObjectPaths);
 				log.log(Level.FINE, directoryType.toString(), externalObjectPaths);
 			}
@@ -250,14 +257,15 @@ public class SourceFolders {
 	 * The result depends on the active device and object.
 	 * @return the list with 0 .. n entries
 	 */
-	private Set<Path> defineCurrentPaths(IDevice device, DirectoryType directoryType) {
+	private Set<Path> defineCurrentPaths(DirectoryType directoryType) {
 		Set<Path> newPaths = new HashSet<>();
 
-		Path basePath = directoryType.getBasePath();
+		Path basePath = directoryType.getBasePath(analyzer.getSettings().getDataFilePath());
 		if (basePath == null) {
 			// an unavailable path results in no files found
 		} else {
-			if (objectKey.isEmpty()) {
+			if (analyzer.getSettings().getActiveObjectKey().isEmpty()) {
+				IDevice device = analyzer.getActiveDevice();
 				Path rootPath = directoryType.getDeviceSubPath(device) != null ? basePath.resolve(directoryType.getDeviceSubPath(device)) : basePath;
 				newPaths.add(rootPath);
 			} else {
@@ -269,7 +277,7 @@ public class SourceFolders {
 
 	private Set<Path> defineObjectPaths(Path basePath) {
 		Set<Path> result = new HashSet<Path>();
-		Stream<String> objectKeys = Stream.of(objectKey);
+		Stream<String> objectKeys = Stream.of(analyzer.getSettings().getActiveObjectKey());
 		try (Stream<Path> objectPaths = ObjectKeyCompliance.defineObjectPaths(basePath, objectKeys)) {
 			result = objectPaths.collect(Collectors.toSet());
 		} catch (IOException e) {
@@ -278,18 +286,6 @@ public class SourceFolders {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
 		return result;
-	}
-
-	/**
-	 * Determine the object directory paths from the external directories (data / import).
-	 * They are defined in the DataExplorer properties.
-	 * The result depends on the active device and object.
-	 * @return the list with 0 .. n entries
-	 */
-	private Set<Path> defineExternalObjectPaths(DirectoryType directoryType) {
-		Stream<Path> externalBaseDirs = directoryType.getExternalBaseDirs();
-		return externalBaseDirs.map(p -> defineObjectPaths(p)) //
-				.flatMap(Set::stream).collect(Collectors.toSet());
 	}
 
 	public Set<Entry<DirectoryType, Set<Path>>> entrySet() {
@@ -369,7 +365,7 @@ public class SourceFolders {
 	}
 
 	public boolean isMatchingPath(Path sourceFile) {
-		int nameCountMax = Settings.getInstance().getSubDirectoryLevelMax() + 1;
+		int nameCountMax = analyzer.getSettings().getSubDirectoryLevelMax() + 1;
 		Map<Path, Set<DirectoryType>> pathMap = getMap();
 		for (Path path : pathMap.keySet()) {
 			try {

@@ -19,7 +19,6 @@
 
 package gde.histo.cache;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -28,6 +27,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import gde.Analyzer;
+import gde.DataAccess;
 import gde.GDE;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -80,7 +80,7 @@ public final class VaultCollector {
 	public VaultCollector(String objectDirectory, Path sourcePath, int fileVersion, int logRecordSetSize, String logRecordsetBaseName, //
 			Analyzer analyzer, boolean providesReaderSettings) {
 		this(objectDirectory, sourcePath, fileVersion, logRecordSetSize, 0, logRecordsetBaseName, analyzer.getActiveDevice().getName(), analyzer, //
-				sourcePath.toFile().lastModified(), analyzer.getActiveChannel().getNumber(), objectDirectory, providesReaderSettings);
+				analyzer.getDataAccess().getSourceLastModified(sourcePath), analyzer.getActiveChannel().getNumber(), objectDirectory, providesReaderSettings);
 	}
 
 	/**
@@ -108,8 +108,8 @@ public final class VaultCollector {
 		this.analyzer = analyzer;
 		String readerSettings = providesReaderSettings && analyzer.getActiveDevice() instanceof IHistoDevice
 				? ((IHistoDevice) analyzer.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
-		File file = sourcePath.toFile();
-		this.vault = new ExtendedVault(objectDirectory, sourcePath, file.lastModified(), file.length(), fileVersion, logRecordSetSize,
+		DataAccess dataAccess = analyzer.getDataAccess();
+		this.vault = new ExtendedVault(objectDirectory, sourcePath, dataAccess.getSourceLastModified(sourcePath), dataAccess.getSourceLength(sourcePath), fileVersion, logRecordSetSize,
 				logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, analyzer, //
 				logStartTimestamp_ms, logChannelNumber, logObjectKey, readerSettings);
 	}
@@ -132,7 +132,7 @@ public final class VaultCollector {
 			setMeasurementPoints(recordSet, isSampled);
 
 			{
-				GroupTransitions transitions = TransitionCollector.defineTransitions(recordSet, this.vault.logChannelNumber);
+				GroupTransitions transitions = new TransitionCollector(recordSet).defineTransitions(this.vault.logChannelNumber);
 				SettlementRecords histoSettlements = determineSettlements(recordSet, transitions);
 				setSettlements(histoSettlements);
 			}
@@ -198,12 +198,12 @@ public final class VaultCollector {
 						evaluator.addFromTransition(transition);
 					}
 				} else if (transitionAmountType != null) {
-					AmountEvaluator evaluator = new AmountEvaluator(record);
+					AmountEvaluator evaluator = new AmountEvaluator(record, analyzer);
 					for (Transition transition : transitions.get(transitionAmountType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}
 				} else if (calculationType != null) {
-					CalculusEvaluator evaluator = new CalculusEvaluator(record);
+					CalculusEvaluator evaluator = new CalculusEvaluator(record, analyzer);
 					for (Transition transition : transitions.get(calculationType.getTransitionGroupId()).values()) {
 						evaluator.addFromTransition(transition);
 					}
@@ -378,7 +378,7 @@ public final class VaultCollector {
 	 * @param isSampled true indicates that the record values are a sample from the original values
 	 */
 	private void setTrailPoints(CompartmentType entryPoints, Record record, boolean isSampled) {
-		UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), true, true, false);
+		UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), true, true, false, analyzer.getSettings());
 		if (!quantile.getOutliers().isEmpty()) {
 			entryPoints.setOutlierPoints(//
 					quantile.getOutliers().stream().distinct().mapToInt(v -> encodeMeasurementValue(record, v)));
@@ -427,7 +427,7 @@ public final class VaultCollector {
 				entryPoints.addPoint(TrailTypes.REAL_FIRST, record.elementAt(0));
 				entryPoints.addPoint(TrailTypes.REAL_LAST, record.elementAt(record.realSize() - 1));
 
-				UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), true, true, false);
+				UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), true, true, false, analyzer.getSettings());
 				if (!quantile.getOutliers().isEmpty()) {
 					entryPoints.setOutlierPoints(//
 							quantile.getOutliers().stream().distinct().mapToInt(v -> encodeSettlementValue(record, v)));

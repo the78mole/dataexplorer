@@ -19,7 +19,6 @@
 
 package gde;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -63,13 +62,13 @@ public abstract class Analyzer {
 		return analyzer;
 	}
 
-	protected final Settings				settings;
-	protected final DataAccess			dataAccess;
-	protected DeviceConfigurations	deviceConfigurations				= null;
-	protected Thread								deviceConfigurationsThread	= null;
+	protected final Settings							settings;
+	protected final DataAccess						dataAccess;
+	protected final Thread								deviceConfigurationsThread;
+	protected final DeviceConfigurations	deviceConfigurations;
 
-	protected IDevice								activeDevice								= null;
-	protected Channels							channels										= null;
+	protected IDevice											activeDevice	= null;
+	protected Channels										channels			= null;
 
 	protected Analyzer() {
 		this.settings = Settings.getInstance();
@@ -81,13 +80,12 @@ public abstract class Analyzer {
 			this.dataAccess = DataAccess.getInstance();
 		}
 
+		this.deviceConfigurations = new DeviceConfigurations();
 		this.deviceConfigurationsThread = new Thread("loadDeviceConfigurations") {
 			@Override
 			public void run() {
 				log.log(Level.FINE, "deviceConfigurationsThread    started");
-				Settings.getInstance();
-				File file = new File(Settings.getDevicesPath());
-				if (file.exists()) Analyzer.this.deviceConfigurations = new DeviceConfigurations(file.list(), Settings.getInstance().getActiveDevice());
+				Analyzer.this.deviceConfigurations.initialize(settings, dataAccess);
 				log.log(Level.TIME, "deviceConfigurationsThread time =", new SimpleDateFormat("ss:SSS").format(new Date().getTime() - GDE.StartTime));
 			}
 		};
@@ -99,20 +97,34 @@ public abstract class Analyzer {
 
 	/**
 	 * Hybrid singleton copy constructor.
-	 * Caution: NO deep copy for device and deviceConfigurations.
+	 * Caution: NO deep copy for the device configurations and the active device.
 	 */
 	protected Analyzer(Analyzer that) {
 		this.settings = new Settings(that.settings);
-		this.channels = new Channels(that.channels);
-
-		this.activeDevice = that.activeDevice;
 		this.dataAccess = that.dataAccess.clone();
-		if (this.deviceConfigurations == null) {
-			throw new UnsupportedOperationException("clone is requested befor the configurations are loaded");
+
+		if (that.channels != null) {
+			this.channels = new Channels(that.channels);
+		}
+
+		if (that.activeDevice == null) {
+			this.activeDevice = null;
+		} else {
+			// inhomogeneous clone: All device configuration objects remain the same (NOT cloned), whereas native device objects are created anew !!!
+			this.activeDevice = that.activeDevice.getDeviceConfiguration().getAsDevice();
+		}
+
+		// shallow copy
+		if (that.deviceConfigurations == null) {
+			throw new UnsupportedOperationException("clone is requested before the configurations are loaded");
 		} else {
 			this.deviceConfigurations = that.deviceConfigurations;
 		}
+		// define thread object for other methods checking its progress
+		this.deviceConfigurationsThread = new Thread("loadDeviceConfigurations");
+		this.deviceConfigurationsThread.start();
 	}
+
 	/**
 	 * @return the roaming data sources support
 	 */
@@ -121,25 +133,10 @@ public abstract class Analyzer {
 	}
 
 	public DeviceConfigurations getDeviceConfigurations() {
-		if (this.deviceConfigurations == null) {
-			if (this.isDeviceConfigurationsThreadAlive()) {
-				try {
-					this.deviceConfigurationsThread.join();
-				} catch (InterruptedException e) {
-				}
-			} else {
-				File file = new File(Settings.getDevicesPath());
-				this.deviceConfigurations = new DeviceConfigurations(file.list());
-			}
+		if (this.deviceConfigurationsThread.isAlive()) {
+			joinDeviceConfigurationsThread();
 		}
 		return this.deviceConfigurations;
-	}
-
-	/**
-	 * @return false if the thread is null or finished
-	 */
-	private boolean isDeviceConfigurationsThreadAlive() {
-		return this.deviceConfigurationsThread != null ? this.deviceConfigurationsThread.isAlive() : false;
 	}
 
 	@Nullable
@@ -162,6 +159,13 @@ public abstract class Analyzer {
 	 */
 	public void setActiveDevice(IDevice device) {
 		this.activeDevice = device;
+	}
+
+	/**
+	 * Do not clean or rebuild the channels.
+	 */
+	public void setActiveDevice(String deviceName) {
+		this.activeDevice = deviceConfigurations.get(deviceName).getAsDevice();
 	}
 
 	/**

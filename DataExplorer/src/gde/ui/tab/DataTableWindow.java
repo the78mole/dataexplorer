@@ -55,6 +55,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
@@ -491,7 +492,7 @@ public class DataTableWindow extends CTabItem {
 					}
 				}
 				if (this.settings.isHistoActive() && this.settings.isDataTableTransitions()) {
-					TransitionTableMapper mapper = new TransitionTableMapper(DataTableWindow.this.application.getActiveRecordSet());
+					TransitionTableMapper mapper = new TransitionTableMapper(DataTableWindow.this.application.getActiveRecordSet(), Analyzer.getInstance());
 					for (SettlementType settlementType : mapper.defineActiveAndDisplayableSettlements().values()) {
 						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 						String recordName = this.xmlResource.getReplacement(settlementType.getName());

@@ -309,7 +309,7 @@ public final class SettlementRecord extends Vector<Integer> {
 
 	public ElementaryQuantile<Integer> getQuantile() {
 		if (this.quantile == null) {
-			this.quantile = new ElementaryQuantile<>(this, true);
+			this.quantile = new ElementaryQuantile<>(this, true, parent.getAnalyzer().getSettings());
 		}
 		return this.quantile;
 	}

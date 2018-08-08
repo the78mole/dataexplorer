@@ -527,7 +527,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 				popupmenu.setData(TabMenuOnDemand.IS_CURSOR_IN_CANVAS.name(), GDE.STRING_TRUE);
 				Path activeFolder = DirectoryScanner.getActiveFolder4Ui();
 				popupmenu.setData(TabMenuOnDemand.EXCLUDED_LIST.name(), Arrays.stream(ExclusionActivity.getExcludedTrusses()).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR)));
-				InclusionData inclusionData = new InclusionData(activeFolder);
+				InclusionData inclusionData = new InclusionData(activeFolder, Analyzer.getInstance().getDataAccess());
 				String[] includedRecordNames = inclusionData.getIncludedRecordNames();
 				SummaryWarning summaryWarning = new SummaryWarning(activeFolder, record != null ? record.getName() : GDE.STRING_EMPTY, includedRecordNames);
 				popupmenu.setData(TabMenuOnDemand.SUMMARY_WARNING.name(), summaryWarning);
@@ -652,7 +652,9 @@ public final class SummaryComposite extends AbstractChartComposite {
 		boolean isSummarySpotsVisible = settings.isSummarySpotsVisible();
 		boolean isCurveSelector = windowActor.isCurveSelectorEnabled();
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
-		InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder4Ui());
+		if (trailRecordSet == null) return;
+
+		InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder4Ui(), Analyzer.getInstance().getDataAccess());
 		List<String> exclusiveNames = Arrays.asList(inclusionData.getIncludedRecordNames());
 
 		for (int i = 0; i < trailRecordSet.getDisplayRecords().size(); i++) {
@@ -687,6 +689,8 @@ public final class SummaryComposite extends AbstractChartComposite {
 	 */
 	private boolean isSpaceBelow(int displayOrdinal) {
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
+		if (trailRecordSet == null) return true;
+
 		int nextOrdinal = displayOrdinal + 1;
 		if (nextOrdinal < trailRecordSet.getDisplayRecords().size()) {
 			TrailRecord nextRecord = trailRecordSet.getDisplayRecords().get(nextOrdinal);

@@ -1484,7 +1484,7 @@ public class MenuToolBar {
 	 */
 	private boolean isObjectKeyConsistentWithDevices(String newObjectKey) {
 		for (Entry<String, DeviceConfiguration> entry : DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().entrySet()) {
-			if (entry.getKey().equals(newObjectKey) || entry.getValue().getPureDeviceName().equals(newObjectKey)) return false;
+			if (entry.getKey().equals(newObjectKey) || entry.getValue().getPureDeviceName(entry.getKey()).equals(newObjectKey)) return false;
 		}
 		return true;
 	}

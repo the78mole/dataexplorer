@@ -19,7 +19,7 @@
 ****************************************************************************************/
 package gde.device;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.lang.reflect.Constructor;
@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -42,12 +43,16 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.swt.custom.CTabItem;
 
+import com.sun.istack.internal.Nullable;
+
 import gde.DataAccess;
+import gde.DataAccess.LocalAccess;
 import gde.GDE;
 import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
@@ -133,14 +138,15 @@ public class DeviceConfiguration {
 		String basePath = "C:/Documents and Settings/brueg/Application Data/DataExplorer/Devices/"; //$NON-NLS-1$
 
 		try {
-			Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new File(basePath + "DeviceProperties_V13.xsd")); //$NON-NLS-1$
+			StreamSource streamSource = new StreamSource(new FileInputStream(basePath + "DeviceProperties_V13.xsd"));
+			Schema schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(streamSource);
 			JAXBContext jc = JAXBContext.newInstance("gde.device"); //$NON-NLS-1$
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema(schema);
 			JAXBElement<DevicePropertiesType> elememt;
 
 			// simple test with Picolario.xml
-			elememt = (JAXBElement<DevicePropertiesType>) unmarshaller.unmarshal(new File(basePath + "Picolario.xml")); //$NON-NLS-1$
+			elememt = (JAXBElement<DevicePropertiesType>) unmarshaller.unmarshal(new FileInputStream(basePath + "Picolario.xml")); //$NON-NLS-1$
 			DevicePropertiesType devProps = elememt.getValue();
 			DeviceType device = devProps.getDevice();
 			log.log(Level.ALL, "device.getName() = " + device.getName()); //$NON-NLS-1$
@@ -165,9 +171,13 @@ public class DeviceConfiguration {
 		}
 	}
 
+	/**
+	 * No roaming data access support.
+	 * Not threadsafe due to JAXB un-/marshallers.
+	 */
 	public DeviceConfiguration(String xmlFileName) throws FileNotFoundException, JAXBException {
 		this.xmlFile = Paths.get(xmlFileName);
-		if (!(xmlFile.toFile().exists())) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
+		if (!((LocalAccess) DataAccess.getInstance()).existsDeviceXml(xmlFileName)) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
 
 		this.settings = Settings.getInstance();
 
@@ -187,16 +197,20 @@ public class DeviceConfiguration {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
 	}
 
+	/**
+	 * No roaming data access support.
+	 * Not threadsafe due to JAXB un-/marshallers.
+	 */
 	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>)
 	public DeviceConfiguration(String xmlFileName, Unmarshaller tmpUnmarshaller) throws FileNotFoundException, JAXBException {
 		this.xmlFile = Paths.get(xmlFileName);
-		if (!(xmlFile.toFile().exists())) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
+		if (!((LocalAccess) DataAccess.getInstance()).existsDeviceXml(xmlFileName)) throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileName);
 
 		this.settings = Settings.getInstance();
 
 		this.settings.joinXsdThread();
 
-		this.elememt = (JAXBElement<DevicePropertiesType>) tmpUnmarshaller.unmarshal(this.xmlFile.toFile());
+		this.elememt = this.settings.getDeviceSerialization().getTopElement(this.xmlFile, tmpUnmarshaller);
 		this.deviceProps = this.elememt.getValue();
 		this.device = this.deviceProps.getDevice();
 		this.serialPort = this.deviceProps.getSerialPort();
@@ -211,7 +225,8 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * copy constructor
+	 * Shallow copy constructor.
+	 * No data access required.
 	 */
 	public DeviceConfiguration(DeviceConfiguration deviceConfig) {
 		this.settings = deviceConfig.settings;
@@ -233,14 +248,47 @@ public class DeviceConfiguration {
 
 	/**
 	 * Use this for roaming data sources support via the DataAccess class.
+	 * Full data access support.
+	 * Not threadsafe due to JAXB un-/marshallers.
 	 * @param xmlFileSubPath is a relative path based on the roaming folder
+	 * @param settings for threadsafe operation with respect to settings
 	 */
-	public DeviceConfiguration(Path xmlFileSubPath) throws FileNotFoundException, JAXBException {
+	public DeviceConfiguration(Path xmlFileSubPath, Unmarshaller tmpUnmarshaller, Settings settings) throws FileNotFoundException, JAXBException {
 		this.xmlFile = Paths.get(GDE.APPL_HOME_PATH).resolve(xmlFileSubPath);
-		if (!(DataAccess.getInstance().existsDeviceXml(xmlFileSubPath))) throw new FileNotFoundException(
-				Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileSubPath.toString());
+		if (!DataAccess.getInstance().existsDeviceXml(xmlFileSubPath)) { // ok
+			throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileSubPath.toString());
+		}
+		this.settings = settings;
 
-		this.settings = Settings.getInstance();
+		this.settings.joinXsdThread();
+
+		this.elememt = this.settings.getDeviceSerialization().getTopElement(xmlFileSubPath, tmpUnmarshaller);
+		this.deviceProps = this.elememt.getValue();
+		this.device = this.deviceProps.getDevice();
+		this.serialPort = this.deviceProps.getSerialPort();
+		this.usbPort = this.deviceProps.getUsbPort();
+		this.dataBlock = this.deviceProps.getDataBlock();
+		this.state = this.deviceProps.getState();
+		this.timeBase = this.deviceProps.getTimeBase();
+		this.desktop = this.deviceProps.getDesktop();
+		this.isChangePropery = false;
+
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.toString());
+	}
+
+	/**
+	 * Use this for roaming data sources support via the DataAccess class.
+	 * Full data access support.
+	 * Not threadsafe due to JAXB un-/marshallers.
+	 * @param xmlFileSubPath is a relative path based on the roaming folder
+	 * @param settings for threadsafe operation with respect to settings
+	 */
+	public DeviceConfiguration(Path xmlFileSubPath, Settings settings) throws FileNotFoundException, JAXBException {
+		this.xmlFile = Paths.get(GDE.APPL_HOME_PATH).resolve(xmlFileSubPath);
+		if (!DataAccess.getInstance().existsDeviceXml(xmlFileSubPath)) { // ok
+			throw new FileNotFoundException(Messages.getString(MessageIds.GDE_MSGE0003) + xmlFileSubPath.toString());
+		}
+		this.settings = settings;
 
 		this.settings.joinXsdThread();
 
@@ -265,7 +313,7 @@ public class DeviceConfiguration {
 		if (this.isChangePropery) {
 			try {
 				this.fileSha1Hash = GDE.STRING_EMPTY;
-				this.settings.getDeviceSerialization().marshall(this.elememt, this.xmlFile);
+				this.settings.getDeviceSerialization().marshall(this.elememt, this.xmlFile.toString());
 			}
 			catch (Throwable t) {
 				log.log(Level.SEVERE, t.getMessage(), t);
@@ -281,7 +329,7 @@ public class DeviceConfiguration {
 	public void storeDeviceProperties(String fullQualifiedFileName) {
 		try {
 			this.fileSha1Hash = GDE.STRING_EMPTY;
-			this.settings.getDeviceSerialization().marshall(this.elememt, Paths.get(fullQualifiedFileName));
+			this.settings.getDeviceSerialization().marshall(this.elememt, fullQualifiedFileName);
 		}
 		catch (Throwable t) {
 			log.log(Level.SEVERE, t.getMessage(), t);
@@ -364,8 +412,8 @@ public class DeviceConfiguration {
 	 * Special directory handling for MC3000 and Q200 supporting battery sets but store data in normal device folder.
 	 * @return the device name stripped by the 'set' extension for devices supporting battery sets
 	 */
-	public String getPureDeviceName() {
-		String pureDeviceName = DataExplorer.getInstance().getActiveDevice().getName();
+	public String getPureDeviceName(String deviceName) {
+		String pureDeviceName = deviceName;
 		if (pureDeviceName.endsWith("-Set")) { // MC3000-Set -> MC3000, Q200-Set -> Q200 //$NON-NLS-1$
 			pureDeviceName = pureDeviceName.substring(0, pureDeviceName.length() - 4);
 		}
@@ -412,13 +460,16 @@ public class DeviceConfiguration {
 	 * Use to convert this instance into a device object without reloading from the device properties file.
 	 * @return the device instance by using the class loader
 	 */
-	public IDevice getAsDevice() throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, NoClassDefFoundError {
-		Class<?> currentClass = Thread.currentThread().getContextClassLoader().loadClass(this.getClassImplName());
-		Constructor<?> constructor = currentClass.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
-		if (constructor != null) {
-			return (IDevice) constructor.newInstance(new Object[] { this });
-		} else
-			throw new NoClassDefFoundError(Messages.getString(MessageIds.GDE_MSGE0016));
+	@Nullable
+	public IDevice getAsDevice() {
+		IDevice tmpDevice = null;
+		try {
+			Class<?> currentClass = Thread.currentThread().getContextClassLoader().loadClass(this.getClassImplName());
+			Constructor<?> constructor = currentClass.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
+			tmpDevice = constructor != null ? (IDevice) constructor.newInstance(new Object[] { this }) : null;
+		} catch (Exception e) {
+		}
+		return tmpDevice;
 	}
 
 	/**
@@ -2650,15 +2701,15 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * Checks the channel mix setting.
+	 * Do not check the channel mix setting.
 	 * @return the 1-based config numbers of those channels which carry identical measurement names compared to the channel identified by the param (result size >= 1)
 	 */
 	public List<Integer> getChannelMixConfigNumbers(int channelNumber) {
 		final List<Integer> channelMixConfigNumbers;
-		if (this.settings.isChannelMix() && getDeviceGroup() == DeviceTypes.CHARGER)
+		if (getDeviceGroup() == DeviceTypes.CHARGER)
 			channelMixConfigNumbers = getChannelBundle(channelNumber);
 		else
-			channelMixConfigNumbers = Arrays.asList(new Integer[] { channelNumber });
+			channelMixConfigNumbers = Collections.singletonList(channelNumber);
 		return channelMixConfigNumbers;
 	}
 
@@ -2706,25 +2757,6 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @return null or import path with trailing device and / or object stripped off
-	 */
-	public Path getImportBaseDir() {
-		Path path = null;
-		String tmpImportDirPath = getDataBlockType().getPreferredDataLocation();
-		if (!(tmpImportDirPath == null || tmpImportDirPath.trim().isEmpty() || tmpImportDirPath.equals(GDE.FILE_SEPARATOR_UNIX))) {
-			path = Paths.get(tmpImportDirPath);
-			// ignore object if path ends with a valid object
-			String directoryName = path.getFileName().toString();
-			path = this.settings.getValidatedObjectKey(directoryName).isPresent() ? path.getParent() : path;
-			// ignore device if path ends with a valid device
-			String directoryName2 = path.getFileName().toString();
-			path = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices().keySet().stream().filter(s -> s.equals(directoryName2)).findFirst().isPresent() ? path.getParent() : path;
-		}
-		log.log(Level.FINER, "ImportBaseDir " + path); //$NON-NLS-1$
-		return path;
-	}
-
-	/**
 	 * function to prepare a row of record set for export while translating available measurement values.
 	 * @return pointer to filled data table row with formated values
 	 */
@@ -2769,7 +2801,7 @@ public class DeviceConfiguration {
 	private void setFileSha1Hash() {
 		Path fileSubPath = Paths.get(GDE.APPL_HOME_PATH).relativize(this.xmlFile);
 		try {
-			this.fileSha1Hash = SecureHash.sha1(DataAccess.getInstance().getDeviceXmlInputStream(fileSubPath));
+			this.fileSha1Hash = SecureHash.sha1(DataAccess.getInstance().getDeviceXmlInputStream(fileSubPath)); // ok
 		} catch (Exception e) {
 			this.fileSha1Hash = GDE.STRING_EMPTY;
 			log.log(Level.SEVERE, e.getMessage(), e);

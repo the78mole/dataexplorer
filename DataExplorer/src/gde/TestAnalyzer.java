@@ -19,8 +19,6 @@
 
 package gde;
 
-import gde.config.Settings;
-import gde.data.Channel;
 import gde.data.Channels;
 import gde.device.IDevice;
 import gde.log.Logger;
@@ -42,57 +40,40 @@ public class TestAnalyzer extends Analyzer {
 		super(analyzer);
 	}
 
-	public void initiateUnitTestEnvironment(IDevice device, Channels channels, String objectKey) {
+	/**
+	 * Use this for non-histo junit tests only.
+	 * @param device
+	 * @param newChannels are set up according to the device
+	 * @param objectKey
+	 */
+	public void initiateUnitTestEnvironment(IDevice device, Channels newChannels, String objectKey) {
+		this.settings.setActiveObjectKey(objectKey);
+
 		// device :
 		this.activeDevice = device;
 
-		// channel : from setupDataChannels
-		this.channels = Channels.getInstance();
-		this.channels.cleanup();
-		String[] channelNames = new String[device.getChannelCount()];
-		// buildup new structure - set up the channels
-		for (int i = 1; i <= device.getChannelCount(); i++) {
-			Channel newChannel = new Channel(device.getChannelNameReplacement(i), device.getChannelTypes(i));
-			// newChannel.setObjectKey(this.application.getObjectKey()); now in application.selectObjectKey
-			this.channels.put(Integer.valueOf(i), newChannel);
-			channelNames[i - 1] = i + " : " + device.getChannelNameReplacement(i);
-		}
-		this.channels.setChannelNames(channelNames);
-
-		if (!Settings.getInstance().getActiveObjectKey().equals(objectKey)) {
-			String[] objectKeys = Settings.getInstance().getObjectList();
-			for (String objectKey2 : objectKeys) {
-				if (objectKey.equals(objectKey2)) {
-					this.channels.getActiveChannel().setObjectKey(objectKey);
-				}
-			}
-		}
+		this.channels = newChannels;
+		this.channels.setupChannels(this);
 	}
 
-	public void setEnvironmentWoutUI(Settings newSettings, IDevice device, int channelNumber) { // todo new settings was set into a field variable
+	public void setArena(IDevice device, int channelNumber, String objectKey) {
+		this.settings.setActiveObjectKey(objectKey);
+
 		if (!device.equals(this.activeDevice)) {
 			// device :
 			this.activeDevice = device;
 
-			// channels : from setupDataChannels
-			// objectKey : is not set because histo does not use it
-			this.channels = Channels.getInstance();
-			this.channels.cleanup();
-			String[] channelNames = new String[device.getChannelCount()];
-			// buildup new structure - set up the channels
-			for (int i = 1; i <= device.getChannelCount(); i++) {
-				Channel newChannel = new Channel(device.getChannelNameReplacement(i), device.getChannelTypes(i));
-				// newChannel.setObjectKey(objectKey);
-				this.channels.put(Integer.valueOf(i), newChannel);
-				channelNames[i - 1] = i + " : " + device.getChannelNameReplacement(i);
-			}
-			this.channels.setChannelNames(channelNames);
+			if (this.channels == null) this.channels = Channels.getInstance();
+			this.channels.setupChannels(this);
 		}
 
 		// channel :
 		this.channels.setActiveChannelNumber(channelNumber);
 	}
 
+	/**
+	 * Use this for non-histo junit tests only.
+	 */
 	@Override
 	public void setActiveDevice(IDevice device) {
 		if (device != null) {
@@ -100,8 +81,16 @@ public class TestAnalyzer extends Analyzer {
 		}
 	}
 
+	/**
+	 * Use this for non-histo junit tests only.
+	 */
+	public void setChannels(Channels channels) {
+		this.channels = channels;
+	}
+
 	@Override
 	public TestAnalyzer clone() {
+		joinDeviceConfigurationsThread();
 		return new TestAnalyzer(this);
 	}
 

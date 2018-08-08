@@ -416,7 +416,7 @@ public class DataExplorer extends Composite {
 			this.fileHandler = new gde.io.FileHandler();
 			this.initGUI();
 
-			((Explorer) this.analyzer).setChannels(Channels.getInstance(this));
+			((Explorer) this.analyzer).setChannels();
 			// this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1);
 			// this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.UTILITY_RECORD_SET, 1);
 
@@ -2089,13 +2089,21 @@ public class DataExplorer extends Composite {
 		this.compareTabItem.redrawGraphics(true);
 	}
 
+	public boolean isWithCompareSet() {
+		return this.compareSet != null && !this.compareSet.isEmpty();
+	}
+
+	public boolean isWithUtilitySet() {
+		return this.utilitySet != null && !this.utilitySet.isEmpty();
+	}
+
 	public RecordSet getCompareSet() {
-		return this.compareSet == null ? this.compareSet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1, GraphicsType.COMPARE)
+		return this.compareSet == null ? this.compareSet = new RecordSet(analyzer.clone(), GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1, GraphicsType.COMPARE)
 				: this.compareSet;
 	}
 
 	public RecordSet getUtilitySet() {
-		return this.utilitySet == null ? this.utilitySet = new RecordSet(null, GDE.STRING_EMPTY, DataExplorer.UTILITY_RECORD_SET, 1, GraphicsType.UTIL)
+		return this.utilitySet == null ? this.utilitySet = new RecordSet(analyzer, GDE.STRING_EMPTY, DataExplorer.UTILITY_RECORD_SET, 1, GraphicsType.UTIL)
 				: this.utilitySet;
 	}
 
@@ -2223,8 +2231,8 @@ public class DataExplorer extends Composite {
 	 * @param enabled
 	 */
 	public void setCompareWindowMode(GraphicsMode graphicsMode, boolean enabled) {
-		RecordSet recordSet = DataExplorer.application.getCompareSet();
-		if (recordSet != null) {
+		if (DataExplorer.application.isWithCompareSet()) {
+			RecordSet recordSet = DataExplorer.application.getCompareSet();
 			switch (graphicsMode) {
 			case ZOOM:
 				recordSet.resetMeasurement();
@@ -2258,12 +2266,10 @@ public class DataExplorer extends Composite {
 			if (isGraphicsTypeNormal) {
 				recordSet.clearMeasurementModes();
 				this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
-			} else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
+			} else if (this.compareTabItem != null && !this.compareTabItem.isDisposed() && this.isWithCompareSet()) {
 				recordSet = DataExplorer.application.getCompareSet();
-				if (recordSet != null) {
-					recordSet.clearMeasurementModes();
-					this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
-				}
+				recordSet.clearMeasurementModes();
+				this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
 			}
 		}
 	}

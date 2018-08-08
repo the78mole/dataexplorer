@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+import gde.Analyzer;
 import gde.GDE;
 import gde.device.resource.DeviceXmlResource;
 import gde.histo.datasources.DirectoryScanner;
@@ -372,7 +373,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "isEclusiveWarning.widgetSelected, event=" + evt);
 					warning.ifPresent(w -> {
-						InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder4Ui());
+						InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder4Ui(), Analyzer.getInstance().getDataAccess());
 						if (isExclusiveWarning.getSelection()) {
 							inclusionData.setProperty(w.recordName);
 						} else {
@@ -393,7 +394,7 @@ public final class ChartTabAreaContextMenu extends AbstractTabAreaContextMenu {
 				public void widgetSelected(SelectionEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "isEclusiveWarning.widgetSelected, event=" + evt);
 					warning.ifPresent(w -> {
-						InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder4Ui());
+						InclusionData inclusionData = new InclusionData(DirectoryScanner.getActiveFolder4Ui(), Analyzer.getInstance().getDataAccess());
 						inclusionData.delete();
 						presentHistoExplorer.updateHistoTabs(false, false, true);
 					});

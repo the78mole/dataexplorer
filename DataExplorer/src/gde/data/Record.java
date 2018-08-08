@@ -60,8 +60,6 @@ public class Record extends AbstractRecord {
 	public static final String	DELIMITER					= "|-|";																		//$NON-NLS-1$
 	public static final String	END_MARKER				= "|:-:|";																	//$NON-NLS-1$
 
-	protected final Settings		settings					= Settings.getInstance();
-
 	// this variables are used to make a record selfcontained within compare set
 	String											channelConfigKey;																							// used as channelConfigKey
 	String											keyName;
@@ -800,7 +798,7 @@ public class Record extends AbstractRecord {
 			value = Double.valueOf(property.getValue()).doubleValue();
 		else
 			try {
-				value = this.getDevice().getMeasurementFactor(this.getAbstractParent().parent.number, this.ordinal);
+				value = this.getDevice().getMeasurementFactor(this.getParent().parent.number, this.ordinal);
 			} catch (RuntimeException e) {
 				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.FACTOR); // log warning and use default value
 			}
@@ -823,7 +821,7 @@ public class Record extends AbstractRecord {
 			value = Double.valueOf(property.getValue()).doubleValue();
 		else
 			try {
-				value = this.getDevice().getMeasurementOffset(this.getAbstractParent().parent.number, this.ordinal);
+				value = this.getDevice().getMeasurementOffset(this.getParent().parent.number, this.ordinal);
 			} catch (RuntimeException e) {
 				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.OFFSET); // log warning and use default value
 			}
@@ -846,7 +844,7 @@ public class Record extends AbstractRecord {
 			value = Double.valueOf(property.getValue()).doubleValue();
 		else {
 			try {
-				String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.getAbstractParent().parent.number, this.ordinal, IDevice.REDUCTION);
+				String strValue = (String) this.getDevice().getMeasurementPropertyValue(this.getParent().parent.number, this.ordinal, IDevice.REDUCTION);
 				if (strValue != null && strValue.length() > 0) value = Double.valueOf(strValue.trim().replace(',', '.')).doubleValue();
 			} catch (RuntimeException e) {
 				// log.log(Level.WARNING, this.name + " use default value for property " + IDevice.REDUCTION); // log warning and use default value
@@ -998,7 +996,7 @@ public class Record extends AbstractRecord {
 						if (this.triggerRanges != null) {
 							log.log(Level.FINE, "evaluate trigger ranges to meet minTimeSec requirement");
 							for (TriggerRange range : this.triggerRanges) {
-								log.log(Level.FINE, this.name + " trigger range = " + range.in + " to " + range.out + " = " //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
+								log.log(Level.FINE, this.name + " trigger range = " + range.in + " to " + range.out + " = " //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 										+ TimeLine.getFomatedTime( this.getTime_ms(range.out) - this.getTime_ms(range.in) ) + " sec"); //$NON-NLS-1$
 							}
 						} else
@@ -1333,8 +1331,7 @@ public class Record extends AbstractRecord {
 			this.df.applyPattern("0.000"); //$NON-NLS-1$
 			break;
 		}
-		RecordSet compareSet = DataExplorer.getInstance().getCompareSet();
-		if (compareSet != null && compareSet.size() > 0) {
+		if (DataExplorer.getInstance().isWithCompareSet()) {
 			this.parent.syncMasterSlaveRecords(this, Record.TYPE_AXIS_NUMBER_FORMAT);
 		}
 	}
@@ -1724,8 +1721,9 @@ public class Record extends AbstractRecord {
 	 * @return string of time value in simple date format HH:ss:mm:SSS
 	 */
 	public String getHorizontalDisplayPointAsFormattedTimeWithUnit(int xPos) {
+		Settings settings = this.getParent().getAnalyzer().getSettings();
 		return TimeLine.getFomatedTimeWithUnit(
-				this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms() + (this.settings != null && this.settings.isTimeFormatAbsolute() ? this.getStartTimeStamp() : 0)); // use GMT time zone for durations now. initially was 1292400000 == 1970-01-16 00:00:00.000
+				this.getHorizontalDisplayPointTime_ms(xPos) + this.getDrawTimeOffset_ms() + (settings != null && settings.isTimeFormatAbsolute() ? this.getStartTimeStamp() : 0)); // use GMT time zone for durations now. initially was 1292400000 == 1970-01-16 00:00:00.000
 	}
 
 	/**

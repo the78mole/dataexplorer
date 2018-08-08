@@ -307,16 +307,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	}
 
 	/**
-	 * get the device to calculate or retrieve measurement properties, this property is hold local to be independent
-	 * @return the device
-	 */
-	public IDevice getDevice() {
-		if (this.device == null) this.device = this.getAbstractParent().getDevice();
-
-		return this.device;
-	}
-
-	/**
 	 * @param finalValue is the value to be displayed (without applying a factor or GPS coordinates fraction correction)
 	 * @return the translated and decimal formatted value
 	 */
