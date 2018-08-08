@@ -366,6 +366,7 @@ public class Settings extends Properties {
 				catch (Exception e) {
 					Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, "xsdThread.run()", e.getMessage(), e);
 				}
+				log.log(Level.TIME, "xsdValidationThread time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
 			}
 		};
 
@@ -433,6 +434,7 @@ public class Settings extends Properties {
 							break;
 						}
 					}
+					log.log(Level.TIME, "migrationThread time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
 				}
 			};
 		}
@@ -2312,7 +2314,15 @@ public class Settings extends Properties {
 	}
 
 	public void startMigationThread() {
-		if (this.migrationThread != null) this.migrationThread.run();
+		if (this.migrationThread != null) {
+			this.migrationThread.run();
+			try {
+				this.migrationThread.join();
+			}
+			catch (InterruptedException e) {
+				Settings.log.logp(java.util.logging.Level.SEVERE, Settings.$CLASS_NAME, "migrationThread.run()", e.getMessage(), e);
+			}
+		}
 	}
 
 	/**

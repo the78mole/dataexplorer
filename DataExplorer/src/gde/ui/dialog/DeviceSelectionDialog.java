@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -162,9 +163,10 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 
 			this.deviceConfigurations = this.application.getDeviceConfigurations();
 			this.activeDevices = this.deviceConfigurations.getActiveDevices();
+			log.log(Level.INFO, String.format("active Device = %s activeDevices = %s", this.activeDeviceName, this.activeDevices.toString()));
 			this.selectedActiveDeviceConfig = this.deviceConfigurations.getSelectedActiveDeviceConfig();
 			if (this.selectedActiveDeviceConfig == null) this.application.setActiveDevice(null);
-			log.log(Level.OFF, "DeviceSelectionDialog    initialized");
+			log.log(Level.TIME, "time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
 		}
 		catch (FileNotFoundException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -1236,6 +1238,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				catch (Throwable t) {
 					DeviceSelectionDialog.log.log(Level.WARNING, t.getMessage(), t);
 				}
+				log.log(Level.TIME, "updateAvailablePortsThread time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
 			}
 		};
 		this.listPortsThread.start();

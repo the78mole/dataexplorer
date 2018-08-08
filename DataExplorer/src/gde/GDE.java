@@ -384,9 +384,8 @@ public class GDE {
 		GDE.settingsThread = new Thread("Settings async") {
 			@Override
 			public void run() {
-				log.log(Level.INFO, "Settings.getInstance  start");
+				log.log(Level.INFO, "Settings.getInstance() settingsAsyncThread.run()");
 				Settings.getInstance();
-				log.log(Level.INFO, "Settings.getInstance  done ");
 			}
 		};
 		GDE.settingsThread.start();

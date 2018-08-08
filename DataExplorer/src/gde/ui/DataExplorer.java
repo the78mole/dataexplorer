@@ -363,14 +363,17 @@ public class DataExplorer extends Composite {
 			this.deviceConfigurationsThread  = new Thread("loadDeviceConfigurations") {
 				@Override
 				public void run() {
-					log.log(Level.OFF, "deviceConfigurationsThread    started");
+					log.log(Level.INFO, "deviceConfigurationsThread    started");
 					File file = new File(Settings.getInstance().getDevicesPath());
-					if (file.exists())
+					if (file.exists()) {
 						DataExplorer.this.deviceConfigurations = new DeviceConfigurations(file.list(), Settings.getInstance().getActiveDevice());
+					}
 					log.log(Level.TIME, "deviceConfigurationsThread time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
 				}
 			};
-			this.deviceConfigurationsThread.start();
+			if (!this.settings.isDevicePropertiesUpdated()) {
+				this.deviceConfigurationsThread.start();
+			}
 
 			new Thread("updateAvailablePorts") {
 				@Override
@@ -382,6 +385,7 @@ public class DataExplorer extends Composite {
 					} catch (Throwable t) {
 						log.log(java.util.logging.Level.WARNING, t.getMessage(), t);
 					}
+					log.log(Level.TIME, "updateAvailablePortsThread time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
 				}
 			}.start();
 
@@ -820,12 +824,19 @@ public class DataExplorer extends Composite {
 				this.settings.setProperty(Settings.IS_LOCK_UUCP_HINTED, "true"); //$NON-NLS-1$
 			}
 
+			// wait for possible migration and delay opening for migration
+			if (this.settings.isDevicePropertiesUpdated()) {
+				this.settings.startMigationThread();
+				this.deviceConfigurationsThread.start();
+				this.deviceConfigurationsThread.join();
+				this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this); //re-initialize to handle updates due to migration 
+			}
+
 			// check initial application settings
 			if (!this.settings.isOK()) {
 				this.openSettingsDialog();
 			}
-			// wait for possible migration and delay opening for migration
-			this.settings.startMigationThread();
+			
 			// check configured device
 			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) {
 				this.deviceSelectionDialog.open();

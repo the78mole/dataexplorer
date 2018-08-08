@@ -66,7 +66,7 @@ public final class DeviceConfigurations {
 
 		this.configs = new TreeMap<String, DeviceConfiguration>(String.CASE_INSENSITIVE_ORDER);
 		this.activeDevices = new Vector<String>(2, 1);
-		initialize(files, activeDeviceName);
+		this.initialize(files, activeDeviceName);
 	}
 
 	public Set<String> keySet() {
