@@ -80,14 +80,10 @@ import gde.utils.OperatingSystemHelper;
  * @author Thomas Eickert (USER)
  */
 public abstract class DataAccess {
-	private static final String	$CLASS_NAME				= DataAccess.class.getName();
-	private static final Logger	log								= Logger.getLogger($CLASS_NAME);
-
-	private static final int		MIN_VAULT_LENGTH	= 2048;
 
 	public final static class LocalAccess extends DataAccess {
-		@SuppressWarnings("hiding")
-		private static final Logger log = Logger.getLogger(LocalAccess.class.getName());
+		private static final String	$CLASS_NAME	= LocalAccess.class.getName();
+		private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
 		private LocalAccess() {
 		}
@@ -369,7 +365,7 @@ public abstract class DataAccess {
 
 		public InputStream getDeviceXsdMigrationStream(int versionNumber) throws FileNotFoundException {
 			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
-			Path targetFilePath = migratePropertyPath.resolve("/DeviceProperties_V" + versionNumber + GDE.FILE_ENDING_DOT_XSD);
+			Path targetFilePath = migratePropertyPath.resolve("DeviceProperties_V" + versionNumber + GDE.FILE_ENDING_DOT_XSD);
 			return new FileInputStream(targetFilePath.toFile());
 		}
 
@@ -558,92 +554,124 @@ public abstract class DataAccess {
 			}
 		}
 
-		public String[] getSourceFolderList(Path fittedFolderPath) {
-			File sourceFolder = fittedFolderPath.toFile();
-			if (!sourceFolder.exists()) {
-				return new String[0];
-			} else {
-				return sourceFolder.list();
-			}
-		}
-
 		@Override
-		@Nullable
-		public Path getActualSourceFile(Path fittedFilePath) {
-			long startMillis = System.currentTimeMillis();
-			File tmpActualFile = null;
-			try {
-				tmpActualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(fittedFilePath.toString()));
-				// getLinkContainedFilePath may have long response times in case of an unavailable network resources
-				// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
-				log.log(Level.FINER, "time_ms=", System.currentTimeMillis() - startMillis);
-				if (!fittedFilePath.toFile().exists()) throw new IllegalArgumentException("source file does not exist");
-
-				if (Files.isSameFile(fittedFilePath, tmpActualFile.toPath()) && (System.currentTimeMillis() - startMillis > 555)) {
-					log.log(Level.WARNING, "Dead OSD link " + fittedFilePath + " pointing to ", tmpActualFile);
-					if (!fittedFilePath.toFile().delete()) {
-						log.log(Level.WARNING, "could not delete link file ", fittedFilePath);
-					}
-					tmpActualFile = null;
+		public Stream<String> getSourceFolderList(Path fittedFolderPath) {
+			if (existsSourceFolder(fittedFolderPath)) {
+				try {
+					return Files.list(fittedFolderPath).map(Path::getFileName).map(Path::toString);
+				} catch (Exception e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
 				}
-			} catch (Exception e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
+// return fittedFolderPath.toFile().list();
 			}
-			return tmpActualFile != null ? tmpActualFile.toPath() : null;
+			return Stream.empty();
 		}
 
-		@Override
-		public boolean deleteFleetObjects() {
-			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
-			return FileUtils.cleanDirectory(targetDirPath.toFile());
-		}
+	@Override
+	public boolean existsSourceFolder(Path fittedFolderPath) {
+		File sourceFolder = fittedFolderPath.toFile();
+		return sourceFolder.exists() && sourceFolder.isDirectory() && sourceFolder.canRead();
+	}
 
-		@Override
-		public List<String> getFleetObjectKeys(Function<String, Boolean> objectKeyfilter) {
-			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
-			FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
-			List<String> objectKeys;
-			try (Stream<String> stream = Files.list(targetDirPath).map(p -> targetDirPath.relativize(p)).map(Path::toString)) {
-				objectKeys = stream.filter(objectKeyfilter::apply).collect(Collectors.toList());
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-			return objectKeys;
-		}
+	@Override
+	public boolean existsSourceFile(Path fittedFilePath) {
+		return FileUtils.checkFileExist(fittedFilePath.toString());
+	}
 
-		@Override
-		public FileInputStream getFleetIntputStream(Path fileSubPath) {
-			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
-			FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
-			try {
-				return new FileInputStream(targetDirPath.resolve(fileSubPath).toFile());
-			} catch (FileNotFoundException e) {
-				throw new IllegalArgumentException("invalid path " + fileSubPath);
-			}
-		}
+	@Override
+	public Stream<Path> getSourceFolders(Path fittedFolderPath) throws IOException {
+		Stream<Path> folders = Files.walk(fittedFolderPath) //
+				.filter(p -> !p.equals(fittedFolderPath)) // eliminate root
+				.filter(Files::isDirectory);
+		return folders;
+	}
 
-		@Override
-		public FileOutputStream getFleetOutputStream(Path fileSubPath) {
-			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
-			FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
-			try {
-				Files.createDirectories(targetDirPath);
-				return new FileOutputStream(targetDirPath.resolve(fileSubPath).toFile());
-			} catch (Exception e) {
-				throw new IllegalArgumentException("invalid path " + fileSubPath);
-			}
-		}
+	@Override
+	public Stream<Path> getSourceFolders(Path fittedFolderPath, Stream<String> objectKeys) throws IOException {
+		List<String> lowerCaseKeys = objectKeys.map(String::toLowerCase).collect(Collectors.toList());
+		Stream<Path> folders = Files.walk(fittedFolderPath) //
+				.filter(Files::isDirectory) //
+				.filter(p -> lowerCaseKeys.contains(p.getFileName().toString().toLowerCase()));
+		return folders;
+	}
 
-		@Override
-		public synchronized LocalAccess clone() {
-			LocalAccess clone = null;
-			try {
-				clone = new LocalAccess(this);
-			} catch (Exception e) {
-				LocalAccess.log.log(Level.SEVERE, e.getMessage(), e);
+	@Override
+	@Nullable
+	public Path getActualSourceFile(Path fittedFilePath) {
+		long startMillis = System.currentTimeMillis();
+		File tmpActualFile = null;
+		try {
+			tmpActualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(fittedFilePath.toString()));
+			// getLinkContainedFilePath may have long response times in case of an unavailable network resources
+			// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
+			log.log(Level.FINER, "time_ms=", System.currentTimeMillis() - startMillis);
+			if (!fittedFilePath.toFile().exists()) throw new IllegalArgumentException("source file does not exist");
+
+			if (Files.isSameFile(fittedFilePath, tmpActualFile.toPath()) && (System.currentTimeMillis() - startMillis > 555)) {
+				log.log(Level.WARNING, "Dead OSD link " + fittedFilePath + " pointing to ", tmpActualFile);
+				if (!fittedFilePath.toFile().delete()) {
+					log.log(Level.WARNING, "could not delete link file ", fittedFilePath);
+				}
+				tmpActualFile = null;
 			}
-			return clone;
+		} catch (Exception e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
+		return tmpActualFile != null ? tmpActualFile.toPath() : null;
+	}
+
+	@Override
+	public boolean deleteFleetObjects() {
+		Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+		return FileUtils.cleanDirectory(targetDirPath.toFile());
+	}
+
+	@Override
+	public List<String> getFleetObjectKeys(Function<String, Boolean> objectKeyfilter) {
+		Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+		FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
+		List<String> objectKeys;
+		try (Stream<String> stream = Files.list(targetDirPath).map(p -> targetDirPath.relativize(p)).map(Path::toString)) {
+			objectKeys = stream.filter(objectKeyfilter::apply).collect(Collectors.toList());
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		return objectKeys;
+	}
+
+	@Override
+	public FileInputStream getFleetIntputStream(Path fileSubPath) {
+		Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+		FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
+		try {
+			return new FileInputStream(targetDirPath.resolve(fileSubPath).toFile());
+		} catch (FileNotFoundException e) {
+			throw new IllegalArgumentException("invalid path " + fileSubPath);
+		}
+	}
+
+	@Override
+	public FileOutputStream getFleetOutputStream(Path fileSubPath) {
+		Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+		FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
+		try {
+			Files.createDirectories(targetDirPath);
+			return new FileOutputStream(targetDirPath.resolve(fileSubPath).toFile());
+		} catch (Exception e) {
+			throw new IllegalArgumentException("invalid path " + fileSubPath);
+		}
+	}
+
+	@Override
+	public synchronized LocalAccess clone() {
+		LocalAccess clone = null;
+		try {
+			clone = new LocalAccess(this);
+		} catch (Exception e) {
+			LocalAccess.log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return clone;
+	}
 
 	}
 
@@ -852,6 +880,39 @@ public abstract class DataAccess {
 	 * @return the input stream for a logging source file (osd, bin , ...)
 	 */
 	public abstract InputStream getSourceInputStream(Path fittedFilePath);
+
+	/**
+	 * @param fittedFolderPath is a customized path (full path for local file system access or relative path for other data sources)
+	 * @return true if the folder exists and is accessible
+	 */
+	public abstract boolean existsSourceFolder(Path fittedFolderPath);
+
+	/**
+	 * @param fittedFilePath is a customized path (full path for local file system access or relative path for other data sources)
+	 * @return true if the folder exists and is accessible
+	 */
+	public abstract boolean existsSourceFile(Path fittedFilePath);
+
+	/**
+	 * @param fittedFolderPath is a customized path (full path for local file system access or relative path for other data sources)
+	 * @return the files and directory entries for the folder
+	 */
+	public abstract Stream<String> getSourceFolderList(Path fittedFolderPath);
+
+	/**
+	 * Use the {@code try-with-resources} construct.
+	 * @see java.nio.file.Files#walk(Path, java.nio.file.FileVisitOption...)
+	 * @param fittedFolderPath is any path
+	 */
+	public abstract Stream<Path> getSourceFolders(Path fittedFolderPath) throws IOException;
+
+	/**
+	 * Use the {@code try-with-resources} construct.
+	 * @see java.nio.file.Files#walk(Path, java.nio.file.FileVisitOption...)
+	 * @param fittedFolderPath is any path
+	 * @return the paths to all folders corresponding to the object keys
+	 */
+	public abstract Stream<Path> getSourceFolders(Path fittedFolderPath, Stream<String> objectKeys) throws IOException;
 
 	/**
 	 * @param fittedFilePath is a customized path (full path for local file system access or relative path for other data sources).

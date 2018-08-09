@@ -48,7 +48,6 @@ import gde.histo.device.IHistoDevice;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
-import gde.utils.ObjectKeyCompliance;
 
 /**
  * Detect valid sub paths.
@@ -278,7 +277,7 @@ public class SourceFolders {
 	private Set<Path> defineObjectPaths(Path basePath) {
 		Set<Path> result = new HashSet<Path>();
 		Stream<String> objectKeys = Stream.of(analyzer.getSettings().getActiveObjectKey());
-		try (Stream<Path> objectPaths = ObjectKeyCompliance.defineObjectPaths(basePath, objectKeys)) {
+		try (Stream<Path> objectPaths = analyzer.getDataAccess().getSourceFolders(basePath, objectKeys)) {
 			result = objectPaths.collect(Collectors.toSet());
 		} catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), " is not accessible : " + e.getClass());

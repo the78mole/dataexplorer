@@ -22,7 +22,6 @@ package gde.utils;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,12 +41,13 @@ import java.util.stream.Stream;
 import org.eclipse.swt.SWT;
 
 import gde.Analyzer;
+import gde.DataAccess;
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.device.DeviceConfiguration;
-import gde.histo.datasources.SupplementObjectFolder;
+import gde.histo.ui.datasources.SupplementObjectFolder;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -112,7 +113,7 @@ public class ObjectKeyCompliance {
 			// ensure that all objects owns a directory
 			for (String tmpObjectKey : newObjectKeys) {
 				Path objectKeyDirPath = Paths.get(Settings.getInstance().getDataFilePath()).resolve(tmpObjectKey);
-				FileUtils.checkDirectoryAndCreate(objectKeyDirPath.toString());
+				FileUtils.checkDirectoryAndCreate(objectKeyDirPath.toString()); //ok
 			}
 			Settings.getInstance().setObjectList(objectListClone.toArray(new String[0]), Settings.getInstance().getActiveObject());
 			log.log(Level.FINE, "object list updated and directories created for object keys : ", newObjectKeys);
@@ -162,10 +163,10 @@ public class ObjectKeyCompliance {
 				new ObjectKeyScanner(newObjKey).start();
 			}
 
-			if (FileUtils.checkDirectoryExist(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey)) {
+			if (FileUtils.checkDirectoryExist(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey)) { //ok
 				// query for old directory deletion
 				if (!GDE.isWithUi() || SWT.YES == DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031)))
-					FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey);
+					FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey); //ok
 			}
 		}
 		replaceObjectKey(oldObjKey, newObjKey, newObjectKeys);
@@ -184,7 +185,7 @@ public class ObjectKeyCompliance {
 		int index = removeIndex >= 2 && !delObjectKey.isEmpty() ? removeIndex - 1 : tmpObjectKeys.size() > 1 ? 1 : 0;
 		Settings.getInstance().setObjectList(tmpObjectKeys.toArray(new String[1]), tmpObjectKeys.get(index));
 		if (!delObjectKey.isEmpty()) {
-			FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + delObjectKey);
+			FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + delObjectKey); //ok
 		}
 	}
 
@@ -217,7 +218,7 @@ public class ObjectKeyCompliance {
 		DataExplorer.getInstance().setObjectDescriptionTabVisible(true);
 		DataExplorer.getInstance().updateObjectDescriptionWindow();
 
-		FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + newObjectKey);
+		FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + newObjectKey); //ok
 		new ObjectKeyScanner(newObjectKey).start();
 	}
 
@@ -254,37 +255,17 @@ public class ObjectKeyCompliance {
 	 */
 	private static ArrayList<Path> getSourcePaths() {
 		ArrayList<Path> dirPaths = new ArrayList<Path>();
-		{
-			final String dataFilePath = Settings.getInstance().getDataFilePath();
-			if (dataFilePath != null && !dataFilePath.trim().isEmpty() && !dataFilePath.equals(GDE.FILE_SEPARATOR_UNIX)) {
-				dirPaths.add(Paths.get(dataFilePath));
-				log.log(Level.FINE, "data path ", dataFilePath);
-			}
-		}
-		{
-			Stream<Path> dataFolders = Arrays.stream(Settings.getInstance().getDataFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
-					.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get);
-			dirPaths.addAll(dataFolders.collect(Collectors.toList()));
-		}
-		{
-			Stream<Path> importFolders = Arrays.stream(Settings.getInstance().getImportFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
-					.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get);
-			dirPaths.addAll(importFolders.collect(Collectors.toList()));
-		}
-		return dirPaths;
-	}
 
-	/**
-	 * Is based on {@code Files.walk} which recommends using the {@code try-with-resources} construct.
-	 * @see java.nio.file.Files#walk(Path, java.nio.file.FileVisitOption...)
-	 * @param basePath is any path
-	 * @return the paths to all folders corresponding to the object keys
-	 */
-	public static Stream<Path> defineObjectPaths(Path basePath, Stream<String> objectKeys) throws IOException {
-		List<String> lowerCaseKeys = objectKeys.map(String::toLowerCase).collect(Collectors.toList());
-		Stream<Path> result = Files.walk(basePath).filter(Files::isDirectory) //
-				.filter(p -> lowerCaseKeys.contains(p.getFileName().toString().toLowerCase()));
-		return result;
+		final String dataFilePath = Settings.getInstance().getDataFilePath();
+		if (dataFilePath != null && !dataFilePath.trim().isEmpty() && !dataFilePath.equals(GDE.FILE_SEPARATOR_UNIX)) {
+			dirPaths.add(Paths.get(dataFilePath));
+			log.log(Level.FINE, "data path ", dataFilePath);
+		}
+		Arrays.stream(Settings.getInstance().getDataFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+				.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get).forEach(dirPaths::add);
+		Arrays.stream(Settings.getInstance().getImportFoldersCsv().split(GDE.STRING_CSV_SEPARATOR)) //
+				.map(String::trim).filter(s -> !s.isEmpty()).map(Paths::get).forEach(dirPaths::add);
+		return dirPaths;
 	}
 
 	/**
@@ -292,10 +273,10 @@ public class ObjectKeyCompliance {
 	 * @return the non-empty sub-directory names which do not represent devices
 	 */
 	public static Set<String> defineObjectKeyCandidates(Map<String, DeviceConfiguration> devices) {
-		final Set<String> excludedLowerCaseNames = new HashSet<>();
+		Set<String> excludedLowerCaseNames = new HashSet<>();
 		excludedLowerCaseNames.add(SupplementObjectFolder.getSupplementObjectsPath().getFileName().toString().toLowerCase());
-		excludedLowerCaseNames.addAll(devices.keySet().stream().map(String::toLowerCase).collect(Collectors.toList()));
 
+		devices.keySet().stream().map(String::toLowerCase).forEach(excludedLowerCaseNames::add);
 		return readSourcePathsObjectKeys(excludedLowerCaseNames);
 	}
 
@@ -304,10 +285,11 @@ public class ObjectKeyCompliance {
 	 * @return the non-empty sub-directory names which neither represent devices nor object keys
 	 */
 	public static Set<String> defineObjectKeyNovelties(Map<String, DeviceConfiguration> devices) {
-		final Set<String> excludedLowerCaseNames = Settings.getInstance().getRealObjectKeys().map(String::toLowerCase).collect(Collectors.toSet());
+		Set<String> excludedLowerCaseNames = new HashSet<>();
 		excludedLowerCaseNames.add(SupplementObjectFolder.getSupplementObjectsPath().getFileName().toString().toLowerCase());
-		excludedLowerCaseNames.addAll(devices.keySet().stream().map(String::toLowerCase).collect(Collectors.toList()));
 
+		devices.keySet().stream().map(String::toLowerCase).forEach(excludedLowerCaseNames::add);
+		Settings.getInstance().getRealObjectKeys().map(String::toLowerCase).forEach(excludedLowerCaseNames::add);
 		return readSourcePathsObjectKeys(excludedLowerCaseNames);
 	}
 
@@ -315,45 +297,38 @@ public class ObjectKeyCompliance {
 	 * @return the folder names of non-empty sub-directories not matching the {@code excludedLowerCaseNames}
 	 */
 	private static Set<String> readSourcePathsObjectKeys(Set<String> excludedLowerCaseNames) {
+		Function<Path, Boolean> isSupplementMirrorRoot = directoryPath -> {
+			// true for mirror copy roots just below the {@code supplementObjectsPath}
+			boolean isRoot = false;
+			try {
+				Path supplementObjectsPath = SupplementObjectFolder.getSupplementObjectsPath();
+				Path subPath = supplementObjectsPath.relativize(directoryPath);
+				boolean isFirstLevelSupplement = directoryPath.startsWith(supplementObjectsPath) && subPath.getNameCount() == 1;
+				isRoot = isFirstLevelSupplement && subPath.toString().length() > 2 && subPath.toString().substring(0, 2).equals(GDE.STRING_UNDER_BAR + GDE.STRING_UNDER_BAR);
+			} catch (IllegalArgumentException e) { // UNC windows path does not compare with standard windows path
+				log.log(Level.FINE, e.getMessage(), SupplementObjectFolder.getSupplementObjectsPath() + " <> other: " + directoryPath);
+			}
+			return isRoot;
+		};
+		Function<Path, Boolean> isExcludedName = p -> excludedLowerCaseNames.contains(p.getFileName().toString().toLowerCase());
+		Function<Path, Boolean> isEmptyFolder = p -> !DataAccess.getInstance().getSourceFolderList(p).anyMatch(s -> true); // todo exclude folders???
+
 		Set<String> directoryNames = new HashSet<>();
 		for (Path dirPath : getSourcePaths()) {
-			if (dirPath != null && !dirPath.toString().isEmpty()) {
-				List<String> result = new ArrayList<>();
-				Path supplementObjectsPath = SupplementObjectFolder.getSupplementObjectsPath();
-				try (Stream<Path> stream = Files.walk(dirPath)) {
-					result = stream //
-							.filter(p -> !p.equals(dirPath)) // eliminate root
-							.filter(Files::isDirectory) //
-							.filter(p -> !isSupplementMirrorRoot(p, supplementObjectsPath)) // eliminate the roots but not their contents
-							.filter(p -> !excludedLowerCaseNames.contains(p.getFileName().toString().toLowerCase())) // hasValidName
-							.filter(p -> p.toFile().listFiles(new LogFileFilter()).length > 0) // hasLogFiles
-							// .peek(p -> System.out.println(p)) //
-							.map(Path::getFileName).map(Path::toString) //
-							.distinct().collect(Collectors.toList());
-				} catch (NoSuchFileException e) { // dir does not exist
-					log.log(Level.WARNING, "NoSuchFileException", dirPath);
-				} catch (IOException e) {
-					log.log(Level.WARNING, e.getMessage(), e);
-				}
-				directoryNames.addAll(result);
+			try (Stream<Path> stream = DataAccess.getInstance().getSourceFolders(dirPath)) {
+				stream.filter(p -> !isSupplementMirrorRoot.apply(p)) // eliminate the roots but not their contents
+						.filter(p -> !isExcludedName.apply(p)) //
+						.filter(p -> !isEmptyFolder.apply(p)) //
+						.peek(p -> log.log(Level.FINER, "sourcePath =", p)) //
+						.map(Path::getFileName).map(Path::toString) //
+						.distinct().forEach(directoryNames::add);
+			} catch (NoSuchFileException e) { // folder does not exist
+				log.log(Level.WARNING, "NoSuchFileException", dirPath);
+			} catch (IOException e) {
+				log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
 		return directoryNames;
-	}
-
-	/**
-	 * @return true for mirror copy roots just below the {@code supplementObjectsPath}
-	 */
-	private static boolean isSupplementMirrorRoot(Path directoryPath, Path supplementObjectsPath) {
-		boolean result = false;
-		try {
-			Path subPath = supplementObjectsPath.relativize(directoryPath);
-			boolean isFirstLevelSupplement = directoryPath.startsWith(supplementObjectsPath) && subPath.getNameCount() == 1;
-			result = isFirstLevelSupplement && subPath.toString().length() > 2 && subPath.toString().substring(0, 2).equals(GDE.STRING_UNDER_BAR + GDE.STRING_UNDER_BAR);
-		} catch (IllegalArgumentException e) { // UNC windows path does not compare with standard windows path
-			log.log(Level.FINE, e.getMessage(), supplementObjectsPath + " <> other: " + directoryPath);
-		}
-		return result;
 	}
 
 	/**

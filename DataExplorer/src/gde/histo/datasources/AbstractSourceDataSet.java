@@ -49,7 +49,6 @@ import gde.histo.io.HistoOsdReaderWriter;
 import gde.histo.utils.PathUtils;
 import gde.io.FileHandler;
 import gde.log.Logger;
-import gde.utils.FileUtils;
 
 /**
  * Exploring and checking source data sets (log files) on a file and vault attribute level.
@@ -72,7 +71,7 @@ public abstract class AbstractSourceDataSet {
 		 * @return true if the current device supports both directory type and file extension
 		 */
 		public boolean isWorkableFile(Set<DirectoryType> directoryTypes, SourceFolders sourceFolders) {
-			return VaultChecker.isWorkableDataSet(filePath, directoryTypes, sourceFolders, analyzer);
+			return new VaultChecker(analyzer).isWorkableDataSet(filePath, directoryTypes, sourceFolders);
 		}
 
 		/**
@@ -144,7 +143,7 @@ public abstract class AbstractSourceDataSet {
 		 * @return true if the file was opened or imported
 		 */
 		public boolean load(String desiredRecordSetName) {
-			if (!FileUtils.checkFileExist(filePath.toString())) return false;
+			if (!analyzer.getDataAccess().existsSourceFile(filePath)) return false;
 
 			loadFile(filePath, desiredRecordSetName);
 			return true;
@@ -221,7 +220,7 @@ public abstract class AbstractSourceDataSet {
 
 		@Override
 		public boolean isValidDeviceChannelObjectAndStart(TrussCriteria trussCriteria, HistoVault vault) {
-			return VaultChecker.matchDeviceChannelObjectAndStart(analyzer, trussCriteria, vault);
+			return new VaultChecker(analyzer).matchDeviceChannelObjectAndStart(trussCriteria, vault);
 		}
 
 		@Override
@@ -290,7 +289,7 @@ public abstract class AbstractSourceDataSet {
 
 		@Override
 		public boolean isValidDeviceChannelObjectAndStart(TrussCriteria trussCriteria, HistoVault vault) {
-			return VaultChecker.matchObjectAndStart(trussCriteria, vault);
+			return new VaultChecker(analyzer).matchObjectAndStart(trussCriteria, vault);
 		}
 
 		@Override

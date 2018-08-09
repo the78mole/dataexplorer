@@ -216,7 +216,7 @@ public final class FleetMonitor {
 			EnumSet<DirectoryType> directoryTypes = DirectoryType.getValidDirectoryTypes(device, Analyzer.getInstance().getSettings());
 			// todo + add object key to Analyzer
 			Analyzer analyzerClone = Analyzer.getInstance().clone();
-			VaultChecker checker = new VaultChecker(analyzerClone, directoryTypes); // clone for thread safety
+			VaultChecker checker = new VaultChecker(analyzerClone); // clone for thread safety
 
 			SourceFolders sourceFolders = new SourceFolders(analyzerClone);
 			sourceFolders.defineDirectories(s -> {
@@ -224,7 +224,7 @@ public final class FleetMonitor {
 			List<HistoVault> allVaults = new VaultReaderWriter(Analyzer.getInstance(), Optional.empty()).readVaults(e.getValue());
 			List<HistoVault> validVaults = new ArrayList<>();
 			for (HistoVault vault : allVaults) {
-				if (checker.isValidVault(vault)) validVaults.add(vault);
+				if (checker.isValidVault(vault, directoryTypes, sourceFolders)) validVaults.add(vault);
 			}
 			log.log(Level.OFF, "valid vaults size=", validVaults.size());
 

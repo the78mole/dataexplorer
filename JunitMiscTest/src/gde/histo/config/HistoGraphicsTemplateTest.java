@@ -62,7 +62,7 @@ class HistoGraphicsTemplateTest extends NonUiTestCase {
 		Analyzer analyzerClone = Analyzer.getInstance().clone();  // clone to prevent changing the object list
 		analyzerClone.getSettings().setObjectList(new String[] { "first", "2nd" }, "first");
 		int channelNumber = 1;
-		((TestAnalyzer) analyzerClone).setEnvironmentWoutUI(analyzerClone.getDeviceConfigurations().get(deviceName).getAsDevice(), channelNumber, objectKey);
+		((TestAnalyzer) analyzerClone).setArena(analyzerClone.getDeviceConfigurations().get(deviceName).getAsDevice(), channelNumber, objectKey);
 
 		HistoGraphicsTemplate template = transitoryTemplate //
 				? HistoGraphicsTemplate.createTransitoryTemplate(analyzerClone) //

@@ -17,9 +17,8 @@
     Copyright (c) 2017,2018 Thomas Eickert
 ****************************************************************************************/
 
-package gde.histo.datasources;
+package gde.histo.ui.datasources;
 
-import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -44,14 +43,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import gde.Analyzer;
+import gde.DataAccess;
 import gde.GDE;
 import gde.config.Settings;
+import gde.histo.datasources.AbstractSourceDataSet;
 import gde.histo.datasources.AbstractSourceDataSet.SourceDataSet;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.FileUtils;
-import gde.utils.ObjectKeyCompliance;
 
 /**
  * Folder for additional object directories in the working directory.
@@ -150,12 +150,12 @@ public final class SupplementObjectFolder {
 	public static String resetFolders() {
 		String message = "";
 		Path objectsPath = getSupplementObjectsPath();
-		int initialSize_MiB = (int) (FileUtils.size(objectsPath) / 1024 / 1024);
+		int initialSize_MiB = (int) (FileUtils.size(objectsPath) / 1024 / 1024); // ok
 
 		Stream<String> realObjectKeys = Settings.getInstance().getRealObjectKeys(); // ok
 
 		StringBuilder sb = new StringBuilder("  in ").append(objectsPath.toString()).append(GDE.STRING_BLANK_COLON_BLANK);
-		try (Stream<Path> stream = ObjectKeyCompliance.defineObjectPaths(objectsPath, realObjectKeys)) {
+		try (Stream<Path> stream = DataAccess.getInstance().getSourceFolders(objectsPath, realObjectKeys)) { // ok
 			int[] i = new int[] { 0 };
 			stream.sorted(Comparator.reverseOrder()).forEach(p -> { // take the deeply nested folders first due to recursive delete
 				FileUtils.deleteDirectory(p.toString());
@@ -210,7 +210,8 @@ public final class SupplementObjectFolder {
 				millis, //
 				Instant.now().toString());
 
-		try (Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetDir.resolve(REPORT_NAME).toFile()), "UTF-8"))) {
+		// no buffered writer as we invoke the write method only once
+		try (Writer out = new OutputStreamWriter(new FileOutputStream(targetDir.resolve(REPORT_NAME).toFile()), "UTF-8")) {
 			out.write(result);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -225,7 +226,8 @@ public final class SupplementObjectFolder {
 		String result = String.format(GDE.STRING_NEW_LINE + "checked=%s", //
 				Instant.now().toString());
 
-		try (Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetDir.resolve(REPORT_NAME).toFile(), true), "UTF-8"))) {
+		// no buffered writer as we invoke the write method only once
+		try (Writer out = new OutputStreamWriter(new FileOutputStream(targetDir.resolve(REPORT_NAME).toFile(), true), "UTF-8")) {
 			out.write(result);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -261,7 +263,7 @@ public final class SupplementObjectFolder {
 		Path targetBaseDir = supplementFolder.resolve(getTargetBasePath(externalBaseDir));
 
 		List<Path> result = new ArrayList<Path>();
-		try (Stream<Path> objectPaths = ObjectKeyCompliance.defineObjectPaths(externalBaseDir, Settings.getInstance().getRealObjectKeys())) { // ok
+		try (Stream<Path> objectPaths = analyzer.getDataAccess().getSourceFolders(externalBaseDir, Settings.getInstance().getRealObjectKeys())) { // ok
 			result = objectPaths.collect(Collectors.toList());
 			for (Path path : result) {
 				log.log(Level.FINER, "sourcePath=", path);

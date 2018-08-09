@@ -21,11 +21,10 @@ package gde.histo.datasources;
 
 import static java.util.logging.Level.INFO;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,6 +32,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+
+import com.sun.istack.internal.Nullable;
 
 import gde.Analyzer;
 import gde.GDE;
@@ -77,8 +78,9 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 
 		int subDirectoryLevelMax = analyzer.getSettings().getSubDirectoryLevelMax();
 		for (Entry<Path, Set<DirectoryType>> entry : pathsWithPermissions.entrySet()) {
+			Path subPath = splitSubPath(entry.getKey());
 			try {
-				sourceDataSets.addAll(getFileListing(entry.getKey().toFile(), subDirectoryLevelMax, entry.getValue()));
+				sourceDataSets.addAll(getFileListing(entry.getKey(), subDirectoryLevelMax, entry.getValue()));
 			} catch (FileNotFoundException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
 			}
@@ -92,36 +94,47 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 	 * @param directoryTypes which the returned files must match (file extension)
 	 * @return the unsorted files matching the {@code extensions} and not discarded as per exclusion list
 	 */
-	private List<SourceDataSet> getFileListing(File rootDirectory, int recursionDepth, Set<DirectoryType> directoryTypes) throws FileNotFoundException {
+	private List<SourceDataSet> getFileListing(Path rootDirectory, int recursionDepth, Set<DirectoryType> directoryTypes) throws FileNotFoundException {
 		signaler.accept("get file names     " + rootDirectory.toString());
 		List<SourceDataSet> result = new ArrayList<>();
-		if (rootDirectory.isDirectory() && rootDirectory.canRead()) {
-			File[] filesAndDirs = rootDirectory.listFiles();
-			if (filesAndDirs != null) {
-				ExclusionData exclusionData = new ExclusionData(new DirectoryScanner(analyzer).getActiveFolder(), analyzer.getDataAccess());
-				boolean isSuppressMode = analyzer.getSettings().isSuppressMode();
-				for (File file : Arrays.asList(filesAndDirs)) {
-					if (file.isFile()) {
-						SourceDataSet originFile = AbstractSourceDataSet.createSourceDataSet(file.toPath(), analyzer);
-						if (originFile != null && originFile.isWorkableFile(directoryTypes, sourceFolders)) {
-							if (!isSuppressMode || !exclusionData.isExcluded(file.getName())) {
-								result.add(originFile);
-							} else {
-								excludedFiles.add(file.toPath());
-								log.log(INFO, "file is excluded              ", file);
-							}
-						} else {
-							nonWorkableCount.increment();
-						}
-					} else if (recursionDepth > 0) { // recursive walk by calling itself
-						List<SourceDataSet> deeperList = getFileListing(file, recursionDepth - 1, directoryTypes);
-						result.addAll(deeperList);
+		ExclusionData exclusionData = new ExclusionData(new DirectoryScanner(analyzer).getActiveFolder(), analyzer.getDataAccess());
+		boolean isSuppressMode = analyzer.getSettings().isSuppressMode();
+		for (String fileName : analyzer.getDataAccess().getSourceFolderList(rootDirectory).toArray(String[]::new)) {
+			Path filePath = rootDirectory.resolve(fileName);
+			if (analyzer.getDataAccess().existsSourceFile(filePath)) {
+				SourceDataSet originFile = AbstractSourceDataSet.createSourceDataSet(filePath, analyzer);
+				if (originFile != null && originFile.isWorkableFile(directoryTypes, sourceFolders)) {
+					if (!isSuppressMode || !exclusionData.isExcluded(filePath.getFileName().toString())) {
+						result.add(originFile);
+					} else {
+						excludedFiles.add(filePath);
+						log.log(INFO, "file is excluded              ", filePath);
 					}
+				} else {
+					nonWorkableCount.increment();
 				}
+			} else if (recursionDepth > 0) { // recursive walk by calling itself
+				List<SourceDataSet> deeperList = getFileListing(filePath, recursionDepth - 1, directoryTypes);
+				result.addAll(deeperList);
 			}
 		}
 		signaler.accept("");
 		return result;
+	}
+
+	/**
+	 * @param filePath is an arbitrary path
+	 * @return the sub path relative to the data directory or null if the file is not in the data directory or its subdirectories
+	 */
+	@Nullable
+	private Path splitSubPath(Path filePath) {
+		Path fileSubPath = null;
+		try {
+			fileSubPath = Paths.get(analyzer.getSettings().getDataFilePath()).relativize(filePath);
+		} catch (Exception e) {
+			// filePath is not located in the standard data file folder
+		}
+		return fileSubPath;
 	}
 
 	/**
