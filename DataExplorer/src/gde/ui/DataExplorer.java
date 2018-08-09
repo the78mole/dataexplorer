@@ -857,6 +857,7 @@ public class DataExplorer extends Composite {
 		if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, $CLASS_NAME, $METHOD_NAME, String.format("layout time = %s", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)))); //$NON-NLS-1$
 		this.setHisto(Settings.getInstance().isHistoActive());
 		if (log.isLoggable(Level.TIME)) log.logp(Level.TIME, $CLASS_NAME, $METHOD_NAME, String.format("done time = %s", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)))); //$NON-NLS-1$
+		GDE.shell.layout(); //fix Ubuntu update problem
 		this.updateLogger();
 	}
 
