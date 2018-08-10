@@ -148,21 +148,23 @@ public class ObjectKeyCompliance {
 	 * @param newObjectKeys is the list of object keys for transfer into the settings
 	 */
 	public static void renameObjectKey(String oldObjKey, String newObjKey, String[] newObjectKeys) {
-		int answer = SWT.YES;
-		if (DataExplorer.getInstance().isWithUi()) {
-			// query if new object key should be used to modify all existing data files with the new corrected one
-			answer = DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0048, new String[] { oldObjKey, newObjKey }));
-		}
-		if (answer == SWT.YES) {
-			OsdReaderWriter.updateObjectKey(oldObjKey, newObjKey);
-			DataExplorer.getInstance().updateCurrentObjectData(newObjKey);
-		}
+		if (!oldObjKey.isEmpty()) {
+			int answer = SWT.YES;
+			if (DataExplorer.getInstance().isWithUi()) {
+				// query if new object key should be used to modify all existing data files with the new corrected one
+				answer = DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0048, new String[] { oldObjKey, newObjKey }));
+			}
+			if (answer == SWT.YES) {
+				OsdReaderWriter.updateObjectKey(oldObjKey, newObjKey);
+				DataExplorer.getInstance().updateCurrentObjectData(newObjKey);
+			}
 
-		if (!oldObjKey.isEmpty() && FileUtils.checkDirectoryExist(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey)) {
-			// query for old directory deletion
-			if (!DataExplorer.getInstance().isWithUi() //
-					|| SWT.YES == DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031)))
-				FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey);
+			if (FileUtils.checkDirectoryExist(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey)) {
+				// query for old directory deletion
+				if (!DataExplorer.getInstance().isWithUi() //
+						|| SWT.YES == DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031)))
+					FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey);
+			}
 		}
 		replaceObjectKey(oldObjKey, newObjKey, newObjectKeys);
 
