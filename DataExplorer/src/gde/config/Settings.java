@@ -68,9 +68,9 @@ import gde.utils.StringHelper;
  * @author Winfried Brügmann
  */
 public final class Settings extends Properties {
-	private final static long				serialVersionUID								= 26031957;
-	final static Logger							log															= Logger.getLogger(Settings.class.getName());
-	final static String							$CLASS_NAME											= Settings.class.getName();
+	private static final long				serialVersionUID								= 26031957;
+	private static final Logger			log															= Logger.getLogger(Settings.class.getName());
+	private static final String			$CLASS_NAME											= Settings.class.getName();
 
 	private static volatile Settings	instance											= null;																																														// singelton
 
@@ -349,7 +349,7 @@ public final class Settings extends Properties {
 			}
 
 			if (this.isDevicePropertiesUpdated) { // check if previous devices exist and migrate device usage, default import directory, ....
-				this.migrationThread = deviceSerialization.createMigrationThread();
+				this.migrationThread = DeviceSerialization.createMigrationThread();
 			}
 
 			String templateDirectory = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.GRAPHICS_TEMPLATES_DIR_NAME;
@@ -472,7 +472,7 @@ public final class Settings extends Properties {
 		this.cbSizes = that.cbSizes;
 		this.comparator = that.comparator;
 		this.measurementProperties = (Properties) that.measurementProperties.clone();
-	}
+}
 
 	/**
 	 * check existence of device graphics default templates, extract if required
@@ -2484,15 +2484,15 @@ public final class Settings extends Properties {
 	 * @return the sampling time which defines the timespan for one single sample value for the history (default is 1 sec)
 	 */
 	public int getSamplingTimespan_ms() {
-		double result;
+		double timespan_sec;
 		try {
-			result = SAMPLING_TIMESPANS[getSamplingTimespanOrdinal()];
+			timespan_sec = SAMPLING_TIMESPANS[getSamplingTimespanOrdinal()];
 		}
 		catch (Exception e) {
 			setSamplingTimespan_ms(Double.toString(1.)); // one second
-			result = SAMPLING_TIMESPANS[getSamplingTimespanOrdinal()];
+			timespan_sec = SAMPLING_TIMESPANS[getSamplingTimespanOrdinal()];
 		}
-		return (int) (result * 1000.);
+		return (int) (timespan_sec * 1000.);
 	}
 
 	/**

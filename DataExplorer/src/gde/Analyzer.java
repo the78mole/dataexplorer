@@ -39,7 +39,7 @@ import gde.log.Logger;
  * Tracks the active device with its channels and the active channel.
  * @author Thomas Eickert (USER)
  */
-public abstract class Analyzer {
+public abstract class Analyzer implements Cloneable {
 	private static final String	$CLASS_NAME	= Analyzer.class.getName();
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
@@ -85,7 +85,7 @@ public abstract class Analyzer {
 			@Override
 			public void run() {
 				log.log(Level.FINE, "deviceConfigurationsThread    started");
-				Analyzer.this.deviceConfigurations.initialize(settings, dataAccess);
+				Analyzer.this.deviceConfigurations.initialize(Analyzer.this);
 				log.log(Level.TIME, "deviceConfigurationsThread time =", new SimpleDateFormat("ss:SSS").format(new Date().getTime() - GDE.StartTime));
 			}
 		};
@@ -97,21 +97,21 @@ public abstract class Analyzer {
 
 	/**
 	 * Hybrid singleton copy constructor.
-	 * Caution: NO deep copy for the device configurations and the active device.
+	 * Caution: <li>NO deep copy for the device configurations and the active device
+	 * <li>the active device does NOT copy the device specific objects (e.g. HoTTAdapter fields)
 	 */
 	protected Analyzer(Analyzer that) {
 		this.settings = new Settings(that.settings);
 		this.dataAccess = that.dataAccess.clone();
 
-		if (that.channels != null) {
-			this.channels = new Channels(that.channels);
-		}
-
 		if (that.activeDevice == null) {
 			this.activeDevice = null;
+			this.channels = null;
 		} else {
 			// inhomogeneous clone: All device configuration objects remain the same (NOT cloned), whereas native device objects are created anew !!!
 			this.activeDevice = that.activeDevice.getDeviceConfiguration().getAsDevice();
+			this.channels = new Channels(that.channels);
+			this.channels.setupChannels(that); // todo better to add the channel put statements to the copy constructor
 		}
 
 		// shallow copy
@@ -121,8 +121,9 @@ public abstract class Analyzer {
 			this.deviceConfigurations = that.deviceConfigurations;
 		}
 		// define thread object for other methods checking its progress
-		this.deviceConfigurationsThread = new Thread("loadDeviceConfigurations");
-		this.deviceConfigurationsThread.start();
+		this.deviceConfigurationsThread = that.deviceConfigurationsThread;
+		// do not start because we only do a shallow copy for performance reasons
+		// this.deviceConfigurationsThread.start();
 	}
 
 	/**
@@ -165,7 +166,11 @@ public abstract class Analyzer {
 	 * Do not clean or rebuild the channels.
 	 */
 	public void setActiveDevice(String deviceName) {
-		this.activeDevice = deviceConfigurations.get(deviceName).getAsDevice();
+		setActiveDevice(deviceConfigurations.get(deviceName).getAsDevice());
+	}
+
+	public void setChannelNumber(int channelNumber) {
+		this.channels.setActiveChannelNumber(channelNumber);
 	}
 
 	/**
@@ -203,4 +208,29 @@ public abstract class Analyzer {
 		return "Analyzer [activeDevice=" + deviceName + ", deviceConfigurationsSize=" + this.deviceConfigurations.getAllConfigurations().size() //
 				+ ", channelNumber=" + channelNumber + ", objectKey=" + this.getSettings().getActiveObjectKey() + ", channelsSize=" + channelsSize + "]";
 	}
+
+	/**
+	 * Set the basic analysis parameters.
+	 * Do not use with the integrated UI.
+	 */
+	public void setArena(IDevice device, int channelNumber, String objectKey) {
+		this.settings.setActiveObjectKey(objectKey);
+
+		if (!device.equals(this.activeDevice)) {
+			// device :
+			this.activeDevice = device;
+			this.setActiveDevice(device);
+
+			if (this.channels == null) {
+				this.channels = Channels.createChannels();
+				channels.setupChannels(this);
+			} else {
+				this.channels.setupChannels(this);
+			}
+		}
+
+		// channel :
+		this.channels.setActiveChannelNumber(channelNumber);
+	}
+
 }

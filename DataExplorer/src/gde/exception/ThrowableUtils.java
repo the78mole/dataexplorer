@@ -17,50 +17,24 @@
     Copyright (c) 2018 Thomas Eickert
 ****************************************************************************************/
 
-package gde;
-
-import gde.data.Channels;
-import gde.device.IDevice;
-import gde.log.Logger;
+package gde.exception;
 
 /**
- * Kernel for analyzing logging data.
- * Use this for unit test without integrated UI.
+ * Helper for checked and unchecked exceptions.
  * @author Thomas Eickert (USER)
  */
-public class TestAnalyzer extends Analyzer {
-	private static final String	$CLASS_NAME	= TestAnalyzer.class.getName();
-	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
-
-	TestAnalyzer() {
-		super();
-	}
-
-	private TestAnalyzer(TestAnalyzer analyzer) {
-		super(analyzer);
-	}
+public class ThrowableUtils {
 
 	/**
-	 * Use this for non-histo junit tests only.
+	 * Cast a CheckedException as an unchecked one.
+	 * @param throwable to cast
+	 * @param <T> the type of the Throwable
+	 * @return this method will never return a Throwable instance, it will just throw it.
+	 * @throws T the throwable as an unchecked throwable
 	 */
-	@Override
-	public void setActiveDevice(IDevice device) {
-		if (device != null) {
-			this.activeDevice = device;
-		}
-	}
-
-	/**
-	 * Use this for non-histo junit tests only.
-	 */
-	public void setChannels(Channels channels) {
-		this.channels = channels;
-	}
-
-	@Override
-	public TestAnalyzer clone() {
-		joinDeviceConfigurationsThread();
-		return new TestAnalyzer(this);
+	@SuppressWarnings("unchecked")
+	public static <T extends Throwable> RuntimeException rethrow(Throwable throwable) throws T {
+		throw (T) throwable; // rely on vacuous cast
 	}
 
 }

@@ -237,11 +237,10 @@ public class TestSuperClass extends TestCase {
 			this.channels.cleanup();
 		} else {
 			// cleanup existing channels and record sets
-			TestAnalyzer analyzerClone = analyzer.clone();
-			analyzerClone.setActiveDevice(activeDevice);
-			analyzerClone.getSettings().setActiveObjectKey(this.application.getObjectKey());
-			this.channels.setupChannels(analyzerClone);
-			analyzerClone.initiateUnitTestEnvironment(activeDevice, this.channels, "");
+			this.analyzer.setActiveDevice(activeDevice);
+			this.analyzer.getSettings().setActiveObjectKey(this.application.getObjectKey());
+			this.channels.setupChannels(this.analyzer);
+			this.channels.setActiveChannelNumber(this.analyzer.getActiveChannel().getNumber());
 		}
 	}
 

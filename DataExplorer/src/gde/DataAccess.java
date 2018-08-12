@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -134,6 +135,7 @@ public abstract class DataAccess {
 		 * @param file is a file in a standard file system
 		 * @return the inputStream for a standard template or an object template
 		 */
+		@SuppressWarnings("static-method")
 		@Nullable
 		public InputStream getAlienTemplateInputStream(File file) throws FileNotFoundException {
 			return new FileInputStream(file);
@@ -293,8 +295,8 @@ public abstract class DataAccess {
 			} else {
 				File file = cachePath.resolve(vaultName).toFile();
 				if (file.length() > minVaultLength) {
-					try {
-						histoVault = VaultProxy.load(getCacheInputStream(vaultDirectory, file.getName()));
+					try (InputStream inputStream = getCacheInputStream(vaultDirectory, file.getName())) {
+						histoVault = VaultProxy.load(inputStream);
 					} catch (Exception e) {
 						log.log(SEVERE, e.getMessage(), e);
 					}
@@ -320,6 +322,7 @@ public abstract class DataAccess {
 			return targetFilePath.toFile().exists();
 		}
 
+		@SuppressWarnings("static-method")
 		public boolean existsDeviceXml(String xmlFilePath) {
 			return new File(xmlFilePath).exists();
 		}
@@ -337,14 +340,9 @@ public abstract class DataAccess {
 			return new FileInputStream(targetFilePath.toFile());
 		}
 
-		@Nullable
-		public InputStream getDeviceXmlInputStream(String xmlFilePath) {
-			try {
+		@SuppressWarnings("static-method")
+		public InputStream getDeviceXmlInputStream(String xmlFilePath) throws FileNotFoundException {
 				return new FileInputStream(xmlFilePath);
-			} catch (FileNotFoundException e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
-				return null;
-			}
 		}
 
 		@Override
@@ -353,27 +351,26 @@ public abstract class DataAccess {
 			return new FileOutputStream(targetFilePath.toFile());
 		}
 
+		@SuppressWarnings("static-method")
 		@Nullable
-		public FileOutputStream getDeviceXmlOutputStream(String xmlFilePath) {
-			try {
+		public FileOutputStream getDeviceXmlOutputStream(String xmlFilePath) throws FileNotFoundException {
 				return new FileOutputStream(xmlFilePath);
-			} catch (FileNotFoundException e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
-				return null;
-			}
 		}
 
+		@SuppressWarnings("static-method")
 		public InputStream getDeviceXsdMigrationStream(int versionNumber) throws FileNotFoundException {
 			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
 			Path targetFilePath = migratePropertyPath.resolve("DeviceProperties_V" + versionNumber + GDE.FILE_ENDING_DOT_XSD);
 			return new FileInputStream(targetFilePath.toFile());
 		}
 
+		@SuppressWarnings("static-method")
 		public boolean existsDeviceMigrationFolder(int versionNumber) {
 			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
 			return migratePropertyPath.toFile().exists();
 		}
 
+		@SuppressWarnings("static-method")
 		public List<Path> getDeviceXmlSubPaths(int versionNumber) throws FileNotFoundException {
 			String folderName = Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber;
 			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + folderName);
@@ -387,6 +384,7 @@ public abstract class DataAccess {
 			return new FileInputStream(filePath.toFile());
 		}
 
+		@SuppressWarnings("static-method")
 		public InputStream getHttpsInputStream(URL requestUrl) throws IOException {
 			HttpsURLConnection conn = (HttpsURLConnection) requestUrl.openConnection();
 			conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
@@ -394,6 +392,7 @@ public abstract class DataAccess {
 			return httpInputStream;
 		}
 
+		@SuppressWarnings("static-method")
 		public FileOutputStream getGeoCodeOutputStream(String geoFileName) throws FileNotFoundException {
 			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH, Settings.GPS_LOCATIONS_DIR_NAME, geoFileName);
 			return new FileOutputStream(targetFilePath.toString());
@@ -426,6 +425,7 @@ public abstract class DataAccess {
 		/**
 		 * @return true if files were actually deleted
 		 */
+		@SuppressWarnings("static-method")
 		public boolean resetHistolocations() {
 			Path locationsPath = Paths.get(GDE.APPL_HOME_PATH, Settings.GPS_LOCATIONS_DIR_NAME);
 			if (FileUtils.checkDirectoryExist(locationsPath.toString())) {
@@ -439,6 +439,7 @@ public abstract class DataAccess {
 		/**
 		 * @return true if the folder already exists
 		 */
+		@SuppressWarnings("static-method")
 		public boolean checkAndCreateHistoLocations() {
 			return FileUtils.checkDirectoryAndCreate(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.GPS_LOCATIONS_DIR_NAME);
 		}
@@ -588,7 +589,7 @@ public abstract class DataAccess {
 
 	@Override
 	public Stream<Path> getSourceFolders(Path fittedFolderPath, Stream<String> objectKeys) throws IOException {
-		List<String> lowerCaseKeys = objectKeys.map(String::toLowerCase).collect(Collectors.toList());
+		Set<String> lowerCaseKeys = objectKeys.map(String::toLowerCase).collect(Collectors.toSet());
 		Stream<Path> folders = Files.walk(fittedFolderPath) //
 				.filter(Files::isDirectory) //
 				.filter(p -> lowerCaseKeys.contains(p.getFileName().toString().toLowerCase()));
@@ -853,7 +854,7 @@ public abstract class DataAccess {
 	/**
 	 * @param vaultDirectory is the folderName or zipFile name
 	 * @param minVaultLength is the lower limit of uncompressed bytes
-	 * @param isZippedCache TODO
+	 * @param isZippedCache
 	 * @return the vault retrieved from the file system if it exceeds the minimum file size
 	 */
 	@Nullable

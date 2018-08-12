@@ -32,7 +32,9 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
 import gde.Analyzer;
+import gde.Explorer;
 import gde.GDE;
+import gde.TestAnalyzer;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.device.TriggerType;
@@ -844,7 +846,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
 		Analyzer analyzer = Analyzer.getInstance();
-		analyzer.setActiveDevice(device); // todo remove this safety assignment
+		if (!(analyzer instanceof Explorer || analyzer instanceof TestAnalyzer)) throw new UnsupportedOperationException("for UI-based tests only, not for histo tests");
 		return createRecordSet(recordSetName, analyzer, channelConfigNumber, isRaw, isFromFile, adjustObjectKey);
 	}
 
@@ -894,7 +896,7 @@ public final class RecordSet extends AbstractRecordSet {
 	public static RecordSet createRecordSet(String recordSetName, IDevice device, int channelConfigNumber, String[] recordNames, String[] recordSymbols,
 			String[] recordUnits, double newTimeStep_ms, boolean isRaw, boolean isFromFile, boolean adjustObjectKey) {
 		Analyzer analyzer = Analyzer.getInstance();
-		analyzer.setActiveDevice(device); // todo remove this safety assignment
+		if (!(analyzer instanceof Explorer || analyzer instanceof TestAnalyzer)) throw new UnsupportedOperationException("for UI-based tests only, not for histo tests");
 		return createRecordSet(recordSetName, analyzer, channelConfigNumber, recordNames, recordSymbols, recordUnits, isRaw, isFromFile, adjustObjectKey);
 	}
 

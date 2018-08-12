@@ -20,6 +20,7 @@
 package gde;
 
 import gde.data.Channels;
+import gde.device.IDevice;
 import gde.log.Logger;
 
 /**
@@ -47,6 +48,21 @@ public class Explorer extends Analyzer {
 	public Explorer clone() {
 		joinDeviceConfigurationsThread();
 		return new Explorer(this);
+	}
+
+	@Override
+	public void setActiveDevice(String deviceName) {
+		throw new UnsupportedOperationException("use UI functions instead");
+	}
+
+	@Override
+	public void setChannelNumber(int channelNumber) {
+		throw new UnsupportedOperationException("use UI functions instead");
+	}
+
+	@Override
+	public void setArena(IDevice device, int channelNumber, String objectKey) {
+		throw new UnsupportedOperationException("use UI functions instead");
 	}
 
 }

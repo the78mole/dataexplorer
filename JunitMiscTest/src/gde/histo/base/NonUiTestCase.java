@@ -35,7 +35,6 @@ import gde.GDE;
 import gde.TestAnalyzer;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -187,16 +186,6 @@ public class NonUiTestCase extends TestCase {
 		if (deviceConfig == null) throw new UnsupportedOperationException("deviceConfig == null");
 
 		this.analyzer.setArena(deviceConfig.getAsDevice(), activeChannelNumber, activeObjectKey);
-	}
-
-	/**
-	 * Emulate user GUI settings required for history tabs.
-	 * @param device
-	 * @param activeChannelNumber
-	 * @param activeObjectKey is an object key which exists in the settings or an empty string for deviceoriented
-	 */
-	protected void setDeviceChannelObject(IDevice device, int activeChannelNumber, String activeObjectKey) {
-		this.analyzer.setArena(device, activeChannelNumber, activeObjectKey);
 	}
 
 }

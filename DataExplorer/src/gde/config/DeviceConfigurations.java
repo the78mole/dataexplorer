@@ -35,7 +35,7 @@ import javax.xml.bind.JAXBException;
 
 import org.xml.sax.SAXParseException;
 
-import gde.DataAccess;
+import gde.Analyzer;
 import gde.GDE;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
@@ -75,17 +75,17 @@ public final class DeviceConfigurations {
 	 * Goes through the existing XML files and set active flagged devices into active devices list.
 	 * Fills the DeviceConfigurations list.
 	 */
-	public void initialize(Settings settings, DataAccess dataAccess) {
-		String activeDeviceName = settings.getActiveDevice();
+	public void initialize(Analyzer analyzer) {
+		String activeDeviceName = analyzer.getSettings().getActiveDevice();
 		Objects.requireNonNull(activeDeviceName);
 
 		DeviceConfiguration devConfig;
-		for (String file : dataAccess.getDeviceFolderList()) {
+		for (String fileName : analyzer.getDataAccess().getDeviceFolderList()) {
 			try {
 				// loop through all device properties XML and check if device used
-				if (file.endsWith(GDE.FILE_ENDING_DOT_XML)) {
-					String deviceKey = file.substring(0, file.length() - 4);
-					devConfig = new DeviceConfiguration(Paths.get(Settings.DEVICE_PROPERTIES_DIR_NAME, file), settings);
+				if (fileName.endsWith(GDE.FILE_ENDING_DOT_XML)) {
+					String deviceKey = fileName.substring(0, fileName.length() - 4);
+					devConfig = new DeviceConfiguration(Paths.get(Settings.DEVICE_PROPERTIES_DIR_NAME, fileName), analyzer);
 					if (devConfig.getName().equals(activeDeviceName) && devConfig.isUsed()) { // define the active device after re-start
 						selectedActiveDeviceConfig = devConfig;
 					}
@@ -104,7 +104,7 @@ public final class DeviceConfigurations {
 					this.configs.put(keyString, devConfig);
 				}
 			} catch (JAXBException e) {
-				log.log(Level.WARNING, file, e);
+				log.log(Level.WARNING, fileName, e);
 				if (e.getLinkedException() instanceof SAXParseException) {
 					SAXParseException spe = (SAXParseException) e.getLinkedException();
 					GDE.setInitError(Messages.getString(MessageIds.GDE_MSGW0038, new String[] {
@@ -155,9 +155,9 @@ public final class DeviceConfigurations {
 	 * @return the supported lowercase file extensions (e.g. '.bin') or an empty set
 	 */
 	public Set<String> getValidLogExtentions() {
-		Set<String> result = getImportExtentions();
-		result.add(GDE.FILE_ENDING_DOT_OSD);
-		return result;
+		Set<String> logExtensions = getImportExtentions();
+		logExtensions.add(GDE.FILE_ENDING_DOT_OSD);
+		return logExtensions;
 	}
 
 	/**
