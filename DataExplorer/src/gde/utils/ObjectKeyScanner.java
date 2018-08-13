@@ -143,7 +143,7 @@ public class ObjectKeyScanner extends Thread {
 							if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD)) {
 								fileCounter++;
 								if (actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) { // this is not a link
-									log.fine(() -> String.format("working with %s" + file.getName())); //$NON-NLS-1$
+									log.fine(() -> String.format("working with %s", file.getName())); //$NON-NLS-1$
 									String foundObjectKey = OsdReaderWriter.getHeader(file.getCanonicalPath()).get(GDE.OBJECT_KEY);
 									if (foundObjectKey != null && foundObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) { // is a valid object key
 										if (!objectKeys.contains(foundObjectKey)) {
@@ -156,7 +156,7 @@ public class ObjectKeyScanner extends Thread {
 										else {
 											objectFilesMap.get(foundObjectKey).add(file);
 										}
-										log.fine(() -> String.format("add file %s to object key %s" , file.getName(), foundObjectKey)); //$NON-NLS-1$
+										log.fine(() -> String.format("add file %s to object key %s", file.getName(), foundObjectKey)); //$NON-NLS-1$
 									}
 								}
 							}
