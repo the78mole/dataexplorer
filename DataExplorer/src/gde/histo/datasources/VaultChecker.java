@@ -95,7 +95,8 @@ public final class VaultChecker {
 			return false;
 		}
 		for (DirectoryType directoryType : directoryTypes) {
-			if (directoryType.getDataSetExtensions(analyzer.getActiveDevice(), analyzer.getSettings()).contains(PathUtils.getFileExtension(logFilePath.getFileName().toString()))) {
+			List<String> dataSetExtentions = directoryType.getDataSetExtentions(analyzer.getActiveDevice(), analyzer.getSettings());
+			if (dataSetExtentions.contains(PathUtils.getFileExtention(logFilePath.getFileName().toString()))) {
 				return true;
 			}
 		}
@@ -107,8 +108,8 @@ public final class VaultChecker {
 	 * @return true if the vault complies with the current device, object and start timestamp
 	 */
 	public boolean isValidDeviceChannelObjectAndStart(HistoVault vault) {
-		String extension = PathUtils.getFileExtension(Paths.get(vault.getLogFilePath()));
-		if (extension.equals(GDE.FILE_ENDING_OSD))
+		String extention = PathUtils.getFileExtention(Paths.get(vault.getLogFilePath()));
+		if (extention.equals(GDE.FILE_ENDING_DOT_OSD))
 			return matchDeviceChannelObjectAndStart(getTrussCriteria(), vault);
 		else if (analyzer.getActiveDevice() instanceof IHistoDevice) {
 			return matchObjectAndStart(getTrussCriteria(), vault);

@@ -930,7 +930,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	private void setSupportedImportExtentions() {
 		if (isHistoImportSupported()) {
 			this.importExtentions = Arrays.stream(getDataBlockPreferredFileExtention().split(GDE.REGEX_FILE_EXTENTION_SEPARATION)) //
-					.map(s -> s.substring(s.lastIndexOf(GDE.STRING_DOT) + 1)).map(e -> e.toLowerCase()) //
+					.map(s -> s.substring(s.lastIndexOf(GDE.STRING_DOT))).map(e -> e.toLowerCase()) //
 					.collect(Collectors.toList());
 		} else {
 			this.importExtentions = new ArrayList<>();
@@ -938,7 +938,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	}
 
 	/**
-	 * @return the device's native file extentions if the device supports histo imports (e.g. 'bin' or 'log')
+	 * @return the device's native file extentions if the device supports histo imports (e.g. '.bin' or '.log')
 	 */
 	@Override
 	public List<String> getSupportedImportExtentions() {
@@ -967,7 +967,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	@Override
 	public void getRecordSetFromImportFile(Supplier<InputStream> inputStream, VaultCollector truss)
 			throws DataInconsitsentException, IOException, DataTypeException {
-		String fileEnding = GDE.STRING_DOT + PathUtils.getFileExtension(truss.getVault().getLoadFilePath());
+		String fileEnding = PathUtils.getFileExtention(truss.getVault().getLoadFilePath());
 		if (GDE.FILE_ENDING_DOT_BIN.equals(fileEnding)) {
 			HoTTbinHistoReader.read(inputStream, truss);
 		} else if (GDE.FILE_ENDING_DOT_LOG.equals(fileEnding)) {

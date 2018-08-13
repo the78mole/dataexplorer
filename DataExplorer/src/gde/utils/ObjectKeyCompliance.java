@@ -19,8 +19,6 @@
 
 package gde.utils;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -48,6 +46,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.device.DeviceConfiguration;
 import gde.histo.ui.datasources.SupplementObjectFolder;
+import gde.histo.utils.PathUtils;
 import gde.io.OsdReaderWriter;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -61,18 +60,6 @@ import gde.ui.DataExplorer;
 public class ObjectKeyCompliance {
 	private static final String	$CLASS_NAME	= ObjectKeyCompliance.class.getName();
 	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
-
-	/**
-	 * FilenameFilter based on valid log file extensions including those from all devices.
-	 */
-	private static final class LogFileFilter implements FilenameFilter {
-		private final Set<String> validLogExtentions = Analyzer.getInstance().getDeviceConfigurations().getValidLogExtentions(); // ok
-
-		@Override
-		public boolean accept(File dir, String name) {
-			return validLogExtentions.stream().anyMatch(name.toLowerCase()::endsWith);
-		}
-	}
 
 	/**
 	 * Scan all OSD files in the data path for object names, create objects from them and merge them into the existing objects key list.
@@ -311,7 +298,10 @@ public class ObjectKeyCompliance {
 			return isRoot;
 		};
 		Function<Path, Boolean> isExcludedName = p -> excludedLowerCaseNames.contains(p.getFileName().toString().toLowerCase());
-		Function<Path, Boolean> isEmptyFolder = p -> !DataAccess.getInstance().getSourceFolderList(p).anyMatch(s -> true); // todo exclude folders???
+		Set<String> validLogExtentions = Analyzer.getInstance().getDeviceConfigurations().getValidLogExtentions(); // ok
+		Function<Path, Boolean> isEmptyFolder = p -> !DataAccess.getInstance().getSourceFolderList(p) //
+				.map(PathUtils:: getFileExtention).map(String::toLowerCase)
+				.anyMatch(s -> validLogExtentions.contains(s)); // todo exclude folders???
 
 		Set<String> directoryNames = new HashSet<>();
 		for (Path dirPath : getSourcePaths()) {

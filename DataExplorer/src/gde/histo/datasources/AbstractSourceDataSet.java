@@ -342,12 +342,12 @@ public abstract class AbstractSourceDataSet {
 	@Nullable
 	public static SourceDataSet createSourceDataSet(Path filePath, Analyzer analyzer) {
 		log.log(Level.FINE, "started");
-		String extension = PathUtils.getFileExtension(filePath);
-		if (extension.equals(GDE.FILE_ENDING_OSD))
+		String extention = PathUtils.getFileExtention(filePath);
+		if (extention.equals(GDE.FILE_ENDING_DOT_OSD))
 			return new OsdDataSet(filePath, analyzer);
 		else if (analyzer.getActiveDevice() instanceof IHistoDevice) {
 			List<String> importExtentions = ((IHistoDevice) analyzer.getActiveDevice()).getSupportedImportExtentions();
-			if (importExtentions.contains(extension)) {
+			if (importExtentions.contains(extention)) {
 				return new ImportDataSet(filePath, analyzer); // todo implement logDataSet and native HottLogReader
 			}
 		}

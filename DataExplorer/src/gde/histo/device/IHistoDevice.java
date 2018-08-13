@@ -43,7 +43,7 @@ public interface IHistoDevice { //todo merging with IDevice later
 	boolean isHistoImportSupported();
 
 	/**
-	 * @return the device's native file extentions if the device supports histo imports (e.g. 'bin' or 'log')
+	 * @return the device's native file extentions if the device supports histo imports (e.g. '.bin' or '.log')
 	 */
 	List<String> getSupportedImportExtentions();
 

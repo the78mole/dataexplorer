@@ -96,7 +96,7 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 	 */
 	private List<SourceDataSet> getFileListing(Path rootDirectory, int recursionDepth, Set<DirectoryType> directoryTypes) throws FileNotFoundException {
 		signaler.accept("get file names     " + rootDirectory.toString());
-		List<SourceDataSet> result = new ArrayList<>();
+		List<SourceDataSet> sourceDataSets = new ArrayList<>();
 		ExclusionData exclusionData = new ExclusionData(new DirectoryScanner(analyzer).getActiveFolder(), analyzer.getDataAccess());
 		boolean isSuppressMode = analyzer.getSettings().isSuppressMode();
 		for (String fileName : analyzer.getDataAccess().getSourceFolderList(rootDirectory).toArray(String[]::new)) {
@@ -105,7 +105,7 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 				SourceDataSet originFile = AbstractSourceDataSet.createSourceDataSet(filePath, analyzer);
 				if (originFile != null && originFile.isWorkableFile(directoryTypes, sourceFolders)) {
 					if (!isSuppressMode || !exclusionData.isExcluded(filePath.getFileName().toString())) {
-						result.add(originFile);
+						sourceDataSets.add(originFile);
 					} else {
 						excludedFiles.add(filePath);
 						log.log(INFO, "file is excluded              ", filePath);
@@ -115,11 +115,11 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 				}
 			} else if (recursionDepth > 0) { // recursive walk by calling itself
 				List<SourceDataSet> deeperList = getFileListing(filePath, recursionDepth - 1, directoryTypes);
-				result.addAll(deeperList);
+				sourceDataSets.addAll(deeperList);
 			}
 		}
 		signaler.accept("");
-		return result;
+		return sourceDataSets;
 	}
 
 	/**

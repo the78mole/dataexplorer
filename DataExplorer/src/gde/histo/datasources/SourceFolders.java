@@ -73,13 +73,13 @@ public class SourceFolders {
 			}
 
 			@Override
-			public List<String> getDataSetExtensions(IDevice device, Settings settings) {
-				List<String> result = new ArrayList<>();
-				result.add(GDE.FILE_ENDING_OSD);
+			public List<String> getDataSetExtentions(IDevice device, Settings settings) {
+				List<String> extentions = new ArrayList<>();
+				extentions.add(GDE.FILE_ENDING_DOT_OSD);
 				if (device instanceof IHistoDevice && settings.getSearchDataPathImports()) {
-					result.addAll(((IHistoDevice) device).getSupportedImportExtentions());
+					extentions.addAll(((IHistoDevice) device).getSupportedImportExtentions());
 				}
-				return result;
+				return extentions;
 			}
 
 			@Override
@@ -112,7 +112,7 @@ public class SourceFolders {
 			}
 
 			@Override
-			public List<String> getDataSetExtensions(IDevice device, Settings settings) {
+			public List<String> getDataSetExtentions(IDevice device, Settings settings) {
 				if (device instanceof IHistoDevice)
 					return ((IHistoDevice) device).getSupportedImportExtentions();
 				else
@@ -132,8 +132,8 @@ public class SourceFolders {
 
 			@Override
 			public boolean isActive(IDevice device, Settings settings) {
-				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtensions(device, settings).isEmpty() + " ExternalFolders.exist=" + getExternalBaseDirs(settings).anyMatch(e -> true));
-				if (getDataSetExtensions(device, settings).isEmpty()) {
+				log.finest(() -> " IMPORT : Extensions.isEmpty=" + getDataSetExtentions(device, settings).isEmpty() + " ExternalFolders.exist=" + getExternalBaseDirs(settings).anyMatch(e -> true));
+				if (getDataSetExtentions(device, settings).isEmpty()) {
 					return false;
 				} else {
 					return getExternalBaseDirs(settings).anyMatch(e -> true);
@@ -168,13 +168,11 @@ public class SourceFolders {
 		public abstract Path getDeviceSubPath(IDevice device);
 
 		/**
-		 * @param settings TODO
-		 * @return the supported file extensions (e.g. 'bin') or an empty list
+		 * @return the supported file extensions (e.g. '.bin') or an empty list
 		 */
-		public abstract List<String> getDataSetExtensions(IDevice device, Settings settings);
+		public abstract List<String> getDataSetExtentions(IDevice device, Settings settings);
 
 		/**
-		 * @param settings TODO
 		 * @return true if the prerequisites for the directory type are fulfilled
 		 */
 		public abstract boolean isActive(IDevice device, Settings settings);
@@ -275,16 +273,16 @@ public class SourceFolders {
 	}
 
 	private Set<Path> defineObjectPaths(Path basePath) {
-		Set<Path> result = new HashSet<Path>();
+		Set<Path> paths = new HashSet<Path>();
 		Stream<String> objectKeys = Stream.of(analyzer.getSettings().getActiveObjectKey());
 		try (Stream<Path> objectPaths = analyzer.getDataAccess().getSourceFolders(basePath, objectKeys)) {
-			result = objectPaths.collect(Collectors.toSet());
+			paths = objectPaths.collect(Collectors.toSet());
 		} catch (IOException e) {
 			log.log(Level.SEVERE, e.getMessage(), " is not accessible : " + e.getClass());
 		} catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}
-		return result;
+		return paths;
 	}
 
 	public Set<Entry<DirectoryType, Set<Path>>> entrySet() {
@@ -296,26 +294,26 @@ public class SourceFolders {
 	}
 
 	public Map<Path, Set<DirectoryType>> getMap() { // todo change folders to Map<Path, Set<DirectoryType>>
-		Map<Path, Set<DirectoryType>> result = new HashMap<>();
+		Map<Path, Set<DirectoryType>> directoryTypesMap = new HashMap<>();
 		for (Entry<DirectoryType, Set<Path>> entry : folders.entrySet()) {
 			for (Path path : entry.getValue()) {
-				Set<DirectoryType> set = result.get(path);
+				Set<DirectoryType> set = directoryTypesMap.get(path);
 				if (set == null) {
 					set = EnumSet.noneOf(DirectoryType.class);
-					result.put(path, set);
+					directoryTypesMap.put(path, set);
 				}
 				set.add(entry.getKey());
 			}
 		}
-		return result;
+		return directoryTypesMap;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((this.folders == null) ? 0 : this.folders.hashCode());
-		return result;
+		int hashCode = 1;
+		hashCode = prime * hashCode + ((this.folders == null) ? 0 : this.folders.hashCode());
+		return hashCode;
 	}
 
 	@Override
@@ -336,7 +334,7 @@ public class SourceFolders {
 	}
 
 	public int getFoldersCount() {
-		return (int) values().parallelStream().flatMap(Collection::parallelStream).count();
+		return values().parallelStream().mapToInt(Collection::size).sum();
 	}
 
 	/**

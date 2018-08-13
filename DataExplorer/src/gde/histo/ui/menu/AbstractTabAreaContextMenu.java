@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -378,7 +379,8 @@ public abstract class AbstractTabAreaContextMenu {
 		String tmpFileName = dataPath.getFileName().toString();
 		String displayName = tmpFileName.length() > 22 ? GDE.STRING_ELLIPSIS + tmpFileName.substring(tmpFileName.length() - 22) : tmpFileName;
 		fileName.setText(">> " + displayName.toString() + GDE.STRING_BLANK_COLON_BLANK + String.format("%1.22s", popupMenu.getData(TabMenuOnDemand.RECORDSET_BASE_NAME.toString()).toString()) + " <<"); //$NON-NLS-1$ //$NON-NLS-2$
-		boolean isImport = DirectoryType.IMPORT.getDataSetExtensions(Analyzer.getInstance().getActiveDevice(), Analyzer.getInstance().getSettings()).contains(PathUtils.getFileExtension(dataPath));
+		List<String> dataSetExtentions = DirectoryType.IMPORT.getDataSetExtentions(Analyzer.getInstance().getActiveDevice(), Analyzer.getInstance().getSettings());
+		boolean isImport = dataSetExtentions.contains(PathUtils.getFileExtention(dataPath));
 		openRecordSetItem.setText(Messages.getString(isImport ? MessageIds.GDE_MSGT0850 : MessageIds.GDE_MSGT0849));
 	}
 

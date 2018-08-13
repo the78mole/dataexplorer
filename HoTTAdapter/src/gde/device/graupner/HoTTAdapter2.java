@@ -1726,7 +1726,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	@Override
 	public void getRecordSetFromImportFile(Supplier<InputStream> inputStream, VaultCollector truss) throws DataInconsitsentException,
 			IOException, DataTypeException {
-		String fileEnding = GDE.STRING_DOT + PathUtils.getFileExtension(truss.getVault().getLoadFilePath());
+		String fileEnding = PathUtils.getFileExtention(truss.getVault().getLoadFilePath());
 		if (GDE.FILE_ENDING_DOT_BIN.equals(fileEnding)) {
 			HoTTbinHistoReader2.read(inputStream, truss);
 		} else if (GDE.FILE_ENDING_DOT_LOG.equals(fileEnding)) {

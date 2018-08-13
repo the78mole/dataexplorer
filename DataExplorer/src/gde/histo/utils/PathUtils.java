@@ -24,29 +24,29 @@ import java.nio.file.Path;
 import gde.GDE;
 
 /**
- *
+ * Absolute and relative paths, file and folder names, extensions.
  * @author Thomas Eickert (USER)
  */
 public class PathUtils {
 
 	/**
-	 * @return the lower case extension without dot
+	 * @return the lower case extension including the dot
 	 */
-	public static String getFileExtension(Path path) {
+	public static String getFileExtention(Path path) {
 		if (path.getNameCount() == 0) {
 			return GDE.STRING_EMPTY;
 		} else {
-			return getFileExtension(path.getFileName().toString());
+			return getFileExtention(path.getFileName().toString());
 		}
 	}
 
 	/**
-	 * @return the lower case extension without dot
+	 * @return the lower case extension including the dot
 	 */
-	public static String getFileExtension(String fileName) {
-		String extension = fileName.toString().substring(fileName.lastIndexOf('.') + 1).toLowerCase();
-		if (extension.equals(fileName)) extension = GDE.STRING_EMPTY;
-		return extension;
+	public static String getFileExtention(String fileName) {
+		String extention = fileName.toString().substring(fileName.lastIndexOf('.')).toLowerCase();
+		if (extention.equals(fileName)) extention = GDE.STRING_EMPTY;
+		return extention;
 	}
 
 }
