@@ -157,6 +157,7 @@ public class ObjectKeyCompliance {
 			if (answer == SWT.YES) {
 				OsdReaderWriter.updateObjectKey(oldObjKey, newObjKey);
 				DataExplorer.getInstance().updateCurrentObjectData(newObjKey);
+				new ObjectKeyScanner(newObjKey).start();
 			}
 
 			if (FileUtils.checkDirectoryExist(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey)) {

@@ -9,6 +9,7 @@ Generic changes/fixes
 	* Ask user for confirmation prior to purging an object key
 	* fix channel object key handling, channels of type outlet (chargers) might have different object key, update object selector accordingly
 	* fix unsaved reason entry for changed comment
+	* fix regression renaming object key scenario
 Device specific changes/fixes
 	* HoTTAdapter* - fix 19200 Baud protocol live data, skip Rx query while other sensors detected, Rx data in sensor data contained
 	* HoTTAdapter* - add file selection hint for *.bin;*.log 

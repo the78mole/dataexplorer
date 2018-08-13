@@ -188,7 +188,8 @@ public class OsdReaderWriter {
 		line = data_in.readUTF();
 		line = line.substring(0, line.length() - 1);
 		log.log(Level.FINE, line);
-		if (!line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) && !line.startsWith(GDE.LEGACY_FILE_VERSION)) throw new NotSupportedFileFormatException(filePath);
+		if (!line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) && !line.startsWith(GDE.LEGACY_FILE_VERSION)) 
+			throw new NotSupportedFileFormatException(filePath);
 
 		String sVersion = line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) ? line.substring(GDE.DATA_EXPLORER_FILE_VERSION.length(), GDE.DATA_EXPLORER_FILE_VERSION.length() + 1).trim()
 				: line.substring(GDE.LEGACY_FILE_VERSION.length(), GDE.LEGACY_FILE_VERSION.length() + 1).trim();
@@ -925,15 +926,19 @@ public class OsdReaderWriter {
 	}
 
 	/**
-	 * Search through all data files and update the old object key with the new one
+	 * Search through all data files and update the old object key with the new one, 
+	 * make backup of old *.osd as *.bak, 
+	 * keep osd file version unchanged
 	 * @param oldObjectKey
 	 * @param newObjectKey
 	 */
 	public static void updateObjectKey(String oldObjectKey, String newObjectKey) {
 		DataInputStream data_in = null;
 		DataOutputStream data_out = null;
+		ZipInputStream zip_input = null;
+		ZipOutputStream zip_out = null;
+
 		try {
-			//scan all data files for object key
 			List<File> files = FileUtils.getFileListing(new File(Settings.getInstance().getDataFilePath()), 1);
 			Iterator<File> iterator = files.iterator();
 			while (iterator.hasNext()) {
@@ -941,9 +946,10 @@ public class OsdReaderWriter {
 				try {
 					String actualFilePath = file.getAbsolutePath();
 					if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD) && actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
-						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "working with " + file.getName()); //$NON-NLS-1$
+						log.finer(() -> String.format("working with %s", file.getName())); //$NON-NLS-1$
+						if (file.getAbsolutePath().contains("Blade")) System.out.println();
 						if (oldObjectKey.equals(OsdReaderWriter.getHeader(file.getCanonicalPath()).get(GDE.OBJECT_KEY))) {
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "found file with given object key " + file.getName()); //$NON-NLS-1$
+							log.fine(() -> String.format("found file with given object key %s", file.getName())); //$NON-NLS-1$
 						}
 						else {
 							iterator.remove();
@@ -963,50 +969,100 @@ public class OsdReaderWriter {
 					log.log(Level.WARNING, t.getLocalizedMessage(), t);
 				}
 			}
-			//at this point I have all data files containing the old object key
+
+			//rename object key of remaining files
 			iterator = files.iterator();
 			while (iterator.hasNext()) {
-				String filePath = iterator.next().getPath();
+				final String filePath = iterator.next().getPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				log.fine(() -> String.format("renaming object key of %s", filePath)); //$NON-NLS-1$
 				String tmpFilePath = FileUtils.renameFile(filePath, GDE.FILE_ENDING_TMP); // rename existing file to *.tmp
 				File tmpFile = new File(tmpFilePath);
 				File updatedFile = new File(filePath);
-
 				try {
+					zip_input = new ZipInputStream(new FileInputStream(tmpFile));
+					ZipEntry zip_entry = zip_input.getNextEntry();
+					if (zip_entry != null) {
+						data_in = new DataInputStream(zip_input);
+					} else {
+						data_in = new DataInputStream(new FileInputStream(tmpFile));
+					}
+
+					zip_out = new ZipOutputStream(new FileOutputStream(updatedFile));
+					zip_out.putNextEntry(new ZipEntry(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1)));
+					data_out = new DataOutputStream(zip_out);
+
 					long filePointer = 0;
 					String tmpData;
-					data_in = new DataInputStream(new FileInputStream(tmpFile));
-					data_out = new DataOutputStream(new FileOutputStream(updatedFile));
+					tmpData = data_in.readUTF();
+					String line = tmpData.substring(0, tmpData.length() - 1);
+					log.finer(() -> String.format("OSD first line = %s", line));
+					if (!line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) && !line.startsWith(GDE.LEGACY_FILE_VERSION)) 
+						throw new NotSupportedFileFormatException(filePath);
+					data_out.writeUTF(tmpData);
+					filePointer += tmpData.getBytes("UTF8").length; //$NON-NLS-1$
 
+					String stringVersion = line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) ? line.substring(GDE.DATA_EXPLORER_FILE_VERSION.length(), GDE.DATA_EXPLORER_FILE_VERSION.length() + 1).trim()
+							: line.substring(GDE.LEGACY_FILE_VERSION.length(), GDE.LEGACY_FILE_VERSION.length() + 1).trim();
+					int version;
+					try {
+						version = Integer.valueOf(stringVersion).intValue(); // one digit only
+					}
+					catch (NumberFormatException e) {
+						log.log(Level.SEVERE, "can not interprete red version information " + stringVersion);
+						throw new NotSupportedFileFormatException(filePath);
+					}
+					//read/write until object key is detected
 					while (!(tmpData = data_in.readUTF()).startsWith(GDE.OBJECT_KEY)) {
 						data_out.writeUTF(tmpData);
 						filePointer += tmpData.getBytes("UTF8").length; //$NON-NLS-1$
-					}
+					}				
 					//write the new object key
 					StringBuilder sb = new StringBuilder();
 					sb.append(GDE.OBJECT_KEY).append(newObjectKey).append(GDE.STRING_NEW_LINE);
 					data_out.writeUTF(sb.toString());
 					filePointer += GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
-
 					tmpData = data_in.readUTF();
 					data_out.writeUTF(tmpData);
 					filePointer += tmpData.getBytes("UTF8").length; //$NON-NLS-1$
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "filePointer = " + filePointer);
-
+					
+					//next line contains number of record sets
 					int numberRecordSets = 0;
 					if (tmpData.startsWith(GDE.RECORD_SET_SIZE)) {
 						numberRecordSets = Integer.valueOf(tmpData.substring(GDE.RECORD_SET_SIZE.length()).trim()).intValue();
 					}
 					else {
-						throw new Exception();
+						throw new NotSupportedFileFormatException(String.format("File %s does not contain number of record sets!", filePath));
 					}
+					//to correct the file pointers delta of bytes in object key length needs to be calculated 
 					int deltaSizeObjectKey = newObjectKey.getBytes("UTF8").length - oldObjectKey.getBytes("UTF8").length;
 
-					//RecordSetName :: ChannelConfigurationName :: RecordSetComment :: RecordSetProperties :: RecordDataSize :: RecordSetDataPointer
-					for (int i = 0; i < numberRecordSets; ++i) {
-						tmpData = data_in.readUTF();
-						long dataPointer = Long.parseLong(tmpData.substring(tmpData.length() - 11).trim());
-						tmpData = tmpData.substring(0, tmpData.length() - 11) + String.format("%10s\n", dataPointer + deltaSizeObjectKey);
-						data_out.writeUTF(tmpData);
+					//begin version dependent writing - read record set descriptors
+					while (numberRecordSets-- > 0) {
+						switch (version) {
+						case 1:
+						case 2:
+						case 3:
+							//RecordSetName :: ChannelConfigurationName :: RecordSetComment :: RecordSetProperties :: RecordDataSize :: RecordSetDataPointer
+							tmpData = data_in.readUTF();
+							long dataPointer = Long.parseLong(tmpData.substring(tmpData.length() - 11).trim());
+							tmpData = tmpData.substring(0, tmpData.length() - 11) + String.format("%10s\n", dataPointer + deltaSizeObjectKey);
+							data_out.writeUTF(tmpData);
+							break;
+
+						default:
+						case 4:
+							//RecordSetName :: ChannelConfigurationName :: RecordSetComment :: RecordSetProperties :: RecordDataSize :: RecordSetDataPointer
+							int length = data_in.readInt();
+							byte[] bytes = new byte[length];
+							data_in.readFully(bytes);
+							tmpData = new String(bytes);
+							dataPointer = Long.parseLong(tmpData.substring(tmpData.length() - 11).trim());
+							tmpData = tmpData.substring(0, tmpData.length() - 11) + String.format("%10s\n", dataPointer + deltaSizeObjectKey);
+							data_out.writeInt(tmpData.getBytes("UTF8").length);
+							data_out.write(tmpData.getBytes("UTF8"));
+							break;
+						}
 					}
 
 					//read/write until EOF binary data
@@ -1018,34 +1074,59 @@ public class OsdReaderWriter {
 
 					FileUtils.renameFile(tmpFilePath, GDE.FILE_ENDING_BAK); // rename existing file to *.bak
 				}
+				catch (FileNotFoundException e) {
+					log.log(Level.WARNING, e.getMessage(), e);
+					DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0038, new Object[] { e.getMessage() }));
+				}
 				catch (Exception e) {
+					log.log(Level.WARNING, e.getMessage(), e);
 					try {
-						if (data_out != null) data_out.close();
-						if (updatedFile.exists())
-							if(updatedFile.delete())
-								log.log(Level.WARNING, "failed to delete " + filePath);
-						if (data_in != null) data_in.close();
+						if (zip_out != null) {
+							zip_out.closeEntry();
+							if (data_out != null) {
+								data_out.flush();
+								data_out.close();
+								data_out = null;
+							}
+							zip_out.close();
+							zip_out = null;
+						}
+						if (updatedFile.exists()) if (updatedFile.delete()) log.log(Level.WARNING, "failed to delete " + filePath);
+						if (data_in != null) {
+							data_in.close();
+							data_in = null;
+						}
 					}
 					catch (IOException e1) {
-						log.log(Level.WARNING, e.getMessage(), e);
+						log.log(Level.WARNING, e1.getMessage(), e1);
 					}
 					FileUtils.renameFile(tmpFilePath, GDE.FILE_ENDING_OSD); // rename existing file to *.osd
 				}
-
+				finally {
+					try {
+						if (zip_out != null) {
+							zip_out.closeEntry();
+							if (data_out != null) {
+								data_out.flush();
+								data_out.close();
+								data_out = null;
+							}
+							zip_out.close();
+							zip_out = null;
+						}
+						if (data_in != null) {
+							data_in.close();
+							data_in = null;
+						}
+					}
+					catch (IOException e) {
+						log.log(Level.WARNING, e.getMessage(), e);
+					}
+				}
 			}
 		}
-		catch (FileNotFoundException e) {
+		catch (Throwable e) {
 			log.log(Level.WARNING, e.getMessage(), e);
-			DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0038, new Object[] { e.getMessage() }));
-		}
-		finally {
-			try {
-				if (data_out != null) data_out.close();
-				if (data_in != null) data_in.close();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 }

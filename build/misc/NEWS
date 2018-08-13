@@ -8,6 +8,7 @@ GNU DataExplorer - News - comes with version 3.3.3 - 10 Aug 2018
 	* Ask user for confirmation prior to purging an object key
 	* fix channel object key handling, channels of type outlet (chargers) might have different object key, update object selector accordingly
 	* fix unsaved reason entry for changed comment
+	* fix regression renaming object key scenario
 
 2) device specific changes/fixes
 	* HoTTAdapter* - fix 19200 Baud protocol live data, skip Rx query while other sensors detected, Rx data in sensor data contained
@@ -47,6 +48,7 @@ GNU DataExplorer - News - comes with version 3.3.3 - 10 Aug 2018
 	 	>> Remove method synchronizing keyword for methods not used in threads
  	* Support new file extensions separator
 
+
 1) allgemeine Korrekturen/Verbesserungen
     * korrigiert Rekursion bei der Synchronisation von Kurvenvergleich Datensätzen beim hinzufügen neuer Datensätze
     * ermögliche gerätespezifische Verzeichnisnamen über Interface-Methode, um Namensabweichungen Gerätenamen zu Verzeichnisnamen zu ermöglichen
@@ -55,7 +57,7 @@ GNU DataExplorer - News - comes with version 3.3.3 - 10 Aug 2018
     * Bei der Behandlung von Objektschlüsseln wir der Benutzer gefragt
     * korrigierte Objektschlüsselbehandlung für Kanäle vom Typ Ausgang (Ladegeräte) und ermögliche verschiedenen Schlüssle pro Ausgang
     * korrigierte Aussage bei der Anzeige der Änderungen bei geladenen Datensätzen
-
+    * korrigiertes Objektschlüssel Umbenennungs Szenario
 
 2) gerätespezifische Korrekturen/Verbesserungen
     * HoTTAdapter* - korrigiert 19200 Baud Protokoll "live data", überspring Rx Abfrage, weil die Rx Daten in allen Abfrageantworten enthalten sind

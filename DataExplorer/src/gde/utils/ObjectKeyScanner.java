@@ -143,11 +143,11 @@ public class ObjectKeyScanner extends Thread {
 							if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD)) {
 								fileCounter++;
 								if (actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) { // this is not a link
-									log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
+									log.fine(() -> String.format("working with %s" + file.getName())); //$NON-NLS-1$
 									String foundObjectKey = OsdReaderWriter.getHeader(file.getCanonicalPath()).get(GDE.OBJECT_KEY);
 									if (foundObjectKey != null && foundObjectKey.length() >= GDE.MIN_OBJECT_KEY_LENGTH) { // is a valid object key
 										if (!objectKeys.contains(foundObjectKey)) {
-											log.log(Level.FINE, "found new object key " + foundObjectKey); //$NON-NLS-1$
+											log.fine(() -> String.format("found new object key %s", foundObjectKey)); //$NON-NLS-1$
 											objectKeys.add(foundObjectKey);
 											Vector<File> tmpObjectFiles = new Vector<File>();
 											tmpObjectFiles.add(file);
@@ -156,7 +156,7 @@ public class ObjectKeyScanner extends Thread {
 										else {
 											objectFilesMap.get(foundObjectKey).add(file);
 										}
-										log.log(Level.FINE, "add file " + file.getName() + " to object key " + foundObjectKey); //$NON-NLS-1$
+										log.fine(() -> String.format("add file %s to object key %s" , file.getName(), foundObjectKey)); //$NON-NLS-1$
 									}
 								}
 							}
@@ -173,7 +173,8 @@ public class ObjectKeyScanner extends Thread {
 							log.log(Level.WARNING, t.getLocalizedMessage(), t);
 						}
 					}
-					log.log(Level.FINE, "scanned " + fileCounter + " files for object key , foundKeysSize=" + objectKeys.size()); //$NON-NLS-1$ //$NON-NLS-2$
+					if (log.isLoggable(Level.FINE)) 
+						log.log(Level.FINE, String.format("scanned %d files for object key, foundKeysSize = %d", fileCounter, objectKeys.size())); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				if (this.application.getMenuToolBar() != null) this.application.setProgress(progressPercentageLimit, sThreadId);
 				{ // createFileLinks: Take the object key list and create file links for all files assigned to object keys.
@@ -185,7 +186,7 @@ public class ObjectKeyScanner extends Thread {
 					//iterate all found object keys
 					while (iterator.hasNext()) {
 						String tmpObjKey = iterator.next();
-						log.log(Level.FINE, "found object key in vector = " + tmpObjKey); //$NON-NLS-1$
+						log.fine(() -> String.format("found object key in vector = %s", tmpObjKey)); //$NON-NLS-1$
 						//iterate all files of temporary object key
 						objectKeyDirPath = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + tmpObjKey;
 						FileUtils.checkDirectoryAndCreate(objectKeyDirPath);
@@ -208,7 +209,8 @@ public class ObjectKeyScanner extends Thread {
 					Set<String> newObjectList = Settings.getInstance().getRealObjectKeys().collect(Collectors.toSet());
 					if (newObjectList.addAll(objectKeys) || !newObjectList.equals(new HashSet<>(objectKeys))) {
 						this.application.setObjectList(newObjectList.toArray(new String[0]), this.settings.getActiveObject());
-						log.log(Level.FINE, "object list updated: ", newObjectList); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE))
+							log.log(Level.FINE, "object list updated: ", newObjectList); //$NON-NLS-1$
 					}
 
 					this.obsoleteObjectKeys = getObsoleteObjectKeys(rootDirectory);
@@ -267,9 +269,11 @@ public class ObjectKeyScanner extends Thread {
 				try {
 					String actualFilePath = file.getAbsolutePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 					if (actualFilePath.endsWith(GDE.FILE_ENDING_OSD) && !actualFilePath.equals(OperatingSystemHelper.getLinkContainedFilePath(actualFilePath))) {
-						log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE))
+							log.log(Level.FINE, "working with " + file.getName()); //$NON-NLS-1$
 						if (!file.delete()) {
-							log.log(Level.FINE, "could not delete " + file.getName()); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINE))
+								log.log(Level.FINE, "could not delete " + file.getName()); //$NON-NLS-1$
 						}
 					}
 				}
