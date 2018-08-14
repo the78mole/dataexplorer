@@ -201,6 +201,8 @@ public class ObjectKeyCompliance {
 			realObjectKeys.remove(tmpObjectKey);
 		}
 		Settings.getInstance().setObjectList(realObjectKeys.toArray(new String[0]), Settings.getInstance().getActiveObject());
+		if (DataExplorer.getInstance().isWithUi()) //junit must skip
+			DataExplorer.getInstance().setObjectListElements();
 	}
 
 	/**
