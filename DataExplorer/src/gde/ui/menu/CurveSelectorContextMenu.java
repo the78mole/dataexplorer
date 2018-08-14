@@ -1069,7 +1069,13 @@ public class CurveSelectorContextMenu {
 				public void menuShown(MenuEvent evt) {
 					CurveSelectorContextMenu.log.finest(() -> "measurementMenu MenuListener " + evt); //$NON-NLS-1$
 					if (CurveSelectorContextMenu.this.selectedItem != null && !CurveSelectorContextMenu.this.selectedItem.isDisposed()) {
-						CurveSelectorContextMenu.this.measurementRecordName.setText(Messages.getString(MessageIds.GDE_MSGT0124) + CurveSelectorContextMenu.this.recordNameMeasurement);
+						AbstractRecord abstractRecord = CurveSelectorContextMenu.this.recordSet.get(CurveSelectorContextMenu.this.recordNameMeasurement);
+						if (abstractRecord != null) {
+							String recordNameUi = abstractRecord instanceof TrailRecord ? ((TrailRecord) abstractRecord).getNameReplacement() : CurveSelectorContextMenu.this.recordNameMeasurement;
+							CurveSelectorContextMenu.this.measurementRecordName.setText(Messages.getString(MessageIds.GDE_MSGT0124) + recordNameUi);
+						}
+						else
+							CurveSelectorContextMenu.this.measurementRecordName.setText(Messages.getString(MessageIds.GDE_MSGT0124) + CurveSelectorContextMenu.this.recordNameMeasurement);
 					}
 				}
 
