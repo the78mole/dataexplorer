@@ -385,6 +385,7 @@ public class HoTTbinReader {
 		HoTTbinReader.lostPackages.clear();
 		HoTTbinReader.countLostPackages = 0;
 		HoTTbinReader.isJustParsed = false;
+		HoTTbinReader.isTextModusSignaled = false;
 		boolean isWrongDataBlockNummerSignaled = false;
 		int countPackageLoss = 0;
 		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && !HoTTAdapter.isChannelsChannelEnabled ? 10 : 1);
