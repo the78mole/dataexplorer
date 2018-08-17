@@ -163,7 +163,6 @@ public class DataExplorer extends Composite {
 	public final static int				TAB_INDEX_COMMENT									= 6;
 	public final static int				TAB_INDEX_HISTO_SUMMARY						= 7;
 	public final static int				TAB_INDEX_HISTO_TABLE							= 8;
-	public final static int				TAB_INDEX_HISTO_GRAPHIC						= 9;
 
 	public final static String		COMPARE_RECORD_SET								= "compare_set";																						//$NON-NLS-1$
 	public final static String		UTILITY_RECORD_SET								= "utility_set";																						//$NON-NLS-1$

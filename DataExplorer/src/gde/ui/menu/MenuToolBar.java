@@ -62,6 +62,7 @@ import gde.ui.dialog.PrintSelectionDialog;
 import gde.ui.dialog.TimeSetDialog;
 import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.ui.tab.GraphicsWindow;
+import gde.ui.tab.GraphicsWindow.GraphicsType;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyCompliance;
 import gde.utils.ObjectKeyScanner;
@@ -746,6 +747,9 @@ public class MenuToolBar {
 									}
 									else {
 										MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0066));
+										if (MenuToolBar.this.application.getTabSelectionIndex() >= DataExplorer.TAB_INDEX_HISTO_SUMMARY) {
+											MenuToolBar.this.application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL));
+										}
 									}
 								}
 							}
