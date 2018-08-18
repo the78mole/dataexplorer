@@ -64,6 +64,14 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
+import gde.device.graupner.HoTTbinReader.BinParser;
+import gde.device.graupner.HoTTbinReader.ChnBinParser;
+import gde.device.graupner.HoTTbinReader.EamBinParser;
+import gde.device.graupner.HoTTbinReader.EscBinParser;
+import gde.device.graupner.HoTTbinReader.GamBinParser;
+import gde.device.graupner.HoTTbinReader.GpsBinParser;
+import gde.device.graupner.HoTTbinReader.RcvBinParser;
+import gde.device.graupner.HoTTbinReader.VarBinParser;
 import gde.device.graupner.hott.MessageIds;
 import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
@@ -92,7 +100,6 @@ import gde.utils.WaitTimer;
 public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoDevice {
 	final static Logger											log																= Logger.getLogger(HoTTAdapter.class.getName());
 
-	final static String											SENSOR_COUNT											= "SensorCount";																													//$NON-NLS-1$
 	final static String											LOG_COUNT													= "LogCount";																															//$NON-NLS-1$
 	final static String											FILE_PATH													= "FilePath";																															//$NON-NLS-1$
 	final static String											SD_FORMAT													= "SD_FORMAT";																															//$NON-NLS-1$
@@ -132,13 +139,48 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	final static int												QUERY_GAP_MS											= 30;
 
 	public enum Sensor {
-		RECEIVER(1, "Receiver", "RECEIVER"), //$NON-NLS-1$
-		VARIO(2, "Vario", "VARIO"), //$NON-NLS-1$
-		GPS(3, "GPS", "GPS"), //$NON-NLS-1$
-		GAM(4, "GAM", "GENERAL"), //$NON-NLS-1$
-		EAM(5, "EAM", "ELECTRIC"), //$NON-NLS-1$
-		ESC(7, "ESC", "?"), //$NON-NLS-1$
-		CHANNEL(6, "Channel", "N/A"); //$NON-NLS-1$
+		RECEIVER(1, "Receiver", "RECEIVER") { //$NON-NLS-1$
+			@Override
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
+				return new RcvBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			}
+		},
+		VARIO(2, "Vario", "VARIO") { //$NON-NLS-1$
+			@Override
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
+				return new VarBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			}
+		},
+		GPS(3, "GPS", "GPS") { //$NON-NLS-1$
+			@Override
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
+				return new GpsBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			}
+		},
+		GAM(4, "GAM", "GENERAL") { //$NON-NLS-1$
+			@Override
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
+				return new GamBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			}
+		},
+		EAM(5, "EAM", "ELECTRIC") {//$NON-NLS-1$
+			@Override
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
+				return new EamBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			}
+		},
+		ESC(7, "ESC", "?") { //$NON-NLS-1$
+			@Override
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
+				return new EscBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			}
+		},
+		CHANNEL(6, "Channel", "N/A") { //$NON-NLS-1$
+			@Override
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
+				return new ChnBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			}
+		};
 
 		private final String				value;
 		private final String				detectedName;
@@ -154,6 +196,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		public String value() {
 			return this.value;
 		}
+
+		/**
+		 * Takes the parsing input objects in order to avoid parsing method parameters for better performance.
+		 * @param timeSteps_ms is the wrapper object holding the current timestep
+		 * @param buffers are the inputs for parsing which might be null for some sensors
+		 */
+		public abstract BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4);
 
 		public static Sensor fromOrdinal(int ordinal) {
 			return Sensor.VALUES[ordinal];
@@ -281,7 +330,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			return this.channelNumber;
 		}
 
-};
+	};
 
 	// protocol definitions
 	public enum Protocol {
@@ -321,12 +370,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @author Thomas Eickert (USER)
 	 */
 	public static final class PickerParameters {
+		final Analyzer									analyzer;
+
 		/**
 		 * isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
-		 * @deprecated as a NON-private field. The value, however,  is fully functional and is a replacement for the sensor signature.
 		 */
-		@Deprecated // todo use the methods in this class instead and change to private
-		// final boolean										isSensorType[]										= { false, false, false, false, false, false };
 		final ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
 
 		boolean													isChannelsChannelEnabled					= false;
@@ -340,6 +388,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		// UniversalSampler histoRandomSample;
 		// List<String> importExtentions = null;
 
+		public PickerParameters(Analyzer analyzer) {
+			this.analyzer = analyzer;
+		}
+
 		/**
 		 * Collect the settings relevant for the values inserted in the histo vault.
 		 * @return the settings which determine the measurement values returned by the reader
@@ -351,15 +403,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 	}
 
-	final DataExplorer					application;
-	final Channels							channels;
-	final Settings							settings;
-	final HoTTAdapterDialog			dialog;
-	final HoTTAdapterSerialPort	serialPort;
+	final DataExplorer								application;
+	final Channels										channels;
+	final Settings										settings;
+	final HoTTAdapterDialog						dialog;
+	final HoTTAdapterSerialPort				serialPort;
 
-	protected final PickerParameters pickerParameters = new PickerParameters();
+	protected final PickerParameters	pickerParameters	= new PickerParameters(Analyzer.getInstance());
 
-	protected List<String>			importExtentions							= null;
+	protected List<String>						importExtentions	= null;
 
 	/**
 	 * constructor using properties file
@@ -1057,21 +1109,21 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	}
 
 	/**
-	 * create history recordSet and add record data size points from binary file to each measurement.
+	 * create recordSet and add record data size points from binary file to each measurement.
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
-	 * since this is a long term operation the progress bar should be updated to signal business to user.
 	 * collects life data if device setting |isLiveDataActive| is true.
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
 	 * @param inputStream for loading the log data
 	 * @param truss references the requested vault for feeding with the results (vault might be without measurements, settlements and scores)
 	 */
 	@Override
-	public void getRecordSetFromImportFile(Supplier<InputStream> inputStream, VaultCollector truss)
+	public void getRecordSetFromImportFile(Supplier<InputStream> inputStream, VaultCollector truss, Analyzer analyzer)
 			throws DataInconsitsentException, IOException, DataTypeException {
 		String fileEnding = PathUtils.getFileExtention(truss.getVault().getLoadFilePath());
 		if (GDE.FILE_ENDING_DOT_BIN.equals(fileEnding)) {
-			HoTTbinHistoReader.read(inputStream, truss, this.pickerParameters);
+			HoTTbinHistoReader histoReader = new HoTTbinHistoReader(new PickerParameters(analyzer));
+			histoReader.read(inputStream, truss);
 		} else if (GDE.FILE_ENDING_DOT_LOG.equals(fileEnding)) {
 			// todo implement HoTTlogHistoReader
 		} else {

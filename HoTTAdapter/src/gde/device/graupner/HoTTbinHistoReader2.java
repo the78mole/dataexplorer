@@ -23,11 +23,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidObjectException;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import gde.Analyzer;
 import gde.GDE;
@@ -111,7 +113,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 	private static synchronized void read(Supplier<InputStream> inputStream) throws IOException, DataTypeException, DataInconsitsentException {
 		HashMap<String, String> header = null;
 		IDevice device = Analyzer.getInstance().getActiveDevice();
-		boolean isChannelsChannel = Analyzer.getInstance().getActiveChannel().getNumber() == HoTTAdapter.Sensor.CHANNEL.ordinal() + 1; // instead of HoTTAdapter setting
+		boolean isChannelsChannel = Analyzer.getInstance().getActiveChannel().getNumber() == HoTTAdapter.Sensor.CHANNEL.getChannelNumber(); // instead of HoTTAdapter setting
 		long numberDatablocks = HoTTbinHistoReader2.truss.getVault().getLogFileLength() / HoTTbinReader.dataBlockSize / (HoTTbinReader.isReceiverOnly && !isChannelsChannel ? 10 : 1);
 		tmpRecordSet = RecordSet.createRecordSet(HoTTbinHistoReader2.truss.getVault().getLogRecordsetBaseName(), Analyzer.getInstance(), HoTTbinHistoReader2.application.getActiveChannelNumber(), true, true, false);
 		tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(truss.getVault().getLoadFileAsPath().getFileName().toString(), truss.getVault().getLogFileLastModified(), numberDatablocks));
@@ -122,22 +124,24 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 
 		HoTTbinReader.pickerParameters = pickerParameters;
 		try (BufferedInputStream info_in = new BufferedInputStream(inputStream.get())) {
-			header = HoTTbinReader.getFileInfo(info_in, truss.getVault().getLoadFilePath(), truss.getVault().getLogFileLength());
+			header = new InfoParser((s) -> {} ).getFileInfo(info_in, truss.getVault().getLoadFilePath(), truss.getVault().getLogFileLength());
 		} catch (DataTypeException e) {
 			HoTTbinHistoReader2.log.log(Level.WARNING, String.format("%s  %s", e.getMessage(), HoTTbinHistoReader2.truss.getVault().getLoadFilePath())); // 'GRAUPNER SD LOG8'
 		}
 
 		if (header == null || header.isEmpty()) return;
-		detectedSensors = Sensor.getSetFromDetected(header.get("DETECTED SENSOR"));
+		detectedSensors = Sensor.getSetFromDetected(header.get(HoTTAdapter.DETECTED_SENSOR));
 		if (!Sensor.getChannelNumbers(detectedSensors).contains(truss.getVault().getVaultChannelNumber())) return;
 
+		EnumSet<Sensor> detectedSensors = EnumSet.noneOf(Sensor.class); // todo
+		detectedSensors.addAll(Arrays.stream(header.get(HoTTAdapter.DETECTED_SENSOR).split(GDE.STRING_COMMA)).map((s) -> Sensor.fromDetectedName(s)).collect(Collectors.toSet()));
 		try (BufferedInputStream in = new BufferedInputStream(inputStream.get()); //
 				InputStream data_in = Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT)) //
 						? new SdLogInputStream(in, truss.getVault().getLogFileLength(), new SdLogFormat(HoTTbinReaderX.headerSize, HoTTbinReaderX.footerSize, 64)) //
 						: in; ) {
 			int readLimitMark = (LOG_RECORD_SCAN_START + NUMBER_LOG_RECORDS_TO_SCAN) * dataBlockSize + 1;
-			if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
-				HoTTbinHistoReader2.isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
+			if (detectedSensors.size() <= 2) {
+				HoTTbinHistoReader2.isReceiverOnly = detectedSensors.size() == 1;
 				data_in.mark(readLimitMark); // reduces # of overscan records from 57 to 23 (to 38 with 1500 blocks)
 				UniversalSampler histoRandomSample = HoTTbinHistoReader2.readSingle(data_in, LOG_RECORD_SCAN_START + NUMBER_LOG_RECORDS_TO_SCAN, new int[0], new int[0]);
 				data_in.reset();
@@ -198,7 +202,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		HoTTbinHistoReader2.isJustParsed = false;
 		int countPackageLoss = 0;
 
-		UniversalSampler histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinReader2.points, recordTimespan_ms, Analyzer.getInstance());
+		UniversalSampler histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinReader2.points, recordTimespan_ms, pickerParameters.analyzer);
 		histoRandomSample.setMaxMinPoints(maxPoints, minPoints);
 
 		// read all the data blocks from the file, parse only for the active channel
@@ -380,7 +384,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 
 					if (isSensorData || (isReceiverData && tmpRecordSet.get(0).realSize() > 0)) {
 						setTimeMarks(TimeMark.READ);
-						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinHistoReader.timeStep_ms);
+						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinReader.timeStep_ms);
 						setTimeMarks(TimeMark.REVIEWED);
 						if (isValidSample && doFullRead) {
 							tmpRecordSet.addPoints(HoTTbinReader2.points, HoTTbinReader.timeStep_ms);
@@ -390,7 +394,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 						isSensorData = isReceiverData = false;
 					} else if (activeChannelNumber == 4) {
 						setTimeMarks(TimeMark.READ);
-						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinHistoReader.timeStep_ms);
+						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinReader2.timeStep_ms);
 						setTimeMarks(TimeMark.REVIEWED);
 						if (isValidSample && doFullRead) {
 							tmpRecordSet.addPoints(HoTTbinReader2.points, HoTTbinReader.timeStep_ms);
@@ -413,7 +417,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 					if (activeChannelNumber == 4) {
 						parseChannel(HoTTbinReader.buf); //Channels
 						setTimeMarks(TimeMark.READ);
-						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinHistoReader.timeStep_ms);
+						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinReader2.timeStep_ms);
 						setTimeMarks(TimeMark.REVIEWED);
 						if (isValidSample && doFullRead) {
 							tmpRecordSet.addPoints(HoTTbinReader2.points, HoTTbinReader.timeStep_ms);
@@ -465,7 +469,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 					String.format("initiateTime: %,7d  readTime: %,7d  reviewTime: %,7d  addTime: %,7d  pickTime: %,7d  finishTime: %,7d", TimeUnit.NANOSECONDS.toMillis(initiateTime), //$NON-NLS-1$
 							TimeUnit.NANOSECONDS.toMillis(readTime), TimeUnit.NANOSECONDS.toMillis(reviewTime), TimeUnit.NANOSECONDS.toMillis(addTime), TimeUnit.NANOSECONDS.toMillis(pickTime),
 							TimeUnit.NANOSECONDS.toMillis(finishTime)));
-			if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
+			if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.getChannelNumber()) {
 				if (tmpRecordSet.getMaxTime_ms() > 0) {
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
 							String.format("lost:%,9d perMille:%,4d total:%,9d   lostMax_ms:%,4d lostAvg_ms=%,4d", countPackageLoss, //$NON-NLS-1$
@@ -548,7 +552,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 		HoTTbinHistoReader2.isTextModusSignaled = false;
 		int countPackageLoss = 0;
 
-		UniversalSampler histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinReader2.points, recordTimespan_ms, Analyzer.getInstance());
+		UniversalSampler histoRandomSample = UniversalSampler.createSampler(activeChannelNumber, HoTTbinReader2.points, recordTimespan_ms, pickerParameters.analyzer);
 		histoRandomSample.setMaxMinPoints(maxPoints, minPoints);
 
 		// read all the data blocks from the file, parse only for the active channel
@@ -695,8 +699,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 
 					if (isReceiverData && (logCountVario > 0 || logCountGPS > 0 || logCountGAM > 0 || logCountEAM > 0 || logCountESC > 0)) {
 						setTimeMarks(TimeMark.READ);
-						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinHistoReader.timeStep_ms);
-						//System.out.println("orig: " + HoTTbinHistoReader2.points[74] + " - " + HoTTbinHistoReader.timeStep_ms);
+						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinReader2.timeStep_ms);
 						setTimeMarks(TimeMark.REVIEWED);
 						if (isValidSample && doFullRead) {
 							tmpRecordSet.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
@@ -708,7 +711,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 						isReceiverData = false;
 					} else if (activeChannelNumber == 4 && !HoTTbinReader2.isJustMigrated) {
 						setTimeMarks(TimeMark.READ);
-						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinHistoReader.timeStep_ms);
+						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinReader2.timeStep_ms);
 						setTimeMarks(TimeMark.REVIEWED);
 						if (isValidSample && doFullRead) {
 							tmpRecordSet.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
@@ -749,7 +752,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 					if (activeChannelNumber == 4) {
 						parseChannel(HoTTbinReader.buf); //Channels
 						setTimeMarks(TimeMark.READ);
-						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinHistoReader.timeStep_ms);
+						boolean isValidSample = histoRandomSample.capturePoints(HoTTbinReader2.timeStep_ms);
 						setTimeMarks(TimeMark.REVIEWED);
 						if (isValidSample && doFullRead) {
 							tmpRecordSet.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
@@ -803,7 +806,7 @@ public class HoTTbinHistoReader2 extends HoTTbinReader2 {
 							TimeUnit.NANOSECONDS.toMillis(readTime), TimeUnit.NANOSECONDS.toMillis(reviewTime), TimeUnit.NANOSECONDS.toMillis(addTime), TimeUnit.NANOSECONDS.toMillis(pickTime),
 							TimeUnit.NANOSECONDS.toMillis(finishTime)));
 
-			if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.ordinal() + 1) {
+			if (activeChannelNumber == HoTTAdapter.Sensor.RECEIVER.getChannelNumber()) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE,
 						String.format("lost:%,9d perMille:%,4d total:%,9d   lostMax_ms:%,4d lostAvg_ms=%,4d", countPackageLoss, //$NON-NLS-1$
 								(int) (countPackageLoss / tmpRecordSet.getTime_ms((int) HoTTbinHistoReader2.truss.getVault().getLogFileLength() / HoTTbinHistoReader2.dataBlockSize - 1) * 1000. * recordTimespan_ms),

@@ -52,6 +52,8 @@ public class HoTTbinReaderX extends HoTTbinReader {
 
 	protected static final boolean	isSensorType[]	= { false, false, false, false, false, false };
 
+	protected static StringBuilder	sensorSignature;
+
 	/**
 	 * convert from RF_RXSQ to strength using lookup table
 	 * @param inValue
@@ -74,7 +76,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 	 */
 	public static synchronized void read(String filePath, PickerParameters newPickerParameters) throws Exception {
 		HoTTbinReader.pickerParameters = newPickerParameters;
-		HoTTbinReader.sensorSignature = new StringBuilder().append(GDE.STRING_LEFT_BRACKET).append(HoTTAdapter.Sensor.RECEIVER.name()).append(GDE.STRING_COMMA);
+		HoTTbinReaderX.sensorSignature = new StringBuilder().append(GDE.STRING_LEFT_BRACKET).append(HoTTAdapter.Sensor.RECEIVER.name()).append(GDE.STRING_COMMA);
 		boolean isHoTTV2 = true;
 
 		File inputFile = new File(filePath);
@@ -209,8 +211,6 @@ public class HoTTbinReaderX extends HoTTbinReader {
 				channel.applyTemplate(recordSetName, false);
 			}
 			//recordSetReceiver initialized and ready to add data
-			HoTTbinReader.sensorSignature = new StringBuilder().append(GDE.STRING_LEFT_BRACKET).append(HoTTAdapter.Sensor.RECEIVER.name()).append(GDE.STRING_COMMA);
-
 			data_in.skip(27); //header with constant length
 
 			//read all the data blocks from the file and parse
@@ -317,7 +317,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 								break;
 							case 02: //ESC 1
 								if (HoTTbinReaderX.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] == false)
-									HoTTbinReader.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
+									HoTTbinReaderX.sensorSignature.append(HoTTAdapter.Sensor.ESC.name()).append(GDE.STRING_COMMA);
 								HoTTbinReaderX.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()] = true;
 								parseESC(HoTTbinReaderX.buf3, HoTTbinReaderX.buf4, HoTTbinReaderX.buf5, HoTTbinReaderX.buf6, HoTTbinReaderX.buf7, HoTTbinReaderX.buf8, HoTTbinReaderX.buf9, HoTTbinReaderX.bufA);
 								break;
@@ -360,7 +360,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 			}
 			String packageLossPercentage = HoTTbinReaderX.recordSetReceiver.getRecordDataSize(true) > 0 ? String.format("%.1f",
 					(countPackageLoss / HoTTbinReaderX.recordSetReceiver.getTime_ms(HoTTbinReaderX.recordSetReceiver.getRecordDataSize(true) - 1) * 1000)) : "100";
-			HoTTbinReader.sensorSignature.deleteCharAt(HoTTbinReader.sensorSignature.length() - 1).append(GDE.STRING_RIGHT_BRACKET);
+
 			HoTTbinReaderX.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
 					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReaderX.lostPackages.getStatistics() })
 					+ HoTTbinReaderX.sensorSignature);

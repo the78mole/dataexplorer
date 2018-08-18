@@ -1703,21 +1703,19 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	}
 
 	/**
-	 * create history recordSet and add record data size points from binary file to each measurement.
+	 * create recordSet and add record data size points from binary file to each measurement.
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
-	 * since this is a long term operation the progress bar should be updated to signal business to user.
-	 * collects life data if device setting |isLiveDataActive| is true.
 	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
 	 * @param inputStream for loading the log data
 	 * @param truss references the requested vault for feeding with the results (vault might be without measurements, settlements and scores)
 	 */
 	@Override
-	public void getRecordSetFromImportFile(Supplier<InputStream> inputStream, VaultCollector truss) throws DataInconsitsentException,
+	public void getRecordSetFromImportFile(Supplier<InputStream> inputStream, VaultCollector truss, Analyzer analyzer) throws DataInconsitsentException,
 			IOException, DataTypeException {
 		String fileEnding = PathUtils.getFileExtention(truss.getVault().getLoadFilePath());
 		if (GDE.FILE_ENDING_DOT_BIN.equals(fileEnding)) {
-			HoTTbinHistoReader2.read(inputStream, truss, this.pickerParameters);
+			HoTTbinHistoReader2.read(inputStream, truss, new PickerParameters(analyzer));
 		} else if (GDE.FILE_ENDING_DOT_LOG.equals(fileEnding)) {
 			// todo implement HoTTlogHistoReader
 		} else {

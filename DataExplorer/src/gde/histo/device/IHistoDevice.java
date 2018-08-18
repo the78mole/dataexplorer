@@ -51,15 +51,15 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * Create recordSet and add record data size points from binary file to each measurement.
 	 * It is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
 	 * Do not forget to call makeInActiveDisplayable afterwards to calculate the missing data.
-	 * Since this is a long term operation the progress bar should be updated to signal business to user.
 	 * Reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
 	 * @param inputStream for loading the log data
 	 * @param truss references the requested vault for feeding with the results (vault might be without measurements, settlements and scores)
+	 * @param analyzer defines the the requested device, channel, object
 	 * @throws DataInconsitsentException
 	 * @throws DataTypeException
 	 * @throws IOException
 	 */
-	public void getRecordSetFromImportFile(Supplier<InputStream> inputStream, VaultCollector truss) throws DataInconsitsentException, IOException, DataTypeException;
+	public void getRecordSetFromImportFile(Supplier<InputStream> inputStream, VaultCollector truss, Analyzer analyzer) throws DataInconsitsentException, IOException, DataTypeException;
 
 	/**
 	 * Add record data points from file stream to each measurement.

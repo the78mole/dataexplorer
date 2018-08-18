@@ -54,6 +54,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 	static boolean									isGpsStartTimeSet	= false;
 	static int											gpsStartTime			= 0;
 
+	protected static StringBuilder	sensorSignature;
 	protected static final boolean	isSensorType[]		= { false, false, false, false, false, false };
 
 	/**
@@ -63,13 +64,14 @@ public class HoTTbinReaderD extends HoTTbinReader {
 	 */
 	public static synchronized void read(String filePath, PickerParameters newPickerParameters) throws Exception {
 		HashMap<String, String> header = HoTTbinReader.getFileInfo(new File(filePath), pickerParameters);
-		EnumSet<Sensor> sensors = Sensor.getSetFromSignature(HoTTbinReader.sensorSignature.toString());
+		EnumSet<Sensor> sensors = Sensor.getSetFromDetected(header.get(HoTTAdapter.DETECTED_SENSOR));
+		HoTTbinReaderD.sensorSignature = Sensor.getSetAsSignature(sensors);
 		for (int i = 1; i < isSensorType.length; i++) { // exclude receiver
 			HoTTbinReaderD.isSensorType[i] = sensors.contains(Sensor.fromOrdinal(i));
 		}
 
-		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
-			HoTTbinReader.isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
+		if (sensors.size() <= 2) {
+			HoTTbinReader.isReceiverOnly = sensors.size() == 1;
 			readSingle(new File(header.get(HoTTAdapter.FILE_PATH)));
 		}
 		else
@@ -380,7 +382,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 					: "100";
 			tmpRecordSet.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
 					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReader.lostPackages.getStatistics() })
-					+ HoTTbinReader.sensorSignature);
+					+ HoTTbinReaderD.sensorSignature);
 			HoTTbinReaderD.logger.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReaderD.logger.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -477,7 +479,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
 		RecordSet tmpRecordSet;
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
 		GDE.getUiNotification().setProgress(0);
@@ -728,7 +729,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 					: "100";
 			tmpRecordSet.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
 					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReader.lostPackages.getStatistics() })
-					+ HoTTbinReader.sensorSignature);
+					+ HoTTbinReaderD.sensorSignature);
 			HoTTbinReaderD.logger.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReaderD.logger.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 

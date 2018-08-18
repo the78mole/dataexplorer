@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -49,19 +48,20 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	final static Logger	log							= Logger.getLogger(HoTTbinReader2.class.getName());
 	static int[]				points;
 	static RecordSet		recordSet;
-	static boolean			isJustMigrated	= false;
+	static boolean			isJustMigrated				= false;
 
 	/**
 	 * read complete file data and display the first found record set
 	 * @param filePath
 	 * @throws Exception
 	 */
-	public static synchronized void read(String filePath, PickerParameters pickerParameters) throws Exception {
-		HoTTbinReader2.pickerParameters = pickerParameters;
-		HashMap<String, String> header = getFileInfo(new File(filePath), pickerParameters);
+	public static synchronized void read(String filePath, PickerParameters newPickerParameters) throws Exception {
+		HoTTbinReader2.pickerParameters = newPickerParameters;
+		HashMap<String, String> header = getFileInfo(new File(filePath), newPickerParameters);
+		HoTTbinReader2.detectedSensors = Sensor.getSetFromDetected(header.get(HoTTAdapter.DETECTED_SENSOR));
 
-		if (Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) <= 1) {
-			HoTTbinReader.isReceiverOnly = Integer.parseInt(header.get(HoTTAdapter.SENSOR_COUNT)) == 0;
+		if (HoTTbinReader2.detectedSensors.size() <= 2) {
+			HoTTbinReader.isReceiverOnly = HoTTbinReader2.detectedSensors.size() == 1;
 			readSingle(new File(header.get(HoTTAdapter.FILE_PATH)));
 		}
 		else
@@ -82,7 +82,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		DataInputStream data_in = new DataInputStream(file_input);
 		long fileSize = file.length();
 		IDevice device = HoTTbinReader.application.getActiveDevice();
-		EnumSet<Sensor> detectedSensors = Sensor.getSetFromSignature(HoTTbinReader.sensorSignature.toString());
 		int recordSetNumber = HoTTbinReader.channels.get(1).maxSize() + 1;
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
@@ -355,7 +354,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			String packageLossPercentage = tmpRecordSet.getRecordDataSize(true) > 0 ? String.format("%.1f", (countPackageLoss / tmpRecordSet.getTime_ms(tmpRecordSet.getRecordDataSize(true) - 1) * 1000)) : "100";
 			tmpRecordSet.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
 					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReader.lostPackages.getStatistics() })
-					+ HoTTbinReader.sensorSignature);
+					+ Sensor.getSetAsSignature(HoTTbinReader.detectedSensors));
 			HoTTbinReader2.log.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader2.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -392,7 +391,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		DataInputStream data_in = new DataInputStream(file_input);
 		long fileSize = file.length();
 		IDevice device = HoTTbinReader.application.getActiveDevice();
-		EnumSet<Sensor> detectedSensors = Sensor.getSetFromSignature(HoTTbinReader.sensorSignature.toString());
 		int recordSetNumber = HoTTbinReader.channels.get(1).maxSize() + 1;
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
@@ -696,7 +694,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					: "100";
 			tmpRecordSet.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
 					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReader.lostPackages.getStatistics() })
-					+ HoTTbinReader.sensorSignature);
+					+ Sensor.getSetAsSignature(HoTTbinReader.detectedSensors));
 			HoTTbinReader2.log.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			HoTTbinReader2.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 

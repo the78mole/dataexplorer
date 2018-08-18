@@ -30,6 +30,7 @@ import gde.GDE;
 import gde.data.Channel;
 import gde.data.RecordSet;
 import gde.device.graupner.HoTTAdapter.PickerParameters;
+import gde.device.graupner.HoTTAdapter.Sensor;
 import gde.exception.DataInconsitsentException;
 import gde.io.DataParser;
 import gde.log.Level;
@@ -50,15 +51,17 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 
 	/**
 	* read log data according to version 0
-	* @param file
-	* @param data_in
+	* @param filePath
+	* @param newPickerParameters
 	* @throws IOException
 	* @throws DataInconsitsentException
 	*/
-	public static synchronized void read(String filePath, PickerParameters pickerParameters) throws Exception {
+	public static synchronized void read(String filePath, PickerParameters newPickerParameters) throws Exception {
 		final String $METHOD_NAME = "read";
-		HoTTlogReaderD.pickerParameters = pickerParameters;
-		HashMap<String, String> fileInfoHeader = getFileInfo(new File(filePath), pickerParameters);
+		HoTTlogReaderD.pickerParameters = newPickerParameters;
+		HashMap<String, String> fileInfoHeader = getFileInfo(new File(filePath), newPickerParameters);
+		HoTTlogReader.detectedSensors = Sensor.getSetFromDetected(fileInfoHeader.get(HoTTAdapter.DETECTED_SENSOR));
+
 		final File file = new File(fileInfoHeader.get(HoTTAdapter.FILE_PATH));
 		long startTime = System.nanoTime() / 1000000;
 		FileInputStream file_input = new FileInputStream(file);
@@ -254,7 +257,7 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 			String packageLossPercentage = tmpRecordSet.getRecordDataSize(true) > 0 ? String.format("%.1f", (countPackageLoss / tmpRecordSet.getTime_ms(tmpRecordSet.getRecordDataSize(true) - 1) * 1000)) : "100";
 			tmpRecordSet.setRecordSetDescription(tmpRecordSet.getRecordSetDescription()
 					+ Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] { countPackageLoss, packageLossPercentage, HoTTbinReader.lostPackages.getStatistics() })
-					+ HoTTbinReader.sensorSignature);
+					+ Sensor.getSetAsSignature(HoTTbinReader.detectedSensors));
 			log.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + countPackageLoss); //$NON-NLS-1$
 			log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 

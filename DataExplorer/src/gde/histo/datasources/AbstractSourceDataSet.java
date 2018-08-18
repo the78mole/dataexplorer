@@ -302,7 +302,7 @@ public abstract class AbstractSourceDataSet {
 				if (truss.getVault().getLoadFilePath().equals(loadFilePath)) {
 					Supplier<InputStream> inputStream = () -> analyzer.getDataAccess().getSourceInputStream(sourcePath);
 					try {
-						((IHistoDevice) analyzer.getActiveDevice()).getRecordSetFromImportFile(inputStream, truss);
+						((IHistoDevice) analyzer.getActiveDevice()).getRecordSetFromImportFile(inputStream, truss, analyzer);
 					} catch (Exception e) {
 						log.log(SEVERE, e.getMessage(), e);
 						log.info(() -> String.format("invalid file format: %s  channelNumber=%d  %s", //
