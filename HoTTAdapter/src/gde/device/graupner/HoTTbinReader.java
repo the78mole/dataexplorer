@@ -678,7 +678,7 @@ public class HoTTbinReader {
 										HoTTbinReader.buf2 = new byte[30];
 										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
 									}
-									if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 2) {
+									if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
 										HoTTbinReader.buf3 = new byte[30];
 										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
 									}
