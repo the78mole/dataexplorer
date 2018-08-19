@@ -495,7 +495,7 @@ public final class VaultPicker {
 
 		progress.ifPresent((p) -> p.reInit(CACHED, remainingJobSize, 1));
 		VaultReaderWriter vaultReaderWriter = new VaultReaderWriter(analyzer, Optional.empty());
-		for (Map.Entry<Path, List<VaultCollector>> trussJobsEntry : trussJobs.entrySet()) {
+		trussJobs.entrySet().parallelStream().forEach(trussJobsEntry -> {
 			vaultReaderWriter.loadFromFile(trussJobsEntry.getKey(), trussJobsEntry.getValue());
 			for (VaultCollector vaultCollector : trussJobsEntry.getValue()) {
 				ExtendedVault histoVault = vaultCollector.getVault();
@@ -507,7 +507,7 @@ public final class VaultPicker {
 				}
 			}
 			progress.ifPresent((p) -> p.countInLoop(trussJobsEntry.getValue().size()));
-		}
+		});
 	}
 
 	/**
