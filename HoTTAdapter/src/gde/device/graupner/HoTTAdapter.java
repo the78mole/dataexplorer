@@ -65,13 +65,6 @@ import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
 import gde.device.graupner.HoTTbinReader.BinParser;
-import gde.device.graupner.HoTTbinReader.ChnBinParser;
-import gde.device.graupner.HoTTbinReader.EamBinParser;
-import gde.device.graupner.HoTTbinReader.EscBinParser;
-import gde.device.graupner.HoTTbinReader.GamBinParser;
-import gde.device.graupner.HoTTbinReader.GpsBinParser;
-import gde.device.graupner.HoTTbinReader.RcvBinParser;
-import gde.device.graupner.HoTTbinReader.VarBinParser;
 import gde.device.graupner.hott.MessageIds;
 import gde.device.resource.DeviceXmlResource;
 import gde.exception.DataInconsitsentException;
@@ -141,44 +134,100 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public enum Sensor {
 		RECEIVER(1, "Receiver", "RECEIVER") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-				return new RcvBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.RcvBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.RcvBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.RcvBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
 		},
 		VARIO(2, "Vario", "VARIO") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-				return new VarBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.VarBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.VarBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.VarBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
 		},
 		GPS(3, "GPS", "GPS") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-				return new GpsBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.GpsBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.GpsBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.GpsBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
 		},
 		GAM(4, "GAM", "GENERAL") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-				return new GamBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.GamBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.GamBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.GamBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
 		},
 		EAM(5, "EAM", "ELECTRIC") {//$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-				return new EamBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.EamBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.EamBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.EamBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
 		},
 		ESC(7, "ESC", "?") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-				return new EscBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.EscBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.EscBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.EscBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
 		},
 		CHANNEL(6, "Channel", "N/A") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-				return new ChnBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.ChnBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.ChnBinParser(pickerParameters, timeSteps_ms, buffers);
+			}
+			@Override
+			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader2.ChnBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
 		};
 
@@ -200,9 +249,26 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		/**
 		 * Takes the parsing input objects in order to avoid parsing method parameters for better performance.
 		 * @param timeSteps_ms is the wrapper object holding the current timestep
-		 * @param buffers are the inputs for parsing which might be null for some sensors
+		 * @param buffers are the required input buffers for parsing (the first dimension corresponds to the buffers count)
 		 */
-		public abstract BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4);
+		public abstract BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers);
+
+		/**
+		 * Parse for HoTTAdapter2.
+		 * Takes the parsing input objects in order to avoid parsing method parameters for better performance.
+		 * @param timeSteps_ms is the wrapper object holding the current timestep
+		 * @param buffers are the required input buffers for parsing (the first dimension corresponds to the buffers count)
+		 */
+		public abstract BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers);
+
+		/**
+		 * Parse in situ for HoTTAdapter2 without the need to migrate the points.
+		 * Takes the parsing input objects as well as the parsing output object.
+		 * @param points is the output object which might be on single commonly used object for all parser subclasses
+		 * @param timeSteps_ms is the wrapper object holding the current timestep
+		 * @param buffers are the required input buffers for parsing (the first dimension corresponds to the buffers count)
+		 */
+		public abstract BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers);
 
 		public static Sensor fromOrdinal(int ordinal) {
 			return Sensor.VALUES[ordinal];
@@ -365,16 +431,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	}
 
 	/**
-	 * Parameter object replacing some HoTTAdapter fields used by other classes.
+	 * Parameter object replacing some HoTTAdapter* fields used by other classes.
 	 * Supports threadsafe access to these parameters.
+	 * todo check if this class is required after making the readers threadsafe
 	 * @author Thomas Eickert (USER)
 	 */
 	public static final class PickerParameters {
 		final Analyzer									analyzer;
 
-		/**
-		 * isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
-		 */
 		final ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
 
 		boolean													isChannelsChannelEnabled					= false;
@@ -384,9 +448,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		boolean													isTolerateSignChangeLongitude			= false;
 		double													latitudeToleranceFactor						= 90.0;
 		double													longitudeToleranceFactor					= 25.0;
-
-		// UniversalSampler histoRandomSample;
-		// List<String> importExtentions = null;
 
 		public PickerParameters(Analyzer analyzer) {
 			this.analyzer = analyzer;

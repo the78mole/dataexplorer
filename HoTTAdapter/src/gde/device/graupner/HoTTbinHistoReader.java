@@ -231,19 +231,19 @@ public class HoTTbinHistoReader {
 		HoTTAdapter device = (HoTTAdapter) analyzer.getActiveDevice();
 		int activeChannelNumber = device.channels.getActiveChannelNumber();
 		if (activeChannelNumber == Sensor.RECEIVER.getChannelNumber()) {
-			binParser = Sensor.RECEIVER.createBinParser(pickerParameters, timeSteps_ms, buf, null, null, null, null);
+			binParser = Sensor.RECEIVER.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf });
 		} else if (activeChannelNumber == Sensor.CHANNEL.getChannelNumber()) {
-			binParser = Sensor.CHANNEL.createBinParser(pickerParameters, timeSteps_ms, buf, null, null, null, null);
-		} else if (activeChannelNumber == Sensor.VARIO.getChannelNumber()) {
-			binParser = Sensor.VARIO.createBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, null, null);
-		} else if (activeChannelNumber == Sensor.GPS.getChannelNumber()) {
-			binParser = Sensor.GPS.createBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, null);
-		} else if (activeChannelNumber == Sensor.GAM.getChannelNumber()) {
-			binParser = Sensor.GAM.createBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
-		} else if (activeChannelNumber == Sensor.EAM.getChannelNumber()) {
-			binParser = Sensor.EAM.createBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
-		} else if (activeChannelNumber == Sensor.ESC.getChannelNumber()) {
-			binParser = Sensor.ESC.createBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, null);
+			binParser = Sensor.CHANNEL.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf });
+		} else if (activeChannelNumber == Sensor.VARIO.getChannelNumber() && detectedSensors.contains(Sensor.VARIO)) {
+			binParser = Sensor.VARIO.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
+		} else if (activeChannelNumber == Sensor.GPS.getChannelNumber() && detectedSensors.contains(Sensor.GPS)) {
+			binParser = Sensor.GPS.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
+		} else if (activeChannelNumber == Sensor.GAM.getChannelNumber() && detectedSensors.contains(Sensor.GAM)) {
+			binParser = Sensor.GAM.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
+		} else if (activeChannelNumber == Sensor.EAM.getChannelNumber() && detectedSensors.contains(Sensor.EAM)) {
+			binParser = Sensor.EAM.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
+		} else if (activeChannelNumber == Sensor.ESC.getChannelNumber() && detectedSensors.contains(Sensor.ESC)) {
+			binParser = Sensor.ESC.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
 		} else {
 			throw new UnsupportedOperationException();
 		}
@@ -609,19 +609,19 @@ public class HoTTbinHistoReader {
 		HoTTAdapter device = (HoTTAdapter) analyzer.getActiveDevice();
 		int activeChannelNumber = device.channels.getActiveChannelNumber();
 		if (activeChannelNumber == Sensor.RECEIVER.getChannelNumber()) {
-			binParser = Sensor.RECEIVER.createBinParser(pickerParameters, timeSteps_ms, buf, null, null, null, null);
+			binParser = Sensor.RECEIVER.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf });
 		} else if (activeChannelNumber == Sensor.CHANNEL.getChannelNumber()) {
-			binParser = Sensor.CHANNEL.createBinParser(pickerParameters, timeSteps_ms, buf, null, null, null, null);
+			binParser = Sensor.CHANNEL.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf });
 		} else if (activeChannelNumber == Sensor.VARIO.getChannelNumber() && detectedSensors.contains(Sensor.VARIO)) {
-			binParser = Sensor.VARIO.createBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, null, null);
+			binParser = Sensor.VARIO.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
 		} else if (activeChannelNumber == Sensor.GPS.getChannelNumber() && detectedSensors.contains(Sensor.GPS)) {
-			binParser = Sensor.GPS.createBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, null);
+			binParser = Sensor.GPS.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
 		} else if (activeChannelNumber == Sensor.GAM.getChannelNumber() && detectedSensors.contains(Sensor.GAM)) {
-			binParser = Sensor.GAM.createBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			binParser = Sensor.GAM.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		} else if (activeChannelNumber == Sensor.EAM.getChannelNumber() && detectedSensors.contains(Sensor.EAM)) {
-			binParser = Sensor.EAM.createBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, buf4);
+			binParser = Sensor.EAM.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		} else if (activeChannelNumber == Sensor.ESC.getChannelNumber() && detectedSensors.contains(Sensor.ESC)) {
-			binParser = Sensor.ESC.createBinParser(pickerParameters, timeSteps_ms, buf0, buf1, buf2, buf3, null);
+			binParser = Sensor.ESC.createBinParser(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
 		} else {
 			throw new UnsupportedOperationException();
 		}

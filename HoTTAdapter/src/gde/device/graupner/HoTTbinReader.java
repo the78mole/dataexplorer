@@ -487,13 +487,13 @@ public class HoTTbinReader {
 		HoTTbinReader.buf4 = new byte[30];
 		boolean isBuf1Ready = false, isBuf2Ready = false, isBuf3Ready = false, isBuf4Ready = false;
 		long[] timeSteps_ms = new long[] {0};
-		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf, null, null, null, null);
-		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf, null, null, null, null);
-		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, null, null);
-		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, null);
-		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-		HoTTbinReader.escBinParser = Sensor.ESC.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, null);
+		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf });
+		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf });
+		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
+		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
+		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
+		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
+		HoTTbinReader.escBinParser = Sensor.ESC.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
 		int version = -1;
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
@@ -931,13 +931,13 @@ public class HoTTbinReader {
 		HoTTbinReader.buf3 = new byte[30];
 		HoTTbinReader.buf4 = new byte[30];
 		long[] timeSteps_ms = new long[] {0};
-		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf, null, null, null, null);
-		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf, null, null, null, null);
-		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, null, null);
-		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, null);
-		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-		HoTTbinReader.escBinParser = Sensor.ESC.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, null);
+		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf });
+		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf });
+		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
+		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
+		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
+		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
+		HoTTbinReader.escBinParser = Sensor.ESC.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
 		byte actualSensor = -1, lastSensor = -1;
 		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0, logCountSpeedControl = 0;
 		HoTTbinReader.isJustParsed = false;
@@ -1292,10 +1292,10 @@ public class HoTTbinReader {
 
 		protected final byte[]											_buf;
 
-		protected RcvBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-			super(pickerParameters, new int[10], timeSteps_ms, buf0, buf1, buf2, buf3, buf4, Sensor.RECEIVER);
-			_buf = buf0;
-			if (buf1 != null || buf2 != null || buf3 != null || buf4 != null) throw new InvalidParameterException("buffers mismatch: " + buf1 + buf2 + buf3 + buf4);
+		protected RcvBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, new int[10], timeSteps_ms, buffers, Sensor.RECEIVER);
+			_buf = buffers[0];
+			if (buffers.length != 1) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
 
 		@Override
@@ -1392,10 +1392,10 @@ public class HoTTbinReader {
 	public static class ChnBinParser extends BinParser {
 		protected final byte[] _buf;
 
-		protected ChnBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-			super(pickerParameters, new int[23], timeSteps_ms, buf0, buf1, buf2, buf3, buf4, Sensor.CHANNEL);
-			_buf = buf0;
-			if (buf1 != null || buf2 != null || buf3 != null || buf4 != null) throw new InvalidParameterException("buffers mismatch: " + buf1 + buf2 + buf3 + buf4);
+		protected ChnBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, new int[23], timeSteps_ms, buffers, Sensor.CHANNEL);
+			_buf = buffers[0];
+			if (buffers.length != 1) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
 
 		@Override
@@ -1471,9 +1471,9 @@ public class HoTTbinReader {
 		private int		tmpHeight		= 0;
 		private int		tmpClimb10	= 0;
 
-		protected VarBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-			super(pickerParameters, new int[8], timeSteps_ms, buf0, buf1, buf2, buf3, buf4, Sensor.VARIO);
-			if (buf3 != null || buf4 != null) throw new InvalidParameterException("buffers mismatch: " + buf3 + buf4);
+		protected VarBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, new int[8], timeSteps_ms, buffers, Sensor.VARIO);
+			if (buffers.length != 3) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 			points[2] = 100000;
 		}
 
@@ -1502,21 +1502,6 @@ public class HoTTbinReader {
 		private  boolean isPointsValid() {
 			return !this.pickerParameters.isFilterEnabled || (tmpHeight > 10 && tmpHeight < 5000 && tmpClimb10 < 40000 && tmpClimb10 > 20000);
 		}
-	}
-
-	/**
-	 * detect the SD Log Version V3 or V4
-	 *
-	 * @param _buf1
-	 * @param _buf2
-	 * @return
-	 */
-	protected static int getSdLogVerion(byte[] _buf1, byte[] _buf2) {
-		// printByteValues(1, _buf1);
-		// printByteValues(2, _buf2);
-		if (HoTTbinReader.log.isLoggable(Level.FINER))
-			HoTTbinReader.log.log(Level.FINER, "version = " + (((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3));
-		return ((DataParser.parse2UnsignedShort(_buf1[3], _buf2[4]) - 30000) < -100) ? 4 : 3;
 	}
 
 	/**
@@ -1549,9 +1534,9 @@ public class HoTTbinReader {
 		private double	longitudeTolerance		= 1;
 		private long		lastLongitudeTimeStep	= 0;
 
-		protected GpsBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-			super(pickerParameters, new int[15], timeSteps_ms, buf0, buf1, buf2, buf3, buf4, Sensor.GPS);
-			if (buf4 != null) throw new InvalidParameterException("buffers mismatch: " + buf4);
+		protected GpsBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, new int[15], timeSteps_ms, buffers, Sensor.GPS);
+			if (buffers.length != 4) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
 
 		@Override
@@ -1650,8 +1635,9 @@ public class HoTTbinReader {
 
 		private int		parseCount	= 0;
 
-		protected GamBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-			super(pickerParameters, new int[26], timeSteps_ms, buf0, buf1, buf2, buf3, buf4, Sensor.GAM);
+		protected GamBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, new int[26], timeSteps_ms, buffers, Sensor.GAM);
+			if (buffers.length != 5) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
 
 		@Override
@@ -1746,8 +1732,9 @@ public class HoTTbinReader {
 
 		private int		parseCount	= 0;
 
-		protected EamBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-			super(pickerParameters, new int[31], timeSteps_ms, buf0, buf1, buf2, buf3, buf4, Sensor.EAM);
+		protected EamBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, new int[31], timeSteps_ms, buffers, Sensor.EAM);
+			if (buffers.length != 5) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
 
 		@Override
@@ -1841,9 +1828,9 @@ public class HoTTbinReader {
 
 		private int		parseCount				= 0;
 
-		protected EscBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
-			super(pickerParameters, new int[14], timeSteps_ms, buf0, buf1, buf2, buf3, buf4, Sensor.ESC);
-			if (buf4 != null) throw new InvalidParameterException("buffers mismatch: " + buf4);
+		protected EscBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, new int[14], timeSteps_ms, buffers, Sensor.ESC);
+			if (buffers.length != 4) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
 
 		@Override
@@ -1980,7 +1967,7 @@ public class HoTTbinReader {
 	}
 
 	/**
-	 * Use for HoTTbinReader and HoTTbinHistoReader only (not for HoTTbinReader2 and derivates).
+	 * Use for HoTTbinReader and HoTTbinHistoReader only (not for HoTTbinReaderD / X and derivates).
 	 * @author Thomas Eickert (USER)
 	 */
 	public abstract static class BinParser {
@@ -1991,27 +1978,39 @@ public class HoTTbinReader {
 		protected final PickerParameters	pickerParameters;
 		protected final int[]							points;
 		protected final long[]						timeSteps_ms;
-		protected final byte[]						_buf0, _buf1, _buf2, _buf3, _buf4;
 		protected final Sensor						sensor;
+
+		protected byte[]									_buf0, _buf1, _buf2, _buf3, _buf4;
 
 		/**
 		 * Takes the parsing input objects in order to avoid parsing method parameters for better performance.
 		 * @param pickerParameters is the parameter object for the current thread
 		 * @param points parsed from the input buffers
 		 * @param timeSteps_ms is the wrapper object holding the current timestep
-		 * @param buf0 are the inputs for parsing which might be null for some sensors
+		 * @param buffers are the required input buffers for parsing (the first dimension corresponds to the buffers count)
 		 * @param sensor associated with this parser (pls note that the receiver / channel is also a sensor)
 		 */
-		protected BinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4, Sensor sensor) {
+		protected BinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers, Sensor sensor) {
 			this.pickerParameters = pickerParameters;
-			this._buf0 = buf0;
-			this._buf1 = buf1;
-			this._buf2 = buf2;
-			this._buf3 = buf3;
-			this._buf4 = buf4;
 			this.points = points;
 			this.timeSteps_ms = timeSteps_ms;
 			this.sensor = sensor;
+			switch (buffers.length) {
+			case 5:
+				this._buf4 = buffers[4];
+			case 4:
+				this._buf3 = buffers[3];
+			case 3:
+				this._buf2 = buffers[2];
+			case 2:
+				this._buf1 = buffers[1];
+			case 1:
+				this._buf0 = buffers[0];
+				break;
+
+			default:
+				throw new IllegalArgumentException("buffers length mismatch " + buffers.length);
+			}
 		}
 
 		/**
@@ -2036,6 +2035,10 @@ public class HoTTbinReader {
 			return this.points;
 		}
 
+		public void migratePoints(int[] targetPoints) {
+			throw new UnsupportedOperationException("required for HoTTbinReader2 only");
+		}
+
 		@Override
 		public String toString() {
 			final int maxLen = 11;
@@ -2043,7 +2046,5 @@ public class HoTTbinReader {
 					? Arrays.toString(Arrays.copyOf(this.points, Math.min(this.points.length, maxLen)))
 					: null) + "]";
 		}
-
 	}
-
 }

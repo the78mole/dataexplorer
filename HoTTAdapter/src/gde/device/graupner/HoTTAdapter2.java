@@ -71,7 +71,9 @@ import gde.utils.WaitTimer;
  * @author Winfried Brügmann
  */
 public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
-	final static Logger log = Logger.getLogger(HoTTAdapter2.class.getName());
+	final static Logger			log											= Logger.getLogger(HoTTAdapter2.class.getName());
+
+	public static final int	CHANNELS_CHANNEL_NUMBER	= 4;
 
 	/**
 	 * constructor using properties file
