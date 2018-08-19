@@ -1,5 +1,16 @@
 Development history / change log, please read from bottom up
 
+Version 3.3.4 - xx yyy 2018
+Generic changes/fixes
+	* fix ratio calculation triggered used capacity to reached motor altitude
+	
+Device specific changes/fixes
+	* HottAdapter* -  fix error message GDE_MSGW2404 appearing only at the first import, Fix missing tab activation after import
+	
+History analysis
+	* fix none translated name display while measuring trail measurements
+	* fix missing tab activation after import
+
 Version 3.3.3 - 10 Aug 2018
 Generic changes/fixes
 	* fix recursion synchronizing compare set while adding curve to compare set

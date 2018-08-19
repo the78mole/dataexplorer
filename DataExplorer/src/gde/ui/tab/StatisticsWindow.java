@@ -372,25 +372,21 @@ public class StatisticsWindow extends CTabItem {
 
 								// append ratio text + ratio value
 								if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-									sb.append(xmlResource.getReplacement(measurementStatistics.getRatioText())).append(" = "); //$NON-NLS-1$
-									Record referencedRecord = activeRecordSet.get(measurementStatistics.getRatioRefOrdinal().intValue());
-									StatisticsType referencedStatistics = device.getMeasurementStatistic(activeChannel.getNumber(), measurementStatistics.getRatioRefOrdinal());
-
-									if (referencedRecord != null && (referencedStatistics.isAvg() || referencedStatistics.isMax())) {
-										double summarizedValue = device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);
-										if (referencedStatistics.isAvg() && summarizedValue != 0.0) {
-											double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0) / summarizedValue;
-											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
-											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
-										}
-										else if (referencedStatistics.isMax() && summarizedValue != 0.0) {
-											double ratio = (device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0) 
-													- device.translateValue(referencedRecord, referencedRecord.getMinValueTriggered(measurementStatistics.getRatioRefOrdinal()) / 1000.0)) / summarizedValue;
-											sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
-											sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
-										}
-										else {
-											sb.append("0 [").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
+									Integer ratioRefOrdinal = measurementStatistics.getRatioRefOrdinal();
+									if (ratioRefOrdinal != null) {
+										Record referencedRecord = activeRecordSet.get(ratioRefOrdinal.intValue());
+										if (referencedRecord != null) {
+											sb.append(xmlResource.getReplacement(measurementStatistics.getRatioText())).append(" = "); //$NON-NLS-1$
+											double summarizedValue = device.translateDeltaValue(record, record.getSumTriggeredRange(ratioRefOrdinal) / 1000.0);
+											double summarizedValueReferenced = device.translateDeltaValue(referencedRecord, referencedRecord.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.0);											
+											if (summarizedValueReferenced > 0. && summarizedValue > 0.) {
+												double ratio = (summarizedValueReferenced / 1000.0) / summarizedValue;
+												sb.append(String.format("%.2f", (ratio < 1.0 ? ratio * 1000 : ratio)));
+												sb.append(" [").append(ratio < 1.0 ? "m" : "").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$											
+											}
+											else {
+												sb.append("0 [").append(referencedRecord.getUnit()).append("/").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
+											}
 										}
 									}
 								}

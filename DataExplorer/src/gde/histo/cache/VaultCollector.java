@@ -281,6 +281,7 @@ public final class VaultCollector {
 		if (refOrdinal != null) {
 			int referencedSumTriggeredRange = record.getSumTriggeredRange(refOrdinal);
 			double summarizedValue = device.translateDeltaValue(record, referencedSumTriggeredRange / 1000.);
+			log.finer(() -> String.format("%s -> summarizedValue = %d", record.getName(), (int)summarizedValue));
 			if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1 && summarizedValue > 0.) {
 				// Warning: Sum values do not sum correctly in case of offset != 0. Reason is summing up the offset multiple times.
 				if (isTriggerLevel) {
@@ -290,22 +291,20 @@ public final class VaultCollector {
 				}
 			}
 
-			Integer ratioRefOrdinal = measurementStatistics.getRatioRefOrdinal();
-			if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && ratioRefOrdinal != null) {
-				Record referencedRecord = recordSet.get(ratioRefOrdinal.intValue());
-				StatisticsType referencedStatistics = device.getMeasurementStatistic(this.vault.getLogChannelNumber(), ratioRefOrdinal);
-				if (referencedRecord != null) {
-					if (referencedStatistics.isAvg() && summarizedValue > 0.) {
-						double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(refOrdinal) / 1000.) / summarizedValue;
-						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
-						entryPoints.addPoint(TrailTypes.REAL_AVG_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
-					} else if (referencedStatistics.isMax() && summarizedValue > 0.) {
-						double ratio = (device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(refOrdinal) / 1000.) 
-								- device.translateValue(referencedRecord, referencedRecord.getMinValueTriggered(refOrdinal) / 1000.)) / summarizedValue;
-						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
-						entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
+			if (summarizedValue > 0.) { //while summarized value is zero it does not make sense to calculate ratio
+				Integer ratioRefOrdinal = measurementStatistics.getRatioRefOrdinal();
+				if (ratioRefOrdinal != null && measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1) {
+					Record referencedRecord = recordSet.get(ratioRefOrdinal.intValue());
+					if (referencedRecord != null) {
+						final double summarizedReferencedValue = device.translateDeltaValue(referencedRecord, referencedRecord.getSumTriggeredRange(refOrdinal) / 1000.0);
+						log.finer(() -> String.format("summarizedReferencedValue = %d, ratioRefOrdinal = %d", (int) summarizedReferencedValue, ratioRefOrdinal));
+						if (summarizedReferencedValue > 0.) {
+							double ratio = summarizedReferencedValue / summarizedValue;
+							// multiply by 1000 -> all ratios are internally stored multiplied by thousand
+							entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
+						}
 					}
-				}
+				} 
 			}
 		}
 
