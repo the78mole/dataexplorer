@@ -825,11 +825,12 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 							if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 
 							try {
+								// use a copy of the picker parameters to avoid changes by the reader
 								if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-									HoTTbinReaderD.read(selectedImportFile, HoTTAdapterD.this.pickerParameters);
+									HoTTbinReaderD.read(selectedImportFile, new PickerParameters(HoTTAdapterD.this.pickerParameters));
 								}
 								else if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
-									HoTTlogReaderD.read(selectedImportFile, HoTTAdapterD.this.pickerParameters);
+									HoTTlogReaderD.read(selectedImportFile, new PickerParameters(HoTTAdapterD.this.pickerParameters));
 								}
 								if (!isInitialSwitched) {
 									Channel activeChannel = HoTTAdapterD.this.application.getActiveChannel();

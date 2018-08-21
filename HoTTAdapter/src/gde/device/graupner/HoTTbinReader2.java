@@ -1300,8 +1300,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			this.tmpCapacity = DataParser.parse2Short(this._buf1, 7);
 			this.tmpRevolution = DataParser.parse2Short(this._buf2, 5);
 			this.tmpTemperatureFet = this._buf1[9] - 20;
-			if (this.isChannelsChannel) {
-				// 93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max,
+			if (this.pickerParameters.isChannelsChannelEnabled) {
+				// 93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
 				// 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
 				if (isPointsValid()) {
 					this.points[93] = this.tmpVoltage * 1000;
@@ -1373,22 +1373,22 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			}
 		}
 
-	@Override
-	public void migratePoints(int[] targetPoints) {
-		if (this.isChannelsChannel) {
-			// 93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max,
-			// 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
-			for (int j = 93; j < targetPoints.length; j++) {
-				targetPoints[j] = HoTTbinReader2.points[j];
-			}
-		} else {
-			// 73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max,
-			// 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
-			for (int j = 73; j < targetPoints.length; j++) {
-				targetPoints[j] = HoTTbinReader2.points[j];
+		@Override
+		public void migratePoints(int[] targetPoints) {
+			if (this.isChannelsChannel) {
+				// 93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+				// 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+				for (int j = 93; j < targetPoints.length; j++) {
+					targetPoints[j] = this.points[j];
+				}
+			} else {
+				// 73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max, 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
+				// 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
+				for (int j = 73; j < targetPoints.length; j++) {
+					targetPoints[j] = this.points[j];
+				}
 			}
 		}
 	}
-}
 
 }

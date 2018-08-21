@@ -1,3 +1,4 @@
+
 /**************************************************************************************
   	This file is part of GNU DataExplorer.
 
@@ -48,6 +49,7 @@ import gde.device.graupner.HoTTbinReader.SdLogInputStream;
 import gde.device.graupner.HoTTbinReader.VarBinParser;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
+import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.device.UniversalSampler;
 import gde.io.DataParser;
@@ -69,6 +71,7 @@ public class HoTTbinHistoReader {
 	 * HoTT logs data rate defined by the channel log
 	 */
 	protected final static int	RECORD_TIMESPAN_MS	= 10;
+	protected final static int	DATA_BLOCK_SIZE			= 64;
 
 	@FunctionalInterface
 	interface Procedure {
@@ -92,7 +95,7 @@ public class HoTTbinHistoReader {
 	protected VaultCollector				truss;
 
 	public HoTTbinHistoReader(PickerParameters pickerParameters) {
-		this.pickerParameters = pickerParameters;
+		this.pickerParameters = new PickerParameters(pickerParameters);
 		this.pickerParameters.isFilterEnabled = true;
 
 		this.analyzer = pickerParameters.analyzer;
@@ -141,7 +144,7 @@ public class HoTTbinHistoReader {
 	 * @param newTruss which is promoted to a full vault object if the file has a minimum length.
 	 */
 	public void read(Supplier<InputStream> inputStream, VaultCollector newTruss) throws IOException, DataTypeException, DataInconsitsentException {
-		if (newTruss.getVault().getLogFileLength() <= HoTTbinReader.NUMBER_LOG_RECORDS_MIN * HoTTbinReader.dataBlockSize) return;
+		if (newTruss.getVault().getLogFileLength() <= HoTTbinReader.NUMBER_LOG_RECORDS_MIN * HoTTbinHistoReader.DATA_BLOCK_SIZE) return;
 
 		nanoTime = System.nanoTime();
 		initiateTime = readTime = reviewTime = addTime = pickTime = finishTime = 0;
@@ -162,41 +165,36 @@ public class HoTTbinHistoReader {
 	private void read(Supplier<InputStream> inputStream) throws IOException, DataTypeException, DataInconsitsentException {
 		HashMap<String, String> header = null;
 		HoTTAdapter device = (HoTTAdapter) analyzer.getActiveDevice();
-		if (log.isLoggable(Level.FINE))
-			log.log(Level.FINE, " recordSetBaseName=" + truss.getVault().getLogRecordsetBaseName()); //$NON-NLS-1$
+		ExtendedVault vault = truss.getVault();
 
-		HoTTbinReader.pickerParameters = pickerParameters;
 		try (BufferedInputStream info_in = new BufferedInputStream(inputStream.get())) {
-			header = new InfoParser((s) -> {} ).getFileInfo(info_in, truss.getVault().getLoadFilePath(), truss.getVault().getLogFileLength());
+			header = new InfoParser((s) -> {} ).getFileInfo(info_in, vault.getLoadFilePath(), vault.getLogFileLength());
 		} catch (DataTypeException e) {
-			log.log(Level.WARNING, String.format("%s  %s", e.getMessage(), truss.getVault().getLoadFilePath())); // 'GRAUPNER SD LOG8'
+			log.log(Level.WARNING, String.format("%s  %s", e.getMessage(), vault.getLoadFilePath()));
 		}
 		if (header == null || header.isEmpty()) return;
 		detectedSensors = Sensor.getSetFromDetected(header.get(HoTTAdapter.DETECTED_SENSOR));
 		if (!Sensor.getChannelNumbers(detectedSensors).contains(truss.getVault().getVaultChannelNumber())) return;
 
+		boolean doDataSkip = detectedSensors.size() == 1 && !isChannelsChannelEnabled;
+		long numberDatablocks = vault.getLogFileLength() / HoTTbinHistoReader.DATA_BLOCK_SIZE / (doDataSkip ? 10 : 1);
+		tmpRecordSet = RecordSet.createRecordSet(vault.getLogRecordsetBaseName(), analyzer, analyzer.getActiveChannel().getNumber(), true, true, false);
+		tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(vault.getLoadFileAsPath().getFileName().toString(), vault.getLogFileLastModified(), numberDatablocks));
+		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", tmpRecordSet.getStartTimeStamp())); //$NON-NLS-1$
+		tmpRecordSet.descriptionAppendFilename(vault.getLoadFileAsPath().getFileName().toString());
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " recordSetBaseName=" + vault.getLogRecordsetBaseName()); //$NON-NLS-1$
+
 		try (BufferedInputStream in = new BufferedInputStream(inputStream.get()); //
 				InputStream data_in = Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT)) //
-						? new SdLogInputStream(in, truss.getVault().getLogFileLength(), new SdLogFormat(HoTTbinReaderX.headerSize, HoTTbinReaderX.footerSize, 64)) //
-								: in; ) {
-			int readLimitMark = (HoTTbinReader.LOG_RECORD_SCAN_START + HoTTbinReader.NUMBER_LOG_RECORDS_TO_SCAN) * HoTTbinReader.dataBlockSize + 1;
+						? new SdLogInputStream(in, vault.getLogFileLength(), new SdLogFormat(HoTTbinReaderX.headerSize, HoTTbinReaderX.footerSize, 64)) //
+						: in; ) {
+			int readLimitMark = (HoTTbinReader.LOG_RECORD_SCAN_START + HoTTbinReader.NUMBER_LOG_RECORDS_TO_SCAN) * HoTTbinHistoReader.DATA_BLOCK_SIZE + 1;
 			if (detectedSensors.size() <= 2) {
-				boolean doDataSkip = detectedSensors.size() == 1 && isChannelsChannelEnabled;
-				long numberDatablocks = truss.getVault().getLogFileLength() / HoTTbinReader.dataBlockSize / (doDataSkip ? 10 : 1);
-				tmpRecordSet = RecordSet.createRecordSet(truss.getVault().getLogRecordsetBaseName(), analyzer, analyzer.getActiveChannel().getNumber(), true, true, false);
-				tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(truss.getVault().getLoadFileAsPath().getFileName().toString(), truss.getVault().getLogFileLastModified(), numberDatablocks));
-				tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", tmpRecordSet.getStartTimeStamp())); //$NON-NLS-1$
-				tmpRecordSet.descriptionAppendFilename(truss.getVault().getLoadFileAsPath().getFileName().toString());
 				data_in.mark(readLimitMark); // reduces # of overscan records from 57 to 23 (to 38 with 1500 blocks)
 				UniversalSampler histoRandomSample = readSingle(data_in, HoTTbinReader.LOG_RECORD_SCAN_START + HoTTbinReader.NUMBER_LOG_RECORDS_TO_SCAN, new int[0], new int[0]);
 				data_in.reset();
 				readSingle(data_in, -1, histoRandomSample.getMaxPoints(), histoRandomSample.getMinPoints());
 			} else {
-				long numberDatablocks = truss.getVault().getLogFileLength() / HoTTbinReader.dataBlockSize;
-				tmpRecordSet = RecordSet.createRecordSet(truss.getVault().getLogRecordsetBaseName(), analyzer, analyzer.getActiveChannel().getNumber(), true, true, false);
-				tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(truss.getVault().getLoadFileAsPath().getFileName().toString(), truss.getVault().getLogFileLastModified(), numberDatablocks));
-				tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", tmpRecordSet.getStartTimeStamp())); //$NON-NLS-1$
-				tmpRecordSet.descriptionAppendFilename(truss.getVault().getLoadFileAsPath().getFileName().toString());
 				data_in.mark(readLimitMark);
 				UniversalSampler histoRandomSample = readMultiple(data_in, HoTTbinReader.LOG_RECORD_SCAN_START + HoTTbinReader.NUMBER_LOG_RECORDS_TO_SCAN, new int[0], new int[0]);
 				data_in.reset();
@@ -216,7 +214,7 @@ public class HoTTbinHistoReader {
 	 * @return the sampler object holding the last value sets and the min/max value sets
 	 */
 	private UniversalSampler readSingle(InputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws DataInconsitsentException, IOException {
-		byte[] buf = new byte[HoTTbinReader.dataBlockSize];
+		byte[] buf = new byte[HoTTbinHistoReader.DATA_BLOCK_SIZE];
 		byte[] buf0 = new byte[30];
 		byte[] buf1 = new byte[30];
 		byte[] buf2 = new byte[30];
@@ -253,8 +251,8 @@ public class HoTTbinHistoReader {
 		initTimer.invoke();
 		// instead of HoTTAdapter setting
 		boolean doFullRead = initializeBlocks <= 0;
-		boolean doDataSkip = detectedSensors.size() == 1 && activeChannelNumber != Sensor.CHANNEL.getChannelNumber();
-		int datablocksLimit = (doFullRead ? (int) truss.getVault().getLogFileLength() / HoTTbinReader.dataBlockSize : initializeBlocks) / (doDataSkip ? 10 : 1);
+		boolean doDataSkip = detectedSensors.size() == 1 && !isChannelsChannelEnabled;
+		int datablocksLimit = (doFullRead ? (int) truss.getVault().getLogFileLength() / HoTTbinHistoReader.DATA_BLOCK_SIZE : initializeBlocks) / (doDataSkip ? 10 : 1);
 		for (int i = 0; i < datablocksLimit; i++) {
 			// if (log.isLoggable(Level.TIME))
 			// log.log(Level.TIME, String.format("markpos: %,9d i: %,9d ", data_in.markpos, i));
@@ -524,12 +522,12 @@ public class HoTTbinHistoReader {
 			}
 		}
 		if (doFullRead) {
-
+			ExtendedVault vault = truss.getVault();
 			final Integer[] scores = new Integer[ScoreLabelTypes.VALUES.length];
 			// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
 			// scores for duration and timestep values are filled in by the HistoVault
 			scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = histoRandomSample.getReadingCount();
-			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = (int) truss.getVault().getLogFileLength() / HoTTbinReader.dataBlockSize;
+			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = (int) truss.getVault().getLogFileLength() / HoTTbinHistoReader.DATA_BLOCK_SIZE;
 			if (binParser instanceof RcvBinParser) {
 			scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = binParser == null ? 0 : ((RcvBinParser) binParser).getCountPackageLoss();
 			scores[ScoreLabelTypes.LOST_PACKAGES_PER_MILLE.ordinal()] = binParser == null || tmpRecordSet.getMaxTime_ms() <= 0 ? 0 : (int) (((RcvBinParser) binParser).getCountPackageLoss() / tmpRecordSet.getMaxTime_ms() * 1000. * RECORD_TIMESPAN_MS) * 1000;
@@ -547,8 +545,8 @@ public class HoTTbinHistoReader {
 			scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = (int) (truss.getVault().getLoadFileAsPath().getFileName().toString().startsWith(GDE.TEMP_FILE_STEM.substring(0, 1)) ? 4.2 * 1000 : 4.0 * 1000); // V4 with and without container
 			scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = 0;
-			scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinReader.dataBlockSize;
-			scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) truss.getVault().getLogFileLength();
+			scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader.DATA_BLOCK_SIZE;
+			scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) vault.getLogFileLength();
 			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = (detectedSensors.size() + 1) * 1000; // +1 for channel
 			scores[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime); // do not multiply by 1000 as usual, this is the conversion from microseconds to ms
 			// no display tmpRecordSet.syncScaleOfSyncableRecords();
@@ -556,8 +554,8 @@ public class HoTTbinHistoReader {
 			tmpRecordSet.setSaved(true);
 			device.calculateInactiveRecords(tmpRecordSet);
 			device.updateVisibilityStatus(tmpRecordSet, true);
-			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", tmpRecordSet.getChannelConfigName(), truss.getVault().getLogFileLength() //$NON-NLS-1$
-					/ HoTTbinReader.dataBlockSize, histoRandomSample.getReadingCount(), tmpRecordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
+			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", tmpRecordSet.getChannelConfigName(), vault.getLogFileLength() //$NON-NLS-1$
+					/ HoTTbinHistoReader.DATA_BLOCK_SIZE, histoRandomSample.getReadingCount(), tmpRecordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
 			finishTimer.invoke();
 			if (log.isLoggable(Level.TIME)) log.log(Level.TIME,
 					String.format("initiateTime: %,7d  readTime: %,7d  reviewTime: %,7d  addTime: %,7d  pickTime: %,7d  finishTime: %,7d", TimeUnit.NANOSECONDS.toMillis(initiateTime), //$NON-NLS-1$
@@ -566,10 +564,10 @@ public class HoTTbinHistoReader {
 			if (binParser instanceof RcvBinParser) {
 				if (tmpRecordSet.getMaxTime_ms() > 0) {
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("lost:%,9d perMille:%,4d total:%,9d   lostMax_ms:%,4d lostAvg_ms=%,4d", ((RcvBinParser) binParser).getCountPackageLoss(), //$NON-NLS-1$
-							(int) (((RcvBinParser) binParser).getCountPackageLoss() / tmpRecordSet.getMaxTime_ms() * 1000. * RECORD_TIMESPAN_MS), truss.getVault().getLogFileLength() / HoTTbinReader.dataBlockSize, ((RcvBinParser) binParser).getLostPackages().getMaxValue() * 10,
+							(int) (((RcvBinParser) binParser).getCountPackageLoss() / tmpRecordSet.getMaxTime_ms() * 1000. * RECORD_TIMESPAN_MS), truss.getVault().getLogFileLength() / HoTTbinHistoReader.DATA_BLOCK_SIZE, ((RcvBinParser) binParser).getLostPackages().getMaxValue() * 10,
 							(int) ((RcvBinParser) binParser).getLostPackages().getAvgValue() * 10));
 				} else {
-					log.log(Level.WARNING, String.format("RecordSet with unidentified data.  fileLength=%,11d   isTextModusSignaled=%b", truss.getVault().getLogFileLength(), isTextModusSignaled)); //$NON-NLS-1$
+					log.log(Level.WARNING, String.format("RecordSet with unidentified data.  fileLength=%,11d   isTextModusSignaled=%b", vault.getLogFileLength(), isTextModusSignaled)); //$NON-NLS-1$
 				}
 			}
 
@@ -593,7 +591,7 @@ public class HoTTbinHistoReader {
 	 * @return the sampler object holding the last value sets and the min/max value sets
 	 */
 	private UniversalSampler readMultiple(InputStream data_in, int initializeBlocks, int[] maxPoints, int[] minPoints) throws IOException, DataInconsitsentException {
-		byte[] buf = new byte[HoTTbinReader.dataBlockSize];
+		byte[] buf = new byte[HoTTbinHistoReader.DATA_BLOCK_SIZE];
 		byte[] buf0 = new byte[30];
 		byte[] buf1 = new byte[30];
 		byte[] buf2 = new byte[30];
@@ -630,7 +628,7 @@ public class HoTTbinHistoReader {
 		// read all the data blocks from the file, parse only for the active channel
 		initTimer.invoke();
 		boolean doFullRead = initializeBlocks <= 0;
-		int datablocksLimit = (doFullRead ? (int) truss.getVault().getLogFileLength() / HoTTbinReader.dataBlockSize : initializeBlocks);
+		int datablocksLimit = (doFullRead ? (int) truss.getVault().getLogFileLength() / HoTTbinHistoReader.DATA_BLOCK_SIZE : initializeBlocks);
 		for (int i = 0; i < datablocksLimit; i++) {
 			data_in.read(buf);
 			if (log.isLoggable(Level.FINEST) && i % 10 == 0) {
@@ -853,11 +851,12 @@ public class HoTTbinHistoReader {
 			}
 		}
 		if (doFullRead) {
+			ExtendedVault vault = truss.getVault();
 			final Integer[] scores = new Integer[ScoreLabelTypes.VALUES.length];
 			// values are multiplied by 1000 as this is the convention for internal values in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
 			// scores for duration and timestep values are filled in by the HistoVault
 			scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = histoRandomSample.getReadingCount();
-			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = (int) truss.getVault().getLogFileLength() / HoTTbinReader.dataBlockSize;
+			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = (int) vault.getLogFileLength() / HoTTbinHistoReader.DATA_BLOCK_SIZE;
 			if (binParser instanceof RcvBinParser) {
 				scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = ((RcvBinParser) binParser).getCountPackageLoss();
 				scores[ScoreLabelTypes.LOST_PACKAGES_PER_MILLE.ordinal()] = tmpRecordSet.getMaxTime_ms() <= 0 ? 0 : (int) (((RcvBinParser) binParser).getCountPackageLoss() / tmpRecordSet.getMaxTime_ms() * 1000. * RECORD_TIMESPAN_MS) * 1000;
@@ -875,16 +874,16 @@ public class HoTTbinHistoReader {
 			scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = (int) (truss.getVault().getLoadFilePath().startsWith(GDE.TEMP_FILE_STEM.substring(0, 1)) ? 4.2 * 1000 : 4.0 * 1000); // V4 with and without container
 			scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = 0;
-			scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinReader.dataBlockSize;
-			scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) truss.getVault().getLogFileLength();
+			scores[ScoreLabelTypes.LOG_RECORD_SET_BYTES.ordinal()] = histoRandomSample.getReadingCount() * HoTTbinHistoReader.DATA_BLOCK_SIZE;
+			scores[ScoreLabelTypes.LOG_FILE_BYTES.ordinal()] = (int) vault.getLogFileLength();
 			scores[ScoreLabelTypes.LOG_FILE_RECORD_SETS.ordinal()] = (detectedSensors.size() + 1) * 1000; // +1 for channel
 			scores[ScoreLabelTypes.ELAPSED_HISTO_RECORD_SET_MS.ordinal()] = (int) TimeUnit.NANOSECONDS.toMicros(System.nanoTime() - nanoTime); // do not multiply by 1000 as usual, this is the conversion from microseconds to ms
 			// no display tmpRecordSet.syncScaleOfSyncableRecords();
 
 			tmpRecordSet.setSaved(true);
 			device.calculateInactiveRecords(tmpRecordSet);
-			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", tmpRecordSet.getChannelConfigName(), truss.getVault().getLogFileLength() //$NON-NLS-1$
-					/ HoTTbinReader.dataBlockSize, histoRandomSample.getReadingCount(), tmpRecordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
+			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", tmpRecordSet.getChannelConfigName(), vault.getLogFileLength() //$NON-NLS-1$
+					/ HoTTbinHistoReader.DATA_BLOCK_SIZE, histoRandomSample.getReadingCount(), tmpRecordSet.getRecordDataSize(true), histoRandomSample.getOverSamplingCount()));
 			finishTimer.invoke();
 			if (log.isLoggable(Level.TIME)) log.log(Level.TIME,
 					String.format("initiateTime: %,7d  readTime: %,7d  reviewTime: %,7d  addTime: %,7d  pickTime: %,7d  finishTime: %,7d", TimeUnit.NANOSECONDS.toMillis(initiateTime), //$NON-NLS-1$
@@ -892,7 +891,7 @@ public class HoTTbinHistoReader {
 							TimeUnit.NANOSECONDS.toMillis(finishTime)));
 			if (binParser instanceof RcvBinParser) {
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("lost:%,9d perMille:%,4d total:%,9d   lostMax_ms:%,4d lostAvg_ms=%,4d", ((RcvBinParser) binParser).getCountPackageLoss(), //$NON-NLS-1$
-						(int) (((RcvBinParser) binParser).getCountPackageLoss() / tmpRecordSet.getTime_ms((int) truss.getVault().getLogFileLength() / HoTTbinReader.dataBlockSize - 1) * 1000. * RECORD_TIMESPAN_MS), truss.getVault().getLogFileLength() / HoTTbinReader.dataBlockSize,
+						(int) (((RcvBinParser) binParser).getCountPackageLoss() / tmpRecordSet.getTime_ms((int) truss.getVault().getLogFileLength() / HoTTbinHistoReader.DATA_BLOCK_SIZE - 1) * 1000. * RECORD_TIMESPAN_MS), truss.getVault().getLogFileLength() / HoTTbinHistoReader.DATA_BLOCK_SIZE,
 						((RcvBinParser) binParser).getLostPackages().getMaxValue() * 10, (int) ((RcvBinParser) binParser).getLostPackages().getAvgValue() * 10));
 			}
 
@@ -906,3 +905,4 @@ public class HoTTbinHistoReader {
 	}
 
 }
+

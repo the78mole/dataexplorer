@@ -439,18 +439,36 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public static final class PickerParameters {
 		final Analyzer									analyzer;
 
-		final ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
+		final ReverseChannelPackageLoss	reverseChannelPackageLossCounter;
 
-		boolean													isChannelsChannelEnabled					= false;
-		boolean													isFilterEnabled										= true;
-		boolean													isFilterTextModus									= true;
-		boolean													isTolerateSignChangeLatitude			= false;
-		boolean													isTolerateSignChangeLongitude			= false;
-		double													latitudeToleranceFactor						= 90.0;
-		double													longitudeToleranceFactor					= 25.0;
+		boolean													isChannelsChannelEnabled			= false;
+		boolean													isFilterEnabled								= true;
+		boolean													isFilterTextModus							= true;
+		boolean													isTolerateSignChangeLatitude	= false;
+		boolean													isTolerateSignChangeLongitude	= false;
+		double													latitudeToleranceFactor				= 90.0;
+		double													longitudeToleranceFactor			= 25.0;
 
 		public PickerParameters(Analyzer analyzer) {
 			this.analyzer = analyzer;
+			this.reverseChannelPackageLossCounter = new ReverseChannelPackageLoss(100);
+		}
+
+		/**
+		 * Shallow copy constructor.
+		 * New package loss counter!
+		 */
+		PickerParameters(PickerParameters that) {
+			this.analyzer = that.analyzer;
+			this.reverseChannelPackageLossCounter = new ReverseChannelPackageLoss(100);
+
+			this.isChannelsChannelEnabled = that.isChannelsChannelEnabled;
+			this.isFilterEnabled = that.isFilterEnabled;
+			this.isFilterTextModus = that.isFilterTextModus;
+			this.isTolerateSignChangeLatitude = that.isTolerateSignChangeLatitude;
+			this.isTolerateSignChangeLongitude = that.isTolerateSignChangeLongitude;
+			this.latitudeToleranceFactor = that.latitudeToleranceFactor;
+			this.longitudeToleranceFactor = that.longitudeToleranceFactor;
 		}
 
 		/**
@@ -1427,11 +1445,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 							if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 
 							try {
+								// use a copy of the picker parameters to avoid changes by the reader
 								if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-									HoTTbinReader.read(selectedImportFile, HoTTAdapter.this.pickerParameters);
+									HoTTbinReader.read(selectedImportFile, new PickerParameters(HoTTAdapter.this.pickerParameters));
 								}
 								else if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
-									HoTTlogReader.read(selectedImportFile, HoTTAdapter.this.pickerParameters);
+									HoTTlogReader.read(selectedImportFile, new PickerParameters(HoTTAdapter.this.pickerParameters));
 								}
 								if (!isInitialSwitched) {
 									if (HoTTAdapter.this.application.getActiveChannel().getActiveRecordSet() == null) {
@@ -1500,18 +1519,19 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						}
 
 						try {
+							// use a copy of the picker parameters to avoid changes by the reader
 							if (HoTTAdapter.this.getClass().equals(HoTTAdapter.class))
-								HoTTbinReader.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
+								HoTTbinReader.read(filePath.toString(), new PickerParameters(HoTTAdapter.this.pickerParameters));
 							else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2.class))
-								HoTTbinReader2.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
+								HoTTbinReader2.read(filePath.toString(), new PickerParameters(HoTTAdapter.this.pickerParameters));
 							else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2M.class))
-								HoTTbinReader2.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
+								HoTTbinReader2.read(filePath.toString(), new PickerParameters(HoTTAdapter.this.pickerParameters));
 							else if (HoTTAdapter.this.getClass().equals(HoTTAdapterD.class))
-								HoTTbinReaderD.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
+								HoTTbinReaderD.read(filePath.toString(), new PickerParameters(HoTTAdapter.this.pickerParameters));
 							else if (HoTTAdapter.this.getClass().equals(HoTTAdapterM.class))
-								HoTTbinReader.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
+								HoTTbinReader.read(filePath.toString(), new PickerParameters(HoTTAdapter.this.pickerParameters));
 							else if (HoTTAdapter.this.getClass().equals(HoTTAdapterX.class))
-								HoTTbinReaderX.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
+								HoTTbinReaderX.read(filePath.toString(), new PickerParameters(HoTTAdapter.this.pickerParameters));
 							else
 								throw new UnsupportedOperationException();
 

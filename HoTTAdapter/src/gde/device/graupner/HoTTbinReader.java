@@ -442,7 +442,7 @@ public class HoTTbinReader {
 	public static synchronized void read(String filePath, PickerParameters newPickerParameters) throws Exception {
 		HoTTbinReader.pickerParameters = newPickerParameters;
 		HashMap<String, String> header = getFileInfo(new File(filePath), newPickerParameters);
-		HoTTbinReader2.detectedSensors = Sensor.getSetFromDetected(header.get("DETECTED SENSOR"));
+		HoTTbinReader2.detectedSensors = Sensor.getSetFromDetected(header.get(HoTTAdapter.DETECTED_SENSOR));
 
 		if (HoTTbinReader2.detectedSensors.size() <= 2) {
 			HoTTbinReader.isReceiverOnly = HoTTbinReader2.detectedSensors.size() == 1;

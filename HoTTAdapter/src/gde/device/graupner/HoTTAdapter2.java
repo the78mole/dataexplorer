@@ -908,11 +908,12 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 							if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 
 							try {
+								// use a copy of the picker parameters to avoid changes by the reader
 								if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-									HoTTbinReader2.read(selectedImportFile, HoTTAdapter2.this.pickerParameters);
+									HoTTbinReader2.read(selectedImportFile, new PickerParameters(HoTTAdapter2.this.pickerParameters));
 								}
 								else if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
-									HoTTlogReader2.read(selectedImportFile, HoTTAdapter2.this.pickerParameters);
+									HoTTlogReader2.read(selectedImportFile, new PickerParameters(HoTTAdapter2.this.pickerParameters));
 								}
 								if (!isInitialSwitched) {
 									Channel activeChannel = HoTTAdapter2.this.application.getActiveChannel();
@@ -1717,7 +1718,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			IOException, DataTypeException {
 		String fileEnding = PathUtils.getFileExtention(truss.getVault().getLoadFilePath());
 		if (GDE.FILE_ENDING_DOT_BIN.equals(fileEnding)) {
-			HoTTbinHistoReader2.read(inputStream, truss, new PickerParameters(analyzer));
+			new HoTTbinHistoReader2(new PickerParameters(analyzer)).read(inputStream, truss);
 		} else if (GDE.FILE_ENDING_DOT_LOG.equals(fileEnding)) {
 			// todo implement HoTTlogHistoReader
 		} else {

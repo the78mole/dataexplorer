@@ -89,7 +89,8 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 							if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 
 							try {
-								HoTTbinReaderX.read(selectedImportFile, HoTTAdapterX.this.pickerParameters); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								// use a copy of the picker parameters to avoid changes by the reader
+								HoTTbinReaderX.read(selectedImportFile, new PickerParameters(HoTTAdapterX.this.pickerParameters)); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
 								if (!isInitialSwitched) {
 									Channel receiverChannel = HoTTAdapterX.this.channels.get(1);
 									HoTTbinReader.channels.switchChannel(receiverChannel.getName());
