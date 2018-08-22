@@ -36,7 +36,6 @@ import gde.messages.Messages;
  *     &lt;enumeration value="real_first"/>
  *     &lt;enumeration value="real_last"/>
  *     &lt;enumeration value="real_sum_triggered"/>
- *     &lt;enumeration value="real_avg_ratio_triggered"/>
  *     &lt;enumeration value="real_max_ratio_triggered"/>
  *     &lt;enumeration value="real_time_sum_triggered"/>
  *     &lt;enumeration value="real_count_triggered"/>
@@ -91,8 +90,6 @@ public enum TrailTypes {
 	REAL_LAST(5, false, false, Messages.getString(MessageIds.GDE_MSGT0753)), //
 	@XmlEnumValue("real_sum_triggered")
 	REAL_SUM_TRIGGERED(6, false, true, Messages.getString(MessageIds.GDE_MSGT0758)), //
-	@XmlEnumValue("real_avg_ratio_triggered")
-	REAL_AVG_RATIO_TRIGGERED(8, false, true, Messages.getString(MessageIds.GDE_MSGT0760)), //
 	@XmlEnumValue("real_max_ratio_triggered")
 	REAL_MAX_RATIO_TRIGGERED(9, false, true, Messages.getString(MessageIds.GDE_MSGT0761)), //
 	@XmlEnumValue("real_time_sum_triggered")
@@ -330,8 +327,6 @@ public enum TrailTypes {
 				return getDeviceXmlReplacement(measurementStatistics.getSumTriggerText());
 			} else if (this.equals(TrailTypes.REAL_TIME_SUM_TRIGGERED)) {
 				return getDeviceXmlReplacement(measurementStatistics.getSumTriggerTimeText());
-			} else if (this.equals(TrailTypes.REAL_AVG_RATIO_TRIGGERED)) {
-				return getDeviceXmlReplacement(measurementStatistics.getRatioText());
 			} else if (this.equals(TrailTypes.REAL_MAX_RATIO_TRIGGERED)) {
 				return getDeviceXmlReplacement(measurementStatistics.getRatioText());
 			} else

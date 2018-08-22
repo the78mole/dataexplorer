@@ -1078,7 +1078,6 @@
 			<xs:enumeration value="real_first" />
 			<xs:enumeration value="real_last" />
 			<xs:enumeration value="real_sum_triggered" />
-			<xs:enumeration value="real_avg_ratio_triggered" />
 			<xs:enumeration value="real_max_ratio_triggered" />
 			<xs:enumeration value="real_time_sum_triggered" />
 			<xs:enumeration value="real_count_triggered" />

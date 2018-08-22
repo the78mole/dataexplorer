@@ -29,7 +29,6 @@ import gde.device.StatisticsType;
 import gde.device.TrailDisplayType;
 import gde.device.TrailTypes;
 import gde.device.TrailVisibilityType;
-import gde.ui.DataExplorer;
 
 /**
  * Handle the trail type assignment to a trailRecord.
@@ -119,9 +118,7 @@ public final class MeasurementTrailSelector extends TrailSelector {
 				applicablePrimitiveTrails[TrailTypes.REAL_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1);
 			}
 			if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
-				StatisticsType referencedStatistics = DataExplorer.getInstance().getActiveDevice().getMeasurementStatistic(channelConfigNumber, measurementStatistics.getRatioRefOrdinal());
-				applicablePrimitiveTrails[TrailTypes.REAL_AVG_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isAvg();
-				applicablePrimitiveTrails[TrailTypes.REAL_MAX_RATIO_TRIGGERED.ordinal()] = referencedStatistics.isMax();
+				applicablePrimitiveTrails[TrailTypes.REAL_MAX_RATIO_TRIGGERED.ordinal()] = true;
 			}
 			applicablePrimitiveTrails[TrailTypes.REAL_TIME_SUM_TRIGGERED.ordinal()] = (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1);
 			applicablePrimitiveTrails[TrailTypes.REAL_COUNT_TRIGGERED.ordinal()] = (measurementStatistics.isCountByTrigger() != null);
@@ -147,7 +144,7 @@ public final class MeasurementTrailSelector extends TrailSelector {
 					&& measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1 && measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 				this.triggerScaleRawText = measurementStatistics.getSumTriggerText();
 				this.triggerScaleUnit = channelItem.getUnit();
-			} else if ((trailType == TrailTypes.REAL_AVG_RATIO_TRIGGERED || trailType == TrailTypes.REAL_MAX_RATIO_TRIGGERED) //
+			} else if ((trailType == TrailTypes.REAL_MAX_RATIO_TRIGGERED) //
 					&& measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && measurementStatistics.getRatioRefOrdinal() != null) {
 				this.triggerScaleRawText = measurementStatistics.getRatioText();
 				this.triggerScaleUnit = GDE.STRING_SLASH + channelItem.getUnit();
