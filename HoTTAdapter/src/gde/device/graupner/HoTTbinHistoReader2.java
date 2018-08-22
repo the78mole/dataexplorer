@@ -113,6 +113,12 @@ public class HoTTbinHistoReader2 {
 		Analyzer analyzer = pickerParameters.analyzer;
 		IDevice device = analyzer.getActiveDevice();
 		ExtendedVault vault = truss.getVault();
+		long numberDatablocks = vault.getLogFileLength() / HoTTbinHistoReader.DATA_BLOCK_SIZE;
+		tmpRecordSet = RecordSet.createRecordSet(vault.getLogRecordsetBaseName(), analyzer, analyzer.getActiveChannel().getNumber(), true, true, false);
+		tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(vault.getLoadFileAsPath().getFileName().toString(), vault.getLogFileLastModified(), numberDatablocks));
+		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", tmpRecordSet.getStartTimeStamp())); //$NON-NLS-1$
+		tmpRecordSet.descriptionAppendFilename(vault.getLoadFileAsPath().getFileName().toString());
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " recordSetBaseName=" + vault.getLogRecordsetBaseName());
 
 		try (BufferedInputStream info_in = new BufferedInputStream(inputStream.get())) {
 			header = new InfoParser((s) -> {} ).getFileInfo(info_in, vault.getLoadFilePath(), vault.getLogFileLength());
@@ -122,14 +128,6 @@ public class HoTTbinHistoReader2 {
 		if (header == null || header.isEmpty()) return;
 		detectedSensors = Sensor.getSetFromDetected(header.get(HoTTAdapter.DETECTED_SENSOR));
 		if (!Sensor.getChannelNumbers(detectedSensors).contains(truss.getVault().getVaultChannelNumber())) return;
-
-		boolean isChannelsChannel = analyzer.getActiveChannel().getNumber() == Sensor.CHANNEL.getChannelNumber(); // instead of HoTTAdapter setting
-		long numberDatablocks = vault.getLogFileLength() / HoTTbinHistoReader.DATA_BLOCK_SIZE / (detectedSensors.size() == 1 && !isChannelsChannel ? 10 : 1);
-		tmpRecordSet = RecordSet.createRecordSet(vault.getLogRecordsetBaseName(), analyzer, analyzer.getActiveChannel().getNumber(), true, true, false);
-		tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(vault.getLoadFileAsPath().getFileName().toString(), vault.getLogFileLastModified(), numberDatablocks));
-		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", tmpRecordSet.getStartTimeStamp())); //$NON-NLS-1$
-		tmpRecordSet.descriptionAppendFilename(vault.getLoadFileAsPath().getFileName().toString());
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " recordSetBaseName=" + vault.getLogRecordsetBaseName());
 
 		try (BufferedInputStream in = new BufferedInputStream(inputStream.get()); //
 				InputStream data_in = Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT)) //
