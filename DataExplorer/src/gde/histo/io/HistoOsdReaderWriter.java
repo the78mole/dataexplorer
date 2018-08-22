@@ -31,6 +31,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import gde.Analyzer;
 import gde.GDE;
@@ -578,8 +578,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = osdRecordSet.getRecordDataSize();
 		if (device instanceof IHistoDevice) {
 			double[] packagesLost = osdRecordSet.getPackageLoss();
-			boolean[] activeSensors = ((IHistoDevice) device).getActiveSensors(osdRecordSet.getSensorSignature());
-			int sensorCount = (int) IntStream.range(0, activeSensors.length).filter(index -> activeSensors[index]).count();
+			BitSet activeSensors =((IHistoDevice) device).getActiveSensors(osdRecordSet.getSensorSignature());
 			// recalculating the following scores from raw data would be feasible
 			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = packagesLost[1] != 0 ? (int) (packagesLost[0] * 100. / packagesLost[1]) : 0;
 			scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = (int) packagesLost[0];
@@ -588,12 +587,12 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			scores[ScoreLabelTypes.LOST_PACKAGES_MAX_MS.ordinal()] = (int) (packagesLost[3] * 1000000.); // sec -> ms
 			scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = (int) (packagesLost[2] * 1000000.); // sec -> ms
 			scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = (int) (packagesLost[5] * 1000000.); // sec -> ms
-			scores[ScoreLabelTypes.SENSORS.ordinal()] = (sensorCount - 1) * 1000; // subtract Receiver
-			scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = activeSensors.length > 1 && activeSensors[1] ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = activeSensors.length > 2 && activeSensors[2] ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = activeSensors.length > 3 && activeSensors[3] ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = activeSensors.length > 4 && activeSensors[4] ? 1000 : 0;
-			scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = activeSensors.length > 5 && activeSensors[5] ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSORS.ordinal()] = (activeSensors.cardinality() - 1) * 1000;
+			scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = activeSensors.get(1) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = activeSensors.get(2) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = activeSensors.get(3) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = activeSensors.get(4) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = activeSensors.get(5) ? 1000 : 0;
 		} else {
 			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = 0;

@@ -21,6 +21,7 @@ package gde.histo.device;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.BitSet;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -98,7 +99,7 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * The zero position is reserved for the receiver and is mandatory.
 	 * The array length and order is specific to the device (i.e. has at least one element).
 	 * @param sensorSignature is a csv list of valid sensor values (i.e. sensor names)
-	 * @return a boolean array with a length of all sensor entries. The ordinal positions holds true for the sensor ordinals in the {@code sensors} set.
+	 * @return a set with bits representing the sensor type ordinal numbers (true if the sensor type is active)
 	 */
-	boolean[] getActiveSensors(String sensorSignature);
+	BitSet getActiveSensors(String sensorSignature);
 }

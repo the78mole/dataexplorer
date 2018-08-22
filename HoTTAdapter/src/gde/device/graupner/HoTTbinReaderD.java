@@ -127,6 +127,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.buf2 = null;
 		HoTTbinReader.buf3 = null;
 		HoTTbinReader.buf4 = null;
+		BufCopier bufCopier = new BufCopier(buf, buf0, buf1, buf2, buf3, buf4);
 		pickerParameters.reverseChannelPackageLossCounter.clear();
 		HoTTbinReader.lostPackages.clear();
 		HoTTbinReader.countLostPackages = 0;
@@ -183,8 +184,8 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						parseChannel(HoTTbinReader.buf); //Channels
 
 						//fill data block 0 receiver voltage an temperature
-						if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
+						if (buf[33] == 0) {
+							bufCopier.copyToBuffer();
 						}
 
 						//create and fill sensor specific data record sets
@@ -192,26 +193,10 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 							if (HoTTbinReaderD.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()]) {
-								//fill data block 1 to 2
-								if (HoTTbinReader.buf[33] == 1) {
-									HoTTbinReader.buf1 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-								}
-								if (HoTTbinReader.buf[33] == 2) {
-									HoTTbinReader.buf2 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-								}
-								if (HoTTbinReader.buf[33] == 3) {
-									HoTTbinReader.buf3 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-								}
-								if (HoTTbinReader.buf[33] == 4) {
-									HoTTbinReader.buf4 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-								}
-								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
+								bufCopier.copyToVarioBuffer();
+								if (bufCopier.is2BuffersFull()) {
 									parseVario(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-									HoTTbinReader.buf1 = HoTTbinReader.buf2 = null;
+									bufCopier.clearBuffers();
 									isSensorData = true;
 								}
 							}
@@ -220,26 +205,10 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 						case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 							if (HoTTbinReaderD.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()]) {
-								//fill data block 1 to 3
-								if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
-									HoTTbinReader.buf1 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-								}
-								if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
-									HoTTbinReader.buf2 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-								}
-								if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
-									HoTTbinReader.buf3 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-								}
-								if (HoTTbinReader.buf4 == null && HoTTbinReader.buf[33] == 4) {
-									HoTTbinReader.buf4 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-								}
-								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
+								bufCopier.copyToFreeBuffer();
+								if (bufCopier.is3BuffersFull()) {
 									parseGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = null;
+									bufCopier.clearBuffers();
 									isSensorData = true;
 								}
 							}
@@ -248,26 +217,10 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 						case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 							if (HoTTbinReaderD.isSensorType[HoTTAdapter.Sensor.GAM.ordinal()]) {
-								//fill data block 1 to 4
-								if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
-									HoTTbinReader.buf1 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-								}
-								if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
-									HoTTbinReader.buf2 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-								}
-								if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
-									HoTTbinReader.buf3 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-								}
-								if (HoTTbinReader.buf4 == null && HoTTbinReader.buf[33] == 4) {
-									HoTTbinReader.buf4 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-								}
-								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
+								bufCopier.copyToFreeBuffer();
+								if (bufCopier.is4BuffersFull()) {
 									parseGAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
+									bufCopier.clearBuffers();
 									isSensorData = true;
 								}
 							}
@@ -276,26 +229,10 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 						case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 							if (HoTTbinReaderD.isSensorType[HoTTAdapter.Sensor.EAM.ordinal()]) {
-								//fill data block 1 to 4
-								if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
-									HoTTbinReader.buf1 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-								}
-								if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
-									HoTTbinReader.buf2 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-								}
-								if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
-									HoTTbinReader.buf3 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-								}
-								if (HoTTbinReader.buf4 == null && HoTTbinReader.buf[33] == 4) {
-									HoTTbinReader.buf4 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-								}
-								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null && HoTTbinReader.buf4 != null) {
+								bufCopier.copyToFreeBuffer();
+								if (bufCopier.is4BuffersFull()) {
 									parseEAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
+									bufCopier.clearBuffers();
 									isSensorData = true;
 								}
 							}
@@ -304,26 +241,10 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 						case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
 							if (HoTTbinReaderD.isSensorType[HoTTAdapter.Sensor.ESC.ordinal()]) {
-								//fill data block 0 to 4
-								if (HoTTbinReader.buf1 == null && HoTTbinReader.buf[33] == 1) {
-									HoTTbinReader.buf1 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-								}
-								if (HoTTbinReader.buf2 == null && HoTTbinReader.buf[33] == 2) {
-									HoTTbinReader.buf2 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-								}
-								if (HoTTbinReader.buf3 == null && HoTTbinReader.buf[33] == 3) {
-									HoTTbinReader.buf3 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-								}
-								if (HoTTbinReader.buf4 == null && HoTTbinReader.buf[33] == 4) {
-									HoTTbinReader.buf4 = new byte[30];
-									System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-								}
-								if (HoTTbinReader.buf1 != null && HoTTbinReader.buf2 != null && HoTTbinReader.buf3 != null) {
+								bufCopier.copyToFreeBuffer();
+								if (bufCopier.is3BuffersFull()) {
 									parseESC(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, channelNumber);
-									HoTTbinReader.buf1 = HoTTbinReader.buf2 = HoTTbinReader.buf3 = HoTTbinReader.buf4 = null;
+									bufCopier.clearBuffers();
 									isSensorData = true;
 								}
 							}
@@ -465,6 +386,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.buf2 = new byte[30];
 		HoTTbinReader.buf3 = new byte[30];
 		HoTTbinReader.buf4 = new byte[30];
+		BufCopier bufCopier = new BufCopier(buf, buf0, buf1, buf2, buf3, buf4);
 		byte actualSensor = -1, lastSensor = -1;
 		int logCountVario = 0, logCountGPS = 0, logCountGAM = 0, logCountEAM = 0, logCountESC = 0;
 		pickerParameters.reverseChannelPackageLossCounter.clear();
@@ -671,23 +593,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						}
 						HoTTbinReaderD.isJustMigrated = false;
 
-						//fill data block 0 to 4
-						if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
-						}
-						if (HoTTbinReader.buf[33] == 1) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-						}
-						if (HoTTbinReader.buf[33] == 2) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-						}
-						if (HoTTbinReader.buf[33] == 3) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-						}
-						if (HoTTbinReader.buf[33] == 4) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-						}
-
+						bufCopier.copyToBuffer();
 						if (HoTTbinReader.blockSequenceCheck.size() > 1) {
 							if (HoTTbinReader.blockSequenceCheck.get(1) != 0 && HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) > 1
 									&& HoTTbinReader.blockSequenceCheck.get(0) - HoTTbinReader.blockSequenceCheck.get(1) < 4 && pickerParameters.reverseChannelPackageLossCounter.getPercentage() < 15)

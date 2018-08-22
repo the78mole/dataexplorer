@@ -29,10 +29,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -91,56 +93,58 @@ import gde.utils.WaitTimer;
  * @author Winfried Brügmann
  */
 public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoDevice {
-	final static Logger											log																= Logger.getLogger(HoTTAdapter.class.getName());
+	final static Logger		log																= Logger.getLogger(HoTTAdapter.class.getName());
 
-	final static String											LOG_COUNT													= "LogCount";																															//$NON-NLS-1$
-	final static String											FILE_PATH													= "FilePath";																															//$NON-NLS-1$
-	final static String											SD_FORMAT													= "SD_FORMAT";																															//$NON-NLS-1$
-	final static String											DETECTED_SENSOR										= "DETECTED SENSOR";																															//$NON-NLS-1$
+	final static String		LOG_COUNT													= "LogCount";																																						//$NON-NLS-1$
+	final static String		FILE_PATH													= "FilePath";																																						//$NON-NLS-1$
+	final static String		SD_FORMAT													= "SD_FORMAT";																																					//$NON-NLS-1$
+	final static String		DETECTED_SENSOR										= "DETECTED SENSOR";																																		//$NON-NLS-1$
 
 	// HoTT sensor bytes 19200 Baud protocol
-	static boolean													IS_SLAVE_MODE											= false;
-	final static byte												SENSOR_TYPE_RECEIVER_19200				= (byte) (0x80 & 0xFF);
-	final static byte												SENSOR_TYPE_VARIO_19200						= (byte) (0x89 & 0xFF);
-	final static byte												SENSOR_TYPE_GPS_19200							= (byte) (0x8A & 0xFF);
-	final static byte												SENSOR_TYPE_GENERAL_19200					= (byte) (0x8D & 0xFF);
-	final static byte												SENSOR_TYPE_ELECTRIC_19200				= (byte) (0x8E & 0xFF);
-	final static byte												SENSOR_TYPE_SPEED_CONTROL_19200		= (byte) (0x8C & 0xFF);
-	final static byte												ANSWER_SENSOR_VARIO_19200					= (byte) (0x90 & 0xFF);
-	final static byte												ANSWER_SENSOR_GPS_19200						= (byte) (0xA0 & 0xFF);
-	final static byte												ANSWER_SENSOR_GENERAL_19200				= (byte) (0xD0 & 0xFF);
-	final static byte												ANSWER_SENSOR_ELECTRIC_19200			= (byte) (0xE0 & 0xFF);
-	final static byte												ANSWER_SENSOR_MOTOR_DRIVER_19200	= (byte) (0xC0 & 0xFF);
+	static boolean				IS_SLAVE_MODE											= false;
+	final static byte			SENSOR_TYPE_RECEIVER_19200				= (byte) (0x80 & 0xFF);
+	final static byte			SENSOR_TYPE_VARIO_19200						= (byte) (0x89 & 0xFF);
+	final static byte			SENSOR_TYPE_GPS_19200							= (byte) (0x8A & 0xFF);
+	final static byte			SENSOR_TYPE_GENERAL_19200					= (byte) (0x8D & 0xFF);
+	final static byte			SENSOR_TYPE_ELECTRIC_19200				= (byte) (0x8E & 0xFF);
+	final static byte			SENSOR_TYPE_SPEED_CONTROL_19200		= (byte) (0x8C & 0xFF);
+	final static byte			ANSWER_SENSOR_VARIO_19200					= (byte) (0x90 & 0xFF);
+	final static byte			ANSWER_SENSOR_GPS_19200						= (byte) (0xA0 & 0xFF);
+	final static byte			ANSWER_SENSOR_GENERAL_19200				= (byte) (0xD0 & 0xFF);
+	final static byte			ANSWER_SENSOR_ELECTRIC_19200			= (byte) (0xE0 & 0xFF);
+	final static byte			ANSWER_SENSOR_MOTOR_DRIVER_19200	= (byte) (0xC0 & 0xFF);
 
 	// HoTT sensor bytes 115200 Baud protocol (actual no slave mode)
 	// there is no real slave mode for this protocol
-	final static byte												SENSOR_TYPE_RECEIVER_115200				= 0x34;
-	final static byte												SENSOR_TYPE_VARIO_115200					= 0x37;
-	final static byte												SENSOR_TYPE_GPS_115200						= 0x38;
-	final static byte												SENSOR_TYPE_GENERAL_115200				= 0x35;
-	final static byte												SENSOR_TYPE_ELECTRIC_115200				= 0x36;
-	final static byte												SENSOR_TYPE_SPEED_CONTROL_115200	= 0x39;
-	final static byte												SENSOR_TYPE_SERVO_POSITION_115200	= 0x40;
-	final static byte												SENSOR_TYPE_SWITCHES_115200				= 0x41;
-	final static byte												SENSOR_TYPE_CONTROL_1_115200			= 0x42;
-	final static byte												SENSOR_TYPE_CONTROL_2_115200			= 0x43;
+	final static byte			SENSOR_TYPE_RECEIVER_115200				= 0x34;
+	final static byte			SENSOR_TYPE_VARIO_115200					= 0x37;
+	final static byte			SENSOR_TYPE_GPS_115200						= 0x38;
+	final static byte			SENSOR_TYPE_GENERAL_115200				= 0x35;
+	final static byte			SENSOR_TYPE_ELECTRIC_115200				= 0x36;
+	final static byte			SENSOR_TYPE_SPEED_CONTROL_115200	= 0x39;
+	final static byte			SENSOR_TYPE_SERVO_POSITION_115200	= 0x40;
+	final static byte			SENSOR_TYPE_SWITCHES_115200				= 0x41;
+	final static byte			SENSOR_TYPE_CONTROL_1_115200			= 0x42;
+	final static byte			SENSOR_TYPE_CONTROL_2_115200			= 0x43;
 
-	final static boolean										isSwitchS[]												= { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-	final static boolean										isSwitchG[]												= { false, false, false, false, false, false, false, false };
-	final static boolean										isSwitchL[]												= { false, false, false, false, false, false, false, false };
+	final static boolean	isSwitchS[]												= { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+	final static boolean	isSwitchG[]												= { false, false, false, false, false, false, false, false };
+	final static boolean	isSwitchL[]												= { false, false, false, false, false, false, false, false };
 
-	final static int												QUERY_GAP_MS											= 30;
+	final static int			QUERY_GAP_MS											= 30;
 
 	public enum Sensor {
 		RECEIVER(1, "Receiver", "RECEIVER") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-				return new HoTTbinReader.RcvBinParser(pickerParameters, timeSteps_ms, buffers);
+			public BinParser createBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.RcvBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.RcvBinParser(pickerParameters, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.RcvBinParser(pickerParameters, points, timeSteps_ms, buffers);
@@ -148,13 +152,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		},
 		VARIO(2, "Vario", "VARIO") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-				return new HoTTbinReader.VarBinParser(pickerParameters, timeSteps_ms, buffers);
+			public BinParser createBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.VarBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.VarBinParser(pickerParameters, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.VarBinParser(pickerParameters, points, timeSteps_ms, buffers);
@@ -162,13 +168,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		},
 		GPS(3, "GPS", "GPS") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-				return new HoTTbinReader.GpsBinParser(pickerParameters, timeSteps_ms, buffers);
+			public BinParser createBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.GpsBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.GpsBinParser(pickerParameters, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.GpsBinParser(pickerParameters, points, timeSteps_ms, buffers);
@@ -176,13 +184,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		},
 		GAM(4, "GAM", "GENERAL") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-				return new HoTTbinReader.GamBinParser(pickerParameters, timeSteps_ms, buffers);
+			public BinParser createBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.GamBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.GamBinParser(pickerParameters, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.GamBinParser(pickerParameters, points, timeSteps_ms, buffers);
@@ -190,13 +200,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		},
 		EAM(5, "EAM", "ELECTRIC") {//$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-				return new HoTTbinReader.EamBinParser(pickerParameters, timeSteps_ms, buffers);
+			public BinParser createBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.EamBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.EamBinParser(pickerParameters, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.EamBinParser(pickerParameters, points, timeSteps_ms, buffers);
@@ -204,13 +216,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		},
 		ESC(7, "ESC", "?") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-				return new HoTTbinReader.EscBinParser(pickerParameters, timeSteps_ms, buffers);
+			public BinParser createBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.EscBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.EscBinParser(pickerParameters, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.EscBinParser(pickerParameters, points, timeSteps_ms, buffers);
@@ -218,13 +232,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		},
 		CHANNEL(6, "Channel", "N/A") { //$NON-NLS-1$
 			@Override
-			public BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-				return new HoTTbinReader.ChnBinParser(pickerParameters, timeSteps_ms, buffers);
+			public BinParser createBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+				return new HoTTbinReader.ChnBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.ChnBinParser(pickerParameters, timeSteps_ms, buffers);
 			}
+
 			@Override
 			public BinParser createBinParser2(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader2.ChnBinParser(pickerParameters, points, timeSteps_ms, buffers);
@@ -248,10 +264,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 		/**
 		 * Takes the parsing input objects in order to avoid parsing method parameters for better performance.
+		 * @param points is the output object
 		 * @param timeSteps_ms is the wrapper object holding the current timestep
 		 * @param buffers are the required input buffers for parsing (the first dimension corresponds to the buffers count)
 		 */
-		public abstract BinParser createBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers);
+		public abstract BinParser createBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers);
 
 		/**
 		 * Parse for HoTTAdapter2.
@@ -312,12 +329,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 		/**
 		 * @param value is the name in the sensor signature
-		 * @return the sensor found
+		 * @return the sensor found (ignoring casing)
 		 */
 		@Nullable
 		public static Sensor fromValue(String value) {
 			for (Sensor sensor : Sensor.VALUES) {
-				if (value.equals(sensor.value)) {
+				if (value.equalsIgnoreCase(sensor.value)) {
 					return sensor;
 				}
 			}
@@ -331,7 +348,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		@Nullable
 		public static Sensor fromDetectedName(String detectedName) {
 			for (Sensor sensor : Sensor.VALUES) {
-				if (detectedName.toUpperCase().equals(sensor.detectedName)) {
+				if (detectedName.equalsIgnoreCase(sensor.detectedName)) {
 					return sensor;
 				}
 			}
@@ -339,16 +356,18 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		}
 
 		public static EnumSet<Sensor> getSetFromSignature(String sensorSignature) {
-			EnumSet<Sensor> sensors = Arrays.stream(sensorSignature.split(GDE.STRING_COMMA)).map((s) -> Sensor.fromValue(s)) //
-					.collect(Collectors.toCollection(() -> EnumSet.noneOf(Sensor.class)));
+			EnumSet<Sensor> sensors = sensorSignature.isEmpty() ? EnumSet.noneOf(Sensor.class)
+					: Arrays.stream(sensorSignature.split(GDE.STRING_COMMA)).map(Sensor::fromValue).filter(Objects::nonNull) //
+							.collect(Collectors.toCollection(() -> EnumSet.noneOf(Sensor.class)));
 			sensors.add(RECEIVER); // always present
 			sensors.remove(CHANNEL); // not a real sensor
 			return sensors;
 		}
 
 		public static EnumSet<Sensor> getSetFromDetected(String detectedSensors) {
-			EnumSet<Sensor> sensors = Arrays.stream(detectedSensors.split(GDE.STRING_COMMA)).map((s) -> Sensor.fromDetectedName(s)) //
-					.collect(Collectors.toCollection(() -> EnumSet.noneOf(Sensor.class)));
+			EnumSet<Sensor> sensors = detectedSensors.isEmpty() ? EnumSet.noneOf(Sensor.class)
+					: Arrays.stream(detectedSensors.split(GDE.STRING_COMMA)).map(Sensor::fromDetectedName).filter(Objects::nonNull) //
+							.collect(Collectors.toCollection(() -> EnumSet.noneOf(Sensor.class)));
 			sensors.add(RECEIVER); // always present
 			sensors.remove(CHANNEL); // not a real sensor
 			return sensors;
@@ -377,6 +396,18 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				activeSensors[i] = sensors.contains(sensor);
 			}
 			return activeSensors;
+		}
+
+		/**
+		 * @param sensors is a subset of the sensor entries
+		 * @return a set with bits 0 to 31 representing the sensor type ordinal numbers (true if the sensor type is active)
+		 */
+		public static BitSet getSensors(EnumSet<Sensor> sensors) {
+			BitSet sensorBitSet = new BitSet();
+			for (Sensor sensor : sensors) {
+				sensorBitSet.set(sensor.ordinal());
+			}
+			return sensorBitSet;
 		}
 
 		/**
@@ -437,21 +468,21 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 * @author Thomas Eickert (USER)
 	 */
 	public static final class PickerParameters {
-		final Analyzer									analyzer;
+		final Analyzer					analyzer;
 
-		final ReverseChannelPackageLoss	reverseChannelPackageLossCounter;
+		final PackageLossDeque	reverseChannelPackageLossCounter;
 
-		boolean													isChannelsChannelEnabled			= false;
-		boolean													isFilterEnabled								= true;
-		boolean													isFilterTextModus							= true;
-		boolean													isTolerateSignChangeLatitude	= false;
-		boolean													isTolerateSignChangeLongitude	= false;
-		double													latitudeToleranceFactor				= 90.0;
-		double													longitudeToleranceFactor			= 25.0;
+		boolean									isChannelsChannelEnabled			= false;
+		boolean									isFilterEnabled								= true;
+		boolean									isFilterTextModus							= true;
+		boolean									isTolerateSignChangeLatitude	= false;
+		boolean									isTolerateSignChangeLongitude	= false;
+		double									latitudeToleranceFactor				= 90.0;
+		double									longitudeToleranceFactor			= 25.0;
 
 		public PickerParameters(Analyzer analyzer) {
 			this.analyzer = analyzer;
-			this.reverseChannelPackageLossCounter = new ReverseChannelPackageLoss(100);
+			this.reverseChannelPackageLossCounter = new PackageLossDeque(100);
 		}
 
 		/**
@@ -460,7 +491,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		 */
 		PickerParameters(PickerParameters that) {
 			this.analyzer = that.analyzer;
-			this.reverseChannelPackageLossCounter = new ReverseChannelPackageLoss(100);
+			this.reverseChannelPackageLossCounter = new PackageLossDeque(100);
 
 			this.isChannelsChannelEnabled = that.isChannelsChannelEnabled;
 			this.isFilterEnabled = that.isFilterEnabled;
@@ -479,6 +510,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			final String d = GDE.STRING_CSV_SEPARATOR;
 			return isFilterEnabled + d + isTolerateSignChangeLatitude + d + isTolerateSignChangeLongitude + d + latitudeToleranceFactor + d + longitudeToleranceFactor;
 		}
+
+		@Override
+		public String toString() {
+			return "PickerParameters [analyzer.channels=" + this.analyzer.getChannels() + ", isChannelsChannelEnabled=" + this.isChannelsChannelEnabled + ", isFilterEnabled=" + this.isFilterEnabled + ", isFilterTextModus=" + this.isFilterTextModus + ", isTolerateSignChangeLatitude=" + this.isTolerateSignChangeLatitude + ", isTolerateSignChangeLongitude=" + this.isTolerateSignChangeLongitude + ", latitudeToleranceFactor=" + this.latitudeToleranceFactor + ", longitudeToleranceFactor=" + this.longitudeToleranceFactor + "]";
+		}
+
 
 	}
 
@@ -1099,7 +1136,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		int[] points = new int[recordSet.size()];
-					String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 1;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
@@ -1810,7 +1847,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			// log.log(Level.OFF, "loading Class " + className); //$NON-NLS-1$
 			ClassLoader loader = Thread.currentThread().getContextClassLoader();
 			Class<?> c = loader.loadClass(className);
-			//Class c = Class.forName(className);
+			// Class c = Class.forName(className);
 			Constructor<?> constructor = c.getDeclaredConstructor();
 			if (constructor != null) {
 				constructor.newInstance();
@@ -2117,12 +2154,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 	/**
 	 * @param sensorSignature is a csv list of valid sensor values (i.e. sensor names)
-	 * @return a boolean array with a length of all sensor entries. The ordinal positions holds true for the sensor ordinals in the {@code sensors} set.
+	 * @return an integer value with bits 0 to 31 representing the sensor type ordinal numbers (true if the sensor type is active)
 	 */
 	@Override
-	public boolean[] getActiveSensors(String sensorSignature) {
+	public BitSet getActiveSensors(String sensorSignature) {
 		EnumSet<Sensor> sensors = Sensor.getSetFromSignature(sensorSignature);
-		return Sensor.getActiveSensors(sensors);
+		return Sensor.getSensors(sensors);
 	}
 
 }

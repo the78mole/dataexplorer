@@ -73,7 +73,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		HoTTbinReader.dataBlockSize = 66 + numberLogChannels * 2;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		int logTimeStep = 1000/Integer.valueOf(fileInfoHeader.get("COUNTER").split("/")[1].split(GDE.STRING_BLANK)[0]);
-		ReverseChannelPackageLoss reverseChannelPackageLossCounter = new ReverseChannelPackageLoss(logTimeStep);
+		PackageLossDeque reverseChannelPackageLossCounter = new PackageLossDeque(logTimeStep);
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
 		int countPackageLoss = 0;

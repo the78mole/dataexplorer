@@ -106,7 +106,7 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 		int[] valuesEAM = new int[31];
 		int[] valuesESC = new int[14];
 		int logTimeStep = 1000/Integer.valueOf(fileInfoHeader.get("COUNTER").split("/")[1].split(GDE.STRING_BLANK)[0]);
-		ReverseChannelPackageLoss reverseChannelPackageLossCounter = new ReverseChannelPackageLoss(logTimeStep);
+		PackageLossDeque reverseChannelPackageLossCounter = new PackageLossDeque(logTimeStep);
 		HoTTbinReader.isTextModusSignaled = false;
 		int countPackageLoss = 0;
 		int logDataOffset = Integer.valueOf(fileInfoHeader.get("LOG DATA OFFSET"));

@@ -13,19 +13,27 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.graupner;
 
-import gde.GDE;
-
 import java.util.Locale;
 import java.util.Vector;
 
-public class ReverseChannelPackageLossStatistics extends Vector<Integer> {
+import gde.GDE;
+
+/**
+ * Running statistics about the reverse channel lost packages.
+ * @author brueg
+ */
+public class PackageLoss extends Vector<Integer> {
 	private static final long	serialVersionUID	= -1434896150654661385L;
 
+	/**
+	 * the total number of lost packages (is summed up while reading the log)
+	 */
+	int												lossTotal					= 0;
 	int												minValue					= 0;
 	int												maxValue					= 0;
 	double										avgValue					= 0;
@@ -72,7 +80,7 @@ public class ReverseChannelPackageLossStatistics extends Vector<Integer> {
 	}
 
 	/**
-	 * calculates the sigmaValue 
+	 * calculates the sigmaValue
 	 */
 	public synchronized double getSigmaValue() {
 		synchronized (this) {
@@ -101,12 +109,12 @@ public class ReverseChannelPackageLossStatistics extends Vector<Integer> {
 	public synchronized int getMaxValue() {
 		return maxValue;
 	}
-	
+
 	/**
 	 * @return the statistics as formated string
 	 */
 	public String getStatistics() {
-		if (this.getMinValue() == this.getMaxValue()) 
+		if (this.getMinValue() == this.getMaxValue())
 			return GDE.STRING_MESSAGE_CONCAT;
 		return String.format(Locale.getDefault(), "min=%.2f sec; max=%.2f sec; avg=%.2f sec; sigma=%.2f sec", this.getMinValue()/100.0, this.getMaxValue()/100.0, this.getAvgValue()/100.0, this.getSigmaValue()/100.0);
 	}

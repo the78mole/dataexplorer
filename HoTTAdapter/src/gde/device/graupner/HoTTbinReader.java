@@ -81,10 +81,9 @@ public class HoTTbinReader {
 	static byte[]																	buf;
 	static byte[]																	buf0, buf1, buf2, buf3, buf4, buf5, buf6, buf7, buf8, buf9, bufA, bufB, bufC, bufD;
 	static long																		timeStep_ms;
-	static RecordSet														recordSetReceiver, recordSetGAM, recordSetEAM, recordSetVario, recordSetGPS, recordSetChannel, recordSetESC;
+	static RecordSet															recordSetReceiver, recordSetGAM, recordSetEAM, recordSetVario, recordSetGPS, recordSetChannel, recordSetESC;
 	// todo remove the next lines which are used neither by this class nor by HoTTbinHistoReader
-	static int[]																	pointsReceiver, pointsEAM, pointsVario, pointsGPS, pointsChannel, pointsESC;
-	static int[]																	pointsGAM;
+	static int[]																	pointsReceiver, pointsEAM, pointsVario, pointsGPS, pointsChannel, pointsESC, pointsGAM;
 	static int																		tmpVoltageRx								= 0;
 	static int																		tmpTemperatureRx						= 0;
 	static int																		tmpHeight										= 0;
@@ -109,7 +108,7 @@ public class HoTTbinReader {
 	static double																	longitudeTolerance					= 1;
 	static long																		lastLongitudeTimeStep				= 0;
 	static int																		countLostPackages						= 0;
-	static ReverseChannelPackageLossStatistics		lostPackages								= new ReverseChannelPackageLossStatistics();
+	static PackageLoss														lostPackages								= new PackageLoss();
 
 	static boolean																isJustParsed								= false;
 	static boolean																isReceiverOnly							= false;
@@ -251,6 +250,138 @@ public class HoTTbinReader {
 			return this.payloadSize;
 		}
 
+	}
+
+	/**
+	 * Copy the buffer array into buf* arrays based on the data block number.
+	 * @author Thomas Eickert (USER)
+	 */
+	public static class BufCopier {
+
+		private final byte[]		buf;
+		private final byte[]		buf0;
+		private final byte[]		buf1;
+		private final byte[]		buf2;
+		private final byte[]		buf3;
+		private final byte[]		buf4;
+		private final boolean[]	isBufReady;
+
+		/**
+		 * @param buf is the source buffer array
+		 * @param buf0 to buf* are the target data blocks
+		 */
+		public BufCopier(byte[] buf, byte[] buf0, byte[] buf1, byte[] buf2, byte[] buf3, byte[] buf4) {
+			this.buf = buf;
+			this.buf0 = buf0;
+			this.buf1 = buf1;
+			this.buf2 = buf2;
+			this.buf3 = buf3;
+			this.buf4 = buf4;
+			this.isBufReady = new boolean[5];
+		}
+
+		public void clearBuffers() {
+			isBufReady[1] = isBufReady[2] = isBufReady[3] = isBufReady[4] = false;
+		}
+
+		public boolean is2BuffersFull() {
+			return isBufReady[1] && isBufReady[2];
+		}
+
+		public boolean is3BuffersFull() {
+			return isBufReady[1] && isBufReady[2] && isBufReady[3];
+		}
+
+		public boolean is4BuffersFull() {
+			return isBufReady[1] && isBufReady[2] && isBufReady[3] && isBufReady[4];
+		}
+
+		/**
+		 * Fill data block 0 to 4 whether it is clear or not.
+		 */
+		public void copyToBuffer() {
+			switch (buf[33]) { // data block number
+			case 0:
+				// fill data block 0 receiver voltage and temperature
+				if (DataParser.parse2Short(buf, 0) != 0) {
+					System.arraycopy(buf, 34, buf1, 0, buf1.length);
+				}
+				break;
+			case 1:
+				System.arraycopy(buf, 34, buf1, 0, buf1.length);
+				break;
+			case 2:
+				System.arraycopy(buf, 34, buf2, 0, buf2.length);
+				break;
+			case 3:
+				System.arraycopy(buf, 34, buf3, 0, buf3.length);
+				break;
+			case 4:
+				System.arraycopy(buf, 34, buf4, 0, buf4.length);
+				break;
+			default:
+				throw new UnsupportedOperationException();
+			}
+		}
+
+		/**
+		 * Fill data block 0 to 4 if it is clear.
+		 */
+		public void copyToFreeBuffer() {
+			switch (buf[33]) { // data block number
+			case 0:
+				break;
+			case 1:
+				if (!isBufReady[1]) {
+					isBufReady[1] = true;
+					System.arraycopy(buf, 34, buf1, 0, buf1.length);
+				}
+				break;
+			case 2:
+				if (!isBufReady[2]) {
+					isBufReady[2] = true;
+					System.arraycopy(buf, 34, buf2, 0, buf2.length);
+				}
+				break;
+			case 3:
+				if (!isBufReady[3]) {
+					isBufReady[3] = true;
+					System.arraycopy(buf, 34, buf3, 0, buf3.length);
+				}
+				break;
+			case 4:
+				if (!isBufReady[4]) {
+					isBufReady[4] = true;
+					System.arraycopy(buf, 34, buf4, 0, buf4.length);
+				}
+				break;
+			default:
+				throw new UnsupportedOperationException();
+			}
+		}
+
+		/**
+		 * Fill data block 0 to 2 whether it is clear or not.
+		 */
+		public void copyToVarioBuffer() {
+			switch (buf[33]) { // data block number
+			case 0:
+				break;
+			case 1:
+				isBufReady[1] = true;
+				System.arraycopy(buf, 34, buf1, 0, buf1.length);
+				break;
+			case 2:
+				isBufReady[2] = true;
+				System.arraycopy(buf, 34, buf2, 0, buf2.length);
+				break;
+			case 3:
+			case 4:
+				break;
+			default:
+				throw new UnsupportedOperationException();
+			}
+		}
 	}
 
 	/**
@@ -477,7 +608,6 @@ public class HoTTbinReader {
 		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		HoTTbinReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		HoTTbinReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
-		HoTTbinReader.timeStep_ms = 0;
 		HoTTbinReader.dataBlockSize = 64;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		HoTTbinReader.buf0 = new byte[30];
@@ -485,15 +615,15 @@ public class HoTTbinReader {
 		HoTTbinReader.buf2 = new byte[30];
 		HoTTbinReader.buf3 = new byte[30];
 		HoTTbinReader.buf4 = new byte[30];
-		boolean isBuf1Ready = false, isBuf2Ready = false, isBuf3Ready = false, isBuf4Ready = false;
+		BufCopier bufCopier = new BufCopier(buf, buf0, buf1, buf2, buf3, buf4);
 		long[] timeSteps_ms = new long[] {0};
-		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf });
-		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf });
-		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
-		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
-		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
-		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
-		HoTTbinReader.escBinParser = Sensor.ESC.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
+		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, new int[10], timeSteps_ms, new byte[][] { buf });
+		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, new int[23], timeSteps_ms, new byte[][] { buf });
+		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, new int[8], timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
+		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, new int[15], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
+		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, new int[26], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
+		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, new int[31], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
+		HoTTbinReader.escBinParser = Sensor.ESC.createBinParser(HoTTbinReader.pickerParameters, new int[14], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
 		int version = -1;
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
@@ -578,8 +708,8 @@ public class HoTTbinReader {
 							}
 						}
 						// fill data block 0 receiver voltage an temperature
-						if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
+						if (HoTTbinReader.buf[33] == 0) {
+							bufCopier.copyToBuffer();
 						}
 						timeSteps_ms[BinParser.TIMESTEP_INDEX] += 10;// add default time step from device of 10 msec
 						// log.log(Level.OFF, "sensor type ID = " + StringHelper.byte2Hex2CharString(new byte[] {(byte) (HoTTbinReader.buf[7] & 0xFF)}, 1));
@@ -606,18 +736,10 @@ public class HoTTbinReader {
 										}
 									}
 									// recordSetVario initialized and ready to add data
-									// fill data block 1 to 2
-									if (HoTTbinReader.buf[33] == 1) {
-										isBuf1Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-									}
-									if (HoTTbinReader.buf[33] == 2) {
-										isBuf2Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-									}
-									if (isBuf1Ready && isBuf2Ready) {
+									bufCopier.copyToVarioBuffer();
+									if (bufCopier.is2BuffersFull()) {
 										version = parseAddVario(version, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2);
-										isBuf1Ready = isBuf2Ready = false;
+										bufCopier.clearBuffers();
 									}
 								}
 								break;
@@ -643,22 +765,10 @@ public class HoTTbinReader {
 										}
 									}
 									// recordSetGPS initialized and ready to add data
-									// fill data block 1 to 3
-									if (!isBuf1Ready && HoTTbinReader.buf[33] == 1) {
-										isBuf1Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-									}
-									if (!isBuf2Ready && HoTTbinReader.buf[33] == 2) {
-										isBuf2Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-									}
-									if (!isBuf3Ready && HoTTbinReader.buf[33] == 3) {
-										isBuf3Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-									}
-									if (isBuf1Ready && isBuf2Ready && isBuf3Ready) {
+									bufCopier.copyToFreeBuffer();
+									if (bufCopier.is3BuffersFull()) {
 										parseAddGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3);
-										isBuf1Ready = isBuf2Ready = isBuf3Ready = false;
+										bufCopier.clearBuffers();
 									}
 								}
 								break;
@@ -684,26 +794,10 @@ public class HoTTbinReader {
 										}
 									}
 									// recordSetGeneral initialized and ready to add data
-									// fill data block 1 to 4
-									if (!isBuf1Ready && HoTTbinReader.buf[33] == 1) {
-										isBuf1Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-									}
-									if (!isBuf2Ready && HoTTbinReader.buf[33] == 2) {
-										isBuf2Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-									}
-									if (!isBuf3Ready && HoTTbinReader.buf[33] == 3) {
-										isBuf3Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-									}
-									if (!isBuf4Ready && HoTTbinReader.buf[33] == 4) {
-										isBuf4Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-									}
-									if (isBuf1Ready && isBuf2Ready && isBuf3Ready && isBuf4Ready) {
+									bufCopier.copyToFreeBuffer();
+									if (bufCopier.is4BuffersFull()) {
 										parseAddGAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-										isBuf1Ready = isBuf2Ready = isBuf3Ready = isBuf4Ready = false;
+										bufCopier.clearBuffers();
 									}
 								}
 								break;
@@ -729,26 +823,10 @@ public class HoTTbinReader {
 										}
 									}
 									// recordSetElectric initialized and ready to add data
-									// fill data block 1 to 3
-									if (!isBuf1Ready && HoTTbinReader.buf[33] == 1) {
-										isBuf1Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-									}
-									if (!isBuf2Ready && HoTTbinReader.buf[33] == 2) {
-										isBuf2Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-									}
-									if (!isBuf3Ready && HoTTbinReader.buf[33] == 3) {
-										isBuf3Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-									}
-									if (!isBuf4Ready && HoTTbinReader.buf[33] == 4) {
-										isBuf4Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-									}
-									if (isBuf1Ready && isBuf2Ready && isBuf3Ready && isBuf4Ready) {
+									bufCopier.copyToFreeBuffer();
+									if (bufCopier.is4BuffersFull()) {
 										parseAddEAM(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
-										isBuf1Ready = isBuf2Ready = isBuf3Ready = isBuf4Ready = false;
+										bufCopier.clearBuffers();
 									}
 								}
 								break;
@@ -774,22 +852,10 @@ public class HoTTbinReader {
 										}
 									}
 									// recordSetMotorDriver initialized and ready to add data
-									// fill data block 1 to 4
-									if (!isBuf1Ready && HoTTbinReader.buf[33] == 1) {
-										isBuf1Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-									}
-									if (!isBuf2Ready && HoTTbinReader.buf[33] == 2) {
-										isBuf2Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-									}
-									if (!isBuf3Ready && HoTTbinReader.buf[33] == 3) {
-										isBuf3Ready = true;
-										System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-									}
-									if (isBuf1Ready && isBuf2Ready && isBuf3Ready) {
+									bufCopier.copyToFreeBuffer();
+									if (bufCopier.is3BuffersFull()) {
 										parseAddESC(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3);
-										isBuf1Ready = isBuf2Ready = isBuf3Ready = false;
+										bufCopier.clearBuffers();
 									}
 								}
 								break;
@@ -826,12 +892,12 @@ public class HoTTbinReader {
 				}
 			}
 			String packageLossPercentage = HoTTbinReader.recordSetReceiver.getRecordDataSize(true) > 0
-					? String.format("%.1f", (((RcvBinParser) HoTTbinReader.rcvBinParser).getCountPackageLoss() / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true) - 1) * 1000))
+					? String.format("%.1f", (((RcvBinParser) HoTTbinReader.rcvBinParser).getLossTotal() / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true) - 1) * 1000))
 					: "100";
 			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {
-					((RcvBinParser) HoTTbinReader.rcvBinParser).getCountPackageLoss(), packageLossPercentage,
+					((RcvBinParser) HoTTbinReader.rcvBinParser).getLossTotal(), packageLossPercentage,
 					((RcvBinParser) HoTTbinReader.rcvBinParser).getLostPackages().getStatistics() }) + Sensor.getSetAsSignature(HoTTbinReader.detectedSensors));
-			HoTTbinReader.log.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + ((RcvBinParser) HoTTbinReader.rcvBinParser).getCountPackageLoss()); //$NON-NLS-1$
+			HoTTbinReader.log.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + ((RcvBinParser) HoTTbinReader.rcvBinParser).getLossTotal()); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " //$NON-NLS-1$
 					+ StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$
 
@@ -922,7 +988,6 @@ public class HoTTbinReader {
 		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 		HoTTbinReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16 19=PowerOff 20=BattLow 21=Reset 22=Warning
 		HoTTbinReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperaure
-		HoTTbinReader.timeStep_ms = 0;
 		HoTTbinReader.dataBlockSize = 64;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		HoTTbinReader.buf0 = new byte[30];
@@ -930,14 +995,15 @@ public class HoTTbinReader {
 		HoTTbinReader.buf2 = new byte[30];
 		HoTTbinReader.buf3 = new byte[30];
 		HoTTbinReader.buf4 = new byte[30];
+		BufCopier bufCopier = new BufCopier(buf, buf0, buf1, buf2, buf3, buf4);
 		long[] timeSteps_ms = new long[] {0};
-		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf });
-		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf });
-		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
-		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
-		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
-		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
-		HoTTbinReader.escBinParser = Sensor.ESC.createBinParser(HoTTbinReader.pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
+		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, new int[10], timeSteps_ms, new byte[][] { buf });
+		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, new int[23], timeSteps_ms, new byte[][] { buf });
+		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, new int[8], timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
+		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, new int[15], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
+		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, new int[26], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
+		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, new int[31], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
+		HoTTbinReader.escBinParser = Sensor.ESC.createBinParser(HoTTbinReader.pickerParameters, new int[14], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
 		byte actualSensor = -1, lastSensor = -1;
 		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0, logCountSpeedControl = 0;
 		HoTTbinReader.isJustParsed = false;
@@ -1185,32 +1251,7 @@ public class HoTTbinReader {
 							break;
 						}
 
-						// fill data block 0 to 4
-						if (HoTTbinReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinReader.buf, 0) != 0) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf0, 0, HoTTbinReader.buf0.length);
-						}
-						else if (HoTTbinReader.buf[33] == 1) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf1, 0, HoTTbinReader.buf1.length);
-						}
-						else if (HoTTbinReader.buf[33] == 2) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf2, 0, HoTTbinReader.buf2.length);
-						}
-						else if (HoTTbinReader.buf[33] == 3) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf3, 0, HoTTbinReader.buf3.length);
-						}
-						else if (HoTTbinReader.buf[33] == 4) {
-							System.arraycopy(HoTTbinReader.buf, 34, HoTTbinReader.buf4, 0, HoTTbinReader.buf4.length);
-						}
-
-						// if (HoTTbinReader.blockSequenceCheck.size() > 1) {
-						// if(HoTTbinReader.blockSequenceCheck.get(0) -
-						// HoTTbinReader.blockSequenceCheck.get(1) > 1 &&
-						// HoTTbinReader.blockSequenceCheck.get(0) -
-						// HoTTbinReader.blockSequenceCheck.get(1) < 4)
-						// ++HoTTbinReader.oldProtocolCount;
-						// HoTTbinReader.blockSequenceCheck.remove(0);
-						// }
-						// HoTTbinReader.blockSequenceCheck.add(HoTTbinReader.buf[33]);
+						bufCopier.copyToBuffer();
 
 						if (i % progressIndicator == 0)
 							GDE.getUiNotification().setProgress((int) (i * 100 / numberDatablocks));
@@ -1241,12 +1282,12 @@ public class HoTTbinReader {
 			// new Object[] { HoTTbinReader.oldProtocolCount }));
 			// }
 			String packageLossPercentage = HoTTbinReader.recordSetReceiver.getRecordDataSize(true) > 0
-					? String.format("%.1f", (((RcvBinParser) HoTTbinReader.rcvBinParser).getCountPackageLoss() / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true) - 1) * 1000))
+					? String.format("%.1f", (((RcvBinParser) HoTTbinReader.rcvBinParser).getLossTotal() / HoTTbinReader.recordSetReceiver.getTime_ms(HoTTbinReader.recordSetReceiver.getRecordDataSize(true) - 1) * 1000))
 					: "100";
 			HoTTbinReader.recordSetReceiver.setRecordSetDescription(tmpRecordSet.getRecordSetDescription() + Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGI2404, new Object[] {
-					((RcvBinParser) HoTTbinReader.rcvBinParser).getCountPackageLoss(), packageLossPercentage,
+					((RcvBinParser) HoTTbinReader.rcvBinParser).getLossTotal(), packageLossPercentage,
 					((RcvBinParser) HoTTbinReader.rcvBinParser).getLostPackages().getStatistics() }) + Sensor.getSetAsSignature(HoTTbinReader.detectedSensors));
-			HoTTbinReader.log.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + ((RcvBinParser) HoTTbinReader.rcvBinParser).getCountPackageLoss()); //$NON-NLS-1$
+			HoTTbinReader.log.logp(Level.WARNING, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "skipped number receiver data due to package loss = " + ((RcvBinParser) HoTTbinReader.rcvBinParser).getLossTotal()); //$NON-NLS-1$
 			HoTTbinReader.log.logp(Level.TIME, HoTTbinReader.$CLASS_NAME, $METHOD_NAME, "read time = " //$NON-NLS-1$
 					+ StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$
 
@@ -1285,15 +1326,17 @@ public class HoTTbinReader {
 		private int																	tmpVoltageRx			= 0;
 		private int																	tmpTemperatureRx	= 0;
 
-		private int																	countPackageLoss	= 0;
-		private int																	countLostPackages	= 0;
+		/**
+		 * the number of lost packages since the last valid package
+		 */
+		private int																	consecutiveLossCounter	= 0;
 
-		private ReverseChannelPackageLossStatistics	lostPackages			= new ReverseChannelPackageLossStatistics();
+		private PackageLoss	lostPackages			= new PackageLoss();
 
 		protected final byte[]											_buf;
 
-		protected RcvBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-			super(pickerParameters, new int[10], timeSteps_ms, buffers, Sensor.RECEIVER);
+		protected RcvBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, points, timeSteps_ms, buffers, Sensor.RECEIVER);
 			_buf = buffers[0];
 			if (buffers.length != 1) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
@@ -1337,8 +1380,8 @@ public class HoTTbinReader {
 				this.pickerParameters.reverseChannelPackageLossCounter.add(0);
 				this.points[0] = this.pickerParameters.reverseChannelPackageLossCounter.getPercentage() * 1000;
 
-				++this.countPackageLoss; // add up lost packages in telemetry data
-				++this.countLostPackages;
+				++this.lostPackages.lossTotal; // add up lost packages in telemetry data
+				++this.consecutiveLossCounter;
 				// points[0] = (int) (countPackageLoss*100.0 / ((this.getTimeStep_ms()+10) / 10.0)*1000.0);
 			}
 		}
@@ -1347,9 +1390,9 @@ public class HoTTbinReader {
 		 * @return true if the lost packages count is transferred into the loss statistics
 		 */
 		public boolean updateLossStatistics() {
-			if (this.countLostPackages > 0) {
-				this.lostPackages.add(this.countLostPackages);
-				this.countLostPackages = 0;
+			if (this.consecutiveLossCounter > 0) {
+				this.lostPackages.add(this.consecutiveLossCounter);
+				this.consecutiveLossCounter = 0;
 				return true;
 			} else {
 				return false;
@@ -1357,13 +1400,13 @@ public class HoTTbinReader {
 		}
 
 		/**
-		 * @return the lost packages count (is the current number of lost packages since the last valid package)
+		 * @return the total number of lost packages (is summed up while reading the log)
 		 */
-		public int getCountPackageLoss() {
-			return this.countPackageLoss;
+		public int getLossTotal() {
+			return this.lostPackages.lossTotal;
 		}
 
-		public ReverseChannelPackageLossStatistics getLostPackages() {
+		public PackageLoss getLostPackages() {
 			return this.lostPackages;
 		}
 
@@ -1373,7 +1416,7 @@ public class HoTTbinReader {
 
 		@Override
 		public String toString() {
-			return super.toString() + "  [countPackageLoss=" + this.countPackageLoss + ", countLostPackages=" + this.countLostPackages + "]";
+			return super.toString() + "  [lossTotal=" + this.lostPackages.lossTotal + ", consecutiveLossCounter=" + this.consecutiveLossCounter + "]";
 		}
 
 	}
@@ -1392,8 +1435,8 @@ public class HoTTbinReader {
 	public static class ChnBinParser extends BinParser {
 		protected final byte[] _buf;
 
-		protected ChnBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-			super(pickerParameters, new int[23], timeSteps_ms, buffers, Sensor.CHANNEL);
+		protected ChnBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, points, timeSteps_ms, buffers, Sensor.CHANNEL);
 			_buf = buffers[0];
 			if (buffers.length != 1) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
@@ -1471,8 +1514,8 @@ public class HoTTbinReader {
 		private int		tmpHeight		= 0;
 		private int		tmpClimb10	= 0;
 
-		protected VarBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-			super(pickerParameters, new int[8], timeSteps_ms, buffers, Sensor.VARIO);
+		protected VarBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, points, timeSteps_ms, buffers, Sensor.VARIO);
 			if (buffers.length != 3) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 			points[2] = 100000;
 		}
@@ -1534,8 +1577,8 @@ public class HoTTbinReader {
 		private double	longitudeTolerance		= 1;
 		private long		lastLongitudeTimeStep	= 0;
 
-		protected GpsBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-			super(pickerParameters, new int[15], timeSteps_ms, buffers, Sensor.GPS);
+		protected GpsBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, points, timeSteps_ms, buffers, Sensor.GPS);
 			if (buffers.length != 4) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
 
@@ -1635,8 +1678,8 @@ public class HoTTbinReader {
 
 		private int		parseCount	= 0;
 
-		protected GamBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-			super(pickerParameters, new int[26], timeSteps_ms, buffers, Sensor.GAM);
+		protected GamBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, points, timeSteps_ms, buffers, Sensor.GAM);
 			if (buffers.length != 5) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
 
@@ -1732,8 +1775,8 @@ public class HoTTbinReader {
 
 		private int		parseCount	= 0;
 
-		protected EamBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-			super(pickerParameters, new int[31], timeSteps_ms, buffers, Sensor.EAM);
+		protected EamBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, points, timeSteps_ms, buffers, Sensor.EAM);
 			if (buffers.length != 5) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
 
@@ -1828,8 +1871,8 @@ public class HoTTbinReader {
 
 		private int		parseCount				= 0;
 
-		protected EscBinParser(PickerParameters pickerParameters, long[] timeSteps_ms, byte[][] buffers) {
-			super(pickerParameters, new int[14], timeSteps_ms, buffers, Sensor.ESC);
+		protected EscBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
+			super(pickerParameters, points, timeSteps_ms, buffers, Sensor.ESC);
 			if (buffers.length != 4) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
 
@@ -2020,7 +2063,7 @@ public class HoTTbinReader {
 		 */
 		protected abstract boolean parse();
 
-		public long getTimeStep_ms() {
+		protected long getTimeStep_ms() {
 			return this.timeSteps_ms[TIMESTEP_INDEX];
 		}
 

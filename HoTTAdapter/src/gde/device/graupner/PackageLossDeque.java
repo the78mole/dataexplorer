@@ -25,12 +25,12 @@ import java.util.Vector;
  * @author brueg
  *
  */
-public class ReverseChannelPackageLoss extends Vector<Integer> {
+public class PackageLossDeque extends Vector<Integer> {
 	private static final long	serialVersionUID	= 1L;
 	final int									integrationInterval;
 	int												lossCounter;
 
-	public ReverseChannelPackageLoss(int integrationCount) {
+	public PackageLossDeque(int integrationCount) {
 		super(integrationCount);
 		this.integrationInterval = integrationCount;
 		this.lossCounter = 0;
