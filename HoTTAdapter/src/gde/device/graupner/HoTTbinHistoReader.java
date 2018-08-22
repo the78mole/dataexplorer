@@ -282,6 +282,7 @@ public class HoTTbinHistoReader extends HoTTbinReader {
 							data_in.read(HoTTbinHistoReader.buf);
 							HoTTbinHistoReader.timeStep_ms += recordTimespan_ms;
 						}
+						HoTTbinHistoReader.isJustParsed = true;
 					}
 					// fill data block 0 receiver voltage and temperature
 					if (HoTTbinHistoReader.buf[33] == 0 && DataParser.parse2Short(HoTTbinHistoReader.buf, 0) != 0) {
