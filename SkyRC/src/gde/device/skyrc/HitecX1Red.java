@@ -829,9 +829,12 @@ public class HitecX1Red extends MC3000 implements IDevice {
 				try {
 					Channel activChannel = Channels.getInstance().getActiveChannel();
 					if (activChannel != null) {
+						log.log(Level.OFF, "Creating gathering thread");
 						this.dataGatherThread = new HitecX1RedGathererThread(this.application, this, this.usbPort, activChannel.getNumber(), this.getDialog());
+						log.log(Level.OFF, "Gathering thread created, USB interface claimed");
 						try {
 							if (this.dataGatherThread != null && this.usbPort.isConnected()) {
+								log.log(Level.OFF, "query system settings");
 								this.systemInfo[0] = new HitecX1Red.SystemInfo(this.usbPort.getSystemInfo(this.dataGatherThread.getUsbInterface(), HitecX1RedUsbPort.QuerySystemInfo.CHANNEL_A.value()));
 								this.systemSetting[0] = new HitecX1Red.SystemSetting(this.usbPort.getSystemSetting(this.dataGatherThread.getUsbInterface(), HitecX1RedUsbPort.QuerySystemSetting.CHANNEL_A.value()));
 
