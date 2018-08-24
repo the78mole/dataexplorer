@@ -44,12 +44,16 @@ import gde.utils.StringHelper;
  * Support sampling to maximize the throughput.
  */
 public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
-	final private static String	$CLASS_NAME					= HoTTbinHistoReader2.class.getName();
-	final private static Logger	log									= Logger.getLogger(HoTTbinHistoReader2.$CLASS_NAME);
+	private static final String	$CLASS_NAME									= HoTTbinHistoReader2.class.getName();
+	private static final Logger	log													= Logger.getLogger(HoTTbinHistoReader2.$CLASS_NAME);
 
+	/**
+	 * the high number of measurement records increases the probability for excessive max/min values
+	 */
+	private static final int		INITIALIZE_SAMPLING_FACTOR	= 3;
 
 	public HoTTbinHistoReader2(PickerParameters pickerParameters) {
-		super(pickerParameters, pickerParameters.analyzer.getActiveChannel().getNumber() == HoTTAdapter2.CHANNELS_CHANNEL_NUMBER);
+		super(pickerParameters, pickerParameters.analyzer.getActiveChannel().getNumber() == HoTTAdapter2.CHANNELS_CHANNEL_NUMBER, INITIALIZE_SAMPLING_FACTOR);
 	}
 
 	/**

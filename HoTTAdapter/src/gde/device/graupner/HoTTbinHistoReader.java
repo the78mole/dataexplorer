@@ -85,32 +85,39 @@ public class HoTTbinHistoReader {
 		void invoke();
 	}
 
-	protected final PickerParameters pickerParameters;
-	protected final Analyzer				analyzer;
-	protected final boolean					isChannelsChannelEnabled;
-	protected final boolean					isFilterEnabled;
-	protected final boolean					isFilterTextModus;
-	protected final Procedure				initTimer, readTimer, reviewTimer, addTimer, pickTimer, finishTimer;
+	protected final PickerParameters	pickerParameters;
+	protected final Analyzer					analyzer;
+	protected final boolean						isChannelsChannelEnabled;
+	protected final int								initializeSamplingFactor;
+	protected final boolean						isFilterEnabled;
+	protected final boolean						isFilterTextModus;
+	protected final Procedure					initTimer, readTimer, reviewTimer, addTimer, pickTimer, finishTimer;
 
-	protected long									nanoTime;
-	protected long									currentTime, initiateTime, readTime, reviewTime, addTime, pickTime, finishTime, lastTime;
+	protected long										nanoTime;
+	protected long										currentTime, initiateTime, readTime, reviewTime, addTime, pickTime, finishTime, lastTime;
 	/**
 	 * The detected sensors including the receiver but without 'channel'
 	 */
-	protected EnumSet<Sensor>				detectedSensors;
-	protected RecordSet							tmpRecordSet;
-	protected VaultCollector				truss;
+	protected EnumSet<Sensor>					detectedSensors;
+	protected RecordSet								tmpRecordSet;
+	protected VaultCollector					truss;
 
 	public HoTTbinHistoReader(PickerParameters pickerParameters) {
-		this(pickerParameters, pickerParameters.analyzer.getActiveChannel().getNumber() == Sensor.CHANNEL.getChannelNumber());
+		this(pickerParameters, pickerParameters.analyzer.getActiveChannel().getNumber() == Sensor.CHANNEL.getChannelNumber(), 1);
 	}
 
-	protected HoTTbinHistoReader(PickerParameters pickerParameters, boolean isChannelsChannelEnabled) {
+	/**
+	 * @param pickerParameters
+	 * @param isChannelsChannelEnabled true activates the channel measurements
+	 * @param initializeSamplingFactor increases the number of blocks for max/min evaluation and reduces the oversampling
+	 */
+	protected HoTTbinHistoReader(PickerParameters pickerParameters, boolean isChannelsChannelEnabled, int initializeSamplingFactor) {
 		this.pickerParameters = new PickerParameters(pickerParameters);
 		this.pickerParameters.isFilterEnabled = true;
 
 		this.analyzer = pickerParameters.analyzer;
 		this.isChannelsChannelEnabled = isChannelsChannelEnabled;
+		this.initializeSamplingFactor = initializeSamplingFactor;
 		this.isFilterEnabled = true;
 		this.isFilterTextModus = true;
 		this.detectedSensors = EnumSet.noneOf(Sensor.class);
@@ -197,7 +204,7 @@ public class HoTTbinHistoReader {
 				InputStream data_in = isSdFormat //
 						? new SdLogInputStream(in, truss.getVault().getLogFileLength(), new SdLogFormat(HoTTbinReaderX.headerSize, HoTTbinReaderX.footerSize, 64)) //
 						: in; ) {
-			int initializeBlockLimit = HoTTbinReader.LOG_RECORD_SCAN_START + HoTTbinReader.NUMBER_LOG_RECORDS_TO_SCAN;
+			int initializeBlockLimit = initializeSamplingFactor * (HoTTbinReader.LOG_RECORD_SCAN_START + HoTTbinReader.NUMBER_LOG_RECORDS_TO_SCAN);
 			int readLimitMark = initializeBlockLimit * HoTTbinHistoReader.DATA_BLOCK_SIZE + 1;
 			if (detectedSensors.size() <= 2) {
 				data_in.mark(readLimitMark); // reduces # of overscan records from 57 to 23 (to 38 with 1500 blocks)
