@@ -379,7 +379,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 										migrator.invoke();
 										isJustMigrated = true;
 										isReceiverData = false;
-										if (doFullRead) this.tmpRecordSet.addPoints(points, timeSteps_ms[BinParser.TIMESTEP_INDEX]); // todo activate sampling
+										pointsAdder.invoke();
 									}
 									varBinParser.parse();
 									migrationJobs.add(Sensor.VARIO);
@@ -393,7 +393,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 										migrator.invoke();
 										isJustMigrated = true;
 										isReceiverData = false;
-										if (doFullRead) tmpRecordSet.addPoints(points, timeSteps_ms[BinParser.TIMESTEP_INDEX]); // todo activate sampling
+										pointsAdder.invoke();
 									}
 									gpsBinParser.parse();
 									migrationJobs.add(Sensor.GPS);
@@ -407,7 +407,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 										migrator.invoke();
 										isJustMigrated = true;
 										isReceiverData = false;
-										if (doFullRead) tmpRecordSet.addPoints(points, timeSteps_ms[BinParser.TIMESTEP_INDEX]); // todo activate sampling
+										pointsAdder.invoke();
 									}
 									gamBinParser.parse();
 									migrationJobs.add(Sensor.GAM);
@@ -421,7 +421,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 										migrator.invoke();
 										isJustMigrated = true;
 										isReceiverData = false;
-										if (doFullRead) tmpRecordSet.addPoints(points, timeSteps_ms[BinParser.TIMESTEP_INDEX]); // todo activate sampling
+										pointsAdder.invoke();
 									}
 									eamBinParser.parse();
 									migrationJobs.add(Sensor.EAM);
@@ -435,7 +435,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 										migrator.invoke();
 										isJustMigrated = true;
 										isReceiverData = false;
-										if (doFullRead) tmpRecordSet.addPoints(points, timeSteps_ms[BinParser.TIMESTEP_INDEX]); // todo activate sampling
+										pointsAdder.invoke();
 									}
 									escBinParser.parse();
 									migrationJobs.add(Sensor.ESC);
