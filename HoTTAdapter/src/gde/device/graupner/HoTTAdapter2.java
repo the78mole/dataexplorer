@@ -20,6 +20,8 @@ package gde.device.graupner;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ import gde.exception.DataTypeException;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.device.IHistoDevice;
+import gde.histo.device.UniversalSampler;
 import gde.io.DataParser;
 import gde.io.FileHandler;
 import gde.log.Level;
@@ -663,24 +666,41 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						+ ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
 			}
 
-			if (this.histoRandomSample == null) {
-				recordSet.addNoneCalculationRecordsPoints(points,
-						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
-			}
-			else if (this.histoRandomSample.isValidSample(points,
-					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10)) {
-				recordSet.addNoneCalculationRecordsPoints(points,
-						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
-			}
+			recordSet.addNoneCalculationRecordsPoints(points,
+					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		if (this.histoRandomSample != null) {
-			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", recordSet.getChannelConfigName(), recordDataSize, //$NON-NLS-1$
-					this.histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), this.histoRandomSample.getOverSamplingCount()));
+		recordSet.syncScaleOfSyncableRecords();
+	}
+
+	/**
+	 * Add record data points from file stream to each measurement.
+	 * It is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
+	 * Do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * Reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+	 * @param recordSet is the target object holding the records (curves) which include measurement curves and calculated curves
+	 * @param dataBuffer holds rows for each time step (i = recordDataSize) with measurement data (j = recordNamesLength equals the number of measurements)
+	 * @param recordDataSize is the number of time steps
+	 */
+	@Override
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, int[] maxPoints, int[] minPoints) throws DataInconsitsentException {
+		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of max/min points differs: " + maxPoints.length + "/" + minPoints.length); //$NON-NLS-1$
+
+		int[] points = new int[recordSet.getNoneCalculationRecordNames().length]; // curve points for one single time step
+		int recordTimespan_ms = 10;
+		UniversalSampler histoRandomSample = UniversalSampler.createSampler(recordSet.getChannelConfigNumber(), maxPoints, minPoints, recordTimespan_ms);
+		IntBuffer intBuffer = ByteBuffer.wrap(dataBuffer).asIntBuffer(); // no performance penalty compared to familiar bit shifting solution
+		for (int i = 0, pointsLength = points.length; i < recordDataSize; i++) {
+			for (int j = 0, iOffset = i * pointsLength + recordDataSize; j < pointsLength; j++) {
+				points[j] = intBuffer.get(j + iOffset);
+			}
+			int timeStep_ms = intBuffer.get(i) / 10;
+			if (histoRandomSample.isValidSample(points, timeStep_ms)) recordSet.addNoneCalculationRecordsPoints(points, timeStep_ms);
 		}
 		recordSet.syncScaleOfSyncableRecords();
+		if (log.isLoggable(Level.FINE)) log.log(Level.INFO, String.format("%s processed: %,9d", recordSet.getChannelConfigName(), recordDataSize)); //$NON-NLS-1$
 	}
 
 	/**

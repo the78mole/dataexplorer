@@ -39,18 +39,12 @@ public interface IHistoDevice { //todo merging with IDevice later
 	/**
 	 * @return true if the device supports a native file import for histo purposes
 	 */
-	public boolean isHistoImportSupported();
-
-	/**
-	 * @return an empty string or the device's import file extention if the device supports a native file import for histo purposes (e.g. '.bin')
-	 */
-	@Deprecated // getSupportedImportExtentions()
-	public String getSupportedImportExtention();
+	boolean isHistoImportSupported();
 
 	/**
 	 * @return the device's native file extentions if the device supports histo imports (e.g. 'bin' or 'log')
 	 */
-	public List<String> getSupportedImportExtentions();
+	List<String> getSupportedImportExtentions();
 
 	/**
 	 * Create history recordSet and add record data size points from binary file to each measurement.
@@ -65,34 +59,36 @@ public interface IHistoDevice { //todo merging with IDevice later
 	 * @throws IOException
 	 * @return the histo vault list collected for the trusses (may contain vaults without measurements, settlements and scores)
 	 */
-	public List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException;
+	List<ExtendedVault> getRecordSetFromImportFile(Path filePath, Collection<VaultCollector> trusses) throws DataInconsitsentException, IOException, DataTypeException;
 
 	/**
-	 * Reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param channelNumber is the log channel number which may differ in case of channel mix
-	 * @param maxPoints maximum values from the data buffer which are verified during sampling
-	 * @param minPoints minimum values from the data buffer which are verified during sampling
-	 * @throws DataInconsitsentException
+	 * Add record data points from file stream to each measurement.
+	 * It is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
+	 * Do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * Reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+	 * @param recordSet is the target object holding the records (curves) which include measurement curves and calculated curves
+	 * @param dataBuffer holds rows for each time step (i = recordDataSize) with measurement data (j = recordNamesLength equals the number of measurements)
+	 * @param recordDataSize is the number of time steps
 	 */
-	public void setSampling(int channelNumber, int[] maxPoints, int[] minPoints) throws DataInconsitsentException;
+	void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] data_in, int recordDataSize, int[] maxPoints, int[] minPoints) throws DataInconsitsentException;
 
-	/**
+		/**
 	 * Import device specific *.bin data files
 	 * @param filePath
 	 */
-	public void importDeviceData(Path filePath);
+	void importDeviceData(Path filePath);
 
 	/**
 	 * Function to calculate values for inactive records, data not readable from device.
 	 * Extracted from makeInActiveDisplayable which performs activities related to the UI.
 	 */
-	public void calculateInactiveRecords(RecordSet recordSet);
+	void calculateInactiveRecords(RecordSet recordSet);
 
 	/**
 	 * Collect the settings relevant for the values inserted in the histo vault.
 	 * @return the settings which determine the measurement values returned by the reader
 	 */
-	public default String getReaderSettingsCsv() {
+	default String getReaderSettingsCsv() {
 		return GDE.STRING_EMPTY;
 	}
 }

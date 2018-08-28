@@ -531,10 +531,10 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 
 		if (histoRecordSet.getDevice() instanceof IHistoDevice) {
 			Map<PointsType, int[]> extrema = getExtremumValues(osdRecordSet, noneCalculationMeasurementNames);
-			((IHistoDevice) histoRecordSet.getDevice()).setSampling(truss.getLogChannelNumber(), extrema.get(PointsType.MAX), extrema.get(PointsType.MIN));
+			((IHistoDevice) histoRecordSet.getDevice()).addDataBufferAsRawDataPoints(histoRecordSet, buffer, recordDataSize, extrema.get(PointsType.MAX), extrema.get(PointsType.MIN));
+		} else {
+			histoRecordSet.getDevice().addDataBufferAsRawDataPoints(histoRecordSet, buffer, recordDataSize, false);
 		}
-		histoRecordSet.getDevice().addDataBufferAsRawDataPoints(histoRecordSet, buffer, recordDataSize, false);
-
 		return histoRecordSet;
 	}
 

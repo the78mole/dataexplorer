@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -243,7 +242,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	static double								latitudeToleranceFactor				= 90.0;
 	static double								longitudeToleranceFactor			= 25.0;
 
-	protected UniversalSampler	histoRandomSample;
 	protected List<String>			importExtentions							= null;
 
 	/**
@@ -879,79 +877,41 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						+ ((dataBuffer[3 + (j * 4) + index] & 0xff) << 0));
 			}
 
-			if (this.histoRandomSample == null) {
-				recordSet.addPoints(points,
-						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
-			} else if (this.histoRandomSample.isValidSample(points,
-					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10)) {
-				recordSet.addPoints(points,
-						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
-			}
+			recordSet.addPoints(points,
+					(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff) << 0)) / 10.0);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		if (this.histoRandomSample != null) {
-			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s > packages:%,9d  readings:%,9d  sampled:%,9d  overSampled:%4d", recordSet.getChannelConfigName(), recordDataSize, //$NON-NLS-1$
-						this.histoRandomSample.getReadingCount(), recordSet.getRecordDataSize(true), this.histoRandomSample.getOverSamplingCount()));
-		}
 		recordSet.syncScaleOfSyncableRecords();
 	}
 
 	/**
-	 * add record data size points from file stream to each measurement
-	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
-	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
-	 * since this is a long term operation the progress bar should be updated to signal business to user
-	 * reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param recordSet target object holding the records (curves) which include measurement curves and calculated curves
-	 * @param dataBuffer Holds rows for each time step (i = recordDataSize) with measurement data (j = recordNamesLength equals the number of measurements)
-	 * @param recordDataSize Number of time steps
-	 * @param doUpdateProgressBar
-	 * @throws DataInconsitsentException
+	 * Add record data points from file stream to each measurement.
+	 * It is possible to add only none calculation records if makeInActiveDisplayable calculates the rest.
+	 * Do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * Reduces memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
+	 * @param recordSet is the target object holding the records (curves) which include measurement curves and calculated curves
+	 * @param dataBuffer holds rows for each time step (i = recordDataSize) with measurement data (j = recordNamesLength equals the number of measurements)
+	 * @param recordDataSize is the number of time steps
 	 */
-	public void addDataBufferAsRawDataPointsTest(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		final String $METHOD_NAME = "addDataBufferAsRawDataPoints"; //$NON-NLS-1$
-		long currentTime, readTime = 0, addTime = 0, pickTime = 0, lastTime = System.nanoTime();
-		if (recordSet.getNoneCalculationRecordNames().length != recordSet.size()) {
-			throw new DataInconsitsentException(Messages.getString(gde.messages.MessageIds.GDE_MSGE0036,
-					new Object[] { this.getClass().getSimpleName(), $METHOD_NAME, recordSet.size(), recordSet.getNoneCalculationRecordNames().length }));
-			// log.log(Level.SEVERE, "RecordSet.size = " + pointsLength + " not equal to recordSet.getNoneCalculationRecordNames().length " + recordSet.getNoneCalculationRecordNames().length); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		log.log(Level.FINER, String.format("%s holds %,d time steps (rows) with %d measurements (columns)", recordSet.getChannelConfigName(), recordDataSize, recordSet.size())); //$NON-NLS-1$
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
-		int progressCycle = 1;
-		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+	@Override
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, int[] maxPoints, int[] minPoints) throws DataInconsitsentException {
+		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of max/min points differs: " + maxPoints.length + "/" + minPoints.length); //$NON-NLS-1$
 
-		IntBuffer intBuffer = ByteBuffer.wrap(dataBuffer).asIntBuffer(); // no performance penalty compared to familiar bit shifting solution
 		int[] points = new int[recordSet.size()]; // curve points for one single time step
-		for (int i = 0, pointsLength = recordSet.size(); i < recordDataSize; i++) {
+		int recordTimespan_ms = 10;
+		UniversalSampler histoRandomSample = UniversalSampler.createSampler(recordSet.getChannelConfigNumber(), maxPoints, minPoints, recordTimespan_ms);
+		IntBuffer intBuffer = ByteBuffer.wrap(dataBuffer).asIntBuffer(); // no performance penalty compared to familiar bit shifting solution
+		for (int i = 0, pointsLength = points.length; i < recordDataSize; i++) {
 			for (int j = 0, iOffset = i * pointsLength + recordDataSize; j < pointsLength; j++) {
 				points[j] = intBuffer.get(j + iOffset);
-				// if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, String.format("row%,9d column %2d value%,11d", i , j , points[j])); //$NON-NLS-1$
 			}
-			currentTime = System.nanoTime();
-			readTime += currentTime - lastTime;
-			lastTime = currentTime;
-			if (this.histoRandomSample == null) {
-				recordSet.addPoints(points, intBuffer.get(i) / 10.0);
-			} else if (this.histoRandomSample.isValidSample(points, intBuffer.get(i) / 10)) {
-				recordSet.addPoints(points, intBuffer.get(i) / 10.0);
-			}
-			// if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("%,11d: points[0..3] %,11d/%,11d/%,11d/%,11d", (int) timeStamp, points[0] , points[1], points[2] , points[3])); //$NON-NLS-1$ // currentTime = System.nanoTime();
-			currentTime = System.nanoTime();
-			addTime += currentTime - lastTime;
-			lastTime = currentTime;
-			currentTime = System.nanoTime();
-			pickTime += currentTime - lastTime;
-			lastTime = currentTime;
-			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
+			int timeStep_ms = intBuffer.get(i) / 10;
+			if (histoRandomSample.isValidSample(points, timeStep_ms)) recordSet.addPoints(points, timeStep_ms);
 		}
-		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		recordSet.syncScaleOfSyncableRecords();
-		if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("%s processed: %,9d", recordSet.getChannelConfigName(), recordDataSize)); //$NON-NLS-1$
-		if (log.isLoggable(Level.TIME)) log.log(Level.TIME,
-				String.format("readTime: %,9d  addTime: %,9d  pickTime: %,9d", TimeUnit.NANOSECONDS.toMillis(readTime), TimeUnit.NANOSECONDS.toMillis(addTime), TimeUnit.NANOSECONDS.toMillis(pickTime))); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.INFO, String.format("%s processed: %,9d", recordSet.getChannelConfigName(), recordDataSize)); //$NON-NLS-1$
 	}
 
 	/**
@@ -961,27 +921,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public boolean isHistoImportSupported() {
 		return this.getClass().equals(HoTTAdapter.class) && !this.getClass().equals(HoTTAdapterD.class) && !this.getClass().equals(HoTTAdapterM.class) && !this.getClass().equals(HoTTAdapterX.class)
 				&& !this.getClass().equals(HoTTViewer.class);
-	}
-
-	/**
-	 * @return an empty string or the device's import file extension if the device supports a native file import for histo purposes (e.g. '.bin')
-	 */
-	@Deprecated // getSupportedImportExtentions()
-	@Override
-	public String getSupportedImportExtention() {
-		String importExtention = GDE.STRING_EMPTY;
-		if (isHistoImportSupported()) {
-			String[] preferredFileExtentions = this.application.getActiveDevice().getDeviceConfiguration().getDataBlockType().getPreferredFileExtention().split(GDE.STRING_COMMA);
-			if (preferredFileExtentions != null && preferredFileExtentions.length != 0) {
-				for (String preferredFileExtention : preferredFileExtentions) {
-					if (preferredFileExtention.endsWith(GDE.FILE_ENDING_BIN)) {
-						importExtention = GDE.FILE_ENDING_DOT_BIN;
-						break;
-					}
-				}
-			}
-		}
-		return importExtention;
 	}
 
 	private void setSupportedImportExtentions() {
@@ -1001,19 +940,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public List<String> getSupportedImportExtentions() {
 		if (this.importExtentions == null) setSupportedImportExtentions();
 		return this.importExtentions;
-	}
-
-	/**
-	 * reduce memory and cpu load by taking measurement samples every x ms based on device setting |histoSamplingTime| .
-	 * @param maxPoints maximum values from the data buffer which are verified during sampling
-	 * @param minPoints minimum values from the data buffer which are verified during sampling
-	 * @throws DataInconsitsentException
-	 */
-	@Override
-	public void setSampling(int channelNumber, int[] maxPoints, int[] minPoints) throws DataInconsitsentException {
-		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of points"); //$NON-NLS-1$
-		int recordTimespan_ms = 10;
-		this.histoRandomSample = UniversalSampler.createSampler(channelNumber, maxPoints, minPoints, recordTimespan_ms);
 	}
 
 	/**
