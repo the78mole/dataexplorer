@@ -446,6 +446,8 @@ public class HistoExplorer {
 	 * Set menu items for the history analysis.
 	 */
 	public void updateHistoMenuItems() {
+		if (!hasRecords()) return;
+
 		final boolean isSmartStatistics = getTrailRecordSet().isSmartStatistics();
 		if (Thread.currentThread().getId() == this.application.getThreadId()) {
 			this.application.getMenuBar().getSmartStatisticsItem().setSelection(isSmartStatistics);

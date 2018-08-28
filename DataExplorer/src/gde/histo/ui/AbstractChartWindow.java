@@ -79,6 +79,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 
 		void setMeasuringActive(String recordKey, boolean enabled, boolean isDeltaMeasuring) {
 			if (Channels.getInstance().getActiveChannel() == null) return;
+			if (!DataExplorer.getInstance().getPresentHistoExplorer().hasRecords()) return;
 
 			TrailRecordSet trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet();
 			if (windowActor.getTrailRecordSet().containsKey(recordKey)) {
@@ -147,9 +148,11 @@ public abstract class AbstractChartWindow extends CTabItem {
 		}
 
 		void saveTemplate() {
-			TrailRecordSet trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet();
-			trailRecordSet.getTemplate().setHistoFileName(trailRecordSet.getTemplate().getDefaultHistoFileName());
-			trailRecordSet.saveTemplate();
+			if (DataExplorer.getInstance().getPresentHistoExplorer().hasRecords()) {
+				TrailRecordSet trailRecordSet = DataExplorer.getInstance().getPresentHistoExplorer().getTrailRecordSet();
+				trailRecordSet.getTemplate().setHistoFileName(trailRecordSet.getTemplate().getDefaultHistoFileName());
+				trailRecordSet.saveTemplate();
+			}
 		}
 
 		void setChartSashFormWeights(SelectorComposite composite) {

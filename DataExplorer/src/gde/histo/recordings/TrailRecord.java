@@ -378,7 +378,7 @@ public abstract class TrailRecord extends CommonRecord {
 	 */
 	@Override
 	public synchronized int size() {
-		return this.trailSelector.isTrailSuite() ? this.suiteRecords.realSize() : super.realSize();
+		return this.suiteRecords.getSuiteLength() > 0 &&  this.trailSelector.isTrailSuite() ? this.suiteRecords.realSize() : super.realSize();
 	}
 
 	/**

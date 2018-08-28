@@ -27,6 +27,8 @@ import java.util.Properties;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
+import com.sun.istack.internal.Nullable;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.data.Channels;
@@ -86,14 +88,19 @@ public final class TrailRecordSetFormatter {
 	}
 
 	public static String getFileNameLines(List<Integer> indices) {
-		String fileNameLines = indices.stream() //
-				.map(i -> Paths.get(getTrailRecordSet().getDataTagText(i, DataTag.FILE_PATH))) //
-				.map(Path::getFileName).map(Path::toString) //
-				.sorted(Comparator.reverseOrder()).limit(MAX_TOOLTIP_LINES).collect(Collectors.joining(GDE.STRING_NEW_LINE));
-		String suffix = indices.size() > MAX_TOOLTIP_LINES ? GDE.STRING_NEW_LINE + GDE.STRING_ELLIPSIS : "";
-		return fileNameLines + suffix;
+		TrailRecordSet trailRecordSet = getTrailRecordSet();
+		if (trailRecordSet != null) {
+			String fileNameLines = indices.stream().map(i -> trailRecordSet.getDataTagText(i, DataTag.FILE_PATH)) //
+					.map(Paths::get).map(Path::getFileName).map(Path::toString) //
+					.sorted(Comparator.reverseOrder()).limit(MAX_TOOLTIP_LINES).collect(Collectors.joining(GDE.STRING_NEW_LINE));
+			String suffix = indices.size() > MAX_TOOLTIP_LINES ? GDE.STRING_NEW_LINE + GDE.STRING_ELLIPSIS : "";
+			return fileNameLines + suffix;
+		} else {
+			return "";
+		}
 	}
 
+	@Nullable
 	private static TrailRecordSet getTrailRecordSet() {
 		TrailRecordSet trailRecordSet = null;
 		if (channels.getActiveChannel() != null) {

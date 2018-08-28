@@ -81,6 +81,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TaskBar;
 import org.eclipse.swt.widgets.TaskItem;
 
+import com.sun.istack.internal.Nullable;
+
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
 import gde.comm.IDeviceCommPort;
@@ -828,14 +830,14 @@ public class DataExplorer extends Composite {
 				this.settings.startMigationThread();
 				this.deviceConfigurationsThread.start();
 				this.deviceConfigurationsThread.join();
-				this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this); //re-initialize to handle updates due to migration 
+				this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this); //re-initialize to handle updates due to migration
 			}
 
 			// check initial application settings
 			if (!this.settings.isOK()) {
 				this.openSettingsDialog();
 			}
-			
+
 			// check configured device
 			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) {
 				this.deviceSelectionDialog.open();
@@ -2205,6 +2207,7 @@ public class DataExplorer extends Composite {
 	/**
 	 * @return the associated recordset - might be a compare / util / histo recordset
 	 */
+	@Nullable
 	public AbstractRecordSet getRecordSetOfVisibleTab() {
 		if (this.isRecordSetVisible(GraphicsType.NORMAL))
 			return this.getActiveRecordSet();

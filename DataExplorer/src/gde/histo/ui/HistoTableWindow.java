@@ -299,8 +299,8 @@ public class HistoTableWindow extends CTabItem {
 		this.dataTable.addListener(SWT.SetData, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				TrailRecordSet trailRecordSet = presentHistoExplorer.getTrailRecordSet();
-				if (trailRecordSet.size() > 0) {
+				if (presentHistoExplorer.hasRecords()) {
+					TrailRecordSet trailRecordSet = presentHistoExplorer.getTrailRecordSet();
 					TableItem item = (TableItem) event.item;
 					Vector<TrailRecord> currentRecords = trailRecordSet.getVisibleAndDisplayableRecordsForTable();
 					if (HistoTableWindow.this.dataTable.indexOf(item) < currentRecords.size()) {
@@ -407,33 +407,37 @@ public class HistoTableWindow extends CTabItem {
 	}
 
 	public boolean isHeaderTextValid() {
-		String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(presentHistoExplorer.getTrailRecordSet());
-		if (tableHeaderRow.length == this.dataTable.getColumnCount() - 2) {
-			boolean isValid = true;
-			for (int i = 0; i < tableHeaderRow.length; i++) {
-				isValid = tableHeaderRow[i].equals(this.dataTable.getColumn(i + 2).getText());
-				if (!isValid) //
-					break;
+		if (presentHistoExplorer.hasRecords()) {
+			String[] tableHeaderRow = HistoTableMapper.getTableHeaderRow(presentHistoExplorer.getTrailRecordSet());
+			if (tableHeaderRow.length == this.dataTable.getColumnCount() - 2) {
+				boolean isValid = true;
+				for (int i = 0; i < tableHeaderRow.length; i++) {
+					isValid = tableHeaderRow[i].equals(this.dataTable.getColumn(i + 2).getText());
+					if (!isValid) //
+						break;
+				}
+				return isValid;
 			}
-			return isValid;
-		} else
-			return false;
+		}
+		return false;
 	}
 
 	public boolean isRowTextAndTrailValid() {
 		boolean isValid = false;
-		TrailRecordSet trailRecordSet = presentHistoExplorer.getTrailRecordSet();
-		for (int j = 0; j < this.dataTable.getItems().length; j++) {
-			TableItem tableItem = this.dataTable.getItems()[j];
-			int index = HistoTableWindow.this.dataTable.indexOf(tableItem);
-			if (HistoTableWindow.this.dataTable.indexOf(tableItem) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
-				TrailRecord trailRecord = trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
-				isValid = tableItem.getText().equals(trailRecord.getTableRowHeader()) && tableItem.getText(1).equals(trailRecord.getTrailSelector().getTrailText());
-			} else {
-				isValid = tableItem.getText().isEmpty();
+		if (presentHistoExplorer.hasRecords()) {
+			TrailRecordSet trailRecordSet = presentHistoExplorer.getTrailRecordSet();
+			for (int j = 0; j < this.dataTable.getItems().length; j++) {
+				TableItem tableItem = this.dataTable.getItems()[j];
+				int index = HistoTableWindow.this.dataTable.indexOf(tableItem);
+				if (HistoTableWindow.this.dataTable.indexOf(tableItem) < trailRecordSet.getVisibleAndDisplayableRecordsForTable().size()) {
+					TrailRecord trailRecord = trailRecordSet.getVisibleAndDisplayableRecordsForTable().get(index);
+					isValid = tableItem.getText().equals(trailRecord.getTableRowHeader()) && tableItem.getText(1).equals(trailRecord.getTrailSelector().getTrailText());
+				} else {
+					isValid = tableItem.getText().isEmpty();
+				}
+				if (!isValid) //
+					break;
 			}
-			if (!isValid) //
-				break;
 		}
 		return isValid;
 	}
