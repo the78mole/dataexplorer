@@ -63,11 +63,12 @@ public final class RandomCandidate extends Candidate {
 	}
 
 	/**
+	 * @param points is the array of measurement points holding the current values corresponding to the timestamp
 	 * @param newSamplingTimespan_ms
 	 * @param newMaxMinObserver
 	 */
-	public RandomCandidate(int newSamplingTimespan_ms, MaxMinObserver newMaxMinObserver) {
-		super();
+	public RandomCandidate(int[] points, int newSamplingTimespan_ms, MaxMinObserver newMaxMinObserver) {
+		super(points);
 		this.samplingTimespan_ms = newSamplingTimespan_ms;
 		this.maxMinObserver = newMaxMinObserver;
 	}
@@ -81,10 +82,10 @@ public final class RandomCandidate extends Candidate {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("timeStep_ms=%,d isSampleTimePassed=%b isRandomCandidate=%b", this.timeStep_ms, this.isSampleTimePassed, this.isRandomCandidate));
+		sb.append(String.format("timeStep_ms=%,d isSampleTimePassed=%b isRandomCandidate=%b", this.sampleTimeStep_ms, this.isSampleTimePassed, this.isRandomCandidate));
 		sb.append("\n").append(String.format("nextStartTimeStamp_ms=%,d nextSamplingTimeStamp_ms=%,d isMinMax=%b timeSpanSamplingCount=%d", this.nextStartTimeStamp_ms, this.nextSamplingTimeStamp_ms, this.isMinMax, this.timeSpanSamplingCount));
-		if (this.points != null)
-			sb.append("\n").append(Arrays.toString(this.points));
+		if (this.samplePoints != null)
+			sb.append("\n").append(Arrays.toString(this.samplePoints));
 		else
 			sb.append("\n").append("no points");
 		return sb.toString();
@@ -97,8 +98,8 @@ public final class RandomCandidate extends Candidate {
 	 * @param rand
 	 * @return true if the candidate is a valid sample
 	 */
-	public boolean processSamplingCandidate(int[] newPoints, long newTimeStep_ms, RandomCandidate previousCandidate, Random rand) {
-		initialize(newPoints, newTimeStep_ms, previousCandidate, rand);
+	public boolean processPoints(long newTimeStep_ms, RandomCandidate previousCandidate, Random rand) {
+		initialize(newTimeStep_ms, previousCandidate, rand);
 
 		boolean isValidSample = isValidSample(previousCandidate);
 
@@ -109,7 +110,7 @@ public final class RandomCandidate extends Candidate {
 				++this.timeSpanSamplingCount;
 		}
 
-		log.finer(() -> String.format("%,12d isValidSample=%b", previousCandidate.timeStep_ms, isValidSample));
+		log.finer(() -> String.format("%,12d isValidSample=%b", previousCandidate.sampleTimeStep_ms, isValidSample));
 		return isValidSample;
 	}
 
@@ -121,7 +122,7 @@ public final class RandomCandidate extends Candidate {
 	 * @param previousCandidate
 	 * @param rand
 	 */
-	private void initialize(int[] newPoints, long newTimeStep_ms, RandomCandidate previousCandidate, Random rand) {
+	private void initialize(long newTimeStep_ms, RandomCandidate previousCandidate, Random rand) {
 		if (newTimeStep_ms >= previousCandidate.nextStartTimeStamp_ms) { // lastTimeStep was the last in the current sampling timespan
 			this.overSamplingCount = this.timeSpanSamplingCount > 0 ? this.timeSpanSamplingCount - 1 : 0;
 			this.isNewTimeSpan = true;
@@ -133,7 +134,7 @@ public final class RandomCandidate extends Candidate {
 			log.finer(() -> "******************** " + String.format("timeStep_ms=%d nextSamplingTimeStamp_ms=%d", newTimeStep_ms, this.nextSamplingTimeStamp_ms));
 
 			this.isRandomCandidate = newTimeStep_ms >= this.nextSamplingTimeStamp_ms;
-			this.isMinMax = this.maxMinObserver.update(newPoints, newTimeStep_ms, previousCandidate.points);
+			this.isMinMax = this.maxMinObserver.update(newTimeStep_ms, previousCandidate.samplePoints);
 
 			// the last sampling time span might not have a sample in case of a very late next sampling time stamp
 			if (previousCandidate.timeSpanSamplingCount == 0 && previousCandidate.nextStartTimeStamp_ms != 0) { // never take the very first record
@@ -149,16 +150,16 @@ public final class RandomCandidate extends Candidate {
 			this.timeSpanSamplingCount = previousCandidate.timeSpanSamplingCount;
 
 			this.isRandomCandidate = !this.isSampleTimePassed && newTimeStep_ms >= this.nextSamplingTimeStamp_ms;
-			this.isMinMax = this.maxMinObserver.update(newPoints, newTimeStep_ms, previousCandidate.points);
+			this.isMinMax = this.maxMinObserver.update(newTimeStep_ms, previousCandidate.samplePoints);
 		}
 
-		this.timeStep_ms = newTimeStep_ms;
+		this.sampleTimeStep_ms = newTimeStep_ms;
 		if (this.isMinMax || this.timeSpanSamplingCount == 0) { // only in these cases the candidate might be promoted to a valid sample
 			// copying makes the object immutable in term of the value set
-			this.points = Arrays.copyOf(newPoints, newPoints.length);
+			this.samplePoints = Arrays.copyOf(points, points.length);
 		} else {
 			// bypass copying the points for performance improvement
-			this.points = null;
+			this.samplePoints = null;
 		}
 
 		log.finer(() -> String.format("timeStep_ms=%,12d isSampleTimePassed=%b isRandomCandidate=%b", newTimeStep_ms, this.isSampleTimePassed, this.isRandomCandidate));
@@ -207,7 +208,7 @@ public final class RandomCandidate extends Candidate {
 		} else {
 			throw new UnsupportedOperationException("is never reached");
 		}
-		log.finer(() -> String.format("action=%-11s %,12d isLastMinMax=%b isLastRandomCandidate=%b isMinMax=%b isRandomCandidate=%b", predecessorAction.toString(), lastItem.timeStep_ms, lastItem.isMinMax, lastItem.isRandomCandidate, this.isMinMax, this.isRandomCandidate));
+		log.finer(() -> String.format("action=%-11s %,12d isLastMinMax=%b isLastRandomCandidate=%b isMinMax=%b isRandomCandidate=%b", predecessorAction.toString(), lastItem.sampleTimeStep_ms, lastItem.isMinMax, lastItem.isRandomCandidate, this.isMinMax, this.isRandomCandidate));
 
 		return predecessorAction == Action.FORCE_RELEASE || predecessorAction == Action.COMPENSATE_RELEASE && lastItem.timeSpanSamplingCount <= 0;
 	}

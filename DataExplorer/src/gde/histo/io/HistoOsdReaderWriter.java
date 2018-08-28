@@ -19,7 +19,6 @@
 package gde.histo.io;
 
 import static java.util.logging.Level.FINEST;
-import static java.util.logging.Level.INFO;
 
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -41,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import gde.Analyzer;
 import gde.GDE;
@@ -50,6 +50,7 @@ import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.ChannelTypes;
+import gde.device.IDevice;
 import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.NotSupportedFileFormatException;
@@ -58,6 +59,7 @@ import gde.histo.cache.VaultCollector;
 import gde.histo.device.IHistoDevice;
 import gde.histo.recordings.TrailRecordSet;
 import gde.io.OsdReaderWriter;
+import gde.log.Level;
 import gde.log.Logger;
 import gde.utils.FileUtils;
 import gde.utils.StringHelper;
@@ -169,7 +171,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 				// Channel currentChannel = channels.get(channels.getChannelNumber(channelConfig));
 				// 1.st try channelConfiguration not found
 				try { // get channel last digit and use as channel config ordinal : 'Channel/Configuration Name: 1 : Ausgang 1'
-					channel = channels.get(Integer.valueOf(channelConfig.substring(channelConfig.length() - 1)));
+					channel = channels.get(Integer.parseInt(channelConfig.substring(channelConfig.length() - 1)));
 					// channelConfigKey = channel.getChannelConfigKey();
 				}
 				catch (NumberFormatException e) {
@@ -180,7 +182,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 				}
 				if (channel == null) { // 2.nd try channelConfiguration not found
 					try { // try to get channel startsWith configuration name : 'Channel/Configuration Name: 1 : Receiver'
-						channel = channels.get(Integer.valueOf(channelConfig.split(GDE.STRING_BLANK)[0]));
+						channel = channels.get(Integer.parseInt(channelConfig.split(GDE.STRING_BLANK)[0]));
 						// channelConfigKey = channel.getChannelConfigKey();
 					}
 					catch (NullPointerException | NumberFormatException e) {
@@ -228,16 +230,17 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		}
 
 		/**
-		 * @return names of the sensors; RECEIVER if parsing was not successful.
+		 * Search the recordset comment for the sensor signature in the format '[RECEIVER,GAM,VARIO]'.
+		 * @return a csv list of names of the sensors or an empty string if parsing was not successful
 		 */
-		String[] getSensors() {
+		String getSensorSignature() {
 			String recordSetComment = getComment();
 			int idx1 = recordSetComment.indexOf(GDE.STRING_LEFT_BRACKET);
 			int idx2 = recordSetComment.indexOf(GDE.STRING_RIGHT_BRACKET);
 			if (idx1 > 0 && idx2 > idx1) {
-				return recordSetComment.substring(idx1 + 1, idx2).split(","); //$NON-NLS-1$
+				return recordSetComment.substring(idx1 + 1, idx2);
 			} else {
-				return new String[] { "RECEIVER" };
+				return "";
 			}
 		}
 
@@ -263,13 +266,14 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		}
 
 		/**
+		 * Search the recordset comment for package loss data in the format '\n<GDE_MSGI2404> = 1154 ~ 13,6 %'.
 		 * @return packagesLostCounter, packagesLostRatio, minPackagesLost_sec, maxPackagesLost_sec, avgPackagesLost_sec,
-		 *         sigmaPackagesLost_sec. null if parsing was not successful.
+		 *         sigmaPackagesLost_sec. zero if parsing was not successful.
 		 */
-		Double[] getPackageLoss() {
+		double[] getPackageLoss() {
 			String recordSetComment = getComment();
 			NumberFormat doubleFormat = NumberFormat.getInstance(Locale.getDefault());
-			Double[] values = new Double[6];
+			double[] values = new double[6];
 			// GDE_MSGI2404=\nVerlorene Rückkanalpakete = {0} ~ {1} % ({2})
 			// "min=%.2f sec; max=%.2f sec; avg=%.2f sec; sigma=%.2f sec"
 			int idx0 = recordSetComment.indexOf(GDE.STRING_NEW_LINE);
@@ -474,7 +478,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 
 					RecordSet histoRecordSet = constructRecordSet(data_in, osdRecordSet, vaultCollector.getVault(), analyzer);
 
-					final Integer[] scores = determineScores(osdRecordSet, elapsedStart_ns, histoRecordSet.getFileDataBytesSize(), vaultCollector.getVault().getLogFileLength());
+					final Integer[] scores = determineScores(osdRecordSet, elapsedStart_ns, histoRecordSet.getFileDataBytesSize(), vaultCollector.getVault().getLogFileLength(), analyzer.getActiveDevice());
 					vaultCollector.promoteTruss(histoRecordSet, scores);
 
 					histoVaults.add(vaultCollector.getVault());
@@ -495,8 +499,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 	 * @param recordSetDataPointer points to the stream position which shall be read next
 	 * @return the new value for the unreadDataPointer
 	 */
-	private static long skipUnreadData(DataInputStream data_in, long unreadDataPointer, final long recordSetDataPointer) throws IOException,
-			EOFException {
+	private static long skipUnreadData(DataInputStream data_in, long unreadDataPointer, long recordSetDataPointer) throws IOException, EOFException {
 		if (unreadDataPointer > -1) {
 			// make up all deferred readings in one single step
 			long toSkip = recordSetDataPointer - unreadDataPointer;
@@ -505,7 +508,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 				// The actual number of bytes skipped is returned.
 				toSkip -= data_in.skip(toSkip);
 				if (toSkip > 0) {
-					log.log(INFO, "toSkip=", toSkip); //$NON-NLS-1$
+					log.log(Level.INFO, String.format("recordSetDataPointer=%,9d toSkip=%,9d", recordSetDataPointer, toSkip)); //$NON-NLS-1$
 					if (data_in.available() == 0) throw new EOFException("recordDataSize / recordSetDataPointer do not match the actual file size"); //$NON-NLS-1$
 				}
 			}
@@ -561,12 +564,11 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 	 * @param elapsedStart_ns is the nanotime when the recordset evaluation was started
 	 * @param recordSetDataBytes is the number of bytes in the recordset data
 	 * @param fileLength is the number of bytes in the log file
+	 * @param iDevice
 	 * @return the scores (may contain null values to be filled in later)
 	 */
-	private static Integer[] determineScores(RecordSetParser osdRecordSet, long elapsedStart_ns, int recordSetDataBytes, long fileLength) {
+	private static Integer[] determineScores(RecordSetParser osdRecordSet, long elapsedStart_ns, int recordSetDataBytes, long fileLength, IDevice device) {
 		final HeaderParser osdHeader = osdRecordSet.getOsdHeader();
-		final Double[] packagesLost = osdRecordSet.getPackageLoss();
-		final String[] sensors = osdRecordSet.getSensors();
 		final Double logDataVersion = osdRecordSet.getFirmware();
 		final Integer[] scores = new Integer[ScoreLabelTypes.VALUES.length];
 
@@ -574,21 +576,39 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		// in order to avoid rounding errors for values below 1.0 (0.5 -> 0)
 		// scores for duration and timestep values are filled in by the HistoRecordSet
 		scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = osdRecordSet.getRecordDataSize();
-		scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = packagesLost[0] != null && packagesLost[1] != null && packagesLost[1] != 0
-				? (int) (packagesLost[0] * 100. / packagesLost[1]) : 0;
-		// recalculating the following scores from raw data would be feasible
-		scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = packagesLost[0] != null ? (int) (packagesLost[0].intValue()) : 0;
-		scores[ScoreLabelTypes.LOST_PACKAGES_PER_MILLE.ordinal()] = packagesLost[1] != null ? (int) (packagesLost[1] * 10. * 1000.) : 0; // % -> %o
-		scores[ScoreLabelTypes.LOST_PACKAGES_AVG_MS.ordinal()] = packagesLost[4] != null ? (int) (packagesLost[4] * 1000000.) : 0; // sec -> ms
-		scores[ScoreLabelTypes.LOST_PACKAGES_MAX_MS.ordinal()] = packagesLost[3] != null ? (int) (packagesLost[3] * 1000000.) : 0; // sec -> ms
-		scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = packagesLost[2] != null ? (int) (packagesLost[2] * 1000000.) : 0; // sec -> ms
-		scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = packagesLost[5] != null ? (int) (packagesLost[5] * 1000000.) : 0; // sec -> ms
-		scores[ScoreLabelTypes.SENSORS.ordinal()] = (sensors.length - 1) > 0 ? (sensors.length - 1) * 1000 : 0; // subtract Receiver
-		scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = Arrays.asList(sensors).contains("VARIO") ? 1000 : 0; //$NON-NLS-1$
-		scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = Arrays.asList(sensors).contains("GPS") ? 1000 : 0; //$NON-NLS-1$
-		scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = Arrays.asList(sensors).contains("GAM") ? 1000 : 0; //$NON-NLS-1$
-		scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = Arrays.asList(sensors).contains("EAM") ? 1000 : 0; //$NON-NLS-1$
-		scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = Arrays.asList(sensors).contains("ESC") ? 1000 : 0; //$NON-NLS-1$
+		if (device instanceof IHistoDevice) {
+			double[] packagesLost = osdRecordSet.getPackageLoss();
+			boolean[] activeSensors = ((IHistoDevice) device).getActiveSensors(osdRecordSet.getSensorSignature());
+			int sensorCount = (int) IntStream.range(0, activeSensors.length).filter(index -> activeSensors[index]).count();
+			// recalculating the following scores from raw data would be feasible
+			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = packagesLost[1] != 0 ? (int) (packagesLost[0] * 100. / packagesLost[1]) : 0;
+			scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = (int) packagesLost[0];
+			scores[ScoreLabelTypes.LOST_PACKAGES_PER_MILLE.ordinal()] = (int) (packagesLost[1] * 10. * 1000.); // % -> %o
+			scores[ScoreLabelTypes.LOST_PACKAGES_AVG_MS.ordinal()] = (int) (packagesLost[4] * 1000000.); // sec -> ms
+			scores[ScoreLabelTypes.LOST_PACKAGES_MAX_MS.ordinal()] = (int) (packagesLost[3] * 1000000.); // sec -> ms
+			scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = (int) (packagesLost[2] * 1000000.); // sec -> ms
+			scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = (int) (packagesLost[5] * 1000000.); // sec -> ms
+			scores[ScoreLabelTypes.SENSORS.ordinal()] = (sensorCount - 1) * 1000; // subtract Receiver
+			scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = activeSensors.length > 1 && activeSensors[1] ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = activeSensors.length > 2 && activeSensors[2] ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = activeSensors.length > 3 && activeSensors[3] ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = activeSensors.length > 4 && activeSensors[4] ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = activeSensors.length > 5 && activeSensors[5] ? 1000 : 0;
+		} else {
+			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = 0;
+			scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = 0;
+			scores[ScoreLabelTypes.LOST_PACKAGES_PER_MILLE.ordinal()] = 0;
+			scores[ScoreLabelTypes.LOST_PACKAGES_AVG_MS.ordinal()] = 0;
+			scores[ScoreLabelTypes.LOST_PACKAGES_MAX_MS.ordinal()] = 0;
+			scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = 0;
+			scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = 0;
+			scores[ScoreLabelTypes.SENSORS.ordinal()] = 0;
+			scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = 0;
+			scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = 0;
+			scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = 0;
+			scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = 0;
+			scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = 0;
+		}
 		scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = logDataVersion != null ? (int) (logDataVersion * 1000.) : 0; // Firmware
 		scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = (int) (osdHeader.getDataExplorerVersion() * 1000.); // from file
 		scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = osdHeader.getFileVersion() * 1000; // from file

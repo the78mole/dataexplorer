@@ -83,15 +83,13 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > MIN_FILENAME_LENGTH) {
-							Integer channelConfigNumber = HoTTAdapterX.this.application.getActiveChannelNumber();
-							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 
 							String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(selectedImportFile));
 							if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 
 							try {
-								HoTTbinReaderX.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
+								HoTTbinReaderX.read(selectedImportFile, HoTTAdapterX.this.pickerParameters); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
 								if (!isInitialSwitched) {
 									Channel receiverChannel = HoTTAdapterX.this.channels.get(1);
 									HoTTbinReader.channels.switchChannel(receiverChannel.getName());
@@ -135,7 +133,7 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 11);
 					tmpVoltageRx = (dataBuffer[6] & 0xFF);
 					tmpTemperatureRx = (dataBuffer[7] & 0xFF) - 20;
-					if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 120) {
+					if (!this.pickerParameters.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 120) {
 						points[0] = 0; // seams not part of live data ?? (dataBuffer[15] & 0xFF) * 1000;
 						points[1] = (dataBuffer[9] & 0xFF) * 1000;
 						points[2] = (dataBuffer[5] & 0xFF) * 1000;
@@ -163,7 +161,7 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 17);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 21);
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 25);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 20000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 20000) {
 						points[9] = tmpVoltage * 1000;
 						points[10] = DataParser.parse2Short(dataBuffer, 19) * 1000;
 						points[11] = tmpCurrent * 1000;
@@ -196,9 +194,9 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 12);
 					tmpVoltageRx = dataBuffer[15] & 0xFF;
 					tmpTemperatureRx = DataParser.parse2Short(dataBuffer, 10);
-					if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 100) {
-						HoTTAdapter.reverseChannelPackageLossCounter.add((dataBuffer[5] & 0xFF) == 0 && (dataBuffer[4] & 0xFF) == 0 ? 0 : 1);
-						points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;//(dataBuffer[16] & 0xFF) * 1000;
+					if (!this.pickerParameters.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 100) {
+						this.pickerParameters.reverseChannelPackageLossCounter.add((dataBuffer[5] & 0xFF) == 0 && (dataBuffer[4] & 0xFF) == 0 ? 0 : 1);
+						points[0] = this.pickerParameters.reverseChannelPackageLossCounter.getPercentage() * 1000;//(dataBuffer[16] & 0xFF) * 1000;
 						points[1] = (dataBuffer[17] & 0xFF) * 1000;
 						points[2] = (dataBuffer[14] & 0xFF) * 1000;
 						points[3] = tmpPackageLoss * 1000;
@@ -224,7 +222,7 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 18);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 20000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 20000) {
 						points[9] = tmpVoltage * 1000;
 						points[10] = DataParser.parse2Short(dataBuffer, 12) * 1000;
 						points[11] = tmpCurrent * 1000;

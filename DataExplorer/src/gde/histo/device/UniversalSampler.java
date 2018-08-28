@@ -45,23 +45,27 @@ public final class UniversalSampler {
 	private final static String		$CLASS_NAME				= UniversalSampler.class.getName();
 	private final static Logger		log								= Logger.getLogger($CLASS_NAME);
 
-	private final int							samplingTimespan_ms;																	// actual used timespan; one sample in this time span +
-																																											// potential oversampling samples
+	/**
+	 * actual used timespan; one sample in this time span + potential oversampling samples
+	 */
+	private final int							samplingTimespan_ms;
+	private final int[]						points;
+	private final Analyzer				analyzer;
+	private final MaxMinObserver	maxMinObserver;
+	private final Random					rand							= new Random();
 
 	private int										readingCount			= 0;
 	private int										samplingCount			= 0;
-
-	private final int							pointsLength;																					// supports internal points array with more elements than the
-																																											// external points
-	private final Analyzer				analyzer;
 
 	private Candidate							lastCandidate;
 
 	// for random sampling only
 	private Candidate							thisCandidate;																				// 2nd candidate pool element
 	private int										oversamplingCount	= 0;
-	private final MaxMinObserver	maxMinObserver;
-	private final Random					rand							= new Random();
+
+	private UniversalSampler(int channelNumber, int[] maxPoints, int[] minPoints, int newRecordTimespan_ms, Analyzer analyzer) {
+		this(channelNumber, new int[maxPoints.length], maxPoints, minPoints, newRecordTimespan_ms, analyzer);
+	}
 
 	/**
 	 * Decide if sampling is required.
@@ -71,10 +75,11 @@ public final class UniversalSampler {
 	 * @param minPoints measurement points with a length equal to the number of log measurement points
 	 * @param newRecordTimespan_ms log measurement rate
 	 */
-	private UniversalSampler(int channelNumber, int[] maxPoints, int[] minPoints, int newRecordTimespan_ms, Analyzer analyzer) {
+	private UniversalSampler(int channelNumber, int[] points, int[] maxPoints, int[] minPoints, int newRecordTimespan_ms, Analyzer analyzer) {
+		if (points.length != minPoints.length) throw new IllegalArgumentException();
 		if (maxPoints.length != minPoints.length) throw new IllegalArgumentException();
 
-		this.pointsLength = maxPoints.length;
+		this.points = points;
 		this.analyzer = analyzer;
 
 		// find the maximum sampling timespan
@@ -96,13 +101,13 @@ public final class UniversalSampler {
 		if (proposedTimespan_ms >= newRecordTimespan_ms) {
 			// sampling timespan must not be smaller than the recording timespan
 			this.samplingTimespan_ms = proposedTimespan_ms;
-			this.maxMinObserver = new MaxMinObserver(maxPoints, minPoints);
-			this.lastCandidate = new RandomCandidate(this.samplingTimespan_ms, this.maxMinObserver);
-			this.thisCandidate = new RandomCandidate(this.samplingTimespan_ms, this.maxMinObserver);
+			this.maxMinObserver = new MaxMinObserver(this.points, maxPoints, minPoints);
+			this.lastCandidate = new RandomCandidate(this.points, this.samplingTimespan_ms, this.maxMinObserver);
+			this.thisCandidate = new RandomCandidate(this.points, this.samplingTimespan_ms, this.maxMinObserver);
 		} else {
 			this.samplingTimespan_ms = -1;
 			this.maxMinObserver = null;
-			this.lastCandidate = new Candidate();
+			this.lastCandidate = new Candidate(this.points);
 			this.thisCandidate = null;
 		}
 		log.log(FINER, "", this); //$NON-NLS-1$
@@ -110,18 +115,19 @@ public final class UniversalSampler {
 
 	/**
 	 * @param channelNumber is the log channel number which may differ in case of channel mix
-	 * @param newPointsLength number of log measurement points
+	 * @param points are the log measurement points
 	 * @param newRecordTimespan_ms log measurement rate
-	 * @param analyzer defines the the requested device, channel, object 
+	 * @param analyzer defines the the requested device, channel, object
 	 * @return a new instance
 	 */
-	public static UniversalSampler createSampler(int channelNumber, int newPointsLength, int newRecordTimespan_ms, Analyzer analyzer) {
-		// reading a binFile with 500K records into a recordset takes 45 to 15 s; reading the file with 5k samples takes 0,60 to 0,35 s which is 1% to 2,5%
-		int[] tmpMaxPoints = new int[newPointsLength];
-		int[] tmpMinPoints = new int[newPointsLength];
+	public static UniversalSampler createSampler(int channelNumber, int[] points, int newRecordTimespan_ms, Analyzer analyzer) {
+		// reading a binFile with 500K records into a recordset takes 45 to 15 s;
+		// reading the file with 5k samples takes 0,60 to 0,35 s which is 1% to 2,5%
+		int[] tmpMaxPoints = new int[points.length];
+		int[] tmpMinPoints = new int[points.length];
 		Arrays.fill(tmpMaxPoints, Integer.MIN_VALUE);
 		Arrays.fill(tmpMinPoints, Integer.MAX_VALUE);
-		return new UniversalSampler(channelNumber, tmpMaxPoints, tmpMinPoints, newRecordTimespan_ms, analyzer);
+		return new UniversalSampler(channelNumber, points, tmpMaxPoints, tmpMinPoints, newRecordTimespan_ms, analyzer);
 	}
 
 	/**
@@ -129,7 +135,7 @@ public final class UniversalSampler {
 	 * @param maxPoints log measurement points with a length equal to the number of log measurement points
 	 * @param minPoints measurement points with a length equal to the number of log measurement points
 	 * @param newRecordTimespan_ms log measurement rate
-	 * @param analyzer defines the the requested device, channel, object 
+	 * @param analyzer defines the the requested device, channel, object
 	 * @return a new instance
 	 */
 	public static UniversalSampler createSampler(int channelNumber, int[] maxPoints, int[] minPoints, int newRecordTimespan_ms, Analyzer analyzer) {
@@ -138,7 +144,7 @@ public final class UniversalSampler {
 
 	@Override
 	public String toString() {
-		return String.format("pointsLength=%d  samplingTimespan_ms=%d userSamplingTimespan_ms=%d  readingCount=%d samplingCount=%d oversamplingCount=%d", this.pointsLength, this.samplingTimespan_ms, this.analyzer.getSettings().getSamplingTimespan_ms(), this.readingCount, this.samplingCount, this.oversamplingCount);
+		return String.format("pointsLength=%d  samplingTimespan_ms=%d userSamplingTimespan_ms=%d  readingCount=%d samplingCount=%d oversamplingCount=%d", points.length, this.samplingTimespan_ms, this.analyzer.getSettings().getSamplingTimespan_ms(), this.readingCount, this.samplingCount, this.oversamplingCount);
 	}
 
 	/**
@@ -149,14 +155,13 @@ public final class UniversalSampler {
 	 * Thus a premature sample is only taken if a minmax state has been detected which did not persist in the next measurement points
 	 * (oversampling case).
 	 * In all cases the sample is made ready for use one cycle later which results in loosing the last sample of the population.
-	 * @param newPoints
 	 * @param newTimeStep_ms
 	 * @return true if a valid sample is available which must be fetched by calling the properties getSamplePoints and getSampleTimeStep_ms
 	 */
-	public boolean isValidSample(int[] newPoints, long newTimeStep_ms) {
+	public boolean capturePoints(long newTimeStep_ms) {
 		boolean isValidSample;
 		if (!(this.lastCandidate instanceof RandomCandidate)) {
-			this.lastCandidate.processSample(newPoints, newTimeStep_ms);
+			this.lastCandidate.processSample(this.points, newTimeStep_ms);
 
 			isValidSample = true;
 			setCounters(1, 0, isValidSample);
@@ -165,7 +170,7 @@ public final class UniversalSampler {
 			RandomCandidate candidate = (RandomCandidate) this.lastCandidate;
 			// shift the current candidate
 			this.lastCandidate = this.thisCandidate;
-			isValidSample = candidate.processSamplingCandidate(newPoints, newTimeStep_ms, (RandomCandidate) this.lastCandidate, this.rand);
+			isValidSample = candidate.processPoints(newTimeStep_ms, (RandomCandidate) this.lastCandidate, this.rand);
 
 			int overSamplingIncrement = candidate.isNewTimeSpan() ? candidate.getOverSamplingCount() : 0;
 			setCounters(1, overSamplingIncrement, isValidSample);
@@ -187,7 +192,7 @@ public final class UniversalSampler {
 		}
 		this.oversamplingCount += overSamplingIncrement;
 		if (overSamplingIncrement > 0)
-			log.finer(() -> String.format("%,12d  ", this.lastCandidate.timeStep_ms) + String.format(String.format("%0" + this.oversamplingCount + "d", 0)));
+			log.finer(() -> String.format("%,12d  ", this.lastCandidate.sampleTimeStep_ms) + String.format(String.format("%0" + this.oversamplingCount + "d", 0)));
 	}
 
 	/**
@@ -199,12 +204,12 @@ public final class UniversalSampler {
 	public void setMaxMinPoints(int[] newMaxPoints, int[] newMinPoints) {
 		if (this.maxMinObserver != null) {
 			if (newMaxPoints.length == 0 || newMinPoints.length == 0) {
-				int[] maxPoints = new int[this.pointsLength];
+				int[] maxPoints = new int[points.length];
 				Arrays.fill(maxPoints, Integer.MIN_VALUE);
-				int[] minPoints = new int[this.pointsLength];
+				int[] minPoints = new int[points.length];
 				Arrays.fill(minPoints, Integer.MAX_VALUE);
 				this.maxMinObserver.setMaxMinPoints(maxPoints, minPoints);
-			} else if (this.pointsLength != newMaxPoints.length || this.pointsLength != newMinPoints.length) {
+			} else if (points.length != newMaxPoints.length || points.length != newMinPoints.length) {
 				throw new UnsupportedOperationException();
 			} else {
 				this.maxMinObserver.setMaxMinPoints(newMaxPoints, newMinPoints);
@@ -216,14 +221,14 @@ public final class UniversalSampler {
 	 * @return the points or null if there is no valid sample
 	 */
 	public int[] getSamplePoints() {
-		return this.lastCandidate.points;
+		return this.lastCandidate.samplePoints;
 	}
 
 	/**
 	 * @return the timestep
 	 */
 	public long getSampleTimeStep_ms() {
-		return this.lastCandidate.timeStep_ms;
+		return this.lastCandidate.sampleTimeStep_ms;
 	}
 
 	public int getReadingCount() {
@@ -244,6 +249,13 @@ public final class UniversalSampler {
 
 	public int[] getMinPoints() {
 		return this.maxMinObserver != null ? this.maxMinObserver.minPoints : new int[0];
+	}
+
+	/**
+	 * @return the points object required for the checking for a valid sample
+	 */
+	public int[] getPoints() {
+		return this.points;
 	}
 
 }

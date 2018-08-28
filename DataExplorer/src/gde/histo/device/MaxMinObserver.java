@@ -33,6 +33,7 @@ public class MaxMinObserver {
 	private final static String	$CLASS_NAME			= MaxMinObserver.class.getName();
 	private final static Logger	log							= Logger.getLogger($CLASS_NAME);
 
+	protected final int[]				points;
 	protected final int[]				minPoints;
 	protected final int[]				maxPoints;
 
@@ -50,8 +51,8 @@ public class MaxMinObserver {
 	 * true if the current candidate has changed the max or min value set
 	 */
 	private boolean							isThisChanged;
-
-	public MaxMinObserver(int[] newMaxPoints, int[] newMinPoints) {
+	public MaxMinObserver(int[] points, int[] newMaxPoints, int[] newMinPoints) {
+		this.points = points;
 		this.maxPoints = new int[newMaxPoints.length];
 		this.minPoints = new int[newMinPoints.length];
 		setMaxMinPoints(newMaxPoints, newMinPoints);
@@ -70,42 +71,36 @@ public class MaxMinObserver {
 
 	/**
 	 * Set the lastAutonomousExtremum property.
-	 * @param points
 	 * @param timeStep_ms
 	 * @param lastPoints
 	 * @return true if a new max or min value was found in the point set
 	 */
-	public boolean update(int[] points, long timeStep_ms, int[] lastPoints) {
+	public boolean update(long timeStep_ms, int[] lastPoints) {
 		boolean isLastChanged = this.isThisChanged;
 		this.isThisChanged = false;
 		this.isLastAutonomousExtremum = false;
 		{ // swap identifier lists
 			if (isLastChanged) {
-				List<Integer> tmpMaxIndices = this.lastMaxIndices;
-				List<Integer> tmpMinIndices = this.lastMinIndices;
 				this.lastMaxIndices = this.thisMaxIndices;
 				this.lastMinIndices = this.thisMinIndices;
-				tmpMaxIndices.clear();
-				tmpMinIndices.clear();
-				this.thisMaxIndices = tmpMaxIndices;
-				this.thisMinIndices = tmpMinIndices;
+				this.thisMaxIndices = new ArrayList<>();
+				this.thisMinIndices = new ArrayList<>();
 			}
 		}
-		for (int i = 0; i < points.length; i++) {
-			int point = points[i];
+		for (int i = 0; i < this.points.length; i++) {
+			int point = this.points[i];
 			if (point > this.maxPoints[i]) {
 				this.thisMaxIndices.add(i);
 				this.maxPoints[i] = point;
 				this.isThisChanged = true;
-			}
-			if (point < this.minPoints[i]) {
+			} else if (point < this.minPoints[i]) {
 				this.thisMinIndices.add(i);
 				this.minPoints[i] = point;
 				this.isThisChanged = true;
 			}
 		}
-		log.finer(() -> String.format("timeStep_ms=%,12d newMinMax=%b %s", timeStep_ms, this.isThisChanged, Arrays.toString(points)));
-		if (isLastChanged && this.isThisChanged) setLastAutonomousExtremum(points, timeStep_ms, lastPoints);
+		log.finer(() -> String.format("timeStep_ms=%,12d newMinMax=%b %s", timeStep_ms, this.isThisChanged, Arrays.toString(this.points)));
+		if (isLastChanged && this.isThisChanged) setLastAutonomousExtremum(timeStep_ms, lastPoints);
 		return this.isThisChanged;
 	}
 
@@ -113,16 +108,15 @@ public class MaxMinObserver {
 	 * Checks the new max/min values found in the last point set.
 	 * An autonomous extremum is a new extremum which does not occur in the current points.
 	 * In this case we need the last point set for oversampling in order not to miss an extremum value.
-	 * @param points
 	 * @param timeStep_ms
 	 * @param lastPoints
 	 */
-	private void setLastAutonomousExtremum(int[] points, long timeStep_ms, int[] lastPoints) {
+	private void setLastAutonomousExtremum(long timeStep_ms, int[] lastPoints) {
 		{
 			List<Integer> autonomousIndices = new ArrayList<>();
 			for (int j = 0; j < this.lastMaxIndices.size(); j++) {
-				Integer i = this.lastMaxIndices.get(j);
-				if (points[i] < lastPoints[i]) autonomousIndices.add(i);
+				int i = this.lastMaxIndices.get(j);
+				if (this.points[i] < lastPoints[i]) autonomousIndices.add(i);
 			}
 			if (!autonomousIndices.isEmpty()) {
 				this.isLastAutonomousExtremum = true;
@@ -132,8 +126,8 @@ public class MaxMinObserver {
 		{
 			List<Integer> autonomousIndices = new ArrayList<>();
 			for (int j = 0; j < this.lastMinIndices.size(); j++) {
-				Integer i = this.lastMinIndices.get(j);
-				if (points[i] > lastPoints[i]) autonomousIndices.add(i);
+				int i = this.lastMinIndices.get(j);
+				if (this.points[i] > lastPoints[i]) autonomousIndices.add(i);
 			}
 			if (!autonomousIndices.isEmpty()) {
 				this.isLastAutonomousExtremum = true;

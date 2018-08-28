@@ -92,4 +92,13 @@ public interface IHistoDevice { //todo merging with IDevice later
 	default String getReaderSettingsCsv() {
 		return GDE.STRING_EMPTY;
 	}
+
+	/**
+	 * Device specific array of active sensors.
+	 * The zero position is reserved for the receiver and is mandatory.
+	 * The array length and order is specific to the device (i.e. has at least one element).
+	 * @param sensorSignature is a csv list of valid sensor values (i.e. sensor names)
+	 * @return a boolean array with a length of all sensor entries. The ordinal positions holds true for the sensor ordinals in the {@code sensors} set.
+	 */
+	boolean[] getActiveSensors(String sensorSignature);
 }

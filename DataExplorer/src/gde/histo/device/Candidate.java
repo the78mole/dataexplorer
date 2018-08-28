@@ -21,16 +21,21 @@ package gde.histo.device;
 
 import java.util.Arrays;
 
+import com.sun.istack.internal.Nullable;
+
 /**
  * Sample candidate without any further selection support.
  * @author Thomas Eickert (USER)
  */
 public class Candidate {
 
-	protected int[]									points;
-	protected long									timeStep_ms	= -1;
+	protected final int[] 					points;
 
-	public Candidate() {
+	protected int[]									samplePoints;
+	protected long									sampleTimeStep_ms	= -1;
+
+	public Candidate(int[] points) {
+		this.points = points;
 	}
 
 	/**
@@ -45,9 +50,9 @@ public class Candidate {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("timeStep_ms=%,d", this.timeStep_ms));
-		if (this.points != null)
-			sb.append("\n").append(Arrays.toString(this.points));
+		sb.append(String.format("timeStep_ms=%,d", this.sampleTimeStep_ms));
+		if (this.samplePoints != null)
+			sb.append("\n").append(Arrays.toString(this.samplePoints));
 		else
 			sb.append("\n").append("no points");
 		return sb.toString();
@@ -58,22 +63,23 @@ public class Candidate {
 	 * @param newTimeStep_ms
 	 */
 	private void set(int[] newPoints, long newTimeStep_ms) {
-		this.points = newPoints;
-		this.timeStep_ms = newTimeStep_ms;
+		this.samplePoints = newPoints;
+		this.sampleTimeStep_ms = newTimeStep_ms;
 	}
 
 	/**
 	 * @return the points or null if there is no valid sample
 	 */
+	@Nullable
 	public int[] getSamplePoints() {
-		return this.points;
+		return this.samplePoints;
 	}
 
 	/**
 	 * @return the timestep or -1 if there is no valid sample
 	 */
 	public long getSampleTimeStep_ms() {
-		return this.timeStep_ms;
+		return this.sampleTimeStep_ms;
 	}
 
 }

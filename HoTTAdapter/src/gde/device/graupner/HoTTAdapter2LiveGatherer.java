@@ -46,9 +46,6 @@ import gde.utils.WaitTimer;
 public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 	final static Logger	logger	= Logger.getLogger(HoTTAdapter2LiveGatherer.class.getName());
 
-	/**
-	 * @throws Exception
-	 */
 	public HoTTAdapter2LiveGatherer(DataExplorer currentApplication, HoTTAdapter useDevice, HoTTAdapterSerialPort useSerialPort, HoTTAdapterDialog useDialog) throws Exception {
 		super(currentApplication, useDevice, useSerialPort, useDialog);
 	}
@@ -57,7 +54,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 	public void run() {
 		RecordSet recordSet = null;
 		int[] points = null;
-		HoTTAdapter.recordSets.clear();
+		HoTTAdapterLiveGatherer.recordSets.clear();
 		StringBuilder sb = new StringBuilder();
 		try {
 			if (!this.serialPort.isConnected()) {
@@ -67,8 +64,8 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 			this.serialPort.isInterruptedByUser = false;
 			long startTime = new Date().getTime();
 			//detect sensor type running a max of 3 times getting the sensor data
-			for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
-				HoTTAdapter.isSensorType[i] = false;
+			for (int i = 0; i < HoTTAdapterLiveGatherer.isSensorType.length; i++) {
+				HoTTAdapterLiveGatherer.isSensorType[i] = false;
 			}
 
 			//detect master slave mode, only in slave mode data are written to receive buffer without query
@@ -82,8 +79,8 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 				HoTTAdapter2LiveGatherer.logger.log(Level.FINE, "HoTTAdapter2.IS_SLAVE_MODE = " + HoTTAdapter.IS_SLAVE_MODE);
 
 				for (int i = 0; i < 3
-						&& (HoTTAdapter.isSensorType[0] == false && HoTTAdapter.isSensorType[1] == false && HoTTAdapter.isSensorType[2] == false && HoTTAdapter.isSensorType[3] == false
-								&& HoTTAdapter.isSensorType[4] == false && HoTTAdapter.isSensorType[5] == false); i++) {
+						&& (HoTTAdapterLiveGatherer.isSensorType[0] == false && HoTTAdapterLiveGatherer.isSensorType[1] == false && HoTTAdapterLiveGatherer.isSensorType[2] == false && HoTTAdapterLiveGatherer.isSensorType[3] == false
+								&& HoTTAdapterLiveGatherer.isSensorType[4] == false && HoTTAdapterLiveGatherer.isSensorType[5] == false); i++) {
 					try {
 						detectSensorType();
 					}
@@ -98,9 +95,9 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 					HoTTAdapter2LiveGatherer.logger.log(Level.WARNING, e.getMessage(), e);
 				}
 
-				boolean[] tmpSensorType = HoTTAdapter.isSensorType.clone();
+				boolean[] tmpSensorType = HoTTAdapterLiveGatherer.isSensorType.clone();
 				//0=isReceiver, 1=isVario, 2=isGPS, 3=isGeneral, 4=isElectric
-				for (int i = HoTTAdapter.isSensorType.length - 1; i >= 0; i--) {
+				for (int i = HoTTAdapterLiveGatherer.isSensorType.length - 1; i >= 0; i--) {
 					if (sb.length() == 0 && tmpSensorType[i]) {
 						sb.append(tmpSensorType[5] ? ">>>SpeedControler<<<" : tmpSensorType[4] ? ">>>Electric<<<" : tmpSensorType[3] ? ">>>General<<<" : tmpSensorType[2] ? ">>>GPS<<<"
 								: tmpSensorType[1] ? ">>>Vario<<<" : tmpSensorType[0] ? ">>>Receiver<<<" : "");
@@ -118,10 +115,10 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 				this.application.setStatusMessage(sb.toString(), SWT.COLOR_BLACK);
 
 				//no sensor type detected, seams only receiver is connected
-				if (HoTTAdapter.isSensorType[1] == false && HoTTAdapter.isSensorType[2] == false && HoTTAdapter.isSensorType[3] == false && HoTTAdapter.isSensorType[4] == false
-						&& HoTTAdapter.isSensorType[5] == false) {
+				if (HoTTAdapterLiveGatherer.isSensorType[1] == false && HoTTAdapterLiveGatherer.isSensorType[2] == false && HoTTAdapterLiveGatherer.isSensorType[3] == false && HoTTAdapterLiveGatherer.isSensorType[4] == false
+						&& HoTTAdapterLiveGatherer.isSensorType[5] == false) {
 					this.serialPort.setSensorType(this.serialPort.protocolType.ordinal() < 2 ? HoTTAdapter.SENSOR_TYPE_RECEIVER_19200 : HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
-					if (HoTTAdapter.isSensorType[0] == false) this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW2400));
+					if (HoTTAdapterLiveGatherer.isSensorType[0] == false) this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(MessageIds.GDE_MSGW2400));
 				}
 			}
 		}
@@ -161,7 +158,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 		this.channel = this.channels.get(this.device.getLastChannelNumber());
 		recordSet = RecordSet.createRecordSet(recordSetKey, this.device, this.device.getLastChannelNumber(), true, true, true);
 		this.channel.put(recordSetKey, recordSet);
-		HoTTAdapter.recordSets.put(HoTTAdapter2.Sensor.RECEIVER.value(), recordSet);
+		HoTTAdapterLiveGatherer.recordSets.put(HoTTAdapter2.Sensor.RECEIVER.value(), recordSet);
 		this.channel.applyTemplate(recordSetKey, true);
 		points = new int[recordSet.size()];
 
@@ -172,8 +169,8 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 		this.application.setStatusMessage(sb.toString(), SWT.COLOR_BLACK);
 
 		Vector<Integer> queryRing = new Vector<Integer>();
-		for (int i = 1; i < HoTTAdapter.isSensorType.length; ++i) {
-			if (HoTTAdapter.isSensorType[i]) queryRing.add(i);
+		for (int i = 1; i < HoTTAdapterLiveGatherer.isSensorType.length; ++i) {
+			if (HoTTAdapterLiveGatherer.isSensorType[i]) queryRing.add(i);
 		}
 		long measurementCount = 0;
 		final long startTime = System.nanoTime() / 1000000;
@@ -221,7 +218,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 					}
 					else {
 						//query receiver only in case other sensors doesn't get detected
-						if (HoTTAdapter.isSensorType[0] == true && !(HoTTAdapter.isSensorType[1] || HoTTAdapter.isSensorType[2] || HoTTAdapter.isSensorType[3] || HoTTAdapter.isSensorType[4] || HoTTAdapter.isSensorType[5])) {
+						if (HoTTAdapterLiveGatherer.isSensorType[0] == true && !(HoTTAdapterLiveGatherer.isSensorType[1] || HoTTAdapterLiveGatherer.isSensorType[2] || HoTTAdapterLiveGatherer.isSensorType[3] || HoTTAdapterLiveGatherer.isSensorType[4] || HoTTAdapterLiveGatherer.isSensorType[5])) {
 							try {
 								//always gather receiver data first, anserRx are used to fill RXSQ, VoltageRx and TemperatureRx
 								WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS);
@@ -303,7 +300,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 					}
 					break;
 				case TYPE_115200:
-					if (HoTTAdapter.isSensorType[0]) {
+					if (HoTTAdapterLiveGatherer.isSensorType[0]) {
 						try {
 							//always gather receiver data first, anserRx are used to fill RXSQ, VoltageRx and TemperatureRx
 							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_RECEIVER_115200);
@@ -396,7 +393,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 				if (queryRing.size() > 1) queryRing.add(queryRing.remove(0));
 
 				if (++measurementCount % 5 == 0) {
-					for (RecordSet tmpRecordSet : HoTTAdapter.recordSets.values()) {
+					for (RecordSet tmpRecordSet : HoTTAdapterLiveGatherer.recordSets.values()) {
 						this.device.updateVisibilityStatus(tmpRecordSet, true);
 					}
 				}
@@ -412,7 +409,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 			catch (DataInconsitsentException e) {
 				HoTTAdapter2LiveGatherer.logger.log(Level.SEVERE, e.getMessage(), e);
 				String message = Messages.getString(gde.messages.MessageIds.GDE_MSGE0028, new Object[] { e.getClass().getSimpleName(), e.getMessage() });
-				for (RecordSet tmpRecordSet : HoTTAdapter.recordSets.values()) {
+				for (RecordSet tmpRecordSet : HoTTAdapterLiveGatherer.recordSets.values()) {
 					cleanup(tmpRecordSet.getName(), message);
 				}
 			}
@@ -431,13 +428,13 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 			catch (Throwable e) {
 				HoTTAdapter2LiveGatherer.logger.log(Level.SEVERE, e.getMessage(), e);
 				this.application.openMessageDialogAsync(e.getClass().getSimpleName() + " - " + e.getMessage()); //$NON-NLS-1$
-				for (RecordSet tmpRecordSet : HoTTAdapter.recordSets.values()) {
+				for (RecordSet tmpRecordSet : HoTTAdapterLiveGatherer.recordSets.values()) {
 					finalizeRecordSet(tmpRecordSet);
 				}
 			}
 			WaitTimer.delay(HoTTAdapter.QUERY_GAP_MS); //make sure we have such a pause while receiving data even we have
 		}
-		for (RecordSet tmpRecordSet : HoTTAdapter.recordSets.values()) {
+		for (RecordSet tmpRecordSet : HoTTAdapterLiveGatherer.recordSets.values()) {
 			finalizeRecordSet(tmpRecordSet);
 		}
 		GDE.display.asyncExec(new Runnable() {

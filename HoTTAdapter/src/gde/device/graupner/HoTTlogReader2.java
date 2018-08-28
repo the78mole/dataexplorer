@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.RecordSet;
+import gde.device.graupner.HoTTAdapter.PickerParameters;
 import gde.exception.DataInconsitsentException;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -53,9 +54,10 @@ public class HoTTlogReader2 extends HoTTlogReader {
 	* @throws IOException
 	* @throws DataInconsitsentException
 	*/
-	public static synchronized void read(String filePath) throws Exception {
+	public static synchronized void read(String filePath, PickerParameters pickerParameters) throws Exception {
 		final String $METHOD_NAME = "read";
-		HashMap<String, String> fileInfoHeader = getFileInfo(new File(filePath));
+		HoTTlogReader.pickerParameters = pickerParameters;
+		HashMap<String, String> fileInfoHeader = getFileInfo(new File(filePath), pickerParameters);
 		final File file = new File(fileInfoHeader.get(HoTTAdapter.FILE_PATH));
 		long startTime = System.nanoTime() / 1000000;
 		FileInputStream file_input = new FileInputStream(file);

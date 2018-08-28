@@ -50,6 +50,7 @@ import gde.device.ChannelPropertyTypes;
 import gde.device.DataTypes;
 import gde.device.DeviceDialog;
 import gde.device.MeasurementPropertyTypes;
+import gde.device.graupner.HoTTAdapter.PickerParameters;
 import gde.device.graupner.hott.MessageIds;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
@@ -268,7 +269,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(java.util.logging.Level.FINEST, "enableChannelRecords.widgetSelected, event=" + evt); //$NON-NLS-1$
 								HoTTAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL, DataTypes.BOOLEAN, GDE.STRING_EMPTY + HoTTAdapterDialog.this.enableChannelRecords.getSelection());
-								HoTTAdapter.setChannelEnabledProperty(HoTTAdapterDialog.this.enableChannelRecords.getSelection());
+								HoTTAdapterDialog.this.device.setChannelEnabledProperty(HoTTAdapterDialog.this.enableChannelRecords.getSelection());
 								HoTTAdapterDialog.this.enableSaveButton(true);
 							}
 						});
@@ -570,7 +571,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "enableFilter.widgetSelected, event=" + evt); //$NON-NLS-1$
 							HoTTAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.ENABLE_FILTER, DataTypes.BOOLEAN, GDE.STRING_EMPTY + HoTTAdapterDialog.this.enableFilter.getSelection());
-							HoTTAdapter.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
+							HoTTAdapterDialog.this.device.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
 									HoTTAdapterDialog.this.tolrateSignLatitude.getSelection(),  HoTTAdapterDialog.this.tolerateSignLongitude.getSelection(),
 									HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
 							HoTTAdapterDialog.this.enableSaveButton(true);
@@ -593,7 +594,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "enableTextModusFilter.widgetSelected, event=" + evt); //$NON-NLS-1$
 							HoTTAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.TEXT_MODE, DataTypes.BOOLEAN, GDE.STRING_EMPTY + HoTTAdapterDialog.this.enableTextModusFilter.getSelection());
-							HoTTAdapter.setTextModusFilter(HoTTAdapterDialog.this.enableTextModusFilter.getSelection());
+							HoTTAdapterDialog.this.device.setTextModusFilter(HoTTAdapterDialog.this.enableTextModusFilter.getSelection());
 							HoTTAdapterDialog.this.enableSaveButton(true);
 						}
 					});
@@ -628,7 +629,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "filterFactorLatitudeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							HoTTAdapterDialog.this.device.setMeasurementPropertyValue(isHoTTAdapter ? 3 : HoTTAdapterDialog.this.tabFolder.getSelectionIndex()+1, isHoTTAdapter ? 1 : 13, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.DOUBLE, HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0);
-							HoTTAdapter.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
+							HoTTAdapterDialog.this.device.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
 									HoTTAdapterDialog.this.tolrateSignLatitude.getSelection(),  HoTTAdapterDialog.this.tolerateSignLongitude.getSelection(),
 									HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
 							HoTTAdapterDialog.this.enableSaveButton(true);
@@ -651,7 +652,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "tolrateSignLatitude.widgetSelected, event=" + evt); //$NON-NLS-1$
 							HoTTAdapterDialog.this.device.setMeasurementPropertyValue(isHoTTAdapter ? 3 : HoTTAdapterDialog.this.tabFolder.getSelectionIndex()+1, isHoTTAdapter ? 1 : 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value(), DataTypes.BOOLEAN, HoTTAdapterDialog.this.tolrateSignLatitude.getSelection());
-							HoTTAdapter.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
+							HoTTAdapterDialog.this.device.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
 									HoTTAdapterDialog.this.tolrateSignLatitude.getSelection(),  HoTTAdapterDialog.this.tolerateSignLongitude.getSelection(),
 									HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
 							HoTTAdapterDialog.this.enableSaveButton(true);
@@ -688,7 +689,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "filterFactorLongitudeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							HoTTAdapterDialog.this.device.setMeasurementPropertyValue(isHoTTAdapter ? 3 : HoTTAdapterDialog.this.tabFolder.getSelectionIndex()+1, isHoTTAdapter ? 2 : 14, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.DOUBLE, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
-							HoTTAdapter.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
+							HoTTAdapterDialog.this.device.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
 									HoTTAdapterDialog.this.tolrateSignLatitude.getSelection(),  HoTTAdapterDialog.this.tolerateSignLongitude.getSelection(),
 									HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
 							HoTTAdapterDialog.this.enableSaveButton(true);
@@ -711,7 +712,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "tolerateSignLongitude.widgetSelected, event=" + evt); //$NON-NLS-1$
 							HoTTAdapterDialog.this.device.setMeasurementPropertyValue(isHoTTAdapter ? 3 : HoTTAdapterDialog.this.tabFolder.getSelectionIndex()+1, isHoTTAdapter ? 2 : 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value(), DataTypes.BOOLEAN, HoTTAdapterDialog.this.tolerateSignLongitude.getSelection());
-							HoTTAdapter.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
+							HoTTAdapterDialog.this.device.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
 									HoTTAdapterDialog.this.tolrateSignLatitude.getSelection(),  HoTTAdapterDialog.this.tolerateSignLongitude.getSelection(),
 									HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
 							HoTTAdapterDialog.this.enableSaveButton(true);
@@ -736,6 +737,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								try {
 									String toolTipText = HoTTAdapter.getImportToolTip();
 									HoTTAdapterDialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, toolTipText, toolTipText);
+									PickerParameters pickerParameters = HoTTAdapterDialog.this.device.getPickerParameters();
 									HoTTAdapterDialog.this.lifeGatherer = HoTTAdapterDialog.this.device.getName().equals("HoTTAdapter") //$NON-NLS-1$
 									? new HoTTAdapterLiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this)
 											: new HoTTAdapter2LiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this);

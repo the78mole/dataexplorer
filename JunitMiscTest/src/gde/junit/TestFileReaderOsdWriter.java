@@ -36,6 +36,7 @@ import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.device.gpx.GPXDataReaderWriter;
 import gde.device.graupner.GeniusWizardLogReader;
+import gde.device.graupner.HoTTAdapter;
 import gde.device.graupner.HoTTbinReader;
 import gde.device.graupner.HoTTbinReader2;
 import gde.device.graupner.HoTTlogReader;
@@ -167,7 +168,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 								drawCurves(recordSet, 1024, 768);
 							}
 						}
-						
+
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
 
@@ -241,7 +242,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
-						
+
 						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
@@ -312,7 +313,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
-						
+
 						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
@@ -383,7 +384,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
-						
+
 						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
@@ -454,7 +455,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
-						
+
 						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
@@ -525,7 +526,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
-						
+
 						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
 						System.out.println("writing as   : " + absolutFilePath);
@@ -607,7 +608,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
-						
+
 						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_nmea.osd";
 						System.out.println("writing as   : " + absolutFilePath);
@@ -681,7 +682,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
-						
+
 						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_txt.osd";
 						System.out.println("writing as   : " + absolutFilePath);
@@ -758,7 +759,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
-						
+
 						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_csv.osd";
 						System.out.println("writing as   : " + absolutFilePath);
@@ -836,7 +837,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
-						
+
 						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_lov.osd";
 						System.out.println("writing as   : " + absolutFilePath);
@@ -893,7 +894,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
-						
+
 						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_gpx.osd";
 						System.out.println("writing as   : " + absolutFilePath);
@@ -945,7 +946,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						if (!new File(this.tmpDir1).exists())
 							throw new FileNotFoundException(this.tmpDir1);
-						
+
 						String absolutFilePath = this.tmpDir1 + file.getName();
 						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_igc.osd";
 						System.out.println("writing as   : " + absolutFilePath);
@@ -981,7 +982,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 		try {
 			if (!new File(this.tmpDir1).exists())
 				throw new FileNotFoundException(this.tmpDir1);
-			
+
 			List<File> files = FileUtils.getFileListing(new File(this.tmpDir1), 1);
 
 			for (File file : files) {
@@ -1433,7 +1434,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from bin log file");
 						activeChannel.setSaved(true);
 
-						HoTTbinReader.read(file.getAbsolutePath());
+						HoTTbinReader.read(file.getAbsolutePath(), ((HoTTAdapter) device).getPickerParameters());
 						RecordSet recordSet = activeChannel.getActiveRecordSet();
 
 						if (recordSet != null) {
@@ -1504,7 +1505,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from bin log file");
 						activeChannel.setSaved(true);
 
-						HoTTbinReader2.read(file.getAbsolutePath());
+						HoTTbinReader2.read(file.getAbsolutePath(), ((HoTTAdapter) device).getPickerParameters());
 						RecordSet recordSet = activeChannel.getActiveRecordSet();
 
 						if (recordSet != null) {
@@ -1579,7 +1580,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						activeChannel.setSaved(true);
 
 						try {
-							HoTTlogReader.read(file.getAbsolutePath());
+							HoTTlogReader.read(file.getAbsolutePath(), ((HoTTAdapter) device).getPickerParameters());
 						}
 						catch (DataTypeException e) {
 							// ignore not supported log files
@@ -1659,7 +1660,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						activeChannel.setSaved(true);
 
 						try {
-							HoTTlogReader2.read(file.getAbsolutePath());
+							HoTTlogReader2.read(file.getAbsolutePath(), ((HoTTAdapter) device).getPickerParameters());
 						}
 						catch (DataTypeException e) {
 							// ignore not supported log files

@@ -183,7 +183,7 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 		GDE.getUiNotification().setProgress(0);
 
 		try {
-			HoTTAdapter.recordSets.clear();
+			HoTTbinReader.recordSets.clear();
 			//ESC always contained
 			channel = GeniusWizardLogReader.channels.get(1);
 			channel.setFileDescription(GeniusWizardLogReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + GeniusWizardLogReader.application.getObjectKey() : date);

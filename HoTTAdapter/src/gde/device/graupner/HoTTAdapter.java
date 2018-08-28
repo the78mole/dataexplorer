@@ -29,10 +29,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -48,6 +48,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+
+import com.sun.istack.internal.Nullable;
 
 import gde.Analyzer;
 import gde.GDE;
@@ -95,7 +97,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	final static String											FILE_PATH													= "FilePath";																															//$NON-NLS-1$
 	final static String											SD_FORMAT													= "SD_FORMAT";																															//$NON-NLS-1$
 	final static String											DETECTED_SENSOR										= "DETECTED SENSOR";																															//$NON-NLS-1$
-	final static Map<String, RecordSet>			recordSets												= new HashMap<String, RecordSet>();
 
 	// HoTT sensor bytes 19200 Baud protocol
 	static boolean													IS_SLAVE_MODE											= false;
@@ -129,24 +130,24 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	final static boolean										isSwitchL[]												= { false, false, false, false, false, false, false, false };
 
 	final static int												QUERY_GAP_MS											= 30;
-	final static boolean										isSensorType[]										= { false, false, false, false, false, false, false };																																// isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
-
-	final static ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
 
 	public enum Sensor {
-		RECEIVER("Receiver", 1), //$NON-NLS-1$
-		VARIO("Vario", 2), //$NON-NLS-1$
-		GPS("GPS", 3), //$NON-NLS-1$
-		GAM("GAM", 4), //$NON-NLS-1$
-		EAM("EAM", 5), //$NON-NLS-1$
-		CHANNEL("Channel", 6), //$NON-NLS-1$
-		ESC("ESC", 7); //$NON-NLS-1$
+		RECEIVER(1, "Receiver", "RECEIVER"), //$NON-NLS-1$
+		VARIO(2, "Vario", "VARIO"), //$NON-NLS-1$
+		GPS(3, "GPS", "GPS"), //$NON-NLS-1$
+		GAM(4, "GAM", "GENERAL"), //$NON-NLS-1$
+		EAM(5, "EAM", "ELECTRIC"), //$NON-NLS-1$
+		ESC(7, "ESC", "?"), //$NON-NLS-1$
+		CHANNEL(6, "Channel", "N/A"); //$NON-NLS-1$
+
 		private final String				value;
+		private final String				detectedName;
 		private final int						channelNumber;
 		public static final Sensor	VALUES[]	= values();	// use this to avoid cloning if calling values()
 
-		private Sensor(String v, int channelNumber) {
-			this.value = v;
+		private Sensor(int channelNumber, String value, String detectedName) {
+			this.value = value;
+			this.detectedName = detectedName;
 			this.channelNumber = channelNumber;
 		}
 
@@ -158,6 +159,33 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			return Sensor.VALUES[ordinal];
 		}
 
+		@Nullable
+		public static Sensor fromSensorByte(byte sensorByte) {
+			Sensor sensor = null;
+			switch (sensorByte) {
+			case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
+				sensor = Sensor.VARIO;
+				break;
+			case HoTTAdapter.SENSOR_TYPE_GPS_19200:
+				sensor = Sensor.GPS;
+				break;
+			case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
+				sensor = Sensor.GAM;
+				break;
+			case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
+				sensor = Sensor.EAM;
+				break;
+			case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
+				sensor = Sensor.ESC;
+				break;
+			default:
+				//
+				break;
+			}
+			return sensor;
+		}
+
+		@Nullable
 		public static Sensor fromChannelNumber(int channelNumber) {
 			for (Sensor sensor : Sensor.VALUES) {
 				if (channelNumber == sensor.channelNumber) {
@@ -168,37 +196,92 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		}
 
 		/**
-		 * @return names of the sensors which are available (w/o receiver, w/o 'channels')
+		 * @param value is the name in the sensor signature
+		 * @return the sensor found
 		 */
-		public static List<String> getSensorNames() {
-			List<String> sensors = new ArrayList<String>();
-			for (int i = 0; i < HoTTAdapter.isSensorType.length; i++) {
-				if (HoTTAdapter.isSensorType[i]) sensors.add(HoTTAdapter.Sensor.fromOrdinal(i).name());
+		@Nullable
+		public static Sensor fromValue(String value) {
+			for (Sensor sensor : Sensor.VALUES) {
+				if (value.equals(sensor.value)) {
+					return sensor;
+				}
 			}
-			return sensors;
+			return null;
 		}
 
 		/**
-		 * @return channel numbers of the sensors which are available (including the receiver and 'channels')
+		 * @param detectedName is the name in the same pattern as the DETECTED SENSOR entry in a *.log file (e.g. RECEIVER,VARIO,GPS,GENERAL,)
+		 * @return the sensor found (ignoring casing)
 		 */
-		public static List<Integer> getChannelNumbers() {
-			List<Integer> result = new ArrayList<Integer>();
-			result.add(Sensor.RECEIVER.channelNumber); // always present
-			result.add(Sensor.CHANNEL.channelNumber); // always present
-			for (int i = 1; i < HoTTAdapter.isSensorType.length; i++) {
-				if (HoTTAdapter.isSensorType[i]) result.add(HoTTAdapter.Sensor.fromOrdinal(i).channelNumber);
+		@Nullable
+		public static Sensor fromDetectedName(String detectedName) {
+			for (Sensor sensor : Sensor.VALUES) {
+				if (detectedName.toUpperCase().equals(sensor.detectedName)) {
+					return sensor;
+				}
 			}
-			return result;
+			return null;
 		}
 
-		public static List<Sensor> getAsList() {
-			List<HoTTAdapter.Sensor> sensors = new ArrayList<HoTTAdapter.Sensor>();
-			for (Sensor sensor : Sensor.VALUES) {
-				sensors.add(sensor);
-			}
+		public static EnumSet<Sensor> getSetFromSignature(String sensorSignature) {
+			EnumSet<Sensor> sensors = Arrays.stream(sensorSignature.split(GDE.STRING_COMMA)).map((s) -> Sensor.fromValue(s)) //
+					.collect(Collectors.toCollection(() -> EnumSet.noneOf(Sensor.class)));
+			sensors.add(RECEIVER); // always present
+			sensors.remove(CHANNEL); // not a real sensor
 			return sensors;
 		}
-	};
+
+		public static EnumSet<Sensor> getSetFromDetected(String detectedSensors) {
+			EnumSet<Sensor> sensors = Arrays.stream(detectedSensors.split(GDE.STRING_COMMA)).map((s) -> Sensor.fromDetectedName(s)) //
+					.collect(Collectors.toCollection(() -> EnumSet.noneOf(Sensor.class)));
+			sensors.add(RECEIVER); // always present
+			sensors.remove(CHANNEL); // not a real sensor
+			return sensors;
+		}
+
+		public static StringBuilder getSetAsSignature(EnumSet<Sensor> sensors) {
+			EnumSet<Sensor> tmpSensors = sensors.clone();
+			tmpSensors.add(RECEIVER);
+			return new StringBuilder(tmpSensors.stream().map(s -> s.value).collect(Collectors.joining(GDE.STRING_COMMA)));
+		}
+
+		public static String getSetAsDetected(EnumSet<Sensor> sensors) {
+			EnumSet<Sensor> tmpSensors = sensors.clone();
+			tmpSensors.add(RECEIVER);
+			return tmpSensors.stream().map(s -> s.detectedName).collect(Collectors.joining(GDE.STRING_COMMA));
+		}
+
+		/**
+		 * @param sensors is a subset of the sensor entries
+		 * @return a boolean array with a length of all sensor entries. It holds true values for the sensors in the {@code sensors} set.
+		 */
+		public static boolean[] getActiveSensors(EnumSet<Sensor> sensors) {
+			boolean[] activeSensors = new boolean[VALUES.length];
+			for (int i = 0; i < VALUES.length; i++) {
+				Sensor sensor = VALUES[i];
+				activeSensors[i] = sensors.contains(sensor);
+			}
+			return activeSensors;
+		}
+
+		/**
+		 * @return channel numbers of the sensors including the receiver and 'channels'
+		 */
+		public static List<Integer> getChannelNumbers(EnumSet<Sensor> sensors) {
+			List<Integer> channelNumbers = new ArrayList<Integer>();
+			channelNumbers.add(RECEIVER.channelNumber); // always present
+			channelNumbers.add(CHANNEL.channelNumber); // always present
+			for (Sensor sensor : sensors) {
+				channelNumbers.add(sensor.channelNumber);
+			}
+			return channelNumbers;
+		}
+
+		public int getChannelNumber() {
+			return this.channelNumber;
+		}
+
+};
 
 	// protocol definitions
 	public enum Protocol {
@@ -232,19 +315,49 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		}
 	}
 
+	/**
+	 * Parameter object replacing some HoTTAdapter fields used by other classes.
+	 * Supports threadsafe access to these parameters.
+	 * @author Thomas Eickert (USER)
+	 */
+	public static final class PickerParameters {
+		/**
+		 * isReceiver, isVario, isGPS, isGeneral, isElectric, isMotorDriver
+		 * @deprecated as a NON-private field. The value, however,  is fully functional and is a replacement for the sensor signature.
+		 */
+		@Deprecated // todo use the methods in this class instead and change to private
+		// final boolean										isSensorType[]										= { false, false, false, false, false, false };
+		final ReverseChannelPackageLoss	reverseChannelPackageLossCounter	= new ReverseChannelPackageLoss(100);
+
+		boolean													isChannelsChannelEnabled					= false;
+		boolean													isFilterEnabled										= true;
+		boolean													isFilterTextModus									= true;
+		boolean													isTolerateSignChangeLatitude			= false;
+		boolean													isTolerateSignChangeLongitude			= false;
+		double													latitudeToleranceFactor						= 90.0;
+		double													longitudeToleranceFactor					= 25.0;
+
+		// UniversalSampler histoRandomSample;
+		// List<String> importExtentions = null;
+
+		/**
+		 * Collect the settings relevant for the values inserted in the histo vault.
+		 * @return the settings which determine the measurement values returned by the reader
+		 */
+		public String getReaderSettingsCsv() {
+			final String d = GDE.STRING_CSV_SEPARATOR;
+			return isFilterEnabled + d + isTolerateSignChangeLatitude + d + isTolerateSignChangeLongitude + d + latitudeToleranceFactor + d + longitudeToleranceFactor;
+		}
+
+	}
+
 	final DataExplorer					application;
 	final Channels							channels;
 	final Settings							settings;
 	final HoTTAdapterDialog			dialog;
 	final HoTTAdapterSerialPort	serialPort;
 
-	static boolean							isChannelsChannelEnabled			= false;
-	static boolean							isFilterEnabled								= true;
-	static boolean							isFilterTextModus							= true;
-	static boolean							isTolerateSignChangeLatitude	= false;
-	static boolean							isTolerateSignChangeLongitude	= false;
-	static double								latitudeToleranceFactor				= 90.0;
-	static double								longitudeToleranceFactor			= 25.0;
+	protected final PickerParameters pickerParameters = new PickerParameters();
 
 	protected List<String>			importExtentions							= null;
 
@@ -270,20 +383,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 
-		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" //$NON-NLS-1$
-				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : false;
-		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" //$NON-NLS-1$
-				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
-		HoTTAdapter.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != "" //$NON-NLS-1$
-				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : false;
-		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
-				? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
-		HoTTAdapter.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
-				? Boolean.parseBoolean(this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
-		HoTTAdapter.latitudeToleranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0
-				? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
-		HoTTAdapter.longitudeToleranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0
-				? Double.parseDouble(this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 25.0;
+		setPickerParameters();
 	}
 
 	/**
@@ -307,19 +407,23 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 
-		HoTTAdapter.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" //$NON-NLS-1$
+		setPickerParameters();
+	}
+
+	private void setPickerParameters() {
+		this.pickerParameters.isChannelsChannelEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue() != "" //$NON-NLS-1$
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()) : false;
-		HoTTAdapter.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" //$NON-NLS-1$
+		this.pickerParameters.isFilterEnabled = this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER) != null && this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue() != "" //$NON-NLS-1$
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
-		HoTTAdapter.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != "" //$NON-NLS-1$
+		this.pickerParameters.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != "" //$NON-NLS-1$
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : false;
-		HoTTAdapter.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
+		this.pickerParameters.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
 				? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
-		HoTTAdapter.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
+		this.pickerParameters.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
 				? Boolean.parseBoolean(this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
-		HoTTAdapter.latitudeToleranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0
+		this.pickerParameters.latitudeToleranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0
 				? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
-		HoTTAdapter.longitudeToleranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0
+		this.pickerParameters.longitudeToleranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0
 				? Double.parseDouble(this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 25.0;
 	}
 
@@ -329,8 +433,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 */
 	@Override
 	public String getReaderSettingsCsv() {
-		final String d = GDE.STRING_CSV_SEPARATOR;
-		return isFilterEnabled + d + isTolerateSignChangeLatitude + d + isTolerateSignChangeLongitude + d + latitudeToleranceFactor + d + longitudeToleranceFactor;
+		return this.pickerParameters.getReaderSettingsCsv();
 	}
 
 	/**
@@ -520,7 +623,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 11);
 					tmpVoltageRx = (dataBuffer[6] & 0xFF);
 					tmpTemperatureRx = (dataBuffer[7] & 0xFF);
-					if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 120) {
+					if (!this.pickerParameters.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 120) {
 						points[0] = 0; // seams not part of live data ?? (dataBuffer[15] & 0xFF) * 1000;
 						points[1] = (dataBuffer[9] & 0xFF) * 1000;
 						points[2] = (dataBuffer[5] & 0xFF) * 1000;
@@ -539,13 +642,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					// 0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 					points[0] = (dataBuffer[9] & 0xFF) * 1000;
 					tmpHeight = DataParser.parse2Short(dataBuffer, 16);
-					if (!HoTTAdapter.isFilterEnabled || tmpHeight > 10 && tmpHeight < 5000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpHeight > 10 && tmpHeight < 5000) {
 						points[1] = tmpHeight * 1000;
 						points[2] = DataParser.parse2Short(dataBuffer, 22) * 1000;
 					}
 					tmpClimb3 = DataParser.parse2Short(dataBuffer, 24);
 					tmpClimb10 = DataParser.parse2Short(dataBuffer, 26);
-					if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 20000 && tmpClimb10 > 20000 && tmpClimb3 < 40000 && tmpClimb10 < 40000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpClimb3 > 20000 && tmpClimb10 > 20000 && tmpClimb3 < 40000 && tmpClimb10 < 40000) {
 						points[3] = tmpClimb3 * 1000;
 						points[4] = tmpClimb10 * 1000;
 					}
@@ -561,7 +664,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					tmpLongitude = DataParser.parse2Short(dataBuffer, 25);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 31);
 					tmpClimb3 = dataBuffer[35] & 0xFF;
-					if (!HoTTAdapter.isFilterEnabled || (tmpLatitude == tmpLongitude || tmpLatitude > 0) && tmpHeight > 10 && tmpHeight < 5000 && tmpClimb3 > 80) {
+					if (!this.pickerParameters.isFilterEnabled || (tmpLatitude == tmpLongitude || tmpLatitude > 0) && tmpHeight > 10 && tmpHeight < 5000 && tmpClimb3 > 80) {
 						points[0] = (dataBuffer[9] & 0xFF) * 1000;
 						points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
 						points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
@@ -589,7 +692,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					tmpClimb3 = dataBuffer[37] & 0xFF;
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 22);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 24);
-					if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
 						points[0] = (dataBuffer[9] & 0xFF) * 1000;
 						points[1] = tmpVoltage * 1000;
 						points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
@@ -629,7 +732,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					tmpClimb3 = dataBuffer[46] & 0xFF;
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 30);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 32);
-					if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
 						points[0] = (dataBuffer[9] & 0xFF) * 1000;
 						points[1] = tmpVoltage * 1000;
 						points[2] = DataParser.parse2Short(dataBuffer, 38) * 1000;
@@ -666,7 +769,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 16);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 24);
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 28);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) {
 						points[1] = tmpVoltage * 1000;
 						points[2] = tmpCurrent * 1000;
 						points[3] = DataParser.parse2Short(dataBuffer, 20) * 1000;
@@ -687,9 +790,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					tmpPackageLoss = DataParser.parse2Short(dataBuffer, 12);
 					tmpVoltageRx = dataBuffer[15] & 0xFF;
 					tmpTemperatureRx = (DataParser.parse2Short(dataBuffer, 10) + 20);
-					if (!HoTTAdapter.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 100) {
-						HoTTAdapter.reverseChannelPackageLossCounter.add((dataBuffer[5] & 0xFF) == 0 && (dataBuffer[4] & 0xFF) == 0 ? 0 : 1);
-						points[0] = HoTTAdapter.reverseChannelPackageLossCounter.getPercentage() * 1000;// (dataBuffer[16] & 0xFF) * 1000;
+					if (!this.pickerParameters.isFilterEnabled || tmpPackageLoss > -1 && tmpVoltageRx > -1 && tmpVoltageRx < 100 && tmpTemperatureRx < 100) {
+						this.pickerParameters.reverseChannelPackageLossCounter.add((dataBuffer[5] & 0xFF) == 0 && (dataBuffer[4] & 0xFF) == 0 ? 0 : 1);
+						points[0] = this.pickerParameters.reverseChannelPackageLossCounter.getPercentage() * 1000;// (dataBuffer[16] & 0xFF) * 1000;
 						points[1] = (dataBuffer[17] & 0xFF) * 1000;
 						points[2] = (dataBuffer[14] & 0xFF) * 1000;
 						points[3] = tmpPackageLoss * 1000;
@@ -707,13 +810,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					// 0=RXSQ, 1=Height, 2=Climb, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
 					points[0] = (dataBuffer[3] & 0xFF) * 1000;
 					tmpHeight = DataParser.parse2Short(dataBuffer, 10) + 500;
-					if (!HoTTAdapter.isFilterEnabled || tmpHeight > 10 && tmpHeight < 5000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpHeight > 10 && tmpHeight < 5000) {
 						points[1] = tmpHeight * 1000;
 						points[2] = (DataParser.parse2Short(dataBuffer, 16) + 30000) * 1000;
 					}
 					tmpClimb3 = DataParser.parse2Short(dataBuffer, 18) + 30000;
 					tmpClimb10 = DataParser.parse2Short(dataBuffer, 20) + 30000;
-					if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 20000 && tmpClimb10 > 20000 && tmpClimb3 < 40000 && tmpClimb10 < 40000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpClimb3 > 20000 && tmpClimb10 > 20000 && tmpClimb3 < 40000 && tmpClimb10 < 40000) {
 						points[3] = tmpClimb3 * 1000;
 						points[4] = tmpClimb10 * 1000;
 					}
@@ -729,7 +832,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					tmpLongitude = DataParser.parse2Short(dataBuffer, 20);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 14) + 500;
 					tmpClimb3 = dataBuffer[30] + 120;
-					if (!HoTTAdapter.isFilterEnabled || (tmpLatitude == tmpLongitude || tmpLatitude > 0) && tmpHeight > 10 && tmpHeight < 5000 && tmpClimb3 > 80) {
+					if (!this.pickerParameters.isFilterEnabled || (tmpLatitude == tmpLongitude || tmpLatitude > 0) && tmpHeight > 10 && tmpHeight < 5000 && tmpClimb3 > 80) {
 						points[0] = (dataBuffer[3] & 0xFF) * 1000;
 						points[1] = tmpLatitude * 10000 + DataParser.parse2Short(dataBuffer, 18);
 						points[1] = dataBuffer[26] == 1 ? -1 * points[1] : points[1];
@@ -757,7 +860,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					tmpClimb3 = dataBuffer[44] + 120;
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 22);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 24);
-					if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
 						points[0] = (dataBuffer[3] & 0xFF) * 1000;
 						points[1] = tmpVoltage * 1000;
 						points[2] = DataParser.parse2Short(dataBuffer, 34) * 1000;
@@ -797,7 +900,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					tmpClimb3 = dataBuffer[56] + 120;
 					tmpVoltage1 = DataParser.parse2Short(dataBuffer, 38);
 					tmpVoltage2 = DataParser.parse2Short(dataBuffer, 40);
-					if (!HoTTAdapter.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpClimb3 > 80 && tmpHeight > 10 && tmpHeight < 5000 && Math.abs(tmpVoltage1) < 600 && Math.abs(tmpVoltage2) < 600 && tmpCapacity >= points[3] / 1000) {
 						points[0] = (dataBuffer[3] & 0xFF) * 1000;
 						points[1] = DataParser.parse2Short(dataBuffer, 50) * 1000;
 						points[2] = DataParser.parse2Short(dataBuffer, 48) * 1000;
@@ -833,7 +936,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					tmpVoltage = DataParser.parse2Short(dataBuffer, 10);
 					tmpCurrent = DataParser.parse2Short(dataBuffer, 14);
 					tmpRevolution = DataParser.parse2Short(dataBuffer, 18);
-					if (!HoTTAdapter.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) {
+					if (!this.pickerParameters.isFilterEnabled || tmpVoltage > -1 && tmpVoltage < 1000 && tmpCurrent < 2550 && tmpRevolution > -1 && tmpRevolution < 2000) {
 						points[1] = tmpVoltage * 1000;
 						points[2] = tmpCurrent * 1000;
 						points[3] = DataParser.parse2Short(dataBuffer, 22) * 1000;
@@ -865,13 +968,12 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		int[] points = new int[recordSet.size()];
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+					String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 1;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 		int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
 		int index = 0;
-
 		for (int i = 0; i < recordDataSize; i++) {
 			index = i * dataBufferSize + timeStampBufferSize;
 			if (HoTTAdapter.log.isLoggable(java.util.logging.Level.FINER)) HoTTAdapter.log.log(java.util.logging.Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
@@ -903,16 +1005,16 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, int[] maxPoints, int[] minPoints, Analyzer analyzer) throws DataInconsitsentException {
 		if (maxPoints.length != minPoints.length || maxPoints.length == 0) throw new DataInconsitsentException("number of max/min points differs: " + maxPoints.length + "/" + minPoints.length); //$NON-NLS-1$
 
-		int[] points = new int[recordSet.size()]; // curve points for one single time step
 		int recordTimespan_ms = 10;
 		UniversalSampler histoRandomSample = UniversalSampler.createSampler(recordSet.getChannelConfigNumber(), maxPoints, minPoints, recordTimespan_ms, analyzer);
+		int[] points = histoRandomSample.getPoints();
 		IntBuffer intBuffer = ByteBuffer.wrap(dataBuffer).asIntBuffer(); // no performance penalty compared to familiar bit shifting solution
 		for (int i = 0, pointsLength = points.length; i < recordDataSize; i++) {
 			for (int j = 0, iOffset = i * pointsLength + recordDataSize; j < pointsLength; j++) {
 				points[j] = intBuffer.get(j + iOffset);
 			}
 			int timeStep_ms = intBuffer.get(i) / 10;
-			if (histoRandomSample.isValidSample(points, timeStep_ms)) recordSet.addPoints(points, timeStep_ms);
+			if (histoRandomSample.capturePoints(timeStep_ms)) recordSet.addPoints(points, timeStep_ms);
 		}
 		recordSet.syncScaleOfSyncableRecords();
 		if (log.isLoggable(Level.FINE)) log.log(Level.INFO, String.format("%s processed: %,9d", recordSet.getChannelConfigName(), recordDataSize)); //$NON-NLS-1$
@@ -969,7 +1071,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			throws DataInconsitsentException, IOException, DataTypeException {
 		String fileEnding = PathUtils.getFileExtention(truss.getVault().getLoadFilePath());
 		if (GDE.FILE_ENDING_DOT_BIN.equals(fileEnding)) {
-			HoTTbinHistoReader.read(inputStream, truss);
+			HoTTbinHistoReader.read(inputStream, truss, this.pickerParameters);
 		} else if (GDE.FILE_ENDING_DOT_LOG.equals(fileEnding)) {
 			// todo implement HoTTlogHistoReader
 		} else {
@@ -1206,8 +1308,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						HoTTAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > MIN_FILENAME_LENGTH) {
-							Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
-							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 							// String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 
 							String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(selectedImportFile));
@@ -1215,10 +1315,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 							try {
 								if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN)) {
-									HoTTbinReader.read(selectedImportFile);
+									HoTTbinReader.read(selectedImportFile, HoTTAdapter.this.pickerParameters);
 								}
 								else if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
-									HoTTlogReader.read(selectedImportFile);
+									HoTTlogReader.read(selectedImportFile, HoTTAdapter.this.pickerParameters);
 								}
 								if (!isInitialSwitched) {
 									if (HoTTAdapter.this.application.getActiveChannel().getActiveRecordSet() == null) {
@@ -1286,21 +1386,19 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 							channel.clear();
 						}
 
-						Integer channelConfigNumber = HoTTAdapter.this.application.getActiveChannelNumber();
-						channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
 						try {
 							if (HoTTAdapter.this.getClass().equals(HoTTAdapter.class))
-								HoTTbinReader.read(filePath.toString());
+								HoTTbinReader.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
 							else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2.class))
-								HoTTbinReader2.read(filePath.toString());
+								HoTTbinReader2.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
 							else if (HoTTAdapter.this.getClass().equals(HoTTAdapter2M.class))
-								HoTTbinReader2.read(filePath.toString());
+								HoTTbinReader2.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
 							else if (HoTTAdapter.this.getClass().equals(HoTTAdapterD.class))
-								HoTTbinReaderD.read(filePath.toString());
+								HoTTbinReaderD.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
 							else if (HoTTAdapter.this.getClass().equals(HoTTAdapterM.class))
-								HoTTbinReader.read(filePath.toString());
+								HoTTbinReader.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
 							else if (HoTTAdapter.this.getClass().equals(HoTTAdapterX.class))
-								HoTTbinReaderX.read(filePath.toString());
+								HoTTbinReaderX.read(filePath.toString(), HoTTAdapter.this.pickerParameters);
 							else
 								throw new UnsupportedOperationException();
 
@@ -1524,20 +1622,20 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/**
 	 * @param isFilterEnabled the isFilterEnabled to set
 	 */
-	public static synchronized void setFilterProperties(boolean isFilterEnabled, boolean isTolerateSignChangeLatitude, boolean isTolerateSignChangeLongitude, double latitudeTolranceFactor,
+	public synchronized void setFilterProperties(boolean isFilterEnabled, boolean isTolerateSignChangeLatitude, boolean isTolerateSignChangeLongitude, double latitudeTolranceFactor,
 			double longitudeTolranceFactor) {
-		HoTTAdapter.isFilterEnabled = isFilterEnabled;
-		HoTTAdapter.isTolerateSignChangeLatitude = isTolerateSignChangeLatitude;
-		HoTTAdapter.isTolerateSignChangeLongitude = isTolerateSignChangeLongitude;
-		HoTTAdapter.latitudeToleranceFactor = latitudeTolranceFactor;
-		HoTTAdapter.longitudeToleranceFactor = longitudeTolranceFactor;
+		this.pickerParameters.isFilterEnabled = isFilterEnabled;
+		this.pickerParameters.isTolerateSignChangeLatitude = isTolerateSignChangeLatitude;
+		this.pickerParameters.isTolerateSignChangeLongitude = isTolerateSignChangeLongitude;
+		this.pickerParameters.latitudeToleranceFactor = latitudeTolranceFactor;
+		this.pickerParameters.longitudeToleranceFactor = longitudeTolranceFactor;
 	}
 
 	/**
 	 * @param isTextModusFilterEnabled the isTextModusFilterEnabled to set
 	 */
-	public static synchronized void setTextModusFilter(boolean isTextModusFilterEnabled) {
-		HoTTAdapter.isFilterTextModus = isTextModusFilterEnabled;
+	public synchronized void setTextModusFilter(boolean isTextModusFilterEnabled) {
+		this.pickerParameters.isFilterTextModus = isTextModusFilterEnabled;
 	}
 
 	/**
@@ -1552,8 +1650,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/**
 	 * @param isChannelEnabled the isChannelEnabled to set
 	 */
-	public static synchronized void setChannelEnabledProperty(boolean isChannelEnabled) {
-		HoTTAdapter.isChannelsChannelEnabled = isChannelEnabled;
+	public synchronized void setChannelEnabledProperty(boolean isChannelEnabled) {
+		this.pickerParameters.isChannelsChannelEnabled = isChannelEnabled;
 	}
 
 	/**
@@ -1878,6 +1976,20 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			}
 		}
 		recordSet.setSaved(true); // adding description will set unsaved reason
+	}
+
+	public PickerParameters getPickerParameters() {
+		return this.pickerParameters;
+	}
+
+	/**
+	 * @param sensorSignature is a csv list of valid sensor values (i.e. sensor names)
+	 * @return a boolean array with a length of all sensor entries. The ordinal positions holds true for the sensor ordinals in the {@code sensors} set.
+	 */
+	@Override
+	public boolean[] getActiveSensors(String sensorSignature) {
+		EnumSet<Sensor> sensors = Sensor.getSetFromSignature(sensorSignature);
+		return Sensor.getActiveSensors(sensors);
 	}
 
 }
