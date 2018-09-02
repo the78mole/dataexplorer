@@ -426,9 +426,9 @@ public abstract class TrailRecord extends CommonRecord {
 		} else {
 			String triggerScaleRawText = GDE.STRING_EMPTY;
 			String triggerScaleUnit = GDE.STRING_EMPTY;
-			if (getTrailSelector().getTrailType().isTriggered()) {
-				triggerScaleRawText = ((MeasurementTrailSelector) getTrailSelector()).getTriggerScaleRawText();
-				triggerScaleUnit = ((MeasurementTrailSelector) getTrailSelector()).getTriggerScaleUnit();
+			if (this.trailSelector instanceof MeasurementTrailSelector && this.trailSelector.getTrailType().isTriggered()) {
+				triggerScaleRawText = ((MeasurementTrailSelector) this.trailSelector).getTriggerScaleRawText();
+				triggerScaleUnit = ((MeasurementTrailSelector) this.trailSelector).getTriggerScaleUnit();
 				if (!triggerScaleUnit.isEmpty() && triggerScaleUnit.startsWith(GDE.STRING_SLASH)) {
 					TrailRecord referencedRatioRecord = getParent().get(((int) ((MeasurementType) getChannelItem()).getStatistics().getRatioRefOrdinal()));
 					triggerScaleUnit = referencedRatioRecord.getUnit() + triggerScaleUnit;
@@ -910,7 +910,7 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	public double[] defineRecentMinMax(int limit) {
-		TrailTypes trailType = getTrailSelector().getTrailType();
+		TrailTypes trailType = this.trailSelector.getTrailType();
 		if (trailType.isAlienValue()) {
 			return getParent().getPickedVaults().defineRecentAlienMinMax(getName(), trailType, limit);
 		} else {
@@ -919,7 +919,7 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	public double[] defineExtrema() { // todo consider caching this result
-		TrailTypes trailType = getTrailSelector().getTrailType();
+		TrailTypes trailType = this.trailSelector.getTrailType();
 		if (trailType.isAlienValue()) {
 			return getParent().getPickedVaults().defineAlienExtrema(getName(), trailType);
 		} else {
