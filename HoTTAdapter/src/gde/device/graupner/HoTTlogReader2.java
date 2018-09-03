@@ -71,7 +71,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
-		int channelNumber = device.getLastChannelNumber();
+		int channelNumber = HoTTlogReader.pickerParameters.analyzer.getActiveChannel().getNumber();
 		boolean isReceiverData = false;
 		boolean isVarioData = false;
 		boolean isGPSData = false;

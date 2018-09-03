@@ -96,7 +96,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
-		int channelNumber = device.getLastChannelNumber();
+		int channelNumber = HoTTbinReaderD.pickerParameters.analyzer.getActiveChannel().getNumber();;
 		device.getMeasurementFactor(channelNumber, 12);
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
@@ -345,7 +345,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
-		int channelNumber = device.getLastChannelNumber();
+		int channelNumber = HoTTbinReaderD.pickerParameters.analyzer.getActiveChannel().getNumber();;
 		boolean isReceiverData = false;
 		boolean isVarioData = false;
 		boolean isGPSData = false;

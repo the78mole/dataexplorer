@@ -85,7 +85,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
-		int channelNumber = device.getLastChannelNumber();
+		int channelNumber = HoTTbinReader2.pickerParameters.analyzer.getActiveChannel().getNumber();;
 		device.getMeasurementFactor(channelNumber, 12);
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
@@ -322,7 +322,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
-		int channelNumber = device.getLastChannelNumber();
+		int channelNumber = HoTTbinReader2.pickerParameters.analyzer.getActiveChannel().getNumber();
 		boolean isReceiverData = false;
 		HoTTbinReader2.recordSet = null;
 		boolean isJustMigrated = false;
@@ -592,11 +592,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * Receiver data are always updated.
 	 */
 	public static void migrateAddPoints(EnumSet<Sensor> migrationJobs, long timeStep_ms) throws DataInconsitsentException {
-		if (migrationJobs.contains(Sensor.EAM)) eamBinParser.migratePoints(HoTTbinReader2.points);
-		if (migrationJobs.contains(Sensor.GAM)) gamBinParser.migratePoints(HoTTbinReader2.points);
-		if (migrationJobs.contains(Sensor.GPS)) gpsBinParser.migratePoints(HoTTbinReader2.points);
-		if (migrationJobs.contains(Sensor.VARIO)) varBinParser.migratePoints(HoTTbinReader2.points);
-		if (migrationJobs.contains(Sensor.ESC)) escBinParser.migratePoints(HoTTbinReader2.points);
+		if (migrationJobs.contains(Sensor.EAM)) HoTTbinReader2.eamBinParser.migratePoints(HoTTbinReader2.points);
+		if (migrationJobs.contains(Sensor.GAM)) HoTTbinReader2.gamBinParser.migratePoints(HoTTbinReader2.points);
+		if (migrationJobs.contains(Sensor.GPS)) HoTTbinReader2.gpsBinParser.migratePoints(HoTTbinReader2.points);
+		if (migrationJobs.contains(Sensor.VARIO)) HoTTbinReader2.varBinParser.migratePoints(HoTTbinReader2.points);
+		if (migrationJobs.contains(Sensor.ESC)) HoTTbinReader2.escBinParser.migratePoints(HoTTbinReader2.points);
 		migrationJobs.clear();
 
 		HoTTbinReader2.recordSet.addPoints(HoTTbinReader2.points, timeStep_ms);
