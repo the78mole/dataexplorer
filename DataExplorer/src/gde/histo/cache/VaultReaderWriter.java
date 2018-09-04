@@ -259,11 +259,11 @@ public final class VaultReaderWriter {
 	 * @return the extracted vaults
 	 */
 	@Nullable
-	public List<HistoVault> readVaults(List<VaultKeyPair> keyPairs) {
+	public List<HistoVault> loadFromCaches(List<VaultKeyPair> keyPairs) {
 		List<HistoVault> vaults = new ArrayList<>();
 		for (VaultKeyPair p : keyPairs) {
 			if (p == null) continue;
-			HistoVault vault = readVault(p.getKey(), p.getValue());
+			HistoVault vault = loadVault(p.getKey(), p.getValue());
 			vaults.add(vault);
 		}
 		log.log(Level.FINE, "vaults size=", vaults.size());
@@ -276,7 +276,7 @@ public final class VaultReaderWriter {
 	 * @return the extracted vault
 	 */
 	@Nullable
-	private HistoVault readVault(String folderName, String fileName) {
+	private HistoVault loadVault(String folderName, String fileName) {
 		HistoVault histoVault = memoryCache.getIfPresent(fileName);
 		if (histoVault == null) {
 			histoVault = analyzer.getDataAccess().getCacheVault(folderName, fileName, MIN_FILE_LENGTH, analyzer.getSettings().isZippedCache());

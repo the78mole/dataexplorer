@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import gde.Analyzer;
+import gde.DataAccess;
 import gde.GDE;
 import gde.TestAnalyzer;
 import gde.config.Settings;
@@ -84,14 +85,15 @@ public class NonUiTestCase extends TestCase {
 		public abstract Path getDataPath(String string);
 	}
 
-	protected final TestAnalyzer	analyzer	= (TestAnalyzer) Analyzer.getInstance();
+	protected final TestAnalyzer	analyzer		= (TestAnalyzer) Analyzer.getInstance();
 
-	protected final Settings			settings	= Settings.getInstance();
-	protected final String				tmpDir		= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR)		//
+	protected final Settings			settings		= Settings.getInstance();
+	protected final DataAccess		dataAccess	= DataAccess.getInstance();
+	protected final String				tmpDir			= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR)		//
 			? System.getProperty("java.io.tmpdir") : System.getProperty("java.io.tmpdir") + GDE.FILE_SEPARATOR;
 
-	Handler												ch				= new ConsoleHandler();
-	LogFormatter									lf				= new LogFormatter();
+	Handler												ch					= new ConsoleHandler();
+	LogFormatter									lf					= new LogFormatter();
 
 	@Override
 	protected void setUp() throws Exception {

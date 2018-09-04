@@ -27,7 +27,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import gde.Analyzer;
 import gde.histo.base.NonUiTestCase;
 import gde.histo.datasources.HistoSet.RebuildStep;
 
@@ -60,14 +59,14 @@ class SourceDataSetExplorerTest extends NonUiTestCase {
 			"UltraTrioPlus14, 6, true", //
 			"UltraTrioPlus14, 2, false" })
 	public void testDefineTrusses(String deviceName, int numberOfDirectories, boolean isChannelMix) {
-		Analyzer.getInstance().getSettings().setChannelMix(isChannelMix);
+		settings.setChannelMix(isChannelMix);
 		setDeviceChannelObject(deviceName, 3, "");
 
-		DirectoryScanner directoryScanner = new DirectoryScanner(Analyzer.getInstance());
+		DirectoryScanner directoryScanner = new DirectoryScanner(analyzer);
 		try {
 			directoryScanner.isValidated(RebuildStep.F_FILE_CHECK);
 			log.log(Level.FINE, directoryScanner.getSourceFolders().getDecoratedPathsCsv());
-			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(Analyzer.getInstance(), directoryScanner.getSourceFolders(), false);
+			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(analyzer, directoryScanner.getSourceFolders(), false);
 			boolean reReadFiles = !directoryScanner.isChannelChangeOnly();
 			sourceDataSetExplorer.screen4Trusses(directoryScanner.getSourceFolders().getMap(), reReadFiles);
 
@@ -92,10 +91,10 @@ class SourceDataSetExplorerTest extends NonUiTestCase {
 
 		setDeviceChannelObject(deviceName, 3, "");
 
-		DirectoryScanner directoryScanner = new DirectoryScanner(Analyzer.getInstance());
+		DirectoryScanner directoryScanner = new DirectoryScanner(analyzer);
 		try {
 			directoryScanner.isValidated(RebuildStep.F_FILE_CHECK);
-			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(Analyzer.getInstance(), directoryScanner.getSourceFolders(), false);
+			SourceDataSetExplorer sourceDataSetExplorer = new SourceDataSetExplorer(analyzer, directoryScanner.getSourceFolders(), false);
 			boolean reReadFiles = !directoryScanner.isChannelChangeOnly();
 			sourceDataSetExplorer.screen4Trusses(directoryScanner.getSourceFolders().getMap(), reReadFiles);
 

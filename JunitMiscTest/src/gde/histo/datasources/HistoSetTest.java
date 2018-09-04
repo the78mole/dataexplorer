@@ -48,7 +48,6 @@ import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.histo.base.NonUiTestCase;
 import gde.histo.datasources.HistoSet.RebuildStep;
-import gde.histo.recordings.TrailDataTags.DataTag;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyCompliance;
 
@@ -263,13 +262,8 @@ public class HistoSetTest extends NonUiTestCase {
 		if (failures.size() > 0) fail(sb.toString());
 	}
 
-	@Tag("performance")
-	@Test
-	public void testHistoSet4OneHoTTObject() {
+	public void buildHistoSet4OneHoTTObject(String deviceName, String objectKey) {
 		this.settings.setSearchDataPathImports(true);
-
-		System.out.println(String.format("Max Memory=%,11d   Total Memory=%,11d   Free Memory=%,11d", Runtime.getRuntime().maxMemory(), Runtime.getRuntime().totalMemory(), Runtime.getRuntime().freeMemory()));
-		TreeMap<String, Exception> failures = new TreeMap<String, Exception>();
 
 		assertTrue(FileUtils.checkDirectoryExist(settings.getDataFilePath()));
 
@@ -280,54 +274,16 @@ public class HistoSetTest extends NonUiTestCase {
 
 		HistoSet histoSet = new HistoSet();
 
-		List<Long> elapsed_sec = new ArrayList<>();
-		long totalVaultsCount = 0;
-		((LocalAccess) DataAccess.getInstance()).resetHistoCache();
-		for (int i = 0; i < 2; i++) { // run twice for cache effects measuring
-			long nanoTime = System.nanoTime();
-			try {
-				totalVaultsCount = 0;
-				// for (Entry<String, DeviceConfiguration> deviceEntry : application.getDeviceConfigurations().getAllConfigurations().entrySet()) {
-				IDevice device = setDevice("HoTTAdapter");
-				System.out.println(device.getName());
-				// for (String objectKey : objectKeys) {
-				String objectKey = "KwikFly";
-				for (int j = 1; j <= device.getChannelCount(); j++) {
-					this.analyzer.setArena(device, j, objectKey);
-
-					histoSet.rebuild4Screening(RebuildStep.A_HISTOSET);
-					List<String> list = histoSet.getTrailRecordSet().getDataTags().get(DataTag.FILE_PATH);
-					System.out.println(list.stream().peek(s -> System.out.println(s)).count());
-					int tmpSize = histoSet.getTrailRecordSet().getTimeStepSize();
-					if (tmpSize > 0) {
-						System.out.println(String.format("%40.44s channelNumber=%2d  histoSetSize==%,11d", //
-								objectKey, j, tmpSize));
-					}
-					totalVaultsCount += tmpSize;
-				}
-				elapsed_sec.add(TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - nanoTime));
-			} catch (Exception e) {
-				e.printStackTrace();
-				fail(e.toString());
+		try {
+			IDevice device = setDevice(deviceName);
+			for (int j = 1; j <= device.getChannelCount(); j++) {
+				this.analyzer.setArena(device, j, objectKey);
+				histoSet.rebuild4Screening(RebuildStep.A_HISTOSET);
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.toString());
 		}
-
-		Collection<String> validLogExtentions = this.settings.getSearchDataPathImports() ? analyzer.getDeviceConfigurations().getValidLogExtentions()
-				: Arrays.asList(new String[] { GDE.FILE_ENDING_DOT_OSD });
-		long logFilesCount = getLogFilesCount(new File(settings.getDataFilePath()), 99, validLogExtentions);
-		long cacheSize = analyzer.getDataAccess().getCacheSize();
-		System.out.println(String.format(" elapsed times for %s with%,5d files resulting in%,6d vaults  @%d object keys and isZippedCache=%b", //
-				settings.getDataFilePath(), logFilesCount, totalVaultsCount, objectKeys.size(), settings.isZippedCache()));
-		for (int j = 0; j < elapsed_sec.size(); j++) {
-			System.out.println(String.format(" - run %d %s vault cache %d sec (%.1f MiB cache)", //
-					j + 1, j == 0 ? " w/o" : "with", elapsed_sec.get(j), cacheSize / 1024. / 1024.));
-		}
-
-		StringBuilder sb = new StringBuilder();
-		for (Entry<String, Exception> failure : failures.entrySet()) {
-			sb.append(failure).append("\n");
-		}
-		if (failures.size() > 0) fail(sb.toString());
 	}
 
 	/**

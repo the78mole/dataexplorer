@@ -628,20 +628,20 @@ public abstract class DataAccess {
 	}
 
 	@Override
-	public List<String> getFleetObjectKeys(Function<String, Boolean> objectKeyfilter) {
+	public Set<String> getFleetFileNames(Function<String, Boolean> objectKeyfilter) {
 		Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
 		FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
-		List<String> objectKeys;
+		Set<String> objectNames;
 		try (Stream<String> stream = Files.list(targetDirPath).map(p -> targetDirPath.relativize(p)).map(Path::toString)) {
-			objectKeys = stream.filter(objectKeyfilter::apply).collect(Collectors.toList());
+			objectNames = stream.filter(objectKeyfilter::apply).collect(Collectors.toSet());
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		return objectKeys;
+		return objectNames;
 	}
 
 	@Override
-	public FileInputStream getFleetIntputStream(Path fileSubPath) {
+	public FileInputStream getFleetInputStream(Path fileSubPath) {
 		Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
 		FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
 		try {
@@ -932,7 +932,7 @@ public abstract class DataAccess {
 	 * @param fileSubPath is a relative path based on the roaming folder
 	 * @return the stream for a fleet index file after creating required directories
 	 */
-	public abstract FileInputStream getFleetIntputStream(Path fileSubPath);
+	public abstract FileInputStream getFleetInputStream(Path fileSubPath);
 
 	/**
 	 * @return true if all fleet files are deleted
@@ -943,7 +943,7 @@ public abstract class DataAccess {
 	 * Search the fleet index entries.
 	 * @return the objectKeys corresponding to the objectKeyFilter
 	 */
-	public abstract List<String> getFleetObjectKeys(Function<String, Boolean> objectKeyFilter);
+	public abstract Set<String> getFleetFileNames(Function<String, Boolean> objectKeyFilter);
 
 	/**
 	 * Support multiple threads with different instances.

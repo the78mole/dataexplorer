@@ -20,21 +20,23 @@
 package gde.histo.guard;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import gde.Analyzer;
-import gde.config.Settings;
 import gde.device.IChannelItem;
 import gde.device.IDevice;
 import gde.device.ScoreLabelTypes;
@@ -81,25 +83,17 @@ public final class FleetMonitor {
 		/**
 		 * Supports arbitrary selection of vaults, e.g. mixed channels
 		 * Supports aggregation for objectKey + device.
-		 * @param vaults
+		 * @param channelVaults for the active object key in start timestamp reverse order (for reminderCount)
 		 */
-		public static final ObjectSummary createObjectSummary(String objectKey, String deviceName, List<HistoVault> vaults) {
+		public static final ObjectSummary createObjectSummary(Map<Integer, TreeSet<HistoVault>> channelVaults, Analyzer analyzer) {
 			ObjectSummary oS = new ObjectSummary();
-			oS.objectKey = objectKey;
-			oS.vaultDeviceName = deviceName;
+			oS.objectKey = analyzer.getSettings().getActiveObjectKey();
+			oS.vaultDeviceName = analyzer.getActiveDevice().getName();
 
-			Map<Integer, TreeSet<HistoVault>> channelVaults = new HashMap<>();
-			for (HistoVault v : vaults) {
-				if (channelVaults.get(v.getLogChannelNumber()) == null) {
-					channelVaults.put(v.getLogChannelNumber(), //
-							new TreeSet<HistoVault>((v1, v2) -> Long.compare(v2.getLogStartTimestamp_ms(), v1.getLogStartTimestamp_ms()))); // reversed !
-				}
-				channelVaults.get(v.getLogChannelNumber()).add(v);
-			}
 			for (Entry<Integer, TreeSet<HistoVault>> e : channelVaults.entrySet()) {
+				analyzer.setChannelNumber(e.getKey());
 				HistoVault[] indexedVaults = e.getValue().toArray(new HistoVault[e.getValue().size()]);
-				// todo ObjectSummary channelSummary = createChannelSummary(objectKey, deviceName, e.getKey(), indexedVaults);
-				ObjectSummary channelSummary = createChannelSummary(Analyzer.getInstance().clone(), indexedVaults);
+				ObjectSummary channelSummary = createChannelSummary(analyzer, indexedVaults);
 				oS.vaultCount += channelSummary.vaultCount;
 				oS.minFileLastModified = Math.max(oS.minFileLastModified, channelSummary.minFileLastModified);
 				oS.maxFileLastModified = Math.max(oS.maxFileLastModified, channelSummary.maxFileLastModified);
@@ -112,12 +106,13 @@ public final class FleetMonitor {
 				oS.minReminders[0] = ReminderType.min(oS.minReminders[0], oS.minReminders[0]);
 				oS.maxReminders[1] = ReminderType.max(oS.maxReminders[1], oS.maxReminders[1]);
 			}
+			log.log(Level.OFF, "objectSummary", oS);
 			return oS;
 		}
 
 		/**
 		 * Supports aggregation for objectKey + device + channel.
-		 * @param vaults in start timestamp reverse order
+		 * @param vaults in start timestamp reverse order (for reminderCount)
 		 */
 		private static final ObjectSummary createChannelSummary(Analyzer analyzer, HistoVault[] indexedVaults) {
 			ObjectSummary oS = new ObjectSummary();
@@ -137,18 +132,20 @@ public final class FleetMonitor {
 			template.load();
 			boolean smartStatistics = Boolean.parseBoolean(template.getProperty(HistoGraphicsTemplate.SMART_STATISTICS, "true"));
 
-			InclusionData inclusionData = new InclusionData(Paths.get(Settings.getInstance().getDataFilePath(), oS.objectKey), analyzer.getDataAccess());
+			InclusionData inclusionData = new InclusionData(Paths.get(analyzer.getSettings().getDataFilePath(), oS.objectKey), analyzer.getDataAccess());
 
 			ReminderType[] minReminders = new ReminderType[] { ReminderType.NONE, ReminderType.NONE };
 			ReminderType[] maxReminders = new ReminderType[] { ReminderType.NONE, ReminderType.NONE };
-			int logLimit = Settings.getInstance().getReminderCount();
+			int logLimit = analyzer.getSettings().getReminderCount();
 			BiConsumer<Integer, IChannelItem> channelItemAction = (idx, itm) -> {
-				boolean isActive = Boolean.parseBoolean(template.getRecordProperty(itm.getName(), HistoGraphicsTemplate.IS_ACTIVE, "true")); // todo recordName Jeti
+				boolean isActive = Boolean.parseBoolean(template.getRecordProperty(itm.getName(), HistoGraphicsTemplate.IS_ACTIVE, "true")); // todo
+																																																																			// recordName
+																																																																			// Jeti
 				boolean isIncluded = inclusionData.isIncluded(itm.getName(), true); // todo recordName Jeti
 				if (!isActive || !isIncluded) return;
 
 				TrailSelector trailSelector = itm.createTrailSelector(analyzer, itm.getName(), smartStatistics); // todo recordName Jeti
-				Reminder[] minMaxReminder = Guardian.defineMinMaxReminder(indexedVaults, itm, trailSelector, logLimit, Settings.getInstance());
+				Reminder[] minMaxReminder = Guardian.defineMinMaxReminder(indexedVaults, itm, trailSelector, logLimit, analyzer.getSettings());
 				if (minMaxReminder[0] != null) {
 					minMaxReminder[0] = minMaxReminder[0];
 					if (minMaxReminder[0].getReminderType().ordinal() > maxReminders[0].ordinal())
@@ -193,45 +190,75 @@ public final class FleetMonitor {
 
 	}
 
-	/**
-	 *
-	 */
-	public FleetMonitor() {
+	private final Analyzer analyzer;
+
+	public FleetMonitor(Analyzer analyzer) {
+		this.analyzer = analyzer;
 	}
 
 	/**
-	 * @return the object summaries per device consisting of aggregated vault data and object base data
+	 * @return the object's summaries per device consisting of aggregated vault data and object base data
 	 */
-	public List<ObjectSummary> defineOverview(String objectKey) {
-		List<ObjectSummary> summaries = new ArrayList<>();
+	public HashMap<String, ObjectSummary> defineDeviceSummaries(String objectKey) {
+		HashMap<String, ObjectSummary> deviceSummaries = new HashMap<>();
 
-		ObjectVaultIndex objectVaultIndex = new ObjectVaultIndex(new String[] { objectKey }, Analyzer.getInstance().getDataAccess());
-		Map<String, IDevice> usedDevices = objectVaultIndex.selectExistingDevices(new String[] { objectKey });
+		analyzer.getSettings().setActiveObjectKey(objectKey);
+		ObjectVaultIndex objectVaultIndex = new ObjectVaultIndex(new String[] { objectKey }, analyzer.getDataAccess(), analyzer.getSettings());
+
+		Set<String> indexedDeviceNames = objectVaultIndex.selectDeviceNames(new String[] { objectKey }, DetailSelector.createDummyFilter());
+		Map<String, IDevice> usedDevices = analyzer.getDeviceConfigurations().getAsDevices(indexedDeviceNames);
+		log.log(Level.FINER, "devices", usedDevices);
 
 		DetailSelector detailSelector = DetailSelector.createDeviceNameFilter(usedDevices.keySet());
 		Function<ObjectVaultIndexEntry, String> classifier = e -> e.vaultDeviceName;
 		TreeMap<String, List<VaultKeyPair>> vaultKeys = objectVaultIndex.selectGroupedVaultKeys(objectKey, detailSelector, classifier);
 		for (Entry<String, List<VaultKeyPair>> e : vaultKeys.entrySet()) {
+			List<VaultKeyPair> vaults = e.getValue();
 			IDevice device = usedDevices.get(e.getKey());
-			EnumSet<DirectoryType> directoryTypes = DirectoryType.getValidDirectoryTypes(device, Analyzer.getInstance().getSettings());
-			// todo + add object key to Analyzer
-			Analyzer analyzerClone = Analyzer.getInstance().clone();
-			VaultChecker checker = new VaultChecker(analyzerClone); // clone for thread safety
-
-			SourceFolders sourceFolders = new SourceFolders(analyzerClone);
-			sourceFolders.defineDirectories(s -> {
-			});
-			List<HistoVault> allVaults = new VaultReaderWriter(Analyzer.getInstance(), Optional.empty()).readVaults(e.getValue());
-			List<HistoVault> validVaults = new ArrayList<>();
-			for (HistoVault vault : allVaults) {
-				if (checker.isValidVault(vault, directoryTypes, sourceFolders)) validVaults.add(vault);
+			int arbitraryChannelNumber = -1;
+			analyzer.setArena(device, arbitraryChannelNumber, objectKey);
+			Map<Integer, TreeSet<HistoVault>> channelVaults = getValidVaults(vaults);
+			if (!channelVaults.isEmpty()) {
+				ObjectSummary objectSummary = ObjectSummary.createObjectSummary(channelVaults, analyzer);
+				log.off(() -> objectSummary.toString());
+				deviceSummaries.put(device.getName(), objectSummary);
 			}
-			log.log(Level.OFF, "valid vaults size=", validVaults.size());
-
-			summaries.add(ObjectSummary.createObjectSummary(objectKey, device.getName(), validVaults));
 		}
-		log.off(() -> summaries.toString());
-		return summaries;
+		return deviceSummaries;
+	}
+
+	/**
+	 * Check the vault for a vault log file path complying with:
+	 * <li>the source folders related to the device and object key
+	 * <li>the directory type.</li>
+	 * <p/>
+	 * In addition, valid vaults have a start timestamp within the retrospect months setting.
+	 * @param vaults are the keys (folder name and vault name) of the vaults to be checked
+	 * @return the validated vaults per channel number in start timestamp reverse order (for reminderCount)
+	 */
+	private Map<Integer, TreeSet<HistoVault>> getValidVaults(List<VaultKeyPair> vaults) {
+		Map<Integer, TreeSet<HistoVault>> channelVaults = new HashMap<>();
+
+		EnumSet<DirectoryType> directoryTypes = DirectoryType.getValidDirectoryTypes(analyzer.getActiveDevice(), analyzer.getSettings());
+		SourceFolders sourceFolders = new SourceFolders(analyzer);
+		sourceFolders.defineDirectories(s -> {});
+		Predicate<HistoVault> checker = (vault) -> (new VaultChecker(analyzer)).isValidVault(vault, directoryTypes, sourceFolders);
+
+		Comparator<HistoVault> comparator = (v1, v2) -> Long.compare(v2.getLogStartTimestamp_ms(), v1.getLogStartTimestamp_ms()); // reversed !
+		List<HistoVault> allVaults = new VaultReaderWriter(analyzer, Optional.empty()).loadFromCaches(vaults);
+		for (HistoVault vault : allVaults) {
+			int logChannelNumber = vault.getLogChannelNumber();
+			analyzer.setChannelNumber(logChannelNumber);
+			if (checker.test(vault)) {
+				if (channelVaults.get(logChannelNumber) == null) {
+					channelVaults.put(logChannelNumber, new TreeSet<HistoVault>(comparator));
+				}
+				channelVaults.get(logChannelNumber).add(vault);
+			}
+		}
+		log.log(Level.OFF, String.format("valid vaults size=%,7d in %d channels", //
+				channelVaults.values().stream().mapToInt(Collection::size).sum(), channelVaults.size()));
+		return channelVaults;
 	}
 
 }

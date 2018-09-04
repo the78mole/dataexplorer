@@ -60,7 +60,7 @@ public final class Guardian {
 	/**
 	 * Determine the reminders of the category which is the most significant.
 	 * This means: The result holds far outliers OR close outliers in case no far outliers are present.
-	 * @param indexedVaults in start timestamp reverse order
+	 * @param indexedVaults in start timestamp reverse order (for reminderCount)
 	 * @param logLimit is the maximum number of the most recent logs which is checked for reminders
 	 * @return the array of reminder objects which may hold null values
 	 */
@@ -319,7 +319,7 @@ public final class Guardian {
 	private static double[] getExtrema(String recordName, List<Double> decodedLowValues, List<Double> decodedHighValues, Settings settings) {
 		ElementaryQuantile<Double> minQuantile = new ElementaryQuantile<>(decodedLowValues, true, settings);
 		ElementaryQuantile<Double> maxQuantile = new ElementaryQuantile<>(decodedHighValues, true, settings);
-		int scaleSpread = Settings.getInstance().getSummaryScaleSpread();
+		int scaleSpread = settings.getSummaryScaleSpread();
 		double scaleMin = minQuantile.getExtremumFromRange(UniversalQuantile.INTER_QUARTILE_SIGMA_FACTOR, -scaleSpread);
 		double scaleMax = maxQuantile.getExtremumFromRange(UniversalQuantile.INTER_QUARTILE_SIGMA_FACTOR, scaleSpread);
 		double[] result = new double[] { Math.min(minQuantile.getQuantileLowerWhisker(), scaleMin),

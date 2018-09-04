@@ -19,7 +19,7 @@
 
 package gde.histo.guard;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,14 +50,19 @@ class FleetMonitorTest extends NonUiTestCase {
 	}
 
 	/**
-	 * Test method for {@link gde.histo.guard.FleetMonitor#defineOverview(java.util.function.Function)}.
+	 * Test method for {@link gde.histo.guard.FleetMonitor#defineDeviceSummaries(java.util.function.Function)}.
 	 */
 	@Test
 	void testDefineOverview() {
 		this.analyzer.getDeviceConfigurations(); // get now because lazy loading will disturb response times
-		FleetMonitor fleetMonitor = new FleetMonitor();
+
+		String objectKey = "KwikFly";
+		new HistoSetTest().buildHistoSet4OneHoTTObject("HoTTAdapter", objectKey);
+		ObjectVaultIndex.rebuild(analyzer);
+
+		FleetMonitor fleetMonitor = new FleetMonitor(this.analyzer);
 		log.log(Level.FINER, "FleetMonitor initialized");
-		List<ObjectSummary> overview = fleetMonitor.defineOverview("KwikFly");
+		HashMap<String, ObjectSummary> overview = fleetMonitor.defineDeviceSummaries(objectKey);
 		log.log(Level.OFF, "KwikFly  HoTTAdapter  number of overview records", overview.size());
 		assertFalse("no records found", overview.isEmpty());
 	}
