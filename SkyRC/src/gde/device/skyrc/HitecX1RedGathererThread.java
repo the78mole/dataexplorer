@@ -66,7 +66,6 @@ public class HitecX1RedGathererThread extends Thread {
 	boolean							isCollectDataStopped				= false;
 	UsbInterface				usbInterface								= null;
 	boolean							isProgrammExecuting1				= false;
-	boolean							isProgrammExecuting2				= false;
 	boolean[]						isAlerted4Finish						= { false, false, false, false };
 	int									retryCounter								= HitecX1RedGathererThread.WAIT_TIME_RETRYS;	//60 Min
 
@@ -251,8 +250,8 @@ public class HitecX1RedGathererThread extends Thread {
 			dataBuffer[0] = 0;	//add up energy		
 		this.device.resetEnergy[number-1] = device.getProcessSubType(channelBuffer, dataBuffer);
 
-		if (HitecX1RedGathererThread.log.isLoggable(Level.OFF)) {
-			HitecX1RedGathererThread.log.log(Level.OFF, "Channel = " + number + " : processTypeName = " + processTypeName);
+		if (HitecX1RedGathererThread.log.isLoggable(Level.FINE)) {
+			HitecX1RedGathererThread.log.log(Level.FINE, String.format("process = %s ; subProcess = %s", processTypeName, processSubTypeName));
 		}
 		Channel channel = this.channels.get(number);
 		if (channel != null) {
@@ -300,8 +299,8 @@ public class HitecX1RedGathererThread extends Thread {
 				// switch the active record set if the current record set is child of active channel
 				this.channels.switchChannel(channel.getNumber(), processRecordSetKey);
 				channel.switchRecordSet(processRecordSetKey);
-				String description = String.format("%s%s%s %s %s;", 
-						recordSet.getRecordSetDescription(), GDE.LINE_SEPARATOR, this.device.getProductIdString(), this.device.getHarwareString(), this.device.getFirmwareString()); //$NON-NLS-1$
+				String description = String.format("%s%s%s %s;", 
+						recordSet.getRecordSetDescription(), GDE.LINE_SEPARATOR, this.device.getHarwareString(), this.device.getFirmwareString()); //$NON-NLS-1$
 				recordSet.setRecordSetDescription(description);
 
 				//firmware 1.09 energy needs to be calculated -> creating a new record set will reset energy

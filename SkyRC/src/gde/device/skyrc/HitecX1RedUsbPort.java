@@ -59,7 +59,7 @@ public class HitecX1RedUsbPort extends DeviceCommPort implements IDeviceCommPort
   protected final byte endpointOut;
 
 	public enum QuerySystemSetting {
-		CHANNEL_A(new byte[]{0x0f, 0x02, 0x5A, 0x5A, (byte) 0xFF, (byte) 0xFF});
+		CHANNEL_A(new byte[]{0x0f, 0x04, 0x5A, 0x00, 0x00, 0x5A, (byte) 0xFF, (byte) 0xFF});
 		private byte[]	value;
 
 		private QuerySystemSetting(byte[] v) {
@@ -76,7 +76,7 @@ public class HitecX1RedUsbPort extends DeviceCommPort implements IDeviceCommPort
 	};
 
 	public enum QueryChannelData {
-		CHANNEL_A(new byte[]{0x0f, 0x02, 0x5F, 0x5F, (byte) 0xFF, (byte) 0xFF});
+		CHANNEL_A(new byte[]{0x0f, 0x04, 0x5F, 0x00, 0x00, 0x5F, (byte) 0xFF, (byte) 0xFF});
 		private byte[]	value;
 
 		private QueryChannelData(byte[] v) {
@@ -93,7 +93,7 @@ public class HitecX1RedUsbPort extends DeviceCommPort implements IDeviceCommPort
 	};
 
 	public enum QueryOperationData {
-		CHANNEL_A(new byte[]{0x0f, 0x02, 0x55, 0x55, (byte) 0xFF, (byte) 0xFF});
+		CHANNEL_A(new byte[]{0x0f, 0x04, 0x55, 0x00, 0x00, 0x55, (byte) 0xFF, (byte) 0xFF});
 		private byte[]	value;
 
 		private QueryOperationData(byte[] v) {
@@ -110,7 +110,7 @@ public class HitecX1RedUsbPort extends DeviceCommPort implements IDeviceCommPort
 	};
 
 	public enum QuerySystemInfo {
-		CHANNEL_A(new byte[]{0x0f, 0x02, 0x57, 0x57, (byte) 0xFF, (byte) 0xFF});
+		CHANNEL_A(new byte[]{0x0f, 0x05, 0x57, 0x00, 0x00, 0x00, 0x57});
 		private byte[]	value;
 
 		private QuerySystemInfo(byte[] v) {
@@ -263,7 +263,7 @@ public class HitecX1RedUsbPort extends DeviceCommPort implements IDeviceCommPort
 		byte[] data = new byte[Math.abs(this.dataSize)];
 
 		try {
-			if (log.isLoggable(Level.OFF)) log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(request, request.length));
+			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(request, request.length));
 			this.write(iface, this.endpointIn, request);			
 			try {
 				Thread.sleep(10);
@@ -273,7 +273,7 @@ public class HitecX1RedUsbPort extends DeviceCommPort implements IDeviceCommPort
 			}
 			this.read(iface, this.endpointOut, data);
 			
-			if (log.isLoggable(Level.OFF)) log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
+			if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
 			//log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "Length = " + data[1]);
 			
 			if (!this.isChecksumOK(data) && this.retrys-- <= 0) {
@@ -300,7 +300,7 @@ public class HitecX1RedUsbPort extends DeviceCommPort implements IDeviceCommPort
 	private boolean isChecksumOK(final byte[] buffer) {
 		final String $METHOD_NAME = "isChecksumOK"; //$NON-NLS-1$
 		final byte chkSum = calculateCheckSum(buffer, buffer[1]);
-		if (log.isLoggable(Level.OFF)) log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME,String.format("Checksum = 0x%02X == 0x%02X", chkSum, buffer[buffer[1]+1])); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME,String.format("Checksum = 0x%02X == 0x%02X", chkSum, buffer[buffer[1]+1])); //$NON-NLS-1$
 		return chkSum == buffer[buffer[1]+1];
 	}
 }

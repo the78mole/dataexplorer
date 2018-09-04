@@ -54,6 +54,7 @@ public class HitecX1Red extends MC3000 implements IDevice {
 
 	int[]								resetEnergy		= new int[] { 5, 5 };
 	double[]						energy				= new double[] { 0, 0 };
+	protected String[]	USAGE_MODE_DJI;
 
 	protected class SystemInfo {
 		byte		productId;
@@ -72,11 +73,11 @@ public class HitecX1Red extends MC3000 implements IDevice {
 			this.isUpgradeSupported = buffer[11];
 			this.isSoftwareEncrytion = buffer[12];
 			this.customerId = buffer[13];
-			System.arraycopy(buffer, 14, this.firmwareVersion, 0, 2);
-			System.arraycopy(buffer, 16, this.hardwareVersion, 0, 2);
+			System.arraycopy(buffer, 16, this.firmwareVersion, 0, 2);
+			System.arraycopy(buffer, 18, this.hardwareVersion, 0, 2);
 			
-			if (log.isLoggable(Level.FINE)) {
-				log.log(Level.FINE, String.format("productId=0x%2x productModel=%s, isUpgradeSupported=%b isSoftwareEncrytion=%b customerId=0x%2x firmwareVersion=%s hardwareVersion=%s", 
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, String.format("productId=0x%02x productModel=%s, isUpgradeSupported=%b isSoftwareEncrytion=%b customerId=0x%02x firmwareVersion=%s hardwareVersion=%s", 
 						this.getProductId(), this.getProductModel(), this.isUpgradeSupported(), this.isSoftwareEncryption(), this.getCustomerId(), this.getFirmwareVersion(), this.getHardwareVersion()));
 			}
 		}
@@ -112,7 +113,7 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		}
 
 		public String getHardwareVersion() {
-			return String.format("Hardware: %d.%d", this.hardwareVersion[0]/10, this.hardwareVersion[1]%10);
+			return String.format("Hardware: %d.%02d", this.hardwareVersion[0], this.hardwareVersion[1]);
 		}
 
 		public int getHardwareVersionAsInt() {
@@ -160,11 +161,11 @@ public class HitecX1Red extends MC3000 implements IDevice {
 			System.arraycopy(buffer, 28, this.voltage5, 0, 2);
 			System.arraycopy(buffer, 30, this.voltage6, 0, 2);			
 			
-			if (log.isLoggable(Level.OFF)) {
-				log.log(Level.OFF, String.format(
-					"productId=0x%02x restingTimeNiMH=%d isPrtotectionTime=0x%02x protectionTime=%d isCapacityLimit=0x%02x capacityLimit=%d isKeySound=0x%02x isSystemSound=0x%02x voltageLow=%d isTemperaturLimit=0x%02x", 
+			if (log.isLoggable(Level.FINER)) {
+				log.log(Level.FINER, String.format(
+					"productId=0x%02x restingTimeNiMH=%d isPrtotectionTime=%b protectionTime=%d isCapacityLimit=%b capacityLimit=%d isKeySound=%b isSystemSound=%b voltageLow=%d isTemperaturLimit=%b", 
 					this.getProductId(), this.getRestingTimeNiMH(), this.isProtectionTime(), this.getProtectionTime(), this.isCapacityLimit(), this.getCapacityLimit(), this.isKeySound(), this.isSystemSound(), this.getVoltageLow(), this.isTemperaturLimit()));
-				log.log(Level.OFF, String.format(
+				log.log(Level.FINER, String.format(
 						"voltage=%d, voltage1=%d voltage2=%d voltage3=%d voltage4=%d voltage5=%d voltage6=%d",
 						this.getVoltage(), this.getVoltage1(), this.getVoltage2(), this.getVoltage3(), this.getVoltage4(), this.getVoltage5(), this.getVoltage6()));
 			}
@@ -211,7 +212,7 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		}
 
 		public short getVoltageLow() {
-			return DataParser.parse2Short(this.voltageLow, 0);
+			return DataParser.parse2Short(this.voltageLow[1], this.voltageLow[0]);
 		}
 
 		public boolean isTemperaturLimit() {
@@ -219,31 +220,31 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		}
 
 		public short getVoltage() {
-			return DataParser.parse2Short(this.voltage, 0);
+			return DataParser.parse2Short(this.voltage[1], this.voltage[0]);
 		}
 
 		public short getVoltage1() {
-			return DataParser.parse2Short(this.voltage1, 0);
+			return DataParser.parse2Short(this.voltage1[1], this.voltage1[0]);
 		}
 
 		public short getVoltage2() {
-			return DataParser.parse2Short(this.voltage2, 0);
+			return DataParser.parse2Short(this.voltage2[1], this.voltage2[0]);
 		}
 
 		public short getVoltage3() {
-			return DataParser.parse2Short(this.voltage3, 0);
+			return DataParser.parse2Short(this.voltage3[1], this.voltage3[0]);
 		}
 
 		public short getVoltage4() {
-			return DataParser.parse2Short(this.voltage4, 0);
+			return DataParser.parse2Short(this.voltage4[1], this.voltage4[0]);
 		}
 
 		public short getVoltage5() {
-			return DataParser.parse2Short(this.voltage5, 0);
+			return DataParser.parse2Short(this.voltage5[1], this.voltage5[0]);
 		}
 
 		public short getVoltage6() {
-			return DataParser.parse2Short(this.voltage6, 0);
+			return DataParser.parse2Short(this.voltage6[1], this.voltage6[0]);
 		}
 	}
 
@@ -277,15 +278,33 @@ public class HitecX1Red extends MC3000 implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3616)};//BALANCE
 
 		//Ni battery:		0=CHARGE 1=AUTO_CHARGE 2=DISCHARGE 3=RE_PEAK 4=CYCLE
-		this.USAGE_MODE_NI = new String[] { Messages.getString(MessageIds.GDE_MSGT3617), Messages.getString(MessageIds.GDE_MSGT3625), Messages.getString(MessageIds.GDE_MSGT3623),
-				Messages.getString(MessageIds.GDE_MSGT3626), Messages.getString(MessageIds.GDE_MSGT3624) };
+		this.USAGE_MODE_NI = new String[] { 
+				Messages.getString(MessageIds.GDE_MSGT3617), 
+				Messages.getString(MessageIds.GDE_MSGT3625), 
+				Messages.getString(MessageIds.GDE_MSGT3623),
+				Messages.getString(MessageIds.GDE_MSGT3626), 
+				Messages.getString(MessageIds.GDE_MSGT3624) };
 
 		//PB battery:		0=CHARGE 1=DISCHARGE
-		this.USAGE_MODE_PB = new String[] { Messages.getString(MessageIds.GDE_MSGT3620), Messages.getString(MessageIds.GDE_MSGT3623) };
+		this.USAGE_MODE_PB = new String[] { 
+				Messages.getString(MessageIds.GDE_MSGT3620), 
+				Messages.getString(MessageIds.GDE_MSGT3623) };
 
-		//battery type:  0:LiPo 1:LiIo 2:LiFe 3:LiHv 4:NiMH 5:NiCd 6:PB 
-		this.BATTERY_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3649), Messages.getString(MessageIds.GDE_MSGT3641), Messages.getString(MessageIds.GDE_MSGT3640),
-				Messages.getString(MessageIds.GDE_MSGT3642), Messages.getString(MessageIds.GDE_MSGT3643), Messages.getString(MessageIds.GDE_MSGT3644), Messages.getString(MessageIds.GDE_MSGT3648) };
+		//DJI battery:		0=CHARGE 1=Storage
+		this.USAGE_MODE_DJI = new String[] { 
+				Messages.getString(MessageIds.GDE_MSGT3617), //CHARGE
+				Messages.getString(MessageIds.GDE_MSGT3612)};//STORAGE
+
+		//battery type:  0:LiPo 1:LiFe 2:LiLo 3:LiHv 4:NiCd 5:NiMH 6:PB 7: DJI Mavic
+		this.BATTERY_TYPE = new String[] { 
+				Messages.getString(MessageIds.GDE_MSGT3649), 
+				Messages.getString(MessageIds.GDE_MSGT3641), 
+				Messages.getString(MessageIds.GDE_MSGT3640),
+				Messages.getString(MessageIds.GDE_MSGT3642), 
+				Messages.getString(MessageIds.GDE_MSGT3644), 
+				Messages.getString(MessageIds.GDE_MSGT3643), 
+				Messages.getString(MessageIds.GDE_MSGT3648), 
+				Messages.getString(MessageIds.GDE_MSGT3687) };
 
 		this.usbPort = new HitecX1RedUsbPort(this, this.application);
 		this.dialog = new ChargerDialog(this.application.getShell(), this);
@@ -315,15 +334,33 @@ public class HitecX1Red extends MC3000 implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3616)};//BALANCE
 
 		//Ni battery:		0=CHARGE 1=AUTO_CHARGE 2=DISCHARGE 3=RE_PEAK 4=CYCLE
-		this.USAGE_MODE_NI = new String[] { Messages.getString(MessageIds.GDE_MSGT3617), Messages.getString(MessageIds.GDE_MSGT3625), Messages.getString(MessageIds.GDE_MSGT3623),
-				Messages.getString(MessageIds.GDE_MSGT3626), Messages.getString(MessageIds.GDE_MSGT3624) };
+		this.USAGE_MODE_NI = new String[] { 
+				Messages.getString(MessageIds.GDE_MSGT3617), 
+				Messages.getString(MessageIds.GDE_MSGT3625), 
+				Messages.getString(MessageIds.GDE_MSGT3623),
+				Messages.getString(MessageIds.GDE_MSGT3626), 
+				Messages.getString(MessageIds.GDE_MSGT3624) };
 
 		//PB battery:		0=CHARGE 1=DISCHARGE
-		this.USAGE_MODE_PB = new String[] { Messages.getString(MessageIds.GDE_MSGT3620), Messages.getString(MessageIds.GDE_MSGT3623) };
+		this.USAGE_MODE_PB = new String[] { 
+				Messages.getString(MessageIds.GDE_MSGT3620), 
+				Messages.getString(MessageIds.GDE_MSGT3623) };
 
-		//battery type:  0:LiPo 1:LiIo 2:LiFe 3:LiHv 4:NiMH 5:NiCd 6:PB 
-		this.BATTERY_TYPE = new String[] { Messages.getString(MessageIds.GDE_MSGT3649), Messages.getString(MessageIds.GDE_MSGT3641), Messages.getString(MessageIds.GDE_MSGT3640),
-				Messages.getString(MessageIds.GDE_MSGT3642), Messages.getString(MessageIds.GDE_MSGT3643), Messages.getString(MessageIds.GDE_MSGT3644), Messages.getString(MessageIds.GDE_MSGT3648) };
+		//DJI battery:		0=CHARGE 1=Storage
+		this.USAGE_MODE_DJI = new String[] { 
+				Messages.getString(MessageIds.GDE_MSGT3617), //CHARGE
+				Messages.getString(MessageIds.GDE_MSGT3612)};//STORAGE
+
+		//battery type:  0:LiPo 1:LiFe 2:LiLo 3:LiHv 4:NiCd 5:NiMH 6:PB 7: DJI Mavic
+		this.BATTERY_TYPE = new String[] { 
+				Messages.getString(MessageIds.GDE_MSGT3649), 
+				Messages.getString(MessageIds.GDE_MSGT3641), 
+				Messages.getString(MessageIds.GDE_MSGT3640),
+				Messages.getString(MessageIds.GDE_MSGT3642), 
+				Messages.getString(MessageIds.GDE_MSGT3644), 
+				Messages.getString(MessageIds.GDE_MSGT3643), 
+				Messages.getString(MessageIds.GDE_MSGT3648), 
+				Messages.getString(MessageIds.GDE_MSGT3687) };
 
 		this.usbPort = new HitecX1RedUsbPort(this, this.application);
 		this.dialog = new ChargerDialog(this.application.getShell(), this);
@@ -409,33 +446,13 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		//databuffer[0] injected energy handling flag
 		switch (dataBuffer[0]) { //injected energy handling flag
 		case 0: //add up energy
-			switch (dataBuffer[1]) { //channel ID
-			case 0x00:
-				energy[0] += points[0] / 1000.0 * points[1] / 3600.0;
-				points[4] = Double.valueOf(energy[0]).intValue();
-				break;
-			case 0x01:
-				energy[1] += points[0] / 1000.0 * points[1] / 3600.0;				
-				points[4] = Double.valueOf(energy[1]).intValue();
-				break;
-			default:
-				break;
-			}
+			energy[0] += points[0] / 1000.0 * points[1] / 3600.0;
+			points[4] = Double.valueOf(energy[0]).intValue();
 			if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, "add up Energy");
 			break;
 		case 1: // reset energy
-			switch (dataBuffer[1]) { //channel ID
-			case 0x00:
-				energy[0] = 0.0;
-				points[4] = 0;
-				break;
-			case 0x01:
-				energy[1] = 0.0;
-				points[4] = 0;
-				break;
-			default:
-				break;
-			}
+			energy[0] = 0.0;
+			points[4] = 0;
 			points[4] = 0;
 			if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, "reset Energy");
 			break;
@@ -450,10 +467,11 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		points[6] = dataBuffer[14] * 1000;
 		points[7] = 0;
 		
-		if (dataBuffer[0] <= 3) { // exclude Ni PB batteries
+		if (dataBuffer[35] <= 3) { // exclude Ni PB batteries
+			int numberCells = dataBuffer[36];
 			//9=CellVoltage1....14=CellVoltage6
 			int j = 0;
-			for (int i = 9; i < points.length; i++, j += 2) {
+			for (int i = 9, k = 0; k < numberCells && i < points.length; i++, j += 2, k++) {
 				if (dataBuffer[j + 17] != 0x00) { // filter none used cell 
 					points[i] = DataParser.parse2Short(dataBuffer[j + 18], dataBuffer[j + 17]);
 					maxVoltage = points[i] > maxVoltage ? points[i] : maxVoltage;
@@ -584,7 +602,7 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		if (log.isLoggable(java.util.logging.Level.FINE)) log.log(java.util.logging.Level.FINE, outletNum + " isProcessing = " + (dataBuffer == null ? channelBuffer[4] == 0x01 : dataBuffer[4] >= 0x01));
 		if (dataBuffer == null) // initial processing type query
 			return channelBuffer[4] == 0x01;
-		return dataBuffer[4] == 0x03 && !this.isContinuousRecordSet() && this.settings.isReduceChargeDischarge()
+		return (channelBuffer[5] == 4 || channelBuffer[5] == 5) && dataBuffer[17] == 0x02 && !this.isContinuousRecordSet() && this.settings.isReduceChargeDischarge()
 				? false 
 				: dataBuffer[4] == 0x01;
 	}
@@ -640,20 +658,23 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		//Ni battery:		0=CHARGE 1=AUTO_CHARGE 2=DISCHARGE 3=RE_PEAK 4=CYCLE
 		//Pb battery:		0=CHARGE 1=DISCHARGE
 
-		//battery type:  0:LiPo 1:LiIo 2:LiFe 3:LiHv 4:NiMH 5:NiCd 6:PB
+		//battery type:  0:LiPo 1:LiFe 2:LiLo 3:LiHv 4:NiCd 5:NiMH 6:PB 7: DJI Mavic
 		switch (this.getBatteryType(channelBuffer)) {
 		case 0: //LiPo
-		case 1: //LiIo
-		case 2: //LiFe
-		case 3: //LiHv
+		case 1: //LiFe
+		case 2: //LiIo
+		case 3: //LiHV
 			processTypeName = this.USAGE_MODE_LI[channelBuffer[7]];
 			break;
-		case 4: //NiMH
-		case 5: //NiCD
+		case 4: //NiCd
+		case 5: //NiMH
 			processTypeName = this.USAGE_MODE_NI[channelBuffer[7]];
 			break;
 		case 6: //PB
 			processTypeName = this.USAGE_MODE_PB[channelBuffer[7]];
+			break;
+		case 7: //DJI Mavic
+			processTypeName = this.USAGE_MODE_DJI[channelBuffer[7]];
 			break;
 		}
 		return this.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : processTypeName;
@@ -665,7 +686,7 @@ public class HitecX1Red extends MC3000 implements IDevice {
 	 * @return
 	 */
 	public int getCycleNumber(final byte[] dataBuffer) {
-		return dataBuffer[18];
+		return dataBuffer[18] + 1;
 	}
 
 	/**
@@ -701,13 +722,13 @@ public class HitecX1Red extends MC3000 implements IDevice {
 			break;
 		}
 		
-		switch (dataBuffer[4]) {
+		switch (dataBuffer[17]) {
 		default:
 		case 1: //charge
 			return Messages.getString(MessageIds.GDE_MSGT3620);
-		case 3: //pause
+		case 2: //pause
 			return Messages.getString(MessageIds.GDE_MSGT3627);
-		case 2: //discharge
+		case 3: //discharge
 			return Messages.getString(MessageIds.GDE_MSGT3623);
 		}
 	}
@@ -720,6 +741,14 @@ public class HitecX1Red extends MC3000 implements IDevice {
 	public int[] getCellVoltageOrdinals() {
 		//0=Voltage 1=Current 2=Capacity 3=Power 4=Energy 5=TempExt  6=TempInt 7=Resistance 8=Balance 9=CellVoltage1....14=CellVoltage6
 		return new int[] { 0, 2 };
+	}
+	
+	/**
+	 * @param channelBuffer
+	 * @return number of configured cells
+	 */
+	public int getNumberCells(final byte[] channelBuffer) {
+		return channelBuffer[6];
 	}
 
 	/**
@@ -829,12 +858,9 @@ public class HitecX1Red extends MC3000 implements IDevice {
 				try {
 					Channel activChannel = Channels.getInstance().getActiveChannel();
 					if (activChannel != null) {
-						log.log(Level.OFF, "Creating gathering thread");
 						this.dataGatherThread = new HitecX1RedGathererThread(this.application, this, this.usbPort, activChannel.getNumber(), this.getDialog());
-						log.log(Level.OFF, "Gathering thread created, USB interface claimed");
 						try {
 							if (this.dataGatherThread != null && this.usbPort.isConnected()) {
-								log.log(Level.OFF, "query system settings");
 								this.systemInfo[0] = new HitecX1Red.SystemInfo(this.usbPort.getSystemInfo(this.dataGatherThread.getUsbInterface(), HitecX1RedUsbPort.QuerySystemInfo.CHANNEL_A.value()));
 								this.systemSetting[0] = new HitecX1Red.SystemSetting(this.usbPort.getSystemSetting(this.dataGatherThread.getUsbInterface(), HitecX1RedUsbPort.QuerySystemSetting.CHANNEL_A.value()));
 

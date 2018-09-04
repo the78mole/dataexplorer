@@ -7,6 +7,8 @@ Generic changes/fixes
 Device specific changes/fixes
 	* HottAdapter* -  fix error message GDE_MSGW2404 appearing only at the first import, Fix missing tab activation after import
 	* HottAdapter - fix wrong sensor sequence reference while import *.bin with single ESC sensor module connected.
+	* Hitec DRX1 - add support (identical Hitex RDX1 Pro is the 100W version)
+	* Hitec X1 Red
 	
 History analysis
 	* fix none translated name display while measuring trail measurements
