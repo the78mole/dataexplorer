@@ -796,6 +796,6 @@ public class D100 extends MC3000 implements IDevice {
 	 * @return the preferred directory to search and store for device specific files
 	 */
 	public String getFileBaseDir() {
-		return this.getClass().getSimpleName();
+		return this.getName();
 	}
 }
