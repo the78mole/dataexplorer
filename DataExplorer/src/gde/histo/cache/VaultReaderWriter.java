@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -67,13 +69,13 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public final class VaultReaderWriter {
-	private static final String											$CLASS_NAME	= VaultReaderWriter.class.getName();
-	private static final Logger											log					= Logger.getLogger($CLASS_NAME);
+	private static final String											$CLASS_NAME				= VaultReaderWriter.class.getName();
+	private static final Logger											log								= Logger.getLogger($CLASS_NAME);
 
-	private static final int												MIN_FILE_LENGTH	= 2048;
+	private static final int												MIN_FILE_LENGTH		= 2048;
 
-	private static final Cache<String, HistoVault>	memoryCache	=																		//
-			CacheBuilder.newBuilder().maximumSize(4444).recordStats().build();													// key is the vaultName
+	private static final Cache<String, HistoVault>	memoryCache				=																		//
+			CacheBuilder.newBuilder().maximumSize(4444).recordStats().build();																// key is the vaultName
 
 	/**
 	 * Prevents closing.
@@ -105,8 +107,8 @@ public final class VaultReaderWriter {
 		}
 	}
 
-	private final Analyzer													analyzer;
-	private final Optional<ProgressManager>					progress;
+	private final Analyzer									analyzer;
+	private final Optional<ProgressManager>	progress;
 
 	public VaultReaderWriter(Analyzer analyzer, Optional<ProgressManager> progress) {
 		this.analyzer = analyzer;
@@ -134,7 +136,7 @@ public final class VaultReaderWriter {
 
 		if (analyzer.getActiveDevice() instanceof IHistoDevice) {
 			String nativeReaderSettings = ((IHistoDevice) analyzer.getActiveDevice()).getReaderSettingsCsv();
-			if (!nativeReaderSettings.equals(osdReaderSettings) ) {
+			if (!nativeReaderSettings.equals(osdReaderSettings)) {
 				List<ExtendedVault> nativeVaults = loadFromCachePath(trussJobs, ExtendedVault.getVaultDirectoryName(analyzer, nativeReaderSettings));
 				vaults.addAll(nativeVaults);
 			}
@@ -146,6 +148,9 @@ public final class VaultReaderWriter {
 		List<ExtendedVault> vaults = new ArrayList<>();
 		if (!analyzer.getDataAccess().existsCacheDirectory(vaultDirectoryName)) return vaults;
 
+		Function<InputStream, HistoVault> storeKeeper = analyzer.getSettings().isXmlCache() //
+				? (stream) -> VaultProxy.load(stream) //
+				: (stream) -> VaultProxy.loadJson(stream);
 		if (analyzer.getSettings().isZippedCache()) {
 			HashMap<String, VaultCollector> vaultNameMap = trussJobs.getAsVaultNameMap();
 			try (CloseIgnoringInputStream stream = new CloseIgnoringInputStream(analyzer.getDataAccess().getCacheZipInputStream(vaultDirectoryName))) {
@@ -155,7 +160,7 @@ public final class VaultReaderWriter {
 					if (vaultNameMap.containsKey(vaultName)) {
 						progress.ifPresent((p) -> p.countInLoop(1));
 						try {
-							HistoVault histoVault = memoryCache.get(vaultName, () -> VaultProxy.load(stream));
+							HistoVault histoVault = memoryCache.get(vaultName, () -> storeKeeper.apply(stream));
 							VaultCollector truss = vaultNameMap.get(vaultName);
 							vaults.add(ExtendedVault.createExtendedVault(histoVault, truss));
 							trussJobs.remove(truss);
@@ -174,11 +179,11 @@ public final class VaultReaderWriter {
 				while (trussesIterator.hasNext()) {
 					progress.ifPresent((p) -> p.countInLoop(1));
 					VaultCollector truss = trussesIterator.next();
-					String fileName = truss.getVault().getVaultName();
-					if (analyzer.getDataAccess().existsCacheVault(vaultDirectoryName, fileName)) {
+					String vaultName = truss.getVault().vaultName;
+					if (analyzer.getDataAccess().existsCacheVault(vaultDirectoryName, vaultName)) {
 						HistoVault histoVault = null;
-						try (InputStream stream = analyzer.getDataAccess().getCacheInputStream(vaultDirectoryName, fileName)) {
-							histoVault = memoryCache.get(fileName, () -> VaultProxy.load(stream));
+						try (InputStream stream = analyzer.getDataAccess().getCacheInputStream(vaultDirectoryName, vaultName)) {
+							histoVault = memoryCache.get(vaultName, () -> storeKeeper.apply(stream));
 							vaults.add(ExtendedVault.createExtendedVault(histoVault, truss));
 							trussesIterator.remove();
 						} catch (Exception e) {
@@ -219,33 +224,34 @@ public final class VaultReaderWriter {
 	 * @throws IOException
 	 */
 	private void storeInCachePath(List<VaultCollector> newVaults, String vaultDirectoryName) throws IOException {
+		BiConsumer<HistoVault, OutputStream> storeKeeper = analyzer.getSettings().isXmlCache() //
+				? (vault, stream) -> VaultProxy.store(vault, stream) //
+				: (vault, stream) -> VaultProxy.storeJson(vault, stream);
 		if (analyzer.getSettings().isZippedCache()) {
 			// use a zip file system because it supports adding files in contrast to the standard procedure using a ZipOutputStream
 			try (FileSystem zipFileSystem = analyzer.getDataAccess().getCacheZipFileSystem(vaultDirectoryName)) {
 				for (VaultCollector vaultCollector : newVaults) {
-					ExtendedVault histoVault = vaultCollector.getVault();
-					String fileName = histoVault.getVaultFileName().toString();
-					try (OutputStream cacheOutputStream = analyzer.getDataAccess().getCacheZipOutputStream(zipFileSystem, fileName);
+					ExtendedVault vault = vaultCollector.getVault();
+					try (OutputStream cacheOutputStream = analyzer.getDataAccess().getCacheZipOutputStream(zipFileSystem, vault.vaultName);
 							OutputStream outputStream = new BufferedOutputStream(cacheOutputStream)) {
-						VaultProxy.store(histoVault, outputStream);
+						storeKeeper.accept(vault, outputStream);
 					} catch (Exception e) {
 						log.log(SEVERE, e.getMessage(), e);
 					}
-					memoryCache.put(histoVault.vaultName, histoVault);
+					memoryCache.put(vault.vaultName, vault);
 				}
 			}
 		} else {
 			analyzer.getDataAccess().ensureCacheDirectory(vaultDirectoryName);
 			for (VaultCollector vaultCollector : newVaults) {
-				ExtendedVault histoVault = vaultCollector.getVault();
-				String fileName = histoVault.getVaultFileName().toString();
-				try (OutputStream cacheOutputStream = analyzer.getDataAccess().getCacheOutputStream(vaultDirectoryName, fileName);
+				ExtendedVault vault = vaultCollector.getVault();
+				try (OutputStream cacheOutputStream = analyzer.getDataAccess().getCacheOutputStream(vaultDirectoryName, vault.vaultName);
 						OutputStream outputStream = new BufferedOutputStream(cacheOutputStream)) {
-					VaultProxy.store(histoVault, outputStream);
+					storeKeeper.accept(vault, outputStream);
 				} catch (Exception e) {
 					log.log(SEVERE, e.getMessage(), e);
 				}
-				memoryCache.put(histoVault.vaultName, histoVault);
+				memoryCache.put(vault.vaultName, vault);
 			}
 		}
 	}
@@ -263,29 +269,22 @@ public final class VaultReaderWriter {
 		List<HistoVault> vaults = new ArrayList<>();
 		for (VaultKeyPair p : keyPairs) {
 			if (p == null) continue;
-			HistoVault vault = loadVault(p.getKey(), p.getValue());
-			vaults.add(vault);
-		}
-		log.log(Level.FINE, "vaults size=", vaults.size());
-		return vaults;
-	}
-
-	/**
-	 * @param folderName defines the zip file holding the vaults or the vaults folder
-	 * @param fileName is the vault name
-	 * @return the extracted vault
-	 */
-	@Nullable
-	private HistoVault loadVault(String folderName, String fileName) {
-		HistoVault histoVault = memoryCache.getIfPresent(fileName);
-		if (histoVault == null) {
-			histoVault = analyzer.getDataAccess().getCacheVault(folderName, fileName, MIN_FILE_LENGTH, analyzer.getSettings().isZippedCache());
+			String folderName = p.getKey();
+			String fileName = p.getValue();
+			HistoVault histoVault = memoryCache.getIfPresent(fileName);
+			if (histoVault == null) {
+				histoVault = analyzer.getSettings().isZippedCache() //
+						? analyzer.getDataAccess().getCacheZipVault(folderName, fileName, MIN_FILE_LENGTH, analyzer.getSettings().isXmlCache()) //
+						: analyzer.getDataAccess().getCacheVault(folderName, fileName, MIN_FILE_LENGTH, analyzer.getSettings().isXmlCache());
+			}
+			vaults.add(histoVault);
 		}
 		log.fine(() -> {
 			CacheStats stats = memoryCache.stats();
 			return String.format("evictionCount=%d  hitCount=%d  missCount=%d hitRate=%f missRate=%f", stats.evictionCount(), stats.hitCount(), stats.missCount(), stats.hitRate(), stats.missRate());
 		});
-		return histoVault;
+		log.log(Level.FINE, "vaults size=", vaults.size());
+		return vaults;
 	}
 
 	/**
@@ -295,14 +294,18 @@ public final class VaultReaderWriter {
 	 */
 	public List<Entry<String, String>> readVaultsIndices(String directoryName) throws IOException {
 		List<Entry<String, String>> vaultExtract = new ArrayList<>();
+
+		Function<InputStream, HistoVault> storeKeeper = analyzer.getSettings().isXmlCache() //
+				? (stream) -> VaultProxy.load(stream) //
+				: (stream) -> VaultProxy.loadJson(stream);
 		if (analyzer.getSettings().isZippedCache()) {
 			try (CloseIgnoringInputStream stream = new CloseIgnoringInputStream(analyzer.getDataAccess().getCacheZipInputStream(directoryName))) {
 				ZipEntry entry;
 				while ((entry = stream.getNextEntry()) != null) {
-					if (entry.getSize() < MIN_FILE_LENGTH) continue;
+					if (entry.getSize() <= MIN_FILE_LENGTH) continue;
 
 					try {
-						HistoVault histoVault = memoryCache.get(entry.getName(), () -> VaultProxy.load(stream));
+						HistoVault histoVault = memoryCache.get(entry.getName(), () -> storeKeeper.apply(stream));
 						vaultExtract.add(new AbstractMap.SimpleImmutableEntry<String, String>(histoVault.getVaultObjectKey(), histoVault.toIndexEntry()));
 					} catch (Exception e) {
 						log.log(SEVERE, e.getMessage(), e);
@@ -311,9 +314,9 @@ public final class VaultReaderWriter {
 				stream.reallyClose();
 			}
 		} else {
-			for (String vaultName : analyzer.getDataAccess().getCacheFolderList(directoryName, MIN_FILE_LENGTH, analyzer.getSettings().isZippedCache())) {
-				try (InputStream inputStream = analyzer.getDataAccess().getCacheInputStream(directoryName, vaultName)) {
-					HistoVault histoVault = memoryCache.get(vaultName, () -> VaultProxy.load(inputStream));
+			for (String vaultName : analyzer.getDataAccess().getCacheFolderList(directoryName, MIN_FILE_LENGTH)) {
+				try (InputStream stream = analyzer.getDataAccess().getCacheInputStream(directoryName, vaultName)) {
+					HistoVault histoVault = memoryCache.get(vaultName, () -> storeKeeper.apply(stream));
 					vaultExtract.add(new AbstractMap.SimpleImmutableEntry<String, String>(histoVault.getVaultObjectKey(), histoVault.toIndexEntry()));
 				} catch (Exception e) {
 					log.log(SEVERE, e.getMessage(), e);
@@ -329,7 +332,8 @@ public final class VaultReaderWriter {
 				log.log(Level.FINER, entry.getKey(), entry.getValue());
 			}
 		}
-		log.fine(() -> String.format( "%s : %s %d", vaultExtract.isEmpty() ? directoryName : vaultExtract.get(0).getKey() , directoryName , vaultExtract.size()));
+		log.fine(() -> String.format("%s : %s %d", //
+				vaultExtract.isEmpty() ? directoryName : vaultExtract.get(0).getKey(), directoryName, vaultExtract.size()));
 		return vaultExtract;
 	}
 

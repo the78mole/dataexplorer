@@ -134,6 +134,7 @@ public final class Settings extends Properties {
 	final static String							IGNORE_LOG_OBJECT_KEY						= "ignore_log_object_key";																																				//$NON-NLS-1$
 	final static String							RETROSPECT_MONTHS								= "retrospect_months";																																						//$NON-NLS-1$
 	final static String							IS_ZIPPED_CACHE									= "zipped_cache";																																									//$NON-NLS-1$
+	final static String							IS_XML_CACHE										= "xml_cache";																																									//$NON-NLS-1$
 	final static String							MINMAX_QUANTILE_DISTANCE				= "minmax_quantile_distance";																																			//$NON-NLS-1$
 	final static String							ABSOLUTE_TRANSITION_LEVEL				= "absolute_transition_level";																																		//$NON-NLS-1$
 	final static String							IS_DATETIME_UTC									= "is_datetime_utc";																																							//$NON-NLS-1$
@@ -683,6 +684,7 @@ public final class Settings extends Properties {
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.SAMPLING_TIMESPAN_ORDINAL, getSamplingTimespanOrdinal())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IGNORE_LOG_OBJECT_KEY, getIgnoreLogObjectKey())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ZIPPED_CACHE, isZippedCache())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_XML_CACHE, isXmlCache())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.MINMAX_QUANTILE_DISTANCE, getMinmaxQuantileDistance())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.ABSOLUTE_TRANSITION_LEVEL, getAbsoluteTransitionLevel())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_DATETIME_UTC, isDateTimeUtc())); //$NON-NLS-1$
@@ -2548,6 +2550,20 @@ public final class Settings extends Properties {
 	 */
 	public void setZippedCache(boolean value) {
 		this.setProperty(Settings.IS_ZIPPED_CACHE, String.valueOf(value));
+	}
+
+	/**
+	 * @return false if the history cache vault files are JSON files
+	 */
+	public boolean isXmlCache() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_XML_CACHE, "false")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param value false if the history cache vault files are JSON files
+	 */
+	public void setXmlCache(boolean value) {
+		this.setProperty(Settings.IS_XML_CACHE, String.valueOf(value));
 	}
 
 	/**

@@ -80,7 +80,7 @@ import gde.utils.OperatingSystemHelper;
  * Is a hybrid singleton supporting cloning.
  * @author Thomas Eickert (USER)
  */
-public abstract class DataAccess {
+public abstract class DataAccess implements Cloneable{
 
 	public final static class LocalAccess extends DataAccess {
 		private static final String	$CLASS_NAME	= LocalAccess.class.getName();
@@ -247,60 +247,71 @@ public abstract class DataAccess {
 		}
 
 		@Override
-		public String[] getCacheFolderList(String vaultDirectory, int minFileLength, boolean isZippedCache) {
+		public String[] getCacheFolderList(String vaultDirectory, int minFileLength) {
 			Path cachePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, vaultDirectory);
 			if (!cachePath.toFile().exists()) return new String[0];
 
-			if (Settings.getInstance().isZippedCache()) {
+			if (minFileLength <= 0) {
+				return cachePath.toFile().list();
+			} else {
 				List<String> vaultNames = new ArrayList<>();
-				try (ZipInputStream stream = dataAccess.getCacheZipInputStream(vaultDirectory)) {
-					ZipEntry entry;
-					while ((entry = stream.getNextEntry()) != null) {
-						if (entry.getSize() >= minFileLength) vaultNames.add(entry.getName());
+				try (DirectoryStream<Path> stream = Files.newDirectoryStream(cachePath)) {
+					for (Path path : stream) {
+						if (path.toFile().length() >= minFileLength) vaultNames.add(path.getFileName().toString());
 					}
 				} catch (Exception e) {
 					log.log(SEVERE, e.getMessage(), e);
 				}
 				return vaultNames.toArray(new String[vaultNames.size()]);
-			} else {
-				if (minFileLength <= 0) {
-					return cachePath.toFile().list();
-				} else {
-					List<String> vaultNames = new ArrayList<>();
-					try (DirectoryStream<Path> stream = Files.newDirectoryStream(cachePath)) {
-						for (Path path : stream) {
-							if (path.toFile().length() >= minFileLength) vaultNames.add(path.getFileName().toString());
-						}
-					} catch (Exception e) {
-						log.log(SEVERE, e.getMessage(), e);
-					}
-					return vaultNames.toArray(new String[vaultNames.size()]);
-				}
 			}
 		}
 
 		@Override
+		public String[] getCacheZipFolderList(String vaultDirectory, int minFileLength) {
+			Path cachePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, vaultDirectory);
+			if (!cachePath.toFile().exists()) return new String[0];
+
+			List<String> vaultNames = new ArrayList<>();
+			try (ZipInputStream stream = dataAccess.getCacheZipInputStream(vaultDirectory)) {
+				ZipEntry entry;
+				while ((entry = stream.getNextEntry()) != null) {
+					if (entry.getSize() >= minFileLength) vaultNames.add(entry.getName());
+				}
+			} catch (Exception e) {
+				log.log(SEVERE, e.getMessage(), e);
+			}
+			return vaultNames.toArray(new String[vaultNames.size()]);
+		}
+
+		@Override
 		@Nullable
-		public HistoVault getCacheVault(String vaultDirectory, String vaultName, int minVaultLength, boolean isZippedCache) {
+		public HistoVault getCacheVault(String vaultDirectory, String vaultName, int minVaultLength, boolean xmlFormat) {
 			Path cachePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, vaultDirectory);
 			HistoVault histoVault = null;
-			if (Settings.getInstance().isZippedCache()) {
-				try (ZipFile zf = new ZipFile(cachePath.toFile())) {
-					if (zf.getEntry(vaultName) != null && zf.getEntry(vaultName).getSize() > minVaultLength) {
-						histoVault = VaultProxy.load(zf.getInputStream(zf.getEntry(vaultName)));
-					}
+			File file = cachePath.resolve(vaultName).toFile();
+			if (file.length() > minVaultLength) {
+				try (InputStream stream = getCacheInputStream(vaultDirectory, file.getName())) {
+					histoVault = xmlFormat ? VaultProxy.load(stream) : VaultProxy.loadJson(stream);
 				} catch (Exception e) {
 					log.log(SEVERE, e.getMessage(), e);
 				}
-			} else {
-				File file = cachePath.resolve(vaultName).toFile();
-				if (file.length() > minVaultLength) {
-					try (InputStream inputStream = getCacheInputStream(vaultDirectory, file.getName())) {
-						histoVault = VaultProxy.load(inputStream);
-					} catch (Exception e) {
-						log.log(SEVERE, e.getMessage(), e);
+			}
+			return histoVault;
+		}
+
+		@Override
+		@Nullable
+		public HistoVault getCacheZipVault(String vaultDirectory, String vaultName, int minVaultLength, boolean xmlFormat) {
+			Path cachePath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_CACHE_ENTRIES_DIR_NAME, vaultDirectory);
+			HistoVault histoVault = null;
+			try (ZipFile zf = new ZipFile(cachePath.toFile())) {
+				if (zf.getEntry(vaultName) != null && zf.getEntry(vaultName).getSize() > minVaultLength) {
+					try (InputStream stream = zf.getInputStream(zf.getEntry(vaultName))) {
+						histoVault = xmlFormat ? VaultProxy.load(stream) : VaultProxy.loadJson(stream);
 					}
 				}
+			} catch (Exception e) {
+				log.log(SEVERE, e.getMessage(), e);
 			}
 			return histoVault;
 		}
@@ -342,7 +353,7 @@ public abstract class DataAccess {
 
 		@SuppressWarnings("static-method")
 		public InputStream getDeviceXmlInputStream(String xmlFilePath) throws FileNotFoundException {
-				return new FileInputStream(xmlFilePath);
+			return new FileInputStream(xmlFilePath);
 		}
 
 		@Override
@@ -354,7 +365,7 @@ public abstract class DataAccess {
 		@SuppressWarnings("static-method")
 		@Nullable
 		public FileOutputStream getDeviceXmlOutputStream(String xmlFilePath) throws FileNotFoundException {
-				return new FileOutputStream(xmlFilePath);
+			return new FileOutputStream(xmlFilePath);
 		}
 
 		@SuppressWarnings("static-method")
@@ -568,111 +579,111 @@ public abstract class DataAccess {
 			return Stream.empty();
 		}
 
-	@Override
-	public boolean existsSourceFolder(Path fittedFolderPath) {
-		File sourceFolder = fittedFolderPath.toFile();
-		return sourceFolder.exists() && sourceFolder.isDirectory() && sourceFolder.canRead();
-	}
+		@Override
+		public boolean existsSourceFolder(Path fittedFolderPath) {
+			File sourceFolder = fittedFolderPath.toFile();
+			return sourceFolder.exists() && sourceFolder.isDirectory() && sourceFolder.canRead();
+		}
 
-	@Override
-	public boolean existsSourceFile(Path fittedFilePath) {
-		return FileUtils.checkFileExist(fittedFilePath.toString());
-	}
+		@Override
+		public boolean existsSourceFile(Path fittedFilePath) {
+			return FileUtils.checkFileExist(fittedFilePath.toString());
+		}
 
-	@Override
-	public Stream<Path> getSourceFolders(Path fittedFolderPath) throws IOException {
-		Stream<Path> folders = Files.walk(fittedFolderPath) //
-				.filter(p -> !p.equals(fittedFolderPath)) // eliminate root
-				.filter(Files::isDirectory);
-		return folders;
-	}
+		@Override
+		public Stream<Path> getSourceFolders(Path fittedFolderPath) throws IOException {
+			Stream<Path> folders = Files.walk(fittedFolderPath) //
+					.filter(p -> !p.equals(fittedFolderPath)) // eliminate root
+					.filter(Files::isDirectory);
+			return folders;
+		}
 
-	@Override
-	public Stream<Path> getSourceFolders(Path fittedFolderPath, Stream<String> objectKeys) throws IOException {
-		Set<String> lowerCaseKeys = objectKeys.map(String::toLowerCase).collect(Collectors.toSet());
-		Stream<Path> folders = Files.walk(fittedFolderPath) //
-				.filter(Files::isDirectory) //
-				.filter(p -> lowerCaseKeys.contains(p.getFileName().toString().toLowerCase()));
-		return folders;
-	}
+		@Override
+		public Stream<Path> getSourceFolders(Path fittedFolderPath, Stream<String> objectKeys) throws IOException {
+			Set<String> lowerCaseKeys = objectKeys.map(String::toLowerCase).collect(Collectors.toSet());
+			Stream<Path> folders = Files.walk(fittedFolderPath) //
+					.filter(Files::isDirectory) //
+					.filter(p -> lowerCaseKeys.contains(p.getFileName().toString().toLowerCase()));
+			return folders;
+		}
 
-	@Override
-	@Nullable
-	public Path getActualSourceFile(Path fittedFilePath) {
-		long startMillis = System.currentTimeMillis();
-		File tmpActualFile = null;
-		try {
-			tmpActualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(fittedFilePath.toString()));
-			// getLinkContainedFilePath may have long response times in case of an unavailable network resources
-			// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
-			log.log(Level.FINER, "time_ms=", System.currentTimeMillis() - startMillis);
-			if (!fittedFilePath.toFile().exists()) throw new IllegalArgumentException("source file does not exist");
+		@Override
+		@Nullable
+		public Path getActualSourceFile(Path fittedFilePath) {
+			long startMillis = System.currentTimeMillis();
+			File tmpActualFile = null;
+			try {
+				tmpActualFile = new File(OperatingSystemHelper.getLinkContainedFilePath(fittedFilePath.toString()));
+				// getLinkContainedFilePath may have long response times in case of an unavailable network resources
+				// This is a workaround: Much better solution would be a function 'getLinkContainedFilePathWithoutAccessingTheLinkedFile'
+				log.log(Level.FINER, "time_ms=", System.currentTimeMillis() - startMillis);
+				if (!fittedFilePath.toFile().exists()) throw new IllegalArgumentException("source file does not exist");
 
-			if (Files.isSameFile(fittedFilePath, tmpActualFile.toPath()) && (System.currentTimeMillis() - startMillis > 555)) {
-				log.log(Level.WARNING, "Dead OSD link " + fittedFilePath + " pointing to ", tmpActualFile);
-				if (!fittedFilePath.toFile().delete()) {
-					log.log(Level.WARNING, "could not delete link file ", fittedFilePath);
+				if (Files.isSameFile(fittedFilePath, tmpActualFile.toPath()) && (System.currentTimeMillis() - startMillis > 555)) {
+					log.log(Level.WARNING, "Dead OSD link " + fittedFilePath + " pointing to ", tmpActualFile);
+					if (!fittedFilePath.toFile().delete()) {
+						log.log(Level.WARNING, "could not delete link file ", fittedFilePath);
+					}
+					tmpActualFile = null;
 				}
-				tmpActualFile = null;
+			} catch (Exception e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
 			}
-		} catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
+			return tmpActualFile != null ? tmpActualFile.toPath() : null;
 		}
-		return tmpActualFile != null ? tmpActualFile.toPath() : null;
-	}
 
-	@Override
-	public boolean deleteFleetObjects() {
-		Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
-		return FileUtils.cleanDirectory(targetDirPath.toFile());
-	}
-
-	@Override
-	public Set<String> getFleetFileNames(Function<String, Boolean> objectKeyfilter) {
-		Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
-		FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
-		Set<String> objectNames;
-		try (Stream<String> stream = Files.list(targetDirPath).map(p -> targetDirPath.relativize(p)).map(Path::toString)) {
-			objectNames = stream.filter(objectKeyfilter::apply).collect(Collectors.toSet());
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+		@Override
+		public boolean deleteFleetObjects() {
+			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+			return FileUtils.cleanDirectory(targetDirPath.toFile());
 		}
-		return objectNames;
-	}
 
-	@Override
-	public FileInputStream getFleetInputStream(Path fileSubPath) {
-		Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
-		FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
-		try {
-			return new FileInputStream(targetDirPath.resolve(fileSubPath).toFile());
-		} catch (FileNotFoundException e) {
-			throw new IllegalArgumentException("invalid path " + fileSubPath);
+		@Override
+		public Set<String> getFleetFileNames(Function<String, Boolean> objectKeyfilter) {
+			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+			FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
+			Set<String> objectNames;
+			try (Stream<String> stream = Files.list(targetDirPath).map(p -> targetDirPath.relativize(p)).map(Path::toString)) {
+				objectNames = stream.filter(objectKeyfilter::apply).collect(Collectors.toSet());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+			return objectNames;
 		}
-	}
 
-	@Override
-	public FileOutputStream getFleetOutputStream(Path fileSubPath) {
-		Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
-		FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
-		try {
-			Files.createDirectories(targetDirPath);
-			return new FileOutputStream(targetDirPath.resolve(fileSubPath).toFile());
-		} catch (Exception e) {
-			throw new IllegalArgumentException("invalid path " + fileSubPath);
+		@Override
+		public FileInputStream getFleetInputStream(Path fileSubPath) {
+			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+			FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
+			try {
+				return new FileInputStream(targetDirPath.resolve(fileSubPath).toFile());
+			} catch (FileNotFoundException e) {
+				throw new IllegalArgumentException("invalid path " + fileSubPath);
+			}
 		}
-	}
 
-	@Override
-	public synchronized LocalAccess clone() {
-		LocalAccess clone = null;
-		try {
-			clone = new LocalAccess(this);
-		} catch (Exception e) {
-			LocalAccess.log.log(Level.SEVERE, e.getMessage(), e);
+		@Override
+		public FileOutputStream getFleetOutputStream(Path fileSubPath) {
+			Path targetDirPath = Paths.get(GDE.APPL_HOME_PATH, Settings.HISTO_OBJECTS_DIR_NAME);
+			FileUtils.checkDirectoryAndCreate(targetDirPath.toString());
+			try {
+				Files.createDirectories(targetDirPath);
+				return new FileOutputStream(targetDirPath.resolve(fileSubPath).toFile());
+			} catch (Exception e) {
+				throw new IllegalArgumentException("invalid path " + fileSubPath);
+			}
 		}
-		return clone;
-	}
+
+		@Override
+		public synchronized LocalAccess clone() {
+			LocalAccess clone = null;
+			try {
+				clone = new LocalAccess(this);
+			} catch (Exception e) {
+				LocalAccess.log.log(Level.SEVERE, e.getMessage(), e);
+			}
+			return clone;
+		}
 
 	}
 
@@ -844,21 +855,36 @@ public abstract class DataAccess {
 	public abstract InputStream getCacheInputStream(String directoryName, String fileName) throws IOException;
 
 	/**
-	 * @param vaultDirectory is the folderName or zipFile name
-	 * @param minVaultLength is the lower limit of uncompressed bytes
-	 * @param isZippedCache true takes the {@code vaultDirectory} as a zip file
+	 * @param vaultDirectory is the folderName
+	 * @param minVaultLength is the lower limit of bytes
 	 * @return the file names without any order
 	 */
-	public abstract String[] getCacheFolderList(String vaultDirectory, int minVaultLength, boolean isZippedCache);
+	public abstract String[] getCacheFolderList(String vaultDirectory, int minVaultLength);
 
 	/**
-	 * @param vaultDirectory is the folderName or zipFile name
+	 * @param vaultDirectory is the zipFile name
 	 * @param minVaultLength is the lower limit of uncompressed bytes
-	 * @param isZippedCache
-	 * @return the vault retrieved from the file system if it exceeds the minimum file size
+	 * @return the file names without any order
+	 */
+	public abstract String[] getCacheZipFolderList(String vaultDirectory, int minVaultLength);
+
+	/**
+	 * @param vaultDirectory is the folderName
+	 * @param minVaultLength is the lower limit of uncompressed bytes
+	 * @param xmlFormat false uses a json format instead
+	 * @return the vault retrieved from the file system if it exceeds the minimum file length
 	 */
 	@Nullable
-	public abstract HistoVault getCacheVault(String vaultDirectory, String vaultName, int minVaultLength, boolean isZippedCache);
+	public abstract HistoVault getCacheVault(String vaultDirectory, String vaultName, int minVaultLength, boolean xmlFormat);
+
+	/**
+	 * @param vaultDirectory is the zipFile name
+	 * @param minVaultLength is the lower limit of uncompressed bytes
+	 * @param xmlFormat false uses a json format instead
+	 * @return the vault retrieved from the file system if it exceeds the minimum file length
+	 */
+	@Nullable
+	public abstract HistoVault getCacheZipVault(String vaultDirectory, String vaultName, int minVaultLength, boolean xmlFormat);
 
 	public abstract InputStream getMappingInputStream(String fileName) throws FileNotFoundException;
 

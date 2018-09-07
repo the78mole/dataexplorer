@@ -150,6 +150,7 @@ public class NonUiTestCase extends TestCase {
 		this.settings.setSamplingTimespan_ms("2"); // this index corresponds to 1 sec
 		this.settings.setIgnoreLogObjectKey(true);
 		this.settings.setRetrospectMonths("240"); // this is the current maximum value
+		this.settings.setXmlCache(true);
 		this.settings.setZippedCache(false);
 		this.settings.setAbsoluteTransitionLevel("999"); // results in default value
 		this.settings.setAbsoluteTransitionLevel("999"); // results in default value

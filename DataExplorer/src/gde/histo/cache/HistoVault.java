@@ -186,6 +186,47 @@ public class HistoVault {
 	@XmlJavaTypeAdapter(PointsTypeAdapter.class)
 	protected HashMap<Integer, PointType>				scores;
 
+	public HistoVault() {
+		}
+
+	/**
+	 * Shallow copy.
+	 * @param histoVault
+	 */
+	public HistoVault(HistoVault histoVault) {
+		this.vaultName = histoVault.vaultName;
+		this.vaultDirectory = histoVault.vaultDirectory;
+		this.vaultCreatedMs = histoVault.vaultCreatedMs;
+
+		this.vaultReaderSettings = histoVault.vaultReaderSettings;
+
+		this.vaultDataExplorerVersion = histoVault.vaultDataExplorerVersion;
+		this.vaultDeviceKey = histoVault.vaultDeviceKey;
+		this.vaultDeviceName = histoVault.vaultDeviceName;
+		this.vaultChannelNumber = histoVault.vaultChannelNumber;
+		this.vaultObjectKey = histoVault.vaultObjectKey;
+		this.vaultSamplingTimespanMs = histoVault.vaultSamplingTimespanMs;
+
+		this.logLinkPath = histoVault.logLinkPath;
+		this.logFilePath = histoVault.logFilePath;
+		this.logFileLastModified = histoVault.logFileLastModified;
+		this.logFileLength = histoVault.logFileLength;
+		this.logFileVersion = histoVault.logFileVersion;
+
+		this.logObjectDirectory = histoVault.logObjectDirectory;
+		this.logRecordSetSize = histoVault.logRecordSetSize;
+		this.logRecordSetOrdinal = histoVault.logRecordSetOrdinal;
+		this.logRecordsetBaseName = histoVault.logRecordsetBaseName;
+		this.logDeviceName = histoVault.logDeviceName;
+		this.logChannelNumber = histoVault.logChannelNumber;
+		this.logObjectKey = histoVault.logObjectKey;
+		this.logStartTimestampMs = histoVault.logStartTimestampMs;
+
+		this.measurements = histoVault.measurements;
+		this.settlements = histoVault.settlements;
+		this.scores = histoVault.scores;
+}
+
 	/**
 	   * Gets the value of the vaultName property.
 	   *
