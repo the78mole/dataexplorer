@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 3.3.4 - xx yyy 2018
 Generic changes/fixes
 	* fix ratio calculation triggered used capacity to reached motor altitude
+	* update Java download URLs in Windows launcher
 	
 Device specific changes/fixes
 	* HottAdapter* -  fix error message GDE_MSGW2404 appearing only at the first import, Fix missing tab activation after import
