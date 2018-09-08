@@ -168,7 +168,7 @@ public class FileUtils {
 		// initial case Device directory does ot exist
 		if (!dir.exists() && !dir.isDirectory()) {
 			exist = false;
-			if (!dir.mkdir()) FileUtils.log.log(Level.WARNING, "failed to create " + directory); //$NON-NLS-1$
+			if (!dir.mkdir()) FileUtils.log.log(Level.WARNING, "error upon create " + directory); //$NON-NLS-1$
 		}
 		else {
 			File file = new File(directory + GDE.FILE_SEPARATOR_UNIX + versionFileName);
@@ -179,7 +179,7 @@ public class FileUtils {
 						if (tmpFile.getPath().endsWith(GDE.FILE_ENDING_DOT_XSD)) {
 							int oldVersion = Integer.parseInt(tmpFile.getPath().substring(tmpFile.getPath().length() - 6, tmpFile.getPath().length() - 4));
 							if (!dir.renameTo(new File(directory + "_V" + oldVersion))) { //$NON-NLS-1$
-								FileUtils.log.log(Level.WARNING, "failed to rename " + directory); //$NON-NLS-1$
+								FileUtils.log.log(Level.WARNING, "failed to rename " + directory + " into _V" + oldVersion); //$NON-NLS-1$
 							}
 						}
 					}
@@ -187,7 +187,7 @@ public class FileUtils {
 					File versionDir = new File(directory + "_V" + version); //$NON-NLS-1$
 					if (versionDir.exists()) {
 						if (!versionDir.renameTo(new File(directory))) {
-							FileUtils.log.log(Level.WARNING, "failed to rename " + directory); //$NON-NLS-1$
+							FileUtils.log.log(Level.WARNING, "failed to rename " + directory + " into _V" + version); //$NON-NLS-1$
 						}
 					}
 					else {

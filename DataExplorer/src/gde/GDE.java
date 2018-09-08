@@ -112,9 +112,9 @@ public class GDE {
 	public static final int									VERSION_NUMBER										= Integer.parseInt(GDE.VERSION.substring(8).replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
 	public static final String							NAME_SHORT												= "GDE";																																																										//$NON-NLS-1$
 	public static final String							NAME_LONG													= "DataExplorer";																																																						//$NON-NLS-1$
-	public final static String							DEVICE_PROPERTIES_XSD_VERSION			= "_V33";																																																										//$NON-NLS-1$
+	public final static String							DEVICE_PROPERTIES_XSD_VERSION			= "_V34";																																																										//$NON-NLS-1$
 	public final static String							GRAPHICS_TEMPLATES_XSD_VERSION		= "_V08";																																																										//$NON-NLS-1$
-	public final static String							HISTO_CACHE_ENTRIES_XSD_VERSION		= "_V03";																																																										//$NON-NLS-1$
+	public final static String							HISTO_CACHE_ENTRIES_XSD_VERSION		= "_V04";																																																										//$NON-NLS-1$
 	public final static String							CLEAN_SETTINGS_WHILE_SHUTDOWN			= "CLEAN_SETTINGS_WHILE_SHUTDOWN";
 	public final static String							TEMP_FILE_STEM										= "~TempFile";
 
