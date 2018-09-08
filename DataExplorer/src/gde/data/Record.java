@@ -20,6 +20,7 @@ package gde.data;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -36,6 +37,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.DataTypes;
+import gde.device.IChannelItem;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.MeasurementType;
@@ -52,7 +54,7 @@ import gde.utils.TimeLine;
  * @author Winfried Brügmann
  *         class record holds data points of one measurement or line or curve
  */
-public class Record extends AbstractRecord {
+public class Record extends AbstractRecord implements IRecord {
 	final static String					$CLASS_NAME				= Record.class.getName();
 	final static long						serialVersionUID	= 26031957;
 	final static Logger					log								= Logger.getLogger(Record.class.getName());
@@ -862,6 +864,26 @@ public class Record extends AbstractRecord {
 	}
 
 	@Override
+	public boolean isBits() {
+		boolean isBits = false;
+		PropertyType tmpProperty = this.getProperty(IDevice.IS_BITS);
+		if (tmpProperty != null) {
+			isBits = Boolean.parseBoolean(tmpProperty.getValue());
+		}
+		return isBits;
+	}
+
+	@Override
+	public boolean isTokens() {
+		boolean isBits = false;
+		PropertyType tmpProperty = this.getProperty(IDevice.IS_TOKENS);
+		if (tmpProperty != null) {
+			isBits = Boolean.parseBoolean(tmpProperty.getValue());
+		}
+		return isBits;
+	}
+
+	@Override
 	public boolean isVisible() {
 		return this.isVisible;
 	}
@@ -1152,6 +1174,7 @@ public class Record extends AbstractRecord {
 	/**
 	 * @return all the translated record values including nulls (do not consider zoom, scope, ...)
 	 */
+	@Override
 	public Vector<Double> getTranslatedValues() {
 		Vector<Double> translatedValues = new Vector<>();
 		for (Integer value : this) { // loops without calling the overridden getter
@@ -1161,6 +1184,11 @@ public class Record extends AbstractRecord {
 				translatedValues.add(null);
 		}
 		return translatedValues;
+	}
+
+	@Override
+	public Collection<Integer> getValues() {
+		return this;
 	}
 
 	@Override
@@ -2631,4 +2659,9 @@ public class Record extends AbstractRecord {
 			return -1;
 		}
 	}
+
+	public IChannelItem getChannelItem() {
+		return device.getMeasurement(this.parent.parent.number, this.ordinal);
+	}
+
 }

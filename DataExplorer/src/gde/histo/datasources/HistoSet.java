@@ -25,8 +25,6 @@ import java.util.List;
 
 import com.sun.istack.internal.Nullable;
 
-import gde.Analyzer;
-import gde.data.Record;
 import gde.data.Record.DataType;
 import gde.device.IChannelItem;
 import gde.exception.DataInconsitsentException;
@@ -237,38 +235,6 @@ public final class HistoSet {
 		default:
 			newValue = value * record.getFactor();
 		}
-		return newValue;
-	}
-
-	/**
-	 * Reverse translate a measured value into a normalized histo vault value.</br>
-	 * Data types might require a special normalization (e.g. GPS coordinates).
-	 * This is the equivalent of {@code device.reverseTranslateValue} for data dedicated to the histo vault.
-	 * @return the normalized histo vault value (as a multiplied int for fractional digits support)
-	 */
-	@Deprecated // use method with IChannelItem parameter instead
-	public static double encodeVaultValue(Record record, double value) {
-		final double newValue;
-		if (Analyzer.getInstance().getActiveDevice().isGPSCoordinates(record)) {
-			newValue = value * 1000.;
-		} else {
-			switch (record.getDataType()) {
-			case GPS_LATITUDE:
-			case GPS_LONGITUDE:
-				// this might be obsolete as isGPSCoordinates should do the job
-				newValue = value * 1000.;
-				break;
-
-			default:
-				double factor = record.getFactor(); // != 1 if a unit translation is required
-				double offset = record.getOffset(); // != 0 if a unit translation is required
-				double reduction = record.getReduction(); // != 0 if a unit translation is required
-
-				newValue = (value - offset) / factor + reduction;
-				break;
-			}
-		}
-		log.fine(() -> "for " + record.getName() + " in value = " + value + " out value = " + newValue);
 		return newValue;
 	}
 

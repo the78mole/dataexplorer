@@ -20,17 +20,23 @@
 package gde.histo.cache;
 
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.BitSet;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import gde.Analyzer;
 import gde.DataAccess;
 import gde.GDE;
+import gde.config.Settings;
+import gde.data.IRecord;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.device.IChannelItem;
 import gde.device.IDevice;
 import gde.device.MeasurementType;
 import gde.device.ScoreLabelTypes;
@@ -52,7 +58,6 @@ import gde.histo.transitions.Transition;
 import gde.histo.transitions.TransitionCollector;
 import gde.histo.transitions.TransitionTableMapper.SettlementRecords;
 import gde.histo.utils.UniversalQuantile;
-import gde.log.Level;
 import gde.log.Logger;
 
 /**
@@ -63,10 +68,78 @@ public final class VaultCollector {
 	final private static String	$CLASS_NAME	= VaultCollector.class.getName();
 	final private static Logger	log					= Logger.getLogger($CLASS_NAME);
 
-	private final Analyzer			analyzer;
+	private enum Coding {
+		BITS {
+			@Override
+			public UniversalQuantile<Integer> toIndexQuantile(IRecord record, Settings settings) {
+				List<Integer> bitIndexes = record.getValues().stream().map(p -> p / 1000) // todo supports a maximum of 22 bits only
+						.flatMap(v -> BitSet.valueOf(new long[] { v }).stream().boxed()) //
+						.collect(Collectors.toList());
+				UniversalQuantile<Integer> quantile = new UniversalQuantile<>(bitIndexes, true, false, false, settings);
+				log.finer(() -> quantile.toString());
+				return quantile;
+			}
 
-	private ExtendedVault				vault;
-	private SourceDataSet				sourceDataSet;
+			@Override
+			public UniversalQuantile<? extends Number> toValueQuantile(IRecord record, Settings settings) {
+				List<Integer> intValues = record.getValues().stream().map(p -> p / 1000) //
+						.collect(Collectors.toList());
+				UniversalQuantile<Integer> quantile = new UniversalQuantile<>(intValues, true, false, false, settings);
+				return quantile;
+			}
+		},
+		TOKENS {
+			@Override
+			public UniversalQuantile<Integer> toIndexQuantile(IRecord record, Settings settings) {
+				List<Integer> bitIndexes = record.getValues().stream().map(p -> p / 1000) //
+						.collect(Collectors.toList());
+				UniversalQuantile<Integer> quantile = new UniversalQuantile<>(bitIndexes, true, false, false, settings);
+				log.finer(() -> quantile.toString());
+				return quantile;
+			}
+
+			@Override
+			public UniversalQuantile<? extends Number> toValueQuantile(IRecord record, Settings settings) {
+				Function<Integer, Integer> indexToSetMapper = i -> {
+					if (i <= 0) return 1; // setting the bits(0) prevents zero values from getting lost
+
+					// take inputs from { 1 .. 32 } corresponding to { A .. Z plus some extra chars }
+					// convert into an int value, i.e. calculate the power of two
+					int idx = i & 0x1F; // todo supports a maximum of 31 tokens only
+					return idx > 0 ? 1 << idx : 0; // 1-based token numbers ('A' maps to bits(1), bits(0) used for zero detection)
+				};
+
+				List<Integer> intValues = record.getValues().stream().map(p -> p / 1000) //
+						.map(indexToSetMapper) //
+						.collect(Collectors.toList());
+				UniversalQuantile<Integer> quantile = new UniversalQuantile<>(intValues, true, false, false, settings);
+				log.finer(() -> quantile.toString());
+				return quantile;
+			}
+		},
+		POINT {
+			@Override
+			public UniversalQuantile<Integer> toIndexQuantile(IRecord record, Settings settings) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public UniversalQuantile<? extends Number> toValueQuantile(IRecord record, Settings settings) {
+				boolean removeCastaways = true;
+				UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), true, removeCastaways, false, settings);
+				return quantile;
+			}
+		};
+
+		public abstract UniversalQuantile<Integer> toIndexQuantile(IRecord record, Settings settings);
+
+		public abstract UniversalQuantile<? extends Number> toValueQuantile(IRecord record, Settings settings);
+	}
+
+	private final Analyzer	analyzer;
+
+	private ExtendedVault		vault;
+	private SourceDataSet		sourceDataSet;
 
 	/**
 	 * Use this for import files.
@@ -109,8 +182,8 @@ public final class VaultCollector {
 		String readerSettings = providesReaderSettings && analyzer.getActiveDevice() instanceof IHistoDevice
 				? ((IHistoDevice) analyzer.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
 		DataAccess dataAccess = analyzer.getDataAccess();
-		this.vault = new ExtendedVault(objectDirectory, sourcePath, dataAccess.getSourceLastModified(sourcePath), dataAccess.getSourceLength(sourcePath), fileVersion, logRecordSetSize,
-				logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, analyzer, //
+		this.vault = new ExtendedVault(objectDirectory, sourcePath, dataAccess.getSourceLastModified(sourcePath), dataAccess.getSourceLength(sourcePath),
+				fileVersion, logRecordSetSize, logRecordSetOrdinal, logRecordsetBaseName, logDeviceName, analyzer, //
 				logStartTimestamp_ms, logChannelNumber, logObjectKey, readerSettings);
 	}
 
@@ -151,7 +224,7 @@ public final class VaultCollector {
 	/**
 	 * Add the measurements points from the records to the vault.
 	 * @param recordSet
-	 * @param isSampled
+	 * @param isSampled true if the recordset does not hold all measurement points
 	 */
 	private void setMeasurementPoints(RecordSet recordSet, boolean isSampled) {
 		List<MeasurementType> channelMeasurements = analyzer.getActiveDevice().getChannelMeasuremts(this.vault.getLogChannelNumber());
@@ -164,14 +237,14 @@ public final class VaultCollector {
 			entryPoints.setTrails(new HashMap<Integer, PointType>());
 
 			if (!record.hasReasonableData()) {
-				log.fine(() -> String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLoadFilePath())); //$NON-NLS-1$
+				log.fine(() -> String.format("no reasonable data for measurementType.getName()=%s %s", measurementType.getName(), this.vault.getLoadFilePath()));
 			} else {
 				if (measurementType.getStatistics() != null) { // this creates trail types mismatch : && record.hasReasonableData()) {
 					setTrailStatisticsPoints(entryPoints, record, recordSet);
 				}
 				setTrailPoints(entryPoints, record, isSampled);
 			}
-			log.finer(() -> record.getName() + " data " + entryPoints); //$NON-NLS-1$
+			log.finer(() -> record.getName() + " data " + entryPoints);
 		}
 	}
 
@@ -290,7 +363,7 @@ public final class VaultCollector {
 		if (refOrdinal != null) {
 			int referencedSumTriggeredRange = record.getSumTriggeredRange(refOrdinal);
 			double summarizedValue = device.translateDeltaValue(record, referencedSumTriggeredRange / 1000.);
-			log.finer(() -> String.format("%s -> summarizedValue = %d", record.getName(), (int)summarizedValue));
+			log.finer(() -> String.format("%s -> summarizedValue = %d", record.getName(), (int) summarizedValue));
 			if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1 && summarizedValue > 0.) {
 				// Warning: Sum values do not sum correctly in case of offset != 0. Reason is summing up the offset multiple times.
 				if (isTriggerLevel) {
@@ -300,7 +373,7 @@ public final class VaultCollector {
 				}
 			}
 
-			if (summarizedValue > 0.) { //while summarized value is zero it does not make sense to calculate ratio
+			if (summarizedValue > 0.) { // while summarized value is zero it does not make sense to calculate ratio
 				Integer ratioRefOrdinal = measurementStatistics.getRatioRefOrdinal();
 				if (ratioRefOrdinal != null && measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1) {
 					Record referencedRecord = recordSet.get(ratioRefOrdinal.intValue());
@@ -312,21 +385,6 @@ public final class VaultCollector {
 							// multiply by 1000 -> all ratios are internally stored multiplied by thousand
 							entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
 						}
-//=======
-//			Integer ratioRefOrdinal = measurementStatistics.getRatioRefOrdinal();
-//			if (measurementStatistics.getRatioText() != null && measurementStatistics.getRatioText().length() > 1 && ratioRefOrdinal != null) {
-//				Record referencedRecord = recordSet.get(ratioRefOrdinal.intValue());
-//				StatisticsType referencedStatistics = device.getMeasurementStatistic(this.vault.getLogChannelNumber(), ratioRefOrdinal);
-//				if (referencedRecord != null) {
-//					if (referencedStatistics.isAvg() && summarizedValue > 0.) {
-//						double ratio = device.translateValue(referencedRecord, referencedRecord.getAvgValueTriggered(refOrdinal) / 1000.) / summarizedValue;
-//						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
-//						entryPoints.addPoint(TrailTypes.REAL_AVG_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
-//					} else if (referencedStatistics.isMax() && summarizedValue > 0.) {
-//						double ratio = (device.translateValue(referencedRecord, referencedRecord.getMaxValueTriggered(refOrdinal) / 1000.) - device.translateValue(referencedRecord, referencedRecord.getMinValueTriggered(refOrdinal) / 1000.)) / summarizedValue;
-//						// multiply by 1000 -> all ratios are internally stored multiplied by thousand
-//						entryPoints.addPoint(TrailTypes.REAL_MAX_RATIO_TRIGGERED, transmuteScalar(record, (int) (ratio * 1000.)));
-//>>>>>>> 5a57072 Fix vault device key
 					}
 				}
 			}
@@ -352,7 +410,7 @@ public final class VaultCollector {
 	 * @return a record value (point) transformed into the device independent histo vault value (point)
 	 */
 	private int transmuteValue(Record record, int value) {
-		return encodeMeasurementValue(record, analyzer.getActiveDevice().translateValue(record, value / 1000.));
+		return encodeValue(record.getChannelItem(), analyzer.getActiveDevice().translateValue(record, value / 1000.));
 	}
 
 	/**
@@ -360,7 +418,7 @@ public final class VaultCollector {
 	 * @return a record delta value transformed into the device independent histo vault value
 	 */
 	private int transmuteDelta(Record record, int deltaValue) {
-		return encodeMeasurementValue(record, analyzer.getActiveDevice().translateDeltaValue(record, deltaValue / 1000.));
+		return encodeValue(record.getChannelItem(), analyzer.getActiveDevice().translateDeltaValue(record, deltaValue / 1000.));
 	}
 
 	/**
@@ -368,7 +426,7 @@ public final class VaultCollector {
 	 * @return a scalar (e.g. ratio) transformed into the device independent histo vault value
 	 */
 	private int transmuteScalar(Record record, int scalar) {
-		return encodeMeasurementValue(record, scalar / 1000.);
+		return encodeValue(record.getChannelItem(), scalar / 1000.);
 	}
 
 	/**
@@ -378,37 +436,59 @@ public final class VaultCollector {
 	 * @param isSampled true indicates that the record values are a sample from the original values
 	 */
 	private void setTrailPoints(CompartmentType entryPoints, Record record, boolean isSampled) {
-		UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), true, true, false, analyzer.getSettings());
-		if (!quantile.getOutliers().isEmpty()) {
-			entryPoints.setOutlierPoints(//
-					quantile.getOutliers().stream().distinct().mapToInt(v -> encodeMeasurementValue(record, v)));
-			log.log(Level.FINE, record.getName() + "  outliers=" + Arrays.toString(quantile.getOutliers().toArray()));
-		}
-		if (!quantile.getConstantScraps().isEmpty()) {
-			entryPoints.setScrappedPoints( //
-					quantile.getConstantScraps().stream().distinct().mapToInt(v -> encodeMeasurementValue(record, v)));
-			log.log(Level.FINE, record.getName() + "  scrappedValues=", Arrays.toString(quantile.getConstantScraps().toArray()));
-		}
+		IChannelItem channelItem = record.getChannelItem();
 
-		entryPoints.addPoint(TrailTypes.AVG, encodeMeasurementValue(record, quantile.getAvgFigure()));
-		entryPoints.addPoint(TrailTypes.MAX, encodeMeasurementValue(record, quantile.getPopulationMaxFigure()));
-		entryPoints.addPoint(TrailTypes.MIN, encodeMeasurementValue(record, quantile.getPopulationMinFigure()));
-		entryPoints.addPoint(TrailTypes.SD, encodeMeasurementValue(record, quantile.getSigmaFigure()));
-		entryPoints.addPoint(TrailTypes.Q0, encodeMeasurementValue(record, quantile.getQuartile0()));
-		entryPoints.addPoint(TrailTypes.Q1, encodeMeasurementValue(record, quantile.getQuartile1()));
-		entryPoints.addPoint(TrailTypes.Q2, encodeMeasurementValue(record, quantile.getQuartile2()));
-		entryPoints.addPoint(TrailTypes.Q3, encodeMeasurementValue(record, quantile.getQuartile3()));
-		entryPoints.addPoint(TrailTypes.Q4, encodeMeasurementValue(record, quantile.getQuartile4()));
-		entryPoints.addPoint(TrailTypes.Q_25_PERMILLE, encodeMeasurementValue(record, quantile.getQuantile(.025)));
-		entryPoints.addPoint(TrailTypes.Q_975_PERMILLE, encodeMeasurementValue(record, quantile.getQuantile(.975)));
-		entryPoints.addPoint(TrailTypes.Q_LOWER_WHISKER, encodeMeasurementValue(record, quantile.getQuantileLowerWhisker()));
-		entryPoints.addPoint(TrailTypes.Q_UPPER_WHISKER, encodeMeasurementValue(record, quantile.getQuantileUpperWhisker()));
+		Function<Double, Integer> encoder = value -> encodeValue(channelItem, value);
 
-		entryPoints.addPoint(TrailTypes.FIRST, encodeMeasurementValue(record, quantile.getFirstFigure()));
-		entryPoints.addPoint(TrailTypes.LAST, encodeMeasurementValue(record, quantile.getLastFigure()));
+		UniversalQuantile<? extends Number> quantile;
+		final int rawMax, rawBitwiseOr;
+		if (channelItem.isBits()) {
+			UniversalQuantile<? extends Number> rawQuantile = Coding.BITS.toValueQuantile(record, analyzer.getSettings());
+			rawMax = (int) Math.round(rawQuantile.getQuartile4());
+			rawBitwiseOr = rawQuantile.getOrFigure();
+			log.finer(() -> "isBits " +  rawQuantile.getQuartile4() + "   " + rawQuantile.getOrFigure());
+			quantile = Coding.BITS.toIndexQuantile(record, analyzer.getSettings());
+		} else if (channelItem.isTokens()) {
+			UniversalQuantile<? extends Number> rawQuantile = Coding.TOKENS.toValueQuantile(record, analyzer.getSettings());
+			rawMax = (int) Math.round(rawQuantile.getQuartile4());
+			rawBitwiseOr = rawQuantile.getOrFigure();
+			log.finer(() -> "isToken " +  rawQuantile.getQuartile4() + "   " + rawQuantile.getOrFigure());
+			quantile = Coding.TOKENS.toIndexQuantile(record, analyzer.getSettings());
+		} else {
+			rawMax = rawBitwiseOr = 0;
+			quantile = Coding.POINT.toValueQuantile(record, analyzer.getSettings());
+			if (!quantile.getOutliers().isEmpty()) {
+				IntStream outliers = quantile.getOutliers().stream().distinct().mapToInt(v -> encodeValue(channelItem, v.doubleValue()));
+				entryPoints.setOutlierPoints(outliers);
+			}
+			if (!quantile.getConstantScraps().isEmpty()) {
+				IntStream scraps = quantile.getConstantScraps().stream().distinct().mapToInt(v -> encoder.apply(v.doubleValue()));
+				entryPoints.setScrappedPoints(scraps);
+			}
+		}
+		// raw points without multiplying by 1000 in order to not loose the bits 22 to 31
+		entryPoints.addPoint(TrailTypes.RAW_BITS, rawBitwiseOr);
+		entryPoints.addPoint(TrailTypes.RAW_MAX, rawMax);
+
+		entryPoints.addPoint(TrailTypes.AVG, encoder.apply(quantile.getAvgFigure()));
+		entryPoints.addPoint(TrailTypes.MAX, encoder.apply(quantile.getPopulationMaxFigure()));
+		entryPoints.addPoint(TrailTypes.MIN, encoder.apply(quantile.getPopulationMinFigure()));
+		entryPoints.addPoint(TrailTypes.SD, encoder.apply(quantile.getSigmaFigure()));
+		entryPoints.addPoint(TrailTypes.Q0, encoder.apply(quantile.getQuartile0()));
+		entryPoints.addPoint(TrailTypes.Q1, encoder.apply(quantile.getQuartile1()));
+		entryPoints.addPoint(TrailTypes.Q2, encoder.apply(quantile.getQuartile2()));
+		entryPoints.addPoint(TrailTypes.Q3, encoder.apply(quantile.getQuartile3()));
+		entryPoints.addPoint(TrailTypes.Q4, encoder.apply(quantile.getQuartile4()));
+		entryPoints.addPoint(TrailTypes.Q_25_PERMILLE, encoder.apply(quantile.getQuantile(.025)));
+		entryPoints.addPoint(TrailTypes.Q_975_PERMILLE, encoder.apply(quantile.getQuantile(.975)));
+		entryPoints.addPoint(TrailTypes.Q_LOWER_WHISKER, encoder.apply(quantile.getQuantileLowerWhisker()));
+		entryPoints.addPoint(TrailTypes.Q_UPPER_WHISKER, encoder.apply(quantile.getQuantileUpperWhisker()));
+
+		entryPoints.addPoint(TrailTypes.FIRST, encoder.apply(quantile.getFirstFigure()));
+		entryPoints.addPoint(TrailTypes.LAST, encoder.apply(quantile.getLastFigure()));
 		// trigger trail types sum are not supported for measurements
 		entryPoints.addPoint(TrailTypes.SUM, 0);
-		entryPoints.addPoint(TrailTypes.COUNT, encodeMeasurementValue(record, quantile.getSize()));
+		entryPoints.addPoint(TrailTypes.COUNT, encoder.apply((double) quantile.getSize()));
 	}
 
 	/**
@@ -427,45 +507,54 @@ public final class VaultCollector {
 				entryPoints.addPoint(TrailTypes.REAL_FIRST, record.elementAt(0));
 				entryPoints.addPoint(TrailTypes.REAL_LAST, record.elementAt(record.realSize() - 1));
 
-				UniversalQuantile<Double> quantile = new UniversalQuantile<>(record.getTranslatedValues(), true, true, false, analyzer.getSettings());
-				if (!quantile.getOutliers().isEmpty()) {
-					entryPoints.setOutlierPoints(//
-							quantile.getOutliers().stream().distinct().mapToInt(v -> encodeSettlementValue(record, v)));
-					log.log(Level.FINE, record.getName() + "  outliers=" + Arrays.toString(quantile.getOutliers().toArray()));
+				Function<Double, Integer> encoder = value -> encodeValue(settlementType, value);
+
+				UniversalQuantile<? extends Number> quantile;
+				if (settlementType.isBits()) {
+					quantile = Coding.BITS.toIndexQuantile(record, analyzer.getSettings());
+				} else if (settlementType.isTokens()) {
+					quantile = Coding.TOKENS.toIndexQuantile(record, analyzer.getSettings());
+				} else {
+					quantile = Coding.POINT.toValueQuantile(record, analyzer.getSettings());
+					if (!quantile.getOutliers().isEmpty()) {
+						IntStream outliers = quantile.getOutliers().stream().distinct().mapToInt(v -> encoder.apply(v.doubleValue()));
+						entryPoints.setOutlierPoints(outliers);
+					}
+					if (!quantile.getConstantScraps().isEmpty()) {
+						IntStream scraps = quantile.getConstantScraps().stream().distinct().mapToInt(v -> encoder.apply(v.doubleValue()));
+						entryPoints.setScrappedPoints(scraps);
+					}
 				}
-				if (!quantile.getConstantScraps().isEmpty()) {
-					entryPoints.setScrappedPoints( //
-							quantile.getConstantScraps().stream().distinct().mapToInt(v -> encodeSettlementValue(record, v)));
-					log.log(Level.FINE, record.getName() + "  scrappedValues=", Arrays.toString(quantile.getConstantScraps().toArray()));
-				}
 
-				entryPoints.addPoint(TrailTypes.REAL_AVG, encodeSettlementValue(record, quantile.getAvgFigure()));
-				entryPoints.addPoint(TrailTypes.REAL_MAX, encodeSettlementValue(record, quantile.getPopulationMaxFigure()));
-				entryPoints.addPoint(TrailTypes.REAL_MIN, encodeSettlementValue(record, quantile.getPopulationMinFigure()));
-				entryPoints.addPoint(TrailTypes.REAL_SD, encodeSettlementValue(record, quantile.getSigmaFigure()));
-				entryPoints.addPoint(TrailTypes.REAL_SUM, encodeSettlementValue(record, quantile.getSumFigure()));
-				entryPoints.addPoint(TrailTypes.REAL_COUNT, encodeSettlementValue(record, quantile.getSize()));
+				entryPoints.addPoint(TrailTypes.RAW_BITS, quantile.getOrFigure());
 
-				entryPoints.addPoint(TrailTypes.AVG, encodeSettlementValue(record, quantile.getAvgFigure()));
-				entryPoints.addPoint(TrailTypes.MAX, encodeSettlementValue(record, quantile.getPopulationMaxFigure()));
-				entryPoints.addPoint(TrailTypes.MIN, encodeSettlementValue(record, quantile.getPopulationMinFigure()));
-				entryPoints.addPoint(TrailTypes.SD, encodeSettlementValue(record, quantile.getSigmaFigure()));
-				entryPoints.addPoint(TrailTypes.Q0, encodeSettlementValue(record, quantile.getQuartile0()));
-				entryPoints.addPoint(TrailTypes.Q1, encodeSettlementValue(record, quantile.getQuartile1()));
-				entryPoints.addPoint(TrailTypes.Q2, encodeSettlementValue(record, quantile.getQuartile2()));
-				entryPoints.addPoint(TrailTypes.Q3, encodeSettlementValue(record, quantile.getQuartile3()));
-				entryPoints.addPoint(TrailTypes.Q4, encodeSettlementValue(record, quantile.getQuartile4()));
-				entryPoints.addPoint(TrailTypes.Q_25_PERMILLE, encodeSettlementValue(record, quantile.getQuantile(.025)));
-				entryPoints.addPoint(TrailTypes.Q_975_PERMILLE, encodeSettlementValue(record, quantile.getQuantile(.975)));
-				entryPoints.addPoint(TrailTypes.Q_LOWER_WHISKER, encodeSettlementValue(record, quantile.getQuantileLowerWhisker()));
-				entryPoints.addPoint(TrailTypes.Q_UPPER_WHISKER, encodeSettlementValue(record, quantile.getQuantileUpperWhisker()));
+				entryPoints.addPoint(TrailTypes.REAL_AVG, encoder.apply(quantile.getAvgFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_MAX, encoder.apply(quantile.getPopulationMaxFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_MIN, encoder.apply(quantile.getPopulationMinFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_SD, encoder.apply(quantile.getSigmaFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_SUM, encoder.apply(quantile.getSumFigure()));
+				entryPoints.addPoint(TrailTypes.REAL_COUNT, encoder.apply((double) quantile.getSize()));
 
-				entryPoints.addPoint(TrailTypes.FIRST, encodeSettlementValue(record, quantile.getFirstFigure()));
-				entryPoints.addPoint(TrailTypes.LAST, encodeSettlementValue(record, quantile.getLastFigure()));
-				entryPoints.addPoint(TrailTypes.SUM, encodeSettlementValue(record, quantile.getSumFigure()));
-				entryPoints.addPoint(TrailTypes.COUNT, encodeSettlementValue(record, quantile.getSize()));
+				entryPoints.addPoint(TrailTypes.AVG, encoder.apply(quantile.getAvgFigure()));
+				entryPoints.addPoint(TrailTypes.MAX, encoder.apply(quantile.getPopulationMaxFigure()));
+				entryPoints.addPoint(TrailTypes.MIN, encoder.apply(quantile.getPopulationMinFigure()));
+				entryPoints.addPoint(TrailTypes.SD, encoder.apply(quantile.getSigmaFigure()));
+				entryPoints.addPoint(TrailTypes.Q0, encoder.apply(quantile.getQuartile0()));
+				entryPoints.addPoint(TrailTypes.Q1, encoder.apply(quantile.getQuartile1()));
+				entryPoints.addPoint(TrailTypes.Q2, encoder.apply(quantile.getQuartile2()));
+				entryPoints.addPoint(TrailTypes.Q3, encoder.apply(quantile.getQuartile3()));
+				entryPoints.addPoint(TrailTypes.Q4, encoder.apply(quantile.getQuartile4()));
+				entryPoints.addPoint(TrailTypes.Q_25_PERMILLE, encoder.apply(quantile.getQuantile(.025)));
+				entryPoints.addPoint(TrailTypes.Q_975_PERMILLE, encoder.apply(quantile.getQuantile(.975)));
+				entryPoints.addPoint(TrailTypes.Q_LOWER_WHISKER, encoder.apply(quantile.getQuantileLowerWhisker()));
+				entryPoints.addPoint(TrailTypes.Q_UPPER_WHISKER, encoder.apply(quantile.getQuantileUpperWhisker()));
+
+				entryPoints.addPoint(TrailTypes.FIRST, encoder.apply(quantile.getFirstFigure()));
+				entryPoints.addPoint(TrailTypes.LAST, encoder.apply(quantile.getLastFigure()));
+				entryPoints.addPoint(TrailTypes.SUM, encoder.apply(quantile.getSumFigure()));
+				entryPoints.addPoint(TrailTypes.COUNT, encoder.apply((double) quantile.getSize()));
 			}
-			log.finer(() -> record.getName() + " data " + this.vault.getSettlements()); //$NON-NLS-1$
+			log.finer(() -> record.getName() + " data " + this.vault.getSettlements());
 		}
 	}
 
@@ -474,6 +563,7 @@ public final class VaultCollector {
 	 * @param scorePoints
 	 */
 	private void setScorePoints(Integer[] scorePoints) {
+
 		for (ScoreLabelTypes scoreLabelTypes : EnumSet.allOf(ScoreLabelTypes.class)) {
 			Integer scoreValue = scorePoints[scoreLabelTypes.ordinal()];
 			if (scoreValue != null) {
@@ -481,24 +571,11 @@ public final class VaultCollector {
 				this.vault.getScores().put(scoreLabelTypes.ordinal(), pointType);
 			}
 		}
-		log.fine(() -> "scores " + this.vault.getScores()); //$NON-NLS-1$
+		log.fine(() -> "scores " + this.vault.getScores());
 	}
 
-	private int encodeMeasurementValue(Record record, double value) {
-		// todo harmonize encodeVaultValue methods later
-		return (int) (HistoSet.encodeVaultValue(record, value) * 1000.);
-	}
-
-	/**
-	 * Function to translate values represented into normalized settlement values.
-	 * Does not support settlements based on GPS-longitude or GPS-latitude.
-	 * @return double of settlement dependent value
-	 */
-	private int encodeSettlementValue(SettlementRecord record, double value) {
-		// todo harmonize encodeVaultValue methods later
-		// todo support settlements based on GPS-longitude or GPS-latitude with a base class common for Record and SettlementRecord
-		double newValue = (value - record.getOffset()) / record.getFactor() + record.getReduction();
-		return (int) (newValue * 1000.);
+	private int encodeValue(IChannelItem channelItem, double value) {
+		return (int) (HistoSet.encodeVaultValue(channelItem, value) * 1000.);
 	}
 
 	public ExtendedVault getVault() {

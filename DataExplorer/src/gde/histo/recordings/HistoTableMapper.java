@@ -22,6 +22,7 @@ package gde.histo.recordings;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import gde.config.Settings;
 import gde.device.TrailTypes;
@@ -189,16 +190,14 @@ public final class HistoTableMapper {
 		int dataSize = trailRecord.getParent().getTimeStepSize();
 		String[] dataTableRow = new String[dataSize + 2];
 
-		BiFunction<TrailRecord, Integer, String> valueFunction = trailRecord.getTrailSelector().isTrailSuite() //
-				? (r, i) -> getSuiteCellValue(r, i) //
-				: (r, i) -> getSingleCellValue(r, i);
+		Function<Integer, String> valueFunction = valueCreator(trailRecord);
 
 		if (Settings.getInstance().isXAxisReversed()) {
 			for (int i = 0; i < dataSize; i++)
-				dataTableRow[i + 2] = valueFunction.apply(trailRecord, i);
+				dataTableRow[i + 2] = valueFunction.apply(i);
 		} else {
 			for (int i = 0, j = dataSize - 1; i < dataSize; i++, j--)
-				dataTableRow[i + 2] = valueFunction.apply(trailRecord, j);
+				dataTableRow[i + 2] = valueFunction.apply(j);
 		}
 		dataTableRow[0] = trailRecord.getTableRowHeader().intern();
 		dataTableRow[1] = trailRecord.getTrailSelector().getTrailText().intern();
@@ -206,23 +205,26 @@ public final class HistoTableMapper {
 		return dataTableRow;
 	}
 
-	private static String getSingleCellValue(TrailRecord trailRecord, int index) {
-		String cellValue = "";
-		if (trailRecord.elementAt(index) != null) {
-			TrailRecordFormatter formatter = new TrailRecordFormatter(trailRecord);
-			cellValue = formatter.getTableValue(index);
-		}
-		return cellValue;
-	}
-
-	private static String getSuiteCellValue(TrailRecord trailRecord, int index) {
-		String cellValue = "";
-		TrailTypes trailType = trailRecord.getTrailSelector().getTrailType();
-		if (!trailRecord.getSuiteRecords().isNullValue(trailType, index)) {
-			TrailRecordFormatter formatter = new TrailRecordFormatter(trailRecord);
-			cellValue = formatter.getTableSuiteValue(index, trailType);
-		}
-		return cellValue;
+	private static Function<Integer, String> valueCreator(TrailRecord trailRecord) { // todo integrate in teh calling method
+		return !trailRecord.getTrailSelector().isTrailSuite() //
+				? (index) -> {
+					String cellValue = "";
+					if (trailRecord.elementAt(index) != null) {
+						TrailRecordFormatter formatter = new TrailRecordFormatter(trailRecord);
+						cellValue = formatter.getTableValue(index);
+					}
+					return cellValue;
+				} //
+				: (index) -> {
+					String cellValue = "";
+					int trailOrdinal = trailRecord.getTrailSelector().getTrailOrdinal();
+					TrailTypes trailType = TrailTypes.fromOrdinal(trailOrdinal);
+					if (trailRecord.getSuiteRecords().getSuiteValue(trailRecord.getTrailSelector().getSuiteMasterIndex(), index) != null) {
+						TrailRecordFormatter formatter = new TrailRecordFormatter(trailRecord);
+						cellValue = formatter.getTableSuiteValue(index, trailType);
+					}
+					return cellValue;
+				};
 	}
 
 	/**

@@ -79,8 +79,8 @@ public abstract class TrailRecord extends CommonRecord {
 		boolean				isStartpointZero	= false;
 		boolean				isStartEndDefined	= false;
 		DecimalFormat	df								= new DecimalFormat("0.0");
-		int						numberFormat			= -1;												// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
-		double				maxScaleValue			= 0.;												// overwrite calculated boundaries
+		int						numberFormat			= -1;																						// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
+		double				maxScaleValue			= 0.;																						// overwrite calculated boundaries
 		double				minScaleValue			= 0.;
 		int						trailTextOrdinal	= -1;
 
@@ -213,17 +213,17 @@ public abstract class TrailRecord extends CommonRecord {
 		/**
 		 * Set the data points for one single trail record.
 		 * The record takes the selected trail type / score data from the trail record vault and populates its data.
-		 * Support suites.
+		 * Support trail suites and bits / tokens.
 		 */
 		synchronized void addVaults(TreeMap<Long, List<ExtendedVault>> histoVaults) {
-			if (!getTrailSelector().isTrailSuite()) {
+			if (!trailSelector.isTrailSuite()) {
 				histoVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
-					addElement(getVaultPoint(v, getTrailSelector().getTrailOrdinal()));
+					addElement(getVaultPoint(v, trailSelector.getTrailOrdinal()));
 				});
 			} else {
 				setSuite(histoVaults.size());
 				histoVaults.values().stream().flatMap(Collection::stream).forEach(v -> {
-					addVaultToSuite(v);
+					addVaultToSuite(v); //
 				});
 			}
 			log.finer(() -> " " + getTrailSelector());
@@ -231,13 +231,14 @@ public abstract class TrailRecord extends CommonRecord {
 
 		/**
 		 * Take those data points from the histo vault which are assigned to the selected trail type.
-		 * Supports trail suites.
+		 * Support trail suites and bits / tokens.
+		 * @param pointFactor for multiplying points for bits or tokens
 		 */
 		private void addVaultToSuite(ExtendedVault histoVault) {
-			List<TrailTypes> suiteMembers = trailSelector.getTrailType().getSuiteMembers();
+			List<TrailTypes> suiteMembers = trailSelector.getSuiteMembers();
 
-			if (trailSelector.getTrailType().isBoxPlot()) {
-				for (int i = 0; i < trailSelector.getTrailType().getSuiteMembers().size(); i++) {
+			if (trailSelector.isBoxPlotSuite()) {
+				for (int i = 0; i < trailSelector.getSuiteMembers().size(); i++) {
 					suiteRecords.get(i).addElement(getVaultPoint(histoVault, suiteMembers.get(i).ordinal()));
 				}
 			} else {
@@ -271,7 +272,8 @@ public abstract class TrailRecord extends CommonRecord {
 		 * @return the alternating -1/+1 factor for summation trail types; 0 otherwise
 		 */
 		private int getSummationFactor(TrailTypes trailType, int previousFactor) {
-			if (trailType.isAlienValue()) {
+			boolean isOddRange = TrailTypes.ODD_RANGE_TRAILS.contains(trailType);
+			if (isOddRange) {
 				return previousFactor == 0 ? -1 : previousFactor * -1;
 			} else {
 				return 0;
@@ -354,7 +356,7 @@ public abstract class TrailRecord extends CommonRecord {
 	 */
 	@Override
 	public synchronized int size() {
-		return this.suiteRecords.getSuiteLength() > 0 &&  this.trailSelector.isTrailSuite() ? this.suiteRecords.realSize() : super.realSize();
+		return this.suiteRecords.getSuiteLength() > 0 && this.trailSelector.isTrailSuite() ? this.suiteRecords.realSize() : super.realSize();
 	}
 
 	/**
@@ -402,7 +404,7 @@ public abstract class TrailRecord extends CommonRecord {
 		} else {
 			String triggerScaleRawText = GDE.STRING_EMPTY;
 			String triggerScaleUnit = GDE.STRING_EMPTY;
-			if (this.trailSelector instanceof MeasurementTrailSelector && this.trailSelector.getTrailType().isTriggered()) {
+			if (this.trailSelector instanceof MeasurementTrailSelector && ((MeasurementTrailSelector) this.trailSelector).isTriggerTrail()) {
 				triggerScaleRawText = ((MeasurementTrailSelector) this.trailSelector).getTriggerScaleRawText();
 				triggerScaleUnit = ((MeasurementTrailSelector) this.trailSelector).getTriggerScaleUnit();
 				if (!triggerScaleUnit.isEmpty() && triggerScaleUnit.startsWith(GDE.STRING_SLASH)) {
@@ -433,6 +435,16 @@ public abstract class TrailRecord extends CommonRecord {
 	@Override // reason is translateValue which accesses the device for offset etc.
 	public double getReduction() {
 		return this.channelItem.getReduction();
+	}
+
+	@Override
+	public boolean isBits() {
+		return this.channelItem.isBits();
+	}
+
+	@Override
+	public boolean isTokens() {
+		return this.channelItem.isTokens();
 	}
 
 	/**
@@ -721,7 +733,7 @@ public abstract class TrailRecord extends CommonRecord {
 		if (!this.trailSelector.isTrailSuite())
 			points = this;
 		else
-			points = this.suiteRecords.get(this.trailSelector.getTrailType().getSuiteMasterIndex());
+			points = this.suiteRecords.get(this.trailSelector.getSuiteMasterIndex());
 
 		return points;
 	}
@@ -733,7 +745,7 @@ public abstract class TrailRecord extends CommonRecord {
 	public void setSuite(int initialCapacity) {
 		this.suiteRecords.clear();
 
-		List<TrailTypes> suiteMembers = this.trailSelector.getTrailType().getSuiteMembers();
+		List<TrailTypes> suiteMembers = this.trailSelector.getSuiteMembers();
 		for (int i = 0; i < suiteMembers.size(); i++) {
 			this.suiteRecords.put(i, new SuiteRecord(suiteMembers.get(i).ordinal(), initialCapacity));
 		}
@@ -850,18 +862,21 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	public double[] defineRecentMinMax(int limit) {
-		TrailTypes trailType = this.trailSelector.getTrailType();
-		if (trailType.isAlienValue()) {
-			return Guardian.defineAlienMinMax(Arrays.stream(getParent().getIndexedVaults()).limit(limit), this.channelItem, trailType);
+		int trailOrdinal = this.trailSelector.getTrailOrdinal();
+		if (this.trailSelector.isOddRangeTrail()) {
+			return Guardian.defineAlienMinMax(Arrays.stream(getParent().getIndexedVaults()).limit(limit), this.channelItem, trailOrdinal);
 		} else {
 			return Guardian.defineStandardMinMax(Arrays.stream(getParent().getIndexedVaults()).limit(limit), this.channelItem);
 		}
 	}
 
+	/**
+	 * @return the lower/upper values for all trails or for the selected trail in case of a different number range than the measurement values (e.g. SD, counters)
+	 */
 	public double[] defineExtrema() { // todo consider caching this result
-		TrailTypes trailType = this.trailSelector.getTrailType();
-		if (trailType.isAlienValue()) {
-			return Guardian.defineAlienExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem, trailType, getParent().getAnalyzer().getSettings());
+		int trailOrdinal = this.trailSelector.getTrailOrdinal();
+		if (this.trailSelector.isOddRangeTrail()) {
+			return Guardian.defineAlienExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem, trailOrdinal, getParent().getAnalyzer().getSettings());
 		} else {
 			return Guardian.defineStandardExtrema(Arrays.asList(getParent().getIndexedVaults()), this.channelItem, getParent().getAnalyzer().getSettings());
 		}
@@ -885,7 +900,7 @@ public abstract class TrailRecord extends CommonRecord {
 
 		final Vector<Integer> record;
 		if (this.trailSelector.isTrailSuite()) {
-			record = this.suiteRecords.get(this.trailSelector.getTrailType().getSuiteMasterIndex());
+			record = this.suiteRecords.get(this.trailSelector.getSuiteMasterIndex());
 		} else {
 			record = this;
 		}

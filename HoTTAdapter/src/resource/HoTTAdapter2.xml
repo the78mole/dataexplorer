@@ -121,11 +121,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
@@ -168,11 +173,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
@@ -246,11 +256,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
@@ -448,11 +463,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
@@ -713,11 +733,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
@@ -842,11 +867,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
@@ -912,12 +942,13 @@
                     <symbol></symbol>
                     <unit></unit>
                     <active>true</active>
-                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorCount" value="scorevalue_count" type="String"/>
                     <score label="sensorVario" value="scorevalue_vario" type="String"/>
                     <score label="sensorGps" value="scorevalue_gps" type="String"/>
                     <score label="sensorGam" value="scorevalue_gam" type="String"/>
                     <score label="sensorEam" value="scorevalue_eam" type="String"/>
                     <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <score label="sensors" value="scorevalue_sensors" type="String"/>
                     <label>scorelabel_sensor_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="6">
@@ -1040,11 +1071,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
@@ -1087,11 +1123,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
@@ -1164,11 +1205,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
@@ -1368,11 +1414,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
@@ -1633,11 +1684,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
@@ -1762,11 +1818,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
@@ -1894,12 +1955,13 @@
                     <symbol></symbol>
                     <unit></unit>
                     <active>true</active>
-                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorCount" value="scorevalue_count" type="String"/>
                     <score label="sensorVario" value="scorevalue_vario" type="String"/>
                     <score label="sensorGps" value="scorevalue_gps" type="String"/>
                     <score label="sensorGam" value="scorevalue_gam" type="String"/>
                     <score label="sensorEam" value="scorevalue_eam" type="String"/>
                     <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <score label="sensors" value="scorevalue_sensors" type="String"/>
                     <label>scorelabel_sensor_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="6">
@@ -2022,11 +2084,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
@@ -2069,11 +2136,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
@@ -2146,11 +2218,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
@@ -2348,11 +2425,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
@@ -2615,11 +2697,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
@@ -2744,11 +2831,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
@@ -2876,12 +2968,13 @@
                     <symbol></symbol>
                     <unit></unit>
                     <active>true</active>
-                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorCount" value="scorevalue_count" type="String"/>
                     <score label="sensorVario" value="scorevalue_vario" type="String"/>
                     <score label="sensorGps" value="scorevalue_gps" type="String"/>
                     <score label="sensorGam" value="scorevalue_gam" type="String"/>
                     <score label="sensorEam" value="scorevalue_eam" type="String"/>
                     <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <score label="sensors" value="scorevalue_sensors" type="String"/>
                     <label>scorelabel_sensor_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="6">
@@ -2996,11 +3089,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
@@ -3040,11 +3138,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
@@ -3116,11 +3219,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
@@ -3303,11 +3411,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
@@ -3544,11 +3657,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
@@ -3705,7 +3823,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
-                <trailDisplay discloseAll="true" defaultTrail="max"/>
+                <property name="is_tokens" value="true" type="Boolean"/>
+                <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
+                	<exposed trail="avg"/>
+                	<exposed trail="max"/>
+                	<exposed trail="min"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+               	</trailDisplay>
                 <label>label_warning</label>
             </Measurement>
             <Measurement>
@@ -3817,11 +3944,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
@@ -3913,11 +4045,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
@@ -3960,11 +4097,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
@@ -4037,11 +4179,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
@@ -4239,11 +4386,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
@@ -4504,11 +4656,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
@@ -4635,11 +4792,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
@@ -4767,12 +4929,13 @@
                     <symbol></symbol>
                     <unit></unit>
                     <active>true</active>
-                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorCount" value="scorevalue_count" type="String"/>
                     <score label="sensorVario" value="scorevalue_vario" type="String"/>
                     <score label="sensorGps" value="scorevalue_gps" type="String"/>
                     <score label="sensorGam" value="scorevalue_gam" type="String"/>
                     <score label="sensorEam" value="scorevalue_eam" type="String"/>
                     <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <score label="sensors" value="scorevalue_sensors" type="String"/>
                     <label>scorelabel_sensor_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="6">
@@ -4887,11 +5050,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Rx</label>
             </Measurement>
@@ -4931,11 +5099,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event Vario</label>
             </Measurement>
@@ -5007,11 +5180,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GPS</label>
             </Measurement>
@@ -5194,11 +5372,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event GAM</label>
             </Measurement>
@@ -5435,11 +5618,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event EAM</label>
             </Measurement>
@@ -5552,11 +5740,16 @@
                 <symbol></symbol>
                 <unit></unit>
                 <active>true</active>
+                <property name="is_bits" value="true" type="Boolean"/>
                 <trailDisplay discloseAll="true">
+                	<exposed trail="q2"/>
                 	<exposed trail="avg"/>
                 	<exposed trail="max"/>
                 	<exposed trail="min"/>
-                	<exposed trail="suite_avg_min_max"/>
+                	<exposed trail="suite_box_plot"/>
+                	<exposed trail="suite_q0_q2_q4"/>
+                	<exposed trail="raw_max"/>
+                	<exposed trail="raw_bits"/>
                	</trailDisplay>
                 <label>label_event ESC</label>
             </Measurement>
@@ -5664,12 +5857,13 @@
                     <symbol></symbol>
                     <unit></unit>
                     <active>true</active>
-                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorCount" value="scorevalue_count" type="String"/>
                     <score label="sensorVario" value="scorevalue_vario" type="String"/>
                     <score label="sensorGps" value="scorevalue_gps" type="String"/>
                     <score label="sensorGam" value="scorevalue_gam" type="String"/>
                     <score label="sensorEam" value="scorevalue_eam" type="String"/>
                     <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <score label="sensors" value="scorevalue_sensors" type="String"/>
                     <label>scorelabel_sensor_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="6">

@@ -20,7 +20,8 @@
 package gde.histo.recordings;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.BitSet;
+import java.util.List;
 import java.util.Optional;
 
 import gde.Analyzer;
@@ -28,7 +29,7 @@ import gde.device.IChannelItem;
 import gde.device.SettlementType;
 import gde.device.TrailDisplayType;
 import gde.device.TrailTypes;
-import gde.device.TrailVisibilityType;
+import gde.log.Level;
 
 /**
  * Handle the trail type assignment to a trailRecord.
@@ -52,17 +53,15 @@ public final class SettlementTrailSelector extends TrailSelector {
 	protected void setApplicableTrails() {
 		if (channelItem.getTrailDisplay().map(TrailDisplayType::getDefaultTrail).map(TrailTypes::isSuite).orElse(false))
 			throw new UnsupportedOperationException("suite trail must not be a device settlement default");
-		final boolean[] applicablePrimitiveTrails = getApplicablePrimitiveTrails();
+		BitSet applicablePrimitiveTrails = getApplicablePrimitiveTrails();
 
 		// build applicable trail type lists for display purposes
 		this.applicableTrailsOrdinals = new ArrayList<Integer>();
 		this.applicableTrailsTexts = new ArrayList<String>();
-		for (int i = 0; i < applicablePrimitiveTrails.length; i++) {
-			if (applicablePrimitiveTrails[i]) {
-				this.applicableTrailsOrdinals.add(i);
-				this.applicableTrailsTexts.add(TrailTypes.VALUES[i].getDisplayName().intern());
-			}
-		}
+		applicablePrimitiveTrails.stream().forEach(i -> {
+			this.applicableTrailsOrdinals.add(i);
+			this.applicableTrailsTexts.add(TrailTypes.VALUES[i].getDisplayName());
+		});
 
 		setApplicableSuiteTrails();
 		log.finer(() -> recordName + " texts " + this.applicableTrailsTexts);
@@ -70,35 +69,71 @@ public final class SettlementTrailSelector extends TrailSelector {
 	}
 
 	/**
-	 * Determine an array with index based on the trail primitives ordinal number.
-	 * @return the array giving the information which trails are visible for the user
+	 * The index is the TrailType ordinal.
+	 * @return a set holding true for trails which are visible for the user
 	 */
-	public boolean[] getApplicablePrimitiveTrails() {
-		boolean[] applicablePrimitiveTrails = new boolean[TrailTypes.getPrimitives().size()];
+	public BitSet getApplicablePrimitiveTrails() {
 		Optional<TrailDisplayType> trailDisplay = channelItem.getTrailDisplay();
+		if (((SettlementType) channelItem).getEvaluation().getTransitionAmount() != null) throw new UnsupportedOperationException(
+				"TransitionAmount not implemented");
 
-		// set quantile-based non-suite trail types : triggered value sum are CURRENTLY not supported
-		if (!trailDisplay.map(TrailDisplayType::isDiscloseAll).orElse(false)) {
-			if (((SettlementType) channelItem).getEvaluation().getTransitionAmount() == null)
-				TrailTypes.getPrimitives().stream().filter(x -> !x.isTriggered() && x.isSmartStatistics() == smartStatistics).forEach(x -> applicablePrimitiveTrails[x.ordinal()] = true);
-			else
-				throw new UnsupportedOperationException("TransitionAmount not implemented"); //$NON-NLS-1$
-		}
+		BitSet trails = new BitSet();
+		// triggered values like count/sum are not contained
+		TrailTypes.getPrimitives().stream() //
+				.filter(t -> !t.isTriggered()).filter(t -> !TrailTypes.OPTIONAL_TRAILS.contains(t)) //
+				.filter(t -> t.isSmartStatistics() == smartStatistics) //
+				.map(TrailTypes::ordinal) //
+				.forEach(idx -> trails.set(idx));
 
-		// set visible and reset hidden trails based on device settlement settings
-		trailDisplay.ifPresent(x -> x.getExposed().stream().map(TrailVisibilityType::getTrail).filter(y -> !y.isSuite()).forEach(y -> applicablePrimitiveTrails[y.ordinal()] = true));
-		trailDisplay.ifPresent(x -> x.getDisclosed().stream().map(TrailVisibilityType::getTrail).filter(y -> !y.isSuite()).forEach(y -> applicablePrimitiveTrails[y.ordinal()] = false));
+		// do not add any triggered values
+
+		trailDisplay.ifPresent(d -> adaptTrailsToDisplayType(trails, d));
 
 		// set at least one trail if no trail is applicable
-		boolean hasApplicablePrimitiveTrails = false;
-		for (boolean value : applicablePrimitiveTrails) {
-			hasApplicablePrimitiveTrails = value;
-			if (hasApplicablePrimitiveTrails) break;
+		if (trails.isEmpty()) {
+			trails.set(TrailTypes.getSubstitute(smartStatistics).ordinal());
 		}
-		if (!hasApplicablePrimitiveTrails)
-			applicablePrimitiveTrails[trailDisplay.map(TrailDisplayType::getDefaultTrail).orElse(TrailTypes.getSubstitute()).ordinal()] = true;
-		log.finer(() -> recordName + " data " + Arrays.toString(applicablePrimitiveTrails));
-		return applicablePrimitiveTrails;
+		log.finer(() -> recordName + " data " + trails.toString());
+		return trails;
+	}
+
+	private TrailTypes getTrailType() {
+		if (this.trailTextSelectedIndex < 0) {
+			log.log(Level.SEVERE, "index not defined yet ", this.trailTextSelectedIndex);
+			throw new UnsupportedOperationException();
+		} else {
+			return TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex));
+		}
+	}
+
+	@Override
+	public boolean isTrailSuite() {
+		return getTrailType().isSuite();
+	}
+
+	@Override
+	public boolean isRangePlotSuite() {
+		return getTrailType().isRangePlot();
+	}
+
+	@Override
+	public boolean isBoxPlotSuite() {
+		return getTrailType().isBoxPlot();
+	}
+
+	@Override
+	public boolean isOddRangeTrail() {
+		return TrailTypes.ODD_RANGE_TRAILS.contains(getTrailType());
+	}
+
+	@Override
+	public int getSuiteMasterIndex() {
+		return getTrailType().getSuiteMasterIndex();
+	}
+
+	@Override
+	public List<TrailTypes> getSuiteMembers() {
+		return getTrailType().getSuiteMembers();
 	}
 
 }

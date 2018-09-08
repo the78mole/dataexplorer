@@ -20,12 +20,15 @@
 package gde.histo.recordings;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import gde.Analyzer;
 import gde.device.IChannelItem;
 import gde.device.ScoreGroupType;
+import gde.device.ScoreLabelTypes;
 import gde.device.ScoreType;
+import gde.device.TrailTypes;
 
 /**
  * Handle the trail type assignment to a trailRecord.
@@ -94,6 +97,23 @@ public final class ScoregroupTrailSelector extends TrailSelector {
 	@Override
 	public boolean isBoxPlotSuite() {
 		return false;
+	}
+
+	@Override
+	public boolean isOddRangeTrail() {
+		List<ScoreType> scoreTypes = ((ScoreGroupType) channelItem).getScore();
+		ScoreLabelTypes scoreLabelType = scoreTypes.get(trailTextSelectedIndex).getLabel();
+		return EnumSet.of(ScoreLabelTypes.SENSORS, ScoreLabelTypes.SIGMA_TIME_STEP_MS, ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS).contains(scoreLabelType);
+	}
+
+	@Override
+	public int getSuiteMasterIndex() {
+		throw new UnsupportedOperationException("score suites not supported");
+	}
+
+	@Override
+	public List<TrailTypes> getSuiteMembers() {
+		throw new UnsupportedOperationException("score suites not supported");
 	}
 
 }

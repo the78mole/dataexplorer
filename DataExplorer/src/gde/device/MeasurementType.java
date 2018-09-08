@@ -478,6 +478,22 @@ public class MeasurementType implements IChannelItem {
 		}
 	}
 
+	@Override
+	public boolean isBits() {
+		boolean isBits = false;
+		PropertyType tmpProperty = this.getProperty(IDevice.IS_BITS);
+		if (tmpProperty != null) isBits = Boolean.parseBoolean(tmpProperty.getValue());
+		return isBits;
+	}
+
+	@Override
+	public boolean isTokens() {
+		boolean isBits = false;
+		PropertyType tmpProperty = this.getProperty(IDevice.IS_TOKENS);
+		if (tmpProperty != null) isBits = Boolean.parseBoolean(tmpProperty.getValue());
+		return isBits;
+	}
+
 	/**
 	 * get the SyncMaster ordinal value
 	 * @return the SyncMaster ordinal value, if property does not exist return -1

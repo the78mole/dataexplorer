@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.function.DoubleConsumer;
+import java.util.function.IntConsumer;
 
 import gde.config.Settings;
 import gde.histo.datasources.HistoSet;
@@ -50,6 +51,19 @@ import gde.log.Logger;
 public class ElementaryQuantile<T extends Number & Comparable<T>> {
 	private static final String	$CLASS_NAME									= ElementaryQuantile.class.getName();
 	private static final Logger	log													= Logger.getLogger($CLASS_NAME);
+
+	interface StatsHelper {
+
+		int getOr();
+
+		double getSum();
+
+		double getAvg();
+
+		double getSigma(boolean isSample);
+
+		int getCount();
+	}
 
 	/**
 	 * This sigma value for the inner 50% of the population.<br>
@@ -170,19 +184,27 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 	/**
 	 * Support standard deviation calculation via parallel streams.
 	 */
-	class StatsHelper implements DoubleConsumer {
+	class StatsDoubleHelper implements DoubleConsumer, StatsHelper {
 		private double	avg				= 0;
 		private double	varTimesN	= 0;
 		private int			count			= 0;
 
+		@Override
+		public int getOr() {
+			return 0;
+		}
+
+		@Override
 		public double getSum() {
 			return avg * count;
 		}
 
+		@Override
 		public double getAvg() {
 			return count > 0 ? avg : 0;
 		}
 
+		@Override
 		public double getSigma(@SuppressWarnings("hiding") boolean isSample) {
 			if (isSample) {
 				return count > 1 ? Math.sqrt(varTimesN / (isSample ? count - 1 : count)) : 0;
@@ -191,7 +213,8 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 			}
 		}
 
-		public double getCount() {
+		@Override
+		public int getCount() {
 			return count;
 		}
 
@@ -205,7 +228,66 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 		 * @param other
 		 * @see <a href="http://stats.stackexchange.com/a/56000">Formulae</a>
 		 */
-		public void combine(StatsHelper other) {
+		public void combine(StatsDoubleHelper other) {
+			double tmpAvg = this.avg * count / (count + other.count) + other.avg * other.count / (count + other.count);
+			// the next line is also valid for samples as we work with varTimesN which is in fact var times (N-1) for the Bessel corrected version
+			varTimesN += other.varTimesN + count * (avg - tmpAvg) * (avg - tmpAvg) + other.count * (other.avg - tmpAvg) * (other.avg - tmpAvg);
+			avg = tmpAvg;
+			count += other.count;
+		}
+	}
+
+	/**
+	 * Support standard deviation calculation via parallel streams.
+	 */
+	class StatsIntHelper implements IntConsumer, StatsHelper {
+		private int			or 				= 0;
+		private double	avg				= 0;
+		private double	varTimesN	= 0;
+		private int			count			= 0;
+
+		@Override
+		public int getOr() {
+			return or;
+		}
+
+		@Override
+		public double getSum() {
+			return avg * count;
+		}
+
+		@Override
+		public double getAvg() {
+			return count > 0 ? avg : 0;
+		}
+
+		@Override
+		public double getSigma(@SuppressWarnings("hiding") boolean isSample) {
+			if (isSample) {
+				return count > 1 ? Math.sqrt(varTimesN / (isSample ? count - 1 : count)) : 0;
+			} else {
+				return count > 0 ? Math.sqrt(varTimesN / (isSample ? count - 1 : count)) : 0;
+			}
+		}
+
+		@Override
+		public int getCount() {
+			return count;
+		}
+
+		@Override
+		public void accept(int value) {
+			or |= value;
+			varTimesN += (value - avg) * (value - avg) * count / ++count; // pls note the counter increment
+			avg += (value - avg) / count;
+		}
+
+		/**
+		 * @param other
+		 * @see <a href="http://stats.stackexchange.com/a/56000">Formulae</a>
+		 */
+		public void combine(StatsIntHelper other) {
+			or |= other.or;
 			double tmpAvg = this.avg * count / (count + other.count) + other.avg * other.count / (count + other.count);
 			// the next line is also valid for samples as we work with varTimesN which is in fact var times (N-1) for the Bessel corrected version
 			varTimesN += other.varTimesN + count * (avg - tmpAvg) * (avg - tmpAvg) + other.count * (other.avg - tmpAvg) * (other.avg - tmpAvg);
@@ -235,6 +317,11 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 		Collections.sort(this.trunk);
 		log.finest(() -> "" + population.size() + Arrays.toString(population.toArray()));
 		log.finest(() -> "" + this.trunk.size() + Arrays.toString(this.trunk.toArray()));
+	}
+
+	public int getOrFigure() {
+		if (statsHelper == null) setStats();
+		return statsHelper.getOr();
 	}
 
 	public double getSumFigure() {
@@ -284,7 +371,11 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 	}
 
 	protected void setStats() {
-		statsHelper = trunk.parallelStream().mapToDouble(T::doubleValue).collect(StatsHelper::new, StatsHelper::accept, StatsHelper::combine);
+		if (!trunk.isEmpty() && (trunk.get(0) instanceof Integer || trunk.get(0) instanceof Short)) {
+			statsHelper = trunk.parallelStream().mapToInt(T::intValue).collect(StatsIntHelper::new, StatsIntHelper::accept, StatsIntHelper::combine);
+		} else {
+			statsHelper = trunk.parallelStream().mapToDouble(T::doubleValue).collect(StatsDoubleHelper::new, StatsDoubleHelper::accept, StatsDoubleHelper::combine);
+		}
 	}
 
 	/**
@@ -403,7 +494,7 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 						return trunkValue;
 					}
 				}
-				throw new UnsupportedOperationException();
+				throw new UnsupportedOperationException("outlier factor < 0");
 			} else {
 				double maxLimit = getQuartile3() + outlierFactor * 2. * toleranceLowerUpper[1];
 				ListIterator<T> iterator = trunk.listIterator(trunk.size());

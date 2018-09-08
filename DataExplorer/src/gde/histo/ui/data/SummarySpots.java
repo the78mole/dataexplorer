@@ -344,7 +344,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 
 		final Vector<Integer> tmpRecord;
 		if (record.getTrailSelector().isTrailSuite()) {
-			tmpRecord = record.getSuiteRecords().get(record.getTrailSelector().getTrailType().getSuiteMasterIndex());
+			tmpRecord = record.getSuiteRecords().get(record.getTrailSelector().getSuiteMasterIndex());
 		} else {
 			tmpRecord = record;
 		}

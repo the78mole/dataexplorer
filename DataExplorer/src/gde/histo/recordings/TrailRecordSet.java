@@ -166,7 +166,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			String[] trailRecordNames = getRecordNames();
 			for (String trailRecordName : trailRecordNames) {
 				TrailRecord trailRecord = get(trailRecordName);
-				trailRecord.getTrailSelector().setApplicableTrails();
+				trailRecord.trailSelector.setApplicableTrails();
 			}
 		}
 
@@ -476,7 +476,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
 				SummaryLayout summary = (SummaryLayout) summaryData.get(syncRecord.getName());
 				// exclude records with special trails from synchronizing
-				if (syncRecord.getTrailSelector().getTrailType().isAlienValue()) continue;
+				if (syncRecord.getTrailSelector().isOddRangeTrail()) continue;
 
 				if (summary.isSyncMinMaxDefined()) {
 					isAffected = true;
@@ -489,13 +489,13 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			// now we have the max/min values over all sync records of the current sync group
 			if (tmpMin == Double.MAX_VALUE || tmpMax == -Double.MAX_VALUE) {
 				for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
-					if (syncRecord.getTrailSelector().getTrailType().isAlienValue()) continue;
+					if (syncRecord.getTrailSelector().isOddRangeTrail()) continue;
 					SummaryLayout summary = (SummaryLayout) summaryData.get(syncRecord.getName());
 					summary.resetSyncMinMax();
 				}
 			} else {
 				for (TrailRecord syncRecord : syncRecordsEntry.getValue()) {
-					if (syncRecord.getTrailSelector().getTrailType().isAlienValue()) continue;
+					if (syncRecord.getTrailSelector().isOddRangeTrail()) continue;
 					SummaryLayout summary = (SummaryLayout) summaryData.get(syncRecord.getName());
 					summary.setSyncMinMax(tmpMin, tmpMax);
 				}

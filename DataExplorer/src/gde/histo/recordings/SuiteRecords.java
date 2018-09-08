@@ -22,8 +22,6 @@ package gde.histo.recordings;
 import java.util.HashMap;
 import java.util.Map;
 
-import gde.device.TrailTypes;
-
 /**
  * Suite records for trail records.
  * Used if a suite trail type is selected the trail record.
@@ -80,15 +78,6 @@ public final class SuiteRecords {
 	 */
 	public Integer getSuiteValue(int memberIndex, int index) {
 		return suiteRecords.get(memberIndex).elementAt(index);
-	}
-
-	/**
-	 * @param trailType
-	 * @param index
-	 * @return true if the suite values are null
-	 */
-	public boolean isNullValue(TrailTypes trailType, int index) {
-		return getSuiteValue(trailType.getSuiteMasterIndex(), index) == null;
 	}
 
 	@Override

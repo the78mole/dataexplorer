@@ -231,8 +231,8 @@ public final class Guardian {
 	/**
 	 * @return the lower/upper values from the most recent logs for trails with a different number range than the measurement values
 	 */
-	public static double[] defineAlienMinMax(Stream<HistoVault> vaults, IChannelItem channelItem, TrailTypes trailType) {
-		Stream<Integer> alienPoints = vaults.map(v -> channelItem.getVaultPoint(v, trailType.ordinal()));
+	public static double[] defineAlienMinMax(Stream<HistoVault> vaults, IChannelItem channelItem, int trailOrdinal) {
+		Stream<Integer> alienPoints = vaults.map(v -> channelItem.getVaultPoint(v, trailOrdinal));
 		DoubleSummaryStatistics decodedAliens = alienPoints.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(channelItem, i / 1000.))//
 				.collect(Collectors.summarizingDouble((Double::doubleValue)));
 		double[] result;
@@ -247,8 +247,8 @@ public final class Guardian {
 	/**
 	 * @return the lower/upper values for trails with a different number range than the measurement values (e.g. SD, counters)
 	 */
-	public static double[] defineAlienExtrema(List<HistoVault> vaults, IChannelItem channelItem, TrailTypes trailType, Settings settings) {
-		Stream<Integer> alienPoints = vaults.stream().map(v -> channelItem.getVaultPoint(v, trailType.ordinal()));
+	public static double[] defineAlienExtrema(List<HistoVault> vaults, IChannelItem channelItem, int trailOrdinal, Settings settings) {
+		Stream<Integer> alienPoints = vaults.stream().map(v -> channelItem.getVaultPoint(v, trailOrdinal));
 		List<Double> decodedAliens = alienPoints.filter(Objects::nonNull).map(i -> HistoSet.decodeVaultValue(channelItem, i / 1000.)).collect(Collectors.toList());
 		double[] result;
 		if (decodedAliens.isEmpty()) {

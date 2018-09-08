@@ -21,6 +21,7 @@ package gde.histo.recordings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,7 +33,6 @@ import gde.device.TrailDisplayType;
 import gde.device.TrailTypes;
 import gde.device.TrailVisibilityType;
 import gde.device.resource.DeviceXmlResource;
-import gde.log.Level;
 import gde.log.Logger;
 
 /**
@@ -138,26 +138,23 @@ public abstract class TrailSelector {
 		return this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex);
 	}
 
-	public TrailTypes getTrailType() {
-		if (this.trailTextSelectedIndex < 0) {
-			log.log(Level.SEVERE, "index not defined yet ", this.trailTextSelectedIndex);
-			throw new UnsupportedOperationException();
-		} else {
-			return TrailTypes.fromOrdinal(this.applicableTrailsOrdinals.get(this.trailTextSelectedIndex));
-		}
-	}
+	public abstract boolean isTrailSuite();
 
-	public boolean isTrailSuite() {
-		return getTrailType().isSuite();
-	}
+	public abstract boolean isRangePlotSuite();
 
-	public boolean isRangePlotSuite() {
-		return getTrailType().isRangePlot();
-	}
+	public abstract boolean isBoxPlotSuite();
 
-	public boolean isBoxPlotSuite() {
-		return getTrailType().isBoxPlot();
-	}
+	/**
+	 * @return true if an own scale max/min is defined (do not use the value's / synchronized value's graphics scale)
+	 */
+	public abstract boolean isOddRangeTrail();
+
+	public abstract int getSuiteMasterIndex();
+
+	/**
+	 * @return the members of the suite in the logical order
+	 */
+	public abstract List<TrailTypes> getSuiteMembers();
 
 	/**
 	 * @param replacementKey
@@ -251,6 +248,30 @@ public abstract class TrailSelector {
 			}
 		}
 	}
+
+	protected void adaptTrailsToDisplayType(BitSet trails, TrailDisplayType displayType) {
+		if (displayType.isDiscloseAll()) {
+			trails.clear();
+		}
+
+		BitSet exposedTrails = new BitSet();
+		displayType.getExposed().stream().map(TrailVisibilityType::getTrail) //
+				.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == smartStatistics) //
+				.map(TrailTypes::ordinal) //
+				.forEach(idx -> exposedTrails.set(idx));
+		trails.or(exposedTrails);
+
+		BitSet disclosedTrails = new BitSet();
+		displayType.getDisclosed().stream().map(TrailVisibilityType::getTrail) //
+				.filter(t -> !t.isSuite()).filter(t -> t.isSmartStatistics() == smartStatistics) //
+				.map(TrailTypes::ordinal) //
+				.forEach(idx -> disclosedTrails.set(idx));
+		trails.andNot(disclosedTrails);
+
+		if (trails.isEmpty() && displayType.getDefaultTrail() != null) {
+			trails.set(displayType.getDefaultTrail().ordinal());
+		}
+}
 
 	@Override
 	public String toString() {

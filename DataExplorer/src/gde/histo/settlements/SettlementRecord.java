@@ -29,8 +29,10 @@ import java.util.Map;
 import java.util.Vector;
 
 import gde.GDE;
+import gde.data.IRecord;
 import gde.data.RecordSet;
 import gde.device.DataTypes;
+import gde.device.IChannelItem;
 import gde.device.IDevice;
 import gde.device.MeasurementPropertyTypes;
 import gde.device.ObjectFactory;
@@ -47,7 +49,7 @@ import gde.log.Logger;
  * Similar to record class except: clone, serialization, zoom / scope, triggers, syncWithRecords, setName, GPS-longitude, GPS-latitude.
  * @author Thomas Eickert
  */
-public final class SettlementRecord extends Vector<Integer> {
+public final class SettlementRecord extends Vector<Integer> implements IRecord {
 	private static final String					$CLASS_NAME							= SettlementRecord.class.getName();
 	private static final long						serialVersionUID				= 6130190003229390899L;
 	private static final Logger					log											= Logger.getLogger($CLASS_NAME);
@@ -103,7 +105,7 @@ public final class SettlementRecord extends Vector<Integer> {
 	}
 
 	@Override
-	public synchronized String toString() {
+	public String toString() {
 		String belowLimit = getBelowLimit() != -Double.MAX_VALUE ? String.format("%.1f", getBelowLimit()) : "none";
 		String beyondLimit = getBeyondLimit() != Double.MAX_VALUE ? String.format("%.1f", getBeyondLimit()) : "none";
 		return String.format("%s channel=%d  limits=%s/%s", this.name, this.logChannelNumber, belowLimit, beyondLimit);
@@ -250,11 +252,26 @@ public final class SettlementRecord extends Vector<Integer> {
 			this.createProperty(IDevice.REDUCTION, DataTypes.DOUBLE, String.format(Locale.ENGLISH, "%.4f", newValue)); //$NON-NLS-1$
 	}
 
+	public boolean isBits() {
+		boolean isBits = false;
+		PropertyType tmpProperty = this.getProperty(IDevice.IS_BITS);
+		if (tmpProperty != null) {
+			isBits = Boolean.parseBoolean(tmpProperty.getValue());
+		}
+		return isBits;
+	}
+
 	/**
 	 * @return all the translated settlement values which hold values only for the transition timestamps
 	 */
+	@Override
 	public Collection<Double> getTranslatedValues() {
 		return translatedValues.values();
+	}
+
+	@Override
+	public Collection<Integer> getValues() {
+		return this;
 	}
 
 	/**
@@ -304,6 +321,10 @@ public final class SettlementRecord extends Vector<Integer> {
 	}
 
 	public SettlementType getSettlement() {
+		return this.settlement;
+	}
+
+	public IChannelItem getChannelItem() {
 		return this.settlement;
 	}
 

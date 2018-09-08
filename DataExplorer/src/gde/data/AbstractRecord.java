@@ -54,6 +54,16 @@ public abstract class AbstractRecord extends Vector<Integer> {
 
 	public abstract double getReduction();
 
+	/**
+	 * @return true if the channel item holds bits, e.g. events
+	 */
+	public abstract boolean isBits();
+
+	/**
+	 * @return true if the channel item holds tokens, e.g. warnings
+	 */
+	public abstract boolean isTokens();
+
 	public abstract int getOrdinal();
 
 	public abstract String getName();
@@ -107,7 +117,7 @@ public abstract class AbstractRecord extends Vector<Integer> {
 	public abstract int getNumberFormat();
 
 	public abstract void setNumberFormat(int newNumberFormat);
-	
+
 	/**
 	 * set instance value directly without logic
 	 * @param newNumberFormat

@@ -88,7 +88,7 @@ public final class HistoGraphicsMapper {
 	public static List<PointArray> getSuiteDisplayPoints(GraphicsLayout graphicsData, HistoTimeLine timeLine) {
 		List<PointArray> suitePoints = new ArrayList<>();
 		TrailRecord trailRecord = graphicsData.getTrailRecord();
-		int firstOrdinal = trailRecord.getTrailSelector().getTrailType().getSuiteMasterIndex();
+		int firstOrdinal = trailRecord.getTrailSelector().getSuiteMasterIndex();
 		for (int i = 0; i < timeLine.getScalePositions().size(); i++) {
 			if (trailRecord.getSuiteRecords().getSuiteValue(firstOrdinal, i) != null)
 				suitePoints.add(getSuiteDisplayPoints(graphicsData, timeLine, i));
@@ -102,7 +102,7 @@ public final class HistoGraphicsMapper {
 		int x0 = timeLine.getCurveAreaBounds().x;
 		int y0 = timeLine.getCurveAreaBounds().height + timeLine.getCurveAreaBounds().y;
 		TrailRecord trailRecord = graphicsData.getTrailRecord();
-		int suiteSize = trailRecord.getTrailSelector().getTrailType().getSuiteMembers().size();
+		int suiteSize = trailRecord.getTrailSelector().getSuiteMembers().size();
 		PointArray pointArray = new PointArray(suiteSize);
 		pointArray.setX(x0 + timeLine.getScalePositions().get((long) trailRecord.getParent().getTime_ms(index)));
 

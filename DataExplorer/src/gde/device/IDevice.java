@@ -39,6 +39,8 @@ public interface IDevice {
 	public static final String	OFFSET							= MeasurementPropertyTypes.OFFSET.value();
 	public static final String	FACTOR							= MeasurementPropertyTypes.FACTOR.value();
 	public static final String	REDUCTION						= MeasurementPropertyTypes.REDUCTION.value();
+	public static final String	IS_BITS							= MeasurementPropertyTypes.IS_BITS.value();
+	public static final String	IS_TOKENS						= MeasurementPropertyTypes.IS_TOKENS.value();
 	public static final String	SYNC_ORDINAL				= MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value();
 
 	public static final int			MIN_FILENAME_LENGTH	= 4;

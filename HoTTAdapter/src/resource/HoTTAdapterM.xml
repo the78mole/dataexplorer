@@ -191,12 +191,13 @@
                     <symbol></symbol>
                     <unit></unit>
                     <active>true</active>
-                    <score label="sensors" value="scorevalue_count" type="String"/>
+                    <score label="sensorCount" value="scorevalue_count" type="String"/>
                     <score label="sensorVario" value="scorevalue_vario" type="String"/>
                     <score label="sensorGps" value="scorevalue_gps" type="String"/>
                     <score label="sensorGam" value="scorevalue_gam" type="String"/>
                     <score label="sensorEam" value="scorevalue_eam" type="String"/>
                     <score label="sensorEsc" value="scorevalue_esc" type="String"/>
+                    <score label="sensors" value="scorevalue_sensors" type="String"/>
                     <label>scorelabel_sensor_number</label>
                 </Scoregroup>
                 <Scoregroup scoregroupId="6">

@@ -51,6 +51,10 @@ public interface IChannelItem {
 
 	double getFactor();
 
+	boolean isBits();
+
+	boolean isTokens();
+
 	int getSyncMasterRecordOrdinal();
 
 	List<PropertyType> getProperty();
@@ -85,7 +89,7 @@ public interface IChannelItem {
 	Integer getVaultPoint(HistoVault vault, int trailOrdinal);
 
 	/**
-	 * @param analyzer defines the the requested device, channel, object 
+	 * @param analyzer defines the the requested device, channel, object
 	 * @param recordName
 	 * @param smartStatistics true if quantiles are active
 	 * @return the trail selector
