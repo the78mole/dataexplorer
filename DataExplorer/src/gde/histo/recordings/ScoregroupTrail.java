@@ -71,7 +71,11 @@ public final class ScoregroupTrail extends TrailRecord {
 
 	@Override
 	public Integer getVaultPoint(ExtendedVault vault, int trailOrdinal) {
-		return vault.getScorePoint(trailOrdinal);
+		if (channelItem.isBits()) {
+			return Integer.bitCount(vault.getScorePoint(trailOrdinal));
+		} else {
+			return vault.getScorePoint(trailOrdinal);
+		}
 	}
 
 	@Override

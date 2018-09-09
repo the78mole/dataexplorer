@@ -57,7 +57,6 @@ import gde.exception.DataTypeException;
 import gde.exception.ThrowableUtils;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
-import gde.histo.device.IHistoDevice;
 import gde.histo.device.UniversalSampler;
 import gde.io.DataParser;
 import gde.log.Level;
@@ -640,13 +639,14 @@ public class HoTTbinHistoReader {
 			scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = 0;
 		}
-		BitSet activeSensors = ((IHistoDevice) analyzer.getActiveDevice()).getActiveSensors(Sensor.getSetAsSignature(detectedSensors).toString());
-		scores[ScoreLabelTypes.SENSORS.ordinal()] = (activeSensors.cardinality() - 1) * 1000;
+		BitSet activeSensors = Sensor.getSensors(detectedSensors);
+		scores[ScoreLabelTypes.SENSORS.ordinal()] = (int) activeSensors.toLongArray()[0]; // todo only 32 sensor types supported
 		scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = detectedSensors.contains(Sensor.VARIO) ? 1000 : 0;
 		scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = detectedSensors.contains(Sensor.GPS) ? 1000 : 0;
 		scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = detectedSensors.contains(Sensor.GAM) ? 1000 : 0;
 		scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = detectedSensors.contains(Sensor.EAM) ? 1000 : 0;
 		scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = detectedSensors.contains(Sensor.ESC) ? 1000 : 0;
+		scores[ScoreLabelTypes.SENSOR_COUNT.ordinal()] = (detectedSensors.size() - 1) * 1000; // exclude receiver
 		scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = (int) 4.0 * 1000; // V4 with and without container
 		scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = 0;
 		scores[ScoreLabelTypes.LOG_FILE_VERSION.ordinal()] = 0;

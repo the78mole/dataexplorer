@@ -578,7 +578,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		scores[ScoreLabelTypes.TOTAL_READINGS.ordinal()] = osdRecordSet.getRecordDataSize();
 		if (device instanceof IHistoDevice) {
 			double[] packagesLost = osdRecordSet.getPackageLoss();
-			BitSet activeSensors =((IHistoDevice) device).getActiveSensors(osdRecordSet.getSensorSignature());
+			BitSet activeSensors = ((IHistoDevice) device).getActiveSensors(osdRecordSet.getSensorSignature());
 			// recalculating the following scores from raw data would be feasible
 			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = packagesLost[1] != 0 ? (int) (packagesLost[0] * 100. / packagesLost[1]) : 0;
 			scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = (int) packagesLost[0];
@@ -587,12 +587,13 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			scores[ScoreLabelTypes.LOST_PACKAGES_MAX_MS.ordinal()] = (int) (packagesLost[3] * 1000000.); // sec -> ms
 			scores[ScoreLabelTypes.LOST_PACKAGES_MIN_MS.ordinal()] = (int) (packagesLost[2] * 1000000.); // sec -> ms
 			scores[ScoreLabelTypes.LOST_PACKAGES_SIGMA_MS.ordinal()] = (int) (packagesLost[5] * 1000000.); // sec -> ms
-			scores[ScoreLabelTypes.SENSORS.ordinal()] = (activeSensors.cardinality() - 1) * 1000;
+			scores[ScoreLabelTypes.SENSORS.ordinal()] = (int) activeSensors.toLongArray()[0]; // todo only 31 sensor types supported
 			scores[ScoreLabelTypes.SENSOR_VARIO.ordinal()] = activeSensors.get(1) ? 1000 : 0;
 			scores[ScoreLabelTypes.SENSOR_GPS.ordinal()] = activeSensors.get(2) ? 1000 : 0;
 			scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = activeSensors.get(3) ? 1000 : 0;
 			scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = activeSensors.get(4) ? 1000 : 0;
 			scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = activeSensors.get(5) ? 1000 : 0;
+			scores[ScoreLabelTypes.SENSOR_COUNT.ordinal()] = (activeSensors.cardinality() - 1) * 1000; // exclude receiver
 		} else {
 			scores[ScoreLabelTypes.TOTAL_PACKAGES.ordinal()] = 0;
 			scores[ScoreLabelTypes.LOST_PACKAGES.ordinal()] = 0;
@@ -607,6 +608,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			scores[ScoreLabelTypes.SENSOR_GAM.ordinal()] = 0;
 			scores[ScoreLabelTypes.SENSOR_EAM.ordinal()] = 0;
 			scores[ScoreLabelTypes.SENSOR_ESC.ordinal()] = 0;
+			scores[ScoreLabelTypes.SENSOR_COUNT.ordinal()] = 0;
 		}
 		scores[ScoreLabelTypes.LOG_DATA_VERSION.ordinal()] = logDataVersion != null ? (int) (logDataVersion * 1000.) : 0; // Firmware
 		scores[ScoreLabelTypes.LOG_DATA_EXPLORER_VERSION.ordinal()] = (int) (osdHeader.getDataExplorerVersion() * 1000.); // from file
