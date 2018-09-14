@@ -981,9 +981,14 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		}
 		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
 		for (TrailRecord record : this.getDisplayRecords()) {
-			if (!isValueGridRecord(record) && record.isScaleSynced() && record.getSyncMasterRecordOrdinal() >= 0
-				&& !resultRecords.contains(record.getParent().get(record.getSyncMasterRecordOrdinal())) && record.getParent().isOneSyncableVisible(record.getSyncMasterRecordOrdinal()))
-				resultRecords.add(record.getParent().get(record.getSyncMasterRecordOrdinal()));
+			if (!isValueGridRecord(record)) {
+				if (record.isScaleSyncMaster()) {
+					resultRecords.add(record);
+				} else if (record.isScaleSynced() && record.getSyncMasterRecordOrdinal() >= 0
+						&& !resultRecords.contains(record.getParent().get(record.getSyncMasterRecordOrdinal())) && record.getParent().isOneSyncableVisible(record.getSyncMasterRecordOrdinal())) {
+					resultRecords.add(record.getParent().get(record.getSyncMasterRecordOrdinal()));
+				}
+			}
 		}
 		// add all others
 		for (TrailRecord record : this.getDisplayRecords()) {
