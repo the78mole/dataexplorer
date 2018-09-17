@@ -347,9 +347,11 @@ public final class CurveSurvey {
 					int right = Math.min(this.width, this.xRightLimit + maxLineWidth); // right is never less than 0 due to the lineWidth
 					int top = Math.min(this.height, Math.max(0, this.yUpperLimit - maxLineWidth));
 					int bottom = Math.min(this.height, Math.max(0, this.yLowerLimit + maxLineWidth));
-					log.finer(() -> "left=" + left + " top=" + top + " width=" + (right - left) + " height=" + (bottom - top));
+					int tmpWidth = Math.max(0, right - left);
+					int tmpHeight = Math.max(0, bottom - top);
+					log.finer(() -> "left=" + left + " top=" + top + " width=" + tmpWidth + " height=" + tmpHeight);
 
-					CurveSurvey.this.canvasGC.drawImage(canvasImage, left + this.offSetX, top + this.offSetY, right - left, bottom - top, left + this.offSetX, top + this.offSetY, right - left, bottom - top);
+					CurveSurvey.this.canvasGC.drawImage(canvasImage, left + this.offSetX, top + this.offSetY, tmpWidth, tmpHeight, left + this.offSetX, top + this.offSetY, tmpWidth, tmpHeight);
 				}
 				this.yLowerLimit = Integer.MIN_VALUE;
 				this.yUpperLimit = Integer.MAX_VALUE;
