@@ -115,6 +115,9 @@ public class DeviceSerialization {
 
 									newConfig.storeDeviceProperties();
 									log.log(Level.INFO, "migrated device configuration " + newConfig.getName());
+								} else if (!oldConfig.isUsed()) {
+									// WB this is a file system garbage cleaner (rf. to commit 'Fix creating new object graphics templates for criteria never utilized')
+									localAccess.deleteDeviceHistoTemplates(oldConfig.getName()); // todo remove
 								}
 							}
 						} catch (Exception e) {

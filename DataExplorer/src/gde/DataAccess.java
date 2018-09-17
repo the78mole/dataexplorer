@@ -43,10 +43,13 @@ import java.net.URL;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +83,7 @@ import gde.utils.OperatingSystemHelper;
  * Is a hybrid singleton supporting cloning.
  * @author Thomas Eickert (USER)
  */
-public abstract class DataAccess implements Cloneable{
+public abstract class DataAccess implements Cloneable {
 
 	public final static class LocalAccess extends DataAccess {
 		private static final String	$CLASS_NAME	= LocalAccess.class.getName();
@@ -387,6 +390,27 @@ public abstract class DataAccess implements Cloneable{
 			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + folderName);
 			List<File> fileList = FileUtils.getFileListing(migratePropertyPath.toFile(), 1, GDE.FILE_ENDING_DOT_XML);
 			return fileList.stream().map(f -> f.getName()).map(s -> Paths.get(folderName, s)).collect(Collectors.toList());
+		}
+
+		public void deleteDeviceHistoTemplates(String deviceName) throws IOException {
+			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH).resolve(Settings.GRAPHICS_TEMPLATES_DIR_NAME);
+			Files.walkFileTree(targetFilePath, new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					String histoTemplateEnding = "H" + Settings.GRAPHICS_TEMPLATES_EXTENSION.substring(1);
+					String fileName = file.getFileName().toString();
+					if (fileName.endsWith(histoTemplateEnding) && fileName.startsWith(deviceName)) {
+						Files.delete(file);
+					}
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+					// do not delete the directory
+					return FileVisitResult.CONTINUE;
+				}
+			});
 		}
 
 		@Override
