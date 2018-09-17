@@ -931,8 +931,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						if (index > -1) {
 							this.portSelectCombo.select(index);
 						}
-						else {
+						else if (this.deviceConfigurations.get(this.activeDeviceName).getSerialPortType() != null) {
 							this.portSelectCombo.setText(Messages.getString(MessageIds.GDE_MSGT0197));
+						}
+						else 	if (this.deviceConfigurations.get(this.activeDeviceName).getUsbPortType() != null) {
+							this.portSelectCombo.setText("  USB"); //$NON-NLS-1$
 						}
 					}
 					else {
@@ -1192,9 +1195,13 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 												if (index > -1) {
 													DeviceSelectionDialog.this.portSelectCombo.select(index);
 												}
-												else {
+												else if (DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.activeDeviceName).getSerialPortType() != null) {
 													DeviceSelectionDialog.this.portSelectCombo.setText(Messages.getString(MessageIds.GDE_MSGT0197));
 												}
+												else 	if (DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.activeDeviceName).getUsbPortType() != null) {
+													DeviceSelectionDialog.this.portSelectCombo.setText("  USB"); //$NON-NLS-1$
+												}
+
 											}
 											else {
 												DeviceSelectionDialog.this.portSelectCombo.setItems(new String[0]);
