@@ -53,7 +53,7 @@ public class HitecX1RedGathererThread extends Thread {
 
 	final DataExplorer			application;
 	final Settings					settings;
-	final HitecX1RedUsbPort	usbPort;
+	final IMaxB6RDX1UsbPort	usbPort;
 	final HitecX1Red				device;
 	final DeviceDialog			dialog;
 	final Channels					channels;
@@ -76,7 +76,7 @@ public class HitecX1RedGathererThread extends Thread {
 	 * @throws UsbException 
 	 * @throws Exception 
 	 */
-	public HitecX1RedGathererThread(DataExplorer currentApplication, HitecX1Red useDevice, HitecX1RedUsbPort useSerialPort, int channelConfigNumber, DeviceDialog useDialog) throws ApplicationConfigurationException,
+	public HitecX1RedGathererThread(DataExplorer currentApplication, HitecX1Red useDevice, IMaxB6RDX1UsbPort useSerialPort, int channelConfigNumber, DeviceDialog useDialog) throws ApplicationConfigurationException,
 			UsbDisconnectedException, UsbException {
 		super("dataGatherer");
 		this.application = currentApplication;
@@ -124,12 +124,12 @@ public class HitecX1RedGathererThread extends Thread {
 					//get data from device for all4 slots
 					if (this.usbPort.isConnected()) 
 						if (this.isProgrammExecuting1) 	{
-							dataBuffer1 = this.usbPort.getData(this.usbInterface, HitecX1RedUsbPort.QueryOperationData.CHANNEL_A.value());
+							dataBuffer1 = this.usbPort.getData(this.usbInterface, IMaxB6RDX1UsbPort.QueryOperationData.CHANNEL_A.value());
 							this.isProgrammExecuting1 = this.device.isProcessing(1, channelBuffer1, dataBuffer1);
 						}
 						else {
 							dataBuffer1 = null;
-							channelBuffer1 = this.usbPort.getData(this.usbInterface, HitecX1RedUsbPort.QueryChannelData.CHANNEL_A.value());
+							channelBuffer1 = this.usbPort.getData(this.usbInterface, IMaxB6RDX1UsbPort.QueryChannelData.CHANNEL_A.value());
 							this.isProgrammExecuting1 = this.device.isProcessing(1, channelBuffer1, dataBuffer1);
 						}
 					WaitTimer.delay(USB_QUERY_DELAY);

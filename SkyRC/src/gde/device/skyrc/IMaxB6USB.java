@@ -43,13 +43,13 @@ import gde.messages.Messages;
 import gde.utils.WaitTimer;
 
 /**
- * Class to implement SKYRC D100 device
+ * Class to implement SKYRC iMax B6 device
  * @author Winfried Bruegmann
  */
-public class HitecX1Red extends MC3000 implements IDevice {
-	final static Logger				log					= Logger.getLogger(HitecX1Red.class.getName());
+public class IMaxB6USB extends MC3000 implements IDevice {
+	final static Logger				log					= Logger.getLogger(IMaxB6USB.class.getName());
 	final ChargerDialog				dialog;
-	HitecX1RedGathererThread	dataGatherThread;
+	ImaxB6GathererThread			dataGatherThread;
 	IMaxB6RDX1UsbPort					usbPort;
 
 	int[]								resetEnergy		= new int[] { 5, 5 };
@@ -257,7 +257,7 @@ public class HitecX1Red extends MC3000 implements IDevice {
 	 * @throws FileNotFoundException
 	 * @throws JAXBException
 	 */
-	public HitecX1Red(String xmlFileName) throws FileNotFoundException, JAXBException {
+	public IMaxB6USB(String xmlFileName) throws FileNotFoundException, JAXBException {
 		super(xmlFileName);
 	
 		this.STATUS_MODE = new String[] { 
@@ -272,9 +272,9 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		//LI battery： 	0：CHARGE, 1：DISCHARGE, 2：STORAGE, 3：FAST CHG, 4：BALANCE
 		this.USAGE_MODE_LI = new String[] { 
 				Messages.getString(MessageIds.GDE_MSGT3617), //CHARGE
-				Messages.getString(MessageIds.GDE_MSGT3615), //FAST CHG
-				Messages.getString(MessageIds.GDE_MSGT3612), //STORAGE
 				Messages.getString(MessageIds.GDE_MSGT3613), //DISCHARGE
+				Messages.getString(MessageIds.GDE_MSGT3612), //STORAGE
+				Messages.getString(MessageIds.GDE_MSGT3615), //FAST CHG
 				Messages.getString(MessageIds.GDE_MSGT3616)};//BALANCE
 
 		//Ni battery:		0=CHARGE 1=AUTO_CHARGE 2=DISCHARGE 3=RE_PEAK 4=CYCLE
@@ -295,14 +295,14 @@ public class HitecX1Red extends MC3000 implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3617), //CHARGE
 				Messages.getString(MessageIds.GDE_MSGT3612)};//STORAGE
 
-		//battery type:  0:LiPo 1:LiFe 2:LiLo 3:LiHv 4:NiCd 5:NiMH 6:PB 7: DJI Mavic
+		//battery type:  0:LiPo 1:LiIo 2:LiFe 3:LiHv 4:NiMH 5:NiCd 6:PB 7: DJI Mavic
 		this.BATTERY_TYPE = new String[] { 
 				Messages.getString(MessageIds.GDE_MSGT3649), 
-				Messages.getString(MessageIds.GDE_MSGT3641), 
 				Messages.getString(MessageIds.GDE_MSGT3640),
+				Messages.getString(MessageIds.GDE_MSGT3641), 
 				Messages.getString(MessageIds.GDE_MSGT3642), 
-				Messages.getString(MessageIds.GDE_MSGT3644), 
 				Messages.getString(MessageIds.GDE_MSGT3643), 
+				Messages.getString(MessageIds.GDE_MSGT3644), 
 				Messages.getString(MessageIds.GDE_MSGT3648), 
 				Messages.getString(MessageIds.GDE_MSGT3687) };
 
@@ -313,7 +313,7 @@ public class HitecX1Red extends MC3000 implements IDevice {
 	/**
 	 * @param deviceConfig
 	 */
-	public HitecX1Red(DeviceConfiguration deviceConfig) {
+	public IMaxB6USB(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		
 		this.STATUS_MODE = new String[] { 
@@ -328,9 +328,9 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		//LI battery： 	0：CHARGE, 1：DISCHARGE, 2：STORAGE, 3：FAST CHG, 4：BALANCE
 		this.USAGE_MODE_LI = new String[] { 
 				Messages.getString(MessageIds.GDE_MSGT3617), //CHARGE
-				Messages.getString(MessageIds.GDE_MSGT3615), //FAST CHG
-				Messages.getString(MessageIds.GDE_MSGT3612), //STORAGE
 				Messages.getString(MessageIds.GDE_MSGT3613), //DISCHARGE
+				Messages.getString(MessageIds.GDE_MSGT3612), //STORAGE
+				Messages.getString(MessageIds.GDE_MSGT3615), //FAST CHG
 				Messages.getString(MessageIds.GDE_MSGT3616)};//BALANCE
 
 		//Ni battery:		0=CHARGE 1=AUTO_CHARGE 2=DISCHARGE 3=RE_PEAK 4=CYCLE
@@ -351,14 +351,14 @@ public class HitecX1Red extends MC3000 implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3617), //CHARGE
 				Messages.getString(MessageIds.GDE_MSGT3612)};//STORAGE
 
-		//battery type:  0:LiPo 1:LiFe 2:LiLo 3:LiHv 4:NiCd 5:NiMH 6:PB 7: DJI Mavic
+		//battery type:  0:LiPo 1:LiIo 2:LiFe 3:LiHv 4:NiMH 5:NiCd 6:PB 7: DJI Mavic
 		this.BATTERY_TYPE = new String[] { 
 				Messages.getString(MessageIds.GDE_MSGT3649), 
-				Messages.getString(MessageIds.GDE_MSGT3641), 
 				Messages.getString(MessageIds.GDE_MSGT3640),
+				Messages.getString(MessageIds.GDE_MSGT3641), 
 				Messages.getString(MessageIds.GDE_MSGT3642), 
-				Messages.getString(MessageIds.GDE_MSGT3644), 
 				Messages.getString(MessageIds.GDE_MSGT3643), 
+				Messages.getString(MessageIds.GDE_MSGT3644), 
 				Messages.getString(MessageIds.GDE_MSGT3648), 
 				Messages.getString(MessageIds.GDE_MSGT3687) };
 
@@ -444,7 +444,7 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		points[2] = DataParser.parse2Short(dataBuffer[6], dataBuffer[5]) * 1000;
 		points[3] = Double.valueOf(points[0] / 1000.0 * points[1]).intValue(); // power U*I [W]
 		//databuffer[0] injected energy handling flag
-		switch (dataBuffer[0]) { //injected energy handling flag
+		switch (dataBuffer[1]) { //injected energy handling flag
 		case 0: //add up energy
 			energy[0] += points[0] / 1000.0 * points[1] / 3600.0;
 			points[4] = Double.valueOf(energy[0]).intValue();
@@ -465,14 +465,13 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		//0=Voltage 1=Current 2=Capacity 3=Power 4=Energy 5=Temperature Ext  6=Temperature Int 7=Resistance
 		points[5] = dataBuffer[13] * 1000;
 		points[6] = dataBuffer[14] * 1000;
-		points[7] = 0;
+		points[7] = dataBuffer[15] * 1000;
 		
-		if (dataBuffer[35] <= 3) { // exclude Ni PB batteries
-			int numberCells = dataBuffer[36];
+		if (dataBuffer[0] <= 3) { // exclude Ni PB batteries
 			//9=CellVoltage1....14=CellVoltage6
 			int j = 0;
-			for (int i = 9, k = 0; k < numberCells && i < points.length; i++, j += 2, k++) {
-				if (dataBuffer[j + 17] != 0x00) { // filter none used cell 
+			for (int i = 9; i < points.length; i++, j += 2) {
+				if (dataBuffer[j + 17] > 0x05) { // filter none used cell 
 					points[i] = DataParser.parse2Short(dataBuffer[j + 18], dataBuffer[j + 17]);
 					maxVoltage = points[i] > maxVoltage ? points[i] : maxVoltage;
 					minVoltage = points[i] < minVoltage ? points[i] : minVoltage;
@@ -658,7 +657,7 @@ public class HitecX1Red extends MC3000 implements IDevice {
 		//Ni battery:		0=CHARGE 1=AUTO_CHARGE 2=DISCHARGE 3=RE_PEAK 4=CYCLE
 		//Pb battery:		0=CHARGE 1=DISCHARGE
 
-		//battery type:  0:LiPo 1:LiFe 2:LiLo 3:LiHv 4:NiCd 5:NiMH 6:PB 7: DJI Mavic
+		//battery type:  0:LiPo 1:LiFe 2:LiLo 3:LiHv 4:NiMH 5:NiCd 6:PB 
 		switch (this.getBatteryType(channelBuffer)) {
 		case 0: //LiPo
 		case 1: //LiFe
@@ -672,9 +671,6 @@ public class HitecX1Red extends MC3000 implements IDevice {
 			break;
 		case 6: //PB
 			processTypeName = this.USAGE_MODE_PB[channelBuffer[7]];
-			break;
-		case 7: //DJI Mavic
-			processTypeName = this.USAGE_MODE_DJI[channelBuffer[7]];
 			break;
 		}
 		return this.isContinuousRecordSet() ? Messages.getString(MessageIds.GDE_MSGT3606) : processTypeName;
@@ -858,13 +854,17 @@ public class HitecX1Red extends MC3000 implements IDevice {
 				try {
 					Channel activChannel = Channels.getInstance().getActiveChannel();
 					if (activChannel != null) {
-						this.dataGatherThread = new HitecX1RedGathererThread(this.application, this, this.usbPort, activChannel.getNumber(), this.getDialog());
+						this.dataGatherThread = new ImaxB6GathererThread(this.application, this, this.usbPort, activChannel.getNumber(), this.getDialog());
 						try {
 							if (this.dataGatherThread != null && this.usbPort.isConnected()) {
-								this.systemInfo[0] = new HitecX1Red.SystemInfo(this.usbPort.getSystemInfo(this.dataGatherThread.getUsbInterface(), IMaxB6RDX1UsbPort.QuerySystemInfo.CHANNEL_A.value()));
-								this.systemSetting[0] = new HitecX1Red.SystemSetting(this.usbPort.getSystemSetting(this.dataGatherThread.getUsbInterface(), IMaxB6RDX1UsbPort.QuerySystemSetting.CHANNEL_A.value()));
+								this.systemInfo[0] = new IMaxB6USB.SystemInfo(this.usbPort.getSystemInfo(this.dataGatherThread.getUsbInterface(), IMaxB6RDX1UsbPort.QuerySystemInfo.CHANNEL_A.value()));
+								this.systemSetting[0] = new IMaxB6USB.SystemSetting(this.usbPort.getSystemSetting(this.dataGatherThread.getUsbInterface(), IMaxB6RDX1UsbPort.QuerySystemSetting.CHANNEL_A.value()));
 
-								WaitTimer.delay(100);
+								if (this.systemInfo[0].getFirmwareVersionAsInt() < 113) {
+									this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT3650, new String[] { this.systemInfo[0].getFirmwareVersion() }));
+								} else {					
+									WaitTimer.delay(100);
+								}
 								this.dataGatherThread.start();
 							}
 						}

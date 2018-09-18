@@ -14,9 +14,16 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
+    Copyright (c) 2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.skyrc;
+
+import java.util.logging.Logger;
+
+import javax.usb.UsbDisconnectedException;
+import javax.usb.UsbException;
+import javax.usb.UsbInterface;
+import javax.usb.UsbNotClaimedException;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -34,31 +41,24 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.WaitTimer;
 
-import java.util.logging.Logger;
-
-import javax.usb.UsbDisconnectedException;
-import javax.usb.UsbException;
-import javax.usb.UsbInterface;
-import javax.usb.UsbNotClaimedException;
-
 /**
  * Thread implementation to gather data from eStation device
  * @author Winfied Brügmann
  */
-public class D100GathererThread extends Thread {
+public class ImaxB6GathererThread extends Thread {
 	protected static final int	USB_QUERY_DELAY	= GDE.IS_WINDOWS ? 70 : 160;
-	final static String	$CLASS_NAME									= D100GathererThread.class.getName();
-	final static Logger	log													= Logger.getLogger(D100GathererThread.class.getName());
+	final static String	$CLASS_NAME									= ImaxB6GathererThread.class.getName();
+	final static Logger	log													= Logger.getLogger(ImaxB6GathererThread.class.getName());
 	final static int		WAIT_TIME_RETRYS						= 3600;		// 3600 * 1 sec = 60 Minutes
 
-	final DataExplorer	application;
-	final Settings			settings;
-	final D100UsbPort		usbPort;
-	final D100					device;
-	final DeviceDialog	dialog;
-	final Channels			channels;
-	final Channel				channel;
-	final int						channelNumber;
+	final DataExplorer			application;
+	final Settings					settings;
+	final IMaxB6RDX1UsbPort	usbPort;
+	final IMaxB6USB								device;
+	final DeviceDialog			dialog;
+	final Channels					channels;
+	final Channel						channel;
+	final int								channelNumber;
 
 	String							recordSetKey								= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
 	boolean							isPortOpenedByLiveGatherer	= false;
@@ -66,9 +66,8 @@ public class D100GathererThread extends Thread {
 	boolean							isCollectDataStopped				= false;
 	UsbInterface				usbInterface								= null;
 	boolean							isProgrammExecuting1				= false;
-	boolean							isProgrammExecuting2				= false;
 	boolean[]						isAlerted4Finish						= { false, false, false, false };
-	int									retryCounter								= D100GathererThread.WAIT_TIME_RETRYS;	//60 Min
+	int									retryCounter								= ImaxB6GathererThread.WAIT_TIME_RETRYS;	//60 Min
 
 	/**
 	 * data gatherer thread definition 
@@ -77,7 +76,7 @@ public class D100GathererThread extends Thread {
 	 * @throws UsbException 
 	 * @throws Exception 
 	 */
-	public D100GathererThread(DataExplorer currentApplication, D100 useDevice, D100UsbPort useSerialPort, int channelConfigNumber, DeviceDialog useDialog) throws ApplicationConfigurationException,
+	public ImaxB6GathererThread(DataExplorer currentApplication, IMaxB6USB useDevice, IMaxB6RDX1UsbPort useSerialPort, int channelConfigNumber, DeviceDialog useDialog) throws ApplicationConfigurationException,
 			UsbDisconnectedException, UsbException {
 		super("dataGatherer");
 		this.application = currentApplication;
@@ -102,26 +101,20 @@ public class D100GathererThread extends Thread {
 		try {
 			final String $METHOD_NAME = "run"; //$NON-NLS-1$
 			RecordSet recordSet1 = null;
-			RecordSet recordSet2 = null;
 			int[] points1 = new int[this.device.getNumberOfMeasurements(1)];
-			int[] points2 = new int[this.device.getNumberOfMeasurements(2)];
-			int lastEnergie1, lastEnergie2;
+			int lastEnergie1;
 
 			this.isProgrammExecuting1 = false;
-			this.isProgrammExecuting2 = false;
 
 			long lastCycleTime = 0;
 			byte[] dataBuffer1 = null;
-			byte[] dataBuffer2 = null;
 			byte[] channelBuffer1 = null;
-			byte[] channelBuffer2 = null;
-			Object[] ch1, ch2;
+			Object[] ch1;
 			String recordSetKey1 = Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
-			String recordSetKey2 = Messages.getString(gde.messages.MessageIds.GDE_MSGT0272); //default initialization
 
 			this.isCollectDataStopped = false;
-			if (D100GathererThread.log.isLoggable(Level.FINE))
-				D100GathererThread.log.logp(Level.FINE, D100GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
+			if (ImaxB6GathererThread.log.isLoggable(Level.FINE))
+				ImaxB6GathererThread.log.logp(Level.FINE, ImaxB6GathererThread.$CLASS_NAME, $METHOD_NAME, "====> entry initial time step ms = " + this.device.getTimeStep_ms()); //$NON-NLS-1$
 
 			lastCycleTime = System.nanoTime()/1000000;
 			while (!this.isCollectDataStopped && this.usbPort.isConnected()) {
@@ -131,38 +124,24 @@ public class D100GathererThread extends Thread {
 					//get data from device for all4 slots
 					if (this.usbPort.isConnected()) 
 						if (this.isProgrammExecuting1) 	{
-							dataBuffer1 = this.usbPort.getData(this.usbInterface, D100UsbPort.QueryOperationData.CHANNEL_A.value());
+							dataBuffer1 = this.usbPort.getData(this.usbInterface, IMaxB6RDX1UsbPort.QueryOperationData.CHANNEL_A.value());
 							this.isProgrammExecuting1 = this.device.isProcessing(1, channelBuffer1, dataBuffer1);
 						}
 						else {
 							dataBuffer1 = null;
-							channelBuffer1 = this.usbPort.getData(this.usbInterface, D100UsbPort.QueryChannelData.CHANNEL_A.value());
+							channelBuffer1 = this.usbPort.getData(this.usbInterface, IMaxB6RDX1UsbPort.QueryChannelData.CHANNEL_A.value());
 							this.isProgrammExecuting1 = this.device.isProcessing(1, channelBuffer1, dataBuffer1);
 						}
 					WaitTimer.delay(USB_QUERY_DELAY);
-					
-					if (this.usbPort.isConnected()) 
-						if (this.isProgrammExecuting2) {
-							dataBuffer2 = this.usbPort.getData(this.usbInterface, D100UsbPort.QueryOperationData.CHANNEL_B.value());
-							this.isProgrammExecuting2 = this.device.isProcessing(2, channelBuffer2, dataBuffer2);
-						}
-						else {
-							dataBuffer2 = null;
-							channelBuffer2 = this.usbPort.getData(this.usbInterface, D100UsbPort.QueryChannelData.CHANNEL_B.value());
-							this.isProgrammExecuting2 = this.device.isProcessing(2, channelBuffer2, dataBuffer2);
-						}
 					if (this.application != null) this.application.setSerialTxOff();
-					WaitTimer.delay(USB_QUERY_DELAY);
 
+					WaitTimer.delay(USB_QUERY_DELAY);
 					if (this.application != null) this.application.setSerialRxOff();
 
 					// check if device is ready for data capturing, discharge or charge allowed only
-					if (this.isProgrammExecuting1 || this.isProgrammExecuting2) {
+					if (this.isProgrammExecuting1) {
 						lastEnergie1 = points1[4];
 						points1 = new int[this.device.getNumberOfMeasurements(1)];
-						
-						lastEnergie2 = points2[4];
-						points2 = new int[this.device.getNumberOfMeasurements(2)];
 
 						if (this.isProgrammExecuting1 && channelBuffer1 != null && dataBuffer1 != null) { // checks for processes active includes check state change waiting to discharge to charge
 							points1[4] = lastEnergie1;
@@ -170,29 +149,12 @@ public class D100GathererThread extends Thread {
 							recordSet1 = (RecordSet) ch1[0];
 							recordSetKey1 = (String) ch1[1];
 						}
-						if (this.isProgrammExecuting2 && channelBuffer2 != null && dataBuffer2 != null) { // checks for processes active includes check state change waiting to discharge to charge
-							points2[4] = lastEnergie2;
-							ch2 = processDataChannel(2, recordSet2, recordSetKey2, channelBuffer2, dataBuffer2, points2);
-							recordSet2 = (RecordSet) ch2[0];
-							recordSetKey2 = (String) ch2[1];
-						}
 						
-						this.application.setStatusMessage(GDE.STRING_EMPTY);
-						
-						//check for all processing finished and stop gathering after 15 min
-//						if (this.device.isProcessingStatusStandByOrFinished(dataBuffer1) && this.device.isProcessingStatusStandByOrFinished(dataBuffer2) && this.device.isProcessingStatusStandByOrFinished(dataBuffer3) && this.device.isProcessingStatusStandByOrFinished(dataBuffer4)) {
-//							if (0 >= (retryCounter -= 4)) {
-//								log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
-//								this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI3601));
-//								stopDataGatheringThread(false, null);
-//							}
-//						}
-//						else
-//							this.retryCounter	= D100GathererThread.WAIT_TIME_RETRYS;	//60 Min
+						this.application.setStatusMessage(GDE.STRING_EMPTY);						
 					}
 					else {
 						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3600));
-						log.logp(Level.FINE, D100GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
+						log.logp(Level.FINE, ImaxB6GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 
 						if (0 >= (retryCounter -= 1)) {
 							log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
@@ -209,8 +171,8 @@ public class D100GathererThread extends Thread {
 					// this case will be reached while data gathering enabled, but no data will be received
 					if (e instanceof TimeOutException) {
 						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3600));
-						if (D100GathererThread.log.isLoggable(Level.FINE))
-							D100GathererThread.log.logp(Level.FINE, D100GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI3600));
+						if (ImaxB6GathererThread.log.isLoggable(Level.FINE))
+							ImaxB6GathererThread.log.logp(Level.FINE, ImaxB6GathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI3600));
 					}
 					else if (e instanceof UsbNotClaimedException) { //USB error detected, p.e. disconnect
 						this.application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
@@ -226,7 +188,7 @@ public class D100GathererThread extends Thread {
 					}
 					// program end or unexpected exception occurred, stop data gathering to enable save data by user
 					else {
-						D100GathererThread.log.log(Level.FINE, "data gathering end detected"); //$NON-NLS-1$
+						ImaxB6GathererThread.log.log(Level.FINE, "data gathering end detected"); //$NON-NLS-1$
 						stopDataGatheringThread(true, e);
 					}
 				}
@@ -238,7 +200,7 @@ public class D100GathererThread extends Thread {
 				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, String.format("delay = %d", delay)); //$NON-NLS-1$
 			}
 			this.application.setStatusMessage(""); //$NON-NLS-1$
-			if (D100GathererThread.log.isLoggable(Level.FINE)) D100GathererThread.log.logp(Level.FINE, D100GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
+			if (ImaxB6GathererThread.log.isLoggable(Level.FINE)) ImaxB6GathererThread.log.logp(Level.FINE, ImaxB6GathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
 
 			if (!this.isCollectDataStopped) {
 				this.stopDataGatheringThread(false, null);
@@ -248,11 +210,11 @@ public class D100GathererThread extends Thread {
 			try {
 				if (this.usbInterface != null) {
 					this.device.usbPort.closeUsbPort(this.usbInterface);
-					D100GathererThread.log.log(Level.FINE, "USB interface closed");
+					ImaxB6GathererThread.log.log(Level.FINE, "USB interface closed");
 				}
 			}
 			catch (UsbException e) {
-				D100GathererThread.log.log(Level.SEVERE, e.getMessage(), e);
+				ImaxB6GathererThread.log.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 	}
@@ -281,15 +243,15 @@ public class D100GathererThread extends Thread {
 		//firmware 1.07 energy needs to be calculated
 		if (this.device.resetEnergy[number-1] != device.getProcessSubType(channelBuffer, dataBuffer) || device.getProcessSubType(channelBuffer, dataBuffer) == 2)
 			if (device.getProcessSubType(channelBuffer, dataBuffer) == 2)
-				dataBuffer[0] = -1; //keep energy
+				dataBuffer[1] = -1; //keep energy
 			else
-				dataBuffer[0] = 1;  //reset energy
+				dataBuffer[1] = 1;  //reset energy
 		else
-			dataBuffer[0] = 0;	//add up energy		
+			dataBuffer[1] = 0;	//add up energy		
 		this.device.resetEnergy[number-1] = device.getProcessSubType(channelBuffer, dataBuffer);
 
-		if (D100GathererThread.log.isLoggable(Level.FINE)) {
-			D100GathererThread.log.log(Level.FINE, "Channel = " + number + " : processTypeName = " + processTypeName + " processSubType = " + processSubTypeName);
+		if (ImaxB6GathererThread.log.isLoggable(Level.FINE)) {
+			ImaxB6GathererThread.log.log(Level.FINE, String.format("process = %s ; subProcess = %s", processTypeName, processSubTypeName));
 		}
 		Channel channel = this.channels.get(number);
 		if (channel != null) {
@@ -315,8 +277,8 @@ public class D100GathererThread extends Thread {
 					}
 				}
 				processRecordSetKey = String.format("%d) %s - %s %s", channel.getNextRecordSetNumber(), processBatteryTypeName, processTypeName, extend.toString());
-				if (D100GathererThread.log.isLoggable(Level.FINE)) {
-					D100GathererThread.log.log(Level.FINE, number + " : processRecordSetKey = " + processRecordSetKey);
+				if (ImaxB6GathererThread.log.isLoggable(Level.FINE)) {
+					ImaxB6GathererThread.log.log(Level.FINE, number + " : processRecordSetKey = " + processRecordSetKey);
 				}
 				processRecordSetKey = processRecordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? processRecordSetKey : processRecordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
@@ -328,27 +290,26 @@ public class D100GathererThread extends Thread {
 					channel.applyTemplateBasics(processRecordSetKey);
 
 				if (log.isLoggable(Level.FINE))
-					log.logp(Level.FINE, D100GathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
+					log.logp(Level.FINE, ImaxB6GathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
 				recordSet = channel.get(processRecordSetKey);
 				recordSet.setAllDisplayable();
-				recordSet.get(5).setUnit(device.getTemperatureUnit(number));
-				recordSet.get(6).setUnit(device.getTemperatureUnit(number));
+//				recordSet.get(5).setUnit(device.getTemperatureUnit(number));
+//				recordSet.get(6).setUnit(device.getTemperatureUnit(number));
 				//channel.applyTemplate(recordSetKey, false);
 				// switch the active record set if the current record set is child of active channel
 				this.channels.switchChannel(channel.getNumber(), processRecordSetKey);
 				channel.switchRecordSet(processRecordSetKey);
-				String description = String.format("%s%s%s %s %s;", 
-						recordSet.getRecordSetDescription(), GDE.LINE_SEPARATOR, this.device.getMachineIdString(number), this.device.getHarwareString(number), this.device.getFirmwareString(number)); //$NON-NLS-1$
+				String description = String.format("%s%s%s %s;", 
+						recordSet.getRecordSetDescription(), GDE.LINE_SEPARATOR, this.device.getHarwareString(), this.device.getFirmwareString()); //$NON-NLS-1$
 				recordSet.setRecordSetDescription(description);
 
-				//firmware 1.09 energy needs to be calculated -> creating a new record set will reset energy
-				dataBuffer[0] = 1;  //reset energy
+				dataBuffer[1] = 1;  //reset energy
 			}
 
 			dataBuffer[0] = (byte) this.device.getBatteryType(channelBuffer); //flag buffer contains Ni or PB battery data
 			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
 
-			D100GathererThread.this.application.updateAllTabs(false);
+			ImaxB6GathererThread.this.application.updateAllTabs(false);
 
 			if (recordSet.get(0).realSize() < 3 || recordSet.get(0).realSize() % 10 == 0) {
 				this.device.updateVisibilityStatus(recordSet, true);
@@ -368,20 +329,20 @@ public class D100GathererThread extends Thread {
 		final String $METHOD_NAME = "stopDataGatheringThread"; //$NON-NLS-1$
 
 		if (throwable != null) {
-			D100GathererThread.log.logp(Level.WARNING, D100GathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
+			ImaxB6GathererThread.log.logp(Level.WARNING, ImaxB6GathererThread.$CLASS_NAME, $METHOD_NAME, throwable.getMessage(), throwable);
 		}
 
 		this.isCollectDataStopped = true;
 
 		if (this.usbPort != null && this.usbPort.getXferErrors() > 0) {
-			D100GathererThread.log.log(Level.WARNING, "During complete data transfer " + this.usbPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
+			ImaxB6GathererThread.log.log(Level.WARNING, "During complete data transfer " + this.usbPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (this.usbPort != null && this.usbPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.usbPort.isConnected()) {
 			try {
 				this.usbPort.closeUsbPort(null);
 			}
 			catch (UsbException e) {
-				D100GathererThread.log.log(Level.WARNING, e.getMessage(), e);
+				ImaxB6GathererThread.log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
 //		if (this.dialog != null && !this.dialog.isDisposed()) {
@@ -411,7 +372,7 @@ public class D100GathererThread extends Thread {
 			this.usbPort.closeUsbPort(null);
 		}
 		catch (UsbException e) {
-			D100GathererThread.log.log(Level.WARNING, e.getMessage(), e);
+			ImaxB6GathererThread.log.log(Level.WARNING, e.getMessage(), e);
 		}
 
 		RecordSet tmpRecordSet = this.channel.get(this.recordSetKey);
@@ -422,7 +383,7 @@ public class D100GathererThread extends Thread {
 			this.application.updateDataTable(this.recordSetKey, false);
 
 			this.device.setAverageTimeStep_ms(tmpRecordSet.getAverageTimeStep_ms());
-			D100GathererThread.log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms()); //$NON-NLS-1$
+			ImaxB6GathererThread.log.log(Level.TIME, "set average time step msec = " + this.device.getAverageTimeStep_ms()); //$NON-NLS-1$
 		}
 	}
 
@@ -448,10 +409,10 @@ public class D100GathererThread extends Thread {
 				GDE.display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						D100GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
-						D100GathererThread.this.application.updateStatisticsData();
-						D100GathererThread.this.application.updateDataTable(useRecordSetKey, true);
-						D100GathererThread.this.application.openMessageDialogAsync(message);
+						ImaxB6GathererThread.this.application.getMenuToolBar().updateRecordSetSelectCombo();
+						ImaxB6GathererThread.this.application.updateStatisticsData();
+						ImaxB6GathererThread.this.application.updateDataTable(useRecordSetKey, true);
+						ImaxB6GathererThread.this.application.openMessageDialogAsync(message);
 						//GathererThread.this.device.getDialog().resetButtons();
 					}
 				});

@@ -13,8 +13,7 @@ Device specific changes/fixes
 	* HottAdapter - fix wrong sensor sequence reference while import *.bin with single ESC sensor module connected.
 	* Hitec DRX1 - add support (identical Hitex RDX1 Pro is the 100W version)
 	* Hitec X1 Red - add support
-	* iMax B6 mini - add support 
-	* iMax B6 AC V2 - add support
+	* iMax B6 mini - add support (iMax B6 AC V2)
 	
 History analysis
 	# Flexibility

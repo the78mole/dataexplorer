@@ -36,8 +36,8 @@ import javax.usb.UsbInterface;
  * Q200 universal serial port implementation
  * @author Winfried Bruegmann
  */
-public class HitecX1RedUsbPort extends DeviceCommPort implements IDeviceCommPort {
-	final static String $CLASS_NAME = HitecX1RedUsbPort.class.getName();
+public class IMaxB6RDX1UsbPort extends DeviceCommPort implements IDeviceCommPort {
+	final static String $CLASS_NAME = IMaxB6RDX1UsbPort.class.getName();
 	final static Logger	log	= Logger.getLogger($CLASS_NAME);
 		
   // The vendor ID SKYRC products are actually not registered.
@@ -134,7 +134,7 @@ public class HitecX1RedUsbPort extends DeviceCommPort implements IDeviceCommPort
 	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
 	 * @param currentApplication - may be used to reflect serial receive,transmit on/off status or overall status by progress bar 
 	 */
-	public HitecX1RedUsbPort(IDevice currentDevice, DataExplorer currentApplication) {
+	public IMaxB6RDX1UsbPort(IDevice currentDevice, DataExplorer currentApplication) {
 		super(currentDevice, currentApplication);
 		this.dataSize = this.deviceConfig.getDataBlockSize(InputTypes.SERIAL_IO);
 		this.interfaceId = this.device.getUsbInterface();
