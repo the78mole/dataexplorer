@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import com.sun.istack.internal.Nullable;
+import com.sun.istack.Nullable;
 
 import gde.GDE;
 

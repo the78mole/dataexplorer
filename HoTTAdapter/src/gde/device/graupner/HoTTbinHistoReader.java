@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import com.sun.istack.internal.Nullable;
+import com.sun.istack.Nullable;
 
 import gde.Analyzer;
 import gde.GDE;

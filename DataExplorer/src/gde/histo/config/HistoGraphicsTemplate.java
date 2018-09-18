@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import com.sun.istack.internal.Nullable;
+import com.sun.istack.Nullable;
 
 import gde.Analyzer;
 import gde.DataAccess.LocalAccess;

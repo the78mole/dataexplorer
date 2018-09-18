@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import com.sun.istack.internal.Nullable;
+import com.sun.istack.Nullable;
 
 import gde.data.Record.DataType;
 import gde.device.IChannelItem;

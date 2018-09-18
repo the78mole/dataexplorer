@@ -33,7 +33,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 
-import com.sun.istack.internal.Nullable;
+import com.sun.istack.Nullable;
 
 import gde.GDE;
 import gde.data.Channels;

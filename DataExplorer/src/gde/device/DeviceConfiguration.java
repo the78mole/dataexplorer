@@ -50,7 +50,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.swt.custom.CTabItem;
 
-import com.sun.istack.internal.Nullable;
+import com.sun.istack.Nullable;
 
 import gde.Analyzer;
 import gde.DataAccess;
