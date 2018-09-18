@@ -16,7 +16,7 @@ package gde.histo.innercache;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 
-import com.sun.istack.internal.Nullable;
+import com.sun.istack.Nullable;
 
 /**
  * A notification of the removal of a single entry. The key and/or value may be null if they were

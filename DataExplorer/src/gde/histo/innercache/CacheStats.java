@@ -18,7 +18,7 @@ import static gde.histo.utils.Preconditions.checkArgument;
 
 import java.util.concurrent.Callable;
 
-import com.sun.istack.internal.Nullable;
+import com.sun.istack.Nullable;
 
 /**
  * Statistics about the performance of a {@link Cache}. Instances of this class are immutable.

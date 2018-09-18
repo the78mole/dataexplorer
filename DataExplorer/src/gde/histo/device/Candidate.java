@@ -21,7 +21,7 @@ package gde.histo.device;
 
 import java.util.Arrays;
 
-import com.sun.istack.internal.Nullable;
+import com.sun.istack.Nullable;
 
 /**
  * Sample candidate without any further selection support.

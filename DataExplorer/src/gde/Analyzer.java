@@ -22,7 +22,7 @@ package gde;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.sun.istack.internal.Nullable;
+import com.sun.istack.Nullable;
 
 import gde.config.DeviceConfigurations;
 import gde.config.Settings;

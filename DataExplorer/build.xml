@@ -77,7 +77,7 @@
 			<attribute name="Created-By" value="${user.name}"/>
 			<attribute name="Built-Date" value="${TODAY}"/> 
 			<attribute name="Main-Class" value="gde.GDE"/>
-			<attribute name="Class-Path" value="java/ext/jaxb-api-2.3.0.jar java/ext/jaxb-core-2.3.0.1.jar java/ext/jaxb-runtime-2.3.0.1.jar java/ext/istack-commons-runtime-3.0.5.jar java/ext/activation-1.1.1.jar java/ext/swt.jar java/ext/RXTXcomm.jar java/ext/usb-api-1.0.2.jar java/ext/usb4java-javax-1.2.0.jar java/ext/usb4java-1.2.0.jar java/ext/commons-lang3-3.2.1.jar java/ext/libusb4java-1.2.0.jar"/>
+			<attribute name="Class-Path" value="java/ext/jaxb-api-2.3.0.jar java/ext/jaxb-core-2.3.0.1.jar java/ext/jaxb-runtime-2.3.0.1.jar java/ext/istack-commons-runtime-3.0.5.jar java/ext/activation-1.1.1.jar java/ext/gson-2.8.5.jar java/ext/swt.jar java/ext/RXTXcomm.jar java/ext/usb-api-1.0.2.jar java/ext/usb4java-javax-1.2.0.jar java/ext/usb4java-1.2.0.jar java/ext/commons-lang3-3.2.1.jar java/ext/libusb4java-1.2.0.jar"/>
    		</manifest>
  	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
