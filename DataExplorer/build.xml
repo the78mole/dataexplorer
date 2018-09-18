@@ -35,6 +35,11 @@
 	<path id="compile.classpath">
 		<pathelement location="../build/lib/gson-2.8.5.jar" />
 		<pathelement location="../build/lib/RXTXcomm.jar" />
+		<pathelement location="../build/lib/jaxb-api-2.3.0.jar"/>
+		<pathelement location="../build/lib/jaxb-core-2.3.0.1.jar"/>
+		<pathelement location="../build/lib/jaxb-runtime-2.3.0.1.jar"/>
+		<pathelement location="../build/lib/istack-commons-runtime-3.0.5.jar"/>
+		<pathelement location="../build/lib/activation-1.1.1.jar"/>
 		<pathelement location="../build/lib/usb4java-1.2.0.jar" />
 		<pathelement location="../build/lib/usb-api-1.0.2.jar" />
 		<pathelement location="../build/lib/usb4java-javax-1.2.0.jar" />
@@ -47,7 +52,7 @@
 		<property name="include.debug.info" value="yes" />
 		<mkdir dir="${module.output}" />
 		<mkdir dir="build" />
-		<javac destdir="${module.output}" classpathref="compile.classpath" compiler="javac1.7" encoding="UTF-8" debug="true" includeantruntime="false">
+		<javac destdir="${module.output}" classpathref="compile.classpath" source="1.8" target="1.8" encoding="UTF-8" debug="true" includeantruntime="false">
 			<src path="src" />
 			<compilerarg value="-XDignore.symbol.file"/>
 		</javac>
@@ -72,7 +77,7 @@
 			<attribute name="Created-By" value="${user.name}"/>
 			<attribute name="Built-Date" value="${TODAY}"/> 
 			<attribute name="Main-Class" value="gde.GDE"/>
-			<attribute name="Class-Path" value="java/ext/swt.jar java/ext/RXTXcomm.jar java/ext/usb-api-1.0.2.jar java/ext/usb4java-javax-1.2.0.jar java/ext/usb4java-1.2.0.jar java/ext/commons-lang3-3.2.1.jar java/ext/libusb4java-1.2.0.jar"/>
+			<attribute name="Class-Path" value="java/ext/jaxb-api-2.3.0.jar java/ext/jaxb-core-2.3.0.1.jar java/ext/jaxb-runtime-2.3.0.1.jar java/ext/istack-commons-runtime-3.0.5.jar java/ext/activation-1.1.1.jar java/ext/swt.jar java/ext/RXTXcomm.jar java/ext/usb-api-1.0.2.jar java/ext/usb4java-javax-1.2.0.jar java/ext/usb4java-1.2.0.jar java/ext/commons-lang3-3.2.1.jar java/ext/libusb4java-1.2.0.jar"/>
    		</manifest>
  	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

@@ -7,5 +7,5 @@ export SWT_GTK3=0
 
 echo java -D64 -Dfile.encoding=UTF-8 -jar -Xms64m -Xmx3092m ./DataExplorer.jar
 echo argument $1
-java -D64 -Dfile.encoding=UTF-8 -jar -Xms64m -Xmx3092m ./DataExplorer.jar $1
+java -Dfile.encoding=UTF-8 -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize  -jar -Xms64m -Xmx3092m ./DataExplorer.jar $1
 
