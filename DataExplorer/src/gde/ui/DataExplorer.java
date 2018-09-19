@@ -3147,7 +3147,7 @@ public class DataExplorer extends Composite {
 	 */
 	public void check4update() {
 		final String[] versionCheck = FileUtils.isUpdateAvailable();
-		if (new Boolean(versionCheck[0])) {
+		if (Boolean.valueOf(versionCheck[0])) {
 			// if (true) {
 			MessageBox messageDialog = new MessageBox(GDE.shell, SWT.YES | SWT.NO | SWT.ICON_QUESTION);
 			messageDialog.setText(GDE.NAME_LONG);
