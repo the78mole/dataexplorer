@@ -450,6 +450,8 @@ public class CSVReaderWriter {
 			for (i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
 				String[] row = recordSet.getDataTableRow(i, isTimeFormatAbsolute);
+				char currentDecimalSeparator = recordSet.get(0).getDecimalFormat().getDecimalFormatSymbols().getDecimalSeparator();
+				String currentrGoupingSeparator = String.valueOf(recordSet.get(0).getDecimalFormat().getDecimalFormatSymbols().getGroupingSeparator());
 
 				// add time entry
 				sb.append(row[0].replace('.', decimalSeparator)).append(separator);
@@ -460,13 +462,13 @@ public class CSVReaderWriter {
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation())
 							if (recordSet.isRaw())
-								sb.append(row[j + 1].replace('.', decimalSeparator)).append(separator);
+								sb.append(row[j + 1].replace(currentrGoupingSeparator, GDE.STRING_BLANK).replace(currentDecimalSeparator, decimalSeparator)).append(separator);
 							else
-								sb.append(row[j + 1].replace('.', decimalSeparator)).append(separator);
+								sb.append(row[j + 1].replace(currentrGoupingSeparator, GDE.STRING_BLANK).replace(currentDecimalSeparator, decimalSeparator)).append(separator);
 					}
 					else
 						// translate according device and measurement unit
-						sb.append(row[j + 1].replace('.', decimalSeparator)).append(separator);
+						sb.append(row[j + 1].replace(currentrGoupingSeparator, GDE.STRING_BLANK).replace(currentDecimalSeparator, decimalSeparator)).append(separator);
 					++j;
 				}
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);

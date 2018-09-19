@@ -6,6 +6,7 @@ Generic changes/fixes
 	* update Java download URLs in Windows launcher
 	* new device xsd version
 	* make ready to execute using JRE 8 to 10
+	* fix [sr #109555] CSV Export does not use decimal point separator
 	
 Device specific changes/fixes
 	* HottAdapter* -  fix error message GDE_MSGW2404 appearing only at the first import, Fix missing tab activation after import
