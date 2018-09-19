@@ -805,8 +805,6 @@ public class DataExplorer extends Composite {
 				this.enableGraphicsHeader(this.isGraphicsHeaderVisible);
 			}
 
-			this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this);
-
 			if (!this.settings.isDesktopShortcutCreated()) {
 				this.settings.setProperty(Settings.IS_DESKTOP_SHORTCUT_CREATED, GDE.STRING_EMPTY + OperatingSystemHelper.createDesktopLink());
 			}
@@ -822,15 +820,22 @@ public class DataExplorer extends Composite {
 				this.settings.setProperty(Settings.IS_LOCK_UUCP_HINTED, "true"); //$NON-NLS-1$
 			}
 
+			// wait for possible migration and delay opening for migration
+			if (this.settings.isDevicePropertiesUpdated()) {
+				this.analyzer.joinDeviceConfigurationsThread(); // todo check if stopping the thread is appropriate
+				this.settings.startMigationThread();
+				this.settings.joinMigationThread();
+				this.analyzer.startDeviceConfigurationsThread();
+				this.analyzer.joinDeviceConfigurationsThread();
+			}
+
 			// check initial application settings
 			if (!this.settings.isOK()) {
 				this.openSettingsDialog();
 			}
 
-			// wait for possible migration and delay opening for migration
-			this.settings.startMigationThread();
-
 			// check configured device
+			this.deviceSelectionDialog = new DeviceSelectionDialog(GDE.shell, SWT.PRIMARY_MODAL, this); //re-initialize to handle updates due to migration
 			if (this.settings.getActiveDevice().equals(Settings.EMPTY)) {
 				this.deviceSelectionDialog.open();
 			} else {

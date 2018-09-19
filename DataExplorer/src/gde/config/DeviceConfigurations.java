@@ -75,17 +75,17 @@ public final class DeviceConfigurations {
 	 * Goes through the existing XML files and set active flagged devices into active devices list.
 	 * Fills the DeviceConfigurations list.
 	 */
-	public void initialize(Analyzer analyzer) {
+	public synchronized void initialize(Analyzer analyzer) {
 		String activeDeviceName = analyzer.getSettings().getActiveDevice();
 		Objects.requireNonNull(activeDeviceName);
 
-		DeviceConfiguration devConfig;
+		this.configs.clear();
 		for (String fileName : analyzer.getDataAccess().getDeviceFolderList()) {
 			try {
 				// loop through all device properties XML and check if device used
 				if (fileName.endsWith(GDE.FILE_ENDING_DOT_XML)) {
 					String deviceKey = fileName.substring(0, fileName.length() - 4);
-					devConfig = new DeviceConfiguration(Paths.get(Settings.DEVICE_PROPERTIES_DIR_NAME, fileName), analyzer);
+					DeviceConfiguration devConfig = new DeviceConfiguration(Paths.get(Settings.DEVICE_PROPERTIES_DIR_NAME, fileName), analyzer);
 					if (devConfig.getName().equals(activeDeviceName) && devConfig.isUsed()) { // define the active device after re-start
 						selectedActiveDeviceConfig = devConfig;
 					}

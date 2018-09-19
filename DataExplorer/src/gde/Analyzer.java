@@ -19,10 +19,7 @@
 
 package gde;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import com.sun.istack.Nullable;
+import com.sun.istack.internal.Nullable;
 
 import gde.config.DeviceConfigurations;
 import gde.config.Settings;
@@ -56,7 +53,7 @@ public abstract class Analyzer implements Cloneable {
 			}
 			// synchronize now to avoid a performance penalty in case of frequent getInstance calls
 			synchronized (analyzer) {
-				analyzer.initialize();
+				analyzer.startDeviceConfigurationsThread();
 			}
 		}
 		return analyzer;
@@ -64,9 +61,9 @@ public abstract class Analyzer implements Cloneable {
 
 	protected final Settings							settings;
 	protected final DataAccess						dataAccess;
-	protected final Thread								deviceConfigurationsThread;
 	protected final DeviceConfigurations	deviceConfigurations;
 
+	protected Thread											deviceConfigurationsThread;
 	protected IDevice											activeDevice	= null;
 	protected Channels										channels			= null;
 
@@ -81,17 +78,16 @@ public abstract class Analyzer implements Cloneable {
 		}
 
 		this.deviceConfigurations = new DeviceConfigurations();
+	}
+
+	public void startDeviceConfigurationsThread() {
 		this.deviceConfigurationsThread = new Thread("loadDeviceConfigurations") {
 			@Override
 			public void run() {
 				log.log(Level.FINE, "deviceConfigurationsThread    started");
 				Analyzer.this.deviceConfigurations.initialize(Analyzer.this);
-				log.log(Level.TIME, "deviceConfigurationsThread time =", new SimpleDateFormat("ss:SSS").format(new Date().getTime() - GDE.StartTime));
 			}
 		};
-	}
-
-	protected void initialize() {
 		this.deviceConfigurationsThread.start();
 	}
 

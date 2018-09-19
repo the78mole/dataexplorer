@@ -102,8 +102,6 @@ public class DeviceSerialization {
 							Unmarshaller tmpUnmarshaller = JAXBContext.newInstance("gde.device").createUnmarshaller();//$NON-NLS-1$
 							tmpUnmarshaller.setSchema(SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(inputStream)));
 
-							analyzer.getSettings().joinXsdThread(); // ok
-							analyzer.joinDeviceConfigurationsThread();
 							for (Path xmlFileSubPath : localAccess.getDeviceXmlSubPaths(i)) {
 								DeviceConfiguration oldConfig = new DeviceConfiguration(xmlFileSubPath, tmpUnmarshaller, analyzer);
 								DeviceConfiguration newConfig = analyzer.getDeviceConfigurations().get(oldConfig.getName());
