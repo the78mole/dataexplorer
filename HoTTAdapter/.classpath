@@ -12,5 +12,6 @@
 	<classpathentry kind="var" path="SWT_JAR_PATH"/>
 	<classpathentry kind="lib" path="/build/lib/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="/build/lib/istack-commons-runtime-3.0.5.jar"/>
+	<classpathentry kind="lib" path="/build/lib/jaxb-api-2.3.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
