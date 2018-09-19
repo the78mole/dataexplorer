@@ -54,12 +54,12 @@ public final class SettlementTrail extends TrailRecord {
 
 	@Override
 	protected boolean isAllowedBySetting() {
-		return getParent().getAnalyzer().getSettings().isDisplayScores();
+		return getParent().getAnalyzer().getSettings().isDisplaySettlements();
 	}
 
 	@Override
 	public boolean isScaleVisible() {
-		return getParent().getAnalyzer().getSettings().isDisplayScores() && super.isScaleVisible();
+		return getParent().getAnalyzer().getSettings().isDisplaySettlements() && super.isScaleVisible();
 	}
 
 	@Override
