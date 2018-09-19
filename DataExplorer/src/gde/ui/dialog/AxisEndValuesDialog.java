@@ -118,11 +118,11 @@ public class AxisEndValuesDialog extends Dialog {
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					try {
-						double minValue = new Double(AxisEndValuesDialog.this.minValueSelect.getText().trim().replace(',', '.'));
-						double maxValue = new Double(AxisEndValuesDialog.this.maxValueSelect.getText().trim().replace(',', '.'));
+						double minValue = Double.valueOf(AxisEndValuesDialog.this.minValueSelect.getText().trim().replace(',', '.'));
+						double maxValue = Double.valueOf(AxisEndValuesDialog.this.maxValueSelect.getText().trim().replace(',', '.'));
 						if (maxValue < minValue) {
-							minValue = new Double(AxisEndValuesDialog.this.maxValueSelect.getText().trim().replace(',', '.'));
-							maxValue = new Double(AxisEndValuesDialog.this.minValueSelect.getText().trim().replace(',', '.'));
+							minValue = Double.valueOf(AxisEndValuesDialog.this.maxValueSelect.getText().trim().replace(',', '.'));
+							maxValue = Double.valueOf(AxisEndValuesDialog.this.minValueSelect.getText().trim().replace(',', '.'));
 						}
 						else if (maxValue == minValue) {
 							minValue = minValue - 0.1;

@@ -73,7 +73,7 @@ public class SimulatorSerialPort extends DeviceCommPort {
 		Vector<Integer> voltage = new Vector<Integer>();
 		Vector<Integer> current = new Vector<Integer>();
 
-		//int xBound = new Double(Math.random() * 1000000).intValue();
+		//int xBound = Double.valueOf(Math.random() * 1000000).intValue();
 		this.xBound = this.xBound + 100;
 		this.lastVoltage = this.xBound / 2;
 		int yBound = this.deviceConfig.getDataBlockSize(InputTypes.SERIAL_IO);

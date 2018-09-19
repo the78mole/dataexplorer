@@ -38,8 +38,8 @@ public class RecordSetNameComparator implements Comparator<String>, Serializable
 		try {
 			Pattern p = Pattern.compile("^[ ]*[0-9]+[^0-9]"); //$NON-NLS-1$
 			if (p.matcher(nameA).find() && p.matcher(nameB).find() ) {
-				Integer intA = new Integer(nameA.trim().split("\\D")[0]); //$NON-NLS-1$
-				Integer intB = new Integer(nameB.trim().split("\\D")[0]); //$NON-NLS-1$
+				Integer intA = Integer.valueOf(nameA.trim().split("\\D")[0]); //$NON-NLS-1$
+				Integer intB = Integer.valueOf(nameB.trim().split("\\D")[0]); //$NON-NLS-1$
 				if (intA > intB)
 					return 1;
 				else if (intA < intB)

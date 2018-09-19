@@ -57,8 +57,8 @@ public class AkkuMasterCalculationThread extends Thread {
 		Record record = this.recordSet.get(this.recordKey);
 		// 0=Spannung, 1=Strom, 2=Ladung, 3=Leistung, 4=Energie
 //		String[] recordNames = this.recordSet.getRecordNames();
-		//		values[5] = new Integer(new Integer(values[2]).intValue() * new Integer(values[3]).intValue()).toString(); // Errechnete Leistung	[mW]
-		//		values[6] = new Integer(new Integer(values[2]).intValue() * new Integer(values[4]).intValue()).toString(); // Errechnete Energie	[mWh]
+		//		values[5] = Integer.valueOf(Integer.valueOf(values[2]).intValue() * Integer.valueOf(values[3]).intValue()).toString(); // Errechnete Leistung	[mW]
+		//		values[6] = Integer.valueOf(Integer.valueOf(values[2]).intValue() * Integer.valueOf(values[4]).intValue()).toString(); // Errechnete Energie	[mWh]
 		if (this.recordKey.equals(this.recordSet.get(3).getName())) { // 3=Leistung P[W]=U[V]*I[A]
 			Record recordVoltage = this.recordSet.get(0); // 0=Spannung
 			Record recordCurrent = this.recordSet.get(1); // 1=Strom

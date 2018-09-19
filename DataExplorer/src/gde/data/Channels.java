@@ -108,16 +108,16 @@ public final class Channels extends HashMap<Integer, Channel> {
 		if (channelName != null && channelName.length() >= CHANNEL_NAME_MIN_LENGTH) {
 			// "2 : Outlet", use the first digit to calculate the channel number
 			if (channelName.contains(GDE.STRING_COLON) && channelName.split(GDE.STRING_COLON).length >= 1 && Character.isDigit(channelName.split(GDE.STRING_COLON)[0].trim().charAt(0))) {
-				return new Integer(channelName.split(GDE.STRING_COLON)[0].trim());
+				return Integer.valueOf(channelName.split(GDE.STRING_COLON)[0].trim());
 			} else // old file content "Outlet 2" use the last digit to calculate the channel number
 			if (channelName.contains(GDE.STRING_BLANK) && channelName.split(GDE.STRING_BLANK).length > 1 && Character.isDigit(channelName.split(GDE.STRING_BLANK)[1].trim().charAt(0))) {
 				try {
-					return new Integer(channelName.split(GDE.STRING_BLANK)[1].trim());
+					return Integer.valueOf(channelName.split(GDE.STRING_BLANK)[1].trim());
 				} catch (NumberFormatException e) {
 					if (channelName.split(GDE.STRING_BLANK)[1].trim().contains("+")) {
 						String tmpNum = channelName.split(GDE.STRING_BLANK)[1].trim();
 						log.log(Level.WARNING, "channel name = " + channelName);
-						return new Integer(tmpNum.substring(0, tmpNum.indexOf(GDE.STRING_PLUS))) + new Integer(tmpNum.substring(tmpNum.indexOf(GDE.STRING_PLUS) + 1));
+						return Integer.valueOf(tmpNum.substring(0, tmpNum.indexOf(GDE.STRING_PLUS))) + Integer.valueOf(tmpNum.substring(tmpNum.indexOf(GDE.STRING_PLUS) + 1));
 					}
 				}
 			} else {
@@ -167,7 +167,7 @@ public final class Channels extends HashMap<Integer, Channel> {
 		RecordSet recordSet = this.getActiveChannel().getActiveRecordSet();
 		if (recordSet != null) recordSet.resetZoomAndMeasurement();
 
-		this.switchChannel(new Integer(channelName.split(GDE.STRING_COLON)[0].trim()).intValue(), GDE.STRING_EMPTY);
+		this.switchChannel(Integer.valueOf(channelName.split(GDE.STRING_COLON)[0].trim()).intValue(), GDE.STRING_EMPTY);
 	}
 
 	/**

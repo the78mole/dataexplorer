@@ -539,7 +539,7 @@ public class UniLog2Dialog extends DeviceDialog {
 							public void keyReleased(KeyEvent evt) {
 								UniLog2Dialog.log.log(java.util.logging.Level.FINEST, "efficencyN100WText.keyReleaded, evt=" + evt); //$NON-NLS-1$
 								try {
-									int propeller_n100W_Value = new Integer(propeller_n100W_Text.getText().trim());
+									int propeller_n100W_Value = Integer.valueOf(propeller_n100W_Text.getText().trim());
 									if (UniLog2Dialog.this.channels.getActiveChannel() != null) {
 										RecordSet recordSet = UniLog2Dialog.this.channels.getActiveChannel().getActiveRecordSet();
 										if (recordSet != null) {

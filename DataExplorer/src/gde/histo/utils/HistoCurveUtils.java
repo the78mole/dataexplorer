@@ -473,7 +473,7 @@ public final class HistoCurveUtils {
 			if (log.isLoggable(Level.FINE))
 				log.log(Level.FINE, String.format("numberTicks = %d; deltaMainTickPixel = %10.6f; deltaPosMini = %10.6f", numberTicks, deltaMainTickPixel, deltaPosMini));
 			// draw mini ticks below first main tick
-			double yTickPositionMin = y0 - (Math.abs(minScaleValue - minValue) * (height / deltaScale)); // new Double(y0 - i *
+			double yTickPositionMin = y0 - (Math.abs(minScaleValue - minValue) * (height / deltaScale)); // Double.valueOf(y0 - i *
 																																																		// deltaMainTickPixel).intValue();
 			for (int j = 1; j < miniticks; j++) {
 				int yPosMini = (int) (yTickPositionMin + (j * deltaPosMini));

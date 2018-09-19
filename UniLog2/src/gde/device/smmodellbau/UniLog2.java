@@ -575,9 +575,9 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		Record recordRevolution = recordSet.get(13); // 13=revolution
 		Record recordPower = recordSet.get(4); // 4=Power [w]
 		PropertyType property = record.getProperty(MeasurementPropertyTypes.PROP_N_100_W.value());
-		int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
+		int prop_n100W = property != null ? Integer.valueOf(property.getValue()) : 10000;
 		property = recordRevolution.getProperty(MeasurementPropertyTypes.NUMBER_MOTOR.value());
-		double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+		double numberMotor = property != null ? Double.valueOf(property.getValue()).doubleValue() : 1.0;
 		Record recordCurrent = recordSet.get(2); // 2=Current
 		for (int i = 0; i < recordRevolution.size(); i++) {
 			if (i > 1 && recordRevolution.get(i)> 100000 && recordCurrent.get(i) > 3000) { //100 1/min && 3A

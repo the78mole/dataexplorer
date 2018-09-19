@@ -364,7 +364,7 @@ public class Picolario2 extends Picolario {
 			Record slopeRecord = recordSet.get(3);//3=Steigrate
 			slopeRecord.setDisplayable(false);
 			PropertyType property = slopeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
-			int regressionInterval = property != null ? new Integer(property.getValue()) : 10;
+			int regressionInterval = property != null ? Integer.valueOf(property.getValue()) : 10;
 			property = slopeRecord.getProperty(CalculationThread.REGRESSION_TYPE);
 			if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
 				this.calculationThread = new QuasiLinearRegression(recordSet, recordSet.get(0).getName(), slopeRecord.getName(), regressionInterval);

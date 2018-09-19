@@ -354,7 +354,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 			Record slopeRecord = recordSet.get(4);//2=Steigrate
 			slopeRecord.setDisplayable(false);
 			PropertyType property = slopeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
-			int regressionInterval = property != null ? new Integer(property.getValue()) : 10;
+			int regressionInterval = property != null ? Integer.valueOf(property.getValue()) : 10;
 			property = slopeRecord.getProperty(CalculationThread.REGRESSION_TYPE);
 			if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
 				this.calculationThread = new QuasiLinearRegression(recordSet, recordSet.get(2).getName(), slopeRecord.getName(), regressionInterval);

@@ -297,7 +297,7 @@ public class FileHandler {
 				String[] splitChannel = channelConfigName.split(GDE.STRING_BLANK);
 				int channelNumber = 1;
 				try {
-					channelNumber = splitChannel.length == 2 ? new Integer(splitChannel[1]) : (splitChannel.length > 2 ? new Integer(splitChannel[0]) : 1);
+					channelNumber = splitChannel.length == 2 ? Integer.valueOf(splitChannel[1]) : (splitChannel.length > 2 ? Integer.valueOf(splitChannel[0]) : 1);
 				}
 				catch (NumberFormatException e) {// ignore
 				}
@@ -492,7 +492,7 @@ public class FileHandler {
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
 			}
 
-			int channelNumber = this.application.getActiveDevice().recordSetNumberFollowChannel() ? new Integer(lovHeader.get(GDE.CHANNEL_CONFIG_NUMBER)).intValue() : channels.getActiveChannelNumber();
+			int channelNumber = this.application.getActiveDevice().recordSetNumberFollowChannel() ? Integer.valueOf(lovHeader.get(GDE.CHANNEL_CONFIG_NUMBER)).intValue() : channels.getActiveChannelNumber();
 			IDevice activeDevice = this.application.getActiveDevice();
 			String channelType = activeDevice.getChannelTypes(channelNumber).name();
 			String channelConfigName = activeDevice.getChannelNameReplacement(channelNumber);

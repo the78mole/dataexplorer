@@ -182,7 +182,7 @@ public class LogViewReader {
 		device.getLovKeyMappings(lov2osdMap);
 
 		HashMap<String, String> header = readHeader(data_in);
-		int channelNumber = device.recordSetNumberFollowChannel() ? new Integer(header.get(GDE.CHANNEL_CONFIG_NUMBER)).intValue() : channels.getActiveChannelNumber();
+		int channelNumber = device.recordSetNumberFollowChannel() ? Integer.valueOf(header.get(GDE.CHANNEL_CONFIG_NUMBER)).intValue() : channels.getActiveChannelNumber();
 		ChannelTypes channelType = device.getChannelTypes(channelNumber);
 		//String channelConfigName = channelType.equals(ChannelTypes.TYPE_OUTLET.name()) ? device.getChannelName(channelNumber) : header.get(GDE.CHANNEL_CONFIG_NAME);
 		String channelConfigName = device.getChannelNameReplacement(channelNumber);
@@ -193,7 +193,7 @@ public class LogViewReader {
 		//header.containsKey(LOV_NUM_MEASUREMENTS)
 
 		// record sets with it properties
-		int numberRecordSets = new Integer(header.get(GDE.RECORD_SET_SIZE).trim()).intValue();
+		int numberRecordSets = Integer.valueOf(header.get(GDE.RECORD_SET_SIZE).trim()).intValue();
 		List<HashMap<String,String>> recordSetsInfo = new ArrayList<HashMap<String,String>>(numberRecordSets);
 		for (int i=1; i<=numberRecordSets; ++i) {
 			// RecordSetName : 1) Flugaufzeichnung||::||RecordSetComment : empfangen: 12.05.2006, 20:42:52||::||RecordDataSize : 22961||::||RecordSetDataBytes : 367376
@@ -288,7 +288,7 @@ public class LogViewReader {
 					firstRecordSet[0] = channelConfig;
 					firstRecordSet[1] = recordSetName;
 				}
-				recordDataSize = new Integer(recordSetInfo.get(GDE.RECORD_DATA_SIZE).trim()).intValue();
+				recordDataSize = Integer.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE).trim()).intValue();
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordDataSize = " + recordDataSize);
 				recordSetDataBytes = new Long(recordSetInfo.get(GDE.RECORD_SET_DATA_BYTES).trim()).intValue();
 				if (lastRecordSetDataBytes == 0) { // file contains more then one record set
@@ -433,7 +433,7 @@ public class LogViewReader {
 		position += data_in.read(buffer);
 		String stringVersion = new String(buffer);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.LOV_SSTREAM_VERSION + stringVersion);
-		if (streamVersion != new Integer(stringVersion.split(":V")[1])) { //$NON-NLS-1$
+		if (streamVersion != Integer.valueOf(stringVersion.split(":V")[1])) { //$NON-NLS-1$
 			NotSupportedFileFormatException e = new NotSupportedFileFormatException(Messages.getString(MessageIds.GDE_MSGE0008, new Object[] { streamVersion, stringVersion }));
 			log.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
@@ -601,7 +601,7 @@ public class LogViewReader {
 			header.put(GDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new Integer(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue();
+		int channelNumber = Integer.valueOf(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NUMBER + channelNumber);
 		header.put(GDE.CHANNEL_CONFIG_NUMBER, GDE.STRING_EMPTY+channelNumber);
 
@@ -749,7 +749,7 @@ public class LogViewReader {
 			header.put(GDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new Integer(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue();
+		int channelNumber = Integer.valueOf(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NUMBER + channelNumber);
 		header.put(GDE.CHANNEL_CONFIG_NUMBER, GDE.STRING_EMPTY+channelNumber);
 
@@ -920,7 +920,7 @@ public class LogViewReader {
 			header.put(GDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new Integer(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue();
+		int channelNumber = Integer.valueOf(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NUMBER + channelNumber);
 		header.put(GDE.CHANNEL_CONFIG_NUMBER, GDE.STRING_EMPTY+channelNumber);
 
@@ -1108,7 +1108,7 @@ public class LogViewReader {
 			header.put(GDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new Integer(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue();
+		int channelNumber = Integer.valueOf(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NUMBER + channelNumber);
 		header.put(GDE.CHANNEL_CONFIG_NUMBER, GDE.STRING_EMPTY+channelNumber);
 
@@ -1153,7 +1153,7 @@ public class LogViewReader {
 			if (configLine.startsWith(GDE.LOV_TIME_STEP))
 				header.put(RecordSet.TIME_STEP_MS, configLine.split(GDE.STRING_EQUAL)[1]);
 			else if (configLine.startsWith(GDE.LOV_NUM_MEASUREMENTS))
-				header.put(GDE.LOV_NUM_MEASUREMENTS, GDE.STRING_EMPTY+ ((new Integer(configLine.split(GDE.STRING_EQUAL)[1].trim()).intValue()) - 1)); // -1 == time
+				header.put(GDE.LOV_NUM_MEASUREMENTS, GDE.STRING_EMPTY+ ((Integer.valueOf(configLine.split(GDE.STRING_EQUAL)[1].trim()).intValue()) - 1)); // -1 == time
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, configLine);
 		}
 
@@ -1324,7 +1324,7 @@ public class LogViewReader {
 			header.put(GDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new Integer(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue();
+		int channelNumber = Integer.valueOf(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue();
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NUMBER + channelNumber);
 		header.put(GDE.CHANNEL_CONFIG_NUMBER, GDE.STRING_EMPTY+channelNumber);
 
@@ -1369,7 +1369,7 @@ public class LogViewReader {
 			if (configLine.startsWith(GDE.LOV_TIME_STEP))
 				header.put(RecordSet.TIME_STEP_MS, configLine.split(GDE.STRING_EQUAL)[1]);
 			else if (configLine.startsWith(GDE.LOV_NUM_MEASUREMENTS))
-				header.put(GDE.LOV_NUM_MEASUREMENTS, GDE.STRING_EMPTY+ ((new Integer(configLine.split(GDE.STRING_EQUAL)[1].trim()).intValue()) - 1)); // -1 == time
+				header.put(GDE.LOV_NUM_MEASUREMENTS, GDE.STRING_EMPTY+ ((Integer.valueOf(configLine.split(GDE.STRING_EQUAL)[1].trim()).intValue()) - 1)); // -1 == time
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, configLine);
 		}
 
@@ -1538,7 +1538,7 @@ public class LogViewReader {
 			header.put(GDE.CHANNEL_CONFIG_NAME, channelConfigName);
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + channelConfigName);
 		}
-		int channelNumber = new String(buffer).contains(GDE.STRING_EQUAL) ? new Integer(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue() : 1;
+		int channelNumber = new String(buffer).contains(GDE.STRING_EQUAL) ? Integer.valueOf(new String(buffer).split(GDE.STRING_EQUAL)[1].trim()).intValue() : 1;
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.CHANNEL_CONFIG_NUMBER + channelNumber);
 		header.put(GDE.CHANNEL_CONFIG_NUMBER, GDE.STRING_EMPTY+channelNumber);
 
@@ -1583,7 +1583,7 @@ public class LogViewReader {
 			if (configLine.startsWith(GDE.LOV_TIME_STEP))
 				header.put(RecordSet.TIME_STEP_MS, configLine.split(GDE.STRING_EQUAL)[1]);
 			else if (configLine.startsWith(GDE.LOV_NUM_MEASUREMENTS))
-				header.put(GDE.LOV_NUM_MEASUREMENTS, GDE.STRING_EMPTY+ ((new Integer(configLine.split(GDE.STRING_EQUAL)[1].trim()).intValue()) - 1)); // -1 == time
+				header.put(GDE.LOV_NUM_MEASUREMENTS, GDE.STRING_EMPTY+ ((Integer.valueOf(configLine.split(GDE.STRING_EQUAL)[1].trim()).intValue()) - 1)); // -1 == time
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, configLine);
 		}
 

@@ -482,7 +482,7 @@ public class AkkuMasterChannelTab {
 									}
 									else {
 										int programNumber = getProgramNumber();
-										int waitTime_days = 1; // new Integer(warteZeitTage.getText()).intValue();
+										int waitTime_days = 1; // Integer.valueOf(warteZeitTage.getText()).intValue();
 										int accuTyp = getAkkuType();
 										int cellCount = getCellCount();
 										int akkuCapacity = getAkkuCapacity();
@@ -542,7 +542,7 @@ public class AkkuMasterChannelTab {
 													AkkuMasterChannelTab.this.application.setStatusMessage(GDE.STRING_EMPTY);
 
 													// check if device is ready for data capturing
-													int processNumber = new Integer(((String) this.data.get(AkkuMasterC4SerialPort.PROCESS_NAME)).split(" ")[0]).intValue(); //$NON-NLS-1$
+													int processNumber = Integer.valueOf(((String) this.data.get(AkkuMasterC4SerialPort.PROCESS_NAME)).split(" ")[0]).intValue(); //$NON-NLS-1$
 													if (processNumber == 1 || processNumber == 2) { // 1=Laden; 2=Entladen - AkkuMaster activ
 														// check state change waiting to discharge to charge
 														// check if a record set matching for re-use is available and prepare a new if required
@@ -755,13 +755,13 @@ public class AkkuMasterChannelTab {
 		String[] configuration = this.serialPort.getConfiguration(this.channelSig);
 		if (log.isLoggable(Level.FINER)) this.serialPort.print(configuration);
 		if (!configuration[0].equals("0")) { // AkkuMaster somehow active			 //$NON-NLS-1$
-			this.programValue = new Integer(configuration[2].split(" ")[0]).intValue() - 1; //$NON-NLS-1$
+			this.programValue = Integer.valueOf(configuration[2].split(" ")[0]).intValue() - 1; //$NON-NLS-1$
 			this.program.setText(this.aProgramm[this.programValue]);
 
-			this.akkuTypeValue = new Integer(configuration[3].split(" ")[0]).intValue(); //$NON-NLS-1$
+			this.akkuTypeValue = Integer.valueOf(configuration[3].split(" ")[0]).intValue(); //$NON-NLS-1$
 			this.akkuType.setText(this.aAkkuTyp[this.akkuTypeValue]);
 
-			this.countCellsValue = new Integer(configuration[4].split(" ")[0]).intValue() - 1; //$NON-NLS-1$
+			this.countCellsValue = Integer.valueOf(configuration[4].split(" ")[0]).intValue() - 1; //$NON-NLS-1$
 			this.countCells.select(this.countCellsValue);
 
 			this.capacityMilliAhValue = configuration[5].split(" ")[0]; //$NON-NLS-1$
@@ -774,7 +774,7 @@ public class AkkuMasterChannelTab {
 			this.dischargeCurrent.setText(this.dischargeCurrentValue);
 
 			String[] adjustments = this.serialPort.getAdjustedValues(this.channelSig);
-			this.memoryNumberValue = new Integer(adjustments[0].split(" ")[0]).intValue(); //$NON-NLS-1$
+			this.memoryNumberValue = Integer.valueOf(adjustments[0].split(" ")[0]).intValue(); //$NON-NLS-1$
 			this.memoryNumberCombo.select(this.memoryNumberValue);
 			if (log.isLoggable(Level.FINER)) this.serialPort.print(adjustments);
 		}
@@ -991,42 +991,42 @@ public class AkkuMasterChannelTab {
 	 * @return
 	 */
 	int getProgramNumber() {
-		return new Integer(this.program.getText().split(" ")[0]).intValue(); //$NON-NLS-1$
+		return Integer.valueOf(this.program.getText().split(" ")[0]).intValue(); //$NON-NLS-1$
 	}
 
 	/**
 	 * @return
 	 */
 	int getAkkuType() {
-		return new Integer(this.akkuType.getText().split(" ")[0]).intValue(); //$NON-NLS-1$
+		return Integer.valueOf(this.akkuType.getText().split(" ")[0]).intValue(); //$NON-NLS-1$
 	}
 
 	/**
 	 * @return
 	 */
 	int getCellCount() {
-		return new Integer(this.countCells.getText().split(" ")[0]).intValue(); //$NON-NLS-1$
+		return Integer.valueOf(this.countCells.getText().split(" ")[0]).intValue(); //$NON-NLS-1$
 	}
 
 	/**
 	 * @return
 	 */
 	int getAkkuCapacity() {
-		return new Integer(this.capacityMilliAh.getText()).intValue();
+		return Integer.valueOf(this.capacityMilliAh.getText()).intValue();
 	}
 
 	/**
 	 * @return
 	 */
 	int getDischargeCurrent() {
-		return new Integer(this.dischargeCurrent.getText()).intValue();
+		return Integer.valueOf(this.dischargeCurrent.getText()).intValue();
 	}
 
 	/**
 	 * @return
 	 */
 	int getChargeCurrent() {
-		return new Integer(this.chargeCurrent.getText()).intValue();
+		return Integer.valueOf(this.chargeCurrent.getText()).intValue();
 	}
 
 	/**

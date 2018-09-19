@@ -373,7 +373,7 @@ public class NMEAReaderWriter {
 	//			for (int i = 0; i < recordEntries; i++) {
 	//				sb = new StringBuffer();
 	//				// add time entry
-	//				sb.append((df3.format(new Double(i * recordSet.getTimeStep_ms() / 1000.0))).replace('.', decimalSeparator)).append(separator).append(' ');
+	//				sb.append((df3.format(Double.valueOf(i * recordSet.getTimeStep_ms() / 1000.0))).replace('.', decimalSeparator)).append(separator).append(' ');
 	//				// add data entries
 	//				for (int j = 0; j < recordNames.length; j++) {
 	//					Record record = recordSet.getRecord(recordNames[j]);

@@ -61,7 +61,7 @@ public class AdapterPurchaseListToHashMap extends XmlAdapter<PurchaseList, HashM
        int cnt = v.entry.size();
        for(int i=0; i < cnt; i++){
             PartEntry tmpE = (PartEntry)v.entry.get(i);
-            aHashMap.put(new Integer(tmpE.key), tmpE.value);
+            aHashMap.put(Integer.valueOf(tmpE.key), tmpE.value);
         } 
        return aHashMap;
     }

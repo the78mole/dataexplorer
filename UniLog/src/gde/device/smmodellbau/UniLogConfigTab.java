@@ -406,10 +406,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							try {
 								if (evt.character == SWT.CR) {
 									UniLogConfigTab.this.setConfigButton.setEnabled(true);
-									UniLogConfigTab.this.numCellValue = new Integer(UniLogConfigTab.this.numCellInput.getText().trim());
+									UniLogConfigTab.this.numCellValue = Integer.valueOf(UniLogConfigTab.this.numCellInput.getText().trim());
 									UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue); //$NON-NLS-1$
 									// update propeller n100W value too, if user has changed, but not hit enter 
-									UniLogConfigTab.this.prop100WValue = new Integer(UniLogConfigTab.this.prop100WInput.getText().trim());
+									UniLogConfigTab.this.prop100WValue = Integer.valueOf(UniLogConfigTab.this.prop100WInput.getText().trim());
 									UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue); //$NON-NLS-1$
 									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
 										RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
@@ -499,10 +499,10 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 							try {
 								if (evt.character == SWT.CR) {
 									UniLogConfigTab.this.setConfigButton.setEnabled(true);
-									UniLogConfigTab.this.prop100WValue = new Integer(UniLogConfigTab.this.prop100WInput.getText().trim());
+									UniLogConfigTab.this.prop100WValue = Integer.valueOf(UniLogConfigTab.this.prop100WInput.getText().trim());
 									UniLogConfigTab.this.prop100WInput.setText(" " + UniLogConfigTab.this.prop100WValue); //$NON-NLS-1$
 									// update number cells too, if user has changed, but not hit enter 
-									UniLogConfigTab.this.numCellValue = new Integer(UniLogConfigTab.this.numCellInput.getText().trim());
+									UniLogConfigTab.this.numCellValue = Integer.valueOf(UniLogConfigTab.this.numCellInput.getText().trim());
 									UniLogConfigTab.this.numCellInput.setText(" " + UniLogConfigTab.this.numCellValue); //$NON-NLS-1$
 									if (UniLogConfigTab.this.channels.getActiveChannel() != null) {
 										RecordSet recordSet = UniLogConfigTab.this.channels.getActiveChannel().getActiveRecordSet();
@@ -764,7 +764,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						public void keyReleased(KeyEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "a1Offset.keyReleased, event=" + evt); //$NON-NLS-1$
 							try {
-								UniLogConfigTab.this.offsetA1 = new Double(UniLogConfigTab.this.a1Offset.getText().trim().replace(',', '.'));
+								UniLogConfigTab.this.offsetA1 = Double.valueOf(UniLogConfigTab.this.a1Offset.getText().trim().replace(',', '.'));
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 							catch (Exception e) {
@@ -782,7 +782,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						public void keyReleased(KeyEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "a1Factor.keyReleased, event=" + evt); //$NON-NLS-1$
 							try {
-								UniLogConfigTab.this.factorA1 = new Double(UniLogConfigTab.this.a1Factor.getText().trim().replace(',', '.'));
+								UniLogConfigTab.this.factorA1 = Double.valueOf(UniLogConfigTab.this.a1Factor.getText().trim().replace(',', '.'));
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 							catch (Exception e) {
@@ -841,7 +841,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						public void keyReleased(KeyEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "a2Offset.keyReleased, event=" + evt); //$NON-NLS-1$
 							try {
-								UniLogConfigTab.this.offsetA2 = new Double(UniLogConfigTab.this.a2Offset.getText().trim().replace(',', '.'));
+								UniLogConfigTab.this.offsetA2 = Double.valueOf(UniLogConfigTab.this.a2Offset.getText().trim().replace(',', '.'));
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 							catch (Exception e) {
@@ -859,7 +859,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						public void keyReleased(KeyEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "a2Factor.keyReleased, event=" + evt); //$NON-NLS-1$
 							try {
-								UniLogConfigTab.this.factorA2 = new Double(UniLogConfigTab.this.a2Factor.getText().trim().replace(',', '.'));
+								UniLogConfigTab.this.factorA2 = Double.valueOf(UniLogConfigTab.this.a2Factor.getText().trim().replace(',', '.'));
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 							catch (Exception e) {
@@ -918,7 +918,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						public void keyReleased(KeyEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "a3Offset.keyReleased, event=" + evt); //$NON-NLS-1$
 							try {
-								UniLogConfigTab.this.offsetA3 = new Double(UniLogConfigTab.this.a3Offset.getText().trim().replace(',', '.'));
+								UniLogConfigTab.this.offsetA3 = Double.valueOf(UniLogConfigTab.this.a3Offset.getText().trim().replace(',', '.'));
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 							catch (Exception e) {
@@ -936,7 +936,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 						public void keyReleased(KeyEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "a3Factor.keyReleased, event=" + evt); //$NON-NLS-1$
 							try {
-								UniLogConfigTab.this.factorA3 = new Double(UniLogConfigTab.this.a3Factor.getText().trim().replace(',', '.'));
+								UniLogConfigTab.this.factorA3 = Double.valueOf(UniLogConfigTab.this.a3Factor.getText().trim().replace(',', '.'));
 								if (evt.character == SWT.CR) checkUpdateAnalog();
 							}
 							catch (Exception e) {
@@ -1147,7 +1147,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 
 		measurement = this.device.getMeasurement(this.configNumber, 2); // 2=current
 		measurement.setActive(this.currentButton.getSelection());
-		measurement.setOffset(new Double(this.currentOffset.getText().replace(',', '.').trim()));
+		measurement.setOffset(Double.valueOf(this.currentOffset.getText().replace(',', '.').trim()));
 
 		this.device.setMeasurementPropertyValue(this.configNumber, 6, UniLog.NUMBER_CELLS, DataTypes.INTEGER, this.numCellValue);
 
@@ -1167,22 +1167,22 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 		measurement.setActive(this.a1Button.getSelection());
 		measurement.setName(this.a1Text.getText().trim());
 		measurement.setUnit(this.a1Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-		measurement.setOffset(new Double(this.a1Offset.getText().trim().replace(',', '.').trim()));
-		measurement.setFactor(new Double(this.a1Factor.getText().trim().replace(',', '.').trim()));
+		measurement.setOffset(Double.valueOf(this.a1Offset.getText().trim().replace(',', '.').trim()));
+		measurement.setFactor(Double.valueOf(this.a1Factor.getText().trim().replace(',', '.').trim()));
 
 		measurement = this.device.getMeasurement(this.configNumber, 12); // 12=A2
 		measurement.setActive(this.a2Button.getSelection());
 		measurement.setName(this.a2Text.getText().trim());
 		measurement.setUnit(this.a2Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-		measurement.setOffset(new Double(this.a2Offset.getText().trim().replace(',', '.').trim()));
-		measurement.setFactor(new Double(this.a2Factor.getText().trim().replace(',', '.').trim()));
+		measurement.setOffset(Double.valueOf(this.a2Offset.getText().trim().replace(',', '.').trim()));
+		measurement.setFactor(Double.valueOf(this.a2Factor.getText().trim().replace(',', '.').trim()));
 
 		measurement = this.device.getMeasurement(this.configNumber, 13); // 13=A3
 		measurement.setActive(this.a3Button.getSelection());
 		measurement.setName(this.a3Text.getText().trim());
 		measurement.setUnit(this.a3Unit.getText().replace('[', ' ').replace(']', ' ').trim());
-		measurement.setOffset(new Double(this.a3Offset.getText().trim().replace(',', '.').trim()));
-		measurement.setFactor(new Double(this.a3Factor.getText().trim().replace(',', '.').trim()));
+		measurement.setOffset(Double.valueOf(this.a3Offset.getText().trim().replace(',', '.').trim()));
+		measurement.setFactor(Double.valueOf(this.a3Factor.getText().trim().replace(',', '.').trim()));
 
 		this.device.setChangePropery(true);
 		this.device.storeDeviceProperties();
@@ -1226,19 +1226,19 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			this.offsetCurrent = recordSet.get(2).getOffset();
 			
 			property = recordSet.get(6).getProperty(UniLog.NUMBER_CELLS);
-			this.numCellValue = property != null ? new Integer(property.getValue().trim()) : 4;
+			this.numCellValue = property != null ? Integer.valueOf(property.getValue().trim()) : 4;
 			
 			this.isActiveRPM = recordSet.get(7).isActive();
 			
 			property = recordSet.get(8).getProperty(UniLog.PROP_N_100_W);
-			this.prop100WValue = property != null ? new Integer(property.getValue().trim()) : 10000;
+			this.prop100WValue = property != null ? Integer.valueOf(property.getValue().trim()) : 10000;
 			
 			this.isActiveHeight = recordSet.get(9).isActive();
 
 			property = recordSet.get(10).getProperty(CalculationThread.REGRESSION_TYPE);
 			this.slopeTypeSelection = property != null ? property.getValue() : CalculationThread.REGRESSION_TYPE_CURVE;
 			property = recordSet.get(10).getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
-			this.slopeTimeSelection = property != null ? new Integer(property.getValue().trim()) : 10;
+			this.slopeTimeSelection = property != null ? Integer.valueOf(property.getValue().trim()) : 10;
 
 			record = recordSet.get(11);
 			this.isActiveA1 = record.isActive();
@@ -1273,13 +1273,13 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			this.offsetCurrent = measurement.getOffset();
 
 			property = this.device.getMeasruementProperty(this.configNumber, 6, UniLog.NUMBER_CELLS);
-			this.numCellValue = property != null ? new Integer(property.getValue().trim()) : 4;
+			this.numCellValue = property != null ? Integer.valueOf(property.getValue().trim()) : 4;
 
 			measurement = this.device.getMeasurement(this.configNumber, 7);
 			this.isActiveRPM = measurement.isActive();
 
 			property = this.device.getMeasruementProperty(this.configNumber, 8, UniLog.PROP_N_100_W);
-			this.prop100WValue = property != null ? new Integer(property.getValue().trim()) : 10000;
+			this.prop100WValue = property != null ? Integer.valueOf(property.getValue().trim()) : 10000;
 
 			measurement = this.device.getMeasurement(this.configNumber, 9);
 			this.isActiveHeight = measurement.isActive();
@@ -1287,7 +1287,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 			property = this.device.getMeasruementProperty(this.configNumber, 10, CalculationThread.REGRESSION_TYPE);
 			this.slopeTypeSelection = property != null ? property.getValue() : CalculationThread.REGRESSION_TYPE_CURVE;
 			property = this.device.getMeasruementProperty(this.configNumber, 10, CalculationThread.REGRESSION_INTERVAL_SEC);
-			this.slopeTimeSelection = property != null ? new Integer(property.getValue().trim()) : 10;
+			this.slopeTimeSelection = property != null ? Integer.valueOf(property.getValue().trim()) : 10;
 
 			if (this.nameA1.equals(GDE.STRING_DASH)) {
 				measurement = this.device.getMeasurement(this.configNumber, 11);

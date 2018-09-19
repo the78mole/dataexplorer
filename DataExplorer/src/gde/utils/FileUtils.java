@@ -1032,7 +1032,7 @@ public class FileUtils {
 			try {
 				unixPermissions = unixPermissions.trim();
 				try {
-					new Integer(unixPermissions);
+					Integer.valueOf(unixPermissions);
 				}
 				catch (NumberFormatException e) {
 					FileUtils.log.log(Level.SEVERE, "Internal Error - permission not usable (" + unixPermissions + ")"); //$NON-NLS-1$ //$NON-NLS-2$

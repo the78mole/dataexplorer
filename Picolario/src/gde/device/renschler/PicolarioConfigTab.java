@@ -141,7 +141,7 @@ public class PicolarioConfigTab extends Composite {
 								PicolarioConfigTab.this.doSubtractLast = false;
 								PicolarioConfigTab.this.doOffsetHeight = false;
 								PicolarioConfigTab.this.heightOffsetValue = 0.0;
-								PicolarioConfigTab.this.heightOffset.setText(new Double(PicolarioConfigTab.this.heightOffsetValue).toString());
+								PicolarioConfigTab.this.heightOffset.setText(Double.valueOf(PicolarioConfigTab.this.heightOffsetValue).toString());
 
 								updateRecordProperties();
 							}
@@ -166,7 +166,7 @@ public class PicolarioConfigTab extends Composite {
 								PicolarioConfigTab.this.doSubtractLast = false;
 								PicolarioConfigTab.this.doOffsetHeight = false;
 								PicolarioConfigTab.this.heightOffsetValue = 0.0;
-								PicolarioConfigTab.this.heightOffset.setText(new Double(PicolarioConfigTab.this.heightOffsetValue).toString());
+								PicolarioConfigTab.this.heightOffset.setText(Double.valueOf(PicolarioConfigTab.this.heightOffsetValue).toString());
 
 								updateRecordProperties();
 							}
@@ -190,7 +190,7 @@ public class PicolarioConfigTab extends Composite {
 								PicolarioConfigTab.this.doSubtractLast = true;
 								PicolarioConfigTab.this.doOffsetHeight = false;
 								PicolarioConfigTab.this.heightOffsetValue = 0.0;
-								PicolarioConfigTab.this.heightOffset.setText(new Double(PicolarioConfigTab.this.heightOffsetValue).toString());
+								PicolarioConfigTab.this.heightOffset.setText(Double.valueOf(PicolarioConfigTab.this.heightOffsetValue).toString());
 
 								updateRecordProperties();
 							}
@@ -214,7 +214,7 @@ public class PicolarioConfigTab extends Composite {
 								PicolarioConfigTab.this.doOffsetHeight = true;
 								PicolarioConfigTab.this.doSubtractFirst = false;
 								PicolarioConfigTab.this.doSubtractLast = false;
-								PicolarioConfigTab.this.heightOffsetValue = new Double(PicolarioConfigTab.this.heightOffset.getText()).doubleValue();
+								PicolarioConfigTab.this.heightOffsetValue = Double.valueOf(PicolarioConfigTab.this.heightOffset.getText()).doubleValue();
 
 								updateRecordProperties();
 							}
@@ -234,7 +234,7 @@ public class PicolarioConfigTab extends Composite {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "heightOffset.widgetSelected, event=" + evt); //$NON-NLS-1$
-								PicolarioConfigTab.this.heightOffsetValue = new Double(heightOffsetValues[PicolarioConfigTab.this.heightOffset.getSelectionIndex()]).doubleValue();
+								PicolarioConfigTab.this.heightOffsetValue = Double.valueOf(heightOffsetValues[PicolarioConfigTab.this.heightOffset.getSelectionIndex()]).doubleValue();
 
 								Channel activeChannel = Channels.getInstance().getActiveChannel();
 								if (activeChannel != null) {
@@ -257,7 +257,7 @@ public class PicolarioConfigTab extends Composite {
 								if (evt.character == SWT.CR) {
 									//heightOffsetSelection 
 									try {
-										PicolarioConfigTab.this.heightOffsetValue = new Double(PicolarioConfigTab.this.heightOffset.getText().replace(',', '.')).doubleValue();
+										PicolarioConfigTab.this.heightOffsetValue = Double.valueOf(PicolarioConfigTab.this.heightOffset.getText().replace(',', '.')).doubleValue();
 
 										Channel activeChannel = Channels.getInstance().getActiveChannel();
 										if (activeChannel != null) {
@@ -445,7 +445,7 @@ public class PicolarioConfigTab extends Composite {
 			log.log(Level.FINER, "doOffsetHeight = " + this.doOffsetHeight); //$NON-NLS-1$
 	
 			property = record.getProperty(IDevice.OFFSET);
-			this.heightOffsetValue = new Double(property != null ? property.getValue() : "0.0").doubleValue(); //$NON-NLS-1$
+			this.heightOffsetValue = Double.valueOf(property != null ? property.getValue() : "0.0").doubleValue(); //$NON-NLS-1$
 			log.log(Level.FINER, "heightOffsetValue = " + this.heightOffsetValue); //$NON-NLS-1$
 	
 			record = recordSet.get(2); // 2 = climb
@@ -463,7 +463,7 @@ public class PicolarioConfigTab extends Composite {
 			if (timeSelection == null)
 				this.slopeTimeSelection = 4;
 			else
-				this.slopeTimeSelection = new Integer(timeSelection.getValue());
+				this.slopeTimeSelection = Integer.valueOf(timeSelection.getValue());
 			log.log(Level.FINER, "slopeTimeSelection = " + this.slopeTimeSelection); //$NON-NLS-1$
 		}
 		else {		
@@ -508,7 +508,7 @@ public class PicolarioConfigTab extends Composite {
 			if (timeSelection == null)
 				this.slopeTimeSelection = 4;
 			else
-				this.slopeTimeSelection = new Integer(timeSelection.getValue());
+				this.slopeTimeSelection = Integer.valueOf(timeSelection.getValue());
 			log.log(Level.FINER, "slopeTimeSelection = " + this.slopeTimeSelection); //$NON-NLS-1$
 		}
 	}
@@ -533,7 +533,7 @@ public class PicolarioConfigTab extends Composite {
 	 * @return integer of dialog selected value
 	 */
 	public int getReduceHeightSelection() {
-		return new Integer(this.heightOffset.getText()).intValue();
+		return Integer.valueOf(this.heightOffset.getText()).intValue();
 	}
 
 	/**
@@ -628,7 +628,7 @@ public class PicolarioConfigTab extends Composite {
 		PicolarioConfigTab.this.reduceByFirstValueButton.setSelection(PicolarioConfigTab.this.doSubtractFirst);
 		PicolarioConfigTab.this.reduceByLastValueButton.setSelection(PicolarioConfigTab.this.doSubtractLast);
 		PicolarioConfigTab.this.reduceByDefinedValueButton.setSelection(PicolarioConfigTab.this.doOffsetHeight);
-		PicolarioConfigTab.this.heightOffset.setText(new Double(PicolarioConfigTab.this.heightOffsetValue).toString());
+		PicolarioConfigTab.this.heightOffset.setText(Double.valueOf(PicolarioConfigTab.this.heightOffsetValue).toString());
 
 		PicolarioConfigTab.this.slopeUnit.setText("[" + PicolarioConfigTab.this.slopeDataUnit + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 		PicolarioConfigTab.this.regressionTime.select(PicolarioConfigTab.this.slopeTimeSelection - 1);

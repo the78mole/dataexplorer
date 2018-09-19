@@ -59,7 +59,7 @@ public class UniLogDataGatherer extends Thread {
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
 		this.dialog = useDevice.getDialog();
-		this.channelNumber = new Integer(useConfigKey.trim().split(":")[0].trim()); //$NON-NLS-1$
+		this.channelNumber = Integer.valueOf(useConfigKey.trim().split(":")[0].trim()); //$NON-NLS-1$
 		this.configKey = useConfigKey.trim().split(":")[1].trim(); //$NON-NLS-1$
 }
 

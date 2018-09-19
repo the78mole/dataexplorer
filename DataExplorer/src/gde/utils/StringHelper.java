@@ -217,7 +217,7 @@ public class StringHelper {
 		String[] stringValues = values.split(";"); //$NON-NLS-1$
 		int[] array = new int[stringValues.length];
 		for (int i = 0; i < stringValues.length && stringValues.length > 1; i++) {
-			array[i] = new Integer(stringValues[i].trim()).intValue();
+			array[i] = Integer.valueOf(stringValues[i].trim()).intValue();
 		}
 		return array;
 	}
@@ -237,7 +237,7 @@ public class StringHelper {
 		Point[] points = new Point[stringValues.length];
 		for (int i = 0; i < points.length && points.length > 1; i++) {
 			String[] xy = stringValues[i].split(":"); //$NON-NLS-1$
-			points[i] = new Point(new Integer(xy[0].trim()).intValue(), new Integer(xy[1].trim()).intValue());
+			points[i] = new Point(Integer.valueOf(xy[0].trim()).intValue(), Integer.valueOf(xy[1].trim()).intValue());
 		}
 		return points;
 	}

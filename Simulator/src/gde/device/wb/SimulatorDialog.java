@@ -189,7 +189,7 @@ public class SimulatorDialog extends DeviceDialog {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINE, "clusterCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							SimulatorDialog.this.device.setDataBlockSize(InputTypes.SERIAL_IO, FormatTypes.BYTE, new Integer(SimulatorDialog.this.clusterCombo.getText()).intValue());
+							SimulatorDialog.this.device.setDataBlockSize(InputTypes.SERIAL_IO, FormatTypes.BYTE, Integer.valueOf(SimulatorDialog.this.clusterCombo.getText()).intValue());
 							log.log(Level.FINE, " new clusterSize = " + Math.abs(SimulatorDialog.this.device.getDataBlockSize(InputTypes.SERIAL_IO))); //$NON-NLS-1$
 						}
 					});
@@ -289,7 +289,7 @@ public class SimulatorDialog extends DeviceDialog {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINE, "timeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							SimulatorDialog.this.device.setTimeStep_ms(new Integer(SimulatorDialog.this.timeCombo.getText()).intValue());
+							SimulatorDialog.this.device.setTimeStep_ms(Integer.valueOf(SimulatorDialog.this.timeCombo.getText()).intValue());
 							log.log(Level.FINE, " new timeStep_ms = " + SimulatorDialog.this.device.getTimeStep_ms()); //$NON-NLS-1$
 						}
 					});

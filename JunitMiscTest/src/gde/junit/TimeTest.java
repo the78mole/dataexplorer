@@ -66,7 +66,7 @@ public class TimeTest {
 		long startTime = System.nanoTime();
 		log.log(Level.INFO, "Start = " + startTime);
 		for (long i = 0; i < maxCounter; i++) {
-			long j = new Double(i - (i / 2) + (i / 3) - (i / 4) + (i / 5)).longValue();
+			long j = Double.valueOf(i - (i / 2) + (i / 3) - (i / 4) + (i / 5)).longValue();
 			j = j*j;
 		}
 		long endTime = System.nanoTime();
@@ -91,7 +91,7 @@ public class TimeTest {
 		startTime = System.currentTimeMillis();
 		log.log(Level.INFO, "Start = " + startTime);
 		for (long i = 0; i < maxCounter; i++) {
-			long j = new Double(i - (i / 2) + (i / 3) - (i / 4) + (i / 5)).longValue();
+			long j = Double.valueOf(i - (i / 2) + (i / 3) - (i / 4) + (i / 5)).longValue();
 			j = j*j;
 		}
 		endTime = System.currentTimeMillis();
@@ -117,7 +117,7 @@ public class TimeTest {
 		startTime = new Date().getTime();
 		log.log(Level.INFO, "Start = " + startTime);
 		for (long i = 0; i < maxCounter; i++) {
-			long j = new Double(i - (i / 2) + (i / 3) - (i / 4) + (i / 5)).longValue();
+			long j = Double.valueOf(i - (i / 2) + (i / 3) - (i / 4) + (i / 5)).longValue();
 			j = j*j;
 		}
 		endTime = new Date().getTime();

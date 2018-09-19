@@ -150,7 +150,7 @@ public class eStationBC6 extends eStation {
 
 			// 7=SpannungZelle1 7=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6
 			for (int j=0, k=0; j<points.length - 7; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
-				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
+				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = Integer.valueOf((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
 				points[j + 7] = (((convertBuffer[k+16]&0xff) << 24) + ((convertBuffer[k+17]&0xff) << 16) + ((convertBuffer[k+18]&0xff) << 8) + ((convertBuffer[k+19]&0xff) << 0));
 				if (points[j + 7] > 0) {
 					maxVotage = points[j + 7] > maxVotage ? points[j + 7] : maxVotage;

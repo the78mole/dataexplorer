@@ -177,6 +177,6 @@ public class ReverseCorrectMessagesIds {
 	 * @return
 	 */
 	static Integer calcMsgValue(String[] sections) {
-		return new Integer(sections[6].substring(10, sections[6].length()-2));
+		return Integer.valueOf(sections[6].substring(10, sections[6].length()-2));
 	}
 }

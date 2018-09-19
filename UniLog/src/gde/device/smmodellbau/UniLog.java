@@ -365,10 +365,10 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		//points[3] = capacity.intValue(); //3=capacity [Ah]
 		points[3] = 0; //3=capacity [mAh]
 
-		//points[4] = new Double(1.0 * points[1] * points[2] / 1000).intValue(); //4=power [W]
+		//points[4] = Double.valueOf(1.0 * points[1] * points[2] / 1000).intValue(); //4=power [W]
 		points[4] = 0; //4=power [W]
 
-		//points[5] = new Double(1.0 * points[1] * points[3] / 1000000).intValue(); //5=energy [Wh]
+		//points[5] = Double.valueOf(1.0 * points[1] * points[3] / 1000000).intValue(); //5=energy [Wh]
 		points[5] = 0; //5=energy [Wh]
 
 		//points[6] = points[1] / numberCells; //6=votagePerCell
@@ -382,7 +382,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 
 		//double motorPower = (points[7]*100.0)/prop100WValue;
 		//double eta = points[4] > motorPower ? (motorPower*100.0)/points[4] : 0;
-		//points[8] = new Double(eta * 1000).intValue();//8=efficiency
+		//points[8] = Double.valueOf(eta * 1000).intValue();//8=efficiency
 		points[8] = 0; //8=efficiency
 
 		// height *** power/drive *** group
@@ -506,11 +506,11 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
 			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
 			//points[3] = capacity.intValue(); //3=capacity [Ah]
-			//points[4] = new Double(1.0 * points[1] * points[2] / 1000).intValue(); //4=power [W]
-			//points[5] = new Double(1.0 * points[1] * points[3] / 1000000).intValue(); //5=energy [Wh]
+			//points[4] = Double.valueOf(1.0 * points[1] * points[2] / 1000).intValue(); //4=power [W]
+			//points[5] = Double.valueOf(1.0 * points[1] * points[3] / 1000000).intValue(); //5=energy [Wh]
 			//points[6] = points[1] / numberCells; //6=votagePerCell
 			points[7] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
-			//points[8] = new Double(eta * 1000).intValue();//8=efficiency
+			//points[8] = Double.valueOf(eta * 1000).intValue();//8=efficiency
 			points[9] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
 			//points[10] = slope
 			points[11] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
@@ -548,7 +548,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					break;
 				case 2: //current
 					property = record.getProperty(UniLog.CURRENT_OFFSET);
-					currentOffset = property != null ? new Double(property.getValue()).doubleValue() : 0;
+					currentOffset = property != null ? Double.valueOf(property.getValue()).doubleValue() : 0;
 					//newValues = value + currentOffset;
 					break;
 				case 3: //capacity
@@ -558,9 +558,9 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 					break;
 				case 7: //revolutionSpeed
 					property = record.getProperty(UniLog.RPM_FACTOR);
-					rpmFactor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+					rpmFactor = property != null ? Double.valueOf(property.getValue()).doubleValue() : 1.0;
 					property = record.getProperty(UniLog.NUMBER_MOTOR);
-					numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+					numberMotor = property != null ? Double.valueOf(property.getValue()).doubleValue() : 1.0;
 					//newValues = value * rpmFactor / numberMotor;
 					break;
 				case 9: //height
@@ -620,7 +620,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 
 		case 7: //7=revolutionSpeed [1/min]
 			property = record.getProperty(UniLog.NUMBER_MOTOR);
-			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			double numberMotor = property != null ? Double.valueOf(property.getValue()).doubleValue() : 1.0;
 			newValue = value * record.getFactor() / numberMotor;
 			break;
 
@@ -674,7 +674,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 
 		case 7: //7=revolutionSpeed [1/min]
 			property = record.getProperty(UniLog.NUMBER_MOTOR);
-			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			double numberMotor = property != null ? Double.valueOf(property.getValue()).doubleValue() : 1.0;
 			newValue = value * numberMotor / record.getFactor();
 			break;
 
@@ -854,7 +854,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			record.clear();
 			recordVoltage = recordSet.get(1); // 1=voltage
 			PropertyType property = record.getProperty(UniLog.NUMBER_CELLS);
-			int numberCells = property != null ? new Integer(property.getValue()) : 4;
+			int numberCells = property != null ? Integer.valueOf(property.getValue()) : 4;
 			for (int i = 0; i < recordVoltage.size(); i++) {
 				record.add(Double.valueOf(recordVoltage.get(i) / (double)numberCells).intValue());
 				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "adding value = " + record.get(i)); //$NON-NLS-1$
@@ -870,12 +870,12 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			record.clear();
 			Record recordRevolution = recordSet.get(7); // 7=revolutionSpeed
 			property = recordRevolution.getProperty(UniLog.RPM_FACTOR);
-			double rpmFactor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			double rpmFactor = property != null ? Double.valueOf(property.getValue()).doubleValue() : 1.0;
 			property = recordRevolution.getProperty(UniLog.NUMBER_MOTOR);
-			double numberMotor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			double numberMotor = property != null ? Double.valueOf(property.getValue()).doubleValue() : 1.0;
 			Record recordPower = recordSet.get(4); // 4=power [w]
 			property = record.getProperty(UniLog.PROP_N_100_W);
-			int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
+			int prop_n100W = property != null ? Integer.valueOf(property.getValue()) : 10000;
 			recordCurrent = recordSet.get(2); // 2=current
 			for (int i = 0; i < recordRevolution.size(); i++) {
 				if (i > 1 && recordRevolution.get(i)> 100000 && recordCurrent.get(i) > 3000) { //100 1/min && 3A
@@ -900,7 +900,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			record.setDisplayable(false);
 			record.clear();
 			property = record.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
-			int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
+			int regressionInterval = property != null ? Integer.valueOf(property.getValue()) : 4;
 			property = record.getProperty(CalculationThread.REGRESSION_TYPE);
 			if (property == null || property.getValue().equals(CalculationThread.REGRESSION_TYPE_CURVE))
 				this.calculationThread = new QuasiLinearRegression(recordSet, recordSet.get(9).getName(), recordSet.get(10).getName(), regressionInterval);

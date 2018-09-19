@@ -2022,7 +2022,7 @@ public class DeviceConfiguration {
 			log.log(Level.FINER, "get offset from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = this.getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.OFFSET);
-		if (property != null) value = new Double(property.getValue()).doubleValue();
+		if (property != null) value = Double.valueOf(property.getValue()).doubleValue();
 
 		return value;
 	}
@@ -2039,7 +2039,7 @@ public class DeviceConfiguration {
 			log.log(Level.FINER, "get offset from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.OFFSET);
-		if (property != null) value = new Double(property.getValue()).doubleValue();
+		if (property != null) value = Double.valueOf(property.getValue()).doubleValue();
 
 		return value;
 	}
@@ -2092,7 +2092,7 @@ public class DeviceConfiguration {
 			log.log(Level.FINER, "get factor from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 1.0;
 		PropertyType property = getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.FACTOR);
-		if (property != null) value = new Double(property.getValue()).doubleValue();
+		if (property != null) value = Double.valueOf(property.getValue()).doubleValue();
 
 		return value;
 	}
@@ -2109,7 +2109,7 @@ public class DeviceConfiguration {
 			log.log(Level.FINER, "get factor from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 1.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.FACTOR);
-		if (property != null) value = new Double(property.getValue()).doubleValue();
+		if (property != null) value = Double.valueOf(property.getValue()).doubleValue();
 
 		return value;
 	}
@@ -2162,7 +2162,7 @@ public class DeviceConfiguration {
 			log.log(Level.FINER, "get reduction from measurement name = " + this.getMeasurement(channelConfigNumber, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = getMeasruementProperty(channelConfigNumber, measurementOrdinal, IDevice.REDUCTION);
-		if (property != null) value = new Double(property.getValue()).doubleValue();
+		if (property != null) value = Double.valueOf(property.getValue()).doubleValue();
 
 		return value;
 	}
@@ -2179,7 +2179,7 @@ public class DeviceConfiguration {
 			log.log(Level.FINER, "get reduction from measurement name = " + this.getMeasurement(channelConfigKey, measurementOrdinal).getName()); //$NON-NLS-1$
 		double value = 0.0;
 		PropertyType property = getMeasruementProperty(channelConfigKey, measurementOrdinal, IDevice.REDUCTION);
-		if (property != null) value = new Double(property.getValue()).doubleValue();
+		if (property != null) value = Double.valueOf(property.getValue()).doubleValue();
 
 		return value;
 	}

@@ -973,8 +973,8 @@ public class LiPoWatchDialog extends DeviceDialog {
 	//				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setActive(temperatureButton.getSelection());
 	//				//activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setVisible(temperatureButton.getSelection());
 	//				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(temperatureButton.getSelection());
-	//				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setOffset(new Double(a1OffsetText.getText().trim().replace(',', '.')));
-	//				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(new Double(a1FactorText.getText().trim().replace(',', '.')));
+	//				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setOffset(Double.valueOf(a1OffsetText.getText().trim().replace(',', '.')));
+	//				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(Double.valueOf(a1FactorText.getText().trim().replace(',', '.')));
 	//				
 	//				application.updateGraphicsWindow();
 	//				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);

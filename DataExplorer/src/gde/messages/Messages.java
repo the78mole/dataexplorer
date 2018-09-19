@@ -61,7 +61,7 @@ public class Messages {
 	public static String getString(String key, Object[] params) {
 		try {
 			String result;
-			if (new Integer(key.substring(key.length()-4)) <= GDE.NUMBER_RANGE_MAX_GDE) {
+			if (Integer.valueOf(key.substring(key.length()-4)) <= GDE.NUMBER_RANGE_MAX_GDE) {
 				result = mainResourceBundle.getString(key);
 			}
 			else {
@@ -93,7 +93,7 @@ public class Messages {
 	 */
 	public static String getString(String key) {
 		try {
-			if (new Integer(key.substring(key.length()-4)) <= GDE.NUMBER_RANGE_MAX_GDE) {
+			if (Integer.valueOf(key.substring(key.length()-4)) <= GDE.NUMBER_RANGE_MAX_GDE) {
 				return mainResourceBundle.getString(key);
 			}
 			return deviceResourceBundle.getString(key);
@@ -132,7 +132,7 @@ public class Messages {
 	public static char getAcceleratorChar(String key) {
 		try {
 			String resourceString;
-			if (new Integer(key.substring(key.length()-4)) <= GDE.NUMBER_RANGE_MAX_GDE) {
+			if (Integer.valueOf(key.substring(key.length()-4)) <= GDE.NUMBER_RANGE_MAX_GDE) {
 				resourceString = mainResourceBundle.getString(key);
 			}
 			else {

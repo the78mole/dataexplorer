@@ -333,9 +333,9 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		PropertyType property = null;
 		if (record.getOrdinal() == 3) {//3=temperature [°C]
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
-			double factor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			double factor = property != null ? Double.valueOf(property.getValue()).doubleValue() : 1.0;
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
-			double offset = property != null ? new Double(property.getValue()).doubleValue() : 0.0;
+			double offset = property != null ? Double.valueOf(property.getValue()).doubleValue() : 0.0;
 			newValue = value * factor + offset;
 		}
 		else if (record.getOrdinal() == 4) {//4=Balance [mV]
@@ -359,9 +359,9 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 		PropertyType property = null;
 		if (record.getOrdinal() == 3) {//3=temperature [°C]
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
-			double factor = property != null ? new Double(property.getValue()).doubleValue() : 1.0;
+			double factor = property != null ? Double.valueOf(property.getValue()).doubleValue() : 1.0;
 			property = record.getProperty(LiPoWatch.A1_FACTOR);
-			double offset = property != null ? new Double(property.getValue()).doubleValue() : 0.0;
+			double offset = property != null ? Double.valueOf(property.getValue()).doubleValue() : 0.0;
 			newValue = (value - offset) / factor;
 		}
 		else if (record.getOrdinal() == 4) {//4=Balance [mV]

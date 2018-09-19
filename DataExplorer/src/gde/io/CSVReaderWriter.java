@@ -344,7 +344,7 @@ public class CSVReaderWriter {
 					}
 					for (int i = 0; i < updateRecordNames.length; i++) { // only iterate over record names found in file
 						data = dataStr[i + 1].trim().replace(',', '.').replace(GDE.STRING_BLANK, GDE.STRING_EMPTY);
-						points[i] = (int) (new Double(data).doubleValue() * 1000);
+						points[i] = (int) (Double.valueOf(data).doubleValue() * 1000);
 					}
 					if (isRaw) 	recordSet.addNoneCalculationRecordsPoints(points, time_ms);
 					else 				recordSet.addPoints(points, time_ms);

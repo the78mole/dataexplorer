@@ -133,7 +133,7 @@ public class GathererThread extends Thread {
 					if (this.channel.size() == 0 || recordSet == null || !this.recordSetKey.endsWith(" " + processName)) { //$NON-NLS-1$
 						this.application.setStatusMessage(""); //$NON-NLS-1$
 						setRetryCounter(GathererThread.WAIT_TIME_RETRYS); // 36 * receive timeout sec timeout = 180 sec
-						waitTime_ms = new Integer(configData.get(eStation.CONFIG_WAIT_TIME)).intValue() * 60000;
+						waitTime_ms = Integer.valueOf(configData.get(eStation.CONFIG_WAIT_TIME)).intValue() * 60000;
 						log.logp(Level.FINE, GathererThread.$CLASS_NAME, $METHOD_NAME, "waitTime_ms = " + waitTime_ms); //$NON-NLS-1$
 						// record set does not exist or is outdated, build a new name and create
 						this.recordSetKey = this.channel.getNextRecordSetNumber() + ") [" + configData.get(eStation.CONFIG_BATTERY_TYPE) + "] " + processName; //$NON-NLS-1$ //$NON-NLS-2$

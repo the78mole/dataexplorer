@@ -696,7 +696,7 @@ public class MenuToolBar {
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST, "scopePointsCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 								try {
-									new Integer(MenuToolBar.this.scopePointsCombo.getText().trim());
+									Integer.valueOf(MenuToolBar.this.scopePointsCombo.getText().trim());
 									MenuToolBar.this.application.setGraphicsMode(GraphicsMode.SCOPE, true);
 									MenuToolBar.this.zoomWindowItem.setEnabled(false);
 								}
@@ -1442,7 +1442,7 @@ public class MenuToolBar {
 	public int getScopeModeLevelValue() {
 		int sizeLastPoints = -1;
 		try {
-			sizeLastPoints = new Integer(MenuToolBar.this.scopePointsCombo.getText().trim());
+			sizeLastPoints = Integer.valueOf(MenuToolBar.this.scopePointsCombo.getText().trim());
 		}
 		catch (NumberFormatException e) {
 			// ignore and return -1

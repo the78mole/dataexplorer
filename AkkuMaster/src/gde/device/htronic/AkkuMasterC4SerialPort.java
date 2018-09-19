@@ -282,23 +282,23 @@ public class AkkuMasterC4SerialPort extends DeviceCommPort {
 	public static HashMap<String, Object> getConvertedValues(HashMap<String, Object> values, String[] currentConfiguration, String[] currentMeasurements) {
 		boolean isActive = true;
 		values.put(AkkuMasterC4SerialPort.PROCESS_NAME, currentConfiguration[0].split(" ")[0]); // AkkuMaster aktiv //$NON-NLS-1$
-		values.put(AkkuMasterC4SerialPort.PROCESS_ERROR_NO, new Integer(currentConfiguration[1].split(" ")[0])); // Aktuelle Fehlernummer //$NON-NLS-1$
-		values.put(AkkuMasterC4SerialPort.PROCESS_VOLTAGE, new Integer(currentMeasurements[2].split(" ")[0])); // Aktuelle Akkuspannung //$NON-NLS-1$
+		values.put(AkkuMasterC4SerialPort.PROCESS_ERROR_NO, Integer.valueOf(currentConfiguration[1].split(" ")[0])); // Aktuelle Fehlernummer //$NON-NLS-1$
+		values.put(AkkuMasterC4SerialPort.PROCESS_VOLTAGE, Integer.valueOf(currentMeasurements[2].split(" ")[0])); // Aktuelle Akkuspannung //$NON-NLS-1$
 
-		switch (new Integer(currentConfiguration[0].split(" ")[0])) { //$NON-NLS-1$
+		switch (Integer.valueOf(currentConfiguration[0].split(" ")[0])) { //$NON-NLS-1$
 		case 1:
 			values.put(AkkuMasterC4SerialPort.PROCESS_NAME, currentConfiguration[0].split(" ")[0] + Messages.getString(MessageIds.GDE_MSGT1126)); //$NON-NLS-1$ 
-			values.put(AkkuMasterC4SerialPort.PROCESS_CURRENT, new Integer(currentConfiguration[7].split(" ")[0])); // eingestellter Ladestrom //$NON-NLS-1$
-			values.put(AkkuMasterC4SerialPort.PROCESS_CAPACITY, new Integer(currentMeasurements[1].split(" ")[0])); // Aktuelle Ladekapazität //$NON-NLS-1$
+			values.put(AkkuMasterC4SerialPort.PROCESS_CURRENT, Integer.valueOf(currentConfiguration[7].split(" ")[0])); // eingestellter Ladestrom //$NON-NLS-1$
+			values.put(AkkuMasterC4SerialPort.PROCESS_CAPACITY, Integer.valueOf(currentMeasurements[1].split(" ")[0])); // Aktuelle Ladekapazität //$NON-NLS-1$
 			break;
 		case 2:
 			values.put(AkkuMasterC4SerialPort.PROCESS_NAME, currentConfiguration[0].split(" ")[0] + Messages.getString(MessageIds.GDE_MSGT1127)); //$NON-NLS-1$ 
-			values.put(AkkuMasterC4SerialPort.PROCESS_CURRENT, new Integer(currentConfiguration[6].split(" ")[0])); // eingestellter Entladestrom //$NON-NLS-1$
-			values.put(AkkuMasterC4SerialPort.PROCESS_CAPACITY, new Integer(currentMeasurements[0].split(" ")[0])); // Aktuelle Entladekapazität //$NON-NLS-1$
+			values.put(AkkuMasterC4SerialPort.PROCESS_CURRENT, Integer.valueOf(currentConfiguration[6].split(" ")[0])); // eingestellter Entladestrom //$NON-NLS-1$
+			values.put(AkkuMasterC4SerialPort.PROCESS_CAPACITY, Integer.valueOf(currentMeasurements[0].split(" ")[0])); // Aktuelle Entladekapazität //$NON-NLS-1$
 			break;
 		case 3:
 			values.put(AkkuMasterC4SerialPort.PROCESS_NAME, currentConfiguration[0].split(" ")[0] + Messages.getString(MessageIds.GDE_MSGT1128)); //$NON-NLS-1$ 
-			values.put(AkkuMasterC4SerialPort.PROCESS_CAPACITY, new Integer("0")); //$NON-NLS-1$
+			values.put(AkkuMasterC4SerialPort.PROCESS_CAPACITY, Integer.valueOf("0")); //$NON-NLS-1$
 			break;
 		default:
 			isActive = false;

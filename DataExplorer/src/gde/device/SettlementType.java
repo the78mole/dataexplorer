@@ -368,7 +368,7 @@ public class SettlementType implements IChannelItem {
 		double value = 0.0;
 		PropertyType tmpProperty = this.getProperty(IDevice.OFFSET);
 		if (tmpProperty != null)
-			value = new Double(tmpProperty.getValue()).doubleValue();
+			value = Double.valueOf(tmpProperty.getValue()).doubleValue();
 
 		return value;
 	}
@@ -395,7 +395,7 @@ public class SettlementType implements IChannelItem {
 		double value = 0.0;
 		PropertyType tmpProperty = this.getProperty(IDevice.REDUCTION);
 		if (tmpProperty != null)
-			value = new Double(tmpProperty.getValue()).doubleValue();
+			value = Double.valueOf(tmpProperty.getValue()).doubleValue();
 
 		return value;
 	}
@@ -422,7 +422,7 @@ public class SettlementType implements IChannelItem {
 		double value = 1.0;
 		PropertyType tmpProperty = getProperty(IDevice.FACTOR);
 		if (tmpProperty != null)
-			value = new Double(tmpProperty.getValue()).doubleValue();
+			value = Double.valueOf(tmpProperty.getValue()).doubleValue();
 
 		return value;
     }

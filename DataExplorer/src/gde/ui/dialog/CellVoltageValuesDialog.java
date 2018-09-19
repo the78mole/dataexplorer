@@ -387,7 +387,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "upperLimitVoltageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-								CellVoltageValuesDialog.this.voltageLimits[0] = new Integer(CellVoltageValuesDialog.this.upperLimitVoltageCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
+								CellVoltageValuesDialog.this.voltageLimits[0] = Integer.valueOf(CellVoltageValuesDialog.this.upperLimitVoltageCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
 								CellVoltageValuesDialog.log.info("upperLimitVoltage = " + CellVoltageValuesDialog.this.voltageLimits[0]); //$NON-NLS-1$
 							}
 						});
@@ -410,7 +410,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "upperLimitColorRedCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-								CellVoltageValuesDialog.this.voltageLimits[1] = new Integer(CellVoltageValuesDialog.this.upperLimitColorRedCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
+								CellVoltageValuesDialog.this.voltageLimits[1] = Integer.valueOf(CellVoltageValuesDialog.this.upperLimitColorRedCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
 								CellVoltageValuesDialog.log.info("upperLimitColorRed = " + CellVoltageValuesDialog.this.voltageLimits[1]); //$NON-NLS-1$
 							}
 						});
@@ -433,7 +433,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "lowerLimitColorGreenCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-								CellVoltageValuesDialog.this.voltageLimits[2] = new Integer(CellVoltageValuesDialog.this.lowerLimitColorGreenCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
+								CellVoltageValuesDialog.this.voltageLimits[2] = Integer.valueOf(CellVoltageValuesDialog.this.lowerLimitColorGreenCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
 								CellVoltageValuesDialog.log.info("lowerLimitColorGreen = " + CellVoltageValuesDialog.this.voltageLimits[2]); //$NON-NLS-1$
 							}
 						});
@@ -456,7 +456,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "beginSpreadVoltageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-								CellVoltageValuesDialog.this.voltageLimits[3] = new Integer(CellVoltageValuesDialog.this.beginSpreadVoltageCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
+								CellVoltageValuesDialog.this.voltageLimits[3] = Integer.valueOf(CellVoltageValuesDialog.this.beginSpreadVoltageCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
 								CellVoltageValuesDialog.log.info("beginSpreadVoltage = " + CellVoltageValuesDialog.this.voltageLimits[3]); //$NON-NLS-1$
 							}
 						});
@@ -479,7 +479,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "lowerLimitRedColorCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-								CellVoltageValuesDialog.this.voltageLimits[4] = new Integer(CellVoltageValuesDialog.this.lowerLimitColorRedCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
+								CellVoltageValuesDialog.this.voltageLimits[4] = Integer.valueOf(CellVoltageValuesDialog.this.lowerLimitColorRedCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
 								CellVoltageValuesDialog.log.info("lowerLimitColorRed = " + CellVoltageValuesDialog.this.voltageLimits[4]); //$NON-NLS-1$
 							}
 						});
@@ -502,7 +502,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
 								CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "lowerLimitVoltageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-								CellVoltageValuesDialog.this.voltageLimits[5] = new Integer(CellVoltageValuesDialog.this.lowerLimitVoltageCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
+								CellVoltageValuesDialog.this.voltageLimits[5] = Integer.valueOf(CellVoltageValuesDialog.this.lowerLimitVoltageCombo.getText().replace(".", "")); //$NON-NLS-1$ //$NON-NLS-2$
 								CellVoltageValuesDialog.log.info("lowerLimitVoltage = " + CellVoltageValuesDialog.this.voltageLimits[5]); //$NON-NLS-1$
 							}
 						});

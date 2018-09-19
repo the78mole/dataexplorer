@@ -86,10 +86,10 @@ public class UniLogLiveGatherer extends Thread {
 		this.calcValues.put(UniLog.A3_FACTOR, useDevice.getMeasurementFactor(this.channelNumber, 13)); // 13 = A3
 		this.calcValues.put(UniLog.A3_OFFSET, useDevice.getMeasurementOffset(this.channelNumber, 13));
 		PropertyType property = useDevice.getMeasruementProperty(this.channelNumber, 6, UniLog.NUMBER_CELLS); // 6 = voltage/cell
-		int numCellValue = property != null ? new Integer(property.getValue()) : 4;
+		int numCellValue = property != null ? Integer.valueOf(property.getValue()) : 4;
 		this.calcValues.put(UniLog.NUMBER_CELLS, (double)numCellValue);
 		property = useDevice.getMeasruementProperty(this.channelNumber, 8, UniLog.PROP_N_100_W); // 8 = efficience
-		int prop_n100W = property != null ? new Integer(property.getValue()) : 10000;
+		int prop_n100W = property != null ? Integer.valueOf(property.getValue()) : 10000;
 		this.calcValues.put(UniLog.PROP_N_100_W, (double)prop_n100W);
 	}
 

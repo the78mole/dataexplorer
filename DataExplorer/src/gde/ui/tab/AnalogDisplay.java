@@ -192,7 +192,7 @@ public class AnalogDisplay extends Composite {
 			this.tachoImageGC.drawArc(this.centerX - this.radius, this.centerY - this.radius, 2 * this.radius, 2 * this.radius, this.angleStart, this.angleDelta);
 			this.tachoImageGC.setForeground(DataExplorer.COLOR_BLACK);
 			this.tachoImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-			int numberTicks = 10; //new Double(maxValue - minValue).intValue();
+			int numberTicks = 10; //Double.valueOf(maxValue - minValue).intValue();
 			double deltaValue = (this.maxValue - this.minValue) / numberTicks;
 			double angleSteps = this.angleDelta * 1.0 / numberTicks;
 			int tickRadius = this.radius + 2;

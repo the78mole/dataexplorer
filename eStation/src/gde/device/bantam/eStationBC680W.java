@@ -281,7 +281,7 @@ public class eStationBC680W extends eStation {
 
 			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6
 			for (int j=0, k=0; j<6; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
-				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
+				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = Integer.valueOf((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
 				points[j + 8] = (((convertBuffer[k+20]&0xff) << 24) + ((convertBuffer[k+21]&0xff) << 16) + ((convertBuffer[k+22]&0xff) << 8) + ((convertBuffer[k+23]&0xff) << 0));
 				if (points[j + 8] > 0) {
 					maxVotage = points[j + 8] > maxVotage ? points[j + 8] : maxVotage;

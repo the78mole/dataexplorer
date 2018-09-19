@@ -529,7 +529,7 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 			switch (MeasurementPropertyTypes.fromValue(propertyTabItemName)) {
 			case OFFSET:
 				tmpPropertyType.setType(DataTypes.DOUBLE);
-				tmpPropertyType.setValue(new Double("0.0")); //$NON-NLS-1$
+				tmpPropertyType.setValue(Double.valueOf("0.0")); //$NON-NLS-1$
 				tmpPropertyType.setDescription(Messages.getString(MessageIds.GDE_MSGT0535));
 				tmpPropertyTypeTabItem.setProperty(this.deviceConfig, tmpPropertyType, false, null, new String[] { DataTypes.DOUBLE.value() }, true);
 				break;

@@ -405,7 +405,7 @@ public class MeasurementType implements IChannelItem {
 	public double getOffset() {
 		double value = 0.0;
 		PropertyType tmpProperty = this.getProperty(IDevice.OFFSET);
-		if (tmpProperty != null) value = new Double(tmpProperty.getValue()).doubleValue();
+		if (tmpProperty != null) value = Double.valueOf(tmpProperty.getValue()).doubleValue();
 
 		return value;
 	}
@@ -432,7 +432,7 @@ public class MeasurementType implements IChannelItem {
 	public double getReduction() {
 		double value = 0.0;
 		PropertyType tmpProperty = this.getProperty(IDevice.REDUCTION);
-		if (tmpProperty != null) value = new Double(tmpProperty.getValue()).doubleValue();
+		if (tmpProperty != null) value = Double.valueOf(tmpProperty.getValue()).doubleValue();
 
 		return value;
 	}
@@ -459,7 +459,7 @@ public class MeasurementType implements IChannelItem {
 	public double getFactor() {
 		double value = 1.0;
 		PropertyType tmpProperty = getProperty(IDevice.FACTOR);
-		if (tmpProperty != null) value = new Double(tmpProperty.getValue()).doubleValue();
+		if (tmpProperty != null) value = Double.valueOf(tmpProperty.getValue()).doubleValue();
 
 		return value;
 	}

@@ -180,7 +180,7 @@ public class CellLog8S extends iCharger {
 			int minVotage = Integer.MAX_VALUE;
 			//2=SpannungZelle1 3=SpannungZelle2 4=SpannungZelle3 5=SpannungZelle4 6=SpannungZelle5 7=SpannungZelle6 8=SpannungZelle7 9=SpannungZelle8
 			for (int j=0, k=0; j<8; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
-				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = new Integer((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
+				//log_base.info("cell " + (i+1) + " points[" + (i+8) + "]  = Integer.valueOf((((dataBuffer[" + (j+45) + "] & 0xFF)-0x80)*100 + ((dataBuffer[" + (j+46)+ "] & 0xFF)-0x80))*10);");  //45,46 CELL_420v[1];
 				//log.log(Level.OFF, j + " k+19 = " + (k+19));
 				points[j + 2] = (((convertBuffer[k+4]&0xff) << 24) + ((convertBuffer[k+5]&0xff) << 16) + ((convertBuffer[k+6]&0xff) << 8) + ((convertBuffer[k+7]&0xff) << 0));
 				if (points[j + 2] > 0) {

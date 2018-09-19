@@ -85,7 +85,7 @@ public class DataGathererThread extends Thread {
 			for (int j = 0; j < this.datagramNumbers.length && !this.threadStop; ++j) {
 				this.dialog.resetTelegramLabel();
 				this.dialog.setAlreadyRedDataSets(this.datagramNumbers[j]);
-				Vector<byte[]> data = this.serialPort.getData(new Integer(this.datagramNumbers[j]).intValue(), this.device);
+				Vector<byte[]> data = this.serialPort.getData(Integer.valueOf(this.datagramNumbers[j]).intValue(), this.device);
 				recordSetKey = channel.getNextRecordSetNumber() + this.RECORD_SET_NAME;
 				channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, this.application.getActiveDevice(), channel.getNumber(), true, false, true));
 				DataGathererThread.log.log(Level.FINE, recordSetKey + " created"); //$NON-NLS-1$
@@ -104,7 +104,7 @@ public class DataGathererThread extends Thread {
 				
 				// start slope calculation
 				PropertyType property = recordSet.get(measurements[2]).getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
-				int regressionInterval = property != null ? new Integer(property.getValue()) : 4;
+				int regressionInterval = property != null ? Integer.valueOf(property.getValue()) : 4;
 				this.calculationThread = new QuasiLinearRegression(recordSet, measurements[1], measurements[2], regressionInterval);
 				try {
 					this.calculationThread.start();

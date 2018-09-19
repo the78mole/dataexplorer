@@ -1638,7 +1638,7 @@ public class UniLogDialog extends DeviceDialog {
 		updateBuffer[11] = (byte) (Integer.parseInt(this.limiterEnergyCombo.getText().trim()) & 0x00FF);
 		checkSum = checkSum + (0xFF & updateBuffer[11]);
 
-		double tempGearRatio = new Double(this.gearFactorCombo.getText().split(":")[0].trim().replace(',', '.')).doubleValue() * 10; //$NON-NLS-1$
+		double tempGearRatio = Double.valueOf(this.gearFactorCombo.getText().split(":")[0].trim().replace(',', '.')).doubleValue() * 10; //$NON-NLS-1$
 		updateBuffer[12] = (byte) tempGearRatio;
 		checkSum = checkSum + (0xFF & updateBuffer[12]);
 
@@ -1702,7 +1702,7 @@ public class UniLogDialog extends DeviceDialog {
 	 * @return
 	 */
 	double getGearRatio() {
-		return new Double(this.gearFactorCombo.getText().split(":")[0].trim().replace(',', '.')).doubleValue(); //$NON-NLS-1$
+		return Double.valueOf(this.gearFactorCombo.getText().split(":")[0].trim().replace(',', '.')).doubleValue(); //$NON-NLS-1$
 	}
 
 	/**
