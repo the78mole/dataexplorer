@@ -372,8 +372,8 @@ public final class Settings extends Properties {
 
 			if (this.getProperty(Settings.WINDOW_LEFT) != null && this.getProperty(Settings.WINDOW_TOP) != null && this.getProperty(Settings.WINDOW_WIDTH) != null
 					&& this.getProperty(Settings.WINDOW_HEIGHT) != null) {
-				this.window = new Rectangle(new Integer(this.getProperty(Settings.WINDOW_LEFT).trim()).intValue(), new Integer(this.getProperty(Settings.WINDOW_TOP).trim()).intValue(),
-						new Integer(this.getProperty(Settings.WINDOW_WIDTH).trim()).intValue(), new Integer(this.getProperty(Settings.WINDOW_HEIGHT).trim()).intValue());
+				this.window = new Rectangle(Integer.valueOf(this.getProperty(Settings.WINDOW_LEFT).trim()).intValue(), Integer.valueOf(this.getProperty(Settings.WINDOW_TOP).trim()).intValue(),
+						Integer.valueOf(this.getProperty(Settings.WINDOW_WIDTH).trim()).intValue(), Integer.valueOf(this.getProperty(Settings.WINDOW_HEIGHT).trim()).intValue());
 			}
 			else
 				this.window = new Rectangle(50, 50, 950, 600);
@@ -397,6 +397,10 @@ public final class Settings extends Properties {
 			String deviceJarBasePath = FileUtils.getDevicePluginJarBasePath();
 			Settings.log.logp(java.util.logging.Level.CONFIG, Settings.$CLASS_NAME, $METHOD_NAME, "deviceJarBasePath = " + deviceJarBasePath); //$NON-NLS-1$
 			String[] files = new File(deviceJarBasePath).list();
+			if (files == null) {
+				log.log(Level.SEVERE, String.format("check if %s is an existing directory", deviceJarBasePath));
+				throw new NullPointerException(String.format("directory %s does not exist", deviceJarBasePath));
+			}
 			for (String jarFileName : files) {
 				if (!jarFileName.endsWith(GDE.FILE_ENDING_DOT_JAR)) continue;
 				JarFile jarFile = null;
@@ -1311,7 +1315,7 @@ public final class Settings extends Properties {
 	 */
 	public int[] getGridDashStyle() {
 		String[] gridLineStyle = this.getProperty(Settings.GRID_DASH_STYLE, "10, 10").split(GDE.STRING_COMMA); //$NON-NLS-1$
-		return new int[] { new Integer(gridLineStyle[0].trim()).intValue(), new Integer(gridLineStyle[1].trim()).intValue() };
+		return new int[] { Integer.valueOf(gridLineStyle[0].trim()).intValue(), Integer.valueOf(gridLineStyle[1].trim()).intValue() };
 	}
 
 	/**
@@ -1333,7 +1337,7 @@ public final class Settings extends Properties {
 	 * @return the grid horizontal type of the compare window (0=none;1=each,2=eachSecond)
 	 */
 	public int getGridCompareWindowHorizontalType() {
-		return new Integer(this.getProperty(Settings.GRID_COMPARE_WINDOW_HOR_TYPE, "0").trim()).intValue(); //$NON-NLS-1$
+		return Integer.valueOf(this.getProperty(Settings.GRID_COMPARE_WINDOW_HOR_TYPE, "0").trim()).intValue(); //$NON-NLS-1$
 	}
 
 	/**
@@ -1371,7 +1375,7 @@ public final class Settings extends Properties {
 	 * @return the grid vertical type of the compare window (0=none;1=each,2=mod60)
 	 */
 	public int getGridCompareWindowVerticalType() {
-		return new Integer(this.getProperty(Settings.GRID_COMPARE_WINDOW_VER_TYPE, "0").trim()).intValue(); //$NON-NLS-1$
+		return Integer.valueOf(this.getProperty(Settings.GRID_COMPARE_WINDOW_VER_TYPE, "0").trim()).intValue(); //$NON-NLS-1$
 	}
 
 	/**
@@ -1601,7 +1605,7 @@ public final class Settings extends Properties {
 	 * @return the alphablending value
 	 */
 	public int getDialogAlphaValue() {
-		return new Integer(this.getProperty(Settings.ALPHA_BLENDING_VALUE, "50").trim()).intValue(); //$NON-NLS-1$
+		return Integer.valueOf(this.getProperty(Settings.ALPHA_BLENDING_VALUE, "50").trim()).intValue(); //$NON-NLS-1$
 	}
 
 	/**
@@ -2182,9 +2186,9 @@ public final class Settings extends Properties {
 	 */
 	private Color getColor(String colorKey, String colorDefault) {
 		String color = this.getProperty(colorKey, colorDefault); // CELL_VOLTAGE_SURROUND_BACKGRD, "250,249,230"
-		int r = new Integer(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-		int g = new Integer(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-		int b = new Integer(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+		int r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
+		int g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
+		int b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
 		return SWTResourceManager.getColor(r, g, b);
 	}
 
