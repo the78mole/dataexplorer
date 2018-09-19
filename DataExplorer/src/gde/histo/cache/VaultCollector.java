@@ -298,9 +298,6 @@ public final class VaultCollector {
 		IDevice device = analyzer.getActiveDevice();
 		StatisticsType measurementStatistics = device.getChannelMeasuremts(this.vault.getLogChannelNumber()).get(record.getOrdinal()).getStatistics();
 
-		entryPoints.addPoint(TrailTypes.REAL_FIRST, transmuteValue(record, record.elementAt(0)));
-		entryPoints.addPoint(TrailTypes.REAL_LAST, transmuteValue(record, record.elementAt(record.realSize() - 1)));
-
 		int triggerRefOrdinal = -1;
 		if (measurementStatistics.getTriggerRefOrdinal() != null) {
 			int tmpOrdinal = measurementStatistics.getTriggerRefOrdinal().intValue();
@@ -400,9 +397,6 @@ public final class VaultCollector {
 			// all counters are internally stored multiplied by thousand
 			entryPoints.addPoint(TrailTypes.REAL_COUNT_TRIGGERED, transmuteScalar(record, countValue * 1000));
 		}
-
-		// all counters are internally stored multiplied by thousand
-		entryPoints.addPoint(TrailTypes.REAL_COUNT, transmuteScalar(record, record.realSize() * 1000));
 	}
 
 	/**
@@ -446,13 +440,13 @@ public final class VaultCollector {
 			UniversalQuantile<? extends Number> rawQuantile = Coding.BITS.toValueQuantile(record, analyzer.getSettings());
 			rawMax = (int) Math.round(rawQuantile.getQuartile4());
 			rawBitwiseOr = rawQuantile.getOrFigure();
-			log.finer(() -> "isBits " +  rawQuantile.getQuartile4() + "   " + rawQuantile.getOrFigure());
+			log.finer(() -> "isBits " + rawQuantile.getQuartile4() + "   " + rawQuantile.getOrFigure());
 			quantile = Coding.BITS.toIndexQuantile(record, analyzer.getSettings());
 		} else if (channelItem.isTokens()) {
 			UniversalQuantile<? extends Number> rawQuantile = Coding.TOKENS.toValueQuantile(record, analyzer.getSettings());
 			rawMax = (int) Math.round(rawQuantile.getQuartile4());
 			rawBitwiseOr = rawQuantile.getOrFigure();
-			log.finer(() -> "isToken " +  rawQuantile.getQuartile4() + "   " + rawQuantile.getOrFigure());
+			log.finer(() -> "isToken " + rawQuantile.getQuartile4() + "   " + rawQuantile.getOrFigure());
 			quantile = Coding.TOKENS.toIndexQuantile(record, analyzer.getSettings());
 		} else {
 			rawMax = rawBitwiseOr = 0;
@@ -469,6 +463,9 @@ public final class VaultCollector {
 		// raw points without multiplying by 1000 in order to not loose the bits 22 to 31
 		entryPoints.addPoint(TrailTypes.RAW_BITS, rawBitwiseOr);
 		entryPoints.addPoint(TrailTypes.RAW_MAX, rawMax);
+
+		entryPoints.addPoint(TrailTypes.REAL_FIRST, transmuteValue(record, record.elementAt(0)));
+		entryPoints.addPoint(TrailTypes.REAL_LAST, transmuteValue(record, record.elementAt(record.realSize() - 1)));
 
 		entryPoints.addPoint(TrailTypes.AVG, encoder.apply(quantile.getAvgFigure()));
 		entryPoints.addPoint(TrailTypes.MAX, encoder.apply(quantile.getPopulationMaxFigure()));
@@ -489,6 +486,9 @@ public final class VaultCollector {
 		// trigger trail types sum are not supported for measurements
 		entryPoints.addPoint(TrailTypes.SUM, 0);
 		entryPoints.addPoint(TrailTypes.COUNT, encoder.apply((double) quantile.getSize()));
+
+		// all counters are internally stored multiplied by thousand
+		entryPoints.addPoint(TrailTypes.REAL_COUNT, encoder.apply((double) record.realSize()));
 	}
 
 	/**
