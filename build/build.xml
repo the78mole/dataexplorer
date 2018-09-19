@@ -404,6 +404,10 @@
 		<ant antfile="build.xml" target="package" dir="Devo-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="CSVImport" inheritall="true" />
 		<!-- add new device here -->
+	</target>
+	
+	<!-- none UI Package -->
+	<target name="non_ui_package" depends="init">
 		<ant antfile="build.xml" target="nonui_package" dir="DataExplorer" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="Picolario" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="AkkuMaster" inheritall="true" />
