@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -46,11 +45,9 @@ import gde.device.PropertyType;
 import gde.device.StatisticsType;
 import gde.log.Level;
 import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
+import gde.utils.ColorUtils;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * @author Winfried Brügmann
@@ -138,7 +135,7 @@ public class Record extends AbstractRecord implements IRecord {
 	Vector<TriggerRange>					triggerRanges							= null;
 	List<PropertyType>						properties								= new ArrayList<PropertyType>();				// offset, factor, reduction, ...
 	boolean												isPositionLeft						= true;
-	Color													color											= DataExplorer.COLOR_BLACK;
+	String												rgb												= "0,0,0";
 	int														lineWidth									= 1;
 	int														lineStyle									= SWT.LINE_SOLID;
 	protected boolean							isRoundOut								= false;
@@ -379,7 +376,7 @@ public class Record extends AbstractRecord implements IRecord {
 		this.numberFormat = record.numberFormat;
 		this.isVisible = record.isVisible;
 		this.isPositionLeft = record.isPositionLeft;
-		this.color = SWTResourceManager.getColor(record.color.getRGB().red, record.color.getRGB().green, record.color.getRGB().blue);
+		this.rgb = record.rgb;
 		this.lineWidth = record.lineWidth;
 		this.lineStyle = record.lineStyle;
 		this.isRoundOut = record.isRoundOut;
@@ -471,7 +468,7 @@ public class Record extends AbstractRecord implements IRecord {
 		this.numberFormat = record.numberFormat;
 		this.isVisible = record.isVisible;
 		this.isPositionLeft = record.isPositionLeft;
-		this.color = SWTResourceManager.getColor(record.color.getRGB().red, record.color.getRGB().green, record.color.getRGB().blue);
+		this.rgb = record.rgb;
 		this.lineWidth = record.lineWidth;
 		this.lineStyle = record.lineStyle;
 		this.isRoundOut = record.isRoundOut;
@@ -516,62 +513,7 @@ public class Record extends AbstractRecord implements IRecord {
 	 * @param recordOrdinal
 	 */
 	public void setColorDefaultsAndPosition(int recordOrdinal) {
-		// set color defaults
-		switch (recordOrdinal) {
-		case 0: // erste Kurve
-			this.color = SWTResourceManager.getColor(0, 0, 255); // (SWT.COLOR_BLUE));
-			break;
-		case 1: // zweite Kurve
-			this.color = SWTResourceManager.getColor(0, 128, 0); // SWT.COLOR_DARK_GREEN));
-			break;
-		case 2: // dritte Kurve
-			this.color = SWTResourceManager.getColor(128, 0, 0); // (SWT.COLOR_DARK_RED));
-			break;
-		case 3: // vierte Kurve
-			this.color = SWTResourceManager.getColor(255, 0, 255); // (SWT.COLOR_MAGENTA));
-			break;
-		case 4: // fünfte Kurve
-			this.color = SWTResourceManager.getColor(64, 0, 64); // (SWT.COLOR_CYAN));
-			break;
-		case 5: // sechste Kurve
-			this.color = SWTResourceManager.getColor(0, 128, 128); // (SWT.COLOR_DARK_YELLOW));
-			break;
-		case 6: // Kurve
-			this.color = SWTResourceManager.getColor(128, 128, 0);
-			break;
-		case 7: // Kurve
-			this.color = SWTResourceManager.getColor(128, 0, 128);
-			break;
-		case 8: // Kurve
-			this.color = SWTResourceManager.getColor(0, 128, 255);
-			break;
-		case 9: // Kurve
-			this.color = SWTResourceManager.getColor(128, 255, 0);
-			break;
-		case 10: // Kurve
-			this.color = SWTResourceManager.getColor(255, 0, 128);
-			break;
-		case 11: // Kurve
-			this.color = SWTResourceManager.getColor(0, 64, 128);
-			break;
-		case 12: // Kurve
-			this.color = SWTResourceManager.getColor(64, 128, 0);
-			break;
-		case 13: // Kurve
-			this.color = SWTResourceManager.getColor(128, 0, 64);
-			break;
-		case 14: // Kurve
-			this.color = SWTResourceManager.getColor(128, 64, 0);
-			break;
-		case 15: // Kurve
-			this.color = SWTResourceManager.getColor(0, 128, 64);
-			break;
-		default:
-			Random rand = new Random();
-			this.color = SWTResourceManager.getColor(rand.nextInt() & 0xff, rand.nextInt() & 0xff, rand.nextInt() & 0xff); // (SWT.COLOR_GREEN));
-			break;
-		}
-		// set position defaults
+		this.rgb = ColorUtils.getDefaultRgb(recordOrdinal);
 		if (recordOrdinal % 2 == 0) {
 			this.setPositionLeft(true); // position left
 		} else {
@@ -684,16 +626,16 @@ public class Record extends AbstractRecord implements IRecord {
 	}
 
   /**
-   * @return the color of the first visible record with synced scale to match behavior of getSyncMasterName()
+   * Related to the first visible record with synced scale to match behavior of getSyncMasterName()
+	 * @return the CSV value (e.g. 0,0,0 for black)
    */
-  public Color getSyncMasterColor() {
-    Color color = this.color;
-      Vector<Record> scaleSyncedRecords = this.parent.getScaleSyncedRecords(this.ordinal);
+  public String getSyncMasterRGB() {
+  	Vector<Record> scaleSyncedRecords = this.parent.getScaleSyncedRecords(this.ordinal);
       for (final Record tmpRecord : scaleSyncedRecords) {
           if (tmpRecord.isVisible && tmpRecord.isDisplayable && tmpRecord.realSize() > 1)
-              return tmpRecord.color;
+              return tmpRecord.rgb;
       }
-    return color;
+    return this.rgb;
   }
 
 	/**
@@ -1203,13 +1145,9 @@ public class Record extends AbstractRecord implements IRecord {
 		this.isPositionLeft = enabled;
 	}
 
-	public Color getColor() {
-		return this.color;
-	}
-
 	@Override
 	public String getRGB() {
-		return String.format("%d,%d,%d", this.color.getRed(), this.color.getGreen(), this.color.getBlue());
+		return this.rgb;
 	}
 
 	/**
@@ -1217,11 +1155,11 @@ public class Record extends AbstractRecord implements IRecord {
 	 */
 	@Override
 	public void setRGB(String rgb) {
-		throw new NotImplementedException();
+		this.rgb = rgb;
 	}
 
 	public void setColor(Color newColor) {
-		this.color = newColor;
+		this.rgb = String.format("%d,%d,%d", newColor.getRed(), newColor.getGreen(), newColor.getBlue());
 	}
 
 	@Override
@@ -2116,8 +2054,7 @@ public class Record extends AbstractRecord implements IRecord {
 		sb.append(DEFINED_MAX_VALUE).append(GDE.STRING_EQUAL).append(this.maxScaleValue).append(DELIMITER);
 		sb.append(DEFINED_MIN_VALUE).append(GDE.STRING_EQUAL).append(this.minScaleValue).append(DELIMITER);
 		sb.append(IS_POSITION_LEFT).append(GDE.STRING_EQUAL).append(this.isPositionLeft).append(DELIMITER);
-		sb.append(COLOR).append(GDE.STRING_EQUAL).append(this.color.getRed()).append(GDE.STRING_COMMA).append(this.color.getGreen()).append(GDE.STRING_COMMA).append(this.color.getBlue())
-				.append(DELIMITER);
+		sb.append(COLOR).append(GDE.STRING_EQUAL).append(this.rgb).append(DELIMITER);
 		sb.append(LINE_WITH).append(GDE.STRING_EQUAL).append(this.lineWidth).append(DELIMITER);
 		sb.append(LINE_STYLE).append(GDE.STRING_EQUAL).append(this.lineStyle).append(DELIMITER);
 		sb.append(IS_ROUND_OUT).append(GDE.STRING_EQUAL).append(this.isRoundOut).append(DELIMITER);
@@ -2156,8 +2093,7 @@ public class Record extends AbstractRecord implements IRecord {
 		tmpValue = recordProps.get(IS_POSITION_LEFT);
 		if (tmpValue != null && tmpValue.length() > 0) this.isPositionLeft = Boolean.valueOf(tmpValue.trim());
 		tmpValue = recordProps.get(COLOR);
-		if (tmpValue != null && tmpValue.length() >= 5) this.color = SWTResourceManager.getColor(Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[0]),
-				Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[1]), Integer.valueOf(tmpValue.split(GDE.STRING_COMMA)[2]));
+		if (tmpValue != null && tmpValue.length() >= 5) this.rgb = tmpValue;
 		tmpValue = recordProps.get(LINE_WITH);
 		if (tmpValue != null && tmpValue.length() > 0) this.lineWidth = Integer.valueOf(tmpValue.trim()).intValue();
 		tmpValue = recordProps.get(LINE_STYLE);

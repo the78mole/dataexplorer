@@ -30,6 +30,7 @@ import gde.data.RecordSet;
 import gde.device.IDevice;
 import gde.log.Level;
 import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
 
 /**
  * This class contains utilities to draw curves and vertical scales
@@ -161,8 +162,10 @@ public class CurveUtils {
 		boolean isPositionLeft = record.isPositionLeft();
 		int positionNumber = isCompareSet ? 0 : parent.getAxisPosition(recordName, isPositionLeft);
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordName + " positionNumber = " + positionNumber); //$NON-NLS-1$
-		if (isDrawScaleInRecordColor) gc.setForeground(record.isScaleSyncMaster() ? record.getSyncMasterColor() : record.getColor()); // draw the main scale line in same color as the curve
-		else gc.setForeground(DataExplorer.COLOR_BLACK);
+		if (isDrawScaleInRecordColor) {
+			String rgb = record.isScaleSyncMaster() ? record.getSyncMasterRGB() : record.getRGB();
+			gc.setForeground(SWTResourceManager.getColor(rgb)); // draw the main scale line in same color as the curve
+		}	else gc.setForeground(DataExplorer.COLOR_BLACK);
 		if (isPositionLeft) {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0+1, xPos, y0-height-1); //xPos = x0
@@ -170,7 +173,7 @@ public class CurveUtils {
 			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks, isDrawNumbersInRecordColor);
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "drawText x = " + (xPos - pt.y - 15)); //xPosition Text Spannung [] //$NON-NLS-1$
 			if (!isCompareSet) {
-				if (isDrawNameInRecordColor) gc.setForeground(record.getColor());
+				if (isDrawNameInRecordColor) gc.setForeground(SWTResourceManager.getColor(record.getRGB()));
 				else gc.setForeground(DataExplorer.COLOR_BLACK);
 				GraphicsUtils.drawTextCentered(graphText, (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
 			}
@@ -181,7 +184,7 @@ public class CurveUtils {
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); //yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks, isDrawNumbersInRecordColor);
 			if (!isCompareSet) {
-				if (isDrawNameInRecordColor) gc.setForeground(record.getColor());
+				if (isDrawNameInRecordColor) gc.setForeground(SWTResourceManager.getColor(record.getRGB()));
 				else gc.setForeground(DataExplorer.COLOR_BLACK);
 				GraphicsUtils.drawTextCentered(graphText, (xPos + scaleWidthSpace - pt.y - 5), y0 / 2 + (y0 - height), gc, SWT.UP);
 			}
@@ -209,7 +212,7 @@ public class CurveUtils {
 		RecordSet parent = (record.getParent());
 
 		// set line properties according adjustment
-		gc.setForeground(record.getColor());
+		gc.setForeground(SWTResourceManager.getColor(record.getRGB()));
 		gc.setLineWidth(record.getLineWidth());
 		gc.setLineStyle(record.getLineStyle());
 

@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.tab;
@@ -84,7 +84,7 @@ public class AnalogDisplay extends Composite {
 	final Channel									channel;
 	final String									recordKey;
 	final IDevice									device;
-	
+
 	final Color										backgroundColor;
 	final Menu										popupmenu;
 	final TabAreaContextMenu			contextMenu;
@@ -93,7 +93,7 @@ public class AnalogDisplay extends Composite {
 	Record									record;
 
 	/**
-	 * 
+	 *
 	 */
 	public AnalogDisplay(Composite analogMainComposite, String currentRecordKey, IDevice currentDevice) {
 		super(analogMainComposite, SWT.BORDER);
@@ -104,7 +104,7 @@ public class AnalogDisplay extends Composite {
 		analogDisplayLData.verticalAlignment = GridData.FILL;
 		analogDisplayLData.horizontalAlignment = GridData.FILL;
 		this.setLayoutData(analogDisplayLData);
-		this.setLayout(AnalogDisplayLayout);		
+		this.setLayout(AnalogDisplayLayout);
 		this.application = DataExplorer.getInstance();
 		this.recordKey = currentRecordKey;
 		this.device = currentDevice;
@@ -117,12 +117,12 @@ public class AnalogDisplay extends Composite {
 			else {
 				this.record = null;
 			}
-		}	
+		}
 		else {
 			this.recordSet = null;
 			this.record = null;
 		}
-		
+
 		this.backgroundColor = Settings.getInstance().getAnalogInnerAreaBackground();
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.contextMenu = new TabAreaContextMenu();
@@ -131,6 +131,7 @@ public class AnalogDisplay extends Composite {
 
 	public void create() {
 		this.addHelpListener(new HelpListener() {
+			@Override
 			public void helpRequested(HelpEvent evt) {
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "AnalogDisplay.helpRequested " + evt); //$NON-NLS-1$
 				DataExplorer.getInstance().openHelpDialog("", "HelpInfo_8.html"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -139,6 +140,7 @@ public class AnalogDisplay extends Composite {
 		this.tacho = new Canvas(this, SWT.NONE);
 		this.tacho.setMenu(this.popupmenu);
 		this.tacho.addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(PaintEvent evt) {
 				AnalogDisplay.this.recordSet = AnalogDisplay.this.channel.getActiveRecordSet();
 				if (AnalogDisplay.this.recordSet != null) {
@@ -148,7 +150,7 @@ public class AnalogDisplay extends Composite {
 			}
 		});
 		this.textAnalogLabel = new CLabel(this.tacho, SWT.CENTER);
-		this.textAnalogLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD)); 
+		this.textAnalogLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD));
 		this.textAnalogLabel.setBackground(this.backgroundColor);
 		this.textAnalogLabel.setForeground(DataExplorer.COLOR_BLACK);
 		this.textAnalogLabel.setBounds(0, 0, this.tacho.getSize().x, this.textHeight);
@@ -157,7 +159,7 @@ public class AnalogDisplay extends Composite {
 
 	void tachoPaintControl(PaintEvent evt) {
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "tacho.paintControl, event=" + evt); //$NON-NLS-1$
-		
+
 		if (this.record != null) {
 			// Get the canvas and its dimensions to check if size changed
 			this.tachoImageBounds = ((Canvas) evt.widget).getClientArea();
@@ -187,7 +189,7 @@ public class AnalogDisplay extends Composite {
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "radius = " + this.radius + " height = " + this.height + " width = " + this.width);
 			this.angleStart = -20;
 			this.angleDelta = 220;
-			this.tachoImageGC.setForeground(this.record.getColor());
+			this.tachoImageGC.setForeground(SWTResourceManager.getColor(this.record.getRGB()));
 			this.tachoImageGC.setLineWidth(4);
 			this.tachoImageGC.drawArc(this.centerX - this.radius, this.centerY - this.radius, 2 * this.radius, 2 * this.radius, this.angleStart, this.angleDelta);
 			this.tachoImageGC.setForeground(DataExplorer.COLOR_BLACK);
@@ -206,7 +208,7 @@ public class AnalogDisplay extends Composite {
 				dxtick = Double.valueOf((tickRadius + 10) * Math.cos(angle * Math.PI / 180)).intValue();
 				dytick = Double.valueOf((tickRadius + 10) * Math.sin(angle * Math.PI / 180)).intValue();
 				this.tachoImageGC.drawLine(this.centerX - dxtick, this.centerY - dytick, this.centerX - dxr, this.centerY - dyr);
-	
+
 				dxtext = Double.valueOf((this.radius + 30) * Math.cos(angle * Math.PI / 180)).intValue();
 				dytext = Double.valueOf((this.radius + 30) * Math.sin(angle * Math.PI / 180)).intValue();
 				String valueText = df.format(this.minValue + (i * deltaValue));
@@ -220,12 +222,12 @@ public class AnalogDisplay extends Composite {
 			this.tachoImageGC.setBackground(DataExplorer.COLOR_BLACK);
 			knobRradius = Double.valueOf(this.radius / 10.0 * 0.2).intValue();
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
-	
+
 			evt.gc.drawImage(this.tachoImage, 0, 0, this.width, this.height, 0, 0, this.width, this.height);
-	
+
 			if (this.record.size() > 0) {
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "record name = " + this.recordKey); //$NON-NLS-1$
-	
+
 				// get min max values and check if this has been changed
 				double tmpMinValue = this.record.isScaleSynced() ? this.record.getSyncMinValue() : this.record.getMinValue();
 				tmpMinValue = this.device.translateValue(this.record, tmpMinValue / 1000.0);
@@ -239,7 +241,7 @@ public class AnalogDisplay extends Composite {
 					this.maxValue = tmpMaxValue;
 					redraw(this.tachoImageBounds.x, this.tachoImageBounds.y, this.tachoImageBounds.width, this.tachoImageBounds.height, true);
 				}
-	
+
 				//draw the new needle if required
 				Rectangle damageBounds = getNeedleBounds();
 				double tmpActualValue = this.device.translateValue(this.record, (this.record.lastElement() / 1000.0));
@@ -249,7 +251,7 @@ public class AnalogDisplay extends Composite {
 					damageBounds = getNeedleBounds();
 					redraw(damageBounds.x, damageBounds.y, damageBounds.width, damageBounds.height, true);
 				}
-	
+
 				drawTachoNeedle(evt.gc, DataExplorer.COLOR_BLACK);
 			}
 			this.tachoImageGC.dispose();
@@ -290,14 +292,14 @@ public class AnalogDisplay extends Composite {
 
 	/**
 	 * updates the needle polygon and calculates the actual needle bounds to enable redraw of exact this area
-	 * @return rectangle bounds of the area where the needle is drawn 
+	 * @return rectangle bounds of the area where the needle is drawn
 	 */
 	Rectangle getNeedleBounds() {
 		calculateNeedle(); // make this actual
-		
+
 		int x = this.needle[0], xWidth = this.needle[0];
 		int y = this.needle[1], yHeight = this.needle[1];
-		
+
 		for (int i = 0; i < this.needle.length; i+=2) {
 			x = x < this.needle[i] ? x : this.needle[i];
 			xWidth = xWidth > this.needle[i] ? xWidth : this.needle[i];
@@ -306,10 +308,10 @@ public class AnalogDisplay extends Composite {
 			y = y < this.needle[i] ? y : this.needle[i];
 			yHeight = yHeight > this.needle[i] ? yHeight : this.needle[i];
 		}
-		
+
 		return new Rectangle(x, y, xWidth-x, yHeight-y);
 	}
-	
+
 	/**
 	 * updates the tacho needle if position has been changed
 	 * - this may initiate redraw of the whole tacho if scale values are changed

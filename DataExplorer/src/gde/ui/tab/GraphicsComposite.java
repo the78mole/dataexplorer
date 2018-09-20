@@ -1853,7 +1853,7 @@ public class GraphicsComposite extends Composite {
 			for (int i = 0, yPos = 30 + this.canvasBounds.height + 5; i < numberCompareSetRecords; ++i, yPos += 20) {
 				Record compareRecord = compareRecordSet.get(i);
 				if (compareRecord != null) {
-					graphicsGC.setForeground(compareRecord.getColor());
+					graphicsGC.setForeground(SWTResourceManager.getColor(compareRecord.getRGB()));
 					String recordName = "--- " + compareRecord.getName(); //$NON-NLS-1$
 					GraphicsUtils.drawText(recordName, 20, yPos, graphicsGC, SWT.HORIZONTAL);
 					graphicsGC.setForeground(this.recordSetComment.getForeground());

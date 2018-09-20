@@ -285,7 +285,7 @@ public class SelectorComposite extends Composite {
 					//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, item.getText() + " " + itemWidth);
 					if (record.isDisplayable()) {
 						TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
-						item.setForeground(record.getColor());
+						item.setForeground(SWTResourceManager.getColor(record.getRGB()));
 						item.setText(record.getName());
 						if (record.isVisible()) {
 							isOneVisible = true;

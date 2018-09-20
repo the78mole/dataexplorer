@@ -479,6 +479,16 @@ public class SWTResourceManager {
 		}
 	}
 
+	public static Color getColor(String rgb) {
+		String name = "COLOR:" + rgb; //$NON-NLS-1$
+		if (resources.containsKey(name)) return (Color) resources.get(name);
+		Color color = new Color(Display.getDefault(), Integer.parseInt(rgb.split(GDE.STRING_COMMA)[0]), Integer.parseInt(rgb.split(GDE.STRING_COMMA)[1]),
+				Integer.parseInt(rgb.split(GDE.STRING_COMMA)[2]));
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "new color created = " + name); //$NON-NLS-1$
+		resources.put(name, color);
+		return color;
+	}
+
 	public static Color getColor(int swtColor) {
 		String name = "COLOR:" + swtColor; //$NON-NLS-1$
 		if (resources.containsKey(name))

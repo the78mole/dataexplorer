@@ -306,9 +306,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				Record record = recordSet.get(i);
 				this.template.setProperty(i + Record.IS_VISIBLE, Boolean.valueOf(record.isVisible()).toString());
 				this.template.setProperty(i + Record.IS_POSITION_LEFT, Boolean.valueOf(record.isPositionLeft()).toString());
-				Color color = record.getColor();
-				String rgb = color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue;
-				this.template.setProperty(i + Record.COLOR, rgb);
+				this.template.setProperty(i + Record.COLOR, record.getRGB());
 				this.template.setProperty(i + Record.LINE_WITH, Integer.valueOf(record.getLineWidth()).toString());
 				this.template.setProperty(i + Record.LINE_STYLE, Integer.valueOf(record.getLineStyle()).toString());
 				this.template.setProperty(i + Record.IS_ROUND_OUT, Boolean.valueOf(record.isRoundOut()).toString());
@@ -407,7 +405,7 @@ public class Channel extends HashMap<String, RecordSet> {
 					if(log.isLoggable(Level.FINER)) log.log(Level.FINER, "lastActiveRecord = " + lastActiveRecord.name + " isVisible=" + lastActiveRecord.isVisible + " isPositionLeft=" + lastActiveRecord.isPositionLeft + " isStartpointZero=" + lastActiveRecord.isStartpointZero);
 					record.setVisible(lastActiveRecord.isVisible);
 					record.setPositionLeft(lastActiveRecord.isPositionLeft);
-					record.setColor(lastActiveRecord.color);
+					record.setRGB(lastActiveRecord.getRGB());
 					record.setLineWidth(lastActiveRecord.lineWidth);
 					record.setLineStyle(lastActiveRecord.lineStyle);
 					record.setRoundOut(lastActiveRecord.isRoundOut);

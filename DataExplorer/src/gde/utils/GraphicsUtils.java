@@ -134,7 +134,7 @@ public class GraphicsUtils {
 					gc.drawLine(x0, yPosMini, x0 - ticklength / 2, yPosMini);
 				}
 				// draw numbers to the scale
-				if (isDrawNumbersInRecordColor) gc.setForeground(record.getColor());
+				if (isDrawNumbersInRecordColor) gc.setForeground(SWTResourceManager.getColor(record.getRGB()));
 				else gc.setForeground(DataExplorer.COLOR_BLACK);
 				drawTextCentered(record.getFormattedScaleValue(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 				gc.setForeground(DataExplorer.COLOR_BLACK);
@@ -151,7 +151,7 @@ public class GraphicsUtils {
 		else {
 			int yTickPosition = (int) (y0 - height / 2.0);
 			gc.drawLine(x0, yTickPosition, x0 - ticklength, yTickPosition);
-			if (isDrawNumbersInRecordColor) gc.setForeground(record.getColor());
+			if (isDrawNumbersInRecordColor) gc.setForeground(SWTResourceManager.getColor(record.getRGB()));
 			else gc.setForeground(DataExplorer.COLOR_BLACK);
 			drawTextCentered(record.getFormattedScaleValue((minScaleValue + minScaleValue) / 2.0), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 			if (isBuildGridVector) horizontalGrid.add(yTickPosition);

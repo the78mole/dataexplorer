@@ -637,14 +637,14 @@ public class CellVoltageWindow extends CTabItem {
 				String[] recordKeys = activeRecordSet.getActiveRecordNames();
 				Record record_U = activeRecordSet.get(recordKeys[this.firstMeasurement]); // voltage U
 				if (record_U != null) {
-					this.voltageValue.setForeground(record_U.getColor());
+					this.voltageValue.setForeground(SWTResourceManager.getColor(record_U.getRGB()));
 					this.voltageValue.setText(new DecimalFormat("0.00").format(device.translateValue(record_U, (record_U.getLast() / 1000.0)))); //$NON-NLS-1$
 					this.voltageUnit.setText("[" + record_U.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 					this.voltageValue.redraw();
 				}
 				Record record_C = activeRecordSet.get(recordKeys[this.secondMeasurement]); // capacitiy C
 				if (record_C != null) {
-					this.capacitiyValue.setForeground(record_C.getColor());
+					this.capacitiyValue.setForeground(SWTResourceManager.getColor(record_C.getRGB()));
 					this.capacitiyValue.setText(new DecimalFormat("0").format(device.translateValue(record_C, (record_C.getLast() / 1000.0)))); //$NON-NLS-1$
 					this.capacityUnit.setText("[" + record_C.getUnit() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
 					this.capacitiyValue.redraw();

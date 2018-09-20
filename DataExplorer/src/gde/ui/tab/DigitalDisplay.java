@@ -86,6 +86,7 @@ public class DigitalDisplay extends Composite {
 	public void create() {
 		{
 			this.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(final PaintEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
@@ -101,7 +102,7 @@ public class DigitalDisplay extends Composite {
 								String maxValue = Messages.getString(MessageIds.GDE_MSGT0236) + record.getFormattedStatisticsValue(record.getMaxValue() / 1000.0);
 								String minValue = Messages.getString(MessageIds.GDE_MSGT0237) + record.getFormattedStatisticsValue(record.getMinValue() / 1000.0);
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, DigitalDisplay.this.recordKey + " actualValue=" + actualValue + " maxValue=" + maxValue + " minValue=" + minValue); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-								DigitalDisplay.this.actualDigitalLabel.setForeground(record.getColor());
+								DigitalDisplay.this.actualDigitalLabel.setForeground(SWTResourceManager.getColor(record.getRGB()));
 								DigitalDisplay.this.actualDigitalLabel.setText(actualValue);
 								DigitalDisplay.this.maxDigitalLabel.setText(maxValue);
 								DigitalDisplay.this.minDigitalLabel.setText(minValue);
@@ -111,6 +112,7 @@ public class DigitalDisplay extends Composite {
 				}
 			});
 			this.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "DigitalDisplay.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_7.html"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -121,6 +123,7 @@ public class DigitalDisplay extends Composite {
 			this.textDigitalLabel.setBackground(this.backgroundColor);
 			this.textDigitalLabel.setMenu(this.popupmenu);
 			this.textDigitalLabel.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(final PaintEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
@@ -144,6 +147,7 @@ public class DigitalDisplay extends Composite {
 			this.actualDigitalLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + fontSize, SWT.NORMAL));
 			this.actualDigitalLabel.setMenu(this.popupmenu);
 			this.actualDigitalLabel.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(final PaintEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
@@ -154,7 +158,7 @@ public class DigitalDisplay extends Composite {
 							if (record != null && record.size() > 0) {
 								String actualValue = record.getFormattedStatisticsValue(record.lastElement() / 1000.0);
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, DigitalDisplay.this.recordKey + " actualValue=" + actualValue); //$NON-NLS-1$
-								DigitalDisplay.this.actualDigitalLabel.setForeground(record.getColor());
+								DigitalDisplay.this.actualDigitalLabel.setForeground(SWTResourceManager.getColor(record.getRGB()));
 								DigitalDisplay.this.actualDigitalLabel.setText(actualValue);
 							}
 						}
@@ -173,6 +177,7 @@ public class DigitalDisplay extends Composite {
 			this.minDigitalLabel.setBackground(this.backgroundColor);
 			this.minDigitalLabel.setMenu(this.popupmenu);
 			this.minDigitalLabel.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(final PaintEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
@@ -196,6 +201,7 @@ public class DigitalDisplay extends Composite {
 			this.maxDigitalLabel.setBackground(this.backgroundColor);
 			this.maxDigitalLabel.setMenu(this.popupmenu);
 			this.maxDigitalLabel.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(final PaintEvent evt) {
 					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "digitalLabel.paintControl, event=" + evt); //$NON-NLS-1$
 					Channel activeChannel = DigitalDisplay.this.channels.getActiveChannel();
