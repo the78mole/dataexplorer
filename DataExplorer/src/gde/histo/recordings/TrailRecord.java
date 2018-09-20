@@ -26,14 +26,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.stream.DoubleStream;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 
 import gde.GDE;
 import gde.data.CommonRecord;
@@ -52,7 +50,7 @@ import gde.histo.guard.Reminder;
 import gde.histo.utils.ElementaryQuantile;
 import gde.histo.utils.Spot;
 import gde.log.Logger;
-import gde.ui.SWTResourceManager;
+import gde.utils.ColorUtils;
 
 /**
  * Hold histo data points of one measurement or settlement; score points are a third option.
@@ -72,7 +70,7 @@ public abstract class TrailRecord extends CommonRecord {
 
 		boolean				isVisible					= true;
 		boolean				isPositionLeft		= true;
-		Color					color							= SWTResourceManager.getColor(SWT.COLOR_BLACK);
+		String				rgb								= "0,0,0";
 		int						lineWidth					= 1;
 		int						lineStyle					= SWT.LINE_SOLID;
 		boolean				isRoundOut				= false;
@@ -91,7 +89,7 @@ public abstract class TrailRecord extends CommonRecord {
 			String recordName = record.getName();
 			template.setRecordProperty(recordName, Record.IS_VISIBLE, String.valueOf(isVisible));
 			template.setRecordProperty(recordName, Record.IS_POSITION_LEFT, String.valueOf(isPositionLeft));
-			template.setRecordProperty(recordName, Record.COLOR, color.getRGB().red + GDE.STRING_COMMA + color.getRGB().green + GDE.STRING_COMMA + color.getRGB().blue);
+			template.setRecordProperty(recordName, Record.COLOR, rgb);
 			template.setRecordProperty(recordName, Record.LINE_WITH, String.valueOf(lineWidth));
 			template.setRecordProperty(recordName, Record.LINE_STYLE, String.valueOf(lineStyle));
 			template.setRecordProperty(recordName, Record.IS_ROUND_OUT, String.valueOf(isRoundOut));
@@ -111,12 +109,7 @@ public abstract class TrailRecord extends CommonRecord {
 			String recordName = record.getName();
 			isVisible = Boolean.parseBoolean(template.getRecordProperty(recordName, Record.IS_VISIBLE, "false"));
 			isPositionLeft = Boolean.parseBoolean(template.getRecordProperty(recordName, Record.IS_POSITION_LEFT, "true"));
-			int r, g, b;
-			String tmpColor = template.getRecordProperty(recordName, Record.COLOR, record.getRGB());
-			r = Integer.parseInt(tmpColor.split(GDE.STRING_COMMA)[0].trim());
-			g = Integer.parseInt(tmpColor.split(GDE.STRING_COMMA)[1].trim());
-			b = Integer.parseInt(tmpColor.split(GDE.STRING_COMMA)[2].trim());
-			color = SWTResourceManager.getColor(r, g, b);
+			rgb = template.getRecordProperty(recordName, Record.COLOR, record.getRGB());
 			lineWidth = Integer.parseInt(template.getRecordProperty(recordName, Record.LINE_WITH, "1"));
 			lineStyle = Integer.parseInt(template.getRecordProperty(recordName, Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID));
 			isRoundOut = Boolean.parseBoolean(template.getRecordProperty(recordName, Record.IS_ROUND_OUT, "false"));
@@ -138,65 +131,6 @@ public abstract class TrailRecord extends CommonRecord {
 			this.isPositionLeft = recordOrdinal % 2 == 0;
 		}
 
-		/**
-		 * Method to initialize color defaults.
-		 */
-		public void setColorDefaults(int recordOrdinal) {
-			switch (recordOrdinal) {
-			case 0:
-				this.color = SWTResourceManager.getColor(0, 0, 255); // (SWT.COLOR_BLUE));
-				break;
-			case 1:
-				this.color = SWTResourceManager.getColor(0, 128, 0); // SWT.COLOR_DARK_GREEN));
-				break;
-			case 2:
-				this.color = SWTResourceManager.getColor(128, 0, 0); // (SWT.COLOR_DARK_RED));
-				break;
-			case 3:
-				this.color = SWTResourceManager.getColor(255, 0, 255); // (SWT.COLOR_MAGENTA));
-				break;
-			case 4:
-				this.color = SWTResourceManager.getColor(64, 0, 64); // (SWT.COLOR_CYAN));
-				break;
-			case 5:
-				this.color = SWTResourceManager.getColor(0, 128, 128); // (SWT.COLOR_DARK_YELLOW));
-				break;
-			case 6:
-				this.color = SWTResourceManager.getColor(128, 128, 0);
-				break;
-			case 7:
-				this.color = SWTResourceManager.getColor(128, 0, 128);
-				break;
-			case 8:
-				this.color = SWTResourceManager.getColor(0, 128, 255);
-				break;
-			case 9:
-				this.color = SWTResourceManager.getColor(128, 255, 0);
-				break;
-			case 10:
-				this.color = SWTResourceManager.getColor(255, 0, 128);
-				break;
-			case 11:
-				this.color = SWTResourceManager.getColor(0, 64, 128);
-				break;
-			case 12:
-				this.color = SWTResourceManager.getColor(64, 128, 0);
-				break;
-			case 13:
-				this.color = SWTResourceManager.getColor(128, 0, 64);
-				break;
-			case 14:
-				this.color = SWTResourceManager.getColor(128, 64, 0);
-				break;
-			case 15:
-				this.color = SWTResourceManager.getColor(0, 128, 64);
-				break;
-			default:
-				Random rand = new Random();
-				this.color = SWTResourceManager.getColor(rand.nextInt() & 0xff, rand.nextInt() & 0xff, rand.nextInt() & 0xff);
-				break;
-			}
-		}
 	}
 
 	protected final ChartTemplate template = new ChartTemplate();
@@ -532,7 +466,7 @@ public abstract class TrailRecord extends CommonRecord {
 	@Deprecated
 	public double getTime_ms(int index) {
 		throw new UnsupportedOperationException();
-// return this.parent.timeStep_ms.getTime_ms(index);
+		// return this.parent.timeStep_ms.getTime_ms(index);
 	}
 
 	/**
@@ -567,18 +501,20 @@ public abstract class TrailRecord extends CommonRecord {
 		this.template.isPositionLeft = enabled;
 	}
 
+	/**
+	 * @return the CSV value (e.g. 0,0,0 for black)
+	 */
 	@Override
-	public Color getColor() {
-		return this.template.color;
-	}
-
 	public String getRGB() {
-		return this.template.color.getRed() + GDE.STRING_CSV_SEPARATOR + this.template.color.getGreen() + GDE.STRING_CSV_SEPARATOR + this.template.color.getBlue();
+		return this.template.rgb;
 	}
 
+	/**
+	 * @param rgb is the CSV value (e.g. 0,0,0 for black)
+	 */
 	@Override
-	public void setColor(Color newColor) {
-		this.template.color = newColor;
+	public void setRGB(String rgb) {
+		this.template.rgb = rgb;
 	}
 
 	/**
@@ -810,7 +746,7 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	public void setColorDefaultsAndPosition(int recordOrdinal) {
-		template.setColorDefaults(recordOrdinal);
+		template.rgb = ColorUtils.getDefaultRgb(recordOrdinal);
 		template.setPositionLeft(recordOrdinal);
 	}
 
@@ -871,7 +807,8 @@ public abstract class TrailRecord extends CommonRecord {
 	}
 
 	/**
-	 * @return the lower/upper values for all trails or for the selected trail in case of a different number range than the measurement values (e.g. SD, counters)
+	 * @return the lower/upper values for all trails or for the selected trail in case of a different number range than the measurement values
+	 *         (e.g. SD, counters)
 	 */
 	public double[] defineExtrema() { // todo consider caching this result
 		int trailOrdinal = this.trailSelector.getTrailOrdinal();

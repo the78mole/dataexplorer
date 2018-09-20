@@ -50,6 +50,8 @@ import gde.ui.SWTResourceManager;
 import gde.utils.StringHelper;
 import gde.utils.TimeLine;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 /**
  * @author Winfried Brügmann
  *         class record holds data points of one measurement or line or curve
@@ -1201,16 +1203,23 @@ public class Record extends AbstractRecord implements IRecord {
 		this.isPositionLeft = enabled;
 	}
 
-	@Override
 	public Color getColor() {
 		return this.color;
 	}
 
+	@Override
 	public String getRGB() {
-		return String.format("%d, %d,%d", this.color.getRed(), this.color.getGreen(), this.color.getBlue());
+		return String.format("%d,%d,%d", this.color.getRed(), this.color.getGreen(), this.color.getBlue());
 	}
 
+	/**
+	 * @param rgb is the CSV value (e.g. 0,0,0 for black)
+	 */
 	@Override
+	public void setRGB(String rgb) {
+		throw new NotImplementedException();
+	}
+
 	public void setColor(Color newColor) {
 		this.color = newColor;
 	}

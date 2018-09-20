@@ -293,7 +293,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 		ChannelItems channelItems = new ChannelItems(analyzer);
 		channelItems.processItems(measurementAction, settlementAction, scoreGroupAction);
-		newTrailRecordSet.get(0).setColor(SWTResourceManager.getColor(0, 0, 0)); // top score group entry, set color to black
+		newTrailRecordSet.get(0).setRGB("0,0,0"); // top score group entry, set color to black
 
 		return newTrailRecordSet;
 	}

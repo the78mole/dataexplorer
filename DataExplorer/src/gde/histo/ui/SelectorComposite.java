@@ -54,6 +54,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.ui.menu.CurveSelectorContextMenu;
+import gde.utils.ColorUtils;
 
 /**
  * Composite with a header (Curve Selector, ..) and table rows for the curves.
@@ -304,7 +305,7 @@ public final class SelectorComposite extends Composite {
 				// log.fine(() -> item.getText() + " " + itemWidth);
 				{
 					TableItem item = new TableItem(this.curveSelectorTable, SWT.NULL);
-					item.setForeground(record.getColor());
+					item.setForeground(ColorUtils.getColor(record.getRGB()));
 					item.setData(DataExplorer.RECORD_NAME, record.getName());
 					item.setData(DataExplorer.NAME_REPLACEMENT, record.getNameReplacement());
 					item.setText(record.getNameReplacement().intern());

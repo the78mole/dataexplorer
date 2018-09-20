@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -47,6 +48,7 @@ import gde.histo.utils.SingleResponseRegression.RegressionType;
 import gde.histo.utils.Spot;
 import gde.log.Logger;
 import gde.ui.SWTResourceManager;
+import gde.utils.ColorUtils;
 
 /**
  * Curve measuring for the graphics window.
@@ -370,7 +372,7 @@ public final class CurveSurvey {
 			CurveSurvey.this.canvasGC.setLineDash(lineMark.lineDash);
 			CurveSurvey.this.canvasGC.setLineStyle(lineMark.lineStyle);
 			if (lineMark.lineColor == null)
-				CurveSurvey.this.canvasGC.setForeground(CurveSurvey.this.trailRecord.getColor());
+				CurveSurvey.this.canvasGC.setForeground(ColorUtils.getColor(CurveSurvey.this.trailRecord.getRGB()));
 			else
 				CurveSurvey.this.canvasGC.setForeground(SWTResourceManager.getColor(lineMark.lineColor));
 		}

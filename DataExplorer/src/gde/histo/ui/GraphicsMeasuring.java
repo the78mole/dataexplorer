@@ -35,6 +35,7 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
+import gde.utils.ColorUtils;
 import gde.utils.StringHelper;
 
 /**
@@ -199,7 +200,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 		Image canvasImage = this.graphicsComposite.canvasImage;
 		// set the gc properties
 		this.canvasGC = new GC(this.graphicsComposite.graphicCanvas);
-		this.canvasGC.setForeground(measure.measureRecord.getColor());
+		this.canvasGC.setForeground(ColorUtils.getColor(measure.measureRecord.getRGB()));
 
 		this.curveSurvey.setCanvasGC(this.canvasGC);
 		// all obsolete lines are cleaned up now draw new position marker
@@ -240,7 +241,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 	public void processMouseDownMove(long timestamp_ms) {
 		this.canvasGC = new GC(this.graphicsComposite.graphicCanvas);
 		this.curveSurvey.setCanvasGC(this.canvasGC);
-		this.canvasGC.setForeground(measure.measureRecord.getColor());
+		this.canvasGC.setForeground(ColorUtils.getColor(measure.measureRecord.getRGB()));
 
 		if (this.isLeftMouseMeasure) {
 			int height = graphicsComposite.curveAreaBounds.height;

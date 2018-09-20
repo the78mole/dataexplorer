@@ -29,6 +29,7 @@ import gde.histo.recordings.TrailRecordSet;
 import gde.histo.ui.data.SummarySpots;
 import gde.histo.ui.data.SummarySpots.Density;
 import gde.log.Logger;
+import gde.utils.ColorUtils;
 
 /**
  * Summary measuring activity mapper for mouse movements and other UI actions from menus, checkboxes etc.
@@ -69,18 +70,11 @@ public final class SummaryMeasuring extends AbstractMeasuring {
 	private void drawMeasuring(long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
 		// set the gc properties
 		this.canvasGC = new GC(this.summaryComposite.graphicCanvas);
-		this.canvasGC.setForeground(measure.measureRecord.getColor());
-
-// this.curveSurvey.setCanvasGC(this.canvasGC);
-// // all obsolete lines are cleaned up now draw new position marker
-// this.curveSurvey.cleanMeasurementPointer(canvasImage);
+		this.canvasGC.setForeground(ColorUtils.getColor(measure.measureRecord.getRGB()));
 
 		measure.setTimestampMeasure_ms(timestampMeasureNew_ms);
 		measure.setTimestampDelta_ms(timestampDeltaNew_ms);
 
-// curveSurvey.initialize();
-// curveSurvey.setMeasurePosition();
-// curveSurvey.setDeltaPosition();
 		drawModeMeasurement(this.canvasGC);
 		this.canvasGC.dispose();
 	}

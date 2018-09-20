@@ -22,8 +22,6 @@ package gde.data;
 import java.text.DecimalFormat;
 import java.util.Vector;
 
-import org.eclipse.swt.graphics.Color;
-
 import gde.data.Record.DataType;
 
 /**
@@ -78,9 +76,15 @@ public abstract class AbstractRecord extends Vector<Integer> {
 
 	public abstract void setPositionLeft(boolean enabled);
 
-	public abstract Color getColor();
+	/**
+	 * @return the CSV value (e.g. 0,0,0 for black)
+	 */
+	public abstract String getRGB();
 
-	public abstract void setColor(Color newColor);
+	/**
+	 * @param rgb is the CSV value (e.g. 0,0,0 for black)
+	 */
+	public abstract void setRGB(String newColor);
 
 	public abstract boolean isRoundOut();
 

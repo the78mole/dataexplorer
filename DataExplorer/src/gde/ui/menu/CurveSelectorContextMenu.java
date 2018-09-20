@@ -49,6 +49,7 @@ import gde.ui.SWTResourceManager;
 import gde.ui.dialog.AxisEndValuesDialog;
 import gde.ui.tab.GraphicsComposite.GraphicsMode;
 import gde.ui.tab.GraphicsWindow.GraphicsType;
+import gde.utils.ColorUtils;
 import gde.utils.TimeLine;
 
 /**
@@ -241,7 +242,7 @@ public class CurveSelectorContextMenu {
 						if (rgb != null) {
 							Color color = SWTResourceManager.getColor(rgb.red, rgb.green, rgb.blue);
 							CurveSelectorContextMenu.this.selectedItem.setForeground(color);
-							CurveSelectorContextMenu.this.actualRecord.setColor(color);
+							CurveSelectorContextMenu.this.actualRecord.setRGB(ColorUtils.toRGB(rgb.red, rgb.green, rgb.blue));
 							if (!CurveSelectorContextMenu.this.isRecordVisible) CurveSelectorContextMenu.this.actualRecord.setVisible(true);
 							//if (!CurveSelectorContextMenu.this.isTypeHisto) ((RecordSet) CurveSelectorContextMenu.this.recordSet).setUnsaved(RecordSet.UNSAVED_REASON_GRAPHICS);
 						}
