@@ -97,10 +97,10 @@ public class PolaronPro extends Polaron {
 				}
 				// 15=SpannungZelle8 16=SpannungZelle9 17=SpannungZelle10 18=SpannungZelle11 19=SpannungZelle12 20=SpannungZelle13 21=SpannungZelle14
 				for (int j = 0; i < 7; ++i, j += 2) {
-					points[i + 8] = DataParser.parse2Short(dataBuffer, j + 159);
-					if (points[i + 8] > 0) {
-						maxVotage = points[i + 8] > maxVotage ? points[i + 8] : maxVotage;
-						minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
+					points[i + 16] = DataParser.parse2Short(dataBuffer, j + 159);
+					if (points[i + 16] > 0) {
+						maxVotage = points[i + 16] > maxVotage ? points[i + 16] : maxVotage;
+						minVotage = points[i + 16] < minVotage ? points[i + 16] : minVotage;
 					}
 				}
 				//calculate balance on the fly
@@ -115,7 +115,7 @@ public class PolaronPro extends Polaron {
 				}
 				// 30=CellRi8 31=CellRi9 32=CellRi10 33=CellRi11 34=CellRi12 35=CellRi13 36=CellRi14
 				for (int j = 0; i < 7; ++i, j += 2) {
-					points[i + 23] = DataParser.parse2Short(dataBuffer, j + 173);
+					points[i + 31] = DataParser.parse2Short(dataBuffer, j + 173);
 				}
 			}
 			catch (Exception e) {

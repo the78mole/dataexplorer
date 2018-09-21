@@ -15,6 +15,7 @@ Device specific changes/fixes
 	* Hitec DRX1 - add support (identical Hitex RDX1 Pro is the 100W version)
 	* Hitec X1 Red - add support
 	* iMax B6 mini - add support (iMax B6 AC V2)
+	* PolaronPro - fix cell voltage update
 	
 History analysis
 	# Flexibility
