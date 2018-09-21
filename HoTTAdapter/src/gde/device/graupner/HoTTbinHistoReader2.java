@@ -18,19 +18,29 @@
  ****************************************************************************************/
 package gde.device.graupner;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InvalidObjectException;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import gde.GDE;
+import gde.data.RecordSet;
+import gde.device.IDevice;
 import gde.device.graupner.HoTTAdapter.PickerParameters;
 import gde.device.graupner.HoTTAdapter.Sensor;
 import gde.device.graupner.HoTTbinReader.BinParser;
 import gde.device.graupner.HoTTbinReader.BufCopier;
+import gde.device.graupner.HoTTbinReader.InfoParser;
 import gde.device.graupner.HoTTbinReader2.RcvBinParser;
 import gde.exception.DataInconsitsentException;
+import gde.exception.DataTypeException;
 import gde.exception.ThrowableUtils;
+import gde.histo.cache.ExtendedVault;
+import gde.histo.cache.VaultCollector;
 import gde.histo.device.UniversalSampler;
 import gde.io.DataParser;
 import gde.log.Level;
@@ -54,6 +64,43 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 
 	public HoTTbinHistoReader2(PickerParameters pickerParameters) {
 		super(pickerParameters, pickerParameters.analyzer.getActiveChannel().getNumber() == HoTTAdapter2.CHANNELS_CHANNEL_NUMBER, INITIALIZE_SAMPLING_FACTOR);
+	}
+
+	/**
+	 * @param inputStream for retrieving the file info and for loading the log data
+	 * @param newTruss which is promoted to a full vault object if the file has a minimum length.
+	 */
+	@Override
+	public void read(Supplier<InputStream> inputStream, VaultCollector newTruss) throws IOException, DataTypeException, DataInconsitsentException {
+		if (newTruss.getVault().getLogFileLength() <= HoTTbinReader.NUMBER_LOG_RECORDS_MIN * HoTTbinHistoReader.DATA_BLOCK_SIZE) return;
+
+		nanoTime = System.nanoTime();
+		initiateTime = readTime = reviewTime = addTime = pickTime = finishTime = 0;
+		lastTime = System.nanoTime();
+
+		truss = newTruss;
+		IDevice device = analyzer.getActiveDevice();
+		ExtendedVault vault = truss.getVault();
+		long numberDatablocks = vault.getLogFileLength() / HoTTbinHistoReader.DATA_BLOCK_SIZE;
+		tmpRecordSet = RecordSet.createRecordSet(vault.getLogRecordsetBaseName(), analyzer, analyzer.getActiveChannel().getNumber(), true, true, false);
+		tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(vault.getLoadFileAsPath().getFileName().toString(), vault.getLogFileLastModified(), numberDatablocks));
+		tmpRecordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", tmpRecordSet.getStartTimeStamp())); //$NON-NLS-1$
+		tmpRecordSet.descriptionAppendFilename(vault.getLoadFileAsPath().getFileName().toString());
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, " recordSetBaseName=" + vault.getLogRecordsetBaseName());
+
+		HashMap<String, String> header = null;
+		try (BufferedInputStream info_in = new BufferedInputStream(inputStream.get())) {
+			header = new InfoParser((s) -> {}).getFileInfo(info_in, vault.getLoadFilePath(), vault.getLogFileLength());
+			if (header == null || header.isEmpty()) return;
+
+			detectedSensors = Sensor.getSetFromDetected(header.get(HoTTAdapter.DETECTED_SENSOR));
+
+			read(inputStream, Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT)));
+		} catch (DataTypeException e) {
+			log.log(Level.WARNING, String.format("%s  %s", e.getMessage(), vault.getLoadFilePath()));
+		} catch (InvalidObjectException e) {
+			// so any anther exception is propagated to the caller
+		}
 	}
 
 	/**
