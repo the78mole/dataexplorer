@@ -7,10 +7,12 @@ How to setup eclipse workspace to build the DataExplorer
 - Make sure that the ANT classpath (Window > Preferences > Ant > Runtime) is correct, containing...
   - all the jars from Eclipse's org.apache.ant plugin directory
   - the tools.jar from the JDK's lib directory
-  - the ant-contrib jar
+  - the antcontrib.jar
 - Check that the file encoding is set to UTF-8 (Window > Preferences > General > Workspace)
 - install git for your operating system, git contains also ssh functionality to make it easier for WIndows users
   (for Windows install check-out and commit in UNIX style to enable cross platform development)
+- optional: Make Java sources available: Window > Preferences > Java > Installed JREs  Edit... 
+            in rt.jar Source attachment...: Java/jdk<version>/src.zip
 
 == Setup DataExplorer in Eclipse ==
 - Check out all projects via CVS (https://savannah.nongnu.org/cvs/?group=dataexplorer). Checking out only specific projects won't work, as the build files expect all projects to exist
@@ -25,6 +27,8 @@ How to setup eclipse workspace to build the DataExplorer
     - Add "SWT_JAR_PATH" with the appropriate path to your system in "build/lib/<OS>/<osarch>/swt.jar"
     - Add "USB4JAVA_PATH" with the appropriate path to your system in "build/lib/<OS>/<osarch>/libusb4java-1.2.0.jar"
 - Complete Ant libraries if not already done
+- Fix RXTXcomm problem messages: Set Window > Preferences > Maven > Errors/Warnings > Plugin execution not covered by lifecycle configuration to 'Ignore' 
+- Verify Window > Preferences > ... > Workspace "Text File Encoding" to UTF-8 and "New text file line delimiter" to UNIX 
 - Open the properties editor of Eclipse
   - Enable project specific settings for "Clean Up" and "Formatter"
     - Import the settings from "build/setup" (code_cleanup_preferences.xml and code_format_preferences.xml)
