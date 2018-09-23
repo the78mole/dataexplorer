@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V34.xsd">
     <Device>
-        <name implementation="gde.device.skyrc.IMaxB6USB">iMax B6 AV</name>
+        <name implementation="gde.device.skyrc.IMaxB6USB">iMax B6 AC</name>
         <manufacturer>SkyRC</manufacturer>
         <manufacturerURL>http://www.skyrc.com</manufacturerURL>
         <group>charger</group>
-        <image>iMAX B6 AC.png</image>
+        <image>iMax B6 AC.png</image>
         <usage>false</usage>
     </Device>
     <UsbPort>
