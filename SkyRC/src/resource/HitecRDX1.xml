@@ -77,6 +77,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="scale_sync_ref_ordinal" value="5" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
             </Measurement>
             <Measurement>
                 <name>battery_internal_resistance</name>
@@ -105,7 +106,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>cell_voltage 3</name>
@@ -113,7 +114,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>cell_voltage 4</name>
@@ -121,7 +122,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>cell_voltage 5</name>
@@ -129,7 +130,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>cell_voltage 6</name>
@@ -137,8 +138,13 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="9" type="Integer" />
+                <property name="scale_sync_ref_ordinal" value="9" type="Integer"/>
             </Measurement>
+            <Settlements/>
+            <ReferenceGroups/>
+            <TransitionGroups/>
+            <Transitions/>
+            <ScoreGroups/>
         </Channel>
     </Channels>
     <Desktop>
