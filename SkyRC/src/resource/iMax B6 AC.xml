@@ -5,7 +5,7 @@
         <manufacturer>SkyRC</manufacturer>
         <manufacturerURL>http://www.skyrc.com</manufacturerURL>
         <group>charger</group>
-        <image>iMAX B6 AC.jpg</image>
+        <image>iMAX B6 AC.png</image>
         <usage>false</usage>
     </Device>
     <UsbPort>
