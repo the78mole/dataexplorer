@@ -32,9 +32,11 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -413,8 +415,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		/**
 		 * @return channel numbers of the sensors including the receiver and 'channels'
 		 */
-		public static List<Integer> getChannelNumbers(EnumSet<Sensor> sensors) {
-			List<Integer> channelNumbers = new ArrayList<Integer>();
+		public static Set<Integer> getChannelNumbers(EnumSet<Sensor> sensors) {
+			Set<Integer> channelNumbers = new HashSet<Integer>();
 			channelNumbers.add(RECEIVER.channelNumber); // always present
 			channelNumbers.add(CHANNEL.channelNumber); // always present
 			for (Sensor sensor : sensors) {
