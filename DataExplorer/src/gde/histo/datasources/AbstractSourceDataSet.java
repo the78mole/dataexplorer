@@ -43,7 +43,6 @@ import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.HistoVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.datasources.SourceFolders.DirectoryType;
-import gde.histo.datasources.VaultChecker.TrussCriteria;
 import gde.histo.device.IHistoDevice;
 import gde.histo.io.HistoOsdReaderWriter;
 import gde.histo.utils.PathUtils;
@@ -90,7 +89,7 @@ public abstract class AbstractSourceDataSet {
 		/**
 		 * @return true if the truss complies with the current device, object and start timestamp
 		 */
-		public abstract boolean isValidDeviceChannelObjectAndStart(TrussCriteria trussCriteria, HistoVault vault);
+		public abstract boolean isValidDeviceChannelObjectAndStart(VaultChecker vaultChecker, HistoVault vault);
 
 		/**
 		 * @returns true is a file reader capable to deliver different measurement values based on device settings
@@ -127,9 +126,9 @@ public abstract class AbstractSourceDataSet {
 		/**
 		 * @return the trusses or an empty stream
 		 */
-		public Stream<VaultCollector> defineTrusses(TrussCriteria trussCriteria, Consumer<String> signaler) {
+		public Stream<VaultCollector> defineTrusses(VaultChecker vaultChecker, Consumer<String> signaler) {
 			signaler.accept("get file properties    " + filePath.toString());
-			return getTrusses4Ui().stream().filter(t -> isValidDeviceChannelObjectAndStart(trussCriteria, t.getVault()));
+			return getTrusses4Ui().stream().filter(t -> isValidDeviceChannelObjectAndStart(vaultChecker, t.getVault()));
 		}
 
 		/**
@@ -219,8 +218,8 @@ public abstract class AbstractSourceDataSet {
 		}
 
 		@Override
-		public boolean isValidDeviceChannelObjectAndStart(TrussCriteria trussCriteria, HistoVault vault) {
-			return new VaultChecker(analyzer).matchDeviceChannelObjectAndStart(trussCriteria, vault);
+		public boolean isValidDeviceChannelObjectAndStart(VaultChecker vaultChecker, HistoVault vault) {
+			return vaultChecker.matchDeviceChannelObjectAndStart(vault);
 		}
 
 		@Override
@@ -288,8 +287,8 @@ public abstract class AbstractSourceDataSet {
 		}
 
 		@Override
-		public boolean isValidDeviceChannelObjectAndStart(TrussCriteria trussCriteria, HistoVault vault) {
-			return new VaultChecker(analyzer).matchObjectAndStart(trussCriteria, vault);
+		public boolean isValidDeviceChannelObjectAndStart(VaultChecker vaultChecker, HistoVault vault) {
+			return vaultChecker.matchObjectAndStart(vault);
 		}
 
 		@Override

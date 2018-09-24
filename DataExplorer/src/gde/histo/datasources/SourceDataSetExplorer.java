@@ -19,8 +19,6 @@
 
 package gde.histo.datasources;
 
-import static java.util.logging.Level.INFO;
-
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -32,13 +30,11 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import com.sun.istack.Nullable;
-
 import gde.Analyzer;
 import gde.GDE;
 import gde.histo.cache.VaultCollector;
+import gde.histo.datasources.AbstractSourceDataSet.SourceDataSet;
 import gde.histo.datasources.SourceFolders.DirectoryType;
-import gde.histo.datasources.VaultChecker.TrussCriteria;
 import gde.histo.exclusions.ExclusionData;
 import gde.log.Logger;
 
@@ -106,7 +102,7 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 						sourceDataSets.add(originFile);
 					} else {
 						excludedFiles.add(filePath);
-						log.log(INFO, "file is excluded              ", filePath);
+						log.log(Level.INFO, "file is excluded              ", filePath);
 					}
 				} else {
 					nonWorkableCount.increment();
@@ -149,9 +145,9 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 		// a channel change without any additional criterion change can use the existent list of files for reading the trusses (performance)
 		if (doListFiles) listFiles(pathsWithPermissions);
 
-		TrussCriteria trussCriteria = TrussCriteria.createTrussCriteria(analyzer);
+		VaultChecker vaultChecker = new VaultChecker(analyzer);
 		trusses = sourceDataSets.parallelStream() //
-				.flatMap(d -> d.defineTrusses(trussCriteria, signaler)) //
+				.flatMap(d -> d.defineTrusses(vaultChecker, signaler)) //
 				.collect(Collectors.toList());
 		signaler.accept("");
 	}
@@ -163,8 +159,7 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 		if (isActive)
 			signaler = s -> GDE.getUiNotification().setStatusMessage(s);
 		else
-			signaler = s -> {
-			};
+			signaler = s -> {};
 	}
 
 	public List<VaultCollector> getTrusses() {

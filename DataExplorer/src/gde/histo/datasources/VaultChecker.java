@@ -78,6 +78,9 @@ public final class VaultChecker {
 	}
 
 	private final Analyzer	analyzer;
+	/**
+	 * Use the getter instead - caching.
+	 */
 	private TrussCriteria		trussCriteria	= null;
 
 	/**
@@ -104,31 +107,17 @@ public final class VaultChecker {
 		return false;
 	}
 
-	/**
-	 * @return true if the vault complies with the current device, object and start timestamp
-	 */
-	public boolean isValidDeviceChannelObjectAndStart(HistoVault vault) {
-		String extention = PathUtils.getFileExtention(Paths.get(vault.getLogFilePath()));
-		if (extention.equals(GDE.FILE_ENDING_DOT_OSD))
-			return matchDeviceChannelObjectAndStart(getTrussCriteria(), vault);
-		else if (analyzer.getActiveDevice() instanceof IHistoDevice) {
-			return matchObjectAndStart(getTrussCriteria(), vault);
-		} else {
-			return false;
-		}
-	}
-
-	public boolean matchObjectAndStart(TrussCriteria trussCriteria, HistoVault vault) {
-		if (vault.getLogStartTimestamp_ms() < trussCriteria.minStartTimeStamp_ms) {
+	public boolean matchObjectAndStart(HistoVault vault) {
+		if (vault.getLogStartTimestamp_ms() < getTrussCriteria().minStartTimeStamp_ms) {
 			log.log(Level.INFO, vault instanceof ExtendedVault //
 					? String.format("no match startTime%,7d kiB %s", analyzer.getDataAccess().getSourceLength(((ExtendedVault) vault).getLoadFileAsPath()) / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
 					: String.format("no match startTime  %s", vault.getLogFilePath()));
 			return false;
 		}
-		if (!trussCriteria.activeObjectKey.isEmpty()) {
-			boolean consistentObjectKey = vault.getLogObjectKey().equalsIgnoreCase(trussCriteria.activeObjectKey);
+		if (!getTrussCriteria().activeObjectKey.isEmpty()) {
+			boolean consistentObjectKey = vault.getLogObjectKey().equalsIgnoreCase(getTrussCriteria().activeObjectKey);
 			if (!consistentObjectKey) {
-				if (trussCriteria.ignoreLogObjectKey) return true;
+				if (getTrussCriteria().ignoreLogObjectKey) return true;
 				log.log(Level.INFO, vault instanceof ExtendedVault //
 						? String.format("no match objectKey=%8s%,7d kiB %s", ((ExtendedVault) vault).getRectifiedObjectKey(), analyzer.getDataAccess().getSourceLength(((ExtendedVault) vault).getLoadFileAsPath()) / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
 						: String.format("no match objectKey  %s", vault.getLogFilePath()));
@@ -138,7 +127,7 @@ public final class VaultChecker {
 		return true;
 	}
 
-	public boolean matchDeviceChannelObjectAndStart(TrussCriteria trussCriteria, HistoVault vault) {
+	public boolean matchDeviceChannelObjectAndStart(HistoVault vault) {
 		if (analyzer.getActiveDevice() != null && !vault.getLogDeviceName().equals(analyzer.getActiveDevice().getName()) //
 		// HoTTViewer V3 -> HoTTViewerAdapter
 				&& !(vault.getLogDeviceName().startsWith("HoTTViewer") && analyzer.getActiveDevice().getName().equals("HoTTViewer"))) {
@@ -147,20 +136,20 @@ public final class VaultChecker {
 					: String.format("no match device  %s", vault.getLogFilePath()));
 			return false;
 		}
-		if (!trussCriteria.channelConfigNumbers.contains(vault.getLogChannelNumber())) {
+		if (!getTrussCriteria().channelConfigNumbers.contains(vault.getLogChannelNumber())) {
 			log.log(Level.INFO, vault instanceof ExtendedVault //
 					? String.format("no match channel%2d%,7d kiB %s", vault.getLogChannelNumber(), analyzer.getDataAccess().getSourceLength(((ExtendedVault) vault).getLoadFileAsPath()) / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
 					: String.format("no match channel  %s", vault.getLogFilePath()));
 			return false;
 		}
-		if (vault.getLogStartTimestamp_ms() < trussCriteria.minStartTimeStamp_ms) {
+		if (vault.getLogStartTimestamp_ms() < getTrussCriteria().minStartTimeStamp_ms) {
 			log.log(Level.INFO, vault instanceof ExtendedVault //
 					? String.format("no match startTime%,7d kiB %s", analyzer.getDataAccess().getSourceLength(((ExtendedVault) vault).getLoadFileAsPath()) / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
 					: String.format("no match startTime  %s", vault.getLogFilePath()));
 			return false;
 		}
 
-		if (trussCriteria.activeObjectKey.isEmpty()) {
+		if (getTrussCriteria().activeObjectKey.isEmpty()) {
 			if (!vault.getLogObjectKey().isEmpty()) return true;
 			// no object in the osd file is a undesirable case but the log is accepted in order to show all logs
 			log.log(Level.INFO, vault instanceof ExtendedVault //
@@ -168,24 +157,24 @@ public final class VaultChecker {
 					: String.format("no match objectKey  %s", vault.getLogFilePath()));
 		} else {
 			if (vault.getLogObjectKey().isEmpty()) {
-				if (trussCriteria.ignoreLogObjectKey) return true;
+				if (getTrussCriteria().ignoreLogObjectKey) return true;
 				log.log(Level.INFO, vault instanceof ExtendedVault //
 						? String.format("no match objectKey=%8s%,7d kiB %s", "empty", analyzer.getDataAccess().getSourceLength(((ExtendedVault) vault).getLoadFileAsPath()) / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
 						: String.format("no match objectKey  %s", vault.getLogFilePath()));
 				return false;
 			}
-			boolean matchingObjectKey = trussCriteria.realObjectKeys.stream().anyMatch(s -> s.equalsIgnoreCase(vault.getLogObjectKey().trim()));
+			boolean matchingObjectKey = getTrussCriteria().realObjectKeys.stream().anyMatch(s -> s.equalsIgnoreCase(vault.getLogObjectKey().trim()));
 			if (!matchingObjectKey) {
-				if (trussCriteria.ignoreLogObjectKey) return true;
+				if (getTrussCriteria().ignoreLogObjectKey) return true;
 				String objectDirectory = vault instanceof ExtendedVault ? ((ExtendedVault) vault).getLoadObjectDirectory() : vault.getLogObjectDirectory();
-				boolean matchingObjectDirectory = trussCriteria.realObjectKeys.stream().anyMatch(s -> s.equalsIgnoreCase(objectDirectory));
+				boolean matchingObjectDirectory = getTrussCriteria().realObjectKeys.stream().anyMatch(s -> s.equalsIgnoreCase(objectDirectory));
 				if (matchingObjectDirectory) return true;
 				log.log(Level.INFO, vault instanceof ExtendedVault //
 						? String.format("no match objectKey=%8s%,7d kiB %s", ((ExtendedVault) vault).getRectifiedObjectKey(), analyzer.getDataAccess().getSourceLength(((ExtendedVault) vault).getLoadFileAsPath()) / 1024, ((ExtendedVault) vault).getLoadFileAsPath().toString()) //
 						: String.format("no match objectKey  %s", vault.getLogFilePath()));
 				return false;
 			}
-			boolean consistentObjectKey = vault.getLogObjectKey().equalsIgnoreCase(trussCriteria.activeObjectKey);
+			boolean consistentObjectKey = vault.getLogObjectKey().equalsIgnoreCase(getTrussCriteria().activeObjectKey);
 			if (!consistentObjectKey) {
 				// finally we found a log with a validated object key which does not correspond to the desired one
 				return false;
@@ -202,7 +191,14 @@ public final class VaultChecker {
 	public boolean isValidVault(HistoVault vault, EnumSet<DirectoryType> validDirectoryTypes, SourceFolders sourceFolders) {
 		Path logFilePath = Paths.get(vault.getLogFilePath());
 		if (isWorkableDataSet(logFilePath, validDirectoryTypes, sourceFolders)) {
-			return isValidDeviceChannelObjectAndStart(vault);
+			String extention = PathUtils.getFileExtention(Paths.get(vault.getLogFilePath()));
+			if (extention.equals(GDE.FILE_ENDING_DOT_OSD))
+				return matchDeviceChannelObjectAndStart(vault);
+			else if (analyzer.getActiveDevice() instanceof IHistoDevice) {
+				return matchObjectAndStart(vault);
+			} else {
+				return false;
+			}
 		} else {
 			return false;
 		}
