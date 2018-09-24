@@ -52,8 +52,7 @@ import com.sun.istack.Nullable;
 
 import gde.Analyzer;
 import gde.GDE;
-import gde.histo.datasources.AbstractSourceDataSet;
-import gde.histo.datasources.AbstractSourceDataSet.SourceDataSet;
+import gde.histo.datasources.SourceDataSet;
 import gde.histo.datasources.VaultPicker.ProgressManager;
 import gde.histo.datasources.VaultPicker.TrussJobs;
 import gde.histo.device.IHistoDevice;
@@ -119,7 +118,7 @@ public final class VaultReaderWriter {
 	 * Read file and populate the vault from the recordset.
 	 */
 	public void loadFromFile(Path filePath, List<VaultCollector> trusses) {
-		SourceDataSet dataSet = AbstractSourceDataSet.createSourceDataSet(filePath, analyzer);
+		SourceDataSet dataSet = SourceDataSet.createSourceDataSet(filePath, analyzer);
 		if (dataSet != null) dataSet.readVaults4Ui(filePath, trusses);
 	}
 

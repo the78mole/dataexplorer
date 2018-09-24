@@ -46,8 +46,7 @@ import gde.Analyzer;
 import gde.DataAccess;
 import gde.GDE;
 import gde.config.Settings;
-import gde.histo.datasources.AbstractSourceDataSet;
-import gde.histo.datasources.AbstractSourceDataSet.SourceDataSet;
+import gde.histo.datasources.SourceDataSet;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -312,7 +311,7 @@ public final class SupplementObjectFolder {
 				Path targetPath = targetDir.resolve(f.getFileName());
 				FileUtils.checkDirectoryAndCreate(targetDir.toString());
 				if (!targetPath.toFile().exists()) {
-					SourceDataSet sourceDataSet = AbstractSourceDataSet.createSourceDataSet(f, analyzer);
+					SourceDataSet sourceDataSet = SourceDataSet.createSourceDataSet(f, analyzer);
 					if (sourceDataSet != null) { // check if supported by histo
 						try {
 							Files.copy(sourceDataSet.getActualFile(), targetPath, options);

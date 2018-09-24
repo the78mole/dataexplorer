@@ -19,6 +19,8 @@
 
 package gde.histo.datasources;
 
+import static java.util.logging.Level.INFO;
+
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -27,13 +29,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import gde.Analyzer;
 import gde.GDE;
 import gde.histo.cache.VaultCollector;
-import gde.histo.datasources.AbstractSourceDataSet.SourceDataSet;
 import gde.histo.datasources.SourceFolders.DirectoryType;
 import gde.histo.exclusions.ExclusionData;
 import gde.log.Logger;
@@ -43,9 +45,14 @@ import gde.log.Logger;
  * Avoid rebuilding if a choice of basic criteria did not change.
  * @author Thomas Eickert (USER)
  */
-public class SourceDataSetExplorer extends AbstractSourceDataSet {
+public class SourceDataSetExplorer {
 	private static final String				$CLASS_NAME				= SourceDataSetExplorer.class.getName();
 	private static final Logger				log								= Logger.getLogger($CLASS_NAME);
+
+	protected final Analyzer			analyzer;
+	protected final SourceFolders	sourceFolders;
+
+	protected Consumer<String>		signaler	= s -> {};
 
 	private final LongAdder						nonWorkableCount	= new LongAdder();
 	private final List<Path>					excludedFiles			= new ArrayList<>();
@@ -57,7 +64,8 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 	 * @param isStatusMessagesActive true for status messages during file system access (advisable in case file system latencies)
 	 */
 	public SourceDataSetExplorer(Analyzer analyzer, SourceFolders sourceFolders, boolean isStatusMessagesActive) {
-		super(analyzer, sourceFolders);
+		this.analyzer = analyzer;
+		this.sourceFolders = sourceFolders;
 
 		setStatusMessages(isStatusMessagesActive);
 	}
@@ -96,13 +104,13 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 		for (String fileName : analyzer.getDataAccess().getSourceFolderList(rootDirectory).toArray(String[]::new)) {
 			Path filePath = rootDirectory.resolve(fileName);
 			if (analyzer.getDataAccess().existsSourceFile(filePath)) {
-				SourceDataSet originFile = AbstractSourceDataSet.createSourceDataSet(filePath, analyzer);
+				SourceDataSet originFile = SourceDataSet.createSourceDataSet(filePath, analyzer);
 				if (originFile != null && originFile.isWorkableFile(directoryTypes, sourceFolders)) {
 					if (!isSuppressMode || !exclusionData.isExcluded(filePath.getFileName().toString())) {
 						sourceDataSets.add(originFile);
 					} else {
 						excludedFiles.add(filePath);
-						log.log(Level.INFO, "file is excluded              ", filePath);
+						log.log(INFO, "file is excluded              ", filePath);
 					}
 				} else {
 					nonWorkableCount.increment();
@@ -147,7 +155,8 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 
 		VaultChecker vaultChecker = new VaultChecker(analyzer);
 		trusses = sourceDataSets.parallelStream() //
-				.flatMap(d -> d.defineTrusses(vaultChecker, signaler)) //
+				.peek(d -> signaler.accept("get file properties    " + d.getActualFile().toString())) //
+				.flatMap(d -> d.getSelectedTrusses(vaultChecker)) //
 				.collect(Collectors.toList());
 		signaler.accept("");
 	}
