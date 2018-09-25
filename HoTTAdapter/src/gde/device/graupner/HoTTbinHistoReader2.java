@@ -22,8 +22,9 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidObjectException;
-import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
@@ -358,15 +359,15 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 			escBinParser = Sensor.ESC.createBinParser2(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
 		} else escBinParser = null;
 
-		EnumSet<Sensor> migrationJobs = EnumSet.noneOf(Sensor.class);
+		Set<BinParser> migrationJobs = new HashSet<>();
 		@SuppressWarnings("null")
 		Procedure migrator = () -> {
 			// the sequence of the next statements is crucial, eg. for vario data
-			if (migrationJobs.contains(Sensor.EAM)) eamBinParser.migratePoints(points);
-			if (migrationJobs.contains(Sensor.GAM)) gamBinParser.migratePoints(points);
-			if (migrationJobs.contains(Sensor.GPS)) gpsBinParser.migratePoints(points);
-			if (migrationJobs.contains(Sensor.VARIO)) varBinParser.migratePoints(points);
-			if (migrationJobs.contains(Sensor.ESC)) escBinParser.migratePoints(points);
+			if (migrationJobs.contains(eamBinParser)) eamBinParser.migratePoints(points);
+			if (migrationJobs.contains(gamBinParser)) gamBinParser.migratePoints(points);
+			if (migrationJobs.contains(gpsBinParser)) gpsBinParser.migratePoints(points);
+			if (migrationJobs.contains(varBinParser)) varBinParser.migratePoints(points);
+			if (migrationJobs.contains(escBinParser)) escBinParser.migratePoints(points);
 			migrationJobs.clear();
 		};
 
@@ -422,70 +423,70 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 							case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 							case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 								if (varBinParser != null) {
-									if (migrationJobs.contains(Sensor.VARIO) && isReceiverData) {
+									if (migrationJobs.contains(varBinParser) && isReceiverData) {
 										migrator.invoke();
 										isJustMigrated = true;
 										isReceiverData = false;
 										pointsAdder.invoke();
 									}
 									varBinParser.parse();
-									migrationJobs.add(Sensor.VARIO);
+									migrationJobs.add(varBinParser);
 								}
 								break;
 
 							case HoTTAdapter.SENSOR_TYPE_GPS_115200:
 							case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 								if (gpsBinParser != null) {
-									if (migrationJobs.contains(Sensor.GPS) && isReceiverData) {
+									if (migrationJobs.contains(gpsBinParser) && isReceiverData) {
 										migrator.invoke();
 										isJustMigrated = true;
 										isReceiverData = false;
 										pointsAdder.invoke();
 									}
 									gpsBinParser.parse();
-									migrationJobs.add(Sensor.GPS);
+									migrationJobs.add(gpsBinParser);
 								}
 								break;
 
 							case HoTTAdapter.SENSOR_TYPE_GENERAL_115200:
 							case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
 								if (gamBinParser != null) {
-									if (migrationJobs.contains(Sensor.GAM) && isReceiverData) {
+									if (migrationJobs.contains(gamBinParser) && isReceiverData) {
 										migrator.invoke();
 										isJustMigrated = true;
 										isReceiverData = false;
 										pointsAdder.invoke();
 									}
 									gamBinParser.parse();
-									migrationJobs.add(Sensor.GAM);
+									migrationJobs.add(gamBinParser);
 								}
 								break;
 
 							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_115200:
 							case HoTTAdapter.SENSOR_TYPE_ELECTRIC_19200:
 								if (eamBinParser != null)  {
-									if (migrationJobs.contains(Sensor.EAM) && isReceiverData) {
+									if (migrationJobs.contains(eamBinParser) && isReceiverData) {
 										migrator.invoke();
 										isJustMigrated = true;
 										isReceiverData = false;
 										pointsAdder.invoke();
 									}
 									eamBinParser.parse();
-									migrationJobs.add(Sensor.EAM);
+									migrationJobs.add(eamBinParser);
 								}
 								break;
 
 							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_115200:
 							case HoTTAdapter.SENSOR_TYPE_SPEED_CONTROL_19200:
 								if (escBinParser != null)  {
-									if (migrationJobs.contains(Sensor.ESC) && isReceiverData) {
+									if (migrationJobs.contains(escBinParser) && isReceiverData) {
 										migrator.invoke();
 										isJustMigrated = true;
 										isReceiverData = false;
 										pointsAdder.invoke();
 									}
 									escBinParser.parse();
-									migrationJobs.add(Sensor.ESC);
+									migrationJobs.add(escBinParser);
 								}
 								break;
 							}
