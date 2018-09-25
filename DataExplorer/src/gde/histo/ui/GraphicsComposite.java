@@ -155,8 +155,8 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		}
 
 		public void setSyncedMinMaxDisplayValues(double newMinValue, double newMaxValue) {
-			this.minDisplayValue = HistoSet.decodeVaultValue(trailRecord, newMinValue);
-			this.maxDisplayValue = HistoSet.decodeVaultValue(trailRecord, newMaxValue);
+			this.minDisplayValue = HistoSet.decodeVaultValue(trailRecord.getChannelItem(), newMinValue);
+			this.maxDisplayValue = HistoSet.decodeVaultValue(trailRecord.getChannelItem(), newMaxValue);
 
 			TrailRecordSet trailRecordset = trailRecord.getParent();
 			if (trailRecordset.isOneOfSyncableRecord(trailRecord.getName())) {
@@ -593,8 +593,8 @@ public final class GraphicsComposite extends AbstractChartComposite {
 			if (!record.getTrailSelector().isTrailSuite() && record.parallelStream().noneMatch(Objects::nonNull))
 				; // in case of an empty record leave the values unchanged
 			else {
-				yMinValueDisplay = HistoSet.decodeVaultValue(record, yMinValue);
-				yMaxValueDisplay = HistoSet.decodeVaultValue(record, yMaxValue);
+				yMinValueDisplay = HistoSet.decodeVaultValue(record.getChannelItem(), yMinValue);
+				yMaxValueDisplay = HistoSet.decodeVaultValue(record.getChannelItem(), yMaxValue);
 			}
 			if (log.isLoggable(FINE)) log.log(FINE, "undefined -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -627,9 +627,9 @@ public final class GraphicsComposite extends AbstractChartComposite {
 					log.log(FINE, "scale starts at 0 -> yMinValueDisplay = " + yMinValueDisplay + "; yMaxValueDisplay = " + yMaxValueDisplay); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
-		
+
   	record.setMinMaxScaleValue(yMinValueDisplay, yMaxValueDisplay); //to enable automatic formating
-		
+
 		getChartData(record).setSyncedMinMaxDisplayValues(yMinValue, yMaxValue);
 		getChartData(record).setNumberTickMarks(numberTickMarks);
 	}

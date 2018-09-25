@@ -38,12 +38,10 @@ import gde.device.SettlementType;
  */
 public final class ChannelItems {
 
-	private final Analyzer						analyzer;
 	private final DeviceConfiguration	deviceConfiguration;
 	private final ChannelType					channelType;
 
 	public ChannelItems(Analyzer analyzer) {
-		this.analyzer = analyzer;
 		this.deviceConfiguration = analyzer.getActiveDevice().getDeviceConfiguration();
 		this.channelType = deviceConfiguration.getChannel(analyzer.getActiveChannel().getNumber());
 	}

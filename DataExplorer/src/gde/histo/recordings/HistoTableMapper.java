@@ -27,7 +27,6 @@ import java.util.function.Function;
 import gde.config.Settings;
 import gde.device.TrailTypes;
 import gde.histo.recordings.TrailDataTags.DataTag;
-import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.LocalizedDateTime;
@@ -38,8 +37,6 @@ import gde.utils.LocalizedDateTime.DateTimePattern;
  * @author Thomas Eickert (USER)
  */
 public final class HistoTableMapper {
-	private static final String	$CLASS_NAME	= HistoTableMapper.class.getName();
-	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	public enum DisplayTag {
 		FILE_NAME {

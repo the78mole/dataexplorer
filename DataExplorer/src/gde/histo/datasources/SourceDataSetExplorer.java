@@ -23,7 +23,6 @@ import static java.util.logging.Level.INFO;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +77,6 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 
 		int subDirectoryLevelMax = analyzer.getSettings().getSubDirectoryLevelMax();
 		for (Entry<Path, Set<DirectoryType>> entry : pathsWithPermissions.entrySet()) {
-			Path subPath = splitSubPath(entry.getKey());
 			try {
 				sourceDataSets.addAll(getFileListing(entry.getKey(), subDirectoryLevelMax, entry.getValue()));
 			} catch (FileNotFoundException e) {
@@ -120,21 +118,6 @@ public class SourceDataSetExplorer extends AbstractSourceDataSet {
 		}
 		signaler.accept("");
 		return sourceDataSets;
-	}
-
-	/**
-	 * @param filePath is an arbitrary path
-	 * @return the sub path relative to the data directory or null if the file is not in the data directory or its subdirectories
-	 */
-	@Nullable
-	private Path splitSubPath(Path filePath) {
-		Path fileSubPath = null;
-		try {
-			fileSubPath = Paths.get(analyzer.getSettings().getDataFilePath()).relativize(filePath);
-		} catch (Exception e) {
-			// filePath is not located in the standard data file folder
-		}
-		return fileSubPath;
 	}
 
 	/**

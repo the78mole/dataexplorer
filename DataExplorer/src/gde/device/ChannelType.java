@@ -207,12 +207,7 @@ public class ChannelType {
 	}
 
 	/**
-	   * Gets the value of the referenceGroups property.
-	 *
-	 * @return
-	 *     possible object is
-	   *     {@link ReferenceGroupsType }
-	 *
+	 * Gets the value of the referenceGroups property.
 	 */
 	public HashMap<Integer, ReferenceGroupType> getReferenceGroups() {
 		if (this.referenceGroups == null) {
@@ -225,8 +220,6 @@ public class ChannelType {
 	   * Sets the value of the referenceGroups property.
 	 *
 	 * @param value
-	 *     allowed object is
-	   *     {@link ReferenceGroupsType }
 	 *
 	 */
 	public void setReferenceGroups(HashMap<Integer, ReferenceGroupType> value) {
@@ -234,12 +227,7 @@ public class ChannelType {
 	}
 
 	/**
-	   * Gets the value of the transitionGroups property.
-	 *
-	   * @return
-	   *     possible object is
-	   *     {@link TransitionGroupsType }
-	 *
+	 * Gets the value of the transitionGroups property.
 	   */
 	public HashMap<Integer, TransitionGroupType> getTransitionGroups() {
 		if (this.transitionGroups == null) {
@@ -250,23 +238,13 @@ public class ChannelType {
 
 	/**
 	 * Sets the value of the transitionGroups property.
-	*
-	 * @param value
-	 *     allowed object is
-	 *     {@link TransitionGroupsType }
-	*
 	*/
 	public void setTransitionGroups(HashMap<Integer, TransitionGroupType> value) {
 		this.transitionGroups = value;
 	}
 
 	/**
-	   * Gets the value of the transitions property.
-	 *
-	   * @return
-	   *     possible object is
-	   *     {@link TransitionsType2 }
-	 *
+	 * Gets the value of the transitions property.
 	 */
 	public HashMap<Integer, TransitionType> getTransitions() {
 		if (this.transitions == null) {
@@ -276,12 +254,7 @@ public class ChannelType {
 	}
 
 	/**
-	   * Sets the value of the transitions property.
-	 *
-	   * @param value
-	   *     allowed object is
-	   *     {@link TransitionsType2 }
-	 *
+	 * Sets the value of the transitions property.
 	 */
 	public void setTransitions(HashMap<Integer, TransitionType> value) {
 		this.transitions = value;
@@ -289,11 +262,6 @@ public class ChannelType {
 
 	/**
 	 * Gets the value of the scoreGroups property.
-	*
-	 * @return
-	 *     possible object is
-	 *     {@link scoreGroups }
-	*
 	*/
 	public LinkedHashMap<Integer, ScoreGroupType> getScoreGroups() {
 		if (this.scoreGroups == null) {
@@ -304,11 +272,6 @@ public class ChannelType {
 
 	/**
 	 * Sets the value of the scoreGroups property.
-	 *
-	 * @param value
-	 *     allowed object is
-	 *     {@link scoreGroups }
-	 *
 	 */
 	public void setScoreGroups(LinkedHashMap<Integer, ScoreGroupType> value) {
 		this.scoreGroups = value;

@@ -205,7 +205,6 @@ public class DeviceConfiguration {
 	 * No roaming data access support.
 	 * Not threadsafe due to JAXB un-/marshallers.
 	 */
-	@SuppressWarnings("unchecked") // cast to (JAXBElement<DevicePropertiesType>)
 	public DeviceConfiguration(String xmlFileName, Unmarshaller tmpUnmarshaller) throws FileNotFoundException, JAXBException {
 		this.xmlFile = Paths.get(xmlFileName);
 		LocalAccess localAccess = (LocalAccess) DataAccess.getInstance();

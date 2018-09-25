@@ -80,13 +80,13 @@ public final class SettlementTrail extends TrailRecord {
 	@Override
 	public DoubleStream getVaultOutliers(ExtendedVault vault) {
 		return vault.getSettlementOutliers(((SettlementType) this.channelItem).getSettlementId()) //
-				.mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.));
+				.mapToDouble(p -> HistoSet.decodeVaultValue(this.getChannelItem(), p / 1000.));
 	}
 
 	@Override
 	public DoubleStream getVaultScraps(ExtendedVault vault) {
 		return vault.getSettlementScraps(((SettlementType) this.channelItem).getSettlementId()) //
-				.mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.));
+				.mapToDouble(p -> HistoSet.decodeVaultValue(this.getChannelItem(), p / 1000.));
 	}
 
 	@Override

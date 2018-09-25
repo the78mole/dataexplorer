@@ -111,7 +111,7 @@ public final class HistoGraphicsMapper {
 		for (int j = 0; j < suiteSize; j++) {
 			Integer value = suiteRecords.getSuiteValue(j, index);
 			if (value != null) {
-				double decodedValue = HistoSet.decodeVaultValue(trailRecord, value / 1000.0);
+				double decodedValue = HistoSet.decodeVaultValue(trailRecord.getChannelItem(), value / 1000.0);
 				pointArray.setY(j, y0 - (int) ((decodedValue - yOffset) * graphicsData.getDisplayScaleFactorValue()));
 			}
 		}
@@ -134,7 +134,7 @@ public final class HistoGraphicsMapper {
 		for (int i = 0; i < trailRecord.realSize(); i++) {
 			Integer value = trailRecord.elementAt(i);
 			if (value != null) {
-				double decodedValue = HistoSet.decodeVaultValue(trailRecord, value / 1000.0);
+				double decodedValue = HistoSet.decodeVaultValue(trailRecord.getChannelItem(), value / 1000.0);
 				points[i] = new Point(x0 + timeLine.getScalePositions().get((long) trailRecord.getParent().getTime_ms(i)),
 						y0 - (int) ((decodedValue - yOffset) * graphicsData.getDisplayScaleFactorValue()));
 			}
@@ -152,7 +152,7 @@ public final class HistoGraphicsMapper {
 		TrailRecord record = graphicsData.getTrailRecord();
 		Integer value = record.getPoints().elementAt(index);
 		if (value != null) {
-			double decodedValue = HistoSet.decodeVaultValue(record, value / 1000.0);
+			double decodedValue = HistoSet.decodeVaultValue(record.getChannelItem(), value / 1000.0);
 			verticalDisplayPos = height - (int) ((decodedValue - getYOffset(graphicsData)) * graphicsData.getDisplayScaleFactorValue());
 		}
 		return verticalDisplayPos;

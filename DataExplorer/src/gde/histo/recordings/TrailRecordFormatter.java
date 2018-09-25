@@ -206,12 +206,12 @@ public final class TrailRecordFormatter {
 		if (HistoSet.isGpsCoordinates(this.record)) {
 			// if (this.getDataType() == DataType.GPS_LATITUDE etc ???
 			if (this.record.getUnit().endsWith("'")) { //$NON-NLS-1$
-				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", HistoSet.decodeVaultValue(this.record, value)).trim(); //$NON-NLS-1$
+				formattedValue = StringHelper.getFormatedWithMinutes("%2d %07.4f", HistoSet.decodeVaultValue(this.record.getChannelItem(), value)).trim(); //$NON-NLS-1$
 			} else {
-				formattedValue = String.format("%8.6f", HistoSet.decodeVaultValue(this.record, value)); //$NON-NLS-1$
+				formattedValue = String.format("%8.6f", HistoSet.decodeVaultValue(this.record.getChannelItem(), value)); //$NON-NLS-1$
 			}
 		} else {
-			formattedValue = this.record.getDecimalFormat().format(HistoSet.decodeVaultValue(this.record, value));
+			formattedValue = this.record.getDecimalFormat().format(HistoSet.decodeVaultValue(this.record.getChannelItem(), value));
 		}
 		return formattedValue;
 	}

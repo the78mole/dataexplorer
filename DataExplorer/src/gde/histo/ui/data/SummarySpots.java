@@ -326,7 +326,7 @@ public class SummarySpots { // MarkerLine + Boxplot + Warnings
 		xValueScaleFactor = stripNetWidth / (decodedScaleMinMax[1] - decodedScaleMinMax[0]);
 		xValueOffset = decodedScaleMinMax[0] * xValueScaleFactor - .5;
 
-		xPointScaleFactor = HistoSet.decodeDeltaValue(record, 1. / 1000.) / ((decodedScaleMinMax[1] - decodedScaleMinMax[0]) / stripNetWidth);
+		xPointScaleFactor = HistoSet.decodeDeltaValue(record.getChannelItem(), 1. / 1000.) / ((decodedScaleMinMax[1] - decodedScaleMinMax[0]) / stripNetWidth);
 		xPointOffset = HistoSet.encodeVaultValue(record, decodedScaleMinMax[0]) * 1000. * xPointScaleFactor - .5;
 
 		int positionsLimit = Settings.getInstance().isSummarySpotsVisible() ? -1 : Settings.getInstance().getReminderCount();

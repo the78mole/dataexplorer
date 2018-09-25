@@ -173,8 +173,6 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	public final class PickedVaults {
-		@SuppressWarnings("hiding")
-		private final Logger															log						= Logger.getLogger(PickedVaults.class.getName());
 
 		/**
 		 * Data source for this recordset.

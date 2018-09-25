@@ -73,7 +73,6 @@ public abstract class CommonRecord extends AbstractRecord {
 	 * @param newSymbol
 	 * @param isActiveValue
 	 * @param newStatistic
-	 * @param newProperties (offset, factor, color, lineType, ...)
 	 * @param initialCapacity
 	 */
 	public CommonRecord(IDevice newDevice, int newOrdinal, String newName, String newSymbol, String newUnit, boolean isActiveValue,

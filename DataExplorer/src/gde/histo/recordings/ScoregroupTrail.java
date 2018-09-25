@@ -28,16 +28,13 @@ import gde.device.ScoreGroupType;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.HistoVault;
 import gde.histo.guard.Guardian;
-import gde.log.Logger;
 
 /**
  * Trail records containing score values.
  * @author Thomas Eickert (USER)
  */
 public final class ScoregroupTrail extends TrailRecord {
-	private static final String	$CLASS_NAME				= ScoregroupTrail.class.getName();
 	private static final long		serialVersionUID	= 110124007964748556L;
-	private static final Logger	log								= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * @param newOrdinal

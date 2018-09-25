@@ -21,7 +21,6 @@ package gde;
 
 import gde.data.Channels;
 import gde.device.IDevice;
-import gde.log.Logger;
 
 /**
  * Kernel for analyzing logging data.
@@ -29,8 +28,6 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public class Explorer extends Analyzer {
-	private static final String	$CLASS_NAME	= Explorer.class.getName();
-	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	Explorer() {
 		super();

@@ -84,13 +84,13 @@ public final class MeasurementTrail extends TrailRecord {
 	@Override
 	public DoubleStream getVaultOutliers(ExtendedVault vault) {
 		return vault.getMeasurementOutliers(this.getOrdinal()) //
-				.mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.));
+				.mapToDouble(p -> HistoSet.decodeVaultValue(this.getChannelItem(), p / 1000.));
 	}
 
 	@Override
 	public DoubleStream getVaultScraps(ExtendedVault vault) {
 		return vault.getMeasurementScraps(this.getOrdinal()) //
-				.mapToDouble(p -> HistoSet.decodeVaultValue(this, p / 1000.));
+				.mapToDouble(p -> HistoSet.decodeVaultValue(this.getChannelItem(), p / 1000.));
 	}
 
 	@Override

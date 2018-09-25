@@ -50,7 +50,6 @@ import gde.device.ChannelPropertyTypes;
 import gde.device.DataTypes;
 import gde.device.DeviceDialog;
 import gde.device.MeasurementPropertyTypes;
-import gde.device.graupner.HoTTAdapter.PickerParameters;
 import gde.device.graupner.hott.MessageIds;
 import gde.messages.Messages;
 import gde.ui.SWTResourceManager;
@@ -737,7 +736,6 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								try {
 									String toolTipText = HoTTAdapter.getImportToolTip();
 									HoTTAdapterDialog.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, toolTipText, toolTipText);
-									PickerParameters pickerParameters = HoTTAdapterDialog.this.device.getPickerParameters();
 									HoTTAdapterDialog.this.lifeGatherer = HoTTAdapterDialog.this.device.getName().equals("HoTTAdapter") //$NON-NLS-1$
 									? new HoTTAdapterLiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this)
 											: new HoTTAdapter2LiveGatherer(HoTTAdapterDialog.this.application, HoTTAdapterDialog.this.device, HoTTAdapterDialog.this.serialPort, HoTTAdapterDialog.this);

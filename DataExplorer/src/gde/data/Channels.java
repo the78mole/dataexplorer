@@ -319,19 +319,19 @@ public final class Channels extends HashMap<Integer, Channel> {
 	 * Buildup new structure  - set up the channels with object key assignments.
 	 * todo might be better to do the setup during instantiation
 	 */
-	public void setupChannels(Analyzer analyzer) {
+	public void setupChannels(Analyzer newAnalyzer) {
 		this.cleanup();
 
-		this.analyzer = analyzer;
+		this.analyzer = newAnalyzer;
 
-		IDevice device = analyzer.getActiveDevice();
+		IDevice device = newAnalyzer.getActiveDevice();
 		int channelCount = device.getChannelCount();
 		this.channelNames = new String[channelCount];
 		for (int i = 1; i <= channelCount; i++) {
 			log.log(Level.FINE, "setting up channels = " + i); //$NON-NLS-1$
 
-			Channel newChannel = new Channel(analyzer, device.getChannelNameReplacement(i), device.getChannelTypes(i));
-			newChannel.setObjectKey(analyzer.getSettings().getActiveObjectKey());
+			Channel newChannel = new Channel(newAnalyzer, device.getChannelNameReplacement(i), device.getChannelTypes(i));
+			newChannel.setObjectKey(newAnalyzer.getSettings().getActiveObjectKey());
 			// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
 			put(Integer.valueOf(i), newChannel);
 			// do not call channel.applyTemplate here, there are no record sets
@@ -343,8 +343,10 @@ public final class Channels extends HashMap<Integer, Channel> {
 	 * Use only if the outlet-channel/configuration in log dataset file does not match any existing.
 	 * @return the new channel
 	 */
-	public Channel addChannel(String channelConfigName, ChannelTypes channelType, Analyzer analyzer) {
-		Channel channel = new Channel(analyzer, channelConfigName, channelType);
+	public Channel addChannel(String channelConfigName, ChannelTypes channelType, Analyzer newAnalyzer) {
+		this.analyzer = newAnalyzer;
+
+		Channel channel = new Channel(newAnalyzer, channelConfigName, channelType);
 		// do not allocate records to record set - newChannel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, activeConfig));
 		this.put(channel.getNumber(), channel);
 		Vector<String> newChannelNames = new Vector<String>();

@@ -2623,6 +2623,7 @@ class SynchronousCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 		}
 	}
 
+	@SuppressWarnings("serial")
 	static class SynchronousManualCache<K, V> implements Cache<K, V>, Serializable {
 		final SynchronousCache<K, V> localCache;
 
