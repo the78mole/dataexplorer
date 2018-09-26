@@ -168,7 +168,7 @@ public abstract class AbstractChartComposite extends Composite {
 	 * @see <a href="https://www.google.de/search?q=Guava 22.0">Guava 22.0</a>
 	 */
 	public static int constrainToRange(int value, int min, int max) { // todo move into gde.utils.MathUtils
-		if (min > max) throw new IllegalArgumentException(value + "  " + min +"/" + max);
+		if (min > max) throw new IllegalArgumentException(value + "  " + min + "/" + max);
 		return Math.min(Math.max(value, min), max);
 	}
 
@@ -488,9 +488,11 @@ public abstract class AbstractChartComposite extends Composite {
 
 		// Get the canvas and its dimensions
 		this.canvasBounds = this.graphicCanvas.getClientArea();
+		log.log(Level.FINE, "canvasBounds", this.canvasBounds);
+		if (this.canvasBounds.height <= 0 || this.canvasBounds.width <= 0) return;
 
 		if (this.canvasImage != null) this.canvasImage.dispose();
-		this.canvasImage = new Image(GDE.display, this.canvasBounds);
+			this.canvasImage = new Image(GDE.display, this.canvasBounds);
 		this.canvasImageGC = new GC(this.canvasImage); // SWTResourceManager.getGC(this.canvasImage);
 		this.canvasImageGC.setBackground(this.surroundingBackground);
 		this.canvasImageGC.fillRectangle(this.canvasBounds);
