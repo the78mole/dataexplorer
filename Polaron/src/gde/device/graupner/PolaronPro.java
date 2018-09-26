@@ -69,8 +69,8 @@ public class PolaronPro extends Polaron {
 	 */
 	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
-		int maxVotage = Integer.MIN_VALUE;
-		int minVotage = Integer.MAX_VALUE;
+		int maxVoltage = Integer.MIN_VALUE;
+		int minVoltage = Integer.MAX_VALUE;
 		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO));
 
 		if (deviceDataBufferSize == dataBuffer.length) { //outlet/channel 1
@@ -80,42 +80,41 @@ public class PolaronPro extends Polaron {
 				points[1] = DataParser.parse2Short(dataBuffer, 31);
 				points[2] = DataParser.parse2Short(dataBuffer, 33);
 				points[3] = DataParser.parse2Short(dataBuffer, 35);
-				points[4] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
-				points[5] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
+				points[4] = Double.valueOf(points[1] * points[2] / 1000.0).intValue(); // power U*I [W]
+				points[5] = Double.valueOf(points[1] * points[3] / 1000.0).intValue(); // energy U*C [Wh]
 				points[6] = DataParser.parse2Short(dataBuffer, 37);
-				if (DataParser.parse2Short(dataBuffer, 39) == 0) points[5] = -1 * points[5];
+				if (DataParser.parse2Short(dataBuffer, 39) == 0) points[6] = -1 * points[6];
 				points[7] = 0;
 
 				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7
-				int i = 0;
-				for (int j = 0; i < 7; ++i, j += 2) {
+				for (int i = 0, j = 0; i < 7; ++i, j += 2) {
 					points[i + 8] = DataParser.parse2Short(dataBuffer, j + 45);
 					if (points[i + 8] > 0) {
-						maxVotage = points[i + 8] > maxVotage ? points[i + 8] : maxVotage;
-						minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
+						maxVoltage = points[i + 8] > maxVoltage ? points[i + 8] : maxVoltage;
+						minVoltage = points[i + 8] < minVoltage ? points[i + 8] : minVoltage;
 					}
 				}
 				// 15=SpannungZelle8 16=SpannungZelle9 17=SpannungZelle10 18=SpannungZelle11 19=SpannungZelle12 20=SpannungZelle13 21=SpannungZelle14
-				for (int j = 0; i < 7; ++i, j += 2) {
-					points[i + 16] = DataParser.parse2Short(dataBuffer, j + 159);
-					if (points[i + 16] > 0) {
-						maxVotage = points[i + 16] > maxVotage ? points[i + 16] : maxVotage;
-						minVotage = points[i + 16] < minVotage ? points[i + 16] : minVotage;
+				for (int i = 0, j = 0; i < 7; ++i, j += 2) {
+					points[i + 15] = DataParser.parse2Short(dataBuffer, j + 159);
+					if (points[i + 15] > 0) {
+						maxVoltage = points[i + 15] > maxVoltage ? points[i + 15] : maxVoltage;
+						minVoltage = points[i + 15] < minVoltage ? points[i + 15] : minVoltage;
 					}
 				}
 				//calculate balance on the fly
-				points[7] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+				points[7] = maxVoltage != Integer.MIN_VALUE && minVoltage != Integer.MAX_VALUE ? maxVoltage - minVoltage : 0;
 
 				// 22=BatteryRi
 				points[22] = DataParser.parse2Short(dataBuffer, 91);
+				
 				// 23=CellRi1 24=CellRi2 25=CellRi3 26=CellRi4 27=CellRi5 28=CellRi6 29=CellRi7
-				i = 0;
-				for (int j = 0; i < 7; ++i, j += 2) {
+				for (int i = 0, j = 0; i < 7; ++i, j += 2) {
 					points[i + 23] = DataParser.parse2Short(dataBuffer, j + 59);
 				}
 				// 30=CellRi8 31=CellRi9 32=CellRi10 33=CellRi11 34=CellRi12 35=CellRi13 36=CellRi14
-				for (int j = 0; i < 7; ++i, j += 2) {
-					points[i + 31] = DataParser.parse2Short(dataBuffer, j + 173);
+				for (int i = 0, j = 0; i < 7; ++i, j += 2) {
+					points[i + 30] = DataParser.parse2Short(dataBuffer, j + 173);
 				}
 			}
 			catch (Exception e) {
@@ -132,7 +131,7 @@ public class PolaronPro extends Polaron {
 				points[4] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 				points[5] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
 				points[6] = DataParser.parse2Short(dataBuffer, 37);
-				if (DataParser.parse2Short(dataBuffer, 39) == 0) points[5] = -1 * points[5];
+				if (DataParser.parse2Short(dataBuffer, 39) == 0) points[6] = -1 * points[6];
 				points[7] = DataParser.parse2Short(dataBuffer, 91);
 			}
 			catch (NumberFormatException e) {

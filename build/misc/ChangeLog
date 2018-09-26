@@ -16,6 +16,7 @@ Device specific changes/fixes
 	* Hitec X1 Red - add support
 	* iMax B6 mini - add support (iMax B6 AC V2)
 	* PolaronPro - fix cell voltage update
+	* Polaron* - fix measurement index position reference (according available specification)
 	
 History analysis
 	# Flexibility

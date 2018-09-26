@@ -143,10 +143,10 @@ public class PolaronEx1400 extends Polaron {
 				points[1] = DataParser.parse2Short(dataBuffer, 31);
 				points[2] = DataParser.parse2Short(dataBuffer, 33);
 				points[3] = DataParser.parse2Short(dataBuffer, 35);
-				points[4] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
-				points[5] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
+				points[4] = Double.valueOf(points[1] * points[2] / 1000.0).intValue(); // power U*I [W]
+				points[5] = Double.valueOf(points[1] * points[3] / 1000.0).intValue(); // energy U*C [Wh]
 				points[6] = DataParser.parse2Short(dataBuffer, 37);
-				if (DataParser.parse2Short(dataBuffer, 39) == 0) points[5] = -1 * points[5];
+				if (DataParser.parse2Short(dataBuffer, 39) == 0) points[6] = -1 * points[6];
 				points[7] = 0;
 
 				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7 15=SpannungZelle8
