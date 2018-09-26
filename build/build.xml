@@ -632,6 +632,7 @@
 			<fileset file="build/lib/jaxb-core-2.3.0.1.jar" />
 			<fileset file="build/lib/jaxb-runtime-2.3.0.1.jar" />
 			<fileset file="build/lib/istack-commons-runtime-3.0.5.jar" />
+			<fileset file="build/lib/activation-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/gson-2.8.5.jar" />
 			<fileset file="build/lib/json-simple-1.1.1.jar" />
@@ -652,6 +653,7 @@
 			<fileset file="build/lib/jaxb-core-2.3.0.1.jar" />
 			<fileset file="build/lib/jaxb-runtime-2.3.0.1.jar" />
 			<fileset file="build/lib/istack-commons-runtime-3.0.5.jar" />
+			<fileset file="build/lib/activation-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
@@ -670,6 +672,7 @@
 			<fileset file="build/lib/jaxb-core-2.3.0.1.jar" />
 			<fileset file="build/lib/jaxb-runtime-2.3.0.1.jar" />
 			<fileset file="build/lib/istack-commons-runtime-3.0.5.jar" />
+			<fileset file="build/lib/activation-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
@@ -688,6 +691,7 @@
 			<fileset file="build/lib/jaxb-core-2.3.0.1.jar" />
 			<fileset file="build/lib/jaxb-runtime-2.3.0.1.jar" />
 			<fileset file="build/lib/istack-commons-runtime-3.0.5.jar" />
+			<fileset file="build/lib/activation-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
@@ -706,6 +710,7 @@
 			<fileset file="build/lib/jaxb-core-2.3.0.1.jar" />
 			<fileset file="build/lib/jaxb-runtime-2.3.0.1.jar" />
 			<fileset file="build/lib/istack-commons-runtime-3.0.5.jar" />
+			<fileset file="build/lib/activation-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
@@ -724,6 +729,7 @@
 			<fileset file="build/lib/jaxb-core-2.3.0.1.jar" />
 			<fileset file="build/lib/jaxb-runtime-2.3.0.1.jar" />
 			<fileset file="build/lib/istack-commons-runtime-3.0.5.jar" />
+			<fileset file="build/lib/activation-1.1.1.jar" />
 			<fileset file="build/lib/usb4java-1.2.0.jar" />
 			<fileset file="build/lib/usb-api-1.0.2.jar" />
 			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
