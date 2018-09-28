@@ -71,6 +71,7 @@ public final class FleetMonitor {
 		String					vaultDeviceName;
 
 		int							vaultCount					= 0;
+		int							channelCount				= 0;
 		long						minFileLastModified	= Long.MAX_VALUE;
 		long						maxFileLastModified	= 0;
 		long						minStartTimestampMs	= Long.MAX_VALUE;
@@ -95,9 +96,10 @@ public final class FleetMonitor {
 				HistoVault[] indexedVaults = e.getValue().toArray(new HistoVault[e.getValue().size()]);
 				ObjectSummary channelSummary = createChannelSummary(analyzer, indexedVaults);
 				oS.vaultCount += channelSummary.vaultCount;
-				oS.minFileLastModified = Math.max(oS.minFileLastModified, channelSummary.minFileLastModified);
+				oS.channelCount += 1;
+				oS.minFileLastModified = Math.min(oS.minFileLastModified, channelSummary.minFileLastModified);
 				oS.maxFileLastModified = Math.max(oS.maxFileLastModified, channelSummary.maxFileLastModified);
-				oS.minStartTimestampMs = Math.max(oS.minStartTimestampMs, channelSummary.minStartTimestampMs);
+				oS.minStartTimestampMs = Math.min(oS.minStartTimestampMs, channelSummary.minStartTimestampMs);
 				oS.maxStartTimestampMs = Math.max(oS.maxStartTimestampMs, channelSummary.maxStartTimestampMs);
 				oS.minDuration_MM = Math.min(oS.minDuration_MM, channelSummary.minDuration_MM);
 				oS.maxDuration_MM = Math.max(oS.maxDuration_MM, channelSummary.maxDuration_MM);
@@ -127,6 +129,7 @@ public final class FleetMonitor {
 				oS.minDuration_MM = Math.min(oS.minDuration_MM, v.getScores().get(ScoreLabelTypes.DURATION_MM.ordinal()).getValue());
 				oS.maxDuration_MM = Math.max(oS.maxDuration_MM, v.getScores().get(ScoreLabelTypes.DURATION_MM.ordinal()).getValue());
 			}
+			oS.channelCount = (int) Arrays.stream(indexedVaults).map(HistoVault::getLogChannelNumber).distinct().count();
 
 			HistoGraphicsTemplate template = HistoGraphicsTemplate.createTransitoryTemplate(analyzer);
 			template.load();
@@ -171,7 +174,7 @@ public final class FleetMonitor {
 
 		@Override
 		public String toString() {
-			return "ObjectSummary [objectKey=" + this.objectKey + ", vaultDeviceName=" + this.vaultDeviceName + ", maxFileLastModified=" + this.maxFileLastModified + ", maxStartTimestampMs=" + this.maxStartTimestampMs + ", maxDuration_MM=" + this.maxDuration_MM + ", maxWarning=" + Arrays.toString(this.maxReminders) + ", vaultCount=" + this.vaultCount + "]";
+			return "ObjectSummary [objectKey=" + this.objectKey + ", vaultDeviceName=" + this.vaultDeviceName + ", maxFileLastModified=" + this.maxFileLastModified + ", maxStartTimestampMs=" + this.maxStartTimestampMs + ", maxDuration_MM=" + this.maxDuration_MM + ", maxWarning=" + Arrays.toString(this.maxReminders) + ", vaultCount=" + this.vaultCount + ", channelCount=" + this.channelCount + "]";
 		}
 	}
 
