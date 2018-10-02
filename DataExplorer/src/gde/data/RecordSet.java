@@ -520,6 +520,17 @@ public final class RecordSet extends AbstractRecordSet {
 	}
 
 	/**
+	 * get all none calculated and formated data points of a given index
+	 * @param index of the data points
+	 * @return raw values as string array including time
+	 */
+	public String[] getRawExportRow(int index, boolean isAbsolute) {
+		String[] exportRow = new String[this.size() + 1]; // add time column
+		exportRow[0] = this.getFormatedTime_sec(index, isAbsolute);
+		return this.device.prepareRawExportRow(this, exportRow, index);
+	}
+
+	/**
 	 * @return a valid time step in msec for record sets from devices with constant time step between measurement points !
 	 *         For devices with none constant time step between measurement points it returns the average value.
 	 *         Do not use for calculation, use for logging purpose only.

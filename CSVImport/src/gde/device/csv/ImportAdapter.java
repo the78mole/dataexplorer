@@ -319,15 +319,6 @@ public class ImportAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * function to prepare a row of record set for export while translating available measurement values.
-	 * @return pointer to filled data table row with formated values
-	 */
-	@Override
-	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
-		return super.prepareExportRow(recordSet, dataTableRow, rowIndex);
-	}
-
-	/**
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */

@@ -282,40 +282,6 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
-	 * function to prepare a row of record set for export while translating available measurement values.
-	 * @return pointer to filled data table row with formated values
-	 */
-	@Override
-	public String[] prepareExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
-		return super.prepareExportRow(recordSet, dataTableRow, rowIndex);
-		//previous code, replaced by super class generic implementation
-		//			try {
-		//				int index = 0;
-		//				for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-		//					double offset = record.getOffset(); // != 0 if curve has an defined offset
-		//					double reduction = record.getReduction();
-		//					double factor = record.getFactor(); // != 1 if a unit translation is required
-		//					//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-		//					if (index > 1) {
-		//						dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
-		//					}
-		//					else {
-		//						//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
-		//						double value = (record.realGet(rowIndex) / 1000000.0);
-		//						int grad = (int) value;
-		//						double minuten = (value - grad) * 100;
-		//						dataTableRow[index + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
-		//					}
-		//					++index;
-		//				}
-		//			}
-		//			catch (RuntimeException e) {
-		//				log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-		//			}
-		//			return dataTableRow;
-	}
-
-	/**
 	 * function to prepare a data table row of record set while translating available measurement values
 	 * @return pointer to filled data table row with formated values
 	 */

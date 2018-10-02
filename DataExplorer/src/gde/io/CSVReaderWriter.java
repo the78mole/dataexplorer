@@ -415,20 +415,25 @@ public class CSVReaderWriter {
 			sb.append(Messages.getString(MessageIds.GDE_MSGT0137)).append(separator); // Spannung [V];Strom [A];Ladung [Ah];Leistung [W];Energie [Wh]";
 			// write the measurements signature
 			int i = 0;
-			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-				MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), record.getOrdinal());
-				log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
-				if (isRaw) {
+			if (isRaw) {
+				String[] recordNames = recordSet.getRecordNames();
+				for (int j = 0; j < recordNames.length; j++) {
+					final Record record = recordSet.get(recordNames[j]);
+					MeasurementType  measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), record.getOrdinal());
+					log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 					if (!measurement.isCalculation()) {	// only use active records for writing raw data
 						sb.append(record.getName()).append(" [---]").append(separator);	 //$NON-NLS-1$
 						log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 					}
 				}
-				else {
-					sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator);	 //$NON-NLS-1$
-					log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
-				}
 				++i;
+			}
+			else {
+				for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+					log.log(Level.FINER, "append " + record.getName()); //$NON-NLS-1$
+					sb.append(record.getName()).append(" [").append(record.getUnit()).append(']').append(separator);	 //$NON-NLS-1$
+					++i;
+				}
 			}
 			sb.deleteCharAt(sb.length() - 1).append(lineSep);
 			log.log(Level.FINER, "header line = " + sb.toString()); //$NON-NLS-1$
@@ -449,27 +454,27 @@ public class CSVReaderWriter {
 
 			for (i = 0; i < recordEntries; i++) {
 				sb = new StringBuffer();
-				String[] row = recordSet.getDataTableRow(i, isTimeFormatAbsolute);
-				char currentDecimalSeparator = recordSet.get(0).getDecimalFormat().getDecimalFormatSymbols().getDecimalSeparator();
-				String currentrGoupingSeparator = String.valueOf(recordSet.get(0).getDecimalFormat().getDecimalFormatSymbols().getGroupingSeparator());
-
-				// add time entry
-				sb.append(row[0].replace('.', decimalSeparator)).append(separator);
-				// add data entries
-				int j = 0;
-				for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), record.getOrdinal());
-					if (isRaw) { // do not change any values
-						if (!measurement.isCalculation())
-							if (recordSet.isRaw())
-								sb.append(row[j + 1].replace(currentrGoupingSeparator, GDE.STRING_BLANK).replace(currentDecimalSeparator, decimalSeparator)).append(separator);
-							else
-								sb.append(row[j + 1].replace(currentrGoupingSeparator, GDE.STRING_BLANK).replace(currentDecimalSeparator, decimalSeparator)).append(separator);
+				if (isRaw) { // do not change any values
+					String[] row = recordSet.getRawExportRow(i, isTimeFormatAbsolute);
+					for (String value : row) {
+						sb.append(value).append(separator);					
 					}
-					else
+				}
+				else {
+					String[] row = recordSet.getDataTableRow(i, isTimeFormatAbsolute);
+					String currentDecimalSeparator = String.valueOf(recordSet.get(0).getDecimalFormat().getDecimalFormatSymbols().getDecimalSeparator());
+					String currentrGoupingSeparator = String.valueOf(recordSet.get(0).getDecimalFormat().getDecimalFormatSymbols().getGroupingSeparator());
+	
+					// add time entry
+					sb.append(row[0].replace('.', decimalSeparator)).append(separator);
+					// add data entries
+					int j = 0;
+					for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
+						log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 						// translate according device and measurement unit
-						sb.append(row[j + 1].replace(currentrGoupingSeparator, GDE.STRING_BLANK).replace(currentDecimalSeparator, decimalSeparator)).append(separator);
-					++j;
+						sb.append(row[j + 1].replace(currentrGoupingSeparator, GDE.STRING_BLANK).replace(currentDecimalSeparator.charAt(0), decimalSeparator)).append(separator);
+						++j;
+					}
 				}
 				sb.deleteCharAt(sb.length() - 1).append(lineSep);
 				writer.write(sb.toString());

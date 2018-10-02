@@ -15,7 +15,7 @@
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
-    					2016,2017,2018 Thomas Eickert
+    							2016,2017,2018 Thomas Eickert
 ****************************************************************************************/
 package gde.device;
 
@@ -1471,7 +1471,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @return the channel measurements by given channel configuration key (name)
+	 * @return the channel measurements with replaced names by given channel configuration number
 	 */
 	public List<MeasurementType> getChannelMeasuremtsReplacedNames(int channelConfigNumber) {
 		List<MeasurementType> tmpMeasurements = this.getChannel(channelConfigNumber).getMeasurement();
