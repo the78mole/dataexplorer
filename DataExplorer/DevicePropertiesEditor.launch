@@ -9,5 +9,5 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="gde.ui.dialog.edit.DevicePropertiesEditor"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="DataExplorer"/>
-    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms40M -Xmx256M -Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms40M -Xmx256M"/>
 </launchConfiguration>
