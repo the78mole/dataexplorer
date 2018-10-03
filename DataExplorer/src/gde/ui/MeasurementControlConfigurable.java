@@ -62,7 +62,7 @@ public class MeasurementControlConfigurable extends Composite {
 	Composite							buttonComposite;
 
 	final IDevice					device;																																// get device specific things, get serial port, ...
-	final DataExplorer		application;																														// interaction with application instance
+	final DataExplorer		application;																													// interaction with application instance
 	final Channels				channels;																															// interaction with channels, source of all records
 	final DeviceDialog		dialog;
 	final MeasurementType	measurementType;
@@ -230,6 +230,8 @@ public class MeasurementControlConfigurable extends Composite {
 		if (activeRecordSet != null) {
 			activeRecordSet.get(this.ordinal).setName(newName + this.filterExtend);
 		}
+		//this.measurementType is a clone, so in case of change the original needs to be updated as well
+		this.device.setMeasurementName(this.channelConfigNumber, this.ordinal, newName + this.filterExtend);
 	}
 
 	/**
@@ -246,8 +248,10 @@ public class MeasurementControlConfigurable extends Composite {
 		this.measurementType.setSymbol(newSymbol);
 		RecordSet activeRecordSet = this.application.getActiveRecordSet();
 		if (activeRecordSet != null) {
-			activeRecordSet.get(this.ordinal).setSymbol(newSymbol + this.filterExtend);
+			activeRecordSet.get(this.ordinal).setSymbol(newSymbol);
 		}
+		//this.measurementType is a clone, so in case of change the original needs to be updated as well
+		this.device.setMeasurementSymbol(this.channelConfigNumber, this.ordinal, newSymbol);
 	}
 
 	/**
@@ -267,8 +271,10 @@ public class MeasurementControlConfigurable extends Composite {
 		this.measurementType.setUnit(newUnit);
 		RecordSet activeRecordSet = this.application.getActiveRecordSet();
 		if (activeRecordSet != null) {
-			activeRecordSet.get(this.ordinal).setUnit(newUnit + this.filterExtend);
+			activeRecordSet.get(this.ordinal).setUnit(newUnit);
 		}
+		//this.measurementType is a clone, so in case of change the original needs to be updated as well
+		this.device.setMeasurementUnit(this.channelConfigNumber, this.ordinal, newUnit);
 	}
 
 	/**

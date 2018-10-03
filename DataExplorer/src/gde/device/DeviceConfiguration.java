@@ -1471,7 +1471,7 @@ public class DeviceConfiguration {
 	}
 
 	/**
-	 * @return the channel measurements with replaced names by given channel configuration number
+	 * @return the channel measurements with replaced name by given channel configuration number as clone, real changes needs to be triggered separate
 	 */
 	public List<MeasurementType> getChannelMeasuremtsReplacedNames(int channelConfigNumber) {
 		List<MeasurementType> tmpMeasurements = this.getChannel(channelConfigNumber).getMeasurement();
@@ -2775,6 +2775,28 @@ public class DeviceConfiguration {
 					dataTableRow[index + 1] = String.format("%02.6f", grad + minuten / 100.); //$NON-NLS-1$
 				} else {
 					dataTableRow[index + 1] = record.getDecimalFormat().format((record.getOffset() + ((record.realGet(rowIndex) / 1000.0) - record.getReduction()) * record.getFactor()));
+				}
+				++index;
+			}
+		} catch (RuntimeException e) {
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+		}
+		return dataTableRow;
+	}
+
+	/**
+	 * function to prepare a row of record set for export while translating available measurement values.
+	 * @return pointer to filled data table row with formated values
+	 */
+	public String[] prepareRawExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
+		try {
+			int index = 0;
+			String[] recordNames = recordSet.getRecordNames();
+			for (int j = 0; j < recordNames.length; j++) {
+				final Record record = recordSet.get(recordNames[j]);
+				MeasurementType  measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), record.getOrdinal());
+				if (!measurement.isCalculation()) {	// only use active records for writing raw data
+					dataTableRow[index + 1] = String.format("%d", record.realGet(rowIndex)/1000);
 				}
 				++index;
 			}
