@@ -253,6 +253,12 @@ public class FutabaAdapterDialog extends DeviceDialog {
 					});
 				}
 
+				try {
+					this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
+				}
+				catch (RuntimeException e) {
+					this.tabFolder.setSelection(0);
+				}
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 375, 10));
 				this.dialogShell.open();
 			}

@@ -373,6 +373,12 @@ public class JLog2Dialog extends DeviceDialog {
 					});
 				}
 
+				try {
+					this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
+				}
+				catch (RuntimeException e) {
+					this.tabFolder.setSelection(0);
+				}
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 375, 10));
 				this.dialogShell.open();
 			}
@@ -380,7 +386,7 @@ public class JLog2Dialog extends DeviceDialog {
 				this.dialogShell.setVisible(true);
 				this.dialogShell.setActive();
 			}
-
+			
 			if (this.serialPort != null && this.serialPort.isConnected())
 				this.liveGathererButton.setText(Messages.getString(MessageIds.GDE_MSGT2806));
 			else

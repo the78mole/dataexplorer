@@ -263,7 +263,12 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						}
 					}
 				}
-				this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
+				try {
+					this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
+				}
+				catch (RuntimeException e) {
+					this.tabFolder.setSelection(0);
+				}
 			}
 			{
 				this.statusComposite = new Composite(this.dialogShell, SWT.NONE);

@@ -229,6 +229,12 @@ public class JetiAdapterDialog extends DeviceDialog {
 					});
 				}
 
+				try {
+					this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
+				}
+				catch (RuntimeException e) {
+					this.tabFolder.setSelection(0);
+				}
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 375, 10));
 				this.dialogShell.open();
 			}
@@ -236,6 +242,7 @@ public class JetiAdapterDialog extends DeviceDialog {
 				this.dialogShell.setVisible(true);
 				this.dialogShell.setActive();
 			}
+						
 			Display display = this.dialogShell.getDisplay();
 			while (!this.dialogShell.isDisposed()) {
 				if (!display.readAndDispatch()) display.sleep();
