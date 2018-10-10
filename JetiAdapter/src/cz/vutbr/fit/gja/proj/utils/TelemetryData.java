@@ -88,8 +88,7 @@ public class TelemetryData {
 	public static Map<Integer, Integer>	idMap						= new HashMap<Integer, Integer>();
 
 	/**
-	 * Vrati priznak, jestli jsou data naplnena
-	 * @return Priznak, ze data nejsou prazdna
+	 * @return Flag that the data is empty
 	 */
 	public boolean isEmpty() {
 		return this.data.isEmpty();
@@ -197,19 +196,18 @@ public class TelemetryData {
 		TelemetryData.timeSteps = new TimeVector();
 	}
 
-	/** Info o pouzitem senzoru */
+	/** describe sensor in use */
 	public static class TelemetrySensor implements Comparable<TelemetrySensor> {
 
-		/** ID senzoru */
+		/** sensor ID */
 		long									id;
-		/** Nazev senzoru */
+		/** sensor name*/
 		String								name;
-		/** Promenne senzoru, udaje, ktere jsou pouzite */
+		/** sensor data  */
 		TreeSet<TelemetryVar>	variables	= new TreeSet<TelemetryVar>();
 
 		/**
-		 * Nazev senzoru
-		 * @return Nazev senzoru
+		 * @return sensor name
 		 */
 		public String getName() {
 			return this.name;
@@ -223,9 +221,8 @@ public class TelemetryData {
 		}
 
 		/**
-		 * Konstruktor
-		 * @param _id ID senzoru
-		 * @param _name Nazev senzoru
+		 * @param _id sensor ID
+		 * @param _name sensor name
 		 */
 		public TelemetrySensor(long _id, String _name) {
 			this.id = _id;
@@ -233,24 +230,24 @@ public class TelemetryData {
 		}
 
 		/**
-		 * Vlozi novou promennou k existujisimu senzoru
-		 * @param v promenna senzoru
+		 * add a new variable to the existing sensor
+		 * @param v sensor variable
 		 */
 		public void addVariable(TelemetryVar v) {
 			this.variables.add(new TelemetryVar(v));
 		}
 
-		/*
-		 * Vrati seznam vsech promennych
-		 * @return Seznam promennych daneho senzoru
+		/**
+		 * Returns a list of all variables
+		 * @return List of variable of all sensors
 		 */
 		public TreeSet<TelemetryVar> getVariables() {
 			return this.variables;
 		}
 
 		/**
-		 * Ziska odkaz ze seznamu letovych hodnot
-		 * @param param parametr
+		 * Takes a link from the list of flight values
+		 * @param param parameter
 		 */
 		public TelemetryVar getVar(int param) {
 			for (TelemetryVar v : this.variables) {
@@ -262,8 +259,8 @@ public class TelemetryData {
 		}
 
 		/**
-		 * Porovnani dvou telem. senzoru
-		 * @param o Porovnavana hodnota
+		 * Compare two telemetry sensors
+		 * @param o comparable value
 		 * @return 1...greater
 		 */
 		@Override
@@ -281,26 +278,26 @@ public class TelemetryData {
 	};
 
 	/**
-	 * Info o zobrazene promenne
+	 * describe telemetry variable
 	 */
 	public static class TelemetryVar implements Comparable<TelemetryVar> {
 
-		/** Cislo parametru*/
+		/** parameter number */
 		int												param;
-		/** Jmeno parametru */
+		/** parameter name */
 		String										name;
-		/** Jednotka promenne parametru */
+		/** parameter unit */
 		String										unit;
-		/** Casosberna data prirazena k danemu parametru */
+		/** list of telemetry values */
 		ArrayList<TelemetryItem>	data;
-		/**Maximalni a minimalni hodnoty */
+		/** maximum and minimum values */
 		double										maxValue	= 0.0, minValue = 0.0;
 
 		/**
-		 * Konstruktor
-		 * @param _param cislo parametru
-		 * @param _name jmeno parametru
-		 * @param _unit jednotka
+		 * constructor telemetry variable
+		 * @param _param parameter number
+		 * @param _name parameter name
+		 * @param _unit parameter unit
 		 */
 		TelemetryVar(int _param, String _name, String _unit) {
 			this.param = _param;
@@ -310,7 +307,7 @@ public class TelemetryData {
 		}
 
 		/**
-		 * Kopirovaci konstruktor
+		 * copy constructor
 		 * @param e
 		 */
 		public TelemetryVar(TelemetryVar e) {
@@ -321,8 +318,9 @@ public class TelemetryData {
 		}
 
 		/**
-		 * Prida novou polozku do casosbernych dat
+		 * Adds a new telemetry item
 		 * @param i data
+		 * @param skip if true without time stamp
 		 */
 		public void addItem(final TelemetryItem i, final boolean skip) {
 			this.data.add(new TelemetryItem(i));
@@ -330,8 +328,10 @@ public class TelemetryData {
 		}
 
 		/**
-		 * Prida novou polozku do casosbernych dat
+		 * Adds a new telemetry item at specified position
+		 * @param index position
 		 * @param i data
+		 * @param skip if true without time stamp
 		 */
 		public void addItem(final int index, final TelemetryItem i, final boolean skip) {
 			this.data.add(index, new TelemetryItem(i));
@@ -339,45 +339,44 @@ public class TelemetryData {
 		}
 
 		/**
-		 * @return Jednotka promenne
+		 * @return unit of telemetry item
 		 */
 		public String getUnit() {
 			return this.unit;
 		}
 
 		/**
-		 * @return Jmeno promenne
+		 * @return name of telemetry item
 		 */
 		public String getName() {
 			return this.name;
 		}
 
 		/**
-		 * @return Maximalni hodnota promenne
+		 * @return maximum value of telemetry item
 		 */
 		public double getMax() {
 			return this.maxValue;
 		}
 
 		/**
-		 * @return Minimalni hodnota promenne
+		 * @return  minimum value of telemetry item
 		 */
 		public double getMin() {
 			return this.minValue;
 		}
 
 		/**
-		 * Prepis na retezec
-		 * @return
+		 * @return translated telemetry item to string
 		 */
 		@Override
 		public String toString() {
 			return this.name + " \t" + "[" + this.unit + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 
-		/*
-		 * Normalizuje cas, tak aby zacinal od nuly.Vyhleda max a min.
-		 * Vraci maximalni dosazeny cas
+		/**
+		 * Normalizes the time so that it starts from zero. Looks at max and min.
+		 * Returns maximum time set
 		 */
 		public double normamlizeItems() {
 			this.maxValue = 0.0;
@@ -403,9 +402,8 @@ public class TelemetryData {
 		}
 
 		/**
-		 * Porovnani dvou promennych
-		 * @param o
-		 * @return
+		 * @param o telemetry variable
+		 * @return Comparison of two telemetry variables
 		 */
 		@Override
 		public int compareTo(TelemetryVar o) {
@@ -413,8 +411,7 @@ public class TelemetryData {
 		}
 
 		/**
-		 *
-		 * @return Pocet desetinnych mist
+		 * @return parameter values
 		 */
 		public int getDecimals() {
 			if (this.data.size() > 0) return this.data.get(0).getDecimals();
@@ -423,8 +420,7 @@ public class TelemetryData {
 		}
 
 		/**
-		 *
-		 * @return Typ promenne (1-15)
+		 * @return parameter type (1-15)
 		 */
 		public int getType() {
 			if (this.data.size() > 0) return this.data.get(0).getType();
@@ -433,8 +429,7 @@ public class TelemetryData {
 		}
 
 		/**
-		 *
-		 * @return Hodnota double aproximovana v zadanem case
+		 * @return the value  approximated to the given time
 		 */
 		public double getDoubleAt(double time) {
 			time = time * 1000;
@@ -448,7 +443,7 @@ public class TelemetryData {
 				return this.data.get(0).getDouble();
 			}
 			else {
-				//interpoluje mezi nejblizsimi casovymi znackami
+				//interpolates between the most recent time stamps
 				for (int i = 0; i < this.data.size() - 1; i++) {
 					TelemetryItem i1, i2;
 					i1 = this.data.get(i);
@@ -467,9 +462,8 @@ public class TelemetryData {
 		}
 
 		/**
-		 * Vrati uhlovy kurz v zadanem casu
-		 * @param time cas
-		 * @return vypocteny cas
+		 * @param time
+		 * @return potential course
 		 */
 		public double getDoubleCourseAt(double time) {
 			time = time * 1000;
@@ -483,7 +477,7 @@ public class TelemetryData {
 				return this.data.get(0).getDouble();
 			}
 
-			//interpoluje mezi nejblizsimi casovymi znackami
+			//interpolates between the most recent time stamps
 			for (int i = 0; i < this.data.size() - 1; i++) {
 				TelemetryItem i1, i2;
 				i1 = this.data.get(i);
@@ -505,9 +499,8 @@ public class TelemetryData {
 		}
 
 		/**
-		 * Vrati hodnotu tyu Int v zadanem case
 		 * @param time
-		 * @return
+		 * @return integer value matching given time
 		 */
 		public int getIntAt(double time) {
 			time = time * 1000;
@@ -521,7 +514,7 @@ public class TelemetryData {
 				return this.data.get(0).getInt();
 			}
 			else {
-				//interpoluje mezi nejblizsimi casovymi znackami
+				//interpolates between the most recent time stamps
 				for (int i = 0; i < this.data.size(); i++) {
 					TelemetryItem i1;
 					i1 = this.data.get(i);
@@ -534,39 +527,38 @@ public class TelemetryData {
 		}
 
 		/**
-		 *
-		 * @return Seznam casosbernych dat
+		 * @return list of telemetry items
 		 */
 		public ArrayList<TelemetryItem> getItems() {
 			return this.data;
 		}
 
 		/**
-		 * @return the param
+		 * @return the parameter
 		 */
 		public synchronized int getParam() {
 			return this.param;
 		}
 	}
 
-	/** Polozka zaznamu telemetrie */
+	/** Telemetry Record Item */
 	public static class TelemetryItem implements Comparable<TelemetryItem> {
 
-		/** Typ dat(1-15) */
+		/** data type(1-15) */
 		private int		dataType;
-		/** Pocet deset. mist */
+		/** decimals */
 		private int		decimals;
-		/** Hodnota */
+		/** value */
 		private int		value;
-		/** casove razitko od zacatku letu */
+		/** time stamp */
 		private long	timestamp;
 
 		/**
 		 * Konstruktor
-		 * @param type Typ
-		 * @param dec pocet des. mist
-		 * @param _value hodnota
-		 * @param _timestamp casove razitko
+		 * @param type dataType
+		 * @param dec decimals
+		 * @param _value value
+		 * @param _timestamp time stamp
 		 */
 		public TelemetryItem(int type, int dec, int _value, long _timestamp) {
 			this.dataType = type;
@@ -576,7 +568,7 @@ public class TelemetryData {
 		}
 
 		/**
-		 * Kopirovaci konstruktor
+		 * copy constructor
 		 * @param i
 		 */
 		TelemetryItem(TelemetryItem i) {
@@ -588,15 +580,14 @@ public class TelemetryData {
 
 		/**
 		 *
-		 * @return Zjisti typ dat
+		 * @return data type
 		 */
 		public int getType() {
 			return this.dataType;
 		}
 
 		/**
-		 * Vrati udaj typu Double
-		 * @return aktualni hodnota
+		 * @return value as double
 		 */
 		public double getDouble() {
 			switch (this.dataType) {
@@ -617,15 +608,14 @@ public class TelemetryData {
 		}
 
 		/**
-		 * Vrati udaj typu Int
+		 * @return value as integer
 		 */
 		public int getInt() {
 			return this.value;
 		}
 
 		/**
-		 *
-		 * @return Porovnani dvou objektu
+		 * @return Compare two telemetry items
 		 */
 		@Override
 		public int compareTo(TelemetryItem o) {
@@ -641,15 +631,14 @@ public class TelemetryData {
 		}
 
 		/**
-		 *
-		 * @return casove razitko  vsekundach
+		 * @return time stamp as long
 		 */
 		public long getTimestamp() {
 			return this.timestamp;
 		}
 
 		/**
-		 * Nastavi casove razitko
+		 * set time stamp
 		 * @param l
 		 */
 		private void setTimestamp(long l) {
@@ -658,7 +647,7 @@ public class TelemetryData {
 
 		/**
 		 *
-		 * @return Pocet desetinnych mist
+		 * @return Number of decimal places
 		 */
 		private int getDecimals() {
 			return this.decimals;
@@ -666,19 +655,18 @@ public class TelemetryData {
 	}
 
 	/**
-	 * Struktura s telemetrickymi udaji
+	 * Structure with telemetry sensor data 
 	 */
 	private TreeSet<TelemetrySensor>	data					= new TreeSet<TelemetrySensor>();
 	/**
-	 * Maximalni casova znacka - celkovy pocet milisekund zaznamu
+	 * Maximal time stamp - total count of milliseconds
 	 */
 	private double										maxTimestamp	= 0.0;
 
 	private String										modelName			= "";														//$NON-NLS-1$
 
 	/**
-	 * Vrati seznam s nactenymi telemetrickymi daty
-	 * @return
+	 * @return a list of loaded telemetry data
 	 */
 	public TreeSet<TelemetrySensor> getData() {
 		return this.data;
@@ -693,7 +681,7 @@ public class TelemetryData {
 	}
 
 	/**
-	 * Vrati senzor podle zadaneho ID
+	 * @return the sensor according to the given ID
 	 */
 	public TelemetrySensor getSensor(long id) {
 		for (TelemetrySensor s : this.data) {
@@ -705,15 +693,14 @@ public class TelemetryData {
 	}
 
 	/**
-	   *
-	   * @return Maximalni cas behem letu
+	   * @return Maximum time during flight
 	   */
 	public double getMaxTimestamp() {
 		return this.maxTimestamp;
 	}
 
 	/**
-	 * Nacte data ze souboru. Pozna, jestli se jedna o *.log nebo *.xml
+	 * load data from file. Supported is *.log or *.jml
 	 * @param file
 	 */
 	public boolean loadData(String file) {
@@ -739,7 +726,7 @@ public class TelemetryData {
 			return false;
 		}
 
-		//Nyni prepocita vsechny polozky a cas. udaje
+		//Now all the items and times, data
 		for (TelemetrySensor s : this.data) {
 			for (TelemetryVar d : s.variables) {
 				this.maxTimestamp = Math.max(this.maxTimestamp, d.normamlizeItems());
@@ -749,9 +736,9 @@ public class TelemetryData {
 	}
 
 	/**
-	 * Nahraje soubor jml, ktery je zalozeny na XML
-	 * @param file nazev souboru
-	 * @return
+	 * It uploads a jml file that is based on XML
+	 * @param filename
+	 * @return true|false true means successful
 	 */
 	boolean loadJML(String filename) {
 		try {
@@ -770,10 +757,10 @@ public class TelemetryData {
 				if (sensor.getNodeType() == Node.ELEMENT_NODE) {
 					Element fstElmnt = (Element) sensor;
 					long ID = Long.parseLong(fstElmnt.getAttribute("dataStorageID")); //$NON-NLS-1$
-					//Vlozim novy sensor
+					//introduce new sensor
 					TelemetrySensor tel = new TelemetrySensor(ID, "-"); //$NON-NLS-1$
 					this.data.add(tel);
-					//Projdu atributy
+					//go through the attributes
 					NodeList elements = fstElmnt.getElementsByTagName("attrDescription"); //$NON-NLS-1$
 					for (int i = 0; i < elements.getLength(); i++) {
 						Node var = elements.item(i);
@@ -783,12 +770,12 @@ public class TelemetryData {
 							String name = varElem.getAttribute("name"); //$NON-NLS-1$
 							String unit = varElem.getAttribute("units"); //$NON-NLS-1$
 							TelemetryVar telvar = new TelemetryVar(varId, name, unit);
-							//Vlozim promennou telemetrie
+							//introduce the telemetry variable
 							tel.addVariable(telvar);
 						}
 					}
 
-					//Projdu data k danemu cidlu
+					//going through the data for the given clue
 					elements = fstElmnt.getElementsByTagName("entity"); //$NON-NLS-1$
 					for (int i = 0; i < elements.getLength(); i++) {
 						Node var = elements.item(i);
@@ -797,7 +784,7 @@ public class TelemetryData {
 							String row = String.valueOf(ID) + ";" + varElem.getAttribute("plainData"); //$NON-NLS-1$ //$NON-NLS-2$
 							String rowData[] = row.split(";"); //$NON-NLS-1$
 							if (rowData.length > 2) {
-								//Prehodim ID a timestamp
+								//Shuffle ID and timestamp
 								String tmp = rowData[1];
 								rowData[1] = rowData[0];
 								rowData[0] = tmp;
@@ -830,7 +817,8 @@ public class TelemetryData {
 	}
 
 	/**
-	 * Nahraje soubor CSV. Vraci info o uspechu
+	 * uploads a CSV file. 
+	 * @return info on success
 	 */
 	boolean loadCSV(String file) {
 		int line = 0;
@@ -853,7 +841,7 @@ public class TelemetryData {
 			while ((strLine = br.readLine()) != null) {
 				line++;
 				//strLine = strLine.trim();
-				//Prvni znak - komentar?
+				//First character - commentary?
 				if (strLine.startsWith("#")) { //$NON-NLS-1$
 					this.modelName = strLine.substring(1).trim();
 					continue;
@@ -889,31 +877,8 @@ public class TelemetryData {
 		}
 	}
 
-	void loadActual() {
-		/*int prepMsg_TxExtRxEnable(uchar *msg)
-		{
-		int len=0;
-		unsigned short ui;
-		// 3E 02 14 00 0F 16 41 01 00 01 42 01 00 01 47 01 00 01 ( 2B- CRC)
-		  msg[len++]=0x3E;
-		  msg[len++]=0x02;
-		  msg[len++]=0x00; // dÃ©lka (doplnÃ­ se pozdÄ›ji)
-		  msg[len++]=0x00; // vyÅ¡Å¡Ã­ bajt dÃ©lky
-		  msg[len++]=0x0F; // counter
-		  msg[len++]=0x16;
-		  msg[len++]=0x41; msg[len++]=0x01; msg[len++]=0x00; msg[len++]=0x01;
-		  msg[len++]=0x42; msg[len++]=0x01; msg[len++]=0x00; msg[len++]=0x01;
-		  msg[len++]=0x47; msg[len++]=0x01; msg[len++]=0x00; msg[len++]=0x01;
-		  msg[2]=len+2; // Ãºprava bajtu s dÃ©lkou
-		  ui=getCrc16(msg,len);
-		  msg[len++]=LOBYTE(ui);
-		  msg[len++]=HIBYTE(ui);
-		  return(len);
-		}*/
-	}
-
 	/**
-	 * Projede zadany seznam retezcu - ziskany radek
+	 * parse string array into parameter
 	 */
 	void parseLineParams(String params[]) {
 		final int ST_TIME = 0;
@@ -963,14 +928,14 @@ public class TelemetryData {
 				break;
 			case ST_LABEL:
 				label = param;
-				//Vlozeni noveho cidla a ukonceni nacitani radku
+				//Insert a new sensor and exit the queue
 				if (timestamp == 0 && paramId == 0) {
 					if (TelemetryData.log.isLoggable(Level.FINE)) TelemetryData.log.log(Level.FINE, "adding sensor " + label);
 					TelemetrySensor sensor = new TelemetrySensor(deviceId, label);
 					this.data.add(sensor);
 					return;
 				}
-				//Nyni nacitam popisek parametru
+				//call the parameter label
 				state = ST_UNIT;
 				break;
 			case ST_UNIT:
@@ -981,7 +946,7 @@ public class TelemetryData {
 					if (TelemetryData.log.isLoggable(Level.FINE)) TelemetryData.log.log(Level.FINE, String.format("add variable %s[%s]", var.name, unit));
 					s.addVariable(var);
 				}
-				//Vypadne z funkce
+				//no function
 				return;
 			case ST_DATATYPE:
 				dataType = Integer.parseInt(param);
@@ -1039,7 +1004,7 @@ public class TelemetryData {
 					state = ST_PARAM_NUM;
 					break;
 				}
-				//Pokusi se vlozit novy zaznam
+				//Try to insert a new record
 				int intval = 0;
 				if (dataType == TelemetryData.T_DATA16)
 					intval = (short) val;
