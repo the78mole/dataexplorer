@@ -345,7 +345,7 @@ public class TimeSteps extends Vector<Long> {
 				for (; index < elementCount; index++) {
 					if (value <= this.get(index)) break;
 				}
-				if (index + 1 <= this.elementCount && value <= (this.get(index) + this.get(index - 1)) / 2) index = index - 1;
+				if (index + 1 <= this.elementCount && (index > 0 && value <= (this.get(index) + this.get(index - 1)) / 2)) index = index - 1;
 			}
 		}
 		//log.log(Level.INFO, "index=" + index);
