@@ -147,7 +147,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			String[] sortedRecordSetNames = this.getRecordSetNames();
 			for (int i = sortedRecordSetNames.length - 1; i >= 0; --i) {
 				try {
-					recordNumber = Integer.valueOf(sortedRecordSetNames[i].split("[)]")[0]) + 1; //$NON-NLS-1$
+					recordNumber = Integer.parseInt(sortedRecordSetNames[i].split("[)]")[0]) + 1; //$NON-NLS-1$
 					break;
 				}
 				catch (NumberFormatException e) {
@@ -172,7 +172,7 @@ public class Channel extends HashMap<String, RecordSet> {
 			String[] sortedRecordSetNames = this.getRecordSetNames();
 			for (String sortedRecordSetName : sortedRecordSetNames) {
 				try {
-					sortedNumbers.add(Integer.valueOf(sortedRecordSetName.split("[)]")[0])); //$NON-NLS-1$
+					sortedNumbers.add(Integer.parseInt(sortedRecordSetName.split("[)]")[0])); //$NON-NLS-1$
 				}
 				catch (NumberFormatException e) {
 					// is alpha no numeric or no ")"
@@ -370,8 +370,9 @@ public class Channel extends HashMap<String, RecordSet> {
 						record.setLineStyle(Integer.valueOf(this.template.getProperty(i + Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID)).intValue());
 						record.setRoundOut(Boolean.valueOf(this.template.getProperty(i + Record.IS_ROUND_OUT, "false"))); //$NON-NLS-1$
 						record.setStartpointZero(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_POINT_ZERO, "false"))); //$NON-NLS-1$
-						record.setStartEndDefined(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), Double.valueOf(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")) //$NON-NLS-1$ //$NON-NLS-2$
-								.doubleValue(), Double.valueOf(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "0")).doubleValue()); //$NON-NLS-1$
+						record.setStartEndDefined(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), //$NON-NLS-1$ 
+								Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")), //$NON-NLS-1$ 
+								Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "100"))); //$NON-NLS-1$
 						record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
 					}
 					//smooth current drop
@@ -452,42 +453,43 @@ public class Channel extends HashMap<String, RecordSet> {
 			if (this.template != null && this.template.isAvailable()) {
 				for (int i = 0; i < recordSet.size(); ++i) {
 					Record record = recordSet.get(i);
-					record.setVisible(Boolean.valueOf(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
-					record.setPositionLeft(Boolean.valueOf(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"))); //$NON-NLS-1$
+					record.setVisible(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_VISIBLE, "true"))); //$NON-NLS-1$
+					record.setPositionLeft(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_POSITION_LEFT, "true"))); //$NON-NLS-1$
 					String color = this.template.getProperty(i + Record.COLOR, record.getRGB());
 					r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
 					g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
 					b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
 					record.setColor(SWTResourceManager.getColor(r, g, b));
-					record.setLineWidth(Integer.valueOf(this.template.getProperty(i + Record.LINE_WITH, "1")).intValue()); //$NON-NLS-1$
-					record.setLineStyle(Integer.valueOf(this.template.getProperty(i + Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID)).intValue());
-					record.setRoundOut(Boolean.valueOf(this.template.getProperty(i + Record.IS_ROUND_OUT, "false"))); //$NON-NLS-1$
-					record.setStartpointZero(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_POINT_ZERO, "false"))); //$NON-NLS-1$
-					record.setStartEndDefined(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), Double.valueOf(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")) //$NON-NLS-1$ //$NON-NLS-2$
-							.doubleValue(), Double.valueOf(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "0")).doubleValue()); //$NON-NLS-1$
-					record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
+					record.setLineWidth(Integer.parseInt(this.template.getProperty(i + Record.LINE_WITH, "1"))); //$NON-NLS-1$
+					record.setLineStyle(Integer.parseInt(this.template.getProperty(i + Record.LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_SOLID)));
+					record.setRoundOut(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_ROUND_OUT, "false"))); //$NON-NLS-1$
+					record.setStartpointZero(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_START_POINT_ZERO, "false"))); //$NON-NLS-1$
+					record.setStartEndDefined(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), //$NON-NLS-1$  
+							Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")), //$NON-NLS-1$ 
+							Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "100"))); //$NON-NLS-1$
+					record.setNumberFormat(Integer.parseInt(this.template.getProperty(i + Record.NUMBER_FORMAT, "1"))); //$NON-NLS-1$
 				}
 				//smooth current drop
-				recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
+				recordSet.setSmoothAtCurrentDrop(Boolean.parseBoolean(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
 				//smooth voltage curve
-				recordSet.setSmoothVoltageCurve(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
+				recordSet.setSmoothVoltageCurve(Boolean.parseBoolean(this.template.getProperty(RecordSet.SMOOTH_VOLTAGE_CURVE, "false"))); //$NON-NLS-1$
 				// time grid
 				String color = this.template.getProperty(RecordSet.TIME_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-				r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-				g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-				b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+				r = Integer.parseInt(color.split(GDE.STRING_COMMA)[0].trim());
+				g = Integer.parseInt(color.split(GDE.STRING_COMMA)[1].trim());
+				b = Integer.parseInt(color.split(GDE.STRING_COMMA)[2].trim());
 				recordSet.setTimeGridColor(SWTResourceManager.getColor(r, g, b));
-				recordSet.setTimeGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-				recordSet.setTimeGridType(Integer.valueOf(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
+				recordSet.setTimeGridLineStyle(Integer.parseInt(this.template.getProperty(RecordSet.TIME_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)));
+				recordSet.setTimeGridType(Integer.parseInt(this.template.getProperty(RecordSet.TIME_GRID_TYPE, "0"))); //$NON-NLS-1$
 				// curve grid
 				color = this.template.getProperty(RecordSet.VALUE_GRID_COLOR, "128,128,128"); //$NON-NLS-1$
-				r = Integer.valueOf(color.split(GDE.STRING_COMMA)[0].trim()).intValue();
-				g = Integer.valueOf(color.split(GDE.STRING_COMMA)[1].trim()).intValue();
-				b = Integer.valueOf(color.split(GDE.STRING_COMMA)[2].trim()).intValue();
+				r = Integer.parseInt(color.split(GDE.STRING_COMMA)[0].trim());
+				g = Integer.parseInt(color.split(GDE.STRING_COMMA)[1].trim());
+				b = Integer.parseInt(color.split(GDE.STRING_COMMA)[2].trim());
 				recordSet.setValueGridColor(SWTResourceManager.getColor(r, g, b));
-				recordSet.setValueGridLineStyle(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)).intValue());
-				recordSet.setValueGridType(Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_TYPE, "0")).intValue()); //$NON-NLS-1$
-				int gridRecordOrdinal = Integer.valueOf(this.template.getProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, "-1")).intValue();
+				recordSet.setValueGridLineStyle(Integer.parseInt(this.template.getProperty(RecordSet.VALUE_GRID_LINE_STYLE, GDE.STRING_EMPTY + SWT.LINE_DOT)));
+				recordSet.setValueGridType(Integer.parseInt(this.template.getProperty(RecordSet.VALUE_GRID_TYPE, "0"))); //$NON-NLS-1$
+				int gridRecordOrdinal = Integer.parseInt(this.template.getProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, "-1"));
 				if (gridRecordOrdinal >= 0 && gridRecordOrdinal < recordSet.realSize() && recordSet.get(gridRecordOrdinal).isVisible) {
 					recordSet.setValueGridRecordOrdinal(gridRecordOrdinal);
 				}
