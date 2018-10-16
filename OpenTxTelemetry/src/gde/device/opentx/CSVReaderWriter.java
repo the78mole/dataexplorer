@@ -260,7 +260,7 @@ public class CSVReaderWriter {
 				for (int i = 0; i < recordSet.size(); i++) {
 					Record record = recordSet.get(i);
 					if (record.getName().toLowerCase().contains("gps") && record.getName().toLowerCase().contains("speed"))
-						record.setDataType(Record.DataType.SPEED);
+						record.setDataType(Record.DataType.GPS_SPEED);
 					else if (record.getName().toLowerCase().contains("gps") && (record.getName().toLowerCase().contains("alt") || record.getName().toLowerCase().contains("höhe")))
 						record.setDataType(Record.DataType.GPS_ALTITUDE);
 					else if (record.getUnit().contains("°") && record.getUnit().contains("'") && (record.getName().toLowerCase().contains("long") || record.getName().toLowerCase().contains("länge")))

@@ -701,7 +701,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				//0=Empfänger-Spannung 1=Höhe 2=Motor-Strom 3=Motor-Spannung 4=Motorakku-Kapazität 5=Geschwindigkeit 6=Temperatur 7=GPS-Länge 8=GPS-Breite 9=GPS-Höhe 10=GPS-Geschwindigkeit 11=Steigen 12=ServoImpuls
 				//13=tripLength 14=distance 15=azimuth 16=directionStart
 				exportFileName = new FileHandler().exportFileKMZ(activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE),
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED),
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_SPEED),
 						activeRecordSet.findRecordOrdinalByUnit(new String[] { "m/s" }), //climb
 						activeRecordSet.findRecordOrdinalByUnit(new String[] { "km" }), //distance 
 						-1, //azimuth
@@ -722,7 +722,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 			if (activeRecordSet != null && activeRecordSet.containsGPSdata()) {
 				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT1710), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE),
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED), activeRecordSet.findRecordOrdinalByUnit(new String[] { "m/s" }), //climb
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_SPEED), activeRecordSet.findRecordOrdinalByUnit(new String[] { "m/s" }), //climb
 						activeRecordSet.findRecordOrdinalByUnit(new String[] { "km" }), //distance 
 						-1, //azimuth
 						type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
@@ -763,7 +763,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && this.isActualRecordSetWithGpsData()) {
-				int recordOrdinal = activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED);
+				int recordOrdinal = activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_SPEED);
 				return recordOrdinal >= 0 ? recordOrdinal : activeRecordSet.findRecordOrdinalByUnit(new String[] { "km/h", "kph" }); //speed;
 			}
 		}

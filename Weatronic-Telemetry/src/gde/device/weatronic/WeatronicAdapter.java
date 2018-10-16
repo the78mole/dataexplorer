@@ -350,7 +350,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public String[] getUsedPropertyKeys() {
 		return new String[] { IDevice.OFFSET, IDevice.FACTOR, Record.DataType.GPS_LATITUDE.value(), Record.DataType.GPS_LONGITUDE.value(), Record.DataType.GPS_ALTITUDE.value(),
-				Record.DataType.GPS_AZIMUTH.value(), Record.DataType.SPEED.value(), "statistics" };
+				Record.DataType.GPS_AZIMUTH.value(), Record.DataType.GPS_SPEED.value(), "statistics" };
 	}
 
 	/**
@@ -472,7 +472,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 					Record record = activeRecordSet.get(i);
 					Record.DataType datatype = record.getDataType();
 					switch (datatype) {
-					case SPEED:
+					case GPS_SPEED:
 						if (record.getName().startsWith("Rx"))
 							return record.getOrdinal();
 						break;
@@ -508,7 +508,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 					case GPS_ALTITUDE:
 						if (record.getName().startsWith("Rx")) altOrdinal = record.getOrdinal();
 						break;
-					case SPEED:
+					case GPS_SPEED:
 						if (record.getName().startsWith("Rx")) speedOrdinal = record.getOrdinal();
 						break;
 

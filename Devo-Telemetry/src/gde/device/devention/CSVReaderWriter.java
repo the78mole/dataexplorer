@@ -262,7 +262,7 @@ public class CSVReaderWriter {
 				for (int i = 0; i < recordSet.size(); i++) {
 					Record record = recordSet.get(i);
 					if (record.getUnit().equals("km/h") || record.getUnit().equals("m/s"))
-						record.setDataType(Record.DataType.SPEED);
+						record.setDataType(Record.DataType.GPS_SPEED);
 					else if (record.getUnit().equals("m") && (record.getName().toLowerCase().contains("alti") || record.getName().toLowerCase().contains("höhe")))
 						record.setDataType(Record.DataType.GPS_ALTITUDE);
 					else if (record.getUnit().contains("°") && record.getUnit().contains("'") && (record.getName().toLowerCase().contains("long") || record.getName().toLowerCase().contains("länge")))

@@ -101,7 +101,7 @@ public class CSVReaderWriter {
 			CSVReaderWriter.log.log(Level.FINE, GDE.CSV_DATA_HEADER + (header.get(GDE.CSV_DATA_HEADER) != null ? header.get(GDE.CSV_DATA_HEADER) : "")); //$NON-NLS-1$
 
 			while (((line = reader.readLine()) != null) && !(line.startsWith("TIME"))) {
-				// read until TIME;CH1;CH2;CH3;CH4;CH5;CH6;CH7;CH8;CH9;CH10;CH11;CH12;CH13;CH14;CH15;CH16;BATTERY;EXTERNAL BATTERY;STATUS;CURRENT;VOLTAGE;CAPACITY;ALTITUDE;VARIOMETER;TEMPERATURE;DISTANCE;SPEED;ALTITUDE;VARIOMETER;LATITUDE;LONGITUDE;TEMPERATURE;TEMPERATURE;TEMPERATURE;
+				// read until TIME;CH1;CH2;CH3;CH4;CH5;CH6;CH7;CH8;CH9;CH10;CH11;CH12;CH13;CH14;CH15;CH16;BATTERY;EXTERNAL BATTERY;STATUS;CURRENT;VOLTAGE;CAPACITY;ALTITUDE;VARIOMETER;TEMPERATURE;DISTANCE;GPS_SPEED;ALTITUDE;VARIOMETER;LATITUDE;LONGITUDE;TEMPERATURE;TEMPERATURE;TEMPERATURE;
 			}
 			header.put(GDE.CSV_DATA_HEADER, line);
 		}
@@ -225,7 +225,7 @@ public class CSVReaderWriter {
 
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "ISO-8859-1")); //$NON-NLS-1$
 				while (((line = reader.readLine()) != null) && !(line.startsWith("TIME"))) {
-					// read until TIME;CH1;CH2;CH3;CH4;CH5;CH6;CH7;CH8;CH9;CH10;CH11;CH12;CH13;CH14;CH15;CH16;BATTERY;EXTERNAL BATTERY;STATUS;CURRENT;VOLTAGE;CAPACITY;ALTITUDE;VARIOMETER;TEMPERATURE;DISTANCE;SPEED;ALTITUDE;VARIOMETER;LATITUDE;LONGITUDE;TEMPERATURE;TEMPERATURE;TEMPERATURE;
+					// read until TIME;CH1;CH2;CH3;CH4;CH5;CH6;CH7;CH8;CH9;CH10;CH11;CH12;CH13;CH14;CH15;CH16;BATTERY;EXTERNAL BATTERY;STATUS;CURRENT;VOLTAGE;CAPACITY;ALTITUDE;VARIOMETER;TEMPERATURE;DISTANCE;GPS_SPEED;ALTITUDE;VARIOMETER;LATITUDE;LONGITUDE;TEMPERATURE;TEMPERATURE;TEMPERATURE;
 				}
 
 				if (GDE.isWithUi()) {
@@ -248,7 +248,7 @@ public class CSVReaderWriter {
 				for (int i = 0; i < recordSet.size(); i++) {
 					Record record = recordSet.get(i);
 					if (record.getUnit().equals("km/h"))
-						record.setDataType(Record.DataType.SPEED);
+						record.setDataType(Record.DataType.GPS_SPEED);
 					else if (record.getUnit().equals("m") && (record.getName().toLowerCase().contains("alti") || record.getName().toLowerCase().contains("höhe")))
 						record.setDataType(Record.DataType.GPS_ALTITUDE);
 					else if (record.getUnit().contains("°") && record.getUnit().contains("'") && (record.getName().toLowerCase().contains("long") || record.getName().toLowerCase().contains("länge")))

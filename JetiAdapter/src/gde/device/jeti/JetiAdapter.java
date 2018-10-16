@@ -554,7 +554,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), 
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
-						activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED), 
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_SPEED), 
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"m/s"}),					//climb
 						activeRecordSet.findRecordOrdinalByUnit(new String[] {"km"}),						//distance 
 						-1, 																																		//azimuth
@@ -622,7 +622,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && this.isActualRecordSetWithGpsData()) {
 				if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
-					return activeRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED); 
+					return activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_SPEED); 
 
 				return this.kmzMeasurementOrdinal != null ? this.kmzMeasurementOrdinal : -1;
 			}

@@ -234,7 +234,8 @@ public class Record extends AbstractRecord implements IRecord {
 		GPS_ALTITUDE("GPS altitude"), // GPS or absolute altitude required in some case for GPS related calculations like speed, distance, ...
 		GPS_AZIMUTH("GPS azimuth"), // GPS azimuth, to be used for live display and positioning of icon if used
 		GPS_TIME("GPS time"), // GPS time, to be used as time stamp or start time if available
-		SPEED("speed"), // speed, to be used for KMZ export with colors of specified velocity
+		GPS_SPEED("GPS speed"), // GPS speed, to be used for KMZ export with colors of specified velocity
+		AIR_SPEED("AIR speed"), // true AIR speed, to be used for KMZ export with colors of specified velocity
 		DATE_TIME("date time"), // special data type where no formatting or calculation can be executed, just display
 		CURRENT("current"), // data type to unique identify current type, mainly used for smoothing current drops
 		VOLTAGE("voltage"); // data type to unique identify voltage type, to smoothing reflex or pulsing voltage values
@@ -292,7 +293,7 @@ public class Record extends AbstractRecord implements IRecord {
 			} else if (isHeight(name)) {
 				dataType = Record.DataType.GPS_ALTITUDE;
 			} else if (isSpeed(name)) {
-				dataType = Record.DataType.SPEED;
+				dataType = Record.DataType.GPS_SPEED;
 			}
 			return dataType;
 		}

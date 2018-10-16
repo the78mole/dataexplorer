@@ -298,7 +298,7 @@ public class LogReader {
 							setupMeasurement(gde.data.Record.DataType.GPS_LONGITUDE, activeChannelConfigNumber, ordinal++, packetGpsName, packetGpsUnits[j], true, packetGpsFactors[j], 0.0, true);
 							break;
 						case 2://Speed
-							setupMeasurement(gde.data.Record.DataType.SPEED, activeChannelConfigNumber, ordinal++, packetGpsName, packetGpsUnits[j], true, packetGpsFactors[j], 0.0, false);
+							setupMeasurement(gde.data.Record.DataType.GPS_SPEED, activeChannelConfigNumber, ordinal++, packetGpsName, packetGpsUnits[j], true, packetGpsFactors[j], 0.0, false);
 							break;
 						case 3://Altitude
 							setupMeasurement(gde.data.Record.DataType.GPS_ALTITUDE, activeChannelConfigNumber, ordinal++, packetGpsName, packetGpsUnits[j], true, packetGpsFactors[j], 0.0, false);
@@ -387,7 +387,7 @@ public class LogReader {
 							setupMeasurement(gde.data.Record.DataType.GPS_AZIMUTH, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), false, measurement.getFactor(),
 									measurement.getOffset(), true);
 						else if (measurement.getName().contains("_GPS_Speed"))
-							setupMeasurement(gde.data.Record.DataType.SPEED, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), false, measurement.getFactor(),
+							setupMeasurement(gde.data.Record.DataType.GPS_SPEED, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), false, measurement.getFactor(),
 									measurement.getOffset(), true);
 						else if (measurement.getName().contains("_GPS_IsValid"))
 							setupMeasurement(gde.data.Record.DataType.DEFAULT, activeChannelConfigNumber, ordinal++, measurement.getName(), measurement.getUnit(), true, measurement.getFactor(),
@@ -497,11 +497,11 @@ public class LogReader {
 				tmpPropertyType.setValue(gde.data.Record.DataType.GPS_AZIMUTH.value());
 				gdeMeasurement.getProperty().add(tmpPropertyType);
 				break;
-			case SPEED:
+			case GPS_SPEED:
 				tmpPropertyType = new PropertyType();
-				tmpPropertyType.setName(gde.data.Record.DataType.SPEED.value());
+				tmpPropertyType.setName(gde.data.Record.DataType.GPS_SPEED.value());
 				tmpPropertyType.setType(DataTypes.STRING);
-				tmpPropertyType.setValue(gde.data.Record.DataType.SPEED.value());
+				tmpPropertyType.setValue(gde.data.Record.DataType.GPS_SPEED.value());
 				gdeMeasurement.getProperty().add(tmpPropertyType);
 				break;
 

@@ -590,7 +590,7 @@ public class DevoAdapter extends DeviceConfiguration implements IDevice {
 		RecordSet actualRecordSet = this.application.getActiveRecordSet();
 		if (actualRecordSet != null) {
 			if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
-				return actualRecordSet.getRecordOrdinalOfType(Record.DataType.SPEED);
+				return actualRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_SPEED);
 		}
 		return this.kmzMeasurementOrdinal != null ? this.kmzMeasurementOrdinal : -1;
 	}

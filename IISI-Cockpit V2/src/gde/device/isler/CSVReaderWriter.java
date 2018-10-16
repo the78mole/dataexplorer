@@ -250,7 +250,7 @@ public class CSVReaderWriter {
 							record.setUnit("°");
 						}
 						if (record.getName().startsWith("GPS H") || record.getName().startsWith("GPS Alt")) record.setDataType(Record.DataType.GPS_ALTITUDE);
-						if (record.getName().startsWith("GPS Ges") || record.getName().startsWith("GPS Spe") || record.getName().startsWith("GPS Vit")) record.setDataType(Record.DataType.SPEED);
+						if (record.getName().startsWith("GPS Ges") || record.getName().startsWith("GPS Spe") || record.getName().startsWith("GPS Vit")) record.setDataType(Record.DataType.GPS_SPEED);
 					}
 				}
 

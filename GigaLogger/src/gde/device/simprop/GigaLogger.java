@@ -559,7 +559,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 					case GPS_ALTITUDE:
 						ordinals[2] = record.getOrdinal();
 						break;
-					case SPEED:
+					case GPS_SPEED:
 						ordinals[7] = record.getOrdinal();
 						break;
 					case GPS_AZIMUTH:
@@ -630,7 +630,7 @@ public class GigaLogger extends DeviceConfiguration implements IDevice {
 						case GPS_ALTITUDE:
 							ordinals[2] = record.getOrdinal();
 							break;
-						case SPEED:
+						case GPS_SPEED:
 							ordinals[7] = record.getOrdinal();
 							break;
 						case GPS_AZIMUTH:
