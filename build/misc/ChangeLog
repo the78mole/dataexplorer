@@ -20,6 +20,7 @@ Device specific changes/fixes
 	* PolaronPro - fix cell voltage update
 	* Polaron* - fix measurement index position reference (according available specification)
 	* GPS-Logger2 - fix device visualization dialog
+	* ArduPilot - initial implementation based on LogStructure.h
 	
 History analysis
 	# Flexibility

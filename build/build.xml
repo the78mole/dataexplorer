@@ -218,6 +218,7 @@
 		<ant antfile="build.xml" target="clean" dir="Pulsar" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="Devo-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="CSVImport" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="ArduPilot" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -403,6 +404,7 @@
 		<ant antfile="build.xml" target="package" dir="Pulsar" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="Devo-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="CSVImport" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="ArduPilot" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 	
@@ -444,6 +446,7 @@
 		<ant antfile="build.xml" target="nonui_package" dir="Pulsar" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="Devo-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="CSVImport" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="ArduPilot" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -484,6 +487,7 @@
 			<include name="Pulsar/build/*.jar" />
 			<include name="Devo-Telemetry/build/*.jar" />
 			<include name="CSVImport/build/*.jar" />
+			<include name="ArduPilot/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
