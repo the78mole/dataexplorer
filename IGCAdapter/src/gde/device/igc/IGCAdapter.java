@@ -428,7 +428,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZ3DAbsoluteItem;
 
-		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0732))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
 
 			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);

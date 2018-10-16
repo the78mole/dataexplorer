@@ -546,7 +546,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		MenuItem convertGPXItem;
 		MenuItem convertGPXGarminItem;
 
-		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0732))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
 
 			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);

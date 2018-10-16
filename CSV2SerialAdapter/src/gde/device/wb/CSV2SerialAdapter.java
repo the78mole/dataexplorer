@@ -777,7 +777,7 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 	public void updateFileMenu(final Menu exportMenue) {
 		GDE.display.asyncExec(new Runnable() {
 			public void run() {
-				if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+				if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0732))) {
 					MenuItem convertKMZ3DRelativeItem;
 					MenuItem convertKMZ3DAbsoluteItem;
 
