@@ -748,7 +748,6 @@ public class CSV2SerialAdapter extends DeviceConfiguration implements IDevice {
 				}
 			}
 		}
-		if (containsGPSdata) updateFileMenu(this.application.getMenuBar().getExportMenu());
 
 		return containsGPSdata;
 	}
