@@ -365,6 +365,19 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * method to get the sorted active or in active record names as string array
+	 * - records which does not have inactive or active flag are calculated from active or inactive
+	 * - all records not calculated may have the active status and must be stored
+	 * @param channelConfigNumber
+	 * @param validMeasurementNames based on the current or any previous configuration
+	 * @return String[] containing record names
+	 */
+	@Override
+	public String[] getNoneCalculationMeasurementNames(int channelConfigNumber, String[] validMeasurementNames) {
+		return validMeasurementNames;
+	}
+
+	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 */
 	@Override

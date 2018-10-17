@@ -22,6 +22,8 @@ Device specific changes/fixes
 	* Polaron* - fix measurement index position reference (according available specification)
 	* GPS-Logger2 - fix device visualization dialog
 	* ArduPilot - initial implementation based on LogStructure.h
+	* CSV2SereilAdapter - fix potential invalid thread access while updating GPS related menu entries
+	* Weatronic-Telemetry - fix potential OSD file reading with lower number of records compared to actual device measurement structure
 	
 History analysis
 	# Flexibility
