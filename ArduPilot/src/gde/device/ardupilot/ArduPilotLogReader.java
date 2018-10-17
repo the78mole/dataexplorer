@@ -278,7 +278,7 @@ public class ArduPilotLogReader {
 					case PID:
 					case QUAT:
 					case GPS:
-						log.log(Level.OFF, logEntryFormat.name);
+						log.log(Level.FINE, logEntryFormat.name);
 						tmpRecordNames.addAll(logEntryFormat.getMeasurementNames());
 						List<String> symbols = logEntryFormat.getSymbols();
 						tmpRecordSymbols.addAll(symbols);
@@ -308,7 +308,7 @@ public class ArduPilotLogReader {
 				//find GPS related records and try to assign data type
 				for (int i = 0; i < recordSet.size(); i++) {
 					Record record = recordSet.get(i);
-					log.log(Level.OFF, String.format("%s - %s", record.getName(), record.getUnit()));
+					log.log(Level.FINE, String.format("%s - %s", record.getName(), record.getUnit()));
 					if (record.getUnit().equals("m/s") && record.getName().toLowerCase().contains("gps_spd") )
 						record.setDataType(Record.DataType.GPS_SPEED);
 					else if (record.getUnit().equals("m/s") && record.getName().toLowerCase().contains("airspeed") )
@@ -360,18 +360,18 @@ public class ArduPilotLogReader {
 					case PID:
 					case QUAT:
 					case GPS: //GPS, 3, 594438201, 6, 4.68, 44.0290459, -77.7367640, 3.13, 91.56, 0.00, 0.00				
-						log.log(Level.OFF, line);
+						log.log(Level.FINE, line);
 						String sensor = line.split(", ")[0];
 						LogFMT logEntry = logEntries.get(sensor);
 						int index = 0;
 						for (String name : logEntry.getMeasurementNames()) {
 							int entryOrdinal = recordSet.get(name).getOrdinal();
 							//FMT, 130, 35, GPS, BIBcLLeeEe, Status,Time,NSats,HDop,Lat,Lng,RelAlt,Alt,Spd,GCrs
-							//log.log(Level.OFF, String.format("name: %s, ordinal: %d, fmt: %s, value: %s", name, entryOrdinal, logEntry.getFmt(index), line.split(", ")[index+1]));
+							//log.log(Level.FINE, String.format("name: %s, ordinal: %d, fmt: %s, value: %s", name, entryOrdinal, logEntry.getFmt(index), line.split(", ")[index+1]));
 	
 							if (name.toLowerCase().contains("time")) {
 								long tmpTimeStamp = Long.parseLong(line.split(", ")[1+index]) *1000;
-								//log.log(Level.OFF, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(tmpTimeStamp));
+								//log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(tmpTimeStamp));
 								if (isFileBasedTimeStamp && lastTimeStamp == 0) {
 									startTimeStamp = lastTimeStamp = tmpTimeStamp;
 									recordSet.setRecordSetDescription(device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129)	+ new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp));
@@ -382,11 +382,16 @@ public class ArduPilotLogReader {
 									lastTimeStamp = tmpTimeStamp;
 									isNewTimeStamp = true;
 								}
-								log.log(Level.OFF, new SimpleDateFormat("mm:ss.SSS").format((lastTimeStamp - startTimeStamp)/1000));
+								log.log(Level.FINE, new SimpleDateFormat("mm:ss.SSS").format((lastTimeStamp - startTimeStamp)/1000));
 								points[entryOrdinal] = 0; //skip time entry (int) (lastTimeStamp - startTimeStamp);																
 							} else {
 								
-								points[entryOrdinal] =  Integer.parseInt(""+ArduPilot.parseValue(logEntry.getFmt(index), line.split(", ")[1+index]));								
+								try {
+									points[entryOrdinal] =  Integer.parseInt(""+ArduPilot.parseValue(logEntry.getFmt(index), line.split(", ")[1+index]));
+								}
+								catch (NumberFormatException e) {
+									log.log(Level.WARNING, String.format("%s line %d -> NumberFormatException for %s", filePath, lineNumber, e.getMessage()));
+								}								
 							}
 							++index;
 						}

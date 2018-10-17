@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.config.Settings;
+import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.Record.DataType;
@@ -1066,7 +1067,7 @@ public class ArduPilot extends DeviceConfiguration implements IDevice {
 	/**
 	 * Format characters in the format string for binary log messages
 	 */
-	public static Object parseValue(String fmt, String value) {
+	public static Object parseValue(String fmt, String value) throws NumberFormatException {
 		switch (fmt.charAt(0)) {
 		  case 'a'://int16_t[32]
 		  	short[] parsedValue = new short[32];
@@ -1251,7 +1252,7 @@ public class ArduPilot extends DeviceConfiguration implements IDevice {
 		MenuItem convertKMZ3DRelativeItem;
 		MenuItem convertKMZDAbsoluteItem;
 
-		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0018))) {
+		if (exportMenue.getItem(exportMenue.getItemCount() - 1).getText().equals(Messages.getString(gde.messages.MessageIds.GDE_MSGT0732))) {
 			new MenuItem(exportMenue, SWT.SEPARATOR);
 
 			convertKMZ3DRelativeItem = new MenuItem(exportMenue, SWT.PUSH);
@@ -1318,21 +1319,46 @@ public class ArduPilot extends DeviceConfiguration implements IDevice {
 		return -1;
 	}
 
+	/**
+	 * export a file of the actual channel/record set
+	 * @return full qualified file path depending of the file ending type
+	 */
+	@Override
+	public String exportFile(String fileEndingType, boolean isExportTmpDir) {
+		String exportFileName = GDE.STRING_EMPTY;
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
+				exportFileName = new FileHandler().exportFileKMZ(
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE), 
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE),
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_ALTITUDE), 
+						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_SPEED),
+						-1, //climb
+						-1, //distance 
+						-1, //azimuth
+						true, isExportTmpDir);
+			}
+		}
+		return exportFileName;
+	}
+
 	@Override
 	public HashMap<String, String> getLovKeyMappings(HashMap<String, String> lov2osdMap) {
-		// TODO Auto-generated method stub
+		// ArduPilot unknown to LogView
 		return null;
 	}
 
 	@Override
 	public String getConvertedRecordConfigurations(HashMap<String, String> header, HashMap<String, String> lov2osdMap, int channelNumber) {
-		// TODO Auto-generated method stub
+		// ArduPilot unknown to LogView
 		return null;
 	}
 
 	@Override
 	public int getLovDataByteSize() {
-		// unknown to LogView
+		// ArduPilot unknown to LogView
 		return 0;
 	}
 
@@ -1551,6 +1577,22 @@ public class ArduPilot extends DeviceConfiguration implements IDevice {
 		return true;
 	}
 
+	/**
+	 * method to get the sorted active or in active record names as string array
+	 * - records which does not have inactive or active flag are calculated from active or inactive
+	 * - all records not calculated may have the active status and must be stored
+	 * @param channelConfigNumber
+	 * @param validMeasurementNames based on the current or any previous configuration
+	 * @return String[] containing record names
+	 */
+	@Override
+	public String[] getNoneCalculationMeasurementNames(int channelConfigNumber, String[] validMeasurementNames) {
+		return validMeasurementNames;
+	}
+
+	/**
+	 * method toggle open close serial port or start/stop gathering data from device
+	 */
 	@Override
 	public void open_closeCommPort() {
 		this.importLogFiles();
@@ -1589,5 +1631,49 @@ public class ArduPilot extends DeviceConfiguration implements IDevice {
 			}
 		};
 		reader.start();
+	}
+
+	/**
+	 * @param record
+	 * @return true if if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
+	 */
+	@Override
+	public boolean isGPSCoordinates(Record record) {
+		return record.getDataType() == DataType.GPS_LATITUDE || record.getDataType() == DataType.GPS_LONGITUDE;
+	}
+
+	/**
+	 * query if the actual record set of this device contains GPS data to enable KML export to enable google earth visualization 
+	 * set value of -1 to suppress this measurement
+	 */
+	@Override
+	public boolean isActualRecordSetWithGpsData() {
+		boolean containsGPSdata = false;
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null) {
+				containsGPSdata = activeRecordSet.containsGPSdata();
+			}
+		}
+
+		return containsGPSdata;
+	}
+
+	/**
+	 * @return the measurement ordinal where velocity limits as well as the colors are specified (GPS-velocity)
+	 */
+	@Override
+	public Integer getGPS2KMZMeasurementOrdinal() {
+		//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
+		Channel activeChannel = this.channels.getActiveChannel();
+		if (activeChannel != null) {
+			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+			if (activeRecordSet != null && this.isActualRecordSetWithGpsData()) {
+				int recordOrdinal = activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_SPEED);
+				return recordOrdinal >= 0 ? recordOrdinal : activeRecordSet.findRecordOrdinalByUnit(new String[] { "km/h", "kph" }); //speed;
+			}
+		}
+		return -1;
 	}
 }

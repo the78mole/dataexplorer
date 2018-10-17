@@ -2,14 +2,18 @@ package gde.device.ardupilot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import gde.GDE;
+import gde.log.Level;
 
 /**
  * Log entry formating
  * GPS, BIBcLLeeEe, Status,Time,NSats,HDop,Lat,Lng,RelAlt,Alt,Spd,GCrs
  */
 public class LogFMT {
+	final static Logger			log					= Logger.getLogger(LogFMT.class.getName());
+
 	String name;
 	List<String> fmts;
 	List<String> measurementNames;
@@ -29,54 +33,104 @@ public class LogFMT {
 		this.fmts = new ArrayList<>();
 		for (int i = 0; i < this.measurementNames.size(); i++) {
 			String measurementName = this.measurementNames.get(i).contains(GDE.STRING_UNDER_BAR) ? this.measurementNames.get(i).split(GDE.STRING_UNDER_BAR)[1] : this.measurementNames.get(i);
+			byte fmt = entries[4].getBytes()[i];
 			switch (ArduPilot.LogEntry.getLogEntry(this.name)) {
 			case ACC:
-				this.fmts.add(ArduPilot.ACC.getFmt(measurementName));
+				String defined_fmt = ArduPilot.ACC.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case ARSP:
-				this.fmts.add(ArduPilot.ARSP.getFmt(measurementName));
+				defined_fmt = ArduPilot.ARSP.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case BARO:
-				this.fmts.add(ArduPilot.BARO.getFmt(measurementName));
+				defined_fmt = ArduPilot.BARO.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case CURR:
-				this.fmts.add(ArduPilot.CURR.getFmt(measurementName));
+				defined_fmt = ArduPilot.CURR.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case CURR_CELL:
-				this.fmts.add(ArduPilot.CURR_CELL.getFmt(measurementName));
+				defined_fmt = ArduPilot.CURR_CELL.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case ESC:
-				this.fmts.add(ArduPilot.ESC.getFmt(measurementName));
+				defined_fmt = ArduPilot.ESC.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case GPA:
-				this.fmts.add(ArduPilot.GPA.getFmt(measurementName));
+				defined_fmt = ArduPilot.GPA.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case GPS:
-				this.fmts.add(ArduPilot.GPS.getFmt(measurementName));
+				defined_fmt = ArduPilot.GPS.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case GYR:
-				this.fmts.add(ArduPilot.GYR.getFmt(measurementName));
+				defined_fmt = ArduPilot.GYR.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case IMT:
-				this.fmts.add(ArduPilot.IMT.getFmt(measurementName));
+				defined_fmt = ArduPilot.IMT.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case IMU:
-				this.fmts.add(ArduPilot.IMU.getFmt(measurementName));
+				defined_fmt = ArduPilot.IMU.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case ISBD:
-				this.fmts.add(ArduPilot.ISBD.getFmt(measurementName));
+				defined_fmt = ArduPilot.ISBD.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case ISBH:
-				this.fmts.add(ArduPilot.ISBH.getFmt(measurementName));
+				defined_fmt = ArduPilot.ISBH.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case MAG:
-				this.fmts.add(ArduPilot.MAG.getFmt(measurementName));
+				defined_fmt = ArduPilot.MAG.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case PID:
-				this.fmts.add(ArduPilot.PID.getFmt(measurementName));
+				defined_fmt = ArduPilot.PID.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
 				break;
 			case QUAT:
-				this.fmts.add(ArduPilot.QUAT.getFmt(measurementName));
+				defined_fmt = ArduPilot.QUAT.getFmt(measurementName);
+				if (defined_fmt.getBytes()[0] != fmt)
+					log.log(Level.WARNING, String.format("%s missmatch fmt log vs definition -> %c vs %c", this.measurementNames.get(i), fmt, defined_fmt.getBytes()[0]));
+				this.fmts.add(""+fmt);
+				//this.fmts.add(defined_fmt);
 				break;
 			default:
 				this.fmts.add(GDE.STRING_EMPTY);
