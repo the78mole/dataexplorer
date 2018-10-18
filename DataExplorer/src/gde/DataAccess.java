@@ -724,7 +724,7 @@ public abstract class DataAccess implements Cloneable {
 		return DataAccess.dataAccess;
 	}
 
-	private static DataAccess dataAccess;
+	protected static DataAccess dataAccess;
 
 	/**
 	 * @param fileSubPath to retrieve the object template from the standard directory
