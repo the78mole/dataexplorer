@@ -39,5 +39,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Pulsar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/S32"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UniTrend"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ArduPilot"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

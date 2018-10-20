@@ -34,6 +34,7 @@ import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.InputTypes;
+import gde.device.ardupilot.ArduPilotLogReader;
 import gde.device.gpx.GPXDataReaderWriter;
 import gde.device.graupner.GeniusWizardLogReader;
 import gde.device.graupner.HoTTAdapter;
@@ -1750,6 +1751,88 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							activeChannel.setActiveRecordSet(recordSet);
 							activeChannel.applyTemplate(recordSet.getName(), true);
 							device.updateVisibilityStatus(recordSet, true);
+							drawCurves(recordSet, 1024, 768);
+						}
+
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
+						System.out.println("writing as   : " + absolutFilePath);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						failures.put(file.getAbsolutePath(), e);
+					}
+				}
+			}
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
+	/**
+	 * test reading ArduPilot log files in configured base directory (DataExplorer.properties and writes OSD files to %TEMP%\Write_1_OSD
+	 * all files must identical except time stamp
+	 */
+	public final void testArduPilotLogReaderOsdWriter() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		try {
+			File logDir = new File(this.settings.getDataFilePath() + GDE.FILE_SEPARATOR + "ArduPilot");
+			boolean isArduPilotDirectory = logDir.exists() && logDir.isDirectory();
+			if (!isArduPilotDirectory) 
+				return;
+			List<File> files = FileUtils.getFileListing(logDir, 1);
+
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".log")) {
+					System.out.println("working with : " + file);
+					try {
+						//System.out.println("file.getPath() = " + file.getPath());
+						String deviceName = "ArduPilot";
+						deviceName = deviceName.substring(1+deviceName.lastIndexOf(GDE.FILE_SEPARATOR));
+						//System.out.println("deviceName = " + deviceName);
+						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+						if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
+
+						IDevice device = this.getInstanceOfDevice(deviceConfig);
+						this.analyzer.setActiveDevice(device);
+
+						setupDataChannels(device);
+
+						this.channels.setActiveChannelNumber(1);
+						Channel activeChannel = this.channels.getActiveChannel();
+						activeChannel.setFileName(file.getAbsolutePath());
+						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from bin log file");
+						activeChannel.setSaved(true);
+
+						try {
+							RecordSet activeRecordSet = ArduPilotLogReader.read(device.getDataBlockSeparator().value().charAt(0), file.getAbsolutePath(), device.getRecordSetStemNameReplacement());
+							device.updateVisibilityStatus(activeRecordSet, true);
+							activeRecordSet.descriptionAppendFilename(file.getAbsolutePath());
+						}
+						catch (DataTypeException e) {
+							// ignore not supported log files
+							System.out.println("====>>>> " + e.getMessage());
+							continue;
+						}
+						RecordSet recordSet = activeChannel.getActiveRecordSet();
+
+						if (recordSet != null) {
+							activeChannel.setActiveRecordSet(recordSet);
+							activeChannel.applyTemplate(recordSet.getName(), true);
+							device.makeInActiveDisplayable(recordSet);
 							drawCurves(recordSet, 1024, 768);
 						}
 
