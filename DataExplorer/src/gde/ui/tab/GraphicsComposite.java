@@ -966,7 +966,7 @@ public class GraphicsComposite extends Composite {
 	 * updates the graphics canvas, while repeatable redraw calls it optimized to the required area
 	 */
 	synchronized void doRedrawGraphics() {
-		this.graphicsHeader.redraw();
+		this.graphicsHeader.notifyListeners(SWT.Paint, new Event());
 
 		if (!GDE.IS_LINUX) { //old code changed due to Mountain Lion refresh problems
 			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update");

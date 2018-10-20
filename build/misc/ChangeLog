@@ -10,6 +10,7 @@ Generic changes/fixes
 	* fix raw csv export 
 	* fix exception while moving scaled curve display around start time stamp
 	* fix adding KMZ export menu on device level
+	* fix graphics header update while switching record set
 	
 Device specific changes/fixes
 	* HottAdapter* -  fix error message GDE_MSGW2404 appearing only at the first import, Fix missing tab activation after import
