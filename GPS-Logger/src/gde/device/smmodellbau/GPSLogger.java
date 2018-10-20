@@ -505,18 +505,22 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 
 						if (fd.getFileName().length() > 4) {
 							try {
-								Integer channelConfigNumber = 1; //channelCongig 1 : UniLog
+								Integer channelConfigNumber = application.getActiveChannelNumber(); 
 								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
 									//check for GPS-Logger containing $UL2
 									DataInputStream binReader = new DataInputStream(new FileInputStream(selectedImportFile));
 									byte[] buffer = new byte[1024];
 									int numBytes = binReader.read(buffer);
-									while (numBytes > 0 && !new String(buffer).contains("$UL2")) {
+									while (numBytes > 0 && !new String(buffer).contains("$UL2") && !new String(buffer).contains("$UNILOG")) {
 										numBytes = binReader.read(buffer);
 									}
 									if (numBytes > 0 && new String(buffer).contains("$UL2")) {
-										channelConfigNumber = 2;
+										channelConfigNumber = 2;//channelCongig 2 : UniLog2
 										GPSLogger.this.channels.switchChannel(channelConfigNumber, GDE.STRING_EMPTY); //channelCongig 2 : UniLog2
+									}
+									else if (numBytes > 0 && new String(buffer).contains("$UNILOG")) {
+										channelConfigNumber = 1;//channelCongig 1 : UniLog
+										GPSLogger.this.channels.switchChannel(channelConfigNumber, GDE.STRING_EMPTY); //channelCongig 1 : UniLog
 									}
 									binReader.close();
 

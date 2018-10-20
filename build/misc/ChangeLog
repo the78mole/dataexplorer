@@ -21,6 +21,8 @@ Device specific changes/fixes
 	* PolaronPro - fix cell voltage update
 	* Polaron* - fix measurement index position reference (according available specification)
 	* GPS-Logger2 - fix device visualization dialog
+	* GPS-Logger* - update behavior selecting configuration while import, 
+		switch to UniLog2 only if $UL2 entry found, respective to UniLog if $UNILOG entry found, else keep the previous selected configuration 
 	* ArduPilot - initial implementation based on LogStructure.h
 	* CSV2SereilAdapter - fix potential invalid thread access while updating GPS related menu entries
 	* Weatronic-Telemetry - fix potential OSD file reading with lower number of records compared to actual device measurement structure
