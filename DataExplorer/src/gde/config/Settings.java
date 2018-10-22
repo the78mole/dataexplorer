@@ -282,7 +282,7 @@ public final class Settings extends Properties {
 	};
 
 	/**
-	 * a singleton needs a static method to get the instance of this calss.
+	 * a singleton needs a static method to get the instance of this class.
 	 * Is synchronized because during startup additional requests for an instance might occur during Settings initialization.
 	 * The result would be multiple settings instances and data loss if any instance fields are modified.
 	 * @return the instance

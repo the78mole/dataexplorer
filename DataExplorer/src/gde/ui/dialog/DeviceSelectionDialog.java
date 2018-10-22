@@ -1090,7 +1090,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		IDevice newInst = null;
 		try {
 			newInst = this.selectedActiveDeviceConfig.defineInstanceOfDevice();
-		}
+			}
 		catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			String msg = e.getClass().getSimpleName() + GDE.STRING_BLANK + e.getMessage() + GDE.LINE_SEPARATOR + Messages.getString(MessageIds.GDE_MSGE0040, new String[] { this.selectedActiveDeviceConfig.getClassImplName() });

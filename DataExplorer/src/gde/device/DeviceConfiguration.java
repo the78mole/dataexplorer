@@ -448,10 +448,19 @@ public class DeviceConfiguration {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		Class<?> c = loader.loadClass(className);
 		// Class c = Class.forName(className);
-		Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { String.class });
+		Constructor<?> constructor = c.getDeclaredConstructor(new Class[] { DeviceConfiguration.class });
 		// log.log(Level.FINE, "constructor != null -> " + (constructor != null ? "true" : "false")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (constructor != null) {
-			return (IDevice) constructor.newInstance(new Object[] { this.getPropertiesFileName() });
+			try {
+				return (IDevice) constructor.newInstance(new Object[] { this });
+			}
+			catch (IllegalArgumentException e) {
+				constructor = c.getDeclaredConstructor(new Class[] { String.class });
+				if (constructor != null) {
+					return (IDevice) constructor.newInstance(new Object[] { this.getPropertiesFileName() });
+				} else
+					throw new NoClassDefFoundError(Messages.getString(MessageIds.GDE_MSGE0016));
+			}
 		} else
 			throw new NoClassDefFoundError(Messages.getString(MessageIds.GDE_MSGE0016));
 	}
