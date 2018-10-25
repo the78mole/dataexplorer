@@ -89,6 +89,7 @@
 		<!-- output directories -->
 		<property name="output.dir" location="build/target" />
 		<property name="build.target.dir" location="build/target/install" />
+		<property name="build.target.nonUI" location="build/target/non_UI" />
 
 		<property name="output.windows32" location="${output.dir}/Windows_32" />
 		<property name="output.windows32.program" location="${output.windows32}/DataExplorer" />
@@ -134,6 +135,7 @@
 		<!-- create output directory structure -->
 		<mkdir dir="${output.dir}" />
 		<mkdir dir="${build.target.dir}" />
+		<mkdir dir="${build.target.nonUI}" />
 
 		<mkdir dir="${output.windows32}" />
 		<mkdir dir="${output.windows32.program}" />
@@ -491,6 +493,58 @@
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
+
+	<fileset dir="${basedir}">
+		<patternset id="DE_PLUGIN_NON_UI_JARS">
+			<include name="DataExplorer/build/*NonUi*.jar" />
+			<include name="Picolario/build/*NonUi*.jar" />
+			<include name="AkkuMaster/build/*NonUi*.jar" />
+			<include name="Simulator/build/*NonUi*.jar" />
+			<include name="UniLog/build/*NonUi*.jar" />
+			<include name="eStation/build/*NonUi*.jar" />
+			<include name="VC800/build/*NonUi*.jar" />
+			<include name="LiPoWatch/build/*NonUi*.jar" />
+			<include name="CSV2SerialAdapter/build/*NonUi*.jar" />
+			<include name="WStechVario/build/*NonUi*.jar" />
+			<include name="QC-Copter/build/*NonUi*.jar" />
+			<include name="GPS-Logger/build/*NonUi*.jar" />
+			<include name="NMEA-Adapter/build/*NonUi*.jar" />
+			<include name="UltramatUDP/build/*NonUi*.jar" />
+			<include name="HoTTAdapter/build/*NonUi*.jar" />
+			<include name="UniLog2/build/*NonUi*.jar" />
+			<include name="iCharger/build/*NonUi*.jar" />
+			<include name="FlightRecorder/build/*NonUi*.jar" />
+			<include name="JLog2/build/*NonUi*.jar" />
+			<include name="S32/build/*NonUi*.jar" />
+			<include name="JetiAdapter/build/*NonUi*.jar" />
+			<include name="IGCAdapter/build/*NonUi*.jar" />
+			<include name="GPXAdapter/build/*NonUi*.jar" />
+			<include name="IISI-Cockpit V2/build/*NonUi*.jar" />
+			<include name="FutabaTelemetry/build/*NonUi*.jar" />
+			<!-- include name="PowerLab/build/*NonUi*.jar" / -->
+			<include name="OpenTxTelemetry/build/*NonUi*.jar" />
+			<include name="Polaron/build/*NonUi*.jar" />
+			<include name="Akkumatik/build/*NonUi*.jar" />
+			<include name="GigaLogger/build/*NonUi*.jar" />
+			<include name="SkyRC/build/*NonUi*.jar" />
+			<include name="Weatronic-Telemetry/build/*NonUi*.jar" />
+			<include name="UniTrend/build/*NonUi*.jar" />
+			<include name="Pulsar/build/*NonUi*.jar" />
+			<include name="Devo-Telemetry/build/*NonUi*.jar" />
+			<include name="CSVImport/build/*NonUi*.jar" />
+			<include name="ArduPilot/build/*NonUi*.jar" />
+			<!-- add new device here -->
+		</patternset>
+	</fileset>
+	
+	<target name="copy-non-UI-files" depends="non_ui_package">
+		<!-- programm directory -->
+		<copy todir="${build.target.nonUI}" flatten="yes">
+			<fileset dir="${basedir}">
+				<patternset refid="DE_PLUGIN_NON_UI_JARS" />
+			</fileset>
+		</copy>
+	</target>
 
 	<!-- create internal temporay file structure -->
 	<target name="copy-files" depends="package,create_HoTTMdlViewer_lib">
