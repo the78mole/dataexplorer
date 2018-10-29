@@ -23,7 +23,6 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.logging.LogManager;
@@ -72,10 +71,10 @@ import gde.DataAccess;
 import gde.DataAccess.LocalAccess;
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
+import gde.config.DeviceConfigurations;
 import gde.config.Settings;
 import gde.device.CommaSeparatorTypes;
 import gde.device.DecimalSeparatorTypes;
-import gde.device.DeviceConfiguration;
 import gde.histo.ui.HistoExplorer;
 import gde.histo.ui.datasources.SupplementObjectFolder;
 import gde.log.Level;
@@ -1802,8 +1801,8 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "createObjectsFromDirectoriesButton.widgetSelected, event=", evt); //$NON-NLS-1$
 										// find directories which might represent object keys
-										Map<String, DeviceConfiguration> devices = DataExplorer.getInstance().getDeviceSelectionDialog().getDevices();
-										Set<String> objectCandidates = ObjectKeyCompliance.defineObjectKeyNovelties(devices);
+										DeviceConfigurations devices = DataExplorer.getInstance().getDeviceSelectionDialog().getDeviceConfigurations();
+										Set<String> objectCandidates = ObjectKeyCompliance.defineObjectKeyNovelties(devices.getAllConfigurations());
 										if (objectCandidates.size() > 0) {
 											if (SWT.OK == SettingsDialog.this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI0069, //
 													new Object[] { objectCandidates.stream().sorted().collect(Collectors.toList()).toString() }))) {

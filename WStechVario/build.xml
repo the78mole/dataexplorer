@@ -47,7 +47,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for comma separated value serial data adapter"/>
-    		<attribute name="Export-Service" value="gde.device.wstech.DataVario, gde.device.wstech.DataVarioDuo, gde.device.wstech.LinkVario, gde.device.wstech.LinkVarioDuo"/>
+    		<attribute name="Export-Service" value="DataVario:WStech:file_import, DataVarioDuo:WStech:file_import, LinkVario:WStech:file_import, LinkVarioDuo:WStech:file_import"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
@@ -73,7 +73,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for comma separated value serial data adapter"/>
-    		<attribute name="Export-Service" value="gde.device.wstech.DataVario, gde.device.wstech.DataVarioDuo, gde.device.wstech.LinkVario, gde.device.wstech.LinkVarioDuo"/>
+    		<attribute name="Export-Service" value="DataVario:WStech:file_import, DataVarioDuo:WStech:file_import, LinkVario:WStech:file_import, LinkVarioDuo:WStech:file_import"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}NonUi-${version.num}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

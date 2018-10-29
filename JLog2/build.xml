@@ -66,9 +66,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for JLog2 with CSV as input data, by file and serial"/>
-    		<!--  attribute name="Export-Service" value="gde.device.smmodellbau.JLog2, gde.device.kontronik.Kosmik, gde.device.kontronik.JivePro"/ -->
-    		<attribute name="Export-Service" value="gde.device.smmodellbau.JLog2, gde.device.kontronik.Kosmik"/>
-    		<!-- attribute name="Export-Service" value="gde.device.smmodellbau.JLog2, gde.device.kontronik.Kosmik, gde.device.kontronik.JivePro"/ -->
+    		<attribute name="Export-Service" value="JLog2:SM-Modellbau:file_import, Kosmik:Kontronik:file_import"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
@@ -94,9 +92,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for JLog2 with CSV as input data, by file and serial"/>
-    		<!--  attribute name="Export-Service" value="gde.device.smmodellbau.JLog2, gde.device.kontronik.Kosmik, gde.device.kontronik.JivePro"/ -->
-    		<attribute name="Export-Service" value="gde.device.smmodellbau.JLog2, gde.device.kontronik.Kosmik"/>
-    		<!-- attribute name="Export-Service" value="gde.device.smmodellbau.JLog2, gde.device.kontronik.Kosmik, gde.device.kontronik.JivePro"/ -->
+        	<attribute name="Export-Service" value="JLog2:SM-Modellbau:file_import, Kosmik:Kontronik:file_import"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}NonUi-${version.num}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

@@ -31,6 +31,8 @@
 	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
 	<property name="module.output" location="classes"/>
+	<property name="graupner.serial" value="Grapner:serial_port" />
+	<property name="export.services" value="Ultramat12:${graupner.serial}, Ultramat16:${graupner.serial}, Ultramat16S:${graupner.serial}, Ultramat18:${graupner.serial}, UltraTrioPlus14:${graupner.serial}, UltraTrioPlus16S:${graupner.serial}, UltraDuoPlus40:${graupner.serial}, UltraDuoPlus45:${graupner.serial}, UltraDuoPlus50:${graupner.serial}, UltraDuoPlus60:${graupner.serial}, UltraDuoPlus80:${graupner.serial}, Ultra Quick 70:${graupner.serial}, Ultramat ACDC EQ:${graupner.serial}"/>
 
 	<path id="compile.classpath">
 		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
@@ -59,7 +61,6 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
-		<property name="export.services" value="gde.device.graupner.Ultramat12, gde.device.graupner.Ultramat16, gde.device.graupner.Ultramat16S, gde.device.graupner.Ultramat18, gde.device.graupner.UltraTrioPlus14, gde.device.graupner.UltraTrioPlus16S, gde.device.graupner.UltraDuoPlus40, gde.device.graupner.UltraDuoPlus45, gde.device.graupner.UltraDuoPlus50, gde.device.graupner.UltraDuoPlus60, gde.device.graupner.UltraDuoPlus80, gde.device.graupner.Ultra Quick 70, gde.device.graupner.Ultramat ACDC EQ"/>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>
@@ -86,7 +87,6 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
-		<property name="export.services" value="gde.device.graupner.Ultramat12, gde.device.graupner.Ultramat16, gde.device.graupner.Ultramat16S, gde.device.graupner.Ultramat18, gde.device.graupner.UltraTrioPlus14, gde.device.graupner.UltraTrioPlus16S, gde.device.graupner.UltraDuoPlus40, gde.device.graupner.UltraDuoPlus45, gde.device.graupner.UltraDuoPlus50, gde.device.graupner.UltraDuoPlus60, gde.device.graupner.UltraDuoPlus80, gde.device.graupner.Ultra Quick 70, gde.device.graupner.Ultramat ACDC EQ"/>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>

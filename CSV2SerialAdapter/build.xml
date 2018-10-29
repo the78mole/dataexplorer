@@ -31,6 +31,7 @@
 	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
 	<property name="module.output" location="classes"/>
+	<property name="export.services" value="CSV2Serial1:WB:file_import, CSV2Serial2:WB:serial_port;file_import, AV4ms_FV_762:Friedrich Mössinger:serial_port;file_import, USB-WDE1:ELV GmbH:serial_port,4D-Akkumonitor:4D.control:file_import, Herkules_III_Telemetry:HerSi Electronic GmbH:file_import"/>
 
 	<path id="compile.classpath">
 		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
@@ -59,6 +60,7 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
+		<property name="manufacturer.dsource" value="ArduPilot:ArduPilot.org:file_import"/>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>
@@ -66,7 +68,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for comma separated value serial data adapter"/>
-    		<attribute name="Export-Service" value="gde.device.wb.CSV2Serial1, gde.device.wb.CSV2Serial2, gde.device.wb.AV4ms_FV_762, gde.device.wb.USB-WDE1, gde.device.wb.4D-Akkumonitor, gde.device.wb.Herkules_III_Telemetry"/>
+        	<attribute name="Export-Service" value="${export.services}"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
@@ -92,7 +94,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for comma separated value serial data adapter"/>
-    		<attribute name="Export-Service" value="gde.device.wb.CSV2Serial1, gde.device.wb.CSV2Serial2, gde.device.wb.AV4ms_FV_762, gde.device.wb.USB-WDE1, gde.device.wb.4D-Akkumonitor, gde.device.wb.Herkules_III_Telemetry"/>
+        	<attribute name="Export-Service" value="${export.services}"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}NonUi-${version.num}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

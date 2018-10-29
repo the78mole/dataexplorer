@@ -11,6 +11,8 @@ Generic changes/fixes
 	* fix exception while moving scaled curve display around start time stamp
 	* fix adding KMZ export menu on device level
 	* fix graphics header update while switching record set
+	* update device selection dialog devices overview tab
+	* reduce extracted device properties XMLs to the devices selected
 	
 Device specific changes/fixes
 	* HottAdapter* -  fix error message GDE_MSGW2404 appearing only at the first import, Fix missing tab activation after import

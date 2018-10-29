@@ -22,8 +22,10 @@
 <project name="HoTTAdapter" default="compile">
 
 	<property name="build.properties" location="../build/build.properties" />
-
 	<property file="${build.properties}" />
+	<property name="graupner.serial" value="Graupner:file_import;serial_port" />
+	<property name="graupner.import" value="Graupner:file_import" />
+	<property name="export.services" value="GeniusWizard:${graupner.import}, HoTTAdapter:${graupner.serial}, HoTTAdapter2:${graupner.serial}, HoTTAdapterM:${graupner.serial}, HoTTAdapter2M:${graupner.serial}, HoTTAdapterX:${graupner.serial}, HoTTViewer:${graupner.serial}" />
 
 	<!-- this is to have nice message about used build.properties file -->
 	<available property="build.properties.exists" file="${build.properties}" />
@@ -67,9 +69,9 @@
 			<attribute name="Built-Date" value="${TODAY}"/> 
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
-    		<attribute name="Bundle-Description" value="Implementation for Graupner Hott binary input data"/>
-    		<!-- attribute name="Export-Service" value="gde.device.graupner.HoTTAdapter, gde.device.graupner.HoTTAdapter2, gde.device.graupner.HoTTAdapterM, gde.device.graupner.HoTTAdapter2M, gde.device.graupner.HoTTAdapterD"/ -->
-    		<attribute name="Export-Service" value="gde.device.graupner.GeniusWizard, gde.device.graupner.HoTTAdapter, gde.device.graupner.HoTTAdapter2, gde.device.graupner.HoTTAdapterM, gde.device.graupner.HoTTAdapter2M, gde.device.graupner.HoTTAdapterX, gde.device.graupner.HoTTViewer"/>
+    		<attribute name="Bundle-Description" value="Implementation for Graupner Hott binary log data"/>
+    		<!-- do not add HoTTAdapterD Graupner internal only"/ -->
+    		<attribute name="Export-Service" value="${export.services}"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
@@ -95,8 +97,8 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for Graupner Hott binary input data"/>
-    		<!-- attribute name="Export-Service" value="gde.device.graupner.HoTTAdapter, gde.device.graupner.HoTTAdapter2, gde.device.graupner.HoTTAdapterM, gde.device.graupner.HoTTAdapter2M, gde.device.graupner.HoTTAdapterD"/ -->
-    		<attribute name="Export-Service" value="gde.device.graupner.GeniusWizard, gde.device.graupner.HoTTAdapter, gde.device.graupner.HoTTAdapter2, gde.device.graupner.HoTTAdapterM, gde.device.graupner.HoTTAdapter2M, gde.device.graupner.HoTTAdapterX, gde.device.graupner.HoTTViewer"/>
+    		<!-- do not add HoTTAdapterD Graupner internal only"/ -->
+    		<attribute name="Export-Service" value="${export.services}"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}NonUi-${version.num}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

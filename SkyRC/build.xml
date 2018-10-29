@@ -12,6 +12,9 @@
 	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
 	<property name="module.output" location="classes"/>
+	<property name="skyrc.props" value="SkyRC:native_usb"/>
+	<property name="hitec.props" value="Hitec:native_usb"/>
+	<property name="export.services" value="MC3000:${skyrc.props}, MC3000-Set:${skyrc.props}, Q200:${skyrc.props}, Q200-Set:${skyrc.props}, D100:${skyrc.props}, D100-Set:${skyrc.props}, HitecRDX1:${hitec.props}, HitecX1Red:${hitec.props}, iMax B6 mini:${skyrc.props}, iMax B6 AC:${skyrc.props}"/>
 
 	<path id="compile.classpath">
 		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
@@ -50,7 +53,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation SKYRC MC3000 charger device using USB communication"/>
-    		<attribute name="Export-Service" value="gde.device.skyrc.MC3000, gde.device.skyrc.MC3000-Set, gde.device.skyrc.Q200, gde.device.skyrc.Q200-Set, gde.device.skyrc.D100, gde.device.skyrc.D100-Set, gde.device.skyrc.HitecRDX1, gde.device.skyrc.HitecX1Red, gde.device.skyrc.iMax B6 mini, gde.device.skyrc.iMax B6 AC"/>
+    		<attribute name="Export-Service" value="${export.services}"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
@@ -77,7 +80,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation SKYRC MC3000 charger device using USB communication"/>
-    		<attribute name="Export-Service" value="gde.device.skyrc.MC3000, gde.device.skyrc.MC3000-Set, gde.device.skyrc.Q200, gde.device.skyrc.Q200-Set, gde.device.skyrc.D100, gde.device.skyrc.D100-Set"/>
+    		<attribute name="Export-Service" value="${export.services}"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}NonUi-${version.num}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

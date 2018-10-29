@@ -68,6 +68,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 import gde.GDE;
+import gde.config.ExportService;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
@@ -171,7 +172,7 @@ public class FileUtils {
 			if (!dir.mkdir()) FileUtils.log.log(Level.WARNING, "error upon create " + directory); //$NON-NLS-1$
 		}
 		else {
-			File file = new File(directory + GDE.FILE_SEPARATOR_UNIX + versionFileName);
+			File file = new File(String.format("%s%s%s", directory, GDE.FILE_SEPARATOR_UNIX, versionFileName));
 			if (!file.exists()) {
 				try {
 					//find directory contained version file and rename directory, do not use actual version -1 to enable support for several installed GDE versions
@@ -486,7 +487,7 @@ public class FileUtils {
 	 */
 	public static boolean extract(Class<?> runtimeInstance, String fileName, String jarInternalSourceDirectory, String targetDirectory, String permissionsUNIX) {
 		boolean isExtracted = false;
-		// normalize input directorys
+		// normalize input directories
 		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory + GDE.FILE_SEPARATOR_UNIX;
 		targetDirectory = targetDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
@@ -494,12 +495,13 @@ public class FileUtils {
 
 		FileOutputStream os = null;
 		InputStream is = null;
-		File file = new File(targetDirectory + fileName);
+		File file = new File(targetDirectory, fileName);
 		try {
 			if (!file.exists()) {
 				if (file.createNewFile())
 					log.info(() -> String.format(">>>>>> created %s", file.getAbsolutePath()));
-				is = runtimeInstance.getClassLoader().getResourceAsStream(jarInternalSourceDirectory + fileName);
+				//TODO this will not work running with eclipse
+				is = runtimeInstance.getClassLoader().getResourceAsStream(String.format("%s%s", jarInternalSourceDirectory, fileName));
 				if (is != null) {
 					int read;
 					byte[] buffer = new byte[4096];
@@ -514,6 +516,7 @@ public class FileUtils {
 					isExtracted = true;
 				}
 				else {
+					file.delete();
 					log.log(Level.SEVERE, String.format("extraction of %s%s failed!", jarInternalSourceDirectory, fileName));
 				}
 			}
@@ -593,7 +596,7 @@ public class FileUtils {
 	 * @throws IOException
 	 */
 	public static void extract(JarFile jarFile, String fileName, String jarSourceDirectory, String targetDirectory, String unixPermissions) {
-		// normalize input directorys
+		// normalize input directories
 		fileName = fileName.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
 		fileName = fileName.startsWith(GDE.FILE_SEPARATOR_UNIX) ? fileName.substring(1) : fileName;
 		jarSourceDirectory = jarSourceDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
@@ -1123,16 +1126,35 @@ public class FileUtils {
 		Vector<String> pluginNamesVector = new Vector<String>();
 		Manifest m = jarFile.getManifest();
 		String services = m.getMainAttributes().getValue("Export-Service"); //$NON-NLS-1$
-		if (services != null && services.length() > 5) {
+		if (services != null && services.length() >= 5) {
 			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "Export-Service = " + services); //$NON-NLS-1$
 			String[] serviceNames = services.split(", *"); //$NON-NLS-1$
 			for (String name : serviceNames) {
-				name = name.substring(name.lastIndexOf('.') + 1);
 				if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "service name = " + name); //$NON-NLS-1$
 				pluginNamesVector.add(name);
 			}
 		}
 		return pluginNamesVector.toArray(new String[0]);
+	}
+
+	/**
+	 * get a list of the exported device services
+	 * @param jarFile
+	 * @throws IOException
+	 */
+	public static List<ExportService> getDeviceJarServices(JarFile jarFile) throws IOException {
+		List<ExportService> pluginServices = new ArrayList<ExportService>();
+		Manifest m = jarFile.getManifest();
+		String exportServices = m.getMainAttributes().getValue("Export-Service"); //$NON-NLS-1$
+		if (exportServices != null && exportServices.length() > 5) {
+			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "Export-Service = " + exportServices); //$NON-NLS-1$
+			String[] services = exportServices.split(", *"); //$NON-NLS-1$
+			for (String service : services) {
+				if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "service name = " + service); //$NON-NLS-1$
+				pluginServices.add(new ExportService(service, jarFile.getName()));
+			}
+		}
+		return pluginServices;
 	}
 
 	/**

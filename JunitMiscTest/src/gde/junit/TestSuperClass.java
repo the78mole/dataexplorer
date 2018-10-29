@@ -20,6 +20,7 @@ package gde.junit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 import gde.Analyzer;
 import gde.GDE;
 import gde.TestAnalyzer;
+import gde.config.ExportService;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.Record;
@@ -177,9 +179,22 @@ public class TestSuperClass extends TestCase {
 		this.application.setHisto(true);
 		setHistoSettings();
 
+		//required extract all device properties and graphic template files for existing jar and exported services
+		//lazy cleanup will occur during next regular DataExplorer startup
+		for (String serviceName : this.settings.getDeviceServices().keySet()) {
+			ExportService service = this.settings.getDeviceServices().get(serviceName);
+			try {
+				this.settings.extractDevicePropertiesAndTemplates(service.getJarFile(), serviceName);
+				this.analyzer.getDeviceConfigurations().add(this.analyzer, serviceName, serviceName+GDE.FILE_ENDING_DOT_XML);			
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		File file = new File(Settings.getDevicesPath());
 		if (!file.exists()) throw new FileNotFoundException(Settings.getDevicesPath());
-
+		
 		// wait until schema is setup
 		this.settings.joinXsdThread();
 

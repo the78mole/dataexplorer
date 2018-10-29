@@ -355,7 +355,7 @@ public class DataExplorer extends Composite {
 				{
 					this.statusBar = new StatusBar(this.statusComposite);
 					this.statusBar.create();
-					log.log(Level.OFF, "Statusbar created");
+					log.log(Level.INFO, "Statusbar created");
 				}
 			}
 		} catch (Exception e) {

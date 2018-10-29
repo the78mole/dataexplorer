@@ -574,13 +574,13 @@ public class MenuBar {
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {
-									int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
-									int size = deviceSelect.getActiveDevices().size();
+									int selection = deviceSelect.getDeviceConfigurations().indexOf(deviceSelect.getActiveConfig().getName());
+									int size = deviceSelect.getDeviceConfigurations().size();
 									if (selection > 0 && selection <= size) {
-										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(selection - 1));
+										deviceConfig = deviceSelect.getDeviceConfigurations().get(deviceSelect.getDeviceConfigurations().get(selection - 1));
 									}
 									else
-										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(size - 1));
+										deviceConfig = deviceSelect.getDeviceConfigurations().get(deviceSelect.getDeviceConfigurations().get(size - 1));
 
 									// if a device tool box is open, dispose it
 									if (MenuBar.this.application.getDeviceDialog() != null && !MenuBar.this.application.getDeviceDialog().isDisposed()) {
@@ -610,12 +610,12 @@ public class MenuBar {
 								DeviceConfiguration deviceConfig;
 								DeviceSelectionDialog deviceSelect = MenuBar.this.application.getDeviceSelectionDialog();
 								if (deviceSelect.checkDataSaved()) {
-									int selection = deviceSelect.getActiveDevices().indexOf(deviceSelect.getActiveConfig().getName());
-									int size = deviceSelect.getActiveDevices().size() - 1;
+									int selection = deviceSelect.getDeviceConfigurations().indexOf(deviceSelect.getActiveConfig().getName());
+									int size = deviceSelect.getDeviceConfigurations().size() - 1;
 									if (selection >= 0 && selection < size)
-										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(selection + 1));
+										deviceConfig = deviceSelect.getDeviceConfigurations().get(deviceSelect.getDeviceConfigurations().get(selection + 1));
 									else
-										deviceConfig = deviceSelect.getDevices().get(deviceSelect.getActiveDevices().get(0));
+										deviceConfig = deviceSelect.getDeviceConfigurations().get(deviceSelect.getDeviceConfigurations().get(0));
 
 									// if a device tool box is open, dispose it
 									if (MenuBar.this.application.getDeviceDialog() != null && !MenuBar.this.application.getDeviceDialog().isDisposed()) {

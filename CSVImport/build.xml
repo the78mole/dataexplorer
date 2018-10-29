@@ -19,7 +19,7 @@
     Copyright (c) 2018 Winfried Bruegmann
 ************************************************************************************** 
 -->
-<project name="CSVImportAdapter" default="compile">
+<project name="CSVImport" default="compile">
 
 	<property name="build.properties" location="../build/build.properties" />
 
@@ -63,8 +63,8 @@
 			<attribute name="Built-Date" value="${TODAY}"/> 
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
-    		<attribute name="Bundle-Description" value="Implementation to enable import of Futaba telemetry files"/>
-    		<attribute name="Export-Service" value="gde.device.csv.Tesla"/>
+    		<attribute name="Bundle-Description" value="Implementation to enable import of Tesla CSV files"/>
+    		<attribute name="Export-Service" value="Tesla:Tesla:file_import"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
@@ -89,8 +89,8 @@
 			<attribute name="Built-Date" value="${TODAY}"/> 
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
-    		<attribute name="Bundle-Description" value="Implementation to enable import of Futaba telemetry files"/>
-    		<attribute name="Export-Service" value="gde.device.csv.Tesla"/>
+    		<attribute name="Bundle-Description" value="Implementation to enable import of Tesla CSV files"/>
+    		<attribute name="Export-Service" value="Tesla:Tesla:file_import"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}NonUi-${version.num}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

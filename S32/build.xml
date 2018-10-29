@@ -66,7 +66,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for S32 with CSV as input data, by file and serial"/>
-    		<attribute name="Export-Service" value="gde.device.r2prototyping.S32, gde.device.r2prototyping.S32_2"/>
+    		<attribute name="Export-Service" value="S32:R2prototyping:file_import, S32_2:R2prototyping:file_import"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
@@ -92,7 +92,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for S32 with CSV as input data, by file and serial"/>
-    		<attribute name="Export-Service" value="gde.device.r2prototyping.S32, gde.device.r2prototyping.S32_2"/>
+        	<attribute name="Export-Service" value="S32:R2prototyping:file_import, S32_2:R2prototyping:file_import"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}NonUi-${version.num}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

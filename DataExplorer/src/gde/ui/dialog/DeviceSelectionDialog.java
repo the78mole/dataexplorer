@@ -20,7 +20,7 @@ package gde.ui.dialog;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -63,6 +63,7 @@ import gde.Analyzer;
 import gde.GDE;
 import gde.comm.DeviceSerialPortImpl;
 import gde.config.DeviceConfigurations;
+import gde.config.ExportService;
 import gde.config.Settings;
 import gde.data.Channels;
 import gde.device.DeviceConfiguration;
@@ -91,7 +92,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Table																	deviceTable;
 	Group																	deviceGroup;
 	Composite															composite1;
-	CTabItem															auswahlTabItem;
+	CTabItem															overviewTabItem;
 	Button																closeButton;
 	Button																rtsCheckBox;
 	Button																dtrCheckBox;
@@ -133,8 +134,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	CCombo																deviceSelectCombo;
 	CTabFolder														settingsTabFolder;
 
+	TreeMap<String, ExportService>				deviceServices;
 	DeviceConfigurations									deviceConfigurations;
-	Vector<String>												activeDevices;
 	final DataExplorer										application;
 	final Settings												settings;
 	String																activeDeviceName;
@@ -160,9 +161,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			File file = new File(Settings.getDevicesPath());
 			if (!file.exists()) throw new FileNotFoundException(Settings.getDevicesPath()); // todo replace throw/catch with simple if
 
+			this.deviceServices = Settings.getInstance().getDeviceServices();
 			this.deviceConfigurations = Analyzer.getInstance().getDeviceConfigurations();
-			this.activeDevices = this.deviceConfigurations.getActiveDevices();
-			log.log(Level.INFO, String.format("active Device = %s activeDevices = %s", this.activeDeviceName, this.activeDevices.toString()));
 			this.selectedActiveDeviceConfig = this.deviceConfigurations.getSelectedActiveDeviceConfig();
 			if (this.selectedActiveDeviceConfig == null) this.application.setActiveDevice(null);
 			log.log(Level.TIME, "time =", StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime)));
@@ -327,8 +327,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 															&& !DeviceSelectionDialog.this.application.getActiveDevice().getCommunicationPort().isConnected())) {
 												int position = DeviceSelectionDialog.this.deviceSlider.getSelection();
 												log.log(Level.FINE, " Position: " + position); //$NON-NLS-1$
-												if (DeviceSelectionDialog.this.activeDevices.size() > 0 && !DeviceSelectionDialog.this.activeDevices.get(position).equals(DeviceSelectionDialog.this.activeDeviceName)) {
-													DeviceSelectionDialog.this.activeDeviceName = DeviceSelectionDialog.this.activeDevices.get(position);
+												if (DeviceSelectionDialog.this.deviceConfigurations.size() > 0 && !DeviceSelectionDialog.this.deviceConfigurations.get(position).equals(DeviceSelectionDialog.this.activeDeviceName)) {
+													DeviceSelectionDialog.this.activeDeviceName = DeviceSelectionDialog.this.deviceConfigurations.get(position);
 													log.log(Level.FINE, "activeName = " + DeviceSelectionDialog.this.activeDeviceName); //$NON-NLS-1$
 													DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.activeDeviceName);
 													// if a device tool box is open, dispose it
@@ -672,13 +672,13 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						}
 					}
 					{
-						this.auswahlTabItem = new CTabItem(this.settingsTabFolder, SWT.NONE);
-						this.auswahlTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-						this.auswahlTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0186));
+						this.overviewTabItem = new CTabItem(this.settingsTabFolder, SWT.NONE);
+						this.overviewTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+						this.overviewTabItem.setText(Messages.getString(MessageIds.GDE_MSGT0186));
 						{
 							this.deviceGroup = new Group(this.settingsTabFolder, SWT.NONE);
 							this.deviceGroup.setLayout(new FormLayout());
-							this.auswahlTabItem.setControl(this.deviceGroup);
+							this.overviewTabItem.setControl(this.deviceGroup);
 							this.deviceGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.deviceGroup.setText(Messages.getString(MessageIds.GDE_MSGT0187));
 							{
@@ -699,22 +699,26 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										DeviceConfiguration tmpDeviceConfiguration;
 										if (item.getChecked()) {
 											log.log(Level.FINE, "add device = " + deviceName); //$NON-NLS-1$
-											tmpDeviceConfiguration = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
-											tmpDeviceConfiguration.setUsed(true);
-											//tmpDeviceConfiguration.storeDeviceProperties();
-											DeviceSelectionDialog.this.deviceConfigurations.put(deviceName, tmpDeviceConfiguration);
-											if (!DeviceSelectionDialog.this.activeDevices.contains(deviceName)) DeviceSelectionDialog.this.activeDevices.add(deviceName);
-											if (DeviceSelectionDialog.this.activeDevices.size() >= 1) {
+											try {
+												Settings.getInstance().extractDevicePropertiesAndTemplates(DeviceSelectionDialog.this.deviceServices.get(deviceName).getJarFile(), deviceName);
+												DeviceSelectionDialog.this.deviceConfigurations.add(Analyzer.getInstance(), deviceName, deviceName+GDE.FILE_ENDING_DOT_XML, false);
+												tmpDeviceConfiguration = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
+												tmpDeviceConfiguration.setUsed(true);
+												//tmpDeviceConfiguration.storeDeviceProperties();
+												DeviceSelectionDialog.this.deviceConfigurations.put(deviceName, tmpDeviceConfiguration);
+											}
+											catch (IOException e) {
+												application.openMessageDialogAsync(GDE.shell, String.format("failed adding %s", deviceName));
+											}
+											if (DeviceSelectionDialog.this.deviceConfigurations.size() >= 1) {
 												DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
 												//open message box to hint dummy device driver or udev
 												if (deviceName.contains("MC3000") || deviceName.contains("Q200") || deviceName.contains("Hitec")) {
-													if (GDE.IS_LINUX)
-														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0057));
+													if (GDE.IS_LINUX)  	 application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0057));
 													else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0058));
 												}
 												else if (deviceName.contains("DUO") && deviceName.contains("iCharger")) {
-													if (GDE.IS_LINUX)
-														application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0060));
+													if (GDE.IS_LINUX) 	 application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0060));
 													else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0061));
 												}
 											}
@@ -722,20 +726,27 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										else {
 											log.log(Level.FINE, "remove device = " + deviceName); //$NON-NLS-1$
 											tmpDeviceConfiguration = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
-											tmpDeviceConfiguration.setUsed(false);
-											//tmpDeviceConfiguration.storeDeviceProperties();
-											if (DeviceSelectionDialog.this.activeDevices.contains(deviceName)) DeviceSelectionDialog.this.activeDevices.remove(deviceName);
-
-											// the removed configuration is the active one
-											if (DeviceSelectionDialog.this.selectedActiveDeviceConfig != null && DeviceSelectionDialog.this.selectedActiveDeviceConfig.getName().equals(deviceName)) {
-												// take first available
-												if (DeviceSelectionDialog.this.activeDevices.size() > 0) {
-													DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.activeDevices.firstElement());
+											if (tmpDeviceConfiguration != null) {
+												tmpDeviceConfiguration.setUsed(false);
+												//tmpDeviceConfiguration.storeDeviceProperties();
+												if (DeviceSelectionDialog.this.deviceConfigurations.contains(deviceName)) {
+													DeviceSelectionDialog.this.deviceConfigurations.remove(deviceName);
+													DeviceSelectionDialog.this.deviceConfigurations.synchronizeDeviceUse();
 												}
-												else { // no device
-													DeviceSelectionDialog.this.selectedActiveDeviceConfig = null;
-												}
+												// the removed configuration is the active one
+												if (DeviceSelectionDialog.this.selectedActiveDeviceConfig != null && DeviceSelectionDialog.this.selectedActiveDeviceConfig.getName().equals(deviceName)) {
+													// take first available
+													if (DeviceSelectionDialog.this.deviceConfigurations.size() > 0) {
+														DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.deviceConfigurations.get(0));
+													}
+													else { // no device
+														DeviceSelectionDialog.this.selectedActiveDeviceConfig = null;
+													}
+												} 
+											} else {
+												log.log(Level.WARNING, String.format("check %s in DataExplorer.properties versus %s.xml", deviceName, deviceName));
 											}
+										
 										}
 										updateDialogEntries();
 									}
@@ -745,7 +756,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								{
 									this.tableColumn1 = new TableColumn(this.deviceTable, SWT.LEFT);
 									this.tableColumn1.setText(Messages.getString(MessageIds.GDE_MSGT0668));
-									this.tableColumn1.setWidth(200);
+									this.tableColumn1.setWidth(150);
 								}
 								{
 									this.tableColumn2 = new TableColumn(this.deviceTable, SWT.LEFT);
@@ -755,7 +766,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								{
 									this.tableColumn3 = new TableColumn(this.deviceTable, SWT.LEFT);
 									this.tableColumn3.setText(Messages.getString(MessageIds.GDE_MSGT0670));
-									this.tableColumn3.setWidth(90);
+									this.tableColumn3.setWidth(150);
 								}
 								{
 									updateDeviceSelectionTable();
@@ -801,18 +812,19 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 *
+	 * update the device table entries 
 	 */
 	private void updateDeviceSelectionTable() {
 		if (!this.isDisposed()) {
 			this.deviceTable.removeAll();
-			for (String deviceKey : this.deviceConfigurations.deviceNames()) {
+			for (String deviceKey : this.deviceServices.keySet()) {
 				log.log(Level.FINE, deviceKey);
-				DeviceConfiguration config = this.deviceConfigurations.get(deviceKey);
+				ExportService exportService = this.deviceServices.get(deviceKey);
+				DeviceConfiguration devConfig = this.deviceConfigurations.get(deviceKey);
 
 				TableItem item = new TableItem(this.deviceTable, SWT.NULL);
-				item.setText(new String[] { config.getName(), config.getManufacturer(), config.getSerialPortType() != null ? config.getPort() : GDE.STRING_MESSAGE_CONCAT });
-				if (config.isUsed()) {
+				item.setText(new String[] { exportService.getName(), exportService.getManufacturer(), exportService.getDataSource() });
+				if (devConfig != null && devConfig.isUsed()) {
 					item.setChecked(true);
 				}
 				else {
@@ -829,25 +841,19 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		if (this.activeDeviceName != null) checkAndStoreDeviceConfiguration(this.activeDeviceName);
 		if (!this.isDisposed()) {
 			// device selection
-			log.log(Level.FINE, "active devices " + this.activeDevices.toString()); //$NON-NLS-1$
-			String[] list = this.activeDevices.toArray(new String[this.activeDevices.size()]);
-			Arrays.sort(list); // this sorts the list but not the vector
-			//get sorted devices list and activeDevices array in sync
-			this.activeDevices.removeAllElements();
-			for (String device : list) {
-				if (!this.activeDevices.contains(device)) this.activeDevices.add(device);
-			}
+			log.log(Level.FINE, "active devices " + this.deviceConfigurations.toString()); //$NON-NLS-1$
+			String[] list = this.deviceConfigurations.deviceNames().toArray(new String[this.deviceConfigurations.size()]);
 			if (list.length > 0) {
-				this.activeDeviceName = (this.selectedActiveDeviceConfig == null) ? this.activeDevices.firstElement() : this.selectedActiveDeviceConfig.getName();
+				this.activeDeviceName = (this.selectedActiveDeviceConfig == null) ? this.deviceConfigurations.get(0) : this.selectedActiveDeviceConfig.getName();
 				this.deviceSelectCombo.setItems(list);
-				this.deviceSelectCombo.setVisibleItemCount(this.activeDevices.size() + 1);
-				this.deviceSelectCombo.select(this.activeDevices.indexOf(this.activeDeviceName));
-				log.log(Level.FINE, this.activeDeviceName + GDE.STRING_MESSAGE_CONCAT + this.activeDevices.indexOf(this.activeDeviceName));
+				this.deviceSelectCombo.setVisibleItemCount(this.deviceConfigurations.size() + 1);
+				this.deviceSelectCombo.select(this.deviceConfigurations.indexOf(this.activeDeviceName));
+				log.log(Level.FINE, this.activeDeviceName + GDE.STRING_MESSAGE_CONCAT + this.deviceConfigurations.indexOf(this.activeDeviceName));
 
-				this.deviceSlider.setMaximum(this.activeDevices.size());
-				this.deviceSlider.setSelection(this.activeDevices.indexOf(this.activeDeviceName));
-				log.log(Level.FINE, "activeDevices.size() " + this.activeDevices.size()); //$NON-NLS-1$
-				if (this.activeDevices.size() > 1)
+				this.deviceSlider.setMaximum(this.deviceConfigurations.size());
+				this.deviceSlider.setSelection(this.deviceConfigurations.indexOf(this.activeDeviceName));
+				log.log(Level.FINE, "activeDevices.size() " + this.deviceConfigurations.size()); //$NON-NLS-1$
+				if (this.deviceConfigurations.size() > 1)
 					this.application.enableDeviceSwitchButtons(true);
 				else
 					this.application.enableDeviceSwitchButtons(false);
@@ -1004,10 +1010,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 */
 	public void setupDevice(String newDeviceName) throws NotSupportedException {
 		newDeviceName = exchangeLegacyDeviceNames(newDeviceName);
-		int selection = this.activeDevices.indexOf(newDeviceName); // is contained in list of active devices
-		if (selection != -1 || getDevices().keySet().contains(newDeviceName)) {
-			if (!this.activeDevices.contains(newDeviceName)) this.activeDevices.add(newDeviceName);
-			DeviceConfiguration tmpDeviceConfig = this.getDevices().get(newDeviceName);
+		int selection = this.deviceConfigurations.indexOf(newDeviceName); // is contained in list of active devices
+		if (selection != -1 || this.deviceConfigurations.deviceNames().contains(newDeviceName)) {
+			DeviceConfiguration tmpDeviceConfig = this.deviceConfigurations.get(newDeviceName);
 			if (!tmpDeviceConfig.isUsed()) tmpDeviceConfig.setUsed(true);
 			setActiveConfig(tmpDeviceConfig);
 			setupDevice();
@@ -1100,10 +1105,9 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			this.selectedActiveDeviceConfig.setUsed(false);
 			this.selectedActiveDeviceConfig.storeDeviceProperties();
 			String selectedDeviceName = this.selectedActiveDeviceConfig.getName();
-			this.activeDevices.remove(selectedDeviceName);
-			this.deviceConfigurations.remove(selectedDeviceName);
-			if (this.activeDevices.size() > 0) {
-				this.selectedActiveDeviceConfig = this.deviceConfigurations.get(this.activeDevices.firstElement());
+			this.deviceConfigurations.remove(selectedDeviceName); //do not remove from device use list at this point
+			if (this.deviceConfigurations.size() > 0) {
+				this.selectedActiveDeviceConfig = this.deviceConfigurations.get(this.deviceConfigurations.get(0));
 			}
 			else {
 				this.selectedActiveDeviceConfig = null;
@@ -1112,10 +1116,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			updateDialogEntries();
 		}
 		return newInst;
-	}
-
-	public Vector<String> getActiveDevices() {
-		return this.activeDevices;
 	}
 
 	public Slider getDeviceSlider() {
@@ -1136,8 +1136,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	/**
 	 * @return the devices
 	 */
-	public TreeMap<String, DeviceConfiguration> getDevices() {
-		return this.deviceConfigurations.getAllConfigurations();
+	public DeviceConfigurations getDeviceConfigurations() {
+		return this.deviceConfigurations;
 	}
 
 	/**
@@ -1229,7 +1229,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	 * @return number of active devices
 	 */
 	public int getNumberOfActiveDevices() {
-		return this.activeDevices.size();
+		return this.deviceConfigurations.size();
 	}
 
 	/**
