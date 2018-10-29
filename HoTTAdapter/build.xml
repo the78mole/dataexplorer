@@ -26,6 +26,9 @@
 	<property name="graupner.serial" value="Graupner:file_import;serial_port" />
 	<property name="graupner.import" value="Graupner:file_import" />
 	<property name="export.services" value="GeniusWizard:${graupner.import}, HoTTAdapter:${graupner.serial}, HoTTAdapter2:${graupner.serial}, HoTTAdapterM:${graupner.serial}, HoTTAdapter2M:${graupner.serial}, HoTTAdapterX:${graupner.serial}, HoTTViewer:${graupner.serial}" />
+	<!-- activate below export.services to enable Graupner internal HoTTAdapterD 
+	<property name="export.services" value="HoTTAdapterD:${graupner.serial}, GeniusWizard:${graupner.import}, HoTTAdapter:${graupner.serial}, HoTTAdapter2:${graupner.serial}, HoTTAdapterM:${graupner.serial}, HoTTAdapter2M:${graupner.serial}, HoTTAdapterX:${graupner.serial}, HoTTViewer:${graupner.serial}" />
+	-->
 
 	<!-- this is to have nice message about used build.properties file -->
 	<available property="build.properties.exists" file="${build.properties}" />

@@ -185,7 +185,7 @@ public class TestSuperClass extends TestCase {
 			ExportService service = this.settings.getDeviceServices().get(serviceName);
 			try {
 				this.settings.extractDevicePropertiesAndTemplates(service.getJarFile(), serviceName);
-				this.analyzer.getDeviceConfigurations().add(this.analyzer, serviceName, serviceName+GDE.FILE_ENDING_DOT_XML);			
+				this.analyzer.getDeviceConfigurations().add(this.analyzer, serviceName, serviceName+GDE.FILE_ENDING_DOT_XML, false);			
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -488,5 +488,4 @@ public class TestSuperClass extends TestCase {
 		System.out.println("this.dataPath = " + this.dataPath.getPath());
 		return this.dataPath;
 	}
-
 }
