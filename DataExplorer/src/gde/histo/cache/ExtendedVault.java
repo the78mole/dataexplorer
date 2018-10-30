@@ -129,7 +129,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		this.vaultDeviceKey = analyzer.getActiveDevice().getDeviceConfiguration().getFileSha1Hash();
 		this.vaultChannelNumber = analyzer.getActiveChannel().getNumber();
 		this.vaultObjectKey = analyzer.getSettings().getActiveObjectKey();
-		this.vaultSamplingTimespanMs = analyzer.getSettings().getSamplingTimespan_ms();
+		this.vaultSamplingTimespan_ms = analyzer.getSettings().getSamplingTimespan_ms();
 
 		this.logLinkPath = GDE.STRING_EMPTY;
 		this.logFilePath = filePath.toString().replace(GDE.FILE_SEPARATOR, GDE.FILE_SEPARATOR_UNIX); // toString to avoid 'Object' during marshalling
@@ -144,17 +144,17 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		this.logDeviceName = logDeviceName;
 		this.logChannelNumber = logChannelNumber;
 		this.logObjectKey = logObjectKey;
-		this.logStartTimestampMs = logStartTimestamp_ms;
+		this.logStartTimestamp_ms = logStartTimestamp_ms;
 
 		this.vaultDirectory = getVaultDirectoryName(analyzer, vaultReaderSettings);
 		this.vaultName = getVaultName(filePath, fileLastModified_ms, fileLength, logRecordSetOrdinal, analyzer, vaultReaderSettings);
-		this.vaultCreatedMs = System.currentTimeMillis();
+		this.vaultCreated_ms = System.currentTimeMillis();
 
 		this.vaultReaderSettings = vaultReaderSettings;
 
 		log.finer(() -> String.format("HistoVault.ctor  objectDirectory=%s  path=%s  lastModified=%s  logRecordSetOrdinal=%d  logRecordSetBaseName=%s  startTimestamp_ms=%d   channelConfigNumber=%d   objectKey=%s", //
 				objectDirectory, filePath.getFileName().toString(), logRecordSetBaseName, StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logFileLastModified), //
-				StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestampMs), logChannelNumber, logObjectKey)); //
+				StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", this.logStartTimestamp_ms), logChannelNumber, logObjectKey)); //
 		log.finer(() -> String.format("vaultDirectory=%s  vaultName=%s", this.vaultDirectory, this.vaultName)); //
 	}
 
@@ -170,7 +170,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 
 		this.vaultName = histoVault.vaultName;
 		this.vaultDirectory = histoVault.vaultDirectory;
-		this.vaultCreatedMs = histoVault.vaultCreatedMs;
+		this.vaultCreated_ms = histoVault.vaultCreated_ms;
 
 		this.vaultReaderSettings = histoVault.vaultReaderSettings;
 
@@ -179,7 +179,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		this.vaultDeviceName = histoVault.vaultDeviceName;
 		this.vaultChannelNumber = histoVault.vaultChannelNumber;
 		this.vaultObjectKey = histoVault.vaultObjectKey;
-		this.vaultSamplingTimespanMs = histoVault.vaultSamplingTimespanMs;
+		this.vaultSamplingTimespan_ms = histoVault.vaultSamplingTimespan_ms;
 
 		this.logLinkPath = histoVault.logLinkPath;
 		this.logFilePath = histoVault.logFilePath;
@@ -194,7 +194,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		this.logDeviceName = histoVault.logDeviceName;
 		this.logChannelNumber = histoVault.logChannelNumber;
 		this.logObjectKey = histoVault.logObjectKey;
-		this.logStartTimestampMs = histoVault.logStartTimestampMs;
+		this.logStartTimestamp_ms = histoVault.logStartTimestamp_ms;
 
 		this.measurements = histoVault.measurements;
 		this.settlements = histoVault.settlements;
@@ -214,7 +214,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @return yyyy-MM-dd HH:mm:ss
 	 */
 	public String getStartTimeStampFormatted() {
-		return StringHelper.getFormatedTime(timestampFormat, this.logStartTimestampMs); //
+		return StringHelper.getFormatedTime(timestampFormat, this.logStartTimestamp_ms); //
 	}
 
 	public String getLoadFileExtension() {
@@ -258,7 +258,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		int hashCode = 1;
 		hashCode = prime * hashCode + this.logChannelNumber;
 		hashCode = prime * hashCode + ((this.logDeviceName == null) ? 0 : this.logDeviceName.hashCode());
-		hashCode = prime * hashCode + (int) (this.logStartTimestampMs ^ (this.logStartTimestampMs >>> 32));
+		hashCode = prime * hashCode + (int) (this.logStartTimestamp_ms ^ (this.logStartTimestamp_ms >>> 32));
 		return hashCode;
 	}
 
@@ -278,7 +278,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		if (this.logDeviceName == null) {
 			if (other.logDeviceName != null) return false;
 		} else if (!this.logDeviceName.equals(other.logDeviceName)) return false;
-		if (this.logStartTimestampMs != other.logStartTimestampMs) return false;
+		if (this.logStartTimestamp_ms != other.logStartTimestamp_ms) return false;
 		return true;
 	}
 
@@ -287,7 +287,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 */
 	@Override
 	public int compareTo(ExtendedVault o) {
-		return Long.compare(o.logStartTimestampMs, this.logStartTimestampMs);
+		return Long.compare(o.logStartTimestamp_ms, this.logStartTimestamp_ms);
 	}
 
 	public static String getSha1Delimiter() {
@@ -308,6 +308,13 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 
 	public String getLoadObjectDirectory() {
 		return this.loadObjectDirectory;
+	}
+
+	/**
+	 * @return true if this is a vault skeleton only
+	 */
+	public boolean isTruss() {
+		return this.getMeasurements().isEmpty();
 	}
 
 }

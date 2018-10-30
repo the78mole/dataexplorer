@@ -108,13 +108,13 @@ import gde.GDE;
     "vaultName",
     "vaultDirectory",
     "vaultReaderSettings",
-    "vaultCreatedMs",
+    "vaultCreated_ms",
     "vaultDataExplorerVersion",
     "vaultDeviceKey",
     "vaultDeviceName",
     "vaultChannelNumber",
     "vaultObjectKey",
-    "vaultSamplingTimespanMs",
+    "vaultSamplingTimespan_ms",
     "logLinkPath",
     "logFilePath",
     "logFileLastModified",
@@ -127,7 +127,7 @@ import gde.GDE;
     "logDeviceName",
     "logChannelNumber",
     "logObjectKey",
-    "logStartTimestampMs",
+    "logStartTimestamp_ms",
     "measurements",
     "settlements",
     "scores"
@@ -141,8 +141,8 @@ public class HistoVault {
 	protected String														vaultDirectory;
   @XmlElement(required = true)
   protected String 														vaultReaderSettings;
-	@XmlElement(name = "vaultCreated_ms")
-	protected long															vaultCreatedMs;
+	@XmlElement(required = true)
+	protected long															vaultCreated_ms;
 	@XmlElement(required = true)
 	protected String														vaultDataExplorerVersion;
 	@XmlElement(required = true)
@@ -152,8 +152,8 @@ public class HistoVault {
 	protected int																vaultChannelNumber;
 	@XmlElement(required = true)
 	protected String														vaultObjectKey;
-	@XmlElement(name = "vaultSamplingTimespan_ms")
-	protected long															vaultSamplingTimespanMs;
+	@XmlElement(required = true)
+	protected long															vaultSamplingTimespan_ms;
   @Deprecated // replaced by loadLinkPath -> remains in the vault for information purposes only
 	@XmlElement(required = true)
 	protected String 														logLinkPath;
@@ -174,8 +174,8 @@ public class HistoVault {
 	protected int																logChannelNumber;
 	@XmlElement(required = true)
 	protected String														logObjectKey;
-	@XmlElement(name = "logStartTimestamp_ms")
-	protected long															logStartTimestampMs;
+	@XmlElement(required = true)
+	protected long															logStartTimestamp_ms;
 	@XmlElement(required = true)
 	@XmlJavaTypeAdapter(CompartmentsTypeAdapter.class)
 	protected HashMap<Integer, CompartmentType>	measurements;
@@ -196,7 +196,7 @@ public class HistoVault {
 	public HistoVault(HistoVault histoVault) {
 		this.vaultName = histoVault.vaultName;
 		this.vaultDirectory = histoVault.vaultDirectory;
-		this.vaultCreatedMs = histoVault.vaultCreatedMs;
+		this.vaultCreated_ms = histoVault.vaultCreated_ms;
 
 		this.vaultReaderSettings = histoVault.vaultReaderSettings;
 
@@ -205,7 +205,7 @@ public class HistoVault {
 		this.vaultDeviceName = histoVault.vaultDeviceName;
 		this.vaultChannelNumber = histoVault.vaultChannelNumber;
 		this.vaultObjectKey = histoVault.vaultObjectKey;
-		this.vaultSamplingTimespanMs = histoVault.vaultSamplingTimespanMs;
+		this.vaultSamplingTimespan_ms = histoVault.vaultSamplingTimespan_ms;
 
 		this.logLinkPath = histoVault.logLinkPath;
 		this.logFilePath = histoVault.logFilePath;
@@ -220,7 +220,7 @@ public class HistoVault {
 		this.logDeviceName = histoVault.logDeviceName;
 		this.logChannelNumber = histoVault.logChannelNumber;
 		this.logObjectKey = histoVault.logObjectKey;
-		this.logStartTimestampMs = histoVault.logStartTimestampMs;
+		this.logStartTimestamp_ms = histoVault.logStartTimestamp_ms;
 
 		this.measurements = histoVault.measurements;
 		this.settlements = histoVault.settlements;
@@ -307,15 +307,15 @@ public class HistoVault {
   	 *
   	 */
   	public long getVaultCreated_ms() {
-  		return vaultCreatedMs;
+  		return vaultCreated_ms;
   	}
 
     /**
 	   * Sets the value of the vaultCreatedMs property.
 	   *
 	   */
-	public void setVaultCreated_Ms(long value) {
-		this.vaultCreatedMs = value;
+	public void setVaultCreated_ms(long value) {
+		this.vaultCreated_ms = value;
 	}
 
 	/**
@@ -434,15 +434,15 @@ public class HistoVault {
 	 *
 	 */
 	public long getVaultSamplingTimespan_ms() {
-		return vaultSamplingTimespanMs;
+		return vaultSamplingTimespan_ms;
 	}
 
 	/**
 	 * Sets the value of the vaultSamplingTimespanMs property.
 	 *
 	 */
-	public void setVaultSamplingTimespan_Ms(long value) {
-		this.vaultSamplingTimespanMs = value;
+	public void setVaultSamplingTimespan_ms(long value) {
+		this.vaultSamplingTimespan_ms = value;
 	}
 
 	/**
@@ -694,15 +694,15 @@ public class HistoVault {
 	 *
 	 */
 	public long getLogStartTimestamp_ms() {
-		return logStartTimestampMs;
+		return logStartTimestamp_ms;
 	}
 
 	/**
 	 * Sets the value of the logStartTimestampMs property.
 	 *
 	 */
-	public void setLogStartTimestampMs(long value) {
-		this.logStartTimestampMs = value;
+	public void setLogStartTimestamp_ms(long value) {
+		this.logStartTimestamp_ms = value;
 	}
 
 	/**
@@ -949,10 +949,6 @@ public class HistoVault {
 		}
 	}
 
-	public HashMap<Integer, PointType> getScorePoints() {
-		return this.getScores();
-	}
-
 	/**
 	 * @param scoreLabelOrdinal
 	 * @return null in case of unavailable score
@@ -961,36 +957,18 @@ public class HistoVault {
 		return this.getScores().get(scoreLabelOrdinal).getValue();
 	}
 
-	/**
-	 * @return true if this is a vault skeleton only
-	 */
-	public boolean isTruss() {
-		return this.getMeasurements().isEmpty();
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		final String d = GDE.STRING_COMMA_BLANK;
 		sb.append(this.vaultName).append(d);
-		sb.append("isTruss=").append(isTruss()).append(d);
 		sb.append("logRecordSetOrdinal=").append(this.logRecordSetOrdinal).append(d);
 		sb.append("logRecordsetBaseName=").append(this.logRecordsetBaseName).append(d);
 		sb.append("logChannelNumber=").append(this.logChannelNumber).append(d);
 		sb.append("logObjectKey=").append(this.logObjectKey).append(d);
-		sb.append("logStartTimestampMs=").append(this.logStartTimestampMs).append(d);
+		sb.append("logStartTimestampMs=").append(this.logStartTimestamp_ms).append(d);
 		sb.append("vaultDirectory=").append(this.vaultDirectory);
 		return sb.toString();
-	}
-
-	public String toIndexEntry() {
-		final String d = GDE.STRING_CSV_SEPARATOR;
-		String readerSettings = vaultReaderSettings.replace(GDE.STRING_CSV_SEPARATOR, GDE.STRING_UNDER_BAR);
-		String attributes = vaultName + d + vaultDirectory + d + readerSettings + d + vaultCreatedMs //
-				+ d + vaultDataExplorerVersion + d + vaultDeviceKey + d + vaultDeviceName + d + vaultChannelNumber + d + vaultSamplingTimespanMs //
-				+ d + logFileLastModified + d + logFileLength + d + logRecordSetOrdinal + d + logRecordsetBaseName //
-				+ d + logChannelNumber + d + logStartTimestampMs + d + logFilePath;
-		return attributes;
 	}
 
 	/**

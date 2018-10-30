@@ -8,8 +8,6 @@
 package gde.histo.cache;
 
 import java.util.HashMap;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -206,10 +204,6 @@ public class CompartmentType {
 		this.outlierPoints = value;
 	}
 
-	public void setOutlierPoints(IntStream values) {
-		this.outlierPoints = values.boxed().map(i -> String.valueOf(i)).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
-	}
-
 	/**
 	 * Gets the value of the scrappedPoints property.
 	 *
@@ -232,10 +226,6 @@ public class CompartmentType {
 	 */
     public void setScrappedPoints(String value) {
 		this.scrappedPoints = value;
-	}
-
-	public void setScrappedPoints(IntStream values) {
-		this.outlierPoints = values.boxed().map(i -> String.valueOf(i)).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
 	}
 
 }

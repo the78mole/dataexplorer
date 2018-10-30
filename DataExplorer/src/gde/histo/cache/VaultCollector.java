@@ -46,8 +46,8 @@ import gde.device.TrailTypes;
 import gde.device.TransitionAmountType;
 import gde.device.TransitionCalculusType;
 import gde.device.TransitionFigureType;
-import gde.histo.datasources.SourceDataSet;
 import gde.histo.datasources.HistoSet;
+import gde.histo.datasources.SourceDataSet;
 import gde.histo.device.IHistoDevice;
 import gde.histo.settlements.AmountEvaluator;
 import gde.histo.settlements.CalculusEvaluator;
@@ -199,7 +199,7 @@ public final class VaultCollector {
 	 */
 	public void promoteTruss(RecordSet recordSet, Integer[] scorePoints) {
 		if (recordSet.getRecordDataSize(true) > 0) {
-			this.vault.logStartTimestampMs = recordSet.getStartTimeStamp();
+			this.vault.logStartTimestamp_ms = recordSet.getStartTimeStamp();
 
 			boolean isSampled = scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] != null && scorePoints[ScoreLabelTypes.TOTAL_READINGS.ordinal()] > recordSet.getRecordDataSize(true);
 			setMeasurementPoints(recordSet, isSampled);
@@ -453,11 +453,13 @@ public final class VaultCollector {
 			quantile = Coding.POINT.toValueQuantile(record, analyzer.getSettings());
 			if (!quantile.getOutliers().isEmpty()) {
 				IntStream outliers = quantile.getOutliers().stream().distinct().mapToInt(v -> encodeValue(channelItem, v.doubleValue()));
-				entryPoints.setOutlierPoints(outliers);
+				String outliersCsv = outliers.boxed().map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+				entryPoints.setOutlierPoints(outliersCsv);
 			}
 			if (!quantile.getConstantScraps().isEmpty()) {
 				IntStream scraps = quantile.getConstantScraps().stream().distinct().mapToInt(v -> encoder.apply(v.doubleValue()));
-				entryPoints.setScrappedPoints(scraps);
+				String scrapsCsv = scraps.boxed().map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+				entryPoints.setScrappedPoints(scrapsCsv);
 			}
 		}
 		// raw points without multiplying by 1000 in order to not loose the bits 22 to 31
@@ -518,11 +520,13 @@ public final class VaultCollector {
 					quantile = Coding.POINT.toValueQuantile(record, analyzer.getSettings());
 					if (!quantile.getOutliers().isEmpty()) {
 						IntStream outliers = quantile.getOutliers().stream().distinct().mapToInt(v -> encoder.apply(v.doubleValue()));
-						entryPoints.setOutlierPoints(outliers);
+						String outliersCsv = outliers.boxed().map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+						entryPoints.setOutlierPoints(outliersCsv);
 					}
 					if (!quantile.getConstantScraps().isEmpty()) {
 						IntStream scraps = quantile.getConstantScraps().stream().distinct().mapToInt(v -> encoder.apply(v.doubleValue()));
-						entryPoints.setScrappedPoints(scraps);
+						String scrapsCsv = scraps.boxed().map(String::valueOf).collect(Collectors.joining(GDE.STRING_CSV_SEPARATOR));
+						entryPoints.setScrappedPoints(scrapsCsv);
 					}
 				}
 

@@ -305,7 +305,7 @@ public final class VaultReaderWriter {
 
 					try {
 						HistoVault histoVault = memoryCache.get(entry.getName(), () -> storeKeeper.apply(stream));
-						vaultExtract.add(new AbstractMap.SimpleImmutableEntry<String, String>(histoVault.getVaultObjectKey(), histoVault.toIndexEntry()));
+						vaultExtract.add(new AbstractMap.SimpleImmutableEntry<String, String>(histoVault.getVaultObjectKey(), toIndexEntry(histoVault)));
 					} catch (Exception e) {
 						log.log(SEVERE, e.getMessage(), e);
 					}
@@ -316,7 +316,7 @@ public final class VaultReaderWriter {
 			for (String vaultName : analyzer.getDataAccess().getCacheFolderList(directoryName, MIN_FILE_LENGTH)) {
 				try (InputStream stream = analyzer.getDataAccess().getCacheInputStream(directoryName, vaultName)) {
 					HistoVault histoVault = memoryCache.get(vaultName, () -> storeKeeper.apply(stream));
-					vaultExtract.add(new AbstractMap.SimpleImmutableEntry<String, String>(histoVault.getVaultObjectKey(), histoVault.toIndexEntry()));
+					vaultExtract.add(new AbstractMap.SimpleImmutableEntry<String, String>(histoVault.getVaultObjectKey(), toIndexEntry(histoVault)));
 				} catch (Exception e) {
 					log.log(SEVERE, e.getMessage(), e);
 				}
@@ -334,6 +334,16 @@ public final class VaultReaderWriter {
 		log.fine(() -> String.format("%s : %s %d", //
 				vaultExtract.isEmpty() ? directoryName : vaultExtract.get(0).getKey(), directoryName, vaultExtract.size()));
 		return vaultExtract;
+	}
+
+	private static String toIndexEntry(HistoVault h) {
+		final String d = GDE.STRING_CSV_SEPARATOR;
+		String readerSettings = h.vaultReaderSettings.replace(GDE.STRING_CSV_SEPARATOR, GDE.STRING_UNDER_BAR);
+		String attributes = h.vaultName + d + h.vaultDirectory + d + readerSettings + d + h.vaultCreated_ms //
+				+ d + h.vaultDataExplorerVersion + d + h.vaultDeviceKey + d + h.vaultDeviceName + d + h.vaultChannelNumber + d + h.vaultSamplingTimespan_ms //
+				+ d + h.logFileLastModified + d + h.logFileLength + d + h.logRecordSetOrdinal + d + h.logRecordsetBaseName //
+				+ d + h.logChannelNumber + d + h.logStartTimestamp_ms + d + h.logFilePath;
+		return attributes;
 	}
 
 }
