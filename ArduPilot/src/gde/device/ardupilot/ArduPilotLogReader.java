@@ -96,7 +96,7 @@ public class ArduPilotLogReader {
 //    xml.write("  <skippedlines>" + escape(repr(self.logdata.skippedLines)) + "</skippedlines>\n")
 //    xml.write("</header>\n")
 
-		header.put("logfile", filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+		header.put("logfile", filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR) + 1));
 		File logFile = new File(filePath);
 		header.put("sizekb", "" + (logFile.isFile() ? logFile.length()/1000 : 0));
 		
