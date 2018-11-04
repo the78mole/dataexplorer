@@ -47,7 +47,7 @@
         <property name="state_info" value="11" type="Integer" description="Informationsanzeige"/>
         <property name="state_ex_discharge" value="12" type="Integer" description="Entladeoperationende"/>
     </State>
-    <Channels lastUseOrdinal="0">
+    <Channels>
         <Channel name="type_outlet 1" type="TYPE_OUTLET">
             <Measurement>
                 <name>current</name>

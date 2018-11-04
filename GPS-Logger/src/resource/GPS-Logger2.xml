@@ -26,7 +26,7 @@
     <State>
         <property type="Integer" value="01" name="state_flight_recording"/>
     </State>
-    <Channels lastUseOrdinal="1">
+    <Channels>
         <Channel type="TYPE_CONFIG" name="UniLog">
             <Measurement>
                 <name>latitude</name>

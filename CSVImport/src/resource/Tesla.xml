@@ -24,7 +24,7 @@
         <property name="state_monitoring" value="01" type="Integer"/>
         <property name="state_data_recording" value="02" type="Integer"/>
     </State>
-    <Channels lastUseOrdinal="0">
+    <Channels>
         <Channel name="type_config_1" type="TYPE_CONFIG">
             <Measurement>
                 <name>0????</name>

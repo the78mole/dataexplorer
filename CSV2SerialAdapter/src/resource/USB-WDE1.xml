@@ -41,7 +41,7 @@
     <State>
         <property name="Empfang von Wetterdaten" value="01" type="Integer"/>
     </State>
-    <Channels lastUseOrdinal="0">
+    <Channels>
         <Channel name="type_outlet 1" type="TYPE_OUTLET">
             <Measurement>
                 <name>temperature S1</name>

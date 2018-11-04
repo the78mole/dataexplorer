@@ -310,6 +310,7 @@ public class DevicePropertiesType {
         @XmlElement(name = "Channel", required = true)
         protected List<ChannelType> channel;
         protected List<ChannelPropertyType> property;
+        @Deprecated // replaced by deviceUse attribute in Settings
         @XmlAttribute
         protected Integer lastUseOrdinal;
 
@@ -373,7 +374,7 @@ public class DevicePropertiesType {
 
         /**
          * Gets the value of the lastUseOrdinal property.
-         *
+         * @deprecated replaced by deviceUse attribute in Settings
          * @return
          *     possible object is
          *     {@link Integer }
@@ -386,7 +387,7 @@ public class DevicePropertiesType {
 
         /**
          * Sets the value of the lastUseOrdinal property.
-         *
+         * @deprecated replaced by deviceUse attribute in Settings
          * @param value
          *     allowed object is
          *     {@link Integer }

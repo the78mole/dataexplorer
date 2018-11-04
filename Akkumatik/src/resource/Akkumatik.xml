@@ -35,7 +35,7 @@
         <format inputType="SERIAL_IO" formatType="BYTE" size="-129"/>
         <checkSum format="BINARY" type="XOR"/>
     </DataBlock>
-    <Channels lastUseOrdinal="0">
+    <Channels>
         <Channel name="type_outlet 1" type="TYPE_OUTLET">
             <Measurement>
                 <name>voltage</name>

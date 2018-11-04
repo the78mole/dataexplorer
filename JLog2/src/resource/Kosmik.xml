@@ -36,7 +36,7 @@
     <State>
         <property type="Integer" value="01" name="state_data_recording"/>
     </State>
-    <Channels lastUseOrdinal="1">
+    <Channels>
         <Channel type="TYPE_OUTLET" name="Firmware 3.1">
             <Measurement>
                 <name>runs_per_minute</name>

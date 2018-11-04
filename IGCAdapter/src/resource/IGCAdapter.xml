@@ -26,7 +26,7 @@
 		<property type="Integer" value="01"
 			name="state_flight_recording" />
 	</State>
-	<Channels lastUseOrdinal="0">
+	<Channels>
 		<Channel type="TYPE_CONFIG" name="type_universal">
 			<Measurement>
 				<name>latitude</name>

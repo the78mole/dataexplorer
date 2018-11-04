@@ -34,7 +34,7 @@
         <property name="state_discharge" value="3" type="Integer"/>
         <property name="state_cycle" value="4" type="Integer"/>
     </State>
-    <Channels lastUseOrdinal="3">
+    <Channels>
         <Channel name="type_slot 1" type="TYPE_CONFIG">
             <Measurement>
                 <name>voltage</name>

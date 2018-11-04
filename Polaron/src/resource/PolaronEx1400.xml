@@ -27,7 +27,7 @@
     <DataBlock>
         <format inputType="SERIAL_IO" formatType="BYTE" size="299"/>
     </DataBlock>
-    <Channels lastUseOrdinal="1">
+    <Channels>
         <Channel name="type_outlet 1" type="TYPE_OUTLET">
             <Measurement>
                 <name>supply_voltage</name>

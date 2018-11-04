@@ -37,7 +37,7 @@
     <State>
         <property name="state_data_recording" value="01" type="Integer"/>
     </State>
-    <Channels lastUseOrdinal="0">
+    <Channels>
         <Channel name="type_general" type="TYPE_CONFIG">
             <Measurement>
                 <name>Rx-&gt;Tx-PLoss</name>

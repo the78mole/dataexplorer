@@ -22,7 +22,7 @@
     <State>
         <property name="state_data_recording" value="01" type="Integer"/>
     </State>
-    <Channels lastUseOrdinal="1">
+    <Channels>
         <Channel name="type_thermal" type="TYPE_CONFIG">
             <Measurement>
                 <name>altitude_relative</name>

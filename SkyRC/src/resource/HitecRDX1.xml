@@ -27,7 +27,7 @@
         <format inputType="SERIAL_IO" formatType="BYTE" size="64"/>
         <checkSum format="BINARY" type="ADD"/>
     </DataBlock>
-    <Channels lastUseOrdinal="1">
+    <Channels>
         <Channel name="type_outlet A" type="TYPE_OUTLET">
             <Measurement>
                 <name>voltage</name>
