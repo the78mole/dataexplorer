@@ -1833,7 +1833,17 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 */
 	@Override
 	public CTabItem getUtilityDeviceTabItem() {
-		if (isMdlTabRequested()) this.application.registerCustomTabItem(this.getMdlTabItem());
+		GDE.display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				if (HoTTAdapter.this.isMdlTabRequested()) {
+					CTabItem mdlTabItem = HoTTAdapter.this.getMdlTabItem();
+					if (mdlTabItem != null) {
+						DataExplorer.getInstance().registerCustomTabItem(mdlTabItem);
+					}
+				}
+			}
+		});
 
 		return new FileTransferTabItem(this.application.getTabFolder(), SWT.NONE, this.application.getTabFolder().getItemCount(), this, this.serialPort);
 	}
