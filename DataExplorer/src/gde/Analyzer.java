@@ -19,6 +19,8 @@
 
 package gde;
 
+import java.util.function.Supplier;
+
 import com.sun.istack.Nullable;
 
 import gde.config.DeviceConfigurations;
@@ -37,23 +39,36 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public abstract class Analyzer implements Cloneable {
-	private static final String	$CLASS_NAME	= Analyzer.class.getName();
-	private static final Logger	log					= Logger.getLogger($CLASS_NAME);
+	private static final String						$CLASS_NAME				= Analyzer.class.getName();
+	private static final Logger						log								= Logger.getLogger($CLASS_NAME);
 
-	protected static Analyzer		analyzer;
+	protected static Analyzer							analyzer;
+	protected static Supplier<Analyzer>		analyzerBuilder		= null;
+	protected static Supplier<DataAccess>	dataAccessBuilder	= null;
+
+	public static void setBuilders(Supplier<Analyzer> analyzerBuilder, Supplier<DataAccess> dataAccessBuilder) {
+		Analyzer.analyzerBuilder = analyzerBuilder;
+		Analyzer.dataAccessBuilder = dataAccessBuilder;
+	}
+
+	public static boolean isWithBuilders() {
+		return analyzerBuilder != null;
+	}
 
 	public static Analyzer getInstance() {
 		if (analyzer == null) {
-			if (GDE.EXECUTION_ENV != null) {
-				analyzer = null; // todo
-			} else if (!GDE.isWithUi()) {
-				analyzer = new TestAnalyzer();
+			if (analyzerBuilder != null) {
+				analyzer = analyzerBuilder.get();
 			} else {
-				analyzer = new Explorer();
-			}
-			// synchronize now to avoid a performance penalty in case of frequent getInstance calls
-			synchronized (analyzer) {
-				analyzer.startDeviceConfigurationsThread();
+				if (!GDE.isWithUi()) {
+					analyzer = new TestAnalyzer();
+				} else {
+					analyzer = new Explorer();
+				}
+				// synchronize now to avoid a performance penalty in case of frequent getInstance calls
+				synchronized (analyzer) {
+					analyzer.startDeviceConfigurationsThread();
+				}
 			}
 		}
 		return analyzer;
@@ -69,8 +84,8 @@ public abstract class Analyzer implements Cloneable {
 
 	protected Analyzer() {
 		this.settings = Settings.getInstance();
-		if (GDE.EXECUTION_ENV != null) {
-			this.dataAccess = null; // todo
+		if (dataAccessBuilder != null) {
+			this.dataAccess = dataAccessBuilder.get();
 		} else if (!GDE.isWithUi()) {
 			this.dataAccess = DataAccess.getInstance();
 		} else {
@@ -93,7 +108,8 @@ public abstract class Analyzer implements Cloneable {
 
 	/**
 	 * Hybrid singleton copy constructor.
-	 * Caution: <li>NO deep copy for the device configurations and the active device
+	 * Caution:
+	 * <li>NO deep copy for the device configurations and the active device
 	 * <li>the active device does NOT copy the device specific objects (e.g. HoTTAdapter fields)
 	 */
 	protected Analyzer(Analyzer that) {
