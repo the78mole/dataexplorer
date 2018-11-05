@@ -54,6 +54,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.xml.sax.SAXException;
 
+import gde.Analyzer;
 import gde.DataAccess;
 import gde.GDE;
 import gde.log.Level;
@@ -329,9 +330,10 @@ public final class Settings extends Properties {
 	private void initialize() throws SAXException, JAXBException {
 		this.load();
 
-		final String lang = this.getLocale().getLanguage().contains("de") || this.getLocale().getLanguage().contains("en") ? this.getLocale().getLanguage() : "en";
-
-		if (GDE.EXECUTION_ENV == null) {
+		if (Analyzer.isWithBuilders()) {
+			this.readMeasurementDiplayProperties();
+		} else {
+			final String lang = this.getLocale().getLanguage().contains("de") || this.getLocale().getLanguage().contains("en") ? this.getLocale().getLanguage() : "en";
 			// check existence of application home directory, check XSD version, copy all device XML+XSD and image files
 			FileUtils.checkDirectoryAndCreate(GDE.APPL_HOME_PATH);
 			String devicePropertiesTargetpath = Settings.getDevicesPath();
@@ -347,9 +349,7 @@ public final class Settings extends Properties {
 				checkDeviceProperties(String.format("%s%s", devicePropertiesTargetpath, GDE.FILE_SEPARATOR_UNIX), true);
 				checkMeasurementDisplayMappings(true, lang);
 			}
-		}
 
-		if (GDE.EXECUTION_ENV == null) {
 			// locale settings has been changed, replacement of device property files required
 			if (this.getLocaleChanged()) {
 				checkMeasurementDisplayMappings(false, lang);
@@ -383,9 +383,9 @@ public final class Settings extends Properties {
 					&& this.getProperty(Settings.WINDOW_HEIGHT) != null) {
 				this.window = new Rectangle(Integer.valueOf(this.getProperty(Settings.WINDOW_LEFT).trim()).intValue(), Integer.parseInt(this.getProperty(Settings.WINDOW_TOP).trim()),
 						Integer.parseInt(this.getProperty(Settings.WINDOW_WIDTH).trim()), Integer.parseInt(this.getProperty(Settings.WINDOW_HEIGHT).trim()));
-			}
-			else
+			} else {
 				this.window = new Rectangle(50, 50, 950, 600);
+			}
 		}
 
 		this.setProperty(Settings.LOCALE_CHANGED, "false"); //$NON-NLS-1$
