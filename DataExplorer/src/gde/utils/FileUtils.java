@@ -1721,9 +1721,9 @@ public class FileUtils {
 	}
 
 	/**
-	 * Wraps the input stream with ZIPInputStream if needed.
-	 * @param inputStream is a zip stream or a standard stream
-	 * @return a zip stream positioned on the first entry or the input stream (first read position)
+	 * Wraps the input stream with ZipInputStream if needed.
+	 * @param inputStream is a zip stream or a standard stream with NO read activities performed yet
+	 * @return wrapped stream if the data is zipped or the unmodified inputstream
 	 */
 	public static InputStream wrapIfZipStream(InputStream inputStream) throws IOException {
 		InputStream markableStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
@@ -1736,6 +1736,20 @@ public class FileUtils {
 			markableStream.reset();
 			return markableStream;
 		}
+	}
+
+	/**
+	 * @param inputStream is a markable stream with NO read activities performed yet
+	 * @return true if the input stream data is zipped
+	 */
+	public static boolean isZipStream(InputStream inputStream) throws IOException {
+		if (!inputStream.markSupported()) throw new IllegalArgumentException();
+
+		inputStream.mark(999);
+		boolean isZipInputStream = new ZipInputStream(inputStream).getNextEntry() != null;
+		inputStream.reset();
+
+		return isZipInputStream;
 	}
 
 }

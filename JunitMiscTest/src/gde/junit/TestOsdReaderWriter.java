@@ -19,7 +19,10 @@
 package gde.junit;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 
@@ -278,5 +281,25 @@ public class TestOsdReaderWriter extends TestSuperClass {
 			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
 		}
 		if (failures.size() > 0) fail(sb.toString());
+	}
+
+	/**
+	 * Test reading OSD example files headers.
+	 */
+	public final void testInputStreamOsdReader() {
+		this.setDataPath(); // set the dataPath variable
+		Path compressedOsd = this.dataPath.toPath().resolve("_ET_Exzerpt\\HoTTAdapter2/2016-08-22_Sharon Pro E all configs.osd");
+		Path uncompressedOsd = this.dataPath.toPath().resolve("_ET_Exzerpt/UltraTrioPlus14/2015-06-12_4NiMH_E_Laden.osd");
+
+		try (InputStream compressedInputStream = new FileInputStream(compressedOsd.toFile()); //
+				InputStream uncompressedInputStream = new FileInputStream(uncompressedOsd.toFile());) {
+			HashMap<String, String> compressedHeader = OsdReaderWriter.getHeader(compressedInputStream);
+			assertFalse("no header entries found for " + compressedOsd.toString(), compressedHeader.isEmpty());
+
+			HashMap<String, String> uncompressedHeader = OsdReaderWriter.getHeader(uncompressedInputStream);
+			assertFalse("no header entries found for " + uncompressedOsd.toString(), uncompressedHeader.isEmpty());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

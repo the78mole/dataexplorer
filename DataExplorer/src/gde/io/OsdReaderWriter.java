@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -141,33 +142,27 @@ public class OsdReaderWriter {
 
 	/**
 	 * get data file header data
+	 * @param inputStream
+	 * @return hash map containing header data as string accessible by public header keys
+	 * @throws NotSupportedFileFormatException with empty message string
+	 */
+	public static HashMap<String, String> getHeader(InputStream inputStream) throws IOException, NotSupportedFileFormatException {
+		String exceptionMessageFilePath = "";
+		return readHeader(exceptionMessageFilePath, new DataInputStream(FileUtils.wrapIfZipStream(inputStream)));
+	}
+
+	/**
+	 * get data file header data
 	 * @param filePath
 	 * @return hash map containing header data as string accessible by public header keys
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 * @throws NotSupportedFileFormatException
 	 */
-
 	public static HashMap<String, String> getHeader(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormatException {
-		FileInputStream file_input = null;
-		DataInputStream data_in = null;
-		ZipInputStream zip_input = null;
-		try {
-			filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-			zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
-			ZipEntry zip_entry = zip_input.getNextEntry();
-			if (zip_entry != null) {
-				data_in = new DataInputStream(zip_input);
-				return readHeader(filePath, data_in);
-			}
-			file_input = new FileInputStream(new File(filePath));
-			data_in = new DataInputStream(file_input);
-			return readHeader(filePath, data_in);
-		}
-		finally {
-			if (data_in != null) data_in.close();
-			if (file_input != null) file_input.close();
-			if (zip_input != null) zip_input.close();
+		try (InputStream inputStream = new FileInputStream(new File(filePath));) {
+			String exceptionMessageFilePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+			return readHeader(exceptionMessageFilePath, new DataInputStream(FileUtils.wrapIfZipStream(inputStream)));
 		}
 	}
 
@@ -187,7 +182,7 @@ public class OsdReaderWriter {
 		line = data_in.readUTF();
 		line = line.substring(0, line.length() - 1);
 		log.log(Level.FINE, line);
-		if (!line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) && !line.startsWith(GDE.LEGACY_FILE_VERSION)) 
+		if (!line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) && !line.startsWith(GDE.LEGACY_FILE_VERSION))
 			throw new NotSupportedFileFormatException(filePath);
 
 		String sVersion = line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) ? line.substring(GDE.DATA_EXPLORER_FILE_VERSION.length(), GDE.DATA_EXPLORER_FILE_VERSION.length() + 1).trim()
@@ -874,8 +869,8 @@ public class OsdReaderWriter {
 	}
 
 	/**
-	 * Search through all data files and update the old object key with the new one, 
-	 * make backup of old *.osd as *.bak, 
+	 * Search through all data files and update the old object key with the new one,
+	 * make backup of old *.osd as *.bak,
 	 * keep osd file version unchanged
 	 * @param oldObjectKey
 	 * @param newObjectKey
@@ -944,7 +939,7 @@ public class OsdReaderWriter {
 					tmpData = data_in.readUTF();
 					String line = tmpData.substring(0, tmpData.length() - 1);
 					log.finer(() -> String.format("OSD first line = %s", line));
-					if (!line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) && !line.startsWith(GDE.LEGACY_FILE_VERSION)) 
+					if (!line.startsWith(GDE.DATA_EXPLORER_FILE_VERSION) && !line.startsWith(GDE.LEGACY_FILE_VERSION))
 						throw new NotSupportedFileFormatException(filePath);
 					data_out.writeUTF(tmpData);
 					filePointer += tmpData.getBytes("UTF8").length; //$NON-NLS-1$
@@ -963,7 +958,7 @@ public class OsdReaderWriter {
 					while (!(tmpData = data_in.readUTF()).startsWith(GDE.OBJECT_KEY)) {
 						data_out.writeUTF(tmpData);
 						filePointer += tmpData.getBytes("UTF8").length; //$NON-NLS-1$
-					}				
+					}
 					//write the new object key
 					StringBuilder sb = new StringBuilder();
 					sb.append(GDE.OBJECT_KEY).append(newObjectKey).append(GDE.STRING_NEW_LINE);
@@ -973,7 +968,7 @@ public class OsdReaderWriter {
 					data_out.writeUTF(tmpData);
 					filePointer += tmpData.getBytes("UTF8").length; //$NON-NLS-1$
 					if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "filePointer = " + filePointer);
-					
+
 					//next line contains number of record sets
 					int numberRecordSets = 0;
 					if (tmpData.startsWith(GDE.RECORD_SET_SIZE)) {
@@ -982,7 +977,7 @@ public class OsdReaderWriter {
 					else {
 						throw new NotSupportedFileFormatException(String.format("File %s does not contain number of record sets!", filePath));
 					}
-					//to correct the file pointers delta of bytes in object key length needs to be calculated 
+					//to correct the file pointers delta of bytes in object key length needs to be calculated
 					int deltaSizeObjectKey = newObjectKey.getBytes("UTF8").length - oldObjectKey.getBytes("UTF8").length;
 
 					//begin version dependent writing - read record set descriptors
