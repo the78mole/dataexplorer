@@ -25,12 +25,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -277,7 +281,7 @@ public final class Settings extends Properties {
 	String													cbSizes;
 	Comparator<String>							comparator											= new RecordSetNameComparator();																																	//used to sort object key list
 	Properties											measurementProperties						= new Properties();
-	
+
 
 	public enum GeoCodeGoogle {
 		STREET_ADDRESS, ROUTE, POLITICAL, ADMINISTRATIVE_AREA_LEVEL_3, ADMINISTRATIVE_AREA_LEVEL_2;
@@ -340,7 +344,7 @@ public final class Settings extends Properties {
 			if (!FileUtils.checkDirectoryAndCreate(devicePropertiesTargetpath, Settings.DEVICE_PROPERTIES_XSD_NAME)) {
 				FileUtils.extract(this.getClass(), Settings.DEVICE_PROPERTIES_XSD_NAME, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555);
 				checkDeviceProperties(String.format("%s%s", devicePropertiesTargetpath, GDE.FILE_SEPARATOR_UNIX), true);
-				this.isDevicePropertiesUpdated = true;			
+				this.isDevicePropertiesUpdated = true;
 				checkMeasurementDisplayMappings(true, lang);
 			}
 			else { // execute every time application starts to enable xsd exist and update from added plug-in
@@ -366,7 +370,7 @@ public final class Settings extends Properties {
 				FileUtils.extract(this.getClass(), Settings.GRAPHICS_TEMPLATES_XSD_NAME, Settings.PATH_RESOURCE, templateDirectory, Settings.PERMISSION_555);
 				this.isGraphicsTemplateUpdated = true;
 			}
-			
+
 			checkDeviceTemplates( String.format("%s%s", templateDirectory, GDE.FILE_SEPARATOR_UNIX));
 
 			String histoCacheDirectory =  String.format("%s%s%s", GDE.APPL_HOME_PATH, GDE.FILE_SEPARATOR_UNIX, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
@@ -387,9 +391,8 @@ public final class Settings extends Properties {
 				this.window = new Rectangle(50, 50, 950, 600);
 			}
 		}
-
 		this.setProperty(Settings.LOCALE_CHANGED, "false"); //$NON-NLS-1$
-		
+
 		this.xsdThread.start(); // wait to start the thread until the XSD checked if exist or updated
 	}
 
@@ -406,9 +409,9 @@ public final class Settings extends Properties {
 	 * @return true if deviceName is in the list of active devices
 	 */
 	public boolean isOneOfActiveDevices(String deviceName) {
-		return Arrays.stream(this.getDeviceUseCsv().split(GDE.STRING_CSV_SEPARATOR)).filter(s -> s.startsWith(deviceName + GDE.STRING_STAR)).count() > 0;			
+		return Arrays.stream(this.getDeviceUseCsv().split(GDE.STRING_CSV_SEPARATOR)).filter(s -> s.startsWith(deviceName + GDE.STRING_STAR)).count() > 0;
 	}
-	
+
 	/**
 	 * check existence of directory, create if required and update all
 	 * @param devicePropertiesTargetpath
@@ -425,7 +428,7 @@ public final class Settings extends Properties {
 				throw new NullPointerException(String.format("directory %s does not exist", deviceJarBasePath));
 			}
 			for (String jarFileName : files) {
-				if (!jarFileName.endsWith(GDE.FILE_ENDING_DOT_JAR)) 
+				if (!jarFileName.endsWith(GDE.FILE_ENDING_DOT_JAR))
 					continue;
 				JarFile jarFile = null;
 				List<ExportService> services = new ArrayList<>();
@@ -451,11 +454,11 @@ public final class Settings extends Properties {
 				//add the services found in jar to the collection of device services
 				for (ExportService service : services) {
 					this.deviceServices.put(service.getName(), service);
-				}			
+				}
 			}
 		}
 	}
-	
+
 	/**
 	 * extract device properties xml if not exist extract from jar
 	 * @param jarFile
@@ -480,7 +483,7 @@ public final class Settings extends Properties {
 			if (!FileUtils.checkFileExist(propertyFilePath))
 				FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, String.format("%s%s%s", Settings.PATH_RESOURCE, lang, GDE.FILE_SEPARATOR_UNIX), path.getAbsolutePath(), Settings.PERMISSION_555);
 		}
-		else { 
+		else {
 			if (FileUtils.checkFileExist(propertyFilePath)) {
 				new File(propertyFilePath).delete();
 				try {
@@ -535,11 +538,11 @@ public final class Settings extends Properties {
 	 * additional access to device jar files not required
 	 * @param templateDirectoryTargetPath
 	 */
-	private void checkDeviceTemplates(String templateDirectoryTargetPath) { 
+	private void checkDeviceTemplates(String templateDirectoryTargetPath) {
 	//deviceServices contains all services exported by found device jar files
-		if (this.getDeviceServices().size() == 0) { 
+		if (this.getDeviceServices().size() == 0) {
 			String deviceJarBasePath = FileUtils.getDevicePluginJarBasePath();
-			log.config(() -> String.format("deviceJarBasePath = %s", deviceJarBasePath)); //$NON-NLS-1$		
+			log.config(() -> String.format("deviceJarBasePath = %s", deviceJarBasePath)); //$NON-NLS-1$
 			String[] files = new File(deviceJarBasePath).list();
 			for (String jarFileName : files) {
 				if (!jarFileName.endsWith(GDE.FILE_ENDING_DOT_JAR)) continue;
@@ -548,7 +551,13 @@ public final class Settings extends Properties {
 				try {
 					jarFile = new JarFile(deviceJarBasePath + GDE.FILE_SEPARATOR_UNIX + jarFileName);
 					services = FileUtils.getDeviceJarServices(jarFile);
-					checkDeviceTemplates(templateDirectoryTargetPath, services);					
+					for (ExportService service : services) {
+						final String serviceName = service.getName();
+						if (this.isOneOfActiveDevices(serviceName)) {
+							extractDeviceDefaultTemplates(service.getJarFile(), serviceName, templateDirectoryTargetPath);
+						}
+					}
+
 				}
 				catch (IOException e) {
 					Settings.log.log(Level.SEVERE, e.getMessage(), e);
@@ -567,6 +576,7 @@ public final class Settings extends Properties {
 	 * @throws FileNotFoundException
 	 */
 	private void checkDeviceTemplates(String templateDirectoryTargetPath, Collection<ExportService> services) {
+	Map<String, List<Path>> templateFileMap = readTemplateFiles(templateDirectoryTargetPath);
 		for (ExportService service : services) {
 			try {
 				final String serviceName = service.getName();
@@ -574,6 +584,16 @@ public final class Settings extends Properties {
 						extractDeviceDefaultTemplates(service.getJarFile(), serviceName, templateDirectoryTargetPath);
 				}
 				else {
+					List<Path> templateFiles = templateFileMap.get(serviceName);
+					if (templateFiles != null) {
+						for (Path path : templateFiles) {
+							File obsoleteFile = path.toFile();
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("delete %s", obsoleteFile.getAbsolutePath())); //$NON-NLS-1$
+							if (!obsoleteFile.delete())
+								log.warning(() -> String.format("could not delete %s%s%s", templateDirectoryTargetPath, serviceName, GDE.FILE_ENDING_DOT_XML));
+						}
+					}
+
 					for (File obsoleteFile : FileUtils.getFileListing(new File(templateDirectoryTargetPath), 1, String.format("%s%s", serviceName, GDE.STRING_UNDER_BAR))) {
 						if (obsoleteFile.exists())
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("delete %s", obsoleteFile.getAbsolutePath())); //$NON-NLS-1$
@@ -586,6 +606,21 @@ public final class Settings extends Properties {
 				Settings.log.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
+	}
+
+	private Map<String, List<Path>> readTemplateFiles(String templateDirectoryTargetPath) {
+		Map<String, List<Path>> filesMap = new HashMap<>();
+		try (Stream<Path> files = Files.walk(Paths.get(templateDirectoryTargetPath), 2)) {
+			Stream<Path> potentialFiles = files.filter(t -> t.getFileName().toString().contains(GDE.STRING_DOT));
+			filesMap = potentialFiles.collect(Collectors.groupingBy(this::getTemplateFilePrefix));
+		} catch (IOException e) {}
+		return filesMap;
+	}
+
+	private String getTemplateFilePrefix(Path t) {
+		String fileName = t.getFileName().toString();
+		int index = fileName.lastIndexOf(GDE.STRING_UNDER_BAR);
+		return index < 0 ? "" : fileName.substring(0, index);
 	}
 
 	/**
@@ -601,7 +636,7 @@ public final class Settings extends Properties {
 			String entryName = e.nextElement().getName();
 			if (entryName.startsWith(Settings.PATH_RESOURCE_TEMPLATE) && entryName.endsWith(GDE.FILE_ENDING_DOT_XML) && entryName.contains(serviceName_)) {
 				String defaultTemplateName = entryName.substring(Settings.PATH_RESOURCE_TEMPLATE.length());
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("jarFile = %s ; defaultTemplateName = %s", jarFile.getName(), entryName)); //$NON-NLS-1$ 
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("jarFile = %s ; defaultTemplateName = %s", jarFile.getName(), entryName)); //$NON-NLS-1$
 				if (!FileUtils.checkFileExist(templateDirectoryTargetPath + defaultTemplateName)) {
 					FileUtils.extract(jarFile, defaultTemplateName, Settings.PATH_RESOURCE_TEMPLATE, templateDirectoryTargetPath, Settings.PERMISSION_555);
 				}
