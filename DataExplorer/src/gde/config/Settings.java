@@ -543,66 +543,46 @@ public final class Settings extends Properties {
 		if (this.getDeviceServices().size() == 0) {
 			String deviceJarBasePath = FileUtils.getDevicePluginJarBasePath();
 			log.config(() -> String.format("deviceJarBasePath = %s", deviceJarBasePath)); //$NON-NLS-1$
-			String[] files = new File(deviceJarBasePath).list();
-			for (String jarFileName : files) {
+			for (String jarFileName : new File(deviceJarBasePath).list()) {
 				if (!jarFileName.endsWith(GDE.FILE_ENDING_DOT_JAR)) continue;
-				JarFile jarFile = null;
-				List<ExportService> services = new ArrayList<>();
 				try {
-					jarFile = new JarFile(deviceJarBasePath + GDE.FILE_SEPARATOR_UNIX + jarFileName);
-					services = FileUtils.getDeviceJarServices(jarFile);
-					for (ExportService service : services) {
+					for (ExportService service : FileUtils.getDeviceJarServices(new JarFile(deviceJarBasePath + GDE.FILE_SEPARATOR_UNIX + jarFileName))) {
 						final String serviceName = service.getName();
 						if (this.isOneOfActiveDevices(serviceName)) {
 							extractDeviceDefaultTemplates(service.getJarFile(), serviceName, templateDirectoryTargetPath);
 						}
 					}
-
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					Settings.log.log(Level.SEVERE, e.getMessage(), e);
 				}
 			}
 		} else {
-				checkDeviceTemplates(templateDirectoryTargetPath, this.getDeviceServices().values());
+			checkDeviceTemplates(templateDirectoryTargetPath, this.getDeviceServices().values());
 		}
 	}
 
 	/**
-	 * check existence of device graphics default templates export services based, extract if required
+	 * check for changes and extract or delete templates
 	 * @param templateDirectoryTargetPath
 	 * @param services
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
 	private void checkDeviceTemplates(String templateDirectoryTargetPath, Collection<ExportService> services) {
-	Map<String, List<Path>> templateFileMap = readTemplateFiles(templateDirectoryTargetPath);
+		Map<String, List<Path>> templateFileMap = readTemplateFiles(templateDirectoryTargetPath);
 		for (ExportService service : services) {
 			try {
 				final String serviceName = service.getName();
 				if (this.isOneOfActiveDevices(serviceName)) {
-						extractDeviceDefaultTemplates(service.getJarFile(), serviceName, templateDirectoryTargetPath);
-				}
-				else {
-					List<Path> templateFiles = templateFileMap.get(serviceName);
-					if (templateFiles != null) {
-						for (Path path : templateFiles) {
-							File obsoleteFile = path.toFile();
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("delete %s", obsoleteFile.getAbsolutePath())); //$NON-NLS-1$
-							if (!obsoleteFile.delete())
-								log.warning(() -> String.format("could not delete %s%s%s", templateDirectoryTargetPath, serviceName, GDE.FILE_ENDING_DOT_XML));
-						}
-					}
-
-					for (File obsoleteFile : FileUtils.getFileListing(new File(templateDirectoryTargetPath), 1, String.format("%s%s", serviceName, GDE.STRING_UNDER_BAR))) {
-						if (obsoleteFile.exists())
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("delete %s", obsoleteFile.getAbsolutePath())); //$NON-NLS-1$
-							if (!obsoleteFile.delete())
-								log.warning(() -> String.format("could not delete %s%s%s", templateDirectoryTargetPath, serviceName, GDE.FILE_ENDING_DOT_XML));
+					extractDeviceDefaultTemplates(service.getJarFile(), serviceName, templateDirectoryTargetPath);
+				} else if (templateFileMap.containsKey(serviceName)) {
+					for (Path path : templateFileMap.get(serviceName)) {
+						log.fine(() -> "delete " + path); //$NON-NLS-1$
+						if (!path.toFile().delete())
+							log.warning(() -> String.format("could not delete %s%s%s", templateDirectoryTargetPath, serviceName, GDE.FILE_ENDING_DOT_XML));
 					}
 				}
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				Settings.log.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
