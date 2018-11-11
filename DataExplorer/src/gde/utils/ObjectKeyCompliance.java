@@ -316,6 +316,8 @@ public class ObjectKeyCompliance {
 				log.log(Level.WARNING, "NoSuchFileException", dirPath);
 			} catch (IOException e) {
 				log.log(Level.WARNING, e.getMessage(), e);
+			} catch (Throwable e) {
+				log.log(Level.WARNING, e.getMessage(), e);
 			}
 		}
 		return directoryNames;
