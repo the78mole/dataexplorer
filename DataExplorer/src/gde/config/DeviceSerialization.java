@@ -92,6 +92,7 @@ public class DeviceSerialization {
 		Thread migrationThread = new Thread("migration") {
 			@Override
 			public void run() {
+				log.log(Level.INFO, "start migration thread");
 				Analyzer analyzer = Analyzer.getInstance();
 				LocalAccess localAccess = (LocalAccess) analyzer.getDataAccess();
 				int lastVersion = Integer.valueOf(GDE.DEVICE_PROPERTIES_XSD_VERSION.substring(GDE.DEVICE_PROPERTIES_XSD_VERSION.lastIndexOf("_V") + 2)) - 1;
@@ -124,6 +125,7 @@ public class DeviceSerialization {
 						break;
 					}
 				}
+				log.log(Level.TIME, "finished migration thread");
 			}
 		};
 		return migrationThread;

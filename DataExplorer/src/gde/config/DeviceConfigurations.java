@@ -105,7 +105,7 @@ public final class DeviceConfigurations {
 		this.deviceConfigs.clear();
 		for (String fileName : analyzer.getDataAccess().getDeviceFolderList()) {
 			// loop through all device properties XML and check if device used
-			add(analyzer, activeDeviceName, fileName, true);
+			add(analyzer, activeDeviceName, fileName, !Settings.getInstance().isDevicePropertiesUpdated);
 		}
 		
 		//active device configurations collected, now synchronize settings device_use accordingly
@@ -116,14 +116,22 @@ public final class DeviceConfigurations {
 
 	/**
 	 * synchronize device use list with device configurations, keep independent from remove to enable user to fix problem during device instantiation
+	 * to support update from older DataExplorer versions add devices to list which have use flag
 	 */
 	public void synchronizeDeviceUse() {
-		String[] deviceUseList = Settings.getInstance().getDeviceUseCsv().split(GDE.STRING_CSV_SEPARATOR);
-		for (String deviceName : deviceUseList) {
-			if (!this.deviceConfigs.containsKey(deviceName.substring(0, deviceName.lastIndexOf(GDE.STRING_STAR)))) {
-				log.log(Level.INFO, String.format("remove %s from device_use list", deviceName));
-				Settings.getInstance().removeDeviceUse(deviceName.substring(0, deviceName.lastIndexOf(GDE.STRING_STAR)));
+		String deviceUseCsv = Settings.getInstance().getDeviceUseCsv();
+		if (!deviceUseCsv.isEmpty()) {
+			for (String deviceName : deviceUseCsv.split(GDE.STRING_CSV_SEPARATOR)) {
+				if (!deviceName.isEmpty() && !this.deviceConfigs.containsKey(deviceName.substring(0, deviceName.lastIndexOf(GDE.STRING_STAR)))) {
+					log.log(Level.INFO, String.format("remove %s from device_use list", deviceName));
+					Settings.getInstance().removeDeviceUse(deviceName.substring(0, deviceName.lastIndexOf(GDE.STRING_STAR)));
+				}
 			}
+		} else { //device_use list empty or does not exist
+			for (String deviceKey : this.deviceConfigs.keySet()) {
+				if (this.deviceConfigs.get(deviceKey).isUsed())
+					Settings.getInstance().addDeviceUse(this.deviceConfigs.get(deviceKey).getName(), 1);
+			}			
 		}
 	}
 

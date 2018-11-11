@@ -437,7 +437,7 @@ public final class Settings extends Properties {
 					services = FileUtils.getDeviceJarServices(jarFile);
 					for (ExportService service : services) {
 						final String serviceName = service.getName();
-						if (this.isOneOfActiveDevices(serviceName)) {
+						if (this.getDeviceUseCsv().isEmpty() || this.isOneOfActiveDevices(serviceName)) {
 							extractDeviceProperties(jarFile, serviceName, devicePropertiesTargetpath);
 						}
 						else {
@@ -573,7 +573,7 @@ public final class Settings extends Properties {
 		for (ExportService service : services) {
 			try {
 				final String serviceName = service.getName();
-				if (this.isOneOfActiveDevices(serviceName)) {
+				if (this.getDeviceUseCsv().isEmpty() || this.isOneOfActiveDevices(serviceName)) {
 					extractDeviceDefaultTemplates(service.getJarFile(), serviceName, templateDirectoryTargetPath);
 				} else if (templateFileMap.containsKey(serviceName)) {
 					for (Path path : templateFileMap.get(serviceName)) {
