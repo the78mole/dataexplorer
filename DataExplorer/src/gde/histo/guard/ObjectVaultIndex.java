@@ -432,7 +432,7 @@ public final class ObjectVaultIndex {
 
 		for (String vaultReaderSettings : validReaderSettings) {
 			for (int j = 1; j <= device.getChannelCount(); j++) {
-				String directoryName = ExtendedVault.getVaultDirectoryName(analyzer, j, vaultReaderSettings);
+				String directoryName = ExtendedVault.getVaultDirectoryName(analyzer.getActiveDevice(), analyzer.getSettings(), j, vaultReaderSettings);
 				cacheDirectoryNames.add(directoryName);
 			}
 		}
