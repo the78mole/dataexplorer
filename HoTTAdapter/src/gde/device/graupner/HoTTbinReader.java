@@ -304,7 +304,7 @@ public class HoTTbinReader {
 			case 0:
 				// fill data block 0 receiver voltage and temperature
 				if (DataParser.parse2Short(buf, 0) != 0) {
-					System.arraycopy(buf, 34, buf1, 0, buf1.length);
+					System.arraycopy(buf, 34, buf0, 0, buf0.length);
 				}
 				break;
 			case 1:

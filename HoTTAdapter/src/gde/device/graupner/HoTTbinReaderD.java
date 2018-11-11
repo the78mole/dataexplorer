@@ -63,7 +63,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 	 * @throws Exception
 	 */
 	public static synchronized void read(String filePath, PickerParameters newPickerParameters) throws Exception {
-		HashMap<String, String> header = HoTTbinReader.getFileInfo(new File(filePath), pickerParameters);
+		HashMap<String, String> header = HoTTbinReader.getFileInfo(new File(filePath), newPickerParameters);
 		EnumSet<Sensor> sensors = Sensor.getSetFromDetected(header.get(HoTTAdapter.DETECTED_SENSOR));
 		HoTTbinReaderD.sensorSignature = Sensor.getSetAsSignature(sensors);
 		for (int i = 1; i < isSensorType.length; i++) { // exclude receiver
@@ -96,7 +96,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
-		int channelNumber = HoTTbinReaderD.pickerParameters.analyzer.getActiveChannel().getNumber();;
+		int channelNumber = HoTTbinReaderD.pickerParameters.analyzer.getActiveChannel().getNumber();
 		device.getMeasurementFactor(channelNumber, 12);
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
@@ -123,10 +123,10 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.dataBlockSize = 64;
 		HoTTbinReader.buf = new byte[HoTTbinReader.dataBlockSize];
 		HoTTbinReader.buf0 = new byte[30];
-		HoTTbinReader.buf1 = null;
-		HoTTbinReader.buf2 = null;
-		HoTTbinReader.buf3 = null;
-		HoTTbinReader.buf4 = null;
+		HoTTbinReader.buf1 = new byte[30];
+		HoTTbinReader.buf2 = new byte[30];
+		HoTTbinReader.buf3 = new byte[30];
+		HoTTbinReader.buf4 = new byte[30];
 		BufCopier bufCopier = new BufCopier(buf, buf0, buf1, buf2, buf3, buf4);
 		pickerParameters.reverseChannelPackageLossCounter.clear();
 		HoTTbinReader.lostPackages.clear();
