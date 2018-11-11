@@ -886,8 +886,7 @@ public class HitecX1Red extends MC3000 implements IDevice {
 				}
 				catch (UsbException e) {
 					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					this.application.openMessageDialog(this.dialog.getDialogShell(),
-							Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
+					this.application.openMessageDialog(this.dialog.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0050));
 					try {
 						if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort(null);
 					}

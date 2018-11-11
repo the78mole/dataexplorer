@@ -313,7 +313,7 @@ public class MC3000GathererThread extends Thread {
 						stopDataGatheringThread(false, e);
 					}
 					else if (e instanceof UsbException) { //USB error detected, p.e. disconnect
-						this.application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
+						this.application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGE0050));
 						stopDataGatheringThread(false, e);
 					}
 					// program end or unexpected exception occurred, stop data gathering to enable save data by user
