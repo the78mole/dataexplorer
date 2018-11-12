@@ -704,8 +704,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 												DeviceSelectionDialog.this.deviceConfigurations.add(Analyzer.getInstance(), deviceName, deviceName+GDE.FILE_ENDING_DOT_XML, false);
 												tmpDeviceConfiguration = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
 												tmpDeviceConfiguration.setUsed(true);
-												//tmpDeviceConfiguration.storeDeviceProperties();
-												DeviceSelectionDialog.this.deviceConfigurations.put(deviceName, tmpDeviceConfiguration);
 											}
 											catch (IOException e) {
 												application.openMessageDialogAsync(GDE.shell, String.format("failed adding %s", deviceName));
@@ -742,11 +740,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 													else { // no device
 														DeviceSelectionDialog.this.selectedActiveDeviceConfig = null;
 													}
-												} 
+												}
 											} else {
 												log.log(Level.WARNING, String.format("check %s in DataExplorer.properties versus %s.xml", deviceName, deviceName));
 											}
-										
+
 										}
 										updateDialogEntries();
 									}
@@ -812,7 +810,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 * update the device table entries 
+	 * update the device table entries
 	 */
 	private void updateDeviceSelectionTable() {
 		if (!this.isDisposed()) {
