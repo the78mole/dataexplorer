@@ -68,13 +68,13 @@ import gde.log.Logger;
  * @author Thomas Eickert (USER)
  */
 public final class VaultReaderWriter {
-	private static final String											$CLASS_NAME				= VaultReaderWriter.class.getName();
-	private static final Logger											log								= Logger.getLogger($CLASS_NAME);
+	private static final String											$CLASS_NAME			= VaultReaderWriter.class.getName();
+	private static final Logger											log							= Logger.getLogger($CLASS_NAME);
 
-	private static final int												MIN_FILE_LENGTH		= 2048;
+	private static final int												MIN_FILE_LENGTH	= 2048;
 
-	private static final Cache<String, HistoVault>	memoryCache				=																		//
-			CacheBuilder.newBuilder().maximumSize(4444).recordStats().build();																// key is the vaultName
+	private static final Cache<String, HistoVault>	memoryCache			=																		//
+			CacheBuilder.newBuilder().maximumSize(4444).recordStats().build();															// key is the vaultName
 
 	/**
 	 * Prevents closing.
@@ -131,12 +131,12 @@ public final class VaultReaderWriter {
 	public synchronized List<ExtendedVault> loadFromCaches(TrussJobs trussJobs) //
 			throws IOException { // syn due to SAXException: FWK005 parse may not be called while parsing.
 		String osdReaderSettings = GDE.STRING_EMPTY;
-		List<ExtendedVault> vaults = loadFromCachePath(trussJobs, ExtendedVault.getVaultDirectoryName(analyzer, osdReaderSettings));
+		List<ExtendedVault> vaults = loadFromCachePath(trussJobs, ExtendedVault.getVaultDirectoryName(analyzer.getActiveDevice(), analyzer.getSettings(), analyzer.getActiveChannel().getNumber(), osdReaderSettings));
 
 		if (analyzer.getActiveDevice() instanceof IHistoDevice) {
 			String nativeReaderSettings = ((IHistoDevice) analyzer.getActiveDevice()).getReaderSettingsCsv();
 			if (!nativeReaderSettings.equals(osdReaderSettings)) {
-				List<ExtendedVault> nativeVaults = loadFromCachePath(trussJobs, ExtendedVault.getVaultDirectoryName(analyzer, nativeReaderSettings));
+				List<ExtendedVault> nativeVaults = loadFromCachePath(trussJobs, ExtendedVault.getVaultDirectoryName(analyzer.getActiveDevice(), analyzer.getSettings(), analyzer.getActiveChannel().getNumber(), nativeReaderSettings));
 				vaults.addAll(nativeVaults);
 			}
 		}
@@ -209,7 +209,7 @@ public final class VaultReaderWriter {
 			boolean providesReaderSettings = e.getKey().providesReaderSettings();
 			String readerSettings = providesReaderSettings && analyzer.getActiveDevice() instanceof IHistoDevice
 					? ((IHistoDevice) analyzer.getActiveDevice()).getReaderSettingsCsv() : GDE.STRING_EMPTY;
-			String vaultsDirectoryName = ExtendedVault.getVaultDirectoryName(analyzer, readerSettings);
+			String vaultsDirectoryName = ExtendedVault.getVaultDirectoryName(analyzer.getActiveDevice(), analyzer.getSettings(), analyzer.getActiveChannel().getNumber(), readerSettings);
 			try {
 				storeInCachePath(e.getValue(), vaultsDirectoryName);
 			} catch (Exception ex) {

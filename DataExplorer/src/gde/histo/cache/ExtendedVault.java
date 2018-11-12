@@ -35,25 +35,14 @@ import gde.utils.StringHelper;
  * @author Thomas Eickert (USER)
  */
 public final class ExtendedVault extends HistoVault implements Comparable<ExtendedVault> {
-	private static final String		$CLASS_NAME			= ExtendedVault.class.getName();
-	private static final Logger		log							= Logger.getLogger($CLASS_NAME);
+	private static final String	$CLASS_NAME			= ExtendedVault.class.getName();
+	private static final Logger	log							= Logger.getLogger($CLASS_NAME);
 
 	/**
 	 * For hashing combined keys.
 	 */
-	private static final String		SHA1_DELIMITER	= ",";
-	private static final String		timestampFormat	= "yyyy-MM-dd HH:mm:ss";
-
-	/**
-	 * The vault directory name is determined without any log file contents.
-	 * This supports vault directory scanning functions in the future.
-	 * @param vaultReaderSettings a non-empty string indicates that the file reader measurement values depend on device settings
-	 * @return directory or zip file name as a unique identifier encoding the data explorer version, the device xml file contents(sha1) plus
-	 *         channel number and some settings values
-	 */
-	public static String getVaultDirectoryName(Analyzer analyzer, String vaultReaderSettings) {
-		return getVaultDirectoryName(analyzer.getActiveDevice(), analyzer.getSettings(), analyzer.getActiveChannel().getNumber(), vaultReaderSettings);
-	}
+	private static final String	SHA1_DELIMITER	= ",";
+	private static final String	timestampFormat	= "yyyy-MM-dd HH:mm:ss";
 
 	/**
 	 * @param vaultReaderSettings a non-empty string indicates that the file reader measurement values depend on device settings
@@ -81,9 +70,9 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @return the file name as a unique identifier (sha1)
 	 */
 	public static String getVaultName(Path newLogFileName, long newFileLastModified_ms, long newFileLength, int newLogRecordSetOrdinal, //
-			Analyzer analyzer, String vaultReaderSettings) {
+			IDevice device, Settings settings, int channelNumber, String vaultReaderSettings) {
 		final String d = SHA1_DELIMITER;
-		String vaultDirectoryName = getVaultDirectoryName(analyzer, vaultReaderSettings);
+		String vaultDirectoryName = getVaultDirectoryName(device, settings, channelNumber, vaultReaderSettings);
 		return SecureHash.sha1(vaultDirectoryName + d + newLogFileName.getFileName() + d + newFileLastModified_ms //
 				+ d + newFileLength + d + newLogRecordSetOrdinal);
 	}
@@ -119,8 +108,8 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 	 * @param vaultReaderSettings a non-empty string indicates that the file reader measurement values depend on device settings
 	 */
 	public ExtendedVault(String objectDirectory, Path filePath, long fileLastModified_ms, long fileLength, int fileVersion, int logRecordSetSize,
-			int logRecordSetOrdinal, String logRecordSetBaseName,  String logDeviceName, Analyzer analyzer, long logStartTimestamp_ms, int logChannelNumber, String logObjectKey,
-			String vaultReaderSettings) {
+			int logRecordSetOrdinal, String logRecordSetBaseName, String logDeviceName, Analyzer analyzer, long logStartTimestamp_ms, int logChannelNumber,
+			String logObjectKey, String vaultReaderSettings) {
 		this.loadFilePath = filePath;
 		this.loadObjectDirectory = objectDirectory;
 		this.loadLinkPath = Paths.get("");
@@ -147,8 +136,8 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		this.logObjectKey = logObjectKey;
 		this.logStartTimestamp_ms = logStartTimestamp_ms;
 
-		this.vaultDirectory = getVaultDirectoryName(analyzer, vaultReaderSettings);
-		this.vaultName = getVaultName(filePath, fileLastModified_ms, fileLength, logRecordSetOrdinal, analyzer, vaultReaderSettings);
+		this.vaultDirectory = getVaultDirectoryName(analyzer.getActiveDevice(), analyzer.getSettings(), analyzer.getActiveChannel().getNumber(), vaultReaderSettings);
+		this.vaultName = getVaultName(filePath, fileLastModified_ms, fileLength, logRecordSetOrdinal, analyzer.getActiveDevice(), analyzer.getSettings(), analyzer.getActiveChannel().getNumber(), vaultReaderSettings);
 		this.vaultCreated_ms = System.currentTimeMillis();
 
 		this.vaultReaderSettings = vaultReaderSettings;
