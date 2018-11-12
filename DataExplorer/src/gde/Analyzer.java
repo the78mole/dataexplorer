@@ -19,14 +19,17 @@
 
 package gde;
 
+import java.io.IOException;
 import java.util.function.Supplier;
 
 import com.sun.istack.Nullable;
 
 import gde.config.DeviceConfigurations;
+import gde.config.ExportService;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.log.Level;
 import gde.log.Logger;
@@ -225,9 +228,32 @@ public abstract class Analyzer implements Cloneable {
 	 * Set the basic analysis parameters.
 	 * Do not use with the integrated UI.
 	 */
+	public void setArena(String fileDeviceName, int channelNumber, String objectKey) {
+		try {
+			DeviceConfiguration deviceConfig = getDeviceConfigurations().get(fileDeviceName);
+			if (deviceConfig == null) {
+				ExportService service = this.settings.getDeviceServices().get(fileDeviceName);
+				getSettings().extractDevicePropertiesAndTemplates(service.getJarFile(), fileDeviceName);
+				this.deviceConfigurations.add(this, fileDeviceName, fileDeviceName + GDE.FILE_ENDING_DOT_XML, false);
+				deviceConfig = this.deviceConfigurations.get(fileDeviceName);
+			}
+
+			log.log(Level.FINE, fileDeviceName, deviceConfig);
+			IDevice asDevice = deviceConfig.getAsDevice();
+			setArena(asDevice, channelNumber, objectKey);
+		} catch (IOException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Set the basic analysis parameters.
+	 * Do not use with the integrated UI.
+	 */
 	public void setArena(IDevice device, int channelNumber, String objectKey) {
 		this.settings.setActiveObjectKey(objectKey);
 
+		log.fine(() -> device + "  " + this.activeDevice);
 		if (!device.equals(this.activeDevice)) {
 			// device :
 			this.activeDevice = device;
