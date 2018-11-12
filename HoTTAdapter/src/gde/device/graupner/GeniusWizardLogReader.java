@@ -27,9 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import gde.GDE;
 import gde.data.Channel;
@@ -116,20 +113,24 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 					header.put(LAP_DATA_SIZE, DataParser.parse2Int(lapdatasize, 0));
 
 					if ((int)header.get(LAP_DATA_SIZE) > 0) { //TODO actually no samples with lap data available!
-						JSONParser parser = new JSONParser();
-						buffer = new byte[(int)header.get(LAP_DATA_SIZE)];
-						data_in.read(buffer);
-						JSONObject json = (JSONObject) parser.parse(new String(buffer));
-						//JSONObject paredString = (JSONObject) parser.parse("{\"balance\": 1000.21, \"num\":100, \"is_vip\":true, \"name\":\"foo\"}");
-						//log.fine(() ->  "balance = " + paredString.get("balance"));
-						log.fine(() ->  "esctime = " + json.get("esctime"));
-						log.fine(() ->  "lap_starttime = " + json.get("lap_starttime"));
-						log.fine(() ->  "lap_started = " + json.get("lap_started"));
-						log.fine(() ->  "lap_value = " + json.get("lap_value"));
-						JSONArray labValues = (JSONArray) json.get("lap_value");
-						for (Object object : labValues) {
-							log.fine(() ->  object.toString());
-						}
+//						JSONParser parser = new JSONParser();
+//						buffer = new byte[(int)header.get(LAP_DATA_SIZE)];
+//						data_in.read(buffer);
+//						JSONObject json = (JSONObject) parser.parse(new String(buffer));
+//						//JSONObject paredString = (JSONObject) parser.parse("{\"balance\": 1000.21, \"num\":100, \"is_vip\":true, \"name\":\"foo\"}");
+//						//log.fine(() ->  "balance = " + paredString.get("balance"));
+//						log.fine(() ->  "esctime = " + json.get("esctime"));
+//						log.fine(() ->  "lap_starttime = " + json.get("lap_starttime"));
+//						log.fine(() ->  "lap_started = " + json.get("lap_started"));
+//						log.fine(() ->  "lap_value = " + json.get("lap_value"));
+//						JSONArray labValues = (JSONArray) json.get("lap_value");
+//						for (Object object : labValues) {
+//							log.fine(() ->  object.toString());
+//						}
+						//TODO change implementation to use GSON, generation of class GeniusLapData is required
+//						buffer = new byte[(int)header.get(LAP_DATA_SIZE)];
+//						data_in.read(buffer);
+//						GeniusLapData lapData = new Gson().fromJson(new String(buffer), GeniusLapData.class);
 					}
 
 					GeniusWizardLogReader.readSingle(new File(filePath));

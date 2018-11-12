@@ -11,6 +11,6 @@
 	<classpathentry kind="lib" path="/build/lib/RXTXcomm.jar" sourcepath="/RXTXcomm/src"/>
 	<classpathentry kind="lib" path="/build/lib/usb-api-1.0.2.jar"/>
 	<classpathentry kind="var" path="USB4JAVA_PATH"/>
-	<classpathentry kind="lib" path="/build/lib/jaxb-api-2.3.0.jar"/>
+	<classpathentry kind="lib" path="/build/lib/jaxb-api.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

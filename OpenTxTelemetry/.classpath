@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DataExplorer"/>
 	<classpathentry kind="lib" path="/build/lib/RXTXcomm.jar"/>
-	<classpathentry kind="lib" path="/build/lib/jaxb-api-2.3.0.jar"/>
+	<classpathentry kind="lib" path="/build/lib/jaxb-api.jar"/>
 	<classpathentry kind="var" path="SWT_JAR_PATH"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

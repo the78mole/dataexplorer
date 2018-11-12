@@ -6,11 +6,11 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/build/lib/jaxb-api-2.3.0.jar"/>
-	<classpathentry kind="lib" path="/build/lib/jaxb-core-2.3.0.1.jar"/>
-	<classpathentry kind="lib" path="/build/lib/jaxb-runtime-2.3.0.1.jar"/>
-	<classpathentry kind="lib" path="/build/lib/istack-commons-runtime-3.0.5.jar"/>
-	<classpathentry kind="lib" path="/build/lib/activation-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/build/lib/jaxb-api.jar"/>
+	<classpathentry kind="lib" path="/build/lib/jaxb-core.jar"/>
+	<classpathentry kind="lib" path="/build/lib/jaxb-runtime.jar"/>
+	<classpathentry kind="lib" path="/build/lib/istack-commons-runtime.jar"/>
+	<classpathentry kind="lib" path="/build/lib/activation.jar"/>
 	<classpathentry kind="var" path="SWT_JAR_PATH" sourcepath="/SWT_SOURCE_PATH"/>
 	<classpathentry kind="lib" path="/build/lib/RXTXcomm.jar" sourcepath="/RXTXcomm/src"/>
 	<classpathentry kind="lib" path="/build/lib/usb4java-1.2.0.jar"/>
@@ -18,6 +18,6 @@
 	<classpathentry kind="var" path="USB4JAVA_PATH"/>
 	<classpathentry kind="lib" path="/build/lib/usb-api-1.0.2.jar"/>
 	<classpathentry kind="lib" path="/build/lib/usb4java-javax-1.2.0.jar"/>
-	<classpathentry kind="lib" path="/build/lib/gson-2.8.5.jar"/>
+	<classpathentry kind="lib" path="/build/lib/gson.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
