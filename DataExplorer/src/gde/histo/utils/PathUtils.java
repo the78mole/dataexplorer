@@ -44,8 +44,14 @@ public class PathUtils {
 	 * @return the lower case extension including the dot
 	 */
 	public static String getFileExtention(String fileName) {
-		String extention = fileName.toString().substring(fileName.lastIndexOf('.')).toLowerCase();
-		if (extention.equals(fileName)) extention = GDE.STRING_EMPTY;
+		int index = fileName.lastIndexOf('.');
+		String extention;
+		if (index < 0) {
+			extention = GDE.STRING_EMPTY;
+		} else {
+			extention = fileName.toString().substring(index).toLowerCase();
+			if (extention.equals(fileName)) extention = GDE.STRING_EMPTY;
+		}
 		return extention;
 	}
 
