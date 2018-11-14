@@ -3,7 +3,7 @@
     <Device>
         <name>Simulator</name>
         <manufacturer>WB</manufacturer>
-        <manufacturerURL>http://www.bruegmaenner.de/de/winfried</manufacturerURL>
+        <manufacturerURL></manufacturerURL>
         <group>multimeter</group>
         <image>Simulator.jpg</image>
         <usage>false</usage>
