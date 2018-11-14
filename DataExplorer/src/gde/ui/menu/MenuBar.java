@@ -771,8 +771,13 @@ public class MenuBar {
 									&& MenuBar.this.application.getPresentHistoExplorer().hasRecords()) {
 								TrailRecordSet trailRecordSet = MenuBar.this.application.getPresentHistoExplorer().getTrailRecordSet();
 								HistoGraphicsTemplate template = trailRecordSet.getTemplate();
+								Path templatesPath = settings.isObjectTemplatesActive() //
+										? settings.getActiveObjectKey().isEmpty() //
+												? Paths.get(Settings.getGraphicsTemplatePath(), GDE.STRING_DEVICE_ORIENTED_FOLDER) //
+												: Paths.get(Settings.getGraphicsTemplatePath(), settings.getActiveObjectKey()) //
+										: Paths.get(Settings.getGraphicsTemplatePath());
 								String filePath = MenuBar.this.application.prepareFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT0038), new String[] {
-										Settings.GRAPHICS_TEMPLATES_EXTENSION }, template.getTargetFileSubPath().getParent().toString(), template.getTargetFileSubPath().getFileName().toString(), SWT.SINGLE) //
+										Settings.GRAPHICS_TEMPLATES_EXTENSION }, templatesPath.toString(), template.getTargetFileSubPath().getFileName().toString(), SWT.SINGLE) //
 										.open();
 								if (filePath != null) {
 									Path templateFilePath = Paths.get(filePath);
