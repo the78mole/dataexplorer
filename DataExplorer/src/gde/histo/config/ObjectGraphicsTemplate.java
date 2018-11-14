@@ -66,7 +66,6 @@ public final class ObjectGraphicsTemplate extends HistoGraphicsTemplate {
 				super.load();
 			} else {
 				currentFilePathFragment = null;
-				this.clear();
 				loadFromXml(getTargetFileSubPath());
 				currentFilePathFragment = getTargetFileSubPath();
 			}

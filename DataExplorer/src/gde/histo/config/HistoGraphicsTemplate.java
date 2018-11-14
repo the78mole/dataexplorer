@@ -263,7 +263,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 	public void loadAlien(Path filePath) {
 		Path fileSubPath = null;
 		try {
-			Path tmpSubPath = Paths.get(GDE.APPL_HOME_PATH, Settings.GRAPHICS_TEMPLATES_DIR_NAME).relativize(filePath);
+			Path tmpSubPath = Paths.get(Settings.getGraphicsTemplatePath()).relativize(filePath);
 			fileSubPath = tmpSubPath.toString().startsWith(GDE.STRING_PARENT_DIR) ? null : tmpSubPath;
 		} catch (Exception e) {
 			fileSubPath = null;
@@ -301,8 +301,6 @@ public abstract class HistoGraphicsTemplate extends Properties {
 			if (!analyzer.getDataAccess().existsGraphicsTemplate(fileSubPath)) {
 				if (this.suppressNewFile) {
 					fileSubPath = Paths.get(defaultFileName);
-
-					clear();
 					loadFromXml(fileSubPath);
 				} else {
 					log.log(FINE, "convert legacy default template as a replacement for ", fileSubPath);
@@ -340,13 +338,14 @@ public abstract class HistoGraphicsTemplate extends Properties {
 		log.log(FINE, "opening template file ", fileSubPath);
 		String fileName = SecureHash.sha1(fileSubPath.toString());
 		Properties cachedInstance = memoryCache.getIfPresent(fileName);
-		if (cachedInstance == null) {
+		if (cachedInstance == null || cachedInstance == this) { // we work on the cached instance -> reload required
 			try (InputStream stream = analyzer.getDataAccess().getGraphicsTemplateInputStream(fileSubPath)) {
 				this.loadFromXML(stream);
 				memoryCache.put(fileName, this);
 				log.log(FINE, "template file successful loaded ", fileSubPath);
 			}
 		} else {
+			this.clear();
 			this.putAll(cachedInstance);
 		}
 	}
