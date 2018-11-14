@@ -105,7 +105,7 @@ public final class DeviceConfigurations {
 		this.deviceConfigs.clear();
 		for (String fileName : analyzer.getDataAccess().getDeviceFolderList()) {
 			// loop through all device properties XML and check if device used
-			add(analyzer, activeDeviceName, fileName, !Settings.getInstance().isDevicePropertiesUpdated);
+			add(analyzer, activeDeviceName, fileName, !analyzer.getSettings().isDevicePropertiesUpdated);
 		}
 		
 		//active device configurations collected, now synchronize settings device_use accordingly
@@ -131,7 +131,7 @@ public final class DeviceConfigurations {
 			for (String deviceKey : this.deviceConfigs.keySet()) {
 				if (this.deviceConfigs.get(deviceKey).isUsed())
 					Settings.getInstance().addDeviceUse(this.deviceConfigs.get(deviceKey).getName(), 1);
-			}			
+			}
 		}
 	}
 
