@@ -979,6 +979,8 @@
 				<include name="build/build.properties" />
 				<include name="WindowsHelper/**" />
 				<include name="thirdparty/**" />
+				<exclude name="**/_SupplementObjectDirs/**" />
+				<exclude name="**/_ET_Exzerpt/**" />
 				<include name="DataFilesTestSamples/**" />
 				<include name="**/lib/HoTTMdlViewer.jar" />
 				<exclude name="*Decoder/**" />
@@ -1061,7 +1063,7 @@
 		<junit printsummary="yes" haltonfailure="no" showoutput="true">
 			<classpath>
 				<pathelement path="${java.home}/bin/rt.jar" />
-				<pathelement path="${basedir}/thirdparty/Junit3/junit.jar" />
+				<pathelement path="${basedir}/thirdparty/Junit5/junit.jar" />
 				<pathelement path="${basedir}/build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
 				<pathelement path="${basedir}/build/lib/RXTXcomm.jar" />
 				<pathelement path="${basedir}/build/target/${build.os.shortname}_${sun.arch.data.model}/DataExplorer/DataExplorer.jar" />
