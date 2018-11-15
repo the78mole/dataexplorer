@@ -29,6 +29,8 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -132,6 +134,10 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		 */
 		long getCreationTimeStamp_ms() {
 			if (header.containsKey(GDE.CREATION_TIME_STAMP)) {
+				try {
+					return Instant.parse(header.get(GDE.CREATION_TIME_STAMP)).toEpochMilli();
+				} catch (DateTimeParseException e) {}
+
 				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd" + ' ' + " HH:mm:ss"); //$NON-NLS-1$ //$NON-NLS-2$
 				try {
 					return simpleDateFormat.parse(header.get(GDE.CREATION_TIME_STAMP)).getTime();

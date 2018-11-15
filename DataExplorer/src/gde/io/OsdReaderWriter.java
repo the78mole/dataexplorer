@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -615,15 +615,14 @@ public class OsdReaderWriter {
 				data_out.writeUTF(versionString);
 				filePointer += GDE.SIZE_UTF_SIGNATURE + versionString.getBytes("UTF8").length; //$NON-NLS-1$
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + versionString.getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				//creation time stamp
-				StringBuilder sb = new StringBuilder();
-				sb.append(GDE.CREATION_TIME_STAMP).append(new SimpleDateFormat("yyyy-MM-dd").format(new Date())).append(' '); //$NON-NLS-1$
-				sb.append(new SimpleDateFormat(" HH:mm:ss").format(new Date().getTime())).append(GDE.STRING_NEW_LINE); //$NON-NLS-1$
-				data_out.writeUTF(sb.toString());
-				filePointer += GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+				String creationString = GDE.CREATION_TIME_STAMP + Instant.now().toString() + GDE.STRING_NEW_LINE;
+				data_out.writeUTF(creationString);
+				filePointer += GDE.SIZE_UTF_SIGNATURE + creationString.getBytes("UTF8").length; //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line lenght = " + (GDE.SIZE_UTF_SIGNATURE + creationString.getBytes("UTF8").length) + " filePointer = " + filePointer); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
 				// second line : size file comment , file comment
-				sb = new StringBuilder();
+				StringBuilder sb = new StringBuilder();
 				sb.append(GDE.FILE_COMMENT).append(activeChannel.getFileDescription()).append(GDE.STRING_NEW_LINE);
 				data_out.writeUTF(sb.toString());
 				filePointer += GDE.SIZE_UTF_SIGNATURE + sb.toString().getBytes("UTF8").length; //$NON-NLS-1$
