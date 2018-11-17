@@ -1211,6 +1211,8 @@
    	    <!-- Create a temporary Disk Image -->
 	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 	      <arg value="create"/>
+		  <arg value="-fs"/>
+		  <arg value="HFS+"/>
 	      <arg value="-srcfolder"/>
 	      <arg value="${output.mac32}/${app.name}.app"/>
 	      <arg value="-volname"/>
@@ -1259,7 +1261,7 @@
 	    </exec>
 	
 	    <!-- Add a symbolic link to the Applications directory -->
-	    <symlink link="${mountdir}/${app.name}" resource="/Applications"/>
+	    <symlink link="${mountdir}/${app.name}/Applications" resource="/Applications/"/>
 	
 	    <!-- Add a readme files and RXTX_Post-Install.sh to the Applications directory -->
 	    <copy file="${basedir}/build/misc/README.de"
@@ -1313,6 +1315,8 @@
    	    <!-- Create a temporary Disk Image -->
 	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
 	      <arg value="create"/>
+		  <arg value="-fs"/>
+		  <arg value="HFS+"/>
 	      <arg value="-srcfolder"/>
 	      <arg value="${output.mac64}/${app.name}.app"/>
 	      <arg value="-volname"/>
@@ -1361,7 +1365,7 @@
 	    </exec>
 	
 	    <!-- Add a symbolic link to the Applications directory -->
-	    <symlink link="${mountdir}/${app.name}" resource="/Applications"/>
+	    <symlink link="${mountdir}/${app.name}/Applications" resource="/Applications/"/>
 	
 	    <!-- Add a readme files and RXTX_Post-Install.sh to the Applications directory -->
 	    <copy file="${basedir}/build/misc/README.de"
