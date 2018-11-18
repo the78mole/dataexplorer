@@ -103,6 +103,7 @@ public class SelectorComposite extends Composite {
 		this.setLayout(curveSelectorLayout);
 		GridData curveSelectorLData = new GridData();
 		this.setLayoutData(curveSelectorLData);
+		this.setBackground(DataExplorer.COLOR_BACKGROUND);
 		this.addHelpListener(new HelpListener() {
 			@Override
 			public void helpRequested(HelpEvent evt) {
@@ -123,8 +124,8 @@ public class SelectorComposite extends Composite {
 			curveSelectorHeaderLData.left = new FormAttachment(0, 1000, GDE.IS_WINDOWS ? 6 : 0);
 			curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 0);
 			this.curveSelectorHeader.setLayoutData(curveSelectorHeaderLData);
-			this.curveSelectorHeader.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-			this.curveSelectorHeader.setForeground(DataExplorer.COLOR_BLACK);
+			this.curveSelectorHeader.setBackground(DataExplorer.COLOR_BACKGROUND);
+			this.curveSelectorHeader.setForeground(DataExplorer.COLOR_FOREGROUND);
 			this.curveSelectorHeader.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
@@ -384,5 +385,15 @@ public class SelectorComposite extends Composite {
 				if (activeRecord.getParent().getVisibleAndDisplayableRecords().size() == 0) SelectorComposite.this.application.clearMeasurementModes();
 			}
 		}
+	}
+	
+	/**
+	 * update background/foreground color of the tool bar
+	 */
+	public void updateColorSchema() {
+		this.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.curveSelectorHeader.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.curveSelectorHeader.setForeground(DataExplorer.COLOR_FOREGROUND);
+
 	}
 }

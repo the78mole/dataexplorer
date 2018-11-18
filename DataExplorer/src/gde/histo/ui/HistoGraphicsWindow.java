@@ -59,7 +59,7 @@ public final class HistoGraphicsWindow extends AbstractChartWindow {
 		window.graphicsComposite = new GraphicsComposite(window.graphicSashForm, window);
 		window.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
 
-		window.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+		window.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		window.setText(Messages.getString(MessageIds.GDE_MSGT0883));
 		return window;
 	}

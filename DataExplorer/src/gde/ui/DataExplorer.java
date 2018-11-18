@@ -155,6 +155,8 @@ public class DataExplorer extends Composite {
 	public final static Color			COLOR_DARK_GREEN									= SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
 	public final static Color			COLOR_BLACK												= SWTResourceManager.getColor(SWT.COLOR_BLACK);
 	public final static Color			COLOR_RED													= SWTResourceManager.getColor(SWT.COLOR_RED);
+	public static Color						COLOR_BACKGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND);
+	public static Color						COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND);
 
 	public final static int				TAB_INDEX_GRAPHIC									= 0;
 	public final static int				TAB_INDEX_DATA_TABLE							= 1;
@@ -291,8 +293,9 @@ public class DataExplorer extends Composite {
 	private void initGUI() {
 		// final String $METHOD_NAME = "initGUI"; //$NON-NLS-1$
 		try {
-			this.setBackground(DataExplorer.COLOR_GREY);
+			this.setColorSchemaColors(this.settings.getSkinColorSchema());
 			this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
+			this.setBackground(DataExplorer.COLOR_BACKGROUND);
 
 			GridLayout thisLayout = new GridLayout(1, true);
 			thisLayout.marginWidth = 0;
@@ -317,6 +320,7 @@ public class DataExplorer extends Composite {
 			}
 			{
 				this.menuCoolBar = new CoolBar(this, SWT.FLAT);
+				this.menuCoolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
 				GridData menuCoolBarLData = new GridData();
 				menuCoolBarLData.horizontalAlignment = GridData.FILL;
 				menuCoolBarLData.verticalAlignment = GridData.BEGINNING;
@@ -329,7 +333,9 @@ public class DataExplorer extends Composite {
 				this.menuCoolBar.setItemLayout(this.settings.getCoolBarOrder(DataExplorer.getInstance().getMenuToolBar().getCoolBarSizes()), this.settings.getCoolBarWraps(), this.settings.getCoolBarSizes(DataExplorer.getInstance().getMenuToolBar().getCoolBarSizes()));
 			}
 			{ // begin main tab display
-				this.displayTab = new CTabFolder(this, SWT.BORDER);
+				this.displayTab = new CTabFolder(this, SWT.FLAT);
+				this.displayTab.setBackground(new Color[]{DataExplorer.COLOR_BACKGROUND, this.settings.getGraphicsSurroundingBackground()}, new int[]{100}, true);
+				this.displayTab.setForeground(DataExplorer.COLOR_FOREGROUND);
 				GridData tabCompositeLData = new GridData();
 				tabCompositeLData.verticalAlignment = GridData.FILL;
 				tabCompositeLData.horizontalAlignment = GridData.FILL;
@@ -350,7 +356,8 @@ public class DataExplorer extends Composite {
 				statusCompositeLData.horizontalAlignment = GridData.FILL;
 				statusCompositeLData.verticalAlignment = GridData.END;
 				this.statusComposite.setLayoutData(statusCompositeLData);
-				RowLayout statusCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+				RowLayout statusCompositeLayout = new RowLayout(SWT.HORIZONTAL);
+				statusCompositeLayout.center = true;
 				this.statusComposite.setLayout(statusCompositeLayout);
 				{
 					this.statusBar = new StatusBar(this.statusComposite);
@@ -1326,17 +1333,6 @@ public class DataExplorer extends Composite {
 					DataExplorer.this.getDeviceDialog().open();
 				}
 			});
-		}
-	}
-
-	public void setGloabalSerialPort(String newPort) {
-		if (this.getActiveDevice() != null) {
-			this.getActiveDevice().setPort(newPort);
-			this.settings.setActiveDevice(this.getActiveDevice().getName() + GDE.STRING_SEMICOLON + this.getActiveDevice().getManufacturer() + GDE.STRING_SEMICOLON + this.getActiveDevice().getPort());
-			this.updateTitleBar(this.getObjectKey(), this.getActiveDevice().getName(), this.getActiveDevice().getPort());
-		} else {
-			this.deviceSelectionDialog.getActiveConfig().setPort(newPort);
-			this.updateTitleBar(this.getObjectKey(), this.settings.getActiveDevice(), this.settings.getSerialPort());
 		}
 	}
 
@@ -3228,4 +3224,37 @@ public class DataExplorer extends Composite {
 		return this.histoExplorer.orElseThrow(UnsupportedOperationException::new);
 	}
 
+	/**
+	 * set color schema to be used
+	 * @param schema
+	 */
+	public void setColorSchemaColors(String schema) {
+		switch (schema) {
+		default:
+		case Settings.COLOR_SCHEMA_SYSTEM:
+			DataExplorer.COLOR_BACKGROUND	= SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND);
+			DataExplorer.COLOR_FOREGROUND	= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND);			
+			break;
+
+		case Settings.COLOR_SCHEMA_LIGHT:
+			DataExplorer.COLOR_BACKGROUND	= SWTResourceManager.getColor(SWT.COLOR_GRAY);
+			DataExplorer.COLOR_FOREGROUND	= SWTResourceManager.getColor(SWT.COLOR_BLACK);			
+			break;
+		case Settings.COLOR_SCHEMA_DARK:
+			DataExplorer.COLOR_BACKGROUND	= SWTResourceManager.getColor(SWT.COLOR_DARK_GRAY);
+			DataExplorer.COLOR_FOREGROUND	= SWTResourceManager.getColor(SWT.COLOR_WHITE);			
+			break;
+		}
+		//updating colors of a widgets
+		if (this.menuCoolBar != null) {
+			this.setBackground(DataExplorer.COLOR_BACKGROUND);
+			this.menuCoolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+			this.menuToolBar.updateColorSchema();
+			this.displayTab.setBackground(new Color[]{DataExplorer.COLOR_BACKGROUND, this.settings.getGraphicsSurroundingBackground()}, new int[]{100}, true);
+			this.displayTab.setForeground(DataExplorer.COLOR_FOREGROUND);
+			this.graphicsTabItem.updateColorSchema();
+			this.statusBar.updateColorSchema();
+		}
+		this.histoExplorer.ifPresent(h -> h.updateColorSchema());
+	}
 }

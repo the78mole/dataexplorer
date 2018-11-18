@@ -120,7 +120,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Button																tableTabButton;
 	Group																	desktopTabsGroup;
 	Group																	deviceSelectionGroup;
-	Button																openToolBoxCheck;
 	Label																	internetLinkText;
 	Label																	deviceTypeText;
 	Label																	manufacturerName;
@@ -219,35 +218,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						DeviceSelectionDialog.this.application.setActiveDevice(null);
 					}
 
-					GDE.display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							handleAutoOpenAfterClose();
-						}
-					});
 					DeviceSelectionDialog.this.application.resetShellIcon();
 					log.log(Level.FINE, "disposed"); //$NON-NLS-1$
-				}
-
-				/**
-				 * handle auto open functions
-				 */
-				void handleAutoOpenAfterClose() {
-					try {
-						//wait until listPortThread is stopped
-						while (DeviceSelectionDialog.this.listPortsThread.isAlive()) {
-							WaitTimer.delay(500);
-						}
-
-						if (DeviceSelectionDialog.this.settings.isAutoOpenToolBox()) {
-							DeviceSelectionDialog.this.application.openDeviceDialog();
-						}
-					}
-					catch (Exception e) {
-						log.log(Level.SEVERE, e.getMessage(), e);
-						DeviceSelectionDialog.this.application
-								.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_MESSAGE_CONCAT + e.getMessage() }));
-					}
 				}
 			});
 			{
@@ -397,25 +369,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									this.internetLinkText = new Label(this.deviceSelectionGroup, SWT.NONE);
 									this.internetLinkText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.internetLinkText.setBounds(358, 136, 154, 16);
-								}
-								{
-									this.openToolBoxCheck = new Button(this.deviceSelectionGroup, SWT.CHECK | SWT.LEFT);
-									this.openToolBoxCheck.setBounds(251, 198, 261, 16);
-									this.openToolBoxCheck.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.openToolBoxCheck.setText(Messages.getString(MessageIds.GDE_MSGT0162));
-									this.openToolBoxCheck.setSelection(this.settings.isAutoOpenToolBox());
-									this.openToolBoxCheck.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											log.log(Level.FINEST, "openToolBoxCheck.widgetSelected, event=" + evt); //$NON-NLS-1$
-											if (DeviceSelectionDialog.this.openToolBoxCheck.getSelection()) {
-												DeviceSelectionDialog.this.settings.setProperty(Settings.AUTO_OPEN_TOOL_BOX, "true"); //$NON-NLS-1$
-												DeviceSelectionDialog.this.application.openMessageDialog(DeviceSelectionDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGI0038));
-											}
-											else
-												DeviceSelectionDialog.this.settings.setProperty(Settings.AUTO_OPEN_TOOL_BOX, "false"); //$NON-NLS-1$
-										}
-									});
 								}
 							}
 							{
@@ -642,14 +595,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									this.voltagePerCellButton.setText(Messages.getString(MessageIds.GDE_MSGT0184));
 									this.voltagePerCellButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0185));
 									this.voltagePerCellButton.setEnabled(false);
-									//									this.voltagePerCellButton.addSelectionListener(new SelectionAdapter() {
-									//										@Override
-									//										public void widgetSelected(SelectionEvent evt) {
-									//											log.log(Level.FINEST, "cellVoltageButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-									//											DeviceSelectionDialog.this.selectedActiveDeviceConfig.setVoltagePerCellTabRequested(DeviceSelectionDialog.this.voltagePerCellButton.getSelection());
-									//											DeviceSelectionDialog.this.application.setCellVoltageTabItemVisible(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isVoltagePerCellTabRequested());
-									//										}
-									//									});
 								}
 								{
 									this.utilityDeviceButton = new Button(this.desktopTabsGroup, SWT.CHECK | SWT.LEFT);
@@ -976,33 +921,6 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	}
 
 	/**
-	 * check if the configure serial port matches system available
-	 */
-	@Deprecated
-	public boolean checkPortSelection() {
-		boolean matches = true;
-		if (this.availablePorts == null) {
-			this.availablePorts = DeviceSerialPortImpl.listConfiguredSerialPorts(false, DeviceSelectionDialog.this.settings.getSerialPortBlackList(),
-					DeviceSelectionDialog.this.settings.getSerialPortWhiteList());
-		}
-
-		if (this.settings.isGlobalSerialPort() && this.availablePorts.indexOf(this.settings.getSerialPort()) < 0) {
-			this.application.openMessageDialog(this.dialogShell, Messages.getString(MessageIds.GDE_MSGW0018));
-			matches = false;
-		}
-		else if (!this.settings.isGlobalSerialPort() && (this.selectedActiveDeviceConfig != null && this.availablePorts.indexOf(this.selectedActiveDeviceConfig.getPort()) < 0)) {
-			this.application.openMessageDialog(this.dialogShell, Messages.getString(MessageIds.GDE_MSGW0019));
-			matches = false;
-		}
-		else {
-			if (this.selectedActiveDeviceConfig != null) { //currently no device selected
-				if (this.settings.isGlobalSerialPort()) this.selectedActiveDeviceConfig.setPort(this.settings.getSerialPort());
-			}
-		}
-		return matches;
-	}
-
-	/**
 	 * method to setup new device, this might called using this dialog or a menu item where device is switched
 	 * @throws NotSupportedException
 	 */
@@ -1245,7 +1163,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			updateDialogEntries();
 		}
 
-		if (DeviceSelectionDialog.this.settings.isGlobalSerialPort() || !DeviceSelectionDialog.this.serialPortSelectionGroup.getEnabled()) {
+		if (!DeviceSelectionDialog.this.serialPortSelectionGroup.getEnabled()) {
 			DeviceSelectionDialog.this.portDescription.setEnabled(false);
 			DeviceSelectionDialog.this.portSelectCombo.setEnabled(false);
 		}

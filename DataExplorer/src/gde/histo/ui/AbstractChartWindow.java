@@ -411,5 +411,12 @@ public abstract class AbstractChartWindow extends CTabItem {
 	protected void setTemplateChart() {
 		// overwrite if function required
 	}
+	
+	/**
+	 * update background/foreground color selector table header
+	 */
+	public void updateColorSchema() {
+		if (curveSelectorComposite != null) curveSelectorComposite.updateColorSchema();
+	}
 
 }

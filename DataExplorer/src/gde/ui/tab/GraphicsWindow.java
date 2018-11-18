@@ -96,7 +96,7 @@ public class GraphicsWindow extends CTabItem {
 		this.tabName = useTabName;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		this.setText(this.tabName);
 	}
 
@@ -366,5 +366,12 @@ public class GraphicsWindow extends CTabItem {
 	 */
 	public GraphicsType getGraphicsType() {
 		return this.graphicsType;
+	}
+	
+	/**
+	 * update background/foreground color selector table header
+	 */
+	public void updateColorSchema() {
+		if (this.curveSelectorComposite != null) this.curveSelectorComposite.updateColorSchema();
 	}
 }

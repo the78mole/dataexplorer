@@ -65,6 +65,7 @@ import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
+import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.FileUtils;
 import gde.utils.RecordSetNameComparator;
@@ -128,7 +129,11 @@ public final class Settings extends Properties {
 	final static String							FILE_COMMENT_SURROUND_BACKGRD		= "file_comment_surround_backgrd";																																//$NON-NLS-1$
 	final static String							OBJECT_DESC_INNER_BACKGROUND		= "object_desciption_inner_background";																														//$NON-NLS-1$
 	final static String							OBJECT_DESC_SURROUND_BACKGRD		= "object_desciption_surround_backgrd";																														//$NON-NLS-1$
-	final static String							DISPLAY_DENSITY_FONT_CORRECT		= "display_density_font_correction";																															//$NON-NLS-1$
+	final static String							DISPLAY_DENSITY_FONT_CORRECT		= "display_density_font_correction";		
+	public final static String			SKIN_COLOR_SCHEMA								= "skin_color_schema";
+	public final static String			COLOR_SCHEMA_SYSTEM							= "color_schema_system";
+	public final static String			COLOR_SCHEMA_LIGHT							= "color_schema_light";
+	public final static String			COLOR_SCHEMA_DARK								= "color_schema_dark";
 
 	final static String							IS_HISTO_ACTIVE									= "is_histo_active";																																							//$NON-NLS-1$
 	final static String							BOXPLOT_SCALE_ORDINAL						= "boxplot_scale_ordinal";																																				//$NON-NLS-1$
@@ -203,8 +208,6 @@ public final class Settings extends Properties {
 	public static final String			ALPHA_BLENDING_VALUE						= "alpha_blending_value";																																					//$NON-NLS-1$
 	public static final String			APLHA_BLENDING_ENABLED					= "aplha_blending_enabled";																																				//$NON-NLS-1$
 	public static final String			KEEP_IMPORT_DIR_OBJECT_RELATED	= "keep_import_dir_object_related";																																//$NON-NLS-1$
-	public final static String			IS_GLOBAL_PORT									= "is_global_port";																																								//$NON-NLS-1$
-	public final static String			GLOBAL_PORT_NAME								= "global_port_name";																																							//$NON-NLS-1$
 	public final static String			SKIP_BLUETOOTH_DEVICES					= "skip_bluetooth_devices";																																				//$NON-NLS-1$
 	public final static String			DO_PORT_AVAILABLE_TEST					= "do_port_available_test";																																				//$NON-NLS-1$
 	public final static String			IS_PORT_BLACKLIST								= "is_port_black_list";																																						//$NON-NLS-1$
@@ -228,7 +231,6 @@ public final class Settings extends Properties {
 	public final static String			SERIAL_IO_LOG_LEVEL							= "serial_IO_log_level";																																					//$NON-NLS-1$
 	public final static Properties	classbasedLogger								= new Properties();
 
-	public final static String			AUTO_OPEN_TOOL_BOX							= "auto_open_tool_box";																																						//$NON-NLS-1$
 	public static final String			LOCALE_IN_USE										= "locale_in_use";																																								//$NON-NLS-1$
 	public static final String			LOCALE_CHANGED									= "locale_changed";																																								//$NON-NLS-1$
 	public static final String			TIME_FORMAT_IN_USE							= "time_format_in_use";																																						//$NON-NLS-1$
@@ -713,6 +715,7 @@ public final class Settings extends Properties {
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_VER_TYPE, getGridCompareWindowVerticalType())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_VER_COLOR, getGridCompareWindowVerticalColorStr())); //$NON-NLS-1$
 
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIN_COLOR_SCHEMA, this.getSkinColorSchema())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_AREA_BACKGROUND, getGraphicsCurveAreaBackgroundStr())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_SURROUND_BACKGRD, getGraphicsSurroundingBackgroundStr())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_BORDER_COLOR, getGraphicsCurvesBorderColorStr())); //$NON-NLS-1$
@@ -754,8 +757,6 @@ public final class Settings extends Properties {
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.ALPHA_BLENDING_VALUE, getDialogAlphaValue())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.APLHA_BLENDING_ENABLED, isDeviceDialogAlphaEnabled())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.KEEP_IMPORT_DIR_OBJECT_RELATED, isDeviceImportDirectoryObjectRelated())); //$NON-NLS-1$
-			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GLOBAL_PORT, isGlobalSerialPort())); //$NON-NLS-1$
-			writer.write(String.format("%-40s \t=\t %s\n", Settings.GLOBAL_PORT_NAME, getSerialPort())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.SKIP_BLUETOOTH_DEVICES, isSkipBluetoothDevices())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.DO_PORT_AVAILABLE_TEST, doPortAvailabilityCheck())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_PORT_BLACKLIST, isSerialPortBlackListEnabled())); //$NON-NLS-1$
@@ -764,7 +765,6 @@ public final class Settings extends Properties {
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.PORT_WHITELIST, getSerialPortWhiteListString())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.DEVICE_DIALOG_USE_MODAL, isDeviceDialogsModal())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.DEVICE_DIALOG_ON_TOP, isDeviceDialogsOnTop())); //$NON-NLS-1$
-			writer.write(String.format("%-40s \t=\t %s\n", Settings.AUTO_OPEN_TOOL_BOX, isAutoOpenToolBox())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.LOCALE_IN_USE, getLocale().getLanguage())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.LOCALE_CHANGED, getLocaleChanged())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.TIME_FORMAT_IN_USE, getTimeFormat())); //$NON-NLS-1$
@@ -1166,20 +1166,6 @@ public final class Settings extends Properties {
 	}
 
 	/**
-	 * @return the global serial port
-	 */
-	public boolean isGlobalSerialPort() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_GLOBAL_PORT, "false").trim()); //$NON-NLS-1$
-	}
-
-	/**
-	 * set the global serial port
-	 */
-	public void setIsGlobalSerialPort(String isGlobalSerialPort) {
-		this.setProperty(Settings.IS_GLOBAL_PORT, isGlobalSerialPort.trim());
-	}
-
-	/**
 	 * @return boolean value of port black list enablement
 	 */
 	public boolean isSerialPortBlackListEnabled() {
@@ -1337,14 +1323,6 @@ public final class Settings extends Properties {
 	}
 
 	/**
-	 * @return the serial port name as string
-	 */
-	public String getSerialPort() {
-		String port = getProperty(Settings.GLOBAL_PORT_NAME, Settings.EMPTY).trim();
-		return port == null ? Settings.EMPTY : port;
-	}
-
-	/**
 	 * set property if during port scan disable detection of bluetooth devices
 	 */
 	public void setSkipBluetoothDevices(boolean enabled) {
@@ -1373,30 +1351,15 @@ public final class Settings extends Properties {
 	}
 
 	/**
-	 * set the decimal separator
-	 */
-	public void setSerialPort(String newSerialPort) {
-		this.setProperty(Settings.GLOBAL_PORT_NAME, newSerialPort.trim());
-	}
-
-	/**
 	 * check if minimal settings available
 	 */
 	public boolean isOK() {
 		boolean ok = false;
-		if (getProperty(Settings.DATA_FILE_PATH) != null || getProperty(Settings.LIST_SEPARATOR) != null || getProperty(Settings.DECIMAL_SEPARATOR) != null || getProperty(Settings.IS_GLOBAL_PORT) != null
-				|| getProperty(Settings.GLOBAL_PORT_NAME) != null) {
+		if (getProperty(Settings.DATA_FILE_PATH) != null || getProperty(Settings.LIST_SEPARATOR) != null || getProperty(Settings.DECIMAL_SEPARATOR) != null) {
 			ok = true;
 		}
 
 		return ok;
-	}
-
-	/**
-	 * query if device tool box to be opened right after closing device selection dialog
-	 */
-	public boolean isAutoOpenToolBox() {
-		return Boolean.valueOf(this.getProperty(Settings.AUTO_OPEN_TOOL_BOX, "false").trim()); //$NON-NLS-1$
 	}
 
 	/**
@@ -3175,4 +3138,18 @@ public final class Settings extends Properties {
 		return lastUseEntry.map(s -> s.substring((deviceName + GDE.STRING_STAR).length())).map(Integer::parseInt).orElse(0) + 1;
 	}
 
+	/**
+	 * get color skin schema
+	 */
+	public String getSkinColorSchema() {
+		return this.getProperty(Settings.SKIN_COLOR_SCHEMA, Settings.COLOR_SCHEMA_SYSTEM);
+	}
+
+	/**
+	 * set color skin schema
+	 */
+	public void setSkinColorSchema(String colorSchema) {
+		this.setProperty(Settings.SKIN_COLOR_SCHEMA, colorSchema);
+		DataExplorer.getInstance().setColorSchemaColors(this.getSkinColorSchema());
+	}
 }

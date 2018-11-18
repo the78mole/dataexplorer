@@ -69,7 +69,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	CCombo											protocolTypesCombo;
 	Button											inputFileButton;
 	Button											startLifeDataCapturing, stopLifeDataCapturing;
-	Button											enableChannelRecords, enableFilter, enableTextModusFilter, tolrateSignLatitude, tolerateSignLongitude;
+	Button											enableChannelRecords, enableTextModusFilter, enableFilter, tolrateSignLatitude, tolerateSignLongitude;
 	CLabel											filterFactorLatitudeLabel, filterFactorLongitudeLabel;
 	CCombo											filterFactorLatitudeCombo, filterFactorLongitudeCombo;
 	CLabel											absorptionLevelLabel, filterStartTimeLabel, filterMaxTimeLabel, filterLapMinTimeLabel, filterMinDeltaRxDbmLabel, filterMinDeltaDistLabel;
@@ -248,6 +248,14 @@ public class HoTTAdapterDialog extends DeviceDialog {
 								HoTTAdapterDialog.this.filterFactorLongitudeCombo.setEnabled(false);
 								HoTTAdapterDialog.this.tolerateSignLongitude.setEnabled(false);
 							}
+							
+							//TODO prepare to remove GPS lat long filter , fist step remove visibility
+							HoTTAdapterDialog.this.filterFactorLatitudeLabel.setVisible(false);
+							HoTTAdapterDialog.this.filterFactorLatitudeCombo.setVisible(false);
+							HoTTAdapterDialog.this.tolrateSignLatitude.setVisible(false);
+							HoTTAdapterDialog.this.filterFactorLongitudeLabel.setVisible(false);
+							HoTTAdapterDialog.this.filterFactorLongitudeCombo.setVisible(false);
+							HoTTAdapterDialog.this.tolerateSignLongitude.setVisible(false);
 						}
 					});
 				}
@@ -718,6 +726,15 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						}
 					});
 				}
+				
+				//TODO prepare to remove GPS lat long filter , fist step remove visibility
+				HoTTAdapterDialog.this.filterFactorLatitudeLabel.setVisible(false);
+				HoTTAdapterDialog.this.filterFactorLatitudeCombo.setVisible(false);
+				HoTTAdapterDialog.this.tolrateSignLatitude.setVisible(false);
+				HoTTAdapterDialog.this.filterFactorLongitudeLabel.setVisible(false);
+				HoTTAdapterDialog.this.filterFactorLongitudeCombo.setVisible(false);
+				HoTTAdapterDialog.this.tolerateSignLongitude.setVisible(false);
+
 				{
 					this.startLifeDataCapturing = new Button(this.dialogShell, SWT.None);
 					FormData startCapturingButtonLData = new FormData();

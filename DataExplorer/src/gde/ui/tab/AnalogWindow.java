@@ -78,7 +78,7 @@ public class AnalogWindow extends CTabItem {
 		this.displayTab = currentDisplayTab;
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0231));
 		
 		this.surroundingBackground = Settings.getInstance().getAnalogSurroundingAreaBackground();

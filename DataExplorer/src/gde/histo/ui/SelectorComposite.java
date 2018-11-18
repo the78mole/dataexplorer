@@ -106,6 +106,7 @@ public final class SelectorComposite extends Composite {
 
 	void initGUI() {
 		FormLayout curveSelectorLayout = new FormLayout();
+		this.setBackground(DataExplorer.COLOR_BACKGROUND);
 		this.setLayout(curveSelectorLayout);
 		GridData curveSelectorLData = new GridData();
 		this.setLayoutData(curveSelectorLData);
@@ -129,8 +130,8 @@ public final class SelectorComposite extends Composite {
 			curveSelectorHeaderLData.left = new FormAttachment(0, 1000, GDE.IS_WINDOWS ? 6 : 0);
 			curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 0);
 			this.curveSelectorHeader.setLayoutData(curveSelectorHeaderLData);
-			this.curveSelectorHeader.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-			this.curveSelectorHeader.setForeground(DataExplorer.COLOR_BLACK);
+			this.curveSelectorHeader.setBackground(DataExplorer.COLOR_BACKGROUND);
+			this.curveSelectorHeader.setForeground(DataExplorer.COLOR_FOREGROUND);
 			this.curveSelectorHeader.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
@@ -497,5 +498,15 @@ public final class SelectorComposite extends Composite {
 	public void setVerticalBarVisible(boolean visible) {
 		if (!visible) curveSelectorTable.setTopIndex(0);
 		this.curveSelectorTable.getVerticalBar().setVisible(visible);
+	}
+	
+	/**
+	 * update background/foreground color of the tool bar
+	 */
+	public void updateColorSchema() {
+		this.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.curveSelectorHeader.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.curveSelectorHeader.setForeground(DataExplorer.COLOR_FOREGROUND);
+
 	}
 }

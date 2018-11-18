@@ -118,7 +118,7 @@ public class StatisticsWindow extends CTabItem {
 		this.tabFolder = currentDisplayTab;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0350));
 
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);

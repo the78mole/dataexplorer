@@ -1906,7 +1906,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		}
 		if (HoTTAdapter.log.isLoggable(java.util.logging.Level.OFF) && inst != null) HoTTAdapter.log.log(java.util.logging.Level.OFF, "loading TabItem " + ((CTabItem) inst).getText()); //$NON-NLS-1$
 
-		if (inst != null) ((CTabItem) inst).setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+		if (inst != null) ((CTabItem) inst).setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		return (CTabItem) inst;
 	}
 

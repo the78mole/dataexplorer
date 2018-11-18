@@ -119,7 +119,7 @@ public class VarioToolTabItem extends CTabItem {
 	public VarioToolTabItem(CTabFolder displayTabFolder, int style, IDevice useDevice, boolean isVarioTool) {
 		super(displayTabFolder, style);
 		this.tabFolder = displayTabFolder;
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		this.device = useDevice;
 		this.isDataVarioTool = isVarioTool;
 		this.setText(isVarioTool ? Messages.getString(MessageIds.GDE_MSGT1803) : Messages.getString(MessageIds.GDE_MSGT1804));
@@ -137,7 +137,7 @@ public class VarioToolTabItem extends CTabItem {
 		super(displayTabFolder, style, position);
 		this.tabFolder = displayTabFolder;
 		SWTResourceManager.registerResourceUser(this);
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		this.device = useDevice;
 		this.isDataVarioTool = isVarioTool;
 		this.setText(isVarioTool ? Messages.getString(MessageIds.GDE_MSGT1803) : Messages.getString(MessageIds.GDE_MSGT1804));

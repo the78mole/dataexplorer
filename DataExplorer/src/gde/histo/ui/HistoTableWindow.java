@@ -97,7 +97,7 @@ public class HistoTableWindow extends CTabItem {
 		SWTResourceManager.registerResourceUser(this);
 		this.tabFolder = dataTab;
 
-		this.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0793));
 
 		this.popupmenu = new Menu(DataExplorer.getInstance().getShell(), SWT.POP_UP);

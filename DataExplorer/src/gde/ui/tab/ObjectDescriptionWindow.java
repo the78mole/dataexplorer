@@ -162,7 +162,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		
 		this.innerAreaBackground = Settings.getInstance().getObjectDescriptionInnerAreaBackground();
 		this.surroundingBackground = Settings.getInstance().getObjectDescriptionSurroundingAreaBackground();
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0403));
 		
 		this.imagePopupMenu = new Menu(this.application.getShell(), SWT.POP_UP);

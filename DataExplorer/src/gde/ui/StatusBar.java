@@ -57,6 +57,7 @@ public class StatusBar {
 	
 	public StatusBar(Composite currentStatusComposite) {
 		this.statusComposite = currentStatusComposite;
+		this.statusComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
 		this.statusComposite.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent evt) {
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "statusComposite.paintControl evt=" + evt); //$NON-NLS-1$
@@ -73,6 +74,7 @@ public class StatusBar {
 	public void create() {
 		{
 			this.connectionComposite = new Composite(this.statusComposite, SWT.NONE);
+			this.connectionComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
 			RowData composite2LData = new RowData();
 			composite2LData.width = 170;
 			composite2LData.height = 23;
@@ -82,6 +84,7 @@ public class StatusBar {
 			this.connectionComposite.setLayoutData(composite2LData);
 			{
 				this.comComposite = new Composite(this.connectionComposite, SWT.NONE);
+				this.comComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
 				FillLayout comCompositeLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				GridData comCompositeLData = new GridData();
 				comCompositeLData.verticalAlignment = GridData.FILL;
@@ -93,35 +96,40 @@ public class StatusBar {
 					this.portButton = new CLabel(this.comComposite, SWT.NONE);
 					this.portButton.setBounds(2,2, 50, 20);
 					this.portButton.setForeground(DataExplorer.COLOR_DARK_GREEN);
+					this.portButton.setBackground(DataExplorer.COLOR_BACKGROUND);
 					this.portButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.conText = new Label(this.comComposite, SWT.LEFT);
 					this.conText.setText("CON"); //$NON-NLS-1$
 					this.conText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), GDE.WIDGET_FONT_SIZE-2, SWT.NORMAL)); //$NON-NLS-1$
-					this.conText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+					this.conText.setBackground(DataExplorer.COLOR_BACKGROUND);
+					this.conText.setForeground(DataExplorer.COLOR_FOREGROUND);
 				}
 				{
 					this.rxButton = new CLabel(this.comComposite, SWT.CENTER);
 					this.rxButton.setBounds(2,2, 50, 20);
 					this.rxButton.setForeground(DataExplorer.COLOR_DARK_GREEN);
+					this.rxButton.setBackground(DataExplorer.COLOR_BACKGROUND);
 					this.rxButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.rxText = new Label(this.comComposite, SWT.LEFT);
-					this.rxText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+					this.rxText.setBackground(DataExplorer.COLOR_BACKGROUND);
+					this.rxText.setForeground(DataExplorer.COLOR_FOREGROUND);
 					this.rxText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), GDE.WIDGET_FONT_SIZE-2, SWT.NORMAL)); //$NON-NLS-1$
 					this.rxText.setText("RX"); //$NON-NLS-1$
 				}
 				{
 					this.txButton = new CLabel(this.comComposite, SWT.CENTER);
 					this.txButton.setBounds(2,2, 50, 20);
-					this.txButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+					this.txButton.setBackground(DataExplorer.COLOR_BACKGROUND);
 					this.txButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
 				}
 				{
 					this.txText = new Label(this.comComposite, SWT.LEFT);
-					this.txText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+					this.txText.setBackground(DataExplorer.COLOR_BACKGROUND);
+					this.txText.setForeground(DataExplorer.COLOR_FOREGROUND);
 					this.txText.setFont(SWTResourceManager.getFont(this.statusComposite.getParent(), GDE.WIDGET_FONT_SIZE-2, SWT.NORMAL)); //$NON-NLS-1$
 					this.txText.setText("TX"); //$NON-NLS-1$
 				}
@@ -132,6 +140,7 @@ public class StatusBar {
 				progressBarLData.width = 250;
 				progressBarLData.height = 20;
 				this.progressBar = new ProgressBar(this.statusComposite, SWT.NONE);
+				this.progressBar.setBackground(DataExplorer.COLOR_BACKGROUND);
 				this.progressBar.setMinimum(0);
 				this.progressBar.setMaximum(100);
 				this.progressBar.setSelection(0);
@@ -139,6 +148,7 @@ public class StatusBar {
 			}
 			{
 				this.msgLabel = new Label(this.statusComposite, SWT.LEFT | SWT.SINGLE);
+				this.msgLabel.setBackground(DataExplorer.COLOR_BACKGROUND);
 				this.msgLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			}
 		}
@@ -226,5 +236,25 @@ public class StatusBar {
 			this.portButton.setImage(SWTResourceManager.getImage("gde/resource/LEDGreen.gif")); //$NON-NLS-1$
 			this.portButton.redraw();
 		}
+	}
+	
+	/**
+	 * update background/foreground color of the tool bar
+	 */
+	public void updateColorSchema() {
+		this.statusComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.connectionComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.comComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.portButton.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.conText.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.conText.setForeground(DataExplorer.COLOR_FOREGROUND);
+		this.rxButton.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.rxText.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.rxText.setForeground(DataExplorer.COLOR_FOREGROUND);
+		this.txButton.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.txText.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.txText.setForeground(DataExplorer.COLOR_FOREGROUND);
+		this.progressBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.msgLabel.setBackground(DataExplorer.COLOR_BACKGROUND);
 	}
 }

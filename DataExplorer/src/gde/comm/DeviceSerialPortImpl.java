@@ -285,13 +285,9 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 					if (SWT.YES == this.application.openYesNoMessageDialogSync(Messages.getString(MessageIds.GDE_MSGE0010) + GDE.LINE_SEPARATOR
 							+ Messages.getString(MessageIds.GDE_MSGT0194, new String[] { this.serialPortStr = DeviceSerialPortImpl.availablePorts.firstElement() }))) {
 						this.serialPortStr = DeviceSerialPortImpl.availablePorts.firstElement();
-						if (this.settings.isGlobalSerialPort())
-							this.settings.setSerialPort(this.serialPortStr);
-						else {
-							this.deviceConfig.setPort(this.serialPortStr);
-							this.deviceConfig.storeDeviceProperties();
-							this.application.updateTitleBar();
-						}
+						this.deviceConfig.setPort(this.serialPortStr);
+						this.deviceConfig.storeDeviceProperties();
+						this.application.updateTitleBar();
 					}
 					else {
 						throw new ApplicationConfigurationException(Messages.getString(MessageIds.GDE_MSGE0010));

@@ -500,4 +500,14 @@ public class HistoExplorer {
 			}
 		}
 	}
+	
+	/**
+	 * update background/foreground color selector table header
+	 */
+	public void updateColorSchema() {
+		for (AbstractChartWindow chartTabItem : this.chartTabItems) {
+			if (chartTabItem instanceof HistoSummaryWindow) chartTabItem.updateColorSchema();
+		}
+	}
+
 }

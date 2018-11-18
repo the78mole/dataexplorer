@@ -214,7 +214,7 @@ public class LogViewReader {
 		}
 
 		try { // build the data structure
-			long position = new Long(header.get(GDE.DATA_POINTER_POS).trim()).longValue();
+			long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS).trim());
 
 			for (HashMap<String,String> recordSetInfo : recordSetsInfo) {
 				channelConfig = recordSetInfo.get(GDE.CHANNEL_CONFIG_NAME);
@@ -290,13 +290,13 @@ public class LogViewReader {
 				}
 				recordDataSize = Integer.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE).trim()).intValue();
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordDataSize = " + recordDataSize);
-				recordSetDataBytes = new Long(recordSetInfo.get(GDE.RECORD_SET_DATA_BYTES).trim()).intValue();
+				recordSetDataBytes = Long.valueOf(recordSetInfo.get(GDE.RECORD_SET_DATA_BYTES).trim()).intValue();
 				if (lastRecordSetDataBytes == 0) { // file contains more then one record set
 					lastRecordSetDataBytes = recordSetDataBytes;
 				}
 				else {
 					recordSetDataBytes = recordSetDataBytes - lastRecordSetDataBytes;
-					lastRecordSetDataBytes = new Long(recordSetInfo.get(GDE.RECORD_SET_DATA_BYTES).trim()).intValue();
+					lastRecordSetDataBytes = Long.valueOf(recordSetInfo.get(GDE.RECORD_SET_DATA_BYTES).trim()).intValue();
 				}
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "recordSetDataSize = " + recordSetDataBytes);
 				recordSetDataPointer = position;
@@ -569,8 +569,8 @@ public class LogViewReader {
 	 * @throws NotSupportedException
 	 */
 	private static HashMap<String, String> getHeaderInfo_1_13(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
-		long headerSize = new Long(header.get(GDE.LOV_HEADER_SIZE)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
+		long headerSize = Long.parseLong(header.get(GDE.LOV_HEADER_SIZE));
 		// read file comment
 		StringBuilder fileComment = new StringBuilder();
 		byte[] buffer = new byte[4];
@@ -643,7 +643,7 @@ public class LogViewReader {
 	 * @throws IOException
 	 */
 	private static HashMap<String, String> getRecordSetInfo_1_13(DataInputStream data_in, HashMap<String, String> header) throws IOException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
 
 		position += data_in.skip(8);
 
@@ -717,8 +717,8 @@ public class LogViewReader {
 	 * @throws NotSupportedException
 	 */
 	private static HashMap<String, String> getHeaderInfo_1_15(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
-		long headerSize = new Long(header.get(GDE.LOV_HEADER_SIZE)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
+		long headerSize = Long.parseLong(header.get(GDE.LOV_HEADER_SIZE));
 		// read file comment
 		StringBuilder fileComment = new StringBuilder();
 		byte[] buffer = new byte[4];
@@ -792,7 +792,7 @@ public class LogViewReader {
 	 * @throws IOException
 	 */
 	private static HashMap<String, String> getRecordSetInfo_1_15(DataInputStream data_in, HashMap<String, String> header) throws IOException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
 
 		position += data_in.skip(8);
 
@@ -887,8 +887,8 @@ public class LogViewReader {
 	 * @throws NotSupportedException
 	 */
 	private static HashMap<String, String> getHeaderInfo_1_50_ALPHA(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
-		long headerSize = new Long(header.get(GDE.LOV_HEADER_SIZE)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
+		long headerSize = Long.parseLong(header.get(GDE.LOV_HEADER_SIZE));
 		// read file comment
 		StringBuilder fileComment = new StringBuilder();
 		byte[] buffer = new byte[4];
@@ -964,7 +964,7 @@ public class LogViewReader {
 	 * @throws IOException
 	 */
 	private static HashMap<String, String> getRecordSetInfo_1_50_ALPHA(DataInputStream data_in, HashMap<String, String> header) throws IOException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
 
 		position += data_in.skip(88);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$
@@ -1078,8 +1078,8 @@ public class LogViewReader {
 	 * @throws NotSupportedException
 	 */
 	private static HashMap<String, String> getHeaderInfo_1_50_BETA(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
-		long headerSize = new Long(header.get(GDE.LOV_HEADER_SIZE)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
+		long headerSize = Long.parseLong(header.get(GDE.LOV_HEADER_SIZE));
 		// read file comment
 		byte[] buffer = new byte[8];
 		position += data_in.read(buffer);
@@ -1174,7 +1174,7 @@ public class LogViewReader {
 	 * @throws IOException
 	 */
 	private static HashMap<String, String> getRecordSetInfo_1_50_BETA(DataInputStream data_in, HashMap<String, String> header) throws IOException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
 
 		position += data_in.skip(88);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$
@@ -1294,8 +1294,8 @@ public class LogViewReader {
 	 * @throws NotSupportedException
 	 */
 	private static HashMap<String, String> getHeaderInfo_4(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
-		long headerSize = new Long(header.get(GDE.LOV_HEADER_SIZE)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
+		long headerSize = Long.parseLong(header.get(GDE.LOV_HEADER_SIZE));
 		// read file comment
 		byte[] buffer = new byte[8];
 		position += data_in.read(buffer);
@@ -1390,7 +1390,7 @@ public class LogViewReader {
 	 * @throws IOException
 	 */
 	private static HashMap<String, String> getRecordSetInfo_4(DataInputStream data_in, HashMap<String, String> header) throws IOException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
 
 		position += data_in.skip(88);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$
@@ -1505,8 +1505,8 @@ public class LogViewReader {
 	 * @throws NotSupportedException
 	 */
 	private static HashMap<String, String> getHeaderInfo_5(DataInputStream data_in, HashMap<String, String> header) throws IOException, NotSupportedException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
-		long headerSize = new Long(header.get(GDE.LOV_HEADER_SIZE)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
+		long headerSize = Long.parseLong(header.get(GDE.LOV_HEADER_SIZE));
 		byte[] buffer = new byte[0];
 		long fileCommentSize = 0;
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$
@@ -1632,7 +1632,7 @@ public class LogViewReader {
 	 * @throws DataInconsitsentException
 	 */
 	private static HashMap<String, String> getRecordSetInfo_5(DataInputStream data_in, HashMap<String, String> header) throws IOException, DataInconsitsentException {
-		long position = new Long(header.get(GDE.DATA_POINTER_POS)).longValue();
+		long position = Long.parseLong(header.get(GDE.DATA_POINTER_POS));
 
 		position += data_in.skip(88);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("position = 0x%X", position)); //$NON-NLS-1$

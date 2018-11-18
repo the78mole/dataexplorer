@@ -33,6 +33,8 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
@@ -92,7 +94,6 @@ public class MenuToolBar {
 	ToolItem						prevDeviceToolItem, nextDeviceToolItem;
 	Composite						objectSelectComposite;
 	CCombo							objectSelectCombo;
-	Point								objectSelectSize = new Point(200, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
 	ToolItem						newObject, deleteObject, editObject;
 	String							oldObjectKey					= null;
 	boolean							isObjectoriented			= false;
@@ -102,11 +103,8 @@ public class MenuToolBar {
 	ToolItem						zoomWindowItem, panItem, fitIntoItem, cutLeftItem, cutRightItem, scopePointsComboSep;
 	Composite						scopePointsComposite;
 	CCombo							scopePointsCombo;
-	Point								scopePointsComboSize = new Point(70, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
-	static final int		leadFill							= 4 + (GDE.IS_WINDOWS == true ? 0 : 3);
-	static final int		trailFill							= 4 + (GDE.IS_WINDOWS == true ? 0 : 3);
 	boolean							isScopePointsCombo		= true;
-	int									toolButtonHeight			= 23;
+	static final int		comboHeight						= (int) (GDE.WIDGET_FONT_SIZE * (GDE.IS_LINUX ? 2.5 : 1.8));
 
 	CoolItem						portCoolItem;
 	ToolBar							portToolBar;
@@ -120,8 +118,6 @@ public class MenuToolBar {
 	ToolItem						nextChannel, prevChannel, prevRecord, nextRecord, separator, deleteRecord, editRecord;
 	Composite						channelSelectComposite, recordSelectComposite;
 	CCombo							channelSelectCombo, recordSelectCombo;
-	Point								channelSelectSize = new Point(180, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
-	Point								recordSelectSize = new Point(260, (int) ((GDE.IS_LINUX ? 22 : 20) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/4));
 
 	CoolItem						helpCoolItem;
 	ToolBar							helpToolBar;
@@ -133,6 +129,7 @@ public class MenuToolBar {
 
 	String							activeObjectKey;
 	String							language;
+	String							colorSchemaType;
 
 	final DataExplorer	application;
 	final Channels			channels;
@@ -144,25 +141,27 @@ public class MenuToolBar {
 		this.coolBar = menuCoolBar;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
+		this.colorSchemaType = getColorSchemaType();
 		this.language = this.settings.getLocale().getLanguage();
-		if (null == this.getClass().getClassLoader().getResourceAsStream("gde/resource/" + this.language + "/PortOpen.gif"))
+		if (null == this.getClass().getClassLoader().getResourceAsStream("gde/resource/" + this.colorSchemaType + this.language + "/PortOpen.gif"))
 			this.language = "en";
 		this.fileHandler = new FileHandler();
 		this.activeObjectKey = this.settings.getActiveObject();
 	}
 
-	public void init() {
-		this.coolBar = new CoolBar(this.application, SWT.NONE);
-		SWTResourceManager.registerResourceUser(this.coolBar);
-		create();
-	}
-
 	public void create() {
 		// long startTime = new Date().getTime();
+		RowLayout comboCompositeLayout = new RowLayout();
+		comboCompositeLayout.marginTop = 4;
+		comboCompositeLayout.justify = true;
+		comboCompositeLayout.center = true;
+
 		{ // begin file cool item
-			this.fileCoolItem = new CoolItem(this.coolBar, SWT.NONE);
+			this.fileCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{ // begin file tool bar
-				this.fileToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.fileToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.fileToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+				this.fileToolBar.setForeground(DataExplorer.COLOR_BACKGROUND);
 				this.fileCoolItem.setControl(this.fileToolBar);
 				{
 					this.newToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
@@ -283,23 +282,19 @@ public class MenuToolBar {
 						}
 					});
 				}
-				this.toolSize = this.fileToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				this.fileToolBar.setSize(this.toolSize);
-				log.log(Level.FINE, "fileToolBar.size = " + this.toolSize); //$NON-NLS-1$
+				this.fileToolBar.pack();
+				this.toolSize = this.fileToolBar.getSize();
 			} // end file tool bar
 			this.fileCoolItem.setSize(this.toolSize.x, this.toolSize.y);
-			// this.fileCoolItem.setPreferredSize(this.size);
 			this.fileCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
-
-			// set height used for selection combos
-			this.toolButtonHeight = this.settingsToolItem.getBounds().height;
 		} // end file cool item
 
 		{ // begin device cool item
-			this.deviceObjectCoolItem = new CoolItem(this.coolBar, SWT.NONE);
+			this.deviceObjectCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{ // begin device tool bar
-				this.deviceObjectToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.deviceObjectToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.deviceObjectToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
 				this.deviceObjectCoolItem.setControl(this.deviceObjectToolBar);
 				{
 					this.deviceSelectToolItem = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
@@ -416,8 +411,10 @@ public class MenuToolBar {
 					ToolItem objectSelectComboSep = new ToolItem(this.deviceObjectToolBar, SWT.SEPARATOR);
 					{
 						this.objectSelectComposite = new Composite(this.deviceObjectToolBar, SWT.NONE);
-						this.objectSelectComposite.setLayout(null);
+						this.objectSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+						this.objectSelectComposite.setLayout(comboCompositeLayout);
 						this.objectSelectCombo = new CCombo(this.objectSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
+						this.objectSelectCombo.setLayoutData(new RowData(200, MenuToolBar.comboHeight));
 						this.objectSelectCombo.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 						this.objectSelectCombo.setItems(this.settings.getObjectList()); // "device-oriented", "ASW-27", "AkkuSubC_1"" });
 						this.objectSelectCombo.select(this.settings.getActiveObjectIndex());
@@ -479,9 +476,7 @@ public class MenuToolBar {
 								}
 							}
 						});
-						this.objectSelectCombo.setSize(this.objectSelectSize);
-						this.objectSelectComposite.setSize(this.objectSelectSize.x + leadFill + trailFill, this.toolButtonHeight);
-						this.objectSelectCombo.setLocation(leadFill, GDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
+						this.objectSelectComposite.pack();
 					}
 					objectSelectComboSep.setWidth(this.objectSelectComposite.getSize().x);
 					objectSelectComboSep.setControl(this.objectSelectComposite);
@@ -598,20 +593,20 @@ public class MenuToolBar {
 						}
 					});
 				}
-				this.toolSize = this.deviceObjectToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				this.deviceObjectToolBar.setSize(this.toolSize);
-				log.log(Level.FINE, "deviceToolBar.size = " + this.toolSize); //$NON-NLS-1$
+				this.deviceObjectToolBar.pack();
+				this.toolSize = this.deviceObjectToolBar.getSize();
 			} // end device tool bar
 			this.deviceObjectCoolItem.setSize(this.toolSize.x, this.toolSize.y);
-			// this.deviceCoolItem.setPreferredSize(this.size);
 			this.deviceObjectCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end device cool item
 
 		{ // begin zoom cool item
-			this.zoomCoolItem = new CoolItem(this.coolBar, SWT.NONE);
+			this.zoomCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{ // begin zoom tool bar
-				this.zoomToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.zoomToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.zoomToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+				log.log(Level.OFF, "Border width = " + this.zoomToolBar.getBorderWidth());
 				this.zoomCoolItem.setControl(this.zoomToolBar);
 				{
 					this.zoomWindowItem = new ToolItem(this.zoomToolBar, SWT.NONE);
@@ -684,8 +679,10 @@ public class MenuToolBar {
 					this.scopePointsComboSep = new ToolItem(this.zoomToolBar, SWT.SEPARATOR);
 					{
 						this.scopePointsComposite = new Composite(this.zoomToolBar, SWT.NONE);
-						this.scopePointsComposite.setLayout(null);
+						this.scopePointsComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+						this.scopePointsComposite.setLayout(comboCompositeLayout);
 						this.scopePointsCombo = new CCombo(this.scopePointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
+						this.scopePointsCombo.setLayoutData(new RowData(60, MenuToolBar.comboHeight));
 						this.scopePointsCombo.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 						this.scopePointsCombo.setItems(SCOPE_VALUES);
 						this.scopePointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -705,35 +702,32 @@ public class MenuToolBar {
 								}
 							}
 						});
-						// this.scopePointsComboSize.x = SWTResourceManager.getGC(this.scopePointsCombo.getDisplay()).stringExtent("00000000").x;
-						this.scopePointsCombo.setSize(this.scopePointsComboSize);
-						this.scopePointsComposite.setSize(this.scopePointsComboSize.x + leadFill + trailFill, this.toolButtonHeight);
-						this.scopePointsCombo.setLocation(leadFill, GDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
+						this.scopePointsComposite.pack();
 					}
 					this.scopePointsComboSep.setWidth(this.scopePointsComposite.getSize().x);
 					this.scopePointsComboSep.setControl(this.scopePointsComposite);
 				}
-				this.toolSize = this.zoomToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				this.zoomToolBar.setSize(this.toolSize);
+				this.zoomToolBar.pack();
+				this.toolSize = this.zoomToolBar.getSize();
 				log.log(Level.FINE, "zoomToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			} // end zoom tool bar
 			this.zoomCoolItem.setSize(this.toolSize.x, this.toolSize.y);
-			// this.zoomCoolItem.setPreferredSize(this.size);
 			this.zoomCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end zoom cool item
 
 		{ // begin port cool item
-			this.portCoolItem = new CoolItem(this.coolBar, SWT.NONE);
+			this.portCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{
-				this.portToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.portToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.portToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
 				this.portCoolItem.setControl(this.portToolBar);
 				{
 					this.portOpenCloseItem = new ToolItem(this.portToolBar, SWT.NONE);
 					this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0066));
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					this.portOpenCloseItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -756,30 +750,30 @@ public class MenuToolBar {
 						}
 					});
 				}
-				// this.portToolBar.pack();
-				this.toolSize = this.portToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				this.portToolBar.setSize(this.toolSize);
+				this.portToolBar.pack();
+				this.toolSize = this.portToolBar.getSize();
 				log.log(Level.FINE, "portToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			}
 			this.portCoolItem.setSize(this.toolSize.x, this.toolSize.y);
-			// this.portCoolItem.setPreferredSize(this.size);
 			this.portCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end port cool item
 
 		{ // begin data cool item (channel select, record select)
-			this.dataCoolItem = new CoolItem(this.coolBar, SWT.NONE);
+			this.dataCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{
-				this.dataToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.dataToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.dataToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
 				this.dataCoolItem.setControl(this.dataToolBar);
 				{
 					ToolItem channelSelectComboSep = new ToolItem(this.dataToolBar, SWT.SEPARATOR);
 					{
 						this.channelSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
-						this.channelSelectComposite.setLayout(null);
+						this.channelSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+						this.channelSelectComposite.setLayout(comboCompositeLayout);
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
+						this.channelSelectCombo.setLayoutData(new RowData(185, MenuToolBar.comboHeight));
 						this.channelSelectCombo.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-						//this.channelSelectCombo.setItems(new String[] { " 1 : Ausgang" }); // " 2 : Ausgang", " 3 : Ausgang", "" 4 : Ausgang"" }); //$NON-NLS-1$
 						this.channelSelectCombo.select(0);
 						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0075));
 						this.channelSelectCombo.setEditable(false);
@@ -792,9 +786,7 @@ public class MenuToolBar {
 								MenuToolBar.this.channels.switchChannel(MenuToolBar.this.channelSelectCombo.getText());
 							}
 						});
-						this.channelSelectCombo.setSize(this.channelSelectSize);
-						this.channelSelectComposite.setSize(this.channelSelectSize.x + leadFill + trailFill, this.toolButtonHeight);
-						this.channelSelectCombo.setLocation(leadFill, GDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
+						this.channelSelectComposite.pack();
 					}
 					channelSelectComboSep.setWidth(this.channelSelectComposite.getSize().x);
 					channelSelectComboSep.setControl(this.channelSelectComposite);
@@ -846,8 +838,10 @@ public class MenuToolBar {
 					ToolItem recordSelectComboSep = new ToolItem(this.dataToolBar, SWT.SEPARATOR);
 					{
 						this.recordSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
-						this.recordSelectComposite.setLayout(null);
+						this.recordSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+						this.recordSelectComposite.setLayout(comboCompositeLayout);
 						this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER | SWT.LEFT);
+						this.recordSelectCombo.setLayoutData(new RowData(260, MenuToolBar.comboHeight));
 						this.recordSelectCombo.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 						this.recordSelectCombo.setItems(new String[] { GDE.STRING_BLANK }); // later "2) Flugaufzeichnung", "3) laden" });
 						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0078));
@@ -890,9 +884,7 @@ public class MenuToolBar {
 								}
 							}
 						});
-						this.recordSelectCombo.setSize(this.recordSelectSize);
-						this.recordSelectComposite.setSize(this.recordSelectSize.x + leadFill + trailFill, this.toolButtonHeight);
-						this.recordSelectCombo.setLocation(leadFill, GDE.IS_MAC ? 1 : (this.toolButtonHeight - this.objectSelectSize.y) / 2 - 1);
+						this.recordSelectComposite.pack();
 					}
 					recordSelectComboSep.setWidth(this.recordSelectComposite.getSize().x);
 					recordSelectComboSep.setControl(this.recordSelectComposite);
@@ -998,20 +990,20 @@ public class MenuToolBar {
 						}
 					});
 				}
-				this.toolSize = this.dataToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				this.dataToolBar.setSize(this.toolSize);
+				this.dataToolBar.pack();
+				this.toolSize = this.dataToolBar.getSize();
 				log.log(Level.FINE, "dataToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			}
 			this.dataCoolItem.setSize(this.toolSize.x, this.toolSize.y);
-			// this.dataCoolItem.setPreferredSize(this.size);
 			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		}
 
 		{ // begin google earth cool item
-			this.googleEarthCoolItem = new CoolItem(this.coolBar, SWT.NONE);
+			this.googleEarthCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{ // begin file tool bar
-				this.googleEarthToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.googleEarthToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.googleEarthToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
 				this.googleEarthCoolItem.setControl(this.googleEarthToolBar);
 				{
 					this.googleEarthToolItem = new ToolItem(this.googleEarthToolBar, SWT.NONE);
@@ -1044,17 +1036,18 @@ public class MenuToolBar {
 					});
 				}
 			}
-			this.toolSize = this.googleEarthToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			this.googleEarthToolBar.pack();
+			this.toolSize = this.googleEarthToolBar.getSize();
 			this.googleEarthCoolItem.setSize(this.toolSize.x, this.toolSize.y);
-			// this.googleEarthCoolItem.setPreferredSize(this.size);
 			this.googleEarthCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end google earth cool item
 
 		{ // begin help cool item
-			this.helpCoolItem = new CoolItem(this.coolBar, SWT.NONE);
+			this.helpCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{ // begin file tool bar
-				this.helpToolBar = new ToolBar(this.coolBar, SWT.NONE);
+				this.helpToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.helpToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
 				this.helpCoolItem.setControl(this.helpToolBar);
 				{
 					this.helpToolItem = new ToolItem(this.helpToolBar, SWT.NONE);
@@ -1095,9 +1088,9 @@ public class MenuToolBar {
 					});
 				}
 			}
-			this.toolSize = this.helpToolBar.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			this.helpToolBar.pack();
+			this.toolSize = this.helpToolBar.getSize();
 			this.helpCoolItem.setSize(this.toolSize.x, this.toolSize.y);
-			// this.helpCoolItem.setPreferredSize(this.size);
 			this.helpCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end help cool item
@@ -1307,22 +1300,23 @@ public class MenuToolBar {
 	 */
 	public void setPortConnected(final boolean isPortOpen) {
 		if (!this.application.isDisposed()) {
+			this.colorSchemaType = getColorSchemaType();
 			switch (this.iconSet) {
 			case 0: // DeviceSerialPort.ICON_SET_OPEN_CLOSE
 			default:
 				if (isPortOpen) {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortCloseDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortClose.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortCloseHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/PortCloseDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/PortClose.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/PortCloseHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					if (this.toolTipOpen != null && this.toolTipOpen.length() > 5)
 						this.portOpenCloseItem.setToolTipText(this.toolTipOpen);
 					else
 						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0067));
 				}
 				else {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/PortOpenHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/PortOpen.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					if (this.toolTipClose != null && this.toolTipClose.length() > 5)
 						this.portOpenCloseItem.setToolTipText(this.toolTipClose);
 					else
@@ -1331,18 +1325,18 @@ public class MenuToolBar {
 				break;
 			case 1: // DeviceSerialPort.ICON_SET_START_STOP
 				if (isPortOpen) {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StopGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StopGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StopGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/StopGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/StopGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/StopGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					if (this.toolTipOpen != null && this.toolTipOpen.length() > 5)
 						this.portOpenCloseItem.setToolTipText(this.toolTipOpen);
 					else
 						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0069));
 				}
 				else {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StartGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StartGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/StartGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/StartGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/StartGather.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/StartGatherHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					if (this.toolTipClose != null && this.toolTipClose.length() > 5)
 						this.portOpenCloseItem.setToolTipText(this.toolTipClose);
 					else
@@ -1351,18 +1345,18 @@ public class MenuToolBar {
 				break;
 			case 2: // DeviceSerialPort.ICON_SET_IMPORT_CLOSE
 				if (isPortOpen) {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportActiveDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportActiveHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportActive.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/ImportActiveDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/ImportActiveHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/ImportActive.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					if (this.toolTipOpen != null && this.toolTipOpen.length() > 5)
 						this.portOpenCloseItem.setToolTipText(this.toolTipOpen);
 					else
 						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0223));
 				}
 				else {
-					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportDataDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportData.gif")); //$NON-NLS-1$ //$NON-NLS-2$
-					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.language + "/ImportDataHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/ImportDataDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setHotImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/ImportData.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+					this.portOpenCloseItem.setImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/ImportDataHot.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 					if (this.toolTipClose != null && this.toolTipClose.length() > 5)
 						this.portOpenCloseItem.setToolTipText(this.toolTipClose);
 					else
@@ -1371,6 +1365,13 @@ public class MenuToolBar {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * @return the color schema type name, actually distinguished between 'light' and 'dark' 
+	 */
+	public String getColorSchemaType() {
+		return DataExplorer.COLOR_BACKGROUND.getRed() + DataExplorer.COLOR_BACKGROUND.getGreen() + DataExplorer.COLOR_BACKGROUND.getBlue() > 500 ? "light/" : "dark/";
 	}
 
 	/**
@@ -1672,4 +1673,21 @@ public class MenuToolBar {
 		}
 	}
 
+	/**
+	 * update background/foreground color of the tool bar
+	 */
+	public void updateColorSchema() {
+		this.objectSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.scopePointsComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.channelSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.recordSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.fileToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
+		this.deviceObjectToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
+		this.zoomToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
+		this.portToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
+		this.dataToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
+		this.googleEarthToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
+		this.helpToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
+		this.setPortConnected(false); //changing port image may result in wrong visualization since device activity status can not detected!
+	}
 }

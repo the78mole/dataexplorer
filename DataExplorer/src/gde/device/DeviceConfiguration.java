@@ -599,8 +599,7 @@ public class DeviceConfiguration {
 	 * @return the port configured for the device, if SerialPortType is not defined in device specific XML a empty string will returned
 	 */
 	public String getPort() {
-		return this.settings.isGlobalSerialPort() ? this.settings.getSerialPort() : this.serialPort != null ? this.serialPort.getPort()
-				: this.getUsbPortType() != null ? "USB" : GDE.STRING_EMPTY;
+		return this.serialPort != null ? this.serialPort.getPort() : this.getUsbPortType() != null ? "USB" : GDE.STRING_EMPTY;
 	}
 
 	/**

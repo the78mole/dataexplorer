@@ -13,6 +13,8 @@ Generic changes/fixes
 	* fix graphics header update while switching record set
 	* update device selection dialog devices overview tab
 	* reduce extracted device properties XMLs to the devices selected
+	* user interface polish enabling different color schema
+	* remove never used global serial port from settings dialog
 	
 Device specific changes/fixes
 	* HottAdapter* -  fix error message GDE_MSGW2404 appearing only at the first import, Fix missing tab activation after import

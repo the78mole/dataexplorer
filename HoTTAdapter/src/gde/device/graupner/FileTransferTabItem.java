@@ -111,7 +111,7 @@ public class FileTransferTabItem extends CTabItem {
 	public FileTransferTabItem(CTabFolder parent, int style, int position, HoTTAdapter useDevice, HoTTAdapterSerialPort useSerialPort) {
 		super(parent, style, position);
 		this.tabFolder = parent;
-		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
+		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		this.device = useDevice;
 		this.serialPort = useSerialPort;
 		this.setText(Messages.getString(MessageIds.GDE_MSGT2426));
