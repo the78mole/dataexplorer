@@ -141,7 +141,7 @@ public class MenuToolBar {
 		this.coolBar = menuCoolBar;
 		this.channels = Channels.getInstance();
 		this.settings = Settings.getInstance();
-		this.colorSchemaType = getColorSchemaType();
+		this.colorSchemaType = this.settings.getColorSchemaType();
 		this.language = this.settings.getLocale().getLanguage();
 		if (null == this.getClass().getClassLoader().getResourceAsStream("gde/resource/" + this.colorSchemaType + this.language + "/PortOpen.gif"))
 			this.language = "en";
@@ -1300,7 +1300,7 @@ public class MenuToolBar {
 	 */
 	public void setPortConnected(final boolean isPortOpen) {
 		if (!this.application.isDisposed()) {
-			this.colorSchemaType = getColorSchemaType();
+			this.colorSchemaType = this.settings.getColorSchemaType();
 			switch (this.iconSet) {
 			case 0: // DeviceSerialPort.ICON_SET_OPEN_CLOSE
 			default:
@@ -1365,13 +1365,6 @@ public class MenuToolBar {
 				break;
 			}
 		}
-	}
-
-	/**
-	 * @return the color schema type name, actually distinguished between 'light' and 'dark' 
-	 */
-	public String getColorSchemaType() {
-		return DataExplorer.COLOR_BACKGROUND.getRed() + DataExplorer.COLOR_BACKGROUND.getGreen() + DataExplorer.COLOR_BACKGROUND.getBlue() > 500 ? "light/" : "dark/";
 	}
 
 	/**

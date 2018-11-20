@@ -3152,4 +3152,12 @@ public final class Settings extends Properties {
 		this.setProperty(Settings.SKIN_COLOR_SCHEMA, colorSchema);
 		DataExplorer.getInstance().setColorSchemaColors(this.getSkinColorSchema());
 	}
+
+	/**
+	 * @return the color schema type name, actually distinguished between 'light' and 'dark' 
+	 */
+	public String getColorSchemaType() {
+		return DataExplorer.COLOR_BACKGROUND.getRed() + DataExplorer.COLOR_BACKGROUND.getGreen() + DataExplorer.COLOR_BACKGROUND.getBlue() > 500 ? "light/" : "dark/";
+	}
+
 }

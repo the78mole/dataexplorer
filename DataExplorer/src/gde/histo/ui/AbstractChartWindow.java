@@ -287,7 +287,8 @@ public abstract class AbstractChartWindow extends CTabItem {
 		if (this.sashFormWeights[0] != newWeights[0] || this.sashFormWeights[1] != newWeights[1]) {
 			this.sashFormWeights = newWeights;
 			try {
-				this.graphicSashForm.setWeights(this.sashFormWeights);
+				if (this.sashFormWeights.length == 2 && this.sashFormWeights[1] != 0) //Linux call this with 0,0
+					this.graphicSashForm.setWeights(this.sashFormWeights);
 			} catch (IllegalArgumentException e) {
 				log.log(WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e); //$NON-NLS-1$
 			}

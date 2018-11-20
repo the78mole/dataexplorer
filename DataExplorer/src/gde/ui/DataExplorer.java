@@ -72,7 +72,6 @@ import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
@@ -177,7 +176,6 @@ public class DataExplorer extends Composite {
 	CTabFolder										displayTab;
 	Settings											settings;
 	Menu													menu;
-	Label													filler;
 	MenuBar												menuBar;
 	CoolBar												menuCoolBar;
 	int[]													order;
@@ -310,13 +308,6 @@ public class DataExplorer extends Composite {
 				this.menuBar = new MenuBar(this, this.menu);
 				this.menuBar.create();
 				GDE.shell.setMenuBar(this.menu);
-			}
-			{
-				this.filler = new Label(this, SWT.SEPARATOR | SWT.HORIZONTAL);
-				GridData label1LData = new GridData();
-				label1LData.horizontalAlignment = GridData.FILL;
-				label1LData.grabExcessHorizontalSpace = true;
-				this.filler.setLayoutData(label1LData);
 			}
 			{
 				this.menuCoolBar = new CoolBar(this, SWT.FLAT);
@@ -635,15 +626,13 @@ public class DataExplorer extends Composite {
 					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, "menuCoolBar.controlResized, event=" + evt); //$NON-NLS-1$
 					// menuCoolBar.controlResized signals collBar item moved
 					if (DataExplorer.this.displayTab != null && getSize().y != 0) {
-						Point fillerSize = DataExplorer.this.filler.getSize();
-						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "filler.size = " + fillerSize); //$NON-NLS-1$
 						Point menuCoolBarSize = DataExplorer.this.menuCoolBar.getSize();
 						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "menuCoolBar.size = " + menuCoolBarSize); //$NON-NLS-1$
 						Point shellSize = new Point(getClientArea().width, getClientArea().height);
 						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "shellClient.size = " + shellSize); //$NON-NLS-1$
 						Point statusBarSize = DataExplorer.this.statusComposite.getSize();
 						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "statusBar.size = " + statusBarSize); //$NON-NLS-1$
-						DataExplorer.this.displayTab.setBounds(0, menuCoolBarSize.y + fillerSize.y, shellSize.x, shellSize.y - menuCoolBarSize.y - statusBarSize.y - fillerSize.y);
+						DataExplorer.this.displayTab.setBounds(0, menuCoolBarSize.y, shellSize.x, shellSize.y - menuCoolBarSize.y - statusBarSize.y);
 						if (log.isLoggable(Level.FINE))
 							log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "displayTab.bounds = " + DataExplorer.this.displayTab.getBounds()); //$NON-NLS-1$
 					}
@@ -675,8 +664,7 @@ public class DataExplorer extends Composite {
 							DataExplorer.this.isObjectWindowVisible = false;
 						}
 					}
-					if (log.isLoggable(Level.FINE) && DataExplorer.this.displayTab != null && DataExplorer.this.filler != null && DataExplorer.this.menuCoolBar != null && DataExplorer.this.statusComposite != null && getSize().y != 0) {
-						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "filler.size = " + DataExplorer.this.filler.getSize()); //$NON-NLS-1$
+					if (log.isLoggable(Level.FINE) && DataExplorer.this.displayTab != null && DataExplorer.this.menuCoolBar != null && DataExplorer.this.statusComposite != null && getSize().y != 0) {
 						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "menuCoolBar.size = " + DataExplorer.this.menuCoolBar.getSize()); //$NON-NLS-1$
 						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "shellClient.size = " + new Point(getClientArea().width, getClientArea().height)); //$NON-NLS-1$
 						log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "statusBar.size = " + DataExplorer.this.statusComposite.getSize()); //$NON-NLS-1$

@@ -188,7 +188,7 @@ public abstract class SourceDataSet {
 					trusses = HistoOsdReaderWriter.readTrusses(sourceInputStream, getActualFile(), objectDirectory, analyzer);
 				} catch (Exception e) {
 					// link file points to non existent file
-					log.log(Level.SEVERE, e.getMessage(), e);
+					log.log(Level.SEVERE,  getActualFile() + GDE.STRING_MESSAGE_CONCAT + e.getMessage(), e);
 				}
 				for (VaultCollector truss : trusses) {
 					truss.getVault().setLoadLinkPath(Paths.get(getLinkPath()));

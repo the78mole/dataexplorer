@@ -452,7 +452,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 				imageCanvasLData.heightHint = 302;
 				this.imageCanvas.setLayoutData(imageCanvasLData);
 				this.imageCanvas.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0413));
-				if (!GDE.IS_MAC) this.imageCanvas.setBackgroundImage(SWTResourceManager.getImage("gde/resource/" + this.settings.getLocale() + "/ObjectImage.gif")); //$NON-NLS-1$ //$NON-NLS-2$
+				if (!GDE.IS_MAC) this.imageCanvas.setBackgroundImage(SWTResourceManager.getImage("gde/resource/"  + this.settings.getColorSchemaType() + this.settings.getLocale() + "/ObjectImage.gif")); //$NON-NLS-1$ //$NON-NLS-2$
 				this.imageCanvas.setSize(402, 302);
 				this.imageCanvas.getClientArea();
 
