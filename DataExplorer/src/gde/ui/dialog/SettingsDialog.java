@@ -440,7 +440,7 @@ public class SettingsDialog extends Dialog {
 							RowData skinColorSchemaGroupLData = new RowData();
 							skinColorSchemaGroupLData.width = GDE.IS_MAC ? 485 : 477;
 							this.skinColorSchemaGroup.setLayoutData(skinColorSchemaGroupLData);
-							this.skinColorSchemaGroup.setText("Farb-Schema");
+							this.skinColorSchemaGroup.setText(Messages.getString(MessageIds.GDE_MSGT0954));
 							{
 								this.osSchema = new Button(this.skinColorSchemaGroup, SWT.CHECK | SWT.LEFT);
 								this.osSchema.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1350,7 +1350,7 @@ public class SettingsDialog extends Dialog {
 							fontSizeGroupLData.height = 70;
 							this.fontSizeGroup.setLayoutData(fontSizeGroupLData);
 							this.fontSizeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.fontSizeGroup.setText("Font Size");
+							this.fontSizeGroup.setText(Messages.getString(MessageIds.GDE_MSGT0727));
 							{
 								Label label = new Label(this.fontSizeGroup, SWT.LEFT);
 								RowData labelLData = new RowData();
