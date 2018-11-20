@@ -1619,9 +1619,9 @@ public class UniLogDialog extends DeviceDialog {
 		checkSum = checkSum + (0xFF & updateBuffer[6]);
 
 		if (this.timeTriggerButton.getSelection())
-			updateBuffer[7] = (byte) ((new Byte(this.timeTriggerCombo.getText().trim())) | 0x80);
+			updateBuffer[7] = (byte) (Byte.parseByte(this.timeTriggerCombo.getText().trim()) | 0x80);
 		else
-			updateBuffer[7] = new Byte(this.timeTriggerCombo.getText().trim());
+			updateBuffer[7] = Byte.parseByte(this.timeTriggerCombo.getText().trim());
 		checkSum = checkSum + (0xFF & updateBuffer[7]);
 
 		updateBuffer[8] = (byte) this.sensorCurrentCombo.getSelectionIndex();

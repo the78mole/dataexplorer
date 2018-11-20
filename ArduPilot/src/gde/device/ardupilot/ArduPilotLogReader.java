@@ -469,7 +469,7 @@ public class ArduPilotLogReader {
 	 * @param offset
 	 * @param isClearStatistics
 	 */
-	private static void setupMeasurement(final gde.data.Record.DataType dataType, final int channelConfig, final int measurementOrdinal, String name, String symbol, String unit, boolean isActive, double factor,
+	public static void setupMeasurement(final gde.data.Record.DataType dataType, final int channelConfig, final int measurementOrdinal, String name, String symbol, String unit, boolean isActive, double factor,
 			boolean isClearStatistics) {
 		++ArduPilotLogReader.realUsedMeasurementCount;
 		MeasurementType gdeMeasurement = ArduPilotLogReader.device.getMeasurement(channelConfig, measurementOrdinal);

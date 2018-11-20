@@ -1121,7 +1121,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 		checkSum = checkSum + (0xFF & updateBuffer[13]);
 
 		if (this.timeTriggerButton.getSelection())
-			updateBuffer[14] = (byte) ((new Byte(this.timeTriggerCombo.getText().trim())) | 0x80);
+			updateBuffer[14] = (byte) (Byte.parseByte(this.timeTriggerCombo.getText().trim()) | 0x80);
 		else {
 			int autoStartZeit = Integer.parseInt(this.timeTriggerCombo.getText().trim());
 			autoStartZeit = autoStartZeit - (autoStartZeit % 5);

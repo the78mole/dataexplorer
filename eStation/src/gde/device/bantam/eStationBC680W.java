@@ -169,7 +169,7 @@ public class eStationBC680W extends eStation {
 				//sb.append(timeBuffer.length).append(" - ");
 				System.arraycopy(dataBuffer, offset - timeBuffer.length, timeBuffer, 0, timeBuffer.length);
 				String timeStamp = new String(timeBuffer).substring(0, timeBuffer.length-8)+"0000000000";
-				long dateTime = new Long(timeStamp.substring(6,17));
+				long dateTime = Long.parseLong(timeStamp.substring(6,17));
 				log.log(Level.FINEST, timeStamp + " " + timeStamp.substring(6,17) + " " + dateTime);
 				sb.append(dateTime);
 				//System.arraycopy(dataBuffer, offset - 4, sizeBuffer, 0, 4);

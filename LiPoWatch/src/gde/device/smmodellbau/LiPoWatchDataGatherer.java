@@ -126,8 +126,9 @@ public class LiPoWatchDataGatherer extends Thread {
 					numCells += (dataBuffer[5] & 0x0F);
 				}
 				int numberRecords = numCells/10 + 5; // number cells + total battery voltage + servo impuls in + servio impuls out + temperature + balance
-				for (int j = numberRecords; j < this.device.getNumberOfMeasurements(1); j++) {
-					recordSet.remove(j);
+				String[] recordNames = recordSet.getRecordNames();
+				for (int j = numberRecords; j < this.device.getNumberOfMeasurements(1) && j < recordNames.length-1; j++) {
+					recordSet.remove(recordNames[j]);
 				}
 				recordSet.syncScaleOfSyncableRecords();
 

@@ -65,7 +65,6 @@ public class Picolario2LogReader {
 	 * @return
 	 */
 	public static RecordSet read(String filePath, IDevice device, String recordNameExtend, Integer channelConfigNumber) {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		Channel activeChannel = null;
 		int lineNumber = 0;
 		String recordSetNameExtend = device.getRecordSetStemNameReplacement();

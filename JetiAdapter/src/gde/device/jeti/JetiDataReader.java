@@ -82,7 +82,6 @@ public class JetiDataReader {
 	 */
 	public static RecordSet read(String filePath, JetiAdapter device, String recordNameExtend, Integer channelConfigNumber, boolean isRaw) throws NotSupportedFileFormatException, IOException,
 			DataInconsitsentException, DataTypeException {
-		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		RecordSet recordSet = null;
 		Channel activeChannel = null;
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
