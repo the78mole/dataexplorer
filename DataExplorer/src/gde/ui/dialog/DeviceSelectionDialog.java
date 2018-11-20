@@ -932,8 +932,20 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			if (!tmpDeviceConfig.isUsed()) tmpDeviceConfig.setUsed(true);
 			setActiveConfig(tmpDeviceConfig);
 			setupDevice();
-		}
-		else {
+		} else if (selection == -1 && Settings.getInstance().getDeviceServices().get(newDeviceName) != null) { 		
+			try { //device not contained in active device list, but exist as exported service from plug-in jar
+				Settings.getInstance().extractDevicePropertiesAndTemplates(this.deviceServices.get(newDeviceName).getJarFile(), newDeviceName);
+				DeviceSelectionDialog.this.deviceConfigurations.add(Analyzer.getInstance(), newDeviceName, newDeviceName+GDE.FILE_ENDING_DOT_XML, false);
+				DeviceConfiguration tmpDeviceConfig = this.deviceConfigurations.get(newDeviceName);
+				if (!tmpDeviceConfig.isUsed()) tmpDeviceConfig.setUsed(true);
+				setActiveConfig(tmpDeviceConfig);
+				setupDevice();
+			} catch (Exception e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+				String msg = Messages.getString(MessageIds.GDE_MSGI0027, new Object[] { newDeviceName });
+				throw new NotSupportedException(msg);
+			}
+		} else {
 			String msg = Messages.getString(MessageIds.GDE_MSGI0027, new Object[] { newDeviceName });
 			NotSupportedException e = new NotSupportedException(msg);
 			log.log(Level.WARNING, e.getMessage(), e);
