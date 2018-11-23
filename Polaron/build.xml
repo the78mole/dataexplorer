@@ -60,7 +60,12 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
-		<property name="export.services" value="PolaronSports:Graupner:serial_port, PolaronACDC:Graupner:serial_port, PolaronEx:Graupner:serial_port, PolaronPro:Graupner:serial_port, PolaronEx1400:Graupner:serial_port"/>
+		<java classname="gde.tools.ExportServiceBuilder" outputproperty="export.services">
+		    <arg value="${basedir}"/>
+		    <classpath>
+		        <pathelement location="../DataExplorer/build/DataExplorer.jar"/>
+		    </classpath>
+		</java>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>
@@ -86,7 +91,12 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
-		<property name="export.services" value="PolaronSports, PolaronACDC, PolaronEx, PolaronPro, PolaronEx1400"/>
+		<java classname="gde.tools.ExportServiceBuilder" outputproperty="export.services">
+		    <arg value="${basedir}"/>
+		    <classpath>
+		        <pathelement location="../DataExplorer/build/DataExplorer.jar"/>
+		    </classpath>
+		</java>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>

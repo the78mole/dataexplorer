@@ -51,12 +51,17 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -68,6 +73,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import com.sun.istack.Nullable;
 
+import gde.config.ExportService;
 import gde.config.Settings;
 import gde.histo.cache.HistoVault;
 import gde.histo.cache.VaultProxy;
@@ -126,6 +132,63 @@ public abstract class DataAccess implements Cloneable {
 				log.log(Level.SEVERE, e.getMessage(), e);
 			}
 			return writer;
+		}
+
+		@Override
+		public void verifyRoaming() {
+			FileUtils.checkDirectoryAndCreate(GDE.APPL_HOME_PATH);
+		}
+
+		@Override
+		public void verifyLogging() {
+			FileUtils.checkDirectoryAndCreate(String.join(GDE.FILE_SEPARATOR_UNIX, GDE.APPL_HOME_PATH, Settings.LOG_PATH));
+		}
+
+		@Override
+		public boolean verifyAndBackupTemplates() {
+			String templatePath = String.join(GDE.FILE_SEPARATOR_UNIX, GDE.APPL_HOME_PATH, Settings.GRAPHICS_TEMPLATES_DIR_NAME);
+			if (!FileUtils.checkDirectoryAndCreate(templatePath, Settings.GRAPHICS_TEMPLATES_XSD_NAME)) {
+				FileUtils.extract(Settings.class, Settings.GRAPHICS_TEMPLATES_XSD_NAME, Settings.PATH_RESOURCE, templatePath, Settings.PERMISSION_555);
+				return false;
+			} else {
+				return true;
+			}
+		}
+
+		@Override
+		public void checkGraphicsTemplates(Collection<ExportService> services, Predicate<String> serviceValidator) {
+			Map<String, List<Path>> templateFileMap = readTemplateFiles();
+			for (ExportService service : services) {
+				try {
+					final String serviceName = service.getName();
+					if (serviceValidator.test(serviceName)) {
+						extractDeviceDefaultTemplates(service.getJarPath(), serviceName);
+					} else if (templateFileMap.containsKey(serviceName)) {
+						for (Path path : templateFileMap.get(serviceName)) {
+							log.log(Level.FINE, "delete ", path);
+							if (!path.toFile().delete()) log.log(Level.WARNING, "could not delete ", path);
+						}
+					}
+				} catch (Exception e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+				}
+			}
+		}
+
+		private Map<String, List<Path>> readTemplateFiles() {
+			Map<String, List<Path>> filesMap = new HashMap<>();
+			Path templatePath = Paths.get(GDE.APPL_HOME_PATH, Settings.GRAPHICS_TEMPLATES_DIR_NAME);
+			try (Stream<Path> files = Files.walk(templatePath, 2)) {
+				Stream<Path> potentialFiles = files.filter(t -> t.getFileName().toString().contains(GDE.STRING_DOT));
+				filesMap = potentialFiles.collect(Collectors.groupingBy(this::getTemplateFilePrefix));
+			} catch (IOException e) {}
+			return filesMap;
+		}
+
+		private String getTemplateFilePrefix(Path t) {
+			String fileName = t.getFileName().toString();
+			int index = fileName.lastIndexOf(GDE.STRING_UNDER_BAR);
+			return index < 0 ? "" : fileName.substring(0, index);
 		}
 
 		@Override
@@ -320,6 +383,41 @@ public abstract class DataAccess implements Cloneable {
 		}
 
 		@Override
+		public boolean verifyAndBackupDevices() {
+			String devicePath = String.join(GDE.FILE_SEPARATOR_UNIX, GDE.APPL_HOME_PATH, Settings.DEVICE_PROPERTIES_DIR_NAME);
+			if (!FileUtils.checkDirectoryAndCreate(devicePath, Settings.DEVICE_PROPERTIES_XSD_NAME)) {
+				FileUtils.extract(Settings.class, Settings.DEVICE_PROPERTIES_XSD_NAME, Settings.PATH_RESOURCE, devicePath, Settings.PERMISSION_555);
+				return false;
+			} else { // execute every time application starts to enable xsd exist and update from added plug-in
+				if (!FileUtils.checkFileExist(String.join(GDE.FILE_SEPARATOR_UNIX, devicePath, Settings.DEVICE_PROPERTIES_XSD_NAME)))
+					FileUtils.extract(Settings.class, Settings.DEVICE_PROPERTIES_XSD_NAME, Settings.PATH_RESOURCE, devicePath, Settings.PERMISSION_555);
+				return true;
+			}
+		}
+
+		@Override
+		public void checkDeviceProperties(List<ExportService> services, Predicate<String> serviceValidator) {
+			for (ExportService service : services) {
+				String serviceName = service.getName();
+				try {
+					if (serviceValidator.test(serviceName)) {
+						extractDeviceProperties(service.getJarPath(), serviceName);
+					} else {
+						Path path = Paths.get(GDE.APPL_HOME_PATH, Settings.DEVICE_PROPERTIES_DIR_NAME, serviceName + GDE.FILE_ENDING_DOT_XML);
+						if (path.toFile().exists()) {
+							log.log(Level.FINE, "delete ", path);
+							if (!path.toFile().delete()) {
+								log.log(Level.WARNING, "could not delete", path);
+							}
+						}
+					}
+				} catch (IOException e) {
+					log.log(Level.SEVERE, e.getMessage(), e);
+				}
+			}
+		}
+
+		@Override
 		public String[] getDeviceFolderList() {
 			String xmlBasePath = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + GDE.FILE_SEPARATOR_UNIX;
 			File deviceFolder = new File(xmlBasePath);
@@ -354,7 +452,7 @@ public abstract class DataAccess implements Cloneable {
 			return new FileInputStream(targetFilePath.toFile());
 		}
 
-		@SuppressWarnings("static-method")
+		@Override
 		public InputStream getDeviceXmlInputStream(String xmlFilePath) throws FileNotFoundException {
 			return new FileInputStream(xmlFilePath);
 		}
@@ -371,6 +469,7 @@ public abstract class DataAccess implements Cloneable {
 			return new FileOutputStream(xmlFilePath);
 		}
 
+		@Override
 		@SuppressWarnings("static-method")
 		public InputStream getDeviceXsdMigrationStream(int versionNumber) throws FileNotFoundException {
 			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
@@ -378,20 +477,28 @@ public abstract class DataAccess implements Cloneable {
 			return new FileInputStream(targetFilePath.toFile());
 		}
 
+		@Override
 		@SuppressWarnings("static-method")
 		public boolean existsDeviceMigrationFolder(int versionNumber) {
 			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
 			return migratePropertyPath.toFile().exists();
 		}
 
-		@SuppressWarnings("static-method")
+		@Override
+		public String[] getDevicePropertyFileNames(Path devicePath) {
+			return devicePath.toFile().list((dir, name) -> name.endsWith(GDE.FILE_ENDING_DOT_XML));
+
+		}
+
+		@Override
 		public List<Path> getDeviceXmlSubPaths(int versionNumber) throws FileNotFoundException {
 			String folderName = Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber;
 			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + folderName);
 			List<File> fileList = FileUtils.getFileListing(migratePropertyPath.toFile(), 1, GDE.FILE_ENDING_DOT_XML);
-			return fileList.stream().map(f -> f.getName()).map(s -> Paths.get(folderName, s)).collect(Collectors.toList());
+			return fileList.stream().map(File::getName).map(s -> Paths.get(folderName, s)).collect(Collectors.toList());
 		}
 
+		@Override
 		public void deleteDeviceHistoTemplates(String deviceName) throws IOException {
 			Path targetFilePath = Paths.get(GDE.APPL_HOME_PATH).resolve(Settings.GRAPHICS_TEMPLATES_DIR_NAME);
 			Files.walkFileTree(targetFilePath, new SimpleFileVisitor<Path>() {
@@ -489,6 +596,17 @@ public abstract class DataAccess implements Cloneable {
 			String message = Messages.getString(MessageIds.GDE_MSGT0831, new Object[] { initialSize_KiB, deletedSize_KiB, cachePath });
 			log.log(Level.CONFIG, message);
 			return message;
+		}
+
+		@Override
+		public boolean verifyAndBackupCache() {
+			String cachePath = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.HISTO_CACHE_ENTRIES_DIR_NAME;
+			if (!FileUtils.checkDirectoryAndCreate(cachePath, Settings.HISTO_CACHE_ENTRIES_XSD_NAME)) {
+				FileUtils.extract(Settings.class, Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, cachePath, Settings.PERMISSION_555);
+				return false;
+			} else {
+				return true;
+			}
 		}
 
 		@Override
@@ -699,6 +817,51 @@ public abstract class DataAccess implements Cloneable {
 		}
 
 		@Override
+		public void extractDeviceProperties(Path jarPath, String serviceName) throws IOException {
+			if (!FileUtils.checkFileExist(Paths.get(Settings.getDevicesPath(), serviceName + GDE.FILE_ENDING_DOT_XML).toString())) {
+				FileUtils.extract(new JarFile(
+						jarPath.toFile()), serviceName + GDE.FILE_ENDING_DOT_XML, Settings.PATH_RESOURCE, Settings.getDevicesPath(), Settings.PERMISSION_555);
+			}
+		}
+
+		@Override
+		public void extractDeviceDefaultTemplates(Path jarPath, String serviceName) throws IOException {
+			JarFile jarFile = new JarFile(jarPath.toFile());
+			String serviceName_ = serviceName + GDE.STRING_UNDER_BAR;
+			Enumeration<JarEntry> e = jarFile.entries();
+			while (e.hasMoreElements()) {
+				String entryName = e.nextElement().getName();
+				if (entryName.startsWith(Settings.PATH_RESOURCE_TEMPLATE) && entryName.endsWith(GDE.FILE_ENDING_DOT_XML) && entryName.contains(serviceName_)) {
+					String defaultTemplateName = entryName.substring(Settings.PATH_RESOURCE_TEMPLATE.length());
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("jarFile = %s ; defaultTemplateName = %s", jarFile.getName(), entryName)); //$NON-NLS-1$
+					if (!FileUtils.checkFileExist(Paths.get(Settings.getGraphicsTemplatePath(), defaultTemplateName).toString())) {
+						FileUtils.extract(jarFile, defaultTemplateName, Settings.PATH_RESOURCE_TEMPLATE, Settings.getGraphicsTemplatePath(), Settings.PERMISSION_555);
+					}
+				}
+			}
+		}
+
+		@Override
+		public void checkMeasurementDisplayProperties(boolean localeChanged, String lang) {
+			Path path = Paths.get(GDE.APPL_HOME_PATH, Settings.MAPPINGS_DIR_NAME);
+			Path propertyFilePath = path.resolve(Settings.MEASUREMENT_DISPLAY_FILE);
+			if (!localeChanged) {
+				if (!FileUtils.checkFileExist(propertyFilePath.toString()))
+					FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, String.format("%s%s%s", Settings.PATH_RESOURCE, lang, GDE.FILE_SEPARATOR_UNIX), path.toString(), Settings.PERMISSION_555);
+			} else {
+				if (FileUtils.checkFileExist(propertyFilePath.toString())) {
+					propertyFilePath.toFile().delete();
+					try {
+						Thread.sleep(5);
+					} catch (InterruptedException e) {
+						// ignore
+					}
+				}
+				FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, String.format("%s%s%s", Settings.PATH_RESOURCE, lang, GDE.FILE_SEPARATOR_UNIX), path.toString(), Settings.PERMISSION_555);
+			}
+		}
+
+		@Override
 		public synchronized LocalAccess clone() {
 			LocalAccess clone = null;
 			try {
@@ -713,12 +876,10 @@ public abstract class DataAccess implements Cloneable {
 
 	public static DataAccess getInstance() {
 		if (DataAccess.dataAccess == null) {
-			if (GDE.EXECUTION_ENV == null) {
+			if (!Analyzer.isWithBuilders()) {
 				DataAccess.dataAccess = new LocalAccess();
-			} else if (GDE.EXECUTION_ENV.equals("AWS_EXECUTION_ENV")) {
-				DataAccess.dataAccess = null;
 			} else {
-				throw new UnsupportedOperationException();
+				DataAccess.dataAccess = null;
 			}
 		}
 		return DataAccess.dataAccess;
@@ -826,6 +987,12 @@ public abstract class DataAccess implements Cloneable {
 	 * @return the inputStream for a device properties file
 	 */
 	public abstract InputStream getDeviceXmlInputStream(Path fileSubPath) throws FileNotFoundException;
+
+	/**
+	 * @param devicePropertiesFilePath is the full path
+	 * @return the inputStream for a device properties file
+	 */
+	public abstract InputStream getDeviceXmlInputStream(String devicePropertiesFilePath) throws FileNotFoundException;
 
 	/**
 	 * @param fileSubPath is a relative path based on the roaming folder
@@ -1003,5 +1170,80 @@ public abstract class DataAccess implements Cloneable {
 	 */
 	@Override
 	public abstract DataAccess clone();
+
+	/**
+	 * Extract device properties xml if not exist extract from jar.
+	 */
+	public abstract void extractDeviceProperties(Path jarPath, String serviceName) throws IOException;
+
+	/**
+	 * Extract device default templates if not exist at target path.
+	 */
+	public abstract void extractDeviceDefaultTemplates(Path jarPath, String serviceName) throws IOException;
+
+	/**
+	 * Check and create path.
+	 */
+	public abstract void verifyRoaming();
+
+	/**
+	 * Check and create path.
+	 */
+	public abstract void verifyLogging();
+
+	/**
+	 * Check XSD version and extract XSD if required.
+	 * @return false if the current version's directory did not exist and was created
+	 */
+	public abstract boolean verifyAndBackupCache();
+
+	/**
+	 * Check XSD version and extract XSD / XMLs if required.
+	 * @return false if the current version's directory did not exist and was created
+	 */
+	public abstract boolean verifyAndBackupDevices();
+
+	/**
+	 * Check XSD version and extract XSD / XMLs if required.
+	 * @return false if the current version's directory did not exist and was created
+	 */
+	public abstract boolean verifyAndBackupTemplates();
+
+	/**
+	 * Extract or delete templates.
+	 * @param serviceValidator true if the the service name identifies a used service
+	 */
+	public abstract void checkGraphicsTemplates(Collection<ExportService> services, Predicate<String> serviceValidator);
+
+	/**
+	 * Check existence of directory, create if required and update all.
+	 * @param services all device jar services
+	 * @param serviceValidator true if the the service name identifies a used service
+	 */
+	public abstract void checkDeviceProperties(List<ExportService> services, Predicate<String> serviceValidator);
+
+	/**
+	 * Update display mapping properties file.
+	 * @param localeChanged true will force a file replacement
+	 * @param lang two-char language identifier (e.g. de, en)
+	 */
+	public abstract void checkMeasurementDisplayProperties(boolean localeChanged, String lang);
+
+	/**
+	 * File system garbage cleaner (rf. to commit 'Fix creating new object graphics templates for criteria never utilized').
+	 */
+	public abstract void deleteDeviceHistoTemplates(String deviceName) throws IOException;
+
+	public abstract List<Path> getDeviceXmlSubPaths(int versionNumber) throws FileNotFoundException;
+
+	/**
+	 * @param devicePath folder with device property files
+	 * @return the device property file names
+	 */
+	public abstract String[] getDevicePropertyFileNames(Path devicePath);
+
+	public abstract boolean existsDeviceMigrationFolder(int versionNumber);
+
+	public abstract InputStream getDeviceXsdMigrationStream(int versionNumber) throws FileNotFoundException;
 
 }

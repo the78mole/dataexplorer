@@ -129,7 +129,7 @@ public final class Settings extends Properties {
 	final static String							FILE_COMMENT_SURROUND_BACKGRD		= "file_comment_surround_backgrd";																																//$NON-NLS-1$
 	final static String							OBJECT_DESC_INNER_BACKGROUND		= "object_desciption_inner_background";																														//$NON-NLS-1$
 	final static String							OBJECT_DESC_SURROUND_BACKGRD		= "object_desciption_surround_backgrd";																														//$NON-NLS-1$
-	final static String							DISPLAY_DENSITY_FONT_CORRECT		= "display_density_font_correction";		
+	final static String							DISPLAY_DENSITY_FONT_CORRECT		= "display_density_font_correction";
 	public final static String			SKIN_COLOR_SCHEMA								= "skin_color_schema";
 	public final static String			COLOR_SCHEMA_SYSTEM							= "color_schema_system";
 	public final static String			COLOR_SCHEMA_LIGHT							= "color_schema_light";
@@ -185,7 +185,7 @@ public final class Settings extends Properties {
 	final static String							TABLE_BLOCK											= "#[Table-Settings]";																																						//$NON-NLS-1$
 	final static String							LOGGING_BLOCK										= "#[Logging-Settings]";																																					//$NON-NLS-1$
 	final static String							HISTO_BLOCK											= "#[Histo-Settings]";																																						//$NON-NLS-1$
-	final static String							LOG_PATH												= "Logs";																																													//$NON-NLS-1$
+	public final static String			LOG_PATH												= "Logs";																																													//$NON-NLS-1$
 	final static String							LOG_FILE												= "trace.log";																																										//$NON-NLS-1$
 	final static String							SERIAL_LOG_FILE									= "serial.log";																																										//$NON-NLS-1$
 	public final static String[]		LOGGING_LEVEL										= new String[] { "SEVERE", "WARNING", "TIME", "INFO", "FINE", "FINER", "FINEST" };								//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
@@ -3154,7 +3154,7 @@ public final class Settings extends Properties {
 	}
 
 	/**
-	 * @return the color schema type name, actually distinguished between 'light' and 'dark' 
+	 * @return the color schema type name, actually distinguished between 'light' and 'dark'
 	 */
 	public String getColorSchemaType() {
 		return DataExplorer.COLOR_BACKGROUND.getRed() + DataExplorer.COLOR_BACKGROUND.getGreen() + DataExplorer.COLOR_BACKGROUND.getBlue() > 500 ? "light/" : "dark/";

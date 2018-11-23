@@ -31,7 +31,6 @@
 	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
 	<property name="module.output" location="classes"/>
-	<property name="export.services" value="IGCAdapter:OLC:file_import"/>
 
 	<path id="compile.classpath">
 		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
@@ -61,6 +60,12 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
+		<java classname="gde.tools.ExportServiceBuilder" outputproperty="export.services">
+		    <arg value="${basedir}"/>
+		    <classpath>
+		        <pathelement location="../DataExplorer/build/DataExplorer.jar"/>
+		    </classpath>
+		</java>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>
@@ -86,6 +91,12 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
+		<java classname="gde.tools.ExportServiceBuilder" outputproperty="export.services">
+		    <arg value="${basedir}"/>
+		    <classpath>
+		        <pathelement location="../DataExplorer/build/DataExplorer.jar"/>
+		    </classpath>
+		</java>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>

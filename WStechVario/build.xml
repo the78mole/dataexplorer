@@ -41,6 +41,12 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
+		<java classname="gde.tools.ExportServiceBuilder" outputproperty="export.services">
+		    <arg value="${basedir}"/>
+		    <classpath>
+		        <pathelement location="../DataExplorer/build/DataExplorer.jar"/>
+		    </classpath>
+		</java>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>
@@ -48,7 +54,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for comma separated value serial data adapter"/>
-    		<attribute name="Export-Service" value="DataVario:WStech:file_import, DataVarioDuo:WStech:file_import, LinkVario:WStech:file_import, LinkVarioDuo:WStech:file_import"/>
+    		<attribute name="Export-Service" value="${export.services}"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
@@ -67,6 +73,12 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
+		<java classname="gde.tools.ExportServiceBuilder" outputproperty="export.services">
+		    <arg value="${basedir}"/>
+		    <classpath>
+		        <pathelement location="../DataExplorer/build/DataExplorer.jar"/>
+		    </classpath>
+		</java>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>
@@ -74,7 +86,7 @@
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
     		<attribute name="Bundle-Description" value="Implementation for comma separated value serial data adapter"/>
-    		<attribute name="Export-Service" value="DataVario:WStech:file_import, DataVarioDuo:WStech:file_import, LinkVario:WStech:file_import, LinkVarioDuo:WStech:file_import"/>
+    		<attribute name="Export-Service" value="${export.services}"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}NonUi-${version.num}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

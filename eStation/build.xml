@@ -32,9 +32,6 @@
 
 	<property name="module.output" location="classes"/>
 	<property name="bantam" value="Bantam:serial_port"/>
-	<property name="pichler" value="Pichler:serial_port"/>
-	<property name="skyrc" value="SkyRC:serial_port"/>
-	<property name="export.services" value="eStation902:${bantam}, eStationBC6:${bantam}, eStationBC6 80W:${bantam}, eStationBC610:${bantam}, eStationBC8:${bantam}, PichlerP6:${pichler}, PichlerP60:${pichler}, PichlerP60 80W:${pichler}, iMax B6:${skyrc}"/>
 
 	<path id="compile.classpath">
 		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
@@ -64,6 +61,12 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
+		<java classname="gde.tools.ExportServiceBuilder" outputproperty="export.services">
+		    <arg value="${basedir}"/>
+		    <classpath>
+		        <pathelement location="../DataExplorer/build/DataExplorer.jar"/>
+		    </classpath>
+		</java>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>
@@ -89,6 +92,12 @@
 		<tstamp>
 		     <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
+		<java classname="gde.tools.ExportServiceBuilder" outputproperty="export.services">
+		    <arg value="${basedir}"/>
+		    <classpath>
+		        <pathelement location="../DataExplorer/build/DataExplorer.jar"/>
+		    </classpath>
+		</java>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>

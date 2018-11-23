@@ -410,7 +410,7 @@ public class GDE {
 	public final static Map<String, String>	deviceMap													= new HashMap<String, String>();
 
 	/** access to progrss bar and status message  */
-	public static UiNotification	uiNotification;
+	public static UiNotification						uiNotification;
 
 	private static Thread										settingsThread;
 
