@@ -44,6 +44,13 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
+                <trailDisplay discloseAll="false">
+                   <disclosed trail="real_avg"/>
+                   <disclosed trail="real_max"/>
+                   <disclosed trail="real_min"/>
+                   <disclosed trail="suite_real_avg_sd"/>
+                   <disclosed trail="suite_real_avg_min_max"/>
+                </trailDisplay>
                 <label>label_rx_tx_ploss</label>
             </Measurement>
             <Measurement>
@@ -965,6 +972,13 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
+                <trailDisplay discloseAll="false">
+                   <disclosed trail="real_avg"/>
+                   <disclosed trail="real_max"/>
+                   <disclosed trail="real_min"/>
+                   <disclosed trail="suite_real_avg_sd"/>
+                   <disclosed trail="suite_real_avg_min_max"/>
+                </trailDisplay>
                 <label>label_rx_tx_ploss</label>
             </Measurement>
             <Measurement>
@@ -1948,6 +1962,13 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
+                <trailDisplay discloseAll="false">
+                   <disclosed trail="real_avg"/>
+                   <disclosed trail="real_max"/>
+                   <disclosed trail="real_min"/>
+                   <disclosed trail="suite_real_avg_sd"/>
+                   <disclosed trail="suite_real_avg_min_max"/>
+                </trailDisplay>
                 <label>label_rx_tx_ploss</label>
             </Measurement>
             <Measurement>
@@ -2931,6 +2952,13 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
+                <trailDisplay discloseAll="false">
+                   <disclosed trail="real_avg"/>
+                   <disclosed trail="real_max"/>
+                   <disclosed trail="real_min"/>
+                   <disclosed trail="suite_real_avg_sd"/>
+                   <disclosed trail="suite_real_avg_min_max"/>
+                </trailDisplay>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
@@ -3840,6 +3868,13 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
+                <trailDisplay discloseAll="false">
+                   <disclosed trail="real_avg"/>
+                   <disclosed trail="real_max"/>
+                   <disclosed trail="real_min"/>
+                   <disclosed trail="suite_real_avg_sd"/>
+                   <disclosed trail="suite_real_avg_min_max"/>
+                </trailDisplay>
                 <label>label_rx_tx_ploss</label>
             </Measurement>
             <Measurement>
@@ -4823,6 +4858,13 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
+                <trailDisplay discloseAll="false">
+                   <disclosed trail="real_avg"/>
+                   <disclosed trail="real_max"/>
+                   <disclosed trail="real_min"/>
+                   <disclosed trail="suite_real_avg_sd"/>
+                   <disclosed trail="suite_real_avg_min_max"/>
+                </trailDisplay>
             </Measurement>
             <Measurement>
                 <name>RXSQ</name>
