@@ -101,7 +101,7 @@ public class ExportServiceBuilder {
 	 */
 	public List<ExportService> getServices(Path basePath, String projectName) {
 		List<ExportService> services = new ArrayList<>();
-		Path devicePropertiesPath = basePath.resolve(projectName).resolve("src\\resource");
+		Path devicePropertiesPath = basePath.resolve(projectName).resolve("src/resource");
 		try {
 			for (String fileName : dataAccess.getDevicePropertyFileNames(devicePropertiesPath)) {
 				ExportService service = getService(basePath, projectName, fileName);
@@ -221,7 +221,7 @@ public class ExportServiceBuilder {
 
 			};
 
-			Path devicePropertiesPath = basePath.resolve(projectName).resolve("src\\resource").resolve(propertiesFileName);
+			Path devicePropertiesPath = basePath.resolve(projectName).resolve("src/resource").resolve(propertiesFileName);
 			saxParser.parse(dataAccess.getDeviceXmlInputStream(devicePropertiesPath.toString()), handler);
 
 		} catch (MySAXTerminatorException e) {
