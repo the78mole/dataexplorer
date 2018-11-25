@@ -25,8 +25,8 @@
         <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format size="-200" formatType="BYTE" inputType="SERIAL_IO"/>
         <format size="-40" formatType="VALUE" inputType="FILE_IO"/>
+        <format size="-200" formatType="BYTE" inputType="SERIAL_IO"/>
         <timeUnit>sec</timeUnit>
         <separator>semicolon</separator>
         <leader>$</leader>

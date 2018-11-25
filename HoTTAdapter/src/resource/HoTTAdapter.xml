@@ -26,8 +26,8 @@
         <UTCdelta>0</UTCdelta>
     </TimeBase>
     <DataBlock>
-        <format inputType="SERIAL_IO" formatType="BYTE" size="57"/>
         <format inputType="FILE_IO" formatType="BYTE" size="64"/>
+        <format inputType="SERIAL_IO" formatType="BYTE" size="57"/>
         <timeUnit>msec</timeUnit>
         <leader>$</leader>
         <trailer>0D0A</trailer>

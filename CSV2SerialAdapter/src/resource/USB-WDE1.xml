@@ -31,8 +31,8 @@
         <timeStep>60000.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format inputType="FILE_IO" formatType="VALUE" size="-23"/>
         <format inputType="SERIAL_IO" formatType="BYTE" size="-120"/>
+        <format inputType="FILE_IO" formatType="VALUE" size="-23"/>
         <timeUnit>msec</timeUnit>
         <separator>semicolon</separator>
         <leader>$</leader>
