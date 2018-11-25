@@ -277,11 +277,13 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 				//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
 				//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
-				if (ordinal >= 0 && ordinal <= 5){
-					dataTableRow[index + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
-				}
-				else {
+				switch(ordinal) {
+				default:
 					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
+					break;
+				case 0: //RXQS
+					dataTableRow[index + 1] = String.format("%.0f",(record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
+					break;
 				}
 				++index;
 			}
