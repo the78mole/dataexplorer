@@ -2423,7 +2423,7 @@ public class Record extends AbstractRecord implements IRecord {
 	}
 
 	/**
-	 * get/calcualte sum of time by configuraed trigger
+	 * get/calculate sum of time by configured trigger
 	 * @param referencedMeasurementOrdinal
 	 * @return sum value according trigger range specification of referenced measurement
 	 */
