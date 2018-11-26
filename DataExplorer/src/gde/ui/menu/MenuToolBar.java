@@ -104,7 +104,7 @@ public class MenuToolBar {
 	Composite						scopePointsComposite;
 	CCombo							scopePointsCombo;
 	boolean							isScopePointsCombo		= true;
-	static final int		comboHeight						= (int) (GDE.WIDGET_FONT_SIZE * (GDE.IS_LINUX ? 2.5 : 1.8));
+	int									comboHeight						= (int) (GDE.WIDGET_FONT_SIZE * (GDE.IS_LINUX ? 2.5 : 1.8));
 
 	CoolItem						portCoolItem;
 	ToolBar							portToolBar;
@@ -414,7 +414,7 @@ public class MenuToolBar {
 						this.objectSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
 						this.objectSelectComposite.setLayout(comboCompositeLayout);
 						this.objectSelectCombo = new CCombo(this.objectSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.objectSelectCombo.setLayoutData(new RowData(200, MenuToolBar.comboHeight));
+						this.objectSelectCombo.setLayoutData(new RowData(200, this.comboHeight));
 						this.objectSelectCombo.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 						this.objectSelectCombo.setItems(this.settings.getObjectList()); // "device-oriented", "ASW-27", "AkkuSubC_1"" });
 						this.objectSelectCombo.select(this.settings.getActiveObjectIndex());
@@ -477,6 +477,8 @@ public class MenuToolBar {
 							}
 						});
 						this.objectSelectComposite.pack();
+						this.comboHeight = (int) (this.objectSelectComposite.getClientArea().height - (GDE.IS_MAC ? 8 : 10) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/2);
+						this.objectSelectCombo.setLayoutData(new RowData(200, this.comboHeight));
 					}
 					objectSelectComboSep.setWidth(this.objectSelectComposite.getSize().x);
 					objectSelectComboSep.setControl(this.objectSelectComposite);
@@ -682,7 +684,7 @@ public class MenuToolBar {
 						this.scopePointsComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
 						this.scopePointsComposite.setLayout(comboCompositeLayout);
 						this.scopePointsCombo = new CCombo(this.scopePointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.scopePointsCombo.setLayoutData(new RowData(60, MenuToolBar.comboHeight));
+						this.scopePointsCombo.setLayoutData(new RowData(60, this.comboHeight));
 						this.scopePointsCombo.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 						this.scopePointsCombo.setItems(SCOPE_VALUES);
 						this.scopePointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -772,7 +774,7 @@ public class MenuToolBar {
 						this.channelSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
 						this.channelSelectComposite.setLayout(comboCompositeLayout);
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.channelSelectCombo.setLayoutData(new RowData(185, MenuToolBar.comboHeight));
+						this.channelSelectCombo.setLayoutData(new RowData(185, this.comboHeight));
 						this.channelSelectCombo.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 						this.channelSelectCombo.select(0);
 						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0075));
@@ -841,7 +843,7 @@ public class MenuToolBar {
 						this.recordSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
 						this.recordSelectComposite.setLayout(comboCompositeLayout);
 						this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER | SWT.LEFT);
-						this.recordSelectCombo.setLayoutData(new RowData(260, MenuToolBar.comboHeight));
+						this.recordSelectCombo.setLayoutData(new RowData(260, this.comboHeight));
 						this.recordSelectCombo.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 						this.recordSelectCombo.setItems(new String[] { GDE.STRING_BLANK }); // later "2) Flugaufzeichnung", "3) laden" });
 						this.recordSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0078));
