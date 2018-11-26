@@ -16,7 +16,7 @@
         <UTCdelta>0</UTCdelta>
     </TimeBase>
     <DataBlock>
-        <format inputType="FILE_IO" formatType="BYTE" size="64"/>
+        <format inputType="SERIAL_IO" formatType="BYTE" size="100"/>
         <timeUnit>msec</timeUnit>
         <preferredDataLocation></preferredDataLocation>
     </DataBlock>
@@ -128,7 +128,7 @@
                 <statistics min="true" max="true" avg="false" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>cells_blance</name>
+                <name>cells_balance</name>
                 <symbol></symbol>
                 <unit>mV</unit>
                 <active>true</active>
