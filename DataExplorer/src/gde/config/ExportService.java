@@ -21,7 +21,7 @@ package gde.config;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -38,8 +38,10 @@ public class ExportService {
 
 	public enum DataFeed {
 
-		FILE(MessageIds.GDE_MSGT0956), //
+		//TODO this get static initialized, remove to avoid none debug able errors
+		NO_DATA_SOURCE(GDE.STRING_MESSAGE_CONCAT), //
 		SERIAL_IO(MessageIds.GDE_MSGT0955), //
+		FILE(MessageIds.GDE_MSGT0956), //
 		NATIVE_USB(MessageIds.GDE_MSGT0957);
 
 		private String messageId;
@@ -53,15 +55,19 @@ public class ExportService {
 		}
 
 		public String displayText() {
-			return Messages.getString(this.messageId);
+			return this.messageId.length() > 3 ? Messages.getString(this.messageId) : this.messageId;
 		}
 
 		public static DataFeed fromValue(String v) {
 			return valueOf(v);
 		}
 
-		public static EnumSet<DataFeed> fromStringArray(String[] values) {
-			EnumSet<DataFeed> dataFeeds = EnumSet.noneOf(DataFeed.class);
+		/**
+		 * @param values
+		 * @return ordered data sources according list in device XML
+		 */
+		public static LinkedHashSet<DataFeed> fromStringArray(String[] values) {
+			LinkedHashSet<DataFeed> dataFeeds = new LinkedHashSet<DataFeed>();
 			for (String value : values) {
 				dataFeeds.add(DataFeed.valueOf(value));
 			}

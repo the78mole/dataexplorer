@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -127,7 +127,7 @@ public class ExportServiceBuilder {
 	@Nullable
 	public ExportService getService(Path basePath, String projectName, String propertiesFileName) {
 		String[] deviceValues = new String[] { "", "" };
-		Set<DataFeed> dataFeeds = EnumSet.noneOf(DataFeed.class);
+		Set<DataFeed> dataFeeds = new LinkedHashSet<ExportService.DataFeed>(); //take order of data source as declared in device XML
 		final ExportService exportService;
 
 		try {
@@ -189,7 +189,11 @@ public class ExportServiceBuilder {
 											dataFeeds.add(DataFeed.SERIAL_IO);
 										} else if (existsUsbPort) {
 											dataFeeds.add(DataFeed.NATIVE_USB);
+										}	else {
+												dataFeeds.add(DataFeed.NO_DATA_SOURCE);//device w/o data source
 										}
+									} else {
+										dataFeeds.add(DataFeed.NO_DATA_SOURCE);//device w/o data source
 									}
 									log.log(Level.FINE, "dataFeed =", value);
 								}
