@@ -1,97 +1,106 @@
-GNU DataExplorer - News - comes with version 3.3.3 - 10 Aug 2018
+GNU DataExplorer - News - comes with version 3.3.4 - 30 Nov 2018
 
-1) generic changes/fixes
-	* fix recursion synchronizing compare set while adding curve to compare set
-	* handle device base directory by interface method to enable device specific directories
-	* enhance calculation of synched scale label 
-	* Reduce DataExplorer startup duration
-	* Ask user for confirmation prior to purging an object key
-	* fix channel object key handling, channels of type outlet (chargers) might have different object key, update object selector accordingly
-	* fix unsaved reason entry for changed comment
-	* fix regression renaming object key scenario
+1) Generic changes/fixes
+	* fix ratio calculation triggered used capacity to reached motor altitude
+	* update Java download URLs in Windows launcher
+	* new device xsd version
+	* make ready to execute using JRE 8 to 10
+	* fix [sr #109555] CSV Export does not use decimal point separator
+	* fix raw csv export 
+	* fix exception while moving scaled curve display around start time stamp
+	* fix adding KMZ export menu on device level
+	* fix graphics header update while switching record set
+	* update device selection dialog devices overview tab
+	* reduce extracted device properties XMLs to the devices selected
+	* user interface polish enabling different color schema
+	* remove never used global serial port from settings dialog
+	
+2) Device specific changes/fixes
+	* HottAdapter* -  fix error message GDE_MSGW2404 appearing only at the first import, Fix missing tab activation after import
+	* HottAdapter* -  fix start time stamp calculation while special case receiver data only analysis
+	* HottAdapter - fix wrong sensor sequence reference while import *.bin with single ESC sensor module connected.
+	* Hitec DRX1 - add support (identical Hitex RDX1 Pro is the 100W version)
+	* Hitec X1 Red - add support
+	* iMax B6 mini - add support (iMax B6 AC V2)
+	* PolaronPro - fix cell voltage update
+	* Polaron* - fix measurement index position reference (according available specification)
+	* GPS-Logger2 - fix device visualization dialog
+	* GPS-Logger* - update behavior selecting configuration while import, 
+		switch to UniLog2 only if $UL2 entry found, respective to UniLog if $UNILOG entry found, else keep the previous selected configuration 
+	* ArduPilot - initial implementation based on LogStructure.h
+	* CSV2SereilAdapter - fix potential invalid thread access while updating GPS related menu entries
+	* Weatronic-Telemetry - fix potential OSD file reading with lower number of records compared to actual device measurement structure
+	
+3) History analysis
+	# Flexibility
+	.. OpenStreetMap GeoCodes (now prioritized over GoogleMaps)
+	      ! -> Clear the location cache via the 'Clear cache' button
+    .. Add warning and event bits support to HoTTAdapter1/2
+	# Performance
+	.. Leverage multicore processors
+		- threadsafe histo functionality
+	.. Boost HoTTAdapter2 import speed
+		- Fix the excessive sampling rate with native imports and HoTTAdapter2
+		- reduce the oversampling rate with native imports and HoTTAdapter2
+	.. New histo cache version with accelerated read access
+		- Enhance performance via threadsafe HoTTbinHistoReaders
+		- Add settings entry for xml cache
+	.. diverse optimizations
+		- Avoid synchronized method performance penalty
+		- Enhance the Quantile classes for better performance
+		- Enhance removing constant outliers from the quantile population
+	# Processing
+	.. Fix start timestamp calculation for HoTT native logs
+	.. Fix measuring illegal argument exception for measuring with null values
 
-2) device specific changes/fixes
-	* HoTTAdapter* - fix 19200 Baud protocol live data, skip Rx query while other sensors detected, Rx data in sensor data contained
-	* HoTTAdapter* - add file selection hint for *.bin;*.log 
-	* HoTTAdapter2 - fix statistics calculation while capacity doesn't start at zero 
-	* S32 - fix factor to correct external temperatures
-	* S32_2 - initial release for S32 as version 2 displaying all measurement values on a single time line
-	* S32 - fix measurement synchronization references (need device XML replacement)
-	* S32 - fix external temperature factor according customer feedback
-	* Ultramat* single channel charger - fix possible NullPointerException
-	* OpenTx-Telemetry - fix potential exception, add some more mapping parameter, enable visualization control and help
-	* OpenTx-Telemetry - split log according time entries into separate record sets
-	* Futaba-Telemetry - fix parsing exception "---", enable visualization control and help
-	* Futaba-Telemetry - fix EOFException saving OSD with record set different real size
-	* Hitec X1 Red - add initial support (alpha)
-	* WSTech DataVario - replace German description with supposed key
-	* UltraDuoPlus* - refine object key selection by memory name
-
-3) history analysis
-	* Enhance UI
-		>> Add support for triggered values (e.g. motor runtime height)
-		>> Add refresh menu item and shortcut
-		>> Add object key wizard (if accessing new directories) 
-		>> Remove MessageBox "No log files"
-		>> Enhance toggling 'Smart values' by preserving the user selections
-		>> Fix importing from histo table with reversed x axis opens wrong file
-		>> Fix InvalidPathException@_SupplementObjectDirs
-		>> Fix wrong decimal places if switching from histo graphics to histo table
-	* Remove searching in the current import path (is obsolete due to remote log file support)
-	* Enhance performance
-	 	>> Memory cache for aggregated histo data 
-	 	>> Optimized directory scans for graphics refresh 
-	 	>> Avoid multiple vault re-reading from the source log files
-	 	>> Code optimizations to avoid materialization
-	 	>> Remove syncing slave records for incomplete master records
-	 	>> Avoid multiple sha1 hashing
-	 	>> Remove method synchronizing keyword for methods not used in threads
- 	* Support new file extensions separator
 
 
-1) allgemeine Korrekturen/Verbesserungen
-    * korrigiert Rekursion bei der Synchronisation von Kurvenvergleich Datensätzen beim hinzufügen neuer Datensätze
-    * ermögliche gerätespezifische Verzeichnisnamen über Interface-Methode, um Namensabweichungen Gerätenamen zu Verzeichnisnamen zu ermöglichen
-    * Berechnung der Skalenbeschiftung von synchronisierten Messwerten basiert nun auf der Selektion
-    * Startzeit des DataExplorers verkürzt
-    * Bei der Behandlung von Objektschlüsseln wir der Benutzer gefragt
-    * korrigierte Objektschlüsselbehandlung für Kanäle vom Typ Ausgang (Ladegeräte) und ermögliche verschiedenen Schlüssle pro Ausgang
-    * korrigierte Aussage bei der Anzeige der Änderungen bei geladenen Datensätzen
-    * korrigiertes Objektschlüssel Umbenennungs Szenario
-
-2) gerätespezifische Korrekturen/Verbesserungen
-    * HoTTAdapter* - korrigiert 19200 Baud Protokoll "live data", überspring Rx Abfrage, weil die Rx Daten in allen Abfrageantworten enthalten sind
-    * HoTTAdapter* - Hinweis hinzugefügt für die Dateiauswahl für *.bin;*.log
-    * HoTTAdapter2 - korrigierte statische Berechnung über Trigger, wenn manche Werte, speziell Kapazität nicht bei Null anfängt
-    * S32 - korrigierter Faktor zur Korrektur von extern gemessenen Temperaturen
-    * S32_2 - initiale Freigabe eines S32 als Version 2 mit der Anzeige aller Daten auf eine einzigen Zeitlinie, die Trennung in verschiedenen Datensätze ist damit aufgehoben
-    * S32 - korrigierte Messwert-Sychronisations-Referenzen
-    * Ultramat* Ladegeräte mit einem Ausgang - korrigierter Code wegen auftretendem Fehler, der die Aufnahme-Funktion verhinderte
-    * OpenTx-Telemetry - korrigierter Code bezüglich Fehlerbehandlung, zusätzliche Mapping-Parameter, Visualisierungs-Kontrolle hinzugefügt
-    * OpenTx-Telemetry - teile Log in separate Datensätze pro Flug anhand des Zeitstempels
-    * Futaba-Telemetry - korrigierte Fehlerbahndlung bei Syntaxanalyse "---", Visualisierungs-Kontrolle hinzugefügt und Hilfe
-    * Futaba-Telemetry - korrigierte Fehlerbahndlung beim Sichern von OSD-Dateien, wenn Anzahl der Messwerte schwankt
-    * Hitec X1 Red - initiale Unterstützung hinzugefügt (alpha), suche Anwender mit diesem Gerät, die über den DataExplorer aufzeichnen wollen
-    * WSTech DataVario - deutsche Beschreibung mit dem dafür vorgesehenen Schlüssel ersetzt
-    * UltraDuoPlus* - verbesserte Objektschlüsselauswahl anhand des Batteriespeichernamens
-
+1) Allgemeine Korrekturen/Änderungen
+	* Korrektur Berechnung vom Verhältnis Kapazität/Motor-Höhe
+	* Korrektur Java Download URLs in Windows Starter
+	* Neue Geräte XML Schema Version
+	* Anpassungen für Java Laufzeit 8 bis 11
+	* Korrektur [sr #109555] CSV Export benutzt nicht den eingestellten Dezimal-Separator
+	* Korrektur Rohdaten CSV Export 
+	* Korrektur der Fehlerbehandlung beim Verschieben der Kurven Nähe Startzeitstempel
+	* hinzugefügt KMZ Export Menü auf Geräteebene
+	* Korrektur Grafiküberschrift Erneuerung bei Datensatzwechsel
+	* Änderung des Geräteauswahldialoges Übersichtstabulator
+	* Reduktion der extrahierten Geräte XMLs auf die benutzten Geräte
+	* Benutzeroberflächen Politur zur Auswahl von verschiedenen Farbschema
+	* Entfernt den neimals benutzten globalen seriellen Port im Einstellungsdialog
+	
+2) Geräte spezifische Korrekturen/Änderungen
+	* HottAdapter* -  Korrektur der Anzeige vom Wechsel in den Text-Modus, gab es lediglich beim ersten import
+	* HottAdapter* -  Korrektur der Startzeitberechnung im Fall ausschliesslicher Empfänger-Daten
+	* HottAdapter - Korrektur falscher Sequenz beim Import von *.bin und nur ESC Daten
+	* Hitec DRX1 - Unterstützung hinzugefügt (identisch mit Hitex RDX1 Pro ist die 100W Version)
+	* Hitec X1 Red - Unterstützung hinzugefügt
+	* iMax B6 mini - Unterstützung hinzugefügt (Protokoll identisch mit iMax B6 AC V2)
+	* PolaronPro - Korrektur der Zellenspannungsauswertung
+	* Polaron* - Korrektur der Refernz zur Indexposition (wie in verfügbarer Spezifikation)
+	* GPS-Logger2 - Korrektur des Geräte-Visualisierungs-Dialog
+	* GPS-Logger* - Korrektur des Konfigurationsauswahl während des Imports, 
+		Umschalten zu UniLog2 nur wenn $UL2 Einträge gefunden werden, beziehungsweise zu UniLog wenn $UNILOG Einträge gefunden werden, 
+		ansonsten behalte die vorher gewählte Konfiguration 
+	* ArduPilot - initiale Unterstützung basierend auf LogStructure.h
+	* CSV2SereilAdapter - Korrektur potentiell fehlerhaften Thread-Zugriff bei Update GPS bezogener Menüeinträge
+	* Weatronic-Telemetry - Korrektur potentiell Fehler beim lesen von OSD-Dateien mit geringerer Anzahl von Messwerten zur aktuellen Messwertstruktur
+	
 3) Historien-Analyse
-    * Verbesserungen Benutzerschnittstelle
-        >> Unterstützung für Trigger abhängige Werte hinzugefügt (z.B. Motorlaufzeit, Kapazität/Höhenmeter,...)
-        >> Aktualisierung als Menüeintrag und Short-Cut hinzugefügt
-        >> Objektschlüssel-Assistent hinzugefügt (beim Zugriff auf neue Verzeichnisse)
-        >> Anzeige "keine Log-Dateien" entfernt
-        >> verbessertes Umschalten für 'Smart values' und beibehalten der Benutzer gewählten Anzeige
-        >> korrigierte Importfunktion bei Auswahl über die Tabellenansicht
-        >> korrigierte Fehlermeldung bei Verzeichnisfehler@_SupplementObjectDirs
-        >> korrigierte Dezimalstellen beim Umschalten zwischen Historien-Grafik und -Tabelle
-    * Suche im Importpfad entfernt (ist unnötig wegen Unterstützung von außerhalb liegenden Dateien)
-    * Verbesserte Geschwindigkeit
-         >> Zwischenspeicherung für bereits aufbereitete Daten
-         >> Optimierung von Verzeichnissuche für die grafische Aktualisierung
-         >> Verhinderung von Mehrfachlesen von Quell-Dateien
-         >> unnötige Synchronisation entfernt
-         >> Verhinderung von mehrfachem sha1 hashing
-         >> Methoden-Synchronisierung entfernt, für Funktionen außerhalb von Threads
-     * Unterstützung für neue Datei-Endung-Separierung
+	# Flexibilität
+	 .. OpenStreetMap GeoCodes (wird gegenüber GoogleMaps bevorzugt)
+	      -> Löschen des Positions-Cache erforderlich über 'Lösche Cache'
+     .. Warnung und Ereignis Auswertung hinzugefügt HoTTAdapter1/2
+	# Verarbeitungsgeschwindigkeit
+		.. Ausnutzung Multicore-Prozessoren
+		.. Verbesserte HoTTAdapter2 Import Geschwindigkeit
+			- Reduktion des Abtast-Rate im VErgleich zum nativen Imports und HoTTAdapter2
+		.. Neue Historien-Cache Versionmit verbessertem Lesezugriff
+		.. diverse Optimierungen
+			- Verhinderung von synchronisierten Methodenzugriffs die den Ablauf behindern
+			- Verbesserte Quantile Klassen mit besserer Geschwindigkeit
+			- Verbesserte Behandlung von Ausreißern bei der Quantile Untersuchungsgesamtheit
+	# Verarbeitung
+		.. Korrektur bei der Messung von ungültigen Werten
 	

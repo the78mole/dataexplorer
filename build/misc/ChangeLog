@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.3.4 - xx yyy 2018
+Version 3.3.4 - 30 Nov 2018
 Generic changes/fixes
 	* fix ratio calculation triggered used capacity to reached motor altitude
 	* update Java download URLs in Windows launcher
@@ -37,32 +37,18 @@ History analysis
 	.. OpenStreetMap GeoCodes (now prioritized over GoogleMaps)
 	      ! -> Clear the location cache via the 'Clear cache' button
     .. Add warning and event bits support to HoTTAdapter1/2
-		>> WB pls delete in the official version
-		- Add raw trail types and warning bits consolidation (V34)
-		- Add raw scores support
-		- Add binary packages builds
 	.. Facilitate using the jars in other systems
-		>> WB pls delete in the official version
-		- Reduce Settings class dependencies from the gde.ui package
 		- Add support for DataExplorer instantiation without UI
 	# Performance
 	.. Leverage multicore processors
-		>> WB pls delete in the official version
-		- Enhance performance via threadsafe HoTTbinHistoReaders
-		- isFilterTextModus is active permanently for histo readers
-		- Use analyzer objects
-		- Use pickerParameters objects
 		- threadsafe histo functionality
 	.. Boost HoTTAdapter2 import speed
-		>> WB pls delete in the official version
 		- Fix the excessive sampling rate with native imports and HoTTAdapter2
 		- Reduce the oversampling rate with native imports and HoTTAdapter2
 	.. New histo cache version with accelerated read access
-		>> WB pls delete in the official version
 		- Enhance performance via threadsafe HoTTbinHistoReaders
 		- Add settings entry for xml cache
 	.. diverse optimizations
-		>> WB pls delete in the official version
 		- Avoid synchronized method performance penalty
 		- Enhance the Quantile classes for better performance
 		- Enhance removing constant outliers from the quantile population
@@ -70,7 +56,6 @@ History analysis
 	.. Fix start timestamp calculation for HoTT native logs
 	.. Fix measuring illegal argument exception for measuring with null values
 	.. numerous improvements 
-		>> WB pls delete in the official version
 		- Harmonize the scores dealing with sensors V34
 		- Harmonize the sensor score value
 		- Fix Junit channel number setting not detected by some readers
