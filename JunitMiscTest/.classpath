@@ -15,7 +15,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/GPXAdapter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/IGCAdapter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/OpenTxTelemetry"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/IISI-Cockpit V2"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/IISI Cockpit V2"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/AkkuMaster"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CSV2SerialAdapter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/eStation"/>
@@ -39,7 +39,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Weatronic-Telemetry"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/WStechVario"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Devo-Telemetry"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CSVImport"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CSVImportAdapter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Pulsar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/S32"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UniTrend"/>

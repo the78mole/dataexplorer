@@ -207,7 +207,7 @@
 		<ant antfile="build.xml" target="clean" dir="JetiAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="IGCAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="GPXAdapter" inheritall="true" />
-		<ant antfile="build.xml" target="clean" dir="IISI-Cockpit V2" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="IISI Cockpit V2" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="FutabaTelemetry" inheritall="true" />
 		<!-- ant antfile="build.xml" target="clean" dir="PowerLab" inheritall="true" / -->
 		<ant antfile="build.xml" target="clean" dir="Polaron" inheritall="true" />
@@ -219,7 +219,7 @@
 		<ant antfile="build.xml" target="clean" dir="UniTrend" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="Pulsar" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="Devo-Telemetry" inheritall="true" />
-		<ant antfile="build.xml" target="clean" dir="CSVImport" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="CSVImportAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="ArduPilot" inheritall="true" />
 		<!-- add new device here -->
 	</target>
@@ -393,7 +393,7 @@
 		<ant antfile="build.xml" target="package" dir="JetiAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="IGCAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="GPXAdapter" inheritall="true" />
-		<ant antfile="build.xml" target="package" dir="IISI-Cockpit V2" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="IISI Cockpit V2" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="FutabaTelemetry" inheritall="true" />
 		<!-- ant antfile="build.xml" target="package" dir="PowerLab" inheritall="true" / -->
 		<ant antfile="build.xml" target="package" dir="Polaron" inheritall="true" />
@@ -405,7 +405,7 @@
 		<ant antfile="build.xml" target="package" dir="UniTrend" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="Pulsar" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="Devo-Telemetry" inheritall="true" />
-		<ant antfile="build.xml" target="package" dir="CSVImport" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="CSVImportAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="ArduPilot" inheritall="true" />
 		<!-- add new device here -->
 	</target>
@@ -435,7 +435,7 @@
 		<ant antfile="build.xml" target="nonui_package" dir="JetiAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="IGCAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="GPXAdapter" inheritall="true" />
-		<ant antfile="build.xml" target="nonui_package" dir="IISI-Cockpit V2" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="IISI Cockpit V2" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="FutabaTelemetry" inheritall="true" />
 		<!-- ant antfile="build.xml" target="nonui_package" dir="PowerLab" inheritall="true" / -->
 		<ant antfile="build.xml" target="nonui_package" dir="Polaron" inheritall="true" />
@@ -447,7 +447,7 @@
 		<ant antfile="build.xml" target="nonui_package" dir="UniTrend" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="Pulsar" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="Devo-Telemetry" inheritall="true" />
-		<ant antfile="build.xml" target="nonui_package" dir="CSVImport" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="CSVImportAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="ArduPilot" inheritall="true" />
 		<!-- add new device here -->
 	</target>
@@ -476,7 +476,7 @@
 			<include name="JetiAdapter/build/*.jar" />
 			<include name="IGCAdapter/build/*.jar" />
 			<include name="GPXAdapter/build/*.jar" />
-			<include name="IISI-Cockpit V2/build/*.jar" />
+			<include name="IISI Cockpit V2/build/*.jar" />
 			<include name="FutabaTelemetry/build/*.jar" />
 			<!-- include name="PowerLab/build/*.jar" / -->
 			<include name="OpenTxTelemetry/build/*.jar" />
@@ -488,7 +488,7 @@
 			<include name="UniTrend/build/*.jar" />
 			<include name="Pulsar/build/*.jar" />
 			<include name="Devo-Telemetry/build/*.jar" />
-			<include name="CSVImport/build/*.jar" />
+			<include name="CSVImportAdapter/build/*.jar" />
 			<include name="ArduPilot/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
@@ -519,7 +519,7 @@
 			<include name="JetiAdapter/build/*NonUi*.jar" />
 			<include name="IGCAdapter/build/*NonUi*.jar" />
 			<include name="GPXAdapter/build/*NonUi*.jar" />
-			<include name="IISI-Cockpit V2/build/*NonUi*.jar" />
+			<include name="IISI Cockpit V2/build/*NonUi*.jar" />
 			<include name="FutabaTelemetry/build/*NonUi*.jar" />
 			<!-- include name="PowerLab/build/*NonUi*.jar" / -->
 			<include name="OpenTxTelemetry/build/*NonUi*.jar" />
@@ -531,7 +531,7 @@
 			<include name="UniTrend/build/*NonUi*.jar" />
 			<include name="Pulsar/build/*NonUi*.jar" />
 			<include name="Devo-Telemetry/build/*NonUi*.jar" />
-			<include name="CSVImport/build/*NonUi*.jar" />
+			<include name="CSVImportAdapter/build/*NonUi*.jar" />
 			<include name="ArduPilot/build/*NonUi*.jar" />
 			<!-- add new device here -->
 		</patternset>
