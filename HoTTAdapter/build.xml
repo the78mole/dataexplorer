@@ -70,12 +70,6 @@
 		        <pathelement location="../DataExplorer/build/DataExplorer.jar"/>
 		    </classpath>
 		</java>
-		<java classname="gde.tools.ExportServiceBuilder" outputproperty="export.services">
-		    <arg value="${basedir}"/>
-		    <classpath>
-		        <pathelement location="../DataExplorer/build/DataExplorer.jar"/>
-		    </classpath>
-		</java>
 		<manifest file="src/META-INF/MANIFEST.MF">
     		<attribute name="Implementation-Version" value="${version.num}"/>
 			<attribute name="Created-By" value="${user.name}"/>

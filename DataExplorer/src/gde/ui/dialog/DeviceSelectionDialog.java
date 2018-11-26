@@ -766,7 +766,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				DeviceConfiguration devConfig = this.deviceConfigurations.get(deviceKey);
 
 				TableItem item = new TableItem(this.deviceTable, SWT.NULL);
-				item.setText(new String[] { exportService.getName(), exportService.getManufacturer(), exportService.getDataSource() });
+				item.setText(new String[] { exportService.getName(), exportService.getManufacturer(), exportService.getDataFeed() });
 				if (devConfig != null && devConfig.isUsed()) {
 					item.setChecked(true);
 				}

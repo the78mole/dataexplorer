@@ -21,14 +21,14 @@ package gde.config;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import gde.GDE;
-import gde.device.InputTypes;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
 
 /**
  * simple structure of exported services as defined for each device implemented in a device plug-in jar manifest
@@ -36,18 +36,51 @@ import gde.device.InputTypes;
  */
 public class ExportService {
 
-	final String									name;
-	final String									manufacturer;
-	final Collection<InputTypes>	inputTypes;
-	final String									jar;
+	public enum DataFeed {
+
+		FILE(MessageIds.GDE_MSGT0956), //
+		SERIAL_IO(MessageIds.GDE_MSGT0955), //
+		NATIVE_USB(MessageIds.GDE_MSGT0957);
+
+		private String messageId;
+
+		private DataFeed(String messageId) {
+			this.messageId = messageId;
+		}
+
+		public String value() {
+			return name();
+		}
+
+		public String displayText() {
+			return Messages.getString(this.messageId);
+		}
+
+		public static DataFeed fromValue(String v) {
+			return valueOf(v);
+		}
+
+		public static EnumSet<DataFeed> fromStringArray(String[] values) {
+			EnumSet<DataFeed> dataFeeds = EnumSet.noneOf(DataFeed.class);
+			for (String value : values) {
+				dataFeeds.add(DataFeed.valueOf(value));
+			}
+			return dataFeeds;
+		}
+	}
+
+	final String				name;
+	final String				manufacturer;
+	final Set<DataFeed>	dataFeeds;
+	final String				jar;
 
 	/**
 	 * Create from the device properties.
 	 */
-	public ExportService(String name, String manufacturer, Collection<InputTypes> inputTypes, String jarPath) {
+	public ExportService(String name, String manufacturer, Set<DataFeed> dataFeeds, String jarPath) {
 		this.name = name;
 		this.manufacturer = manufacturer;
-		this.inputTypes = inputTypes;
+		this.dataFeeds = dataFeeds;
 		this.jar = jarPath;
 	}
 
@@ -60,17 +93,7 @@ public class ExportService {
 		this.name = temp[0].trim();
 		this.manufacturer = temp[1].trim();
 		String[] inputTexts = temp[2].trim().split(GDE.STRING_SEMICOLON);
-		// todo remove this if clause after functional test with old jars
-		if (!Arrays.asList(InputTypes.valuesAsStingArray()).contains(inputTexts[0])) {
-			// todo remove
-			this.inputTypes = EnumSet.noneOf(InputTypes.class);
-			for (String inputText : inputTexts) {
-				this.inputTypes.add(inputText.equals("file_import") ? InputTypes.FILE_IO : InputTypes.SERIAL_IO);
-			}
-		} else {
-			// keep only this line
-			this.inputTypes = InputTypes.fromStringArray(inputTexts);
-		}
+		this.dataFeeds = DataFeed.fromStringArray(inputTexts);
 		this.jar = jarPath;
 	}
 
@@ -82,8 +105,8 @@ public class ExportService {
 		return manufacturer;
 	}
 
-	public String getDataSource() {
-		return inputTypes.stream().map(InputTypes::displayText).collect(Collectors.joining(GDE.STRING_SEMICOLON));
+	public String getDataFeed() {
+		return dataFeeds.stream().map(DataFeed::displayText).collect(Collectors.joining(GDE.STRING_SEMICOLON));
 	}
 
 	public JarFile getJarFile() throws IOException {
@@ -95,12 +118,12 @@ public class ExportService {
 	}
 
 	public String getDisplayText() {
-		return String.join(GDE.STRING_COLON, name, manufacturer, getDataSource());
+		return String.join(GDE.STRING_COLON, name, manufacturer, getDataFeed());
 	}
 
 	@Override
 	public String toString() {
-		String neutralSource = inputTypes.stream().map(InputTypes::name).collect(Collectors.joining(GDE.STRING_SEMICOLON));
+		String neutralSource = dataFeeds.stream().map(DataFeed::name).collect(Collectors.joining(GDE.STRING_SEMICOLON));
 		return String.join(GDE.STRING_COLON, name, manufacturer, neutralSource);
 	}
 

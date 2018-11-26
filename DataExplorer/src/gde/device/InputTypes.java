@@ -15,8 +15,6 @@ import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
 import gde.GDE;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
 
 
 /**
@@ -38,26 +36,16 @@ import gde.messages.Messages;
 @XmlEnum
 public enum InputTypes {
 
-		FILE_IO(MessageIds.GDE_MSGT0956), //
-		SERIAL_IO(MessageIds.GDE_MSGT0955);
+  FILE_IO,
+  SERIAL_IO;
 
-		private String messageId;
+  public String value() {
+      return name();
+  }
 
-		private InputTypes(String messageId) {
-			this.messageId = messageId;
-		}
-
-		public String value() {
-        return name();
-    }
-
-		public String displayText() {
-			return Messages.getString(this.messageId);
-		}
-
-    public static InputTypes fromValue(String v) {
-        return valueOf(v);
-    }
+  public static InputTypes fromValue(String v) {
+      return valueOf(v);
+  }
 
   	public static String[] valuesAsStingArray() {
   		StringBuilder sb = new StringBuilder();

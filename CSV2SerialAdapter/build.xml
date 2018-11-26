@@ -31,7 +31,6 @@
 	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}" />
 
 	<property name="module.output" location="classes"/>
-	<property name="export.services" value="CSV2Serial1:WB:file_import, CSV2Serial2:WB:serial_port;file_import, AV4ms_FV_762:Friedrich Mössinger:serial_port;file_import, USB-WDE1:ELV GmbH:serial_port,4D-Akkumonitor:4D.control:file_import, Herkules_III_Telemetry:HerSi Electronic GmbH:file_import"/>
 
 	<path id="compile.classpath">
 		<pathelement location="../DataExplorer/build/DataExplorer.jar" />

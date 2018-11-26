@@ -23,7 +23,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,7 @@ import com.sun.istack.Nullable;
 import gde.DataAccess;
 import gde.GDE;
 import gde.config.ExportService;
+import gde.config.ExportService.DataFeed;
 import gde.device.InputTypes;
 import gde.log.Level;
 import gde.log.Logger;
@@ -55,6 +58,8 @@ public class ExportServiceBuilder {
 	private static final String	DEVICE_TAG								= "Device";
 	private static final String	DEVICE_NAME_TAG						= "name";
 	private static final String	DEVICE_MANUFACTURER_TAG		= "manufacturer";
+	private static final String	SERIAL_PORT_TAG						= "SerialPort";
+	private static final String	USB_PORT_TAG							= "UsbPort";
 	private static final String	DATA_BLOCK_TAG						= "DataBlock";
 	private static final String	DATA_BLOCK_FORMAT_TAG			= "format";
 	private static final String	DATA_BLOCK_INPUT_TYPE_TAG	= "inputType";
@@ -122,7 +127,7 @@ public class ExportServiceBuilder {
 	@Nullable
 	public ExportService getService(Path basePath, String projectName, String propertiesFileName) {
 		String[] deviceValues = new String[] { "", "" };
-		List<InputTypes> inputTypes = new ArrayList<InputTypes>();
+		Set<DataFeed> dataFeeds = EnumSet.noneOf(DataFeed.class);
 		final ExportService exportService;
 
 		try {
@@ -134,8 +139,9 @@ public class ExportServiceBuilder {
 				private boolean	isDevice						= false;
 				private boolean	isName							= false;
 				private boolean	isManufacturer			= false;
+				private boolean	existsSerialPort		= false;
+				private boolean	existsUsbPort				= false;
 				private boolean	isDataBlock					= false;
-				private boolean	isFormat						= false;
 				private String	deviceName					= "";
 				private String	deviceManufacturer	= "";
 
@@ -154,23 +160,38 @@ public class ExportServiceBuilder {
 						isManufacturer = true;
 						break;
 
+					case SERIAL_PORT_TAG:
+						existsSerialPort = true;
+						break;
+
+					case USB_PORT_TAG:
+						existsUsbPort = true;
+						break;
+
 					case DATA_BLOCK_TAG:
 						isDataBlock = true;
 						break;
 
 					case DATA_BLOCK_FORMAT_TAG:
-						isFormat = true;
 						if (isDataBlock) {
 							for (int i = 0; i < attributes.getLength(); i++) {
 								String string = attributes.getQName(i);
 								if (string.equals(DATA_BLOCK_INPUT_TYPE_TAG)) {
-									if (inputTypes.isEmpty()) {
+									if (dataFeeds.isEmpty()) {
 										deviceValues[0] = deviceName;
 										deviceValues[1] = deviceManufacturer;
 									}
 									String value = attributes.getValue(i);
-									inputTypes.add(InputTypes.valueOf(value));
-									log.log(Level.FINE, "inputType =", value);
+									if (InputTypes.fromValue(value) == InputTypes.FILE_IO) {
+										dataFeeds.add(DataFeed.FILE);
+									} else if (InputTypes.fromValue(value) == InputTypes.SERIAL_IO) {
+										if (existsSerialPort) {
+											dataFeeds.add(DataFeed.SERIAL_IO);
+										} else if (existsUsbPort) {
+											dataFeeds.add(DataFeed.NATIVE_USB);
+										}
+									}
+									log.log(Level.FINE, "dataFeed =", value);
 								}
 							}
 						}
@@ -192,10 +213,6 @@ public class ExportServiceBuilder {
 
 					case DATA_BLOCK_TAG:
 						isDataBlock = false;
-						break;
-
-					case DATA_BLOCK_FORMAT_TAG:
-						isFormat = false;
 						break;
 
 					default:
@@ -230,7 +247,7 @@ public class ExportServiceBuilder {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 
-		exportService = inputTypes.isEmpty() ? null : new ExportService(deviceValues[0], deviceValues[1], inputTypes, projectName + ".jar");
+		exportService = dataFeeds.isEmpty() ? null : new ExportService(deviceValues[0], deviceValues[1], dataFeeds, projectName + ".jar");
 		return exportService;
 	}
 
