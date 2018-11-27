@@ -12,6 +12,7 @@ import static gde.messages.MessageIds.GDE_MSGT0776;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
@@ -78,129 +79,135 @@ import gde.messages.Messages;
 @XmlEnum
 public enum TrailTypes {
 
+	//@formatter:off
+
 	@XmlEnumValue("real_avg")
-	REAL_AVG(0, false, Messages.getString(MessageIds.GDE_MSGT0750)), // average
+	REAL_AVG(0, false, MessageIds.GDE_MSGT0750),
 	@XmlEnumValue("real_count")
-	REAL_COUNT(12, false, Messages.getString(MessageIds.GDE_MSGT0751)), // counter
+	REAL_COUNT(12, false, MessageIds.GDE_MSGT0751), // counter
 	@XmlEnumValue("real_max")
-	REAL_MAX(1, false, Messages.getString(MessageIds.GDE_MSGT0754)), //
+	REAL_MAX(1, false, MessageIds.GDE_MSGT0754),
 	@XmlEnumValue("real_min")
-	REAL_MIN(2, false, Messages.getString(MessageIds.GDE_MSGT0755)), //
+	REAL_MIN(2, false, MessageIds.GDE_MSGT0755),
 	@XmlEnumValue("real_sd")
-	REAL_SD(3, true, Messages.getString(MessageIds.GDE_MSGT0756)), //
+	REAL_SD(3, true, MessageIds.GDE_MSGT0756),
 	@XmlEnumValue("real_first")
-	REAL_FIRST(4, false, Messages.getString(MessageIds.GDE_MSGT0752)), //
+	REAL_FIRST(4, false, MessageIds.GDE_MSGT0752),
 	@XmlEnumValue("real_last")
-	REAL_LAST(5, false, Messages.getString(MessageIds.GDE_MSGT0753)), //
+	REAL_LAST(5, false, MessageIds.GDE_MSGT0753),
 	@XmlEnumValue("real_sum_triggered")
-	REAL_SUM_TRIGGERED(6, true, Messages.getString(MessageIds.GDE_MSGT0758)), //
+	REAL_SUM_TRIGGERED(6, true, MessageIds.GDE_MSGT0758),
 	@XmlEnumValue("real_max_ratio_triggered")
-	REAL_MAX_RATIO_TRIGGERED(9, true, Messages.getString(MessageIds.GDE_MSGT0761)), //
+	REAL_MAX_RATIO_TRIGGERED(9, true, MessageIds.GDE_MSGT0761),
 	@XmlEnumValue("real_time_sum_triggered")
-	REAL_TIME_SUM_TRIGGERED(7, true, Messages.getString(MessageIds.GDE_MSGT0759)), //
+	REAL_TIME_SUM_TRIGGERED(7, true, MessageIds.GDE_MSGT0759),
 	@XmlEnumValue("real_count_triggered")
-	REAL_COUNT_TRIGGERED(10, true, Messages.getString(MessageIds.GDE_MSGT0757)), //
+	REAL_COUNT_TRIGGERED(10, true, MessageIds.GDE_MSGT0757),
 	@XmlEnumValue("real_sum")
-	REAL_SUM(11, true, Messages.getString(MessageIds.GDE_MSGT0762)), //
+	REAL_SUM(11, true, MessageIds.GDE_MSGT0762),
 
 	@XmlEnumValue("avg")
-	AVG(13, Messages.getString(MessageIds.GDE_MSGT0763), new boolean[0]), // average with zeros and without sigma fringe outliers
+	AVG(13, MessageIds.GDE_MSGT0763), // average with zeros and without sigma fringe outliers
 	@XmlEnumValue("max")
-	MAX(14, Messages.getString(MessageIds.GDE_MSGT0764), new boolean[0]), // maximum with zeros and without sigma fringe outliers
+	MAX(14, MessageIds.GDE_MSGT0764), // maximum with zeros and without sigma fringe outliers
 	@XmlEnumValue("min")
-	MIN(15, Messages.getString(MessageIds.GDE_MSGT0765), new boolean[0]), // minimum with zeros and without sigma fringe outliers
+	MIN(15, MessageIds.GDE_MSGT0765), // minimum with zeros and without sigma fringe outliers
 	@XmlEnumValue("sd")
-	SD(16, Messages.getString(MessageIds.GDE_MSGT0766), new boolean[0]), // sigma with zeros and without sigma fringe outliers
+	SD(16, MessageIds.GDE_MSGT0766), // sigma with zeros and without sigma fringe outliers
 	@XmlEnumValue("q0")
-	Q0(17, Messages.getString(MessageIds.GDE_MSGT0767), new boolean[0]), // quantile 0 is q(0%) which is the minimum
+	Q0(17, MessageIds.GDE_MSGT0767), // quantile 0 is q(0%) which is the minimum
 	@XmlEnumValue("q1")
-	Q1(18, Messages.getString(MessageIds.GDE_MSGT0768), new boolean[0]), // quantile 1 is q(25%)
+	Q1(18, MessageIds.GDE_MSGT0768), // quantile 1 is q(25%)
 	@XmlEnumValue("q2")
-	Q2(19, Messages.getString(MessageIds.GDE_MSGT0769), new boolean[0]), // quantile 2 is q(50%) which is the median
+	Q2(19, MessageIds.GDE_MSGT0769), // quantile 2 is q(50%) which is the median
 	@XmlEnumValue("q3")
-	Q3(20, Messages.getString(MessageIds.GDE_MSGT0770), new boolean[0]), // quantile 3 is q(75%)
+	Q3(20, MessageIds.GDE_MSGT0770), // quantile 3 is q(75%)
 	@XmlEnumValue("q4")
-	Q4(21, Messages.getString(MessageIds.GDE_MSGT0771), new boolean[0]), // quantile 4 is q(100%) which is the maximum
+	Q4(21, MessageIds.GDE_MSGT0771), // quantile 4 is q(100%) which is the maximum
 	@XmlEnumValue("q_25_permille")
-	Q_25_PERMILLE(22, Messages.getString(MessageIds.GDE_MSGT0772), new boolean[0]), // octile 1 is q(12,5%)
+	Q_25_PERMILLE(22, MessageIds.GDE_MSGT0772), // octile 1 is q(12,5%)
 	@XmlEnumValue("q_975_permille")
-	Q_975_PERMILLE(23, Messages.getString(MessageIds.GDE_MSGT0773), new boolean[0]), // octile 7 is q(87,5%)
+	Q_975_PERMILLE(23, MessageIds.GDE_MSGT0773), // octile 7 is q(87,5%)
 	@XmlEnumValue("q_lower_whisker")
-	Q_LOWER_WHISKER(24, Messages.getString(MessageIds.GDE_MSGT0774), new boolean[0]), // quantile of the closest value to the 4 * IQR lower limit
+	Q_LOWER_WHISKER(24, MessageIds.GDE_MSGT0774), // quantile of the closest value to the 4 * IQR lower limit
 	@XmlEnumValue("q_upper_whisker")
-	Q_UPPER_WHISKER(25, Messages.getString(MessageIds.GDE_MSGT0775), new boolean[0]), // quantile of the closest value to the 4 * IQR upper limit
+	Q_UPPER_WHISKER(25, MessageIds.GDE_MSGT0775), // quantile of the closest value to the 4 * IQR upper limit
 	@XmlEnumValue("first")
-	FIRST(30, Messages.getString(GDE_MSGT0776), new boolean[0]),
+	FIRST(30, GDE_MSGT0776),
 	@XmlEnumValue("last")
-	LAST(31, Messages.getString(MessageIds.GDE_MSGT0777), new boolean[0]),
+	LAST(31, MessageIds.GDE_MSGT0777),
 	@XmlEnumValue("sum")
-	SUM(32, Messages.getString(MessageIds.GDE_MSGT0778), new boolean[0]),
+	SUM(32, MessageIds.GDE_MSGT0778),
 	@XmlEnumValue("count")
-	COUNT(33, Messages.getString(MessageIds.GDE_MSGT0779), new boolean[0]),
+	COUNT(33, MessageIds.GDE_MSGT0779),
 	@XmlEnumValue("raw_max")
-	RAW_MAX(34, Messages.getString(MessageIds.GDE_MSGT0760), new boolean[0]),
+	RAW_MAX(34, MessageIds.GDE_MSGT0760),
 	@XmlEnumValue("raw_bits")
-	RAW_BITS(35, Messages.getString(MessageIds.GDE_MSGT0801), new boolean[0]),
+	RAW_BITS(35, MessageIds.GDE_MSGT0801),
 
 	@XmlEnumValue("suite_real_avg_sd")
-	SUITE_REAL_AVG_SD(101, Messages.getString(MessageIds.GDE_MSGT0780), false, new TrailTypes[] { REAL_AVG, REAL_SD, REAL_SD }), // avg, avg - n times sd, avg + n times sd
+	SUITE_REAL_AVG_SD(101, MessageIds.GDE_MSGT0780, false, new TrailTypes[] { REAL_AVG, REAL_SD, REAL_SD }), // avg, avg - n times sd, avg + n times sd
 	@XmlEnumValue("suite_real_avg_min_max")
-	SUITE_REAL_AVG_MIN_MAX(102, Messages.getString(MessageIds.GDE_MSGT0781), false, new TrailTypes[] { REAL_AVG, REAL_MIN, REAL_MAX }), //
+	SUITE_REAL_AVG_MIN_MAX(102, MessageIds.GDE_MSGT0781, false, new TrailTypes[] { REAL_AVG, REAL_MIN, REAL_MAX }),
 	@XmlEnumValue("suite_avg_sd")
-	SUITE_AVG_SD(108, Messages.getString(MessageIds.GDE_MSGT0782), true, new TrailTypes[] { AVG, SD, SD }), // avg, avg - n times sd, avg + n times sd
+	SUITE_AVG_SD(108, MessageIds.GDE_MSGT0782, true, new TrailTypes[] { AVG, SD, SD }), // avg, avg - n times sd, avg + n times sd
 	@XmlEnumValue("suite_avg_min_max")
-	SUITE_AVG_MIN_MAX(109, Messages.getString(MessageIds.GDE_MSGT0783), true, new TrailTypes[] { AVG, MIN, MAX }), //
+	SUITE_AVG_MIN_MAX(109, MessageIds.GDE_MSGT0783, true, new TrailTypes[] { AVG, MIN, MAX }),
 	@XmlEnumValue("suite_box_plot")
-	SUITE_BOX_PLOT(104, Messages.getString(MessageIds.GDE_MSGT0784), true, new TrailTypes[] { Q0, Q1, Q2, Q3, Q4, Q_LOWER_WHISKER, Q_UPPER_WHISKER }), // 4 * IQR range (John. W. Tukey)
+	SUITE_BOX_PLOT(104, MessageIds.GDE_MSGT0784, true, new TrailTypes[] { Q0, Q1, Q2, Q3, Q4, Q_LOWER_WHISKER, Q_UPPER_WHISKER }), // 4 * IQR range (John. W. Tukey)
 	@XmlEnumValue("suite_box_plot_95")
-	SUITE_BOX_PLOT_95(105, Messages.getString(MessageIds.GDE_MSGT0785), true, new TrailTypes[] { Q0, Q1, Q2, Q3, Q4, Q_25_PERMILLE, Q_975_PERMILLE }), // 95% range
+	SUITE_BOX_PLOT_95(105, MessageIds.GDE_MSGT0785, true, new TrailTypes[] { Q0, Q1, Q2, Q3, Q4, Q_25_PERMILLE, Q_975_PERMILLE }),
 	@XmlEnumValue("suite_q0_q2_q4")
-	SUITE_Q0_Q2_Q4(106, Messages.getString(MessageIds.GDE_MSGT0786), true, new TrailTypes[] { Q2, Q0, Q4 }), //
+	SUITE_Q0_Q2_Q4(106, MessageIds.GDE_MSGT0786, true, new TrailTypes[] { Q2, Q0, Q4 }),
 	@XmlEnumValue("suite_q1_q2_q3")
-	SUITE_Q1_Q2_Q3(107, Messages.getString(MessageIds.GDE_MSGT0787), true, new TrailTypes[] { Q2, Q1, Q3 });
+	SUITE_Q1_Q2_Q3(107, MessageIds.GDE_MSGT0787, true, new TrailTypes[] { Q2, Q1, Q3 });
 
-	public static final int										RANGE_PLOT_SIZE		= 3;
-	public static final int										BOX_PLOT_SIZE			= 7;
+	//@formatter:on
 
-	private final int													displaySequence;
-	private final boolean											isTriggered;
-	private final String											displayName;
-	private final boolean											isSmartStatistics;
-	private final int													suiteMasterIndex;
-	private final int													suiteLowerIndex;
-	private final int													suiteUpperIndex;
+	public static final int														RANGE_PLOT_SIZE		= 3;
+	public static final int														BOX_PLOT_SIZE			= 7;
+
+	private final int																	displaySequence;
+	private final boolean															isTriggered;
+	private final String															displayId;
+	private final boolean															isSmartStatistics;
+	private final TrailTypes[]												suiteMembers;
+	private final int																	suiteMasterIndex;
+	private final int																	suiteLowerIndex;
+	private final int																	suiteUpperIndex;
 
 	/**
 	 * Use this instead of values() to avoid repeatedly cloning actions.
 	 */
-	public static final TrailTypes						VALUES[]					= values();
+	public static final TrailTypes										VALUES[]					= values();
 	/**
 	 * Trails do not use the value's (or synchronized value's) graphics scale and define its own scale max/min.
 	 */
-	public static final EnumSet<TrailTypes>		ODD_RANGE_TRAILS	= EnumSet.noneOf(TrailTypes.class);
+	public static final EnumSet<TrailTypes>						ODD_RANGE_TRAILS	= EnumSet.noneOf(TrailTypes.class);
 	/**
 	 * Trails not elected for display except the trail display is set to exposed.
 	 */
-	public static final EnumSet<TrailTypes>		OPTIONAL_TRAILS	= EnumSet.noneOf(TrailTypes.class);
+	public static final EnumSet<TrailTypes>						OPTIONAL_TRAILS		= EnumSet.noneOf(TrailTypes.class);
 	/**
 	 * Values array in display order.
 	 */
-	public static final TrailTypes						DISPLAY_VALUES[]	= values().clone();									// todo implement
+	public static final TrailTypes										DISPLAY_VALUES[]	= values().clone();
 
-	private static final EnumSet<TrailTypes>	PRIMITIVES				= EnumSet.noneOf(TrailTypes.class);
-	private static final EnumSet<TrailTypes>	SUITES						= EnumSet.noneOf(TrailTypes.class);
-	private static final EnumSet<TrailTypes>	SUBSTITUTES				= EnumSet.noneOf(TrailTypes.class);
+	private static final EnumSet<TrailTypes>					PRIMITIVES				= EnumSet.noneOf(TrailTypes.class);
+	private static final EnumSet<TrailTypes>					SUITES						= EnumSet.noneOf(TrailTypes.class);
+	private static final EnumSet<TrailTypes>					SUBSTITUTES				= EnumSet.noneOf(TrailTypes.class);
 
-	private TrailTypes[]											suiteMembers			= new TrailTypes[0];
+	private static final Function<TrailTypes, String>	MSG								= t -> Messages.getString(t.displayId);
 
 	/**
 	 * For legacy trails (no smart values).
 	 */
-	private TrailTypes(int displaySequence, boolean isTriggered, String displayName) {
+	private TrailTypes(int displaySequence, boolean isTriggered, String displayId) {
 		this.displaySequence = displaySequence;
 		this.isTriggered = isTriggered;
-		this.displayName = displayName;
+		this.displayId = displayId;
 		this.isSmartStatistics = false;
+		this.suiteMembers = new TrailTypes[0];
 		this.suiteMasterIndex = 0;
 		this.suiteLowerIndex = 0;
 		this.suiteUpperIndex = 0;
@@ -209,11 +216,12 @@ public enum TrailTypes {
 	/**
 	 * For Smart values.
 	 */
-	private TrailTypes(int displaySequence, String displayName, boolean[] flags) {
+	private TrailTypes(int displaySequence, String displayId) {
 		this.displaySequence = displaySequence;
-		this.isTriggered = flags.length > 0 ? flags[0] : false;
-		this.displayName = displayName;
+		this.isTriggered = false;
+		this.displayId = displayId;
 		this.isSmartStatistics = true;
+		this.suiteMembers = new TrailTypes[0];
 		this.suiteMasterIndex = 0;
 		this.suiteLowerIndex = 0;
 		this.suiteUpperIndex = 0;
@@ -222,10 +230,10 @@ public enum TrailTypes {
 	/**
 	 * For suites.
 	 */
-	private TrailTypes(int displaySequence, String displayName, boolean isSmartStatistics, TrailTypes[] suiteMembers) {
+	private TrailTypes(int displaySequence, String displayId, boolean isSmartStatistics, TrailTypes[] suiteMembers) {
 		this.displaySequence = displaySequence;
 		this.isTriggered = false;
-		this.displayName = displayName;
+		this.displayId = displayId;
 		this.isSmartStatistics = isSmartStatistics;
 		this.suiteMembers = suiteMembers;
 		if (isBoxPlot()) {
@@ -266,7 +274,7 @@ public enum TrailTypes {
 	public static TrailTypes fromDisplayName(String displayName) {
 		if (displayName != null) {
 			for (TrailTypes trailType : TrailTypes.VALUES) {
-				if (displayName.equalsIgnoreCase(trailType.displayName)) {
+				if (displayName.equalsIgnoreCase(MSG.apply(trailType))) {
 					return trailType;
 				}
 			}
@@ -335,7 +343,7 @@ public enum TrailTypes {
 	}
 
 	public String getDisplayName() {
-		return this.displayName;
+		return MSG.apply(this);
 	}
 
 	public String getDisplayNameWithTriggerText(IChannelItem channelItem) {
@@ -350,9 +358,9 @@ public enum TrailTypes {
 			} else if (this.equals(TrailTypes.REAL_MAX_RATIO_TRIGGERED)) {
 				return getDeviceXmlReplacement(measurementStatistics.getRatioText());
 			} else
-				throw new UnsupportedOperationException("TrailTypes.isTriggered"); //$NON-NLS-1$
+				throw new UnsupportedOperationException("TrailTypes.isTriggered");
 		} else {
-			return this.displayName;
+			return getDisplayName();
 		}
 	}
 
