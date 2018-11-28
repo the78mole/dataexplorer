@@ -2798,15 +2798,14 @@ public class DeviceConfiguration {
 	 */
 	public String[] prepareRawExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
 		try {
-			int index = 0;
 			String[] recordNames = recordSet.getRecordNames();
-			for (int j = 0; j < recordNames.length; j++) {
+			for (int index = 1, j = 0; index < dataTableRow.length && j < recordNames.length; j++) { //do not touch index 0 with time entry
 				final Record record = recordSet.get(recordNames[j]);
 				MeasurementType  measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), record.getOrdinal());
 				if (!measurement.isCalculation()) {	// only use active records for writing raw data
-					dataTableRow[index + 1] = String.format("%d", record.realGet(rowIndex)/1000);
+					dataTableRow[index] = String.format("%d", record.realGet(rowIndex)/1000);
+					++index;
 				}
-				++index;
 			}
 		} catch (RuntimeException e) {
 			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
