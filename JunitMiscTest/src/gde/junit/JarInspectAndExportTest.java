@@ -21,12 +21,17 @@ package gde.junit;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import javax.xml.bind.JAXBException;
+
 import junit.framework.TestCase;
 import gde.GDE;
+import gde.config.ExportService;
+import gde.device.DeviceConfiguration;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.FileUtils;
@@ -121,10 +126,22 @@ public class JarInspectAndExportTest extends TestCase {
 			for (String jarFileName : files) {
 				if (!jarFileName.endsWith(".jar")) continue;
 				JarFile jarFile = new JarFile(jarFileDir + "/" + jarFileName);
-				String[] plugins = FileUtils.getDeviceJarServicesNames(jarFile);
-				for (String plugin : plugins) {
+				List<ExportService> services = FileUtils.getDeviceJarServices(jarFile);
+				for (ExportService service : services) {
 					String targetDirectory = System.getProperty("java.io.tmpdir");
-					FileUtils.extract(jarFile, plugin + ".jpg", "resource/", targetDirectory, "555");
+					File devConfigFile = new File(targetDirectory + "/" + service.getName() + GDE.FILE_ENDING_DOT_XML);
+					if (devConfigFile.exists()) {
+						try {
+							DeviceConfiguration devConfig = new DeviceConfiguration(devConfigFile.getAbsolutePath());						
+							FileUtils.extract(jarFile, devConfig.getImageFileName(), "resource/", targetDirectory, "555");
+							System.out.println("extracted = " + devConfig.getImageFileName());					
+						}
+						catch (JAXBException e) {
+							failures.put(e.getMessage(), e);
+						}
+					} else {
+						System.out.println("===>>> " + devConfigFile.getAbsolutePath() + " does not exist?");
+					}
 				}
 			}
 		}
@@ -149,10 +166,11 @@ public class JarInspectAndExportTest extends TestCase {
 			for (String jarFileName : files) {
 				if (!jarFileName.endsWith(".jar")) continue;
 				JarFile jarFile = new JarFile(jarFileDir + "/" + jarFileName);
-				String[] plugins = FileUtils.getDeviceJarServicesNames(jarFile);
-				for (String plugin : plugins) {
+				List<ExportService> services = FileUtils.getDeviceJarServices(jarFile);
+				for (ExportService service : services) {
 					String targetDirectory = System.getProperty("java.io.tmpdir");
-					FileUtils.extract(jarFile, plugin + GDE.FILE_ENDING_DOT_XML, "resource/en/", targetDirectory, "555");
+					FileUtils.extract(jarFile, service.getName() + GDE.FILE_ENDING_DOT_XML, "resource/", targetDirectory, "555");
+					System.out.println("extracted = " + service.getName() + GDE.FILE_ENDING_DOT_XML);					
 				}
 			}
 		}
