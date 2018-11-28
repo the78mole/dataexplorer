@@ -3229,7 +3229,7 @@ public class DataExplorer extends Composite {
 			DataExplorer.COLOR_FOREGROUND	= SWTResourceManager.getColor(SWT.COLOR_BLACK);			
 			break;
 		case Settings.COLOR_SCHEMA_DARK:
-			DataExplorer.COLOR_BACKGROUND	= SWTResourceManager.getColor(SWT.COLOR_DARK_GRAY);
+			DataExplorer.COLOR_BACKGROUND	= SWTResourceManager.getColor(80, 80, 80);
 			DataExplorer.COLOR_FOREGROUND	= SWTResourceManager.getColor(SWT.COLOR_WHITE);			
 			break;
 		}
