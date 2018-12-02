@@ -112,7 +112,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 				}
 				if (HoTTAdapterLiveGatherer.log.isLoggable(Level.TIME))
 					HoTTAdapterLiveGatherer.log.log(Level.TIME, sb.toString() + ", detecting sensor type takes " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-				this.application.setStatusMessage(sb.toString(), SWT.COLOR_BLACK);
+				this.application.setStatusMessage(sb.toString());
 
 				//no sensor type detected, seams only receiver is connected
 				if (HoTTAdapterLiveGatherer.isSensorType[1] == false && HoTTAdapterLiveGatherer.isSensorType[2] == false && HoTTAdapterLiveGatherer.isSensorType[3] == false && HoTTAdapterLiveGatherer.isSensorType[4] == false
@@ -166,7 +166,7 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 		this.application.getMenuToolBar().updateRecordSetSelectCombo();
 		this.channels.switchChannel(this.channel.getName());
 		this.channel.switchRecordSet(recordSetKey);
-		this.application.setStatusMessage(sb.toString(), SWT.COLOR_BLACK);
+		this.application.setStatusMessage(sb.toString());
 
 		Vector<Integer> queryRing = new Vector<Integer>();
 		for (int i = 1; i < HoTTAdapterLiveGatherer.isSensorType.length; ++i) {

@@ -1843,7 +1843,7 @@ public class Record extends AbstractRecord implements IRecord {
 			measureDelta = (this.maxScaleValue - this.minScaleValue) * points.y / this.parent.drawAreaBounds.height;
 		double timeDelta = this.drawTimeWidth * points.x / this.parent.drawAreaBounds.width / 1000; // sec
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measureDelta = " + measureDelta + " timeDelta = " + timeDelta); //$NON-NLS-1$ //$NON-NLS-2$
-		return new DecimalFormat("0.0").format(measureDelta / timeDelta); //$NON-NLS-1$
+		return new DecimalFormat("0.000").format(measureDelta / timeDelta); //$NON-NLS-1$
 	}
 
 	/**
