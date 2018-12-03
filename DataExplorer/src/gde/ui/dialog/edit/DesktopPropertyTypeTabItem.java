@@ -13,21 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.dialog.edit;
-
-import gde.GDE;
-import gde.device.DesktopPropertyType;
-import gde.device.DesktopPropertyTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.ObjectFactory;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 import java.util.logging.Logger;
 
@@ -49,8 +38,19 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 
+import gde.GDE;
+import gde.device.DesktopPropertyType;
+import gde.device.DesktopPropertyTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.ObjectFactory;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
 /**
- * Composite to wrap XML DesktopPropertyType enable to edit existing and create new device property files 
+ * Composite to wrap XML DesktopPropertyType enable to edit existing and create new device property files
  * @author Winfried Brügmann
  */
 public class DesktopPropertyTypeTabItem extends CTabItem {
@@ -128,7 +128,7 @@ public class DesktopPropertyTypeTabItem extends CTabItem {
 	 * update the tab item internal widgets by property content
 	 * @param useDeviceConfig of DeviceConfiguration
 	 * @param useProperty of PropertyType
-	 * @param enableEditName 
+	 * @param enableEditName
 	 * @param nameSelectionItems String[] used to fill a selection combo box
 	 * @param typeSelectionItems String[] used to fill a selection combo box
 	 * @param enableEditValue
@@ -140,7 +140,7 @@ public class DesktopPropertyTypeTabItem extends CTabItem {
 
 		this.valueCombo.setVisible(true);
 		this.valueCombo.select(this.propertyType.isValue() == true ? 0 : 1);
-			
+
 		this.descriptionText.setText(this.propertyType.getDescription() != null ? this.propertyType.getDescription() : GDE.STRING_EMPTY);
 		this.enableContextMenu(true);
 	}
@@ -151,6 +151,7 @@ public class DesktopPropertyTypeTabItem extends CTabItem {
 			this.setText(this.tabName);
 			this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent disposeevent) {
 					log.log(java.util.logging.Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
 					DesktopPropertyTypeTabItem.this.enableContextMenu(false);
@@ -160,7 +161,8 @@ public class DesktopPropertyTypeTabItem extends CTabItem {
 			this.setControl(this.propertyTypeComposite);
 			this.propertyTypeComposite.setLayout(null);
 			this.propertyTypeComposite.setSize(300, 160);
-			this.propertyTypeComposite.addHelpListener(new HelpListener() {			
+			this.propertyTypeComposite.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "propertyTypeComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -203,7 +205,7 @@ public class DesktopPropertyTypeTabItem extends CTabItem {
 				this.valueCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.valueCombo.setBounds(90, 65, 120, 20);
 				this.valueCombo.setEditable(false);
-				this.valueCombo.setBackground(DataExplorer.COLOR_WHITE);
+				this.valueCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 				this.valueCombo.setItems(GDE.STRING_ARRAY_TRUE_FALSE);
 				this.valueCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -211,7 +213,7 @@ public class DesktopPropertyTypeTabItem extends CTabItem {
 						log.log(java.util.logging.Level.FINEST, "valueCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 						if (DesktopPropertyTypeTabItem.this.deviceConfig != null) {
 							DesktopPropertyTypeTabItem.this.deviceConfig.setTableTabRequested(Boolean.parseBoolean(DesktopPropertyTypeTabItem.this.valueCombo.getText()));
-						
+
 							DesktopPropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
 							DesktopPropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
@@ -234,7 +236,7 @@ public class DesktopPropertyTypeTabItem extends CTabItem {
 							DesktopPropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
 							DesktopPropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
 						}
-					}					
+					}
 					@Override
 					public void keyPressed(KeyEvent e) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "descriptionText.keyPressed , event=" + e); //$NON-NLS-1$
@@ -252,7 +254,7 @@ public class DesktopPropertyTypeTabItem extends CTabItem {
 					this.attributeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.attributeCombo.setBounds(90, 145, 120, 20);
 					this.attributeCombo.setEditable(false);
-					this.attributeCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.attributeCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 					this.attributeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {

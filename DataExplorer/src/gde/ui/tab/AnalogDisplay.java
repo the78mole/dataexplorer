@@ -152,7 +152,7 @@ public class AnalogDisplay extends Composite {
 		this.textAnalogLabel = new CLabel(this.tacho, SWT.CENTER);
 		this.textAnalogLabel.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD));
 		this.textAnalogLabel.setBackground(this.backgroundColor);
-		this.textAnalogLabel.setForeground(DataExplorer.COLOR_BLACK);
+		this.textAnalogLabel.setForeground(this.application.COLOR_BLACK);
 		this.textAnalogLabel.setBounds(0, 0, this.tacho.getSize().x, this.textHeight);
 		this.textAnalogLabel.setMenu(this.popupmenu);
 	}
@@ -192,7 +192,7 @@ public class AnalogDisplay extends Composite {
 			this.tachoImageGC.setForeground(SWTResourceManager.getColor(this.record.getRGB()));
 			this.tachoImageGC.setLineWidth(4);
 			this.tachoImageGC.drawArc(this.centerX - this.radius, this.centerY - this.radius, 2 * this.radius, 2 * this.radius, this.angleStart, this.angleDelta);
-			this.tachoImageGC.setForeground(DataExplorer.COLOR_BLACK);
+			this.tachoImageGC.setForeground(this.application.COLOR_BLACK);
 			this.tachoImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			int numberTicks = 10; //Double.valueOf(maxValue - minValue).intValue();
 			double deltaValue = (this.maxValue - this.minValue) / numberTicks;
@@ -216,10 +216,10 @@ public class AnalogDisplay extends Composite {
 				GraphicsUtils.drawTextCentered(valueText, this.centerX - dxtext, this.centerY - dytext, this.tachoImageGC, SWT.HORIZONTAL);
 			}
 			// center knob
-			this.tachoImageGC.setBackground(DataExplorer.COLOR_GREY);
+			this.tachoImageGC.setBackground(this.application.COLOR_GREY);
 			int knobRradius = (int) (this.radius * 0.1);
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
-			this.tachoImageGC.setBackground(DataExplorer.COLOR_BLACK);
+			this.tachoImageGC.setBackground(this.application.COLOR_BLACK);
 			knobRradius = Double.valueOf(this.radius / 10.0 * 0.2).intValue();
 			this.tachoImageGC.fillArc(this.centerX - knobRradius, this.centerY - knobRradius, 2 * knobRradius, 2 * knobRradius, 0, 360);
 
@@ -252,7 +252,7 @@ public class AnalogDisplay extends Composite {
 					redraw(damageBounds.x, damageBounds.y, damageBounds.width, damageBounds.height, true);
 				}
 
-				drawTachoNeedle(evt.gc, DataExplorer.COLOR_BLACK);
+				drawTachoNeedle(evt.gc, this.application.COLOR_BLACK);
 			}
 			this.tachoImageGC.dispose();
 		}

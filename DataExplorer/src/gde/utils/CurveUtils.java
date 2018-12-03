@@ -165,7 +165,7 @@ public class CurveUtils {
 		if (isDrawScaleInRecordColor) {
 			String rgb = record.isScaleSyncMaster() ? record.getSyncMasterRGB() : record.getRGB();
 			gc.setForeground(SWTResourceManager.getColor(rgb)); // draw the main scale line in same color as the curve
-		}	else gc.setForeground(DataExplorer.COLOR_BLACK);
+		}	else gc.setForeground(DataExplorer.getInstance().COLOR_BLACK);
 		if (isPositionLeft) {
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
 			gc.drawLine(xPos, y0+1, xPos, y0-height-1); //xPos = x0
@@ -174,7 +174,10 @@ public class CurveUtils {
 			if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "drawText x = " + (xPos - pt.y - 15)); //xPosition Text Spannung [] //$NON-NLS-1$
 			if (!isCompareSet) {
 				if (isDrawNameInRecordColor) gc.setForeground(SWTResourceManager.getColor(record.getRGB()));
-				else gc.setForeground(DataExplorer.COLOR_BLACK);
+				else {
+					DataExplorer.getInstance();
+					gc.setForeground(DataExplorer.getInstance().COLOR_BLACK);
+				}
 				GraphicsUtils.drawTextCentered(graphText, (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
 			}
 		}
@@ -185,7 +188,10 @@ public class CurveUtils {
 			GraphicsUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, yMinValueDisplay, yMaxValueDisplay, ticklength, miniticks, gap, isPositionLeft, numberTicks, isDrawNumbersInRecordColor);
 			if (!isCompareSet) {
 				if (isDrawNameInRecordColor) gc.setForeground(SWTResourceManager.getColor(record.getRGB()));
-				else gc.setForeground(DataExplorer.COLOR_BLACK);
+				else {
+					DataExplorer.getInstance();
+					gc.setForeground(DataExplorer.getInstance().COLOR_BLACK);
+				}
 				GraphicsUtils.drawTextCentered(graphText, (xPos + scaleWidthSpace - pt.y - 5), y0 / 2 + (y0 - height), gc, SWT.UP);
 			}
 		}

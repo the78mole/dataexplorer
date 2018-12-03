@@ -70,6 +70,7 @@ public final class SelectorComposite extends Composite {
 	private static final int				YGAP_CHARTSELECTOR			= GDE.IS_WINDOWS ? 2 : 0;
 	private static final int				COMBO_COLUMN_ORDINAL		= 1;
 
+	private final DataExplorer			application;
 	private final Menu							popupmenu;
 	final CurveSelectorContextMenu	contextMenu;
 
@@ -88,10 +89,12 @@ public final class SelectorComposite extends Composite {
 
 	private WindowActor							windowActor;
 
+
 	public SelectorComposite(final SashForm useParent, AbstractChartWindow parentWindow) {
 		super(useParent, SWT.NONE);
 		SWTResourceManager.registerResourceUser(this);
 
+		this.application = DataExplorer.getInstance();
 		this.popupmenu = new Menu(DataExplorer.getInstance().getShell(), SWT.POP_UP);
 		this.contextMenu = new CurveSelectorContextMenu();
 		this.contextMenu.createMenu(this.popupmenu);
@@ -106,7 +109,7 @@ public final class SelectorComposite extends Composite {
 
 	void initGUI() {
 		FormLayout curveSelectorLayout = new FormLayout();
-		this.setBackground(DataExplorer.COLOR_BACKGROUND);
+		this.setBackground(this.application.COLOR_BACKGROUND);
 		this.setLayout(curveSelectorLayout);
 		GridData curveSelectorLData = new GridData();
 		this.setLayoutData(curveSelectorLData);
@@ -130,8 +133,8 @@ public final class SelectorComposite extends Composite {
 			curveSelectorHeaderLData.left = new FormAttachment(0, 1000, GDE.IS_WINDOWS ? 6 : 0);
 			curveSelectorHeaderLData.top = new FormAttachment(0, 1000, 0);
 			this.curveSelectorHeader.setLayoutData(curveSelectorHeaderLData);
-			this.curveSelectorHeader.setBackground(DataExplorer.COLOR_BACKGROUND);
-			this.curveSelectorHeader.setForeground(DataExplorer.COLOR_FOREGROUND);
+			this.curveSelectorHeader.setBackground(this.application.COLOR_BACKGROUND);
+			this.curveSelectorHeader.setForeground(this.application.COLOR_FOREGROUND);
 			this.curveSelectorHeader.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
@@ -499,14 +502,14 @@ public final class SelectorComposite extends Composite {
 		if (!visible) curveSelectorTable.setTopIndex(0);
 		this.curveSelectorTable.getVerticalBar().setVisible(visible);
 	}
-	
+
 	/**
 	 * update background/foreground color of the tool bar
 	 */
 	public void updateColorSchema() {
-		this.setBackground(DataExplorer.COLOR_BACKGROUND);
-		this.curveSelectorHeader.setBackground(DataExplorer.COLOR_BACKGROUND);
-		this.curveSelectorHeader.setForeground(DataExplorer.COLOR_FOREGROUND);
+		this.setBackground(this.application.COLOR_BACKGROUND);
+		this.curveSelectorHeader.setBackground(this.application.COLOR_BACKGROUND);
+		this.curveSelectorHeader.setForeground(this.application.COLOR_FOREGROUND);
 
 	}
 }

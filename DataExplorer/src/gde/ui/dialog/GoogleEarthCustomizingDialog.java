@@ -13,25 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.dialog;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.ObjectData;
-import gde.data.RecordSet;
-import gde.device.DataTypes;
-import gde.device.IDevice;
-import gde.device.MeasurementPropertyTypes;
-import gde.device.PropertyType;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
 
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -63,6 +48,21 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.ObjectData;
+import gde.data.RecordSet;
+import gde.device.DataTypes;
+import gde.device.IDevice;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.PropertyType;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
 
 /**
  * this dialog enable to modify speed limits and associated colors of the KML track
@@ -97,16 +97,16 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 	Composite compositeUpper;
 	Composite compositeWithin;
 	Composite compositeLower;
-	
+
 	int upperLimitVelocity = 100;
 	int lowerLimitVelocity = 20;
 	double avgLimitFactor = 2.0;
 	RGB withinLimitsColor = SWTResourceManager.getColor(0, 255, 0).getRGB();
 	RGB lowerLimitColor = SWTResourceManager.getColor(255, 0, 0).getRGB();
 	RGB upperLimitColor = SWTResourceManager.getColor(128, 128, 0).getRGB();
-	
+
 	/**
-	* Auto-generated main method to display this 
+	* Auto-generated main method to display this
 	* org.eclipse.swt.widgets.Dialog inside a new Shell.
 	*/
 	public static void main(String[] args) {
@@ -135,10 +135,11 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0283));
 			dialogShell.setLayout( new FormLayout());
 			dialogShell.layout();
-			dialogShell.pack();			
+			dialogShell.pack();
 			dialogShell.setSize(360, 255);
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
-	      public void handleEvent(Event event) {
+	      @Override
+				public void handleEvent(Event event) {
 	        switch (event.detail) {
 	        case SWT.TRAVERSE_ESCAPE:
 	        	GoogleEarthCustomizingDialog.this.dialogShell.close();
@@ -150,6 +151,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 	    });
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/EarthConfigHot.gif")); //$NON-NLS-1$
 			dialogShell.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(Level.FINEST,  "dialogShell.widgetDisposed, event="+evt); //$NON-NLS-1$
 					makePersistent();
@@ -251,7 +253,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 							public void widgetSelected(SelectionEvent evt) {
 								log.log(Level.FINEST,  "lowerLimitButton.widgetSelected, event="+evt); //$NON-NLS-1$
 								lowerLimitColor = application.openColorDialog();
-								compositeLower.setBackground(SWTResourceManager.getColor(lowerLimitColor.red, lowerLimitColor.green, lowerLimitColor.blue));							
+								compositeLower.setBackground(SWTResourceManager.getColor(lowerLimitColor.red, lowerLimitColor.green, lowerLimitColor.blue));
 							}
 						});
 					}
@@ -363,6 +365,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					lowerLimitTextLData.height = 16;
 					lowerLimitText.setLayoutData(lowerLimitTextLData);
 					lowerLimitText.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent evt) {
 							log.log(Level.FINEST,  "lowerLimitText.verifyText, event="+evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -385,6 +388,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					avgFactorTextLData.height = 16;
 					avgFactorText.setLayoutData(avgFactorTextLData);
 					avgFactorText.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent evt) {
 							log.log(Level.FINEST,  "avgFactorText.verifyText, event="+evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, evt.text);
@@ -403,22 +407,22 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 									if (factor >= 1) {
 										lowerLimitText.setText(String.format("%d", (int) (avgValue / factor))); //$NON-NLS-1$
 										upperLimitText.setText(String.format("%d", (int) (avgValue * factor))); //$NON-NLS-1$
-										lowerLimitText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-									  avgFactorText.setBackground(DataExplorer.COLOR_WHITE);
-										upperLimitText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+										lowerLimitText.setBackground(DataExplorer.getInstance().COLOR_LIGHT_GREY);
+									  avgFactorText.setBackground(DataExplorer.getInstance().COLOR_WHITE);
+										upperLimitText.setBackground(DataExplorer.getInstance().COLOR_LIGHT_GREY);
 									}
 									else {
-										lowerLimitText.setText(GDE.STRING_EMPTY + lowerLimitVelocity); 
+										lowerLimitText.setText(GDE.STRING_EMPTY + lowerLimitVelocity);
 										upperLimitText.setText(GDE.STRING_EMPTY + upperLimitVelocity);
-										lowerLimitText.setBackground(DataExplorer.COLOR_WHITE);
-									  avgFactorText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-										upperLimitText.setBackground(DataExplorer.COLOR_WHITE);
+										lowerLimitText.setBackground(DataExplorer.getInstance().COLOR_WHITE);
+									  avgFactorText.setBackground(DataExplorer.getInstance().COLOR_LIGHT_GREY);
+										upperLimitText.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									}
 								}
 								catch (Exception e) {
 									// ignore
 								}
-							}		
+							}
 							else avgText.setText("0");
 						}
 					});
@@ -439,6 +443,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					upperLimitTextLData.height = 16;
 					upperLimitText.setLayoutData(upperLimitTextLData);
 					upperLimitText.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent evt) {
 							log.log(Level.FINEST,  "upperLimitText.verifyText, event="+evt); //$NON-NLS-1$
 							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -501,7 +506,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			e.printStackTrace();
 		}
 	}
-	
+
 	void initialize() {
 		lowerLimitVelocity = 20;
 		avgLimitFactor = 0.0;
@@ -660,7 +665,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 				}
 			}
 		}
-		
+
 		lowerLimitText.setText(GDE.STRING_EMPTY + lowerLimitVelocity);
 	  avgFactorText.setText(String.format("%.1f", avgLimitFactor)); //$NON-NLS-1$
 		upperLimitText.setText(GDE.STRING_EMPTY + upperLimitVelocity);
@@ -681,14 +686,14 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 					// ignore
 				}
 			}
-			lowerLimitText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-		  avgFactorText.setBackground(DataExplorer.COLOR_WHITE);
-			upperLimitText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+			lowerLimitText.setBackground(this.application.COLOR_LIGHT_GREY);
+		  avgFactorText.setBackground(this.application.COLOR_WHITE);
+			upperLimitText.setBackground(this.application.COLOR_LIGHT_GREY);
 		}
 		else {
-			lowerLimitText.setBackground(DataExplorer.COLOR_WHITE);
-		  avgFactorText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
-			upperLimitText.setBackground(DataExplorer.COLOR_WHITE);
+			lowerLimitText.setBackground(this.application.COLOR_WHITE);
+		  avgFactorText.setBackground(this.application.COLOR_LIGHT_GREY);
+			upperLimitText.setBackground(this.application.COLOR_WHITE);
 		}
 	}
 

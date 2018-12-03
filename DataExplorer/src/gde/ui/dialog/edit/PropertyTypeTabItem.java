@@ -13,24 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.dialog.edit;
-
-import gde.GDE;
-import gde.data.Record;
-import gde.device.DataTypes;
-import gde.device.DeviceConfiguration;
-import gde.device.MeasurementPropertyTypes;
-import gde.device.ObjectFactory;
-import gde.device.PropertyType;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
 
 import java.util.logging.Logger;
 
@@ -53,8 +39,22 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 
+import gde.GDE;
+import gde.data.Record;
+import gde.device.DataTypes;
+import gde.device.DeviceConfiguration;
+import gde.device.MeasurementPropertyTypes;
+import gde.device.ObjectFactory;
+import gde.device.PropertyType;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
+
 /**
- * Composite to wrap XML PropertyType enable to edit existing and create new device property files 
+ * Composite to wrap XML PropertyType enable to edit existing and create new device property files
  * @author Winfried Brügmann
  */
 public class PropertyTypeTabItem extends CTabItem {
@@ -143,7 +143,7 @@ public class PropertyTypeTabItem extends CTabItem {
 	 * update the tab item internal widgets by property content
 	 * @param useDeviceConfig of DeviceConfiguration
 	 * @param useProperty of PropertyType
-	 * @param enableEditName 
+	 * @param enableEditName
 	 * @param nameSelectionItems String[] used to fill a selection combo box
 	 * @param typeSelectionItems String[] used to fill a selection combo box
 	 * @param enableEditValue
@@ -237,10 +237,11 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.setText(this.tabName);
 			this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent disposeevent) {
 					log.log(java.util.logging.Level.FINEST, "propertyTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
 					if (PropertyTypeTabItem.this.deviceConfig != null && PropertyTypeTabItem.this.propsEditor != null && PropertyTypeTabItem.this.propsEditor.saveButton != null && !PropertyTypeTabItem.this.propsEditor.saveButton.isDisposed()) {
-						PropertyTypeTabItem.this.measurementTypeTabItem.measurementType.getProperty().remove(PropertyTypeTabItem.this.propertyType);						
+						PropertyTypeTabItem.this.measurementTypeTabItem.measurementType.getProperty().remove(PropertyTypeTabItem.this.propertyType);
 						PropertyTypeTabItem.this.deviceConfig.setChangePropery(true);
 						PropertyTypeTabItem.this.propsEditor.enableSaveButton(true);
 						//PropertyTypeTabItem.this.enableContextMenu(false);
@@ -251,7 +252,8 @@ public class PropertyTypeTabItem extends CTabItem {
 			this.setControl(this.propertyTypeComposite);
 			this.propertyTypeComposite.setLayout(null);
 			this.propertyTypeComposite.setSize(300, 160);
-			this.propertyTypeComposite.addHelpListener(new HelpListener() {			
+			this.propertyTypeComposite.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "propertyTypeComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A.html"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -360,6 +362,7 @@ public class PropertyTypeTabItem extends CTabItem {
 					}
 				});
 				this.valueText.addVerifyListener(this.valueVerifyListener = new VerifyListener() {
+					@Override
 					public void verifyText(VerifyEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "valueText.verifyText, event=" + evt); //$NON-NLS-1$
 						log.log(java.util.logging.Level.FINE, evt.text);
@@ -370,7 +373,7 @@ public class PropertyTypeTabItem extends CTabItem {
 				this.valueCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.valueCombo.setBounds(90, 65, 120, 20);
 				this.valueCombo.setEditable(false);
-				this.valueCombo.setBackground(DataExplorer.COLOR_WHITE);
+				this.valueCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 				this.valueCombo.setItems(GDE.STRING_ARRAY_TRUE_FALSE);
 				this.valueCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -434,12 +437,12 @@ public class PropertyTypeTabItem extends CTabItem {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void initialize() {
 		if (this.propertyType != null) {
 			this.nameText.setText(this.propertyType.getName());
-			
+
 			if (this.nameCombo.isVisible()) {
 				this.nameCombo.select(MeasurementPropertyTypes.fromValue(this.propertyType.getName()).ordinal());
 			}

@@ -256,7 +256,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									this.deviceSelectCombo.setItems(new String[] { Messages.getString(MessageIds.GDE_MSGT0156) });
 									this.deviceSelectCombo.setBounds(12, GDE.IS_MAC_COCOA ? 15 : 20, 375, GDE.IS_LINUX ? 22 : 20);
 									this.deviceSelectCombo.setEditable(false);
-									this.deviceSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.deviceSelectCombo.setBackground(this.application.COLOR_WHITE);
 									this.deviceSelectCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -391,7 +391,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 									this.portSelectCombo.setEditable(false);
 									this.portSelectCombo.setText(Messages.getString(MessageIds.GDE_MSGT0199));
 									this.portSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0165));
-									this.portSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.portSelectCombo.setBackground(this.application.COLOR_WHITE);
 									this.portSelectCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -930,7 +930,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 			if (!tmpDeviceConfig.isUsed()) tmpDeviceConfig.setUsed(true);
 			setActiveConfig(tmpDeviceConfig);
 			setupDevice();
-		} else if (selection == -1 && Settings.getInstance().getDeviceServices().get(newDeviceName) != null) { 		
+		} else if (selection == -1 && Settings.getInstance().getDeviceServices().get(newDeviceName) != null) {
 			try { //device not contained in active device list, but exist as exported service from plug-in jar
 				Settings.getInstance().extractDevicePropertiesAndTemplates(this.deviceServices.get(newDeviceName).getJarFile(), newDeviceName);
 				DeviceSelectionDialog.this.deviceConfigurations.add(Analyzer.getInstance(), newDeviceName, newDeviceName+GDE.FILE_ENDING_DOT_XML, false);

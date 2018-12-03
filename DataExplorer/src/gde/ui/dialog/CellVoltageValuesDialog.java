@@ -13,13 +13,12 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.dialog;
 
 import java.util.Locale;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -48,6 +47,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import gde.GDE;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -93,8 +93,8 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 	Button											okButton;
 
 	int[]												voltageLimits;
-	
-	final DataExplorer application;
+
+	final DataExplorer 					application;
 
 	public CellVoltageValuesDialog(DataExplorer currentApplication, int style) {
 		super(currentApplication.getShell(), style);
@@ -114,9 +114,10 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 			this.dialogShell.pack();
 			this.dialogShell.setSize(380, 380);
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0376));
-			this.dialogShell.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+			this.dialogShell.setBackground(this.application.COLOR_CANVAS_YELLOW);
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
-	      public void handleEvent(Event event) {
+	      @Override
+				public void handleEvent(Event event) {
 	        switch (event.detail) {
 	        case SWT.TRAVERSE_ESCAPE:
 	        	CellVoltageValuesDialog.this.dialogShell.close();
@@ -127,6 +128,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 	      }
 	    });
 			this.dialogShell.addDisposeListener( new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent event) {
 					CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "dialogShell.disposeListener, event=" + event); //$NON-NLS-1$
 					if (CellVoltageValuesDialog.this.voltageLimits[5] < CellVoltageValuesDialog.this.voltageLimits[0] && (CellVoltageValuesDialog.this.voltageLimits[0] - CellVoltageValuesDialog.this.voltageLimits[5]) >= 2
@@ -135,13 +137,13 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							&& CellVoltageValuesDialog.this.voltageLimits[2] < CellVoltageValuesDialog.this.voltageLimits[0] && CellVoltageValuesDialog.this.voltageLimits[3] < CellVoltageValuesDialog.this.voltageLimits[0]
 							&& CellVoltageValuesDialog.this.voltageLimits[3] > CellVoltageValuesDialog.this.voltageLimits[5]) {
 						CellVoltageValues.setVoltageLimits(
-								CellVoltageValuesDialog.this.voltageLimits[0], 
+								CellVoltageValuesDialog.this.voltageLimits[0],
 								CellVoltageValuesDialog.this.voltageLimits[1],
 								CellVoltageValuesDialog.this.voltageLimits[2],
 								CellVoltageValuesDialog.this.voltageLimits[3],
 								CellVoltageValuesDialog.this.voltageLimits[4],
-								CellVoltageValuesDialog.this.voltageLimits[5]); 
-						//{upperLimitVoltage=0,  upperLimitColorRed=1, lowerLimitColorGreen=2, beginSpreadVoltage=3, lowerLimitColorRed=4, lowerLimitVoltage=5}; 
+								CellVoltageValuesDialog.this.voltageLimits[5]);
+						//{upperLimitVoltage=0,  upperLimitColorRed=1, lowerLimitColorGreen=2, beginSpreadVoltage=3, lowerLimitColorRed=4, lowerLimitVoltage=5};
 					}
 					CellVoltageValuesDialog.this.application.updateCellVoltageLimitsSelector();
 				}
@@ -160,7 +162,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				defaultSelectionCompositeLData.top = new FormAttachment(0, 1000, 0);
 				defaultSelectionCompositeLData.bottom = new FormAttachment(1000, 1000, -35);
 				this.presetsGroup.setLayoutData(defaultSelectionCompositeLData);
-				this.presetsGroup.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+				this.presetsGroup.setBackground(this.application.COLOR_CANVAS_YELLOW);
 				this.presetsGroup.setText(Messages.getString(MessageIds.GDE_MSGT0374));
 				{
 					this.upperSpacer = new Composite(this.presetsGroup, SWT.NONE);
@@ -172,7 +174,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					upperSpacerLData.verticalAlignment = GridData.BEGINNING;
 					this.upperSpacer.setLayoutData(upperSpacerLData);
 					this.upperSpacer.setLayout(upperSpacerLayout);
-					this.upperSpacer.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+					this.upperSpacer.setBackground(this.application.COLOR_CANVAS_YELLOW);
 				}
 				{
 					this.buttonLiPo = new Button(this.presetsGroup, SWT.TOGGLE | SWT.CENTER);
@@ -193,7 +195,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							CellVoltageValuesDialog.this.buttonLiPo.setSelection(true);
 							CellVoltageValuesDialog.this.buttonLiIo.setSelection(false);
 							CellVoltageValuesDialog.this.buttonLiFe.setSelection(false);
-							
+
 							CellVoltageValuesDialog.this.voltageLimits = CellVoltageValues.getVoltageLimits(CellVoltageTypes.LiPo);
 							CellVoltageValuesDialog.this.individualGroup.redraw();
 						}
@@ -217,7 +219,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 							CellVoltageValuesDialog.this.buttonLiIo.setSelection(true);
 							CellVoltageValuesDialog.this.buttonLiPo.setSelection(false);
 							CellVoltageValuesDialog.this.buttonLiFe.setSelection(false);
-							
+
 							CellVoltageValuesDialog.this.voltageLimits = CellVoltageValues.getVoltageLimits(CellVoltageTypes.LiIo);
 							CellVoltageValuesDialog.this.individualGroup.redraw();
 						}
@@ -283,7 +285,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					lowerSpacerLData.verticalAlignment = GridData.END;
 					this.lowerSpacer.setLayoutData(lowerSpacerLData);
 					this.lowerSpacer.setLayout(lowerSpacerLayout);
-					this.lowerSpacer.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+					this.lowerSpacer.setBackground(this.application.COLOR_CANVAS_YELLOW);
 				}
 			}
 			{
@@ -294,15 +296,17 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 				valueSelectionCompositeLData.left = new FormAttachment(this.presetsGroup);
 				valueSelectionCompositeLData.bottom = new FormAttachment(1000, 1000, -35);
 				this.individualGroup.setLayoutData(valueSelectionCompositeLData);
-				this.individualGroup.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+				this.individualGroup.setBackground(this.application.COLOR_CANVAS_YELLOW);
 				this.individualGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.individualGroup.setText(Messages.getString(MessageIds.GDE_MSGT0375));
 				this.individualGroup.addHelpListener(new HelpListener() {
+					@Override
 					public void helpRequested(HelpEvent evt) {
 						CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "individualGroup.helpRequested, event=" + evt); //$NON-NLS-1$
 					}
 				});
 				this.individualGroup.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent evt) {
 						CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "lableComboComposite.paintControl, event=" + evt); //$NON-NLS-1$
 						evt.gc.drawLine(100, 40, 145, 35);
@@ -347,6 +351,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 						this.yellowField.setBounds(0, 50, 80, 160);
 						this.yellowField.setBackground(SWTResourceManager.getColor(255, 255, 0));
 						this.yellowField.addPaintListener(new PaintListener() {
+							@Override
 							public void paintControl(PaintEvent evt) {
 								CellVoltageValuesDialog.log.logp(Level.FINEST, CellVoltageValuesDialog.$CLASS_NAME, $METHOD_NAME, "lableComboComposite.paintControl, event=" + evt); //$NON-NLS-1$
 								evt.gc.setLineStyle(SWT.LINE_DASH);
@@ -368,7 +373,7 @@ public class CellVoltageValuesDialog extends org.eclipse.swt.widgets.Dialog {
 					FillLayout lableComboCompositeLayout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
 					this.lableComboComposite.setLayout(lableComboCompositeLayout);
 					this.lableComboComposite.setBounds(145, 10, 100, 290);
-					this.lableComboComposite.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+					this.lableComboComposite.setBackground(this.application.COLOR_CANVAS_YELLOW);
 					{
 						this.upperLimitVoltageLabel = new CLabel(this.lableComboComposite, SWT.LEFT | SWT.EMBEDDED);
 						this.upperLimitVoltageLabel.setBackground(SWTResourceManager.getColor(255, 255, 128));

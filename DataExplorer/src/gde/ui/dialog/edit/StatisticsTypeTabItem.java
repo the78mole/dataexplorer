@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.dialog.edit;
@@ -171,7 +171,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 
 	/**
 	 * set the statistics type and update all internal variables
-	 * @param useDeviceConfig the device configuration used 
+	 * @param useDeviceConfig the device configuration used
 	 * @param useStatisticsType the statisticsType to set
 	 * @param useChannelConfigNumber the channel configuration number
 	 */
@@ -404,6 +404,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 			this.scrolledComposite = new ScrolledComposite(this.channelConfigMeasurementPropertiesTabFolder, SWT.H_SCROLL);
 			this.setControl(this.scrolledComposite);
 			this.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent disposeevent) {
 					log.log(java.util.logging.Level.FINEST, "statisticsTypeTabItem.widgetDisposed, event=" + disposeevent); //$NON-NLS-1$
 					//StatisticsTypeTabItem.this.enableContextMenu(false);
@@ -411,7 +412,8 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 			});
 			this.statisticsComposite = new Composite(this.scrolledComposite, SWT.NONE);
 			this.statisticsComposite.setLayout(null);
-			this.statisticsComposite.addHelpListener(new HelpListener() {			
+			this.statisticsComposite.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "statisticsComposite.helpRequested " + evt); //$NON-NLS-1$
 					DataExplorer.getInstance().openHelpDialog("", "HelpInfo_A1.html#device_properties_statistics"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -611,6 +613,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 					}
 				});
 				this.triggerLevelCombo.addVerifyListener(new VerifyListener() {
+					@Override
 					public void verifyText(VerifyEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "triggerLevelCombo.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -691,6 +694,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 					}
 				});
 				this.minTimeSecCombo.addVerifyListener(new VerifyListener() {
+					@Override
 					public void verifyText(VerifyEvent evt) {
 						log.log(java.util.logging.Level.FINEST, "minTimeSecCombo.verifyText, event=" + evt); //$NON-NLS-1$
 						evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
@@ -800,8 +804,8 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 				this.triggerRefOrdinalCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.triggerRefOrdinalCombo.setBounds(245, 105, 110, 20);
 				this.triggerRefOrdinalCombo.setEnabled(false);
-				this.triggerRefOrdinalCombo.setBackground(DataExplorer.COLOR_WHITE);
-				this.triggerRefOrdinalCombo.setForeground(DataExplorer.COLOR_BLACK);
+				this.triggerRefOrdinalCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
+				this.triggerRefOrdinalCombo.setForeground(DataExplorer.getInstance().COLOR_BLACK);
 			}
 			{
 				this.triggerRefOrdinalText = new Text(this.statisticsComposite, SWT.BORDER);
@@ -857,8 +861,8 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 				this.sumByTriggerRefOrdinalCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.sumByTriggerRefOrdinalCombo.setBounds(245, 130, 110, 20);
 				this.sumByTriggerRefOrdinalCombo.setEnabled(false);
-				this.sumByTriggerRefOrdinalCombo.setBackground(DataExplorer.COLOR_WHITE);
-				this.sumByTriggerRefOrdinalCombo.setForeground(DataExplorer.COLOR_BLACK);
+				this.sumByTriggerRefOrdinalCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
+				this.sumByTriggerRefOrdinalCombo.setForeground(DataExplorer.getInstance().COLOR_BLACK);
 			}
 			{
 				this.sumTriggerText = new Text(this.statisticsComposite, SWT.BORDER);
@@ -946,7 +950,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 			this.scrolledComposite.setContent(this.statisticsComposite);
 			this.statisticsComposite.setSize(700, 185);
 			this.statisticsComposite.layout();
-			
+
 			initialize();
 		}
 		catch (Exception e) {

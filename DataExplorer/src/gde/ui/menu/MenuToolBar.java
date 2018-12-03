@@ -160,8 +160,8 @@ public class MenuToolBar {
 			this.fileCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{ // begin file tool bar
 				this.fileToolBar = new ToolBar(this.coolBar, SWT.FLAT);
-				this.fileToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
-				this.fileToolBar.setForeground(DataExplorer.COLOR_BACKGROUND);
+				this.fileToolBar.setBackground(this.application.COLOR_BACKGROUND);
+				this.fileToolBar.setForeground(this.application.COLOR_BACKGROUND);
 				this.fileCoolItem.setControl(this.fileToolBar);
 				{
 					this.newToolItem = new ToolItem(this.fileToolBar, SWT.NONE);
@@ -294,7 +294,7 @@ public class MenuToolBar {
 			this.deviceObjectCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{ // begin device tool bar
 				this.deviceObjectToolBar = new ToolBar(this.coolBar, SWT.FLAT);
-				this.deviceObjectToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+				this.deviceObjectToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				this.deviceObjectCoolItem.setControl(this.deviceObjectToolBar);
 				{
 					this.deviceSelectToolItem = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
@@ -411,7 +411,7 @@ public class MenuToolBar {
 					ToolItem objectSelectComboSep = new ToolItem(this.deviceObjectToolBar, SWT.SEPARATOR);
 					{
 						this.objectSelectComposite = new Composite(this.deviceObjectToolBar, SWT.NONE);
-						this.objectSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+						this.objectSelectComposite.setBackground(this.application.COLOR_BACKGROUND);
 						this.objectSelectComposite.setLayout(comboCompositeLayout);
 						this.objectSelectCombo = new CCombo(this.objectSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
 						this.objectSelectCombo.setLayoutData(new RowData(200, this.comboHeight));
@@ -421,7 +421,7 @@ public class MenuToolBar {
 						this.isObjectoriented = this.settings.getActiveObjectIndex() > 0;
 						this.objectSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0201));
 						this.objectSelectCombo.setEditable(false);
-						this.objectSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
+						this.objectSelectCombo.setBackground(this.application.COLOR_WHITE);
 						this.objectSelectCombo.setVisibleItemCount(20);
 						this.objectSelectCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -607,7 +607,7 @@ public class MenuToolBar {
 			this.zoomCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{ // begin zoom tool bar
 				this.zoomToolBar = new ToolBar(this.coolBar, SWT.FLAT);
-				this.zoomToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+				this.zoomToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				log.log(Level.OFF, "Border width = " + this.zoomToolBar.getBorderWidth());
 				this.zoomCoolItem.setControl(this.zoomToolBar);
 				{
@@ -681,7 +681,7 @@ public class MenuToolBar {
 					this.scopePointsComboSep = new ToolItem(this.zoomToolBar, SWT.SEPARATOR);
 					{
 						this.scopePointsComposite = new Composite(this.zoomToolBar, SWT.NONE);
-						this.scopePointsComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+						this.scopePointsComposite.setBackground(this.application.COLOR_BACKGROUND);
 						this.scopePointsComposite.setLayout(comboCompositeLayout);
 						this.scopePointsCombo = new CCombo(this.scopePointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
 						this.scopePointsCombo.setLayoutData(new RowData(60, this.comboHeight));
@@ -722,7 +722,7 @@ public class MenuToolBar {
 			this.portCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{
 				this.portToolBar = new ToolBar(this.coolBar, SWT.FLAT);
-				this.portToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+				this.portToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				this.portCoolItem.setControl(this.portToolBar);
 				{
 					this.portOpenCloseItem = new ToolItem(this.portToolBar, SWT.NONE);
@@ -765,13 +765,13 @@ public class MenuToolBar {
 			this.dataCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{
 				this.dataToolBar = new ToolBar(this.coolBar, SWT.FLAT);
-				this.dataToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+				this.dataToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				this.dataCoolItem.setControl(this.dataToolBar);
 				{
 					ToolItem channelSelectComboSep = new ToolItem(this.dataToolBar, SWT.SEPARATOR);
 					{
 						this.channelSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
-						this.channelSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+						this.channelSelectComposite.setBackground(this.application.COLOR_BACKGROUND);
 						this.channelSelectComposite.setLayout(comboCompositeLayout);
 						this.channelSelectCombo = new CCombo(this.channelSelectComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
 						this.channelSelectCombo.setLayoutData(new RowData(185, this.comboHeight));
@@ -780,7 +780,7 @@ public class MenuToolBar {
 						this.channelSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0075));
 						this.channelSelectCombo.setEditable(false);
 						this.channelSelectCombo.setVisibleItemCount(10);
-						this.channelSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
+						this.channelSelectCombo.setBackground(this.application.COLOR_WHITE);
 						this.channelSelectCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -840,7 +840,7 @@ public class MenuToolBar {
 					ToolItem recordSelectComboSep = new ToolItem(this.dataToolBar, SWT.SEPARATOR);
 					{
 						this.recordSelectComposite = new Composite(this.dataToolBar, SWT.NONE);
-						this.recordSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
+						this.recordSelectComposite.setBackground(this.application.COLOR_BACKGROUND);
 						this.recordSelectComposite.setLayout(comboCompositeLayout);
 						this.recordSelectCombo = new CCombo(this.recordSelectComposite, SWT.BORDER | SWT.LEFT);
 						this.recordSelectCombo.setLayoutData(new RowData(260, this.comboHeight));
@@ -850,7 +850,7 @@ public class MenuToolBar {
 						this.recordSelectCombo.setTextLimit(RecordSet.MAX_NAME_LENGTH);
 						this.recordSelectCombo.setVisibleItemCount(20);
 						this.recordSelectCombo.setEditable(false);
-						this.recordSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
+						this.recordSelectCombo.setBackground(this.application.COLOR_WHITE);
 						this.recordSelectCombo.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
@@ -1005,7 +1005,7 @@ public class MenuToolBar {
 			this.googleEarthCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{ // begin file tool bar
 				this.googleEarthToolBar = new ToolBar(this.coolBar, SWT.FLAT);
-				this.googleEarthToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+				this.googleEarthToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				this.googleEarthCoolItem.setControl(this.googleEarthToolBar);
 				{
 					this.googleEarthToolItem = new ToolItem(this.googleEarthToolBar, SWT.NONE);
@@ -1049,7 +1049,7 @@ public class MenuToolBar {
 			this.helpCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
 			{ // begin file tool bar
 				this.helpToolBar = new ToolBar(this.coolBar, SWT.FLAT);
-				this.helpToolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+				this.helpToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				this.helpCoolItem.setControl(this.helpToolBar);
 				{
 					this.helpToolItem = new ToolItem(this.helpToolBar, SWT.NONE);
@@ -1672,17 +1672,17 @@ public class MenuToolBar {
 	 * update background/foreground color of the tool bar
 	 */
 	public void updateColorSchema() {
-		this.objectSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
-		this.scopePointsComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
-		this.channelSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
-		this.recordSelectComposite.setBackground(DataExplorer.COLOR_BACKGROUND);
-		this.fileToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
-		this.deviceObjectToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
-		this.zoomToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
-		this.portToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
-		this.dataToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
-		this.googleEarthToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
-		this.helpToolBar.setBackground(DataExplorer.COLOR_BACKGROUND); 
+		this.objectSelectComposite.setBackground(this.application.COLOR_BACKGROUND);
+		this.scopePointsComposite.setBackground(this.application.COLOR_BACKGROUND);
+		this.channelSelectComposite.setBackground(this.application.COLOR_BACKGROUND);
+		this.recordSelectComposite.setBackground(this.application.COLOR_BACKGROUND);
+		this.fileToolBar.setBackground(this.application.COLOR_BACKGROUND);
+		this.deviceObjectToolBar.setBackground(this.application.COLOR_BACKGROUND);
+		this.zoomToolBar.setBackground(this.application.COLOR_BACKGROUND);
+		this.portToolBar.setBackground(this.application.COLOR_BACKGROUND);
+		this.dataToolBar.setBackground(this.application.COLOR_BACKGROUND);
+		this.googleEarthToolBar.setBackground(this.application.COLOR_BACKGROUND);
+		this.helpToolBar.setBackground(this.application.COLOR_BACKGROUND);
 		this.setPortConnected(false); //changing port image may result in wrong visualization since device activity status can not detected!
 	}
 }

@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.renschler;
@@ -103,7 +103,7 @@ public class PicolarioDialog extends DeviceDialog {
 
 	@Override
 	public void open() {
-		this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
+		this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
 		this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
 
 		log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
@@ -124,7 +124,8 @@ public class PicolarioDialog extends DeviceDialog {
 			this.dialogShell.setText(DEVICE_NAME + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
-	      public void handleEvent(Event event) {
+	      @Override
+				public void handleEvent(Event event) {
 	        switch (event.detail) {
 	        case SWT.TRAVERSE_ESCAPE:
 	        	PicolarioDialog.this.dialogShell.close();
@@ -135,6 +136,7 @@ public class PicolarioDialog extends DeviceDialog {
 	      }
 	    });
 			this.dialogShell.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent evt) {
 					log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 					if (PicolarioDialog.this.gatherThread != null && PicolarioDialog.this.gatherThread.isAlive()) PicolarioDialog.this.gatherThread.setThreadStop(true);
@@ -142,9 +144,10 @@ public class PicolarioDialog extends DeviceDialog {
 				}
 			});
 			this.dialogShell.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
-					PicolarioDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html"); //$NON-NLS-2$
+					PicolarioDialog.this.application.openHelpDialog(DEVICE_NAME, "HelpInfo.html");
 				}
 			});
 			this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
@@ -174,7 +177,7 @@ public class PicolarioDialog extends DeviceDialog {
 				{
 					this.queryAvailableRecordSetButton = new Button(this.numberAvailableRecorsSetsGroup1, SWT.PUSH | SWT.CENTER);
 					this.queryAvailableRecordSetButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.queryAvailableRecordSetButton.setText(Messages.getString(MessageIds.GDE_MSGT1201)); 
+					this.queryAvailableRecordSetButton.setText(Messages.getString(MessageIds.GDE_MSGT1201));
 					this.queryAvailableRecordSetButton.setBounds(10, GDE.IS_MAC_COCOA ? 10 : 25, 250, 25);
 					this.queryAvailableRecordSetButton.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -206,7 +209,7 @@ public class PicolarioDialog extends DeviceDialog {
 				{
 					this.numberAvailableRecordSetsLabel = new CLabel(this.numberAvailableRecorsSetsGroup1, SWT.RIGHT | SWT.BORDER);
 					this.numberAvailableRecordSetsLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.numberAvailableRecordSetsLabel.setBackground(DataExplorer.COLOR_WHITE);
+					this.numberAvailableRecordSetsLabel.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 					this.numberAvailableRecordSetsLabel.setBounds(270, GDE.IS_MAC_COCOA ? 10 : 25, 30, 24);
 					this.numberAvailableRecordSetsLabel.setText(this.numberAvailable);
 				}
@@ -249,7 +252,7 @@ public class PicolarioDialog extends DeviceDialog {
 								if (answer == SWT.YES) {
 									String recordSetKey = activeRecordSet.getName();
 									log.log(Level.FINE, "move record set " + recordSetKey + " to configuration " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
-									channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(channelNumber)); //$NON-NLS-1$
+									channels.get(channelNumber).put(recordSetKey, activeRecordSet.clone(channelNumber));
 									activeChannel.remove(recordSetKey);
 									channels.switchChannel(channelNumber, recordSetKey);
 									PicolarioDialog.this.getDialogShell().redraw();
@@ -431,6 +434,7 @@ public class PicolarioDialog extends DeviceDialog {
 	 */
 	public void resetTelegramLabel() {
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
 					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
@@ -449,6 +453,7 @@ public class PicolarioDialog extends DeviceDialog {
 	public void setAlreadyRedText(final int newValue) {
 		this.redDatagrams = Integer.valueOf(newValue).toString();
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) PicolarioDialog.this.alreadyRedLabel.setText(PicolarioDialog.this.redDatagrams);
 			}
@@ -460,6 +465,7 @@ public class PicolarioDialog extends DeviceDialog {
 	 */
 	public void resetDataSetsLabel() {
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
 					PicolarioDialog.this.redDataSetsText = "0"; //$NON-NLS-1$
@@ -476,6 +482,7 @@ public class PicolarioDialog extends DeviceDialog {
 	public void setAlreadyRedDataSets(final String newValue) {
 		this.redDataSetsText = newValue;
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
 					PicolarioDialog.this.redDataSets.setText(newValue);
@@ -497,6 +504,7 @@ public class PicolarioDialog extends DeviceDialog {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (!PicolarioDialog.this.application.getDeviceDialog().isDisposed()) {
 						PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(true);
@@ -531,6 +539,7 @@ public class PicolarioDialog extends DeviceDialog {
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						PicolarioDialog.this.setClosePossible(true);
 						PicolarioDialog.this.queryAvailableRecordSetButton.setEnabled(true);

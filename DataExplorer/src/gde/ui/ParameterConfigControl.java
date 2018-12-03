@@ -1,5 +1,24 @@
 package gde.ui;
 
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Slider;
+import org.eclipse.swt.widgets.Text;
+
 /**************************************************************************************
 This file is part of GNU DataExplorer.
 
@@ -22,25 +41,6 @@ import gde.GDE;
 import gde.device.DataTypes;
 import gde.utils.StringHelper;
 
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Slider;
-import org.eclipse.swt.widgets.Text;
-
 public class ParameterConfigControl {
 	final static Logger	log						= Logger.getLogger(ParameterConfigControl.class.getName());
 	final Composite			baseComposite;
@@ -62,7 +62,7 @@ public class ParameterConfigControl {
 	 * @param valueArray
 	 * @param valueIndex
 	 * @param valueFormat string, if empty no formating like "%d"
-	 * @param parameterName	
+	 * @param parameterName
 	 * @param nameWidth
 	 * @param parameterDescription
 	 * @param descriptionWidth
@@ -182,11 +182,11 @@ public class ParameterConfigControl {
 					if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "slider.widgetSelected, event=" + evt); //$NON-NLS-1$
 					ParameterConfigControl.this.value = ParameterConfigControl.this.slider.getSelection() - ParameterConfigControl.this.offset;
 					if (isRounding)
-						valueArray[valueIndex] = ParameterConfigControl.this.value > 1000 
-						? (valueArray[valueIndex] <= ParameterConfigControl.this.value 
+						valueArray[valueIndex] = ParameterConfigControl.this.value > 1000
+						? (valueArray[valueIndex] <= ParameterConfigControl.this.value
 							? ParameterConfigControl.this.value + 49
-							: ParameterConfigControl.this.value - 40) / 50 * 50 
-						: (valueArray[valueIndex] <= ParameterConfigControl.this.value 
+							: ParameterConfigControl.this.value - 40) / 50 * 50
+						: (valueArray[valueIndex] <= ParameterConfigControl.this.value
 							? ParameterConfigControl.this.value + 9
 							: ParameterConfigControl.this.value - 5) / 10 * 10;
 					else
@@ -407,9 +407,9 @@ public class ParameterConfigControl {
 	}
 
 	public void setEnabled(final boolean enable) {
-		this.nameLabel.setForeground(enable ? DataExplorer.COLOR_BLACK : DataExplorer.COLOR_GREY);
+		this.nameLabel.setForeground(enable ? DataExplorer.getInstance().COLOR_BLACK : DataExplorer.getInstance().COLOR_GREY);
 		this.text.setEnabled(enable);
-		this.descriptionLabel.setForeground(enable ? DataExplorer.COLOR_BLACK : DataExplorer.COLOR_GREY);
+		this.descriptionLabel.setForeground(enable ? DataExplorer.getInstance().COLOR_BLACK : DataExplorer.getInstance().COLOR_GREY);
 		this.slider.setEnabled(enable);
 	}
 
@@ -467,7 +467,7 @@ public class ParameterConfigControl {
 		this.slider.setMinimum(newMinSliderValue + this.offset);
 		this.slider.setMaximum(newMaxSliderValue + this.offset + 10);
 	}
-	
+
 	public void updateTextFieldValues(final String[] textFiledValues) {
 		this.textValues = textFiledValues;
 		this.slider.setMaximum(this.textValues.length < 10 ? 10 + this.textValues.length - 1 : this.textValues.length + 1);

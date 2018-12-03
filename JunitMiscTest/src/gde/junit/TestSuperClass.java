@@ -56,7 +56,6 @@ import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
 import gde.utils.CurveUtils;
 import gde.utils.TimeLine;
-
 import junit.framework.TestCase;
 
 public class TestSuperClass extends TestCase {
@@ -185,16 +184,16 @@ public class TestSuperClass extends TestCase {
 			ExportService service = this.settings.getDeviceServices().get(serviceName);
 			try {
 				this.settings.extractDevicePropertiesAndTemplates(service.getJarFile(), serviceName);
-				this.analyzer.getDeviceConfigurations().add(this.analyzer, serviceName, serviceName+GDE.FILE_ENDING_DOT_XML, false);			
+				this.analyzer.getDeviceConfigurations().add(this.analyzer, serviceName, serviceName+GDE.FILE_ENDING_DOT_XML, false);
 			}
 			catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		
+
 		File file = new File(Settings.getDevicesPath());
 		if (!file.exists()) throw new FileNotFoundException(Settings.getDevicesPath());
-		
+
 		// wait until schema is setup
 		this.settings.joinXsdThread();
 
@@ -367,7 +366,7 @@ public class TestSuperClass extends TestCase {
 		// System.out.println("startTime = " + startTimeFormated + " detaTime_ms
 		// = " + (int)totalDisplayDeltaTime_ms + " endTime = " +
 		// endTimeFormated);
-		this.timeLine.drawTimeLine(recordSet, gc, x0, y0 + 1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (long) totalDisplayDeltaTime_ms, DataExplorer.COLOR_BLACK);
+		this.timeLine.drawTimeLine(recordSet, gc, x0, y0 + 1, width, startTimeFormated, endTimeFormated, scaleFactor, timeFormat, (long) totalDisplayDeltaTime_ms, DataExplorer.getInstance().COLOR_BLACK);
 
 		// draw draw area bounding
 		// gc.setForeground(this.curveAreaBorderColor);

@@ -13,19 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
-
-import gde.GDE;
-import gde.device.DataTypes;
-import gde.device.smmodellbau.gpslogger.MessageIds;
-import gde.log.Level;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
-import gde.utils.StringHelper;
 
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -50,6 +41,15 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
+
+import gde.GDE;
+import gde.device.DataTypes;
+import gde.device.smmodellbau.gpslogger.MessageIds;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+import gde.utils.StringHelper;
 
 /**
  * class to implement SM GPS-Logger basic configuration panel 1
@@ -90,15 +90,15 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 			" 4.3", " 4.4", " 4.5", " 4.6", " 4.7", " 4.8", " 4.9", " 5.0" };
 	final String[]					varioTons				= Messages.getString(MessageIds.GDE_MSGT2022).split(GDE.STRING_COMMA);
 	final String[]					heightValues		= {
-			"   10", "   25", "   50", "   75", "  100", "  150", "  200", "  250", "  300", "  350", "  400", "  450", "  500", "  600", "  700", "  800", "  900", " 1000", " 1250", " 1500", " 2000", " 2500", " 3000", " 3500", " 4000" };																												//$NON-NLS-*$
+			"   10", "   25", "   50", "   75", "  100", "  150", "  200", "  250", "  300", "  350", "  400", "  450", "  500", "  600", "  700", "  800", "  900", " 1000", " 1250", " 1500", " 2000", " 2500", " 3000", " 3500", " 4000" };
 	final String[]					speedValues			= {
-			"   10", "   25", "   50", "   75", "  100", "  150", "  200", "  250", "  300", "  350", "  400", "  450", "  500", "  600", "  700", "  800", "  900", " 1000" };																																																											//$NON-NLS-*$
+			"   10", "   25", "   50", "   75", "  100", "  150", "  200", "  250", "  300", "  350", "  400", "  450", "  500", "  600", "  700", "  800", "  900", " 1000" };
 	final String[]					distanceValues	= {
-			"   10", "   25", "   50", "   75", "  100", "  150", "  200", "  250", "  300", "  350", "  400", "  450", "  500", "  600", "  700", "  800", "  900", " 1000", " 1250", " 1500", " 2000", " 2500", " 3000", " 3500", " 4000", " 4500", " 5000" };																			//$NON-NLS-*$
+			"   10", "   25", "   50", "   75", "  100", "  150", "  200", "  250", "  300", "  350", "  400", "  450", "  500", "  600", "  700", "  800", "  900", " 1000", " 1250", " 1500", " 2000", " 2500", " 3000", " 3500", " 4000", " 4500", " 5000" };
 	final String[]					tripValues			= {
-			"  1.0", "  2.5", "  5.0", "  7.5", " 10.0", " 15.0", " 20.0", " 25.0", " 30.0", " 35.0", " 40.0", " 45.0", " 50.0", " 60.0", " 70.0", " 80.0", " 90.0", " 99.0" };																																																											//$NON-NLS-*$
+			"  1.0", "  2.5", "  5.0", "  7.5", " 10.0", " 15.0", " 20.0", " 25.0", " 30.0", " 35.0", " 40.0", " 45.0", " 50.0", " 60.0", " 70.0", " 80.0", " 90.0", " 99.0" };
 	final String[]					voltageRxValues	= {
-			"  3.00", "  3.25", "  3.50", "  3.75", "  4.00", "  4.25", "  4.50", "  4.75", "  4.80", "  4.85", "  4.90", "  4.95", "  5.00", "  5.05", "  5.10", "  5.15", "  5.20", "  5.25", "  5.50", "  6.00", "  6.25", "  6.50", "  6.75", "  7.00", "  7.25", "  7.50", "  7.75", "  8.00" }; //$NON-NLS-*$
+			"  3.00", "  3.25", "  3.50", "  3.75", "  4.00", "  4.25", "  4.50", "  4.75", "  4.80", "  4.85", "  4.90", "  4.95", "  5.00", "  5.05", "  5.10", "  5.15", "  5.20", "  5.25", "  5.50", "  6.00", "  6.25", "  6.50", "  6.75", "  7.00", "  7.25", "  7.50", "  7.75", "  8.00" };
 	final String[]					igcModes				= Messages.getString(MessageIds.GDE_MSGT2069).split(GDE.STRING_COMMA);
 	final String[]					distanceModes		= Messages.getString(MessageIds.GDE_MSGT2071).split(GDE.STRING_COMMA);
 	final String[]					telemetrieTypes	= { " - - - ", " Futaba", " JR DMSS", " HoTT", " JetiDuplex", " M-Link", " FrSky", "Spektrum" };
@@ -167,7 +167,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 
 		this.changeVisibility();
 	}
-	
+
 	public void changeVisibility() {
 		this.frskyIdLabel.setVisible(false);
 		this.frskyIdCombo.setVisible(false);
@@ -216,7 +216,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				}
 				if (GPSLoggerSetupConfiguration2.jetiExGroupStatic != null) {
 					GPSLoggerSetupConfiguration2.jetiExGroupStatic.setVisible(true);
-					GPSLoggerSetupConfiguration2.unilogTelemtryAlarmsGroupStatic.setVisible(true);	
+					GPSLoggerSetupConfiguration2.unilogTelemtryAlarmsGroupStatic.setVisible(true);
 				}
 				break;
 			case 1: //Futaba
@@ -233,6 +233,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 		try {
 			this.setLayout(new FormLayout());
 			this.addHelpListener(new HelpListener() {
+				@Override
 				public void helpRequested(HelpEvent evt) {
 					log.log(Level.FINEST, "GPSLoggerSetupConfiguration1.helpRequested, event=" + evt); //$NON-NLS-1$
 					GPSLoggerSetupConfiguration1.this.application.openHelpDialog(Messages.getString(MessageIds.GDE_MSGT2010), "HelpInfo.html#configuration");  //$NON-NLS-1$
@@ -312,7 +313,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.telemetryTypeCombo.setItems(this.telemetrieTypes);
 					this.telemetryTypeCombo.select(this.configuration.telemetryType);
 					this.telemetryTypeCombo.setEditable(false);
-					this.telemetryTypeCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.telemetryTypeCombo.setBackground(this.application.COLOR_WHITE);
 					this.telemetryTypeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -376,7 +377,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 								}
 								else {
 									GPSLoggerSetupConfiguration2.unilogTelemtryAlarmsGroupStatic.setVisible(true);
-									GPSLoggerSetupConfiguration2.fixGpsStartPositionGroupStatic.setVisible(false);					
+									GPSLoggerSetupConfiguration2.fixGpsStartPositionGroupStatic.setVisible(false);
 								}
 							}
 						});
@@ -453,7 +454,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.dataRateCombo.setItems(this.dataRateValues);
 					this.dataRateCombo.select(this.configuration.datarate);
 					this.dataRateCombo.setEditable(false);
-					this.dataRateCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataRateCombo.setBackground(this.application.COLOR_WHITE);
 					this.dataRateCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -482,7 +483,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.startModusCombo.setItems(this.startValues);
 					this.startModusCombo.select(this.configuration.startModus);
 					this.startModusCombo.setEditable(false);
-					this.startModusCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.startModusCombo.setBackground(this.application.COLOR_WHITE);
 					this.startModusCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -511,7 +512,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.stopModusCombo.setItems(this.stopValues);
 					this.stopModusCombo.select(this.configuration.stopModus);
 					this.stopModusCombo.setEditable(false);
-					this.stopModusCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.stopModusCombo.setBackground(this.application.COLOR_WHITE);
 					this.stopModusCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -540,7 +541,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.timeZoneCombo.setItems(this.deltaUTC);
 					this.timeZoneCombo.select(this.configuration.timeZone + 12);
 					this.timeZoneCombo.setEditable(false);
-					this.timeZoneCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.timeZoneCombo.setBackground(this.application.COLOR_WHITE);
 					this.timeZoneCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -579,7 +580,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.timeAutoCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2070).split(GDE.STRING_COMMA));
 					this.timeAutoCombo.select(this.configuration.daylightSavingModus);
 					this.timeAutoCombo.setEditable(false);
-					this.timeAutoCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.timeAutoCombo.setBackground(this.application.COLOR_WHITE);
 					this.timeAutoCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -608,7 +609,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioLimitClimbCombo.setItems(this.varioThresholds);
 					this.varioLimitClimbCombo.select(this.configuration.varioThreshold);
 					this.varioLimitClimbCombo.setEditable(false);
-					this.varioLimitClimbCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.varioLimitClimbCombo.setBackground(this.application.COLOR_WHITE);
 					this.varioLimitClimbCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -646,7 +647,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioLimitSinkCombo.setItems(this.varioThresholds);
 					this.varioLimitSinkCombo.select(this.configuration.varioThreshold);
 					this.varioLimitSinkCombo.setEditable(false);
-					this.varioLimitSinkCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.varioLimitSinkCombo.setBackground(this.application.COLOR_WHITE);
 					this.varioLimitSinkCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -684,7 +685,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioToneCombo.setItems(this.varioTons);
 					this.varioToneCombo.select(this.configuration.varioTon);
 					this.varioToneCombo.setEditable(false);
-					this.varioToneCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.varioToneCombo.setBackground(this.application.COLOR_WHITE);
 					this.varioToneCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -769,7 +770,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.modusIgcCombo.setItems(this.igcModes);
 					this.modusIgcCombo.select(this.configuration.modusIGC);
 					this.modusIgcCombo.setEditable(false);
-					this.modusIgcCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.modusIgcCombo.setBackground(this.application.COLOR_WHITE);
 					this.modusIgcCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -798,7 +799,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.modusDistanceCombo.setItems(this.distanceModes);
 					this.modusDistanceCombo.select(this.configuration.modusDistance);
 					this.modusDistanceCombo.setEditable(false);
-					this.modusDistanceCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.modusDistanceCombo.setBackground(this.application.COLOR_WHITE);
 					this.modusDistanceCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -901,11 +902,12 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							log.log(Level.FINEST, "heightCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.heightAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.heightMaxAlarmCombo.getText().trim());
 							GPSLoggerSetupConfiguration1.this.configuration.heightAlarm = GPSLoggerSetupConfiguration1.this.configuration.heightAlarm < 10 ? 10
-									: GPSLoggerSetupConfiguration1.this.configuration.heightAlarm > 4000 ? 4000 : GPSLoggerSetupConfiguration1.this.configuration.heightAlarm; 
+									: GPSLoggerSetupConfiguration1.this.configuration.heightAlarm > 4000 ? 4000 : GPSLoggerSetupConfiguration1.this.configuration.heightAlarm;
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
 					this.heightMaxAlarmCombo.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "heightCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
@@ -918,7 +920,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							try {
 								GPSLoggerSetupConfiguration1.this.configuration.heightAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.heightMaxAlarmCombo.getText().trim());
 								GPSLoggerSetupConfiguration1.this.configuration.heightAlarm = GPSLoggerSetupConfiguration1.this.configuration.heightAlarm < 10 ? 10
-										: GPSLoggerSetupConfiguration1.this.configuration.heightAlarm > 4000 ? 4000 : GPSLoggerSetupConfiguration1.this.configuration.heightAlarm; 
+										: GPSLoggerSetupConfiguration1.this.configuration.heightAlarm > 4000 ? 4000 : GPSLoggerSetupConfiguration1.this.configuration.heightAlarm;
 								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 							}
 							catch (NumberFormatException e) {
@@ -982,11 +984,12 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							log.log(Level.FINEST, "velocityCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.speedMaxAlarmCombo.getText().trim());
 							GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm = GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm < 10 ? 10
-									: GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm > 1000 ? 1000 : GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm; 
+									: GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm > 1000 ? 1000 : GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm;
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
 					this.speedMaxAlarmCombo.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "velocityCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
@@ -999,7 +1002,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							try {
 								GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.speedMaxAlarmCombo.getText().trim());
 								GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm = GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm < 10 ? 10
-										: GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm > 1000 ? 1000 : GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm; 
+										: GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm > 1000 ? 1000 : GPSLoggerSetupConfiguration1.this.configuration.speedMaxAlarm;
 								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 							}
 							catch (NumberFormatException e) {
@@ -1063,11 +1066,12 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							log.log(Level.FINEST, "velocityCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.speedMinAlarmCombo.getText().trim());
 							GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm = GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm < 10 ? 10
-									: GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm > 1000 ? 1000 : GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm; 
+									: GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm > 1000 ? 1000 : GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm;
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
 					this.speedMinAlarmCombo.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "velocityCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
@@ -1080,7 +1084,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							try {
 								GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.speedMinAlarmCombo.getText().trim());
 								GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm = GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm < 10 ? 10
-										: GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm > 1000 ? 1000 : GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm; 
+										: GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm > 1000 ? 1000 : GPSLoggerSetupConfiguration1.this.configuration.speedMinAlarm;
 								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 							}
 							catch (NumberFormatException e) {
@@ -1147,6 +1151,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						}
 					});
 					this.distanceMaxCombo.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "distanceCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
@@ -1159,7 +1164,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							try {
 								GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceMaxCombo.getText().trim());
 								GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm = GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm < 10 ? 10
-										: GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm > 5000 ? 5000 : GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm; 
+										: GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm > 5000 ? 5000 : GPSLoggerSetupConfiguration1.this.configuration.distanceMaxAlarm;
 								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 							}
 							catch (NumberFormatException e) {
@@ -1226,6 +1231,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						}
 					});
 					this.distanceMinCombo.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "distanceMinCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
@@ -1238,7 +1244,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							try {
 								GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm = (short) Integer.parseInt(GPSLoggerSetupConfiguration1.this.distanceMinCombo.getText().trim());
 								GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm = GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm < 0 ? 0
-										: GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm > 5000 ? 5000 : GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm; 
+										: GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm > 5000 ? 5000 : GPSLoggerSetupConfiguration1.this.configuration.distanceMinAlarm;
 								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 							}
 							catch (NumberFormatException e) {
@@ -1302,11 +1308,12 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							log.log(Level.FINEST, "tripLengthCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.tripLengthCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
 							GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm < 1 ? 1
-									: GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm > 999 ? 999 : GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm; 
+									: GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm > 999 ? 999 : GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm;
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
 					this.distanceMaxCombo.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "tripLengthCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, verifyevent.text);
@@ -1319,7 +1326,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							try {
 								GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.tripLengthCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
 								GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm < 1 ? 1
-										: GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm > 999 ? 999 : GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm; 
+										: GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm > 999 ? 999 : GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm;
 								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 							}
 							catch (NumberFormatException e) {
@@ -1383,11 +1390,12 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							log.log(Level.FINEST, "voltageRxCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.voltageRxCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
 							GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm < 300 ? 300
-									: GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm > 800 ? 800 : GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm; 
+									: GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm > 800 ? 800 : GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm;
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
 					this.voltageRxCombo.addVerifyListener(new VerifyListener() {
+						@Override
 						public void verifyText(VerifyEvent verifyevent) {
 							log.log(Level.FINEST, "voltageRxCombo.verify, event=" + verifyevent); //$NON-NLS-1$
 							verifyevent.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, verifyevent.text);
@@ -1400,7 +1408,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 							try {
 								GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.voltageRxCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
 								GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm < 300 ? 300
-										: GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm > 800 ? 800 : GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm; 
+										: GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm > 800 ? 800 : GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm;
 								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 							}
 							catch (NumberFormatException e) {

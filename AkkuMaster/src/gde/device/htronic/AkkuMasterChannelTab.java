@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.htronic;
@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import gde.log.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -44,6 +43,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.exception.DataInconsitsentException;
+import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.SWTResourceManager;
@@ -116,7 +116,7 @@ public class AkkuMasterChannelTab {
 	boolean												isCollectDataStopped			= true;
 	boolean												isMemorySelectionChanged	= false;
 	String												recordSetKey							= Messages.getString(gde.messages.MessageIds.GDE_MSGT0272);
-	
+
 	int 													actualCurrent = 0;
 	String 												processName = GDE.STRING_EMPTY;
 
@@ -167,6 +167,7 @@ public class AkkuMasterChannelTab {
 				this.channelComposite.setLayout(null);
 				this.channelComposite.addMouseTrackListener(this.parent.getDevice().getDialog().mouseTrackerEnterFadeOut);
 				this.channelComposite.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent evt) {
 						log.log(Level.FINEST, "channelComposite.widgetSelected, event=" + evt); //$NON-NLS-1$
 						updateStartDataGatheringButton();
@@ -180,6 +181,7 @@ public class AkkuMasterChannelTab {
 					this.captureOnlyGroup.setBounds(12, 8, 400, 80);
 					this.captureOnlyGroup.addMouseTrackListener(this.parent.getDevice().getDialog().mouseTrackerEnterFadeOut);
 					this.captureOnlyGroup.addPaintListener(new PaintListener() {
+						@Override
 						public void paintControl(PaintEvent evt) {
 							log.log(Level.FINEST, "captureOnlyGroup.widgetSelected, event=" + evt); //$NON-NLS-1$
 							updateCaptureOnlyButton();
@@ -189,13 +191,13 @@ public class AkkuMasterChannelTab {
 						this.captureOnlyText = new Text(this.captureOnlyGroup, SWT.MULTI | SWT.WRAP);
 						this.captureOnlyText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.captureOnlyText.setText(Messages.getString(MessageIds.GDE_MSGT1173));
-						this.captureOnlyText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+						this.captureOnlyText.setBackground(this.application.COLOR_LIGHT_GREY);
 						this.captureOnlyText.setBounds(51, GDE.IS_MAC_COCOA ? 25 : 40, 315, 37);
 					}
 					{
 						this.captureOnlyButton = new Button(this.captureOnlyGroup, SWT.RADIO | SWT.LEFT);
 						this.captureOnlyButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
-						this.captureOnlyButton.setText(Messages.getString(MessageIds.GDE_MSGT1174)); 
+						this.captureOnlyButton.setText(Messages.getString(MessageIds.GDE_MSGT1174));
 						this.captureOnlyButton.setBounds(12, GDE.IS_MAC_COCOA ? 0 : 15, 310, 22);
 						this.captureOnlyButton.addSelectionListener(new SelectionAdapter() {
 							@Override
@@ -229,6 +231,7 @@ public class AkkuMasterChannelTab {
 					this.programGroup.setBounds(12, 95, 400, 250);
 					this.programGroup.addMouseTrackListener(this.parent.getDevice().getDialog().mouseTrackerEnterFadeOut);
 					this.programGroup.addPaintListener(new PaintListener() {
+						@Override
 						public void paintControl(PaintEvent evt) {
 							log.log(Level.FINEST, "programGroup.widgetSelected, event=" + evt); //$NON-NLS-1$
 							updateProgramButton();
@@ -270,6 +273,7 @@ public class AkkuMasterChannelTab {
 						this.akkuGroup.setText(Messages.getString(MessageIds.GDE_MSGT1176));
 						this.akkuGroup.setBounds(15, GDE.IS_MAC_COCOA ? 25 : 40, 369, 67);
 						this.akkuGroup.addPaintListener(new PaintListener() {
+							@Override
 							public void paintControl(PaintEvent evt) {
 								log.log(Level.FINEST, "akkuGroup.widgetSelected, event=" + evt); //$NON-NLS-1$
 								updateCapacityMilliAhText();
@@ -282,7 +286,7 @@ public class AkkuMasterChannelTab {
 							this.capacityText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.capacityText.setBounds(12, GDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
 							this.capacityText.setText(Messages.getString(MessageIds.GDE_MSGT1177));
-							this.capacityText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.capacityText.setBackground(this.application.COLOR_LIGHT_GREY);
 							this.capacityText.setEditable(false);
 						}
 						{
@@ -302,7 +306,7 @@ public class AkkuMasterChannelTab {
 						{
 							this.countCellsText = new Text(this.akkuGroup, SWT.NONE);
 							this.countCellsText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.countCellsText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.countCellsText.setBackground(this.application.COLOR_LIGHT_GREY);
 							this.countCellsText.setBounds(130, GDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
 							this.countCellsText.setText(Messages.getString(MessageIds.GDE_MSGT1178));
 							this.countCellsText.setEditable(false);
@@ -314,7 +318,7 @@ public class AkkuMasterChannelTab {
 							this.countCells.setItems(this.aCellCount);
 							this.countCells.setText(this.aCellCount[3]);
 							this.countCells.setEditable(false);
-							this.countCells.setBackground(DataExplorer.COLOR_WHITE);
+							this.countCells.setBackground(this.application.COLOR_WHITE);
 							this.countCells.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -326,7 +330,7 @@ public class AkkuMasterChannelTab {
 						{
 							this.akkuTypeText = new Text(this.akkuGroup, SWT.NONE);
 							this.akkuTypeText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.akkuTypeText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.akkuTypeText.setBackground(this.application.COLOR_LIGHT_GREY);
 							this.akkuTypeText.setBounds(255, GDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
 							this.akkuTypeText.setText(Messages.getString(MessageIds.GDE_MSGT1179));
 							this.akkuTypeText.setDoubleClickEnabled(false);
@@ -340,7 +344,7 @@ public class AkkuMasterChannelTab {
 							this.akkuType.setItems(this.aAkkuTyp);
 							this.akkuType.setText(this.aAkkuTyp[0]);
 							this.akkuType.setEditable(false);
-							this.akkuType.setBackground(DataExplorer.COLOR_WHITE);
+							this.akkuType.setBackground(this.application.COLOR_WHITE);
 							this.akkuType.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -357,6 +361,7 @@ public class AkkuMasterChannelTab {
 						this.programTypeGroup.setText(Messages.getString(MessageIds.GDE_MSGT1180));
 						this.programTypeGroup.setLayout(null);
 						this.programTypeGroup.addPaintListener(new PaintListener() {
+							@Override
 							public void paintControl(PaintEvent evt) {
 								log.log(Level.FINEST, "programTypeGroup.widgetSelected, event=" + evt); //$NON-NLS-1$
 								updateProgramText();
@@ -368,9 +373,9 @@ public class AkkuMasterChannelTab {
 						{
 							this.programText = new Text(this.programTypeGroup, SWT.NONE);
 							this.programText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.programText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.programText.setBackground(this.application.COLOR_LIGHT_GREY);
 							this.programText.setBounds(130, GDE.IS_MAC_COCOA ? 5 : 20, 105, 18);
-							this.programText.setText(Messages.getString(MessageIds.GDE_MSGT1181)); 
+							this.programText.setText(Messages.getString(MessageIds.GDE_MSGT1181));
 						}
 						{
 							this.program = new CCombo(this.programTypeGroup, SWT.BORDER);
@@ -379,7 +384,7 @@ public class AkkuMasterChannelTab {
 							this.program.setItems(this.aProgramm);
 							this.program.select(2);
 							this.program.setEditable(false);
-							this.program.setBackground(DataExplorer.COLOR_WHITE);
+							this.program.setBackground(this.application.COLOR_WHITE);
 							this.program.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -391,7 +396,7 @@ public class AkkuMasterChannelTab {
 						{
 							this.chargeCurrentText = new Text(this.programTypeGroup, SWT.NONE);
 							this.chargeCurrentText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.chargeCurrentText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.chargeCurrentText.setBackground(this.application.COLOR_LIGHT_GREY);
 							this.chargeCurrentText.setBounds(12, GDE.IS_MAC_COCOA ? 55 : 70, 105, 18);
 							this.chargeCurrentText.setText(Messages.getString(MessageIds.GDE_MSGT1182));
 							this.chargeCurrentText.setEditable(false);
@@ -413,7 +418,7 @@ public class AkkuMasterChannelTab {
 						{
 							this.dischargeCurrentText = new Text(this.programTypeGroup, SWT.NONE);
 							this.dischargeCurrentText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.dischargeCurrentText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.dischargeCurrentText.setBackground(this.application.COLOR_LIGHT_GREY);
 							this.dischargeCurrentText.setBounds(130, GDE.IS_MAC_COCOA ? 55 : 70, 105, 18);
 							this.dischargeCurrentText.setDragDetect(false);
 							this.dischargeCurrentText.setDoubleClickEnabled(false);
@@ -437,9 +442,9 @@ public class AkkuMasterChannelTab {
 						{
 							this.memoryNumberText = new Text(this.programTypeGroup, SWT.NONE);
 							this.memoryNumberText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.memoryNumberText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+							this.memoryNumberText.setBackground(this.application.COLOR_LIGHT_GREY);
 							this.memoryNumberText.setBounds(255, GDE.IS_MAC_COCOA ? 55 : 70, 105, 18);
-							this.memoryNumberText.setText(Messages.getString(MessageIds.GDE_MSGT1184)); 
+							this.memoryNumberText.setText(Messages.getString(MessageIds.GDE_MSGT1184));
 							this.memoryNumberText.setEditable(false);
 						}
 						{
@@ -449,7 +454,7 @@ public class AkkuMasterChannelTab {
 							this.memoryNumberCombo.setItems(new String[] { "0", "1", "2", "3", "4", "5", "6", "7" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 							this.memoryNumberCombo.select(1);
 							this.memoryNumberCombo.setEditable(false);
-							this.memoryNumberCombo.setBackground(DataExplorer.COLOR_WHITE);
+							this.memoryNumberCombo.setBackground(this.application.COLOR_WHITE);
 							this.memoryNumberCombo.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
@@ -512,7 +517,7 @@ public class AkkuMasterChannelTab {
 									updateStartDataGatheringButton();
 									AkkuMasterChannelTab.this.isStopButtonEnabled = true;
 									updateStopDataGatheringButton();
-									
+
 									AkkuMasterChannelTab.this.channels.switchChannel(AkkuMasterChannelTab.this.channel.getName());
 									// prepare timed data gatherer thread
 									int delay = 0;
@@ -528,9 +533,9 @@ public class AkkuMasterChannelTab {
 											 * [2] int		Aktuelle Akkuspannung 			[mV]
 											 * [3] int 		Aktueller Prozesssstrom 		[mA] 	(laden/entladen)
 											 * [4] int 		Aktuelle Prozesskapazität		[mAh] (laden/entladen)
-											 * [5] int 		Errechnete Leistung					[mW]			
-											 * [6] int		Errechnete Energie					[mWh]			
-											 * [7] int		Prozesszeit									[msec]			
+											 * [5] int 		Errechnete Leistung					[mW]
+											 * [6] int		Errechnete Energie					[mWh]
+											 * [7] int		Prozesszeit									[msec]
 											 */
 											try {
 												this.data = AkkuMasterChannelTab.this.serialPort.getData(AkkuMasterChannelTab.this.channelSig);
@@ -547,7 +552,7 @@ public class AkkuMasterChannelTab {
 														// check state change waiting to discharge to charge
 														// check if a record set matching for re-use is available and prepare a new if required
 														log.log(Level.FINE, AkkuMasterChannelTab.this.channel.getName() + "=" + AkkuMasterChannelTab.this.channel.size()); //$NON-NLS-1$
-														if (AkkuMasterChannelTab.this.channel.size() == 0 
+														if (AkkuMasterChannelTab.this.channel.size() == 0
 																|| !AkkuMasterChannelTab.this.channel.getRecordSetNames()[AkkuMasterChannelTab.this.channel.getRecordSetNames().length - 1].endsWith(" " + processName) //$NON-NLS-1$
 																|| (new Date().getTime() - getTimeStamp()) > 30000 || isCollectDataStopped()) {
 															setCollectDataStopped(false);
@@ -580,13 +585,13 @@ public class AkkuMasterChannelTab {
 														points[0] = Integer.valueOf((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_VOLTAGE)).intValue(); //Spannung 	[mV]
 														points[1] = Integer.valueOf((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_CURRENT)).intValue(); //Strom 			[mA]
 														// display adaption * 1000  -  / 1000
-														points[2] = Integer.valueOf((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY)).intValue() * 1000; //Kapazität	[mAh] 
+														points[2] = Integer.valueOf((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_CAPACITY)).intValue() * 1000; //Kapazität	[mAh]
 														points[3] = Integer.valueOf((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_POWER)).intValue() / 1000; //Leistung		[mW]
 														points[4] = Integer.valueOf((Integer) this.data.get(AkkuMasterC4SerialPort.PROCESS_ENERGIE)).intValue() / 1000; //Energie		[mWh]
 														log.log(Level.FINE, points[0] + " mV; " + points[1] + " mA; " + points[2] + " mAh; " + points[3] + " mW; " + points[4] + " mWh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
-														AkkuMasterChannelTab.this.recordSet.addPoints(points); 
-														
+														AkkuMasterChannelTab.this.recordSet.addPoints(points);
+
 														if (AkkuMasterChannelTab.this.recordSet.isChildOfActiveChannel() && AkkuMasterChannelTab.this.recordSet.equals(AkkuMasterChannelTab.this.channels.getActiveChannel().getActiveRecordSet())) {
 															AkkuMasterChannelTab.this.application.updateAllTabs(false);														}
 													}
@@ -620,14 +625,14 @@ public class AkkuMasterChannelTab {
 													}
 													setCollectData(false);
 													stopTimer();
-													AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0027));											
+													AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0027));
 												}
 											}
 											catch (DataInconsitsentException e) {
 												updateCurrentStatus();
 												AkkuMasterChannelTab.this.isChargeCurrentAdded = false;
 												AkkuMasterChannelTab.this.isDischargeCurrentAdded = false;
-												// exception is logged where it is thrown first 
+												// exception is logged where it is thrown first
 												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
 												stopTimer();
@@ -637,8 +642,8 @@ public class AkkuMasterChannelTab {
 												updateCurrentStatus();
 												AkkuMasterChannelTab.this.isChargeCurrentAdded = false;
 												AkkuMasterChannelTab.this.isDischargeCurrentAdded = false;
-												
-												// exception is logged where it is thrown first 
+
+												// exception is logged where it is thrown first
 												log.log(Level.SEVERE, e.getMessage(), e);
 												setCollectData(false);
 												stopTimer();
@@ -653,7 +658,7 @@ public class AkkuMasterChannelTab {
 									updateCurrentStatus();
 									AkkuMasterChannelTab.this.isChargeCurrentAdded = false;
 									AkkuMasterChannelTab.this.isDischargeCurrentAdded = false;
-									
+
 									AkkuMasterChannelTab.this.isStopButtonEnabled = false;
 									AkkuMasterChannelTab.this.startDataGatheringButton.setSelection(true);
 									AkkuMasterChannelTab.this.application.openMessageDialog(AkkuMasterChannelTab.this.parent.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0026));
@@ -734,7 +739,7 @@ public class AkkuMasterChannelTab {
 		else { // timer stopped
 			if (this.isChargeCurrentAdded == true) {
 				AkkuMasterChannelTab.this.parent.subtractTotalChargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
-				this.isChargeCurrentAdded = false;				
+				this.isChargeCurrentAdded = false;
 			}
 			if (this.isDischargeCurrentAdded == true) {
 				AkkuMasterChannelTab.this.parent.subtractTotalDischargeCurrent(AkkuMasterChannelTab.this.actualCurrent);
@@ -798,6 +803,7 @@ public class AkkuMasterChannelTab {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					updateDialogAfterStop();
 				}
@@ -861,105 +867,105 @@ public class AkkuMasterChannelTab {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateProgramButton() {
 		this.programmButton.setSelection(this.isDefinedProgram);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateCapacityMilliAhText() {
 		this.capacityMilliAh.setText(this.capacityMilliAhValue);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateCountCellSelection() {
 		this.countCells.select(this.countCellsValue);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateAkkuType() {
 		this.akkuType.setText(this.aAkkuTyp[this.akkuTypeValue]);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateCapacityMilliAhValue() {
 		this.capacityMilliAhValue = this.capacityMilliAh.getText();
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateCellCountValue() {
 		this.countCellsValue = this.countCells.getSelectionIndex();
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateAkkuTypeValue() {
 		this.akkuTypeValue = this.akkuType.getSelectionIndex();
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateProgramText() {
 		this.program.setText(this.aProgramm[this.programValue]);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateChargeCurrentText() {
 		this.chargeCurrent.setText(this.chargeCurrentValue);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateDichargeCurrentText() {
 		this.dischargeCurrent.setText(this.dischargeCurrentValue);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateMemoryNumberSelection() {
 		this.memoryNumberCombo.select(this.memoryNumberValue);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateProgramSelectionValue() {
 		this.programValue = this.program.getSelectionIndex() + 1;
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateChargeCurrentValue() {
 		this.chargeCurrentValue = this.chargeCurrent.getText();
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateDischargeCurrentValue() {
 		this.dischargeCurrentValue = this.dischargeCurrent.getText();
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void updateMemoryNumberValue() {
 		this.memoryNumberValue = this.memoryNumberCombo.getSelectionIndex();

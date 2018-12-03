@@ -13,17 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.dialog;
-
-import gde.GDE;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 import java.util.logging.Logger;
 
@@ -44,6 +37,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
+import gde.GDE;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
 /**
  * Dialog class showing some info text with disclaimers, version , ...
  * @author Winfried Brügmann
@@ -57,11 +57,11 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 	Label infoText;
 	Label version;
 	Canvas aboutImage;
-	
+
 	final DataExplorer application;
 
 	/**
-	* Auto-generated main method to display this 
+	* Auto-generated main method to display this
 	* org.eclipse.swt.widgets.Dialog inside a new Shell.
 	*/
 	public static void main(String[] args) {
@@ -88,11 +88,12 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			this.dialogShell.setLayout(new FormLayout());
 			this.dialogShell.layout();
-			this.dialogShell.pack();			
+			this.dialogShell.pack();
 			this.dialogShell.setSize(650, 430);
 			this.dialogShell.setText(Messages.getString(MessageIds.GDE_MSGT0146));
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
-	      public void handleEvent(Event event) {
+	      @Override
+				public void handleEvent(Event event) {
 	        switch (event.detail) {
 	        case SWT.TRAVERSE_ESCAPE:
 	        	AboutDialog.this.dialogShell.close();
@@ -113,15 +114,15 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.infoText.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.infoText.setLayoutData(infoTextLData);
 				this.infoText.setText(Messages.getString(MessageIds.GDE_MSGT0147)
-						+ System.getProperty("line.separator") 
+						+ System.getProperty("line.separator")
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGT0148)  //$NON-NLS-1$
-						+ System.getProperty("line.separator") 
+						+ System.getProperty("line.separator")
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGT0149)  //$NON-NLS-1$
-						+ System.getProperty("line.separator") 
+						+ System.getProperty("line.separator")
 						+ System.getProperty("line.separator") + Messages.getString(MessageIds.GDE_MSGT0150)); //$NON-NLS-1$
-				this.infoText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+				this.infoText.setBackground(this.application.COLOR_LIGHT_GREY);
 				//this.infoText.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-				//this.infoText.setForeground(DataExplorer.COLOR_BLACK);
+				//this.infoText.setForeground(this.application.COLOR_BLACK);
 			}
 			{
 				FormData versionLData = new FormData();
@@ -134,7 +135,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.version.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.version.setLayoutData(versionLData);
 				this.version.setText(GDE.VERSION);
-				this.version.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+				this.version.setBackground(this.application.COLOR_LIGHT_GREY);
 			}
 			{
 				FormData okLData = new FormData();
@@ -166,7 +167,7 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.aboutText.setLayoutData(aboutTextLData);
 				this.aboutText.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 8, 2));
 				this.aboutText.setText("DataExplorer"); //$NON-NLS-1$
-				this.aboutText.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+				this.aboutText.setBackground(this.application.COLOR_LIGHT_GREY);
 				this.aboutText.setText(DataExplorer.getInstance().getClass().getSimpleName());
 			}
 			{
@@ -180,14 +181,15 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 
 				final Image ideaImage = SWTResourceManager.getImage("gde/resource/DataExplorer.png");
 				this.aboutImage.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent e) {
 						/* we need to use this instead of setBackgroundImage() as otherwise
-						 * the transparency wouldn´t work 
+						 * the transparency wouldn´t work
 						 */
 						e.gc.drawImage(ideaImage,0,0);
 					}
 				});
-		    
+
 			}
 			this.dialogShell.setLocation(getParent().toDisplay(100, 100));
 			this.dialogShell.open();
@@ -200,5 +202,5 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
-	
+
 }

@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
@@ -93,7 +93,7 @@ public class JLog2Configuration extends Composite {
 	final DataExplorer						application;
 	final JLog2Dialog							dialog;
 	final JLog2										device;
-	final String[]								jlogFirmware					= new String[] { "3.2.2", "4.0.0" };//$NON-NLS-1$																																																																				//$NON-NLS-1$ //$NON-NLS-2$ 
+	final String[]								jlogFirmware					= new String[] { "3.2.2", "4.0.0" };//$NON-NLS-1$																																																																				//$NON-NLS-1$ //$NON-NLS-2$
 	final String[]								jlogConfigurations322	= new String[] {
 			"---- normal ----", //$NON-NLS-1$
 			Messages.getString(MessageIds.GDE_MSGT2894), Messages.getString(MessageIds.GDE_MSGI2878), Messages.getString(MessageIds.GDE_MSGI2879), Messages.getString(MessageIds.GDE_MSGI2880),
@@ -107,15 +107,15 @@ public class JLog2Configuration extends Composite {
 			" Jive JETI EX", //$NON-NLS-1$ //R61: Kontronik JIVE with JETI EX telemetry.  Also supported: OpenFormat live stream, Unidisplay and JETI v1 telemetry
 			" Jive HoTT v4", //$NON-NLS-1$ //R62: Kontronik JIVE with HoTTv4 telemetry.  Also supported: OpenFormat live stream and JETI v1 telemetry
 			" Jive Futaba SBUS2", //$NON-NLS-1$ //R63: Kontronik JIVE with Futaba(S.BUS2) telemetry.  Also supported: OpenFormat live stream, JETI v1 and MPX telemetry
-			" Jive HiTec", //$NON-NLS-1$ //R64: Kontronik JIVE with HiTec telemetry.  (HiTec only!) Interface JSend required for pull up resistors to +3,3 V to enalbel Optima-Rx detection 
+			" Jive HiTec", //$NON-NLS-1$ //R64: Kontronik JIVE with HiTec telemetry.  (HiTec only!) Interface JSend required for pull up resistors to +3,3 V to enalbel Optima-Rx detection
 			" Jive Spektrum", //$NON-NLS-1$ //R65: Kontronik JIVE with SPEKTRUM telemetry.  (SPEKTRUM only!) JSPEK Interface to TM1000 required and adapter to connect K4-1, K4-2 to 2 x 3 Pin JR
 			" Castle Creations Jeti EX", //$NON-NLS-1$ //R71: Castle Creations ESC with JETI EX telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX telemetry
 			" Castle Creations HoTT v4", //$NON-NLS-1$ //R72: Castle Creations ESC with HoTTv4 telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX telemetry
-			" Castle Creations Futaba SBUS2", //$NON-NLS-1$ //R73: Castle Creations ESC with Futaba(S.BUS2) telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX 
-			" Castle Creations HiTec", //$NON-NLS-1$ //R74: Castle Creations ESC with HiTec telemetry.  (HiTec only!) Interface JLog-COM<->CC/Rx-throttle required and JSend required for pull up resistors to +3,3 V to enalbel Optima-Rx detection 
+			" Castle Creations Futaba SBUS2", //$NON-NLS-1$ //R73: Castle Creations ESC with Futaba(S.BUS2) telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX
+			" Castle Creations HiTec", //$NON-NLS-1$ //R74: Castle Creations ESC with HiTec telemetry.  (HiTec only!) Interface JLog-COM<->CC/Rx-throttle required and JSend required for pull up resistors to +3,3 V to enalbel Optima-Rx detection
 			" Castle Creations Spektrum", //$NON-NLS-1$ //R75: Castle Creations ESC with SPEKTRUM telemetry.  (SPEKTRUM only!)   Interface JLog-COM<->CC/Rx-throttle required and  JSPEK Interface to TM1000
 			" C200 current sensor HoTT V4", //$NON-NLS-1$ //R81: Current sensor C200 with HoTTv4 telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX telemetry
-			" C200 current sensor Futaba SBUS2", //$NON-NLS-1$ //R82: Current sensor C200 with Futaba(S.BUS2) telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX 
+			" C200 current sensor Futaba SBUS2", //$NON-NLS-1$ //R82: Current sensor C200 with Futaba(S.BUS2) telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX
 																											};
 
 	final String[]								baudrates							= new String[] { "JIVE", "2400", "4800", "9600", "38400", "57600", "115200", "CMT" };																																											//$NON-NLS-1$
@@ -396,7 +396,7 @@ public class JLog2Configuration extends Composite {
 			JLog2Configuration.log.log(Level.FINER, getConfiguration());
 		}
 
-		public void set25Type(int type) { //this is unclear, set only in combination with special configurations, may be JLog2.5 
+		public void set25Type(int type) { //this is unclear, set only in combination with special configurations, may be JLog2.5
 			this.config[25] = GDE.STRING_EMPTY + type;
 			JLog2Configuration.log.log(Level.FINER, getConfiguration());
 		}
@@ -577,7 +577,7 @@ public class JLog2Configuration extends Composite {
 
 		@Override
 		public void switchConfig() {
-			//0=normal, 1=HSS, 2=HSSG2, 3=HSST, 4=BH, 5=BM, 6=BHSS, 7=BHSST, 8=G, 9=S 10=L, 
+			//0=normal, 1=HSS, 2=HSSG2, 3=HSST, 4=BH, 5=BM, 6=BHSS, 7=BHSST, 8=G, 9=S 10=L,
 			//11=T, 12=GT, 13=V, 14=VG, 15=VS, 16=BID, 17=BIDG, 18=BIDS, 19=A, 20=AV, 21=B, 22=BV, 23=P1, 24=P2, 25=AVP1, 26=AP2
 			switch (JLog2Configuration.this.jlogConfigurationCombo.getSelectionIndex()) {
 			default:
@@ -614,7 +614,7 @@ public class JLog2Configuration extends Composite {
 			case 10:
 				JLog2Configuration.this.configuration.update(this.L);
 				break;
-			//11=T, 12=GT, 13=V, 14=VG, 15=VS, 16=BID, 17=BIDG, 18=BIDS, 19=A, 20=AV, 
+			//11=T, 12=GT, 13=V, 14=VG, 15=VS, 16=BID, 17=BIDG, 18=BIDS, 19=A, 20=AV,
 			case 11:
 				JLog2Configuration.this.configuration.update(this.T);
 				break;
@@ -698,15 +698,15 @@ public class JLog2Configuration extends Composite {
 			//R61: Kontronik JIVE with JETI EX telemetry.  Also supported: OpenFormat live stream, Unidisplay and JETI v1 telemetry
 			//R62: Kontronik JIVE with HoTTv4 telemetry.  Also supported: OpenFormat live stream and JETI v1 telemetry
 			//R63: Kontronik JIVE with Futaba(S.BUS2) telemetry.  Also supported: OpenFormat live stream, JETI v1 and MPX telemetry
-			//R64: Kontronik JIVE with HiTec telemetry.  (HiTec only!) Interface JSend required for pull up resistors to +3,3 V to enalbel Optima-Rx detection 
+			//R64: Kontronik JIVE with HiTec telemetry.  (HiTec only!) Interface JSend required for pull up resistors to +3,3 V to enalbel Optima-Rx detection
 			//R65: Kontronik JIVE with SPEKTRUM telemetry.  (SPEKTRUM only!) JSPEK Interface to TM1000 required and adapter to connect K4-1, K4-2 to 2 x 3 Pin JR
 			//R71: Castle Creations ESC with JETI EX telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX telemetry
 			//R72: Castle Creations ESC with HoTTv4 telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX telemetry
-			//R73: Castle Creations ESC with Futaba(S.BUS2) telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX 
-			//R74: Castle Creations ESC with HiTec telemetry.  (HiTec only!) Interface JLog-COM<->CC/Rx-throttle required and JSend required for pull up resistors to +3,3 V to enalbel Optima-Rx detection 
+			//R73: Castle Creations ESC with Futaba(S.BUS2) telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX
+			//R74: Castle Creations ESC with HiTec telemetry.  (HiTec only!) Interface JLog-COM<->CC/Rx-throttle required and JSend required for pull up resistors to +3,3 V to enalbel Optima-Rx detection
 			//R75: Castle Creations ESC with SPEKTRUM telemetry.  (SPEKTRUM only!)   Interface JLog-COM<->CC/Rx-throttle required and  JSPEK Interface to TM1000
 			//R81: Current sensor C200 with HoTTv4 telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX telemetry
-			//R82: Current sensor C200 with Futaba(S.BUS2) telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX 
+			//R82: Current sensor C200 with Futaba(S.BUS2) telemetry.  Also supported: OpenFormat live stream, Unidisplay, JETI v1 and MPX
 			switch (JLog2Configuration.this.jlogConfigurationCombo.getSelectionIndex()) {
 			default:
 			case 0:
@@ -886,7 +886,7 @@ public class JLog2Configuration extends Composite {
 	}
 
 	/**
-	* Auto-generated main method to display this 
+	* Auto-generated main method to display this
 	* org.eclipse.swt.widgets.Composite inside a new Shell.
 	*/
 	public static void main(String[] args) {
@@ -894,7 +894,7 @@ public class JLog2Configuration extends Composite {
 	}
 
 	/**
-	* Auto-generated method to display this 
+	* Auto-generated method to display this
 	* org.eclipse.swt.widgets.Composite inside a new Shell.
 	*/
 	public static void showGUI() {
@@ -2319,10 +2319,10 @@ public class JLog2Configuration extends Composite {
 						public void widgetSelected(SelectionEvent evt) {
 							JLog2Configuration.log.log(Level.FINEST, "alarmLinesCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							if (JLog2Configuration.this.alarmLinesCombo.getSelectionIndex() >= 1) {
-								JLog2Configuration.this.alarmLinesLabel.setForeground(DataExplorer.COLOR_RED);
+								JLog2Configuration.this.alarmLinesLabel.setForeground(DataExplorer.getInstance().COLOR_RED);
 							}
 							else {
-								JLog2Configuration.this.alarmLinesLabel.setForeground(DataExplorer.COLOR_BLACK);
+								JLog2Configuration.this.alarmLinesLabel.setForeground(DataExplorer.getInstance().COLOR_BLACK);
 							}
 							checkAdapterRequired();
 							JLog2Configuration.this.configuration.setNumberAlarmLines(JLog2Configuration.this.alarmLinesCombo.getSelectionIndex());
@@ -2367,7 +2367,7 @@ public class JLog2Configuration extends Composite {
 							case 1: //interval
 								JLog2Configuration.this.configuration.setLine1signalType(64);
 								break;
-							case 2: //flash 
+							case 2: //flash
 								JLog2Configuration.this.configuration.setLine1signalType(32);
 								break;
 							case 3: //Morse
@@ -2553,14 +2553,14 @@ public class JLog2Configuration extends Composite {
 								JLog2Configuration.this.pulsPerRevolutionSensorCombo.setItems(JLog2Configuration.this.motorPols);
 								JLog2Configuration.this.pulsPerRevolutionSensorCombo.select(JLog2Configuration.this.motorPolsCombo.getSelectionIndex());
 								JLog2Configuration.this.rpmSensorLabel.setText(Messages.getString(MessageIds.GDE_MSGT2890));
-								JLog2Configuration.this.rpmSensorLabel.setForeground(DataExplorer.COLOR_RED);
+								JLog2Configuration.this.rpmSensorLabel.setForeground(DataExplorer.getInstance().COLOR_RED);
 								JLog2Configuration.this.configuration.setPulsePerRevolution(1);
 							}
 							else {
 								JLog2Configuration.this.pulsPerRevolutionSensorCombo.setItems(JLog2Configuration.this.zeroTo127);
 								JLog2Configuration.this.pulsPerRevolutionSensorCombo.select(1);
 								JLog2Configuration.this.rpmSensorLabel.setText(Messages.getString(MessageIds.GDE_MSGT2891));
-								JLog2Configuration.this.rpmSensorLabel.setForeground(DataExplorer.COLOR_BLACK);
+								JLog2Configuration.this.rpmSensorLabel.setForeground(DataExplorer.getInstance().COLOR_BLACK);
 								JLog2Configuration.this.configuration.setPulsePerRevolution(1);
 							}
 							enableSaveSettings();
@@ -2789,10 +2789,10 @@ public class JLog2Configuration extends Composite {
 		this.ext5smallerButton.setSelection((config.get(22) & 0x0010) != 0);
 
 		this.alarmLinesCombo.select(config.get(23));
-		if (config.get(23) > 0) this.alarmLinesLabel.setForeground(DataExplorer.COLOR_RED);
+		if (config.get(23) > 0) this.alarmLinesLabel.setForeground(this.application.COLOR_RED);
 		setLine1SignalType(config.get(46));
 		setTemperaturSensorType(config.get(24));
-		this.telemetryCombo.select(config.get(26) <= 3 ? config.get(26) + 1 : 0); // 0=none 1=FTDI 2=JETI 3=MPX 4=Unidisplay 
+		this.telemetryCombo.select(config.get(26) <= 3 ? config.get(26) + 1 : 0); // 0=none 1=FTDI 2=JETI 3=MPX 4=Unidisplay
 		this.pulsPerRevolutionSensorCombo.select(config.get(27));
 		if (this.pulsPerRevolutionSensorCombo.getSelectionIndex() > 0) this.extRpmButton.setEnabled(true);
 		setPulsPerRevolutionSensor(config.get(28));
@@ -2838,7 +2838,7 @@ public class JLog2Configuration extends Composite {
 			this.pulsPerRevolutionSensorCombo.setItems(this.motorPols);
 			this.pulsPerRevolutionSensorCombo.select(this.motorPolsCombo.getSelectionIndex());
 			this.rpmSensorLabel.setText(Messages.getString(MessageIds.GDE_MSGI2874));
-			this.rpmSensorLabel.setForeground(DataExplorer.COLOR_RED);
+			this.rpmSensorLabel.setForeground(this.application.COLOR_RED);
 		}
 		else {
 			int selectionIndex = this.pulsPerRevolutionSensorCombo.getSelectionIndex();
@@ -2846,7 +2846,7 @@ public class JLog2Configuration extends Composite {
 			if (selectionIndex > 0) this.pulsPerRevolutionSensorCombo.select(1);
 			else this.pulsPerRevolutionSensorCombo.select(0);
 			this.rpmSensorLabel.setText(Messages.getString(MessageIds.GDE_MSGI2875));
-			this.rpmSensorLabel.setForeground(DataExplorer.COLOR_BLACK);
+			this.rpmSensorLabel.setForeground(this.application.COLOR_BLACK);
 		}
 	}
 
@@ -2888,11 +2888,11 @@ public class JLog2Configuration extends Composite {
 			break;
 		case 2:
 			enableExternTempeartureAll(true);
-			this.tempSensorTypeLabel.setForeground(DataExplorer.COLOR_RED);
+			this.tempSensorTypeLabel.setForeground(this.application.COLOR_RED);
 			break;
 		default:
 			enableExternTempeartureAll(false);
-			this.tempSensorTypeLabel.setForeground(DataExplorer.COLOR_BLACK);
+			this.tempSensorTypeLabel.setForeground(this.application.COLOR_BLACK);
 			break;
 		}
 	}
@@ -2906,7 +2906,7 @@ public class JLog2Configuration extends Composite {
 		case 0: //switch
 			this.line1signalTypeCombo.select(0);
 			break;
-		case 32: //flash 
+		case 32: //flash
 			this.line1signalTypeCombo.select(1);
 			break;
 		case 64: //interval
@@ -3082,8 +3082,8 @@ public class JLog2Configuration extends Composite {
 			this.alarmLinesCombo.setItems(this.zeroAlarms);
 			this.alarmLinesCombo.select(0);
 			this.configuration.setNumberAlarmLines(0);
-			this.alarmLinesLabel.setForeground(DataExplorer.COLOR_BLACK);
-			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+			this.alarmLinesLabel.setForeground(this.application.COLOR_BLACK);
+			this.sensorAdapterButton.setBackground(this.application.COLOR_LIGHT_GREY);
 			this.sensorAdapterButton.setEnabled(false);
 		}
 		checkAdapterRequired();
@@ -3095,11 +3095,11 @@ public class JLog2Configuration extends Composite {
 				|| this.ext1smallerButton.getSelection() || this.extern2Combo.getSelectionIndex() > 0 || this.ext2smallerButton.getSelection() || this.extern3Combo.getSelectionIndex() > 0
 				|| this.ext3smallerButton.getSelection() || this.extern4Combo.getSelectionIndex() > 0 || this.ext4smallerButton.getSelection() || this.extern5Combo.getSelectionIndex() > 0
 				|| this.ext5smallerButton.getSelection()) {
-			this.alarmsClearButton.setBackground(DataExplorer.COLOR_RED);
+			this.alarmsClearButton.setBackground(this.application.COLOR_RED);
 			this.alarmsClearButton.setEnabled(true);
 		}
 		else {
-			this.alarmsClearButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+			this.alarmsClearButton.setBackground(this.application.COLOR_LIGHT_GREY);
 			this.alarmsClearButton.setEnabled(false);
 		}
 		checkNumberAlarms();
@@ -3129,7 +3129,7 @@ public class JLog2Configuration extends Composite {
 		this.configuration.setExtTemp5("0"); //$NON-NLS-1$
 		this.configuration.setExtTemp5LowerThan(0);
 
-		this.alarmLinesLabel.setForeground(DataExplorer.COLOR_BLACK);
+		this.alarmLinesLabel.setForeground(this.application.COLOR_BLACK);
 		this.alarmLinesCombo.select(0);
 
 		checkClearButtonState();
@@ -3164,14 +3164,14 @@ public class JLog2Configuration extends Composite {
 	}
 
 	private void updateSubDevices(int value) {
-		this.subDevicesLabel.setForeground(DataExplorer.COLOR_BLACK);
+		this.subDevicesLabel.setForeground(this.application.COLOR_BLACK);
 		this.subDevicesCombo.setText(Messages.getString(MessageIds.GDE_MSGT2865));
 		this.sensorAdapterButton.setEnabled(false);
-		this.sensorAdapterButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+		this.sensorAdapterButton.setBackground(this.application.COLOR_LIGHT_GREY);
 		this.telemetryCombo.setEnabled(true);
 		this.alarmLinesCombo.setEnabled(true);
 		this.line1signalTypeCombo.setEnabled(true);
-		this.alarmLinesLabel.setForeground(DataExplorer.COLOR_BLACK);
+		this.alarmLinesLabel.setForeground(this.application.COLOR_BLACK);
 		this.tempSensorTypeCombo.setEnabled(true);
 		this.pulsPerRevolutionSensorCombo.setEnabled(true);
 		this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGT2874));
@@ -3183,49 +3183,49 @@ public class JLog2Configuration extends Composite {
 		this.speedSensorLabel.setVisible(false);
 		this.speedSensorButton.setVisible(false);
 		if (this.configuration.version == 322) {
-			if (this.comOutput.lastIndexOf(this.hottOutput) > 0) 
+			if (this.comOutput.lastIndexOf(this.hottOutput) > 0)
 				this.comOutput.substring(0, this.comOutput.lastIndexOf(this.hottOutput));
 			this.telemetryCombo.setItems(this.comOutputString.split(GDE.STRING_COMMA));
-			
-			//0=normal, 1=HSS, 2=HSSG2, 3=HSST, 4=BH, 5=BM, 6=BHSS, 7=BHSST, 8=G, 9=S 10=L, 
+
+			//0=normal, 1=HSS, 2=HSSG2, 3=HSST, 4=BH, 5=BM, 6=BHSS, 7=BHSST, 8=G, 9=S 10=L,
 			//11=T, 12=GT, 13=V, 14=VG, 15=VS, 16=BID, 17=BIDG, 18=BIDS, 19=A, 20=AV, 21=B, 22=BV, 23=P1, 24=P2, 25=AVP1, 26=AP2
 			switch (value) {
 			case 1: //V (V4T0)
 				this.jlogConfigurationCombo.select(13);
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				enableExternTempearture1(true);
 				this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGI2877));
 				this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
 				break;
 			case 2: //BID
 				this.jlogConfigurationCombo.select(16);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				this.subDevicesCombo.setText("BID"); //$NON-NLS-1$
 				this.alarmLinesCombo.setEnabled(false);
 				this.line1signalTypeCombo.setEnabled(false);
 				this.pulsPerRevolutionSensorCombo.setEnabled(false);
 				this.tempSensorTypeCombo.setEnabled(false);
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				break;
 			case 92: //P2 (Phase puls K4-2)
 				this.jlogConfigurationCombo.select(24);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				this.subDevicesCombo.setText("BID"); //$NON-NLS-1$
 				this.alarmLinesCombo.setEnabled(false);
 				this.line1signalTypeCombo.setEnabled(false);
 				this.pulsPerRevolutionSensorCombo.setEnabled(false);
 				this.tempSensorTypeCombo.setEnabled(false);
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				break;
 			case 3: //B (JTX base)
 				this.jlogConfigurationCombo.select(21);
 				this.alarmLinesCombo.setItems(this.greaterOneAlarms);
 				this.alarmLinesCombo.select(2);
 				this.alarmLinesCombo.setEnabled(false);
-				this.alarmLinesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.alarmLinesLabel.setForeground(this.application.COLOR_RED);
 				this.line1signalTypeCombo.setEnabled(false);
 				this.tempSensorTypeCombo.setEnabled(false);
 				this.pulsPerRevolutionSensorCombo.setEnabled(false);
@@ -3237,7 +3237,7 @@ public class JLog2Configuration extends Composite {
 				this.alarmLinesCombo.setItems(this.greaterOneAlarms);
 				this.alarmLinesCombo.select(2);
 				this.alarmLinesCombo.setEnabled(false);
-				this.alarmLinesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.alarmLinesLabel.setForeground(this.application.COLOR_RED);
 				this.line1signalTypeCombo.setEnabled(false);
 				this.tempSensorTypeCombo.setEnabled(false);
 				this.pulsPerRevolutionSensorCombo.setEnabled(false);
@@ -3265,7 +3265,7 @@ public class JLog2Configuration extends Composite {
 				this.telemetryCombo.setEnabled(false);
 				this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				break;
 			case 11: //HoTT
 				//this.jlogConfigurationCombo.select(10); // no special configuration or firmaware required
@@ -3286,14 +3286,14 @@ public class JLog2Configuration extends Composite {
 				this.telemetryCombo.setEnabled(false);
 				this.telemetryCombo.setText("MPX"); //$NON-NLS-1$
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				enableExternTempearture1(true);
 				this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGI2877));
 				this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
 				break;
 			case 20: //BIDG (GPS single)
 				this.jlogConfigurationCombo.select(17);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				this.subDevicesCombo.setText("BID"); //$NON-NLS-1$
 				this.telemetryCombo.setEnabled(false);
 				this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
@@ -3302,7 +3302,7 @@ public class JLog2Configuration extends Composite {
 				this.pulsPerRevolutionSensorCombo.setEnabled(false);
 				this.tempSensorTypeCombo.setEnabled(false);
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				break;
 			case 23: //VG (V4T0 GPS single)
 				this.jlogConfigurationCombo.select(14);
@@ -3310,14 +3310,14 @@ public class JLog2Configuration extends Composite {
 				this.telemetryCombo.setEnabled(false);
 				this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				enableExternTempearture1(true);
 				this.ext1Label.setText(Messages.getString(MessageIds.GDE_MSGI2877));
 				this.temperaure1Label.setText("[V]"); //$NON-NLS-1$
 				break;
 			case 25: //BIDS (GPS mpx)
 				this.jlogConfigurationCombo.select(18);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				this.subDevicesCombo.setText("BID"); //$NON-NLS-1$
 				this.telemetryCombo.setEnabled(false);
 				this.telemetryCombo.setText("MPX"); //$NON-NLS-1$
@@ -3326,7 +3326,7 @@ public class JLog2Configuration extends Composite {
 				this.pulsPerRevolutionSensorCombo.setEnabled(false);
 				this.tempSensorTypeCombo.setEnabled(false);
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				enableMpxAddressSelection(true);
 				break;
 			case 40: //L (GPS mpx LQI)
@@ -3337,7 +3337,7 @@ public class JLog2Configuration extends Composite {
 				break;
 			case 91: //P1 (Phase puls K4-1)
 				this.jlogConfigurationCombo.select(23);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				break;
 			case 110: //T (Prandtl probe)
 				this.jlogConfigurationCombo.select(11);
@@ -3351,24 +3351,24 @@ public class JLog2Configuration extends Composite {
 				this.telemetryCombo.setEnabled(false);
 				this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				this.speedSensorLabel.setVisible(true);
 				this.speedSensorButton.setVisible(true);
 				break;
 			case 200: //HTS-SS (HiTec telemetry)
 				this.jlogConfigurationCombo.select(1);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				this.subDevicesCombo.setText("HTS-SS"); //$NON-NLS-1$
 				this.alarmLinesCombo.setEnabled(false);
 				this.line1signalTypeCombo.setEnabled(false);
 				this.pulsPerRevolutionSensorCombo.setEnabled(false);
 				this.tempSensorTypeCombo.setEnabled(false);
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				break;
 			case 201: //HTS-SS + GPS-Logger (no HiTec telemetry)
 				this.jlogConfigurationCombo.select(2);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				this.subDevicesCombo.setText("HTS-SS"); //$NON-NLS-1$
 				this.alarmLinesCombo.setEnabled(false);
 				this.line1signalTypeCombo.setEnabled(false);
@@ -3377,11 +3377,11 @@ public class JLog2Configuration extends Composite {
 				this.telemetryCombo.setEnabled(false);
 				this.telemetryCombo.setText("MBS"); //$NON-NLS-1$
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				break;
 			case 202: //HTS-SS + temperature sensor (no HiTec telemetry)
 				this.jlogConfigurationCombo.select(3);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				this.subDevicesCombo.setText("HTS-SS"); //$NON-NLS-1$
 				this.alarmLinesCombo.setEnabled(false);
 				this.line1signalTypeCombo.setEnabled(false);
@@ -3391,11 +3391,11 @@ public class JLog2Configuration extends Composite {
 				this.telemetryCombo.setEnabled(false);
 				this.telemetryCombo.setText("digital COM"); //$NON-NLS-1$
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				break;
 			case 210: //BH (HV²BEC no MPX telemetry)
 				this.jlogConfigurationCombo.select(4);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				this.subDevicesCombo.setText("HV²BEC"); //$NON-NLS-1$
 				this.ext1Label.setText("HV²BEC Temp"); //$NON-NLS-1$
 				this.alarmLinesCombo.setEnabled(false);
@@ -3405,13 +3405,13 @@ public class JLog2Configuration extends Composite {
 				this.tempSensorTypeCombo.setEnabled(false);
 				enableExternTempearture1(true);
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				this.hv2BecLabel.setVisible(true);
 				this.hv2BecCombo.setVisible(true);
 				break;
 			case 211: //BM (HV²BEC no HoTT telemetry)
 				this.jlogConfigurationCombo.select(5);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				this.subDevicesCombo.setText("HV²BEC"); //$NON-NLS-1$
 				this.ext1Label.setText("HV²BEC Temp"); //$NON-NLS-1$
 				this.alarmLinesCombo.setEnabled(false);
@@ -3421,13 +3421,13 @@ public class JLog2Configuration extends Composite {
 				this.tempSensorTypeCombo.setEnabled(false);
 				enableExternTempearture1(true);
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				this.hv2BecLabel.setVisible(true);
 				this.hv2BecCombo.setVisible(true);
 				break;
 			case 212: //HV²BEC/HTSS (HiTec telemetry)
 				this.jlogConfigurationCombo.select(6);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				this.subDevicesCombo.setText("HV²BEC/HTSS"); //$NON-NLS-1$
 				this.ext1Label.setText("HV²BEC Temp"); //$NON-NLS-1$
 				this.alarmLinesCombo.setEnabled(false);
@@ -3437,13 +3437,13 @@ public class JLog2Configuration extends Composite {
 				this.tempSensorTypeCombo.setEnabled(false);
 				enableExternTempearture1(true);
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				this.hv2BecLabel.setVisible(true);
 				this.hv2BecCombo.setVisible(true);
 				break;
 			case 213: //BHSST (HV²BEC + HiTec telemetry + digital temperature sensors at COM)
 				this.jlogConfigurationCombo.select(7);
-				this.subDevicesLabel.setForeground(DataExplorer.COLOR_RED);
+				this.subDevicesLabel.setForeground(this.application.COLOR_RED);
 				this.subDevicesCombo.setText("HV²BEC/HTSS"); //$NON-NLS-1$
 				this.ext1Label.setText("HV²BEC Temp"); //$NON-NLS-1$
 				this.alarmLinesCombo.setEnabled(false);
@@ -3455,7 +3455,7 @@ public class JLog2Configuration extends Composite {
 				this.tempSensorTypeCombo.setEnabled(false);
 				this.enableExternTempearture1(true);
 				this.sensorAdapterButton.setEnabled(true);
-				this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+				this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 				this.hv2BecLabel.setVisible(true);
 				this.hv2BecCombo.setVisible(true);
 				break;
@@ -3502,7 +3502,7 @@ public class JLog2Configuration extends Composite {
 				this.telemetryCombo.select(0);
 				break;
 			}
-			
+
 		}
 		JLog2Configuration.log.log(Level.FINE, "telemetryCombo selection index = " + this.telemetryCombo.getSelectionIndex() + " jlogConfigurationCombo selection index = " + this.jlogConfigurationCombo.getSelectionIndex()); //$NON-NLS-1$ //$NON-NLS-2$
 		JLog2Configuration.log.log(Level.FINER, StringHelper.printBinary((byte) (value & 0xFF), false));
@@ -3515,7 +3515,7 @@ public class JLog2Configuration extends Composite {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void updateGearRatio() {
 		double gearRatio = Double.valueOf(this.gearMainWheelCombo.getText().trim() + GDE.STRING_DOT + this.gearMainWheelDecimalsCombo.getText().trim())
@@ -3527,17 +3527,17 @@ public class JLog2Configuration extends Composite {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void checkAdapterRequired() {
 		if (this.alarmLinesCombo.getSelectionIndex() > 1 || this.tempSensorTypeCombo.getSelectionIndex() == 2
 				|| (this.tempSensorTypeCombo.getSelectionIndex() >= 1 && this.pulsPerRevolutionSensorCombo.getSelectionIndex() > 0)) {
 			this.sensorAdapterButton.setEnabled(true);
-			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_RED);
+			this.sensorAdapterButton.setBackground(this.application.COLOR_RED);
 		}
 		else {
 			this.sensorAdapterButton.setEnabled(false);
-			this.sensorAdapterButton.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+			this.sensorAdapterButton.setBackground(this.application.COLOR_LIGHT_GREY);
 		}
 	}
 }

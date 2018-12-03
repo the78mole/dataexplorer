@@ -188,6 +188,7 @@ public class DevicePropertiesEditor extends Composite {
 	//cross over fields
 	DeviceConfiguration										deviceConfig;
 	final Settings												settings;
+	final DataExplorer 										application;
 
 	public static DevicePropertiesEditor getInstance() {
 		if (DevicePropertiesEditor.devicePropsEditor == null) {
@@ -205,6 +206,7 @@ public class DevicePropertiesEditor extends Composite {
 	private DevicePropertiesEditor(Shell parent, int style) {
 		super(parent, style);
 		this.settings = Settings.getInstance();
+		this.application = DataExplorer.getInstance();
 	}
 
 	/**
@@ -610,7 +612,7 @@ public class DevicePropertiesEditor extends Composite {
 							{
 								this.deviceImplementationButton = new Button(this.devicePropsComposite, SWT.CHECK);
 								this.deviceImplementationButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-								this.deviceImplementationButton.setForeground(DataExplorer.COLOR_BLACK);
+								this.deviceImplementationButton.setForeground(this.application.COLOR_BLACK);
 								this.deviceImplementationButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0478));
 								this.deviceImplementationButton.setBounds(0, 30, 22, 22);
 								this.deviceImplementationButton.addSelectionListener(new SelectionAdapter() {
@@ -1151,7 +1153,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockInputCombo1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 					this.dataBlockInputCombo1.setBounds(80, GDE.IS_MAC_COCOA ? 15 : 30, 90, 20);
 					this.dataBlockInputCombo1.setItems(InputTypes.valuesAsStingArray());
-					this.dataBlockInputCombo1.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockInputCombo1.setBackground(this.application.COLOR_WHITE);
 					this.dataBlockInputCombo1.setLayout(null);
 					this.dataBlockInputCombo1.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -1177,7 +1179,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockInputCombo2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 					this.dataBlockInputCombo2.setBounds(175, GDE.IS_MAC_COCOA ? 15 : 30, 90, 20);
 					this.dataBlockInputCombo2.setItems(InputTypes.valuesAsStingArray());
-					this.dataBlockInputCombo2.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockInputCombo2.setBackground(this.application.COLOR_WHITE);
 					this.dataBlockInputCombo2.setLayout(null);
 					this.dataBlockInputCombo2.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -1209,7 +1211,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockFormatCombo1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 					this.dataBlockFormatCombo1.setBounds(80, GDE.IS_MAC_COCOA ? 45 : 60, 90, 20);
 					this.dataBlockFormatCombo1.setItems(FormatTypes.valuesAsStingArray());
-					this.dataBlockFormatCombo1.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockFormatCombo1.setBackground(this.application.COLOR_WHITE);
 					this.dataBlockFormatCombo1.setLayout(null);
 					this.dataBlockFormatCombo1.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -1235,7 +1237,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockFormatCombo2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
 					this.dataBlockFormatCombo2.setBounds(175, GDE.IS_MAC_COCOA ? 45 : 60, 90, 20);
 					this.dataBlockFormatCombo2.setItems(FormatTypes.valuesAsStingArray());
-					this.dataBlockFormatCombo2.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockFormatCombo2.setBackground(this.application.COLOR_WHITE);
 					this.dataBlockFormatCombo2.setLayout(null);
 					this.dataBlockFormatCombo2.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -1326,7 +1328,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockTimeUnitCombo.setBounds(130, GDE.IS_MAC_COCOA ? 105 : 120, 60, 20);
 					this.dataBlockTimeUnitCombo.setItems(TimeUnitTypes.valuesAsStingArray());
 					this.dataBlockTimeUnitCombo.setEditable(false);
-					this.dataBlockTimeUnitCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockTimeUnitCombo.setBackground(this.application.COLOR_WHITE);
 					this.dataBlockTimeUnitCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1352,7 +1354,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockSeparatorCombo.setBounds(130, GDE.IS_MAC_COCOA ? 135 : 150, 40, 20);
 					this.dataBlockSeparatorCombo.setItems(CommaSeparatorTypes.valuesAsStingArray());
 					this.dataBlockSeparatorCombo.setEditable(false);
-					this.dataBlockSeparatorCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockSeparatorCombo.setBackground(this.application.COLOR_WHITE);
 					this.dataBlockSeparatorCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1375,7 +1377,7 @@ public class DevicePropertiesEditor extends Composite {
 			{
 				this.dataBlockLeaderText = new Text(this.dataBlockRequiredGroup, SWT.BORDER);
 				this.dataBlockLeaderText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.dataBlockLeaderText.setBackground(DataExplorer.COLOR_WHITE);
+				this.dataBlockLeaderText.setBackground(this.application.COLOR_WHITE);
 				this.dataBlockLeaderText.setBounds(130, GDE.IS_MAC_COCOA ? 165 : 180, 30, 20);
 				this.dataBlockLeaderText.setText(GDE.STRING_BLANK + DevicePropertiesEditor.this.dataBlockLeader);
 				this.dataBlockLeaderText.setEnabled(false);
@@ -1401,7 +1403,7 @@ public class DevicePropertiesEditor extends Composite {
 			{
 				this.dataBlockEndingCombo = new CCombo(this.dataBlockRequiredGroup, SWT.BORDER);
 				this.dataBlockEndingCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-				this.dataBlockEndingCombo.setBackground(DataExplorer.COLOR_WHITE);
+				this.dataBlockEndingCombo.setBackground(this.application.COLOR_WHITE);
 				this.dataBlockEndingCombo.setBounds(130, GDE.IS_MAC_COCOA ? 195 : 210, 90, 20);
 				this.dataBlockEndingCombo.setItems(LineEndingTypes.valuesAsStingArray());
 				this.dataBlockEndingCombo.setEnabled(false);
@@ -1456,7 +1458,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockcheckSumFormatCombo.setEditable(false);
 					this.dataBlockcheckSumFormatCombo.setEnabled(false);
 					this.dataBlockcheckSumFormatCombo.select(1);
-					this.dataBlockcheckSumFormatCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockcheckSumFormatCombo.setBackground(this.application.COLOR_WHITE);
 					this.dataBlockcheckSumFormatCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -1483,7 +1485,7 @@ public class DevicePropertiesEditor extends Composite {
 					this.dataBlockCheckSumTypeCombo.setEditable(false);
 					this.dataBlockCheckSumTypeCombo.setEnabled(false);
 					this.dataBlockCheckSumTypeCombo.select(1);
-					this.dataBlockCheckSumTypeCombo.setBackground(DataExplorer.COLOR_WHITE);
+					this.dataBlockCheckSumTypeCombo.setBackground(this.application.COLOR_WHITE);
 					this.dataBlockCheckSumTypeCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {

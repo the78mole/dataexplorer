@@ -134,9 +134,6 @@ import gde.utils.WebBrowser;
 public class DataExplorer extends Composite {
 	final static String	$CLASS_NAME	= DataExplorer.class.getName();
 	final static Logger	log					= Logger.getLogger(DataExplorer.class.getName());
-	{
-		SWTResourceManager.registerResourceUser(this);
-	}
 
 	final HashMap<String, String>	extensionFilterMap								= new HashMap<String, String>();
 
@@ -145,17 +142,17 @@ public class DataExplorer extends Composite {
 	public final static String		CURVE_SELECTION_ITEM							= "curveSelectedItem";																			//$NON-NLS-1$
 	public final static String		OLD_STATE													= "oldState";																								//$NON-NLS-1$
 
-	public final static Color			COLOR_WHITE												= SWTResourceManager.getColor(SWT.COLOR_WHITE);
-	public final static Color			COLOR_LIGHT_GREY									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND);
-	public final static Color			COLOR_GREY												= SWTResourceManager.getColor(SWT.COLOR_GRAY);
-	public final static Color			COLOR_CANVAS_YELLOW								= SWTResourceManager.getColor(250, 249, 211);
-	public final static Color			COLOR_BLUE												= SWTResourceManager.getColor(SWT.COLOR_BLUE);
-	public final static Color			COLOR_LIGHT_BLUE									= SWTResourceManager.getColor(239, 239, 255);
-	public final static Color			COLOR_DARK_GREEN									= SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
-	public final static Color			COLOR_BLACK												= SWTResourceManager.getColor(SWT.COLOR_BLACK);
-	public final static Color			COLOR_RED													= SWTResourceManager.getColor(SWT.COLOR_RED);
-	public static Color						COLOR_BACKGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND);
-	public static Color						COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND);
+	public final Color			COLOR_WHITE												;
+	public final Color			COLOR_LIGHT_GREY									;
+	public final Color			COLOR_GREY												;
+	public final Color			COLOR_CANVAS_YELLOW								;
+	public final Color			COLOR_BLUE												;
+	public final Color			COLOR_LIGHT_BLUE									;
+	public final Color			COLOR_DARK_GREEN									;
+	public final Color			COLOR_BLACK												;
+	public final Color			COLOR_RED													;
+	public Color						COLOR_BACKGROUND									;
+	public Color						COLOR_FOREGROUND									;
 
 	public final static int				TAB_INDEX_GRAPHIC									= 0;
 	public final static int				TAB_INDEX_DATA_TABLE							= 1;
@@ -241,6 +238,24 @@ public class DataExplorer extends Composite {
 	private DataExplorer() {
 		super(GDE.shell, SWT.NONE);
 		this.threadId = Thread.currentThread().getId();
+
+		SWTResourceManager.registerResourceUser(this);
+COLOR_WHITE												= SWTResourceManager.getColor(SWT.COLOR_WHITE);
+COLOR_LIGHT_GREY									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND);
+COLOR_GREY												= SWTResourceManager.getColor(SWT.COLOR_GRAY);
+COLOR_CANVAS_YELLOW								= SWTResourceManager.getColor(250, 249, 211);
+COLOR_BLUE												= SWTResourceManager.getColor(SWT.COLOR_BLUE);
+COLOR_LIGHT_BLUE									= SWTResourceManager.getColor(239, 239, 255);
+COLOR_DARK_GREEN									= SWTResourceManager.getColor(SWT.COLOR_DARK_GREEN);
+COLOR_BLACK												= SWTResourceManager.getColor(SWT.COLOR_BLACK);
+COLOR_RED													= SWTResourceManager.getColor(SWT.COLOR_RED);
+COLOR_BACKGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND);
+COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND);
+
+
+
+
+
 	}
 
 	/**
@@ -293,7 +308,7 @@ public class DataExplorer extends Composite {
 		try {
 			this.setColorSchemaColors(this.settings.getSkinColorSchema());
 			this.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL, false, false));
-			this.setBackground(DataExplorer.COLOR_BACKGROUND);
+			this.setBackground(this.COLOR_BACKGROUND);
 
 			GridLayout thisLayout = new GridLayout(1, true);
 			thisLayout.marginWidth = 0;
@@ -311,7 +326,7 @@ public class DataExplorer extends Composite {
 			}
 			{
 				this.menuCoolBar = new CoolBar(this, SWT.FLAT);
-				this.menuCoolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+				this.menuCoolBar.setBackground(this.COLOR_BACKGROUND);
 				GridData menuCoolBarLData = new GridData();
 				menuCoolBarLData.horizontalAlignment = GridData.FILL;
 				menuCoolBarLData.verticalAlignment = GridData.BEGINNING;
@@ -325,8 +340,8 @@ public class DataExplorer extends Composite {
 			}
 			{ // begin main tab display
 				this.displayTab = new CTabFolder(this, SWT.FLAT);
-				this.displayTab.setBackground(new Color[]{DataExplorer.COLOR_BACKGROUND, this.settings.getGraphicsSurroundingBackground()}, new int[]{100}, true);
-				this.displayTab.setForeground(DataExplorer.COLOR_FOREGROUND);
+				this.displayTab.setBackground(new Color[]{this.COLOR_BACKGROUND, this.settings.getGraphicsSurroundingBackground()}, new int[]{100}, true);
+				this.displayTab.setForeground(this.COLOR_FOREGROUND);
 				GridData tabCompositeLData = new GridData();
 				tabCompositeLData.verticalAlignment = GridData.FILL;
 				tabCompositeLData.horizontalAlignment = GridData.FILL;
@@ -3241,26 +3256,26 @@ public class DataExplorer extends Composite {
 		switch (schema) {
 		default:
 		case Settings.COLOR_SCHEMA_SYSTEM:
-			DataExplorer.COLOR_BACKGROUND	= SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND);
-			DataExplorer.COLOR_FOREGROUND	= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND);			
+			this.COLOR_BACKGROUND	= SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND);
+			this.COLOR_FOREGROUND	= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROUND);
 			break;
 
 		case Settings.COLOR_SCHEMA_LIGHT:
-			DataExplorer.COLOR_BACKGROUND	= SWTResourceManager.getColor(SWT.COLOR_GRAY);
-			DataExplorer.COLOR_FOREGROUND	= SWTResourceManager.getColor(SWT.COLOR_BLACK);			
+			this.COLOR_BACKGROUND	= SWTResourceManager.getColor(SWT.COLOR_GRAY);
+			this.COLOR_FOREGROUND	= SWTResourceManager.getColor(SWT.COLOR_BLACK);
 			break;
 		case Settings.COLOR_SCHEMA_DARK:
-			DataExplorer.COLOR_BACKGROUND	= SWTResourceManager.getColor(80, 80, 80);
-			DataExplorer.COLOR_FOREGROUND	= SWTResourceManager.getColor(SWT.COLOR_WHITE);			
+			this.COLOR_BACKGROUND	= SWTResourceManager.getColor(80, 80, 80);
+			this.COLOR_FOREGROUND	= SWTResourceManager.getColor(SWT.COLOR_WHITE);
 			break;
 		}
 		//updating colors of a widgets
 		if (this.menuCoolBar != null) {
-			this.setBackground(DataExplorer.COLOR_BACKGROUND);
-			this.menuCoolBar.setBackground(DataExplorer.COLOR_BACKGROUND);
+			this.setBackground(this.COLOR_BACKGROUND);
+			this.menuCoolBar.setBackground(this.COLOR_BACKGROUND);
 			this.menuToolBar.updateColorSchema();
-			this.displayTab.setBackground(new Color[]{DataExplorer.COLOR_BACKGROUND, this.settings.getGraphicsSurroundingBackground()}, new int[]{100}, true);
-			this.displayTab.setForeground(DataExplorer.COLOR_FOREGROUND);
+			this.displayTab.setBackground(new Color[]{this.COLOR_BACKGROUND, this.settings.getGraphicsSurroundingBackground()}, new int[]{100}, true);
+			this.displayTab.setForeground(this.COLOR_FOREGROUND);
 			this.graphicsTabItem.updateColorSchema();
 			this.statusBar.updateColorSchema();
 		}

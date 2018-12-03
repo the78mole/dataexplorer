@@ -3157,7 +3157,7 @@ public final class Settings extends Properties {
 	 * @return the color schema type name, actually distinguished between 'light' and 'dark'
 	 */
 	public String getColorSchemaType() {
-		return DataExplorer.COLOR_BACKGROUND.getRed() + DataExplorer.COLOR_BACKGROUND.getGreen() + DataExplorer.COLOR_BACKGROUND.getBlue() > 500 ? "light/" : "dark/";
+		return DataExplorer.getInstance().COLOR_BACKGROUND.getRed() + DataExplorer.getInstance().COLOR_BACKGROUND.getGreen() + DataExplorer.getInstance().COLOR_BACKGROUND.getBlue() > 500 ? "light/" : "dark/";
 	}
 
 }

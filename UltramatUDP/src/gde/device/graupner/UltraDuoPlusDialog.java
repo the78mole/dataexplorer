@@ -153,6 +153,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	ProgressBar								cycleDataProgressBar, graphicsDataProgressBar;
 	Table											dataTable;
 
+	final DataExplorer 				application;
 	final Ultramat						device;																																																																												// get device specific things, get serial port, ...
 	final UltramatSerialPort	serialPort;																																																																										// open/close port execute getData()....
 	final Channels						channels;																																																																											// interaction with channels, source of all records
@@ -321,6 +322,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 */
 	public UltraDuoPlusDialog(Shell parent, Ultramat useDevice) {
 		super(parent);
+		this.application = DataExplorer.getInstance();
 		this.serialPort = useDevice.getCommunicationPort();
 		this.device = useDevice;
 		this.channels = Channels.getInstance();
@@ -775,7 +777,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									this.memorySelectComposite.setLayoutData(memorySelectLData);
 									RowLayout composite2Layout = new RowLayout(SWT.HORIZONTAL);
 									this.memorySelectComposite.setLayout(composite2Layout);
-									this.memorySelectComposite.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+									this.memorySelectComposite.setBackground(this.application.COLOR_CANVAS_YELLOW);
 									{
 										this.memorySelectLabel = new CLabel(this.memorySelectComposite, SWT.RIGHT);
 										RowData memorySelectLabelLData = new RowData();
@@ -784,7 +786,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.memorySelectLabel.setLayoutData(memorySelectLabelLData);
 										this.memorySelectLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.memorySelectLabel.setText(Messages.getString(MessageIds.GDE_MSGT2251));
-										this.memorySelectLabel.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+										this.memorySelectLabel.setBackground(this.application.COLOR_CANVAS_YELLOW);
 									}
 									{
 										updateBatterySetup(1);
@@ -934,7 +936,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										CLabel filler = new CLabel(this.memorySelectComposite, SWT.RIGHT);
 										filler.setLayoutData(new RowData(140, 20));
 										filler.setText("<---------   "); //$NON-NLS-1$
-										filler.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+										filler.setBackground(this.application.COLOR_CANVAS_YELLOW);
 									}
 									{
 										this.copyButton = new Button(this.memorySelectComposite, SWT.CHECK | SWT.LEFT);
@@ -945,7 +947,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.copyButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.copyButton.setText(Messages.getString(MessageIds.GDE_MSGT2288));
 										this.copyButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2256));
-										this.copyButton.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+										this.copyButton.setBackground(this.application.COLOR_CANVAS_YELLOW);
 									}
 									//cell type
 									this.memoryParameters[0] = new ParameterConfigControl(this.memorySelectComposite, this.memoryValues, 0, Messages.getString(MessageIds.GDE_MSGT2257), 175,
@@ -1134,11 +1136,11 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									this.memoryDataSelectComposite.setLayoutData(memorySelectLData);
 									RowLayout composite2Layout = new RowLayout(SWT.HORIZONTAL);
 									this.memoryDataSelectComposite.setLayout(composite2Layout);
-									this.memoryDataSelectComposite.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+									this.memoryDataSelectComposite.setBackground(this.application.COLOR_CANVAS_YELLOW);
 									{
 										Composite filler = new Composite(this.memoryDataSelectComposite, SWT.NONE);
 										filler.setLayoutData(new RowData(500, 10));
-										filler.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+										filler.setBackground(this.application.COLOR_CANVAS_YELLOW);
 									}
 									{
 										this.memoryDataSelectLabel = new CLabel(this.memoryDataSelectComposite, SWT.RIGHT);
@@ -1148,7 +1150,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.memoryDataSelectLabel.setLayoutData(memoryCycleDataSelectLabelLData);
 										this.memoryDataSelectLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.memoryDataSelectLabel.setText(Messages.getString(MessageIds.GDE_MSGT2321) + Messages.getString(MessageIds.GDE_MSGT2251));
-										this.memoryDataSelectLabel.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+										this.memoryDataSelectLabel.setBackground(this.application.COLOR_CANVAS_YELLOW);
 									}
 									{
 										//this.memoryNames will be updated by memoryCombo selection handler
@@ -1451,11 +1453,11 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									this.channelSelectComposite.setLayoutData(channelSelectLData);
 									RowLayout composite2Layout = new RowLayout(SWT.HORIZONTAL);
 									this.channelSelectComposite.setLayout(composite2Layout);
-									this.channelSelectComposite.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+									this.channelSelectComposite.setBackground(this.application.COLOR_CANVAS_YELLOW);
 									{
 										Composite filler = new Composite(this.channelSelectComposite, SWT.NONE);
 										filler.setLayoutData(new RowData(500, 10));
-										filler.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+										filler.setBackground(this.application.COLOR_CANVAS_YELLOW);
 									}
 									{
 										this.channelSelectLabel = new CLabel(this.channelSelectComposite, SWT.RIGHT);
@@ -1465,7 +1467,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.channelSelectLabel.setLayoutData(memoryCycleDataSelectLabelLData);
 										this.channelSelectLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.channelSelectLabel.setText(Messages.getString(MessageIds.GDE_MSGT2334));
-										this.channelSelectLabel.setBackground(DataExplorer.COLOR_CANVAS_YELLOW);
+										this.channelSelectLabel.setBackground(this.application.COLOR_CANVAS_YELLOW);
 									}
 									{
 										//this.memoryNames will be updated by memoryCombo selection handler

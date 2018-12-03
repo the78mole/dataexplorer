@@ -1,5 +1,5 @@
 /**************************************************************************************
-  	This file is part of GNU DataExplorer.
+  	This file is part of GNU DataExplorer.getInstance().
 
     GNU DataExplorer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.getInstance().  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
     					2016,2017,2018 Thomas Eickert
@@ -364,7 +364,7 @@ public final class HistoTimeLine {
 	public void drawTimeLine(GC gc) {
 		gc.setLineWidth(1);
 		gc.setLineStyle(SWT.LINE_SOLID);
-		gc.setForeground(DataExplorer.COLOR_BLACK);
+		gc.setForeground(DataExplorer.getInstance().COLOR_BLACK);
 
 		int x0 = curveAreaBounds.x;
 		int y0 = curveAreaBounds.y + curveAreaBounds.height;

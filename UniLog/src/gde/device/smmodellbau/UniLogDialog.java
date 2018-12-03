@@ -13,23 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channel;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.device.DeviceDialog;
-import gde.device.smmodellbau.unilog.MessageIds;
-import gde.exception.ApplicationConfigurationException;
-import gde.log.Level;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -65,6 +52,19 @@ import org.eclipse.swt.widgets.TaskBar;
 import org.eclipse.swt.widgets.TaskItem;
 import org.eclipse.swt.widgets.Text;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channel;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceDialog;
+import gde.device.smmodellbau.unilog.MessageIds;
+import gde.exception.ApplicationConfigurationException;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
 /**
  * UniLog device dialog class
  * @author Winfried Brügmann
@@ -74,18 +74,18 @@ public class UniLogDialog extends DeviceDialog {
 	static final Logger						log												= Logger.getLogger(UniLogDialog.class.getName());
 
 	public final static int				WERTESAETZE_MAX						= 25920;
-	public final static String[]	TIME_INTERVAL							= { " 1/16 s  (-> 27 min)", 
-																															"   1/8 s  (-> 54 min)", 
-																															"   1/4 s  (-> 1:48 h)", 
-																															"   1/2 s  (-> 3:36 h)", 
+	public final static String[]	TIME_INTERVAL							= { " 1/16 s  (-> 27 min)",
+																															"   1/8 s  (-> 54 min)",
+																															"   1/4 s  (-> 1:48 h)",
+																															"   1/2 s  (-> 3:36 h)",
 																															"      1 s   (-> 7:12 h)",
-																															"      2 s   (-> 14:24 h)", 
-																															"      5 s   (-> 36 h)", 
-																															"    10 s   (->  3 d)", 
+																															"      2 s   (-> 14:24 h)",
+																															"      5 s   (-> 36 h)",
+																															"    10 s   (->  3 d)",
 																															"    30 s   (->  9 d)",
 																															"   1 min (-> 18 d)",
 																															"   2 min (-> 36 d)",
-																															"   5 min (-> 90 d)"};	
+																															"   5 min (-> 90 d)"};
 	public final static String[]	RX_AUTO_START_MS					= { " 1,1 ms", " 1,2 ms", " 1,3 ms", " 1,4 ms", " 1,5 ms", " 1,6 ms", " 1,7 ms", " 1,8 ms", " 1,9 ms", " Rx on" };	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
 	public final static String[]	CURRENT_SENSOR						= { " 40/80A ", "  150A ", "  400A ", "    20A " };	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	public final static String[]	A1_MODUS_NAMES						= Messages.getString(MessageIds.GDE_MSGT1366).split(GDE.STRING_SEMICOLON);
@@ -166,7 +166,7 @@ public class UniLogDialog extends DeviceDialog {
 	Button												stopLiveGatherButton;
 	Button												editConfigButton;
 	CLabel												memoryDeleteInfo;
-	
+
 	CTabItem											telemetryTabItem;
 	UniLogTelemetryTab						telemetryTab;
 
@@ -204,7 +204,7 @@ public class UniLogDialog extends DeviceDialog {
 	int 													limiterValue							= 0;
 	boolean												isLimiterActive						= false;
 	double												gearRatio									= 1.0;
-	
+
 	boolean 											isLiveGathererEnabled			= true;
 
 	int														sliderPosition						= 50;
@@ -216,7 +216,7 @@ public class UniLogDialog extends DeviceDialog {
 	int														channelSelectionIndex			= 0;
 
 	/**
-	* main method to test this dialog inside a shell 
+	* main method to test this dialog inside a shell
 	*/
 	public static void main(String[] args) {
 		try {
@@ -271,7 +271,8 @@ public class UniLogDialog extends DeviceDialog {
 				this.dialogShell.pack();
 				this.dialogShell.setSize(642, 446);
 				this.dialogShell.addListener(SWT.Traverse, new Listener() {
-		      public void handleEvent(Event event) {
+		      @Override
+					public void handleEvent(Event event) {
 		        switch (event.detail) {
 		        case SWT.TRAVERSE_ESCAPE:
 		        	UniLogDialog.this.dialogShell.close();
@@ -282,6 +283,7 @@ public class UniLogDialog extends DeviceDialog {
 		      }
 		    });
 				this.dialogShell.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (UniLogDialog.this.configTab1.getConfigButtonStatus() || UniLogDialog.this.configTab2.getConfigButtonStatus() || UniLogDialog.this.configTab3.getConfigButtonStatus()
@@ -310,6 +312,7 @@ public class UniLogDialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
+					@Override
 					public void helpRequested(HelpEvent evt) {
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						int selection = UniLogDialog.this.deviceConfigTabFolder.getSelectionIndex();
@@ -339,7 +342,8 @@ public class UniLogDialog extends DeviceDialog {
 						fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 10, 10, -10, 15);
 					}
 				});
-				this.dialogShell.addPaintListener(new PaintListener() {		
+				this.dialogShell.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent paintevent) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.paintControl, event=" + paintevent); //$NON-NLS-1$
 						RecordSet activeRecordSet = UniLogDialog.this.application.getActiveRecordSet();
@@ -394,6 +398,7 @@ public class UniLogDialog extends DeviceDialog {
 							this.configMainComosite.setLayout(null);
 							this.configMainComosite.addMouseTrackListener(mouseTrackerEnterFadeOut);
 							this.configMainComosite.addPaintListener(new PaintListener() {
+								@Override
 								public void paintControl(PaintEvent evt) {
 									if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "configMainComosite.paintControl " + evt); //$NON-NLS-1$
 									if (UniLogDialog.this.timeIntervalPosition == -1) {
@@ -531,7 +536,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.currentTriggerCombo.setItems(new String[] { "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", "15", "20", "25", "30", "35", "40", "45", "50" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$
 									this.currentTriggerCombo.select(2);
 									this.currentTriggerCombo.setEditable(false);
-									this.currentTriggerCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.currentTriggerCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.currentTriggerCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -548,7 +553,7 @@ public class UniLogDialog extends DeviceDialog {
 											" 20", " 30", " 60", " 120" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 									this.timeTriggerCombo.select(16);
 									this.timeTriggerCombo.setEditable(true);
-									this.timeTriggerCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.timeTriggerCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.timeTriggerCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -562,7 +567,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.impulseTriggerCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.impulseTriggerCombo.setBounds(200, GDE.IS_MAC_COCOA ? 55 : 70, 80, GDE.IS_LINUX ? 22 : 20);
 									this.impulseTriggerCombo.setEditable(false);
-									this.impulseTriggerCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.impulseTriggerCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.impulseTriggerCombo.setItems(UniLogDialog.RX_AUTO_START_MS);
 									this.impulseTriggerCombo.select(4);
 									this.impulseTriggerCombo.addSelectionListener(new SelectionAdapter() {
@@ -610,7 +615,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.motorPoleCombo.setItems(new String[] { "  2", "  4", "  6", "  8", " 10", " 12", " 14", " 16" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 									this.motorPoleCombo.select(6);
 									this.motorPoleCombo.setEditable(false);
-									this.motorPoleCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.motorPoleCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.motorPoleCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -631,7 +636,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.gearFactorCombo.setBounds(198, GDE.IS_MAC_COCOA ? 27 : 44, 63, GDE.IS_LINUX ? 22 : 20);
 									this.gearFactorCombo.setText(" 1.0  :  1"); //$NON-NLS-1$
 									this.gearFactorCombo.setEditable(false);
-									this.gearFactorCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.gearFactorCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 								}
 								{
 									this.gearRatioSlider = new Slider(this.motorPropGroup, SWT.VERTICAL);
@@ -686,7 +691,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.numberProbCombo.setItems(new String[] { " 1", " 2", " 3", " 4" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 									this.numberProbCombo.select(1);
 									this.numberProbCombo.setEditable(false);
-									this.numberProbCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.numberProbCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.numberProbCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -709,7 +714,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.timeIntervalCombo.setBounds(60, GDE.IS_MAC_COCOA ? 2 : 17, 156, GDE.IS_LINUX ? 22 : 20);
 									this.timeIntervalCombo.select(1);
 									this.timeIntervalCombo.setEditable(false);
-									this.timeIntervalCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.timeIntervalCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.timeIntervalCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -738,7 +743,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.sensorCurrentCombo.setItems(UniLogDialog.CURRENT_SENSOR);
 									this.sensorCurrentCombo.select(2);
 									this.sensorCurrentCombo.setEditable(false);
-									this.sensorCurrentCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.sensorCurrentCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.sensorCurrentCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -752,14 +757,14 @@ public class UniLogDialog extends DeviceDialog {
 									this.a1ModusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a1ModusLabel.setText("A1 Modus");
 									this.a1ModusLabel.setBounds(42, GDE.IS_MAC_COCOA ? 32 : 47, 60, GDE.IS_LINUX ? 22 : 20);
-									
+
 									this.a1ModusCombo = new CCombo(this.sensorGroup, SWT.BORDER);
 									this.a1ModusCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a1ModusCombo.setItems(UniLogDialog.A1_MODUS_NAMES_COMBO);
 									this.a1ModusCombo.select(0);
 									this.a1ModusCombo.setEditable(false);
 									this.a1ModusCombo.setBounds(110, GDE.IS_MAC_COCOA ? 30 : 45, 135, GDE.IS_LINUX ? 22 : 20);
-									this.a1ModusCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.a1ModusCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.a1ModusCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -774,14 +779,14 @@ public class UniLogDialog extends DeviceDialog {
 									this.a2ModusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a2ModusLabel.setText("A2 Modus");
 									this.a2ModusLabel.setBounds(42, GDE.IS_MAC_COCOA ? 57 : 72, 60, GDE.IS_LINUX ? 22 : 20);
-									
+
 									this.a2ModusCombo = new CCombo(this.sensorGroup, SWT.BORDER);
 									this.a2ModusCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a2ModusCombo.setItems(UniLogDialog.A2_MODUS_NAMES_COMBO);
 									this.a2ModusCombo.select(0);
 									this.a2ModusCombo.setEditable(false);
 									this.a2ModusCombo.setBounds(110, GDE.IS_MAC_COCOA ? 55 : 70, 135, GDE.IS_LINUX ? 22 : 20);
-									this.a2ModusCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.a2ModusCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.a2ModusCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -796,14 +801,14 @@ public class UniLogDialog extends DeviceDialog {
 									this.a3ModusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a3ModusLabel.setText("A3 Modus");
 									this.a3ModusLabel.setBounds(42, GDE.IS_MAC_COCOA ? 82 : 97, 60, GDE.IS_LINUX ? 22 : 20);
-									
+
 									this.a3ModusCombo = new CCombo(this.sensorGroup, SWT.BORDER);
 									this.a3ModusCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a3ModusCombo.setItems(UniLogDialog.A3_MODUS_NAMES_COMBO);
 									this.a3ModusCombo.select(0);
 									this.a3ModusCombo.setEditable(false);
 									this.a3ModusCombo.setBounds(110, GDE.IS_MAC_COCOA ? 80 : 95, 135, GDE.IS_LINUX ? 22 : 20);
-									this.a3ModusCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.a3ModusCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.a3ModusCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -845,7 +850,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.limiterEnergyCombo.setBounds(150, GDE.IS_MAC_COCOA ? 2 : 17, 60, GDE.IS_LINUX ? 22 : 20);
 									this.limiterEnergyCombo.select(1);
 									this.limiterEnergyCombo.setEditable(true);
-									this.limiterEnergyCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.limiterEnergyCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.limiterEnergyCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -854,7 +859,7 @@ public class UniLogDialog extends DeviceDialog {
 											int limiterMaxValue = Integer.parseInt(UniLogDialog.this.limiterEnergyCombo.getText().trim().replace(",", "."));
 											if (limiterMaxValue < 100)
 												limiterMaxValue = 100;
-											else if (limiterMaxValue > 3000) 
+											else if (limiterMaxValue > 3000)
 												limiterMaxValue = 3000;
 										}
 									});
@@ -974,7 +979,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.useConfigCombo.setEditable(false);
 									this.useConfigCombo.setTextLimit(18);
 									this.useConfigCombo.setVisibleItemCount(5);
-									this.useConfigCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.useConfigCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.useConfigCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1322));
 									this.useConfigCombo.addKeyListener(new KeyAdapter() {
 										@Override
@@ -997,7 +1002,7 @@ public class UniLogDialog extends DeviceDialog {
 													UniLogDialog.this.configTabItem2.setText(configName);
 													UniLogDialog.this.configTab2.setConfigName(configName);
 													break;
-												case 2: //configTab3												
+												case 2: //configTab3
 													UniLogDialog.this.configTabItem3.setText(configName);
 													UniLogDialog.this.configTab3.setConfigName(configName);
 													break;
@@ -1050,6 +1055,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.dataReadGroup.setText(Messages.getString(MessageIds.GDE_MSGT1324));
 								this.dataReadGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								this.dataReadGroup.addPaintListener(new PaintListener() {
+									@Override
 									public void paintControl(PaintEvent evt) {
 										if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dataReadGroup.paintControl, event=" + evt); //$NON-NLS-1$
 										int index = UniLogDialog.this.application.getActiveChannelNumber() - 1;
@@ -1157,7 +1163,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.stopDataButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "stopDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$											
+											if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "stopDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											if (UniLogDialog.this.gatherThread != null && UniLogDialog.this.gatherThread.isAlive()) {
 												UniLogDialog.this.gatherThread.setThreadStop(); // end serial communication
 											}
@@ -1341,7 +1347,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.memoryDeleteInfo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.memoryDeleteInfo.setBounds(12, GDE.IS_MAC_COCOA ? 7 : 22, 256, 34);
 									this.memoryDeleteInfo.setText(Messages.getString(MessageIds.GDE_MSGI1301));
-									this.memoryDeleteInfo.setBackground(DataExplorer.COLOR_LIGHT_GREY);
+									this.memoryDeleteInfo.setBackground(DataExplorer.getInstance().COLOR_LIGHT_GREY);
 									//this.memoryDeleteInfo.setEditable(false);
 								}
 							} // end clearDataBufferGroup
@@ -1409,7 +1415,7 @@ public class UniLogDialog extends DeviceDialog {
 					this.telemetryTabItem.setControl(this.telemetryTab);
 
 				} // end tab
-				
+
 				int index = Channels.getInstance().getActiveChannelNumber();
 				this.deviceConfigTabFolder.setSelection(index < 1 || index > this.deviceConfigTabFolder.getChildren().length - 2 ? 1 : index);
 
@@ -1431,7 +1437,7 @@ public class UniLogDialog extends DeviceDialog {
 	}
 
 	/**
-	 * update the configuration tab with values red 
+	 * update the configuration tab with values red
 	 * @param readBuffer
 	 */
 	public void updateConfigurationValues(byte[] readBuffer) {
@@ -1505,7 +1511,7 @@ public class UniLogDialog extends DeviceDialog {
 
 		this.modusA1Position = (readBuffer[18] & 0xFF) <= 3 ? (readBuffer[18] & 0xFF) : 0;
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "modusA1 = " + this.modusA1Position); //$NON-NLS-1$
-		
+
 		this.modusA2Position = (readBuffer[4] & 0xFF);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "modusA2 = " + this.modusA2Position); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "select A2 combo = " + (this.modusA2Position >= 1 ? this.modusA2Position - 1 : this.modusA2Position)); //$NON-NLS-1$
@@ -1516,15 +1522,16 @@ public class UniLogDialog extends DeviceDialog {
 
 		this.isLimiterActive = (readBuffer[19] & 0x80) > 1;
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "limiter active = " + this.isLimiterActive); //$NON-NLS-1$
-		
+
 		this.limiterValue = ((readBuffer[19] & 0x7F) << 8) | (readBuffer[20] & 0xFF);
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "limiterValue = " + this.limiterValue); //$NON-NLS-1$
 
 		this.gearRatio = (readBuffer[21] & 0xFF) / 10.0;
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("gearRatio = %.1f", this.gearRatio)); //$NON-NLS-1$
-		
+
 		if (this.dialogShell != null && !this.dialogShell.isDisposed()) { //update UI if opened
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					UniLogDialog.this.firmwareVersionLabel.setText(UniLogDialog.this.unilogVersion);
 					UniLogDialog.this.memUsagePercent.setText(UniLogDialog.this.memoryUsedPercent);
@@ -1568,14 +1575,14 @@ public class UniLogDialog extends DeviceDialog {
 					if (UniLogDialog.this.configTab2 != null) UniLogDialog.this.configTab2.setA1ModusAvailable(true);
 					if (UniLogDialog.this.configTab3 != null) UniLogDialog.this.configTab3.setA1ModusAvailable(true);
 					if (UniLogDialog.this.configTab4 != null) UniLogDialog.this.configTab4.setA1ModusAvailable(true);
-					
+
 					TaskBar taskBar = UniLogDialog.this.dialogShell.getDisplay().getSystemTaskBar();
 					if (taskBar == null)
 						UniLogDialog.this.taskBarItem = null;
 					else {
 						UniLogDialog.this.taskBarItem = taskBar.getItem(UniLogDialog.this.dialogShell) != null ? taskBar.getItem(UniLogDialog.this.dialogShell) : taskBar.getItem(null);
-						
-						if (!UniLogDialog.this.readDataButton.getEnabled() && UniLogDialog.this.taskBarItem != null) 
+
+						if (!UniLogDialog.this.readDataButton.getEnabled() && UniLogDialog.this.taskBarItem != null)
 							UniLogDialog.this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.ERROR : SWT.NORMAL);
 					}
 				}
@@ -1629,12 +1636,12 @@ public class UniLogDialog extends DeviceDialog {
 
 		updateBuffer[9] = (byte) this.a1ModusCombo.getSelectionIndex();
 		checkSum = checkSum + (0xFF & updateBuffer[9]);
-		
+
 		updateBuffer[10] = (byte) ((Integer.parseInt(this.limiterEnergyCombo.getText().trim()) & 0xFF00) >> 8);
 		if (this.limiterButton.getSelection()) {
-			updateBuffer[10] = (byte) (updateBuffer[10] | 0x80); 
+			updateBuffer[10] = (byte) (updateBuffer[10] | 0x80);
 		}
-		checkSum = checkSum + (0xFF & updateBuffer[10]);	
+		checkSum = checkSum + (0xFF & updateBuffer[10]);
 		updateBuffer[11] = (byte) (Integer.parseInt(this.limiterEnergyCombo.getText().trim()) & 0x00FF);
 		checkSum = checkSum + (0xFF & updateBuffer[11]);
 
@@ -1688,6 +1695,7 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public void setReadDataProgressBar(final int value) {
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				int tmpValue = value < 0 ? 0 : value;
 				tmpValue = value > 100 ? 100 : value;
@@ -1719,6 +1727,7 @@ public class UniLogDialog extends DeviceDialog {
 		this.numberReadErrorText = "" + numReadErrors; //$NON-NLS-1$
 		this.numberLess2Text = "" + numLess2Measurements; //$NON-NLS-1$
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				int progress = memoryUsedValue > 0 ? redTelegrams * 100 / memoryUsedValue : 100;
 				int tmpValue = progress < 0 ? 0 : progress;
@@ -1751,6 +1760,7 @@ public class UniLogDialog extends DeviceDialog {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					UniLogDialog.this.numberRedDataSetsText = "0"; //$NON-NLS-1$
 					UniLogDialog.this.numberActualDataSetsText = "0"; //$NON-NLS-1$
@@ -1771,17 +1781,18 @@ public class UniLogDialog extends DeviceDialog {
 	 */
 	public void resetButtons() {
 		if (this.dialogShell != null && !this.dialogShell.isDisposed()) {
-			if (Thread.currentThread().getId() == this.application.getThreadId()) {		
+			if (Thread.currentThread().getId() == this.application.getThreadId()) {
 				this.setButtonStateLiveGatherer(true);
 				this.startLoggingButton.setEnabled(true);
 				this.stopLoggingButton.setEnabled(false);
 				this.closeButton.setEnabled(true);
 				setClosePossible(true);
-				if (this.taskBarItem != null) 
+				if (this.taskBarItem != null)
 					this.taskBarItem.setProgressState(SWT.DEFAULT);
 			}
 			else {
 				GDE.display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						UniLogDialog.this.setButtonStateLiveGatherer(true);
 						UniLogDialog.this.readAdjustmentButton.setEnabled(true);
@@ -1789,7 +1800,7 @@ public class UniLogDialog extends DeviceDialog {
 						UniLogDialog.this.stopLoggingButton.setEnabled(false);
 						UniLogDialog.this.closeButton.setEnabled(true);
 						setClosePossible(true);
-						if (UniLogDialog.this.taskBarItem != null) 
+						if (UniLogDialog.this.taskBarItem != null)
 							UniLogDialog.this.taskBarItem.setProgressState(SWT.DEFAULT);
 					}
 				});

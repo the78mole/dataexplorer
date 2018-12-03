@@ -13,7 +13,7 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.tab;
@@ -115,7 +115,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 	StyledText										styledText;
 
 	Group													mainObjectCharacterisitcsGroup;
-	Composite											headerComposite;	
+	Composite											headerComposite;
 	CLabel												objectNameLabel;
 	CLabel												objectName;
 	Composite											objectTypeComposite;
@@ -135,7 +135,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 	final DataExplorer	application;
 	final Settings								settings;
 	final Channels								channels;
-	
+
 	Menu													imagePopupMenu;
 	ObjectImageContextMenu				imageContextMenu;
 	Menu													popupmenu;
@@ -159,12 +159,12 @@ public class ObjectDescriptionWindow extends CTabItem {
 		this.settings = Settings.getInstance();
 		this.channels = Channels.getInstance();
 		this.activeObjectKey = this.settings.getActiveObject();
-		
+
 		this.innerAreaBackground = Settings.getInstance().getObjectDescriptionInnerAreaBackground();
 		this.surroundingBackground = Settings.getInstance().getObjectDescriptionSurroundingAreaBackground();
 		this.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		this.setText(Messages.getString(MessageIds.GDE_MSGT0403));
-		
+
 		this.imagePopupMenu = new Menu(this.application.getShell(), SWT.POP_UP);
 		this.imageContextMenu = new ObjectImageContextMenu();
 		this.popupmenu = new Menu(this.application.getShell(), SWT.POP_UP);
@@ -238,7 +238,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 			if (activeChannel != null) {
 				activeChannel.setUnsaved(Channel.UNSAVED_REASON_CHANGED_OBJECT_DATA);
 			}
-				
+
 		}
 	}
 
@@ -253,6 +253,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		this.tabComposite.setBackground(this.surroundingBackground);
 		this.tabComposite.setMenu(this.popupmenu);
 		this.tabComposite.addHelpListener(new HelpListener() {
+			@Override
 			public void helpRequested(HelpEvent evt) {
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "tabComposite.helpRequested " + evt); 			//$NON-NLS-1$
 				ObjectDescriptionWindow.this.application.openHelpDialog("", "HelpInfo_93.html"); 	//$NON-NLS-1$ //$NON-NLS-2$
@@ -430,7 +431,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					group1LData.width = 120;
 					group1LData.height = GDE.IS_LINUX ? 22 : 20;
 					this.statusText.setLayoutData(group1LData);
-					this.statusText.setBackground(DataExplorer.COLOR_WHITE);
+					this.statusText.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 					this.statusText.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0411));
 					this.statusText.addSelectionListener(new SelectionAdapter() {
 						@Override
@@ -458,19 +459,23 @@ public class ObjectDescriptionWindow extends CTabItem {
 
 				this.imageContextMenu.createMenu(this.imagePopupMenu);
 				this.imageCanvas.setMenu(this.imagePopupMenu);
-				
-				this.imageCanvas.addMouseListener(new MouseListener() {					
+
+				this.imageCanvas.addMouseListener(new MouseListener() {
+					@Override
 					public void mouseUp(MouseEvent e) {
 						// ignore
-					}					
+					}
+					@Override
 					public void mouseDown(MouseEvent e) {
 						// ignore
 					}
+					@Override
 					public void mouseDoubleClick(MouseEvent e) {
 						imageContextMenu.chooseImageFile();
 					}
 				});
 				this.imageCanvas.addPaintListener(new PaintListener() {
+					@Override
 					public void paintControl(PaintEvent evt) {
 						if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "imageCanvas.paintControl, event=" + evt); //$NON-NLS-1$
 						ObjectDescriptionWindow.this.contextMenu.createMenu(ObjectDescriptionWindow.this.popupmenu, TabMenuType.SIMPLE);
@@ -563,7 +568,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 								this.fontSizeSelectCombo.select(3);
 								this.fontSizeSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0201));
 								this.fontSizeSelectCombo.setEditable(false);
-								this.fontSizeSelectCombo.setBackground(DataExplorer.COLOR_WHITE);
+								this.fontSizeSelectCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 								this.fontSizeSelectCombo.setVisibleItemCount(5);
 								this.fontSizeSelectCombo.addSelectionListener(new SelectionAdapter() {
 									@Override
@@ -757,6 +762,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 					if (!GDE.IS_MAC) this.styledText.setBackground(this.innerAreaBackground);
 					this.styledText.setMenu(this.popupmenu);
 					this.styledText.addExtendedModifyListener(new ExtendedModifyListener() {
+						@Override
 						public void modifyText(ExtendedModifyEvent evt) {
 							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "styledText.modifyText, event=" + evt); //$NON-NLS-1$
 							if (evt.length == 0) return;
@@ -841,10 +847,10 @@ public class ObjectDescriptionWindow extends CTabItem {
 	//		inst.setLayout(instLayout);
 	//			{
 	//				cTabFolder1 = new CTabFolder(inst, SWT.NONE);
-	//				
+	//
 	//				ObjectDescriptionWindow objectDescriptionWindow = new ObjectDescriptionWindow(cTabFolder1);
 	//				objectDescriptionWindow.create();
-	//				
+	//
 	//				cTabFolder1.setSelection(0);
 	//			}
 	//			inst.layout();
@@ -966,14 +972,14 @@ public class ObjectDescriptionWindow extends CTabItem {
 			}
 		}
 	}
-	
+
 	/**
 	 * prepare object description window as image for printing purpose
 	 * @return object description window as image
 	 */
 	public Image getContentAsImage() {
 		if(this.isDisposed()) SWT.error(SWT.ERROR_WIDGET_DISPOSED);
-		
+
 		Rectangle bounds = this.tabFolder.getClientArea();
 		Image objectImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(objectImage);
@@ -1027,7 +1033,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		this.fontSizeSelectComposite.setBackground(this.surroundingBackground);
 		this.tabComposite.redraw();
 	}
-	
+
 	public ObjectData getObject() {
 		return object;
 	}

@@ -112,9 +112,9 @@ public final class HistoCurveUtils {
 		// prepare layout
 		gc.setLineWidth(1);
 		gc.setLineStyle(SWT.LINE_SOLID);
-		gc.setForeground(DataExplorer.COLOR_LIGHT_BLUE);
+		gc.setForeground(DataExplorer.getInstance().COLOR_LIGHT_BLUE);
 		Color background = gc.getBackground();
-		gc.setBackground(DataExplorer.COLOR_LIGHT_BLUE);
+		gc.setBackground(DataExplorer.getInstance().COLOR_LIGHT_BLUE);
 
 		Rectangle drawStripBounds = summarySpots.getDrawStripBounds();
 		int yPos = drawStripBounds.y + 1;
@@ -186,7 +186,7 @@ public final class HistoCurveUtils {
 		if (drawNumbers) {
 			DecimalFormat df = summary.getDecimalFormat();
 			gc.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE - 1, SWT.NORMAL));
-			Color color = drawNumbersInRecordColor ? tmpColor : DataExplorer.COLOR_BLACK;
+			Color color = drawNumbersInRecordColor ? tmpColor : DataExplorer.getInstance().COLOR_BLACK;
 			gc.setForeground(color);
 			double[] tukeyBoxPlot = summary.getTrailRecord().getQuantile().getTukeyBoxPlot();
 
@@ -224,7 +224,7 @@ public final class HistoCurveUtils {
 			gc.drawLine(xPosUpperWhisker, yPos - scaledHalfAntennaHeight, xPosUpperWhisker, yPos + scaledHalfAntennaHeight);
 			if (drawNumbers) {
 				gc.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE - 1, SWT.NORMAL));
-				Color color = drawNumbersInRecordColor ? tmpColor : DataExplorer.COLOR_BLACK;
+				Color color = drawNumbersInRecordColor ? tmpColor : DataExplorer.getInstance().COLOR_BLACK;
 				gc.setForeground(color);
 				double[] tukeyBoxPlot = summary.getTrailRecord().getQuantile().getTukeyBoxPlot();
 
@@ -305,7 +305,7 @@ public final class HistoCurveUtils {
 		Color tmpColor = ColorUtils.getColor(summary.getTrailRecord().getRGB());
 
 		{
-			Color color = drawNumbersInRecordColor ? tmpColor : DataExplorer.COLOR_BLACK;
+			Color color = drawNumbersInRecordColor ? tmpColor : DataExplorer.getInstance().COLOR_BLACK;
 			gc.setForeground(color);
 			TrailRecordFormatter recordFormatter = new TrailRecordFormatter(summary.getTrailRecord());
 			GraphicsUtils.drawTextCentered(recordFormatter.getSummaryValue(summary.getScaleMinMax()[0], summary.getDecimalFormat()), x0 - gap - scaleWidthSpace / 2, yPos, gc, SWT.HORIZONTAL);
@@ -317,7 +317,7 @@ public final class HistoCurveUtils {
 			gc.setLineWidth(1);
 			// gc.setLineDash(dashLineStyle);
 			gc.setLineStyle(SWT.LINE_DOT);
-			gc.setForeground(drawScaleInRecordColor ? tmpColor : DataExplorer.COLOR_DARK_GREEN);
+			gc.setForeground(drawScaleInRecordColor ? tmpColor : DataExplorer.getInstance().COLOR_DARK_GREEN);
 			for (int x : summarySpots.defineGrid(false)) {
 				gc.drawLine(x, drawStripBounds.y, x, drawStripBounds.y + drawStripBounds.height);
 			}
@@ -337,7 +337,7 @@ public final class HistoCurveUtils {
 		int xN = x0 + width + 1;
 		int yPos = drawStripBounds.y + drawStripBounds.height / 2 - 1;
 
-		Color color = drawNumbersInRecordColor ? ColorUtils.getColor(summary.getTrailRecord().getRGB()) : DataExplorer.COLOR_BLACK;
+		Color color = drawNumbersInRecordColor ? ColorUtils.getColor(summary.getTrailRecord().getRGB()) : DataExplorer.getInstance().COLOR_BLACK;
 		gc.setForeground(color);
 		GraphicsUtils.drawTextCentered("*", x0 - scaleWidthSpace * 9 / 10, yPos, gc, SWT.HORIZONTAL);
 		GraphicsUtils.drawTextCentered("*", xN + scaleWidthSpace * 9 / 10, yPos, gc, SWT.HORIZONTAL);
@@ -367,7 +367,7 @@ public final class HistoCurveUtils {
 			pt.x -= 7;
 		}
 
-		Color color = drawNameInRecordColor ? ColorUtils.getColor(summary.getTrailRecord().getRGB()) : DataExplorer.COLOR_BLACK;
+		Color color = drawNameInRecordColor ? ColorUtils.getColor(summary.getTrailRecord().getRGB()) : DataExplorer.getInstance().COLOR_BLACK;
 		gc.setForeground(color);
 		GraphicsUtils.drawTextCentered(graphText, x0 + pt.x / 2 + 7, yPos, gc, SWT.HORIZONTAL | SWT.DRAW_TRANSPARENT);
 	}
@@ -394,7 +394,7 @@ public final class HistoCurveUtils {
 		Color tmpColor = ColorUtils.getColor(record.getRGB());
 		gc.setLineWidth(2);
 		gc.setLineStyle(SWT.LINE_SOLID);
-		gc.setForeground(drawScaleInRecordColor ? tmpColor : DataExplorer.COLOR_BLACK);
+		gc.setForeground(drawScaleInRecordColor ? tmpColor : DataExplorer.getInstance().COLOR_BLACK);
 		if (record.isPositionLeft()) {
 			int positionNumber = record.getParent().getAxisPosition(record.getName(), record.isPositionLeft());
 			int xPos = x0 - 1 - positionNumber * scaleWidthSpace;
@@ -402,7 +402,7 @@ public final class HistoCurveUtils {
 			log.fine(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height)); // yMax //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, graphicsData.getMinDisplayValue(), graphicsData.getMaxDisplayValue(), ticklength, gap, record.isPositionLeft(), drawNumbersInRecordColor);
 
-			gc.setForeground(drawNameInRecordColor ? tmpColor : DataExplorer.COLOR_BLACK);
+			gc.setForeground(drawNameInRecordColor ? tmpColor : DataExplorer.getInstance().COLOR_BLACK);
 			GraphicsUtils.drawTextCentered(record.getScaleText(), (xPos - scaleWidthSpace + 3), y0 / 2 + (y0 - height), gc, SWT.UP);
 		} else {
 			int positionNumber = record.getParent().getAxisPosition(record.getName(), record.isPositionLeft());
@@ -411,7 +411,7 @@ public final class HistoCurveUtils {
 			log.fine(() -> "y-Achse = " + xPos + ", " + y0 + ", " + xPos + ", " + (y0 - height));
 			HistoCurveUtils.drawVerticalTickMarks(record, gc, xPos, y0, height, graphicsData.getMinDisplayValue(), graphicsData.getMaxDisplayValue(), ticklength, gap, record.isPositionLeft(), drawNumbersInRecordColor);
 
-			gc.setForeground(drawNameInRecordColor ? tmpColor : DataExplorer.COLOR_BLACK);
+			gc.setForeground(drawNameInRecordColor ? tmpColor : DataExplorer.getInstance().COLOR_BLACK);
 			GraphicsUtils.drawTextCentered(record.getScaleText(), (xPos + scaleWidthSpace - pt.y - 5), y0 / 2 + (y0 - height), gc, SWT.UP);
 		}
 	}
@@ -430,7 +430,7 @@ public final class HistoCurveUtils {
 	 */
 	private static void drawVerticalTickMarks(TrailRecord record, GC gc, int x0, int y0, int height, double minValue, double maxValue, //
 			int ticklength, int gap, boolean isPositionLeft, boolean drawNumbersInRecordColor) {
-		gc.setForeground(DataExplorer.COLOR_BLACK);
+		gc.setForeground(DataExplorer.getInstance().COLOR_BLACK);
 
 		final int yTop = y0 - height + 1;
 		final double deltaScale = (maxValue - minValue);
@@ -502,9 +502,9 @@ public final class HistoCurveUtils {
 				if (drawNumbersInRecordColor)
 					gc.setForeground(tmpColor);
 				else
-					gc.setForeground(DataExplorer.COLOR_BLACK);
+					gc.setForeground(DataExplorer.getInstance().COLOR_BLACK);
 				GraphicsUtils.drawTextCentered(record.getFormattedScaleValue(minScaleValue + i * deltaMainTickValue), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
-				gc.setForeground(DataExplorer.COLOR_BLACK);
+				gc.setForeground(DataExplorer.getInstance().COLOR_BLACK);
 			}
 			// draw mini ticks above first main tick
 			double yTickPositionMax = yTickPositionMin - numberTicks * deltaMainTickPixel;
@@ -520,7 +520,7 @@ public final class HistoCurveUtils {
 			if (drawNumbersInRecordColor)
 				gc.setForeground(tmpColor);
 			else
-				gc.setForeground(DataExplorer.COLOR_BLACK);
+				gc.setForeground(DataExplorer.getInstance().COLOR_BLACK);
 			GraphicsUtils.drawTextCentered(record.getFormattedScaleValue((minScaleValue + minScaleValue) / 2.0), x0 - ticklength - gap - dist, yTickPosition, gc, SWT.HORIZONTAL);
 			if (isBuildGridVector) horizontalGrid.add(yTickPosition);
 		}

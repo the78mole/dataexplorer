@@ -13,22 +13,10 @@
 
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
-
-import gde.GDE;
-import gde.config.Settings;
-import gde.data.Channels;
-import gde.data.RecordSet;
-import gde.device.DeviceDialog;
-import gde.device.smmodellbau.lipowatch.MessageIds;
-import gde.exception.ApplicationConfigurationException;
-import gde.log.Level;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.ui.SWTResourceManager;
 
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -59,6 +47,18 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TaskBar;
 import org.eclipse.swt.widgets.TaskItem;
 
+import gde.GDE;
+import gde.config.Settings;
+import gde.data.Channels;
+import gde.data.RecordSet;
+import gde.device.DeviceDialog;
+import gde.device.smmodellbau.lipowatch.MessageIds;
+import gde.exception.ApplicationConfigurationException;
+import gde.log.Level;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.ui.SWTResourceManager;
+
 /**
  * LiPoWatch device dialog class
  * @author Winfried Brügmann
@@ -72,16 +72,16 @@ public class LiPoWatchDialog extends DeviceDialog {
 	public final static int				FLASH_POSITION_DATA_BEGIN		= 0x100;
 	public final static int				MAX_DATA_VALUES							= LiPoWatchDialog.FLASH_SIZE - 0x100;
 
-	public final static String[]	TIME_INTERVAL								= { 
+	public final static String[]	TIME_INTERVAL								= {
 			"   1/4 s  (->     5 h)", //$NON-NLS-1$
 			"   1/2 s  (->   10 h)", 	//$NON-NLS-1$
 			"      1 s   (->   20 h)",//$NON-NLS-1$
 			"      2 s   (->   40 h)",//$NON-NLS-1$
 			"      5 s   (-> 100 h)", //$NON-NLS-1$
 			"    10 s   (->  200 h)"};//$NON-NLS-1$
-	public final static String[]	RX_AUTO_START_MS						= { " 1,1", " 1,2", " 1,3", " 1,4", " 1,5", " 1,6", " 1,7", " 1,8", " 1,9", " Rx on" }; //$NON-NLS-$
-	public final static String[]	CELL_VOLTAGE_LIMITS					= { " 2.0", " 2.1", " 2.2", " 2.3", " 2.4", " 2.5", " 2.6", " 2.7", " 2.8", " 2.9", " 3.0", " 3.1", " 3.2", " 3.3", " 3.4", " 3.5", " 3.6", " 3.7"};	//$NON-NLS-$
-	
+	public final static String[]	RX_AUTO_START_MS						= { " 1,1", " 1,2", " 1,3", " 1,4", " 1,5", " 1,6", " 1,7", " 1,8", " 1,9", " Rx on" };
+	public final static String[]	CELL_VOLTAGE_LIMITS					= { " 2.0", " 2.1", " 2.2", " 2.3", " 2.4", " 2.5", " 2.6", " 2.7", " 2.8", " 2.9", " 3.0", " 3.1", " 3.2", " 3.3", " 3.4", " 3.5", " 3.6", " 3.7"};
+
 	//Shell dialogShell; // remove this later
 	CTabFolder										mainTabFolder;
 	CTabItem											configTabItem;
@@ -160,8 +160,8 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 	String												numberRedDataSetsText				= "0";																																											//$NON-NLS-1$
 	String												numberActualDataSetsText		= "0";																																											//$NON-NLS-1$
-	String												numberReadErrorText					= "0";																																											//$NON-NLS-1$	
-	String												numberLess4Text							= "0";																																											//$NON-NLS-1$	
+	String												numberReadErrorText					= "0";																																											//$NON-NLS-1$
+	String												numberLess4Text							= "0";																																											//$NON-NLS-1$
 	TaskItem											taskBarItem;
 
 	final LiPoWatch								device;																																																								// get device specific things, get serial port, ...
@@ -207,7 +207,8 @@ public class LiPoWatchDialog extends DeviceDialog {
 				this.dialogShell.setSize(509, 394);
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
 				this.dialogShell.addListener(SWT.Traverse, new Listener() {
-		      public void handleEvent(Event event) {
+		      @Override
+					public void handleEvent(Event event) {
 		        switch (event.detail) {
 		        case SWT.TRAVERSE_ESCAPE:
 		        	LiPoWatchDialog.this.dialogShell.close();
@@ -218,13 +219,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 		      }
 		    });
 				this.dialogShell.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent evt) {
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (LiPoWatchDialog.this.storeConfigButton.getEnabled()) {
 							String msg = Messages.getString(MessageIds.GDE_MSGI1600);
 							if (LiPoWatchDialog.this.application.openYesNoMessageDialog(getDialogShell(), msg) == SWT.YES) {
 								if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "SWT.YES"); //$NON-NLS-1$
-								//device.storeDeviceProperties(); // only used for configurable analog input 
+								//device.storeDeviceProperties(); // only used for configurable analog input
 								setClosePossible(true);
 							}
 							// check threads before close
@@ -239,6 +241,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 					}
 				});
 				this.dialogShell.addHelpListener(new HelpListener() {
+					@Override
 					public void helpRequested(HelpEvent evt) {
 						if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						LiPoWatchDialog.this.application.openHelpDialog("LiPoWatch", "HelpInfo.html"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -382,7 +385,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.timeTriggerCombo.setItems(new String[] { " 15", " 20", " 25", " 30", " 60", " 90" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 									this.timeTriggerCombo.select(3);
 									this.timeTriggerCombo.setEditable(true);
-									this.timeTriggerCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.timeTriggerCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.timeTriggerCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -436,7 +439,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.impulseTriggerCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.impulseTriggerCombo.setBounds(159, GDE.IS_MAC_COCOA ? 63 : 78, 59, GDE.IS_LINUX ? 22 : 20);
 									this.impulseTriggerCombo.setEditable(false);
-									this.impulseTriggerCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.impulseTriggerCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.impulseTriggerCombo.setItems(LiPoWatchDialog.RX_AUTO_START_MS);
 									this.impulseTriggerCombo.select(4);
 									this.impulseTriggerCombo.addSelectionListener(new SelectionAdapter() {
@@ -463,7 +466,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 									this.timeIntervalCombo.setBounds(49, GDE.IS_MAC_COCOA ? 2 : 17, 133, GDE.IS_LINUX ? 22 : 20);
 									this.timeIntervalCombo.select(1);
 									this.timeIntervalCombo.setEditable(false);
-									this.timeIntervalCombo.setBackground(DataExplorer.COLOR_WHITE);
+									this.timeIntervalCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.timeIntervalCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1625));
 									this.timeIntervalCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -941,7 +944,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 					this.mainTabFolder.setBounds(0, 0, 501, 312);
 					this.mainTabFolder.setSelection(0);
-					
+
 					initialize();
 				}
 				this.dialogShell.open();
@@ -969,13 +972,13 @@ public class LiPoWatchDialog extends DeviceDialog {
 	//		if (channels.getActiveChannel() != null) {
 	//			RecordSet activeRecordSet = channels.getActiveChannel().getActiveRecordSet();
 	//			if (activeRecordSet != null) {
-	//				// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, .... 
+	//				// 0=total voltage, 1=ServoImpuls on, 2=ServoImpulse off, 3=temperature, 4=cell voltage, 5=cell voltage, 6=cell voltage, ....
 	//				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setActive(temperatureButton.getSelection());
 	//				//activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setVisible(temperatureButton.getSelection());
 	//				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setDisplayable(temperatureButton.getSelection());
 	//				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setOffset(Double.valueOf(a1OffsetText.getText().trim().replace(',', '.')));
 	//				activeRecordSet.get(activeRecordSet.getRecordNames()[11]).setFactor(Double.valueOf(a1FactorText.getText().trim().replace(',', '.')));
-	//				
+	//
 	//				application.updateGraphicsWindow();
 	//				activeRecordSet.setUnsaved(RecordSet.UNSAVED_REASON_CONFIGURATION);
 	//			}
@@ -984,7 +987,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 	//	}
 
 	/**
-	 * update the configuration tab with values red 
+	 * update the configuration tab with values red
 	 * @param readBuffer
 	 */
 	public void updateConfigurationValues(byte[] readBuffer) {
@@ -1034,13 +1037,13 @@ public class LiPoWatchDialog extends DeviceDialog {
 		// auto start rx signal
 		this.isAutStartRx = (readBuffer[17] & 0x80) != 0;
 
-		
+
 		this.isRxOn = (readBuffer[17] & 0x7F) == 0;
 		if (this.isRxOn) {// auto start rx impulse "Rx on"
-			this.rxAutoStartValue = (readBuffer[17] & 0x7F) + 9; // 9 = Rx on 
+			this.rxAutoStartValue = (readBuffer[17] & 0x7F) + 9; // 9 = Rx on
 		}
-		else {// auto start rx impulse length	
-			this.rxAutoStartValue = (readBuffer[17] & 0x7F) - 11; // 16 = 1.6 ms 
+		else {// auto start rx impulse length
+			this.rxAutoStartValue = (readBuffer[17] & 0x7F) - 11; // 16 = 1.6 ms
 		}
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isAutStartRx = " + this.isAutStartRx + " isRxOn = " + this.isRxOn + " rxAutoStartValue = " + this.rxAutoStartValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -1051,7 +1054,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 		if ((readBuffer[19] & 0xFF) != 0) {
 			this.isAutoStartVoltageDrop = true;
 		}
-		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isAutoStartVoltageDrop = " + this.isAutoStartVoltageDrop); //$NON-NLS-1$ 
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isAutoStartVoltageDrop = " + this.isAutoStartVoltageDrop); //$NON-NLS-1$
 
 		// cell type
 		this.cellType = readBuffer[20] & 0xFF;
@@ -1059,6 +1062,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 
 		if (this.dialogShell != null && !this.dialogShell.isDisposed()) { //update UI if opened
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					LiPoWatchDialog.this.snLabel.setText(LiPoWatchDialog.this.serialNumber);
 					LiPoWatchDialog.this.firmwareVersionLabel.setText(LiPoWatchDialog.this.lipoWatchVersion);
@@ -1079,14 +1083,14 @@ public class LiPoWatchDialog extends DeviceDialog {
 					LiPoWatchDialog.this.regulationTypeCombo.select(LiPoWatchDialog.this.impulsReductionType);
 					LiPoWatchDialog.this.voltageDropTriggerButton.setSelection(LiPoWatchDialog.this.isAutoStartVoltageDrop);
 					LiPoWatchDialog.this.cellTypeCombo.select(LiPoWatchDialog.this.cellType);
-					
+
 					TaskBar taskBar = LiPoWatchDialog.this.dialogShell.getDisplay().getSystemTaskBar();
 					if (taskBar == null)
 						LiPoWatchDialog.this.taskBarItem = null;
 					else {
 						LiPoWatchDialog.this.taskBarItem = taskBar.getItem(LiPoWatchDialog.this.dialogShell) != null ? taskBar.getItem(LiPoWatchDialog.this.dialogShell) : taskBar.getItem(null);
-						
-						if (!LiPoWatchDialog.this.readDataButton.getEnabled() && LiPoWatchDialog.this.taskBarItem != null) 
+
+						if (!LiPoWatchDialog.this.readDataButton.getEnabled() && LiPoWatchDialog.this.taskBarItem != null)
 							LiPoWatchDialog.this.taskBarItem.setProgressState(GDE.IS_MAC ? SWT.ERROR : SWT.NORMAL);
 					}
 				}
@@ -1189,6 +1193,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					LiPoWatchDialog.this.numberRedDataSetsText = "0"; //$NON-NLS-1$
 					LiPoWatchDialog.this.numberActualDataSetsText = "0"; //$NON-NLS-1$
@@ -1224,11 +1229,12 @@ public class LiPoWatchDialog extends DeviceDialog {
 			this.clearMemoryButton.setEnabled(true);
 			this.closeButton.setEnabled(true);
 			setClosePossible(true);
-			if (LiPoWatchDialog.this.taskBarItem != null) 
+			if (LiPoWatchDialog.this.taskBarItem != null)
 				LiPoWatchDialog.this.taskBarItem.setProgressState(SWT.DEFAULT);
 		}
 		else {
 			GDE.display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					if (!LiPoWatchDialog.this.readConfigButton.isDisposed()) {
 						LiPoWatchDialog.this.readConfigButton.setEnabled(true);
@@ -1301,6 +1307,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 	 */
 	public void setReadDataProgressBar(final int value) {
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				int tmpValue = value < 0 ? 0 : value;
 				tmpValue = value > 100 ? 100 : value;
@@ -1324,6 +1331,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 		this.numberReadErrorText = "" + numReadErrors; //$NON-NLS-1$
 		this.numberLess4Text = "" + numLess4Measurements; //$NON-NLS-1$
 		GDE.display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				int progress = redTelegrams * 100 / memoryUsedValue;
 				int tmpValue = progress < 0 ? 0 : progress;
