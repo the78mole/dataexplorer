@@ -2084,7 +2084,7 @@ public class DataExplorer extends Composite {
 	}
 
 	public RecordSet getCompareSet() {
-		return this.compareSet == null ? this.compareSet = new RecordSet(analyzer.clone(), GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1, GraphicsType.COMPARE)
+		return this.compareSet == null ? this.compareSet = new RecordSet(analyzer, GDE.STRING_EMPTY, DataExplorer.COMPARE_RECORD_SET, 1, GraphicsType.COMPARE)
 				: this.compareSet;
 	}
 

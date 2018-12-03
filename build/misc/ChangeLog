@@ -4,6 +4,7 @@ Version 3.3.5 - xx xx 2019
 Generic changes/fixes
 	* fix setting foreground color of status message
 	* change delta calculation result to display 3 decimal places
+	* fix exception while copy curve into compare window
 
 Version 3.3.4 - 30 Nov 2018
 Generic changes/fixes
