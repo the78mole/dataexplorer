@@ -35,7 +35,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 
 import gde.GDE;
-import gde.config.Settings;
 
 /**
  * user interface status bar class, device, serial port, port activity, progress bar, messages
@@ -168,14 +167,7 @@ public class StatusBar {
 	 * method to set a message text to the message label of the status bar
 	 */
 	public void setMessage(final String text) {
-		switch (Settings.getInstance().getColorSchemaType()) {
-		case "light":
-			this.msgLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			break;
-		case "dark":
-			this.msgLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-			break;
-		}
+		this.msgLabel.setForeground(DataExplorer.COLOR_FOREGROUND);
 		this.msgLabel.setText(text);
 	}
 	
