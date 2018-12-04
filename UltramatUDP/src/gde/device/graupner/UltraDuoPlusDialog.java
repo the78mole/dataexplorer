@@ -437,7 +437,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						createUltraDuoPlusSetup(this.deviceIdentifierName);
 					}
 					catch (Exception e) {
-						if (e.getCause() instanceof FileNotFoundException) {
+						if (e.getCause() instanceof FileNotFoundException || e instanceof IllegalArgumentException) {
 							createUltraDuoPlusSetup(this.deviceIdentifierName);
 						}
 						else
