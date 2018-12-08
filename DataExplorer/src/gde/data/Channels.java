@@ -89,7 +89,7 @@ public final class Channels extends HashMap<Integer, Channel> {
 	 */
 	public Channels(Channels that) {
 		this(4);
-		if (this.analyzer == null) throw new IllegalArgumentException("setup is missing");
+		if (that.analyzer == null) throw new IllegalArgumentException("setup is missing");
 
 		// non-UI fields
 		this.analyzer  = that.analyzer;
