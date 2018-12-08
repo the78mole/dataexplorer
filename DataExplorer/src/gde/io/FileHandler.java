@@ -229,9 +229,10 @@ public class FileHandler {
 			else {
 				String devicePath = getDevicePath();
 				path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
-				if (!FileUtils.checkDirectoryAndCreate(path)) {
+				if (!FileUtils.checkDirectoryAndCreate(path)) 
 					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
-				}
+				if (FileUtils.checkDirectoryExist(path)) 
+					this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0056, new Object[] { path }));
 			}
 			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD, GDE.FILE_ENDING_STAR_LOV }, path, null, SWT.SINGLE);
 			if (openFileDialog.getFileName().length() > 4) {
@@ -387,9 +388,10 @@ public class FileHandler {
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = getDevicePath();
 		String path = deviceSetting.getDataFilePath() + devicePath;
-		if (!FileUtils.checkDirectoryAndCreate(path)) {
+		if (!FileUtils.checkDirectoryAndCreate(path))
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
-		}
+		if (FileUtils.checkDirectoryExist(path)) 
+			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0056, new Object[] { path }));
 		FileDialog fileDialog = null;
 		String osdFilePath = null;
 		if (fileName == null || fileName.length() < 5 || fileName.equals(getFileNameProposal(false))) {

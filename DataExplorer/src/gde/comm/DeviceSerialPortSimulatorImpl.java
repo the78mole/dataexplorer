@@ -111,9 +111,10 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 						else {
 							String devicePath = application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + application.getActiveDevice().getName() : GDE.STRING_EMPTY;
 							path = application.getActiveDevice() != null ? settings.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX : settings.getDataFilePath();
-							if (!FileUtils.checkDirectoryAndCreate(path)) {
+							if (!FileUtils.checkDirectoryAndCreate(path)) 
 								application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
-							}
+							if (FileUtils.checkDirectoryExist(path)) 
+								application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0056, new Object[] { path }));
 						}
 						FileDialog openFileDialog = application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV, GDE.FILE_ENDING_STAR_TXT,
 								GDE.FILE_ENDING_STAR_LOG }, path, null, SWT.SINGLE);
