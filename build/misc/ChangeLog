@@ -7,6 +7,7 @@ Generic changes/fixes
 	* fix exception while copy curve into compare window
 	* fix exception while cutting curve edges
 	* fix hanging application shutdown while executing device thread
+	* add migration hint for custom devices to add <device-name>*0 to device _use list
 
 Version 3.3.4 - 30 Nov 2018
 Generic changes/fixes
