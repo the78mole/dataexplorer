@@ -1,4 +1,4 @@
-/**************************************************************************************
+/************************************************************************************** 
   	This file is part of GNU DataExplorer.
 
 		GNU DataExplorer is free software: you can redistribute it and/or modify
@@ -14,15 +14,15 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
 
-Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
+Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann 
 ****************************************************************************************/
 package gde.messages;
 
-/**
- * @author Winfried Brügmann
- * Do not edit, MessageIds are generated from messages.properties
- */
-public class MessageIds {
+/** 
+ * @author Winfried Brügmann 
+ * Do not edit, MessageIds are generated from messages.properties 
+ */ 
+public class MessageIds { 
 
 	public final static String	GDE_MSGE0001 = "GDE_MSGE0001";
 	public final static String	GDE_MSGE0002 = "GDE_MSGE0002";
@@ -123,6 +123,7 @@ public class MessageIds {
 	public final static String	GDE_MSGW0045 = "GDE_MSGW0045";
 	public final static String	GDE_MSGW0046 = "GDE_MSGW0046";
 	public final static String	GDE_MSGW0047 = "GDE_MSGW0047";
+	public final static String	GDE_MSGW0048 = "GDE_MSGW0048";
 	public final static String	GDE_MSGI0001 = "GDE_MSGI0001";
 	public final static String	GDE_MSGI0002 = "GDE_MSGI0002";
 	public final static String	GDE_MSGI0003 = "GDE_MSGI0003";

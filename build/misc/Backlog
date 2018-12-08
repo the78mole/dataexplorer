@@ -1,8 +1,5 @@
 ﻿Development backlog: loose collection of open work items to be done in future
 
-while running threads (data gatherer threads) this threads needs to be stopped while user initiate application shutdown
-IDevice needs to be updated to enable necessary call while receiving dispose listener event 
-
 there might be custom device XMLs in Devices folder and device_use list, while XSD update this custom devices get lost, 
 both device XML and an entry in device_use is required for such custom devices
  

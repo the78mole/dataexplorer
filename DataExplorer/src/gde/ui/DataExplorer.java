@@ -560,17 +560,37 @@ public class DataExplorer extends Composite {
 				public void handleEvent(Event evt) {
 					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, GDE.shell.getLocation().toString() + "event = " + evt); //$NON-NLS-1$
 
-					// checkk all data saved - prevent closing application
+					// check all data saved - prevent closing application
 					evt.doit = getDeviceSelectionDialog().checkDataSaved();
+					
+					//check for device initiated running thread like data gathering, skip application shutdown
+					for (Thread thread : Thread.getAllStackTraces().keySet()) {
+						if (thread != null && !thread.isDaemon() && thread.isAlive() && thread.getClass().getName().startsWith("gde.device")) {
+							evt.doit = (SWT.OK == DataExplorer.this.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGW0048)));
+						}
+					}
 				}
 			});
 			this.addDisposeListener(new DisposeListener() {
+				@SuppressWarnings("deprecation")
 				@Override
 				public void widgetDisposed(DisposeEvent evt) {
 					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, "widgetDisposed", GDE.shell.getLocation().toString() + "event = " + evt); //$NON-NLS-1$ //$NON-NLS-2$
 					if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, "widgetDisposed", GDE.shell.getSize().toString()); //$NON-NLS-1$
-					// cleanup
-					// if help browser is open, dispose it
+
+					//kill long running thread initiated by used device, warning skipped by user
+					for (Thread thread : Thread.getAllStackTraces().keySet()) {
+						if (thread != null && !thread.isDaemon() && thread.isAlive() && thread.getClass().getName().startsWith("gde.device")) {
+							try {
+								thread.stop();
+							}
+							catch (Throwable e) {
+								log.log(Level.SEVERE, "thread.getClass().getName() killed brute force while shutdown");
+							}
+						}
+					}
+					
+					// cleanup if help browser is open, dispose it
 					if (DataExplorer.this.helpDialog != null && !DataExplorer.this.helpDialog.isDisposed()) {
 						DataExplorer.this.helpDialog.dispose();
 					}
