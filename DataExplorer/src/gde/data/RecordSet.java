@@ -182,7 +182,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	private RecordSet(RecordSet recordSet, int channelConfigurationNumber) {
 		super(recordSet);
-		this.analyzer = recordSet.analyzer.clone();
+		this.analyzer = recordSet.analyzer.getReplica();
 		this.channels = recordSet.channels;
 		this.device = recordSet.device;
 
@@ -289,7 +289,7 @@ public final class RecordSet extends AbstractRecordSet {
 	 */
 	private RecordSet(RecordSet recordSet, int dataIndex, boolean isFromBegin) {
 		super(recordSet, DeviceXmlResource.getInstance().getReplacements(recordSet.recordNames.clone())); // copy record names without possible syncableName
-		this.analyzer = recordSet.analyzer.clone();
+		this.analyzer = recordSet.analyzer.getReplica();
 		this.channels = recordSet.channels;
 		this.device = recordSet.device;
 

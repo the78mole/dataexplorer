@@ -195,14 +195,19 @@ public abstract class Analyzer implements Cloneable {
 		return this.settings;
 	}
 
+	@Override
+	@Deprecated // use getReplica instead
+	public Analyzer clone() {
+		throw new UnsupportedOperationException();
+	};
+
 	/**
 	 * Support multiple threads with different analyzer instances.
 	 * Use this if analyzer updates are not required or apply to the current thread only.
 	 * Be aware of the cloning performance impact.
 	 * @return the shallow / deep clone instance ({@link gde.Analyzer#Analyzer(Analyzer)})
 	 */
-	@Override
-	public abstract Analyzer clone();
+	public abstract Analyzer getReplica();
 
 	public void joinDeviceConfigurationsThread() {
 		try {

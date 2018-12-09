@@ -55,9 +55,8 @@ public class TestAnalyzer extends Analyzer {
 	}
 
 	@Override
-	public TestAnalyzer clone() {
-		joinDeviceConfigurationsThread();
-		return new TestAnalyzer(this);
+	public TestAnalyzer getReplica() {
+		return this;
 	}
 
 }

@@ -42,9 +42,8 @@ public class Explorer extends Analyzer {
 	}
 
 	@Override
-	public Explorer clone() {
-		joinDeviceConfigurationsThread();
-		return new Explorer(this);
+	public Analyzer getReplica() {
+		return this;
 	}
 
 	@Override

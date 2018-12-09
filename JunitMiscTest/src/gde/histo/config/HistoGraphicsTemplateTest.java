@@ -59,7 +59,7 @@ class HistoGraphicsTemplateTest extends NonUiTestCase {
 	void testConvertIntoObjectTemplateAndLoad(String deviceName, String objectKey, boolean transitoryTemplate) {
 		this.settings.setObjectTemplatesActive(true);
 
-		Analyzer analyzerClone = Analyzer.getInstance().clone();  // clone to prevent changing the object list
+		Analyzer analyzerClone = Analyzer.getInstance().getReplica();  // clone to prevent changing the object list
 		analyzerClone.getSettings().setObjectList(new String[] { "first", "2nd" }, "first");
 		int channelNumber = 1;
 		((TestAnalyzer) analyzerClone).setArena(deviceName, channelNumber, objectKey);
