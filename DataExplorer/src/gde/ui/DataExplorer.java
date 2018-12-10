@@ -566,7 +566,8 @@ public class DataExplorer extends Composite {
 					//check for device initiated running thread like data gathering, skip application shutdown
 					for (Thread thread : Thread.getAllStackTraces().keySet()) {
 						if (thread != null && !thread.isDaemon() && thread.isAlive() && thread.getClass().getName().startsWith("gde.device")) {
-							evt.doit = (SWT.OK == DataExplorer.this.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGW0048)));
+							DataExplorer.this.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0048));
+							evt.doit = false;
 						}
 					}
 				}
