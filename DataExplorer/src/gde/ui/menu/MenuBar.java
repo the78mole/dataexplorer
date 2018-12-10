@@ -514,22 +514,6 @@ public class MenuBar {
 				this.deviceMenu = new Menu(this.deviceMenuItem);
 				this.deviceMenuItem.setMenu(this.deviceMenu);
 				{
-					this.toolBoxDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
-					this.toolBoxDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0029, GDE.MOD1));
-					this.toolBoxDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
-					this.toolBoxDeviceMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0029));
-					this.toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "toolBoxDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
-							MenuBar.this.application.openDeviceDialog();
-						}
-					});
-				}
-				{
-					new MenuItem(this.deviceMenu, SWT.SEPARATOR);
-				}
-				{
 					this.portMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
 					this.portMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0049));
 					this.portMenuItem.setImage(SWTResourceManager.getImage("gde/resource/BulletHotRed.gif")); //$NON-NLS-1$
@@ -634,6 +618,19 @@ public class MenuBar {
 				}
 				{
 					new MenuItem(this.deviceMenu, SWT.SEPARATOR);
+				}
+				{
+					this.toolBoxDeviceMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
+					this.toolBoxDeviceMenuItem.setText(Messages.getString(MessageIds.GDE_MSGT0029, GDE.MOD1));
+					this.toolBoxDeviceMenuItem.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+					this.toolBoxDeviceMenuItem.setAccelerator(SWT.MOD1 + Messages.getAcceleratorChar(MessageIds.GDE_MSGT0029));
+					this.toolBoxDeviceMenuItem.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "toolBoxDeviceMenuItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							MenuBar.this.application.openDeviceDialog();
+						}
+					});
 				}
 				{
 					this.devicePropertyFileEditMenuItem = new MenuItem(this.deviceMenu, SWT.PUSH);
