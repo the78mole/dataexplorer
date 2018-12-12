@@ -164,6 +164,7 @@ public class SelectorComposite extends Composite {
 				@Override
 				public void widgetSelected(SelectionEvent evt) {
 					if (SelectorComposite.log.isLoggable(Level.FINEST)) SelectorComposite.log.log(Level.FINEST, "curveSelectorTable.widgetSelected, event=" + evt); //$NON-NLS-1$
+					SelectorComposite.this.resetMeasuring();
 					if (evt != null && evt.item != null && !evt.item.isDisposed()) {
 						toggleRecordSelection((TableItem) evt.item, true, false);
 						SelectorComposite.this.application.updateAllTabs(true, false);
@@ -396,4 +397,13 @@ public class SelectorComposite extends Composite {
 		this.curveSelectorHeader.setForeground(DataExplorer.COLOR_FOREGROUND);
 
 	}
+
+	/**
+	 * reset active measuring modes 
+	 */
+	private void resetMeasuring() {
+		if (this.contextMenu != null) contextMenu.resetMeasuring();
+		this.application.clearMeasurementModes();
+	}
+
 }
