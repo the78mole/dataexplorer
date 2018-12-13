@@ -108,7 +108,7 @@ public class GDE {
 	private static boolean									isWithUi													= false;
 
 	// ****** begin global constants section *******
-	public static final String							VERSION														= "Version 3.3.4";																																																					//$NON-NLS-1$
+	public static final String							VERSION														= "Version 3.3.5";																																																					//$NON-NLS-1$
 	public static final int									VERSION_NUMBER										= Integer.parseInt(GDE.VERSION.substring(8).replace(GDE.STRING_DOT, GDE.STRING_EMPTY));
 	public static final String							NAME_SHORT												= "GDE";																																																										//$NON-NLS-1$
 	public static final String							NAME_LONG													= "DataExplorer";																																																						//$NON-NLS-1$
