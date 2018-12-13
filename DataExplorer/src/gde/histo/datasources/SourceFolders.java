@@ -20,6 +20,7 @@
 package gde.histo.datasources;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ import gde.Analyzer;
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.IDevice;
+import gde.exception.ThrowableUtils;
 import gde.histo.device.IHistoDevice;
 import gde.log.Logger;
 import gde.messages.MessageIds;
@@ -277,8 +279,11 @@ public class SourceFolders {
 		Stream<String> objectKeys = Stream.of(analyzer.getSettings().getActiveObjectKey());
 		try (Stream<Path> objectPaths = analyzer.getDataAccess().getSourceFolders(basePath, objectKeys)) {
 			paths = objectPaths.collect(Collectors.toSet());
-		} catch (IOException e) {
+		} catch (IOException | UncheckedIOException e) {
 			log.log(Level.SEVERE, e.getMessage(), " is not accessible : " + e.getClass());
+			if (e.getMessage().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX).contains(analyzer.getSettings().getDataFilePath())) {
+				ThrowableUtils.rethrow(e);
+			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
 		}

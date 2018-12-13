@@ -36,6 +36,7 @@ import static java.util.logging.Level.WARNING;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,6 +62,7 @@ import gde.device.ScoreLabelTypes;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedFileFormatException;
+import gde.exception.ThrowableUtils;
 import gde.histo.cache.ExtendedVault;
 import gde.histo.cache.VaultCollector;
 import gde.histo.cache.VaultReaderWriter;
@@ -478,6 +480,8 @@ public final class VaultPicker {
 
 			this.elapsedTime_us = (int) ((System.nanoTime() - startNanoTime + 500000) / 1000);
 			log.time(() -> format("%,5d timeSteps  total              time=%,6d [ms] :: per second:%5d :: Rate=%,6d MiB/s", this.pickedVaults.size(), elapsedTime_us / 1000, this.pickedVaults.size() * 1000000 / this.elapsedTime_us, (int) (this.recordSetBytesSum / 1.024 / 1.024 / this.elapsedTime_us)));
+		} catch (IOException | UncheckedIOException e) {
+			ThrowableUtils.rethrow(e);
 		} catch (Exception e) {
 			log.log(SEVERE, e.getMessage(), e);
 		} finally {
