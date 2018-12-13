@@ -167,7 +167,7 @@ public final class DeviceConfigurations {
 			if (e.getLinkedException() instanceof SAXParseException) {
 				SAXParseException spe = (SAXParseException) e.getLinkedException();
 				GDE.setInitError(Messages.getString(MessageIds.GDE_MSGW0038, new String[] {
-						spe.getSystemId().replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK), spe.getLocalizedMessage() }));
+						fileName, spe.getLocalizedMessage() }));
 			}
 		} catch (Exception e) {
 			log.log(Level.WARNING, e.getMessage(), e);
