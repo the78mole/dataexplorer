@@ -517,6 +517,8 @@ public class HistoTableWindow extends CTabItem {
 		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.dataTable.print(imageGC);
+		if (GDE.IS_MAC)
+			this.dataTable.print(imageGC);
 		imageGC.dispose();
 
 		return tabContentImage;

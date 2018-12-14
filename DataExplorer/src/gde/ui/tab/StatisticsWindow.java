@@ -569,6 +569,8 @@ public class StatisticsWindow extends CTabItem {
 		Image objectImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(objectImage);
 		this.composite.print(imageGC);
+		if (GDE.IS_MAC)
+			this.composite.print(imageGC);
 		imageGC.dispose();
 
 		return objectImage;

@@ -285,8 +285,12 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 		GC imageGC = new GC(tabContentImage);
 		this.graphicSashForm.print(imageGC);
 		if (GDE.IS_MAC) {
+			this.graphicSashForm.print(imageGC);
 			Image graphics = this.getGraphicsComposite().getGraphicsPrintImage();
-			imageGC.drawImage(SWTResourceManager.getImage(flipHorizontal(graphics.getImageData())), bounds.width - graphics.getBounds().width, 0);
+			if (graphics != null) {
+				imageGC.drawImage(graphics, bounds.width - graphics.getBounds().width, 0);
+				graphics.dispose();
+			}
 		}
 		imageGC.dispose();
 

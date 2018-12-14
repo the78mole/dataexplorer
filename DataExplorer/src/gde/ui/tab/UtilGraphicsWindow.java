@@ -245,6 +245,14 @@ public class UtilGraphicsWindow extends CTabItem {
 		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.graphicSashForm.print(imageGC);
+		if (GDE.IS_MAC) {
+			this.graphicSashForm.print(imageGC);
+			Image graphics = this.graphicsComposite.getGraphicsPrintImage();
+			if (graphics != null) {
+				imageGC.drawImage(graphics, bounds.width - graphics.getBounds().width, 0);
+				graphics.dispose();
+			}
+		}
 		imageGC.dispose();
 
 		return tabContentImage;

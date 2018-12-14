@@ -10,6 +10,7 @@ Generic changes/fixes
 	* add migration hint for custom devices to add <device-name>*0 to device _use list
 	* add hint if device folder creation fails
 	* fix missing error message disabling device due to invalid XML
+	* fix MAC OS copy to clip board capability
 
 Version 3.3.4 - 30 Nov 2018
 Generic changes/fixes

@@ -695,6 +695,8 @@ public class CellVoltageWindow extends CTabItem {
 		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.cellVoltageMainComposite.print(imageGC);
+		if (GDE.IS_MAC)
+			this.cellVoltageMainComposite.print(imageGC);
 		imageGC.dispose();
 
 		return tabContentImage;

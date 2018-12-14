@@ -185,6 +185,8 @@ public class DigitalWindow extends CTabItem {
 		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.digitalMainComposite.print(imageGC);
+		if (GDE.IS_MAC)
+			this.digitalMainComposite.print(imageGC);
 		imageGC.dispose();
 
 		return tabContentImage;

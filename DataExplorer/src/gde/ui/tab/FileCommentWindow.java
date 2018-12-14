@@ -501,6 +501,8 @@ public class FileCommentWindow extends CTabItem {
 		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.commentMainComposite.print(imageGC);
+		if (GDE.IS_MAC)
+			this.commentMainComposite.print(imageGC);
 		imageGC.dispose();
 
 		return tabContentImage;

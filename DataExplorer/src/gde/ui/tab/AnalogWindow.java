@@ -199,6 +199,8 @@ public class AnalogWindow extends CTabItem {
 		Image tabContentImage = new Image(GDE.display, bounds.width, bounds.height);
 		GC imageGC = new GC(tabContentImage);
 		this.analogMainComposite.print(imageGC);
+		if (GDE.IS_MAC)
+			this.analogMainComposite.print(imageGC);
 		imageGC.dispose();
 
 		return tabContentImage;
