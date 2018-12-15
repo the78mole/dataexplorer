@@ -172,6 +172,9 @@ public final class TrailRecordSet extends AbstractRecordSet {
 
 	}
 
+	/**
+	 * Keeps a shallow copy of the startTimeStamp vault map.
+	 */
 	public final class PickedVaults {
 
 		/**
@@ -186,6 +189,9 @@ public final class TrailRecordSet extends AbstractRecordSet {
 		 */
 		private final HistoVault[]												indexedVaults;
 
+		/**
+		 * @param initialVaults in startTimeStamp in reverse order for creating a new map
+		 */
 		public PickedVaults(TreeMap<Long, List<ExtendedVault>> initialVaults) {
 			this.initialVaults.putAll(initialVaults);
 			Stream<ExtendedVault> map1 = this.initialVaults.values().stream().flatMap(List::stream).distinct();
