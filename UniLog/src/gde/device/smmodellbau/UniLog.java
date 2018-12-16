@@ -542,7 +542,7 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 				double numberMotor = 1;
 				PropertyType property = null;
 
-				switch (index) {
+				switch (record.getOrdinal()) {
 				case 0: //voltageReceiver
 				case 1: //voltage
 					break;

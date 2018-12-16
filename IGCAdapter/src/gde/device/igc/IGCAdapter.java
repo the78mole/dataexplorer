@@ -212,7 +212,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				//0=latitude 1=longitude  2=altitudeAbs 3=height
-				if (index > 1) { // ET the index decides about formatting? What about 3=height?  isGPSCoordinates method is missing.
+				if (record.getOrdinal() > 1) {
 					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 				}
 				else {

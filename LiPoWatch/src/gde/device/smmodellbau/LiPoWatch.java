@@ -294,7 +294,7 @@ public class LiPoWatch extends DeviceConfiguration implements IDevice {
 			double factor = 1.0;
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
-				switch (index) {
+				switch (record.getOrdinal()) {
 				case 3: //3=temperature analog outlet
 					offset = record.getOffset(); // != 0 if curve has an defined offset
 					factor = record.getFactor(); // != 1 if a unit translation is required

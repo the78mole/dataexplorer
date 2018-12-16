@@ -296,7 +296,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
 				//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
 				//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-				if (index > 1) {
+				if (record.getOrdinal() > 1) {
 					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
 				else {
@@ -757,4 +757,15 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			});
 		}
 	}
+	
+	/**
+	 * get the measurement ordinal of altitude, speed and trip length
+	 * @return empty integer array if device does not fulfill complete requirement
+	 */
+	@Override
+	public int[] getAtlitudeTripSpeedOrdinals() { 
+		//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+		return new int[] { 8, 11, 7}; 
+	}  
 }

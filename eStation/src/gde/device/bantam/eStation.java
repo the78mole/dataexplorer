@@ -428,7 +428,7 @@ public class eStation extends DeviceConfiguration implements IDevice {
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				if(index > 5 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
+				if(record.getOrdinal() > 5 && record.getUnit().equals("V")) //cell voltage BC6 no temperature measurements
 					dataTableRow[index + 1] = String.format("%.3f", (((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				else
 					dataTableRow[index + 1] = record.getDecimalFormat().format((((record.realGet(rowIndex) / 1000.0) - reduction) * factor));

@@ -222,7 +222,7 @@ public class Picolario2 extends Picolario {
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 
 				//0=Height, 1=Pressure, 2=VoltageRx, 3=Climb, 4=Voltage, 5=Current, 5=Capacity, 7=Power 8=Revolution 9=Temperature, 10=Latitude, 11=Longitude, 12=Altitude GPS, 13=Speed (GPS)
-				switch (index) {
+				switch (record.getOrdinal()) {
 				case 0: //Höhe/Height
 					PropertyType property = record.getProperty(Picolario.DO_SUBTRACT_FIRST);
 					boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;

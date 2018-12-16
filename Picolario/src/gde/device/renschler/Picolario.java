@@ -223,7 +223,7 @@ public class Picolario extends DeviceConfiguration implements IDevice {
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 
-				switch (index) { // 0=Spannung, 1=Höhe, 2=Steigung
+				switch (record.getOrdinal()) { // 0=Spannung, 1=Höhe, 2=Steigung
 				case 0: //Spannung/Voltage
 					break;
 				case 1: //Höhe/Height

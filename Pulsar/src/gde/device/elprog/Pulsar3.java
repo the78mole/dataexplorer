@@ -363,7 +363,7 @@ public class Pulsar3 extends DeviceConfiguration implements IDevice {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				double factor = record.getFactor(); // != 1 if a unit translation is required
-				if(index > 7 && record.getUnit().equals("V"))
+				if(record.getOrdinal() > 7 && record.getUnit().equals("V"))
 					try {
 						dataTableRow[index + 1] = String.format("%.3f", ((record.realGet(rowIndex) / 1000.0) * factor)); //$NON-NLS-1$
 					}

@@ -353,7 +353,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-				if (index > 1) {
+				if (record.getOrdinal() > 1) {
 					if (record.getName().toLowerCase().indexOf("flag") >= 0) //$NON-NLS-1$
 						dataTableRow[index + 1] = String.format("0x%02x", record.realGet(rowIndex) / 1000); //$NON-NLS-1$
 					else

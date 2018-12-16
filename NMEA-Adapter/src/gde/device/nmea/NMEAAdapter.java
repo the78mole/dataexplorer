@@ -284,7 +284,7 @@ public class NMEAAdapter extends DeviceConfiguration implements IDevice {
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity 8=magneticVariation;
 				//GPS 		9=altitudeRel 10=climb 11=tripLength 12=distance 13=azimuth 14=directionStart
-				if (index > 1) {
+				if (record.getOrdinal() > 1) {
 					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
 				else {

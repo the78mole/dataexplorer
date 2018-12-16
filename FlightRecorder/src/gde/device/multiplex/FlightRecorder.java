@@ -286,7 +286,7 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-				if (index > 1) {
+				if (record.getOrdinal() > 1) {
 					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
 				else {
