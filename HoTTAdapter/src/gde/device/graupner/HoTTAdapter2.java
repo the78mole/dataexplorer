@@ -1725,5 +1725,20 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			throw new UnsupportedOperationException(truss.getVault().getLoadFilePath());
 		}
 	}
-
+	
+	/**
+	 * get the measurement ordinal of altitude, speed and trip length
+	 * @return empty integer array if device does not fulfill complete requirement
+	 */
+	@Override
+	public int[] getAtlitudeTripSpeedOrdinals() { 
+		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
+		//10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+		//15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+		RecordSet activeRecordSet = this.application.getActiveChannel().getActiveRecordSet();
+		if (activeRecordSet.get(10).hasReasonableData() && activeRecordSet.get(20).hasReasonableData() && activeRecordSet.get(17).hasReasonableData())
+			return new int[] { 10, 20, 17 };
+		else
+			return new int[0];
+	}  
 }

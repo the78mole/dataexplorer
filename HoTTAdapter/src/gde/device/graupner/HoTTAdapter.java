@@ -2173,5 +2173,18 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		EnumSet<Sensor> sensors = Sensor.getSetFromSignature(sensorSignature);
 		return Sensor.getSensors(sensors);
 	}
-
+	
+	/**
+	 * get the measurement ordinal of altitude, speed and trip length
+	 * @return empty integer array if device does not fulfill complete requirement
+	 */
+	@Override
+	public int[] getAtlitudeTripSpeedOrdinals() { 
+		switch (this.application.getActiveChannelNumber()) {
+		case 3: //GPS = 3; 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+			return new int[] { 3, 9, 6 };
+		default:
+			return new int[0];
+		}
+	}  
 }

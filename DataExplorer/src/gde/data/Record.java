@@ -2243,6 +2243,28 @@ public class Record extends AbstractRecord implements IRecord {
 	}
 
 	/**
+	 * calculates the avgValue by discarding nulls and zeroes
+	 */
+	public int getAvgValue(int indexStart, int indexEnd) {
+		synchronized (this) {
+			long sum = 0;
+			int zeroCount = 0;
+			if (super.size() > 0) {
+				for (int i = indexStart; i <= indexEnd && i < super.size(); ++i) { 
+					Integer xi = this.realGet(i);
+					if (xi != null && xi != 0) {
+						sum += xi;
+					} else {
+						zeroCount++;
+					}
+				}
+			}
+			int indexDelta = indexEnd - indexStart + 1;
+			return (indexDelta - zeroCount) > 0 ? Long.valueOf(sum / (indexDelta - zeroCount)).intValue() : 0;
+		}
+	}
+
+	/**
 	 * calculates the avgValue using trigger ranges
 	 * does not support null measurement values.
 	 */

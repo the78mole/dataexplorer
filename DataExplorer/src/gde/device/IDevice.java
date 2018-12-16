@@ -1113,4 +1113,11 @@ public interface IDevice {
 	default String toStringOption() {
 		return "IDevice [name=" + getName() + ", isUsed=" + isUsed() + ", deviceGroup=" + getDeviceGroup() + ", channelCount=" + getChannelCount()+ "]";
 	}
+
+	/**
+	 * get the measurement ordinal of altitude, speed and trip length
+	 * @return empty integer array if device does not fulfill complete requirement
+	 */
+	public int[] getAtlitudeTripSpeedOrdinals();
+
 }

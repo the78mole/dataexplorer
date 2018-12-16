@@ -59,6 +59,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
 import gde.data.RecordSet;
+import gde.device.IDevice;
 import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -1004,6 +1005,7 @@ public class GraphicsComposite extends Composite {
 		this.canvasGC.setLineWidth(1);
 		this.canvasGC.setLineStyle(SWT.LINE_DASH);
 		this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+		IDevice actualDevice = record.getDevice();
 
 		if (recordSet.isMeasurementMode(measureRecordKey)) {
 			// initial measure position
@@ -1015,9 +1017,8 @@ public class GraphicsComposite extends Composite {
 			drawHorizontalLine(this.yPosMeasure, 0, this.curveAreaBounds.width);
 
 			this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
-
-			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { record.getName(),
-					record.getVerticalDisplayPointAsFormattedScaleValue(this.yPosMeasure, this.curveAreaBounds), record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }));
+			int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
+			this.calculateMeasurementStatusMessage(actualDevice, record, indexPosMeasure);
 		}
 		else if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
 			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
@@ -1038,11 +1039,18 @@ public class GraphicsComposite extends Composite {
 			drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
 
 			this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+			
+			int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
+			int indexPosDelta = record.getHorizontalPointIndexFromDisplayPoint(this.xPosDelta);		
 
-			this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257,
-					new Object[] { record.getName(), Messages.getString(MessageIds.GDE_MSGT0212), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds),
-							record.getUnit(), TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
-							record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }));
+			if (this.settings.isEnhancedMeasurement() //actually hidden, must be manually enabled
+					&& record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must support and measurement record with data
+					&& record.getOrdinal() == record.getDevice().getAtlitudeTripSpeedOrdinals()[0]) { // returned first ordinal match altitude 								
+				this.calculateSinkAndGlideRatioStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
+			} else {
+				this.calculateDeltaValueStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
+			}
+
 		}
 		this.canvasGC.dispose();
 	}
@@ -1412,6 +1420,8 @@ public class GraphicsComposite extends Composite {
 						}
 						else if (this.isLeftMouseMeasure) {
 							Record record = recordSet.get(measureRecordKey);
+							IDevice actualDevice = record.getDevice();
+							int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
 							// clear old measure lines
 							eraseVerticalLine(this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
 							//no change don't needs to be calculated, but the calculation limits to bounds
@@ -1444,21 +1454,25 @@ public class GraphicsComposite extends Composite {
 								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
 									drawConnectingLine(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
 								}
-								this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257,
-										new Object[] { record.getName(), Messages.getString(MessageIds.GDE_MSGT0212),
-												record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds), record.getUnit(),
-												TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
-												record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }));
+								
+								int indexPosDelta = record.getHorizontalPointIndexFromDisplayPoint(this.xPosDelta);									
+
+								if (this.settings.isEnhancedMeasurement() //actually hidden, must be manually enabled
+										&& record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must support and measurement record with data
+										&& record.getOrdinal() == record.getDevice().getAtlitudeTripSpeedOrdinals()[0]) { // returned first ordinal match altitude 								
+									this.calculateSinkAndGlideRatioStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
+								} else {
+									this.calculateDeltaValueStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
+								}
 							}
 							else {
 								this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
-								this.application.setStatusMessage(
-										Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { record.getName(), record.getVerticalDisplayPointAsFormattedScaleValue(this.yPosMeasure, this.curveAreaBounds),
-												record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }));
+								this.calculateMeasurementStatusMessage(actualDevice, record, indexPosMeasure);
 							}
 						}
 						else if (this.isRightMouseMeasure) {
 							Record record = recordSet.get(measureRecordKey);
+							IDevice actualDevice = record.getDevice();
 							// clear old delta measure lines
 							eraseVerticalLine(this.xPosDelta, 0, this.curveAreaBounds.height, 1);
 							//no change don't needs to be calculated, but the calculation limits to bounds
@@ -1493,10 +1507,17 @@ public class GraphicsComposite extends Composite {
 
 							this.canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
 
-							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257,
-									new Object[] { record.getName(), Messages.getString(MessageIds.GDE_MSGT0212), record.getVerticalDisplayDeltaAsFormattedValue(this.yPosMeasure - this.yPosDelta, this.curveAreaBounds),
-											record.getUnit(), TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
-											record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }));
+							int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
+							int indexPosDelta = record.getHorizontalPointIndexFromDisplayPoint(this.xPosDelta);									
+
+							if (this.settings.isEnhancedMeasurement() //actually hidden, must be manually enabled
+									&& record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must support and measurement record with data
+									&& record.getOrdinal() == record.getDevice().getAtlitudeTripSpeedOrdinals()[0]) { // returned first ordinal match altitude 								
+								this.calculateSinkAndGlideRatioStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
+							} else {
+								this.calculateDeltaValueStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
+							}
+
 						}
 						else if (this.isPanMouse) {
 							this.xDeltaPan = (this.xLast != 0 && this.xLast != evt.x) ? (this.xDeltaPan + (this.xLast < evt.x ? -1 : 1)) : 0;
@@ -1577,6 +1598,62 @@ public class GraphicsComposite extends Composite {
 				this.canvasGC.dispose();
 			}
 		}
+	}
+
+	/**
+	 * calculate measurement status message to display the actual record value, formatted as configured
+	 * @param actualDevice
+	 * @param record the record where the measurement pointer is set
+	 * @param indexPosMeasure index of measurement pointer
+	 */
+	private void calculateMeasurementStatusMessage(IDevice actualDevice, Record record, int indexPosMeasure) {
+		this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0256, new Object[] { record.getName(),
+				record.getDecimalFormat().format(actualDevice.translateValue(record, record.realGet(indexPosMeasure)) / 1000.0),
+				record.getUnit(), record.getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure) }));
+	}
+
+	/**
+	 * calculate delta values based on pointer position formatted as configured
+	 * @param actualDevice
+	 * @param record the record where the measurement pointer is set
+	 * @param indexPosMeasure index of black measurement
+	 * @param indexPosDelta index of blue measurement pointer
+	 */
+	private void calculateDeltaValueStatusMessage(IDevice actualDevice, Record record, int indexPosMeasure, int indexPosDelta) {
+		this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0257,
+				new Object[] { record.getName(), Messages.getString(MessageIds.GDE_MSGT0212), 
+						record.getDecimalFormat().format(actualDevice.translateValue(record, record.realGet(indexPosDelta) - record.realGet(indexPosMeasure)) / 1000.0),
+						record.getUnit(), TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
+						record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit() }));
+	}
+
+	/**
+	 * calculates some interesting ratios for glider evaluation, values formatted as configured
+	 * @param record the record where the measurement pointer is set
+	 * @param indexPosMeasure index of black measurement
+	 * @param indexPosDelta index of blue measurement pointer
+	 */
+	private void calculateSinkAndGlideRatioStatusMessage(IDevice actualDevice, Record record, int indexPosMeasure, int indexPosDelta) {
+		Record tripLength =  record.getParent().get(record.getDevice().getAtlitudeTripSpeedOrdinals()[1]);
+		Record altitude =  record.getParent().get(record.getDevice().getAtlitudeTripSpeedOrdinals()[0]);
+		Record speed = record.getParent().get(record.getDevice().getAtlitudeTripSpeedOrdinals()[2]);
+		
+		double altitudeDelta = altitude.realGet(indexPosDelta) - altitude.realGet(indexPosMeasure);
+		String altDelta_m = altitude.getDecimalFormat().format(actualDevice.translateValue(altitude, altitudeDelta) / 1000.0);
+		
+		double tripDelta = tripLength.realGet(indexPosDelta) - tripLength.realGet(indexPosMeasure);
+		String tripDelta_m = tripLength.getDecimalFormat().format(actualDevice.translateValue(tripLength, tripDelta));
+		
+		String ratioTripAltitude = String.format("%4.2f", Math.abs(actualDevice.translateValue(tripLength, tripDelta) / actualDevice.translateValue(altitude, altitudeDelta)) * 1000.0);
+		String speedAvg = speed.getDecimalFormat().format(actualDevice.translateValue(speed, speed.getAvgValue(indexPosMeasure, indexPosDelta)) / 1000.0 );
+
+		this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0187,
+				//GDE_MSGT0187=\  \u2206h/\u2206t = {1} {2}/{3} ===> {4} {5}/sec - \u2206s/\u2206h = {6} {7} ===> {8} m bei ~{9} {10}
+				new Object[] { 
+						altDelta_m, record.getUnit(),
+						TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
+						record.getSlopeValue(new Point(this.xPosDelta - this.xPosMeasure, this.yPosMeasure - this.yPosDelta)), record.getUnit(),
+						tripDelta_m, altDelta_m, ratioTripAltitude,  speedAvg, speed.getUnit()}));
 	}
 
 	/**
@@ -1936,6 +2013,8 @@ public class GraphicsComposite extends Composite {
 		Properties displayProps = this.settings.getMeasurementDisplayProperties();
 		RecordSet activeRecordSet = this.application.getActiveRecordSet();
 		if (activeRecordSet != null) {
+			int indexPosMeasure = activeRecordSet.get(0).getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
+			IDevice actualDevice = activeRecordSet.getDevice();
 			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD));
 			Vector<Record> records = activeRecordSet.getVisibleAndDisplayableRecords();
 			String formattedTimeWithUnit = records.firstElement().getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure);
@@ -1952,7 +2031,7 @@ public class GraphicsComposite extends Composite {
 			}
 			sb.append("| ").append(GDE.LINE_SEPARATOR).append(String.format("%16s  ", formattedTimeWithUnit.substring(0, formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET) - 1)));
 			for (Record record : records) {
-				sb.append(String.format("|%7s   ", record.getVerticalDisplayPointAsFormattedScaleValue(record.getVerticalDisplayPointValue(this.xPosMeasure), this.curveAreaBounds)));
+				sb.append(String.format("|%7s   ", record.getDecimalFormat().format(actualDevice.translateValue(record, record.realGet(indexPosMeasure)) / 1000.0)));
 			}
 			return sb.append("|").toString();
 		}

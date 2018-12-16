@@ -12,6 +12,9 @@ Generic changes/fixes
 	* fix missing error message disabling device due to invalid XML
 	* fix MAC OS copy to clip board capability
 	* fix partial data table calculation for several devices 
+	* fix reset measurement selection in curve selector context menu
+	* fix measurement formatting based on record decimal format
+	* fix measurement based on calculated record index
 
 Version 3.3.4 - 30 Nov 2018
 Generic changes/fixes

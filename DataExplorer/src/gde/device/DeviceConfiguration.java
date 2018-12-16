@@ -2841,4 +2841,10 @@ public class DeviceConfiguration {
 		}
 	}
 
+	/**
+	 * get the measurement ordinal of altitude, speed and trip length
+	 * @return empty integer array if device does not fulfill complete requirement
+	 */
+	public int[] getAtlitudeTripSpeedOrdinals() { return new int[0]; }  
+
 }
