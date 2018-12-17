@@ -68,10 +68,10 @@ public abstract class Analyzer implements Cloneable {
 				} else {
 					analyzer = new Explorer();
 				}
-				// synchronize now to avoid a performance penalty in case of frequent getInstance calls
-				synchronized (analyzer) {
-					analyzer.startDeviceConfigurationsThread();
-				}
+			}
+			// synchronize now to avoid a performance penalty in case of frequent getInstance calls
+			synchronized (analyzer) {
+				analyzer.startDeviceConfigurationsThread();
 			}
 		}
 		return analyzer;
