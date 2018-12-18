@@ -81,6 +81,7 @@ public class NMEAParser implements IDataParser {
 	public enum NMEA {
 		//NMEA sentences
 		GPRMC, GPGSA, GPGGA, GPVTG, GPGSV, GPRMB, GPGLL, GPZDA, 
+		GNRMC, GNGSA, GNGGA, GNVTG, GNGSV, GNRMB, GNGLL, GNZDA, 
 		//additional SM-Modellbau GPS-Logger NMEA sentences
 		GPSSETUP, SETUP, SMGPS, SMGPS2, MLINK, UNILOG, KOMMENTAR, COMMENT,
 		//additional SM-Modellbau UniLog2 sentences
@@ -205,27 +206,35 @@ public class NMEAParser implements IDataParser {
 			NMEA sentence = NMEA.valueOf(strValues[0].substring(1));
 			switch (sentence) {
 			case GPRMC: //Recommended Minimum Sentence C (RMC)
+			case GNRMC: //Recommended Minimum Sentence C (RMC)
 				parseRMC(strValues);
 				break;
 			case GPGGA: //Global Positioning System Fix Data (GGA)				
+			case GNGGA: //Global Positioning System Fix Data (GGA)				
 				parseGGA(strValues);
 				break;
 			case GPGSA: //Satellite status (GSA)
+			case GNGSA: //Satellite status (GSA)
 				parseGSA(strValues);
 				break;
 			case GPVTG: // Velocity made good (VTG)
+			case GNVTG: // Velocity made good (VTG)
 				if(!deviceName.startsWith("GPS-Logger")) parseVTG(strValues);
 				break;
 			case GPGSV: // Satellites in view (GSV)
+			case GNGSV: // Satellites in view (GSV)
 				parseGSV(strValues);
 				break;
 			case GPRMB: // Recommended minimum navigation information (RMB)
+			case GNRMB: // Recommended minimum navigation information (RMB)
 				parseRMB(strValues);
 				break;
 			case GPGLL: // Geographic Latitude and Longitude (GLL)
+			case GNGLL: // Geographic Latitude and Longitude (GLL)
 				parseGLL(strValues);
 				break;
 			case GPZDA: // Data and Time (ZDA)
+			case GNZDA: // Data and Time (ZDA)
 				parseZDA(strValues);
 				break;
 			case SMGPS:
