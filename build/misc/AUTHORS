@@ -1,4 +1,4 @@
-This is AUTHORS  Jan 11 2011
+This is AUTHORS  Dec 18 2018
 
 The DataExplorer is written, starting October 2008, to 
 remove frustration by similar available not cross platform 
@@ -20,6 +20,9 @@ Special thanks to Markus Verkoyen
 
 Special thanks to Oliver Petrik 
 	a lot of support regarding MAC OSX 
+
+Special thanks to Thomas Eickert 
+	implementation of history analysis and code renew
 
 Maintainer: Winfried Brügmann <winfried.bruegmann@web.de>
 

@@ -1,95 +1,31 @@
-GNU DataExplorer - News - comes with version 3.3.4 - 30 Nov 2018
+GNU DataExplorer - News - comes with version 3.3.5 - 20 Dec 2018
 
-1) Generic changes/fixes
-	* fix ratio calculation triggered used capacity to reached motor altitude
-	* update Java download URLs in Windows launcher
-	* new device xsd version
-	* make ready to execute using JRE 8 to 11
-	* fix [sr #109555] CSV Export does not use decimal point separator
-	* fix raw csv export 
-	* fix exception while moving scaled curve display around start time stamp
-	* fix adding KMZ export menu on device level
-	* fix graphics header update while switching record set
-	* update device selection dialog devices overview tab
-	* reduce extracted device properties XMLs to the devices selected
-	* user interface polish enabling different color schema
-	* remove never used global serial port from settings dialog
+Generic changes/fixes
+	* fix setting foreground color of status message
+	* fix exception while copy curve into compare window
+	* fix exception while cutting curve edges
+	* fix hanging application shutdown while executing device thread
+	* add migration hint for custom devices to add <device-name>*0 to device _use list
+	* add hint if device folder creation fails
+	* fix missing error message disabling device due to invalid XML
+	* fix MAC OS copy to clip board capability
+	* fix partial data table calculation for several devices 
+	* fix reset measurement selection in curve selector context menu
+	* fix measurement formatting based on record decimal format
+	* fix measurement based on calculated record index
 	
-2) Device specific changes/fixes
-	* HottAdapter* -  fix error message GDE_MSGW2404 appearing only at the first import, Fix missing tab activation after import
-	* HottAdapter* -  fix start time stamp calculation while special case receiver data only analysis
-	* HottAdapter - fix wrong sensor sequence reference while import *.bin with single ESC sensor module connected.
-	* Hitec DRX1 - add support (identical Hitex RDX1 Pro is the 100W version)
-	* Hitec X1 Red - add support
-	* iMax B6 mini - add support (iMax B6 AC V2)
-	* PolaronPro - fix cell voltage update
-	* Polaron* - fix measurement index position reference (according available specification)
-	* GPS-Logger2 - fix device visualization dialog
-	* GPS-Logger* - update behavior selecting configuration while import, 
-		switch to UniLog2 only if $UL2 entry found, respective to UniLog if $UNILOG entry found, else keep the previous selected configuration 
-	* ArduPilot - initial implementation based on LogStructure.h
-	* CSV2SerialAdapter - fix potential invalid thread access while updating GPS related menu entries
-	* Weatronic-Telemetry - fix potential OSD file reading with lower number of records compared to actual device measurement structure
+Generelle Fehlerkorrektur und Verbesserungen
+	* Schriftfarbe der Statusmessage in Abhängigkeit des gewählten Farbthemas korrigiert
+	* Absturz bei Benutzung der Kurven-Kopierfunktion beseitigt
+	* Absturz bei Benutzung der Schneidefunktion beseitigt
+	* Beachtung einer laufenden Datenaufnahme beim Schliessen der Anwendung
+	* Migrationshilfe bei selbst erstellten Geräten hinzugefügt (<Geräte_name>*0 zur device_use Liste)
+	* Hinweis bei erstellen eines benötigten Geräte-Ordners hinzugefügt
+	* Fehleranzeige für Validierung-Fehler der Geräte XML-Dateien berichtigt
+	* Kopieren des Inhaltes der Anzeigen unter MAC OS Mojave korrigiert
+	* Korrektur der fehlerhaften Anzeige der reduzierten Tabelle bei vielen Geräten
+	* Rücksetzen der Selektion beim Messen in der grafischen Anzeige korrigiert
+	* beim Messen in der grafischen Anzeige wird jetzt die eingestellte Nachkommastelle berücksichtig
+	* Korrektur der Wertermittlung beim Messen über die grafischen Anzeige
 	
-3) History analysis
-	# Flexibility
-		.. OpenStreetMap GeoCodes (now prioritized over GoogleMaps)
-	       ! -> Clear the location cache via the 'Clear cache' button!
-    	.. Add warning and event bits support to HoTTAdapter1/2
-	# Performance
-		.. Leverage multicore processors
-		.. Boost HoTTAdapter2 import speed
-		.. New histo cache version with accelerated read access
-		.. diverse optimizations
-	# Processing
-		.. Fix start timestamp calculation for HoTT native logs
-		.. Fix measuring illegal argument exception for measuring with null values
-
-
-
-1) Allgemeine Korrekturen/Änderungen
-	* Korrektur Berechnung vom Verhältnis Kapazität/Motor-Höhe
-	* Korrektur Java Download URLs in Windows Starter
-	* Neue Geräte XML Schema Version
-	* Anpassungen für Java Laufzeitumgebung 8 bis 11
-	* Korrektur [sr #109555] CSV Export benutzt nicht den eingestellten Dezimal-Separator
-	* Korrektur Rohdaten CSV Export 
-	* Korrektur der Fehlerbehandlung beim Verschieben der Kurven in der Nähe de Log-Starts
-	* KMZ Export Menü auf Geräteebene hinzugefügt
-	* Korrektur Grafiküberschrift Erneuerung bei Datensatzwechsel
-	* Änderung des Geräteauswahldialoges Übersichtstabulator
-	* Reduktion der extrahierten Geräte XMLs auf die benutzten Geräte
-	* Auswahl von verschiedenen Farbschema
-	* Niemals benutzten globalen seriellen Port im Einstellungsdialog entfernt
-	
-2) Geräte spezifische Korrekturen/Änderungen
-	* HottAdapter* -  Korrektur der Anzeige vom Wechsel in den Text-Modus, gab es lediglich beim ersten import
-	* HottAdapter* -  Korrektur der Startzeitberechnung im Fall ausschliesslicher Empfänger-Daten
-	* HottAdapter - Korrektur falscher Sequenz beim Import von *.bin mit ESC-Sensor
-	* Hitec DRX1 - Unterstützung hinzugefügt (identisch mit Hitex RDX1 Pro ist die 100W Version)
-	* Hitec X1 Red - Unterstützung hinzugefügt
-	* iMax B6 mini - Unterstützung hinzugefügt (Protokoll identisch mit iMax B6 AC V2)
-	* PolaronPro - Korrektur der Zellenspannungsauswertung
-	* Polaron* - Korrektur der Referenz zur Indexposition (wie in verfügbarer Spezifikation)
-	* GPS-Logger2 - Korrektur des Geräte-Visualisierungs-Dialogs
-	* GPS-Logger* - Korrektur der Konfigurationsauswahl während des Imports, 
-		Umschalten zu UniLog2 nur wenn $UL2 Einträge gefunden werden, beziehungsweise zu UniLog wenn $UNILOG Einträge gefunden werden, 
-		ansonsten behalte die vorher gewählte Konfiguration 
-	* ArduPilot - initiale Unterstützung basierend auf LogStructure.h
-	* CSV2SerialAdapter - Korrektur potentiell fehlerhaften Thread-Zugriff bei Update GPS bezogener Menüeinträge
-	* Weatronic-Telemetry - Korrektur eines potentiellen Fehlers beim Lesen von OSD-Dateien mit geringerer Anzahl von Messwerten als in der aktuellen Messwertstruktur
-	
-3) Historien-Analyse
-	# Flexibilität
-	 	.. OpenStreetMap GeoCodes (priorisiert gegenüber GoogleMaps )
-	       ! -> Löschen des GeoCodes-Cache erforderlich über 'Cache bereinigen'!
-     	.. Warnung- und Ereignis-Auswertung hinzugefügt bei HoTTAdapter1/2
-	# Verarbeitungsgeschwindigkeit
-		.. Ausnutzung Multicore-Prozessoren
-		.. Deutlich verbesserte Import-Geschwindigkeit beim HoTTAdapter2
-		.. Neue Historien-Cache Version mit schnellerem Lesezugriff
-		.. diverse Optimierungen
-	# Verarbeitung
-		.. Verbesserung der Berechnung des Startzeitpunkts bei bin-Importen
-		.. Korrektur bei der manuellen Messung von ungültigen Werten
 	
