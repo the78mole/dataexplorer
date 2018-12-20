@@ -13,6 +13,7 @@ Generic changes/fixes
 	* fix reset measurement selection in curve selector context menu
 	* fix measurement formatting based on record decimal format
 	* fix measurement based on calculated record index
+	* fix Windows missing color change with swt library update
 	
 Generelle Fehlerkorrektur und Verbesserungen
 	* Schriftfarbe der Statusmessage in Abhängigkeit des gewählten Farbthemas korrigiert
@@ -27,5 +28,6 @@ Generelle Fehlerkorrektur und Verbesserungen
 	* Rücksetzen der Selektion beim Messen in der grafischen Anzeige korrigiert
 	* beim Messen in der grafischen Anzeige wird jetzt die eingestellte Nachkommastelle berücksichtig
 	* Korrektur der Wertermittlung beim Messen über die grafischen Anzeige
+	* fehlender Farbwechsel unter Windows verbessert durch Update der SWT Bibliothek
 	
 	

@@ -14,6 +14,7 @@ Generic changes/fixes
 	* fix reset measurement selection in curve selector context menu
 	* fix measurement formatting based on record decimal format
 	* fix measurement based on calculated record index
+	* fix Windows missing color change with swt library update
 
 Version 3.3.4 - 30 Nov 2018
 Generic changes/fixes
