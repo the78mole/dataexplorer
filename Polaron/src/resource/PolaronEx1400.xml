@@ -25,7 +25,7 @@
         <timeStep>1000.0</timeStep>
     </TimeBase>
     <DataBlock>
-        <format inputType="SERIAL_IO" formatType="BYTE" size="299"/>
+        <format inputType="SERIAL_IO" formatType="BYTE" size="305"/>
     </DataBlock>
     <Channels>
         <Channel name="type_outlet 1" type="TYPE_OUTLET">

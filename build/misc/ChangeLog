@@ -1,6 +1,14 @@
 Development history / change log, please read from bottom up
 
-Version 3.3.5 - 20 Dec 2019
+Version 3.3.6 - xx yyy 2019
+Generic changes/fixes
+
+Device specific changes/fixes
+	* Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)
+
+History analysis
+
+Version 3.3.5 - 20 Dec 2018
 Generic changes/fixes
 	* fix setting foreground color of status message
 	* fix exception while copy curve into compare window
