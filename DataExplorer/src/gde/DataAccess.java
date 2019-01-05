@@ -141,12 +141,12 @@ public abstract class DataAccess implements Cloneable {
 
 		@Override
 		public void verifyLogging() {
-			FileUtils.checkDirectoryAndCreate(String.join(GDE.FILE_SEPARATOR_UNIX, GDE.APPL_HOME_PATH, Settings.LOG_PATH));
+			FileUtils.checkDirectoryAndCreate(String.join(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.APPL_HOME_PATH, Settings.LOG_PATH));
 		}
 
 		@Override
 		public boolean verifyAndBackupTemplates() {
-			String templatePath = String.join(GDE.FILE_SEPARATOR_UNIX, GDE.APPL_HOME_PATH, Settings.GRAPHICS_TEMPLATES_DIR_NAME);
+			String templatePath = String.join(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.APPL_HOME_PATH, Settings.GRAPHICS_TEMPLATES_DIR_NAME);
 			if (!FileUtils.checkDirectoryAndCreate(templatePath, Settings.GRAPHICS_TEMPLATES_XSD_NAME)) {
 				FileUtils.extract(Settings.class, Settings.GRAPHICS_TEMPLATES_XSD_NAME, Settings.PATH_RESOURCE, templatePath, Settings.PERMISSION_555);
 				return false;
@@ -187,7 +187,7 @@ public abstract class DataAccess implements Cloneable {
 
 		private String getTemplateFilePrefix(Path t) {
 			String fileName = t.getFileName().toString();
-			int index = fileName.lastIndexOf(GDE.STRING_UNDER_BAR);
+			int index = fileName.lastIndexOf(GDE.CHAR_UNDER_BAR);
 			return index < 0 ? "" : fileName.substring(0, index);
 		}
 
@@ -384,12 +384,12 @@ public abstract class DataAccess implements Cloneable {
 
 		@Override
 		public boolean verifyAndBackupDevices() {
-			String devicePath = String.join(GDE.FILE_SEPARATOR_UNIX, GDE.APPL_HOME_PATH, Settings.DEVICE_PROPERTIES_DIR_NAME);
+			String devicePath = String.join(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.APPL_HOME_PATH, Settings.DEVICE_PROPERTIES_DIR_NAME);
 			if (!FileUtils.checkDirectoryAndCreate(devicePath, Settings.DEVICE_PROPERTIES_XSD_NAME)) {
 				FileUtils.extract(Settings.class, Settings.DEVICE_PROPERTIES_XSD_NAME, Settings.PATH_RESOURCE, devicePath, Settings.PERMISSION_555);
 				return false;
 			} else { // execute every time application starts to enable xsd exist and update from added plug-in
-				if (!FileUtils.checkFileExist(String.join(GDE.FILE_SEPARATOR_UNIX, devicePath, Settings.DEVICE_PROPERTIES_XSD_NAME)))
+				if (!FileUtils.checkFileExist(String.join(GDE.STRING_FILE_SEPARATOR_UNIX, devicePath, Settings.DEVICE_PROPERTIES_XSD_NAME)))
 					FileUtils.extract(Settings.class, Settings.DEVICE_PROPERTIES_XSD_NAME, Settings.PATH_RESOURCE, devicePath, Settings.PERMISSION_555);
 				return true;
 			}
@@ -419,7 +419,7 @@ public abstract class DataAccess implements Cloneable {
 
 		@Override
 		public String[] getDeviceFolderList() {
-			String xmlBasePath = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + GDE.FILE_SEPARATOR_UNIX;
+			String xmlBasePath = GDE.APPL_HOME_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + GDE.STRING_FILE_SEPARATOR_UNIX;
 			File deviceFolder = new File(xmlBasePath);
 			if (!deviceFolder.exists()) {
 				return new String[0];
@@ -441,7 +441,7 @@ public abstract class DataAccess implements Cloneable {
 
 		@Override
 		public InputStream getDeviceXsdInputStream() throws FileNotFoundException {
-			String xmlBasePath = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + GDE.FILE_SEPARATOR_UNIX;
+			String xmlBasePath = GDE.APPL_HOME_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + GDE.STRING_FILE_SEPARATOR_UNIX;
 			Path targetFilePath = Paths.get(xmlBasePath, Settings.DEVICE_PROPERTIES_XSD_NAME);
 			return new FileInputStream(targetFilePath.toFile());
 		}
@@ -472,7 +472,7 @@ public abstract class DataAccess implements Cloneable {
 		@Override
 		@SuppressWarnings("static-method")
 		public InputStream getDeviceXsdMigrationStream(int versionNumber) throws FileNotFoundException {
-			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
+			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
 			Path targetFilePath = migratePropertyPath.resolve("DeviceProperties_V" + versionNumber + GDE.FILE_ENDING_DOT_XSD);
 			return new FileInputStream(targetFilePath.toFile());
 		}
@@ -480,7 +480,7 @@ public abstract class DataAccess implements Cloneable {
 		@Override
 		@SuppressWarnings("static-method")
 		public boolean existsDeviceMigrationFolder(int versionNumber) {
-			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
+			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber);
 			return migratePropertyPath.toFile().exists();
 		}
 
@@ -493,7 +493,7 @@ public abstract class DataAccess implements Cloneable {
 		@Override
 		public List<Path> getDeviceXmlSubPaths(int versionNumber) throws FileNotFoundException {
 			String folderName = Settings.DEVICE_PROPERTIES_DIR_NAME + "_V" + versionNumber;
-			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + folderName);
+			Path migratePropertyPath = Paths.get(GDE.APPL_HOME_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + folderName);
 			List<File> fileList = FileUtils.getFileListing(migratePropertyPath.toFile(), 1, GDE.FILE_ENDING_DOT_XML);
 			return fileList.stream().map(File::getName).map(s -> Paths.get(folderName, s)).collect(Collectors.toList());
 		}
@@ -583,7 +583,7 @@ public abstract class DataAccess implements Cloneable {
 		 */
 		@SuppressWarnings("static-method")
 		public boolean checkAndCreateHistoLocations() {
-			return FileUtils.checkDirectoryAndCreate(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.GPS_LOCATIONS_DIR_NAME);
+			return FileUtils.checkDirectoryAndCreate(GDE.APPL_HOME_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.GPS_LOCATIONS_DIR_NAME);
 		}
 
 		public String resetHistoCache() {
@@ -600,7 +600,7 @@ public abstract class DataAccess implements Cloneable {
 
 		@Override
 		public boolean verifyAndBackupCache() {
-			String cachePath = GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.HISTO_CACHE_ENTRIES_DIR_NAME;
+			String cachePath = GDE.APPL_HOME_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.HISTO_CACHE_ENTRIES_DIR_NAME;
 			if (!FileUtils.checkDirectoryAndCreate(cachePath, Settings.HISTO_CACHE_ENTRIES_XSD_NAME)) {
 				FileUtils.extract(Settings.class, Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, cachePath, Settings.PERMISSION_555);
 				return false;
@@ -678,8 +678,8 @@ public abstract class DataAccess implements Cloneable {
 
 		@Override
 		public void checkMappingFileAndCreate(Class<?> sourceClass, String fileName) {
-			File path = new File(GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.MAPPINGS_DIR_NAME);
-			Path targetFilePath = Paths.get(path.toString() + GDE.FILE_SEPARATOR_UNIX + fileName);
+			File path = new File(GDE.APPL_HOME_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.MAPPINGS_DIR_NAME);
+			Path targetFilePath = Paths.get(path.toString() + GDE.STRING_FILE_SEPARATOR_UNIX + fileName);
 			if (!targetFilePath.toFile().exists()) {
 				if (!path.exists() && !path.isDirectory()) path.mkdir();
 				// extract initial property files
@@ -847,7 +847,7 @@ public abstract class DataAccess implements Cloneable {
 			Path propertyFilePath = path.resolve(Settings.MEASUREMENT_DISPLAY_FILE);
 			if (!localeChanged) {
 				if (!FileUtils.checkFileExist(propertyFilePath.toString()))
-					FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, String.format("%s%s%s", Settings.PATH_RESOURCE, lang, GDE.FILE_SEPARATOR_UNIX), path.toString(), Settings.PERMISSION_555);
+					FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, String.format("%s%s%s", Settings.PATH_RESOURCE, lang, GDE.STRING_FILE_SEPARATOR_UNIX), path.toString(), Settings.PERMISSION_555);
 			} else {
 				if (FileUtils.checkFileExist(propertyFilePath.toString())) {
 					propertyFilePath.toFile().delete();
@@ -857,7 +857,7 @@ public abstract class DataAccess implements Cloneable {
 						// ignore
 					}
 				}
-				FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, String.format("%s%s%s", Settings.PATH_RESOURCE, lang, GDE.FILE_SEPARATOR_UNIX), path.toString(), Settings.PERMISSION_555);
+				FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, String.format("%s%s%s", Settings.PATH_RESOURCE, lang, GDE.STRING_FILE_SEPARATOR_UNIX), path.toString(), Settings.PERMISSION_555);
 			}
 		}
 

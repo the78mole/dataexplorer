@@ -236,7 +236,7 @@ public class DevicePropertiesEditor extends Composite {
 			DevicePropertiesEditor.dialogShell.open();
 
 			if (args.length > 0) {
-				String tmpDevFileName = args[0].replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				String tmpDevFileName = args[0].replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 				tmpDevFileName = tmpDevFileName.toUpperCase().startsWith(devicePropsEditor.getDevicesPath().toUpperCase()) && tmpDevFileName.length() > devicePropsEditor.getDevicesPath().length() + 6 // "/a.xml"
 				? tmpDevFileName.substring(devicePropsEditor.getDevicesPath().length() + 1) : tmpDevFileName;
 				devicePropsEditor.openDevicePropertiesFile(tmpDevFileName);
@@ -397,15 +397,15 @@ public class DevicePropertiesEditor extends Composite {
 							try {
 								DevicePropertiesEditor.this.devicePropertiesFileName = DevicePropertiesEditor.this.deviceFileNameText.getText().trim();
 								if (!DevicePropertiesEditor.this.devicePropertiesFileName.endsWith(GDE.FILE_ENDING_DOT_XML)) {
-									if (DevicePropertiesEditor.this.devicePropertiesFileName.lastIndexOf(GDE.STRING_DOT) != -1) {
+									if (DevicePropertiesEditor.this.devicePropertiesFileName.lastIndexOf(GDE.CHAR_DOT) != -1) {
 										DevicePropertiesEditor.this.devicePropertiesFileName = DevicePropertiesEditor.this.devicePropertiesFileName.substring(0, DevicePropertiesEditor.this.devicePropertiesFileName
-												.lastIndexOf(GDE.STRING_DOT));
+												.lastIndexOf(GDE.CHAR_DOT));
 									}
 									DevicePropertiesEditor.this.devicePropertiesFileName = DevicePropertiesEditor.this.devicePropertiesFileName + GDE.FILE_ENDING_DOT_XML;
 								}
 								log.log(java.util.logging.Level.FINE, "devicePropertiesFileName = " + DevicePropertiesEditor.this.devicePropertiesFileName); //$NON-NLS-1$
 
-								if (!(new File(getDevicesPath() + GDE.FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.devicePropertiesFileName)).exists()) {
+								if (!(new File(getDevicesPath() + GDE.STRING_FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.devicePropertiesFileName)).exists()) {
 									MessageBox okCancelMessageDialog = new MessageBox(DevicePropertiesEditor.this.getShell(), SWT.PRIMARY_MODAL | SWT.OK | SWT.CANCEL | SWT.ICON_QUESTION);
 									okCancelMessageDialog.setText(Messages.getString(MessageIds.GDE_MSGT0440));
 									okCancelMessageDialog.setMessage(Messages.getString(MessageIds.GDE_MSGE0003) + DevicePropertiesEditor.this.devicePropertiesFileName + Messages.getString(MessageIds.GDE_MSGT0481));
@@ -415,12 +415,12 @@ public class DevicePropertiesEditor extends Composite {
 														this.getClass(),
 														"DeviceSample_" + DevicePropertiesEditor.this.settings.getLocale() + GDE.FILE_ENDING_DOT_XML, DevicePropertiesEditor.this.devicePropertiesFileName,//$NON-NLS-1$
 														"resource/", getDevicesPath(), "555")) { //$NON-NLS-1$ //$NON-NLS-2$
-											DevicePropertiesEditor.this.deviceConfig = new DeviceConfiguration(getDevicesPath() + GDE.FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.devicePropertiesFileName);
+											DevicePropertiesEditor.this.deviceConfig = new DeviceConfiguration(getDevicesPath() + GDE.STRING_FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.devicePropertiesFileName);
 										}
 									}
 								}
 								else {
-									DevicePropertiesEditor.this.deviceConfig = new DeviceConfiguration(getDevicesPath() + GDE.FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.devicePropertiesFileName);
+									DevicePropertiesEditor.this.deviceConfig = new DeviceConfiguration(getDevicesPath() + GDE.STRING_FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.devicePropertiesFileName);
 								}
 								update();
 							}
@@ -731,7 +731,7 @@ public class DevicePropertiesEditor extends Composite {
 												Messages.getString(MessageIds.GDE_MSGT0213) });
 										fileSelectionDialog.open();
 										DevicePropertiesEditor.this.imageFileName = fileSelectionDialog.getFileName();
-										String fullQualifiedImageSourceName = fileSelectionDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.imageFileName;
+										String fullQualifiedImageSourceName = fileSelectionDialog.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + DevicePropertiesEditor.this.imageFileName;
 										if (DevicePropertiesEditor.this.imageFileName != null && DevicePropertiesEditor.this.imageFileName.length() > 5) {
 											DevicePropertiesEditor.this.imageFileNameText.setText(DevicePropertiesEditor.this.imageFileName);
 											log.log(java.util.logging.Level.FINE, "imageFileName = " + DevicePropertiesEditor.this.imageFileName); //$NON-NLS-1$
@@ -830,7 +830,7 @@ public class DevicePropertiesEditor extends Composite {
 								public void keyReleased(KeyEvent evt) {
 									log.log(java.util.logging.Level.FINEST, "timeBaseTimeStepText.keyReleased, event=" + evt); //$NON-NLS-1$
 									try {
-										DevicePropertiesEditor.this.timeStep_ms = Double.parseDouble(DevicePropertiesEditor.this.timeBaseTimeStepText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT));
+										DevicePropertiesEditor.this.timeStep_ms = Double.parseDouble(DevicePropertiesEditor.this.timeBaseTimeStepText.getText().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT));
 										DevicePropertiesEditor.this.timeStep_ms = Double.parseDouble(String.format(Locale.ENGLISH, "%.1f", DevicePropertiesEditor.this.timeStep_ms)); //$NON-NLS-1$
 										if (DevicePropertiesEditor.this.deviceConfig != null) {
 											DevicePropertiesEditor.this.deviceConfig.setTimeStep_ms(DevicePropertiesEditor.this.timeStep_ms);
@@ -1089,7 +1089,7 @@ public class DevicePropertiesEditor extends Composite {
 	 */
 	private void openDevicePropertiesFile(String useDevicePropertiesFileName) {
 		try {
-			DevicePropertiesEditor.this.deviceConfig = new DeviceConfiguration(getDevicesPath() + GDE.FILE_SEPARATOR_UNIX + useDevicePropertiesFileName);
+			DevicePropertiesEditor.this.deviceConfig = new DeviceConfiguration(getDevicesPath() + GDE.STRING_FILE_SEPARATOR_UNIX + useDevicePropertiesFileName);
 
 			DevicePropertiesEditor.this.devicePropertiesFileName = useDevicePropertiesFileName;
 			DevicePropertiesEditor.this.deviceFileNameText.setText(DevicePropertiesEditor.this.devicePropertiesFileName);
@@ -1705,13 +1705,13 @@ public class DevicePropertiesEditor extends Composite {
 	private String getDevicesPath() {
 		String applHomePath = GDE.STRING_EMPTY;
 		if (GDE.IS_WINDOWS) {
-			applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + GDE.FILE_SEPARATOR_UNIX).replace("\\", GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$
+			applHomePath = (System.getenv("APPDATA") + GDE.STRING_FILE_SEPARATOR_UNIX + GDE.NAME_LONG + GDE.STRING_FILE_SEPARATOR_UNIX).replace("\\", GDE.STRING_FILE_SEPARATOR_UNIX); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else if (GDE.IS_LINUX) {
-			applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "." + GDE.NAME_LONG + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+			applHomePath = System.getProperty("user.home") + GDE.STRING_FILE_SEPARATOR_UNIX + "." + GDE.NAME_LONG + GDE.STRING_FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else if (GDE.IS_MAC) {
-			applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+			applHomePath = System.getProperty("user.home") + GDE.STRING_FILE_SEPARATOR_UNIX + "Library" + GDE.STRING_FILE_SEPARATOR_UNIX + "Application Support" + GDE.STRING_FILE_SEPARATOR_UNIX + GDE.NAME_LONG + GDE.STRING_FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
 			log.log(Level.SEVERE, Messages.getString(MessageIds.GDE_MSGW0001));

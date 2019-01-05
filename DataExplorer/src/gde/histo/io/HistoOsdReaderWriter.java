@@ -241,8 +241,8 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 		 */
 		String getSensorSignature() {
 			String recordSetComment = getComment();
-			int idx1 = recordSetComment.indexOf(GDE.STRING_LEFT_BRACKET);
-			int idx2 = recordSetComment.indexOf(GDE.STRING_RIGHT_BRACKET);
+			int idx1 = recordSetComment.indexOf(GDE.CHAR_LEFT_BRACKET);
+			int idx2 = recordSetComment.indexOf(GDE.CHAR_RIGHT_BRACKET);
 			if (idx1 > 0 && idx2 > idx1) {
 				return recordSetComment.substring(idx1 + 1, idx2);
 			} else {
@@ -257,7 +257,7 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			String recordSetComment = getComment();
 			final String label = "Firmware"; //$NON-NLS-1$
 			int idx1 = recordSetComment.indexOf(label);
-			// int idx2 = recordSetComment.indexOf(GDE.STRING_RIGHT_BRACKET);
+			// int idx2 = recordSetComment.indexOf(GDE.CHAR_RIGHT_BRACKET);
 			if (idx1 > 0) {
 				try {
 					String firmwareVersion = recordSetComment.substring(idx1 + label.length(), recordSetComment.length());
@@ -282,8 +282,8 @@ public final class HistoOsdReaderWriter extends OsdReaderWriter {
 			double[] values = new double[6];
 			// GDE_MSGI2404=\nVerlorene Rückkanalpakete = {0} ~ {1} % ({2})
 			// "min=%.2f sec; max=%.2f sec; avg=%.2f sec; sigma=%.2f sec"
-			int idx0 = recordSetComment.indexOf(GDE.STRING_NEW_LINE);
-			int idx1 = recordSetComment.indexOf(GDE.STRING_EQUAL);
+			int idx0 = recordSetComment.indexOf(GDE.CHAR_NEW_LINE);
+			int idx1 = recordSetComment.indexOf(GDE.CHAR_EQUAL);
 			int idx2 = recordSetComment.indexOf("~", idx1); //$NON-NLS-1$
 			int idx3 = recordSetComment.indexOf("%", idx2); //$NON-NLS-1$
 			if (idx0 > 0 && idx1 > idx0 && idx2 > idx1 && idx3 > idx2) {

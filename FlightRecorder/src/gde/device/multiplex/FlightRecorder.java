@@ -457,10 +457,10 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 				try {
 					FlightRecorder.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
 							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.CHAR_DOT));
 							}
 							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
 						}
@@ -469,7 +469,7 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : 1;
-								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT)-4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 								RecordSet recordSet = CSVSerialDataReaderWriter.read(selectedImportFile, FlightRecorder.this, recordNameExtend, channelConfigNumber,
 										new DataParser(FlightRecorder.this.getDataBlockTimeUnitFactor(),
 												FlightRecorder.this.getDataBlockLeader(), FlightRecorder.this.getDataBlockSeparator().value(),
@@ -494,8 +494,8 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 		reader.start();
 	}
 //	public void open_closeCommPort() {
-//		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-//		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+//		String devicePath = this.application.getActiveDevice() != null ? GDE.STRING_FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+//		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 //		if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 //			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 //		}
@@ -508,10 +508,10 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 //			@Override
 //			public void run() {
 //				for (String tmpFileName : fd.getFileNames()) {
-//					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+//					String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 //					if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
 //						if (selectedImportFile.contains(GDE.STRING_DOT)) {
-//							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+//							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.CHAR_DOT));
 //						}
 //						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
 //					}
@@ -520,7 +520,7 @@ public class FlightRecorder extends DeviceConfiguration implements IDevice {
 //					if (fd.getFileName().length() > 4) {
 //						try {
 //							Integer channelConfigNumber = FlightRecorder.this.application.getActiveChannelNumber();
-//							String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+//							String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 //
 //							NMEAReaderWriter.read(selectedImportFile, FlightRecorder.this, recordNameExtend, channelConfigNumber);
 //						}

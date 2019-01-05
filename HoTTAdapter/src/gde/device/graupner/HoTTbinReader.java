@@ -444,7 +444,7 @@ public class HoTTbinReader {
 				String line;
 				BufferedReader reader = new BufferedReader(new InputStreamReader(data_in, "ISO-8859-1")); //$NON-NLS-1$
 				while ((line = reader.readLine()) != null && sb.append(line).append(GDE.STRING_NEW_LINE).length() < logDataOffset) {
-					if (line.contains(": ") && line.indexOf(GDE.STRING_COLON) > 5) {
+					if (line.contains(": ") && line.indexOf(GDE.CHAR_COLON) > 5) {
 						String key = line.split(": ")[0].trim();
 						String value = null;
 						try {
@@ -942,12 +942,12 @@ public class HoTTbinReader {
 		String recordSetNameExtend = GDE.STRING_EMPTY;
 		if (fileName.contains(GDE.STRING_UNDER_BAR)) {
 			try {
-				Integer.parseInt(fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)));
-				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+				Integer.parseInt(fileName.substring(0, fileName.lastIndexOf(GDE.CHAR_UNDER_BAR)));
+				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.CHAR_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 			}
 			catch (Exception e) {
-				if (fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)).length() <= 8)
-					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+				if (fileName.substring(0, fileName.lastIndexOf(GDE.CHAR_UNDER_BAR)).length() <= 8)
+					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + fileName.substring(0, fileName.lastIndexOf(GDE.CHAR_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 			}
 		}
 		else {

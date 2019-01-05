@@ -2360,7 +2360,7 @@ public class SettingsDialog extends Dialog {
 		StringBuilder sb = new StringBuilder();
 		while (loggerNames.hasMoreElements()) {
 			String loggerName = loggerNames.nextElement();
-			if (loggerName.startsWith(GDE.STRING_BASE_PACKAGE) && loggerName.replace(GDE.STRING_DOT, GDE.STRING_COLON).split(GDE.STRING_COLON).length >= 3) {
+			if (loggerName.startsWith(GDE.STRING_BASE_PACKAGE) && loggerName.replace(GDE.CHAR_DOT, GDE.CHAR_COLON).split(GDE.STRING_COLON).length >= 3) {
 				sb.append(loggerName).append(GDE.STRING_SEMICOLON);
 			}
 		}
@@ -2376,7 +2376,7 @@ public class SettingsDialog extends Dialog {
 		TreeItem treeItemRoot = null;
 		TreeItem treeItemNode;
 		for (String string : loggers) {
-			String[] tmp = string.replace(GDE.STRING_DOT, GDE.STRING_COLON).split(GDE.STRING_COLON);
+			String[] tmp = string.replace(GDE.CHAR_DOT, GDE.CHAR_COLON).split(GDE.STRING_COLON);
 			switch (tmp.length) {
 			case 3:
 				if (!root.equals(tmp[0] + GDE.STRING_DOT + tmp[1])) {

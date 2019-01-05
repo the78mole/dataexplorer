@@ -117,7 +117,7 @@ public final class Channels extends HashMap<Integer, Channel> {
 					if (channelName.split(GDE.STRING_BLANK)[1].trim().contains("+")) {
 						String tmpNum = channelName.split(GDE.STRING_BLANK)[1].trim();
 						log.log(Level.WARNING, "channel name = " + channelName);
-						return Integer.valueOf(tmpNum.substring(0, tmpNum.indexOf(GDE.STRING_PLUS))) + Integer.valueOf(tmpNum.substring(tmpNum.indexOf(GDE.STRING_PLUS) + 1));
+						return Integer.valueOf(tmpNum.substring(0, tmpNum.indexOf(GDE.CHAR_PLUS))) + Integer.valueOf(tmpNum.substring(tmpNum.indexOf(GDE.CHAR_PLUS) + 1));
 					}
 				}
 			} else {

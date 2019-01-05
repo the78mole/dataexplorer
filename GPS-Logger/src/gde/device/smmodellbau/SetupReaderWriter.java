@@ -147,7 +147,7 @@ public class SetupReaderWriter {
 	void loadSetup() {
 		FileDialog fd = this.application.openFileOpenDialog(this.parent, Messages.getString(MessageIds.GDE_MSGT2001), new String[] { GDE.FILE_ENDING_STAR_INI, GDE.FILE_ENDING_STAR },
 				this.device.getConfigurationFileDirecotry(), this.device.getDefaultConfigurationFileName(), SWT.SINGLE);
-		GPSLogger.selectedSetupFilePath = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
+		GPSLogger.selectedSetupFilePath = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + fd.getFileName();
 		log.log(Level.FINE, "selectedSetupFile = " + GPSLogger.selectedSetupFilePath); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {

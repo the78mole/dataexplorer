@@ -282,7 +282,7 @@ public class CSVReaderWriter {
 						if (recordSet.getRecordSetDescription().endsWith(GDE.LINE_SEPARATOR))
 							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.substring(1) + GDE.LINE_SEPARATOR);
 						else
-							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.replace("#", GDE.STRING_BLANK) + GDE.LINE_SEPARATOR);
+							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.replace('#', GDE.CHAR_BLANK) + GDE.LINE_SEPARATOR);
 						continue;
 					}
 					String[] dataStr = line.split(GDE.STRING_EMPTY + separator);
@@ -292,7 +292,7 @@ public class CSVReaderWriter {
 						int minute = Integer.parseInt(data.substring(3, 5));
 						int second = Integer.parseInt(data.substring(6, 8));
 						GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
-						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.STRING_DOT) + 1)) : 0);
+						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.CHAR_DOT) + 1)) : 0);
 
 						if (lastTimeStamp < timeStamp) {
 							time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));

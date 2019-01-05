@@ -1306,7 +1306,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "tripLengthCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.tripLengthCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+							GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.tripLengthCombo.getText().trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT)) * 10);
 							GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm < 1 ? 1
 									: GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm > 999 ? 999 : GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm;
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
@@ -1324,7 +1324,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "tripLengthCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							try {
-								GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.tripLengthCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 10);
+								GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.tripLengthCombo.getText().trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT)) * 10);
 								GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm = GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm < 1 ? 1
 										: GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm > 999 ? 999 : GPSLoggerSetupConfiguration1.this.configuration.tripLengthAlarm;
 								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
@@ -1388,7 +1388,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(Level.FINEST, "voltageRxCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.voltageRxCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
+							GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.voltageRxCombo.getText().trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT)) * 100);
 							GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm < 300 ? 300
 									: GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm > 800 ? 800 : GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm;
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
@@ -1406,7 +1406,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						public void keyReleased(KeyEvent keyevent) {
 							log.log(Level.FINEST, "voltageRxCombo.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							try {
-								GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.voltageRxCombo.getText().trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
+								GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = (short) (Double.parseDouble(GPSLoggerSetupConfiguration1.this.voltageRxCombo.getText().trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT)) * 100);
 								GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm = GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm < 300 ? 300
 										: GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm > 800 ? 800 : GPSLoggerSetupConfiguration1.this.configuration.voltageRxAlarm;
 								GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);

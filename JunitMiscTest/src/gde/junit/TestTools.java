@@ -67,7 +67,7 @@ public class TestTools extends BasicTestCase {
 		Path basePath = Paths.get(sourcePath.substring(index, sourcePath.lastIndexOf(DataExplorer.class.getSimpleName())));
 		ExportServiceBuilder builder = new ExportServiceBuilder(Analyzer.getInstance().getDataAccess());
 
-		String[] projectFolders = basePath.toFile().list((dir, name) -> name.indexOf(GDE.STRING_DOT) == -1);
+		String[] projectFolders = basePath.toFile().list((dir, name) -> name.indexOf(GDE.CHAR_DOT) == -1);
 		for (String projectName : projectFolders) {
 			List<ExportService> exportServices = builder.getServices(basePath, projectName);
 			log.log(Level.FINE, String.format("%-12.12s: %s", projectName, exportServices.stream().map(ExportService::getDisplayText).collect(Collectors.joining(", "))));

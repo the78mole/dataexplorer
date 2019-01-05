@@ -457,7 +457,7 @@ public class StringHelper {
 				}
 			}
 			else if (GDE.IS_LINUX) {
-				String portName = OperatingSystemHelper.dereferenceLink("/dev/serial/by-id", tmpSerialPortList[i].substring(tmpSerialPortList[i].lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+				String portName = OperatingSystemHelper.dereferenceLink("/dev/serial/by-id", tmpSerialPortList[i].substring(tmpSerialPortList[i].lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)));
 				if (portName.length() > 8) // ./ttyUSB0
 					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + portName.substring(portName.indexOf("usb-") + 4, portName.length() - 11);
 				else

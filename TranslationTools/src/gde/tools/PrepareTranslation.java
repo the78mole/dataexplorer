@@ -51,7 +51,7 @@ public class PrepareTranslation {
 		URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
 		log.log(Level.INFO, "base URL = " + url.toString()); //$NON-NLS-1$
 		
-		if (url.getPath().endsWith(GDE.FILE_SEPARATOR_UNIX)) { // running inside Eclipse
+		if (url.getPath().endsWith(GDE.STRING_FILE_SEPARATOR_UNIX)) { // running inside Eclipse
 			log.log(Level.INFO, "started inside Eclipse"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
@@ -97,8 +97,8 @@ public class PrepareTranslation {
 		}
 		else { // started outside java -jar *.jar
 			log.log(Level.INFO, "started outside with: java -jar *.jar"); //$NON-NLS-1$
-			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
-			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1);
+			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK).replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 			log.log(Level.INFO, "basePath = " + basePath); //$NON-NLS-1$
 			File file = new File(basePath);
 			String[] files = file.list();

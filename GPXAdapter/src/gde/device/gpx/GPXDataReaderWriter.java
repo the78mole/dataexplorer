@@ -103,7 +103,7 @@ public class GPXDataReaderWriter {
 				channelRecordSet = activeChannel.get(recordSetName);
 				if (channelRecordSet != null) {
 					//write filename after import to record description
-					channelRecordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1));
+					channelRecordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1));
 				}
 
 				GDE.getUiNotification().setProgress(100);
@@ -351,7 +351,7 @@ public class GPXDataReaderWriter {
 								//translate extension names to others, translate
 								if (GPXAdapter.languageMap.get(recordNames[i].split(GDE.STRING_BLANK)[0]) != null) {
 									measurement.setName(recordNames[i] = GPXAdapter.languageMap.get(recordNames[i].split(GDE.STRING_BLANK)[0])
-											+ (recordNames[i].split(GDE.STRING_BLANK).length > 1 ? recordNames[i].substring(recordNames[i].indexOf(GDE.STRING_BLANK)) : GDE.STRING_BLANK));
+											+ (recordNames[i].split(GDE.STRING_BLANK).length > 1 ? recordNames[i].substring(recordNames[i].indexOf(GDE.CHAR_BLANK)) : GDE.STRING_BLANK));
 								}
 							}
 							activeRecordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), recordNames, recordSymbols, recordUnits, device.getTimeStep_ms(), true, true, true);
@@ -442,10 +442,10 @@ public class GPXDataReaderWriter {
 						this.time[1] = Integer.parseInt(strValueTime.substring(3, 5));
 						this.time[2] = Integer.parseInt(strValueTime.substring(6, 8));
 						GregorianCalendar calendar = new GregorianCalendar(this.date[0], this.date[1] - 1, this.date[2], this.time[0], this.time[1], this.time[2]);
-						this.timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
+						this.timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.CHAR_DOT) + 1)) : 0);
 						if (!this.isDateSet && this.isExtensionFirstCalled != null) {
 							String description = activeRecordSet.getRecordSetDescription();
-							activeRecordSet.setRecordSetDescription(description.substring(0, description.indexOf(GDE.STRING_COLON) + 2) + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", this.startTimeStamp) + recordSetDescription); //$NON-NLS-1$
+							activeRecordSet.setRecordSetDescription(description.substring(0, description.indexOf(GDE.CHAR_COLON) + 2) + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", this.startTimeStamp) + recordSetDescription); //$NON-NLS-1$
 							activeRecordSet.setStartTimeStamp(this.startTimeStamp);
 							this.isDateSet = true;
 						}

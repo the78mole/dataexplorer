@@ -444,18 +444,18 @@ public class StatisticsType implements Cloneable {
 		sb.append(String.format("statistics min=%b max=%b avg=%b sigma=%b", this.min, this.max, this.avg, this.sigma));
 		if (triggerRefOrdinal != null) sb.append(String.format(" triggerRefOrdinal=%d", this.triggerRefOrdinal));
 		if (sumByTriggerRefOrdinal != null) sb.append(String.format(" sumByTriggerRefOrdinal=%d", this.sumByTriggerRefOrdinal));
-		if (sumTriggerText != null) sb.append(String.format(" sumTriggerText=%s", this.sumTriggerText.replaceAll(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR)));
+		if (sumTriggerText != null) sb.append(String.format(" sumTriggerText=%s", this.sumTriggerText.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR)));
 		if (countByTrigger != null) sb.append(String.format(" countByTrigger=%b", this.countByTrigger));
-		if (countTriggerText != null) sb.append(String.format(" countTriggerText=%s", this.countTriggerText.replaceAll(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR)));
-		if (comment != null) sb.append(String.format(" comment=%s", this.comment.replaceAll(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR)));
-		if (sumTriggerTimeText != null) sb.append(String.format(" sumTriggerTimeText=%s", this.sumTriggerTimeText.replaceAll(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR)));
+		if (countTriggerText != null) sb.append(String.format(" countTriggerText=%s", this.countTriggerText.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR)));
+		if (comment != null) sb.append(String.format(" comment=%s", this.comment.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR)));
+		if (sumTriggerTimeText != null) sb.append(String.format(" sumTriggerTimeText=%s", this.sumTriggerTimeText.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR)));
 		if (ratioRefOrdinal != null) sb.append(String.format(" ratioRefOrdinal=%d", this.ratioRefOrdinal));
-		if (ratioText != null) sb.append(String.format(" ratioText=%s", this.ratioText.replaceAll(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR)));
+		if (ratioText != null) sb.append(String.format(" ratioText=%s", this.ratioText.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR)));
 
 		if (this.trigger != null) {
 			sb.append(String.format(" trigger level=%s isGreater=%b minTimeSec=%s", this.trigger.level, this.trigger.isGreater, this.trigger.minTimeSec));
 			if (this.trigger.comment != null)
-				sb.append(String.format(" comment=%s", this.trigger.comment.replaceAll(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR)));
+				sb.append(String.format(" comment=%s", this.trigger.comment.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR)));
 		}
 		
 		return sb.toString();
@@ -477,7 +477,7 @@ public class StatisticsType implements Cloneable {
 					if (props[0].equals("level")) tmpTrigger.level = Integer.valueOf(props[1]);
 					else if (props[0].equals("isGreater")) tmpTrigger.isGreater = Boolean.valueOf(props[1]);
 					else if (props[0].equals("minTimeSec")) tmpTrigger.minTimeSec = Integer.valueOf(props[1]);
-					else if (props[0].equals("comment")) tmpTrigger.comment = props[1].replace(GDE.STRING_UNDER_BAR, GDE.STRING_BLANK);
+					else if (props[0].equals("comment")) tmpTrigger.comment = props[1].replace(GDE.CHAR_UNDER_BAR, GDE.CHAR_BLANK);
 				}
 			}
 			statistics.setTrigger(tmpTrigger);
@@ -492,13 +492,13 @@ public class StatisticsType implements Cloneable {
 				else if (props[0].equals("sigma")) statistics.sigma = Boolean.valueOf(props[1]);
 				else if (props[0].equals("triggerRefOrdinal")) statistics.triggerRefOrdinal = Integer.valueOf(props[1]);
 				else if (props[0].equals("sumByTriggerRefOrdinal")) statistics.sumByTriggerRefOrdinal = Integer.valueOf(props[1]);
-				else if (props[0].equals("sumTriggerText")) statistics.sumTriggerText = props[1].replace(GDE.STRING_UNDER_BAR, GDE.STRING_BLANK);
+				else if (props[0].equals("sumTriggerText")) statistics.sumTriggerText = props[1].replace(GDE.CHAR_UNDER_BAR, GDE.CHAR_BLANK);
 				else if (props[0].equals("countByTrigger")) statistics.countByTrigger = Boolean.valueOf(props[1]);
-				else if (props[0].equals("countTriggerText")) statistics.countTriggerText = props[1].replace(GDE.STRING_UNDER_BAR, GDE.STRING_BLANK);
-				else if (props[0].equals("comment")) statistics.comment = props[1].replace(GDE.STRING_UNDER_BAR, GDE.STRING_BLANK);				
-				else if (props[0].equals("sumTriggerTimeText")) statistics.sumTriggerTimeText = props[1].replace(GDE.STRING_UNDER_BAR, GDE.STRING_BLANK);
+				else if (props[0].equals("countTriggerText")) statistics.countTriggerText = props[1].replace(GDE.CHAR_UNDER_BAR, GDE.CHAR_BLANK);
+				else if (props[0].equals("comment")) statistics.comment = props[1].replace(GDE.CHAR_UNDER_BAR, GDE.CHAR_BLANK);				
+				else if (props[0].equals("sumTriggerTimeText")) statistics.sumTriggerTimeText = props[1].replace(GDE.CHAR_UNDER_BAR, GDE.CHAR_BLANK);
 				else if (props[0].equals("ratioRefOrdinal")) statistics.ratioRefOrdinal = Integer.valueOf(props[1]);
-				else if (props[0].equals("ratioText")) statistics.ratioText = props[1].replace(GDE.STRING_UNDER_BAR, GDE.STRING_BLANK);			
+				else if (props[0].equals("ratioText")) statistics.ratioText = props[1].replace(GDE.CHAR_UNDER_BAR, GDE.CHAR_BLANK);			
 			}
 		}
 		

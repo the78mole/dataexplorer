@@ -346,14 +346,14 @@ public final class Settings extends Properties {
 			String devicePropertiesTargetpath = Settings.getDevicesPath();
 			if (!FileUtils.checkDirectoryAndCreate(devicePropertiesTargetpath, Settings.DEVICE_PROPERTIES_XSD_NAME)) {
 				FileUtils.extract(this.getClass(), Settings.DEVICE_PROPERTIES_XSD_NAME, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555);
-				checkDeviceProperties(String.format("%s%s", devicePropertiesTargetpath, GDE.FILE_SEPARATOR_UNIX), true);
+				checkDeviceProperties(String.format("%s%s", devicePropertiesTargetpath, GDE.STRING_FILE_SEPARATOR_UNIX), true);
 				this.isDevicePropertiesUpdated = true;
 				checkMeasurementDisplayMappings(true, lang);
 			}
 			else { // execute every time application starts to enable xsd exist and update from added plug-in
 				if (!FileUtils.checkFileExist(String.format("%s%s", devicePropertiesTargetpath, Settings.DEVICE_PROPERTIES_XSD_NAME)))
 					FileUtils.extract(this.getClass(), Settings.DEVICE_PROPERTIES_XSD_NAME, Settings.PATH_RESOURCE, devicePropertiesTargetpath, Settings.PERMISSION_555);
-				checkDeviceProperties(String.format("%s%s", devicePropertiesTargetpath, GDE.FILE_SEPARATOR_UNIX), true);
+				checkDeviceProperties(String.format("%s%s", devicePropertiesTargetpath, GDE.STRING_FILE_SEPARATOR_UNIX), true);
 				checkMeasurementDisplayMappings(true, lang);
 			}
 
@@ -374,15 +374,15 @@ public final class Settings extends Properties {
 				this.isGraphicsTemplateUpdated = true;
 			}
 
-			checkDeviceTemplates( String.format("%s%s", templateDirectory, GDE.FILE_SEPARATOR_UNIX));
+			checkDeviceTemplates( String.format("%s%s", templateDirectory, GDE.STRING_FILE_SEPARATOR_UNIX));
 
-			String histoCacheDirectory =  String.format("%s%s%s", GDE.APPL_HOME_PATH, GDE.FILE_SEPARATOR_UNIX, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
+			String histoCacheDirectory =  String.format("%s%s%s", GDE.APPL_HOME_PATH, GDE.STRING_FILE_SEPARATOR_UNIX, Settings.HISTO_CACHE_ENTRIES_DIR_NAME);
 			if (!FileUtils.checkDirectoryAndCreate(histoCacheDirectory, Settings.HISTO_CACHE_ENTRIES_XSD_NAME)) {
 				FileUtils.extract(Settings.class, Settings.HISTO_CACHE_ENTRIES_XSD_NAME, Settings.PATH_RESOURCE, histoCacheDirectory, Settings.PERMISSION_555);
 				this.isHistocacheTemplateUpdated = true;
 			}
 
-			FileUtils.checkDirectoryAndCreate(String.format("%s%s%s", GDE.APPL_HOME_PATH, GDE.FILE_SEPARATOR_UNIX, Settings.LOG_PATH));
+			FileUtils.checkDirectoryAndCreate(String.format("%s%s%s", GDE.APPL_HOME_PATH, GDE.STRING_FILE_SEPARATOR_UNIX, Settings.LOG_PATH));
 
 			this.isWindowMaximized = Boolean.parseBoolean(this.getProperty(Settings.WINDOW_MAXIMIZED, "false"));
 
@@ -436,7 +436,7 @@ public final class Settings extends Properties {
 				JarFile jarFile = null;
 				List<ExportService> services = new ArrayList<>();
 				try {
-					jarFile = new JarFile(String.format("%s%s%s", deviceJarBasePath, GDE.FILE_SEPARATOR_UNIX, jarFileName));
+					jarFile = new JarFile(String.format("%s%s%s", deviceJarBasePath, GDE.STRING_FILE_SEPARATOR_UNIX, jarFileName));
 					services = FileUtils.getDeviceJarServices(jarFile);
 					for (ExportService service : services) {
 						final String serviceName = service.getName();
@@ -480,11 +480,11 @@ public final class Settings extends Properties {
 	 * @param lang
 	 */
 	private void checkMeasurementDisplayMappings(boolean existCheck, final String lang) {
-		File path = new File(String.format("%s%s%s",GDE.APPL_HOME_PATH, GDE.FILE_SEPARATOR_UNIX, Settings.MAPPINGS_DIR_NAME));
-		String propertyFilePath = String.format("%s%s%s", path.toString(), GDE.FILE_SEPARATOR_UNIX, Settings.MEASUREMENT_DISPLAY_FILE);
+		File path = new File(String.format("%s%s%s",GDE.APPL_HOME_PATH, GDE.STRING_FILE_SEPARATOR_UNIX, Settings.MAPPINGS_DIR_NAME));
+		String propertyFilePath = String.format("%s%s%s", path.toString(), GDE.STRING_FILE_SEPARATOR_UNIX, Settings.MEASUREMENT_DISPLAY_FILE);
 		if (existCheck) {
 			if (!FileUtils.checkFileExist(propertyFilePath))
-				FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, String.format("%s%s%s", Settings.PATH_RESOURCE, lang, GDE.FILE_SEPARATOR_UNIX), path.getAbsolutePath(), Settings.PERMISSION_555);
+				FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, String.format("%s%s%s", Settings.PATH_RESOURCE, lang, GDE.STRING_FILE_SEPARATOR_UNIX), path.getAbsolutePath(), Settings.PERMISSION_555);
 		}
 		else {
 			if (FileUtils.checkFileExist(propertyFilePath)) {
@@ -496,7 +496,7 @@ public final class Settings extends Properties {
 					// ignore
 				}
 			}
-			FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, String.format("%s%s%s", Settings.PATH_RESOURCE, lang, GDE.FILE_SEPARATOR_UNIX), path.getAbsolutePath(), Settings.PERMISSION_555);
+			FileUtils.extract(this.getClass(), Settings.MEASUREMENT_DISPLAY_FILE, String.format("%s%s%s", Settings.PATH_RESOURCE, lang, GDE.STRING_FILE_SEPARATOR_UNIX), path.getAbsolutePath(), Settings.PERMISSION_555);
 		}
 	}
 
@@ -549,7 +549,7 @@ public final class Settings extends Properties {
 			for (String jarFileName : new File(deviceJarBasePath).list()) {
 				if (!jarFileName.endsWith(GDE.FILE_ENDING_DOT_JAR)) continue;
 				try {
-					for (ExportService service : FileUtils.getDeviceJarServices(new JarFile(deviceJarBasePath + GDE.FILE_SEPARATOR_UNIX + jarFileName))) {
+					for (ExportService service : FileUtils.getDeviceJarServices(new JarFile(deviceJarBasePath + GDE.STRING_FILE_SEPARATOR_UNIX + jarFileName))) {
 						final String serviceName = service.getName();
 						if (this.isOneOfActiveDevices(serviceName)) {
 							extractDeviceDefaultTemplates(service.getJarFile(), serviceName, templateDirectoryTargetPath);
@@ -602,7 +602,7 @@ public final class Settings extends Properties {
 
 	private String getTemplateFilePrefix(Path t) {
 		String fileName = t.getFileName().toString();
-		int index = fileName.lastIndexOf(GDE.STRING_UNDER_BAR);
+		int index = fileName.lastIndexOf(GDE.CHAR_UNDER_BAR);
 		return index < 0 ? "" : fileName.substring(0, index);
 	}
 
@@ -633,8 +633,8 @@ public final class Settings extends Properties {
 	 * @param serviceName
 	 */
 	public void extractDevicePropertiesAndTemplates(JarFile jarFile, final String serviceName) {
-		extractDeviceProperties(jarFile, serviceName, String.format("%s%s", Settings.getDevicesPath(), GDE.FILE_SEPARATOR_UNIX));
-		extractDeviceDefaultTemplates(jarFile, serviceName, String.format("%s%s", Settings.getGraphicsTemplatePath(), GDE.FILE_SEPARATOR_UNIX));
+		extractDeviceProperties(jarFile, serviceName, String.format("%s%s", Settings.getDevicesPath(), GDE.STRING_FILE_SEPARATOR_UNIX));
+		extractDeviceDefaultTemplates(jarFile, serviceName, String.format("%s%s", Settings.getGraphicsTemplatePath(), GDE.STRING_FILE_SEPARATOR_UNIX));
 	}
 
 	/**
@@ -1049,14 +1049,14 @@ public final class Settings extends Properties {
 	 * @return the devicesFilePath
 	 */
 	public static String getDevicesPath() {
-		return String.format("%s%s%s", GDE.APPL_HOME_PATH, GDE.FILE_SEPARATOR_UNIX, Settings.DEVICE_PROPERTIES_DIR_NAME).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
+		return String.format("%s%s%s", GDE.APPL_HOME_PATH, GDE.STRING_FILE_SEPARATOR_UNIX, Settings.DEVICE_PROPERTIES_DIR_NAME).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 	}
 
 	/**
 	 * @return the graphicsTemplatePath
 	 */
 	public static String getGraphicsTemplatePath() {
-		return String.format("%s%s%s", GDE.APPL_HOME_PATH, GDE.FILE_SEPARATOR_UNIX, Settings.GRAPHICS_TEMPLATES_DIR_NAME).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
+		return String.format("%s%s%s", GDE.APPL_HOME_PATH, GDE.STRING_FILE_SEPARATOR_UNIX, Settings.GRAPHICS_TEMPLATES_DIR_NAME).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 	}
 
 	/**
@@ -1065,14 +1065,14 @@ public final class Settings extends Properties {
 	public static String getLogFilePath() {
 		final String $METHOD_NAME = "getLogFilePath"; //$NON-NLS-1$
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "applHomePath = " + GDE.APPL_HOME_PATH); //$NON-NLS-1$
-		return GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_FILE;
+		return GDE.APPL_HOME_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.LOG_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.LOG_FILE;
 	}
 
 	/**
 	 * @return the log file path for the serial trace logs
 	 */
 	public static String getSerialLogFilePath() {
-		return GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.LOG_PATH + GDE.FILE_SEPARATOR_UNIX + Settings.SERIAL_LOG_FILE;
+		return GDE.APPL_HOME_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.LOG_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.SERIAL_LOG_FILE;
 	}
 
 	/**
@@ -1080,7 +1080,7 @@ public final class Settings extends Properties {
 	 */
 	public String getDataFilePath() {
 		final String $METHOD_NAME = "getDataFilePath"; //$NON-NLS-1$
-		String dataPath = this.getProperty(Settings.DATA_FILE_PATH, System.getProperty("user.home")).replace("\\\\", GDE.FILE_SEPARATOR_UNIX).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX); //$NON-NLS-1$
+		String dataPath = this.getProperty(Settings.DATA_FILE_PATH, System.getProperty("user.home")).replace("\\\\", GDE.STRING_FILE_SEPARATOR_UNIX).replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX); //$NON-NLS-1$
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "dataFilePath = " + dataPath); //$NON-NLS-1$
 		return dataPath.trim();
 	}
@@ -1090,7 +1090,7 @@ public final class Settings extends Properties {
 	 */
 	public void setDataFilePath(String newDataFilePath) {
 		final String $METHOD_NAME = "setDataFilePath"; //$NON-NLS-1$
-		String filePath = newDataFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX).trim();
+		String filePath = newDataFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX).trim();
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "newDataFilePath = " + filePath); //$NON-NLS-1$
 		this.setProperty(Settings.DATA_FILE_PATH, filePath);
 	}
@@ -1114,7 +1114,7 @@ public final class Settings extends Properties {
 	 * @return the decimal separator, default value is '.'
 	 */
 	public char getDecimalSeparator() {
-		if (this.getProperty(Settings.DECIMAL_SEPARATOR) == null) this.setProperty(Settings.DECIMAL_SEPARATOR, GDE.STRING_DOT);
+		if (this.getProperty(Settings.DECIMAL_SEPARATOR) == null) this.setProperty(Settings.DECIMAL_SEPARATOR, GDE.STRING_SEMICOLON);
 		return this.getProperty(Settings.DECIMAL_SEPARATOR).trim().charAt(0);
 	}
 
@@ -2300,8 +2300,8 @@ public final class Settings extends Properties {
 	 */
 	public String getObjectImageFilePath() {
 		final String $METHOD_NAME = "getObjectImageFilePath"; //$NON-NLS-1$
-		String objectImageFilePath = this.getProperty(Settings.OBJECT_IMAGE_FILE_PATH, getDataFilePath()).replace("\\\\", GDE.FILE_SEPARATOR_UNIX).replace(GDE.FILE_SEPARATOR_WINDOWS, //$NON-NLS-1$
-				GDE.FILE_SEPARATOR_UNIX);
+		String objectImageFilePath = this.getProperty(Settings.OBJECT_IMAGE_FILE_PATH, getDataFilePath()).replace("\\\\", GDE.STRING_FILE_SEPARATOR_UNIX) //$NON-NLS-1$
+				.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "objectImageFilePath = " + objectImageFilePath); //$NON-NLS-1$
 		return objectImageFilePath.trim();
 	}
@@ -2311,7 +2311,7 @@ public final class Settings extends Properties {
 	 */
 	public void setObjectImageFilePath(String newImageFilePath) {
 		final String $METHOD_NAME = "setObjectImageFilePath"; //$NON-NLS-1$
-		String filePath = newImageFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX).trim();
+		String filePath = newImageFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX).trim();
 		Settings.log.logp(java.util.logging.Level.FINE, Settings.$CLASS_NAME, $METHOD_NAME, "newDataFilePath = " + filePath); //$NON-NLS-1$
 		this.setProperty(Settings.OBJECT_IMAGE_FILE_PATH, filePath);
 	}

@@ -374,7 +374,7 @@ public final class ObjectVaultIndex {
 			String[] values = attributesCsv.split(GDE.STRING_CSV_SEPARATOR);
 			this.vaultName = values[0];
 			this.vaultDirectory = values[1];
-			this.vaultReaderSettingsCsv = values[2].replace(GDE.STRING_UNDER_BAR, GDE.STRING_CSV_SEPARATOR);
+			this.vaultReaderSettingsCsv = values[2].replace(GDE.CHAR_UNDER_BAR, GDE.CHAR_CSV_SEPARATOR);
 			this.vaultCreatedMs = Long.parseLong(values[3]);
 			this.vaultDataExplorerVersion = values[4];
 			this.vaultDeviceKey = values[5];
@@ -394,7 +394,7 @@ public final class ObjectVaultIndex {
 		@Override
 		public String toString() {
 			String d = GDE.STRING_CSV_SEPARATOR;
-			String readerSettings = this.vaultReaderSettingsCsv.replace(GDE.STRING_CSV_SEPARATOR, GDE.STRING_UNDER_BAR);
+			String readerSettings = this.vaultReaderSettingsCsv.replace(GDE.CHAR_CSV_SEPARATOR, GDE.CHAR_UNDER_BAR);
 			return GDE.STRING_CSV_QUOTE + this.vaultObjectKey + GDE.STRING_CSV_QUOTE + d + this.vaultName + d + this.vaultDirectory + d + readerSettings + d + this.vaultCreatedMs //
 					+ d + this.vaultDataExplorerVersion + d + this.vaultDeviceKey + d + this.vaultDeviceName + d + this.vaultChannelNumber + d + this.vaultSamplingTimespanMs //
 					+ d + this.logFileLastModified + d + this.logFileLength + d + this.logRecordSetOrdinal + d + this.logRecordsetBaseName //

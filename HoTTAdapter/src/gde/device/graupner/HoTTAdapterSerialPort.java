@@ -811,7 +811,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 		StringBuilder sb = new StringBuilder();
 		try {
 			//change to root directory and query sub folders
-			sendCmd(HoTTAdapterSerialPort.CHANGE_DIR, GDE.FILE_SEPARATOR_UNIX);
+			sendCmd(HoTTAdapterSerialPort.CHANGE_DIR, GDE.STRING_FILE_SEPARATOR_UNIX);
 			HoTTAdapterSerialPort.root = this.read(new byte[50], HoTTAdapterSerialPort.READ_TIMEOUT_MS, 5);
 			if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE))
 				HoTTAdapterSerialPort.log.log(Level.FINE, StringHelper.byte2Hex2CharString(HoTTAdapterSerialPort.root, HoTTAdapterSerialPort.root.length));
@@ -879,7 +879,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			}
 
 			result.put("FOLDER", folders.toString().split(GDE.STRING_SEMICOLON));
-			if (files.toString().length() > 0) result.put("FILES", queryFilesInfo(dirPath + GDE.FILE_SEPARATOR_UNIX, files.toString().split(GDE.STRING_SEMICOLON), 0));
+			if (files.toString().length() > 0) result.put("FILES", queryFilesInfo(dirPath + GDE.STRING_FILE_SEPARATOR_UNIX, files.toString().split(GDE.STRING_SEMICOLON), 0));
 		}
 		catch (RuntimeException e) {
 			HoTTAdapterSerialPort.log.log(Level.WARNING, e.getMessage(), e);
@@ -945,7 +945,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 					String fileQueryAnswer = this.queryFilesInfo(sourceDirPath, new String[] { fileInfo }, 0)[0];
 					long remainingFileSize = Long.parseLong(fileQueryAnswer.split(GDE.STRING_COMMA)[3]);
 
-					File xferFile = new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1]);
+					File xferFile = new File(targetDirPath + GDE.STRING_FILE_SEPARATOR_UNIX + file[1]);
 					data_out = new DataOutputStream(new FileOutputStream(xferFile));
 
 					sendCmd(HoTTAdapterSerialPort.FILE_XFER_INIT, String.format("0x01 %s%s", sourceDirPath, file[1]));
@@ -1054,7 +1054,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				if (!this.isInterruptedByUser) {
 					//fileInfo index,name,size
 					String[] file = fileInfo.split(GDE.STRING_COMMA);
-					File xferFile = new File(targetDirPath + GDE.FILE_SEPARATOR_UNIX + file[1]);
+					File xferFile = new File(targetDirPath + GDE.STRING_FILE_SEPARATOR_UNIX + file[1]);
 					data_in = new DataInputStream(new FileInputStream(xferFile));
 					long remainingFileSize = xferFile.length();
 
@@ -1417,7 +1417,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 					vModels.add(GDE.STRING_DASH);
 			}
 			HoTTAdapterSerialPort.log.log(Level.FINE, vModels.size() + " - " + vModels.toString());
-			String dirName = selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + "backup_" + sModels[0].toLowerCase();
+			String dirName = selectedPcFolder + GDE.STRING_FILE_SEPARATOR_UNIX + "backup_" + sModels[0].toLowerCase();
 			FileUtils.checkDirectoryAndCreate(dirName);
 			if (!FileUtils.checkDirectoryAndCreate(dirName)) {
 				throw new RuntimeException("Failed create directory " + dirName);
@@ -1444,7 +1444,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			int iQueryModels = 0x30; //start address
 			for (String modelName : vModels) {
 				if (!modelName.equals(GDE.STRING_DASH)) {
-					String outputFile = dirName + GDE.FILE_SEPARATOR_UNIX + "a" + modelName + ".mdl";
+					String outputFile = dirName + GDE.STRING_FILE_SEPARATOR_UNIX + "a" + modelName + ".mdl";
 					DataOutputStream out = new DataOutputStream(new FileOutputStream(outputFile));
 					HoTTAdapterSerialPort.log.log(Level.FINE, "writing " + outputFile);
 

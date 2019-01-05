@@ -338,7 +338,7 @@ public class Channel extends HashMap<String, RecordSet> {
 				this.template.setProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, GDE.STRING_EMPTY + recordSet.getValueGridRecordOrdinal());
 			}
 			this.template.store();
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "creating graphics template file " + Settings.getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "creating graphics template file " + Settings.getApplHomePath() + GDE.STRING_FILE_SEPARATOR_UNIX + this.getActiveRecordSet().getName() + this.name); //$NON-NLS-1$
 		}
 	}
 
@@ -651,7 +651,7 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	public String getFileName() {
-		return this.fileName!= null ? this.fileName.substring(this.fileName.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1) : null;
+		return this.fileName!= null ? this.fileName.substring(this.fileName.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)+1) : null;
 	}
 
 	public String getFullQualifiedFileName() {

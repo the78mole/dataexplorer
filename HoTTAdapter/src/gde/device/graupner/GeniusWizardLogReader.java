@@ -188,7 +188,7 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 			//ESC always contained
 			channel = GeniusWizardLogReader.channels.get(1);
 			channel.setFileDescription(GeniusWizardLogReader.application.isObjectoriented() ? date + GDE.STRING_BLANK + GeniusWizardLogReader.application.getObjectKey() : date);
-			recordSetName = String.format("%d) %s[%s]", recordSetNumber, device.getRecordSetStateNameReplacement(1), file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_DOT)));
+			recordSetName = String.format("%d) %s[%s]", recordSetNumber, device.getRecordSetStateNameReplacement(1), file.getName().substring(0, file.getName().lastIndexOf(GDE.CHAR_DOT)));
 			GeniusWizardLogReader.recordSetESC = RecordSet.createRecordSet(recordSetName, device, 1, true, true, true);
 			channel.put(recordSetName, GeniusWizardLogReader.recordSetESC);
 			GeniusWizardLogReader.recordSetESC = channel.get(recordSetName);
@@ -258,12 +258,12 @@ public class GeniusWizardLogReader extends HoTTbinReader {
 		String recordSetNameExtend = GDE.STRING_EMPTY;
 		if (file.getName().contains(GDE.STRING_UNDER_BAR)) {
 			try {
-				Integer.parseInt(file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)));
-				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+				Integer.parseInt(file.getName().substring(0, file.getName().lastIndexOf(GDE.CHAR_UNDER_BAR)));
+				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.CHAR_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 			}
 			catch (Exception e) {
-				if (file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)).length() <= 8)
-					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+				if (file.getName().substring(0, file.getName().lastIndexOf(GDE.CHAR_UNDER_BAR)).length() <= 8)
+					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.CHAR_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 			}
 		}
 		else {

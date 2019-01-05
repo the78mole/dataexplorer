@@ -250,10 +250,10 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 				try {
 					DataVario.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
 							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.CHAR_DOT));
 							}
 							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
 						}
@@ -262,7 +262,7 @@ public class DataVario  extends DeviceConfiguration implements IDevice {
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String  recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)+4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 								CSVSerialDataReaderWriter.read(selectedImportFile, DataVario.this, recordNameExtend, channelConfigNumber, 
 										new DataParser(DataVario.this.getDataBlockTimeUnitFactor(), 
 												DataVario.this.getDataBlockLeader(), DataVario.this.getDataBlockSeparator().value(), 

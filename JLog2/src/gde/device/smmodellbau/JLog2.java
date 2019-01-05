@@ -541,13 +541,13 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 				try {
 					JLog2.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 								CSVSerialDataReaderWriter.read(selectedImportFile, JLog2.this, recordNameExtend, channelConfigNumber, 
 										new DataParser(JLog2.this.getDataBlockTimeUnitFactor(), 
 												JLog2.this.getDataBlockLeader(), JLog2.this.getDataBlockSeparator().value(), 
@@ -599,9 +599,9 @@ public class JLog2 extends DeviceConfiguration implements IDevice {
 	}
 	
 	String getConfigurationFileDirecotry() {
-		String searchPath = this.getDataBlockPreferredDataLocation().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		if (!FileUtils.checkFileExist(searchPath + GDE.FILE_SEPARATOR_UNIX + JLog2.SM_JLOG2_CONFIG_TXT)) {
-			searchPath = searchPath.substring(0, (searchPath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+		String searchPath = this.getDataBlockPreferredDataLocation().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		if (!FileUtils.checkFileExist(searchPath + GDE.STRING_FILE_SEPARATOR_UNIX + JLog2.SM_JLOG2_CONFIG_TXT)) {
+			searchPath = searchPath.substring(0, (searchPath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)));
 		}
 		return searchPath;
 	}

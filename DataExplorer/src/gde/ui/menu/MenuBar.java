@@ -1212,7 +1212,7 @@ public class MenuBar {
 	public void updateSubHistoryMenuItem(String fullQualifiedFileName) {
 		List<String> refFileHistory = Settings.getInstance().getFileHistory();
 		if (fullQualifiedFileName != null && fullQualifiedFileName.length() > 4) {
-			final String newhistoryEntry = fullQualifiedFileName.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+			final String newhistoryEntry = fullQualifiedFileName.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 
 			if (refFileHistory.indexOf(newhistoryEntry) > -1) { // fileName already exist
 				refFileHistory.remove(newhistoryEntry);

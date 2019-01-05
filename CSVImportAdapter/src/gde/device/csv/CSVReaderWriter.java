@@ -167,7 +167,7 @@ public class CSVReaderWriter {
 			for (String measurement : sb_measurements.toString().split(GDE.STRING_SEMICOLON)) {
 				if (mappedMeasurement.split("\\[|]")[0].trim().equals(measurement)) {
 					mappedMeasurement = String.format("%s %d [%s]",
-							mappedMeasurement.split("\\[|]")[0].trim().indexOf(GDE.STRING_BLANK) > 0 ? mappedMeasurement.substring(0, mappedMeasurement.indexOf(GDE.STRING_BLANK))
+							mappedMeasurement.split("\\[|]")[0].trim().indexOf(GDE.CHAR_BLANK) > 0 ? mappedMeasurement.substring(0, mappedMeasurement.indexOf(GDE.CHAR_BLANK))
 									: mappedMeasurement.split("\\[|]")[0].trim(), count++, mappedMeasurement.split("\\[|]")[1]);
 					continue;
 				}
@@ -284,17 +284,17 @@ public class CSVReaderWriter {
 						if (recordSet.getRecordSetDescription().endsWith(GDE.LINE_SEPARATOR))
 							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.substring(1) + GDE.LINE_SEPARATOR);
 						else
-							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.replace("#", GDE.STRING_BLANK) + GDE.LINE_SEPARATOR);
+							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.replace('#', GDE.CHAR_BLANK) + GDE.LINE_SEPARATOR);
 						continue;
 					}
 					String[] dataStr = line.split(GDE.STRING_EMPTY + separator);
-					String data = dataStr[0].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT);
+					String data = dataStr[0].trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT);
 					if (data.contains(GDE.STRING_COLON)) {
 						int hour = Integer.parseInt(data.substring(0, 2));
 						int minute = Integer.parseInt(data.substring(3, 5));
 						int second = Integer.parseInt(data.substring(6, 8));
 						GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
-						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.STRING_DOT) + 1)) : 0);
+						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.CHAR_DOT) + 1)) : 0);
 
 						if (lastTimeStamp < timeStamp) {
 							time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));
@@ -310,7 +310,7 @@ public class CSVReaderWriter {
 
 					for (int i = 0; i < updateRecordNames.length && i < dataStr.length - 1; i++) { // only iterate over record names found in file
 						try {
-							data = dataStr[i + 1].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT).replace(GDE.STRING_BLANK, GDE.STRING_EMPTY);
+							data = dataStr[i + 1].trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT).replace(GDE.STRING_BLANK, GDE.STRING_EMPTY);
 						}
 						catch (Exception e) {
 							data = "0";
@@ -320,7 +320,7 @@ public class CSVReaderWriter {
 						case GPS_LONGITUDE:
 						case GPS_LATITUDE:
 							points[i] = Double.valueOf(
-									data.replace("E", GDE.STRING_EMPTY).replace("W", GDE.STRING_DASH).replace("N", GDE.STRING_EMPTY).replace("S", GDE.STRING_DASH).replace(GDE.STRING_COLON, GDE.STRING_EMPTY)
+									data.replace("E", GDE.STRING_EMPTY).replace('W', GDE.CHAR_DASH).replace("N", GDE.STRING_EMPTY).replace('S', GDE.CHAR_DASH).replace(GDE.STRING_COLON, GDE.STRING_EMPTY)
 											.replace(GDE.STRING_DOT, GDE.STRING_EMPTY)).intValue();
 							break;
 
@@ -440,19 +440,19 @@ public class CSVReaderWriter {
 				String[] row = recordSet.getExportRow(i, true);
 
 				// add time entry
-				CSVReaderWriter.sb.append(row[0].replace('.', decimalSeparator)).append(separator).append(GDE.STRING_BLANK);
+				CSVReaderWriter.sb.append(row[0].replace(GDE.CHAR_DOT, decimalSeparator)).append(separator).append(GDE.STRING_BLANK);
 				// add data entries
 				for (int j = 0; j < recordSet.size(); j++) {
 					MeasurementType measurement = device.getMeasurement(recordSet.getChannelConfigNumber(), j);
 					if (isRaw) { // do not change any values
 						if (!measurement.isCalculation()) if (recordSet.isRaw())
-							CSVReaderWriter.sb.append(row[j + 1].replace('.', decimalSeparator)).append(separator);
+							CSVReaderWriter.sb.append(row[j + 1].replace(GDE.CHAR_DOT, decimalSeparator)).append(separator);
 						else
-							CSVReaderWriter.sb.append(row[j + 1].replace('.', decimalSeparator)).append(separator);
+							CSVReaderWriter.sb.append(row[j + 1].replace(GDE.CHAR_DOT, decimalSeparator)).append(separator);
 					}
 					else
 						// translate according device and measurement unit
-						CSVReaderWriter.sb.append(row[j + 1].replace('.', decimalSeparator)).append(separator);
+						CSVReaderWriter.sb.append(row[j + 1].replace(GDE.CHAR_DOT, decimalSeparator)).append(separator);
 				}
 				CSVReaderWriter.sb.deleteCharAt(CSVReaderWriter.sb.length() - 1).append(CSVReaderWriter.lineSep);
 				writer.write(CSVReaderWriter.sb.toString());

@@ -55,9 +55,9 @@ public class ApplicationLauncher {
 			Vector<String> searchKeyVector = new Vector<String>();
 			for (String tmpSearchExecutableKey : searchExecutableKeys) {
 				if (tmpSearchExecutableKey != null && tmpSearchExecutableKey.length() > 4) {
-					tmpSearchExecutableKey = tmpSearchExecutableKey.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-					if (tmpSearchExecutableKey.contains(GDE.FILE_SEPARATOR_UNIX)) {
-						tmpSearchExecutableKey = tmpSearchExecutableKey.substring(tmpSearchExecutableKey.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
+					tmpSearchExecutableKey = tmpSearchExecutableKey.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+					if (tmpSearchExecutableKey.contains(GDE.STRING_FILE_SEPARATOR_UNIX)) {
+						tmpSearchExecutableKey = tmpSearchExecutableKey.substring(tmpSearchExecutableKey.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1);
 					}
 					searchKeyVector.add(tmpSearchExecutableKey);
 				}

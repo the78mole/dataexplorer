@@ -122,7 +122,7 @@ public final class ExtendedVault extends HistoVault implements Comparable<Extend
 		this.vaultSamplingTimespan_ms = analyzer.getSettings().getSamplingTimespan_ms();
 
 		this.logLinkPath = GDE.STRING_EMPTY;
-		this.logFilePath = filePath.toString().replace(GDE.FILE_SEPARATOR, GDE.FILE_SEPARATOR_UNIX); // toString to avoid 'Object' during marshalling
+		this.logFilePath = filePath.toString().replace(GDE.FILE_SEPARATOR, GDE.STRING_FILE_SEPARATOR_UNIX); // toString to avoid 'Object' during marshalling
 		this.logFileLastModified = fileLastModified_ms;
 		this.logFileLength = fileLength;
 		this.logFileVersion = fileVersion;

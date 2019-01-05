@@ -445,13 +445,13 @@ public class JLog2Dialog extends DeviceDialog {
 	void loadSetup() {
 		FileDialog fd = this.application.openFileOpenDialog(this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2801), new String[] { GDE.FILE_ENDING_STAR_TXT, GDE.FILE_ENDING_STAR },
 				((JLog2) this.device).getConfigurationFileDirecotry(), JLog2.SM_JLOG2_CONFIG_TXT, SWT.SINGLE);
-		this.selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
-		this.selectedVersionFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + "version.txt";
+		this.selectedSetupFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + fd.getFileName();
+		this.selectedVersionFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + "version.txt";
 		JLog2Dialog.log.log(Level.FINE, "selectedSetupFile = " + this.selectedSetupFile); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {
 			String searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
-			if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.contains(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+			if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.contains(fd.getFilterPath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX)))
 				device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 			int version = Integer.valueOf("400");
 			try {
@@ -487,7 +487,7 @@ public class JLog2Dialog extends DeviceDialog {
 
 		if (setupFilePath != null && setupFilePath.length() > 4) {
 			String searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
-			if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.contains(fileDialog.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+			if (!Settings.getInstance().isDeviceImportDirectoryObjectRelated() && !searchDirectory.contains(fileDialog.getFilterPath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX)))
 				device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fileDialog.getFilterPath());
 			try {
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(setupFilePath), "ISO-8859-1")); //$NON-NLS-1$

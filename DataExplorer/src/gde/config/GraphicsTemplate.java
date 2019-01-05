@@ -72,7 +72,7 @@ public class GraphicsTemplate extends Properties {
 	 */
 	public void load() {
 		try {
-			this.currentFileFilePath = Settings.getGraphicsTemplatePath() + GDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
+			this.currentFileFilePath = Settings.getGraphicsTemplatePath() + GDE.STRING_FILE_SEPARATOR_UNIX + ((this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
 			log.log(Level.FINE, "opening template file " + this.currentFileFilePath); //$NON-NLS-1$
 			this.loadFromXML(new FileInputStream(new File(this.currentFileFilePath)));
 			this.isAvailable = true;
@@ -99,7 +99,7 @@ public class GraphicsTemplate extends Properties {
 				}
 			}
 
-			this.currentFileFilePath = Settings.getGraphicsTemplatePath() + GDE.FILE_SEPARATOR_UNIX + ((this.selectedFileName != null && this.selectedFileName.equals(GDE.STRING_EMPTY) || this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
+			this.currentFileFilePath = Settings.getGraphicsTemplatePath() + GDE.STRING_FILE_SEPARATOR_UNIX + ((this.selectedFileName != null && this.selectedFileName.equals(GDE.STRING_EMPTY) || this.selectedFileName == null) ? this.defaultFileName : this.selectedFileName);
 			this.storeToXML(new FileOutputStream(new File(this.currentFileFilePath)), "-- DataExplorer GraphicsTemplate --"); //$NON-NLS-1$
 			this.isSaved = true;
 			this.selectedFileName = null;

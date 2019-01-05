@@ -236,7 +236,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						Unmarshaller unmarshaller = jc.createUnmarshaller();
 						unmarshaller.setSchema(schema);
 						ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(basePath + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
-								+ deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
+								+ deviceIdentifierName.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
 						UltraDuoPlusDialog.log.log(Level.TIME, "read memory setup XML time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - time))); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					catch (Exception e) {
@@ -301,7 +301,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				Marshaller marshaller = jc.createMarshaller();
 				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.valueOf(true));
 				marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, UltraDuoPlusDialog.ULTRA_DUO_PLUS_XSD);
-				marshaller.marshal(ultraDuoPlusSetup, new FileOutputStream(basePath + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX + deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR)
+				marshaller.marshal(ultraDuoPlusSetup, new FileOutputStream(basePath + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX + deviceIdentifierName.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR)
 						+ GDE.FILE_ENDING_DOT_XML));
 				UltraDuoPlusDialog.log.log(Level.TIME, "write memory setup XML time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - GDE.StartTime))); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -432,7 +432,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						Unmarshaller unmarshaller = this.jc.createUnmarshaller();
 						unmarshaller.setSchema(this.schema);
 						this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(Settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
-								+ this.deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
+								+ this.deviceIdentifierName.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
 					}
 					catch (UnmarshalException e) {
 						UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
@@ -548,7 +548,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									e.printStackTrace();
 								}
 								saveConfigUDP(Settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
-										+ UltraDuoPlusDialog.this.deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML);
+										+ UltraDuoPlusDialog.this.deviceIdentifierName.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML);
 
 								UltraDuoPlusDialog.this.serialPort.write(UltramatSerialPort.RESET);
 							}
@@ -605,7 +605,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 							public void keyReleased(KeyEvent evt) {
 								UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
 								File oldConfigDataFile = new File(Settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
-										+ UltraDuoPlusDialog.this.deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML);
+										+ UltraDuoPlusDialog.this.deviceIdentifierName.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML);
 								if (oldConfigDataFile.exists()) if (!oldConfigDataFile.delete()) UltraDuoPlusDialog.log.log(java.util.logging.Level.WARNING, "could not delete " + oldConfigDataFile.getName()); //$NON-NLS-1$
 								UltraDuoPlusDialog.this.deviceIdentifierName = (UltraDuoPlusDialog.this.userNameText.getText().trim() + UltraDuoPlusDialog.STRING_16_BLANK).substring(0, 16);
 								UltraDuoPlusDialog.this.ultraDuoPlusSetup.setIdentifierName(UltraDuoPlusDialog.this.deviceIdentifierName);

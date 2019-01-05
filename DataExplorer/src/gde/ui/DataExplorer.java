@@ -1646,8 +1646,8 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 	 */
 	public String getObjectFilePath() {
 		String objectkey = this.menuToolBar.getActiveObjectKey();
-		FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectkey);
-		return this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectkey + GDE.FILE_SEPARATOR_UNIX;
+		FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + objectkey);
+		return this.settings.getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + objectkey + GDE.STRING_FILE_SEPARATOR_UNIX;
 	}
 
 	/**
@@ -1784,7 +1784,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 		final String $METHOD_NAME = "fileOpenDialogPath"; //$NON-NLS-1$
 		FileDialog fileOpenDialog = new FileDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);
 		if (path != null) {
-			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = path.replace(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		}
 		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1801,7 +1801,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 		final String $METHOD_NAME = "openFileOpenDialog"; //$NON-NLS-1$
 		FileDialog fileOpenDialog = new FileDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);
 		if (path != null) {
-			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = path.replace(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		}
 		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1840,7 +1840,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 		final String $METHOD_NAME = "openFileOpenDialog"; //$NON-NLS-1$
 		FileDialog fileOpenDialog = new FileDialog(parent, SWT.PRIMARY_MODAL | SWT.OPEN | addStyle);
 		if (path != null) {
-			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = path.replace(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		}
 		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1858,7 +1858,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 		final String $METHOD_NAME = "openFileSaveDialog"; //$NON-NLS-1$
 		FileDialog fileSaveDialog = new FileDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.SAVE);
 		if (path != null) {
-			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = path.replace(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		}
 		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1875,7 +1875,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 		final String $METHOD_NAME = "openFileSaveDialog"; //$NON-NLS-1$
 		FileDialog fileSaveDialog = new FileDialog(parent, SWT.PRIMARY_MODAL | SWT.SAVE | SWT.ON_TOP);
 		if (path != null) {
-			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = path.replace(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		}
 		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1895,16 +1895,16 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 	public String[] getExtensionDescription(String[] extensions) {
 		String[] filterNames = new String[extensions.length];
 		for (int i = 0; i < filterNames.length; i++) {
-			int beginIndex = extensions[i].indexOf(GDE.STRING_DOT);
+			int beginIndex = extensions[i].indexOf(GDE.CHAR_DOT);
 			String tmpExt = (beginIndex != -1 ? extensions[i].substring(beginIndex + 1) : extensions[i]);
 			filterNames[i] = this.extensionFilterMap.get(tmpExt.toLowerCase());
 
 			if (filterNames[i] == null)
 				filterNames[i] = extensions[i];
 			else {
-				beginIndex = filterNames[i].indexOf(GDE.STRING_DOT);
+				beginIndex = filterNames[i].indexOf(GDE.CHAR_DOT);
 				if (beginIndex > 0) { // replace extension case
-					String tmpFilterExt = filterNames[i].substring(filterNames[i].indexOf(GDE.STRING_DOT) + 1, filterNames[i].length() - 1);
+					String tmpFilterExt = filterNames[i].substring(filterNames[i].indexOf(GDE.CHAR_DOT) + 1, filterNames[i].length() - 1);
 					filterNames[i] = tmpExt.equals(tmpFilterExt) ? filterNames[i] : filterNames[i].replace(tmpFilterExt, tmpExt);
 				}
 			}
@@ -1916,7 +1916,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 		final String $METHOD_NAME = "openDirFileDialog"; //$NON-NLS-1$
 		DirectoryDialog fileDirDialog = new DirectoryDialog(GDE.shell, SWT.PRIMARY_MODAL | SWT.NONE);
 		if (path != null) {
-			path = path.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
+			path = path.replace(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 			path = !path.endsWith(GDE.FILE_SEPARATOR) ? path + GDE.FILE_SEPARATOR : path;
 		}
 		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "dialogName = " + name + " path = " + path); //$NON-NLS-1$ //$NON-NLS-2$
@@ -3144,7 +3144,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 
 							if (DataExplorer.this.isTmpWriteStop) break;
 
-							String tmpFilePath = Settings.getApplHomePath() + GDE.FILE_SEPARATOR_UNIX + GDE.TEMP_FILE_STEM;
+							String tmpFilePath = Settings.getApplHomePath() + GDE.STRING_FILE_SEPARATOR_UNIX + GDE.TEMP_FILE_STEM;
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "attempt to save a temporary file(s)");
 							if (DataExplorer.this.analyzer.getActiveChannel() != null && DataExplorer.this.analyzer.getActiveChannel().getType() == ChannelTypes.TYPE_CONFIG) {
 								if (DataExplorer.this.analyzer.getActiveChannel().getActiveRecordSet() != null)
@@ -3193,7 +3193,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 							else if (GDE.IS_MAC) // DataExplorer-3.0.8_Mac_64.dmg
 								filename = "DataExplorer-" + version + "_Mac_" + arch + ".dmg";
 
-							final String targetFilePath = GDE.JAVA_IO_TMPDIR + GDE.FILE_SEPARATOR_UNIX + filename;
+							final String targetFilePath = GDE.JAVA_IO_TMPDIR + GDE.STRING_FILE_SEPARATOR_UNIX + filename;
 
 							if (!new File(targetFilePath).exists()) FileUtils.downloadFile(new URL(downloadUrl + filename), targetFilePath);
 
@@ -3203,8 +3203,8 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 									if (GDE.IS_LINUX) {
 										URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
 										if (url.getFile().endsWith(GDE.FILE_ENDING_DOT_JAR)) {
-											String installpath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
-											installpath = installpath.substring(0, installpath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
+											String installpath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
+											installpath = installpath.substring(0, installpath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
 											String command = "cd " + installpath + "; sudo tar -xzf " + targetFilePath + "\"";
 											log.log(Level.OFF, "command = " + command);
 											MessageBox message = new MessageBox(GDE.shell, SWT.ICON_INFORMATION);

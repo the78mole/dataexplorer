@@ -279,9 +279,9 @@ public final class GraphicsComposite extends AbstractChartComposite {
 					log.finer(() -> "graphicsHeader.paintControl, event=" + evt); //$NON-NLS-1$
 					SourceFolders sourceFolders = DataExplorer.getInstance().getPresentHistoExplorer().getHistoSet().getSourceFolders();
 					String headerText = sourceFolders != null //
-							? sourceFolders.getTruncatedFileNamesCsv().replace(GDE.STRING_CSV_SEPARATOR, GDE.STRING_BLANK + GDE.STRING_OR + GDE.STRING_BLANK) : "";
+							? sourceFolders.getTruncatedFileNamesCsv().replace(GDE.STRING_CSV_SEPARATOR, " | ") : "";
 					String toolTipText = sourceFolders != null //
-							? sourceFolders.getDecoratedPathsCsv().replaceAll(GDE.STRING_CSV_SEPARATOR, GDE.STRING_NEW_LINE) : "";
+							? sourceFolders.getDecoratedPathsCsv().replace(GDE.CHAR_CSV_SEPARATOR, GDE.CHAR_NEW_LINE) : "";
 					if (!headerText.equals(graphicsHeaderText)) {
 						graphicsHeaderText = headerText;
 						graphicsHeader.setText(headerText);

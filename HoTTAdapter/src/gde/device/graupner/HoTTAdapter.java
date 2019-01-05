@@ -1202,7 +1202,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	private void setSupportedImportExtentions() {
 		if (isHistoImportSupported()) {
 			this.importExtentions = Arrays.stream(getDataBlockPreferredFileExtention().split(GDE.REGEX_FILE_EXTENTION_SEPARATION)) //
-					.map(s -> s.substring(s.lastIndexOf(GDE.STRING_DOT))).map(e -> e.toLowerCase()) //
+					.map(s -> s.substring(s.lastIndexOf(GDE.CHAR_DOT))).map(e -> e.toLowerCase()) //
 					.collect(Collectors.toList());
 		} else {
 			this.importExtentions = new ArrayList<>();
@@ -1471,14 +1471,14 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					boolean isInitialSwitched = false;
 
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_BIN) && !selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
 							log.log(Level.WARNING, String.format("skip selectedImportFile %s since it has not a supported file ending", selectedImportFile));
 						}
 						HoTTAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > MIN_FILENAME_LENGTH) {
-							// String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+							// String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 
 							String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(selectedImportFile));
 							if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
@@ -1889,7 +1889,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			if (constructor != null) {
 
 				// set directory where to start search for mdl files
-				System.setProperty("log.dir", Settings.getLogFilePath().substring(0, Settings.getLogFilePath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX))); //$NON-NLS-1$
+				System.setProperty("log.dir", Settings.getLogFilePath().substring(0, Settings.getLogFilePath().lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX))); //$NON-NLS-1$
 				HoTTAdapter.log.log(java.util.logging.Level.OFF, "log.dir =  " + System.getProperty("log.dir")); //$NON-NLS-1$ //$NON-NLS-2$
 				System.setProperty("mdl.dir", Settings.getInstance().getDataFilePath());//$NON-NLS-1$
 				HoTTAdapter.log.log(java.util.logging.Level.OFF, "mdl.dir =  " + System.getProperty("mdl.dir")); //$NON-NLS-1$ //$NON-NLS-2$

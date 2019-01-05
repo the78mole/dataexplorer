@@ -55,19 +55,19 @@ public class AkkuMonitor extends CSV2SerialAdapter {
 				try {
 					AkkuMonitor.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							try {
 								String recordNameExtend;
 								try {
-									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT)-4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 									Integer.valueOf(recordNameExtend);
 								}
 								catch (Exception e) {
 									try {
-										recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-3, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+										recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT)-3, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 										Integer.valueOf(recordNameExtend);
 									}
 									catch (Exception e1) {

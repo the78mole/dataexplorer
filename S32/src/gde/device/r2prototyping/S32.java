@@ -517,12 +517,12 @@ public class S32 extends DeviceConfiguration implements IDevice {
 				try {
 					S32.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							try {
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 								CSVSerialDataReaderWriter.read(selectedImportFile, S32.this, recordNameExtend, null, 
 										new DataParser(S32.this.getDataBlockTimeUnitFactor(), 
 												S32.this.getDataBlockLeader(), S32.this.getDataBlockSeparator().value(), 

@@ -361,7 +361,7 @@ public class GPXWriter {
 									//<Capacity>6</Capacity>
 									final Record record = recordSet.get(j);
 									if (record != null) {
-										final String name = record.getName().replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR).replace(GDE.STRING_LEFT_PARENTHESIS, GDE.STRING_EMPTY).replace(GDE.STRING_RIGHT_PARENTHESIS, GDE.STRING_EMPTY);
+										final String name = record.getName().replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR).replace(GDE.STRING_LEFT_PARENTHESIS, GDE.STRING_EMPTY).replace(GDE.STRING_RIGHT_PARENTHESIS, GDE.STRING_EMPTY);
 										writer.write(String.format(Locale.getDefault(), "          <%s>%.3f</%s>\n", name, record.realGet(i) / 1000.0, name));
 									}
 								}

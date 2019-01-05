@@ -174,7 +174,7 @@ public class CSVReaderWriter {
 			for (String measurement : sb_measurements.toString().split(GDE.STRING_SEMICOLON)) {
 				if (mappedMeasurement.split("\\[|]")[0].trim().equals(measurement)) {
 					mappedMeasurement = String.format("%s %d [%s]",
-							mappedMeasurement.split("\\[|]")[0].trim().indexOf(GDE.STRING_BLANK) > 0 ? mappedMeasurement.substring(0, mappedMeasurement.indexOf(GDE.STRING_BLANK))
+							mappedMeasurement.split("\\[|]")[0].trim().indexOf(GDE.CHAR_BLANK) > 0 ? mappedMeasurement.substring(0, mappedMeasurement.indexOf(GDE.CHAR_BLANK))
 									: mappedMeasurement.split("\\[|]")[0].trim(), count++, mappedMeasurement.split("\\[|]")[1]);
 					continue;
 				}
@@ -287,7 +287,7 @@ public class CSVReaderWriter {
 						if (recordSet.getRecordSetDescription().endsWith(GDE.LINE_SEPARATOR))
 							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.substring(1) + GDE.LINE_SEPARATOR);
 						else
-							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.replace("#", GDE.STRING_BLANK) + GDE.LINE_SEPARATOR);
+							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.replace('#', GDE.CHAR_BLANK) + GDE.LINE_SEPARATOR);
 						continue;
 					}
 					String[] dataStr = line.split(GDE.STRING_EMPTY + separator);
@@ -356,7 +356,7 @@ public class CSVReaderWriter {
 						case GPS_LONGITUDE:
 						case GPS_LATITUDE:
 							points[i] = data.contains(GDE.STRING_MINUS) ? 0
-									: Double.valueOf(data.replace("E", GDE.STRING_EMPTY).replace("W", GDE.STRING_DASH).replace("N", GDE.STRING_EMPTY).replace("S", GDE.STRING_DASH)
+									: Double.valueOf(data.replace("E", GDE.STRING_EMPTY).replace('W', GDE.CHAR_DASH).replace("N", GDE.STRING_EMPTY).replace('S', GDE.CHAR_DASH)
 											.replace(GDE.STRING_COLON, GDE.STRING_EMPTY).replace(GDE.STRING_DOT, GDE.STRING_EMPTY)).intValue();
 							break;
 

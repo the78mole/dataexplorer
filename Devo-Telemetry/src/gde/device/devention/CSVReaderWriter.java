@@ -177,7 +177,7 @@ public class CSVReaderWriter {
 			for (String measurement : sb_measurements.toString().split(GDE.STRING_SEMICOLON)) {
 				if (mappedMeasurement.split("\\[|]")[0].trim().equals(measurement)) {
 					mappedMeasurement = String.format("%s %d [%s]",
-							mappedMeasurement.split("\\[|]")[0].trim().indexOf(GDE.STRING_BLANK) > 0 ? mappedMeasurement.substring(0, mappedMeasurement.indexOf(GDE.STRING_BLANK))
+							mappedMeasurement.split("\\[|]")[0].trim().indexOf(GDE.CHAR_BLANK) > 0 ? mappedMeasurement.substring(0, mappedMeasurement.indexOf(GDE.CHAR_BLANK))
 									: mappedMeasurement.split("\\[|]")[0].trim(), count++, mappedMeasurement.split("\\[|]")[1]);
 					continue;
 				}
@@ -332,7 +332,7 @@ public class CSVReaderWriter {
 						int minuteAdd = Integer.parseInt(data.substring(0, 2));
 						int secondAdd = Integer.parseInt(data.substring(3, 5));
 						GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute+minuteAdd, second+secondAdd);
-						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.STRING_DOT) + 1)) : 0);
+						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.CHAR_DOT) + 1)) : 0);
 
 						if (lastTimeStamp <= timeStamp) {
 							time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));
@@ -404,7 +404,7 @@ public class CSVReaderWriter {
 		int minuteAdd = Integer.parseInt(strValue.substring(0, 2));
 		int secondAdd = Integer.parseInt(strValue.substring(3, 5));
 		GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute+minuteAdd, second+secondAdd);
-		long timeStamp = calendar.getTimeInMillis() + (strValue.contains(GDE.STRING_DOT) ? Integer.parseInt(strValue.substring(strValue.lastIndexOf(GDE.STRING_DOT) + 1)) : 0);
+		long timeStamp = calendar.getTimeInMillis() + (strValue.contains(GDE.STRING_DOT) ? Integer.parseInt(strValue.substring(strValue.lastIndexOf(GDE.CHAR_DOT) + 1)) : 0);
 		int time_ms = 0;
 
 		if (lastTimeStamp <= timeStamp) {

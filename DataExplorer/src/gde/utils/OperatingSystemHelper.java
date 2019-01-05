@@ -61,7 +61,7 @@ public class OperatingSystemHelper {
 		String sourceLaunchFilePath, targetDesktopLaucherFilePath;
 		String sourceBasePath = url.getPath(), targetBasePath;
 
-		if (url.getPath().endsWith(GDE.FILE_SEPARATOR_UNIX)) { // running inside Eclipse
+		if (url.getPath().endsWith(GDE.STRING_FILE_SEPARATOR_UNIX)) { // running inside Eclipse
 			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "started inside Eclipse -> skip creation of shortcut"); //$NON-NLS-1$
 		}
 		else {
@@ -70,11 +70,11 @@ public class OperatingSystemHelper {
 			if (GDE.IS_WINDOWS) {
 				try {
 					String launchFilename = "DataExplorer.exe"; //$NON-NLS-1$
-					sourceBasePath = sourceBasePath.substring(1, sourceBasePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK); 
+					sourceBasePath = sourceBasePath.substring(1, sourceBasePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK); 
 					if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
 					sourceLaunchFilePath = (sourceBasePath + launchFilename);
 					if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "sourceLaunchFilePath = " + sourceLaunchFilePath); //$NON-NLS-1$
-					targetBasePath = System.getenv("USERPROFILE") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+					targetBasePath = System.getenv("USERPROFILE") + GDE.STRING_FILE_SEPARATOR_UNIX + "Desktop" + GDE.STRING_FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 					targetDesktopLaucherFilePath = targetBasePath + "DataExplorer.lnk"; //$NON-NLS-1$
 					if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 					String fqExecutablePath = sourceLaunchFilePath.replace("/", GDE.FILE_SEPARATOR); //$NON-NLS-1$
@@ -93,11 +93,11 @@ public class OperatingSystemHelper {
 
 					sourceBasePath = url.getPath();
 					launchFilename = "DevicePropertiesEditor.exe"; //$NON-NLS-1$
-					sourceBasePath = sourceBasePath.substring(1, sourceBasePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK); 
+					sourceBasePath = sourceBasePath.substring(1, sourceBasePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK); 
 					if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
 					sourceLaunchFilePath = (sourceBasePath + launchFilename);
 					if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "sourceLaunchFilePath = " + sourceLaunchFilePath); //$NON-NLS-1$
-					targetBasePath = System.getenv("USERPROFILE") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+					targetBasePath = System.getenv("USERPROFILE") + GDE.STRING_FILE_SEPARATOR_UNIX + "Desktop" + GDE.STRING_FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 					targetDesktopLaucherFilePath = targetBasePath + "DeviceProperties Editor.lnk"; //$NON-NLS-1$
 					if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 					fqExecutablePath = sourceLaunchFilePath.replace("/", GDE.FILE_SEPARATOR); //$NON-NLS-1$
@@ -119,7 +119,7 @@ public class OperatingSystemHelper {
 			}
 			else if (GDE.IS_LINUX) { 
 				try {
-					sourceBasePath = sourceBasePath.substring(0, sourceBasePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
+					sourceBasePath = sourceBasePath.substring(0, sourceBasePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1);
 					if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
 
 					String desktopFileName = "DataExplorer.desktop"; //$NON-NLS-1$
@@ -134,7 +134,7 @@ public class OperatingSystemHelper {
 
 						FileUtils.extractWhileReplace("@GDE_DIR@", sourceBasePath, jarFilePath, desktopFileName, extractTargetFilePath, GDE.STRING_UTF_8, GDE.STRING_UTF_8); //$NON-NLS-1$ 
 
-						targetBasePath = System.getenv("HOME") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+						targetBasePath = System.getenv("HOME") + GDE.STRING_FILE_SEPARATOR_UNIX + "Desktop" + GDE.STRING_FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 						if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
 						targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
 						if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
@@ -156,7 +156,7 @@ public class OperatingSystemHelper {
 
 						FileUtils.extractWhileReplace("@GDE_DIR@", sourceBasePath, jarFilePath, desktopFileName, extractTargetFilePath, GDE.STRING_UTF_8, GDE.STRING_UTF_8); //$NON-NLS-1$ 
 
-						targetBasePath = System.getenv("HOME") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+						targetBasePath = System.getenv("HOME") + GDE.STRING_FILE_SEPARATOR_UNIX + "Desktop" + GDE.STRING_FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 						if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
 						targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
 						if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
@@ -207,7 +207,7 @@ public class OperatingSystemHelper {
 
 		try {
 			if (GDE.IS_WINDOWS) {
-				targetBasePath = System.getenv("USERPROFILE") + GDE.FILE_SEPARATOR_WINDOWS + "Desktop" + GDE.FILE_SEPARATOR_WINDOWS; //$NON-NLS-1$ //$NON-NLS-2$
+				targetBasePath = System.getenv("USERPROFILE") + GDE.STRING_FILE_SEPARATOR_WINDOWS + "Desktop" + GDE.STRING_FILE_SEPARATOR_WINDOWS; //$NON-NLS-1$ //$NON-NLS-2$
 				targetDesktopLaucherFilePath = targetBasePath + "DataExplorer.lnk"; //$NON-NLS-1$
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "fqShellLinkPath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
 
@@ -230,7 +230,7 @@ public class OperatingSystemHelper {
 			}
 			else if (GDE.IS_LINUX) {
 				String desktopFileName = "DataExplorer.desktop"; //$NON-NLS-1$
-				targetBasePath = System.getenv("HOME") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+				targetBasePath = System.getenv("HOME") + GDE.STRING_FILE_SEPARATOR_UNIX + "Desktop" + GDE.STRING_FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 				log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
 				targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
@@ -242,7 +242,7 @@ public class OperatingSystemHelper {
 				}
 
 				desktopFileName = "DevicePropertiesEditor.desktop"; //$NON-NLS-1$
-				targetBasePath = System.getenv("HOME") + GDE.FILE_SEPARATOR_UNIX + "Desktop" + GDE.FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
+				targetBasePath = System.getenv("HOME") + GDE.STRING_FILE_SEPARATOR_UNIX + "Desktop" + GDE.STRING_FILE_SEPARATOR_UNIX; //$NON-NLS-1$ //$NON-NLS-2$
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetBasePath = " + targetBasePath); //$NON-NLS-1$
 				targetDesktopLaucherFilePath = targetBasePath + desktopFileName;
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "targetDesktopLaucherFilePath = " + targetDesktopLaucherFilePath); //$NON-NLS-1$
@@ -281,7 +281,7 @@ public class OperatingSystemHelper {
 		try {
 			URL url = FileUtils.class.getProtectionDomain().getCodeSource().getLocation();
 
-			if (url.getPath().endsWith(GDE.FILE_SEPARATOR_UNIX)) { // running inside Eclipse
+			if (url.getPath().endsWith(GDE.STRING_FILE_SEPARATOR_UNIX)) { // running inside Eclipse
 				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "started inside Eclipse -> skip creation of shortcut"); //$NON-NLS-1$
 			}
 			else {
@@ -299,9 +299,9 @@ public class OperatingSystemHelper {
 					log.log(Level.INFO, "register exe = " + regExe); //$NON-NLS-1$
 
 					FileUtils.extract(jarFile, regExe, GDE.STRING_EMPTY, targetDir, "WIN"); //$NON-NLS-1$
-					String targetBasePath = jarBasePath.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR_WINDOWS);
-					targetBasePath = targetBasePath.startsWith(GDE.FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(1) : targetBasePath;
-					targetBasePath = targetBasePath.endsWith(GDE.FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(0, targetBasePath.length() - 1) : targetBasePath;
+					String targetBasePath = jarBasePath.replace(GDE.CHAR_FILE_SEPARATOR_UNIX, GDE.CHAR_FILE_SEPARATOR_WINDOWS);
+					targetBasePath = targetBasePath.startsWith(GDE.STRING_FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(1) : targetBasePath;
+					targetBasePath = targetBasePath.endsWith(GDE.STRING_FILE_SEPARATOR_WINDOWS) ? targetBasePath.substring(0, targetBasePath.length() - 1) : targetBasePath;
 					command = "cmd /C " + targetDir + regExe + GDE.STRING_BLANK + targetBasePath; //$NON-NLS-1$
 					if (log.isLoggable(Level.INFO)) log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
 					Process process = new ProcessBuilder("cmd", "/C", targetDir + regExe, targetBasePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
@@ -605,7 +605,7 @@ public class OperatingSystemHelper {
 		try {
 			if (FileUtils.checkFileExist(fullQualifiedTargetFilePath)) {
 				// check if the target file contained is the same
-				String existingSourcePath = OperatingSystemHelper.getLinkContainedFilePath(fullQualifiedTargetFilePath).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				String existingSourcePath = OperatingSystemHelper.getLinkContainedFilePath(fullQualifiedTargetFilePath).replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 				if (!existingSourcePath.equals(fullQualifiedSourceFilePath)) {
 					fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.substring(0, fullQualifiedTargetFilePath.length() - 4) + GDE.STRING_UNDER_BAR + GDE.FILE_ENDING_DOT_OSD;
 					DataExplorer.getInstance()
@@ -615,12 +615,12 @@ public class OperatingSystemHelper {
 
 			if (GDE.IS_WINDOWS) {
 				try {
-					fullQualifiedSourceFilePath = fullQualifiedSourceFilePath.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR_WINDOWS);
-					fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR_WINDOWS);
-					String sourceBasePath = fullQualifiedSourceFilePath.substring(0, fullQualifiedSourceFilePath.lastIndexOf(GDE.FILE_SEPARATOR_WINDOWS) + 1);
+					fullQualifiedSourceFilePath = fullQualifiedSourceFilePath.replace(GDE.CHAR_FILE_SEPARATOR_UNIX, GDE.CHAR_FILE_SEPARATOR_WINDOWS);
+					fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.replace(GDE.CHAR_FILE_SEPARATOR_UNIX, GDE.CHAR_FILE_SEPARATOR_WINDOWS);
+					String sourceBasePath = fullQualifiedSourceFilePath.substring(0, fullQualifiedSourceFilePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_WINDOWS) + 1);
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sourceBasePath = " + sourceBasePath); //$NON-NLS-1$
 
-					String targetFileLinkPath = fullQualifiedTargetFilePath.replace(GDE.FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR_WINDOWS); // + ".lnk"; 
+					String targetFileLinkPath = fullQualifiedTargetFilePath.replace(GDE.CHAR_FILE_SEPARATOR_UNIX, GDE.CHAR_FILE_SEPARATOR_WINDOWS); // + ".lnk"; 
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "targetFileLinkPath = " + targetFileLinkPath); //$NON-NLS-1$
 
 					String[] shellLinkArgs = { targetFileLinkPath, fullQualifiedSourceFilePath, GDE.STRING_EMPTY, sourceBasePath, fullQualifiedSourceFilePath, GDE.STRING_EMPTY };
@@ -633,8 +633,8 @@ public class OperatingSystemHelper {
 			}
 			else if (GDE.IS_LINUX) { 
 				try {
-					String fullQualifiedLinkTargetPath = fullQualifiedSourceFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-					String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+					String fullQualifiedLinkTargetPath = fullQualifiedSourceFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+					String fullQualifiedLinkPath = fullQualifiedTargetFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 					String command = "ln -s '" + fullQualifiedLinkTargetPath + "' '" + fullQualifiedLinkPath + "'"; //$NON-NLS-1$
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "executing: " + command); //$NON-NLS-1$
 
@@ -661,8 +661,8 @@ public class OperatingSystemHelper {
 				}
 			}
 			else if (GDE.IS_MAC) { 
-				fullQualifiedSourceFilePath = fullQualifiedSourceFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-				fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				fullQualifiedSourceFilePath = fullQualifiedSourceFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+				fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "sourceBasePath = " + fullQualifiedSourceFilePath + ", targetFileLinkPath = " + fullQualifiedTargetFilePath); //$NON-NLS-1$
 
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fullQualifiedTargetFilePath), "UTF-8")); //$NON-NLS-1$
@@ -687,7 +687,7 @@ public class OperatingSystemHelper {
 	 * @throws IOException
 	 */
 	public static String getLinkContainedFilePath(String filePath) throws IOException {
-		filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		filePath = filePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		String ret = filePath;
 		String line = GDE.STRING_EMPTY;
 		if (GDE.IS_WINDOWS) {
@@ -897,8 +897,8 @@ public class OperatingSystemHelper {
 		else if (GDE.IS_LINUX) {
 			URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
 			if (url.getFile().endsWith(GDE.FILE_ENDING_DOT_JAR)) {
-				String installpath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
-				installpath = installpath.substring(0, installpath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
+				String installpath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
+				installpath = installpath.substring(0, installpath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
 				String command = "cd " + installpath + "\nsudo tar -xzf " + installablePath + "\"";
 				DataExplorer.getInstance().openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0055, new String[] { command }));
 			}

@@ -109,8 +109,8 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 							path = application.getObjectFilePath();
 						}
 						else {
-							String devicePath = application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-							path = application.getActiveDevice() != null ? settings.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX : settings.getDataFilePath();
+							String devicePath = application.getActiveDevice() != null ? GDE.STRING_FILE_SEPARATOR_UNIX + application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+							path = application.getActiveDevice() != null ? settings.getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX : settings.getDataFilePath();
 							if (!FileUtils.checkDirectoryAndCreate(path)) {
 								if (!FileUtils.checkDirectoryExist(path)) 
 									application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0056, new Object[] { path }));
@@ -121,7 +121,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 						FileDialog openFileDialog = application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV, GDE.FILE_ENDING_STAR_TXT,
 								GDE.FILE_ENDING_STAR_LOG }, path, null, SWT.SINGLE);
 						if (openFileDialog.getFileName().length() > 4) {
-							String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+							String openFilePath = (openFileDialog.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 
 							try {
 								if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {

@@ -108,11 +108,11 @@ public class ObjectKeyComplianceTest extends TestSuperClass {
 		this.settings.setDataFilePath(DataSource.TESTDATA.getDataPath(Paths.get("_ET_Exzerpt")).toString());
 		String deviceoriented = Messages.getString(MessageIds.GDE_MSGT0200).split(GDE.STRING_SEMICOLON)[0];
 		String[] objectKeys = new String[] { deviceoriented, "first", "2nd", "3rd" };
-		FileUtils.checkDirectoryAndCreate(this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + "first");
+		FileUtils.checkDirectoryAndCreate(this.settings.getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + "first");
 
 		ObjectKeyCompliance.renameObjectKey("first", "1st", objectKeys);
 		assertTrue("object key renamed ", Arrays.equals(this.settings.getObjectList(), new String[] { deviceoriented, "1st", "2nd", "3rd" }));
-		assertFalse("directory deleted ", FileUtils.checkFileExist(this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + "first"));
+		assertFalse("directory deleted ", FileUtils.checkFileExist(this.settings.getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + "first"));
 	}
 
 	public void testAddObjectKey() {

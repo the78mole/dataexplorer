@@ -122,9 +122,9 @@ public final class DeviceConfigurations {
 		String deviceUseCsv = Settings.getInstance().getDeviceUseCsv();
 		if (!deviceUseCsv.isEmpty()) {
 			for (String deviceName : deviceUseCsv.split(GDE.STRING_CSV_SEPARATOR)) {
-				if (!deviceName.isEmpty() && !this.deviceConfigs.containsKey(deviceName.substring(0, deviceName.lastIndexOf(GDE.STRING_STAR)))) {
+				if (!deviceName.isEmpty() && !this.deviceConfigs.containsKey(deviceName.substring(0, deviceName.lastIndexOf(GDE.CHAR_STAR)))) {
 					log.log(Level.INFO, String.format("remove %s from device_use list", deviceName));
-					Settings.getInstance().removeDeviceUse(deviceName.substring(0, deviceName.lastIndexOf(GDE.STRING_STAR)));
+					Settings.getInstance().removeDeviceUse(deviceName.substring(0, deviceName.lastIndexOf(GDE.CHAR_STAR)));
 				}
 			}
 		} else { //device_use list empty or does not exist
@@ -216,7 +216,7 @@ public final class DeviceConfigurations {
 	public Set<String> getImportExtentions() {
 		Set<String> extentions = this.deviceConfigs.values().parallelStream() //
 				.map(c -> Arrays.asList(c.getDataBlockPreferredFileExtention().split(GDE.REGEX_FILE_EXTENTION_SEPARATION))).flatMap(Collection::stream) //
-				.map(s -> s.substring(s.lastIndexOf(GDE.STRING_DOT))).map(e -> e.toLowerCase()) //
+				.map(s -> s.substring(s.lastIndexOf(GDE.CHAR_DOT))).map(e -> e.toLowerCase()) //
 				.collect(Collectors.toSet());
 		return extentions;
 	}

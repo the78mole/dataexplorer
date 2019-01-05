@@ -279,7 +279,7 @@ public class NMEAReaderWriter {
 				reader = null;
 
 				//write filename after import to record description
-				activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
+				activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)+1));
 			}
 		}
 		catch (FileNotFoundException e) {

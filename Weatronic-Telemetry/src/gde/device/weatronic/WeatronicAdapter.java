@@ -118,7 +118,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 		try (InputStream stream = DataAccess.getInstance().getMappingInputStream("WeatronicSynchronizationMappings.xml")) {
 			WeatronicAdapter.properties.loadFromXML(stream);
 		} catch (Exception e) {
-			String preopertyFilePath = Settings.MAPPINGS_DIR_NAME + GDE.FILE_SEPARATOR_UNIX + "WeatronicSynchronizationMappings.xml"; //$NON-NLS-1$
+			String preopertyFilePath = Settings.MAPPINGS_DIR_NAME + GDE.STRING_FILE_SEPARATOR_UNIX + "WeatronicSynchronizationMappings.xml"; //$NON-NLS-1$
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE3700, new String[] { preopertyFilePath }));
 		}
 	}
@@ -397,10 +397,10 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 				try {
 					WeatronicAdapter.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
 							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.CHAR_DOT));
 							}
 							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_LOG;
 						}
@@ -409,7 +409,7 @@ public class WeatronicAdapter extends DeviceConfiguration implements IDevice {
 						if (fd.getFileName().length() > 4) {
 							Integer channelConfigNumber = WeatronicAdapter.this.application.getActiveChannelNumber();
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
-							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 							try {
 								LogReader.read(selectedImportFile, channelConfigNumber); //, WeatronicAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
 								WaitTimer.delay(500);

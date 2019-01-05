@@ -338,7 +338,7 @@ public final class VaultReaderWriter {
 
 	private static String toIndexEntry(HistoVault h) {
 		final String d = GDE.STRING_CSV_SEPARATOR;
-		String readerSettings = h.vaultReaderSettings.replace(GDE.STRING_CSV_SEPARATOR, GDE.STRING_UNDER_BAR);
+		String readerSettings = h.vaultReaderSettings.replace(GDE.CHAR_CSV_SEPARATOR, GDE.CHAR_UNDER_BAR);
 		String attributes = h.vaultName + d + h.vaultDirectory + d + readerSettings + d + h.vaultCreated_ms //
 				+ d + h.vaultDataExplorerVersion + d + h.vaultDeviceKey + d + h.vaultDeviceName + d + h.vaultChannelNumber + d + h.vaultSamplingTimespan_ms //
 				+ d + h.logFileLastModified + d + h.logFileLength + d + h.logRecordSetOrdinal + d + h.logRecordsetBaseName //

@@ -78,7 +78,7 @@ public class AkkuMonitorParser extends DataParser {
 		strValue = strValues[1].trim();
 		this.state = Integer.parseInt(strValue);
 
-		strValue = strValues[2].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT);
+		strValue = strValues[2].trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT);
 		strValue = strValue.length() > 0 ? strValue : "0";
 		if (this.start_time_ms == Integer.MIN_VALUE) {
 			this.start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
@@ -118,9 +118,9 @@ public class AkkuMonitorParser extends DataParser {
 						String[] tmpValues = strValue.split(GDE.STRING_COLON);
 						if (tmpValues.length == 2) { //: contained
 							this.values[i] = tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 1000 : 0; //mm:ss.S
-							if (tmpValues[1].indexOf(GDE.STRING_DOT) >= 0) {
-								tmpValues[0] = tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_DOT));
-								tmpValues[1] = tmpValues[1].substring(tmpValues[1].indexOf(GDE.STRING_DOT)+1);
+							if (tmpValues[1].indexOf(GDE.CHAR_DOT) >= 0) {
+								tmpValues[0] = tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_DOT));
+								tmpValues[1] = tmpValues[1].substring(tmpValues[1].indexOf(GDE.CHAR_DOT)+1);
 								this.values[i] += tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 1000 : 0; //mm:ss.S
 								this.values[i] += tmpValues[1].trim().length() > 0 ? Integer.parseInt(tmpValues[1].trim()) * 100 : 0; //mm:ss.S
 							}
@@ -130,8 +130,8 @@ public class AkkuMonitorParser extends DataParser {
 						}
 						else if (strValue.contains(GDE.STRING_DOT)) { // dot contained
 							tmpValues = new String[2];
-							tmpValues[0] = strValue.substring(0, strValue.indexOf(GDE.STRING_DOT));
-							tmpValues[1] = strValue.substring(strValue.indexOf(GDE.STRING_DOT)+1);
+							tmpValues[0] = strValue.substring(0, strValue.indexOf(GDE.CHAR_DOT));
+							tmpValues[1] = strValue.substring(strValue.indexOf(GDE.CHAR_DOT)+1);
 							this.values[i] += tmpValues[0].trim().length() > 0 ? Integer.parseInt(tmpValues[0].trim()) * 60 * 1000 : 0; //mm:ss.S
 							this.values[i] += tmpValues[1].trim().length() > 0 ? Integer.parseInt(tmpValues[1].trim()) * 1000 : 0; //mm:ss.S
 						}

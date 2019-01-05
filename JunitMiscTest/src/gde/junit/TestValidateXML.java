@@ -49,7 +49,7 @@ public class TestValidateXML extends TestCase {
 		String basePath = this.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
 		basePath = basePath.substring(GDE.IS_WINDOWS?1:0, basePath.indexOf("JunitMiscTest"));
 		log.log(Level.INFO, "basePath = " + basePath);
-		String xsdBasePath = basePath + GDE.FILE_SEPARATOR_UNIX + "DataExplorer/src/resource/";
+		String xsdBasePath = basePath + GDE.STRING_FILE_SEPARATOR_UNIX + "DataExplorer/src/resource/";
 		log.log(Level.INFO, "xsdBasePath = " + xsdBasePath);
 
 

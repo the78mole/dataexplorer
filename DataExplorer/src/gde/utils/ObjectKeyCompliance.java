@@ -150,10 +150,10 @@ public class ObjectKeyCompliance {
 				new ObjectKeyScanner(newObjKey).start();
 			}
 
-			if (FileUtils.checkDirectoryExist(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey)) { //ok
+			if (FileUtils.checkDirectoryExist(Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + oldObjKey)) { //ok
 				// query for old directory deletion
 				if (!GDE.isWithUi() || SWT.YES == DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW0031)))
-					FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + oldObjKey); //ok
+					FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + oldObjKey); //ok
 			}
 		}
 		replaceObjectKey(oldObjKey, newObjKey, newObjectKeys);
@@ -172,7 +172,7 @@ public class ObjectKeyCompliance {
 		int index = removeIndex >= 2 && !delObjectKey.isEmpty() ? removeIndex - 1 : tmpObjectKeys.size() > 1 ? 1 : 0;
 		Settings.getInstance().setObjectList(tmpObjectKeys.toArray(new String[1]), tmpObjectKeys.get(index));
 		if (!delObjectKey.isEmpty()) {
-			FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + delObjectKey); //ok
+			FileUtils.deleteDirectory(Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + delObjectKey); //ok
 		}
 	}
 
@@ -205,7 +205,7 @@ public class ObjectKeyCompliance {
 		DataExplorer.getInstance().setObjectDescriptionTabVisible(true);
 		DataExplorer.getInstance().updateObjectDescriptionWindow();
 
-		FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + newObjectKey); //ok
+		FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + newObjectKey); //ok
 		new ObjectKeyScanner(newObjectKey).start();
 	}
 
@@ -244,7 +244,7 @@ public class ObjectKeyCompliance {
 		ArrayList<Path> dirPaths = new ArrayList<Path>();
 
 		final String dataFilePath = Settings.getInstance().getDataFilePath();
-		if (dataFilePath != null && !dataFilePath.trim().isEmpty() && !dataFilePath.equals(GDE.FILE_SEPARATOR_UNIX)) {
+		if (dataFilePath != null && !dataFilePath.trim().isEmpty() && !dataFilePath.equals(GDE.STRING_FILE_SEPARATOR_UNIX)) {
 			dirPaths.add(Paths.get(dataFilePath));
 			log.log(Level.FINE, "data path ", dataFilePath);
 		}
@@ -291,7 +291,7 @@ public class ObjectKeyCompliance {
 				Path supplementObjectsPath = SupplementObjectFolder.getSupplementObjectsPath();
 				Path subPath = supplementObjectsPath.relativize(directoryPath);
 				boolean isFirstLevelSupplement = directoryPath.startsWith(supplementObjectsPath) && subPath.getNameCount() == 1;
-				isRoot = isFirstLevelSupplement && subPath.toString().length() > 2 && subPath.toString().substring(0, 2).equals(GDE.STRING_UNDER_BAR + GDE.STRING_UNDER_BAR);
+				isRoot = isFirstLevelSupplement && subPath.toString().length() > 2 && subPath.toString().substring(0, 2).equals(GDE.CHAR_UNDER_BAR + GDE.STRING_UNDER_BAR);
 			} catch (IllegalArgumentException e) { // UNC windows path does not compare with standard windows path
 				log.log(Level.FINE, e.getMessage(), SupplementObjectFolder.getSupplementObjectsPath() + " <> other: " + directoryPath);
 			}

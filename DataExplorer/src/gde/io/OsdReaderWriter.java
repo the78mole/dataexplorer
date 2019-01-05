@@ -161,7 +161,7 @@ public class OsdReaderWriter {
 	 */
 	public static HashMap<String, String> getHeader(String filePath) throws FileNotFoundException, IOException, NotSupportedFileFormatException {
 		try (InputStream inputStream = new FileInputStream(new File(filePath));) {
-			String exceptionMessageFilePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+			String exceptionMessageFilePath = filePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 			return readHeader(exceptionMessageFilePath, new DataInputStream(FileUtils.wrapIfZipStream(inputStream)));
 		}
 	}
@@ -281,7 +281,7 @@ public class OsdReaderWriter {
 	}
 
 	private static RecordSet read(String filePath, RecordSetSelector recordSetSelector) throws FileNotFoundException, IOException, NotSupportedFileFormatException, DataInconsitsentException {
-		filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		filePath = filePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
 		ZipEntry zip_entry = zip_input.getNextEntry();
 		FileInputStream file_input = null;
@@ -598,10 +598,10 @@ public class OsdReaderWriter {
 	 * @throws IOException
 	 */
 	public static void write(String fullQualifiedFilePath, Channel activeChannel, int useVersion) throws FileNotFoundException, IOException {
-		fullQualifiedFilePath = fullQualifiedFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		fullQualifiedFilePath = fullQualifiedFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		if (activeChannel != null && fullQualifiedFilePath != null && useVersion != 0) {
 			ZipOutputStream file_out = new ZipOutputStream(new FileOutputStream(new File(fullQualifiedFilePath)));
-			file_out.putNextEntry(new ZipEntry(fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1)));
+			file_out.putNextEntry(new ZipEntry(fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1)));
 			DataOutputStream data_out = new DataOutputStream(file_out);
 			IDevice activeDevice = OsdReaderWriter.application.getActiveDevice();
 			boolean isObjectOriented = OsdReaderWriter.application.isObjectoriented();
@@ -785,7 +785,7 @@ public class OsdReaderWriter {
 				//update/write link if object oriented
 				if (isObjectOriented && !fullQualifiedFilePath.contains(GDE.TEMP_FILE_STEM)) {
 					OperatingSystemHelper.createFileLink(fullQualifiedFilePath,
-							OsdReaderWriter.application.getObjectFilePath() + fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1));
+							OsdReaderWriter.application.getObjectFilePath() + fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1));
 				}
 			}
 			finally {
@@ -810,7 +810,7 @@ public class OsdReaderWriter {
 	 * @throws DataInconsitsentException
 	 */
 	public static synchronized void readRecordSetsData(RecordSet recordSet, String filePath, boolean doUpdateProgressBar) throws FileNotFoundException, IOException, DataInconsitsentException {
-		filePath = filePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		filePath = filePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
 		ZipEntry zip_entry = zip_input.getNextEntry();
 		RandomAccessFile random_in = null;
@@ -915,7 +915,7 @@ public class OsdReaderWriter {
 			//rename object key of remaining files
 			iterator = files.iterator();
 			while (iterator.hasNext()) {
-				final String filePath = iterator.next().getPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				final String filePath = iterator.next().getPath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 				log.fine(() -> String.format("renaming object key of %s", filePath)); //$NON-NLS-1$
 				String tmpFilePath = FileUtils.renameFile(filePath, GDE.FILE_ENDING_TMP); // rename existing file to *.tmp
 				File tmpFile = new File(tmpFilePath);
@@ -930,7 +930,7 @@ public class OsdReaderWriter {
 					}
 
 					zip_out = new ZipOutputStream(new FileOutputStream(updatedFile));
-					zip_out.putNextEntry(new ZipEntry(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1)));
+					zip_out.putNextEntry(new ZipEntry(filePath.substring(filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1)));
 					data_out = new DataOutputStream(zip_out);
 
 					long filePointer = 0;

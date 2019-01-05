@@ -2269,12 +2269,12 @@ public class DeviceConfiguration {
 				if (type == DataTypes.STRING)
 					createProperty(channelConfigNumber, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value));
 				else
-					createProperty(channelConfigNumber, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
+					createProperty(channelConfigNumber, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value).replace(GDE.CHAR_COMMA, GDE.CHAR_DOT));
 			} else {
 				if (type == DataTypes.STRING)
 					property.setValue((GDE.STRING_EMPTY + value));
 				else
-					property.setValue((GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
+					property.setValue((GDE.STRING_EMPTY + value).replace(GDE.CHAR_COMMA, GDE.CHAR_DOT));
 			}
 		} else
 			this.removeMeasruementProperty(channelConfigNumber, measurementOrdinal, propertyKey);
@@ -2293,9 +2293,9 @@ public class DeviceConfiguration {
 		this.isChangePropery = true;
 		PropertyType property = this.getMeasruementProperty(channelConfigKey, measurementOrdinal, propertyKey);
 		if (property == null) {
-			createProperty(channelConfigKey, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
+			createProperty(channelConfigKey, measurementOrdinal, propertyKey, type, (GDE.STRING_EMPTY + value).replace(GDE.CHAR_COMMA, GDE.CHAR_DOT));
 		} else {
-			property.setValue((GDE.STRING_EMPTY + value).replace(GDE.STRING_COMMA, GDE.STRING_DOT));
+			property.setValue((GDE.STRING_EMPTY + value).replace(GDE.CHAR_COMMA, GDE.CHAR_DOT));
 		}
 	}
 

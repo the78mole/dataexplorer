@@ -79,12 +79,12 @@ public class S32_2 extends S32 implements IDevice {
 				try {
 					S32_2.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							try {
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 								CSVSerialDataReaderWriter.read(selectedImportFile, S32_2.this, recordNameExtend, null, 
 										new DataParser(S32_2.this.getDataBlockTimeUnitFactor(), 
 												S32_2.this.getDataBlockLeader(), S32_2.this.getDataBlockSeparator().value(), 

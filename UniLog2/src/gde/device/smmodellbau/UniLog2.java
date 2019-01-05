@@ -643,10 +643,10 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 				try {
 					UniLog2.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
 							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.CHAR_DOT));
 							}
 							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_TXT;
 						}
@@ -655,7 +655,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 						if (fd.getFileName().length() > 4) {
 							Integer channelConfigNumber = UniLog2.this.application.getActiveChannelNumber();
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
-							String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+							String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 							try {
 								NMEAReaderWriter.read(selectedImportFile, UniLog2.this, recordNameExtend, channelConfigNumber);
 							}
@@ -680,25 +680,25 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 	String getConfigurationFileDirecotry() {
 		if (UniLog2.selectedSetupFilePath == null) {
 			String searchPath = GDE.OBJECT_KEY == null
-					? this.getDataBlockPreferredDataLocation().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)
+					? this.getDataBlockPreferredDataLocation().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX)
 					: FileUtils.getDeviceImportDirectory(this);
 			if (searchPath.contains(UniLog2.SM_UNILOG_2_DIR_STUB)) {
 				searchPath = searchPath.substring(0, searchPath.indexOf(UniLog2.SM_UNILOG_2_DIR_STUB)) + UniLog2.SM_UNILOG_2_INI_PATH;
 			}
 			else {
-				String dataFilePath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX;
+				String dataFilePath = Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX;
 				if (searchPath.equals(dataFilePath)) { //check if retrieved search path is equals to configured data file base path
-					searchPath = searchPath + this.getName() + GDE.FILE_SEPARATOR_UNIX;
+					searchPath = searchPath + this.getName() + GDE.STRING_FILE_SEPARATOR_UNIX;
 				}
 
-				if (searchPath.endsWith(GDE.FILE_SEPARATOR_UNIX))
+				if (searchPath.endsWith(GDE.STRING_FILE_SEPARATOR_UNIX))
 					searchPath = searchPath + UniLog2.SM_UNILOG_2_INI_PATH;
 				else
-					searchPath = searchPath + GDE.FILE_SEPARATOR_UNIX + UniLog2.SM_UNILOG_2_INI_PATH;
+					searchPath = searchPath + GDE.STRING_FILE_SEPARATOR_UNIX + UniLog2.SM_UNILOG_2_INI_PATH;
 			}
 			return searchPath;
 		}
-		return UniLog2.selectedSetupFilePath.substring(0, UniLog2.selectedSetupFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
+		return UniLog2.selectedSetupFilePath.substring(0, UniLog2.selectedSetupFilePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
 	}
 
 	/**

@@ -303,7 +303,7 @@ public class JetiDataReader {
 								device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date())); //$NON-NLS-1$
 					}
 					//write filename after import to record description
-					activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1));
+					activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1));
 					activeChannel.get(recordSetName).setRecordSetDescription(Messages.getString(gde.device.jeti.MessageIds.GDE_MSGT2914,
 							new String[]{activeChannel.get(recordSetName).getRecordSetDescription(), data.getModelName(),
 							String.format(Locale.getDefault(), "min=%.3f sec; max=%.3f sec; avg=%.3f sec; sigma=%.3f sec", data.getMinTimeStep()/1000.0, data.getMaxTimeStep()/1000.0, data.getAvgTimeStep()/1000.0, data.getSigmaTimeStep()/1000.0)}));

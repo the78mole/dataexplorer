@@ -90,9 +90,9 @@ public final class SupplementObjectFolder {
 		if (externalPath.toString().isEmpty()) throw new IllegalArgumentException("empty mirror property string");
 
 		String finalPath = externalPath.toString() //
-				.replaceAll(GDE.FILE_SEPARATOR_UNIX, GDE.STRING_UNDER_BAR) //
-				.replaceAll(Matcher.quoteReplacement(GDE.FILE_SEPARATOR_WINDOWS), GDE.STRING_UNDER_BAR) //
-				.replaceAll(GDE.STRING_COLON, GDE.STRING_UNDER_BAR);
+				.replace(GDE.CHAR_FILE_SEPARATOR_UNIX, GDE.CHAR_UNDER_BAR) //
+				.replaceAll(Matcher.quoteReplacement(GDE.STRING_FILE_SEPARATOR_WINDOWS), GDE.STRING_UNDER_BAR) //
+				.replace(GDE.CHAR_COLON, GDE.CHAR_UNDER_BAR);
 		// force path starting with "__"
 		if (finalPath.substring(0, 1) != GDE.STRING_UNDER_BAR) finalPath = GDE.STRING_UNDER_BAR + finalPath;
 		if (finalPath.substring(1, 2) != GDE.STRING_UNDER_BAR) finalPath = GDE.STRING_UNDER_BAR + finalPath;

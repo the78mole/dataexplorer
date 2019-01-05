@@ -84,10 +84,10 @@ public class GeniusWizard extends HoTTAdapter implements IDevice {
 					boolean isInitialSwitched = false;
 
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
 							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.CHAR_DOT));
 							}
 							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_LOG;
 						}
@@ -96,7 +96,7 @@ public class GeniusWizard extends HoTTAdapter implements IDevice {
 						if (fd.getFileName().length() > MIN_FILENAME_LENGTH) {
 							Integer channelConfigNumber = GeniusWizard.this.application.getActiveChannelNumber();
 							channelConfigNumber = channelConfigNumber == null ? 1 : channelConfigNumber;
-							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+							//String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 							try {
 								GeniusWizardLogReader.read(selectedImportFile); //, HoTTAdapter.this, GDE.STRING_EMPTY, channelConfigNumber);
 								if (!isInitialSwitched) {

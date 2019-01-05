@@ -281,7 +281,7 @@ public class SourceFolders {
 			paths = objectPaths.collect(Collectors.toSet());
 		} catch (IOException | UncheckedIOException e) {
 			log.log(Level.SEVERE, e.getMessage(), " is not accessible : " + e.getClass());
-			if (e.getMessage().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX).contains(analyzer.getSettings().getDataFilePath())) {
+			if (e.getMessage().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX).contains(analyzer.getSettings().getDataFilePath())) {
 				ThrowableUtils.rethrow(e);
 			}
 		} catch (Exception e) {

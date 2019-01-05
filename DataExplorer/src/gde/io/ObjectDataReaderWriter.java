@@ -72,7 +72,7 @@ public class ObjectDataReaderWriter {
 
 	public ObjectDataReaderWriter(ObjectData newObjectData) {
 		this.objectData = newObjectData;
-		this.filePath = newObjectData.getFullQualifiedObjectFilePath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		this.filePath = newObjectData.getFullQualifiedObjectFilePath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -273,7 +273,7 @@ public class ObjectDataReaderWriter {
 			File targetFile = new File(this.filePath);
 
 			// check if target directory exist, it must be created and removed by creatingor removing object key
-			File targetFileDir = new File(this.filePath.substring(0, this.filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+			File targetFileDir = new File(this.filePath.substring(0, this.filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)));
 			if (targetFileDir.exists()) {
 				if (!targetFile.exists()) {
 					if (!targetFile.createNewFile())

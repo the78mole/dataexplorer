@@ -392,10 +392,10 @@ public class NMEAParser implements IDataParser {
 	boolean isChecksumOK(String sentence) {
 		boolean isOK = true;
 		try {
-			String hexCheckSum = sentence.trim().substring(sentence.indexOf(GDE.STRING_STAR) + 1);
+			String hexCheckSum = sentence.trim().substring(sentence.indexOf(GDE.CHAR_STAR) + 1);
 			if (hexCheckSum.length() == 2) {
 				int tmpCheckSum = Integer.parseInt(hexCheckSum, 16);
-				String subSentence = sentence.substring(1, sentence.indexOf(GDE.STRING_STAR));
+				String subSentence = sentence.substring(1, sentence.indexOf(GDE.CHAR_STAR));
 				isOK = tmpCheckSum == Checksum.XOR(subSentence.toCharArray());
 				if (!isOK) 
 					log.logp(Level.WARNING, $CLASS_NAME, "parse()", String.format("line number %d : checkSum 0x%s missmatch 0x%02X in %s!", this.lineNumber, hexCheckSum, Checksum.XOR(subSentence.getBytes()), subSentence)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -440,7 +440,7 @@ public class NMEAParser implements IDataParser {
 			int minute = Integer.parseInt(strValueTime.substring(2, 4));
 			int second = Integer.parseInt(strValueTime.substring(4, 6));
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
+			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.CHAR_DOT) + 1)) : 0);
 
 			if (this.lastTimeStamp < timeStamp) {
 				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
@@ -533,7 +533,7 @@ public class NMEAParser implements IDataParser {
 				int minute = Integer.parseInt(strValueTime.substring(2, 4));
 				int second = Integer.parseInt(strValueTime.substring(4, 6));
 				GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-				timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
+				timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.CHAR_DOT) + 1)) : 0);
 			}
 
 			int latitude, longitude, numSatelites, altitudeAbs;
@@ -651,7 +651,7 @@ public class NMEAParser implements IDataParser {
 			}
 			try {
 				String value = strValues[strValues.length - 1].trim();
-				value = value.contains(GDE.STRING_STAR) ? value.substring(0, value.indexOf(GDE.STRING_STAR)) : value;
+				value = value.contains(GDE.STRING_STAR) ? value.substring(0, value.indexOf(GDE.CHAR_STAR)) : value;
 				VDOP = (int) (Double.parseDouble(value) * 1000.0);
 			}
 			catch (Exception e) {
@@ -719,7 +719,7 @@ public class NMEAParser implements IDataParser {
 					int azimuthDegrees = Integer.parseInt(strValues[6 + 4*i]);
 					int signalNoiseRation;
 					if (strValues[7 + 4*i].contains(GDE.STRING_STAR)) {
-						String tmpValue = strValues[7 + 4*i].substring(0, strValues[7 + 4*i].indexOf(GDE.STRING_STAR));
+						String tmpValue = strValues[7 + 4*i].substring(0, strValues[7 + 4*i].indexOf(GDE.CHAR_STAR));
 						signalNoiseRation = tmpValue.length() > 0 ? Integer.parseInt(tmpValue) : 0;
 					}
 					else 
@@ -820,7 +820,7 @@ public class NMEAParser implements IDataParser {
 			int minute = Integer.parseInt(strValueTime.substring(2, 4));
 			int second = Integer.parseInt(strValueTime.substring(4, 6));
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
+			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.CHAR_DOT) + 1)) : 0);
 
 			if (this.lastTimeStamp < timeStamp) {
 				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
@@ -894,7 +894,7 @@ public class NMEAParser implements IDataParser {
 		int minute = Integer.parseInt(strValueTime.substring(2, 4));
 		int second = Integer.parseInt(strValueTime.substring(4, 6));
 		GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-		long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.STRING_DOT) + 1)) : 0);
+		long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.CHAR_DOT) + 1)) : 0);
 
 		if (this.lastTimeStamp < timeStamp) {
 			this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
@@ -968,7 +968,7 @@ public class NMEAParser implements IDataParser {
 				if (i != 6) {
 					this.values[8 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
 					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().startsWith(tmpValues[1].substring(0, 1))) {
-						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_STAR)) : tmpValues[1]);
+						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_STAR)) : tmpValues[1]);
 					}
 				}
 				else {
@@ -1074,7 +1074,7 @@ public class NMEAParser implements IDataParser {
 						String[] tmpValues = strValues[i + 1].trim().split(GDE.STRING_BLANK);
 						this.values[15 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
 						if (!this.device.getMeasurement(this.channelConfigNumber, 15 + i).getUnit().equals(tmpValues[1])) {
-							this.device.getMeasurement(this.channelConfigNumber, 15 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_STAR)) : tmpValues[1]);
+							this.device.getMeasurement(this.channelConfigNumber, 15 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_STAR)) : tmpValues[1]);
 						}
 					}
 					catch (Exception e) {
@@ -1095,7 +1095,7 @@ public class NMEAParser implements IDataParser {
 						String[] tmpValues = strValues[i + 1].trim().split(GDE.STRING_BLANK);
 						this.values[20 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
 						if (!this.device.getMeasurement(this.channelConfigNumber, 20 + i).getUnit().equals(tmpValues[1])) {
-							this.device.getMeasurement(this.channelConfigNumber, 20 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.STRING_STAR)) : tmpValues[1]);
+							this.device.getMeasurement(this.channelConfigNumber, 20 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_STAR)) : tmpValues[1]);
 						}
 					}
 					catch (Exception e) {
@@ -1181,8 +1181,8 @@ public class NMEAParser implements IDataParser {
 			//this.values[16] = 5: current [A]
 			try {
 				String tmpValue = strValues[i].trim();
-				this.values[i + 15 - 4] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
-						? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
+				this.values[i + 15 - 4] = (int) (tmpValue.indexOf(GDE.CHAR_STAR) > 1 
+						? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.CHAR_STAR))) * 1000.0 
 						: Double.parseDouble(tmpValue) * 1000.0);
 			}
 			catch (Exception e) {
@@ -1191,8 +1191,8 @@ public class NMEAParser implements IDataParser {
 		}
 		try { //this.values[20] = 6: height (relative) [m]
 			String tmpValue = strValues[6].trim();
-			this.values[20] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
-					? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
+			this.values[20] = (int) (tmpValue.indexOf(GDE.CHAR_STAR) > 1 
+					? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.CHAR_STAR))) * 1000.0 
 					: Double.parseDouble(tmpValue) * 1000.0);
 		}
 		catch (Exception e) {
@@ -1201,8 +1201,8 @@ public class NMEAParser implements IDataParser {
 		try {	//this.values[17] = 8: power [W]
 
 			String tmpValue = strValues[8].trim();
-			this.values[17] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
-					? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
+			this.values[17] = (int) (tmpValue.indexOf(GDE.CHAR_STAR) > 1 
+					? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.CHAR_STAR))) * 1000.0 
 					: Double.parseDouble(tmpValue) * 1000.0);
 		}
 		catch (Exception e) {
@@ -1213,8 +1213,8 @@ public class NMEAParser implements IDataParser {
 			//this.values[19] = 10: voltageRx [V]
 			try {
 				String tmpValue = strValues[i].trim();
-				this.values[i + 18 - 9] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
-						? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
+				this.values[i + 18 - 9] = (int) (tmpValue.indexOf(GDE.CHAR_STAR) > 1 
+						? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.CHAR_STAR))) * 1000.0 
 						: Double.parseDouble(tmpValue) * 1000.0);
 			}
 			catch (Exception e) {
@@ -1227,8 +1227,8 @@ public class NMEAParser implements IDataParser {
 			//this.values[23] = 15: value A3
 			try {
 				String tmpValue = strValues[i].trim();
-				this.values[i + 21 - 13] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 
-						? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 
+				this.values[i + 21 - 13] = (int) (tmpValue.indexOf(GDE.CHAR_STAR) > 1 
+						? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.CHAR_STAR))) * 1000.0 
 						: Double.parseDouble(tmpValue) * 1000.0);
 			}
 			catch (Exception e) {
@@ -1319,13 +1319,13 @@ public class NMEAParser implements IDataParser {
 			int minute = Integer.parseInt(strValueTime[1]);
 			int second = 0;
 			if (strValueTime[2].contains(GDE.STRING_DOT)) {
-				second = Integer.parseInt(strValueTime[2].substring(0, strValueTime[2].indexOf(GDE.STRING_DOT)));
+				second = Integer.parseInt(strValueTime[2].substring(0, strValueTime[2].indexOf(GDE.CHAR_DOT)));
 			}
 			else {
 				second = Integer.parseInt(strValueTime[2]);
 			}
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-			long timeStamp = calendar.getTimeInMillis() + (strValueTime[2].contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime[2].substring(strValueTime[2].indexOf(GDE.STRING_DOT) + 1))*10 : 0);
+			long timeStamp = calendar.getTimeInMillis() + (strValueTime[2].contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime[2].substring(strValueTime[2].indexOf(GDE.CHAR_DOT) + 1))*10 : 0);
 			if (this.lastTimeStamp < timeStamp) {
 				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
 				this.lastTimeStamp = timeStamp;
@@ -1349,7 +1349,7 @@ public class NMEAParser implements IDataParser {
 			try {
 				if (inOutMapping[i] >= 0) {
 					String tmpValue = strValues[i].trim();
-					this.values[inOutMapping[i]] = (int) (tmpValue.indexOf(GDE.STRING_STAR) > 1 ? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.STRING_STAR))) * 1000.0 : Double.parseDouble(tmpValue) * 1000.0);
+					this.values[inOutMapping[i]] = (int) (tmpValue.indexOf(GDE.CHAR_STAR) > 1 ? Double.parseDouble(tmpValue.substring(0, tmpValue.indexOf(GDE.CHAR_STAR))) * 1000.0 : Double.parseDouble(tmpValue) * 1000.0);
 					if (i >= 16 && i <= 21 && this.values[inOutMapping[i]] > 0) {
 						maxVotage = this.values[inOutMapping[i]] > maxVotage ? this.values[inOutMapping[i]] : maxVotage;
 						minVotage = this.values[inOutMapping[i]] < minVotage ? this.values[inOutMapping[i]] : minVotage;
@@ -1390,7 +1390,7 @@ public class NMEAParser implements IDataParser {
 						int address = Integer.parseInt(tmpValues[0]);
 						this.values[24 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
 						if (!this.device.getMeasurement(this.channelConfigNumber, 24 + address).getUnit().equals(tmpValues[3])) {
-							this.device.getMeasurement(this.channelConfigNumber, 24 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
+							this.device.getMeasurement(this.channelConfigNumber, 24 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.CHAR_STAR)) : tmpValues[3]);
 						}
 					}
 					catch (Exception e) {
@@ -1410,7 +1410,7 @@ public class NMEAParser implements IDataParser {
 						int address = Integer.parseInt(tmpValues[0]);
 						this.values[32 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
 						if (!this.device.getMeasurement(this.channelConfigNumber, 32 + address).getUnit().equals(tmpValues[3])) {
-							this.device.getMeasurement(this.channelConfigNumber, 32 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
+							this.device.getMeasurement(this.channelConfigNumber, 32 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.CHAR_STAR)) : tmpValues[3]);
 						}
 					}
 					catch (Exception e) {
@@ -1432,7 +1432,7 @@ public class NMEAParser implements IDataParser {
 						int address = Integer.parseInt(tmpValues[0]);
 						this.values[29 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
 						if (!this.device.getMeasurement(this.channelConfigNumber, 29 + address).getUnit().equals(tmpValues[3])) {
-							this.device.getMeasurement(this.channelConfigNumber, 29 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
+							this.device.getMeasurement(this.channelConfigNumber, 29 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.CHAR_STAR)) : tmpValues[3]);
 						}
 					}
 					catch (Exception e) {
@@ -1453,7 +1453,7 @@ public class NMEAParser implements IDataParser {
 						int address = Integer.parseInt(tmpValues[0]);
 						this.values[37 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
 						if (!this.device.getMeasurement(this.channelConfigNumber, 37 + address).getUnit().equals(tmpValues[3])) {
-							this.device.getMeasurement(this.channelConfigNumber, 37 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
+							this.device.getMeasurement(this.channelConfigNumber, 37 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.CHAR_STAR)) : tmpValues[3]);
 						}
 					}
 					catch (Exception e) {
@@ -1473,7 +1473,7 @@ public class NMEAParser implements IDataParser {
 					int address = Integer.parseInt(tmpValues[0]);
 					this.values[24 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
 					if (!this.device.getMeasurement(this.channelConfigNumber, 24 + address).getUnit().equals(tmpValues[3])) {
-						this.device.getMeasurement(this.channelConfigNumber, 24 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.STRING_STAR)) : tmpValues[3]);
+						this.device.getMeasurement(this.channelConfigNumber, 24 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.CHAR_STAR)) : tmpValues[3]);
 					}
 				}
 				catch (Exception e) {

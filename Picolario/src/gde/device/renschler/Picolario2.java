@@ -480,13 +480,13 @@ public class Picolario2 extends Picolario {
 				try {
 					Picolario2.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						Picolario2.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = Picolario2.this.dialog != null && !Picolario2.this.dialog.isDisposed() ? ((Picolario2Dialog)Picolario2.this.dialog).getTabFolderSelectionIndex() + 1 : null;
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 								Picolario2LogReader.read(selectedImportFile, Picolario2.this, recordNameExtend, channelConfigNumber);
 							}
 							catch (Throwable e) {

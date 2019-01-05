@@ -175,11 +175,11 @@ public class CSVSerialDataReaderWriter {
 							int numValues = dataBlockNumber == 2 ? 58 : dataBlockNumber == 3 ? 75 : Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)) - 25;
 							if (inputLineBuffer.toString().split(device.getDataBlockSeparator().value()).length > numValues) {
 								data.parse(inputLineBuffer.toString(), lineNumber);
-								endIndex = line.lastIndexOf(GDE.STRING_SEMICOLON, line.lastIndexOf(GDE.STRING_SEMICOLON) - 3);
+								endIndex = line.lastIndexOf(GDE.CHAR_SEMICOLON, line.lastIndexOf(GDE.CHAR_SEMICOLON) - 3);
 								inputLineBuffer = new StringBuilder().append(line.substring(0, endIndex));
 							}
 							else {
-								endIndex = line.lastIndexOf(GDE.STRING_SEMICOLON, line.lastIndexOf(GDE.STRING_SEMICOLON) - 3);
+								endIndex = line.lastIndexOf(GDE.CHAR_SEMICOLON, line.lastIndexOf(GDE.CHAR_SEMICOLON) - 3);
 								inputLineBuffer = new StringBuilder().append(line.substring(0, endIndex));
 								continue;
 							}
@@ -191,7 +191,7 @@ public class CSVSerialDataReaderWriter {
 							catch (Exception e) {
 								dataBlockNumber = 1;
 							}
-							endIndex = line.lastIndexOf(GDE.STRING_SEMICOLON);
+							endIndex = line.lastIndexOf(GDE.CHAR_SEMICOLON);
 							inputLineBuffer.append(line.substring(line.indexOf(device.getDataBlockSeparator().value(), 6), endIndex));
 							continue;
 						}
@@ -321,7 +321,7 @@ public class CSVSerialDataReaderWriter {
 						device.updateVisibilityStatus(tmpRecordSet, true);
 					}
 					//write filename after import to record description
-					tmpRecordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
+					tmpRecordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)+1));
 				}
 
 				if (GDE.isWithUi()) {

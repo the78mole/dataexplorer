@@ -46,13 +46,13 @@ public class JarInspectAndExportTest extends TestCase {
 		super.setUp();
 
 		if (this.osname.startsWith("windows")) { //$NON-NLS-1$
-			this.applHomePath = (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + "DataExplorer").replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			this.applHomePath = (System.getenv("APPDATA") + GDE.STRING_FILE_SEPARATOR_UNIX + "DataExplorer").replace("\\", "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		else if (this.osname.startsWith("linux")) { //$NON-NLS-1$
-			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + ".DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
+			this.applHomePath = System.getProperty("user.home") + GDE.STRING_FILE_SEPARATOR_UNIX + ".DataExplorer"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else if (this.osname.startsWith("mac")) { //$NON-NLS-1$
-			this.applHomePath = System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG; //$NON-NLS-1$ //$NON-NLS-2$
+			this.applHomePath = System.getProperty("user.home") + GDE.STRING_FILE_SEPARATOR_UNIX + "Library" + GDE.STRING_FILE_SEPARATOR_UNIX + "Application Support" + GDE.STRING_FILE_SEPARATOR_UNIX + GDE.NAME_LONG; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else {
 			System.err.println(Messages.getString(MessageIds.GDE_MSGW0001));

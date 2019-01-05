@@ -315,7 +315,7 @@ public abstract class HistoGraphicsTemplate extends Properties {
 			} else {
 				clear();
 				loadFromXml(fileSubPath);
-				boolean isHistoTemplate = keySet().stream().map(String.class::cast).anyMatch(k -> k.indexOf(GDE.STRING_UNDER_BAR + GDE.STRING_UNDER_BAR) >= 0);
+				boolean isHistoTemplate = keySet().stream().map(String.class::cast).anyMatch(k -> k.indexOf(GDE.CHAR_UNDER_BAR + GDE.STRING_UNDER_BAR) >= 0);
 				if (!isHistoTemplate) {
 					log.log(FINE, "convert template identified as legacy template ", fileSubPath);
 					ConvertedLegacyTemplate template = new ConvertedLegacyTemplate(fileSubPath, analyzer);

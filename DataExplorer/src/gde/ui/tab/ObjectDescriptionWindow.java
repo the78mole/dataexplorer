@@ -182,7 +182,7 @@ public class ObjectDescriptionWindow extends CTabItem {
 		checkSaveObjectData();
 
 		this.activeObjectKey = this.application.getMenuToolBar().getActiveObjectKey();
-		this.objectFilePath = this.settings.getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + this.activeObjectKey + GDE.FILE_SEPARATOR_UNIX + this.activeObjectKey + GDE.FILE_ENDING_DOT_ZIP;
+		this.objectFilePath = this.settings.getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + this.activeObjectKey + GDE.STRING_FILE_SEPARATOR_UNIX + this.activeObjectKey + GDE.FILE_ENDING_DOT_ZIP;
 		this.object = new ObjectData(this.objectFilePath);
 
 		// check if object data can be load from file

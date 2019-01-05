@@ -475,13 +475,13 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 				try {
 					JetiAdapter.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = JetiAdapter.this.dialog != null && !JetiAdapter.this.dialog.isDisposed() ? JetiAdapter.this.dialog.getTabFolderSelectionIndex() + 1 : null;
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 								JetiDataReader.read(selectedImportFile, JetiAdapter.this, recordNameExtend, channelConfigNumber, true);
 							}
 							catch (Throwable e) {

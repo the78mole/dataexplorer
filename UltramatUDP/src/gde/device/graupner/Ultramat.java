@@ -402,7 +402,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 									Unmarshaller unmarshaller = this.jc.createUnmarshaller();
 									unmarshaller.setSchema(this.schema);
 									this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(Settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
-											+ deviceIdentifierName.replace(GDE.STRING_BLANK, GDE.STRING_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
+											+ deviceIdentifierName.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
 								}
 							}
 							catch (Exception e) {

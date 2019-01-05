@@ -2119,7 +2119,7 @@ public class Record extends AbstractRecord implements IRecord {
 		if (tmpValue != null && tmpValue.length() > 0) try {
 			this.dataType = Record.DataType.fromValue(tmpValue);
 		} catch (Exception e) {
-			if (tmpValue.startsWith("GPS") && tmpValue.endsWith("degree")) this.dataType = Record.DataType.fromValue(tmpValue.substring(0, tmpValue.lastIndexOf(GDE.STRING_BLANK)));
+			if (tmpValue.startsWith("GPS") && tmpValue.endsWith("degree")) this.dataType = Record.DataType.fromValue(tmpValue.substring(0, tmpValue.lastIndexOf(GDE.CHAR_BLANK)));
 		}
 
 		tmpValue = recordProps.get(NAME);

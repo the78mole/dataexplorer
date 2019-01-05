@@ -2018,7 +2018,7 @@ public class GraphicsComposite extends Composite {
 			this.recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD));
 			Vector<Record> records = activeRecordSet.getVisibleAndDisplayableRecords();
 			String formattedTimeWithUnit = records.firstElement().getHorizontalDisplayPointAsFormattedTimeWithUnit(this.xPosMeasure);
-			StringBuilder sb = new StringBuilder().append(String.format(" %16s ", formattedTimeWithUnit.substring(formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET))));
+			StringBuilder sb = new StringBuilder().append(String.format(" %16s ", formattedTimeWithUnit.substring(formattedTimeWithUnit.indexOf(GDE.CHAR_LEFT_BRACKET))));
 			for (Record record : records) {
 				if (displayProps.getProperty(record.getName()) != null)
 					sb.append(String.format("|%-10s", displayProps.getProperty(record.getName())));
@@ -2029,7 +2029,7 @@ public class GraphicsComposite extends Composite {
 					sb.append(String.format(format, name, unit));
 				}
 			}
-			sb.append("| ").append(GDE.LINE_SEPARATOR).append(String.format("%16s  ", formattedTimeWithUnit.substring(0, formattedTimeWithUnit.indexOf(GDE.STRING_LEFT_BRACKET) - 1)));
+			sb.append("| ").append(GDE.LINE_SEPARATOR).append(String.format("%16s  ", formattedTimeWithUnit.substring(0, formattedTimeWithUnit.indexOf(GDE.CHAR_LEFT_BRACKET) - 1)));
 			for (Record record : records) {
 				sb.append(String.format("|%7s   ", record.getDecimalFormat().format(actualDevice.translateValue(record, record.realGet(indexPosMeasure)) / 1000.0)));
 			}

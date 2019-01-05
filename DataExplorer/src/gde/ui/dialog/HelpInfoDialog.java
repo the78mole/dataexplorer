@@ -122,14 +122,14 @@ public class HelpInfoDialog extends Dialog {
 	 * @param extractBase
 	 */
 	private void openURL(String deviceName, String fileName, boolean extractBase) {
-		String jarBasePath = FileUtils.getJarBasePath() + GDE.FILE_SEPARATOR_UNIX;
+		String jarBasePath = FileUtils.getJarBasePath() + GDE.STRING_FILE_SEPARATOR_UNIX;
 		String jarName = GDE.NAME_LONG + GDE.FILE_ENDING_DOT_JAR;
 		final String lang = this.settings.getLocale().getLanguage().contains("de") || this.settings.getLocale().getLanguage().contains("en") 
 				? this.settings.getLocale().getLanguage() : "en";
 
 		String helpDir = extractBase ? "help" + GDE.FILE_SEPARATOR : "help" + GDE.FILE_SEPARATOR + lang + GDE.FILE_SEPARATOR;
 		String helpFileDir = "help" + GDE.FILE_SEPARATOR + lang + GDE.FILE_SEPARATOR;
-		String targetDir = GDE.JAVA_IO_TMPDIR + (GDE.IS_WINDOWS ? "" : GDE.FILE_SEPARATOR_UNIX) + "GDE" + GDE.FILE_SEPARATOR_UNIX;
+		String targetDir = GDE.JAVA_IO_TMPDIR + (GDE.IS_WINDOWS ? "" : GDE.STRING_FILE_SEPARATOR_UNIX) + "GDE" + GDE.STRING_FILE_SEPARATOR_UNIX;
 		
 		try {
 			if (!(new File(targetDir)).exists()) {
@@ -139,15 +139,15 @@ public class HelpInfoDialog extends Dialog {
 			}
 			
 			if (deviceName.length() >= 1) { // devices/<deviceName>.jar
-				jarBasePath = jarBasePath + "devices" + GDE.FILE_SEPARATOR_UNIX;
+				jarBasePath = jarBasePath + "devices" + GDE.STRING_FILE_SEPARATOR_UNIX;
 				jarName = deviceName + GDE.FILE_ENDING_DOT_JAR;
-				targetDir = targetDir + deviceName + GDE.FILE_SEPARATOR_UNIX;
+				targetDir = targetDir + deviceName + GDE.STRING_FILE_SEPARATOR_UNIX;
 
 				FileUtils.extractDir(new JarFile(jarBasePath + jarName), helpDir, targetDir, "555");
 			}
 		
 		
-			String stringUrl = (targetDir + helpFileDir + fileName).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+			String stringUrl = (targetDir + helpFileDir + fileName).replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 			log.log(Level.FINE, "stringUrl = " + "file:///" + stringUrl); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			this.textBrowser.setUrl("file:///" + stringUrl); //$NON-NLS-1$

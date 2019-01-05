@@ -132,9 +132,9 @@ public class FileUtils {
 			if (GDE.IS_WINDOWS) {
 				srcFile = srcFile.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			}
-			File src = new File(srcDir + GDE.FILE_SEPARATOR_UNIX + srcFile);
+			File src = new File(srcDir + GDE.STRING_FILE_SEPARATOR_UNIX + srcFile);
 			if (!src.isDirectory()) {
-				File tgt = new File(tgtDir + GDE.FILE_SEPARATOR_UNIX + srcFile);
+				File tgt = new File(tgtDir + GDE.STRING_FILE_SEPARATOR_UNIX + srcFile);
 				if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "copy " + src.toString() + " to " + tgt.toString()); //$NON-NLS-1$ //$NON-NLS-2$
 				FileUtils.copyFile(src, tgt);
 			}
@@ -172,7 +172,7 @@ public class FileUtils {
 			if (!dir.mkdir()) FileUtils.log.log(Level.WARNING, "error upon create " + directory); //$NON-NLS-1$
 		}
 		else {
-			File file = new File(String.format("%s%s%s", directory, GDE.FILE_SEPARATOR_UNIX, versionFileName));
+			File file = new File(String.format("%s%s%s", directory, GDE.STRING_FILE_SEPARATOR_UNIX, versionFileName));
 			if (!file.exists()) {
 				try {
 					//find directory contained version file and rename directory, do not use actual version -1 to enable support for several installed GDE versions
@@ -319,12 +319,12 @@ public class FileUtils {
 		if (checkFileExist(filePath)) {
 			File file = new File(filePath);
 			if (file.canWrite()) {
-				File newFile = new File(filePath.substring(0, filePath.lastIndexOf(GDE.STRING_DOT) + 1) + extension);
+				File newFile = new File(filePath.substring(0, filePath.lastIndexOf(GDE.CHAR_DOT) + 1) + extension);
 				if (newFile.exists()) {
 					if (!newFile.delete()) FileUtils.log.log(Level.WARNING, "failed to delete " + filePath); //$NON-NLS-1$
 				}
-				if (!file.renameTo(newFile)) FileUtils.log.log(Level.WARNING, "failed to rename " + filePath.substring(0, filePath.lastIndexOf(GDE.STRING_DOT) + 1) + extension); //$NON-NLS-1$
-				resultFilePath = filePath.substring(0, filePath.lastIndexOf(GDE.STRING_DOT) + 1) + extension;
+				if (!file.renameTo(newFile)) FileUtils.log.log(Level.WARNING, "failed to rename " + filePath.substring(0, filePath.lastIndexOf(GDE.CHAR_DOT) + 1) + extension); //$NON-NLS-1$
+				resultFilePath = filePath.substring(0, filePath.lastIndexOf(GDE.CHAR_DOT) + 1) + extension;
 			}
 			else {
 				FileUtils.log.log(Level.WARNING, "no write permission on " + file.getAbsolutePath()); //$NON-NLS-1$
@@ -356,7 +356,7 @@ public class FileUtils {
 	 * attention, only 4 directory levels gets visited !
 	 */
 	public static void cleanFiles(String fileBasePath, String[] fileNames) {
-		fileBasePath = fileBasePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		fileBasePath = fileBasePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		Vector<String> fileNamesWildCard = new Vector<String>();
 		for (String fileName : fileNames) {
 			if (fileName.length() >= 2 && !fileName.contains(GDE.STRING_STAR)) { // "a.csv" "GDE", "OSDE"
@@ -370,8 +370,8 @@ public class FileUtils {
 			for (String fileName : fileNamesWildCard) {
 				if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "fileName = '" + fileName + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 				try {
-					String startSignature = fileName.substring(0, fileName.indexOf(GDE.STRING_STAR));
-					String endingSignature = fileName.substring(fileName.lastIndexOf(GDE.STRING_STAR) + 1);
+					String startSignature = fileName.substring(0, fileName.indexOf(GDE.CHAR_STAR));
+					String endingSignature = fileName.substring(fileName.lastIndexOf(GDE.CHAR_STAR) + 1);
 					List<File> fileList = FileUtils.getFileListingNoSort(new File(fileBasePath), 0); // no directories to be scanned here
 					for (File file : fileList) {
 						String tmpFileName = file.getName();
@@ -467,7 +467,7 @@ public class FileUtils {
 				line = sb.toString();
 			}
 
-			line = line.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK) + GDE.LINE_SEPARATOR;
+			line = line.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX).replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK) + GDE.LINE_SEPARATOR;
 
 			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, line);
 			writer.write(line);
@@ -488,10 +488,10 @@ public class FileUtils {
 	public static boolean extract(Class<?> runtimeInstance, String fileName, String jarInternalSourceDirectory, String targetDirectory, String permissionsUNIX) {
 		boolean isExtracted = false;
 		// normalize input directories
-		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory + GDE.FILE_SEPARATOR_UNIX;
-		targetDirectory = targetDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		targetDirectory = targetDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory + GDE.FILE_SEPARATOR_UNIX;
+		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(GDE.STRING_FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory + GDE.STRING_FILE_SEPARATOR_UNIX;
+		targetDirectory = targetDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		targetDirectory = targetDirectory.endsWith(GDE.STRING_FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory + GDE.STRING_FILE_SEPARATOR_UNIX;
 
 		FileOutputStream os = null;
 		InputStream is = null;
@@ -547,7 +547,7 @@ public class FileUtils {
 	 */
 	public static InputStream getFileInputStream(JarFile jarFile, String jarInternalFilePath) throws IOException {
 		// normalize input file path
-		jarInternalFilePath = jarInternalFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		jarInternalFilePath = jarInternalFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 
 		ZipEntry ze = jarFile.getEntry(jarInternalFilePath);
 
@@ -567,11 +567,11 @@ public class FileUtils {
 	 */
 	public static boolean extract(Class<?> runtimeInstance, String sourceFileName, String targetFileName, String jarInternalSourceDirectory, String targetDirectory, String unixPermissions) {
 		boolean isRenamed = false;
-		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory
-				: jarInternalSourceDirectory.length() > 1 ? jarInternalSourceDirectory + GDE.FILE_SEPARATOR_UNIX : jarInternalSourceDirectory;
-		targetDirectory = targetDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		targetDirectory = targetDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory.length() > 1 ? targetDirectory + GDE.FILE_SEPARATOR_UNIX : targetDirectory;
+		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(GDE.STRING_FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory
+				: jarInternalSourceDirectory.length() > 1 ? jarInternalSourceDirectory + GDE.STRING_FILE_SEPARATOR_UNIX : jarInternalSourceDirectory;
+		targetDirectory = targetDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		targetDirectory = targetDirectory.endsWith(GDE.STRING_FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory.length() > 1 ? targetDirectory + GDE.STRING_FILE_SEPARATOR_UNIX : targetDirectory;
 		FileUtils.extract(runtimeInstance, sourceFileName, jarInternalSourceDirectory, targetDirectory, unixPermissions);
 		File sourceFile = new File(targetDirectory + sourceFileName);
 		if (new File(targetDirectory + targetFileName).exists()) {
@@ -597,13 +597,13 @@ public class FileUtils {
 	 */
 	public static void extract(JarFile jarFile, String fileName, String jarSourceDirectory, String targetDirectory, String unixPermissions) {
 		// normalize input directories
-		fileName = fileName.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		fileName = fileName.startsWith(GDE.FILE_SEPARATOR_UNIX) ? fileName.substring(1) : fileName;
-		jarSourceDirectory = jarSourceDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		jarSourceDirectory = jarSourceDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? jarSourceDirectory
-				: jarSourceDirectory.length() > 1 ? jarSourceDirectory + GDE.FILE_SEPARATOR_UNIX : jarSourceDirectory;
-		targetDirectory = targetDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		targetDirectory = targetDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory.length() > 1 ? targetDirectory + GDE.FILE_SEPARATOR_UNIX : targetDirectory;
+		fileName = fileName.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		fileName = fileName.startsWith(GDE.STRING_FILE_SEPARATOR_UNIX) ? fileName.substring(1) : fileName;
+		jarSourceDirectory = jarSourceDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		jarSourceDirectory = jarSourceDirectory.endsWith(GDE.STRING_FILE_SEPARATOR_UNIX) ? jarSourceDirectory
+				: jarSourceDirectory.length() > 1 ? jarSourceDirectory + GDE.STRING_FILE_SEPARATOR_UNIX : jarSourceDirectory;
+		targetDirectory = targetDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		targetDirectory = targetDirectory.endsWith(GDE.STRING_FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory.length() > 1 ? targetDirectory + GDE.STRING_FILE_SEPARATOR_UNIX : targetDirectory;
 
 		ZipEntry ze = jarFile.getEntry(jarSourceDirectory + fileName);
 
@@ -652,10 +652,10 @@ public class FileUtils {
 	 */
 	public static void extractDir(JarFile jarFile, String jarInternalSourceDirectory, String targetDirectory, String permissionsUNIX) {
 		// normalize input directorys
-		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory + GDE.FILE_SEPARATOR_UNIX;
-		targetDirectory = targetDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		targetDirectory = targetDirectory.endsWith(GDE.FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory + GDE.FILE_SEPARATOR_UNIX;
+		jarInternalSourceDirectory = jarInternalSourceDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		jarInternalSourceDirectory = jarInternalSourceDirectory.endsWith(GDE.STRING_FILE_SEPARATOR_UNIX) ? jarInternalSourceDirectory : jarInternalSourceDirectory + GDE.STRING_FILE_SEPARATOR_UNIX;
+		targetDirectory = targetDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		targetDirectory = targetDirectory.endsWith(GDE.STRING_FILE_SEPARATOR_UNIX) ? targetDirectory : targetDirectory + GDE.STRING_FILE_SEPARATOR_UNIX;
 
 		int read;
 		byte[] buffer = new byte[4096];
@@ -670,7 +670,7 @@ public class FileUtils {
 			String entryName = jarEntry.getName();
 			if ((entryName.startsWith(jarInternalSourceDirectory) || entryName.endsWith(".css")) && entryName.contains(GDE.STRING_DOT) && !FileUtils.checkFileExist(targetDirectory + entryName)) { //$NON-NLS-1$
 				ZipEntry ze = jarFile.getEntry(entryName);
-				FileUtils.checkDirectoryAndCreate(targetDirectory + entryName.substring(0, entryName.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+				FileUtils.checkDirectoryAndCreate(targetDirectory + entryName.substring(0, entryName.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)));
 				try {
 					is = jarFile.getInputStream(ze);
 					os = new FileOutputStream(targetDirectory + entryName);
@@ -708,7 +708,7 @@ public class FileUtils {
 	 */
 	public static void updateImageInDeviceJar(DeviceConfiguration deviceConfig, String imageFileName, Image deviceImage) {
 		try {
-			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(GDE.FILE_SEPARATOR_UNIX);
+			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(GDE.STRING_FILE_SEPARATOR_UNIX);
 			if (isStartedWithinEclipse) {
 				FileUtils.log.log(Level.INFO, "started within Eclipse"); //$NON-NLS-1$
 				String fullQualifiedImageTargetName = findDeviceProjectDirectoryPath(deviceConfig) + "/src/resource/" + imageFileName; //$NON-NLS-1$
@@ -743,9 +743,9 @@ public class FileUtils {
 				// deviceJarPath = "c:\\Program Files\\DataExplorer\\devices\\Simulator.jar";
 				// }
 
-				String tmpDeviceJarPath = deviceJarPath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-				tmpDeviceJarPath = GDE.JAVA_IO_TMPDIR.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)
-						+ tmpDeviceJarPath.substring(tmpDeviceJarPath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1, tmpDeviceJarPath.length());
+				String tmpDeviceJarPath = deviceJarPath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+				tmpDeviceJarPath = GDE.JAVA_IO_TMPDIR.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX)
+						+ tmpDeviceJarPath.substring(tmpDeviceJarPath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1, tmpDeviceJarPath.length());
 				FileUtils.log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
 
 				FileUtils.updateJarContent(deviceJarPath, tmpDeviceJarPath, addJarEntryName, deviceImage, DevicePropertiesEditor.dialogShell);
@@ -775,7 +775,7 @@ public class FileUtils {
 				return;
 			else if (SWT.NO == ret) {
 				FileUtils.renameFile(tmpDeviceJarPath, GDE.FILE_ENDING_BAK);
-				deviceJarPath = tmpDeviceJarPath.substring(0, tmpDeviceJarPath.lastIndexOf(GDE.STRING_DOT) + 1) + GDE.FILE_ENDING_BAK;
+				deviceJarPath = tmpDeviceJarPath.substring(0, tmpDeviceJarPath.lastIndexOf(GDE.CHAR_DOT) + 1) + GDE.FILE_ENDING_BAK;
 			}
 		}
 
@@ -827,16 +827,16 @@ public class FileUtils {
 	 */
 	public static void updateFileInDeviceJar(DeviceConfiguration deviceConfig, String devicePropsFileName) {
 		String deviceJarPath = null;
-		String devicePropsFileNameResource = devicePropsFileName = devicePropsFileName.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
-		if (devicePropsFileNameResource.contains(GDE.FILE_SEPARATOR_UNIX)) { // seams full qualified, strip directory
-			devicePropsFileNameResource = devicePropsFileNameResource.substring(devicePropsFileNameResource.lastIndexOf(GDE.FILE_SEPARATOR_UNIX), devicePropsFileNameResource.length());
+		String devicePropsFileNameResource = devicePropsFileName = devicePropsFileName.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		if (devicePropsFileNameResource.contains(GDE.STRING_FILE_SEPARATOR_UNIX)) { // seams full qualified, strip directory
+			devicePropsFileNameResource = devicePropsFileNameResource.substring(devicePropsFileNameResource.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX), devicePropsFileNameResource.length());
 		}
 
 		try {
-			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(GDE.FILE_SEPARATOR_UNIX);
+			boolean isStartedWithinEclipse = DevicePropertiesEditor.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(GDE.STRING_FILE_SEPARATOR_UNIX);
 			if (isStartedWithinEclipse) {
 				FileUtils.log.log(Level.INFO, "started within Eclipse"); //$NON-NLS-1$
-				String fullQualifiedPropertiesTargetFileName = findDeviceProjectDirectoryPath(deviceConfig) + "/src/resource/" + Settings.getInstance().getLocale() + GDE.FILE_SEPARATOR_UNIX //$NON-NLS-1$
+				String fullQualifiedPropertiesTargetFileName = findDeviceProjectDirectoryPath(deviceConfig) + "/src/resource/" + Settings.getInstance().getLocale() + GDE.STRING_FILE_SEPARATOR_UNIX //$NON-NLS-1$
 						+ devicePropsFileName;
 				FileUtils.log.log(Level.INFO, "fullQualifiedImageTargetFileName = " + fullQualifiedPropertiesTargetFileName); //$NON-NLS-1$
 				deviceConfig.storeDeviceProperties(fullQualifiedPropertiesTargetFileName);
@@ -858,7 +858,7 @@ public class FileUtils {
 				String tmpDeviceJarPath = null;
 				deviceJarPath = getJarFileNameOfDevice(deviceConfig);
 
-				tmpDeviceJarPath = GDE.JAVA_IO_TMPDIR + deviceJarPath.substring(deviceJarPath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1, deviceJarPath.length());
+				tmpDeviceJarPath = GDE.JAVA_IO_TMPDIR + deviceJarPath.substring(deviceJarPath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1, deviceJarPath.length());
 				FileUtils.log.log(Level.WARNING, "deviceJarPath = " + deviceJarPath + "; tmpDeviceJarPath = " + tmpDeviceJarPath); //$NON-NLS-1$ //$NON-NLS-2$
 
 				FileUtils.updateJarContent(deviceJarPath, tmpDeviceJarPath, addJarEntryName, devicePropsFileName, DevicePropertiesEditor.dialogShell);
@@ -903,12 +903,12 @@ public class FileUtils {
 			throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, NoClassDefFoundError {
 		IDevice newInst = deviceConfig.defineInstanceOfDevice();
 		String deviceJarFileName = newInst.getClass().getProtectionDomain().getCodeSource().getLocation().getPath().replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
-		deviceJarFileName = deviceJarFileName.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		deviceJarFileName = deviceJarFileName.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		FileUtils.log.log(Level.WARNING, "deviceJarPath = " + deviceJarFileName); //$NON-NLS-1$
 
 		if (deviceJarFileName.endsWith(GDE.STRING_WITHIN_ECLIPSE)) { // stated within eclipse
 			deviceJarFileName = deviceJarFileName.substring(0, deviceJarFileName.indexOf(GDE.STRING_WITHIN_ECLIPSE));
-			deviceJarFileName = deviceJarFileName.substring(deviceJarFileName.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
+			deviceJarFileName = deviceJarFileName.substring(deviceJarFileName.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1);
 		}
 
 		return deviceJarFileName;
@@ -933,7 +933,7 @@ public class FileUtils {
 				return;
 			else if (SWT.NO == ret) {
 				FileUtils.renameFile(tmpDeviceJarPath, GDE.FILE_ENDING_BAK);
-				deviceJarPath = tmpDeviceJarPath.substring(0, tmpDeviceJarPath.lastIndexOf(GDE.STRING_DOT) + 1) + GDE.FILE_ENDING_BAK;
+				deviceJarPath = tmpDeviceJarPath.substring(0, tmpDeviceJarPath.lastIndexOf(GDE.CHAR_DOT) + 1) + GDE.FILE_ENDING_BAK;
 			}
 		}
 
@@ -994,7 +994,7 @@ public class FileUtils {
 						String deviceJarPath = job.split("2")[0]; //$NON-NLS-1$
 						String tmpDeviceJarPath = job.split("2")[1]; //$NON-NLS-1$
 						try {
-							String javaexec = System.getProperty("java.home").replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX) + "/bin/java"; //$NON-NLS-1$ //$NON-NLS-2$
+							String javaexec = System.getProperty("java.home").replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX) + "/bin/java"; //$NON-NLS-1$ //$NON-NLS-2$
 							String classpath = OperatingSystemHelper.getClasspathAsString().replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 							String command = javaexec + " -classpath '" + classpath + "' gde.utils.FileUtils '" + deviceJarPath + "' '" + tmpDeviceJarPath + "'"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 							FileUtils.log.log(Level.INFO, "executing: " + command); //$NON-NLS-1$
@@ -1063,7 +1063,7 @@ public class FileUtils {
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			basePath = basePath + "build" + "/target/" //$NON-NLS-1$ //$NON-NLS-2$
 					+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY) + System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE //$NON-NLS-1$ //$NON-NLS-2$
-					+ GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY) + GDE.FILE_SEPARATOR_UNIX;
+					+ GDE.STRING_FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY) + GDE.STRING_FILE_SEPARATOR_UNIX;
 		}
 		else { // started outside java -jar *.jar
 			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "started outside with: java -jar *.jar"); //$NON-NLS-1$
@@ -1089,11 +1089,11 @@ public class FileUtils {
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
 			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
-				//jarPath = basePath + "build" + GDE.FILE_SEPARATOR_UNIX + "target" + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME; //$NON-NLS-1$ //$NON-NLS-2$
-				// targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
+				//jarPath = basePath + "build" + GDE.STRING_FILE_SEPARATOR_UNIX + "target" + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME; //$NON-NLS-1$ //$NON-NLS-2$
+				// targetDirectory this.applHomePath + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
 				jarPath = basePath + "build" + "/target/" //$NON-NLS-1$ //$NON-NLS-2$
 						+ (GDE.IS_LINUX ? "GNU" : GDE.STRING_EMPTY) + System.getProperty("os.name").split(GDE.STRING_BLANK)[0] + GDE.STRING_UNDER_BAR + GDE.BIT_MODE //$NON-NLS-1$ //$NON-NLS-2$
-						+ GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY) + "/devices"; //$NON-NLS-1$
+						+ GDE.STRING_FILE_SEPARATOR_UNIX + GDE.NAME_LONG + (GDE.IS_MAC ? GDE.STRING_MAC_DOT_APP + GDE.STRING_MAC_APP_RES_PATH : GDE.STRING_EMPTY) + "/devices"; //$NON-NLS-1$
 			}
 			catch (Exception e) {
 				e.printStackTrace(System.err);
@@ -1106,7 +1106,7 @@ public class FileUtils {
 			if (FileUtils.log.isLoggable(Level.FINE)) FileUtils.log.log(Level.FINE, "basePath = " + basePath); //$NON-NLS-1$
 			try {
 				// jarPath = basePath + Settings.DEVICE_PROPERTIES_DIR_NAME;
-				// targetDirectory this.applHomePath + GDE.FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
+				// targetDirectory this.applHomePath + GDE.STRING_FILE_SEPARATOR_UNIX + Settings.DEVICE_PROPERTIES_DIR_NAME);
 				jarPath = basePath + "devices"; //$NON-NLS-1$
 			}
 			catch (Exception e) {
@@ -1440,10 +1440,10 @@ public class FileUtils {
 		// else if (GDE.IS_LINUX) {
 		// OperatingSystemHelper.removeDesktopLink();
 		// OperatingSystemHelper.deregisterApplication();
-		// FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX, new String[] {GDE.STRING_DOT+GDE.NAME_LONG});
+		// FileUtils.cleanFiles(System.getProperty("user.home") + GDE.STRING_FILE_SEPARATOR_UNIX, new String[] {GDE.CHAR_DOT+GDE.NAME_LONG});
 		// }
 		// else if (GDE.IS_MAC) {
-		//				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX , new String[] {GDE.NAME_LONG});
+		//				FileUtils.cleanFiles(System.getProperty("user.home") + GDE.STRING_FILE_SEPARATOR_UNIX + "Library" + GDE.STRING_FILE_SEPARATOR_UNIX + "Application Support" + GDE.STRING_FILE_SEPARATOR_UNIX , new String[] {GDE.NAME_LONG});
 		// }
 		// }
 		// if (GDE.IS_WINDOWS)
@@ -1462,19 +1462,19 @@ public class FileUtils {
 	 * @return device and object related import directory path
 	 */
 	public static String getDeviceImportDirectory(IDevice device) {
-		String devicePath = DataExplorer.getInstance().getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.getInstance().getActiveDevice().getName() : GDE.STRING_EMPTY;
-		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String devicePath = DataExplorer.getInstance().getActiveDevice() != null ? GDE.STRING_FILE_SEPARATOR_UNIX + DataExplorer.getInstance().getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 		String objectKey = DataExplorer.getInstance().getObjectKey();
 
 		if (Settings.getInstance().isDeviceImportDirectoryObjectRelated() && DataExplorer.getInstance().isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
-			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
+			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + objectKey;
 			FileUtils.checkDirectoryAndCreate(objectkeyPath);
 			searchDirectory = objectkeyPath;
 		}
 		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
-		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		searchDirectory = searchDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		return searchDirectory;
 	}
 
@@ -1483,24 +1483,24 @@ public class FileUtils {
 	 * @return
 	 */
 	public static FileDialog getImportDirectoryFileDialog(IDevice device, String dialogTitleMessage) {
-		String devicePath = DataExplorer.getInstance().getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.getInstance().getActiveDevice().getName() : GDE.STRING_EMPTY;
-		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String devicePath = DataExplorer.getInstance().getActiveDevice() != null ? GDE.STRING_FILE_SEPARATOR_UNIX + DataExplorer.getInstance().getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 		String objectKey = DataExplorer.getInstance().getObjectKey();
 
 		if (Settings.getInstance().isDeviceImportDirectoryObjectRelated() && DataExplorer.getInstance().isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
-			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
+			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + objectKey;
 			FileUtils.checkDirectoryAndCreate(objectkeyPath);
 			searchDirectory = objectkeyPath;
 		}
 		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
-		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		searchDirectory = searchDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		final FileDialog fd = DataExplorer.getInstance().openFileOpenDialog(dialogTitleMessage,
 				new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, SWT.MULTI);
 
 		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.getInstance().isObjectoriented())
-				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX)))
 			device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
 	}
@@ -1510,24 +1510,24 @@ public class FileUtils {
 	 * @return
 	 */
 	public static FileDialog getImportDirectoryFileDialog(IDevice device, String dialogTitleMessage, final int swtStyle) {
-		String devicePath = DataExplorer.getInstance().getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.getInstance().getActiveDevice().getName() : GDE.STRING_EMPTY;
-		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String devicePath = DataExplorer.getInstance().getActiveDevice() != null ? GDE.STRING_FILE_SEPARATOR_UNIX + DataExplorer.getInstance().getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 		String objectKey = DataExplorer.getInstance().getObjectKey();
 
 		if (Settings.getInstance().isDeviceImportDirectoryObjectRelated() && DataExplorer.getInstance().isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
-			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
+			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + objectKey;
 			FileUtils.checkDirectoryAndCreate(objectkeyPath);
 			searchDirectory = objectkeyPath;
 		}
 		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
-		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		searchDirectory = searchDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		final FileDialog fd = DataExplorer.getInstance().openFileOpenDialog(dialogTitleMessage,
 				new String[] { device.getDeviceConfiguration().getDataBlockPreferredFileExtention(), GDE.FILE_ENDING_STAR_STAR }, searchDirectory, null, swtStyle);
 
 		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.getInstance().isObjectoriented())
-				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX)))
 			device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
 	}
@@ -1540,23 +1540,23 @@ public class FileUtils {
 	 * @return
 	 */
 	public static FileDialog getImportDirectoryFileDialog(IDevice device, String dialogTitleMessage, String[] fileExtensions) {
-		String devicePath = DataExplorer.getInstance().getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.getInstance().getActiveDevice().getName() : GDE.STRING_EMPTY;
-		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String devicePath = DataExplorer.getInstance().getActiveDevice() != null ? GDE.STRING_FILE_SEPARATOR_UNIX + DataExplorer.getInstance().getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 		String objectKey = DataExplorer.getInstance().getObjectKey();
 
 		if (Settings.getInstance().isDeviceImportDirectoryObjectRelated() && DataExplorer.getInstance().isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
-			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
+			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + objectKey;
 			FileUtils.checkDirectoryAndCreate(objectkeyPath);
 			searchDirectory = objectkeyPath;
 		}
 		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
-		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		searchDirectory = searchDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		final FileDialog fd = DataExplorer.getInstance().openFileOpenDialog(dialogTitleMessage, fileExtensions, searchDirectory, null, SWT.MULTI);
 
 		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.getInstance().isObjectoriented())
-				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX)))
 			device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
 	}
@@ -1567,25 +1567,25 @@ public class FileUtils {
 	 * @return
 	 */
 	public static FileDialog getImportDirectoryFileDialog(IDevice device, String dialogTitleMessage, String baseDirectory) {
-		String devicePath = DataExplorer.getInstance().getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + DataExplorer.getInstance().getActiveDevice().getName() : GDE.STRING_EMPTY;
-		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String devicePath = DataExplorer.getInstance().getActiveDevice() != null ? GDE.STRING_FILE_SEPARATOR_UNIX + DataExplorer.getInstance().getActiveDevice().getName() : GDE.STRING_EMPTY;
+		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 		String objectKey = DataExplorer.getInstance().getObjectKey();
 
 		if (Settings.getInstance().isDeviceImportDirectoryObjectRelated() && DataExplorer.getInstance().isObjectoriented() && objectKey != null && !objectKey.equals(GDE.STRING_EMPTY)) {
-			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectKey;
+			String objectkeyPath = Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + objectKey;
 			FileUtils.checkDirectoryAndCreate(objectkeyPath);
 			searchDirectory = objectkeyPath;
 		}
 		else if (!DataExplorer.getInstance().isObjectoriented()) {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 			if (searchDirectory.contains(baseDirectory)) {
-				searchDirectory = searchDirectory.substring(0, searchDirectory.lastIndexOf(baseDirectory)) + baseDirectory + GDE.FILE_SEPARATOR_UNIX + objectKey;
+				searchDirectory = searchDirectory.substring(0, searchDirectory.lastIndexOf(baseDirectory)) + baseDirectory + GDE.STRING_FILE_SEPARATOR_UNIX + objectKey;
 			}
 		}
 		else if (FileUtils.checkDirectoryExist(device.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 			searchDirectory = device.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 		}
-		searchDirectory = searchDirectory.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+		searchDirectory = searchDirectory.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 		Vector<String> extensionFilter = new Vector<String>();
 		extensionFilter.addAll(Arrays.asList(device.getDeviceConfiguration().getDataBlockPreferredFileExtention().split(GDE.STRING_COMMA)));
 		extensionFilter.add(GDE.IS_WINDOWS ? GDE.FILE_ENDING_STAR_STAR : GDE.FILE_ENDING_STAR);
@@ -1593,7 +1593,7 @@ public class FileUtils {
 				extensionFilter.toArray(new String[1]), searchDirectory, null, SWT.MULTI);
 
 		if ((!Settings.getInstance().isDeviceImportDirectoryObjectRelated() || !DataExplorer.getInstance().isObjectoriented())
-				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
+				&& !searchDirectory.equals(fd.getFilterPath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX)))
 			device.getDeviceConfiguration().setDataBlockPreferredDataLocation(fd.getFilterPath());
 		return fd;
 	}

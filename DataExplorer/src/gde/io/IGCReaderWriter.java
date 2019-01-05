@@ -246,7 +246,7 @@ public class IGCReaderWriter {
 							String description = device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime + GDE.LINE_SEPARATOR + header.toString();
 							recordSet.setRecordSetDescription(description);
 							//write filename after import to record description
-							recordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1));
+							recordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1));
 							activeChannel.setFileDescription(dateTime.substring(0, 10) + (activeChannel.getFileDescription().length() < 11 ? "" : activeChannel.getFileDescription().substring(10)));
 
 							activeChannel.put(recordSetName, recordSet);
@@ -331,7 +331,7 @@ public class IGCReaderWriter {
 				reader = null;
 
 				//write filename after import to record description
-				activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1));
+				activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)+1));
 
 				if (GDE.IS_WINDOWS && isGsentence && GDE.BIT_MODE.equals("32") && dllID.equalsIgnoreCase("XTT")) {
 					if (IGCDLL.loadIgcDll(dllID)) {

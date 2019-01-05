@@ -431,7 +431,7 @@ public class SWTResourceManager {
 		String tmpUrl = null;
 		try {
 			tmpUrl = url.replace('\\', '/');
-			if (tmpUrl.startsWith(GDE.FILE_SEPARATOR_UNIX))
+			if (tmpUrl.startsWith(GDE.STRING_FILE_SEPARATOR_UNIX))
 				tmpUrl = tmpUrl.substring(1);
 			if (resources.containsKey(tmpUrl))
 				return (Image) resources.get(tmpUrl);
@@ -450,7 +450,7 @@ public class SWTResourceManager {
 		String tmpUrl = null;
 		try {
 			tmpUrl = url.replace('\\', '/');
-			if (tmpUrl.startsWith(GDE.FILE_SEPARATOR_UNIX))
+			if (tmpUrl.startsWith(GDE.STRING_FILE_SEPARATOR_UNIX))
 				tmpUrl = tmpUrl.substring(1);
 			if (resources.containsKey(tmpUrl))
 				return (Image) resources.get(tmpUrl);
@@ -461,18 +461,18 @@ public class SWTResourceManager {
 		} catch (Exception e) {
 			try {
 				log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + tmpUrl + " not found");
-				Image img = new Image(Display.getDefault(), new FileInputStream(Settings.getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX))));
+				Image img = new Image(Display.getDefault(), new FileInputStream(Settings.getDevicesPath() + url.substring(url.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX))));
 				if (log.isLoggable(Level.FINE))
 				 {
 					Settings.getInstance();
-					log.log(Level.FINE, "new image created = " + Settings.getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX))); //$NON-NLS-1$
+					log.log(Level.FINE, "new image created = " + Settings.getDevicesPath() + url.substring(url.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX))); //$NON-NLS-1$
 				}
 				resources.put(tmpUrl, img);
 				return img;
 			}
 			catch (Throwable t) {
 				Settings.getInstance();
-				log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + Settings.getDevicesPath() + url.substring(url.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)));
+				log.log(Level.SEVERE, activeDeviceInstance.getName() + " - " + Settings.getDevicesPath() + url.substring(url.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)));
 				log.log(Level.SEVERE, e.getMessage(), e);
 				return getImage(activeDeviceInstance, "resource/NoDevicePicture.jpg");
 			}
@@ -552,7 +552,7 @@ public class SWTResourceManager {
 	public static Cursor getCursor(String url) {
 		try {
 			String tmpUrl = url.replace('\\', '/');
-			if (tmpUrl.startsWith(GDE.FILE_SEPARATOR_UNIX)) tmpUrl = tmpUrl.substring(1);
+			if (tmpUrl.startsWith(GDE.STRING_FILE_SEPARATOR_UNIX)) tmpUrl = tmpUrl.substring(1);
 			if (resources.containsKey(tmpUrl)) return (Cursor) resources.get(tmpUrl);
 			ImageData imgCur = new ImageData(instance.getClass().getClassLoader().getResourceAsStream(tmpUrl));
 			Cursor cursor = new Cursor(Display.getDefault(), imgCur, imgCur.width/2, imgCur.height/2);

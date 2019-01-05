@@ -80,7 +80,7 @@ public class ParameterConfigControl {
 		this.value = valueArray[valueIndex];
 		this.format = valueFormat.equals(GDE.STRING_EMPTY) ? "%d" : valueFormat; //$NON-NLS-1$
 		if (this.format.contains(GDE.STRING_DOT)) {
-			int startIndex = this.format.indexOf(GDE.STRING_DOT)+1;
+			int startIndex = this.format.indexOf(GDE.CHAR_DOT)+1;
 			int digits = Integer.valueOf(this.format.substring(startIndex, startIndex+1));
 			switch (digits) {
 			case 1:

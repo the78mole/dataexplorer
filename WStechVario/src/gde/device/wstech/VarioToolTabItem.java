@@ -2167,7 +2167,7 @@ public class VarioToolTabItem extends CTabItem {
 
 	void loadSetup() {
 		FileDialog fd = this.application.openFileOpenDialog(Messages.getString(MessageIds.GDE_MSGT1892), new String[] { GDE.FILE_ENDING_STAR_HEX, GDE.FILE_ENDING_STAR }, this.device.getDataBlockPreferredDataLocation(), this.getDefaultFileName(), SWT.SINGLE);
-		String selectedSetupFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
+		String selectedSetupFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + fd.getFileName();
 		VarioToolTabItem.log.log(Level.FINE, "selectedSetupFile = " + selectedSetupFile); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {

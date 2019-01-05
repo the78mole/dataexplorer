@@ -74,10 +74,10 @@ public class FileHandler {
 		}
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = getDevicePath();
-		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String path = deviceSetting.getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 		FileDialog csvFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, null, SWT.SINGLE);
 		if (csvFileDialog.getFileName().length() > 4) {
-			final String csvFilePath = csvFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
+			final String csvFilePath = csvFileDialog.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + csvFileDialog.getFileName();
 
 			String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(csvFilePath));
 			if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
@@ -132,7 +132,7 @@ public class FileHandler {
 
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = getDevicePath();
-		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String path = deviceSetting.getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 		FileDialog csvFileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_CSV }, path, getFileNameProposal(true));
 		String recordSetKey = activeRecordSet.getName();
 		String csvFilePath = csvFileDialog.open();
@@ -228,7 +228,7 @@ public class FileHandler {
 			}
 			else {
 				String devicePath = getDevicePath();
-				path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
+				path = this.application.getActiveDevice() != null ? deviceSetting.getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX : deviceSetting.getDataFilePath();
 				if (!FileUtils.checkDirectoryAndCreate(path)) {
 					if (!FileUtils.checkDirectoryExist(path)) 
 						this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0056, new Object[] { path }));
@@ -238,7 +238,7 @@ public class FileHandler {
 			}
 			FileDialog openFileDialog = this.application.openFileOpenDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD, GDE.FILE_ENDING_STAR_LOV }, path, null, SWT.SINGLE);
 			if (openFileDialog.getFileName().length() > 4) {
-				String openFilePath = (openFileDialog.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				String openFilePath = (openFileDialog.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 
 				if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
 					String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(openFilePath));
@@ -259,9 +259,9 @@ public class FileHandler {
 	 * @return device path to store or read files
 	 */
 	private String getDevicePath() {
-		String devicePath = GDE.FILE_SEPARATOR_UNIX;
+		String devicePath = GDE.STRING_FILE_SEPARATOR_UNIX;
 		if (this.application.getActiveDevice() != null) {
-			devicePath = GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getFileBaseDir();
+			devicePath = GDE.STRING_FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getFileBaseDir();
 		}
 		return devicePath;
 	}
@@ -285,7 +285,7 @@ public class FileHandler {
 			// only switch object key, if application is object oriented
 			String objectkey = osdHeader.get(GDE.OBJECT_KEY);
 			if (this.application.isObjectoriented() && objectkey != null && !objectkey.equals(GDE.STRING_EMPTY)) {
-				existAsObjectLinkFile = FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + objectkey);
+				existAsObjectLinkFile = FileUtils.checkDirectoryAndCreate(Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + objectkey);
 				this.application.getMenuToolBar().selectObjectKey(0, objectkey);
 			}
 			else {
@@ -320,7 +320,7 @@ public class FileHandler {
 			try {
 				this.application.enableMenuActions(false);
 				OsdReaderWriter.read(openFilePath);
-				this.channels.getActiveChannel().setFileName(openFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
+				this.channels.getActiveChannel().setFileName(openFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX));
 				if (!existAsObjectLinkFile) this.channels.getActiveChannel().setUnsaved(Channel.UNSAVED_REASON_ADD_OBJECT_KEY);
 			}
 			catch (Exception e) {
@@ -354,7 +354,7 @@ public class FileHandler {
 				this.application.enableMenuActions(false);
 				try {
 					OsdReaderWriter.read(openFilePath, recordSetName);
-					this.channels.getActiveChannel().setFileName(openFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
+					this.channels.getActiveChannel().setFileName(openFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX));
 				}
 				catch (Exception e) {
 					FileHandler.log.log(Level.WARNING, e.getMessage(), e);
@@ -399,20 +399,20 @@ public class FileHandler {
 		FileDialog fileDialog = null;
 		String osdFilePath = null;
 		if (fileName == null || fileName.length() < 5 || fileName.equals(getFileNameProposal(false))) {
-			fileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD }, path + GDE.FILE_SEPARATOR_UNIX, getFileNameProposal(false));
+			fileDialog = this.application.prepareFileSaveDialog(dialogName, new String[] { GDE.FILE_ENDING_STAR_OSD }, path + GDE.STRING_FILE_SEPARATOR_UNIX, getFileNameProposal(false));
 			if (fileDialog != null) {
 				osdFilePath = fileDialog.open();
 			}
 		}
 		else {
-			osdFilePath = path + GDE.FILE_SEPARATOR_UNIX + fileName; // including ending ".osd"
+			osdFilePath = path + GDE.STRING_FILE_SEPARATOR_UNIX + fileName; // including ending ".osd"
 		}
 
 		if (osdFilePath != null && osdFilePath.length() > 4 && (getFileNameProposal(false).length() == 0 || !osdFilePath.endsWith(getFileNameProposal(false)))) { // file name has a reasonable length
 			while (osdFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_OSD) || osdFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOV)) {
 				osdFilePath = osdFilePath.substring(0, osdFilePath.lastIndexOf('.'));
 			}
-			osdFilePath = (osdFilePath + GDE.FILE_ENDING_DOT_OSD).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+			osdFilePath = (osdFilePath + GDE.FILE_ENDING_DOT_OSD).replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 			if (FileUtils.checkFileExist(osdFilePath) && SWT.NO == this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0013, new Object[] { osdFilePath }))) {
 				return;
 			}
@@ -425,7 +425,7 @@ public class FileHandler {
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 				FileUtils.renameFile(osdFilePath, GDE.FILE_ENDING_BAK); // rename existing file to *.bak
 				OsdReaderWriter.write(osdFilePath, activeChannel, GDE.DATA_EXPLORER_FILE_VERSION_INT);
-				activeChannel.setFileName(osdFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
+				activeChannel.setFileName(osdFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX));
 				activeChannel.setSaved(true);
 			}
 			catch (Exception e) {
@@ -521,7 +521,7 @@ public class FileHandler {
 			try {
 				this.application.enableMenuActions(false);
 				LogViewReader.read(openFilePath);
-				this.channels.getActiveChannel().setFileName(openFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
+				this.channels.getActiveChannel().setFileName(openFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX));
 			}
 			catch (Exception e) {
 				FileHandler.log.log(Level.WARNING, e.getMessage(), e);
@@ -564,12 +564,12 @@ public class FileHandler {
 
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = getDevicePath();
-		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String path = deviceSetting.getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName();
-		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
+		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.CHAR_DOT)) : fileName;
 		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
 			try {
-				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.STRING_LEFT_BRACKET) + 1, activeRecordSet.getName().lastIndexOf(GDE.STRING_RIGHT_BRACKET));
+				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.CHAR_LEFT_BRACKET) + 1, activeRecordSet.getName().lastIndexOf(GDE.CHAR_RIGHT_BRACKET));
 				if (fileName != null && !fileName.contains(GDE.STRING_EMPTY + Integer.parseInt(flightNumber))) {
 					fileName = fileName + GDE.STRING_UNDER_BAR + flightNumber;
 				}
@@ -593,7 +593,7 @@ public class FileHandler {
 				GDE.getUiNotification().setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0138, new String[] { GDE.FILE_ENDING_KMZ, kmzFilePath }));
 
 				String kmlFileName = this.getFileNameProposal(activeChannel.getActiveRecordSet().getName());
-				kmlFileName = kmlFileName != null && kmlFileName.contains(GDE.STRING_DOT) ? kmlFileName.substring(0, kmlFileName.indexOf(GDE.STRING_DOT)) : kmlFileName;
+				kmlFileName = kmlFileName != null && kmlFileName.contains(GDE.STRING_DOT) ? kmlFileName.substring(0, kmlFileName.indexOf(GDE.CHAR_DOT)) : kmlFileName;
 				kmlFileName = kmlFileName + GDE.FILE_ENDING_DOT_KML;
 
 				KMZWriter.write(kmzFilePath, kmlFileName, activeChannel.getActiveRecordSet(), ordinalLongitude, ordinalLatitude, ordinalHeight, ordinalMeasurement, ordinalSlope, ordinalTripLength,
@@ -639,13 +639,13 @@ public class FileHandler {
 
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = getDevicePath();
-		String path = isExportTmpDir ? GDE.JAVA_IO_TMPDIR : (deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX);
+		String path = isExportTmpDir ? GDE.JAVA_IO_TMPDIR : (deviceSetting.getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX);
 		FileUtils.checkDirectoryAndCreate(path);
 		String fileName = path + (activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName());
-		fileName = fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
+		fileName = fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.CHAR_DOT)) : fileName;
 		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
 			try {
-				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.STRING_LEFT_BRACKET) + 1, activeRecordSet.getName().lastIndexOf(GDE.STRING_RIGHT_BRACKET));
+				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.CHAR_LEFT_BRACKET) + 1, activeRecordSet.getName().lastIndexOf(GDE.CHAR_RIGHT_BRACKET));
 				if (!fileName.contains(GDE.STRING_EMPTY + Integer.parseInt(flightNumber))) {
 					fileName = fileName + GDE.STRING_UNDER_BAR + flightNumber;
 				}
@@ -702,12 +702,12 @@ public class FileHandler {
 
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = getDevicePath();
-		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String path = deviceSetting.getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName();
-		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
+		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.CHAR_DOT)) : fileName;
 		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
 			try {
-				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.STRING_LEFT_BRACKET) + 1, activeRecordSet.getName().lastIndexOf(GDE.STRING_RIGHT_BRACKET));
+				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.CHAR_LEFT_BRACKET) + 1, activeRecordSet.getName().lastIndexOf(GDE.CHAR_RIGHT_BRACKET));
 				if (fileName != null && !fileName.contains(GDE.STRING_EMPTY + Integer.parseInt(flightNumber))) {
 					fileName = fileName + GDE.STRING_UNDER_BAR + flightNumber;
 				}
@@ -763,12 +763,12 @@ public class FileHandler {
 
 		Settings deviceSetting = Settings.getInstance();
 		String devicePath = getDevicePath();
-		String path = deviceSetting.getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+		String path = deviceSetting.getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 		String fileName = activeChannel.getFileName() == null ? this.getFileNameProposal(true) : activeChannel.getFileName();
-		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.STRING_DOT)) : fileName;
+		fileName = fileName != null && fileName.contains(GDE.STRING_DOT) ? fileName.substring(0, fileName.indexOf(GDE.CHAR_DOT)) : fileName;
 		if (activeRecordSet.getName().contains(GDE.STRING_RIGHT_BRACKET) && activeRecordSet.getName().contains(GDE.STRING_LEFT_BRACKET)) {
 			try {
-				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.STRING_LEFT_BRACKET) + 1, activeRecordSet.getName().lastIndexOf(GDE.STRING_RIGHT_BRACKET));
+				String flightNumber = activeRecordSet.getName().substring(activeRecordSet.getName().lastIndexOf(GDE.CHAR_LEFT_BRACKET) + 1, activeRecordSet.getName().lastIndexOf(GDE.CHAR_RIGHT_BRACKET));
 				if (fileName != null && !fileName.contains(GDE.STRING_EMPTY + Integer.parseInt(flightNumber))) {
 					fileName = fileName + GDE.STRING_UNDER_BAR + flightNumber;
 				}

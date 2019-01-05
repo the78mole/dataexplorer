@@ -86,7 +86,7 @@ public class ObjectData {
 	 */
 	public ObjectData(String objectFilePath) {
 		this.fullQualifiedObjectFilePath = objectFilePath;
-		this.key = objectFilePath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX).substring(objectFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1, objectFilePath.lastIndexOf(GDE.STRING_DOT));
+		this.key = objectFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX).substring(objectFilePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1, objectFilePath.lastIndexOf(GDE.CHAR_DOT));
 		this.type = Messages.getString(MessageIds.GDE_MSGT0279);
 		this.activationDate = Messages.getString(MessageIds.GDE_MSGT0279);
 		this.status = Messages.getString(MessageIds.GDE_MSGT0279);
@@ -120,7 +120,7 @@ public class ObjectData {
 	 * copy constructor
 	 */
 	public ObjectData(ObjectData objectData, String updateObjectKey) {
-		this.fullQualifiedObjectFilePath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX + updateObjectKey + GDE.FILE_SEPARATOR_UNIX + updateObjectKey + GDE.FILE_ENDING_DOT_ZIP;
+		this.fullQualifiedObjectFilePath = Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX + updateObjectKey + GDE.STRING_FILE_SEPARATOR_UNIX + updateObjectKey + GDE.FILE_ENDING_DOT_ZIP;
 		this.key = objectData.key;
 		this.type = objectData.type;
 		this.activationDate = objectData.activationDate;

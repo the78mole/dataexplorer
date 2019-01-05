@@ -205,11 +205,11 @@ public enum Transmitter {
 		byte[] bytes = new byte[targetTransmitter.ordinal() <= 5 ? 12288 : 8192];
 
 		try {
-			filepath = filepath.replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+			filepath = filepath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 			File inputFile = new File(filepath);
 			in = new DataInputStream( new FileInputStream(inputFile));
-			String outFilePath = filepath.substring(0, filepath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
-			outFilePath = outFilePath.substring(0, outFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1) + targetTransmitter.value() + GDE.FILE_SEPARATOR_UNIX;
+			String outFilePath = filepath.substring(0, filepath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
+			outFilePath = outFilePath.substring(0, outFilePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)+1) + targetTransmitter.value() + GDE.STRING_FILE_SEPARATOR_UNIX;
 			FileUtils.checkDirectoryAndCreate(outFilePath);
 			outFilePath = outFilePath+ inputFile.getName();
 			File outputFile = new File(outFilePath);

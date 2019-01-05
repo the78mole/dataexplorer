@@ -134,7 +134,7 @@ public class DevoAdapter extends DeviceConfiguration implements IDevice {
 		try (InputStream stream = DataAccess.getInstance().getMappingInputStream("DevoMeasurementMappings.xml")) {
 			DevoAdapter.properties.loadFromXML(stream);
 		} catch (Exception e) {
-			String preopertyFilePath = Settings.MAPPINGS_DIR_NAME + GDE.FILE_SEPARATOR_UNIX + "DevoMeasurementMappings.xml"; //$NON-NLS-1$
+			String preopertyFilePath = Settings.MAPPINGS_DIR_NAME + GDE.STRING_FILE_SEPARATOR_UNIX + "DevoMeasurementMappings.xml"; //$NON-NLS-1$
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE3300, new String[] { preopertyFilePath }));
 		}
 	}
@@ -536,7 +536,7 @@ public class DevoAdapter extends DeviceConfiguration implements IDevice {
 				try {
 					DevoAdapter.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						DevoAdapter.log.log(java.util.logging.Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {

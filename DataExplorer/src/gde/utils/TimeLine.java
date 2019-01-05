@@ -828,7 +828,7 @@ public class TimeLine {
 				time = LocalizedDateTime.getFormatedDuration(DurationPattern.mm_ss_SSS, (long) milliSeconds);
 			else {
 				time = LocalizedDateTime.getFormatedDuration(DurationPattern.HH_mm_ss_SSS, (long) milliSeconds);
-				if (Integer.parseInt(time.substring(0, time.indexOf(GDE.STRING_COLON))) != lHours) time = String.format("%02d%s", lHours, time.substring(time.indexOf(GDE.STRING_COLON)));
+				if (Integer.parseInt(time.substring(0, time.indexOf(GDE.CHAR_COLON))) != lHours) time = String.format("%02d%s", lHours, time.substring(time.indexOf(GDE.CHAR_COLON)));
 			}
 		}
 		return time;

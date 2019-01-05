@@ -129,7 +129,7 @@ public class FileTransferTabItem extends CTabItem {
 
 			if (selection == null || selection.length < 1 || FileTransferTabItem.this.selectedSdFolder == null
 					|| FileTransferTabItem.this.selectedSdFolder.length() < 5
-					|| FileTransferTabItem.this.selectedSdFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) < 0) {
+					|| FileTransferTabItem.this.selectedSdFolder.lastIndexOf(GDE.STRING_FILE_SEPARATOR_UNIX) < 0) {
 				FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2431));
 				return;
 			}
@@ -159,7 +159,7 @@ public class FileTransferTabItem extends CTabItem {
 					try {
 						enableActionButtons(true);
 						FileTransferTabItem.this.serialPort.setInterruptedByUser(false);
-						FileTransferTabItem.this.serialPort.upLoadFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.FILE_SEPARATOR_UNIX,
+						FileTransferTabItem.this.serialPort.upLoadFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.STRING_FILE_SEPARATOR_UNIX,
 								FileTransferTabItem.this.selectedPcFolder.toString(), filesInfo.toString().split(GDE.STRING_SEMICOLON), totalSize,
 								FileTransferTabItem.this);
 					}
@@ -183,7 +183,7 @@ public class FileTransferTabItem extends CTabItem {
 
 			if (selection == null || selection.length < 1 || FileTransferTabItem.this.selectedSdFolder == null
 					|| FileTransferTabItem.this.selectedSdFolder.length() < 5
-					|| FileTransferTabItem.this.selectedSdFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) < 0) {
+					|| FileTransferTabItem.this.selectedSdFolder.lastIndexOf(GDE.STRING_FILE_SEPARATOR_UNIX) < 0) {
 				FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2431));
 				return;
 			}
@@ -207,7 +207,7 @@ public class FileTransferTabItem extends CTabItem {
 					try {
 						enableActionButtons(true);
 						FileTransferTabItem.this.serialPort.setInterruptedByUser(false);
-						FileTransferTabItem.this.serialPort.downLoadFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.FILE_SEPARATOR_UNIX,
+						FileTransferTabItem.this.serialPort.downLoadFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.STRING_FILE_SEPARATOR_UNIX,
 								FileTransferTabItem.this.selectedPcFolder.toString(), filesInfo.toString().split(GDE.STRING_SEMICOLON), totalSize,
 								FileTransferTabItem.this);
 					}
@@ -317,7 +317,7 @@ public class FileTransferTabItem extends CTabItem {
 						});
 						{
 							this.pcRootTreeItem = new TreeItem(this.pcFolderTree, SWT.NONE);
-							this.pcRootTreeItem.setText(this.selectedPcBaseFolder.substring(this.selectedPcBaseFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1));
+							this.pcRootTreeItem.setText(this.selectedPcBaseFolder.substring(this.selectedPcBaseFolder.lastIndexOf(GDE.STRING_FILE_SEPARATOR_UNIX) + 1));
 							updatePcBaseFolder();
 						}
 					}
@@ -361,8 +361,8 @@ public class FileTransferTabItem extends CTabItem {
 									FileTransferTabItem.log.log(Level.FINE, "Selection={" + sb.toString() + "}"); //$NON-NLS-1$ //$NON-NLS-2$
 								}
 								FileTransferTabItem.this.contextMenu.createMenu(FileTransferTabItem.this.popupmenu,
-										Transmitter.detectTransmitter(item.getText(1), FileTransferTabItem.this.selectedPcFolder + GDE.FILE_SEPARATOR_UNIX + item.getText(1)), FileTransferTabItem.this.selectedPcFolder
-												+ GDE.FILE_SEPARATOR_UNIX + item.getText(1));
+										Transmitter.detectTransmitter(item.getText(1), FileTransferTabItem.this.selectedPcFolder + GDE.STRING_FILE_SEPARATOR_UNIX + item.getText(1)), FileTransferTabItem.this.selectedPcFolder
+												+ GDE.STRING_FILE_SEPARATOR_UNIX + item.getText(1));
 							}
 						});
 						this.pcFoldersTable.setMenu(this.popupmenu);
@@ -584,14 +584,14 @@ public class FileTransferTabItem extends CTabItem {
 								FileTransferTabItem.log.log(Level.FINEST, "sourceFolderTree.widgetSelected, event=" + evt); //$NON-NLS-1$
 								TreeItem evtTreeitem = (TreeItem) evt.item;
 								FileTransferTabItem.log.log(Level.FINEST, "sourceFolderTree.widgetSelected, tree item = " + evtTreeitem.getText()); //$NON-NLS-1$
-								if (FileTransferTabItem.this.serialPort.isConnected() && !evtTreeitem.getText().equals(GDE.FILE_SEPARATOR_UNIX)) {
+								if (FileTransferTabItem.this.serialPort.isConnected() && !evtTreeitem.getText().equals(GDE.STRING_FILE_SEPARATOR_UNIX)) {
 									updateSelectedSdFolder(evtTreeitem);
 								}
 							}
 						});
 						{
 							this.sdRootDirectoryTreeItem = new TreeItem(this.sdFolderTree, SWT.NONE);
-							this.sdRootDirectoryTreeItem.setText(GDE.FILE_SEPARATOR_UNIX);
+							this.sdRootDirectoryTreeItem.setText(GDE.STRING_FILE_SEPARATOR_UNIX);
 							this.sdRootDirectoryTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif")); //$NON-NLS-1$
 						}
 					}
@@ -681,7 +681,7 @@ public class FileTransferTabItem extends CTabItem {
 								TableItem[] selection = FileTransferTabItem.this.sdCardFoldersTable.getSelection();
 
 								if (selection == null || selection.length < 1 || FileTransferTabItem.this.selectedSdFolder == null || FileTransferTabItem.this.selectedSdFolder.length() < 5
-										|| FileTransferTabItem.this.selectedSdFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) < 0) {
+										|| FileTransferTabItem.this.selectedSdFolder.lastIndexOf(GDE.STRING_FILE_SEPARATOR_UNIX) < 0) {
 									FileTransferTabItem.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2431));
 									return;
 								}
@@ -694,7 +694,7 @@ public class FileTransferTabItem extends CTabItem {
 
 								try {
 									enableActionButtons(true);
-									FileTransferTabItem.this.serialPort.deleteFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.FILE_SEPARATOR_UNIX, filesInfo.toString().split(GDE.STRING_SEMICOLON));
+									FileTransferTabItem.this.serialPort.deleteFiles(FileTransferTabItem.this.selectedSdFolder.toString() + GDE.STRING_FILE_SEPARATOR_UNIX, filesInfo.toString().split(GDE.STRING_SEMICOLON));
 									updateSelectedSdFolder(FileTransferTabItem.this.lastSelectedSdTreeItem);
 								}
 								catch (Exception e) {
@@ -746,11 +746,11 @@ public class FileTransferTabItem extends CTabItem {
 		for (TreeItem item : this.pcRootTreeItem.getItems()) {
 			item.dispose();
 		}
-		this.selectedPcBaseFolder = new StringBuilder().append(this.pcBaseFolderSelectionLabel.getText().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
+		this.selectedPcBaseFolder = new StringBuilder().append(this.pcBaseFolderSelectionLabel.getText().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX));
 		this.pcRootTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif")); //$NON-NLS-1$
-		String baseFolderName = this.selectedPcBaseFolder.length() > this.selectedPcBaseFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1 ? this.selectedPcBaseFolder.substring(this.selectedPcBaseFolder
-				.lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1) : GDE.IS_WINDOWS ? this.selectedPcBaseFolder.substring(0, this.selectedPcBaseFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX))
-				: this.selectedPcBaseFolder.substring(this.selectedPcBaseFolder.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
+		String baseFolderName = this.selectedPcBaseFolder.length() > this.selectedPcBaseFolder.lastIndexOf(GDE.STRING_FILE_SEPARATOR_UNIX) + 1 ? this.selectedPcBaseFolder.substring(this.selectedPcBaseFolder
+				.lastIndexOf(GDE.STRING_FILE_SEPARATOR_UNIX) + 1) : GDE.IS_WINDOWS ? this.selectedPcBaseFolder.substring(0, this.selectedPcBaseFolder.lastIndexOf(GDE.STRING_FILE_SEPARATOR_UNIX))
+				: this.selectedPcBaseFolder.substring(this.selectedPcBaseFolder.lastIndexOf(GDE.STRING_FILE_SEPARATOR_UNIX));
 		this.pcRootTreeItem.setText(baseFolderName);
 		try {
 			//getDirListing gets only direct child folders, no sub child folders
@@ -866,13 +866,13 @@ public class FileTransferTabItem extends CTabItem {
 			}
 
 			//build path traversing tree items, apply open folder icon
-			this.selectedPcFolder = new StringBuilder().append(GDE.FILE_SEPARATOR_UNIX).append(evtItem.getText());
+			this.selectedPcFolder = new StringBuilder().append(GDE.STRING_FILE_SEPARATOR_UNIX).append(evtItem.getText());
 			tmpItem = evtItem;
 			parentItem = tmpItem.getParentItem();
 			if (parentItem != null) {
 				while (this.pcRootTreeItem != (parentItem = tmpItem.getParentItem())) {
 					this.selectedPcFolder.insert(0, parentItem.getText());
-					this.selectedPcFolder.insert(0, GDE.FILE_SEPARATOR_UNIX);
+					this.selectedPcFolder.insert(0, GDE.STRING_FILE_SEPARATOR_UNIX);
 					parentItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif")); //$NON-NLS-1$
 					tmpItem = parentItem;
 				}
@@ -924,11 +924,11 @@ public class FileTransferTabItem extends CTabItem {
 					this.lastSelectedSdTreeItem = parentItem;
 				}
 			}
-			this.selectedSdFolder = new StringBuilder().append(GDE.FILE_SEPARATOR_UNIX).append(evtTreeitem.getText());
+			this.selectedSdFolder = new StringBuilder().append(GDE.STRING_FILE_SEPARATOR_UNIX).append(evtTreeitem.getText());
 			tmpItem = evtTreeitem;
-			while (!(parentItem = tmpItem.getParentItem()).getText().equals(GDE.FILE_SEPARATOR_UNIX)) {
+			while (!(parentItem = tmpItem.getParentItem()).getText().equals(GDE.STRING_FILE_SEPARATOR_UNIX)) {
 				this.selectedSdFolder.insert(0, parentItem.getText());
-				this.selectedSdFolder.insert(0, GDE.FILE_SEPARATOR_UNIX);
+				this.selectedSdFolder.insert(0, GDE.STRING_FILE_SEPARATOR_UNIX);
 				parentItem.setImage(SWTResourceManager.getImage("/gde/resource/FolderOpen.gif")); //$NON-NLS-1$
 				tmpItem = parentItem;
 			}

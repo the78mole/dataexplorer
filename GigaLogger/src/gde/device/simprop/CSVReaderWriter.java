@@ -250,7 +250,7 @@ public class CSVReaderWriter {
 						int minute = Integer.parseInt(data.substring(4, 6));
 						int second = Integer.parseInt(data.substring(7, 9));
 						GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
-						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.STRING_DOT) + 1)) : 0);
+						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.CHAR_DOT) + 1)) : 0);
 
 						if (lastTimeStamp < timeStamp) {
 							time_ms = (int) (lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp));

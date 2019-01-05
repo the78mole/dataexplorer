@@ -224,13 +224,13 @@ public class Kosmik extends JLog2 {
 				try {
 					Kosmik.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = dialog != null && !dialog.isDisposed() ? dialog.getTabFolderSelectionIndex() + 1 : null;
-								String recordNameExtend = selectedImportFile.contains(GDE.STRING_UNDER_BAR) ? selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_UNDER_BAR)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT)) : selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String recordNameExtend = selectedImportFile.contains(GDE.STRING_UNDER_BAR) ? selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_UNDER_BAR)+1, selectedImportFile.lastIndexOf(GDE.CHAR_DOT)) : selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR)+1, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 								RecordSet redRecordSet = CSVSerialDataReaderWriter.read(selectedImportFile, Kosmik.this, recordNameExtend, channelConfigNumber, 
 										new DataParser(Kosmik.this.getDataBlockTimeUnitFactor(), 
 												Kosmik.this.getDataBlockLeader(), Kosmik.this.getDataBlockSeparator().value(), 

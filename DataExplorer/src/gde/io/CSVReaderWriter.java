@@ -317,7 +317,7 @@ public class CSVReaderWriter {
 						int minute = Integer.parseInt(data.substring(3, 5));
 						int second = Integer.parseInt(data.substring(6, 8));
 						GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
-						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.STRING_DOT) + 1)) : 0);
+						long timeStamp = calendar.getTimeInMillis() + (data.contains(GDE.STRING_DOT) ? Integer.parseInt(data.substring(data.lastIndexOf(GDE.CHAR_DOT) + 1)) : 0);
 
 						if (lastTimeStamp < timeStamp) {
 							time_ms = lastTimeStamp == 0 ? 0 : time_ms + (timeStamp - lastTimeStamp);
@@ -333,13 +333,13 @@ public class CSVReaderWriter {
 						if (data.length() == 9) { //00:00.000
 							int minute = Integer.parseInt(data.substring(0, 2));
 							int second = Integer.parseInt(data.substring(3, 5));
-							time_ms = minute*60*1000 + second*1000 + Integer.parseInt(data.substring(data.lastIndexOf(GDE.STRING_DOT) + 1));
+							time_ms = minute*60*1000 + second*1000 + Integer.parseInt(data.substring(data.lastIndexOf(GDE.CHAR_DOT) + 1));
 						}
 						else if (data.length() == 12) { //00:00:00.000)
 							int hour = Integer.parseInt(data.substring(0, 2));
 							int minute = Integer.parseInt(data.substring(3, 5));
 							int second = Integer.parseInt(data.substring(6, 8));
-							time_ms = hour*60*60*1000 + minute*60*1000 + second*1000 + Integer.parseInt(data.substring(data.lastIndexOf(GDE.STRING_DOT) + 1));
+							time_ms = hour*60*60*1000 + minute*60*1000 + second*1000 + Integer.parseInt(data.substring(data.lastIndexOf(GDE.CHAR_DOT) + 1));
 						}
 					}
 					for (int i = 0; i < updateRecordNames.length; i++) { // only iterate over record names found in file
@@ -462,8 +462,8 @@ public class CSVReaderWriter {
 				}
 				else {
 					String[] row = recordSet.getDataTableRow(i, isTimeFormatAbsolute);
-					String currentDecimalSeparator = String.valueOf(recordSet.get(0).getDecimalFormat().getDecimalFormatSymbols().getDecimalSeparator());
-					String currentrGoupingSeparator = String.valueOf(recordSet.get(0).getDecimalFormat().getDecimalFormatSymbols().getGroupingSeparator());
+					char currentDecimalSeparator = Character.valueOf(recordSet.get(0).getDecimalFormat().getDecimalFormatSymbols().getDecimalSeparator());
+					char currentrGoupingSeparator = Character.valueOf(recordSet.get(0).getDecimalFormat().getDecimalFormatSymbols().getGroupingSeparator());
 	
 					// add time entry
 					sb.append(row[0].replace('.', decimalSeparator)).append(separator);
@@ -472,7 +472,7 @@ public class CSVReaderWriter {
 					for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 						log.log(Level.FINEST, "append " + record.getName()); //$NON-NLS-1$
 						// translate according device and measurement unit
-						sb.append(row[j + 1].replace(currentrGoupingSeparator, GDE.STRING_BLANK).replace(currentDecimalSeparator.charAt(0), decimalSeparator)).append(separator);
+						sb.append(row[j + 1].replace(currentrGoupingSeparator, GDE.CHAR_BLANK).replace(currentDecimalSeparator, decimalSeparator)).append(separator);
 						++j;
 					}
 				}

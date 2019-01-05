@@ -159,7 +159,7 @@ public class DataParser extends NMEAParser implements IDataParser {
 		strValue = strValues[1].trim();
 		this.state = Integer.parseInt(strValue);
 
-		strValue = strValues[2].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT);
+		strValue = strValues[2].trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT);
 		strValue = strValue.length() > 0 ? strValue : "0";
 		if (this.start_time_ms == Integer.MIN_VALUE) {
 			this.start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
@@ -174,7 +174,7 @@ public class DataParser extends NMEAParser implements IDataParser {
 		}
 
 		for (int i = 0; i < this.valueSize && i < strValues.length - 4; i++) {
-			strValue = strValues[i + 3].trim().replace(GDE.STRING_COMMA, GDE.STRING_DOT);
+			strValue = strValues[i + 3].trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT);
 			try {
 				double tmpValue = strValue.length() > 0 ? Double.parseDouble(strValue) : 0.0;
 				if (this.isMultiply1000 && tmpValue < Integer.MAX_VALUE / 1000 && tmpValue > Integer.MIN_VALUE / 1000)

@@ -128,20 +128,22 @@ public class GDE {
 
 	/** Depends on the Operating System type. Is empty if no valid OS. */
 	public static final String							APPL_HOME_PATH										= GDE.IS_WINDOWS
-			? (System.getenv("APPDATA") + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG).replace("\\", GDE.FILE_SEPARATOR_UNIX)																																									//
-			: GDE.IS_LINUX ? System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "." + GDE.NAME_LONG																																															//
-					: GDE.IS_MAC ? System.getProperty("user.home") + GDE.FILE_SEPARATOR_UNIX + "Library" + GDE.FILE_SEPARATOR_UNIX + "Application Support" + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG										//
+			? (System.getenv("APPDATA") + GDE.STRING_FILE_SEPARATOR_UNIX + GDE.NAME_LONG).replace("\\", GDE.STRING_FILE_SEPARATOR_UNIX)																																									//
+			: GDE.IS_LINUX ? System.getProperty("user.home") + GDE.STRING_FILE_SEPARATOR_UNIX + "." + GDE.NAME_LONG																																															//
+					: GDE.IS_MAC ? System.getProperty("user.home") + GDE.STRING_FILE_SEPARATOR_UNIX + "Library" + GDE.STRING_FILE_SEPARATOR_UNIX + "Application Support" + GDE.STRING_FILE_SEPARATOR_UNIX + GDE.NAME_LONG										//
 							: "";
 
-	public static final String							SETTINGS_FILE_PATH								= GDE.APPL_HOME_PATH + GDE.FILE_SEPARATOR_UNIX + GDE.NAME_LONG + ".properties";																							//$NON-NLS-1$
+	public static final String							SETTINGS_FILE_PATH								= GDE.APPL_HOME_PATH + GDE.STRING_FILE_SEPARATOR_UNIX + GDE.NAME_LONG + ".properties";																							//$NON-NLS-1$
 
 	public static final String							STRING_BASE_PACKAGE								= "gde";																																																										//$NON-NLS-1$
 
 	public static final String							BIT_MODE													= System.getProperty("sun.arch.data.model") != null																																					//$NON-NLS-1$
 			? System.getProperty("sun.arch.data.model")																																																																												//$NON-NLS-1$
 			: System.getProperty("com.ibm.vm.bitmode");																																																																												//$NON-NLS-1$
-	public static final String							FILE_SEPARATOR_UNIX								= "/";																																																											//$NON-NLS-1$
-	public static final String							FILE_SEPARATOR_WINDOWS						= "\\";																																																											//$NON-NLS-1$
+	public static final String							STRING_FILE_SEPARATOR_UNIX				= "/";																																																											//$NON-NLS-1$
+	public static final char								CHAR_FILE_SEPARATOR_UNIX					= '/';																																																											//$NON-NLS-1$
+	public static final String							STRING_FILE_SEPARATOR_WINDOWS			= "\\";																																																											//$NON-NLS-1$
+	public static final char								CHAR_FILE_SEPARATOR_WINDOWS				= '\\';																																																											//$NON-NLS-1$
 	public static final String							FILE_SEPARATOR										= System.getProperty("file.separator");																																											//$NON-NLS-1$
 	public static final String							JAVA_IO_TMPDIR										= System.getProperty("java.io.tmpdir").endsWith(GDE.FILE_SEPARATOR)																													//$NON-NLS-1$
 			? System.getProperty("java.io.tmpdir")																																																																														//$NON-NLS-1$
@@ -156,27 +158,39 @@ public class GDE {
 	public static final String							REGEX_FILE_EXTENTION_SEPARATION		= ",|;";																																																								//$NON-NLS-1$
 
 	public final static String							STRING_NEW_LINE										= "\n";																																																											// is OS dependent //$NON-NLS-1$
-	public final static String							STRING_RETURN											= "\r";																																																											// is OS dependent //$NON-NLS-1$
+	public final static char								CHAR_NEW_LINE											= '\n';																																																											// is OS dependent //$NON-NLS-1$
+	public final static char								CHAR_RETURN												= '\r';																																																											// is OS dependent //$NON-NLS-1$
 	public static final String							STRING_MESSAGE_CONCAT							= " - ";																																																										//$NON-NLS-1$
 	public static final String							STRING_DASH												= "-";																																																											//$NON-NLS-1$
+	public static final char								CHAR_DASH													= '-';																																																											//$NON-NLS-1$
 	public static final String							STRING_UNDER_BAR									= "_";																																																											//$NON-NLS-1$
+	public static final char								CHAR_UNDER_BAR										= '_';																																																											//$NON-NLS-1$
 	public static final String							STRING_EMPTY											= "";																																																												//$NON-NLS-1$
 	public static final String							STRING_BLANK											= " ";																																																											//$NON-NLS-1$
+	public static final char								CHAR_BLANK												= ' ';																																																											//$NON-NLS-1$
 	public static final String							STRING_URL_BLANK									= "%20";																																																										//$NON-NLS-1$
 	public static final String							STRING_COLON											= ":";																																																											//$NON-NLS-1$
+	public static final char								CHAR_COLON												= ':';																																																											//$NON-NLS-1$
 	public static final String							STRING_BLANK_COLON_BLANK					= " : ";																																																										//$NON-NLS-1$
 	public static final String							STRING_COMMA											= ",";																																																											//$NON-NLS-1$
+	public static final char								CHAR_COMMA												= ',';																																																											//$NON-NLS-1$
 	public static final String							STRING_COMMA_BLANK								= ", ";																																																											//$NON-NLS-1$
 	public static final String							STRING_SEMICOLON									= ";";																																																											//$NON-NLS-1$
+	public static final char								CHAR_SEMICOLON										= ';';																																																											//$NON-NLS-1$
 	public static final String							STRING_DOT												= ".";																																																											//$NON-NLS-1$
+	public static final char								CHAR_DOT													= '.';																																																											//$NON-NLS-1$
 	public static final String							STRING_EQUAL											= "=";																																																											//$NON-NLS-1$
+	public static final char								CHAR_EQUAL												= '=';																																																											//$NON-NLS-1$
 	public static final String							STRING_STAR												= "*";																																																											//$NON-NLS-1$
+	public static final char								CHAR_STAR													= '*';																																																											//$NON-NLS-1$
 	public static final String							STRING_LEFT_PARENTHESIS						= "(";																																																											//$NON-NLS-1$
 	public static final String							STRING_RIGHT_PARENTHESIS					= ")";																																																											//$NON-NLS-1$
 	public static final String							STRING_RIGHT_PARENTHESIS_BLANK		= ") ";																																																											//$NON-NLS-1$
 	public static final String							STRING_BLANK_LEFT_BRACKET					= " [";																																																											//$NON-NLS-1$
 	public static final String							STRING_LEFT_BRACKET								= "[";																																																											//$NON-NLS-1$
+	public static final char								CHAR_LEFT_BRACKET									= '[';																																																											//$NON-NLS-1$
 	public static final String							STRING_RIGHT_BRACKET							= "]";																																																											//$NON-NLS-1$
+	public static final char								CHAR_RIGHT_BRACKET								= ']';																																																											//$NON-NLS-1$
 	public static final String							STRING_RIGHT_BRACKET_COMMA				= "], ";																																																										//$NON-NLS-1$
 	public static final String							STRING_OR													= "|";																																																											//$NON-NLS-1$
 	public static final String							STRING_DOLLAR											= "$";																																																											//$NON-NLS-1$
@@ -185,6 +199,7 @@ public class GDE {
 	public static final String							STRING_ISO_8895_1									= "ISO-8859-1";																																																							//$NON-NLS-1$
 	public static final String							STRING_BLANK_PLUS_BLANK						= " + ";																																																											//$NON-NLS-1$
 	public static final String							STRING_PLUS												= "+";																																																											//$NON-NLS-1$
+	public static final char								CHAR_PLUS													= '+';																																																											//$NON-NLS-1$
 	public static final String							STRING_MINUS											= "-";																																																											//$NON-NLS-1$
 	public static final String							STRING_TRUE												= "true";																																																										//$NON-NLS-1$
 	public static final String							STRING_FALSE											= "false";																																																									//$NON-NLS-1$
@@ -195,6 +210,7 @@ public class GDE {
 	public static final String							STRING_GREATER										= ">";																																																											//$NON-NLS-1$
 	public static final String							STRING_ELLIPSIS										= "...";																																																								//$NON-NLS-1$
 	public static final String							STRING_PARENT_DIR									= "..";																																																									//$NON-NLS-1$
+	public static final char								CHAR_CSV_SEPARATOR								= ',';																																																									//$NON-NLS-1$
 	public static final String							STRING_CSV_SEPARATOR							= ",";																																																									//$NON-NLS-1$
 	public static final String							STRING_CSV_QUOTE									= "\"";																																																									//$NON-NLS-1$
 	public static final String							STRING_DEVICE_ORIENTED_FOLDER			= "_";																																																									//$NON-NLS-1$
@@ -532,7 +548,7 @@ public class GDE {
 		final Vector<URL> urls = new Vector<URL>();
 		URL url = GDE.class.getProtectionDomain().getCodeSource().getLocation();
 		log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "base URL = " + url.toString()); //$NON-NLS-1$
-		if (url.getPath().endsWith(GDE.FILE_SEPARATOR_UNIX)) { // running inside Eclipse
+		if (url.getPath().endsWith(GDE.STRING_FILE_SEPARATOR_UNIX)) { // running inside Eclipse
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "started inside Eclipse"); //$NON-NLS-1$
 			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(DataExplorer.class.getSimpleName()));
 			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK);
@@ -560,8 +576,8 @@ public class GDE {
 		}
 		else { // started outside java -jar *.jar
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "started outside with: java -jar *.jar"); //$NON-NLS-1$
-			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
-			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX) + GDE.DEVICES_PLUG_IN_DIR;
+			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1);
+			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK).replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX) + GDE.DEVICES_PLUG_IN_DIR;
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "basePath = " + basePath); //$NON-NLS-1$
 			File file = new File(basePath);
 			String[] files = file.list();
@@ -577,8 +593,8 @@ public class GDE {
 			}
 
 			//add the jars located below java/ext
-			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.FILE_SEPARATOR_UNIX) + 1);
-			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK).replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX) + GDE.JAVA_EXT_DIR;
+			basePath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1);
+			basePath = basePath.replace(GDE.STRING_URL_BLANK, GDE.STRING_BLANK).replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX) + GDE.JAVA_EXT_DIR;
 			log.logp(Level.INFO, GDE.$CLASS_NAME, $METHOD_NAME, "basePath = " + basePath); //$NON-NLS-1$
 			file = new File(basePath);
 			files = file.list();

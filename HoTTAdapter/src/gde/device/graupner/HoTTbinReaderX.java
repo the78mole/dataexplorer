@@ -310,7 +310,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 //							printByteValues(timeStep_ms, HoTTbinReaderX.bufB);
 //							printByteValues(timeStep_ms, HoTTbinReaderX.bufC);
 //							printByteValues(timeStep_ms, HoTTbinReaderX.bufD);
-//							HoTTbinReaderX.logx.logp(Level.OFF, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, GDE.STRING_BLANK);
+//							HoTTbinReaderX.logx.logp(Level.OFF, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, GDE.CHAR_BLANK);
 							switch (HoTTbinReaderX.buf[7]) {
 							case 00: //receiver 1
 								parseAddReceiver(HoTTbinReaderX.buf1, HoTTbinReaderX.buf2, HoTTbinReaderX.buf4, HoTTbinReaderX.bufD);
@@ -416,12 +416,12 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		String recordSetNameExtend = GDE.STRING_EMPTY;
 		if (file.getName().contains(GDE.STRING_UNDER_BAR)) {
 			try {
-				Integer.parseInt(file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)));
-				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+				Integer.parseInt(file.getName().substring(0, file.getName().lastIndexOf(GDE.CHAR_UNDER_BAR)));
+				recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.CHAR_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 			}
 			catch (Exception e) {
-				if (file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)).length() <= 8)
-					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.STRING_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
+				if (file.getName().substring(0, file.getName().lastIndexOf(GDE.CHAR_UNDER_BAR)).length() <= 8)
+					recordSetNameExtend = GDE.STRING_BLANK_LEFT_BRACKET + file.getName().substring(0, file.getName().lastIndexOf(GDE.CHAR_UNDER_BAR)) + GDE.STRING_RIGHT_BRACKET;
 			}
 		}
 		else {

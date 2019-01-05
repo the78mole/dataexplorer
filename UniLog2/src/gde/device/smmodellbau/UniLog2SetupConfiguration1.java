@@ -600,7 +600,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 							UniLog2SetupConfiguration1.log.log(Level.FINEST, "gearFactorText.keyReleased, event=" + keyevent); //$NON-NLS-1$
 							try {
 								UniLog2SetupConfiguration1.this.configuration.gearFactor = (short) (Double.parseDouble(UniLog2SetupConfiguration1.this.gearFactorText.getText().trim()
-										.replace(GDE.STRING_COMMA, GDE.STRING_DOT)) * 100);
+										.replace(GDE.CHAR_COMMA, GDE.CHAR_DOT)) * 100);
 								if (UniLog2SetupConfiguration1.this.configuration.gearFactor < 100) {
 									UniLog2SetupConfiguration1.this.configuration.gearFactor = 100;
 									UniLog2SetupConfiguration1.this.gearFactorText.setText(String.format(Locale.ENGLISH, " %.2f", (UniLog2SetupConfiguration1.this.configuration.gearFactor / 100.0))); //$NON-NLS-1$

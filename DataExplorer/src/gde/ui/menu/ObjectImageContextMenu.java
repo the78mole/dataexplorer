@@ -86,10 +86,10 @@ public class ObjectImageContextMenu {
 		String imgFilePath = imgFileDialog.getFilterPath();
 		ObjectImageContextMenu.log.log(Level.FINE, "imgFilePath = " + imgFilePath); //$NON-NLS-1$
 		if (imgFileDialog.getFileName().length() > 4) {
-			if (!Settings.getInstance().getObjectImageFilePath().equalsIgnoreCase(imgFileDialog.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)))
-				Settings.getInstance().setObjectImageFilePath(imgFileDialog.getFilterPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX));
+			if (!Settings.getInstance().getObjectImageFilePath().equalsIgnoreCase(imgFileDialog.getFilterPath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX)))
+				Settings.getInstance().setObjectImageFilePath(imgFileDialog.getFilterPath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX));
 			ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_CHANGED, true);
-			ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, imgFilePath + GDE.FILE_SEPARATOR_UNIX + imgFileDialog.getFileName());
+			ObjectImageContextMenu.this.menu.setData(ObjectImageContextMenu.OBJECT_IMAGE_PATH, imgFilePath + GDE.STRING_FILE_SEPARATOR_UNIX + imgFileDialog.getFileName());
 			ObjectImageContextMenu.this.application.updateObjectImage();
 		}
 	}

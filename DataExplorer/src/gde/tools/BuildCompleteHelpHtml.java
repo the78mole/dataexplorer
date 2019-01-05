@@ -85,8 +85,8 @@ public class BuildCompleteHelpHtml {
 			log.log(Level.INFO, "base URL = " + url.toString()); //$NON-NLS-1$
 			baseFilePath = url.getFile();
 			baseFilePath = baseFilePath.substring(1, baseFilePath.indexOf(GDE.NAME_LONG) + GDE.NAME_LONG.length());
-			String targetPath = baseFilePath + GDE.FILE_SEPARATOR_UNIX + "doc"  + GDE.FILE_SEPARATOR_UNIX;
-			baseFilePath = baseFilePath + GDE.FILE_SEPARATOR_UNIX + "src" + GDE.FILE_SEPARATOR_UNIX + "help";
+			String targetPath = baseFilePath + GDE.STRING_FILE_SEPARATOR_UNIX + "doc"  + GDE.STRING_FILE_SEPARATOR_UNIX;
+			baseFilePath = baseFilePath + GDE.STRING_FILE_SEPARATOR_UNIX + "src" + GDE.STRING_FILE_SEPARATOR_UNIX + "help";
 			
 
 			//iterate over de and en directory
@@ -95,7 +95,7 @@ public class BuildCompleteHelpHtml {
 				writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetPath + SUPPORTED_LANGUAGE_FILEPATHES[i]), "UTF-8")); //$NON-NLS-1$
 				writer.write(SUPPORTED_LANGUAGE_HEADERS[i]);
 					
-				String langFilePath = baseFilePath + GDE.FILE_SEPARATOR_UNIX + SUPPORTED_LANGUAGES[i];
+				String langFilePath = baseFilePath + GDE.STRING_FILE_SEPARATOR_UNIX + SUPPORTED_LANGUAGES[i];
 				log.log(Level.INFO, "langFilePath = " + langFilePath);
 				List<File> files = FileUtils.getFileListing(new File(langFilePath), 4);
 				
@@ -132,7 +132,7 @@ public class BuildCompleteHelpHtml {
 					pluginBaseFilePath = pluginBaseFilePath + "src/help";
 					
 					if (new File(pluginBaseFilePath).exists() && !pluginBaseFilePath.contains(GDE.NAME_LONG) && !pluginBaseFilePath.contains("Sample")) {
-						String pluginLangFilePath = pluginBaseFilePath + GDE.FILE_SEPARATOR_UNIX + SUPPORTED_LANGUAGES[i];
+						String pluginLangFilePath = pluginBaseFilePath + GDE.STRING_FILE_SEPARATOR_UNIX + SUPPORTED_LANGUAGES[i];
 						log.log(Level.INFO, "pluginLangFilePath = " + pluginLangFilePath);
 						
 						files = FileUtils.getFileListing(new File(pluginLangFilePath), 5);

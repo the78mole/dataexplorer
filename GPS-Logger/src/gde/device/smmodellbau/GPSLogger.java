@@ -494,10 +494,10 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				try {
 					GPSLogger.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_NMEA)) {
 							if (selectedImportFile.contains(GDE.STRING_DOT)) {
-								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+								selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.CHAR_DOT));
 							}
 							selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_NMEA;
 						}
@@ -506,7 +506,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = application.getActiveChannelNumber(); 
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 									//check for GPS-Logger containing $UL2
 									DataInputStream binReader = new DataInputStream(new FileInputStream(selectedImportFile));
 									byte[] buffer = new byte[1024];
@@ -715,25 +715,25 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	String getConfigurationFileDirecotry() {
 		if (GPSLogger.selectedSetupFilePath == null) {
 			String searchPath = GDE.OBJECT_KEY == null 
-					? this.getDataBlockPreferredDataLocation().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX)
+					? this.getDataBlockPreferredDataLocation().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX)
 					: FileUtils.getDeviceImportDirectory(this);
 			if (searchPath.contains(GPSLogger.SM_GPS_LOGGER_DIR_STUB)) {
 				searchPath = searchPath.substring(0, searchPath.indexOf(GPSLogger.SM_GPS_LOGGER_DIR_STUB)) + GPSLogger.SM_GPS_LOGGER_INI_DIR;
 			}
 			else {
-				String dataFilePath = Settings.getInstance().getDataFilePath() + GDE.FILE_SEPARATOR_UNIX;
+				String dataFilePath = Settings.getInstance().getDataFilePath() + GDE.STRING_FILE_SEPARATOR_UNIX;
 				if (searchPath.equals(dataFilePath)) {
-					searchPath = searchPath + this.getName() + GDE.FILE_SEPARATOR_UNIX;
+					searchPath = searchPath + this.getName() + GDE.STRING_FILE_SEPARATOR_UNIX;
 				}
 
-				if (searchPath.endsWith(GDE.FILE_SEPARATOR_UNIX))
+				if (searchPath.endsWith(GDE.STRING_FILE_SEPARATOR_UNIX))
 					searchPath = searchPath + GPSLogger.SM_GPS_LOGGER_INI_DIR;
 				else 
-					searchPath = searchPath + GDE.FILE_SEPARATOR_UNIX + GPSLogger.SM_GPS_LOGGER_INI_DIR;
+					searchPath = searchPath + GDE.STRING_FILE_SEPARATOR_UNIX + GPSLogger.SM_GPS_LOGGER_INI_DIR;
 			}
 			return searchPath;
 		}
-		return GPSLogger.selectedSetupFilePath.substring(0, GPSLogger.selectedSetupFilePath.lastIndexOf(GDE.FILE_SEPARATOR_UNIX));
+		return GPSLogger.selectedSetupFilePath.substring(0, GPSLogger.selectedSetupFilePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
 	}
 	
 	/**

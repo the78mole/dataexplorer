@@ -182,7 +182,7 @@ public class UniLog2SetupReaderWriter {
 	void loadSetup() {
 		FileDialog fd = this.application.openFileOpenDialog(this.parent, Messages.getString(MessageIds.GDE_MSGT2501), new String[] { GDE.FILE_ENDING_STAR_INI, GDE.FILE_ENDING_STAR },
 				this.device.getConfigurationFileDirecotry(), this.device.getDefaultConfigurationFileName(), SWT.SINGLE);
-		UniLog2.selectedSetupFilePath = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + fd.getFileName();
+		UniLog2.selectedSetupFilePath = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + fd.getFileName();
 		UniLog2SetupReaderWriter.log.log(java.util.logging.Level.FINE, "selectedSetupFile = " + UniLog2.selectedSetupFilePath); //$NON-NLS-1$
 
 		if (fd.getFileName().length() > 4) {

@@ -403,7 +403,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 								int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000.0);
 								avgText.setText(GDE.STRING_BLANK + avgValue);
 								try {
-									double factor = Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT));
+									double factor = Double.parseDouble(avgFactorText.getText().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT));
 									if (factor >= 1) {
 										lowerLimitText.setText(String.format("%d", (int) (avgValue / factor))); //$NON-NLS-1$
 										upperLimitText.setText(String.format("%d", (int) (avgValue * factor))); //$NON-NLS-1$
@@ -679,8 +679,8 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			if (activeRecordSet != null && measurementOrdinal != null && measurementOrdinal >= 0) {
 				int avgValue = (int) device.translateValue(activeRecordSet.get(measurementOrdinal.intValue()), activeRecordSet.get(measurementOrdinal.intValue()).getAvgValue()/1000.0);
 				try {
-					lowerLimitText.setText(String.format("%d", (int)(avgValue/Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT))))); //$NON-NLS-1$
-					upperLimitText.setText(String.format("%d", (int)(avgValue*Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT))))); //$NON-NLS-1$
+					lowerLimitText.setText(String.format("%d", (int)(avgValue/Double.parseDouble(avgFactorText.getText().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT))))); //$NON-NLS-1$
+					upperLimitText.setText(String.format("%d", (int)(avgValue*Double.parseDouble(avgFactorText.getText().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT))))); //$NON-NLS-1$
 				}
 				catch (Exception e) {
 					// ignore
@@ -699,7 +699,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 
 	void makePersistent() {
 		lowerLimitVelocity = Integer.parseInt(lowerLimitText.getText());
-		avgLimitFactor = Double.parseDouble(avgFactorText.getText().replace(GDE.STRING_COMMA, GDE.STRING_DOT));
+		avgLimitFactor = Double.parseDouble(avgFactorText.getText().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT));
 		upperLimitVelocity = Integer.parseInt(upperLimitText.getText());
 
 		if (application.isObjectoriented()) {

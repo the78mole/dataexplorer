@@ -385,16 +385,16 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 				try {
 					IGCAdapter.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 						
 						if (fd.getFileName().length() > 4) {
 							try {
 								//distinguish between short and long IGC file name
-								int fileNameLength = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.FILE_SEPARATOR_UNIX)+1, selectedImportFile.lastIndexOf(GDE.STRING_DOT)).length();
+								int fileNameLength = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)+1, selectedImportFile.lastIndexOf(GDE.CHAR_DOT)).length();
 								String  recordNameExtend;
 								if (fileNameLength == 8) { //short name 
-									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-1, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT)-1, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 									try {
 										Integer.parseInt(recordNameExtend);
 									}
@@ -403,7 +403,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 									}
 								}
 								else
-									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT)-4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT)-4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 								IGCReaderWriter.read(selectedImportFile, IGCAdapter.this, recordNameExtend, 1);
 							}
 							catch (Throwable e) {

@@ -84,7 +84,7 @@ public class TestSuperClass extends TestCase {
 		}, TESTDATA {
 			@Override
 			Path getDataPath(Path subPath) {
-				String srcDataPath = getLoaderPath().replace(GDE.FILE_SEPARATOR_WINDOWS, GDE.FILE_SEPARATOR_UNIX);
+				String srcDataPath = getLoaderPath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 				if (srcDataPath.endsWith("bin/")) { // running inside eclipse
 					srcDataPath = srcDataPath.substring(0, srcDataPath.indexOf(GDE.NAME_LONG)) + "DataFilesTestSamples/" + GDE.NAME_LONG;
 				}

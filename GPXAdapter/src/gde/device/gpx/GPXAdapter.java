@@ -134,27 +134,27 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 					GPXAdapter.unitMap.put(propertyName.split(GDE.STRING_UNDER_BAR)[1], properties.getProperty(propertyName).trim());
 				}
 				else if (propertyName.startsWith("language")) { //$NON-NLS-1$
-					GPXAdapter.languageMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), properties.getProperty(propertyName).trim());
+					GPXAdapter.languageMap.put(propertyName.substring(propertyName.indexOf(GDE.CHAR_UNDER_BAR)+1), properties.getProperty(propertyName).trim());
 				}
 				else if (propertyName.startsWith("sync")) { //$NON-NLS-1$
-					GPXAdapter.syncMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), true);
+					GPXAdapter.syncMap.put(propertyName.substring(propertyName.indexOf(GDE.CHAR_UNDER_BAR)+1), true);
 				}
 				else if (propertyName.startsWith("ignore")) { //$NON-NLS-1$
-					GPXAdapter.ignoreMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), true);
+					GPXAdapter.ignoreMap.put(propertyName.substring(propertyName.indexOf(GDE.CHAR_UNDER_BAR)+1), true);
 				}
 				else if (propertyName.startsWith("symbol")) { //$NON-NLS-1$
-					GPXAdapter.symbolMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), properties.getProperty(propertyName).trim());
+					GPXAdapter.symbolMap.put(propertyName.substring(propertyName.indexOf(GDE.CHAR_UNDER_BAR)+1), properties.getProperty(propertyName).trim());
 				}
 				else
 					try {
 						if (propertyName.startsWith("factor")) { //$NON-NLS-1$
-							GPXAdapter.factorMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
+							GPXAdapter.factorMap.put(propertyName.substring(propertyName.indexOf(GDE.CHAR_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
 						}
 						else if (propertyName.startsWith("offset")) { //$NON-NLS-1$
-							GPXAdapter.offsetMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
+							GPXAdapter.offsetMap.put(propertyName.substring(propertyName.indexOf(GDE.CHAR_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
 						}
 						else if (propertyName.startsWith("reduction")) { //$NON-NLS-1$
-							GPXAdapter.reductionMap.put(propertyName.substring(propertyName.indexOf(GDE.STRING_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
+							GPXAdapter.reductionMap.put(propertyName.substring(propertyName.indexOf(GDE.CHAR_UNDER_BAR)+1), Double.valueOf(properties.getProperty(propertyName).trim()));
 						}
 					}
 					catch (NumberFormatException e) {
@@ -163,7 +163,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 			}
 		}
 		catch (Exception e) {
-			String preopertyFilePath = Settings.MAPPINGS_DIR_NAME + GDE.FILE_SEPARATOR_UNIX + "GPXAdapter.properties"; //$NON-NLS-1$
+			String preopertyFilePath = Settings.MAPPINGS_DIR_NAME + GDE.STRING_FILE_SEPARATOR_UNIX + "GPXAdapter.properties"; //$NON-NLS-1$
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW1776, new String[] {preopertyFilePath}));
 		}
 	}
@@ -529,13 +529,13 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 				try {
 					GPXAdapter.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = GPXAdapter.this.dialog != null && !GPXAdapter.this.dialog.isDisposed() ? GPXAdapter.this.dialog.getTabFolderSelectionIndex() + 1 : null;
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 								GPXDataReaderWriter.read(selectedImportFile, GPXAdapter.this, recordNameExtend, channelConfigNumber);
 							}
 							catch (Throwable e) {
@@ -553,8 +553,8 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	}
 
 	//	public void open_closeCommPort() {
-	//		String devicePath = this.application.getActiveDevice() != null ? GDE.FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
-	//		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.FILE_SEPARATOR_UNIX;
+	//		String devicePath = this.application.getActiveDevice() != null ? GDE.STRING_FILE_SEPARATOR_UNIX + this.application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+	//		String searchDirectory = Settings.getInstance().getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX;
 	//		if (FileUtils.checkDirectoryExist(this.getDeviceConfiguration().getDataBlockPreferredDataLocation())) {
 	//			searchDirectory = this.getDeviceConfiguration().getDataBlockPreferredDataLocation();
 	//		}
@@ -567,10 +567,10 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	//			@Override
 	//			public void run() {
 	//				for (String tmpFileName : fd.getFileNames()) {
-	//					String selectedImportFile = fd.getFilterPath() + GDE.FILE_SEPARATOR_UNIX + tmpFileName;
+	//					String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
 	//					if (!selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_CSV)) {
 	//						if (selectedImportFile.contains(GDE.STRING_DOT)) {
-	//							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.STRING_DOT));
+	//							selectedImportFile = selectedImportFile.substring(0, selectedImportFile.indexOf(GDE.CHAR_DOT));
 	//						}
 	//						selectedImportFile = selectedImportFile + GDE.FILE_ENDING_DOT_CSV;
 	//					}
@@ -579,7 +579,7 @@ public class GPXAdapter extends DeviceConfiguration implements IDevice {
 	//					if (fd.getFileName().length() > 4) {
 	//						try {
 	//							Integer channelConfigNumber = FlightRecorder.this.application.getActiveChannelNumber();
-	//							String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.STRING_DOT) - 4, selectedImportFile.lastIndexOf(GDE.STRING_DOT));
+	//							String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT) - 4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
 	//
 	//							NMEAReaderWriter.read(selectedImportFile, FlightRecorder.this, recordNameExtend, channelConfigNumber);
 	//						}
