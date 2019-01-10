@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.r2prototyping.S32">S32</name>
         <manufacturer>R2prototyping</manufacturer>
-        <manufacturerURL>http://http://www.r2prototyping.ch/</manufacturerURL>
+        <manufacturerURL>https://www.r2prototyping.ch/</manufacturerURL>
         <group>logger</group>
         <image>S32.png</image>
         <usage>false</usage>

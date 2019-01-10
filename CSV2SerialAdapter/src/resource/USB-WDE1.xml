@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.wb.CSV2SerialAdapter">USB-WDE1</name>
         <manufacturer>ELV GmbH</manufacturer>
-        <manufacturerURL>http://www.elv.de</manufacturerURL>
+        <manufacturerURL>https://www.elv.de</manufacturerURL>
         <group>logger</group>
         <image>USB-WDE1.png</image>
         <usage>false</usage>

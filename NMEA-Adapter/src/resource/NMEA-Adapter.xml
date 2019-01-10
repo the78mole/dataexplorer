@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.nmea.NMEAAdapter">NMEA-Adapter</name>
         <manufacturer>diverse</manufacturer>
-        <manufacturerURL>http://www.nmea.org</manufacturerURL>
+        <manufacturerURL>https://www.nmea.org</manufacturerURL>
         <group>logger</group>
         <image>NMEA-Adapter.png</image>
         <usage>false</usage>

@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.skyrc.D100">D100</name>
         <manufacturer>SKYRC</manufacturer>
-        <manufacturerURL>http://www.skyrc.com</manufacturerURL>
+        <manufacturerURL>https://www.skyrc.com</manufacturerURL>
         <group>charger</group>
         <image>D100.png</image>
         <usage>false</usage>

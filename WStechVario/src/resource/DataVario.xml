@@ -3,7 +3,7 @@
 	<Device>
 		<name>DataVario</name>
 		<manufacturer>WSTech</manufacturer>
-		<manufacturerURL>http://www.wstech.de</manufacturerURL>
+		<manufacturerURL>https://www.wstech.de</manufacturerURL>
 		<group>flightrecorder</group>
 		<image>DataVario.jpg</image>
 		<usage>false</usage>

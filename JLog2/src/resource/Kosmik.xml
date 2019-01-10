@@ -3,7 +3,7 @@
     <Device>
         <name>Kosmik</name>
         <manufacturer>Kontronik</manufacturer>
-        <manufacturerURL>http://www.kontronik.de</manufacturerURL>
+        <manufacturerURL>https://www.kontronik.de</manufacturerURL>
         <group>logger</group>
         <image>Kosmik.jpg</image>
         <usage>false</usage>

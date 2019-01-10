@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.skyrc.MC3000">MC3000</name>
         <manufacturer>SKYRC</manufacturer>
-        <manufacturerURL>http://www.skyrc.com</manufacturerURL>
+        <manufacturerURL>https://www.skyrc.com</manufacturerURL>
         <group>charger</group>
         <image>MC3000.png</image>
         <usage>false</usage>

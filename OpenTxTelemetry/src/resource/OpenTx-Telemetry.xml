@@ -3,7 +3,7 @@
 	<Device>
 		<name implementation="gde.device.opentx.OpenTxAdapter">OpenTx-Telemetry</name>
 		<manufacturer>OpenTx</manufacturer>
-		<manufacturerURL>http://http://www.open-tx.org/</manufacturerURL>
+		<manufacturerURL>https://www.open-tx.org/</manufacturerURL>
 		<group>logger</group>
 		<image>OpenTxTelemetry.png</image>
 		<usage>false</usage>

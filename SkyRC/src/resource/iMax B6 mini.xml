@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.skyrc.IMaxB6USB">iMax B6 mini</name>
         <manufacturer>SkyRC</manufacturer>
-        <manufacturerURL>http://www.skyrc.com</manufacturerURL>
+        <manufacturerURL>https://www.skyrc.com</manufacturerURL>
         <group>charger</group>
         <image>iMax B6 mini.jpg</image>
         <usage>false</usage>

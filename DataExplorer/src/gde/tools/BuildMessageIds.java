@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
 ****************************************************************************************/
 package gde.tools;
 
@@ -46,9 +46,9 @@ public class BuildMessageIds {
 		+ "    GNU General Public License for more details.\n"
 		+ "\n"
 		+ "    You should have received a copy of the GNU General Public License\n"
-		+ "    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.\n"
+		+ "    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.\n"
     + "\n"
-    + "Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann \n"
+    + "Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann \n"
 		+ "****************************************************************************************/\n";
 		
 	final static String classHeader = "/** \n"

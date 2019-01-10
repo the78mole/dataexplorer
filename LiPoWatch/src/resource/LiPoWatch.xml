@@ -3,7 +3,7 @@
     <Device>
         <name>LiPoWatch</name>
         <manufacturer>SM-Modellbau</manufacturer>
-        <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
+        <manufacturerURL>https://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
         <image>LiPoWatch.jpg</image>
         <usage>false</usage>

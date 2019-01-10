@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2017,2018 Thomas Eickert
+    Copyright (c) 2017,2018,2019 Thomas Eickert
 ****************************************************************************************/
 package gde.histo.utils;
 
@@ -32,8 +32,8 @@ import gde.log.Logger;
  * &alpha; is the <em>y-intercept</em>, and &beta; is the <em>slope</em>).
  * It includes the coefficient of determination <em>R</em><sup>2</sup> and the standard deviation of the estimates for the slope.<br>
  * Quadratic regression of the best-fit parabola <em>y = &alpha; + &beta; x + &gamma; x<sup>2</sup></em>.<br>
- * @see <a href="http://algs4.cs.princeton.edu/14analysis/LinearRegression.java.html">Basic algorithm</a>
- * @see <a href="http://www.stksachs.uni-leipzig.de/tl_files/media/pdf/lehrbuecher/informatik/Regressionsanalyse.pdf">Quadratic
+ * @see <a href="https://algs4.cs.princeton.edu/14analysis/LinearRegression.java.html">Basic algorithm</a>
+ * @see <a href="https://www.stksachs.uni-leipzig.de/tl_files/media/pdf/lehrbuecher/informatik/Regressionsanalyse.pdf">Quadratic
  *      regression</a>
  * @author Robert Sedgewick
  * @author Kevin Wayne

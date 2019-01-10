@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2017,2018 Thomas Eickert
+    Copyright (c) 2017,2018,2019 Thomas Eickert
 ****************************************************************************************/
 
 package gde.histo.utils;
@@ -34,7 +34,7 @@ public final class SecureHash {
 	/**
 	 * @param input
 	 * @return the SHA-1 hash value rendered as a hexadecimal number, 40 digits long
-	 * @see <a href=" http://www.sha1-online.com/sha1-java/">Code example</a>
+	 * @see <a href=" https://www.sha1-online.com/sha1-java/">Code example</a>
 	 */
 	public static String sha1(String input) {
 		StringBuilder sb = new StringBuilder();
@@ -55,7 +55,7 @@ public final class SecureHash {
 	 * @param inputStream is the stream which is consumed but NOT closed
 	 * @return the file's full data SHA1 checksum
 	 * @throws IOException
-	 * @see <a href=" http://www.sha1-online.com/sha1-java/">Code example</a>
+	 * @see <a href=" https://www.sha1-online.com/sha1-java/">Code example</a>
 	 */
 	public static String sha1(InputStream inputStream) throws IOException {
 		StringBuilder sb = new StringBuilder();

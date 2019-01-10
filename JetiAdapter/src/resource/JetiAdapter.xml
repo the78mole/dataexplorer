@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.jeti.JetiAdapter">JetiAdapter</name>
         <manufacturer>JETI model s.r.o.</manufacturer>
-        <manufacturerURL>http://www.jetimodel.com</manufacturerURL>
+        <manufacturerURL>https://www.jetimodel.com</manufacturerURL>
         <group>logger</group>
         <image>JetiAdapter.png</image>
         <usage>false</usage>

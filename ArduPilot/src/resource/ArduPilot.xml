@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.ardupilot.ArduPilot">ArduPilot</name>
         <manufacturer>ArduPilot</manufacturer>
-        <manufacturerURL>http://ardupilot.org/</manufacturerURL>
+        <manufacturerURL>https://ardupilot.org/</manufacturerURL>
         <group>logger</group>
         <image>ArduPilot.png</image>
         <usage>false</usage>

@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2017,2018 Thomas Eickert
+    Copyright (c) 2017,2018,2019 Thomas Eickert
 ****************************************************************************************/
 
 package gde.histo.utils;
@@ -149,7 +149,7 @@ public class GpsCoordinate implements Comparable<GpsCoordinate> {
 	 * particularly well-conditioned for numerical computation even at small distances.
 	 * @param yourCoordinate
 	 * @return the great circle distance in km
-	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Latitude / longitude formulae</a>
+	 * @see <a href="https://www.movable-type.co.uk/scripts/latlong.html">Latitude / longitude formulae</a>
 	 */
 	public double getDistance(GpsCoordinate yourCoordinate) {
 		double phi1 = Math.toRadians(this.latitude);

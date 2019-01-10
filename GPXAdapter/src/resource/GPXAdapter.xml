@@ -3,7 +3,7 @@
     <Device>
         <name>GPXAdapter</name>
         <manufacturer>GPX</manufacturer>
-        <manufacturerURL>http://www.topografix.com</manufacturerURL>
+        <manufacturerURL>https://www.topografix.com</manufacturerURL>
         <group>logger</group>
         <image>GPXAdapter.png</image>
         <usage>false</usage>

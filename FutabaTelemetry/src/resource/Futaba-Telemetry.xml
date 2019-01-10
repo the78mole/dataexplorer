@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.robbe.FutabaAdapter">Futaba-Telemetry</name>
         <manufacturer>Robbe/Futaba Modellsport</manufacturer>
-        <manufacturerURL>http://www.futaba-rc.com/</manufacturerURL>
+        <manufacturerURL>https://www.futaba-rc.com/</manufacturerURL>
         <group>logger</group>
         <image>FutabaTelemetry.png</image>
         <usage>false</usage>

@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.wb.Herkules_III_Telemetrie">Herkules_III_Telemetry</name>
         <manufacturer>HerSi Electronic GmbH</manufacturer>
-        <manufacturerURL>http://www.andreasbaier.de</manufacturerURL>
+        <manufacturerURL>https://www.andreasbaier.de</manufacturerURL>
         <group>logger</group>
         <image>Herkules_III_Telemetrie.jpg</image>
         <usage>false</usage>

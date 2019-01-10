@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
+    Copyright (c) 2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
@@ -1000,7 +1000,7 @@ public class JLog2Configuration extends Composite {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							JLog2Configuration.log.log(Level.FINEST, "jlcDownloadButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							JLog2Configuration.this.application.openWebBrowser("http://jlog.hacknet.eu/jlog/");//$NON-NLS-1$
+							JLog2Configuration.this.application.openWebBrowser("https://jlog.hacknet.eu/jlog/");//$NON-NLS-1$
 						}
 					});
 				}
@@ -1016,7 +1016,7 @@ public class JLog2Configuration extends Composite {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							JLog2Configuration.log.log(Level.FINEST, "jlcForumButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-							JLog2Configuration.this.application.openWebBrowser("http://jlog.hacknet.eu/jlog/forum/");//$NON-NLS-1$
+							JLog2Configuration.this.application.openWebBrowser("https://jlog.hacknet.eu/jlog/forum/");//$NON-NLS-1$
 						}
 					});
 				}

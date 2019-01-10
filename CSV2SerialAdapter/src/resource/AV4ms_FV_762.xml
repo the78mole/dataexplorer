@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.wb.AV4ms_FV_762">AV4ms_FV_762</name>
         <manufacturer>Friedrich Mössinger</manufacturer>
-        <manufacturerURL>http://www.accu-select.de</manufacturerURL>
+        <manufacturerURL>https://www.accu-select.de</manufacturerURL>
         <group>charger</group>
         <image>AV4ms_Accu-Select.jpg</image>
         <usage>false</usage>

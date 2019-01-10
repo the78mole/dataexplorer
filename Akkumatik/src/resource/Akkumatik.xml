@@ -3,7 +3,7 @@
     <Device>
         <name>Akkumatik</name>
         <manufacturer>Estner</manufacturer>
-        <manufacturerURL>http://www.akkumatik.de</manufacturerURL>
+        <manufacturerURL>https://www.akkumatik.de</manufacturerURL>
         <group>charger</group>
         <image>Akkumatik.jpg</image>
         <usage>false</usage>

@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.simprop.GigaLogger">GigaLogger</name>
         <manufacturer>Simprop Electronic</manufacturer>
-        <manufacturerURL>http://www.simprop.de</manufacturerURL>
+        <manufacturerURL>https://www.simprop.de</manufacturerURL>
         <group>logger</group>
         <image>GigaLogger.png</image>
         <usage>false</usage>

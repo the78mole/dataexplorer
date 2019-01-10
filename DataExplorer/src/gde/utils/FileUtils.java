@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
 ****************************************************************************************/
 package gde.utils;
 
@@ -1602,7 +1602,7 @@ public class FileUtils {
 		BufferedReader in = null;
 		String[] versionCheck = new String[] { "false", GDE.VERSION.substring(8) }; //$NON-NLS-1$
 		try {
-			URL gdeDownload = new URL("http://www.nongnu.org/dataexplorer/download.html"); //$NON-NLS-1$
+			URL gdeDownload = new URL("https://www.nongnu.org/dataexplorer/download.html"); //$NON-NLS-1$
 			in = new BufferedReader(new InputStreamReader(gdeDownload.openStream()));
 
 			String inputLine;
@@ -1686,7 +1686,7 @@ public class FileUtils {
 	 * <p>
 	 * Since the operation is non-atomic, the returned value may be inaccurate.
 	 * However, this method is quick and does its best.
-	 * @see <a href="http://stackoverflow.com/a/19877372">Code example</a>
+	 * @see <a href="https://stackoverflow.com/a/19877372">Code example</a>
 	 */
 	public static long size(Path path) {
 		final AtomicLong size = new AtomicLong(0);

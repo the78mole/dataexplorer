@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2017,2018 Thomas Eickert
+    Copyright (c) 2017,2018,2019 Thomas Eickert
 ****************************************************************************************/
 package gde.histo.ui;
 
@@ -203,7 +203,7 @@ public class HistoTableWindow extends CTabItem {
 			 * the TableCursor has already internally processed the home/end keyevent and changed the row/column.
 			 * Therefore, we need a Vector that stores the last cell positions, so we can access the position before the current position.
 			 * @param col
-			 * @see <a href="http://www.javadocexamples.com/org/eclipse/swt/custom/org.eclipse.swt.custom.TableCursor-source.html">TableCursor
+			 * @see <a href="https://www.javadocexamples.com/org/eclipse/swt/custom/org.eclipse.swt.custom.TableCursor-source.html">TableCursor
 			 *      source</a>
 			 */
 			private void workaroundTableCursor(int col) {

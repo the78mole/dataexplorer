@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
@@ -2467,7 +2467,7 @@ class SynchronousCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 		}
 
 		// super.toArray() may misbehave if size() is inaccurate, at least on old versions of Android.
-		// https://code.google.com/p/android/issues/detail?id=36519 / http://r.android.com/47508
+		// https://code.google.com/p/android/issues/detail?id=36519 / https://r.android.com/47508
 
 		@Override
 		public Object[] toArray() {
@@ -2567,7 +2567,7 @@ class SynchronousCache<K, V> extends AbstractMap<K, V> implements ConcurrentMap<
 		}
 
 		// super.toArray() may misbehave if size() is inaccurate, at least on old versions of Android.
-		// https://code.google.com/p/android/issues/detail?id=36519 / http://r.android.com/47508
+		// https://code.google.com/p/android/issues/detail?id=36519 / https://r.android.com/47508
 
 		@Override
 		public Object[] toArray() {

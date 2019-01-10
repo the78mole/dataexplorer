@@ -3,7 +3,7 @@
     <Device>
         <name>iCharger308DUO</name>
         <manufacturer>Junsi</manufacturer>
-        <manufacturerURL>http://www.jun-si.com</manufacturerURL>
+        <manufacturerURL>https://www.jun-si.com</manufacturerURL>
         <group>charger</group>
         <image>iCharger308DUO.png</image>
         <usage>false</usage>

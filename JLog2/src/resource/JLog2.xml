@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.smmodellbau.JLog2">JLog2</name>
         <manufacturer>SM-Modellbau</manufacturer>
-        <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
+        <manufacturerURL>https://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
         <image>JLog2.png</image>
         <usage>false</usage>

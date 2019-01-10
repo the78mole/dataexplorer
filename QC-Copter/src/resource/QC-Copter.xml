@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.tttronix.QcCopter">QC-Copter</name>
         <manufacturer>tt-tronix</manufacturer>
-        <manufacturerURL>http://www.qc-copter.de</manufacturerURL>
+        <manufacturerURL>https://www.qc-copter.de</manufacturerURL>
         <group>control-unit</group>
         <image>QC-Copter.png</image>
         <usage>false</usage>

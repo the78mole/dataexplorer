@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
 ****************************************************************************************/
 package gde.tools;
 
@@ -44,9 +44,9 @@ public class ReverseCorrectMessagesIds {
 	+ "#    DataExplorer is distributed in the hope that it will be useful, \n"
 	+ "#    but WITHOUT ANY WARRANTY; without even the implied warranty of \n" + "#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
 	+ "#    GNU General Public License for more details. \n" + "# \n" + "#    You should have received a copy of the GNU General Public License \n"
-	+ "#    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>. \n"
+	+ "#    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>. \n"
 	+ "#\n"
-	+ "#Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann \n"
+	+ "#Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann \n"
 	+ "#****************************************************************************************/ \n"
 	+ "# DataExplorer message file Locale.GERMANY Winfried Brügmann  - 22 Jan 2008 \n" + " \n" 
 	+ "# GDE_MSGE0000 -> error messages \n"

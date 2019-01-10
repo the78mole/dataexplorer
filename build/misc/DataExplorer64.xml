@@ -8,8 +8,8 @@
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
-  <downloadUrl>http://www.oracle.com/technetwork/java/javase/downloads/server-jre8-downloads-2133154.html</downloadUrl>
-  <supportUrl>http://savannah.nongnu.org/projects/dataexplorer</supportUrl>
+  <downloadUrl>https://www.oracle.com/technetwork/java/javase/downloads/server-jre8-downloads-2133154.html</downloadUrl>
+  <supportUrl>https://savannah.nongnu.org/projects/dataexplorer</supportUrl>
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
@@ -29,7 +29,6 @@
     <initialHeapSize>64</initialHeapSize>
     <maxHeapSize>3092</maxHeapSize>
     <opt>-Dfile.encoding=UTF-8</opt>
-    <opt>-Dcom.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize</opt>
   </jre>
   <messages>
     <startupErr>An error occurred while starting the application.</startupErr>

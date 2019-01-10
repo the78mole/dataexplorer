@@ -3,7 +3,7 @@
     <Device>
         <name>Pulsar3</name>
         <manufacturer>Elprog</manufacturer>
-        <manufacturerURL>http://www.elprog.com.pl/english</manufacturerURL>
+        <manufacturerURL>https://www.elprog.com.pl/english</manufacturerURL>
         <group>charger</group>
         <image>Pulsar3.png</image>
         <usage>false</usage>

@@ -12,15 +12,15 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
 		DataExplorer uses Guava 22.0, released May 22, 2017,
-		which is available from http://code.google.com/p/guava-libraries/.
+		which is available from https://code.google.com/p/guava-libraries/.
 		Guava is subject to the Apache License v. 2.0:
 		https://github.com/google/guava/blob/master/COPYING
 
 		Copyright 2017 Google Inc.
-    Copyright (c) 2017,2018 Thomas Eickert
+    Copyright (c) 2017,2018,2019 Thomas Eickert
 ****************************************************************************************/
 
 package gde.histo.cache;

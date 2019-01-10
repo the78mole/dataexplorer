@@ -12,10 +12,10 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
-    					2017,2018 Thomas Eickert
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
+    					2017,2018,2019 Thomas Eickert
 ****************************************************************************************/
 package gde.ui;
 
@@ -3182,7 +3182,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 					@Override
 					public void run() {
 						try {
-							String downloadUrl = "http://download.savannah.gnu.org/releases/dataexplorer/";
+							String downloadUrl = "https://download.savannah.gnu.org/releases/dataexplorer/";
 							String arch = System.getProperty("sun.arch.data.model");
 							String version = versionCheck[1];
 							String filename = GDE.STRING_EMPTY;

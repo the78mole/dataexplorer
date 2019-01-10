@@ -3,7 +3,7 @@
     <Device>
         <name>Picolario2</name>
         <manufacturer>Renschler</manufacturer>
-        <manufacturerURL>http://www.renschler.de</manufacturerURL>
+        <manufacturerURL>https://www.renschler.de</manufacturerURL>
         <group>logger</group>
         <image>Picolario.jpg</image>
         <usage>false</usage>

@@ -12,10 +12,10 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
-    							2016,2017,2018 Thomas Eickert
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
+    							2016,2017,2018,2019 Thomas Eickert
 ****************************************************************************************/
 package gde.config;
 
@@ -258,7 +258,7 @@ public final class Settings extends Properties {
 	public static final String			HISTO_EXCLUSIONS_FILE_NAME			= ".gdeignore";																																										//$NON-NLS-1$
 	public static final String			HISTO_EXCLUSIONS_DIR_NAME				= ".gdeignore";																																										//$NON-NLS-1$
 	public static final String			GPS_LOCATIONS_DIR_NAME					= "Locations";																																										//$NON-NLS-1$
-	public static final String			GPS_API_URL											= "http://maps.googleapis.com/maps/api/geocode/xml?latlng=";																			//$NON-NLS-1$
+	public static final String			GPS_API_URL											= "https://maps.googleapis.com/maps/api/geocode/xml?latlng=";																			//$NON-NLS-1$
 	public static final String			HISTO_INCLUSIONS_FILE_NAME			= ".gdeinclude";																																									//$NON-NLS-1$
 	public static final String			HISTO_INCLUSIONS_DIR_NAME				= ".gdeinclude";																																									//$NON-NLS-1$
 	public final static String			HISTO_OBJECTS_DIR_NAME					= "Fleet";																																												//$NON-NLS-1$

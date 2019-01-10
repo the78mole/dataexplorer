@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
 ****************************************************************************************/
 package gde.ui.tab;
 
@@ -280,7 +280,7 @@ public class DataTableWindow extends CTabItem {
 			 * Problem: When our code for the TableCursor keyReleased() is reached,
 			 * the TableCursor has already internally processed the home/end keyevent
 			 * and changed the row/column, see:
-			 * http://www.javadocexamples.com/org/eclipse/swt/custom/org.eclipse.swt.custom.TableCursor-source.html
+			 * https://www.javadocexamples.com/org/eclipse/swt/custom/org.eclipse.swt.custom.TableCursor-source.html
 			 *
 			 * Therefore, we need a Vector that stores the last cell positions, so we can
 			 * access the position before the current position.

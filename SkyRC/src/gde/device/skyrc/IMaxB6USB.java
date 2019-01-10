@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2018 Winfried Bruegmann
+    Copyright (c) 2018,2019 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.skyrc;
 

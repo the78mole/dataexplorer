@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.csv.ImportAdapter">Tesla</name>
         <manufacturer>Tesla</manufacturer>
-        <manufacturerURL>http://www.tesla.com/</manufacturerURL>
+        <manufacturerURL>https://www.tesla.com/</manufacturerURL>
         <group>logger</group>
         <image>Tesla.png</image>
         <usage>false</usage>

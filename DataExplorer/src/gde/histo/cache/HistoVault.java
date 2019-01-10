@@ -18,9 +18,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2017,2018 Thomas Eickert
+    Copyright (c) 2017,2018,2019 Thomas Eickert
 ****************************************************************************************/
 
 package gde.histo.cache;
@@ -57,31 +57,31 @@ import gde.GDE;
  * <pre>
  * &lt;complexType name="histoVault">
  *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *     &lt;restriction base="{https://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="vaultName" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="vaultDirectory" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="vaultReaderSettings" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="vaultCreated_ms" type="{http://www.w3.org/2001/XMLSchema}long"/>
- *         &lt;element name="vaultDataExplorerVersion" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="vaultDeviceKey" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="vaultDeviceName" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="vaultChannelNumber" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="vaultObjectKey" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="vaultSamplingTimespan_ms" type="{http://www.w3.org/2001/XMLSchema}long"/>
- *         &lt;element name="logLinkPath" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="logFilePath" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="logFileLastModified" type="{http://www.w3.org/2001/XMLSchema}long"/>
- *         &lt;element name="logFileLength" type="{http://www.w3.org/2001/XMLSchema}long"/>
- *         &lt;element name="logObjectDirectory" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="logFileVersion" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="logRecordSetSize" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="logRecordSetOrdinal" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="logRecordsetBaseName" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="logDeviceName" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="logChannelNumber" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="logObjectKey" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="logStartTimestamp_ms" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="vaultName" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultDirectory" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultReaderSettings" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultCreated_ms" type="{https://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="vaultDataExplorerVersion" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultDeviceKey" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultDeviceName" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultChannelNumber" type="{https://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="vaultObjectKey" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="vaultSamplingTimespan_ms" type="{https://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="logLinkPath" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="logFilePath" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="logFileLastModified" type="{https://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="logFileLength" type="{https://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="logObjectDirectory" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="logFileVersion" type="{https://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="logRecordSetSize" type="{https://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="logRecordSetOrdinal" type="{https://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="logRecordsetBaseName" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="logDeviceName" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="logChannelNumber" type="{https://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="logObjectKey" type="{https://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="logStartTimestamp_ms" type="{https://www.w3.org/2001/XMLSchema}long"/>
  *         &lt;element name="measurements" type="{}compartmentsType"/>
  *         &lt;element name="settlements" type="{}compartmentsType"/>
  *         &lt;element name="scores" type="{}pointsType"/>

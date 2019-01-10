@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.skyrc.Q200">Q200-Set</name>
         <manufacturer>SKYRC</manufacturer>
-        <manufacturerURL>http://www.skyrc.com</manufacturerURL>
+        <manufacturerURL>https://www.skyrc.com</manufacturerURL>
         <group>charger</group>
         <image>Q200.png</image>
         <usage>false</usage>

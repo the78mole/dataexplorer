@@ -3,6 +3,10 @@ Development history / change log, please read from bottom up
 Version 3.3.6 - xx yyy 2019
 Generic changes/fixes
 	* use char instead of string const. while string operations for performance reasons
+	* update SWT to version 4.9, last version 32 bit versions distributed
+	* update copyright to 2019
+	* update all http URLs to https if possible
+	* update jaxb jars and remove disabling of optimization statement
 
 Device specific changes/fixes
 	* Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)

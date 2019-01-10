@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.weatronic.WeatronicAdapter">Weatronic-Telemetry</name>
         <manufacturer>Weatronic</manufacturer>
-        <manufacturerURL>http://www.weatronic.com</manufacturerURL>
+        <manufacturerURL>https://www.weatronic.com</manufacturerURL>
         <group>logger</group>
         <image>Weatronic-Telemetry.png</image>
         <usage>false</usage>

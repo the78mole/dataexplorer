@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.smmodellbau.UniLog2">UniLog2</name>
         <manufacturer>SM-Modellbau</manufacturer>
-        <manufacturerURL>http://www.sm-modellbau.de</manufacturerURL>
+        <manufacturerURL>https://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
         <image>UniLog2.jpg</image>
         <usage>false</usage>

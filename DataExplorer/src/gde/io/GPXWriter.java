@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018 Winfried Bruegmann
+    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
 ****************************************************************************************/
 package gde.io;
 
@@ -60,18 +60,18 @@ public class GPXWriter {
 
 	static final String				header_xml			= "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 	static final String				header_gpx			= "<gpx version=\"1.1\" creator=\"GNU DataExplorer\">" + GDE.LINE_SEPARATOR;	//$NON-NLS-1$
-	static final String				header_garmin		= "<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:gpxx=\"http://www.garmin.com/xmlschemas/GpxExtensions/v3\" xmlns:gpxtrkx=\"http://www.garmin.com/xmlschemas/TrackStatsExtension/v1\" xmlns:wptx1=\"http://www.garmin.com/xmlschemas/WaypointExtension/v1\" xmlns:gpxtpx=\"http://www.garmin.com/xmlschemas/TrackPointExtension/v1\" xmlns:gpxacc=\"http://www.garmin.com/xmlschemas/AccelerationExtension/v1\" creator=\"GNU DataExplorer\" version=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www8.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackStatsExtension/v1 http://www8.garmin.com/xmlschemas/TrackStatsExtension.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd http://www.garmin.com/xmlschemas/AccelerationExtension/v1 http://www.garmin.com/xmlschemas/AccelerationExtensionv1.xsd\">" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
-//static final String				header_garmin		= "<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:gpxacc=\"http://www.garmin.com/xmlschemas/AccelerationExtension/v1\" version=\"1.1\" creator=\"GNU DataExplorer\">" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
+	static final String				header_garmin		= "<gpx xmlns=\"https://www.topografix.com/GPX/1/1\" xmlns:gpxx=\"https://www.garmin.com/xmlschemas/GpxExtensions/v3\" xmlns:gpxtrkx=\"https://www.garmin.com/xmlschemas/TrackStatsExtension/v1\" xmlns:wptx1=\"https://www.garmin.com/xmlschemas/WaypointExtension/v1\" xmlns:gpxtpx=\"https://www.garmin.com/xmlschemas/TrackPointExtension/v1\" xmlns:gpxacc=\"https://www.garmin.com/xmlschemas/AccelerationExtension/v1\" creator=\"GNU DataExplorer\" version=\"1.1\" xmlns:xsi=\"https://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://www.topografix.com/GPX/1/1 https://www.topografix.com/GPX/1/1/gpx.xsd https://www.garmin.com/xmlschemas/GpxExtensions/v3 https://www8.garmin.com/xmlschemas/GpxExtensionsv3.xsd https://www.garmin.com/xmlschemas/TrackStatsExtension/v1 https://www8.garmin.com/xmlschemas/TrackStatsExtension.xsd https://www.garmin.com/xmlschemas/WaypointExtension/v1 https://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd https://www.garmin.com/xmlschemas/TrackPointExtension/v1 https://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd https://www.garmin.com/xmlschemas/AccelerationExtension/v1 https://www.garmin.com/xmlschemas/AccelerationExtensionv1.xsd\">" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
+//static final String				header_garmin		= "<gpx xmlns=\"https://www.topografix.com/GPX/1/1\" xmlns:gpxacc=\"https://www.garmin.com/xmlschemas/AccelerationExtension/v1\" version=\"1.1\" creator=\"GNU DataExplorer\">" + GDE.LINE_SEPARATOR; //$NON-NLS-1$
 
 	static final String				footer					= "</gpx>"  + GDE.LINE_SEPARATOR;
 
 	static final String				metadata				= "  <metadata>" + GDE.LINE_SEPARATOR
-			+ "    <link href=\"http://www.nongnu.org/dataexplorer\">" + GDE.LINE_SEPARATOR
+			+ "    <link href=\"https://www.nongnu.org/dataexplorer\">" + GDE.LINE_SEPARATOR
 			+ "      <text>DataExplorer</text>" + GDE.LINE_SEPARATOR
 			+ "    </link>" + GDE.LINE_SEPARATOR
 			+ "    <time>%sT%sZ</time>" + GDE.LINE_SEPARATOR
 			+ "  </metadata>" + GDE.LINE_SEPARATOR;
-	//<metadata><link href="http://www.garmin.com"><text>Garmin International</text></link><time>2013-12-04T12:31:22Z</time></metadata>
+	//<metadata><link href="https://www.garmin.com"><text>Garmin International</text></link><time>2013-12-04T12:31:22Z</time></metadata>
 
 	static final String				track_begin					= "  <trk>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 			+ "    <name>%s</name>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
@@ -137,7 +137,7 @@ public class GPXWriter {
 	        <gpxtpx:cad>55</gpxtpx:cad>
 	      </gpxtpx:TrackPointExtension>
 	      <gpxx:TrackPointExtension />
-	      <acc:AccelerationExtension xmlns:acc="http://www.garmin.com/xmlschemas/AccelerationExtension/v1">
+	      <acc:AccelerationExtension xmlns:acc="https://www.garmin.com/xmlschemas/AccelerationExtension/v1">
 	        <acc:accel offset="9" x="0.1" y="0.9" z="1.3" />
 	        <acc:accel offset="110" x="0.2" y="0.9" z="1.4" />
 	        <acc:accel offset="209" x="0.2" y="0.8" z="1.4" />

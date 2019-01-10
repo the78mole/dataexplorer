@@ -12,9 +12,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with GNU DataExplorer.  If not, see <http://www.gnu.org/licenses/>.
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2017,2018 Thomas Eickert
+    Copyright (c) 2017,2018,2019 Thomas Eickert
 ****************************************************************************************/
 package gde.histo.utils;
 
@@ -118,7 +118,7 @@ public class Quantile {
 	 * erf(1.0E-20) = -3.0000000483809686E-8 // true anser 1.13E-20
 	 * Phi(1.0E-20) = 0.49999998499999976
 	 *
-	 * @see <a href="http://introcs.cs.princeton.edu/java/21function/ErrorFunction.java.html">Error Function</a>
+	 * @see <a href="https://introcs.cs.princeton.edu/java/21function/ErrorFunction.java.html">Error Function</a>
 	 * @author Thomas Eickert
 	 */
 	private static class ErrorFunction {
@@ -177,7 +177,7 @@ public class Quantile {
 
 		/**
 		 * @param other
-		 * @see <a href="http://stats.stackexchange.com/a/56000">Formulae</a>
+		 * @see <a href="https://stats.stackexchange.com/a/56000">Formulae</a>
 		 */
 		public void combine(StatsHelper other) {
 			double tmpAvg = this.avg * count / (count + other.count) + other.avg * other.count / (count + other.count);

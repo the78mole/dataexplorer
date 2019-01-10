@@ -1,5 +1,5 @@
     <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <!-- This is a dummy driver which binds to Junsi iCharger 308/4010 Duo USB interface  -->
     <!-- contains no actual code; its only purpose is to     -->
     <!-- prevent Apple's USBHID driver from exclusively      -->

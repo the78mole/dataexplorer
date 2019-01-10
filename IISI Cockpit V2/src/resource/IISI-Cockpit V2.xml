@@ -3,7 +3,7 @@
     <Device>
         <name implementation="gde.device.isler.IISICockpitV2">IISI-Cockpit V2</name>
         <manufacturer>ESC Electronics Sales and Consulting GmbH</manufacturer>
-        <manufacturerURL>http://www.iisi-rc.com</manufacturerURL>
+        <manufacturerURL>https://www.iisi-rc.com</manufacturerURL>
         <group>logger</group>
         <image>IISI-Cockpit V2.png</image>
         <usage>false</usage>
