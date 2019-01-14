@@ -152,14 +152,14 @@ public class MenuToolBar {
 	public void create() {
 		// long startTime = new Date().getTime();
 		RowLayout comboCompositeLayout = new RowLayout();
-		comboCompositeLayout.marginTop = 4;
+		comboCompositeLayout.marginTop = GDE.IS_LINUX ? 7 : 4;
 		comboCompositeLayout.justify = true;
 		comboCompositeLayout.center = true;
 
 		{ // begin file cool item
-			this.fileCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
+			this.fileCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin file tool bar
-				this.fileToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.fileToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.fileToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				this.fileToolBar.setForeground(this.application.COLOR_BACKGROUND);
 				this.fileCoolItem.setControl(this.fileToolBar);
@@ -285,15 +285,16 @@ public class MenuToolBar {
 				this.fileToolBar.pack();
 				this.toolSize = this.fileToolBar.getSize();
 			} // end file tool bar
+			this.fileCoolItem.setControl(this.fileToolBar);
 			this.fileCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			this.fileCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end file cool item
 
 		{ // begin device cool item
-			this.deviceObjectCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
+			this.deviceObjectCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin device tool bar
-				this.deviceObjectToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.deviceObjectToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.deviceObjectToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				this.deviceObjectCoolItem.setControl(this.deviceObjectToolBar);
 				{
@@ -477,14 +478,15 @@ public class MenuToolBar {
 							}
 						});
 						this.objectSelectComposite.pack();
-						this.comboHeight = (int) (this.objectSelectComposite.getClientArea().height - (GDE.IS_MAC ? 8 : 10) + Settings.getInstance().getFontDisplayDensityAdaptionFactor()/2);
+						this.comboHeight = this.objectSelectComposite.getClientArea().height - 2 * comboCompositeLayout.marginTop;
 						this.objectSelectCombo.setLayoutData(new RowData(200, this.comboHeight));
+						this.objectSelectComposite.pack();
 					}
 					objectSelectComboSep.setWidth(this.objectSelectComposite.getSize().x);
 					objectSelectComboSep.setControl(this.objectSelectComposite);
 				}
 				{
-					this.newObject = new ToolItem(this.deviceObjectToolBar, SWT.CHECK);
+					this.newObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
 					this.newObject.setImage(SWTResourceManager.getImage("gde/resource/NewObj.gif")); //$NON-NLS-1$
 					this.newObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0202));
 					this.newObject.setHotImage(SWTResourceManager.getImage("gde/resource/NewObjHot.gif")); //$NON-NLS-1$
@@ -557,7 +559,7 @@ public class MenuToolBar {
 					});
 				}
 				{
-					this.editObject = new ToolItem(this.deviceObjectToolBar, SWT.CHECK);
+					this.editObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
 					this.editObject.setImage(SWTResourceManager.getImage("gde/resource/EditObj.gif")); //$NON-NLS-1$
 					this.editObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0204));
 					this.editObject.setHotImage(SWTResourceManager.getImage("gde/resource/EditObjHot.gif")); //$NON-NLS-1$
@@ -598,15 +600,16 @@ public class MenuToolBar {
 				this.deviceObjectToolBar.pack();
 				this.toolSize = this.deviceObjectToolBar.getSize();
 			} // end device tool bar
+			this.deviceObjectCoolItem.setControl(this.deviceObjectToolBar);
 			this.deviceObjectCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			this.deviceObjectCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end device cool item
 
 		{ // begin zoom cool item
-			this.zoomCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
+			this.zoomCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin zoom tool bar
-				this.zoomToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.zoomToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.zoomToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				log.log(Level.OFF, "Border width = " + this.zoomToolBar.getBorderWidth());
 				this.zoomCoolItem.setControl(this.zoomToolBar);
@@ -713,15 +716,16 @@ public class MenuToolBar {
 				this.toolSize = this.zoomToolBar.getSize();
 				log.log(Level.FINE, "zoomToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			} // end zoom tool bar
+			this.zoomCoolItem.setControl(this.zoomToolBar);
 			this.zoomCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			this.zoomCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end zoom cool item
 
 		{ // begin port cool item
-			this.portCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
+			this.portCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{
-				this.portToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.portToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.portToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				this.portCoolItem.setControl(this.portToolBar);
 				{
@@ -756,15 +760,16 @@ public class MenuToolBar {
 				this.toolSize = this.portToolBar.getSize();
 				log.log(Level.FINE, "portToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			}
+			this.portCoolItem.setControl(this.portToolBar);
 			this.portCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			this.portCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end port cool item
 
 		{ // begin data cool item (channel select, record select)
-			this.dataCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
+			this.dataCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{
-				this.dataToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.dataToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.dataToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				this.dataCoolItem.setControl(this.dataToolBar);
 				{
@@ -996,15 +1001,16 @@ public class MenuToolBar {
 				this.toolSize = this.dataToolBar.getSize();
 				log.log(Level.FINE, "dataToolBar.size = " + this.toolSize); //$NON-NLS-1$
 			}
+			this.dataCoolItem.setControl(this.dataToolBar);
 			this.dataCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			this.dataCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		}
 
 		{ // begin google earth cool item
-			this.googleEarthCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
+			this.googleEarthCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin file tool bar
-				this.googleEarthToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.googleEarthToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.googleEarthToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				this.googleEarthCoolItem.setControl(this.googleEarthToolBar);
 				{
@@ -1037,18 +1043,19 @@ public class MenuToolBar {
 						}
 					});
 				}
+				this.googleEarthToolBar.pack();
+				this.toolSize = this.googleEarthToolBar.getSize();
 			}
-			this.googleEarthToolBar.pack();
-			this.toolSize = this.googleEarthToolBar.getSize();
+			this.googleEarthCoolItem.setControl(this.googleEarthToolBar);
 			this.googleEarthCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			this.googleEarthCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
 		} // end google earth cool item
 
 		{ // begin help cool item
-			this.helpCoolItem = new CoolItem(this.coolBar, SWT.FLAT);
+			this.helpCoolItem = new CoolItem(this.coolBar, SWT.NONE);
 			{ // begin file tool bar
-				this.helpToolBar = new ToolBar(this.coolBar, SWT.FLAT);
+				this.helpToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.helpToolBar.setBackground(this.application.COLOR_BACKGROUND);
 				this.helpCoolItem.setControl(this.helpToolBar);
 				{
@@ -1089,9 +1096,10 @@ public class MenuToolBar {
 						}
 					});
 				}
+				this.helpToolBar.pack();
+				this.toolSize = this.helpToolBar.getSize();
 			}
-			this.helpToolBar.pack();
-			this.toolSize = this.helpToolBar.getSize();
+			this.helpCoolItem.setControl(this.helpToolBar);
 			this.helpCoolItem.setSize(this.toolSize.x, this.toolSize.y);
 			this.helpCoolItem.setMinimumSize(this.toolSize.x, this.toolSize.y);
 			this.toolBarSizes.append(this.toolSize.x).append(GDE.STRING_COLON).append(this.toolSize.y).append(GDE.STRING_SEMICOLON);
