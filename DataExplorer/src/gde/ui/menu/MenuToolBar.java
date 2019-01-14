@@ -687,7 +687,7 @@ public class MenuToolBar {
 						this.scopePointsComposite.setBackground(this.application.COLOR_BACKGROUND);
 						this.scopePointsComposite.setLayout(comboCompositeLayout);
 						this.scopePointsCombo = new CCombo(this.scopePointsComposite, SWT.BORDER | SWT.LEFT | SWT.READ_ONLY);
-						this.scopePointsCombo.setLayoutData(new RowData(60, this.comboHeight));
+						this.scopePointsCombo.setLayoutData(new RowData(GDE.IS_LINUX ? 80 : 60, this.comboHeight));
 						this.scopePointsCombo.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 						this.scopePointsCombo.setItems(SCOPE_VALUES);
 						this.scopePointsCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
