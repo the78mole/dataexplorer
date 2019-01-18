@@ -48,7 +48,7 @@ public class ParameterConfigControl {
 	final Text					text;
 	final Slider				slider;
 
-	final int						controlHeight	= 20;
+	final int						controlHeight	= GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 	int									offset;
 	final String				format;
 
@@ -100,6 +100,7 @@ public class ParameterConfigControl {
 		this.offset = sliderOffset;
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+		group1Layout.center = true;
 		this.baseComposite.setLayout(group1Layout);
 		this.baseComposite.setBackground(parent.getBackground());
 		{
@@ -116,7 +117,7 @@ public class ParameterConfigControl {
 			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
 			RowData textLData = new RowData();
 			textLData.width = textFieldWidth;
-			textLData.height = this.controlHeight - (GDE.IS_LINUX ? 8 : 5);
+			textLData.height = this.controlHeight;
 			this.text.setLayoutData(textLData);
 			this.text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.text.setEditable(isTextValueEditable);
@@ -170,7 +171,7 @@ public class ParameterConfigControl {
 		{
 			RowData sliderLData = new RowData();
 			sliderLData.width = sliderWidth;
-			sliderLData.height = this.controlHeight - (GDE.IS_MAC ? 3 : 0);
+			sliderLData.height = this.controlHeight;
 			this.slider = new Slider(this.baseComposite, SWT.NONE);
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(sliderMinValue + this.offset);
@@ -229,6 +230,7 @@ public class ParameterConfigControl {
 		this.offset = 0;
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+		group1Layout.center = true;
 		this.baseComposite.setLayout(group1Layout);
 		this.baseComposite.setBackground(parent.getBackground());
 		{
@@ -245,7 +247,7 @@ public class ParameterConfigControl {
 			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
 			RowData textLData = new RowData();
 			textLData.width = textFieldWidth;
-			textLData.height = this.controlHeight - (GDE.IS_LINUX ? 8 : 5);
+			textLData.height = this.controlHeight;
 			this.text.setLayoutData(textLData);
 			this.text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.text.setEditable(isTextValueEditable);
@@ -299,7 +301,7 @@ public class ParameterConfigControl {
 		{
 			RowData sliderLData = new RowData();
 			sliderLData.width = sliderWidth;
-			sliderLData.height = this.controlHeight - (GDE.IS_MAC ? 3 : 0);
+			sliderLData.height = this.controlHeight;
 			this.slider = new Slider(this.baseComposite, SWT.NONE);
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(sliderMinValue);
@@ -343,6 +345,7 @@ public class ParameterConfigControl {
 		this.offset = 0;
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
+		group1Layout.center = true;
 		this.baseComposite.setLayout(group1Layout);
 		this.baseComposite.setBackground(parent.getBackground());
 		{
@@ -359,7 +362,7 @@ public class ParameterConfigControl {
 			this.text = new Text(this.baseComposite, SWT.CENTER | SWT.BORDER);
 			RowData textLData = new RowData();
 			textLData.width = textFieldWidth;
-			textLData.height = this.controlHeight - (GDE.IS_LINUX ? 8 : 5);
+			textLData.height = this.controlHeight;
 			this.text.setLayoutData(textLData);
 			this.text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			this.text.setEditable(false);
@@ -378,7 +381,7 @@ public class ParameterConfigControl {
 		{
 			RowData sliderLData = new RowData();
 			sliderLData.width = sliderWidth;
-			sliderLData.height = this.controlHeight - (GDE.IS_MAC ? 3 : 0);
+			sliderLData.height = this.controlHeight;
 			this.slider = new Slider(this.baseComposite, SWT.NONE);
 			this.slider.setLayoutData(sliderLData);
 			this.slider.setMinimum(0);

@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.DisposeEvent;
@@ -110,7 +111,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Label																	baudeDescription;
 	Group																	portSettingsGroup;
 	CCombo																portSelectCombo;
-	Label																	portDescription;
+	CLabel																portDescription;
 	Group																	serialPortSelectionGroup;
 	Button																voltagePerCellButton;
 	Button																utilityGraphicsButton;
@@ -373,21 +374,23 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 							}
 							{
 								this.serialPortSelectionGroup = new Group(this.composite2, SWT.NONE);
-								this.serialPortSelectionGroup.setLayout(null);
+								RowLayout portSelectionGroupLayout = new RowLayout(SWT.HORIZONTAL);
+								portSelectionGroupLayout.center = true;
+								this.serialPortSelectionGroup.setLayout(portSelectionGroupLayout);
 								this.serialPortSelectionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.serialPortSelectionGroup.setText(Messages.getString(MessageIds.GDE_MSGT0163));
 								this.serialPortSelectionGroup.setBounds(12, 265, 524, 58);
 								{
-									this.portDescription = new Label(this.serialPortSelectionGroup, SWT.NONE);
+									this.portDescription = new CLabel(this.serialPortSelectionGroup, SWT.NONE);
 									this.portDescription.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.portDescription.setText(Messages.getString(MessageIds.GDE_MSGT0164));
-									this.portDescription.setBounds(10, GDE.IS_MAC_COCOA ? 12 : 29, 70, 18);
+									this.portDescription.setLayoutData(new RowData(50, GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18));
 									this.portDescription.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0165));
 								}
 								{
 									this.portSelectCombo = new CCombo(this.serialPortSelectionGroup, SWT.FLAT | SWT.BORDER);
 									this.portSelectCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.portSelectCombo.setBounds(80, GDE.IS_MAC_COCOA ? 10 : 27, 435, GDE.IS_LINUX ? 22 : 20);
+									this.portSelectCombo.setLayoutData(new RowData(440, GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18));
 									this.portSelectCombo.setEditable(false);
 									this.portSelectCombo.setText(Messages.getString(MessageIds.GDE_MSGT0199));
 									this.portSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0165));
@@ -403,6 +406,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										}
 									});
 								}
+								this.serialPortSelectionGroup.layout();
 							}
 							{
 								this.portSettingsGroup = new Group(this.composite2, SWT.NONE);
@@ -542,7 +546,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 								{
 									this.tableTabButton = new Button(this.desktopTabsGroup, SWT.CHECK | SWT.LEFT);
-									this.tableTabButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : GDE.IS_LINUX ? 162 : 165, GDE.IS_WINDOWS ? 25 : 20));
+									this.tableTabButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : 165, GDE.IS_WINDOWS ? 25 : 20));
 									this.tableTabButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.tableTabButton.setText(Messages.getString(MessageIds.GDE_MSGT0178));
 									this.tableTabButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0179));
@@ -557,7 +561,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 								{
 									this.digitalTabButton = new Button(this.desktopTabsGroup, SWT.CHECK | SWT.LEFT);
-									this.digitalTabButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : GDE.IS_LINUX ? 162 : 165, GDE.IS_WINDOWS ? 25 : 20));
+									this.digitalTabButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : 165, GDE.IS_WINDOWS ? 25 : 20));
 									this.digitalTabButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.digitalTabButton.setText(Messages.getString(MessageIds.GDE_MSGT0180));
 									this.digitalTabButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0181));
@@ -572,7 +576,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 								{
 									this.analogTabButton = new Button(this.desktopTabsGroup, SWT.CHECK | SWT.LEFT);
-									this.analogTabButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : GDE.IS_LINUX ? 162 : 165, GDE.IS_WINDOWS ? 25 : 20));
+									this.analogTabButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : 165, GDE.IS_WINDOWS ? 25 : 20));
 									this.analogTabButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.analogTabButton.setText(Messages.getString(MessageIds.GDE_MSGT0182));
 									this.analogTabButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0183));
@@ -590,7 +594,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 								{
 									this.voltagePerCellButton = new Button(this.desktopTabsGroup, SWT.CHECK | SWT.LEFT);
-									this.voltagePerCellButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : GDE.IS_LINUX ? 162 : 165, GDE.IS_WINDOWS ? 25 : 20));
+									this.voltagePerCellButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : 165, GDE.IS_WINDOWS ? 25 : 20));
 									this.voltagePerCellButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.voltagePerCellButton.setText(Messages.getString(MessageIds.GDE_MSGT0184));
 									this.voltagePerCellButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0185));
@@ -598,7 +602,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 								{
 									this.utilityDeviceButton = new Button(this.desktopTabsGroup, SWT.CHECK | SWT.LEFT);
-									this.utilityDeviceButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : GDE.IS_LINUX ? 162 : 165, GDE.IS_WINDOWS ? 25 : 20));
+									this.utilityDeviceButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : 165, GDE.IS_WINDOWS ? 25 : 20));
 									this.utilityDeviceButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.utilityDeviceButton.setText(Messages.getString(MessageIds.GDE_MSGT0224));
 									this.utilityDeviceButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0225));
@@ -606,7 +610,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								}
 								{
 									this.utilityGraphicsButton = new Button(this.desktopTabsGroup, SWT.CHECK | SWT.LEFT);
-									this.utilityGraphicsButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : GDE.IS_LINUX ? 162 : 165, GDE.IS_WINDOWS ? 25 : 20));
+									this.utilityGraphicsButton.setLayoutData(new RowData(GDE.IS_MAC ? 159 : 165, GDE.IS_WINDOWS ? 25 : 20));
 									this.utilityGraphicsButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.utilityGraphicsButton.setText(Messages.getString(MessageIds.GDE_MSGT0226));
 									this.utilityGraphicsButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0227));

@@ -104,7 +104,7 @@ public class MenuToolBar {
 	Composite						scopePointsComposite;
 	CCombo							scopePointsCombo;
 	boolean							isScopePointsCombo		= true;
-	int									comboHeight						= (int) (GDE.WIDGET_FONT_SIZE * (GDE.IS_LINUX ? 2.5 : 1.8));
+	int									comboHeight						= GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18; //(int) (GDE.WIDGET_FONT_SIZE * (GDE.IS_LINUX ? 2.5 : 1.8));
 
 	CoolItem						portCoolItem;
 	ToolBar							portToolBar;
@@ -152,7 +152,7 @@ public class MenuToolBar {
 	public void create() {
 		// long startTime = new Date().getTime();
 		RowLayout comboCompositeLayout = new RowLayout();
-		comboCompositeLayout.marginTop = GDE.IS_LINUX ? 7 : 4;
+		comboCompositeLayout.marginTop = 4;
 		comboCompositeLayout.justify = true;
 		comboCompositeLayout.center = true;
 
@@ -478,9 +478,9 @@ public class MenuToolBar {
 							}
 						});
 						this.objectSelectComposite.pack();
-						this.comboHeight = this.objectSelectComposite.getClientArea().height - 2 * comboCompositeLayout.marginTop;
-						this.objectSelectCombo.setLayoutData(new RowData(200, this.comboHeight));
-						this.objectSelectComposite.pack();
+						//this.comboHeight = this.objectSelectComposite.getClientArea().height - 2 * comboCompositeLayout.marginTop;
+						//this.objectSelectCombo.setLayoutData(new RowData(200, this.comboHeight));
+						//this.objectSelectComposite.pack();
 					}
 					objectSelectComboSep.setWidth(this.objectSelectComposite.getSize().x);
 					objectSelectComboSep.setControl(this.objectSelectComposite);

@@ -29,6 +29,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
@@ -43,7 +44,7 @@ import gde.log.Level;
 public class StatusBar {
 	final Logger	log	= Logger.getLogger(this.getClass().getName());
 
-	final DataExplorer 					application;
+	final DataExplorer 			application;
 	final Composite					statusComposite;
 	Composite								connectionComposite;
 	Label										txText;
@@ -54,11 +55,15 @@ public class StatusBar {
 	CLabel									rxButton;
 	Composite								comComposite;
 	Label										msgLabel;
+	Composite								progressComposite;
 	ProgressBar							progressBar;
 
 	public StatusBar(Composite currentStatusComposite) {
 		this.application = DataExplorer.getInstance();
 		this.statusComposite = currentStatusComposite;
+		RowLayout statusCompositeLayout = new RowLayout(SWT.HORIZONTAL);
+		statusCompositeLayout.center = true;
+		this.statusComposite.setLayout(statusCompositeLayout);
 		this.statusComposite.setBackground(this.application.COLOR_BACKGROUND);
 		this.statusComposite.addPaintListener(new PaintListener() {
 			@Override
@@ -78,13 +83,10 @@ public class StatusBar {
 		{
 			this.connectionComposite = new Composite(this.statusComposite, SWT.NONE);
 			this.connectionComposite.setBackground(this.application.COLOR_BACKGROUND);
-			RowData composite2LData = new RowData();
-			composite2LData.width = 170;
-			composite2LData.height = 23;
 			GridLayout composite2Layout1 = new GridLayout();
 			composite2Layout1.makeColumnsEqualWidth = true;
 			this.connectionComposite.setLayout(composite2Layout1);
-			this.connectionComposite.setLayoutData(composite2LData);
+			this.connectionComposite.setLayoutData(new RowData(170, 24));
 			{
 				this.comComposite = new Composite(this.connectionComposite, SWT.NONE);
 				this.comComposite.setBackground(this.application.COLOR_BACKGROUND);
@@ -139,15 +141,19 @@ public class StatusBar {
 				this.comComposite.pack();
 			}
 			{
-				RowData progressBarLData = new RowData();
-				progressBarLData.width = 250;
-				progressBarLData.height = 20;
-				this.progressBar = new ProgressBar(this.statusComposite, SWT.NONE);
-				this.progressBar.setBackground(this.application.COLOR_BACKGROUND);
-				this.progressBar.setMinimum(0);
-				this.progressBar.setMaximum(100);
-				this.progressBar.setSelection(0);
-				this.progressBar.setLayoutData(progressBarLData);
+				this.progressComposite = new Composite(this.statusComposite, SWT.NONE);
+				this.progressComposite.setBackground(this.application.COLOR_BACKGROUND);
+				FillLayout progressCompositeLayout = new FillLayout(SWT.HORIZONTAL);
+				this.progressComposite.setLayout(progressCompositeLayout);
+				{
+					this.progressBar = new ProgressBar(this.progressComposite, SWT.NONE);
+					this.progressBar.setBounds(2, 2, 250, 20);
+					this.progressBar.setBackground(this.application.COLOR_BACKGROUND);
+					this.progressBar.setMinimum(0);
+					this.progressBar.setMaximum(100);
+					this.progressBar.setSelection(0);
+				}
+				this.progressComposite.pack();
 			}
 			{
 				this.msgLabel = new Label(this.statusComposite, SWT.LEFT | SWT.SINGLE);
@@ -156,6 +162,7 @@ public class StatusBar {
 				this.msgLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 			}
 		}
+		this.statusComposite.pack();
 	}
 
 	/**

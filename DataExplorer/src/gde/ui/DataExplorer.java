@@ -362,14 +362,9 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 				statusCompositeLData.horizontalAlignment = GridData.FILL;
 				statusCompositeLData.verticalAlignment = GridData.END;
 				this.statusComposite.setLayoutData(statusCompositeLData);
-				RowLayout statusCompositeLayout = new RowLayout(SWT.HORIZONTAL);
-				statusCompositeLayout.center = true;
-				this.statusComposite.setLayout(statusCompositeLayout);
-				{
-					this.statusBar = new StatusBar(this.statusComposite);
-					this.statusBar.create();
-					log.log(Level.INFO, "Statusbar created");
-				}
+				this.statusBar = new StatusBar(this.statusComposite);
+				this.statusBar.create();
+				log.info(() -> "Statusbar created");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
