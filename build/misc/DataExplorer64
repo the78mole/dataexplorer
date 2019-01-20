@@ -1,12 +1,12 @@
 #!/bin/bash
 # ***** script to launch DataExplorer ** 30 Dec 2014 WB *****
 #fix Ubuntu Unity problem not displaying sliders set LIBOVERLAY_SCROLLBAR to 0
-export LIBOVERLAY_SCROLLBAR=0
-#fix GTK3 SWT incompatibility
+#export LIBOVERLAY_SCROLLBAR=0
+#fix GTK3 SWT incompatibility for systems still using GTK2
 #refer to bootstrap.log and look for org.eclipse.swt.internal.gtk.version = 2.24.32
-export SWT_GTK3=0
+#export SWT_GTK3=0
 
-echo java -D64 -Dfile.encoding=UTF-8 -jar -Xms64m -Xmx3092m ./DataExplorer.jar
+echo java -Dfile.encoding=UTF-8 -jar -Xms64m -Xmx3092m ./DataExplorer.jar
 echo argument $1
 java -Dfile.encoding=UTF-8 -jar -Xms64m -Xmx3092m ./DataExplorer.jar $1
 
