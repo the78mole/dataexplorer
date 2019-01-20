@@ -77,7 +77,7 @@
 <entry key="3_defMinValue">0.0</entry>
 <entry key="1_isStartEndDefined">false</entry>
 <entry key="8_isStartEndDefined">false</entry>
-<entry key="RecordSet_smoothVoltageCurve">true</entry>
+<entry key="RecordSet_smoothVoltageCurve">false</entry>
 <entry key="13_numberFormat">-1</entry>
 <entry key="4_defMaxValue">0.0</entry>
 <entry key="3_isRoundOut">false</entry>

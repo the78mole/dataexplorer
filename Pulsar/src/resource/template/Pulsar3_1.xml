@@ -131,7 +131,7 @@
 <entry key="55_lineWidth">1</entry>
 <entry key="52_isStartpointZero">false</entry>
 <entry key="53_isPositionLeft">true</entry>
-<entry key="RecordSet_smoothVoltageCurve">true</entry>
+<entry key="RecordSet_smoothVoltageCurve">false</entry>
 <entry key="1_color">255,0,0</entry>
 <entry key="15_lineStyle">1</entry>
 <entry key="24_isVisible">true</entry>

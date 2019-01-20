@@ -124,7 +124,7 @@
 <entry key="1_isStartEndDefined">false</entry>
 <entry key="22_isStartEndDefined">false</entry>
 <entry key="8_isStartEndDefined">false</entry>
-<entry key="RecordSet_smoothVoltageCurve">true</entry>
+<entry key="RecordSet_smoothVoltageCurve">false</entry>
 <entry key="20_numberFormat">-1</entry>
 <entry key="20_lineStyle">1</entry>
 <entry key="13_numberFormat">-1</entry>
