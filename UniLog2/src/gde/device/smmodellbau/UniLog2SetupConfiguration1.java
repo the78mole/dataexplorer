@@ -296,7 +296,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.telemetrieTypeCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
 					RowData telemetrieTypeComboLData = new RowData();
 					telemetrieTypeComboLData.width = 130;
-					telemetrieTypeComboLData.height = GDE.IS_MAC ? 18 : 14;
+					telemetrieTypeComboLData.height = 17;
 					this.telemetrieTypeCombo.setLayoutData(telemetrieTypeComboLData);
 					this.telemetrieTypeCombo.setItems(this.telemetrieTypes);
 					this.telemetrieTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -406,7 +406,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.dataRateCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData dataRateComboLData = new RowData();
 					dataRateComboLData.width = 84;
-					dataRateComboLData.height = GDE.IS_MAC ? 18 : 14;
+					dataRateComboLData.height = 17;
 					this.dataRateCombo.setLayoutData(dataRateComboLData);
 					this.dataRateCombo.setEditable(false);
 					this.dataRateCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -432,7 +432,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.currentSensorCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
 					RowData currentSensorComboLData = new RowData();
 					currentSensorComboLData.width = 84;
-					currentSensorComboLData.height = GDE.IS_MAC ? 18 : 14;
+					currentSensorComboLData.height = 17;
 					this.currentSensorCombo.setLayoutData(currentSensorComboLData);
 					this.currentSensorCombo.setItems(this.currentSensorTypes);
 					this.currentSensorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -462,7 +462,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.a1ModusCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData a1ModusComboLData = new RowData();
 					a1ModusComboLData.width = 105;
-					a1ModusComboLData.height = GDE.IS_MAC ? 18 : 14;
+					a1ModusComboLData.height = 17;
 					this.a1ModusCombo.setLayoutData(a1ModusComboLData);
 					this.a1ModusCombo.setEditable(false);
 					this.a1ModusCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -491,7 +491,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.a2ModusCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData a2ModusComboLData = new RowData();
 					a2ModusComboLData.width = 105;
-					a2ModusComboLData.height = GDE.IS_MAC ? 18 : 14;
+					a2ModusComboLData.height = 17;
 					this.a2ModusCombo.setLayoutData(a2ModusComboLData);
 					this.a2ModusCombo.setEditable(false);
 					this.a2ModusCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -520,7 +520,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.a3ModusCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData a3ModusComboLData = new RowData();
 					a3ModusComboLData.width = 105;
-					a3ModusComboLData.height = GDE.IS_MAC ? 18 : 14;
+					a3ModusComboLData.height = 17;
 					this.a3ModusCombo.setLayoutData(a3ModusComboLData);
 					this.a3ModusCombo.setEditable(false);
 					this.a3ModusCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
@@ -546,8 +546,8 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 				{
 					this.propBladesCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
 					RowData propBladesComboLData = new RowData();
-					propBladesComboLData.width = 60;
-					propBladesComboLData.height = GDE.IS_MAC ? 18 : 14;
+					propBladesComboLData.width = 65;
+					propBladesComboLData.height = 17;
 					this.propBladesCombo.setLayoutData(propBladesComboLData);
 					this.propBladesCombo.setItems(this.numberProbMotorPoles);
 					this.propBladesCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -736,7 +736,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.varioToneCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER | SWT.CENTER);
 					RowData varioToneComboLData = new RowData();
 					varioToneComboLData.width = 84;
-					varioToneComboLData.height = GDE.IS_MAC ? 18 : 14;
+					varioToneComboLData.height = 17;
 					this.varioToneCombo.setLayoutData(varioToneComboLData);
 					this.varioToneCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2522).split(GDE.STRING_COMMA));
 					this.varioToneCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -764,7 +764,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.varioFactorCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER | SWT.CENTER);
 					RowData varioFactorComboLData = new RowData();
 					varioFactorComboLData.width = 84;
-					varioFactorComboLData.height = GDE.IS_MAC ? 18 : 14;
+					varioFactorComboLData.height = 17;
 					this.varioFactorCombo.setLayoutData(varioFactorComboLData);
 					this.varioFactorCombo.setItems(this.varioFactors);
 					this.varioFactorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -792,7 +792,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.varioFilterCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER | SWT.CENTER);
 					RowData varioFilterComboLData = new RowData();
 					varioFilterComboLData.width = 84;
-					varioFilterComboLData.height = GDE.IS_MAC ? 18 : 14;
+					varioFilterComboLData.height = 17;
 					this.varioFilterCombo.setLayoutData(varioFilterComboLData);
 					this.varioFilterCombo.setItems(this.varioFilters);
 					this.varioFilterCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -820,7 +820,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.limiterModusCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER | SWT.CENTER);
 					RowData limiterModusComboLData = new RowData();
 					limiterModusComboLData.width = 84;
-					limiterModusComboLData.height = GDE.IS_MAC ? 18 : 14;
+					limiterModusComboLData.height = 17;
 					this.limiterModusCombo.setLayoutData(limiterModusComboLData);
 					this.limiterModusCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2521).split(GDE.STRING_COMMA));
 					this.limiterModusCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -886,7 +886,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.minMaxRxCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
 					RowData minMaxRxComboLData = new RowData();
 					minMaxRxComboLData.width = 84;
-					minMaxRxComboLData.height = GDE.IS_MAC ? 18 : 14;
+					minMaxRxComboLData.height = 17;
 					this.minMaxRxCombo.setLayoutData(minMaxRxComboLData);
 					this.minMaxRxCombo.setItems(Messages.getString(MessageIds.GDE_MSGT2519).split(GDE.STRING_COMMA));
 					this.minMaxRxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -914,7 +914,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.capacityResetCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
 					RowData capacityResetComboLData = new RowData();
 					capacityResetComboLData.width = 130;
-					capacityResetComboLData.height = GDE.IS_MAC ? 18 : 14;
+					capacityResetComboLData.height = 17;
 					this.capacityResetCombo.setLayoutData(capacityResetComboLData);
 					this.capacityResetCombo.setItems(this.capacityResets);
 					this.capacityResetCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -942,7 +942,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.currentOffsetCombo = new CCombo(this.commonAdjustmentsGroup, SWT.BORDER);
 					RowData currentOffsetComboLData = new RowData();
 					currentOffsetComboLData.width = 84;
-					currentOffsetComboLData.height = GDE.IS_MAC ? 18 : 14;
+					currentOffsetComboLData.height = 17;
 					this.currentOffsetCombo.setLayoutData(currentOffsetComboLData);
 					this.currentOffsetCombo.setItems(this.currentOffsets);
 					this.currentOffsetCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1003,7 +1003,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.autoStartCurrentCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
 					RowData currentTriggerComboLData = new RowData();
 					currentTriggerComboLData.width = 84;
-					currentTriggerComboLData.height = GDE.IS_MAC ? 18 : 14;
+					currentTriggerComboLData.height = 17;
 					this.autoStartCurrentCombo.setLayoutData(currentTriggerComboLData);
 					this.autoStartCurrentCombo.setItems(this.currentStartValues);
 					this.autoStartCurrentCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1053,7 +1053,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.autoStartRxCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
 					RowData rxTriggerComboLData = new RowData();
 					rxTriggerComboLData.width = 84;
-					rxTriggerComboLData.height = GDE.IS_MAC ? 18 : 14;
+					rxTriggerComboLData.height = 17;
 					this.autoStartRxCombo.setLayoutData(rxTriggerComboLData);
 					this.autoStartRxCombo.setItems(this.rxStartValues);
 					this.autoStartRxCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1103,7 +1103,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.autoStartTimeCombo = new CCombo(this.logStartStopGroup, SWT.BORDER);
 					RowData timeTriggerComboLData = new RowData();
 					timeTriggerComboLData.width = 84;
-					timeTriggerComboLData.height = GDE.IS_MAC ? 18 : 14;
+					timeTriggerComboLData.height = 17;
 					this.autoStartTimeCombo.setLayoutData(timeTriggerComboLData);
 					this.autoStartTimeCombo.setItems(this.timeStartValues);
 					this.autoStartTimeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1142,7 +1142,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.autoStopCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData autoStopComboLData = new RowData();
 					autoStopComboLData.width = 84;
-					autoStopComboLData.height = GDE.IS_MAC ? 18 : 14;
+					autoStopComboLData.height = 17;
 					this.autoStopCombo.setLayoutData(autoStopComboLData);
 					this.autoStopCombo.setEditable(false);
 					this.autoStopCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));

@@ -1868,15 +1868,15 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.spektrumAddressLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel1LData = new RowData();
 					addressLabel1LData.width = 140;
-					addressLabel1LData.height = 21;
+					addressLabel1LData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 					this.spektrumAddressLabel.setLayoutData(addressLabel1LData);
 					this.spektrumAddressLabel.setText(Messages.getString(MessageIds.GDE_MSGT2095));
 				}
 				{
 					this.spektrumAddressCombo = new CCombo(this.spektrumAdapterGroup, SWT.BORDER);
 					RowData currentCComboLData = new RowData();
-					currentCComboLData.width = 50;
-					currentCComboLData.height = GDE.IS_MAC ? 18 : 14;
+					currentCComboLData.width = 60;
+					currentCComboLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 					this.spektrumAddressCombo.setLayoutData(currentCComboLData);
 					this.spektrumAddressCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.spektrumAddressCombo.setItems(this.spektrumAddresses);
@@ -1894,8 +1894,8 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				{
 					this.fillerComposite = new Composite(this.spektrumAdapterGroup, SWT.NONE);
 					RowData fillerCompositeRA1LData = new RowData();
-					fillerCompositeRA1LData.width = 280 - 50 - 140;
-					fillerCompositeRA1LData.height = 20;
+					fillerCompositeRA1LData.width = 280;
+					fillerCompositeRA1LData.height = 2;
 					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
 				}
 				{
@@ -1909,7 +1909,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.spektrumEscSensor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
 					RowData analogAlarm1DirectionButtonLData = new RowData();
 					analogAlarm1DirectionButtonLData.width = 280 - this.fillerWidth;
-					analogAlarm1DirectionButtonLData.height = 19;
+					analogAlarm1DirectionButtonLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 					this.spektrumEscSensor.setLayoutData(analogAlarm1DirectionButtonLData);
 					this.spektrumEscSensor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.spektrumEscSensor.setText(Messages.getString(MessageIds.GDE_MSGT2096));
@@ -1935,7 +1935,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.spektrumCurrentSensor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
 					RowData analogAlarm1DirectionButtonLData = new RowData();
 					analogAlarm1DirectionButtonLData.width = 280 - this.fillerWidth;
-					analogAlarm1DirectionButtonLData.height = 19;
+					analogAlarm1DirectionButtonLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 					this.spektrumCurrentSensor.setLayoutData(analogAlarm1DirectionButtonLData);
 					this.spektrumCurrentSensor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.spektrumCurrentSensor.setText(Messages.getString(MessageIds.GDE_MSGT2097));
@@ -1961,7 +1961,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.spektrumVarioSensor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
 					RowData analogAlarm1DirectionButtonLData = new RowData();
 					analogAlarm1DirectionButtonLData.width = 280 - this.fillerWidth;
-					analogAlarm1DirectionButtonLData.height = 19;
+					analogAlarm1DirectionButtonLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 					this.spektrumVarioSensor.setLayoutData(analogAlarm1DirectionButtonLData);
 					this.spektrumVarioSensor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.spektrumVarioSensor.setText(Messages.getString(MessageIds.GDE_MSGT2098));
@@ -1987,7 +1987,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.spektrumLiPoMonitor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
 					RowData analogAlarm1DirectionButtonLData = new RowData();
 					analogAlarm1DirectionButtonLData.width = 280 - this.fillerWidth;
-					analogAlarm1DirectionButtonLData.height = 19;
+					analogAlarm1DirectionButtonLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 					this.spektrumLiPoMonitor.setLayoutData(analogAlarm1DirectionButtonLData);
 					this.spektrumLiPoMonitor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.spektrumLiPoMonitor.setText(Messages.getString(MessageIds.GDE_MSGT2099));

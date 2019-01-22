@@ -827,10 +827,10 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.protocolTypesLabel.setText(Messages.getString(MessageIds.GDE_MSGT2411));
 					this.protocolTypesLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2415));
 					FormData timeZoneOffsetUTCLabelLData = new FormData();
-					timeZoneOffsetUTCLabelLData.width = 80;
-					timeZoneOffsetUTCLabelLData.height = 20;
+					timeZoneOffsetUTCLabelLData.width = 70;
+					timeZoneOffsetUTCLabelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 					timeZoneOffsetUTCLabelLData.bottom = new FormAttachment(1000, 1000, -50);
-					timeZoneOffsetUTCLabelLData.right = new FormAttachment(1000, 1000, -125);
+					timeZoneOffsetUTCLabelLData.right = new FormAttachment(1000, 1000, -130);
 					this.protocolTypesLabel.setLayoutData(timeZoneOffsetUTCLabelLData);
 				}
 				{
@@ -838,8 +838,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.protocolTypesCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.protocolTypesCombo.setItems(HoTTAdapter.Protocol.valuesAsStingArray());
 					FormData timeZoneOffsetUTCComboLData = new FormData();
-					timeZoneOffsetUTCComboLData.width = 75;
-					timeZoneOffsetUTCComboLData.height = 17;
+					timeZoneOffsetUTCComboLData.width = 85;
+					timeZoneOffsetUTCComboLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 					timeZoneOffsetUTCComboLData.bottom = new FormAttachment(1000, 1000, -50);
 					timeZoneOffsetUTCComboLData.right = new FormAttachment(1000, 1000, -40);
 					this.protocolTypesCombo.setLayoutData(timeZoneOffsetUTCComboLData);
@@ -864,8 +864,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 					this.protocolTypesUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2412));
 					this.protocolTypesUnitLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2415));
 					FormData timeZoneOffsetUTCUnitLData = new FormData();
-					timeZoneOffsetUTCUnitLData.width = 35;
-					timeZoneOffsetUTCUnitLData.height = 20;
+					timeZoneOffsetUTCUnitLData.width = 30;
+					timeZoneOffsetUTCUnitLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 					timeZoneOffsetUTCUnitLData.bottom = new FormAttachment(1000, 1000, -50);
 					timeZoneOffsetUTCUnitLData.right = new FormAttachment(1000, 1000, -3);
 					this.protocolTypesUnitLabel.setLayoutData(timeZoneOffsetUTCUnitLData);

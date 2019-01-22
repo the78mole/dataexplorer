@@ -25,6 +25,9 @@ import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.HelpEvent;
@@ -33,24 +36,30 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import gde.GDE;
 import gde.config.Settings;
+import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.log.Level;
 import gde.messages.Messages;
+import gde.ui.MeasurementControlConfigurable;
 import gde.ui.SWTResourceManager;
 
 /**
@@ -63,11 +72,10 @@ public class S32Dialog extends DeviceDialog {
 	CTabFolder							tabFolder, subTabFolder1, subTabFolder2;
 	CTabItem								visualizationTabItem;
 	CTabItem								configurationTabItem;
-	Composite								visualizationMainComposite, uniLogVisualization, mLinkVisualization;
 	Composite								configurationMainComposite;
+	Label										tabItemLabel;
 
 	Button									saveVisualizationButton, inputFileButton, helpButton, closeButton;
-
 
 	final IDevice						device;																																								// get device specific things, get serial port, ...
 	final Settings					settings;																																							// application configuration settings
@@ -78,7 +86,8 @@ public class S32Dialog extends DeviceDialog {
 	boolean									isVisibilityChanged	= false;
 	boolean									isConfigChanged			= false;
 	int											measurementsCount		= 0;
-	final List<CTabItem>		configurations			= new ArrayList<CTabItem>();
+	final List<CTabItem>		csonfigurations			= new ArrayList<CTabItem>();
+	final List<Composite>		measurementTypes		= new ArrayList<Composite>();
 
 	/**
 	 * default constructor initialize all variables required
@@ -111,9 +120,8 @@ public class S32Dialog extends DeviceDialog {
 
 				FormLayout dialogShellLayout = new FormLayout();
 				this.dialogShell.setLayout(dialogShellLayout);
-				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(GDE.IS_LINUX ? 740 : 675, 30 + 25 + 25 + (this.measurementsCount + 1) / 2 * 27 + 50 + 45); //header + tab + label + this.measurementsCount * 26 + buttons
+				this.dialogShell.setSize(GDE.IS_LINUX ? 740 : 675, 500);
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -162,11 +170,6 @@ public class S32Dialog extends DeviceDialog {
 				{
 					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
 					this.tabFolder.setSimple(false);
-					{
-						for (int i = 1; i <= this.device.getChannelCount(); i++) {
-							createVisualizationTabItem(i, this.device.getNumberOfMeasurements(i));
-						}
-					}
 					FormData tabFolderLData = new FormData();
 					tabFolderLData.top = new FormAttachment(0, 1000, 0);
 					tabFolderLData.left = new FormAttachment(0, 1000, 0);
@@ -174,6 +177,11 @@ public class S32Dialog extends DeviceDialog {
 					tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
 					this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.tabFolder.setLayoutData(tabFolderLData);
+					{
+						for (int i = 1; i <= this.device.getChannelCount(); i++) {
+							createVisualizationTabItem(i, this.device.getNumberOfMeasurements(i));
+						}
+					}
 					this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
 				}
 				{
@@ -287,19 +295,59 @@ public class S32Dialog extends DeviceDialog {
 		this.visualizationTabItem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 1 : 0), SWT.NORMAL));
 		this.visualizationTabItem.setText(this.device.getChannelNameReplacement(channelNumber));
 
-		this.visualizationMainComposite = new Composite(this.tabFolder, SWT.NONE);
-		FormLayout visualizationMainCompositeLayout = new FormLayout();
-		this.visualizationMainComposite.setLayout(visualizationMainCompositeLayout);
-		this.visualizationTabItem.setControl(this.visualizationMainComposite);
-		{
-			FormData layoutData = new FormData();
-			layoutData.top = new FormAttachment(0, 1000, 0);
-			layoutData.left = new FormAttachment(0, 1000, 0);
-			layoutData.right = new FormAttachment(1000, 1000, 0);
-			layoutData.bottom = new FormAttachment(1000, 1000, 0);
-			new S32VisualizationControl(this.visualizationMainComposite, layoutData, this, channelNumber, this.device, Messages.getString(MessageIds.GDE_MSGT3809), 0, numMeasurements);
+		ScrolledComposite scolledComposite = new ScrolledComposite(this.tabFolder, SWT.V_SCROLL);
+		scolledComposite.setLayout(new FillLayout());
+		this.visualizationTabItem.setControl(scolledComposite);
 
+		Composite mainTabComposite = new Composite(scolledComposite, SWT.None);
+		GridLayout mainTabCompositeLayout = new GridLayout();
+		mainTabCompositeLayout.makeColumnsEqualWidth = true;
+		mainTabCompositeLayout.numColumns = 2;
+		mainTabComposite.setLayout(mainTabCompositeLayout);
+		mainTabComposite.setSize(610, 350);
+		scolledComposite.setContent(mainTabComposite);
+
+		this.tabItemLabel = new Label(mainTabComposite, SWT.CENTER);
+		GridData tabItemLabelLData = new GridData();
+		tabItemLabelLData.grabExcessHorizontalSpace = true;
+		tabItemLabelLData.horizontalAlignment = GridData.CENTER;
+		tabItemLabelLData.verticalAlignment = GridData.BEGINNING;
+		tabItemLabelLData.heightHint = 18;
+		tabItemLabelLData.widthHint = 600;
+		tabItemLabelLData.horizontalSpan = 2;
+		this.tabItemLabel.setLayoutData(tabItemLabelLData);
+		this.tabItemLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD));
+		this.tabItemLabel.setText(Messages.getString(MessageIds.GDE_MSGT3809));
+	
+		for (int i = 0; i < numMeasurements; i++) { // display actual only the native 31 measurements of JLog2
+			//allow all measurement names, symbols and units to be correctable
+			this.measurementTypes.add(new MeasurementControlConfigurable(mainTabComposite, this, channelNumber, i,
+					this.device.getChannelMeasuremtsReplacedNames(channelNumber).get(i), this.device, 1, GDE.STRING_BLANK + i, GDE.STRING_EMPTY));
 		}
+
+		scolledComposite.addControlListener(new ControlListener() {
+			@Override
+			public void controlResized(ControlEvent evt) {
+				log.log(java.util.logging.Level.FINEST, "scolledComposite.controlResized, event=" + evt); //$NON-NLS-1$
+				int height = 35 + S32Dialog.this.device.getChannelMeasuremtsReplacedNames(S32Dialog.this.tabFolder.getSelectionIndex() + 1).size() * 28 / 2;
+				Channel channel = Channels.getInstance().get(S32Dialog.this.tabFolder.getSelectionIndex() + 1);
+				if (channel != null)
+					if (channel.getActiveRecordSet() != null)
+						height = 35 + (channel.getActiveRecordSet().size() + 1) * 28 / 2;
+				mainTabComposite.setSize(scolledComposite.getClientArea().width, height);
+			}
+
+			@Override
+			public void controlMoved(ControlEvent evt) {
+				log.log(java.util.logging.Level.FINEST, "scolledComposite.controlMoved, event=" + evt); //$NON-NLS-1$
+				int height = 35 + S32Dialog.this.device.getChannelMeasuremtsReplacedNames(S32Dialog.this.tabFolder.getSelectionIndex() + 1).size() * 28 / 2;
+				Channel channel = Channels.getInstance().get(S32Dialog.this.tabFolder.getSelectionIndex() + 1);
+				if (channel != null)
+					if (channel.getActiveRecordSet() != null)
+						height = 35 + (channel.getActiveRecordSet().size() + 1) * 28 / 2;
+				mainTabComposite.setSize(scolledComposite.getClientArea().width, height);
+			}
+		});
 	}
 
 	/**

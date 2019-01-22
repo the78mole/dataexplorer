@@ -708,7 +708,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioFactorCombo = new CCombo(this.gpsLoggerGroup, SWT.BORDER | SWT.CENTER);
 					RowData varioFactorComboLData = new RowData();
 					varioFactorComboLData.width = COMBO_WIDTH;
-					varioFactorComboLData.height = GDE.IS_MAC ? 17 : 14;
+					varioFactorComboLData.height = 17;
 					this.varioFactorCombo.setLayoutData(varioFactorComboLData);
 					this.varioFactorCombo.setItems(this.varioFactors);
 					this.varioFactorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -736,7 +736,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioFilterCombo = new CCombo(this.gpsLoggerGroup, SWT.BORDER | SWT.CENTER);
 					RowData varioFilterComboLData = new RowData();
 					varioFilterComboLData.width = COMBO_WIDTH;
-					varioFilterComboLData.height = GDE.IS_MAC ? 17 : 14;
+					varioFilterComboLData.height = 17;
 					this.varioFilterCombo.setLayoutData(varioFilterComboLData);
 					this.varioFilterCombo.setItems(this.varioFilters);
 					this.varioFilterCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));

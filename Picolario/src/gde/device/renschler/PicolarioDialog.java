@@ -33,6 +33,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -170,15 +172,15 @@ public class PicolarioDialog extends DeviceDialog {
 			{ // group 1
 				this.numberAvailableRecorsSetsGroup1 = new Group(this.dialogShell, SWT.NONE);
 				this.numberAvailableRecorsSetsGroup1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.numberAvailableRecorsSetsGroup1.setLayout(null);
+				this.numberAvailableRecorsSetsGroup1.setLayout(new GridLayout(2, false));
 				this.numberAvailableRecorsSetsGroup1.setText(Messages.getString(MessageIds.GDE_MSGT1200));
-				this.numberAvailableRecorsSetsGroup1.setBounds(10, 5, 320, 60);
+				this.numberAvailableRecorsSetsGroup1.setBounds(10, 5, 320, 55);
 				this.numberAvailableRecorsSetsGroup1.addMouseTrackListener(PicolarioDialog.this.mouseTrackerEnterFadeOut);
 				{
 					this.queryAvailableRecordSetButton = new Button(this.numberAvailableRecorsSetsGroup1, SWT.PUSH | SWT.CENTER);
 					this.queryAvailableRecordSetButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.queryAvailableRecordSetButton.setText(Messages.getString(MessageIds.GDE_MSGT1201));
-					this.queryAvailableRecordSetButton.setBounds(10, GDE.IS_MAC_COCOA ? 10 : 25, 250, 25);
+					this.queryAvailableRecordSetButton.setLayoutData(new GridData(250, 25));
 					this.queryAvailableRecordSetButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
@@ -210,9 +212,10 @@ public class PicolarioDialog extends DeviceDialog {
 					this.numberAvailableRecordSetsLabel = new CLabel(this.numberAvailableRecorsSetsGroup1, SWT.RIGHT | SWT.BORDER);
 					this.numberAvailableRecordSetsLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.numberAvailableRecordSetsLabel.setBackground(DataExplorer.getInstance().COLOR_WHITE);
-					this.numberAvailableRecordSetsLabel.setBounds(270, GDE.IS_MAC_COCOA ? 10 : 25, 30, 24);
+					this.numberAvailableRecordSetsLabel.setLayoutData(new GridData(30, 24));
 					this.numberAvailableRecordSetsLabel.setText(this.numberAvailable);
 				}
+				this.numberAvailableRecorsSetsGroup1.layout();
 			} // end group1
 
 			{ // config tab 2
@@ -234,7 +237,7 @@ public class PicolarioDialog extends DeviceDialog {
 				}
 
 				this.configTabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
-				this.configTabFolder.setBounds(10, 70, 320, 235);
+				this.configTabFolder.setBounds(10, 65, 320, 240);
 				this.configTabFolder.addMouseTrackListener(PicolarioDialog.this.mouseTrackerEnterFadeOut);
 				this.configTabFolder.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -268,7 +271,7 @@ public class PicolarioDialog extends DeviceDialog {
 				this.readDataGroup3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.readDataGroup3.setLayout(null);
 				this.readDataGroup3.setText(Messages.getString(MessageIds.GDE_MSGT1203));
-				this.readDataGroup3.setBounds(10, 310, 320, 195);
+				this.readDataGroup3.setBounds(10, 310, 320, 200);
 				this.readDataGroup3.addMouseTrackListener(PicolarioDialog.this.mouseTrackerEnterFadeOut);
 				{
 					this.switchRecordSetButton = new Button(this.readDataGroup3, SWT.CHECK | SWT.CENTER);

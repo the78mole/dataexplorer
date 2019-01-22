@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -57,25 +57,26 @@ public class S32VisualizationControl extends Composite {
 	Label									measurementUnitLabel;
 	Label									measurementSymbolLabel;
 	Label									tabItemLabel;
+	ScrolledComposite			scolledComposite;
 	Composite							mainTabComposite;
 
 	boolean								isVisibilityChanged	= false;
 
-	final Widget					parent;
+	final Widget					mainTabComosite;
 	final IDevice					device;																																						// get device specific things, get serial port, ...
 	final DataExplorer		application;																																			// interaction with application instance
 	final Channels				channels;																																					// interaction with channels, source of all records
-	final S32Dialog			dialog;
+	final S32Dialog				dialog;
 	final int							channelConfigNumber;
 	final String					typeName;
 	final int							measurementCount;
 	final int							measurementOffset;
 	final List<Composite>	measurementTypes		= new ArrayList<Composite>();
 
-	public S32VisualizationControl(Composite parentComposite, FormData useLayoutData, S32Dialog parentDialog, int useChannelConfigNumber, IDevice useDevice, String useName,
+	public S32VisualizationControl(Composite parentComposite, S32Dialog parentDialog, int useChannelConfigNumber, IDevice useDevice, String useName,
 			int useMeasurementOffset, int useMeasurementCount) {
 		super(parentComposite, SWT.NONE);
-		this.parent = parentComposite;
+		this.mainTabComosite = parentComposite;
 		this.dialog = parentDialog;
 		this.device = useDevice;
 		this.typeName = useName;
@@ -84,10 +85,7 @@ public class S32VisualizationControl extends Composite {
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.measurementOffset = useMeasurementOffset;
 		this.measurementCount = useMeasurementCount;
-		this.setLayoutData(useLayoutData);
-		GridLayout mainTabCompositeLayout = new GridLayout();
-		mainTabCompositeLayout.makeColumnsEqualWidth = true;
-		this.setLayout(mainTabCompositeLayout);
+		this.setLayout(new GridLayout(1, true));
 		this.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent evt) {
@@ -119,12 +117,10 @@ public class S32VisualizationControl extends Composite {
 				this.tabItemLabel.setText(this.typeName);
 			}
 		}
+		
 		{
 			this.mainTabComposite = new Composite(this, SWT.NONE);
-			GridLayout mainTabCompositeLayout = new GridLayout();
-			mainTabCompositeLayout.makeColumnsEqualWidth = true;
-			mainTabCompositeLayout.numColumns = 2;
-			mainTabCompositeLayout.verticalSpacing = 5;
+			GridLayout mainTabCompositeLayout = new GridLayout(2, true);
 			this.mainTabComposite.setLayout(mainTabCompositeLayout);
 
 			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) { // display actual only the native 31 measurements of JLog2

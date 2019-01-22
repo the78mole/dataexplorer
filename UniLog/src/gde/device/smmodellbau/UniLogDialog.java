@@ -38,12 +38,15 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
@@ -99,7 +102,7 @@ public class UniLogDialog extends DeviceDialog {
 	public final static String[]	A3_MODUS_UNITS						= Messages.getString(MessageIds.GDE_MSGT1371).split(GDE.STRING_SEMICOLON);
 
 	CTabItem											configTabItem1, configTabItem2, configTabItem3, configTabItem4;
-	Label													currentSensorLabel, a1ModusLabel, a2ModusLabel, a3ModusLabel;
+	CLabel												currentSensorLabel, a1ModusLabel, a2ModusLabel, a3ModusLabel;
 	CCombo												a1ModusCombo, a2ModusCombo, a3ModusCombo;
 	CCombo												sensorCurrentCombo;
 	Group													sensorGroup;
@@ -165,7 +168,7 @@ public class UniLogDialog extends DeviceDialog {
 	Group													channleConfigGroup;
 	Button												stopLiveGatherButton;
 	Button												editConfigButton;
-	CLabel												memoryDeleteInfo;
+	Text													memoryDeleteInfo;
 
 	CTabItem											telemetryTabItem;
 	UniLogTelemetryTab						telemetryTab;
@@ -269,7 +272,7 @@ public class UniLogDialog extends DeviceDialog {
 				this.dialogShell.setLayout(null);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(642, 446);
+				this.dialogShell.setSize(GDE.IS_LINUX ? 655 : 645, 445);
 				this.dialogShell.addListener(SWT.Traverse, new Listener() {
 		      @Override
 					public void handleEvent(Event event) {
@@ -437,52 +440,56 @@ public class UniLogDialog extends DeviceDialog {
 							{
 								this.statusGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.statusGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-								this.statusGroup.setLayout(null);
+								this.statusGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
 								this.statusGroup.setText(Messages.getString(MessageIds.GDE_MSGT1302));
 								this.statusGroup.setBounds(12, 17, 602, 45);
 								this.statusGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
 								{
+									new Composite(this.statusGroup, SWT.NONE).setLayoutData(new RowData(10, 22));
+								}
+								{
 									this.firmwareText = new CLabel(this.statusGroup, SWT.NONE);
 									this.firmwareText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.firmwareText.setText(Messages.getString(MessageIds.GDE_MSGT1303));
-									this.firmwareText.setBounds(146, GDE.IS_MAC_COCOA ? 0 : 15, 79, 22);
+									this.firmwareText.setLayoutData(new RowData(90, 22));
 								}
 								{
 									this.firmwareVersionLabel = new CLabel(this.statusGroup, SWT.NONE);
 									this.firmwareVersionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.firmwareVersionLabel.setBounds(225, GDE.IS_MAC_COCOA ? 3 : 15, 71, 22);
+									this.firmwareVersionLabel.setLayoutData(new RowData(70, 22));
 									this.firmwareVersionLabel.setText(this.unilogVersion);
 								}
 								{
 									this.serialNumberText = new CLabel(this.statusGroup, SWT.NONE);
 									this.serialNumberText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.serialNumberText.setText(Messages.getString(MessageIds.GDE_MSGT1304));
-									this.serialNumberText.setBounds(12, GDE.IS_MAC_COCOA ? 0 : 15, 42, 22);
+									this.serialNumberText.setLayoutData(new RowData(45, 22));
 								}
 								{
 									this.snLabel = new CLabel(this.statusGroup, SWT.CENTER | SWT.EMBEDDED);
 									this.snLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.snLabel.setBounds(52, GDE.IS_MAC_COCOA ? 0 : 15, 88, 22);
+									this.snLabel.setLayoutData(new RowData(90, 22));
 									this.snLabel.setText(this.serialNumber);
 								}
 								{
 									this.memoryUsageText = new CLabel(this.statusGroup, SWT.NONE);
 									this.memoryUsageText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.memoryUsageText.setText(Messages.getString(MessageIds.GDE_MSGT1305));
-									this.memoryUsageText.setBounds(338, GDE.IS_MAC_COCOA ? 3 : 15, 134, 22);
+									this.memoryUsageText.setLayoutData(new RowData(135, 22));
 								}
 								{
 									this.memUsagePercent = new CLabel(this.statusGroup, SWT.NONE);
 									this.memUsagePercent.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.memUsagePercent.setBounds(472, GDE.IS_MAC_COCOA ? 0 : 15, 59, 22);
+									this.memUsagePercent.setLayoutData(new RowData(70, 22));
 									this.memUsagePercent.setText(this.memoryUsedPercent);
 								}
 								{
 									this.memUsageUnit = new CLabel(this.statusGroup, SWT.NONE);
 									this.memUsageUnit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.memUsageUnit.setText(Messages.getString(MessageIds.GDE_MSGT1306));
-									this.memUsageUnit.setBounds(543, GDE.IS_MAC_COCOA ? 0 : 15, 26, 22);
+									this.memUsageUnit.setLayoutData(new RowData(25, 22));
 								}
+								this.statusGroup.layout();
 							}
 							{
 								this.autoStartGroup = new Group(this.configMainComosite, SWT.NONE);
@@ -490,11 +497,15 @@ public class UniLogDialog extends DeviceDialog {
 								this.autoStartGroup.setText(Messages.getString(MessageIds.GDE_MSGT1309));
 								this.autoStartGroup.setBounds(12, 226, 300, 99);
 								this.autoStartGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+								this.autoStartGroup.setLayout(new GridLayout(3, false));
+								{
+									new Composite(this.autoStartGroup, SWT.NONE).setLayoutData(new GridData(10, 20));
+								}
 								{
 									this.currentTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
 									this.currentTriggerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.currentTriggerButton.setText(Messages.getString(MessageIds.GDE_MSGT1310));
-									this.currentTriggerButton.setBounds(34, GDE.IS_MAC_COCOA ? 7 : 22, 150, 18);
+									this.currentTriggerButton.setLayoutData(new GridData(150, 18));
 									this.currentTriggerButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -504,35 +515,9 @@ public class UniLogDialog extends DeviceDialog {
 									});
 								}
 								{
-									this.timeTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
-									this.timeTriggerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.timeTriggerButton.setText(Messages.getString(MessageIds.GDE_MSGT1311));
-									this.timeTriggerButton.setBounds(34, GDE.IS_MAC_COCOA ? 31 : 46, 150, 18);
-									this.timeTriggerButton.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "timeTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
-										}
-									});
-								}
-								{
-									this.impulseTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
-									this.impulseTriggerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.impulseTriggerButton.setText(Messages.getString(MessageIds.GDE_MSGT1312));
-									this.impulseTriggerButton.setBounds(34, GDE.IS_MAC_COCOA ? 55 : 70, 150, 18);
-									this.impulseTriggerButton.addSelectionListener(new SelectionAdapter() {
-										@Override
-										public void widgetSelected(SelectionEvent evt) {
-											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "impulseTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
-										}
-									});
-								}
-								{
 									this.currentTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.currentTriggerCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.currentTriggerCombo.setBounds(200, GDE.IS_MAC_COCOA ? 7 : 22, 80, GDE.IS_LINUX ? 22 : 20);
+									this.currentTriggerCombo.setLayoutData(new GridData(80, 20));
 									this.currentTriggerCombo.setItems(new String[] { "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", "15", "20", "25", "30", "35", "40", "45", "50" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$
 									this.currentTriggerCombo.select(2);
 									this.currentTriggerCombo.setEditable(false);
@@ -546,9 +531,25 @@ public class UniLogDialog extends DeviceDialog {
 									});
 								}
 								{
+									new Composite(this.autoStartGroup, SWT.NONE).setLayoutData(new GridData(10, 20));
+								}
+								{
+									this.timeTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
+									this.timeTriggerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.timeTriggerButton.setText(Messages.getString(MessageIds.GDE_MSGT1311));
+									this.timeTriggerButton.setLayoutData(new GridData(150, 18));
+									this.timeTriggerButton.addSelectionListener(new SelectionAdapter() {
+										@Override
+										public void widgetSelected(SelectionEvent evt) {
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "timeTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
+										}
+									});
+								}
+								{
 									this.timeTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.timeTriggerCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.timeTriggerCombo.setBounds(200, GDE.IS_MAC_COCOA ? 31 : 46, 80, GDE.IS_LINUX ? 22 : 20);
+									this.timeTriggerCombo.setLayoutData(new GridData(80, 20));
 									this.timeTriggerCombo.setItems(new String[] { "  1", "  2", "  3", "  4", "  5", "  6", "  7", "  8", "  9", " 10", " 11", " 12", " 13", " 14", " 15", " 16", " 17", " 18", " 19", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$ //$NON-NLS-15$ //$NON-NLS-16$ //$NON-NLS-17$ //$NON-NLS-18$ //$NON-NLS-19$
 											" 20", " 30", " 60", " 120" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 									this.timeTriggerCombo.select(16);
@@ -563,9 +564,25 @@ public class UniLogDialog extends DeviceDialog {
 									});
 								}
 								{
+									new Composite(this.autoStartGroup, SWT.NONE).setLayoutData(new GridData(10, 20));
+								}
+								{
+									this.impulseTriggerButton = new Button(this.autoStartGroup, SWT.CHECK | SWT.LEFT);
+									this.impulseTriggerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									this.impulseTriggerButton.setText(Messages.getString(MessageIds.GDE_MSGT1312));
+									this.impulseTriggerButton.setLayoutData(new GridData(150, 18));
+									this.impulseTriggerButton.addSelectionListener(new SelectionAdapter() {
+										@Override
+										public void widgetSelected(SelectionEvent evt) {
+											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "impulseTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
+										}
+									});
+								}
+								{
 									this.impulseTriggerCombo = new CCombo(this.autoStartGroup, SWT.BORDER);
 									this.impulseTriggerCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.impulseTriggerCombo.setBounds(200, GDE.IS_MAC_COCOA ? 55 : 70, 80, GDE.IS_LINUX ? 22 : 20);
+									this.impulseTriggerCombo.setLayoutData(new GridData(80, 20));
 									this.impulseTriggerCombo.setEditable(false);
 									this.impulseTriggerCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.impulseTriggerCombo.setItems(UniLogDialog.RX_AUTO_START_MS);
@@ -578,19 +595,24 @@ public class UniLogDialog extends DeviceDialog {
 										}
 									});
 								}
+								this.autoStartGroup.layout();
 							}
 							{
 								this.motorPropGroup = new Group(this.configMainComosite, SWT.NONE);
 								this.motorPropGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.motorPropGroup.setLayout(null);
 								this.motorPropGroup.setText(Messages.getString(MessageIds.GDE_MSGT1313));
-								this.motorPropGroup.setBounds(12, 117, 300, 96);
+								this.motorPropGroup.setBounds(12, 117, 300, 99);
 								this.motorPropGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+								this.motorPropGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
+								{
+									new Composite(this.motorPropGroup, SWT.NONE).setLayoutData(new RowData(10, 22));
+								}
 								{
 									this.numberPolsButton = new Button(this.motorPropGroup, SWT.RADIO | SWT.LEFT);
 									this.numberPolsButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.numberPolsButton.setText(Messages.getString(MessageIds.GDE_MSGT1314));
-									this.numberPolsButton.setBounds(31, GDE.IS_MAC_COCOA ? 5 : 20, 150, 20);
+									this.numberPolsButton.setLayoutData(new RowData(140, 20));
 									this.numberPolsButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -611,7 +633,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.motorPoleCombo = new CCombo(this.motorPropGroup, SWT.BORDER);
 									this.motorPoleCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.motorPoleCombo.setBounds(198, GDE.IS_MAC_COCOA ? 5 : 20, 63, GDE.IS_LINUX ? 22 : 20);
+									this.motorPoleCombo.setLayoutData(new RowData(60, 20));
 									this.motorPoleCombo.setItems(new String[] { "  2", "  4", "  6", "  8", " 10", " 12", " 14", " 16" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 									this.motorPoleCombo.select(6);
 									this.motorPoleCombo.setEditable(false);
@@ -627,21 +649,21 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.gearLabel = new CLabel(this.motorPropGroup, SWT.LEFT);
 									this.gearLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.gearLabel.setBounds(31, GDE.IS_MAC_COCOA ? 27 : 42, 150, 20);
+									this.gearLabel.setLayoutData(new RowData(150, 20));
 									this.gearLabel.setText(Messages.getString(MessageIds.GDE_MSGT1315));
 								}
 								{
 									this.gearFactorCombo = new Text(this.motorPropGroup, SWT.LEFT | SWT.BORDER);
 									this.gearFactorCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.gearFactorCombo.setBounds(198, GDE.IS_MAC_COCOA ? 27 : 44, 63, GDE.IS_LINUX ? 22 : 20);
+									this.gearFactorCombo.setLayoutData(new RowData(50, 20));
 									this.gearFactorCombo.setText(" 1.0  :  1"); //$NON-NLS-1$
 									this.gearFactorCombo.setEditable(false);
 									this.gearFactorCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 								}
 								{
-									this.gearRatioSlider = new Slider(this.motorPropGroup, SWT.VERTICAL);
+									this.gearRatioSlider = new Slider(this.motorPropGroup, SWT.HORIZONTAL);
 									this.gearRatioSlider.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.gearRatioSlider.setBounds(263, GDE.IS_MAC_COCOA ? 7 : 39, 21, GDE.IS_WINDOWS ? 30 : GDE.IS_MAC ? 60 : 34);
+									this.gearRatioSlider.setLayoutData(new RowData(70, 20));
 									this.gearRatioSlider.setMinimum(0);
 									this.gearRatioSlider.setMaximum(100);
 									this.gearRatioSlider.setSelection(this.sliderPosition);
@@ -651,7 +673,6 @@ public class UniLogDialog extends DeviceDialog {
 											if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "gearRatioSlider.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UniLogDialog.this.storeAdjustmentsButton.setEnabled(true);
 											if (UniLogDialog.this.gearRatioSlider.getSelection() > UniLogDialog.this.sliderPosition) {
-												//" 1.0  :  1"
 												UniLogDialog.this.gearFactorCombo.setText(String.format(" %.1f  :  1", getGearRatio() - 0.1)); //$NON-NLS-1$
 												++UniLogDialog.this.sliderPosition;
 											}
@@ -663,10 +684,13 @@ public class UniLogDialog extends DeviceDialog {
 									});
 								}
 								{
+									new Composite(this.motorPropGroup, SWT.NONE).setLayoutData(new RowData(10, 22));
+								}
+								{
 									this.numberPropButton = new Button(this.motorPropGroup, SWT.RADIO | SWT.LEFT);
 									this.numberPropButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.numberPropButton.setText(Messages.getString(MessageIds.GDE_MSGT1316));
-									this.numberPropButton.setBounds(31, GDE.IS_MAC_COCOA ? 53 : 68, 150, 18);
+									this.numberPropButton.setLayoutData(new RowData(140, 20));
 									this.numberPropButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -687,7 +711,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.numberProbCombo = new CCombo(this.motorPropGroup, SWT.BORDER);
 									this.numberProbCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.numberProbCombo.setBounds(198, GDE.IS_MAC_COCOA ? 53 : 68, 63, GDE.IS_LINUX ? 22 : 20);
+									this.numberProbCombo.setLayoutData(new RowData(60, 20));
 									this.numberProbCombo.setItems(new String[] { " 1", " 2", " 3", " 4" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 									this.numberProbCombo.select(1);
 									this.numberProbCombo.setEditable(false);
@@ -700,6 +724,7 @@ public class UniLogDialog extends DeviceDialog {
 										}
 									});
 								}
+								this.motorPropGroup.layout();
 							}
 							{
 								this.dataRateGroup = new Group(this.configMainComosite, SWT.NONE);
@@ -707,11 +732,15 @@ public class UniLogDialog extends DeviceDialog {
 								this.dataRateGroup.setText(Messages.getString(MessageIds.GDE_MSGT1317));
 								this.dataRateGroup.setBounds(337, 70, 277, 45);
 								this.dataRateGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+								this.dataRateGroup.setLayout(new GridLayout(1, true));
 								{
 									this.timeIntervalCombo = new CCombo(this.dataRateGroup, SWT.BORDER);
 									this.timeIntervalCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.timeIntervalCombo.setItems(UniLogDialog.TIME_INTERVAL);
-									this.timeIntervalCombo.setBounds(60, GDE.IS_MAC_COCOA ? 2 : 17, 156, GDE.IS_LINUX ? 22 : 20);
+									GridData timeGridData = new GridData(160, 20);
+									timeGridData.grabExcessHorizontalSpace = true;
+									timeGridData.horizontalAlignment = SWT.CENTER;
+									this.timeIntervalCombo.setLayoutData(timeGridData);
 									this.timeIntervalCombo.select(1);
 									this.timeIntervalCombo.setEditable(false);
 									this.timeIntervalCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
@@ -724,6 +753,7 @@ public class UniLogDialog extends DeviceDialog {
 										}
 									});
 								}
+								this.dataRateGroup.layout();
 							}
 							{
 								this.sensorGroup = new Group(this.configMainComosite, SWT.NONE);
@@ -731,15 +761,16 @@ public class UniLogDialog extends DeviceDialog {
 								this.sensorGroup.setText(Messages.getString(MessageIds.GDE_MSGT1307));
 								this.sensorGroup.setBounds(337, 120, 277, 120);
 								this.sensorGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+								this.sensorGroup.setLayout(new RowLayout(SWT.HORIZONTAL));
 								{
-									this.currentSensorLabel = new Label(this.sensorGroup, SWT.RIGHT);
+									this.currentSensorLabel = new CLabel(this.sensorGroup, SWT.RIGHT);
 									this.currentSensorLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.currentSensorLabel.setText("Current");
-									this.currentSensorLabel.setBounds(42, GDE.IS_MAC_COCOA ? 2 : 19, 60, GDE.IS_LINUX ? 22 : 20);
+									this.currentSensorLabel.setLayoutData(new RowData(90, 20));
 
 									this.sensorCurrentCombo = new CCombo(this.sensorGroup, SWT.BORDER);
 									this.sensorCurrentCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.sensorCurrentCombo.setBounds(110, GDE.IS_MAC_COCOA ? 2 : 17, 120, GDE.IS_LINUX ? 22 : 20);
+									this.sensorCurrentCombo.setLayoutData(new RowData(135, 20));
 									this.sensorCurrentCombo.setItems(UniLogDialog.CURRENT_SENSOR);
 									this.sensorCurrentCombo.select(2);
 									this.sensorCurrentCombo.setEditable(false);
@@ -753,17 +784,17 @@ public class UniLogDialog extends DeviceDialog {
 									});
 								}
 								{
-									this.a1ModusLabel = new Label(this.sensorGroup, SWT.RIGHT);
+									this.a1ModusLabel = new CLabel(this.sensorGroup, SWT.RIGHT);
 									this.a1ModusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a1ModusLabel.setText("A1 Modus");
-									this.a1ModusLabel.setBounds(42, GDE.IS_MAC_COCOA ? 32 : 47, 60, GDE.IS_LINUX ? 22 : 20);
+									this.a1ModusLabel.setLayoutData(new RowData(90, 20));
 
 									this.a1ModusCombo = new CCombo(this.sensorGroup, SWT.BORDER);
 									this.a1ModusCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a1ModusCombo.setItems(UniLogDialog.A1_MODUS_NAMES_COMBO);
 									this.a1ModusCombo.select(0);
 									this.a1ModusCombo.setEditable(false);
-									this.a1ModusCombo.setBounds(110, GDE.IS_MAC_COCOA ? 30 : 45, 135, GDE.IS_LINUX ? 22 : 20);
+									this.a1ModusCombo.setLayoutData(new RowData(135, 20));
 									this.a1ModusCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.a1ModusCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -775,17 +806,17 @@ public class UniLogDialog extends DeviceDialog {
 									});
 								}
 								{
-									this.a2ModusLabel = new Label(this.sensorGroup, SWT.RIGHT);
+									this.a2ModusLabel = new CLabel(this.sensorGroup, SWT.RIGHT);
 									this.a2ModusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a2ModusLabel.setText("A2 Modus");
-									this.a2ModusLabel.setBounds(42, GDE.IS_MAC_COCOA ? 57 : 72, 60, GDE.IS_LINUX ? 22 : 20);
+									this.a2ModusLabel.setLayoutData(new RowData(90, 20));
 
 									this.a2ModusCombo = new CCombo(this.sensorGroup, SWT.BORDER);
 									this.a2ModusCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a2ModusCombo.setItems(UniLogDialog.A2_MODUS_NAMES_COMBO);
 									this.a2ModusCombo.select(0);
 									this.a2ModusCombo.setEditable(false);
-									this.a2ModusCombo.setBounds(110, GDE.IS_MAC_COCOA ? 55 : 70, 135, GDE.IS_LINUX ? 22 : 20);
+									this.a2ModusCombo.setLayoutData(new RowData(135, 20));
 									this.a2ModusCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.a2ModusCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -797,17 +828,17 @@ public class UniLogDialog extends DeviceDialog {
 									});
 								}
 								{
-									this.a3ModusLabel = new Label(this.sensorGroup, SWT.RIGHT);
+									this.a3ModusLabel = new CLabel(this.sensorGroup, SWT.RIGHT);
 									this.a3ModusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a3ModusLabel.setText("A3 Modus");
-									this.a3ModusLabel.setBounds(42, GDE.IS_MAC_COCOA ? 82 : 97, 60, GDE.IS_LINUX ? 22 : 20);
+									this.a3ModusLabel.setLayoutData(new RowData(90, 20));
 
 									this.a3ModusCombo = new CCombo(this.sensorGroup, SWT.BORDER);
 									this.a3ModusCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.a3ModusCombo.setItems(UniLogDialog.A3_MODUS_NAMES_COMBO);
 									this.a3ModusCombo.select(0);
 									this.a3ModusCombo.setEditable(false);
-									this.a3ModusCombo.setBounds(110, GDE.IS_MAC_COCOA ? 80 : 95, 135, GDE.IS_LINUX ? 22 : 20);
+									this.a3ModusCombo.setLayoutData(new RowData(135, 20));
 									this.a3ModusCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
 									this.a3ModusCombo.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -818,6 +849,7 @@ public class UniLogDialog extends DeviceDialog {
 										}
 									});
 								}
+								this.sensorGroup.layout();
 							}
 							{
 								this.limiterGroup = new Group(this.configMainComosite, SWT.NONE);
@@ -825,10 +857,14 @@ public class UniLogDialog extends DeviceDialog {
 								this.limiterGroup.setText(Messages.getString(MessageIds.GDE_MSGT1308));
 								this.limiterGroup.setBounds(337, 243, 277, 45);
 								this.limiterGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+								this.limiterGroup.setLayout(new GridLayout(3, false));
 								{
-									this.limiterButton = new Button(this.limiterGroup, SWT.CHECK);
+									new Composite(this.limiterGroup, SWT.NONE).setLayoutData(new GridData(25, 20));
+								}
+								{
+									this.limiterButton = new Button(this.limiterGroup, SWT.CHECK | SWT.LEFT);
 									this.limiterButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.limiterButton.setBounds(55, GDE.IS_MAC_COCOA ? 2 : 17, 90, GDE.IS_LINUX ? 22 : 20);
+									this.limiterButton.setLayoutData(new GridData(100, 20));
 									this.limiterButton.setText("      [ W min ] ");
 									this.limiterButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -847,7 +883,7 @@ public class UniLogDialog extends DeviceDialog {
 									this.limiterEnergyCombo = new CCombo(this.limiterGroup, SWT.BORDER);
 									this.limiterEnergyCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.limiterEnergyCombo.setItems(new String[]{" 100", " 250", " 500"," 1000", " 1500", " 2000", " 2500", " 3000"});
-									this.limiterEnergyCombo.setBounds(150, GDE.IS_MAC_COCOA ? 2 : 17, 60, GDE.IS_LINUX ? 22 : 20);
+									this.limiterEnergyCombo.setLayoutData(new GridData(80, 20));
 									this.limiterEnergyCombo.select(1);
 									this.limiterEnergyCombo.setEditable(true);
 									this.limiterEnergyCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
@@ -871,6 +907,7 @@ public class UniLogDialog extends DeviceDialog {
 										}
 									});
 								}
+								this.limiterGroup.layout();
 							}
 							{
 								this.readAdjustmentButton = new Button(this.configMainComosite, SWT.PUSH | SWT.FLAT | SWT.CENTER);
@@ -970,10 +1007,11 @@ public class UniLogDialog extends DeviceDialog {
 								this.channleConfigGroup.setBounds(14, 12, 290, 58);
 								this.channleConfigGroup.setText(Messages.getString(MessageIds.GDE_MSGT1321));
 								this.channleConfigGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+								this.channleConfigGroup.setLayout(new GridLayout(2, true));
 								{
 									this.useConfigCombo = new CCombo(this.channleConfigGroup, SWT.BORDER);
 									this.useConfigCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.useConfigCombo.setBounds(24, GDE.IS_MAC_COCOA ? 9 : 24, 140, GDE.IS_LINUX ? 22 : 20);
+									this.useConfigCombo.setLayoutData(new GridData(140, 20));
 									this.useConfigCombo.setItems(this.configurationNames);
 									this.useConfigCombo.select(this.channelSelectionIndex);
 									this.useConfigCombo.setEditable(false);
@@ -1035,7 +1073,7 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.editConfigButton = new Button(this.channleConfigGroup, SWT.PUSH | SWT.CENTER);
 									this.editConfigButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.editConfigButton.setBounds(172, GDE.IS_MAC_COCOA ? 8 : 23, 106, 23);
+									this.editConfigButton.setLayoutData(new GridData(130, 20));
 									this.editConfigButton.setText(Messages.getString(MessageIds.GDE_MSGT1323));
 									this.editConfigButton.setEnabled(false);
 									this.editConfigButton.addSelectionListener(new SelectionAdapter() {
@@ -1047,6 +1085,7 @@ public class UniLogDialog extends DeviceDialog {
 										}
 									});
 								}
+								this.channleConfigGroup.layout();
 							}
 							{
 								this.dataReadGroup = new Group(this.dataMainComposite, SWT.NONE);
@@ -1054,6 +1093,7 @@ public class UniLogDialog extends DeviceDialog {
 								this.dataReadGroup.setBounds(14, 78, 290, 242);
 								this.dataReadGroup.setText(Messages.getString(MessageIds.GDE_MSGT1324));
 								this.dataReadGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+								this.dataReadGroup.setLayout(new GridLayout(2, false));
 								this.dataReadGroup.addPaintListener(new PaintListener() {
 									@Override
 									public void paintControl(PaintEvent evt) {
@@ -1071,7 +1111,11 @@ public class UniLogDialog extends DeviceDialog {
 									this.readDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 									this.readDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.readDataButton.setText(Messages.getString(MessageIds.GDE_MSGT1325));
-									this.readDataButton.setBounds(11, GDE.IS_MAC_COCOA ? 15 : 30, 260, 30);
+									GridData buttonGridData = new GridData(260, 35);
+									buttonGridData.grabExcessHorizontalSpace = true;
+									buttonGridData.horizontalAlignment = SWT.CENTER;
+									buttonGridData.horizontalSpan = 2;
+									this.readDataButton.setLayoutData(buttonGridData);
 									this.readDataButton.setEnabled(true);
 									this.readDataButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -1103,61 +1147,102 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.dataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.dataSetLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.dataSetLabel.setBounds(22, GDE.IS_MAC_COCOA ? 53 : 68, 180, 20);
+									GridData labelGridData = new GridData(180, 20);
+									labelGridData.grabExcessHorizontalSpace = true;
+									labelGridData.horizontalAlignment = SWT.CENTER;
+									labelGridData.horizontalSpan = 1;
+									this.dataSetLabel.setLayoutData(labelGridData);
 									this.dataSetLabel.setText(Messages.getString(MessageIds.GDE_MSGT1326));
 								}
 								{
 									this.redDataSetLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.redDataSetLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.redDataSetLabel.setBounds(205, GDE.IS_MAC_COCOA ? 53 : 68, 55, 20);
+									GridData labelGridData = new GridData(55, 20);
+									labelGridData.grabExcessHorizontalSpace = true;
+									labelGridData.horizontalAlignment = SWT.CENTER;
+									labelGridData.horizontalSpan = 1;
+									this.redDataSetLabel.setLayoutData(labelGridData);
 									this.redDataSetLabel.setText("0"); //$NON-NLS-1$
 								}
 								{
 									this.actualDataSetNumberLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.actualDataSetNumberLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.actualDataSetNumberLabel.setBounds(22, GDE.IS_MAC_COCOA ? 76 : 91, 180, 20);
+									GridData labelGridData = new GridData(180, 20);
+									labelGridData.grabExcessHorizontalSpace = true;
+									labelGridData.horizontalAlignment = SWT.CENTER;
+									labelGridData.horizontalSpan = 1;
+									this.actualDataSetNumberLabel.setLayoutData(labelGridData);
 									this.actualDataSetNumberLabel.setText(Messages.getString(MessageIds.GDE_MSGT1327));
 								}
 								{
 									this.actualDataSetNumber = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.actualDataSetNumber.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.actualDataSetNumber.setBounds(205, GDE.IS_MAC_COCOA ? 76 : 91, 55, 20);
+									GridData labelGridData = new GridData(55, 20);
+									labelGridData.grabExcessHorizontalSpace = true;
+									labelGridData.horizontalAlignment = SWT.CENTER;
+									labelGridData.horizontalSpan = 1;
+									this.actualDataSetNumber.setLayoutData(labelGridData);
 									this.actualDataSetNumber.setText("0"); //$NON-NLS-1$
 								}
 								{
 									this.readDataErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.readDataErrorLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.readDataErrorLabel.setBounds(22, GDE.IS_MAC_COCOA ? 98 : 113, 180, 20);
+									GridData labelGridData = new GridData(180, 20);
+									labelGridData.grabExcessHorizontalSpace = true;
+									labelGridData.horizontalAlignment = SWT.CENTER;
+									labelGridData.horizontalSpan = 1;
+									this.readDataErrorLabel.setLayoutData(labelGridData);
 									this.readDataErrorLabel.setText(Messages.getString(MessageIds.GDE_MSGT1328));
 								}
 								{
 									this.numberReadErrorLabel = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.numberReadErrorLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.numberReadErrorLabel.setBounds(205, GDE.IS_MAC_COCOA ? 98 : 113, 55, 20);
+									GridData labelGridData = new GridData(55, 20);
+									labelGridData.grabExcessHorizontalSpace = true;
+									labelGridData.horizontalAlignment = SWT.CENTER;
+									labelGridData.horizontalSpan = 1;
+									this.numberReadErrorLabel.setLayoutData(labelGridData);
 									this.numberReadErrorLabel.setText("0"); //$NON-NLS-1$
 								}
 								{
 									this.readDataLess2Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.readDataLess2Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.readDataLess2Label.setBounds(22, GDE.IS_MAC_COCOA ? 120 : 135, 180, 20);
+									GridData labelGridData = new GridData(180, 20);
+									labelGridData.grabExcessHorizontalSpace = true;
+									labelGridData.horizontalAlignment = SWT.CENTER;
+									labelGridData.horizontalSpan = 1;
+									this.readDataLess2Label.setLayoutData(labelGridData);
 									this.readDataLess2Label.setText(Messages.getString(MessageIds.GDE_MSGT1331));
 								}
 								{
 									this.numberLess2Label = new CLabel(this.dataReadGroup, SWT.RIGHT);
 									this.numberLess2Label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.numberLess2Label.setBounds(205, GDE.IS_MAC_COCOA ? 120 : 135, 55, 20);
+									GridData labelGridData = new GridData(55, 20);
+									labelGridData.grabExcessHorizontalSpace = true;
+									labelGridData.horizontalAlignment = SWT.CENTER;
+									labelGridData.horizontalSpan = 1;
+									this.numberLess2Label.setLayoutData(labelGridData);
 									this.numberLess2Label.setText("0"); //$NON-NLS-1$
 								}
 								{
 									this.readDataProgressBar = new ProgressBar(this.dataReadGroup, SWT.NONE);
-									this.readDataProgressBar.setBounds(15, GDE.IS_MAC_COCOA ? 150 : 165, 260, 15);
+									GridData labelGridData = new GridData(260, 24);
+									labelGridData.grabExcessHorizontalSpace = true;
+									//labelGridData.grabExcessVerticalSpace = true;
+									labelGridData.horizontalAlignment = SWT.CENTER;
+									labelGridData.horizontalSpan = 2;
+									this.readDataProgressBar.setLayoutData(labelGridData);
 									this.readDataProgressBar.setMinimum(0);
 									this.readDataProgressBar.setMaximum(100);
 								}
 								{
 									this.stopDataButton = new Button(this.dataReadGroup, SWT.PUSH | SWT.CENTER);
 									this.stopDataButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.stopDataButton.setBounds(15, GDE.IS_MAC_COCOA ? 179 : 194, 260, 30);
+									GridData buttonGridData = new GridData(260, 35);
+									buttonGridData.grabExcessHorizontalSpace = true;
+									buttonGridData.horizontalAlignment = SWT.CENTER;
+									buttonGridData.horizontalSpan = 2;
+									this.stopDataButton.setLayoutData(buttonGridData);
 									this.stopDataButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0278));
 									this.stopDataButton.setEnabled(false);
 									this.stopDataButton.addSelectionListener(new SelectionAdapter() {
@@ -1171,6 +1256,7 @@ public class UniLogDialog extends DeviceDialog {
 										}
 									});
 								}
+								this.dataReadGroup.layout();
 							}
 							{
 								this.liveDataCaptureGroup = new Group(this.dataMainComposite, SWT.NONE);
@@ -1179,13 +1265,16 @@ public class UniLogDialog extends DeviceDialog {
 								this.liveDataCaptureGroup.setText(Messages.getString(MessageIds.GDE_MSGT1329));
 								this.liveDataCaptureGroup.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1384));
 								this.liveDataCaptureGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+								this.liveDataCaptureGroup.setLayout(new GridLayout(1, true));
 								{
 									this.startLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 									this.startLiveGatherButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.startLiveGatherButton.setText(Messages.getString(MessageIds.GDE_MSGT1330));
 									this.startLiveGatherButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1384));
-									this.startLiveGatherButton.setBounds(16, GDE.IS_MAC_COCOA ? 11 : 26, 246, 30);
-									this.startLiveGatherButton.setSize(260, 30);
+									GridData buttonGridData = new GridData(260, 35);
+									buttonGridData.grabExcessHorizontalSpace = true;
+									buttonGridData.horizontalAlignment = SWT.CENTER;
+									this.startLiveGatherButton.setLayoutData(buttonGridData);
 									this.startLiveGatherButton.setEnabled(UniLogDialog.this.isLiveGathererEnabled);
 									this.startLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 										@Override
@@ -1218,16 +1307,24 @@ public class UniLogDialog extends DeviceDialog {
 								{
 									this.loggingGroup = new Group(this.liveDataCaptureGroup, SWT.NONE);
 									this.loggingGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.loggingGroup.setBounds(25, GDE.IS_MAC_COCOA ? 55 : 70, 228, 70);
+									GridData groupGridData = new GridData(260, 70);
+									groupGridData.grabExcessHorizontalSpace = true;
+									groupGridData.horizontalAlignment = SWT.CENTER;
+									this.loggingGroup.setLayoutData(groupGridData);
 									this.loggingGroup.setText(Messages.getString(MessageIds.GDE_MSGT1332));
 									this.loggingGroup.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1383));
 									this.loggingGroup.addMouseTrackListener(mouseTrackerEnterFadeOut);
+									this.loggingGroup.setLayout(new GridLayout(2, true));
 									{
 										this.startLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
 										this.startLoggingButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.startLoggingButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0274));
 										this.startLoggingButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1383));
-										this.startLoggingButton.setBounds(12, GDE.IS_MAC_COCOA ? 12 : 27, 100, 30);
+										GridData buttonGridData = new GridData(100, 30);
+										buttonGridData.grabExcessHorizontalSpace = true;
+										buttonGridData.grabExcessVerticalSpace = true;
+										buttonGridData.horizontalAlignment = SWT.CENTER;
+										this.startLoggingButton.setLayoutData(buttonGridData);
 										this.startLoggingButton.setEnabled(true);
 										this.startLoggingButton.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -1250,7 +1347,11 @@ public class UniLogDialog extends DeviceDialog {
 										this.stopLoggingButton = new Button(this.loggingGroup, SWT.PUSH | SWT.CENTER);
 										this.stopLoggingButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.stopLoggingButton.setText(Messages.getString(gde.messages.MessageIds.GDE_MSGT0275));
-										this.stopLoggingButton.setBounds(116, GDE.IS_MAC_COCOA ? 12 : 27, 100, 30);
+										GridData buttonGridData = new GridData(100, 30);
+										buttonGridData.grabExcessHorizontalSpace = true;
+										buttonGridData.grabExcessVerticalSpace = true;
+										buttonGridData.horizontalAlignment = SWT.CENTER;
+										this.stopLoggingButton.setLayoutData(buttonGridData);
 										this.stopLoggingButton.setEnabled(false);
 										this.stopLoggingButton.addSelectionListener(new SelectionAdapter() {
 											@Override
@@ -1272,14 +1373,17 @@ public class UniLogDialog extends DeviceDialog {
 											}
 										});
 									}
+									this.loggingGroup.layout();
 								}
 								{
 									this.stopLiveGatherButton = new Button(this.liveDataCaptureGroup, SWT.PUSH | SWT.CENTER);
 									this.stopLiveGatherButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.stopLiveGatherButton.setBounds(17, GDE.IS_MAC_COCOA ? 141 : 156, 246, 30);
+									GridData buttonGridData = new GridData(260, 35);
+									buttonGridData.grabExcessHorizontalSpace = true;
+									buttonGridData.horizontalAlignment = SWT.CENTER;
+									this.stopLiveGatherButton.setLayoutData(buttonGridData);
 									this.stopLiveGatherButton.setText(Messages.getString(MessageIds.GDE_MSGT1333));
 									this.stopLiveGatherButton.setEnabled(!UniLogDialog.this.isLiveGathererEnabled);
-									this.stopLiveGatherButton.setSize(260, 30);
 									this.stopLiveGatherButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -1310,6 +1414,7 @@ public class UniLogDialog extends DeviceDialog {
 										}
 									});
 								}
+								this.liveDataCaptureGroup.layout();
 							}
 
 							{ // begin clearDataBufferGroup
@@ -1319,12 +1424,26 @@ public class UniLogDialog extends DeviceDialog {
 								this.clearDataBufferGroup.setText(Messages.getString(MessageIds.GDE_MSGT1334));
 								this.clearDataBufferGroup.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1385));
 								this.clearDataBufferGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+								this.clearDataBufferGroup.setLayout(new GridLayout(1, true));
+								{
+									this.memoryDeleteInfo = new Text(this.clearDataBufferGroup, SWT.MULTI | SWT.CENTER | SWT.WRAP);
+									this.memoryDeleteInfo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+									GridData infoGridData = new GridData(260, 30);
+									infoGridData.grabExcessHorizontalSpace = true;
+									infoGridData.horizontalAlignment = SWT.CENTER;
+									this.memoryDeleteInfo.setLayoutData(infoGridData);
+									this.memoryDeleteInfo.setText(Messages.getString(MessageIds.GDE_MSGI1301));
+									this.memoryDeleteInfo.setBackground(DataExplorer.getInstance().COLOR_LIGHT_GREY);
+								}
 								{
 									this.clearMemoryButton = new Button(this.clearDataBufferGroup, SWT.PUSH | SWT.CENTER);
 									this.clearMemoryButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 									this.clearMemoryButton.setText(Messages.getString(MessageIds.GDE_MSGT1335));
 									this.clearMemoryButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1385));
-									this.clearMemoryButton.setBounds(15, GDE.IS_MAC_COCOA ? 45 : 60, 260, 30);
+									GridData buttonGridData = new GridData(260, 35);
+									buttonGridData.grabExcessHorizontalSpace = true;
+									buttonGridData.horizontalAlignment = SWT.CENTER;
+									this.clearMemoryButton.setLayoutData(buttonGridData);
 									this.clearMemoryButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
@@ -1342,19 +1461,12 @@ public class UniLogDialog extends DeviceDialog {
 										}
 									});
 								}
-								{
-									this.memoryDeleteInfo = new CLabel(this.clearDataBufferGroup, SWT.CENTER | SWT.WRAP);
-									this.memoryDeleteInfo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.memoryDeleteInfo.setBounds(12, GDE.IS_MAC_COCOA ? 7 : 22, 256, 34);
-									this.memoryDeleteInfo.setText(Messages.getString(MessageIds.GDE_MSGI1301));
-									this.memoryDeleteInfo.setBackground(DataExplorer.getInstance().COLOR_LIGHT_GREY);
-									//this.memoryDeleteInfo.setEditable(false);
-								}
+								this.clearDataBufferGroup.layout();
 							} // end clearDataBufferGroup
 						}
 					} // end data tab
 
-					this.deviceConfigTabFolder.setBounds(0, 0, 634, 362);
+					this.deviceConfigTabFolder.setBounds(0, 0, GDE.IS_LINUX ? 650 : 635, 360);
 					this.deviceConfigTabFolder.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {

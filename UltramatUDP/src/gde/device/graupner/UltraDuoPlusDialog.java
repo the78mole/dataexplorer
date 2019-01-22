@@ -110,7 +110,6 @@ import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.log.LogFormatter;
 import gde.messages.Messages;
-import gde.ui.DataExplorer;
 import gde.ui.ParameterConfigControl;
 import gde.ui.SWTResourceManager;
 import gde.ui.tab.GraphicsWindow;
@@ -153,7 +152,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	ProgressBar								cycleDataProgressBar, graphicsDataProgressBar;
 	Table											dataTable;
 
-	final DataExplorer 				application;
 	final Ultramat						device;																																																																												// get device specific things, get serial port, ...
 	final UltramatSerialPort	serialPort;																																																																										// open/close port execute getData()....
 	final Channels						channels;																																																																											// interaction with channels, source of all records
@@ -206,7 +204,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 		Handler ch = new ConsoleHandler();
 		LogFormatter lf = new LogFormatter();
 		ch.setFormatter(lf);
-		ch.setLevel(java.util.logging.Level.ALL);
+		ch.setLevel(Level.ALL);
 		Logger.getLogger(GDE.STRING_EMPTY).addHandler(ch);
 		Logger.getLogger(GDE.STRING_EMPTY).setLevel(Level.TIME);
 
@@ -240,7 +238,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						UltraDuoPlusDialog.log.log(Level.TIME, "read memory setup XML time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - time))); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					catch (Exception e) {
-						UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+						UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 						if (e.getCause() instanceof FileNotFoundException) {
 							ultraDuoPlusSetup = new ObjectFactory().createUltraDuoPlusType();
 							List<MemoryType> cellMemories = ultraDuoPlusSetup.getMemory();
@@ -263,7 +261,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					readSynchronizer.join();
 				}
 				catch (Exception e) {
-					UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+					UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 					return;
 				}
 				finally {
@@ -308,10 +306,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 
 		}
 		catch (Exception e) {
-			UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		catch (Throwable t) {
-			UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, t.getMessage(), t);
+			UltraDuoPlusDialog.log.log(Level.SEVERE, t.getMessage(), t);
 		}
 	}
 
@@ -322,7 +320,6 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 */
 	public UltraDuoPlusDialog(Shell parent, Ultramat useDevice) {
 		super(parent);
-		this.application = DataExplorer.getInstance();
 		this.serialPort = useDevice.getCommunicationPort();
 		this.device = useDevice;
 		this.channels = Channels.getInstance();
@@ -352,7 +349,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				if (UltraDuoPlusDialog.this.lastMemorySelectionIndex >= 0 && UltraDuoPlusDialog.this.lastMemorySelectionIndex < UltraDuoPlusDialog.numberMemories) {
 					if (UltraDuoPlusDialog.this.ultraDuoPlusSetup != null) {
 						if (UltraDuoPlusDialog.log.isLoggable(Level.FINE))
-							UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE,
+							UltraDuoPlusDialog.log.log(Level.FINE,
 										"memoryComposite.handleEvent, (" + UltraDuoPlusDialog.this.lastMemorySelectionIndex + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName() + " memoryValues[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 						UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getSetupData().setChanged(true);
@@ -391,12 +388,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					else if (evt.index == 6) { // current change
 						updateBatteryParameterValues(6);
 					}
-					if (UltraDuoPlusDialog.this.ultraDuoPlusSetup != null && UltraDuoPlusDialog.log.isLoggable(java.util.logging.Level.FINE)) {
+					if (UltraDuoPlusDialog.this.ultraDuoPlusSetup != null && UltraDuoPlusDialog.log.isLoggable(Level.FINE)) {
 						StringBuffer sb = new StringBuffer();
 						for (int i = 0; i < UltramatSerialPort.SIZE_MEMORY_SETUP; i++) {
 							sb.append(UltraDuoPlusDialog.this.memoryValues[i]).append(GDE.STRING_LEFT_BRACKET).append(i).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 						}
-						UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE, sb.toString());
+						UltraDuoPlusDialog.log.log(Level.FINE, sb.toString());
 					}
 				}
 			}
@@ -435,7 +432,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 								+ this.deviceIdentifierName.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
 					}
 					catch (UnmarshalException e) {
-						UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+						UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 						createUltraDuoPlusSetup(this.deviceIdentifierName);
 					}
 					catch (Exception e) {
@@ -450,7 +447,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					this.synchronizerRead.start();
 				}
 				catch (Exception e) {
-					UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+					UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 					this.serialPort.close();
 					this.application.openMessageDialog(null,
 							Messages.getString(gde.messages.MessageIds.GDE_MSGE0015, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
@@ -460,13 +457,13 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				}
 			}
 			else {
-				UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, "serial port == null"); //$NON-NLS-1$
+				UltraDuoPlusDialog.log.log(Level.SEVERE, "serial port == null"); //$NON-NLS-1$
 				this.application.openMessageDialogAsync(null, Messages.getString(gde.messages.MessageIds.GDE_MSGE0010));
 				this.application.getDeviceSelectionDialog().open();
 				return;
 			}
 
-			UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
+			UltraDuoPlusDialog.log.log(Level.FINE, "dialogShell.isDisposed() " + ((this.dialogShell == null) ? "null" : this.dialogShell.isDisposed())); //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.dialogShell == null || this.dialogShell.isDisposed()) {
 				if (this.settings.isDeviceDialogsModal())
 					this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
@@ -497,14 +494,14 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.dialogShell.addHelpListener(new HelpListener() {
 					@Override
 					public void helpRequested(HelpEvent evt) {
-						UltraDuoPlusDialog.log.log(java.util.logging.Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
+						UltraDuoPlusDialog.log.log(Level.FINER, "dialogShell.helpRequested, event=" + evt); //$NON-NLS-1$
 						UltraDuoPlusDialog.this.application.openHelpDialog(UltraDuoPlusDialog.DEVICE_JAR_NAME, "HelpInfo.html"); //$NON-NLS-1$
 					}
 				});
 				this.dialogShell.addDisposeListener(new DisposeListener() {
 					@Override
 					public void widgetDisposed(DisposeEvent evt) {
-						UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
+						UltraDuoPlusDialog.log.finest(() -> "dialogShell.widgetDisposed, event=" + evt); //$NON-NLS-1$
 						if (UltraDuoPlusDialog.this.serialPort != null && UltraDuoPlusDialog.this.serialPort.isConnected()) {
 							try {
 								UltraDuoPlusDialog.this.synchronizerRead.join();
@@ -596,17 +593,17 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						this.userNameText.addVerifyListener(new VerifyListener() {
 							@Override
 							public void verifyText(VerifyEvent evt) {
-								UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "evt.doit = " + (evt.text.length() <= 16)); //$NON-NLS-1$
+								UltraDuoPlusDialog.log.finest(() -> "evt.doit = " + (evt.text.length() <= 16)); //$NON-NLS-1$
 								evt.doit = evt.text.length() <= 16;
 							}
 						});
 						this.userNameText.addKeyListener(new KeyAdapter() {
 							@Override
 							public void keyReleased(KeyEvent evt) {
-								UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
+								UltraDuoPlusDialog.log.finest(() -> "text.keyReleased, event=" + evt); //$NON-NLS-1$
 								File oldConfigDataFile = new File(Settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
 										+ UltraDuoPlusDialog.this.deviceIdentifierName.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML);
-								if (oldConfigDataFile.exists()) if (!oldConfigDataFile.delete()) UltraDuoPlusDialog.log.log(java.util.logging.Level.WARNING, "could not delete " + oldConfigDataFile.getName()); //$NON-NLS-1$
+								if (oldConfigDataFile.exists()) if (!oldConfigDataFile.delete()) UltraDuoPlusDialog.log.log(Level.WARNING, "could not delete " + oldConfigDataFile.getName()); //$NON-NLS-1$
 								UltraDuoPlusDialog.this.deviceIdentifierName = (UltraDuoPlusDialog.this.userNameText.getText().trim() + UltraDuoPlusDialog.STRING_16_BLANK).substring(0, 16);
 								UltraDuoPlusDialog.this.ultraDuoPlusSetup.setIdentifierName(UltraDuoPlusDialog.this.deviceIdentifierName);
 								UltraDuoPlusDialog.this.ultraDuoPlusSetup.setChanged(true);
@@ -617,7 +614,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 
 							@Override
 							public void keyPressed(KeyEvent evt) {
-								UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "text.keyPressed, event=" + evt); //$NON-NLS-1$
+								UltraDuoPlusDialog.log.finest(() -> "text.keyPressed, event=" + evt); //$NON-NLS-1$
 							}
 						});
 					}
@@ -770,7 +767,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 								{
 									this.memorySelectComposite = new Composite(this.memoryBoundsComposite, SWT.NONE);
 									FormData memorySelectLData = new FormData();
-									memorySelectLData.height = 150;
+									memorySelectLData.height = GDE.IS_LINUX ? 160 : 150;
 									memorySelectLData.left = new FormAttachment(0, 1000, 0);
 									memorySelectLData.right = new FormAttachment(1000, 1000, 0);
 									memorySelectLData.top = new FormAttachment(0, 1000, 0);
@@ -797,7 +794,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.memoryCombo.setTextLimit(5 + 16);
 										RowData memoryComboLData = new RowData();
 										memoryComboLData.width = 165;
-										memoryComboLData.height = GDE.IS_WINDOWS ? 16 : 18;
+										memoryComboLData.height = GDE.IS_LINUX ? 20 : GDE.IS_WINDOWS ? 16 : 18;
 										this.memoryCombo.setLayoutData(memoryComboLData);
 										this.memoryCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2252));
 										this.memoryCombo.select(0);
@@ -806,7 +803,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.memoryCombo.addSelectionListener(new SelectionAdapter() {
 											@Override
 											public void widgetSelected(SelectionEvent evt) {
-												UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "memoryCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+												UltraDuoPlusDialog.log.finest(() -> "memoryCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 												try {
 													int actualSelectionIndex = UltraDuoPlusDialog.this.memoryCombo.getSelectionIndex();
 													if (UltraDuoPlusDialog.this.lastMemorySelectionIndex != actualSelectionIndex) {
@@ -846,17 +843,15 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 																				UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName(), (actualSelectionIndex + 1),
 																				UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName() }))) {
 																	//copy memory name and setup data of lastMemorySelectionIndex to memoryCombo.getSelectionIndex()
-																	UltraDuoPlusDialog.log
-																			.log(
-																					java.util.logging.Level.FINE,
+																	if (UltraDuoPlusDialog.log.isLoggable(Level.FINE)) {
+																		UltraDuoPlusDialog.log.log(Level.FINE,
 																					"copy memory: (" + (UltraDuoPlusDialog.this.lastMemorySelectionIndex + 1) + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName()//$NON-NLS-1$
-																							+ " to (" + (actualSelectionIndex + 1) + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName()); //$NON-NLS-1$
-																	if (UltraDuoPlusDialog.log.isLoggable(java.util.logging.Level.FINE)) {
+																					+ " to (" + (actualSelectionIndex + 1) + GDE.STRING_RIGHT_PARENTHESIS + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(actualSelectionIndex).getName()); //$NON-NLS-1$
 																		StringBuffer sb = new StringBuffer();
 																		for (int i = 0; i < UltramatSerialPort.SIZE_MEMORY_SETUP; i++) {
 																			sb.append(UltraDuoPlusDialog.this.memoryValues[i]).append(GDE.STRING_LEFT_BRACKET).append(i).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 																		}
-																		UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE, sb.toString());
+																		UltraDuoPlusDialog.log.log(Level.FINE, sb.toString());
 																	}
 																	UltraDuoPlusDialog.this.serialPort.writeConfigData(UltramatSerialPort.WRITE_MEMORY_NAME,
 																			UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(UltraDuoPlusDialog.this.lastMemorySelectionIndex).getName().getBytes(), actualSelectionIndex + 1);
@@ -898,19 +893,19 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													}
 												}
 												catch (Throwable e) {
-													UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+													UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 												}
 											}
 										});
 										this.memoryCombo.addKeyListener(new KeyAdapter() {
 											@Override
 											public void keyReleased(KeyEvent evt) {
-												UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "memoryCombo.keyReleased, event=" + evt); //$NON-NLS-1$
+												UltraDuoPlusDialog.log.finest(() -> "memoryCombo.keyReleased, event=" + evt); //$NON-NLS-1$
 											}
 
 											@Override
 											public void keyPressed(KeyEvent evt) {
-												UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "memoryCombo.keyPressed, event=" + evt); //$NON-NLS-1$
+												UltraDuoPlusDialog.log.finest(() -> "memoryCombo.keyPressed, event=" + evt); //$NON-NLS-1$
 												if (evt.character == SWT.CR) {
 													try {
 														String newMemoryName = String.format(UltraDuoPlusDialog.STRING_FORMAT_02d_s, UltraDuoPlusDialog.this.lastMemorySelectionIndex + 1,
@@ -974,12 +969,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									chargeTypeTabFolderLData.left = new FormAttachment(0, 1000, 0);
 									chargeTypeTabFolderLData.right = new FormAttachment(1000, 1000, 0);
 									chargeTypeTabFolderLData.bottom = new FormAttachment(1000, 1000, 0);
-									chargeTypeTabFolderLData.top = new FormAttachment(0, 1000, 150);
+									chargeTypeTabFolderLData.top = new FormAttachment(0, 1000, GDE.IS_LINUX ? 160 : 150);
 									this.chargeTypeTabFolder.setLayoutData(chargeTypeTabFolderLData);
 									this.chargeTypeTabFolder.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "restoreButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											UltraDuoPlusDialog.log.finest(() -> "restoreButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UltraDuoPlusDialog.this.lastCellSelectionIndex = -1;
 											switch (UltraDuoPlusDialog.this.device.getDeviceTypeIdentifier()) {
 											case UltraDuoPlus50:
@@ -1048,13 +1043,13 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 											this.scrolledchargeComposite.addControlListener(new ControlListener() {
 												@Override
 												public void controlResized(ControlEvent evt) {
-													UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "scrolledMemoryComposite.controlResized, event=" + evt); //$NON-NLS-1$
+													UltraDuoPlusDialog.log.finest(() -> "scrolledMemoryComposite.controlResized, event=" + evt); //$NON-NLS-1$
 													UltraDuoPlusDialog.this.chargeGroup.setSize(UltraDuoPlusDialog.this.scrolledchargeComposite.getClientArea().width, UltraDuoPlusDialog.this.chargeSelectHeight);
 												}
 
 												@Override
 												public void controlMoved(ControlEvent evt) {
-													UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "scrolledMemoryComposite.controlMoved, event=" + evt); //$NON-NLS-1$
+													UltraDuoPlusDialog.log.finest(() -> "scrolledMemoryComposite.controlMoved, event=" + evt); //$NON-NLS-1$
 													UltraDuoPlusDialog.this.chargeGroup.setSize(UltraDuoPlusDialog.this.scrolledchargeComposite.getClientArea().width, UltraDuoPlusDialog.this.chargeSelectHeight);
 												}
 											});
@@ -1161,7 +1156,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.memoryDataCombo.setTextLimit(5 + 16);
 										RowData memoryComboCycleDataLData = new RowData();
 										memoryComboCycleDataLData.width = 165;
-										memoryComboCycleDataLData.height = GDE.IS_WINDOWS ? 16 : 18;
+										memoryComboCycleDataLData.height = GDE.IS_LINUX ? 20 : GDE.IS_WINDOWS ? 16 : 18;
 										this.memoryDataCombo.setLayoutData(memoryComboCycleDataLData);
 										this.memoryDataCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2339));
 										this.memoryDataCombo.select(0);
@@ -1170,7 +1165,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.memoryDataCombo.addSelectionListener(new SelectionAdapter() {
 											@Override
 											public void widgetSelected(SelectionEvent evt) {
-												UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "memoryComboData.widgetSelected, event=" + evt); //$NON-NLS-1$
+												UltraDuoPlusDialog.log.finest(() -> "memoryComboData.widgetSelected, event=" + evt); //$NON-NLS-1$
 												UltraDuoPlusDialog.this.memorySelectionIndexData = UltraDuoPlusDialog.this.memoryDataCombo.getSelectionIndex() + 1;
 											}
 										});
@@ -1190,7 +1185,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									cycleDataButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "cycleDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											UltraDuoPlusDialog.log.finest(() -> "cycleDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											try {
 												UltraDuoPlusDialog.this.cycleDataProgressBar.setSelection(0);
 												GraphicsWindow cycleGraph = (GraphicsWindow) UltraDuoPlusDialog.this.device.getUtilityDeviceTabItem();
@@ -1265,12 +1260,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													cyclesData = UltraDuoPlusDialog.this.serialPort.readMemoryCycleData(UltraDuoPlusDialog.this.memorySelectionIndexData);
 												}
 
-												if (UltraDuoPlusDialog.log.isLoggable(java.util.logging.Level.FINE)) {
+												if (UltraDuoPlusDialog.log.isLoggable(Level.FINE)) {
 													StringBuilder sb = new StringBuilder();
 													for (byte[] cycleData : cyclesData) {
 														sb.append(new String(cycleData));
 													}
-													UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE, sb.toString());
+													UltraDuoPlusDialog.log.log(Level.FINE, sb.toString());
 												}
 												UltraDuoPlusDialog.this.dataTable.removeAll();
 
@@ -1291,7 +1286,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 														timeStamp = new GregorianCalendar(2000 + year, month - 1, day, hour, minute, 0).getTimeInMillis();
 													}
 													catch (NumberFormatException e) {
-														UltraDuoPlusDialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+														UltraDuoPlusDialog.log.log(Level.WARNING, e.getMessage(), e);
 													}
 
 													try {
@@ -1303,15 +1298,15 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 														points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[40], (char) cycleData[41], (char) cycleData[42], (char) cycleData[43]), 16);
 													}
 													catch (Exception e) {
-														UltraDuoPlusDialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+														UltraDuoPlusDialog.log.log(Level.WARNING, e.getMessage(), e);
 													}
 
-													if (UltraDuoPlusDialog.log.isLoggable(java.util.logging.Level.FINE)) {
+													if (UltraDuoPlusDialog.log.isLoggable(Level.FINE)) {
 														StringBuilder sb = new StringBuilder();
 														for (int point : points) {
 															sb.append("; ").append(String.format("%8d", point)); //$NON-NLS-1$ //$NON-NLS-2$
 														}
-														UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp) + sb.toString()); //$NON-NLS-1$
+														UltraDuoPlusDialog.log.log(Level.FINE, StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp) + sb.toString()); //$NON-NLS-1$
 													}
 
 													//if time stamp is not between just now - 1 year and just now + 2 hrs  and contains data ask if the date should be corrected
@@ -1320,10 +1315,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 														dataSum += point;
 													}
 													if (dataSum > 0 && (timeStamp < justNowMinus2Year || timeStamp > justNowPlus2Hours)) {
-														UltraDuoPlusDialog.log.log(java.util.logging.Level.FINER, "time stamp out of range ! " + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp)); //$NON-NLS-1$ //$NON-NLS-2$
+														UltraDuoPlusDialog.log.log(Level.FINER, "time stamp out of range ! " + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", timeStamp)); //$NON-NLS-1$ //$NON-NLS-2$
 														int[] newTimeStamp = new ChangeDateDialog(UltraDuoPlusDialog.this.dialogShell, SWT.NONE, new int[] { hour, minute, 2000 + year, month, day, points[2], points[3] }).open();
 														if (newTimeStamp.length > 0) { //change requested
-															UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE, "date change requested !"); //$NON-NLS-1$
+															UltraDuoPlusDialog.log.log(Level.FINE, "date change requested !"); //$NON-NLS-1$
 															isDateChanged = true;
 															newTimeStamp[0] = newTimeStamp[0] < 0 ? 0 : newTimeStamp[0] > 24 ? 24 : newTimeStamp[0]; //hour
 															newTimeStamp[1] = newTimeStamp[1] < 0 ? 0 : newTimeStamp[1] > 60 ? 60 : newTimeStamp[1]; //minute
@@ -1371,21 +1366,18 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													isDateChanged = false;
 												}
 
-												UltraDuoPlusDialog.log
-														.log(
-																java.util.logging.Level.FINE,
-																"used entries between " + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", justNowMinus2Year) + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", justNowPlus2Hours) + GDE.LINE_SEPARATOR); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+												UltraDuoPlusDialog.log.log(Level.FINE,
+														"used entries between " + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", justNowMinus2Year) + GDE.STRING_MESSAGE_CONCAT + StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", justNowPlus2Hours) + GDE.LINE_SEPARATOR); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 												long lastTimeStamp = 0;
 												for (Entry<Long, int[]> entry : sortCyclesData.entrySet()) {
 													utilitySet.addPoints(entry.getValue(), (lastTimeStamp == 0 ? 0 : entry.getKey() - lastTimeStamp));
 
-													if (UltraDuoPlusDialog.log.isLoggable(java.util.logging.Level.FINE)) {
+													if (UltraDuoPlusDialog.log.isLoggable(Level.FINE)) {
 														StringBuilder sb = new StringBuilder();
 														for (int i = 0; i < entry.getValue().length; i++) {
 															sb.append("; ").append(String.format("%8d", entry.getValue()[i])); //$NON-NLS-1$ //$NON-NLS-2$
 														}
-														UltraDuoPlusDialog.log.log(
-																java.util.logging.Level.FINE,
+														UltraDuoPlusDialog.log.log(Level.FINE,
 																StringHelper.getFormatedTime("yyyy-MM-dd, HH:mm:ss", entry.getKey()) + String.format("; %12d%s", (lastTimeStamp == 0 ? 0 : entry.getKey() - lastTimeStamp), sb.toString())); //$NON-NLS-1$ //$NON-NLS-2$
 													}
 													lastTimeStamp = lastTimeStamp == 0 ? entry.getKey() : lastTimeStamp;
@@ -1405,7 +1397,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 												UltraDuoPlusDialog.this.cycleDataProgressBar.setSelection(100);
 											}
 											catch (Exception e) {
-												UltraDuoPlusDialog.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
+												UltraDuoPlusDialog.log.log(Level.WARNING, e.getMessage(), e);
 											}
 										}
 									});
@@ -1477,7 +1469,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.channelCombo.setVisibleItemCount(2);
 										RowData memoryComboCycleDataLData = new RowData();
 										memoryComboCycleDataLData.width = 35;
-										memoryComboCycleDataLData.height = GDE.IS_WINDOWS ? 16 : 18;
+										memoryComboCycleDataLData.height = GDE.IS_LINUX ? 20 : GDE.IS_WINDOWS ? 16 : 18;
 										this.channelCombo.setLayoutData(memoryComboCycleDataLData);
 										this.channelCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2335));
 										this.channelCombo.select(0);
@@ -1486,7 +1478,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										this.channelCombo.addSelectionListener(new SelectionAdapter() {
 											@Override
 											public void widgetSelected(SelectionEvent evt) {
-												UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "memoryComboData.widgetSelected, event=" + evt); //$NON-NLS-1$
+												UltraDuoPlusDialog.log.finest(() -> "memoryComboData.widgetSelected, event=" + evt); //$NON-NLS-1$
 												UltraDuoPlusDialog.this.channelSelectionIndex = UltraDuoPlusDialog.this.channelCombo.getSelectionIndex() + 1;
 											}
 										});
@@ -1506,7 +1498,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									graphicsDataButton.addSelectionListener(new SelectionAdapter() {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
-											UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "graphicsDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+											UltraDuoPlusDialog.log.finest(() -> "graphicsDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											try {
 												UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 												int[] points = new int[UltraDuoPlusDialog.this.device.getNumberOfMeasurements(UltraDuoPlusDialog.this.channelSelectionIndex)];
@@ -1523,7 +1515,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 
 													channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, UltraDuoPlusDialog.this.device, UltraDuoPlusDialog.this.channelSelectionIndex, true, false, true));
 													channel.applyTemplateBasics(recordSetKey);
-													UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE, recordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
+													UltraDuoPlusDialog.log.log(Level.FINE, recordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
 													recordSet = channel.get(recordSetKey);
 													UltraDuoPlusDialog.this.device.setTemperatureUnit(UltraDuoPlusDialog.this.channelSelectionIndex, recordSet, UltraDuoPlusDialog.this.initialAnswerData); //°C or °F
 													recordSet.setAllDisplayable();
@@ -1569,11 +1561,11 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 
 											}
 											catch (DataInconsitsentException e) {
-												UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+												UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 												UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2338));
 											}
 											catch (Exception e) {
-												UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+												UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 												UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2336));
 											}
 											finally {
@@ -1611,7 +1603,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						this.restoreButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "restoreButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								UltraDuoPlusDialog.log.finest(() -> "restoreButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								FileDialog fileDialog = UltraDuoPlusDialog.this.application.openFileOpenDialog(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2284), new String[] {
 										GDE.FILE_ENDING_STAR_XML, GDE.FILE_ENDING_STAR }, UltraDuoPlusDialog.this.settings.getDataFilePath(), GDE.STRING_EMPTY, SWT.SINGLE);
 								if (fileDialog.getFileName().length() > 4) {
@@ -1636,7 +1628,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										}
 									}
 									catch (Exception e) {
-										UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+										UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 										if (e.getCause() instanceof FileNotFoundException) {
 											UltraDuoPlusDialog.this.ultraDuoPlusSetup = new ObjectFactory().createUltraDuoPlusType();
 											List<MemoryType> cellMemories = UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory();
@@ -1674,7 +1666,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						this.backupButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "backupButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								UltraDuoPlusDialog.log.finest(() -> "backupButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								FileDialog fileDialog = UltraDuoPlusDialog.this.application.prepareFileSaveDialog(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2285), new String[] {
 										GDE.FILE_ENDING_STAR_XML, GDE.FILE_ENDING_STAR }, UltraDuoPlusDialog.this.settings.getDataFilePath(), StringHelper.getDateAndTime("yyyy-MM-dd-HH-mm-ss") + GDE.STRING_UNDER_BAR //$NON-NLS-1$
 										+ UltraDuoPlusDialog.this.device.getName() + UltraDuoPlusDialog.this.ultraDuoPlusSetup.getIdentifierName());
@@ -1704,7 +1696,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						this.closeButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								UltraDuoPlusDialog.log.finest(() -> "closeButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								UltraDuoPlusDialog.this.dialogShell.dispose();
 							}
 						});
@@ -1721,7 +1713,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						this.helpButton.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(SelectionEvent evt) {
-								UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+								UltraDuoPlusDialog.log.finest(() -> "helpButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 								UltraDuoPlusDialog.this.application.openHelpDialog(UltraDuoPlusDialog.DEVICE_JAR_NAME, "HelpInfo.html"); //$NON-NLS-1$
 							}
 						});
@@ -1729,7 +1721,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					this.boundsComposite.addPaintListener(new PaintListener() {
 						@Override
 						public void paintControl(PaintEvent evt) {
-							UltraDuoPlusDialog.log.log(java.util.logging.Level.FINER, "boundsComposite.paintControl() " + evt); //$NON-NLS-1$
+							UltraDuoPlusDialog.log.log(Level.FINER, "boundsComposite.paintControl() " + evt); //$NON-NLS-1$
 						}
 					});
 				} // end boundsComposite
@@ -1757,7 +1749,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			}
 		}
 		catch (Throwable e) {
-			UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		finally {
 			if (!GDE.shell.isDisposed()) {
@@ -1815,7 +1807,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 * @throws SerialPortException
 	 */
 	private void updateBaseSetup() throws IOException, TimeOutException, SerialPortException {
-		UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, GDE.STRING_ENTRY);
+		UltraDuoPlusDialog.log.finest(() -> GDE.STRING_ENTRY);
 		if (this.ultraDuoPlusSetup != null) {
 			if (this.ultraDuoPlusSetup.getChannelData1() == null || !this.ultraDuoPlusSetup.getChannelData1().isSynced()) {
 				ChannelData1 channelData1 = new ObjectFactory().createUltraDuoPlusTypeChannelData1();
@@ -1831,7 +1823,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			if (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45) { //no configurable outlet channel 2
 				this.device.convert2IntArray(this.channelValues2, this.ultraDuoPlusSetup.channelData2.getValue());
 			}
-			if (UltraDuoPlusDialog.log.isLoggable(java.util.logging.Level.FINEST)) {
+			if (UltraDuoPlusDialog.log.isLoggable(Level.FINEST)) {
 				StringBuffer sb = new StringBuffer();
 				for (int i = 0; i < UltramatSerialPort.SIZE_CHANNEL_1_SETUP; i++) {
 					sb.append(this.channelValues1[i]).append(GDE.STRING_LEFT_BRACKET).append(i).append(GDE.STRING_RIGHT_BRACKET_COMMA);
@@ -1840,16 +1832,16 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				for (int i = 0; this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45 && i < UltramatSerialPort.SIZE_CHANNEL_2_SETUP; i++) {
 					sb.append(this.channelValues2[i]).append(GDE.STRING_LEFT_BRACKET).append(i).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 				}
-				UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, sb.toString());
+				UltraDuoPlusDialog.log.finest(() -> sb.toString());
 			}
 
 			if (this.device.getDeviceTypeIdentifier() != GraupnerDeviceType.UltraDuoPlus45) {
-				UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "add handler"); //$NON-NLS-1$
+				UltraDuoPlusDialog.log.finest(() -> "add handler"); //$NON-NLS-1$
 				//don't need a change listener handler for baseDeviceSetupGroup and baseDeviceSetupGroup1, it will always written to sync date and time
 				this.baseDeviceSetupGroup2.addListener(SWT.Selection, new Listener() {
 					@Override
 					public void handleEvent(Event evt) {
-						UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "baseDeviceSetupComposite2.handleEvent, channelValues2[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$
+						UltraDuoPlusDialog.log.finest(() -> "baseDeviceSetupComposite2.handleEvent, channelValues2[" + evt.index + "] changed"); //$NON-NLS-1$ //$NON-NLS-2$
 						ChannelData2 value = new ChannelData2();
 						value.setValue(StringHelper.integer2Hex4ByteString(UltraDuoPlusDialog.this.channelValues2));
 						UltraDuoPlusDialog.this.ultraDuoPlusSetup.setChannelData2(value);
@@ -1869,7 +1861,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.channelParameters[UltramatSerialPort.SIZE_CHANNEL_1_SETUP + i].setSliderSelection(this.channelValues2[i]);
 			}
 		}
-		UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, GDE.STRING_EXIT);
+		UltraDuoPlusDialog.log.finest(() -> GDE.STRING_EXIT);
 	}
 
 	/**
@@ -1879,10 +1871,10 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 * @throws TimeOutException
 	 */
 	private void updateBatterySetup(int memoryNumber) {
-		UltraDuoPlusDialog.log.log(java.util.logging.Level.FINER, GDE.STRING_ENTRY + memoryNumber);
+		UltraDuoPlusDialog.log.log(Level.FINER, GDE.STRING_ENTRY + memoryNumber);
 		try {
 			if (this.chargeGroup != null && !this.chargeGroup.isDisposed()) {
-				UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "remove event handler"); //$NON-NLS-1$
+				UltraDuoPlusDialog.log.finest(() -> "remove event handler"); //$NON-NLS-1$
 				this.memorySelectComposite.removeListener(SWT.Selection, this.memoryParameterChangeListener);
 				this.chargeGroup.removeListener(SWT.Selection, this.memoryParameterChangeListener);
 				this.dischargeGroup.removeListener(SWT.Selection, this.memoryParameterChangeListener);
@@ -1904,7 +1896,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 						WaitTimer.delay(100);
 						continue;
 					}
-					if (UltraDuoPlusDialog.log.isLoggable(java.util.logging.Level.FINE)) UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE, "-------> [" + i + "] " + this.memoryNames[i]); //$NON-NLS-1$ //$NON-NLS-2$
+					if (UltraDuoPlusDialog.log.isLoggable(Level.FINE)) UltraDuoPlusDialog.log.log(Level.FINE, "-------> [" + i + "] " + this.memoryNames[i]); //$NON-NLS-1$ //$NON-NLS-2$
 					++i;
 				}
 
@@ -1938,12 +1930,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.memoryValues[5] = 1;
 			}
 
-			if (UltraDuoPlusDialog.log.isLoggable(java.util.logging.Level.FINE)) {
+			if (UltraDuoPlusDialog.log.isLoggable(Level.FINE)) {
 				StringBuffer sb = new StringBuffer();
 				for (int i = 0; i < UltramatSerialPort.SIZE_MEMORY_SETUP; i++) {
 					sb.append(String.format("%04d", this.memoryValues[i])).append(GDE.STRING_LEFT_BRACKET).append(i).append(GDE.STRING_RIGHT_BRACKET_COMMA); //$NON-NLS-1$
 				}
-				UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE, sb.toString());
+				UltraDuoPlusDialog.log.log(Level.FINE, sb.toString());
 			}
 			if (this.memoryParameters[0] != null && !this.memoryParameters[0].getSlider().isDisposed()) updateBatteryMemoryParameter(this.memoryValues[0]);
 
@@ -1954,7 +1946,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			}
 
 			if (this.chargeGroup != null && !this.chargeGroup.isDisposed()) {
-				UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, "add event handler"); //$NON-NLS-1$
+				UltraDuoPlusDialog.log.finest(() -> "add event handler"); //$NON-NLS-1$
 				this.memorySelectComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
 				this.chargeGroup.addListener(SWT.Selection, this.memoryParameterChangeListener);
 				this.dischargeGroup.addListener(SWT.Selection, this.memoryParameterChangeListener);
@@ -1965,22 +1957,22 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			}
 		}
 		catch (Throwable e) {
-			UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 		}
-		UltraDuoPlusDialog.log.log(java.util.logging.Level.FINER, GDE.STRING_EXIT);
+		UltraDuoPlusDialog.log.log(Level.FINER, GDE.STRING_EXIT);
 	}
 
 	/**
 	 * update the memory setup parameter list to cell type dependent
 	 */
 	private void updateBatteryMemoryParameter(int selectionIndex) {
-		UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, GDE.STRING_ENTRY);
+		UltraDuoPlusDialog.log.finest(() -> GDE.STRING_ENTRY);
 		//0=cellType,1=numCells,2=capacity,3=year,4=month,5=day,
 		//6=chargeCurrent,7=deltaPeak,8=preDeltaPeakDelay,9=trickleCurrent,10=chargeOffTemperature,11=chargeMaxCapacity,12=chargeSafetyTimer,13=rePeakCycle,14=chargeVoltage,15=repaekDelay,16=flatLimitCheck,26=storeVoltage
 		//17=dischargeCurrent,18=dischargOffVolage,19=dischargeOffTemp,20=dischargemaxCapacity,21=NiMhMatchVoltage
 		//22=cycleDirection,23=cycleCount,24=chargeEndDelay,25=dischargeEndDelay
 		if (this.lastCellSelectionIndex != selectionIndex) {
-			UltraDuoPlusDialog.log.log(java.util.logging.Level.FINE, "cell type changed to : " + UltraDuoPlusDialog.cellTypeNames[this.memoryValues[0]]); //$NON-NLS-1$
+			UltraDuoPlusDialog.log.log(Level.FINE, "cell type changed to : " + UltraDuoPlusDialog.cellTypeNames[this.memoryValues[0]]); //$NON-NLS-1$
 			this.memoryValues[0] = selectionIndex;
 			//update memory parameter table to reflect not edit able parameters for selected cell type
 			switch (this.memoryValues[0]) {
@@ -2181,7 +2173,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				break;
 			}
 		}
-		UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, GDE.STRING_EXIT);
+		UltraDuoPlusDialog.log.finest(() -> GDE.STRING_EXIT);
 	}
 
 	/**
@@ -2189,7 +2181,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 * set meaningful initial values
 	 */
 	private void updateBatteryParameterValues(final int updateIndex) {
-		UltraDuoPlusDialog.log.log(java.util.logging.Level.FINEST, GDE.STRING_ENTRY);
+		UltraDuoPlusDialog.log.finest(() -> GDE.STRING_ENTRY);
 		//0=cellType,1=numCells,2=capacity,3=year,4=month,5=day,
 		//6=chargeCurrent,7=deltaPeak,8=preDeltaPeakDelay,9=trickleCurrent,10=chargeOffTemperature,11=chargeMaxCapacity,12=chargeSafetyTimer,13=rePeakCycle,14=chargeVoltage,15=repaekDelay,16=flatLimitCheck,26=storeVoltage
 		//17=dischargeCurrent,18=dischargOffVolage,19=dischargeOffTemp,20=dischargemaxCapacity,21=NiMhMatchVoltage
@@ -2314,12 +2306,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.memoryParameters[i].setSliderSelection(this.memoryValues[i]);
 			}
 		}
-		if (UltraDuoPlusDialog.log.isLoggable(java.util.logging.Level.FINER)) {
+		if (UltraDuoPlusDialog.log.isLoggable(Level.FINER)) {
 			StringBuffer sb = new StringBuffer();
 			for (int i = 0; i < UltramatSerialPort.SIZE_MEMORY_SETUP; i++) {
 				sb.append(String.format("%04d", this.memoryValues[i])).append(GDE.STRING_LEFT_BRACKET).append(i).append(GDE.STRING_RIGHT_BRACKET_COMMA); //$NON-NLS-1$
 			}
-			UltraDuoPlusDialog.log.log(java.util.logging.Level.FINER, sb.toString());
+			UltraDuoPlusDialog.log.log(Level.FINER, sb.toString());
 		}
 	}
 
@@ -2381,7 +2373,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 			}
 		}
 		catch (Throwable e) {
-			UltraDuoPlusDialog.log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+			UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialogAsync(this.dialogShell != null && !this.dialogShell.isDisposed() ? this.dialogShell : null,
 					Messages.getString(gde.messages.MessageIds.GDE_MSGE0007, new String[] { e.getMessage() }));
 		}

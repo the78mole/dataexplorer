@@ -48,7 +48,7 @@ public class ParameterConfigControl {
 	final Text					text;
 	final Slider				slider;
 
-	final int						controlHeight	= GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+	final int						controlHeight	= GDE.IS_MAC ? 20 : 18;
 	int									offset;
 	final String				format;
 

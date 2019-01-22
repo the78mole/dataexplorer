@@ -169,7 +169,7 @@ public class KosmikConfiguration extends Composite {
 				kosmikHeaderLabelLData.left = new FormAttachment(0, 1000, 10);
 				kosmikHeaderLabelLData.top = new FormAttachment(0, 1000, 10);
 				kosmikHeaderLabelLData.width = this.getClientArea().width - 20;
-				kosmikHeaderLabelLData.height = GDE.IS_MAC ? 18 : 16;
+				kosmikHeaderLabelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				this.kosmikHeaderLabel.setLayoutData(kosmikHeaderLabelLData);
 				this.kosmikHeaderLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.kosmikHeaderLabel.setText(Messages.getString(MessageIds.GDE_MSGW2804));
@@ -180,7 +180,7 @@ public class KosmikConfiguration extends Composite {
 				this.motorRotorRpmLabel.setText(Messages.getString(MessageIds.GDE_MSGW2805));
 				FormData rpmLabelLData = new FormData();
 				rpmLabelLData.width = 272;
-				rpmLabelLData.height = GDE.IS_MAC ? 18 : 16;
+				rpmLabelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				rpmLabelLData.left = new FormAttachment(0, 1000, 125);
 				rpmLabelLData.top = new FormAttachment(0, 1000, 40);
 				this.motorRotorRpmLabel.setLayoutData(rpmLabelLData);
@@ -191,7 +191,7 @@ public class KosmikConfiguration extends Composite {
 				this.motorRotorRpmCombo.setItems(new String[] { "  Motor", "Propeller/Rotor" }); //$NON-NLS-1$ //$NON-NLS-2$
 				FormData motorRotorRpmComboLData = new FormData();
 				motorRotorRpmComboLData.width = 120;
-				motorRotorRpmComboLData.height = GDE.IS_MAC ? 18 : 16;
+				motorRotorRpmComboLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				motorRotorRpmComboLData.left = new FormAttachment(0, 1000, 400);
 				motorRotorRpmComboLData.top = new FormAttachment(0, 1000, 40);
 				this.motorRotorRpmCombo.setLayoutData(motorRotorRpmComboLData);
@@ -220,7 +220,7 @@ public class KosmikConfiguration extends Composite {
 				this.numMotorPolsLabel.setText(Messages.getString(MessageIds.GDE_MSGW2808));
 				FormData numPolsLabelLData = new FormData();
 				numPolsLabelLData.width = 272;
-				numPolsLabelLData.height = GDE.IS_MAC ? 18 : 16;
+				numPolsLabelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				numPolsLabelLData.left = new FormAttachment(0, 1000, 125);
 				numPolsLabelLData.top = new FormAttachment(0, 1000, 75);
 				this.numMotorPolsLabel.setLayoutData(numPolsLabelLData);
@@ -231,7 +231,7 @@ public class KosmikConfiguration extends Composite {
 				this.numMotorPolsCombo.setItems(new String[] { "    2", "    4", "    6", "    8", "   10", "   12", "   14", "   16", "   18" });
 				FormData numMotorPolsComboLData = new FormData();
 				numMotorPolsComboLData.width = 80;
-				numMotorPolsComboLData.height = GDE.IS_MAC ? 18 : 16;
+				numMotorPolsComboLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				numMotorPolsComboLData.left = new FormAttachment(0, 1000, 400);
 				numMotorPolsComboLData.top = new FormAttachment(0, 1000, 75);
 				this.numMotorPolsCombo.setLayoutData(numMotorPolsComboLData);
@@ -257,7 +257,7 @@ public class KosmikConfiguration extends Composite {
 				this.motorPinionLabel.setText(Messages.getString(MessageIds.GDE_MSGW2806));
 				FormData motorPinionLabelLData = new FormData();
 				motorPinionLabelLData.width = 272;
-				motorPinionLabelLData.height = GDE.IS_MAC ? 18 : 16;
+				motorPinionLabelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				motorPinionLabelLData.left = new FormAttachment(0, 1000, 125);
 				motorPinionLabelLData.top = new FormAttachment(0, 1000, 110);
 				this.motorPinionLabel.setLayoutData(motorPinionLabelLData);
@@ -267,8 +267,8 @@ public class KosmikConfiguration extends Composite {
 				this.motorPinionText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.motorPinionText.setText("17"); //$NON-NLS-1$
 				FormData motorPinionTextLData = new FormData();
-				motorPinionTextLData.width = 23;
-				motorPinionTextLData.height = GDE.IS_MAC ? 18 : 16;
+				motorPinionTextLData.width = 30;
+				motorPinionTextLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				motorPinionTextLData.left = new FormAttachment(0, 1000, 400);
 				motorPinionTextLData.top = new FormAttachment(0, 1000, 110);
 				this.motorPinionText.setLayoutData(motorPinionTextLData);
@@ -294,8 +294,8 @@ public class KosmikConfiguration extends Composite {
 				this.motorPinionSlider = new Slider(this, SWT.HORIZONTAL | SWT.BORDER);
 				FormData motorPinionSliderLData = new FormData();
 				motorPinionSliderLData.width = 100;
-				motorPinionSliderLData.height = GDE.IS_MAC ? 18 : 16;
-				motorPinionSliderLData.left = new FormAttachment(0, 1000, 440);
+				motorPinionSliderLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+				motorPinionSliderLData.left = new FormAttachment(0, 1000, 450);
 				motorPinionSliderLData.top = new FormAttachment(0, 1000, 110);
 				this.motorPinionSlider.setLayoutData(motorPinionSliderLData);
 				this.motorPinionSlider.setMaximum(50);
@@ -318,7 +318,7 @@ public class KosmikConfiguration extends Composite {
 				this.mainGearToothCountLabel.setText(Messages.getString(MessageIds.GDE_MSGW2807));
 				FormData mainGearToothCountLabelLData = new FormData();
 				mainGearToothCountLabelLData.width = 272;
-				mainGearToothCountLabelLData.height = GDE.IS_MAC ? 18 : 16;
+				mainGearToothCountLabelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				mainGearToothCountLabelLData.left = new FormAttachment(0, 1000, 125);
 				mainGearToothCountLabelLData.top = new FormAttachment(0, 1000, 145);
 				this.mainGearToothCountLabel.setLayoutData(mainGearToothCountLabelLData);
@@ -329,7 +329,7 @@ public class KosmikConfiguration extends Composite {
 				this.mainGearToothCountText.setText("87");
 				FormData mainGearToothCountTextLData = new FormData();
 				mainGearToothCountTextLData.width = 30;
-				mainGearToothCountTextLData.height = GDE.IS_MAC ? 18 : 16;
+				mainGearToothCountTextLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				mainGearToothCountTextLData.left = new FormAttachment(0, 1000, 400);
 				mainGearToothCountTextLData.top = new FormAttachment(0, 1000, 145);
 				this.mainGearToothCountText.setLayoutData(mainGearToothCountTextLData);
@@ -355,8 +355,8 @@ public class KosmikConfiguration extends Composite {
 				this.mainGearToothCountSlider = new Slider(this, SWT.HORIZONTAL | SWT.BORDER);
 				FormData mainGearToothCountSliderLData = new FormData();
 				mainGearToothCountSliderLData.width = 100;
-				mainGearToothCountSliderLData.height = GDE.IS_MAC ? 18 : 16;
-				mainGearToothCountSliderLData.left = new FormAttachment(0, 1000, 440);
+				mainGearToothCountSliderLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+				mainGearToothCountSliderLData.left = new FormAttachment(0, 1000, 450);
 				mainGearToothCountSliderLData.top = new FormAttachment(0, 1000, 145);
 				this.mainGearToothCountSlider.setLayoutData(mainGearToothCountSliderLData);
 				this.mainGearToothCountSlider.setMaximum(300);
@@ -379,7 +379,7 @@ public class KosmikConfiguration extends Composite {
 				this.temperatureUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGW2810));
 				FormData temperatureUnitLabelLData = new FormData();
 				temperatureUnitLabelLData.width = 272;
-				temperatureUnitLabelLData.height = GDE.IS_MAC ? 18 : 16;
+				temperatureUnitLabelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				temperatureUnitLabelLData.left = new FormAttachment(0, 1000, 125);
 				temperatureUnitLabelLData.top = new FormAttachment(0, 1000, 180);
 				this.temperatureUnitLabel.setLayoutData(temperatureUnitLabelLData);
@@ -390,7 +390,7 @@ public class KosmikConfiguration extends Composite {
 				this.temperatureUnitCombo.setItems(new String[] { "  Celsius", " Fahrenheit" });
 				FormData temperatureUnitComboLData = new FormData();
 				temperatureUnitComboLData.width = 100;
-				temperatureUnitComboLData.height = GDE.IS_MAC ? 18 : 16;
+				temperatureUnitComboLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				temperatureUnitComboLData.left = new FormAttachment(0, 1000, 400);
 				temperatureUnitComboLData.top = new FormAttachment(0, 1000, 180);
 				this.temperatureUnitCombo.setLayoutData(temperatureUnitComboLData);
@@ -456,7 +456,7 @@ public class KosmikConfiguration extends Composite {
 				this.kosmikVersionLabel.setText("Kosmik Version:"); //$NON-NLS-1$
 				FormData kosmikVersionLabelLData = new FormData();
 				kosmikVersionLabelLData.width = 272;
-				kosmikVersionLabelLData.height = GDE.IS_MAC ? 18 : 16;
+				kosmikVersionLabelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				kosmikVersionLabelLData.left = new FormAttachment(0, 1000, 125);
 				kosmikVersionLabelLData.top = new FormAttachment(0, 1000, 225);
 				this.kosmikVersionLabel.setLayoutData(kosmikVersionLabelLData);
@@ -467,7 +467,7 @@ public class KosmikConfiguration extends Composite {
 				this.kosmikVersionCombo.setItems(new String[] { "  <= 3.1", "  >= 3.2" }); //$NON-NLS-1$ //$NON-NLS-2$
 				FormData kosmikVersionComboLData = new FormData();
 				kosmikVersionComboLData.width = 80;
-				kosmikVersionComboLData.height = GDE.IS_MAC ? 18 : 16;
+				kosmikVersionComboLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 				kosmikVersionComboLData.left = new FormAttachment(0, 1000, 400);
 				kosmikVersionComboLData.top = new FormAttachment(0, 1000, 225);
 				this.kosmikVersionCombo.setLayoutData(kosmikVersionComboLData);

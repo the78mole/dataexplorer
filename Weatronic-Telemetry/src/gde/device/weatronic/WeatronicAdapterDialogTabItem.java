@@ -21,6 +21,7 @@ package gde.device.weatronic;
 import gde.GDE;
 import gde.data.Channels;
 import gde.device.IDevice;
+import gde.device.MeasurementType;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.MeasurementControl;
@@ -64,7 +65,7 @@ public class WeatronicAdapterDialogTabItem extends CTabItem {
 	final Channels									channels;																																						// interaction with channels, source of all records
 	final WeatronicAdapterDialog		dialog;
 	final int												channelConfigNumber;
-	final List<MeasurementControl>	measurementTypes	= new ArrayList<MeasurementControl>();
+	final List<MeasurementControl>	measurementControls	= new ArrayList<MeasurementControl>();
 
 	public WeatronicAdapterDialogTabItem(CTabFolder parentTabFolder, WeatronicAdapterDialog parentDialog, int useChannelConfigNumber, IDevice useDevice) {
 		super(parentTabFolder, SWT.NONE);
@@ -113,9 +114,9 @@ public class WeatronicAdapterDialogTabItem extends CTabItem {
 				filler.setLayoutData(fillerLData);
 			}
 			{
+				List<MeasurementType> measurementTypes = this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber);
 				for (int i = 0; i < this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).size(); i++) {
-					this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i),
-							this.device, 1));
+					this.measurementControls.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, measurementTypes.get(i), this.device, 1));
 				}
 			}
 			this.scolledComposite.addControlListener(new ControlListener() {
