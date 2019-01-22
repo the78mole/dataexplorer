@@ -208,7 +208,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 				if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
 				this.dialogShell.setText("LiPoWatch" + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273)); //$NON-NLS-1$
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
-				this.dialogShell.setSize(509, 394);
+				this.dialogShell.setSize(515, 400);
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
 				this.dialogShell.addListener(SWT.Traverse, new Listener() {
 		      @Override
@@ -917,15 +917,21 @@ public class LiPoWatchDialog extends DeviceDialog {
 								{
 									this.clearMemoryGroup = new Group(this.dataMainComposite, SWT.NONE);
 									this.clearMemoryGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-									this.clearMemoryGroup.setLayout(null);
 									this.clearMemoryGroup.setText(Messages.getString(MessageIds.GDE_MSGT1667));
 									this.clearMemoryGroup.setBounds(259, 187, 228, 100);
 									this.clearMemoryGroup.addMouseTrackListener(this.mouseTrackerEnterFadeOut);
+									this.clearMemoryGroup.setLayout(new RowLayout(SWT.VERTICAL));
+									{
+										this.clearMemoryLabel = new CLabel(this.clearMemoryGroup, SWT.CENTER | SWT.EMBEDDED);
+										this.clearMemoryLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+										this.clearMemoryLabel.setText(Messages.getString(MessageIds.GDE_MSGT1604));
+										this.clearMemoryLabel.setLayoutData(new RowData(205, 40));
+									}
 									{
 										this.clearMemoryButton = new Button(this.clearMemoryGroup, SWT.PUSH | SWT.CENTER);
 										this.clearMemoryButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.clearMemoryButton.setText(Messages.getString(MessageIds.GDE_MSGT1668));
-										this.clearMemoryButton.setBounds(12, 46, 202, 31);
+										this.clearMemoryButton.setLayoutData(new RowData(205, 30));
 										this.clearMemoryButton.setEnabled(this.isLiveGathererEnabled);
 										this.clearMemoryButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1603));
 										this.clearMemoryButton.addSelectionListener(new SelectionAdapter() {
@@ -946,14 +952,8 @@ public class LiPoWatchDialog extends DeviceDialog {
 											}
 										});
 									}
-									{
-										this.clearMemoryLabel = new CLabel(this.clearMemoryGroup, SWT.CENTER | SWT.EMBEDDED);
-										this.clearMemoryLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-										this.clearMemoryLabel.setText(Messages.getString(MessageIds.GDE_MSGT1604));
-										this.clearMemoryLabel.setBounds(12, 10, 202, 40);
-									}
+									this.clearMemoryGroup.layout();
 								}
-
 							}
 						}
 					}

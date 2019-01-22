@@ -245,7 +245,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				gpsLoggerGroupLData.left = new FormAttachment(0, 1000, 10);
 				gpsLoggerGroupLData.top = new FormAttachment(0, 1000, 5);
 				gpsLoggerGroupLData.width = 290;
-				gpsLoggerGroupLData.height = GDE.IS_MAC ? 395 : 400;
+				gpsLoggerGroupLData.height = GDE.IS_MAC ? 405 : 410;
 				RowLayout gpsLoggerGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.gpsLoggerGroup.setLayout(gpsLoggerGroupLayout);
 				this.gpsLoggerGroup.setLayoutData(gpsLoggerGroupLData);
@@ -844,7 +844,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				gpsTelemertieGroupLData.left = new FormAttachment(0, 1000, 10);
 				gpsTelemertieGroupLData.top = new FormAttachment(0, 1000, 430);
 				gpsTelemertieGroupLData.width = 290;
-				gpsTelemertieGroupLData.height = 168;
+				gpsTelemertieGroupLData.height = 175;
 				this.gpsTelemertieAlarmGroup.setLayoutData(gpsTelemertieGroupLData);
 				this.gpsTelemertieAlarmGroup.setLayout(new RowLayout(org.eclipse.swt.SWT.HORIZONTAL));
 				this.gpsTelemertieAlarmGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
