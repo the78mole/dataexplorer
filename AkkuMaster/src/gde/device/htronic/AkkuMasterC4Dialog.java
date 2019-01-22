@@ -510,15 +510,15 @@ public class AkkuMasterC4Dialog extends DeviceDialog {
 						@Override
 						public void run() {
 							try {
-//								if (!AkkuMasterC4Dialog.this.serialPort.isConnected()) {
-//									AkkuMasterC4Dialog.this.serialPort.open();
-//								}
-//								AkkuMasterC4Dialog.this.version = AkkuMasterC4Dialog.this.serialPort.getVersion();
-//								getDialogShell().getDisplay().asyncExec(new Runnable() {
-//									public void run() {
-//										AkkuMasterC4Dialog.this.versionComposite.redraw();
-//									}
-//								});
+								if (!AkkuMasterC4Dialog.this.serialPort.isConnected()) {
+									AkkuMasterC4Dialog.this.serialPort.open();
+								}
+								AkkuMasterC4Dialog.this.version = AkkuMasterC4Dialog.this.serialPort.getVersion();
+								getDialogShell().getDisplay().asyncExec(new Runnable() {
+									public void run() {
+										AkkuMasterC4Dialog.this.versionComposite.redraw();
+									}
+								});
 							}
 							catch (Throwable e) {
 								AkkuMasterC4Dialog.this.application.openMessageDialog(AkkuMasterC4Dialog.this.getDialogShell(), Messages.getString(gde.messages.MessageIds.GDE_MSGE0024, new Object[] {e.getClass().getSimpleName(), e.getMessage() } ));

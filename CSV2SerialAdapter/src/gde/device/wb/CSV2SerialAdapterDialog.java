@@ -102,7 +102,7 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				//dialogShell.pack();
-				this.dialogShell.setSize(GDE.IS_LINUX ? 350 : 310, 600); 
+				this.dialogShell.setSize(GDE.IS_LINUX ? 380 : 350, 600); 
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
@@ -158,10 +158,60 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 //				});
 				{
 					this.tabFolder = new CTabFolder(this.dialogShell, SWT.NONE);
+					FormData tabFolderLData = new FormData();
+					tabFolderLData.top = new FormAttachment(0, 1000, 0);
+					tabFolderLData.left = new FormAttachment(0, 1000, 0);
+					tabFolderLData.right = new FormAttachment(1000, 1000, 0);
+					tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
+					this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.tabFolder.setLayoutData(tabFolderLData);
+					this.tabFolder.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(java.util.logging.Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
+							int channelNumber = CSV2SerialAdapterDialog.this.tabFolder.getSelectionIndex();
+							if (channelNumber >= 0 && channelNumber <= CSV2SerialAdapterDialog.this.device.getChannelCount()) { // enable other tabs for future use
+								channelNumber += 1;
+								String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText(); //$NON-NLS-1$
+								Channels channels = Channels.getInstance();
+								Channel activeChannel = channels.getActiveChannel();
+								if (activeChannel != null) {
+									log.log(java.util.logging.Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
+									if (activeRecordSet != null && activeChannel.getNumber() != channelNumber) {
+										int answer = CSV2SerialAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1701));
+										if (answer == SWT.YES) {
+											String recordSetKey = activeRecordSet.getName();
+											Channel tmpChannel = channels.get(channelNumber);
+											if (tmpChannel != null) {
+												log.log(java.util.logging.Level.FINE,
+														"move record set " + recordSetKey + " to channel/configuration " + channelNumber + GDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
+												tmpChannel.put(recordSetKey, activeRecordSet.clone(channelNumber));
+												activeChannel.remove(recordSetKey);
+												channels.switchChannel(channelNumber, recordSetKey);
+												RecordSet newActiveRecordSet = channels.get(channelNumber).getActiveRecordSet();
+												if (newActiveRecordSet != null) {
+													CSV2SerialAdapterDialog.this.device.updateVisibilityStatus(newActiveRecordSet, false);
+													CSV2SerialAdapterDialog.this.device.makeInActiveDisplayable(newActiveRecordSet);
+												}
+											}
+										}
+										CSV2SerialAdapterDialog.this.application.updateCurveSelectorTable();
+									}
+								}
+							}
+						}
+					});
 					{
 						for (int i = 0; i < this.device.getChannelCount(); i++) {
 							this.configurations.add(new CSV2SerialAdapterDialogTabItem(this.tabFolder, this, (i + 1), this.device));
 						}
+					}
+					try {
+						this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
+					}
+					catch (RuntimeException e) {
+						this.tabFolder.setSelection(0);
 					}
 					{
 						this.saveButton = new Button(this.dialogShell, SWT.PUSH | SWT.CENTER);
@@ -219,57 +269,6 @@ public class CSV2SerialAdapterDialog extends DeviceDialog {
 							}
 						});
 					}
-					FormData tabFolderLData = new FormData();
-					tabFolderLData.top = new FormAttachment(0, 1000, 0);
-					tabFolderLData.left = new FormAttachment(0, 1000, 0);
-					tabFolderLData.right = new FormAttachment(1000, 1000, 0);
-					tabFolderLData.bottom = new FormAttachment(1000, 1000, -50);
-					this.tabFolder.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.tabFolder.setLayoutData(tabFolderLData);
-					this.tabFolder.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "configTabFolder.widgetSelected, event=" + evt); //$NON-NLS-1$
-							int channelNumber = CSV2SerialAdapterDialog.this.tabFolder.getSelectionIndex();
-							if (channelNumber >= 0 && channelNumber <= CSV2SerialAdapterDialog.this.device.getChannelCount()) { // enable other tabs for future use
-								channelNumber += 1;
-								String configKey = channelNumber + " : " + ((CTabItem) evt.item).getText(); //$NON-NLS-1$
-								Channels channels = Channels.getInstance();
-								Channel activeChannel = channels.getActiveChannel();
-								if (activeChannel != null) {
-									log.log(java.util.logging.Level.FINE, "activeChannel = " + activeChannel.getName() + " configKey = " + configKey); //$NON-NLS-1$ //$NON-NLS-2$
-									RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-									if (activeRecordSet != null && activeChannel.getNumber() != channelNumber) {
-										int answer = CSV2SerialAdapterDialog.this.application.openYesNoMessageDialog(getDialogShell(), Messages.getString(MessageIds.GDE_MSGI1701));
-										if (answer == SWT.YES) {
-											String recordSetKey = activeRecordSet.getName();
-											Channel tmpChannel = channels.get(channelNumber);
-											if (tmpChannel != null) {
-												log.log(java.util.logging.Level.FINE,
-														"move record set " + recordSetKey + " to channel/configuration " + channelNumber + GDE.STRING_BLANK_COLON_BLANK + configKey); //$NON-NLS-1$ //$NON-NLS-2$
-												tmpChannel.put(recordSetKey, activeRecordSet.clone(channelNumber));
-												activeChannel.remove(recordSetKey);
-												channels.switchChannel(channelNumber, recordSetKey);
-												RecordSet newActiveRecordSet = channels.get(channelNumber).getActiveRecordSet();
-												if (newActiveRecordSet != null) {
-													CSV2SerialAdapterDialog.this.device.updateVisibilityStatus(newActiveRecordSet, false);
-													CSV2SerialAdapterDialog.this.device.makeInActiveDisplayable(newActiveRecordSet);
-												}
-											}
-										}
-										CSV2SerialAdapterDialog.this.application.updateCurveSelectorTable();
-									}
-								}
-							}
-						}
-					});
-				}
-
-				try {
-					this.tabFolder.setSelection(Channels.getInstance().getActiveChannelNumber() - 1);
-				}
-				catch (RuntimeException e) {
-					this.tabFolder.setSelection(0);
 				}
 				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 175, 100));
 				this.dialogShell.open();

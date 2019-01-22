@@ -57,6 +57,7 @@ import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
+import gde.device.MeasurementType;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.MeasurementControlConfigurable;
@@ -87,7 +88,7 @@ public class S32Dialog extends DeviceDialog {
 	boolean									isConfigChanged			= false;
 	int											measurementsCount		= 0;
 	final List<CTabItem>		csonfigurations			= new ArrayList<CTabItem>();
-	final List<Composite>		measurementTypes		= new ArrayList<Composite>();
+	final List<Composite>		measurementControls	= new ArrayList<Composite>();
 
 	/**
 	 * default constructor initialize all variables required
@@ -319,10 +320,11 @@ public class S32Dialog extends DeviceDialog {
 		this.tabItemLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 2, SWT.BOLD));
 		this.tabItemLabel.setText(Messages.getString(MessageIds.GDE_MSGT3809));
 	
+		List<MeasurementType> measurementTypes = this.device.getChannelMeasuremtsReplacedNames(channelNumber);
 		for (int i = 0; i < numMeasurements; i++) { // display actual only the native 31 measurements of JLog2
 			//allow all measurement names, symbols and units to be correctable
-			this.measurementTypes.add(new MeasurementControlConfigurable(mainTabComposite, this, channelNumber, i,
-					this.device.getChannelMeasuremtsReplacedNames(channelNumber).get(i), this.device, 1, GDE.STRING_BLANK + i, GDE.STRING_EMPTY));
+			this.measurementControls.add(new MeasurementControlConfigurable(mainTabComposite, this, channelNumber, i,
+					measurementTypes.get(i), this.device, 1, GDE.STRING_BLANK + i, GDE.STRING_EMPTY));
 		}
 
 		scolledComposite.addControlListener(new ControlListener() {

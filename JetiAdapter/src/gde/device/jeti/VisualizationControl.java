@@ -21,6 +21,7 @@ package gde.device.jeti;
 import gde.GDE;
 import gde.data.Channels;
 import gde.device.IDevice;
+import gde.device.MeasurementType;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.MeasurementControlConfigurable;
@@ -66,7 +67,7 @@ public class VisualizationControl extends Composite {
 	final String								typeName;
 	final int										measurementCount;
 	final int										measurementOffset;
-	final List<Composite>				measurementTypes		= new ArrayList<Composite>();
+	final List<Composite>				measurementControls		= new ArrayList<Composite>();
 
 	public VisualizationControl(Composite parentComposite, FormData useLayoutData, JetiAdapterDialog parentDialog, int useChannelConfigNumber, IDevice useDevice, String useName,
 			int useMeasurementOffset, int useMeasurementCount) {
@@ -109,10 +110,12 @@ public class VisualizationControl extends Composite {
 			mainTabCompositeLayout.numColumns = 2;
 			this.mainTabComposite.setLayout(mainTabCompositeLayout);
 			
+			List<MeasurementType> measurementTypes = this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber);
 			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) {
-				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i,
-						this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), ""));
+				this.measurementControls.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i,
+						measurementTypes.get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), ""));
 			}
+			this.mainTabComposite.layout();
 		}
 	}
 }

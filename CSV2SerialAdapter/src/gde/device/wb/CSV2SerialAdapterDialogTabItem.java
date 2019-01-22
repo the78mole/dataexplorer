@@ -21,6 +21,7 @@ package gde.device.wb;
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.device.MeasurementType;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.MeasurementControlConfigurable;
@@ -62,7 +63,6 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 	Label														measurementUnitLabel;
 	Label														measurementSymbolLabel;
 	Label														tabItemLabel;
-	Composite												mainTabComposite;
 
 	boolean													isVisibilityChanged	= false;
 
@@ -72,7 +72,7 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 	final Channels									channels;																																							// interaction with channels, source of all records
 	final CSV2SerialAdapterDialog		dialog;
 	final int												channelConfigNumber;
-	final List<MeasurementControlConfigurable>	measurementTypes		= new ArrayList<MeasurementControlConfigurable>();
+	final List<MeasurementControlConfigurable>	measurementControls		= new ArrayList<MeasurementControlConfigurable>();
 
 	public CSV2SerialAdapterDialogTabItem(CTabFolder parentTabFolder, CSV2SerialAdapterDialog parentDialog, int useChannelConfigNumber, CSV2SerialAdapter useDevice) {
 		super(parentTabFolder, SWT.NONE);
@@ -92,13 +92,13 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 		scolledComposite.setLayout(new FillLayout());
 		this.setControl(scolledComposite);
 		
-		this.mainTabComposite = new Composite(scolledComposite, SWT.NONE);
+		Composite mainTabComposite = new Composite(scolledComposite, SWT.NONE);
 		GridLayout mainTabCompositeLayout = new GridLayout();
 		mainTabCompositeLayout.makeColumnsEqualWidth = true;
-		this.mainTabComposite.setLayout(mainTabCompositeLayout);
-		scolledComposite.setContent(this.mainTabComposite);
+		mainTabComposite.setLayout(mainTabCompositeLayout);
+		scolledComposite.setContent(mainTabComposite);
 		{
-			this.tabItemLabel = new Label(this.mainTabComposite, SWT.CENTER);
+			this.tabItemLabel = new Label(mainTabComposite, SWT.CENTER);
 			GridData tabItemLabelLData = new GridData();
 			tabItemLabelLData.horizontalAlignment = GridData.BEGINNING;
 			tabItemLabelLData.verticalAlignment = GridData.BEGINNING;
@@ -110,36 +110,38 @@ public class CSV2SerialAdapterDialogTabItem extends CTabItem {
 		}
 		{
 			// 0=voltageReceiver, 1=voltage, 2=current, 3=capacity, 4=power, 5=energy, 6=votagePerCell, 7=revolutionSpeed, 8=efficiency, 9=height, 10=slope, 11=a1Value, 12=a2Value, 13=a3Value
-			for (int i = 0; i < this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).size(); i++) {
-				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i), this.device, 1, GDE.STRING_BLANK + i, ""));
+			List<MeasurementType> measurementTypes = this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber);
+			for (int i = 0; i < measurementTypes.size(); i++) {
+				this.measurementControls.add(new MeasurementControlConfigurable(mainTabComposite, this.dialog, this.channelConfigNumber, i, measurementTypes.get(i), this.device, 1, GDE.STRING_BLANK + i, ""));
 			}
 		}
 		scolledComposite.addControlListener(new ControlListener() {
 			@Override
 			public void controlResized(ControlEvent evt) {
 				log.log(java.util.logging.Level.FINEST, "scolledComposite.controlResized, event=" + evt); //$NON-NLS-1$
-				int height = 35 + device.getChannelMeasuremtsReplacedNames(parent.getSelectionIndex() + 1).size() * 28 / 2;
+				int height = 35 + device.getChannelMeasuremtsReplacedNames(parent.getSelectionIndex() + 1).size() * 28;
 				Channel channel = Channels.getInstance().get(parent.getSelectionIndex() + 1);
 				if (channel != null)
 					if (channel.getActiveRecordSet() != null)
-						height = 35 + (channel.getActiveRecordSet().size() + 1) * 28 / 2;
+						height = 35 + (channel.getActiveRecordSet().size() + 1) * 28;
 				mainTabComposite.setSize(scolledComposite.getClientArea().width, height);
 			}
 
 			@Override
 			public void controlMoved(ControlEvent evt) {
 				log.log(java.util.logging.Level.FINEST, "scolledComposite.controlMoved, event=" + evt); //$NON-NLS-1$
-				int height = 35 + device.getChannelMeasuremtsReplacedNames(parent.getSelectionIndex() + 1).size() * 28 / 2;
+				int height = 35 + device.getChannelMeasuremtsReplacedNames(parent.getSelectionIndex() + 1).size() * 28;
 				Channel channel = Channels.getInstance().get(parent.getSelectionIndex() + 1);
 				if (channel != null)
 					if (channel.getActiveRecordSet() != null)
-						height = 35 + (channel.getActiveRecordSet().size() + 1) * 28 / 2;
+						height = 35 + (channel.getActiveRecordSet().size() + 1) * 28;
 				mainTabComposite.setSize(scolledComposite.getClientArea().width, height);
 			}
 		});
+		mainTabComposite.layout();
 
 		{
-			this.buttonComposite = new Composite(this.mainTabComposite, SWT.NONE);
+			this.buttonComposite = new Composite(mainTabComposite, SWT.NONE);
 			GridData buttonCompositeLData = new GridData();
 			buttonCompositeLData.verticalAlignment = GridData.BEGINNING;
 			buttonCompositeLData.horizontalAlignment = GridData.BEGINNING;
