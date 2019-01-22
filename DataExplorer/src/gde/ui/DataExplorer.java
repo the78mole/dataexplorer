@@ -65,7 +65,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
@@ -3051,9 +3050,8 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 	public ObjectData getActiveObject() {
 		if (this.objectDescriptionTabItem != null && !this.objectDescriptionTabItem.isDisposed()) {
 			return this.objectDescriptionTabItem.getObject();
-		} else {
-			return null;
-		}
+		} 
+		return null;
 	}
 
 	/**

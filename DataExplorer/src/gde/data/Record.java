@@ -279,9 +279,8 @@ public class Record extends AbstractRecord implements IRecord {
 			if (record.getDataType() == DataType.DEFAULT) {
 				DataType guess = guess(record.getName());
 				return guess != null ? guess : DataType.DEFAULT;
-			} else {
-				return record.getDataType();
 			}
+			return record.getDataType();
 		}
 
 		public static DataType guess(String name) {
@@ -1591,11 +1590,11 @@ public class Record extends AbstractRecord implements IRecord {
 	public Point getGPSDisplayPoint(int measurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
 		//log.log(Level.OFF, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue()) + ")");
 		int grad = this.get(measurementPointIndex) / 1000000;
-		if (this.getUnit().endsWith("'"))
+		if (this.getUnit().endsWith("'")) {
 			return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), yDisplayOffset - Double
 					.valueOf((((grad + ((this.get(measurementPointIndex) / 1000000.0 - grad) / 0.60)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
-		else
-			return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), yDisplayOffset - Double
+		}
+		return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), yDisplayOffset - Double
 					.valueOf((((grad + (this.get(measurementPointIndex) / 1000000.0 - grad)) * 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
 	}
 
@@ -1605,12 +1604,12 @@ public class Record extends AbstractRecord implements IRecord {
 	 */
 	public String getFormattedMeasureValue(int index) {
 		if (this.device.isGPSCoordinates(this)) {
-			if (this.getUnit().endsWith("'")) //$NON-NLS-1$
+			if (this.getUnit().endsWith("'")) { //$NON-NLS-1$
 				return this.elementAt(index) != null ? StringHelper.getFormatedWithMinutes("%2d %04.1f", this.device.translateValue(this, this.elementAt(index) / 1000.)).trim() : GDE.STRING_STAR; //$NON-NLS-1$
-			else
-				return this.elementAt(index) != null ? this.getDecimalFormat().format(this.device.translateValue(this, this.elementAt(index) / 1000.)) : GDE.STRING_STAR;
-		} else
+			}
 			return this.elementAt(index) != null ? this.getDecimalFormat().format(this.device.translateValue(this, this.elementAt(index) / 1000.)) : GDE.STRING_STAR;
+		}
+		return this.elementAt(index) != null ? this.getDecimalFormat().format(this.device.translateValue(this, this.elementAt(index) / 1000.)) : GDE.STRING_STAR;
 	}
 
 	/**
@@ -1620,12 +1619,12 @@ public class Record extends AbstractRecord implements IRecord {
 	@Override
 	public String getFormattedScaleValue(double finalValue) {
 		if (this.device.isGPSCoordinates(this)) {
-			if (this.getUnit().endsWith("'")) //$NON-NLS-1$
+			if (this.getUnit().endsWith("'")) { //$NON-NLS-1$
 				return StringHelper.getFormatedWithMinutes("%2d %04.1f", finalValue); //$NON-NLS-1$
-			else
-				return this.getDecimalFormat().format(finalValue);
-		} else
+			}
 			return this.getDecimalFormat().format(finalValue);
+		}
+		return this.getDecimalFormat().format(finalValue);
 	}
 
 	/**
@@ -1894,9 +1893,9 @@ public class Record extends AbstractRecord implements IRecord {
 	 */
 	public void setDisplayScaleFactorValue(int drawAreaHeight) {
 		this.displayScaleFactorValue = (1.0 * drawAreaHeight) / (this.maxDisplayValue - this.minDisplayValue);
-		RecordSet parent = this.getParent();
-		if (parent.isOneOfSyncableRecord(this.name) && this.getFactor() / parent.get(parent.getSyncMasterRecordOrdinal(this.name)).getFactor() != 1) {
-			this.syncMasterFactor = this.getFactor() / parent.get(parent.getSyncMasterRecordOrdinal(this.name)).getFactor();
+		RecordSet recordParent = this.getParent();
+		if (recordParent.isOneOfSyncableRecord(this.name) && this.getFactor() / recordParent.get(recordParent.getSyncMasterRecordOrdinal(this.name)).getFactor() != 1) {
+			this.syncMasterFactor = this.getFactor() / recordParent.get(recordParent.getSyncMasterRecordOrdinal(this.name)).getFactor();
 			this.displayScaleFactorValue = this.displayScaleFactorValue * this.syncMasterFactor;
 		}
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format(Locale.ENGLISH, "drawAreaHeight = %d displayScaleFactorValue = %.3f (this.maxDisplayValue - this.minDisplayValue) = %.3f", //$NON-NLS-1$
@@ -2062,7 +2061,8 @@ public class Record extends AbstractRecord implements IRecord {
 		sb.append(IS_START_POINT_ZERO).append(GDE.STRING_EQUAL).append(this.isStartpointZero).append(DELIMITER);
 		sb.append(IS_START_END_DEFINED).append(GDE.STRING_EQUAL).append(this.isStartEndDefined).append(DELIMITER);
 		sb.append(NUMBER_FORMAT).append(GDE.STRING_EQUAL).append(this.numberFormat).append(DELIMITER);
-		if (this.dataType != Record.DataType.DEFAULT) sb.append(DATA_TYPE).append(GDE.STRING_EQUAL).append(this.dataType.value).append(DELIMITER);
+		if (this.dataType != null && this.dataType != Record.DataType.DEFAULT) 
+			sb.append(DATA_TYPE).append(GDE.STRING_EQUAL).append(this.dataType.value).append(DELIMITER);
 		return sb.substring(0, sb.lastIndexOf(Record.DELIMITER)) + Record.END_MARKER;
 	}
 
@@ -2623,9 +2623,8 @@ public class Record extends AbstractRecord implements IRecord {
 				: this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 		if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
 			return Integer.parseInt(syncProperty.getValue());
-		} else {
-			return -1;
 		}
+		return -1;
 	}
 
 	public IChannelItem getChannelItem() {
