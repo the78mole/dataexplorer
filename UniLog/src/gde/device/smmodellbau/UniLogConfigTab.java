@@ -742,7 +742,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a1Text = new Text(this.axModusGroup, SWT.BORDER);
 					this.a1Text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a1Text.setLayoutData(new GridData(105, 20));
+					this.a1Text.setLayoutData(new GridData(105, 16));
 					this.a1Text.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1358));
 					this.a1Text.addKeyListener(new KeyAdapter() {
 						@Override
@@ -756,7 +756,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a1Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 					this.a1Unit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a1Unit.setLayoutData(new GridData(30, 20));
+					this.a1Unit.setLayoutData(new GridData(30, 16));
 					this.a1Unit.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
@@ -769,7 +769,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a1Offset = new Text(this.axModusGroup, SWT.BORDER);
 					this.a1Offset.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a1Offset.setLayoutData(new GridData(30, 20));
+					this.a1Offset.setLayoutData(new GridData(30, 16));
 					this.a1Offset.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
@@ -787,7 +787,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a1Factor = new Text(this.axModusGroup, SWT.BORDER);
 					this.a1Factor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a1Factor.setLayoutData(new GridData(30, 20));
+					this.a1Factor.setLayoutData(new GridData(30, 16));
 					this.a1Factor.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
@@ -819,7 +819,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a2Text = new Text(this.axModusGroup, SWT.BORDER);
 					this.a2Text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a2Text.setLayoutData(new GridData(105, 20));
+					this.a2Text.setLayoutData(new GridData(105, 16));
 					this.a2Text.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1360));
 					this.a2Text.addKeyListener(new KeyAdapter() {
 						@Override
@@ -833,7 +833,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a2Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 					this.a2Unit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a2Unit.setLayoutData(new GridData(30, 20));
+					this.a2Unit.setLayoutData(new GridData(30, 16));
 					this.a2Unit.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
@@ -846,7 +846,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a2Offset = new Text(this.axModusGroup, SWT.BORDER);
 					this.a2Offset.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a2Offset.setLayoutData(new GridData(30, 20));
+					this.a2Offset.setLayoutData(new GridData(30, 16));
 					this.a2Offset.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
@@ -864,7 +864,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a2Factor = new Text(this.axModusGroup, SWT.BORDER);
 					this.a2Factor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a2Factor.setLayoutData(new GridData(30, 20));
+					this.a2Factor.setLayoutData(new GridData(30, 16));
 					this.a2Factor.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
@@ -896,7 +896,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a3Text = new Text(this.axModusGroup, SWT.BORDER);
 					this.a3Text.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a3Text.setLayoutData(new GridData(105, 20));
+					this.a3Text.setLayoutData(new GridData(105, 16));
 					this.a3Text.setToolTipText(Messages.getString(MessageIds.GDE_MSGT1362));
 					this.a3Text.addKeyListener(new KeyAdapter() {
 						@Override
@@ -910,7 +910,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a3Unit = new Text(this.axModusGroup, SWT.CENTER | SWT.BORDER);
 					this.a3Unit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a3Unit.setLayoutData(new GridData(30, 20));
+					this.a3Unit.setLayoutData(new GridData(30, 16));
 					this.a3Unit.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
@@ -923,7 +923,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a3Offset = new Text(this.axModusGroup, SWT.BORDER);
 					this.a3Offset.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a3Offset.setLayoutData(new GridData(30, 20));
+					this.a3Offset.setLayoutData(new GridData(30, 16));
 					this.a3Offset.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {
@@ -941,7 +941,7 @@ public class UniLogConfigTab extends org.eclipse.swt.widgets.Composite {
 				{
 					this.a3Factor = new Text(this.axModusGroup, SWT.BORDER);
 					this.a3Factor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.a3Factor.setLayoutData(new GridData(30, 20));
+					this.a3Factor.setLayoutData(new GridData(30, 16));
 					this.a3Factor.addKeyListener(new KeyAdapter() {
 						@Override
 						public void keyReleased(KeyEvent evt) {

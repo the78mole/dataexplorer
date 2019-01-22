@@ -2002,7 +2002,7 @@ public class VarioToolTabItem extends CTabItem {
 								this.setupText19 = new Text(this.setupComposite19a, SWT.CENTER | SWT.BORDER);
 								RowData setupText19LData = new RowData();
 								setupText19LData.width = 30;
-								setupText19LData.height = 16;
+								setupText19LData.height = 12;
 								this.setupText19.setLayoutData(setupText19LData);
 								this.setupText19.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE-1, SWT.NORMAL));
 								this.setupText19.setText(GDE.STRING_EMPTY + (this.setupValue19 & 0x03));

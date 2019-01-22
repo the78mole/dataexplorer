@@ -253,7 +253,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.serialNumberText = new Text(this.commonAdjustmentsGroup, SWT.RIGHT | SWT.BORDER);
 					RowData serialNumberTextLData = new RowData();
 					serialNumberTextLData.width = 50;
-					serialNumberTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					serialNumberTextLData.height = 16;
 					this.serialNumberText.setLayoutData(serialNumberTextLData);
 					this.serialNumberText.setEditable(false);
 					this.serialNumberText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -271,7 +271,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.firmwareText = new Text(this.commonAdjustmentsGroup, SWT.BORDER | SWT.RIGHT);
 					RowData firmwareTextLData = new RowData();
 					firmwareTextLData.width = GDE.IS_LINUX ? 35 : 40;
-					firmwareTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					firmwareTextLData.height = 16;
 					this.firmwareText.setLayoutData(firmwareTextLData);
 					this.firmwareText.setEditable(false);
 					this.firmwareText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -584,7 +584,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.gearFactorText = new Text(this.commonAdjustmentsGroup, SWT.CENTER | SWT.BORDER);
 					RowData gearFactorTextLData = new RowData();
 					gearFactorTextLData.width = GDE.IS_LINUX ? 30 : 35;
-					gearFactorTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					gearFactorTextLData.height = 16;
 					this.gearFactorText.setLayoutData(gearFactorTextLData);
 					this.gearFactorText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.gearFactorText.addVerifyListener(new VerifyListener() {
@@ -660,7 +660,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.varioTriggerLevelText = new Text(this.commonAdjustmentsGroup, SWT.CENTER | SWT.BORDER);
 					RowData varioTriggerLevelTextLData = new RowData();
 					varioTriggerLevelTextLData.width = GDE.IS_LINUX ? 30 : 35;
-					varioTriggerLevelTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					varioTriggerLevelTextLData.height = 16;
 					this.varioTriggerLevelText.setLayoutData(varioTriggerLevelTextLData);
 					this.varioTriggerLevelText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioTriggerLevelText.setEditable(false);
@@ -698,7 +698,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.varioTriggerSinkLevelText = new Text(this.commonAdjustmentsGroup, SWT.CENTER | SWT.BORDER);
 					RowData varioTriggerSinkLevelTextLData = new RowData();
 					varioTriggerSinkLevelTextLData.width = GDE.IS_LINUX ? 30 : 35;
-					varioTriggerSinkLevelTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					varioTriggerSinkLevelTextLData.height = 16;
 					this.varioTriggerSinkLevelText.setLayoutData(varioTriggerSinkLevelTextLData);
 					this.varioTriggerSinkLevelText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioTriggerSinkLevelText.setEditable(false);
@@ -848,7 +848,7 @@ public class UniLog2SetupConfiguration1 extends org.eclipse.swt.widgets.Composit
 					this.energyLimitText = new Text(this.commonAdjustmentsGroup, SWT.CENTER | SWT.BORDER);
 					RowData energyLimitTextLData = new RowData();
 					energyLimitTextLData.width = GDE.IS_MAC ? 39 : GDE.IS_LINUX ? 30 : 35;
-					energyLimitTextLData.height = GDE.IS_MAC ? 16 : GDE.IS_LINUX ? 10 : 13;
+					energyLimitTextLData.height = 16;
 					this.energyLimitText.setLayoutData(energyLimitTextLData);
 					this.energyLimitText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.energyLimitText.setEditable(false);
