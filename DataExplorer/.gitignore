@@ -5,3 +5,6 @@ classes
 *.dll
 .DS_Store
 */**/.DS_Store
+/hs_err_pid200.log
+/hs_err_pid7828.log
+/hs_err_pid7944.log
