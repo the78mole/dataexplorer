@@ -399,10 +399,11 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											log.log(Level.FINEST, "portSelectCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-											DeviceSelectionDialog.this.selectedActiveDeviceConfig.setPort(DeviceSelectionDialog.this.portSelectCombo.getText().trim().split(GDE.STRING_BLANK)[0]);
+											String selectedPort = DeviceSelectionDialog.this.portSelectCombo.getItem(DeviceSelectionDialog.this.portSelectCombo.getSelectionIndex()).trim().split(GDE.STRING_BLANK)[0];
+											DeviceSelectionDialog.this.selectedActiveDeviceConfig.setPort(selectedPort);
 											DeviceSelectionDialog.this.selectedActiveDeviceConfig.storeDeviceProperties();
 											DeviceSelectionDialog.this.application.updateTitleBar(DeviceSelectionDialog.this.application.getObjectKey(), DeviceSelectionDialog.this.selectedActiveDeviceConfig.getName(),
-													DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
+											DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
 										}
 									});
 								}
