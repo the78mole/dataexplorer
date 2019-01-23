@@ -307,7 +307,7 @@ public class StepChargeComposite extends ScrolledComposite {
 		try {
 			FillLayout thisLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 			this.setLayout(thisLayout);
-			this.setSize(620, 373);
+			this.setSize(620, 380);
 			{
 				this.stepChargeGroup = new Group(this, SWT.NONE);
 				FormLayout stepChargeGroupLayout = new FormLayout();
@@ -394,18 +394,15 @@ public class StepChargeComposite extends ScrolledComposite {
 					this.stepAdjustmentComposite = new Composite(this.stepChargeGroup, SWT.NONE);
 					FillLayout stepAdjustmentCompositeLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					FormData stepAdjustmentCompositeLData = new FormData();
-					stepAdjustmentCompositeLData.left = new FormAttachment(0, 1000, 2);
+					stepAdjustmentCompositeLData.left = new FormAttachment(0, 1000, 5);
 					stepAdjustmentCompositeLData.top = new FormAttachment(0, 1000, 130);
-					stepAdjustmentCompositeLData.width = 594;
-					stepAdjustmentCompositeLData.height = 171;
-					stepAdjustmentCompositeLData.bottom = new FormAttachment(1000, 1000, -120);
-					stepAdjustmentCompositeLData.right = new FormAttachment(1000, 1000, -2);
+					stepAdjustmentCompositeLData.bottom = new FormAttachment(1000, 1000, -140);
+					stepAdjustmentCompositeLData.right = new FormAttachment(1000, 1000, -5);
 					this.stepAdjustmentComposite.setLayoutData(stepAdjustmentCompositeLData);
 					this.stepAdjustmentComposite.setLayout(stepAdjustmentCompositeLayout);
 					{
 						this.stepGroup1 = new Group(this.stepAdjustmentComposite, SWT.NONE);
-						FillLayout stepGroup1Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
-						this.stepGroup1.setLayout(stepGroup1Layout);
+						this.stepGroup1.setLayout(new FillLayout(SWT.VERTICAL));
 						this.stepGroup1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.stepGroup1.setText(Messages.getString(MessageIds.GDE_MSGT2343, new String[] { "1" }));
 						{
@@ -415,8 +412,6 @@ public class StepChargeComposite extends ScrolledComposite {
 						}
 						{
 							this.stepTextC1 = new Text(this.stepGroup1, SWT.CENTER | SWT.BORDER);
-							RowData stepTextC1LData = new RowData();
-							this.stepTextC1.setLayoutData(stepTextC1LData);
 							this.stepTextC1.setEditable(false);
 							this.stepTextC1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						}
@@ -452,8 +447,6 @@ public class StepChargeComposite extends ScrolledComposite {
 						}
 						{
 							this.stepTextA1 = new Text(this.stepGroup1, SWT.CENTER | SWT.BORDER);
-							RowData stepTextA1LData = new RowData();
-							this.stepTextA1.setLayoutData(stepTextA1LData);
 							this.stepTextA1.setEditable(false);
 							this.stepTextA1.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						}
@@ -505,11 +498,11 @@ public class StepChargeComposite extends ScrolledComposite {
 								}
 							});
 						}
+						this.stepGroup1.layout();
 					}
 					{
 						this.stepGroup2 = new Group(this.stepAdjustmentComposite, SWT.NONE);
-						FillLayout stepGroup2Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
-						this.stepGroup2.setLayout(stepGroup2Layout);
+						this.stepGroup2.setLayout(new FillLayout(SWT.VERTICAL));
 						this.stepGroup2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.stepGroup2.setText(Messages.getString(MessageIds.GDE_MSGT2343, new String[] { "2" }));
 						{
@@ -519,15 +512,11 @@ public class StepChargeComposite extends ScrolledComposite {
 						}
 						{
 							this.stepTextC2 = new Text(this.stepGroup2, SWT.CENTER | SWT.BORDER);
-							RowData stepTextLData = new RowData();
-							this.stepTextC2.setLayoutData(stepTextLData);
 							this.stepTextC2.setEditable(false);
 							this.stepTextC2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						}
 						{
-							RowData stepSliderLData = new RowData();
 							this.stepSliderC2 = new Slider(this.stepGroup2, SWT.BORDER);
-							this.stepSliderC2.setLayoutData(stepSliderLData);
 							this.stepSliderC2.setMinimum(0);
 							this.stepSliderC2.setMaximum(9910);
 							this.stepSliderC2.setIncrement(1);
@@ -563,15 +552,11 @@ public class StepChargeComposite extends ScrolledComposite {
 						}
 						{
 							this.stepTextA2 = new Text(this.stepGroup2, SWT.CENTER | SWT.BORDER);
-							RowData stepTextLData = new RowData();
-							this.stepTextA2.setLayoutData(stepTextLData);
 							this.stepTextA2.setEditable(false);
 							this.stepTextA2.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						}
 						{
 							this.stepSliderA2 = new Slider(this.stepGroup2, SWT.BORDER);
-							RowData stepSliderLData = new RowData();
-							this.stepSliderA2.setLayoutData(stepSliderLData);
 							this.stepSliderA2.setMinimum(1);
 							this.stepSliderA2.setMaximum(2000 + 10);
 							this.stepSliderA2.setIncrement(1);
@@ -618,11 +603,11 @@ public class StepChargeComposite extends ScrolledComposite {
 								}
 							});
 						}
+						this.stepGroup2.layout();
 					}
 					{
 						this.stepGroup3 = new Group(this.stepAdjustmentComposite, SWT.NONE);
-						FillLayout stepGroup3Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
-						this.stepGroup3.setLayout(stepGroup3Layout);
+						this.stepGroup3.setLayout(new FillLayout(SWT.VERTICAL));
 						this.stepGroup3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.stepGroup3.setText(Messages.getString(MessageIds.GDE_MSGT2343, new String[] { "3" }));
 						{
@@ -632,15 +617,11 @@ public class StepChargeComposite extends ScrolledComposite {
 						}
 						{
 							this.stepTextC3 = new Text(this.stepGroup3, SWT.CENTER | SWT.BORDER);
-							RowData stepTextLData = new RowData();
-							this.stepTextC3.setLayoutData(stepTextLData);
 							this.stepTextC3.setEditable(false);
 							this.stepTextC3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						}
 						{
-							RowData stepSliderLData = new RowData();
 							this.stepSliderC3 = new Slider(this.stepGroup3, SWT.BORDER);
-							this.stepSliderC3.setLayoutData(stepSliderLData);
 							this.stepSliderC3.setMinimum(0);
 							this.stepSliderC3.setMaximum(9910);
 							this.stepSliderC3.setIncrement(1);
@@ -671,15 +652,11 @@ public class StepChargeComposite extends ScrolledComposite {
 						}
 						{
 							this.stepTextA3 = new Text(this.stepGroup3, SWT.CENTER | SWT.BORDER);
-							RowData stepTextLData = new RowData();
-							this.stepTextA3.setLayoutData(stepTextLData);
 							this.stepTextA3.setEditable(false);
 							this.stepTextA3.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						}
 						{
 							this.stepSliderA3 = new Slider(this.stepGroup3, SWT.BORDER);
-							RowData stepSliderLData = new RowData();
-							this.stepSliderA3.setLayoutData(stepSliderLData);
 							this.stepSliderA3.setMinimum(1);
 							this.stepSliderA3.setMaximum(2000 + 10);
 							this.stepSliderA3.setIncrement(1);
@@ -726,11 +703,11 @@ public class StepChargeComposite extends ScrolledComposite {
 								}
 							});
 						}
+						this.stepGroup3.layout();
 					}
 					{
 						this.stepGroup4 = new Group(this.stepAdjustmentComposite, SWT.NONE);
-						FillLayout stepGroup4Layout = new FillLayout(org.eclipse.swt.SWT.VERTICAL);
-						this.stepGroup4.setLayout(stepGroup4Layout);
+						this.stepGroup4.setLayout(new FillLayout(SWT.VERTICAL));
 						this.stepGroup4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						this.stepGroup4.setText(Messages.getString(MessageIds.GDE_MSGT2343, new String[] { "4" }));
 						{
@@ -740,15 +717,11 @@ public class StepChargeComposite extends ScrolledComposite {
 						}
 						{
 							this.stepTextC4 = new Text(this.stepGroup4, SWT.CENTER | SWT.BORDER);
-							RowData stepTextLData = new RowData();
-							this.stepTextC4.setLayoutData(stepTextLData);
 							this.stepTextC4.setEditable(false);
 							this.stepTextC4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						}
 						{
-							RowData stepSliderLData = new RowData();
 							this.stepSliderC4 = new Slider(this.stepGroup4, SWT.BORDER);
-							this.stepSliderC4.setLayoutData(stepSliderLData);
 							this.stepSliderC4.setMinimum(0);
 							this.stepSliderC4.setMaximum(9910);
 							this.stepSliderC4.setIncrement(1);
@@ -779,15 +752,11 @@ public class StepChargeComposite extends ScrolledComposite {
 						}
 						{
 							this.stepTextA4 = new Text(this.stepGroup4, SWT.CENTER | SWT.BORDER);
-							RowData stepTextLData = new RowData();
-							this.stepTextA4.setLayoutData(stepTextLData);
 							this.stepTextA4.setEditable(false);
 							this.stepTextA4.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 						}
 						{
-							RowData stepSliderLData = new RowData();
 							this.stepSliderA4 = new Slider(this.stepGroup4, SWT.BORDER);
-							this.stepSliderA4.setLayoutData(stepSliderLData);
 							this.stepSliderA4.setMinimum(1);
 							this.stepSliderA4.setMaximum(2000 + 10);
 							this.stepSliderA4.setIncrement(1);
@@ -834,6 +803,7 @@ public class StepChargeComposite extends ScrolledComposite {
 								}
 							});
 						}
+						this.stepGroup4.layout();
 					}
 				}
 				{
@@ -841,9 +811,7 @@ public class StepChargeComposite extends ScrolledComposite {
 					RowLayout configCompositeLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 					FormData configCompositeLData = new FormData();
 					configCompositeLData.left = new FormAttachment(0, 1000, 5);
-					configCompositeLData.top = new FormAttachment(1000, 1000, -120);
-					configCompositeLData.width = 596;
-					configCompositeLData.height = 45;
+					configCompositeLData.top = new FormAttachment(1000, 1000, -140);
 					configCompositeLData.right = new FormAttachment(1000, 1000, -5);
 					configCompositeLData.bottom = new FormAttachment(1000, 1000, -5);
 					this.configComposite.setLayoutData(configCompositeLData);
@@ -890,18 +858,18 @@ public class StepChargeComposite extends ScrolledComposite {
 				}
 			}
 			this.setContent(this.stepChargeGroup);
-			this.stepChargeGroup.setSize(620, 470);
+			this.stepChargeGroup.setSize(620, 490);
 			this.addControlListener(new ControlListener() {
 				@Override
 				public void controlResized(ControlEvent evt) {
 					StepChargeComposite.log.log(java.util.logging.Level.FINEST, "scrolledMemoryComposite.controlResized, event=" + evt); //$NON-NLS-1$
-					StepChargeComposite.this.stepChargeGroup.setSize(getClientArea().width, 450);
+					StepChargeComposite.this.stepChargeGroup.setSize(getClientArea().width, 490);
 				}
 
 				@Override
 				public void controlMoved(ControlEvent evt) {
 					StepChargeComposite.log.log(java.util.logging.Level.FINEST, "scrolledMemoryComposite.controlMoved, event=" + evt); //$NON-NLS-1$
-					StepChargeComposite.this.stepChargeGroup.setSize(getClientArea().width, 450);
+					StepChargeComposite.this.stepChargeGroup.setSize(getClientArea().width, 490);
 				}
 			});
 			this.layout();

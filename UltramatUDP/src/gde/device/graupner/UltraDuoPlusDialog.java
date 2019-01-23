@@ -478,7 +478,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(665, GDE.IS_MAC ? 685 : 675);
+				this.dialogShell.setSize(665, GDE.IS_MAC || GDE.IS_OS_ARCH_ARM ? 690 : 675);
 				this.dialogShell.addListener(SWT.Traverse, new Listener() {
 					@Override
 					public void handleEvent(Event event) {
@@ -767,7 +767,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 								{
 									this.memorySelectComposite = new Composite(this.memoryBoundsComposite, SWT.NONE);
 									FormData memorySelectLData = new FormData();
-									memorySelectLData.height = 160;
+									memorySelectLData.height = GDE.IS_OS_ARCH_ARM ? 170 : 160;
 									memorySelectLData.left = new FormAttachment(0, 1000, 0);
 									memorySelectLData.right = new FormAttachment(1000, 1000, 0);
 									memorySelectLData.top = new FormAttachment(0, 1000, 0);
@@ -969,7 +969,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									chargeTypeTabFolderLData.left = new FormAttachment(0, 1000, 0);
 									chargeTypeTabFolderLData.right = new FormAttachment(1000, 1000, 0);
 									chargeTypeTabFolderLData.bottom = new FormAttachment(1000, 1000, 0);
-									chargeTypeTabFolderLData.top = new FormAttachment(0, 1000, 160);
+									chargeTypeTabFolderLData.top = new FormAttachment(0, 1000, GDE.IS_OS_ARCH_ARM ? 170 : 165);
 									this.chargeTypeTabFolder.setLayoutData(chargeTypeTabFolderLData);
 									this.chargeTypeTabFolder.addSelectionListener(new SelectionAdapter() {
 										@Override
