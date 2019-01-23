@@ -400,21 +400,23 @@ public class Channel extends HashMap<String, RecordSet> {
 			}
 			else { //take over values from last active record set
 				RecordSet _lastActiveRecordSet = this.get(this.getLastActiveRecordSetName());
+				int _lastActiveRecordSetSize = _lastActiveRecordSet.realSize();
 				for (int i = 0; i < recordSet.realSize(); ++i) {
 					Record record = recordSet.get(i);
+					if (i < _lastActiveRecordSetSize) {
 					Record lastActiveRecord = _lastActiveRecordSet.get(i);
 					if(log.isLoggable(Level.FINER)) log.log(Level.FINER, "lastActiveRecord = " + lastActiveRecord.name + " isVisible=" + lastActiveRecord.isVisible + " isPositionLeft=" + lastActiveRecord.isPositionLeft + " isStartpointZero=" + lastActiveRecord.isStartpointZero);
-					record.setVisible(lastActiveRecord.isVisible);
-					record.setPositionLeft(lastActiveRecord.isPositionLeft);
-					record.setRGB(lastActiveRecord.getRGB());
-					record.setLineWidth(lastActiveRecord.lineWidth);
-					record.setLineStyle(lastActiveRecord.lineStyle);
-					record.setRoundOut(lastActiveRecord.isRoundOut);
-					record.setStartpointZero(lastActiveRecord.isStartpointZero);
-					record.setStartEndDefined(lastActiveRecord.isStartEndDefined, lastActiveRecord.getMinScaleValue(), lastActiveRecord.getMaxScaleValue());
-					record.setNumberFormat(lastActiveRecord.numberFormat);
-
-					RecordSet lastActiveParent = lastActiveRecord.parent;
+						record.setVisible(lastActiveRecord.isVisible);
+						record.setPositionLeft(lastActiveRecord.isPositionLeft);
+						record.setRGB(lastActiveRecord.getRGB());
+						record.setLineWidth(lastActiveRecord.lineWidth);
+						record.setLineStyle(lastActiveRecord.lineStyle);
+						record.setRoundOut(lastActiveRecord.isRoundOut);
+						record.setStartpointZero(lastActiveRecord.isStartpointZero);
+						record.setStartEndDefined(lastActiveRecord.isStartEndDefined, lastActiveRecord.getMinScaleValue(), lastActiveRecord.getMaxScaleValue());
+						record.setNumberFormat(lastActiveRecord.numberFormat);
+					}
+					RecordSet lastActiveParent = _lastActiveRecordSet;
 					//smooth current drop
 					recordSet.setSmoothAtCurrentDrop(lastActiveParent.isSmoothAtCurrentDrop);
 					//smooth voltage curve
