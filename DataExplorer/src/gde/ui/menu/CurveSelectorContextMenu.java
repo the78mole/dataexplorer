@@ -1129,7 +1129,7 @@ public class CurveSelectorContextMenu {
 								if (!compareSet.get(compareSet.getFirstRecordName()).getUnit().equalsIgnoreCase(copyFromRecord.getUnit())) {
 									CurveSelectorContextMenu.this.application
 											.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0004, new Object[] { copyFromRecordKey + GDE.STRING_MESSAGE_CONCAT + compareSet.getFirstRecordName() }));
-									return;
+									//return; //enable curve compare using different units, but warn about this fact 
 								}
 								// while adding a new curve to compare set - reset the zoom mode
 								CurveSelectorContextMenu.this.application.setCompareWindowMode(GraphicsMode.RESET, false);

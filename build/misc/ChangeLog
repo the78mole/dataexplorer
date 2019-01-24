@@ -10,6 +10,7 @@ Generic changes/fixes
 	* update jaxb jars and remove disabling of optimization statement
 	* remove/reset unnecessary smoothVoltageCurve entry from devices
 	* fix visualization of serial port selection 
+	* enable curve compare independent of selected measurement unit, but warn about this fact
 
 Device specific changes/fixes
 	* Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)
