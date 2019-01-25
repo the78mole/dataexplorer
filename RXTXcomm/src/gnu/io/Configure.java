@@ -63,6 +63,7 @@ import java.io.*;
 
 class Configure extends Frame
 {
+	private static final long serialVersionUID = 1L;
 	Checkbox cb[];
 	Panel p1;
 	static final int PORT_SERIAL	=	1;

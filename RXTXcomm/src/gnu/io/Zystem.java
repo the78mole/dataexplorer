@@ -249,7 +249,7 @@ public class Zystem
 
 	public boolean reportln( )
 	{
-		boolean b;
+		// boolean b;
 		if ( mode == NET_MODE )
 		{
 		//	b= nativeNetReportln( "\n" );
@@ -282,7 +282,7 @@ public class Zystem
 
 	public boolean reportln( String s)
 	{
-		boolean b;
+		//boolean b;
 		if ( mode == NET_MODE )
 		{
 		//	b= nativeNetReportln( s + "\n" );

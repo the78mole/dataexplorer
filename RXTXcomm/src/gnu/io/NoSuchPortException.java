@@ -56,7 +56,6 @@
 |   All trademarks belong to their respective owners.
 --------------------------------------------------------------------------*/
 package gnu.io;
-import java.util.*;
 
 /**
 * The requested Port does not exist
@@ -67,6 +66,7 @@ import java.util.*;
 
 public class NoSuchPortException extends Exception
 {
+	private static final long serialVersionUID = 1L;
 	NoSuchPortException( String str )
 	{
 		super( str );

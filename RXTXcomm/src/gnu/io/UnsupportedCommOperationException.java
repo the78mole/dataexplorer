@@ -56,7 +56,6 @@
 |   All trademarks belong to their respective owners.
 --------------------------------------------------------------------------*/
 package gnu.io;
-import java.util.*;
 
 /**
 * Exception thrown when a method does not support the requested functionality.
@@ -65,23 +64,23 @@ import java.util.*;
 * @since JDK1.0
 */
 
-public class UnsupportedCommOperationException extends Exception
-{
-/**
-* create an instances with no message about why the Exception was thrown.
-* @since JDK1.0
-*/
-	public UnsupportedCommOperationException()
-	{
+public class UnsupportedCommOperationException extends Exception {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	* create an instances with no message about why the Exception was thrown.
+	* @since JDK1.0
+	*/
+	public UnsupportedCommOperationException() {
 		super();
 	}
-/**
-* create an instance with a message about why the Exception was thrown.
-* @param str	A detailed message explaining the reason for the Exception.
-* @since JDK1.0
-*/
-	public UnsupportedCommOperationException( String str )
-	{
-		super( str );
+
+	/**
+	* create an instance with a message about why the Exception was thrown.
+	* @param str	A detailed message explaining the reason for the Exception.
+	* @since JDK1.0
+	*/
+	public UnsupportedCommOperationException(String str) {
+		super(str);
 	}
 }

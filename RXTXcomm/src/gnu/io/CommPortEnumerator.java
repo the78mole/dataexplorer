@@ -66,7 +66,7 @@ import java.util.Enumeration;
 */
 
 
-class CommPortEnumerator implements Enumeration
+class CommPortEnumerator implements Enumeration<CommPortIdentifier>
 {
 	private CommPortIdentifier index;
 	private final static boolean debug = false;
@@ -87,7 +87,7 @@ class CommPortEnumerator implements Enumeration
         exceptions:
         comments:
 ------------------------------------------------------------------------------*/
-	public Object nextElement()
+	public CommPortIdentifier nextElement()
 	{
 		if(debug) System.out.println("CommPortEnumerator:nextElement()");
 		synchronized (CommPortIdentifier.Sync)

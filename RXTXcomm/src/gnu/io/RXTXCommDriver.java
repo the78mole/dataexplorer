@@ -63,7 +63,6 @@
 
 package gnu.io;
 
-import java.lang.*;
 import java.util.*;
 import java.io.*;
 import java.util.StringTokenizer;
@@ -411,7 +410,7 @@ public class RXTXCommDriver implements CommDriver
 		     Properties p=new Properties();
 		     p.load(rxtx_prop);
 		     System.setProperties(p);
-		     for (Iterator it = p.keySet().iterator(); it.hasNext();) {
+		     for (Iterator<Object> it = p.keySet().iterator(); it.hasNext();) {
 		          String key = (String) it.next();
 		          System.setProperty(key, p.getProperty(key));
 		     }
