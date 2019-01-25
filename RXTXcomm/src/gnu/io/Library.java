@@ -19,7 +19,7 @@ public class Library {
 		File file = new File(fileName);
 		try {
 			if (!file.exists()) {
-				is = Library.class.getResourceAsStream("/" + mappedName); //$NON-NLS-1$
+				is = Library.class.getResourceAsStream("/src/" + mappedName); //$NON-NLS-1$
 				if (is != null) {
 					int read;
 					byte[] buffer = new byte[4096];

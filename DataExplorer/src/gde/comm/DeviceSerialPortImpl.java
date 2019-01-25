@@ -159,7 +159,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @param portBlackList
 	 * @param portWhiteList
 	 */
-	@SuppressWarnings("unchecked")
 	public static Vector<String> listConfiguredSerialPorts(final boolean doAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
 		final String $METHOD_NAME = "listConfiguredSerialPorts"; //$NON-NLS-1$
 		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
