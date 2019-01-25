@@ -969,7 +969,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									chargeTypeTabFolderLData.left = new FormAttachment(0, 1000, 0);
 									chargeTypeTabFolderLData.right = new FormAttachment(1000, 1000, 0);
 									chargeTypeTabFolderLData.bottom = new FormAttachment(1000, 1000, 0);
-									chargeTypeTabFolderLData.top = new FormAttachment(0, 1000, GDE.IS_OS_ARCH_ARM ? 170 : 165);
+									chargeTypeTabFolderLData.top = new FormAttachment(0, 1000, GDE.IS_OS_ARCH_ARM ? 170 : 160);
 									this.chargeTypeTabFolder.setLayoutData(chargeTypeTabFolderLData);
 									this.chargeTypeTabFolder.addSelectionListener(new SelectionAdapter() {
 										@Override
