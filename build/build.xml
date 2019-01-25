@@ -1078,8 +1078,16 @@
 		</junit>
 	</target>
 
-	<taskdef resource="net/sf/antcontrib/antlib.xml" />
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<fileset dir="${basedir}/build/ant"/>
+		</classpath>
+	</taskdef>
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<fileset dir="${basedir}/build/ant"/>
+		</classpath>
+	</taskdef>
 
 	<target name="copy_docu" description="copy docu pdfs to build/target/install" depends="init" >
 		<copy todir="${build.target.dir}" overwrite="true">
