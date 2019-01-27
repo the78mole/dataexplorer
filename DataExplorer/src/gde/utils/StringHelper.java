@@ -32,7 +32,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Point;
 
 import gde.GDE;
-import gde.comm.DeviceSerialPortImpl;
+import gde.comm.DeviceCommPort;
 import gde.device.DataTypes;
 import gde.io.DataParser;
 import gde.log.Level;
@@ -449,7 +449,7 @@ public class StringHelper {
 			if (GDE.IS_WINDOWS) {
 				try {
 					int portNumber = Integer.parseInt(tmpSerialPortList[i].substring(3));
-					String portDescription = DeviceSerialPortImpl.getWindowsPorts().get(portNumber) == null ? "" : DeviceSerialPortImpl.getWindowsPorts().get(portNumber);
+					String portDescription = DeviceCommPort.getWindowsPorts().get(portNumber) == null ? "" : DeviceCommPort.getWindowsPorts().get(portNumber);
 					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + portDescription;
 				}
 				catch (Exception e) {
@@ -786,14 +786,14 @@ public class StringHelper {
 	public static String convert2CharString(byte[] buffer) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < buffer.length; ++i) {
-			if (buffer[i] == DeviceSerialPortImpl.FF)
-				sb.append(DeviceSerialPortImpl.STRING_FF);
-			else if (buffer[i] == DeviceSerialPortImpl.CR)
-				sb.append(DeviceSerialPortImpl.STRING_CR);
-			else if (buffer[i] == DeviceSerialPortImpl.ACK)
-				sb.append(DeviceSerialPortImpl.STRING_ACK);
-			else if (buffer[i] == DeviceSerialPortImpl.NAK)
-				sb.append(DeviceSerialPortImpl.STRING_NAK);
+			if (buffer[i] == DeviceCommPort.FF)
+				sb.append(DeviceCommPort.STRING_FF);
+			else if (buffer[i] == DeviceCommPort.CR)
+				sb.append(DeviceCommPort.STRING_CR);
+			else if (buffer[i] == DeviceCommPort.ACK)
+				sb.append(DeviceCommPort.STRING_ACK);
+			else if (buffer[i] == DeviceCommPort.NAK)
+				sb.append(DeviceCommPort.STRING_NAK);
 			else if (buffer[i] == -1)
 				sb.append('|');
 			else if (i == buffer.length - 6)

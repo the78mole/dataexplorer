@@ -83,7 +83,7 @@ import com.sun.istack.Nullable;
 import gde.Analyzer;
 import gde.Explorer;
 import gde.GDE;
-import gde.comm.DeviceSerialPortImpl;
+import gde.comm.DeviceCommPort;
 import gde.comm.IDeviceCommPort;
 import gde.config.Settings;
 import gde.data.AbstractRecordSet;
@@ -387,9 +387,13 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 				@Override
 				public void run() {
 					try {
-						DeviceSerialPortImpl.listConfiguredSerialPorts(DataExplorer.this.settings.doPortAvailabilityCheck(), DataExplorer.this.settings.isSerialPortBlackListEnabled()
-								? DataExplorer.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY, DataExplorer.this.settings.isSerialPortWhiteListEnabled()
-										? DataExplorer.this.settings.getSerialPortWhiteList() : new Vector<String>());
+						if (DataExplorer.this.getActiveDevice() != null && DataExplorer.this.getActiveDevice().getDeviceConfiguration() != null
+								&& DataExplorer.this.getActiveDevice().getDeviceConfiguration().getSerialPortType() != null) {
+							//RXTXcomm usage: DeviceSerialPortImpl.listConfiguredSerialPorts(...);
+							DeviceCommPort.listConfiguredSerialPorts(DataExplorer.this.settings.doPortAvailabilityCheck(),
+									DataExplorer.this.settings.isSerialPortBlackListEnabled() ? DataExplorer.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
+									DataExplorer.this.settings.isSerialPortWhiteListEnabled() ? DataExplorer.this.settings.getSerialPortWhiteList() : new Vector<String>());
+						}
 					} catch (Throwable t) {
 						log.log(java.util.logging.Level.WARNING, t.getMessage(), t);
 					}

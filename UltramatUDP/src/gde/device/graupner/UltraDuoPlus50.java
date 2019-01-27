@@ -28,7 +28,6 @@ import org.eclipse.swt.custom.CTabItem;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
-import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -171,14 +170,14 @@ public class UltraDuoPlus50 extends Ultramat {
 		if (deviceDataBufferSize == dataBuffer.length && this.isLinkedMode(dataBuffer)) {
 			try {
 				// 0=Spannung 1=Spannung1 2=Spannung2 3=Strom 4=Strom1 5=Strom2 6=Ladung 7=Ladung1 8=Ladung2 9=Leistung 10=Leistung1 11=Leistung2 12=Energie 13=Energie1 14=Energie2 15=BatteryTemperature1 16=BatteryTemperature2 17=VersorgungsSpg1 18=Balance
-				points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[15], (char) dataBuffer[16], (char) dataBuffer[17], (char) dataBuffer[18]), 16);
-				points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[73], (char) dataBuffer[74], (char) dataBuffer[75], (char) dataBuffer[76]), 16);
+				points[1] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[15], (char) dataBuffer[16], (char) dataBuffer[17], (char) dataBuffer[18]), 16);
+				points[2] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[73], (char) dataBuffer[74], (char) dataBuffer[75], (char) dataBuffer[76]), 16);
 				points[0] = points[1] + points[2];
-				points[4] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[19], (char) dataBuffer[20], (char) dataBuffer[21], (char) dataBuffer[22]), 16);
-				points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[77], (char) dataBuffer[78], (char) dataBuffer[79], (char) dataBuffer[80]), 16);
+				points[4] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[19], (char) dataBuffer[20], (char) dataBuffer[21], (char) dataBuffer[22]), 16);
+				points[5] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[77], (char) dataBuffer[78], (char) dataBuffer[79], (char) dataBuffer[80]), 16);
 				points[3] = points[4] + points[5];
-				points[7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[23], (char) dataBuffer[24], (char) dataBuffer[25], (char) dataBuffer[26]), 16);
-				points[8] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[81], (char) dataBuffer[82], (char) dataBuffer[83], (char) dataBuffer[84]), 16);
+				points[7] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[23], (char) dataBuffer[24], (char) dataBuffer[25], (char) dataBuffer[26]), 16);
+				points[8] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[81], (char) dataBuffer[82], (char) dataBuffer[83], (char) dataBuffer[84]), 16);
 				points[6] = points[7] + points[8];
 				points[10] = Double.valueOf(points[1] * points[4] / 1000.0).intValue(); // power U*I [W]
 				points[11] = Double.valueOf(points[2] * points[5] / 1000.0).intValue(); // power U*I [W]
@@ -186,19 +185,19 @@ public class UltraDuoPlus50 extends Ultramat {
 				points[13] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
 				points[14] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
 				points[12] = points[13] + points[14];
-				points[15] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[27], (char) dataBuffer[28], (char) dataBuffer[29], (char) dataBuffer[30]), 16);
-				String sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[31], (char) dataBuffer[32]);
+				points[15] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[27], (char) dataBuffer[28], (char) dataBuffer[29], (char) dataBuffer[30]), 16);
+				String sign = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[31], (char) dataBuffer[32]);
 				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[15] = -1 * points[15];
-				points[16] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[85], (char) dataBuffer[86], (char) dataBuffer[87], (char) dataBuffer[88]), 16);
-				sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[89], (char) dataBuffer[90]);
+				points[16] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[85], (char) dataBuffer[86], (char) dataBuffer[87], (char) dataBuffer[88]), 16);
+				sign = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[89], (char) dataBuffer[90]);
 				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[16] = -1 * points[16];
-				points[17] = (Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16)
-						+ Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[63], (char) dataBuffer[64], (char) dataBuffer[65], (char) dataBuffer[66]), 16)) >>> 1;
+				points[17] = (Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16)
+						+ Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[63], (char) dataBuffer[64], (char) dataBuffer[65], (char) dataBuffer[66]), 16)) >>> 1;
 				points[18] = 0;
 
 				// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7
 				for (int i = 0, j = 0; i < 7; ++i, j += 4) {
-					points[i + 19] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[35 + j], (char) dataBuffer[36 + j], (char) dataBuffer[37 + j], (char) dataBuffer[38 + j]),	16);
+					points[i + 19] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[35 + j], (char) dataBuffer[36 + j], (char) dataBuffer[37 + j], (char) dataBuffer[38 + j]),	16);
 					if (points[i + 19] > 0) {
 						maxVotage = points[i + 19] > maxVotage ? points[i + 19] : maxVotage;
 						minVotage = points[i + 19] < minVotage ? points[i + 19] : minVotage;
@@ -207,7 +206,7 @@ public class UltraDuoPlus50 extends Ultramat {
 				// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
 				for (int i = 0, j = 0; i < 7; ++i, j += 4) {
 					points[i + 26] = Integer.parseInt(
-							String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[93 + j], (char) dataBuffer[94 + j], (char) dataBuffer[95 + j], (char) dataBuffer[96 + j]), 16);
+							String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[93 + j], (char) dataBuffer[94 + j], (char) dataBuffer[95 + j], (char) dataBuffer[96 + j]), 16);
 					if (points[i + 26] > 0) {
 						maxVotage = points[i + 26] > maxVotage ? points[i + 26] : maxVotage;
 						minVotage = points[i + 26] < minVotage ? points[i + 26] : minVotage;
@@ -223,21 +222,21 @@ public class UltraDuoPlus50 extends Ultramat {
 		else {
 			try {
 				// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 8=SpannungZelle1 9=SpannungZelle2...
-				points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[15], (char) dataBuffer[16], (char) dataBuffer[17], (char) dataBuffer[18]), 16);
-				points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[19], (char) dataBuffer[20], (char) dataBuffer[21], (char) dataBuffer[22]), 16);
-				points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[23], (char) dataBuffer[24], (char) dataBuffer[25], (char) dataBuffer[26]), 16);
+				points[0] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[15], (char) dataBuffer[16], (char) dataBuffer[17], (char) dataBuffer[18]), 16);
+				points[1] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[19], (char) dataBuffer[20], (char) dataBuffer[21], (char) dataBuffer[22]), 16);
+				points[2] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[23], (char) dataBuffer[24], (char) dataBuffer[25], (char) dataBuffer[26]), 16);
 				points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 				points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-				points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[27], (char) dataBuffer[28], (char) dataBuffer[29], (char) dataBuffer[30]), 16);
-				String sign = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[31], (char) dataBuffer[32]);
+				points[5] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[27], (char) dataBuffer[28], (char) dataBuffer[29], (char) dataBuffer[30]), 16);
+				String sign = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[31], (char) dataBuffer[32]);
 				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[5] = -1 * points[5];
-				points[6] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16);
+				points[6] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16);
 				points[7] = 0;
 
 				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7
 				for (int i = 0, j = 0; i < points.length - 8; ++i, j += 4) {
 					points[i + 8] = Integer
-							.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[35 + j], (char) dataBuffer[36 + j], (char) dataBuffer[37 + j], (char) dataBuffer[38 + j]), 16);
+							.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[35 + j], (char) dataBuffer[36 + j], (char) dataBuffer[37 + j], (char) dataBuffer[38 + j]), 16);
 					if (points[i + 8] > 0) {
 						maxVotage = points[i + 8] > maxVotage ? points[i + 8] : maxVotage;
 						minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
@@ -430,7 +429,7 @@ public class UltraDuoPlus50 extends Ultramat {
 	@Override
 	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
 		if (outletNum == 1) {
-			String operationModeOut1 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]);
+			String operationModeOut1 = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]);
 			if (logger.isLoggable(Level.FINE)) {
 				logger.log(Level.FINE,
 						"operationModeOut1 = " + (operationModeOut1 != null && operationModeOut1.length() > 0 ? this.USAGE_MODE[Integer.parseInt(operationModeOut1, 16)] : operationModeOut1)); //$NON-NLS-1$
@@ -440,7 +439,7 @@ public class UltraDuoPlus50 extends Ultramat {
 			return operationModeOut1 != null && operationModeOut1.length() == 2 && !(operationModeOut1.equals(Ultramat.OPERATIONS_MODE_NONE) || operationModeOut1.equals(Ultramat.OPERATIONS_MODE_ERROR));
 		}
 		else if (outletNum == 2) {
-			String operationModeOut2 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[67], (char) dataBuffer[68]);
+			String operationModeOut2 = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[67], (char) dataBuffer[68]);
 			if (logger.isLoggable(Level.FINE)) {
 				logger.log(Level.FINE,
 						"operationModeOut2 = " + (operationModeOut2 != null && operationModeOut2.length() > 0 ? this.USAGE_MODE[Integer.parseInt(operationModeOut2, 16)] : operationModeOut2)); //$NON-NLS-1$
@@ -460,7 +459,7 @@ public class UltraDuoPlus50 extends Ultramat {
 	 */
 	@Override
 	public int getProcessingMode(byte[] dataBuffer) {
-		String operationMode = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]);
+		String operationMode = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]);
 		return operationMode != null && operationMode.length() > 0 ? Integer.parseInt(operationMode, 16) : 0;
 	}
 
@@ -472,9 +471,9 @@ public class UltraDuoPlus50 extends Ultramat {
 	@Override
 	public String getProcessingType(byte[] dataBuffer) {
 		String type = GDE.STRING_EMPTY;
-		String operationMode = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]);
+		String operationMode = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]);
 		int opMode = operationMode != null && operationMode.length() > 0 ? Integer.parseInt(operationMode, 16) : 0;
-		String operationType = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[11], (char) dataBuffer[12]);
+		String operationType = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[11], (char) dataBuffer[12]);
 		switch (opMode) {
 		case 1: //charge
 			type = operationType != null && operationType.length() > 0 ? this.CHARGE_MODE[Integer.parseInt(operationType, 16)] : GDE.STRING_EMPTY;
@@ -502,10 +501,10 @@ public class UltraDuoPlus50 extends Ultramat {
 	 */
 	@Override
 	public boolean isLinkedMode(byte[] dataBuffer) {
-		String operationMode1 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]);
-		String operationMode2 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[67], (char) dataBuffer[68]);
-		String operationType1 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[11], (char) dataBuffer[12]);
-		String operationType2 = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[69], (char) dataBuffer[70]);
+		String operationMode1 = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]);
+		String operationMode2 = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[67], (char) dataBuffer[68]);
+		String operationType1 = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[11], (char) dataBuffer[12]);
+		String operationType2 = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[69], (char) dataBuffer[70]);
 		return operationMode1.equals(operationMode2) && operationType1.equals(operationType2)
 				&& ((operationMode1.equals("01") && operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_CHARGE))
 						|| (operationMode1.equals("02") && operationType1.equals(Ultramat.OPERATIONS_MODE_LINK_DISCHARGE)));
@@ -519,10 +518,10 @@ public class UltraDuoPlus50 extends Ultramat {
 	 */
 	@Override
 	public int getCycleNumber(int outletNum, byte[] dataBuffer) {
-		String cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[13], (char) dataBuffer[14]);
+		String cycleNumber = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[13], (char) dataBuffer[14]);
 		if (outletNum == 2) {
 			try {
-				cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[71], (char) dataBuffer[72]);
+				cycleNumber = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[71], (char) dataBuffer[72]);
 			}
 			catch (Exception e) {
 				// ignore and use values from outlet channel 1 (data buffer will be copied)
@@ -539,7 +538,7 @@ public class UltraDuoPlus50 extends Ultramat {
 	 */
 	@Override
 	public void setTemperatureUnit(int channelNumber, RecordSet recordSet, byte[] dataBuffer) {
-		String unit = String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[33], (char) dataBuffer[34]);
+		String unit = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[33], (char) dataBuffer[34]);
 		if (unit != null && unit.length() > 0) if (channelNumber == 3) {
 			if (Integer.parseInt(unit) == 0) {
 				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 15, DeviceConfiguration.UNIT_DEGREE_CELSIUS);

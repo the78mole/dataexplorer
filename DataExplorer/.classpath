@@ -12,6 +12,7 @@
 	<classpathentry kind="lib" path="/build/lib/istack-commons-runtime.jar"/>
 	<classpathentry kind="lib" path="/build/lib/activation.jar"/>
 	<classpathentry kind="var" path="SWT_JAR_PATH" sourcepath="/SWT_SOURCE_PATH"/>
+	<classpathentry kind="lib" path="/build/lib/jSerialComm.jar" sourcepath="/jSerialComm"/>
 	<classpathentry kind="lib" path="/build/lib/RXTXcomm.jar" sourcepath="/RXTXcomm/src"/>
 	<classpathentry kind="lib" path="/build/lib/usb4java-1.2.0.jar"/>
 	<classpathentry kind="lib" path="/build/lib/commons-lang3-3.2.1.jar"/>

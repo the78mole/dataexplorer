@@ -26,9 +26,9 @@ import gde.exception.FailedQueryException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
 import gde.ui.DataExplorer;
-import gnu.io.SerialPort;
 
 import java.io.IOException;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import javax.usb.UsbClaimException;
@@ -56,9 +56,27 @@ public class DeviceCommPort implements IDeviceCommPort {
 	public static final int ICON_SET_OPEN_CLOSE = 0;
 	public static final int ICON_SET_START_STOP = 1;
 	public static final int ICON_SET_IMPORT_CLOSE = 2;
+
+	public final static byte							FF												= 0x0C;
+	public final static byte							CR												= 0x0D;
+	public final static byte							ACK												= 0x06;
+	public final static byte							NAK												= 0x15;
+	public static final String						STRING_NAK								= "<NAK>";
+	public static final String						STRING_ACK								= "<ACK>";
+	public static final String						STRING_CR									= "<CR>";
+	public static final String						STRING_FF									= "<FF>";
+	public static final String						FORMAT_2_CHAR							= "%c%c";																																												//2 char to string formating
+	public static final String						FORMAT_4_CHAR							= "%c%c%c%c";																																										//4 char to string formating
+	public static final String						FORMAT_16_CHAR						= "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c";
+	public static final String[]					STRING_ARRAY_BAUDE_RATES	= new String[] { "2400", "4800", "7200", "9600", "14400", "19200", "28800", "38400", "57600", "115200" , "128000", "230400"};	//$NON-NLS-1$
 	
 	public boolean				isInterruptedByUser	= false;	
 
+	static IDeviceCommPort staticPort = null;
+
+	final protected static Vector<String>						availablePorts						= new Vector<String>();																																					//available port vector used by all application dialogs
+	final protected static TreeMap<Integer, String>	windowsPorts							= new TreeMap<Integer, String>();
+	
 	/**
 	 * constructor of default implementation
 	 * @param currentDeviceConfig - required by super class to initialize the serial communication port
@@ -75,12 +93,16 @@ public class DeviceCommPort implements IDeviceCommPort {
 						: (System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC") != null ? Integer.parseInt(System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC")) : (int)this.device.getTimeStep_ms())));
 		}
 		else  if (this.deviceConfig.getSerialPortType() != null) {
-			this.port = new DeviceSerialPortImpl(this.deviceConfig, this.application);
+			//RXTXcomm usage: this.port = new DeviceSerialPortImpl(this.deviceConfig, this.application);
+			//jSerialCommPort: 
+			this.port = new DeviceJavaSerialCommPortImpl(this.deviceConfig, this.application);
 		}
 		else if (this.deviceConfig.getUsbPortType() != null) { // USB device
 			this.port = new DeviceUsbPortImpl(this.deviceConfig, this.application);
 		}
 		else this.port = null;
+		
+		DeviceCommPort.staticPort = (IDeviceCommPort) this.port;
 	}
 	
 	/**
@@ -99,18 +121,49 @@ public class DeviceCommPort implements IDeviceCommPort {
 						: (System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC") != null ? Integer.parseInt(System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC")) : (int)this.deviceConfig.getTimeStep_ms())));
 		}
 		else  if (this.deviceConfig.getSerialPortType() != null) {
-			this.port = new DeviceSerialPortImpl(this.deviceConfig, this.application);
+			//RXTXcomm usage: this.port = new DeviceSerialPortImpl(this.deviceConfig, this.application);
+			//jSerialCommPort: 
+			this.port = new DeviceJavaSerialCommPortImpl(this.deviceConfig, this.application);
 		}
 		else if (this.deviceConfig.getUsbPortType() != null) { // USB device
 			this.port = new DeviceUsbPortImpl(this.deviceConfig, this.application);
 		}
 		else this.port = null;
+
+		DeviceCommPort.staticPort = (IDeviceCommPort) this.port;
 	}
+
+	/**
+	 * updates the given vector with actual available according black/white list configuration
+	 * @param doAvialabilityCheck
+	 * @param portBlackList
+	 * @param portWhiteList
+	 */
+	public static Vector<String> listConfiguredSerialPorts(final boolean doAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
+		//RXTXcomm used: return DeviceCommPort.staticPort != null ? DeviceSerialPortImpl.listConfiguredSerialPorts(doAvialabilityCheck, portBlackList, portWhiteList) : new Vector<String>();
+		//JSerialCommPort: 
+		return DeviceCommPort.staticPort != null ? DeviceJavaSerialCommPortImpl.listConfiguredSerialPorts(doAvialabilityCheck, portBlackList, portWhiteList) : new Vector<String>();
+	}
+
+	/**
+	 * @return the available serial port names
+	 */
+	public static Vector<String> getAvailableports() {
+		return DeviceCommPort.availablePorts;
+	}
+
+	/**
+	 * @return the windows ports
+	 */
+	public static TreeMap<Integer, String> getWindowsPorts() {
+		return DeviceCommPort.windowsPorts;
+	}
+
 
 	/* (non-Javadoc)
 	 * @see gde.serial.IDeviceCommPort#open()
 	 */
-	public SerialPort open() throws ApplicationConfigurationException, SerialPortException {
+	public Object open() throws ApplicationConfigurationException, SerialPortException {
 		return this.port.open();
 	}
 

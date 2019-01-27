@@ -19,7 +19,7 @@
 package gde.ui.dialog.edit;
 
 import gde.GDE;
-import gde.comm.DeviceSerialPortImpl;
+import gde.comm.DeviceCommPort;
 import gde.device.DataBitsTypes;
 import gde.device.DataTypes;
 import gde.device.DeviceConfiguration;
@@ -154,7 +154,7 @@ public class SeriaPortTypeTabItem extends CTabItem {
 				{
 					this.baudeRateCombo = new CCombo(this.serialPortComposite, SWT.BORDER);
 					this.baudeRateCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.baudeRateCombo.setItems(DeviceSerialPortImpl.STRING_ARRAY_BAUDE_RATES);
+					this.baudeRateCombo.setItems(DeviceCommPort.STRING_ARRAY_BAUDE_RATES);
 					this.baudeRateCombo.setBounds(142, 101, 180, 20);
 					this.baudeRateCombo.addSelectionListener(new SelectionAdapter() {
 						@Override

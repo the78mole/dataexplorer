@@ -87,7 +87,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
-import gde.comm.DeviceSerialPortImpl;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -1278,11 +1278,11 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													int month = 0;
 													int day = 0;
 													try {
-														hour = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[0], cycleData[1], cycleData[2], cycleData[3]), 16);
-														minute = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[4], cycleData[5], cycleData[6], cycleData[7]), 16);
-														day = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[8], cycleData[9], cycleData[10], cycleData[11]), 16);
-														month = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[12], cycleData[13], cycleData[14], cycleData[15]), 16);
-														year = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[16], cycleData[17], cycleData[18], cycleData[19]), 16);
+														hour = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[0], cycleData[1], cycleData[2], cycleData[3]), 16);
+														minute = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[4], cycleData[5], cycleData[6], cycleData[7]), 16);
+														day = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[8], cycleData[9], cycleData[10], cycleData[11]), 16);
+														month = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[12], cycleData[13], cycleData[14], cycleData[15]), 16);
+														year = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[16], cycleData[17], cycleData[18], cycleData[19]), 16);
 														timeStamp = new GregorianCalendar(2000 + year, month - 1, day, hour, minute, 0).getTimeInMillis();
 													}
 													catch (NumberFormatException e) {
@@ -1290,12 +1290,12 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													}
 
 													try {
-														points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[20], (char) cycleData[21], (char) cycleData[22], (char) cycleData[23]), 16);
-														points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[24], (char) cycleData[25], (char) cycleData[26], (char) cycleData[27]), 16);
-														points[4] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[28], (char) cycleData[29], (char) cycleData[30], (char) cycleData[31]), 16);
-														points[3] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[32], (char) cycleData[33], (char) cycleData[34], (char) cycleData[35]), 16);
-														points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[36], (char) cycleData[37], (char) cycleData[38], (char) cycleData[39]), 16);
-														points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[40], (char) cycleData[41], (char) cycleData[42], (char) cycleData[43]), 16);
+														points[2] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[20], (char) cycleData[21], (char) cycleData[22], (char) cycleData[23]), 16);
+														points[0] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[24], (char) cycleData[25], (char) cycleData[26], (char) cycleData[27]), 16);
+														points[4] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[28], (char) cycleData[29], (char) cycleData[30], (char) cycleData[31]), 16);
+														points[3] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[32], (char) cycleData[33], (char) cycleData[34], (char) cycleData[35]), 16);
+														points[1] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[36], (char) cycleData[37], (char) cycleData[38], (char) cycleData[39]), 16);
+														points[5] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[40], (char) cycleData[41], (char) cycleData[42], (char) cycleData[43]), 16);
 													}
 													catch (Exception e) {
 														UltraDuoPlusDialog.log.log(Level.WARNING, e.getMessage(), e);
@@ -1331,11 +1331,11 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 																	cycleData[j + k] = bytes[j];
 																}
 															}
-															hour = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[0], cycleData[1], cycleData[2], cycleData[3]), 16);
-															minute = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[4], cycleData[5], cycleData[6], cycleData[7]), 16);
-															year = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[8], cycleData[9], cycleData[10], cycleData[11]), 16);
-															month = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[12], cycleData[13], cycleData[14], cycleData[15]), 16);
-															day = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, cycleData[16], cycleData[17], cycleData[18], cycleData[19]), 16);
+															hour = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[0], cycleData[1], cycleData[2], cycleData[3]), 16);
+															minute = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[4], cycleData[5], cycleData[6], cycleData[7]), 16);
+															year = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[8], cycleData[9], cycleData[10], cycleData[11]), 16);
+															month = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[12], cycleData[13], cycleData[14], cycleData[15]), 16);
+															day = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, cycleData[16], cycleData[17], cycleData[18], cycleData[19]), 16);
 															timeStamp = new GregorianCalendar(2000 + year, month - 1, day, hour, minute, 0).getTimeInMillis();
 														}
 													}
@@ -1541,17 +1541,17 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 													recordSet.setRecordSetDescription(description);
 
 													int numOfPoints = Integer.parseInt(
-															String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, graphicsData[0][1], (char) graphicsData[0][2], (char) graphicsData[0][3], (char) graphicsData[0][4]), 16) - 10;
+															String.format(DeviceCommPort.FORMAT_4_CHAR, graphicsData[0][1], (char) graphicsData[0][2], (char) graphicsData[0][3], (char) graphicsData[0][4]), 16) - 10;
 													int timeStep_sec = Integer.parseInt(
-															String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, graphicsData[0][5], (char) graphicsData[0][6], (char) graphicsData[0][7], (char) graphicsData[0][8]), 16);
+															String.format(DeviceCommPort.FORMAT_4_CHAR, graphicsData[0][5], (char) graphicsData[0][6], (char) graphicsData[0][7], (char) graphicsData[0][8]), 16);
 													recordSet.setNewTimeStep_ms(timeStep_sec * 1000.0);
 													for (int i = 0, j = 9; i < numOfPoints; i++, j += 4) {
 														// 0=Spannung 1=Strom 5=BatteryTemperature
-														points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) graphicsData[0][j], (char) graphicsData[0][j + 1], (char) graphicsData[0][j + 2],
+														points[0] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) graphicsData[0][j], (char) graphicsData[0][j + 1], (char) graphicsData[0][j + 2],
 																(char) graphicsData[0][j + 3]), 16);
-														points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) graphicsData[1][j], (char) graphicsData[1][j + 1], (char) graphicsData[1][j + 2],
+														points[1] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) graphicsData[1][j], (char) graphicsData[1][j + 1], (char) graphicsData[1][j + 2],
 																(char) graphicsData[1][j + 3]), 16);
-														points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) graphicsData[2][j], (char) graphicsData[2][j + 1], (char) graphicsData[2][j + 2],
+														points[5] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) graphicsData[2][j], (char) graphicsData[2][j + 1], (char) graphicsData[2][j + 2],
 																(char) graphicsData[2][j + 3]), 16);
 														recordSet.addPoints(points);
 													}

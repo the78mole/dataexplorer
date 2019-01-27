@@ -20,7 +20,6 @@ package gde.device.graupner;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
-import gde.comm.DeviceSerialPortImpl;
 import gde.device.DeviceConfiguration;
 import gde.device.InputTypes;
 import gde.exception.SerialPortException;
@@ -42,7 +41,7 @@ public class PolaronSerialPort extends DeviceCommPort {
 	final static Logger	log														= Logger.getLogger(PolaronSerialPort.$CLASS_NAME);
 
 	final static byte[] QUERY_DATA										= new byte[] {0x00, (byte) 0x99};
-	final static byte[]	RESET													= new byte[] { DeviceSerialPortImpl.FF, 0x43, 0x30, 0x30, 0x30, 0x30, 0x30, 0x44, 0x33, DeviceSerialPortImpl.CR };	//1000 1111
+	final static byte[]	RESET													= new byte[] { DeviceCommPort.FF, 0x43, 0x30, 0x30, 0x30, 0x30, 0x30, 0x44, 0x33, DeviceCommPort.CR };	//1000 1111
 
 	final static int		xferErrorLimit								= 15;
 
@@ -185,11 +184,11 @@ public class PolaronSerialPort extends DeviceCommPort {
 
 			answer = new byte[data.length];
 			answer = this.read(data, 3000);
-			// synchronize received data to DeviceSerialPortImpl.FF of sent data 
-			while (answer[0] != DeviceSerialPortImpl.FF) {
+			// synchronize received data to DeviceCommPort.FF of sent data 
+			while (answer[0] != DeviceCommPort.FF) {
 				this.isInSync = false;
 				for (int i = 1; i < answer.length; i++) {
-					if (answer[i] == DeviceSerialPortImpl.FF) {
+					if (answer[i] == DeviceCommPort.FF) {
 						System.arraycopy(answer, i, data, 0, data.length - i);
 						answer = new byte[i];
 						answer = this.read(answer, 1000);
@@ -211,7 +210,7 @@ public class PolaronSerialPort extends DeviceCommPort {
 			}
 			if (PolaronSerialPort.log.isLoggable(Level.FINE)) log.logp(Level.FINE, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
 
-			if (checkBeginEndSignature && !(data[0] == DeviceSerialPortImpl.FF && data[data.length - 1] == DeviceSerialPortImpl.CR)) {
+			if (checkBeginEndSignature && !(data[0] == DeviceCommPort.FF && data[data.length - 1] == DeviceCommPort.CR)) {
 				this.addXferError();
 				log.logp(Level.WARNING, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
@@ -263,7 +262,7 @@ public class PolaronSerialPort extends DeviceCommPort {
 		int length = buffer.length;
 		int check_sum = Checksum.ADD(buffer, 1, length - 6);
 		int buffer_check_sum = Integer.parseInt(
-				String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length - 5], (char) buffer[length - 4], (char) buffer[length - 3], (char) buffer[length - 2]), 16);
+				String.format(DeviceCommPort.FORMAT_4_CHAR, (char) buffer[length - 5], (char) buffer[length - 4], (char) buffer[length - 3], (char) buffer[length - 2]), 16);
 		if (check_sum == buffer_check_sum || check_sum == (buffer_check_sum - this.dataCheckSumOffset))
 			isOK = true;
 		else {

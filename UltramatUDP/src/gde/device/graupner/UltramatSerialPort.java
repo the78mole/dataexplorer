@@ -20,7 +20,6 @@ package gde.device.graupner;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
-import gde.comm.DeviceSerialPortImpl;
 import gde.device.DeviceConfiguration;
 import gde.device.InputTypes;
 import gde.exception.SerialPortException;
@@ -42,28 +41,28 @@ public class UltramatSerialPort extends DeviceCommPort {
 	final static String	$CLASS_NAME										= UltramatSerialPort.class.getName();
 	final static Logger	log														= Logger.getLogger(UltramatSerialPort.$CLASS_NAME);
 
-	final static byte[]	RESET_CONFIG									= new byte[] { DeviceSerialPortImpl.FF, 0x41, 0x37, 0x30, 0x30, 0x30, 0x30, 0x44, 0x38, DeviceSerialPortImpl.CR };	//1000 1111
-	final static byte[]	RESET													= new byte[] { DeviceSerialPortImpl.FF, 0x43, 0x30, 0x30, 0x30, 0x30, 0x30, 0x44, 0x33, DeviceSerialPortImpl.CR };	//1000 1111
-	final static byte[]	READ_MEMORY_NAME							= new byte[] { DeviceSerialPortImpl.FF, '8', '0', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0000
-	final static byte[]	WRITE_MEMORY_NAME							= new byte[] { DeviceSerialPortImpl.FF, '0', '0' };																																//0000 0000
-	final static byte[]	READ_MEMORY_SETUP							= new byte[] { DeviceSerialPortImpl.FF, '8', '1', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0001
-	final static byte[]	WRITE_MEMORY_SETUP						= new byte[] { DeviceSerialPortImpl.FF, '0', '1' };																																//0000 0001
-	final static byte[]	READ_MEMORY_STEP_CHARGE_SETUP	= new byte[] { DeviceSerialPortImpl.FF, '8', '2', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0010
-	final static byte[]	WRITE_STEP_CHARGE_SETUP				= new byte[] { DeviceSerialPortImpl.FF, '0', '2' };																																//0000 0010
-	final static byte[]	READ_MEMORY_CYCLE_DATA				= new byte[] { DeviceSerialPortImpl.FF, '8', '3', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0011
-	final static byte[]	WRITE_CYCLE_DATA							= new byte[] { DeviceSerialPortImpl.FF, '0', '3' };																																//0000 0011
-	final static byte[]	READ_MEMORY_TRACE_DATA				= new byte[] { DeviceSerialPortImpl.FF, '8', '4', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0100
-	final static byte[]	WRITE_TRACE_DATA							= new byte[] { DeviceSerialPortImpl.FF, '0', '4' };																																//0000 0100
-	final static byte[]	READ_TIRE_HEATER							= new byte[] { DeviceSerialPortImpl.FF, '8', '5', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0101
-	final static byte[]	WRITE_TIRE_HEATER							= new byte[] { DeviceSerialPortImpl.FF, '0', '5' };																																//0000 0101
-	final static byte[]	READ_MOTOR_RUN								= new byte[] { DeviceSerialPortImpl.FF, '8', '6', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0110
-	final static byte[]	WRITE_MOTOR_RUN								= new byte[] { DeviceSerialPortImpl.FF, '0', '6' };																																//0000 0110
-	final static byte[]	READ_CHANNEL_SETUP						= new byte[] { DeviceSerialPortImpl.FF, '8', '7', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 0111
-	final static byte[]	WRITE_CHANNEL_SETUP						= new byte[] { DeviceSerialPortImpl.FF, '0', '7' };																																//0000 0111
-	final static byte[]	READ_DEVICE_IDENTIFIER_NAME		= new byte[] { DeviceSerialPortImpl.FF, '8', '8', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 1000
-	final static byte[]	WRITE_DEVICE_IDENTIFIER_NAME	= new byte[] { DeviceSerialPortImpl.FF, '0', '8' };																																//0000 1000
-	final static byte[]	READ_GRAPHICS_DATA						= new byte[] { DeviceSerialPortImpl.FF, '8', '9', '0', '0', '0', '0', '0', '0', DeviceSerialPortImpl.CR };					//1000 1001
-	final static byte[]	WRITE_GRAPHICS_DATA						= new byte[] { DeviceSerialPortImpl.FF, '0', '9' };																																//0000 1001
+	final static byte[]	RESET_CONFIG									= new byte[] { DeviceCommPort.FF, 0x41, 0x37, 0x30, 0x30, 0x30, 0x30, 0x44, 0x38, DeviceCommPort.CR };	//1000 1111
+	final static byte[]	RESET													= new byte[] { DeviceCommPort.FF, 0x43, 0x30, 0x30, 0x30, 0x30, 0x30, 0x44, 0x33, DeviceCommPort.CR };	//1000 1111
+	final static byte[]	READ_MEMORY_NAME							= new byte[] { DeviceCommPort.FF, '8', '0', '0', '0', '0', '0', '0', '0', DeviceCommPort.CR };					//1000 0000
+	final static byte[]	WRITE_MEMORY_NAME							= new byte[] { DeviceCommPort.FF, '0', '0' };																																//0000 0000
+	final static byte[]	READ_MEMORY_SETUP							= new byte[] { DeviceCommPort.FF, '8', '1', '0', '0', '0', '0', '0', '0', DeviceCommPort.CR };					//1000 0001
+	final static byte[]	WRITE_MEMORY_SETUP						= new byte[] { DeviceCommPort.FF, '0', '1' };																																//0000 0001
+	final static byte[]	READ_MEMORY_STEP_CHARGE_SETUP	= new byte[] { DeviceCommPort.FF, '8', '2', '0', '0', '0', '0', '0', '0', DeviceCommPort.CR };					//1000 0010
+	final static byte[]	WRITE_STEP_CHARGE_SETUP				= new byte[] { DeviceCommPort.FF, '0', '2' };																																//0000 0010
+	final static byte[]	READ_MEMORY_CYCLE_DATA				= new byte[] { DeviceCommPort.FF, '8', '3', '0', '0', '0', '0', '0', '0', DeviceCommPort.CR };					//1000 0011
+	final static byte[]	WRITE_CYCLE_DATA							= new byte[] { DeviceCommPort.FF, '0', '3' };																																//0000 0011
+	final static byte[]	READ_MEMORY_TRACE_DATA				= new byte[] { DeviceCommPort.FF, '8', '4', '0', '0', '0', '0', '0', '0', DeviceCommPort.CR };					//1000 0100
+	final static byte[]	WRITE_TRACE_DATA							= new byte[] { DeviceCommPort.FF, '0', '4' };																																//0000 0100
+	final static byte[]	READ_TIRE_HEATER							= new byte[] { DeviceCommPort.FF, '8', '5', '0', '0', '0', '0', '0', '0', DeviceCommPort.CR };					//1000 0101
+	final static byte[]	WRITE_TIRE_HEATER							= new byte[] { DeviceCommPort.FF, '0', '5' };																																//0000 0101
+	final static byte[]	READ_MOTOR_RUN								= new byte[] { DeviceCommPort.FF, '8', '6', '0', '0', '0', '0', '0', '0', DeviceCommPort.CR };					//1000 0110
+	final static byte[]	WRITE_MOTOR_RUN								= new byte[] { DeviceCommPort.FF, '0', '6' };																																//0000 0110
+	final static byte[]	READ_CHANNEL_SETUP						= new byte[] { DeviceCommPort.FF, '8', '7', '0', '0', '0', '0', '0', '0', DeviceCommPort.CR };					//1000 0111
+	final static byte[]	WRITE_CHANNEL_SETUP						= new byte[] { DeviceCommPort.FF, '0', '7' };																																//0000 0111
+	final static byte[]	READ_DEVICE_IDENTIFIER_NAME		= new byte[] { DeviceCommPort.FF, '8', '8', '0', '0', '0', '0', '0', '0', DeviceCommPort.CR };					//1000 1000
+	final static byte[]	WRITE_DEVICE_IDENTIFIER_NAME	= new byte[] { DeviceCommPort.FF, '0', '8' };																																//0000 1000
+	final static byte[]	READ_GRAPHICS_DATA						= new byte[] { DeviceCommPort.FF, '8', '9', '0', '0', '0', '0', '0', '0', DeviceCommPort.CR };					//1000 1001
+	final static byte[]	WRITE_GRAPHICS_DATA						= new byte[] { DeviceCommPort.FF, '0', '9' };																																//0000 1001
 
 	static int					SIZE_MEMORY_SETUP							= 28;
 	final static int		SIZE_MEMORY_STEP_CHARGE_SETUP	= 20;
@@ -136,11 +135,11 @@ public class UltramatSerialPort extends DeviceCommPort {
 
 			answer = new byte[data.length];
 			answer = this.read(data, 3000);
-			// synchronize received data to DeviceSerialPortImpl.FF of sent data 
-			while (answer[0] != DeviceSerialPortImpl.FF) {
+			// synchronize received data to DeviceCommPort.FF of sent data 
+			while (answer[0] != DeviceCommPort.FF) {
 				this.isInSync = false;
 				for (int i = 1; i < answer.length; i++) {
-					if (answer[i] == DeviceSerialPortImpl.FF) {
+					if (answer[i] == DeviceCommPort.FF) {
 						System.arraycopy(answer, i, data, 0, data.length - i);
 						answer = new byte[i];
 						answer = this.read(answer, 1000);
@@ -162,7 +161,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 			}
 			log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
 
-			if (checkBeginEndSignature && !(data[0] == DeviceSerialPortImpl.FF && data[data.length - 1] == DeviceSerialPortImpl.CR)) {
+			if (checkBeginEndSignature && !(data[0] == DeviceCommPort.FF && data[data.length - 1] == DeviceCommPort.CR)) {
 				this.addXferError();
 				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
@@ -197,7 +196,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 	 */
 	public synchronized String readDeviceUserName() throws IOException, TimeOutException, SerialPortException {
 		byte[] answer = this.readConfigData(UltramatSerialPort.READ_DEVICE_IDENTIFIER_NAME, 23, 2);
-		return String.format(DeviceSerialPortImpl.FORMAT_16_CHAR, answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12],
+		return String.format(DeviceCommPort.FORMAT_16_CHAR, answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12],
 				answer[13], answer[14], answer[15], answer[16]);
 	}
 
@@ -234,7 +233,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 		for (int i = 1; i < answer.length-1; i++) {
 			if (answer[i] < 31 || answer[i] > 126) answer[i] = ' ';
 		}
-		return String.format(DeviceSerialPortImpl.FORMAT_16_CHAR, answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12],
+		return String.format(DeviceCommPort.FORMAT_16_CHAR, answer[1], answer[2], answer[3], answer[4], answer[5], answer[6], answer[7], answer[8], answer[9], answer[10], answer[11], answer[12],
 				answer[13], answer[14], answer[15], answer[16]);
 	}
 
@@ -321,10 +320,10 @@ public class UltramatSerialPort extends DeviceCommPort {
 
 			this.write(writeBuffer);
 			byte[] answer = this.read(readBuffer, 3000);
-			while (answer[0] != DeviceSerialPortImpl.FF) {
+			while (answer[0] != DeviceCommPort.FF) {
 				this.isInSync = false;
 				for (int i = 1; i < answer.length; i++) {
-					if (answer[i] == DeviceSerialPortImpl.FF) {
+					if (answer[i] == DeviceCommPort.FF) {
 						System.arraycopy(answer, i, readBuffer, 0, readBuffer.length - i);
 						answer = new byte[i];
 						answer = this.read(answer, 1000);
@@ -344,7 +343,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 				answer = new byte[expectedDataSize];
 				answer = this.read(answer, 3000);
 			}
-			if (!(readBuffer[0] == DeviceSerialPortImpl.FF && readBuffer[readBuffer.length - 1] == DeviceSerialPortImpl.ACK && isCommandChecksumOK(readBuffer))) {
+			if (!(readBuffer[0] == DeviceCommPort.FF && readBuffer[readBuffer.length - 1] == DeviceCommPort.ACK && isCommandChecksumOK(readBuffer))) {
 				this.addXferError();
 				log.logp(java.util.logging.Level.WARNING, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
@@ -385,8 +384,8 @@ public class UltramatSerialPort extends DeviceCommPort {
 
 				byte[] readBuffer = new byte[9];
 				byte[] answer = this.read(readBuffer, 3000);
-				int numOfPoints = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, answer[1], answer[2], answer[3], answer[4]), 16);
-				int timeStep_sec = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, answer[5], answer[6], answer[7], answer[8]), 16);
+				int numOfPoints = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, answer[1], answer[2], answer[3], answer[4]), 16);
+				int timeStep_sec = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, answer[5], answer[6], answer[7], answer[8]), 16);
 				numBytes = numOfPoints * 3 * 4 + 3 * 9 + 5;
 				for (byte b : answer) {
 					graphicsData.add(b);
@@ -404,7 +403,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 					dialog.setGraphicsDataReadProgress(redPoints * 100 / numBytes);
 				}
 				readBuffer = new byte[1]; // checksum + 0x0D
-				while (readBuffer[0] != DeviceSerialPortImpl.ACK) {
+				while (readBuffer[0] != DeviceCommPort.ACK) {
 					answer = this.read(readBuffer, 1000);
 					graphicsData.add(answer[0]);
 					redPoints += 1;
@@ -437,7 +436,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 
 		if (this.isConnected()) {
 			System.arraycopy(type, 0, writeBuffer, 0, 3);
-			writeBuffer[writeBuffer.length - 1] = DeviceSerialPortImpl.CR;
+			writeBuffer[writeBuffer.length - 1] = DeviceCommPort.CR;
 			byte[] num = String.format("%02X", index).getBytes(); //$NON-NLS-1$
 			System.arraycopy(num, 0, writeBuffer, 3, 2);
 			System.arraycopy(configData, 0, writeBuffer, 5, configData.length);
@@ -448,7 +447,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 			this.write(writeBuffer);
 			byte[] answer = this.read(new byte[1], 3000);
 			log.logp(java.util.logging.Level.FINE, UltramatSerialPort.$CLASS_NAME, $METHOD_NAME, "answer = " + StringHelper.convert2CharString(answer)); //$NON-NLS-1$
-			if ((answer[0] == DeviceSerialPortImpl.NAK)) {
+			if ((answer[0] == DeviceCommPort.NAK)) {
 				log.log(java.util.logging.Level.WARNING, "Writing UltraDuoPlus configuration type (" + new String(type) + ") data failed!"); //$NON-NLS-1$ //$NON-NLS-2$
 				throw new IOException("Writing UltraDuoPlus configuration type (" + new String(type) + ") data failed!"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -466,7 +465,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 		int length = buffer.length;
 		int check_sum = Checksum.ADD(buffer, 1, length - 6);
 		int buffer_check_sum = Integer.parseInt(
-				String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length - 5], (char) buffer[length - 4], (char) buffer[length - 3], (char) buffer[length - 2]), 16);
+				String.format(DeviceCommPort.FORMAT_4_CHAR, (char) buffer[length - 5], (char) buffer[length - 4], (char) buffer[length - 3], (char) buffer[length - 2]), 16);
 		if (check_sum == buffer_check_sum || check_sum == (buffer_check_sum - this.dataCheckSumOffset))
 			isOK = true;
 		else {
@@ -495,7 +494,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 		int length = buffer.length;
 		int check_sum = Checksum.ADD(buffer, 1, length - 7);
 		int buffer_check_sum = Integer.parseInt(
-				String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) buffer[length - 6], (char) buffer[length - 5], (char) buffer[length - 4], (char) buffer[length - 3]), 16);
+				String.format(DeviceCommPort.FORMAT_4_CHAR, (char) buffer[length - 6], (char) buffer[length - 5], (char) buffer[length - 4], (char) buffer[length - 3]), 16);
 		if (check_sum == buffer_check_sum || check_sum == (buffer_check_sum - this.cmdCheckSumOffset))
 			isOK = true;
 		else {

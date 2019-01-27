@@ -51,7 +51,7 @@ import gde.utils.CalculationThread;
 import gde.utils.LinearRegression;
 import gde.utils.QuasiLinearRegression;
 import gde.utils.StringHelper;
-import gnu.io.NoSuchPortException;
+import gde.exception.NoSuchPortException;
 
 /**
  * UniLog default device implementation, just copied from Sample project

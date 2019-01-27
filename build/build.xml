@@ -682,6 +682,7 @@
 		<!-- java extenssions -->
 		<copy todir="${output.windows32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
 			<fileset file="build/lib/Windows/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />
@@ -700,6 +701,7 @@
 		</copy>
 		<copy todir="${output.windows64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
 			<fileset file="build/lib/Windows/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />
@@ -718,6 +720,7 @@
 		</copy>
 		<copy todir="${output.raspbian32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
 			<fileset file="build/lib/Raspbian/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />
@@ -736,6 +739,7 @@
 		</copy>
 		<copy todir="${output.gnulinux32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
 			<fileset file="build/lib/GNULinux/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />
@@ -754,6 +758,7 @@
 		</copy>
 		<copy todir="${output.gnulinux64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
 			<fileset file="build/lib/GNULinux/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />
@@ -772,6 +777,7 @@
 		</copy>
 		<copy todir="${output.mac32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
 			<fileset file="build/lib/MAC/32/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />		
@@ -790,6 +796,7 @@
 		</copy>
 		<copy todir="${output.mac64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
 			<fileset file="build/lib/MAC/64/swt.jar" />
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
@@ -1066,6 +1073,7 @@
 				<pathelement path="${basedir}/thirdparty/Junit5/junit.jar" />
 				<pathelement path="${basedir}/build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
 				<pathelement path="${basedir}/build/lib/RXTXcomm.jar" />
+				<pathelement path="${basedir}/build/lib/jSerialComm.jar" />
 				<pathelement path="${basedir}/build/target/${build.os.shortname}_${sun.arch.data.model}/DataExplorer/DataExplorer.jar" />
 				<pathelement location="${basedir}/JunitMiscTest/bin" />
 			</classpath>

@@ -62,7 +62,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 import gde.Analyzer;
 import gde.GDE;
-import gde.comm.DeviceSerialPortImpl;
+import gde.comm.DeviceCommPort;
 import gde.config.DeviceConfigurations;
 import gde.config.ExportService;
 import gde.config.Settings;
@@ -150,7 +150,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 		this.application = currentApplication;
 		this.settings = Settings.getInstance();
 		this.activeDeviceName = this.settings.getActiveDevice();
-		this.availablePorts = DeviceSerialPortImpl.getAvailableports();
+		this.availablePorts = DeviceCommPort.getAvailableports();
 
 		//add this two renamed device plug-ins to the list of legacy devices
 		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
@@ -1112,7 +1112,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				try {
 					while (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
 						if (DeviceSelectionDialog.this.isUpdateSerialPorts) {
-							DeviceSelectionDialog.this.availablePorts = DeviceSerialPortImpl.listConfiguredSerialPorts(DeviceSelectionDialog.this.settings.doPortAvailabilityCheck(),
+							DeviceSelectionDialog.this.availablePorts = DeviceCommPort.listConfiguredSerialPorts(DeviceSelectionDialog.this.settings.doPortAvailabilityCheck(),
 									DeviceSelectionDialog.this.settings.isSerialPortBlackListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
 									DeviceSelectionDialog.this.settings.isSerialPortWhiteListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
 							if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {

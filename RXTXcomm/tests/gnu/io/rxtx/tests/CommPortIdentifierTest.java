@@ -58,7 +58,7 @@
 package gnu.io.rxtx.tests;
 
 import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
+import gde.exception.NoSuchPortException;
 
 import java.util.ArrayList;
 import java.util.Enumeration;

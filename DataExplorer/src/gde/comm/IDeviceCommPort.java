@@ -23,7 +23,6 @@ import gde.exception.ApplicationConfigurationException;
 import gde.exception.FailedQueryException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
-import gnu.io.SerialPort;
 
 import java.io.IOException;
 import java.util.Vector;
@@ -48,7 +47,7 @@ public interface IDeviceCommPort {
 	 * @throws ApplicationConfigurationException
 	 * @throws SerialPortException
 	 */
-	public SerialPort open() throws ApplicationConfigurationException, SerialPortException;
+	public Object open() throws ApplicationConfigurationException, SerialPortException;
 	
 	/**
 	 * function to close the serial port

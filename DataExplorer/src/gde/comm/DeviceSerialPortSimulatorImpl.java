@@ -257,8 +257,8 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 							byte[] tmpData = StringHelper.convert2ByteArray(sb.toString());
 							System.arraycopy(tmpData, 0, readBuffer, 0, tmpData.length <= readBuffer.length ? tmpData.length : readBuffer.length);
 							if (log.isLoggable(Level.FINE)) {
-								log.logp(java.util.logging.Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(readBuffer));
-								log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBuffer.length));
+								log.logp(java.util.logging.Level.FINER, DeviceSerialPortSimulatorImpl.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(readBuffer));
+								log.logp(Level.FINE, DeviceSerialPortSimulatorImpl.$CLASS_NAME, $METHOD_NAME, "  Read : " + StringHelper.byte2Hex2CharString(readBuffer, readBuffer.length));
 							}
 						}
 						else { // WARNING, assume time out

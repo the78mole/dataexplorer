@@ -25,7 +25,6 @@ import javax.xml.bind.JAXBException;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
-import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
 import gde.data.Record;
 import gde.data.RecordSet;
@@ -150,16 +149,16 @@ public class UltraTrioPlus14 extends Ultramat {
 
 		try {
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=VersorgungsSpg 6=Balance 7=SpannungZelle1 8=SpannungZelle2....
-			points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[13], (char) dataBuffer[14], (char) dataBuffer[15], (char) dataBuffer[16]), 16);
-			points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[17], (char) dataBuffer[18], (char) dataBuffer[19], (char) dataBuffer[20]), 16);
-			points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
+			points[0] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[13], (char) dataBuffer[14], (char) dataBuffer[15], (char) dataBuffer[16]), 16);
+			points[1] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[17], (char) dataBuffer[18], (char) dataBuffer[19], (char) dataBuffer[20]), 16);
+			points[2] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]), 16);
 			points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 			points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
-			points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16);
+			points[5] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16);
 			points[6] = 0;
 			// 7=SpannungZelle1 8=SpannungZelle2 9=SpannungZelle3 10=SpannungZelle4 11=SpannungZelle5 12=SpannungZelle6
 			for (int i = 0, j = 0; i < points.length - 7; ++i, j += 4) {
-				points[i + 7] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25 + j], (char) dataBuffer[26 + j], (char) dataBuffer[27 + j], (char) dataBuffer[28 + j]),
+				points[i + 7] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[25 + j], (char) dataBuffer[26 + j], (char) dataBuffer[27 + j], (char) dataBuffer[28 + j]),
 						16);
 				if (points[i + 7] > 0) {
 					maxVotage = points[i + 7] > maxVotage ? points[i + 7] : maxVotage;
@@ -300,7 +299,7 @@ public class UltraTrioPlus14 extends Ultramat {
 		}
 		else if (outletNum == 2) {
 			try {
-				int operationMode2 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[49], (char) dataBuffer[50]), 16);
+				int operationMode2 = Integer.parseInt(String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[49], (char) dataBuffer[50]), 16);
 				if (log.isLoggable(Level.FINE)) {
 					log.log(Level.FINE,	"operationMode1 = " + operationMode2);
 				}
@@ -314,7 +313,7 @@ public class UltraTrioPlus14 extends Ultramat {
 		}
 		else if (outletNum == 3) {
 			try {
-				int operationMode3 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[75], (char) dataBuffer[76]), 16);
+				int operationMode3 = Integer.parseInt(String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[75], (char) dataBuffer[76]), 16);
 				if (log.isLoggable(Level.FINE)) {
 					log.log(Level.FINE,	"operationMode1 = " + operationMode3);
 				}
@@ -336,7 +335,7 @@ public class UltraTrioPlus14 extends Ultramat {
 	 */
 	@Override
 	public int getProcessingMode(byte[] dataBuffer) {
-		return Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]), 16);
+		return Integer.parseInt(String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[9], (char) dataBuffer[10]), 16);
 	}
 
 	/**
@@ -347,6 +346,6 @@ public class UltraTrioPlus14 extends Ultramat {
 	 */
 	@Override
 	public int getCycleNumber(int outletNum, byte[] dataBuffer) {
-		return Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[11], (char) dataBuffer[12]), 16);
+		return Integer.parseInt(String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[11], (char) dataBuffer[12]), 16);
 	}
 }

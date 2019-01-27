@@ -26,7 +26,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.Checksum;
 import gde.utils.WaitTimer;
-import gnu.io.NoSuchPortException;
+import gde.exception.NoSuchPortException;
 
 import java.io.IOException;
 import java.util.Vector;

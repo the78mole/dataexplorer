@@ -20,7 +20,6 @@ package gde.device.graupner;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
-import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
 import gde.data.RecordSet;
 import gde.device.DeviceConfiguration;
@@ -269,7 +268,7 @@ public class UltraTrioPlus16S extends UltraTrioPlus14 {
 		}
 		else if (outletNum == 2) {
 			try {
-				int operationMode2 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[57], (char) dataBuffer[58]), 16);
+				int operationMode2 = Integer.parseInt(String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[57], (char) dataBuffer[58]), 16);
 				if (log.isLoggable(java.util.logging.Level.FINE)) {
 					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode2);
 				}
@@ -283,7 +282,7 @@ public class UltraTrioPlus16S extends UltraTrioPlus14 {
 		}
 		else if (outletNum == 3) {
 			try {
-				int operationMode3 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_2_CHAR, (char) dataBuffer[83], (char) dataBuffer[84]), 16);
+				int operationMode3 = Integer.parseInt(String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[83], (char) dataBuffer[84]), 16);
 				if (log.isLoggable(java.util.logging.Level.FINE)) {
 					log.log(java.util.logging.Level.FINE,	"operationMode1 = " + operationMode3);
 				}

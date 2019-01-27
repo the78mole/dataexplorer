@@ -134,14 +134,14 @@ public class CSV2SerialPort extends DeviceCommPort implements IDeviceCommPort {
 			//System.out.println(startIndex + " - " + this.tmpData.length + " - " + endIndex);
 			System.arraycopy(this.tmpData, 0, this.data, 0, this.tmpData.length);
 			System.arraycopy(this.answer, startIndex, this.data, this.tmpData.length, endIndex - startIndex);
-			if (CSV2SerialPort.log.isLoggable(Level.OFF)) {
+			if (CSV2SerialPort.log.isLoggable(Level.FINER)) {
 				StringBuilder sb = new StringBuilder();
 				for (byte b : this.data) {
 					sb.append((char) b);
 				}
 				while (sb.length() > 5 && (sb.charAt(sb.length() - 1) == '\n' || sb.charAt(sb.length() - 1) == '\r'))
 					sb.deleteCharAt(sb.length() - 1);
-				CSV2SerialPort.log.logp(Level.OFF, CSV2SerialPort.$CLASS_NAME, $METHOD_NAME, sb.toString());
+				CSV2SerialPort.log.logp(Level.FINER, CSV2SerialPort.$CLASS_NAME, $METHOD_NAME, sb.toString());
 			}
 			return this.data;
 		}

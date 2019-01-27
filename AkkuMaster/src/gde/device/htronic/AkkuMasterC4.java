@@ -31,7 +31,6 @@ import gde.exception.DataInconsitsentException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
-import gnu.io.NoSuchPortException;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -73,7 +72,6 @@ public class AkkuMasterC4 extends DeviceConfiguration implements IDevice {
 	/**
 	 * constructor using existing device configuration
 	 * @param deviceConfig device configuration
-	 * @throws NoSuchPortException 
 	 */
 	public AkkuMasterC4(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);

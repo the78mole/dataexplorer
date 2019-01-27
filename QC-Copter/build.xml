@@ -15,7 +15,6 @@
 
 	<path id="compile.classpath">
 		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
-		<pathelement location="../build/lib/RXTXcomm.jar" />
 		<pathelement location="../build/lib/jaxb-api.jar" />
 		<pathelement location="../build/lib/usb-api-1.0.2.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />

@@ -25,7 +25,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
-import gnu.io.NoSuchPortException;
+import gde.exception.NoSuchPortException;
 
 import java.util.logging.Logger;
 

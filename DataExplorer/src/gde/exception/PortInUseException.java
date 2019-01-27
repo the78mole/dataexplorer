@@ -14,21 +14,28 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
     
-    Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
+    Copyright (c) 2019 Winfried Bruegmann
 ****************************************************************************************/
 package gde.exception;
 
 /**
- * Exception class to be used if the port can not be used due to internal errors, not configuration error
+ * Exception class to be used if the port can not be opened due to internal errors, not configuration error
  * @author Winfried Brügmann
  */
-public class SerialPortException extends RuntimeException {
+public class PortInUseException extends RuntimeException {
 	static final long serialVersionUID = 26031957;
+
+	/**
+	 * default constructor
+	 */
+	public PortInUseException() {
+		super();
+	}
 
 	/**
 	 * @param message
 	 */
-	public SerialPortException(String message) {
+	public PortInUseException(String message) {
 		super(message);
 	}
 
@@ -36,7 +43,7 @@ public class SerialPortException extends RuntimeException {
 	 * @param message
 	 * @param cause
 	 */
-	public SerialPortException(String message, Throwable cause) {
+	public PortInUseException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

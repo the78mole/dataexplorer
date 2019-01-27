@@ -11,6 +11,7 @@ Generic changes/fixes
 	* remove/reset unnecessary smoothVoltageCurve entry from devices
 	* fix visualization of serial port selection 
 	* enable curve compare independent of selected measurement unit, but warn about this fact
+	* fix Windows Java 11 serial communication add jSerialComm implementation 
 
 Device specific changes/fixes
 	* Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)

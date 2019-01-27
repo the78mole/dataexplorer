@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DataExplorer"/>
-	<classpathentry kind="lib" path="/build/lib/RXTXcomm.jar"/>
+	<!-- classpathentry kind="lib" path="/build/lib/RXTXcomm.jar"/ -->
 	<classpathentry kind="lib" path="/build/lib/usb-api-1.0.2.jar"/>
 	<classpathentry kind="lib" path="/build/lib/jaxb-api.jar"/>
 	<classpathentry kind="var" path="SWT_JAR_PATH"/>

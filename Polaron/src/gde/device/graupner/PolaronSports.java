@@ -26,7 +26,7 @@ import javax.xml.bind.JAXBException;
 import org.eclipse.swt.SWT;
 
 import gde.GDE;
-import gde.comm.DeviceSerialPortImpl;
+import gde.comm.DeviceCommPort;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
@@ -150,18 +150,18 @@ public class PolaronSports extends Polaron {
 
 			try {
 				// 0=VersorgungsSpg1 1=Spannung 2=Spannung1 3=Spannung2 4=Strom 5=Strom1 6=Strom2 7=Ladung 8=Ladung1 9=Ladung2 10=Leistung 11=Leistung1 12=Leistung2 13=Energie 14=Energie1 15=Energie2 16=BatteryTemperature1 17=BatteryTemperature2 18=Balance
-				points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[9], (char) dataBuffer[10], (char) dataBuffer[11], (char) dataBuffer[12]), 16);
+				points[0] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[9], (char) dataBuffer[10], (char) dataBuffer[11], (char) dataBuffer[12]), 16);
 
-				points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
-				points[3] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[93], (char) dataBuffer[94], (char) dataBuffer[95], (char) dataBuffer[96]), 16);
+				points[2] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
+				points[3] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[93], (char) dataBuffer[94], (char) dataBuffer[95], (char) dataBuffer[96]), 16);
 				points[1] = points[2] + points[3];
 
-				points[5] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
-				points[6] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[97], (char) dataBuffer[98], (char) dataBuffer[99], (char) dataBuffer[100]), 16);
+				points[5] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
+				points[6] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[97], (char) dataBuffer[98], (char) dataBuffer[99], (char) dataBuffer[100]), 16);
 				points[4] = points[5] + points[6];
 
-				points[8] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
-				points[9] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[101], (char) dataBuffer[102], (char) dataBuffer[103], (char) dataBuffer[104]), 16);
+				points[8] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
+				points[9] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[101], (char) dataBuffer[102], (char) dataBuffer[103], (char) dataBuffer[104]), 16);
 				points[7] = points[8] + points[9];
 
 				points[11] = Double.valueOf(points[2] * points[5] / 1000.0).intValue(); // power U*I [W]
@@ -172,18 +172,18 @@ public class PolaronSports extends Polaron {
 				points[15] = Double.valueOf(points[3] * points[9] / 1000.0).intValue(); // energy U*C [Wh]
 				points[13] = points[14] + points[15];
 
-				points[16] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[37], (char) dataBuffer[38], (char) dataBuffer[39], (char) dataBuffer[40]), 16);
-				String sign = String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41], (char) dataBuffer[42], (char) dataBuffer[43], (char) dataBuffer[44]);
+				points[16] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[37], (char) dataBuffer[38], (char) dataBuffer[39], (char) dataBuffer[40]), 16);
+				String sign = String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[41], (char) dataBuffer[42], (char) dataBuffer[43], (char) dataBuffer[44]);
 				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[16] = -1 * points[16];
 
-				points[17] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[105], (char) dataBuffer[106], (char) dataBuffer[107], (char) dataBuffer[108]), 16);
-				sign = String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[109], (char) dataBuffer[110], (char) dataBuffer[111], (char) dataBuffer[112]);
+				points[17] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[105], (char) dataBuffer[106], (char) dataBuffer[107], (char) dataBuffer[108]), 16);
+				sign = String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[109], (char) dataBuffer[110], (char) dataBuffer[111], (char) dataBuffer[112]);
 				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[17] = -1 * points[17];
 				points[18] = 0;
 
 				// 19=SpannungZelle1 20=SpannungZelle2 21=SpannungZelle3 22=SpannungZelle4 23=SpannungZelle5 24=SpannungZelle6 25=SpannungZelle7
 				for (int i = 0, j = 0; i < 7; ++i, j += 4) {
-					points[i + 19] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[49 + j], (char) dataBuffer[50 + j], (char) dataBuffer[51 + j], (char) dataBuffer[52 + j]),	16);
+					points[i + 19] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[49 + j], (char) dataBuffer[50 + j], (char) dataBuffer[51 + j], (char) dataBuffer[52 + j]),	16);
 					if (points[i + 19] > 0) {
 						maxVotage = points[i + 19] > maxVotage ? points[i + 19] : maxVotage;
 						minVotage = points[i + 19] < minVotage ? points[i + 19] : minVotage;
@@ -192,7 +192,7 @@ public class PolaronSports extends Polaron {
 				// 26=SpannungZelle8 27=SpannungZelle9 28=SpannungZelle10 29=SpannungZelle11 30=SpannungZelle12 31=SpannungZelle13 32=SpannungZelle14
 				for (int i = 0, j = 0; i < 7; ++i, j += 4) {
 					points[i + 26] = Integer.parseInt(
-							String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[117 + j], (char) dataBuffer[118 + j], (char) dataBuffer[119 + j], (char) dataBuffer[120 + j]), 16);
+							String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[117 + j], (char) dataBuffer[118 + j], (char) dataBuffer[119 + j], (char) dataBuffer[120 + j]), 16);
 					if (points[i + 26] > 0) {
 						maxVotage = points[i + 26] > maxVotage ? points[i + 26] : maxVotage;
 						minVotage = points[i + 26] < minVotage ? points[i + 26] : minVotage;
@@ -208,21 +208,21 @@ public class PolaronSports extends Polaron {
 		else {
 			try {
 				// 0=VersorgungsSpg 1=Spannung 2=Strom 3=Ladung 4=Leistung 5=Energie 6=BatteryTemperature 7=Balance 8=SpannungZelle1 9=SpannungZelle2...
-				points[0] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[9], (char) dataBuffer[10], (char) dataBuffer[11], (char) dataBuffer[12]), 16);
-				points[1] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
-				points[2] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
-				points[3] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
+				points[0] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[9], (char) dataBuffer[10], (char) dataBuffer[11], (char) dataBuffer[12]), 16);
+				points[1] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
+				points[2] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[29], (char) dataBuffer[30], (char) dataBuffer[31], (char) dataBuffer[32]), 16);
+				points[3] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[33], (char) dataBuffer[34], (char) dataBuffer[35], (char) dataBuffer[36]), 16);
 				points[4] = Double.valueOf(points[1] * points[2] / 1000.0).intValue(); // power U*I [W]
 				points[5] = Double.valueOf(points[1] * points[3] / 1000.0).intValue(); // energy U*C [Wh]
-				points[6] = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[37], (char) dataBuffer[38], (char) dataBuffer[39], (char) dataBuffer[40]), 16);
-				String sign = String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[41], (char) dataBuffer[42], (char) dataBuffer[43], (char) dataBuffer[44]);
+				points[6] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[37], (char) dataBuffer[38], (char) dataBuffer[39], (char) dataBuffer[40]), 16);
+				String sign = String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[41], (char) dataBuffer[42], (char) dataBuffer[43], (char) dataBuffer[44]);
 				if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[6] = -1 * points[6];
 				points[7] = 0;
 
 				// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7
 				for (int i = 0, j = 0; i < 7; ++i, j += 4) {
 					points[i + 8] = Integer
-							.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[49 + j], (char) dataBuffer[50 + j], (char) dataBuffer[51 + j], (char) dataBuffer[52 + j]), 16);
+							.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[49 + j], (char) dataBuffer[50 + j], (char) dataBuffer[51 + j], (char) dataBuffer[52 + j]), 16);
 					if (points[i + 8] > 0) {
 						maxVotage = points[i + 8] > maxVotage ? points[i + 8] : maxVotage;
 						minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
@@ -361,7 +361,7 @@ public class PolaronSports extends Polaron {
 			return !(processingModeOut1 == Polaron.OPERATIONS_MODE_NONE || processingModeOut1 == Polaron.OPERATIONS_MODE_ERROR);
 		}
 		else if (outletNum == 2) {
-			String tmpProcessing = String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[81], (char) dataBuffer[82], (char) dataBuffer[83], (char) dataBuffer[84]);
+			String tmpProcessing = String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[81], (char) dataBuffer[82], (char) dataBuffer[83], (char) dataBuffer[84]);
 			int processingModeOut2 = tmpProcessing != null && tmpProcessing.length() > 0 ? Integer.parseInt(tmpProcessing, 16) : 0;
 			if (Polaron.log.isLoggable(java.util.logging.Level.FINE)) {
 				Polaron.log.log(java.util.logging.Level.FINE, "processingModeOut2 = " + this.PROCESSING_MODE[processingModeOut2]); //$NON-NLS-1$
@@ -379,7 +379,7 @@ public class PolaronSports extends Polaron {
 	 */
 	@Override
 	public int getProcessingMode(byte[] dataBuffer) {
-		String processingMode = String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[13], (char) dataBuffer[14], (char) dataBuffer[15], (char) dataBuffer[16]);
+		String processingMode = String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[13], (char) dataBuffer[14], (char) dataBuffer[15], (char) dataBuffer[16]);
 		return processingMode != null && processingMode.length() > 0 ? Integer.parseInt(processingMode, 16) : 0;
 	}
 
@@ -392,7 +392,7 @@ public class PolaronSports extends Polaron {
 	public String getProcessingType(byte[] dataBuffer) {
 		String type = GDE.STRING_EMPTY;
 		int processingMode = this.getProcessingMode(dataBuffer);
-		String processingType = String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[17], (char) dataBuffer[18], (char) dataBuffer[19], (char) dataBuffer[20]);
+		String processingType = String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[17], (char) dataBuffer[18], (char) dataBuffer[19], (char) dataBuffer[20]);
 		switch (processingMode) {
 		case 1: //charge
 			type = processingType != null && processingType.length() > 0 ? this.CHARGE_TYPE[Integer.parseInt(processingType, 16)] : GDE.STRING_EMPTY;
@@ -424,10 +424,10 @@ public class PolaronSports extends Polaron {
 	 */
 	@Override
 	public boolean isLinkedMode(byte[] dataBuffer) {
-		int operationMode1 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[13], (char) dataBuffer[14], (char) dataBuffer[15], (char) dataBuffer[16]), 16);
-		int operationMode2 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[81], (char) dataBuffer[82], (char) dataBuffer[83], (char) dataBuffer[84]), 16);
-		int operationType1 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[17], (char) dataBuffer[18], (char) dataBuffer[19], (char) dataBuffer[20]), 16);
-		int operationType2 = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[85], (char) dataBuffer[86], (char) dataBuffer[87], (char) dataBuffer[88]), 16);
+		int operationMode1 = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[13], (char) dataBuffer[14], (char) dataBuffer[15], (char) dataBuffer[16]), 16);
+		int operationMode2 = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[81], (char) dataBuffer[82], (char) dataBuffer[83], (char) dataBuffer[84]), 16);
+		int operationType1 = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[17], (char) dataBuffer[18], (char) dataBuffer[19], (char) dataBuffer[20]), 16);
+		int operationType2 = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[85], (char) dataBuffer[86], (char) dataBuffer[87], (char) dataBuffer[88]), 16);
 		return operationMode1 == operationMode2 && operationType1 == operationType2
 				&& ((operationMode1 == 1 && operationType1 == Polaron.OPERATIONS_MODE_LINK_CHARGE))
 						|| (operationMode1 == 2 && operationType1 == Polaron.OPERATIONS_MODE_LINK_DISCHARGE);
@@ -441,7 +441,7 @@ public class PolaronSports extends Polaron {
 	@Override
 	public int getProductCode(byte[] dataBuffer) {
 		//0=unknown, 1=PolaronEx, 2=PolaronAcDcEQ, 3=PolaronAcDc, 4=PolaronPro, 5=PolaronSports
-		return Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16);
+		return Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[5], (char) dataBuffer[6], (char) dataBuffer[7], (char) dataBuffer[8]), 16);
 	}
 
 	/**
@@ -451,7 +451,7 @@ public class PolaronSports extends Polaron {
 	 */
 	@Override
 	public String getFirmwareVersion(byte[] dataBuffer) {
-		return String.format(Locale.ENGLISH, "%.3f", (Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[1], (char) dataBuffer[2], (char) dataBuffer[3], (char) dataBuffer[4]), 16) / 1000.0)); //$NON-NLS-1$
+		return String.format(Locale.ENGLISH, "%.3f", (Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[1], (char) dataBuffer[2], (char) dataBuffer[3], (char) dataBuffer[4]), 16) / 1000.0)); //$NON-NLS-1$
 	}
 
 	/**
@@ -462,7 +462,7 @@ public class PolaronSports extends Polaron {
 	 */
 	@Override
 	public void setTemperatureUnit(int channelNumber, RecordSet recordSet, byte[] dataBuffer) {
-		int unit = Integer.parseInt(String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[45], (char) dataBuffer[46], (char) dataBuffer[47], (char) dataBuffer[48]), 16);
+		int unit = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[45], (char) dataBuffer[46], (char) dataBuffer[47], (char) dataBuffer[48]), 16);
 		if (unit == 0) {
 			this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 6, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
 			this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 6, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
@@ -481,10 +481,10 @@ public class PolaronSports extends Polaron {
 	 */
 	@Override
 	public int getCycleNumber(int outletNum, byte[] dataBuffer) {
-		String cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]);
+		String cycleNumber = String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[21], (char) dataBuffer[22], (char) dataBuffer[23], (char) dataBuffer[24]);
 		if (outletNum == 2) {
 			try {
-				cycleNumber = String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, (char) dataBuffer[89], (char) dataBuffer[90], (char) dataBuffer[91], (char) dataBuffer[92]);
+				cycleNumber = String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[89], (char) dataBuffer[90], (char) dataBuffer[91], (char) dataBuffer[92]);
 			}
 			catch (Exception e) {
 				// ignore and use values from outlet channel 1 (data buffer will be copied)

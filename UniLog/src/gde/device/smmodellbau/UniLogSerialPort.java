@@ -29,7 +29,7 @@ import gde.ui.SWTResourceManager;
 import gde.utils.Checksum;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
-import gnu.io.NoSuchPortException;
+import gde.exception.NoSuchPortException;
 
 import java.io.IOException;
 import java.util.Vector;

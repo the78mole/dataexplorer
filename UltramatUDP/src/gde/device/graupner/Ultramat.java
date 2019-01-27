@@ -35,7 +35,6 @@ import org.eclipse.swt.SWT;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
-import gde.comm.DeviceSerialPortImpl;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
@@ -626,7 +625,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	public synchronized int[] convert2IntArray(int[] values, String setupString) {
 		for (int i = 0; i < values.length; i++) {
 			values[i] = Integer.parseInt(
-					String.format(DeviceSerialPortImpl.FORMAT_4_CHAR, setupString.charAt(i * 4), setupString.charAt(i * 4 + 1), setupString.charAt(i * 4 + 2), setupString.charAt(i * 4 + 3)), 16);
+					String.format(DeviceCommPort.FORMAT_4_CHAR, setupString.charAt(i * 4), setupString.charAt(i * 4 + 1), setupString.charAt(i * 4 + 2), setupString.charAt(i * 4 + 3)), 16);
 		}
 		return values;
 	}

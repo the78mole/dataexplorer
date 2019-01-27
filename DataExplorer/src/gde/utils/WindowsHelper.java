@@ -19,7 +19,7 @@
 package gde.utils;
 
 import gde.GDE;
-import gde.comm.DeviceSerialPortImpl;
+import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -99,7 +99,7 @@ public class WindowsHelper {
 		}
 		boolean isSkipBlootoothDevices = Settings.getInstance().isSkipBluetoothDevices();
 		
-		TreeMap<Integer, String> winPorts = DeviceSerialPortImpl.getWindowsPorts();
+		TreeMap<Integer, String> winPorts = DeviceCommPort.getWindowsPorts();
 		winPorts.clear();
 		for (String portString : enumPorts) {
 			if (portString != null && portString.length() > 1) { //$NON-NLS-1$
