@@ -213,9 +213,9 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
 	 */
 	public static String[] prepareSerialPortList() {
 		String[] serialPortList = new String[DeviceCommPort.availablePorts.size()];
-		String[] tmpSerialPortList = DeviceCommPort.availablePorts.keySet().toArray(new String[DeviceCommPort.availablePorts.size()]);
+		String[] tmpSerialPortList = DeviceCommPort.availablePorts.values().toArray(new String[DeviceCommPort.availablePorts.size()]);
 		for (int i = 0; i < tmpSerialPortList.length; i++) {
-			serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + DeviceCommPort.availablePorts.get(tmpSerialPortList[i]);
+			serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
 		}
 		return serialPortList;
 	}
