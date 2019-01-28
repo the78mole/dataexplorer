@@ -440,36 +440,6 @@ public class StringHelper {
 	}
 
 	/**
-	 * @return available serial port list
-	 */
-	public static String[] prepareSerialPortList(Vector<String> availablePorts) {
-		String[] serialPortList = new String[availablePorts.size()];
-		String[] tmpSerialPortList = availablePorts.toArray(new String[availablePorts.size()]);
-		for (int i = 0; i < tmpSerialPortList.length; i++) {
-			if (GDE.IS_WINDOWS) {
-				try {
-					int portNumber = Integer.parseInt(tmpSerialPortList[i].substring(3));
-					String portDescription = DeviceCommPort.getWindowsPorts().get(portNumber) == null ? "" : DeviceCommPort.getWindowsPorts().get(portNumber);
-					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + portDescription;
-				}
-				catch (Exception e) {
-					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
-				}
-			}
-			else if (GDE.IS_LINUX) {
-				String portName = OperatingSystemHelper.dereferenceLink("/dev/serial/by-id", tmpSerialPortList[i].substring(tmpSerialPortList[i].lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)));
-				if (portName.length() > 8) // ./ttyUSB0
-					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + portName.substring(portName.indexOf("usb-") + 4, portName.length() - 11);
-				else
-					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
-			}
-			else
-				serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
-		}
-		return serialPortList;
-	}
-
-	/**
 	 * verify the user input while typing port names
 	 * @param eventText of the VerifyEvent test containing the char(s) to be verified
 	 */

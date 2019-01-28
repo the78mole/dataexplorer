@@ -221,7 +221,7 @@ public final class Settings extends Properties {
 	public final static String			IS_ALL_IN_ONE_RECORDSET					= "is_all_in_one_record_set";																																			//$NON-NLS-1$
 	public final static String			IS_PARTIAL_DATA_TABLE						= "is_partial_data_table";																																				//$NON-NLS-1$
 	public final static String			IS_DATA_TABLE_EDITABLE					= "is_data_table_editable";																																				//$NON-NLS-1$
-	public final static String			IS_ENHANCED_DELTA_MEASUREMENT		= "is_enhanced_delta_measurement";																																				//$NON-NLS-1$
+	public final static String			IS_RXTX_COMM_TO_BE_USED					= "is_rxtx_comm_to_be_used";																																				//$NON-NLS-1$
 	public final static String			GLOBAL_LOG_LEVEL								= "global_log_level";																																							//$NON-NLS-1$
 	public final static String			UI_LOG_LEVEL										= "ui_log_level";																																									//$NON-NLS-1$
 	public final static String			DEVICE_LOG_LEVEL								= "device_log_level";																																							//$NON-NLS-1$
@@ -778,7 +778,7 @@ public final class Settings extends Properties {
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_REDUCE_CHARGE_DISCHARGE, this.isReduceChargeDischarge())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ALL_IN_ONE_RECORDSET, this.isContinuousRecordSet())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_PARTIAL_DATA_TABLE, this.isPartialDataTable())); //$NON-NLS-1$
-			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ENHANCED_DELTA_MEASUREMENT, this.isEnhancedMeasurement())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_RXTX_COMM_TO_BE_USED, this.isRXTXcommToBeUsed())); //$NON-NLS-1$
 
 			writer.write(String.format("%s\n", Settings.TABLE_BLOCK)); // [Tabellen Einstellungen] //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.LIST_SEPARATOR, getListSeparator())); //$NON-NLS-1$
@@ -3162,7 +3162,7 @@ public final class Settings extends Properties {
 		return DataExplorer.getInstance().COLOR_BACKGROUND.getRed() + DataExplorer.getInstance().COLOR_BACKGROUND.getGreen() + DataExplorer.getInstance().COLOR_BACKGROUND.getBlue() > 500 ? "light/" : "dark/";
 	}
 
-	public boolean isEnhancedMeasurement() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_ENHANCED_DELTA_MEASUREMENT, "false"));
+	public boolean isRXTXcommToBeUsed() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_RXTX_COMM_TO_BE_USED, "false"));
 	}
 }

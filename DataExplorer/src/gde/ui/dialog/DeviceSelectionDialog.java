@@ -141,16 +141,16 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	String																activeDeviceName;
 	DeviceConfiguration										selectedActiveDeviceConfig;
 	Thread																listPortsThread;
-	Vector<String>												availablePorts			= new Vector<String>();
-	boolean																isUpdateSerialPorts	= true;
-	HashMap<String, String>								legacyDeviceNames		= new HashMap<String, String>(2);
+	Vector<String>												availablePorts							= new Vector<String>();
+	boolean																isUpdateSerialPorts					= true;
+	HashMap<String, String>								legacyDeviceNames						= new HashMap<String, String>(2);
 
 	public DeviceSelectionDialog(Shell parent, int style, final DataExplorer currentApplication) {
 		super(parent, style);
 		this.application = currentApplication;
 		this.settings = Settings.getInstance();
 		this.activeDeviceName = this.settings.getActiveDevice();
-		this.availablePorts = DeviceCommPort.getAvailableports();
+		this.availablePorts.addAll(DeviceCommPort.getAvailableports().keySet());
 
 		//add this two renamed device plug-ins to the list of legacy devices
 		this.legacyDeviceNames.put("GPSLogger", "GPS-Logger");
@@ -830,7 +830,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				this.deviceTypeText.setText(Settings.EMPTY);
 				this.internetLinkText.setText(Settings.EMPTY);
 
-				this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(this.availablePorts));
+				this.portSelectCombo.setItems(DeviceCommPort.prepareSerialPortList());
 				this.portSelectCombo.select(0);
 
 				// com port adjustments group
@@ -878,7 +878,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						this.rtsCheckBox.setSelection(false);
 					}
 					if (this.availablePorts != null && this.availablePorts.size() > 0) {
-						this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(this.availablePorts));
+						this.portSelectCombo.setItems(DeviceCommPort.prepareSerialPortList());
 						int index = DeviceSelectionDialog.this.availablePorts.indexOf(this.selectedActiveDeviceConfig.getPort());
 						if (index > -1) {
 							this.portSelectCombo.select(index);
@@ -1112,16 +1112,18 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				try {
 					while (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
 						if (DeviceSelectionDialog.this.isUpdateSerialPorts) {
-							DeviceSelectionDialog.this.availablePorts = DeviceCommPort.listConfiguredSerialPorts(DeviceSelectionDialog.this.settings.doPortAvailabilityCheck(),
+							DeviceSelectionDialog.this.availablePorts.clear();
+							DeviceSelectionDialog.this.availablePorts.addAll(DeviceCommPort.listConfiguredSerialPorts(
+									DeviceSelectionDialog.this.settings.doPortAvailabilityCheck(),
 									DeviceSelectionDialog.this.settings.isSerialPortBlackListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
-									DeviceSelectionDialog.this.settings.isSerialPortWhiteListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortWhiteList() : new Vector<String>());
+									DeviceSelectionDialog.this.settings.isSerialPortWhiteListEnabled() ? DeviceSelectionDialog.this.settings.getSerialPortWhiteList() : new Vector<String>()).keySet());
 							if (DeviceSelectionDialog.this.dialogShell != null && !DeviceSelectionDialog.this.dialogShell.isDisposed()) {
 								GDE.display.syncExec(new Runnable() {
 									@Override
 									public void run() {
 										if (!DeviceSelectionDialog.this.dialogShell.isDisposed() && DeviceSelectionDialog.this.selectedActiveDeviceConfig != null) {
 											if (DeviceSelectionDialog.this.availablePorts != null && DeviceSelectionDialog.this.availablePorts.size() > 0) {
-												DeviceSelectionDialog.this.portSelectCombo.setItems(StringHelper.prepareSerialPortList(DeviceSelectionDialog.this.availablePorts));
+												DeviceSelectionDialog.this.portSelectCombo.setItems(DeviceCommPort.prepareSerialPortList());
 												int index = DeviceSelectionDialog.this.availablePorts.indexOf(DeviceSelectionDialog.this.selectedActiveDeviceConfig.getPort());
 												if (index > -1) {
 													DeviceSelectionDialog.this.portSelectCombo.select(index);

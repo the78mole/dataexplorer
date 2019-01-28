@@ -74,7 +74,7 @@ public class DeviceCommPort implements IDeviceCommPort {
 
 	static IDeviceCommPort staticPort = null;
 
-	final protected static Vector<String>						availablePorts						= new Vector<String>();																																					//available port vector used by all application dialogs
+	final protected static TreeMap<String, String>	availablePorts						= new TreeMap<String, String>();																																					//available port vector used by all application dialogs
 	final protected static TreeMap<Integer, String>	windowsPorts							= new TreeMap<Integer, String>();
 	
 	/**
@@ -93,9 +93,10 @@ public class DeviceCommPort implements IDeviceCommPort {
 						: (System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC") != null ? Integer.parseInt(System.getProperty("GDE_SIMULATION_TIME_STEP_MSEC")) : (int)this.device.getTimeStep_ms())));
 		}
 		else  if (this.deviceConfig.getSerialPortType() != null) {
-			//RXTXcomm usage: this.port = new DeviceSerialPortImpl(this.deviceConfig, this.application);
-			//jSerialCommPort: 
-			this.port = new DeviceJavaSerialCommPortImpl(this.deviceConfig, this.application);
+			if (this.settings.isRXTXcommToBeUsed()) //RXTXcomm
+				this.port = new DeviceSerialPortImpl(this.deviceConfig, this.application);
+			else //jSerialCommPort: 
+				this.port = new DeviceJavaSerialCommPortImpl(this.deviceConfig, this.application);
 		}
 		else if (this.deviceConfig.getUsbPortType() != null) { // USB device
 			this.port = new DeviceUsbPortImpl(this.deviceConfig, this.application);
@@ -139,16 +140,34 @@ public class DeviceCommPort implements IDeviceCommPort {
 	 * @param portBlackList
 	 * @param portWhiteList
 	 */
-	public static Vector<String> listConfiguredSerialPorts(final boolean doAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
-		//RXTXcomm used: return DeviceCommPort.staticPort != null ? DeviceSerialPortImpl.listConfiguredSerialPorts(doAvialabilityCheck, portBlackList, portWhiteList) : new Vector<String>();
-		//JSerialCommPort: 
-		return DeviceCommPort.staticPort != null ? DeviceJavaSerialCommPortImpl.listConfiguredSerialPorts(doAvialabilityCheck, portBlackList, portWhiteList) : new Vector<String>();
+	public static TreeMap<String, String> listConfiguredSerialPorts(final boolean doAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
+		if (DeviceCommPort.staticPort != null && DeviceCommPort.staticPort instanceof DeviceSerialPortImpl) //RXTXcomm
+			return DeviceSerialPortImpl.listConfiguredSerialPorts(doAvialabilityCheck, portBlackList, portWhiteList);
+		else if (DeviceCommPort.staticPort != null && DeviceCommPort.staticPort instanceof DeviceJavaSerialCommPortImpl) //JSerialCommPort: 
+			return DeviceJavaSerialCommPortImpl.listConfiguredSerialPorts(doAvialabilityCheck, portBlackList, portWhiteList);
+		else {
+			DeviceCommPort.availablePorts.clear();
+			return DeviceCommPort.availablePorts;
+		}
 	}
 
+
+	/**
+	 * @return available serial port list
+	 */
+	public static String[] prepareSerialPortList() {
+		if (DeviceCommPort.staticPort != null && DeviceCommPort.staticPort instanceof DeviceSerialPortImpl) //RXTXcomm
+			return DeviceSerialPortImpl.prepareSerialPortList();
+		else if (DeviceCommPort.staticPort != null && DeviceCommPort.staticPort instanceof DeviceJavaSerialCommPortImpl) //JSerialCommPort: 
+			return DeviceJavaSerialCommPortImpl.prepareSerialPortList();
+		else
+			return new String[0];
+	}
+	
 	/**
 	 * @return the available serial port names
 	 */
-	public static Vector<String> getAvailableports() {
+	public static TreeMap<String, String> getAvailableports() {
 		return DeviceCommPort.availablePorts;
 	}
 

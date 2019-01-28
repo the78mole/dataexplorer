@@ -31,6 +31,7 @@ import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.OperatingSystemHelper;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 import gde.utils.WindowsHelper;
@@ -141,7 +142,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @param portBlackList
 	 * @param portWhiteList
 	 */
-	public synchronized static Vector<String> listConfiguredSerialPorts(final boolean doAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
+	public synchronized static TreeMap<String, String> listConfiguredSerialPorts(final boolean doAvialabilityCheck, final String portBlackList, final Vector<String> portWhiteList) {
 		final String $METHOD_NAME = "listConfiguredSerialPorts"; //$NON-NLS-1$
 		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 
@@ -166,7 +167,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 								if (doAvialabilityCheck) {
 									((SerialPort) commPortIdentifier.open(GDE.NAME_LONG, 1000)).close();
 								}
-								DeviceCommPort.availablePorts.add(serialPortStr);
+								DeviceCommPort.availablePorts.put(serialPortStr, "");
 								if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
 							}
 							catch (Exception e) {
@@ -191,7 +192,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 								if (doAvialabilityCheck) {
 									((SerialPort) commPortIdentifier.open("DataExplorer", 1000)).close(); //$NON-NLS-1$
 								}
-								DeviceCommPort.availablePorts.add(serialPortStr);
+								DeviceCommPort.availablePorts.put(serialPortStr, "");
 								if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
 							}
 							catch (Exception e) {
@@ -203,7 +204,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			}
 			if (log.isLoggable(Level.FINE)) {
 				StringBuilder sb = new StringBuilder().append("Available serial Ports : "); //$NON-NLS-1$
-				for (String comPort : DeviceCommPort.availablePorts) {
+				for (String comPort : DeviceCommPort.availablePorts.keySet()) {
 					sb.append(comPort).append(" "); //$NON-NLS-1$
 				}
 				if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceSerialPortImpl.$CLASS_NAME, $METHOD_NAME, sb.toString());
@@ -211,11 +212,10 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			// Windows COM1, COM2 -> COM20
 			// GNU/Linux /dev/ttyS0, /dev/ttyS1, /dev/ttyUSB0, /dev/ttyUSB1
 			// MAC /dev/tty.WT12-BT-MX20 /dev/tty.GraupnerHoTTBT32
-			DeviceCommPort.availablePorts.trimToSize();
 			if (GDE.IS_MAC) {
-				Iterator<String> iterator = DeviceCommPort.availablePorts.iterator();
+				Iterator<String> iterator = DeviceCommPort.availablePorts.keySet().iterator();
 				while (iterator.hasNext()) {
-					if (iterator.next().contains("/cu."))
+					if (iterator.next().contains("cu."))
 						iterator.remove();
 				}
 			}
@@ -229,17 +229,47 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	}
 
 	/**
+	 * @return available serial port list
+	 */
+	public static String[] prepareSerialPortList() {
+		String[] serialPortList = new String[DeviceCommPort.availablePorts.size()];
+		String[] tmpSerialPortList = DeviceCommPort.availablePorts.keySet().toArray(new String[DeviceCommPort.availablePorts.size()]);
+		for (int i = 0; i < tmpSerialPortList.length; i++) {
+			if (GDE.IS_WINDOWS) {
+				try {
+					int portNumber = Integer.parseInt(tmpSerialPortList[i].substring(3));
+					String portDescription = DeviceCommPort.getWindowsPorts().get(portNumber) == null ? "" : DeviceCommPort.getWindowsPorts().get(portNumber);
+					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + portDescription;
+				}
+				catch (Exception e) {
+					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
+				}
+			}
+			else if (GDE.IS_LINUX) {
+				String portName = OperatingSystemHelper.dereferenceLink("/dev/serial/by-id", tmpSerialPortList[i].substring(tmpSerialPortList[i].lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)));
+				if (portName.length() > 8) // ./ttyUSB0
+					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i] + GDE.STRING_MESSAGE_CONCAT + portName.substring(portName.indexOf("usb-") + 4, portName.length() - 11);
+				else
+					serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
+			}
+			else
+				serialPortList[i] = GDE.STRING_BLANK + tmpSerialPortList[i];
+		}
+		return serialPortList;
+	}
+
+	/**
 	 * check if a configured serial port string matches actual available ports
 	 * @param newSerialPortStr
 	 * @return true if given port string matches one of the available once
 	 */
 	public boolean isMatchAvailablePorts(String newSerialPortStr) {
 		boolean match = false;
-		if (DeviceCommPort.availablePorts.size() == 0 || (this.serialPortStr != null && !DeviceCommPort.availablePorts.contains(this.serialPortStr))) {
+		if (DeviceCommPort.availablePorts.size() == 0 || (this.serialPortStr != null && !DeviceCommPort.availablePorts.keySet().contains(this.serialPortStr))) {
 			listConfiguredSerialPorts(false, this.settings.isSerialPortBlackListEnabled() ? this.settings.getSerialPortBlackList() : GDE.STRING_EMPTY,
 					this.settings.isSerialPortWhiteListEnabled() ? this.settings.getSerialPortWhiteList() : new Vector<String>());
 		}
-		for (String availablePort : DeviceCommPort.availablePorts) {
+		for (String availablePort : DeviceCommPort.availablePorts.keySet()) {
 			if (availablePort.equals(newSerialPortStr)) {
 				match = true;
 				break;
@@ -264,8 +294,8 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 			if (this.serialPortStr == null || this.serialPortStr.length() < 4 || !isMatchAvailablePorts(this.serialPortStr)) {
 				if (DeviceCommPort.availablePorts.size() == 1 && (this.serialPortStr != null && !isMatchAvailablePorts(this.serialPortStr))) {
 					if (SWT.YES == this.application.openYesNoMessageDialogSync(Messages.getString(MessageIds.GDE_MSGE0010) + GDE.LINE_SEPARATOR
-							+ Messages.getString(MessageIds.GDE_MSGT0194, new String[] { this.serialPortStr = DeviceCommPort.availablePorts.firstElement() }))) {
-						this.serialPortStr = DeviceCommPort.availablePorts.firstElement();
+							+ Messages.getString(MessageIds.GDE_MSGT0194, new String[] { this.serialPortStr = DeviceCommPort.availablePorts.firstKey() }))) {
+						this.serialPortStr = DeviceCommPort.availablePorts.firstKey();
 						this.deviceConfig.setPort(this.serialPortStr);
 						this.deviceConfig.storeDeviceProperties();
 						this.application.updateTitleBar();
@@ -1005,13 +1035,6 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 */
 	public int getTimeoutErrors() {
 		return this.timeoutErrors;
-	}
-
-	/**
-	 * @return the windows ports
-	 */
-	public static TreeMap<Integer, String> getWindowsPorts() {
-		return DeviceCommPort.windowsPorts;
 	}
 	
 	/**
