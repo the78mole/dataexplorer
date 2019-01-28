@@ -18,6 +18,8 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
+import static java.util.logging.Level.WARNING;
+
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -63,7 +65,12 @@ public final class HistoSummaryWindow extends AbstractChartWindow {
 		window.setControl(window.graphicSashForm);
 		window.curveSelectorComposite = new SelectorComposite(window.graphicSashForm, window);
 		window.compositeSashForm = new SashForm(window.graphicSashForm, SWT.VERTICAL);
-		window.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
+		try {
+			if (GDE.shell.getClientArea().width > SELECTOR_WIDTH) //Linux call this with 0,0
+				window.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
+		} catch (IllegalArgumentException e) {
+			log.log(WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e); //$NON-NLS-1$
+		}
 
 		SummaryComposite summaryComposite = new SummaryComposite(window.compositeSashForm, window); // at the top
 		new GraphicsComposite(window.compositeSashForm, window);

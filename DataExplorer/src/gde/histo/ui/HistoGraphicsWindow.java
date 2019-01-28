@@ -18,6 +18,8 @@
 ****************************************************************************************/
 package gde.histo.ui;
 
+import static java.util.logging.Level.WARNING;
+
 import java.util.Optional;
 
 import org.eclipse.swt.SWT;
@@ -57,7 +59,12 @@ public final class HistoGraphicsWindow extends AbstractChartWindow {
 
 		window.curveSelectorComposite = new SelectorComposite(window.graphicSashForm, window);
 		window.graphicsComposite = new GraphicsComposite(window.graphicSashForm, window);
-		window.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
+		try {
+			if (GDE.shell.getClientArea().width > SELECTOR_WIDTH) //Linux call this with 0,0
+				window.graphicSashForm.setWeights(new int[] { SELECTOR_WIDTH, GDE.shell.getClientArea().width - SELECTOR_WIDTH });
+		} catch (IllegalArgumentException e) {
+			log.log(WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e); //$NON-NLS-1$
+		}
 
 		window.setFont(SWTResourceManager.getFont(DataExplorer.getInstance(), GDE.WIDGET_FONT_SIZE + (GDE.IS_LINUX ? 3 : 1), SWT.NORMAL));
 		window.setText(Messages.getString(MessageIds.GDE_MSGT0883));

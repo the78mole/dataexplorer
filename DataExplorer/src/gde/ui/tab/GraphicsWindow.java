@@ -18,6 +18,8 @@
 ****************************************************************************************/
 package gde.ui.tab;
 
+import static java.util.logging.Level.WARNING;
+
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -114,7 +116,12 @@ public class GraphicsWindow extends CTabItem {
 		} // graphics composite
 
 		// graphicSashForm
-		this.graphicSashForm.setWeights(new int[] { 117, GDE.shell.getClientArea().width - 117 });
+		try {
+			if (GDE.shell.getClientArea().width > 117) //Linux call this with 0,0
+				this.graphicSashForm.setWeights(new int[] { 117, GDE.shell.getClientArea().width - 117 });
+		} catch (IllegalArgumentException e) {
+			log.log(WARNING, "graphicSashForm.setWeights(this.sashFormWeights) failed!", e); //$NON-NLS-1$
+		}
 	}
 
 	/**

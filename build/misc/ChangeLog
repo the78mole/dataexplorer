@@ -13,6 +13,7 @@ Generic changes/fixes
 	* enable curve compare independent of selected measurement unit, but warn about this fact
 	* fix Windows Java 11 serial communication add jSerialComm implementation 
 	* enable enhanced delta ratio measurement on altitude while supported by selected device
+	* fix IllegalParameterException on Linux while initiating main UI
 
 Device specific changes/fixes
 	* Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)
