@@ -1043,8 +1043,7 @@ public class GraphicsComposite extends Composite {
 			int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
 			int indexPosDelta = record.getHorizontalPointIndexFromDisplayPoint(this.xPosDelta);		
 
-			if (this.settings.isEnhancedMeasurement() //actually hidden, must be manually enabled
-					&& record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must support and measurement record with data
+			if (record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must make sure required measurements available
 					&& record.getOrdinal() == record.getDevice().getAtlitudeTripSpeedOrdinals()[0]) { // returned first ordinal match altitude 								
 				this.calculateSinkAndGlideRatioStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
 			} else {
@@ -1457,8 +1456,7 @@ public class GraphicsComposite extends Composite {
 								
 								int indexPosDelta = record.getHorizontalPointIndexFromDisplayPoint(this.xPosDelta);									
 
-								if (this.settings.isEnhancedMeasurement() //actually hidden, must be manually enabled
-										&& record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must support and measurement record with data
+								if (record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must make sure required measurements available
 										&& record.getOrdinal() == record.getDevice().getAtlitudeTripSpeedOrdinals()[0]) { // returned first ordinal match altitude 								
 									this.calculateSinkAndGlideRatioStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
 								} else {
@@ -1510,8 +1508,7 @@ public class GraphicsComposite extends Composite {
 							int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
 							int indexPosDelta = record.getHorizontalPointIndexFromDisplayPoint(this.xPosDelta);									
 
-							if (this.settings.isEnhancedMeasurement() //actually hidden, must be manually enabled
-									&& record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must support and measurement record with data
+							if (record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must make sure required measurements available
 									&& record.getOrdinal() == record.getDevice().getAtlitudeTripSpeedOrdinals()[0]) { // returned first ordinal match altitude 								
 								this.calculateSinkAndGlideRatioStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
 							} else {
@@ -1648,7 +1645,7 @@ public class GraphicsComposite extends Composite {
 		String speedAvg = speed.getDecimalFormat().format(actualDevice.translateValue(speed, speed.getAvgValue(indexPosMeasure, indexPosDelta)) / 1000.0 );
 
 		this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0187,
-				//GDE_MSGT0187=\  \u2206h/\u2206t = {1} {2}/{3} ===> {4} {5}/sec - \u2206s/\u2206h = {6} {7} ===> {8} m bei ~{9} {10}
+				//GDE_MSGT0187=\  \u2206h/\u2206t = {1} {2}/{3} ===> {4} {5}/sec - \u2206s/\u2206h = {6} {7} ===> {8} bei ~{9} {10}
 				new Object[] { 
 						altDelta_m, record.getUnit(),
 						TimeLine.getFomatedTimeWithUnit(record.getHorizontalDisplayPointTime_ms(this.xPosDelta) - record.getHorizontalDisplayPointTime_ms(this.xPosMeasure)),
