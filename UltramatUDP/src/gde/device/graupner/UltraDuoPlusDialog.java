@@ -1499,78 +1499,90 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										@Override
 										public void widgetSelected(SelectionEvent evt) {
 											UltraDuoPlusDialog.log.finest(() -> "graphicsDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-											try {
-												UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
-												int[] points = new int[UltraDuoPlusDialog.this.device.getNumberOfMeasurements(UltraDuoPlusDialog.this.channelSelectionIndex)];
-												final byte[][] graphicsData = new byte[3][];
-												UltraDuoPlusDialog.this.serialPort.readGraphicsData(graphicsData, UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this);
+											UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 
-												//create a new record set at the selected output channel
-												String processName = Messages.getString(MessageIds.GDE_MSGT2337);
-												RecordSet recordSet = null;
-												Channel channel = Channels.getInstance().get(UltraDuoPlusDialog.this.channelSelectionIndex);
-												if (channel != null) {
-													String recordSetKey = channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName;
-													recordSetKey = recordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetKey : recordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
+											final int[] points = new int[UltraDuoPlusDialog.this.device.getNumberOfMeasurements(UltraDuoPlusDialog.this.channelSelectionIndex)];
+											final byte[][] graphicsData = new byte[3][];
 
-													channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, UltraDuoPlusDialog.this.device, UltraDuoPlusDialog.this.channelSelectionIndex, true, false, true));
-													channel.applyTemplateBasics(recordSetKey);
-													UltraDuoPlusDialog.log.log(Level.FINE, recordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
-													recordSet = channel.get(recordSetKey);
-													UltraDuoPlusDialog.this.device.setTemperatureUnit(UltraDuoPlusDialog.this.channelSelectionIndex, recordSet, UltraDuoPlusDialog.this.initialAnswerData); //°C or °F
-													recordSet.setAllDisplayable();
-													// switch the active record set if the current record set is child of active channel
-													UltraDuoPlusDialog.this.channels.switchChannel(UltraDuoPlusDialog.this.channelSelectionIndex, recordSetKey);
-													channel.switchRecordSet(recordSetKey);
-													String description = recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR
-															+ "Firmware  : " + UltraDuoPlusDialog.this.device.getFirmwareVersion(UltraDuoPlusDialog.this.initialAnswerData) //$NON-NLS-1$
-															+ (UltraDuoPlusDialog.this.device.getBatteryMemoryNumber(UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this.initialAnswerData) >= 1 ? "; Memory #" + UltraDuoPlusDialog.this.device.getBatteryMemoryNumber(UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this.initialAnswerData) : GDE.STRING_EMPTY); //$NON-NLS-1$
+											Thread akkuDataGatherer = new Thread("akku data gatherer") {
+												@Override
+												public void run() {
 													try {
-														int batteryMemoryNumber = UltraDuoPlusDialog.this.device.getBatteryMemoryNumber(UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this.initialAnswerData);
-														if (batteryMemoryNumber > 0 && UltraDuoPlusDialog.this.ultraDuoPlusSetup != null && UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(batteryMemoryNumber) != null) {
-															String batteryMemoryName = UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory()
-																	.get(UltraDuoPlusDialog.this.device.getBatteryMemoryNumber(UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this.initialAnswerData) - 1).getName();
-															description = description + GDE.STRING_MESSAGE_CONCAT + batteryMemoryName;
-															UltraDuoPlusDialog.this.device.matchBatteryMemory2ObjectKey(batteryMemoryName);
+														UltraDuoPlusDialog.this.serialPort.readGraphicsData(graphicsData, UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this);
+
+														//create a new record set at the selected output channel
+														String processName = Messages.getString(MessageIds.GDE_MSGT2337);
+														RecordSet recordSet = null;
+														Channel channel = Channels.getInstance().get(UltraDuoPlusDialog.this.channelSelectionIndex);
+														if (channel != null) {
+															String recordSetKey = channel.getNextRecordSetNumber() + GDE.STRING_RIGHT_PARENTHESIS_BLANK + processName;
+															recordSetKey = recordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetKey : recordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
+
+															channel.put(recordSetKey, RecordSet.createRecordSet(recordSetKey, UltraDuoPlusDialog.this.device, UltraDuoPlusDialog.this.channelSelectionIndex, true, false, true));
+															channel.applyTemplateBasics(recordSetKey);
+															UltraDuoPlusDialog.log.log(Level.FINE, recordSetKey + " created for channel " + channel.getName()); //$NON-NLS-1$
+															recordSet = channel.get(recordSetKey);
+															UltraDuoPlusDialog.this.device.setTemperatureUnit(UltraDuoPlusDialog.this.channelSelectionIndex, recordSet, UltraDuoPlusDialog.this.initialAnswerData); //°C or °F
+															recordSet.setAllDisplayable();
+															// switch the active record set if the current record set is child of active channel
+															UltraDuoPlusDialog.this.channels.switchChannel(UltraDuoPlusDialog.this.channelSelectionIndex, recordSetKey);
+															channel.switchRecordSet(recordSetKey);
+															String description = recordSet.getRecordSetDescription() + GDE.LINE_SEPARATOR + "Firmware  : " //$NON-NLS-1$
+																	+ UltraDuoPlusDialog.this.device.getFirmwareVersion(UltraDuoPlusDialog.this.initialAnswerData)
+																	+ (UltraDuoPlusDialog.this.device.getBatteryMemoryNumber(UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this.initialAnswerData) >= 1
+																			? "; Memory #" + UltraDuoPlusDialog.this.device.getBatteryMemoryNumber(UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this.initialAnswerData) //$NON-NLS-1$
+																			: GDE.STRING_EMPTY);
+															try {
+																int batteryMemoryNumber = UltraDuoPlusDialog.this.device.getBatteryMemoryNumber(UltraDuoPlusDialog.this.channelSelectionIndex,
+																		UltraDuoPlusDialog.this.initialAnswerData);
+																if (batteryMemoryNumber > 0 && UltraDuoPlusDialog.this.ultraDuoPlusSetup != null
+																		&& UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory().get(batteryMemoryNumber) != null) {
+																	String batteryMemoryName = UltraDuoPlusDialog.this.ultraDuoPlusSetup.getMemory()
+																			.get(UltraDuoPlusDialog.this.device.getBatteryMemoryNumber(UltraDuoPlusDialog.this.channelSelectionIndex, UltraDuoPlusDialog.this.initialAnswerData) - 1)
+																			.getName();
+																	description = description + GDE.STRING_MESSAGE_CONCAT + batteryMemoryName;
+																	UltraDuoPlusDialog.this.device.matchBatteryMemory2ObjectKey(batteryMemoryName);
+																}
+															}
+															catch (Exception e) {
+																e.printStackTrace();
+																// ignore and do not append memory name
+															}
+															recordSet.setRecordSetDescription(description);
+
+															int numOfPoints = Integer
+																	.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, graphicsData[0][1], (char) graphicsData[0][2], (char) graphicsData[0][3], (char) graphicsData[0][4]), 16) - 10;
+															int timeStep_sec = Integer
+																	.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, graphicsData[0][5], (char) graphicsData[0][6], (char) graphicsData[0][7], (char) graphicsData[0][8]), 16);
+															recordSet.setNewTimeStep_ms(timeStep_sec * 1000.0);
+															for (int i = 0, j = 9; i < numOfPoints; i++, j += 4) {
+																// 0=Spannung 1=Strom 5=BatteryTemperature
+																points[0] = Integer.parseInt(
+																		String.format(DeviceCommPort.FORMAT_4_CHAR, (char) graphicsData[0][j], (char) graphicsData[0][j + 1], (char) graphicsData[0][j + 2], (char) graphicsData[0][j + 3]), 16);
+																points[1] = Integer.parseInt(
+																		String.format(DeviceCommPort.FORMAT_4_CHAR, (char) graphicsData[1][j], (char) graphicsData[1][j + 1], (char) graphicsData[1][j + 2], (char) graphicsData[1][j + 3]), 16);
+																points[5] = Integer.parseInt(
+																		String.format(DeviceCommPort.FORMAT_4_CHAR, (char) graphicsData[2][j], (char) graphicsData[2][j + 1], (char) graphicsData[2][j + 2], (char) graphicsData[2][j + 3]), 16);
+																recordSet.addPoints(points);
+															}
+															UltraDuoPlusDialog.this.device.updateVisibilityStatus(recordSet, true);
+															UltraDuoPlusDialog.this.application.updateAllTabs(true);
 														}
 													}
+													catch (DataInconsitsentException e) {
+														UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
+														UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2338));
+													}
 													catch (Exception e) {
-														e.printStackTrace();
-														// ignore and do not append memory name
+														UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
+														UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2336));
 													}
-													recordSet.setRecordSetDescription(description);
-
-													int numOfPoints = Integer.parseInt(
-															String.format(DeviceCommPort.FORMAT_4_CHAR, graphicsData[0][1], (char) graphicsData[0][2], (char) graphicsData[0][3], (char) graphicsData[0][4]), 16) - 10;
-													int timeStep_sec = Integer.parseInt(
-															String.format(DeviceCommPort.FORMAT_4_CHAR, graphicsData[0][5], (char) graphicsData[0][6], (char) graphicsData[0][7], (char) graphicsData[0][8]), 16);
-													recordSet.setNewTimeStep_ms(timeStep_sec * 1000.0);
-													for (int i = 0, j = 9; i < numOfPoints; i++, j += 4) {
-														// 0=Spannung 1=Strom 5=BatteryTemperature
-														points[0] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) graphicsData[0][j], (char) graphicsData[0][j + 1], (char) graphicsData[0][j + 2],
-																(char) graphicsData[0][j + 3]), 16);
-														points[1] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) graphicsData[1][j], (char) graphicsData[1][j + 1], (char) graphicsData[1][j + 2],
-																(char) graphicsData[1][j + 3]), 16);
-														points[5] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) graphicsData[2][j], (char) graphicsData[2][j + 1], (char) graphicsData[2][j + 2],
-																(char) graphicsData[2][j + 3]), 16);
-														recordSet.addPoints(points);
+													finally {
+														UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 													}
-													UltraDuoPlusDialog.this.device.updateVisibilityStatus(recordSet, true);
-													UltraDuoPlusDialog.this.application.updateAllTabs(true);
 												}
-
-											}
-											catch (DataInconsitsentException e) {
-												UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
-												UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2338));
-											}
-											catch (Exception e) {
-												UltraDuoPlusDialog.log.log(Level.SEVERE, e.getMessage(), e);
-												UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2336));
-											}
-											finally {
-												UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-											}
+											};
+											akkuDataGatherer.start();
 										}
 									});
 								}
@@ -2555,6 +2567,20 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	 * @param percentage
 	 */
 	public void setGraphicsDataReadProgress(final int percentage) {
-		this.graphicsDataProgressBar.setSelection(percentage);
+		if (Thread.currentThread().getId() == this.application.getThreadId()) {
+			if (!UltraDuoPlusDialog.this.dialogShell.isDisposed() && UltraDuoPlusDialog.this.graphicsDataProgressBar != null&& !UltraDuoPlusDialog.this.graphicsDataProgressBar.isDisposed()) {
+				this.graphicsDataProgressBar.setSelection(percentage);
+		}
+		}
+		else {
+			GDE.display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					if (!UltraDuoPlusDialog.this.dialogShell.isDisposed() && UltraDuoPlusDialog.this.graphicsDataProgressBar != null && !UltraDuoPlusDialog.this.graphicsDataProgressBar.isDisposed()) {
+						UltraDuoPlusDialog.this.graphicsDataProgressBar.setSelection(percentage);
+					}
+				}
+			});
+		}
 	}
 }

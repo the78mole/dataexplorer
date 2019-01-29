@@ -358,7 +358,7 @@ public class UltramatSerialPort extends DeviceCommPort {
 
 	/**
 	 * read last available graphics data for the given  channel number
-	 * @param graphicsRecordSetData pointer to the graphis data organized in a array[3][]
+	 * @param graphicsRecordSetData pointer to the graphics data organized in a array[3][]
 	 * @param channelNumber 1 | 2 supported by device only
 	 * @throws IOException
 	 * @throws TimeOutException

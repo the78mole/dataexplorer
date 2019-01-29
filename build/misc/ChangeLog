@@ -16,7 +16,8 @@ Generic changes/fixes
 	* fix IllegalParameterException on Linux while initiating main UI
 
 Device specific changes/fixes
-	* Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)
+	* Graupner Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)
+	* Graupner Ultra Duo Plus - fix missing update while reading battery data using device dialog
 
 History analysis
 
