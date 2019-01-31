@@ -14,10 +14,12 @@ Generic changes/fixes
 	* fix Windows Java 11 serial communication add jSerialComm implementation 
 	* enable enhanced delta ratio measurement on altitude while supported by selected device
 	* fix IllegalParameterException on Linux while initiating main UI
+	* update 
 
 Device specific changes/fixes
 	* Graupner Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)
 	* Graupner Ultra Duo Plus - fix missing update while reading battery data using device dialog
+	* Graupner HoTT MDL Viewer plug-in update 9.4
 
 History analysis
 
