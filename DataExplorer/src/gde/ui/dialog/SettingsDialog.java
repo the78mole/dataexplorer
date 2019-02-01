@@ -50,6 +50,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
@@ -272,17 +274,15 @@ public class SettingsDialog extends Dialog {
 					{
 						this.generalTabComposite = new Composite(this.settingsTabFolder, SWT.NONE);
 						this.generalTabItem.setControl(this.generalTabComposite);
-						RowLayout generalTabCompositeLayout = new RowLayout(SWT.HORIZONTAL);
-						generalTabCompositeLayout.marginLeft = GDE.IS_MAC ? 3 : 5;
-						generalTabCompositeLayout.marginTop = GDE.IS_MAC ? 3 : 11;
-						generalTabCompositeLayout.spacing = GDE.IS_MAC ? 3 : 5;
+						GridLayout generalTabCompositeLayout = new GridLayout(2, true);
 						this.generalTabComposite.setLayout(generalTabCompositeLayout);
 						{
 							this.groupLocale = new Group(this.generalTabComposite, SWT.NONE);
 							this.groupLocale.setLayout(null);
 							this.groupLocale.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							RowData groupLocaleLData = new RowData();
-							groupLocaleLData.width = shellWidth/2 - 24;
+							GridData groupLocaleLData = new GridData(SWT.HORIZONTAL);
+							groupLocaleLData.horizontalSpan = 1;
+							groupLocaleLData.widthHint = shellWidth/2 - 24;
 							this.groupLocale.setLayoutData(groupLocaleLData);
 							this.groupLocale.setText(Messages.getString(MessageIds.GDE_MSGT0305));
 							{
@@ -316,8 +316,9 @@ public class SettingsDialog extends Dialog {
 							this.groupTimeFormat = new Group(this.generalTabComposite, SWT.NONE);
 							this.groupTimeFormat.setLayout(null);
 							this.groupTimeFormat.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							RowData groupTimeFormatLData = new RowData();
-							groupTimeFormatLData.width = shellWidth/2 - 24;
+							GridData groupTimeFormatLData = new GridData(SWT.HORIZONTAL);
+							groupTimeFormatLData.horizontalSpan = 1;
+							groupTimeFormatLData.widthHint = shellWidth/2 - 24;
 							this.groupTimeFormat.setLayoutData(groupTimeFormatLData);
 							this.groupTimeFormat.setText(Messages.getString(MessageIds.GDE_MSGT0682));
 							{
@@ -347,9 +348,10 @@ public class SettingsDialog extends Dialog {
 						}
 						{ // begin default data path group
 							this.defaultDataPathGroup = new Group(this.generalTabComposite, SWT.NONE);
-							this.defaultDataPathGroup.setLayout(null);
-							RowData defaultDataPathGroupLData = new RowData();
-							defaultDataPathGroupLData.width = shellWidth - 25;
+							GridData defaultDataPathGroupLData = new GridData(SWT.HORIZONTAL);
+							defaultDataPathGroupLData.horizontalSpan = 2;
+							defaultDataPathGroupLData.widthHint = shellWidth - 25;
+							defaultDataPathGroupLData.grabExcessHorizontalSpace = true; 
 							this.defaultDataPathGroup.setLayoutData(defaultDataPathGroupLData);
 							this.defaultDataPathGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.defaultDataPathGroup.setText(Messages.getString(MessageIds.GDE_MSGT0310));
@@ -388,8 +390,10 @@ public class SettingsDialog extends Dialog {
 							this.fileOpenSaveDialogGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.fileOpenSaveDialogGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.fileOpenSaveDialogGroup.setLayout(null);
-							RowData fileOpenSaveDialogGroupLData = new RowData();
-							fileOpenSaveDialogGroupLData.width = shellWidth - 25;
+							GridData fileOpenSaveDialogGroupLData = new GridData(SWT.HORIZONTAL);
+							fileOpenSaveDialogGroupLData.horizontalSpan = 2;
+							fileOpenSaveDialogGroupLData.widthHint = shellWidth - 25;
+							fileOpenSaveDialogGroupLData.grabExcessHorizontalSpace = true; 
 							this.fileOpenSaveDialogGroup.setLayoutData(fileOpenSaveDialogGroupLData);
 							this.fileOpenSaveDialogGroup.setText(Messages.getString(MessageIds.GDE_MSGT0315));
 							{
@@ -438,8 +442,10 @@ public class SettingsDialog extends Dialog {
 							this.skinColorSchemaGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.skinColorSchemaGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.skinColorSchemaGroup.setLayout(null);
-							RowData skinColorSchemaGroupLData = new RowData();
-							skinColorSchemaGroupLData.width = shellWidth - 25;
+							GridData skinColorSchemaGroupLData = new GridData(SWT.HORIZONTAL);
+							skinColorSchemaGroupLData.horizontalSpan = 2;
+							skinColorSchemaGroupLData.widthHint = shellWidth - 25;
+							skinColorSchemaGroupLData.grabExcessHorizontalSpace = true; 
 							this.skinColorSchemaGroup.setLayoutData(skinColorSchemaGroupLData);
 							this.skinColorSchemaGroup.setText(Messages.getString(MessageIds.GDE_MSGT0954));
 							{
@@ -498,8 +504,10 @@ public class SettingsDialog extends Dialog {
 						{ // begin device dialog settings
 							this.deviceDialogGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.deviceDialogGroup.setLayout(null);
-							RowData deviceDialogLData = new RowData();
-							deviceDialogLData.width = shellWidth - 25;
+							GridData deviceDialogLData = new GridData(SWT.HORIZONTAL);
+							deviceDialogLData.horizontalSpan = 2;
+							deviceDialogLData.widthHint = shellWidth - 25;
+							deviceDialogLData.grabExcessHorizontalSpace = true; 
 							this.deviceDialogGroup.setLayoutData(deviceDialogLData);
 							this.deviceDialogGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.deviceDialogGroup.setText(Messages.getString(MessageIds.GDE_MSGT0318));
@@ -590,8 +598,10 @@ public class SettingsDialog extends Dialog {
 							this.separatorGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.separatorGroup.setLayout(null);
 							this.separatorGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							RowData separatorGroupLData = new RowData();
-							separatorGroupLData.width = shellWidth - 25;
+							GridData separatorGroupLData = new GridData(SWT.HORIZONTAL);
+							separatorGroupLData.horizontalSpan = 2;
+							separatorGroupLData.widthHint = shellWidth - 25;
+							separatorGroupLData.grabExcessHorizontalSpace = true; 
 							this.separatorGroup.setLayoutData(separatorGroupLData);
 							this.separatorGroup.setText(Messages.getString(MessageIds.GDE_MSGT0325));
 							{
@@ -640,8 +650,10 @@ public class SettingsDialog extends Dialog {
 						{ // begin serial port group
 							this.serialPortGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.serialPortGroup.setLayout(null);
-							RowData serialPortGroupLData = new RowData();
-							serialPortGroupLData.width = shellWidth - 25;
+							GridData serialPortGroupLData = new GridData(SWT.HORIZONTAL);
+							serialPortGroupLData.horizontalSpan = 2;
+							serialPortGroupLData.widthHint = shellWidth - 25;
+							serialPortGroupLData.grabExcessHorizontalSpace = true; 
 							this.serialPortGroup.setLayoutData(serialPortGroupLData);
 							this.serialPortGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.serialPortGroup.setText(Messages.getString(MessageIds.GDE_MSGT0330));
@@ -777,7 +789,8 @@ public class SettingsDialog extends Dialog {
 								});
 							}
 						} // end serial port group
-					} // end tabComposite1
+					} // end generalTabComposite
+					this.generalTabComposite.layout();
 				} // end general tab item
 				{ // begin histo tab item
 					this.histoTabItem = new CTabItem(this.settingsTabFolder, SWT.NONE);
