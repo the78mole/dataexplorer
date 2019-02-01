@@ -224,7 +224,7 @@ public class SettingsDialog extends Dialog {
 
 	final LogLevelSelectionContextMenu	logLevelMenu						= new LogLevelSelectionContextMenu();
 	Menu																popupmenu;
-
+	
 	public SettingsDialog(Shell parent, int style) {
 		super(parent, style);
 		this.application = DataExplorer.getInstance();
@@ -232,14 +232,15 @@ public class SettingsDialog extends Dialog {
 	}
 
 	public void open() {
+		int shellWidth =  500;
+		int shellHeight =  GDE.IS_LINUX ? 600 : 590;
 		try {
 			Shell parent = getParent();
 			this.dialogShell = new Shell(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 			SWTResourceManager.registerResourceUser(this.dialogShell);
 			this.dialogShell.setLayout(new FormLayout());
+			this.dialogShell.setSize(shellWidth, shellHeight);
 			this.dialogShell.layout();
-			this.dialogShell.pack();
-			this.dialogShell.setSize(500, GDE.IS_LINUX ? 600 : 580);
 			this.dialogShell.setText(GDE.NAME_LONG + Messages.getString(MessageIds.GDE_MSGT0300));
 			this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/DataExplorer.png")); //$NON-NLS-1$
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
@@ -281,7 +282,7 @@ public class SettingsDialog extends Dialog {
 							this.groupLocale.setLayout(null);
 							this.groupLocale.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							RowData groupLocaleLData = new RowData();
-							groupLocaleLData.width = 215;
+							groupLocaleLData.width = shellWidth/2 - 24;
 							this.groupLocale.setLayoutData(groupLocaleLData);
 							this.groupLocale.setText(Messages.getString(MessageIds.GDE_MSGT0305));
 							{
@@ -316,7 +317,7 @@ public class SettingsDialog extends Dialog {
 							this.groupTimeFormat.setLayout(null);
 							this.groupTimeFormat.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							RowData groupTimeFormatLData = new RowData();
-							groupTimeFormatLData.width = 245;
+							groupTimeFormatLData.width = shellWidth/2 - 24;
 							this.groupTimeFormat.setLayoutData(groupTimeFormatLData);
 							this.groupTimeFormat.setText(Messages.getString(MessageIds.GDE_MSGT0682));
 							{
@@ -348,7 +349,7 @@ public class SettingsDialog extends Dialog {
 							this.defaultDataPathGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.defaultDataPathGroup.setLayout(null);
 							RowData defaultDataPathGroupLData = new RowData();
-							defaultDataPathGroupLData.width = GDE.IS_MAC ? 485 : 477;
+							defaultDataPathGroupLData.width = shellWidth - 25;
 							this.defaultDataPathGroup.setLayoutData(defaultDataPathGroupLData);
 							this.defaultDataPathGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.defaultDataPathGroup.setText(Messages.getString(MessageIds.GDE_MSGT0310));
@@ -388,7 +389,7 @@ public class SettingsDialog extends Dialog {
 							this.fileOpenSaveDialogGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.fileOpenSaveDialogGroup.setLayout(null);
 							RowData fileOpenSaveDialogGroupLData = new RowData();
-							fileOpenSaveDialogGroupLData.width = GDE.IS_MAC ? 485 : 477;
+							fileOpenSaveDialogGroupLData.width = shellWidth - 25;
 							this.fileOpenSaveDialogGroup.setLayoutData(fileOpenSaveDialogGroupLData);
 							this.fileOpenSaveDialogGroup.setText(Messages.getString(MessageIds.GDE_MSGT0315));
 							{
@@ -438,7 +439,7 @@ public class SettingsDialog extends Dialog {
 							this.skinColorSchemaGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.skinColorSchemaGroup.setLayout(null);
 							RowData skinColorSchemaGroupLData = new RowData();
-							skinColorSchemaGroupLData.width = GDE.IS_MAC ? 485 : 477;
+							skinColorSchemaGroupLData.width = shellWidth - 25;
 							this.skinColorSchemaGroup.setLayoutData(skinColorSchemaGroupLData);
 							this.skinColorSchemaGroup.setText(Messages.getString(MessageIds.GDE_MSGT0954));
 							{
@@ -498,7 +499,7 @@ public class SettingsDialog extends Dialog {
 							this.deviceDialogGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.deviceDialogGroup.setLayout(null);
 							RowData deviceDialogLData = new RowData();
-							deviceDialogLData.width = GDE.IS_MAC ? 485 : 477;
+							deviceDialogLData.width = shellWidth - 25;
 							this.deviceDialogGroup.setLayoutData(deviceDialogLData);
 							this.deviceDialogGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.deviceDialogGroup.setText(Messages.getString(MessageIds.GDE_MSGT0318));
@@ -590,7 +591,7 @@ public class SettingsDialog extends Dialog {
 							this.separatorGroup.setLayout(null);
 							this.separatorGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							RowData separatorGroupLData = new RowData();
-							separatorGroupLData.width = GDE.IS_MAC ? 485 : 477;
+							separatorGroupLData.width = shellWidth - 25;
 							this.separatorGroup.setLayoutData(separatorGroupLData);
 							this.separatorGroup.setText(Messages.getString(MessageIds.GDE_MSGT0325));
 							{
@@ -640,7 +641,7 @@ public class SettingsDialog extends Dialog {
 							this.serialPortGroup = new Group(this.generalTabComposite, SWT.NONE);
 							this.serialPortGroup.setLayout(null);
 							RowData serialPortGroupLData = new RowData();
-							serialPortGroupLData.width = GDE.IS_MAC ? 485 : 477;
+							serialPortGroupLData.width = shellWidth - 25;
 							this.serialPortGroup.setLayoutData(serialPortGroupLData);
 							this.serialPortGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.serialPortGroup.setText(Messages.getString(MessageIds.GDE_MSGT0330));
