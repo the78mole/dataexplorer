@@ -4,7 +4,7 @@
     <options buildIfNeeded="true" compress="true" descriptionLocation="/jSerialComm/build.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
-    <manifest generateManifest="false" manifestLocation="/RXTXcomm/META-INF/MANIFEST.MF" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
+    <manifest generateManifest="true" manifestLocation="/jSerialComm/META-INF/MANIFEST.MF" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
         <sealing sealJar="true">
             <packagesToSeal/>
             <packagesToUnSeal/>
@@ -15,13 +15,11 @@
         <file path="/jSerialComm/COPYING"/>
         <file path="/jSerialComm/COPYING.LESSER"/>
         <file path="/jSerialComm/NOTICE"/>
-        <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Android.armeabi"/>
         <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Windows.x86_64"/>
         <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Linux.armv8_32"/>
         <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Linux.x86_64"/>
         <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Linux.armv6"/>
         <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Linux.x86"/>
-        <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Android"/>
         <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Linux"/>
         <file path="/jSerialComm/LICENSE-APACHE-2.0"/>
         <file path="/jSerialComm/README.md"/>
