@@ -468,12 +468,12 @@ public class FileTransferTabItem extends CTabItem {
 
 										listSdCardBaseDirs();
 									}
-									catch (Exception e) {
+									catch (Throwable e) {
 										FileTransferTabItem.log.log(Level.SEVERE, e.getMessage(), e);
 										FileTransferTabItem.this.serialPort.close();
 										FileTransferTabItem.this.sdRootDirectoryTreeItem.setImage(SWTResourceManager.getImage("/gde/resource/Folder.gif")); //$NON-NLS-1$
 										enableSerialButtons(false);
-										FileTransferTabItem.this.application.openMessageDialog(e.getMessage());
+										FileTransferTabItem.this.application.openMessageDialog(Messages.getString(gde.messages.MessageIds.GDE_MSGE0025, new String[] {e.getClass().getSimpleName(), e.getMessage()}));
 									}
 								}
 							});
