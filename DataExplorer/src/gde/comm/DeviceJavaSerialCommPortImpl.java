@@ -140,14 +140,30 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
 
 			if (portWhiteList.size() > 0) { // check ports from the white list only
 				for (String serialPortDescriptor : portWhiteList) {
-					SerialPort commPortIdentifier = SerialPort.getCommPort(serialPortDescriptor);
+					SerialPort commPortIdentifier = null;
+					for (SerialPort commPort : SerialPort.getCommPorts()) {
+						if (commPort.getSystemPortName().equals(serialPortDescriptor)) {
+							commPortIdentifier = commPort;
+							break;
+						}
+					}
 					try {
 						if (doAvialabilityCheck) {
-							commPortIdentifier.openPort(100);
-							if (commPortIdentifier.isOpen()) 
+							boolean isOpen = commPortIdentifier.openPort(1);
+							if (isOpen) 
 								commPortIdentifier.closePort();
-							else
-								throw new NoSuchPortException();
+							else if (commPortIdentifier.getDescriptivePortName().toLowerCase().contains("virtual")){
+								commPortIdentifier.setFlowControl(SerialPort.FLOW_CONTROL_DISABLED);
+								commPortIdentifier.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 1000);
+								commPortIdentifier.setComPortParameters(115200, 8,  SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
+								commPortIdentifier.disablePortConfiguration();
+								isOpen = commPortIdentifier.openPort(1);
+								if (isOpen) 
+									commPortIdentifier.closePort();
+								else
+									throw new NoSuchPortException();
+							}
+							else throw new NoSuchPortException();
 						}
 						DeviceCommPort.availablePorts.put(serialPortDescriptor, serialPortDescriptor + GDE.STRING_MESSAGE_CONCAT + commPortIdentifier.getDescriptivePortName());
 						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, DeviceJavaSerialCommPortImpl.$CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortDescriptor); //$NON-NLS-1$
@@ -155,7 +171,6 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
 					catch (Exception e) {
 						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, DeviceJavaSerialCommPortImpl.$CLASS_NAME, $METHOD_NAME, "Found port, but in use: " + serialPortDescriptor); //$NON-NLS-1$
 					}
-
 				}
 			}
 			else { // find all available serial ports, check against black list
@@ -166,11 +181,22 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
 					if (!portBlackList.contains(serialPortStr)) {
 						try {
 							if (doAvialabilityCheck) {
-								commPort.openPort(100);
-								if (commPort.isOpen())
+								boolean isOpen = commPort.openPort(1);
+								if (isOpen) {
 									commPort.closePort();
-								else
-									throw new NoSuchPortException();
+								} 
+								else if (commPort.getDescriptivePortName().toLowerCase().contains("virtual")) { //STM32 virtual
+									commPort.setFlowControl(SerialPort.FLOW_CONTROL_DISABLED);
+									commPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 1000);
+									commPort.setComPortParameters(115200, 8,  SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
+									commPort.disablePortConfiguration();
+									isOpen = commPort.openPort(1);
+									if (isOpen)
+										commPort.closePort();
+									else
+										throw new NoSuchPortException();
+								}
+								else new NoSuchPortException();
 							}
 							DeviceCommPort.availablePorts.put(serialPortStr, commPort.getSystemPortName() + GDE.STRING_MESSAGE_CONCAT + commPort.getDescriptivePortName());
 							if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, DeviceJavaSerialCommPortImpl.$CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortStr); //$NON-NLS-1$
@@ -273,14 +299,27 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
 			log.logp(Level.FINE, DeviceJavaSerialCommPortImpl.$CLASS_NAME, $METHOD_NAME,
 				String.format("serialPortString = %s; baudeRate = %d; dataBits = %s; stopBits = %s; parity = %s; flowControlMode = %s; RTS = %s; DTR = %s", this.serialPortStr, this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits(), this.deviceConfig.getStopBits(), this.deviceConfig.getParity(), this.deviceConfig.getFlowCtrlMode(), this.deviceConfig.isRTS(), this.deviceConfig.isDTR())); //$NON-NLS-1$
 
-			this.serialPort = SerialPort.getCommPort(this.serialPortStr);
-			
-			if (this.serialPort.openPort(100)) {
-				// set port parameters
-				this.serialPort.setComPortParameters(this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits().ordinal() + 5,  this.deviceConfig.getStopBits().ordinal() + 1, this.deviceConfig.getParity().ordinal());
+			for (SerialPort commPort : SerialPort.getCommPorts()) {
+				if (commPort.getSystemPortName().equals(this.serialPortStr)) {
+					this.serialPort = commPort;
+					break;
+				}
+			}
+			//this.serialPort = SerialPort.getCommPort(this.serialPortStr);
+			boolean isVirtual = this.serialPort.getDescriptivePortName().toLowerCase().contains("virtual");
+			if (isVirtual) {
 				this.serialPort.setFlowControl(this.deviceConfig.getFlowCtrlMode());
-				if (this.deviceConfig.isRTS()) this.serialPort.setRTS();
-				if (this.deviceConfig.isDTR()) this.serialPort.setDTR();
+				this.serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 1000);
+				this.serialPort.setComPortParameters(115200, this.deviceConfig.getDataBits().ordinal() + 5,  this.deviceConfig.getStopBits().ordinal() + 1, this.deviceConfig.getParity().ordinal());
+				this.serialPort.disablePortConfiguration();
+			}
+			if (this.serialPort.openPort()) {
+				if (!isVirtual) { // set port parameters
+					this.serialPort.setComPortParameters(this.deviceConfig.getBaudeRate(), this.deviceConfig.getDataBits().ordinal() + 5,  this.deviceConfig.getStopBits().ordinal() + 1, this.deviceConfig.getParity().ordinal());
+					this.serialPort.setFlowControl(this.deviceConfig.getFlowCtrlMode());
+					if (this.deviceConfig.isRTS()) this.serialPort.setRTS();
+					if (this.deviceConfig.isDTR()) this.serialPort.setDTR();
+				}
 				// init in and out stream for writing and reading
 				this.inputStream = this.serialPort.getInputStream();
 				this.outputStream = this.serialPort.getOutputStream();
