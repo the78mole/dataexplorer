@@ -486,7 +486,7 @@ public class MenuToolBar {
 					objectSelectComboSep.setControl(this.objectSelectComposite);
 				}
 				{
-					this.newObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
+					this.newObject = new ToolItem(this.deviceObjectToolBar, SWT.CHECK);
 					this.newObject.setImage(SWTResourceManager.getImage("gde/resource/NewObj.gif")); //$NON-NLS-1$
 					this.newObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0202));
 					this.newObject.setHotImage(SWTResourceManager.getImage("gde/resource/NewObjHot.gif")); //$NON-NLS-1$
@@ -559,7 +559,7 @@ public class MenuToolBar {
 					});
 				}
 				{
-					this.editObject = new ToolItem(this.deviceObjectToolBar, SWT.NONE);
+					this.editObject = new ToolItem(this.deviceObjectToolBar, SWT.CHECK);
 					this.editObject.setImage(SWTResourceManager.getImage("gde/resource/EditObj.gif")); //$NON-NLS-1$
 					this.editObject.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0204));
 					this.editObject.setHotImage(SWTResourceManager.getImage("gde/resource/EditObjHot.gif")); //$NON-NLS-1$
