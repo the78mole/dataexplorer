@@ -125,16 +125,6 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
 		final String $METHOD_NAME = "listConfiguredSerialPorts"; //$NON-NLS-1$
 		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, DeviceJavaSerialCommPortImpl.$CLASS_NAME, $METHOD_NAME, "entry"); //$NON-NLS-1$
 
-//    this part is identically handled by jSerialComm		
-//		if (GDE.IS_WINDOWS) {
-//			try {
-//				WindowsHelper.registerSerialPorts();
-//			}
-//			catch (Throwable e) {
-//				log.log(Level.WARNING, Messages.getString(MessageIds.GDE_MSGW0035));
-//			}
-//		}
-
 		try {
 			DeviceCommPort.availablePorts.clear();
 
@@ -148,25 +138,28 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
 						}
 					}
 					try {
-						if (doAvialabilityCheck) {
-							boolean isOpen = commPortIdentifier.openPort(1);
-							if (isOpen) 
-								commPortIdentifier.closePort();
-							else if (commPortIdentifier.getDescriptivePortName().toLowerCase().contains("virtual")){
-								commPortIdentifier.setFlowControl(SerialPort.FLOW_CONTROL_DISABLED);
-								commPortIdentifier.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 1000);
-								commPortIdentifier.setComPortParameters(115200, 8,  SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
-								commPortIdentifier.disablePortConfiguration();
-								isOpen = commPortIdentifier.openPort(1);
-								if (isOpen) 
+						if (commPortIdentifier != null) {
+							if (doAvialabilityCheck) {
+								boolean isOpen = commPortIdentifier.openPort(1);
+								if (isOpen)
 									commPortIdentifier.closePort();
+								else if (commPortIdentifier.getDescriptivePortName().toLowerCase().contains("virtual")) {
+									commPortIdentifier.setFlowControl(SerialPort.FLOW_CONTROL_DISABLED);
+									commPortIdentifier.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 1000);
+									commPortIdentifier.setComPortParameters(115200, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
+									commPortIdentifier.disablePortConfiguration();
+									isOpen = commPortIdentifier.openPort(1);
+									if (isOpen)
+										commPortIdentifier.closePort();
+									else
+										throw new NoSuchPortException();
+								}
 								else
 									throw new NoSuchPortException();
 							}
-							else throw new NoSuchPortException();
+							DeviceCommPort.availablePorts.put(serialPortDescriptor, serialPortDescriptor + GDE.STRING_MESSAGE_CONCAT + commPortIdentifier.getDescriptivePortName());
+							if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, DeviceJavaSerialCommPortImpl.$CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortDescriptor); //$NON-NLS-1$
 						}
-						DeviceCommPort.availablePorts.put(serialPortDescriptor, serialPortDescriptor + GDE.STRING_MESSAGE_CONCAT + commPortIdentifier.getDescriptivePortName());
-						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, DeviceJavaSerialCommPortImpl.$CLASS_NAME, $METHOD_NAME, "Found available port: " + serialPortDescriptor); //$NON-NLS-1$
 					}
 					catch (Exception e) {
 						if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, DeviceJavaSerialCommPortImpl.$CLASS_NAME, $METHOD_NAME, "Found port, but in use: " + serialPortDescriptor); //$NON-NLS-1$
@@ -306,7 +299,7 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
 				}
 			}
 			//this.serialPort = SerialPort.getCommPort(this.serialPortStr);
-			boolean isVirtual = this.serialPort.getDescriptivePortName().toLowerCase().contains("virtual");
+			boolean isVirtual = GDE.IS_WINDOWS && this.serialPort.getDescriptivePortName().toLowerCase().contains("virtual");
 			if (isVirtual) {
 				this.serialPort.setFlowControl(this.deviceConfig.getFlowCtrlMode());
 				this.serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 1000);
