@@ -406,6 +406,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 	@Override
 	public void open() {
 		long openStartTime = new Date().getTime();
+		final Button graphicsDataButton;
+		final Button cycleDataButton;
 		try {
 			this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
 
@@ -1172,7 +1174,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									}
 								}
 								{
-									Button cycleDataButton = new Button(this.memoryDataComposite, SWT.Selection);
+									cycleDataButton = new Button(this.memoryDataComposite, SWT.Selection);
 									FormData cycleDataButtonLData = new FormData();
 									cycleDataButtonLData.height = 30;
 									cycleDataButtonLData.left = new FormAttachment(0, 1000, 150);
@@ -1485,7 +1487,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 									}
 								}
 								{
-									Button graphicsDataButton = new Button(this.memoryDataComposite, SWT.Selection);
+									graphicsDataButton = new Button(this.memoryDataComposite, SWT.Selection);
 									FormData graphicsDataButtonLData = new FormData();
 									graphicsDataButtonLData.height = 30;
 									graphicsDataButtonLData.left = new FormAttachment(0, 1000, 150);
@@ -1500,6 +1502,8 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 										public void widgetSelected(SelectionEvent evt) {
 											UltraDuoPlusDialog.log.finest(() -> "graphicsDataButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 											UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
+											graphicsDataButton.setEnabled(false);
+											cycleDataButton.setEnabled(false);
 
 											final int[] points = new int[UltraDuoPlusDialog.this.device.getNumberOfMeasurements(UltraDuoPlusDialog.this.channelSelectionIndex)];
 											final byte[][] graphicsData = new byte[3][];
@@ -1578,7 +1582,16 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 														UltraDuoPlusDialog.this.application.openMessageDialogAsync(UltraDuoPlusDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGT2336));
 													}
 													finally {
-														UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+														GDE.display.asyncExec(new Runnable() {
+															@Override
+															public void run() {
+																if (UltraDuoPlusDialog.this.dialogShell != null && !UltraDuoPlusDialog.this.dialogShell.isDisposed() 
+																		&& graphicsDataButton != null && !graphicsDataButton.isDisposed()) {
+																	UltraDuoPlusDialog.this.dialogShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
+																	graphicsDataButton.setEnabled(true);
+																	cycleDataButton.setEnabled(true);																}
+															}
+														});														
 													}
 												}
 											};
@@ -1738,7 +1751,7 @@ public class UltraDuoPlusDialog extends DeviceDialog {
 					});
 				} // end boundsComposite
 				this.application.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
-				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 300, 100));
+				this.dialogShell.setLocation(getParent().toDisplay(getParent().getSize().x / 2 - 300, 30));
 				this.dialogShell.open();
 				this.lastMemorySelectionIndex = -1;
 				this.lastCellSelectionIndex = -1;
