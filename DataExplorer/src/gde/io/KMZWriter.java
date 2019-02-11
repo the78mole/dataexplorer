@@ -64,7 +64,7 @@ public class KMZWriter {
 	static final String				ALTITUDE_CLAMP2GROUNDE		= "clampToGround";
 
 	static final String				header					= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
-																						+ "<kml xmlns=\"https://www.opengis.net/kml/2.2\" xmlns:gx=\"https://www.google.com/kml/ext/2.2\">" + GDE.LINE_SEPARATOR + GDE.LINE_SEPARATOR;	//$NON-NLS-1$
+																						+ "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\">" + GDE.LINE_SEPARATOR + GDE.LINE_SEPARATOR;	//$NON-NLS-1$
 
 	static final String				position				= "<Document>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
 																						+ "\t<name>%s</name>" + GDE.LINE_SEPARATOR //$NON-NLS-1$
