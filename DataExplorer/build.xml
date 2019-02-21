@@ -41,12 +41,12 @@
 		<pathelement location="../build/lib/jaxb-runtime.jar"/>
 		<pathelement location="../build/lib/istack-commons-runtime.jar"/>
 		<pathelement location="../build/lib/activation.jar"/>
-		<pathelement location="../build/lib/usb4java-1.2.0.jar" />
-		<pathelement location="../build/lib/usb-api-1.0.2.jar" />
-		<pathelement location="../build/lib/usb4java-javax-1.2.0.jar" />
-		<pathelement location="../build/lib/build/lib/commons-lang3-3.2.1.jar" />
+		<pathelement location="../build/lib/usb4java.jar" />
+		<pathelement location="../build/lib/usb-api.jar" />
+		<pathelement location="../build/lib/usb4java-javax.jar" />
+		<pathelement location="../build/lib/build/lib/commons-lang3.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
-		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/libusb4java-1.2.0.jar" />
+		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/libusb4java.jar" />
 	</path>
 
 	<target name="compile" description="compile the project">
@@ -78,7 +78,7 @@
 			<attribute name="Created-By" value="${user.name}"/>
 			<attribute name="Built-Date" value="${TODAY}"/> 
 			<attribute name="Main-Class" value="gde.GDE"/>
-			<attribute name="Class-Path" value="java/ext/jaxb-api.jar java/ext/jaxb-core.jar java/ext/jaxb-runtime.jar java/ext/istack-commons-runtime.jar java/ext/activation.jar java/ext/gson.jar java/ext/swt.jar java/ext/jSerialComm.jar java/ext/RXTXcomm.jar java/ext/usb-api-1.0.2.jar java/ext/usb4java-javax-1.2.0.jar java/ext/usb4java-1.2.0.jar java/ext/commons-lang3-3.2.1.jar java/ext/libusb4java-1.2.0.jar"/>
+			<attribute name="Class-Path" value="java/ext/juniversalchardet.jar java/ext/jaxb-api.jar java/ext/jaxb-core.jar java/ext/jaxb-runtime.jar java/ext/istack-commons-runtime.jar java/ext/activation.jar java/ext/gson.jar java/ext/swt.jar java/ext/jSerialComm.jar java/ext/RXTXcomm.jar java/ext/usb-api.jar java/ext/usb4java-javax.jar java/ext/usb4java.jar java/ext/commons-lang3.jar java/ext/libusb4java.jar"/>
    		</manifest>
  	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
@@ -109,7 +109,7 @@
 			<attribute name="Created-By" value="${user.name}"/>
 			<attribute name="Built-Date" value="${TODAY}"/> 
 			<attribute name="Main-Class" value="gde.GDE"/>
-			<attribute name="Class-Path" value="java/ext/commons-lang3-3.2.1.jar"/>
+			<attribute name="Class-Path" value="java/ext/commons-lang3.jar"/>
    		</manifest>
  	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}NonUi-${version.num}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

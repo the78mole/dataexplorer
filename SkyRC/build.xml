@@ -16,11 +16,11 @@
 	<path id="compile.classpath">
 		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
 		<pathelement location="../build/lib/jaxb-api.jar" />
-		<pathelement location="../build/lib/usb4java-1.2.0.jar" />
-		<pathelement location="../build/lib/usb-api-1.0.2.jar" />
-		<pathelement location="../build/lib/build/lib/commons-lang3-3.2.1.jar" />
+		<pathelement location="../build/lib/usb4java.jar" />
+		<pathelement location="../build/lib/usb-api.jar" />
+		<pathelement location="../build/lib/build/lib/commons-lang3.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
-		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/libusb4java-1.2.0.jar" />
+		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/libusb4java.jar" />
 	</path>
 
 	<target name="compile" description="compile the project">

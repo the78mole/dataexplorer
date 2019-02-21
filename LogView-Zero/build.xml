@@ -16,10 +16,10 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
     
-    Copyright (c) 2017,2018,2019 Winfried Bruegmann
+    Copyright (c) 2019 Winfried Bruegmann
 ************************************************************************************** 
 -->
-<project name="Pulsar" default="compile">
+<project name="LogView-Zero" default="compile">
 
 	<property name="build.properties" location="../build/build.properties" />
 
@@ -34,6 +34,7 @@
 
 	<path id="compile.classpath">
 		<pathelement location="../DataExplorer/build/DataExplorer.jar" />
+		<pathelement location="../build/lib/juniversalchardet.jar" />
 		<pathelement location="../build/lib/jaxb-api.jar" />
 		<pathelement location="../build/lib/usb-api.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
@@ -71,16 +72,17 @@
 			<attribute name="Built-Date" value="${TODAY}"/> 
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
-    		<attribute name="Bundle-Description" value="Implementation for Pulsar devices from Elprog"/>
+    		<attribute name="Bundle-Description" value="Implementation to enable import of LogView Zero files"/>
     		<attribute name="Export-Service" value="${export.services}"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
 	    	<fileset dir="src" includes="**/*.xml"/>
 	    	<fileset dir="src" includes="**/*.jpg"/>
- 	    	<fileset dir="src" includes="**/*.properties"/>
-	    	<fileset dir="src" includes="**/*.html"/>
+	    	<fileset dir="src" includes="**/*.gif"/>
 	    	<fileset dir="src" includes="**/*.png"/>
+	    	<fileset dir="src" includes="**/*.properties"/>
+	    	<fileset dir="src" includes="**/*.html"/>
 	    	<fileset dir="src" includes="**/*.css"/>
 	    </jar>
 	</target>
@@ -102,13 +104,13 @@
 			<attribute name="Built-Date" value="${TODAY}"/> 
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
-    		<attribute name="Bundle-Description" value="Implementation for Pulsar devices from Elprog"/>
+    		<attribute name="Bundle-Description" value="Implementation to enable import of LogView Zero files"/>
     		<attribute name="Export-Service" value="${export.services}"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}NonUi-${version.num}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>
 	    	<fileset dir="src" includes="**/*.xml"/>
- 	    	<fileset dir="src" includes="**/*.properties"/>
+	    	<fileset dir="src" includes="**/*.properties"/>
 	    </jar>
 	</target>
 

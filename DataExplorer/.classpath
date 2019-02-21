@@ -14,11 +14,11 @@
 	<classpathentry kind="var" path="SWT_JAR_PATH" sourcepath="/SWT_SOURCE_PATH"/>
 	<classpathentry kind="lib" path="/build/lib/jSerialComm.jar" sourcepath="/jSerialComm"/>
 	<classpathentry kind="lib" path="/build/lib/RXTXcomm.jar" sourcepath="/RXTXcomm/src"/>
-	<classpathentry kind="lib" path="/build/lib/usb4java-1.2.0.jar"/>
-	<classpathentry kind="lib" path="/build/lib/commons-lang3-3.2.1.jar"/>
+	<classpathentry kind="lib" path="/build/lib/usb4java.jar"/>
+	<classpathentry kind="lib" path="/build/lib/commons-lang3.jar"/>
 	<classpathentry kind="var" path="USB4JAVA_PATH"/>
-	<classpathentry kind="lib" path="/build/lib/usb-api-1.0.2.jar"/>
-	<classpathentry kind="lib" path="/build/lib/usb4java-javax-1.2.0.jar"/>
+	<classpathentry kind="lib" path="/build/lib/usb-api.jar"/>
+	<classpathentry kind="lib" path="/build/lib/usb4java-javax.jar"/>
 	<classpathentry kind="lib" path="/build/lib/gson.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

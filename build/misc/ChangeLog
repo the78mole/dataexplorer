@@ -14,7 +14,7 @@ Generic changes/fixes
 	* fix Windows Java 11 serial communication add jSerialComm implementation 
 	* enable enhanced delta ratio measurement on altitude while supported by selected device
 	* fix IllegalParameterException on Linux while initiating main UI
-	* update 
+	* remove usb4java jar version numbers to enable update
 
 Device specific changes/fixes
 	* Graupner Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)

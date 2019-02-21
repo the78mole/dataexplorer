@@ -221,6 +221,7 @@
 		<ant antfile="build.xml" target="clean" dir="Devo-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="CSVImportAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="ArduPilot" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="LogView-Zero" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -407,6 +408,7 @@
 		<ant antfile="build.xml" target="package" dir="Devo-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="CSVImportAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="ArduPilot" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="LogView-Zero" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 	
@@ -449,6 +451,7 @@
 		<ant antfile="build.xml" target="nonui_package" dir="Devo-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="CSVImportAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="ArduPilot" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="LogView-Zero" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -490,6 +493,7 @@
 			<include name="Devo-Telemetry/build/*.jar" />
 			<include name="CSVImportAdapter/build/*.jar" />
 			<include name="ArduPilot/build/*.jar" />
+			<include name="LogView-Zero/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
@@ -533,6 +537,7 @@
 			<include name="Devo-Telemetry/build/*NonUi*.jar" />
 			<include name="CSVImportAdapter/build/*NonUi*.jar" />
 			<include name="ArduPilot/build/*NonUi*.jar" />
+			<include name="LogView-Zero/build/*NonUi*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
@@ -687,17 +692,18 @@
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />		
+			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
 			<fileset file="build/lib/jaxb-api.jar" />
 			<fileset file="build/lib/jaxb-core.jar" />
 			<fileset file="build/lib/jaxb-runtime.jar" />
 			<fileset file="build/lib/istack-commons-runtime.jar" />
 			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java-1.2.0.jar" />
-			<fileset file="build/lib/gson.jar" />
-			<fileset file="build/lib/usb-api-1.0.2.jar" />
-			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
-			<fileset file="build/lib/commons-lang3-3.2.1.jar" />
-			<fileset file="build/lib/Windows/32/libusb4java-1.2.0.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/Windows/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.windows64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
@@ -707,16 +713,17 @@
 			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
 			<fileset file="build/lib/jaxb-api.jar" />
 			<fileset file="build/lib/jaxb-core.jar" />
 			<fileset file="build/lib/jaxb-runtime.jar" />
 			<fileset file="build/lib/istack-commons-runtime.jar" />
 			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java-1.2.0.jar" />
-			<fileset file="build/lib/usb-api-1.0.2.jar" />
-			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
-			<fileset file="build/lib/commons-lang3-3.2.1.jar" />
-			<fileset file="build/lib/Windows/64/libusb4java-1.2.0.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/Windows/64/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.raspbian32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
@@ -726,16 +733,17 @@
 			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
 			<fileset file="build/lib/jaxb-api.jar" />
 			<fileset file="build/lib/jaxb-core.jar" />
 			<fileset file="build/lib/jaxb-runtime.jar" />
 			<fileset file="build/lib/istack-commons-runtime.jar" />
 			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java-1.2.0.jar" />
-			<fileset file="build/lib/usb-api-1.0.2.jar" />
-			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
-			<fileset file="build/lib/commons-lang3-3.2.1.jar" />
-			<fileset file="build/lib/Raspbian/32/libusb4java-1.2.0.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/Raspbian/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.gnulinux32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
@@ -745,16 +753,17 @@
 			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
 			<fileset file="build/lib/jaxb-api.jar" />
 			<fileset file="build/lib/jaxb-core.jar" />
 			<fileset file="build/lib/jaxb-runtime.jar" />
 			<fileset file="build/lib/istack-commons-runtime.jar" />
 			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java-1.2.0.jar" />
-			<fileset file="build/lib/usb-api-1.0.2.jar" />
-			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
-			<fileset file="build/lib/commons-lang3-3.2.1.jar" />
-			<fileset file="build/lib/GNULinux/32/libusb4java-1.2.0.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/GNULinux/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.gnulinux64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
@@ -764,16 +773,17 @@
 			<fileset file="build/misc/*.README" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
 			<fileset file="build/lib/jaxb-api.jar" />
 			<fileset file="build/lib/jaxb-core.jar" />
 			<fileset file="build/lib/jaxb-runtime.jar" />
 			<fileset file="build/lib/istack-commons-runtime.jar" />
 			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java-1.2.0.jar" />
-			<fileset file="build/lib/usb-api-1.0.2.jar" />
-			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
-			<fileset file="build/lib/commons-lang3-3.2.1.jar" />
-			<fileset file="build/lib/GNULinux/64/libusb4java-1.2.0.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/GNULinux/64/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.mac32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
@@ -783,16 +793,17 @@
 			<fileset file="build/misc/*.README" />		
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
 			<fileset file="build/lib/jaxb-api.jar" />
 			<fileset file="build/lib/jaxb-core.jar" />
 			<fileset file="build/lib/jaxb-runtime.jar" />
 			<fileset file="build/lib/istack-commons-runtime.jar" />
 			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java-1.2.0.jar" />
-			<fileset file="build/lib/usb-api-1.0.2.jar" />
-			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
-			<fileset file="build/lib/commons-lang3-3.2.1.jar" />
-			<fileset file="build/lib/MAC/32/libusb4java-1.2.0.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/MAC/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.mac64.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
@@ -801,16 +812,17 @@
 			<fileset file="build/misc/*.LICENSE" />
 			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
 			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
 			<fileset file="build/lib/jaxb-api.jar" />
 			<fileset file="build/lib/jaxb-core.jar" />
 			<fileset file="build/lib/jaxb-runtime.jar" />
 			<fileset file="build/lib/istack-commons-runtime.jar" />
 			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java-1.2.0.jar" />
-			<fileset file="build/lib/usb-api-1.0.2.jar" />
-			<fileset file="build/lib/usb4java-javax-1.2.0.jar" />
-			<fileset file="build/lib/commons-lang3-3.2.1.jar" />
-			<fileset file="build/lib/MAC/64/libusb4java-1.2.0.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/MAC/64/libusb4java.jar" />
 		</copy>
 
 		<!-- launcher scripts, README -->

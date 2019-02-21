@@ -6,7 +6,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/build/lib/usb-api-1.0.2.jar"/>
+	<classpathentry kind="lib" path="/build/lib/usb-api.jar"/>
 	<classpathentry kind="lib" path="/build/lib/jaxb-api.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/DataExplorer"/>
 	<classpathentry kind="var" path="SWT_JAR_PATH"/>
