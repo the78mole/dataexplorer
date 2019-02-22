@@ -215,6 +215,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 							if (detectedSensors.contains(Sensor.GAM)) {
 								bufCopier.copyToFreeBuffer();
 								if (bufCopier.is4BuffersFull()) {
+									HoTTbinReader2.gamBinParser.parse();
 									bufCopier.clearBuffers();
 									isSensorData = true;
 								}
