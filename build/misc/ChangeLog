@@ -15,6 +15,7 @@ Generic changes/fixes
 	* enable enhanced delta ratio measurement on altitude while supported by selected device
 	* fix IllegalParameterException on Linux while initiating main UI
 	* remove usb4java jar version numbers to enable update
+	* update usb4java to version 1.3.0
 
 Device specific changes/fixes
 	* Graupner Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)
