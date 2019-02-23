@@ -18,6 +18,28 @@
 ****************************************************************************************/
 package gde.comm;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.usb.UsbClaimException;
+import javax.usb.UsbDevice;
+import javax.usb.UsbDisconnectedException;
+import javax.usb.UsbException;
+import javax.usb.UsbHub;
+import javax.usb.UsbInterface;
+import javax.usb.UsbNotActiveException;
+import javax.usb.UsbNotClaimedException;
+
+import org.eclipse.swt.SWT;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
@@ -40,27 +62,6 @@ import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import gnu.io.UnsupportedCommOperationException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.TreeMap;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import javax.usb.UsbClaimException;
-import javax.usb.UsbDevice;
-import javax.usb.UsbDisconnectedException;
-import javax.usb.UsbException;
-import javax.usb.UsbHub;
-import javax.usb.UsbInterface;
-import javax.usb.UsbNotActiveException;
-import javax.usb.UsbNotClaimedException;
-
-import org.eclipse.swt.SWT;
 
 /**
  * DeviceSerialPort is the abstract class of the serial port implementation as parent for a device specific serial port implementation
@@ -1120,7 +1121,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
    * @return
    * @throws UsbException
    */
-	public UsbDevice findUsbDevice(final short vendorId, final short productId) throws UsbException {
+	public Set<UsbDevice> findUsbDevices(final short vendorId, final short productId) throws UsbException {
 		return null;
 	}
 
@@ -1131,7 +1132,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @param productId
 	 * @return
 	 */
-	public UsbDevice findDevice(UsbHub hub, short vendorId, short productId) {
+	public Set<UsbDevice> findDevices(UsbHub hub, short vendorId, short productId) {
 		return null;
 	}
 
@@ -1142,7 +1143,7 @@ public class DeviceSerialPortImpl implements IDeviceCommPort, SerialPortEventLis
 	 * @param productId
 	 * @throws UsbException
 	 */
-	public void dumpUsbDevice(final short vendorId, final short productId) throws UsbException {
+	public void dumpUsbDevices(final short vendorId, final short productId) throws UsbException {
 		//no explicit return result
 	}
 	

@@ -18,16 +18,8 @@
 ****************************************************************************************/
 package gde.comm;
 
-import gde.config.Settings;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.exception.ApplicationConfigurationException;
-import gde.exception.FailedQueryException;
-import gde.exception.SerialPortException;
-import gde.exception.TimeOutException;
-import gde.ui.DataExplorer;
-
 import java.io.IOException;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -39,6 +31,15 @@ import javax.usb.UsbHub;
 import javax.usb.UsbInterface;
 import javax.usb.UsbNotActiveException;
 import javax.usb.UsbNotClaimedException;
+
+import gde.config.Settings;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.exception.ApplicationConfigurationException;
+import gde.exception.FailedQueryException;
+import gde.exception.SerialPortException;
+import gde.exception.TimeOutException;
+import gde.ui.DataExplorer;
 
 /**
  * @author brueg
@@ -342,25 +343,25 @@ public class DeviceCommPort implements IDeviceCommPort {
 	
 	/////// USB interface starts here
   /**
-   * find USB device to be identified by vendor ID and product ID
+   * find USB devices identified by vendor ID and product ID
    * @param vendorId
    * @param productId
    * @return
    * @throws UsbException
    */
-	public UsbDevice findUsbDevice(final short vendorId, final short productId) throws UsbException {
-		return this.port.findUsbDevice(vendorId, productId);
+	public Set<UsbDevice> findUsbDevices(final short vendorId, final short productId) throws UsbException {
+		return this.port.findUsbDevices(vendorId, productId);
 	}
 
 	/**
-	 * find USB device starting from hub (root hub)
+	 * find USB devices starting from hub (root hub)
 	 * @param hub
 	 * @param vendorId
 	 * @param productId
 	 * @return
 	 */
-	public UsbDevice findDevice(UsbHub hub, short vendorId, short productId) {
-		return this.port.findDevice(hub, vendorId, productId);
+	public Set<UsbDevice> findDevices(UsbHub hub, short vendorId, short productId) {
+		return this.port.findDevices(hub, vendorId, productId);
 	}
 
 	/**
@@ -370,8 +371,8 @@ public class DeviceCommPort implements IDeviceCommPort {
 	 * @param productId
 	 * @throws UsbException
 	 */
-	public void dumpUsbDevice(final short vendorId, final short productId) throws UsbException {
-		this.port.dumpUsbDevice(vendorId, productId);
+	public void dumpUsbDevices(final short vendorId, final short productId) throws UsbException {
+		this.port.dumpUsbDevices(vendorId, productId);
 	}
 	
 	/**

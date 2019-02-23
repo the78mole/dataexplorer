@@ -18,6 +18,32 @@
 ****************************************************************************************/
 package gde.comm;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Date;
+import java.util.Random;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import javax.usb.UsbClaimException;
+import javax.usb.UsbDevice;
+import javax.usb.UsbDisconnectedException;
+import javax.usb.UsbException;
+import javax.usb.UsbHub;
+import javax.usb.UsbInterface;
+import javax.usb.UsbNotActiveException;
+import javax.usb.UsbNotClaimedException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.FileDialog;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.FormatTypes;
@@ -36,31 +62,6 @@ import gde.utils.FileUtils;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 import gnu.io.SerialPort;
-
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Date;
-import java.util.Random;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.util.logging.Logger;
-
-import javax.usb.UsbClaimException;
-import javax.usb.UsbDevice;
-import javax.usb.UsbDisconnectedException;
-import javax.usb.UsbException;
-import javax.usb.UsbHub;
-import javax.usb.UsbInterface;
-import javax.usb.UsbNotActiveException;
-import javax.usb.UsbNotClaimedException;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.FileDialog;
 
 /**
  * class to simulate serial port where bytes read form input file
@@ -656,7 +657,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
    * @return
    * @throws UsbException
    */
-	public UsbDevice findUsbDevice(final short vendorId, final short productId) throws UsbException {
+	public Set<UsbDevice> findUsbDevices(final short vendorId, final short productId) throws UsbException {
 		return null;
 	}
 
@@ -667,7 +668,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @param productId
 	 * @return
 	 */
-	public UsbDevice findDevice(UsbHub hub, short vendorId, short productId) {
+	public Set<UsbDevice> findDevices(UsbHub hub, short vendorId, short productId) {
 		return null;
 	}
 
@@ -678,7 +679,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @param productId
 	 * @throws UsbException
 	 */
-	public void dumpUsbDevice(final short vendorId, final short productId) throws UsbException {
+	public void dumpUsbDevices(final short vendorId, final short productId) throws UsbException {
 		//no explicit return result
 	}
 	

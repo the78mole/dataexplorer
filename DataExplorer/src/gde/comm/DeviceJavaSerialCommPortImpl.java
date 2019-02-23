@@ -18,29 +18,12 @@
 ****************************************************************************************/
 package gde.comm;
 
-import gde.GDE;
-import gde.config.Settings;
-import gde.device.DeviceConfiguration;
-import gde.device.IDevice;
-import gde.exception.ApplicationConfigurationException;
-import gde.exception.FailedQueryException;
-import gde.exception.ReadWriteOutOfSyncException;
-import gde.exception.SerialPortException;
-import gde.exception.TimeOutException;
-import gde.log.Level;
-import gde.messages.MessageIds;
-import gde.messages.Messages;
-import gde.ui.DataExplorer;
-import gde.utils.StringHelper;
-import gde.utils.WaitTimer;
-import gde.exception.NoSuchPortException;
-import gde.exception.PortInUseException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -59,6 +42,24 @@ import org.eclipse.swt.SWT;
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortEvent;
 import com.fazecast.jSerialComm.SerialPortPacketListener;
+
+import gde.GDE;
+import gde.config.Settings;
+import gde.device.DeviceConfiguration;
+import gde.device.IDevice;
+import gde.exception.ApplicationConfigurationException;
+import gde.exception.FailedQueryException;
+import gde.exception.NoSuchPortException;
+import gde.exception.PortInUseException;
+import gde.exception.ReadWriteOutOfSyncException;
+import gde.exception.SerialPortException;
+import gde.exception.TimeOutException;
+import gde.log.Level;
+import gde.messages.MessageIds;
+import gde.messages.Messages;
+import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
+import gde.utils.WaitTimer;
 
 /**
  * DeviceSerialPort is the abstract class of the serial port implementation as parent for a device specific serial port implementation
@@ -1075,7 +1076,7 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
    * @return
    * @throws UsbException
    */
-	public UsbDevice findUsbDevice(final short vendorId, final short productId) throws UsbException {
+	public Set<UsbDevice> findUsbDevices(final short vendorId, final short productId) throws UsbException {
 		return null;
 	}
 
@@ -1086,7 +1087,7 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
 	 * @param productId
 	 * @return
 	 */
-	public UsbDevice findDevice(UsbHub hub, short vendorId, short productId) {
+	public Set<UsbDevice> findDevices(UsbHub hub, short vendorId, short productId) {
 		return null;
 	}
 
@@ -1097,7 +1098,7 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
 	 * @param productId
 	 * @throws UsbException
 	 */
-	public void dumpUsbDevice(final short vendorId, final short productId) throws UsbException {
+	public void dumpUsbDevices(final short vendorId, final short productId) throws UsbException {
 		//no explicit return result
 	}
 	

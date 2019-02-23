@@ -18,13 +18,8 @@
 ****************************************************************************************/
 package gde.comm;
 
-import gde.device.IDevice;
-import gde.exception.ApplicationConfigurationException;
-import gde.exception.FailedQueryException;
-import gde.exception.SerialPortException;
-import gde.exception.TimeOutException;
-
 import java.io.IOException;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.usb.UsbClaimException;
@@ -35,6 +30,12 @@ import javax.usb.UsbHub;
 import javax.usb.UsbInterface;
 import javax.usb.UsbNotActiveException;
 import javax.usb.UsbNotClaimedException;
+
+import gde.device.IDevice;
+import gde.exception.ApplicationConfigurationException;
+import gde.exception.FailedQueryException;
+import gde.exception.SerialPortException;
+import gde.exception.TimeOutException;
 
 /**
  * interface to device serial port to enable overloading with different implementations
@@ -223,22 +224,22 @@ public interface IDeviceCommPort {
 	
 	/////// USB interface starts here
   /**
-   * find USB device to be identified by vendor ID and product ID
+   * find USB devices identified by vendor ID and product ID
    * @param vendorId
    * @param productId
    * @return
    * @throws UsbException
    */
-	public UsbDevice findUsbDevice(final short vendorId, final short productId) throws UsbException;
+	public Set<UsbDevice> findUsbDevices(final short vendorId, final short productId) throws UsbException;
 
 	/**
-	 * find USB device starting from hub (root hub)
+	 * find USB devices starting from hub (root hub)
 	 * @param hub
 	 * @param vendorId
 	 * @param productId
 	 * @return
 	 */
-	public UsbDevice findDevice(UsbHub hub, short vendorId, short productId);
+	public Set<UsbDevice> findDevices(UsbHub hub, short vendorId, short productId);
 
 	/**
 	 * dump required information for a USB device with known product ID and
@@ -247,7 +248,7 @@ public interface IDeviceCommPort {
 	 * @param productId
 	 * @throws UsbException
 	 */
-	public void dumpUsbDevice(final short vendorId, final short productId) throws UsbException;
+	public void dumpUsbDevices(final short vendorId, final short productId) throws UsbException;
 	
 	
 	/**
