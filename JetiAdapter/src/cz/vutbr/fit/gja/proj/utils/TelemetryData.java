@@ -100,7 +100,7 @@ public class TelemetryData {
 		long											lastTimeStamp			= 0;
 		long											minValue					= Long.MAX_VALUE;
 		long											maxValue					= Long.MIN_VALUE;
-		long											avgValue					= Long.MIN_VALUE;			// avarage value (avg = sum(xi)/n)
+		long											avgValue					= Long.MIN_VALUE;			// average value (avg = sum(xi)/n)
 		long											sigmaValue				= Long.MIN_VALUE;			// sigma value of time steps
 
 		public TimeVector() {

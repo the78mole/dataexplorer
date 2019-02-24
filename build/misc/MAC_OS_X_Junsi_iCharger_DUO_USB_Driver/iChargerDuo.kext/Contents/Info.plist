@@ -31,7 +31,7 @@
                 <string>IOService</string>
                 <key>IOProviderClass</key>
                 <string>IOUSBInterface</string>
-		<key>bConfigurationValue</key>
+				<key>bConfigurationValue</key>
                 <integer>1</integer>
                 <key>bInterfaceNumber</key>
                 <integer>0</integer>
