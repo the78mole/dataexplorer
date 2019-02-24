@@ -104,7 +104,7 @@ public class UsbGathererThread extends Thread {
 			RecordSet recordSet2 = null;
 			int[] points1 = new int[this.device.getNumberOfMeasurements(1)];
 			int[] points2 = new int[this.device.getNumberOfMeasurements(2)];
-			int lastEnergie1, lastEnergie2;
+			int lastEnergie1 = 0, lastEnergie2 = 0;
 
 			this.isProgrammExecuting1 = false;
 			this.isProgrammExecuting2 = false;
@@ -144,8 +144,10 @@ public class UsbGathererThread extends Thread {
 							lastEnergie1 = points1[5];
 							points1 = new int[this.device.getNumberOfMeasurements(1)];
 							
-							lastEnergie2 = points2[5];
-							points2 = new int[this.device.getNumberOfMeasurements(2)];
+							if (this.isProgrammExecuting2) {
+								lastEnergie2 = points2[5];
+								points2 = new int[this.device.getNumberOfMeasurements(2)];
+							}
 
 							if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
 								points1[5] = lastEnergie1;

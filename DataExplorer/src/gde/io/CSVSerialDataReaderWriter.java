@@ -99,6 +99,7 @@ public class CSVSerialDataReaderWriter {
 		boolean isRedirect2Channel1 = data.isRedirectChannel1();
 		int endIndex = 0;
 		int dataBlockNumber = 1;
+		String firmwareHardwareDescription = new String();
 
 		try {
 			if (channelConfigNumber == null)
@@ -165,7 +166,13 @@ public class CSVSerialDataReaderWriter {
 						}
 					}
 					else {//skip all lines which does not match the configured data block leader
-						log.log(Level.WARNING, filePath + " - skipped " + lineNumber + ", it does not start with " + device.getDataBlockLeader()); //$NON-NLS-1$
+						if (line.startsWith("@Model")) {//iCharger model and hardware/firmware level
+							//System.out.println("!" + line.substring(1) + "! " + line.substring(1).length());
+							//System.out.println("!" + line.substring(1).trim() + "! " + line.substring(1).trim().length());
+							//attention, special character has influence to file pointer calculation while writing OSD file
+							firmwareHardwareDescription = line.substring(1).trim(); //this line contains some special character, remove it using trim()
+						} else
+							log.log(Level.WARNING, filePath + " - skipped " + lineNumber + ", it does not start with " + device.getDataBlockLeader()); //$NON-NLS-1$
 						continue;
 					}
 
@@ -261,6 +268,8 @@ public class CSVSerialDataReaderWriter {
 							channelRecordSet = activeChannel.get(recordSetName);
 							createdRecordSets.add(channelRecordSet);
 							recordSetName = channelRecordSet.getName(); // cut/correct length
+							if (firmwareHardwareDescription.length() > 10 && !activeChannel.getFileDescription().contains(firmwareHardwareDescription))
+								activeChannel.setFileDescription(activeChannel.getFileDescription() + GDE.STRING_MESSAGE_CONCAT + firmwareHardwareDescription);
 							device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 						}
 

@@ -23,6 +23,8 @@ Device specific changes/fixes
 	* Graupner Ultra Duo Plus - fix missing update while reading battery data using device dialog
 	* Graupner HoTT MDL Viewer plug-in update 9.4
 	* Graupner HoTTAdapter2 - add missing call parsing GAM data while only a GAM is connected to receiver 
+	* Junsi iCharger X6 - initial release
+	* Junsi iCharger X8 - initial release
 
 History analysis
 

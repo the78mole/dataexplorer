@@ -78,7 +78,7 @@ public class iCharger4010DUO extends iChargerUsb {
 		points[6] = DataParser.parse2Short(dataBuffer, 20);
 		points[7] = DataParser.parse2Short(dataBuffer, 22);
 		//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8
-		for (int i = 0,j=0; i < 10; i++,j+=2) {
+		for (int i = 0,j=0; i < this.getNumberOfLithiumCells(); i++,j+=2) {
 			points[i+9] = DataParser.parse2Short(dataBuffer, 24+j);
 			if (points[i + 9] > 0) {
 				maxVotage = points[i + 9] > maxVotage ? points[i + 9] : maxVotage;
