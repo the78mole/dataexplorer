@@ -33,6 +33,8 @@ import java.util.logging.Logger;
 import javax.usb.UsbDisconnectedException;
 import javax.usb.UsbInterface;
 
+import org.usb4java.DeviceHandle;
+
 /**
  * @author Winfried Brügmann
  */
@@ -73,6 +75,31 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 
 		try {
 			this.read(iface, this.endpointOut, data, TIMEOUT);
+			
+			if (log.isLoggable(Level.FINE)) {
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
+				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, DataParser.parse2Int(data, 3)/1000/60 + " min " + (DataParser.parse2Int(data, 3)/1000)%60 + " sec run time");
+			}
+		}
+		catch (Exception e) {
+				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
+				if (e instanceof UsbDisconnectedException) throw e;
+		}
+		return data;
+	}
+
+	/**
+	 * method to gather data from device, implementation is individual for device
+	 * @param libUsbHandle the valid device handle to communicate through USB-HID 
+	 * @return byte array containing gathered data - this can individual specified per device
+	 * @throws IOException
+	 */
+	public synchronized byte[] getData(final DeviceHandle libUsbHandle) throws Exception {
+		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
+		byte[] data = new byte[Math.abs(this.dataSize)];
+
+		try {
+			this.read(libUsbHandle, this.endpointOut, data, (long)TIMEOUT);
 			
 			if (log.isLoggable(Level.FINE)) {
 				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));

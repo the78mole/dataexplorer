@@ -794,6 +794,13 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * @return the product string of the device to be used for communication
+	 */
+	public String getUsbProductString() {
+		return this.usbPort.getProductString();
+	}
+
+	/**
 	 * @return the interface address to be used for communication
 	 */
 	public byte getUsbInterface() {

@@ -1072,14 +1072,19 @@ public interface IDevice {
 	public int getCurrentSmoothIndex();
 
 	/**
-	 * @return the vendor ID of the USB port to be used for device communication
+	 * @return the vendor ID of the USB definition to be used for device communication
 	 */
 	public short getUsbVendorId();
 
 	/**
-	 * @return the product ID of the device to be used for communication
+	 * @return the product ID of the device USB definition to be used for communication
 	 */
 	public short getUsbProductId();
+
+	/**
+	 * @return the product string of the device USb definition to be used for communication
+	 */
+	public String getUsbProductString();
 
 	/**
 	 * @return the interface address to be used for communication

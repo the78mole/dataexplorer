@@ -23,20 +23,25 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DataBlockType;
 import gde.device.DeviceConfiguration;
+import gde.device.FormatTypes;
 import gde.device.IDevice;
 import gde.device.InputTypes;
+import gde.device.MeasurementType;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.io.CSVSerialDataReaderWriter;
+import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.utils.FileUtils;
 import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
+import java.util.Vector;
 
 import javax.usb.UsbClaimException;
 import javax.usb.UsbException;
@@ -303,8 +308,9 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 									}
 								}
 								CSVSerialDataReaderWriter.read(selectedImportFile, iChargerUsb.this, recordNameExtend, 1, 
-										new  DataParserDuo(getDataBlockTimeUnitFactor(), getDataBlockLeader(), getDataBlockSeparator().value(), null, null, Math.abs(getDataBlockSize(InputTypes.FILE_IO)), getDataBlockFormat(InputTypes.FILE_IO), false, 2)
-								);
+										new  DataParserDuo(getDataBlockTimeUnitFactor(), getDataBlockLeader(), getDataBlockSeparator().value(), null, null, 
+												 getNoneCalculationMeasurementNames(1, getMeasurementNames(1)).length, 
+												 getDataBlockFormat(InputTypes.FILE_IO), false, 2));
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage(), e);
@@ -327,5 +333,226 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	 */
 	public String getBattrieType(final byte[] databuffer) {
 		return this.BATTERIE_TYPE[databuffer[8]];
+	}
+
+	/**
+	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
+	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
+	 * @param points pointer to integer array to be filled with converted data
+	 * @param dataBuffer byte arrax with the data to be converted
+	 */
+	@Override
+	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
+		int maxVotage = Integer.MIN_VALUE;
+		int minVotage = Integer.MAX_VALUE;
+
+		//2C 10 01 F8 7D 07 00 02 01 00 E5 FF 04 87 2B 3C CF FF FF FF 64 01 00 00 02 0F 0B 0F 0E 0F 00 0F 00 00 00 00 00 00 00 00 00 00 00
+	  //                                    34564 15403             35,6        3842  3851  3854  3840
+		switch (dataBuffer[7]) {
+		default: //LOG_NORMAL = 0, LOG_CHARGE = 1, LOG_DISCHARGE = 2, LOG_MONITOR = 3, LOG_WASTE = 4, LOG_PRECHARGE = 5, LOG_OVER = 6,
+			//LOG_ERR = 7, LOG_TRICKLE = 8, LOG_ONLYBAL = 9, LOG_INFO = 11, LOG_DIGITPOWER = 30,
+			//byte[0] length; byte[1] type, byte[2] channel, byte[3..6]ushort timeStamp, byte[7] logState, byte[8] battType, byte[9] cycleCount
+			//short current, ushort Vin, ushort Vbat, int capacity, short tempInt, short tempExt, int Vcell1, int Vcell2, ....
+			//0=Current 1=SupplyVoltage. 2=Voltage
+			points[0] = DataParser.parse2Short(dataBuffer, 10);
+			points[1] = DataParser.parse2UnsignedShort(dataBuffer, 12);
+			points[2] = DataParser.parse2Short(dataBuffer, 14);
+			//3=Capacity 4=Power 5=Energy
+			points[3] = DataParser.parse2Int(dataBuffer, 16);
+			points[4] = points[0] * points[2] / 100; 																	// power U*I [W]
+			points[5] = Double.valueOf(points[2]/1.0 * points[3]/1000.0).intValue();	// energy U*C [mWh]
+			//6=Temp.intern 7=Temp.extern
+			points[6] = DataParser.parse2Short(dataBuffer, 20);
+			points[7] = DataParser.parse2Short(dataBuffer, 22);
+			//9=VoltageCell1 10=VoltageCell2 11=VoltageCell3 12=VoltageCell4 13=VoltageCell5 14=VoltageCell6 ... VoltageCell[numberOfLithiumCells]
+			for (int i = 0,j=0; i < this.getNumberOfLithiumCells(); i++,j+=2) {
+				points[i+9] = DataParser.parse2Short(dataBuffer, 24+j);
+				if (points[i + 9] > 0) {
+					maxVotage = points[i + 9] > maxVotage ? points[i + 9] : maxVotage;
+					minVotage = points[i + 9] < minVotage ? points[i + 9] : minVotage;
+				}
+			}
+			//8=Balance
+			points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+			break;
+			
+		case (byte) 0x80: //LOG_EX_IR = 0x80
+			//byte[0] length; byte[1] type, byte[2] channel, byte[3..6]ushort timeStamp, byte[7] logState, byte[8] battType, byte[9] cycleCount
+			//short PackIR, short CellIR1, .... CellIR[CELL_MAX]
+			int offset = 9 + this.getNumberOfLithiumCells();
+			points[offset] = DataParser.parse2UnsignedShort(dataBuffer, 8); //BatteryRi
+	
+			//CellRi1, CellRi2, ... CellRi(numberOfLithiumCells)
+			for (int i = 0,j=0; i < this.getNumberOfLithiumCells(); i++,j+=2) {
+				points[i+1+offset] = DataParser.parse2UnsignedShort(dataBuffer, 10+j);
+			}
+			break;
+		}
+
+		return points;
+	}
+
+	/**
+	 * add record data size points from file stream to each measurement
+	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
+	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
+	 * since this is a long term operation the progress bar should be updated to signal business to user
+	 * @param recordSet
+	 * @param dataBuffer
+	 * @param recordDataSize
+	 * @param doUpdateProgressBar
+	 * @throws DataInconsitsentException
+	 */
+	@Override
+	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
+		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		byte[] convertBuffer = new byte[dataBufferSize];
+		int[] points = new int[recordSet.size()];
+		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		int progressCycle = 0;
+		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
+		int offset = 9 + this.getNumberOfLithiumCells();
+
+		for (int i = 0; i < recordDataSize; i++) {
+			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize); //$NON-NLS-1$
+			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
+
+			//0=Current. 1=SupplyVoltage 2=Voltage
+			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
+			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
+			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
+			//3=Capacity 4=Power 5=Energy
+			points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
+			points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue(); 						// power U*I [W]
+			points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
+			//6=Temp.intern 7=Temp.extern
+			points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
+			points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
+
+			int maxVotage = Integer.MIN_VALUE;
+			int minVotage = Integer.MAX_VALUE;
+			//7=VoltageCell1 8=VoltageCell2 9=VoltageCell3 10=VoltageCell4 11=VoltageCell5 12=VoltageCell6 ...... NumberOfLithiumCells
+			for (int j=0, k=0; j < this.getNumberOfLithiumCells(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+				points[j + 9] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff) << 0));
+				if (points[j + 9] > 0) {
+					maxVotage = points[j + 9] > maxVotage ? points[j + 9] : maxVotage;
+					minVotage = points[j + 9] < minVotage ? points[j + 9] : minVotage;
+				}
+			}
+			//calculate balance on the fly
+			points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+			
+			//BatteryRi
+			points[offset] = (((convertBuffer[offset+24]&0xff) << 24) + ((convertBuffer[offset+25]&0xff) << 16) + ((convertBuffer[offset+26]&0xff) << 8) + ((convertBuffer[offset+27]&0xff) << 0));
+			for (int j=0, k=0; j < this.getNumberOfLithiumCells(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+				points[j + offset + 1] = (((convertBuffer[k+offset+1+24]&0xff) << 24) + ((convertBuffer[k+offset+1+25]&0xff) << 16) + ((convertBuffer[k+offset+1+26]&0xff) << 8) + ((convertBuffer[k+offset+1+27]&0xff) << 0));
+			}
+
+			recordSet.addPoints(points);
+
+			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
+		}
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		recordSet.syncScaleOfSyncableRecords();
+	}
+
+	/**
+	 * function to calculate values for inactive records, data not readable from device
+	 * if calculation is done during data gathering this can be a loop switching all records to displayable
+	 * for calculation which requires more effort or is time consuming it can call a background thread,
+	 * target is to make sure all data point not coming from device directly are available and can be displayed
+	 */
+	@Override
+	public void makeInActiveDisplayable(RecordSet recordSet) {
+		// since there are live measurement points only the calculation will take place directly after switch all to displayable
+		if (recordSet.isRaw()) {
+			// calculate the values required
+			try {
+				//0=Current 1=SupplyVoltage. 2=Voltage 3=Capacity 4=Power 5=Energy 6=Temp.intern 7=Temp.extern 8=Balance
+				//9=VoltageCell1 10=VoltageCell2 11=VoltageCell3 12=VoltageCell4 13=VoltageCell5 14=VoltageCell6 12=VoltageCell6 ...... NumberOfLithiumCells
+				int displayableCounter = 0;
+
+				Record recordCurrent = recordSet.get(0);
+				Record recordVoltage = recordSet.get(2);
+				Record recordCapacity = recordSet.get(3);
+				Record recordPower = recordSet.get(4);
+				Record recordEnergy = recordSet.get(5);
+				Record recordBalance = recordSet.get(8);
+
+				recordPower.clear();
+				recordEnergy.clear();
+				recordBalance.clear();
+
+				for (int i = 0; i < recordCurrent.size(); i++) {
+					//4=Power 5=Energy
+					recordPower.add(recordVoltage.get(i) * recordCurrent.get(i) / 100); // power U*I [W]
+					recordEnergy.add(recordVoltage.get(i) * recordCapacity.get(i) / 1000); // energy U*C [mWh]
+
+					int maxVotage = Integer.MIN_VALUE;
+					int minVotage = Integer.MAX_VALUE;
+					for (int j = 0; j < this.getNumberOfLithiumCells(); j++) {
+						Record  selectedRecord = recordSet.get(j + 9);
+						if (selectedRecord.size() > i) {
+							int value = selectedRecord.get(i);
+							if (value > 0) {
+								maxVotage = value > maxVotage ? value : maxVotage;
+								minVotage = value < minVotage ? value : minVotage;
+							}
+						}
+					}
+					//8=Balance
+					recordBalance.add(maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
+
+				}
+
+				// check if measurements isActive == false and set to isDisplayable == false
+				for (int i = 0; i < recordSet.size(); i++) {
+					Record record = recordSet.get(i);
+					if (record.isActive() && record.hasReasonableData()) {
+						++displayableCounter;
+					}
+				}
+
+				log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+				recordSet.setConfiguredDisplayable(displayableCounter);
+
+				if (this.channels.getActiveChannel().getActiveRecordSet() == null || recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
+					this.application.updateGraphicsWindow();
+				}
+			}
+			catch (RuntimeException e) {
+				log.log(Level.SEVERE, e.getMessage(), e);
+			}
+		}
+	}
+
+	/**
+	 * method to get the sorted active or in active record names as string array
+	 * - records which does not have inactive or active flag are calculated from active or inactive
+	 * - all records not calculated may have the active status and must be stored
+	 * @param channelConfigNumber
+	 * @param validMeasurementNames based on the current or any previous configuration
+	 * @return String[] containing record names
+	 */
+	@Override
+	public String[] getNoneCalculationMeasurementNames(int channelConfigNumber, String[] validMeasurementNames) {
+		final Vector<String> tmpCalculationRecords = new Vector<String>();
+		final String[] deviceMeasurements = this.getMeasurementNames(channelConfigNumber);
+		int deviceDataBlockSize = Math.abs(this.getDataBlockSize(FormatTypes.VALUE)) + getNumberOfLithiumCells() + 1;
+		deviceDataBlockSize = this.getDataBlockSize(FormatTypes.VALUE) <= 0 ? deviceMeasurements.length : deviceDataBlockSize;
+		// record names may not match device measurements, but device measurements might be more then existing records
+		for (int i = 0; i < deviceMeasurements.length && i < validMeasurementNames.length; ++i) {
+			final MeasurementType measurement = this.getMeasurement(channelConfigNumber, i);
+			if (!measurement.isCalculation()) { // active or inactive
+				tmpCalculationRecords.add(validMeasurementNames[i]);
+			}
+			// else
+			// System.out.println(measurement.getName());
+		}
+		// assume attached records are calculations like DataVario
+		while (tmpCalculationRecords.size() > deviceDataBlockSize) {
+			tmpCalculationRecords.remove(deviceDataBlockSize);
+		}
+		return tmpCalculationRecords.toArray(new String[0]);
 	}
 }

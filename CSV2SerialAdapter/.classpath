@@ -8,6 +8,7 @@
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/DataExplorer"/>
 	<classpathentry kind="lib" path="/build/lib/usb-api.jar"/>
+	<classpathentry kind="lib" path="/build/lib/usb4java.jar"/>
 	<classpathentry kind="lib" path="/build/lib/jaxb-api.jar"/>
 	<classpathentry kind="var" path="SWT_JAR_PATH"/>
 	<classpathentry kind="output" path="classes"/>

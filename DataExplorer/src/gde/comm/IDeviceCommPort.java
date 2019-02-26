@@ -31,6 +31,9 @@ import javax.usb.UsbInterface;
 import javax.usb.UsbNotActiveException;
 import javax.usb.UsbNotClaimedException;
 
+import org.usb4java.DeviceHandle;
+import org.usb4java.LibUsbException;
+
 import gde.device.IDevice;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.FailedQueryException;
@@ -249,7 +252,7 @@ public interface IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public void dumpUsbDevices(final short vendorId, final short productId) throws UsbException;
-	
+
 	
 	/**
 	 * claim USB interface with given number which correlates to open a USB port
@@ -259,6 +262,15 @@ public interface IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public UsbInterface openUsbPort(final IDevice activeDevice) throws UsbClaimException, UsbException;
+	
+	/**
+	 * claim USB interface with given number which correlates to open a USB port
+	 * @param IDevice the actual device in use
+	 * @return
+	 * @throws UsbClaimException
+	 * @throws UsbException
+	 */
+	public DeviceHandle openLibUsbPort(final IDevice activeDevice) throws UsbClaimException, UsbException;
 
 	/**
 	 * release or close the given interface
@@ -267,6 +279,14 @@ public interface IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public void closeUsbPort(final UsbInterface usbInterface) throws UsbClaimException, UsbException;
+
+	/**
+	 * release or close the given interface
+	 * @param usbInterface
+	 * @throws UsbClaimException
+	 * @throws UsbException
+	 */
+	public void closeLibUsbPort(final DeviceHandle libUsbHandle) throws UsbClaimException, UsbException;
 
 	/**
 	 * write a byte array of data using the given interface and its end point address
@@ -307,5 +327,27 @@ public interface IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public int read(final UsbInterface iface, final byte endpointAddress, byte[] data, final int timeout_msec) throws UsbNotActiveException, UsbNotClaimedException, UsbDisconnectedException, UsbException;
+
+	
+  /**
+   * Writes some data byte array to the device.
+   * @param handle The device handle.
+   * @param outEndpoint The end point address
+   * @param data the byte array for data with length as size to be send 
+   * @param timeout_ms the time out in milli seconds
+   * @throws LibUsbException while data transmission failed
+   */
+  public void write(final DeviceHandle handle, final byte outEndpoint, final byte[] data, final long timeout_ms) throws LibUsbException;
+
+  /**
+   * Reads some data with length from the device
+   * @param handle The device handle.
+   * @param inEndpoint The end point address
+   * @param data the byte array for data with length as size to be received 
+   * @param timeout_ms the time out in milli seconds
+   * @return The number of bytes red
+   * @throws LibUsbException while data transmission failed
+   */
+  public int read(final DeviceHandle handle, final byte inEndpoint, final byte[] data, final long timeout_ms) throws LibUsbException;
 
 }

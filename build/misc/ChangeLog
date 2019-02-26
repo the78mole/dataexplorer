@@ -17,14 +17,20 @@ Generic changes/fixes
 	* remove usb4java jar version numbers to enable update
 	* update usb4java to version 1.3.0
 	* UsbPortImpl cleanup code, remove unchecked warning, add dump methods
+	* add LibUsb library code which is closer to hardware and enable use of productString as additional USB-HID constrain
+	* update XSD to enable additional UsbPort productString
 
 Device specific changes/fixes
 	* Graupner Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)
 	* Graupner Ultra Duo Plus - fix missing update while reading battery data using device dialog
 	* Graupner HoTT MDL Viewer plug-in update 9.4
 	* Graupner HoTTAdapter2 - add missing call parsing GAM data while only a GAM is connected to receiver 
-	* Junsi iCharger X6 - initial release
-	* Junsi iCharger X8 - initial release
+	* Junsi iCharger X6 - add initial release
+	* Junsi iCharger X8 - add initial release
+	* Junsi iCharger 406Duo - add initial release
+	* Junsi iCharger* - prepare for upcoming FW release enabling Ri logging
+	* GPS-Logger2 - update device selection picture
+	* GPS-Logger3 - update device selection picture
 
 History analysis
 

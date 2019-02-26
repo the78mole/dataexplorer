@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V34.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V35.xsd">
     <Device>
         <name implementation="gde.device.smmodellbau.GPSLogger3">GPS-Logger3</name>
         <manufacturer>SM-Modellbau</manufacturer>
         <manufacturerURL>https://www.sm-modellbau.de</manufacturerURL>
         <group>logger</group>
-        <image>GPS-Logger.png</image>
+        <image>GPS-Logger3.png</image>
         <usage>false</usage>
     </Device>
     <TimeBase>
@@ -466,7 +466,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
-            <Measurement>
+             <Measurement>
                 <name>acceleration X</name>
                 <symbol>x</symbol>
                 <unit>g</unit>

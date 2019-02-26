@@ -38,8 +38,9 @@ import java.util.logging.Logger;
 
 import javax.usb.UsbDisconnectedException;
 import javax.usb.UsbException;
-import javax.usb.UsbInterface;
 import javax.usb.UsbNotClaimedException;
+
+import org.usb4java.DeviceHandle;
 
 /**
  * Thread implementation to gather data from eStation device
@@ -63,7 +64,7 @@ public class UsbGathererThread extends Thread {
 	boolean							isPortOpenedByLiveGatherer	= false;
 	boolean							isGatheredRecordSetVisible	= true;
 	boolean							isCollectDataStopped				= false;
-	UsbInterface				usbInterface								= null;
+	DeviceHandle				libUsbHandle								= null;
 	boolean							isProgrammExecuting1				= false;
 	boolean							isProgrammExecuting2				= false;
 	boolean							isProgrammExecuting3				= false;
@@ -90,7 +91,7 @@ public class UsbGathererThread extends Thread {
 		this.channel = this.channels.get(this.channelNumber);
 
 		if (!this.usbPort.isConnected()) {
-			this.usbInterface = this.usbPort.openUsbPort(this.device);
+			this.libUsbHandle = this.usbPort.openLibUsbPort(this.device);
 			this.isPortOpenedByLiveGatherer = true;
 		}
 		this.setPriority(Thread.MAX_PRIORITY);
@@ -128,7 +129,7 @@ public class UsbGathererThread extends Thread {
 							this.application.setSerialRxOn();
 							this.application.setSerialTxOff();
 						}
-						dataBuffer = this.usbPort.getData(this.usbInterface);
+						dataBuffer = this.usbPort.getData(this.libUsbHandle);
 						if (this.application != null) this.application.setSerialRxOff();
 
 						this.isProgrammExecuting1 = dataBuffer[2] == 0x01; //output channel 1
@@ -218,8 +219,8 @@ public class UsbGathererThread extends Thread {
 		}
 		finally {
 			try {
-				if (this.usbInterface != null) {
-					this.device.usbPort.closeUsbPort(this.usbInterface);
+				if (this.libUsbHandle != null) {
+					this.device.usbPort.closeLibUsbPort(this.libUsbHandle);
 					UsbGathererThread.log.log(Level.FINE, "USB interface closed");
 				}
 			}
@@ -421,7 +422,7 @@ public class UsbGathererThread extends Thread {
 		return this.isCollectDataStopped;
 	}
 	
-	public UsbInterface getUsbInterface() {
-		return this.usbInterface;
+	public DeviceHandle getLibUsbHandle() {
+		return this.libUsbHandle;
 	}
 }

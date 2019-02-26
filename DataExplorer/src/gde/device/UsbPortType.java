@@ -40,6 +40,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "UsbPortType", propOrder = {
     "vendorId",
     "productId",
+    "productString",
     "usbInterface",
     "timeOut"
 })
@@ -49,6 +50,8 @@ public class UsbPortType {
     protected String vendorId;
     @XmlElement(required = true)
     protected String productId;
+    @XmlElement(required = false)
+    protected String productString;
     @XmlElement(required = true)
     protected UsbInterfaceType usbInterface;
     @XmlElement(name = "TimeOut")
@@ -100,6 +103,30 @@ public class UsbPortType {
      */
     public void setProductId(String value) {
         this.productId = value;
+    }
+
+    /**
+     * Gets the value of the productString property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getProductString() {
+        return productString;
+    }
+
+    /**
+     * Sets the value of the productString property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setProductString(String value) {
+        this.productString = value;
     }
 
     /**

@@ -129,7 +129,8 @@ public class DataParser extends NMEAParser implements IDataParser {
 									? this.device.getNumberOfMeasurements(this.channelConfigNumber)
 									: Math.abs(this.dataBlockSize)
 							: strValues.length - 4;
-				this.values = new int[this.valueSize];
+				//enable iCharger Ri values
+				if (!device.getName().startsWith("iCharger")) this.values = new int[this.valueSize];
 				DataParser.log.log(Level.FINER, "parser inputLine = " + inputLine); //$NON-NLS-1$
 
 				parse(inputLine, strValues);

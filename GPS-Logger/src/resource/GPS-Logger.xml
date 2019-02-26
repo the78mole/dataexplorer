@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V34.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V35.xsd">
     <Device>
         <name implementation="gde.device.smmodellbau.GPSLogger">GPS-Logger</name>
         <manufacturer>SM-Modellbau</manufacturer>
@@ -429,7 +429,7 @@
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
-            <Measurement>
+             <Measurement>
                 <name>voltage_UL</name>
                 <symbol>U</symbol>
                 <unit>V</unit>

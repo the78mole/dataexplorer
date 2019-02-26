@@ -25,10 +25,10 @@ import javax.xml.bind.JAXBException;
 import gde.device.DeviceConfiguration;
 
 /**
- * @author brueg
- *
+ * Junsi iCharger X8 device class
+ * @author Winfried Brügmann
  */
-public class iChargerX8 extends iCharger308DUO {
+public class iChargerX8 extends iChargerUsb {
 
 	/**
 	 * @param deviceProperties
@@ -46,6 +46,15 @@ public class iChargerX8 extends iCharger308DUO {
 	public iChargerX8(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * query number of Lithium cells of this charger device
+	 * @return
+	 */
+	@Override
+	public int getNumberOfLithiumCells() {
+		return 8;
 	}
 
 }

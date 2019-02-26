@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import gde.GDE;
 import gde.device.CheckSumTypes;
 import gde.device.FormatTypes;
+import gde.device.InputTypes;
 import gde.exception.DevicePropertiesInconsistenceException;
 import gde.io.DataParser;
 import gde.messages.MessageIds;
@@ -79,34 +80,62 @@ public class DataParserDuo extends DataParser {
 
 		strValue = strValues[1].trim();
 		this.state = Integer.parseInt(strValue);
+		
+		switch (this.state) {
+		default: 
+			strValue = strValues[2].trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT);
+			strValue = strValue.length() > 0 ? strValue : "0";
+			if (this.start_time_ms == Integer.MIN_VALUE) {
+				this.start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
+			}
+			else {
+				this.time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - this.start_time_ms; // Seconds * 1000 = msec			
+			}
 
-		strValue = strValues[2].trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT);
-		strValue = strValue.length() > 0 ? strValue : "0";
-		if (this.start_time_ms == Integer.MIN_VALUE) {
-			this.start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
-		}
-		else {
-			this.time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - this.start_time_ms; // Seconds * 1000 = msec			
-		}
-
-		for (int i = 0+offset; i < this.valueSize+offset; i++) {
-			strValue = strValues[i + 3].trim();
-			try {
-				double tmpValue = strValue.length() > 0 ? Double.parseDouble(strValue.trim()) : 0.0;
-				if (this.isMultiply1000 && tmpValue < Integer.MAX_VALUE / 1000 && tmpValue > Integer.MIN_VALUE / 1000)
-					this.values[i-offset] = (int) (tmpValue * 1000); // enable 3 positions after decimal place
-				else // needs special processing within IDevice.translateValue(), IDevice.reverseTranslateValue()
-				if (tmpValue < Integer.MAX_VALUE || tmpValue > Integer.MIN_VALUE) {
-					this.values[i-offset] = (int) tmpValue;
+			for (int i = offset; i < Math.abs(device.getDataBlockSize(InputTypes.FILE_IO))+offset; i++) {
+				strValue = strValues[i + 3].trim();
+				try {
+					double tmpValue = strValue.length() > 0 ? Double.parseDouble(strValue.trim()) : 0.0;
+					if (this.isMultiply1000 && tmpValue < Integer.MAX_VALUE / 1000 && tmpValue > Integer.MIN_VALUE / 1000)
+						this.values[i-offset] = (int) (tmpValue * 1000); // enable 3 positions after decimal place
+					else // needs special processing within IDevice.translateValue(), IDevice.reverseTranslateValue()
+					if (tmpValue < Integer.MAX_VALUE || tmpValue > Integer.MIN_VALUE) {
+						this.values[i-offset] = (int) tmpValue;
+					}
+					else {
+						this.values[i-offset] = (int) (tmpValue / 1000);
+					}
 				}
-				else {
-					this.values[i-offset] = (int) (tmpValue / 1000);
+				catch (NumberFormatException e) {
+					this.values[i-offset] = 0;
 				}
 			}
-			catch (NumberFormatException e) {
-				this.values[i-offset] = 0;
+			break;
+			
+		case 128: //0x80 BattRi
+			int valueOffset = ((iChargerUsb)this.device).getNoneCalculationMeasurementNames(1, ((iChargerUsb)this.device).getMeasurementNames(1)).length - ((iChargerUsb)this.device).getNumberOfLithiumCells() - 1;
+			strValue = strValues[2].trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT);
+			strValue = strValue.length() > 0 ? strValue : "0";
+			if (this.start_time_ms == Integer.MIN_VALUE) {
+				this.start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
 			}
+			else {
+				this.time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - this.start_time_ms; // Seconds * 1000 = msec			
+			}
+
+			for (int i = 0; i < this.valueSize-valueOffset; i++) {
+				strValue = strValues[i + 1 + offset].trim();
+				try {
+					double tmpValue = strValue.length() > 0 ? Double.parseDouble(strValue.trim()) : 0.0;
+					this.values[i + valueOffset] = (int) tmpValue;
+				}
+				catch (NumberFormatException e) {
+					this.values[i + valueOffset] = 0;
+				}
+			}
+			break;
 		}
+
 
 		//check time reset to force a new data set creation
 		if (this.device.getTimeStep_ms() < 0 && this.time_ms <= 0 && this.isTimeResetEnabled) {

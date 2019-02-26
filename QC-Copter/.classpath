@@ -6,6 +6,7 @@
 	<classpathentry kind="var" path="SWT_JAR_PATH" sourcepath="/SWT_SOURCE_PATH"/>
 	<classpathentry kind="lib" path="/build/lib/RXTXcomm.jar" sourcepath="/RXTXcomm/src"/>
 	<classpathentry kind="lib" path="/build/lib/usb-api.jar"/>
+	<classpathentry kind="lib" path="/build/lib/usb4java.jar"/>
 	<classpathentry kind="lib" path="/build/lib/jaxb-api.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

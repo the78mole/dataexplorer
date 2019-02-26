@@ -216,7 +216,8 @@ public class CSVSerialDataReaderWriter {
 
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + activeChannelConfigNumber + " state = " + data.getState());
 
-						recordSetNameExtend = device.getRecordSetStateNameReplacement(data.getState());
+						//enable adding iCharger Ri values
+						recordSetNameExtend = (device.getName().startsWith("iCharger") && data.getState() == 128) ? recordSetNameExtend : device.getRecordSetStateNameReplacement(data.getState());
 						if (recordNameExtend.length() > 0) {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}

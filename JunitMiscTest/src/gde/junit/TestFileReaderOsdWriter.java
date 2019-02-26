@@ -44,6 +44,7 @@ import gde.device.graupner.HoTTlogReader;
 import gde.device.graupner.HoTTlogReader2;
 import gde.device.jeti.JetiAdapter;
 import gde.device.jeti.JetiDataReader;
+import gde.device.junsi.DataParserDuo;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedException;
@@ -233,6 +234,80 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						activeChannel.setSaved(true);
 
 						RecordSet recordSet = gde.device.robbe.CSVReaderWriter.read(';', file.getAbsolutePath(), "csv test");
+
+						if (recordSet != null) {
+							activeChannel.setActiveRecordSet(recordSet);
+							activeChannel.applyTemplate(recordSet.getName(), true);
+							//device.makeInActiveDisplayable(recordSet);
+							drawCurves(recordSet, 1024, 768);
+						}
+
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
+						System.out.println("writing as   : " + absolutFilePath);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						failures.put(file.getAbsolutePath(), e);
+					}
+				}
+			}
+
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
+	/**
+	 * test reading Junsi iCharger *.txt log files files from device directory and writes OSD files to %TEMP%\Write_1_OSD
+	 * all consistent files must red without failures
+	 */
+	public final void testJunsiCsvReaderOsdWriter() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		this.setDataPath(); //set the dataPath variable
+
+		try {
+			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
+
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".txt") && file.getPath().toLowerCase().contains("icharger")) {
+					System.out.println("working with : " + file);
+
+					try {
+						//System.out.println("file.getPath() = " + file.getPath());
+						String deviceName = file.getAbsolutePath().substring(file.getAbsolutePath().indexOf("iCharger"), file.getAbsolutePath().lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
+						System.out.println("deviceName = " + deviceName);
+						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+						if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
+
+						IDevice device = this.getInstanceOfDevice(deviceConfig);
+						this.analyzer.setActiveDevice(device);
+
+						setupDataChannels(device);
+
+						this.channels.setActiveChannelNumber(1);
+						Channel activeChannel = this.channels.getActiveChannel();
+						activeChannel.setFileName(file.getAbsolutePath());
+						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
+						activeChannel.setSaved(true);
+
+						RecordSet recordSet = CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "test txt import", 1, 
+								new  DataParserDuo(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), null, null, 
+										Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)), device.getDataBlockFormat(InputTypes.FILE_IO), false, 2)	);
+
 
 						if (recordSet != null) {
 							activeChannel.setActiveRecordSet(recordSet);
