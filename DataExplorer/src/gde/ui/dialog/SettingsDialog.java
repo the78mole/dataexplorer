@@ -1361,7 +1361,7 @@ public class SettingsDialog extends Dialog {
 							this.fontSizeGroup.setLayout(fontSizeGroupLayout);
 							RowData fontSizeGroupLData = new RowData();
 							fontSizeGroupLData.width = 478;
-							fontSizeGroupLData.height = 70;
+							//fontSizeGroupLData.height = 70;
 							this.fontSizeGroup.setLayoutData(fontSizeGroupLData);
 							this.fontSizeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.fontSizeGroup.setText(Messages.getString(MessageIds.GDE_MSGT0727));
@@ -1386,6 +1386,7 @@ public class SettingsDialog extends Dialog {
 									}
 								});
 							}
+							this.fontSizeGroup.layout();
 						}
 						{
 							this.graphicsView = new Group(this.miscComposite, SWT.NONE);
@@ -1397,7 +1398,7 @@ public class SettingsDialog extends Dialog {
 							this.graphicsView.setLayout(chargerSpecialsLayout);
 							RowData graphicsViewLData = new RowData();
 							graphicsViewLData.width = 478;
-							graphicsViewLData.height = 160;
+							//graphicsViewLData.height = 160;
 							this.graphicsView.setLayoutData(graphicsViewLData);
 							this.graphicsView.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.graphicsView.setText(Messages.getString(MessageIds.GDE_MSGT0692));
@@ -1494,6 +1495,7 @@ public class SettingsDialog extends Dialog {
 									}
 								});
 							}
+							this.graphicsView.layout();
 						}
 						{
 							this.dataTableGroup = new Group(this.miscComposite, SWT.NONE);
@@ -1505,7 +1507,7 @@ public class SettingsDialog extends Dialog {
 							this.dataTableGroup.setLayout(chargerSpecialsLayout);
 							RowData dataTableGroupLData = new RowData();
 							dataTableGroupLData.width = 478;
-							dataTableGroupLData.height = 70;
+							//dataTableGroupLData.height = 70;
 							this.dataTableGroup.setLayoutData(dataTableGroupLData);
 							this.dataTableGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.dataTableGroup.setText(Messages.getString(MessageIds.GDE_MSGT0702));
@@ -1538,6 +1540,7 @@ public class SettingsDialog extends Dialog {
 									}
 								});
 							}
+							this.dataTableGroup.layout();
 						}
 						{
 							this.chargerSpecials = new Group(this.miscComposite, SWT.NONE);
@@ -1549,7 +1552,7 @@ public class SettingsDialog extends Dialog {
 							this.chargerSpecials.setLayout(chargerSpecialsLayout);
 							RowData chargerSpecialsLData = new RowData();
 							chargerSpecialsLData.width = 478;
-							chargerSpecialsLData.height = 80;
+							//chargerSpecialsLData.height = 80;
 							this.chargerSpecials.setLayoutData(chargerSpecialsLData);
 							this.chargerSpecials.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.chargerSpecials.setText(Messages.getString(MessageIds.GDE_MSGT0690));
@@ -1610,6 +1613,7 @@ public class SettingsDialog extends Dialog {
 									}
 								});
 							}
+							this.chargerSpecials.layout();
 						}
 					}
 				}
