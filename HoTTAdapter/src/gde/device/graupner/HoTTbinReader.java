@@ -522,8 +522,17 @@ public class HoTTbinReader {
 		long position = (fileLength / 2) - ((NUMBER_LOG_RECORDS_TO_SCAN * 64) / 2);
 		position = position - position % 64;
 		if (position > 0) {
+			position = position - 64;
 			position = position <= 64 ? 64 : position;
-			data_in.skip(position - 64);
+			
+			long skipped = 0, iterationCount = -1;
+			while ((skipped = data_in.skip(position)) < position && iterationCount < 3) {
+				position -= skipped;
+				++iterationCount;
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "position " + position + " skipped " + skipped);
+			}
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "position " + position + " skipped " + skipped);
+			
 			for (int i = 0; i < NUMBER_LOG_RECORDS_TO_SCAN && data_in.available() >= 64; i++) {
 				data_in.read(buffer);
 				Sensor tmpSensor = Sensor.fromSensorByte(buffer[7]);
@@ -995,6 +1004,7 @@ public class HoTTbinReader {
 		HoTTbinReader.buf2 = new byte[30];
 		HoTTbinReader.buf3 = new byte[30];
 		HoTTbinReader.buf4 = new byte[30];
+		boolean isBufferZero = false;
 		BufCopier bufCopier = new BufCopier(buf, buf0, buf1, buf2, buf3, buf4);
 		long[] timeSteps_ms = new long[] {0};
 		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, new int[10], timeSteps_ms, new byte[][] { buf });
@@ -1090,8 +1100,7 @@ public class HoTTbinReader {
 						else
 							actualSensor = (byte) (HoTTbinReader.buf[7] & 0xFF);
 
-						if (actualSensor != lastSensor) {
-							// write data just after sensor switch
+						if (isBufferZero) { // write data just after sensor switch
 							if (logCountVario >= 3 || logCountGPS >= 4 || logCountGeneral >= 5 || logCountElectric >= 5 || logCountSpeedControl >= 5) {
 								switch (lastSensor) {
 								case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
@@ -1276,6 +1285,7 @@ public class HoTTbinReader {
 					HoTTbinReader.isTextModusSignaled = true;
 					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2404));
 				}
+				isBufferZero = buf[33] == 4; //after switch to buffer 4 enable data take over while buffer is 0
 			}
 			// if (HoTTbinReader.oldProtocolCount > 2) {
 			// application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2405,

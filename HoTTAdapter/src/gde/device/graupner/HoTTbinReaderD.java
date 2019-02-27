@@ -389,6 +389,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		BufCopier bufCopier = new BufCopier(buf, buf0, buf1, buf2, buf3, buf4);
 		byte actualSensor = -1, lastSensor = -1;
 		int logCountVario = 0, logCountGPS = 0, logCountGAM = 0, logCountEAM = 0, logCountESC = 0;
+		boolean isBufferZero = false;
 		pickerParameters.reverseChannelPackageLossCounter.clear();
 		HoTTbinReader.lostPackages.clear();
 		HoTTbinReader.countLostPackages = 0;
@@ -472,9 +473,8 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						//												break;
 						//											}
 
-						if (actualSensor != lastSensor) {
+						if (isBufferZero) { // write data just after sensor switch
 							if (logCountVario >= 5 || logCountGPS >= 5 || logCountGAM >= 5 || logCountEAM >= 5 || logCountESC >= 5) {
-								//							System.out.println();
 								switch (lastSensor) {
 								case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 								case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
@@ -627,6 +627,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 					HoTTbinReader.isTextModusSignaled = true;
 					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2404));
 				}
+				isBufferZero = buf[33] == 4; //after switch to buffer 4 enable data take over while buffer is 0
 			}
 			if (HoTTbinReader.oldProtocolCount > 2) {
 				HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2405, new Object[] { HoTTbinReader.oldProtocolCount }));
