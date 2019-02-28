@@ -245,6 +245,15 @@ public class UsbGathererThread extends Thread {
 		Object[] result = new Object[2];
 		boolean isReduceChargeDischarge = this.settings.isReduceChargeDischarge();
 		boolean isContinuousRecordSet = this.settings.isContinuousRecordSet();
+		
+		if (dataBuffer[7] == 128) { //LOG_EX_IR = 0x80 only integrate Ri values
+			if (UsbGathererThread.log.isLoggable(Level.FINE)) 
+				UsbGathererThread.log.log(Level.FINE, String.format("channel:%d integrate Ri values", number));
+			this.device.convertDataBytes(points, dataBuffer);
+			result[0] = recordSet;
+			result[1] = processRecordSetKey;
+			return result;
+		}
 
 		//BATTERY_TYPE 1=LiPo 2=LiIo 3=LiFe 4=NiMH 5=NiCd 6=Pb 7=NiZn
 		String batterieType = this.device.getBattrieType(dataBuffer);
@@ -257,7 +266,7 @@ public class UsbGathererThread extends Thread {
 			UsbGathererThread.log.log(Level.FINE, String.format("channel:%d %s %s %s", number, batterieType, processTypeName, processStatusName).trim());
 		}
 		
-		//Mode： 		1=CHARGE 2=DISCHARGE 4=PAUSE
+		//Mode： 	1=CHARGE 2=DISCHARGE 4=PAUSE
 		if (isReduceChargeDischarge && dataBuffer[7] == 4) {
 			result[0] = recordSet;
 			result[1] = processRecordSetKey;

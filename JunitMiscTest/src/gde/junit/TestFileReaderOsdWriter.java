@@ -45,6 +45,7 @@ import gde.device.graupner.HoTTlogReader2;
 import gde.device.jeti.JetiAdapter;
 import gde.device.jeti.JetiDataReader;
 import gde.device.junsi.DataParserDuo;
+import gde.device.junsi.iChargerUsb;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedException;
@@ -291,7 +292,8 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						String deviceName = file.getAbsolutePath().substring(file.getAbsolutePath().indexOf("iCharger"), file.getAbsolutePath().lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
 						System.out.println("deviceName = " + deviceName);
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
-						if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
+						if (deviceConfig == null) 
+							throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
 
 						IDevice device = this.getInstanceOfDevice(deviceConfig);
 						this.analyzer.setActiveDevice(device);
@@ -304,9 +306,15 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
 						activeChannel.setSaved(true);
 
-						RecordSet recordSet = CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "test txt import", 1, 
-								new  DataParserDuo(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), null, null, 
-										Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)), device.getDataBlockFormat(InputTypes.FILE_IO), false, 2)	);
+						RecordSet recordSet = (device instanceof iChargerUsb) 
+								?	CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "test txt import", 1, 
+										new  DataParserDuo(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), null, null, 
+												device.getNoneCalculationMeasurementNames(1, device.getMeasurementNames(1)).length, 
+												device.getDataBlockFormat(InputTypes.FILE_IO), false, 2))							
+								: CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "test txt import", 1, 
+										new  DataParserDuo(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), null, null, 
+												Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)), 
+												device.getDataBlockFormat(InputTypes.FILE_IO), false, 2));
 
 
 						if (recordSet != null) {

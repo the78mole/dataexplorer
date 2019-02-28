@@ -442,10 +442,11 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			//calculate balance on the fly
 			points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 			
-			//BatteryRi
-			points[offset] = (((convertBuffer[offset+24]&0xff) << 24) + ((convertBuffer[offset+25]&0xff) << 16) + ((convertBuffer[offset+26]&0xff) << 8) + ((convertBuffer[offset+27]&0xff) << 0));
-			for (int j=0, k=0; j < this.getNumberOfLithiumCells(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
-				points[j + offset + 1] = (((convertBuffer[k+offset+1+24]&0xff) << 24) + ((convertBuffer[k+offset+1+25]&0xff) << 16) + ((convertBuffer[k+offset+1+26]&0xff) << 8) + ((convertBuffer[k+offset+1+27]&0xff) << 0));
+			if (recordSet.size() > 9 + this.getNumberOfLithiumCells()) {//BatteryRi
+				points[offset] = (((convertBuffer[offset+24]&0xff) << 24) + ((convertBuffer[offset+25]&0xff) << 16) + ((convertBuffer[offset+26]&0xff) << 8) + ((convertBuffer[offset+27]&0xff) << 0));
+				for (int j=0, k=0; j < this.getNumberOfLithiumCells(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+					points[j + offset + 1] = (((convertBuffer[k+offset+1+24]&0xff) << 24) + ((convertBuffer[k+offset+1+25]&0xff) << 16) + ((convertBuffer[k+offset+1+26]&0xff) << 8) + ((convertBuffer[k+offset+1+27]&0xff) << 0));
+				}
 			}
 
 			recordSet.addPoints(points);
