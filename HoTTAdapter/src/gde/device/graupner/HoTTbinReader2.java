@@ -327,7 +327,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		boolean isReceiverData = false;
 		HoTTbinReader2.recordSet = null;
 		boolean isJustMigrated = false;
-		boolean isBufferZero = false;
 		// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
 		// 10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
 		// 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
@@ -423,7 +422,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						else
 							actualSensor = (byte) (HoTTbinReader.buf[7] & 0xFF);
 
-						if (isBufferZero) { // write data just after sensor switch
+						if (actualSensor != lastSensor) {
 							if (logCountVario >= 3 || logCountGPS >= 4 || logCountGAM >= 5 || logCountEAM >= 5 || logCountESC >= 4) {
 								switch (lastSensor) {
 								case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
@@ -556,7 +555,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					HoTTbinReader.isTextModusSignaled = true;
 					HoTTbinReader.application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2404));
 				}
-				isBufferZero = buf[33] == 4; //after switch to buffer 4 enable data take over while buffer is 0
 			}
 			// if (HoTTbinReader.oldProtocolCount > 2) {
 			// application.openMessageDialogAsync(Messages.getString(gde.device.graupner.hott.MessageIds.GDE_MSGW2405, new Object[] {
