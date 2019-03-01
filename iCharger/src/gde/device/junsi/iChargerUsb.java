@@ -377,8 +377,8 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			break;
 			
 		case (byte) 0x80: //LOG_EX_IR = 0x80
-			//byte[0] length; byte[1] type, byte[2] channel, byte[3..6]ushort timeStamp, byte[7] logState, byte[8] battType, byte[9] cycleCount
-			//short PackIR, short CellIR1, .... CellIR[CELL_MAX]
+			//byte[0] length; byte[1] type, byte[2] channel, byte[3..6]ushort timeStamp, byte[7] logState, 
+			//short[8,9] PackIR, short[10,11] CellIR1, .... CellIR[CELL_MAX]
 			int offset = 9 + this.getNumberOfLithiumCells();
 			points[offset] = DataParser.parse2UnsignedShort(dataBuffer, 8); //BatteryRi
 	

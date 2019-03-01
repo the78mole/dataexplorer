@@ -34,6 +34,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.WaitTimer;
 
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import javax.usb.UsbDisconnectedException;
@@ -143,11 +144,11 @@ public class UsbGathererThread extends Thread {
 						// check if device is ready for data capturing, charge,discharge or pause only
 						if (this.isProgrammExecuting1 || this.isProgrammExecuting2) {
 							lastEnergie1 = points1[5];
-							points1 = new int[this.device.getNumberOfMeasurements(1)];
+							//points1 = new int[this.device.getNumberOfMeasurements(1)]; //move initialization of point array to processDataChannel for new recordSet created.
 							
 							if (this.isProgrammExecuting2) {
 								lastEnergie2 = points2[5];
-								points2 = new int[this.device.getNumberOfMeasurements(2)];
+								//points2 = new int[this.device.getNumberOfMeasurements(2)]; //move initialization of point array to processDataChannel for new recordSet created.
 							}
 
 							if (this.isProgrammExecuting1) { // checks for processes active includes check state change waiting to discharge to charge
@@ -246,10 +247,14 @@ public class UsbGathererThread extends Thread {
 		boolean isReduceChargeDischarge = this.settings.isReduceChargeDischarge();
 		boolean isContinuousRecordSet = this.settings.isContinuousRecordSet();
 		
-		if (dataBuffer[7] == 128) { //LOG_EX_IR = 0x80 only integrate Ri values
+		if (dataBuffer[7] == (byte)0x80) { //LOG_EX_IR = 0x80 only integrate Ri values
 			if (UsbGathererThread.log.isLoggable(Level.FINE)) 
 				UsbGathererThread.log.log(Level.FINE, String.format("channel:%d integrate Ri values", number));
 			this.device.convertDataBytes(points, dataBuffer);
+			result[0] = recordSet;
+			result[1] = processRecordSetKey;
+			return result;
+		} else if (isReduceChargeDischarge && dataBuffer[7] == 4) { //skip Mode: 4=PAUSE
 			result[0] = recordSet;
 			result[1] = processRecordSetKey;
 			return result;
@@ -266,13 +271,6 @@ public class UsbGathererThread extends Thread {
 			UsbGathererThread.log.log(Level.FINE, String.format("channel:%d %s %s %s", number, batterieType, processTypeName, processStatusName).trim());
 		}
 		
-		//Mode： 	1=CHARGE 2=DISCHARGE 4=PAUSE
-		if (isReduceChargeDischarge && dataBuffer[7] == 4) {
-			result[0] = recordSet;
-			result[1] = processRecordSetKey;
-			return result;
-		}
-
 		Channel outputChannel = this.channels.get(number);
 		if (outputChannel != null) {
 			// check if a record set matching for re-use is available and prepare a new if required
@@ -303,6 +301,7 @@ public class UsbGathererThread extends Thread {
 				// switch the active record set if the current record set is child of active channel
 				this.channels.switchChannel(outputChannel.getNumber(), processRecordSetKey);
 				outputChannel.switchRecordSet(processRecordSetKey);
+				Arrays.fill(points, 0); //clear points array for the new recordSet created
 			}
 
 			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));

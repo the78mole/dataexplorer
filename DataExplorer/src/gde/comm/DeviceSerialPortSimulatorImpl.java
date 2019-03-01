@@ -55,6 +55,7 @@ import gde.exception.ApplicationConfigurationException;
 import gde.exception.FailedQueryException;
 import gde.exception.SerialPortException;
 import gde.exception.TimeOutException;
+import gde.io.DataParser;
 import gde.io.LogViewReader;
 import gde.log.Level;
 import gde.messages.MessageIds;
@@ -710,6 +711,64 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public DeviceHandle openLibUsbPort(final IDevice activeDevice) throws LibUsbException, UsbException {
+		try {
+			if (this.application != null) {
+				GDE.display.syncExec(new Runnable() {
+					public void run() {
+						String path;
+						if (application.isObjectoriented()) {
+							path = application.getObjectFilePath();
+						}
+						else {
+							String devicePath = application.getActiveDevice() != null ? GDE.STRING_FILE_SEPARATOR_UNIX + application.getActiveDevice().getName() : GDE.STRING_EMPTY;
+							path = application.getActiveDevice() != null ? settings.getDataFilePath() + devicePath + GDE.STRING_FILE_SEPARATOR_UNIX : settings.getDataFilePath();
+							if (!FileUtils.checkDirectoryAndCreate(path)) {
+								if (!FileUtils.checkDirectoryExist(path)) 
+									application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0056, new Object[] { path }));
+								else
+									application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0012, new Object[] { path }));
+							}
+						}
+						FileDialog openFileDialog = application.openFileOpenDialog("Open File used as simulation input", new String[] { GDE.FILE_ENDING_STAR_LOV, GDE.FILE_ENDING_STAR_TXT,
+								GDE.FILE_ENDING_STAR_LOG }, path, null, SWT.SINGLE);
+						if (openFileDialog.getFileName().length() > 4) {
+							String openFilePath = (openFileDialog.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + openFileDialog.getFileName()).replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+
+							try {
+								if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
+									fileType = GDE.FILE_ENDING_STAR_OSD;
+									//add implementation to use *.osd files as simulation data input
+								}
+								else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
+									fileType = GDE.FILE_ENDING_STAR_LOV;
+									data_in = new DataInputStream(new FileInputStream(new File(openFilePath)));
+									LogViewReader.readHeader(data_in);
+								}
+								else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
+									fileType = GDE.FILE_ENDING_STAR_TXT;
+									txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
+									txt_in.read();
+								}
+								else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_LOG)) {
+									fileType = GDE.FILE_ENDING_STAR_LOG;
+									txt_in = new BufferedReader(new InputStreamReader(new FileInputStream(openFilePath), "ISO-8859-1")); //$NON-NLS-1$
+								}
+								else
+									application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGI0008) + openFilePath);
+							}
+							catch (Exception e) {
+								log.log(Level.SEVERE, e.getMessage(), e);
+							}
+						}
+						isConnected = data_in != null || txt_in != null;
+						application.setPortConnected(isConnected);
+					}
+				});
+			}
+		}
+		catch (Throwable e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
 		return null;
 	}
 
@@ -720,7 +779,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public void closeUsbPort(final UsbInterface usbInterface) throws UsbClaimException, UsbException {
-		//no explicit return result
+		this.close();
 	}
 
 	/**
@@ -730,7 +789,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 * @throws UsbException
 	 */
 	public void closeLibUsbPort(final DeviceHandle libUsbDeviceHanlde) throws LibUsbException, UsbException {
-		//no explicit return result
+		this.close();
 	}
 	
 	/**
@@ -807,7 +866,66 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
    * @throws LibUsbException while data transmission failed
    */
   public int read(final DeviceHandle handle, final byte inEndpoint, final byte[] data, final long timeout_ms) throws LibUsbException {
-  	return 0;
-  }
+		try {
+			wait4Bytes((int) timeout_ms);
+		}
+		catch (InterruptedException e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
+		catch (TimeOutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		byte[] readBuffer = new byte[data.length];
+		if (this.isConnected) {
+			try {
+				if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
+					if (data_in.read(readBuffer) > 0) {
+						int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
+						if (data_in.read(new byte[size2Read]) != size2Read) {
+							log.log(Level.WARNING, "expected byte size to  read does not macht really red size of bytes !");
+						}
+						if (this.device.getName().toLowerCase().contains("icharger")) {
+							byte[] tmpBuffer = new byte[ Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO))];
+							System.arraycopy(readBuffer, 5, tmpBuffer, 0, tmpBuffer.length-5);
+							System.arraycopy(tmpBuffer, 0, readBuffer, 0, tmpBuffer.length);	
+							int timeStamp = DataParser.parse2Int(readBuffer, 3);
+							//System.out.println("timeStamp = " + timeStamp);
+							if (timeStamp % 5000 == 0) {
+								System.out.println(StringHelper.byte2Hex2CharString(readBuffer));
+								System.out.println("inject IR data");
+								byte[] irBuffer = new byte[64 - 7];
+								irBuffer[7 - 7] = (byte) 0x80;
+								irBuffer[8 - 7] = (byte) 0xF4; //pack  ri
+								irBuffer[9 - 7] = 0x01; //pack  ri
+								irBuffer[10 - 7] = 0x65;//cell1 ri
+								irBuffer[12 - 7] = 0x64;//cell2 ri
+								irBuffer[14 - 7] = 0x63;//cell3 ri
+								irBuffer[16 - 7] = 0x63;//cell4 ri
+								irBuffer[18 - 7] = 0x65;//cell5 ri
+								System.arraycopy(irBuffer, 0, readBuffer, 7, 64 - 7);
+								System.out.println(StringHelper.byte2Hex2CharString(readBuffer));
+							}
+							//2C 10 01 90D00300 01 01 00 C7006C86394C850000008A0100003C0F3A0F3B0F3C0F330F000000000000000000000000000000000000000000000000000000000000
+							//2C 10 01 90D00300 80 3200 0A00 0900 0A00 0A00 0B00 0000 000000000000000000000000000000000000000000000000000000000000000000000000000000000
+						}
+					}
+					else {
+						readBuffer = new byte[0];
+						this.close();
+					}
+				}
+			} catch (Exception e) {
+				
+			}
+		}
+		System.arraycopy(readBuffer, 0, data, 0, data.length);
+		return readBuffer.length;
+	}
 
 }
