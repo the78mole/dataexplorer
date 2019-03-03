@@ -117,7 +117,7 @@ public class VisualizationControl extends Composite {
 				if (activeRecordSet != null)
 					recordMeasurement.setUnit(activeRecordSet.get(i).getUnit());
 				this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, recordMeasurement,
-							this.device, 1, GDE.STRING_BLANK + i, ""));
+							this.device, 1, GDE.STRING_BLANK + i, GDE.STRING_EMPTY));
 			}
 		}
 	}

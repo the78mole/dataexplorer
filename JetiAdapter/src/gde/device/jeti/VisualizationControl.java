@@ -113,7 +113,7 @@ public class VisualizationControl extends Composite {
 			List<MeasurementType> measurementTypes = this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber);
 			for (int i = this.measurementOffset; i < this.measurementOffset + this.measurementCount; i++) {
 				this.measurementControls.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i,
-						measurementTypes.get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), ""));
+						measurementTypes.get(i), this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), GDE.STRING_EMPTY));
 			}
 			this.mainTabComposite.layout();
 		}

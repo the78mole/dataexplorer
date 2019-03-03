@@ -114,7 +114,7 @@ public class VisualizationControl extends Composite {
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
 				if (i > 3) {
 					this.measurementTypes.add(new MeasurementControlConfigurable(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i),
-							this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), ""));
+							this.device, 1, GDE.STRING_BLANK + (i - this.measurementOffset), GDE.STRING_EMPTY));
 				}
 				else {
 					this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i), this.device, 1));

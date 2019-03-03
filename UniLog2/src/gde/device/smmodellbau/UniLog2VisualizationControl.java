@@ -117,7 +117,7 @@ public class UniLog2VisualizationControl extends Composite {
 				}
 				else if (this.typeName.startsWith(Messages.getString(MessageIds.GDE_MSGT2511)) && i > 16 && i < 20) {
 					this.measurementTypes.add(new MeasurementControlConfigurable(this, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i), this.device,
-							1, "A" + (i - 16), GDE.STRING_BLANK)); //$NON-NLS-1$
+							1, "A" + (i - 16), GDE.STRING_EMPTY)); //$NON-NLS-1$
 				}
 				else {
 					this.measurementTypes.add(new MeasurementControl(this, this.dialog, this.channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(this.channelConfigNumber).get(i), this.device, 1));

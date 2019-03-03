@@ -21,6 +21,7 @@ package gde.ui;
 import gde.GDE;
 import gde.data.Channel;
 import gde.data.Channels;
+import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DataTypes;
 import gde.device.DeviceDialog;
@@ -287,7 +288,9 @@ public class MeasurementControlConfigurable extends Composite {
 			if (activeRecordSet != null) {
 				String syncMeasurementName_1 = this.measurementType.getName().endsWith(this.filterExtend) ? this.measurementType.getName().substring(0, this.measurementType.getName().length() - this.filterExtend.length()) : this.measurementType.getName();
 				String syncMeasurementName_0 = activeRecordSet.get(syncMeasurementName_1.split(GDE.STRING_BLANK)[0]) != null && syncMeasurementName_1.contains(syncMeasurementName_1.split(GDE.STRING_BLANK)[0])
-						? syncMeasurementName_1.split(GDE.STRING_BLANK)[0] : syncMeasurementName_1.split(GDE.STRING_BLANK)[0] + GDE.STRING_BLANK + 1;
+						? syncMeasurementName_1.split(GDE.STRING_BLANK)[0] 
+						: syncMeasurementName_1.split(GDE.STRING_BLANK)[0] + GDE.STRING_BLANK + 1;
+
 				if (activeRecordSet.get(syncMeasurementName_0) != null && activeRecordSet.get(syncMeasurementName_0).getOrdinal() != this.ordinal) {
 					this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,	activeRecordSet.get(syncMeasurementName_0).getOrdinal());
 					isEnabled = true;
@@ -295,6 +298,27 @@ public class MeasurementControlConfigurable extends Composite {
 				else if (activeRecordSet.get(syncMeasurementName_1) != null && activeRecordSet.get(syncMeasurementName_1).getOrdinal() != this.ordinal) {
 					this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,	activeRecordSet.get(syncMeasurementName_1).getOrdinal());
 					isEnabled = true;
+				}
+				
+				if (!isEnabled) { //check measurement name stem, first four characters and unit match
+					syncMeasurementName_1 = this.measurementType.getName().length() > 4 ? this.measurementType.getName().substring(0, 4) : this.measurementType.getName();
+					String syncMeasurementUnit_1 = this.measurementType.getUnit();
+					Record toBeSyncRecord = activeRecordSet.get(this.measurementType.getName());
+					for (String recordKey : activeRecordSet.getRecordNames()) {
+						Record tmpSyncMasterRecord = activeRecordSet.get(recordKey);
+						String tmpSyncMasterRecordName = tmpSyncMasterRecord.getName().length() > 4 ? tmpSyncMasterRecord.getName().substring(0, 4) : tmpSyncMasterRecord.getName();
+						if (toBeSyncRecord != null && log.isLoggable(Level.FINE)) 
+							log.log(Level.FINE, String.format("tmpSyncMasterRecord name %s, ordinal %d : toBeSyncRecord name %s, ordinal %d", tmpSyncMasterRecord.getName(), tmpSyncMasterRecord.getOrdinal(), toBeSyncRecord.getName(), toBeSyncRecord.getOrdinal()));
+						if (toBeSyncRecord != null 
+								&& tmpSyncMasterRecord.getUnit().equals(syncMeasurementUnit_1) 
+								&& tmpSyncMasterRecordName.equals(syncMeasurementName_1) 
+								&& tmpSyncMasterRecord.getOrdinal() != activeRecordSet.get(this.measurementType.getName()).getOrdinal()
+								&& tmpSyncMasterRecord.getOrdinal() < activeRecordSet.get(this.measurementType.getName()).getOrdinal()) {
+							this.device.setMeasurementPropertyValue(this.channelConfigNumber, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value(), DataTypes.INTEGER,	tmpSyncMasterRecord.getOrdinal());
+							isEnabled = true;
+							break;
+						}							
+					}
 				}
 			}
 		}
