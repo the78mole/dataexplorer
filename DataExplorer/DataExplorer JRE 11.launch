@@ -15,8 +15,30 @@
     </listAttribute>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR" value="false"/>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+    <listAttribute key="org.eclipse.jdt.launching.CLASSPATH">
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry path=&quot;5&quot; projectName=&quot;DataExplorer&quot; type=&quot;1&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/jaxb-api.jar&quot; path=&quot;5&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/jaxb-core.jar&quot; path=&quot;5&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/jaxb-runtime.jar&quot; path=&quot;5&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/istack-commons-runtime.jar&quot; path=&quot;5&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/activation.jar&quot; path=&quot;5&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry containerPath=&quot;SWT_JAR_PATH&quot; path=&quot;5&quot; sourceAttachmentPath=&quot;/SWT_SOURCE_PATH&quot; sourceRootPath=&quot;&quot; type=&quot;3&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/jSerialComm.jar&quot; path=&quot;5&quot; sourceAttachmentPath=&quot;/jSerialComm&quot; sourceRootPath=&quot;&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/RXTXcomm.jar&quot; path=&quot;5&quot; sourceAttachmentPath=&quot;/RXTXcomm/src&quot; sourceRootPath=&quot;&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/usb4java.jar&quot; path=&quot;5&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/commons-lang3.jar&quot; path=&quot;5&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry containerPath=&quot;USB4JAVA_PATH&quot; path=&quot;5&quot; type=&quot;3&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/usb-api.jar&quot; path=&quot;5&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/usb4java-javax.jar&quot; path=&quot;5&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/gson.jar&quot; path=&quot;5&quot; type=&quot;2&quot;/&gt;&#10;"/>
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry internalArchive=&quot;/build/lib/juniversalchardet.jar&quot; path=&quot;5&quot; type=&quot;2&quot;/&gt;&#10;"/>
+    </listAttribute>
+    <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
     <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/Java SE 11.0.1"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="gde.GDE"/>
+    <listAttribute key="org.eclipse.jdt.launching.MODULEPATH">
+        <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#10;&lt;runtimeClasspathEntry containerPath=&quot;org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/Java SE 11.0.1&quot; path=&quot;4&quot; type=&quot;4&quot;/&gt;&#10;"/>
+    </listAttribute>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="DataExplorer"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms64M -Xmx1024m -DECLIPSE=true"/>
 </launchConfiguration>
