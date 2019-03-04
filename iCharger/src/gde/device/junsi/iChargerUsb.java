@@ -330,9 +330,15 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	 * query the batteries type BATTERY_TYPE 1=LiPo 2=LiIo 3=LiFe 4=NiMH 5=NiCd 6=Pb 7=NiZn
 	 * @param databuffer
 	 * @return
+	 * @throws DataInconsitsentException 
 	 */
-	public String getBattrieType(final byte[] databuffer) {
-		return this.BATTERIE_TYPE[databuffer[8]];
+	public String getBattrieType(final byte[] databuffer) throws DataInconsitsentException {
+		try {
+			return this.BATTERIE_TYPE[databuffer[8]];
+		}
+		catch (Exception e) {
+			throw new DataInconsitsentException("could not detect battery type !");
+		}
 	}
 
 	/**
