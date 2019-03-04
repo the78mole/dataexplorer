@@ -46,6 +46,7 @@ import gde.device.jeti.JetiAdapter;
 import gde.device.jeti.JetiDataReader;
 import gde.device.junsi.DataParserDuo;
 import gde.device.junsi.iChargerUsb;
+import gde.device.logview.ZeroReaderWriter;
 import gde.exception.DataInconsitsentException;
 import gde.exception.DataTypeException;
 import gde.exception.NotSupportedException;
@@ -315,6 +316,80 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 										new  DataParserDuo(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), null, null, 
 												Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)), 
 												device.getDataBlockFormat(InputTypes.FILE_IO), false, 2));
+
+
+						if (recordSet != null) {
+							activeChannel.setActiveRecordSet(recordSet);
+							activeChannel.applyTemplate(recordSet.getName(), true);
+							//device.makeInActiveDisplayable(recordSet);
+							drawCurves(recordSet, 1024, 768);
+						}
+
+						if (!new File(this.tmpDir1).exists())
+							throw new FileNotFoundException(this.tmpDir1);
+
+						String absolutFilePath = this.tmpDir1 + file.getName();
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_cvs.osd";
+						System.out.println("writing as   : " + absolutFilePath);
+						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
+					}
+					catch (Exception e) {
+						e.printStackTrace();
+						failures.put(file.getAbsolutePath(), e);
+					}
+				}
+			}
+
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			fail(e.toString());
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for (String key : failures.keySet()) {
+			sb.append(key).append(" - ").append(failures.get(key).getMessage()).append("\n");
+		}
+		if (failures.size() > 0) fail(sb.toString());
+	}
+
+	/**
+	 * test reading log files following the LogView OpenFormat Zero and writes OSD files to %TEMP%\Write_1_OSD
+	 * all consistent files must red without failures
+	 */
+	public final void testLogViewZeroCsvReaderOsdWriter() {
+		HashMap<String, Exception> failures = new HashMap<String, Exception>();
+
+		this.setDataPath(); //set the dataPath variable
+
+		try {
+			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
+
+			for (File file : files) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".txt") && file.getPath().toLowerCase().contains("zero")) {
+					System.out.println("working with : " + file);
+
+					try {
+						//System.out.println("file.getPath() = " + file.getPath());
+						String deviceName = "ZeroAdapter";
+						//System.out.println("deviceName = " + deviceName);
+						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
+						if (deviceConfig == null) 
+							throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");
+
+						IDevice device = this.getInstanceOfDevice(deviceConfig);
+						this.analyzer.setActiveDevice(device);
+
+						setupDataChannels(device);
+
+						this.channels.setActiveChannelNumber(1);
+						Channel activeChannel = this.channels.getActiveChannel();
+						activeChannel.setFileName(file.getAbsolutePath());
+						activeChannel.setFileDescription(StringHelper.getDateAndTime() + " - imported from CSV file");
+						activeChannel.setSaved(true);
+
+						RecordSet recordSet = ZeroReaderWriter.read(device.getDataBlockSeparator().value().charAt(0), 
+								file.getAbsolutePath(), device.getRecordSetStemNameReplacement());
 
 
 						if (recordSet != null) {
@@ -2172,8 +2247,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 	}
 
 	/**
-	 * test reading CSV(.txt) JLog2 files in configured base directory (DataExplorer.properties and writes OSD files to %TEMP%\Write_1_OSD
-	 * all files must identical except time stamp
+	 * test reading Jeti *.log log files in configured base directory (DataExplorer.properties and writes OSD files to %TEMP%\Write_1_OSD
 	 */
 	public final void testJetiAdapterReaderOsdWriter() {
 		HashMap<String, Exception> failures = new HashMap<String, Exception>();

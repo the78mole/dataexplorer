@@ -45,5 +45,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/UniTrend"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ArduPilot"/>
 	<classpathentry kind="lib" path="/build/lib/jaxb-api.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/LogView-Zero"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
