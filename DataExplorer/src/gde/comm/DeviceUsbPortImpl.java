@@ -717,17 +717,24 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
    * @throws LibUsbException while data transmission failed
    */
   public int read(final DeviceHandle handle, final byte inEndpoint, final byte[] data, final long timeout_ms) throws LibUsbException {
-  	
+  	int readBytes = 0;
       ByteBuffer buffer = BufferUtils.allocateByteBuffer(data.length).order(ByteOrder.LITTLE_ENDIAN);
       IntBuffer transferred = BufferUtils.allocateIntBuffer();
       
       int result = LibUsb.bulkTransfer(handle, inEndpoint, buffer, transferred, timeout_ms);
       if (result != LibUsb.SUCCESS) {
+        readBytes = transferred.get();
+        if (readBytes != (buffer.get(0) & 0xFF))
           throw new LibUsbException("Unable to read data", result);
+        else 
+          buffer.get(data, 0, readBytes);
+        
+  			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, readBytes + " bytes received");
+        return readBytes;
       }
-      buffer.get(data, 0, data.length);
+      readBytes = transferred.get();
+      buffer.get(data, 0, readBytes);
       
-      int readBytes = transferred.get();
       
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, readBytes + " bytes received");
       return readBytes;
