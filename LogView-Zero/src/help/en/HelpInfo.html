@@ -46,7 +46,7 @@ The ZeroAdapter.xml file is located in the folder where the program settings are
 <li>GNU/Linux: /home/Benutzer/.DataExplorer/Devices
 <li>Mac OS X: /Users/Benutzer/Library/Application Support/DataExplore/Devices
 </ul>
-The ZeroAdapter.xml file is renamed to BrushlessPower.xml if "BrushlessPower" is the device name. 
+The ZeroAdapter.xml file is renamed to MyZeroDevice.xml if "MyZeroDevice" is the device name to be used for file import and as storage directory. 
 As an example of meaningful changes in the file should serve the following picture:
 </P>
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Image_1.png" NAME="HelpInfo_Image_1" ALT="HelpInfo_Image_1">
@@ -55,7 +55,7 @@ As an example of meaningful changes in the file should serve the following pictu
 The places where an adjustment makes sense are highlighted. The device name must match the name of the XML file.
 </P>
 <P>
-If the name of the device, here "BrushlessPower", is changed, this name will later be displayed in the device selection.
+If the name of the device, here "MyZeroDevice", is changed, this name will later be displayed in the device selection.
 </P>
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Image_2.png" NAME="HelpInfo_Image_2" ALT="HelpInfo_Image_2">
 </P>
@@ -86,8 +86,11 @@ For further description see <A HREF="../../../help/de/HelpInfo_36.html">Toolbar 
 <P ALIGN=CENTER><IMG SRC="HelpInfo_Image_4.png" NAME="HelpInfo_Image_4" ALT="HelpInfo_Image_4"></P>
 <P>
 On the right side of the display configuration is an additional switch that allows semi-automatic synchronization of the scales. 
-If you select here, the measurement name and unit match is checked. 
+If you select here, the measurement name first 4 characters and unit match is checked. 
 While a match is detected, the appropriate property is used in the device configuration file for the measured values. 
+Synchronization reference always to the first measurement match in the list of measurements as ordinal.
+This ordinal value get displayed next to the check box to help identifying the measurement which get referenced.
+This measurement can not reference to itself and therefore can not be selected.
 If this does not work automatically, there is still the possibility to set this manually via the device configuration editor. 
 Scale synchronization increases the available display area and can directly compare sensor values without using the curve comparison.
 </P>
