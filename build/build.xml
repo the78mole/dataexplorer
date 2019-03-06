@@ -995,12 +995,15 @@
 				<exclude name="**/CVS/**" />
 				<include name="build/lib/**" />
 				<include name="build/misc/**" />
+				<exclude name="build/misc/MAC_OS*/**" />
 				<include name="build/build.properties" />
 				<include name="WindowsHelper/**" />
+				<!-- exclude sample files for testing purpose unless test target is broken 
 				<include name="thirdparty/**" />
 				<exclude name="**/_SupplementObjectDirs/**" />
 				<exclude name="**/_ET_Exzerpt/**" />
 				<include name="DataFilesTestSamples/**" />
+				-->
 				<include name="**/lib/HoTTMdlViewer.jar" />
 				<exclude name="*Decoder/**" />
 				<exclude name="*Config/**" />
@@ -1036,13 +1039,9 @@
 				<exclude name="launch4j/**" />
 				<exclude name="Port*/**" />
 				<exclude name="Print*/**" />
-				<exclude name="RXTXcomm*/**" />
+				<exclude name="RXTXcomm/**" />
+				<exclude name="jSerialComm/**" />
 				<exclude name="X-Tools/**" />
-			</tarfileset>
-			<tarfileset dir="${basedir}" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="644">
-				<include name="RXTXcomm/src/**/*.dll" />
-				<include name="RXTXcomm/src/**/*.so" />
-				<include name="RXTXcomm/src/**/*.jnilib" />
 			</tarfileset>
 			<tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
 				<include name="COPYING" />
@@ -1066,11 +1065,6 @@
 				<include name="*.odt" />
 				<include name="*.pdf" />
 				<include name="design/*.pdf" />
-			</tarfileset>
-			<tarfileset dir="${basedir}/RXTXcomm" casesensitive="true" prefix="dataexplorer-${version.num}/thirdparty/rxtx-2.2pre2" filemode="444">
-				<include name="**/**" />
-				<exclude name="**/CVS/**" />
-				<exclude name="**/bin/**" />
 			</tarfileset>
 		</tar>
 	</target>
@@ -1120,9 +1114,8 @@
 	<target name="copy_misc" description="copy misc files to build/target/install" depends="init" >
 		<copy todir="${build.target.dir}" overwrite="true">
 			<fileset dir="build/misc" >
-				<include name="*USB_D*/**" />
+				<include name="*USB_HID_KEXT.zip" />
 				<include name="*UDEV*/*" />
-				<include name="*DUO*/*" />
 				<include name="GNULinux_cp210x/*" />
 				<include name="udev_rules/*" />
 				<include name="HowToCreateDevicePlugin" />

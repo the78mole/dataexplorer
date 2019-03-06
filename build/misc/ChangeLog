@@ -20,6 +20,7 @@ Generic changes/fixes
 	* add LibUsb library code which is closer to hardware and enable use of productString as additional USB-HID constrain
 	* update XSD to enable additional UsbPort productString
 	* refine semi automatic detection of scale synchronization reference
+	* update Mac OS kernel extensions for SkyRCand Junsi USB-HID hinting kext utility
 
 Device specific changes/fixes
 	* Graupner Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)
