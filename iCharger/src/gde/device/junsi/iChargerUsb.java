@@ -73,15 +73,17 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.BATTERIE_TYPE = new String[] { "? - ",      //unknown batteries type
-				Messages.getString(MessageIds.GDE_MSGT2611), //LiPo
-				Messages.getString(MessageIds.GDE_MSGT2612), //LiIo
-				Messages.getString(MessageIds.GDE_MSGT2613), //LiFe
-				Messages.getString(MessageIds.GDE_MSGT2614), //NiMH
-				Messages.getString(MessageIds.GDE_MSGT2615), //NiCd
-				Messages.getString(MessageIds.GDE_MSGT2616), //Pb
-				Messages.getString(MessageIds.GDE_MSGT2617), //NiZn
-				"? - " };//unknown batterie type
+		this.BATTERIE_TYPE = new String[] { 
+				"?",    //unknown batteries type
+				"LiPo", //LiPo
+				"LiIo", //LiIo
+				"LiFe", //LiFe
+				"NiMH", //NiMH
+				"NiCd", //NiCd
+				"Pb", 	//Pb
+				"NiZn", //NiZn
+				"LiHV", //liHv
+				"?" };  //unknown batterie type
 
 		if (this.application.getMenuToolBar() != null) {
 			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
@@ -107,15 +109,17 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.BATTERIE_TYPE = new String[] { "? - ",      //unknown batteries type
-				Messages.getString(MessageIds.GDE_MSGT2611), //LiPo
-				Messages.getString(MessageIds.GDE_MSGT2612), //LiIo
-				Messages.getString(MessageIds.GDE_MSGT2613), //LiFe
-				Messages.getString(MessageIds.GDE_MSGT2614), //NiMH
-				Messages.getString(MessageIds.GDE_MSGT2615), //NiCd
-				Messages.getString(MessageIds.GDE_MSGT2616), //Pb
-				Messages.getString(MessageIds.GDE_MSGT2617), //NiZn
-				"? - " };//unknown batterie type
+		this.BATTERIE_TYPE = new String[] { 
+				"?",    //unknown batteries type
+				"LiPo", //LiPo
+				"LiIo", //LiIo
+				"LiFe", //LiFe
+				"NiMH", //NiMH
+				"NiCd", //NiCd
+				"Pb", 	//Pb
+				"NiZn", //NiZn
+				"LiHV", //liHv
+				"?" };  //unknown batterie type
 
 		if (this.application.getMenuToolBar() != null) {
 			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
@@ -241,7 +245,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 					}
 					catch (UsbException e) {
 						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-						this.application.openMessageDialog(Messages.getString(gde.messages.MessageIds.GDE_MSGE0050));
+						this.application.openMessageDialog(e.getMessage());
 						try {
 							if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort(null);
 						}
@@ -332,7 +336,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	 * @return
 	 * @throws DataInconsitsentException 
 	 */
-	public String getBattrieType(final byte[] databuffer) throws DataInconsitsentException {
+	public String getBatteryType(final byte[] databuffer) throws DataInconsitsentException {
 		try {
 			return this.BATTERIE_TYPE[databuffer[8]];
 		}
@@ -561,5 +565,16 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			tmpCalculationRecords.remove(deviceDataBlockSize);
 		}
 		return tmpCalculationRecords.toArray(new String[0]);
+	}
+
+	/**
+	 * set the measurement ordinal of the values displayed in cell voltage window underneath the cell voltage bars
+	 * set value of -1 to suppress this measurement
+	 */
+	@Override
+	public int[] getCellVoltageOrdinals() {
+		//0=Current 1=SupplyVoltage. 2=Voltage 3=Capacity 4=Power 5=Energy 6=Temp.intern 7=Temp.extern 8=Balance
+		//9=VoltageCell1 10=VoltageCell2 11=VoltageCell3 12=VoltageCell4 13=VoltageCell5 14=VoltageCell6 12=VoltageCell6 ...... NumberOfLithiumCells
+		return new int[] {2, 3};
 	}
 }

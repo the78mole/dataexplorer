@@ -37,7 +37,20 @@ public class iChargerX8 extends iChargerUsb {
 	 */
 	public iChargerX8(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
-		// TODO Auto-generated constructor stub
+		this.BATTERIE_TYPE = new String[] { 
+				"?",    //unknown batteries type
+				"LiPo", //LiPo
+				"LiIo", //LiIo
+				"LiFe", //LiFe
+				"LiHV", //LiHv
+				"LTO", 	//LTO
+				"NiMH", //NiMH
+				"NiCd", //NiCd
+				"NiZn", //NiZn
+				"Pb", 	//Pb
+				"Power",//Power
+				"BT_User", 
+				"?" };  //unknown battery type
 	}
 
 	/**
@@ -45,7 +58,20 @@ public class iChargerX8 extends iChargerUsb {
 	 */
 	public iChargerX8(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
-		// TODO Auto-generated constructor stub
+		this.BATTERIE_TYPE = new String[] { 
+				"?",    //unknown batteries type
+				"LiPo", //LiPo
+				"LiIo", //LiIo
+				"LiFe", //LiFe
+				"LiHV", //LiHv
+				"LTO", 	//LTO
+				"NiMH", //NiMH
+				"NiCd", //NiCd
+				"NiZn", //NiZn
+				"Pb", 	//Pb
+				"Power",//Power
+				"BT_User", 
+				"?" };  //unknown battery type
 	}
 
 	/**
