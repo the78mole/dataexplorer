@@ -462,7 +462,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 
 		Set<Device> libUsbDevices = findDevices(activeDevice.getUsbVendorId(), activeDevice.getUsbProductId(), activeDevice.getUsbProductString());
 		if (libUsbDevices.size() == 0) {
-			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0050));
+			throw new UsbException(String.format("%s\n===>>>  %s", Messages.getString(MessageIds.GDE_MSGE0050), activeDevice.getUsbProductString()));
 		}
 		else if (libUsbDevices.size() == 1) {
 			for (Device libUsbDevice : libUsbDevices) {
@@ -692,9 +692,10 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
    * @param outEndpoint The end point address
    * @param data the byte array for data with length as size to be send 
    * @param timeout_ms the time out in milli seconds
-   * @throws LibUsbException while data transmission failed
+   * @throws IllegalStateException while handle not initialized
+   * @throws TimeOutException while data transmission failed
    */
-  public void write(final DeviceHandle handle, final byte outEndpoint, final byte[] data, final long timeout_ms) throws LibUsbException {
+  public void write(final DeviceHandle handle, final byte outEndpoint, final byte[] data, final long timeout_ms) throws IllegalStateException, TimeOutException {
 
       ByteBuffer buffer = BufferUtils.allocateByteBuffer(data.length);
       buffer.put(data);      
@@ -714,9 +715,10 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
    * @param data the byte array for data with length as size to be received 
    * @param timeout_ms the time out in milli seconds
    * @return The number of bytes red
-   * @throws LibUsbException while data transmission failed
+   * @throws IllegalStateException while handle not initialized
+   * @throws TimeOutException while data transmission failed
    */
-  public int read(final DeviceHandle handle, final byte inEndpoint, final byte[] data, final long timeout_ms) throws LibUsbException {
+  public int read(final DeviceHandle handle, final byte inEndpoint, final byte[] data, final long timeout_ms) throws IllegalStateException, TimeOutException {
   	int readBytes = 0;
       ByteBuffer buffer = BufferUtils.allocateByteBuffer(data.length).order(ByteOrder.LITTLE_ENDIAN);
       IntBuffer transferred = BufferUtils.allocateIntBuffer();
@@ -724,8 +726,8 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
       int result = LibUsb.bulkTransfer(handle, inEndpoint, buffer, transferred, timeout_ms);
       if (result != LibUsb.SUCCESS) {
         readBytes = transferred.get();
-        if (readBytes != (buffer.get(0) & 0xFF))
-          throw new LibUsbException("Unable to read data", result);
+        if (readBytes == 0 || readBytes != (buffer.get(0) & 0xFF))
+          throw new TimeOutException(new LibUsbException("Unable to read data", result).getMessage());
         else 
           buffer.get(data, 0, readBytes);
         

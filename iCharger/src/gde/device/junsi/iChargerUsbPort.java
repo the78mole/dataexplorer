@@ -30,7 +30,6 @@ import gde.utils.StringHelper;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.usb.UsbDisconnectedException;
 import javax.usb.UsbInterface;
 
 import org.usb4java.DeviceHandle;
@@ -43,7 +42,7 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 	final static Logger	log	= Logger.getLogger($CLASS_NAME);
 		
   // The communication timeout in milliseconds. */
-  protected static final int TIMEOUT = 1000;
+  protected static final int TIMEOUT = 1200;
   
   protected final byte interfaceId;
   protected final byte endpointIn;
@@ -83,7 +82,7 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		}
 		catch (Exception e) {
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
-				if (e instanceof UsbDisconnectedException) throw e;
+				if (e instanceof RuntimeException) throw e;
 		}
 		return data;
 	}
@@ -108,7 +107,7 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		}
 		catch (Exception e) {
 				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
-				if (e instanceof UsbDisconnectedException) throw e;
+				if (e instanceof RuntimeException) throw e;
 		}
 		return data;
 	}

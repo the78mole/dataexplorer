@@ -33,7 +33,6 @@ import javax.usb.UsbNotActiveException;
 import javax.usb.UsbNotClaimedException;
 
 import org.usb4java.DeviceHandle;
-import org.usb4java.LibUsbException;
 
 import gde.config.Settings;
 import gde.device.DeviceConfiguration;
@@ -472,9 +471,10 @@ public class DeviceCommPort implements IDeviceCommPort {
    * @param outEndpoint The end point address
    * @param data the byte array for data with length as size to be send 
    * @param timeout_ms the time out in milli seconds
-   * @throws LibUsbException while data transmission failed
+   * @throws IllegalStateException while handle not initialized
+   * @throws TimeOutException while data transmission failed
    */
-  public void write(final DeviceHandle handle, final byte outEndpoint, final byte[] data, final long timeout_ms) throws LibUsbException {
+  public void write(final DeviceHandle handle, final byte outEndpoint, final byte[] data, final long timeout_ms) throws IllegalStateException, TimeOutException {
   	this.port.write(handle, outEndpoint, data, timeout_ms);
   } 
 
@@ -485,9 +485,10 @@ public class DeviceCommPort implements IDeviceCommPort {
    * @param data the byte array for data with length as size to be received 
    * @param timeout_ms the time out in milli seconds
    * @return The number of bytes red
-   * @throws LibUsbException while data transmission failed
+   * @throws IllegalStateException while handle not initialized
+   * @throws TimeOutException while data transmission failed
    */
-  public int read(final DeviceHandle handle, final byte inEndpoint, final byte[] data, final long timeout_ms) throws LibUsbException {
+  public int read(final DeviceHandle handle, final byte inEndpoint, final byte[] data, final long timeout_ms) throws IllegalStateException, TimeOutException {
   	return this.port.read(handle, inEndpoint, data, timeout_ms);
   }
 

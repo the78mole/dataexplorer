@@ -204,6 +204,10 @@ public class UsbGathererThread extends Thread {
 						this.application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGE0050));
 						stopDataGatheringThread(false, e);
 					}
+					else if (e instanceof IllegalStateException) { //USB error detected, p.e. disconnect
+						this.application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGE0050));
+						stopDataGatheringThread(false, e);
+					}
 					// program end or unexpected exception occurred, stop data gathering to enable save data by user
 					else {
 						UsbGathererThread.log.log(Level.FINE, "data gathering end detected"); //$NON-NLS-1$
@@ -261,20 +265,20 @@ public class UsbGathererThread extends Thread {
 		}
 
 		//BATTERY_TYPE 1=LiPo 2=LiIo 3=LiFe 4=NiMH 5=NiCd 6=Pb 7=NiZn
-		String batterieType = this.device.getBattrieType(dataBuffer);
+		String batteryType = this.device.getBatteryType(dataBuffer);
 		//Mode： 		1=CHARGE 2=DISCHARGE 4=PAUSE 8=TrickleCurrent 9=Balancing
 		int processModeNumber = dataBuffer[7];
 		String processTypeName = isContinuousRecordSet ? Messages.getString(MessageIds.GDE_MSGT2618) : this.device.getRecordSetStateNameReplacement(processModeNumber);
 		//STATUS:     0=normal !0=cycle
 		String processStatusName = !isContinuousRecordSet && dataBuffer[9] != 0 ? Messages.getString(MessageIds.GDE_MSGT2610) : GDE.STRING_EMPTY;
 		if (UsbGathererThread.log.isLoggable(Level.FINE)) {
-			UsbGathererThread.log.log(Level.FINE, String.format("channel:%d %s %s %s", number, batterieType, processTypeName, processStatusName).trim());
+			UsbGathererThread.log.log(Level.FINE, String.format("channel:%d %s %s %s", number, batteryType, processTypeName, processStatusName).trim());
 		}
 		
 		Channel outputChannel = this.channels.get(number);
 		if (outputChannel != null) {
 			// check if a record set matching for re-use is available and prepare a new if required
-			if (recordSet == null || !processRecordSetKey.contains(batterieType)  || !processRecordSetKey.contains(processTypeName) || !processRecordSetKey.contains(processStatusName)) {
+			if (recordSet == null || !processRecordSetKey.contains(batteryType)  || !processRecordSetKey.contains(processTypeName) || !processRecordSetKey.contains(processStatusName)) {
 				this.application.setStatusMessage(""); //$NON-NLS-1$
 
 				// record set does not exist or is out dated, build a new name and create
@@ -289,7 +293,7 @@ public class UsbGathererThread extends Thread {
 						}
 					}
 				}
-				processRecordSetKey = String.format("%d) %s - %s %s", outputChannel.getNextRecordSetNumber(), batterieType, processTypeName, extend.toString()).trim();
+				processRecordSetKey = String.format("%d) %s - %s %s", outputChannel.getNextRecordSetNumber(), batteryType, processTypeName, extend.toString()).trim();
 				processRecordSetKey = processRecordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? processRecordSetKey : processRecordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 
 				outputChannel.put(processRecordSetKey, RecordSet.createRecordSet(processRecordSetKey, this.application.getActiveDevice(), outputChannel.getNumber(), true, false, true));
