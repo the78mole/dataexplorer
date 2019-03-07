@@ -34,20 +34,20 @@
         <preferredDataLocation></preferredDataLocation>
         <preferredFileExtention>*.txt</preferredFileExtention>
     </DataBlock>
-    <State>
-        <property name="state_charge" value="1" type="Integer" description="Ladeoperation"/>
-        <property name="state_discharge" value="2" type="Integer" description="Entladeoperation"/>
-        <property name="state_monitoring" value="3" type="Integer" description="Beobachten"/>
-        <property name="state_dry_time" value="4" type="Integer" description="Warten auf anderen Status"/>
-        <property name="state_motor_test" value="5" type="Integer" description="Motortestlauf"/>
-        <property name="state_finish" value="6" type="Integer" description="alle Programme abgelaufen"/>
-        <property name="state_error" value="7" type="Integer" description="Fehler"/>
-        <property name="state_lixx_maintain" value="8" type="Integer" description="LiXx Erhaltungsladung"/>
-        <property name="state_nixx_maintain" value="9" type="Integer" description="NiXx Erhaltungsladung"/>
+    <State>    
+        <property name="state_charge" value="1" type="Integer" description="charge operation"/>
+        <property name="state_discharge" value="2" type="Integer" description="discharge operation"/>
+        <property name="state_monitoring" value="3" type="Integer" description="monitoring"/>
+        <property name="state_dry_time" value="4" type="Integer" description="wait for different state"/>
+        <property name="state_precharge" value="5" type="Integer" description="pre-charge operation"/>
+        <property name="state_finish" value="6" type="Integer" description="all operations finished"/>
+        <property name="state_error" value="7" type="Integer" description="error"/>
+        <property name="state_trickle" value="8" type="Integer" description="ni cells trickle state"/>
+        <property name="state_balancing" value="9" type="Integer" description="balancing operation"/>
         <property name="state_foam_cut" value="10" type="Integer" description="Schaumschneideprogramm"/>
         <property name="state_info" value="11" type="Integer" description="Informationsanzeige"/>
-        <property name="state_ex_discharge" value="12" type="Integer" description="Entladeoperationende"/>
-		<property name="state_digit_power" value="30" type="Integer" description="Entladeoperationende"/>
+        <property name="state_ex_discharge" value="12" type="Integer" description="discharge operation deprecated"/>
+		<property name="state_digit_power" value="30" type="Integer" description="digit power"/>
     </State>
     <Channels>
         <Channel name="type_outlet 1" type="TYPE_OUTLET">
@@ -230,7 +230,7 @@
     <Desktop>
         <property name="table_tab" value="true"/>
         <property name="digital_tab" value="true"/>
-        <property name="analog_tab" value="true"/>
+        <property name="analog_tab" value="false"/>
         <property name="voltage_per_cell_tab" value="true" target_reference_ordinal="9"/>
         <property name="utility_garphics_tab" value="false" description="UTILITY_GRAPHICS_TAB"/>
         <property name="utility_device_tab" value="false" description="UTILITY_DEVICE_TAB"/>
