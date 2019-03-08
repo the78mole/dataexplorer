@@ -309,11 +309,11 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 
 						RecordSet recordSet = (device instanceof iChargerUsb) 
 								?	CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "test txt import", 1, 
-										new  DataParserDuo(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), null, null, 
+										new  DataParserDuo(1, device.getDataBlockLeader(), device.getDataBlockSeparator().value(), null, null, 
 												device.getNoneCalculationMeasurementNames(1, device.getMeasurementNames(1)).length, 
 												device.getDataBlockFormat(InputTypes.FILE_IO), false, 2))							
 								: CSVSerialDataReaderWriter.read(file.getAbsolutePath(), device, "test txt import", 1, 
-										new  DataParserDuo(device.getDataBlockTimeUnitFactor(), device.getDataBlockLeader(), device.getDataBlockSeparator().value(), null, null, 
+										new  DataParserDuo(1, device.getDataBlockLeader(), device.getDataBlockSeparator().value(), null, null, 
 												Math.abs(device.getDataBlockSize(InputTypes.FILE_IO)), 
 												device.getDataBlockFormat(InputTypes.FILE_IO), false, 2));
 

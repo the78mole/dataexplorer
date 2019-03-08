@@ -1,4 +1,3 @@
-package gde.device.junsi;
 /**************************************************************************************
   	This file is part of GNU DataExplorer.
 
@@ -17,7 +16,7 @@ package gde.device.junsi;
     
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
 ****************************************************************************************/
-
+package gde.device.junsi;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -51,7 +50,7 @@ public class UsbGathererThread extends Thread {
 	protected static final int	USB_QUERY_DELAY	= GDE.IS_WINDOWS ? 70 : 160;
 	final static String	$CLASS_NAME									= UsbGathererThread.class.getName();
 	final static Logger	log													= Logger.getLogger(UsbGathererThread.class.getName());
-	final static int		WAIT_TIME_RETRYS						= 3600;		// 3600 * 1 sec = 60 Minutes
+	final static int		WAIT_TIME_RETRYS						= 36000;		// 3600 * 1 sec = 600 Minutes
 
 	final DataExplorer					application;
 	final Settings							settings;
@@ -71,7 +70,12 @@ public class UsbGathererThread extends Thread {
 	boolean							isProgrammExecuting3				= false;
 	boolean							isProgrammExecuting4				= false;
 	boolean[]						isAlerted4Finish						= { false, false, false, false };
-	int									retryCounter								= UsbGathererThread.WAIT_TIME_RETRYS;	//60 Min
+	int									retryCounter								= UsbGathererThread.WAIT_TIME_RETRYS;	//600 Min
+	long								lastTimeStamp_01_ms						= 0;
+	long 								lastRecordEndTimeStamp_01_ms 	= 0;
+	long								lastTimeStamp_02_ms						= 0;
+	long 								lastRecordEndTimeStamp_02_ms 	= 0;
+
 
 	/**
 	 * data gatherer thread definition 
@@ -306,9 +310,36 @@ public class UsbGathererThread extends Thread {
 				this.channels.switchChannel(outputChannel.getNumber(), processRecordSetKey);
 				outputChannel.switchRecordSet(processRecordSetKey);
 				Arrays.fill(points, 0); //clear points array for the new recordSet created
+				switch (number) {
+				default:
+				case 1:
+					this.lastRecordEndTimeStamp_01_ms = this.device.getTimeStamp(dataBuffer);
+					this.lastTimeStamp_01_ms = 0;
+					break;
+				case 2:
+					this.lastRecordEndTimeStamp_02_ms = this.device.getTimeStamp(dataBuffer);
+					this.lastTimeStamp_02_ms = 0;
+					break;
+				}
 			}
 
-			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer));
+			long deltaTimeStamp_ms = this.device.getTimeStamp(dataBuffer) - (number == 2 ? this.lastRecordEndTimeStamp_02_ms : this.lastRecordEndTimeStamp_01_ms);
+
+			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), deltaTimeStamp_ms);
+			
+			long intervalTime_ms = deltaTimeStamp_ms - (number == 2 ? this.lastTimeStamp_02_ms : this.lastTimeStamp_01_ms);
+			if (this.usbPort.getTimeOut_ms() < intervalTime_ms)
+				this.usbPort.setTimeOut_ms(intervalTime_ms + 200);
+			
+			switch (number) {
+			default:
+			case 1:
+				this.lastTimeStamp_01_ms = this.device.getTimeStamp(dataBuffer);
+				break;
+			case 2:
+				this.lastTimeStamp_02_ms = this.device.getTimeStamp(dataBuffer);
+				break;
+			}
 
 			UsbGathererThread.this.application.updateAllTabs(false);
 

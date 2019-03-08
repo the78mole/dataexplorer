@@ -31,7 +31,9 @@ Device specific changes/fixes
 	* Junsi iCharger X6 - add initial release
 	* Junsi iCharger X8 - add initial release
 	* Junsi iCharger 406Duo - add initial release
-	* Junsi iCharger* - prepare for upcoming FW release enabling Ri logging
+	* Junsi iChargerUSB* - prepare for upcoming FW release enabling Ri logging
+	* Junsi iChargerUSB* - make import and data gathering using log time stamp -> variable log interval
+	* Junsi iChargerUSB* - update supported battery type (chemistry)
 	* GPS-Logger2 - update device selection picture
 	* GPS-Logger3 - update device selection picture
 	* ZeroAdapter - initial release to support LogView OpenFormat Zero log file evaluation

@@ -38,6 +38,7 @@ import gde.io.DataParser;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.utils.FileUtils;
+import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
 import java.io.FileNotFoundException;
@@ -312,7 +313,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 									}
 								}
 								CSVSerialDataReaderWriter.read(selectedImportFile, iChargerUsb.this, recordNameExtend, 1, 
-										new  DataParserDuo(getDataBlockTimeUnitFactor(), getDataBlockLeader(), getDataBlockSeparator().value(), null, null, 
+										new  DataParserDuo(1, getDataBlockLeader(), getDataBlockSeparator().value(), null, null, 
 												 getNoneCalculationMeasurementNames(1, getMeasurementNames(1)).length, 
 												 getDataBlockFormat(InputTypes.FILE_IO), false, 2));
 							}
@@ -422,46 +423,96 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		int offset = 9 + this.getNumberOfLithiumCells();
+		boolean isVariableIntervalTime = !recordSet.isTimeStepConstant();
+		//System.out.println("isVariableIntervalTime = " + isVariableIntervalTime);
 
-		for (int i = 0; i < recordDataSize; i++) {
-			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize); //$NON-NLS-1$
-			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
-
-			//0=Current. 1=SupplyVoltage 2=Voltage
-			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
-			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
-			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
-			//3=Capacity 4=Power 5=Energy
-			points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
-			points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue(); 						// power U*I [W]
-			points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
-			//6=Temp.intern 7=Temp.extern
-			points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
-			points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
-
-			int maxVotage = Integer.MIN_VALUE;
-			int minVotage = Integer.MAX_VALUE;
-			//7=VoltageCell1 8=VoltageCell2 9=VoltageCell3 10=VoltageCell4 11=VoltageCell5 12=VoltageCell6 ...... NumberOfLithiumCells
-			for (int j=0, k=0; j < this.getNumberOfLithiumCells(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
-				points[j + 9] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff) << 0));
-				if (points[j + 9] > 0) {
-					maxVotage = points[j + 9] > maxVotage ? points[j + 9] : maxVotage;
-					minVotage = points[j + 9] < minVotage ? points[j + 9] : minVotage;
+		if (isVariableIntervalTime) {
+			int timeStampBufferSize = GDE.SIZE_BYTES_INTEGER * recordDataSize;
+			int index = 0;
+			for (int i = 0; i < recordDataSize; i++) {
+				index = i * dataBufferSize + timeStampBufferSize;
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
+				System.arraycopy(dataBuffer, index, convertBuffer, 0, dataBufferSize);
+				
+				//0=Current. 1=SupplyVoltage 2=Voltage
+				points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff)));
+				points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff)));
+				points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff)));
+				//3=Capacity 4=Power 5=Energy
+				points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff)));
+				points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue(); 						// power U*I [W]
+				points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
+				//6=Temp.intern 7=Temp.extern
+				points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff)));
+				points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff)));
+	
+				int maxVotage = Integer.MIN_VALUE;
+				int minVotage = Integer.MAX_VALUE;
+				//7=VoltageCell1 8=VoltageCell2 9=VoltageCell3 10=VoltageCell4 11=VoltageCell5 12=VoltageCell6 ...... NumberOfLithiumCells
+				int k = 0;
+				for (int j=0; j < this.getNumberOfLithiumCells(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+					points[j + 9] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff)));
+					if (points[j + 9] > 0) {
+						maxVotage = points[j + 9] > maxVotage ? points[j + 9] : maxVotage;
+						minVotage = points[j + 9] < minVotage ? points[j + 9] : minVotage;
+					}
 				}
-			}
-			//calculate balance on the fly
-			points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
-			
-			if (recordSet.size() > 9 + this.getNumberOfLithiumCells()) {//BatteryRi
-				points[offset] = (((convertBuffer[offset+24]&0xff) << 24) + ((convertBuffer[offset+25]&0xff) << 16) + ((convertBuffer[offset+26]&0xff) << 8) + ((convertBuffer[offset+27]&0xff) << 0));
-				for (int j=0, k=0; j < this.getNumberOfLithiumCells(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
-					points[j + offset + 1] = (((convertBuffer[k+offset+1+24]&0xff) << 24) + ((convertBuffer[k+offset+1+25]&0xff) << 16) + ((convertBuffer[k+offset+1+26]&0xff) << 8) + ((convertBuffer[k+offset+1+27]&0xff) << 0));
+				//calculate balance on the fly
+				points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+				
+				if (recordSet.size() > 9 + this.getNumberOfLithiumCells()) {//BatteryRi
+					for (int j=0; j < this.getNumberOfLithiumCells()+1; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+						points[j+offset] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff)));
+					}
 				}
+	
+				recordSet.addPoints(points,
+						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff))) / 10.0);
+	
+				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);				
 			}
-
-			recordSet.addPoints(points);
-
-			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
+		} 
+		else { //older recorded files doesn't have variable log interval
+			for (int i = 0; i < recordDataSize; i++) {
+				log.log(Level.FINER, i + " i*dataBufferSize = " + i*dataBufferSize); //$NON-NLS-1$
+				System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
+	
+				//0=Current. 1=SupplyVoltage 2=Voltage
+				points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff)));
+				points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff)));
+				points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff)));
+				//3=Capacity 4=Power 5=Energy
+				points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff)));
+				points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue(); 						// power U*I [W]
+				points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
+				//6=Temp.intern 7=Temp.extern
+				points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff)));
+				points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff)));
+	
+				int maxVotage = Integer.MIN_VALUE;
+				int minVotage = Integer.MAX_VALUE;
+				//7=VoltageCell1 8=VoltageCell2 9=VoltageCell3 10=VoltageCell4 11=VoltageCell5 12=VoltageCell6 ...... NumberOfLithiumCells
+				int k=0;
+				for (int j=0; j < this.getNumberOfLithiumCells(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+					points[j + 9] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff)));
+					if (points[j + 9] > 0) {
+						maxVotage = points[j + 9] > maxVotage ? points[j + 9] : maxVotage;
+						minVotage = points[j + 9] < minVotage ? points[j + 9] : minVotage;
+					}
+				}
+				//calculate balance on the fly
+				points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+				
+				if (recordSet.size() > 9 + this.getNumberOfLithiumCells()) {//BatteryRi
+					for (int j=0; j < this.getNumberOfLithiumCells() + 1; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+						points[j+offset] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff)));
+					}
+				}
+	
+				recordSet.addPoints(points);
+	
+				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);
+			}
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		recordSet.syncScaleOfSyncableRecords();
@@ -576,5 +627,11 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		//0=Current 1=SupplyVoltage. 2=Voltage 3=Capacity 4=Power 5=Energy 6=Temp.intern 7=Temp.extern 8=Balance
 		//9=VoltageCell1 10=VoltageCell2 11=VoltageCell3 12=VoltageCell4 13=VoltageCell5 14=VoltageCell6 12=VoltageCell6 ...... NumberOfLithiumCells
 		return new int[] {2, 3};
+	}
+	
+	public long getTimeStamp(final byte[] buffer) {
+		//DataParser.parse2Int(buffer, 3)/1000/60 + " min " + (DataParser.parse2Int(buffer, 3)/1000)%60 + " sec run time");
+		log.finer(() -> StringHelper.byte2Hex2CharString(buffer, 3, 4));
+		return DataParser.getUInt32(buffer, 3);
 	}
 }

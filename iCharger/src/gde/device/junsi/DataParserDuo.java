@@ -120,7 +120,7 @@ public class DataParserDuo extends DataParser {
 				this.start_time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor); // Seconds * 1000 = msec
 			}
 			else {
-				this.time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - this.start_time_ms; // Seconds * 1000 = msec			
+				this.time_ms = (int) (Double.parseDouble(strValue) * this.timeFactor) - this.start_time_ms; // Seconds * 1000 = msec		
 			}
 
 			for (int i = 0; i < this.valueSize-valueOffset; i++) {

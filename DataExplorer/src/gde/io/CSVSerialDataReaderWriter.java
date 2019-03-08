@@ -100,6 +100,7 @@ public class CSVSerialDataReaderWriter {
 		int endIndex = 0;
 		int dataBlockNumber = 1;
 		String firmwareHardwareDescription = new String();
+		long lastRecordEndTimeStamp_ms = 0;
 
 		try {
 			if (channelConfigNumber == null)
@@ -275,6 +276,7 @@ public class CSVSerialDataReaderWriter {
 							if (firmwareHardwareDescription.length() > 10 && !activeChannel.getFileDescription().contains(firmwareHardwareDescription))
 								activeChannel.setFileDescription(activeChannel.getFileDescription() + GDE.STRING_MESSAGE_CONCAT + firmwareHardwareDescription);
 							device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
+							lastRecordEndTimeStamp_ms = data.getTime_ms();
 						}
 
 
@@ -294,7 +296,8 @@ public class CSVSerialDataReaderWriter {
 					}
 					//add data only if
 					if (data.getTime_ms() - lastTimeStamp >= 0) {
-						channelRecordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms());
+						//System.out.println("timeStep_ms = " + (data.getTime_ms() - lastRecordEndTimeStamp_ms));
+						channelRecordSet.addNoneCalculationRecordsPoints(data.getValues(), data.getTime_ms() - lastRecordEndTimeStamp_ms);
 						data.setTimeResetEnabled(true);
 						lastTimeStamp = data.getTime_ms();
 					}

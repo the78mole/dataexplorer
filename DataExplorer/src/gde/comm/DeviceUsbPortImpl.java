@@ -703,7 +703,16 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
       
       int result = LibUsb.bulkTransfer(handle, outEndpoint, buffer, transferred, timeout_ms);
       if (result != LibUsb.SUCCESS) {
-          throw new LibUsbException("Unable to send data", result);
+      	switch (result) {
+      	case LibUsb.ERROR_TIMEOUT:
+          throw new TimeOutException(new LibUsbException(result).getMessage());
+      	case LibUsb.ERROR_ACCESS:
+      	case LibUsb.ERROR_IO:
+      	case LibUsb.ERROR_NO_DEVICE:
+          throw new UsbDisconnectedException(new LibUsbException(result).getMessage());
+        default:
+        	throw new IllegalStateException(new LibUsbException(result).getMessage());
+      	}
       }
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, transferred.get() + " bytes sent");
   }
@@ -727,7 +736,16 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
       if (result != LibUsb.SUCCESS) {
         readBytes = transferred.get();
         if (readBytes == 0 || readBytes != (buffer.get(0) & 0xFF))
-          throw new TimeOutException(new LibUsbException("Unable to read data", result).getMessage());
+        	switch (result) {
+        	case LibUsb.ERROR_TIMEOUT:
+            throw new TimeOutException(new LibUsbException(result).getMessage());
+        	case LibUsb.ERROR_ACCESS:
+        	case LibUsb.ERROR_IO:
+        	case LibUsb.ERROR_NO_DEVICE:
+            throw new UsbDisconnectedException(new LibUsbException(result).getMessage());
+          default:
+          	throw new IllegalStateException(new LibUsbException(result).getMessage());
+        	}
         else 
           buffer.get(data, 0, readBytes);
         

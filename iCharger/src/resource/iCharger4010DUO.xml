@@ -22,7 +22,7 @@
         <name>time</name>
         <symbol>t</symbol>
         <unit>msec</unit>
-        <timeStep>1000.0</timeStep>
+        <timeStep>-1.0</timeStep>
     </TimeBase>
     <DataBlock>
         <format inputType="SERIAL_IO" formatType="BYTE" size="64"/>

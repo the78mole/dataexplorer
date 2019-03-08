@@ -42,7 +42,7 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 	final static Logger	log	= Logger.getLogger($CLASS_NAME);
 		
   // The communication timeout in milliseconds. */
-  protected static final int TIMEOUT = 1200;
+  protected long 			 timeout_ms = 1200;
   
   protected final byte interfaceId;
   protected final byte endpointIn;
@@ -73,7 +73,7 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		byte[] data = new byte[Math.abs(this.dataSize)];
 
 		try {
-			this.read(iface, this.endpointOut, data, TIMEOUT);
+			this.read(iface, this.endpointOut, data, (int)timeout_ms);
 			
 			if (log.isLoggable(Level.FINE)) {
 				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
@@ -98,7 +98,7 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		byte[] data = new byte[Math.abs(this.dataSize)];
 
 		try {
-			this.read(libUsbHandle, this.endpointOut, data, (long)TIMEOUT);
+			this.read(libUsbHandle, this.endpointOut, data, timeout_ms);
 			
 			if (log.isLoggable(Level.FINE)) {
 				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
@@ -110,5 +110,13 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 				if (e instanceof RuntimeException) throw e;
 		}
 		return data;
+	}
+	
+	public long getTimeOut_ms() {
+		return this.timeout_ms;
+	}
+	
+	public void setTimeOut_ms(long newTimeout_ms) {
+		this.timeout_ms = newTimeout_ms;
 	}
 }
