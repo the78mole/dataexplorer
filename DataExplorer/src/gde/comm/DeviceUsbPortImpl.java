@@ -471,25 +471,25 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 				if (result < 0) {
         	if (libUsbDeviceHandle != null) LibUsb.close(libUsbDeviceHandle);
         	log.log(Level.SEVERE, String.format("Unable to open device: %s.", LibUsb.strError(result)));
-					throw new LibUsbException("Unable to open device: %s.", result);
+					throw new UsbClaimException(new LibUsbException(result).getMessage());
 				}
-				//temp test code begin
-				//final ConfigDescriptor descriptor = new ConfigDescriptor();
-        //result = LibUsb.getConfigDescriptor(libUsbDevice, (byte) 0, descriptor);
-        //if (result < 0) {
-        //	if (libUsbDeviceHandle != null) LibUsb.close(libUsbDeviceHandle);
-        //  throw new LibUsbException("Unable to read config descriptor", result);
-        //}
-        //Interface[] interfaces = descriptor.iface();
-        //Interface interface0 = interfaces[0];
-        //System.out.println(interface0.toString());
-				//temp test code end
         
+				if (GDE.IS_LINUX && libUsbDeviceHandle != null) {
+					result = LibUsb.kernelDriverActive(libUsbDeviceHandle, ifaceId);
+
+					if (result == 1) {
+						result = LibUsb.detachKernelDriver(libUsbDeviceHandle, ifaceId);
+
+						if (result != LibUsb.SUCCESS) {
+							throw new UsbClaimException(new LibUsbException(result).getMessage());
+						}
+					}
+				}
 				result = LibUsb.claimInterface(libUsbDeviceHandle, ifaceId);
 				if (result < 0) {
         	if (libUsbDeviceHandle != null) LibUsb.close(libUsbDeviceHandle);
 					log.log(Level.SEVERE, String.format("Unable to claim device: %s.", LibUsb.strError(result)));
-					throw new UsbClaimException(String.format("Unable to claim device: %s.", result));
+					throw new UsbClaimException(new LibUsbException(result).getMessage());
 				}
 			}
 		}
@@ -500,16 +500,8 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
         if (result < 0) {
         	if (libUsbDeviceHandle != null) LibUsb.close(libUsbDeviceHandle);
 					log.log(Level.SEVERE, String.format("Unable to claim device: %s.", LibUsb.strError(result)));
-					throw new UsbClaimException(String.format("Unable to claim device: %s.", result));
+					throw new UsbClaimException(new LibUsbException(result).getMessage());
         }
-        //Interface[] interfaces = descriptor.iface();
-        //Interface interface0 = interfaces[0];
-        //System.out.println(interface0.toString());
-//				UsbInterface tmpUsbInterface = ((UsbConfiguration) usbDevice.getUsbConfigurations().get(0)).getUsbInterface(ifaceId);
-//				if (tmpUsbInterface != null && !(tmpUsbInterface.isActive() || tmpUsbInterface.isClaimed())) {
-//					usbInterface = claimUsbInterface(usbDevice, ifaceId);
-//					break;
-//				}
 			}
 		}
 		log.log(Level.FINE, "interface claimed");
