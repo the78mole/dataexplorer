@@ -373,7 +373,7 @@ public class Channel extends HashMap<String, RecordSet> {
 						record.setStartEndDefined(Boolean.valueOf(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), //$NON-NLS-1$ 
 								Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")), //$NON-NLS-1$ 
 								Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "100"))); //$NON-NLS-1$
-						record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "1")).intValue()); //$NON-NLS-1$
+						record.setNumberFormat(Integer.valueOf(this.template.getProperty(i + Record.NUMBER_FORMAT, "-1")).intValue()); //$NON-NLS-1$
 					}
 					//smooth current drop
 					recordSet.setSmoothAtCurrentDrop(Boolean.valueOf(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
@@ -469,7 +469,7 @@ public class Channel extends HashMap<String, RecordSet> {
 					record.setStartEndDefined(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_START_END_DEFINED, "false")), //$NON-NLS-1$  
 							Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MIN_VALUE, "0")), //$NON-NLS-1$ 
 							Double.parseDouble(this.template.getProperty(i + Record.DEFINED_MAX_VALUE, "100"))); //$NON-NLS-1$
-					record.setNumberFormat(Integer.parseInt(this.template.getProperty(i + Record.NUMBER_FORMAT, "1"))); //$NON-NLS-1$
+					record.setNumberFormat(Integer.parseInt(this.template.getProperty(i + Record.NUMBER_FORMAT, "-1"))); //$NON-NLS-1$
 				}
 				//smooth current drop
 				recordSet.setSmoothAtCurrentDrop(Boolean.parseBoolean(this.template.getProperty(RecordSet.SMOOTH_AT_CURRENT_DROP, "false"))); //$NON-NLS-1$
