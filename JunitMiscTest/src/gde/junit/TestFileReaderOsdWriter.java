@@ -289,8 +289,8 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 					System.out.println("working with : " + file);
 
 					try {
-						//System.out.println("file.getPath() = " + file.getPath());
-						String deviceName = file.getAbsolutePath().substring(file.getAbsolutePath().indexOf("iCharger"), file.getAbsolutePath().lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
+						String absolutePath = file.getAbsolutePath().replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+						String deviceName = absolutePath.substring(absolutePath.indexOf("iCharger"), absolutePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
 						System.out.println("deviceName = " + deviceName);
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
 						if (deviceConfig == null) 
