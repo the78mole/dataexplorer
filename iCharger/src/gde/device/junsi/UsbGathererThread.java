@@ -50,7 +50,7 @@ public class UsbGathererThread extends Thread {
 	protected static final int	USB_QUERY_DELAY	= GDE.IS_WINDOWS ? 70 : 160;
 	final static String	$CLASS_NAME									= UsbGathererThread.class.getName();
 	final static Logger	log													= Logger.getLogger(UsbGathererThread.class.getName());
-	final static int		WAIT_TIME_RETRYS						= 36000;		// 3600 * 1 sec = 600 Minutes
+	final static int		WAIT_TIME_RETRYS						= 3600;		// 3600 * 1 sec = 60 Minutes
 
 	final DataExplorer					application;
 	final Settings							settings;
@@ -70,7 +70,7 @@ public class UsbGathererThread extends Thread {
 	boolean							isProgrammExecuting3				= false;
 	boolean							isProgrammExecuting4				= false;
 	boolean[]						isAlerted4Finish						= { false, false, false, false };
-	int									retryCounter								= UsbGathererThread.WAIT_TIME_RETRYS;	//600 Min
+	int									retryCounter								= UsbGathererThread.WAIT_TIME_RETRYS;	//60 Min
 	long								lastTimeStamp_01_ms						= 0;
 	long 								lastRecordEndTimeStamp_01_ms 	= 0;
 	long								lastTimeStamp_02_ms						= 0;

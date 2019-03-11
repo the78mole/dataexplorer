@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.3.6 - xx yyy 2019
+Version 3.3.6 - 12 Mar 2019
 Generic changes/fixes
 	* use char instead of string const. while string operations for performance reasons
 	* update SWT to version 4.9, last version 32 bit versions distributed
@@ -37,8 +37,6 @@ Device specific changes/fixes
 	* GPS-Logger2 - update device selection picture
 	* GPS-Logger3 - update device selection picture
 	* ZeroAdapter - initial release to support LogView OpenFormat Zero log file evaluation
-
-History analysis
 
 Version 3.3.5 - 20 Dec 2018
 Generic changes/fixes

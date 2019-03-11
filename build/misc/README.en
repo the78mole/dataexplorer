@@ -1,9 +1,9 @@
-﻿******** DataExplorer README ***********  15 Apr 2018 WB
+﻿******** DataExplorer README ***********  11 Mar 2019 WB
 
 The GNU DataExplorer is free software, please see http://www.gnu.org/philosophy/free-sw.html. It is also available at no
 cost, but without any warranty. Since the implementation is based on Java using the free available libraries RXTXcomm and SWT
 the execution of this program is possible under a number of popular operating systems like 32/64 Bit Windows and GNU/Linux 
-and MAC OS. To execute the only prerequisite is an installed Java runtime with version 1.8.+ to Java 11, like IcedTea or
+and MAC OS. To execute the only prerequisite is an installed Java runtime with version 1.8.+ to Java 11, like IcedTea, openJDK or
 SUN/Oracles Java Runtime or Java Service Environment.
 
 The GNU DataExplorer read data from serial connected devices or text file import and display this data for a 
@@ -29,10 +29,10 @@ on command prompt : "echo %PROCESSOR_ARCHITECTURE% -> x86 == 32 Bit; AMD64 == 64
 Correlating to the processor architecture the Java runtime should be installed. Please pay attention during download.
 Starting with version 3.06 DataExplorere comes with an installer. The install operations requires administration rights.
 Attention: Do not use special characters in installation path, Java using UTF-8 as default, conversion problems could occur!
-During the first execution of the program the application configuration directories are created at %APPDATA%\<user>\DataExplorer.
+During the first execution of the program the application configuration directories are created at %APPDATA%\DataExplorer.
 Below this directory also application configuration and trace log files are located.
 
-Hint: Is a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major version at offset=6" 
+Hint: Is a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major version" 
 is received while executing the Java version (java -version) is to old to execute this program and must be renewed to a version 1.8.+ to Java 11.
 
 Depending of the used Windows version and patch level it might be required to install the latest 
@@ -51,10 +51,10 @@ For the very first execution use a command shell and change into the just create
 During the first execution of the program the application configuration directories are created /home/<user>/.DataExplorer.
 Below this directory also application configuration and trace log files are located.
 
-Hint: Is a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major version at offset=6" 
+Hint: Is a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major version" 
 is received while executing the Java version (java -version) is to old to execute this program and must be renewed to a version 1.8.+ to Java 11.
 
-RXTXcomm uses serial port locking mechanism, the application user must be part of uucp group. Set permissions of /var/lock to root:uucp.
+RXTXcomm uses serial port locking mechanism, the application user must be part of uucp and dialout group. Set permissions of /var/lock to root:uucp.
 While facing problems with USB2Serial UART SiliconLabs cp210x refer to GNULinux_cp210x directory in download area.
 
 
@@ -74,5 +74,5 @@ During the first execution of the program the application configuration director
 Below this directory also application configuration and trace log files are located.
 
 Hint: If the application do not start, use the terminal application and change to /Applications/DataExplorere.app/Contents/MacOS and execute the DataExplorer
-script manually. If a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major version at offset=6" 
+script manually. If a message similar to "The java class could not be loaded. java.lang.UnsupportedClassVersionError: (gde/GDE) bad major version" 
 is received check your installed/configured Java runtime. 

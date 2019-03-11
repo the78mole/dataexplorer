@@ -1,33 +1,78 @@
-GNU DataExplorer - News - comes with version 3.3.5 - 20 Dec 2018
+GNU DataExplorer - News - comes with version 3.3.6 - 12 Mar 2019
 
 Generic changes/fixes
-	* fix setting foreground color of status message
-	* fix exception while copy curve into compare window
-	* fix exception while cutting curve edges
-	* fix hanging application shutdown while executing device thread
-	* add migration hint for custom devices to add <device-name>*0 to device _use list
-	* add hint if device folder creation fails
-	* fix missing error message disabling device due to invalid XML
-	* fix MAC OS copy to clip board capability
-	* fix partial data table calculation for several devices 
-	* fix reset measurement selection in curve selector context menu
-	* fix measurement formatting based on record decimal format
-	* fix measurement based on calculated record index
-	* fix Windows missing color change with swt library update
+	* use char instead of string const. while string operations for performance reasons
+	* update SWT to version 4.9, last version 32 bit versions distributed
+		** new SWT Linux libraries prefer to use GTK3 libraries
+		** new SWT Linux libraries does not support Windows XP anymore
+	* update all http URLs to https if possible
+	* update jaxb jars and remove disabling of optimization statement
+	* remove/reset unnecessary smoothVoltageCurve entry from devices
+	* fix visualization of serial port selection 
+	* enable curve compare independent of selected measurement unit, but warn about this fact
+	* fix Windows Java 11 serial communication add jSerialComm implementation 
+	* enable enhanced delta ratio measurement on altitude while supported by selected device
+	* fix IllegalParameterException on Linux while initiating main UI
+	* remove usb4java jar version numbers to enable update
+	* update usb4java to version 1.3.0
+	* UsbPortImpl cleanup code, remove unchecked warning, add dump methods
+	* add LibUsb library code which is closer to hardware and enable use of productString/serialNumber as additional USB-HID constrain
+	* update XSD to enable additional UsbPort productString
+	* refine semi automatic detection of scale synchronization reference
+	* update Mac OS kernel extensions for SkyRCand Junsi USB-HID hinting kext utility application
+
+Device specific changes/fixes
+	* Graupner Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)
+	* Graupner Ultra Duo Plus - fix missing update while reading battery data using device dialog
+	* Graupner HoTT MDL Viewer plug-in update 9.4
+	* Graupner HoTTAdapter2 - add missing call parsing GAM data while only a GAM is connected to receiver 
+	* Graupner HottAdapter* - *.bin fix sensor detection while seeking position in file stream
+	* Junsi iCharger X6 - add initial release
+	* Junsi iCharger X8 - add initial release
+	* Junsi iCharger 406Duo - add initial release
+	* Junsi iChargerUSB* - prepare for upcoming FW release enabling Ri logging
+	* Junsi iChargerUSB* - enable variable log interval
+	* Junsi iChargerUSB* - update supported battery type (chemistry)
+	* GPS-Logger2 - update device selection picture
+	* GPS-Logger3 - update device selection picture
+	* ZeroAdapter - initial release to support LogView OpenFormat Zero log file evaluation
 	
-Generelle Fehlerkorrektur und Verbesserungen
-	* Schriftfarbe der Statusmessage in Abhängigkeit des gewählten Farbthemas korrigiert
-	* Absturz bei Benutzung der Kurven-Kopierfunktion beseitigt
-	* Absturz bei Benutzung der Schneidefunktion beseitigt
-	* Beachtung einer laufenden Datenaufnahme beim Schliessen der Anwendung
-	* Migrationshilfe bei selbst erstellten Geräten hinzugefügt (<Geräte_name>*0 zur device_use Liste)
-	* Hinweis bei erstellen eines benötigten Geräte-Ordners hinzugefügt
-	* Fehleranzeige für Validierung-Fehler der Geräte XML-Dateien berichtigt
-	* Kopieren des Inhaltes der Anzeigen unter MAC OS Mojave korrigiert
-	* Korrektur der fehlerhaften Anzeige der reduzierten Tabelle bei vielen Geräten
-	* Rücksetzen der Selektion beim Messen in der grafischen Anzeige korrigiert
-	* beim Messen in der grafischen Anzeige wird jetzt die eingestellte Nachkommastelle berücksichtig
-	* Korrektur der Wertermittlung beim Messen über die grafischen Anzeige
-	* fehlender Farbwechsel unter Windows verbessert durch Update der SWT Bibliothek
 	
+Generelle Änderungen/Verbesserungen
+	* benutze Zeichen anstatt String Operationen, wegen besserer Performance
+	* Update SWT Bibliothek zu Version 4.9, das ist die letzte Version, die 32 Bit unterstützt
+		** die neuen SWT Linux Bibliotheken bevorzugen jetzt GTK3
+		** die neuen SWT Linux Bibliotheken unterstützen kein Windows XP mehr
+	* Update von allen http URLs nach https, soweit möglich
+	* Update jaxb Jars und deshalb konnte das Verhindern von Laufzeitoptimierungen entfernt werden.
+	* Unnötige Spannungskurvenglättung von allen Geräten entfernt
+	* Anzeige für die Auswahl des seriellen Ports verbessert 
+	* Der Kurvenvergleich kann jetzt auch mit Messwerten unterschiedlicher Einheit verwendet werden
+	* Windows mit Java 11 serielle Kommunikation durch Verwendung von jSerialComm verbessert 
+	* Erweiterte Möglichkeit der Verhältnismessung der Höhe generell eingeführt, wenn das verwendete Gerät entsprechende Daten liefert
+	* Verbesserung des IllegalParameter-Fehlers auf Linux bei der Initialisierung der Benutzerschnittstelle
+	* Entfernen der usb4java Versionsnummer, um Updates zu erleichtern
+	* Update usb4java zu Version 1.3.0
+	* UsbPortImpl Codebereinigung, entfernen von Warnungen, Auflistungsmethode hinzugefügt
+	* Verwendung der LibUsb Bibliothek, um Hardware näher zu sein und Einschränkungen der Portauswahl durch Zusatzparameter zu ermöglichen
+	* Update XSD, um zusätzlichen UsbPort Parameter productString zu ermöglichen
+	* Verbesserung der halbautomatischen Skalensynchronisation
+	* Update Mac OS Kernerweiterungen für SkyRC und Junsi USB-HID, Hinweise auf "kext utility" Anwendung
+
+Gerätespezifische Änderungen/Verbesserungen
+	* Graupner Polaron* - Anpassung der zu übertragenden Bytes  (Firmware 2.x Voraussetung)
+	* Graupner Ultra Duo Plus - Berichtigung fehlender Batterieparameter innerhalb des Geräte-Dialoges
+	* Graupner HoTT MDL Viewer plug-in Update auf 9.4
+	* Graupner HoTTAdapter2 - fehlender Aufruf zur Integration von GAM Daten hinzugefügt, nur GAM am Empfänger 
+	* Graupner HottAdapter* - *.bin Sensorerkennung verbessert, Positionierung auf dem Datenstrom hat nicht funktioniert
+	* Junsi iCharger X6 - initiale Unterstützung
+	* Junsi iCharger X8 - initiale Unterstützung
+	* Junsi iCharger 406Duo - initiale Unterstützung
+	* Junsi iChargerUSB* - Vorbereitung für kommende Firmware mit Aufzeichnungen des Innenwiderstands getroffen
+	* Junsi iChargerUSB* - Unterstützung von variablem Log-Interval eingeführt
+	* Junsi iChargerUSB* - Update unterstützter Batterie-Typen (Zellen-Chemie)
+	* GPS-Logger2 - Update Gerätebild
+	* GPS-Logger3 - Update Gerätebild
+	* ZeroAdapter - initiale Unterstützung LogView OpenFormat Zero
+
 	
