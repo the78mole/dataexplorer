@@ -300,17 +300,10 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 							try {
 								String recordNameExtend;
 								try {
-									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT)-4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
-									Integer.valueOf(recordNameExtend);
+									recordNameExtend = selectedImportFile.substring(selectedImportFile.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX).lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1, selectedImportFile.lastIndexOf('['));
 								}
 								catch (Exception e) {
-									try {
-										recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT)-3, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
-										Integer.valueOf(recordNameExtend);
-									}
-									catch (Exception e1) {
-										recordNameExtend = GDE.STRING_EMPTY;
-									}
+									recordNameExtend = GDE.STRING_EMPTY;
 								}
 								CSVSerialDataReaderWriter.read(selectedImportFile, iChargerUsb.this, recordNameExtend, 1, 
 										new  DataParserDuo(1, getDataBlockLeader(), getDataBlockSeparator().value(), null, null, 
@@ -631,7 +624,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	
 	public long getTimeStamp(final byte[] buffer) {
 		//DataParser.parse2Int(buffer, 3)/1000/60 + " min " + (DataParser.parse2Int(buffer, 3)/1000)%60 + " sec run time");
-		log.finer(() -> StringHelper.byte2Hex2CharString(buffer, 3, 4));
+		log.finest(() -> StringHelper.byte2Hex2CharString(buffer, 3, 4));
 		return DataParser.getUInt32(buffer, 3);
 	}
 }

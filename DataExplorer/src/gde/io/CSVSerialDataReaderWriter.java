@@ -261,6 +261,8 @@ public class CSVSerialDataReaderWriter {
 						else {
 							int recordNumber = device.recordSetNumberFollowChannel() && activeChannel.getType() == ChannelTypes.TYPE_CONFIG ? activeChannel.getNextRecordSetNumber(activeChannelConfigNumber) : activeChannel.getNextRecordSetNumber();
 							recordSetName = recordNumber + GDE.STRING_RIGHT_PARENTHESIS_BLANK + recordSetNameExtend;
+							recordSetName = recordSetName.length() <= RecordSet.MAX_NAME_LENGTH ? recordSetName : recordSetName.substring(0, RecordSet.MAX_NAME_LENGTH-1) + GDE.STRING_RIGHT_BRACKET;
+
 							activeChannel.put(recordSetName, RecordSet.createRecordSet(recordSetName, application.getActiveDevice(), activeChannelConfigNumber, true, false, true));
 							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, recordSetName + " created for channel " + activeChannel.getName()); //$NON-NLS-1$
 
@@ -348,7 +350,7 @@ public class CSVSerialDataReaderWriter {
 						channels.switchChannel(activeChannelConfigNumber, createdRecordSets.lastElement().getName());
 					}
 					else {
-						channels.switchChannel(1, GDE.STRING_EMPTY);
+						channels.switchChannel(activeChannelConfigNumber, GDE.STRING_EMPTY);
 					}
 				}
 

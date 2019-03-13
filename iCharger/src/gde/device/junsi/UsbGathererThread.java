@@ -50,7 +50,7 @@ public class UsbGathererThread extends Thread {
 	protected static final int	USB_QUERY_DELAY	= GDE.IS_WINDOWS ? 70 : 160;
 	final static String	$CLASS_NAME									= UsbGathererThread.class.getName();
 	final static Logger	log													= Logger.getLogger(UsbGathererThread.class.getName());
-	final static int		WAIT_TIME_RETRYS						= 3600;		// 3600 * 1 sec = 60 Minutes
+	final static int		WAIT_TIME_RETRYS						= 1900;		// 1900 * 1 sec = 30 Minutes
 
 	final DataExplorer					application;
 	final Settings							settings;
@@ -70,7 +70,7 @@ public class UsbGathererThread extends Thread {
 	boolean							isProgrammExecuting3				= false;
 	boolean							isProgrammExecuting4				= false;
 	boolean[]						isAlerted4Finish						= { false, false, false, false };
-	int									retryCounter								= UsbGathererThread.WAIT_TIME_RETRYS;	//60 Min
+	int									retryCounter								= UsbGathererThread.WAIT_TIME_RETRYS;	//30 Min
 	long								lastTimeStamp_01_ms						= 0;
 	long 								lastRecordEndTimeStamp_01_ms 	= 0;
 	long								lastTimeStamp_02_ms						= 0;
@@ -94,6 +94,7 @@ public class UsbGathererThread extends Thread {
 		this.channels = Channels.getInstance();
 		this.channelNumber = channelConfigNumber;
 		this.channel = this.channels.get(this.channelNumber);
+		if (this.usbPort!= null) this.usbPort.setTimeOut_ms(iChargerUsbPort.TIMEOUT_MS); //reset timeout to default
 
 		if (!this.usbPort.isConnected()) {
 			this.libUsbHandle = this.usbPort.openLibUsbPort(this.device);
@@ -170,7 +171,7 @@ public class UsbGathererThread extends Thread {
 							
 							this.application.setStatusMessage(GDE.STRING_EMPTY);
 							
-							this.retryCounter	= UsbGathererThread.WAIT_TIME_RETRYS;	//60 Min
+							this.retryCounter	= UsbGathererThread.WAIT_TIME_RETRYS;	//30 Min
 						}
 						else {
 							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2600));
@@ -192,6 +193,7 @@ public class UsbGathererThread extends Thread {
 				catch (Throwable e) {
 					// this case will be reached while data gathering enabled, but no data will be received
 					if (e instanceof TimeOutException) {
+						if (this.usbPort!= null) this.usbPort.setTimeOut_ms(iChargerUsbPort.TIMEOUT_MS); //reset timeout to default
 						this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI2600));
 						if (UsbGathererThread.log.isLoggable(Level.FINE))
 							UsbGathererThread.log.logp(Level.FINE, UsbGathererThread.$CLASS_NAME, $METHOD_NAME, Messages.getString(MessageIds.GDE_MSGI2600));
@@ -266,8 +268,8 @@ public class UsbGathererThread extends Thread {
 			result[0] = recordSet;
 			result[1] = processRecordSetKey;
 			return result;
-		}
-
+		} 
+		
 		//BATTERY_TYPE 1=LiPo 2=LiIo 3=LiFe 4=NiMH 5=NiCd 6=Pb 7=NiZn
 		String batteryType = this.device.getBatteryType(dataBuffer);
 		//Mode： 		1=CHARGE 2=DISCHARGE 4=PAUSE 8=TrickleCurrent 9=Balancing
@@ -281,8 +283,10 @@ public class UsbGathererThread extends Thread {
 		
 		Channel outputChannel = this.channels.get(number);
 		if (outputChannel != null) {
-			// check if a record set matching for re-use is available and prepare a new if required
-			if (recordSet == null || !processRecordSetKey.contains(batteryType)  || !processRecordSetKey.contains(processTypeName) || !processRecordSetKey.contains(processStatusName)) {
+			long deltaTimeStamp_ms = this.device.getTimeStamp(dataBuffer) - (number == 2 ? this.lastTimeStamp_02_ms : this.lastTimeStamp_01_ms);
+			// check if a record set matching for re-use is available and prepare a new if required, case continuous gathering check for timeStamp since starting a new process will reset time
+			if (recordSet == null || deltaTimeStamp_ms <= 0 || !processRecordSetKey.contains(batteryType)  || !processRecordSetKey.contains(processTypeName) || !processRecordSetKey.contains(processStatusName)) {
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "timestampDifference " + deltaTimeStamp_ms);
 				this.application.setStatusMessage(""); //$NON-NLS-1$
 
 				// record set does not exist or is out dated, build a new name and create
@@ -323,7 +327,7 @@ public class UsbGathererThread extends Thread {
 				}
 			}
 
-			long deltaTimeStamp_ms = this.device.getTimeStamp(dataBuffer) - (number == 2 ? this.lastRecordEndTimeStamp_02_ms : this.lastRecordEndTimeStamp_01_ms);
+			deltaTimeStamp_ms = this.device.getTimeStamp(dataBuffer) - (number == 2 ? this.lastRecordEndTimeStamp_02_ms : this.lastRecordEndTimeStamp_01_ms);
 
 			recordSet.addPoints(this.device.convertDataBytes(points, dataBuffer), deltaTimeStamp_ms);
 			

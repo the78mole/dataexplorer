@@ -41,8 +41,9 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 	final static String $CLASS_NAME = iChargerUsbPort.class.getName();
 	final static Logger	log	= Logger.getLogger($CLASS_NAME);
 		
-  // The communication timeout in milliseconds. */
-  protected long 			 timeout_ms = 1200;
+  // The communication timeout in milliseconds, 500ms is the smalles interval
+	public final static long		 TIMEOUT_MS	= 997; //subtract runtime difference
+  protected long 			 timeout_ms = 1000;
   
   protected final byte interfaceId;
   protected final byte endpointIn;
@@ -97,17 +98,11 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
 		byte[] data = new byte[Math.abs(this.dataSize)];
 
-		try {
-			this.read(libUsbHandle, this.endpointOut, data, timeout_ms);
-			
-			if (log.isLoggable(Level.FINE)) {
-				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
-				log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, DataParser.parse2Int(data, 3)/1000/60 + " min " + (DataParser.parse2Int(data, 3)/1000)%60 + " sec run time");
-			}
-		}
-		catch (Exception e) {
-				log.logp(Level.WARNING, $CLASS_NAME, $METHOD_NAME, e.getMessage(), e);
-				if (e instanceof RuntimeException) throw e;
+		this.read(libUsbHandle, this.endpointOut, data, timeout_ms);
+		
+		if (log.isLoggable(Level.FINE)) {
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
+			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, DataParser.parse2Int(data, 3)/1000/60 + " min " + (DataParser.parse2Int(data, 3)/1000)%60 + " sec run time");
 		}
 		return data;
 	}
@@ -117,6 +112,7 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 	}
 	
 	public void setTimeOut_ms(long newTimeout_ms) {
+		log.finer(() -> String.format("set new timeout_ms = %d", newTimeout_ms));
 		this.timeout_ms = newTimeout_ms;
 	}
 }
