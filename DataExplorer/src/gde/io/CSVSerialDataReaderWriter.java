@@ -171,7 +171,7 @@ public class CSVSerialDataReaderWriter {
 							//System.out.println("!" + line.substring(1) + "! " + line.substring(1).length());
 							//System.out.println("!" + line.substring(1).trim() + "! " + line.substring(1).trim().length());
 							//attention, special character has influence to file pointer calculation while writing OSD file
-							firmwareHardwareDescription = line.substring(1).trim(); //this line contains some special character, remove it using trim()
+							firmwareHardwareDescription = line.substring(1).trim().replace(GDE.CHAR_COLON, GDE.CHAR_BLANK); //this line contains some special character, remove it using trim()
 						} else
 							log.log(Level.WARNING, filePath + " - skipped " + lineNumber + ", it does not start with " + device.getDataBlockLeader()); //$NON-NLS-1$
 						continue;
