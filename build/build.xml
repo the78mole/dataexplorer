@@ -994,6 +994,7 @@
 				<include name="**/build.xml" />
 				<exclude name="**/CVS/**" />
 				<include name="build/lib/**" />
+				<include name="build/ant/**" />
 				<include name="build/misc/**" />
 				<exclude name="build/misc/MAC_OS*/**" />
 				<include name="build/build.properties" />
@@ -1039,8 +1040,8 @@
 				<exclude name="launch4j/**" />
 				<exclude name="Port*/**" />
 				<exclude name="Print*/**" />
-				<exclude name="RXTXcomm/**" />
-				<exclude name="jSerialComm/**" />
+				<include name="RXTXcomm/**" />
+				<include name="jSerialComm/**" />
 				<exclude name="X-Tools/**" />
 			</tarfileset>
 			<tarfileset dir="${basedir}/build/misc" casesensitive="true" prefix="dataexplorer-${version.num}" filemode="444">
