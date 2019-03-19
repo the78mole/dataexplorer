@@ -409,7 +409,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			int offset = 9 + this.getNumberOfLithiumCells();
 			points[offset++] = DataParser.parse2UnsignedShort(dataBuffer, 8); //BatteryRi 
 
-			log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
+			//log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
 			switch (dataBuffer[2] == 2 ? batteryType_2 : batteryType_1) {
 			case "LiPo":
 			case "LiIo":
