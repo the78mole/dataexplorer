@@ -473,7 +473,7 @@ public abstract class TrailRecord extends CommonRecord {
 	 * Update the displayable record information in this record set.
 	 */
 	public void setDisplayable() {
-		this.isDisplayable = isActive() && isAllowedBySetting() && hasReasonableData();
+		this.isDisplayable = isAllowedBySetting() && hasReasonableData();
 	}
 
 	@Override

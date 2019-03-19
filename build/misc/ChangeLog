@@ -1,5 +1,12 @@
 Development history / change log, please read from bottom up
 
+Version 3.3.7 - xx yyy 2019
+Generic changes/fixes
+	* make none active measurement visible while history exploring
+	
+Device specific changes/fixes
+	* 
+	
 Version 3.3.6 - 12 Mar 2019
 Generic changes/fixes
 	* use char instead of string const. while string operations for performance reasons
