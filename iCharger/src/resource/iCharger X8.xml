@@ -187,6 +187,14 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="100.0" type="Double" description="factor to measurement value"/>
+             </Measurement>
+            <Measurement>
+                <name>cell_internal_resistance ∑</name>
+                <symbol>r</symbol>
+                <unit>mΩ</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="factor" value="100.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>cell_internal_resistance 1</name>
@@ -202,7 +210,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="18" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -211,7 +219,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="18" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -220,7 +228,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="18" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -229,7 +237,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="18" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -238,7 +246,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="18" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -247,7 +255,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="18" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
@@ -256,7 +264,7 @@
                 <unit>mΩ</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="18" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="19" type="Integer"/>
                 <property name="factor" value="100.0" type="Double" description="factor to measurement value"/>
             </Measurement>
         </Channel>

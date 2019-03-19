@@ -5,7 +5,7 @@ Generic changes/fixes
 	* make none active measurement visible while history exploring
 	
 Device specific changes/fixes
-	* 
+	* iCharger X6/X8 - adapt parsing algorithm to support FW 207 beta 2
 	
 Version 3.3.6 - 12 Mar 2019
 Generic changes/fixes

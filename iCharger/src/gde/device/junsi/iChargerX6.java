@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBException;
 
+import gde.GDE;
 import gde.device.DeviceConfiguration;
 
 /**
@@ -30,6 +31,27 @@ import gde.device.DeviceConfiguration;
  */
 public class iChargerX6 extends iChargerUsb {
 
+	protected enum BatteryTypesX { //is different to iChargerUSB.BatteryTypesDuo
+		BT_UNKNOWN("?"), BT_LIPO("LiPo"), BT_LIIO("LiIo"), BT_LIFE("LiFe"), BT_LIHV("LiHv"), BT_LTO("LTO"), BT_NIMH("NiMH"), BT_NICD("NiCd"), BT_NIZN("NiZn"), BT_PB("PB"), BT_POWER("Power"), BT_USER("User"), BT_UNKNOWN_("?");
+
+		private String value;
+		
+		private BatteryTypesX(String newValue) {
+			value = newValue;
+		}
+		
+		protected String getName() {
+			return value;
+		}
+		
+		protected static String[] getValues() {
+			StringBuilder sb = new StringBuilder();
+			for (BatteryTypesX bt : BatteryTypesX.values()) 
+				sb.append(bt.value).append(GDE.CHAR_CSV_SEPARATOR);
+			return sb.toString().split(GDE.STRING_CSV_SEPARATOR);
+		}
+	};
+		
 	/**
 	 * @param deviceProperties
 	 * @throws FileNotFoundException
@@ -37,20 +59,7 @@ public class iChargerX6 extends iChargerUsb {
 	 */
 	public iChargerX6(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
-		this.BATTERIE_TYPE = new String[] { 
-				"?",    //unknown batteries type
-				"LiPo", //LiPo
-				"LiIo", //LiIo
-				"LiFe", //LiFe
-				"LiHV", //LiHv
-				"LTO", 	//LTO
-				"NiMH", //NiMH
-				"NiCd", //NiCd
-				"NiZn", //NiZn
-				"Pb", 	//Pb
-				"Power",//Power
-				"BT_User", 
-				"?" };  //unknown battery type
+		this.BATTERIE_TYPE = BatteryTypesX.getValues(); 
 	}
 
 	/**
@@ -58,20 +67,7 @@ public class iChargerX6 extends iChargerUsb {
 	 */
 	public iChargerX6(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
-		this.BATTERIE_TYPE = new String[] { 
-				"?",    //unknown batteries type
-				"LiPo", //LiPo
-				"LiIo", //LiIo
-				"LiFe", //LiFe
-				"LiHV", //LiHv
-				"LTO", 	//LTO
-				"NiMH", //NiMH
-				"NiCd", //NiCd
-				"NiZn", //NiZn
-				"Pb", 	//Pb
-				"Power",//Power
-				"BT_User", 
-				"?" };  //unknown battery type
+		this.BATTERIE_TYPE = BatteryTypesX.getValues(); 
 	}
 
 	/**

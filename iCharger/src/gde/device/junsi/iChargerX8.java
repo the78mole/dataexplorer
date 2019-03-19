@@ -28,7 +28,7 @@ import gde.device.DeviceConfiguration;
  * Junsi iCharger X8 device class
  * @author Winfried Brügmann
  */
-public class iChargerX8 extends iChargerUsb {
+public class iChargerX8 extends iChargerX6 {
 
 	/**
 	 * @param deviceProperties
@@ -37,20 +37,7 @@ public class iChargerX8 extends iChargerUsb {
 	 */
 	public iChargerX8(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
-		this.BATTERIE_TYPE = new String[] { 
-				"?",    //unknown batteries type
-				"LiPo", //LiPo
-				"LiIo", //LiIo
-				"LiFe", //LiFe
-				"LiHV", //LiHv
-				"LTO", 	//LTO
-				"NiMH", //NiMH
-				"NiCd", //NiCd
-				"NiZn", //NiZn
-				"Pb", 	//Pb
-				"Power",//Power
-				"BT_User", 
-				"?" };  //unknown battery type
+		this.BATTERIE_TYPE = BatteryTypesX.getValues(); 
 	}
 
 	/**
@@ -58,20 +45,7 @@ public class iChargerX8 extends iChargerUsb {
 	 */
 	public iChargerX8(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
-		this.BATTERIE_TYPE = new String[] { 
-				"?",    //unknown batteries type
-				"LiPo", //LiPo
-				"LiIo", //LiIo
-				"LiFe", //LiFe
-				"LiHV", //LiHv
-				"LTO", 	//LTO
-				"NiMH", //NiMH
-				"NiCd", //NiCd
-				"NiZn", //NiZn
-				"Pb", 	//Pb
-				"Power",//Power
-				"BT_User", 
-				"?" };  //unknown battery type
+		this.BATTERIE_TYPE = BatteryTypesX.getValues(); 
 	}
 
 	/**

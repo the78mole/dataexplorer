@@ -64,7 +64,31 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	protected boolean								isFileIO		= false;
 	protected boolean								isSerialIO	= false;
 	protected UsbGathererThread			dataGatherThread;
+	protected String 								batteryType_1 = GDE.STRING_QUESTION_MARK;
+	protected String 								batteryType_2 = GDE.STRING_QUESTION_MARK;
 
+		
+	protected enum BatteryTypesDuo {
+		BT_UNKNOWN("?"), BT_LIPO("LiPo"), BT_LIIO("LiIo"), BT_LIFE("LiFe"), BT_NIMH("NiMH"), BT_NICD("NiCd"), BT_PB("PB"), BT_NIZN("NiZn"), BT_LIHV("LiHv"), BT_UNKNOWN_("?");
+
+		private String value;
+		
+		private BatteryTypesDuo(String newValue) {
+			value = newValue;
+		}
+		
+		protected String getName() {
+			return value;
+		}
+		
+		protected static String[] getValues() {
+			StringBuilder sb = new StringBuilder();
+			for (BatteryTypesDuo bt : BatteryTypesDuo.values()) 
+				sb.append(bt.value).append(GDE.CHAR_CSV_SEPARATOR);
+			return sb.toString().split(GDE.STRING_CSV_SEPARATOR);
+		}
+	};
+	
 	/**
 	 * @param deviceProperties
 	 * @throws FileNotFoundException
@@ -74,18 +98,8 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.BATTERIE_TYPE = new String[] { 
-				"?",    //unknown batteries type
-				"LiPo", //LiPo
-				"LiIo", //LiIo
-				"LiFe", //LiFe
-				"NiMH", //NiMH
-				"NiCd", //NiCd
-				"Pb", 	//Pb
-				"NiZn", //NiZn
-				"LiHV", //liHv
-				"?" };  //unknown batterie type
-
+		this.BATTERIE_TYPE = BatteryTypesDuo.getValues(); 
+ 
 		if (this.application.getMenuToolBar() != null) {
 			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
 				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
@@ -110,18 +124,8 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.BATTERIE_TYPE = new String[] { 
-				"?",    //unknown batteries type
-				"LiPo", //LiPo
-				"LiIo", //LiIo
-				"LiFe", //LiFe
-				"NiMH", //NiMH
-				"NiCd", //NiCd
-				"Pb", 	//Pb
-				"NiZn", //NiZn
-				"LiHV", //liHv
-				"?" };  //unknown batterie type
-
+		this.BATTERIE_TYPE = BatteryTypesDuo.getValues(); 
+ 
 		if (this.application.getMenuToolBar() != null) {
 			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
 				if (!isSerialIO) isSerialIO = format.getInputType() == InputTypes.SERIAL_IO;
@@ -343,7 +347,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	 * convert the device bytes into raw values, no calculation will take place here, see translateValue reverseTranslateValue
 	 * inactive or to be calculated data point are filled with 0 and needs to be handles after words
 	 * @param points pointer to integer array to be filled with converted data
-	 * @param dataBuffer byte arrax with the data to be converted
+	 * @param dataBuffer byte array with the data to be converted
 	 */
 	@Override
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
@@ -357,6 +361,25 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			//LOG_ERR = 7, LOG_TRICKLE = 8, LOG_ONLYBAL = 9, LOG_INFO = 11, LOG_DIGITPOWER = 30,
 			//byte[0] length; byte[1] type, byte[2] channel, byte[3..6]ushort timeStamp, byte[7] logState, byte[8] battType, byte[9] cycleCount
 			//short current, ushort Vin, ushort Vbat, int capacity, short tempInt, short tempExt, int Vcell1, int Vcell2, ....
+			switch (dataBuffer[2]) {
+			default:
+			case 1:
+				try {
+					batteryType_1 = this.getBatteryType(dataBuffer);
+				}
+				catch (DataInconsitsentException e) {
+					batteryType_1 = GDE.STRING_QUESTION_MARK;
+				}
+				break;
+			case 2:
+				try {
+					batteryType_2 = this.getBatteryType(dataBuffer);
+				}
+				catch (DataInconsitsentException e) {
+					batteryType_2 = GDE.STRING_QUESTION_MARK;
+				}
+				break;
+			}
 			//0=Current 1=SupplyVoltage. 2=Voltage
 			points[0] = DataParser.parse2Short(dataBuffer, 10);
 			points[1] = DataParser.parse2UnsignedShort(dataBuffer, 12);
@@ -382,13 +405,30 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			
 		case (byte) 0x80: //LOG_EX_IR = 0x80
 			//byte[0] length; byte[1] type, byte[2] channel, byte[3..6]ushort timeStamp, byte[7] logState, 
-			//short[8,9] PackIR, short[10,11] CellIR1, .... CellIR[CELL_MAX]
+			//short[8,9] PackIR, short[8,9] SumCellIR, short[10,11] CellIR1, .... CellIR[CELL_MAX]
 			int offset = 9 + this.getNumberOfLithiumCells();
-			points[offset] = DataParser.parse2UnsignedShort(dataBuffer, 8); //BatteryRi
-	
-			//CellRi1, CellRi2, ... CellRi(numberOfLithiumCells)
-			for (int i = 0,j=0; i < this.getNumberOfLithiumCells(); i++,j+=2) {
-				points[i+1+offset] = DataParser.parse2UnsignedShort(dataBuffer, 10+j);
+			points[offset++] = DataParser.parse2UnsignedShort(dataBuffer, 8); //BatteryRi 
+
+			log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
+			switch (dataBuffer[2] == 2 ? batteryType_2 : batteryType_1) {
+			case "LiPo":
+			case "LiIo":
+			case "LiFe":
+			case "LiHv":
+			case "LTO":
+			case "NiZn":
+				points[offset++] = DataParser.parse2UnsignedShort(dataBuffer, 10); //CellRiSum
+		
+				//CellRi1, CellRi2, ... CellRi(numberOfLithiumCells)
+				for (int i = 0,j=0; i < this.getNumberOfLithiumCells(); i++,j+=2) {
+					points[i+offset] = DataParser.parse2UnsignedShort(dataBuffer, 12+j);
+				}
+				break;
+			default:
+			case "NiMH":
+			case "NiCd":
+			case "PB":
+				break;
 			}
 			break;
 		}
