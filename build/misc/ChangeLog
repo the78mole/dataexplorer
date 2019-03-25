@@ -10,6 +10,7 @@ Device specific changes/fixes
 	* iChargerUSB - add scale synchronization cell Ri sum to pack Ri
 	* NMEA-Adapter - correct measurement name direction to direction_start (direction relative to start point),
     * NMEA-Adapter - reduce one none necessary call to updateVisibilityStatus
+    * GPS-Logger* - remove generated glide ratio which was never evaluated and exchange with azimuth instead
 	
 Version 3.3.6 - 12 Mar 2019
 Generic changes/fixes

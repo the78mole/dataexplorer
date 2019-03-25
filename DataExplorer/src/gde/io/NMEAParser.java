@@ -304,7 +304,7 @@ public class NMEAParser implements IDataParser {
 							//UL2 4:voltage, 5:current, 6:height, 7:climb, 8:power, 9:revolution, 11:capacity, 12:energy, 13:valueA1, 14:valueA2, 15:valueA3, 
 							//UL2 16:cellvoltage1, 17:cellvoltage2, 18:cellvoltage3, 19:cellvoltage4, 20:cellvoltage5, 21:cellvoltage6, 23:temperature intern
 							//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-							//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+							//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 							//Unilog2 15=Voltage, 16=Current, 17=Capacity, 18=Power, 19=Energy, 20=CellBalance, 21=CellVoltage1, 21=CellVoltage2, 23=CellVoltage3, 
 							//Unilog2 24=CellVoltage4, 25=CellVoltage5, 26=CellVoltage6, 27=Revolution, 28=ValueA1, 29=ValueA2, 30=ValueA3, 31=InternTemperature
 							//M-LINK  32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
@@ -318,7 +318,7 @@ public class NMEAParser implements IDataParser {
 							//UL2 4:voltage, 5:current, 6:height, 7:climb, 8:power, 9:revolution, 11:capacity, 12:energy, 13:valueA1, 14:valueA2, 15:valueA3, 
 							//UL2 16:cellvoltage1, 17:cellvoltage2, 18:cellvoltage3, 19:cellvoltage4, 20:cellvoltage5, 21:cellvoltage6, 23:temperature intern
 							//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-							//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+							//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 							//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
 							//Unilog2 	20=Voltage, 21=Current, 22=Capacity, 23=Power, 24=Energy, 25=CellBalance, 26=CellVoltage1, 27=CellVoltage2, 28=CellVoltage3, 
 							//Unilog2 	29=CellVoltage4, 30=CellVoltage5, 31=CellVoltage6, 32=Revolution, 33=ValueA1, 34=ValueA2, 35=ValueA3, 36=InternTemperature
@@ -732,6 +732,7 @@ public class NMEAParser implements IDataParser {
 			catch (Exception e) {
 				//ignore and leave value unchanged
 			}
+			
 
 			//GPS 
 			//this.values[0]  = latitude;
@@ -749,6 +750,7 @@ public class NMEAParser implements IDataParser {
 			//this.values[11] = distanceTotal;
 			//this.values[12] = distanceStart;
 			//this.values[13] = directionStart;
+			//this.values[14] = direction/azimuth;
 		}
 	}
 
@@ -957,7 +959,6 @@ public class NMEAParser implements IDataParser {
 	 * 4: Strecke (gesamt zurückgelegt)
 	 * 5: Entfernung vom Startpunkt Luftlinie
 	 * 6: Richtung vom Startpunkt
-	 * 7: Gleitzahl, in der Form „1:xx (yy.y km/h)“, dabei ist 1:xx die Gleitzahl, kein gültiger Wert ist „1:--“
 	 * @param strValues
 	 */
 	void parseSMGPS(String[] strValues) {
@@ -999,7 +1000,7 @@ public class NMEAParser implements IDataParser {
 		//this.values[11] = distanceTotal;
 		//this.values[12] = distanceStart;
 		//this.values[13] = directionStart;
-		//this.values[14] = glideRatio;
+		//this.values[14] = direction;
 	}
 
 	/**
@@ -1039,7 +1040,7 @@ public class NMEAParser implements IDataParser {
 		//this.values[11] = distanceTotal;
 		//this.values[12] = distanceStart;
 		//this.values[13] = directionStart;
-		//this.values[14] = glideRatio;
+		//this.values[14] = direction;
 		//SMGPS2
 		//this.values[15]  = acceleration x;
 		//this.values[16]  = acceleration y;
@@ -1066,7 +1067,7 @@ public class NMEAParser implements IDataParser {
 		if (this.deviceName.equals("GPS-Logger")) {
 			if (this.channelConfigNumber == 1) {
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//Unilog 	15=Voltage, 16=Current, 17=Power, 18=Revolution, 19=VoltageRx, 20=Height, 21=ValueA1, 22=ValueA2, 23=ValueA3
 				//M-LINK    24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 				for (int i = 0; i < strValues.length && i < 9; i++) {
@@ -1086,7 +1087,7 @@ public class NMEAParser implements IDataParser {
 		else if (this.deviceName.equals("GPS-Logger2") || this.deviceName.equals("GPS-Logger3")) {
 			if (this.channelConfigNumber == 1) {
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
 				//Unilog 	20=Voltage, 21=Current, 22=Power, 32=Revolution, 24=VoltageRx, 25=Height, 26=ValueA1, 27=ValueA2, 28=ValueA3
 				//M-LINK    29=valAdd00 30=valAdd01 31=valAdd02 32=valAdd03 33=valAdd04 34=valAdd05 35=valAdd06 36=valAdd07 37=valAdd08 38=valAdd09 39=valAdd10 40=valAdd11 41=valAdd12 42=valAdd13 43=valAdd14;
@@ -1121,7 +1122,7 @@ public class NMEAParser implements IDataParser {
 		//this.values[11] = distanceTotal;
 		//this.values[12] = distanceStart;
 		//this.values[13] = directionStart;
-		//this.values[14] = glideRatio;
+		//this.values[14] = direction;
 		//Unilog
 		//this.values[15] = voltageUniLog;
 		//this.values[16] = currentUniLog;
@@ -1260,7 +1261,7 @@ public class NMEAParser implements IDataParser {
 		//this.values[11] = distanceTotal;
 		//this.values[12] = distanceStart;
 		//this.values[13] = directionStart;
-		//this.values[14] = glideRatio;
+		//this.values[14] = direction;
 		//Unilog
 		//this.values[15] = voltageUniLog;
 		//this.values[16] = currentUniLog;
@@ -1381,7 +1382,7 @@ public class NMEAParser implements IDataParser {
 		if (this.deviceName.equals("GPS-Logger")) {
 			if (this.channelConfigNumber == 1) { //UniLog
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//Unilog 	15=Voltage, 16=Current, 17=Power, 18=Revolution, 19=VoltageRx, 20=Height, 21=ValueA1, 22=ValueA2, 23=ValueA3
 				//M-LINK  24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 				for (int i = 1; i < strValues.length && i <= 15; i++) {
@@ -1400,7 +1401,7 @@ public class NMEAParser implements IDataParser {
 			}
 			if (this.channelConfigNumber == 2) { //UniLog2
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//Unilog2 15=Voltage, 16=Current, 17=Capacity, 18=Power, 19=Energy, 20=CellBalance, 21=CellVoltage1, 21=CellVoltage2, 23=CellVoltage3, 
 				//Unilog2 24=CellVoltage4, 25=CellVoltage5, 26=CellVoltage6, 27=Revolution, 28=ValueA1, 29=ValueA2, 30=ValueA3, 31=InternTemperature
 				//M-LINK  32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
@@ -1422,7 +1423,7 @@ public class NMEAParser implements IDataParser {
 		else if (this.deviceName.equals("GPS-Logger2") || this.deviceName.equals("GPS-Logger3")) {
 			if (this.channelConfigNumber == 1) { //UniLog
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
 				//Unilog 	20=Voltage, 21=Current, 22=Power, 32=Revolution, 24=VoltageRx, 25=Height, 26=ValueA1, 27=ValueA2, 28=ValueA3
 				//M-LINK  29=valAdd00 30=valAdd01 31=valAdd02 32=valAdd03 33=valAdd04 34=valAdd05 35=valAdd06 36=valAdd07 37=valAdd08 38=valAdd09 39=valAdd10 40=valAdd11 41=valAdd12 42=valAdd13 43=valAdd14;
@@ -1442,7 +1443,7 @@ public class NMEAParser implements IDataParser {
 			}
 			if (this.channelConfigNumber == 2) { //UniLog2
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
 				//Unilog2 	20=Voltage, 21=Current, 22=Capacity, 23=Power, 24=Energy, 25=CellBalance, 26=CellVoltage1, 27=CellVoltage2, 28=CellVoltage3, 
 				//Unilog2 	29=CellVoltage4, 30=CellVoltage5, 31=CellVoltage6, 32=Revolution, 33=ValueA1, 34=ValueA2, 35=ValueA3, 36=InternTemperature
@@ -1497,7 +1498,7 @@ public class NMEAParser implements IDataParser {
 		//this.values[11] = distanceTotal;
 		//this.values[12] = distanceStart;
 		//this.values[13] = directionStart;
-		//this.values[14] = glideRatio;
+		//this.values[14] = direction;
 		//Unilog
 		//this.values[15] = voltageUniLog;
 		//this.values[16] = currentUniLog;

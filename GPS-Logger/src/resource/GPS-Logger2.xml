@@ -132,12 +132,11 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>glide_ratio</name>
+                <name>azimuth</name>
                 <symbol></symbol>
-                <unit>m/1</unit>
+                <unit>°</unit>
                 <active>true</active>
-                <statistics sigma="false" avg="true" max="true" min="true"/>
-            </Measurement>
+             </Measurement>
              <Measurement>
                 <name>acceleration X</name>
                 <symbol>x</symbol>

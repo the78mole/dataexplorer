@@ -30,7 +30,7 @@ import javax.xml.bind.JAXBException;
  */
 public class GPSLogger2 extends GPSLogger {
 	//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-	//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=glideRatio;
+	//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth;
 	//SMGPS2 15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 
 	//Unilog 19=voltageUniLog 20=currentUniLog 21=powerUniLog 22=revolutionUniLog 23=voltageRxUniLog 24=heightUniLog 25=a1UniLog 26=a2UniLog 27=a3UniLog;
 	//M-LINK 28=valAdd00 29=valAdd01 30=valAdd02 31=valAdd03 32=valAdd04 33=valAdd05 34=valAdd06 35=valAdd07 36=valAdd08 37=valAdd09 38=valAdd10 39=valAdd11 40=valAdd12 41=valAdd13 42=valAdd14;
