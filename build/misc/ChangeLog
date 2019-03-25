@@ -8,6 +8,8 @@ Generic changes/fixes
 Device specific changes/fixes
 	* iCharger X6/X8 - adapt parsing algorithm to support FW 207 beta 2
 	* iChargerUSB - add scale synchronization cell Ri sum to pack Ri
+	* NMEA-Adapter - correct measurement name direction to direction_start (direction relative to start point),
+    * NMEA-Adapter - reduce one none necessary call to updateVisibilityStatus
 	
 Version 3.3.6 - 12 Mar 2019
 Generic changes/fixes
