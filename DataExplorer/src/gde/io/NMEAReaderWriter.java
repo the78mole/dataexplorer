@@ -261,6 +261,9 @@ public class NMEAReaderWriter {
 
 					if (timeStamp < data.time_ms) {
 						recordSet.addNoneCalculationRecordsPoints(data.values, data.time_ms);
+						
+						if (log.isLoggable(Level.TIME)) 
+							log.log(Level.TIME, "add " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(data.time_ms)); //$NON-NLS-1$);
 					}
 					timeStamp = data.time_ms;
 				}

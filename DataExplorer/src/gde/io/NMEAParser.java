@@ -440,7 +440,10 @@ public class NMEAParser implements IDataParser {
 			int minute = Integer.parseInt(strValueTime.substring(2, 4));
 			int second = Integer.parseInt(strValueTime.substring(4, 6));
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.CHAR_DOT) + 1)) : 0);
+			int indexAfterDot = strValueTime.indexOf(GDE.CHAR_DOT) + 1;
+			long timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime.length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
+			if (log.isLoggable(Level.FINER))
+				log.log(Level.FINER, "RMC " + Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10); //$NON-NLS-1$);
 
 			if (this.lastTimeStamp < timeStamp) {
 				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
@@ -449,7 +452,7 @@ public class NMEAParser implements IDataParser {
 				if (this.startTimeStamp == 0) this.startTimeStamp = timeStamp;
 				
 				if (log.isLoggable(Level.FINE)) 
-					log.log(Level.FINE, new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(this.date)); //$NON-NLS-1$);
+					log.log(Level.FINE, "RMC " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(timeStamp)); //$NON-NLS-1$);
 
 				int latitude, longitude, velocity, magneticVariation;
 				try {
@@ -533,7 +536,13 @@ public class NMEAParser implements IDataParser {
 				int minute = Integer.parseInt(strValueTime.substring(2, 4));
 				int second = Integer.parseInt(strValueTime.substring(4, 6));
 				GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-				timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.CHAR_DOT) + 1)) : 0);
+				int indexAfterDot = strValueTime.indexOf(GDE.CHAR_DOT) + 1;
+				timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime.length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
+				if (log.isLoggable(Level.FINER))
+					log.log(Level.FINER, "GGA " + Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10); //$NON-NLS-1$);
+				
+				if (log.isLoggable(Level.FINE)) 
+					log.log(Level.FINE, "GGA " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(timeStamp)); //$NON-NLS-1$);
 			}
 
 			int latitude, longitude, numSatelites, altitudeAbs;
@@ -822,7 +831,13 @@ public class NMEAParser implements IDataParser {
 			int minute = Integer.parseInt(strValueTime.substring(2, 4));
 			int second = Integer.parseInt(strValueTime.substring(4, 6));
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-			long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.CHAR_DOT) + 1)) : 0);
+			int indexAfterDot = strValueTime.indexOf(GDE.CHAR_DOT) + 1;
+			long timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime.length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
+			if (log.isLoggable(Level.FINER))
+				log.log(Level.FINER, "GLL " + Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10); //$NON-NLS-1$);
+			
+			if (log.isLoggable(Level.FINE)) 
+				log.log(Level.FINE, "GLL " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(timeStamp)); //$NON-NLS-1$);
 
 			if (this.lastTimeStamp < timeStamp) {
 				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
@@ -896,7 +911,13 @@ public class NMEAParser implements IDataParser {
 		int minute = Integer.parseInt(strValueTime.substring(2, 4));
 		int second = Integer.parseInt(strValueTime.substring(4, 6));
 		GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-		long timeStamp = calendar.getTimeInMillis() + (strValueTime.contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime.substring(strValueTime.indexOf(GDE.CHAR_DOT) + 1)) : 0);
+		int indexAfterDot = strValueTime.indexOf(GDE.CHAR_DOT) + 1;
+		long timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime.length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
+		if (log.isLoggable(Level.FINER))
+			log.log(Level.FINER, "ZDA " + Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10); //$NON-NLS-1$);
+		
+		if (log.isLoggable(Level.FINE)) 
+			log.log(Level.FINE, "ZDA " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(timeStamp)); //$NON-NLS-1$);
 
 		if (this.lastTimeStamp < timeStamp) {
 			this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
@@ -1326,7 +1347,10 @@ public class NMEAParser implements IDataParser {
 				second = Integer.parseInt(strValueTime[2]);
 			}
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-			long timeStamp = calendar.getTimeInMillis() + (strValueTime[2].contains(GDE.STRING_DOT) ? Integer.parseInt(strValueTime[2].substring(strValueTime[2].indexOf(GDE.CHAR_DOT) + 1))*10 : 0);
+			int indexAfterDot = strValueTime[2].indexOf(GDE.CHAR_DOT) + 1;
+			long timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime[2].length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime[2].substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
+			if (log.isLoggable(Level.FINER))
+				log.log(Level.FINER, "UNILOG2 " + Integer.parseInt(strValueTime[2].substring(indexAfterDot, indexAfterDot + 2)) * 10); //$NON-NLS-1$);
 			if (this.lastTimeStamp < timeStamp) {
 				this.time_ms = (int) (this.lastTimeStamp == 0 ? 0 : this.time_ms + (timeStamp - this.lastTimeStamp));
 				this.lastTimeStamp = timeStamp;
