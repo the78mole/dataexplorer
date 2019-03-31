@@ -23,7 +23,6 @@ import gde.comm.DeviceCommPort;
 import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
-import gde.data.Record;
 import gde.data.RecordSet;
 import gde.device.DataBlockType;
 import gde.device.DeviceConfiguration;
@@ -449,13 +448,14 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	 */
 	@Override
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
-		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
+		int numberOfNoneCalculationRecords = recordSet.getNoneCalculationRecordNames().length;
+		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * numberOfNoneCalculationRecords;
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
-		int offset = 9 + this.getNumberOfLithiumCells();
+		int riRecordOffset = 9 + this.getNumberOfLithiumCells();
 		boolean isVariableIntervalTime = !recordSet.isTimeStepConstant();
 		//System.out.println("isVariableIntervalTime = " + isVariableIntervalTime);
 
@@ -467,12 +467,12 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + index); //$NON-NLS-1$
 				System.arraycopy(dataBuffer, index, convertBuffer, 0, dataBufferSize);
 				
-				//0=Current. 1=SupplyVoltage 2=Voltage
+				//0=Current 1=SupplyVoltage 2=Voltage 3=Capacity 
 				points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff)));
 				points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff)));
 				points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff)));
-				//3=Capacity 4=Power 5=Energy
 				points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff)));
+				//4=Power 5=Energy
 				points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue(); 						// power U*I [W]
 				points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
 				//6=Temp.intern 7=Temp.extern
@@ -481,21 +481,25 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	
 				int maxVotage = Integer.MIN_VALUE;
 				int minVotage = Integer.MAX_VALUE;
-				//7=VoltageCell1 8=VoltageCell2 9=VoltageCell3 10=VoltageCell4 11=VoltageCell5 12=VoltageCell6 ...... NumberOfLithiumCells
 				int k = 0;
+				//7=VoltageCell1 8=VoltageCell2 9=VoltageCell3 10=VoltageCell4 11=VoltageCell5 12=VoltageCell6 ...... NumberOfLithiumCells
 				for (int j=0; j < this.getNumberOfLithiumCells(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
 					points[j + 9] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff)));
+					//System.out.println(String.format("points[%d] k=%d..%d <- %d", (j+9), k+24, k+27, points[j+9]));
 					if (points[j + 9] > 0) {
 						maxVotage = points[j + 9] > maxVotage ? points[j + 9] : maxVotage;
 						minVotage = points[j + 9] < minVotage ? points[j + 9] : minVotage;
 					}
 				}
-				//calculate balance on the fly
+				//8=Balance calculate balance on the fly
 				points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
+				//System.out.println("----");
 				
-				if (recordSet.size() >= 9 + this.getNumberOfLithiumCells()*2 + 2) {//BatteryRi
-					for (int j=0; j < this.getNumberOfLithiumCells() + 1; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
-						points[j+offset] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff)));
+				//BatteryRi, CellRi∑, CellRi1...
+				if (recordSet.size() == 9 + this.getNumberOfLithiumCells() * 2 + 2) {
+					for (int j=0; j < this.getNumberOfLithiumCells() + 2 && j+riRecordOffset < recordSet.size(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+						points[j+riRecordOffset] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff)));
+						//System.out.println(String.format("points[%d] k=%d..%d <- %d", (j+riRecordOffset), (k+24), (k+27), points[j+riRecordOffset]));
 					}
 				}
 	
@@ -510,12 +514,12 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 				log.log(Level.FINER, i + " i*dataBufferSize = " + i*dataBufferSize); //$NON-NLS-1$
 				System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
 	
-				//0=Current. 1=SupplyVoltage 2=Voltage
+				//0=Current. 1=SupplyVoltage 2=Voltage 3=Capacity 
 				points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff)));
 				points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff)));
 				points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff)));
-				//3=Capacity 4=Power 5=Energy
 				points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff)));
+				//4=Power 5=Energy
 				points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue(); 						// power U*I [W]
 				points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
 				//6=Temp.intern 7=Temp.extern
@@ -524,21 +528,24 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	
 				int maxVotage = Integer.MIN_VALUE;
 				int minVotage = Integer.MAX_VALUE;
-				//7=VoltageCell1 8=VoltageCell2 9=VoltageCell3 10=VoltageCell4 11=VoltageCell5 12=VoltageCell6 ...... NumberOfLithiumCells
 				int k=0;
+				//7=VoltageCell1 8=VoltageCell2 9=VoltageCell3 10=VoltageCell4 11=VoltageCell5 12=VoltageCell6 ...... NumberOfLithiumCells
 				for (int j=0; j < this.getNumberOfLithiumCells(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
 					points[j + 9] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff)));
+					//System.out.println(String.format("points[%d] k=%d..%d <- %d", (j+9), k+24, k+27, points[j+9]));
 					if (points[j + 9] > 0) {
 						maxVotage = points[j + 9] > maxVotage ? points[j + 9] : maxVotage;
 						minVotage = points[j + 9] < minVotage ? points[j + 9] : minVotage;
 					}
 				}
-				//calculate balance on the fly
+				//8=Balance calculate balance on the fly
 				points[8] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0;
 				
-				if (recordSet.size() >= 9 + this.getNumberOfLithiumCells()*2 + 2) {//BatteryRi
-					for (int j=0; j < this.getNumberOfLithiumCells() + 1; ++j, k+=GDE.SIZE_BYTES_INTEGER) {
-						points[j+offset] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff)));
+				//BatteryRi, CellRi∑, CellRi1...
+				if (recordSet.size() == 9 + this.getNumberOfLithiumCells() * 2 + 2) {
+					for (int j=0; j < this.getNumberOfLithiumCells() + 2 && j+riRecordOffset < recordSet.size(); ++j, k+=GDE.SIZE_BYTES_INTEGER) {
+						points[j+riRecordOffset] = (((convertBuffer[k+24]&0xff) << 24) + ((convertBuffer[k+25]&0xff) << 16) + ((convertBuffer[k+26]&0xff) << 8) + ((convertBuffer[k+27]&0xff)));
+						//System.out.println(String.format("points[%d] k=%d..%d <- %d", (j+riRecordOffset), (k+24), (k+27), points[j+riRecordOffset]));
 					}
 				}
 	
@@ -552,6 +559,36 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	}
 
 	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		String[] recordKeys = recordSet.getRecordNames();
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		
+		if ((recordKeys.length - fileRecordsProperties.length) == 1) { // CellRi ∑
+			recordSet.remove(recordKeys[9 + this.getNumberOfLithiumCells() + 1]);
+			recordKeys = recordSet.getRecordNames();
+		}
+		else if ((recordKeys.length - fileRecordsProperties.length) > 0) { // CellRi ∑
+			int i = 0;
+			for (; i < fileRecordsProperties.length; ++i) {
+				cleanedRecordNames.add(recordKeys[i]);
+			}
+			// cleanup recordSet
+			for (; i < recordKeys.length; ++i) {
+				recordSet.remove(recordKeys[i]);
+			}
+			recordKeys = cleanedRecordNames.toArray(new String[1]);
+		}
+		return recordKeys;
+	}
+
+	/**
 	 * function to calculate values for inactive records, data not readable from device
 	 * if calculation is done during data gathering this can be a loop switching all records to displayable
 	 * for calculation which requires more effort or is time consuming it can call a background thread,
@@ -559,66 +596,67 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-		// since there are live measurement points only the calculation will take place directly after switch all to displayable
-		if (recordSet.isRaw()) {
-			// calculate the values required
-			try {
-				//0=Current 1=SupplyVoltage. 2=Voltage 3=Capacity 4=Power 5=Energy 6=Temp.intern 7=Temp.extern 8=Balance
-				//9=VoltageCell1 10=VoltageCell2 11=VoltageCell3 12=VoltageCell4 13=VoltageCell5 14=VoltageCell6 12=VoltageCell6 ...... NumberOfLithiumCells
-				int displayableCounter = 0;
-
-				Record recordCurrent = recordSet.get(0);
-				Record recordVoltage = recordSet.get(2);
-				Record recordCapacity = recordSet.get(3);
-				Record recordPower = recordSet.get(4);
-				Record recordEnergy = recordSet.get(5);
-				Record recordBalance = recordSet.get(8);
-
-				recordPower.clear();
-				recordEnergy.clear();
-				recordBalance.clear();
-
-				for (int i = 0; i < recordCurrent.size(); i++) {
-					//4=Power 5=Energy
-					recordPower.add(recordVoltage.get(i) * recordCurrent.get(i) / 100); // power U*I [W]
-					recordEnergy.add(recordVoltage.get(i) * recordCapacity.get(i) / 1000); // energy U*C [mWh]
-
-					int maxVotage = Integer.MIN_VALUE;
-					int minVotage = Integer.MAX_VALUE;
-					for (int j = 0; j < this.getNumberOfLithiumCells(); j++) {
-						Record  selectedRecord = recordSet.get(j + 9);
-						if (selectedRecord.size() > i) {
-							int value = selectedRecord.get(i);
-							if (value > 0) {
-								maxVotage = value > maxVotage ? value : maxVotage;
-								minVotage = value < minVotage ? value : minVotage;
-							}
-						}
-					}
-					//8=Balance
-					recordBalance.add(maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
-
-				}
-
-				// check if measurements isActive == false and set to isDisplayable == false
-				for (int i = 0; i < recordSet.size(); i++) {
-					Record record = recordSet.get(i);
-					if (record.isActive() && record.hasReasonableData()) {
-						++displayableCounter;
-					}
-				}
-
-				log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
-				recordSet.setConfiguredDisplayable(displayableCounter);
-
-				if (this.channels.getActiveChannel().getActiveRecordSet() == null || recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
-					this.application.updateGraphicsWindow();
-				}
-			}
-			catch (RuntimeException e) {
-				log.log(Level.SEVERE, e.getMessage(), e);
-			}
-		}
+//		// since there are live measurement points only the calculation will take place directly after switch all to displayable
+//		if (recordSet.isRaw()) {
+//			// calculate the values required
+//			try {
+//				//0=Current 1=SupplyVoltage. 2=Voltage 3=Capacity 4=Power 5=Energy 6=Temp.intern 7=Temp.extern 8=Balance
+//				//9=VoltageCell1 10=VoltageCell2 11=VoltageCell3 12=VoltageCell4 13=VoltageCell5 14=VoltageCell6 12=VoltageCell6 ...... NumberOfLithiumCells
+//				int displayableCounter = 0;
+//
+//				Record recordCurrent = recordSet.get(0);
+//				Record recordVoltage = recordSet.get(2);
+//				Record recordCapacity = recordSet.get(3);
+//				Record recordPower = recordSet.get(4);
+//				Record recordEnergy = recordSet.get(5);
+//				Record recordBalance = recordSet.get(8);
+//
+//				recordPower.clear();
+//				recordEnergy.clear();
+//				recordBalance.clear();
+//
+//				for (int i = 0; i < recordCurrent.size(); i++) {
+//					//4=Power 5=Energy
+//					recordPower.add(recordVoltage.get(i) * recordCurrent.get(i) / 100); // power U*I [W]
+//					recordEnergy.add(recordVoltage.get(i) * recordCapacity.get(i) / 1000); // energy U*C [mWh]
+//
+//					int maxVotage = Integer.MIN_VALUE;
+//					int minVotage = Integer.MAX_VALUE;
+//					for (int j = 0; j < this.getNumberOfLithiumCells(); j++) {
+//						Record  selectedRecord = recordSet.get(j + 9);
+//						if (selectedRecord.size() > i) {
+//							int value = selectedRecord.get(i);
+//							if (value > 0) {
+//								maxVotage = value > maxVotage ? value : maxVotage;
+//								minVotage = value < minVotage ? value : minVotage;
+//							}
+//						}
+//					}
+//					//8=Balance
+//					recordBalance.add(maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
+//
+//				}
+//
+//				// check if measurements isActive == false and set to isDisplayable == false
+//				for (int i = 0; i < recordSet.size(); i++) {
+//					Record record = recordSet.get(i);
+//					if (record.isActive() && record.hasReasonableData()) {
+//						++displayableCounter;
+//					}
+//				}
+//
+//				log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
+//				recordSet.setConfiguredDisplayable(displayableCounter);
+//
+//				if (this.channels.getActiveChannel().getActiveRecordSet() == null || recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
+//					this.application.updateGraphicsWindow();
+//				}
+//			}
+//			catch (RuntimeException e) {
+//				log.log(Level.SEVERE, e.getMessage(), e);
+//			}
+//		}
+		this.updateVisibilityStatus(recordSet, true);
 	}
 
 	/**
@@ -633,7 +671,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	public String[] getNoneCalculationMeasurementNames(int channelConfigNumber, String[] validMeasurementNames) {
 		final Vector<String> tmpCalculationRecords = new Vector<String>();
 		final String[] deviceMeasurements = this.getMeasurementNames(channelConfigNumber);
-		int deviceDataBlockSize = Math.abs(this.getDataBlockSize(FormatTypes.VALUE)) + getNumberOfLithiumCells() + 1;
+		int deviceDataBlockSize = Math.abs(this.getDataBlockSize(FormatTypes.VALUE)) + getNumberOfLithiumCells() + 2;
 		deviceDataBlockSize = this.getDataBlockSize(FormatTypes.VALUE) <= 0 ? deviceMeasurements.length : deviceDataBlockSize;
 		// record names may not match device measurements, but device measurements might be more then existing records
 		for (int i = 0; i < deviceMeasurements.length && i < validMeasurementNames.length; ++i) {

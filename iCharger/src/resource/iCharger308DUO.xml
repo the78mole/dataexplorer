@@ -414,6 +414,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="100.0" type="Double" description="factor to measurement value"/>
+                <property name="scale_sync_ref_ordinal" value="17" type="Integer" description="Skalasynchronisations Messwertreferenz ala Zahl"/>
             </Measurement>
             <Measurement>
                 <name>cell_internal_resistance 1</name>

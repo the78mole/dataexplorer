@@ -113,7 +113,7 @@ public class DataParserDuo extends DataParser {
 			break;
 			
 		case 128: //0x80 BattRi
-			int valueOffset = ((iChargerUsb)this.device).getNoneCalculationMeasurementNames(1, ((iChargerUsb)this.device).getMeasurementNames(1)).length - ((iChargerUsb)this.device).getNumberOfLithiumCells() - 1;
+			int valueOffset = ((iChargerUsb)this.device).getNoneCalculationMeasurementNames(1, ((iChargerUsb)this.device).getMeasurementNames(1)).length - ((iChargerUsb)this.device).getNumberOfLithiumCells() - 2;
 			strValue = strValues[2].trim().replace(GDE.CHAR_COMMA, GDE.CHAR_DOT);
 			strValue = strValue.length() > 0 ? strValue : "0";
 			if (this.start_time_ms == Integer.MIN_VALUE) {
