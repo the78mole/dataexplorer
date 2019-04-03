@@ -301,14 +301,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 
 						if (fd.getFileName().length() > 4) {
 							try {
-								String recordNameExtend;
-								try {
-									recordNameExtend = selectedImportFile.substring(selectedImportFile.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX).lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1, selectedImportFile.lastIndexOf('['));
-								}
-								catch (Exception e) {
-									recordNameExtend = GDE.STRING_EMPTY;
-								}
-								CSVSerialDataReaderWriter.read(selectedImportFile, iChargerUsb.this, recordNameExtend, 1, 
+								CSVSerialDataReaderWriter.read(selectedImportFile, iChargerUsb.this, GDE.STRING_EMPTY, 1, 
 										new  DataParserDuo(1, getDataBlockLeader(), getDataBlockSeparator().value(), null, null, 
 												 getNoneCalculationMeasurementNames(1, getMeasurementNames(1)).length, 
 												 getDataBlockFormat(InputTypes.FILE_IO), false, 2));
