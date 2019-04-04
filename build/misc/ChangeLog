@@ -4,6 +4,7 @@ Version 3.3.7 - xx yyy 2019
 Generic changes/fixes
 	* make none active measurement visible while history exploring
 	* fix wrong naming replacement direction_start
+	* add a check while user tries to create OSD-file direct in object directory to prevent overwriting data file with file link
 	
 Device specific changes/fixes
 	* iCharger X6/X8 - adapt parsing algorithm to support FW 207 beta 2

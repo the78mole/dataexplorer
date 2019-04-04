@@ -37,6 +37,8 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 import java.util.zip.ZipInputStream;
 
+import org.eclipse.swt.SWT;
+
 import gde.GDE;
 import gde.device.IDevice;
 import gde.log.Level;
@@ -603,8 +605,11 @@ public class OperatingSystemHelper {
 	public static void createFileLink(String fullQualifiedSourceFilePath, String fullQualifiedTargetFilePath) {
 
 		try {
+			//check if a file with this name already exist
 			if (FileUtils.checkFileExist(fullQualifiedTargetFilePath)) {
-				// check if the target file contained is the same
+				if (SWT.NO == DataExplorer.getInstance().openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGI0062, new Object[] { fullQualifiedTargetFilePath })))
+					return;
+				// check if the target file contained is the same link target
 				String existingSourcePath = OperatingSystemHelper.getLinkContainedFilePath(fullQualifiedTargetFilePath).replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
 				if (!existingSourcePath.equals(fullQualifiedSourceFilePath)) {
 					fullQualifiedTargetFilePath = fullQualifiedTargetFilePath.substring(0, fullQualifiedTargetFilePath.length() - 4) + GDE.STRING_UNDER_BAR + GDE.FILE_ENDING_DOT_OSD;

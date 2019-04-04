@@ -781,12 +781,6 @@ public class OsdReaderWriter {
 					}
 				}
 				if (log.isLoggable(Level.TIME)) log.log(Level.TIME, "write time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));
-
-				//update/write link if object oriented
-				if (isObjectOriented && !fullQualifiedFilePath.contains(GDE.TEMP_FILE_STEM)) {
-					OperatingSystemHelper.createFileLink(fullQualifiedFilePath,
-							OsdReaderWriter.application.getObjectFilePath() + fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1));
-				}
 			}
 			finally {
 				data_out.flush();
@@ -795,6 +789,12 @@ public class OsdReaderWriter {
 				data_out = null;
 				file_out.close();
 				file_out = null;
+				
+				//update/write link if object oriented
+				if (isObjectOriented && !fullQualifiedFilePath.contains(GDE.TEMP_FILE_STEM)) {
+					OperatingSystemHelper.createFileLink(fullQualifiedFilePath,
+							OsdReaderWriter.application.getObjectFilePath() + fullQualifiedFilePath.substring(fullQualifiedFilePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1));
+				}
 			}
 		}
 		else {

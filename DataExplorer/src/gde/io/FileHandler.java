@@ -243,7 +243,7 @@ public class FileHandler {
 				if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_OSD)) {
 					String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(openFilePath));
 					if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
-					openOsdFile(openFilePath);
+					openOsdFile(openFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX));
 				} else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_LOV)) {
 					String directoryName = ObjectKeyCompliance.getUpcomingObjectKey(Paths.get(openFilePath));
 					if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
@@ -268,12 +268,16 @@ public class FileHandler {
 
 	/**
 	 * open a DataExplorer file and load data into a cleaned device/channel
-	 * @param openFilePath
+	 * @param inputFilePath
 	 */
-	public void openOsdFile(String openFilePath) {
+	public void openOsdFile(final String inputFilePath) {
 		try {
 			boolean existAsObjectLinkFile = true;
-			openFilePath = OperatingSystemHelper.getLinkContainedFilePath(openFilePath); // check if windows link
+			String openFilePath = OperatingSystemHelper.getLinkContainedFilePath(inputFilePath); // check if windows link
+			if (openFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX).equals(inputFilePath)) {
+				DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0066, new String[] {openFilePath}));
+				return;
+			}
 			// check current device and switch if required
 			HashMap<String, String> osdHeader = OsdReaderWriter.getHeader(openFilePath);
 			String fileDeviceName = osdHeader.get(GDE.DEVICE_NAME);
