@@ -589,66 +589,6 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	 */
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
-//		// since there are live measurement points only the calculation will take place directly after switch all to displayable
-//		if (recordSet.isRaw()) {
-//			// calculate the values required
-//			try {
-//				//0=Current 1=SupplyVoltage. 2=Voltage 3=Capacity 4=Power 5=Energy 6=Temp.intern 7=Temp.extern 8=Balance
-//				//9=VoltageCell1 10=VoltageCell2 11=VoltageCell3 12=VoltageCell4 13=VoltageCell5 14=VoltageCell6 12=VoltageCell6 ...... NumberOfLithiumCells
-//				int displayableCounter = 0;
-//
-//				Record recordCurrent = recordSet.get(0);
-//				Record recordVoltage = recordSet.get(2);
-//				Record recordCapacity = recordSet.get(3);
-//				Record recordPower = recordSet.get(4);
-//				Record recordEnergy = recordSet.get(5);
-//				Record recordBalance = recordSet.get(8);
-//
-//				recordPower.clear();
-//				recordEnergy.clear();
-//				recordBalance.clear();
-//
-//				for (int i = 0; i < recordCurrent.size(); i++) {
-//					//4=Power 5=Energy
-//					recordPower.add(recordVoltage.get(i) * recordCurrent.get(i) / 100); // power U*I [W]
-//					recordEnergy.add(recordVoltage.get(i) * recordCapacity.get(i) / 1000); // energy U*C [mWh]
-//
-//					int maxVotage = Integer.MIN_VALUE;
-//					int minVotage = Integer.MAX_VALUE;
-//					for (int j = 0; j < this.getNumberOfLithiumCells(); j++) {
-//						Record  selectedRecord = recordSet.get(j + 9);
-//						if (selectedRecord.size() > i) {
-//							int value = selectedRecord.get(i);
-//							if (value > 0) {
-//								maxVotage = value > maxVotage ? value : maxVotage;
-//								minVotage = value < minVotage ? value : minVotage;
-//							}
-//						}
-//					}
-//					//8=Balance
-//					recordBalance.add(maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? maxVotage - minVotage : 0);
-//
-//				}
-//
-//				// check if measurements isActive == false and set to isDisplayable == false
-//				for (int i = 0; i < recordSet.size(); i++) {
-//					Record record = recordSet.get(i);
-//					if (record.isActive() && record.hasReasonableData()) {
-//						++displayableCounter;
-//					}
-//				}
-//
-//				log.log(Level.FINE, "displayableCounter = " + displayableCounter); //$NON-NLS-1$
-//				recordSet.setConfiguredDisplayable(displayableCounter);
-//
-//				if (this.channels.getActiveChannel().getActiveRecordSet() == null || recordSet.getName().equals(this.channels.getActiveChannel().getActiveRecordSet().getName())) {
-//					this.application.updateGraphicsWindow();
-//				}
-//			}
-//			catch (RuntimeException e) {
-//				log.log(Level.SEVERE, e.getMessage(), e);
-//			}
-//		}
 		this.updateVisibilityStatus(recordSet, true);
 	}
 

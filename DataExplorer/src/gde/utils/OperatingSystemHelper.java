@@ -686,6 +686,85 @@ public class OperatingSystemHelper {
 	}
 
 	/**
+	 * check if the given file is a file link
+	 * @param filePath
+	 * @return true if link file, esle false
+	 * @throws IOException
+	 */
+	public static boolean isLinkContained(String filePath) throws IOException {
+		filePath = filePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX);
+		boolean isFileLink = false;
+		String line = GDE.STRING_EMPTY;
+		if (GDE.IS_WINDOWS) {
+			boolean isZippedFile = false;
+			try (ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)))) {
+				isZippedFile = zip_input.getNextEntry() != null; 
+			}
+			if (!isZippedFile) {
+				char[] tmpChars = new char[25];
+				try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"))) {//$NON-NLS-1$
+					if (reader.read(tmpChars) != 25) log.log(Level.WARNING, "failed reading " + filePath);
+				}
+				line = new String(tmpChars);
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "line = " + line); //$NON-NLS-1$
+				if (!line.isEmpty() && !line.contains(GDE.DATA_EXPLORER_FILE) && !line.contains(GDE.LEGACY_OSDE_FILE)) {
+					isFileLink = true;
+				}
+			}
+		}
+		else if (GDE.IS_LINUX) {
+			try {
+				String command = "ls -al " + filePath; //$NON-NLS-1$
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "executing: " + command); //$NON-NLS-1$
+				Process process = new ProcessBuilder("ls", "-al", filePath).start(); //$NON-NLS-1$ //$NON-NLS-2$
+				process.waitFor();
+				BufferedReader bisr = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				BufferedReader besr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+				while ((line = bisr.readLine()) != null) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "std.out = " + line); //$NON-NLS-1$
+					if (line.contains(OperatingSystemHelper.STRING_LINK_POINTER)) {
+						isFileLink = true;
+					}
+				}
+				while ((line = besr.readLine()) != null) {
+					if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "std.err = " + line); //$NON-NLS-1$
+				}
+				if (process.exitValue() != 0) {
+					String msg = "failed to execute \"" + command + "\" rc = " + process.exitValue(); //$NON-NLS-1$ //$NON-NLS-2$
+					log.log(Level.SEVERE, msg);
+				}
+				besr.close();
+				bisr.close();
+			}
+			catch (Exception e) {
+				log.log(Level.SEVERE, e.getLocalizedMessage(), e);
+			}
+
+		}
+		else if (GDE.IS_MAC) {
+			ZipInputStream zip_input = new ZipInputStream(new FileInputStream(new File(filePath)));
+			if (zip_input.getNextEntry() == null) {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8")); //$NON-NLS-1$
+				char[] tmpChars = new char[25]; // max path length
+				if (25 != reader.read(tmpChars)) log.log(Level.WARNING, "failed to read from " + filePath);
+				line = new String(tmpChars);
+				log.log(Level.FINE, "line = " + line); //$NON-NLS-1$
+				if (!line.contains(GDE.DATA_EXPLORER_FILE) && !line.contains(GDE.LEGACY_OSDE_FILE)) {
+					line = line + reader.readLine();
+					isFileLink = true;
+				}
+				reader.close();
+			}
+			zip_input.close();
+		}
+		else {
+			log.log(Level.WARNING, "Operating System implementation not available"); //$NON-NLS-1$
+		}
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "isFileLink " + isFileLink);
+		return isFileLink;
+	}
+
+	/**
 	 * check if the given file is a file link, if so it returns the contained file path
 	 * @param filePath
 	 * @return if shell link file the contained file path is returned, else the given file path is returned

@@ -274,7 +274,7 @@ public class FileHandler {
 		try {
 			boolean existAsObjectLinkFile = true;
 			String openFilePath = OperatingSystemHelper.getLinkContainedFilePath(inputFilePath); // check if windows link
-			if (openFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX).equals(inputFilePath)) {
+			if (OperatingSystemHelper.isLinkContained(inputFilePath) && openFilePath.replace(GDE.CHAR_FILE_SEPARATOR_WINDOWS, GDE.CHAR_FILE_SEPARATOR_UNIX).equals(inputFilePath)) {
 				DataExplorer.getInstance().openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI0066, new String[] {openFilePath}));
 				return;
 			}
