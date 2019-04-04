@@ -101,6 +101,7 @@ public class CSVSerialDataReaderWriter {
 		int dataBlockNumber = 1;
 		String firmwareHardwareDescription = new String();
 		long lastRecordEndTimeStamp_ms = 0;
+		boolean isDataConsistentChecked = false;
 
 		try {
 			if (channelConfigNumber == null)
@@ -114,24 +115,11 @@ public class CSVSerialDataReaderWriter {
 				GDE.getUiNotification().setProgress(0);
 				activeChannelConfigNumber = activeChannel.getNumber();
 
-//				if (application.getStatusBar() != null) {
-//					channels.switchChannel(activeChannelConfigNumber, GDE.STRING_EMPTY);
-//					application.getMenuToolBar().updateChannelSelector();
-//					activeChannel = channels.getActiveChannel();
-//				}
 				if (device.recordSetNumberFollowChannel() && activeChannel.size() != 0) {
 					application.getDeviceSelectionDialog().setupDataChannels(device);
 				}
 
-				String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend;
-
-				//now get all data   $1;1;0; 14780;  598;  1000;  8838;  0002
-				//$channelConfigNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
-				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
-				int dataBlockSize = device.getDataBlockSize(InputTypes.FILE_IO); // measurements size must not match data block size, there are some measurements which are result of calculation
-				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
-				if (dataBlockSize < 0 && measurementSize > Math.abs(dataBlockSize))
-					throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] {filePath}));
+				String recordSetName = (activeChannel.size() + 1) + recordSetNameExtend; //temporary name will be replaced while recordSet creation below
 
 				DataInputStream binReader    = new DataInputStream(new FileInputStream(new File(filePath)));
 				byte[] buffer = new byte[1024];
@@ -212,10 +200,20 @@ public class CSVSerialDataReaderWriter {
 						if (data.getChannelConfigNumber() > device.getChannelCount())
 							continue; //skip data if not configured
 
-						activeChannelConfigNumber = device.recordSetNumberFollowChannel() ? data.getChannelConfigNumber() : activeChannelConfigNumber;
+						activeChannelConfigNumber = device.recordSetNumberFollowChannel() ? data.getChannelConfigNumber() : activeChannelConfigNumber;					
 						activeChannel = channels.get(activeChannelConfigNumber);
-
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, device.getChannelCount() + " - data for channel = " + activeChannelConfigNumber + " state = " + data.getState());
+						
+						if (!isDataConsistentChecked) {
+							//$1;1;0; 14780;  598;  1000;  8838;  0002
+							//$channelConfigNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
+							int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
+							int dataBlockSize = device.getDataBlockSize(InputTypes.FILE_IO); // measurements size must not match data block size, there are some measurements which are result of calculation
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize);  //$NON-NLS-1$ //$NON-NLS-2$
+							if (dataBlockSize < 0 && measurementSize > Math.abs(dataBlockSize))
+								throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] {filePath}));
+							isDataConsistentChecked = true;
+						}
 
 						//enable adding iCharger Ri values
 						boolean isJunsiChargerRiState = (device.getName().startsWith("iCharger") && data.getState() == 128);
@@ -226,6 +224,7 @@ public class CSVSerialDataReaderWriter {
 							recordSetNameExtend = recordSetNameExtend + GDE.STRING_BLANK + GDE.STRING_LEFT_BRACKET + recordNameExtend + GDE.STRING_RIGHT_BRACKET;
 						}
 						channelRecordSet = activeChannel.get(device.recordSetNumberFollowChannel() && activeChannel.getType() == ChannelTypes.TYPE_CONFIG ? activeChannel.getLastActiveRecordSetName() : recordSetName);
+						recordSetNameExtend = recordSetNameExtend.length() <= RecordSet.MAX_NAME_LENGTH - 4 /* '99) '*/ ? recordSetNameExtend : recordSetNameExtend.substring(0, RecordSet.MAX_NAME_LENGTH - 5) + GDE.STRING_RIGHT_BRACKET;
 					}
 					catch (Exception e) {
 						throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0044, new Object[] {data.getState(), filePath, device.getPropertiesFileName()}));
