@@ -470,11 +470,14 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth;
 		//calculate azimuth
 		Record recordAzimuth = recordSet.get(14);
-		recordAzimuth.clear();
-		for (Integer value : GPSHelper.calculateAzimuth(this, recordSet, 0, 1, 2)) {
-			recordAzimuth.add(value); // use add to fill min/max which get used to detect display able state
+    //exclude azimuth calculation while opening older OSD files
+    if (!recordAzimuth.hasReasonableData() && !recordAzimuth.getName().startsWith("Gl")) { //GlideRatio or Gleitzahl
+			recordAzimuth.clear();
+			for (Integer value : GPSHelper.calculateAzimuth(this, recordSet, 0, 1, 2)) {
+				recordAzimuth.add(value); // use add to fill min/max which get used to detect display able state
+			}
+			//recordAzimuth.addAll(GPSHelper.calculateAzimuth(this, recordSet, 0, 1, 2));
 		}
-		//recordAzimuth.addAll(GPSHelper.calculateAzimuth(this, recordSet, 0, 1, 2));
 
 		this.application.updateStatisticsData();
 	}

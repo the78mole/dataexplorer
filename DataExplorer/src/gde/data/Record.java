@@ -2123,7 +2123,7 @@ public class Record extends AbstractRecord implements IRecord {
 		}
 
 		tmpValue = recordProps.get(NAME);
-		if (tmpValue != null && tmpValue.length() > 0 && !this.getName().equals(tmpValue)) {
+		if (tmpValue != null && tmpValue.length() > 0 && !this.name.trim().equals(tmpValue.trim())) {
 			this.setName(tmpValue); // replace the record set key as well
 		}
 	}

@@ -983,22 +983,22 @@ public class NMEAParser implements IDataParser {
 	 * @param strValues
 	 */
 	void parseSMGPS(String[] strValues) {
-		final String STRING_GLIDE_RATIO_UNIT = "m/1"; //$NON-NLS-1$
-		for (int i = 0; i < strValues.length && i < 7; i++) {
+		//final String STRING_GLIDE_RATIO_UNIT = "m/1"; //$NON-NLS-1$
+		for (int i = 0; i < strValues.length && i < 6; i++) {
 			try {
 				String[] tmpValues = strValues[i + 1].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
-				if (i != 6) {
+				//if (i != 6) {
 					this.values[8 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
 					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().startsWith(tmpValues[1].substring(0, 1))) {
 						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_STAR)) : tmpValues[1]);
 					}
-				}
-				else {
-					this.values[8 + i] = (int) (Double.parseDouble(tmpValues[1]) * 1000.0);
-					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals(STRING_GLIDE_RATIO_UNIT)) {
-						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(STRING_GLIDE_RATIO_UNIT);
-					}
-				}
+				//}
+				//else {
+				//	this.values[8 + i] = (int) (Double.parseDouble(tmpValues[1]) * 1000.0);
+				//	if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals(STRING_GLIDE_RATIO_UNIT)) {
+				//		this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(STRING_GLIDE_RATIO_UNIT);
+				//	}
+				//}
 			}
 			catch (Exception e) {
 				// ignore and leave value unchanged
