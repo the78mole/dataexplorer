@@ -41,9 +41,9 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 	final static String $CLASS_NAME = iChargerUsbPort.class.getName();
 	final static Logger	log	= Logger.getLogger($CLASS_NAME);
 		
-  // The communication timeout in milliseconds, 500ms is the smalles interval
-	public final static long		 TIMEOUT_MS	= 997; //subtract runtime difference
-  protected long 			 timeout_ms = 1000;
+  // The communication timeout in milliseconds, 500ms is the smallest interval
+	public final static long		 TIMEOUT_MS	= 1200; 
+  protected long 			 timeout_ms = 1200;
   
   protected final byte interfaceId;
   protected final byte endpointIn;
