@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V35.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V36.xsd">
     <Device>
         <name implementation="gde.device.graupner.HoTTAdapter2">HoTTAdapter2</name>
         <manufacturer>Graupner</manufacturer>
@@ -3701,128 +3701,128 @@
             <Measurement>
                 <name>Ch 1</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
                 <name>Ch 2</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 3</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 4</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 5</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 6</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 7</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 8</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>true</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 9</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>false</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>false</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 10</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>false</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>false</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 11</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>false</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>false</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 12</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>false</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>false</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 13</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>false</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>false</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 14</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>false</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>false</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 15</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>false</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>false</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 16</name>
                 <symbol></symbol>
-                <unit>µsec</unit>
-                <active>false</active>
-                <statistics min="true" max="true" avg="true" sigma="false"/>
+				<unit>%</unit>
+				<active>false</active>
+				<statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="scale_sync_ref_ordinal" value="73" type="Integer"/>
             </Measurement>
             <Measurement>

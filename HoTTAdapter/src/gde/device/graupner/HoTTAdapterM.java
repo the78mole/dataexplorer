@@ -98,6 +98,18 @@ public class HoTTAdapterM extends HoTTAdapter {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 			newValue = value / 1000.0;
 		}
+		else if (record.getAbstractParent().getChannelConfigNumber() == 6 && (record.getOrdinal() >= 3 && record.getOrdinal() <= 18)) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = (value - reduction) * factor;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor + offset;
+			}
+		}
 		else {
 			newValue = (value - reduction) * factor + offset;
 		}
@@ -121,6 +133,18 @@ public class HoTTAdapterM extends HoTTAdapter {
 		if ((record.getOrdinal() == 1 || record.getOrdinal() == 2) && record.getAbstractParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude  )
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 			newValue = value * 1000.0;
+		}
+		else if (record.getAbstractParent().getChannelConfigNumber() == 6 && (record.getOrdinal() >= 3 && record.getOrdinal() <= 18)) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = value / factor + reduction;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor;
+			}
 		}
 		else {
 			newValue = (value - offset) / factor + reduction;

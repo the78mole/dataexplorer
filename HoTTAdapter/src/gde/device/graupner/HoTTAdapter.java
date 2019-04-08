@@ -477,6 +477,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		boolean									isChannelsChannelEnabled			= false;
 		boolean									isFilterEnabled								= true;
 		boolean									isFilterTextModus							= true;
+		boolean									isChannelPercentEnabled				= true;
 		boolean									isTolerateSignChangeLatitude	= false;
 		boolean									isTolerateSignChangeLongitude	= false;
 		double									latitudeToleranceFactor				= 90.0;
@@ -498,6 +499,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			this.isChannelsChannelEnabled = that.isChannelsChannelEnabled;
 			this.isFilterEnabled = that.isFilterEnabled;
 			this.isFilterTextModus = that.isFilterTextModus;
+			this.isChannelPercentEnabled = that.isChannelPercentEnabled;
 			this.isTolerateSignChangeLatitude = that.isTolerateSignChangeLatitude;
 			this.isTolerateSignChangeLongitude = that.isTolerateSignChangeLongitude;
 			this.latitudeToleranceFactor = that.latitudeToleranceFactor;
@@ -1298,6 +1300,18 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			double minuten = (value - (grad * 1000.0)) / 10.0;
 			newValue = grad + minuten / 60.0;
 		}
+		else if (record.getAbstractParent().getChannelConfigNumber() == 6 && (record.getOrdinal() >= 3 && record.getOrdinal() <= 18)) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = (value - reduction) * factor;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor + offset;
+			}
+		}
 		// ET logic differs compared to prepareDataTableRow for getChannelConfigNumber() == 1 (Receiver)
 		else {
 			newValue = (value - reduction) * factor + offset;
@@ -1324,7 +1338,20 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			int grad = (int) value;
 			double minuten = (value - grad * 1.0) * 60.0;
 			newValue = (grad + minuten / 100.0) * 1000.0;
-		} else {
+		} 
+		else if (record.getAbstractParent().getChannelConfigNumber() == 6 && (record.getOrdinal() >= 3 && record.getOrdinal() <= 18)) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = value / factor + reduction;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor;
+			}
+		}
+		else {
 			newValue = (value - offset) / factor + reduction;
 		}
 
@@ -1808,6 +1835,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	 */
 	public synchronized void setTextModusFilter(boolean isTextModusFilterEnabled) {
 		this.pickerParameters.isFilterTextModus = isTextModusFilterEnabled;
+	}
+
+	/**
+	 * @param isTextModusFilterEnabled the isTextModusFilterEnabled to set
+	 */
+	public synchronized void setChannelPercent(boolean isChannelPercentEnabled) {
+		this.pickerParameters.isChannelPercentEnabled = isChannelPercentEnabled;
 	}
 
 	/**

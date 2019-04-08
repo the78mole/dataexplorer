@@ -114,6 +114,18 @@ public class HoTTAdapter2M extends HoTTAdapter2 {
 		if (record.getOrdinal() == 15 || record.getOrdinal() == 16) { //15=Latitude, 16=Longitude
 			newValue = value / 1000.0;
 		}
+		else if (record.getAbstractParent().getChannelConfigNumber() == 4 && (record.getOrdinal() >= 73 && record.getOrdinal() <= 88)) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = (value - reduction) * factor;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor;
+			}
+		}
 		else {
 			newValue = (value - reduction) * factor + offset;
 		}
@@ -146,6 +158,18 @@ public class HoTTAdapter2M extends HoTTAdapter2 {
 
 		if (record.getOrdinal() == 15 || record.getOrdinal() == 16) { // 15=Latitude, 16=Longitude
 			newValue = value * 1000.0;
+		}
+		else if (record.getAbstractParent().getChannelConfigNumber() == 6 && (record.getOrdinal() >= 73 && record.getOrdinal() <= 88)) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = value / factor + reduction;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor;
+			}
 		}
 		else {
 			newValue = (value - offset) / factor + reduction;

@@ -693,6 +693,9 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 	 */
 	@Override
 	public double translateValue(Record record, double value) {
+		double factor = record.getFactor(); // != 1 if a unit translation is required
+		double offset = record.getOffset(); // != 0 if a unit translation is required
+		double reduction = record.getReduction(); // != 0 if a unit translation is required
 		double newValue = 0;
 
 		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
@@ -707,10 +710,19 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			double minuten = (value - (grad * 1000.0)) / 10.0;
 			newValue = grad + minuten / 60.0;
 		}
+		else if (record.getOrdinal() >= 76 && record.getOrdinal() <= 91) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = (value - reduction) * factor;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor;
+			}
+		}
 		else {
-			double factor = record.getFactor(); // != 1 if a unit translation is required
-			double offset = record.getOffset(); // != 0 if a unit translation is required
-			double reduction = record.getReduction(); // != 0 if a unit translation is required
 			newValue = (value - reduction) * factor + offset;
 		}
 
@@ -741,6 +753,18 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 			int grad = (int) value;
 			double minuten = (value - grad * 1.0) * 60.0;
 			newValue = (grad + minuten / 100.0) * 1000.0;
+		}
+		else if (record.getOrdinal() >= 76 && record.getOrdinal() <= 91) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = value / factor + reduction;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor;
+			}
 		}
 		else {
 			newValue = (value - offset) / factor + reduction;

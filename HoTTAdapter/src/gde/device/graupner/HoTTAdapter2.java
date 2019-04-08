@@ -753,6 +753,9 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	 */
 	@Override
 	public double translateValue(Record record, double value) {
+		double factor = record.getFactor(); // != 1 if a unit translation is required
+		double offset = record.getOffset(); // != 0 if a unit translation is required
+		double reduction = record.getReduction(); // != 0 if a unit translation is required
 		double newValue = 0;
 		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
 		//10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
@@ -769,10 +772,19 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			double minuten = (value - (grad * 1000.0)) / 10.0;
 			newValue = grad + minuten / 60.0;
 		}
+		else if (record.getAbstractParent().getChannelConfigNumber() == 4 && (record.getOrdinal() >= 73 && record.getOrdinal() <= 88)) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = (value - reduction) * factor;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor;
+			}
+		}
 		else {
-			double factor = record.getFactor(); // != 1 if a unit translation is required
-			double offset = record.getOffset(); // != 0 if a unit translation is required
-			double reduction = record.getReduction(); // != 0 if a unit translation is required
 			newValue = (value - reduction) * factor + offset;
 		}
 
@@ -805,6 +817,18 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			int grad = (int) value;
 			double minuten = (value - grad * 1.0) * 60.0;
 			newValue = (grad + minuten / 100.0) * 1000.0;
+		}
+		else if (record.getAbstractParent().getChannelConfigNumber() == 6 && (record.getOrdinal() >= 73 && record.getOrdinal() <= 88)) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = value / factor + reduction;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor;
+			}
 		}
 		else {
 			newValue = (value - offset) / factor + reduction;

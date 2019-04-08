@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import gde.GDE;
 import gde.data.Channel;
+import gde.data.Record;
 import gde.device.DeviceConfiguration;
 import gde.device.IDevice;
 import gde.device.graupner.hott.MessageIds;
@@ -245,6 +246,70 @@ public class HoTTAdapterX extends HoTTAdapter implements IDevice {
 			break;
 		}
 		return points;
+	}
+
+	/**
+	 * function to translate measured values from a device to values represented
+	 * this function should be over written by device and measurement specific algorithm
+	 * @return double of device dependent value
+	 */
+	@Override
+	public double translateValue(Record record, double value) {
+		double factor = record.getFactor(); // != 1 if a unit translation is required
+		double offset = record.getOffset(); // != 0 if a unit translation is required
+		double reduction = record.getReduction(); // != 0 if a unit translation is required
+		double newValue = 0;
+
+		if (record.getAbstractParent().getChannelConfigNumber() == 2 && (record.getOrdinal() >= 3 && record.getOrdinal() <= 10)) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = (value - reduction) * factor;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor + offset;
+			}
+		}
+		else {
+			newValue = (value - reduction) * factor + offset;
+		}
+
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return newValue;
+	}
+
+	/**
+	 * function to reverse translate measured values from a device to values represented
+	 * this function should be over written by device and measurement specific algorithm
+	 * @return double of device dependent value
+	 */
+	@Override
+	public double reverseTranslateValue(Record record, double value) {
+		double factor = record.getFactor(); // != 1 if a unit translation is required
+		double offset = record.getOffset(); // != 0 if a unit translation is required
+		double reduction = record.getReduction(); // != 0 if a unit translation is required
+		double newValue = 0;
+
+		if (record.getAbstractParent().getChannelConfigNumber() == 2 && (record.getOrdinal() >= 3 && record.getOrdinal() <= 10)) {
+			if (this.pickerParameters.isChannelPercentEnabled) {
+				if (!record.getUnit().equals("%")) record.setUnit("%");
+				factor = 0.250;
+				reduction = 1500.0;
+				newValue = value / factor + reduction;
+			}
+			else {
+				if (!record.getUnit().equals("µsec")) record.setUnit("µsec");
+				newValue = (value - reduction) * factor;
+			}
+		}
+		else {
+			newValue = (value - offset) / factor + reduction;
+		}
+
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return newValue;
 	}
 
 }
