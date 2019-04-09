@@ -6,6 +6,7 @@ Generic changes/fixes
 	* fix wrong naming replacement direction_start
 	* add a check while user tries to create OSD-file direct in object directory to prevent overwriting data file with file link
 	* update XSD version to force device xml replacement due to xml changes for several devices
+	* add DataExplorer.cmd script to Windows installation to be used while openJDK is installed and java.exe in PATH
 	
 Device specific changes/fixes
 	* HoTTAdapter* - enable channel values in % configurable using device dialog

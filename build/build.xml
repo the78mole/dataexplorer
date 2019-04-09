@@ -555,6 +555,7 @@
 	<target name="copy-files" depends="package,create_HoTTMdlViewer_lib">
 		<!-- programm directory -->
 		<copy file="build/misc/DataExplorer32.exe" tofile="${output.windows32.program}/DataExplorer.exe" />
+		<copy file="build/misc/DataExplorer32.cmd" tofile="${output.windows32.program}/DataExplorer.cmd" />
 		<copy todir="${output.windows32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" excludes="**/*NonUi*.jar" />
 			<fileset file="build/misc/DevicePropertiesEditor.exe" />
@@ -572,6 +573,7 @@
 		</copy>
 
 		<copy file="build/misc/DataExplorer64.exe" tofile="${output.windows64.program}/DataExplorer.exe" />
+		<copy file="build/misc/DataExplorer64.cmd" tofile="${output.windows64.program}/DataExplorer.cmd" />
 		<copy todir="${output.windows64.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" excludes="**/*NonUi*.jar" />
 			<fileset file="build/misc/DevicePropertiesEditor.exe" />
