@@ -61,7 +61,7 @@ public class SetupReaderWriter {
 	final static int		TEL_ALARM_SPEED_MIN					= 0x0400;
 
 	//$SETUP,192 Byte*
-	short								serialNumber								= 357;																									// 1
+	int									serialNumber								= 357;																									// 1
 	short								datarate										= 0;																										// 2 0 = 10Hz, 1 = 5Hz, 2 = 2Hz, 1 = 1Hz
 	short								startModus									= 1;																										// 3 0 = „manuell“, 1 = „3D-Fix“, 2 = „ >20 m“, 3 = „>20 km/h“
 	short								timeZone										= 2;																										// 4 -12 --> +12 step 1
@@ -161,7 +161,7 @@ public class SetupReaderWriter {
 				if (size != 192) {
 					log.log(Level.SEVERE, "error reading configuration file, data size != 192 Bytes!"); //$NON-NLS-1$
 				}
-				this.serialNumber 					= DataParser.parse2Short(buffer, 0);
+				this.serialNumber 					= DataParser.parse2UnsignedShort(buffer, 0);
 				this.datarate 							= DataParser.parse2Short(buffer, 2);
 				this.startModus 						= DataParser.parse2Short(buffer, 4);
 				this.timeZone 							= DataParser.parse2Short(buffer, 6);

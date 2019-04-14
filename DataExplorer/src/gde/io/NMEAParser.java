@@ -261,6 +261,11 @@ public class NMEAParser implements IDataParser {
 				//$GPSSETUP,2F5A,1,1,2,0,5,0,0,0,0,0,0,0,0,0,0,0,17,12C,96,3E8,1EA,1F4,64,7C,64,7D0,0,0,0,0,0,0,0,0,0,0,0,1,3,4,6,7,2,5,8,9,A,B,0,0,0,0,67,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9A67*09
 				this.deviceSerialNumber = String.format("%d", Integer.parseInt(strValues[1].trim(), 16)); //$NON-NLS-1$
 				this.timeOffsetUTC = (short) Integer.parseInt(strValues[4].trim(), 16);
+				log.log(Level.TIME, String.format("timeOffsetUTC = %d", Integer.parseInt(strValues[4].trim(), 16)));
+				if (Integer.parseInt(strValues[11].trim(), 16) == 1) { //automatic summer time
+					this.timeOffsetUTC += new GregorianCalendar().get(Calendar.DST_OFFSET)/3600000;
+					log.log(Level.TIME, String.format("DST_OFFSET+timeOffsetUTC = %d", this.timeOffsetUTC));
+				}
 				this.firmwareVersion = String.format("%.2f", Integer.parseInt(strValues[54].trim(), 16)/100.0); //$NON-NLS-1$
 				break;
 			case SETUP: // setup SM GPS-Logger firmware 1.00
@@ -430,6 +435,7 @@ public class NMEAParser implements IDataParser {
 		if (strValues[2].equals("A") || strValues[2].equals("V")) { //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.date == null) {
 				String strValueDate = strValues[9].trim();
+				if (strValueDate.length() < 6) return; //invalid values in RMC sentence
 				this.year = Integer.parseInt(strValueDate.substring(4));
 				this.year = this.year > 50 ? this.year + 1900 : this.year + 2000;
 				this.month = Integer.parseInt(strValueDate.substring(2, 4));
@@ -531,19 +537,20 @@ public class NMEAParser implements IDataParser {
 		if (strValues[6].trim().length() == 0 || Integer.parseInt(strValues[6].trim()) > 0) { //fix quality 
 			String strValueTime = strValues[1].trim();
 			long timeStamp = 0l;
-			if (strValueTime.length() > 0) {
-				int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
-				int minute = Integer.parseInt(strValueTime.substring(2, 4));
-				int second = Integer.parseInt(strValueTime.substring(4, 6));
-				GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
-				int indexAfterDot = strValueTime.indexOf(GDE.CHAR_DOT) + 1;
-				timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime.length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
-				if (log.isLoggable(Level.FINER))
-					log.log(Level.FINER, "GGA " + Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10); //$NON-NLS-1$);
-				
-				if (log.isLoggable(Level.FINE)) 
-					log.log(Level.FINE, "GGA " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(timeStamp)); //$NON-NLS-1$);
-			}
+			if (strValueTime.length() < 6) return;
+			
+			int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
+			int minute = Integer.parseInt(strValueTime.substring(2, 4));
+			int second = Integer.parseInt(strValueTime.substring(4, 6));
+			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+			int indexAfterDot = strValueTime.indexOf(GDE.CHAR_DOT) + 1;
+			timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime.length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
+			if (log.isLoggable(Level.FINER))
+				log.log(Level.FINER, "GGA " + Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10); //$NON-NLS-1$);
+			
+			if (log.isLoggable(Level.FINE)) 
+				log.log(Level.FINE, "GGA " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(timeStamp)); //$NON-NLS-1$);
+			
 
 			int latitude, longitude, numSatelites, altitudeAbs;
 			if (this.lastTimeStamp == timeStamp) { // validate sentence  depends to same sentence set
@@ -827,6 +834,8 @@ public class NMEAParser implements IDataParser {
 				this.day = calendar.get(Calendar.DATE);
 			}
 			String strValueTime = strValues[5].trim();
+			if (strValueTime.length() < 6) return;
+			
 			int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
 			int minute = Integer.parseInt(strValueTime.substring(2, 4));
 			int second = Integer.parseInt(strValueTime.substring(4, 6));
@@ -907,6 +916,8 @@ public class NMEAParser implements IDataParser {
 			this.day = Integer.parseInt(strValueDate.substring(0, 2));
 		}
 		String strValueTime = strValues[1].trim();
+		if (strValueTime.length() < 6) return;
+		
 		int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
 		int minute = Integer.parseInt(strValueTime.substring(2, 4));
 		int second = Integer.parseInt(strValueTime.substring(4, 6));

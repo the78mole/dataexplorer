@@ -1,78 +1,42 @@
-GNU DataExplorer - News - comes with version 3.3.6 - 12 Mar 2019
+GNU DataExplorer - News - comes with version 3.3.7 - 14 Apr 2019
 
 Generic changes/fixes
-	* use char instead of string const. while string operations for performance reasons
-	* update SWT to version 4.9, last version 32 bit versions distributed
-		** new SWT Linux libraries prefer to use GTK3 libraries
-		** new SWT Linux libraries does not support Windows XP anymore
-	* update all http URLs to https if possible
-	* update jaxb jars and remove disabling of optimization statement
-	* remove/reset unnecessary smoothVoltageCurve entry from devices
-	* fix visualization of serial port selection 
-	* enable curve compare independent of selected measurement unit, but warn about this fact
-	* fix Windows Java 11 serial communication add jSerialComm implementation 
-	* enable enhanced delta ratio measurement on altitude while supported by selected device
-	* fix IllegalParameterException on Linux while initiating main UI
-	* remove usb4java jar version numbers to enable update
-	* update usb4java to version 1.3.0
-	* UsbPortImpl cleanup code, remove unchecked warning, add dump methods
-	* add LibUsb library code which is closer to hardware and enable use of productString/serialNumber as additional USB-HID constrain
-	* update XSD to enable additional UsbPort productString
-	* refine semi automatic detection of scale synchronization reference
-	* update Mac OS kernel extensions for SkyRCand Junsi USB-HID hinting kext utility application
-
+	* make none active measurement visible while history exploring
+	* fix wrong naming replacement direction_start
+	* add a check while user tries to create OSD-file direct in object directory to prevent overwriting data file with file link
+	* update XSD version to force device xml replacement due to xml changes for several devices
+	* add DataExplorer.cmd script to Windows installation to be used while openJDK is installed and java.exe in PATH
+	* add news URL while update check detected new version
+	
 Device specific changes/fixes
-	* Graupner Polaron* - adapt number of transfered bytes to latest specification (Firmware 2.x required)
-	* Graupner Ultra Duo Plus - fix missing update while reading battery data using device dialog
-	* Graupner HoTT MDL Viewer plug-in update 9.4
-	* Graupner HoTTAdapter2 - add missing call parsing GAM data while only a GAM is connected to receiver 
-	* Graupner HottAdapter* - *.bin fix sensor detection while seeking position in file stream
-	* Junsi iCharger X6 - add initial release
-	* Junsi iCharger X8 - add initial release
-	* Junsi iCharger 406Duo - add initial release
-	* Junsi iChargerUSB* - prepare for upcoming FW release enabling Ri logging
-	* Junsi iChargerUSB* - enable variable log interval
-	* Junsi iChargerUSB* - update supported battery type (chemistry)
-	* GPS-Logger2 - update device selection picture
-	* GPS-Logger3 - update device selection picture
-	* ZeroAdapter - initial release to support LogView OpenFormat Zero log file evaluation
+	* HoTTAdapter* - enable channel values in % configurable using device dialog
+	* iCharger X6/X8 - adapt parsing algorithm to support FW 207 beta 2
+	* iChargerUSB - add scale synchronization cell Ri sum to pack Ri
+	* NMEA-Adapter - correct measurement name direction to direction_start (direction relative to start point),
+    * NMEA-Adapter - reduce one none necessary call to updateVisibilityStatus
+    * GPS-Logger* - remove generated glide ratio and exchange with azimuth instead
+    * GPS-Logger3 - correct time stamp evaluation, it has only two digits instead of three
+    * GPS-Logger3 - fix parsing error while invalid data
+    * GPS-Logger3 - fix time parsing/calculation using configured utcOffset
 	
 	
 Generelle Änderungen/Verbesserungen
-	* benutze Zeichen anstatt String Operationen, wegen besserer Performance
-	* Update SWT Bibliothek zu Version 4.9, das ist die letzte Version, die 32 Bit unterstützt
-		** die neuen SWT Linux Bibliotheken bevorzugen jetzt GTK3
-		** die neuen SWT Linux Bibliotheken unterstützen kein Windows XP mehr
-	* Update von allen http URLs nach https, soweit möglich
-	* Update jaxb Jars und deshalb konnte das Verhindern von Laufzeitoptimierungen entfernt werden.
-	* Unnötige Spannungskurvenglättung von allen Geräten entfernt
-	* Anzeige für die Auswahl des seriellen Ports verbessert 
-	* Der Kurvenvergleich kann jetzt auch mit Messwerten unterschiedlicher Einheit verwendet werden
-	* Windows mit Java 11 serielle Kommunikation durch Verwendung von jSerialComm verbessert 
-	* Erweiterte Möglichkeit der Verhältnismessung der Höhe generell eingeführt, wenn das verwendete Gerät entsprechende Daten liefert
-	* Verbesserung des IllegalParameter-Fehlers auf Linux bei der Initialisierung der Benutzerschnittstelle
-	* Entfernen der usb4java Versionsnummer, um Updates zu erleichtern
-	* Update usb4java zu Version 1.3.0
-	* UsbPortImpl Codebereinigung, entfernen von Warnungen, Auflistungsmethode hinzugefügt
-	* Verwendung der LibUsb Bibliothek, um Hardware näher zu sein und Einschränkungen der Portauswahl durch Zusatzparameter zu ermöglichen
-	* Update XSD, um zusätzlichen UsbPort Parameter productString zu ermöglichen
-	* Verbesserung der halbautomatischen Skalensynchronisation
-	* Update Mac OS Kernerweiterungen für SkyRC und Junsi USB-HID, Hinweise auf "kext utility" Anwendung
+	* inaktive Messwerte sind jetzt in der Historienanalyse sichtbar geschaltet
+	* fehlerhafter Messwertname für Sclüssel direction_start ersetzt
+	* Prüfung beim Sichern von OSD-Dateien direkt im Objektverzeichnis hinzugefügt, um ein Überschreiben der OSD-Datei durch den Link zu unterbinden
+	* XSD-Version hoch gezählt, um ein Austausch der Geräte-XMLs zu erzwingen (Änderungen Messwertnamen, Messwerteinheit, Synchronisationsreferenz)
+	* DataExplorer.cmd Script zur Windows-Installation hinzugefügt, um zukünftige openJDK-Installationen mit java.exe im PATH zu unterstützen
+	* News-URL zum Dialog hinzugefügt, wenn einen neue Version erkaannt wird
 
 Gerätespezifische Änderungen/Verbesserungen
-	* Graupner Polaron* - Anpassung der zu übertragenden Bytes  (Firmware 2.x Voraussetung)
-	* Graupner Ultra Duo Plus - Berichtigung fehlender Batterieparameter innerhalb des Geräte-Dialoges
-	* Graupner HoTT MDL Viewer plug-in Update auf 9.4
-	* Graupner HoTTAdapter2 - fehlender Aufruf zur Integration von GAM Daten hinzugefügt, nur GAM am Empfänger 
-	* Graupner HottAdapter* - *.bin Sensorerkennung verbessert, Positionierung auf dem Datenstrom hat nicht funktioniert
-	* Junsi iCharger X6 - initiale Unterstützung
-	* Junsi iCharger X8 - initiale Unterstützung
-	* Junsi iCharger 406Duo - initiale Unterstützung
-	* Junsi iChargerUSB* - Vorbereitung für kommende Firmware mit Aufzeichnungen des Innenwiderstands getroffen
-	* Junsi iChargerUSB* - Unterstützung von variablem Log-Interval eingeführt
-	* Junsi iChargerUSB* - Update unterstützter Batterie-Typen (Zellen-Chemie)
-	* GPS-Logger2 - Update Gerätebild
-	* GPS-Logger3 - Update Gerätebild
-	* ZeroAdapter - initiale Unterstützung LogView OpenFormat Zero
+	* HoTTAdapter* - durch Konfigurationsänderung ist jetzt die Anzeige in % oder µsec für die Kanäle möglich
+	* iCharger X6/X8 - Parsing-Algorithmus zur Unterstützung von FW 207 beta 2
+	* iChargerUSB - Skalen-Synchronization für ZellenRi ∑ mit BatterieRi eingeführt
+	* NMEA-Adapter - Messwertname korrigiert Richtung nach RichtungStart
+    * NMEA-Adapter - unnötiger Methodenaufruf zur Reduktion nicht anzeigbarer Messwerte entfernt
+    * GPS-Logger* - Messwert Gleitverhältnis mit Flugrichtung ausgetauscht
+    * GPS-Logger3 - Zeitstempel-Auswertung korrigiert, es gibt nur noch 2 Nachkommastellen anstatt drei
+    * GPS-Logger3 - Parsingfehler bei ungültigen Daten korrigiert, bzw. abgefangen
+    * GPS-Logger3 - Korrektur der eingestellten Zeitabweichung für die Zeitberechnung
 
 	
