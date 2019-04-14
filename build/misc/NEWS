@@ -17,26 +17,26 @@ Device specific changes/fixes
     * GPS-Logger* - remove generated glide ratio and exchange with azimuth instead
     * GPS-Logger3 - correct time stamp evaluation, it has only two digits instead of three
     * GPS-Logger3 - fix parsing error while invalid data
-    * GPS-Logger3 - fix time parsing/calculation using configured utcOffset
+    * GPS-Logger3 - fix time parsing/calculation adding UTC as well as DST offset if required
 	
 	
 Generelle Änderungen/Verbesserungen
-	* inaktive Messwerte sind jetzt in der Historienanalyse sichtbar geschaltet
-	* fehlerhafter Messwertname für Sclüssel direction_start ersetzt
-	* Prüfung beim Sichern von OSD-Dateien direkt im Objektverzeichnis hinzugefügt, um ein Überschreiben der OSD-Datei durch den Link zu unterbinden
-	* XSD-Version hoch gezählt, um ein Austausch der Geräte-XMLs zu erzwingen (Änderungen Messwertnamen, Messwerteinheit, Synchronisationsreferenz)
-	* DataExplorer.cmd Script zur Windows-Installation hinzugefügt, um zukünftige openJDK-Installationen mit java.exe im PATH zu unterstützen
-	* News-URL zum Dialog hinzugefügt, wenn einen neue Version erkaannt wird
+    * inaktive Messwerte sind jetzt in der Historien-Analyse sichtbar geschaltet
+    * fehlerhafter Messwertname für Schlüssel direction_start ersetzt
+    * Prüfung beim Sichern von OSD-Dateien direkt im Objektverzeichnis hinzugefügt, um ein Überschreiben der OSD-Datei durch den Link zu unterbinden
+    * XSD-Version hoch gezählt, um ein Austausch der Geräte-XMLs zu erzwingen (Änderungen Messwertnamen, Messwerteinheit, Synchronisationsreferenz)
+    * DataExplorer.cmd Script zur Windows-Installation hinzugefügt, um zukünftige openJDK-Installationen mit java.exe im PATH zu unterstützen
+    * News-URL zum Dialog hinzugefügt, wenn einen neue Version erkannt wird
 
 Gerätespezifische Änderungen/Verbesserungen
-	* HoTTAdapter* - durch Konfigurationsänderung ist jetzt die Anzeige in % oder µsec für die Kanäle möglich
-	* iCharger X6/X8 - Parsing-Algorithmus zur Unterstützung von FW 207 beta 2
-	* iChargerUSB - Skalen-Synchronization für ZellenRi ∑ mit BatterieRi eingeführt
-	* NMEA-Adapter - Messwertname korrigiert Richtung nach RichtungStart
+    * HoTTAdapter* - durch Konfigurationsänderung ist jetzt die Anzeige in % oder µsec für die Kanäle möglich
+    * iCharger X6/X8 - Korrektur zur Unterstützung von FW 207 beta 2
+    * iChargerUSB - Skalen-Synchronisation für Zellen Ri ∑ mit Batterie Ri eingeführt
+    * NMEA-Adapter - Messwertname korrigiert Richtung nach RichtungStart
     * NMEA-Adapter - unnötiger Methodenaufruf zur Reduktion nicht anzeigbarer Messwerte entfernt
     * GPS-Logger* - Messwert Gleitverhältnis mit Flugrichtung ausgetauscht
     * GPS-Logger3 - Zeitstempel-Auswertung korrigiert, es gibt nur noch 2 Nachkommastellen anstatt drei
-    * GPS-Logger3 - Parsingfehler bei ungültigen Daten korrigiert, bzw. abgefangen
-    * GPS-Logger3 - Korrektur der eingestellten Zeitabweichung für die Zeitberechnung
+    * GPS-Logger3 - Fehler bei ungültigen Daten korrigiert, bzw. abgefangen
+    * GPS-Logger3 - Korrektur der Zeitberechnung, berücksichtigt eingestellten UTC offset und DST Offset
 
 	
