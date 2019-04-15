@@ -55,6 +55,9 @@ public class NMEAParser implements IDataParser {
 	protected int[]												values;
 	protected Date												date;
 	protected short												timeOffsetUTC							= 0;
+	protected short												dstOffset									= Short.MIN_VALUE;
+	protected boolean											isAutoDstOffset						= false;
+	protected boolean											isNmeaSentenceTime				= false;
 	protected int													checkSum;
 	protected String											comment;
 	protected int													year, month, day;
@@ -261,10 +264,10 @@ public class NMEAParser implements IDataParser {
 				//$GPSSETUP,2F5A,1,1,2,0,5,0,0,0,0,0,0,0,0,0,0,0,17,12C,96,3E8,1EA,1F4,64,7C,64,7D0,0,0,0,0,0,0,0,0,0,0,0,1,3,4,6,7,2,5,8,9,A,B,0,0,0,0,67,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9A67*09
 				this.deviceSerialNumber = String.format("%d", Integer.parseInt(strValues[1].trim(), 16)); //$NON-NLS-1$
 				this.timeOffsetUTC = (short) Integer.parseInt(strValues[4].trim(), 16);
-				log.log(Level.TIME, String.format("timeOffsetUTC = %d", Integer.parseInt(strValues[4].trim(), 16)));
+				if (log.isLoggable(Level.TIME)) 
+					log.log(Level.TIME, String.format("timeOffsetUTC = %d", Integer.parseInt(strValues[4].trim(), 16)));
 				if (Integer.parseInt(strValues[11].trim(), 16) == 1) { //automatic summer time
-					this.timeOffsetUTC += new GregorianCalendar().get(Calendar.DST_OFFSET)/3600000;
-					log.log(Level.TIME, String.format("DST_OFFSET+timeOffsetUTC = %d", this.timeOffsetUTC));
+					this.isAutoDstOffset = true;
 				}
 				this.firmwareVersion = String.format("%.2f", Integer.parseInt(strValues[54].trim(), 16)/100.0); //$NON-NLS-1$
 				break;
@@ -331,7 +334,9 @@ public class NMEAParser implements IDataParser {
 							//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
 						  //int[] in2out = { -1,  -1,  -1,  -1,  15,  16,  -1,  -1,  18,  27,  -1,  17,  19,  28,  29,  30,  21,  22,  23,  24,  25,  26,  -1,  31,  -1,  -1};
 							int[] in2out = { -1,  -1,  -1,  -1,  20,  21,  -1,  -1,  23,  32,  -1,  22,  24,  33,  34,  35,  26,  27,  28,  29,  30,  31,  -1,  36,  -1,  -1};
-							parseUNILOG2(strValues, in2out, 25, false);								
+							if (log.isLoggable(Level.FINE)) 
+								log.log(Level.FINE, String.format("isNmeaSentenceTime = %b", this.isNmeaSentenceTime));
+							parseUNILOG2(strValues, in2out, 25, !this.isNmeaSentenceTime);								
 						}
 					}
 				}
@@ -413,6 +418,21 @@ public class NMEAParser implements IDataParser {
 	}
 
 	/**
+	 * check and correct time offset for GPS-Logger which allow to configure automatically DST adjustment for file time stamps
+	 * @param calendar
+	 * @param hour
+	 * @param minute
+	 * @param second
+	 * @return corrected calendar
+	 */
+	private void correctDstOffset(GregorianCalendar calendar) {
+		this.dstOffset = (short) (calendar.get(Calendar.DST_OFFSET)/3600000);
+		this.timeOffsetUTC += this.dstOffset;
+		log.log(Level.TIME, String.format("DST_OFFSET+timeOffsetUTC = %d", this.timeOffsetUTC));
+		calendar.add(Calendar.HOUR, this.dstOffset);
+	}
+
+	/**
 	 * parse the recommended minimum sentence RMC
 	 * if a NumberFormatExeption in date and time parsing occurs, skip sentence set
 	 * <ul>
@@ -442,10 +462,16 @@ public class NMEAParser implements IDataParser {
 				this.day = Integer.parseInt(strValueDate.substring(0, 2));
 			}
 			String strValueTime = strValues[1].trim();
+			if (strValueTime.length() < 9) return; //invalid values in RMC sentence
+			
 			int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
 			int minute = Integer.parseInt(strValueTime.substring(2, 4));
 			int second = Integer.parseInt(strValueTime.substring(4, 6));
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+			this.isNmeaSentenceTime = true;
+			if (this.isAutoDstOffset && this.dstOffset == Short.MIN_VALUE) {
+				this.correctDstOffset(calendar);
+			}
 			int indexAfterDot = strValueTime.indexOf(GDE.CHAR_DOT) + 1;
 			long timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime.length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
 			if (log.isLoggable(Level.FINER))
@@ -457,8 +483,8 @@ public class NMEAParser implements IDataParser {
 				this.date = calendar.getTime();
 				if (this.startTimeStamp == 0) this.startTimeStamp = timeStamp;
 				
-				if (log.isLoggable(Level.FINE)) 
-					log.log(Level.FINE, "RMC " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(timeStamp)); //$NON-NLS-1$);
+				if (log.isLoggable(Level.FINER)) 
+					log.log(Level.FINER, "RMC " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(timeStamp)); //$NON-NLS-1$);
 
 				int latitude, longitude, velocity, magneticVariation;
 				try {
@@ -537,12 +563,16 @@ public class NMEAParser implements IDataParser {
 		if (strValues[6].trim().length() == 0 || Integer.parseInt(strValues[6].trim()) > 0) { //fix quality 
 			String strValueTime = strValues[1].trim();
 			long timeStamp = 0l;
-			if (strValueTime.length() < 6) return;
+			if (strValueTime.length() < 9) return;
 			
 			int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
 			int minute = Integer.parseInt(strValueTime.substring(2, 4));
 			int second = Integer.parseInt(strValueTime.substring(4, 6));
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+			this.isNmeaSentenceTime = true;
+			if (this.isAutoDstOffset && this.dstOffset == Short.MIN_VALUE) {
+				this.correctDstOffset(calendar);
+			}
 			int indexAfterDot = strValueTime.indexOf(GDE.CHAR_DOT) + 1;
 			timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime.length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
 			if (log.isLoggable(Level.FINER))
@@ -834,12 +864,16 @@ public class NMEAParser implements IDataParser {
 				this.day = calendar.get(Calendar.DATE);
 			}
 			String strValueTime = strValues[5].trim();
-			if (strValueTime.length() < 6) return;
+			if (strValueTime.length() < 9) return;
 			
 			int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
 			int minute = Integer.parseInt(strValueTime.substring(2, 4));
 			int second = Integer.parseInt(strValueTime.substring(4, 6));
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+			this.isNmeaSentenceTime = true;
+			if (this.isAutoDstOffset && this.dstOffset == Short.MIN_VALUE) {
+				this.correctDstOffset(calendar);
+			}
 			int indexAfterDot = strValueTime.indexOf(GDE.CHAR_DOT) + 1;
 			long timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime.length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
 			if (log.isLoggable(Level.FINER))
@@ -916,12 +950,16 @@ public class NMEAParser implements IDataParser {
 			this.day = Integer.parseInt(strValueDate.substring(0, 2));
 		}
 		String strValueTime = strValues[1].trim();
-		if (strValueTime.length() < 6) return;
+		if (strValueTime.length() < 9) return;
 		
 		int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
 		int minute = Integer.parseInt(strValueTime.substring(2, 4));
 		int second = Integer.parseInt(strValueTime.substring(4, 6));
 		GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+		this.isNmeaSentenceTime = true;
+		if (this.isAutoDstOffset && this.dstOffset == Short.MIN_VALUE) {
+			this.correctDstOffset(calendar);
+		}
 		int indexAfterDot = strValueTime.indexOf(GDE.CHAR_DOT) + 1;
 		long timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime.length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
 		if (log.isLoggable(Level.FINER))
@@ -1358,6 +1396,9 @@ public class NMEAParser implements IDataParser {
 				second = Integer.parseInt(strValueTime[2]);
 			}
 			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+			if (this.isAutoDstOffset && this.dstOffset == Short.MIN_VALUE) {
+				this.correctDstOffset(calendar);
+			}
 			int indexAfterDot = strValueTime[2].indexOf(GDE.CHAR_DOT) + 1;
 			long timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime[2].length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime[2].substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
 			if (log.isLoggable(Level.FINER))

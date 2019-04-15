@@ -17,7 +17,8 @@ Device specific changes/fixes
     * GPS-Logger* - remove generated glide ratio and exchange with azimuth instead
     * GPS-Logger3 - correct time stamp evaluation, it has only two digits instead of three
     * GPS-Logger3 - fix parsing error while invalid data
-    * GPS-Logger3 - fix time parsing/calculation adding UTC as well as DST offset if required
+    * GPS-Logger3 - fix time calculation adding DST offset if required
+    * GPS-Logger3 - enable log evaluation without GPS-fix while UniLog injects time stamp
 	
 	
 Generelle Änderungen/Verbesserungen
@@ -38,5 +39,6 @@ Gerätespezifische Änderungen/Verbesserungen
     * GPS-Logger3 - Zeitstempel-Auswertung korrigiert, es gibt nur noch 2 Nachkommastellen anstatt drei
     * GPS-Logger3 - Fehler bei ungültigen Daten korrigiert, bzw. abgefangen
     * GPS-Logger3 - Korrektur der Zeitberechnung, berücksichtigt eingestellten UTC offset und DST Offset
+    * GPS-Logger3 - Logauswertung ohne GPS-fix mit angeschlossenem Unilog, wenn dieses Zeitstempel schreibt
 
 	
