@@ -3091,7 +3091,7 @@ public final class Settings extends Properties {
 	 * @return true if a log file directory is checked for new object key candidate
 	 */
 	public boolean isObjectQueryActive() {
-		return Boolean.valueOf(this.getProperty(Settings.IS_OBJECT_QUERY_ACTIVE, "true"));
+		return Boolean.valueOf(this.getProperty(Settings.IS_OBJECT_QUERY_ACTIVE, "false"));
 	}
 
 	/**
