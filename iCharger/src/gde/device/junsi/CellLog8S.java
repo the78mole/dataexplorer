@@ -243,6 +243,6 @@ public class CellLog8S extends iCharger {
 	@Override
 	public int[] getCellVoltageOrdinals() {
 		//0=Spannung 1=Balance 2=SpannungZelle1 3=SpannungZelle2 4=SpannungZelle3 5=SpannungZelle4 6=SpannungZelle5 7=SpannungZelle6 8=SpannungZelle7 9=SpannungZelle8
-		return new int[] {1, -1};
+		return new int[] {0, -1};
 	}
 }
