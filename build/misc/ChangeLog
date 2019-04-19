@@ -1,5 +1,13 @@
 Development history / change log, please read from bottom up
 
+Version 3.3.8 - xx yyy 2019
+Generic changes/fixes
+	*
+	
+Device specific changes/fixes
+	* HoTTAdapter2 - fix power calculation while importing *.log EAM
+	
+	
 Version 3.3.7 - 14 Apr 2019
 Generic changes/fixes
 	* make none active measurement visible while history exploring

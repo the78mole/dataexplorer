@@ -569,7 +569,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[1] = DataParser.parse2Short(_buf, 53) * 1000;
 		values[2] = DataParser.parse2Short(_buf, 51) * 1000;
 		values[3] = HoTTbinReader.tmpCapacity * 1000;
-		values[4] = Double.valueOf(values[3] / 1000.0 * values[4]).intValue(); // power U*I [W];
+		values[4] = Double.valueOf(values[1] / 1000.0 * values[2]).intValue(); // power U*I [W];
 		for (int j = 0; j < 14; j++) { //cell voltages
 			values[j + 6] = (_buf[j + 29] & 0xFF) * 1000;
 			if (values[j + 6] > 0) {
