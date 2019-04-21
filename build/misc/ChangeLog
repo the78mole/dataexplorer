@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 3.3.8 - xx yyy 2019
 Generic changes/fixes
 	* catch possible IndexOutOfBoundsException while updating cell voltage window
+	* 32 bit Linux seams still better compatible with GTK-2, use export SWT_GTK3=0 force using GTK-2 libs
 	
 Device specific changes/fixes
 	* HoTTAdapter2 - fix power calculation while importing *.log EAM
