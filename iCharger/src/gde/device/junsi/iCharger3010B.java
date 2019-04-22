@@ -114,20 +114,26 @@ public class iCharger3010B extends iCharger {
 			System.arraycopy(dataBuffer, startLength[0], lineBuffer, 0, startLength[1]);
 			data.parse(new String(lineBuffer), 1);
 			int[] values = data.getValues();
+//			System.out.println(StringHelper.arrayToString(values));
+//			13703, 32911, 219, 3704, 3679, 3691, 3710, 3640, 3606, 3573, 3569, 3586, 0, 333, 200, 30, 0, 
+//			13683, 32933, 220, 3708, 3682, 3694, 3712, 3642, 3609, 3576, 3571, 3591, 0, 333, 198, 31, 0, 
+//			13683, 32951, 220, 3709, 3682, 3696, 3712, 3643, 3610, 3581, 3574, 3593, 0, 333, 200, 33, 0, 
+
+			int cellOffset = this.getNumberOfLithiumCells() + 2;
 			
-			//0=VersorgungsSpg. 1=Spannung 2=Strom  
+			//0=VersorgungsSpg. 1=Spannung 2=Strom 3=Ladung 
 			points[0] = values[0];
 			points[1] = values[1];
 			points[2] = values[2];			
-			//3=Ladung 4=Leistung 5=Energie
-			points[3] = values[15] * 1000;
+			points[3] = values[cellOffset + 3] * 1000;
+			//4=Leistung 5=Energie
 			points[4] = points[1] * points[2] / 100; 							// power U*I [W]
-			points[5] = points[1]/1000 * points[3]/1000;						// energy U*C [mWh]
+			points[5] = points[1]/1000 * points[3]/1000;					// energy U*C [mWh]
 			//6=Temp.intern 7=Temp.extern 
-			points[6] = values[13];
-			points[7] = values[14];
+			points[6] = values[cellOffset + 1];
+			points[7] = values[cellOffset + 2];
 			//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 ... 18=SpannungZelle10
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < this.getNumberOfLithiumCells(); i++) {
 				points[i+9] = values[i+3];
 				if (points[i + 9] > 0) {
 					maxVotage = points[i + 9] > maxVotage ? points[i + 9] : maxVotage;
@@ -167,17 +173,17 @@ public class iCharger3010B extends iCharger {
 			log.log(Level.FINER, i + " i*dataBufferSize+timeStampBufferSize = " + i*dataBufferSize); //$NON-NLS-1$
 			System.arraycopy(dataBuffer, i*dataBufferSize, convertBuffer, 0, dataBufferSize);
 			
-			//0=VersorgungsSpg. 1=Spannung 2=Strom  
+			//0=VersorgungsSpg. 1=Spannung 2=Strom 3=Ladung  
 			points[0] = (((convertBuffer[0]&0xff) << 24) + ((convertBuffer[1]&0xff) << 16) + ((convertBuffer[2]&0xff) << 8) + ((convertBuffer[3]&0xff) << 0));
 			points[1] = (((convertBuffer[4]&0xff) << 24) + ((convertBuffer[5]&0xff) << 16) + ((convertBuffer[6]&0xff) << 8) + ((convertBuffer[7]&0xff) << 0));
 			points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff) << 0));
-			//3=Ladung 4=Leistung 5=Energie
 			points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
+			//4=Leistung 5=Energie
 			points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue();							// power U*I [W]
 			points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
 			//6=Temp.intern 7=Temp.extern 
-			points[6] = (((convertBuffer[32]&0xff) << 24) + ((convertBuffer[33]&0xff) << 16) + ((convertBuffer[34]&0xff) << 8) + ((convertBuffer[35]&0xff) << 0));
-			points[7] = (((convertBuffer[36]&0xff) << 24) + ((convertBuffer[37]&0xff) << 16) + ((convertBuffer[38]&0xff) << 8) + ((convertBuffer[39]&0xff) << 0));
+			points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
+			points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));
 
 			int maxVotage = Integer.MIN_VALUE;
 			int minVotage = Integer.MAX_VALUE;

@@ -123,18 +123,19 @@ public class iCharger208B extends iCharger {
 			//	System.out.println("Checksum = false");
 			data.parse(new String(lineBuffer), 1);
 			int[] values = data.getValues();
+			int cellOffset = this.getNumberOfLithiumCells() + 2;
 			
 			//0=VersorgungsSpg. 1=Spannung 2=Strom  
 			points[0] = values[0];
 			points[1] = values[1];
 			points[2] = values[2];			
 			//3=Ladung 4=Leistung 5=Energie
-			points[3] = values[13] * 1000;
+			points[3] = values[cellOffset + 3] * 1000;
 			points[4] = points[1] * points[2] / 100; 							// power U*I [W]
 			points[5] = points[1]/1000 * points[3]/1000;						// energy U*C [mWh]
 			//6=Temp.intern 7=Temp.extern 
-			points[6] = values[11];
-			points[7] = values[12];
+			points[6] = values[cellOffset + 1];
+			points[7] = values[cellOffset + 2];
 			//9=SpannungZelle1 10=SpannungZelle2 11=SpannungZelle3 12=SpannungZelle4 13=SpannungZelle5 14=SpannungZelle6 15=SpannungZelle7 16=SpannungZelle8
 			for (int i = 0; i < 8; i++) {
 				points[i+9] = values[i+3];

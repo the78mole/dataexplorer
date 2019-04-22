@@ -972,4 +972,12 @@ public class StringHelper {
 		}
 		return sb.toString();
 	}
+	
+	public static String arrayToString(int[] inputArray) {
+		StringBuffer sb = new StringBuffer();
+		for (Object object : inputArray) {
+			sb.append(object).append(GDE.STRING_COMMA_BLANK);
+		}
+		return sb.toString();
+	}
 }
