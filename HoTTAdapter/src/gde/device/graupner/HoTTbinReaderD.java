@@ -194,7 +194,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 							if (HoTTbinReaderD.isSensorType[HoTTAdapter.Sensor.VARIO.ordinal()]) {
 								bufCopier.copyToVarioBuffer();
-								if (bufCopier.is2BuffersFull()) {
+								if (bufCopier.is4BuffersFull()) {
 									parseVario(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 									bufCopier.clearBuffers();
 									isSensorData = true;

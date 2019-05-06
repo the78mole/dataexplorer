@@ -362,6 +362,7 @@ public class HoTTbinReader {
 
 		/**
 		 * Fill data block 0 to 2 whether it is clear or not.
+		 * fill data block 3 and 4 if HoTTAdapterD is involved
 		 */
 		public void copyToVarioBuffer() {
 			switch (buf[33]) { // data block number
@@ -376,7 +377,12 @@ public class HoTTbinReader {
 				System.arraycopy(buf, 34, buf2, 0, buf2.length);
 				break;
 			case 3:
+				isBufReady[3] = true;
+				System.arraycopy(buf, 34, buf3, 0, buf3.length);
+				break;
 			case 4:
+				isBufReady[4] = true;
+				System.arraycopy(buf, 34, buf4, 0, buf4.length);
 				break;
 			default:
 				throw new UnsupportedOperationException();
