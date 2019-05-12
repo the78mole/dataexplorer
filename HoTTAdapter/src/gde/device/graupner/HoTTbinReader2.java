@@ -1248,7 +1248,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			if (this.isChannelsChannel) {
 				return !this.pickerParameters.isFilterEnabled
 						|| this.tmpVoltage > 0 && this.tmpVoltage < 1000 && this.tmpCurrent < 4000 && this.tmpCurrent > -10 && this.tmpRevolution > -1
-						&& this.tmpRevolution < 20000 && !(this.points[85] != 0 && this.points[85] / 1000 - this.tmpTemperatureFet > 20);
+						&& this.tmpRevolution < 20000 && !(this.points[98] != 0 && this.points[98] / 1000 - this.tmpTemperatureFet > 20);
 			} else {
 				return !this.pickerParameters.isFilterEnabled
 						|| this.tmpVoltage > 0 && this.tmpVoltage < 1000 && this.tmpCurrent < 4000 && this.tmpCurrent > -10 && this.tmpRevolution > -1
