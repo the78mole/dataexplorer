@@ -72,10 +72,10 @@ public class HoTTbinReaderD extends HoTTbinReader {
 
 		if (sensors.size() <= 2) {
 			HoTTbinReader.isReceiverOnly = sensors.size() == 1;
-			readSingle(new File(header.get(HoTTAdapter.FILE_PATH)));
+			readSingle(new File(header.get(HoTTAdapter.FILE_PATH)), header);
 		}
 		else
-			readMultiple(new File(header.get(HoTTAdapter.FILE_PATH)));
+			readMultiple(new File(header.get(HoTTAdapter.FILE_PATH)), header);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 	* @throws IOException
 	* @throws DataInconsitsentException
 	*/
-	static void readSingle(File file) throws IOException, DataInconsitsentException {
+	static void readSingle(File file, HashMap<String, String> header) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readSingle";
 		long startTime = System.nanoTime() / 1000000;
 		FileInputStream file_input = new FileInputStream(file);
@@ -135,7 +135,8 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.oldProtocolCount = 0;
 		HoTTbinReader.blockSequenceCheck = new Vector<Byte>();
 		int countPackageLoss = 0;
-		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
+		boolean isSdLogFormat = Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT));
+		long numberDatablocks = isSdLogFormat ? fileSize - HoTTbinReaderX.headerSize - HoTTbinReaderX.footerSize : fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
@@ -143,6 +144,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
 		GDE.getUiNotification().setProgress(0);
+		if (isSdLogFormat) data_in.skip(HoTTbinReaderX.headerSize);
 
 		try {
 			//check if recordSet initialized, transmitter and receiver data always present, but not in the same data rate and signals
@@ -334,7 +336,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 	* @throws IOException
 	* @throws DataInconsitsentException
 	*/
-	static void readMultiple(File file) throws IOException, DataInconsitsentException {
+	static void readMultiple(File file, HashMap<String, String> header) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readMultiple";
 		long startTime = System.nanoTime() / 1000000;
 		FileInputStream file_input = new FileInputStream(file);
@@ -397,7 +399,8 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.oldProtocolCount = 0;
 		HoTTbinReader.blockSequenceCheck = new Vector<Byte>();
 		int countPackageLoss = 0;
-		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
+		boolean isSdLogFormat = Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT));
+		long numberDatablocks = isSdLogFormat ? fileSize - HoTTbinReaderX.headerSize - HoTTbinReaderX.footerSize : fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		String date = new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp_ms); //$NON-NLS-1$
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
@@ -405,6 +408,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
 		GDE.getUiNotification().setProgress(0);
+		if (isSdLogFormat) data_in.skip(HoTTbinReaderX.headerSize);
 
 		try {
 			//receiver data are always contained

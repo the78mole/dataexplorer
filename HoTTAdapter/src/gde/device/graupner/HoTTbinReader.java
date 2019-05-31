@@ -176,10 +176,10 @@ public class HoTTbinReader {
 		}
 
 		protected boolean verifyHoTTFormat() throws IOException {
-			mark(1 + this.sdLogFormat.dataBlockSize * 4);
+			mark(1 + sdLogFormat.dataBlockSize * 4);
 			byte[] buffer;
 			boolean isHoTT = true;
-			buffer = new byte[this.sdLogFormat.dataBlockSize];
+			buffer = new byte[sdLogFormat.dataBlockSize];
 			for (int i = 0; i < 4; i++) {
 				read(buffer);
 				if (buffer[0] != i + 1) {
@@ -480,15 +480,17 @@ public class HoTTbinReader {
 	 */
 	public HashMap<String, String> getFileInfo(FilterInputStream data_in, String filePath, long fileLength) throws IOException, DataTypeException {
 		final HashMap<String, String> fileInfo;
-		data_in.mark(999);
+		data_in.mark(64000);
 		byte[] buffer = new byte[64];
 		data_in.read(buffer);
 		if (filePath.endsWith(GDE.FILE_ENDING_BIN) && new String(buffer).startsWith("GRAUPNER SD LOG")) {
 			// begin evaluate for HoTTAdapterX files containing normal HoTT V4 sensor data
 			try {
+				data_in.reset();
 				SdLogFormat sdLogFormat = new SdLogFormat(HoTTbinReaderX.headerSize, HoTTbinReaderX.footerSize, 64);
 				SdLogInputStream sdLogInputStream = new SdLogInputStream(data_in, fileLength, sdLogFormat);
 				fileInfo = getFileInfo(sdLogInputStream, filePath, fileLength);
+				return fileInfo;
 			} catch (DataTypeException e) {
 				// includes diverse format exceptions
 			}
@@ -526,7 +528,10 @@ public class HoTTbinReader {
 		byte[] buffer = new byte[64];
 		data_in.read(buffer);
 		long position = (fileLength / 2) - ((NUMBER_LOG_RECORDS_TO_SCAN * 64) / 2);
-		position = position - position % 64;
+		if (data_in instanceof SdLogInputStream) 
+			position = ((fileLength - HoTTbinReaderX.headerSize - HoTTbinReaderX.footerSize) / 2) - ((NUMBER_LOG_RECORDS_TO_SCAN * 64) / 2);
+		else 	
+			position = position - position % 64;
 		if (position > 0) {
 			position = position - 64;
 			position = position <= 64 ? 64 : position;
@@ -543,13 +548,16 @@ public class HoTTbinReader {
 				data_in.read(buffer);
 				Sensor tmpSensor = Sensor.fromSensorByte(buffer[7]);
 				if (tmpSensor != null) sensors.add(tmpSensor);
-				if (HoTTbinReader.log.isLoggable(Level.FINER)) {
-					HoTTbinReader.log.log(Level.FINER, StringHelper.byte2Hex4CharString(buffer, buffer.length));
-					HoTTbinReader.log.log(Level.FINER, String.format("SensorByte  %02X", buffer[7]));
+				if (HoTTbinReader.log.isLoggable(Level.OFF)) {
+					HoTTbinReader.log.log(Level.OFF, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+					HoTTbinReader.log.log(Level.OFF, String.format("SensorByte  %02X", buffer[7]));
 				}
 			}
 		}
-		fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (fileLength / HoTTbinReader.dataBlockSize));
+		if (data_in instanceof SdLogInputStream) 
+			fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + ((fileLength - HoTTbinReaderX.headerSize - HoTTbinReaderX.footerSize) / HoTTbinReader.dataBlockSize));
+		else 	
+			fileInfo.put(HoTTAdapter.LOG_COUNT, GDE.STRING_EMPTY + (fileLength / HoTTbinReader.dataBlockSize));
 		fileInfo.put(HoTTAdapter.DETECTED_SENSOR, Sensor.getSetAsDetected(sensors));
 		if (HoTTbinReader.log.isLoggable(Level.FINE))
 			for (Entry<String, String> entry : fileInfo.entrySet()) {
@@ -592,9 +600,9 @@ public class HoTTbinReader {
 
 		if (HoTTbinReader2.detectedSensors.size() <= 2) {
 			HoTTbinReader.isReceiverOnly = HoTTbinReader2.detectedSensors.size() == 1;
-			readSingle(new File(filePath));
+			readSingle(new File(filePath), header);
 		} else {
-			readMultiple(new File(filePath));
+			readMultiple(new File(filePath), header);
 		}
 	}
 
@@ -605,7 +613,7 @@ public class HoTTbinReader {
 	 * @throws IOException
 	 * @throws DataInconsitsentException
 	 */
-	static void readSingle(File file) throws IOException, DataInconsitsentException {
+	static void readSingle(File file, HashMap<String, String> header) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readSingle";
 		long startTime = System.nanoTime() / 1000000;
 		FileInputStream file_input = new FileInputStream(file);
@@ -643,7 +651,8 @@ public class HoTTbinReader {
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
 		boolean isWrongDataBlockNummerSignaled = false;
-		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
+		boolean isSdLogFormat = Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT));
+		long numberDatablocks = isSdLogFormat ? fileSize - HoTTbinReaderX.headerSize - HoTTbinReaderX.footerSize : fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		numberDatablocks = HoTTbinReader.isReceiverOnly && !HoTTbinReader.pickerParameters.isChannelsChannelEnabled ? numberDatablocks / 10 : numberDatablocks;
 		String date = StringHelper.getDate();
@@ -652,6 +661,7 @@ public class HoTTbinReader {
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
 		GDE.getUiNotification().setProgress(0);
+		if (isSdLogFormat) data_in.skip(HoTTbinReaderX.headerSize);
 
 		try {
 			HoTTbinReader.recordSets.clear();
@@ -985,7 +995,7 @@ public class HoTTbinReader {
 	 * @throws IOException
 	 * @throws DataInconsitsentException
 	 */
-	static void readMultiple(File file) throws IOException, DataInconsitsentException {
+	static void readMultiple(File file, HashMap<String, String> header) throws IOException, DataInconsitsentException {
 		final String $METHOD_NAME = "readMultiple";
 		long startTime = System.nanoTime() / 1000000;
 		FileInputStream file_input = new FileInputStream(file);
@@ -1023,7 +1033,8 @@ public class HoTTbinReader {
 		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0, logCountSpeedControl = 0;
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
-		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
+		boolean isSdLogFormat = Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT));
+		long numberDatablocks = isSdLogFormat ? fileSize - HoTTbinReaderX.headerSize - HoTTbinReaderX.footerSize : fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
@@ -1031,6 +1042,7 @@ public class HoTTbinReader {
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
 		GDE.getUiNotification().setProgress(0);
+		if (isSdLogFormat) data_in.skip(HoTTbinReaderX.headerSize);
 
 		try {
 			HoTTbinReader.recordSets.clear();

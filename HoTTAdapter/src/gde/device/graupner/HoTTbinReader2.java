@@ -63,9 +63,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 		if (HoTTbinReader2.detectedSensors.size() <= 2) {
 			HoTTbinReader.isReceiverOnly = HoTTbinReader2.detectedSensors.size() == 1;
-			readSingle(new File(header.get(HoTTAdapter.FILE_PATH)));
+			readSingle(new File(header.get(HoTTAdapter.FILE_PATH)), header);
 		} else
-			readMultiple(new File(header.get(HoTTAdapter.FILE_PATH)));
+			readMultiple(new File(header.get(HoTTAdapter.FILE_PATH)), header);
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @throws IOException
 	 * @throws DataInconsitsentException
 	 */
-	static void readSingle(File file) throws IOException, DataInconsitsentException {
+	static void readSingle(File file, HashMap<String, String> header) throws IOException, DataInconsitsentException {
 		long startTime = System.nanoTime() / 1000000;
 		FileInputStream file_input = new FileInputStream(file);
 		DataInputStream data_in = new DataInputStream(file_input);
@@ -123,7 +123,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser2(HoTTbinReader.pickerParameters, HoTTbinReader2.points, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.escBinParser = Sensor.ESC.createBinParser2(HoTTbinReader.pickerParameters, HoTTbinReader2.points, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
 		HoTTbinReader.isTextModusSignaled = false;
-		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
+		boolean isSdLogFormat = Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT));
+		long numberDatablocks = isSdLogFormat ? fileSize - HoTTbinReaderX.headerSize - HoTTbinReaderX.footerSize : fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		numberDatablocks = HoTTbinReader.isReceiverOnly && channelNumber != HoTTAdapter2.CHANNELS_CHANNEL_NUMBER ? numberDatablocks / 10 : numberDatablocks;
 		String date = StringHelper.getDate();
@@ -132,6 +133,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
 		GDE.getUiNotification().setProgress(0);
+		if (isSdLogFormat) data_in.skip(HoTTbinReaderX.headerSize);
 
 		try {
 			// check if recordSet initialized, transmitter and receiver data always present, but not in the same data rate and signals
@@ -313,7 +315,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 	 * @throws IOException
 	 * @throws DataInconsitsentException
 	 */
-	static void readMultiple(File file) throws IOException, DataInconsitsentException {
+	static void readMultiple(File file, HashMap<String, String> header) throws IOException, DataInconsitsentException {
 		long startTime = System.nanoTime() / 1000000;
 		FileInputStream file_input = new FileInputStream(file);
 		DataInputStream data_in = new DataInputStream(file_input);
@@ -370,7 +372,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		int logCountVario = 0, logCountGPS = 0, logCountGAM = 0, logCountEAM = 0, logCountESC = 0;
 		EnumSet<Sensor> migrationJobs = EnumSet.noneOf(Sensor.class);
 
-		long numberDatablocks = fileSize / HoTTbinReader.dataBlockSize;
+		boolean isSdLogFormat = Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT));
+		long numberDatablocks = isSdLogFormat ? fileSize - HoTTbinReaderX.headerSize - HoTTbinReaderX.footerSize : fileSize / HoTTbinReader.dataBlockSize;
 		long startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(file.getName(), file.lastModified(), numberDatablocks);
 		String date = StringHelper.getDate();
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp_ms); //$NON-NLS-1$
@@ -378,6 +381,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		MenuToolBar menuToolBar = HoTTbinReader.application.getMenuToolBar();
 		int progressIndicator = (int) (numberDatablocks / 30);
 		GDE.getUiNotification().setProgress(0);
+		if (isSdLogFormat) data_in.skip(HoTTbinReaderX.headerSize);
 
 		try {
 			// receiver data are always contained

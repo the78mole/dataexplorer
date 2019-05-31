@@ -8,6 +8,7 @@ Generic changes/fixes
 Device specific changes/fixes
 	* HoTTAdapter2 - fix power calculation while importing *.log EAM
 	* HoTTAdapter2 - fix missing ESC parsing while configuration channels selected
+	* HoTTAdapter* - fix/enable again capability to analyze log files written in SD-Format with 64 byte blocks  
 	* CellLog8S - fix cell voltage display, correct index
 	* iCharger* - fix index temperature intern/extern for serial connected once only
 	
