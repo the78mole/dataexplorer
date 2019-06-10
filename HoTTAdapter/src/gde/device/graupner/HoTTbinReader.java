@@ -548,9 +548,9 @@ public class HoTTbinReader {
 				data_in.read(buffer);
 				Sensor tmpSensor = Sensor.fromSensorByte(buffer[7]);
 				if (tmpSensor != null) sensors.add(tmpSensor);
-				if (HoTTbinReader.log.isLoggable(Level.OFF)) {
-					HoTTbinReader.log.log(Level.OFF, StringHelper.byte2Hex4CharString(buffer, buffer.length));
-					HoTTbinReader.log.log(Level.OFF, String.format("SensorByte  %02X", buffer[7]));
+				if (HoTTbinReader.log.isLoggable(Level.FINER)) {
+					HoTTbinReader.log.log(Level.FINER, StringHelper.byte2Hex4CharString(buffer, buffer.length));
+					HoTTbinReader.log.log(Level.FINER, String.format("SensorByte  %02X", buffer[7]));
 				}
 			}
 		}
