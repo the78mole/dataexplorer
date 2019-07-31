@@ -793,7 +793,7 @@ public class OperatingSystemHelper {
 					if (ret.startsWith("GDE_MSGE")) { //$NON-NLS-1$
 						String msgKey = ret.split(GDE.STRING_SEMICOLON)[0];
 						String msgValue = ret.split("; ")[1];
-						throw new UnsatisfiedLinkError(Messages.getString(msgKey, new Object[] { msgValue }));
+						throw new UnsatisfiedLinkError(filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(msgKey, new Object[] { msgValue }));
 					}
 				}
 			}
