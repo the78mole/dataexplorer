@@ -62,7 +62,11 @@ public enum ChannelPropertyTypes {
     @XmlEnumValue("outlier_range_factor")
     OUTLIER_RANGE_FACTOR("outlier_range_factor"),
     @XmlEnumValue("none_specified")
-    NONE_SPECIFIED("none_specified");
+    NONE_SPECIFIED("none_specified"),
+    @XmlEnumValue("none_specified")
+    CHANNEL_PERCENTAGE("channel_percentage"),
+    @XmlEnumValue("sensor_alt_climb")
+    SENSOR_ALT_CLIMB("sensor_alt_climb");
     private final String value;
 
     ChannelPropertyTypes(String v) {

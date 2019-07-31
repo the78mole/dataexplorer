@@ -3,9 +3,13 @@ Development history / change log, please read from bottom up
 Version 3.3.8 - xx yyy 2019
 Generic changes/fixes
 	* catch possible IndexOutOfBoundsException while updating cell voltage window
-	* 32 bit Linux seams still better compatible with GTK-2, use export SWT_GTK3=0 force using GTK-2 libs
+	* 32 bit Linux lack of updates and seams still better compatible with GTK-2, use export SWT_GTK3=0 force using GTK-2 libs
+	* update XSD to version 37 to enable sensor selection for altitude/climb values
+	* update History analysis to use auto sensor selection for altitude/climb values 
 	
 Device specific changes/fixes
+	* HoTTAdapterD - enable suppressing of lab calculation by smoothing value Rx dbm
+	* HoTTAdapter2/D - enable selection of altitude/climb values source sensor
 	* HoTTAdapter2 - fix power calculation while importing *.log EAM
 	* HoTTAdapter2 - fix missing ESC parsing while configuration channels selected
 	* HoTTAdapter* - fix/enable again capability to analyze log files written in SD-Format with 64 byte blocks  
