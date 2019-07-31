@@ -478,6 +478,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		boolean									isFilterEnabled								= true;
 		boolean									isFilterTextModus							= true;
 		boolean									isChannelPercentEnabled				= true;
+		int											altitudeClimbSensorSelection						= 0;
+		
 		boolean									isTolerateSignChangeLatitude	= false;
 		boolean									isTolerateSignChangeLongitude	= false;
 		double									latitudeToleranceFactor				= 90.0;
@@ -500,6 +502,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			this.isFilterEnabled = that.isFilterEnabled;
 			this.isFilterTextModus = that.isFilterTextModus;
 			this.isChannelPercentEnabled = that.isChannelPercentEnabled;
+			this.altitudeClimbSensorSelection = that.altitudeClimbSensorSelection;
+			
 			this.isTolerateSignChangeLatitude = that.isTolerateSignChangeLatitude;
 			this.isTolerateSignChangeLongitude = that.isTolerateSignChangeLongitude;
 			this.latitudeToleranceFactor = that.latitudeToleranceFactor;
@@ -512,12 +516,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		 */
 		public String getReaderSettingsCsv() {
 			final String d = GDE.STRING_CSV_SEPARATOR;
-			return isFilterEnabled + d + isTolerateSignChangeLatitude + d + isTolerateSignChangeLongitude + d + latitudeToleranceFactor + d + longitudeToleranceFactor;
+			return isFilterEnabled + d + altitudeClimbSensorSelection;
+			//return isFilterEnabled + d + isTolerateSignChangeLatitude + d + isTolerateSignChangeLongitude + d + latitudeToleranceFactor + d + longitudeToleranceFactor;
 		}
 
 		@Override
 		public String toString() {
-			return "PickerParameters [analyzer.channels=" + this.analyzer.getChannels() + ", isChannelsChannelEnabled=" + this.isChannelsChannelEnabled + ", isFilterEnabled=" + this.isFilterEnabled + ", isFilterTextModus=" + this.isFilterTextModus + ", isTolerateSignChangeLatitude=" + this.isTolerateSignChangeLatitude + ", isTolerateSignChangeLongitude=" + this.isTolerateSignChangeLongitude + ", latitudeToleranceFactor=" + this.latitudeToleranceFactor + ", longitudeToleranceFactor=" + this.longitudeToleranceFactor + "]";
+			return "PickerParameters [analyzer.channels=" + this.analyzer.getChannels() + ", isChannelsChannelEnabled=" + this.isChannelsChannelEnabled + ", isFilterEnabled=" + this.isFilterEnabled + ", isFilterTextModus=" + this.isFilterTextModus + ", altitudeClimbSensorSelection=" + this.altitudeClimbSensorSelection + "]";
 		}
 
 
@@ -589,6 +594,15 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()) : true;
 		this.pickerParameters.isFilterTextModus = this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE) != null && this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != "" //$NON-NLS-1$
 				? Boolean.parseBoolean(this.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue()) : false;
+		try {
+			this.pickerParameters.altitudeClimbSensorSelection = this.getChannelProperty(ChannelPropertyTypes.SENSOR_ALT_CLIMB) != null && this.getChannelProperty(ChannelPropertyTypes.SENSOR_ALT_CLIMB).getValue() != null //$NON-NLS-1$
+					? Integer.parseInt(this.getChannelProperty(ChannelPropertyTypes.SENSOR_ALT_CLIMB).getValue()) : 0;
+		}
+		catch (NumberFormatException e) {
+			this.pickerParameters.altitudeClimbSensorSelection = 0;
+		}
+		
+		//TODO unused in future releases
 		this.pickerParameters.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
 				? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
 		this.pickerParameters.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
@@ -1821,13 +1835,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	/**
 	 * @param isFilterEnabled the isFilterEnabled to set
 	 */
-	public synchronized void setFilterProperties(boolean isFilterEnabled, boolean isTolerateSignChangeLatitude, boolean isTolerateSignChangeLongitude, double latitudeTolranceFactor,
-			double longitudeTolranceFactor) {
+	public synchronized void setFilterProperties(boolean isFilterEnabled) {
 		this.pickerParameters.isFilterEnabled = isFilterEnabled;
-		this.pickerParameters.isTolerateSignChangeLatitude = isTolerateSignChangeLatitude;
-		this.pickerParameters.isTolerateSignChangeLongitude = isTolerateSignChangeLongitude;
-		this.pickerParameters.latitudeToleranceFactor = latitudeTolranceFactor;
-		this.pickerParameters.longitudeToleranceFactor = longitudeTolranceFactor;
 	}
 
 	/**
@@ -1838,10 +1847,17 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	}
 
 	/**
-	 * @param isTextModusFilterEnabled the isTextModusFilterEnabled to set
+	 * @param isChannelPercentEnabled the isChannelPercentEnabled to set
 	 */
 	public synchronized void setChannelPercent(boolean isChannelPercentEnabled) {
 		this.pickerParameters.isChannelPercentEnabled = isChannelPercentEnabled;
+	}
+	
+	/**
+	 * @param altitudeClimbComboSelectionIndex the altitudeClimbSensorSelection index to set
+	 */
+	public synchronized void setAltitudeClimbSelectionProperties(int altitudeClimbComboSelectionIndex) {
+		this.pickerParameters.altitudeClimbSensorSelection = altitudeClimbComboSelectionIndex;
 	}
 
 	/**

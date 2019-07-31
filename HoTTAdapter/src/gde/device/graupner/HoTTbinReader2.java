@@ -60,6 +60,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		HoTTbinReader.pickerParameters = newPickerParameters;
 		HashMap<String, String> header = getFileInfo(new File(filePath), newPickerParameters);
 		HoTTbinReader2.detectedSensors = Sensor.getSetFromDetected(header.get(HoTTAdapter.DETECTED_SENSOR));
+		
+		//set picker parameter setting sensor for altitude/climb usage (0=auto, 1=VARIO, 2=GPS, 3=GAM, 4=EAM)
+		HoTTbinReader.setAltitudeClimbPickeParameter(HoTTbinReader.pickerParameters, HoTTbinReader2.detectedSensors);
 
 		if (HoTTbinReader2.detectedSensors.size() <= 2) {
 			HoTTbinReader.isReceiverOnly = HoTTbinReader2.detectedSensors.size() == 1;
@@ -744,12 +747,14 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			this.tmpHeight = DataParser.parse2Short(this._buf1, 2) - 500;
 			this.tmpClimb10 = DataParser.parse2UnsignedShort(this._buf2, 2) - 30000;
 			if (isPointsValid()) {
-				this.points[10] = this.tmpHeight * 1000;
-				// pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
-				// pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
-				this.points[11] = (DataParser.parse2UnsignedShort(this._buf1, 8) - 30000) * 10;
-				this.points[12] = (DataParser.parse2UnsignedShort(this._buf2, 0) - 30000) * 10;
-				this.points[13] = this.tmpClimb10 * 10;
+				if (this.pickerParameters.altitudeClimbSensorSelection == 1) { //sensor selection GPS (auto, Vario, GPS, GAM, EAM)
+					this.points[10] = this.tmpHeight * 1000;
+					// pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
+					// pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
+					this.points[11] = (DataParser.parse2UnsignedShort(this._buf1, 8) - 30000) * 10;
+					this.points[12] = (DataParser.parse2UnsignedShort(this._buf2, 0) - 30000) * 10;
+					this.points[13] = this.tmpClimb10 * 10;
+				}
 				this.points[14] = (this._buf1[1] & 0x3F) * 1000; // inverse event
 				return true;
 			}
@@ -758,7 +763,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		}
 
 		private boolean isPointsValid() {
-			// WB !this.pickerParameters.isFilterEnabled || (tmpHeight > 10 && tmpHeight < 5000 && tmpClimb10 < 40000 && tmpClimb10 > 20000); fromHoTTbinReader
 			return !this.pickerParameters.isFilterEnabled || (this.tmpHeight >= -490 && this.tmpHeight < 5000 && this.tmpClimb10 > -10000 && this.tmpClimb10 < 10000);
 		}
 
@@ -840,9 +844,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						HoTTbinReader2.log.log(Level.FINE, StringHelper.getFormatedTime("HH:mm:ss:SSS", this.getTimeStep_ms() - GDE.ONE_HOUR_MS) + " Long " + this.tmpLongitude + " - " + this.tmpLongitudeDelta);
 				}
 
-				this.points[10] = this.tmpHeight * 1000;
-				this.points[11] = this.tmpClimb1 * 10;
-				this.points[12] = this.tmpClimb3 * 1000;
+				if (this.pickerParameters.altitudeClimbSensorSelection == 2) { //sensor selection GPS (auto, Vario, GPS, GAM, EAM)
+					this.points[10] = this.tmpHeight * 1000;
+					this.points[11] = this.tmpClimb1 * 10;
+					this.points[12] = this.tmpClimb3 * 1000;
+				}
 				this.points[18] = DataParser.parse2Short(this._buf2, 6) * 1000;
 				this.points[19] = (this._buf1[3] & 0xFF) * 1000;
 				this.points[20] = 0;
@@ -933,9 +939,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				this.points[28] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
 				this.points[35] = DataParser.parse2Short(this._buf2, 8) * 1000;
 				this.points[36] = DataParser.parse2Short(this._buf2, 6) * 1000;
-				this.points[10] = this.tmpHeight * 1000;
-				this.points[11] = (DataParser.parse2UnsignedShort(this._buf3, 2) - 30000) * 10;
-				this.points[12] = this.tmpClimb3 * 1000;
+				if (this.pickerParameters.altitudeClimbSensorSelection == 3) { //sensor selection GPS (auto, Vario, GPS, GAM, EAM)
+					this.points[10] = this.tmpHeight * 1000;
+					this.points[11] = (DataParser.parse2UnsignedShort(this._buf3, 2) - 30000) * 10;
+					this.points[12] = this.tmpClimb3 * 1000;
+				}
 				this.points[37] = this.tmpVoltage1 * 100;
 				this.points[38] = this.tmpVoltage2 * 100;
 				this.points[39] = ((this._buf2[3] & 0xFF) - 20) * 1000;
@@ -1035,9 +1043,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				}
 				// calculate balance on the fly
 				this.points[50] = maxVotage != Integer.MIN_VALUE && minVotage != Integer.MAX_VALUE ? (maxVotage - minVotage) * 10 : 0;
-				this.points[10] = this.tmpHeight * 1000;
-				this.points[11] = (DataParser.parse2UnsignedShort(this._buf4, 1) - 30000) * 10;
-				this.points[12] = this.tmpClimb3 * 1000;
+				if (this.pickerParameters.altitudeClimbSensorSelection == 4) { //sensor selection GPS (auto, Vario, GPS, GAM, EAM)
+					this.points[10] = this.tmpHeight * 1000;
+					this.points[11] = (DataParser.parse2UnsignedShort(this._buf4, 1) - 30000) * 10;
+					this.points[12] = this.tmpClimb3 * 1000;
+				}
 				this.points[65] = this.tmpVoltage1 * 100;
 				this.points[66] = this.tmpVoltage2 * 100;
 				this.points[67] = ((this._buf3[1] & 0xFF) - 20) * 1000;

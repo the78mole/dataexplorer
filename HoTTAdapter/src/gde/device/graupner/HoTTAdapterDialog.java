@@ -69,9 +69,9 @@ public class HoTTAdapterDialog extends DeviceDialog {
 	CCombo											protocolTypesCombo;
 	Button											inputFileButton;
 	Button											startLifeDataCapturing, stopLifeDataCapturing;
-	Button											enableChannelRecords, enableTextModusFilter, enableChannelPercent, enableFilter, tolrateSignLatitude, tolerateSignLongitude;
-	CLabel											filterFactorLatitudeLabel, filterFactorLongitudeLabel;
-	CCombo											filterFactorLatitudeCombo, filterFactorLongitudeCombo;
+	Button											enableChannelRecords, enableTextModusFilter, enableChannelPercent, enableFilter;
+	CLabel											altitudeClimbSelectLabel;
+	CCombo											altitudeClimbSelectCombo;
 	CLabel											absorptionLevelLabel, filterStartTimeLabel, filterMaxTimeLabel, filterLapMinTimeLabel, filterMinDeltaRxDbmLabel, filterMinDeltaDistLabel;
 	CCombo											absorptionLevelCombo, filterStartTimeCombo, filterMaxTimeCombo, filterLapMinTimeCombo, filterMinDeltaRxDbmCombo, filterMinDeltaDistCombo;
 
@@ -89,7 +89,8 @@ public class HoTTAdapterDialog extends DeviceDialog {
 
 	int													measurementsCount			= 0;
 	int 												protocolTypeOrdinal		= 0;
-	String[]										filterItems = new String[] {"10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100", "105", "110", "115", "120", "130", "140", "150", "160", "170", "180", "190", "200"};
+	String[]										altitudeClimbSensors = new String[] {"auto", "VARIO", "GPS", "GAM", "EAM"};
+	String[]										filterItems = new String[] {"0", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100", "105", "110", "115", "120", "130", "140", "150", "160", "170", "180", "190", "200"};
 	String[]										filterMinItems = new String[] {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "25", "30", "40", "50", "60", "70", "80", "90", "100", "150"};
 	String[]										filterMaxItems = new String[] {"50", "60", "70", "80", "90", "100", "110", "120", "130", "140", "150", "160", "170", "180", "190", "200", "210", "300", "360", "420", "480", "540", "600"};
 
@@ -204,58 +205,16 @@ public class HoTTAdapterDialog extends DeviceDialog {
 									dialogTabItems.get(channelNumber - 1).createMeasurementsControls(channelNumber);
 								}
 							}
-							if (isHoTTAdapter) {
-								HoTTAdapterDialog.this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(HoTTAdapterDialog.this.device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
-								HoTTAdapterDialog.this.tolrateSignLatitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
-								HoTTAdapterDialog.this.filterFactorLongitudeCombo.select((int) (Double.parseDouble((String) HoTTAdapterDialog.this.device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value())) / 5 - 2));
-								HoTTAdapterDialog.this.tolerateSignLongitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
-							}
-							else if (isHoTTAdapter2){
-								HoTTAdapterDialog.this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(HoTTAdapterDialog.this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
-								HoTTAdapterDialog.this.tolrateSignLatitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
-								HoTTAdapterDialog.this.filterFactorLongitudeCombo.select((int) (Double.parseDouble((String) HoTTAdapterDialog.this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.FILTER_FACTOR.value())) / 5 - 2));
-								HoTTAdapterDialog.this.tolerateSignLongitude.setSelection(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(HoTTAdapterDialog.this.device.getMeasruementProperty(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
-							}
 							if (isHoTTAdapterX) {
 								HoTTAdapterDialog.this.enableFilter.setVisible(false);
 								HoTTAdapterDialog.this.enableTextModusFilter.setVisible(false);
 
-								HoTTAdapterDialog.this.filterFactorLatitudeLabel.setVisible(false);
-								HoTTAdapterDialog.this.filterFactorLatitudeCombo.setVisible(false);
-								HoTTAdapterDialog.this.tolrateSignLatitude.setVisible(false);
-								HoTTAdapterDialog.this.filterFactorLongitudeLabel.setVisible(false);
-								HoTTAdapterDialog.this.filterFactorLongitudeCombo.setVisible(false);
-								HoTTAdapterDialog.this.tolerateSignLongitude.setVisible(false);
 								HoTTAdapterDialog.this.startLifeDataCapturing.setVisible(false);
 								HoTTAdapterDialog.this.stopLifeDataCapturing.setVisible(false);
 								HoTTAdapterDialog.this.protocolTypesLabel.setVisible(false);
 								HoTTAdapterDialog.this.protocolTypesCombo.setVisible(false);
 								HoTTAdapterDialog.this.protocolTypesUnitLabel.setVisible(false);
 							}
-							else if (isHoTTAdapter && channelNumber == 3 || !isHoTTAdapter) { //GPS
-								HoTTAdapterDialog.this.filterFactorLatitudeLabel.setEnabled(true);
-								HoTTAdapterDialog.this.filterFactorLatitudeCombo.setEnabled(true);
-								HoTTAdapterDialog.this.tolrateSignLatitude.setEnabled(true);
-								HoTTAdapterDialog.this.filterFactorLongitudeLabel.setEnabled(true);
-								HoTTAdapterDialog.this.filterFactorLongitudeCombo.setEnabled(true);
-								HoTTAdapterDialog.this.tolerateSignLongitude.setEnabled(true);
-							}
-							else {
-								HoTTAdapterDialog.this.filterFactorLatitudeLabel.setEnabled(false);
-								HoTTAdapterDialog.this.filterFactorLatitudeCombo.setEnabled(false);
-								HoTTAdapterDialog.this.tolrateSignLatitude.setEnabled(false);
-								HoTTAdapterDialog.this.filterFactorLongitudeLabel.setEnabled(false);
-								HoTTAdapterDialog.this.filterFactorLongitudeCombo.setEnabled(false);
-								HoTTAdapterDialog.this.tolerateSignLongitude.setEnabled(false);
-							}
-							
-							//TODO prepare to remove GPS lat long filter , fist step remove visibility
-							HoTTAdapterDialog.this.filterFactorLatitudeLabel.setVisible(false);
-							HoTTAdapterDialog.this.filterFactorLatitudeCombo.setVisible(false);
-							HoTTAdapterDialog.this.tolrateSignLatitude.setVisible(false);
-							HoTTAdapterDialog.this.filterFactorLongitudeLabel.setVisible(false);
-							HoTTAdapterDialog.this.filterFactorLongitudeCombo.setVisible(false);
-							HoTTAdapterDialog.this.tolerateSignLongitude.setVisible(false);
 						}
 					});
 				}
@@ -444,8 +403,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 							this.absorptionLevelCombo.setLayoutData(enableFilterLData);
 							this.absorptionLevelCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.absorptionLevelCombo.setItems(filterItems);
-							//this.absorptionLevelCombo.select(12);
-							this.absorptionLevelCombo.setToolTipText("Größerer Wert -> größere Glättung");
+							this.absorptionLevelCombo.setToolTipText("Größerer Wert -> größere Glättung, 0 == aus");
 							this.absorptionLevelCombo.setEditable(false);
 							this.absorptionLevelCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 							this.absorptionLevelCombo.addSelectionListener(new SelectionAdapter() {
@@ -578,9 +536,7 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "enableFilter.widgetSelected, event=" + evt); //$NON-NLS-1$
 							HoTTAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.ENABLE_FILTER, DataTypes.BOOLEAN, GDE.STRING_EMPTY + HoTTAdapterDialog.this.enableFilter.getSelection());
-							HoTTAdapterDialog.this.device.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(), 
-									HoTTAdapterDialog.this.tolrateSignLatitude.getSelection(),  HoTTAdapterDialog.this.tolerateSignLongitude.getSelection(),
-									HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
+							HoTTAdapterDialog.this.device.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection());
 							HoTTAdapterDialog.this.enableSaveButton(true);
 						}
 					});
@@ -621,140 +577,47 @@ public class HoTTAdapterDialog extends DeviceDialog {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "enableChannelPercent.widgetSelected, event=" + evt); //$NON-NLS-1$
-							HoTTAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED, DataTypes.BOOLEAN, GDE.STRING_EMPTY + HoTTAdapterDialog.this.enableChannelPercent.getSelection());
+							HoTTAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.CHANNEL_PERCENTAGE, DataTypes.BOOLEAN, GDE.STRING_EMPTY + HoTTAdapterDialog.this.enableChannelPercent.getSelection());
 							HoTTAdapterDialog.this.device.setChannelPercent(HoTTAdapterDialog.this.enableChannelPercent.getSelection());
 							HoTTAdapterDialog.this.enableSaveButton(true);
 						}
 					});
 				}
 				{
-					this.filterFactorLatitudeLabel = new CLabel(this.dialogShell, SWT.RIGHT);
+					this.altitudeClimbSelectLabel = new CLabel(this.dialogShell, SWT.RIGHT);
 					FormData enableFilterLData = new FormData();
 					enableFilterLData.height = GDE.IS_MAC ? 22: 20;
-					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 225 : 175);
-					enableFilterLData.width = this.isHoTTAdapter ? 105 : 140;
+					enableFilterLData.left = new FormAttachment(0, 1000, 380); //not used for HoTTAdapter
+					enableFilterLData.width = this.isHoTTAdapter ? 135 : 140;
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
-					this.filterFactorLatitudeLabel.setLayoutData(enableFilterLData);
-					this.filterFactorLatitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.filterFactorLatitudeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2419));
-					this.filterFactorLatitudeLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2420));
+					this.altitudeClimbSelectLabel.setLayoutData(enableFilterLData);
+					this.altitudeClimbSelectLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.altitudeClimbSelectLabel.setText(Messages.getString(MessageIds.GDE_MSGT2419));
+					this.altitudeClimbSelectLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2420));
 				}
 				{
-					this.filterFactorLatitudeCombo = new CCombo(this.dialogShell, SWT.BORDER);
+					this.altitudeClimbSelectCombo = new CCombo(this.dialogShell, SWT.BORDER);
 					FormData enableFilterLData = new FormData();
 					enableFilterLData.height = GDE.IS_MAC ? 18 : 16;
-					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 330 : 320);
-					enableFilterLData.width = 42;
+					enableFilterLData.left = new FormAttachment(0, 1000, 520); //not used for HoTTAdapter
+					enableFilterLData.width = 62;
 					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -80 : -80);
-					this.filterFactorLatitudeCombo.setLayoutData(enableFilterLData);
-					this.filterFactorLatitudeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.filterFactorLatitudeCombo.setItems(filterItems);
-					this.filterFactorLatitudeCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2420));
-					this.filterFactorLatitudeCombo.setEditable(false);
-					this.filterFactorLatitudeCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-					this.filterFactorLatitudeCombo.addSelectionListener(new SelectionAdapter() {
+					this.altitudeClimbSelectCombo.setLayoutData(enableFilterLData);
+					this.altitudeClimbSelectCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.altitudeClimbSelectCombo.setItems(altitudeClimbSensors);
+					this.altitudeClimbSelectCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2420));
+					this.altitudeClimbSelectCombo.setEditable(false);
+					this.altitudeClimbSelectCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
+					this.altitudeClimbSelectCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
 							log.log(java.util.logging.Level.FINEST, "filterFactorLatitudeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							HoTTAdapterDialog.this.device.setMeasurementPropertyValue(isHoTTAdapter ? 3 : HoTTAdapterDialog.this.tabFolder.getSelectionIndex()+1, isHoTTAdapter ? 1 : 13, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.DOUBLE, HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0);
-							HoTTAdapterDialog.this.device.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
-									HoTTAdapterDialog.this.tolrateSignLatitude.getSelection(),  HoTTAdapterDialog.this.tolerateSignLongitude.getSelection(),
-									HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
+							HoTTAdapterDialog.this.device.setChannelProperty(ChannelPropertyTypes.SENSOR_ALT_CLIMB, DataTypes.INTEGER, GDE.STRING_EMPTY + HoTTAdapterDialog.this.altitudeClimbSelectCombo.getSelectionIndex());
+							HoTTAdapterDialog.this.device.setAltitudeClimbSelectionProperties(HoTTAdapterDialog.this.altitudeClimbSelectCombo.getSelectionIndex());
 							HoTTAdapterDialog.this.enableSaveButton(true);
 						}
 					});
 				}
-				{
-					this.tolrateSignLatitude = new Button(this.dialogShell, SWT.CHECK);
-					FormData enableFilterLData = new FormData();
-					enableFilterLData.height = GDE.IS_MAC ? 22 : 20;
-					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 375 : 365);
-					enableFilterLData.width = 45;
-					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -80 : -80);
-					this.tolrateSignLatitude.setLayoutData(enableFilterLData);
-					this.tolrateSignLatitude.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
-					this.tolrateSignLatitude.setText("+/-"); //$NON-NLS-1$
-					this.tolrateSignLatitude.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2421));
-					this.tolrateSignLatitude.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "tolrateSignLatitude.widgetSelected, event=" + evt); //$NON-NLS-1$
-							HoTTAdapterDialog.this.device.setMeasurementPropertyValue(isHoTTAdapter ? 3 : HoTTAdapterDialog.this.tabFolder.getSelectionIndex()+1, isHoTTAdapter ? 1 : 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value(), DataTypes.BOOLEAN, HoTTAdapterDialog.this.tolrateSignLatitude.getSelection());
-							HoTTAdapterDialog.this.device.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
-									HoTTAdapterDialog.this.tolrateSignLatitude.getSelection(),  HoTTAdapterDialog.this.tolerateSignLongitude.getSelection(),
-									HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
-							HoTTAdapterDialog.this.enableSaveButton(true);
-						}
-					});
-				}
-				{
-					this.filterFactorLongitudeLabel = new CLabel(this.dialogShell, SWT.RIGHT);
-					FormData enableFilterLData = new FormData();
-					enableFilterLData.height = GDE.IS_MAC ? 22: 20;
-					enableFilterLData.left = new FormAttachment(0, 1000, this.isHoTTAdapter ? 420 : 380);
-					enableFilterLData.width = this.isHoTTAdapter ? 105 : 140;
-					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -78 : -80);
-					this.filterFactorLongitudeLabel.setLayoutData(enableFilterLData);
-					this.filterFactorLongitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.filterFactorLongitudeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2422));
-					this.filterFactorLongitudeLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2423));
-				}
-				{
-					this.filterFactorLongitudeCombo = new CCombo(this.dialogShell, SWT.BORDER);
-					FormData enableFilterLData = new FormData();
-					enableFilterLData.height = GDE.IS_MAC ? 18 : 16;
-					enableFilterLData.left = new FormAttachment(0, 1000, 525);
-					enableFilterLData.width = 42;
-					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -80 : -80);
-					this.filterFactorLongitudeCombo.setLayoutData(enableFilterLData);
-					this.filterFactorLongitudeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.filterFactorLongitudeCombo.setItems(filterItems);
-					this.filterFactorLongitudeCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2423));
-					this.filterFactorLongitudeCombo.setEditable(false);
-					this.filterFactorLongitudeCombo.setBackground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
-					this.filterFactorLongitudeCombo.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "filterFactorLongitudeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
-							HoTTAdapterDialog.this.device.setMeasurementPropertyValue(isHoTTAdapter ? 3 : HoTTAdapterDialog.this.tabFolder.getSelectionIndex()+1, isHoTTAdapter ? 2 : 14, MeasurementPropertyTypes.FILTER_FACTOR.value(), DataTypes.DOUBLE, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
-							HoTTAdapterDialog.this.device.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
-									HoTTAdapterDialog.this.tolrateSignLatitude.getSelection(),  HoTTAdapterDialog.this.tolerateSignLongitude.getSelection(),
-									HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
-							HoTTAdapterDialog.this.enableSaveButton(true);
-						}
-					});
-				}
-				{
-					this.tolerateSignLongitude = new Button(this.dialogShell, SWT.CHECK);
-					FormData enableFilterLData = new FormData();
-					enableFilterLData.height = GDE.IS_MAC ? 22 : 20;
-					enableFilterLData.left = new FormAttachment(0, 1000, 570);
-					enableFilterLData.width = 45;
-					enableFilterLData.bottom = new FormAttachment(1000, 1000, GDE.IS_MAC ? -80 : -80);
-					this.tolerateSignLongitude.setLayoutData(enableFilterLData);
-					this.tolerateSignLongitude.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+1, SWT.NORMAL));
-					this.tolerateSignLongitude.setText("+/-"); //$NON-NLS-1$
-					this.tolerateSignLongitude.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2422));
-					this.tolerateSignLongitude.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent evt) {
-							log.log(java.util.logging.Level.FINEST, "tolerateSignLongitude.widgetSelected, event=" + evt); //$NON-NLS-1$
-							HoTTAdapterDialog.this.device.setMeasurementPropertyValue(isHoTTAdapter ? 3 : HoTTAdapterDialog.this.tabFolder.getSelectionIndex()+1, isHoTTAdapter ? 2 : 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value(), DataTypes.BOOLEAN, HoTTAdapterDialog.this.tolerateSignLongitude.getSelection());
-							HoTTAdapterDialog.this.device.setFilterProperties(HoTTAdapterDialog.this.enableFilter.getSelection(),
-									HoTTAdapterDialog.this.tolrateSignLatitude.getSelection(),  HoTTAdapterDialog.this.tolerateSignLongitude.getSelection(),
-									HoTTAdapterDialog.this.filterFactorLatitudeCombo.getSelectionIndex()*5+10.0, HoTTAdapterDialog.this.filterFactorLongitudeCombo.getSelectionIndex()*5+10.0);
-							HoTTAdapterDialog.this.enableSaveButton(true);
-						}
-					});
-				}
-				
-				//TODO prepare to remove GPS lat long filter , fist step remove visibility
-				HoTTAdapterDialog.this.filterFactorLatitudeLabel.setVisible(false);
-				HoTTAdapterDialog.this.filterFactorLatitudeCombo.setVisible(false);
-				HoTTAdapterDialog.this.tolrateSignLatitude.setVisible(false);
-				HoTTAdapterDialog.this.filterFactorLongitudeLabel.setVisible(false);
-				HoTTAdapterDialog.this.filterFactorLongitudeCombo.setVisible(false);
-				HoTTAdapterDialog.this.tolerateSignLongitude.setVisible(false);
 
 				{
 					this.startLifeDataCapturing = new Button(this.dialogShell, SWT.None);
@@ -967,40 +830,33 @@ public class HoTTAdapterDialog extends DeviceDialog {
 				this.enableChannelRecords.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_CHANNEL).getValue()));
 			this.enableFilter.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.ENABLE_FILTER).getValue()));
 			this.enableTextModusFilter.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() != null ? this.device.getChannelProperty(ChannelPropertyTypes.TEXT_MODE).getValue() : "true"));
-			this.enableChannelPercent.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED).getValue() != null ? this.device.getChannelProperty(ChannelPropertyTypes.NONE_SPECIFIED).getValue() : "true"));
-			if (isHoTTAdapter) {
-				this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
-				this.tolrateSignLatitude.setSelection(this.device.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
-				this.filterFactorLongitudeCombo.select((int) (Double.parseDouble((String) this.device.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value())) / 5 - 2));
-				this.tolerateSignLongitude.setSelection(this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
+			this.enableChannelPercent.setSelection(Boolean.parseBoolean(this.device.getChannelProperty(ChannelPropertyTypes.CHANNEL_PERCENTAGE).getValue() != null ? this.device.getChannelProperty(ChannelPropertyTypes.CHANNEL_PERCENTAGE).getValue() : "true"));
+			
+			if (isHoTTAdapter) { //altitudeClimbSelection usable for HoTTAdapter2, HoTTAdapterD only
+				HoTTAdapterDialog.this.altitudeClimbSelectLabel.setVisible(false);
+				HoTTAdapterDialog.this.altitudeClimbSelectCombo.setVisible(false);
 			}
 			else if (isHoTTAdapter2) {
-				this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
-				this.tolrateSignLatitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 15, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
-				this.filterFactorLongitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
-				this.tolerateSignLongitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 16, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
+				this.altitudeClimbSelectCombo.select(Integer.parseInt(this.device.getChannelProperty(ChannelPropertyTypes.SENSOR_ALT_CLIMB).getValue() != null ? this.device.getChannelProperty(ChannelPropertyTypes.SENSOR_ALT_CLIMB).getValue() : "0"));
 				int activeChannelNumber = this.application.getActiveChannelNumber();
 				if (activeChannelNumber == 6 && this.device.getNumberOfMeasurements(activeChannelNumber) > 86  && this.device.getMeasurementPropertyValue(activeChannelNumber, 88, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
 					this.filterStartTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 87, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
 					this.filterLapMinTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 88, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
 					this.filterMaxTimeCombo.select(findPosition(filterMaxItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 5, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
 					//5=Rx_dbm, 18=DistanceStart, 86=SmoothedRx_dbm, 87=DiffRx_dbm, 88=LapsRx_dbm 89=DiffDistance, 90=LapsDistance
-					this.absorptionLevelCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 72, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 12));
+					this.absorptionLevelCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 72, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
 					this.filterMinDeltaRxDbmCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 86, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 10));
 					this.filterMinDeltaDistCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(activeChannelNumber, 89, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 0));
 				}
 			}
 			else if (isHoTTAdapterD) {
-				this.filterFactorLatitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 12, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
-				this.tolrateSignLatitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 12, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
-				this.filterFactorLongitudeCombo.select((int) (Double.parseDouble(this.device.getMeasurementPropertyValue(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) / 5 - 2));
-				this.tolerateSignLongitude.setSelection(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 13, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null ? Boolean.parseBoolean(this.device.getMeasruementProperty(application.getActiveChannelNumber(), 14, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false);
+				this.altitudeClimbSelectCombo.select(Integer.parseInt(this.device.getChannelProperty(ChannelPropertyTypes.SENSOR_ALT_CLIMB).getValue() != null ? this.device.getChannelProperty(ChannelPropertyTypes.SENSOR_ALT_CLIMB).getValue() : "0"));
 				if (this.device.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0) {
 					this.filterStartTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
 					this.filterLapMinTimeCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 111, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
 					this.filterMaxTimeCombo.select(findPosition(filterMaxItems, this.device.getMeasurementPropertyValue(1, 5, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 10));
 					//5=Rx_dbm, 109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm
-					this.absorptionLevelCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 109, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 12));
+					this.absorptionLevelCombo.select(findPosition(filterItems, this.device.getMeasurementPropertyValue(1, 109, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim(), 0));
 					//15=DistanceStart, 112=DiffDistance, 113=LapsDistance
 					this.filterMinDeltaRxDbmCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 110, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 10));
 					this.filterMinDeltaDistCombo.select(findPosition(filterMinItems, this.device.getMeasurementPropertyValue(1, 112, MeasurementPropertyTypes.NONE_SPECIFIED.value()).toString().trim(), 0));
