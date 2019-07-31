@@ -588,6 +588,54 @@ public class HoTTbinReader {
 	}
 
 	/**
+	 * set picker parameter setting sensor for altitude/climb usage (0=auto, 1=VARIO, 2=GPS, 3=GAM, 4=EAM)
+	 */
+	protected static void setAltitudeClimbPickeParameter(PickerParameters pickerParameters, EnumSet<Sensor>	detectedSensors) {
+		if (pickerParameters.altitudeClimbSensorSelection == 0) {
+			boolean isSensorDetected = false;
+			for (Sensor sensor : detectedSensors) {
+				switch (sensor) {
+				case VARIO:
+					pickerParameters.altitudeClimbSensorSelection = sensor.ordinal();
+					isSensorDetected = true;
+					break;
+				case GPS:
+					pickerParameters.altitudeClimbSensorSelection = sensor.ordinal();
+					isSensorDetected = true;
+					break;
+				case GAM:
+					pickerParameters.altitudeClimbSensorSelection = sensor.ordinal();
+					isSensorDetected = true;
+					break;
+				case EAM:
+					pickerParameters.altitudeClimbSensorSelection = sensor.ordinal();
+					isSensorDetected = true;
+					break;
+				default: //sensor does not provide altitude and climb values
+					break;
+				}
+				if (isSensorDetected)
+					break;
+			}
+		}
+		else { //sensor already selected by user, check if part of detected sensors
+			boolean isSensorContained = false;
+			for (Sensor sensor : detectedSensors) {
+				if (pickerParameters.altitudeClimbSensorSelection == sensor.ordinal()) {
+					isSensorContained = true;
+					break;
+				}
+			}
+			if (!isSensorContained) { //sensor selected which is not part of detected sensors
+				pickerParameters.altitudeClimbSensorSelection = 0; //auto
+				//reverse call set picker parameter for altitude/climb sensor selection
+				HoTTbinReader.setAltitudeClimbPickeParameter(pickerParameters, detectedSensors);
+			}
+		}
+		log.log(Level.OFF, String.format("pickerParameters.altitudeClimbSensorSelection = %s", Sensor.fromOrdinal(pickerParameters.altitudeClimbSensorSelection).name()));
+	}
+
+	/**
 	 * read complete file data and display the first found record set
 	 *
 	 * @param filePath

@@ -91,6 +91,7 @@ public class HoTTbinHistoReader {
 	protected final int								initializeSamplingFactor;
 	protected final boolean						isFilterEnabled;
 	protected final boolean						isFilterTextModus;
+	protected final int 							altitudeClimbSensorSelection;
 	protected final Procedure					initTimer, readTimer, reviewTimer, addTimer, pickTimer, finishTimer;
 
 	protected long										nanoTime;
@@ -120,6 +121,7 @@ public class HoTTbinHistoReader {
 		this.initializeSamplingFactor = initializeSamplingFactor;
 		this.isFilterEnabled = true;
 		this.isFilterTextModus = true;
+		this.altitudeClimbSensorSelection = 0; //auto
 		this.detectedSensors = EnumSet.noneOf(Sensor.class);
 		if (log.isLoggable(Level.TIME)) {
 			initTimer = () -> {

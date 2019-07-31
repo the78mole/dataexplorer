@@ -8,6 +8,7 @@ Generic changes/fixes
 	* update History analysis to use auto sensor selection for altitude/climb values 
 	
 Device specific changes/fixes
+	* HoTTAdapterD - update Vario/ESC filter to synchronize with HottAdapter2
 	* HoTTAdapterD - enable suppressing of lab calculation by smoothing value Rx dbm
 	* HoTTAdapter2/D - enable selection of altitude/climb values source sensor
 	* HoTTAdapter2 - fix power calculation while importing *.log EAM

@@ -814,7 +814,8 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 
 			//5=Rx_dbm, 109=SmoothedRx_dbm, 110=DiffRx_dbm, 111=LapsRx_dbm
 			//15=DistanceStart, 112=DiffDistance, 113=LapsDistance
-			runLabsCalculation(recordSet, 1, 5, 109, 110, 111, 15, 112, 113);
+			if (Integer.parseInt(recordSet.getDevice().getMeasurementPropertyValue(1, 109, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().trim()) != 0)
+				runLabsCalculation(recordSet, 1, 5, 109, 110, 111, 15, 112, 113);
 
 			this.application.updateStatisticsData();
 			this.updateVisibilityStatus(recordSet, true);
