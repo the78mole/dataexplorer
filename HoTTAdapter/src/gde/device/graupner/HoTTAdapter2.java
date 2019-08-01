@@ -1604,7 +1604,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				break;
 
 			case 72:	//3.2.7 General, GAM, EAM, ESC
-			case 77:	//3.3.7 Lab-Time
+			case 77:	//3.2.7 Lab-Time
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					//3.3.1 extend this measurements: 9=EventRx, 14=EventVario, 21=NumSatellites 22=GPS-Fix 23=EventGPS, 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G, 70=MotorTime 71=Speed 72=Event E, 85/105=Event M
 					switch (i) {
