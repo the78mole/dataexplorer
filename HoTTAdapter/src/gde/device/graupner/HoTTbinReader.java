@@ -537,7 +537,7 @@ public class HoTTbinReader {
 			position = position <= 64 ? 64 : position;
 			
 			long skipped = 0, iterationCount = -1;
-			while ((skipped = data_in.skip(position)) < position && iterationCount < 3) {
+			while ((skipped = data_in.skip(position)) < position && iterationCount < 8) { //check skipped bytes while sensor detection problems
 				position -= skipped;
 				++iterationCount;
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "position " + position + " skipped " + skipped);
