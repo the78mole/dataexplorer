@@ -1,44 +1,33 @@
-GNU DataExplorer - News - comes with version 3.3.7 - 14 Apr 2019
+GNU DataExplorer - News - comes with version 3.3.8 - 04 Aug 2019
 
 Generic changes/fixes
-	* make none active measurement visible while history exploring
-	* fix wrong naming replacement direction_start
-	* add a check while user tries to create OSD-file direct in object directory to prevent overwriting data file with file link
-	* update XSD version to force device xml replacement due to xml changes for several devices
-	* add DataExplorer.cmd script to Windows installation to be used while openJDK is installed and java.exe in PATH
-	* add news URL while update check detected new version
+	* catch possible IndexOutOfBoundsException while updating cell voltage window
+	* 32 bit Linux lack of updates and seams still better compatible with GTK-2, use export SWT_GTK3=0 force using GTK-2 libs
+	* update XSD to version 37, add additional keys
 	
 Device specific changes/fixes
-	* HoTTAdapter* - enable channel values in % configurable using device dialog
-	* iCharger X6/X8 - adapt parsing algorithm to support FW 207 beta 2
-	* iChargerUSB - add scale synchronization cell Ri sum to pack Ri
-	* NMEA-Adapter - correct measurement name direction to direction_start (direction relative to start point),
-    * NMEA-Adapter - reduce one none necessary call to updateVisibilityStatus
-    * GPS-Logger* - remove generated glide ratio and exchange with azimuth instead
-    * GPS-Logger3 - correct time stamp evaluation, it has only two digits instead of three
-    * GPS-Logger3 - fix parsing error while invalid data
-    * GPS-Logger3 - fix time calculation adding DST offset if required
-    * GPS-Logger3 - enable log evaluation without GPS-fix while UniLog injects time stamp
+	* HoTTAdapter2 - fix power calculation while importing *.log EAM
+	* HoTTAdapter2 - fix missing ESC parsing while configuration channels selected
+	* HoTTAdapter* - fix/enable again capability to analyze log files written in SD-Format with 64 byte blocks  
+	* HoTTAdapter2 - enable selection of altitude/climb values source sensor
+	* HoTTAdapter2 - update history analysis to sensor selection
+	* CellLog8S - fix cell voltage display, correct index
+	* iCharger* - fix index temperature intern/extern for serial connected once only
+
 	
 	
 Generelle Änderungen/Verbesserungen
-    * inaktive Messwerte sind jetzt in der Historien-Analyse sichtbar geschaltet
-    * fehlerhafter Messwertname für Schlüssel direction_start ersetzt
-    * Prüfung beim Sichern von OSD-Dateien direkt im Objektverzeichnis hinzugefügt, um ein Überschreiben der OSD-Datei durch den Link zu unterbinden
-    * XSD-Version hoch gezählt, um ein Austausch der Geräte-XMLs zu erzwingen (Änderungen Messwertnamen, Messwerteinheit, Synchronisationsreferenz)
-    * DataExplorer.cmd Script zur Windows-Installation hinzugefügt, um zukünftige openJDK-Installationen mit java.exe im PATH zu unterstützen
-    * News-URL zum Dialog hinzugefügt, wenn einen neue Version erkannt wird
+    * Erweiterte Fehlerbehandlung im Zellenspannungen Fenster
+    * 32 Bit Linux fehlen GTK-Updates, es erscheint hier besser bei GTK-2 zu bleiben, "export SWT_GTK3=0" erzwingt die Verwendung der GTK-2 Bibliotheken
+    * XSD-Update nach Version 37, weitere Schlüsselwerte hinzugefügt
 
 Gerätespezifische Änderungen/Verbesserungen
-    * HoTTAdapter* - durch Konfigurationsänderung ist jetzt die Anzeige in % oder µsec für die Kanäle möglich
-    * iCharger X6/X8 - Korrektur zur Unterstützung von FW 207 beta 2
-    * iChargerUSB - Skalen-Synchronisation für Zellen Ri ∑ mit Batterie Ri eingeführt
-    * NMEA-Adapter - Messwertname korrigiert Richtung nach RichtungStart
-    * NMEA-Adapter - unnötiger Methodenaufruf zur Reduktion nicht anzeigbarer Messwerte entfernt
-    * GPS-Logger* - Messwert Gleitverhältnis mit Flugrichtung ausgetauscht
-    * GPS-Logger3 - Zeitstempel-Auswertung korrigiert, es gibt nur noch 2 Nachkommastellen anstatt drei
-    * GPS-Logger3 - Fehler bei ungültigen Daten korrigiert, bzw. abgefangen
-    * GPS-Logger3 - Korrektur der Zeitberechnung, berücksichtigt eingestellten UTC offset und DST Offset
-    * GPS-Logger3 - Logauswertung ohne GPS-fix mit angeschlossenem Unilog, wenn dieses Zeitstempel schreibt
+    * HoTTAdapter2 - Korrektur der Leistungsberechnung beim Import von EAM *.log Dateien
+    * HoTTAdapter2 - Korrektur fehlender Werte vom ESC wenn Kanäle ausgewählt
+    * HoTTAdapter* - Korrektur/Wiederbelebung der Datenanalyse vom SD-Logformat mit 64 Byte Blöcken
+    * HoTTAdapter2 - Ermögliche die Auswahl eines Sensors für die Höhen/Steigen Auswertung
+    * HoTTAdapter2 - Update Historienanalyse in Bezug auf Sensorselektion
+    * CellLog8S - Korrigierte Zellenspannungen Anzeige
+    * iCharger* - Korrigierter Index zur Temperatur intern/extern für seriell angebundene Geräte
 
 	
