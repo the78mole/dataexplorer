@@ -1,5 +1,11 @@
 Development history / change log, please read from bottom up
 
+Version 3.3.9 - xx yyy 2019
+Generic changes/fixes
+	* update measurement properties XML containing [] by mistake
+	
+Device specific changes/fixes
+
 Version 3.3.8 - 04 Aug 2019
 Generic changes/fixes
 	* catch possible IndexOutOfBoundsException while updating cell voltage window
