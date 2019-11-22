@@ -1,5 +1,12 @@
 Development history / change log, please read from bottom up
 
+Version 3.4.1 - xx yyy 2019
+Generic changes/fixes
+	* add control listener to handle size changes after modifying menu cool bar
+
+Device specific changes/fixes
+	*
+
 Version 3.4.0 - 10 Nov 2019
 Generic changes/fixes
 	* update launch4j Windows executable wrapper supporting java PATH entries in addition to registry

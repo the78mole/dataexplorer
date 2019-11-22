@@ -454,7 +454,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 				@Override
 				public void controlResized(ControlEvent controlevent) {
 					if (log.isLoggable(Level.FINEST))
-						log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
+						log.logp(Level.FINEST, $CLASS_NAME, "shell.controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					DataExplorer.application.settings.setWindowMaximized(GDE.shell.getMaximized());
 					if (!DataExplorer.application.settings.isWindowMaximized()) {
 						DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
@@ -464,7 +464,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 				@Override
 				public void controlMoved(ControlEvent controlevent) {
 					if (log.isLoggable(Level.FINEST))
-						log.logp(Level.FINEST, $CLASS_NAME, "controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
+						log.logp(Level.FINEST, $CLASS_NAME, "shell.controlResized", GDE.shell.getLocation().toString() + "event = " + controlevent); //$NON-NLS-1$ //$NON-NLS-2$
 					if (!GDE.shell.getMaximized()) DataExplorer.application.settings.setWindow(GDE.shell.getLocation(), GDE.shell.getSize());
 				}
 			});
@@ -661,14 +661,29 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 					// menuCoolBar.controlResized signals collBar item moved
 					if (DataExplorer.this.displayTab != null && getSize().y != 0) {
 						Point menuCoolBarSize = DataExplorer.this.menuCoolBar.getSize();
-						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "menuCoolBar.size = " + menuCoolBarSize); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, "menuCoolBar.controlResized", "menuCoolBarSize = " + menuCoolBarSize); //$NON-NLS-1$
 						Point shellSize = new Point(getClientArea().width, getClientArea().height);
-						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "shellClient.size = " + shellSize); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, "menuCoolBar.controlResized", "shellClientSize = " + shellSize); //$NON-NLS-1$
 						Point statusBarSize = DataExplorer.this.statusComposite.getSize();
-						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "statusBar.size = " + statusBarSize); //$NON-NLS-1$
+						if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, $CLASS_NAME, "menuCoolBar.controlResized", "statusBarSize = " + statusBarSize); //$NON-NLS-1$
 						DataExplorer.this.displayTab.setBounds(0, menuCoolBarSize.y, shellSize.x, shellSize.y - menuCoolBarSize.y - statusBarSize.y);
 						if (log.isLoggable(Level.FINE))
 							log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, "displayTab.bounds = " + DataExplorer.this.displayTab.getBounds()); //$NON-NLS-1$
+					}
+				}
+			});
+			this.displayTab.addControlListener(new ControlAdapter() {
+				@Override
+				public void controlResized(ControlEvent evt) {
+					if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, "displayTab.controlResized, event=" + evt); //$NON-NLS-1$
+					if (DataExplorer.this.displayTab != null && getSize().y != 0) {
+						DataExplorer.this.menuCoolBar.pack();
+						Point menuCoolBarSize = DataExplorer.this.menuCoolBar.getSize();
+				    Point shellSize = new Point(GDE.shell.getClientArea().width, GDE.shell.getClientArea().height);
+						Point statusBarSize = DataExplorer.this.statusComposite.getSize();
+						if (log.isLoggable(Level.FINE))
+							log.logp(Level.FINE, $CLASS_NAME, "displayTab.controlRezised", "displayTab.bounds = " + DataExplorer.this.displayTab.getBounds()); //$NON-NLS-1$
+				    DataExplorer.this.displayTab.setBounds(0, menuCoolBarSize.y, shellSize.x, shellSize.y - menuCoolBarSize.y - statusBarSize.y);
 					}
 				}
 			});
