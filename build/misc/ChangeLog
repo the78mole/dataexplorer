@@ -3,7 +3,9 @@ Development history / change log, please read from bottom up
 Version 3.4.1 - xx yyy 2019
 Generic changes/fixes
 	* add control listener to handle size changes after modifying menu cool bar
-	* update swt for Linux to fix webkit problems
+	* uniform build execution environment to Java 8 compatible byte code
+	* split build in OS dependent steps
+	* update swt.jar for Linux 64 bit to fix webkit problems
 
 Device specific changes/fixes
 	*
