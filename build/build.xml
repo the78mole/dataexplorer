@@ -19,7 +19,7 @@
     Copyright (c) 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
 ************************************************************************************** 
 -->
-<project name="DataExplorerMasterBuild" default="dist" basedir="..">
+<project name="DataExplorerMasterBuild" default="dist" basedir=".." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
 	<target name="echo:build.properties" if="build.properties.exists">
 		<echo message="Building using ${build.properties}" />
@@ -75,10 +75,25 @@
 		</condition>
 
 		<echo message="OS short name = ${build.os.shortname}" />
+		
+		<condition property="isWindows">
+			<equals arg1="${build.os.shortname}" arg2="Windows" />
+		</condition>
+		<condition property="isLinux">
+			<equals arg1="${build.os.shortname}" arg2="GNULinux" />
+		</condition>
+		<condition property="isMac">
+			<equals arg1="${build.os.shortname}" arg2="MAC" />
+		</condition>
 	</target>
 
 	<!-- init -->
 	<target name="init" depends="init_OS">
+		<echo if:set="isWindows">running on Windows</echo>
+		<echo unless:set="isWindows">not running on Windows</echo>
+		<echo if:set="isLinux">running on Linux</echo>
+		<echo if:set="isMac">running on MacOS</echo>
+		
 		<property name="build.properties" location="build/build.properties" />
 		<property file="${build.properties}" />
 
@@ -90,7 +105,22 @@
 		<property name="output.dir" location="build/target" />
 		<property name="build.target.dir" location="build/target/install" />
 		<property name="build.target.nonUI" location="build/target/non_UI" />
+		<!-- create output directory structure -->
+		<mkdir dir="${output.dir}" />
+		<mkdir dir="${build.target.dir}" />
+		<mkdir dir="${build.target.nonUI}" />
 
+		<!-- create src directory varaible -->
+		<property name="source.dir" location="${basedir}" />
+		
+		<antcall target="init-windows" if:set="isWindows" />
+		<antcall target="init-raspbian" unless:set="isWindows" />
+		<antcall target="init-linux" if:set="isLinux" />
+		<antcall target="init-mac" if:set="isMac" />
+	</target>
+
+	<target name="init-windows">
+		<!-- output directories -->
 		<property name="output.windows32" location="${output.dir}/Windows_32" />
 		<property name="output.windows32.program" location="${output.windows32}/DataExplorer" />
 		<property name="output.windows32.program.devices" location="${output.windows32}/DataExplorer/devices" />
@@ -101,11 +131,34 @@
 		<property name="output.windows64.program.devices" location="${output.windows64}/DataExplorer/devices" />
 		<property name="output.windows64.java.ext" location="${output.windows64}/DataExplorer/java/ext" />
 
+		<!-- create output directory structure -->
+		<mkdir dir="${output.windows32}" />
+		<mkdir dir="${output.windows32.program}" />
+		<mkdir dir="${output.windows32.program.devices}" />
+		<mkdir dir="${output.windows32.java.ext}" />
+
+		<mkdir dir="${output.windows64}" />
+		<mkdir dir="${output.windows64.program}" />
+		<mkdir dir="${output.windows64.program.devices}" />
+		<mkdir dir="${output.windows64.java.ext}" />
+	</target>
+
+	<target name="init-raspbian">
+		<!-- output directories -->
 		<property name="output.raspbian32" location="${output.dir}/Raspbian_32" />
 		<property name="output.raspbian32.program" location="${output.raspbian32}/DataExplorer" />
 		<property name="output.raspbian32.program.devices" location="${output.raspbian32}/DataExplorer/devices" />
 		<property name="output.raspbian32.java.ext" location="${output.raspbian32}/DataExplorer/java/ext" />
 
+		<!-- create output directory structure -->
+		<mkdir dir="${output.raspbian32}" />
+		<mkdir dir="${output.raspbian32.program}" />
+		<mkdir dir="${output.raspbian32.program.devices}" />
+		<mkdir dir="${output.raspbian32.java.ext}" />
+	</target>
+
+	<target name="init-linux">
+		<!-- output directories -->
 		<property name="output.gnulinux32" location="${output.dir}/GNULinux_32" />
 		<property name="output.gnulinux32.program" location="${output.gnulinux32}/DataExplorer" />
 		<property name="output.gnulinux32.program.devices" location="${output.gnulinux32}/DataExplorer/devices" />
@@ -116,6 +169,20 @@
 		<property name="output.gnulinux64.program.devices" location="${output.gnulinux64}/DataExplorer/devices" />
 		<property name="output.gnulinux64.java.ext" location="${output.gnulinux64}/DataExplorer/java/ext" />
 
+		<!-- create output directory structure -->
+		<mkdir dir="${output.gnulinux32}" />
+		<mkdir dir="${output.gnulinux32.program}" />
+		<mkdir dir="${output.gnulinux32.program.devices}" />
+		<mkdir dir="${output.gnulinux32.java.ext}" />
+
+		<mkdir dir="${output.gnulinux64}" />
+		<mkdir dir="${output.gnulinux64.program}" />
+		<mkdir dir="${output.gnulinux64.program.devices}" />
+		<mkdir dir="${output.gnulinux64.java.ext}" />
+	</target>
+
+	<target name="init-mac">
+		<!-- output directories -->
 		<property name="output.mac32" location="${output.dir}/Mac_32" />
 		<property name="output.mac32.app" location="${output.mac32}/DataExplorer.app" />
 		<property name="output.mac32.bundle" location="${output.mac32}/DataExplorer.app/Contents" />
@@ -133,35 +200,6 @@
 		<property name="output.mac64.java.ext" location="${output.mac64.program}/java/ext" />
 
 		<!-- create output directory structure -->
-		<mkdir dir="${output.dir}" />
-		<mkdir dir="${build.target.dir}" />
-		<mkdir dir="${build.target.nonUI}" />
-
-		<mkdir dir="${output.windows32}" />
-		<mkdir dir="${output.windows32.program}" />
-		<mkdir dir="${output.windows32.program.devices}" />
-		<mkdir dir="${output.windows32.java.ext}" />
-
-		<mkdir dir="${output.windows64}" />
-		<mkdir dir="${output.windows64.program}" />
-		<mkdir dir="${output.windows64.program.devices}" />
-		<mkdir dir="${output.windows64.java.ext}" />
-
-		<mkdir dir="${output.raspbian32}" />
-		<mkdir dir="${output.raspbian32.program}" />
-		<mkdir dir="${output.raspbian32.program.devices}" />
-		<mkdir dir="${output.raspbian32.java.ext}" />
-
-		<mkdir dir="${output.gnulinux32}" />
-		<mkdir dir="${output.gnulinux32.program}" />
-		<mkdir dir="${output.gnulinux32.program.devices}" />
-		<mkdir dir="${output.gnulinux32.java.ext}" />
-
-		<mkdir dir="${output.gnulinux64}" />
-		<mkdir dir="${output.gnulinux64.program}" />
-		<mkdir dir="${output.gnulinux64.program.devices}" />
-		<mkdir dir="${output.gnulinux64.java.ext}" />
-
 		<mkdir dir="${output.mac32}" />
 		<mkdir dir="${output.mac32.bundle}" />
 		<mkdir dir="${output.mac32.bundle.bin}" />
@@ -175,9 +213,6 @@
 		<mkdir dir="${output.mac64.program}" />
 		<mkdir dir="${output.mac64.program.devices}" />
 		<mkdir dir="${output.mac64.java.ext}" />
-
-		<!-- create src directory varaible -->
-		<property name="source.dir" location="${basedir}" />
 	</target>
 
 	<!-- cleanup -->
@@ -553,6 +588,13 @@
 
 	<!-- create internal temporay file structure -->
 	<target name="copy-files" depends="package,create_HoTTMdlViewer_lib">
+		<antcall target="copy-files-windows" if:set="isWindows" />
+		<antcall target="copy-files-raspbian" unless:set="isWindows" />
+		<antcall target="copy-files-linux" if:set="isLinux" />
+		<antcall target="copy-files-mac" if:set="isMac" />
+	</target>
+
+	<target name="copy-files-windows" depends="init-windows">
 		<!-- programm directory -->
 		<copy file="build/misc/DataExplorer32.exe" tofile="${output.windows32.program}/DataExplorer.exe" />
 		<copy file="build/misc/DataExplorer32.cmd" tofile="${output.windows32.program}/DataExplorer.cmd" />
@@ -589,7 +631,59 @@
 				<patternset refid="DE_PLUGIN_JARS" />
 			</fileset>
 		</copy>
-
+		
+		<!-- java extenssions -->
+		<copy todir="${output.windows32.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
+			<fileset file="build/lib/Windows/32/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+			<fileset file="build/misc/*.README" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />		
+			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
+			<fileset file="build/lib/jaxb-api.jar" />
+			<fileset file="build/lib/jaxb-core.jar" />
+			<fileset file="build/lib/jaxb-runtime.jar" />
+			<fileset file="build/lib/istack-commons-runtime.jar" />
+			<fileset file="build/lib/activation.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/Windows/32/libusb4java.jar" />
+		</copy>
+		<copy todir="${output.windows64.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
+			<fileset file="build/lib/Windows/64/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+			<fileset file="build/misc/*.README" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
+			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
+			<fileset file="build/lib/jaxb-api.jar" />
+			<fileset file="build/lib/jaxb-core.jar" />
+			<fileset file="build/lib/jaxb-runtime.jar" />
+			<fileset file="build/lib/istack-commons-runtime.jar" />
+			<fileset file="build/lib/activation.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/Windows/64/libusb4java.jar" />
+		</copy>
+		
+		<!-- launcher scripts, README -->
+		<copy todir="${output.windows32}/DataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.windows64}/DataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+	</target>
+	
+	<target name="copy-files-raspbian" depends="init-raspbian">
 		<copy file="build/misc/DataExplorer32" tofile="${output.raspbian32.program}/DataExplorer" />
 		<copy todir="${output.raspbian32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
@@ -608,6 +702,35 @@
 			</fileset>
 		</copy>
 
+		<!-- java extenssions -->
+		<copy todir="${output.raspbian32.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
+			<fileset file="build/lib/Raspbian/32/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+			<fileset file="build/misc/*.README" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
+			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
+			<fileset file="build/lib/jaxb-api.jar" />
+			<fileset file="build/lib/jaxb-core.jar" />
+			<fileset file="build/lib/jaxb-runtime.jar" />
+			<fileset file="build/lib/istack-commons-runtime.jar" />
+			<fileset file="build/lib/activation.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/Raspbian/32/libusb4java.jar" />
+		</copy>
+		
+		<!-- launcher scripts, README -->
+		<copy todir="${output.raspbian32}/DataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+	</target>
+
+	<target name="copy-files-linux" depends="init-linux">
 		<copy file="build/misc/DataExplorer32" tofile="${output.gnulinux32.program}/DataExplorer" />
 		<copy todir="${output.gnulinux32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
@@ -643,7 +766,59 @@
 				<patternset refid="DE_PLUGIN_JARS" />
 			</fileset>
 		</copy>
+		
+		<!-- java extenssions -->
+		<copy todir="${output.gnulinux32.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
+			<fileset file="build/lib/GNULinux/32/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+			<fileset file="build/misc/*.README" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
+			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
+			<fileset file="build/lib/jaxb-api.jar" />
+			<fileset file="build/lib/jaxb-core.jar" />
+			<fileset file="build/lib/jaxb-runtime.jar" />
+			<fileset file="build/lib/istack-commons-runtime.jar" />
+			<fileset file="build/lib/activation.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/GNULinux/32/libusb4java.jar" />
+		</copy>
+		<copy todir="${output.gnulinux64.java.ext}" flatten="yes">
+			<fileset file="build/lib/RXTXcomm.jar" />
+			<fileset file="build/lib/jSerialComm.jar" />
+			<fileset file="build/lib/GNULinux/64/swt.jar" />
+			<fileset file="build/misc/*.LICENSE" />
+			<fileset file="build/misc/*.README" />
+			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
+			<fileset file="build/lib/gson.jar" />
+			<fileset file="build/lib/juniversalchardet.jar" />
+			<fileset file="build/lib/jaxb-api.jar" />
+			<fileset file="build/lib/jaxb-core.jar" />
+			<fileset file="build/lib/jaxb-runtime.jar" />
+			<fileset file="build/lib/istack-commons-runtime.jar" />
+			<fileset file="build/lib/activation.jar" />
+			<fileset file="build/lib/usb4java.jar" />
+			<fileset file="build/lib/usb-api.jar" />
+			<fileset file="build/lib/usb4java-javax.jar" />
+			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/GNULinux/64/libusb4java.jar" />
+		</copy>
 
+		<!-- launcher scripts, README -->
+		<copy todir="${output.gnulinux32}/DataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+		<copy todir="${output.gnulinux64}/DataExplorer" flatten="yes">
+			<fileset file="build/misc/README.*" />
+		</copy>
+	</target>
+
+	<target name="copy-files-mac" depends="init-mac">
 		<copy todir="${output.mac32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer.icns" />
@@ -687,106 +862,6 @@
 		</copy>
 
 		<!-- java extenssions -->
-		<copy todir="${output.windows32.java.ext}" flatten="yes">
-			<fileset file="build/lib/RXTXcomm.jar" />
-			<fileset file="build/lib/jSerialComm.jar" />
-			<fileset file="build/lib/Windows/32/swt.jar" />
-			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="build/misc/*.README" />
-			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />		
-			<fileset file="build/lib/gson.jar" />
-			<fileset file="build/lib/juniversalchardet.jar" />
-			<fileset file="build/lib/jaxb-api.jar" />
-			<fileset file="build/lib/jaxb-core.jar" />
-			<fileset file="build/lib/jaxb-runtime.jar" />
-			<fileset file="build/lib/istack-commons-runtime.jar" />
-			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java.jar" />
-			<fileset file="build/lib/usb-api.jar" />
-			<fileset file="build/lib/usb4java-javax.jar" />
-			<fileset file="build/lib/commons-lang3.jar" />
-			<fileset file="build/lib/Windows/32/libusb4java.jar" />
-		</copy>
-		<copy todir="${output.windows64.java.ext}" flatten="yes">
-			<fileset file="build/lib/RXTXcomm.jar" />
-			<fileset file="build/lib/jSerialComm.jar" />
-			<fileset file="build/lib/Windows/64/swt.jar" />
-			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="build/misc/*.README" />
-			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
-			<fileset file="build/lib/gson.jar" />
-			<fileset file="build/lib/juniversalchardet.jar" />
-			<fileset file="build/lib/jaxb-api.jar" />
-			<fileset file="build/lib/jaxb-core.jar" />
-			<fileset file="build/lib/jaxb-runtime.jar" />
-			<fileset file="build/lib/istack-commons-runtime.jar" />
-			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java.jar" />
-			<fileset file="build/lib/usb-api.jar" />
-			<fileset file="build/lib/usb4java-javax.jar" />
-			<fileset file="build/lib/commons-lang3.jar" />
-			<fileset file="build/lib/Windows/64/libusb4java.jar" />
-		</copy>
-		<copy todir="${output.raspbian32.java.ext}" flatten="yes">
-			<fileset file="build/lib/RXTXcomm.jar" />
-			<fileset file="build/lib/jSerialComm.jar" />
-			<fileset file="build/lib/Raspbian/32/swt.jar" />
-			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="build/misc/*.README" />
-			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
-			<fileset file="build/lib/gson.jar" />
-			<fileset file="build/lib/juniversalchardet.jar" />
-			<fileset file="build/lib/jaxb-api.jar" />
-			<fileset file="build/lib/jaxb-core.jar" />
-			<fileset file="build/lib/jaxb-runtime.jar" />
-			<fileset file="build/lib/istack-commons-runtime.jar" />
-			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java.jar" />
-			<fileset file="build/lib/usb-api.jar" />
-			<fileset file="build/lib/usb4java-javax.jar" />
-			<fileset file="build/lib/commons-lang3.jar" />
-			<fileset file="build/lib/Raspbian/32/libusb4java.jar" />
-		</copy>
-		<copy todir="${output.gnulinux32.java.ext}" flatten="yes">
-			<fileset file="build/lib/RXTXcomm.jar" />
-			<fileset file="build/lib/jSerialComm.jar" />
-			<fileset file="build/lib/GNULinux/32/swt.jar" />
-			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="build/misc/*.README" />
-			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
-			<fileset file="build/lib/gson.jar" />
-			<fileset file="build/lib/juniversalchardet.jar" />
-			<fileset file="build/lib/jaxb-api.jar" />
-			<fileset file="build/lib/jaxb-core.jar" />
-			<fileset file="build/lib/jaxb-runtime.jar" />
-			<fileset file="build/lib/istack-commons-runtime.jar" />
-			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java.jar" />
-			<fileset file="build/lib/usb-api.jar" />
-			<fileset file="build/lib/usb4java-javax.jar" />
-			<fileset file="build/lib/commons-lang3.jar" />
-			<fileset file="build/lib/GNULinux/32/libusb4java.jar" />
-		</copy>
-		<copy todir="${output.gnulinux64.java.ext}" flatten="yes">
-			<fileset file="build/lib/RXTXcomm.jar" />
-			<fileset file="build/lib/jSerialComm.jar" />
-			<fileset file="build/lib/GNULinux/64/swt.jar" />
-			<fileset file="build/misc/*.LICENSE" />
-			<fileset file="build/misc/*.README" />
-			<fileset file="${basedir}/HoTTMdlViewer/lib/HoTTMdlViewer.jar" />
-			<fileset file="build/lib/gson.jar" />
-			<fileset file="build/lib/juniversalchardet.jar" />
-			<fileset file="build/lib/jaxb-api.jar" />
-			<fileset file="build/lib/jaxb-core.jar" />
-			<fileset file="build/lib/jaxb-runtime.jar" />
-			<fileset file="build/lib/istack-commons-runtime.jar" />
-			<fileset file="build/lib/activation.jar" />
-			<fileset file="build/lib/usb4java.jar" />
-			<fileset file="build/lib/usb-api.jar" />
-			<fileset file="build/lib/usb4java-javax.jar" />
-			<fileset file="build/lib/commons-lang3.jar" />
-			<fileset file="build/lib/GNULinux/64/libusb4java.jar" />
-		</copy>
 		<copy todir="${output.mac32.java.ext}" flatten="yes">
 			<fileset file="build/lib/RXTXcomm.jar" />
 			<fileset file="build/lib/jSerialComm.jar" />
@@ -828,21 +903,6 @@
 		</copy>
 
 		<!-- launcher scripts, README -->
-		<copy todir="${output.windows32}/DataExplorer" flatten="yes">
-			<fileset file="build/misc/README.*" />
-		</copy>
-		<copy todir="${output.windows64}/DataExplorer" flatten="yes">
-			<fileset file="build/misc/README.*" />
-		</copy>
-		<copy todir="${output.raspbian32}/DataExplorer" flatten="yes">
-			<fileset file="build/misc/README.*" />
-		</copy>
-		<copy todir="${output.gnulinux32}/DataExplorer" flatten="yes">
-			<fileset file="build/misc/README.*" />
-		</copy>
-		<copy todir="${output.gnulinux64}/DataExplorer" flatten="yes">
-			<fileset file="build/misc/README.*" />
-		</copy>
 		<!-- 
 		<copy todir="${output.mac32.app}" flatten="yes">
 			<fileset file="build/misc/README.*" />
@@ -853,25 +913,17 @@
 			<fileset file="build/misc/RXTX_Post-Install_MacOS.sh" />
 		</copy>
 		-->
-
 	</target>
 
 	<!-- package, build Windows installer, MAC OS disk image, tar for GNULinux -->
-	<target name="binary_package" depends="copy-files">
-		
-	    <antcall target="build_Windows_NSIS_installer" description="replacing zip archive target with building NSIS Windows installer"/>
-	    <!-- 
-		<echo message="zip Windows 32 bit files" />
-		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Windows_x86_32.zip">
-			<zipfileset dir="${output.windows32}" casesensitive="true" />
-		</zip>
-
-		<echo message="zip Windows 64 bit files" />
-		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Windows_x86_64.zip">
-			<zipfileset dir="${output.windows64}" casesensitive="true" />
-		</zip>
-		-->
-		
+	<target name="binary_package" depends="copy-files">		
+	    <antcall target="build_Windows_NSIS_installer" description="building NSIS Windows installer" if:set="isWindows" />		
+		<antcall target="binary_package-raspbian" description="build raspbian tarball" unless:set="isWindows" />
+		<antcall target="binary_package-linux" description="build Linux tarball" if:set="isLinux" />
+		<antcall target="build_Mac_install_dmg" description="build Mac disk images, replaces building zip archives" if:set="isMac" />
+	</target>
+	
+	<target name="binary_package-raspbian" depends="init-raspbian">
 		<echo message="tar Raspbian Linux 32 bit files" />
 		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-bin_RaspbianLinux_ARM_32.tar.gz" compression="gzip">
 			<tarfileset dir="${output.raspbian32}" casesensitive="true" mode="755">
@@ -889,8 +941,10 @@
 				<exclude name="*/DataExplorer.desktop" />
 				<exclude name="*/DevicePropertiesEditor.desktop" />
 			</tarfileset>
-		</tar>
-		
+		</tar>		
+	</target>
+	
+	<target name="binary_package-linux" depends="init-linux">
 		<echo message="tar GNULinux 32 bit files" />
 		<tar destfile="${build.target.dir}/dataexplorer-${version.num}-bin_GNULinux_x86_32.tar.gz" compression="gzip">
 			<tarfileset dir="${output.gnulinux32}" casesensitive="true" mode="755">
@@ -928,37 +982,6 @@
 				<exclude name="*/DevicePropertiesEditor.desktop" />
 			</tarfileset>
 		</tar>
-
-		<antcall target="build_Mac_install_dmg" description="build Mac disk images, replaces building zip archives"/>
-		<!-- 
-		<echo message="zip Mac 32 cocoa application bundle" />
-		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_32_cocoa.zip">
-			<zipfileset dir="${output.mac32}" casesensitive="true" filemode="755">
-				<include name="**/DataExplorerMac32" />
-				<include name="**/DevicePropertiesEditorMac32" />
-				<include name="**/RXTX_Post-Install_MacOS.sh" />
-			</zipfileset>
-			<zipfileset dir="${output.mac32}" casesensitive="true">
-				<exclude name="**/DataExplorerMac32" />
-				<exclude name="**/DevicePropertiesEditorMac32" />
-				<exclude name="**/RXTX_Post-Install_MacOS.sh" />
-			</zipfileset>
-		</zip>
-
-		<echo message="zip Mac 64 cocoa application bundle" />
-		<zip destfile="${build.target.dir}/dataexplorer-${version.num}-bin_Mac_64_cocoa.zip">
-			<zipfileset dir="${output.mac64}" casesensitive="true" filemode="755">
-				<include name="**/DataExplorerMac64" />
-				<include name="**/DevicePropertiesEditorMac64" />
-				<include name="**/RXTX_Post-Install_MacOS.sh" />
-			</zipfileset>
-			<zipfileset dir="${output.mac64}" casesensitive="true">
-				<exclude name="**/DataExplorerMac64" />
-				<exclude name="**/DevicePropertiesEditorMac64" />
-				<exclude name="**/RXTX_Post-Install_MacOS.sh" />
-			</zipfileset>
-		</zip>
-	-->
 	</target>
 
 	<target name="backupDataFilesWindows" description="pack personal data files">
@@ -1223,7 +1246,7 @@
         <antcall target="build_dmg_64"/>
     </target>
     
-    <target name="build_dmg_32" description="creates MAC OS disk image 32 bit">
+    <target name="build_dmg_32" depends="init-mac" description="creates MAC OS disk image 32 bit">
 	    <property name="mountdir" value="${build.target.dir}"/>
 	    <property name="targetDmgPath" value="${build.target.dir}/${app.name}-${version.num}_Mac_32.dmg"/>
 	    <property name="tmpDmgPath" value="${mountdir}/${app.name}_32-tmp.dmg"/>
@@ -1324,7 +1347,7 @@
 	    <delete file="${tmpDmgPath}" quiet="yes" failonerror="false"/>
     </target>
     
-    <target name="build_dmg_64" description="creates MAC OS disk image 64 bit">
+    <target name="build_dmg_64" depends="init-mac" description="creates MAC OS disk image 64 bit">
 	    <!-- Set this property value to your application name -->
 	    <property name="app.name" value="DataExplorer"/>
 	
