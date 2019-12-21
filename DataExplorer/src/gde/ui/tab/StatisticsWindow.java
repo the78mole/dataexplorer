@@ -90,6 +90,8 @@ public class StatisticsWindow extends CTabItem {
 	TableColumn							avgTableColumn;
 	TableColumn							maxTableColumn;
 	TableColumn							minTableColumn;
+	TableColumn							maxTimeTableColumn;
+	TableColumn							minTimeTableColumn;
 
 	Menu										popupmenu;
 	TabAreaContextMenu			contextMenu;
@@ -231,6 +233,11 @@ public class StatisticsWindow extends CTabItem {
 					this.minTableColumn.setText(Messages.getString(MessageIds.GDE_MSGT0354));
 				}
 				{
+					this.minTimeTableColumn = new TableColumn(this.dataTable, SWT.RIGHT);
+					this.minTimeTableColumn.setWidth(110);
+					this.minTimeTableColumn.setText(Messages.getString(MessageIds.GDE_MSGT0359) + GDE.STRING_BLANK);
+				}
+				{
 					this.avgTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
 					this.avgTableColumn.setWidth(90);
 					this.avgTableColumn.setText(Messages.getString(MessageIds.GDE_MSGT0355));
@@ -239,6 +246,11 @@ public class StatisticsWindow extends CTabItem {
 					this.maxTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
 					this.maxTableColumn.setWidth(90);
 					this.maxTableColumn.setText(Messages.getString(MessageIds.GDE_MSGT0356));
+				}
+				{
+					this.maxTimeTableColumn = new TableColumn(this.dataTable, SWT.RIGHT);
+					this.maxTimeTableColumn.setWidth(110);
+					this.maxTimeTableColumn.setText(Messages.getString(MessageIds.GDE_MSGT0359) + GDE.STRING_BLANK);
 				}
 				{
 					this.sigmaTableColumn = new TableColumn(this.dataTable, SWT.CENTER);
@@ -286,7 +298,9 @@ public class StatisticsWindow extends CTabItem {
 					sb.append(Messages.getString(MessageIds.GDE_MSGT0359)).append(DELIMITER);
 					sb.append("     0      ").append(DELIMITER); //$NON-NLS-1$
 					sb.append(NO_VALUE).append(DELIMITER);
+					sb.append(NO_VALUE).append(DELIMITER);
 					sb.append(TimeLine.getFomatedTime(activeRecordSet.getMaxTime_ms())).append(" ").append(DELIMITER); //$NON-NLS-1$
+					sb.append(NO_VALUE).append(DELIMITER);
 					sb.append(NO_VALUE).append(DELIMITER);
 					if (activeRecordSet.isTimeStepConstant()) {
 						sb.append(Messages.getString(MessageIds.GDE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTime_ms(1))).append(Messages.getString(MessageIds.GDE_MSGT0361)); //$NON-NLS-1$
@@ -312,9 +326,12 @@ public class StatisticsWindow extends CTabItem {
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								else
 									sb.append(NO_VALUE);
+								
+								if (!sb.toString().endsWith(NO_VALUE)) 
+									sb.append(DELIMITER).append(TimeLine.getFomatedTime(record.getRealMinValueTime_ms())).append(GDE.STRING_BLANK);
 							}
 							else
-								sb.append(NO_VALUE);
+								sb.append(NO_VALUE).append(DELIMITER).append(NO_VALUE);
 							sb.append(DELIMITER);
 
 							if (measurementStatistics.isAvg())
@@ -333,9 +350,12 @@ public class StatisticsWindow extends CTabItem {
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								else
 									sb.append(NO_VALUE);
+								
+								if (!sb.toString().endsWith(NO_VALUE)) 
+									sb.append(DELIMITER).append(TimeLine.getFomatedTime(record.getRealMaxValueTime_ms())).append(GDE.STRING_BLANK);
 							}
 							else
-								sb.append(NO_VALUE);
+								sb.append(NO_VALUE).append(DELIMITER).append(NO_VALUE);
 							sb.append(DELIMITER);
 
 							if (measurementStatistics.isSigma()) {

@@ -146,6 +146,8 @@ public class Record extends AbstractRecord implements IRecord {
 	protected int									numberFormat							= -1;																		// -1 = automatic, 0 = 0000, 1 = 000.0, 2 = 00.00
 	protected int									maxValue									= 0;																		// max value of the curve
 	protected int									minValue									= 0;																		// min value of the curve
+	protected int									maxValueTimeStampIndex		= 0;																		// time stamp index of max value of the curve
+	protected int									minValueTimeStampIndex		= 0;																		// time stamp index min value of the curve
 	protected double							maxScaleValue							= this.maxValue;												// overwrite calculated boundaries
 	protected double							minScaleValue							= this.minValue;
 	DataType											dataType									= Record.DataType.DEFAULT;
@@ -373,6 +375,8 @@ public class Record extends AbstractRecord implements IRecord {
 		this.initializeProperties(record, record.properties);
 		this.maxValue = record.maxValue;
 		this.minValue = record.minValue;
+		this.maxValueTimeStampIndex = record.maxValueTimeStampIndex;
+		this.minValueTimeStampIndex = record.minValueTimeStampIndex;
 		this.df = (DecimalFormat) record.df.clone();
 		this.numberFormat = record.numberFormat;
 		this.isVisible = record.isVisible;
@@ -439,6 +443,8 @@ public class Record extends AbstractRecord implements IRecord {
 		this.initializeProperties(record, record.properties);
 		this.maxValue = 0;
 		this.minValue = 0;
+		this.maxValueTimeStampIndex = 0;
+		this.minValueTimeStampIndex = 0;
 		this.isCurrentRecord = record.isCurrentRecord;
 		this.isVoltageRecord = record.isVoltageRecord;
 		this.device = record.device; // reference to device
@@ -541,9 +547,14 @@ public class Record extends AbstractRecord implements IRecord {
 		if (super.size() == 0) {
 			this.minValue = this.maxValue = point;
 		} else {
-			if (point > this.maxValue)
+			if (point > this.maxValue) {
 				this.maxValue = point;
-			else if (point < this.minValue) this.minValue = point;
+				this.maxValueTimeStampIndex = super.size();
+			}
+			else if (point < this.minValue) {
+				this.minValue = point;
+				this.minValueTimeStampIndex = super.size();
+			}
 		}
 		if (log.isLoggable(Level.FINER)) log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, this.name + " adding point = " + point); //$NON-NLS-1$
 		if (log.isLoggable(Level.FINEST)) log.logp(Level.FINEST, $CLASS_NAME, $METHOD_NAME, this.name + " minValue = " + this.minValue + " maxValue = " + this.maxValue); //$NON-NLS-1$ //$NON-NLS-2$
@@ -867,6 +878,14 @@ public class Record extends AbstractRecord implements IRecord {
 
 	public int getRealMinValue() {
 		return this.minValue;
+	}
+
+	public long getRealMaxValueTime_ms() {
+		return (long) this.parent.timeStep_ms.getTime_ms(this.maxValueTimeStampIndex);
+	}
+
+	public long getRealMinValueTime_ms() {
+		return (long) this.parent.timeStep_ms.getTime_ms(this.minValueTimeStampIndex);
 	}
 
 	public int getMaxValueTriggered() {

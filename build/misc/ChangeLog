@@ -6,6 +6,7 @@ Generic changes/fixes
 	* uniform build execution environment to Java 8 compatible byte code
 	* split build in OS dependent steps (future MAC OS does not support 32 bit makensis processing)
 	* update swt.jar for Linux 64 bit to fix webkit problems
+	* add time stamp of min/max value evaluated
 
 Device specific changes/fixes
 	*
