@@ -7,6 +7,7 @@ Generic changes/fixes
 	* split build in OS dependent steps (future MAC OS does not support 32 bit makensis processing)
 	* update swt.jar for Linux 64 bit to fix webkit problems
 	* add time stamp of min/max value evaluated
+	* update swt.jar for available OS to support future Java versions (new SWT libs available for 64 bit only)
 
 Device specific changes/fixes
 	*
