@@ -10,7 +10,7 @@ Generic changes/fixes
 	* update swt.jar for available OS to support future Java versions (new SWT libs available for 64 bit only)
 
 Device specific changes/fixes
-	*
+	* LiPoWatch - adapt clear memory button position for MAC OS X and Linux
 
 Version 3.4.0 - 10 Nov 2019
 Generic changes/fixes

@@ -925,7 +925,7 @@ public class LiPoWatchDialog extends DeviceDialog {
 										this.clearMemoryLabel = new CLabel(this.clearMemoryGroup, SWT.CENTER | SWT.EMBEDDED);
 										this.clearMemoryLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 										this.clearMemoryLabel.setText(Messages.getString(MessageIds.GDE_MSGT1604));
-										this.clearMemoryLabel.setLayoutData(new RowData(205, 40));
+										this.clearMemoryLabel.setLayoutData(new RowData(205, GDE.IS_WINDOWS ? 40 : 30));
 									}
 									{
 										this.clearMemoryButton = new Button(this.clearMemoryGroup, SWT.PUSH | SWT.CENTER);
