@@ -127,6 +127,7 @@ public class LogViewReader {
 		deviceMap.put("graupner ultra duo plus 80", "UltraDuoPlus80"); //$NON-NLS-1$ //$NON-NLS-2$
 		//map temporary identical charger to UDP80
 		deviceMap.put("robbe powerpeak twin 1000w", "UltraDuoPlus80"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("robbe powerpeak iv", "Robbe PowerPeak IV"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("megapower gemini 2014 duo2", "UltraDuoPlus80"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("graupner ultramat 18", "Ultramat18"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("graupner ultramat 12 plus pocket", "Ultramat12"); //$NON-NLS-1$ //$NON-NLS-2$

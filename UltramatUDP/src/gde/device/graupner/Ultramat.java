@@ -61,7 +61,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 
 	public enum GraupnerDeviceType {
 		//0=Ultramat50, 1=UltraDuoPlus40, 2=UltramatTrio14, 3=Ultramat18 4=Ultramat45, 5=Ultramat60, 6=UltramatTrioPlus16S ?=Ultramat12 ?=Ultramat16 ?=Ultramat16S
-		UltraDuoPlus50, UltraDuoPlus40, UltraTrioPlus14, Ultramat18, UltraDuoPlus45, UltraDuoPlus60, UltraTrioPlus16S, Ultramat16S, UltraDuoPlus80, UltraQuick70, UltraAcDcEq
+		UltraDuoPlus50, UltraDuoPlus40, UltraTrioPlus14, Ultramat18, UltraDuoPlus45, UltraDuoPlus60, UltraTrioPlus16S, Ultramat16S, UltraDuoPlus80, UltraQuick70, UltraAcDcEq, RobbePowerPeakIV
 	};
 
 	protected String[]														USAGE_MODE;
