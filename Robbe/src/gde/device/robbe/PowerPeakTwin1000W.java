@@ -16,7 +16,7 @@
 
     Copyright (c) 2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
 ****************************************************************************************/
-package gde.device.graupner;
+package gde.device.robbe;
 
 import java.io.FileNotFoundException;
 import java.util.logging.Logger;
@@ -35,23 +35,24 @@ import gde.device.DesktopPropertyType;
 import gde.device.DesktopPropertyTypes;
 import gde.device.DeviceConfiguration;
 import gde.device.InputTypes;
+import gde.device.graupner.MessageIds;
 import gde.exception.DataInconsitsentException;
 import gde.log.Level;
 import gde.messages.Messages;
 
 /**
- * Robbe PowerPeak base class
+ * Graupner Ultra Duo Plus 80 base class
  * @author Winfried Brügmann
  */
-public class RobbePowerPeakIV extends Ultramat {
-	final static Logger	logger	= Logger.getLogger(RobbePowerPeakIV.class.getName());
+public class PowerPeakTwin1000W extends PowerPeak {
+	final static Logger	logger	= Logger.getLogger(PowerPeakTwin1000W.class.getName());
 
 	/**
 	 * constructor using properties file
 	 * @throws JAXBException
 	 * @throws FileNotFoundException
 	 */
-	public RobbePowerPeakIV(String deviceProperties) throws FileNotFoundException, JAXBException {
+	public PowerPeakTwin1000W(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
@@ -102,14 +103,13 @@ public class RobbePowerPeakIV extends Ultramat {
 				Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
-		this.dialog = null;
 	}
 
 	/**
 	 * constructor using existing device configuration
 	 * @param deviceConfig device configuration
 	 */
-	public RobbePowerPeakIV(DeviceConfiguration deviceConfig) {
+	public PowerPeakTwin1000W(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
@@ -160,7 +160,6 @@ public class RobbePowerPeakIV extends Ultramat {
 				Messages.getString(MessageIds.GDE_MSGT2237) };
 
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
-		this.dialog = null;
 	}
 
 	/**
@@ -168,7 +167,7 @@ public class RobbePowerPeakIV extends Ultramat {
 	 */
 	@Override
 	public int getLovDataByteSize() {
-		return 128;
+		return 132;
 	}
 
 	/**
@@ -189,7 +188,7 @@ public class RobbePowerPeakIV extends Ultramat {
 		int deviceDataBufferSize2 = deviceDataBufferSize / 2;
 		int channel2Offset = deviceDataBufferSize2 - 4;
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
-		int offset = 6;
+		int offset = 0;
 		int progressCycle = 0;
 		int lovDataSize = this.getLovDataByteSize();
 		int outputChannel = recordSet.getChannelConfigNumber();
@@ -200,9 +199,9 @@ public class RobbePowerPeakIV extends Ultramat {
 
 			for (int i = 0; i < recordDataSize; i++) {
 				if (outputChannel == 1)
-					System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+					System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize2);
 				else if (outputChannel == 2)
-					System.arraycopy(dataBuffer, channel2Offset + offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+					System.arraycopy(dataBuffer, channel2Offset + offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize2);
 
 				recordSet.addPoints(convertDataBytes(points, convertBuffer));
 
@@ -243,14 +242,8 @@ public class RobbePowerPeakIV extends Ultramat {
 
 			// 8=SpannungZelle1 9=SpannungZelle2 10=SpannungZelle3 11=SpannungZelle4 12=SpannungZelle5 13=SpannungZelle6 14=SpannungZelle7
 			for (int i = 0, j = 0; i < points.length - 8; ++i, j += 4) {
-				try {
-					//System.out.println(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[16+33 + j], (char) dataBuffer[16+34 + j], (char) dataBuffer[16+35 + j], (char) dataBuffer[16+36 + j]));
-					points[i + 8] = Integer
-							.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[16+33 + j], (char) dataBuffer[16+34 + j], (char) dataBuffer[16+35 + j], (char) dataBuffer[16+36 + j]), 16);
-				}
-				catch (NumberFormatException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
+				points[i + 8] = Integer
+						.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[33 + j], (char) dataBuffer[34 + j], (char) dataBuffer[35 + j], (char) dataBuffer[36 + j]), 16);
 				if (points[i + 8] > 0) {
 					maxVotage = points[i + 8] > maxVotage ? points[i + 8] : maxVotage;
 					minVotage = points[i + 8] < minVotage ? points[i + 8] : minVotage;
@@ -334,7 +327,7 @@ public class RobbePowerPeakIV extends Ultramat {
 	public void updateVisibilityStatus(RecordSet recordSet, boolean includeReasonableDataCheck) {
 
 		recordSet.setAllDisplayable();
-		int numCells = recordSet.getChannelConfigNumber() == 1 ? 12 : 3;
+		int numCells = 7;
 		for (int i = recordSet.size() - numCells - 1; i < recordSet.size(); ++i) {
 			Record record = recordSet.get(i);
 			record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
@@ -354,8 +347,8 @@ public class RobbePowerPeakIV extends Ultramat {
 	 * @return 	-1=Ultramat16 1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, 6=Ultramat16S
 	 */
 	@Override
-	public GraupnerDeviceType getDeviceTypeIdentifier() {
-		return GraupnerDeviceType.RobbePowerPeakIV;
+	public RobbeDeviceType getDeviceTypeIdentifier() {
+		return RobbeDeviceType.PowerPeakTwin1000W;
 	}
 
 	/**
@@ -395,7 +388,7 @@ public class RobbePowerPeakIV extends Ultramat {
 			}
 			if (this.settings.isReduceChargeDischarge())
 				return processingModeOut1 != null && processingModeOut1.length() == 2 && (processingModeOut1.equals("01") || processingModeOut1.equals("02") || (this.settings.isContinuousRecordSet() && processingModeOut1.equals("03")));
-			return processingModeOut1 != null && processingModeOut1.length() == 2 && !(processingModeOut1.equals(Ultramat.OPERATIONS_MODE_NONE) || processingModeOut1.equals(Ultramat.OPERATIONS_MODE_ERROR));
+			return processingModeOut1 != null && processingModeOut1.length() == 2 && !(processingModeOut1.equals(PowerPeak.OPERATIONS_MODE_NONE) || processingModeOut1.equals(PowerPeak.OPERATIONS_MODE_ERROR));
 		}
 		else if (outletNum == 2) {
 			String processingModeOut2 = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[65], (char) dataBuffer[66]);
@@ -405,7 +398,7 @@ public class RobbePowerPeakIV extends Ultramat {
 			}
 			if (this.settings.isReduceChargeDischarge())
 				return processingModeOut2 != null && processingModeOut2.length() == 2 && (processingModeOut2.equals("01") || processingModeOut2.equals("02") || (this.settings.isContinuousRecordSet() && processingModeOut2.equals("03")));
-			return processingModeOut2 != null && processingModeOut2.length() == 2 && !(processingModeOut2.equals(Ultramat.OPERATIONS_MODE_NONE) || processingModeOut2.equals(Ultramat.OPERATIONS_MODE_ERROR));
+			return processingModeOut2 != null && processingModeOut2.length() == 2 && !(processingModeOut2.equals(PowerPeak.OPERATIONS_MODE_NONE) || processingModeOut2.equals(PowerPeak.OPERATIONS_MODE_ERROR));
 		}
 		else
 			return false;

@@ -136,6 +136,13 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 									fileType = GDE.FILE_ENDING_STAR_LOV;
 									data_in = new DataInputStream(new FileInputStream(new File(openFilePath)));
 									LogViewReader.readHeader(data_in);
+									switch (application.getActiveDevice().getName()) {
+									case "Robbe PowerPeak IV":
+										data_in.skip(6); //data start offset
+										break;
+									default:
+										break;
+									}
 								}
 								else if (openFilePath.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TXT)) {
 									fileType = GDE.FILE_ENDING_STAR_TXT;
@@ -202,6 +209,7 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 		if (this.isConnected) {
 			if (data_in != null && this.fileType.equals(GDE.FILE_ENDING_STAR_LOV)) {
 				if (data_in.read(readBuffer) > 0) {
+					//System.out.println(StringHelper.byte2Hex2CharString(readBuffer, readBuffer.length));
 					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
 					if (data_in.read(new byte[size2Read]) != size2Read) {
 						log.log(Level.WARNING, "expected byte size to  read does not macht really red size of bytes !");

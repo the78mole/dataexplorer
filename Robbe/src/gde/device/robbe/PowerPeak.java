@@ -16,22 +16,15 @@
 
     Copyright (c) 2011,2012,2013,2014,2015,2016,2017,2018,2019 Winfried Bruegmann
 ****************************************************************************************/
-package gde.device.graupner;
+package gde.device.robbe;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
-import org.eclipse.swt.SWT;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -43,25 +36,24 @@ import gde.data.RecordSet;
 import gde.device.DesktopPropertyType;
 import gde.device.DesktopPropertyTypes;
 import gde.device.DeviceConfiguration;
+import gde.device.DeviceDialog;
 import gde.device.IDevice;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
-import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 
 /**
- * Graupner Ultramat base class
+ * Graupner PowerPeak base class
  * @author Winfried Brügmann
  */
-public abstract class Ultramat extends DeviceConfiguration implements IDevice {
-	final static Logger	log	= Logger.getLogger(Ultramat.class.getName());
+public abstract class PowerPeak extends DeviceConfiguration implements IDevice {
+	final static Logger	log	= Logger.getLogger(PowerPeak.class.getName());
 
-	public enum GraupnerDeviceType {
-		//0=Ultramat50, 1=UltraDuoPlus40, 2=UltramatTrio14, 3=Ultramat18 4=Ultramat45, 5=Ultramat60, 6=UltramatTrioPlus16S ?=Ultramat12 ?=Ultramat16 ?=Ultramat16S
-		UltraDuoPlus50, UltraDuoPlus40, UltraTrioPlus14, Ultramat18, UltraDuoPlus45, UltraDuoPlus60, UltraTrioPlus16S, Ultramat16S, UltraDuoPlus80, UltraQuick70, UltraAcDcEq
+	public enum RobbeDeviceType {
+		PowerPeakTwin1000W, PowerPeakIV
 	};
 
 	protected String[]														USAGE_MODE;
@@ -78,16 +70,14 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 
 	protected Schema															schema;
 	protected JAXBContext													jc;
-	protected UltraDuoPlusType										ultraDuoPlusSetup;
 	protected String															firmware												= GDE.STRING_MINUS;
-	protected GathererThread											dataGatherThread;
-	protected HashMap<String, CalculationThread>	calculationThreads							= new HashMap<String, CalculationThread>();
+	protected PowerPeakGathererThread											dataGatherThread;
+	protected HashMap<String, PowerPeakCalculationThread>	powerPeakCalculationThreads							= new HashMap<String, PowerPeakCalculationThread>();
 
 	protected final Settings settings = Settings.getInstance();
 	protected final DataExplorer									application;
-	protected final UltramatSerialPort						serialPort;
+	protected final PowerPeakSerialPort						serialPort;
 	protected final Channels											channels;
-	protected UltraDuoPlusDialog									dialog;
 
 	public static final String[]									cycleDataRecordNames						= Messages.getString(gde.messages.MessageIds.GDE_MSGT0398).split(GDE.STRING_COMMA);
 	public static final String[]									cycleDataUnitNames							= { "V", "V", "mAh", "mAh", "m\u2126", "m\u2126" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
@@ -101,32 +91,30 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @throws JAXBException
 	 * @throws FileNotFoundException
 	 */
-	public Ultramat(String deviceProperties) throws FileNotFoundException, JAXBException {
+	public PowerPeak(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
-		this.serialPort = new UltramatSerialPort(this, this.application);
+		this.serialPort = new PowerPeakSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
-		this.dialog = new UltraDuoPlusDialog(this.application.getShell(), this);
 	}
 
 	/**
 	 * constructor using existing device configuration
 	 * @param deviceConfig device configuration
 	 */
-	public Ultramat(DeviceConfiguration deviceConfig) {
+	public PowerPeak(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.graupner.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
-		this.serialPort = new UltramatSerialPort(this, this.application);
+		this.serialPort = new PowerPeakSerialPort(this, this.application);
 		this.channels = Channels.getInstance();
 		this.configureSerialPortMenu(DeviceCommPort.ICON_SET_START_STOP, GDE.STRING_EMPTY, GDE.STRING_EMPTY);
-		this.dialog = new UltraDuoPlusDialog(this.application.getShell(), this);
 	}
 
 	/**
@@ -300,9 +288,9 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 
 				Record record = recordSet.get(3);//3=Leistung
 				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
-					this.calculationThreads.put(record.getName(), new CalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
+					this.powerPeakCalculationThreads.put(record.getName(), new PowerPeakCalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
 					try {
-						this.calculationThreads.get(record.getName()).start();
+						this.powerPeakCalculationThreads.get(record.getName()).start();
 					}
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, e.getMessage(), e);
@@ -312,9 +300,9 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 
 				record = recordSet.get(4);//4=Energie
 				if (record != null && (record.size() == 0 || !record.hasReasonableData())) {
-					this.calculationThreads.put(record.getName(), new CalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
+					this.powerPeakCalculationThreads.put(record.getName(), new PowerPeakCalculationThread(record.getName(), this.channels.getActiveChannel().getActiveRecordSet()));
 					try {
-						this.calculationThreads.get(record.getName()).start();
+						this.powerPeakCalculationThreads.get(record.getName()).start();
 					}
 					catch (RuntimeException e) {
 						log.log(Level.WARNING, e.getMessage(), e);
@@ -339,7 +327,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @return the serialPort
 	 */
 	@Override
-	public UltramatSerialPort getCommunicationPort() {
+	public PowerPeakSerialPort getCommunicationPort() {
 		return this.serialPort;
 	}
 
@@ -347,8 +335,8 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * @return the device specific dialog instance
 	 */
 	@Override
-	public UltraDuoPlusDialog getDialog() {
-		return this.dialog;
+	public DeviceDialog getDialog() {
+		return null;
 	}
 
 	/**
@@ -370,72 +358,10 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 			if (!this.serialPort.isConnected()) {
 				try {
 					this.serialPort.open();
-					this.serialPort.write(UltramatSerialPort.RESET);
-					try {
-						byte[] dataBuffer = this.serialPort.getData(false);
-						this.firmware = this.getFirmwareVersion(dataBuffer);
-						//check if device fits this.device.getProductCode(dataBuffer)
-						if (!this.getDeviceTypeIdentifier().name().equals(this.getClass().getSimpleName()) && this.getDeviceTypeIdentifier().ordinal() != this.getProductCode(dataBuffer)) {
-							int answer = this.application.openYesNoMessageDialog(Messages.getString(MessageIds.GDE_MSGW2202, new String[] {GraupnerDeviceType.values()[this.getProductCode(dataBuffer)].toString()}));
-							if (answer == SWT.YES) {
-								this.application.getDeviceSelectionDialog().setupDevice(GraupnerDeviceType.values()[this.getProductCode(dataBuffer)].toString());
-								this.serialPort.close();
-								return;
-							}
-						}
-
-						//load cached memory configurations to enable memory name to object key match
-						switch (this.getDeviceTypeIdentifier()) {
-						case UltraDuoPlus45:
-						case UltraDuoPlus50:
-						case UltraDuoPlus60:
-							try {
-								if (!(this.isProcessing(1, dataBuffer) || this.isProcessing(2, dataBuffer))) {
-									this.serialPort.write(UltramatSerialPort.RESET_CONFIG);
-									String deviceIdentifierName = this.serialPort.readDeviceUserName();
-									this.serialPort.write(UltramatSerialPort.RESET);
-
-									this.jc = JAXBContext.newInstance("gde.device.graupner"); //$NON-NLS-1$
-									this.schema = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(
-											new StreamSource(UltraDuoPlusDialog.class.getClassLoader().getResourceAsStream("resource/" + UltraDuoPlusDialog.ULTRA_DUO_PLUS_XSD))); //$NON-NLS-1$
-									Unmarshaller unmarshaller = this.jc.createUnmarshaller();
-									unmarshaller.setSchema(this.schema);
-									this.ultraDuoPlusSetup = (UltraDuoPlusType) unmarshaller.unmarshal(new File(Settings.getApplHomePath() + UltraDuoPlusDialog.UDP_CONFIGURATION_SUFFIX
-											+ deviceIdentifierName.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR) + GDE.FILE_ENDING_DOT_XML));
-								}
-							}
-							catch (Exception e) {
-								if (e instanceof FileNotFoundException) {
-									this.application.openMessageDialog(e.getLocalizedMessage());
-								}
-								log.log(Level.WARNING, e.getMessage(), e);
-							}
-							break;
-						default:
-							break;
-						}
-					}
-					catch (FileNotFoundException e) {
-						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET);
-						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					}
-					catch (SerialPortException e) {
-						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET);
-						throw e;
-					}
-					catch (TimeOutException e) {
-						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET);
-						throw new SerialPortException(e.getMessage());
-					}
-					catch (Exception e) {
-						if (this.serialPort.isConnected()) this.serialPort.write(UltramatSerialPort.RESET);
-						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-						throw e;
-					}
 
 					Channel activChannel = Channels.getInstance().getActiveChannel();
 					if (activChannel != null) {
-						this.dataGatherThread = new GathererThread();
+						this.dataGatherThread = new PowerPeakGathererThread();
 						try {
 							if (this.serialPort.isConnected()) {
 								this.dataGatherThread.start();
@@ -505,7 +431,7 @@ public abstract class Ultramat extends DeviceConfiguration implements IDevice {
 	 * query the device identifier to differentiate between different device implementations
 	 * @return 1=Ultramat50, 2=Ultramat40, 3=UltramatTrio14, 4=Ultramat45, 5=Ultramat60, 6=Ultramat16S ?=Ultramat16
 	 */
-	public abstract GraupnerDeviceType getDeviceTypeIdentifier();
+	public abstract RobbeDeviceType getDeviceTypeIdentifier();
 
 	/**
 	 * query the firmware version

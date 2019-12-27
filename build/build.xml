@@ -257,6 +257,7 @@
 		<ant antfile="build.xml" target="clean" dir="CSVImportAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="ArduPilot" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="LogView-Zero" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="Robbe" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -444,6 +445,7 @@
 		<ant antfile="build.xml" target="package" dir="CSVImportAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="ArduPilot" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="LogView-Zero" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="Robbe" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 	
@@ -487,6 +489,7 @@
 		<ant antfile="build.xml" target="nonui_package" dir="CSVImportAdapter" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="ArduPilot" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="LogView-Zero" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="Robbe" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -529,6 +532,7 @@
 			<include name="CSVImportAdapter/build/*.jar" />
 			<include name="ArduPilot/build/*.jar" />
 			<include name="LogView-Zero/build/*.jar" />
+			<include name="Robbe/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
@@ -573,6 +577,7 @@
 			<include name="CSVImportAdapter/build/*NonUi*.jar" />
 			<include name="ArduPilot/build/*NonUi*.jar" />
 			<include name="LogView-Zero/build/*NonUi*.jar" />
+			<include name="Robbe/build/*NonUi*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>

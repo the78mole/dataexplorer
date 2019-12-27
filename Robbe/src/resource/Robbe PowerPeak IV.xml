@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V39.xsd">
     <Device>
-        <name implementation="gde.device.graupner.RobbePowerPeakIV">Robbe PowerPeak IV</name>
+        <name implementation="gde.device.robbe.PowerPeakIV">Robbe PowerPeak IV</name>
         <manufacturer>Robbe</manufacturer>
         <manufacturerURL>https://www.robbe.com</manufacturerURL>
         <group>charger</group>
