@@ -513,11 +513,10 @@ public class FileHandler {
 				if (this.channels.getActiveChannelNumber() != channelNumber) {
 					int answer = this.application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI0006, new Object[] { channelConfigName }));
 					if (answer != SWT.OK) return;
-
-					// clean existing channel for new data, if channel does not exist ignore,
-					// this will be covered by the reader by creating a new channel
-					channel.clear();
 				}
+				// clean existing channel for new data, if channel does not exist ignore,
+				// this will be covered by the reader by creating a new channel
+				channel.clear();
 			}
 			else
 				this.application.getDeviceSelectionDialog().setupDevice(fileDeviceName);
