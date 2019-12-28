@@ -110,6 +110,8 @@ public class PowerPeakSerialPort extends DeviceCommPort {
 
 			answer = new byte[data.length];
 			answer = this.read(data, 3000);
+			log.logp(java.util.logging.Level.OFF, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(answer));
+
 			// synchronize received data to DeviceCommPort.FF of sent data 
 			while (answer[0] != DeviceCommPort.FF) {
 				this.isInSync = false;
@@ -118,9 +120,10 @@ public class PowerPeakSerialPort extends DeviceCommPort {
 						System.arraycopy(answer, i, data, 0, data.length - i);
 						answer = new byte[i];
 						answer = this.read(answer, 1000);
+						log.logp(java.util.logging.Level.OFF, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(answer));
 						System.arraycopy(answer, 0, data, data.length - i, i);
 						this.isInSync = true;
-						log.logp(java.util.logging.Level.FINE, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+						log.logp(java.util.logging.Level.OFF, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
 						break; //sync
 					}
 				}
@@ -130,18 +133,17 @@ public class PowerPeakSerialPort extends DeviceCommPort {
 				log.logp(java.util.logging.Level.WARNING, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> unable to synchronize received data, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > PowerPeakSerialPort.xferErrorLimit) throw new SerialPortException("Number of transfer error exceed the acceptable limit of " + PowerPeakSerialPort.xferErrorLimit); //$NON-NLS-1$
-				this.write(PowerPeakSerialPort.RESET);
+				//this.write(PowerPeakSerialPort.RESET);
 				answer = new byte[data.length];
 				answer = this.read(answer, 3000);
 			}
-			log.logp(java.util.logging.Level.FINE, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(data));
 
 			if (checkBeginEndSignature && !(data[0] == DeviceCommPort.FF && data[data.length - 1] == DeviceCommPort.CR)) {
 				this.addXferError();
 				log.logp(java.util.logging.Level.WARNING, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME,
 						"=====> data start or end does not match, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > PowerPeakSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + PowerPeakSerialPort.xferErrorLimit); //$NON-NLS-1$
-				this.write(PowerPeakSerialPort.RESET);
+				//this.write(PowerPeakSerialPort.RESET);
 				data = getData(true);
 			}
 
@@ -149,7 +151,7 @@ public class PowerPeakSerialPort extends DeviceCommPort {
 				this.addXferError();
 				log.logp(java.util.logging.Level.WARNING, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, "=====> checksum error occured, number of errors = " + this.getXferErrors()); //$NON-NLS-1$
 				if (this.getXferErrors() > PowerPeakSerialPort.xferErrorLimit) throw new SerialPortException("Number of tranfer error exceed the acceptable limit of " + PowerPeakSerialPort.xferErrorLimit); //$NON-NLS-1$
-				this.write(PowerPeakSerialPort.RESET);
+				//this.write(PowerPeakSerialPort.RESET);
 				data = getData(true);
 			}
 		}
