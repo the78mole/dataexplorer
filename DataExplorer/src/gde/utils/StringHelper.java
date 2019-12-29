@@ -766,14 +766,13 @@ public class StringHelper {
 				sb.append(DeviceCommPort.STRING_NAK);
 			else if (buffer[i] == -1)
 				sb.append('|');
-//			else if (i == buffer.length - 5)
-//				sb.append(GDE.STRING_OR).append((char) buffer[i]);
+			else if (i == buffer.length - 5)
+				sb.append(GDE.STRING_OR).append((char) buffer[i]);
 			else
 				sb.append((char) buffer[i]);
 			//sb.append(String.format("%X", buffer[i]));
 
-			if (i%2 == 0) 
-				sb.append(" ");
+			//if (i%4 == 0) sb.append(" ");
 		}
 		return sb.toString();
 	}

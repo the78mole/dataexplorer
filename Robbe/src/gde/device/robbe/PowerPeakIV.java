@@ -19,6 +19,7 @@
 package gde.device.robbe;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -171,6 +172,22 @@ public class PowerPeakIV extends PowerPeak {
 	}
 
 	/**
+	 * to enable same data points used in method addConvertedLovDataBufferAsRawDataPoints() and convertDataBytes() for both channels
+	 * use this to resort data bytes in returned buffer
+	 * @param dataBuffer input buffer
+	 * @return prepared output buffer
+	 */
+	public byte[] getPreparedBufferChannel2(byte[] dataBuffer) {
+		byte[] buffer = new byte[Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO))];
+		Arrays.fill(buffer, (byte)0x30);
+		System.arraycopy(dataBuffer, 0, buffer, 0, 7);
+		System.arraycopy(dataBuffer, 33, buffer, 7, 4);
+		System.arraycopy(dataBuffer, 37, buffer, 13, 12);
+		System.arraycopy(dataBuffer, 97, buffer, 49, 12);
+		return buffer;
+	}
+	
+	/**
 	 * add record data size points from LogView data stream to each measurement, if measurement is calculation 0 will be added
 	 * adaption from LogView stream data format into the device data buffer format is required
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
@@ -185,8 +202,6 @@ public class PowerPeakIV extends PowerPeak {
 	public synchronized void addConvertedLovDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int deviceDataBufferSize = Math.abs(this.getDataBlockSize(InputTypes.SERIAL_IO)); // const.
-		int deviceDataBufferSize2 = deviceDataBufferSize / 2;
-		int channel2Offset = deviceDataBufferSize2 - 4;
 		int[] points = new int[this.getNumberOfMeasurements(recordSet.getChannelConfigNumber())];
 		int offset = 6;
 		int progressCycle = 0;
@@ -198,12 +213,11 @@ public class PowerPeakIV extends PowerPeak {
 			if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 
 			for (int i = 0; i < recordDataSize; i++) {
-				if (outputChannel == 1)
-					System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
-				else if (outputChannel == 2)
-					System.arraycopy(dataBuffer, channel2Offset + offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
-
-				recordSet.addPoints(convertDataBytes(points, convertBuffer));
+				System.arraycopy(dataBuffer, offset + i * lovDataSize, convertBuffer, 0, deviceDataBufferSize);
+				if (outputChannel == 1) 
+					recordSet.addPoints(convertDataBytes(points, convertBuffer));
+				else if (outputChannel == 2) 
+					recordSet.addPoints(convertDataBytes(points, this.getPreparedBufferChannel2(convertBuffer)));
 
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 			}
@@ -226,7 +240,8 @@ public class PowerPeakIV extends PowerPeak {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
-
+		//log.log(java.util.logging.Level.OFF, StringHelper.convert2CharString(dataBuffer));
+ 
 		try {
 			// 0=Spannung 1=Strom 2=Ladung 3=Leistung 4=Energie 5=BatteryTemperature 6=VersorgungsSpg 7=Balance 8=SpannungZelle1 9=SpannungZelle2...
 			points[0] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[13], (char) dataBuffer[14], (char) dataBuffer[15], (char) dataBuffer[16]), 16);
@@ -235,8 +250,8 @@ public class PowerPeakIV extends PowerPeak {
 			points[3] = Double.valueOf(points[0] * points[1] / 1000.0).intValue(); // power U*I [W]
 			points[4] = Double.valueOf(points[0] * points[2] / 1000.0).intValue(); // energy U*C [Wh]
 			points[5] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[25], (char) dataBuffer[26], (char) dataBuffer[27], (char) dataBuffer[28]), 16);
-			String sign = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[29], (char) dataBuffer[30]);
-			if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[5] = -1 * points[5];
+			//String sign = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[29], (char) dataBuffer[30]);
+			//if (sign != null && sign.length() > 0 && Integer.parseInt(sign) == 0) points[5] = -1 * points[5];
 			points[6] = Integer.parseInt(String.format(DeviceCommPort.FORMAT_4_CHAR, (char) dataBuffer[3], (char) dataBuffer[4], (char) dataBuffer[5], (char) dataBuffer[6]), 16);
 			points[7] = 0;
 
@@ -334,9 +349,9 @@ public class PowerPeakIV extends PowerPeak {
 
 		recordSet.setAllDisplayable();
 		int numCells = recordSet.getChannelConfigNumber() == 1 ? 12 : 3;
-		for (int i = recordSet.size() - numCells - 1; i < recordSet.size(); ++i) {
+		for (int i = recordSet.size() - numCells - 3; i < recordSet.size(); ++i) {
 			Record record = recordSet.get(i);
-			record.setDisplayable(record.getOrdinal() <= 5 || record.hasReasonableData());
+			record.setDisplayable(record.hasReasonableData());
 			log.log(Level.FINER, record.getName() + " setDisplayable=" + (record.getOrdinal() <= 5 || record.hasReasonableData())); //$NON-NLS-1$
 		}
 
@@ -397,7 +412,7 @@ public class PowerPeakIV extends PowerPeak {
 			return processingModeOut1 != null && processingModeOut1.length() == 2 && !(processingModeOut1.equals(PowerPeak.OPERATIONS_MODE_NONE) || processingModeOut1.equals(PowerPeak.OPERATIONS_MODE_ERROR));
 		}
 		else if (outletNum == 2) {
-			String processingModeOut2 = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[65], (char) dataBuffer[66]);
+			String processingModeOut2 = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[33], (char) dataBuffer[34]);
 			if (logger.isLoggable(Level.FINE)) {
 				logger.log(Level.FINE,
 						"processingModeOut2 = " + (processingModeOut2 != null && processingModeOut2.length() > 0 ? this.USAGE_MODE[Integer.parseInt(processingModeOut2, 16)] : processingModeOut2)); //$NON-NLS-1$
@@ -484,16 +499,8 @@ public class PowerPeakIV extends PowerPeak {
 	 */
 	@Override
 	public int getCycleNumber(int outletNum, byte[] dataBuffer) {
-		String cycleNumber = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[11], (char) dataBuffer[12]);
-		if (outletNum == 2) {
-			try {
-				cycleNumber = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[69], (char) dataBuffer[70]);
-			}
-			catch (Exception e) {
-				// ignore and use values from outlet channel 1 (data buffer will be copied)
-			}
-		}
-		return Integer.parseInt(cycleNumber, 16);
+		//position of cycle number unknown
+		return 0;
 	}
 
 	/**
@@ -504,22 +511,7 @@ public class PowerPeakIV extends PowerPeak {
 	 */
 	@Override
 	public void setTemperatureUnit(int channelNumber, RecordSet recordSet, byte[] dataBuffer) {
-		String unit = String.format(DeviceCommPort.FORMAT_2_CHAR, (char) dataBuffer[31], (char) dataBuffer[32]);
-		if (unit != null && unit.length() > 0) if (channelNumber == 3) {
-			if (Integer.parseInt(unit) == 0) {
-				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 15, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
-				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 16, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
-			}
-			else if (Integer.parseInt(unit) == 1) {
-				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 15, DeviceConfiguration.UNIT_DEGREE_FAHRENHEIT);
-				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 16, DeviceConfiguration.UNIT_DEGREE_FAHRENHEIT);
-			}
-		}
-		else {
-			if (Integer.parseInt(unit) == 0)
-				this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 5, DeviceConfiguration.UNIT_DEGREE_CELSIUS);
-			else if (Integer.parseInt(unit) == 1) this.setMeasurementUnit(recordSet.getChannelConfigNumber(), 5, DeviceConfiguration.UNIT_DEGREE_FAHRENHEIT);
-		}
+		//position of unit unknown, skip
 	}
 
 	/**

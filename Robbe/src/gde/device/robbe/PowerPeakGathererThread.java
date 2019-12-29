@@ -138,14 +138,8 @@ public class PowerPeakGathererThread extends Thread {
 							recordSet1 = (RecordSet) ch1[0];
 							this.recordSetKey1 = (String) ch1[1];
 						}
-						if (false && this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
-							byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2];
-							System.arraycopy(dataBuffer, buffer.length - 4, buffer, 0, buffer.length);
-							if (log.isLoggable(Level.FINER)) {
-								log.log(Level.FINER, StringHelper.byte2CharString(dataBuffer, 1, buffer.length));
-								log.log(Level.FINER, StringHelper.byte2CharString(buffer, 1, buffer.length));
-							}
-							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, buffer, points2);
+						if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
+							ch2 = processDataChannel(2, recordSet2, this.recordSetKey2, ((PowerPeakIV)this.device).getPreparedBufferChannel2(dataBuffer), points2);
 							recordSet2 = (RecordSet) ch2[0];
 							this.recordSetKey2 = (String) ch2[1];
 						}
