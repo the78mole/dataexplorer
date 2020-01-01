@@ -8,6 +8,8 @@ Generic changes/fixes
 	* update swt.jar for Linux 64 bit to fix webkit problems
 	* add time stamp of min/max value evaluated
 	* update swt.jar for available OS to support future Java versions (new SWT libs available for 64 bit only)
+	* update cell voltages for the known different cell types
+	* fix missing synchronization between cell voltages and active record set
 
 Device specific changes/fixes
 	* LiPoWatch - adapt clear memory button position for MAC OS X and Linux

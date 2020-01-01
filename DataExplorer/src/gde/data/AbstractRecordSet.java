@@ -252,24 +252,24 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	protected String														name;
 	protected TimeSteps													timeStep_ms;
 
-	protected String														header													= null;
+	protected String														header										= null;
 	/**
 	 * Spannung, Strom, ..
 	 */
 	protected String[]													recordNames;
-	protected String														description											= GDE.STRING_EMPTY;
+	protected String														description								= GDE.STRING_EMPTY;
 
-	protected boolean														hasDisplayableData							= false;
+	protected boolean														hasDisplayableData				= false;
 	// current drop, shadow point vector to mark data points capable to be smoothed
-	protected boolean														isSmoothAtCurrentDrop						= false;
-	protected Vector<Integer[]>									currentDropShadow								= new Vector<>(0);
-	public static final String									SMOOTH_AT_CURRENT_DROP					= "RecordSet_smoothAtCurrentDrop";					//$NON-NLS-1$
+	protected boolean														isSmoothAtCurrentDrop			= false;
+	protected Vector<Integer[]>									currentDropShadow					= new Vector<>(0);
+	public static final String									SMOOTH_AT_CURRENT_DROP		= "RecordSet_smoothAtCurrentDrop";					//$NON-NLS-1$
 
-	protected boolean														isSmoothVoltageCurve						= false;
-	public static final String									SMOOTH_VOLTAGE_CURVE						= "RecordSet_smoothVoltageCurve";						//$NON-NLS-1$
+	protected boolean														isSmoothVoltageCurve			= false;
+	public static final String									SMOOTH_VOLTAGE_CURVE			= "RecordSet_smoothVoltageCurve";						//$NON-NLS-1$
 
-	int[]													voltageLimits									= CellVoltageValues.getVoltageLimits();																																									// voltage limits for LiXx cells, initial LiPo
-	public static final String		VOLTAGE_LIMITS								= "RecordSet_voltageLimits";									// each main tickmark //$NON-NLS-1$
+	int[]																				voltageLimits							= CellVoltageValues.getVoltageLimits();																																									// voltage limits for LiXx cells, initial LiPo
+	public static final String									VOLTAGE_LIMITS						= "RecordSet_voltageLimits";									// each main tickmark //$NON-NLS-1$
 
 	/**
 	 * display in data table.
@@ -280,30 +280,30 @@ public abstract class AbstractRecordSet extends LinkedHashMap<String, AbstractRe
 	 */
 	protected Vector<? extends AbstractRecord>	displayRecords;
 
-	public static final String									TIME_STEP_MS										= "timeStep_ms";														//$NON-NLS-1$
-	public static final String									START_TIME_STAMP								= "startTimeStamp";													//$NON-NLS-1$
-	protected static final String								TIME														= "time";																		//$NON-NLS-1$
-	protected static final String								TIME_GRID_TYPE									= "RecordSet_timeGridType";									//$NON-NLS-1$
-	protected static final String								TIME_GRID_COLOR									= "RecordSet_timeGridColor";								//$NON-NLS-1$
-	protected static final String								TIME_GRID_LINE_STYLE						= "RecordSet_timeGridLineStyle";						//$NON-NLS-1$
+	public static final String									TIME_STEP_MS							= "timeStep_ms";														//$NON-NLS-1$
+	public static final String									START_TIME_STAMP					= "startTimeStamp";													//$NON-NLS-1$
+	protected static final String								TIME											= "time";																		//$NON-NLS-1$
+	protected static final String								TIME_GRID_TYPE						= "RecordSet_timeGridType";									//$NON-NLS-1$
+	protected static final String								TIME_GRID_COLOR						= "RecordSet_timeGridColor";								//$NON-NLS-1$
+	protected static final String								TIME_GRID_LINE_STYLE			= "RecordSet_timeGridLineStyle";						//$NON-NLS-1$
 	/**
 	 * no time grid
 	 */
-	public static final int											TIME_GRID_NONE									= 0;
+	public static final int											TIME_GRID_NONE						= 0;
 	/**
 	 * each main tickmark
 	 */
-	public static final int											TIME_GRID_MAIN									= 1;
+	public static final int											TIME_GRID_MAIN						= 1;
 	/**
 	 * each mod60 tickmark
 	 */
-	public static final int											TIME_GRID_MOD60									= 2;
-	protected int																timeGridType										= TIME_GRID_NONE;
+	public static final int											TIME_GRID_MOD60						= 2;
+	protected int																timeGridType							= TIME_GRID_NONE;
 	/**
 	 * contains the time grid position, updated from TimeLine.drawTickMarks
 	 */
-	protected Vector<Integer>										timeGrid												= new Vector<Integer>();
-	protected Color															timeGridColor										= DataExplorer.getInstance().COLOR_GREY;
+	protected Vector<Integer>										timeGrid									= new Vector<Integer>();
+	protected Color															timeGridColor							= DataExplorer.getInstance().COLOR_GREY;
 	protected int																timeGridLineStyle					= SWT.LINE_DOT;
 
 	public static final String									SMART_STATISTICS					= "RecordSet_smartStatistics";							// histo: Quantiles

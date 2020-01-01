@@ -18,6 +18,8 @@
 ****************************************************************************************/
 package gde.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -31,20 +33,30 @@ public class CellVoltageValues {
 	
 	public enum CellVoltageTypes { LiPo, LiIo, LiFe, NiMh, Custom }
 	
-	public final static String[] upperLimitVoltage		= new String[] { "4.600", "4.500", "4.400", "4.300", "4.200", "4.100", "4.000", "3.900", "3.800", "3.700", "3.600", "1.600", "1.500", "1.400", "1.300"};
-	public final static String[] upperLimitColorRed 	= new String[] { "4.615", "4.515", "4.415", "4.315", "4.215", "4.115", "4.015", "3.915", "3.815", "3.715", "3.615", "1.600", "1.550", "1.500", "1.450", "1.400"};
-	public final static String[] lowerLimitColorGreen = new String[] { "4.550", "4.450", "4.350", "4.250", "4.150", "4.050", "3.950", "3.850", "3.750", "3.650", "3.550", "1.350", "1.300", "1.250", "1.200"};
-	public final static String[] beginSpreadVoltage 	= new String[] { "4.400", "4.300", "4.200", "4.100", "4.000", "3.900", "3.800", "3.700", "3.600", "3.500", "3.400", "3.300", "3.200", "3.300", "1.100", "1.000", "0.900"};
-	public final static String[] lowerLimitColorRed		= new String[] { "3.000", "2.900", "2.800", "2.700", "2.600", "2.500", "2.400", "2.300", "2.200", "2.100", "2.000", "0.900", "0.800", "0.700", "0.600"};
-	public final static String[] lowerLimitVoltage		= new String[] { "2.700", "2.600", "2.500", "2.400", "2.300", "2.200", "2.000", "1.900", "1.800", "1.700", "1.600", "1.500", "1.000", "0.500", "0.000" };
+	public final List<String> voltageLimitsArray = new ArrayList<String>();
 	
-	public final static int[]			liPoLimits					= new int[] {4200, 4215, 4150, 4000, 2600, 2300};
-	public final static int[]			liIoLimits					= new int[] {4100, 4115, 4050, 3900, 2600, 2300};
-	public final static int[]			liFeLimits					= new int[] {3800, 3815, 3750, 3300, 2100, 1900};
-	public final static int[]			niMhLimits					= new int[] {1500, 1500, 1250, 1000, 800, 500};
+	public final static int[]			liPoLimits					= new int[] {4200, 4215, 4150, 4000, 3300, 3000};
+	public final static int[]			liIoLimits					= new int[] {4100, 4115, 4050, 3900, 3300, 3000};
+	public final static int[]			liFeLimits					= new int[] {3600, 3700, 3450, 3300, 3000, 2700};
+	public final static int[]			niMhLimits					= new int[] {1450, 1500, 1350, 1000, 900, 800};
 
 	// all initial values fit to LiPo akku type LiPo 3.7 V, LiIo 3.6 V LiFe 3.3 V
-	static int[]	voltageLimits				= new int[] {4200, 4215, 4150, 4000, 2600, 2300};
+	static int[]	voltageLimits				= new int[] {4200, 4215, 4150, 4000, 3300, 3000};
+	
+	private static CellVoltageValues cellVoltageValues = null;
+	
+	private CellVoltageValues() {
+		for (double i = 4.400; i > 0.600; i-=0.005) {
+			voltageLimitsArray.add(String.format("%5.3f", i));
+		}
+	}
+	
+	public static CellVoltageValues getCellVoltageValues() {
+		if (CellVoltageValues.cellVoltageValues == null) {
+			CellVoltageValues.cellVoltageValues = new CellVoltageValues();
+		}
+		return CellVoltageValues.cellVoltageValues;
+	}
 	
 	public static int[] getVoltageLimits(CellVoltageTypes cellVoltageType) {
 		switch (cellVoltageType) {
@@ -71,6 +83,13 @@ public class CellVoltageValues {
 	 */
 	public static int[] getVoltageLimits() {
 		return voltageLimits.clone();
+	}
+
+	/**
+	 * @return the voltage limits as int array
+	 */
+	public static String[] getVoltageLimitsStringArray() {
+		return CellVoltageValues.getCellVoltageValues().voltageLimitsArray.toArray(new String[0]);
 	}
 
 	/**
