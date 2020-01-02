@@ -14,6 +14,7 @@ Generic changes/fixes
 Device specific changes/fixes
 	* LiPoWatch - adapt clear memory button position for MAC OS X and Linux
 	* Robbe PowerPeak IV - add initial implementation supporting output channel 1
+	* HoTTAdapter2 - reset min/max values while detecting valid values
 
 Version 3.4.0 - 10 Nov 2019
 Generic changes/fixes

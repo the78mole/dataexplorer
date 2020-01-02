@@ -120,6 +120,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 		HoTTAdapter2 device = (HoTTAdapter2) analyzer.getActiveDevice();
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
+		boolean[] isResetMinMax = new boolean[] {false, false, false, false, false}; //ESC, EAM, GAM, GPS, Vario
 		int[]	points = histoRandomSample.getPoints();
 		byte[] buf = new byte[HoTTbinHistoReader.DATA_BLOCK_SIZE];
 		byte[] buf0 = new byte[30];
@@ -159,7 +160,52 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 					reviewTimer.invoke();
 					if (isValidSample) {
 						try {
-							tmpRecordSet.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
+							int[] histoRandomSamplePoints = histoRandomSample.getSamplePoints();
+							//GPS 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+							if (!isResetMinMax[3] && histoRandomSamplePoints[22] == 3000  && histoRandomSamplePoints[15] != 0 && histoRandomSamplePoints[16] != 0) {
+								for (int j=15; j<23; ++j) {
+									tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);
+								}
+								isResetMinMax[3] = true;
+							}
+							//GAM 24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6,
+							// 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage,
+							// 43=LowestCellNumber, 44=Pressure, 45=Event G
+							if (!isResetMinMax[2] && histoRandomSamplePoints[24] != 0) {
+								for (int j=24; j<45; ++j) {
+									tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);
+								}
+								isResetMinMax[2] = true;
+							}
+							//EAM 46=Voltage E, 47=Current E, 48=Capacity E, 49=Power E, 50=Balance E, 51=CellVoltage E1, 52=CellVoltage E2 .... 64=CellVoltage E14,
+							// 65=Voltage E1, 66=Voltage E2, 67=Temperature E1, 68=Temperature E2 69=Revolution E 70=MotorTime 71=Speed 72=Event E
+							if (!isResetMinMax[1] && histoRandomSamplePoints[46] != 0) {
+								for (int j=46; j<72; ++j) {
+									tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);
+								}
+								isResetMinMax[1] = true;
+							}
+							if (isChannelsChannelEnabled) {
+								//ESC 93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+								// 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+								if (!isResetMinMax[0] && histoRandomSamplePoints[93] != 0) {
+									for (int j=93; j<105; ++j) {
+										tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);
+									}
+									isResetMinMax[0] = true;
+								}
+							} else {
+								//ESC 73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max,
+								// 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
+								if (!isResetMinMax[0] && histoRandomSamplePoints[73] != 0) {
+									for (int j=73; j<85; ++j) {
+										tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);
+									}
+									isResetMinMax[0] = true;
+								}
+							}
+
+							tmpRecordSet.addPoints(histoRandomSamplePoints, histoRandomSample.getSampleTimeStep_ms());
 						} catch (DataInconsitsentException e) {
 							throw ThrowableUtils.rethrow(e);
 						}
@@ -326,6 +372,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 		HoTTAdapter2 device = (HoTTAdapter2) analyzer.getActiveDevice();
 		boolean isReceiverData = false;
 		boolean isJustMigrated = false;
+		boolean[] isResetMinMax = new boolean[] {false, false, false, false, false}; //ESC, EAM, GAM, GPS, Vario
 		int[]	points = histoRandomSample.getPoints();
 		byte[] buf = new byte[HoTTbinHistoReader.DATA_BLOCK_SIZE];
 		byte[] buf0 = new byte[30];
@@ -381,7 +428,52 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 					reviewTimer.invoke();
 					if (isValidSample) {
 						try {
-							tmpRecordSet.addPoints(histoRandomSample.getSamplePoints(), histoRandomSample.getSampleTimeStep_ms());
+							int[] histoRandomSamplePoints = histoRandomSample.getSamplePoints();
+							//GPS 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+							if (!isResetMinMax[3] && histoRandomSamplePoints[22] == 3000  && histoRandomSamplePoints[15] != 0 && histoRandomSamplePoints[16] != 0) {
+								for (int j=15; j<23; ++j) {
+									tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);
+								}
+								isResetMinMax[3] = true;
+							}
+							//GAM 24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6,
+							// 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage,
+							// 43=LowestCellNumber, 44=Pressure, 45=Event G
+							if (!isResetMinMax[2] && histoRandomSamplePoints[24] != 0) {
+								for (int j=24; j<45; ++j) {
+									tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);
+								}
+								isResetMinMax[2] = true;
+							}
+							//EAM 46=Voltage E, 47=Current E, 48=Capacity E, 49=Power E, 50=Balance E, 51=CellVoltage E1, 52=CellVoltage E2 .... 64=CellVoltage E14,
+							// 65=Voltage E1, 66=Voltage E2, 67=Temperature E1, 68=Temperature E2 69=Revolution E 70=MotorTime 71=Speed 72=Event E
+							if (!isResetMinMax[1] && histoRandomSamplePoints[46] != 0) {
+								for (int j=46; j<72; ++j) {
+									tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);
+								}
+								isResetMinMax[1] = true;
+							}
+							if (isChannelsChannelEnabled) {
+								//ESC 93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+								// 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+								if (!isResetMinMax[0] && histoRandomSamplePoints[93] != 0) {
+									for (int j=93; j<105; ++j) {
+										tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);
+									}
+									isResetMinMax[0] = true;
+								}
+							} else {
+								//ESC 73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max,
+								// 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
+								if (!isResetMinMax[0] && histoRandomSamplePoints[73] != 0) {
+									for (int j=73; j<85; ++j) {
+										tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);
+									}
+									isResetMinMax[0] = true;
+								}
+							}
+
+							tmpRecordSet.addPoints(histoRandomSamplePoints, histoRandomSample.getSampleTimeStep_ms());
 						} catch (DataInconsitsentException e) {
 							throw ThrowableUtils.rethrow(e);
 						}
