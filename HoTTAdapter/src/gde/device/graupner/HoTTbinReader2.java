@@ -678,7 +678,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				isResetMinMax[3] = true;
 			}
 		}
-		if (migrationJobs.contains(Sensor.VARIO)) HoTTbinReader2.varBinParser.migratePoints(HoTTbinReader2.points);
+		if (migrationJobs.contains(Sensor.VARIO)) {
+			HoTTbinReader2.varBinParser.migratePoints(HoTTbinReader2.points);
+		}
 		if (migrationJobs.contains(Sensor.ESC)) {
 			HoTTbinReader2.escBinParser.migratePoints(HoTTbinReader2.points);
 			if (((EscBinParser) HoTTbinReader2.escBinParser).isChannelsChannel()) {

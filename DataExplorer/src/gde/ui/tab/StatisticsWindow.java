@@ -321,11 +321,14 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isMin()) {
 								if (isTriggerLevel)
-									sb.append(record.getFormattedStatisticsValue(record.getMinValueTriggered() / 1000.0));
+									if (record.getMinValueTriggered() != Integer.MAX_VALUE)
+										sb.append(record.getFormattedStatisticsValue(record.getMinValueTriggered() / 1000.0));
+									else
+										sb.append(NO_VALUE).append(DELIMITER).append(NO_VALUE);
 								else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE)
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								else
-									sb.append(NO_VALUE);
+									sb.append(NO_VALUE).append(DELIMITER).append(NO_VALUE);
 								
 								if (!sb.toString().endsWith(NO_VALUE)) 
 									sb.append(DELIMITER).append(TimeLine.getFomatedTime(record.getRealMinValueTime_ms())).append(GDE.STRING_BLANK);
@@ -336,8 +339,11 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isAvg())
 								if (isTriggerLevel)
-									sb.append(formatOutput(record.getFormattedStatisticsValue(record.getAvgValueTriggered() / 1000.0)));
-								else
+									if (record.getAvgValueTriggered() != Integer.MIN_VALUE)
+										sb.append(formatOutput(record.getFormattedStatisticsValue(record.getAvgValueTriggered() / 1000.0)));
+									else
+										sb.append(NO_VALUE);
+								else if (triggerRefOrdinal < 0 || record.getAvgValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0)));
 							else
 								sb.append(NO_VALUE);
@@ -345,11 +351,14 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isMax()) {
 								if (isTriggerLevel)
-									sb.append(record.getFormattedStatisticsValue(record.getMaxValueTriggered() / 1000.0));
+									if (record.getMaxValueTriggered() != Integer.MIN_VALUE)
+										sb.append(record.getFormattedStatisticsValue(record.getMaxValueTriggered() / 1000.0));
+									else
+										sb.append(NO_VALUE).append(DELIMITER).append(NO_VALUE);
 								else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								else
-									sb.append(NO_VALUE);
+									sb.append(NO_VALUE).append(DELIMITER).append(NO_VALUE);
 								
 								if (!sb.toString().endsWith(NO_VALUE)) 
 									sb.append(DELIMITER).append(TimeLine.getFomatedTime(record.getRealMaxValueTime_ms())).append(GDE.STRING_BLANK);
@@ -360,9 +369,11 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isSigma()) {
 								DecimalFormat cdf = new DecimalFormat("0.000"); //$NON-NLS-1$
-								if (isTriggerLevel) {
-									sb.append(formatOutput(cdf.format(device.translateValue(record, record.getSigmaValueTriggered() / 1000.0))));
-								}
+								if (isTriggerLevel) 
+									if (record.getSigmaValueTriggered() != Integer.MIN_VALUE)
+										sb.append(formatOutput(cdf.format(device.translateValue(record, record.getSigmaValueTriggered() / 1000.0))));
+									else
+										sb.append(NO_VALUE);
 								else
 									sb.append(formatOutput(cdf.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getSigmaValue() : record.getSigmaValueTriggered(triggerRefOrdinal)) / 1000.0))));
 							}
