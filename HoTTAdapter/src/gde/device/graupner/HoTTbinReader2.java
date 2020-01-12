@@ -743,8 +743,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				this.points[2] = (convertRxDbm2Strength(this._buf[4] & 0xFF)) * 1000;
 				this.points[4] = (this._buf[3] & 0xFF) * -1000;
 				this.points[5] = (this._buf[4] & 0xFF) * -1000;
-				this.points[6] = (this._buf[35] & 0xFF) * 1000;
-				this.points[7] = ((this._buf[36] & 0xFF) - 20) * 1000;
+				this.points[6] = this.tmpVoltageRx * 1000;
+				this.points[7] = this.tmpTemperatureRx * 1000;
 				this.points[8] = (this._buf[39] & 0xFF) * 1000;
 				if ((this._buf[32] & 0x40) > 0 || (this._buf[32] & 0x25) > 0 && this.tmpTemperatureRx >= 70) // T = 70 - 20 = 50 lowest temperature warning
 					this.points[9] = (this._buf[32] & 0x65) * 1000; // warning E,V,T only

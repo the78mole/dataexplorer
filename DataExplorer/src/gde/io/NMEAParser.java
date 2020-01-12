@@ -815,7 +815,6 @@ public class NMEAParser implements IDataParser {
 	 * @param strValues
 	 */
 	void parseVTG(String[] strValues) {
-		if (true) {
 			int velocity;
 			try {
 				velocity = (int) (Double.parseDouble(strValues[7].trim()) * 1000.0);
@@ -839,7 +838,6 @@ public class NMEAParser implements IDataParser {
 			//this.values[6]  = VDOP (vertical dilution of precision)
 			this.values[7] = velocity;
 			//this.values[8]  = magneticVariation; // SM GPS-Logger -> altitudeRel;
-		}
 	}
 
 	/**
