@@ -10,10 +10,11 @@ Generic changes/fixes
 	* update swt.jar for available OS to support future Java versions (new SWT libs available for 64 bit only)
 	* update cell voltages for the known different cell types
 	* fix missing synchronization between cell voltages and active record set
+	* update software widget toolkit (swt) for 64 bit systems to enable support for newer Java run times 
 
 Device specific changes/fixes
 	* LiPoWatch - adapt clear memory button position for MAC OS X and Linux
-	* Robbe PowerPeak IV - add initial implementation supporting output channel 1
+	* Robbe PowerPeak IV - initial implementation
 	* HoTTAdapter2 - reset min/max values while detecting valid values
 
 Version 3.4.0 - 10 Nov 2019
