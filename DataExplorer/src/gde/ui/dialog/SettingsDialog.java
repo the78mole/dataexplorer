@@ -297,7 +297,7 @@ public class SettingsDialog extends Dialog {
 								this.localCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								this.localCombo.setItems(this.supportedLocals);
 								this.localCombo.select(getLocalLanguageIndex());
-								this.localCombo.setBounds(138, GDE.IS_MAC ? 8 : GDE.IS_LINUX ? 12 : 20, 60, GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18);
+								this.localCombo.setBounds(138, GDE.IS_MAC ? 8 : GDE.IS_LINUX ? 12 : 20, 65, GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18);
 								this.localCombo.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0306));
 								this.localCombo.setEditable(false);
 								this.localCombo.setBackground(SWTResourceManager.getColor(255, 255, 255));
@@ -612,10 +612,10 @@ public class SettingsDialog extends Dialog {
 								this.decimalSeparatorLabel.setBounds(10, GDE.IS_MAC || GDE.IS_LINUX ? 12 : 24, 140, GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18);
 							}
 							{
-								this.decimalSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
+								this.decimalSeparator = new CCombo(this.separatorGroup, SWT.BORDER);
 								this.decimalSeparator.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 								this.decimalSeparator.setItems(DecimalSeparatorTypes.valuesAsStingArray());
-								this.decimalSeparator.setBounds(153, GDE.IS_MAC || GDE.IS_LINUX ? 12 : 24, 55, GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18);
+								this.decimalSeparator.setBounds(153, GDE.IS_MAC || GDE.IS_LINUX ? 12 : 24, 65, GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18);
 								this.decimalSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -633,10 +633,10 @@ public class SettingsDialog extends Dialog {
 								this.listSeparatorLabel.setBounds(228, GDE.IS_MAC || GDE.IS_LINUX ? 12 : 24, 140, GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18);
 							}
 							{
-								this.listSeparator = new CCombo(this.separatorGroup, SWT.BORDER | SWT.CENTER);
+								this.listSeparator = new CCombo(this.separatorGroup, SWT.BORDER);
 								this.listSeparator.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.BOLD));
 								this.listSeparator.setItems(CommaSeparatorTypes.valuesAsStingArray());
-								this.listSeparator.setBounds(370, GDE.IS_MAC || GDE.IS_LINUX ? 12 : 24, 55, GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18);
+								this.listSeparator.setBounds(370, GDE.IS_MAC || GDE.IS_LINUX ? 12 : 24, 65, GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18);
 								this.listSeparator.addSelectionListener(new SelectionAdapter() {
 									@Override
 									public void widgetSelected(SelectionEvent evt) {
@@ -873,7 +873,7 @@ public class SettingsDialog extends Dialog {
 									this.histoSpreadLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0818));
 								}
 								{
-									this.histoSpreadGrade = new CCombo(this.histoXAxis, SWT.BORDER | SWT.CENTER);
+									this.histoSpreadGrade = new CCombo(this.histoXAxis, SWT.BORDER);
 									FormData formData = new FormData();
 									formData.top = new FormAttachment(this.histoReversed, 5);
 									formData.right = new FormAttachment(100, -5);
@@ -934,7 +934,7 @@ public class SettingsDialog extends Dialog {
 									this.histoBoxplotScaleLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0813));
 								}
 								{
-									this.histoBoxplotScale = new CCombo(this.histoBoxplot, SWT.BORDER | SWT.CENTER);
+									this.histoBoxplotScale = new CCombo(this.histoBoxplot, SWT.BORDER);
 									FormData formData = new FormData();
 									formData.right = new FormAttachment(100, -5);
 									formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
@@ -965,7 +965,7 @@ public class SettingsDialog extends Dialog {
 									this.histoBoxplotSizeAdaptationLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0815));
 								}
 								{
-									this.histoBoxplotSizeAdaptation = new CCombo(this.histoBoxplot, SWT.BORDER | SWT.CENTER);
+									this.histoBoxplotSizeAdaptation = new CCombo(this.histoBoxplot, SWT.BORDER);
 									FormData formData = new FormData();
 									formData.top = new FormAttachment(this.histoBoxplotScaleLabel, 5);
 									formData.right = new FormAttachment(100, -5);
@@ -1257,12 +1257,12 @@ public class SettingsDialog extends Dialog {
 								this.histoSubdirectoryLevelLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0872));
 							}
 							{
-								this.histoSubdirectoryLevel = new CCombo(this.histoScreening, SWT.BORDER | SWT.CENTER);
+								this.histoSubdirectoryLevel = new CCombo(this.histoScreening, SWT.BORDER);
 								FormData formData = new FormData();
 								formData.top = new FormAttachment(this.histoForceObject, 5);
 								formData.right = new FormAttachment(100, -5);
 								formData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
-								formData.width = GDE.IS_LINUX ? 50 : 40;
+								formData.width = GDE.IS_LINUX ? 60 : 40;
 								this.histoSubdirectoryLevel.setLayoutData(formData);
 								this.histoSubdirectoryLevel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 								//this.histoSamplingTimespan_ms.setBounds(370, GDE.IS_MAC ? 14 : 24, 47, GDE.IS_LINUX ? 22 : 20);
@@ -1299,7 +1299,7 @@ public class SettingsDialog extends Dialog {
 								this.histoSamplingLabel.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0808));
 							}
 							{
-								this.histoSamplingTimespan_ms = new CCombo(this.histoFileContents, SWT.BORDER | SWT.CENTER);
+								this.histoSamplingTimespan_ms = new CCombo(this.histoFileContents, SWT.BORDER);
 								FormData formData = new FormData();
 								formData.top = new FormAttachment(this.histoMaxDurationLabel, 5);
 								formData.right = new FormAttachment(100, -5);
