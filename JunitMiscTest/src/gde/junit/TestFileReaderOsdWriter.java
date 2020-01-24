@@ -440,12 +440,13 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 			List<File> files = FileUtils.getFileListing(this.dataPath, 1);
 
 			for (File file : files) {
-				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") && file.getPath().toLowerCase().contains("tesla")) {
+				if (file.getAbsolutePath().toLowerCase().endsWith(".csv") 
+						&& (file.getPath().toLowerCase().contains("tesla") || file.getPath().toLowerCase().contains("spektrum"))) {
 					System.out.println("working with : " + file);
 
 					try {
 						//System.out.println("file.getPath() = " + file.getPath());
-						String deviceName = "Tesla";
+						String deviceName = file.getPath().toLowerCase().contains("tesla") ? "Tesla" : "SpektrumCSV";
 						//System.out.println("deviceName = " + deviceName);
 						DeviceConfiguration deviceConfig = this.deviceConfigurations.get(deviceName);
 						if (deviceConfig == null) throw new NotSupportedException("device = " + deviceName + " is not supported or in list of active devices");

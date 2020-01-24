@@ -72,6 +72,8 @@ public class CSVReaderWriter {
 	final static Channels			channels		= Channels.getInstance();
 	final static String 			pattern 		= "[^0-9].";
 
+	final static String TRANSMITTER_TYPE	= "transmitter_type";
+	final static String TRANSMITTER_TYPE_SPEKTRUM	= "transmitter_type_spektrum";
 
 	/**
 	 * read the first two line of CSV file and prepare a map with all available information
@@ -159,7 +161,12 @@ public class CSVReaderWriter {
 
 		for (int i = 1; i < headerLineArray.length; i++) {
 			String mappedMeasurement = ImportAdapter.properties.getProperty(headerLineArray[i]);
-			if (mappedMeasurement == null) {
+			String[] splitMappedMeasurement = headerLineArray[i].split("\\(|\\)");
+			if (mappedMeasurement == null && splitMappedMeasurement.length == 2) {
+				header.put(TRANSMITTER_TYPE, TRANSMITTER_TYPE_SPEKTRUM);
+				mappedMeasurement = String.format("%s [%s]", splitMappedMeasurement[0].trim(), splitMappedMeasurement[1].trim());
+			}
+			else if (mappedMeasurement == null) {
 				mappedMeasurement = String.format("%s [-]", headerLineArray[i]);
 			}
 			//check if the mapped measurement name is already in use
@@ -306,7 +313,7 @@ public class CSVReaderWriter {
 					}
 					else
 						// decimal time value
-						time_ms = Integer.valueOf(data).intValue();
+						time_ms = Integer.valueOf(data).intValue() * (fileHeader.get(TRANSMITTER_TYPE) != null && fileHeader.get(TRANSMITTER_TYPE).equals(TRANSMITTER_TYPE_SPEKTRUM) ? 10 : 1);
 
 					for (int i = 0; i < updateRecordNames.length && i < dataStr.length - 1; i++) { // only iterate over record names found in file
 						try {
