@@ -20,5 +20,7 @@
 	<classpathentry kind="lib" path="/build/lib/usb-api.jar"/>
 	<classpathentry kind="lib" path="/build/lib/usb4java-javax.jar"/>
 	<classpathentry kind="lib" path="/build/lib/gson.jar"/>
+	<classpathentry kind="lib" path="/build/lib/guava-jre.jar"/>
+	<classpathentry kind="lib" path="/build/lib/joda-time.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

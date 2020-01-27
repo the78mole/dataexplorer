@@ -17,6 +17,7 @@ Device specific changes/fixes
 	* Robbe PowerPeak IV - initial implementation
 	* HoTTAdapter2 - reset min/max values while detecting valid values
 	* SpektrumCSV - simple sample to be used with exports from TLM Viewer
+	* Spektrum-Telemetry - add initial implementation
 
 Version 3.4.0 - 10 Nov 2019
 Generic changes/fixes

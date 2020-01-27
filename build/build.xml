@@ -258,6 +258,7 @@
 		<ant antfile="build.xml" target="clean" dir="ArduPilot" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="LogView-Zero" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="Robbe" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="Spektrum-Telemetry" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -446,6 +447,7 @@
 		<ant antfile="build.xml" target="package" dir="ArduPilot" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="LogView-Zero" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="Robbe" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="Spektrum-Telemetry" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 	
@@ -490,6 +492,7 @@
 		<ant antfile="build.xml" target="nonui_package" dir="ArduPilot" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="LogView-Zero" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="Robbe" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="Spektrum-Telemetry" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -533,6 +536,7 @@
 			<include name="ArduPilot/build/*.jar" />
 			<include name="LogView-Zero/build/*.jar" />
 			<include name="Robbe/build/*.jar" />
+			<include name="Spektrum-Telemetry/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
@@ -578,6 +582,7 @@
 			<include name="ArduPilot/build/*NonUi*.jar" />
 			<include name="LogView-Zero/build/*NonUi*.jar" />
 			<include name="Robbe/build/*NonUi*.jar" />
+			<include name="Spektrum-Telemetry/build/*NonUi*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
@@ -656,6 +661,8 @@
 			<fileset file="build/lib/usb-api.jar" />
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/joda-time.jar" />
+			<fileset file="build/lib/guava-jre.jar" />
 			<fileset file="build/lib/Windows/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.windows64.java.ext}" flatten="yes">
@@ -676,6 +683,8 @@
 			<fileset file="build/lib/usb-api.jar" />
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/joda-time.jar" />
+			<fileset file="build/lib/guava-jre.jar" />
 			<fileset file="build/lib/Windows/64/libusb4java.jar" />
 		</copy>
 		
@@ -726,6 +735,8 @@
 			<fileset file="build/lib/usb-api.jar" />
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/joda-time.jar" />
+			<fileset file="build/lib/guava-jre.jar" />
 			<fileset file="build/lib/Raspbian/32/libusb4java.jar" />
 		</copy>
 		
@@ -791,6 +802,8 @@
 			<fileset file="build/lib/usb-api.jar" />
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/joda-time.jar" />
+			<fileset file="build/lib/guava-jre.jar" />
 			<fileset file="build/lib/GNULinux/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.gnulinux64.java.ext}" flatten="yes">
@@ -811,6 +824,8 @@
 			<fileset file="build/lib/usb-api.jar" />
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/joda-time.jar" />
+			<fileset file="build/lib/guava-jre.jar" />
 			<fileset file="build/lib/GNULinux/64/libusb4java.jar" />
 		</copy>
 
@@ -885,6 +900,8 @@
 			<fileset file="build/lib/usb-api.jar" />
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/joda-time.jar" />
+			<fileset file="build/lib/guava-jre.jar" />
 			<fileset file="build/lib/MAC/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.mac64.java.ext}" flatten="yes">
@@ -904,6 +921,8 @@
 			<fileset file="build/lib/usb-api.jar" />
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/joda-time.jar" />
+			<fileset file="build/lib/guava-jre.jar" />
 			<fileset file="build/lib/MAC/64/libusb4java.jar" />
 		</copy>
 

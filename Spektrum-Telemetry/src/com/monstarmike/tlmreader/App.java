@@ -1,0 +1,93 @@
+package com.monstarmike.tlmreader;
+
+import java.io.IOException;
+import java.util.List;
+
+import org.joda.time.Duration;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
+
+import com.monstarmike.tlmreader.datablock.DataBlock;
+import com.monstarmike.tlmreader.datablock.RxBlock;
+import com.monstarmike.tlmreader.datablock.StandardBlock;
+
+public class App {
+
+	public static void main(String[] args) {
+		TLMReader reader = new TLMReader();
+		try {
+			long start = System.currentTimeMillis();
+			String tlmFileSailplane = "src/test/data/2015-FSS2-day2.TLM";
+			String tlmFileHeli = "src/test/data/2015-12-22_HELI.TLM";
+			// String tlmFileHeli = "src/test/data/2015-12-29.TLM";
+			// String tlmFileHeli = "src/test/data/20160129.TLM";
+			String tlm = tlmFileHeli;
+			List<IFlight> flights = reader.parseFlightDefinitions(tlm);
+			for (IFlight flight : flights) {
+				printFlightDefinitions(flight);
+			}
+			Flight flight = reader.parseFlight(tlm, flights.size() - 1);
+			flight.removeRedundantDataBlocks();
+			printFlightDefinitions(flight);
+			printDataBlocks(flight);
+			long end = System.currentTimeMillis();
+			System.out.println("duration: " + (end - start) + " ms");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private static void printFlightDefinitions(IFlight flight) {
+		System.out.println("FlightHeader; Duration: " + duration(flight.getDuration()) + ", duration in millis: "
+				+ flight.getDuration().getMillis() + ", expectedNumberOfBlocks: " + flight.getNumberOfDataBlocks());
+	}
+
+	private static void printDataBlocks(Flight flight) {
+		int lastTimestamp = 0;
+		for (DataBlock dataBlock : flight.getDataBlocks()) {
+			// if (dataBlock instanceof StandardBlock) {
+			// System.out.println("Timestamp: " + dataBlock.getTimestamp());
+			// if (lastTimestamp >= dataBlock.getTimestamp()) {
+			// System.out.println(
+			// " ---------------- last: " + lastTimestamp + " current: " +
+			// dataBlock.getTimestamp());
+			// }
+			// }
+			// printStandardBlock(dataBlock);
+			// printRxBlock(dataBlock);
+		}
+	}
+
+	private static void printRxBlock(DataBlock dataBlock) {
+		if (dataBlock instanceof RxBlock) {
+			RxBlock rxBlock = (RxBlock) dataBlock;
+			System.out.println(rxBlock);
+			// System.out.println("A: " + rxBlock.getLostPacketsReceiverA() + ",
+			// B: " + rxBlock.getLostPacketsReceiverB() + ", L: " +
+			// rxBlock.getLostPacketsReceiverL()
+			// + ", R: " + rxBlock.getLostPacketsReceiverR() + ", FrameLoss: " +
+			// rxBlock.getFrameLoss() + ", Holds: "
+			// + rxBlock.getHolds());
+		}
+	}
+
+	private static void printStandardBlock(DataBlock dataBlock) {
+		if (dataBlock instanceof StandardBlock) {
+			StandardBlock standardBlock = (StandardBlock) dataBlock;
+			System.out.println("Std: rpm: " + standardBlock.getRpm() + "(" + standardBlock.hasValidRpmData()
+					+ ") volt: " + standardBlock.getVoltageInHunderthOfVolts() + "("
+					+ standardBlock.hasValidVoltageData() + ") temp: " + standardBlock.getTemperatureInDegreeFahrenheit()
+					+ "(" + standardBlock.hasValidTemperatureData() + ")");
+		}
+	}
+
+	private static String duration(Duration flightDuration) {
+		Period period = flightDuration.toPeriod();
+		PeriodFormatter hms = new PeriodFormatterBuilder().appendHours().appendSeparator(":").printZeroAlways()
+				.appendMinutes().appendSeparator(":").appendSecondsWithMillis().toFormatter();
+
+		return hms.print(period);
+	}
+}

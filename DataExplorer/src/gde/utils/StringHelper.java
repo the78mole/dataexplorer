@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -690,6 +691,25 @@ public class StringHelper {
 		StringBuffer sb = new StringBuffer().append(GDE.STRING_LEFT_BRACKET).append(String.format("%3d", size)).append(GDE.STRING_RIGHT_BRACKET_COMMA);
 		for (int i = start; i < start+size; i++) {
 			sb.append(String.format(" %02X", bytes[i])); //$NON-NLS-1$
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * convert a byte array inverted into BCD character string representation
+	 * @param bytes array of bytes
+	 * @param start start position  (start + size - 1) 
+	 * @param size iteration length
+	 * @return string with converted characters
+	 */
+	public static String bcdEncodeInverted(byte[] bytes, int start, int size) {
+		StringBuffer sb = new StringBuffer();
+		for (int i = start+size-1; i >= start; --i) {
+			sb.append(String.format("%02X", bytes[i])); //$NON-NLS-1$
+		}
+		if (Pattern.compile(".*[ABCDEF]").matcher(sb.toString()).find()) {
+			System.out.println(sb);
+			return "0";
 		}
 		return sb.toString();
 	}

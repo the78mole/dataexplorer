@@ -248,6 +248,7 @@ public class GDE {
 	public static final String							FILE_ENDING_STAR_TXT							= "*.txt";																																																									//$NON-NLS-1$
 	public static final String							FILE_ENDING_STAR_LOG							= "*.log";																																																									//$NON-NLS-1$
 	public static final String							FILE_ENDING_STAR_BIN							= "*.bin";																																																									//$NON-NLS-1$
+	public static final String							FILE_ENDING_STAR_TLM							= "*.tlm";																																																									//$NON-NLS-1$
 	public static final String							FILE_ENDING_STAR_JML							= "*.jml";																																																									//$NON-NLS-1$
 	public static final String							FILE_ENDING_STAR_STAR							= "*.*";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_DOT_JAR								= ".jar";																																																										//$NON-NLS-1$
@@ -274,6 +275,7 @@ public class GDE {
 	public static final String							FILE_ENDING_DOT_EXE								= ".exe";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_DOT_INI								= ".ini";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_DOT_BIN								= ".bin";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_DOT_TLM								= ".tlm";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_DOT_JML								= ".jml";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_LOV										= "lov";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_OSD										= "osd";																																																										//$NON-NLS-1$
@@ -293,6 +295,7 @@ public class GDE {
 	public static final String							FILE_ENDING_EXE										= "exe";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_INI										= "ini";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_BIN										= "bin";																																																										//$NON-NLS-1$
+	public static final String							FILE_ENDING_TLM										= "tlm";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_LOG										= "log";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_TXT										= "txt";																																																										//$NON-NLS-1$
 	public static final String							FILE_ENDING_JML										= "jml";																																																										//$NON-NLS-1$
