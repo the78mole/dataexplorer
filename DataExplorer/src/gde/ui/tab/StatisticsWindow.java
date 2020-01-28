@@ -300,7 +300,7 @@ public class StatisticsWindow extends CTabItem {
 					sb.append(NO_VALUE).append(DELIMITER);
 					sb.append(NO_VALUE).append(DELIMITER);
 					sb.append(TimeLine.getFomatedTime(activeRecordSet.getMaxTime_ms())).append(" ").append(DELIMITER); //$NON-NLS-1$
-					sb.append(NO_VALUE).append(DELIMITER);
+					sb.append(TimeLine.getFomatedTime(activeRecordSet.getMaxTime_ms())).append(" ").append(DELIMITER); //$NON-NLS-1$
 					sb.append(NO_VALUE).append(DELIMITER);
 					if (activeRecordSet.isTimeStepConstant()) {
 						sb.append(Messages.getString(MessageIds.GDE_MSGT0360)).append(String.format("%6.1f", activeRecordSet.getTime_ms(1))).append(Messages.getString(MessageIds.GDE_MSGT0361)); //$NON-NLS-1$
