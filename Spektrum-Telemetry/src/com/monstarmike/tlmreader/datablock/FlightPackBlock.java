@@ -84,7 +84,7 @@ public class FlightPackBlock extends DataBlock {
 	 * @return the currentAInTenthOfAmps
 	 */
 	public int getCurrentAInTenthOfAmps() {
-		return currentAInTenthOfAmps != 0x7FFF ? currentAInTenthOfAmps : 0;
+		return currentAInTenthOfAmps < 3000 ? currentAInTenthOfAmps : 0;
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class FlightPackBlock extends DataBlock {
 	 * @return the currentBInTenthOfAmps
 	 */
 	public int getCurrentBInTenthOfAmps() {
-		return currentBInTenthOfAmps != 0x7FFF ? currentBInTenthOfAmps : 0;
+		return currentBInTenthOfAmps < 3000 ? currentBInTenthOfAmps : 0;
 	}
 
 	/**

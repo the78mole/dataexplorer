@@ -59,10 +59,10 @@ public class EscBlock extends DataBlock {
 		measurementFactors.add(0.1);
 		measurementFactors.add(0.01);
 		measurementFactors.add(0.1);
-		measurementFactors.add(0.02);
+		measurementFactors.add(0.05);
 		measurementFactors.add(0.5);
 		measurementFactors.add(0.5);
-		measurementFactors.add(0.0001);
+		measurementFactors.add(0.1);
 	}
 	
 	private void decode(byte[] rawData) {
@@ -84,7 +84,7 @@ public class EscBlock extends DataBlock {
 		measurementValues.add((int)getVoltsBECInHundredthOfVolt());
 		measurementValues.add((int)getThrottleInPercent());
 		measurementValues.add((int)getPowerOutInPercent());
-		measurementValues.add((int)getPowerInThenThousandsW());
+		measurementValues.add((int)getPowerInTenthsOfW());
 	}
 
 	@Override
@@ -143,35 +143,35 @@ public class EscBlock extends DataBlock {
 	 * @return the currentBECInTenthOfAmps
 	 */
 	public int getCurrentBECInTenthOfAmps() {
-		return currentBECInTenthOfAmps != 0xFF ? currentBECInTenthOfAmps : 0;
+		return currentBECInTenthOfAmps != 0xFF ? currentBECInTenthOfAmps & 0xFF: 0;
 	}
 
 	/**
 	 * @return the voltsBECInHundredthOfVolt
 	 */
 	public int getVoltsBECInHundredthOfVolt() {
-		return voltsBECInHundredthOfVolt != 0xFF ? voltsBECInHundredthOfVolt : 0;
+		return voltsBECInHundredthOfVolt != 0xFF ? voltsBECInHundredthOfVolt & 0xFF : 0;
 	}
 
 	/**
 	 * @return the throttleInPercent
 	 */
 	public int getThrottleInPercent() {
-		return throttleInPercent != 0xFF ? throttleInPercent : 0;
+		return throttleInPercent != -1 ? throttleInPercent & 0xFF : 0;
 	}
 
 	/**
 	 * @return the powerOutInPercent
 	 */
 	public int getPowerOutInPercent() {
-		return powerOutInPercent != 0xFF ? powerOutInPercent : 0;
+		return powerOutInPercent != 0xFF ? powerOutInPercent & 0xFF : 0;
 	}
 
 	/**
 	 * @return the powerOutInPercent
 	 */
-	public int getPowerInThenThousandsW() {
-		return getCurrentMotorInHundredthAmps() * getVoltsInputInHundredthOfVolt();
+	public int getPowerInTenthsOfW() {
+		return (int) (getCurrentMotorInHundredthAmps() / 1000.0 * getVoltsInputInHundredthOfVolt());
 	}
 
 }

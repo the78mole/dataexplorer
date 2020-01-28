@@ -36,6 +36,7 @@ import com.monstarmike.tlmreader.datablock.GPSLocationBlock;
 import com.monstarmike.tlmreader.datablock.GPSStatusBlock;
 import com.monstarmike.tlmreader.datablock.HeaderBlock;
 import com.monstarmike.tlmreader.datablock.HeaderNameBlock;
+import com.monstarmike.tlmreader.datablock.JetCatBlock;
 import com.monstarmike.tlmreader.datablock.PowerBoxBlock;
 import com.monstarmike.tlmreader.datablock.RxBlock;
 import com.monstarmike.tlmreader.datablock.ServoDataBlock;
@@ -126,8 +127,22 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
-				//73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
-				//93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+				//Standard 0=RPM St, 1=Volt St, 2=Temperature St, 3=dbm_A, 4=dbm_B
+				//Rx	5=LostPacketsReceiver A, 6=LostPacketsReceiver B, 7=LostPacketsReceiver L, 8=LostPacketsReceiver R, 9=FrameLoss, 10=Holds, 11=VoltageRx
+				//Vario 12=Altitude V, 13=Climb V
+				//Altitude	14=Altitude A
+				//AltitudeZero 15=Altitude Offset
+				//Voltage 16=Voltage V
+				//Current 17=Current C
+				//Temperature 18=Temperature T
+				//AirSpeed 19=AirSpeed
+				//GPS	20=Altitude GPS, 21=Latitude, 22=Longitude, 23=Speed GPS, 24=Satellites GPS, 25=Course, 26=HDOP, 27=GPSFix, 28=Trip/UTC
+				//FlightPack 29=Current FPA, 30=Capacity FPA, 31=Temperature FPA, 32=Current FPB, 33=Capacity FPB, 34=Temperature FPB
+				//ESC 35=RPM ESC, 36=Voltage ESC, 37=TempFET ESC, 38=Current ESC, 39=CurrentBEC ESC, 40=VoltsBEC ESC, 41=Throttle ESC, 42=PowerOut ESC, 43=PowerIn ESC
+				//PowerBox 44=Voltage PB1, 45=Capacity PB1, 46=Voltage PB2, 47=Capacity PB2, 48=Alarms PB
+				//JetCat 49=RawECUStatus JC, 50=Throttle JC, 51=PackVoltage JC, 52=PumpVoltage JC, 53=RPM JC, 54=EGT JC, 55=RawOffCondition JC
+				//GForce 56=X GF, 57=Y GF, 58=Z GF, 59=Xmax GF, 60=Ymax GF, 61=Zmax GF, 62=Zmin GF
+				//Channel 63=Ch 1, ..., 70=Ch 8, ..., 82=Ch 20]
 				final int latOrdinal = 21, lonOrdinal = 22, altOrdinal = 20, climbOrdinal = 13, tripOrdinal = 28;
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
 				exportFileName = new FileHandler().exportFileKMZ(lonOrdinal, latOrdinal, altOrdinal, additionalMeasurementOrdinal, climbOrdinal, tripOrdinal, -1, true, isExport2TmpDir);
@@ -141,8 +156,24 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 	 * @param type DeviceConfiguration.HEIGHT_RELATIVE | DeviceConfiguration.HEIGHT_ABSOLUTE
 	 */
 	public void export2KMZ3D(int type) {
-		// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-		new FileHandler().exportFileKMZ(Messages.getString(gde.messages.MessageIds.GDE_MSGT0963), 2, 1, 3, 6, 5, 9, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
+		//Standard 0=RPM St, 1=Volt St, 2=Temperature St, 3=dbm_A, 4=dbm_B
+		//Rx	5=LostPacketsReceiver A, 6=LostPacketsReceiver B, 7=LostPacketsReceiver L, 8=LostPacketsReceiver R, 9=FrameLoss, 10=Holds, 11=VoltageRx
+		//Vario 12=Altitude V, 13=Climb V
+		//Altitude	14=Altitude A
+		//AltitudeZero 15=Altitude Offset
+		//Voltage 16=Voltage V
+		//Current 17=Current C
+		//Temperature 18=Temperature T
+		//AirSpeed 19=AirSpeed
+		//GPS	20=Altitude GPS, 21=Latitude, 22=Longitude, 23=Speed GPS, 24=Satellites GPS, 25=Course, 26=HDOP, 27=GPSFix, 28=Trip/UTC
+		//FlightPack 29=Current FPA, 30=Capacity FPA, 31=Temperature FPA, 32=Current FPB, 33=Capacity FPB, 34=Temperature FPB
+		//ESC 35=RPM ESC, 36=Voltage ESC, 37=TempFET ESC, 38=Current ESC, 39=CurrentBEC ESC, 40=VoltsBEC ESC, 41=Throttle ESC, 42=PowerOut ESC, 43=PowerIn ESC
+		//PowerBox 44=Voltage PB1, 45=Capacity PB1, 46=Voltage PB2, 47=Capacity PB2, 48=Alarms PB
+		//JetCat 49=RawECUStatus JC, 50=Throttle JC, 51=PackVoltage JC, 52=PumpVoltage JC, 53=RPM JC, 54=EGT JC, 55=RawOffCondition JC
+		//GForce 56=X GF, 57=Y GF, 58=Z GF, 59=Xmax GF, 60=Ymax GF, 61=Zmax GF, 62=Zmin GF
+		//Channel 63=Ch 1, ..., 70=Ch 8, ..., 82=Ch 20]
+		//21=Latitude, 22=Longitude, 20=Height, 13=Altitude, 23=Speed, 13=Climb, -1=TripLength, -1=Azimuth
+	new FileHandler().exportFileKMZ(Messages.getString(gde.messages.MessageIds.GDE_MSGT0963), 21, 22, 20, 23, 13, -1, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 
 	/**
@@ -290,16 +321,36 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 												.toFormatter();
 										int index = 0;
 										List<IFlight> flights = reader.parseFlightDefinitions(selectedImportFile);
-										System.out.println("found " + flights.size() + " flight sessions");
+										if (log.isLoggable(Level.FINE)) 
+											log.log(Level.FINE, "found " + flights.size() + " flight sessions");
 										String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date().getTime()); //$NON-NLS-1$
 										String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new Date().getTime()); //$NON-NLS-1$
 										channel = SpektrumAdapter.channels.get(channelNumber);
 										channel.setFileDescription(SpektrumAdapter.application.isObjectoriented() ? date + GDE.STRING_BLANK + SpektrumAdapter.application.getObjectKey() : date);
+										
+//										//print all measurement names										
+//										System.out.println(new StandardBlock(new byte[25], new HeaderRpmBlock(new byte[25])).getMeasurementNames().toString());
+//										System.out.println(new RxBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new VarioBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new AltitudeBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new AltitudeZeroBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new VoltageBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new CurrentBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new TemperatureBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new AirspeedBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(GPSCollectorBlock.getInstance().getMeasurementNames().toString());
+//										System.out.println(new FlightPackBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new EscBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new PowerBoxBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new JetCatBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new GForceBlock(new byte[25]).getMeasurementNames().toString());
+//										System.out.println(new ServoDataBlock(new byte[25]).getMeasurementNames().toString());
+
 
 										for (IFlight flight : flights) {
 											if (flight.getNumberOfDataBlocks() > 10 || flight.getHeaderBlocks().size() > 0) {
-												//System.out.println(flight.toString());
-												//System.out.println(String.format("flight.getDuration() = %d ms", flight.getDuration().getMillis()));
+												if (log.isLoggable(Level.FINE)) 
+													log.log(Level.FINE, String.format("flight.getDuration() = %d ms", flight.getDuration().getMillis()));
 
 												Flight currentFlight = reader.parseFlight(selectedImportFile, index);
 
@@ -316,11 +367,13 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 //													else
 //														System.out.println(header.getClass().getSimpleName() + " - " + header.toString());
 												}
-												System.out.println(String.format("model %s flight %d duration() = %s", modelName, index, formatter.print(flight.getDuration().toPeriod())));
+												if (log.isLoggable(Level.FINE)) 
+													log.log(Level.FINE, String.format("model %s flight %d duration() = %s", modelName, index, formatter.print(flight.getDuration().toPeriod())));
 												List<DataBlock> dataBlocks = currentFlight.getDataBlocks();
-												System.out.println("current flight contains " + dataBlocks.size() + " DataBlocks, and " + currentFlight.getHeaderBlocks().size() + " headerBlocks");
+												if (log.isLoggable(Level.FINE)) 
+													log.log(Level.FINE, "current flight contains " + dataBlocks.size() + " DataBlocks, and " + currentFlight.getHeaderBlocks().size() + " headerBlocks");
 
-												if (dataBlocks.size() > 1000) {
+												if (dataBlocks.size() > 2000) {
 													currentFlight.removeRedundantDataBlocks();
 													int recordSetNumber = SpektrumAdapter.channels.get(1).maxSize() + 1;
 													long numberDatablocks = dataBlocks.size() + 1;
@@ -336,44 +389,59 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 													int[] points = new int[device.getNumberOfMeasurements(channelNumber)];
 													long timeOffset = -1;
 													//recordSet initialized and ready to add data
+													
+													//1=Standard 2=Rx 3=Vario 4=Altitude 5=AltitudeZero 6=Voltage 7=Current 8=Temperature 9=AirSpeed
+													//10=GPS	11=FlightPack 12=ESC 13=PowerBox 14=JetCat 15=GForce 16=Servo
+													int sizeSupportedDataBlockTypes = 16;
+													boolean[] isResetMinMax = new boolean[sizeSupportedDataBlockTypes];
 
 													for (DataBlock data : dataBlocks) {
 														++indexDataBlock;
 														if (data instanceof StandardBlock) {
 															//System.out.println(((StandardBlock) data).toString());
+															//Standard 0=RPM St, 1=Volt St, 2=Temperature St, 3=dbm_A, 4=dbm_B
+															isResetMinMax[0] = mergeRawData(((StandardBlock) data).getMeasurementValues(), points, 0, 5, tmpRecordSet, isResetMinMax[0], 3);
 														}
 														else if (data instanceof RxBlock) {
 															//System.out.println(((RxBlock) data).toString());
-															mergeRawData(((RxBlock) data).getMeasurementValues(), points, 5, 7);
+															//Rx	5=LostPacketsReceiver A, 6=LostPacketsReceiver B, 7=LostPacketsReceiver L, 8=LostPacketsReceiver R, 9=FrameLoss, 10=Holds, 11=VoltageRx
+															isResetMinMax[1] = mergeRawData(((RxBlock) data).getMeasurementValues(), points, 5, 7, tmpRecordSet, isResetMinMax[1], 6);
 														}
 														else if (data instanceof VarioBlock) {
 															//System.out.println(((VarioBlock) data).toString());
-															mergeRawData(((VarioBlock) data).getMeasurementValues(), points, 12, 2);
+															//Vario 12=Altitude V, 13=Climb V
+															mergeRawData(((VarioBlock) data).getMeasurementValues(), points, 12, 2, tmpRecordSet, true, -1);
 														}
 														//primitive data blocks
 														else if (data instanceof AltitudeBlock) {
 															//System.out.println(((AltitudeBlock) data).toString());
-															mergeRawData(((AltitudeBlock) data).getMeasurementValues(), points, 14, 1);
+															//Altitude	14=Altitude A
+															mergeRawData(((AltitudeBlock) data).getMeasurementValues(), points, 14, 1, tmpRecordSet, true, -1);
 														}
 														else if (data instanceof AltitudeZeroBlock) {
 															//System.out.println(((AltitudeZeroBlock) data).toString());
-															mergeRawData(((AltitudeZeroBlock) data).getMeasurementValues(), points, 15, 1);
+															//AltitudeZero 15=Altitude Offset
+															mergeRawData(((AltitudeZeroBlock) data).getMeasurementValues(), points, 15, 1, tmpRecordSet, true, -1);
 														}
 														else if (data instanceof VoltageBlock) {
 															//System.out.println(((VoltageBlock) data).toString());
-															mergeRawData(((VoltageBlock) data).getMeasurementValues(), points, 16, 1);
+															//Voltage 16=Voltage V
+															isResetMinMax[5] = mergeRawData(((VoltageBlock) data).getMeasurementValues(), points, 16, 1, tmpRecordSet, isResetMinMax[5], 0);
 														}
 														else if (data instanceof CurrentBlock) {
 															//System.out.println(((CurrentBlock) data).toString());
-															mergeRawData(((CurrentBlock) data).getMeasurementValues(), points, 17, 1);
+															//Current 17=Current C
+															mergeRawData(((CurrentBlock) data).getMeasurementValues(), points, 17, 1, tmpRecordSet, true, -1);
 														}
 														else if (data instanceof TemperatureBlock) {
 															//System.out.println(((TemperatureBlock) data).toString());
-															mergeRawData(((TemperatureBlock) data).getMeasurementValues(), points, 18, 1);
+															//Temperature 18=Temperature T
+															isResetMinMax[7] = mergeRawData(((TemperatureBlock) data).getMeasurementValues(), points, 18, 1, tmpRecordSet, isResetMinMax[7], 0);
 														}
 														else if (data instanceof AirspeedBlock) {
 															//System.out.println(((AirspeedBlock) data).toString());
-															mergeRawData(((AirspeedBlock) data).getMeasurementValues(), points, 19, 1);
+															//AirSpeed 19=AirSpeed
+															mergeRawData(((AirspeedBlock) data).getMeasurementValues(), points, 19, 1, tmpRecordSet, true, -1);
 														}
 														//other important data blocks
 														else if (data instanceof GPSLocationBlock) {
@@ -381,7 +449,8 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 															GPSCollectorBlock.getInstance().updateLocation((GPSLocationBlock) data);
 															if (GPSCollectorBlock.getInstance().isUpdated()) {
 																//System.out.println(GPSCollectorBlock.getInstance().toString());
-																mergeGPSRawData(GPSCollectorBlock.getInstance().getMeasurementValues(), points, 20, 8);
+																//GPS	20=Altitude GPS, 21=Latitude, 22=Longitude, 23=Speed GPS, 24=Satellites GPS, 25=Course, 26=HDOP, 27=GPSFix, 28=Trip/UTC
+																isResetMinMax[9] = mergeGPSRawData(GPSCollectorBlock.getInstance().getMeasurementValues(), points, 20, 8, tmpRecordSet, isResetMinMax[9], 1);
 															}
 														}
 														else if (data instanceof GPSStatusBlock) {
@@ -389,35 +458,42 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 															GPSCollectorBlock.getInstance().updateStatus((GPSStatusBlock) data);
 															if (GPSCollectorBlock.getInstance().isUpdated()) {
 																//System.out.println(GPSCollectorBlock.getInstance().toString());
-																mergeGPSRawData(GPSCollectorBlock.getInstance().getMeasurementValues(), points, 20, 8);
+																isResetMinMax[9] = mergeGPSRawData(GPSCollectorBlock.getInstance().getMeasurementValues(), points, 20, 8, tmpRecordSet, isResetMinMax[9], 1);
 															}
 														}
 														else if (data instanceof FlightPackBlock) {
 															//System.out.println(((FlightPackBlock) data).toString());
-															mergeRawData(((FlightPackBlock) data).getMeasurementValues(), points, 29, 6);
+															//FlightPack 29=Current FPA, 30=Capacity FPA, 31=Temperature FPA, 32=Current FPB, 33=Capacity FPB, 34=Temperature FPB
+															mergeRawData(((FlightPackBlock) data).getMeasurementValues(), points, 29, 6, tmpRecordSet, true, -1);
 														}
 														else if (data instanceof EscBlock) {
 															//System.out.println(((EscBlock) data).toString());
-															mergeRawData(((EscBlock) data).getMeasurementValues(), points, 35, 9);
+															//ESC 35=RPM ESC, 36=Voltage ESC, 37=TempFET ESC, 38=Current ESC, 39=CurrentBEC ESC, 40=VoltsBEC ESC, 41=Throttle ESC, 42=PowerOut ESC, 43=PowerIn ESC
+															isResetMinMax[11] = mergeRawData(((EscBlock) data).getMeasurementValues(), points, 35, 9, tmpRecordSet, isResetMinMax[11], 1);
 														}
 														else if (data instanceof PowerBoxBlock) {
 															//System.out.println(((PowerBoxBlock) data).toString());
-															mergeRawData(((PowerBoxBlock) data).getMeasurementValues(), points, 43, 5);
+															//PowerBox 44=Voltage PB1, 45=Capacity PB1, 46=Voltage PB2, 47=Capacity PB2, 48=Alarms PB
+															isResetMinMax[12] = mergeRawData(((PowerBoxBlock) data).getMeasurementValues(), points, 44, 5, tmpRecordSet, isResetMinMax[12], 0);
 														}
-														else if (data instanceof GForceBlock) {
+														else if (data instanceof JetCatBlock) {
 															//System.out.println(((JetCatBlock) data).toString());
-															mergeRawData(((GForceBlock) data).getMeasurementValues(), points, 48, 7);
+															//JetCat 49=RawECUStatus JC, 50=Throttle JC, 51=PackVoltage JC, 52=PumpVoltage JC, 53=RPM JC, 54=EGT JC, 55=RawOffCondition JC
+															isResetMinMax[13] = mergeRawData(((JetCatBlock) data).getMeasurementValues(), points, 49, 7, tmpRecordSet, isResetMinMax[13], 2);
 														}
 														else if (data instanceof GForceBlock) {
 															//System.out.println(((GForceBlock) data).toString());
-															mergeRawData(((GForceBlock) data).getMeasurementValues(), points, 54, 7);
+															//GForce 56=X GF, 57=Y GF, 58=Z GF, 59=Xmax GF, 60=Ymax GF, 61=Zmax GF, 62=Zmin GF
+															mergeRawData(((GForceBlock) data).getMeasurementValues(), points, 56, 7, tmpRecordSet, true, -1);
 														}
 														else if (data instanceof ServoDataBlock) {
 															//System.out.println(((ServoDataBlock) data).toString());
-															mergeRawData(((ServoDataBlock) data).getMeasurementValues(), points, 61, 20);
+															//Channel 63=Ch 1, ..., 70=Ch 8, ..., 82=Ch 20]
+															mergeRawData(((ServoDataBlock) data).getMeasurementValues(), points, 63, 20, tmpRecordSet, true, -1);
 														}
 														else
-															System.out.println(data.toString());
+															log.log(Level.WARNING, data.toString());
+														
 
 														if (timeOffset == -1) timeOffset = data.getTimestamp();
 
@@ -460,13 +536,24 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 			 * @param points output data points
 			 * @param destPos 
 			 * @param length
+			 * @param recordSet to be reset min/max with start values
+			 * @param isResetMinMax supported data block index
+			 * @param zeroValueIndex value to be use to detect valid data
 			 */
-			private void mergeRawData(List<Integer> measurementRawValues, int[] points, int destPos, int length) {
+			private boolean mergeRawData(List<Integer> measurementRawValues, int[] points, int destPos, int length, RecordSet recordSet, boolean isResetMinMax, int zeroValueIndex) {
+				boolean isReset = isResetMinMax;
 				int[] srcValues = new int[measurementRawValues.size()];
 				for (int i=0; i < measurementRawValues.size(); ++i)
 					srcValues[i] = measurementRawValues.get(i) * 1000;
+				
+				if (!isResetMinMax && measurementRawValues.get(zeroValueIndex) != 0) {
+					for (int i = destPos, j = 0; i < destPos+length; ++i, ++j) 
+						recordSet.get(i).setMinMax(srcValues[j], srcValues[j]);
+					isReset = true;
+				}
 
 				System.arraycopy(srcValues, 0, points, destPos, length);
+				return isReset;
 			}
 
 			/**
@@ -475,8 +562,12 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 			 * @param points output data points
 			 * @param destPos 
 			 * @param length
+			 * @param recordSet to be reset min/max with start values
+			 * @param isResetMinMax supported data block index
+			 * @param zeroValueIndex value to be use to detect valid data
 			 */
-			private void mergeGPSRawData(List<Integer> measurementRawValues, int[] points, int destPos, int length) {
+			private boolean mergeGPSRawData(List<Integer> measurementRawValues, int[] points, int destPos, int length, RecordSet recordSet, boolean isResetMinMax, int zeroValueIndex) {
+				boolean isReset = isResetMinMax;
 				int[] srcValues = new int[measurementRawValues.size()-1];
 				for (int i=0; i < measurementRawValues.size()-1; ++i)
 					if (i == 1 || i == 2)
@@ -484,7 +575,14 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 					else
 						srcValues[i] = measurementRawValues.get(i) * 1000;
 
+				if (!isResetMinMax && measurementRawValues.get(zeroValueIndex) != 0) {
+					for (int i = destPos, j = 0; i < destPos+length; ++i, ++j) 
+						recordSet.get(i).setMinMax(srcValues[j], srcValues[j]);
+					isReset = true;
+				}
+
 				System.arraycopy(srcValues, 0, points, destPos, length);
+				return isReset;
 			}
 		};
 		reader.start();
@@ -552,8 +650,22 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 			int index = 0;
 			for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
 				int ordinal = record.getOrdinal();
-				//73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
-				//93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+				//Standard 0=RPM St, 1=Volt St, 2=Temperature St, 3=dbm_A, 4=dbm_B
+				//Rx	5=LostPacketsReceiver A, 6=LostPacketsReceiver B, 7=LostPacketsReceiver L, 8=LostPacketsReceiver R, 9=FrameLoss, 10=Holds, 11=VoltageRx
+				//Vario 12=Altitude V, 13=Climb V
+				//Altitude	14=Altitude A
+				//AltitudeZero 15=Altitude Offset
+				//Voltage 16=Voltage V
+				//Current 17=Current C
+				//Temperature 18=Temperature T
+				//AirSpeed 19=AirSpeed
+				//GPS	20=Altitude GPS, 21=Latitude, 22=Longitude, 23=Speed GPS, 24=Satellites GPS, 25=Course, 26=HDOP, 27=GPSFix, 28=Trip/UTC
+				//FlightPack 29=Current FPA, 30=Capacity FPA, 31=Temperature FPA, 32=Current FPB, 33=Capacity FPB, 34=Temperature FPB
+				//ESC 35=RPM ESC, 36=Voltage ESC, 37=TempFET ESC, 38=Current ESC, 39=CurrentBEC ESC, 40=VoltsBEC ESC, 41=Throttle ESC, 42=PowerOut ESC, 43=PowerIn ESC
+				//PowerBox 44=Voltage PB1, 45=Capacity PB1, 46=Voltage PB2, 47=Capacity PB2, 48=Alarms PB
+				//JetCat 49=RawECUStatus JC, 50=Throttle JC, 51=PackVoltage JC, 52=PumpVoltage JC, 53=RPM JC, 54=EGT JC, 55=RawOffCondition JC
+				//GForce 56=X GF, 57=Y GF, 58=Z GF, 59=Xmax GF, 60=Ymax GF, 61=Zmax GF, 62=Zmin GF
+				//Channel 63=Ch 1, ..., 70=Ch 8, ..., 82=Ch 20]
 				if (ordinal >= 3 && ordinal <= 10) {
 					dataTableRow[index + 1] = String.format("%.0f", (record.realGet(rowIndex) / 1000.0)); //$NON-NLS-1$
 				}
@@ -576,7 +688,7 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public boolean isGPSCoordinates(Record record) {
-		//15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+		//GPS	20=Altitude GPS, 21=Latitude, 22=Longitude, 23=Speed GPS, 24=Satellites GPS, 25=Course, 26=HDOP, 27=GPSFix, 28=Trip/UTC
 		final int latOrdinal = 21, lonOrdinal = 22;
 		return record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal;
 	}
@@ -592,8 +704,7 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				//73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
-				//93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+				//GPS	20=Altitude GPS, 21=Latitude, 22=Longitude, 23=Speed GPS, 24=Satellites GPS, 25=Course, 26=HDOP, 27=GPSFix, 28=Trip/UTC
 				final int latOrdinal = 21, lonOrdinal = 22;
 				containsGPSdata = activeRecordSet.get(latOrdinal).hasReasonableData() && activeRecordSet.get(lonOrdinal).hasReasonableData();
 			}
@@ -606,8 +717,22 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
-		//73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
-		//93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+		//Standard 0=RPM St, 1=Volt St, 2=Temperature St, 3=dbm_A, 4=dbm_B
+		//Rx	5=LostPacketsReceiver A, 6=LostPacketsReceiver B, 7=LostPacketsReceiver L, 8=LostPacketsReceiver R, 9=FrameLoss, 10=Holds, 11=VoltageRx
+		//Vario 12=Altitude V, 13=Climb V
+		//Altitude	14=Altitude A
+		//AltitudeZero 15=Altitude Offset
+		//Voltage 16=Voltage V
+		//Current 17=Current C
+		//Temperature 18=Temperature T
+		//AirSpeed 19=AirSpeed
+		//GPS	20=Altitude GPS, 21=Latitude, 22=Longitude, 23=Speed GPS, 24=Satellites GPS, 25=Course, 26=HDOP, 27=GPSFix, 28=Trip/UTC
+		//FlightPack 29=Current FPA, 30=Capacity FPA, 31=Temperature FPA, 32=Current FPB, 33=Capacity FPB, 34=Temperature FPB
+		//ESC 35=RPM ESC, 36=Voltage ESC, 37=TempFET ESC, 38=Current ESC, 39=CurrentBEC ESC, 40=VoltsBEC ESC, 41=Throttle ESC, 42=PowerOut ESC, 43=PowerIn ESC
+		//PowerBox 44=Voltage PB1, 45=Capacity PB1, 46=Voltage PB2, 47=Capacity PB2, 48=Alarms PB
+		//JetCat 49=RawECUStatus JC, 50=Throttle JC, 51=PackVoltage JC, 52=PumpVoltage JC, 53=RPM JC, 54=EGT JC, 55=RawOffCondition JC
+		//GForce 56=X GF, 57=Y GF, 58=Z GF, 59=Xmax GF, 60=Ymax GF, 61=Zmax GF, 62=Zmin GF
+		//Channel 63=Ch 1, ..., 70=Ch 8, ..., 82=Ch 20]
 		if (kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
 			return 23;
 
@@ -618,8 +743,22 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 	public double translateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double newValue = 0;
-		//73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
-		//93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+		//Standard 0=RPM St, 1=Volt St, 2=Temperature St, 3=dbm_A, 4=dbm_B
+		//Rx	5=LostPacketsReceiver A, 6=LostPacketsReceiver B, 7=LostPacketsReceiver L, 8=LostPacketsReceiver R, 9=FrameLoss, 10=Holds, 11=VoltageRx
+		//Vario 12=Altitude V, 13=Climb V
+		//Altitude	14=Altitude A
+		//AltitudeZero 15=Altitude Offset
+		//Voltage 16=Voltage V
+		//Current 17=Current C
+		//Temperature 18=Temperature T
+		//AirSpeed 19=AirSpeed
+		//GPS	20=Altitude GPS, 21=Latitude, 22=Longitude, 23=Speed GPS, 24=Satellites GPS, 25=Course, 26=HDOP, 27=GPSFix, 28=Trip/UTC
+		//FlightPack 29=Current FPA, 30=Capacity FPA, 31=Temperature FPA, 32=Current FPB, 33=Capacity FPB, 34=Temperature FPB
+		//ESC 35=RPM ESC, 36=Voltage ESC, 37=TempFET ESC, 38=Current ESC, 39=CurrentBEC ESC, 40=VoltsBEC ESC, 41=Throttle ESC, 42=PowerOut ESC, 43=PowerIn ESC
+		//PowerBox 44=Voltage PB1, 45=Capacity PB1, 46=Voltage PB2, 47=Capacity PB2, 48=Alarms PB
+		//JetCat 49=RawECUStatus JC, 50=Throttle JC, 51=PackVoltage JC, 52=PumpVoltage JC, 53=RPM JC, 54=EGT JC, 55=RawOffCondition JC
+		//GForce 56=X GF, 57=Y GF, 58=Z GF, 59=Xmax GF, 60=Ymax GF, 61=Zmax GF, 62=Zmin GF
+		//Channel 63=Ch 1, ..., 70=Ch 8, ..., 82=Ch 20]
 		final int latOrdinal = 21, lonOrdinal = 22;
 		if (record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal) { //15=Latitude, 16=Longitude
 			int grad = ((int) (value / 1000));
@@ -638,8 +777,22 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 	public double reverseTranslateValue(Record record, double value) {
 		double factor = record.getFactor(); // != 1 if a unit translation is required
 		double newValue = 0;
-		//73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
-		//93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+		//Standard 0=RPM St, 1=Volt St, 2=Temperature St, 3=dbm_A, 4=dbm_B
+		//Rx	5=LostPacketsReceiver A, 6=LostPacketsReceiver B, 7=LostPacketsReceiver L, 8=LostPacketsReceiver R, 9=FrameLoss, 10=Holds, 11=VoltageRx
+		//Vario 12=Altitude V, 13=Climb V
+		//Altitude	14=Altitude A
+		//AltitudeZero 15=Altitude Offset
+		//Voltage 16=Voltage V
+		//Current 17=Current C
+		//Temperature 18=Temperature T
+		//AirSpeed 19=AirSpeed
+		//GPS	20=Altitude GPS, 21=Latitude, 22=Longitude, 23=Speed GPS, 24=Satellites GPS, 25=Course, 26=HDOP, 27=GPSFix, 28=Trip/UTC
+		//FlightPack 29=Current FPA, 30=Capacity FPA, 31=Temperature FPA, 32=Current FPB, 33=Capacity FPB, 34=Temperature FPB
+		//ESC 35=RPM ESC, 36=Voltage ESC, 37=TempFET ESC, 38=Current ESC, 39=CurrentBEC ESC, 40=VoltsBEC ESC, 41=Throttle ESC, 42=PowerOut ESC, 43=PowerIn ESC
+		//PowerBox 44=Voltage PB1, 45=Capacity PB1, 46=Voltage PB2, 47=Capacity PB2, 48=Alarms PB
+		//JetCat 49=RawECUStatus JC, 50=Throttle JC, 51=PackVoltage JC, 52=PumpVoltage JC, 53=RPM JC, 54=EGT JC, 55=RawOffCondition JC
+		//GForce 56=X GF, 57=Y GF, 58=Z GF, 59=Xmax GF, 60=Ymax GF, 61=Zmax GF, 62=Zmin GF
+		//Channel 63=Ch 1, ..., 70=Ch 8, ..., 82=Ch 20]
 		final int latOrdinal = 21, lonOrdinal = 22;
 		if (record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal) { // 15=Latitude, 16=Longitude
 			int grad = (int) value;

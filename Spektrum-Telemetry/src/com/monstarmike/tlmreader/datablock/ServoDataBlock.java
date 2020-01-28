@@ -62,7 +62,7 @@ public class ServoDataBlock extends DataBlock {
 		decode(rawData);
 
 		for (int i = 0; i < MAX_NUMBER_OF_CHANNELS; i++) {
-			measurementNames.add("Cannel " + i);
+			measurementNames.add("Ch " + (i+1));
 		}
 
 		for (int i = 0; i < MAX_NUMBER_OF_CHANNELS; i++) {
@@ -146,21 +146,21 @@ public class ServoDataBlock extends DataBlock {
 		availableChannelWithDataBitArray |= (1 << channelNumber);
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("ServoData:       ").append(getTimestamp());
-		for (int i = 0; i < MAX_NUMBER_OF_CHANNELS; i++) {
-			if (isBitSet(i)) {
-				if (sb.length() != 0) {
-					sb.append(", ");
-				}
-				sb.append("CH: ").append(i).append(" = ").append(channelValues[i]).append(" (")
-						.append(getPercent(i, channelValues[i])).append("%)");
-			}
-		}
-		return sb.toString();
-	}
+//	@Override
+//	public String toString() {
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("ServoData:        ").append(getTimestamp());
+//		for (int i = 0; i < MAX_NUMBER_OF_CHANNELS; i++) {
+//			if (isBitSet(i)) {
+//				if (sb.length() != 0) {
+//					sb.append(", ");
+//				}
+//				sb.append("CH: ").append(i).append(" = ").append(channelValues[i]).append(" (")
+//						.append(getPercent(i, channelValues[i])).append("%)");
+//			}
+//		}
+//		return sb.toString();
+//	}
 
 	private float getPercent(Integer channelNumber, short channelValue) {
 		final int MAX_SERVO_TRAVEL_IN_PERCENT = 300; // +-150%

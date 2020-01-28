@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import com.monstarmike.tlmreader.datablock.DataBlock;
 
 public class RedundantDataBlocksProcessor extends AbstractProcessor<DataBlock> {
+	
+	private static boolean DEBUG = false; //drive debug output
 
 	private Map<String, ProcessBlockType> typeMap = new HashMap<>();
 
@@ -87,9 +89,9 @@ public class RedundantDataBlocksProcessor extends AbstractProcessor<DataBlock> {
 			ProcessBlockType blockType = entry.getValue();
 			countAll += blockType.getCount();
 			redundantAll += blockType.getNumberOfRedundantBlocks();
-			printRedundantBlocks(type, blockType.getCount(), blockType.getNumberOfRedundantBlocks());
+			if (DEBUG) printRedundantBlocks(type, blockType.getCount(), blockType.getNumberOfRedundantBlocks());
 		}
-		printRedundantBlocks("TOTAL", countAll, redundantAll);
+		if (DEBUG) printRedundantBlocks("TOTAL", countAll, redundantAll);
 	}
 
 	private void printRedundantBlocks(String type, int totalBlocks, int redundantBlocks) {

@@ -53,8 +53,8 @@ public class PowerBoxBlock extends DataBlock {
 
 		measurementNames.add("Voltage PB1");
 		measurementNames.add("Capacity PB1");
-		measurementNames.add("Voltage PPBB2");
-		measurementNames.add("Capacity 2");
+		measurementNames.add("Voltage PB2");
+		measurementNames.add("Capacity PB2");
 		measurementNames.add("Alarms PB");
 
 		measurementUnits.add("V");
