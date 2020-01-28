@@ -777,7 +777,6 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
-                <trailDisplay discloseAll="true" defaultTrail="last"/>
             </Measurement>
             <Measurement>
                 <name>voltage_rx</name>
