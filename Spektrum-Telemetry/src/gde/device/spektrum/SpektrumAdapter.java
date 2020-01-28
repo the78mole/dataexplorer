@@ -81,7 +81,7 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 	public SpektrumAdapter(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.graupner.hott.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		//Messages.setDeviceResourceBundle("gde.device.graupner.hott.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.settings = Settings.getInstance();
 		if (SpektrumAdapter.application.getMenuToolBar() != null) {
@@ -95,7 +95,7 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 	public SpektrumAdapter(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.graupner.hott.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		//Messages.setDeviceResourceBundle("gde.device.graupner.hott.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.settings = Settings.getInstance();
 		if (SpektrumAdapter.application.getMenuToolBar() != null) {

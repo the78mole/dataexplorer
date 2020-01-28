@@ -5,7 +5,7 @@
         <manufacturer>Spektrum</manufacturer>
         <manufacturerURL>https://www.spektrumrc.com/</manufacturerURL>
         <group>logger</group>
-        <image>Spektrum.png</image>
+        <image>SpektrumTLM.png</image>
         <usage>true</usage>
     </Device>
     <TimeBase>
