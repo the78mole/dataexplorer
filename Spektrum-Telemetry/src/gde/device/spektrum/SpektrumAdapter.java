@@ -66,6 +66,7 @@ import gde.ui.DataExplorer;
 import gde.ui.menu.MenuToolBar;
 import gde.utils.FileUtils;
 import gde.utils.ObjectKeyCompliance;
+import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
 
 public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
@@ -304,6 +305,7 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 							if (!directoryName.isEmpty()) ObjectKeyCompliance.createObjectKey(directoryName);
 
 							try {
+								long startTime = System.nanoTime() / 1000000;
 								if (selectedImportFile.toLowerCase().endsWith(GDE.FILE_ENDING_DOT_TLM)) {
 									TLMReader reader = new TLMReader();
 									RecordSet tmpRecordSet = null;
@@ -315,7 +317,6 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 									int channelNumber = SpektrumAdapter.analyser.getActiveChannel().getNumber();
 									
 									if (new File(selectedImportFile).exists()) {
-
 										String modelName = "???";
 										PeriodFormatter formatter = new PeriodFormatterBuilder().appendHours().appendSuffix(":").appendMinutes().appendSuffix(":").appendSeconds().appendSuffix(".").appendMillis()
 												.toFormatter();
@@ -345,7 +346,8 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 //										System.out.println(new JetCatBlock(new byte[25]).getMeasurementNames().toString());
 //										System.out.println(new GForceBlock(new byte[25]).getMeasurementNames().toString());
 //										System.out.println(new ServoDataBlock(new byte[25]).getMeasurementNames().toString());
-
+										if (log.isLoggable(Level.TIME)) 
+											log.log(Level.TIME, "read flight definitions time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 										for (IFlight flight : flights) {
 											if (flight.getDuration().getMillis() > 5000 || flight.getNumberOfDataBlocks() > 10 || flight.getHeaderBlocks().size() > 0) {
@@ -515,13 +517,17 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 														SpektrumAdapter.channels.switchChannel(channelNumber, recordSetName);
 														GDE.getUiNotification().setProgress(100);
 													}
-													WaitTimer.delay(500); //enable refresh
+													if (log.isLoggable(Level.TIME)) 
+														log.log(Level.TIME, String.format("read flight %d time = %s", index, StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime)))); //$NON-NLS-1$ //$NON-NLS-2$
+													WaitTimer.delay(100); //enable refresh
 												}
 												++index;
 											}
 										}
 									}
 								}
+								if (log.isLoggable(Level.TIME)) 
+									log.log(Level.TIME, "overall read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 							} catch (Exception e) {
 								SpektrumAdapter.log.log(java.util.logging.Level.WARNING, e.getMessage(), e);
 							}
