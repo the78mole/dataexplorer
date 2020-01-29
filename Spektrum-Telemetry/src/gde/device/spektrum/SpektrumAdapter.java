@@ -348,9 +348,9 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 
 
 										for (IFlight flight : flights) {
-											if (flight.getNumberOfDataBlocks() > 10 || flight.getHeaderBlocks().size() > 0) {
-												if (log.isLoggable(Level.FINE)) 
-													log.log(Level.FINE, String.format("flight.getDuration() = %d ms", flight.getDuration().getMillis()));
+											if (flight.getDuration().getMillis() > 5000 || flight.getNumberOfDataBlocks() > 10 || flight.getHeaderBlocks().size() > 0) {
+												if (log.isLoggable(Level.INFO)) 
+													log.log(Level.INFO, String.format("flight.getDuration() = %d ms", flight.getDuration().getMillis()));
 
 												Flight currentFlight = reader.parseFlight(selectedImportFile, index);
 
@@ -367,14 +367,16 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 //													else
 //														System.out.println(header.getClass().getSimpleName() + " - " + header.toString());
 												}
-												if (log.isLoggable(Level.FINE)) 
-													log.log(Level.FINE, String.format("model %s flight %d duration() = %s", modelName, index, formatter.print(flight.getDuration().toPeriod())));
-												List<DataBlock> dataBlocks = currentFlight.getDataBlocks();
-												if (log.isLoggable(Level.FINE)) 
-													log.log(Level.FINE, "current flight contains " + dataBlocks.size() + " DataBlocks, and " + currentFlight.getHeaderBlocks().size() + " headerBlocks");
 
-												if (dataBlocks.size() > 2000) {
+												if (currentFlight.getDuration().getStandardSeconds() > 5) {
+													if (log.isLoggable(Level.INFO)) 
+														log.log(Level.INFO, String.format("model %s flight %d duration() = %s", modelName, index, formatter.print(currentFlight.getDuration().toPeriod())));
+													List<DataBlock> dataBlocks = currentFlight.getDataBlocks();
+													if (log.isLoggable(Level.INFO)) 
+														log.log(Level.INFO, "current flight contains " + dataBlocks.size() + " DataBlocks, and " + currentFlight.getHeaderBlocks().size() + " headerBlocks");
+													
 													currentFlight.removeRedundantDataBlocks();
+													
 													int recordSetNumber = SpektrumAdapter.channels.get(1).maxSize() + 1;
 													long numberDatablocks = dataBlocks.size() + 1;
 													int progressIndicator = 10;

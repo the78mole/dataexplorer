@@ -84,7 +84,7 @@ public class StandardBlock extends DataBlock {
 	}
 
 	public boolean hasValidTemperatureData() {
-		return tempInDegreeFahrenheit != 0xFF8D;
+		return tempInDegreeFahrenheit != 0x7FFF;
 	}
 
 	public int getTemperatureInDegreeFahrenheit() {

@@ -256,6 +256,9 @@ public abstract class DataBlock implements IBlock{
 		return measurementFactors;
 	}
 
+	/**
+	 * generic toString method for all derived BlockData classes excluding GPS related classes
+	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder().append(String.format("%-18s", this.getClass().getSimpleName())).append(getTimestamp()).append(" - ");
 		measurementNames = getMeasurementNames();
@@ -275,4 +278,29 @@ public abstract class DataBlock implements IBlock{
 		return sb.toString();
 	}
 
+	/**
+	 * generic method for all derived BlockData classes to be used as CSV export header line
+	 */
+	public String getNamesAndUnitsAsCCV() {
+		StringBuilder sb = new StringBuilder().append(String.format("%-18s, Time [ms],", this.getClass().getSimpleName()));
+		measurementNames = getMeasurementNames();
+		measurementUnits = getMeasurementUnits();
+		for(int i=0; i < measurementNames.size(); ++i) {
+			sb.append(measurementNames.get(i)).append(" [").append(measurementUnits.get(i)).append("],");
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * generic method for all derived BlockData classes to be used as CSV export data line
+	 */
+	public String getCorrectedValuesAsCCV() {
+		StringBuilder sb = new StringBuilder().append(String.format("%-18s, %d,", this.getClass().getSimpleName(), getTimestamp() * 10));
+		measurementValues = getMeasurementValues();
+		measurementFactors = getMeasurementFactors();
+		for(int i=0; i < measurementValues.size(); ++i) {
+			sb.append(String.format(" %7.2f,", measurementValues.get(i) * measurementFactors.get(i)));
+		}
+		return sb.toString();
+	}
 }

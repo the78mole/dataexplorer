@@ -95,8 +95,9 @@ public class RedundantDataBlocksProcessor extends AbstractProcessor<DataBlock> {
 	}
 
 	private void printRedundantBlocks(String type, int totalBlocks, int redundantBlocks) {
-		System.out.println("[" + type + "] redundant Blocks: " + redundantBlocks + ", total Blocks: " + totalBlocks
-				+ ", redundant Blocks in percent: " + (double) redundantBlocks / totalBlocks * 100 + "%");
+		if (DEBUG)
+			System.out.println("[" + type + "] redundant Blocks: " + redundantBlocks + ", total Blocks: " + totalBlocks
+					+ ", redundant Blocks in percent: " + (double) redundantBlocks / totalBlocks * 100 + "%");
 	}
 
 	@Override

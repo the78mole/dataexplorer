@@ -127,7 +127,7 @@ public class RxBlock extends DataBlock {
 	 *         less if packets are lost.
 	 */
 	public short getLostPacketsReceiverA() {
-		return lostPacketsReceiverA;
+		return (lostPacketsReceiverA  & 0xF000) < 1 ? lostPacketsReceiverA : 0;
 	}
 
 	public boolean hasValidDataLostPacketsReceiverB() {
@@ -140,7 +140,7 @@ public class RxBlock extends DataBlock {
 	 *         If Lemon Telemetry System is used, the id is not used
 	 */
 	public short getLostPacketsReceiverB() {
-		return lostPacketsReceiverB != -1 ? lostPacketsReceiverB : 0;
+		return (lostPacketsReceiverB  & 0xF000) < 1 ? lostPacketsReceiverB : 0;
 	}
 
 	public boolean hasValidDataLostPacketsReceiverL() {
@@ -153,7 +153,7 @@ public class RxBlock extends DataBlock {
 	 *         If Lemon Telemetry System is used, the id is not used
 	 */
 	public short getLostPacketsReceiverL() {
-		return lostPacketsReceiverL != -1 ? lostPacketsReceiverL : 0;
+		return (lostPacketsReceiverL  & 0xF000) < 1 ? lostPacketsReceiverL : 0;
 	}
 
 	public boolean hasValidDataLostPacketsReceiverR() {
@@ -166,7 +166,7 @@ public class RxBlock extends DataBlock {
 	 *         If Lemon Telemetry System is used, the id is not used
 	 */
 	public short getLostPacketsReceiverR() {
-		return lostPacketsReceiverR != -1 ? lostPacketsReceiverR : 0;
+		return (lostPacketsReceiverR  & 0xF000) < 1 ? lostPacketsReceiverR : 0;
 	}
 
 	public boolean hasValidFrameLosssData() {
@@ -179,7 +179,7 @@ public class RxBlock extends DataBlock {
 	 *         If Lemon Telemetry System is used, the id is not used.
 	 */
 	public short getFrameLoss() {
-		return frameLoss != -1 ? frameLoss : 0;
+		return (frameLoss  & 0xF000) < 1 ? frameLoss : 0;
 	}
 
 	public boolean hasValidHoldsData() {
@@ -191,7 +191,7 @@ public class RxBlock extends DataBlock {
 	 *         If Lemon Telemetry System is used, the id is not used.
 	 */
 	public short getHolds() {
-		return holds != -1 ? holds : 0;
+		return (holds & 0xF000) < 1 ? holds : 0;
 	}
 
 	/**

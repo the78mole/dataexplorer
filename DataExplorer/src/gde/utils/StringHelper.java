@@ -708,7 +708,7 @@ public class StringHelper {
 			sb.append(String.format("%02X", bytes[i])); //$NON-NLS-1$
 		}
 		if (Pattern.compile(".*[ABCDEF]").matcher(sb.toString()).find()) {
-			System.out.println(sb);
+			log.log(Level.WARNING, "invalid input " + sb);
 			return "0";
 		}
 		return sb.toString();
