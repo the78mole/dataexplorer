@@ -49,14 +49,14 @@
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
-                <name>dbm A</name>
+                <name>Ant A</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>dbm B</name>
+                <name>Ant B</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -713,14 +713,14 @@
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
-                <name>dbm A</name>
+                <name>Ant A</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>dbm B</name>
+                <name>Ant B</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -1441,14 +1441,14 @@
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
-                <name>dbm A</name>
+                <name>Ant A</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>dbm B</name>
+                <name>Ant B</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -2171,14 +2171,14 @@
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
-                <name>dbm A</name>
+                <name>Ant A</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>dbm B</name>
+                <name>Ant B</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -2835,14 +2835,14 @@
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
-                <name>dbm A</name>
+                <name>Ant A</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>dbm B</name>
+                <name>Ant B</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>
@@ -3499,14 +3499,14 @@
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
-                <name>dbm A</name>
+                <name>Ant A</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>dbm B</name>
+                <name>Ant B</name>
                 <symbol>-</symbol>
                 <unit>dBm</unit>
                 <active>true</active>

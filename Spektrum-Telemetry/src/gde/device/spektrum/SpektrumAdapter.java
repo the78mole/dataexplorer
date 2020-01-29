@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -381,7 +382,7 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 													
 													int recordSetNumber = SpektrumAdapter.channels.get(1).maxSize() + 1;
 													long numberDatablocks = dataBlocks.size() + 1;
-													int progressIndicator = 10;
+													int progressIndicator = (int) (numberDatablocks / 5);
 													GDE.getUiNotification().setProgress(0);
 													int indexDataBlock = 0;
 													recordSetName = recordSetNumber + device.getRecordSetStemNameReplacement() + recordSetNameExtend;
@@ -399,7 +400,10 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 													int sizeSupportedDataBlockTypes = 16;
 													boolean[] isResetMinMax = new boolean[sizeSupportedDataBlockTypes];
 
-													for (DataBlock data : dataBlocks) {
+													Iterator<DataBlock> iterator = dataBlocks.iterator();
+													while (iterator.hasNext()) {
+														DataBlock data = iterator.next();
+													//for (DataBlock data : dataBlocks) {
 														++indexDataBlock;
 														if (data instanceof StandardBlock) {
 															//System.out.println(((StandardBlock) data).toString());
@@ -504,6 +508,8 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 														tmpRecordSet.addPoints(points, (data.getTimestamp() - timeOffset) * 10.0);
 														if (indexDataBlock % progressIndicator == 0) 
 															GDE.getUiNotification().setProgress((int) (indexDataBlock * 100 / numberDatablocks));
+														
+														iterator.remove();
 													}
 													
 													if (GDE.isWithUi() && tmpRecordSet != null) {
