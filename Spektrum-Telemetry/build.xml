@@ -18,9 +18,8 @@
 		<pathelement location="../build/lib/jaxb-api.jar" />
 		<pathelement location="../build/lib/joda-time.jar" />
 		<pathelement location="../build/lib/guava-jre.jar" />
-		<pathelement location="../build/lib/commons-lang3.jar"/>
+		<pathelement location="../build/lib/tlmreader.jar" />
 		<pathelement location="../build/lib/istack-commons-runtime.jar"/>
-		<pathelement location="../build/lib/build/lib/commons-lang3.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/libusb4java.jar" />
 	</path>

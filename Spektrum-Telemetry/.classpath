@@ -5,9 +5,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/DataExplorer"/>
 	<classpathentry kind="lib" path="/build/lib/joda-time.jar"/>
 	<classpathentry kind="lib" path="/build/lib/guava-jre.jar"/>
-	<classpathentry kind="lib" path="/build/lib/commons-lang3.jar"/>
 	<classpathentry kind="lib" path="/build/lib/istack-commons-runtime.jar"/>
-	<classpathentry kind="lib" path="/build/lib/jaxb-api.jar"/>
 	<classpathentry kind="var" path="SWT_JAR_PATH"/>
+	<classpathentry kind="lib" path="/build/lib/tlmreader.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

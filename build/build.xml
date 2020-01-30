@@ -663,6 +663,7 @@
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/joda-time.jar" />
 			<fileset file="build/lib/guava-jre.jar" />
+			<fileset file="build/lib/tlmreader.jar" />
 			<fileset file="build/lib/Windows/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.windows64.java.ext}" flatten="yes">
@@ -685,6 +686,7 @@
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/joda-time.jar" />
 			<fileset file="build/lib/guava-jre.jar" />
+			<fileset file="build/lib/tlmreader.jar" />
 			<fileset file="build/lib/Windows/64/libusb4java.jar" />
 		</copy>
 		
@@ -737,6 +739,7 @@
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/joda-time.jar" />
 			<fileset file="build/lib/guava-jre.jar" />
+			<fileset file="build/lib/tlmreader.jar" />
 			<fileset file="build/lib/Raspbian/32/libusb4java.jar" />
 		</copy>
 		
@@ -804,6 +807,7 @@
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/joda-time.jar" />
 			<fileset file="build/lib/guava-jre.jar" />
+			<fileset file="build/lib/tlmreader.jar" />
 			<fileset file="build/lib/GNULinux/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.gnulinux64.java.ext}" flatten="yes">
@@ -826,6 +830,7 @@
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/joda-time.jar" />
 			<fileset file="build/lib/guava-jre.jar" />
+			<fileset file="build/lib/tlmreader.jar" />
 			<fileset file="build/lib/GNULinux/64/libusb4java.jar" />
 		</copy>
 
@@ -902,6 +907,7 @@
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/joda-time.jar" />
 			<fileset file="build/lib/guava-jre.jar" />
+			<fileset file="build/lib/tlmreader.jar" />
 			<fileset file="build/lib/MAC/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.mac64.java.ext}" flatten="yes">
@@ -923,6 +929,7 @@
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/joda-time.jar" />
 			<fileset file="build/lib/guava-jre.jar" />
+			<fileset file="build/lib/tlmreader.jar" />
 			<fileset file="build/lib/MAC/64/libusb4java.jar" />
 		</copy>
 

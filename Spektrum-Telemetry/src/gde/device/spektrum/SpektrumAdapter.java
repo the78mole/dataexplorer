@@ -66,6 +66,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.menu.MenuToolBar;
 import gde.utils.FileUtils;
+import gde.utils.GPSHelper;
 import gde.utils.ObjectKeyCompliance;
 import gde.utils.StringHelper;
 import gde.utils.WaitTimer;
@@ -408,7 +409,7 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 														if (data instanceof StandardBlock) {
 															//System.out.println(((StandardBlock) data).toString());
 															//Standard 0=RPM St, 1=Volt St, 2=Temperature St, 3=dbm_A, 4=dbm_B
-															isResetMinMax[0] = mergeRawData(((StandardBlock) data).getMeasurementValues(), points, 0, 5, tmpRecordSet, isResetMinMax[0], 3);
+															isResetMinMax[0] = mergeRawData(((StandardBlock) data).getMeasurementValues(), points, 0, 5, tmpRecordSet, isResetMinMax[0], 2);
 														}
 														else if (data instanceof RxBlock) {
 															//System.out.println(((RxBlock) data).toString());
@@ -820,11 +821,73 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "for " + record.getName() + " in value = " + value + " out value = " + newValue); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return newValue;
 	}
+	
+
+	/**
+	 * function to calculate values for inactive records, data not readable from device
+	 */
+	public void calculateInactiveRecords(RecordSet recordSet) {
+		// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
+		// 10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+		// 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+		// 24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6,
+		// 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage,
+		// 43=LowestCellNumber, 44=Pressure, 45=Event G
+		// 46=Voltage E, 47=Current E, 48=Capacity E, 49=Power E, 50=Balance E, 51=CellVoltage E1, 52=CellVoltage E2 .... 64=CellVoltage E14,
+		// 65=Voltage E1, 66=Voltage E2, 67=Temperature E1, 68=Temperature E2 69=Revolution E 70=MotorTime 71=Speed 72=Event E
+		// 73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max,
+		// 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
+
+		// 73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
+		// 93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max,
+		// 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+		final int latOrdinal = 15, lonOrdinal = 16, altOrdinal = 10, distOrdinal = 18, tripOrdinal = 20;
+		Record recordLatitude = recordSet.get(latOrdinal);
+		Record recordLongitude = recordSet.get(lonOrdinal);
+		Record recordAlitude = recordSet.get(altOrdinal);
+		if (recordLatitude.hasReasonableData() && recordLongitude.hasReasonableData() && recordAlitude.hasReasonableData()) { // 13=Latitude,
+																																																													// 14=Longitude 9=Height
+			int recordSize = recordLatitude.realSize();
+			int startAltitude = recordAlitude.get(8); // using this as start point might be sense less if the GPS data has no 3D-fix
+			// check GPS latitude and longitude
+			int indexGPS = 0;
+			int i = 0;
+			for (; i < recordSize; ++i) {
+				if (recordLatitude.get(i) != 0 && recordLongitude.get(i) != 0) {
+					indexGPS = i;
+					++i;
+					break;
+				}
+			}
+			startAltitude = recordAlitude.get(indexGPS); // set initial altitude to enable absolute altitude calculation
+
+			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, startAltitude, distOrdinal, tripOrdinal);
+			// GPSHelper.calculateLabs(this, recordSet, latOrdinal, lonOrdinal, distOrdinal, tripOrdinal, 15);
+		}
+	}
 
 	@Override
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		if (recordSet != null) {
-			//calculateInactiveRecords(recordSet);
+			//Standard 0=RPM St, 1=Volt St, 2=Temperature St, 3=dbm_A, 4=dbm_B
+			//Rx	5=LostPacketsReceiver A, 6=LostPacketsReceiver B, 7=LostPacketsReceiver L, 8=LostPacketsReceiver R, 9=FrameLoss, 10=Holds, 11=VoltageRx
+			//Vario 12=Altitude V, 13=Climb V
+			//Altitude	14=Altitude A
+			//AltitudeZero 15=Altitude Offset
+			//Voltage 16=Voltage V
+			//Current 17=Current C
+			//Temperature 18=Temperature T
+			//AirSpeed 19=AirSpeed
+			//GPS	20=Altitude GPS, 21=Latitude, 22=Longitude, 23=Speed GPS, 24=Satellites GPS, 25=Course, 26=HDOP, 27=GPSFix, 28=Trip/UTC
+			//FlightPack 29=Current FPA, 30=Capacity FPA, 31=Temperature FPA, 32=Current FPB, 33=Capacity FPB, 34=Temperature FPB
+			//ESC 35=RPM ESC, 36=Voltage ESC, 37=TempFET ESC, 38=Current ESC, 39=CurrentBEC ESC, 40=VoltsBEC ESC, 41=Throttle ESC, 42=PowerOut ESC, 43=PowerIn ESC
+			//PowerBox 44=Voltage PB1, 45=Capacity PB1, 46=Voltage PB2, 47=Capacity PB2, 48=Alarms PB
+			//JetCat 49=RawECUStatus JC, 50=Throttle JC, 51=PackVoltage JC, 52=PumpVoltage JC, 53=RPM JC, 54=EGT JC, 55=RawOffCondition JC
+			//GForce 56=X GF, 57=Y GF, 58=Z GF, 59=Xmax GF, 60=Ymax GF, 61=Zmax GF, 62=Zmin GF
+			//Channel 63=Ch 1, ..., 70=Ch 8, ..., 82=Ch 20]
+			final int latOrdinal = 21, lonOrdinal = 22, altOrdinal = 20, tripOrdinal = 28;
+			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, -1, -1, tripOrdinal);
+
 			recordSet.syncScaleOfSyncableRecords();
 			this.updateVisibilityStatus(recordSet, true);
 			SpektrumAdapter.application.updateStatisticsData();

@@ -22,5 +22,6 @@
 	<classpathentry kind="lib" path="/build/lib/gson.jar"/>
 	<classpathentry kind="lib" path="/build/lib/guava-jre.jar"/>
 	<classpathentry kind="lib" path="/build/lib/joda-time.jar"/>
+	<classpathentry kind="lib" path="/build/lib/tlmreader.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
