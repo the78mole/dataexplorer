@@ -88,7 +88,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		String recordSetName = GDE.STRING_EMPTY;
 		String recordSetNameExtend = getRecordSetExtend(file);
 		Channel channel = null;
-		int channelNumber = HoTTbinReader2.pickerParameters.analyzer.getActiveChannel().getNumber();;
+		int channelNumber = HoTTbinReader2.pickerParameters.analyzer.getActiveChannel().getNumber();
 		device.getMeasurementFactor(channelNumber, 12);
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
