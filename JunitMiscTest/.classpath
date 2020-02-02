@@ -46,5 +46,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ArduPilot"/>
 	<classpathentry kind="lib" path="/build/lib/jaxb-api.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/LogView-Zero"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Robbe"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Spektrum-Telemetry"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
