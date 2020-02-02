@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2019 Winfried Bruegmann
+    Copyright (c) 2019,2020 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.logview;
 
