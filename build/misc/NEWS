@@ -1,34 +1,36 @@
-GNU DataExplorer - News - comes with version 3.4.0 - 10 Nov 2019
+GNU DataExplorer - News - comes with Version 3.4.1 - 03 Feb 2020
 
 Generic changes/fixes
-	* update launch4j Windows executable wrapper supporting java PATH entries in addition to registry
-	* enable secondary trigger to extend primary trigger range -> require XSD (XML schema definition) upgrade
-	* add additional comment placeholder for motor capacity for cases with sumByTriggerReferenceOrdinal.
+	* add control listener to handle size changes after modifying menu cool bar
+	* uniform build execution environment to Java 8 compatible byte code
+	* split build in OS dependent steps (future MAC OS does not support 32 bit makensis processing)
+	* update swt.jar for Linux 64 bit to fix webkit problems
+	* add time stamp of min/max value evaluated
+	* update swt.jar for available OS to support future Java versions (new SWT libs available for 64 bit only)
+	* update cell voltages for the known different cell types
+	* fix missing synchronization between cell voltages and active record set
 
 Device specific changes/fixes
-	* JetiAdapter - fix backward compatibility skipping sensor parameter without unit, result as missing measurement
-	* JetiAdapter - enhance Tx->Rx statistics
-	* GPS-Logger2 - enable secondary trigger definition for combinations with UL2 data (UniLog2 or UniSensE)
-	* HoTTAdapter2/D - enable selection of altitude/climb values source sensor *.log
-	* HoTTAdapter2 - enable secondary trigger range for GAM and ESC as example
-	* PolaronACDC - fix data capturing channel 2
-	* Open-Tx - enable log time step > 1000 msec 
-	* iChargerUSB* - enable additional special states used for internal data evaluation
-		
+	* LiPoWatch - adapt clear memory button position in device dialog for MAC OS X and Linux
+	* Robbe PowerPeak IV - initial implementation
+	* HoTTAdapter2 - reset min/max values while detecting valid values
+	* SpektrumCSV - add simple sample to be used with exports from TLM Viewer
+	* Spektrum-Telemetry - add initial implementation
+
 	
 Generelle Änderungen/Verbesserungen
-	* Aktualisierung des launch4j Windows Java-Starter-Anwendung, unterstützt nun Java Pfad Einträge zusätzlich zur Registry
-	* Ein sekundärer Trigger zur Erweiterung des primären Triggers ist jetzt erlaubt -> erfordert Aktualisierung des XSD (Geräte XML Schema)
-	* zusätzlicher Kommentar-Platzhalter für Fälle mit sumByTriggerReferenceOrdinal hinzugefügt
+    * Code hinzugefügt, der Änderungen der Größe der Menü-Cool-Bar überwacht
+    * Vereinheitlichung der Bau-Ausführungsumgebung zu zur Sicherstellung von Java 8 kompatiblen Bytecode
+    * Bauschritte wurden in Betriebssystem abhängige Stücke geteilt, makensis kann nicht mehr auf MAC OS ausgeführt werden
+    * Update swt.jar für Linux 64 Bit zur Behebung des Webkit-Problems
+    * Zeitstempel für die Berechnung von Min-/Max-Werten hinzugefügt
+    * Update swt.jar fÜr alle Betriebssysteme, um zukünftiges Java Versionen zu unterstützen (nur 64 Bit)
+    * Update Zellenspannungen für die bekannten Zellen-Typen
+    * Fehlende Synchronisation zwischen Zellenspannungen und aktivem Datensatz behoben
 
-Gerätespezifische Änderungen/Verbesserungen
-	* JetiAdapter - Rückwärtskompatibilität Sensorwerte ohne Einheit verbessert
-	* JetiAdapter - Verbesserte Tx->Rx Statistik
-	* GPS-Logger2 - Sekundärer Tigger beispielhaft für Kombinatinen mit UL2 Daten (UniLog2 or UniSensE) hinzugefügt
-	* HoTTAdapter2 - Auswahl Sensor für Höhen und Steigwerte ermöglicht für *.log
-	* HoTTAdapter2 - Sekundärer Trigger für ESC und GAM beispielhaft eingeführt
-	* PolaronACDC - Korrektur Datenaufnahme Kanal 2
-	* Open-Tx - Zeitschritte > 1000 msec ermöglicht, hier wurde kein zusammenhängendes Log erkannt 
-	* iChargerUSB* - Tolerierung spezieller Datenübermittlung für internen Gebrauch eingeführt
-	
-	
+Geräte spezifische Änderungen/Verbesserungen
+    * LiPoWatch - Knopfposition zum Löschen des Speichers für Linux/MacOS angepasst
+    * Robbe PowerPeak IV - initiale Unterstützung eingebaut
+    * HoTTAdapter2 - Zurücksetzen der Min-/Max-Werte bei Erkennung valider Messwerte eingebaut
+    * SpektrumCSV - einfaches Beispiel zum Import von Spektrum TLMViewer CSV-Exports eingebaut
+    * Spektrum-Telemetry - initiale Unterstützung eingebaut	
