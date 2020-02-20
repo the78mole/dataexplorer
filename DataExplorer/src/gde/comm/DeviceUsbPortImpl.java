@@ -63,6 +63,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 	boolean															isConnected			= false;
 	int																	asyncReceived		= 0;
 	boolean															isAsyncReceived	= false;
+	int																	endpointTransferType = LibUsb.TRANSFER_TYPE_INTERRUPT; //check interface descriptor
 
 	Set<UsbDevice>											usbDevices			= new HashSet<UsbDevice>();
 	Set<Device>													libUsbDevices		= new HashSet<Device>();
@@ -497,6 +498,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 			for (Device libUsbDevice : libUsbDevices) {
 				final ConfigDescriptor descriptor = new ConfigDescriptor();
         result = LibUsb.getConfigDescriptor(libUsbDevice, (byte) 0, descriptor);
+        LibUsb.freeConfigDescriptor(descriptor);
         if (result < 0) {
         	if (libUsbDeviceHandle != null) LibUsb.close(libUsbDeviceHandle);
 					log.log(Level.SEVERE, String.format("Unable to claim device: %s.", LibUsb.strError(result)));
@@ -693,7 +695,9 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
       buffer.put(data);      
       IntBuffer transferred = BufferUtils.allocateIntBuffer();
       
-      int result = LibUsb.bulkTransfer(handle, outEndpoint, buffer, transferred, timeout_ms);
+      int result = this.endpointTransferType == LibUsb.TRANSFER_TYPE_BULK 
+      		? LibUsb.bulkTransfer(handle, outEndpoint, buffer, transferred, timeout_ms)
+      				: LibUsb.interruptTransfer(handle, outEndpoint, buffer, transferred, timeout_ms);
       if (result != LibUsb.SUCCESS) {
       	switch (result) {
       	case LibUsb.ERROR_TIMEOUT:
@@ -724,7 +728,9 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
       ByteBuffer buffer = BufferUtils.allocateByteBuffer(data.length).order(ByteOrder.LITTLE_ENDIAN);
       IntBuffer transferred = BufferUtils.allocateIntBuffer();
       
-      int result = LibUsb.bulkTransfer(handle, inEndpoint, buffer, transferred, timeout_ms);
+      int result = this.endpointTransferType == LibUsb.TRANSFER_TYPE_BULK 
+      		? LibUsb.bulkTransfer(handle, inEndpoint, buffer, transferred, timeout_ms)
+      				: LibUsb.interruptTransfer(handle, inEndpoint, buffer, transferred, timeout_ms);
       if (result != LibUsb.SUCCESS) {
         readBytes = transferred.get();
         if (readBytes == 0 || readBytes != (buffer.get(0) & 0xFF))

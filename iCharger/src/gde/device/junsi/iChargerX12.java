@@ -22,44 +22,20 @@ import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBException;
 
-import gde.GDE;
 import gde.device.DeviceConfiguration;
 
 /**
- * Junsi iCharger X6 device class
+ * Junsi iCharger X8 device class
  * @author Winfried Brügmann
  */
-public class iChargerX6 extends iChargerUsb {
+public class iChargerX12 extends iChargerX6 {
 
-	public enum BatteryTypesX { //is different to iChargerUSB.BatteryTypesDuo
-		BT_UNKNOWN("?"), BT_LIPO("LiPo"), BT_LIIO("LiIo"), BT_LIFE("LiFe"), BT_LIHV("LiHV"), BT_LTO("LTO"), BT_NIMH("NiMH"), BT_NICD("NiCd"), BT_NIZN("NiZn"), BT_PB("PB"), BT_POWER("Power"), BT_USER("User"), BT_UNKNOWN_("?");
-
-		private String value;
-		
-		private BatteryTypesX(String newValue) {
-			value = newValue;
-		}
-		
-		protected String getName() {
-			return value;
-		}
-		
-		public static BatteryTypesX[] VALUES = values();
-		
-		public static String[] getValues() {
-			StringBuilder sb = new StringBuilder();
-			for (BatteryTypesX bt : BatteryTypesX.values()) 
-				sb.append(bt.value).append(GDE.CHAR_CSV_SEPARATOR);
-			return sb.toString().split(GDE.STRING_CSV_SEPARATOR);
-		}
-	};
-		
 	/**
 	 * @param deviceProperties
 	 * @throws FileNotFoundException
 	 * @throws JAXBException
 	 */
-	public iChargerX6(String deviceProperties) throws FileNotFoundException, JAXBException {
+	public iChargerX12(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		this.BATTERIE_TYPES = BatteryTypesX.getValues(); 
 	}
@@ -67,7 +43,7 @@ public class iChargerX6 extends iChargerUsb {
 	/**
 	 * @param deviceConfig
 	 */
-	public iChargerX6(DeviceConfiguration deviceConfig) {
+	public iChargerX12(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		this.BATTERIE_TYPES = BatteryTypesX.getValues(); 
 	}
@@ -78,6 +54,7 @@ public class iChargerX6 extends iChargerUsb {
 	 */
 	@Override
 	public int getNumberOfLithiumCells() {
-		return 6;
+		return 12;
 	}
+
 }

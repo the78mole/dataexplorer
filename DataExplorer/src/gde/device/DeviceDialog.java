@@ -73,6 +73,18 @@ public abstract class DeviceDialog extends Dialog {
 	};	
 
 	/**
+	 * default constructor for the dialog, in most cases this dialog should not modal  
+	 * @param parent
+	 * @param style
+	 */
+	public DeviceDialog(Shell parent, int style) {
+		super(parent, style);
+		this.application = DataExplorer.getInstance();
+		this.shellAlpha = Settings.getInstance().getDialogAlphaValue(); 
+		this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
+	}
+
+	/**
 	 * constructor for the dialog, in most cases this dialog should not modal  
 	 * @param parent
 	 */

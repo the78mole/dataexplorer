@@ -37,7 +37,7 @@ public class iChargerX8 extends iChargerX6 {
 	 */
 	public iChargerX8(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
-		this.BATTERIE_TYPE = BatteryTypesX.getValues(); 
+		this.BATTERIE_TYPES = BatteryTypesX.getValues(); 
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class iChargerX8 extends iChargerX6 {
 	 */
 	public iChargerX8(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
-		this.BATTERIE_TYPE = BatteryTypesX.getValues(); 
+		this.BATTERIE_TYPES = BatteryTypesX.getValues(); 
 	}
 
 	/**

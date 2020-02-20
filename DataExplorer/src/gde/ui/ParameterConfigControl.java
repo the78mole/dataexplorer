@@ -71,8 +71,8 @@ public class ParameterConfigControl {
 	 * @param sliderWidth
 	 * @param sliderMinValue
 	 * @param sliderMaxValue
-	 * @param sliderFactor
 	 * @param sliderOffset
+	 * @param isRounding
 	 */
 	public ParameterConfigControl(final Composite parent, final int[] valueArray, final int valueIndex, final String valueFormat, final String parameterName, final int nameWidth,
 			final String parameterDescription, final int descriptionWidth, final boolean isTextValueEditable, final int textFieldWidth, final int sliderWidth, final int sliderMinValue,
@@ -472,9 +472,14 @@ public class ParameterConfigControl {
 	}
 
 	public void updateTextFieldValues(final String[] textFiledValues) {
+		this.descriptionLabel.setText(String.join(",", textFiledValues));
 		this.textValues = textFiledValues;
 		this.slider.setMaximum(this.textValues.length < 10 ? 10 + this.textValues.length - 1 : this.textValues.length + 1);
 		this.value = ParameterConfigControl.this.slider.getSelection();
 		this.text.setText(this.textValues[ParameterConfigControl.this.value]);
+	}
+	
+	public void updateNameLabel(final String newNameText) {
+		this.nameLabel.setText(newNameText);
 	}
 }

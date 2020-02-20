@@ -45,6 +45,7 @@ import gde.device.FormatTypes;
 import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.device.MeasurementType;
+import gde.device.junsi.modbus.ChargerDialog;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.io.CSVSerialDataReaderWriter;
@@ -64,12 +65,14 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	protected boolean								isFileIO		= false;
 	protected boolean								isSerialIO	= false;
 	protected UsbGathererThread			dataGatherThread;
+	protected ChargerDialog		dialog;
+
 	protected String 								batteryType_1 = GDE.STRING_QUESTION_MARK;
 	protected String 								batteryType_2 = GDE.STRING_QUESTION_MARK;
 
 		
-	protected enum BatteryTypesDuo {
-		BT_UNKNOWN("?"), BT_LIPO("LiPo"), BT_LIIO("LiIo"), BT_LIFE("LiFe"), BT_NIMH("NiMH"), BT_NICD("NiCd"), BT_PB("PB"), BT_NIZN("NiZn"), BT_LIHV("LiHv"), BT_UNKNOWN_("?");
+	public enum BatteryTypesDuo {
+		BT_UNKNOWN("?"), BT_LIPO("LiPo"), BT_LIIO("LiIo"), BT_LIFE("LiFe"), BT_NIMH("NiMH"), BT_NICD("NiCd"), BT_PB("PB"), BT_NIZN("NiZn"), BT_LIHV("LiHV"), BT_UNKNOWN_("?");
 
 		private String value;
 		
@@ -81,7 +84,9 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			return value;
 		}
 		
-		protected static String[] getValues() {
+		public static BatteryTypesDuo[] VALUES = values();
+		
+		public static String[] getValues() {
 			StringBuilder sb = new StringBuilder();
 			for (BatteryTypesDuo bt : BatteryTypesDuo.values()) 
 				sb.append(bt.value).append(GDE.CHAR_CSV_SEPARATOR);
@@ -98,7 +103,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.BATTERIE_TYPE = BatteryTypesDuo.getValues(); 
+		this.BATTERIE_TYPES = BatteryTypesDuo.getValues(); 
  
 		if (this.application.getMenuToolBar() != null) {
 			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
@@ -115,6 +120,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		}
 		
 		this.usbPort = new iChargerUsbPort(this, this.application);
+		this.dialog = new ChargerDialog(this.application.getShell(), this);
 	}
 
 	/**
@@ -124,7 +130,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
 		Messages.setDeviceResourceBundle("gde.device.junsi.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
-		this.BATTERIE_TYPE = BatteryTypesDuo.getValues(); 
+		this.BATTERIE_TYPES = BatteryTypesDuo.getValues(); 
  
 		if (this.application.getMenuToolBar() != null) {
 			for (DataBlockType.Format format : this.getDataBlockType().getFormat()) {
@@ -141,6 +147,15 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		}
 		
 		this.usbPort = new iChargerUsbPort(this, this.application);
+		this.dialog = new ChargerDialog(this.application.getShell(), this);
+	}
+
+	/**
+	 * @return the device specific dialog instance
+	 */
+	@Override
+	public ChargerDialog getDialog() {
+		return this.dialog;
 	}
 
 	/**
@@ -208,6 +223,11 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			});
 		}
 	}
+	
+	public boolean isDeviceActive() {
+		return this.usbPort.isConnected() || (this.gathererThread != null && this.gathererThread.isAlive());
+	}
+	
 	/**
 	 * method toggle open close serial port or start/stop gathering data from device
 	 * if the device does not use serial port communication this place could be used for other device related actions which makes sense here
@@ -329,7 +349,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	 */
 	public String getBatteryType(final byte[] databuffer) throws DataInconsitsentException {
 		try {
-			return this.BATTERIE_TYPE[databuffer[8]];
+			return this.BATTERIE_TYPES[databuffer[8]];
 		}
 		catch (Exception e) {
 			throw new DataInconsitsentException("could not detect battery type !");

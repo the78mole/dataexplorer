@@ -60,7 +60,19 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	protected   		iChargerSerialPort						serialPort;
 	protected final Channels											channels;
 	protected       GathererThread								gathererThread;
-	protected String[]														BATTERIE_TYPE;
+	protected String[]														BATTERIE_TYPES;
+
+	/**
+	 * @param batTypeName LiPo, LiIo, LiFe,...
+	 * @return index according device specific enumeration
+	 */
+	public int getBatTypeIndex(String batTypeName) {	
+		for (int i=0; i<this.BATTERIE_TYPES.length; ++i) {
+			if (this.BATTERIE_TYPES[i].toLowerCase().equals(batTypeName.toLowerCase()))
+				return i;
+		}
+		return -1;
+	}
 
 	/**
 	 * constructor using properties file
