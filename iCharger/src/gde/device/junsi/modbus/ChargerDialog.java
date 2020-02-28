@@ -36,6 +36,7 @@ import gde.config.Settings;
 import gde.data.Channels;
 import gde.device.DeviceDialog;
 import gde.device.IDevice;
+import gde.device.junsi.iCharger4010DUO;
 import gde.device.junsi.iChargerUsb;
 import gde.device.junsi.iChargerX6;
 import gde.exception.TimeOutException;
@@ -46,20 +47,34 @@ import gde.ui.DataExplorer;
 import gde.ui.ParameterConfigControl;
 
 public class ChargerDialog extends DeviceDialog {
-	final static Logger		log				= Logger.getLogger(ChargerDialog.class.getName());
+	final static Logger								log													= Logger.getLogger(ChargerDialog.class.getName());
 	static Handler										logHandler;
-	static Logger														rootLogger;
-	
-	protected Shell			dialogShell;
+	static Logger											rootLogger;
 
-	final IDevice			device;
-	final static Channels	channels	= Channels.getInstance();
-	final static Settings	settings	= Settings.getInstance();
-	private ChargerUsbPort	usbPort = null;
-	private ChargerMemory selectedProgramMemory = null;
-	private ChargerMemory copiedProgramMemory = null;
-	private int lastSelectedProgramMemoryIndex;
-	byte[] memoryHeadIndex = new byte[ChargerMemoryHead.LIST_MEM_MAX];
+	protected Shell										dialogShell;
+
+	final IDevice											device;
+	final static Channels							channels										= Channels.getInstance();
+	final static Settings							settings										= Settings.getInstance();
+	private ChargerUsbPort						usbPort											= null;
+	private ChargerMemory							selectedProgramMemory				= null;
+	private ChargerMemory							copiedProgramMemory					= null;
+	private int												lastSelectedProgramMemoryIndex;
+	byte[]														memoryHeadIndex							= new byte[ChargerMemoryHead.LIST_MEM_MAX];
+
+	private Button										btnAdd, btnCopy, btnEdit, btnWrite, btnDelete;
+	private Button										btnCharge, btnStorage, btnDischarge, btnCycle, btnBalance, btnStop;
+	private Group											grpProgramMemory, grpBalancerSettings, grpAdvancedRestoreSettings, grpChargeSaftySettings, grpDischargeSaftySettings;
+	private Composite									chargeComposite, dischargeComposite, storageComposite, cycleComposite;
+	private CTabItem									tbtmStorage;
+	private CTabFolder								tabFolder;
+
+	private ParameterConfigControl[]	memoryParameters						= new ParameterConfigControl[50];																													// battery type, number cells, capacity
+	private final String							cellTypeNames;
+	private final String[]						cellTypeNamesArray;
+	private int[]											memoryValues								= new int[50];																																						//values to be used for modifying sliders
+	private final boolean							isDuo;
+	final Listener										memoryParameterChangeListener;
 
 	final static short		REG_INPUT_INFO_START				= 0x0000;
 	//final short REG_INPUT_INFO_NREGS 
@@ -79,21 +94,6 @@ public class ChargerDialog extends DeviceDialog {
 	final static short		REG_HOLDING_MEM_HEAD_NREGS	= (short) ((ChargerMemoryHead.getSize() + 1) / 2);
 
 	final static short		REG_HOLDING_MEM_START				= (short) 0x8c00;
-
-	private Button btnAdd, btnCopy, btnEdit, btnWrite, btnDelete;
-	private Button btnCharge, btnStorage, btnDischarge, btnCycle, btnBalance, btnStop;
-	private Group grpProgramMemory, grpBalancerSettings, grpAdvancedRestoreSettings, grpChargeSaftySettings, grpDischargeSaftySettings;
-	private Composite chargeComposite, dischargeComposite, storageComposite, cycleComposite;
-	private CTabItem tbtmStorage;
-	private CTabFolder tabFolder;
-	
-	private ParameterConfigControl[]	memoryParameters					= new ParameterConfigControl[50]; // battery type, number cells, capacity
-	private final String			cellTypeNames;
-	private final String[]			cellTypeNamesArray;
-	private int[]	memoryValues = new int[50]; //values to be used for modifying sliders
-	private final boolean isDuo;
-	final Listener						memoryParameterChangeListener;
-
 
 	final static short VALUE_ORDER_KEY	=	0x55aa;
 
@@ -138,49 +138,50 @@ public class ChargerDialog extends DeviceDialog {
 			initLogger();
 			Display display = Display.getDefault();
 			Shell dialogShell = new Shell(display);
-			iChargerX6 device = new iChargerX6("c:\\Users\\Winfried\\AppData\\Roaming\\DataExplorer\\Devices\\iCharger406DUO.xml"); //$NON-NLS-1$
+			iChargerUsb device = new iCharger4010DUO("c:\\Users\\Winfried\\AppData\\Roaming\\DataExplorer\\Devices\\iCharger406DUO.xml"); //$NON-NLS-1$
+			boolean isDuo = true; //X6 = false
 			ChargerDialog inst = new ChargerDialog(dialogShell, device);
 			inst.open();
-//			ModbusUsbPort usbPort = new ModbusUsbPort(device, null);
-//			if (usbPort != null && !usbPort.isConnected()) 
-//				usbPort.openMbUsbPort();
-//			
-//			if (usbPort != null && usbPort.isConnected()) {
-//				//Read system setup data
-//				//MasterRead(0,REG_HOLDING_SYS_START,(sizeof(SYSTEM)+1)/2,(BYTE *)&System)		
-////				short sizeSystem = (short) ((ModbusSystem.getSize() + 1) / 2);
-////				byte[] systemBuffer = new byte[sizeSystem*2];
-////				usbPort.masterRead((byte) 0, REG_HOLDING_SYS_START, sizeSystem, systemBuffer);
-////				log.log(Level.INFO, new ModbusSystem(systemBuffer).toString());
-//				
-//				//Read memory structure of original and added/modified program memories
-//				//MasterWrite(REG_HOLDING_MEM_HEAD_START,(sizeof(MEM_HEAD)+1)/2,(BYTE *)&MemHead)
-//				short sizeMemHead = (short) ((ModbusMemHead.getSize() + 1) / 2);
-//				byte[] memHeadBuffer = new byte[sizeMemHead*2];
-//				usbPort.masterRead((byte) 0, REG_HOLDING_MEM_HEAD_START, sizeMemHead, memHeadBuffer);
-//				ModbusMemHead memHead = new ModbusMemHead(memHeadBuffer);
-//				log.log(Level.INFO, memHead.toString());
-//				
-//				for (int i = 0; i < memHead.getCount(); ++i) {
-//					//Read charger program memory after write index selection
-//					//MasterWrite(REG_SEL_MEM,1,(BYTE *)&Index) != MB_EOK
-//					byte[] index = new byte[2];
-//					index[0] = memHead.getIndex()[i];
-//					log.log(Level.INFO, String.format("select mem index %d", DataParser.parse2Short(index[0], index[1])));
-//					usbPort.masterWrite(Register.REG_SEL_MEM.value, (short)1, index);
-//					
-//					//MasterRead(0,REG_HOLDING_MEM_START,(sizeof(MEMORY)+1)/2,(BYTE *)&Memory) == MB_EOK
-//					short sizeMemory = (short) ((ModbusMemory.getSize() + 1) / 2);
-//					byte[] memoryBuffer = new byte[sizeMemory*2];
-//					usbPort.masterRead((byte) 0, REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
-//					log.log(Level.INFO, String.format("%02d %s", memHead.getIndex()[i], new ModbusMemory(memoryBuffer).getUseFlagAndName()));
-////				log.log(Level.INFO, new ModbusMemory(memoryBuffer).toString());
-//				}
-//				
-//			}
-//			
-//			if (usbPort != null && usbPort.isConnected()) 
-//				usbPort.closeMbUsbPort();
+			ChargerUsbPort usbPort = new ChargerUsbPort(device, null);
+			if (usbPort != null && !usbPort.isConnected()) 
+				usbPort.openMbUsbPort();
+			
+			if (usbPort != null && usbPort.isConnected()) {
+				//Read system setup data
+				//MasterRead(0,REG_HOLDING_SYS_START,(sizeof(SYSTEM)+1)/2,(BYTE *)&System)		
+				short sizeSystem = (short) ((ChargerSystem.getSize() + 1) / 2);
+				byte[] systemBuffer = new byte[sizeSystem*2];
+				usbPort.masterRead((byte) 0, REG_HOLDING_SYS_START, sizeSystem, systemBuffer);
+				log.log(Level.INFO, new ChargerSystem(systemBuffer).toString());
+				
+				//Read memory structure of original and added/modified program memories
+				//MasterWrite(REG_HOLDING_MEM_HEAD_START,(sizeof(MEM_HEAD)+1)/2,(BYTE *)&MemHead)
+				short sizeMemHead = (short) ((ChargerMemoryHead.getSize() + 1) / 2);
+				byte[] memHeadBuffer = new byte[sizeMemHead*2];
+				usbPort.masterRead((byte) 0, REG_HOLDING_MEM_HEAD_START, sizeMemHead, memHeadBuffer);
+				ChargerMemoryHead memHead = new ChargerMemoryHead(memHeadBuffer);
+				log.log(Level.INFO, memHead.toString());
+				
+				for (int i = 0; i < memHead.getCount(); ++i) {
+					//Read charger program memory after write index selection
+					//MasterWrite(REG_SEL_MEM,1,(BYTE *)&Index) != MB_EOK
+					byte[] index = new byte[2];
+					index[0] = memHead.getIndex()[i];
+					log.log(Level.INFO, String.format("select mem index %d", DataParser.parse2Short(index[0], index[1])));
+					usbPort.masterWrite(Register.REG_SEL_MEM.value, (short)1, index);
+					
+					//MasterRead(0,REG_HOLDING_MEM_START,(sizeof(MEMORY)+1)/2,(BYTE *)&Memory) == MB_EOK
+					short sizeMemory = (short) ((ChargerMemory.getSize(true) + 1) / 2);
+					byte[] memoryBuffer = new byte[sizeMemory*2];
+					usbPort.masterRead((byte) 0, REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
+					log.log(Level.INFO, String.format("%02d %s", memHead.getIndex()[i], new ChargerMemory(memoryBuffer, isDuo).getUseFlagAndName()));
+					log.log(Level.INFO, new ChargerMemory(memoryBuffer, isDuo).toString(isDuo));
+				}
+				
+			}
+			
+			if (usbPort != null && usbPort.isConnected()) 
+				usbPort.closeMbUsbPort();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -387,13 +388,13 @@ public class ChargerDialog extends DeviceDialog {
 						}
 						break;
 					case 8: // charge cut temperature
-						selectedProgramMemory.setSafetyTempC((byte) ChargerDialog.this.memoryValues[8]);
+						selectedProgramMemory.setSafetyTempC((short) (ChargerDialog.this.memoryValues[8] * 10));
 						break;
 					case 9: // charge max charge
-						selectedProgramMemory.setSafetyCapC((byte) ChargerDialog.this.memoryValues[9]);
+						selectedProgramMemory.setSafetyCapC((short) ChargerDialog.this.memoryValues[9]);
 						break;
 					case 10: // charge parameter balancer difference
-						selectedProgramMemory.setSafetyTimeC((byte) ChargerDialog.this.memoryValues[10]);
+						selectedProgramMemory.setSafetyTimeC((short) ChargerDialog.this.memoryValues[10]);
 						break;
 					case 11: // charge parameter balancer
 						selectedProgramMemory.setBalSpeed((byte) ChargerDialog.this.memoryValues[11]);
@@ -732,7 +733,7 @@ public class ChargerDialog extends DeviceDialog {
 		byte[] index = new byte[2];
 		index[0] = (byte) (selectedProgramMemoryIndex & 0xFF);
 		
-		if ((this.isDuo && selectedProgramMemoryIndex < 8) || selectedProgramMemoryIndex < 10) {
+		if ((this.isDuo && selectedProgramMemoryIndex < 7) || (!isDuo && selectedProgramMemoryIndex < 10)) {
 			log.log(Level.SEVERE, String.format("Wrong program memory index = %d", selectedProgramMemoryIndex));
 			this.application.openMessageDialog(dialogShell, "Wrong entry selected, writing program memory of \"BUILD IN\" not supported");
 			return;

@@ -1426,7 +1426,7 @@ public class ChargerMemory {
 		}
 		
 		//8 charge safety temp cut
-		values[8] = (int)this.getSafetyTempC();
+		values[8] = (int)this.getSafetyTempC() / 10;
 		//9 charge max capacity
 		values[9] = (int)this.getSafetyCapC();
 		//10 charge max time
