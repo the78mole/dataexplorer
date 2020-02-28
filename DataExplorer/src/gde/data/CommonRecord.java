@@ -296,7 +296,7 @@ public abstract class CommonRecord extends AbstractRecord {
 	 * @param time_ms
 	 * @return two index values around the given time
 	 */
-	private int[] findBoundingIndexes(double time_ms) {
+	protected int[] findBoundingIndexes(double time_ms) {
 		int[] indexs = this.timeStep_ms == null ? this.parent.timeStep_ms.findBoundingIndexes(time_ms) : this.timeStep_ms.findBoundingIndexes(time_ms);
 		if (this.elementCount > 0) {
 			indexs[0] = indexs[0] > this.elementCount - 1 ? this.elementCount - 1 : indexs[0];
