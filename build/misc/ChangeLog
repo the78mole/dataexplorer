@@ -4,7 +4,7 @@ Version 3.4.2 - xx yyy 2020
 Generic changes/fixes
 	*
 Device specific changes/fixes
-	* iCharger X6/X8/S6/406Duo - enable program memory control by device dialog 
+	* iChargerUSB - enable program memory control
 
 Version 3.4.1 - 03 Feb 2020
 Generic changes/fixes
