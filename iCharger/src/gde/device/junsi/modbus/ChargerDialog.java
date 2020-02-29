@@ -230,7 +230,6 @@ public class ChargerDialog extends DeviceDialog {
 		System.arraycopy(tmpNamesArray, 1, this.cellTypeNamesArray, 0, this.cellTypeNamesArray.length);		
 		this.cellTypeNames = String.join(", ", this.cellTypeNamesArray); //$NON-NLS-1$
 		this.memoryParameterChangeListener = addProgramMemoryChangedListener();
-		this.readSystem();
 	}
 
 	private Listener addProgramMemoryChangedListener() {
@@ -963,7 +962,6 @@ public class ChargerDialog extends DeviceDialog {
 		System.arraycopy(tmpNamesArray, 1, this.cellTypeNamesArray, 0, this.cellTypeNamesArray.length);		
 		this.cellTypeNames = String.join(", ", this.cellTypeNamesArray); //$NON-NLS-1$
 		this.memoryParameterChangeListener = addProgramMemoryChangedListener();
-		this.readSystem();
 	}
 
 	/**
@@ -971,6 +969,9 @@ public class ChargerDialog extends DeviceDialog {
 	 * @return the result
 	 */
 	public void open() {
+		if (SWT.CANCEL == application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI2602))) 
+			return;
+		this.readSystem();
 		createContents();
 		dialogShell.setLocation(300,  50);
 		dialogShell.open();
@@ -1433,8 +1434,8 @@ public class ChargerDialog extends DeviceDialog {
 		FormData fd_grpRunProgram = new FormData();
 		fd_grpRunProgram.left = new FormAttachment(0, 10);
 		fd_grpRunProgram.right = new FormAttachment(100, -180);
-		fd_grpRunProgram.top = new FormAttachment(100, -75);
-		fd_grpRunProgram.bottom = new FormAttachment(100, -20);
+		fd_grpRunProgram.top = new FormAttachment(100, -65);
+		fd_grpRunProgram.bottom = new FormAttachment(100, -10);
 		grpRunProgram.setLayoutData(fd_grpRunProgram);
 		grpRunProgram.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2686)); //$NON-NLS-1$
 
@@ -1544,7 +1545,7 @@ public class ChargerDialog extends DeviceDialog {
 		
 		Button btnClose = new Button(mainComposite, SWT.NONE);
 		FormData fd_btnCancel = new FormData();
-		fd_btnCancel.bottom = new FormAttachment(100, -25);
+		fd_btnCancel.bottom = new FormAttachment(100, -15);
 		fd_btnCancel.right = new FormAttachment(100, -10);
 		fd_btnCancel.left = new FormAttachment(100, -150);
 		btnClose.setLayoutData(fd_btnCancel);

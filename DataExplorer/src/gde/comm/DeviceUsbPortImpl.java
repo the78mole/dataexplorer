@@ -451,7 +451,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 		DeviceHandle libUsbDeviceHandle = new DeviceHandle();
 		byte ifaceId = activeDevice.getUsbInterface();
 
-		if (log.isLoggable(Level.INFO)) {
+		if (log.isLoggable(Level.FINE)) {
 			dumpLibUsbDevices();
 		}
 		
