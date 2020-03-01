@@ -64,7 +64,8 @@ public class ChargerDialog extends DeviceDialog {
 	private int												lastSelectedProgramMemoryIndex;
 	byte[]														memoryHeadIndex							= new byte[ChargerMemoryHead.LIST_MEM_MAX];
 
-	private Button										btnAdd, btnCopy, btnEdit, btnWrite, btnDelete;
+	private CCombo 										combo;
+	private Button										btnCopy, btnEdit, btnWrite, btnDelete;
 	private Button										btnCharge, btnStorage, btnDischarge, btnCycle, btnBalance, btnStop;
 	private Group											grpProgramMemory, grpBalancerSettings, grpAdvancedRestoreSettings, grpChargeSaftySettings, grpDischargeSaftySettings;
 	private Composite									chargeComposite, dischargeComposite, storageComposite, cycleComposite;
@@ -238,6 +239,13 @@ public class ChargerDialog extends DeviceDialog {
 			public void handleEvent(Event evt) {
 				if (selectedProgramMemory != null) {
 					btnWrite.setEnabled(true);
+					String changedProgramMemoryText = combo.getText().trim();
+					if (changedProgramMemoryText.contains(" - ")) { //$NON-NLS-1$
+	 					changedProgramMemoryText = changedProgramMemoryText.substring(changedProgramMemoryText.lastIndexOf(" - ")+3); //$NON-NLS-1$
+					}
+					combo.setText(lastSelectedProgramMemoryIndex + Messages.getString(MessageIds.GDE_MSGT2625) + changedProgramMemoryText);		 //$NON-NLS-1$
+					combo.setForeground(application.COLOR_RED);
+
 					switch (evt.index) {
 					case 0: //battery type, disabled can be changed by selection in drop down only
 					default:
@@ -728,8 +736,9 @@ public class ChargerDialog extends DeviceDialog {
 	 * this method will update the useFlag to 0x55AA to differentiate to build in memories
 	 * @param selectedProgramMemoryIndex the index of the selected program memory according memory head structure
 	 * @param modifiedProgramMemory the modified program memory class
+	 * @param useFlag 0x0000 for BUILD IN or 0x55aa for CUSTOM 
 	 */
-	private void writeProgramMemory(final int selectedProgramMemoryIndex, ChargerMemory modifiedProgramMemory) {
+	private void writeProgramMemory(final int selectedProgramMemoryIndex, ChargerMemory modifiedProgramMemory, short useFlag) {
 		short sizeMemory = (short) ((ChargerMemory.getSize(isDuo) + 1) / 2);
 		byte[] index = new byte[2];
 		index[0] = (byte) (selectedProgramMemoryIndex & 0xFF);
@@ -745,8 +754,10 @@ public class ChargerDialog extends DeviceDialog {
 
 			usbPort.masterWrite(Register.REG_SEL_MEM.value, (short) 1, index);
 
-			modifiedProgramMemory.setUseFlag((short) 0x55aa);
+			if (modifiedProgramMemory.getUseFlag() != useFlag)
+				modifiedProgramMemory.setUseFlag(useFlag);
 			log.log(Level.OFF, String.format("Program memory name = %s", new String(modifiedProgramMemory.getName()).trim())); //$NON-NLS-1$
+			log.log(Level.OFF, String.format("Program memory useFlag = 0x04X", modifiedProgramMemory.getUseFlag())); //$NON-NLS-1$
 			log.log(Level.OFF, "write using memory buffer length " + sizeMemory * 2); //$NON-NLS-1$
 			//modifiedProgramMemory.setLiCell((byte) ((iChargerUsb) device).getNumberOfLithiumCells());
 			//System.arraycopy(new String("Space Pro 4S 2200mAh").getBytes(), 0, modifiedProgramMemory, 2, "Space Pro 4S 2200mAh".length());
@@ -1018,8 +1029,8 @@ public class ChargerDialog extends DeviceDialog {
 		fd_grpMemory.left = new FormAttachment(0, 10);
 		grpProgramMemory.setLayoutData(fd_grpMemory);
 		
-		CCombo combo = new CCombo(grpProgramMemory, SWT.BORDER);
-		combo.setLayoutData(new RowData(300, 23));
+		combo = new CCombo(grpProgramMemory, SWT.BORDER);
+		combo.setLayoutData(new RowData(350, 23));
 		combo.setItems(((iChargerUsb)device).isDeviceActive() ? new String[] {Messages.getString(MessageIds.GDE_MSGT2624)} : this.getProgramMemories()); //$NON-NLS-1$
 		combo.select(0);
 		combo.setBackground(application.COLOR_WHITE);
@@ -1034,14 +1045,13 @@ public class ChargerDialog extends DeviceDialog {
 				lastSelectedProgramMemoryIndex = memoryHeadIndex[combo.getSelectionIndex()];
 				if (combo.getText().contains("BUILD IN")) { //$NON-NLS-1$
 					btnCopy.setEnabled(true);
-					//btnEdit.setEnabled(true); //enable line to fix corrupted memory
 				}
 				else {
 					btnCopy.setEnabled(false);
-					btnEdit.setEnabled(true);
 					btnDelete.setEnabled(true);
 				}
-				btnAdd.setEnabled(false);
+				//btnEdit.setEnabled(true); //enable line to fix corrupted memory
+				btnEdit.setEnabled(combo.getText().contains("CUSTOM"));
 			}
 		});
 		combo.addKeyListener(new KeyAdapter() {
@@ -1074,30 +1084,15 @@ public class ChargerDialog extends DeviceDialog {
 			public void widgetSelected(SelectionEvent e) {
 				combo.setForeground(application.COLOR_RED);
 				copiedProgramMemory = new ChargerMemory(selectedProgramMemory, isDuo);
-				btnAdd.setEnabled(true);
-			}
-		});
-		
-		btnAdd = new Button(grpProgramMemory, SWT.NONE);
-		btnAdd.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2628)); //$NON-NLS-1$
-		btnAdd.setLayoutData(new RowData(70, SWT.DEFAULT));
-		btnAdd.setText(Messages.getString(MessageIds.GDE_MSGT2629)); //$NON-NLS-1$
-		btnAdd.setEnabled(false);
-		btnAdd.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (copiedProgramMemory != null) {
-					String batteryType = new String(copiedProgramMemory.getName()).trim();
-					copiedProgramMemory.setName(batteryType + Messages.getString(MessageIds.GDE_MSGT2620)); //$NON-NLS-1$
-					short newIndex = addEntryMemoryHead(batteryType);
-					writeProgramMemory(newIndex, copiedProgramMemory);
-					copiedProgramMemory = null;
-				}
+				String batteryType = new String(copiedProgramMemory.getName()).trim();
+				copiedProgramMemory.setName(batteryType + Messages.getString(MessageIds.GDE_MSGT2620)); //$NON-NLS-1$
+				short newIndex = addEntryMemoryHead(batteryType);
+				writeProgramMemory(newIndex, copiedProgramMemory, (short) 0x55aa);
+				copiedProgramMemory = null;
 				combo.setForeground(application.COLOR_BLACK);
 				combo.setItems(getProgramMemories());
 				combo.select(0);
 				combo.notifyListeners(SWT.Selection, new Event());				
-				btnAdd.setEnabled(false);
 			}
 		});
 		
@@ -1122,7 +1117,7 @@ public class ChargerDialog extends DeviceDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (selectedProgramMemory != null)
-					writeProgramMemory(lastSelectedProgramMemoryIndex, selectedProgramMemory);
+					writeProgramMemory(lastSelectedProgramMemoryIndex, selectedProgramMemory, selectedProgramMemory.getUseFlag());
 				combo.setForeground(application.COLOR_BLACK);
 				combo.setItems(getProgramMemories());
 				combo.select(0);
@@ -1428,19 +1423,22 @@ public class ChargerDialog extends DeviceDialog {
 	
 
 		Group grpRunProgram = new Group(mainComposite, SWT.NONE);
-		fd_tabFolder.bottom = new FormAttachment(grpRunProgram, -6);
+		fd_tabFolder.bottom = new FormAttachment(grpRunProgram, -5);
 		grpRunProgram.setText(Messages.getString(MessageIds.GDE_MSGT2685)); //$NON-NLS-1$
-		grpRunProgram.setLayout(new FillLayout(SWT.HORIZONTAL));
+		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
+		rowLayout.justify = true;
+		grpRunProgram.setLayout(rowLayout);
 		FormData fd_grpRunProgram = new FormData();
 		fd_grpRunProgram.left = new FormAttachment(0, 10);
-		fd_grpRunProgram.right = new FormAttachment(100, -180);
+		fd_grpRunProgram.right = new FormAttachment(100, -170);
 		fd_grpRunProgram.top = new FormAttachment(100, -65);
-		fd_grpRunProgram.bottom = new FormAttachment(100, -10);
+		fd_grpRunProgram.bottom = new FormAttachment(100, -5);
 		grpRunProgram.setLayoutData(fd_grpRunProgram);
 		grpRunProgram.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2686)); //$NON-NLS-1$
 
 		
 		btnCharge = new Button(grpRunProgram, SWT.NONE);
+		btnCharge.setLayoutData(new RowData(85, SWT.DEFAULT));
 		btnCharge.setText(Messages.getString(MessageIds.GDE_MSGT2687)); //$NON-NLS-1$
 		btnCharge.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1458,6 +1456,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 		
 		btnStorage = new Button(grpRunProgram, SWT.NONE);
+		btnStorage.setLayoutData(new RowData(85, SWT.DEFAULT));
 		btnStorage.setText(Messages.getString(MessageIds.GDE_MSGT2688)); //$NON-NLS-1$
 		btnStorage.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1475,6 +1474,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 		
 		btnDischarge = new Button(grpRunProgram, SWT.NONE);
+		btnDischarge.setLayoutData(new RowData(85, SWT.DEFAULT));
 		btnDischarge.setText(Messages.getString(MessageIds.GDE_MSGT2689)); //$NON-NLS-1$
 		btnDischarge.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1492,6 +1492,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 		
 		btnCycle = new Button(grpRunProgram, SWT.NONE);
+		btnCycle.setLayoutData(new RowData(85, SWT.DEFAULT));
 		btnCycle.setText(Messages.getString(MessageIds.GDE_MSGT2690)); //$NON-NLS-1$
 		btnCycle.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1509,6 +1510,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 		
 		btnBalance = new Button(grpRunProgram, SWT.NONE);
+		btnBalance.setLayoutData(new RowData(85, SWT.DEFAULT));
 		btnBalance.setText(Messages.getString(MessageIds.GDE_MSGT2691)); //$NON-NLS-1$
 		btnBalance.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1526,6 +1528,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 		
 		btnStop = new Button(grpRunProgram, SWT.NONE);
+		btnStop.setLayoutData(new RowData(85, SWT.DEFAULT));
 		btnStop.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2692)); //$NON-NLS-1$
 		btnStop.setText(Messages.getString(MessageIds.GDE_MSGT2693)); //$NON-NLS-1$
 		btnStop.setEnabled(false);
@@ -1545,7 +1548,7 @@ public class ChargerDialog extends DeviceDialog {
 		
 		Button btnClose = new Button(mainComposite, SWT.NONE);
 		FormData fd_btnCancel = new FormData();
-		fd_btnCancel.bottom = new FormAttachment(100, -15);
+		fd_btnCancel.bottom = new FormAttachment(100, -12);
 		fd_btnCancel.right = new FormAttachment(100, -10);
 		fd_btnCancel.left = new FormAttachment(100, -150);
 		btnClose.setLayoutData(fd_btnCancel);
@@ -1557,6 +1560,7 @@ public class ChargerDialog extends DeviceDialog {
 				dialogShell.dispose();
 			}
 		}); 
+		combo.notifyListeners(SWT.Selection, new Event());
 	}
 
 	private void createStorageTabItem(CTabFolder tabFolder) {
