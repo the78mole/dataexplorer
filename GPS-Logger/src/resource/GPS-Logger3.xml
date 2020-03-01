@@ -31,14 +31,14 @@
             <Measurement>
                 <name>latitude</name>
                 <symbol>B</symbol>
-                <unit>°</unit>
+                <unit>° '</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>longitude</name>
                 <symbol>L</symbol>
-                <unit>°</unit>
+                <unit>° '</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
@@ -358,14 +358,14 @@
             <Measurement>
                 <name>latitude</name>
                 <symbol>B</symbol>
-                <unit>°</unit>
+                <unit>° '</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>longitude</name>
                 <symbol>L</symbol>
-                <unit>°</unit>
+                <unit>° '</unit>
                 <active>false</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
