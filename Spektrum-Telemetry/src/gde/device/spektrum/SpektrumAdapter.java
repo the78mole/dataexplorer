@@ -586,7 +586,8 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 				record.setDisplayable(measurement.isActive());
 				if (SpektrumAdapter.log.isLoggable(java.util.logging.Level.FINE)) SpektrumAdapter.log.log(java.util.logging.Level.FINE, "switch " + record.getName() + " to " + measurement.isActive()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			if (includeReasonableDataCheck) {
+			if (includeReasonableDataCheck && !(record.getOrdinal() == 9 || record.getOrdinal() == 10)) {
+				//Rx	5=LostPacketsReceiver A, 6=LostPacketsReceiver B, 7=LostPacketsReceiver L, 8=LostPacketsReceiver R, 9=FrameLoss, 10=Holds, 11=VoltageRx
 				record.setDisplayable(measurement.isActive() && record.hasReasonableData());
 				if (SpektrumAdapter.log.isLoggable(java.util.logging.Level.FINE)) SpektrumAdapter.log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData " + record.hasReasonableData()); //$NON-NLS-1$
 			}

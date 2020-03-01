@@ -6,6 +6,7 @@ Generic changes/fixes
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control
 	* GPS_Logger* - fix latitude, longitude unit which caused display problem while activated
+	* Spektrum-Telemetry - make frame loss and holds always visible, even no reasonable data
 
 Version 3.4.1 - 03 Feb 2020
 Generic changes/fixes
