@@ -237,7 +237,7 @@ public class ChargerDialog extends DeviceDialog {
 		return new Listener() {
 			@Override
 			public void handleEvent(Event evt) {
-				if (selectedProgramMemory != null) {
+				if (selectedProgramMemory != null && selectedProgramMemory.getUseFlag() == (short)0x55aa) {
 					btnWrite.setEnabled(true);
 					String changedProgramMemoryText = combo.getText().trim();
 					if (changedProgramMemoryText.contains(" - ")) { //$NON-NLS-1$
@@ -1560,7 +1560,6 @@ public class ChargerDialog extends DeviceDialog {
 				dialogShell.dispose();
 			}
 		}); 
-		combo.notifyListeners(SWT.Selection, new Event());
 	}
 
 	private void createStorageTabItem(CTabFolder tabFolder) {
