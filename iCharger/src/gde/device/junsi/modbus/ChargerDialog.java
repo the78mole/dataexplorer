@@ -1039,10 +1039,12 @@ public class ChargerDialog extends DeviceDialog {
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
 				combo.setForeground(application.COLOR_BLACK);
-				initProgramMemory(memoryHeadIndex[combo.getSelectionIndex()]);
-				memoryValues = selectedProgramMemory.getMemoryValues(memoryValues, isDuo);
-				updateMemoryParameterControls();
-				lastSelectedProgramMemoryIndex = memoryHeadIndex[combo.getSelectionIndex()];
+				if (memoryHeadIndex[combo.getSelectionIndex()] >= 0) {
+					initProgramMemory(memoryHeadIndex[combo.getSelectionIndex()]);
+					memoryValues = selectedProgramMemory.getMemoryValues(memoryValues, isDuo);
+					updateMemoryParameterControls();
+					lastSelectedProgramMemoryIndex = memoryHeadIndex[combo.getSelectionIndex()];
+				}
 				if (combo.getText().contains("BUILD IN")) { //$NON-NLS-1$
 					btnCopy.setEnabled(true);
 				}
