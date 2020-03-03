@@ -2,7 +2,8 @@ Development history / change log, please read from bottom up
 
 Version 3.4.2 - xx yyy 2020
 Generic changes/fixes
-	*
+	* fix cell voltage dialog adjusting value position
+	
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control
 	* GPS_Logger* - fix latitude, longitude unit which caused display problem while activated
