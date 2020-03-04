@@ -237,8 +237,32 @@ public class UsbGathererThread extends Thread {
 						stopDataGatheringThread(false, e);
 					}
 					else if (e instanceof IllegalStateException) { //USB error detected, p.e. disconnect
-						this.application.setStatusMessage(Messages.getString(gde.messages.MessageIds.GDE_MSGE0050));
-						stopDataGatheringThread(false, e);
+						UsbGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
+						this.application.setStatusMessage(e.getMessage(), SWT.COLOR_RED);
+						try {
+							if (this.libUsbHandle != null) {
+								this.device.usbPort.closeLibUsbPort(this.libUsbHandle);
+								UsbGathererThread.log.log(Level.FINE, "USB interface closed");
+							}
+						}
+						catch (UsbException eClose) {
+							UsbGathererThread.log.log(Level.SEVERE, eClose.getMessage(), eClose);
+						}
+
+						for (int i = 0; i < 5; i++) {
+							try {
+								WaitTimer.delay(500);
+								if (!this.usbPort.isConnected()) {
+									UsbGathererThread.log.log(Level.WARNING, "USB error recovery, reopen USB port");
+									this.libUsbHandle = null;
+									this.libUsbHandle = this.device.usbPort.openLibUsbPort(this.device);
+									this.isPortOpenedByLiveGatherer = true;
+								}
+							}
+							catch (UsbException eOpen) {
+								UsbGathererThread.log.log(Level.SEVERE, eOpen.getMessage(), eOpen);
+							}
+						}
 					}
 					// program end or unexpected exception occurred, stop data gathering to enable save data by user
 					else {

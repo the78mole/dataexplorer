@@ -203,7 +203,10 @@ public class ChargerDialog extends DeviceDialog {
 			log.log(Level.INFO, new ChargerSystem(systemBuffer).toString());
 		}
 		catch (UsbException | IllegalStateException | TimeOutException e) {
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		catch (RuntimeException rte) {
+			log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
 		finally {
 			if (usbPort != null && usbPort.isConnected()) try {
@@ -683,7 +686,10 @@ public class ChargerDialog extends DeviceDialog {
 			if (e instanceof UsbException) {
 				application.openMessageDialogAsync(e.getMessage());
 			}
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		catch (RuntimeException rte) {
+			log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
 		finally {
 			if (usbPort != null && usbPort.isConnected()) try {
@@ -718,7 +724,10 @@ public class ChargerDialog extends DeviceDialog {
 			log.log(Level.OFF, this.selectedProgramMemory.toString(isDuo));
 		}
 		catch (UsbException | IllegalStateException | TimeOutException e) {
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		catch (RuntimeException rte) {
+			log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
 		finally {
 			if (usbPort != null && usbPort.isConnected()) try {
@@ -766,7 +775,10 @@ public class ChargerDialog extends DeviceDialog {
 			transOrder((byte) Order.ORDER_WRITE_MEM.ordinal());
 		}
 		catch (UsbException | IllegalStateException | TimeOutException e) {
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		catch (RuntimeException rte) {
+			log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
 		finally {
 			if (usbPort != null && usbPort.isConnected()) try {
@@ -856,7 +868,10 @@ public class ChargerDialog extends DeviceDialog {
 			if (ex instanceof UsbException) {
 				application.openMessageDialogAsync(ex.getMessage());
 			}
-			ex.printStackTrace();
+			log.log(Level.SEVERE, ex.getMessage(), ex);
+		}
+		catch (RuntimeException rte) {
+			log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
 		finally {
 			if (usbPort != null && usbPort.isConnected()) try {
@@ -911,7 +926,10 @@ public class ChargerDialog extends DeviceDialog {
 			if (e instanceof UsbException) {
 				application.openMessageDialogAsync(e.getMessage());
 			}
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		catch (RuntimeException rte) {
+			log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
 		finally {
 			if (usbPort != null && usbPort.isConnected()) try {
@@ -945,7 +963,10 @@ public class ChargerDialog extends DeviceDialog {
 			if (e instanceof UsbException) {
 				application.openMessageDialogAsync(e.getMessage());
 			}
-			e.printStackTrace();
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		catch (RuntimeException rte) {
+			log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
 		finally {
 			if (usbPort != null && usbPort.isConnected()) try {
