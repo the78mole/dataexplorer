@@ -25,10 +25,9 @@ import javax.usb.UsbException;
 
 import org.usb4java.DeviceHandle;
 
-import gde.comm.DeviceCommPort;
-import gde.comm.IDeviceCommPort;
 import gde.device.IDevice;
 import gde.device.InputTypes;
+import gde.device.junsi.iChargerUsbPort;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.ui.DataExplorer;
@@ -36,18 +35,12 @@ import gde.ui.DataExplorer;
 /**
  * @author Winfried Brügmann
  */
-public class ChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
+public class ChargerUsbPort extends iChargerUsbPort {
 	final static String					$CLASS_NAME														= ChargerUsbPort.class.getName();
 	final static Logger					log																		= Logger.getLogger($CLASS_NAME);
 
-	// The communication timeout in milliseconds, 500ms is the smallest interval
-	public final static long		TIMEOUT_MS														= 500;
-
 	protected final IDevice			activeDevice;
 	protected final int					dataSize;
-	protected final byte				interfaceId;
-	protected final byte				endpointIn;
-	protected final byte				endpointOut;
 	protected DeviceHandle			libUsbHandle;
 
 	protected final static byte	MB_HID_PROTOCOL_ID										= 0x30;
@@ -125,9 +118,6 @@ public class ChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		super(currentDevice, currentApplication);
 		this.activeDevice = currentDevice;
 		this.dataSize = this.deviceConfig.getDataBlockSize(InputTypes.SERIAL_IO);
-		this.interfaceId = this.device.getUsbInterface();
-		this.endpointIn = this.device.getUsbEndpointIn();
-		this.endpointOut = this.device.getUsbEndpointOut();
 	}
 
 	public void openMbUsbPort() throws UsbClaimException, UsbException {
@@ -138,10 +128,6 @@ public class ChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 	public void closeMbUsbPort() throws UsbClaimException, UsbException {
 		log.log(Level.INFO, "closeMbUsbPort");
 		closeLibUsbPort(this.libUsbHandle);
-	}
-
-	public long getTimeOut_ms() {
-		return TIMEOUT_MS;
 	}
 
 	ModBusErrorCode masterRead(byte readType, short regStart, short regCount, byte[] pOut) throws IllegalStateException, TimeOutException {
@@ -174,6 +160,7 @@ public class ChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 			inBuf[2] = 0;
 			inBuf[3] = (byte) (regCount % READ_REG_COUNT_MAX);
 
+			log.log(Level.OFF, String.format("indexOut = %d", indexOut));
 			ret = masterModBus(funCode, inBuf, pOut, indexOut, TIMEOUT_MS);
 			if (ret != ModBusErrorCode.MB_EOK) return ret;
 		}
@@ -218,7 +205,7 @@ public class ChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		return ret;
 	}
 
-	ModBusErrorCode masterModBus(byte funCode, byte[] pIn, byte[] pOut, int outIndex, long ms) throws IllegalStateException, TimeOutException {
+	ModBusErrorCode masterModBus(byte funCode, byte[] pIn, byte[] pOut, int outIndex, long timeOut_ms) throws IllegalStateException, TimeOutException {
 		int i;
 		byte[] hidBuf = new byte[HID_PACK_MAX];
 		//hidBuf[HID_PACK_CH] = REPORT_ID;
@@ -253,11 +240,11 @@ public class ChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		//read system junk 2: [64] 07 30 03 84 1E 00 1D 20 01 F4 00 64 00 02 00 10 00 10 00 0A 00 00 00 00 00 00 00 01 00 01 00 01 00 01 00 05 00 05 00 05 00 05 00 00 00 00 03 E8 00 00 00 5A 01 C2 04 4C 00 00 00 91 00 64 04 4C
 		//read memory junk 1: [64] 07 30 03 8C 00 00 1E
 		//log.log(Level.OFF, "write " + StringHelper.byte2Hex2CharString(hidBuf, hidBuf.length));
-		this.write(libUsbHandle, this.endpointIn, hidBuf, TIMEOUT_MS);
+		this.write(libUsbHandle, this.endpointIn, hidBuf, timeOut_ms);
 		//if(JsHID.Write(hidBuf,HID_PACK_MAX+1)==FALSE)return ModBusErrorCode.MB_EIO;
 		//rece
 		//hidBuf[HID_PACK_CH] = REPORT_ID;
-		this.read(libUsbHandle, this.endpointOut, hidBuf, TIMEOUT_MS);
+		this.read(libUsbHandle, this.endpointOut, hidBuf, timeOut_ms);
 		//read system junk 1: [64] 40 30 03 3C 00 00 03 20 01 F4 00 64 00 02 00 10 00 10 00 0A 00 00 00 00 00 00 00 01 00 01 00 01 00 01 00 05 00 05 00 05 00 05 00 00 00 00 03 E8 00 00 00 5A 01 C2 04 4C 00 00 00 91 00 64 04 4C
 		//read system junk 2: [64] 3E 30 03 3A 00 00 00 00 00 5A 01 C2 04 4C 00 00 00 91 00 64 04 4C 00 00 00 00 00 5A 01 C2 04 4C 00 00 00 91 00 64 04 4C 00 00 00 00 00 5A 01 C2 04 4C 00 00 00 91 00 64 04 4C 00 00 00 00 04 4C
 		//log.log(Level.OFF, "read  " + StringHelper.byte2Hex2CharString(hidBuf, hidBuf.length));

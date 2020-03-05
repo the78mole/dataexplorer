@@ -150,6 +150,8 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		this.dialog = new ChargerDialog(this.application.getShell(), this);
 	}
 
+	public iChargerUsbPort getUsbPort() { return this.usbPort; };
+	
 	/**
 	 * @return the device specific dialog instance
 	 */
@@ -580,6 +582,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
 	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
 	 */
+	@Override
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();

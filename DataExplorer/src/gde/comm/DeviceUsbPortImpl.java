@@ -269,7 +269,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 						}
 						String[] descriptorStringArray = descriptor.dump(handle).split("\\n");
 						for (String descriptorString : descriptorStringArray) {
-							if (productString == null || (descriptorString.contains("iProduct") && descriptorString.contains(productString))) 
+							if ((descriptorString.contains("iProduct") && descriptorString.contains(productString))) 
 								libUsbDevices.add(device);
 						}
 					}
@@ -308,7 +308,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 		log.log(Level.INFO, "Use UsbHostManager.getUsbServices()\n");
 		UsbServices services = UsbHostManager.getUsbServices();
 		UsbHub hub = services.getRootUsbHub();
-		findUsbDevices((UsbHub) hub);
+		findUsbDevices(hub);
 	}
 
 	/**
@@ -412,17 +412,17 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 		
 		byte ifaceId = activeDevice.getUsbInterface();
 		UsbInterface usbInterface = null;
-		Set<UsbDevice> usbDevices = findUsbDevices(activeDevice.getUsbVendorId(), activeDevice.getUsbProductId());
-		if (usbDevices.size() == 0) {
+		Set<UsbDevice> myLsbDevices = findUsbDevices(activeDevice.getUsbVendorId(), activeDevice.getUsbProductId());
+		if (myLsbDevices.size() == 0) {
 			this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGE0050));
-		} else if (usbDevices.size() == 1) {
-			for (UsbDevice usbDevice : usbDevices) {
+		} else if (myLsbDevices.size() == 1) {
+			for (UsbDevice usbDevice : myLsbDevices) {
 				if (usbDevice == null) 
 					throw new UsbException(Messages.getString(gde.messages.MessageIds.GDE_MSGE0050));
 				usbInterface = claimUsbInterface(usbDevice, ifaceId);
 			}
 		} else {
-			for (UsbDevice usbDevice : usbDevices) {
+			for (UsbDevice usbDevice : myLsbDevices) {
 				UsbInterface tmpUsbInterface = ((UsbConfiguration) usbDevice.getUsbConfigurations().get(0)).getUsbInterface(ifaceId);
 				if (tmpUsbInterface!= null && !(tmpUsbInterface.isActive() || tmpUsbInterface.isClaimed())) {
 					usbInterface = claimUsbInterface(usbDevice, ifaceId);
@@ -461,12 +461,12 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
         throw new LibUsbException("Unable to initialize libusb", result);
     }
 
-		Set<Device> libUsbDevices = findDevices(activeDevice.getUsbVendorId(), activeDevice.getUsbProductId(), activeDevice.getUsbProductString());
-		if (libUsbDevices.size() == 0) {
+		Set<Device> myLibUsbDevices = findDevices(activeDevice.getUsbVendorId(), activeDevice.getUsbProductId(), activeDevice.getUsbProductString());
+		if (myLibUsbDevices.size() == 0) {
 			throw new UsbException(String.format("%s\n===>>>  %s", Messages.getString(MessageIds.GDE_MSGE0050), activeDevice.getUsbProductString()));
 		}
-		else if (libUsbDevices.size() == 1) {
-			for (Device libUsbDevice : libUsbDevices) {
+		else if (myLibUsbDevices.size() == 1) {
+			for (Device libUsbDevice : myLibUsbDevices) {
 				if (libUsbDevice == null) throw new UsbException(Messages.getString(gde.messages.MessageIds.GDE_MSGE0050));
 				result = LibUsb.open(libUsbDevice, libUsbDeviceHandle);
 				if (result < 0) {
@@ -495,7 +495,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 			}
 		}
 		else {
-			for (Device libUsbDevice : libUsbDevices) {
+			for (Device libUsbDevice : myLibUsbDevices) {
 				final ConfigDescriptor descriptor = new ConfigDescriptor();
         result = LibUsb.getConfigDescriptor(libUsbDevice, (byte) 0, descriptor);
         LibUsb.freeConfigDescriptor(descriptor);

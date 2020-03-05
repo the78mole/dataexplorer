@@ -106,7 +106,7 @@ public class DeviceCommPort implements IDeviceCommPort {
 		}
 		else this.port = null;
 		
-		DeviceCommPort.staticPort = (IDeviceCommPort) this.port;
+		DeviceCommPort.staticPort = this.port;
 	}
 	
 	/**
@@ -134,7 +134,7 @@ public class DeviceCommPort implements IDeviceCommPort {
 		}
 		else this.port = null;
 
-		DeviceCommPort.staticPort = (IDeviceCommPort) this.port;
+		DeviceCommPort.staticPort = this.port;
 	}
 
 	/**

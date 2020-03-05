@@ -1292,7 +1292,7 @@ public class ChargerMemory {
 	
 	public int[] getMemoryValues(final int[] values, final boolean isDuo) {
 		
-		values[0] = (int)this.getType(); //0 battery type
+		values[0] = this.getType(); //0 battery type
 		
 		if (isDuo) {
 			switch (this.getType()) { //LiPo,LiLo,LiFe,NiMH,Nicd,Pb
@@ -1300,17 +1300,17 @@ public class ChargerMemory {
 			case 1: //LiIo
 			case 2: //LiFe
 			case 7: //LiHV
-				values[1] = (int) this.getLiCell(); //1 cell count
+				values[1] = this.getLiCell(); //1 cell count
 				break;
 			case 3: //NiMH
 			case 4: //NiCd
-				values[1] = (int) this.getNiCell(); //1 cell count
+				values[1] = this.getNiCell(); //1 cell count
 				break;
 			case 5: //Pb
-				values[1] = (int) this.getPbCell(); //1 cell count
+				values[1] = this.getPbCell(); //1 cell count
 				break;
 			case 6: //NiZn
-				values[1] = (int) this.getNiZnCell(); //1 cell count
+				values[1] = this.getNiZnCell(); //1 cell count
 				break;
 			default: //unknown
 				values[1] = 0; //1 cell count
@@ -1324,17 +1324,17 @@ public class ChargerMemory {
 			case 2: //LiFe
 			case 3: //LiHV
 			case 4: //LTO
-				values[1] = (int) this.getLiCell(); //1 cell count
+				values[1] = this.getLiCell(); //1 cell count
 				break;
 			case 5: //NiMH
 			case 6: //NiCd
-				values[1] = (int) this.getNiCell(); //1 cell count
+				values[1] = this.getNiCell(); //1 cell count
 				break;
 			case 7: //NiZn
-				values[1] = (int) this.getNiZnCell(); //1 cell count
+				values[1] = this.getNiZnCell(); //1 cell count
 				break;
 			case 8: //Pb
-				values[1] = (int) this.getPbCell(); //1 cell count
+				values[1] = this.getPbCell(); //1 cell count
 				break;
 			default: //Power
 				values[1] = 0; //1 cell count
@@ -1342,46 +1342,46 @@ public class ChargerMemory {
 			}
 		}
 		
-		values[2] = (int)this.getCapacity(); //2 capacity
+		values[2] = this.getCapacity(); //2 capacity
 		
 		//3 charge parameter current
-		values[3] = (int)this.getChargeCurrent() * 10;
+		values[3] = this.getChargeCurrent() * 10;
 		//5 charge parameter balancer Li Setup
-		values[5] = (int)this.getLiBalEndMode(); //end current OFF, detect balancer ON,...
+		values[5] = this.getLiBalEndMode(); //end current OFF, detect balancer ON,...
 		//6 charge parameter end current
-		values[6] = (int)this.getEndCharge();
+		values[6] = this.getEndCharge();
 		//4 charge parameter modus normal,balance,external,reflex 
 		//7 charge parameter cell voltage
 		if (isDuo) {
 			switch (this.getType()) { //LiPo,LiLo,LiFe,NiMH,Nicd,Pb
 			case 0: //LiPo
-				values[4] = (int)this.getLiModeC(); 
-				values[7] = (int)this.getLiPoChgCellVolt(); 
+				values[4] = this.getLiModeC(); 
+				values[7] = this.getLiPoChgCellVolt(); 
 				break;
 			case 1: //LiIo
-				values[4] = (int)this.getLiModeC(); 
-				values[7] = (int)this.getLiIoChgCellVolt(); 
+				values[4] = this.getLiModeC(); 
+				values[7] = this.getLiIoChgCellVolt(); 
 				break;
 			case 2: //LiFe
-				values[4] = (int)this.getLiModeC(); 
-				values[7] = (int)this.getLiFeChgCellVolt(); 
+				values[4] = this.getLiModeC(); 
+				values[7] = this.getLiFeChgCellVolt(); 
 				break;
 			case 3: //NiMH
 			case 4: //NiCd
-				values[4] = (int)this.getNiModeC(); 
+				values[4] = this.getNiModeC(); 
 				values[7] = 0; 
 				break;
 			case 5: //Pb
-				values[4] = (int)this.getPbModeC(); 
+				values[4] = this.getPbModeC(); 
 				values[7] = 0;
 				break;
 			case 6: //NiZn
-				values[4] = (int)this.getNiModeC(); 
-				values[7] = (int) this.getNiZnChgCellVolt();
+				values[4] = this.getNiModeC(); 
+				values[7] = this.getNiZnChgCellVolt();
 				break;
 			case 7: //LiHV
-				values[4] = (int)this.getLiModeC(); 
-				values[7] = (int)this.getLiHVChgCellVolt(); 
+				values[4] = this.getLiModeC(); 
+				values[7] = this.getLiHVChgCellVolt(); 
 				break;
 			default: 
 				values[7] = 0; 
@@ -1391,33 +1391,33 @@ public class ChargerMemory {
 		else {
 			switch (this.getType()) { //LiPo,LiLo,LiFe,NiMH,Nicd,Pb
 			case 0: //LiPo
-				values[4] = (int)this.getLiModeC(); 
-				values[7] = (int)this.getLiPoChgCellVolt(); 
+				values[4] = this.getLiModeC(); 
+				values[7] = this.getLiPoChgCellVolt(); 
 				break;
 			case 1: //LiIo
-				values[4] = (int)this.getLiModeC(); 
-				values[7] = (int)this.getLiIoChgCellVolt(); 
+				values[4] = this.getLiModeC(); 
+				values[7] = this.getLiIoChgCellVolt(); 
 				break;
 			case 2: //LiFe
-				values[4] = (int)this.getLiModeC(); 
-				values[7] = (int)this.getLiFeChgCellVolt(); 
+				values[4] = this.getLiModeC(); 
+				values[7] = this.getLiFeChgCellVolt(); 
 				break;
 			case 3: //LiHV
-				values[4] = (int)this.getLiModeC(); 
-				values[7] = (int)this.getLiHVChgCellVolt();
+				values[4] = this.getLiModeC(); 
+				values[7] = this.getLiHVChgCellVolt();
 				break;
 			case 4: //LTO
-				values[4] = (int)this.getLiModeC(); 
-				values[7] = (int)this.getLtoChgCellVolt();
+				values[4] = this.getLiModeC(); 
+				values[7] = this.getLtoChgCellVolt();
 				break;
 			case 5: //NiMH
 			case 6: //NiCd
-				values[4] = (int)this.getNiModeC(); 
+				values[4] = this.getNiModeC(); 
 				values[7] = 0; 
 				break;
 			case 7: //NiZn
-				values[4] = (int)this.getNiModeC(); 
-				values[7] = (int) this.getNiZnChgCellVolt(); 
+				values[4] = this.getNiModeC(); 
+				values[7] = this.getNiZnChgCellVolt(); 
 				break;
 			default: 
 				values[7] = 0; 
@@ -1426,71 +1426,71 @@ public class ChargerMemory {
 		}
 		
 		//8 charge safety temp cut
-		values[8] = (int)this.getSafetyTempC() / 10;
+		values[8] = this.getSafetyTempC() / 10;
 		//9 charge max capacity
-		values[9] = (int)this.getSafetyCapC();
+		values[9] = this.getSafetyCapC();
 		//10 charge max time
-		values[10] = (int)this.getSafetyTimeC();
+		values[10] = this.getSafetyTimeC();
 
 		//11 charge parameter balancer
-		values[11] = (int)this.getBalSpeed();
+		values[11] = this.getBalSpeed();
 		//12 charge parameter balancer start
-		values[12] = (int)this.getBalStartMode();
+		values[12] = this.getBalStartMode();
 		//13 charge parameter balancer difference
-		values[13] = (int)this.getBalDiff();
+		values[13] = this.getBalDiff();
 		//14 charge parameter balancer target
-		values[14] = (int)this.getBalSetPoint();
+		values[14] = this.getBalSetPoint();
 		//15 charge parameter balancer over charge
-		values[15] = (int)this.getBalOverPoint();
+		values[15] = this.getBalOverPoint();
 		//16 charge parameter balancer delay
-		values[16] = (int)this.getBalDelay();
+		values[16] = this.getBalDelay();
 
 		//17 discharge parameter current
-		values[17] = (int)this.getDischargeCurrent() * 10;
+		values[17] = this.getDischargeCurrent() * 10;
 		//19 discharge end current
-		values[19] = (int)this.getEndDischarge();
+		values[19] = this.getEndDischarge();
 		//20 regenerative mode 
-		values[20] = (int)this.getRegDchgMode();
+		values[20] = this.getRegDchgMode();
 		//18 discharge parameter cell voltage
 		//21 discharge extra
 		//22 discharge balancer
 		if (isDuo) {
 			switch (this.getType()) { //LiPo,LiLo,LiFe,NiMH,Nicd,Pb
 			case 0: //LiPo
-				values[18] = (int)this.getLiPoDchgCellVolt();
-				values[21] = (int)(this.getLiModeD() & 0x01);
-				values[22] = (int)(this.getLiModeD() >> 1);
+				values[18] = this.getLiPoDchgCellVolt();
+				values[21] = this.getLiModeD() & 0x01;
+				values[22] = this.getLiModeD() >> 1;
 				break;
 			case 1: //LiIo
-				values[18] = (int)this.getLiIoDchgCellVolt();
-				values[21] = (int)(this.getLiModeD() & 0x01);
-				values[22] = (int)(this.getLiModeD() >> 1);
+				values[18] = this.getLiIoDchgCellVolt();
+				values[21] = this.getLiModeD() & 0x01;
+				values[22] = this.getLiModeD() >> 1;
 				break;
 			case 2: //LiFe
-				values[18] = (int)this.getLiFeDchgCellVolt();
-				values[21] = (int)(this.getLiModeD() & 0x01);
-				values[22] = (int)(this.getLiModeD() >> 1);
+				values[18] = this.getLiFeDchgCellVolt();
+				values[21] = this.getLiModeD() & 0x01;
+				values[22] = this.getLiModeD() >> 1;
 				break;
 			case 3: //NiMH
 			case 4: //NiCd
-				values[18] = (int)this.getNiDischargeVolt();
-				values[21] = (int)(this.getNiModeD() & 0x01);
-				values[22] = (int)(this.getNiModeD() >> 1);
+				values[18] = this.getNiDischargeVolt();
+				values[21] = this.getNiModeD() & 0x01;
+				values[22] = this.getNiModeD() >> 1;
 				break;
 			case 5: //Pb
-				values[18] = (int)this.getPbDchgCellVolt();
-				values[21] = (int)(this.getPbModeD() & 0x01);
-				values[22] = (int)(this.getPbModeD() >> 1);
+				values[18] = this.getPbDchgCellVolt();
+				values[21] = this.getPbModeD() & 0x01;
+				values[22] = this.getPbModeD() >> 1;
 				break;
 			case 6: //NiZn
-				values[18] = (int)this.getNiZnDchgCellVolt();
-				values[21] = (int)(this.getLiModeD() & 0x01);
-				values[22] = (int)(this.getLiModeD() >> 1);
+				values[18] = this.getNiZnDchgCellVolt();
+				values[21] = this.getLiModeD() & 0x01;
+				values[22] = this.getLiModeD() >> 1;
 				break;
 			case 7: //LiHV
-				values[18] = (int)this.getLiHVDchgCellVolt();
-				values[21] = (int)(this.getLiModeD() & 0x01);
-				values[22] = (int)(this.getLiModeD() >> 1);
+				values[18] = this.getLiHVDchgCellVolt();
+				values[21] = this.getLiModeD() & 0x01;
+				values[22] = this.getLiModeD() >> 1;
 				break;
 			default: 
 				values[18] = 0;
@@ -1502,45 +1502,45 @@ public class ChargerMemory {
 		else {
 			switch (this.getType()) { //LiPo,LiLo,LiFe,NiMH,Nicd,Pb
 			case 0: //LiPo
-				values[18] = (int)this.getLiPoDchgCellVolt();
-				values[21] = (int)(this.getLiModeD() & 0x01);
-				values[22] = (int)(this.getLiModeD() >> 1);
+				values[18] = this.getLiPoDchgCellVolt();
+				values[21] = this.getLiModeD() & 0x01;
+				values[22] = this.getLiModeD() >> 1;
 				break;
 			case 1: //LiIo
-				values[18] = (int)this.getLiIoDchgCellVolt();
-				values[21] = (int)(this.getLiModeD() & 0x01);
-				values[22] = (int)(this.getLiModeD() >> 1);
+				values[18] = this.getLiIoDchgCellVolt();
+				values[21] = this.getLiModeD() & 0x01;
+				values[22] = this.getLiModeD() >> 1;
 				break;
 			case 2: //LiFe
-				values[18] = (int)this.getLiFeDchgCellVolt();
-				values[21] = (int)(this.getLiModeD() & 0x01);
-				values[22] = (int)(this.getLiModeD() >> 1);
+				values[18] = this.getLiFeDchgCellVolt();
+				values[21] = this.getLiModeD() & 0x01;
+				values[22] = this.getLiModeD() >> 1;
 				break;
 			case 3: //LiHV
-				values[18] = (int)this.getLiHVDchgCellVolt();
-				values[21] = (int)(this.getLiModeD() & 0x01);
-				values[22] = (int)(this.getLiModeD() >> 1);
+				values[18] = this.getLiHVDchgCellVolt();
+				values[21] = this.getLiModeD() & 0x01;
+				values[22] = this.getLiModeD() >> 1;
 				break;
 			case 4: //LTO
-				values[18] = (int)this.getLtoDchgCellVolt();
-				values[21] = (int)(this.getLiModeD() & 0x01);
-				values[22] = (int)(this.getLiModeD() >> 1);
+				values[18] = this.getLtoDchgCellVolt();
+				values[21] = this.getLiModeD() & 0x01;
+				values[22] = this.getLiModeD() >> 1;
 				break;
 			case 5: //NiMH
 			case 6: //NiCd
-				values[18] = (int)this.getNiDischargeVolt();
-				values[21] = (int)(this.getNiModeD() & 0x01);
-				values[22] = (int)(this.getNiModeD() >> 1);
+				values[18] = this.getNiDischargeVolt();
+				values[21] = this.getNiModeD() & 0x01;
+				values[22] = this.getNiModeD() >> 1;
 				break;
 			case 7: //NiZn
-				values[18] = (int)this.getNiZnDchgCellVolt();
-				values[21] = (int)(this.getLiModeD() & 0x01);
-				values[22] = (int)(this.getLiModeD() >> 1);
+				values[18] = this.getNiZnDchgCellVolt();
+				values[21] = this.getLiModeD() & 0x01;
+				values[22] = this.getLiModeD() >> 1;
 				break;
 			case 8: //Pb
-				values[18] = (int)this.getPbDchgCellVolt();
-				values[21] = (int)(this.getPbModeD() & 0x01);
-				values[22] = (int)(this.getPbModeD() >> 1);
+				values[18] = this.getPbDchgCellVolt();
+				values[21] = this.getPbModeD() & 0x01;
+				values[22] = this.getPbModeD() >> 1;
 				break;
 			default: 
 				values[18] = 0;
@@ -1550,11 +1550,11 @@ public class ChargerMemory {
 			}
 		}
 		//23 discharge parameter cut temperature
-		values[23] = (int)(this.getSafetyTempD() / 10);
+		values[23] = this.getSafetyTempD() / 10;
 		//24 discharge parameter max discharge capacity
-		values[24] = (int)this.getSafetyCapD();
+		values[24] = this.getSafetyCapD();
 		//25 discharge parameter safety timer
-		values[25] = (int)this.getSafetyTimeD();
+		values[25] = this.getSafetyTimeD();
 
 		//26 Ni charge voltage drop
 		values[26] = this.getNiPeak();

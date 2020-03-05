@@ -20,6 +20,7 @@ public class ChargerMemoryHead {
 		}
 	}
 	
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.getClass().getSimpleName()).append(" : \n");
