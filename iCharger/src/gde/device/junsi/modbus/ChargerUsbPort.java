@@ -147,6 +147,7 @@ public class ChargerUsbPort extends iChargerUsbPort {
 			inBuf[1] = (byte) (regStart & 0xff);
 			inBuf[2] = 0;
 			inBuf[3] = READ_REG_COUNT_MAX;
+			log.log(Level.OFF, String.format("transfer data length = %d indexOut = %d", inBuf[3], indexOut));
 			ret = masterModBus(funCode, inBuf, pOut, indexOut, TIMEOUT_MS);
 			if (ret != ModBusErrorCode.MB_EOK) 
 				return ret;
@@ -159,8 +160,7 @@ public class ChargerUsbPort extends iChargerUsbPort {
 			inBuf[1] = (byte) (regStart & 0xff);
 			inBuf[2] = 0;
 			inBuf[3] = (byte) (regCount % READ_REG_COUNT_MAX);
-
-			log.log(Level.OFF, String.format("indexOut = %d", indexOut));
+			log.log(Level.OFF, String.format("transfer data length = %d indexOut = %d", inBuf[3], indexOut));
 			ret = masterModBus(funCode, inBuf, pOut, indexOut, TIMEOUT_MS);
 			if (ret != ModBusErrorCode.MB_EOK) return ret;
 		}
@@ -232,7 +232,7 @@ public class ChargerUsbPort extends iChargerUsbPort {
 		default:
 			return ModBusErrorCode.MB_EILLFUNCTION;
 		}
-		//copy from pD
+		//copy from pIn
 		for (i = 0; i < hidBuf[HID_PACK_LEN-1] - 3; i++)
 			hidBuf[HID_PACK_MODBUS + i] = pIn[i];
 
@@ -259,7 +259,8 @@ public class ChargerUsbPort extends iChargerUsbPort {
 				if ((hidBuf[HID_PACK_LEN-1] != hidBuf[HID_PACK_MODBUS] + 4) || (hidBuf[HID_PACK_LEN-1] & 0x01) != 0) 
 					return ModBusErrorCode.MB_ELEN;
 				//copy to pOut
-				for (i = 0; i < hidBuf[HID_PACK_MODBUS]; i += 2) {
+				log.log(Level.OFF, String.format("copy to pOut data length = %d", hidBuf[HID_PACK_MODBUS]));
+				for (i = 0; i < hidBuf[HID_PACK_MODBUS] && i + outIndex < pOut.length; i += 2) {
 					pOut[i + outIndex] = hidBuf[HID_PACK_MODBUS + 1 + i + 1];
 					pOut[i + 1 + outIndex] = hidBuf[HID_PACK_MODBUS + 1 + i];
 				}
