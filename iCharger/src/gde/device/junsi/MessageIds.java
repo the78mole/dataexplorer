@@ -27,6 +27,7 @@ public class MessageIds {
 	public final static String	GDE_MSGE2600 = "GDE_MSGE2600";
 	public final static String	GDE_MSGW2600 = "GDE_MSGW2600";
 	public final static String	GDE_MSGW2601 = "GDE_MSGW2601";
+	public final static String	GDE_MSGW2602 = "GDE_MSGW2602";
 	public final static String	GDE_MSGI2600 = "GDE_MSGI2600";
 	public final static String	GDE_MSGI2601 = "GDE_MSGI2601";
 	public final static String	GDE_MSGI2602 = "GDE_MSGI2602";
@@ -57,8 +58,6 @@ public class MessageIds {
 	public final static String	GDE_MSGT2625 = "GDE_MSGT2625";
 	public final static String	GDE_MSGT2626 = "GDE_MSGT2626";
 	public final static String	GDE_MSGT2627 = "GDE_MSGT2627";
-	public final static String	GDE_MSGT2628 = "GDE_MSGT2628";
-	public final static String	GDE_MSGT2629 = "GDE_MSGT2629";
 	public final static String	GDE_MSGT2630 = "GDE_MSGT2630";
 	public final static String	GDE_MSGT2631 = "GDE_MSGT2631";
 	public final static String	GDE_MSGT2632 = "GDE_MSGT2632";

@@ -47,6 +47,7 @@ import gde.log.LogFormatter;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.ParameterConfigControl;
+import gde.utils.WaitTimer;
 
 public class ChargerDialog extends DeviceDialog {
 	final static Logger								log													= Logger.getLogger(ChargerDialog.class.getName());
@@ -192,8 +193,6 @@ public class ChargerDialog extends DeviceDialog {
 
 	public void readSystem() {
 		try {
-			if (usbPort != null && !usbPort.isConnected()) usbPort.openMbUsbPort();
-
 			//Read system setup data
 			//MasterRead(0,REG_HOLDING_SYS_START,(sizeof(SYSTEM)+1)/2,(BYTE *)&System)		
 			short sizeSystem = (short) ((ChargerSystem.getSize() + 1) / 2);
@@ -201,24 +200,12 @@ public class ChargerDialog extends DeviceDialog {
 			usbPort.masterRead((byte) 0, REG_HOLDING_SYS_START, sizeSystem, systemBuffer);
 			log.log(Level.INFO, new ChargerSystem(systemBuffer).toString());
 		}
-		catch (UsbException | IllegalStateException | TimeOutException e) {
+		catch (IllegalStateException | TimeOutException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		catch (RuntimeException rte) {
 			log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
-		finally {
-			if (!this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
-				try {
-					usbPort.closeMbUsbPort();
-					this.isPortOpenedByDialog = false;
-				}
-				catch (UsbException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
-			}
-		}
-
 	}
 	/**
 	 * default constructor initialize all variables required
@@ -653,9 +640,6 @@ public class ChargerDialog extends DeviceDialog {
 		List<String> programMemories = new ArrayList<String>();
 
 		try {			
-			if (usbPort != null && !usbPort.isConnected()) 
-				usbPort.openMbUsbPort();
-			
 			if (usbPort != null && usbPort.isConnected()) {
 				//Read memory structure of original and added/modified program memories
 				short sizeMemHead = (short) ((ChargerMemoryHead.getSize() + 1) / 2);
@@ -686,7 +670,7 @@ public class ChargerDialog extends DeviceDialog {
 				initProgramMemory(0);
 			}					
 		}
-		catch (IllegalStateException | UsbException | TimeOutException e) {
+		catch (IllegalStateException | TimeOutException e) {
 			if (e instanceof UsbException) {
 				application.openMessageDialogAsync(e.getMessage());
 			}
@@ -694,17 +678,6 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (RuntimeException rte) {
 			log.log(Level.SEVERE, rte.getMessage(), rte);
-		}
-		finally {
-			if (!this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
-				try {
-					usbPort.closeMbUsbPort();
-					this.isPortOpenedByDialog = false;
-				}
-				catch (UsbException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
-			}
 		}
 		return programMemories.size() == 0 ? new String[0] : programMemories.toArray(new String[1]);
 	}
@@ -721,8 +694,6 @@ public class ChargerDialog extends DeviceDialog {
 		byte[] index = new byte[2];
 		index[0] = (byte) (selectedProgramMemoryIndex & 0xFF);
 		try {
-			if (usbPort != null && !usbPort.isConnected()) 
-				usbPort.openMbUsbPort();
 
 			usbPort.masterWrite(Register.REG_SEL_MEM.value, (short)1, index);
 			
@@ -730,22 +701,11 @@ public class ChargerDialog extends DeviceDialog {
 			this.selectedProgramMemory = new ChargerMemory(memoryBuffer, isDuo);
 			log.log(Level.OFF, this.selectedProgramMemory.toString(isDuo));
 		}
-		catch (UsbException | IllegalStateException | TimeOutException e) {
+		catch (IllegalStateException | TimeOutException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		catch (RuntimeException rte) {
 			log.log(Level.SEVERE, rte.getMessage(), rte);
-		}
-		finally {
-			if (!this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
-				try {
-					usbPort.closeMbUsbPort();
-					this.isPortOpenedByDialog = false;
-				}
-				catch (UsbException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
-			}
 		}
 		return memoryBuffer;
 	}
@@ -769,37 +729,22 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		
 		try {
-			if (usbPort != null && !usbPort.isConnected()) usbPort.openMbUsbPort();
-
 			usbPort.masterWrite(Register.REG_SEL_MEM.value, (short) 1, index);
 
 			if (modifiedProgramMemory.getUseFlag() != useFlag)
 				modifiedProgramMemory.setUseFlag(useFlag);
 			log.log(Level.OFF, String.format("Program memory name = %s", new String(modifiedProgramMemory.getName()).trim())); //$NON-NLS-1$
 			log.log(Level.OFF, String.format("Program memory useFlag = 0x04X", modifiedProgramMemory.getUseFlag())); //$NON-NLS-1$
-			log.log(Level.OFF, "write using memory buffer length " + sizeMemory * 2); //$NON-NLS-1$
-			//modifiedProgramMemory.setLiCell((byte) ((iChargerUsb) device).getNumberOfLithiumCells());
-			//System.arraycopy(new String("Space Pro 4S 2200mAh").getBytes(), 0, modifiedProgramMemory, 2, "Space Pro 4S 2200mAh".length());
+			log.log(Level.OFF, String.format("write memory buffer index  = %d", index)); //$NON-NLS-1$
 			usbPort.masterWrite(REG_HOLDING_MEM_START, sizeMemory, modifiedProgramMemory.getAsByteArray(isDuo));
 
 			transOrder((byte) Order.ORDER_WRITE_MEM.ordinal());
 		}
-		catch (UsbException | IllegalStateException | TimeOutException e) {
+		catch (IllegalStateException | TimeOutException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		catch (RuntimeException rte) {
 			log.log(Level.SEVERE, rte.getMessage(), rte);
-		}
-		finally {
-			if (!this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
-				try {
-					usbPort.closeMbUsbPort();
-					this.isPortOpenedByDialog = false;
-				}
-				catch (UsbException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
-			}
 		}
 	}
 	
@@ -857,9 +802,6 @@ public class ChargerDialog extends DeviceDialog {
 	 */
 	private void removeMemoryHead(byte removeProgramMemoryIndex) {
 		try {			
-			if (usbPort != null && !usbPort.isConnected()) 
-				usbPort.openMbUsbPort();
-			
 			if (usbPort != null && usbPort.isConnected()) {
 				//Read memory structure of original and added/modified program memories
 				short sizeMemHead = (short) ((ChargerMemoryHead.getSize() + 1) / 2);
@@ -877,7 +819,7 @@ public class ChargerDialog extends DeviceDialog {
 				transOrder((byte) Order.ORDER_WRITE_MEM_HEAD.ordinal());
 			}					
 		}
-		catch (IllegalStateException | UsbException | TimeOutException ex) {
+		catch (IllegalStateException | TimeOutException ex) {
 			if (ex instanceof UsbException) {
 				application.openMessageDialogAsync(ex.getMessage());
 			}
@@ -885,17 +827,6 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (RuntimeException rte) {
 			log.log(Level.SEVERE, rte.getMessage(), rte);
-		}
-		finally {
-			if (!this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
-				try {
-					usbPort.closeMbUsbPort();
-					this.isPortOpenedByDialog = false;
-				}
-				catch (UsbException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
-			}
 		}
 	}
 	
@@ -925,8 +856,6 @@ public class ChargerDialog extends DeviceDialog {
 	 */
 	private void startProgramExecution(byte programType, byte channel, byte programMemoryIndex) {
 		try {
-			if (usbPort != null && !usbPort.isConnected()) usbPort.openMbUsbPort();
-
 			if (usbPort != null && usbPort.isConnected()) {
 				byte[] runOrderBuf = new byte[10];
 				runOrderBuf[0] = programType;// enum {charge, storage, discharge, cycle, balance};
@@ -938,7 +867,7 @@ public class ChargerDialog extends DeviceDialog {
 				usbPort.masterWrite(Register.REG_SEL_OP.value, (short) 5, runOrderBuf);
 			}
 		}
-		catch (IllegalStateException | UsbException | TimeOutException e) {
+		catch (IllegalStateException | TimeOutException e) {
 			if (e instanceof UsbException) {
 				application.openMessageDialogAsync(e.getMessage());
 			}
@@ -946,17 +875,6 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (RuntimeException rte) {
 			log.log(Level.SEVERE, rte.getMessage(), rte);
-		}
-		finally {
-			if (!this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
-				try {
-					usbPort.closeMbUsbPort();
-					this.isPortOpenedByDialog = false;
-				}
-				catch (UsbException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
-			}
 		}
 	}
 	
@@ -966,8 +884,6 @@ public class ChargerDialog extends DeviceDialog {
 	 */
 	private void stopProgramExecution(byte channel) {
 		try {
-			if (usbPort != null && !usbPort.isConnected()) usbPort.openMbUsbPort();
-
 			if (usbPort != null && usbPort.isConnected()) {
 				byte[] runOrderBuf = new byte[6];
 				runOrderBuf[0] = channel;
@@ -978,7 +894,7 @@ public class ChargerDialog extends DeviceDialog {
 				usbPort.masterWrite(Register.REG_SEL_CHANNEL.value, (short) 3, runOrderBuf);
 			}
 		}
-		catch (IllegalStateException | UsbException | TimeOutException e) {
+		catch (IllegalStateException | TimeOutException e) {
 			if (e instanceof UsbException) {
 				application.openMessageDialogAsync(e.getMessage());
 			}
@@ -986,17 +902,6 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (RuntimeException rte) {
 			log.log(Level.SEVERE, rte.getMessage(), rte);
-		}
-		finally {
-			if (!this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
-				try {
-					usbPort.closeMbUsbPort();
-					this.isPortOpenedByDialog = false;
-				}
-				catch (UsbException e) {
-					log.log(Level.SEVERE, e.getMessage(), e);
-				}
-			}
 		}
 	}
 	
@@ -1026,13 +931,20 @@ public class ChargerDialog extends DeviceDialog {
 		if (SWT.CANCEL == application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI2602))) 
 			return;
 		try {
-			if (this.usbPort != null && !this.usbPort.isConnected()) 
+			if (!((iChargerUsb)device).isDeviceActive() && this.usbPort != null) {
 				this.usbPort.openMbUsbPort();
 				this.isPortOpenedByDialog = true;
+				WaitTimer.delay(500);
+			}
+			else {
+				this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2602, new String[] { this.device.getName() }));
+				return;
+			}
 		}
 		catch (UsbException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 			this.application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
+			return;
 		}
 		this.readSystem();
 		createContents();

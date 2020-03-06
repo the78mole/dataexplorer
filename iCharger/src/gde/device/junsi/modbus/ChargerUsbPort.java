@@ -26,7 +26,6 @@ import javax.usb.UsbException;
 import org.usb4java.DeviceHandle;
 
 import gde.device.IDevice;
-import gde.device.InputTypes;
 import gde.device.junsi.iChargerUsbPort;
 import gde.exception.TimeOutException;
 import gde.log.Level;
@@ -39,8 +38,6 @@ public class ChargerUsbPort extends iChargerUsbPort {
 	final static String					$CLASS_NAME														= ChargerUsbPort.class.getName();
 	final static Logger					log																		= Logger.getLogger($CLASS_NAME);
 
-	protected final IDevice			activeDevice;
-	protected final int					dataSize;
 	protected DeviceHandle			libUsbHandle;
 
 	protected final static byte	MB_HID_PROTOCOL_ID										= 0x30;
@@ -116,18 +113,16 @@ public class ChargerUsbPort extends iChargerUsbPort {
 	 */
 	public ChargerUsbPort(IDevice currentDevice, DataExplorer currentApplication) {
 		super(currentDevice, currentApplication);
-		this.activeDevice = currentDevice;
-		this.dataSize = this.deviceConfig.getDataBlockSize(InputTypes.SERIAL_IO);
 	}
 
 	public void openMbUsbPort() throws UsbClaimException, UsbException {
 		log.log(Level.INFO, "openMbUsbPort");
-		this.libUsbHandle = openLibUsbPort(this.activeDevice);
+		this.libUsbHandle = this.openLibUsbPort(this.device);
 	}
 
 	public void closeMbUsbPort() throws UsbClaimException, UsbException {
 		log.log(Level.INFO, "closeMbUsbPort");
-		closeLibUsbPort(this.libUsbHandle);
+		this.closeLibUsbPort(this.libUsbHandle);
 	}
 
 	ModBusErrorCode masterRead(byte readType, short regStart, short regCount, byte[] pOut) throws IllegalStateException, TimeOutException {
