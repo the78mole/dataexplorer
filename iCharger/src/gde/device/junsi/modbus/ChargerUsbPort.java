@@ -30,6 +30,7 @@ import gde.device.junsi.iChargerUsbPort;
 import gde.exception.TimeOutException;
 import gde.log.Level;
 import gde.ui.DataExplorer;
+import gde.utils.StringHelper;
 
 /**
  * @author Winfried Brügmann
@@ -142,7 +143,7 @@ public class ChargerUsbPort extends iChargerUsbPort {
 			inBuf[1] = (byte) (regStart & 0xff);
 			inBuf[2] = 0;
 			inBuf[3] = READ_REG_COUNT_MAX;
-			log.log(Level.OFF, String.format("transfer data length = %d indexOut = %d", inBuf[3], indexOut));
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("transfer data length = %d indexOut = %d", inBuf[3], indexOut));
 			ret = masterModBus(funCode, inBuf, pOut, indexOut, TIMEOUT_MS);
 			if (ret != ModBusErrorCode.MB_EOK) 
 				return ret;
@@ -155,7 +156,7 @@ public class ChargerUsbPort extends iChargerUsbPort {
 			inBuf[1] = (byte) (regStart & 0xff);
 			inBuf[2] = 0;
 			inBuf[3] = (byte) (regCount % READ_REG_COUNT_MAX);
-			log.log(Level.OFF, String.format("transfer data length = %d indexOut = %d", inBuf[3], indexOut));
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, String.format("transfer data length = %d indexOut = %d", inBuf[3], indexOut));
 			ret = masterModBus(funCode, inBuf, pOut, indexOut, TIMEOUT_MS);
 			if (ret != ModBusErrorCode.MB_EOK) return ret;
 		}
@@ -234,7 +235,7 @@ public class ChargerUsbPort extends iChargerUsbPort {
 		//read system junk 1: [64] 07 30 03 84 00 00 1E 45 DC 4E 77 24 F5 19 00 00 00 00 00 C8 EF 42 00 60 C7 68 00 0C F5 19 00 00 00 00 00 00 00 00 00 04 03 00 00 0E 3B 40 00 00 00 00 00 01 00 00 00 01 00 00 00 BB 80 42 00 14
 		//read system junk 2: [64] 07 30 03 84 1E 00 1D 20 01 F4 00 64 00 02 00 10 00 10 00 0A 00 00 00 00 00 00 00 01 00 01 00 01 00 01 00 05 00 05 00 05 00 05 00 00 00 00 03 E8 00 00 00 5A 01 C2 04 4C 00 00 00 91 00 64 04 4C
 		//read memory junk 1: [64] 07 30 03 8C 00 00 1E
-		//log.log(Level.OFF, "write " + StringHelper.byte2Hex2CharString(hidBuf, hidBuf.length));
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "write " + StringHelper.byte2Hex2CharString(hidBuf, hidBuf.length));
 		this.write(libUsbHandle, this.endpointIn, hidBuf, timeOut_ms);
 		//if(JsHID.Write(hidBuf,HID_PACK_MAX+1)==FALSE)return ModBusErrorCode.MB_EIO;
 		//rece
@@ -242,7 +243,7 @@ public class ChargerUsbPort extends iChargerUsbPort {
 		this.read(libUsbHandle, this.endpointOut, hidBuf, timeOut_ms);
 		//read system junk 1: [64] 40 30 03 3C 00 00 03 20 01 F4 00 64 00 02 00 10 00 10 00 0A 00 00 00 00 00 00 00 01 00 01 00 01 00 01 00 05 00 05 00 05 00 05 00 00 00 00 03 E8 00 00 00 5A 01 C2 04 4C 00 00 00 91 00 64 04 4C
 		//read system junk 2: [64] 3E 30 03 3A 00 00 00 00 00 5A 01 C2 04 4C 00 00 00 91 00 64 04 4C 00 00 00 00 00 5A 01 C2 04 4C 00 00 00 91 00 64 04 4C 00 00 00 00 00 5A 01 C2 04 4C 00 00 00 91 00 64 04 4C 00 00 00 00 04 4C
-		//log.log(Level.OFF, "read  " + StringHelper.byte2Hex2CharString(hidBuf, hidBuf.length));
+		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "read  " + StringHelper.byte2Hex2CharString(hidBuf, hidBuf.length));
 		//if(JsHID.Read(hidBuf,HID_PACK_MAX+1,ms)==FALSE)return ModBusErrorCode.MB_ETIMEDOUT;
 		if (hidBuf[HID_PACK_LEN-1] > HID_PACK_MAX) 
 			return ModBusErrorCode.MB_ELEN;
@@ -254,7 +255,7 @@ public class ChargerUsbPort extends iChargerUsbPort {
 				if ((hidBuf[HID_PACK_LEN-1] != hidBuf[HID_PACK_MODBUS] + 4) || (hidBuf[HID_PACK_LEN-1] & 0x01) != 0) 
 					return ModBusErrorCode.MB_ELEN;
 				//copy to pOut
-				log.log(Level.OFF, String.format("copy to pOut data length = %d", hidBuf[HID_PACK_MODBUS]));
+				if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("copy to pOut data length = %d", hidBuf[HID_PACK_MODBUS]));
 				for (i = 0; i < hidBuf[HID_PACK_MODBUS] && i + outIndex < pOut.length; i += 2) {
 					pOut[i + outIndex] = hidBuf[HID_PACK_MODBUS + 1 + i + 1];
 					pOut[i + 1 + outIndex] = hidBuf[HID_PACK_MODBUS + 1 + i];

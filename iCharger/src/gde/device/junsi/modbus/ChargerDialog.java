@@ -197,7 +197,7 @@ public class ChargerDialog extends DeviceDialog {
 			short sizeSystem = (short) ((ChargerSystem.getSize() + 1) / 2);
 			byte[] systemBuffer = new byte[sizeSystem * 2];
 			this.usbPort.masterRead((byte) 0, REG_HOLDING_SYS_START, sizeSystem, systemBuffer);
-			log.log(Level.INFO, new ChargerSystem(systemBuffer).toString());
+			if (log.isLoggable(Level.FINER)) log.log(Level.FINER, new ChargerSystem(systemBuffer).toString());
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -645,7 +645,7 @@ public class ChargerDialog extends DeviceDialog {
 				byte[] memHeadBuffer = new byte[sizeMemHead*2];
 				this.usbPort.masterRead((byte) 0, REG_HOLDING_MEM_HEAD_START, sizeMemHead, memHeadBuffer);			
 				ChargerMemoryHead memHead = new ChargerMemoryHead(memHeadBuffer);
-				log.log(Level.OFF, memHead.toString());
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, memHead.toString());
 				
 				int i = 0;
 				byte[] index = new byte[2];
@@ -657,14 +657,14 @@ public class ChargerDialog extends DeviceDialog {
 					//Read charger program memory after writing selected index
 					//index[0] = (byte) i; //order number
 					index[0] = memoryHeadIndex[i]; //order logical
-					log.log(Level.INFO, String.format("select mem index %d", DataParser.parse2Short(index[0], index[1]))); //$NON-NLS-1$
+					if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("select mem index %d", DataParser.parse2Short(index[0], index[1]))); //$NON-NLS-1$
 					this.usbPort.masterWrite(Register.REG_SEL_MEM.value, (short)1, index);
 					
 					//Read selected charger program memory
 					memoryBuffer = new byte[sizeMemory*2];
 					this.usbPort.masterRead((byte) 0, REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
 					programMemories.add(String.format("%02d - %s", memoryHeadIndex[i], new ChargerMemory(memoryBuffer, isDuo).getUseFlagAndName())); //orde logical //$NON-NLS-1$
-					log.log(Level.INFO, programMemories.get(programMemories.size() - 1));
+					if (log.isLoggable(Level.INFO)) log.log(Level.INFO, programMemories.get(programMemories.size() - 1));
 				}		
 				initProgramMemory(0);
 			}					
@@ -689,7 +689,7 @@ public class ChargerDialog extends DeviceDialog {
 	private byte[] initProgramMemory(int selectedProgramMemoryIndex) {
 		short sizeMemory = (short) ((ChargerMemory.getSize(isDuo) + 1) / 2);
 		byte[] memoryBuffer = new byte[sizeMemory*2];
-		log.log(Level.OFF, "read using memory buffer length " + memoryBuffer.length); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "read using memory buffer length " + memoryBuffer.length); //$NON-NLS-1$
 		byte[] index = new byte[2];
 		index[0] = (byte) (selectedProgramMemoryIndex & 0xFF);
 		try {
@@ -698,7 +698,7 @@ public class ChargerDialog extends DeviceDialog {
 			
 			this.usbPort.masterRead((byte) 0, REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
 			this.selectedProgramMemory = new ChargerMemory(memoryBuffer, isDuo);
-			log.log(Level.OFF, this.selectedProgramMemory.toString(isDuo));
+			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, this.selectedProgramMemory.toString(isDuo));
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
@@ -732,9 +732,11 @@ public class ChargerDialog extends DeviceDialog {
 
 			if (modifiedProgramMemory.getUseFlag() != useFlag)
 				modifiedProgramMemory.setUseFlag(useFlag);
-			log.log(Level.OFF, String.format("Program memory name = %s", new String(modifiedProgramMemory.getName()).trim())); //$NON-NLS-1$
-			log.log(Level.OFF, String.format("Program memory useFlag = 0x%04X", modifiedProgramMemory.getUseFlag())); //$NON-NLS-1$
-			log.log(Level.OFF, String.format("write memory buffer index  = %d", selectedProgramMemoryIndex)); //$NON-NLS-1$
+			if (log.isLoggable(Level.INFO)) {
+				log.log(Level.INFO, String.format("Program memory name = %s", new String(modifiedProgramMemory.getName()).trim())); //$NON-NLS-1$
+				log.log(Level.INFO, String.format("Program memory useFlag = 0x%04X", modifiedProgramMemory.getUseFlag())); //$NON-NLS-1$
+				log.log(Level.INFO, String.format("write memory buffer index  = %d", selectedProgramMemoryIndex)); //$NON-NLS-1$
+			}
 			this.usbPort.masterWrite(REG_HOLDING_MEM_START, sizeMemory, modifiedProgramMemory.getAsByteArray(isDuo));
 
 			transOrder((byte) Order.ORDER_WRITE_MEM.ordinal());
@@ -762,13 +764,13 @@ public class ChargerDialog extends DeviceDialog {
 				this.usbPort.masterRead((byte) 0, REG_HOLDING_MEM_HEAD_START, sizeMemHead, memHeadBuffer);			
 				ChargerMemoryHead memHead = new ChargerMemoryHead(memHeadBuffer);
 				newHeadIndex = memHead.getCount();
-				//log.log(Level.OFF, memHead.toString());
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("before modification: %s", memHead.toString()));
 				
 				//program memory count = 18
 				memHead.setIndex(memHead.addIndexAfter((byte)(((iChargerUsb)device).getBatTypeIndex(batTypeName) - 1)));
 				//0, 17, 16, 15, 14, 13, 12, 10, 1, 2, 11, 3, 4, 5, 6, 7, 8, 9,
 				memHead.setCount((short)(memHead.getCount() + 1));
-				log.log(Level.OFF, memHead.toString());
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("after modification: %s", memHead.toString()));
 				
 				//write the updated memory head structure to device
 				this.usbPort.masterWrite(REG_HOLDING_MEM_HEAD_START, sizeMemHead, memHead.getAsByteArray());
@@ -796,11 +798,11 @@ public class ChargerDialog extends DeviceDialog {
 				byte[] memHeadBuffer = new byte[sizeMemHead*2];
 				this.usbPort.masterRead((byte) 0, REG_HOLDING_MEM_HEAD_START, sizeMemHead, memHeadBuffer);			
 				ChargerMemoryHead memHead = new ChargerMemoryHead(memHeadBuffer);
-				log.log(Level.OFF, String.format("before modification: %s", memHead.toString())); //$NON-NLS-1$
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("before modification: %s", memHead.toString())); //$NON-NLS-1$
 				
 				memHead.setIndex(memHead.removeIndex(removeProgramMemoryIndex));
 				memHead.setCount((short)(memHead.getCount() - 1));
-				log.log(Level.OFF, String.format("after modification: %s", memHead.toString())); //$NON-NLS-1$
+				if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("after modification: %s", memHead.toString())); //$NON-NLS-1$
 				
 				//write the updated memory head structure to device
 				this.usbPort.masterWrite(REG_HOLDING_MEM_HEAD_START, sizeMemHead, memHead.getAsByteArray());
@@ -830,10 +832,10 @@ public class ChargerDialog extends DeviceDialog {
 		temp[0] = (byte) (VALUE_ORDER_KEY & 0xFF);
 		temp[1] = (byte) (VALUE_ORDER_KEY >> 8);
 		temp[2] = order;
-		this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short)2 , temp);
+		this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short)(temp.length / 2), temp);
 
-		temp[0] = temp[1] = 0;
-		this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short)1 , temp);
+		temp = new byte[2];
+		this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short)(temp.length / 2), temp);
 	}
 	
 	/**
@@ -852,7 +854,9 @@ public class ChargerDialog extends DeviceDialog {
 				runOrderBuf[6] = (byte) (VALUE_ORDER_KEY & 0xFF);
 				runOrderBuf[7] = (byte) (VALUE_ORDER_KEY >> 8);
 				runOrderBuf[8] = (byte) Order.ORDER_RUN.ordinal();
-				this.usbPort.masterWrite(Register.REG_SEL_OP.value, (short) 5, runOrderBuf);
+				this.usbPort.masterWrite(Register.REG_SEL_OP.value, (short) (runOrderBuf.length / 2), runOrderBuf);
+//				byte[] temp = new byte[2];
+//				this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short)(temp.length / 2), temp);
 			}
 		}
 		catch (IllegalStateException | TimeOutException e) {
@@ -879,7 +883,9 @@ public class ChargerDialog extends DeviceDialog {
 				runOrderBuf[3] = (byte) (VALUE_ORDER_KEY >> 8);
 				runOrderBuf[4] = (byte) Order.ORDER_STOP.ordinal();
 
-				this.usbPort.masterWrite(Register.REG_SEL_CHANNEL.value, (short) 3, runOrderBuf);
+				this.usbPort.masterWrite(Register.REG_SEL_CHANNEL.value, (short) (runOrderBuf.length / 2), runOrderBuf);
+//				byte[] temp = new byte[2];
+//				this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short)(temp.length / 2), temp);
 			}
 		}
 		catch (IllegalStateException | TimeOutException e) {
@@ -954,7 +960,7 @@ public class ChargerDialog extends DeviceDialog {
 				display.sleep();
 			}
 		}
-		if (this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
+		if (!((iChargerUsb)device).isDeviceActive() && this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
 			try {
 				this.usbPort.closeMbUsbPort();
 				this.isPortOpenedByDialog = false;
@@ -1519,7 +1525,6 @@ public class ChargerDialog extends DeviceDialog {
 		btnClose.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent evt) {
-				log.log(Level.FINEST, "clusterCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 				dialogShell.dispose();
 			}
 		}); 
