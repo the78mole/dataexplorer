@@ -7,7 +7,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/DataExplorer"/>
-	<classpathentry kind="lib" path="/build/lib/joda-time.jar"/>
 	<classpathentry kind="lib" path="/build/lib/istack-commons-runtime.jar"/>
 	<classpathentry kind="var" path="SWT_JAR_PATH"/>
 	<classpathentry kind="lib" path="/build/lib/jaxb-api.jar"/>

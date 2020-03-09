@@ -26,9 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
-
 import com.monstarmike.tlmreader.Flight;
 import com.monstarmike.tlmreader.IFlight;
 import com.monstarmike.tlmreader.TLMReader;
@@ -63,15 +60,16 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.menu.MenuToolBar;
 import gde.utils.StringHelper;
+import gde.utils.TimeLine;
 import gde.utils.WaitTimer;
 
 public class TlmReader {
 	
-	final static Logger		log																= Logger.getLogger(TlmReader.class.getName());
-
+	final static int		TIME_LIMIT_MS	= 5000;
+	final static Logger	log						= Logger.getLogger(TlmReader.class.getName());
 
 	/**
-	 * Spektrun binary log files reader class to parse TLM files
+	 * Spektrum binary log files reader class to parse TLM files
 	 */
 	public TlmReader() {
 		
@@ -181,8 +179,6 @@ public class TlmReader {
 		
 		if (new File(selectedImportFile).exists()) {
 			String modelName = "???";
-			PeriodFormatter formatter = new PeriodFormatterBuilder().appendHours().appendSuffix(":").appendMinutes().appendSuffix(":").appendSeconds().appendSuffix(".").appendMillis()
-					.toFormatter();
 			int index = 0;
 			List<IFlight> flights = reader.parseFlightDefinitions(selectedImportFile);
 			if (log.isLoggable(Level.FINE)) 
@@ -213,10 +209,10 @@ public class TlmReader {
 				log.log(Level.TIME, "read flight definitions time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
 			for (IFlight flight : flights) {
-				if (flight.getDuration().getMillis() > 5000 || flight.getNumberOfDataBlocks() > 10 || flight.getHeaderBlocks().size() > 0) {
-					if (log.isLoggable(Level.INFO)) 
-						log.log(Level.INFO, String.format("flight.getDuration() = %d ms", flight.getDuration().getMillis()));
-
+				if (flight.getDuration_ms() > TIME_LIMIT_MS || flight.getNumberOfDataBlocks() > 10 || flight.getHeaderBlocks().size() > 0) {
+					if (log.isLoggable(Level.INFO))  
+						log.log(Level.INFO, String.format("flight.getDuration() = %d ms", flight.getDuration_ms()));
+					 
 					Flight currentFlight = reader.parseFlight(selectedImportFile, index);
 
 					for (HeaderBlock header : currentFlight.getHeaderBlocks()) {
@@ -233,10 +229,11 @@ public class TlmReader {
 //														System.out.println(header.getClass().getSimpleName() + " - " + header.toString());
 					}
 
-					if (currentFlight.getDuration().getStandardSeconds() > 5) {
+					if (currentFlight.getDuration_ms() > TIME_LIMIT_MS) {
 						if (log.isLoggable(Level.INFO)) 
-							log.log(Level.INFO, String.format("model %s flight %d duration() = %s", modelName, index, formatter.print(currentFlight.getDuration().toPeriod())));
-						List<DataBlock> dataBlocks = currentFlight.getDataBlocks();
+							log.log(Level.INFO, String.format("model %s flight %d duration() = %s", modelName, index, TimeLine.getFomatedTimeWithUnit(currentFlight.getDuration_ms())));
+						 
+							List<DataBlock> dataBlocks = currentFlight.getDataBlocks();
 						if (log.isLoggable(Level.INFO)) 
 							log.log(Level.INFO, "current flight contains " + dataBlocks.size() + " DataBlocks, and " + currentFlight.getHeaderBlocks().size() + " headerBlocks");
 						
