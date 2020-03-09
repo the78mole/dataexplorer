@@ -3,6 +3,8 @@ Development history / change log, please read from bottom up
 Version 3.4.2 - xx yyy 2020
 Generic changes/fixes
 	* fix cell voltage dialog adjusting value position
+	* remove guava-jre dependency
+	* add several missing license files
 	
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control
