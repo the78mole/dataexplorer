@@ -396,6 +396,26 @@ public class DataParser extends NMEAParser implements IDataParser {
 	}
 
 	/**
+	 * @param b1 byte
+	 * @param b2 byte
+	 * @param b3 byte
+	 * @param b4 byte
+	 * @return the integer value whose byte representation is the given 4 bytes in big-endian order
+	 */
+  public static int intFromBytes(byte b1, byte b2, byte b3, byte b4) {
+    return b1 << 24 | (b2 & 0xFF) << 16 | (b3 & 0xFF) << 8 | (b4 & 0xFF);
+  }
+
+	/**
+	 * @param b1 byte
+	 * @param b2 byte
+	 * @return the short value whose byte representation is the given 2 bytes in big-endian order
+	 */
+  public static short shortFromBytes(byte b1, byte b2) {
+    return (short) ((b1 << 8) | (b2 & 0xFF));
+  }
+
+	/**
 	 * parse high and low byte to short integer value
 	 * @param low byte
 	 * @param high byte

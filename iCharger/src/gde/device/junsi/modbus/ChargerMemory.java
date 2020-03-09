@@ -3,8 +3,6 @@ package gde.device.junsi.modbus;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.primitives.Ints;
-
 import gde.device.IDevice;
 import gde.device.junsi.iCharger308DUO;
 import gde.device.junsi.iCharger4010DUO;
@@ -574,7 +572,7 @@ public class ChargerMemory {
 	public ChargerMemory(final byte[] memoryBuffer, final boolean isDuo) {
 		this.useFlag = DataParser.parse2Short(memoryBuffer[0], memoryBuffer[1]);
 		System.arraycopy(memoryBuffer, 2, this.name, 0, this.name.length);
-		this.capacity = Ints.fromBytes(memoryBuffer[MEM_NAME_LEN+1+5], memoryBuffer[MEM_NAME_LEN+1+4], memoryBuffer[MEM_NAME_LEN+1+3], memoryBuffer[MEM_NAME_LEN+1+2]);
+		this.capacity = DataParser.intFromBytes(memoryBuffer[MEM_NAME_LEN+1+5], memoryBuffer[MEM_NAME_LEN+1+4], memoryBuffer[MEM_NAME_LEN+1+3], memoryBuffer[MEM_NAME_LEN+1+2]);
 		this.autoSave = memoryBuffer[44];
 		this.liBalEndMode = memoryBuffer[45];
 		this.lockFlag = memoryBuffer[46];
