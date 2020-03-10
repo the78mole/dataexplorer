@@ -184,7 +184,7 @@ public class SettingsDialog extends Dialog {
 	Button															removeLauncherButton;
 	Button															createLauncherButton;
 	Button															partialDataTableButton, blankChargeDischargeButton, continiousRecordSetButton;
-	Button															drawScaleInRecordColorButton, drawNameInRecordColorButton, drawNumbersInRecordColorButton, addChannelConfigNameCurveCompareButton;
+	Button															drawScaleInRecordColorButton, drawNameInRecordColorButton, drawNumbersInRecordColorButton, draw10TicksPerRecordButton, addChannelConfigNameCurveCompareButton;
 	ParameterConfigControl							fontSizeCorrectionSlider;
 	int[]																fontCorrection					= new int[1];
 	Composite														osMiscComposite;
@@ -1464,6 +1464,26 @@ public class SettingsDialog extends Dialog {
 									public void widgetSelected(SelectionEvent evt) {
 										SettingsDialog.log.log(Level.FINEST, "drawNumbersInRecordColorButton.widgetSelected, event=" + evt); //$NON-NLS-1$
 										SettingsDialog.this.settings.setDrawNumbersInRecordColor(SettingsDialog.this.drawNumbersInRecordColorButton.getSelection());
+										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
+									}
+								});
+							}
+							{
+								this.draw10TicksPerRecordButton = new Button(this.graphicsView, SWT.CHECK);
+								this.draw10TicksPerRecordButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+								this.draw10TicksPerRecordButton.setText(Messages.getString(MessageIds.GDE_MSGT0968));
+								this.draw10TicksPerRecordButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0969));
+								this.draw10TicksPerRecordButton.setSelection(this.settings.isDraw10TicksPerRecord());
+								RowData createLauncerButtonLData = new RowData();
+								createLauncerButtonLData.width = 460;
+								createLauncerButtonLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+								this.draw10TicksPerRecordButton.setLayoutData(createLauncerButtonLData);
+								this.draw10TicksPerRecordButton.addSelectionListener(new SelectionAdapter() {
+									@Override
+									public void widgetSelected(SelectionEvent evt) {
+										SettingsDialog.log.log(Level.FINEST, "draw10TicksPerRecord.widgetSelected, event=" + evt); //$NON-NLS-1$
+										SettingsDialog.this.settings.setDraw10TicksPerRecord(SettingsDialog.this.draw10TicksPerRecordButton.getSelection());
+										SettingsDialog.this.application.updateAllTabs(false);
 										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));
 									}
 								});

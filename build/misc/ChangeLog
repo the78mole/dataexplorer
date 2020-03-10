@@ -5,6 +5,7 @@ Generic changes/fixes
 	* fix cell voltage dialog adjusting value position
 	* remove guava-jre, joda-time dependency
 	* add several missing license files
+	* add option to force 10 major scale ticks while rounding graphics end values
 	
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control

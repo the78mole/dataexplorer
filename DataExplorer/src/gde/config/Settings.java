@@ -110,6 +110,7 @@ public final class Settings extends Properties {
 	final static String							IS_GRAPHICS_SCALE_COLOR					= "is_graphics_scale_color";																																			//$NON-NLS-1$
 	final static String							IS_GRAPHICS_NUMBERS_COLOR				= "is_graphics_number_color";																																			//$NON-NLS-1$
 	final static String							IS_GRAPHICS_NAME_COLOR					= "is_graphics_text_color";																																				//$NON-NLS-1$
+	final static String							IS_GRAPHICS_TICKS_10						= "is_graphics_ticks_bound_10";																																				//$NON-NLS-1$
 	final static String							COMPARE_AREA_BACKGROUND					= "compare_area_background";																																			//$NON-NLS-1$
 	final static String							COMPARE_SURROUND_BACKGRD				= "compare_surround_backgrd";																																			//$NON-NLS-1$
 	final static String							COMPARE_BORDER_COLOR						= "compare_border_color";																																					//$NON-NLS-1$
@@ -722,6 +723,7 @@ public final class Settings extends Properties {
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_BORDER_COLOR, getGraphicsCurvesBorderColorStr())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_SCALE_COLOR, isDrawScaleInRecordColor())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_NAME_COLOR, isDrawNameInRecordColor())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_TICKS_10, isDraw10TicksPerRecord())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_GRAPHICS_NUMBERS_COLOR, isDrawNumbersInRecordColor())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_AREA_BACKGROUND, getCompareCurveAreaBackgroundStr())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.COMPARE_SURROUND_BACKGRD, getCompareSurroundingBackgroundStr())); //$NON-NLS-1$
@@ -2344,6 +2346,21 @@ public final class Settings extends Properties {
 	 */
 	public boolean isDrawNameInRecordColor() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_GRAPHICS_NAME_COLOR, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * set boolean value if boolean value of true if the number of ticks of the records drawn in graphics should be 10
+	 * @param isDraw10TicksPerRecord
+	 */
+	public void setDraw10TicksPerRecord(boolean isDraw10TicksPerRecord) {
+		this.setProperty(Settings.IS_GRAPHICS_TICKS_10, GDE.STRING_EMPTY + isDraw10TicksPerRecord);
+	}
+
+	/**
+	 * @return boolean value of true if the number of ticks of the records drawn in graphics should be 10
+	 */
+	public boolean isDraw10TicksPerRecord() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_GRAPHICS_TICKS_10, "false")); //$NON-NLS-1$
 	}
 
 	/**

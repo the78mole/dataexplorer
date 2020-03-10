@@ -53,11 +53,13 @@ public class CurveUtils {
 	 * @param isDrawNameInRecordColor
 	 * @param isDrawNumbersInRecordColor
 	 */
-	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace, boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor) {
+	public static void drawScale(Record record, GC gc, int x0, int y0, int width, int height, int scaleWidthSpace, boolean isDrawScaleInRecordColor, boolean isDrawNameInRecordColor, boolean isDrawNumbersInRecordColor, boolean isDraw10TicksPerRecord) {
 		final IDevice device = record.getDevice(); // defines the link to a device where values may corrected
 		RecordSet parent = (record.getParent());
 		final boolean isCompareSet = parent.isCompareSet();
 		int numberTicks = 10, miniticks = 5;
+		if (isDraw10TicksPerRecord)
+			record.setRoundOut(true);
 
 		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "x0=" + x0 + " y0=" + y0 + " width=" + width + " height=" + height + " horizontalSpace=" + scaleWidthSpace); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 		if (record.isEmpty() && !record.isDisplayable() && !record.isScaleVisible()) return; // nothing to display
@@ -103,10 +105,10 @@ public class CurveUtils {
 				double deltaValueDisplay = yMaxValueDisplay - yMinValueDisplay;
 				yMaxValueDisplay = MathUtils.roundUp(yMaxValueDisplay, deltaValueDisplay); // max
 				yMinValueDisplay = MathUtils.roundDown(yMinValueDisplay, deltaValueDisplay); // min
-				Object[] roundResult = MathUtils.adaptRounding(yMinValueDisplay, yMaxValueDisplay, false, height / 25 >= 3 ? height / 25 : 2);
+				Object[] roundResult = MathUtils.adaptRounding(yMinValueDisplay, yMaxValueDisplay, false, isDraw10TicksPerRecord ? 10 : height / 25 >= 3 ? height / 25 : 2);
 				yMinValueDisplay = (Double)roundResult[0];
 				yMaxValueDisplay = (Double)roundResult[1];
-				numberTicks = (Integer)roundResult[2];
+				numberTicks = isDraw10TicksPerRecord ? 10 : (Integer)roundResult[2];
 				miniticks = (Integer)roundResult[3];
 				if (isRaw) {
 					yMinValue = device.reverseTranslateValue(record, yMinValueDisplay);
