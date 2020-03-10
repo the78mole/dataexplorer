@@ -447,7 +447,7 @@ public class UsbGathererThread extends Thread {
 		else {
 			if (enableEndMessage && throwable != null) cleanup(throwable.getMessage());
 			else if (throwable != null) cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0022, new Object[] { throwable.getClass().getSimpleName(), throwable.getMessage() }));
-			else if (enableEndMessage) cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026) + Messages.getString(MessageIds.GDE_MSGT2602));
+			else if (enableEndMessage) cleanup(Messages.getString(gde.messages.MessageIds.GDE_MSGE0026));
 		}
 	}
 
