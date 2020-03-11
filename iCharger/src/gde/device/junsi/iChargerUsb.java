@@ -489,8 +489,8 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 				points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff)));
 				points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff)));
 				//4=Power 5=Energy
-				points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue(); 						// power U*I [W]
-				points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
+				points[4] = Double.valueOf((points[0] / 100.0) * (points[2] / 1000.0) * 1000.).intValue(); 							// power U*I [W]
+				points[5] = Double.valueOf((points[0] / 100.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
 				//6=Temp.intern 7=Temp.extern
 				points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff)));
 				points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff)));
@@ -536,8 +536,8 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 				points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff)));
 				points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff)));
 				//4=Power 5=Energy
-				points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue(); 						// power U*I [W]
-				points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
+				points[4] = Double.valueOf((points[0] / 100.0) * (points[2] / 1000.0) * 1000.).intValue(); 							// power U*I [W]
+				points[5] = Double.valueOf((points[0] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
 				//6=Temp.intern 7=Temp.extern
 				points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff)));
 				points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff)));
