@@ -146,44 +146,42 @@ public class ChargerDialog extends DeviceDialog {
 			ChargerDialog inst = new ChargerDialog(dialogShell, device);
 			inst.open();
 			ChargerUsbPort usbPort = new ChargerUsbPort(device, null);
-			if (!usbPort.isConnected()) 
-				usbPort.openMbUsbPort();
-			
+			if (!usbPort.isConnected()) usbPort.openUsbPort();
+
 			if (usbPort.isConnected()) {
 				//Read system setup data
 				//MasterRead(0,REG_HOLDING_SYS_START,(sizeof(SYSTEM)+1)/2,(BYTE *)&System)		
 				short sizeSystem = (short) ((ChargerSystem.getSize() + 1) / 2);
-				byte[] systemBuffer = new byte[sizeSystem*2];
+				byte[] systemBuffer = new byte[sizeSystem * 2];
 				usbPort.masterRead((byte) 0, REG_HOLDING_SYS_START, sizeSystem, systemBuffer);
 				log.log(Level.INFO, new ChargerSystem(systemBuffer).toString());
-				
+
 				//Read memory structure of original and added/modified program memories
 				//MasterWrite(REG_HOLDING_MEM_HEAD_START,(sizeof(MEM_HEAD)+1)/2,(BYTE *)&MemHead)
 				short sizeMemHead = (short) ((ChargerMemoryHead.getSize() + 1) / 2);
-				byte[] memHeadBuffer = new byte[sizeMemHead*2];
+				byte[] memHeadBuffer = new byte[sizeMemHead * 2];
 				usbPort.masterRead((byte) 0, REG_HOLDING_MEM_HEAD_START, sizeMemHead, memHeadBuffer);
 				ChargerMemoryHead memHead = new ChargerMemoryHead(memHeadBuffer);
 				log.log(Level.INFO, memHead.toString());
-				
+
 				for (int i = 0; i < memHead.getCount(); ++i) {
 					//Read charger program memory after write index selection
 					//MasterWrite(REG_SEL_MEM,1,(BYTE *)&Index) != MB_EOK
 					byte[] index = new byte[2];
 					index[0] = memHead.getIndex()[i];
 					log.log(Level.INFO, String.format("select mem index %d", DataParser.parse2Short(index[0], index[1]))); //$NON-NLS-1$
-					usbPort.masterWrite(Register.REG_SEL_MEM.value, (short)1, index);
-					
+					usbPort.masterWrite(Register.REG_SEL_MEM.value, (short) 1, index);
+
 					//MasterRead(0,REG_HOLDING_MEM_START,(sizeof(MEMORY)+1)/2,(BYTE *)&Memory) == MB_EOK
 					short sizeMemory = (short) ((ChargerMemory.getSize(true) + 1) / 2);
-					byte[] memoryBuffer = new byte[sizeMemory*2];
+					byte[] memoryBuffer = new byte[sizeMemory * 2];
 					usbPort.masterRead((byte) 0, REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
 					log.log(Level.INFO, String.format("%02d %s", memHead.getIndex()[i], new ChargerMemory(memoryBuffer, isDuo).getUseFlagAndName())); //$NON-NLS-1$
 					log.log(Level.INFO, new ChargerMemory(memoryBuffer, isDuo).toString(isDuo));
 				}
-				
-			}		
-			if (usbPort.isConnected()) 
-				usbPort.closeMbUsbPort();
+
+			}
+			if (usbPort.isConnected()) usbPort.closeUsbPort();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -214,7 +212,7 @@ public class ChargerDialog extends DeviceDialog {
 	public ChargerDialog(Shell parent, iChargerUsb useDevice) {
 		super(parent, SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
 		this.device = useDevice;
-		this.usbPort = new ChargerUsbPort(this.device, this.application);
+		this.usbPort = ((iChargerUsb)this.device).getUsbPort();
 		setText(this.device.getName());
 		this.isDuo = this.device.getName().toLowerCase().endsWith("duo") ? true : false; //$NON-NLS-1$
 		String[] tmpNamesArray = this.isDuo ? iChargerUsb.BatteryTypesDuo.getValues() : iChargerX6.BatteryTypesX.getValues();
@@ -855,8 +853,6 @@ public class ChargerDialog extends DeviceDialog {
 				runOrderBuf[7] = (byte) (VALUE_ORDER_KEY >> 8);
 				runOrderBuf[8] = (byte) Order.ORDER_RUN.ordinal();
 				this.usbPort.masterWrite(Register.REG_SEL_OP.value, (short) (runOrderBuf.length / 2), runOrderBuf);
-//				byte[] temp = new byte[2];
-//				this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short)(temp.length / 2), temp);
 			}
 		}
 		catch (IllegalStateException | TimeOutException e) {
@@ -876,7 +872,12 @@ public class ChargerDialog extends DeviceDialog {
 	 */
 	private void stopProgramExecution(byte channel) {
 		try {
-			if (usbPort != null && usbPort.isConnected()) {
+			boolean isConnectedByStop = false;
+			if (usbPort != null) {
+				if (!usbPort.isConnected()) {
+					this.usbPort.openUsbPort();
+					isConnectedByStop = true;
+				}
 				byte[] runOrderBuf = new byte[6];
 				runOrderBuf[0] = channel;
 				runOrderBuf[2] = (byte) (VALUE_ORDER_KEY & 0xFF);
@@ -884,11 +885,12 @@ public class ChargerDialog extends DeviceDialog {
 				runOrderBuf[4] = (byte) Order.ORDER_STOP.ordinal();
 
 				this.usbPort.masterWrite(Register.REG_SEL_CHANNEL.value, (short) (runOrderBuf.length / 2), runOrderBuf);
-//				byte[] temp = new byte[2];
-//				this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short)(temp.length / 2), temp);
+				
+				if (isConnectedByStop)
+					this.usbPort.closeUsbPort();
 			}
 		}
-		catch (IllegalStateException | TimeOutException e) {
+		catch (UsbException | IllegalStateException | TimeOutException e) {
 			if (e instanceof UsbException) {
 				application.openMessageDialogAsync(e.getMessage());
 			}
@@ -907,7 +909,7 @@ public class ChargerDialog extends DeviceDialog {
 	public ChargerDialog(Shell parent, int style) {
 		super(parent, style);
 		this.device = DataExplorer.getInstance().getActiveDevice();
-		this.usbPort = new ChargerUsbPort(this.device, this.application);
+		this.usbPort = ((iChargerUsb)this.device).getUsbPort();
 		setText(this.device.getName());
 		this.isDuo = this.device.getName().toLowerCase().endsWith("duo") ? true : false; //$NON-NLS-1$
 		String[] tmpNamesArray = this.isDuo ? iChargerUsb.BatteryTypesDuo.getValues() : iChargerX6.BatteryTypesX.getValues();
@@ -925,8 +927,8 @@ public class ChargerDialog extends DeviceDialog {
 		if (SWT.CANCEL == application.openOkCancelMessageDialog(Messages.getString(MessageIds.GDE_MSGI2602))) 
 			return;
 		try {
-			if (!((iChargerUsb)device).isDeviceActive() && this.usbPort != null) {
-				this.usbPort.openMbUsbPort();
+			if (this.usbPort != null && !this.usbPort.isConnected()) {
+				this.usbPort.openUsbPort();
 				this.isPortOpenedByDialog = true;
 				WaitTimer.delay(500);
 			}
@@ -944,7 +946,7 @@ public class ChargerDialog extends DeviceDialog {
 		createContents();
 		dialogShell.setLocation(300,  50);
 		dialogShell.open();
-		if (((iChargerUsb)device).isDeviceActive()) {
+		if (((iChargerUsb)device).isDataGathererActive()) {
 			btnCharge.setEnabled(false);
 			btnStorage.setEnabled(false);
 			btnDischarge.setEnabled(false);
@@ -960,10 +962,12 @@ public class ChargerDialog extends DeviceDialog {
 				display.sleep();
 			}
 		}
-		if (!((iChargerUsb)device).isDeviceActive() && this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
+		if (!((iChargerUsb)device).isDataGathererActive() && this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
 			try {
-				this.usbPort.closeMbUsbPort();
-				this.isPortOpenedByDialog = false;
+				if (!((iChargerUsb) device).isDataGathererActive()) {
+					this.usbPort.closeUsbPort();
+					this.isPortOpenedByDialog = false;
+				}
 			}
 			catch (UsbException e) {
 				log.log(Level.SEVERE, e.getMessage(), e);
@@ -998,7 +1002,7 @@ public class ChargerDialog extends DeviceDialog {
 		
 		combo = new CCombo(grpProgramMemory, SWT.BORDER);
 		combo.setLayoutData(new RowData(350, 23));
-		combo.setItems(((iChargerUsb)device).isDeviceActive() ? new String[] {Messages.getString(MessageIds.GDE_MSGT2624)} : this.getProgramMemories()); //$NON-NLS-1$
+		combo.setItems(((iChargerUsb)device).isDataGathererActive() ? new String[] {Messages.getString(MessageIds.GDE_MSGT2624)} : this.getProgramMemories()); //$NON-NLS-1$
 		combo.select(0);
 		combo.setBackground(application.COLOR_WHITE);
 		combo.setEditable(false);
@@ -1504,13 +1508,16 @@ public class ChargerDialog extends DeviceDialog {
 		btnStop.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				stopProgramExecution((byte)(application.getActiveChannelNumber() - 1));
 				device.open_closeCommPort();
+				while (((iChargerUsb)device).isDataGathererActive())
+					WaitTimer.delay(100); //wait to avoid communication conflicts
+				stopProgramExecution((byte)(application.getActiveChannelNumber() - 1));
 				btnCharge.setEnabled(true);
 				btnStorage.setEnabled(true);
 				btnDischarge.setEnabled(true);
 				btnCycle.setEnabled(true);
 				btnBalance.setEnabled(true);
+				btnStop.setEnabled(false);
 				grpProgramMemory.setEnabled(true);
 			}
 		});

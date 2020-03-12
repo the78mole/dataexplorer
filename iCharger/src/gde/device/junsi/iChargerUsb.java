@@ -46,6 +46,7 @@ import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.device.MeasurementType;
 import gde.device.junsi.modbus.ChargerDialog;
+import gde.device.junsi.modbus.ChargerUsbPort;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.io.CSVSerialDataReaderWriter;
@@ -61,11 +62,11 @@ import gde.utils.WaitTimer;
  */
 public abstract class iChargerUsb extends iCharger implements IDevice {
 
-	protected final iChargerUsbPort	usbPort;
+	protected final ChargerUsbPort	usbPort;
 	protected boolean								isFileIO		= false;
 	protected boolean								isSerialIO	= false;
-	protected UsbGathererThread			dataGatherThread;
-	protected ChargerDialog		dialog;
+	protected UsbGathererThread			usbGathererThread;
+	protected ChargerDialog					dialog;
 
 	protected String 								batteryType_1 = GDE.STRING_QUESTION_MARK;
 	protected String 								batteryType_2 = GDE.STRING_QUESTION_MARK;
@@ -119,7 +120,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 		
-		this.usbPort = new iChargerUsbPort(this, this.application);
+		this.usbPort = new ChargerUsbPort(this, this.application);
 		this.dialog = new ChargerDialog(this.application.getShell(), this);
 	}
 
@@ -146,11 +147,11 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 				updateFileImportMenu(this.application.getMenuBar().getImportMenu());
 		}
 		
-		this.usbPort = new iChargerUsbPort(this, this.application);
+		this.usbPort = new ChargerUsbPort(this, this.application);
 		this.dialog = new ChargerDialog(this.application.getShell(), this);
 	}
 
-	public iChargerUsbPort getUsbPort() { return this.usbPort; };
+	public ChargerUsbPort getUsbPort() { return this.usbPort; };
 	
 	/**
 	 * @return the device specific dialog instance
@@ -226,8 +227,8 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		}
 	}
 	
-	public boolean isDeviceActive() {
-		return this.usbPort.isConnected() || (this.gathererThread != null && this.gathererThread.isAlive());
+	public boolean isDataGathererActive() {
+		return this.usbGathererThread != null && this.usbGathererThread.isAlive();
 	}
 	
 	/**
@@ -244,15 +245,15 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			
 		case DeviceCommPort.ICON_SET_START_STOP:
 			if (this.usbPort != null) {
-				if (!this.usbPort.isConnected()) {
+				if (!this.usbPort.isConnected() || !this.isDataGathererActive()) { 
 					try {
 						Channel activChannel = Channels.getInstance().getActiveChannel();
 						if (activChannel != null) {
-							this.dataGatherThread = new UsbGathererThread(this.application, this, this.usbPort, activChannel.getNumber());
+							this.usbGathererThread = new UsbGathererThread(this.application, this, this.usbPort, activChannel.getNumber());
 							try {
-								if (this.dataGatherThread != null && this.usbPort.isConnected()) {
+								if (this.usbGathererThread != null && this.usbPort.isConnected()) {
 									WaitTimer.delay(100);
-									this.dataGatherThread.start();
+									this.usbGathererThread.start();
 								}
 							}
 							catch (Throwable e) {
@@ -290,13 +291,13 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 					}
 				}
 				else {
-					if (this.dataGatherThread != null) {
-						this.dataGatherThread.stopDataGatheringThread(false, null);
+					if (this.usbGathererThread != null) {
+						this.usbGathererThread.stopDataGatheringThread(false, null);
+						//this.usbGathererThread = null;
 					}
-					//if (this.boundsComposite != null && !this.isDisposed()) this.boundsComposite.redraw();
 					try {
 						WaitTimer.delay(1000);
-						if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort(null);
+						if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort();
 					}
 					catch (UsbException e) {
 						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);

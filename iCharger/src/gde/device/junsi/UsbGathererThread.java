@@ -26,7 +26,6 @@ import javax.usb.UsbException;
 import javax.usb.UsbNotClaimedException;
 
 import org.eclipse.swt.SWT;
-import org.usb4java.DeviceHandle;
 
 import gde.GDE;
 import gde.config.Settings;
@@ -66,7 +65,6 @@ public class UsbGathererThread extends Thread {
 	boolean							isPortOpenedByLiveGatherer	= false;
 	boolean							isGatheredRecordSetVisible	= true;
 	boolean							isCollectDataStopped				= false;
-	DeviceHandle				libUsbHandle								= null;
 	boolean							isProgrammExecuting1				= false;
 	boolean							isProgrammExecuting2				= false;
 	boolean							isProgrammExecuting3				= false;
@@ -99,7 +97,7 @@ public class UsbGathererThread extends Thread {
 		if (this.usbPort!= null) this.usbPort.setTimeOut_ms(iChargerUsbPort.TIMEOUT_MS); //reset timeout to default
 
 		if (!this.usbPort.isConnected()) {
-			this.libUsbHandle = this.usbPort.openLibUsbPort(this.device);
+			this.usbPort.openUsbPort();
 			this.isPortOpenedByLiveGatherer = true;
 		}
 		this.setPriority(Thread.MAX_PRIORITY);
@@ -137,7 +135,7 @@ public class UsbGathererThread extends Thread {
 							this.application.setSerialRxOn();
 							this.application.setSerialTxOff();
 						}
-						dataBuffer = this.usbPort.getData(this.libUsbHandle);
+						dataBuffer = this.usbPort.getData();
 						if (this.application != null) this.application.setSerialRxOff();
 
 						this.isProgrammExecuting1 = dataBuffer[2] == 0x01; //output channel 1
@@ -208,10 +206,8 @@ public class UsbGathererThread extends Thread {
 						UsbGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
 						this.application.setStatusMessage(e.getMessage(), SWT.COLOR_RED);
 						try {
-							if (this.libUsbHandle != null) {
-								this.device.usbPort.closeLibUsbPort(this.libUsbHandle);
+								this.usbPort.closeUsbPort();
 								UsbGathererThread.log.log(Level.FINE, "USB interface closed");
-							}
 						}
 						catch (UsbException eClose) {
 							UsbGathererThread.log.log(Level.SEVERE, eClose.getMessage(), eClose);
@@ -222,8 +218,7 @@ public class UsbGathererThread extends Thread {
 								WaitTimer.delay(500);
 								if (!this.usbPort.isConnected()) {
 									UsbGathererThread.log.log(Level.WARNING, "USB error recovery, reopen USB port");
-									this.libUsbHandle = null;
-									this.libUsbHandle = this.device.usbPort.openLibUsbPort(this.device);
+									this.usbPort.openUsbPort();
 									this.isPortOpenedByLiveGatherer = true;
 								}
 							}
@@ -240,10 +235,8 @@ public class UsbGathererThread extends Thread {
 						UsbGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
 						this.application.setStatusMessage(e.getMessage(), SWT.COLOR_RED);
 						try {
-							if (this.libUsbHandle != null) {
-								this.device.usbPort.closeLibUsbPort(this.libUsbHandle);
+								this.usbPort.closeUsbPort();
 								UsbGathererThread.log.log(Level.FINE, "USB interface closed");
-							}
 						}
 						catch (UsbException eClose) {
 							UsbGathererThread.log.log(Level.SEVERE, eClose.getMessage(), eClose);
@@ -254,8 +247,7 @@ public class UsbGathererThread extends Thread {
 								WaitTimer.delay(500);
 								if (!this.usbPort.isConnected()) {
 									UsbGathererThread.log.log(Level.WARNING, "USB error recovery, reopen USB port");
-									this.libUsbHandle = null;
-									this.libUsbHandle = this.device.usbPort.openLibUsbPort(this.device);
+									this.usbPort.openUsbPort();
 									this.isPortOpenedByLiveGatherer = true;
 								}
 							}
@@ -280,10 +272,8 @@ public class UsbGathererThread extends Thread {
 		}
 		finally {
 			try {
-				if (this.libUsbHandle != null) {
-					this.device.usbPort.closeLibUsbPort(this.libUsbHandle);
+					this.usbPort.closeUsbPort();
 					UsbGathererThread.log.log(Level.FINE, "USB interface closed");
-				}
 			}
 			catch (UsbException e) {
 				UsbGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
@@ -426,13 +416,14 @@ public class UsbGathererThread extends Thread {
 		}
 
 		this.isCollectDataStopped = true;
+		WaitTimer.delay(this.usbPort.getTimeOut_ms());
 
 		if (this.usbPort != null && this.usbPort.getXferErrors() > 0) {
 			UsbGathererThread.log.log(Level.WARNING, "During complete data transfer " + this.usbPort.getXferErrors() + " number of errors occured!"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (this.usbPort != null && this.usbPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.usbPort.isConnected()) {
 			try {
-				this.usbPort.closeUsbPort(null);
+				this.usbPort.closeUsbPort();
 			}
 			catch (UsbException e) {
 				UsbGathererThread.log.log(Level.WARNING, e.getMessage(), e);
@@ -456,7 +447,7 @@ public class UsbGathererThread extends Thread {
 	 */
 	void finalizeRecordSet(boolean doClosePort) {
 		if (doClosePort && this.isPortOpenedByLiveGatherer && this.usbPort.isConnected()) try {
-			this.usbPort.closeUsbPort(null);
+			this.usbPort.closeUsbPort();
 		}
 		catch (UsbException e) {
 			UsbGathererThread.log.log(Level.WARNING, e.getMessage(), e);
@@ -521,9 +512,5 @@ public class UsbGathererThread extends Thread {
 	 */
 	boolean isCollectDataStopped() {
 		return this.isCollectDataStopped;
-	}
-	
-	public DeviceHandle getLibUsbHandle() {
-		return this.libUsbHandle;
 	}
 }

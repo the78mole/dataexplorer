@@ -30,6 +30,8 @@ import gde.utils.StringHelper;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import javax.usb.UsbClaimException;
+import javax.usb.UsbException;
 import javax.usb.UsbInterface;
 
 import org.usb4java.DeviceHandle;
@@ -38,18 +40,20 @@ import org.usb4java.DeviceHandle;
  * @author Winfried Brügmann
  */
 public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
-	final static String $CLASS_NAME = iChargerUsbPort.class.getName();
-	final static Logger	log	= Logger.getLogger($CLASS_NAME);
-		
-  // The communication timeout in milliseconds, 500ms is the smallest interval
-	public final static long		 TIMEOUT_MS	= 1200; 
-  protected long 			 timeout_ms = 1200;
-  
-  protected final byte interfaceId;
-  protected final byte endpointIn;
-  protected final byte endpointOut;
+	final static String				$CLASS_NAME	= iChargerUsbPort.class.getName();
+	final static Logger				log					= Logger.getLogger($CLASS_NAME);
 
-	final int  dataSize;
+	// The communication timeout in milliseconds, 500ms is the smallest interval
+	public final static long	TIMEOUT_MS	= 1200;
+	protected long						timeout_ms	= 1200;
+
+	protected DeviceHandle		libUsbHandle;
+
+	protected final byte			interfaceId;
+	protected final byte			endpointIn;
+	protected final byte			endpointOut;
+
+	final int									dataSize;
 	
 	/**
 	 * constructor of default implementation
@@ -62,6 +66,18 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		this.interfaceId = this.device.getUsbInterface();
 		this.endpointIn = this.device.getUsbEndpointIn();
 		this.endpointOut = this.device.getUsbEndpointOut();
+	}
+
+	public void openUsbPort() throws UsbClaimException, UsbException {
+		this.libUsbHandle = this.openLibUsbPort(this.device);
+	}
+
+	public void closeUsbPort() throws UsbClaimException, UsbException {
+		if (this.libUsbHandle != null) {
+			this.closeLibUsbPort(this.libUsbHandle);
+			this.libUsbHandle = null;
+		}
+		else this.closeLibUsbPort(null);
 	}
 
 	/**
@@ -94,11 +110,11 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 	 * @return byte array containing gathered data - this can individual specified per device
 	 * @throws IOException
 	 */
-	public synchronized byte[] getData(final DeviceHandle libUsbHandle) throws Exception {
+	public synchronized byte[] getData() throws Exception {
 		final String $METHOD_NAME = "getData"; //$NON-NLS-1$
 		byte[] data = new byte[Math.abs(this.dataSize)];
 
-		this.read(libUsbHandle, this.endpointOut, data, timeout_ms);
+		this.read(this.libUsbHandle, this.endpointOut, data, timeout_ms);
 		
 		if (log.isLoggable(Level.FINE)) {
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));

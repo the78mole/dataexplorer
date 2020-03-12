@@ -470,12 +470,12 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 				if (libUsbDevice == null) throw new UsbException(Messages.getString(gde.messages.MessageIds.GDE_MSGE0050));
 				result = LibUsb.open(libUsbDevice, libUsbDeviceHandle);
 				if (result < 0) {
-        	if (libUsbDeviceHandle != null) LibUsb.close(libUsbDeviceHandle);
+        	LibUsb.close(libUsbDeviceHandle);
         	log.log(Level.SEVERE, String.format("Unable to open device: %s.", LibUsb.strError(result)));
 					throw new UsbClaimException(new LibUsbException(result).getMessage());
 				}
         
-				if (GDE.IS_LINUX && libUsbDeviceHandle != null) {
+				if (GDE.IS_LINUX) {
 					result = LibUsb.kernelDriverActive(libUsbDeviceHandle, ifaceId);
 
 					if (result == 1) {
@@ -488,7 +488,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
 				}
 				result = LibUsb.claimInterface(libUsbDeviceHandle, ifaceId);
 				if (result < 0) {
-        	if (libUsbDeviceHandle != null) LibUsb.close(libUsbDeviceHandle);
+        	LibUsb.close(libUsbDeviceHandle);
 					log.log(Level.SEVERE, String.format("Unable to claim device: %s.", LibUsb.strError(result)));
 					throw new UsbClaimException(new LibUsbException(result).getMessage());
 				}
@@ -500,7 +500,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
         result = LibUsb.getConfigDescriptor(libUsbDevice, (byte) 0, descriptor);
         LibUsb.freeConfigDescriptor(descriptor);
         if (result < 0) {
-        	if (libUsbDeviceHandle != null) LibUsb.close(libUsbDeviceHandle);
+        	LibUsb.close(libUsbDeviceHandle);
 					log.log(Level.SEVERE, String.format("Unable to claim device: %s.", LibUsb.strError(result)));
 					throw new UsbClaimException(new LibUsbException(result).getMessage());
         }
@@ -744,7 +744,7 @@ public class DeviceUsbPortImpl implements IDeviceCommPort {
           default:
           	throw new IllegalStateException(new LibUsbException(result).getMessage());
         	}
-        else 
+
           buffer.get(data, 0, readBytes);
         
   			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, readBytes + " bytes received");
