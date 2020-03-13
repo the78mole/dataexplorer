@@ -877,6 +877,7 @@ public class ChargerDialog extends DeviceDialog {
 				if (!usbPort.isConnected()) {
 					this.usbPort.openUsbPort();
 					isConnectedByStop = true;
+					WaitTimer.delay(500);
 				}
 				byte[] runOrderBuf = new byte[6];
 				runOrderBuf[0] = channel;
@@ -1532,6 +1533,17 @@ public class ChargerDialog extends DeviceDialog {
 					WaitTimer.delay(100); //wait to avoid communication conflicts
 				stopProgramExecution((byte)(application.getActiveChannelNumber() - 1));
 				dialogShell.dispose();
+//			btnCharge.setEnabled(true);
+//			btnStorage.setEnabled(true);
+//			btnDischarge.setEnabled(true);
+//			btnCycle.setEnabled(true);
+//			btnBalance.setEnabled(true);
+//			btnStop.setEnabled(false);
+//			combo.setItems(ChargerDialog.this.getProgramMemories());
+//			combo.select(0);
+//			grpProgramMemory.setEnabled(true);
+//			memoryComposite.setEnabled(true);
+// 			addAllListeners();
 			}
 		});
 		
@@ -1957,9 +1969,6 @@ public class ChargerDialog extends DeviceDialog {
 					break;
 				}
 			}
-
-			//
-		
 			//update parameter controls
 			for (int i = 0; i < this.memoryParameters.length; i++) {
 				if (this.memoryParameters[i] != null) {
@@ -1969,7 +1978,17 @@ public class ChargerDialog extends DeviceDialog {
 		}
 	}
 
-	private void removeAllListeners() {
+	void addAllListeners() {
+		storageComposite.addListener(SWT.Selection, memoryParameterChangeListener);
+		memoryComposite.addListener(SWT.Selection, memoryParameterChangeListener);
+		chargeComposite.addListener(SWT.Selection, memoryParameterChangeListener);
+		grpChargeSaftySettings.addListener(SWT.Selection, memoryParameterChangeListener);
+		grpBalancerSettings.addListener(SWT.Selection, memoryParameterChangeListener);
+		grpAdvancedRestoreSettings.addListener(SWT.Selection, memoryParameterChangeListener);
+		dischargeComposite.addListener(SWT.Selection, memoryParameterChangeListener);
+	}
+
+	void removeAllListeners() {
 		storageComposite.removeListener(SWT.Selection, memoryParameterChangeListener);
 		memoryComposite.removeListener(SWT.Selection, memoryParameterChangeListener);
 		chargeComposite.removeListener(SWT.Selection, memoryParameterChangeListener);
