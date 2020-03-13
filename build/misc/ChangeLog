@@ -6,6 +6,7 @@ Generic changes/fixes
 	* remove guava-jre, joda-time dependency
 	* add several missing license files
 	* add option to force 10 major scale ticks while rounding graphics end values
+	* enable class based log level configuration device sub packages (p.e. gde.device.junsi.modbus)
 	
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control

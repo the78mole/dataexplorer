@@ -2434,6 +2434,15 @@ public class SettingsDialog extends Dialog {
 				treeItemNode = new TreeItem(treeItemRoot, SWT.NULL);
 				treeItemNode.setText(tmp[3]);
 				break;
+			case 5:
+				if (!root.equals(tmp[0] + GDE.STRING_DOT + tmp[1] + GDE.STRING_DOT + tmp[2] + GDE.STRING_DOT + tmp[3])) {
+					root = tmp[0] + GDE.STRING_DOT + tmp[1] + GDE.STRING_DOT + tmp[2] + GDE.STRING_DOT + tmp[3];
+					treeItemRoot = new TreeItem(SettingsDialog.this.tree, SWT.SINGLE);
+					treeItemRoot.setText(root);
+				}
+				treeItemNode = new TreeItem(treeItemRoot, SWT.NULL);
+				treeItemNode.setText(tmp[4]);
+				break;
 			}
 		}
 	}
