@@ -68,7 +68,7 @@ public class ChargerDialog extends DeviceDialog {
 	private Button										btnCopy, btnEdit, btnWrite, btnDelete;
 	private Button										btnCharge, btnStorage, btnDischarge, btnCycle, btnBalance, btnStop;
 	private Group											grpProgramMemory, grpBalancerSettings, grpAdvancedRestoreSettings, grpChargeSaftySettings, grpDischargeSaftySettings;
-	private Composite									chargeComposite, dischargeComposite, storageComposite, cycleComposite;
+	private Composite 								memoryComposite, chargeComposite, dischargeComposite, storageComposite, cycleComposite;
 	private CTabItem									tbtmStorage;
 	private CTabFolder								tabFolder;
 
@@ -1034,7 +1034,10 @@ public class ChargerDialog extends DeviceDialog {
 					combo.setEditable(false);
 					String changedProgramMemoryText = combo.getText().trim();
 					if (changedProgramMemoryText.contains(" - ")) { //$NON-NLS-1$
-	 					changedProgramMemoryText = changedProgramMemoryText.substring(changedProgramMemoryText.lastIndexOf(" - ")+3); //$NON-NLS-1$
+	 					changedProgramMemoryText = changedProgramMemoryText.substring(changedProgramMemoryText.lastIndexOf(" - ")+3).trim(); //$NON-NLS-1$
+					}
+					else if (changedProgramMemoryText.contains("CUSTOM")) { //$NON-NLS-1$
+	 					changedProgramMemoryText = changedProgramMemoryText.substring(changedProgramMemoryText.lastIndexOf("CUSTOM")+6).trim(); //$NON-NLS-1$
 					}
 					combo.setText(lastSelectedProgramMemoryIndex + Messages.getString(MessageIds.GDE_MSGT2625) + changedProgramMemoryText);		 //$NON-NLS-1$
 					combo.setForeground(application.COLOR_RED);
@@ -1118,7 +1121,7 @@ public class ChargerDialog extends DeviceDialog {
 		if(selectedProgramMemory != null)
 			this.memoryValues = selectedProgramMemory.getMemoryValues(this.memoryValues, isDuo);
 		
-		Composite memoryComposite = new Composite(mainComposite, SWT.BORDER);
+		memoryComposite = new Composite(mainComposite, SWT.BORDER);
 		memoryComposite.setLayout(new FillLayout(SWT.VERTICAL));
 		FormData fd_composite_1 = new FormData();
 		fd_composite_1.top = new FormAttachment(0, 80);
@@ -1425,6 +1428,8 @@ public class ChargerDialog extends DeviceDialog {
 				btnBalance.setEnabled(false);
 				btnStop.setEnabled(true);
 				grpProgramMemory.setEnabled(false);
+				memoryComposite.setEnabled(false);
+				removeAllListeners();
 			}
 		});
 		
@@ -1443,6 +1448,8 @@ public class ChargerDialog extends DeviceDialog {
 				btnBalance.setEnabled(false);
 				btnStop.setEnabled(true);
 				grpProgramMemory.setEnabled(false);
+				memoryComposite.setEnabled(false);
+				removeAllListeners();
 			}
 		});
 		
@@ -1452,15 +1459,19 @@ public class ChargerDialog extends DeviceDialog {
 		btnDischarge.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				startProgramExecution((byte)2, (byte)(application.getActiveChannelNumber() - 1), memoryHeadIndex[combo.getSelectionIndex()]);
-				device.open_closeCommPort();
-				btnCharge.setEnabled(false);
-				btnStorage.setEnabled(false);
-				btnDischarge.setEnabled(false);
-				btnCycle.setEnabled(false);
-				btnBalance.setEnabled(false);
-				btnStop.setEnabled(true);
-				grpProgramMemory.setEnabled(false);
+				if (memoryHeadIndex[combo.getSelectionIndex()] >= 0) {
+					startProgramExecution((byte)2, (byte)(application.getActiveChannelNumber() - 1), memoryHeadIndex[combo.getSelectionIndex()]);
+					device.open_closeCommPort();
+					btnCharge.setEnabled(false);
+					btnStorage.setEnabled(false);
+					btnDischarge.setEnabled(false);
+					btnCycle.setEnabled(false);
+					btnBalance.setEnabled(false);
+					btnStop.setEnabled(true);
+					grpProgramMemory.setEnabled(false);
+					memoryComposite.setEnabled(false);
+					removeAllListeners();
+				}
 			}
 		});
 		
@@ -1470,15 +1481,19 @@ public class ChargerDialog extends DeviceDialog {
 		btnCycle.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				startProgramExecution((byte)3, (byte)(application.getActiveChannelNumber() - 1), memoryHeadIndex[combo.getSelectionIndex()]);
-				device.open_closeCommPort();
-				btnCharge.setEnabled(false);
-				btnStorage.setEnabled(false);
-				btnDischarge.setEnabled(false);
-				btnCycle.setEnabled(false);
-				btnBalance.setEnabled(false);
-				btnStop.setEnabled(true);
-				grpProgramMemory.setEnabled(false);
+				if (memoryHeadIndex[combo.getSelectionIndex()] >= 0) {
+					startProgramExecution((byte) 3, (byte) (application.getActiveChannelNumber() - 1), memoryHeadIndex[combo.getSelectionIndex()]);
+					device.open_closeCommPort();
+					btnCharge.setEnabled(false);
+					btnStorage.setEnabled(false);
+					btnDischarge.setEnabled(false);
+					btnCycle.setEnabled(false);
+					btnBalance.setEnabled(false);
+					btnStop.setEnabled(true);
+					grpProgramMemory.setEnabled(false);
+					memoryComposite.setEnabled(false);
+					removeAllListeners();
+				}
 			}
 		});
 		
@@ -1488,15 +1503,19 @@ public class ChargerDialog extends DeviceDialog {
 		btnBalance.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				startProgramExecution((byte)4, (byte)(application.getActiveChannelNumber() - 1), memoryHeadIndex[combo.getSelectionIndex()]);
-				device.open_closeCommPort();
-				btnCharge.setEnabled(false);
-				btnStorage.setEnabled(false);
-				btnDischarge.setEnabled(false);
-				btnCycle.setEnabled(false);
-				btnBalance.setEnabled(false);
-				btnStop.setEnabled(true);
-				grpProgramMemory.setEnabled(false);
+				if (memoryHeadIndex[combo.getSelectionIndex()] >= 0) {
+					startProgramExecution((byte) 4, (byte) (application.getActiveChannelNumber() - 1), memoryHeadIndex[combo.getSelectionIndex()]);
+					device.open_closeCommPort();
+					btnCharge.setEnabled(false);
+					btnStorage.setEnabled(false);
+					btnDischarge.setEnabled(false);
+					btnCycle.setEnabled(false);
+					btnBalance.setEnabled(false);
+					btnStop.setEnabled(true);
+					grpProgramMemory.setEnabled(false);
+					memoryComposite.setEnabled(false);
+					removeAllListeners();
+				}
 			}
 		});
 		
@@ -1512,13 +1531,7 @@ public class ChargerDialog extends DeviceDialog {
 				while (((iChargerUsb)device).isDataGathererActive())
 					WaitTimer.delay(100); //wait to avoid communication conflicts
 				stopProgramExecution((byte)(application.getActiveChannelNumber() - 1));
-				btnCharge.setEnabled(true);
-				btnStorage.setEnabled(true);
-				btnDischarge.setEnabled(true);
-				btnCycle.setEnabled(true);
-				btnBalance.setEnabled(true);
-				btnStop.setEnabled(false);
-				grpProgramMemory.setEnabled(true);
+				dialogShell.dispose();
 			}
 		});
 		
@@ -1954,5 +1967,15 @@ public class ChargerDialog extends DeviceDialog {
 				}
 			} 
 		}
+	}
+
+	private void removeAllListeners() {
+		storageComposite.removeListener(SWT.Selection, memoryParameterChangeListener);
+		memoryComposite.removeListener(SWT.Selection, memoryParameterChangeListener);
+		chargeComposite.removeListener(SWT.Selection, memoryParameterChangeListener);
+		grpChargeSaftySettings.removeListener(SWT.Selection, memoryParameterChangeListener);
+		grpBalancerSettings.removeListener(SWT.Selection, memoryParameterChangeListener);
+		grpAdvancedRestoreSettings.removeListener(SWT.Selection, memoryParameterChangeListener);
+		dischargeComposite.removeListener(SWT.Selection, memoryParameterChangeListener);
 	}
 }
