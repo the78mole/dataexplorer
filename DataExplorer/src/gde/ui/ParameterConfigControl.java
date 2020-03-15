@@ -192,10 +192,12 @@ public class ParameterConfigControl {
 							: ParameterConfigControl.this.value - 5) / 10 * 10;
 					else
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
+					
 					if (devisor == 1.0)
 						ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, ParameterConfigControl.this.value));
-					else
-						ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, (int)(ParameterConfigControl.this.value/devisor)));
+					else 
+						ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, ParameterConfigControl.this.value/devisor));
+
 					if (evt.data == null) {
 						Event changeEvent = new Event();
 						changeEvent.index = valueIndex;

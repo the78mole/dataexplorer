@@ -1638,6 +1638,17 @@ public class ChargerMemory {
 		//41 cycle delay
 		values[41] = this.getCycleDelay();
 
+		//42 power voltage
+		values[42] = this.getDigitPowerVolt() / 100;		
+		//43 power current
+		values[43] = this.getDigitPowerCurrent() / 10;		
+		//44 power option lock
+		values[44] = this.getDigitPowerSet() & 0x01;		
+		//45 power option auto start
+		values[45] = this.getDigitPowerSet() & 0x02;	
+		//46 power option live update
+		values[46] = this.getDigitPowerSet() & 0x04;
+
 		return values;
 	}
 

@@ -10,6 +10,7 @@ import javax.usb.UsbException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -47,6 +48,7 @@ import gde.log.LogFormatter;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.ui.ParameterConfigControl;
+import gde.ui.SWTResourceManager;
 import gde.utils.WaitTimer;
 
 public class ChargerDialog extends DeviceDialog {
@@ -67,11 +69,11 @@ public class ChargerDialog extends DeviceDialog {
 	private CCombo 										combo;
 	private Button										btnCopy, btnEdit, btnWrite, btnDelete;
 	private Button										btnCharge, btnStorage, btnDischarge, btnCycle, btnBalance, btnStop;
-	private Group											grpProgramMemory, grpBalancerSettings, grpAdvancedRestoreSettings, grpChargeSaftySettings, grpDischargeSaftySettings;
-	private Composite 								memoryComposite, chargeComposite, dischargeComposite, storageComposite, cycleComposite;
-	private CTabItem									tbtmStorage;
+	private Group											grpProgramMemory, grpBalancerSettings, grpAdvancedRestoreSettings, grpChargeSaftySettings, grpDischargeSaftySettings, grpRunProgram;
 	private CTabFolder								tabFolder;
-
+	private CTabItem									tbtmCharge, tbtmDischarge, tbtmStorage, tbtmCycle, tbtmPower;
+	private Composite 								memoryComposite, chargeComposite, dischargeComposite, storageComposite, cycleComposite, powerComposite;
+	private CLabel 										powerLabel;
 	private ParameterConfigControl[]	memoryParameters						= new ParameterConfigControl[50];																													// battery type, number cells, capacity
 	private final String							cellTypeNames;
 	private final String[]						cellTypeNamesArray;
@@ -607,6 +609,20 @@ public class ChargerDialog extends DeviceDialog {
 						selectedProgramMemory.setCycleDelay((short) ChargerDialog.this.memoryValues[41]);
 						break;
 
+					case 42: // power voltage
+						selectedProgramMemory.setDigitPowerVolt((short) (ChargerDialog.this.memoryValues[42] * 100));		
+						break;
+					case 43: // power current
+						selectedProgramMemory.setDigitPowerCurrent((short) (ChargerDialog.this.memoryValues[43] * 10));			
+						break;
+					case 44: // power option lock
+					case 45: // power option auto start
+					case 46: // power option live update
+						selectedProgramMemory.setDigitPowerSet((byte) (ChargerDialog.this.memoryValues[44] 
+								+ (ChargerDialog.this.memoryValues[45] << 1) 
+								+ (ChargerDialog.this.memoryValues[46] << 2)));
+						break;
+
 					}
 					memoryValues = selectedProgramMemory.getMemoryValues(memoryValues, isDuo);
 					updateMemoryParameterControls();
@@ -1131,24 +1147,7 @@ public class ChargerDialog extends DeviceDialog {
 		fd_composite_1.left = new FormAttachment(0, 10);
 		memoryComposite.setLayoutData(fd_composite_1);
 		memoryComposite.setBackground(this.application.COLOR_CANVAS_YELLOW);
-		//battery type
-		this.memoryParameters[0] = new ParameterConfigControl(memoryComposite, this.memoryValues, 0, 
-				Messages.getString(MessageIds.GDE_MSGT2636), 175, //$NON-NLS-1$
-				this.cellTypeNames, 280, 
-				this.cellTypeNamesArray, 50, 150);
-		this.memoryParameters[0].getSlider().setVisible(false);
-		//number cells
-		int maxNumberCells = ((iChargerUsb)this.device).getNumberOfLithiumCells();
-		this.memoryParameters[1] = new ParameterConfigControl(memoryComposite, this.memoryValues, 1, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2637), 175, //$NON-NLS-1$
-				"0(auto) - " + maxNumberCells, 280,  //$NON-NLS-1$
-				false, 50, 150, 0, maxNumberCells); //$NON-NLS-1$
-		//battery capacity
-		this.memoryParameters[2] = new ParameterConfigControl(memoryComposite, this.memoryValues, 2, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2638), 175, //$NON-NLS-1$
-				"0(auto) ~ 65000 mAh", 280,  //$NON-NLS-1$
-				true, 50, 150, 0, 65000, 0, true); //$NON-NLS-1$
-		memoryComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
+		createBaseBatteryParameters();
 	
 		tabFolder = new CTabFolder(mainComposite, SWT.NONE);
 		FormData fd_tabFolder = new FormData();
@@ -1158,248 +1157,16 @@ public class ChargerDialog extends DeviceDialog {
 		tabFolder.setLayoutData(fd_tabFolder);
 		tabFolder.setSimple(false);
 		
-		CTabItem tbtmCharge = new CTabItem(tabFolder, SWT.NONE);
-		tbtmCharge.setText(Messages.getString(MessageIds.GDE_MSGT2639));	 //$NON-NLS-1$
-		ScrolledComposite scrolledComposite = new ScrolledComposite(tabFolder, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		tbtmCharge.setControl(scrolledComposite);
-		scrolledComposite.setExpandHorizontal(true);
-		scrolledComposite.setLayout(new FillLayout(SWT.VERTICAL));
-		chargeComposite = new Composite(scrolledComposite, SWT.NONE);
-		chargeComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
-		scrolledComposite.setContent(chargeComposite);
-		scrolledComposite.setMinSize(chargeComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		chargeComposite.setSize(tbtmCharge.getBounds().width, 880);
-		//charge parameter current
-		this.memoryParameters[3] = new ParameterConfigControl(chargeComposite, this.memoryValues, 3, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2640), 175, //$NON-NLS-1$
-				"100 ~ 20000 mA", 280,  //$NON-NLS-1$
-				true, 50, 150, 100, 20000, -100, false); //$NON-NLS-1$
-		//charge parameter modus normal,balance,external,reflex 
-		this.memoryParameters[4] = new ParameterConfigControl(chargeComposite, this.memoryValues, 4, 
-				Messages.getString(MessageIds.GDE_MSGT2641), 175, //$NON-NLS-1$
-				String.join(", ", ChargerMemory.LiMode.VALUES), 280,  //$NON-NLS-1$
-				ChargerMemory.LiMode.VALUES, 50, 150);
-		//charge parameter modus normal,balance,external,reflex 
-		this.memoryParameters[5] = new ParameterConfigControl(chargeComposite, this.memoryValues, 5, 
-				Messages.getString(MessageIds.GDE_MSGT2642), 175, //$NON-NLS-1$
-				String.join(", ", ChargerMemory.BalancerLiSetup.VALUES), 280,  //$NON-NLS-1$
-				ChargerMemory.BalancerLiSetup.VALUES, 50, 150);
-		//charge parameter end current
-		this.memoryParameters[6] = new ParameterConfigControl(chargeComposite, this.memoryValues, 6, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2643), 175, //$NON-NLS-1$
-				"10% - 50%", 280,  //$NON-NLS-1$
-				true, 50, 150, 10, 50, -10, false); //$NON-NLS-1$
-		if (this.memoryValues[5] == 0) this.memoryParameters[6].setEnabled(false);
-		//charge parameter cell voltage
-		this.memoryParameters[7] = new ParameterConfigControl(chargeComposite, this.memoryValues, 7, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2644), 175, //$NON-NLS-1$
-				"4000 mV - 4200 mV", 280,  //$NON-NLS-1$
-				true, 50, 150, 4000, 4200, -4000, false); //$NON-NLS-1$
-
-		//Ni charge voltage drop
-		this.memoryParameters[26] = new ParameterConfigControl(chargeComposite, this.memoryValues, 26, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2645), 175, //$NON-NLS-1$
-				"1 mV - 20 mV", 280,  //$NON-NLS-1$
-				true, 50, 150, 1, 20, -1, false); //$NON-NLS-1$
-		//Ni charge voltage drop delay
-		this.memoryParameters[27] = new ParameterConfigControl(chargeComposite, this.memoryValues, 27, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2646), 175, //$NON-NLS-1$
-				"0 Min - 20 Min", 280,  //$NON-NLS-1$
-				true, 50, 150, 0, 20, 0, false); //$NON-NLS-1$
-		//Ni charge allow 0V 
-		this.memoryParameters[28] = new ParameterConfigControl(chargeComposite, this.memoryValues, 28, 
-				Messages.getString(MessageIds.GDE_MSGT2647), 175, //$NON-NLS-1$
-				Messages.getString(MessageIds.GDE_MSGT2648), 280,  //$NON-NLS-1$
-				new String[]{Messages.getString(MessageIds.GDE_MSGT2649), Messages.getString(MessageIds.GDE_MSGT2650)}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
-		//Ni trickle charge enable 
-		this.memoryParameters[29] = new ParameterConfigControl(chargeComposite, this.memoryValues, 29, 
-				Messages.getString(MessageIds.GDE_MSGT2651), 175, //$NON-NLS-1$
-				"off, on", 280,  //$NON-NLS-1$
-				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
-		//Ni charge trickle current
-		this.memoryParameters[30] = new ParameterConfigControl(chargeComposite, this.memoryValues, 30, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2652), 175, //$NON-NLS-1$
-				"20mA - 1000mA", 280,  //$NON-NLS-1$
-				true, 50, 150, 20, 1000, -20, false); //$NON-NLS-1$
-		//Ni charge trickle timeout
-		this.memoryParameters[31] = new ParameterConfigControl(chargeComposite, this.memoryValues, 31, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2653), 175, //$NON-NLS-1$
-				"1 Min - 999 Min", 280,  //$NON-NLS-1$
-				true, 50, 150, 1, 999, -1, false); //$NON-NLS-1$
-		chargeComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
-		
-		grpChargeSaftySettings = new Group(chargeComposite, SWT.NONE);
-		grpChargeSaftySettings.setText(Messages.getString(MessageIds.GDE_MSGT2654)); //$NON-NLS-1$
-		grpChargeSaftySettings.setBackground(application.COLOR_WHITE);
-		grpChargeSaftySettings.setLayout(new RowLayout(SWT.VERTICAL));
-		//charge parameter balancer
-		this.memoryParameters[8] = new ParameterConfigControl(grpChargeSaftySettings, this.memoryValues, 8, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2655), 175, //$NON-NLS-1$
-				"20°C - 80°C", 280,  //$NON-NLS-1$
-				true, 50, 150, 20, 80, -20, false); //$NON-NLS-1$
-		//charge parameter balancer start
-		this.memoryParameters[9] = new ParameterConfigControl(grpChargeSaftySettings, this.memoryValues, 9, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2656), 175, //$NON-NLS-1$
-				"50% - 200%", 280,  //$NON-NLS-1$
-				true, 50, 150, 50, 200, -50, false); //$NON-NLS-1$
-		//charge parameter balancer difference
-		this.memoryParameters[10] = new ParameterConfigControl(grpChargeSaftySettings, this.memoryValues, 10, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2657), 175, //$NON-NLS-1$
-				"0(OFF) - 9999 Min", 280,  //$NON-NLS-1$
-				true, 50, 150, 0, 9999, 0, false); //$NON-NLS-1$
-		grpChargeSaftySettings.addListener(SWT.Selection, this.memoryParameterChangeListener);
-		
-		grpBalancerSettings = new Group(chargeComposite, SWT.NONE);
-		grpBalancerSettings.setText(Messages.getString(MessageIds.GDE_MSGT2658)); //$NON-NLS-1$
-		grpBalancerSettings.setLayout(new RowLayout(SWT.VERTICAL));
-		//charge parameter balancer
-		this.memoryParameters[11] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 11, 
-				Messages.getString(MessageIds.GDE_MSGT2659), 175, //$NON-NLS-1$
-				String.join(", ", ChargerMemory.BalancerSpeed.VALUES), 280,  //$NON-NLS-1$
-				ChargerMemory.BalancerSpeed.VALUES, 50, 150);
-		//charge parameter balancer start
-		this.memoryParameters[12] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 12, 
-				Messages.getString(MessageIds.GDE_MSGT2660), 175, //$NON-NLS-1$
-				String.join(", ", ChargerMemory.BalancerStart.VALUES), 280,  //$NON-NLS-1$
-				ChargerMemory.BalancerStart.VALUES, 50, 150);
-		//charge parameter balancer difference
-		this.memoryParameters[13] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 13, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2661), 175, //$NON-NLS-1$
-				"1 mV - 10 mV", 280,  //$NON-NLS-1$
-				true, 50, 150, 1, 10, -1, false); //$NON-NLS-1$
-		//charge parameter balancer target
-		this.memoryParameters[14] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 14, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2662), 175, //$NON-NLS-1$
-				"1 mV - 50 mV", 280,  //$NON-NLS-1$
-				true, 50, 150, 1, 50, -1, false); //$NON-NLS-1$
-		//charge parameter balancer over charge
-		this.memoryParameters[15] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 15, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2663), 175, //$NON-NLS-1$
-				"0 mV - 50 mV", 280,  //$NON-NLS-1$
-				true, 50, 150, 0, 50, 0, false); //$NON-NLS-1$
-		//charge parameter balancer delay
-		this.memoryParameters[16] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 16, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2664), 175, //$NON-NLS-1$
-				"0 Min - 20 Min", 280,  //$NON-NLS-1$
-				true, 50, 150, 0, 20, 0, false); //$NON-NLS-1$
-		grpBalancerSettings.addListener(SWT.Selection, this.memoryParameterChangeListener);
-		
-		//Li, NiZn, Pb only (NiMH, NiCd has charge at 0V enablement)
-		grpAdvancedRestoreSettings = new Group(chargeComposite, SWT.NONE);
-		grpAdvancedRestoreSettings.setText(Messages.getString(MessageIds.GDE_MSGT2665)); //$NON-NLS-1$
-		grpAdvancedRestoreSettings.setLayout(new RowLayout(SWT.VERTICAL));
-		//charge restore lowest voltage
-		this.memoryParameters[32] = new ParameterConfigControl(grpAdvancedRestoreSettings, this.memoryValues, 32, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2666), 175, //$NON-NLS-1$
-				"500 mV - 2500 mV", 280,  //$NON-NLS-1$
-				true, 50, 150, 500, 2500, -500, false); //$NON-NLS-1$
-		//charge restore charge time
-		this.memoryParameters[33] = new ParameterConfigControl(grpAdvancedRestoreSettings, this.memoryValues, 33, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2667), 175, //$NON-NLS-1$
-				"1 Min - 5 Min", 280,  //$NON-NLS-1$
-				true, 50, 150, 1, 5, -1, false); //$NON-NLS-1$
-		//charge restore charge time
-		this.memoryParameters[34] = new ParameterConfigControl(grpAdvancedRestoreSettings, this.memoryValues, 34, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2668), 175, //$NON-NLS-1$
-				"20 mA - 500 mA", 280,  //$NON-NLS-1$
-				true, 50, 150, 20, 500, -20, false); //$NON-NLS-1$
-		//charge keep charging after done
-		this.memoryParameters[35] = new ParameterConfigControl(grpAdvancedRestoreSettings, this.memoryValues, 35, 
-				Messages.getString(MessageIds.GDE_MSGT2669), 175, //$NON-NLS-1$
-				"off, on", 280,  //$NON-NLS-1$
-				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
-
-		grpAdvancedRestoreSettings.addListener(SWT.Selection, this.memoryParameterChangeListener);		
-		chargeComposite.layout();
-		
-		
-		CTabItem tbtmDischarge = new CTabItem(tabFolder, SWT.NONE);
-		tbtmDischarge.setText(Messages.getString(MessageIds.GDE_MSGT2670));	 //$NON-NLS-1$
-		dischargeComposite = new Composite(tabFolder, SWT.NONE);
-		tbtmDischarge.setControl(dischargeComposite);
-		dischargeComposite.setLayout(new RowLayout(SWT.VERTICAL));
-		//discharge parameter current
-		this.memoryParameters[17] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 17, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2671), 175, //$NON-NLS-1$
-				"50 ~ 30000 mA", 280,  //$NON-NLS-1$
-				true, 50, 150, 50, 30000, -50, false); //$NON-NLS-1$
-		//discharge parameter cell voltage
-		this.memoryParameters[18] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 18, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2672), 175, //$NON-NLS-1$
-				"3000mV - 4100mV", 280,  //$NON-NLS-1$
-				true, 50, 150, 3000, 4100, -3000, false); //$NON-NLS-1$
-		//discharge end current
-		this.memoryParameters[19] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 19, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2673), 175, //$NON-NLS-1$
-				"1% - 100%", 280,  //$NON-NLS-1$
-				true, 50, 150, 1, 100, -1, false); //$NON-NLS-1$
-		//20 regenerative mode 
-		this.memoryParameters[20] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 20, 
-				Messages.getString(MessageIds.GDE_MSGT2674), 175, //$NON-NLS-1$
-				"off, on", 280,  //$NON-NLS-1$
-				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
-		//discharge extra
-		this.memoryParameters[21] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 21, 
-				Messages.getString(MessageIds.GDE_MSGT2675), 175, //$NON-NLS-1$
-				"off, on", 280,  //$NON-NLS-1$
-				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
-		//discharge balancer
-		this.memoryParameters[22] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 22,
-				Messages.getString(MessageIds.GDE_MSGT2676), 175, //$NON-NLS-1$
-				"off, on", 280,  //$NON-NLS-1$
-				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
-		dischargeComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
-		
-		grpDischargeSaftySettings = new Group(dischargeComposite, SWT.NONE);
-		grpDischargeSaftySettings.setText(Messages.getString(MessageIds.GDE_MSGT2654)); //$NON-NLS-1$
-		grpDischargeSaftySettings.setBackground(application.COLOR_WHITE);
-		grpDischargeSaftySettings.setLayout(new RowLayout(SWT.VERTICAL));
-		//discharge parameter cut temperature
-		this.memoryParameters[23] = new ParameterConfigControl(grpDischargeSaftySettings, this.memoryValues, 23, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2655), 175, //$NON-NLS-1$
-				"20°C - 80°C", 280,  //$NON-NLS-1$
-				true, 50, 150, 20, 80, -20, false); //$NON-NLS-1$
-		//discharge parameter max discharge capacity
-		this.memoryParameters[24] = new ParameterConfigControl(grpDischargeSaftySettings, this.memoryValues, 24, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2656), 175, //$NON-NLS-1$
-				"50% - 200%", 280,  //$NON-NLS-1$
-				true, 50, 150, 50, 200, -50, false); //$NON-NLS-1$
-		//discharge parameter safety timer
-		this.memoryParameters[25] = new ParameterConfigControl(grpDischargeSaftySettings, this.memoryValues, 25, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2657), 175, //$NON-NLS-1$
-				"0(OFF) - 9999 Min", 280,  //$NON-NLS-1$
-				true, 50, 150, 0, 9999, 0, false); //$NON-NLS-1$
-		grpDischargeSaftySettings.addListener(SWT.Selection, this.memoryParameterChangeListener);
-		
-		createStorageTabItem(tabFolder);
-		
-		CTabItem tbtmCycle = new CTabItem(tabFolder, SWT.NONE);
-		tbtmCycle.setText(Messages.getString(MessageIds.GDE_MSGT2681));	 //$NON-NLS-1$
-		cycleComposite = new Composite(tabFolder, SWT.NONE);
-		tbtmCycle.setControl(cycleComposite);
-		cycleComposite.setLayout(new RowLayout(SWT.VERTICAL));
-		//cycle parameter mode CHG->DCHG
-		this.memoryParameters[39] = new ParameterConfigControl(cycleComposite, this.memoryValues, 39,
-				Messages.getString(MessageIds.GDE_MSGT2682), 175, //$NON-NLS-1$
-				String.join(", ", ChargerMemory.CycleMode.VALUES), 280,  //$NON-NLS-1$
-				ChargerMemory.CycleMode.VALUES, 50, 150);
-		//cycle count
-		this.memoryParameters[40] = new ParameterConfigControl(cycleComposite, this.memoryValues, 40, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2683), 175, //$NON-NLS-1$
-				"1 - 99", 280,  //$NON-NLS-1$
-				true, 50, 150, 1, 99, -1, false); //$NON-NLS-1$
-		//cycle delay
-		this.memoryParameters[41] = new ParameterConfigControl(cycleComposite, this.memoryValues, 41, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGT2684), 175, //$NON-NLS-1$
-				"1 Min - 999 Min", 280,  //$NON-NLS-1$
-				true, 50, 150, 1, 999, -1, false); //$NON-NLS-1$
-		cycleComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
-	
+		createChargeTabItem();			
+		createDischargeTabItem();		
+		createStorageTabItem();	
+		createCycleTabItem();
+		//createPowerTabItem();
 		tabFolder.setSelection(0);
 		updateMemoryParameterControls();
 	
 
-		Group grpRunProgram = new Group(mainComposite, SWT.NONE);
+		grpRunProgram = new Group(mainComposite, SWT.NONE);
 		fd_tabFolder.bottom = new FormAttachment(grpRunProgram, -5);
 		grpRunProgram.setText(Messages.getString(MessageIds.GDE_MSGT2685)); //$NON-NLS-1$
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
@@ -1562,10 +1329,248 @@ public class ChargerDialog extends DeviceDialog {
 		}); 
 	}
 
-	private void createStorageTabItem(CTabFolder usetabFolder) {
-		tbtmStorage = new CTabItem(usetabFolder, SWT.NONE);
+	private void createBaseBatteryParameters() {
+		//battery type
+		this.memoryParameters[0] = new ParameterConfigControl(memoryComposite, this.memoryValues, 0, 
+				Messages.getString(MessageIds.GDE_MSGT2636), 175, //$NON-NLS-1$
+				this.cellTypeNames, 280, 
+				this.cellTypeNamesArray, 50, 150);
+		this.memoryParameters[0].getSlider().setVisible(false);
+		//number cells
+		int maxNumberCells = ((iChargerUsb)this.device).getNumberOfLithiumCells();
+		this.memoryParameters[1] = new ParameterConfigControl(memoryComposite, this.memoryValues, 1, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2637), 175, //$NON-NLS-1$
+				"0(auto) - " + maxNumberCells, 280,  //$NON-NLS-1$
+				false, 50, 150, 0, maxNumberCells); //$NON-NLS-1$
+		//battery capacity
+		this.memoryParameters[2] = new ParameterConfigControl(memoryComposite, this.memoryValues, 2, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2638), 175, //$NON-NLS-1$
+				"0(auto) ~ 65000 mAh", 280,  //$NON-NLS-1$
+				true, 50, 150, 0, 65000, 0, true); //$NON-NLS-1$
+		memoryComposite.layout();
+		memoryComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
+	}
+
+	private void createChargeTabItem() {
+		tbtmCharge = new CTabItem(tabFolder, SWT.NONE);
+		tbtmCharge.setText(Messages.getString(MessageIds.GDE_MSGT2639));	 //$NON-NLS-1$
+		ScrolledComposite scrolledComposite = new ScrolledComposite(tabFolder, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		tbtmCharge.setControl(scrolledComposite);
+		scrolledComposite.setExpandHorizontal(true);
+		scrolledComposite.setLayout(new FillLayout(SWT.VERTICAL));
+		chargeComposite = new Composite(scrolledComposite, SWT.NONE);
+		chargeComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
+		scrolledComposite.setContent(chargeComposite);
+		scrolledComposite.setMinSize(chargeComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		chargeComposite.setSize(tbtmCharge.getBounds().width, 880);
+		//charge parameter current
+		this.memoryParameters[3] = new ParameterConfigControl(chargeComposite, this.memoryValues, 3, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2640), 175, //$NON-NLS-1$
+				"100 ~ 20000 mA", 280,  //$NON-NLS-1$
+				true, 50, 150, 100, 20000, -100, false); //$NON-NLS-1$
+		//charge parameter modus normal,balance,external,reflex 
+		this.memoryParameters[4] = new ParameterConfigControl(chargeComposite, this.memoryValues, 4, 
+				Messages.getString(MessageIds.GDE_MSGT2641), 175, //$NON-NLS-1$
+				String.join(", ", ChargerMemory.LiMode.VALUES), 280,  //$NON-NLS-1$
+				ChargerMemory.LiMode.VALUES, 50, 150);
+		//charge parameter modus normal,balance,external,reflex 
+		this.memoryParameters[5] = new ParameterConfigControl(chargeComposite, this.memoryValues, 5, 
+				Messages.getString(MessageIds.GDE_MSGT2642), 175, //$NON-NLS-1$
+				String.join(", ", ChargerMemory.BalancerLiSetup.VALUES), 280,  //$NON-NLS-1$
+				ChargerMemory.BalancerLiSetup.VALUES, 50, 150);
+		//charge parameter end current
+		this.memoryParameters[6] = new ParameterConfigControl(chargeComposite, this.memoryValues, 6, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2643), 175, //$NON-NLS-1$
+				"10% - 50%", 280,  //$NON-NLS-1$
+				true, 50, 150, 10, 50, -10, false); //$NON-NLS-1$
+		if (this.memoryValues[5] == 0) this.memoryParameters[6].setEnabled(false);
+		//charge parameter cell voltage
+		this.memoryParameters[7] = new ParameterConfigControl(chargeComposite, this.memoryValues, 7, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2644), 175, //$NON-NLS-1$
+				"4000 mV - 4200 mV", 280,  //$NON-NLS-1$
+				true, 50, 150, 4000, 4200, -4000, false); //$NON-NLS-1$
+
+		//Ni charge voltage drop
+		this.memoryParameters[26] = new ParameterConfigControl(chargeComposite, this.memoryValues, 26, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2645), 175, //$NON-NLS-1$
+				"1 mV - 20 mV", 280,  //$NON-NLS-1$
+				true, 50, 150, 1, 20, -1, false); //$NON-NLS-1$
+		//Ni charge voltage drop delay
+		this.memoryParameters[27] = new ParameterConfigControl(chargeComposite, this.memoryValues, 27, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2646), 175, //$NON-NLS-1$
+				"0 Min - 20 Min", 280,  //$NON-NLS-1$
+				true, 50, 150, 0, 20, 0, false); //$NON-NLS-1$
+		//Ni charge allow 0V 
+		this.memoryParameters[28] = new ParameterConfigControl(chargeComposite, this.memoryValues, 28, 
+				Messages.getString(MessageIds.GDE_MSGT2647), 175, //$NON-NLS-1$
+				Messages.getString(MessageIds.GDE_MSGT2648), 280,  //$NON-NLS-1$
+				new String[]{Messages.getString(MessageIds.GDE_MSGT2649), Messages.getString(MessageIds.GDE_MSGT2650)}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
+		//Ni trickle charge enable 
+		this.memoryParameters[29] = new ParameterConfigControl(chargeComposite, this.memoryValues, 29, 
+				Messages.getString(MessageIds.GDE_MSGT2651), 175, //$NON-NLS-1$
+				"off, on", 280,  //$NON-NLS-1$
+				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
+		//Ni charge trickle current
+		this.memoryParameters[30] = new ParameterConfigControl(chargeComposite, this.memoryValues, 30, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2652), 175, //$NON-NLS-1$
+				"20mA - 1000mA", 280,  //$NON-NLS-1$
+				true, 50, 150, 20, 1000, -20, false); //$NON-NLS-1$
+		//Ni charge trickle timeout
+		this.memoryParameters[31] = new ParameterConfigControl(chargeComposite, this.memoryValues, 31, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2653), 175, //$NON-NLS-1$
+				"1 Min - 999 Min", 280,  //$NON-NLS-1$
+				true, 50, 150, 1, 999, -1, false); //$NON-NLS-1$
+		chargeComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
+		
+		grpChargeSaftySettings = new Group(chargeComposite, SWT.NONE);
+		grpChargeSaftySettings.setText(Messages.getString(MessageIds.GDE_MSGT2654)); //$NON-NLS-1$
+		grpChargeSaftySettings.setBackground(application.COLOR_WHITE);
+		grpChargeSaftySettings.setLayout(new RowLayout(SWT.VERTICAL));
+		//charge parameter balancer
+		this.memoryParameters[8] = new ParameterConfigControl(grpChargeSaftySettings, this.memoryValues, 8, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2655), 175, //$NON-NLS-1$
+				"20°C - 80°C", 280,  //$NON-NLS-1$
+				true, 50, 150, 20, 80, -20, false); //$NON-NLS-1$
+		//charge parameter balancer start
+		this.memoryParameters[9] = new ParameterConfigControl(grpChargeSaftySettings, this.memoryValues, 9, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2656), 175, //$NON-NLS-1$
+				"50% - 200%", 280,  //$NON-NLS-1$
+				true, 50, 150, 50, 200, -50, false); //$NON-NLS-1$
+		//charge parameter balancer difference
+		this.memoryParameters[10] = new ParameterConfigControl(grpChargeSaftySettings, this.memoryValues, 10, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2657), 175, //$NON-NLS-1$
+				"0(OFF) - 9999 Min", 280,  //$NON-NLS-1$
+				true, 50, 150, 0, 9999, 0, false); //$NON-NLS-1$
+		grpChargeSaftySettings.addListener(SWT.Selection, this.memoryParameterChangeListener);
+		
+		grpBalancerSettings = new Group(chargeComposite, SWT.NONE);
+		grpBalancerSettings.setText(Messages.getString(MessageIds.GDE_MSGT2658)); //$NON-NLS-1$
+		grpBalancerSettings.setLayout(new RowLayout(SWT.VERTICAL));
+		//charge parameter balancer
+		this.memoryParameters[11] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 11, 
+				Messages.getString(MessageIds.GDE_MSGT2659), 175, //$NON-NLS-1$
+				String.join(", ", ChargerMemory.BalancerSpeed.VALUES), 280,  //$NON-NLS-1$
+				ChargerMemory.BalancerSpeed.VALUES, 50, 150);
+		//charge parameter balancer start
+		this.memoryParameters[12] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 12, 
+				Messages.getString(MessageIds.GDE_MSGT2660), 175, //$NON-NLS-1$
+				String.join(", ", ChargerMemory.BalancerStart.VALUES), 280,  //$NON-NLS-1$
+				ChargerMemory.BalancerStart.VALUES, 50, 150);
+		//charge parameter balancer difference
+		this.memoryParameters[13] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 13, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2661), 175, //$NON-NLS-1$
+				"1 mV - 10 mV", 280,  //$NON-NLS-1$
+				true, 50, 150, 1, 10, -1, false); //$NON-NLS-1$
+		//charge parameter balancer target
+		this.memoryParameters[14] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 14, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2662), 175, //$NON-NLS-1$
+				"1 mV - 50 mV", 280,  //$NON-NLS-1$
+				true, 50, 150, 1, 50, -1, false); //$NON-NLS-1$
+		//charge parameter balancer over charge
+		this.memoryParameters[15] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 15, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2663), 175, //$NON-NLS-1$
+				"0 mV - 50 mV", 280,  //$NON-NLS-1$
+				true, 50, 150, 0, 50, 0, false); //$NON-NLS-1$
+		//charge parameter balancer delay
+		this.memoryParameters[16] = new ParameterConfigControl(grpBalancerSettings, this.memoryValues, 16, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2664), 175, //$NON-NLS-1$
+				"0 Min - 20 Min", 280,  //$NON-NLS-1$
+				true, 50, 150, 0, 20, 0, false); //$NON-NLS-1$
+		grpBalancerSettings.addListener(SWT.Selection, this.memoryParameterChangeListener);
+		
+		//Li, NiZn, Pb only (NiMH, NiCd has charge at 0V enablement)
+		grpAdvancedRestoreSettings = new Group(chargeComposite, SWT.NONE);
+		grpAdvancedRestoreSettings.setText(Messages.getString(MessageIds.GDE_MSGT2665)); //$NON-NLS-1$
+		grpAdvancedRestoreSettings.setLayout(new RowLayout(SWT.VERTICAL));
+		//charge restore lowest voltage
+		this.memoryParameters[32] = new ParameterConfigControl(grpAdvancedRestoreSettings, this.memoryValues, 32, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2666), 175, //$NON-NLS-1$
+				"500 mV - 2500 mV", 280,  //$NON-NLS-1$
+				true, 50, 150, 500, 2500, -500, false); //$NON-NLS-1$
+		//charge restore charge time
+		this.memoryParameters[33] = new ParameterConfigControl(grpAdvancedRestoreSettings, this.memoryValues, 33, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2667), 175, //$NON-NLS-1$
+				"1 Min - 5 Min", 280,  //$NON-NLS-1$
+				true, 50, 150, 1, 5, -1, false); //$NON-NLS-1$
+		//charge restore charge time
+		this.memoryParameters[34] = new ParameterConfigControl(grpAdvancedRestoreSettings, this.memoryValues, 34, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2668), 175, //$NON-NLS-1$
+				"20 mA - 500 mA", 280,  //$NON-NLS-1$
+				true, 50, 150, 20, 500, -20, false); //$NON-NLS-1$
+		//charge keep charging after done
+		this.memoryParameters[35] = new ParameterConfigControl(grpAdvancedRestoreSettings, this.memoryValues, 35, 
+				Messages.getString(MessageIds.GDE_MSGT2669), 175, //$NON-NLS-1$
+				"off, on", 280,  //$NON-NLS-1$
+				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
+
+		grpAdvancedRestoreSettings.addListener(SWT.Selection, this.memoryParameterChangeListener);		
+		chargeComposite.layout();
+	}
+
+	private void createDischargeTabItem() {
+		tbtmDischarge = new CTabItem(tabFolder, SWT.NONE);
+		tbtmDischarge.setText(Messages.getString(MessageIds.GDE_MSGT2670));	 //$NON-NLS-1$
+		dischargeComposite = new Composite(tabFolder, SWT.NONE);
+		tbtmDischarge.setControl(dischargeComposite);
+		dischargeComposite.setLayout(new RowLayout(SWT.VERTICAL));
+		//discharge parameter current
+		this.memoryParameters[17] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 17, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2671), 175, //$NON-NLS-1$
+				"50 ~ 30000 mA", 280,  //$NON-NLS-1$
+				true, 50, 150, 50, 30000, -50, false); //$NON-NLS-1$
+		//discharge parameter cell voltage
+		this.memoryParameters[18] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 18, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2672), 175, //$NON-NLS-1$
+				"3000mV - 4100mV", 280,  //$NON-NLS-1$
+				true, 50, 150, 3000, 4100, -3000, false); //$NON-NLS-1$
+		//discharge end current
+		this.memoryParameters[19] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 19, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2673), 175, //$NON-NLS-1$
+				"1% - 100%", 280,  //$NON-NLS-1$
+				true, 50, 150, 1, 100, -1, false); //$NON-NLS-1$
+		//20 regenerative mode 
+		this.memoryParameters[20] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 20, 
+				Messages.getString(MessageIds.GDE_MSGT2674), 175, //$NON-NLS-1$
+				"off, on", 280,  //$NON-NLS-1$
+				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
+		//discharge extra
+		this.memoryParameters[21] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 21, 
+				Messages.getString(MessageIds.GDE_MSGT2675), 175, //$NON-NLS-1$
+				"off, on", 280,  //$NON-NLS-1$
+				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
+		//discharge balancer
+		this.memoryParameters[22] = new ParameterConfigControl(dischargeComposite, this.memoryValues, 22,
+				Messages.getString(MessageIds.GDE_MSGT2676), 175, //$NON-NLS-1$
+				"off, on", 280,  //$NON-NLS-1$
+				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
+		dischargeComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
+		
+		grpDischargeSaftySettings = new Group(dischargeComposite, SWT.NONE);
+		grpDischargeSaftySettings.setText(Messages.getString(MessageIds.GDE_MSGT2654)); //$NON-NLS-1$
+		grpDischargeSaftySettings.setBackground(application.COLOR_WHITE);
+		grpDischargeSaftySettings.setLayout(new RowLayout(SWT.VERTICAL));
+		//discharge parameter cut temperature
+		this.memoryParameters[23] = new ParameterConfigControl(grpDischargeSaftySettings, this.memoryValues, 23, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2655), 175, //$NON-NLS-1$
+				"20°C - 80°C", 280,  //$NON-NLS-1$
+				true, 50, 150, 20, 80, -20, false); //$NON-NLS-1$
+		//discharge parameter max discharge capacity
+		this.memoryParameters[24] = new ParameterConfigControl(grpDischargeSaftySettings, this.memoryValues, 24, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2656), 175, //$NON-NLS-1$
+				"50% - 200%", 280,  //$NON-NLS-1$
+				true, 50, 150, 50, 200, -50, false); //$NON-NLS-1$
+		//discharge parameter safety timer
+		this.memoryParameters[25] = new ParameterConfigControl(grpDischargeSaftySettings, this.memoryValues, 25, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2657), 175, //$NON-NLS-1$
+				"0(OFF) - 9999 Min", 280,  //$NON-NLS-1$
+				true, 50, 150, 0, 9999, 0, false); //$NON-NLS-1$
+		grpDischargeSaftySettings.addListener(SWT.Selection, this.memoryParameterChangeListener);
+	}
+
+	private void createStorageTabItem() {
+		tbtmStorage = new CTabItem(tabFolder, SWT.NONE);
 		tbtmStorage.setText(Messages.getString(MessageIds.GDE_MSGT2695));	 //$NON-NLS-1$
-		storageComposite = new Composite(usetabFolder, SWT.NONE);
+		storageComposite = new Composite(tabFolder, SWT.NONE);
 		tbtmStorage.setControl(storageComposite);
 		storageComposite.setLayout(new RowLayout(SWT.VERTICAL));
 		//storage parameter cell voltage (Li battery type only)
@@ -1586,12 +1591,92 @@ public class ChargerDialog extends DeviceDialog {
 		storageComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
 	}
 
+	private void createCycleTabItem() {
+		tbtmCycle = new CTabItem(tabFolder, SWT.NONE);
+		tbtmCycle.setText(Messages.getString(MessageIds.GDE_MSGT2681));	 //$NON-NLS-1$
+		cycleComposite = new Composite(tabFolder, SWT.NONE);
+		tbtmCycle.setControl(cycleComposite);
+		cycleComposite.setLayout(new RowLayout(SWT.VERTICAL));
+		//cycle parameter mode CHG->DCHG
+		this.memoryParameters[39] = new ParameterConfigControl(cycleComposite, this.memoryValues, 39,
+				Messages.getString(MessageIds.GDE_MSGT2682), 175, //$NON-NLS-1$
+				String.join(", ", ChargerMemory.CycleMode.VALUES), 280,  //$NON-NLS-1$
+				ChargerMemory.CycleMode.VALUES, 50, 150);
+		//cycle count
+		this.memoryParameters[40] = new ParameterConfigControl(cycleComposite, this.memoryValues, 40, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2683), 175, //$NON-NLS-1$
+				"1 - 99", 280,  //$NON-NLS-1$
+				true, 50, 150, 1, 99, -1, false); //$NON-NLS-1$
+		//cycle delay
+		this.memoryParameters[41] = new ParameterConfigControl(cycleComposite, this.memoryValues, 41, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGT2684), 175, //$NON-NLS-1$
+				"1 Min - 999 Min", 280,  //$NON-NLS-1$
+				true, 50, 150, 1, 999, -1, false); //$NON-NLS-1$
+		cycleComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
+	}
+
+	private void createPowerTabItem() {
+		tbtmPower = new CTabItem(tabFolder, SWT.NONE);
+		tbtmPower.setText(Messages.getString(MessageIds.GDE_MSGT2677));
+		powerComposite = new Composite(tabFolder, SWT.NONE);
+		tbtmPower.setControl(powerComposite);
+		powerComposite.setLayout(new RowLayout(SWT.VERTICAL));
+		//power voltage
+		this.memoryParameters[42] = new ParameterConfigControl(powerComposite, this.memoryValues, 42, "%3.1f", 
+				"Voltage", 175, //$NON-NLS-1$
+				"2.0 - 26.5 V", 280,  //$NON-NLS-1$
+				true, 50, 150, 20, 265, -20, false); //$NON-NLS-1$
+		//power current
+		this.memoryParameters[43] = new ParameterConfigControl(powerComposite, this.memoryValues, 43, "%3.1f",
+				"Current", 175, //$NON-NLS-1$
+				"1.0 - 30.0 A", 280,  //$NON-NLS-1$
+				true, 50, 150, 10, 300, -10, false); //$NON-NLS-1$
+		//power option lock
+		this.memoryParameters[44] = new ParameterConfigControl(powerComposite, this.memoryValues, 44,
+				"Lock", 175, //$NON-NLS-1$
+				"off, on", 280,  //$NON-NLS-1$
+				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
+		//power option auto start
+		this.memoryParameters[45] = new ParameterConfigControl(powerComposite, this.memoryValues, 45,
+				"Auto start", 175, //$NON-NLS-1$
+				"off, on", 280,  //$NON-NLS-1$
+				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
+		//power option live update
+		this.memoryParameters[46] = new ParameterConfigControl(powerComposite, this.memoryValues, 46,
+				"Live update", 175, //$NON-NLS-1$
+				"off, on", 280,  //$NON-NLS-1$
+				new String[]{"off", "on"}, 50, 150); //$NON-NLS-1$ //$NON-NLS-2$
+		powerComposite.layout();
+		powerComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
+	}
+	
 	private void updateMemoryParameterControls() {
 		
 		if ((isDuo && this.memoryValues[0] < 8) || this.memoryValues[0] < 9) { // X devices up to Power
 			int maxNumberCells = this.cellTypeNamesArray[this.memoryValues[0]].startsWith("L") ? ((iChargerUsb) this.device).getNumberOfLithiumCells() //$NON-NLS-1$
 					: this.cellTypeNamesArray[this.memoryValues[0]].startsWith("N") ? ChargerMemory.getMaxCellsNi(this.device) //$NON-NLS-1$
 							: this.cellTypeNamesArray[this.memoryValues[0]].startsWith("P") ? ChargerMemory.getMaxCellsPb(this.device) : 0; //$NON-NLS-1$
+					
+							
+			if (tbtmPower != null && !tbtmPower.isDisposed()) {
+				powerComposite.removeListener(SWT.Selection, this.memoryParameterChangeListener);
+				for (int i = 42; i < 47; ++i) 
+					this.memoryParameters[i].dispose();
+				powerComposite.dispose();
+				tbtmPower.dispose();
+			}
+			if (powerLabel != null && !powerLabel.isDisposed()) {
+				powerLabel.dispose();		
+				createBaseBatteryParameters();
+			}
+			if (tbtmCharge == null || tbtmCharge.isDisposed()) {
+				createChargeTabItem();
+				grpRunProgram.setEnabled(true);
+				tabFolder.setSelection(0);
+			}
+			if (tbtmDischarge == null || tbtmDischarge.isDisposed()) createDischargeTabItem();
+			if (tbtmCycle == null || tbtmCycle.isDisposed()) createCycleTabItem();
+			
 			this.memoryParameters[1].updateValueRange("autom. - " + maxNumberCells, 0, maxNumberCells, 0); //$NON-NLS-1$
 			//battery type dependent updates
 			this.memoryParameters[5].setEnabled(true);
@@ -1891,7 +1976,7 @@ public class ChargerDialog extends DeviceDialog {
 				case 7: //LiHV
 				default: 
 					if (tbtmStorage == null || tbtmStorage.isDisposed()) {
-						createStorageTabItem(tabFolder);						
+						createStorageTabItem();						
 					}
 					switch (this.memoryValues[0]) { //LiPo,LiLo,LiFe
 					case 0: //LiPo
@@ -1932,7 +2017,7 @@ public class ChargerDialog extends DeviceDialog {
 				case 3: //LiHV
 				case 4: //LTO
 					if (tbtmStorage == null || tbtmStorage.isDisposed()) {
-						createStorageTabItem(tabFolder);						
+						createStorageTabItem();						
 					}
 					switch (this.memoryValues[0]) { //LiPo,LiLo,LiFe
 					case 0: //LiPo
@@ -1969,13 +2054,60 @@ public class ChargerDialog extends DeviceDialog {
 					break;
 				}
 			}
-			//update parameter controls
-			for (int i = 0; i < this.memoryParameters.length; i++) {
-				if (this.memoryParameters[i] != null) {
-					this.memoryParameters[i].setSliderSelection(this.memoryValues[i]);
-				}
-			} 
 		}
+		else if (!isDuo && this.memoryValues[0] == 9) { // X devices power type memory
+			memoryComposite.removeListener(SWT.Selection, this.memoryParameterChangeListener);
+			for (int i = 0; i < 42; ++i) 
+				if (this.memoryParameters[i] != null)
+					this.memoryParameters[i].dispose();
+			
+			if (powerLabel == null || powerLabel.isDisposed()) {
+				powerLabel = new CLabel(memoryComposite, SWT.CENTER);
+				powerLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE+15, SWT.BOLD));
+				powerLabel.setBackground(this.application.COLOR_CANVAS_YELLOW);
+				powerLabel.setText(Messages.getString(MessageIds.GDE_MSGT2677));
+				memoryComposite.layout();
+			}
+			
+			if (tbtmCharge != null && !tbtmCharge.isDisposed()) {
+				grpBalancerSettings.removeListener(SWT.Selection, this.memoryParameterChangeListener);
+				grpBalancerSettings.dispose();
+				grpAdvancedRestoreSettings.removeListener(SWT.Selection, this.memoryParameterChangeListener);
+				grpAdvancedRestoreSettings.dispose();
+				grpChargeSaftySettings.removeListener(SWT.Selection, this.memoryParameterChangeListener);
+				grpChargeSaftySettings.dispose();
+				chargeComposite.removeListener(SWT.Selection, this.memoryParameterChangeListener);
+				chargeComposite.dispose();
+				tbtmCharge.dispose();
+			}
+			if (tbtmDischarge != null && !tbtmDischarge.isDisposed()) {
+				dischargeComposite.removeListener(SWT.Selection, this.memoryParameterChangeListener);
+				dischargeComposite.dispose();
+				tbtmDischarge.dispose();
+			}
+			if (tbtmStorage != null && !tbtmStorage.isDisposed()) {
+				storageComposite.removeListener(SWT.Selection, this.memoryParameterChangeListener);
+				storageComposite.dispose();
+				tbtmStorage.dispose();
+			}
+			if (tbtmCycle != null && !tbtmCycle.isDisposed()) {
+				cycleComposite.removeListener(SWT.Selection, this.memoryParameterChangeListener);
+				cycleComposite.dispose();
+				tbtmCycle.dispose();
+			}
+			if (tbtmPower == null || tbtmPower.isDisposed()) {
+				createPowerTabItem();
+				tabFolder.setSelection(0);
+				grpRunProgram.setEnabled(false);
+			}
+		}
+		
+		//update parameter controls
+		for (int i = 0; i < this.memoryParameters.length; i++) {
+			if (this.memoryParameters[i] != null) {
+				this.memoryParameters[i].setSliderSelection(this.memoryValues[i]);
+			}
+		} 
 	}
 
 	void addAllListeners() {
@@ -1986,6 +2118,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpBalancerSettings.addListener(SWT.Selection, memoryParameterChangeListener);
 		grpAdvancedRestoreSettings.addListener(SWT.Selection, memoryParameterChangeListener);
 		dischargeComposite.addListener(SWT.Selection, memoryParameterChangeListener);
+		powerComposite.addListener(SWT.Selection, memoryParameterChangeListener);
 	}
 
 	void removeAllListeners() {
@@ -1995,6 +2128,6 @@ public class ChargerDialog extends DeviceDialog {
 		grpChargeSaftySettings.removeListener(SWT.Selection, memoryParameterChangeListener);
 		grpBalancerSettings.removeListener(SWT.Selection, memoryParameterChangeListener);
 		grpAdvancedRestoreSettings.removeListener(SWT.Selection, memoryParameterChangeListener);
-		dischargeComposite.removeListener(SWT.Selection, memoryParameterChangeListener);
+		powerComposite.removeListener(SWT.Selection, memoryParameterChangeListener);
 	}
 }
