@@ -1132,13 +1132,6 @@ public class ChargerDialog extends DeviceDialog {
 				ChargerDialog.this.combo.select(0);
 				ChargerDialog.this.combo.notifyListeners(SWT.Selection, new Event());
 				ChargerDialog.this.btnWrite.setEnabled(false);
-				ChargerDialog.this.btnCharge.setEnabled(true);
-				ChargerDialog.this.btnStorage.setEnabled(true);
-				ChargerDialog.this.btnDischarge.setEnabled(true);
-				ChargerDialog.this.btnCycle.setEnabled(true);
-				ChargerDialog.this.btnBalance.setEnabled(true);
-				ChargerDialog.this.btnPower.setEnabled(false);
-				ChargerDialog.this.btnStop.setEnabled(false);
 			}
 		});
 
@@ -1315,6 +1308,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.btnPower = new Button(this.grpRunProgram, SWT.NONE);
 		this.btnPower.setLayoutData(new RowData(85, SWT.DEFAULT));
 		this.btnPower.setText("power"); //$NON-NLS-1$
+		this.btnPower.setEnabled(false);
 		this.btnPower.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
