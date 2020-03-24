@@ -1,16 +1,38 @@
+/**************************************************************************************
+  	This file is part of GNU DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GNU DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
+
+    Copyright (c) 2020 Winfried Bruegmann
+****************************************************************************************/
 package gde.device.junsi.modbus;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import gde.device.IDevice;
+import gde.device.junsi.MessageIds;
 import gde.device.junsi.iCharger308DUO;
 import gde.device.junsi.iCharger4010DUO;
 import gde.device.junsi.iCharger406DUO;
+import gde.device.junsi.iChargerUsb.BatteryTypesDuo;
 import gde.device.junsi.iChargerX12;
 import gde.device.junsi.iChargerX6;
+import gde.device.junsi.iChargerX6.BatteryTypesX;
 import gde.device.junsi.iChargerX8;
 import gde.io.DataParser;
+import gde.messages.Messages;
 import gde.utils.StringHelper;
 
 public class ChargerMemory {
@@ -1649,12 +1671,25 @@ public class ChargerMemory {
 		//46 power option live update
 		values[46] = this.getDigitPowerSet() & 0x04;
 
+		//47 channel mode asynchronous | synchronous DUO only
+		values[47] = this.getChannelMode();
+		//48 log interval
+		values[48] = this.getLogInterval();
+		//49 power option auto start
+		values[49] = this.getSaveToSD();
+
 		return values;
 	}
 
-	public String getUseFlagAndName() {
+	public String getUseFlagAndName(boolean isDuo) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("%-7s - %s", useFlag == MEM_USED ? "CUSTOM" : "BUILD IN", new String(name).trim()));
+		if (this.name[0] == 0) {
+			String replaceDeviceCopiedName = isDuo ? BatteryTypesDuo.getValues()[1 + this.getType()] : BatteryTypesX.getValues()[1 + this.getType()];
+			replaceDeviceCopiedName += Messages.getString(MessageIds.GDE_MSGT2620);
+			sb.append(String.format("%-7s - %s", useFlag == MEM_USED ? "CUSTOM" : "BUILD IN", replaceDeviceCopiedName));
+		}
+		else
+			sb.append(String.format("%-7s - %s", useFlag == MEM_USED ? "CUSTOM" : "BUILD IN", new String(name).trim()));
 		return sb.toString();
 	}
 
