@@ -1614,7 +1614,7 @@ public class ChargerDialog extends DeviceDialog {
 		//sysScrolledComposite.setExpandVertical(true);
 		sysScrolledComposite.setContent(sysComposite);
 		sysScrolledComposite.setMinSize(sysComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		sysComposite.setSize(800, 1150);
+		sysComposite.setSize(800, GDE.IS_WINDOWS ? 1150 : 1300);
 		sysComposite.setLayout(new RowLayout(SWT.VERTICAL));
 		
 		grpTemperature = new Group(sysComposite, SWT.NONE);
