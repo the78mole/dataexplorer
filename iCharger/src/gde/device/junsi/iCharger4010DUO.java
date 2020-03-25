@@ -55,4 +55,28 @@ public class iCharger4010DUO extends iChargerUsb {
 	public int getNumberOfLithiumCells() {
 		return 10;
 	}
+
+	/**
+	 * @return the maximal charge current
+	 */
+	@Override
+	public int getChargeCurrentMax() {
+		return 40;
+	}
+
+	/**
+	 * @return the maximal charge power
+	 */
+	@Override
+	public int[] getChargePowerMax() {
+		return new int[] {1000, 1000};
+	}
+
+	/**
+	 * @return the maximal discharge current
+	 */
+	@Override
+	public int[] getDischargePowerMax() {
+		return new int[] {80, 80};
+	}
 }

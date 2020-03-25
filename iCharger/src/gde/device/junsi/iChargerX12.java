@@ -23,12 +23,13 @@ import java.io.FileNotFoundException;
 import javax.xml.bind.JAXBException;
 
 import gde.device.DeviceConfiguration;
+import gde.device.junsi.iChargerX6.BatteryTypesX;
 
 /**
  * Junsi iCharger X8 device class
  * @author Winfried Brügmann
  */
-public class iChargerX12 extends iChargerX6 {
+public class iChargerX12 extends iChargerUsb {
 
 	/**
 	 * @param deviceProperties
@@ -57,4 +58,27 @@ public class iChargerX12 extends iChargerX6 {
 		return 12;
 	}
 
+	/**
+	 * @return the maximal charge current
+	 */
+	@Override
+	public int getChargeCurrentMax() {
+		return 40;
+	}
+
+	/**
+	 * @return the maximal charge power
+	 */
+	@Override
+	public int[] getChargePowerMax() {
+		return new int[] {1100, 0};
+	}
+
+	/**
+	 * @return the maximal discharge current
+	 */
+	@Override
+	public int[] getDischargePowerMax() {
+		return new int[] {40, 0};
+	}
 }

@@ -1,464 +1,1157 @@
+/**************************************************************************************
+  	This file is part of GNU DataExplorer.
+
+    GNU DataExplorer is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GNU DataExplorer is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
+
+    Copyright (c) 2020 Winfried Bruegmann
+****************************************************************************************/
 package gde.device.junsi.modbus;
 
 import gde.io.DataParser;
 
 public class ChargerSystem {
-	final static short	MODEL_MAX						= 2;
+	
+	short								tempUnit;
+	short								tempStop;
+	short								tempFansOn;
+	short								tempReduce;
+	short								fansSpeed;														//DUO only
+	short								fansOffDelay;
+	short								lcdContraste;
+	short								lightValue;
+	short								beepMode;															//DUO only
+	short[]							beepType						= new short[4];
+	short[]							beepEnable					= new short[4];
+	short[]							beepVOL							= new short[4];
+	short								selectLanguage; 											//0=english, 1=german
+	short								selectAdj; 														//calibration
+	short								systemVersion;
+	short								selInputSource; 											//DUO 0=AC, 1=Bat; X 0-3
+	
+	//begin DUO only section
+	short								dcInputLowVolt;
+	short								dcInputOverVolt;
+	short								dcInputCurrentLimit;
+	short								batInputLowVolt;
+	short								batInputOverVolt;
+	short								batInputCurrentLimit;
+	short								regEnable;
+	short								regVoltLimit;
+	short								regCurrentLimit;
+	short[]							chargePower					= new short[2]; 
+	short[]							dischargePower			= new short[2];
+	short								proPower;
+	short[]							monitorLogInterval	= new short[2];
+	short[]							monitorLogSaveToSD	= new short[2];
+	//end DUO only section
+	
+	//begin X only section
+	InputSource[]				xInputSources = new InputSource[4]; //X 0-3
+	short								xDischargePower;
+	short								xMonitorLogInterval;
+	short								xMonitorLogSaveToSD;
+	//end X only section
+	short								servoType;
+	short								servoUserCenter;
+	short								servoUserRate;
+	short								servoUserOpAngle;
 
-	short								TempUnit;
-	short								TempStop;
-	short								TempFansOn;
-	short								TempReduce;
-	short								FansSpeed;
-	short								FansOffDelay;
-	short								LcdContraste;
-	short								LightValue;
-	short								BeepMode;
-	short[]							BeepType						= new short[4];
-	short[]							BeepEnable					= new short[4];
-	short[]							BeepVOL							= new short[4];
-	short								DoneBeepType;
-	short								SelectAdj;
-	short								Ver;
-	short								SelInputSource;
-	short								DCInputLowVolt;
-	short								DCInputOverVolt;
-	short								DCInputCurrentLimit;
-	short								BatInputLowVolt;
-	short								BatInputOverVolt;
-	short								BatInputCurrentLimit;
-	short								RegEnable;
-	short								RegVoltLimit;
-	short								RegCurrentLimit;
-	short[]							ChargePower					= new short[MODEL_MAX];
-	short[]							DischargePower			= new short[MODEL_MAX];
-	short								ProPower;
-	short[]							MonitorLogInterval	= new short[MODEL_MAX];
-	short[]							MonitorLogSaveToSD	= new short[MODEL_MAX];
+	short								modBusMode;
+	short								modBusAddr;
 
-	short								ServoType;
-	short								ServoUserCenter;
-	short								ServoUserRate;
-	short								ServoUserOpAngle;
+	short[]							dump;
+	
+	int									index	= 0;						//iterate in constructor
+	
+	class InputSource {
+		short	inputLowVolt;				
+		short	inputCurrentLimit;	
+		short	chargePower;				
+		short	regEnable;					
+		short	regVoltLimit;				  
+		short	regCurrentLimit;		
+		short	regPowerLimit;			
+		int		regCapLimit;				
+		
+		InputSource(final byte[] readSystemData, int index) {
+			this.inputLowVolt = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.inputCurrentLimit = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.chargePower = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.regEnable = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.regVoltLimit = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.regCurrentLimit = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.regPowerLimit = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.regCapLimit = DataParser.parse2Int(readSystemData, index);
+		}
 
-	short								ModBusMode;
-	short								ModBusAddr;
+		/**
+		 * @return the size in bytes
+		 */
+		public int getSize() {
+			return 18;
+		}
+		/**
+		 * @return the inputLowVolt
+		 */
+		public short getInputLowVolt() {
+			return inputLowVolt;
+		}
 
-	short[]							Dump								= new short[10];
+		/**
+		 * @param inputLowVolt the inputLowVolt to set
+		 */
+		public void setInputLowVolt(short inputLowVolt) {
+			this.inputLowVolt = inputLowVolt;
+		}
+
+		/**
+		 * @return the inputCurrentLimit
+		 */
+		public short getInputCurrentLimit() {
+			return inputCurrentLimit;
+		}
+
+		/**
+		 * @param inputCurrentLimit the inputCurrentLimit to set
+		 */
+		public void setInputCurrentLimit(short inputCurrentLimit) {
+			this.inputCurrentLimit = inputCurrentLimit;
+		}
+
+		/**
+		 * @return the chargePower
+		 */
+		public short getChargePower() {
+			return chargePower;
+		}
+
+		/**
+		 * @param chargePower the chargePower to set
+		 */
+		public void setChargePower(short chargePower) {
+			this.chargePower = chargePower;
+		}
+
+		/**
+		 * @return the regEnable
+		 */
+		public short getRegEnable() {
+			return regEnable;
+		}
+
+		/**
+		 * @param regEnable the regEnable to set
+		 */
+		public void setRegEnable(short regEnable) {
+			this.regEnable = regEnable;
+		}
+
+		/**
+		 * @return the regVoltLimit
+		 */
+		public short getRegVoltLimit() {
+			return regVoltLimit;
+		}
+
+		/**
+		 * @param regVoltLimit the regVoltLimit to set
+		 */
+		public void setRegVoltLimit(short regVoltLimit) {
+			this.regVoltLimit = regVoltLimit;
+		}
+
+		/**
+		 * @return the regCurrentLimit
+		 */
+		public short getRegCurrentLimit() {
+			return regCurrentLimit;
+		}
+
+		/**
+		 * @param regCurrentLimit the regCurrentLimit to set
+		 */
+		public void setRegCurrentLimit(short regCurrentLimit) {
+			this.regCurrentLimit = regCurrentLimit;
+		}
+
+		/**
+		 * @return the regPowerLimit
+		 */
+		public short getRegPowerLimit() {
+			return regPowerLimit;
+		}
+
+		/**
+		 * @param regPowerLimit the regPowerLimit to set
+		 */
+		public void setRegPowerLimit(short regPowerLimit) {
+			this.regPowerLimit = regPowerLimit;
+		}
+
+		/**
+		 * @return the regCapLimit
+		 */
+		public int getRegCapLimit() {
+			return regCapLimit;
+		}
+
+		/**
+		 * @param regCapLimit the regCapLimit to set
+		 */
+		public void setRegCapLimit(int regCapLimit) {
+			this.regCapLimit = regCapLimit;
+		}
+	}
 
 	//construct System data using received data array
-	ChargerSystem(final byte[] readSystemData) {
-		this.TempUnit = DataParser.parse2Short(readSystemData[0], readSystemData[1]);
-		this.TempStop = DataParser.parse2Short(readSystemData[2], readSystemData[3]);
-		this.TempFansOn = DataParser.parse2Short(readSystemData[4], readSystemData[5]);
-		this.TempReduce = DataParser.parse2Short(readSystemData[6], readSystemData[7]);
-		this.FansSpeed = DataParser.parse2Short(readSystemData[8], readSystemData[9]);
-		this.FansOffDelay = DataParser.parse2Short(readSystemData[10], readSystemData[11]);
-		this.LcdContraste = DataParser.parse2Short(readSystemData[12], readSystemData[13]);
-		this.LightValue = DataParser.parse2Short(readSystemData[14], readSystemData[15]);
-		this.BeepMode = DataParser.parse2Short(readSystemData[16], readSystemData[17]);
-		this.BeepType[0] = DataParser.parse2Short(readSystemData[18], readSystemData[19]);
-		this.BeepType[1] = DataParser.parse2Short(readSystemData[20], readSystemData[21]);
-		this.BeepType[2] = DataParser.parse2Short(readSystemData[22], readSystemData[23]);
-		this.BeepType[3] = DataParser.parse2Short(readSystemData[24], readSystemData[25]);
-		this.BeepEnable[0] = DataParser.parse2Short(readSystemData[26], readSystemData[27]);
-		this.BeepEnable[1] = DataParser.parse2Short(readSystemData[28], readSystemData[29]);
-		this.BeepEnable[2] = DataParser.parse2Short(readSystemData[30], readSystemData[31]);
-		this.BeepEnable[3] = DataParser.parse2Short(readSystemData[32], readSystemData[33]);
-		this.BeepVOL[0] = DataParser.parse2Short(readSystemData[34], readSystemData[35]);
-		this.BeepVOL[1] = DataParser.parse2Short(readSystemData[36], readSystemData[37]);
-		this.BeepVOL[2] = DataParser.parse2Short(readSystemData[38], readSystemData[39]);
-		this.BeepVOL[3] = DataParser.parse2Short(readSystemData[40], readSystemData[41]);
-		this.DoneBeepType = DataParser.parse2Short(readSystemData[42], readSystemData[43]);
-		this.SelectAdj = DataParser.parse2Short(readSystemData[44], readSystemData[45]);
-		this.Ver = DataParser.parse2Short(readSystemData[46], readSystemData[47]);
-		this.SelInputSource = DataParser.parse2Short(readSystemData[48], readSystemData[49]);
-		this.DCInputLowVolt = DataParser.parse2Short(readSystemData[50], readSystemData[51]);
-		this.DCInputOverVolt = DataParser.parse2Short(readSystemData[52], readSystemData[53]);
-		this.DCInputCurrentLimit = DataParser.parse2Short(readSystemData[54], readSystemData[55]);
-		this.BatInputLowVolt = DataParser.parse2Short(readSystemData[56], readSystemData[57]);
-		this.BatInputOverVolt = DataParser.parse2Short(readSystemData[58], readSystemData[59]);
-		this.BatInputCurrentLimit = DataParser.parse2Short(readSystemData[60], readSystemData[61]);
-		this.RegEnable = DataParser.parse2Short(readSystemData[62], readSystemData[63]);
-		this.RegVoltLimit = DataParser.parse2Short(readSystemData[64], readSystemData[65]);
-		this.RegCurrentLimit = DataParser.parse2Short(readSystemData[66], readSystemData[67]);
-		this.ChargePower[0] = DataParser.parse2Short(readSystemData[68], readSystemData[69]);
-		this.ChargePower[1] = DataParser.parse2Short(readSystemData[70], readSystemData[71]);
-		this.DischargePower[0] = DataParser.parse2Short(readSystemData[72], readSystemData[73]);
-		this.DischargePower[1] = DataParser.parse2Short(readSystemData[74], readSystemData[75]);
-		this.ProPower = DataParser.parse2Short(readSystemData[76], readSystemData[77]);
-		this.MonitorLogInterval[0] = DataParser.parse2Short(readSystemData[78], readSystemData[79]);
-		this.MonitorLogInterval[1] = DataParser.parse2Short(readSystemData[80], readSystemData[81]);
-		this.MonitorLogSaveToSD[0] = DataParser.parse2Short(readSystemData[82], readSystemData[83]);
-		this.MonitorLogSaveToSD[1] = DataParser.parse2Short(readSystemData[84], readSystemData[85]);
+	ChargerSystem(final byte[] readSystemData, final boolean isDuo) {
+		this.index = 0;
+		this.tempUnit = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.tempStop = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.tempFansOn = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.tempReduce = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		
+		if (isDuo)
+			this.fansSpeed = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 
-		this.ServoType = DataParser.parse2Short(readSystemData[86], readSystemData[87]);
-		this.ServoUserCenter = DataParser.parse2Short(readSystemData[88], readSystemData[89]);
-		this.ServoUserRate = DataParser.parse2Short(readSystemData[90], readSystemData[91]);
-		this.ServoUserOpAngle = DataParser.parse2Short(readSystemData[92], readSystemData[93]);
-
-		this.ModBusMode = DataParser.parse2Short(readSystemData[94], readSystemData[95]);
-		this.ModBusAddr = DataParser.parse2Short(readSystemData[96], readSystemData[97]);
-
-		this.Dump[0] = DataParser.parse2Short(readSystemData[98], readSystemData[99]);
-		this.Dump[1] = DataParser.parse2Short(readSystemData[100], readSystemData[101]);
-		this.Dump[2] = DataParser.parse2Short(readSystemData[102], readSystemData[103]);
-		this.Dump[3] = DataParser.parse2Short(readSystemData[104], readSystemData[105]);
-		this.Dump[4] = DataParser.parse2Short(readSystemData[106], readSystemData[107]);
-		this.Dump[5] = DataParser.parse2Short(readSystemData[108], readSystemData[109]);
-		this.Dump[6] = DataParser.parse2Short(readSystemData[110], readSystemData[111]);
-		this.Dump[7] = DataParser.parse2Short(readSystemData[112], readSystemData[113]);
-		this.Dump[8] = DataParser.parse2Short(readSystemData[114], readSystemData[115]);
-		this.Dump[9] = DataParser.parse2Short(readSystemData[116], readSystemData[117]);
-	}
+		this.fansOffDelay = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.lcdContraste = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.lightValue = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		
+		if (isDuo)
+			this.beepMode = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		
+		this.beepType[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.beepType[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.beepType[2] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.beepType[3] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.beepEnable[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.beepEnable[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.beepEnable[2] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.beepEnable[3] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.beepVOL[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.beepVOL[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.beepVOL[2] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.beepVOL[3] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.selectLanguage = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.selectAdj = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.systemVersion = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		this.selInputSource = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		
+		if (isDuo) { //duo devices allow channel individual log setting		
+			this.dcInputLowVolt = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dcInputOverVolt = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dcInputCurrentLimit = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.batInputLowVolt = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.batInputOverVolt = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.batInputCurrentLimit = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.regEnable = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.regVoltLimit = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.regCurrentLimit = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.chargePower[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.chargePower[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dischargePower[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dischargePower[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.proPower = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.monitorLogInterval[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.monitorLogInterval[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.monitorLogSaveToSD[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.monitorLogSaveToSD[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 	
-	@Override
-	public String toString() {
+			this.servoType = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.servoUserCenter = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.servoUserRate = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.servoUserOpAngle = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+	
+			this.modBusMode = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.modBusAddr = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+	
+			this.dump	= new short[10];
+			this.dump[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[2] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[3] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[4] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[5] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[6] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[7] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[8] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[9] = DataParser.parse2Short(readSystemData[index++], readSystemData[index]);
+		}
+		else {			
+			this.xInputSources[0] = new InputSource(readSystemData, index);
+			index += this.xInputSources[0].getSize();
+			this.xInputSources[1] = new InputSource(readSystemData, index);
+			index += this.xInputSources[0].getSize();
+			this.xInputSources[2] = new InputSource(readSystemData, index);
+			index += this.xInputSources[0].getSize();
+			this.xInputSources[3] = new InputSource(readSystemData, index);
+			index += this.xInputSources[0].getSize();
+			this.xDischargePower = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.xMonitorLogInterval = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.xMonitorLogSaveToSD = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+	
+			this.servoType = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.servoUserCenter = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.servoUserRate = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.servoUserOpAngle = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+	
+			this.modBusMode = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.modBusAddr = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+	
+			this.dump	= new short[10];
+			this.dump[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[2] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[3] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[4] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[5] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[6] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[7] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[8] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[9] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		}
+	}
+
+	public byte[] getAsByteArray(boolean isDuo) {
+		byte[] memoryBuffer = new byte[(ChargerSystem.getSize(isDuo) + 1) / 2 * 2];
+
+		index = 0;
+		if (isDuo) {
+			memoryBuffer[index++] = (byte) (this.tempUnit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.tempUnit >> 8);
+			memoryBuffer[index++] = (byte) (this.tempStop & 0xFF);
+			memoryBuffer[index++] = (byte) (this.tempStop >> 8);
+			memoryBuffer[index++] = (byte) (this.tempFansOn & 0xFF);
+			memoryBuffer[index++] = (byte) (this.tempFansOn >> 8);
+			memoryBuffer[index++] = (byte) (this.tempReduce & 0xFF);
+			memoryBuffer[index++] = (byte) (this.tempReduce >> 8);
+			memoryBuffer[index++] = (byte) (this.fansSpeed & 0xFF);
+			memoryBuffer[index++] = (byte) (this.fansSpeed >> 8);
+			memoryBuffer[index++] = (byte) (this.fansOffDelay & 0xFF);
+			memoryBuffer[index++] = (byte) (this.fansOffDelay >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.lcdContraste & 0xFF);
+			memoryBuffer[index++] = (byte) (this.lcdContraste >> 8);
+			memoryBuffer[index++] = (byte) (this.lightValue & 0xFF);
+			memoryBuffer[index++] = (byte) (this.lightValue >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.beepMode & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepMode >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.beepType[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepType[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepType[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepType[1] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepType[2] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepType[2] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepType[3] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepType[3] >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.beepEnable[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepEnable[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepEnable[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepEnable[1] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepEnable[2] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepEnable[2] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepEnable[3] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepEnable[3] >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.beepVOL[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepVOL[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepVOL[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepVOL[1] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepVOL[2] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepVOL[2] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepVOL[3] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepVOL[3] >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.selectLanguage & 0xFF);
+			memoryBuffer[index++] = (byte) (this.selectLanguage >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.selectAdj & 0xFF);
+			memoryBuffer[index++] = (byte) (this.selectAdj >> 8);
+			memoryBuffer[index++] = (byte) (this.systemVersion & 0xFF);
+			memoryBuffer[index++] = (byte) (this.systemVersion >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.selInputSource & 0xFF);
+			memoryBuffer[index++] = (byte) (this.selInputSource >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.dcInputLowVolt & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dcInputLowVolt >> 8);
+			memoryBuffer[index++] = (byte) (this.dcInputOverVolt & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dcInputOverVolt >> 8);
+			memoryBuffer[index++] = (byte) (this.dcInputCurrentLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dcInputCurrentLimit >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.batInputLowVolt & 0xFF);
+			memoryBuffer[index++] = (byte) (this.batInputLowVolt >> 8);
+			memoryBuffer[index++] = (byte) (this.batInputOverVolt & 0xFF);
+			memoryBuffer[index++] = (byte) (this.batInputOverVolt >> 8);
+			memoryBuffer[index++] = (byte) (this.batInputCurrentLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.batInputCurrentLimit >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.regEnable & 0xFF);
+			memoryBuffer[index++] = (byte) (this.regEnable >> 8);
+			memoryBuffer[index++] = (byte) (this.regVoltLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.regVoltLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.regCurrentLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.regCurrentLimit >> 8);
+
+			memoryBuffer[index++] = (byte) (this.chargePower[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.chargePower[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.chargePower[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.chargePower[1] >> 8);
+			
+			memoryBuffer[index++] = (byte) (this.dischargePower[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dischargePower[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.dischargePower[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dischargePower[1] >> 8);
+			
+			memoryBuffer[index++] = (byte) (this.proPower & 0xFF);
+			memoryBuffer[index++] = (byte) (this.proPower >> 8);
+
+			memoryBuffer[index++] = (byte) (this.monitorLogInterval[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.monitorLogInterval[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.monitorLogInterval[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.monitorLogInterval[1] >> 8);
+
+			memoryBuffer[index++] = (byte) (this.monitorLogSaveToSD[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.monitorLogSaveToSD[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.monitorLogSaveToSD[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.monitorLogSaveToSD[1] >> 8);
+
+			memoryBuffer[index++] = (byte) (this.servoType & 0xFF);
+			memoryBuffer[index++] = (byte) (this.servoType >> 8);
+			memoryBuffer[index++] = (byte) (this.servoUserCenter & 0xFF);
+			memoryBuffer[index++] = (byte) (this.servoUserCenter >> 8);
+			memoryBuffer[index++] = (byte) (this.servoUserRate & 0xFF);
+			memoryBuffer[index++] = (byte) (this.servoUserRate >> 8);
+			memoryBuffer[index++] = (byte) (this.servoUserOpAngle & 0xFF);
+			memoryBuffer[index++] = (byte) (this.servoUserOpAngle >> 8);
+
+			memoryBuffer[index++] = (byte) (this.modBusMode & 0xFF);
+			memoryBuffer[index++] = (byte) (this.modBusMode >> 8);
+			memoryBuffer[index++] = (byte) (this.modBusAddr & 0xFF);
+			memoryBuffer[index++] = (byte) (this.modBusAddr >> 8);
+
+			memoryBuffer[index++] = (byte) (this.dump[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[1] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[2] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[2] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[3] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[3] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[4] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[4] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[5] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[5] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[6] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[6] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[7] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[7] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[8] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[8] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[9] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[9] >> 8);
+		}
+		else {
+			memoryBuffer[index++] = (byte) (this.tempUnit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.tempUnit >> 8);
+			memoryBuffer[index++] = (byte) (this.tempStop & 0xFF);
+			memoryBuffer[index++] = (byte) (this.tempStop >> 8);
+			memoryBuffer[index++] = (byte) (this.tempFansOn & 0xFF);
+			memoryBuffer[index++] = (byte) (this.tempFansOn >> 8);
+			memoryBuffer[index++] = (byte) (this.tempReduce & 0xFF);
+			memoryBuffer[index++] = (byte) (this.tempReduce >> 8);
+			memoryBuffer[index++] = (byte) (this.fansOffDelay & 0xFF);
+			memoryBuffer[index++] = (byte) (this.fansOffDelay >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.lcdContraste & 0xFF);
+			memoryBuffer[index++] = (byte) (this.lcdContraste >> 8);
+			memoryBuffer[index++] = (byte) (this.lightValue & 0xFF);
+			memoryBuffer[index++] = (byte) (this.lightValue >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.beepType[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepType[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepType[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepType[1] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepType[2] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepType[2] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepType[3] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepType[3] >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.beepEnable[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepEnable[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepEnable[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepEnable[1] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepEnable[2] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepEnable[2] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepEnable[3] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepEnable[3] >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.beepVOL[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepVOL[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepVOL[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepVOL[1] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepVOL[2] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepVOL[2] >> 8);
+			memoryBuffer[index++] = (byte) (this.beepVOL[3] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.beepVOL[3] >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.selectLanguage & 0xFF);
+			memoryBuffer[index++] = (byte) (this.selectLanguage >> 8);
+			
+			memoryBuffer[index++] = (byte) (this.selectAdj & 0xFF);
+			memoryBuffer[index++] = (byte) (this.selectAdj >> 8);
+			memoryBuffer[index++] = (byte) (this.systemVersion & 0xFF);
+			memoryBuffer[index++] = (byte) (this.systemVersion >> 8);
+	
+			memoryBuffer[index++] = (byte) (this.selInputSource & 0xFF);
+			memoryBuffer[index++] = (byte) (this.selInputSource >> 8);
+
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].inputLowVolt & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].inputLowVolt >> 8);			
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].inputCurrentLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].inputCurrentLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].chargePower & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].chargePower >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].regEnable & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].regEnable >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].regVoltLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].regVoltLimit >> 8);			
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].regCurrentLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].regCurrentLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].regPowerLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].regPowerLimit >> 8);		
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].regCapLimit & 0xFF);
+			memoryBuffer[index++] = (byte) ((this.xInputSources[0].regCapLimit & 0x0000FF00) >> 8);
+			memoryBuffer[index++] = (byte) ((this.xInputSources[0].regCapLimit & 0x00FF0000) >> 16);
+			memoryBuffer[index++] = (byte) (this.xInputSources[0].regCapLimit >> 24);
+
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].inputLowVolt & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].inputLowVolt >> 8);			
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].inputCurrentLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].inputCurrentLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].chargePower & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].chargePower >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].regEnable & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].regEnable >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].regVoltLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].regVoltLimit >> 8);			
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].regCurrentLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].regCurrentLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].regPowerLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].regPowerLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].regCapLimit & 0xFF);
+			memoryBuffer[index++] = (byte) ((this.xInputSources[1].regCapLimit & 0x0000FF00) >> 8);
+			memoryBuffer[index++] = (byte) ((this.xInputSources[1].regCapLimit & 0x00FF0000) >> 16);
+			memoryBuffer[index++] = (byte) (this.xInputSources[1].regCapLimit >> 24);
+
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].inputLowVolt & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].inputLowVolt >> 8);			
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].inputCurrentLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].inputCurrentLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].chargePower & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].chargePower >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].regEnable & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].regEnable >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].regVoltLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].regVoltLimit >> 8);			
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].regCurrentLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].regCurrentLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].regPowerLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].regPowerLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].regCapLimit & 0xFF);
+			memoryBuffer[index++] = (byte) ((this.xInputSources[2].regCapLimit & 0x0000FF00) >> 8);
+			memoryBuffer[index++] = (byte) ((this.xInputSources[2].regCapLimit & 0x00FF0000) >> 16);
+			memoryBuffer[index++] = (byte) (this.xInputSources[2].regCapLimit >> 24);
+
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].inputLowVolt & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].inputLowVolt >> 8);			
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].inputCurrentLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].inputCurrentLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].chargePower & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].chargePower >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].regEnable & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].regEnable >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].regVoltLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].regVoltLimit >> 8);			
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].regCurrentLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].regCurrentLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].regPowerLimit & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].regPowerLimit >> 8);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].regCapLimit & 0xFF);
+			memoryBuffer[index++] = (byte) ((this.xInputSources[3].regCapLimit & 0x0000FF00) >> 8);
+			memoryBuffer[index++] = (byte) ((this.xInputSources[3].regCapLimit & 0x00FF0000) >> 16);
+			memoryBuffer[index++] = (byte) (this.xInputSources[3].regCapLimit >> 24);
+			
+			memoryBuffer[index++] = (byte) (this.xDischargePower & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xDischargePower >> 8);
+			memoryBuffer[index++] = (byte) (this.xMonitorLogInterval & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xMonitorLogInterval >> 8);
+			memoryBuffer[index++] = (byte) (this.xMonitorLogSaveToSD & 0xFF);
+			memoryBuffer[index++] = (byte) (this.xMonitorLogSaveToSD >> 8);
+
+			memoryBuffer[index++] = (byte) (this.servoType & 0xFF);
+			memoryBuffer[index++] = (byte) (this.servoType >> 8);
+			memoryBuffer[index++] = (byte) (this.servoUserCenter & 0xFF);
+			memoryBuffer[index++] = (byte) (this.servoUserCenter >> 8);
+			memoryBuffer[index++] = (byte) (this.servoUserRate & 0xFF);
+			memoryBuffer[index++] = (byte) (this.servoUserRate >> 8);
+			memoryBuffer[index++] = (byte) (this.servoUserOpAngle & 0xFF);
+			memoryBuffer[index++] = (byte) (this.servoUserOpAngle >> 8);
+
+			memoryBuffer[index++] = (byte) (this.modBusMode & 0xFF);
+			memoryBuffer[index++] = (byte) (this.modBusMode >> 8);
+			memoryBuffer[index++] = (byte) (this.modBusAddr & 0xFF);
+			memoryBuffer[index++] = (byte) (this.modBusAddr >> 8);
+
+			memoryBuffer[index++] = (byte) (this.dump[0] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[0] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[1] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[1] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[2] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[2] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[3] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[3] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[4] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[4] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[5] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[5] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[6] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[6] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[7] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[7] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[8] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[8] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[9] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[9] >> 8);
+		}
+
+		return memoryBuffer;
+	}
+
+	public String toString(boolean isDuo) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.getClass().getSimpleName()).append(":\n");
-		sb.append(String.format("TempUnit \t\t= %d", TempUnit)).append("\n");
-		sb.append(String.format("TempStop \t\t= %d", TempStop)).append("\n");
-		sb.append(String.format("TempFansOn	\t= %d", TempFansOn)).append("\n");
-		sb.append(String.format("TempReduce	\t= %d", TempReduce)).append("\n");
-		sb.append(String.format("FansSpeed \t\t= %d", FansSpeed)).append("\n");
-		sb.append(String.format("FansOffDelay \t\t= %d", FansOffDelay)).append("\n");
-		sb.append(String.format("LcdContraste \t\t= %d", LcdContraste)).append("\n");
-		sb.append(String.format("LightValue \t\t= %d", LightValue)).append("\n");
-		sb.append(String.format("BeepMode \t\t= %d", BeepMode)).append("\n");
-		sb.append(String.format("BeepType \t\t= [%d, %d, %d, %d]", this.BeepType[0], this.BeepType[1], this.BeepType[2], this.BeepType[3])).append("\n");
-		sb.append(String.format("BeepEnable \t\t= [%d, %d, %d, %d]", this.BeepEnable[0], this.BeepEnable[1], this.BeepEnable[2], this.BeepEnable[3])).append("\n");
-		sb.append(String.format("BeepVOL \t\t= [%d, %d, %d, %d]", this.BeepVOL[0], this.BeepVOL[1], this.BeepVOL[2], this.BeepVOL[3])).append("\n");
-		sb.append(String.format("DoneBeepType \t\t= %d", DoneBeepType)).append("\n");
-		sb.append(String.format("SelectAdj \t\t= %d", SelectAdj)).append("\n");
-		sb.append(String.format("Ver \t\t\t= %d", Ver)).append("\n");
-		sb.append(String.format("SelInputSource	\t= %d", SelInputSource)).append("\n");
-		sb.append(String.format("DCInputLowVolt	\t= %d", DCInputLowVolt)).append("\n");
-		sb.append(String.format("DCInputOverVolt \t= %d", DCInputOverVolt)).append("\n");
-		sb.append(String.format("DCInputCurrentLimit \t= %d", DCInputCurrentLimit)).append("\n");
-		sb.append(String.format("BatInputLowVolt \t= %d", BatInputLowVolt)).append("\n");
-		sb.append(String.format("BatInputOverVolt	= %d", BatInputOverVolt)).append("\n");
-		sb.append(String.format("BatInputCurrentLimit	= %d", BatInputCurrentLimit)).append("\n");
-		sb.append(String.format("RegEnable \t\t= %d", RegEnable)).append("\n");
-		sb.append(String.format("RegVoltLimit	\t= %d", RegVoltLimit)).append("\n");
-		sb.append(String.format("RegCurrentLimit \t= %d", RegCurrentLimit)).append("\n");
-		sb.append(String.format("ChargePower \t\t= [%d, %d]", this.ChargePower[0], this.ChargePower[1])).append("\n");
-		sb.append(String.format("DischargePower \t\t= [%d, %d]", this.DischargePower[0], this.DischargePower[1])).append("\n");
-		sb.append(String.format("ProPower \t\t= %d", BatInputLowVolt)).append("\n");
-		sb.append(String.format("MonitorLogInterval \t= [%d, %d]", this.MonitorLogInterval[0], this.MonitorLogInterval[1])).append("\n");
-		sb.append(String.format("MonitorLogSaveToSD \t= [%d, %d]", this.MonitorLogSaveToSD[0], this.MonitorLogSaveToSD[1])).append("\n");
+		sb.append(String.format("TempUnit \t\t= %d", this.tempUnit)).append("\n");
+		sb.append(String.format("TempStop \t\t= %d", this.tempStop)).append("\n");
+		sb.append(String.format("TempFansOn	\t= %d", this.tempFansOn)).append("\n");
+		sb.append(String.format("TempReduce	\t= %d", this.tempReduce)).append("\n");
+		//DUO reserved	sb.append(String.format("FansSpeed \t\t= %d", this.fansSpeed)).append("\n");
+		sb.append(String.format("FansOffDelay \t\t= %d", this.fansOffDelay)).append("\n");
+		sb.append(String.format("LcdContraste \t\t= %d", this.lcdContraste)).append("\n");
+		sb.append(String.format("LightValue \t\t= %d", this.lightValue)).append("\n");
+		//DUO reserved	sb.append(String.format("BeepMode \t\t= %d", this.beepMode)).append("\n");
+		sb.append(String.format("BeepType \t\t= [%d, %d, %d, %d]", this.beepType[0], this.beepType[1], this.beepType[2], this.beepType[3])).append("\n");
+		sb.append(String.format("BeepEnable \t\t= [%d, %d, %d, %d]", this.beepEnable[0], this.beepEnable[1], this.beepEnable[2], this.beepEnable[3])).append("\n");
+		sb.append(String.format("BeepVOL \t\t= [%d, %d, %d, %d]", this.beepVOL[0], this.beepVOL[1], this.beepVOL[2], this.beepVOL[3])).append("\n");
+		sb.append(String.format("SelectLanguage \t\t= %d", this.selectLanguage)).append("\n");
+		sb.append(String.format("SelectAdj \t\t= %d", this.selectAdj)).append("\n");
+		sb.append(String.format("SystemVersion \t\t= %d", this.systemVersion)).append("\n");
+		sb.append(String.format("SelInputSource	\t= %d", this.selInputSource)).append("\n").append("\n");
+		if (isDuo) {
+			sb.append(String.format("DCInputLowVolt	\t= %d", this.dcInputLowVolt)).append("\n");
+			sb.append(String.format("DCInputOverVolt \t= %d", this.dcInputOverVolt)).append("\n");
+			sb.append(String.format("DCInputCurrentLimit \t= %d", this.dcInputCurrentLimit)).append("\n");
+			sb.append(String.format("BatInputLowVolt \t= %d", this.batInputLowVolt)).append("\n");
+			sb.append(String.format("BatInputOverVolt	= %d", this.batInputOverVolt)).append("\n");
+			sb.append(String.format("BatInputCurrentLimit	= %d", this.batInputCurrentLimit)).append("\n");
+			sb.append(String.format("RegEnable \t\t= %d", this.regEnable)).append("\n");
+			sb.append(String.format("RegVoltLimit	\t= %d", this.regVoltLimit)).append("\n");
+			sb.append(String.format("RegCurrentLimit \t= %d", this.regCurrentLimit)).append("\n");
+			sb.append(String.format("ChargePower \t\t= [%d, %d]", this.chargePower[0], this.chargePower[1])).append("\n");
+			sb.append(String.format("DischargePower \t\t= [%d, %d]", this.dischargePower[0], this.dischargePower[1])).append("\n");
+			sb.append(String.format("ProPower \t\t= %d", this.batInputLowVolt)).append("\n");
+			sb.append(String.format("MonitorLogInterval \t= [%d, %d]", this.monitorLogInterval[0], this.monitorLogInterval[1])).append("\n");
+			sb.append(String.format("MonitorLogSaveToSD \t= [%d, %d]", this.monitorLogSaveToSD[0], this.monitorLogSaveToSD[1])).append("\n");
+			sb.append("\n");
+			sb.append(String.format("ServoType \t\t= %d", this.servoType)).append("\n");
+			sb.append(String.format("ServoUserCenter \t= %d", this.servoUserCenter)).append("\n");
+			sb.append(String.format("ServoUserRate \t\t= %d", this.servoUserRate)).append("\n");
+			sb.append(String.format("ServoUserOpAngle \t= %d", this.servoUserOpAngle)).append("\n");
+	
+			sb.append(String.format("ModBusMode \t\t= %d", this.modBusMode)).append("\n");
+			sb.append(String.format("ModBusAddr \t\t= %d", this.modBusAddr)).append("\n");
+	
+			sb.append(String.format("Dump \t\t\t= [%d, %d, %d, %d ,%d, %d, %d, %d, %d, %d]", this.dump[0], this.dump[1], this.dump[2], this.dump[3], this.dump[4], this.dump[5], this.dump[6], this.dump[7],
+					this.dump[8], this.dump[9])).append("\n");
+		}
+		else {
+			sb.append(String.format("[0]inputLowVolt \t= %d", xInputSources[0].inputLowVolt)).append("\n");
+			sb.append(String.format("[0]inputCurrentLimit \t= %d", xInputSources[0].inputCurrentLimit)).append("\n");
+			sb.append(String.format("[0]chargePower \t\t= %d", xInputSources[0].chargePower)).append("\n");
+			sb.append(String.format("[0]regEnable \t\t= %d", xInputSources[0].regEnable)).append("\n");
+			sb.append(String.format("[0]regVoltLimit \t= %d", xInputSources[0].regVoltLimit)).append("\n");
+			sb.append(String.format("[0]regCurrentLimit \t= %d", xInputSources[0].regCurrentLimit)).append("\n");
+			sb.append(String.format("[0]regPowerLimit \t= %d", xInputSources[0].regPowerLimit)).append("\n");
+			sb.append(String.format("[0]regCapLimit \t\t= %d", xInputSources[0].regCapLimit)).append("\n");
+			sb.append("\n");
 
-		sb.append(String.format("ServoType \t\t= %d", ServoType)).append("\n");
-		sb.append(String.format("ServoUserCenter \t= %d", ServoUserCenter)).append("\n");
-		sb.append(String.format("ServoUserRate \t\t= %d", ServoUserRate)).append("\n");
-		sb.append(String.format("ServoUserOpAngle \t= %d", ServoUserOpAngle)).append("\n");
+			sb.append(String.format("[1]inputLowVolt \t= %d", xInputSources[1].inputLowVolt)).append("\n");
+			sb.append(String.format("[1]inputCurrentLimit \t= %d", xInputSources[1].inputCurrentLimit)).append("\n");
+			sb.append(String.format("[1]chargePower \t\t= %d", xInputSources[1].chargePower)).append("\n");
+			sb.append(String.format("[1]regEnable \t\t= %d", xInputSources[1].regEnable)).append("\n");
+			sb.append(String.format("[1]regVoltLimit \t= %d", xInputSources[1].regVoltLimit)).append("\n");
+			sb.append(String.format("[1]regCurrentLimit \t= %d", xInputSources[1].regCurrentLimit)).append("\n");
+			sb.append(String.format("[1]regPowerLimit \t= %d", xInputSources[1].regPowerLimit)).append("\n");
+			sb.append(String.format("[1]regCapLimit \t\t= %d", xInputSources[1].regCapLimit)).append("\n");
+			sb.append("\n");
 
-		sb.append(String.format("ModBusMode \t\t= %d", ModBusMode)).append("\n");
-		sb.append(String.format("ModBusAddr \t\t= %d", ModBusAddr)).append("\n");
+			sb.append(String.format("[2]inputLowVolt \t= %d", xInputSources[2].inputLowVolt)).append("\n");
+			sb.append(String.format("[2]inputCurrentLimit \t= %d", xInputSources[2].inputCurrentLimit)).append("\n");
+			sb.append(String.format("[2]chargePower \t\t= %d", xInputSources[2].chargePower)).append("\n");
+			sb.append(String.format("[2]regEnable \t\t= %d", xInputSources[2].regEnable)).append("\n");
+			sb.append(String.format("[2]regVoltLimit \t= %d", xInputSources[2].regVoltLimit)).append("\n");
+			sb.append(String.format("[2]regCurrentLimit \t= %d", xInputSources[2].regCurrentLimit)).append("\n");
+			sb.append(String.format("[2]regPowerLimit \t= %d", xInputSources[2].regPowerLimit)).append("\n");
+			sb.append(String.format("[2]regCapLimit \t\t= %d", xInputSources[2].regCapLimit)).append("\n");
+			sb.append("\n");
 
-		sb.append(String.format("Dump \t\t\t= [%d, %d, %d, %d ,%d, %d, %d, %d, %d, %d]", this.Dump[0], this.Dump[1], this.Dump[2], this.Dump[3], this.Dump[4], this.Dump[5], this.Dump[6], this.Dump[7], this.Dump[8], this.Dump[9])).append("\n");
+			sb.append(String.format("[3]inputLowVolt \t= %d", xInputSources[3].inputLowVolt)).append("\n");
+			sb.append(String.format("[3]inputCurrentLimit \t= %d", xInputSources[3].inputCurrentLimit)).append("\n");
+			sb.append(String.format("[3]chargePower \t\t= %d", xInputSources[3].chargePower)).append("\n");
+			sb.append(String.format("[3]regEnable \t\t= %d", xInputSources[3].regEnable)).append("\n");
+			sb.append(String.format("[3]regVoltLimit \t= %d", xInputSources[3].regVoltLimit)).append("\n");
+			sb.append(String.format("[3]regCurrentLimit \t= %d", xInputSources[3].regCurrentLimit)).append("\n");
+			sb.append(String.format("[3]regPowerLimit \t= %d", xInputSources[3].regPowerLimit)).append("\n");
+			sb.append(String.format("[3]regCapLimit \t\t= %d", xInputSources[3].regCapLimit)).append("\n");
+			sb.append("\n");
+
+			sb.append(String.format("DischargePower \t\t= %d", this.xDischargePower)).append("\n");
+			sb.append(String.format("MonitorLogInterval \t= %d", this.xMonitorLogInterval)).append("\n");
+			sb.append(String.format("MonitorLogSaveToSD \t= %d", this.xMonitorLogSaveToSD)).append("\n");
+			sb.append("\n");
+	
+			sb.append(String.format("ServoType \t\t= %d", this.servoType)).append("\n");
+			sb.append(String.format("ServoUserCenter \t= %d", this.servoUserCenter)).append("\n");
+			sb.append(String.format("ServoUserRate \t\t= %d", this.servoUserRate)).append("\n");
+			sb.append(String.format("ServoUserOpAngle \t= %d", this.servoUserOpAngle)).append("\n");
+	
+			sb.append(String.format("ModBusMode \t\t= %d", this.modBusMode)).append("\n");
+			sb.append(String.format("ModBusAddr \t\t= %d", this.modBusAddr)).append("\n");
+	
+			sb.append(String.format("Dump \t\t\t= [%d, %d, %d, %d ,%d, %d, %d, %d, %d, %d]", this.dump[0], this.dump[1], this.dump[2], this.dump[3], this.dump[4], this.dump[5], this.dump[6], this.dump[7],
+					this.dump[8], this.dump[9])).append("\n");
+		}
 		return sb.toString();
 	}
-	
-	final static int		size								= 59*2; //size in byte
 
-	public static int getSize() {
-		return size;
+	final static int size = 59 * 2; //size in byte
+
+	public static int getSize(boolean isDuo) {
+		return isDuo ? ChargerSystem.size : 156;
 	}
 
 	public short getTempUnit() {
-		return TempUnit;
+		return this.tempUnit;
 	}
 
 	public void setTempUnit(short tempUnit) {
-		TempUnit = tempUnit;
+		this.tempUnit = tempUnit;
 	}
 
 	public short getTempStop() {
-		return TempStop;
+		return this.tempStop;
 	}
 
 	public void setTempStop(short tempStop) {
-		TempStop = tempStop;
+		this.tempStop = tempStop;
 	}
 
 	public short getTempFansOn() {
-		return TempFansOn;
+		return this.tempFansOn;
 	}
 
 	public void setTempFansOn(short tempFansOn) {
-		TempFansOn = tempFansOn;
+		this.tempFansOn = tempFansOn;
 	}
 
 	public short getTempReduce() {
-		return TempReduce;
+		return this.tempReduce;
 	}
 
 	public void setTempReduce(short tempReduce) {
-		TempReduce = tempReduce;
+		this.tempReduce = tempReduce;
 	}
 
 	public short getFansSpeed() {
-		return FansSpeed;
+		return this.fansSpeed;
 	}
 
 	public void setFansSpeed(short fansSpeed) {
-		FansSpeed = fansSpeed;
+		this.fansSpeed = fansSpeed;
 	}
 
 	public short getFansOffDelay() {
-		return FansOffDelay;
+		return this.fansOffDelay;
 	}
 
 	public void setFansOffDelay(short fansOffDelay) {
-		FansOffDelay = fansOffDelay;
+		this.fansOffDelay = fansOffDelay;
 	}
 
 	public short getLcdContraste() {
-		return LcdContraste;
+		return this.lcdContraste;
+	}
+
+	/**
+	 * @return the xDischargePower
+	 */
+	public short getxDischargePower() {
+		return xDischargePower;
+	}
+
+	/**
+	 * @param xDischargePower the xDischargePower to set
+	 */
+	public void setxDischargePower(short xDischargePower) {
+		this.xDischargePower = xDischargePower;
 	}
 
 	public void setLcdContraste(short lcdContraste) {
-		LcdContraste = lcdContraste;
+		this.lcdContraste = lcdContraste;
 	}
 
 	public short getLightValue() {
-		return LightValue;
+		return this.lightValue;
 	}
 
 	public void setLightValue(short lightValue) {
-		LightValue = lightValue;
+		this.lightValue = lightValue;
 	}
 
 	public short getBeepMode() {
-		return BeepMode;
+		return this.beepMode;
 	}
 
 	public void setBeepMode(short beepMode) {
-		BeepMode = beepMode;
+		this.beepMode = beepMode;
 	}
 
 	public short[] getBeepType() {
-		return BeepType;
+		return this.beepType;
 	}
 
 	public void setBeepType(short[] beepType) {
-		BeepType = beepType;
+		this.beepType = beepType;
 	}
 
 	public short[] getBeepEnable() {
-		return BeepEnable;
+		return this.beepEnable;
 	}
 
 	public void setBeepEnable(short[] beepEnable) {
-		BeepEnable = beepEnable;
+		this.beepEnable = beepEnable;
 	}
 
 	public short[] getBeepVOL() {
-		return BeepVOL;
+		return this.beepVOL;
 	}
 
 	public void setBeepVOL(short[] beepVOL) {
-		BeepVOL = beepVOL;
-	}
-
-	public short getDoneBeepType() {
-		return DoneBeepType;
-	}
-
-	public void setDoneBeepType(short doneBeepType) {
-		DoneBeepType = doneBeepType;
+		this.beepVOL = beepVOL;
 	}
 
 	public short getSelectAdj() {
-		return SelectAdj;
+		return this.selectAdj;
 	}
 
 	public void setSelectAdj(short selectAdj) {
-		SelectAdj = selectAdj;
+		this.selectAdj = selectAdj;
 	}
 
 	public short getVer() {
-		return Ver;
+		return this.systemVersion;
 	}
 
 	public void setVer(short ver) {
-		Ver = ver;
+		this.systemVersion = ver;
 	}
 
 	public short getSelInputSource() {
-		return SelInputSource;
+		return this.selInputSource;
 	}
 
 	public void setSelInputSource(short selInputSource) {
-		SelInputSource = selInputSource;
+		this.selInputSource = selInputSource;
 	}
 
 	public short getDCInputLowVolt() {
-		return DCInputLowVolt;
+		return this.dcInputLowVolt;
 	}
 
 	public void setDCInputLowVolt(short dCInputLowVolt) {
-		DCInputLowVolt = dCInputLowVolt;
+		this.dcInputLowVolt = dCInputLowVolt;
 	}
 
 	public short getDCInputOverVolt() {
-		return DCInputOverVolt;
+		return this.dcInputOverVolt;
 	}
 
 	public void setDCInputOverVolt(short dCInputOverVolt) {
-		DCInputOverVolt = dCInputOverVolt;
+		this.dcInputOverVolt = dCInputOverVolt;
 	}
 
 	public short getDCInputCurrentLimit() {
-		return DCInputCurrentLimit;
+		return this.dcInputCurrentLimit;
 	}
 
 	public void setDCInputCurrentLimit(short dCInputCurrentLimit) {
-		DCInputCurrentLimit = dCInputCurrentLimit;
+		this.dcInputCurrentLimit = dCInputCurrentLimit;
 	}
 
 	public short getBatInputLowVolt() {
-		return BatInputLowVolt;
+		return this.batInputLowVolt;
 	}
 
 	public void setBatInputLowVolt(short batInputLowVolt) {
-		BatInputLowVolt = batInputLowVolt;
+		this.batInputLowVolt = batInputLowVolt;
 	}
 
 	public short getBatInputOverVolt() {
-		return BatInputOverVolt;
+		return this.batInputOverVolt;
 	}
 
 	public void setBatInputOverVolt(short batInputOverVolt) {
-		BatInputOverVolt = batInputOverVolt;
+		this.batInputOverVolt = batInputOverVolt;
 	}
 
 	public short getBatInputCurrentLimit() {
-		return BatInputCurrentLimit;
+		return this.batInputCurrentLimit;
 	}
 
 	public void setBatInputCurrentLimit(short batInputCurrentLimit) {
-		BatInputCurrentLimit = batInputCurrentLimit;
+		this.batInputCurrentLimit = batInputCurrentLimit;
 	}
 
 	public short getRegEnable() {
-		return RegEnable;
+		return this.regEnable;
 	}
 
 	public void setRegEnable(short regEnable) {
-		RegEnable = regEnable;
+		this.regEnable = regEnable;
 	}
 
 	public short getRegVoltLimit() {
-		return RegVoltLimit;
+		return this.regVoltLimit;
 	}
 
 	public void setRegVoltLimit(short regVoltLimit) {
-		RegVoltLimit = regVoltLimit;
+		this.regVoltLimit = regVoltLimit;
 	}
 
 	public short getRegCurrentLimit() {
-		return RegCurrentLimit;
+		return this.regCurrentLimit;
 	}
 
 	public void setRegCurrentLimit(short regCurrentLimit) {
-		RegCurrentLimit = regCurrentLimit;
+		this.regCurrentLimit = regCurrentLimit;
 	}
 
 	public short[] getChargePower() {
-		return ChargePower;
+		return this.chargePower;
 	}
 
 	public void setChargePower(short[] chargePower) {
-		ChargePower = chargePower;
+		this.chargePower = chargePower;
 	}
 
 	public short[] getDischargePower() {
-		return DischargePower;
+		return this.dischargePower;
 	}
 
 	public void setDischargePower(short[] dischargePower) {
-		DischargePower = dischargePower;
+		this.dischargePower = dischargePower;
 	}
 
 	public short getProPower() {
-		return ProPower;
+		return this.proPower;
 	}
 
 	public void setProPower(short proPower) {
-		ProPower = proPower;
+		this.proPower = proPower;
 	}
 
 	public short[] getMonitorLogInterval() {
-		return MonitorLogInterval;
+		return this.monitorLogInterval;
 	}
 
 	public void setMonitorLogInterval(short[] monitorLogInterval) {
-		MonitorLogInterval = monitorLogInterval;
+		this.monitorLogInterval = monitorLogInterval;
 	}
 
 	public short[] getMonitorLogSaveToSD() {
-		return MonitorLogSaveToSD;
+		return this.monitorLogSaveToSD;
 	}
 
 	public void setMonitorLogSaveToSD(short[] monitorLogSaveToSD) {
-		MonitorLogSaveToSD = monitorLogSaveToSD;
+		this.monitorLogSaveToSD = monitorLogSaveToSD;
 	}
 
 	public short getServoType() {
-		return ServoType;
+		return this.servoType;
 	}
 
 	public void setServoType(short servoType) {
-		ServoType = servoType;
+		this.servoType = servoType;
 	}
 
 	public short getServoUserCenter() {
-		return ServoUserCenter;
+		return this.servoUserCenter;
 	}
 
 	public void setServoUserCenter(short servoUserCenter) {
-		ServoUserCenter = servoUserCenter;
+		this.servoUserCenter = servoUserCenter;
 	}
 
 	public short getServoUserRate() {
-		return ServoUserRate;
+		return this.servoUserRate;
 	}
 
 	public void setServoUserRate(short servoUserRate) {
-		ServoUserRate = servoUserRate;
+		this.servoUserRate = servoUserRate;
 	}
 
 	public short getServoUserOpAngle() {
-		return ServoUserOpAngle;
+		return this.servoUserOpAngle;
 	}
 
 	public void setServoUserOpAngle(short servoUserOpAngle) {
-		ServoUserOpAngle = servoUserOpAngle;
+		this.servoUserOpAngle = servoUserOpAngle;
 	}
 
 	public short getModBusMode() {
-		return ModBusMode;
+		return this.modBusMode;
 	}
 
 	public void setModBusMode(short modBusMode) {
-		ModBusMode = modBusMode;
+		this.modBusMode = modBusMode;
 	}
 
 	public short getModBusAddr() {
-		return ModBusAddr;
+		return this.modBusAddr;
 	}
 
 	public void setModBusAddr(short modBusAddr) {
-		ModBusAddr = modBusAddr;
+		this.modBusAddr = modBusAddr;
 	}
 
 	public short[] getDump() {
-		return Dump;
+		return this.dump;
 	}
 
 	public void setDump(short[] dump) {
-		Dump = dump;
+		this.dump = dump;
+	}
+
+	public int[] getSystemValues(final int[] values) {
+
+		values[0] = this.getTempUnit(); //0 temperature unit
+		values[1] = this.getTempStop(); //1 shut down temperature
+		values[2] = this.getTempReduce(); //2 power reduce delta
+		values[3] = this.getTempFansOn(); //3 Cooling fan on temperature
+		values[4] = this.getFansOffDelay(); //4 Cooling fan off delay time
+
+		values[5] = this.getBeepEnable()[0] != 0 ? this.getBeepVOL()[0] : 0; //5 Beep volume buttons
+		values[6] = this.getBeepEnable()[1] != 0 ? this.getBeepVOL()[1] : 0; //6 Beep volume tip
+		values[7] = this.getBeepEnable()[2] != 0 ? this.getBeepVOL()[2] : 0; //7 Beep volume alarm
+		values[8] = this.getBeepEnable()[3] != 0 ? this.getBeepVOL()[3] : 0; //8 Beep volume end
+		values[9] = this.getBeepType()[3]; //9 Beep type
+
+		values[10] = this.getLightValue(); //10 LCD brightness
+		values[11] = this.getLcdContraste(); //11 LCD contrast
+
+		values[12] = this.getChargePower()[0];//12 Charge power channel 1
+		values[13] = this.getChargePower()[1];//13 Charge power channel 2
+		values[14] = this.getDischargePower()[0];//14 Charge power channel 1
+		values[15] = this.getDischargePower()[1];//15 Charge power channel 2
+		values[16] = this.getProPower(); //16 Power distribution
+
+		values[17] = this.getSelInputSource(); //17 input select
+
+		values[18] = this.getxDischargePower(); //18 discharge power Limit
+		if (this.xInputSources[values[17]] != null) {
+			values[19] = this.xInputSources[values[17]].getInputLowVolt(); //19 inputLowVolt
+			values[20] = this.xInputSources[values[17]].getInputCurrentLimit(); //20 inputCurrentLimit
+			values[21] = this.xInputSources[values[17]].getChargePower(); //21 Charge power 
+			values[22] = this.xInputSources[values[17]].getRegEnable(); //22 regEnable
+			values[23] = this.xInputSources[values[17]].getRegVoltLimit(); //23 regVoltLimit
+			values[24] = this.xInputSources[values[17]].getRegCurrentLimit(); //24 regCurrentLimit
+			values[25] = this.xInputSources[values[17]].getRegPowerLimit(); //25 regPowerLimit
+			values[26] = this.xInputSources[values[17]].getRegCapLimit(); //26 regCapLimit
+		}
+		values[27] = this.getSelectLanguage(); //27 language 0=en 1=de
+		return values;
+	}
+
+	/**
+	 * @return the selectLanguage
+	 */
+	public short getSelectLanguage() {
+		return selectLanguage;
+	}
+
+	/**
+	 * @param selectLanguage the selectLanguage to set
+	 */
+	public void setSelectLanguage(short selectLanguage) {
+		this.selectLanguage = selectLanguage;
+	}
+
+	/**
+	 * @return the dcInputLowVolt
+	 */
+	public short getDcInputLowVolt() {
+		return dcInputLowVolt;
+	}
+
+	/**
+	 * @param dcInputLowVolt the dcInputLowVolt to set
+	 */
+	public void setDcInputLowVolt(short dcInputLowVolt) {
+		this.dcInputLowVolt = dcInputLowVolt;
+	}
+
+	/**
+	 * @return the dcInputOverVolt
+	 */
+	public short getDcInputOverVolt() {
+		return dcInputOverVolt;
+	}
+
+	/**
+	 * @param dcInputOverVolt the dcInputOverVolt to set
+	 */
+	public void setDcInputOverVolt(short dcInputOverVolt) {
+		this.dcInputOverVolt = dcInputOverVolt;
+	}
+
+	/**
+	 * @return the dcInputCurrentLimit
+	 */
+	public short getDcInputCurrentLimit() {
+		return dcInputCurrentLimit;
+	}
+
+	/**
+	 * @param dcInputCurrentLimit the dcInputCurrentLimit to set
+	 */
+	public void setDcInputCurrentLimit(short dcInputCurrentLimit) {
+		this.dcInputCurrentLimit = dcInputCurrentLimit;
 	}
 
 }

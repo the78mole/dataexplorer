@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V39.xsd">
     <Device>
-        <name implementation="gde.device.junsi.iChargerX6">iCharger S6</name>
+        <name>iCharger S6</name>
         <manufacturer>Junsi</manufacturer>
         <manufacturerURL>http://www.jun-si.com</manufacturerURL>
         <group>charger</group>

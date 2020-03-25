@@ -723,4 +723,20 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		log.finest(() -> StringHelper.byte2Hex2CharString(buffer, 3, 4));
 		return DataParser.getUInt32(buffer, 3);
 	}
+	
+	/**
+	 * @return the maximal charge current
+	 */
+	public abstract int getChargeCurrentMax();
+	
+	/**
+	 * @return the maximal charge power
+	 */
+	public abstract int[] getChargePowerMax();
+	
+	/**
+	 * @return the maximal discharge current
+	 */
+	public abstract int[] getDischargePowerMax();
+	
 }

@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with GNU DataExplorer.  If not, see <https://www.gnu.org/licenses/>.
 
-    Copyright (c) 2012,2013,2014,2015,2016,2017,2018,2019,2020 Winfried Bruegmann
+    Copyright (c) 2019,2020 Winfried Bruegmann
 ****************************************************************************************/
 package gde.device.junsi;
 
@@ -22,29 +22,54 @@ import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBException;
 
+import gde.GDE;
 import gde.device.DeviceConfiguration;
 
 /**
- * Junsi iCharger 406DUO device class
+ * Junsi iCharger X6 device class
  * @author Winfried Brügmann
  */
-public class iCharger406DUO extends iChargerUsb {
+public class iChargerS6 extends iChargerUsb {
 
+	public enum BatteryTypesX { //is different to iChargerUSB.BatteryTypesDuo
+		BT_UNKNOWN("?"), BT_LIPO("LiPo"), BT_LIIO("LiIo"), BT_LIFE("LiFe"), BT_LIHV("LiHV"), BT_LTO("LTO"), BT_NIMH("NiMH"), BT_NICD("NiCd"), BT_NIZN("NiZn"), BT_PB("PB"), BT_POWER("Power"), BT_USER("User"), BT_UNKNOWN_("?");
+
+		private String value;
+		
+		private BatteryTypesX(String newValue) {
+			value = newValue;
+		}
+		
+		protected String getName() {
+			return value;
+		}
+		
+		public static BatteryTypesX[] VALUES = values();
+		
+		public static String[] getValues() {
+			StringBuilder sb = new StringBuilder();
+			for (BatteryTypesX bt : BatteryTypesX.values()) 
+				sb.append(bt.value).append(GDE.CHAR_CSV_SEPARATOR);
+			return sb.toString().split(GDE.STRING_CSV_SEPARATOR);
+		}
+	};
+		
 	/**
-	 * constructor using properties file
-	 * @throws JAXBException
+	 * @param deviceProperties
 	 * @throws FileNotFoundException
+	 * @throws JAXBException
 	 */
-	public iCharger406DUO(String deviceProperties) throws FileNotFoundException, JAXBException {
+	public iChargerS6(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
+		this.BATTERIE_TYPES = BatteryTypesX.getValues(); 
 	}
 
 	/**
-	 * constructor using existing device configuration
-	 * @param deviceConfig device configuration
+	 * @param deviceConfig
 	 */
-	public iCharger406DUO(DeviceConfiguration deviceConfig) {
+	public iChargerS6(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
+		this.BATTERIE_TYPES = BatteryTypesX.getValues(); 
 	}
 
 	/**
@@ -69,7 +94,7 @@ public class iCharger406DUO extends iChargerUsb {
 	 */
 	@Override
 	public int[] getChargePowerMax() {
-		return new int[] {1000, 1000};
+		return new int[] {1100, 0};
 	}
 
 	/**
@@ -77,6 +102,6 @@ public class iCharger406DUO extends iChargerUsb {
 	 */
 	@Override
 	public int[] getDischargePowerMax() {
-		return new int[] {80, 80};
+		return new int[] {40, 0};
 	}
 }

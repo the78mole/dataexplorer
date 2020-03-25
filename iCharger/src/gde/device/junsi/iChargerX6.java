@@ -80,4 +80,28 @@ public class iChargerX6 extends iChargerUsb {
 	public int getNumberOfLithiumCells() {
 		return 6;
 	}
+
+	/**
+	 * @return the maximal charge current
+	 */
+	@Override
+	public int getChargeCurrentMax() {
+		return 40;
+	}
+
+	/**
+	 * @return the maximal charge power
+	 */
+	@Override
+	public int[] getChargePowerMax() {
+		return new int[] {800, 0};
+	}
+
+	/**
+	 * @return the maximal discharge current
+	 */
+	@Override
+	public int[] getDischargePowerMax() {
+		return new int[] {40, 0};
+	}
 }
