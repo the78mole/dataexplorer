@@ -72,12 +72,12 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		this.libUsbHandle = this.openLibUsbPort(this.device);
 	}
 
-	public void closeUsbPort() throws UsbClaimException, UsbException {
+	public void closeUsbPort(boolean cacheSelectedUsbDevice) throws UsbClaimException, UsbException {
 		if (this.libUsbHandle != null) {
-			this.closeLibUsbPort(this.libUsbHandle);
+			this.closeLibUsbPort(this.libUsbHandle, cacheSelectedUsbDevice);
 			this.libUsbHandle = null;
 		}
-		else this.closeLibUsbPort(null);
+		else this.closeLibUsbPort(null, false);
 	}
 
 	/**

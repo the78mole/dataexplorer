@@ -206,7 +206,7 @@ public class UsbGathererThread extends Thread {
 						UsbGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
 						this.application.setStatusMessage(e.getMessage(), SWT.COLOR_RED);
 						try {
-								this.usbPort.closeUsbPort();
+								this.usbPort.closeUsbPort(true);
 								UsbGathererThread.log.log(Level.FINE, "USB interface closed");
 						}
 						catch (UsbException eClose) {
@@ -235,7 +235,7 @@ public class UsbGathererThread extends Thread {
 						UsbGathererThread.log.log(Level.SEVERE, e.getMessage(), e);
 						this.application.setStatusMessage(e.getMessage(), SWT.COLOR_RED);
 						try {
-								this.usbPort.closeUsbPort();
+								this.usbPort.closeUsbPort(true);
 								UsbGathererThread.log.log(Level.FINE, "USB interface closed");
 						}
 						catch (UsbException eClose) {
@@ -272,7 +272,7 @@ public class UsbGathererThread extends Thread {
 		}
 		finally {
 			try {
-					this.usbPort.closeUsbPort();
+					this.usbPort.closeUsbPort(false);
 					UsbGathererThread.log.log(Level.FINE, "USB interface closed");
 			}
 			catch (UsbException e) {
@@ -423,7 +423,7 @@ public class UsbGathererThread extends Thread {
 		}
 		if (this.usbPort != null && this.usbPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.usbPort.isConnected()) {
 			try {
-				this.usbPort.closeUsbPort();
+				this.usbPort.closeUsbPort(false);
 			}
 			catch (UsbException e) {
 				UsbGathererThread.log.log(Level.WARNING, e.getMessage(), e);
@@ -447,7 +447,7 @@ public class UsbGathererThread extends Thread {
 	 */
 	void finalizeRecordSet(boolean doClosePort) {
 		if (doClosePort && this.isPortOpenedByLiveGatherer && this.usbPort.isConnected()) try {
-			this.usbPort.closeUsbPort();
+			this.usbPort.closeUsbPort(false);
 		}
 		catch (UsbException e) {
 			UsbGathererThread.log.log(Level.WARNING, e.getMessage(), e);

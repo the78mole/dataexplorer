@@ -1139,10 +1139,11 @@ public class DeviceJavaSerialCommPortImpl implements IDeviceCommPort, SerialPort
 	/**
 	 * release or close the given lib usb handle
 	 * @param libUsbDeviceHanlde
+	 * @param cacheSelectedUsbDevice true| false
 	 * @throws UsbClaimException
 	 * @throws UsbException
 	 */
-	public void closeLibUsbPort(final DeviceHandle libUsbDeviceHanlde) throws LibUsbException, UsbException {
+	public void closeLibUsbPort(final DeviceHandle libUsbDeviceHanlde, boolean cacheSelectedUsbDevice) throws LibUsbException, UsbException {
 		//no explicit return result
 	}
 	

@@ -412,11 +412,12 @@ public class DeviceCommPort implements IDeviceCommPort {
 	/**
 	 * release or close the given interface
 	 * @param libUsbHandle
+	 * @param cacheSelectedUsbDevice true| false
 	 * @throws UsbClaimException
 	 * @throws UsbException
 	 */
-	public void closeLibUsbPort(final DeviceHandle libUsbHandle) throws UsbClaimException, UsbException {
-		this.port.closeLibUsbPort(libUsbHandle);
+	public void closeLibUsbPort(final DeviceHandle libUsbHandle, boolean cacheSelectedUsbDevice) throws UsbClaimException, UsbException {
+		this.port.closeLibUsbPort(libUsbHandle, cacheSelectedUsbDevice);
 	}
 	
 	/**

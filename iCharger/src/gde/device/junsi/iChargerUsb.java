@@ -297,7 +297,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 					}
 					try {
 						WaitTimer.delay(1000);
-						if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort();
+						if (this.usbPort != null && this.usbPort.isConnected()) this.usbPort.closeUsbPort(false);
 					}
 					catch (UsbException e) {
 						log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);

@@ -282,10 +282,11 @@ public interface IDeviceCommPort {
 	/**
 	 * release or close the given interface
 	 * @param usbInterface
+	 * @param cacheSelectedUsbDevice true| false
 	 * @throws UsbClaimException
 	 * @throws UsbException
 	 */
-	public void closeLibUsbPort(final DeviceHandle libUsbHandle) throws UsbClaimException, UsbException;
+	public void closeLibUsbPort(final DeviceHandle libUsbHandle, boolean cacheSelectedUsbDevice) throws UsbClaimException, UsbException;
 
 	/**
 	 * write a byte array of data using the given interface and its end point address

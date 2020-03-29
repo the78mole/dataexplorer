@@ -226,7 +226,7 @@ public class ChargerDialog extends DeviceDialog {
 					ChargerDialog.log.log(Level.INFO, new ChargerMemory(memoryBuffer, isDuo).toString(isDuo));
 				}
 			}
-			if (usbPort.isConnected()) usbPort.closeUsbPort();
+			if (usbPort.isConnected()) usbPort.closeUsbPort(false);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -1121,7 +1121,7 @@ public class ChargerDialog extends DeviceDialog {
 
 				this.usbPort.masterWrite(Register.REG_SEL_CHANNEL.value, (short) (runOrderBuf.length / 2), runOrderBuf);
 
-				if (isConnectedByStop) this.usbPort.closeUsbPort();
+				if (isConnectedByStop) this.usbPort.closeUsbPort(true);
 			}
 		}
 		catch (UsbException | IllegalStateException | TimeOutException e) {
@@ -1199,7 +1199,7 @@ public class ChargerDialog extends DeviceDialog {
 		if (!((iChargerUsb) this.device).isDataGathererActive() && this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
 			try {
 				if (!((iChargerUsb) this.device).isDataGathererActive()) {
-					this.usbPort.closeUsbPort();
+					this.usbPort.closeUsbPort(true);
 					this.isPortOpenedByDialog = false;
 				}
 			}
