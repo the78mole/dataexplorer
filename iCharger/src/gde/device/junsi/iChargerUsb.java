@@ -725,6 +725,31 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	}
 	
 	/**
+	 * @return the minimal input voltage
+	 */
+	public abstract int getDcInputVoltMin();
+	
+	/**
+	 * @return the maximal input voltage
+	 */
+	public abstract int getDcInputVoltMax();
+	
+	/**
+	 * @return the maximal input current
+	 */
+	public abstract int getDcInputCurrentMax();
+	
+	/**
+	 * @return the minimal regenerative input voltage
+	 */
+	public abstract int getRegInputVoltMin();
+	
+	/**
+	 * @return the maximal regenerative input voltage
+	 */
+	public abstract int getRegInputVoltMax();
+	
+	/**
 	 * @return the maximal charge current
 	 */
 	public abstract int getChargeCurrentMax();

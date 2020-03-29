@@ -1365,7 +1365,7 @@ public class ChargerMemory {
 		values[2] = this.getCapacity(); //2 capacity
 		
 		//3 charge parameter current
-		values[3] = this.getChargeCurrent() * 10;
+		values[3] = this.getChargeCurrent();
 		//5 charge parameter balancer Li Setup
 		values[5] = this.getLiBalEndMode(); //end current OFF, detect balancer ON,...
 		//6 charge parameter end current
@@ -1466,7 +1466,7 @@ public class ChargerMemory {
 		values[16] = this.getBalDelay();
 
 		//17 discharge parameter current
-		values[17] = this.getDischargeCurrent() * 10;
+		values[17] = this.getDischargeCurrent();
 		//19 discharge end current
 		values[19] = this.getEndDischarge();
 		//20 regenerative mode 

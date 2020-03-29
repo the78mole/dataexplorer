@@ -57,13 +57,53 @@ public class iChargerX8 extends iChargerUsb {
 	public int getNumberOfLithiumCells() {
 		return 8;
 	}
+	
+	/**
+	 * @return the minimal input voltage
+	 */
+	@Override
+	public int getDcInputVoltMin() {
+		return 90; //*0.1V
+	}
+	
+	/**
+	 * @return the maximal input voltage
+	 */
+	@Override
+	public int getDcInputVoltMax() {
+		return 480; //*0.1 V
+	}
+	
+	/**
+	 * @return the maximal input current
+	 */
+	@Override
+	public int getDcInputCurrentMax() {
+		return 350; //*0.1 A
+	}
+	
+	/**
+	 * @return the minimal regenerative input voltage
+	 */
+	@Override
+	public int getRegInputVoltMin() {
+		return 90; //*0.1V
+	}
+	
+	/**
+	 * @return the maximal regenerative input voltage
+	 */
+	@Override
+	public int getRegInputVoltMax() {
+		return 480; //*0.1 V
+	}
 
 	/**
 	 * @return the maximal charge current
 	 */
 	@Override
 	public int getChargeCurrentMax() {
-		return 30;
+		return 300; //*0.1 A
 	}
 
 	/**

@@ -57,13 +57,53 @@ public class iChargerX12 extends iChargerUsb {
 	public int getNumberOfLithiumCells() {
 		return 12;
 	}
+	
+	/**
+	 * @return the minimal input voltage
+	 */
+	@Override
+	public int getDcInputVoltMin() {
+		return 110; //*0.1V
+	}
+	
+	/**
+	 * @return the maximal input voltage
+	 */
+	@Override
+	public int getDcInputVoltMax() {
+		return 520; //*0.1 V
+	}
+	
+	/**
+	 * @return the maximal input current
+	 */
+	@Override
+	public int getDcInputCurrentMax() {
+		return 350; //*0.1 A
+	}
+	
+	/**
+	 * @return the minimal regenerative input voltage
+	 */
+	@Override
+	public int getRegInputVoltMin() {
+		return 110; //*0.1V
+	}
+	
+	/**
+	 * @return the maximal regenerative input voltage
+	 */
+	@Override
+	public int getRegInputVoltMax() {
+		return 520; //*0.1 V
+	}
 
 	/**
 	 * @return the maximal charge current
 	 */
 	@Override
 	public int getChargeCurrentMax() {
-		return 40;
+		return 250; //*0.1 A
 	}
 
 	/**
