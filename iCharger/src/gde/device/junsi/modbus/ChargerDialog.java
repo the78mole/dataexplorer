@@ -154,13 +154,9 @@ public class ChargerDialog extends DeviceDialog {
 	public static void main(String[] args) {
 		try {
 			initLogger();
-			Display display = Display.getDefault();
-			Shell dialogShell = new Shell(display);
 			//iChargerUsb device = new iCharger4010DUO("c:\\Users\\Winfried\\AppData\\Roaming\\DataExplorer\\Devices\\iCharger406DUO.xml"); //$NON-NLS-1$
 			iChargerUsb device = new iChargerX6("c:\\Users\\Winfried\\AppData\\Roaming\\DataExplorer\\Devices\\iCharger S6.xml"); //$NON-NLS-1$
 			boolean isDuo = device.getName().endsWith("DUO"); //DUO = true; X6 = false
-			ChargerDialog inst = new ChargerDialog(dialogShell, device);
-			inst.open();
 			ChargerUsbPort usbPort = new ChargerUsbPort(device, null);
 			if (!usbPort.isConnected()) usbPort.openUsbPort();
 
@@ -179,6 +175,32 @@ public class ChargerDialog extends DeviceDialog {
 				byte[] systemBuffer = new byte[sizeSystem * 2];
 				usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_SYS_START, sizeSystem, systemBuffer);
 				ChargerDialog.log.log(Level.INFO, new ChargerSystem(systemBuffer, isDuo).toString(isDuo));
+				
+				//repair X6 while looping soft boot after writing wrong system memory using S6 configuration
+//				if (usbPort.isConnected()) usbPort.closeUsbPort();
+//				
+//				byte[] temp = new byte[4];
+//				temp[0] = (byte) (ChargerDialog.VALUE_ORDER_KEY & 0xFF);
+//				temp[1] = (byte) (ChargerDialog.VALUE_ORDER_KEY >> 8);
+//				temp[2] = (byte) Order.ORDER_WRITE_SYS.ordinal();
+//				
+//				byte[] temp2 = new byte[2];
+//
+//				boolean sysNotWritten = true;
+//				do {
+//					while (!usbPort.isConnected())
+//						try {
+//							usbPort.openUsbPort();
+//						}
+//						catch (Exception e) {
+//							// ignore
+//						}
+//					usbPort.masterWrite(REG_HOLDING_SYS_START, sizeSystem, systemBuffer);
+//					usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short) 2, temp);
+//					usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short) 1, temp2);
+//					sysNotWritten = false;
+//				}
+//				while (sysNotWritten);
 
 				//Read memory structure of original and added/modified program memories
 				//MasterWrite(REG_HOLDING_MEM_HEAD_START,(sizeof(MEM_HEAD)+1)/2,(BYTE *)&MemHead)
@@ -203,7 +225,6 @@ public class ChargerDialog extends DeviceDialog {
 					ChargerDialog.log.log(Level.INFO, String.format("%02d %s", memHead.getIndex()[i], new ChargerMemory(memoryBuffer, isDuo).getUseFlagAndName(isDuo))); //$NON-NLS-1$
 					ChargerDialog.log.log(Level.INFO, new ChargerMemory(memoryBuffer, isDuo).toString(isDuo));
 				}
-
 			}
 			if (usbPort.isConnected()) usbPort.closeUsbPort();
 		}
