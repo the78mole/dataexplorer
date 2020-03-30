@@ -117,6 +117,6 @@ public class iCharger4010DUO extends iChargerUsb {
 	 */
 	@Override
 	public int[] getDischargePowerMax() {
-		return new int[] {80, 80};
+		return new int[] {130, 130};
 	}
 }

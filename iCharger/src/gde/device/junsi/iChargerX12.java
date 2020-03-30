@@ -119,6 +119,6 @@ public class iChargerX12 extends iChargerUsb {
 	 */
 	@Override
 	public int[] getDischargePowerMax() {
-		return new int[] {40, 0};
+		return new int[] {50, 0};
 	}
 }
