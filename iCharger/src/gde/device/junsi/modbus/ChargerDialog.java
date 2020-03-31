@@ -962,7 +962,7 @@ public class ChargerDialog extends DeviceDialog {
 	 * this method will update the useFlag to 0x55AA to differentiate to build in memories
 	 * @param modifiedSystemMemory the modified program memory class
 	 */
-	private void writeSystemMemory(boolean isDuo) {
+	private boolean writeSystemMemory(boolean isDuo) {
 		short sizeSystem = (short) (((systemInfo != null ? systemInfo.getSystemMemoryLength() : ChargerSystem.getSize(isDuo)) + 1) / 2);
 
 		try {
@@ -980,6 +980,7 @@ public class ChargerDialog extends DeviceDialog {
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
+		return true;
 	}
 
 	/**
@@ -1781,8 +1782,13 @@ public class ChargerDialog extends DeviceDialog {
 		btnSystemSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				writeSystemMemory(isDuo);
-				btnSystemSave.setEnabled(false);
+				try {
+						btnSystemSave.setEnabled(!writeSystemMemory(isDuo));
+				}
+				catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		

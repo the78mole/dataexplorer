@@ -750,7 +750,7 @@ public class ChargerSystem {
 		return sb.toString();
 	}
 
-	final static int size = 59 * 2; //size in byte
+	final static int size = 60 * 2; //size in byte
 
 	public static int getSize(boolean isDuo) {
 		return isDuo ? ChargerSystem.size : 156;
