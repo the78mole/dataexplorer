@@ -49,6 +49,8 @@ public class ParameterConfigControl {
 	final Slider				slider;
 
 	final int						controlHeight	= GDE.IS_MAC ? 20 : 18;
+	int									sliderMinValue;
+	int									sliderMaxValue;
 	int									offset;
 	final String				format;
 
@@ -97,6 +99,8 @@ public class ParameterConfigControl {
 				break;
 			}
 		}
+		this.sliderMinValue = sliderMinValue;
+		this.sliderMaxValue = sliderMaxValue;
 		this.offset = sliderOffset;
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -135,13 +139,13 @@ public class ParameterConfigControl {
 					public void keyReleased(KeyEvent evt) {
 						if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
 						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText().replace(GDE.STRING_DOT,GDE.STRING_EMPTY));
-						if (ParameterConfigControl.this.value < sliderMinValue) {
-							ParameterConfigControl.this.value = sliderMinValue;
-							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : (int)(ParameterConfigControl.this.value/devisor)));
+						if (ParameterConfigControl.this.value < ParameterConfigControl.this.sliderMinValue) {
+							ParameterConfigControl.this.value = ParameterConfigControl.this.sliderMinValue;
+							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : ParameterConfigControl.this.value/devisor));
 						}
-						if (ParameterConfigControl.this.value > sliderMaxValue) {
-							ParameterConfigControl.this.value = sliderMaxValue;
-							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : (int)(ParameterConfigControl.this.value/devisor)));
+						if (ParameterConfigControl.this.value > ParameterConfigControl.this.sliderMaxValue) {
+							ParameterConfigControl.this.value = ParameterConfigControl.this.sliderMaxValue;
+							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : ParameterConfigControl.this.value/devisor));
 						}
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
 						ParameterConfigControl.this.slider.setSelection(ParameterConfigControl.this.value + ParameterConfigControl.this.offset);
@@ -174,8 +178,8 @@ public class ParameterConfigControl {
 			sliderLData.height = this.controlHeight;
 			this.slider = new Slider(this.baseComposite, SWT.NONE);
 			this.slider.setLayoutData(sliderLData);
-			this.slider.setMinimum(sliderMinValue + this.offset);
-			this.slider.setMaximum(sliderMaxValue + this.offset + 10);
+			this.slider.setMinimum(this.sliderMinValue + this.offset);
+			this.slider.setMaximum(this.sliderMaxValue + this.offset + 10);
 			this.slider.setIncrement(1);
 			this.slider.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -229,6 +233,8 @@ public class ParameterConfigControl {
 			final int sliderMaxValue) {
 		this.value = valueArray[valueIndex];
 		this.format = valueFormat.equals(GDE.STRING_EMPTY) ? "%d" : valueFormat; //$NON-NLS-1$
+		this.sliderMinValue = sliderMinValue;
+		this.sliderMaxValue = sliderMaxValue;
 		this.offset = 0;
 		this.baseComposite = new Composite(parent, SWT.NONE);
 		RowLayout group1Layout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -267,12 +273,12 @@ public class ParameterConfigControl {
 					public void keyReleased(KeyEvent evt) {
 						if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "text.keyReleased, event=" + evt); //$NON-NLS-1$
 						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText());
-						if (ParameterConfigControl.this.value < sliderMinValue) {
-							ParameterConfigControl.this.value = sliderMinValue;
+						if (ParameterConfigControl.this.value < ParameterConfigControl.this.sliderMinValue) {
+							ParameterConfigControl.this.value = ParameterConfigControl.this.sliderMinValue;
 							ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
 						}
-						if (ParameterConfigControl.this.value > sliderMaxValue) {
-							ParameterConfigControl.this.value = sliderMaxValue;
+						if (ParameterConfigControl.this.value > ParameterConfigControl.this.sliderMaxValue) {
+							ParameterConfigControl.this.value = ParameterConfigControl.this.sliderMaxValue;
 							ParameterConfigControl.this.text.setText(String.format(ParameterConfigControl.this.format, ParameterConfigControl.this.value));
 						}
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
@@ -306,8 +312,8 @@ public class ParameterConfigControl {
 			sliderLData.height = this.controlHeight;
 			this.slider = new Slider(this.baseComposite, SWT.NONE);
 			this.slider.setLayoutData(sliderLData);
-			this.slider.setMinimum(sliderMinValue);
-			this.slider.setMaximum(sliderMaxValue + 10);
+			this.slider.setMinimum(this.sliderMinValue);
+			this.slider.setMaximum(this.sliderMaxValue + 10);
 			this.slider.setIncrement(1);
 			this.slider.setSelection(this.value);
 			this.slider.addSelectionListener(new SelectionAdapter() {
@@ -456,7 +462,9 @@ public class ParameterConfigControl {
 	 */
 	public void updateValueRange(String newParameterDescription, int newMinSliderValue, int newMaxSliderValue) {
 		this.descriptionLabel.setText(newParameterDescription);
+		this.sliderMinValue = newMinSliderValue;
 		this.slider.setMinimum(newMinSliderValue);
+		this.sliderMaxValue = newMaxSliderValue;
 		this.slider.setMaximum(newMaxSliderValue);
 	}
 
@@ -469,14 +477,17 @@ public class ParameterConfigControl {
 	public void updateValueRange(String newParameterDescription, int newMinSliderValue, int newMaxSliderValue, int newOffset) {
 		this.descriptionLabel.setText(newParameterDescription);
 		this.offset = newOffset;
+		this.sliderMinValue = newMinSliderValue;
 		this.slider.setMinimum(newMinSliderValue + this.offset);
+		this.sliderMaxValue = newMaxSliderValue;
 		this.slider.setMaximum(newMaxSliderValue + this.offset + 10);
 	}
 
 	public void updateTextFieldValues(final String[] textFiledValues) {
 		this.descriptionLabel.setText(String.join(",", textFiledValues));
 		this.textValues = textFiledValues;
-		this.slider.setMaximum(this.textValues.length < 10 ? 10 + this.textValues.length - 1 : this.textValues.length + 1);
+		this.sliderMaxValue = this.textValues.length < 10 ? 10 + this.textValues.length - 1 : this.textValues.length + 1;
+		this.slider.setMaximum(this.sliderMaxValue);
 		this.value = ParameterConfigControl.this.slider.getSelection();
 		this.text.setText(this.textValues[ParameterConfigControl.this.value]);
 	}
