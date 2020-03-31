@@ -1734,7 +1734,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpLanguage.layout();
 
 		grpSaveLoadConfig = new Group(sysComposite, SWT.NONE);
-		grpSaveLoadConfig.setLayoutData(new RowData(750, SWT.DEFAULT));
+		grpSaveLoadConfig.setLayoutData(new RowData(740, SWT.DEFAULT));
 		grpSaveLoadConfig.setText("Save, Restore & Load Configuration");
 		FillLayout fillLayout = new FillLayout(SWT.VERTICAL);
 		fillLayout.marginHeight = 10;
@@ -1971,7 +1971,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.chargeComposite.setLayout(new RowLayout(SWT.VERTICAL));
 		scrolledComposite.setContent(this.chargeComposite);
 		scrolledComposite.setMinSize(this.chargeComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		this.chargeComposite.setSize(750, 880);
+		this.chargeComposite.setSize(750, GDE.IS_WINDOWS ? 880 : 1050);
 		//charge parameter current
 		this.memoryParameters[3] = new ParameterConfigControl(this.chargeComposite, this.memoryValues, 3, "%4.2f", Messages.getString(MessageIds.GDE_MSGT2640), 175, 
 				String.format("0.05 ~ %d A", device.getChargeCurrentMax()/100), 280, //$NON-NLS-1$
