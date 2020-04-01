@@ -85,6 +85,7 @@ public class ChargerDialog extends DeviceDialog {
 	private ChargerMemory							selectedProgramMemory				= null;
 	private ChargerMemory							copiedProgramMemory					= null;
 	private int												lastSelectedProgramMemoryIndex;
+	private int												lastSelectedComboIndex = 0;
 	byte[]														memoryHeadIndex							= new byte[ChargerMemoryHead.LIST_MEM_MAX];
 
 	private CCombo										combo;
@@ -871,7 +872,7 @@ public class ChargerDialog extends DeviceDialog {
 					//Read selected charger program memory
 					memoryBuffer = new byte[sizeMemory * 2];
 					this.usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
-					programMemories.add(String.format("%02d - %s", this.memoryHeadIndex[i], new ChargerMemory(memoryBuffer, this.isDuo).getUseFlagAndName(isDuo))); //orde logical //$NON-NLS-1$
+					programMemories.add(getFormatedListEntry(i, new ChargerMemory(memoryBuffer, this.isDuo))); //order logical //$NON-NLS-1$
 					if (ChargerDialog.log.isLoggable(Level.INFO)) 
 						ChargerDialog.log.log(Level.INFO, programMemories.get(programMemories.size() - 1));
 				}
@@ -888,6 +889,15 @@ public class ChargerDialog extends DeviceDialog {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
 		return programMemories.size() == 0 ? new String[0] : programMemories.toArray(new String[1]);
+	}
+
+	/**
+	 * @param memHeadIndex
+	 * @param programMemory
+	 * @return a formated string for program memory
+	 */
+	private String getFormatedListEntry(final int memHeadIndex, final ChargerMemory programMemory) {
+		return String.format("%02d - %s", this.memoryHeadIndex[memHeadIndex], programMemory.getUseFlagAndName(isDuo));
 	}
 
 	/**
@@ -1265,7 +1275,8 @@ public class ChargerDialog extends DeviceDialog {
 					initProgramMemory(ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
 					ChargerDialog.this.memoryValues = ChargerDialog.this.selectedProgramMemory.getMemoryValues(ChargerDialog.this.memoryValues, ChargerDialog.this.isDuo);
 					updateMemoryParameterControls();
-					ChargerDialog.this.lastSelectedProgramMemoryIndex = ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()];
+					ChargerDialog.this.lastSelectedComboIndex = ChargerDialog.this.combo.getSelectionIndex();
+					ChargerDialog.this.lastSelectedProgramMemoryIndex = ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.lastSelectedComboIndex];
 				}
 				if (ChargerDialog.this.combo.getText().contains("BUILD IN")) { //$NON-NLS-1$
 					ChargerDialog.this.btnCopy.setEnabled(true);
@@ -1341,7 +1352,7 @@ public class ChargerDialog extends DeviceDialog {
 				ChargerDialog.this.copiedProgramMemory = null;
 				ChargerDialog.this.combo.setForeground(ChargerDialog.this.application.COLOR_BLACK);
 				ChargerDialog.this.combo.setItems(readProgramMemories());
-				ChargerDialog.this.combo.select(0);
+				ChargerDialog.this.combo.select(ChargerDialog.this.lastSelectedComboIndex+1);
 				ChargerDialog.this.combo.notifyListeners(SWT.Selection, new Event());
 			}
 		});
@@ -1369,9 +1380,15 @@ public class ChargerDialog extends DeviceDialog {
 				if (ChargerDialog.this.selectedProgramMemory != null)
 					writeProgramMemory(ChargerDialog.this.lastSelectedProgramMemoryIndex, ChargerDialog.this.selectedProgramMemory, ChargerDialog.this.selectedProgramMemory.getUseFlag());
 				ChargerDialog.this.combo.setForeground(ChargerDialog.this.application.COLOR_BLACK);
-				ChargerDialog.this.combo.setItems(readProgramMemories());
-				ChargerDialog.this.combo.select(0);
-				ChargerDialog.this.combo.notifyListeners(SWT.Selection, new Event());
+				String updatedItemText = getFormatedListEntry(ChargerDialog.this.lastSelectedComboIndex, ChargerDialog.this.selectedProgramMemory);
+				String[] items = ChargerDialog.this.combo.getItems();
+				items[ChargerDialog.this.lastSelectedComboIndex] = updatedItemText;
+				ChargerDialog.this.combo.setItems(items);
+				ChargerDialog.this.combo.setText(updatedItemText);
+				//reduce combo change and not required read write operations
+				//ChargerDialog.this.combo.setItems(readProgramMemories());
+				//ChargerDialog.this.combo.select(0);
+				//ChargerDialog.this.combo.notifyListeners(SWT.Selection, new Event());
 				ChargerDialog.this.btnWrite.setEnabled(false);
 			}
 		});
@@ -1786,8 +1803,7 @@ public class ChargerDialog extends DeviceDialog {
 						btnSystemSave.setEnabled(!writeSystemMemory(isDuo));
 				}
 				catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					log.log(Level.SEVERE, e1.getMessage(), e);
 				}
 			}
 		});
