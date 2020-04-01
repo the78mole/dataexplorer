@@ -1996,8 +1996,8 @@ public class ChargerDialog extends DeviceDialog {
 		this.chargeComposite.setSize(750, GDE.IS_WINDOWS ? 880 : 1050);
 		//charge parameter current
 		this.memoryParameters[3] = new ParameterConfigControl(this.chargeComposite, this.memoryValues, 3, "%4.2f", Messages.getString(MessageIds.GDE_MSGT2640), 175, 
-				String.format("0.05 ~ %d A", device.getChargeCurrentMax()/100), 280, //$NON-NLS-1$
-				true, 50, 200, 50, device.getChargeCurrentMax(), -50, false);
+				String.format("0.05 ~ %d A", device.getChargeCurrentMax()/10), 280, //$NON-NLS-1$
+				true, 50, 200, 5, device.getChargeCurrentMax()*10, -5, false);
 		//charge parameter modus normal,balance,external,reflex
 		this.memoryParameters[4] = new ParameterConfigControl(this.chargeComposite, this.memoryValues, 4, Messages.getString(MessageIds.GDE_MSGT2641), 175, String.join(", ", ChargerMemory.LiMode.VALUES), //$NON-NLS-1$
 				280, ChargerMemory.LiMode.VALUES, 50, 200);
@@ -2103,10 +2103,10 @@ public class ChargerDialog extends DeviceDialog {
 		this.dischargeComposite.setLayout(new RowLayout(SWT.VERTICAL));
 		//discharge parameter current
 		this.memoryParameters[17] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 17, "%4.2f", Messages.getString(MessageIds.GDE_MSGT2671), 175, 
-				String.format("0.05 ~ %d A", device.getChargeCurrentMax()/100), 280, //$NON-NLS-1$
-				true, 50, 200, 50, device.getChargeCurrentMax(), -50, false);
+				String.format("0.05 ~ %d A", device.getChargeCurrentMax()/10), 280, //$NON-NLS-1$
+				true, 50, 200, 5, device.getChargeCurrentMax()*10, -5, false);
 		//discharge parameter cell voltage
-		this.memoryParameters[18] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 18, "%5.3f", Messages.getString(MessageIds.GDE_MSGT2672), 175, "3.000 - 4.100 V", 280, //$NON-NLS-1$
+		this.memoryParameters[18] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 18, "%4.3f", Messages.getString(MessageIds.GDE_MSGT2672), 175, "3.000 - 4.100 V", 280, //$NON-NLS-1$
 				true, 50, 200, 3000, 4100, -3000, false);
 		//discharge end current
 		this.memoryParameters[19] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 19, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2673), 175, "1% - 100%", 280, //$NON-NLS-1$
@@ -2290,7 +2290,7 @@ public class ChargerDialog extends DeviceDialog {
 					this.memoryParameters[5].setEnabled(false);
 					this.memoryParameters[7].setEnabled(false);
 					this.grpBalancerSettings.setEnabled(false);
-					for (int i = 8; i < 14; ++i)
+					for (int i = 11; i < 17; ++i)
 						this.memoryParameters[i].setEnabled(false);
 					break;
 				case 5: //Pb
@@ -2298,7 +2298,7 @@ public class ChargerDialog extends DeviceDialog {
 					this.memoryParameters[5].setEnabled(false);
 					this.memoryParameters[7].setEnabled(false);
 					this.grpBalancerSettings.setEnabled(false);
-					for (int i = 8; i < 14; ++i)
+					for (int i = 11; i < 17; ++i)
 						this.memoryParameters[i].setEnabled(false);
 					break;
 				default: //unknown
