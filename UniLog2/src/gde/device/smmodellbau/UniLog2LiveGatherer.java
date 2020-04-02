@@ -18,6 +18,10 @@
 ****************************************************************************************/
 package gde.device.smmodellbau;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.logging.Logger;
+
 import gde.GDE;
 import gde.comm.DeviceCommPort;
 import gde.data.Channel;
@@ -32,11 +36,6 @@ import gde.log.Level;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.TimeLine;
-import gde.utils.WaitTimer;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.logging.Logger;
 
 /**
  * Thread implementation to gather data from UniLog device
@@ -45,6 +44,14 @@ import java.util.logging.Logger;
 public class UniLog2LiveGatherer extends Thread {
 	final static String			$CLASS_NAME									= UniLog2LiveGatherer.class.getName();
 	final static Logger			log													= Logger.getLogger(UniLog2LiveGatherer.class.getName());
+	final static String			CELL_VOLTAGES_UL2						= "[f[1mUL2live 0052\n" + 
+			"[0m*  Zeit  0:00:52\n" + 
+			" 0.00V1   0.00V2\n" + 
+			" 0.00V3   0.00V4\n" + 
+			" 0.00V5   0.00V6\n" + 
+			"A1        ----`C\n" + 
+			"A2        ----`C\n" + 
+			"A3        ----`C\n";
 
 	final DataExplorer			application;
 	final UniLog2SerialPort	serialPort;
@@ -85,7 +92,7 @@ public class UniLog2LiveGatherer extends Thread {
 			if (!this.serialPort.isConnected()) {
 				this.serialPort.open();
 				this.isPortOpenedByLiveGatherer = true;
-				WaitTimer.delay(2000);
+				//WaitTimer.delay(1000);
 			}
 		}
 		catch (SerialPortException e) {
@@ -147,6 +154,8 @@ public class UniLog2LiveGatherer extends Thread {
 						String liveAnswer = UniLog2LiveGatherer.this.serialPort.queryLiveData();
 						if(liveAnswer.length() < 100) 
 							break;
+						if (liveAnswer.contains("UniSens")) liveAnswers[1] = CELL_VOLTAGES_UL2;
+						
 						if (liveAnswer.contains("rpm") && liveAnswer.contains("VRx")) {
 							liveAnswers[0] = liveAnswer;
 						}
@@ -216,11 +225,13 @@ public class UniLog2LiveGatherer extends Thread {
 		}
 		finally {
 			cleanup(recordSetKey, null);
-			GDE.display.asyncExec(new Runnable() {
-				public void run() {
-					UniLog2LiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
-				}
-			});
+			if (this.device.getDialog() != null) {
+				GDE.display.asyncExec(new Runnable() {
+					public void run() {
+						UniLog2LiveGatherer.this.device.configureSerialPortMenu(DeviceCommPort.ICON_SET_IMPORT_CLOSE, Messages.getString(MessageIds.GDE_MSGT2504), Messages.getString(MessageIds.GDE_MSGT2504));
+					}
+				});
+			}
 		}
 	}
 
@@ -250,11 +261,13 @@ public class UniLog2LiveGatherer extends Thread {
 			this.application.getMenuToolBar().updateRecordSetSelectCombo();
 			this.application.updateStatisticsData();
 			this.application.updateDataTable(recordSetKey, true);
-			GDE.display.asyncExec(new Runnable() {
-				public void run() {
-					UniLog2LiveGatherer.this.device.getDialog().resetButtons();
-				}
-			});
+			if (UniLog2LiveGatherer.this.device.getDialog() != null) {
+				GDE.display.asyncExec(new Runnable() {
+					public void run() {
+						UniLog2LiveGatherer.this.device.getDialog().resetButtons();
+					}
+				});
+			}
 			if (message != null && message.length() > 5) {
 				this.application.openMessageDialog(this.dialog.getDialogShell(), message);
 			}
