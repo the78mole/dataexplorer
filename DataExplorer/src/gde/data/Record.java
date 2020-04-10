@@ -2453,7 +2453,9 @@ public class Record extends AbstractRecord implements IRecord {
 
 					while (!isMatchRanges && secondaryIterator.hasNext()) {
 						secondaryRange = (TriggerRange) secondaryIterator.next();
-						if (secondaryRange.in > primaryRange.in && secondaryRange.in < primaryRange.out && secondaryRange.out > primaryRange.out 
+						if (secondaryRange.in >= primaryRange.in 
+								&& secondaryRange.in < primaryRange.out 
+								&& secondaryRange.out > primaryRange.out 
 								&& secondaryRange.out < (primaryRange.out + (primaryRange.out - primaryRange.in))) {
 							this.triggerRanges.add(new TriggerRange(primaryRange.in, secondaryRange.out));
 							isMatchRanges = true;
