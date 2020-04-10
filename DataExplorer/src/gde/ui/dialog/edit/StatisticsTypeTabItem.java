@@ -76,7 +76,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 	Composite											statisticsComposite;
 	CCombo												triggerLevelCombo;
 	Label													triggerLevelLabel;
-	CCombo												sumByTriggerRefOrdinalCombo;
+	CCombo												sumByTriggerRefOrdinalCombo, sumBySecondaryTriggerRefOrdinalCombo;
 	Button												isSumByTriggerRefOrdinalButton;
 	Button												sumTriggerTimeButton;
 	Button												countByTriggerButton;
@@ -94,16 +94,16 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 	Text													countByTriggerText;
 	CCombo												triggerRefOrdinalCombo;
 	Button												triggerRefOrdinalButton;
-	Button												statisticsSigmaButton;
+	Button												statisticsSigmaButton, secondaryTriggerButton;
 	Button												statisticsMaxButton;
 	Button												statisticsAvgButton;
 	Button												statisticsMinButton;
 
-	Boolean												statisticsMin, statisticsMax, statisticsAvg, statisticsSigma;
+	Boolean												statisticsMin, statisticsMax, statisticsAvg, statisticsSigma, isSecondaryTrigger;
 	String												triggerComment, sumTriggerComment, sumTriggerTimeComment, countByTriggerComment, ratioComment, triggerRefOrdinalComment;
 	Boolean												isGreater, isSumTriggerTime, isCountByTrigger, isRatioRefOrdinal, isIntegrateByTrigger;
 	Integer												triggerLevel, minTimeSec, ratioRefOrdinal;
-	Integer												triggerRefOrdinal, sumByTriggerRefOrdinal;																																																											// must be equal !!!
+	Integer												triggerRefOrdinal, sumByTriggerRefOrdinal, sumBySecondaryTriggerRefOrdinal;																																																											// must be equal !!!
 	boolean												isSomeTriggerDefined					= false;
 	String[]											measurementReferenceItems;
 
@@ -159,6 +159,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 
 		this.triggerRefOrdinal = copyFrom.triggerRefOrdinal;
 		this.sumByTriggerRefOrdinal = copyFrom.sumByTriggerRefOrdinal;
+		this.sumBySecondaryTriggerRefOrdinal = copyFrom.sumBySecondaryTriggerRefOrdinal;
 		this.sumTriggerComment = copyFrom.sumTriggerComment;
 		this.isRatioRefOrdinal = copyFrom.isRatioRefOrdinal;
 		this.ratioRefOrdinal = copyFrom.ratioRefOrdinal;
@@ -193,6 +194,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 		this.measurementReferenceItems = this.deviceConfig.getMeasurementNames(this.channelConfigNumber);
 		this.triggerRefOrdinalCombo.setItems(this.measurementReferenceItems);
 		this.sumByTriggerRefOrdinalCombo.setItems(this.measurementReferenceItems);
+		this.sumBySecondaryTriggerRefOrdinalCombo.setItems(this.measurementReferenceItems);
 		this.ratioRefOrdinalCombo.setItems(this.measurementReferenceItems);
 
 		updateTriggerDependent(this.isSomeTriggerDefined = isSomeTriggerDefined());
@@ -212,8 +214,10 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 	 */
 	private void updateTriggerDependent(boolean isTriggerDefined) {
 		this.triggerLevelButton.setEnabled(!isTriggerDefined || this.triggerType != null);
+		this.secondaryTriggerButton.setEnabled(!isTriggerDefined || this.triggerType != null);
 
 		this.triggerLevelButton.setSelection(isTriggerDefined && this.triggerType != null);
+		this.secondaryTriggerButton.setSelection(isTriggerDefined && this.triggerType != null && this.triggerType.isSecondary());
 		this.triggerLevelLabel.setEnabled(isTriggerDefined && this.triggerType != null);
 		this.triggerLevelCombo.setEnabled(isTriggerDefined && this.triggerType != null);
 		this.triggerCommentText.setEnabled(isTriggerDefined && this.triggerType != null);
@@ -293,6 +297,9 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 					//this.sumByTriggerRefOrdinalCombo.setEnabled(false);
 					this.sumTriggerText.setEnabled(false);
 				}
+				if (this.sumByTriggerRefOrdinal != null && (this.sumBySecondaryTriggerRefOrdinal = this.statisticsType.getSumBySecondaryTriggerRefOrdinal()) != null) {
+					this.sumBySecondaryTriggerRefOrdinalCombo.select(this.sumBySecondaryTriggerRefOrdinal);
+				}
 				if ((this.ratioRefOrdinal = this.statisticsType.getRatioRefOrdinal()) != null) {
 					this.isRatioRefOrdinalButton.setEnabled(true);
 					this.isRatioRefOrdinalButton.setSelection(this.isRatioRefOrdinal = true);
@@ -348,6 +355,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 				}
 				this.isSumByTriggerRefOrdinalButton.setSelection(false);
 				this.sumByTriggerRefOrdinalCombo.select(0);
+				this.sumBySecondaryTriggerRefOrdinalCombo.select(0);
 				this.sumTriggerComment = null;
 				if (this.statisticsType.getSumTriggerText() != null) {
 					this.statisticsType.setSumTriggerText(null);
@@ -498,6 +506,27 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 							StatisticsTypeTabItem.this.statisticsType.setSigma(StatisticsTypeTabItem.this.statisticsSigma);
 							StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
 							StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
+						}
+					}
+				});
+			}
+			{
+				this.secondaryTriggerButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
+				this.secondaryTriggerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.secondaryTriggerButton.setText("secondary");
+				this.secondaryTriggerButton.setToolTipText("secondary Trigger");
+				this.secondaryTriggerButton.setBounds(10, 105, 90, 20);
+				this.secondaryTriggerButton.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent evt) {
+						log.log(java.util.logging.Level.FINEST, "secondaryTriggerButton.widgetSelected, event=" + evt); //$NON-NLS-1$
+						StatisticsTypeTabItem.this.isSecondaryTrigger = StatisticsTypeTabItem.this.secondaryTriggerButton.getSelection();
+						if (StatisticsTypeTabItem.this.statisticsType != null) {
+							if (StatisticsTypeTabItem.this.triggerType != null) {
+								StatisticsTypeTabItem.this.triggerType.setSecondary(StatisticsTypeTabItem.this.isSecondaryTrigger);
+								StatisticsTypeTabItem.this.deviceConfig.setChangePropery(true);
+								StatisticsTypeTabItem.this.propsEditor.enableSaveButton(true);
+							}
 						}
 					}
 				});
@@ -896,10 +925,18 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 				});
 			}
 			{
+				this.sumBySecondaryTriggerRefOrdinalCombo = new CCombo(this.statisticsComposite, SWT.BORDER);
+				this.sumBySecondaryTriggerRefOrdinalCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+				this.sumBySecondaryTriggerRefOrdinalCombo.setBounds(245, 155, 110, 20);
+				this.sumBySecondaryTriggerRefOrdinalCombo.setEnabled(false);
+				this.sumBySecondaryTriggerRefOrdinalCombo.setBackground(DataExplorer.getInstance().COLOR_WHITE);
+				this.sumBySecondaryTriggerRefOrdinalCombo.setForeground(DataExplorer.getInstance().COLOR_BLACK);
+			}
+			{
 				this.isRatioRefOrdinalButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
 				this.isRatioRefOrdinalButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.isRatioRefOrdinalButton.setText(Messages.getString(MessageIds.GDE_MSGT0574));
-				this.isRatioRefOrdinalButton.setBounds(125, 155, 118, 20);
+				this.isRatioRefOrdinalButton.setBounds(125, 180, 118, 20);
 				this.isRatioRefOrdinalButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0575));
 				this.isRatioRefOrdinalButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -928,7 +965,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 			{
 				this.ratioRefOrdinalCombo = new CCombo(this.statisticsComposite, SWT.BORDER);
 				this.ratioRefOrdinalCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.ratioRefOrdinalCombo.setBounds(245, 155, 110, 20);
+				this.ratioRefOrdinalCombo.setBounds(245, 180, 110, 20);
 				this.ratioRefOrdinalCombo.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
@@ -945,7 +982,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 			{
 				this.ratioText = new Text(this.statisticsComposite, SWT.BORDER);
 				this.ratioText.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-				this.ratioText.setBounds(360, 155, 325, 20);
+				this.ratioText.setBounds(360, 180, 325, 20);
 				this.ratioText.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0576));
 				this.ratioText.addKeyListener(new KeyAdapter() {
 					@Override
@@ -964,7 +1001,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 				this.isIntegrateByTriggerButton = new Button(this.statisticsComposite, SWT.CHECK | SWT.LEFT);
 				this.isIntegrateByTriggerButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.isIntegrateByTriggerButton.setText(Messages.getString(MessageIds.GDE_MSGT0959));
-				this.isIntegrateByTriggerButton.setBounds(125, 180, 118, 20);
+				this.isIntegrateByTriggerButton.setBounds(125, 205, 118, 20);
 				this.isIntegrateByTriggerButton.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0960));
 				this.isIntegrateByTriggerButton.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -985,7 +1022,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 				});
 			}
 			this.scrolledComposite.setContent(this.statisticsComposite);
-			this.statisticsComposite.setSize(700, 205);
+			this.statisticsComposite.setSize(700, 235);
 			this.statisticsComposite.layout();
 
 			initialize();
@@ -1016,6 +1053,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 		this.statisticsAvgButton.setMenu(this.popupMenu);
 		this.statisticsMaxButton.setMenu(this.popupMenu);
 		this.statisticsSigmaButton.setMenu(this.popupMenu);
+		this.secondaryTriggerButton.setMenu(this.popupMenu);
 		this.triggerLevelButton.setMenu(this.popupMenu);
 		this.triggerLevelLabel.setMenu(this.popupMenu);
 		this.isGreaterButton.setMenu(this.popupMenu);
@@ -1089,6 +1127,8 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 		StatisticsTypeTabItem.this.isSumByTriggerRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal != null);
 		StatisticsTypeTabItem.this.sumByTriggerRefOrdinalCombo.select(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal == null ? StatisticsTypeTabItem.this.getTriggerReferenceOrdinal()
 				: StatisticsTypeTabItem.this.sumByTriggerRefOrdinal);
+		StatisticsTypeTabItem.this.sumBySecondaryTriggerRefOrdinalCombo.select(StatisticsTypeTabItem.this.sumBySecondaryTriggerRefOrdinal == null ? StatisticsTypeTabItem.this.getTriggerReferenceOrdinal()
+				: StatisticsTypeTabItem.this.sumBySecondaryTriggerRefOrdinal);
 		StatisticsTypeTabItem.this.sumTriggerText.setText(StatisticsTypeTabItem.this.sumTriggerComment == null ? GDE.STRING_EMPTY : StatisticsTypeTabItem.this.sumTriggerComment);
 		StatisticsTypeTabItem.this.isRatioRefOrdinalButton.setSelection(StatisticsTypeTabItem.this.ratioRefOrdinal != null);
 		StatisticsTypeTabItem.this.ratioRefOrdinalCombo.select(StatisticsTypeTabItem.this.ratioRefOrdinal == null ? 0 : StatisticsTypeTabItem.this.ratioRefOrdinal);

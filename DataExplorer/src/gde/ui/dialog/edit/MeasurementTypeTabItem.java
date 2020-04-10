@@ -430,7 +430,7 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 				}
 				{
 					this.channelConfigMeasurementPropertiesTabFolder = new CTabFolder(this.measurementsComposite, SWT.BORDER);
-					this.channelConfigMeasurementPropertiesTabFolder.setBounds(237, 0, 379 + 45, 199 + 30 + 15);
+					this.channelConfigMeasurementPropertiesTabFolder.setBounds(237, 0, 379 + 45, 199 + 30 + 15 + 30);
 					this.channelConfigMeasurementPropertiesTabFolder.setSelection(0);
 					this.channelConfigMeasurementPropertiesTabFolder.addCTabFolder2Listener(new CTabFolder2Adapter() {
 						@Override

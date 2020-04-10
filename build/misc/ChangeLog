@@ -8,6 +8,7 @@ Generic changes/fixes
 	* add option to force 10 major scale ticks while rounding graphics end values
 	* enable class based log level configuration device sub packages (p.e. gde.device.junsi.modbus)
 	* enable USB HID device selection while devices with almost identical characteristics connected
+	* enable secondary trigger range in properties editor (functional added in 3.4.0)
 	
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control

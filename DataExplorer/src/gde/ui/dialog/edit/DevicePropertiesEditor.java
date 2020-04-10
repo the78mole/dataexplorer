@@ -231,8 +231,8 @@ public class DevicePropertiesEditor extends Composite {
 			//DevicePropertiesEditor.dialogShell.setLocation(displayBounds.x < 0 ? -size.x : displayBounds.width + displayBounds.x - size.x, displayBounds.height - size.y - 150);
 			DevicePropertiesEditor.dialogShell.layout();
 			Rectangle shellBounds = DevicePropertiesEditor.dialogShell.computeTrim(0, 0, size.x, size.y);
-			DevicePropertiesEditor.dialogShell.setSize(shellBounds.width, shellBounds.height+20);
-			DevicePropertiesEditor.dialogShell.setMinimumSize(shellBounds.width, shellBounds.height+20);
+			DevicePropertiesEditor.dialogShell.setSize(shellBounds.width, shellBounds.height+20+30);
+			DevicePropertiesEditor.dialogShell.setMinimumSize(shellBounds.width, shellBounds.height+20+30);
 			DevicePropertiesEditor.dialogShell.open();
 
 			if (args.length > 0) {
@@ -262,8 +262,8 @@ public class DevicePropertiesEditor extends Composite {
 			DevicePropertiesEditor.dialogShell.setLocation(DataExplorer.getInstance().getShell().toDisplay(100, 50));
 			DevicePropertiesEditor.dialogShell.layout();
 			Rectangle shellBounds = DevicePropertiesEditor.dialogShell.computeTrim(0, 0, size.x, size.y);
-			DevicePropertiesEditor.dialogShell.setSize(shellBounds.width, shellBounds.height+20);
-			DevicePropertiesEditor.dialogShell.setMinimumSize(shellBounds.width, shellBounds.height+20);
+			DevicePropertiesEditor.dialogShell.setSize(shellBounds.width, shellBounds.height+20+30);
+			DevicePropertiesEditor.dialogShell.setMinimumSize(shellBounds.width, shellBounds.height+20+30);
 			DevicePropertiesEditor.dialogShell.open();
 			DevicePropertiesEditor.dialogShell.addListener(SWT.Traverse, new Listener() {
 	      @Override
