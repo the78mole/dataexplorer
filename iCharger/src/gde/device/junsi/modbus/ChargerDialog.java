@@ -2258,7 +2258,7 @@ public class ChargerDialog extends DeviceDialog {
 			if (this.tbtmCycle == null || this.tbtmCycle.isDisposed()) createCycleTabItem();
 			if (this.tbtmOption == null || this.tbtmOption.isDisposed()) createOptionTabItem();
 
-			this.memoryParameters[1].updateValueRange("autom. - " + maxNumberCells, 0, maxNumberCells, 0); //$NON-NLS-1$
+			this.memoryParameters[1].updateValueRange("0(auto) - " + maxNumberCells, 0, maxNumberCells, 0); //$NON-NLS-1$
 			//battery type dependent updates
 			this.memoryParameters[5].setEnabled(true);
 			this.memoryParameters[6].setEnabled(this.memoryValues[5] != 0);
