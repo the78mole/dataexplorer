@@ -89,6 +89,7 @@ public class ChargerDialog extends DeviceDialog {
 	byte[]														memoryHeadIndex							= new byte[ChargerMemoryHead.LIST_MEM_MAX];
 
 	private CCombo										combo;
+	private int												comboHeight									= GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
 	private Button										btnCopy, btnEdit, btnWrite, btnDelete, btnSystemSave;
 	private Button										btnCharge, btnStorage, btnDischarge, btnCycle, btnBalance, btnPower, btnStop;
 	private Group											grpProgramMemory, grpBalancerSettings, grpAdvancedRestoreSettings, grpChargeSaftySettings, grpDischargeSaftySettings, grpRunProgram;
@@ -1226,6 +1227,7 @@ public class ChargerDialog extends DeviceDialog {
 	private void createContents() {
 		this.dialogShell = new Shell(getParent(), getStyle());
 		this.dialogShell.setSize(800, 750);
+		this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		this.dialogShell.setText(getText());
 		this.dialogShell.setLayout(new FillLayout());
 		
@@ -1243,12 +1245,14 @@ public class ChargerDialog extends DeviceDialog {
 		});
 		
 		CTabItem tbtmProgramMemory = new CTabItem(mainTabFolder, SWT.NONE);
+		tbtmProgramMemory.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		tbtmProgramMemory.setText(Messages.getString(MessageIds.GDE_MSGI2607)); //$NON-NLS-1$
 		Composite mainMemoryComposite = new Composite(mainTabFolder, SWT.NONE);
 		tbtmProgramMemory.setControl(mainMemoryComposite);
 		mainMemoryComposite.setLayout(new FormLayout());
 
 		this.grpProgramMemory = new Group(mainMemoryComposite, SWT.NONE);
+		this.grpProgramMemory.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.grpProgramMemory.setText(Messages.getString(MessageIds.GDE_MSGT2623));
 		RowLayout rl_grpMemory = new RowLayout(SWT.HORIZONTAL);
 		rl_grpMemory.justify = true;
@@ -1262,7 +1266,8 @@ public class ChargerDialog extends DeviceDialog {
 		this.grpProgramMemory.setLayoutData(fd_grpMemory);
 
 		this.combo = new CCombo(this.grpProgramMemory, SWT.BORDER);
-		this.combo.setLayoutData(new RowData(350, 23));
+		this.combo.setLayoutData(new RowData(350, this.comboHeight));
+		this.combo.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		this.combo.setItems(((iChargerUsb) this.device).isDataGathererActive() ? new String[] { Messages.getString(MessageIds.GDE_MSGT2624) } : this.readProgramMemories());
 		this.combo.select(0);
 		this.combo.setBackground(this.application.COLOR_WHITE);
@@ -1337,6 +1342,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		this.btnCopy = new Button(this.grpProgramMemory, SWT.NONE);
 		this.btnCopy.setLayoutData(new RowData(70, SWT.DEFAULT));
+		this.btnCopy.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnCopy.setText(Messages.getString(MessageIds.GDE_MSGT2626));
 		this.btnCopy.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2627));
 		this.btnCopy.setEnabled(false);
@@ -1359,6 +1365,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		this.btnEdit = new Button(this.grpProgramMemory, SWT.NONE);
 		this.btnEdit.setLayoutData(new RowData(70, SWT.DEFAULT));
+		this.btnEdit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnEdit.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2630));
 		this.btnEdit.setText(Messages.getString(MessageIds.GDE_MSGT2631));
 		this.btnEdit.setEnabled(false);
@@ -1371,6 +1378,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		this.btnWrite = new Button(this.grpProgramMemory, SWT.NONE);
 		this.btnWrite.setLayoutData(new RowData(70, SWT.DEFAULT));
+		this.btnWrite.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnWrite.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2632));
 		this.btnWrite.setText(Messages.getString(MessageIds.GDE_MSGT2633));
 		this.btnWrite.setEnabled(false);
@@ -1394,6 +1402,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 
 		this.btnDelete = new Button(this.grpProgramMemory, SWT.NONE);
+		this.btnDelete.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnDelete.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2634));
 		this.btnDelete.setLayoutData(new RowData(70, SWT.DEFAULT));
 		this.btnDelete.setText(Messages.getString(MessageIds.GDE_MSGT2635));
@@ -1456,6 +1465,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		this.btnCharge = new Button(this.grpRunProgram, SWT.NONE);
 		this.btnCharge.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnCharge.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnCharge.setText(Messages.getString(MessageIds.GDE_MSGT2687));
 		this.btnCharge.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1477,6 +1487,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		this.btnStorage = new Button(this.grpRunProgram, SWT.NONE);
 		this.btnStorage.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnStorage.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnStorage.setText(Messages.getString(MessageIds.GDE_MSGT2688));
 		this.btnStorage.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1498,6 +1509,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		this.btnDischarge = new Button(this.grpRunProgram, SWT.NONE);
 		this.btnDischarge.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnDischarge.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnDischarge.setText(Messages.getString(MessageIds.GDE_MSGT2689));
 		this.btnDischarge.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1521,6 +1533,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		this.btnCycle = new Button(this.grpRunProgram, SWT.NONE);
 		this.btnCycle.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnCycle.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnCycle.setText(Messages.getString(MessageIds.GDE_MSGT2690));
 		this.btnCycle.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1544,6 +1557,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		this.btnBalance = new Button(this.grpRunProgram, SWT.NONE);
 		this.btnBalance.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnBalance.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnBalance.setText(Messages.getString(MessageIds.GDE_MSGT2691));
 		this.btnBalance.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1567,6 +1581,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		this.btnPower = new Button(this.grpRunProgram, SWT.NONE);
 		this.btnPower.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnPower.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnPower.setText("power"); //$NON-NLS-1$
 		this.btnPower.setEnabled(false);
 		this.btnPower.addSelectionListener(new SelectionAdapter() {
@@ -1592,6 +1607,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		this.btnStop = new Button(this.grpRunProgram, SWT.NONE);
 		this.btnStop.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnStop.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnStop.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2692));
 		this.btnStop.setText(Messages.getString(MessageIds.GDE_MSGT2693));
 		this.btnStop.setEnabled(false);
@@ -1624,6 +1640,7 @@ public class ChargerDialog extends DeviceDialog {
 		fd_btnCancel.right = new FormAttachment(100, -10);
 		fd_btnCancel.left = new FormAttachment(100, -110);
 		btnClose.setLayoutData(fd_btnCancel);
+		btnClose.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		btnClose.setText(Messages.getString(MessageIds.GDE_MSGT2694));
 		btnClose.setToolTipText(Messages.getString(MessageIds.GDE_MSGI2610)); //$NON-NLS-1$
 		btnClose.addSelectionListener(new SelectionAdapter() {
@@ -1635,6 +1652,7 @@ public class ChargerDialog extends DeviceDialog {
 		
 		
 		CTabItem tbtmSystem = new CTabItem(mainTabFolder, SWT.NONE);
+		tbtmSystem.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		tbtmSystem.setText(Messages.getString(MessageIds.GDE_MSGI2605)); //$NON-NLS-1$
 		Composite mainSystemComposite = new Composite(mainTabFolder, SWT.NONE);
 		tbtmSystem.setControl(mainSystemComposite);
@@ -1657,6 +1675,7 @@ public class ChargerDialog extends DeviceDialog {
 		sysComposite.setLayout(new RowLayout(SWT.VERTICAL));
 		
 		grpTemperature = new Group(sysComposite, SWT.NONE);
+		grpTemperature.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		grpTemperature.setText(Messages.getString(MessageIds.GDE_MSGI2603)); //$NON-NLS-1$
 		grpTemperature.setLayout(new RowLayout(SWT.VERTICAL));
 		//0 Unit
@@ -1678,6 +1697,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpTemperature.layout();
 
 		grpFans = new Group(sysComposite, SWT.NONE);
+		grpFans.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		grpFans.setText(Messages.getString(MessageIds.GDE_MSGI2609)); //$NON-NLS-1$
 		grpFans.setLayout(new RowLayout(SWT.VERTICAL));
 		//3 Cooling fan on temperature
@@ -1694,6 +1714,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpFans.layout();
 		
 		grpBeepTone = new Group(sysComposite, SWT.NONE);
+		grpBeepTone.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		grpBeepTone.setText(Messages.getString(MessageIds.GDE_MSGI2613)); //$NON-NLS-1$
 		grpBeepTone.setLayout(new RowLayout(SWT.VERTICAL));
 		//5 Beep volume buttons
@@ -1725,6 +1746,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpBeepTone.layout();
 		
 		grpLcdScreen = new Group(sysComposite, SWT.NONE);
+		grpLcdScreen.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		grpLcdScreen.setText(Messages.getString(MessageIds.GDE_MSGI2621)); //$NON-NLS-1$
 		grpLcdScreen.setLayout(new RowLayout(SWT.VERTICAL));
 		//10 LCD brightness
@@ -1741,6 +1763,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpLcdScreen.layout();
 		
 		grpLanguage = new Group(sysComposite, SWT.NONE);
+		grpLanguage.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		grpLanguage.setText("Language");
 		grpLanguage.setLayout(new RowLayout(SWT.VERTICAL));
 		//27 language 0=en 1=de
@@ -1753,6 +1776,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		grpSaveLoadConfig = new Group(sysComposite, SWT.NONE);
 		grpSaveLoadConfig.setLayoutData(new RowData(740, SWT.DEFAULT));
+		grpSaveLoadConfig.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		grpSaveLoadConfig.setText("Save, Restore & Load Configuration");
 		FillLayout fillLayout = new FillLayout(SWT.VERTICAL);
 		fillLayout.marginHeight = 10;
@@ -1761,6 +1785,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpSaveLoadConfig.setLayout(fillLayout);
 		
 		btnSaveActualConf = new Button(grpSaveLoadConfig, SWT.NONE);
+		btnSaveActualConf.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		btnSaveActualConf.setText("Save Actual System Configuration");
 		btnSaveActualConf.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1769,6 +1794,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 		
 		btnRestoreSavedConf = new Button(grpSaveLoadConfig, SWT.NONE);
+		btnRestoreSavedConf.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		btnRestoreSavedConf.setText("Restore Saved System Configuration");
 		btnRestoreSavedConf.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1777,6 +1803,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 		
 		btnLoadDefaultSysConf = new Button(grpSaveLoadConfig, SWT.NONE);
+		btnLoadDefaultSysConf.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		btnLoadDefaultSysConf.setText("Load Default System Configuration");
 		btnLoadDefaultSysConf.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1793,6 +1820,7 @@ public class ChargerDialog extends DeviceDialog {
 		fd_btnSave.left = new FormAttachment(0, 100);
 		fd_btnSave.right = new FormAttachment(0, 300);
 		btnSystemSave.setLayoutData(fd_btnSave);
+		btnSystemSave.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		btnSystemSave.setText(Messages.getString(MessageIds.GDE_MSGI2624)); //$NON-NLS-1$
 		btnSystemSave.setToolTipText(Messages.getString(MessageIds.GDE_MSGI2625)); //$NON-NLS-1$
 		btnSystemSave.setEnabled(false);
@@ -1814,6 +1842,7 @@ public class ChargerDialog extends DeviceDialog {
 		fd_btnSystemClose.left = new FormAttachment(100, -300);
 		fd_btnSystemClose.right = new FormAttachment(100, -100);
 		btnSystemClose.setLayoutData(fd_btnSystemClose);
+		btnSystemClose.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		btnSystemClose.setText(Messages.getString(MessageIds.GDE_MSGT2694));
 		btnSystemClose.setToolTipText(Messages.getString(MessageIds.GDE_MSGI2610)); //$NON-NLS-1$
 		btnSystemClose.addSelectionListener(new SelectionAdapter() {
@@ -1828,6 +1857,7 @@ public class ChargerDialog extends DeviceDialog {
 
 	private void createGrpInputDischargePowerLimits() {
 		grpInputDischargePowerLimits = new Group(sysComposite, SWT.NONE);
+		grpInputDischargePowerLimits.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		grpInputDischargePowerLimits.setText(Messages.getString(MessageIds.GDE_MSGI2627)); //$NON-NLS-1$
 		grpInputDischargePowerLimits.setLayout(new RowLayout(SWT.VERTICAL));
 		grpInputDischargePowerLimits.setBackground(application.COLOR_CANVAS_YELLOW);
@@ -1844,6 +1874,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpInputDischargePowerLimits.addListener(SWT.Selection, systemParameterChangeListener);
 		
 		grpInputPowerLimits = new Group(grpInputDischargePowerLimits, SWT.NONE);
+		grpInputPowerLimits.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		grpInputPowerLimits.setText(Messages.getString(MessageIds.GDE_MSGI2630)); //$NON-NLS-1$
 		grpInputPowerLimits.setLayout(new RowLayout(SWT.VERTICAL));
 		//19 inputLowVolt
@@ -1869,6 +1900,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpInputPowerLimits.addListener(SWT.Selection, systemParameterChangeListener);
 		
 		grpRegInputPowerLimits = new Group(grpInputPowerLimits, SWT.NONE);
+		grpRegInputPowerLimits.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		grpRegInputPowerLimits.setText(Messages.getString(MessageIds.GDE_MSGI2634)); //$NON-NLS-1$
 		grpRegInputPowerLimits.setLayout(new RowLayout(SWT.VERTICAL));
 		grpRegInputPowerLimits.setBackground(application.COLOR_GREY);
@@ -1899,6 +1931,7 @@ public class ChargerDialog extends DeviceDialog {
 
 	private void createGrpChargeDischargePower() {
 		grpChargeDischargePower = new Group(sysComposite, SWT.NONE);
+		grpChargeDischargePower.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		grpChargeDischargePower.setText(Messages.getString(MessageIds.GDE_MSGI2639)); //$NON-NLS-1$
 		grpChargeDischargePower.setLayout(new RowLayout(SWT.VERTICAL));
 		//12 Charge power channel 1
@@ -1984,6 +2017,7 @@ public class ChargerDialog extends DeviceDialog {
 
 	private void createChargeTabItem() {
 		this.tbtmCharge = new CTabItem(this.tabFolderProgrMem, SWT.NONE);
+		this.tbtmCharge.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.tbtmCharge.setText(Messages.getString(MessageIds.GDE_MSGT2639));
 		ScrolledComposite scrolledComposite = new ScrolledComposite(this.tabFolderProgrMem, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		this.tbtmCharge.setControl(scrolledComposite);
@@ -2034,6 +2068,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.chargeComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
 
 		this.grpChargeSaftySettings = new Group(this.chargeComposite, SWT.NONE);
+		this.grpChargeSaftySettings.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.grpChargeSaftySettings.setText(Messages.getString(MessageIds.GDE_MSGT2654));
 		this.grpChargeSaftySettings.setBackground(this.application.COLOR_WHITE);
 		this.grpChargeSaftySettings.setLayout(new RowLayout(SWT.VERTICAL));
@@ -2049,6 +2084,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.grpChargeSaftySettings.addListener(SWT.Selection, this.memoryParameterChangeListener);
 
 		this.grpBalancerSettings = new Group(this.chargeComposite, SWT.NONE);
+		this.grpBalancerSettings.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.grpBalancerSettings.setText(Messages.getString(MessageIds.GDE_MSGT2658));
 		this.grpBalancerSettings.setLayout(new RowLayout(SWT.VERTICAL));
 		//charge parameter balancer
@@ -2075,6 +2111,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		//Li, NiZn, Pb only (NiMH, NiCd has charge at 0V enablement)
 		this.grpAdvancedRestoreSettings = new Group(this.chargeComposite, SWT.NONE);
+		this.grpAdvancedRestoreSettings.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.grpAdvancedRestoreSettings.setText(Messages.getString(MessageIds.GDE_MSGT2665));
 		this.grpAdvancedRestoreSettings.setLayout(new RowLayout(SWT.VERTICAL));
 		//charge restore lowest voltage
@@ -2097,6 +2134,7 @@ public class ChargerDialog extends DeviceDialog {
 
 	private void createDischargeTabItem() {
 		this.tbtmDischarge = new CTabItem(this.tabFolderProgrMem, SWT.NONE);
+		this.tbtmDischarge.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.tbtmDischarge.setText(Messages.getString(MessageIds.GDE_MSGT2670));
 		this.dischargeComposite = new Composite(this.tabFolderProgrMem, SWT.NONE);
 		this.tbtmDischarge.setControl(this.dischargeComposite);
@@ -2123,6 +2161,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.dischargeComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
 
 		this.grpDischargeSaftySettings = new Group(this.dischargeComposite, SWT.NONE);
+		this.grpDischargeSaftySettings.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.grpDischargeSaftySettings.setText(Messages.getString(MessageIds.GDE_MSGT2654));
 		this.grpDischargeSaftySettings.setBackground(this.application.COLOR_WHITE);
 		this.grpDischargeSaftySettings.setLayout(new RowLayout(SWT.VERTICAL));
@@ -2141,6 +2180,7 @@ public class ChargerDialog extends DeviceDialog {
 
 	private void createStorageTabItem() {
 		this.tbtmStorage = new CTabItem(this.tabFolderProgrMem, SWT.NONE);
+		this.tbtmStorage.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.tbtmStorage.setText(Messages.getString(MessageIds.GDE_MSGT2695));
 		this.storageComposite = new Composite(this.tabFolderProgrMem, SWT.NONE);
 		this.tbtmStorage.setControl(this.storageComposite);
@@ -2159,6 +2199,7 @@ public class ChargerDialog extends DeviceDialog {
 
 	private void createCycleTabItem() {
 		this.tbtmCycle = new CTabItem(this.tabFolderProgrMem, SWT.NONE);
+		this.tbtmCycle.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.tbtmCycle.setText(Messages.getString(MessageIds.GDE_MSGT2681));
 		this.cycleComposite = new Composite(this.tabFolderProgrMem, SWT.NONE);
 		this.tbtmCycle.setControl(this.cycleComposite);
@@ -2178,6 +2219,7 @@ public class ChargerDialog extends DeviceDialog {
 
 	private void createPowerTabItem() {
 		this.tbtmPower = new CTabItem(this.tabFolderProgrMem, SWT.NONE);
+		this.tbtmPower.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.tbtmPower.setText(Messages.getString(MessageIds.GDE_MSGT2677));
 		this.powerComposite = new Composite(this.tabFolderProgrMem, SWT.NONE);
 		this.tbtmPower.setControl(this.powerComposite);
@@ -2210,6 +2252,7 @@ public class ChargerDialog extends DeviceDialog {
 
 	private void createOptionTabItem() {
 		this.tbtmOption = new CTabItem(this.tabFolderProgrMem, SWT.NONE);
+		this.tbtmOption.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.tbtmOption.setText(Messages.getString(MessageIds.GDE_MSGI2648)); //$NON-NLS-1$
 		this.optionComposite = new Composite(this.tabFolderProgrMem, SWT.NONE);
 		this.tbtmOption.setControl(this.optionComposite);
@@ -2649,6 +2692,7 @@ public class ChargerDialog extends DeviceDialog {
 				this.powerLabel = new CLabel(this.memoryComposite, SWT.CENTER);
 				this.powerLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 15, SWT.BOLD));
 				this.powerLabel.setBackground(this.application.COLOR_CANVAS_YELLOW);
+				this.powerLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.powerLabel.setText(Messages.getString(MessageIds.GDE_MSGT2677));
 				this.memoryComposite.layout();
 			}
