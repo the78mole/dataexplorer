@@ -1256,7 +1256,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.grpProgramMemory.setText(Messages.getString(MessageIds.GDE_MSGT2623));
 		RowLayout rl_grpMemory = new RowLayout(SWT.HORIZONTAL);
 		rl_grpMemory.justify = true;
-		rl_grpMemory.fill = GDE.IS_WINDOWS;
+		rl_grpMemory.fill = GDE.IS_WINDOWS | GDE.IS_OS_ARCH_ARM;
 		this.grpProgramMemory.setLayout(rl_grpMemory);
 		FormData fd_grpMemory = new FormData();
 		fd_grpMemory.top = new FormAttachment(0, 10);
@@ -1454,7 +1454,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.grpRunProgram.setText(Messages.getString(MessageIds.GDE_MSGT2685));
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
 		rowLayout.justify = true;
-		rowLayout.fill = GDE.IS_WINDOWS;
+		rowLayout.fill = GDE.IS_WINDOWS | GDE.IS_OS_ARCH_ARM;
 		this.grpRunProgram.setLayout(rowLayout);
 		FormData fd_grpRunProgram = new FormData();
 		fd_grpRunProgram.left = new FormAttachment(0, 10);
