@@ -89,7 +89,7 @@ public class ChargerDialog extends DeviceDialog {
 	byte[]														memoryHeadIndex							= new byte[ChargerMemoryHead.LIST_MEM_MAX];
 
 	private CCombo										combo;
-	private int												comboHeight									= GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+	private int												comboHeight									= GDE.IS_LINUX ? 24 : GDE.IS_MAC ? 20 : 22;
 	private Button										btnCopy, btnEdit, btnWrite, btnDelete, btnSystemSave;
 	private Button										btnCharge, btnStorage, btnDischarge, btnCycle, btnBalance, btnPower, btnStop;
 	private Group											grpProgramMemory, grpBalancerSettings, grpAdvancedRestoreSettings, grpChargeSaftySettings, grpDischargeSaftySettings, grpRunProgram;
@@ -242,8 +242,8 @@ public class ChargerDialog extends DeviceDialog {
 			byte[] infoBuffer = new byte[sizeInfo * 2];
 			this.usbPort.masterRead((byte) 1, ChargerDialog.REG_INPUT_INFO_START, sizeInfo, infoBuffer);
 			this.systemInfo = new ChargerInfo(infoBuffer);
-			if (ChargerDialog.log.isLoggable(Level.INFO)) 
-				ChargerDialog.log.log(Level.INFO, new ChargerInfo(infoBuffer).toString());
+			if (ChargerDialog.log.isLoggable(Level.OFF)) 
+				ChargerDialog.log.log(Level.OFF, new ChargerInfo(infoBuffer).toString());
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
@@ -1256,7 +1256,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.grpProgramMemory.setText(Messages.getString(MessageIds.GDE_MSGT2623));
 		RowLayout rl_grpMemory = new RowLayout(SWT.HORIZONTAL);
 		rl_grpMemory.justify = true;
-		rl_grpMemory.fill = true;
+		rl_grpMemory.fill = GDE.IS_WINDOWS;
 		this.grpProgramMemory.setLayout(rl_grpMemory);
 		FormData fd_grpMemory = new FormData();
 		fd_grpMemory.top = new FormAttachment(0, 10);
@@ -1341,7 +1341,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 
 		this.btnCopy = new Button(this.grpProgramMemory, SWT.NONE);
-		this.btnCopy.setLayoutData(new RowData(70, SWT.DEFAULT));
+		this.btnCopy.setLayoutData(new RowData(70, this.comboHeight));
 		this.btnCopy.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnCopy.setText(Messages.getString(MessageIds.GDE_MSGT2626));
 		this.btnCopy.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2627));
@@ -1364,7 +1364,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 
 		this.btnEdit = new Button(this.grpProgramMemory, SWT.NONE);
-		this.btnEdit.setLayoutData(new RowData(70, SWT.DEFAULT));
+		this.btnEdit.setLayoutData(new RowData(70, this.comboHeight));
 		this.btnEdit.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnEdit.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2630));
 		this.btnEdit.setText(Messages.getString(MessageIds.GDE_MSGT2631));
@@ -1377,7 +1377,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 
 		this.btnWrite = new Button(this.grpProgramMemory, SWT.NONE);
-		this.btnWrite.setLayoutData(new RowData(70, SWT.DEFAULT));
+		this.btnWrite.setLayoutData(new RowData(70, this.comboHeight));
 		this.btnWrite.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnWrite.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2632));
 		this.btnWrite.setText(Messages.getString(MessageIds.GDE_MSGT2633));
@@ -1404,7 +1404,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.btnDelete = new Button(this.grpProgramMemory, SWT.NONE);
 		this.btnDelete.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnDelete.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2634));
-		this.btnDelete.setLayoutData(new RowData(70, SWT.DEFAULT));
+		this.btnDelete.setLayoutData(new RowData(70, this.comboHeight));
 		this.btnDelete.setText(Messages.getString(MessageIds.GDE_MSGT2635));
 		this.btnDelete.setEnabled(false);
 		this.btnDelete.addSelectionListener(new SelectionAdapter() {
@@ -1417,7 +1417,7 @@ public class ChargerDialog extends DeviceDialog {
 				ChargerDialog.this.combo.notifyListeners(SWT.Selection, new Event());
 			}
 		});
-
+		
 		if (this.selectedProgramMemory != null) this.memoryValues = this.selectedProgramMemory.getMemoryValues(this.memoryValues, this.isDuo);
 
 		this.memoryComposite = new Composite(mainMemoryComposite, SWT.BORDER);
@@ -1454,6 +1454,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.grpRunProgram.setText(Messages.getString(MessageIds.GDE_MSGT2685));
 		RowLayout rowLayout = new RowLayout(SWT.HORIZONTAL);
 		rowLayout.justify = true;
+		rowLayout.fill = GDE.IS_WINDOWS;
 		this.grpRunProgram.setLayout(rowLayout);
 		FormData fd_grpRunProgram = new FormData();
 		fd_grpRunProgram.left = new FormAttachment(0, 10);
@@ -1464,7 +1465,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.grpRunProgram.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2686));
 
 		this.btnCharge = new Button(this.grpRunProgram, SWT.NONE);
-		this.btnCharge.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnCharge.setLayoutData(new RowData(85, this.comboHeight));
 		this.btnCharge.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnCharge.setText(Messages.getString(MessageIds.GDE_MSGT2687));
 		this.btnCharge.addSelectionListener(new SelectionAdapter() {
@@ -1486,7 +1487,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 
 		this.btnStorage = new Button(this.grpRunProgram, SWT.NONE);
-		this.btnStorage.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnStorage.setLayoutData(new RowData(85, this.comboHeight));
 		this.btnStorage.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnStorage.setText(Messages.getString(MessageIds.GDE_MSGT2688));
 		this.btnStorage.addSelectionListener(new SelectionAdapter() {
@@ -1508,7 +1509,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 
 		this.btnDischarge = new Button(this.grpRunProgram, SWT.NONE);
-		this.btnDischarge.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnDischarge.setLayoutData(new RowData(85, this.comboHeight));
 		this.btnDischarge.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnDischarge.setText(Messages.getString(MessageIds.GDE_MSGT2689));
 		this.btnDischarge.addSelectionListener(new SelectionAdapter() {
@@ -1532,7 +1533,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 
 		this.btnCycle = new Button(this.grpRunProgram, SWT.NONE);
-		this.btnCycle.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnCycle.setLayoutData(new RowData(85, this.comboHeight));
 		this.btnCycle.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnCycle.setText(Messages.getString(MessageIds.GDE_MSGT2690));
 		this.btnCycle.addSelectionListener(new SelectionAdapter() {
@@ -1556,7 +1557,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 
 		this.btnBalance = new Button(this.grpRunProgram, SWT.NONE);
-		this.btnBalance.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnBalance.setLayoutData(new RowData(85, this.comboHeight));
 		this.btnBalance.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnBalance.setText(Messages.getString(MessageIds.GDE_MSGT2691));
 		this.btnBalance.addSelectionListener(new SelectionAdapter() {
@@ -1580,9 +1581,9 @@ public class ChargerDialog extends DeviceDialog {
 		});
 
 		this.btnPower = new Button(this.grpRunProgram, SWT.NONE);
-		this.btnPower.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnPower.setLayoutData(new RowData(85, this.comboHeight));
 		this.btnPower.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		this.btnPower.setText("power"); //$NON-NLS-1$
+		this.btnPower.setText("Power"); //$NON-NLS-1$
 		this.btnPower.setEnabled(false);
 		this.btnPower.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -1606,7 +1607,7 @@ public class ChargerDialog extends DeviceDialog {
 		});
 
 		this.btnStop = new Button(this.grpRunProgram, SWT.NONE);
-		this.btnStop.setLayoutData(new RowData(85, SWT.DEFAULT));
+		this.btnStop.setLayoutData(new RowData(85, this.comboHeight));
 		this.btnStop.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.btnStop.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2692));
 		this.btnStop.setText(Messages.getString(MessageIds.GDE_MSGT2693));
@@ -1775,7 +1776,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpLanguage.layout();
 
 		grpSaveLoadConfig = new Group(sysComposite, SWT.NONE);
-		grpSaveLoadConfig.setLayoutData(new RowData(740, SWT.DEFAULT));
+		grpSaveLoadConfig.setLayoutData(new RowData(740, this.comboHeight));
 		grpSaveLoadConfig.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		grpSaveLoadConfig.setText("Save, Restore & Load Configuration");
 		FillLayout fillLayout = new FillLayout(SWT.VERTICAL);
