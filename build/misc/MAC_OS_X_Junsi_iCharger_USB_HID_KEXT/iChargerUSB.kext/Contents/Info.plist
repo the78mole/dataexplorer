@@ -11,7 +11,7 @@
         <key>CFBundleIconFile</key>
         <string></string>
         <key>CFBundleIdentifier</key>
-        <string>com.ichargerduo.driver.dummy</string>
+        <string>com.ichargerusb.driver.dummy</string>
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
         <key>CFBundlePackageType</key>
@@ -23,7 +23,7 @@
         <key>IOKitPersonalities</key>
         <dict>
             <!-- The Junsi iCharger X6/X8/308Duo/4010Duo/406Duo USB-HID interface -->
-            <key>iChargerDuo</key>
+            <key>iChargerUSB</key>
             <dict>
                 <key>CFBundleIdentifier</key>
                 <string>com.apple.kpi.iokit</string>
