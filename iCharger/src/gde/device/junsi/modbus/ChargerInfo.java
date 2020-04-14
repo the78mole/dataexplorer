@@ -109,7 +109,7 @@ public class ChargerInfo {
 	 * @return the deviceSN
 	 */
 	public String getDeviceSnString() {
-		return new String(deviceSN);
+		return new String(deviceSN).trim();
 	}
 
 	/**
