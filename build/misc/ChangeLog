@@ -13,6 +13,7 @@ Generic changes/fixes
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control
 	* iChargerUSB - correct power/energy calculation for opened files (*.osd)
+	* iChargerUSB - add system info string to recording
 	* GPS_Logger* - fix latitude, longitude unit which caused display problem while activated
 	* Spektrum-Telemetry - make frame loss and holds always visible, even no reasonable data
 	* UniSens-E - enable live data gathering

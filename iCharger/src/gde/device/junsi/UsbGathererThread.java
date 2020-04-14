@@ -33,6 +33,7 @@ import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.RecordSet;
 import gde.device.InputTypes;
+import gde.device.junsi.modbus.ChargerInfo;
 import gde.exception.ApplicationConfigurationException;
 import gde.exception.DataInconsitsentException;
 import gde.exception.SerialPortException;
@@ -75,6 +76,7 @@ public class UsbGathererThread extends Thread {
 	long 								lastRecordEndTimeStamp_01_ms 	= 0;
 	long								lastTimeStamp_02_ms						= 0;
 	long 								lastRecordEndTimeStamp_02_ms 	= 0;
+	ChargerInfo 				chargerInfo 									= null;
 
 
 	/**
@@ -101,6 +103,16 @@ public class UsbGathererThread extends Thread {
 			this.isPortOpenedByLiveGatherer = true;
 		}
 		this.setPriority(Thread.MAX_PRIORITY);
+		
+		try {
+			if (this.device.getDialog() != null) {
+				this.chargerInfo = this.device.getDialog().readInfo();
+				log.log(Level.OFF, this.device.getName() + GDE.STRING_MESSAGE_CONCAT + this.chargerInfo.getSystemInfo());
+			}
+		}
+		catch (Exception e) {
+			log.log(Level.WARNING, e.getMessage(), e);
+		}
 	}
 
 	@Override
@@ -355,6 +367,8 @@ public class UsbGathererThread extends Thread {
 				outputChannel.applyTemplateBasics(processRecordSetKey);
 				UsbGathererThread.log.logp(Level.FINE, UsbGathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + outputChannel.getName()); //$NON-NLS-1$
 				recordSet = outputChannel.get(processRecordSetKey);
+				if (this.chargerInfo != null)
+					recordSet.setRecordSetDescription(String.format("%s\n%s", recordSet.getDescription(), this.chargerInfo.getSystemInfo()));
 				recordSet.setAllDisplayable();
 				channel.applyTemplate(recordSetKey, false);
 				// switch the active record set if the current record set is child of active channel

@@ -235,15 +235,16 @@ public class ChargerDialog extends DeviceDialog {
 		}
 	}
 
-	public void readInfo() {
+	public ChargerInfo readInfo() {
+		ChargerInfo chargerInfo = null;
 		try {
 			//Read system info data
 			short sizeInfo = (short) ((ChargerInfo.getSize() + 1) / 2);
 			byte[] infoBuffer = new byte[sizeInfo * 2];
 			this.usbPort.masterRead((byte) 1, ChargerDialog.REG_INPUT_INFO_START, sizeInfo, infoBuffer);
-			this.systemInfo = new ChargerInfo(infoBuffer);
-			if (ChargerDialog.log.isLoggable(Level.OFF)) 
-				ChargerDialog.log.log(Level.OFF, new ChargerInfo(infoBuffer).toString());
+			chargerInfo = new ChargerInfo(infoBuffer);
+			if (ChargerDialog.log.isLoggable(Level.INFO)) 
+				ChargerDialog.log.log(Level.INFO, chargerInfo.toString());
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
@@ -251,6 +252,7 @@ public class ChargerDialog extends DeviceDialog {
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
+		return chargerInfo;
 	}
 
 	public void readSystem(boolean isDuo) {
@@ -1188,7 +1190,7 @@ public class ChargerDialog extends DeviceDialog {
 			this.application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 			return;
 		}
-		this.readInfo();
+		this.systemInfo = this.readInfo();
 		createContents();
 		this.dialogShell.setLocation(300, 50);
 		this.dialogShell.open();

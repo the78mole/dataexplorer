@@ -47,13 +47,41 @@ public class ChargerInfo {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.getClass().getSimpleName()).append(":\n");
 		sb.append(String.format("deviceID \t\t= %d", this.deviceID)).append("\n");
-		sb.append(String.format("deviceSN \t\t= %s", new String(this.deviceSN))).append("\n");
-		sb.append(String.format("softwareVersion \t= %d", this.softwareVersion)).append("\n");
-		sb.append(String.format("hardwareVersion \t= %d", this.hardwareVersion)).append("\n");
+		sb.append(String.format("deviceSN \t\t= %s", this.getDeviceSnString())).append("\n");
+		//sb.append(String.format("softwareVersion \t= %d", this.softwareVersion)).append("\n");
+		sb.append(String.format("softwareVersion \t= %s", this.getSoftwareVersionString())).append("\n");
+		//sb.append(String.format("hardwareVersion \t= %d", this.hardwareVersion)).append("\n");
+		sb.append(String.format("hardwareVersion \t= %s", this.getHardwareVersionString())).append("\n");
 		sb.append(String.format("systemMemoryLength \t= %d", this.systemMemoryLength)).append("\n");
 		sb.append(String.format("programMemoryLength \t= %d", this.programMemoryLength)).append("\n");
 		sb.append(String.format("status \t\t\t= %s", StringHelper.printBinary((byte)(status & 0xFF), false))).append("\n");
 		return sb.toString();
+	}
+
+	public String getHardwareVersionString() {
+		String hardwareVersionString = "V" + this.hardwareVersion;
+		try {
+			hardwareVersionString =	String.format("%s.%s.%d", hardwareVersionString.substring(0, 2), hardwareVersionString.substring(2, 3), Integer.parseInt(hardwareVersionString.substring(3)));
+		}
+		catch (RuntimeException e) {
+			// ignore
+		}
+		return hardwareVersionString;
+	}
+
+	public String getSoftwareVersionString() {
+		String softwareVersionString = "V" + this.softwareVersion;
+		try {
+			softwareVersionString =	String.format("%s.%s.%d", softwareVersionString.substring(0, 2), softwareVersionString.substring(2, 3), Integer.parseInt(softwareVersionString.substring(3)));
+		}
+		catch (RuntimeException e) {
+			// ignore
+		}
+		return softwareVersionString;
+	}
+	
+	public String getSystemInfo() {
+		return String.format("Firmware:%s; Hardware:%s; SN:%s", this.getSoftwareVersionString(), this.getHardwareVersionString(), this.getDeviceSnString());
 	}
 
 	/**
@@ -75,6 +103,13 @@ public class ChargerInfo {
 	 */
 	public byte[] getDeviceSN() {
 		return deviceSN;
+	}
+
+	/**
+	 * @return the deviceSN
+	 */
+	public String getDeviceSnString() {
+		return new String(deviceSN);
 	}
 
 	/**
