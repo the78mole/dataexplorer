@@ -48,10 +48,10 @@ public class ChargerInfo {
 		sb.append(this.getClass().getSimpleName()).append(":\n");
 		sb.append(String.format("deviceID \t\t= %d", this.deviceID)).append("\n");
 		sb.append(String.format("deviceSN \t\t= %s", this.getDeviceSnString())).append("\n");
-		//sb.append(String.format("softwareVersion \t= %d", this.softwareVersion)).append("\n");
-		sb.append(String.format("softwareVersion \t= %s", this.getSoftwareVersionString())).append("\n");
-		//sb.append(String.format("hardwareVersion \t= %d", this.hardwareVersion)).append("\n");
-		sb.append(String.format("hardwareVersion \t= %s", this.getHardwareVersionString())).append("\n");
+		sb.append(String.format("softwareVersion \t= %d", this.softwareVersion)).append("\n");
+		//sb.append(String.format("softwareVersion \t= %s", this.getSoftwareVersionString())).append("\n");
+		sb.append(String.format("hardwareVersion \t= %d", this.hardwareVersion)).append("\n");
+		//sb.append(String.format("hardwareVersion \t= %s", this.getHardwareVersionString())).append("\n");
 		sb.append(String.format("systemMemoryLength \t= %d", this.systemMemoryLength)).append("\n");
 		sb.append(String.format("programMemoryLength \t= %d", this.programMemoryLength)).append("\n");
 		sb.append(String.format("status \t\t\t= %s", StringHelper.printBinary((byte)(status & 0xFF), false))).append("\n");
