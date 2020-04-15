@@ -1280,10 +1280,12 @@ public class ChargerDialog extends DeviceDialog {
 				ChargerDialog.this.combo.setForeground(ChargerDialog.this.application.COLOR_BLACK);
 				if (ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()] >= 0) {
 					initProgramMemory(ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
-					ChargerDialog.this.memoryValues = ChargerDialog.this.selectedProgramMemory.getMemoryValues(ChargerDialog.this.memoryValues, ChargerDialog.this.isDuo);
-					updateMemoryParameterControls();
 					ChargerDialog.this.lastSelectedComboIndex = ChargerDialog.this.combo.getSelectionIndex();
 					ChargerDialog.this.lastSelectedProgramMemoryIndex = ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.lastSelectedComboIndex];
+					if (ChargerDialog.this.selectedProgramMemory != null) {
+						ChargerDialog.this.memoryValues = ChargerDialog.this.selectedProgramMemory.getMemoryValues(ChargerDialog.this.memoryValues, ChargerDialog.this.isDuo);
+						updateMemoryParameterControls();
+					}
 				}
 				if (ChargerDialog.this.combo.getText().contains("BUILD IN")) { //$NON-NLS-1$
 					ChargerDialog.this.btnCopy.setEnabled(true);
