@@ -54,10 +54,34 @@ public class ChargerInfo {
 		//sb.append(String.format("hardwareVersion \t= %s", this.getHardwareVersionString())).append("\n");
 		sb.append(String.format("systemMemoryLength \t= %d", this.systemMemoryLength)).append("\n");
 		sb.append(String.format("programMemoryLength \t= %d", this.programMemoryLength)).append("\n");
-		sb.append(String.format("status \t\t\t= %s", StringHelper.printBinary((byte)(status & 0xFF), false))).append("\n");
+		sb.append(this.getStatusString());
 		return sb.toString();
 	}
 
+	/**
+	 * @return status as string Bit0-run flag, Bit1-error flag, Bit2-control status flag, Bit3-run status flag, Bit4-dialog box status flag, Bit5-cell voltage flag, Bit6-balance flag 
+	 */
+	public String getStatusString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(String.format("status \t\t\t= %s", StringHelper.printBinary((byte)(status & 0xFF), false)));
+		//Bit0-run flag, Bit1-error flag, Bit2-control status flag, Bit3-run status flag, Bit4-dialog box status flag, Bit5-cell voltage flag, Bit6-balance flag 
+		if ((this.status & 0x40) != 0)
+			sb.append(" - balance");
+		if ((this.status & 0x20) != 0)
+			sb.append(" - cell-voltage");
+		if ((this.status & 0x10) != 0)
+			sb.append(" - dialog-box");
+		if ((this.status & 0x08) != 0)
+			sb.append(" - run-status");
+		if ((this.status & 0x04) != 0)
+			sb.append(" - control");
+		if ((this.status & 0x02) != 0)
+			sb.append(" - error");
+		if ((this.status & 0x01) != 0)
+			sb.append(" - run");
+		return sb.toString();
+	}
+	
 	public String getHardwareVersionString() {
 		String hardwareVersionString = "V" + this.hardwareVersion;
 		try {

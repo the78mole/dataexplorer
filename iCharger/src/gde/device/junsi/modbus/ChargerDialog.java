@@ -90,6 +90,7 @@ public class ChargerDialog extends DeviceDialog {
 
 	private CCombo										combo;
 	private int												comboHeight									= GDE.IS_LINUX ? 24 : GDE.IS_MAC ? 20 : 22;
+	private boolean										isComboSetEdit							= false;
 	private Button										btnCopy, btnEdit, btnWrite, btnDelete, btnSystemSave;
 	private Button										btnCharge, btnStorage, btnDischarge, btnCycle, btnBalance, btnPower, btnStop;
 	private Group											grpProgramMemory, grpBalancerSettings, grpAdvancedRestoreSettings, grpChargeSaftySettings, grpDischargeSaftySettings, grpRunProgram;
@@ -1191,6 +1192,17 @@ public class ChargerDialog extends DeviceDialog {
 			return;
 		}
 		this.systemInfo = this.readInfo();
+		if ((this.systemInfo.getStatus() & 0x02) != 0) {
+			log.log(Level.SEVERE, this.systemInfo.getStatusString());
+			this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE2603));
+			try {
+				this.usbPort.closeUsbPort(true);
+			}
+			catch (UsbException e) {
+				ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
+			}
+			return;
+		}
 		createContents();
 		this.dialogShell.setLocation(300, 50);
 		this.dialogShell.open();
@@ -1377,6 +1389,7 @@ public class ChargerDialog extends DeviceDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ChargerDialog.this.combo.setEditable(true);
+				ChargerDialog.this.isComboSetEdit = true;
 			}
 		});
 
@@ -1389,6 +1402,13 @@ public class ChargerDialog extends DeviceDialog {
 		this.btnWrite.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				if (ChargerDialog.this.isComboSetEdit) {
+					Event evt = new Event();
+					evt.character = SWT.CR;
+					ChargerDialog.this.combo.notifyListeners(SWT.KeyDown, evt);
+					ChargerDialog.this.isComboSetEdit = false;
+					WaitTimer.delay(400);
+				}
 				if (ChargerDialog.this.selectedProgramMemory != null)
 					writeProgramMemory(ChargerDialog.this.lastSelectedProgramMemoryIndex, ChargerDialog.this.selectedProgramMemory, ChargerDialog.this.selectedProgramMemory.getUseFlag());
 				ChargerDialog.this.combo.setForeground(ChargerDialog.this.application.COLOR_BLACK);
@@ -1477,16 +1497,24 @@ public class ChargerDialog extends DeviceDialog {
 			public void widgetSelected(SelectionEvent e) {
 				startProgramExecution((byte) Operation.Charge.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
 						ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
-				ChargerDialog.this.device.open_closeCommPort();
-				ChargerDialog.this.btnCharge.setEnabled(false);
-				ChargerDialog.this.btnStorage.setEnabled(false);
-				ChargerDialog.this.btnDischarge.setEnabled(false);
-				ChargerDialog.this.btnCycle.setEnabled(false);
-				ChargerDialog.this.btnBalance.setEnabled(false);
-				ChargerDialog.this.btnStop.setEnabled(true);
-				ChargerDialog.this.grpProgramMemory.setEnabled(false);
-				ChargerDialog.this.memoryComposite.setEnabled(false);
-				removeAllListeners();
+				WaitTimer.delay(400);
+				ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
+				if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+					log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
+					ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
+				}
+				else {
+					ChargerDialog.this.btnCharge.setEnabled(false);
+					ChargerDialog.this.btnStorage.setEnabled(false);
+					ChargerDialog.this.btnDischarge.setEnabled(false);
+					ChargerDialog.this.btnCycle.setEnabled(false);
+					ChargerDialog.this.btnBalance.setEnabled(false);
+					ChargerDialog.this.btnStop.setEnabled(true);
+					ChargerDialog.this.grpProgramMemory.setEnabled(false);
+					ChargerDialog.this.memoryComposite.setEnabled(false);
+					ChargerDialog.this.device.open_closeCommPort();
+					removeAllListeners();
+				}
 			}
 		});
 
@@ -1499,16 +1527,24 @@ public class ChargerDialog extends DeviceDialog {
 			public void widgetSelected(SelectionEvent e) {
 				startProgramExecution((byte) Operation.Storage.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
 						ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
-				ChargerDialog.this.device.open_closeCommPort();
-				ChargerDialog.this.btnCharge.setEnabled(false);
-				ChargerDialog.this.btnStorage.setEnabled(false);
-				ChargerDialog.this.btnDischarge.setEnabled(false);
-				ChargerDialog.this.btnCycle.setEnabled(false);
-				ChargerDialog.this.btnBalance.setEnabled(false);
-				ChargerDialog.this.btnStop.setEnabled(true);
-				ChargerDialog.this.grpProgramMemory.setEnabled(false);
-				ChargerDialog.this.memoryComposite.setEnabled(false);
-				removeAllListeners();
+				WaitTimer.delay(400);
+				ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
+				if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+					log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
+					ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
+				}
+				else {
+					ChargerDialog.this.device.open_closeCommPort();
+					ChargerDialog.this.btnCharge.setEnabled(false);
+					ChargerDialog.this.btnStorage.setEnabled(false);
+					ChargerDialog.this.btnDischarge.setEnabled(false);
+					ChargerDialog.this.btnCycle.setEnabled(false);
+					ChargerDialog.this.btnBalance.setEnabled(false);
+					ChargerDialog.this.btnStop.setEnabled(true);
+					ChargerDialog.this.grpProgramMemory.setEnabled(false);
+					ChargerDialog.this.memoryComposite.setEnabled(false);
+					removeAllListeners();
+				}
 			}
 		});
 
@@ -1522,16 +1558,23 @@ public class ChargerDialog extends DeviceDialog {
 				if (ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()] >= 0) {
 					startProgramExecution((byte) Operation.Discharge.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
 							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
-					ChargerDialog.this.device.open_closeCommPort();
-					ChargerDialog.this.btnCharge.setEnabled(false);
-					ChargerDialog.this.btnStorage.setEnabled(false);
-					ChargerDialog.this.btnDischarge.setEnabled(false);
-					ChargerDialog.this.btnCycle.setEnabled(false);
-					ChargerDialog.this.btnBalance.setEnabled(false);
-					ChargerDialog.this.btnStop.setEnabled(true);
-					ChargerDialog.this.grpProgramMemory.setEnabled(false);
-					ChargerDialog.this.memoryComposite.setEnabled(false);
-					removeAllListeners();
+					WaitTimer.delay(400);
+					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+						log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
+						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
+					}
+					else {
+						ChargerDialog.this.device.open_closeCommPort();
+						ChargerDialog.this.btnCharge.setEnabled(false);
+						ChargerDialog.this.btnStorage.setEnabled(false);
+						ChargerDialog.this.btnDischarge.setEnabled(false);
+						ChargerDialog.this.btnCycle.setEnabled(false);
+						ChargerDialog.this.btnBalance.setEnabled(false);
+						ChargerDialog.this.btnStop.setEnabled(true);
+						ChargerDialog.this.grpProgramMemory.setEnabled(false);
+						ChargerDialog.this.memoryComposite.setEnabled(false);
+						removeAllListeners();
+					}
 				}
 			}
 		});
@@ -1546,16 +1589,24 @@ public class ChargerDialog extends DeviceDialog {
 				if (ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()] >= 0) {
 					startProgramExecution((byte) Operation.Cycle.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
 							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
-					ChargerDialog.this.device.open_closeCommPort();
-					ChargerDialog.this.btnCharge.setEnabled(false);
-					ChargerDialog.this.btnStorage.setEnabled(false);
-					ChargerDialog.this.btnDischarge.setEnabled(false);
-					ChargerDialog.this.btnCycle.setEnabled(false);
-					ChargerDialog.this.btnBalance.setEnabled(false);
-					ChargerDialog.this.btnStop.setEnabled(true);
-					ChargerDialog.this.grpProgramMemory.setEnabled(false);
-					ChargerDialog.this.memoryComposite.setEnabled(false);
-					removeAllListeners();
+					WaitTimer.delay(400);
+					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
+					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+						log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
+						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
+					}
+					else {
+						ChargerDialog.this.device.open_closeCommPort();
+						ChargerDialog.this.btnCharge.setEnabled(false);
+						ChargerDialog.this.btnStorage.setEnabled(false);
+						ChargerDialog.this.btnDischarge.setEnabled(false);
+						ChargerDialog.this.btnCycle.setEnabled(false);
+						ChargerDialog.this.btnBalance.setEnabled(false);
+						ChargerDialog.this.btnStop.setEnabled(true);
+						ChargerDialog.this.grpProgramMemory.setEnabled(false);
+						ChargerDialog.this.memoryComposite.setEnabled(false);
+						removeAllListeners();
+					}
 				}
 			}
 		});
@@ -1570,16 +1621,24 @@ public class ChargerDialog extends DeviceDialog {
 				if (ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()] >= 0) {
 					startProgramExecution((byte) Operation.Balance.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
 							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
-					ChargerDialog.this.device.open_closeCommPort();
-					ChargerDialog.this.btnCharge.setEnabled(false);
-					ChargerDialog.this.btnStorage.setEnabled(false);
-					ChargerDialog.this.btnDischarge.setEnabled(false);
-					ChargerDialog.this.btnCycle.setEnabled(false);
-					ChargerDialog.this.btnBalance.setEnabled(false);
-					ChargerDialog.this.btnStop.setEnabled(true);
-					ChargerDialog.this.grpProgramMemory.setEnabled(false);
-					ChargerDialog.this.memoryComposite.setEnabled(false);
-					removeAllListeners();
+					WaitTimer.delay(400);
+					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
+					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+						log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
+						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
+					}
+					else {
+						ChargerDialog.this.device.open_closeCommPort();
+						ChargerDialog.this.btnCharge.setEnabled(false);
+						ChargerDialog.this.btnStorage.setEnabled(false);
+						ChargerDialog.this.btnDischarge.setEnabled(false);
+						ChargerDialog.this.btnCycle.setEnabled(false);
+						ChargerDialog.this.btnBalance.setEnabled(false);
+						ChargerDialog.this.btnStop.setEnabled(true);
+						ChargerDialog.this.grpProgramMemory.setEnabled(false);
+						ChargerDialog.this.memoryComposite.setEnabled(false);
+						removeAllListeners();
+					}
 				}
 			}
 		});
@@ -1595,17 +1654,25 @@ public class ChargerDialog extends DeviceDialog {
 				if (ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()] >= 0) {
 					//set select to run operations = 0(Power), Select MEMORY, Select CHANNEL=0, then send Order RUN command
 					startProgramExecution((byte) 0, (byte) 0, ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
-					ChargerDialog.this.device.open_closeCommPort();
-					ChargerDialog.this.btnCharge.setEnabled(false);
-					ChargerDialog.this.btnStorage.setEnabled(false);
-					ChargerDialog.this.btnDischarge.setEnabled(false);
-					ChargerDialog.this.btnCycle.setEnabled(false);
-					ChargerDialog.this.btnBalance.setEnabled(false);
-					ChargerDialog.this.btnPower.setEnabled(false);
-					ChargerDialog.this.btnStop.setEnabled(true);
-					ChargerDialog.this.grpProgramMemory.setEnabled(false);
-					ChargerDialog.this.memoryComposite.setEnabled(false);
-					removeAllListeners();
+					WaitTimer.delay(400);
+					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
+					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+						log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
+						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
+					}
+					else {
+						ChargerDialog.this.device.open_closeCommPort();
+						ChargerDialog.this.btnCharge.setEnabled(false);
+						ChargerDialog.this.btnStorage.setEnabled(false);
+						ChargerDialog.this.btnDischarge.setEnabled(false);
+						ChargerDialog.this.btnCycle.setEnabled(false);
+						ChargerDialog.this.btnBalance.setEnabled(false);
+						ChargerDialog.this.btnPower.setEnabled(false);
+						ChargerDialog.this.btnStop.setEnabled(true);
+						ChargerDialog.this.grpProgramMemory.setEnabled(false);
+						ChargerDialog.this.memoryComposite.setEnabled(false);
+						removeAllListeners();
+					}
 				}
 			}
 		});
