@@ -696,8 +696,8 @@ public class HitecX1Red extends MC3000 implements IDevice {
 	 * @return
 	 */
 	public int getProcessSubType(final byte[] channelBuffer, final byte[] dataBuffer) {
-		if (channelBuffer[4] == 4 || channelBuffer[3] == 5) 
-			return dataBuffer[15];
+		if (channelBuffer[5] == 4 || channelBuffer[5] == 5) 
+			return dataBuffer[17];
 		return this.getProcessingType(channelBuffer);
 	}
 

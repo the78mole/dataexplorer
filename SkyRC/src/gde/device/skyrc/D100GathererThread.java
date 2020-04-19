@@ -279,14 +279,15 @@ public class D100GathererThread extends Thread {
 		String processBatteryTypeName = this.device.getProcessingBatteryTypeName(channelBuffer);
 
 		//firmware 1.07 energy needs to be calculated
-		if (this.device.resetEnergy[number-1] != device.getProcessSubType(channelBuffer, dataBuffer) || device.getProcessSubType(channelBuffer, dataBuffer) == 2)
-			if (device.getProcessSubType(channelBuffer, dataBuffer) == 2)
+		int processSubType = device.getProcessSubType(channelBuffer, dataBuffer);
+		if (this.device.resetEnergy[number-1] != processSubType || processSubType == 2)
+			if (processSubType == 2)
 				dataBuffer[0] = -1; //keep energy
 			else
 				dataBuffer[0] = 1;  //reset energy
 		else
 			dataBuffer[0] = 0;	//add up energy		
-		this.device.resetEnergy[number-1] = device.getProcessSubType(channelBuffer, dataBuffer);
+		this.device.resetEnergy[number-1] = processSubType;
 
 		if (D100GathererThread.log.isLoggable(Level.FINE)) {
 			D100GathererThread.log.log(Level.FINE, "Channel = " + number + " : processTypeName = " + processTypeName + " processSubType = " + processSubTypeName);

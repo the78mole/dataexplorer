@@ -17,6 +17,7 @@ Device specific changes/fixes
 	* GPS_Logger* - fix latitude, longitude unit which caused display problem while activated
 	* Spektrum-Telemetry - make frame loss and holds always visible, even no reasonable data
 	* UniSens-E - enable live data gathering
+	* iMax B6* - fix missing energy calculation Ni battery type outside cycle
 
 Version 3.4.1 - 03 Feb 2020
 Generic changes/fixes

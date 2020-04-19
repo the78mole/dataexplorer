@@ -686,14 +686,14 @@ public class IMaxB6USB extends MC3000 implements IDevice {
 	}
 
 	/**
-	 * query the sub process name if in cycle
+	 * query the sub process type if in cycle
 	 * 1=charge 2=pause 3=discharge
 	 * @param dataBuffer
 	 * @return
 	 */
 	public int getProcessSubType(final byte[] channelBuffer, final byte[] dataBuffer) {
-		if (channelBuffer[4] == 4 || channelBuffer[3] == 5) 
-			return dataBuffer[15];
+		if (channelBuffer[5] == 4 || channelBuffer[5] == 5) 
+			return dataBuffer[17];
 		return this.getProcessingType(channelBuffer);
 	}
 
