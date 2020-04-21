@@ -9,6 +9,7 @@ Generic changes/fixes
 	* enable class based log level configuration device sub packages (p.e. gde.device.junsi.modbus)
 	* enable USB HID device selection while devices with almost identical characteristics connected
 	* enable secondary trigger range in properties editor (functional added in 3.4.0)
+	* add JAVA_IO_TMPDIR GDE cleanup tree (exported help files)
 	* macOS build - add code signing for gatekeeper
 	
 Device specific changes/fixes

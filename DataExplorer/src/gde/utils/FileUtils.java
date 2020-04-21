@@ -1392,10 +1392,10 @@ public class FileUtils {
 	 */
 	public static void cleanupPre() {
 		if (GDE.IS_WINDOWS)
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] { "bootstrap.log.*", "WinHelper*.dll", "Register*.exe", "rxtxSerial.dll" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] { "GDE", "bootstrap.log.*", "WinHelper*.dll", "Register*.exe", "rxtxSerial.dll" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		else if (GDE.IS_LINUX)
-			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] { "bootstrap.log.*", "*register.sh", "librxtxSerial.so" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		else if (GDE.IS_MAC) FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] { "bootstrap.log.*", "librxtxSerial.jnilib" }); //$NON-NLS-1$ //$NON-NLS-2$
+			FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] { "GDE", "bootstrap.log.*", "*register.sh", "librxtxSerial.so" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		else if (GDE.IS_MAC) FileUtils.cleanFiles(GDE.JAVA_IO_TMPDIR, new String[] { "GDE", "bootstrap.log.*", "librxtxSerial.jnilib" }); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
