@@ -1706,9 +1706,26 @@ public class ChargerDialog extends DeviceDialog {
 			}
 		});
 
+		Button btnHelp = new Button(mainMemoryComposite, SWT.NONE);
+		FormData fd_btnHelp = new FormData();
+		fd_btnHelp.width = GDE.IS_MAC ? 50 : 40;
+		fd_btnHelp.height = GDE.IS_MAC ? 33 : 30;
+		fd_btnHelp.bottom = new FormAttachment(100, -35);
+		fd_btnHelp.right = new FormAttachment(100, -40);
+		btnHelp.setLayoutData(fd_btnHelp);
+		btnHelp.setImage(SWTResourceManager.getImage("gde/resource/QuestionHot.gif"));
+		btnHelp.setToolTipText(Messages.getString(MessageIds.GDE_MSGT2628)); //$NON-NLS-1$
+		btnHelp.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent evt) {
+				ChargerDialog.this.application.openHelpDialog("iCharger", "HelpInfo.html");  //$NON-NLS-1$
+			}
+		});
+
 		Button btnClose = new Button(mainMemoryComposite, SWT.NONE);
 		FormData fd_btnCancel = new FormData();
-		fd_btnCancel.bottom = new FormAttachment(100, -12);
+		fd_btnCancel.height = GDE.IS_MAC ? 33 : 30;
+		fd_btnCancel.bottom = new FormAttachment(100, -5);
 		fd_btnCancel.right = new FormAttachment(100, -10);
 		fd_btnCancel.left = new FormAttachment(100, -110);
 		btnClose.setLayoutData(fd_btnCancel);
