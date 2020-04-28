@@ -837,7 +837,7 @@
 		<copy todir="${output.mac32.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer.icns" />
-			<fileset file="build/misc/DevicePropertiesEditor.icns" />
+			<!-- fileset file="build/misc/DevicePropertiesEditor.icns" / -->
 			<fileset file="RXTXcomm/src/mac/librxtxSerial.jnilib" />
 		</copy>
 		<copy todir="${output.mac32.bundle}" flatten="yes">
@@ -847,7 +847,7 @@
 		</copy>
 		<copy todir="${output.mac32.bundle.bin}" flatten="yes">
 			<fileset file="build/misc/DataExplorerMac32" />
-			<fileset file="build/misc/DevicePropertiesEditorMac32" />
+			<!-- fileset file="build/misc/DevicePropertiesEditorMac32" / -->
 		</copy>
 		<copy todir="${output.mac32.program.devices}" flatten="yes">
 			<fileset dir="${basedir}">
@@ -858,7 +858,7 @@
 		<copy todir="${output.mac64.program}" flatten="yes">
 			<fileset file="DataExplorer/build/*.jar" />
 			<fileset file="build/misc/DataExplorer.icns" />
-			<fileset file="build/misc/DevicePropertiesEditor.icns" />
+			<!-- fileset file="build/misc/DevicePropertiesEditor.icns" / -->
 			<fileset file="RXTXcomm/src/mac/librxtxSerial.jnilib" />
 		</copy>
 		<copy todir="${output.mac64.bundle}" flatten="yes">
@@ -868,7 +868,7 @@
 		</copy>
 		<copy todir="${output.mac64.bundle.bin}" flatten="yes">
 			<fileset file="build/misc/DataExplorerMac64" />
-			<fileset file="build/misc/DevicePropertiesEditorMac64" />
+			<!-- fileset file="build/misc/DevicePropertiesEditorMac64" / -->
 		</copy>
 		<copy todir="${output.mac64.program.devices}" flatten="yes">
 			<fileset dir="${basedir}">
@@ -1272,6 +1272,15 @@
 	    <delete file="${targetDmgPath}" quiet="yes" failonerror="false"/>
 	    <!-- Delete the temporary image -->
 	    <delete file="${tmpDmgPath}" quiet="yes" failonerror="false"/>
+    	
+    	<!-- sign app for gatekeeper -->
+	    <exec executable="/usr/bin/codesign" os="Mac OS X" failonerror="true">
+	      <arg value="-f"/>
+		  <arg value="-s"/>
+		  <arg value="D9D82CX2Z9"/>
+	      <arg value="--verbose"/>
+	      <arg value="${output.mac32}/${app.name}.app"/>
+	    </exec>
 	    	
    	    <!-- Create a temporary Disk Image -->
 	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
@@ -1301,10 +1310,10 @@
 	      <arg value="+x"/>
 	      <arg value="${mountdir}/${app.name}/${app.name}.app/Contents/MacOS/DataExplorerMac32"/>
 	    </exec>
-	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	    <!-- exec executable="chmod" os="Mac OS X" failonerror="true">
 	      <arg value="+x"/>
 	      <arg value="${mountdir}/${app.name}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac32"/>
-	    </exec>
+	    </exec -->
 	    
 	    <!-- Copy the background, the volume icon and DS_Store files -->
 	    <mkdir dir="${mountdir}/${app.name}/.background"/>
@@ -1376,6 +1385,15 @@
 	    <delete file="${targetDmgPath}" quiet="yes" failonerror="false"/>
 	    <!-- Delete the temporary image -->
 	    <delete file="${mountdir}/${app.name}-tmp.dmg" quiet="yes" failonerror="false"/>
+    	
+    	<!-- sign app for gatekeeper -->
+	    <exec executable="/usr/bin/codesign" os="Mac OS X" failonerror="true">
+	      <arg value="-f"/>
+		  <arg value="-s"/>
+		  <arg value="D9D82CX2Z9"/>
+	      <arg value="--verbose"/>
+	      <arg value="${output.mac64}/${app.name}.app"/>
+	    </exec>
 	    	
    	    <!-- Create a temporary Disk Image -->
 	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
@@ -1405,10 +1423,10 @@
 	      <arg value="+x"/>
 	      <arg value="${mountdir}/${app.name}/${app.name}.app/Contents/MacOS/DataExplorerMac64"/>
 	    </exec>
-	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	    <!-- exec executable="chmod" os="Mac OS X" failonerror="true">
 	      <arg value="+x"/>
 	      <arg value="${mountdir}/${app.name}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac64"/>
-	    </exec>
+	    </exec -->
 	    	    	    	    	    	    	
 	    <!-- Copy the background, the volume icon and DS_Store files -->
 	    <copy file="${basedir}/build/misc/DS_Store"
