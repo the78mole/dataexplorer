@@ -1281,6 +1281,12 @@
 	      <arg value="--verbose"/>
 	      <arg value="${output.mac32}/${app.name}.app"/>
 	    </exec>
+	    <exec executable="/usr/bin/codesign" os="Mac OS X" failonerror="true">
+	      <arg value="-vvv"/>
+		  <arg value="--deep"/>
+		  <arg value="--strict"/>
+	      <arg value="${output.mac32}/${app.name}.app"/>
+	    </exec>
 	    	
    	    <!-- Create a temporary Disk Image -->
 	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
@@ -1392,6 +1398,12 @@
 		  <arg value="-s"/>
 		  <arg value="D9D82CX2Z9"/>
 	      <arg value="--verbose"/>
+	      <arg value="${output.mac64}/${app.name}.app"/>
+	    </exec>
+	    <exec executable="/usr/bin/codesign" os="Mac OS X" failonerror="true">
+	      <arg value="-vvv"/>
+		  <arg value="--deep"/>
+		  <arg value="--strict"/>
 	      <arg value="${output.mac64}/${app.name}.app"/>
 	    </exec>
 	    	
