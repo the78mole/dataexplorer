@@ -374,10 +374,10 @@
 	      <arg value="+x"/>
 	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DataExplorerMac64"/>
 	    </exec>
-	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	    <!-- exec executable="chmod" os="Mac OS X" failonerror="true">
 	      <arg value="+x"/>
 	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac64"/>
-	    </exec>
+	    </exec -->
 		<copy toDir="${install.dir.mac}/${app.name}.app">
 			<fileset file="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/**" />
 		</copy>
@@ -389,10 +389,10 @@
 	      <arg value="+x"/>
 	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DataExplorerMac64"/>
 	    </exec>
-	    <exec executable="chmod" os="Mac OS X" failonerror="true">
+	    <!-- exec executable="chmod" os="Mac OS X" failonerror="true">
 	      <arg value="+x"/>
 	      <arg value="${output.dir}/Mac_${sun.arch.data.model}/${app.name}.app/Contents/MacOS/DevicePropertiesEditorMac64"/>
-	    </exec>
+	    </exec -->
 		<copy toDir="${prefix}">
 			<fileset file="${output.dir}/Mac_${sun.arch.data.model}/**" />
 		</copy>
@@ -1273,7 +1273,7 @@
 	    <!-- Delete the temporary image -->
 	    <delete file="${tmpDmgPath}" quiet="yes" failonerror="false"/>
     	
-    	<!-- sign app for gatekeeper -->
+    	<!-- sign app -->
 	    <exec executable="/usr/bin/codesign" os="Mac OS X" failonerror="true">
 	      <arg value="-f"/>
 		  <arg value="-s"/>
@@ -1374,6 +1374,21 @@
 	      <arg value="-o"/>
 	      <arg value="${targetDmgPath}"/>
 	    </exec>
+    	
+    	<!-- sign dmg -->
+	    <exec executable="/usr/bin/codesign" os="Mac OS X" failonerror="true">
+	      <arg value="-f"/>
+		  <arg value="-s"/>
+		  <arg value="D9D82CX2Z9"/>
+	      <arg value="--verbose"/>
+	      <arg value="${targetDmgPath}"/>
+	    </exec>
+	    <exec executable="/usr/bin/codesign" os="Mac OS X" failonerror="true">
+	      <arg value="-vvv"/>
+		  <arg value="--deep"/>
+		  <arg value="--strict"/>
+	      <arg value="${targetDmgPath}"/>
+	    </exec>
 	
 	    <!-- Delete the temporary image -->
 	    <delete file="${tmpDmgPath}" quiet="yes" failonerror="false"/>
@@ -1392,7 +1407,7 @@
 	    <!-- Delete the temporary image -->
 	    <delete file="${mountdir}/${app.name}-tmp.dmg" quiet="yes" failonerror="false"/>
     	
-    	<!-- sign app for gatekeeper -->
+    	<!-- sign app -->
 	    <exec executable="/usr/bin/codesign" os="Mac OS X" failonerror="true">
 	      <arg value="-f"/>
 		  <arg value="-s"/>
@@ -1491,6 +1506,21 @@
 	      <arg value="-format"/>
 	      <arg value="UDZO"/>
 	      <arg value="-o"/>
+	      <arg value="${targetDmgPath}"/>
+	    </exec>
+    	
+    	<!-- sign dmg -->
+	    <exec executable="/usr/bin/codesign" os="Mac OS X" failonerror="true">
+	      <arg value="-f"/>
+		  <arg value="-s"/>
+		  <arg value="D9D82CX2Z9"/>
+	      <arg value="--verbose"/>
+	      <arg value="${targetDmgPath}"/>
+	    </exec>
+	    <exec executable="/usr/bin/codesign" os="Mac OS X" failonerror="true">
+	      <arg value="-vvv"/>
+		  <arg value="--deep"/>
+		  <arg value="--strict"/>
 	      <arg value="${targetDmgPath}"/>
 	    </exec>
 	

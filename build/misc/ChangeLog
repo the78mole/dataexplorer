@@ -10,7 +10,7 @@ Generic changes/fixes
 	* enable USB HID device selection while devices with almost identical characteristics connected
 	* enable secondary trigger range in properties editor (functional added in 3.4.0)
 	* add JAVA_IO_TMPDIR GDE cleanup tree (exported help files)
-	* macOS build - add code signing for gatekeeper
+	* macOS build - add code signing app and dmg to fulfill gatekeeper requirements
 	
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control
