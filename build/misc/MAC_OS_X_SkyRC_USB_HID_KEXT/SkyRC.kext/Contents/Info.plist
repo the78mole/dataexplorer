@@ -11,7 +11,7 @@
         <key>CFBundleIconFile</key>
         <string></string>
         <key>CFBundleIdentifier</key>
-        <string>com.skyrc.driver.dummy</string>
+        <string>com.skyrc.driver.SkyRC</string>
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
         <key>CFBundlePackageType</key>
@@ -40,11 +40,6 @@
                 <key>idVendor</key>
                 <integer>0000</integer>
             </dict>
-        </dict>
-        <key>OSBundleLibraries</key>
-        <dict>
-            <key>com.apple.iokit.IOUSBFamily</key>
-            <string>1.8</string>
         </dict>
     </dict>
 </plist>
