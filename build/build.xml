@@ -1285,6 +1285,9 @@
 	      <arg value="-vvv"/>
 		  <arg value="--deep"/>
 		  <arg value="--strict"/>
+		  <arg value="--display"/>
+		  <arg value="--entitlements"/>
+		  <arg value=":-"/>
 	      <arg value="${output.mac32}/${app.name}.app"/>
 	    </exec>
 	    	
@@ -1387,6 +1390,9 @@
 	      <arg value="-vvv"/>
 		  <arg value="--deep"/>
 		  <arg value="--strict"/>
+		  <arg value="--display"/>
+		  <arg value="--entitlements"/>
+		  <arg value=":-"/>
 	      <arg value="${targetDmgPath}"/>
 	    </exec>
 	
@@ -1419,6 +1425,9 @@
 	      <arg value="-vvv"/>
 		  <arg value="--deep"/>
 		  <arg value="--strict"/>
+		  <arg value="--display"/>
+		  <arg value="--entitlements"/>
+		  <arg value=":-"/>
 	      <arg value="${output.mac64}/${app.name}.app"/>
 	    </exec>
 	    	
@@ -1521,6 +1530,9 @@
 	      <arg value="-vvv"/>
 		  <arg value="--deep"/>
 		  <arg value="--strict"/>
+		  <arg value="--display"/>
+		  <arg value="--entitlements"/>
+		  <arg value=":-"/>
 	      <arg value="${targetDmgPath}"/>
 	    </exec>
 	
