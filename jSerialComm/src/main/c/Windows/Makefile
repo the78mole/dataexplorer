@@ -3,7 +3,7 @@ COMPILE			= cl
 LINK			= link
 CFLAGS			= /c /O2 /GF /GL /MT /EHsc /fp:precise /J /nologo /TP
 LDFLAGS			= /DLL /LTCG /NOASSEMBLY /NOLOGO
-INCLUDES		= /I"$(JDK_HOME)/include" /I"$(JDK_HOME)/include/win32"
+INCLUDES		= /I"$(JDK_HOME)\include" /I"$(JDK_HOME)\include\win32"
 LIBRARIES		= Advapi32.lib SetupAPI.lib
 DELETE			= @del /q /f
 RMDIR			= @rd /q /s
@@ -13,7 +13,6 @@ MOVE			= @move /y
 PRINT			= @echo
 FULL_CLASS		= com.fazecast.jSerialComm.SerialPort
 JAVAC			= "$(JDK_HOME)\bin\javac"
-JAVAH			= "$(JDK_HOME)\bin\javah" -jni
 JFLAGS 			= -source 1.6 -target 1.6 -Xlint:-options
 LIBRARY_NAME	= jSerialComm.dll
 SOURCES			= SerialPort_Windows.c WindowsHelperFunctions.c
@@ -77,8 +76,7 @@ $(OBJECTSx86) :
 
 # Rule to build JNI header file
 $(JNI_HEADER) : $(JAVA_CLASS)
-	$(JAVAH) -d .. -classpath $(JAVA_CLASS_DIR)\..\..\.. $(FULL_CLASS)
 
 # Suffix rule to get from *.java -> *.class
 $(JAVA_CLASS) :
-	$(JAVAC) $(JFLAGS) -d $(JAVA_CLASS_DIR)\..\..\.. -cp $(JAVA_SOURCE_DIR)\..\..\.. $(JAVA_SOURCE_DIR)\$(*B).java
+	$(JAVAC) $(JFLAGS) -d $(JAVA_CLASS_DIR)\..\..\.. -cp $(JAVA_SOURCE_DIR)\..\..\.. $(JAVA_SOURCE_DIR)\$(*B).java -h ..

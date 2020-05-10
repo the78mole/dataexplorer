@@ -2,10 +2,10 @@
  * SerialPort.java
  *
  *       Created on:  Feb 25, 2012
- *  Last Updated on:  Mar 07, 2019
+ *  Last Updated on:  Apr 29, 2020
  *           Author:  Will Hedgecock
  *
- * Copyright (C) 2012-2019 Fazecast, Inc.
+ * Copyright (C) 2012-2020 Fazecast, Inc.
  *
  * This file is part of jSerialComm.
  *
@@ -27,50 +27,43 @@ package com.fazecast.jSerialComm;
 
 import java.lang.ProcessBuilder;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
  * This class provides native access to serial ports and devices without requiring external libraries or tools.
  *
  * @author Will Hedgecock &lt;will.hedgecock@fazecast.com&gt;
- * @version 2.4.2
+ * @version 2.6.2
  * @see java.io.InputStream
  * @see java.io.OutputStream
  */
 public final class SerialPort
 {
 	// Static initializer loads correct native library for this machine
+	private static final String versionString = "2.6.2";
 	private static volatile boolean isAndroid = false;
 	private static volatile boolean isUnixBased = false;
 	private static volatile boolean isWindows = false;
 	static
 	{
-		// Determine the temporary file directory for Java
+		// Determine the temporary file directory for Java and remove any previous versions of this library
 		String OS = System.getProperty("os.name").toLowerCase();
 		String libraryPath = "", fileName = "";
 		String tempFileDirectory = System.getProperty("java.io.tmpdir");
-		if ((tempFileDirectory.charAt(tempFileDirectory.length()-1) != '\\') &&
-				(tempFileDirectory.charAt(tempFileDirectory.length()-1) != '/'))
+		if ((tempFileDirectory.charAt(tempFileDirectory.length()-1) != '\\') && (tempFileDirectory.charAt(tempFileDirectory.length()-1) != '/'))
 			tempFileDirectory += "/";
-
-		// Force remove any previous versions of this library
-		File directory = new File(tempFileDirectory);
-		if (directory.exists())
-		{
-			File directoryListing[] = directory.listFiles();
-			for (File listing : directoryListing)
-				if (listing.isFile() && listing.toString().contains("jSerialComm"))
-					listing.delete();
-		}
+		tempFileDirectory += "jSerialComm/";
+		deleteDirectory(new File(tempFileDirectory));
 
 		// Determine Operating System and architecture
 		if (System.getProperty("java.vm.vendor").toLowerCase().contains("android"))
@@ -93,6 +86,7 @@ public final class SerialPort
 				getpropProcess.waitFor();
 				buildProperties.close();
 			}
+			catch (InterruptedException e) { Thread.currentThread().interrupt(); }
 			catch (Exception e) { e.printStackTrace(); }
 
 			if (libraryPath.isEmpty())
@@ -136,13 +130,18 @@ public final class SerialPort
 				// Determine the specific ARM architecture of this device
 				try
 				{
-					BufferedReader cpuPropertiesFile = new BufferedReader(new FileReader("/proc/cpuinfo"));
 					String line;
+					BufferedReader cpuPropertiesFile = new BufferedReader(new FileReader("/proc/cpuinfo"));
 					while ((line = cpuPropertiesFile.readLine()) != null)
 					{
 						if (line.contains("ARMv"))
 						{
 							libraryPath = "Linux/armv" + line.substring(line.indexOf("ARMv")+4, line.indexOf("ARMv")+5);
+							break;
+						}
+						else if (line.contains("ARM") && line.contains("(v"))
+						{
+							libraryPath = "Linux/armv" + line.substring(line.indexOf("(v")+2, line.indexOf("(v")+3);
 							break;
 						}
 						else if (line.contains("aarch"))
@@ -159,7 +158,8 @@ public final class SerialPort
 				if (libraryPath.isEmpty())
 					libraryPath = "Linux/armv6";
 				else if (libraryPath.contains("Linux/armv8"))
-					libraryPath += (System.getProperty("os.arch").indexOf("64") >= 0) ? "_64" : "_32";
+					libraryPath += ((System.getProperty("sun.arch.data.model") != null) ? ("_" + System.getProperty("sun.arch.data.model")) :
+						((System.getProperty("os.arch").indexOf("64") >= 0) ? "_64" : "_32"));
 				else
 				{
 					try
@@ -207,12 +207,17 @@ public final class SerialPort
 			System.exit(-1);
 		}
 
-		// Get path of native library and copy file to working directory
-		String tempFileName = tempFileDirectory + (new Date()).getTime() + "-" + fileName;
-		File tempNativeLibrary = new File(tempFileName);
-		tempNativeLibrary.deleteOnExit();
+		// Copy platform-specific binary to a temporary location
 		try
 		{
+			// Get path of native library and copy file to working directory with open permissions
+			File tempNativeLibrary = new File(tempFileDirectory + (new Date()).getTime() + "-" + fileName);
+			tempNativeLibrary.getParentFile().mkdirs();
+			tempNativeLibrary.getParentFile().setReadable(true, false);
+			tempNativeLibrary.getParentFile().setWritable(true, false);
+			tempNativeLibrary.getParentFile().setExecutable(true, false);
+			tempNativeLibrary.deleteOnExit();
+
 			// Load the native jSerialComm library
 			InputStream fileContents = SerialPort.class.getResourceAsStream("/" + libraryPath + "/" + fileName);
 			if ((fileContents == null) && isAndroid)
@@ -228,18 +233,16 @@ public final class SerialPort
 			else
 			{
 				// Copy the native library to the system temp directory
-				try
-				{
-					FileOutputStream destinationFileContents = new FileOutputStream(tempNativeLibrary);
-					byte transferBuffer[] = new byte[4096];
-					int numBytesRead;
-
-					while ((numBytesRead = fileContents.read(transferBuffer)) > 0)
-						destinationFileContents.write(transferBuffer, 0, numBytesRead);
-					destinationFileContents.close();
-				}
-				catch (FileNotFoundException e) {};
+				FileOutputStream destinationFileContents = new FileOutputStream(tempNativeLibrary);
+				byte transferBuffer[] = new byte[4096];
+				int numBytesRead;
+				while ((numBytesRead = fileContents.read(transferBuffer)) > 0)
+					destinationFileContents.write(transferBuffer, 0, numBytesRead);
+				destinationFileContents.close();
 				fileContents.close();
+				tempNativeLibrary.setReadable(true, false);
+				tempNativeLibrary.setWritable(true, false);
+				tempNativeLibrary.setExecutable(true, false);
 
 				// Load and initialize native library
 				System.load(tempNativeLibrary.getAbsolutePath());
@@ -256,20 +259,41 @@ public final class SerialPort
 		return !canonicalFile.getCanonicalFile().equals(canonicalFile.getAbsoluteFile());
 	}
 
+	// Static recursive directory deletion function
+	private static void deleteDirectory(File path)
+	{
+		if (path.isDirectory())
+			for (File file : path.listFiles())
+				deleteDirectory(file);
+		path.delete();
+	}
+
 	/**
 	 * Returns the same output as calling {@link #getPortDescription()}.  This may be useful for display containers which call a Java Object's default toString() method.
 	 *
 	 * @return The port description as reported by the device itself.
 	 */
 	@Override
-    public String toString() { return getPortDescription(); }
+	public String toString() { return getPortDescription(); }
+
+	/**
+	 * Returns the current version of the jSerialComm library.
+	 *
+	 * @return The current library version.
+	 */
+	static public String getVersion() { return versionString; }
 
 	/**
 	 * Returns a list of all available serial ports on this machine.
 	 * <p>
 	 * The serial ports can be accessed by iterating through each of the SerialPort objects in this array.
 	 * <p>
-	 * Note that the {@link #openPort()} method must be called before any attempts to read from or write to the port.  Likewise, {@link #closePort()} should be called when you are finished accessing the port.
+	 * Note that the {@link #openPort()} method must be called before any attempts to read from or write to the port.
+	 * Likewise, {@link #closePort()} should be called when you are finished accessing the port.
+	 * <p>
+	 * Also note that repeated calls to this function will re-enumerate all serial ports and will return a completely
+	 * unique set of array objects. As such, you should store a reference to the serial port object(s) you are
+	 * interested in in your own application code.
 	 * <p>
 	 * All serial port parameters or timeouts can be changed at any time after the port has been opened.
 	 *
@@ -284,9 +308,10 @@ public final class SerialPort
 	 * On Linux machines, the descriptor will look similar to "/dev/tty[*]".
 	 *
 	 * @param portDescriptor The desired serial port to use with this library.
-	 * @return A SerialPort object.
+	 * @return A {@link SerialPort} object.
+	 * @throws SerialPortInvalidPortException If a {@link SerialPort} object cannot be created due to a logical or formatting error in the portDescriptor parameter.
 	 */
-	static public SerialPort getCommPort(String portDescriptor)
+	static public SerialPort getCommPort(String portDescriptor) throws SerialPortInvalidPortException
 	{
 		// Correct port descriptor, if needed
 		try
@@ -305,21 +330,13 @@ public final class SerialPort
 			else if (!((new File(portDescriptor)).exists()))
 				portDescriptor = "/dev/" + portDescriptor.substring(portDescriptor.lastIndexOf('/')+1);
 		}
-		catch (Exception e)
-		{
-			SerialPort serialPort = new SerialPort();
-			serialPort.comPort = "/dev/null";
-			serialPort.friendlyName = "Bad Port";
-			serialPort.portDescription = "Bad Port";
-			return serialPort;
-		}
+		catch (Exception e) { throw new SerialPortInvalidPortException("Unable to create a serial port object from the invalid port descriptor: " + portDescriptor, e); }
 
-		// Create SerialPort object
+		// Create the SerialPort object
 		SerialPort serialPort = new SerialPort();
 		serialPort.comPort = portDescriptor;
 		serialPort.friendlyName = "User-Specified Port";
 		serialPort.portDescription = "User-Specified Port";
-
 		return serialPort;
 	}
 
@@ -361,12 +378,14 @@ public final class SerialPort
 	private volatile int baudRate = 9600, dataBits = 8, stopBits = ONE_STOP_BIT, parity = NO_PARITY, eventFlags = 0;
 	private volatile int timeoutMode = TIMEOUT_NONBLOCKING, readTimeout = 0, writeTimeout = 0, flowControl = 0;
 	private volatile int sendDeviceQueueSize = 4096, receiveDeviceQueueSize = 4096;
-	private volatile SerialPortInputStream inputStream = null;
-	private volatile SerialPortOutputStream outputStream = null;
+	private volatile int safetySleepTimeMS = 200, rs485DelayBefore = 0, rs485DelayAfter = 0;
 	private volatile SerialPortDataListener userDataListener = null;
 	private volatile SerialPortEventListener serialEventListener = null;
 	private volatile String comPort, friendlyName, portDescription;
-	private volatile boolean isOpened = false, disableConfig = false, isRtsEnabled = true, isDtrEnabled = true;
+	private volatile boolean eventListenerRunning = false, disableConfig = false, rs485Mode = false;
+	private volatile boolean rs485ActiveHigh = true, isRtsEnabled = true, isDtrEnabled = true;
+	private final SerialPortInputStream inputStream = new SerialPortInputStream();
+	private final SerialPortOutputStream outputStream = new SerialPortOutputStream();
 
 	/**
 	 * Opens this serial port for reading and writing with an optional delay time and user-specified device buffer size.
@@ -378,19 +397,20 @@ public final class SerialPort
 	 * @param safetySleepTime The number of milliseconds to sleep before opening the port in case of frequent closing/openings.
 	 * @param deviceSendQueueSize The requested size in bytes of the internal device driver's output queue (no effect on OSX)
 	 * @param deviceReceiveQueueSize The requested size in bytes of the internal device driver's input queue (no effect on Linux/OSX)
-	 * @return Whether the port was successfully opened.
+	 * @return Whether the port was successfully opened with a valid configuration.
 	 */
-	public final boolean openPort(int safetySleepTime, int deviceSendQueueSize, int deviceReceiveQueueSize)
+	public final synchronized boolean openPort(int safetySleepTime, int deviceSendQueueSize, int deviceReceiveQueueSize)
 	{
 		// Set the send/receive internal buffer sizes, and return true if already opened
+		safetySleepTimeMS = safetySleepTime;
 		sendDeviceQueueSize = deviceSendQueueSize;
 		receiveDeviceQueueSize = deviceReceiveQueueSize;
-		if (isOpened)
+		if (portHandle > 0)
 			return configPort(portHandle);
 
 		// Force a sleep to ensure that the port does not become unusable due to rapid closing/opening on the part of the user
-		if (safetySleepTime > 0)
-			try { Thread.sleep(safetySleepTime); } catch (Exception e) {}
+		if (safetySleepTimeMS > 0)
+			try { Thread.sleep(safetySleepTimeMS); } catch (Exception e) { Thread.currentThread().interrupt(); }
 
 		// If this is an Android root application, we must explicitly allow serial port access to the library
 		File portFile = isAndroid ? new File(comPort) : null;
@@ -416,22 +436,21 @@ public final class SerialPort
 			{
 				if (process == null)
 					return false;
-				try { process.waitFor(); } catch (InterruptedException e) { return false; }
+				try { process.waitFor(); } catch (InterruptedException e) { Thread.currentThread().interrupt(); return false; }
 				try { process.getInputStream().close(); } catch (IOException e) { e.printStackTrace(); return false; }
 				try { process.getOutputStream().close(); } catch (IOException e) { e.printStackTrace(); return false; }
 				try { process.getErrorStream().close(); } catch (IOException e) { e.printStackTrace(); return false; }
-				try { Thread.sleep(500); } catch (InterruptedException e) { return false; }
+				try { Thread.sleep(500); } catch (InterruptedException e) { Thread.currentThread().interrupt(); return false; }
 			}
 		}
 
+		// Open the serial port and start an event-based listener if registered
 		if ((portHandle = openPortNative()) > 0)
 		{
-			inputStream = new SerialPortInputStream();
-			outputStream = new SerialPortOutputStream();
 			if (serialEventListener != null)
 				serialEventListener.startListening();
 		}
-		return isOpened;
+		return (portHandle > 0);
 	}
 
 	/**
@@ -442,22 +461,22 @@ public final class SerialPort
 	 * Note that calling this method on an already opened port will simply reconfigure the port parameters.
 	 *
 	 * @param safetySleepTime The number of milliseconds to sleep before opening the port in case of frequent closing/openings.
-	 * @return Whether the port was successfully opened.
+	 * @return Whether the port was successfully opened with a valid configuration.
 	 */
 	public final boolean openPort(int safetySleepTime) { return openPort(safetySleepTime, sendDeviceQueueSize, receiveDeviceQueueSize); }
 
 	/**
 	 * Opens this serial port for reading and writing.
 	 * <p>
-	 * This method is equivalent to calling {@link #openPort} with a value of 1000.
+	 * This method is equivalent to calling {@link #openPort} with a value of 200.
 	 * <p>
 	 * All serial port parameters or timeouts can be changed at any time before or after the port has been opened.
 	 * <p>
 	 * Note that calling this method on an already opened port will simply reconfigure the port parameters.
 	 *
-	 * @return Whether the port was successfully opened.
+	 * @return Whether the port was successfully opened with a valid configuration.
 	 */
-	public final boolean openPort() { return openPort(1000); }
+	public final boolean openPort() { return openPort(200); }
 
 	/**
 	 * Closes this serial port.
@@ -466,17 +485,12 @@ public final class SerialPort
 	 *
 	 * @return Whether the port was successfully closed.
 	 */
-	public final boolean closePort()
+	public final synchronized boolean closePort()
 	{
 		if (serialEventListener != null)
 			serialEventListener.stopListening();
-		if (isOpened && closePortNative(portHandle))
-		{
-			inputStream = null;
-			outputStream = null;
-			portHandle = -1;
-		}
-		return !isOpened;
+		closePortNative(portHandle);
+		return (portHandle <= 0);
 	}
 
 	/**
@@ -484,7 +498,7 @@ public final class SerialPort
 	 *
 	 * @return Whether the port is opened.
 	 */
-	public final boolean isOpen() { return isOpened; }
+	public final synchronized boolean isOpen() { return (portHandle > 0); }
 
 	/**
 	 * Disables the library from calling any of the underlying device driver configuration methods.
@@ -493,7 +507,7 @@ public final class SerialPort
 	 * with buggy device drivers. In that case, this function <b>must</b> be called before attempting to
 	 * open the port.
 	 */
-	public final void disablePortConfiguration() { disableConfig = true; }
+	public final synchronized void disablePortConfiguration() { disableConfig = true; }
 
 	// Serial Port Setup Methods
 	private static native void initializeLibrary();						// Initializes the JNI code
@@ -521,6 +535,9 @@ public final class SerialPort
 	private final native boolean getCTS(long portHandle);				// Returns whether the CTS signal is 1
 	private final native boolean getDSR(long portHandle);				// Returns whether the DSR signal is 1
 	private final native boolean getDCD(long portHandle);				// Returns whether the DCD signal is 1
+	private final native boolean getDTR(long portHandle);				// Returns whether the DTR signal is 1
+	private final native boolean getRTS(long portHandle);				// Returns whether the RTS signal is 1
+	private final native boolean getRI(long portHandle);				// Returns whether the RI signal is 1
 
 	/**
 	 * Returns the number of bytes available without blocking if {@link #readBytes(byte[], long)} were to be called immediately
@@ -600,6 +617,18 @@ public final class SerialPort
 	 * @return The number of bytes successfully written, or -1 if there was an error writing to the port.
 	 */
 	public final int writeBytes(byte[] buffer, long bytesToWrite, long offset) { return writeBytes(portHandle, buffer, bytesToWrite, offset); }
+	
+	/**
+	 * Returns the underlying transmit buffer size used by the serial port device driver. The device or operating system may choose to misrepresent this value.
+	 * @return The underlying device transmit buffer size.
+	 */
+	public final int getDeviceWriteBufferSize() { return sendDeviceQueueSize; }
+
+	/**
+	 * Returns the underlying receive buffer size used by the serial port device driver. The device or operating system may choose to misrepresent this value.
+	 * @return The underlying device receive buffer size.
+	 */
+	public final int getDeviceReadBufferSize() { return receiveDeviceQueueSize; }
 
 	/**
 	 * Sets the BREAK signal on the serial control line.
@@ -620,7 +649,7 @@ public final class SerialPort
 	public final boolean setRTS()
 	{
 		isRtsEnabled = true;
-		return (isOpened ? setRTS(portHandle) : presetRTS());
+		return ((portHandle > 0) ? setRTS(portHandle) : presetRTS());
 	}
 
 	/**
@@ -630,7 +659,7 @@ public final class SerialPort
 	public final boolean clearRTS()
 	{
 		isRtsEnabled = false;
-		return (isOpened ? clearRTS(portHandle) : preclearRTS());
+		return ((portHandle > 0) ? clearRTS(portHandle) : preclearRTS());
 	}
 
 	/**
@@ -640,7 +669,7 @@ public final class SerialPort
 	public final boolean setDTR()
 	{
 		isDtrEnabled = true;
-		return (isOpened ? setDTR(portHandle) : presetDTR());
+		return ((portHandle > 0) ? setDTR(portHandle) : presetDTR());
 	}
 
 	/**
@@ -650,7 +679,7 @@ public final class SerialPort
 	public final boolean clearDTR()
 	{
 		isDtrEnabled = false;
-		return (isOpened ? clearDTR(portHandle) : preclearDTR());
+		return ((portHandle > 0) ? clearDTR(portHandle) : preclearDTR());
 	}
 
 	/**
@@ -664,12 +693,34 @@ public final class SerialPort
 	 * @return Whether or not the DSR line is asserted.
 	 */
 	public final boolean getDSR() { return getDSR(portHandle); }
-
+	
 	/**
 	 * Returns whether the DCD line is currently asserted.
 	 * @return Whether or not the DCD line is asserted.
 	 */
 	public final boolean getDCD() { return getDCD(portHandle); }
+
+	/**
+	 * Returns whether the DTR line is currently asserted.
+	 * <p>
+	 * Note that polling this line's status is not supported on Windows, so results may be incorrect.
+	 * @return Whether or not the DTR line is asserted.
+	 */
+	public final boolean getDTR() { return getDTR(portHandle); }
+
+	/**
+	 * Returns whether the RTS line is currently asserted.
+	 * <p>
+	 * Note that polling this line's status is not supported on Windows, so results may be incorrect.
+	 * @return Whether or not the RTS line is asserted.
+	 */
+	public final boolean getRTS() { return getRTS(portHandle); }
+
+	/**
+	 * Returns whether the RI line is currently asserted.
+	 * @return Whether or not the RI line is asserted.
+	 */
+	public final boolean getRI() { return getRI(portHandle); }
 
 	// Default Constructor
 	private SerialPort() {}
@@ -679,25 +730,32 @@ public final class SerialPort
 	 * <p>
 	 * Calling this function enables event-based serial port callbacks to be used instead of, or in addition to, direct serial port read/write calls or the {@link java.io.InputStream}/{@link java.io.OutputStream} interface.
 	 * <p>
-	 * The parameter passed into this method must be an implementation of either the {@link SerialPortDataListener} or the {@link SerialPortPacketListener}.
-	 * The {@link SerialPortPacketListener} interface <b>must</b> be used if you plan to use event-based reading of <i>full</i> data packets over the serial port.
-	 * Otherwise, the simpler {@link SerialPortDataListener} may be used.
+	 * The parameter passed into this method must be an implementation of either {@link SerialPortDataListener}, {@link SerialPortDataListenerWithExceptions},
+	 * {@link SerialPortPacketListener}, {@link SerialPortMessageListener} or {@link SerialPortMessageListenerWithExceptions}.
+	 * The {@link SerialPortMessageListener} or {@link SerialPortMessageListenerWithExceptions} interface <b>should</b> be used if you plan to use event-based reading of <i>delimited</i> data messages over the serial port.
+	 * The {@link SerialPortPacketListener} interface <b>should</b> be used if you plan to use event-based reading of <i>full</i> data packets over the serial port.
+	 * Otherwise, the simpler {@link SerialPortDataListener} or {@link SerialPortDataListenerWithExceptions} may be used.
 	 * <p>
 	 * Only one listener can be registered at a time; however, that listener can be used to detect multiple types of serial port events.
-	 * Refer to {@link SerialPortDataListener} and {@link SerialPortPacketListener} for more information.
+	 * Refer to {@link SerialPortDataListener}, {@link SerialPortDataListenerWithExceptions}, {@link SerialPortPacketListener}, {@link SerialPortMessageListener}, and {@link SerialPortMessageListenerWithExceptions} for more information.
 	 *
-	 * @param listener A {@link SerialPortDataListener} or {@link SerialPortPacketListener}implementation to be used for event-based serial port communications.
+	 * @param listener A {@link SerialPortDataListener}, {@link SerialPortDataListenerWithExceptions}, {@link SerialPortPacketListener}, {@link SerialPortMessageListener}, or {@link SerialPortMessageListenerWithExceptions} implementation to be used for event-based serial port communications.
 	 * @return Whether the listener was successfully registered with the serial port.
 	 * @see SerialPortDataListener
+	 * @see SerialPortDataListenerWithExceptions
 	 * @see SerialPortPacketListener
+	 * @see SerialPortMessageListener
+	 * @see SerialPortMessageListenerWithExceptions
 	 */
-	public final boolean addDataListener(SerialPortDataListener listener)
+	public final synchronized boolean addDataListener(SerialPortDataListener listener)
 	{
 		if (userDataListener != null)
 			return false;
 		userDataListener = listener;
-		serialEventListener = new SerialPortEventListener((userDataListener instanceof SerialPortPacketListener) ?
-				((SerialPortPacketListener)userDataListener).getPacketSize() : 0);
+		serialEventListener = ((userDataListener instanceof SerialPortPacketListener) ? new SerialPortEventListener(((SerialPortPacketListener)userDataListener).getPacketSize()) :
+			((userDataListener instanceof SerialPortMessageListener) ?
+					new SerialPortEventListener(((SerialPortMessageListener)userDataListener).getMessageDelimiter(), ((SerialPortMessageListener)userDataListener).delimiterIndicatesEndOfMessage()) :
+						new SerialPortEventListener()));
 
 		eventFlags = 0;
 		if ((listener.getListeningEvents() & LISTENING_EVENT_DATA_AVAILABLE) > 0)
@@ -707,7 +765,7 @@ public final class SerialPort
 		if ((listener.getListeningEvents() & LISTENING_EVENT_DATA_WRITTEN) > 0)
 			eventFlags |= LISTENING_EVENT_DATA_WRITTEN;
 
-		if (isOpened)
+		if (portHandle > 0)
 		{
 			configEventFlags(portHandle);
 			serialEventListener.startListening();
@@ -718,18 +776,15 @@ public final class SerialPort
 	/**
 	 * Removes the associated {@link SerialPortDataListener} from the serial port interface.
 	 */
-	public final void removeDataListener()
+	public final synchronized void removeDataListener()
 	{
+		eventFlags = 0;
 		if (serialEventListener != null)
 		{
 			serialEventListener.stopListening();
 			serialEventListener = null;
 		}
 		userDataListener = null;
-
-		eventFlags = 0;
-		if (isOpened)
-			configEventFlags(portHandle);
 	}
 
 	/**
@@ -790,6 +845,7 @@ public final class SerialPort
 	 * @param newDataBits The number of data bits to use per word.
 	 * @param newStopBits The number of stop bits to use.
 	 * @param newParity The type of parity error-checking desired.
+	 * @return Whether the port configuration is valid or disallowed on this system (only meaningful after the port is already opened).
 	 * @see #ONE_STOP_BIT
 	 * @see #ONE_POINT_FIVE_STOP_BITS
 	 * @see #TWO_STOP_BITS
@@ -799,18 +855,59 @@ public final class SerialPort
 	 * @see #MARK_PARITY
 	 * @see #SPACE_PARITY
 	 */
-	public final void setComPortParameters(int newBaudRate, int newDataBits, int newStopBits, int newParity)
+	public final boolean setComPortParameters(int newBaudRate, int newDataBits, int newStopBits, int newParity)
+	{
+		return setComPortParameters(newBaudRate, newDataBits, newStopBits, newParity, rs485Mode);
+	}
+
+	/**
+	 * Sets all serial port parameters at one time.
+	 * <p>
+	 * Allows the user to set all port parameters with a single function call.
+	 * <p>
+	 * The baud rate can be any arbitrary value specified by the user.  The default value is 9600 baud.  The data bits parameter
+	 * specifies how many data bits to use per word.  The default is 8, but any values from 5 to 8 are acceptable.
+	 * <p>
+	 * The default number of stop bits is 1, but 2 bits can also be used or even 1.5 on Windows machines.  Please use the built-in
+	 * constants for this parameter ({@link #ONE_STOP_BIT}, {@link #ONE_POINT_FIVE_STOP_BITS}, {@link #TWO_STOP_BITS}).
+	 * <p>
+	 * The parity parameter specifies how error detection is carried out.  Again, the built-in constants should be used.
+	 * Acceptable values are {@link #NO_PARITY}, {@link #EVEN_PARITY}, {@link #ODD_PARITY}, {@link #MARK_PARITY}, and {@link #SPACE_PARITY}.
+	 * <p>
+	 * RS-485 mode can be used to enable transmit/receive mode signaling using the RTS pin.  This mode should be set if you plan
+	 * to use this library with an RS-485 device.  Note that this mode requires support from the underlying device driver, so it
+	 * may not work with all RS-485 devices.
+	 *
+	 * @param newBaudRate The desired baud rate for this serial port.
+	 * @param newDataBits The number of data bits to use per word.
+	 * @param newStopBits The number of stop bits to use.
+	 * @param newParity The type of parity error-checking desired.
+	 * @param useRS485Mode Whether to enable RS-485 mode.
+	 * @return Whether the port configuration is valid or disallowed on this system (only meaningful after the port is already opened).
+	 * @see #ONE_STOP_BIT
+	 * @see #ONE_POINT_FIVE_STOP_BITS
+	 * @see #TWO_STOP_BITS
+	 * @see #NO_PARITY
+	 * @see #EVEN_PARITY
+	 * @see #ODD_PARITY
+	 * @see #MARK_PARITY
+	 * @see #SPACE_PARITY
+	 */
+	public final synchronized boolean setComPortParameters(int newBaudRate, int newDataBits, int newStopBits, int newParity, boolean useRS485Mode)
 	{
 		baudRate = newBaudRate;
 		dataBits = newDataBits;
 		stopBits = newStopBits;
 		parity = newParity;
+		rs485Mode = useRS485Mode;
 
-		if (isOpened)
+		if (portHandle > 0)
 		{
-			try { Thread.sleep(200); } catch (Exception e) {}
-			configPort(portHandle);
+			if (safetySleepTimeMS > 0)
+				try { Thread.sleep(safetySleepTimeMS); } catch (Exception e) { Thread.currentThread().interrupt(); }
+			return configPort(portHandle);
 		}
+		return true;
 	}
 
 	/**
@@ -857,8 +954,9 @@ public final class SerialPort
 	 * @param newTimeoutMode The new timeout mode as specified above.
 	 * @param newReadTimeout The number of milliseconds of inactivity to tolerate before returning from a {@link #readBytes(byte[],long)} call.
 	 * @param newWriteTimeout The number of milliseconds of inactivity to tolerate before returning from a {@link #writeBytes(byte[],long)} call (effective only on Windows).
+	 * @return Whether the port configuration is valid or disallowed on this system (only meaningful after the port is already opened).
 	 */
-	public final void setComPortTimeouts(int newTimeoutMode, int newReadTimeout, int newWriteTimeout)
+	public final synchronized boolean setComPortTimeouts(int newTimeoutMode, int newReadTimeout, int newWriteTimeout)
 	{
 		timeoutMode = newTimeoutMode;
 		if (isWindows)
@@ -871,11 +969,13 @@ public final class SerialPort
 		else
 			readTimeout = Math.round((float)newReadTimeout / 100.0f) * 100;
 
-		if (isOpened)
+		if (portHandle > 0)
 		{
-			try { Thread.sleep(200); } catch (Exception e) {}
-			configTimeouts(portHandle);
+			if (safetySleepTimeMS > 0)
+				try { Thread.sleep(safetySleepTimeMS); } catch (Exception e) { Thread.currentThread().interrupt(); }
+			return configTimeouts(portHandle);
 		}
+		return true;
 	}
 
 	/**
@@ -884,16 +984,19 @@ public final class SerialPort
 	 * The default baud rate is 9600 baud.
 	 *
 	 * @param newBaudRate The desired baud rate for this serial port.
+	 * @return Whether the port configuration is valid or disallowed on this system (only meaningful after the port is already opened).
 	 */
-	public final void setBaudRate(int newBaudRate)
+	public final synchronized boolean setBaudRate(int newBaudRate)
 	{
 		baudRate = newBaudRate;
 
-		if (isOpened)
+		if (portHandle > 0)
 		{
-			try { Thread.sleep(200); } catch (Exception e) {}
-			configPort(portHandle);
+			if (safetySleepTimeMS > 0)
+				try { Thread.sleep(safetySleepTimeMS); } catch (Exception e) { Thread.currentThread().interrupt(); }
+			return configPort(portHandle);
 		}
+		return true;
 	}
 
 	/**
@@ -902,16 +1005,19 @@ public final class SerialPort
 	 * The default number of data bits per word is 8.
 	 *
 	 * @param newDataBits The desired number of data bits per word.
+	 * @return Whether the port configuration is valid or disallowed on this system (only meaningful after the port is already opened).
 	 */
-	public final void setNumDataBits(int newDataBits)
+	public final synchronized boolean setNumDataBits(int newDataBits)
 	{
 		dataBits = newDataBits;
 
-		if (isOpened)
+		if (portHandle > 0)
 		{
-			try { Thread.sleep(200); } catch (Exception e) {}
-			configPort(portHandle);
+			if (safetySleepTimeMS > 0)
+				try { Thread.sleep(safetySleepTimeMS); } catch (Exception e) { Thread.currentThread().interrupt(); }
+			return configPort(portHandle);
 		}
+		return true;
 	}
 
 	/**
@@ -923,19 +1029,22 @@ public final class SerialPort
 	 * Note that {@link #ONE_POINT_FIVE_STOP_BITS} stop bits may not be available on non-Windows systems.
 	 *
 	 * @param newStopBits The desired number of stop bits per word.
+	 * @return Whether the port configuration is valid or disallowed on this system (only meaningful after the port is already opened).
 	 * @see #ONE_STOP_BIT
 	 * @see #ONE_POINT_FIVE_STOP_BITS
 	 * @see #TWO_STOP_BITS
 	 */
-	public final void setNumStopBits(int newStopBits)
+	public final synchronized boolean setNumStopBits(int newStopBits)
 	{
 		stopBits = newStopBits;
 
-		if (isOpened)
+		if (portHandle > 0)
 		{
-			try { Thread.sleep(200); } catch (Exception e) {}
-			configPort(portHandle);
+			if (safetySleepTimeMS > 0)
+				try { Thread.sleep(safetySleepTimeMS); } catch (Exception e) { Thread.currentThread().interrupt(); }
+			return configPort(portHandle);
 		}
+		return true;
 	}
 
 	/**
@@ -964,6 +1073,7 @@ public final class SerialPort
 	 * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Linux: RTS/CTS, Xon, Xoff, Xon/Xoff
 	 *
 	 * @param newFlowControlSettings The desired type of flow control to enable for this serial port.
+	 * @return Whether the port configuration is valid or disallowed on this system (only meaningful after the port is already opened).
 	 * @see #FLOW_CONTROL_DISABLED
 	 * @see #FLOW_CONTROL_RTS_ENABLED
 	 * @see #FLOW_CONTROL_CTS_ENABLED
@@ -972,15 +1082,17 @@ public final class SerialPort
 	 * @see #FLOW_CONTROL_XONXOFF_IN_ENABLED
 	 * @see #FLOW_CONTROL_XONXOFF_OUT_ENABLED
 	 */
-	public final void setFlowControl(int newFlowControlSettings)
+	public final synchronized boolean setFlowControl(int newFlowControlSettings)
 	{
 		flowControl = newFlowControlSettings;
 
-		if (isOpened)
+		if (portHandle > 0)
 		{
-			try { Thread.sleep(200); } catch (Exception e) {}
-			configPort(portHandle);
+			if (safetySleepTimeMS > 0)
+				try { Thread.sleep(safetySleepTimeMS); } catch (Exception e) { Thread.currentThread().interrupt(); }
+			return configPort(portHandle);
 		}
+		return true;
 	}
 
 	/**
@@ -990,21 +1102,59 @@ public final class SerialPort
 	 * Acceptable values are {@link #NO_PARITY}, {@link #EVEN_PARITY}, {@link #ODD_PARITY}, {@link #MARK_PARITY}, and {@link #SPACE_PARITY}.
 	 *
 	 * @param newParity The desired parity scheme to be used.
+	 * @return Whether the port configuration is valid or disallowed on this system (only meaningful after the port is already opened).
 	 * @see #NO_PARITY
 	 * @see #EVEN_PARITY
 	 * @see #ODD_PARITY
 	 * @see #MARK_PARITY
 	 * @see #SPACE_PARITY
 	 */
-	public final void setParity(int newParity)
+	public final synchronized boolean setParity(int newParity)
 	{
 		parity = newParity;
 
-		if (isOpened)
+		if (portHandle > 0)
 		{
-			try { Thread.sleep(200); } catch (Exception e) {}
-			configPort(portHandle);
+			if (safetySleepTimeMS > 0)
+				try { Thread.sleep(safetySleepTimeMS); } catch (Exception e) { Thread.currentThread().interrupt(); }
+			return configPort(portHandle);
 		}
+		return true;
+	}
+
+	/**
+	 * Sets whether to enable RS-485 mode for this device.
+	 * <p>
+	 * RS-485 mode can be used to enable transmit/receive mode signaling using the RTS pin. This mode should be set if you plan
+	 * to use this library with an RS-485 device. Note that this mode requires support from the underlying device driver, so it
+	 * may not work with all RS-485 devices.
+	 * <p>
+	 * The RTS "active high" parameter specifies that the logical level of the RTS line will be set to 1 when transmitting and
+	 * 0 when receiving.
+	 * <p>
+	 * The delay parameters specify how long to wait before or after transmission of data before enabling or disabling
+	 * transmission mode via the RTS pin.
+	 *
+	 * @param useRS485Mode Whether to enable RS-485 mode.
+	 * @param rs485RtsActiveHigh Whether to set the RTS line to 1 when transmitting.
+	 * @param delayBeforeSendMicroseconds The time to wait after enabling transmit mode before sending the first data bit.
+	 * @param delayAfterSendMicroseconds The time to wait after sending the last data bit before disabling transmit mode.
+	 * @return Whether the port configuration is valid or disallowed on this system (only meaningful after the port is already opened).
+	 */
+	public final synchronized boolean setRs485ModeParameters(boolean useRS485Mode, boolean rs485RtsActiveHigh, int delayBeforeSendMicroseconds, int delayAfterSendMicroseconds)
+	{
+		rs485Mode = useRS485Mode;
+		rs485ActiveHigh = rs485RtsActiveHigh;
+		rs485DelayBefore = delayBeforeSendMicroseconds;
+		rs485DelayAfter = delayAfterSendMicroseconds;
+
+		if (portHandle > 0)
+		{
+			if (safetySleepTimeMS > 0)
+				try { Thread.sleep(safetySleepTimeMS); } catch (Exception e) { Thread.currentThread().interrupt(); }
+			return configPort(portHandle);
+		}
+		return true;
 	}
 
 	/**
@@ -1137,18 +1287,21 @@ public final class SerialPort
 	// Private EventListener class
 	private final class SerialPortEventListener
 	{
-		private volatile boolean isListening = false;
-		private final byte[] dataPacket;
-		private volatile int dataPacketIndex = 0;
+		private final boolean messageEndIsDelimited;
+		private final byte[] dataPacket, delimiters;
+		private volatile ByteArrayOutputStream messageBytes = new ByteArrayOutputStream();
+		private volatile int dataPacketIndex = 0, delimiterIndex = 0;
 		private Thread serialEventThread = null;
 
-		public SerialPortEventListener(int packetSizeToReceive) { dataPacket = new byte[packetSizeToReceive]; }
+		public SerialPortEventListener() { dataPacket = new byte[0]; delimiters = new byte[0]; messageEndIsDelimited = true; }
+		public SerialPortEventListener(int packetSizeToReceive) { dataPacket = new byte[packetSizeToReceive]; delimiters = new byte[0]; messageEndIsDelimited = true; }
+		public SerialPortEventListener(byte[] messageDelimiters, boolean delimiterForMessageEnd) { dataPacket = new byte[0]; delimiters = messageDelimiters; messageEndIsDelimited = delimiterForMessageEnd; }
 
 		public final void startListening()
 		{
-			if (isListening)
+			if (eventListenerRunning)
 				return;
-			isListening = true;
+			eventListenerRunning = true;
 
 			dataPacketIndex = 0;
 			serialEventThread = new Thread(new Runnable()
@@ -1156,8 +1309,19 @@ public final class SerialPort
 				@Override
 				public void run()
 				{
-					while (isListening && isOpened) { try { waitForSerialEvent(); } catch (NullPointerException e) { isListening = false; } }
-					isListening = false;
+					while (eventListenerRunning && (portHandle > 0))
+					{
+						try { waitForSerialEvent(); }
+						catch (Exception e)
+						{
+							eventListenerRunning = false;
+							if (userDataListener instanceof SerialPortDataListenerWithExceptions)
+								((SerialPortDataListenerWithExceptions)userDataListener).catchException(e);
+							else if (userDataListener instanceof SerialPortMessageListenerWithExceptions)
+								((SerialPortMessageListenerWithExceptions)userDataListener).catchException(e);
+						}
+					}
+					eventListenerRunning = false;
 				}
 			});
 			serialEventThread.start();
@@ -1165,19 +1329,26 @@ public final class SerialPort
 
 		public final void stopListening()
 		{
-			if (!isListening)
+			if (!eventListenerRunning)
 				return;
-			isListening = false;
+			eventListenerRunning = false;
 
 			int oldEventFlags = eventFlags;
 			eventFlags = 0;
 			configEventFlags(portHandle);
-			try { serialEventThread.join(); } catch (InterruptedException e) {}
-			serialEventThread = null;
 			eventFlags = oldEventFlags;
+			try
+			{
+				serialEventThread.join(500);
+				if (serialEventThread.isAlive())
+					serialEventThread.interrupt();
+				serialEventThread.join();
+			}
+			catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+			serialEventThread = null;
 		}
 
-		public final void waitForSerialEvent() throws NullPointerException
+		public final void waitForSerialEvent() throws Exception
 		{
 			switch (waitForEvent(portHandle))
 			{
@@ -1187,12 +1358,35 @@ public final class SerialPort
 					{
 						// Read data from serial port
 						int numBytesAvailable, bytesRemaining, newBytesIndex;
-						while ((numBytesAvailable = bytesAvailable(portHandle)) > 0)
+						while (eventListenerRunning && ((numBytesAvailable = bytesAvailable(portHandle)) > 0))
 						{
 							byte[] newBytes = new byte[numBytesAvailable];
 							newBytesIndex = 0;
 							bytesRemaining = readBytes(portHandle, newBytes, newBytes.length, 0);
-							if(dataPacket.length == 0)
+							if (delimiters.length > 0)
+							{
+								int startIndex = 0;
+								for (int offset = 0; offset < bytesRemaining; ++offset)
+									if (newBytes[offset] == delimiters[delimiterIndex])
+									{
+										if ((++delimiterIndex) == delimiters.length)
+										{
+											messageBytes.write(newBytes, startIndex, 1 + offset - startIndex);
+											byte[] byteArray = (messageEndIsDelimited ? messageBytes.toByteArray() : Arrays.copyOf(messageBytes.toByteArray(), messageBytes.size() - delimiters.length));
+											if ((byteArray.length > 0) && (messageEndIsDelimited || (delimiters[0] == byteArray[0])))
+												userDataListener.serialEvent(new SerialPortEvent(SerialPort.this, LISTENING_EVENT_DATA_RECEIVED, byteArray));
+											startIndex = offset + 1;
+											messageBytes.reset();
+											delimiterIndex = 0;
+											if (!messageEndIsDelimited)
+												messageBytes.write(delimiters, 0, delimiters.length);
+										}
+									}
+									else if (delimiterIndex != 0)
+										delimiterIndex = (newBytes[offset] == delimiters[0]) ? 1 : 0;
+								messageBytes.write(newBytes, startIndex, bytesRemaining - startIndex);
+							}
+							else if (dataPacket.length == 0)
 								userDataListener.serialEvent(new SerialPortEvent(SerialPort.this, LISTENING_EVENT_DATA_RECEIVED, newBytes.clone()));
 							else
 							{
@@ -1238,7 +1432,7 @@ public final class SerialPort
 		@Override
 		public final int available() throws SerialPortIOException
 		{
-			if (!isOpened)
+			if (portHandle <= 0)
 				throw new SerialPortIOException("This port appears to have been shutdown or disconnected.");
 			return bytesAvailable(portHandle);
 		}
@@ -1247,7 +1441,7 @@ public final class SerialPort
 		public final int read() throws SerialPortIOException, SerialPortTimeoutException
 		{
 			// Perform error checking
-			if (!isOpened)
+			if (portHandle <= 0)
 				throw new SerialPortIOException("This port appears to have been shutdown or disconnected.");
 
 			// Read from the serial port
@@ -1263,7 +1457,7 @@ public final class SerialPort
 			// Perform error checking
 			if (b == null)
 				throw new NullPointerException("A null pointer was passed in for the read buffer.");
-			if (!isOpened)
+			if (portHandle <= 0)
 				throw new SerialPortIOException("This port appears to have been shutdown or disconnected.");
 			if (b.length == 0)
 				return 0;
@@ -1283,7 +1477,7 @@ public final class SerialPort
 				throw new NullPointerException("A null pointer was passed in for the read buffer.");
 			if ((len < 0) || (off < 0) || (len > (b.length - off)))
 				throw new IndexOutOfBoundsException("The specified read offset plus length extends past the end of the specified buffer.");
-			if (!isOpened)
+			if (portHandle <= 0)
 				throw new SerialPortIOException("This port appears to have been shutdown or disconnected.");
 			if ((b.length == 0) || (len == 0))
 				return 0;
@@ -1298,7 +1492,7 @@ public final class SerialPort
 		@Override
 		public final long skip(long n) throws SerialPortIOException
 		{
-			if (!isOpened)
+			if (portHandle <= 0)
 				throw new SerialPortIOException("This port appears to have been shutdown or disconnected.");
 			byte[] buffer = new byte[(int)n];
 			return readBytes(portHandle, buffer, n, 0);
@@ -1315,12 +1509,12 @@ public final class SerialPort
 		@Override
 		public final void write(int b) throws SerialPortIOException, SerialPortTimeoutException
 		{
-			if (!isOpened)
+			if (portHandle <= 0)
 				throw new SerialPortIOException("This port appears to have been shutdown or disconnected.");
 			byteBuffer[0] = (byte)(b & 0xFF);
 			int bytesWritten = writeBytes(portHandle, byteBuffer, 1L, 0);
 			if (bytesWritten < 0)
-				throw new SerialPortIOException("This port appears to have been shutdown or disconnected.");
+				throw new SerialPortIOException("No bytes written. This port appears to have been shutdown or disconnected.");
 			else if (bytesWritten == 0)
 				throw new SerialPortTimeoutException("The write operation timed out before all data was written.");
 		}
@@ -1339,7 +1533,7 @@ public final class SerialPort
 				throw new NullPointerException("A null pointer was passed in for the write buffer.");
 			if ((len < 0) || (off < 0) || ((off + len) > b.length))
 				throw new IndexOutOfBoundsException("The specified write offset plus length extends past the end of the specified buffer.");
-			if (!isOpened)
+			if (portHandle <= 0)
 				throw new SerialPortIOException("This port appears to have been shutdown or disconnected.");
 			if (len == 0)
 				return;
@@ -1347,7 +1541,7 @@ public final class SerialPort
 			// Write to the serial port
 			int numWritten = writeBytes(portHandle, b, len, off);
 			if (numWritten < 0)
-				throw new SerialPortIOException("This port appears to have been shutdown or disconnected.");
+				throw new SerialPortIOException("No bytes written. This port appears to have been shutdown or disconnected.");
 			else if (numWritten == 0)
 				throw new SerialPortTimeoutException("The write operation timed out before all data was written.");
 		}

@@ -2,10 +2,10 @@
  * SerialPort_Windows.c
  *
  *       Created on:  Feb 25, 2012
- *  Last Updated on:  Oct 31, 2018
+ *  Last Updated on:  Apr 01, 2020
  *           Author:  Will Hedgecock
  *
- * Copyright (C) 2012-2018 Fazecast, Inc.
+ * Copyright (C) 2012-2020 Fazecast, Inc.
  *
  * This file is part of jSerialComm.
  *
@@ -46,7 +46,7 @@ jfieldID serialPortHandleField;
 jfieldID comPortField;
 jfieldID friendlyNameField;
 jfieldID portDescriptionField;
-jfieldID isOpenedField;
+jfieldID eventListenerRunningField;
 jfieldID disableConfigField;
 jfieldID isDtrEnabledField;
 jfieldID isRtsEnabledField;
@@ -57,6 +57,9 @@ jfieldID parityField;
 jfieldID flowControlField;
 jfieldID sendDeviceQueueSizeField;
 jfieldID receiveDeviceQueueSizeField;
+jfieldID rs485ModeField;
+jfieldID rs485DelayBeforeField;
+jfieldID rs485DelayAfterField;
 jfieldID timeoutModeField;
 jfieldID readTimeoutField;
 jfieldID writeTimeoutField;
@@ -347,7 +350,7 @@ JNIEXPORT void JNICALL Java_com_fazecast_jSerialComm_SerialPort_initializeLibrar
 	comPortField = env->GetFieldID(serialCommClass, "comPort", "Ljava/lang/String;");
 	friendlyNameField = env->GetFieldID(serialCommClass, "friendlyName", "Ljava/lang/String;");
 	portDescriptionField = env->GetFieldID(serialCommClass, "portDescription", "Ljava/lang/String;");
-	isOpenedField = env->GetFieldID(serialCommClass, "isOpened", "Z");
+	eventListenerRunningField = env->GetFieldID(serialCommClass, "eventListenerRunning", "Z");
 	disableConfigField = env->GetFieldID(serialCommClass, "disableConfig", "Z");
 	isDtrEnabledField = env->GetFieldID(serialCommClass, "isDtrEnabled", "Z");
 	isRtsEnabledField = env->GetFieldID(serialCommClass, "isRtsEnabled", "Z");
@@ -358,6 +361,9 @@ JNIEXPORT void JNICALL Java_com_fazecast_jSerialComm_SerialPort_initializeLibrar
 	flowControlField = env->GetFieldID(serialCommClass, "flowControl", "I");
 	sendDeviceQueueSizeField = env->GetFieldID(serialCommClass, "sendDeviceQueueSize", "I");
 	receiveDeviceQueueSizeField = env->GetFieldID(serialCommClass, "receiveDeviceQueueSize", "I");
+	rs485ModeField = env->GetFieldID(serialCommClass, "rs485Mode", "Z");
+	rs485DelayBeforeField = env->GetFieldID(serialCommClass, "rs485DelayBefore", "I");
+	rs485DelayAfterField = env->GetFieldID(serialCommClass, "rs485DelayAfter", "I");
 	timeoutModeField = env->GetFieldID(serialCommClass, "timeoutMode", "I");
 	readTimeoutField = env->GetFieldID(serialCommClass, "readTimeout", "I");
 	writeTimeoutField = env->GetFieldID(serialCommClass, "writeTimeout", "I");
@@ -381,7 +387,7 @@ JNIEXPORT jlong JNICALL Java_com_fazecast_jSerialComm_SerialPort_openPortNative(
 	{
 		// Configure the port parameters and timeouts
 		if (Java_com_fazecast_jSerialComm_SerialPort_configPort(env, obj, (jlong)serialPortHandle))
-			env->SetBooleanField(obj, isOpenedField, JNI_TRUE);
+			env->SetLongField(obj, serialPortHandleField, (jlong)serialPortHandle);
 		else
 		{
 			// Close the port if there was a problem setting the parameters
@@ -389,7 +395,7 @@ JNIEXPORT jlong JNICALL Java_com_fazecast_jSerialComm_SerialPort_openPortNative(
 			PurgeComm(serialPortHandle, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
 			while (!CloseHandle(serialPortHandle) && (numRetries-- > 0));
 			serialPortHandle = INVALID_HANDLE_VALUE;
-			env->SetBooleanField(obj, isOpenedField, JNI_FALSE);
+			env->SetLongField(obj, serialPortHandleField, -1l);
 		}
 	}
 
@@ -402,7 +408,7 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configPort(J
 	HANDLE serialPortHandle = (HANDLE)serialPortFD;
 	if (serialPortHandle == INVALID_HANDLE_VALUE)
 		return JNI_FALSE;
-	DCB dcbSerialParams = {0};
+	DCB dcbSerialParams{};
 	dcbSerialParams.DCBlength = sizeof(DCB);
 
 	// Get port parameters from Java class
@@ -414,6 +420,7 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configPort(J
 	DWORD sendDeviceQueueSize = (DWORD)env->GetIntField(obj, sendDeviceQueueSizeField);
 	DWORD receiveDeviceQueueSize = (DWORD)env->GetIntField(obj, receiveDeviceQueueSizeField);
 	BYTE configDisabled = (BYTE)env->GetBooleanField(obj, disableConfigField);
+	BYTE rs485ModeEnabled = (BYTE)env->GetBooleanField(obj, rs485ModeField);
 	BYTE isDtrEnabled = env->GetBooleanField(obj, isDtrEnabledField);
 	BYTE isRtsEnabled = env->GetBooleanField(obj, isRtsEnabledField);
 	BYTE stopBits = (stopBitsInt == com_fazecast_jSerialComm_SerialPort_ONE_STOP_BIT) ? ONESTOPBIT : (stopBitsInt == com_fazecast_jSerialComm_SerialPort_ONE_POINT_FIVE_STOP_BITS) ? ONE5STOPBITS : TWOSTOPBITS;
@@ -424,13 +431,13 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configPort(J
 	BOOL DSREnabled = (((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_DSR_ENABLED) > 0) ||
 			((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_DTR_ENABLED) > 0));
 	BYTE DTRValue = ((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_DTR_ENABLED) > 0) ? DTR_CONTROL_HANDSHAKE : (isDtrEnabled ? DTR_CONTROL_ENABLE : DTR_CONTROL_DISABLE);
-	BYTE RTSValue = ((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_RTS_ENABLED) > 0) ? RTS_CONTROL_HANDSHAKE : (isRtsEnabled ? RTS_CONTROL_ENABLE : RTS_CONTROL_DISABLE);
+	BYTE RTSValue = (rs485ModeEnabled ? RTS_CONTROL_TOGGLE :
+			(((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_RTS_ENABLED) > 0) ? RTS_CONTROL_HANDSHAKE : (isRtsEnabled ? RTS_CONTROL_ENABLE : RTS_CONTROL_DISABLE)));
 	BOOL XonXoffInEnabled = ((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_XONXOFF_IN_ENABLED) > 0);
 	BOOL XonXoffOutEnabled = ((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_XONXOFF_OUT_ENABLED) > 0);
 
 	// Retrieve existing port configuration
-	SetupComm(serialPortHandle, receiveDeviceQueueSize, sendDeviceQueueSize);
-	if (!configDisabled && !GetCommState(serialPortHandle, &dcbSerialParams))
+	if (!configDisabled && (!SetupComm(serialPortHandle, receiveDeviceQueueSize, sendDeviceQueueSize) || !GetCommState(serialPortHandle, &dcbSerialParams)))
 		return JNI_FALSE;
 
 	// Set updated port parameters
@@ -468,7 +475,7 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configTimeou
 	HANDLE serialPortHandle = (HANDLE)serialPortFD;
 	if (serialPortHandle == INVALID_HANDLE_VALUE)
 		return JNI_FALSE;
-	COMMTIMEOUTS timeouts = {0};
+	COMMTIMEOUTS timeouts{};
 	int timeoutMode = env->GetIntField(obj, timeoutModeField);
 	DWORD readTimeout = (DWORD)env->GetIntField(obj, readTimeoutField);
 	DWORD writeTimeout = (DWORD)env->GetIntField(obj, writeTimeoutField);
@@ -519,7 +526,7 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configEventF
 
 	// Get event flags from Java class
 	int eventsToMonitor = env->GetIntField(obj, eventFlagsField);
-	int eventFlags = 0;
+	int eventFlags = EV_ERR;
 	if (((eventsToMonitor & com_fazecast_jSerialComm_SerialPort_LISTENING_EVENT_DATA_AVAILABLE) > 0) ||
 			((eventsToMonitor & com_fazecast_jSerialComm_SerialPort_LISTENING_EVENT_DATA_RECEIVED) > 0))
 		eventFlags |= EV_RXCHAR;
@@ -529,7 +536,7 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configEventF
 	// Change read timeouts if we are monitoring data received
 	if ((eventsToMonitor & com_fazecast_jSerialComm_SerialPort_LISTENING_EVENT_DATA_RECEIVED) > 0)
 	{
-		COMMTIMEOUTS timeouts = {0};
+		COMMTIMEOUTS timeouts{};
 		timeouts.ReadIntervalTimeout = MAXDWORD;
 		timeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
 		timeouts.ReadTotalTimeoutConstant = 1000;
@@ -549,7 +556,7 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_waitForEvent(JNI
 	HANDLE serialPortHandle = (HANDLE)serialPortFD;
 	if (serialPortHandle == INVALID_HANDLE_VALUE)
 		return 0;
-	OVERLAPPED overlappedStruct = {0};
+	OVERLAPPED overlappedStruct{};
 	overlappedStruct.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	if (overlappedStruct.hEvent == NULL)
 	{
@@ -558,35 +565,47 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_waitForEvent(JNI
 	}
 
 	// Wait for a serial port event
-	DWORD eventMask, numBytesRead, readResult = WAIT_FAILED;
+	BOOL listenerRunning = TRUE;
+	DWORD eventMask = 0, numBytesRead = 0, errorsMask, readResult = WAIT_FAILED;
 	if (WaitCommEvent(serialPortHandle, &eventMask, &overlappedStruct) == FALSE)
 	{
 		if (GetLastError() != ERROR_IO_PENDING)			// Problem occurred
 		{
 			// Problem reading, close port
-			int numRetries = 10;
-			PurgeComm(serialPortHandle, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
-			while (!CloseHandle(serialPortHandle) && (numRetries-- > 0));
-			serialPortHandle = INVALID_HANDLE_VALUE;
-			env->SetLongField(obj, serialPortHandleField, -1l);
-			env->SetBooleanField(obj, isOpenedField, JNI_FALSE);
+			Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
+			listenerRunning = FALSE;
 		}
 		else
 		{
-			BOOL continueWaiting = TRUE;
-			while (continueWaiting)
+			do
 			{
-				readResult = WaitForSingleObject(overlappedStruct.hEvent, 750);
-				continueWaiting = ((readResult == WAIT_TIMEOUT) && (env->GetIntField(obj, eventFlagsField) != 0));
-			}
-			if ((readResult != WAIT_OBJECT_0) || (GetOverlappedResult(serialPortHandle, &overlappedStruct, &numBytesRead, TRUE) == FALSE))
+				listenerRunning = env->GetBooleanField(obj, eventListenerRunningField);
+				if (listenerRunning)
+					readResult = WaitForSingleObject(overlappedStruct.hEvent, 500);
+				else
+				{
+					CancelIo(serialPortHandle);
+					readResult = WaitForSingleObject(overlappedStruct.hEvent, INFINITE);
+				}
+			} while ((readResult == WAIT_TIMEOUT) && listenerRunning);
+			if ((readResult != WAIT_OBJECT_0) || (GetOverlappedResult(serialPortHandle, &overlappedStruct, &numBytesRead, FALSE) == FALSE))
 				numBytesRead = 0;
 		}
 	}
 
+	// Ensure that new data actually was received
+	if (listenerRunning)
+	{
+		COMSTAT commInfo;
+		if (!ClearCommError(serialPortHandle, &errorsMask, &commInfo))
+			Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
+		else
+			numBytesRead = commInfo.cbInQue;
+	}
+
 	// Return type of event if successful
 	CloseHandle(overlappedStruct.hEvent);
-	return ((eventMask & EV_RXCHAR) > 0) ? com_fazecast_jSerialComm_SerialPort_LISTENING_EVENT_DATA_AVAILABLE :
+	return (((eventMask & EV_RXCHAR) > 0) && numBytesRead) ? com_fazecast_jSerialComm_SerialPort_LISTENING_EVENT_DATA_AVAILABLE :
 			(((eventMask & EV_TXEMPTY) > 0) ? com_fazecast_jSerialComm_SerialPort_LISTENING_EVENT_DATA_WRITTEN : 0);
 }
 
@@ -599,7 +618,7 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_closePortNat
 	PurgeComm(serialPortHandle, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
 
 	// Force the port to enter non-blocking mode to ensure that any current reads return
-	COMMTIMEOUTS timeouts = {0};
+	COMMTIMEOUTS timeouts{};
 	timeouts.WriteTotalTimeoutMultiplier = 0;
 	timeouts.ReadIntervalTimeout = MAXDWORD;
 	timeouts.ReadTotalTimeoutMultiplier = 0;
@@ -609,16 +628,15 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_closePortNat
 
 	// Close the port
 	int numRetries = 10;
-	env->SetBooleanField(obj, isOpenedField, JNI_FALSE);
-	while (!CloseHandle(serialPortHandle) && (numRetries-- > 0));
+	while (!CloseHandle(serialPortHandle) && (GetLastError() != ERROR_INVALID_HANDLE) && (numRetries-- > 0));
 	if (numRetries > 0)
 	{
 		env->SetLongField(obj, serialPortHandleField, -1l);
 		return JNI_TRUE;
 	}
-	else
-		env->SetBooleanField(obj, isOpenedField, JNI_TRUE);
 
+	// Error closing port, reconfigure port settings
+	Java_com_fazecast_jSerialComm_SerialPort_configEventFlags(env, obj, serialPortFD);
 	return JNI_FALSE;
 }
 
@@ -628,12 +646,16 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_bytesAvailable(J
 	if (serialPortHandle == INVALID_HANDLE_VALUE)
 		return -1;
 
+	// Retrieve bytes available to read
 	COMSTAT commInfo;
-	if (!ClearCommError(serialPortHandle, NULL, &commInfo))
-		return -1;
-	DWORD numBytesAvailable = commInfo.cbInQue;
-
-	return (jint)numBytesAvailable;
+	DWORD errorsMask;
+	if (!ClearCommError(serialPortHandle, &errorsMask, &commInfo))
+	{
+		// Problem detected, close port
+		Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
+		serialPortHandle = INVALID_HANDLE_VALUE;
+	}
+	return (serialPortHandle == INVALID_HANDLE_VALUE) ? -1 : commInfo.cbInQue;
 }
 
 JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_bytesAwaitingWrite(JNIEnv *env, jobject obj, jlong serialPortFD)
@@ -642,20 +664,37 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_bytesAwaitingWri
 	if (serialPortHandle == INVALID_HANDLE_VALUE)
 		return -1;
 
+	// Retrieve bytes awaiting write
 	COMSTAT commInfo;
-	if (!ClearCommError(serialPortHandle, NULL, &commInfo))
-		return -1;
-	DWORD numBytesToWrite = commInfo.cbOutQue;
-
-	return (jint)numBytesToWrite;
+	DWORD errorsMask;
+	if (!ClearCommError(serialPortHandle, &errorsMask, &commInfo))
+	{
+		// Problem detected, close port
+		Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
+		serialPortHandle = INVALID_HANDLE_VALUE;
+	}
+	return (serialPortHandle == INVALID_HANDLE_VALUE) ? -1 : commInfo.cbOutQue;
 }
 
 JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_readBytes(JNIEnv *env, jobject obj, jlong serialPortFD, jbyteArray buffer, jlong bytesToRead, jlong offset)
 {
+	// Retrieve the serial port handle
 	HANDLE serialPortHandle = (HANDLE)serialPortFD;
 	if (serialPortHandle == INVALID_HANDLE_VALUE)
 		return -1;
-	OVERLAPPED overlappedStruct = {0};
+
+	// Check for a disconnected serial port
+	COMSTAT commInfo;
+	DWORD errorsMask;
+	if (!ClearCommError(serialPortHandle, &errorsMask, &commInfo))
+	{
+		// Problem detected, close port
+		Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
+		return -1;
+	}
+
+	// Create an asynchronous result structure
+	OVERLAPPED overlappedStruct{};
     overlappedStruct.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (overlappedStruct.hEvent == NULL)
     {
@@ -664,46 +703,40 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_readBytes(JNIEnv
     }
     char *readBuffer = (char*)malloc(bytesToRead);
     DWORD numBytesRead = 0;
-    BOOL result;
 
-    // Read from serial port
-    if ((result = ReadFile(serialPortHandle, readBuffer, bytesToRead, &numBytesRead, &overlappedStruct)) == FALSE)
-    {
-    	if (GetLastError() != ERROR_IO_PENDING)			// Problem occurred
-		{
-			// Problem reading, close port
-			int numRetries = 10;
-			PurgeComm(serialPortHandle, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
-			while (!CloseHandle(serialPortHandle) && (numRetries-- > 0));
-			serialPortHandle = INVALID_HANDLE_VALUE;
-			env->SetLongField(obj, serialPortHandleField, -1l);
-			env->SetBooleanField(obj, isOpenedField, JNI_FALSE);
-		}
-		else if ((result = GetOverlappedResult(serialPortHandle, &overlappedStruct, &numBytesRead, TRUE)) == FALSE)
-		{
-			// Problem reading, close port
-			int numRetries = 10;
-			PurgeComm(serialPortHandle, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
-			while (!CloseHandle(serialPortHandle) && (numRetries-- > 0));
-			serialPortHandle = INVALID_HANDLE_VALUE;
-			env->SetLongField(obj, serialPortHandleField, -1l);
-			env->SetBooleanField(obj, isOpenedField, JNI_FALSE);
-		}
-    }
+    // Read from serial port and close upon error
+    BOOL result;
+    if (((result = ReadFile(serialPortHandle, readBuffer, bytesToRead, NULL, &overlappedStruct)) == FALSE) && (GetLastError() != ERROR_IO_PENDING))
+		Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
+	else if ((result = GetOverlappedResult(serialPortHandle, &overlappedStruct, &numBytesRead, TRUE)) == FALSE)
+		Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
 
     // Return number of bytes read if successful
     CloseHandle(overlappedStruct.hEvent);
     env->SetByteArrayRegion(buffer, offset, numBytesRead, (jbyte*)readBuffer);
     free(readBuffer);
-	return (result == TRUE) && (env->GetBooleanField(obj, isOpenedField)) ? numBytesRead : -1;
+	return (result == TRUE) ? numBytesRead : -1;
 }
 
 JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_writeBytes(JNIEnv *env, jobject obj, jlong serialPortFD, jbyteArray buffer, jlong bytesToWrite, jlong offset)
 {
+	// Retrieve the serial port handle
 	HANDLE serialPortHandle = (HANDLE)serialPortFD;
 	if (serialPortHandle == INVALID_HANDLE_VALUE)
 		return -1;
-	OVERLAPPED overlappedStruct = {0};
+
+	// Check for a disconnected serial port
+	COMSTAT commInfo;
+	DWORD errorsMask;
+	if (!ClearCommError(serialPortHandle, &errorsMask, &commInfo))
+	{
+		// Problem detected, close port
+		Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
+		return -1;
+	}
+
+	// Create an asynchronous result structure
+	OVERLAPPED overlappedStruct{};
 	overlappedStruct.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	if (overlappedStruct.hEvent == NULL)
 	{
@@ -714,38 +747,11 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_writeBytes(JNIEn
 	DWORD numBytesWritten = 0;
 	BOOL result;
 
-	// Set the DTR line to high if using RS-422
-	//EscapeCommFunction(serialPortHandle, SETDTR);
-
-	// Write to serial port
-	if ((result = WriteFile(serialPortHandle, writeBuffer+offset, bytesToWrite, &numBytesWritten, &overlappedStruct)) == FALSE)
-	{
-		if (GetLastError() != ERROR_IO_PENDING)
-		{
-			// Problem writing, close port
-			int numRetries = 10;
-			PurgeComm(serialPortHandle, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
-			while (!CloseHandle(serialPortHandle) && (numRetries-- > 0));
-			serialPortHandle = INVALID_HANDLE_VALUE;
-			env->SetLongField(obj, serialPortHandleField, -1l);
-			env->SetBooleanField(obj, isOpenedField, JNI_FALSE);
-		}
-		else if ((result = GetOverlappedResult(serialPortHandle, &overlappedStruct, &numBytesWritten, TRUE)) == FALSE)
-		{
-			// Problem reading, close port
-			int numRetries = 10;
-			PurgeComm(serialPortHandle, PURGE_RXABORT | PURGE_RXCLEAR | PURGE_TXABORT | PURGE_TXCLEAR);
-			while (!CloseHandle(serialPortHandle) && (numRetries-- > 0));
-			serialPortHandle = INVALID_HANDLE_VALUE;
-			env->SetLongField(obj, serialPortHandleField, -1l);
-			env->SetBooleanField(obj, isOpenedField, JNI_FALSE);
-		}
-	}
-
-	// Clear the DTR line if using RS-422
-	//COMSTAT commInfo;
-	//do { ClearCommError(serialPortHandle, NULL, &commInfo); } while (commInfo.cbOutQue > 0);
-	//EscapeCommFunction(serialPortHandle, CLRDTR);
+	// Write to serial port and close upon error
+	if (((result = WriteFile(serialPortHandle, writeBuffer+offset, bytesToWrite, NULL, &overlappedStruct)) == FALSE) && (GetLastError() != ERROR_IO_PENDING))
+		Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
+	else if ((result = GetOverlappedResult(serialPortHandle, &overlappedStruct, &numBytesWritten, TRUE)) == FALSE)
+		Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
 
 	// Return number of bytes written if successful
 	CloseHandle(overlappedStruct.hEvent);
@@ -792,16 +798,26 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_presetRTS(JN
 	const char* comPort = strrchr(portName, '\\');
 
 	// Try to preset the RTS mode of the COM port using a Windows command
-	int result = -1;
+	int result = 0;
 	if (comPort != NULL)
 	{
-		char commandString[32];
-		sprintf(commandString, "MODE %s rts=on", comPort + 1);
-		result = system(commandString);
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+		char commandString[64];
+		ZeroMemory(&si, sizeof(si));
+		ZeroMemory(&pi, sizeof(pi));
+		si.cb = sizeof(si);
+		si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+		si.wShowWindow = SW_HIDE;
+		sprintf(commandString, "mode.com %s rts=on", comPort + 1);
+		result = CreateProcess(NULL, commandString, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
 	}
 
 	env->ReleaseStringUTFChars(portNameJString, portName);
-	return (result == 0);
+	return (result != 0);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_preclearRTS(JNIEnv *env, jobject obj)
@@ -811,16 +827,26 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_preclearRTS(
 	const char* comPort = strrchr(portName, '\\');
 
 	// Try to preset the RTS mode of the COM port using a Windows command
-	int result = -1;
+	int result = 0;
 	if (comPort != NULL)
 	{
-		char commandString[32];
-		sprintf(commandString, "MODE %s rts=off", comPort + 1);
-		result = system(commandString);
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+		char commandString[64];
+		ZeroMemory(&si, sizeof(si));
+		ZeroMemory(&pi, sizeof(pi));
+		si.cb = sizeof(si);
+		si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+		si.wShowWindow = SW_HIDE;
+		sprintf(commandString, "mode.com %s rts=off", comPort + 1);
+		result = CreateProcess(NULL, commandString, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
 	}
 
 	env->ReleaseStringUTFChars(portNameJString, portName);
-	return (result == 0);
+	return (result != 0);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_setDTR(JNIEnv *env, jobject obj, jlong serialPortFD)
@@ -846,16 +872,26 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_presetDTR(JN
 	const char* comPort = strrchr(portName, '\\');
 
 	// Try to preset the DTR mode of the COM port using a Windows command
-	int result = -1;
+	int result = 0;
 	if (comPort != NULL)
 	{
-		char commandString[32];
-		sprintf(commandString, "MODE %s dtr=on", comPort + 1);
-		result = system(commandString);
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+		char commandString[64];
+		ZeroMemory(&si, sizeof(si));
+		ZeroMemory(&pi, sizeof(pi));
+		si.cb = sizeof(si);
+		si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+		si.wShowWindow = SW_HIDE;
+		sprintf(commandString, "mode.com %s dtr=on", comPort + 1);
+		result = CreateProcess(NULL, commandString, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
 	}
 
 	env->ReleaseStringUTFChars(portNameJString, portName);
-	return (result == 0);
+	return (result != 0);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_preclearDTR(JNIEnv *env, jobject obj)
@@ -865,16 +901,26 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_preclearDTR(
 	const char* comPort = strrchr(portName, '\\');
 
 	// Try to preset the DTR mode of the COM port using a Windows command
-	int result = -1;
+	int result = 0;
 	if (comPort != NULL)
 	{
-		char commandString[32];
-		sprintf(commandString, "MODE %s dtr=off", comPort + 1);
-		result = system(commandString);
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+		char commandString[64];
+		ZeroMemory(&si, sizeof(si));
+		ZeroMemory(&pi, sizeof(pi));
+		si.cb = sizeof(si);
+		si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+		si.wShowWindow = SW_HIDE;
+		sprintf(commandString, "mode.com %s dtr=off", comPort + 1);
+		result = CreateProcess(NULL, commandString, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
 	}
 
 	env->ReleaseStringUTFChars(portNameJString, portName);
-	return (result == 0);
+	return (result != 0);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_getCTS(JNIEnv *env, jobject obj, jlong serialPortFD)
@@ -893,6 +939,40 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_getDSR(JNIEn
 		return JNI_FALSE;
 	DWORD modemStatus = 0;
 	return GetCommModemStatus(serialPortHandle, &modemStatus) && (modemStatus & MS_DSR_ON);
+}
+
+JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_getDCD(JNIEnv *env, jobject obj, jlong serialPortFD)
+{
+	HANDLE serialPortHandle = (HANDLE)serialPortFD;
+	if (serialPortHandle == INVALID_HANDLE_VALUE)
+		return JNI_FALSE;
+	DWORD modemStatus = 0;
+	return GetCommModemStatus(serialPortHandle, &modemStatus) && (modemStatus & MS_RLSD_ON);
+}
+
+JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_getDTR(JNIEnv *env, jobject obj, jlong serialPortFD)
+{
+	HANDLE serialPortHandle = (HANDLE)serialPortFD;
+	if (serialPortHandle == INVALID_HANDLE_VALUE)
+		return JNI_FALSE;
+	return env->GetBooleanField(obj, isDtrEnabledField);
+}
+
+JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_getRTS(JNIEnv *env, jobject obj, jlong serialPortFD)
+{
+	HANDLE serialPortHandle = (HANDLE)serialPortFD;
+	if (serialPortHandle == INVALID_HANDLE_VALUE)
+		return JNI_FALSE;
+	return env->GetBooleanField(obj, isRtsEnabledField);
+}
+
+JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_getRI(JNIEnv *env, jobject obj, jlong serialPortFD)
+{
+	HANDLE serialPortHandle = (HANDLE)serialPortFD;
+	if (serialPortHandle == INVALID_HANDLE_VALUE)
+		return JNI_FALSE;
+	DWORD modemStatus = 0;
+	return GetCommModemStatus(serialPortHandle, &modemStatus) && (modemStatus & MS_RING_ON);
 }
 
 #endif

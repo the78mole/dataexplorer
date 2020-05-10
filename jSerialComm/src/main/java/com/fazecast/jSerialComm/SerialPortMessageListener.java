@@ -1,8 +1,8 @@
 /*
- * SerialPortPacketListener.java
+ * SerialPortMessageListener.java
  *
- *       Created on:  Feb 25, 2015
- *  Last Updated on:  Jan 03, 2018
+ *       Created on:  Mar 14, 2019
+ *  Last Updated on:  Mar 19, 2019
  *           Author:  Will Hedgecock
  *
  * Copyright (C) 2012-2020 Fazecast, Inc.
@@ -26,7 +26,7 @@
 package com.fazecast.jSerialComm;
 
 /**
- * This interface must be implemented to enable full packet reads using event-based serial port I/O.
+ * This interface must be implemented to enable delimited message reads using event-based serial port I/O.
  * <p>
  * <i>Note</i>: Using this interface will negate any serial port read timeout settings since they make no sense in an asynchronous context.
  * 
@@ -35,12 +35,19 @@ package com.fazecast.jSerialComm;
  * @see com.fazecast.jSerialComm.SerialPortDataListener
  * @see java.util.EventListener
  */
-public interface SerialPortPacketListener extends SerialPortDataListener
+public interface SerialPortMessageListener extends SerialPortDataListener
 {
 	/**
-	 * Must be overridden to return the desired number of bytes that <b>must</b> be read before the {@link #serialEvent(SerialPortEvent)} callback is triggered.
+	 * Must be overridden to return the expected message delimiter bytes that <b>must</b> be encountered before the {@link #serialEvent(SerialPortEvent)} callback is triggered.
 	 * 
-	 * @return The number of bytes that must be read before the {@link #serialEvent(SerialPortEvent)} callback is triggered.
+	 * @return A byte array containing the expected message delimiters that must be encountered before the {@link #serialEvent(SerialPortEvent)} callback is triggered.
 	 */
-	public abstract int getPacketSize();
+	public abstract byte[] getMessageDelimiter();
+
+	/**
+	 * Must be overridden to return whether the message delimiter indicates the end or the beginning of a message.
+	 * 
+	 * @return A boolean indicating whether the message delimiter indicates the end or the beginning of a message.
+	 */
+	public abstract boolean delimiterIndicatesEndOfMessage();
 }

@@ -2,10 +2,10 @@
  * SerialPortTest.java
  *
  *       Created on:  Feb 27, 2015
- *  Last Updated on:  Jan 10, 2018
+ *  Last Updated on:  Feb 20, 2020
  *           Author:  Will Hedgecock
  *
- * Copyright (C) 2012-2018 Fazecast, Inc.
+ * Copyright (C) 2012-2020 Fazecast, Inc.
  *
  * This file is part of jSerialComm.
  *
@@ -32,7 +32,7 @@ import java.util.Scanner;
  * This class provides a test case for the jSerialComm library.
  * 
  * @author Will Hedgecock &lt;will.hedgecock@gmail.com&gt;
- * @version 2.4.1
+ * @version 2.6.2
  * @see java.io.InputStream
  * @see java.io.OutputStream
  */
@@ -55,8 +55,35 @@ public class SerialPortTest
 		public int getPacketSize() { return 100; }
 	}
 	
+	private static final class MessageListener implements SerialPortMessageListener
+	{
+		public String byteToHex(byte num)
+		{
+			char[] hexDigits = new char[2];
+			hexDigits[0] = Character.forDigit((num >> 4) & 0xF, 16);
+			hexDigits[1] = Character.forDigit((num & 0xF), 16);
+			return new String(hexDigits);
+		}
+		@Override
+		public int getListeningEvents() { return SerialPort.LISTENING_EVENT_DATA_RECEIVED; }
+		@Override
+		public void serialEvent(SerialPortEvent event)
+		{
+			byte[] byteArray = event.getReceivedData();
+			StringBuffer hexStringBuffer = new StringBuffer();
+			for (int i = 0; i < byteArray.length; i++)
+				hexStringBuffer.append(byteToHex(byteArray[i]));
+			System.out.println("Received the following message: " + hexStringBuffer.toString());
+		}
+		@Override
+		public byte[] getMessageDelimiter() { return new byte[]{ (byte)0xB5, (byte)0x62 }; }
+		@Override
+		public boolean delimiterIndicatesEndOfMessage() { return false; }
+	}
+
 	static public void main(String[] args)
 	{
+		System.out.println("\nUsing Library Version v" + SerialPort.getVersion());
 		SerialPort[] ports = SerialPort.getCommPorts();
 		System.out.println("\nAvailable Ports:\n");
 		for (int i = 0; i < ports.length; ++i)
@@ -83,8 +110,8 @@ public class SerialPortTest
 		else
 			ubxPort = ports[serialPortChoice];
 		byte[] readBuffer = new byte[2048];
-		
-		boolean openedSuccessfully = ubxPort.openPort();
+		System.out.println("\nPre-setting RTS: " + (ubxPort.setRTS() ? "Success" : "Failure"));
+		boolean openedSuccessfully = ubxPort.openPort(0);
 		System.out.println("\nOpening " + ubxPort.getSystemPortName() + ": " + ubxPort.getDescriptivePortName() + " - " + ubxPort.getPortDescription() + ": " + openedSuccessfully);
 		if (!openedSuccessfully)
 			return;
@@ -158,6 +185,7 @@ public class SerialPortTest
 			public void serialEvent(SerialPortEvent event)
 			{
 				SerialPort comPort = event.getSerialPort();
+				System.out.println("Available: " + comPort.bytesAvailable() + " bytes.");
 				byte[] newData = new byte[comPort.bytesAvailable()];
 				int numRead = comPort.readBytes(newData, newData.length);
 				System.out.println("Read " + numRead + " bytes.");
@@ -169,8 +197,13 @@ public class SerialPortTest
 		PacketListener listener = new PacketListener();
 		ubxPort.addDataListener(listener);
 		try { Thread.sleep(5000); } catch (Exception e) {}
-		System.out.println("\n\nClosing " + ubxPort.getDescriptivePortName() + ": " + ubxPort.closePort());
 		ubxPort.removeDataListener();
+		System.out.println("\nNow listening for byte-delimited binary messages\n");
+		MessageListener messageListener = new MessageListener();
+		ubxPort.addDataListener(messageListener);
+		try { Thread.sleep(5000); } catch (Exception e) {}
+		ubxPort.removeDataListener();
+		System.out.println("\n\nClosing " + ubxPort.getDescriptivePortName() + ": " + ubxPort.closePort());
 		try { Thread.sleep(1000); } catch (InterruptedException e1) { e1.printStackTrace(); }
 		System.out.println("Reopening " + ubxPort.getDescriptivePortName() + ": " + ubxPort.openPort() + "\n");
 		ubxPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
@@ -181,7 +214,31 @@ public class SerialPortTest
 				System.out.print((char)in.read());
 			in.close();
 		} catch (Exception e) { e.printStackTrace(); }
-		System.out.println("\n\nAttempting to read from two serial ports simultaneously\n");
+		System.out.println("\n\nClosing " + ubxPort.getDescriptivePortName() + ": " + ubxPort.closePort());
+		openedSuccessfully = ubxPort.openPort(0);
+		System.out.println("Reopening " + ubxPort.getSystemPortName() + ": " + ubxPort.getDescriptivePortName() + ": " + openedSuccessfully);
+		if (!openedSuccessfully)
+			return;
+		System.out.println("Unplug the device sometime in the next 10 seconds to ensure that it closes properly...\n");
+		ubxPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 0, 0);
+		ubxPort.addDataListener(new SerialPortDataListener() {
+			@Override
+			public int getListeningEvents() { return SerialPort.LISTENING_EVENT_DATA_AVAILABLE; }
+			@Override
+			public void serialEvent(SerialPortEvent event)
+			{
+				SerialPort comPort = event.getSerialPort();
+				System.out.println("Available: " + comPort.bytesAvailable() + " bytes.");
+				byte[] newData = new byte[comPort.bytesAvailable()];
+				int numRead = comPort.readBytes(newData, newData.length);
+				System.out.println("Read " + numRead + " bytes.");
+			}
+		});
+		try { Thread.sleep(10000); } catch (Exception e) {}
+		ubxPort.removeDataListener();
+		System.out.println("\n\nClosing " + ubxPort.getDescriptivePortName() + ": " + ubxPort.closePort());
+
+		/*System.out.println("\n\nAttempting to read from two serial ports simultaneously\n");
 		System.out.println("\nAvailable Ports:\n");
 		for (int i = 0; i < ports.length; ++i)
 			System.out.println("   [" + i + "] " + ports[i].getSystemPortName() + ": " + ports[i].getDescriptivePortName() + " - " + ports[i].getPortDescription());
@@ -223,6 +280,6 @@ public class SerialPortTest
 			if (scanner.hasNextLine())
 				System.out.println("Full Line #" + i + ": " + scanner.nextLine());
 		scanner.close();
-		System.out.println("\n\nClosing " + ubxPort.getDescriptivePortName() + ": " + ubxPort.closePort());
+		System.out.println("\n\nClosing " + ubxPort.getDescriptivePortName() + ": " + ubxPort.closePort());*/
 	}
 }

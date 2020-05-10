@@ -24,9 +24,8 @@
         <file path="/jSerialComm/LICENSE-APACHE-2.0"/>
         <file path="/jSerialComm/README.md"/>
         <file path="/jSerialComm/LICENSE-LGPL-3.0"/>
-        <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Linux.armv7"/>
-        <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;OSX.x86"/>
         <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;OSX.x86_64"/>
+        <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Linux.armv7"/>
         <file path="/jSerialComm/AUTHORS.md"/>
         <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Linux.armv5"/>
         <javaElement handleIdentifier="=jSerialComm/src\/main\/resources&lt;Linux.armv8_64"/>

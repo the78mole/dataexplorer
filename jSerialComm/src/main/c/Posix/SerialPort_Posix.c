@@ -2,10 +2,10 @@
  * SerialPort_Posix.c
  *
  *       Created on:  Feb 25, 2012
- *  Last Updated on:  Dec 07, 2018
+ *  Last Updated on:  Apr 29, 2020
  *           Author:  Will Hedgecock
  *
- * Copyright (C) 2012-2018 Fazecast, Inc.
+ * Copyright (C) 2012-2020 Fazecast, Inc.
  *
  * This file is part of jSerialComm.
  *
@@ -28,6 +28,7 @@
 #include <poll.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/file.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <termios.h>
@@ -52,7 +53,7 @@ jfieldID serialPortFdField;
 jfieldID comPortField;
 jfieldID friendlyNameField;
 jfieldID portDescriptionField;
-jfieldID isOpenedField;
+jfieldID eventListenerRunningField;
 jfieldID disableConfigField;
 jfieldID isDtrEnabledField;
 jfieldID isRtsEnabledField;
@@ -63,6 +64,10 @@ jfieldID parityField;
 jfieldID flowControlField;
 jfieldID sendDeviceQueueSizeField;
 jfieldID receiveDeviceQueueSizeField;
+jfieldID rs485ModeField;
+jfieldID rs485ActiveHighField;
+jfieldID rs485DelayBeforeField;
+jfieldID rs485DelayAfterField;
 jfieldID timeoutModeField;
 jfieldID readTimeoutField;
 jfieldID writeTimeoutField;
@@ -213,7 +218,7 @@ JNIEXPORT void JNICALL Java_com_fazecast_jSerialComm_SerialPort_initializeLibrar
 	comPortField = (*env)->GetFieldID(env, serialCommClass, "comPort", "Ljava/lang/String;");
 	friendlyNameField = (*env)->GetFieldID(env, serialCommClass, "friendlyName", "Ljava/lang/String;");
 	portDescriptionField = (*env)->GetFieldID(env, serialCommClass, "portDescription", "Ljava/lang/String;");
-	isOpenedField = (*env)->GetFieldID(env, serialCommClass, "isOpened", "Z");
+	eventListenerRunningField = (*env)->GetFieldID(env, serialCommClass, "eventListenerRunning", "Z");
 	disableConfigField = (*env)->GetFieldID(env, serialCommClass, "disableConfig", "Z");
 	isDtrEnabledField = (*env)->GetFieldID(env, serialCommClass, "isDtrEnabled", "Z");
 	isRtsEnabledField = (*env)->GetFieldID(env, serialCommClass, "isRtsEnabled", "Z");
@@ -224,6 +229,10 @@ JNIEXPORT void JNICALL Java_com_fazecast_jSerialComm_SerialPort_initializeLibrar
 	flowControlField = (*env)->GetFieldID(env, serialCommClass, "flowControl", "I");
 	sendDeviceQueueSizeField = (*env)->GetFieldID(env, serialCommClass, "sendDeviceQueueSize", "I");
 	receiveDeviceQueueSizeField = (*env)->GetFieldID(env, serialCommClass, "receiveDeviceQueueSize", "I");
+	rs485ModeField = (*env)->GetFieldID(env, serialCommClass, "rs485Mode", "Z");
+	rs485ActiveHighField = (*env)->GetFieldID(env, serialCommClass, "rs485ActiveHigh", "Z");
+	rs485DelayBeforeField = (*env)->GetFieldID(env, serialCommClass, "rs485DelayBefore", "I");
+	rs485DelayAfterField = (*env)->GetFieldID(env, serialCommClass, "rs485DelayAfter", "I");
 	timeoutModeField = (*env)->GetFieldID(env, serialCommClass, "timeoutMode", "I");
 	readTimeoutField = (*env)->GetFieldID(env, serialCommClass, "readTimeout", "I");
 	writeTimeoutField = (*env)->GetFieldID(env, serialCommClass, "writeTimeout", "I");
@@ -242,40 +251,50 @@ JNIEXPORT jlong JNICALL Java_com_fazecast_jSerialComm_SerialPort_openPortNative(
 	const char *portName = (*env)->GetStringUTFChars(env, portNameJString, NULL);
 	unsigned char isDtrEnabled = (*env)->GetBooleanField(env, obj, isDtrEnabledField);
 	unsigned char isRtsEnabled = (*env)->GetBooleanField(env, obj, isRtsEnabledField);
+	unsigned char rs485ModeEnabled = (*env)->GetBooleanField(env, obj, rs485ModeField);
 
 	// Try to open existing serial port with read/write access
 	int serialPortFD = -1;
 	if ((serialPortFD = open(portName, O_RDWR | O_NOCTTY | O_NONBLOCK)) > 0)
 	{
-		// Clear any serial port flags and set up raw, non-canonical port parameters
-		struct termios options = { 0 };
-		fcntl(serialPortFD, F_SETFL, 0);
-		tcgetattr(serialPortFD, &options);
-#if defined(__sun__)
-		options.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
-		options.c_oflag &= ~OPOST;
-		options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-		options.c_cflag &= ~(CSIZE | PARENB);
-		options.c_cflag |= CS8;
-#else
-		cfmakeraw(&options);
-#endif
-		if (!isDtrEnabled || !isRtsEnabled)
-			options.c_cflag &= ~HUPCL;
-		options.c_iflag |= BRKINT;
-		tcsetattr(serialPortFD, TCSANOW, &options);
-
-		// Configure the port parameters and timeouts
-		if (Java_com_fazecast_jSerialComm_SerialPort_configPort(env, obj, serialPortFD))
-			(*env)->SetBooleanField(env, obj, isOpenedField, JNI_TRUE);
+		// Ensure that multiple root users cannot access the device simultaneously
+		if (flock(serialPortFD, LOCK_EX | LOCK_NB) == -1)
+		{
+			while ((close(serialPortFD) == -1) && (errno == EINTR))
+				errno = 0;
+			serialPortFD = -1;
+		}
 		else
 		{
-			// Close the port if there was a problem setting the parameters
-			ioctl(serialPortFD, TIOCNXCL);
-			tcdrain(serialPortFD);
-			while ((close(serialPortFD) == -1) && (errno != EBADF));
-			serialPortFD = -1;
-			(*env)->SetBooleanField(env, obj, isOpenedField, JNI_FALSE);
+			// Clear any serial port flags and set up raw, non-canonical port parameters
+			struct termios options = {0};
+			fcntl(serialPortFD, F_SETFL, 0);
+			tcgetattr(serialPortFD, &options);
+#if defined(__sun__)
+			options.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+			options.c_oflag &= ~OPOST;
+			options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+			options.c_cflag &= ~(CSIZE | PARENB);
+			options.c_cflag |= CS8;
+#else
+			cfmakeraw(&options);
+#endif
+			if (!isDtrEnabled || !isRtsEnabled)
+				options.c_cflag &= ~HUPCL;
+			if (!rs485ModeEnabled)
+				options.c_iflag |= BRKINT;
+			tcsetattr(serialPortFD, TCSANOW, &options);
+
+			// Configure the port parameters and timeouts
+			if (Java_com_fazecast_jSerialComm_SerialPort_configPort(env, obj, serialPortFD))
+				(*env)->SetLongField(env, obj, serialPortFdField, serialPortFD);
+			else
+			{
+				// Close the port if there was a problem setting the parameters
+				while ((close(serialPortFD) == -1) && (errno == EINTR))
+					errno = 0;
+				serialPortFD = -1;
+			}
 		}
 	}
 
@@ -287,7 +306,7 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configPort(J
 {
 	if (serialPortFD <= 0)
 		return JNI_FALSE;
-	struct termios options = { 0 };
+	struct termios options = {0};
 
 	// Get port parameters from Java class
 	baud_rate baudRate = (*env)->GetIntField(env, obj, baudRateField);
@@ -297,22 +316,30 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configPort(J
 	int flowControl = (*env)->GetIntField(env, obj, flowControlField);
 	int sendDeviceQueueSize = (*env)->GetIntField(env, obj, sendDeviceQueueSizeField);
 	int receiveDeviceQueueSize = (*env)->GetIntField(env, obj, receiveDeviceQueueSizeField);
+	int rs485DelayBefore = (*env)->GetIntField(env, obj, rs485DelayBeforeField);
+	int rs485DelayAfter = (*env)->GetIntField(env, obj, rs485DelayAfterField);
 	unsigned char configDisabled = (*env)->GetBooleanField(env, obj, disableConfigField);
+	unsigned char rs485ModeEnabled = (*env)->GetBooleanField(env, obj, rs485ModeField);
+	unsigned char rs485ActiveHigh = (*env)->GetBooleanField(env, obj, rs485ActiveHighField);
 	unsigned char isDtrEnabled = (*env)->GetBooleanField(env, obj, isDtrEnabledField);
 	unsigned char isRtsEnabled = (*env)->GetBooleanField(env, obj, isRtsEnabledField);
 	tcflag_t byteSize = (byteSizeInt == 5) ? CS5 : (byteSizeInt == 6) ? CS6 : (byteSizeInt == 7) ? CS7 : CS8;
-	tcflag_t stopBits = ((stopBitsInt == com_fazecast_jSerialComm_SerialPort_ONE_STOP_BIT) || (stopBitsInt == com_fazecast_jSerialComm_SerialPort_ONE_POINT_FIVE_STOP_BITS)) ? 0 : CSTOPB;
 	tcflag_t parity = (parityInt == com_fazecast_jSerialComm_SerialPort_NO_PARITY) ? 0 : (parityInt == com_fazecast_jSerialComm_SerialPort_ODD_PARITY) ? (PARENB | PARODD) : (parityInt == com_fazecast_jSerialComm_SerialPort_EVEN_PARITY) ? PARENB : (parityInt == com_fazecast_jSerialComm_SerialPort_MARK_PARITY) ? (PARENB | CMSPAR | PARODD) : (PARENB | CMSPAR);
-	tcflag_t CTSRTSEnabled = (((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_CTS_ENABLED) > 0) ||
-			((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_RTS_ENABLED) > 0)) ? CRTSCTS : 0;
 	tcflag_t XonXoffInEnabled = ((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_XONXOFF_IN_ENABLED) > 0) ? IXOFF : 0;
 	tcflag_t XonXoffOutEnabled = ((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_XONXOFF_OUT_ENABLED) > 0) ? IXON : 0;
 
 	// Set updated port parameters
 	tcgetattr(serialPortFD, &options);
-	options.c_cflag = (byteSize | stopBits | parity | CLOCAL | CREAD | CTSRTSEnabled);
-	if (parityInt == com_fazecast_jSerialComm_SerialPort_SPACE_PARITY)
-		options.c_cflag &= ~PARODD;
+	options.c_cflag &= ~(CSIZE | PARENB | CMSPAR | PARODD);
+	options.c_cflag |= (byteSize | parity | CLOCAL | CREAD);
+	if (stopBitsInt == com_fazecast_jSerialComm_SerialPort_TWO_STOP_BITS)
+		options.c_cflag |= CSTOPB;
+	else
+		options.c_cflag &= ~CSTOPB;
+	if (((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_CTS_ENABLED) > 0) || ((flowControl & com_fazecast_jSerialComm_SerialPort_FLOW_CONTROL_RTS_ENABLED) > 0))
+		options.c_cflag |= CRTSCTS;
+	else
+		options.c_cflag &= ~CRTSCTS;
 	if (!isDtrEnabled || !isRtsEnabled)
 		options.c_cflag &= ~HUPCL;
 	options.c_iflag &= ~(INPCK | IGNPAR | PARMRK | ISTRIP);
@@ -322,30 +349,55 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configPort(J
 		options.c_iflag |= (INPCK | IGNPAR);
 	options.c_iflag |= (XonXoffInEnabled | XonXoffOutEnabled);
 
-	// Set baud rate
+	// Set baud rate and apply changes
 	baud_rate baudRateCode = getBaudRateCode(baudRate);
 	unsigned char nonStandardBaudRate = (baudRateCode == 0);
 	if (nonStandardBaudRate)
 		baudRateCode = B38400;
 	cfsetispeed(&options, baudRateCode);
 	cfsetospeed(&options, baudRateCode);
-
-	// Apply changes and block non-root users from opening this port
 	int retVal = configDisabled ? 0 : tcsetattr(serialPortFD, TCSANOW, &options);
-	ioctl(serialPortFD, TIOCEXCL);
 
 	// Attempt to set the transmit buffer size and any necessary custom baud rates
 #if defined(__linux__)
-	struct serial_struct serInfo;
-	int ioctlRetVal = ioctl(serialPortFD, TIOCGSERIAL, &serInfo);
-	if (ioctlRetVal == 0)
+	struct serial_struct serInfo = {0};
+	if (ioctl(serialPortFD, TIOCGSERIAL, &serInfo) == 0)
 	{
 		serInfo.xmit_fifo_size = sendDeviceQueueSize;
+		serInfo.flags |= ASYNC_LOW_LATENCY;
 		ioctl(serialPortFD, TIOCSSERIAL, &serInfo);
 	}
+#else
+	(*env)->SetIntField(env, obj, sendDeviceQueueSizeField, sysconf(_SC_PAGESIZE));
 #endif
+	(*env)->SetIntField(env, obj, receiveDeviceQueueSizeField, sysconf(_SC_PAGESIZE));
 	if (nonStandardBaudRate)
 		setBaudRateCustom(serialPortFD, baudRate);
+
+	// Attempt to set the requested RS-485 mode
+#if defined(__linux__)
+	struct serial_rs485 rs485Conf = {0};
+	if (ioctl(serialPortFD, TIOCGRS485, &rs485Conf) == 0)
+	{
+		if (rs485ModeEnabled)
+			rs485Conf.flags |= SER_RS485_ENABLED;
+		else
+			rs485Conf.flags &= ~SER_RS485_ENABLED;
+		if (rs485ActiveHigh)
+		{
+			rs485Conf.flags |= SER_RS485_RTS_ON_SEND;
+			rs485Conf.flags &= ~(SER_RS485_RTS_AFTER_SEND);
+		}
+		else
+		{
+			rs485Conf.flags &= ~(SER_RS485_RTS_ON_SEND);
+			rs485Conf.flags |= SER_RS485_RTS_AFTER_SEND;
+		}
+		rs485Conf.delay_rts_before_send = rs485DelayBefore;
+		rs485Conf.delay_rts_after_send = rs485DelayAfter;
+		ioctl(serialPortFD, TIOCSRS485, &rs485Conf);
+	}
+#endif
 	return ((retVal == 0) && Java_com_fazecast_jSerialComm_SerialPort_configEventFlags(env, obj, serialPortFD) ? JNI_TRUE : JNI_FALSE);
 }
 
@@ -360,7 +412,7 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configTimeou
 	int readTimeout = (*env)->GetIntField(env, obj, readTimeoutField);
 
 	// Retrieve existing port configuration
-	struct termios options = { 0 };
+	struct termios options = {0};
 	tcgetattr(serialPortFD, &options);
 	int flags = fcntl(serialPortFD, F_GETFL);
 	if (flags == -1)
@@ -427,7 +479,7 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configEventF
 	jboolean retVal;
 	if ((eventsToMonitor & com_fazecast_jSerialComm_SerialPort_LISTENING_EVENT_DATA_RECEIVED) > 0)
 	{
-		struct termios options = { 0 };
+		struct termios options = {0};
 		tcgetattr(serialPortFD, &options);
 		int flags = fcntl(serialPortFD, F_GETFL);
 		if (flags == -1)
@@ -435,8 +487,7 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_configEventF
 		flags &= ~O_NONBLOCK;
 		options.c_cc[VMIN] = 0;
 		options.c_cc[VTIME] = 10;
-		retVal = ((fcntl(serialPortFD, F_SETFL, flags) == -1) || (tcsetattr(serialPortFD, TCSANOW, &options) == -1)) ?
-				JNI_FALSE : JNI_TRUE;
+		retVal = ((fcntl(serialPortFD, F_SETFL, flags) == -1) || (tcsetattr(serialPortFD, TCSANOW, &options) == -1)) ? JNI_FALSE : JNI_TRUE;
 		if (baudRateCode == 0)
 			setBaudRateCustom(serialPortFD, baudRate);
 	}
@@ -455,7 +506,7 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_waitForEvent(JNI
 	struct pollfd waitingSet = { serialPortFD, POLLIN, 0 };
 
 	// Wait for a serial port event
-	if (poll(&waitingSet, 1, 1000) <= 0)
+	if (poll(&waitingSet, 1, 500) <= 0)
 		return 0;
 	return (waitingSet.revents & POLLIN) ? com_fazecast_jSerialComm_SerialPort_LISTENING_EVENT_DATA_AVAILABLE : 0;
 }
@@ -466,13 +517,8 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_closePortNat
 	if (serialPortFD <= 0)
 		return JNI_TRUE;
 
-	// Allow others to open the port
-	ioctl(serialPortFD, TIOCNXCL);
-	tcdrain(serialPortFD);
-	(*env)->SetBooleanField(env, obj, isOpenedField, JNI_FALSE);
-
 	// Force the port to enter non-blocking mode to ensure that any current reads return
-	struct termios options;
+	struct termios options = {0};
 	tcgetattr(serialPortFD, &options);
 	int flags = fcntl(serialPortFD, F_GETFL);
 	flags |= O_NONBLOCK;
@@ -482,26 +528,29 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_closePortNat
 	tcsetattr(serialPortFD, TCSANOW, &options);
 
 	// Close the port
-	while ((close(serialPortFD) == -1) && (errno != EBADF));
+	flock(serialPortFD, LOCK_UN | LOCK_NB);
+	fdatasync(serialPortFD);
+	while ((close(serialPortFD) == -1) && (errno == EINTR))
+		errno = 0;
 	(*env)->SetLongField(env, obj, serialPortFdField, -1l);
 	return JNI_TRUE;
 }
 
 JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_bytesAvailable(JNIEnv *env, jobject obj, jlong serialPortFD)
 {
+	// Retrieve bytes available to read and close port upon error
 	int numBytesAvailable = -1;
-	if (serialPortFD > 0)
-		ioctl(serialPortFD, FIONREAD, &numBytesAvailable);
-
+	if ((serialPortFD > 0) && (ioctl(serialPortFD, FIONREAD, &numBytesAvailable) == -1))
+		Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
 	return numBytesAvailable;
 }
 
 JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_bytesAwaitingWrite(JNIEnv *env, jobject obj, jlong serialPortFD)
 {
+	// Retrieve bytes awaiting write and close port upon error
 	int numBytesToWrite = -1;
-	if (serialPortFD > 0)
-		ioctl(serialPortFD, TIOCOUTQ, &numBytesToWrite);
-
+	if ((serialPortFD > 0) && (ioctl(serialPortFD, TIOCOUTQ, &numBytesToWrite) == -1))
+		Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
 	return numBytesToWrite;
 }
 
@@ -512,7 +561,7 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_readBytes(JNIEnv
 		return -1;
 	int timeoutMode = (*env)->GetIntField(env, obj, timeoutModeField);
 	int readTimeout = (*env)->GetIntField(env, obj, readTimeoutField);
-	int numBytesRead, numBytesReadTotal = 0, bytesRemaining = bytesToRead;
+	int numBytesRead, numBytesReadTotal = 0, bytesRemaining = bytesToRead, ioctlResult = 0;
 	char* readBuffer = (char*)malloc(bytesToRead);
 
 	// Infinite blocking mode specified, don't return until we have completely finished the read
@@ -522,15 +571,11 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_readBytes(JNIEnv
 		while (bytesRemaining > 0)
 		{
 			do { numBytesRead = read(serialPortFD, readBuffer+numBytesReadTotal, bytesRemaining); } while ((numBytesRead < 0) && (errno == EINTR));
-			if (numBytesRead == -1)
+			if ((numBytesRead == -1) || ((numBytesRead == 0) && (ioctl(serialPortFD, FIONREAD, &ioctlResult) == -1)))
 			{
-				// Problem reading, allow others to open the port and close it ourselves
-				ioctl(serialPortFD, TIOCNXCL);
-				tcdrain(serialPortFD);
-				while ((close(serialPortFD) == -1) && (errno != EBADF));
+				// Problem reading, close the port
+				Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
 				serialPortFD = -1;
-				(*env)->SetLongField(env, obj, serialPortFdField, -1l);
-				(*env)->SetBooleanField(env, obj, isOpenedField, JNI_FALSE);
 				break;
 			}
 
@@ -542,7 +587,7 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_readBytes(JNIEnv
 	else if ((timeoutMode & com_fazecast_jSerialComm_SerialPort_TIMEOUT_READ_BLOCKING) > 0)		// Blocking mode, but not indefinitely
 	{
 		// Get current system time
-		struct timeval expireTime = { 0 }, currTime = { 0 };
+		struct timeval expireTime = {0}, currTime = {0};
 		gettimeofday(&expireTime, NULL);
 		expireTime.tv_usec += (readTimeout * 1000);
 		if (expireTime.tv_usec > 1000000)
@@ -555,15 +600,11 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_readBytes(JNIEnv
 		do
 		{
 			do { numBytesRead = read(serialPortFD, readBuffer+numBytesReadTotal, bytesRemaining); } while ((numBytesRead < 0) && (errno == EINTR));
-			if (numBytesRead == -1)
+			if ((numBytesRead == -1) || ((numBytesRead == 0) && (ioctl(serialPortFD, FIONREAD, &ioctlResult) == -1)))
 			{
-				// Problem reading, allow others to open the port and close it ourselves
-				ioctl(serialPortFD, TIOCNXCL);
-				tcdrain(serialPortFD);
-				while ((close(serialPortFD) == -1) && (errno != EBADF));
+				// Problem reading, close the port
+				Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
 				serialPortFD = -1;
-				(*env)->SetLongField(env, obj, serialPortFdField, -1l);
-				(*env)->SetBooleanField(env, obj, isOpenedField, JNI_FALSE);
 				break;
 			}
 
@@ -573,22 +614,17 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_readBytes(JNIEnv
 
 			// Get current system time
 			gettimeofday(&currTime, NULL);
-		} while ((bytesRemaining > 0) && ((expireTime.tv_sec > currTime.tv_sec) ||
-				((expireTime.tv_sec == currTime.tv_sec) && (expireTime.tv_usec > currTime.tv_usec))));
+		} while ((bytesRemaining > 0) && ((expireTime.tv_sec > currTime.tv_sec) || ((expireTime.tv_sec == currTime.tv_sec) && (expireTime.tv_usec > currTime.tv_usec))));
 	}
 	else		// Semi- or non-blocking specified
 	{
 		// Read from port
 		do { numBytesRead = read(serialPortFD, readBuffer, bytesToRead); } while ((numBytesRead < 0) && (errno == EINTR));
-		if (numBytesRead == -1)
+		if ((numBytesRead == -1) || ((numBytesRead == 0) && (ioctl(serialPortFD, FIONREAD, &ioctlResult) == -1)))
 		{
-			// Problem reading, allow others to open the port and close it ourselves
-			ioctl(serialPortFD, TIOCNXCL);
-			tcdrain(serialPortFD);
-			while ((close(serialPortFD) == -1) && (errno != EBADF));
+			// Problem reading, close the port
+			Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
 			serialPortFD = -1;
-			(*env)->SetLongField(env, obj, serialPortFdField, -1l);
-			(*env)->SetBooleanField(env, obj, isOpenedField, JNI_FALSE);
 		}
 		else
 			numBytesReadTotal = numBytesRead;
@@ -597,7 +633,7 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_readBytes(JNIEnv
 	// Return number of bytes read if successful
 	(*env)->SetByteArrayRegion(env, buffer, offset, numBytesReadTotal, (jbyte*)readBuffer);
 	free(readBuffer);
-	return (numBytesRead == -1) || !((*env)->GetBooleanField(env, obj, isOpenedField)) ? -1 : numBytesReadTotal;
+	return ((numBytesRead == -1) || (serialPortFD == -1)) ? -1 : numBytesReadTotal;
 }
 
 JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_writeBytes(JNIEnv *env, jobject obj, jlong serialPortFD, jbyteArray buffer, jlong bytesToWrite, jlong offset)
@@ -606,43 +642,20 @@ JNIEXPORT jint JNICALL Java_com_fazecast_jSerialComm_SerialPort_writeBytes(JNIEn
 		return -1;
 	int timeoutMode = (*env)->GetIntField(env, obj, timeoutModeField);
 	jbyte *writeBuffer = (*env)->GetByteArrayElements(env, buffer, 0);
-	int numBytesWritten, result = 0;
-
-	// Set the DTR line to high if using RS-422
-	//ioctl(serialPortFD, TIOCMGET, &result);
-	//result |= TIOCM_DTR;
-	//ioctl(serialPortFD, TIOCMSET, &result);
+	int numBytesWritten, result = 0, ioctlResult = 0;
 
 	// Write to port
 	do { numBytesWritten = write(serialPortFD, writeBuffer+offset, bytesToWrite); } while ((numBytesWritten < 0) && (errno == EINTR));
-	if (numBytesWritten == -1)
+	if ((numBytesWritten == -1) || ((numBytesWritten == 0) && (ioctl(serialPortFD, FIONREAD, &ioctlResult) == -1)))
 	{
-		// Problem writing, allow others to open the port and close it ourselves
-		ioctl(serialPortFD, TIOCNXCL);
-		tcdrain(serialPortFD);
-		while ((close(serialPortFD) == -1) && (errno != EBADF));
+		// Problem writing, close the port
+		Java_com_fazecast_jSerialComm_SerialPort_closePortNative(env, obj, serialPortFD);
 		serialPortFD = -1;
-		(*env)->SetLongField(env, obj, serialPortFdField, -1l);
-		(*env)->SetBooleanField(env, obj, isOpenedField, JNI_FALSE);
 	}
 
 	// Wait until all bytes were written in write-blocking mode
-	if ((timeoutMode & com_fazecast_jSerialComm_SerialPort_TIMEOUT_WRITE_BLOCKING) > 0)
+	if (((timeoutMode & com_fazecast_jSerialComm_SerialPort_TIMEOUT_WRITE_BLOCKING) > 0) && (serialPortFD > 0))
 		tcdrain(serialPortFD);
-
-	// Clear the DTR line if using RS-422
-//#ifdef TIOCSERGETLSR
-	//do
-	//{
-		//result = ioctl(serialPortFD, TIOCSERGETLSR);
-		//if (result != TIOCSER_TEMT)
-			//usleep(100);
-	//} while (result != TIOCSER_TEMT);
-//#endif
-	//ioctl(serialPortFD, TIOCMGET, &result);
-	//result &= ~TIOCM_DTR;
-	//ioctl(serialPortFD, TIOCMSET, &result);
-	//do { result = tcflush(serialPortFD, TCIFLUSH); } while ((result < 0) && (errno == EINTR));
 
 	// Return number of bytes written if successful
 	(*env)->ReleaseByteArrayElements(env, buffer, writeBuffer, JNI_ABORT);
@@ -685,11 +698,11 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_presetRTS(JN
 	const char *portName = (*env)->GetStringUTFChars(env, portNameJString, NULL);
 
 	// Send a system command to preset the RTS mode of the serial port
-	char commandString[64];
+	char commandString[128];
 #if defined(__linux__)
-	sprintf(commandString, "stty -F %s hupcl", portName);
+	sprintf(commandString, "stty -F %s hupcl >>/dev/null 2>&1", portName);
 #else
-	sprintf(commandString, "stty -f %s hupcl", portName);
+	sprintf(commandString, "stty -f %s hupcl >>/dev/null 2>&1", portName);
 #endif
 	int result = system(commandString);
 
@@ -703,11 +716,11 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_preclearRTS(
 	const char *portName = (*env)->GetStringUTFChars(env, portNameJString, NULL);
 
 	// Send a system command to preset the RTS mode of the serial port
-	char commandString[64];
+	char commandString[128];
 #if defined(__linux__)
-	sprintf(commandString, "stty -F %s -hupcl", portName);
+	sprintf(commandString, "stty -F %s -hupcl >>/dev/null 2>&1", portName);
 #else
-	sprintf(commandString, "stty -f %s -hupcl", portName);
+	sprintf(commandString, "stty -f %s -hupcl >>/dev/null 2>&1", portName);
 #endif
 	int result = system(commandString);
 
@@ -737,11 +750,11 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_presetDTR(JN
 	const char *portName = (*env)->GetStringUTFChars(env, portNameJString, NULL);
 
 	// Send a system command to preset the DTR mode of the serial port
-	char commandString[64];
+	char commandString[128];
 #if defined(__linux__)
-	sprintf(commandString, "stty -F %s hupcl", portName);
+	sprintf(commandString, "stty -F %s hupcl >>/dev/null 2>&1", portName);
 #else
-	sprintf(commandString, "stty -f %s hupcl", portName);
+	sprintf(commandString, "stty -f %s hupcl >>/dev/null 2>&1", portName);
 #endif
 	int result = system(commandString);
 
@@ -755,11 +768,11 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_preclearDTR(
 	const char *portName = (*env)->GetStringUTFChars(env, portNameJString, NULL);
 
 	// Send a system command to preset the DTR mode of the serial port
-	char commandString[64];
+	char commandString[128];
 #if defined(__linux__)
-	sprintf(commandString, "stty -F %s -hupcl", portName);
+	sprintf(commandString, "stty -F %s -hupcl >>/dev/null 2>&1", portName);
 #else
-	sprintf(commandString, "stty -f %s -hupcl", portName);
+	sprintf(commandString, "stty -f %s -hupcl >>/dev/null 2>&1", portName);
 #endif
 	int result = system(commandString);
 
@@ -780,5 +793,37 @@ JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_getDSR(JNIEn
 	if (serialPortFD <= 0)
 		return JNI_FALSE;
 	int modemBits = 0;
-	return (ioctl(serialPortFD, TIOCMGET, &modemBits) == 0) && (modemBits & TIOCM_LE);
+	return (ioctl(serialPortFD, TIOCMGET, &modemBits) == 0) && (modemBits & TIOCM_DSR);
+}
+
+JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_getDCD(JNIEnv *env, jobject obj, jlong serialPortFD)
+{
+	if (serialPortFD <= 0)
+		return JNI_FALSE;
+	int modemBits = 0;
+	return (ioctl(serialPortFD, TIOCMGET, &modemBits) == 0) && (modemBits & TIOCM_CAR);
+}
+
+JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_getDTR(JNIEnv *env, jobject obj, jlong serialPortFD)
+{
+	if (serialPortFD <= 0)
+		return JNI_FALSE;
+	int modemBits = 0;
+	return (ioctl(serialPortFD, TIOCMGET, &modemBits) == 0) && (modemBits & TIOCM_DTR);
+}
+
+JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_getRTS(JNIEnv *env, jobject obj, jlong serialPortFD)
+{
+	if (serialPortFD <= 0)
+		return JNI_FALSE;
+	int modemBits = 0;
+	return (ioctl(serialPortFD, TIOCMGET, &modemBits) == 0) && (modemBits & TIOCM_RTS);
+}
+
+JNIEXPORT jboolean JNICALL Java_com_fazecast_jSerialComm_SerialPort_getRI(JNIEnv *env, jobject obj, jlong serialPortFD)
+{
+	if (serialPortFD <= 0)
+		return JNI_FALSE;
+	int modemBits = 0;
+	return (ioctl(serialPortFD, TIOCMGET, &modemBits) == 0) && (modemBits & TIOCM_RI);
 }

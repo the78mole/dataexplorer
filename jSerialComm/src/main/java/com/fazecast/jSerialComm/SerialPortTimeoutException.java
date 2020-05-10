@@ -5,7 +5,7 @@
  *  Last Updated on:  Aug 20, 2018
  *           Author:  Will Hedgecock
  *
- * Copyright (C) 2018-2018 Fazecast, Inc.
+ * Copyright (C) 2018-2020 Fazecast, Inc.
  *
  * This file is part of jSerialComm.
  *
@@ -31,7 +31,7 @@ import java.io.InterruptedIOException;
  * This class describes a serial port timeout exception.
  * 
  * @author Will Hedgecock &lt;will.hedgecock@fazecast.com&gt;
- * @version 2.4.2
+ * @version 2.6.2
  * @see java.io.InterruptedIOException
  */
 public final class SerialPortTimeoutException extends InterruptedIOException

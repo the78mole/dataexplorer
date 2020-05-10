@@ -1,8 +1,8 @@
 /*
- * WindowsHelperFunctions.h
+ * SerialPortDataListenerWithExceptions.java
  *
- *       Created on:  May 05, 2015
- *  Last Updated on:  Apr 01, 2018
+ *       Created on:  Jul 11, 2019
+ *  Last Updated on:  Aug 28, 2019
  *           Author:  Will Hedgecock
  *
  * Copyright (C) 2012-2020 Fazecast, Inc.
@@ -23,15 +23,22 @@
  * see <http://www.gnu.org/licenses/> and <http://www.apache.org/licenses/>.
  */
 
-#ifndef __WINDOWS_HELPER_FUNCTIONS_HEADER_H__
-#define __WINDOWS_HELPER_FUNCTIONS_HEADER_H__
+package com.fazecast.jSerialComm;
 
-typedef struct charTupleVector
+/**
+ * This interface must be implemented to enable simple event-based serial port I/O with a custom Exception callback.
+ *
+ * @author Will Hedgecock &lt;will.hedgecock@fazecast.com&gt;
+ * @version 2.6.2
+ * @see com.fazecast.jSerialComm.SerialPortDataListener
+ * @see java.util.EventListener
+ */
+public interface SerialPortDataListenerWithExceptions extends SerialPortDataListener
 {
-	wchar_t **first, **second, **third;
-	size_t length;
-} charTupleVector;
-void push_back(struct charTupleVector* vector, const wchar_t* firstString, const wchar_t* secondString, const wchar_t* thirdString);
-char keyExists(struct charTupleVector* vector, const wchar_t* key);
-
-#endif		// #ifndef __WINDOWS_HELPER_FUNCTIONS_HEADER_H__
+	/**
+	 * Must be overridden to handle any Java exceptions that occur asynchronously in this data listener.
+	 *
+	 * @param e An {@link Exception} object containing information about the exception that occurred.
+	 */
+	public abstract void catchException(Exception e);
+}
