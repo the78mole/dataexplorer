@@ -592,124 +592,101 @@ public class ChargerMemory {
 	 * @param memoryBuffer filled by Modbus communication
 	 */
 	public ChargerMemory(final byte[] memoryBuffer, final boolean isDuo) {
-		this.useFlag = DataParser.parse2Short(memoryBuffer[0], memoryBuffer[1]);
-		System.arraycopy(memoryBuffer, 2, this.name, 0, this.name.length);
-		this.capacity = DataParser.intFromBytes(memoryBuffer[MEM_NAME_LEN+1+5], memoryBuffer[MEM_NAME_LEN+1+4], memoryBuffer[MEM_NAME_LEN+1+3], memoryBuffer[MEM_NAME_LEN+1+2]);
-		this.autoSave = memoryBuffer[44];
-		this.liBalEndMode = memoryBuffer[45];
-		this.lockFlag = memoryBuffer[46];
-		System.arraycopy(memoryBuffer, 47, this.lockPWD, 0, lockPWD.length);
-		this.opEnable = DataParser.parse2Short(memoryBuffer[53], memoryBuffer[54]); //Charge(bit0) ,Storage(bit2) ,Discharge(bit3) ,Cycle(bit4) ,OnlyBalance(bit5) 
-
-		this.channelMode = memoryBuffer[55]; //CH1|CH2,CH1&CH2,CH1,CH2	
-		this.saveToSD = memoryBuffer[56];
-		this.logInterval = DataParser.parse2Short(memoryBuffer[57], memoryBuffer[58]);
-		this.runCounter = DataParser.parse2Short(memoryBuffer[59], memoryBuffer[60]);
-
-		this.type = memoryBuffer[61]; //LiPo,LiLo,LiFe,NiMH,Nicd,Pb
-		this.liCell = memoryBuffer[62];
-		this.niCell = memoryBuffer[63];
-		this.pbCell = memoryBuffer[64];
-
-		this.liModeC = memoryBuffer[65]; //Normal,Balance
-		this.liModeD = memoryBuffer[66]; //Normal,Balance,External
-		this.niModeC = memoryBuffer[67]; //Normal,REFLEX
-		this.niModeD = memoryBuffer[68];
-		this.pbModeC = memoryBuffer[69]; //Normal,REFLEX
-		this.pbModeD = memoryBuffer[70];
-
-		this.balSpeed = memoryBuffer[71];
-		this.balStartMode = memoryBuffer[72];
-		this.balStartVolt = DataParser.parse2Short(memoryBuffer[73], memoryBuffer[74]);
-		this.balDiff = memoryBuffer[75];
-		this.balOverPoint = memoryBuffer[76];
-		this.balSetPoint = memoryBuffer[77];
-		this.balDelay = memoryBuffer[78];
-
-		this.keepChargeEnable = memoryBuffer[79];
-
-		this.liPoChgCellVolt = DataParser.parse2Short(memoryBuffer[80], memoryBuffer[81]);
-		this.liIoChgCellVolt = DataParser.parse2Short(memoryBuffer[82], memoryBuffer[83]);
-		this.liFeChgCellVolt = DataParser.parse2Short(memoryBuffer[84], memoryBuffer[85]);
-
-		this.liPoStoCellVolt = DataParser.parse2Short(memoryBuffer[86], memoryBuffer[87]);
-		this.liLoStoCellVolt = DataParser.parse2Short(memoryBuffer[88], memoryBuffer[89]);
-		this.liFeStoCellVolt = DataParser.parse2Short(memoryBuffer[90], memoryBuffer[91]);
-
-		this.liPoDchgCellVolt = DataParser.parse2Short(memoryBuffer[92], memoryBuffer[93]);
-		this.liIoDchgCellVolt = DataParser.parse2Short(memoryBuffer[94], memoryBuffer[95]);
-		this.liFeDchgCellVolt = DataParser.parse2Short(memoryBuffer[96], memoryBuffer[97]);
-
-		this.chargeCurrent = DataParser.parse2Short(memoryBuffer[98], memoryBuffer[99]);
-		this.dischargeCurrent = DataParser.parse2Short(memoryBuffer[100], memoryBuffer[101]);
-
-		this.endCharge = DataParser.parse2Short(memoryBuffer[102], memoryBuffer[103]);
-		this.endDischarge = DataParser.parse2Short(memoryBuffer[104], memoryBuffer[105]);
-		this.regDchgMode = DataParser.parse2Short(memoryBuffer[106], memoryBuffer[107]);
-
-		this.niPeak = DataParser.parse2Short(memoryBuffer[108], memoryBuffer[109]);
-		this.niPeakDelay = DataParser.parse2Short(memoryBuffer[110], memoryBuffer[111]);
-
-		this.niTrickleEnable = DataParser.parse2Short(memoryBuffer[112], memoryBuffer[113]);
-		this.niTrickleCurrent = DataParser.parse2Short(memoryBuffer[114], memoryBuffer[115]);
-		this.niTrickleTime = DataParser.parse2Short(memoryBuffer[116], memoryBuffer[117]);
-
-		this.niZeroEnable = DataParser.parse2Short(memoryBuffer[118], memoryBuffer[119]);
-
-		this.niDischargeVolt = DataParser.parse2Short(memoryBuffer[120], memoryBuffer[121]);
-		this.pbChgCellVolt = DataParser.parse2Short(memoryBuffer[122], memoryBuffer[123]);
-		this.pbDchgCellVolt = DataParser.parse2Short(memoryBuffer[124], memoryBuffer[125]);
-		this.pbFloatEnable = DataParser.parse2Short(memoryBuffer[126], memoryBuffer[127]);
-		this.pbFloatCellVolt = DataParser.parse2Short(memoryBuffer[128], memoryBuffer[129]);
-
-		this.restoreVolt = DataParser.parse2Short(memoryBuffer[130], memoryBuffer[131]);
-		this.restoreTime = DataParser.parse2Short(memoryBuffer[132], memoryBuffer[133]);
-		this.restoreCurent = DataParser.parse2Short(memoryBuffer[134], memoryBuffer[135]);
-
-		this.cycleCount = DataParser.parse2Short(memoryBuffer[136], memoryBuffer[137]);
-		this.cycleDelay = DataParser.parse2Short(memoryBuffer[138], memoryBuffer[139]);
-		this.cycleMode = memoryBuffer[140];
-
-		this.safetyTimeC = DataParser.parse2Short(memoryBuffer[141], memoryBuffer[142]);
-		this.safetyCapC = DataParser.parse2Short(memoryBuffer[143], memoryBuffer[144]);
-		this.safetyTempC = DataParser.parse2Short(memoryBuffer[145], memoryBuffer[146]);
-		this.safetyTimeD = DataParser.parse2Short(memoryBuffer[147], memoryBuffer[148]);
-		this.safetyCapD = DataParser.parse2Short(memoryBuffer[149], memoryBuffer[150]);
-		this.safetyTempD = DataParser.parse2Short(memoryBuffer[151], memoryBuffer[152]);
-
-		this.regChMode = memoryBuffer[153];
-		this.regChVolt = DataParser.parse2Short(memoryBuffer[154], memoryBuffer[155]);
-		this.regChCurrent = DataParser.parse2Short(memoryBuffer[156], memoryBuffer[157]);
-
-		this.fastSto = memoryBuffer[158];
-		this.stoCompensation = DataParser.parse2Short(memoryBuffer[159], memoryBuffer[160]);
-
-		this.niZnChgCellVolt = DataParser.parse2Short(memoryBuffer[161], memoryBuffer[162]);
-		this.niZnDchgCellVolt = DataParser.parse2Short(memoryBuffer[163], memoryBuffer[164]);
-		this.niZnCell = memoryBuffer[165];
-
-		this.liHVChgCellVolt = DataParser.parse2Short(memoryBuffer[166], memoryBuffer[167]);																					//LIHV charge cell voltage
-		this.liHVStoCellVolt = DataParser.parse2Short(memoryBuffer[168], memoryBuffer[169]);																					//LIHV storage cell voltage
-		this.liHVDchgCellVolt = DataParser.parse2Short(memoryBuffer[170], memoryBuffer[171]);																					//LIHV discharge cell voltage
-		
-		if (isDuo) { //without LTO, User, Power		
-			this.dump = memoryBuffer[166];
-			return;
+		if (memoryBuffer != null && ((isDuo && memoryBuffer.length >= 167) || memoryBuffer.length >= 192))  {
+			this.useFlag = DataParser.parse2Short(memoryBuffer[0], memoryBuffer[1]);
+			System.arraycopy(memoryBuffer, 2, this.name, 0, this.name.length);
+			this.capacity = DataParser.intFromBytes(memoryBuffer[MEM_NAME_LEN + 1 + 5], memoryBuffer[MEM_NAME_LEN + 1 + 4], memoryBuffer[MEM_NAME_LEN + 1 + 3], memoryBuffer[MEM_NAME_LEN + 1 + 2]);
+			this.autoSave = memoryBuffer[44];
+			this.liBalEndMode = memoryBuffer[45];
+			this.lockFlag = memoryBuffer[46];
+			System.arraycopy(memoryBuffer, 47, this.lockPWD, 0, lockPWD.length);
+			this.opEnable = DataParser.parse2Short(memoryBuffer[53], memoryBuffer[54]); //Charge(bit0) ,Storage(bit2) ,Discharge(bit3) ,Cycle(bit4) ,OnlyBalance(bit5) 
+			this.channelMode = memoryBuffer[55]; //CH1|CH2,CH1&CH2,CH1,CH2	
+			this.saveToSD = memoryBuffer[56];
+			this.logInterval = DataParser.parse2Short(memoryBuffer[57], memoryBuffer[58]);
+			this.runCounter = DataParser.parse2Short(memoryBuffer[59], memoryBuffer[60]);
+			this.type = memoryBuffer[61]; //LiPo,LiLo,LiFe,NiMH,Nicd,Pb
+			this.liCell = memoryBuffer[62];
+			this.niCell = memoryBuffer[63];
+			this.pbCell = memoryBuffer[64];
+			this.liModeC = memoryBuffer[65]; //Normal,Balance
+			this.liModeD = memoryBuffer[66]; //Normal,Balance,External
+			this.niModeC = memoryBuffer[67]; //Normal,REFLEX
+			this.niModeD = memoryBuffer[68];
+			this.pbModeC = memoryBuffer[69]; //Normal,REFLEX
+			this.pbModeD = memoryBuffer[70];
+			this.balSpeed = memoryBuffer[71];
+			this.balStartMode = memoryBuffer[72];
+			this.balStartVolt = DataParser.parse2Short(memoryBuffer[73], memoryBuffer[74]);
+			this.balDiff = memoryBuffer[75];
+			this.balOverPoint = memoryBuffer[76];
+			this.balSetPoint = memoryBuffer[77];
+			this.balDelay = memoryBuffer[78];
+			this.keepChargeEnable = memoryBuffer[79];
+			this.liPoChgCellVolt = DataParser.parse2Short(memoryBuffer[80], memoryBuffer[81]);
+			this.liIoChgCellVolt = DataParser.parse2Short(memoryBuffer[82], memoryBuffer[83]);
+			this.liFeChgCellVolt = DataParser.parse2Short(memoryBuffer[84], memoryBuffer[85]);
+			this.liPoStoCellVolt = DataParser.parse2Short(memoryBuffer[86], memoryBuffer[87]);
+			this.liLoStoCellVolt = DataParser.parse2Short(memoryBuffer[88], memoryBuffer[89]);
+			this.liFeStoCellVolt = DataParser.parse2Short(memoryBuffer[90], memoryBuffer[91]);
+			this.liPoDchgCellVolt = DataParser.parse2Short(memoryBuffer[92], memoryBuffer[93]);
+			this.liIoDchgCellVolt = DataParser.parse2Short(memoryBuffer[94], memoryBuffer[95]);
+			this.liFeDchgCellVolt = DataParser.parse2Short(memoryBuffer[96], memoryBuffer[97]);
+			this.chargeCurrent = DataParser.parse2Short(memoryBuffer[98], memoryBuffer[99]);
+			this.dischargeCurrent = DataParser.parse2Short(memoryBuffer[100], memoryBuffer[101]);
+			this.endCharge = DataParser.parse2Short(memoryBuffer[102], memoryBuffer[103]);
+			this.endDischarge = DataParser.parse2Short(memoryBuffer[104], memoryBuffer[105]);
+			this.regDchgMode = DataParser.parse2Short(memoryBuffer[106], memoryBuffer[107]);
+			this.niPeak = DataParser.parse2Short(memoryBuffer[108], memoryBuffer[109]);
+			this.niPeakDelay = DataParser.parse2Short(memoryBuffer[110], memoryBuffer[111]);
+			this.niTrickleEnable = DataParser.parse2Short(memoryBuffer[112], memoryBuffer[113]);
+			this.niTrickleCurrent = DataParser.parse2Short(memoryBuffer[114], memoryBuffer[115]);
+			this.niTrickleTime = DataParser.parse2Short(memoryBuffer[116], memoryBuffer[117]);
+			this.niZeroEnable = DataParser.parse2Short(memoryBuffer[118], memoryBuffer[119]);
+			this.niDischargeVolt = DataParser.parse2Short(memoryBuffer[120], memoryBuffer[121]);
+			this.pbChgCellVolt = DataParser.parse2Short(memoryBuffer[122], memoryBuffer[123]);
+			this.pbDchgCellVolt = DataParser.parse2Short(memoryBuffer[124], memoryBuffer[125]);
+			this.pbFloatEnable = DataParser.parse2Short(memoryBuffer[126], memoryBuffer[127]);
+			this.pbFloatCellVolt = DataParser.parse2Short(memoryBuffer[128], memoryBuffer[129]);
+			this.restoreVolt = DataParser.parse2Short(memoryBuffer[130], memoryBuffer[131]);
+			this.restoreTime = DataParser.parse2Short(memoryBuffer[132], memoryBuffer[133]);
+			this.restoreCurent = DataParser.parse2Short(memoryBuffer[134], memoryBuffer[135]);
+			this.cycleCount = DataParser.parse2Short(memoryBuffer[136], memoryBuffer[137]);
+			this.cycleDelay = DataParser.parse2Short(memoryBuffer[138], memoryBuffer[139]);
+			this.cycleMode = memoryBuffer[140];
+			this.safetyTimeC = DataParser.parse2Short(memoryBuffer[141], memoryBuffer[142]);
+			this.safetyCapC = DataParser.parse2Short(memoryBuffer[143], memoryBuffer[144]);
+			this.safetyTempC = DataParser.parse2Short(memoryBuffer[145], memoryBuffer[146]);
+			this.safetyTimeD = DataParser.parse2Short(memoryBuffer[147], memoryBuffer[148]);
+			this.safetyCapD = DataParser.parse2Short(memoryBuffer[149], memoryBuffer[150]);
+			this.safetyTempD = DataParser.parse2Short(memoryBuffer[151], memoryBuffer[152]);
+			this.regChMode = memoryBuffer[153];
+			this.regChVolt = DataParser.parse2Short(memoryBuffer[154], memoryBuffer[155]);
+			this.regChCurrent = DataParser.parse2Short(memoryBuffer[156], memoryBuffer[157]);
+			this.fastSto = memoryBuffer[158];
+			this.stoCompensation = DataParser.parse2Short(memoryBuffer[159], memoryBuffer[160]);
+			this.niZnChgCellVolt = DataParser.parse2Short(memoryBuffer[161], memoryBuffer[162]);
+			this.niZnDchgCellVolt = DataParser.parse2Short(memoryBuffer[163], memoryBuffer[164]);
+			this.niZnCell = memoryBuffer[165];
+			this.liHVChgCellVolt = DataParser.parse2Short(memoryBuffer[166], memoryBuffer[167]); //LIHV charge cell voltage
+			this.liHVStoCellVolt = DataParser.parse2Short(memoryBuffer[168], memoryBuffer[169]); //LIHV storage cell voltage
+			this.liHVDchgCellVolt = DataParser.parse2Short(memoryBuffer[170], memoryBuffer[171]); //LIHV discharge cell voltage
+			if (isDuo) { //without LTO, User, Power		
+				this.dump = memoryBuffer[166];
+				return;
+			}
+			this.ltoChgCellVolt = DataParser.parse2Short(memoryBuffer[172], memoryBuffer[173]); //LTO charge cell voltage
+			this.ltoStoCellVolt = DataParser.parse2Short(memoryBuffer[174], memoryBuffer[175]); //LTO storage cell voltage
+			this.ltoDchgCellVolt = DataParser.parse2Short(memoryBuffer[176], memoryBuffer[177]); //LTO discharge cell voltage
+			this.userChgCellVolt = DataParser.parse2Short(memoryBuffer[178], memoryBuffer[179]); //LTO charge cell voltage
+			this.userStoCellVolt = DataParser.parse2Short(memoryBuffer[180], memoryBuffer[181]); //LTO charge cell voltage
+			this.userDchgCellVolt = DataParser.parse2Short(memoryBuffer[182], memoryBuffer[183]); //LTO charge cell voltage
+			this.userCell = memoryBuffer[184]; //user defined cell
+			this.digitPowerVolt = DataParser.parse2Short(memoryBuffer[185], memoryBuffer[186]);
+			this.digitPowerCurrent = DataParser.parse2Short(memoryBuffer[187], memoryBuffer[188]);
+			this.digitPowerSet = DataParser.parse2Short(memoryBuffer[189], memoryBuffer[190]); //bit0--LOCK  bit1--?? bit2--??
+			this.dump = memoryBuffer[191];
 		}
-		this.ltoChgCellVolt = DataParser.parse2Short(memoryBuffer[172], memoryBuffer[173]);																						//LTO charge cell voltage
-		this.ltoStoCellVolt = DataParser.parse2Short(memoryBuffer[174], memoryBuffer[175]);																						//LTO storage cell voltage
-		this.ltoDchgCellVolt = DataParser.parse2Short(memoryBuffer[176], memoryBuffer[177]);																					//LTO discharge cell voltage
-
-		this.userChgCellVolt = DataParser.parse2Short(memoryBuffer[178], memoryBuffer[179]);																					//LTO charge cell voltage
-		this.userStoCellVolt = DataParser.parse2Short(memoryBuffer[180], memoryBuffer[181]);																					//LTO charge cell voltage
-		this.userDchgCellVolt = DataParser.parse2Short(memoryBuffer[182], memoryBuffer[183]);																					//LTO charge cell voltage
-		this.userCell = memoryBuffer[184];																									//user defined cell
-
-		this.digitPowerVolt = DataParser.parse2Short(memoryBuffer[185], memoryBuffer[186]);
-		this.digitPowerCurrent = DataParser.parse2Short(memoryBuffer[187], memoryBuffer[188]);
-		this.digitPowerSet = DataParser.parse2Short(memoryBuffer[189], memoryBuffer[190]);																					//bit0--LOCK  bit1--?? bit2--??
-
-		this.dump = memoryBuffer[191];
 	}
 //	
 //	/**
