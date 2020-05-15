@@ -279,6 +279,10 @@ public class MC3000 extends DeviceConfiguration implements IDevice {
 					this.trickleTime = buffer[30];
 					this.dischargeRestingTime = buffer[31];
 				}
+				else {
+					this.trickleTime = 0;
+					this.dischargeRestingTime = 0;
+				}
 				MC3000.log.log(java.util.logging.Level.FINE, this.toString());
 			}
 			else {

@@ -48,7 +48,8 @@ public class MC3000GathererThread extends Thread {
 	protected static final int	USB_QUERY_DELAY	= GDE.IS_WINDOWS ? 70 : 160;
 	final static String	$CLASS_NAME									= MC3000GathererThread.class.getName();
 	final static Logger	log													= Logger.getLogger(MC3000GathererThread.class.getName());
-	final static int		WAIT_TIME_RETRYS						= 3600;		// 3600 * 1 sec = 60 Minutes
+	final static int		WAIT_TIME_RETRYS_END_SEC		= 3600;		// 3600 * 1 sec = 60 Minutes
+	final static int		WAIT_TIME_RETRYS_MAX_SEC		= (240 + 1) * 60; // maximal evaluated resting time plus 1 Min
 
 	final DataExplorer	application;
 	final Settings			settings;
@@ -69,7 +70,8 @@ public class MC3000GathererThread extends Thread {
 	boolean							isProgrammExecuting3				= false;
 	boolean							isProgrammExecuting4				= false;
 	boolean[]						isAlerted4Finish						= { false, false, false, false };
-	int									retryCounter								= MC3000GathererThread.WAIT_TIME_RETRYS;	//60 Min
+	int									retryCounterRest_sec				= MC3000GathererThread.WAIT_TIME_RETRYS_MAX_SEC;	//maximal evaluated resting time plus 1 Min
+	int									retryCounterEnd_sec					= MC3000GathererThread.WAIT_TIME_RETRYS_END_SEC;	//60/4 = 15 Min
 
 	/**
 	 * data gatherer thread definition 
@@ -277,21 +279,23 @@ public class MC3000GathererThread extends Thread {
 							
 							//check for all processing finished and stop gathering after 15 min
 							if (this.device.isProcessingStatusStandByOrFinished(dataBuffer1) && this.device.isProcessingStatusStandByOrFinished(dataBuffer2) && this.device.isProcessingStatusStandByOrFinished(dataBuffer3) && this.device.isProcessingStatusStandByOrFinished(dataBuffer4)) {
-								if (0 >= (retryCounter -= 4)) {
-									log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
+								if (0 >= (retryCounterEnd_sec -= 4)) {
+									log.log(Level.OFF, "finish device activation timeout"); //$NON-NLS-1$
 									this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI3601));
 									stopDataGatheringThread(false, null);
 								}
 							}
-							else
-								this.retryCounter	= MC3000GathererThread.WAIT_TIME_RETRYS;	//60 Min
+							else {
+								this.retryCounterRest_sec	= MC3000GathererThread.WAIT_TIME_RETRYS_MAX_SEC;
+								this.retryCounterEnd_sec	= MC3000GathererThread.WAIT_TIME_RETRYS_END_SEC;
+							}
 						}
 						else {
 							this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGI3600));
 							log.logp(Level.FINE, MC3000GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 
-							if (0 >= (retryCounter -= 1)) {
-								log.log(Level.FINE, "device activation timeout"); //$NON-NLS-1$
+							if (0 >= (retryCounterRest_sec -= 1)) {
+								log.log(Level.OFF, "device activation timeout"); //$NON-NLS-1$
 								this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI3601));
 								stopDataGatheringThread(false, null);
 							}
