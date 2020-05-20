@@ -274,7 +274,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 	@Override
 	public void processMouseUpMove(Point point) {
 		if (this.curveSurvey.isOverVerticalLine(point.x)) {
-			this.graphicsComposite.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/MoveH.gif"));
+			this.graphicsComposite.graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_SIZEWE));
 		} else {
 			this.graphicsComposite.graphicCanvas.setCursor(DataExplorer.getInstance().getCursor());
 		}

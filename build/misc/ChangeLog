@@ -13,6 +13,7 @@ Generic changes/fixes
 	* macOS build - add code signing app and dmg to fulfill gatekeeper requirements
 	* add Java version check, detect run time version out of specified range
 	* update jSerialComm to version 2.6.2
+	* use system cursor for measuring to avoid misplaced cursor while sized desktop
 	
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control

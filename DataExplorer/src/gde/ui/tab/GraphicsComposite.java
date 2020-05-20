@@ -709,7 +709,7 @@ public class GraphicsComposite extends Composite {
 		if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
 		// Get the canvas and its dimensions
 		this.canvasBounds = this.graphicCanvas.getClientArea();
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "canvas size = " + this.canvasBounds); //$NON-NLS-1$
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "canvas size = " + this.canvasBounds); //$NON-NLS-1$
 
 		if (this.canvasImage != null) this.canvasImage.dispose();
 		this.canvasImage = new Image(GDE.display, this.canvasBounds);
@@ -1347,7 +1347,8 @@ public class GraphicsComposite extends Composite {
 	 * @param Point containing corrected x,y position value
 	 */
 	private Point checkCurveBounds(int xPos, int yPos) {
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "in  xPos = " + xPos + " yPos = " + yPos); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "in  xPos = " + xPos + " yPos = " + yPos); //$NON-NLS-1$ //$NON-NLS-2$
+		log.log(Level.OFF, "in  offSetX = " + offSetX + " offSetY = " + offSetY);
 		int tmpxPos = xPos - this.offSetX;
 		int tmpyPos = yPos - this.offSetY;
 		int minX = 0;
@@ -1360,7 +1361,7 @@ public class GraphicsComposite extends Composite {
 		if (tmpyPos < minY || tmpyPos > maxY) {
 			tmpyPos = tmpyPos < minY ? minY : maxY;
 		}
-		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "out xPos = " + tmpxPos + " yPos = " + tmpyPos); //$NON-NLS-1$ //$NON-NLS-2$
+		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "out xPos = " + tmpxPos + " yPos = " + tmpyPos); //$NON-NLS-1$ //$NON-NLS-2$
 		return new Point(tmpxPos, tmpyPos);
 	}
 
@@ -1381,12 +1382,12 @@ public class GraphicsComposite extends Composite {
 				this.canvasGC.setLineWidth(1);
 				this.canvasGC.setLineStyle(SWT.LINE_DASH);
 
+				if (log.isLoggable(Level.OFF))
+					log.log(Level.OFF, String.format("xDown = %d, evt.x = %d, xLast = %d  -  yDown = %d, evt.y = %d, yLast = %d", this.xDown, evt.x, this.xLast, this.yDown, evt.y, this.yLast)); //$NON-NLS-1$
+
 				if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
 					try {
 						if (this.isZoomMouse && recordSet.isZoomMode() && this.isResetZoomPosition) {
-							if (log.isLoggable(Level.FINER))
-								log.log(Level.FINER, String.format("xDown = %d, evt.x = %d, xLast = %d  -  yDown = %d, evt.y = %d, yLast = %d", this.xDown, evt.x, this.xLast, this.yDown, evt.y, this.yLast)); //$NON-NLS-1$
-
 							//clean obsolete rectangle
 							int left = this.xLast - this.xDown > 0 ? this.xDown : this.xLast;
 							int top = this.yLast - this.yDown > 0 ? this.yDown : this.yLast;
@@ -1570,7 +1571,7 @@ public class GraphicsComposite extends Composite {
 				}
 				else if (measureRecordKey != null && (recordSet.isMeasurementMode(measureRecordKey) || recordSet.isDeltaMeasurementMode(measureRecordKey))) {
 					if (this.xPosMeasure + 1 >= evt.x && this.xPosMeasure - 1 <= evt.x || this.xPosDelta + 1 >= evt.x && this.xPosDelta - 1 <= evt.x) { // snap mouse pointer
-						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/MoveH.gif")); //$NON-NLS-1$
+						this.graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_SIZEWE)); //$NON-NLS-1$
 					}
 					else {
 						this.graphicCanvas.setCursor(this.application.getCursor());
@@ -1584,7 +1585,7 @@ public class GraphicsComposite extends Composite {
 				}
 				else if (this.isLeftCutMode || this.isRightCutMode) {
 					if (this.xPosCut + 1 >= evt.x && this.xPosCut - 1 <= evt.x) { // snap mouse pointer
-						this.graphicCanvas.setCursor(SWTResourceManager.getCursor("gde/resource/MoveH.gif")); //$NON-NLS-1$
+						this.graphicCanvas.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_SIZESW)); //$NON-NLS-1$
 					}
 					else {
 						this.graphicCanvas.setCursor(this.application.getCursor());
