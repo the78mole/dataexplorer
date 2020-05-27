@@ -15,6 +15,7 @@ Generic changes/fixes
 	* update jSerialComm to version 2.6.2
 	* use system cursor for measuring to avoid misplaced cursor while sized desktop
 	* documentation update
+	* remove leading blanks while CSV relative time export
 	
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control

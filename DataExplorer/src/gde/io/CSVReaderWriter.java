@@ -457,7 +457,9 @@ public class CSVReaderWriter {
 				if (isRaw) { // do not change any values
 					String[] row = recordSet.getRawExportRow(i, isTimeFormatAbsolute);
 					for (String value : row) {
-						sb.append(value).append(separator);					
+						if (value != null)
+							sb.append(value.trim());		
+						sb.append(separator);
 					}
 				}
 				else {
@@ -466,7 +468,7 @@ public class CSVReaderWriter {
 					char currentrGoupingSeparator = Character.valueOf(recordSet.get(0).getDecimalFormat().getDecimalFormatSymbols().getGroupingSeparator());
 	
 					// add time entry
-					sb.append(row[0].replace('.', decimalSeparator)).append(separator);
+					sb.append(row[0].replace('.', decimalSeparator).trim()).append(separator);
 					// add data entries
 					int j = 0;
 					for (final Record record : recordSet.getVisibleAndDisplayableRecordsForTable()) {
