@@ -26,6 +26,7 @@ Device specific changes/fixes
 	* UniSens-E - enable live data gathering
 	* iMax B6* - fix missing energy calculation Ni battery type outside cycle
 	* MC3000 - fix to short wait time for possible adjustable rest time
+	* UniLog(1) * fix raw CSV export/import
 
 Version 3.4.1 - 03 Feb 2020
 Generic changes/fixes

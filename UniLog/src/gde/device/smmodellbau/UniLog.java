@@ -601,6 +601,28 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 		}
 		return dataTableRow;
 	}
+	
+	/**
+	 * function to prepare a row of record set for export while translating available measurement values.
+	 * @return pointer to filled data table row with formated values
+	 */
+	public String[] prepareRawExportRow(RecordSet recordSet, String[] dataTableRow, int rowIndex) {
+		try {
+			String[] recordNames = recordSet.getRecordNames();
+			for (int index = 1, j = 0; index < dataTableRow.length && j < recordNames.length; j++) { //do not touch index 0 with time entry
+				final Record record = recordSet.get(recordNames[j]);
+				MeasurementType  measurement = this.getMeasurement(recordSet.getChannelConfigNumber(), record.getOrdinal());
+				if (!measurement.isCalculation()) {	// only use active records for writing raw data
+					dataTableRow[index] = String.format("%d", record.realGet(rowIndex));
+					++index;
+				}
+			}
+		} catch (RuntimeException e) {
+			log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
+		}
+		return dataTableRow;
+	}
+
 
 	/**
 	 * function to translate measured values from a device to values represented
