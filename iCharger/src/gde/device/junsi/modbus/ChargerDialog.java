@@ -238,6 +238,8 @@ public class ChargerDialog extends DeviceDialog {
 
 	public ChargerInfo readInfo() {
 		ChargerInfo chargerInfo = null;
+		int retrys = 0;
+
 		try {
 			//Read system info data
 			short sizeInfo = (short) ((ChargerInfo.getSize() + 1) / 2);
@@ -249,6 +251,32 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
+			if (e instanceof TimeOutException) {
+				try {
+					this.usbPort.closeUsbPort(true);
+					log.log(Level.FINE, "USB interface closed");
+				}
+				catch (UsbException eClose) {
+					log.log(Level.SEVERE, eClose.getMessage(), eClose);
+				}
+	
+				for (int i = 0; i < 5; i++) {
+					try {
+						WaitTimer.delay(500);
+						if (!this.usbPort.isConnected()) {
+							log.log(Level.WARNING, "USB error recovery, reopen USB port");
+							this.usbPort.openUsbPort();
+						}
+					}
+					catch (UsbException eOpen) {
+						log.log(Level.SEVERE, eOpen.getMessage(), eOpen);
+					}
+				}
+				if (retrys++ < 3) {
+					log.log(Level.WARNING, String.format("attempt retry %d", retrys));
+					readInfo();
+				}
+			}
 		}
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
@@ -257,6 +285,8 @@ public class ChargerDialog extends DeviceDialog {
 	}
 
 	public void readSystem(boolean isDuo) {
+		int retrys = 0;
+
 		try {
 			//Read system setup data
 			//MasterRead(0,REG_HOLDING_SYS_START,(sizeof(SYSTEM)+1)/2,(BYTE *)&System)
@@ -269,6 +299,32 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
+			if (e instanceof TimeOutException) {
+				try {
+					this.usbPort.closeUsbPort(true);
+					log.log(Level.FINE, "USB interface closed");
+				}
+				catch (UsbException eClose) {
+					log.log(Level.SEVERE, eClose.getMessage(), eClose);
+				}
+	
+				for (int i = 0; i < 5; i++) {
+					try {
+						WaitTimer.delay(500);
+						if (!this.usbPort.isConnected()) {
+							log.log(Level.WARNING, "USB error recovery, reopen USB port");
+							this.usbPort.openUsbPort();
+						}
+					}
+					catch (UsbException eOpen) {
+						log.log(Level.SEVERE, eOpen.getMessage(), eOpen);
+					}
+				}
+				if (retrys++ < 3) {
+					log.log(Level.WARNING, String.format("attempt retry %d", retrys));
+					readSystem(isDuo);
+				}
+			}
 		}
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
@@ -848,6 +904,7 @@ public class ChargerDialog extends DeviceDialog {
 	 */
 	private String[] readProgramMemories() {
 		List<String> programMemories = new ArrayList<String>();
+		int retrys = 0;
 
 		try {
 			if (this.usbPort != null && this.usbPort.isConnected()) {
@@ -884,10 +941,36 @@ public class ChargerDialog extends DeviceDialog {
 			}
 		}
 		catch (IllegalStateException | TimeOutException e) {
+			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
 			if (e instanceof UsbException) {
 				this.application.openMessageDialogAsync(e.getMessage());
 			}
-			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
+			else if (e instanceof TimeOutException) {
+				try {
+					this.usbPort.closeUsbPort(true);
+					log.log(Level.FINE, "USB interface closed");
+				}
+				catch (UsbException eClose) {
+					log.log(Level.SEVERE, eClose.getMessage(), eClose);
+				}
+	
+				for (int i = 0; i < 5; i++) {
+					try {
+						WaitTimer.delay(500);
+						if (!this.usbPort.isConnected()) {
+							log.log(Level.WARNING, "USB error recovery, reopen USB port");
+							this.usbPort.openUsbPort();
+						}
+					}
+					catch (UsbException eOpen) {
+						log.log(Level.SEVERE, eOpen.getMessage(), eOpen);
+					}
+				}
+				if (retrys++ < 3) {
+					log.log(Level.WARNING, String.format("attempt retry %d", retrys));
+					readProgramMemories();
+				}
+			}
 		}
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
@@ -915,8 +998,9 @@ public class ChargerDialog extends DeviceDialog {
 		if (ChargerDialog.log.isLoggable(Level.FINER)) ChargerDialog.log.log(Level.FINER, "read using memory buffer length " + memoryBuffer.length); //$NON-NLS-1$
 		byte[] index = new byte[2];
 		index[0] = (byte) (selectedProgramMemoryIndex & 0xFF);
-		try {
+		int retrys = 0;
 
+		try {
 			this.usbPort.masterWrite(Register.REG_SEL_MEM.value, (short) 1, index);
 
 			this.usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
@@ -925,6 +1009,32 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
+			if (e instanceof TimeOutException) {
+				try {
+					this.usbPort.closeUsbPort(true);
+					log.log(Level.FINE, "USB interface closed");
+				}
+				catch (UsbException eClose) {
+					log.log(Level.SEVERE, eClose.getMessage(), eClose);
+				}
+	
+				for (int i = 0; i < 5; i++) {
+					try {
+						WaitTimer.delay(500);
+						if (!this.usbPort.isConnected()) {
+							log.log(Level.WARNING, "USB error recovery, reopen USB port");
+							this.usbPort.openUsbPort();
+						}
+					}
+					catch (UsbException eOpen) {
+						log.log(Level.SEVERE, eOpen.getMessage(), eOpen);
+					}
+				}
+				if (retrys++ < 3) {
+					log.log(Level.WARNING, String.format("attempt retry %d", retrys));
+					initProgramMemory(selectedProgramMemoryIndex);
+				}
+			}
 		}
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
@@ -943,6 +1053,7 @@ public class ChargerDialog extends DeviceDialog {
 		short sizeMemory = (short) (((this.systemInfo != null ? this.systemInfo.getProgramMemoryLength() : ChargerMemory.getSize(this.isDuo)) + 1) / 2);
 		byte[] index = new byte[2];
 		index[0] = (byte) (selectedProgramMemoryIndex & 0xFF);
+		int retrys = 0;
 
 		if ((this.isDuo && selectedProgramMemoryIndex < 7) || (!this.isDuo && selectedProgramMemoryIndex < 10)) {
 			ChargerDialog.log.log(Level.SEVERE, String.format(Messages.getString(MessageIds.GDE_MSGT2621), selectedProgramMemoryIndex));
@@ -965,6 +1076,32 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
+			if (e instanceof TimeOutException) {
+				try {
+					this.usbPort.closeUsbPort(true);
+					log.log(Level.FINE, "USB interface closed");
+				}
+				catch (UsbException eClose) {
+					log.log(Level.SEVERE, eClose.getMessage(), eClose);
+				}
+	
+				for (int i = 0; i < 5; i++) {
+					try {
+						WaitTimer.delay(500);
+						if (!this.usbPort.isConnected()) {
+							log.log(Level.WARNING, "USB error recovery, reopen USB port");
+							this.usbPort.openUsbPort();
+						}
+					}
+					catch (UsbException eOpen) {
+						log.log(Level.SEVERE, eOpen.getMessage(), eOpen);
+					}
+				}
+				if (retrys++ < 3) {
+					log.log(Level.WARNING, String.format("attempt retry %d", retrys));
+					writeProgramMemory(selectedProgramMemoryIndex, modifiedProgramMemory, useFlag);
+				}
+			}
 		}
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
