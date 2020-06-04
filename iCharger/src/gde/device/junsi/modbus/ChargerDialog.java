@@ -114,11 +114,14 @@ public class ChargerDialog extends DeviceDialog {
 	private ChargerSystem							systemSettings = null;
 
 	final static short								REG_INPUT_INFO_START				= 0x0000;
-
+	
 	final static short								REG_INPUT_CH1_START					= 0x0100;
 	final static short								REG_INPUT_CH1_NREGS					= 0x0100;
 	final static short								REG_INPUT_CH2_START					= (0x0100 + ChargerDialog.REG_INPUT_CH1_START);
 	final static short								REG_INPUT_CH2_NREGS					= ChargerDialog.REG_INPUT_CH1_NREGS;
+
+	final static short								REG_INPUT_STATUS_CH1				= REG_INPUT_CH1_START;
+	final static short								REG_INPUT_STATUS_CH2				= REG_INPUT_CH2_START;
 
 	final static short								REG_HOLDING_CTRL_START			= (short) 0x8000;
 	final static short								REG_HOLDING_SYS_START				= (short) 0x8400;
@@ -238,8 +241,6 @@ public class ChargerDialog extends DeviceDialog {
 
 	public ChargerInfo readInfo() {
 		ChargerInfo chargerInfo = null;
-		int retrys = 0;
-
 		try {
 			//Read system info data
 			short sizeInfo = (short) ((ChargerInfo.getSize() + 1) / 2);
@@ -251,32 +252,6 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
-			if (e instanceof TimeOutException) {
-				try {
-					this.usbPort.closeUsbPort(true);
-					log.log(Level.FINE, "USB interface closed");
-				}
-				catch (UsbException eClose) {
-					log.log(Level.SEVERE, eClose.getMessage(), eClose);
-				}
-	
-				for (int i = 0; i < 5; i++) {
-					try {
-						WaitTimer.delay(500);
-						if (!this.usbPort.isConnected()) {
-							log.log(Level.WARNING, "USB error recovery, reopen USB port");
-							this.usbPort.openUsbPort();
-						}
-					}
-					catch (UsbException eOpen) {
-						log.log(Level.SEVERE, eOpen.getMessage(), eOpen);
-					}
-				}
-				if (retrys++ < 3) {
-					log.log(Level.WARNING, String.format("attempt retry %d", retrys));
-					readInfo();
-				}
-			}
 		}
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
@@ -284,13 +259,35 @@ public class ChargerDialog extends DeviceDialog {
 		return chargerInfo;
 	}
 
-	public void readSystem(boolean isDuo) {
-		int retrys = 0;
+	public ChargerStatus readStatus(int channelNumber) {
+		ChargerStatus chargerStatus = null;
+		try {
+			//Read system info data
+			short sizeStatus = (short) ((ChargerStatus.getSize() + 1) / 2);
+			byte[] statusBuffer = new byte[sizeStatus * 2];
+			if (channelNumber == 2)
+				this.usbPort.masterRead((byte) 1, ChargerDialog.REG_INPUT_STATUS_CH2, sizeStatus, statusBuffer);
+			else
+				this.usbPort.masterRead((byte) 1, ChargerDialog.REG_INPUT_STATUS_CH1, sizeStatus, statusBuffer);
+			
+			chargerStatus = new ChargerStatus(statusBuffer);
+			if (ChargerDialog.log.isLoggable(Level.INFO)) 
+				ChargerDialog.log.log(Level.INFO, chargerStatus.toString());
+		}
+		catch (IllegalStateException | TimeOutException e) {
+			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		catch (RuntimeException rte) {
+			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
+		}
+		return chargerStatus;
+	}
 
+	public void readSystem(boolean isDuo) {
 		try {
 			//Read system setup data
 			//MasterRead(0,REG_HOLDING_SYS_START,(sizeof(SYSTEM)+1)/2,(BYTE *)&System)
-			short sizeSystem = (short) (((this.systemInfo != null ? this.systemInfo.getSystemMemoryLength() : ChargerSystem.getSize(isDuo)) + 1) / 2);
+			short sizeSystem = (short) (((this.systemInfo != null && this.systemInfo.getDeviceID() != 0 ? this.systemInfo.getSystemMemoryLength() : ChargerSystem.getSize(isDuo)) + 1) / 2);
 			byte[] systemBuffer = new byte[sizeSystem * 2];
 			this.usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_SYS_START, sizeSystem, systemBuffer);
 			this.systemSettings = new ChargerSystem(systemBuffer, isDuo);
@@ -299,32 +296,6 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
-			if (e instanceof TimeOutException) {
-				try {
-					this.usbPort.closeUsbPort(true);
-					log.log(Level.FINE, "USB interface closed");
-				}
-				catch (UsbException eClose) {
-					log.log(Level.SEVERE, eClose.getMessage(), eClose);
-				}
-	
-				for (int i = 0; i < 5; i++) {
-					try {
-						WaitTimer.delay(500);
-						if (!this.usbPort.isConnected()) {
-							log.log(Level.WARNING, "USB error recovery, reopen USB port");
-							this.usbPort.openUsbPort();
-						}
-					}
-					catch (UsbException eOpen) {
-						log.log(Level.SEVERE, eOpen.getMessage(), eOpen);
-					}
-				}
-				if (retrys++ < 3) {
-					log.log(Level.WARNING, String.format("attempt retry %d", retrys));
-					readSystem(isDuo);
-				}
-			}
 		}
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
@@ -904,8 +875,6 @@ public class ChargerDialog extends DeviceDialog {
 	 */
 	private String[] readProgramMemories() {
 		List<String> programMemories = new ArrayList<String>();
-		int retrys = 0;
-
 		try {
 			if (this.usbPort != null && this.usbPort.isConnected()) {
 				//Read memory structure of original and added/modified program memories
@@ -918,7 +887,7 @@ public class ChargerDialog extends DeviceDialog {
 
 				int i = 0;
 				byte[] index = new byte[2];
-				short sizeMemory = (short) (((this.systemInfo != null ? this.systemInfo.getProgramMemoryLength() : ChargerMemory.getSize(this.isDuo)) + 1) / 2);
+				short sizeMemory = (short) (((this.systemInfo != null && this.systemInfo.getDeviceID() != 0 ? this.systemInfo.getProgramMemoryLength() : ChargerMemory.getSize(this.isDuo)) + 1) / 2);
 				byte[] memoryBuffer;
 				this.memoryHeadIndex = memHead.getIndex();
 
@@ -942,35 +911,6 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
-			if (e instanceof UsbException) {
-				this.application.openMessageDialogAsync(e.getMessage());
-			}
-			else if (e instanceof TimeOutException) {
-				try {
-					this.usbPort.closeUsbPort(true);
-					log.log(Level.FINE, "USB interface closed");
-				}
-				catch (UsbException eClose) {
-					log.log(Level.SEVERE, eClose.getMessage(), eClose);
-				}
-	
-				for (int i = 0; i < 5; i++) {
-					try {
-						WaitTimer.delay(500);
-						if (!this.usbPort.isConnected()) {
-							log.log(Level.WARNING, "USB error recovery, reopen USB port");
-							this.usbPort.openUsbPort();
-						}
-					}
-					catch (UsbException eOpen) {
-						log.log(Level.SEVERE, eOpen.getMessage(), eOpen);
-					}
-				}
-				if (retrys++ < 3) {
-					log.log(Level.WARNING, String.format("attempt retry %d", retrys));
-					readProgramMemories();
-				}
-			}
 		}
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
@@ -993,12 +933,11 @@ public class ChargerDialog extends DeviceDialog {
 	 * @return byte array containing the program memory
 	 */
 	private byte[] initProgramMemory(int selectedProgramMemoryIndex) {
-		short sizeMemory = (short) (((this.systemInfo != null ? this.systemInfo.getProgramMemoryLength() : ChargerMemory.getSize(this.isDuo)) + 1) / 2);
+		short sizeMemory = (short) (((this.systemInfo != null && this.systemInfo.getDeviceID() != 0 ? this.systemInfo.getProgramMemoryLength() : ChargerMemory.getSize(this.isDuo)) + 1) / 2);
 		byte[] memoryBuffer = new byte[sizeMemory * 2];
 		if (ChargerDialog.log.isLoggable(Level.FINER)) ChargerDialog.log.log(Level.FINER, "read using memory buffer length " + memoryBuffer.length); //$NON-NLS-1$
 		byte[] index = new byte[2];
 		index[0] = (byte) (selectedProgramMemoryIndex & 0xFF);
-		int retrys = 0;
 
 		try {
 			this.usbPort.masterWrite(Register.REG_SEL_MEM.value, (short) 1, index);
@@ -1009,32 +948,6 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
-			if (e instanceof TimeOutException) {
-				try {
-					this.usbPort.closeUsbPort(true);
-					log.log(Level.FINE, "USB interface closed");
-				}
-				catch (UsbException eClose) {
-					log.log(Level.SEVERE, eClose.getMessage(), eClose);
-				}
-	
-				for (int i = 0; i < 5; i++) {
-					try {
-						WaitTimer.delay(500);
-						if (!this.usbPort.isConnected()) {
-							log.log(Level.WARNING, "USB error recovery, reopen USB port");
-							this.usbPort.openUsbPort();
-						}
-					}
-					catch (UsbException eOpen) {
-						log.log(Level.SEVERE, eOpen.getMessage(), eOpen);
-					}
-				}
-				if (retrys++ < 3) {
-					log.log(Level.WARNING, String.format("attempt retry %d", retrys));
-					initProgramMemory(selectedProgramMemoryIndex);
-				}
-			}
 		}
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
@@ -1050,10 +963,9 @@ public class ChargerDialog extends DeviceDialog {
 	 * @param useFlag 0x0000 for BUILD IN or 0x55aa for CUSTOM
 	 */
 	private void writeProgramMemory(final int selectedProgramMemoryIndex, ChargerMemory modifiedProgramMemory, short useFlag) {
-		short sizeMemory = (short) (((this.systemInfo != null ? this.systemInfo.getProgramMemoryLength() : ChargerMemory.getSize(this.isDuo)) + 1) / 2);
+		short sizeMemory = (short) (((this.systemInfo != null && this.systemInfo.getDeviceID() != 0 ? this.systemInfo.getProgramMemoryLength() : ChargerMemory.getSize(this.isDuo)) + 1) / 2);
 		byte[] index = new byte[2];
 		index[0] = (byte) (selectedProgramMemoryIndex & 0xFF);
-		int retrys = 0;
 
 		if ((this.isDuo && selectedProgramMemoryIndex < 7) || (!this.isDuo && selectedProgramMemoryIndex < 10)) {
 			ChargerDialog.log.log(Level.SEVERE, String.format(Messages.getString(MessageIds.GDE_MSGT2621), selectedProgramMemoryIndex));
@@ -1076,32 +988,6 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
-			if (e instanceof TimeOutException) {
-				try {
-					this.usbPort.closeUsbPort(true);
-					log.log(Level.FINE, "USB interface closed");
-				}
-				catch (UsbException eClose) {
-					log.log(Level.SEVERE, eClose.getMessage(), eClose);
-				}
-	
-				for (int i = 0; i < 5; i++) {
-					try {
-						WaitTimer.delay(500);
-						if (!this.usbPort.isConnected()) {
-							log.log(Level.WARNING, "USB error recovery, reopen USB port");
-							this.usbPort.openUsbPort();
-						}
-					}
-					catch (UsbException eOpen) {
-						log.log(Level.SEVERE, eOpen.getMessage(), eOpen);
-					}
-				}
-				if (retrys++ < 3) {
-					log.log(Level.WARNING, String.format("attempt retry %d", retrys));
-					writeProgramMemory(selectedProgramMemoryIndex, modifiedProgramMemory, useFlag);
-				}
-			}
 		}
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
@@ -1329,7 +1215,18 @@ public class ChargerDialog extends DeviceDialog {
 			return;
 		}
 		this.systemInfo = this.readInfo();
-		if ((this.systemInfo.getStatus() & 0x02) != 0) {
+		if (this.systemInfo == null || this.systemInfo.getDeviceID() == 0) {
+			log.log(Level.SEVERE, "Read system info failed");
+			this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGW2602, new String[] { this.device.getName() }));
+			try {
+				this.usbPort.closeUsbPort(true);
+			}
+			catch (UsbException e) {
+				ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
+			}
+			return;
+		}
+		else if ((this.systemInfo.getStatus() & 0x02) != 0) {
 			log.log(Level.SEVERE, this.systemInfo.getStatusString());
 			this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE2603));
 			try {
@@ -1649,8 +1546,8 @@ public class ChargerDialog extends DeviceDialog {
 					ChargerDialog.this.btnStop.setEnabled(true);
 					ChargerDialog.this.grpProgramMemory.setEnabled(false);
 					ChargerDialog.this.memoryComposite.setEnabled(false);
-					ChargerDialog.this.device.open_closeCommPort();
 					removeAllListeners();
+					ChargerDialog.this.device.open_closeCommPort();
 				}
 			}
 		});
@@ -1671,7 +1568,6 @@ public class ChargerDialog extends DeviceDialog {
 					ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 				}
 				else {
-					ChargerDialog.this.device.open_closeCommPort();
 					ChargerDialog.this.btnCharge.setEnabled(false);
 					ChargerDialog.this.btnStorage.setEnabled(false);
 					ChargerDialog.this.btnDischarge.setEnabled(false);
@@ -1681,6 +1577,7 @@ public class ChargerDialog extends DeviceDialog {
 					ChargerDialog.this.grpProgramMemory.setEnabled(false);
 					ChargerDialog.this.memoryComposite.setEnabled(false);
 					removeAllListeners();
+					ChargerDialog.this.device.open_closeCommPort();
 				}
 			}
 		});
@@ -1701,7 +1598,6 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
 					else {
-						ChargerDialog.this.device.open_closeCommPort();
 						ChargerDialog.this.btnCharge.setEnabled(false);
 						ChargerDialog.this.btnStorage.setEnabled(false);
 						ChargerDialog.this.btnDischarge.setEnabled(false);
@@ -1711,6 +1607,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.grpProgramMemory.setEnabled(false);
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
+						ChargerDialog.this.device.open_closeCommPort();
 					}
 				}
 			}
@@ -1733,7 +1630,6 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
 					else {
-						ChargerDialog.this.device.open_closeCommPort();
 						ChargerDialog.this.btnCharge.setEnabled(false);
 						ChargerDialog.this.btnStorage.setEnabled(false);
 						ChargerDialog.this.btnDischarge.setEnabled(false);
@@ -1743,6 +1639,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.grpProgramMemory.setEnabled(false);
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
+						ChargerDialog.this.device.open_closeCommPort();
 					}
 				}
 			}
@@ -1765,7 +1662,6 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
 					else {
-						ChargerDialog.this.device.open_closeCommPort();
 						ChargerDialog.this.btnCharge.setEnabled(false);
 						ChargerDialog.this.btnStorage.setEnabled(false);
 						ChargerDialog.this.btnDischarge.setEnabled(false);
@@ -1775,6 +1671,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.grpProgramMemory.setEnabled(false);
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
+						ChargerDialog.this.device.open_closeCommPort();
 					}
 				}
 			}
@@ -1798,7 +1695,6 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
 					else {
-						ChargerDialog.this.device.open_closeCommPort();
 						ChargerDialog.this.btnCharge.setEnabled(false);
 						ChargerDialog.this.btnStorage.setEnabled(false);
 						ChargerDialog.this.btnDischarge.setEnabled(false);
@@ -1809,6 +1705,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.grpProgramMemory.setEnabled(false);
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
+						ChargerDialog.this.device.open_closeCommPort();
 					}
 				}
 			}
@@ -2182,7 +2079,7 @@ public class ChargerDialog extends DeviceDialog {
 				true, 50, 200, 5, 1000, -5, false);
 		//15 Discharge power channel 2
 		this.systemParameters[15] = new ParameterConfigControl(this.grpChargeDischargePower, this.systemValues, 15, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGI2640, new String[] {Messages.getString(MessageIds.GDE_MSGI2645).split(",")[2]}), 175, 
+				Messages.getString(MessageIds.GDE_MSGI2642, new String[] {Messages.getString(MessageIds.GDE_MSGI2645).split(",")[2]}), 175, 
 				String.format("5W - %dW", device.getDischargePowerMax()[1]), 280, //$NON-NLS-1$
 				true, 50, 200, 5, device.getDischargePowerMax()[1], -5, false);
 		//17 input select
