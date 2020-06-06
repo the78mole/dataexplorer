@@ -106,8 +106,19 @@ public class UsbGathererThread extends Thread {
 		
 		try {
 			if (this.device.getDialog() != null) {
+				try {
+					this.usbPort.getData(); //sync logging and modbus query
+					//WaitTimer.delay(200);
+				}
+				catch (TimeOutException e) {
+					//ignore 
+				}
+				this.device.getDialog().startLogTransmission();
 				this.chargerInfo = this.device.getDialog().readInfo();
-				log.log(Level.OFF, this.device.getName() + GDE.STRING_MESSAGE_CONCAT + this.chargerInfo.getSystemInfo());
+				if (this.chargerInfo != null)
+					log.log(Level.OFF, this.device.getName() + GDE.STRING_MESSAGE_CONCAT + this.chargerInfo.getSystemInfo());
+				else 
+					log.log(Level.OFF, this.device.getName() + GDE.STRING_MESSAGE_CONCAT + "failed to initialize chargerInfo");
 			}
 		}
 		catch (Exception e) {

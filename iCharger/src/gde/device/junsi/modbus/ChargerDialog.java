@@ -59,6 +59,7 @@ import gde.device.junsi.MessageIds;
 import gde.device.junsi.iCharger4010DUO;
 import gde.device.junsi.iChargerUsb;
 import gde.device.junsi.iChargerX6;
+import gde.device.junsi.modbus.ChargerUsbPort.ModBusErrorCode;
 import gde.exception.TimeOutException;
 import gde.io.DataParser;
 import gde.log.Level;
@@ -245,7 +246,8 @@ public class ChargerDialog extends DeviceDialog {
 			//Read system info data
 			short sizeInfo = (short) ((ChargerInfo.getSize() + 1) / 2);
 			byte[] infoBuffer = new byte[sizeInfo * 2];
-			this.usbPort.masterRead((byte) 1, ChargerDialog.REG_INPUT_INFO_START, sizeInfo, infoBuffer);
+			if (ModBusErrorCode.MB_EOK != this.usbPort.masterRead((byte) 1, ChargerDialog.REG_INPUT_INFO_START, sizeInfo, infoBuffer))
+				throw new IllegalStateException();
 			chargerInfo = new ChargerInfo(infoBuffer);
 			if (ChargerDialog.log.isLoggable(Level.INFO)) 
 				ChargerDialog.log.log(Level.INFO, chargerInfo.toString());
@@ -266,9 +268,11 @@ public class ChargerDialog extends DeviceDialog {
 			short sizeStatus = (short) ((ChargerStatus.getSize() + 1) / 2);
 			byte[] statusBuffer = new byte[sizeStatus * 2];
 			if (channelNumber == 2)
-				this.usbPort.masterRead((byte) 1, ChargerDialog.REG_INPUT_STATUS_CH2, sizeStatus, statusBuffer);
+				if (ModBusErrorCode.MB_EOK != this.usbPort.masterRead((byte) 1, ChargerDialog.REG_INPUT_STATUS_CH2, sizeStatus, statusBuffer))
+					throw new IllegalStateException();
 			else
-				this.usbPort.masterRead((byte) 1, ChargerDialog.REG_INPUT_STATUS_CH1, sizeStatus, statusBuffer);
+				if (ModBusErrorCode.MB_EOK != this.usbPort.masterRead((byte) 1, ChargerDialog.REG_INPUT_STATUS_CH1, sizeStatus, statusBuffer))
+					throw new IllegalStateException();
 			
 			chargerStatus = new ChargerStatus(statusBuffer);
 			if (ChargerDialog.log.isLoggable(Level.INFO)) 
@@ -289,7 +293,8 @@ public class ChargerDialog extends DeviceDialog {
 			//MasterRead(0,REG_HOLDING_SYS_START,(sizeof(SYSTEM)+1)/2,(BYTE *)&System)
 			short sizeSystem = (short) (((this.systemInfo != null && this.systemInfo.getDeviceID() != 0 ? this.systemInfo.getSystemMemoryLength() : ChargerSystem.getSize(isDuo)) + 1) / 2);
 			byte[] systemBuffer = new byte[sizeSystem * 2];
-			this.usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_SYS_START, sizeSystem, systemBuffer);
+			if (ModBusErrorCode.MB_EOK != this.usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_SYS_START, sizeSystem, systemBuffer))
+				throw new IllegalStateException();				
 			this.systemSettings = new ChargerSystem(systemBuffer, isDuo);
 			this.systemValues = this.systemSettings.getSystemValues(this.systemValues);
 			if (ChargerDialog.log.isLoggable(Level.FINER)) ChargerDialog.log.log(Level.FINER, new ChargerSystem(systemBuffer, isDuo).toString(isDuo));
@@ -1174,6 +1179,81 @@ public class ChargerDialog extends DeviceDialog {
 	}
 
 	/**
+	 * stop log transmission, log transmission and modbus communication needs synchronization
+	 * @param channel number of channel enum {channel1, channel2}
+	 */
+	private void stopLogTransmission() {
+		try {
+			boolean isConnectedByStop = false;
+			if (this.usbPort != null) {
+				if (!this.usbPort.isConnected()) {
+					this.usbPort.openUsbPort();
+					isConnectedByStop = true;
+					WaitTimer.delay(500);
+				}
+				byte[] temp = new byte[4];
+				temp[0] = (byte) (ChargerDialog.VALUE_ORDER_KEY & 0xFF);
+				temp[1] = (byte) (ChargerDialog.VALUE_ORDER_KEY >> 8);
+				temp[2] = (byte) Order.ORDER_TRANS_LOG_OFF.ordinal();
+				if (ModBusErrorCode.MB_EOK != this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short) (temp.length / 2), temp))
+					throw new IllegalStateException();
+
+				temp = new byte[2];
+				if (ModBusErrorCode.MB_EOK != this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short) (temp.length / 2), temp))
+					throw new IllegalStateException();
+
+				if (isConnectedByStop) this.usbPort.closeUsbPort(true);
+			}
+		}
+		catch (UsbException | IllegalStateException | TimeOutException e) {
+			if (e instanceof UsbException) {
+				this.application.openMessageDialogAsync(e.getMessage());
+			}
+			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		catch (RuntimeException rte) {
+			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
+		}
+	}
+
+	/**
+	 * stop log transmission, log transmission and modbus communication needs synchronization
+	 */
+	public void startLogTransmission() {
+		try {
+			boolean isConnectedByStop = false;
+			if (this.usbPort != null) {
+				if (!this.usbPort.isConnected()) {
+					this.usbPort.openUsbPort();
+					isConnectedByStop = true;
+					WaitTimer.delay(500);
+				}
+				byte[] temp = new byte[4];
+				temp[0] = (byte) (ChargerDialog.VALUE_ORDER_KEY & 0xFF);
+				temp[1] = (byte) (ChargerDialog.VALUE_ORDER_KEY >> 8);
+				temp[2] = (byte) Order.ORDER_TRANS_LOG_ON.ordinal();
+				if (ModBusErrorCode.MB_EOK != this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short) (temp.length / 2), temp))
+						throw new IllegalStateException();
+
+				temp = new byte[2];
+				if (ModBusErrorCode.MB_EOK != this.usbPort.masterWrite(Register.REG_ORDER_KEY.value, (short) (temp.length / 2), temp))
+						throw new IllegalStateException();
+
+				if (isConnectedByStop) this.usbPort.closeUsbPort(true);
+			}
+		}
+		catch (UsbException | IllegalStateException | TimeOutException e) {
+			if (e instanceof UsbException) {
+				this.application.openMessageDialogAsync(e.getMessage());
+			}
+			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		catch (RuntimeException rte) {
+			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
+		}
+	}
+
+	/**
 	 * Create the dialog.
 	 * @param parent
 	 * @param style
@@ -1214,6 +1294,20 @@ public class ChargerDialog extends DeviceDialog {
 			this.application.openMessageDialogAsync(Messages.getString(gde.messages.MessageIds.GDE_MSGE0051, new Object[] { e.getClass().getSimpleName() + GDE.STRING_BLANK_COLON_BLANK + e.getMessage() }));
 			return;
 		}
+		try {
+			this.usbPort.getData();
+		}
+		catch (Exception e1) {
+			//ignore
+		}
+		try {
+			this.usbPort.getData(); //sync logging and modbus query
+			WaitTimer.delay(200);
+		}
+		catch (Exception e) {
+			//ignore 
+		}
+		this.stopLogTransmission();
 		this.systemInfo = this.readInfo();
 		if (this.systemInfo == null || this.systemInfo.getDeviceID() == 0) {
 			log.log(Level.SEVERE, "Read system info failed");
@@ -1259,6 +1353,7 @@ public class ChargerDialog extends DeviceDialog {
 		if (!((iChargerUsb) this.device).isDataGathererActive() && this.isPortOpenedByDialog && this.usbPort != null && this.usbPort.isConnected()) {
 			try {
 				if (!((iChargerUsb) this.device).isDataGathererActive()) {
+					this.startLogTransmission();
 					this.usbPort.closeUsbPort(true);
 					this.isPortOpenedByDialog = false;
 				}
@@ -1538,6 +1633,7 @@ public class ChargerDialog extends DeviceDialog {
 					ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 				}
 				else {
+					ChargerDialog.this.startLogTransmission();
 					ChargerDialog.this.btnCharge.setEnabled(false);
 					ChargerDialog.this.btnStorage.setEnabled(false);
 					ChargerDialog.this.btnDischarge.setEnabled(false);
@@ -1548,6 +1644,7 @@ public class ChargerDialog extends DeviceDialog {
 					ChargerDialog.this.memoryComposite.setEnabled(false);
 					removeAllListeners();
 					ChargerDialog.this.device.open_closeCommPort();
+					ChargerDialog.this.dialogShell.dispose();
 				}
 			}
 		});
@@ -1568,6 +1665,7 @@ public class ChargerDialog extends DeviceDialog {
 					ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 				}
 				else {
+					ChargerDialog.this.startLogTransmission();
 					ChargerDialog.this.btnCharge.setEnabled(false);
 					ChargerDialog.this.btnStorage.setEnabled(false);
 					ChargerDialog.this.btnDischarge.setEnabled(false);
@@ -1578,6 +1676,7 @@ public class ChargerDialog extends DeviceDialog {
 					ChargerDialog.this.memoryComposite.setEnabled(false);
 					removeAllListeners();
 					ChargerDialog.this.device.open_closeCommPort();
+					ChargerDialog.this.dialogShell.dispose();
 				}
 			}
 		});
@@ -1598,6 +1697,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
 					else {
+						ChargerDialog.this.startLogTransmission();
 						ChargerDialog.this.btnCharge.setEnabled(false);
 						ChargerDialog.this.btnStorage.setEnabled(false);
 						ChargerDialog.this.btnDischarge.setEnabled(false);
@@ -1608,6 +1708,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
 						ChargerDialog.this.device.open_closeCommPort();
+						ChargerDialog.this.dialogShell.dispose();
 					}
 				}
 			}
@@ -1630,6 +1731,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
 					else {
+						ChargerDialog.this.startLogTransmission();
 						ChargerDialog.this.btnCharge.setEnabled(false);
 						ChargerDialog.this.btnStorage.setEnabled(false);
 						ChargerDialog.this.btnDischarge.setEnabled(false);
@@ -1640,6 +1742,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
 						ChargerDialog.this.device.open_closeCommPort();
+						ChargerDialog.this.dialogShell.dispose();
 					}
 				}
 			}
@@ -1662,6 +1765,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
 					else {
+						ChargerDialog.this.startLogTransmission();
 						ChargerDialog.this.btnCharge.setEnabled(false);
 						ChargerDialog.this.btnStorage.setEnabled(false);
 						ChargerDialog.this.btnDischarge.setEnabled(false);
@@ -1672,6 +1776,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
 						ChargerDialog.this.device.open_closeCommPort();
+						ChargerDialog.this.dialogShell.dispose();
 					}
 				}
 			}
@@ -1695,6 +1800,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
 					else {
+						ChargerDialog.this.startLogTransmission();
 						ChargerDialog.this.btnCharge.setEnabled(false);
 						ChargerDialog.this.btnStorage.setEnabled(false);
 						ChargerDialog.this.btnDischarge.setEnabled(false);
@@ -1706,6 +1812,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
 						ChargerDialog.this.device.open_closeCommPort();
+						ChargerDialog.this.dialogShell.dispose();
 					}
 				}
 			}
@@ -1725,18 +1832,6 @@ public class ChargerDialog extends DeviceDialog {
 					WaitTimer.delay(100); //wait to avoid communication conflicts
 				stopProgramExecution((byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1));
 				ChargerDialog.this.dialogShell.dispose();
-				//				btnCharge.setEnabled(true);
-				//				btnStorage.setEnabled(true);
-				//				btnDischarge.setEnabled(true);
-				//				btnCycle.setEnabled(true);
-				//				btnBalance.setEnabled(true);
-				//				btnPower.setEnabled(false);
-				//				btnStop.setEnabled(false);
-				//				combo.setItems(ChargerDialog.this.getProgramMemories());
-				//				combo.select(0);
-				//				grpProgramMemory.setEnabled(true);
-				//				memoryComposite.setEnabled(true);
-				//	 			addAllListeners();
 			}
 		});
 
