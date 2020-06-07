@@ -82,10 +82,13 @@ public class ChargerInfo {
 		return sb.toString();
 	}
 	
-	public String getHardwareVersionString() {
+	public String getHardwareVersionString(boolean isDuo) {
 		String hardwareVersionString = "V" + this.hardwareVersion;
 		try {
-			hardwareVersionString =	String.format("%s.%s.%d", hardwareVersionString.substring(0, 2), hardwareVersionString.substring(2, 3), Integer.parseInt(hardwareVersionString.substring(3)));
+			if (isDuo)
+				hardwareVersionString =	String.format("%s.%s%d", hardwareVersionString.substring(0, 2), hardwareVersionString.substring(2, 3), Integer.parseInt(hardwareVersionString.substring(3)));
+			else
+				hardwareVersionString =	String.format("%s.%s.%d", hardwareVersionString.substring(0, 2), hardwareVersionString.substring(2, 3), Integer.parseInt(hardwareVersionString.substring(3)));
 		}
 		catch (RuntimeException e) {
 			// ignore
@@ -93,10 +96,13 @@ public class ChargerInfo {
 		return hardwareVersionString;
 	}
 
-	public String getSoftwareVersionString() {
+	public String getSoftwareVersionString(boolean isDuo) {
 		String softwareVersionString = "V" + this.softwareVersion;
 		try {
-			softwareVersionString =	String.format("%s.%s.%d", softwareVersionString.substring(0, 2), softwareVersionString.substring(2, 3), Integer.parseInt(softwareVersionString.substring(3)));
+			if (isDuo)
+				softwareVersionString =	String.format("%s.%s%d", softwareVersionString.substring(0, 2), softwareVersionString.substring(2, 3), Integer.parseInt(softwareVersionString.substring(3)));
+			else
+				softwareVersionString =	String.format("%s.%s.%d", softwareVersionString.substring(0, 2), softwareVersionString.substring(2, 3), Integer.parseInt(softwareVersionString.substring(3)));
 		}
 		catch (RuntimeException e) {
 			// ignore
@@ -104,8 +110,8 @@ public class ChargerInfo {
 		return softwareVersionString;
 	}
 	
-	public String getSystemInfo() {
-		return String.format("Firmware:%s; Hardware:%s; SN:%s", this.getSoftwareVersionString(), this.getHardwareVersionString(), this.getDeviceSnString());
+	public String getSystemInfo(boolean isDuo) {
+		return String.format("Firmware:%s; Hardware:%s; SN:%s", this.getSoftwareVersionString(isDuo), this.getHardwareVersionString(isDuo), this.getDeviceSnString());
 	}
 
 	/**

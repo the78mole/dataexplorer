@@ -108,7 +108,7 @@ public class UsbGathererThread extends Thread {
 			if (this.device.getDialog() != null) {
 				try {
 					this.usbPort.getData(); //sync logging and modbus query
-					//WaitTimer.delay(200);
+					WaitTimer.delay(100);
 				}
 				catch (TimeOutException e) {
 					//ignore 
@@ -116,7 +116,7 @@ public class UsbGathererThread extends Thread {
 				this.device.getDialog().startLogTransmission();
 				this.chargerInfo = this.device.getDialog().readInfo();
 				if (this.chargerInfo != null)
-					log.log(Level.OFF, this.device.getName() + GDE.STRING_MESSAGE_CONCAT + this.chargerInfo.getSystemInfo());
+					log.log(Level.OFF, this.device.getName() + GDE.STRING_MESSAGE_CONCAT + this.chargerInfo.getSystemInfo(this.device.getName().toLowerCase().endsWith("duo") ? true : false));
 				else 
 					log.log(Level.OFF, this.device.getName() + GDE.STRING_MESSAGE_CONCAT + "failed to initialize chargerInfo");
 			}
@@ -379,7 +379,7 @@ public class UsbGathererThread extends Thread {
 				UsbGathererThread.log.logp(Level.FINE, UsbGathererThread.$CLASS_NAME, $METHOD_NAME, processRecordSetKey + " created for channel " + outputChannel.getName()); //$NON-NLS-1$
 				recordSet = outputChannel.get(processRecordSetKey);
 				if (this.chargerInfo != null)
-					recordSet.setRecordSetDescription(String.format("%s\n%s", recordSet.getDescription(), this.chargerInfo.getSystemInfo()));
+					recordSet.setRecordSetDescription(String.format("%s\n%s", recordSet.getDescription(), this.chargerInfo.getSystemInfo(this.device.getName().toLowerCase().endsWith("duo") ? true : false)));
 				recordSet.setAllDisplayable();
 				channel.applyTemplate(recordSetKey, false);
 				// switch the active record set if the current record set is child of active channel

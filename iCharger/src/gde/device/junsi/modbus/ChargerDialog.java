@@ -34,6 +34,8 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -1302,7 +1304,7 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		try {
 			this.usbPort.getData(); //sync logging and modbus query
-			WaitTimer.delay(200);
+			WaitTimer.delay(100);
 		}
 		catch (Exception e) {
 			//ignore 
@@ -1343,6 +1345,22 @@ public class ChargerDialog extends DeviceDialog {
 			this.btnStop.setEnabled(true);
 			this.grpProgramMemory.setEnabled(false);
 		}
+		this.dialogShell.addMouseTrackListener(new MouseTrackAdapter() {
+			@Override
+			public void mouseEnter(MouseEvent evt) {
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.mouseEnter, event=" + evt); //$NON-NLS-1$
+				fadeOutAplhaBlending(evt, getDialogShell().getClientArea(), 10, 10, 10, 15);
+			}
+			@Override
+			public void mouseHover(MouseEvent evt) {
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.mouseHover, event=" + evt); //$NON-NLS-1$
+			}
+			@Override
+			public void mouseExit(MouseEvent evt) {
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "dialogShell.mouseExit, event=" + evt); //$NON-NLS-1$
+				fadeInAlpaBlending(evt, getDialogShell().getClientArea(), 5, 5, -5, 5);
+			}
+		});
 		this.dialogShell.layout();
 		Display display = getParent().getDisplay();
 		while (!this.dialogShell.isDisposed()) {
@@ -1368,11 +1386,25 @@ public class ChargerDialog extends DeviceDialog {
 	 * Create contents of the dialog.
 	 */
 	private void createContents() {
-		this.dialogShell = new Shell(getParent(), getStyle());
-		this.dialogShell.setSize(800, 750);
+		this.shellAlpha = Settings.getInstance().getDialogAlphaValue();
+		this.isAlphaEnabled = Settings.getInstance().isDeviceDialogAlphaEnabled();
+
+		if (Settings.getInstance().isDeviceDialogsModal())
+			this.dialogShell = new Shell(this.application.getShell(), SWT.DIALOG_TRIM | SWT.PRIMARY_MODAL);
+		else if (Settings.getInstance().isDeviceDialogsOnTop())
+			this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM | SWT.ON_TOP);
+		else
+			this.dialogShell = new Shell(this.application.getDisplay(), SWT.DIALOG_TRIM);		this.dialogShell.setSize(800, 750);
+		
+		SWTResourceManager.registerResourceUser(this.dialogShell);
 		this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		this.dialogShell.setText(getText());
-		this.dialogShell.setLayout(new FillLayout());
+		this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$
+		if (this.isAlphaEnabled) this.dialogShell.setAlpha(254);
+		FillLayout mainTabFolderLayout = new FillLayout();
+		mainTabFolderLayout.marginHeight = 5;
+		mainTabFolderLayout.marginWidth = 5;
+		this.dialogShell.setLayout(mainTabFolderLayout);
 		
 		CTabFolder mainTabFolder = new CTabFolder(dialogShell, SWT.NONE);
 		mainTabFolder.setSelectionBackground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
@@ -1644,7 +1676,6 @@ public class ChargerDialog extends DeviceDialog {
 					ChargerDialog.this.memoryComposite.setEnabled(false);
 					removeAllListeners();
 					ChargerDialog.this.device.open_closeCommPort();
-					ChargerDialog.this.dialogShell.dispose();
 				}
 			}
 		});
@@ -1676,7 +1707,6 @@ public class ChargerDialog extends DeviceDialog {
 					ChargerDialog.this.memoryComposite.setEnabled(false);
 					removeAllListeners();
 					ChargerDialog.this.device.open_closeCommPort();
-					ChargerDialog.this.dialogShell.dispose();
 				}
 			}
 		});
@@ -1708,7 +1738,6 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
 						ChargerDialog.this.device.open_closeCommPort();
-						ChargerDialog.this.dialogShell.dispose();
 					}
 				}
 			}
@@ -1742,7 +1771,6 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
 						ChargerDialog.this.device.open_closeCommPort();
-						ChargerDialog.this.dialogShell.dispose();
 					}
 				}
 			}
@@ -1776,7 +1804,6 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
 						ChargerDialog.this.device.open_closeCommPort();
-						ChargerDialog.this.dialogShell.dispose();
 					}
 				}
 			}
@@ -1812,7 +1839,6 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.this.memoryComposite.setEnabled(false);
 						removeAllListeners();
 						ChargerDialog.this.device.open_closeCommPort();
-						ChargerDialog.this.dialogShell.dispose();
 					}
 				}
 			}
@@ -1828,9 +1854,14 @@ public class ChargerDialog extends DeviceDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ChargerDialog.this.device.open_closeCommPort();
-				while (((iChargerUsb) ChargerDialog.this.device).isDataGathererActive())
-					WaitTimer.delay(100); //wait to avoid communication conflicts
-				stopProgramExecution((byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1));
+				try {
+					ChargerDialog.this.usbPort.getData(); //sync logging and modbus query
+					WaitTimer.delay(100);
+				}
+				catch (Exception ex) {
+					//ignore 
+				}
+				ChargerDialog.this.stopProgramExecution((byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1));
 				ChargerDialog.this.dialogShell.dispose();
 			}
 		});
