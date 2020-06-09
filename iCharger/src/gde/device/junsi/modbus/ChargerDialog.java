@@ -140,8 +140,12 @@ public class ChargerDialog extends DeviceDialog {
 		ORDER_STOP, ORDER_RUN, ORDER_MODIFY, ORDER_WRITE_SYS, ORDER_WRITE_MEM_HEAD, ORDER_WRITE_MEM, ORDER_TRANS_LOG_ON, ORDER_TRANS_LOG_OFF, ORDER_MSGBOX_YES, ORDER_MSGBOX_NO;
 	};
 
-	enum Operation {
-		Charge, Storage, Discharge, Cycle, Balance, Power;
+	enum OperationLi {
+		Charge, Storage, Discharge, Cycle, Balance;
+	}
+
+	enum OperationNiPb {
+		Charge, Discharge, Cycle;
 	}
 
 	enum Register {
@@ -1656,26 +1660,28 @@ public class ChargerDialog extends DeviceDialog {
 		this.btnCharge.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				startProgramExecution((byte) Operation.Charge.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
-						ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
-				WaitTimer.delay(400);
-				ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
-				if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
-					log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
-					ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
-				}
-				else {
-					ChargerDialog.this.startLogTransmission();
-					ChargerDialog.this.btnCharge.setEnabled(false);
-					ChargerDialog.this.btnStorage.setEnabled(false);
-					ChargerDialog.this.btnDischarge.setEnabled(false);
-					ChargerDialog.this.btnCycle.setEnabled(false);
-					ChargerDialog.this.btnBalance.setEnabled(false);
-					ChargerDialog.this.btnStop.setEnabled(true);
-					ChargerDialog.this.grpProgramMemory.setEnabled(false);
-					ChargerDialog.this.memoryComposite.setEnabled(false);
-					removeAllListeners();
-					ChargerDialog.this.device.open_closeCommPort();
+				if (ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()] >= 0) {
+					startProgramExecution((byte) OperationLi.Charge.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
+							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
+					WaitTimer.delay(400);
+					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
+					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+						log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
+						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
+					}
+					else {
+						ChargerDialog.this.startLogTransmission();
+						ChargerDialog.this.btnCharge.setEnabled(false);
+						ChargerDialog.this.btnStorage.setEnabled(false);
+						ChargerDialog.this.btnDischarge.setEnabled(false);
+						ChargerDialog.this.btnCycle.setEnabled(false);
+						ChargerDialog.this.btnBalance.setEnabled(false);
+						ChargerDialog.this.btnStop.setEnabled(true);
+						ChargerDialog.this.grpProgramMemory.setEnabled(false);
+						ChargerDialog.this.memoryComposite.setEnabled(false);
+						removeAllListeners();
+						ChargerDialog.this.device.open_closeCommPort();
+					} 
 				}
 			}
 		});
@@ -1687,26 +1693,28 @@ public class ChargerDialog extends DeviceDialog {
 		this.btnStorage.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				startProgramExecution((byte) Operation.Storage.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
-						ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
-				WaitTimer.delay(400);
-				ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
-				if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
-					log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
-					ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
-				}
-				else {
-					ChargerDialog.this.startLogTransmission();
-					ChargerDialog.this.btnCharge.setEnabled(false);
-					ChargerDialog.this.btnStorage.setEnabled(false);
-					ChargerDialog.this.btnDischarge.setEnabled(false);
-					ChargerDialog.this.btnCycle.setEnabled(false);
-					ChargerDialog.this.btnBalance.setEnabled(false);
-					ChargerDialog.this.btnStop.setEnabled(true);
-					ChargerDialog.this.grpProgramMemory.setEnabled(false);
-					ChargerDialog.this.memoryComposite.setEnabled(false);
-					removeAllListeners();
-					ChargerDialog.this.device.open_closeCommPort();
+				if (ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()] >= 0) {
+					startProgramExecution((byte) OperationLi.Storage.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
+							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
+					WaitTimer.delay(400);
+					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
+					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+						log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
+						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
+					}
+					else {
+						ChargerDialog.this.startLogTransmission();
+						ChargerDialog.this.btnCharge.setEnabled(false);
+						ChargerDialog.this.btnStorage.setEnabled(false);
+						ChargerDialog.this.btnDischarge.setEnabled(false);
+						ChargerDialog.this.btnCycle.setEnabled(false);
+						ChargerDialog.this.btnBalance.setEnabled(false);
+						ChargerDialog.this.btnStop.setEnabled(true);
+						ChargerDialog.this.grpProgramMemory.setEnabled(false);
+						ChargerDialog.this.memoryComposite.setEnabled(false);
+						removeAllListeners();
+						ChargerDialog.this.device.open_closeCommPort();
+					} 
 				}
 			}
 		});
@@ -1719,7 +1727,9 @@ public class ChargerDialog extends DeviceDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()] >= 0) {
-					startProgramExecution((byte) Operation.Discharge.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
+					byte operationIndex = ChargerDialog.this.cellTypeNamesArray[ChargerDialog.this.memoryValues[0]].startsWith("L") 
+							? (byte) OperationLi.Discharge.ordinal() : (byte) OperationNiPb.Discharge.ordinal();
+					startProgramExecution(operationIndex, (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
 							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
 					WaitTimer.delay(400);
 					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
@@ -1751,7 +1761,9 @@ public class ChargerDialog extends DeviceDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()] >= 0) {
-					startProgramExecution((byte) Operation.Cycle.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
+					byte operationIndex = ChargerDialog.this.cellTypeNamesArray[ChargerDialog.this.memoryValues[0]].startsWith("L") 
+							? (byte) OperationLi.Cycle.ordinal() : (byte) OperationNiPb.Cycle.ordinal();
+					startProgramExecution(operationIndex, (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
 							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
 					WaitTimer.delay(400);
 					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
@@ -1784,7 +1796,7 @@ public class ChargerDialog extends DeviceDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()] >= 0) {
-					startProgramExecution((byte) Operation.Balance.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
+					startProgramExecution((byte) OperationLi.Balance.ordinal(), (byte) (ChargerDialog.this.application.getActiveChannelNumber() - 1),
 							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
 					WaitTimer.delay(400);
 					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
