@@ -134,6 +134,9 @@ public class DataParserDuo extends DataParser {
 				}
 			}
 			break;
+					
+		case 130: //0x82 Batt capacity/cell skip
+			break;
 		}
 
 
