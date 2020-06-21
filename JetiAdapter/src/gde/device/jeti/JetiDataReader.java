@@ -192,7 +192,8 @@ public class JetiDataReader {
 									newRecordName = String.format("%s %s", newRecordName, telemetrySensor.getName());
 								}
 								vecRecordNames.add(newRecordName);
-								if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "add new record name = " + newRecordName);
+								if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) 
+									JetiDataReader.log.log(java.util.logging.Level.FINE, String.format("add new record = %s [%s]", newRecordName, dataVar.getUnit()));
 
 								device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
 								device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
@@ -213,7 +214,7 @@ public class JetiDataReader {
 								{
 									mapRecordType.put(index, Record.DataType.GPS_ALTITUDE);
 								}
-								else if (dataVar.getName().toLowerCase().contains("speed") && (dataVar.getUnit().equals("km/h") || dataVar.getUnit().equals("kmh") || dataVar.getUnit().equals("kph") || dataVar.getUnit().equals("m/s"))) {
+								else if ((dataVar.getName().toLowerCase().contains("speed") || dataVar.getName().toLowerCase().contains("geschw")) && (dataVar.getUnit().equals("km/h") || dataVar.getUnit().equals("kmh") || dataVar.getUnit().equals("kph") || dataVar.getUnit().equals("m/s"))) {
 									mapRecordType.put(index, Record.DataType.GPS_SPEED);
 								}
 								if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "param = " + dataVar.getParam());
