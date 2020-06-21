@@ -374,15 +374,15 @@ public class KMZWriter {
 			String dateString = new SimpleDateFormat("yyyy-MM-dd").format(date); //$NON-NLS-1$
 
 			boolean isPositionWritten = false;
-			double positionLongitude = device.translateValue(recordLongitude, recordLongitude.realGet(1) / 1000.0);
-			double positionLatitude = device.translateValue(recordLongitude, recordLatitude.realGet(1) / 1000.0);
+			double positionLongitude = device.translateValue(recordLongitude, recordLongitude.get(1) / 1000.0);
+			double positionLatitude = device.translateValue(recordLongitude, recordLatitude.get(1) / 1000.0);
 			int i = 0;
 			for (; i < realDataSize; i++) {
-				if (recordLongitude.realGet(i) != 0 && recordLatitude.realGet(i) != 0) {
+				if (recordLongitude.get(i) != 0 && recordLatitude.get(i) != 0) {
 					if (!isPositionWritten) {
 						// longitude, latitude, heading, tilt, range, lineColor, lineWidth, extrude
-						positionLongitude = device.translateValue(recordLongitude, recordLongitude.realGet(i) / 1000.0);
-						positionLatitude = device.translateValue(recordLongitude, recordLatitude.realGet(i) / 1000.0);
+						positionLongitude = device.translateValue(recordLongitude, recordLongitude.get(i) / 1000.0);
+						positionLatitude = device.translateValue(recordLongitude, recordLatitude.get(i) / 1000.0);
 						String recordSetDescription = recordSet.getRecordSetDescription();
 						recordSetDescription = recordSetDescription.contains(GDE.STRING_NEW_LINE) ? recordSetDescription.split(GDE.STRING_NEW_LINE)[0] : recordSetDescription;
 						zipWriter.write(String.format(Locale.ENGLISH, KMZWriter.position, recordSet.getName(),
@@ -392,7 +392,7 @@ public class KMZWriter {
 								dateString, new SimpleDateFormat("HH:mm:ss").format(date + recordSet.getTime_ms(recordLongitude.size() - 1)),
 								positionLongitude, positionLatitude, -50, 70, 1000).getBytes());
 						isPositionWritten = true;
-						height0 = isHeightRelative && !isClampToGround && recordHeight != null ? device.translateValue(recordHeight, recordHeight.realGet(i) / 1000.0) : 0;
+						height0 = isHeightRelative && !isClampToGround && recordHeight != null ? device.translateValue(recordHeight, recordHeight.get(i) / 1000.0) : 0;
 						break;
 					}
 				}

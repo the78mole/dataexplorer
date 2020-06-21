@@ -1905,7 +1905,7 @@ public final class RecordSet extends AbstractRecordSet {
 		for (Record record : this.getValues()) {
 			if (record.dataType == Record.DataType.GPS_LATITUDE || record.dataType == Record.DataType.GPS_LONGITUDE || record.dataType == Record.DataType.GPS_ALTITUDE) ++sumGpsRelatedRecords;
 		}
-		return sumGpsRelatedRecords == 3;
+		return sumGpsRelatedRecords >= 3;
 	}
 
 	/**
