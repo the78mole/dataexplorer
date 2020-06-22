@@ -899,9 +899,12 @@ public class UniLog extends DeviceConfiguration implements IDevice {
 			property = record.getProperty(UniLog.PROP_N_100_W);
 			int prop_n100W = property != null ? Integer.valueOf(property.getValue()) : 10000;
 			recordCurrent = recordSet.get(2); // 2=current
+			Record recordA1 = recordSet.get(11); // 11=A1 -> torque
 			for (int i = 0; i < recordRevolution.size(); i++) {
 				if (i > 1 && recordRevolution.get(i)> 100000 && recordCurrent.get(i) > 3000) { //100 1/min && 3A
-					double motorPower = Math.pow(((recordRevolution.get(i) * rpmFactor / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
+					double motorPower = (prop_n100W == 99999 // A1 -> torque
+							? 2 * Math.PI * (recordA1.get(i)/1000.) * (recordRevolution.get(i)/1000.) / ((recordVoltage.get(i)/1000.) * (recordCurrent.get(i)/1000.) * 60)
+							: Math.pow(((recordRevolution.get(i) * rpmFactor / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3)) * 1000.0;
 					double eta = motorPower * 100.0 / recordPower.get(i);
 					eta = eta > 100 ? record.lastElement()/1000.0 : eta < 0 ? 0 : eta;
 					if (log.isLoggable(Level.FINER))
