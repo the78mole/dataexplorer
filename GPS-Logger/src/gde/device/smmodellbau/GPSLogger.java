@@ -301,11 +301,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
 				else {
-					//dataTableRow[j + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
-					double value = (record.get(rowIndex) / 1000000.0);
-					int grad = (int)value;
-					double minuten = (value - grad) * 100;
-					dataTableRow[index + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
+					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 				}
 				++index;
 			}
