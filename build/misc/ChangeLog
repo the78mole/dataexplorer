@@ -17,6 +17,7 @@ Generic changes/fixes
 	* documentation update
 	* remove leading blanks while CSV relative time export
 	* fix GPS export make LookAt section related
+	* fix display problem of geo-coordinates in curve compare
 	
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control

@@ -262,12 +262,16 @@ public class CurveUtils {
 		try {
 			// draw scaled points to draw area - measurements can only be drawn starting with the first measurement point
 			if (parent.isCompareSet()) {// compare set might contain records with different size
+				boolean isGPSCoordinate = record.getDevice().isGPSCoordinates(record);
 				//drawLimit = drawLimit / xScale;
 				int drawLimit = record.findBestIndex(record.getCompareSetDrawLimit_ms()) - record.findBestIndex(record.getZoomTimeOffset());
 				int j = 0;
 				for (; j < displayableSize && displayableSize > 1; j += xScaleFactor) {
 					// get the point to be drawn
-					newPoint = record.getDisplayPoint(j, x0, y0);
+					if (isGPSCoordinate)
+						newPoint = record.getGPSDisplayPoint(j, x0, y0);
+					else
+						newPoint = record.getDisplayPoint(j, x0, y0);
 					if (log.isLoggable(Level.FINEST)) sb.append(GDE.LINE_SEPARATOR).append(newPoint.toString());
 					if (j <= drawLimit) {
 						gc.drawLine(oldPoint.x, oldPoint.y, newPoint.x, newPoint.y);
