@@ -2042,7 +2042,7 @@ public class HoTTbinReader {
 			lastModifiedDate.setTimeInMillis(fileLastModified - numberDatablocks * 10);
 			if (year == lastModifiedDate.get(Calendar.YEAR) && month == lastModifiedDate.get(Calendar.MONTH) + 1 && day == lastModifiedDate.get(Calendar.DAY_OF_MONTH)) {
 				startTimeStamp = lastModifiedDate.getTimeInMillis();
-				log.log(Level.FINE, "lastModified=" + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", fileLastModified) + " " + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss", lastModifiedDate.getTimeInMillis())); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				log.log(Level.FINE, "creation=" + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", lastModifiedDate.getTimeInMillis()) + " lastModified=" + StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", fileLastModified)); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			else {
 				// spread the logCounter into steps of 10 minutes
