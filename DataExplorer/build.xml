@@ -45,11 +45,11 @@
 		<pathelement location="../build/lib/usb4java.jar" />
 		<pathelement location="../build/lib/usb-api.jar" />
 		<pathelement location="../build/lib/usb4java-javax.jar" />
-		<pathelement location="../build/lib/build/lib/commons-lang3.jar" />
+		<pathelement location="../build/lib/commons-lang3.jar" />
+		<pathelement location="../build/lib/jtouchbar.jar" />
+		<pathelement location="../build/lib/jtouchbar-swt.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/libusb4java.jar" />
-		<pathelement location="../build/lib/MAC/64/jtouchbar.jar" />
-		<pathelement location="../build/lib/MAC/64/jtouchbar-swt.jar" />
 	</path>
 
 	<target name="compile" description="compile the project">

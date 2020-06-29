@@ -662,6 +662,8 @@
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/tlmreader.jar" />
+			<fileset file="build/lib/jtouchbar.jar" />
+			<fileset file="build/lib/jtouchbar-swt.jar" />
 			<fileset file="build/lib/Windows/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.windows64.java.ext}" flatten="yes">
@@ -683,6 +685,8 @@
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/tlmreader.jar" />
+			<fileset file="build/lib/jtouchbar.jar" />
+			<fileset file="build/lib/jtouchbar-swt.jar" />
 			<fileset file="build/lib/Windows/64/libusb4java.jar" />
 		</copy>
 		
@@ -734,6 +738,8 @@
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/tlmreader.jar" />
+			<fileset file="build/lib/jtouchbar.jar" />
+			<fileset file="build/lib/jtouchbar-swt.jar" />
 			<fileset file="build/lib/Raspbian/32/libusb4java.jar" />
 		</copy>
 		
@@ -800,6 +806,8 @@
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/tlmreader.jar" />
+			<fileset file="build/lib/jtouchbar.jar" />
+			<fileset file="build/lib/jtouchbar-swt.jar" />
 			<fileset file="build/lib/GNULinux/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.gnulinux64.java.ext}" flatten="yes">
@@ -821,6 +829,8 @@
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/tlmreader.jar" />
+			<fileset file="build/lib/jtouchbar.jar" />
+			<fileset file="build/lib/jtouchbar-swt.jar" />
 			<fileset file="build/lib/GNULinux/64/libusb4java.jar" />
 		</copy>
 
@@ -896,6 +906,8 @@
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/tlmreader.jar" />
+			<fileset file="build/lib/jtouchbar.jar" />
+			<fileset file="build/lib/jtouchbar-swt.jar" />
 			<fileset file="build/lib/MAC/32/libusb4java.jar" />
 		</copy>
 		<copy todir="${output.mac64.java.ext}" flatten="yes">
@@ -915,10 +927,10 @@
 			<fileset file="build/lib/usb-api.jar" />
 			<fileset file="build/lib/usb4java-javax.jar" />
 			<fileset file="build/lib/commons-lang3.jar" />
+			<fileset file="build/lib/jtouchbar.jar" />
+			<fileset file="build/lib/jtouchbar-swt.jar" />
 			<fileset file="build/lib/tlmreader.jar" />
 			<fileset file="build/lib/MAC/64/libusb4java.jar" />
-			<fileset file="build/lib/MAC/64/jtouchbar.jar" />
-			<fileset file="build/lib/MAC/64/jtouchbar-swt.jar" />
 		</copy>
 
 		<!-- launcher scripts, README -->
