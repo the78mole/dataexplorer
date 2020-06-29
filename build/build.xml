@@ -917,6 +917,8 @@
 			<fileset file="build/lib/commons-lang3.jar" />
 			<fileset file="build/lib/tlmreader.jar" />
 			<fileset file="build/lib/MAC/64/libusb4java.jar" />
+			<fileset file="build/lib/MAC/64/jtouchbar.jar" />
+			<fileset file="build/lib/MAC/64/jtouchbar-swt.jar" />
 		</copy>
 
 		<!-- launcher scripts, README -->

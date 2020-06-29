@@ -29,6 +29,7 @@
 	<available property="build.properties.exists" file="${build.properties}" />
 	<echo message="Building using ${build.properties}" />
 	<echo message="Execution OS = ${os.name} ${os.arch} ${sun.arch.data.model}, OS short name = ${build.os.shortname}" />
+	<echo message="compile.classpath = ../build/lib/${build.os.shortname}/${sun.arch.data.model}/touchbar.jar" />
 
 	<property name="module.output" location="classes"/>
 
@@ -47,6 +48,8 @@
 		<pathelement location="../build/lib/build/lib/commons-lang3.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/swt.jar" />
 		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/libusb4java.jar" />
+		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/jtouchbar.jar" />
+		<pathelement location="../build/lib/${build.os.shortname}/${sun.arch.data.model}/jtouchbar-swt.jar" />
 	</path>
 
 	<target name="compile" description="compile the project">
@@ -78,7 +81,7 @@
 			<attribute name="Created-By" value="${user.name}"/>
 			<attribute name="Built-Date" value="${TODAY}"/> 
 			<attribute name="Main-Class" value="gde.GDE"/>
-			<attribute name="Class-Path" value="java/ext/juniversalchardet.jar java/ext/jaxb-api.jar java/ext/jaxb-core.jar java/ext/jaxb-runtime.jar java/ext/istack-commons-runtime.jar java/ext/activation.jar java/ext/gson.jar java/ext/swt.jar java/ext/jSerialComm.jar java/ext/RXTXcomm.jar java/ext/usb-api.jar java/ext/usb4java-javax.jar java/ext/usb4java.jar java/ext/commons-lang3.jar java/ext/libusb4java.jar"/>
+			<attribute name="Class-Path" value="java/ext/juniversalchardet.jar java/ext/jaxb-api.jar java/ext/jaxb-core.jar java/ext/jaxb-runtime.jar java/ext/istack-commons-runtime.jar java/ext/activation.jar java/ext/gson.jar java/ext/swt.jar java/ext/jSerialComm.jar java/ext/RXTXcomm.jar java/ext/usb-api.jar java/ext/usb4java-javax.jar java/ext/usb4java.jar java/ext/commons-lang3.jar java/ext/libusb4java.jar java/ext/jtouchbar.jar java/ext/jtouchbar-swt.jar"/>
    		</manifest>
  	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" >
 	       	<fileset dir="${module.output}" includes="**/*.class"/>

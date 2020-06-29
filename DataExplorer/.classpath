@@ -21,5 +21,7 @@
 	<classpathentry kind="lib" path="/build/lib/usb4java-javax.jar"/>
 	<classpathentry kind="lib" path="/build/lib/gson.jar"/>
 	<classpathentry kind="lib" path="/build/lib/tlmreader.jar"/>
+	<classpathentry kind="lib" path="/build/lib/MAC/64/jtouchbar-swt.jar"/>
+	<classpathentry kind="lib" path="/build/lib/MAC/64/jtouchbar.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -18,6 +18,7 @@ Generic changes/fixes
 	* remove leading blanks while CSV relative time export
 	* fix GPS export make LookAt section related
 	* fix display problem of geo-coordinates in curve compare
+	* add macOS touch bar support
 	
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control

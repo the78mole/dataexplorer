@@ -19,6 +19,7 @@
 ****************************************************************************************/
 package gde.ui.menu;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map.Entry;
@@ -41,6 +42,13 @@ import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+
+import com.thizzer.jtouchbar.JTouchBar;
+import com.thizzer.jtouchbar.item.TouchBarItem;
+import com.thizzer.jtouchbar.item.view.TouchBarButton;
+import com.thizzer.jtouchbar.item.view.TouchBarView;
+import com.thizzer.jtouchbar.item.view.action.TouchBarViewAction;
+import com.thizzer.jtouchbar.swt.JTouchBarSWT;
 
 import gde.GDE;
 import gde.comm.DeviceCommPort;
@@ -130,6 +138,8 @@ public class MenuToolBar {
 	String							activeObjectKey;
 	String							language;
 	String							colorSchemaType;
+	
+	TouchBarButton 			touchBarButtonImport;
 
 	final DataExplorer	application;
 	final Channels			channels;
@@ -1107,6 +1117,190 @@ public class MenuToolBar {
 
 		// set the focus controlled to an item which has no slection capability
 		this.deviceObjectToolBar.setFocus();
+		
+		if (GDE.IS_MAC && GDE.IS_ARCH_DATA_MODEL_64) {
+			try {
+				createTouchBar();
+			}
+			catch (Exception e) {
+				// ignore touch bar is model dependent 
+			}
+		}
+	}
+
+	/**
+	 * create the touch bar if system supported
+	 * @throws IOException
+	 */
+	private void createTouchBar() throws IOException {
+		JTouchBar jTouchBar = new JTouchBar();
+		jTouchBar.setCustomizationIdentifier("GDE_TouchBar");
+		// flexible space
+		jTouchBar.addItem(new TouchBarItem(TouchBarItem.NSTouchBarItemIdentifierFlexibleSpace));
+
+		// New
+		TouchBarButton touchBarButtonNew = new TouchBarButton();
+		touchBarButtonNew.setAlternatTitle("New");
+		touchBarButtonNew.setAction(new TouchBarViewAction() {
+			@Override
+			public void onCall(TouchBarView view) {
+				if (MenuToolBar.this.application.getDeviceSelectionDialog().checkDataSaved()) {
+					MenuToolBar.this.application.getDeviceSelectionDialog().setupDataChannels(MenuToolBar.this.application.getActiveDevice());
+				}
+			}
+		});
+		com.thizzer.jtouchbar.common.Image newImg = new com.thizzer.jtouchbar.common.Image(GDE.class.getClassLoader().getResourceAsStream("gde/resource/New.gif"));
+		touchBarButtonNew.setImage(newImg);
+		jTouchBar.addItem(new TouchBarItem("New", touchBarButtonNew, true));
+
+		// Open
+		TouchBarButton touchBarButtonOpen = new TouchBarButton();
+		touchBarButtonOpen.setAlternatTitle("Open");
+		touchBarButtonOpen.setAction(new TouchBarViewAction() {
+			@Override
+			public void onCall(TouchBarView view) {
+				new FileHandler().openFileDialog(Messages.getString(MessageIds.GDE_MSGT0004));						}
+		});
+		com.thizzer.jtouchbar.common.Image open = new com.thizzer.jtouchbar.common.Image(GDE.class.getClassLoader().getResourceAsStream("gde/resource/Open.gif"));
+		touchBarButtonOpen.setImage(open);
+		jTouchBar.addItem(new TouchBarItem("Open", touchBarButtonOpen, true));
+
+		// Import
+		touchBarButtonImport = new TouchBarButton();
+		touchBarButtonImport.setAlternatTitle("Import");
+		touchBarButtonImport.setAction(new TouchBarViewAction() {
+			@Override
+			public void onCall(TouchBarView view) {
+				IDevice activeDevice = MenuToolBar.this.application.getActiveDevice();
+				if (activeDevice != null) {
+					activeDevice.open_closeCommPort();
+					if (activeDevice.getCommunicationPort() != null) {
+						if (activeDevice.getCommunicationPort().isConnected()) {
+							MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0067));
+						}
+						else {
+							MenuToolBar.this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0066));
+							if (MenuToolBar.this.application.getTabSelectionIndex() >= DataExplorer.TAB_INDEX_HISTO_SUMMARY) {
+								MenuToolBar.this.application.selectTab(c -> c instanceof GraphicsWindow && ((GraphicsWindow) c).getGraphicsType().equals(GraphicsType.NORMAL));
+							}
+						}
+					}
+				}
+			}
+		});
+		updateTouchBarImportButton("gde/resource/" + this.colorSchemaType + this.language + "/PortCloseHot.gif");
+		jTouchBar.addItem(new TouchBarItem("Import", touchBarButtonImport, true));
+
+		// Save
+		TouchBarButton touchBarButtonSave = new TouchBarButton();
+		touchBarButtonSave.setAlternatTitle("Save");
+		touchBarButtonSave.setAction(new TouchBarViewAction() {
+			@Override
+			public void onCall(TouchBarView view) {
+				Channel activeChannel = Channels.getInstance().getActiveChannel();
+				if (activeChannel != null) {
+					if (!activeChannel.isSaved())
+						new FileHandler().saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0006), GDE.STRING_EMPTY);
+					else
+						new FileHandler().saveOsdFile(Messages.getString(MessageIds.GDE_MSGT0007), activeChannel.getFileName());
+				}
+			}
+		});
+		com.thizzer.jtouchbar.common.Image save = new com.thizzer.jtouchbar.common.Image(GDE.class.getClassLoader().getResourceAsStream("gde/resource/Save.gif"));
+		touchBarButtonSave.setImage(save);
+		jTouchBar.addItem(new TouchBarItem("Save", touchBarButtonSave, true));
+
+		// Copy
+		TouchBarButton touchBarButtonCopy = new TouchBarButton();
+		touchBarButtonCopy.setAlternatTitle("Copy");
+		touchBarButtonCopy.setAction(new TouchBarViewAction() {
+			@Override
+			public void onCall(TouchBarView view) {
+				MenuToolBar.this.application.copyTabContentAsImage();
+			}
+		});
+		com.thizzer.jtouchbar.common.Image copy = new com.thizzer.jtouchbar.common.Image(GDE.class.getClassLoader().getResourceAsStream("gde/resource/Copy.gif"));
+		touchBarButtonCopy.setImage(copy);
+		jTouchBar.addItem(new TouchBarItem("Copy", touchBarButtonCopy, true));
+
+		// Previous
+		TouchBarButton touchBarButtonPrev = new TouchBarButton();
+		touchBarButtonPrev.setAlternatTitle("Prev");
+		touchBarButtonPrev.setAction(new TouchBarViewAction() {
+			@Override
+			public void onCall(TouchBarView view) {
+				if (MenuToolBar.this.application.getActiveDevice() == null
+						|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getCommunicationPort() == null)
+						|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getCommunicationPort() != null && !MenuToolBar.this.application.getActiveDevice().getCommunicationPort().isConnected())) {
+					DeviceConfiguration deviceConfig;
+					DeviceSelectionDialog deviceSelect = MenuToolBar.this.application.getDeviceSelectionDialog();
+					if (deviceSelect.checkDataSaved()) {
+						int selection = deviceSelect.getDeviceConfigurations().indexOf(deviceSelect.getActiveConfig().getName());
+						int tmpSize = deviceSelect.getNumberOfActiveDevices();
+						if (selection > 0 && selection <= tmpSize) {
+							deviceConfig = deviceSelect.getDeviceConfigurations().get(deviceSelect.getDeviceConfigurations().get(selection - 1));
+						}
+						else
+							deviceConfig = deviceSelect.getDeviceConfigurations().get(deviceSelect.getDeviceConfigurations().get(tmpSize - 1));
+
+						// if a device tool box is open, dispose it
+						if (MenuToolBar.this.application.getDeviceDialog() != null && !MenuToolBar.this.application.getDeviceDialog().isDisposed()) {
+							MenuToolBar.this.application.getDeviceDialog().dispose();
+						}
+
+						deviceSelect.setActiveConfig(deviceConfig);
+						deviceSelect.setupDevice();
+					}
+				}
+				else {
+					MenuToolBar.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0017));
+				}
+			}
+		});
+		com.thizzer.jtouchbar.common.Image back = new com.thizzer.jtouchbar.common.Image(GDE.class.getClassLoader().getResourceAsStream("gde/resource/ArrowWhiteGreenFieldLeft.gif"));
+		touchBarButtonPrev.setImage(back);
+		jTouchBar.addItem(new TouchBarItem("Prev", touchBarButtonPrev, true));
+
+		// Next
+		TouchBarButton touchBarButtonNext = new TouchBarButton();
+		touchBarButtonNext.setAlternatTitle("Next");
+		touchBarButtonNext.setAction(new TouchBarViewAction() {
+			@Override
+			public void onCall(TouchBarView view) {
+				// allow device switch only if port not connected
+				if (MenuToolBar.this.application.getActiveDevice() == null
+						|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getCommunicationPort() == null)
+						|| (MenuToolBar.this.application.getActiveDevice() != null && MenuToolBar.this.application.getActiveDevice().getCommunicationPort() != null && !MenuToolBar.this.application.getActiveDevice().getCommunicationPort().isConnected())) {
+					DeviceConfiguration deviceConfig;
+					DeviceSelectionDialog deviceSelect = MenuToolBar.this.application.getDeviceSelectionDialog();
+					if (deviceSelect.checkDataSaved()) {
+						int selection = deviceSelect.getDeviceConfigurations().indexOf(deviceSelect.getActiveConfig().getName());
+						int tmpSize = deviceSelect.getNumberOfActiveDevices() - 1;
+						if (selection >= 0 && selection < tmpSize)
+							deviceConfig = deviceSelect.getDeviceConfigurations().get(deviceSelect.getDeviceConfigurations().get(selection + 1));
+						else
+							deviceConfig = deviceSelect.getDeviceConfigurations().get(deviceSelect.getDeviceConfigurations().get(0));
+
+						// if a device tool box is open, dispose it
+						if (MenuToolBar.this.application.getDeviceDialog() != null && !MenuToolBar.this.application.getDeviceDialog().isDisposed()) {
+							MenuToolBar.this.application.getDeviceDialog().dispose();
+						}
+
+						deviceSelect.setActiveConfig(deviceConfig);
+						deviceSelect.setupDevice();
+					}
+				}
+				else {
+					MenuToolBar.this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGW0030));
+				}
+			}
+		});
+		com.thizzer.jtouchbar.common.Image next = new com.thizzer.jtouchbar.common.Image(GDE.class.getClassLoader().getResourceAsStream("gde/resource/ArrowWhiteGreenFieldRight.gif"));
+		touchBarButtonNext.setImage(next);
+		jTouchBar.addItem(new TouchBarItem("Next", touchBarButtonNext, true));
+
+		// enable touchbar
+		JTouchBarSWT.show(jTouchBar, GDE.shell);
 	}
 
 	/**
@@ -1322,6 +1516,10 @@ public class MenuToolBar {
 						this.portOpenCloseItem.setToolTipText(this.toolTipOpen);
 					else
 						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0067));
+					
+					if (touchBarButtonImport != null) {
+						updateTouchBarImportButton("gde/resource/" + this.colorSchemaType + this.language + "/PortCloseHot.gif");					
+					}
 				}
 				else {
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/PortOpenDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1331,6 +1529,10 @@ public class MenuToolBar {
 						this.portOpenCloseItem.setToolTipText(this.toolTipClose);
 					else
 						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0066));
+					
+					if (touchBarButtonImport != null) {
+						updateTouchBarImportButton("gde/resource/" + this.colorSchemaType + this.language + "/PortOpen.gif");					
+					}
 				}
 				break;
 			case 1: // DeviceSerialPort.ICON_SET_START_STOP
@@ -1342,6 +1544,10 @@ public class MenuToolBar {
 						this.portOpenCloseItem.setToolTipText(this.toolTipOpen);
 					else
 						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0069));
+					
+					if (touchBarButtonImport != null) {
+						updateTouchBarImportButton("gde/resource/" + this.colorSchemaType + this.language + "/StopGather.gif");					
+					}
 				}
 				else {
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/StartGatherDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1351,6 +1557,10 @@ public class MenuToolBar {
 						this.portOpenCloseItem.setToolTipText(this.toolTipClose);
 					else
 						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0068));
+					
+					if (touchBarButtonImport != null) {
+						updateTouchBarImportButton("gde/resource/" + this.colorSchemaType + this.language + "/StartGatherHot.gif");					
+					}
 				}
 				break;
 			case 2: // DeviceSerialPort.ICON_SET_IMPORT_CLOSE
@@ -1362,6 +1572,10 @@ public class MenuToolBar {
 						this.portOpenCloseItem.setToolTipText(this.toolTipOpen);
 					else
 						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0223));
+					
+					if (touchBarButtonImport != null) {
+						updateTouchBarImportButton("gde/resource/" + this.colorSchemaType + this.language + "/ImportActive.gif");					
+					}
 				}
 				else {
 					this.portOpenCloseItem.setDisabledImage(SWTResourceManager.getImage("gde/resource/" + this.colorSchemaType + this.language + "/ImportDataDisabled.gif")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1371,9 +1585,26 @@ public class MenuToolBar {
 						this.portOpenCloseItem.setToolTipText(this.toolTipClose);
 					else
 						this.portOpenCloseItem.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0223));
+					
+					if (touchBarButtonImport != null) {
+						updateTouchBarImportButton("gde/resource/" + this.colorSchemaType + this.language + "/ImportDataHot.gif");					
+					}
 				}
 				break;
 			}
+		}
+	}
+
+	/**
+	 * update the touch bar import image
+	 * @throws IOException
+	 */
+	private void updateTouchBarImportButton(String imageUrl) {
+		try {
+			touchBarButtonImport.setImage(new com.thizzer.jtouchbar.common.Image(GDE.class.getClassLoader().getResourceAsStream(imageUrl)));
+		}
+		catch (IOException e) {
+			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
@@ -1487,7 +1718,7 @@ public class MenuToolBar {
 	 * @return true if the object key harmonizes with device names
 	 */
 	private boolean isObjectKeyConsistentWithDevices(String newObjectKey) {
-		for (Entry<String, DeviceConfiguration> entry : DataExplorer.getInstance().getDeviceSelectionDialog().getDeviceConfigurations().getAllConfigurations().entrySet()) {
+		for (Entry<String, DeviceConfiguration> entry : MenuToolBar.this.application.getDeviceSelectionDialog().getDeviceConfigurations().getAllConfigurations().entrySet()) {
 			if (entry.getKey().equals(newObjectKey) || entry.getValue().getPureDeviceName(entry.getKey()).equals(newObjectKey)) return false;
 		}
 		return true;
