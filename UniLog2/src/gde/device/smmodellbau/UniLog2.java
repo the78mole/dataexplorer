@@ -578,14 +578,23 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		int prop_n100W = property != null ? Integer.valueOf(property.getValue()) : 10000;
 		property = recordRevolution.getProperty(MeasurementPropertyTypes.NUMBER_MOTOR.value());
 		double numberMotor = property != null ? Double.valueOf(property.getValue()).doubleValue() : 1.0;
+		Record recordVoltage = recordSet.get(1); // 1=voltage
 		Record recordCurrent = recordSet.get(2); // 2=Current
+		Record recordA1 = recordSet.get(11); // 11=A1 -> torque
+		double eta = 0.;
 		for (int i = 0; i < recordRevolution.size(); i++) {
 			if (i > 1 && recordRevolution.get(i)> 100000 && recordCurrent.get(i) > 3000) { //100 1/min && 3A
-				double motorPower = Math.pow(((recordRevolution.get(i) / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
-				double eta = motorPower * 100.0 / recordPower.get(i);
-				eta = eta > 100 && i > 1 ? record.get(i-1)/1000.0 : eta < 0 ? 0 : eta;
-				if (log.isLoggable(Level.FINER))
-					log.log(Level.FINER, String.format("current=%5.1f; recordRevolution=%5.0f; recordPower=%6.2f; motorPower=%6.2f eta=%5.1f", recordCurrent.get(i)/1000.0, recordRevolution.get(i)/1000.0, recordPower.get(i)/1000.0, motorPower/1000.0, eta));
+				if (prop_n100W == 99999) { // A1 -> torque
+					eta = (2 * Math.PI * (this.translateValue(recordA1, recordA1.get(i) / 1000.)) * (recordRevolution.get(i) / 1000.)) / ((recordVoltage.get(i) / 1000.) * (recordCurrent.get(i) / 1000.) * 60.);
+					log.log(Level.OFF, String.format("(2 * %4.3f * %3.1fNcm * %5.0frpm) / (%3.1fV * %3.1fA * 60 * 100) = %4.2f", Math.PI, (this.translateValue(recordA1, recordA1.get(i) / 1000.)), (recordRevolution.get(i) / 1000.), (recordVoltage.get(i) / 1000.), (recordCurrent.get(i) / 1000.), eta));
+				}
+				else {
+					double motorPower = Math.pow(((recordRevolution.get(i) / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;
+					eta = motorPower * 100.0 / recordPower.get(i);
+					eta = eta > 100 && i > 1 ? record.get(i-1)/1000.0 : eta < 0 ? 0 : eta;
+					if (log.isLoggable(Level.FINER))
+						log.log(Level.FINER, String.format("current=%5.1f; recordRevolution=%5.0f; recordPower=%6.2f; motorPower=%6.2f eta=%5.1f", recordCurrent.get(i)/1000.0, recordRevolution.get(i)/1000.0, recordPower.get(i)/1000.0, motorPower/1000.0, eta));
+				}
 				record.set(i, Double.valueOf(eta * 1000).intValue());
 				record.setDisplayable(true);
 			}
