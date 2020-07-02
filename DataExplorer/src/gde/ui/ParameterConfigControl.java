@@ -131,7 +131,10 @@ public class ParameterConfigControl {
 					@Override
 					public void verifyText(VerifyEvent evt) {
 						if (ParameterConfigControl.log.isLoggable(Level.FINEST)) ParameterConfigControl.log.log(Level.FINEST, "text.verifyText, event=" + evt); //$NON-NLS-1$
-						evt.doit = StringHelper.verifyTypedInput(devisor == 1.0 ? DataTypes.INTEGER : DataTypes.DOUBLE, evt.text);
+						if (devisor == 1.0)
+							evt.doit = StringHelper.verifyTypedInput(DataTypes.INTEGER, evt.text);
+						else
+							evt.doit = StringHelper.verifyTypedInput(DataTypes.DOUBLE, evt.text);
 					}
 				});
 				this.text.addKeyListener(new KeyAdapter() {
@@ -141,11 +144,17 @@ public class ParameterConfigControl {
 						ParameterConfigControl.this.value = Integer.parseInt(ParameterConfigControl.this.text.getText().replace(GDE.STRING_DOT,GDE.STRING_EMPTY).replace(GDE.STRING_COMMA,GDE.STRING_EMPTY));
 						if (ParameterConfigControl.this.value < ParameterConfigControl.this.sliderMinValue) {
 							ParameterConfigControl.this.value = ParameterConfigControl.this.sliderMinValue;
-							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : ParameterConfigControl.this.value/devisor));
+							if (devisor == 1.0)
+								ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, ParameterConfigControl.this.value));
+							else 
+								ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, ParameterConfigControl.this.value/devisor));
 						}
 						if (ParameterConfigControl.this.value > ParameterConfigControl.this.sliderMaxValue) {
 							ParameterConfigControl.this.value = ParameterConfigControl.this.sliderMaxValue;
-							ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, devisor == 1.0 ? ParameterConfigControl.this.value : ParameterConfigControl.this.value/devisor));
+							if (devisor == 1.0)
+								ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, ParameterConfigControl.this.value));
+							else 
+								ParameterConfigControl.this.text.setText(String.format(Locale.ENGLISH, ParameterConfigControl.this.format, ParameterConfigControl.this.value/devisor));
 						}
 						valueArray[valueIndex] = ParameterConfigControl.this.value;
 						ParameterConfigControl.this.slider.setSelection(ParameterConfigControl.this.value + ParameterConfigControl.this.offset);
