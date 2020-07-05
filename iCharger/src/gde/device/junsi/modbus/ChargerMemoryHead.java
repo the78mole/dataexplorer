@@ -21,49 +21,58 @@ package gde.device.junsi.modbus;
 import gde.io.DataParser;
 
 public class ChargerMemoryHead {
-	public final static int	LIST_MEM_MAX	= 32;
 	//public final int[][] MEM_HEAD_DEFAULT	 = new int[][] {7,{0,1,2,3,4,5,6}};
 
-	short							count;
-	byte[]						index					= new byte[LIST_MEM_MAX];	//0-LIST_MEM_MAX
-	
+	short								count;
+	byte[]							index;	//0-LIST_MEM_MAX
+
 	/**
 	 * constructor to create instance from received data
 	 * @param memoryHeadBuffer filled by Modbus communication
 	 */
-	public ChargerMemoryHead(final byte[] memoryHeadBuffer) {
+	public ChargerMemoryHead(final byte[] memoryHeadBuffer, boolean isDuo) {
+		this.index = new byte[ChargerMemoryHead.getMaxListIndex(isDuo)];
+
 		this.count = DataParser.parse2Short(memoryHeadBuffer[0], memoryHeadBuffer[1]);
 		for (int i = 0; i < this.count; ++i) {
-			index[i] = memoryHeadBuffer[2 + i];
+			this.index[i] = memoryHeadBuffer[2 + i];
 		}
 	}
 	
+	/**
+	 * @param isDuo
+	 * @return maximal list index, size of program memory
+	 */
+	public static int getMaxListIndex(boolean isDuo) {
+		return isDuo ? 64 : 32;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.getClass().getSimpleName()).append(" : \n");
 		sb.append(String.format("program memory count = %d", this.count)).append("\n");
 		for (int i = 0; i < this.count; ++i) {
-			sb.append(index[i]).append(", ");
+			sb.append(this.index[i]).append(", ");
 		}
 		sb.append("\n");
 		return sb.toString();
 	}
-	
-	public byte[] getAsByteArray() {
-		byte[] memHeadBuffer = new byte[size];
+
+	public byte[] getAsByteArray(boolean isDuo) {
+		byte[] memHeadBuffer = new byte[ChargerMemoryHead.getSize(isDuo)];
 		memHeadBuffer[0] = (byte) (this.count & 0xFF);
 		memHeadBuffer[1] = (byte) (this.count >> 8);
 		for (int i = 0; i < this.count; i++) {
-			memHeadBuffer[2+i] = index[i];
+			memHeadBuffer[2 + i] = this.index[i];
 		}
 		return memHeadBuffer;
 	}
-	
-	final static int		size								= 17*2; //size in byte
 
-	public static int getSize() {
-		return size;
+	final static int size = 17 * 2; //size in byte
+
+	public static int getSize(boolean isDuo) {
+		return (isDuo ? 64 : 32) + 2 ;
 	}
 
 	public short getCount() {
@@ -77,9 +86,9 @@ public class ChargerMemoryHead {
 	public byte[] getIndex() {
 		return this.index;
 	}
-	
+
 	public byte[] addIndexAfter(byte batTypeOrdinal) {
-		byte[] updatedIndex = new byte[this.count+1];
+		byte[] updatedIndex = new byte[this.count + 1];
 		//find next free index, if there is any
 		int n = this.count;
 		int sum = n * (n + 1) / 2;
@@ -88,24 +97,24 @@ public class ChargerMemoryHead {
 			restSum += this.index[i];
 		}
 		int nextFreeIndex = sum - restSum;
-		
-		for (int i=0, j=0; i < this.count+1;) {
+
+		for (int i = 0, j = 0; i < this.count + 1;) {
 			updatedIndex[i++] = this.index[j++];
-			if (updatedIndex[i-1] == batTypeOrdinal)
-				updatedIndex[i++] = (byte) nextFreeIndex;			
+			if (updatedIndex[i - 1] == batTypeOrdinal) 
+				updatedIndex[i++] = (byte) nextFreeIndex;
 		}
 		return updatedIndex;
 	}
 
 	public byte[] removeIndex(byte removeIndex) {
-		byte[] updatedIndex = new byte[this.count+1];
-		for (int i=0, j=0; i < this.count+1;) {
-			if (this.index[j++] != removeIndex)
-				updatedIndex[i++] = this.index[j-1];
+		byte[] updatedIndex = new byte[this.count - 1];
+		for (int i = 0, j = 0; i < this.count - 1;) {
+			if (this.index[j++] != removeIndex) 
+				updatedIndex[i++] = this.index[j - 1];
 		}
 		return updatedIndex;
 	}
-	
+
 	public void setIndex(byte[] index) {
 		this.index = index;
 	}

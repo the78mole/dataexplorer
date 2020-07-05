@@ -25,6 +25,7 @@ package gde.device.junsi;
 public class MessageIds { 
 
 	public final static String	GDE_MSGE2600 = "GDE_MSGE2600";
+	public final static String	GDE_MSGE2601 = "GDE_MSGE2601";
 	public final static String	GDE_MSGW2600 = "GDE_MSGW2600";
 	public final static String	GDE_MSGW2601 = "GDE_MSGW2601";
 	public final static String	GDE_MSGW2602 = "GDE_MSGW2602";
