@@ -32,6 +32,7 @@ Device specific changes/fixes
 	* UniLog(1) * fix raw CSV export/import
 	* UniLog* * enable special efficiency calculation while n100W 99999, A1 torque input [Ncm]
 	* JetiAdapter - fix measurement name and unit related data type parser "Geschwindigkeit [kmh]"
+	* HoTTAdapter* - add missing GPS values (satellites, 3D-fix) live data gathering 
 
 Version 3.4.1 - 03 Feb 2020
 Generic changes/fixes

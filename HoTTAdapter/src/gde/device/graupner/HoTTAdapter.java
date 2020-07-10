@@ -1033,6 +1033,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						points[9] = 0;
 						points[10] = dataBuffer[4] * 1000;
 						points[11] = (dataBuffer[5] + 20) * 1000;
+						points[12] = dataBuffer[32];
+						try {
+							points[13] = Integer.valueOf(String.format("%c", dataBuffer[33])) * 1000;
+						} catch (NumberFormatException e1) {
+							// ignore;
+						}
+						points[14] = (dataBuffer[1] & 0x0F) * 1000; // inverse event
 					}
 				}
 				break;

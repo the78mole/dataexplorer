@@ -496,6 +496,13 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						points[18] = DataParser.parse2Short(dataBuffer, 12) * 1000;
 						points[19] = DataParser.parse2Short(dataBuffer, 24) * 500;
 						points[20] = 0;
+						points[21] = dataBuffer[32];
+						try {
+							points[22] = Integer.valueOf(String.format("%c", dataBuffer[33])) * 1000;
+						} catch (NumberFormatException e1) {
+							// ignore;
+						}
+						points[23] = (dataBuffer[1] & 0x0F) * 1000; // inverse event
 					}
 				}
 				break;
