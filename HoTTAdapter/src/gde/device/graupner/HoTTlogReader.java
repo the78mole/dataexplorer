@@ -486,11 +486,27 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[10] = (_buf[13] & 0xFF) * 1000;				//voltageRx
 		values[11] = ((_buf[14] & 0xFF) - 20) * 1000;	//temperaturRx
 		values[12] = (_buf[49] & 0xFF) * 1000;
-		try {
-			values[13] = Integer.valueOf(String.format("%c", _buf[50])) * 1000;
-		}
-		catch (NumberFormatException e1) {
-			//ignore;
+		switch (_buf[50]) { //sat-fix
+		case '-':
+			values[13] = 0;
+			break;
+		case '2':
+			values[13] = 2000;
+			break;
+		case '3':
+			values[13] = 3000;
+			break;
+		case 'D':
+			values[13] = 4000;
+			break;
+		default:
+			try {
+				values[13] = Integer.valueOf(String.format("%c", _buf[50])) * 1000;
+			}
+			catch (NumberFormatException e1) {
+				values[13] = 1000;
+			}
+			break;
 		}
 		values[14] = (_buf[27] & 0x0F) * 1000; //inverse event
 

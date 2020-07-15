@@ -930,11 +930,27 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsGPS[17] = 0;
 			//18=Satellites 19=Fix 20=HomeDirection 21=NorthVelocity 22=SpeedAccuracy 23=Time 24=EastVelocity 25=HorizontalAccuracy 26=Altitude 27=Fix2 28=Version
 			HoTTbinReader.pointsGPS[18] = (_buf3[3] & 0xFF) * 1000;
-			try {
-				HoTTbinReader.pointsGPS[19] = Integer.valueOf(String.format("%c", _buf3[4])) * 1000;
-			}
-			catch (NumberFormatException e1) {
-				//ignore;
+			switch (_buf3[4]) { //sat-fix
+			case '-':
+				HoTTbinReader.pointsGPS[19] = 0;
+				break;
+			case '2':
+				HoTTbinReader.pointsGPS[19] = 2000;
+				break;
+			case '3':
+				HoTTbinReader.pointsGPS[19] = 3000;
+				break;
+			case 'D':
+				HoTTbinReader.pointsGPS[19] = 4000;
+				break;
+			default:
+				try {
+					HoTTbinReader.pointsGPS[19] = Integer.valueOf(String.format("%c", _buf3[4])) * 1000;
+				}
+				catch (NumberFormatException e1) {
+					HoTTbinReader.pointsGPS[19] = 1000;
+				}
+				break;
 			}
 			HoTTbinReader.pointsGPS[20] = (_buf3[5] & 0xFF) * 1000;
 			HoTTbinReader.pointsGPS[21] = DataParser.parse2Short(_buf3, 6) * 1000;

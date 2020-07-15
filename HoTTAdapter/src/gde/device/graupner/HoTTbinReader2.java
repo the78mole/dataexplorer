@@ -951,10 +951,28 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				this.points[19] = (this._buf1[3] & 0xFF) * 1000;
 				this.points[20] = 0;
 				this.points[21] = (this._buf3[3] & 0xFF) * 1000;
-				try {
-					this.points[22] = Integer.valueOf(String.format("%c", this._buf3[4])) * 1000;
-				} catch (NumberFormatException e1) {
-					// ignore;
+				
+				switch (_buf3[4]) { //sat-fix
+				case '-':
+					this.points[22] = 0;
+					break;
+				case '2':
+					this.points[22] = 2000;
+					break;
+				case '3':
+					this.points[22] = 3000;
+					break;
+				case 'D':
+					this.points[22] = 4000;
+					break;
+				default:
+					try {
+						this.points[22] = Integer.valueOf(String.format("%c", _buf3[4])) * 1000;
+					}
+					catch (NumberFormatException e1) {
+						this.points[22] = 1000;
+					}
+					break;
 				}
 				this.points[23] = (this._buf1[1] & 0x0F) * 1000; // inverse event
 				return true;
