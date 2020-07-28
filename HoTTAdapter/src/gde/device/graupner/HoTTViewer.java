@@ -276,7 +276,8 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 				//0=RXSQ, 1=VoltageRx, 2=TemperatureRx, 3=Climb 1, 4=Climb 3, 5=Climb 10, 6=Height, 7=Speed, 8=Revolution
 				//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
-				//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
+				//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx,
+				//25=lap-time, 26=Rx_dbm, 27=ENL, 28=satellites, 29=GPS-fix
 				switch(ordinal) {
 				default:
 					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
@@ -309,6 +310,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 				//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
 				//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
+				//25=lap-time, 26=Rx_dbm, 27=ENL, 28=satellites, 29=GPS-fix
 				containsGPSdata = activeRecordSet.get(22).hasReasonableData() && activeRecordSet.get(23).hasReasonableData();
 			}
 		}
@@ -326,6 +328,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
+		//25=lap-time, 26=Rx_dbm, 27=ENL, 28=satellites, 29=GPS-fix
 		final int latOrdinal = 22, lonOrdinal = 23;
 		return record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal;
 	}
@@ -339,6 +342,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
+		//25=lap-time, 26=Rx_dbm, 27=ENL, 28=satellites, 29=GPS-fix
 		if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
 			return 7;
 
@@ -360,6 +364,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 				//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 				//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
 				//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
+				//25=lap-time, 26=Rx_dbm, 27=ENL, 28=satellites, 29=GPS-fix
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
 				final int latOrdinal = 22, lonOrdinal = 23, altOrdinal = 6, climbOrdinal = 3;
 				exportFileName = new FileHandler().exportFileKMZ(lonOrdinal, latOrdinal, altOrdinal, additionalMeasurementOrdinal, climbOrdinal, -1, -1, true, isExport2TmpDir);
@@ -378,6 +383,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
+		//25=lap-time, 26=Rx_dbm, 27=ENL, 28=satellites, 29=GPS-fix
 		final int latOrdinal = 22, lonOrdinal = 23, altOrdinal = 6, climbOrdinal = 3, speedOrdinal = 7;
 		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2403), lonOrdinal, latOrdinal, altOrdinal, speedOrdinal, climbOrdinal, -1, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
@@ -392,6 +398,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
+		//25=lap-time, 26=Rx_dbm, 27=ENL, 28=satellites, 29=GPS-fix
 		if (isGarminExtension)
 			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 	22, 23, 6, 7, -1, -1, -1, -1, new int[] {-1,-1,-1});
 		else
@@ -411,6 +418,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
+		//25=lap-time, 26=Rx_dbm, 27=ENL, 28=satellites, 29=GPS-fix
 		final int latOrdinal = 22, lonOrdinal = 23;
 		if (record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal) { //13=Latitude, 14=Longitude
 			int grad = ((int) (value / 1000));
@@ -444,6 +452,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
+		//25=lap-time, 26=Rx_dbm, 27=ENL, 28=satellites, 29=GPS-fix
 		final int latOrdinal = 22, lonOrdinal = 23;
 		if (record.getOrdinal() == latOrdinal || record.getOrdinal() == lonOrdinal) { // 13=Latitude, 14=Longitude
 			int grad = (int) value;
@@ -471,6 +480,7 @@ public class HoTTViewer extends HoTTAdapter implements IDevice {
 		//9=Voltage, 10=Current, 11=Capacity, 12=Power 13=Fuel, 14=Balance, 15=CellAverage
 		//16=Temperature 1, 17=Temperature 2, 18=Voltage 1, 19=Voltage 2,
 		//20=DistanceStart, 21=DirectionStart, 22=Latitude, 23=Longitude, 24=VoltageTx
+		//25=lap-time, 26=Rx_dbm, 27=ENL, 28=satellites, 29=GPS-fix
 		recordSet.syncScaleOfSyncableRecords();
 		this.application.updateStatisticsData();
 		this.updateVisibilityStatus(recordSet, true);

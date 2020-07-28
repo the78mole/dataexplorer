@@ -34,6 +34,8 @@ Device specific changes/fixes
 	* JetiAdapter - fix measurement name and unit related data type parser "Geschwindigkeit [kmh]"
 	* HoTTAdapter* - add missing GPS values (satellites, 3D-fix) live data gathering 
 	* HoTTAdapter* - adapt GPS fix values '-'=0, '2'=2, '3'=3, 'D'=4, unknown char=1
+	* HoTTViewer - add measurement ENL, satellites, GPS-Fix
+	* iCharger S6/X12 - add support
 
 Version 3.4.1 - 03 Feb 2020
 Generic changes/fixes

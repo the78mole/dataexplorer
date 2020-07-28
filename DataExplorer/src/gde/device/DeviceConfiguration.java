@@ -2633,7 +2633,7 @@ public class DeviceConfiguration {
 	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
 	 */
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
-		// check for HoTTAdapter2 file contained record properties which are not contained in actual configuration
+		// check for device file contained record properties which are not contained in actual configuration
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
 		if ((recordKeys.length - fileRecordsProperties.length) > 0) { // events ...

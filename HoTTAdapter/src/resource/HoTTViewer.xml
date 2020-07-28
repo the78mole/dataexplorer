@@ -220,6 +220,27 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true"/>
             </Measurement>
+            <Measurement>
+                <name>ENL</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="false" max="false" avg="false" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>satellites</name>
+                <symbol></symbol>
+                <unit>#</unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
+            <Measurement>
+                <name>GPS-Fix</name>
+                <symbol></symbol>
+                <unit></unit>
+                <active>true</active>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
+            </Measurement>
         </Channel>
     </Channels>
     <Desktop>
