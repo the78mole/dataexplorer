@@ -24,6 +24,8 @@ Device specific changes/fixes
 	* iChargerUSB - enable program memory control
 	* iChargerUSB - correct power/energy calculation for opened files (*.osd)
 	* iChargerUSB - add system info string to recording
+	* iChargerUSB - fix parsing error battery voltage > 25,4 Volts
+	* iCharger S6/X12 - add support
 	* GPS_Logger* - fix latitude, longitude unit which caused display problem while activated
 	* Spektrum-Telemetry - make frame loss and holds always visible, even no reasonable data
 	* UniSens-E - enable live data gathering
@@ -35,7 +37,6 @@ Device specific changes/fixes
 	* HoTTAdapter* - add missing GPS values (satellites, 3D-fix) live data gathering 
 	* HoTTAdapter* - adapt GPS fix values '-'=0, '2'=2, '3'=3, 'D'=4, unknown char=1
 	* HoTTViewer - add measurement ENL, satellites, GPS-Fix
-	* iCharger S6/X12 - add support
 
 Version 3.4.1 - 03 Feb 2020
 Generic changes/fixes

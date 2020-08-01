@@ -399,7 +399,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			//0=Current 1=SupplyVoltage. 2=Voltage
 			points[0] = DataParser.parse2Short(dataBuffer, 10);
 			points[1] = DataParser.parse2UnsignedShort(dataBuffer, 12);
-			points[2] = DataParser.parse2Short(dataBuffer, 14);
+			points[2] = DataParser.parse2UnsignedShort(dataBuffer, 14);
 			//3=Capacity 4=Power 5=Energy
 			points[3] = DataParser.parse2Int(dataBuffer, 16);
 			points[4] = points[0] * points[2] / 100; 																	// power U*I [W]
