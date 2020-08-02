@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.4.2 - xx yyy 2020
+Version 3.4.2 - 04 Aug 2020
 Generic changes/fixes
 	* fix cell voltage dialog adjusting value position
 	* remove guava-jre, joda-time dependency
@@ -19,6 +19,7 @@ Generic changes/fixes
 	* fix GPS export make LookAt section related
 	* fix display problem of geo-coordinates in curve compare
 	* add macOS touch bar support
+	* documentation update
 	
 Device specific changes/fixes
 	* iChargerUSB - enable program memory control

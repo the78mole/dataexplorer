@@ -1618,7 +1618,7 @@ public class HoTTbinReader {
 		}
 
 		private  boolean isPointsValid() {
-			return !this.pickerParameters.isFilterEnabled || (tmpHeight > 10 && tmpHeight < 5000 && tmpClimb10 < 50000);
+			return !this.pickerParameters.isFilterEnabled || (tmpHeight > 10 && tmpHeight < 5000);
 		}
 	}
 
