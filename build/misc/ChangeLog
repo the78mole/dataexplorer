@@ -36,6 +36,7 @@ Device specific changes/fixes
 	* JetiAdapter - fix measurement name and unit related data type parser "Geschwindigkeit [kmh]"
 	* HoTTAdapter* - add missing GPS values (satellites, 3D-fix) live data gathering 
 	* HoTTAdapter* - adapt GPS fix values '-'=0, '2'=2, '3'=3, 'D'=4, unknown char=1
+	* HoTTAdapter* - adjust and synchronize Vario climb10 filter
 	* HoTTViewer - add measurement ENL, satellites, GPS-Fix
 
 Version 3.4.1 - 03 Feb 2020

@@ -856,12 +856,14 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				this.points[14] = (this._buf1[1] & 0x3F) * 1000; // inverse event
 				return true;
 			}
+			else 
+				System.out.println();
 			this.points[14] = (this._buf1[1] & 0x3F) * 1000; // inverse event
 			return isPointsValid();
 		}
 
 		private boolean isPointsValid() {
-			return !this.pickerParameters.isFilterEnabled || (this.tmpHeight >= -490 && this.tmpHeight < 5000 && this.tmpClimb10 > -10000 && this.tmpClimb10 < 10000);
+			return !this.pickerParameters.isFilterEnabled || (this.tmpHeight >= -490 && this.tmpHeight < 5000 && this.tmpClimb10 > -25000 && this.tmpClimb10 < 25000);
 		}
 
 		@Override
