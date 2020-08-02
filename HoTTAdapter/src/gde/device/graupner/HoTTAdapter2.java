@@ -484,11 +484,11 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					tmpLongitudeGrad = DataParser.parse2Short(dataBuffer, 20);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 14);
 					tmpClimb3 = dataBuffer[30];
-					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > -490 && tmpHeight < 5000 && tmpClimb3 > -50) {
+					if ((tmpLatitudeGrad == tmpLongitudeGrad || tmpLatitudeGrad > 0) && tmpHeight > -490 && tmpHeight < 4500 && tmpClimb3 > -90) {
 						points[15] = tmpLatitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 18);
-						points[15] = dataBuffer[27] == 1 ? -1 * points[15] : points[15];
+						points[15] = dataBuffer[26] == 1 ? -1 * points[15] : points[15];
 						points[16] = tmpLongitudeGrad * 10000 + DataParser.parse2Short(dataBuffer, 22);
-						points[16] = dataBuffer[28] == 1 ? -1 * points[16] : points[16];
+						points[16] = dataBuffer[27] == 1 ? -1 * points[16] : points[16];
 						points[10] = tmpHeight * 1000;
 						points[11] = DataParser.parse2Short(dataBuffer, 28) * 10;
 						points[12] = tmpClimb3 * 1000;
