@@ -1,36 +1,79 @@
-GNU DataExplorer - News - comes with Version 3.4.1 - 03 Feb 2020
+GNU DataExplorer - News - comes with Version 3.4.2 - 04 Aug 2020
 
 Generic changes/fixes
-	* add control listener to handle size changes after modifying menu cool bar
-	* uniform build execution environment to Java 8 compatible byte code
-	* split build in OS dependent steps (future MAC OS does not support 32 bit makensis processing)
-	* update swt.jar for Linux 64 bit to fix webkit problems
-	* add time stamp of min/max value evaluated
-	* update swt.jar for available OS to support future Java versions (new SWT libs available for 64 bit only)
-	* update cell voltages for the known different cell types
-	* fix missing synchronization between cell voltages and active record set
-
+	* fix cell voltage dialog adjusting value position
+	* remove guava-jre, joda-time dependency
+	* add several missing license files
+	* add option to force 10 major scale ticks while rounding graphics end values
+	* enable class based log level configuration device sub packages (p.e. gde.device.junsi.modbus)
+	* enable USB HID device selection while devices with almost identical characteristics connected
+	* enable secondary trigger range in properties editor (functional added in 3.4.0)
+	* add JAVA_IO_TMPDIR GDE cleanup tree (exported help files)
+	* macOS build - add code signing app and dmg to fulfill gatekeeper requirements
+	* add Java version check, detect run time version out of specified range
+	* update jSerialComm to version 2.6.2
+	* use system cursor for measuring to avoid misplaced cursor while sized desktop
+	* documentation update
+	* remove leading blanks while CSV relative time export
+	* fix GPS export make LookAt section related
+	* fix display problem of geo-coordinates in curve compare
+	* add macOS touch bar support
+	* documentation update
+	
 Device specific changes/fixes
-	* LiPoWatch - adapt clear memory button position in device dialog for MAC OS X and Linux
-	* Robbe PowerPeak IV - initial implementation
-	* HoTTAdapter2 - reset min/max values while detecting valid values
-	* SpektrumCSV - add simple sample to be used with exports from TLM Viewer
-	* Spektrum-Telemetry - add initial implementation
+	* iChargerUSB - enable program memory control
+	* iChargerUSB - correct power/energy calculation for opened files (*.osd)
+	* iChargerUSB - add system info string to recording
+	* iChargerUSB - fix parsing error battery voltage > 25,4 Volts
+	* iCharger S6/X12 - add support
+	* GPS_Logger* - fix latitude, longitude unit which caused display problem while activated
+	* Spektrum-Telemetry - make frame loss and holds always visible, even no reasonable data
+	* UniSens-E - enable live data gathering
+	* iMax B6* - fix missing energy calculation Ni battery type outside cycle
+	* MC3000 - fix to short wait time for possible adjustable rest time
+	* UniLog(1) * fix raw CSV export/import
+	* UniLog* * enable special efficiency calculation while n100W 99999, A1 torque input [Ncm]
+	* JetiAdapter - fix measurement name and unit related data type parser "Geschwindigkeit [kmh]"
+	* HoTTAdapter* - add missing GPS values (satellites, 3D-fix) live data gathering 
+	* HoTTAdapter* - adapt GPS fix values '-'=0, '2'=2, '3'=3, 'D'=4, unknown char=1
+	* HoTTAdapter* - adjust and synchronize Vario climb10 filter
+	* HoTTViewer - add measurement ENL, satellites, GPS-Fix
 
 	
 Generelle Änderungen/Verbesserungen
-    * Code hinzugefügt, der Änderungen der Größe der Menü-Cool-Bar überwacht
-    * Vereinheitlichung der Bau-Ausführungsumgebung zu zur Sicherstellung von Java 8 kompatiblen Bytecode
-    * Bauschritte wurden in Betriebssystem abhängige Stücke geteilt, makensis kann nicht mehr auf MAC OS ausgeführt werden
-    * Update swt.jar für Linux 64 Bit zur Behebung des Webkit-Problems
-    * Zeitstempel für die Berechnung von Min-/Max-Werten hinzugefügt
-    * Update swt.jar fÜr alle Betriebssysteme, um zukünftiges Java Versionen zu unterstützen (nur 64 Bit)
-    * Update Zellenspannungen für die bekannten Zellen-Typen
-    * Fehlende Synchronisation zwischen Zellenspannungen und aktivem Datensatz behoben
+    * Zellenspannung Anzeigeposition korrigiert
+    * Abhängigkeiten zu guava-jre, joda-time entfernt
+    * Fehlende Lizenzdateien hinzugefügt
+    * Option, um Zehnerteilung der Messwert-Skalen hinzugefügt
+    * Klassen basiertes Loggen um eine Ebene erweitert (Beispiel gde.device.junsi.modbus)
+    * Auswahl gleichartiger USB HID Adapter ermöglicht
+    * Messwert-Trigger-Erweiterung in Eigenschaften-Editor eingebaut (funktional zugefügt in 3.4.0)
+    * Aufräumen des JAVA_IO_TMPDIR der GDE exportierten Hilfedateien implementiert
+    * macOS build - Code Signierung von App und DMG für Gatekeeper hinzugefügt
+    * Java Version Überprüfung zur Erkennung nicht unterstützter Versionen hinzugefügt
+    * jSerialComm Update zu Version 2.6.2 (serielle Schnittstelle)
+    * System Cursor wird jetzt zum Messen benutzt, um Positionierungs-Fehler zu vermeiden
+    * Dokumentations-Update
+    * Führende Leerzeichen bei CSV Export und relativem Zeitstempel entfernt
+    * Korrektur bei GPS Export (KMZ/KML) der LookAt Sektion, Anzeige Google Earth war dadurch falsch positioniert
+    * Anzeigeprobleme von Geo-Koordinaten in Kurvenvergleich korrigiert
+    * macOS Touch-Bar Unterstützung eingebaut
 
 Geräte spezifische Änderungen/Verbesserungen
-    * LiPoWatch - Knopfposition zum Löschen des Speichers für Linux/MacOS angepasst
-    * Robbe PowerPeak IV - initiale Unterstützung eingebaut
-    * HoTTAdapter2 - Zurücksetzen der Min-/Max-Werte bei Erkennung valider Messwerte eingebaut
-    * SpektrumCSV - einfaches Beispiel zum Import von Spektrum TLMViewer CSV-Exports eingebaut
-    * Spektrum-Telemetry - initiale Unterstützung eingebaut	
+    * iChargerUSB - Konfiguration von Ladeprogrammen unterstützt
+    * iChargerUSB - Leistung und Energieberechnung korrigiert
+    * iChargerUSB - Systeminformation Zeile bei Datenaufnahme hinzugefügt
+    * iChargerUSB - Korrektur beim Parsen Akku-Spannungen > 25,4 Volt
+    * iCharger S6/X12 - Unterstützung hinzugefügt
+    * GPS_Logger* - Korrektur der Anzeige von Längengrad und Breitengrad
+    * Spektrum-Telemetry - Frameloss und Holds sind jetzt immer sichtbar auch wenn der Wert bei 0 liegt
+    * UniSens-E - Live-Datenaufnahme unterstützt
+    * iMax B6* - fehlende Energieberechnung für Nickel Akkus ergänzt
+    * MC3000 - Korrektur der zu kurzen Wartezeiten entsprechend konfigurierbarem Wert
+    * UniLog(1) - Korrektur CSV export/import
+    * UniLog* - Spezielle Effektivitätsberechnung bei n100W=99999 und A1 Drehmoment in [Ncm] ermöglicht
+    * JetiAdapter - Korrektur des Daten-Parser, Ergänzung mit Messwertname "Geschwindigkeit [kmh]"
+    * HoTTAdapter* - fehlende GPS-Werte bei Live-Datenaufnahme (Anzahl Satelliten, 3D-fix) hinzugefügt
+    * HoTTAdapter* - Anpassung GPS Fix Werte '-'=0, '2'=2, '3'=3, 'D'=4 ergänzt (D kommt vom SM GPS-Logger)
+    * HoTTAdapter* - Korrektur der Vario Steigen10 Filter
+    * HoTTViewer - Messwerte ENL, Satelliten, GPS-Fix hinzugefügt
