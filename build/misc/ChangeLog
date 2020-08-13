@@ -1,5 +1,12 @@
 Development history / change log, please read from bottom up
 
+Version 3.4.3 - xx yy 2020
+Generic changes/fixes
+	* fix display problem of geo-coordinates in degree curve compare
+
+Device specific changes/fixes
+	* OnLineCommander - add initial support
+
 Version 3.4.2 - 04 Aug 2020
 Generic changes/fixes
 	* fix cell voltage dialog adjusting value position
