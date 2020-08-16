@@ -6,6 +6,7 @@ Generic changes/fixes
 
 Device specific changes/fixes
 	* OnLineCommander - add initial support
+	* HoTTAdpter2* - add missing property reduction/offset to Temperature Rx
 
 Version 3.4.2 - 04 Aug 2020
 Generic changes/fixes

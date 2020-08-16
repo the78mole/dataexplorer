@@ -110,6 +110,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
                 <label>label_temperature_rx</label>
             </Measurement>
             <Measurement>
@@ -1038,6 +1039,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+               	<property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
                 <label>label_temperature_rx</label>
             </Measurement>
             <Measurement>
@@ -2028,6 +2030,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
                 <label>label_temperature_rx</label>
             </Measurement>
             <Measurement>
@@ -3012,6 +3015,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
             </Measurement>
             <Measurement>
                 <name>voltage_rx_min</name>
@@ -3934,6 +3938,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+               <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
                 <label>label_temperature_rx</label>
             </Measurement>
             <Measurement>
@@ -4918,6 +4923,7 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+               <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
             </Measurement>
             <Measurement>
                 <name>voltage_rx_min</name>
