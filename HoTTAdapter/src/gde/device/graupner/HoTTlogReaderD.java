@@ -81,8 +81,8 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 		HoTTlogReaderD.recordSet = null;
 		HoTTlogReaderD.isJustMigrated = false;
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx_dbm, 5=Rx_dbm, 6=VoltageRx, 7=TemperatureRx
-		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
-		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+		//8=Altitude, 9=Climb 1, 10=Climb 3, 11=Climb 10
+		//12=Latitude, 13=Longitude, 14=Velocity, 15=Distance, 16=Direction, 17=TripDistance
 		//18=GPS.Satelites, 19=GPS.Fix, 20=HomeDirection, 21=NorthVelocity, 22=SpeedAccuracy, 23=GPS.Time, 24=EastVelocity, 25=HorizontalAccuracy, 26=Altitude, 27=GPS.Fix2, 28=Version
 		//29=VoltageG, 30=CurrentG, 31=CapacityG, 32=PowerG, 33=BalanceG, 34=CellVoltageG 1, 35=CellVoltageG 2 .... 39=CellVoltageG 6, 40=Revolution, 41=FuelLevel, 42=VoltageG 1, 43=VoltageG 2, 44=TemperatureG 1, 45=TemperatureG 2
 		//46=VoltageE, 47=CurrentE, 48=CapacityE, 49=PowerE, 50=BalanceE, 51=CellVoltageE 1, 52=CellVoltageE 2 .... 64=CellVoltageE 14, 65=Revolution, 66=VoltageE 1, 67=VoltageE 2, 68=TemperatureE 1, 69=TemperatureE 2
@@ -286,8 +286,8 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 	 * @param _buf
 	 */
 	protected static boolean parseVario(byte[] _buf, int[] values, boolean isHoTTAdapter2) {
-		//0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx 7=EventVario
-		//10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+		//0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx 7=EventVario
+		//10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
 		//sensor byte: 26=sensor byte
 		//27=inverseBits 28,29=altitude 30,31=altitude_max 32,33=altitude_min 34,35=climb1 36,37=climb3 38,39=climb10
 		HoTTlogReader.parseVario(_buf, values, isHoTTAdapter2);
@@ -321,9 +321,9 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 	 * @param _buf
 	 */
 	protected static boolean parseGPS(byte[] _buf, int[] values, boolean isHoTTAdapter2) {
-		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS
-		//10=Height, 11=Climb 1, 12=Climb 3
-		//15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS
+		//10=Altitude, 11=Climb 1, 12=Climb 3
+		//15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 		//sensor byte: 26=sensor byte
 		//27,28=InverseBits 29=moveDirection 30,31=speed 32,33,34,35,36=latitude 37,38,39,40,41=longitude 42,43=distanceStart 44,45=altitude
 		//46,47=climb1 48=climb3 49=#satellites 50=GPS-Fix 51=homeDirection 52,53=northVelocity 54=hAcc 55-58=GPStime 59,60=eastVelocity
@@ -408,8 +408,8 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 			throws DataInconsitsentException {
 		//receiver data gets integrated each cycle
 		//0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx_dbm, 5=Rx_dbm, 6=VoltageRx, 7=TemperatureRx
-		//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
-		//12=Latitude, 13=Longitude, 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+		//8=Altitude, 9=Climb 1, 10=Climb 3, 11=Climb 10
+		//12=Latitude, 13=Longitude, 14=Velocity, 15=Distance, 16=Direction, 17=TripDistance
 		//18=GPS.Satelites, 19=GPS.Fix, 20=HomeDirection, 21=NorthVelocity, 22=SpeedAccuracy, 23=GPS.Time, 24=EastVelocity, 25=HorizontalAccuracy, 26=Altitude, 27=GPS.Fix2, 28=Version
 		//29=VoltageG, 30=CurrentG, 31=CapacityG, 32=PowerG, 33=BalanceG, 34=CellVoltageG 1, 35=CellVoltageG 2 .... 39=CellVoltageG 6, 40=Revolution, 41=FuelLevel, 42=VoltageG 1, 43=VoltageG 2, 44=TemperatureG 1, 45=TemperatureG 2
 		//46=VoltageE, 47=CurrentE, 48=CapacityE, 49=PowerE, 50=BalanceE, 51=CellVoltageE 1, 52=CellVoltageE 2 .... 64=CellVoltageE 14, 65=Revolution, 66=VoltageE 1, 67=VoltageE 2, 68=TemperatureE 1, 69=TemperatureE 2
@@ -423,9 +423,9 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 		//127=EventRx 128=EventVario 129=EventGPS 130=EventGAM 131=EventEAM 132=EventESC
 
 		//in 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14,
-		//in 20=Height, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 27=RPM 28=MotorTime 29=Speed 30=Event
+		//in 20=Altitude, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 27=RPM 28=MotorTime 29=Speed 30=Event
 		if (isElectricData) {
-			//out 10=Height, 11=Climb 1, 12=Climb 3
+			//out 10=Altitude, 11=Climb 1, 12=Climb 3
 			for (int j = 0; !isVarioData && !isGPSData && !isGeneralData && j < 3; j++) { //0=altitude 1=climb1 2=climb3
 				HoTTlogReaderD.points[j+8] = valuesEAM[j+20];
 			}
@@ -445,10 +445,10 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 			HoTTlogReaderD.points[131] = valuesEAM[30];
 		}
 		//in 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution,
-		//in 13=Height, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
+		//in 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		//in 21=Speed, 22=LowestCellVoltage, 23=LowestCellNumber, 24=Pressure, 24=Event
 		if (isGeneralData) {
-			//out 8=Height, 9=Climb 1, 10=Climb 3
+			//out 8=Altitude, 9=Climb 1, 10=Climb 3
 			for (int k = 0; !isVarioData && !isGPSData && k < 3; k++) {
 				HoTTlogReaderD.points[k+8] = valuesGAM[k+13];
 			}
@@ -466,18 +466,18 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 			}
 			HoTTlogReaderD.points[130] = valuesGAM[24]; //130=EventGAM
 		}
-		//in 0=RXSQ, 1=Latitude, 2=Longitude, 3=Height, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=DistanceStart, 8=DirectionStart, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
+		//in 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 		//in 12=satellites 13=GPS-fix 14=EventGPS
 		//in 15=HomeDirection 16=NorthVelocity 17=SpeedAccuracy 18=Time 19=EastVelocity 20=HorizontalAccuracy 21=Altitude 22=Fix2 23=Version
 		if (isGPSData) {
-			//out 8=Height, 9=Climb 1, 10=Climb 3
+			//out 8=Altitude, 9=Climb 1, 10=Climb 3
 			for (int j = 0; !isVarioData && j < 3; j++) {
 				HoTTlogReaderD.points[j+8] = valuesGPS[j+3];
 			}
 			//out 12=Latitude, 13=Longitude,
 			HoTTlogReaderD.points[12] = valuesGPS[1];
 			HoTTlogReaderD.points[13] = valuesGPS[2];
-			//out 14=Velocity, 15=DistanceStart, 16=DirectionStart, 17=TripDistance
+			//out 14=Velocity, 15=Distance, 16=Direction, 17=TripDistance
 			for (int k = 0; k < 4; k++) {
 				HoTTlogReaderD.points[k+14] = valuesGPS[k+6];
 			}
@@ -490,9 +490,9 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 			}
 			HoTTlogReaderD.points[129] = valuesGPS[14]; //129=EventGPS
 		}
-		//in 0=RXSQ, 1=Height, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx	7=EventVario
+		//in 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx	7=EventVario
 		if (isVarioData) {
-			//out 8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+			//out 8=Altitude, 9=Climb 1, 10=Climb 3, 11=Climb 10
 			for (int j = 0; j < 4; j++) {
 				HoTTlogReaderD.points[j+8] = valuesVario[j+1];
 			}
@@ -522,14 +522,14 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 		//log.log(Level.OFF, String.format("pickerParameters.altitudeClimbSensorSelection = %s", pickerParameters.altitudeClimbSensorSelection));
 		switch (Sensor.VALUES[HoTTbinReader.pickerParameters.altitudeClimbSensorSelection]) {
 		case VARIO:
-			//8=Height, 9=Climb 1, 10=Climb 3, 11=Climb 10
+			//8=Altitude, 9=Climb 1, 10=Climb 3, 11=Climb 10
 			if (isVarioData)
 				for (int j = 0; j < 4; j++) {
 					HoTTlogReaderD.points[j+8] = valuesVario[j+1];
 				}
 			break;
 		case GPS:
-			//8=Height, 9=Climb 1, 10=Climb 3
+			//8=Altitude, 9=Climb 1, 10=Climb 3
 			if (isGPSData)
 				for (int j = 0; j < 3; j++) {
 					HoTTlogReaderD.points[j+8] = valuesGPS[j+3];
@@ -537,7 +537,7 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 			HoTTlogReaderD.points[11] = 0;
 			break;
 		case GAM:
-			//8=Height, 9=Climb 1, 10=Climb 3
+			//8=Altitude, 9=Climb 1, 10=Climb 3
 			if (isGeneralData)
 				for (int j = 0; j < 3; j++) {
 					HoTTlogReaderD.points[j+8] = valuesGAM[j+13];
@@ -545,7 +545,7 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 			HoTTlogReaderD.points[11] = 0;
 			break;
 		case EAM:
-			//8=Height, 9=Climb 1, 10=Climb 3
+			//8=Altitude, 9=Climb 1, 10=Climb 3
 			if (isElectricData)
 				for (int j = 0; j < 3; j++) { //0=altitude 1=climb1 2=climb3
 					HoTTlogReaderD.points[j+8] = valuesEAM[j+20];

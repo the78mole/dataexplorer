@@ -161,7 +161,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 					if (isValidSample) {
 						try {
 							int[] histoRandomSamplePoints = histoRandomSample.getSamplePoints();
-							//GPS 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+							//GPS 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 							if (!isResetMinMax[3] && histoRandomSamplePoints[22] == 3000  && histoRandomSamplePoints[15] != 0 && histoRandomSamplePoints[16] != 0) {
 								for (int j=15; j<23; ++j) {
 									tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);
@@ -429,7 +429,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 					if (isValidSample) {
 						try {
 							int[] histoRandomSamplePoints = histoRandomSample.getSamplePoints();
-							//GPS 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+							//GPS 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 							if (!isResetMinMax[3] && histoRandomSamplePoints[22] == 3000  && histoRandomSamplePoints[15] != 0 && histoRandomSamplePoints[16] != 0) {
 								for (int j=15; j<23; ++j) {
 									tmpRecordSet.get(j).setMinMax(histoRandomSamplePoints[j], histoRandomSamplePoints[j]);

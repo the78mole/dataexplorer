@@ -194,7 +194,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 				while (st.hasMoreTokens())
 					vec.add(st.nextToken("\r\n")); //$NON-NLS-1$
 				//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3,
-				//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+				//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 				//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out,
 				//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 				data.parse(vec, vec.size());
@@ -236,7 +236,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		String[] dataArray = StringHelper.splitString(stringBuffer, "\r", "\n");
 		for (int i=2; i < dataArray.length; i++) {
 			//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3,
-			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 			//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out,
 			try {
 				switch (i) {
@@ -369,7 +369,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 			System.arraycopy(dataBuffer, i * dataBufferSize + timeStampBufferSize, convertBuffer, 0, dataBufferSize);
 
 			//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3,
-			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 			//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out,
 			//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 			for (int j = 0; j < points.length; j++) {
@@ -400,10 +400,10 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 				double reduction = record.getReduction();
 				double factor = record.getFactor(); // != 1 if a unit translation is required
 				//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3,
-				//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+				//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 				//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out,
 				//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-				if (record.getOrdinal() == 15) { //15=Height
+				if (record.getOrdinal() == 15) { //15=Altitude
 					PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
 					boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 					property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
@@ -442,10 +442,10 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
 		//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3,
-		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 		//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out,
 		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-		if (record.getOrdinal() == 15) { //15=Height
+		if (record.getOrdinal() == 15) { //15=Altitude
 			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
 			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
@@ -481,10 +481,10 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		double reduction = record.getReduction(); // != 0 if a unit translation is required
 
 		//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3,
-		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 		//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out,
 		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
-		if (record.getOrdinal() == 15) { //15=Height
+		if (record.getOrdinal() == 15) { //15=Altitude
 			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
 			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
 			property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_LAST.value());
@@ -523,7 +523,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		Record record;
 		MeasurementType measurement;
 		//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3,
-		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 		//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out,
 		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
@@ -566,7 +566,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 		//do not forget to make record displayable -> record.setDisplayable(true);
 		// calculate the values required
 		//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3,
-		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+		//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 		//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out,
 		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 

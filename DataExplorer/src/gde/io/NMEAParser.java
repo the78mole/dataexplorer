@@ -300,7 +300,7 @@ public class NMEAParser implements IDataParser {
 				if (this.values.length >=25){
 					if (this.deviceName.equals("UniLog2")) {
 						//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
-						//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+						//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 						//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
 						//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 						//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
@@ -1136,7 +1136,7 @@ public class NMEAParser implements IDataParser {
 			if (this.channelConfigNumber == 1) {
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
-				//Unilog 	15=Voltage, 16=Current, 17=Power, 18=Revolution, 19=VoltageRx, 20=Height, 21=ValueA1, 22=ValueA2, 23=ValueA3
+				//Unilog 	15=Voltage, 16=Current, 17=Power, 18=Revolution, 19=VoltageRx, 20=Altitude, 21=ValueA1, 22=ValueA2, 23=ValueA3
 				//M-LINK    24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 				for (int i = 0; i < strValues.length && i < 9; i++) {
 					try {
@@ -1157,7 +1157,7 @@ public class NMEAParser implements IDataParser {
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
-				//Unilog 	20=Voltage, 21=Current, 22=Power, 32=Revolution, 24=VoltageRx, 25=Height, 26=ValueA1, 27=ValueA2, 28=ValueA3
+				//Unilog 	20=Voltage, 21=Current, 22=Power, 32=Revolution, 24=VoltageRx, 25=Altitude, 26=ValueA1, 27=ValueA2, 28=ValueA3
 				//M-LINK    29=valAdd00 30=valAdd01 31=valAdd02 32=valAdd03 33=valAdd04 34=valAdd05 35=valAdd06 36=valAdd07 37=valAdd08 38=valAdd09 39=valAdd10 40=valAdd11 41=valAdd12 42=valAdd13 43=valAdd14;
 				for (int i = 0; i < strValues.length && i < 9; i++) {
 					try {
@@ -1457,7 +1457,7 @@ public class NMEAParser implements IDataParser {
 			if (this.channelConfigNumber == 1) { //UniLog
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
-				//Unilog 	15=Voltage, 16=Current, 17=Power, 18=Revolution, 19=VoltageRx, 20=Height, 21=ValueA1, 22=ValueA2, 23=ValueA3
+				//Unilog 	15=Voltage, 16=Current, 17=Power, 18=Revolution, 19=VoltageRx, 20=Altitude, 21=ValueA1, 22=ValueA2, 23=ValueA3
 				//M-LINK  24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 				for (int i = 1; i < strValues.length && i <= 15; i++) {
 					try {
@@ -1499,7 +1499,7 @@ public class NMEAParser implements IDataParser {
 				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
-				//Unilog 	20=Voltage, 21=Current, 22=Power, 32=Revolution, 24=VoltageRx, 25=Height, 26=ValueA1, 27=ValueA2, 28=ValueA3
+				//Unilog 	20=Voltage, 21=Current, 22=Power, 32=Revolution, 24=VoltageRx, 25=Altitude, 26=ValueA1, 27=ValueA2, 28=ValueA3
 				//M-LINK  29=valAdd00 30=valAdd01 31=valAdd02 32=valAdd03 33=valAdd04 34=valAdd05 35=valAdd06 36=valAdd07 37=valAdd08 38=valAdd09 39=valAdd10 40=valAdd11 41=valAdd12 42=valAdd13 43=valAdd14;
 				for (int i = 1; i < strValues.length && i <= 15; i++) {
 					try {
@@ -1539,7 +1539,7 @@ public class NMEAParser implements IDataParser {
 		}
 		else if (this.deviceName.equals("UniLog2")) {
 			//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
-			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Height, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
+			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
 			//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
 			//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 			for (int i = 1; i < strValues.length && i <= 15; i++) {

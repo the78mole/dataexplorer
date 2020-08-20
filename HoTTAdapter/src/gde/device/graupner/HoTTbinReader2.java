@@ -95,8 +95,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		boolean[] isResetMinMax = new boolean[] {false, false, false, false, false}; //ESC, EAM, GAM, GPS, Vario
 		HoTTbinReader2.recordSet = null;
 		// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-		// 10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
-		// 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+		// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+		// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 		// 24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6,
 		// 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage,
 		// 43=LowestCellNumber, 44=Pressure, 45=Event G
@@ -212,7 +212,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 									HoTTbinReader2.gpsBinParser.parse();
 									bufCopier.clearBuffers();
 									isSensorData = true;
-									// 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+									// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 									if (!isResetMinMax[3] && HoTTbinReader2.points[22] == 3000 && HoTTbinReader2.points[15] != 0 && HoTTbinReader2.points[16] != 0) {
 										for (int j=15; j<23; ++j) {
 											tmpRecordSet.get(j).setMinMax(HoTTbinReader2.points[j], HoTTbinReader2.points[j]);
@@ -378,8 +378,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		boolean isJustMigrated = false;
 		boolean[] isResetMinMax = new boolean[] {false, false, false, false, false}; //ESC, EAM, GAM, GPS, Vario
 		// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-		// 10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
-		// 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+		// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+		// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 		// 24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6,
 		// 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage,
 		// 43=LowestCellNumber, 44=Pressure, 45=Event G
@@ -670,7 +670,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		}
 		if (migrationJobs.contains(Sensor.GPS)) {
 			HoTTbinReader2.gpsBinParser.migratePoints(HoTTbinReader2.points);
-			// 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+			// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 			if (!isResetMinMax[3] && HoTTbinReader2.points[22] == 3000  && HoTTbinReader2.points[15] != 0 && HoTTbinReader2.points[16] != 0) {
 				for (int i=15; i<23; ++i) {
 					tmpRecordSet.get(i).setMinMax(HoTTbinReader2.points[i], HoTTbinReader2.points[i]);
@@ -841,7 +841,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		@Override
 		protected boolean parse() {
 			// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-			// 10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+			// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
 			this.tmpHeight = DataParser.parse2Short(this._buf1, 2) - 500;
 			this.tmpClimb10 = DataParser.parse2UnsignedShort(this._buf2, 2) - 30000;
 			if (isPointsValid()) {
@@ -905,8 +905,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		@Override
 		protected boolean parse() {
 			// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-			// 10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
-			// 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+			// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+			// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 			this.tmpHeight = DataParser.parse2Short(this._buf2, 8) - 500;
 			this.tmpClimb1 = (DataParser.parse2UnsignedShort(this._buf3, 0) - 30000);
 			this.tmpClimb3 = (this._buf3[2] & 0xFF) - 120;
@@ -984,7 +984,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		}
 
 		private boolean isPointsValid() {
-			// WB !this.pickerParameters.isFilterEnabled || (this.tmpClimb1 > 10000 && this.tmpClimb3 > 30 && this.tmpHeight > 10 && this.tmpHeight < 4500); from HottbinReader
 			return !this.pickerParameters.isFilterEnabled || (this.tmpClimb1 > -20000 && this.tmpClimb3 > -90 && this.tmpHeight >= -490 && this.tmpHeight < 4500);
 		}
 
@@ -1028,8 +1027,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			this.tmpVoltage2 = DataParser.parse2Short(this._buf2, 1);
 			this.tmpCapacity = DataParser.parse2Short(this._buf3[9], this._buf4[0]);
 			// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-			// 10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
-			// 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+			// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+			// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 			// 24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6,
 			// 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage,
 			// 43=LowestCellNumber, 44=Pressure, 45=Event G
@@ -1120,8 +1119,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		@Override
 		protected boolean parse() {
 			// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-			// 10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
-			// 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+			// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+			// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 			// 24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6,
 			// 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage,
 			// 43=LowestCellNumber, 44=Pressure, 45=Event G
@@ -1218,8 +1217,8 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		@Override
 		protected boolean parse() {
 			// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-			// 10=Height, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
-			// 15=Latitude, 16=Longitude, 17=Velocity, 18=DistanceStart, 19=DirectionStart, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+			// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+			// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 			// 24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6,
 			// 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage,
 			// 43=LowestCellNumber, 44=Pressure, 45=Event G

@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 3.4.3 - xx yy 2020
 Generic changes/fixes
 	* fix display problem of geo-coordinates in degree curve compare
+	* update several naming
 
 Device specific changes/fixes
 	* OnLineCommander - add initial support

@@ -54,7 +54,7 @@ the abbreviation should have a length of 10 characters together with unit
          <entry key="Velocity_UL">Speed km/h</entry>
          <entry key="Capacity_UL">CapUL[mAh]</entry>
       <entry key="Temperature_UL">TempUL [°]</entry>
-       <entry key="DistanceStart">Dist.  [m]</entry>
+       <entry key="Distance">Dist.  [m]</entry>
              <entry key="Current">Amps   [A]</entry>
            <entry key="Current G">Amps G [A]</entry>
            <entry key="Current E">Apms E [A]</entry>
