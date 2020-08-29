@@ -1334,7 +1334,7 @@ public class ChargerDialog extends DeviceDialog {
 			}
 			return;
 		}
-		else if ((this.systemInfo.getStatus() & 0x02) != 0) {
+		else if (this.systemInfo != null && (this.systemInfo.getStatus() & 0x02) != 0) {
 			log.log(Level.SEVERE, this.systemInfo.getStatusString());
 			this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGE2603));
 			try {
@@ -1675,7 +1675,7 @@ public class ChargerDialog extends DeviceDialog {
 							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
 					WaitTimer.delay(400);
 					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
-					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+					if (ChargerDialog.this.systemInfo != null && (ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
 						log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
@@ -1708,7 +1708,7 @@ public class ChargerDialog extends DeviceDialog {
 							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
 					WaitTimer.delay(400);
 					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
-					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+					if (ChargerDialog.this.systemInfo != null && (ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
 						log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
@@ -1777,7 +1777,7 @@ public class ChargerDialog extends DeviceDialog {
 							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
 					WaitTimer.delay(400);
 					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
-					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+					if (ChargerDialog.this.systemInfo != null && (ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
 						log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
@@ -1810,7 +1810,7 @@ public class ChargerDialog extends DeviceDialog {
 							ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
 					WaitTimer.delay(400);
 					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
-					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+					if (ChargerDialog.this.systemInfo != null && (ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
 						log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
@@ -1844,7 +1844,7 @@ public class ChargerDialog extends DeviceDialog {
 					startProgramExecution((byte) 0, (byte) 0, ChargerDialog.this.memoryHeadIndex[ChargerDialog.this.combo.getSelectionIndex()]);
 					WaitTimer.delay(400);
 					ChargerDialog.this.systemInfo = ChargerDialog.this.readInfo();
-					if ((ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
+					if (ChargerDialog.this.systemInfo != null && (ChargerDialog.this.systemInfo.getStatus() & 0x02) != 0) {
 						log.log(Level.WARNING, ChargerDialog.this.systemInfo.getStatusString());
 						ChargerDialog.this.application.openMessageDialog(ChargerDialog.this.dialogShell, Messages.getString(MessageIds.GDE_MSGE2604));
 					}
