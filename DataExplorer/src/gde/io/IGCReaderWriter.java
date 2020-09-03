@@ -166,6 +166,7 @@ public class IGCReaderWriter {
 				//skip all lines which describe the hardware, pilot and plane, save as header
 				while ((line = reader.readLine()) == null || !line.startsWith(device.getDataBlockLeader())) {
 					if (line != null) {
+						log.log(Level.FINE, line);
 						if (line.startsWith("HFDTE")) { //160701	UTC date of flight, here 16th July 2001
 							date = line.substring(5).trim();
 						}
@@ -195,7 +196,7 @@ public class IGCReaderWriter {
 					++lineNumber;
 				}
 				//calculate the start time stamp using the first B record
-				int year = Integer.parseInt(date.substring(4)) + 2000;
+				int year = Integer.parseInt(date.substring(4, 6)) + 2000;
 				int month = Integer.parseInt(date.substring(2, 4));
 				int day = Integer.parseInt(date.substring(0, 2));
 				time = line.substring(1, 7); //16 02 40
@@ -257,7 +258,7 @@ public class IGCReaderWriter {
 
 							int i=0;
 							for (IgcExtension extension : extensions) {
-							if (recordSet.realSize() < 5+i && !recordSet.get(5+i).getName().equals(extension.getThreeLetterCode()))
+							if (recordSet.realSize() > 5+i && !recordSet.get(5+i).getName().equals(extension.getThreeLetterCode()))
 								recordSet.get(5+i).setName(extension.getThreeLetterCode());
 							++i;
 							}
@@ -308,6 +309,10 @@ public class IGCReaderWriter {
 						}
 						timeStamp = actualTimeStamp;
 					}
+					else if (line.startsWith("F")) {
+						//skip F RECORD - SATELLITE CONSTELLATION.
+						log.log(Level.FINE, "F RECORD - SATELLITE CONSTELLATION = " + line);
+					}
 					else if (line.startsWith("G")) {
 						isGsentence = true;
 						log.log(Level.FINE, "line number " + lineNumber + " contains security code and is voted as last line! " + lastLine); //$NON-NLS-1$ //$NON-NLS-2$
@@ -329,9 +334,6 @@ public class IGCReaderWriter {
 
 				reader.close();
 				reader = null;
-
-				//write filename after import to record description
-				activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)+1));
 
 				if (GDE.IS_WINDOWS && isGsentence && GDE.BIT_MODE.equals("32") && dllID.equalsIgnoreCase("XTT")) {
 					if (IGCDLL.loadIgcDll(dllID)) {

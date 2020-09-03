@@ -402,8 +402,12 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 										recordNameExtend = GDE.STRING_EMPTY + (recordNameExtend.getBytes()[0] - 54);
 									}
 								}
-								else
-									recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT)-4, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
+								else { 
+									if (tmpFileName.contains(GDE.STRING_DASH))
+										recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DASH)+1, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
+									else
+										recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_DOT)-1, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
+								}
 								IGCReaderWriter.read(selectedImportFile, IGCAdapter.this, recordNameExtend, 1);
 							}
 							catch (Throwable e) {
