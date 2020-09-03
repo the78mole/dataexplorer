@@ -127,6 +127,7 @@ public class HoTTlogReader extends HoTTbinReader {
 				// recordSetChannel initialized and ready to add data
 			}
 
+			log.log(Level.INFO, fileInfoHeader.toString());
 			// read all the data blocks from the file and parse
 			data_in.skip(logDataOffset);
 			for (int i = 0; i < numberDatablocks; i++) {
