@@ -8,6 +8,7 @@ Generic changes/fixes
 
 Device specific changes/fixes
 	* OnLineCommander - add initial support
+	* iChargerUSB - fix some possible exception in charger dialog reading data from connected device
 	* HoTTAdpter2* - add missing property reduction/offset to Temperature Rx
 	* IGCAdapter - fix flight number parsing, parsing F record, record naming
 
