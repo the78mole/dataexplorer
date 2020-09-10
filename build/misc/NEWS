@@ -1,79 +1,25 @@
-GNU DataExplorer - News - comes with Version 3.4.2 - 04 Aug 2020
+GNU DataExplorer - News - comes with Version 3.4.3 - 09 Sep 2020
 
 Generic changes/fixes
-	* fix cell voltage dialog adjusting value position
-	* remove guava-jre, joda-time dependency
-	* add several missing license files
-	* add option to force 10 major scale ticks while rounding graphics end values
-	* enable class based log level configuration device sub packages (p.e. gde.device.junsi.modbus)
-	* enable USB HID device selection while devices with almost identical characteristics connected
-	* enable secondary trigger range in properties editor (functional added in 3.4.0)
-	* add JAVA_IO_TMPDIR GDE cleanup tree (exported help files)
-	* macOS build - add code signing app and dmg to fulfill gatekeeper requirements
-	* add Java version check, detect run time version out of specified range
-	* update jSerialComm to version 2.6.2
-	* use system cursor for measuring to avoid misplaced cursor while sized desktop
-	* documentation update
-	* remove leading blanks while CSV relative time export
-	* fix GPS export make LookAt section related
-	* fix display problem of geo-coordinates in curve compare
-	* add macOS touch bar support
-	* documentation update
+	* fix display problem of geo-coordinates in degree curve compare
+	* update several naming p.e. "TrackAngle"
+	* KMZ export, remove definition of relative altitude start point out of definition of LookAt
 	
+
 Device specific changes/fixes
-	* iChargerUSB - enable program memory control
-	* iChargerUSB - correct power/energy calculation for opened files (*.osd)
-	* iChargerUSB - add system info string to recording
-	* iChargerUSB - fix parsing error battery voltage > 25,4 Volts
-	* iCharger S6/X12 - add support
-	* GPS_Logger* - fix latitude, longitude unit which caused display problem while activated
-	* Spektrum-Telemetry - make frame loss and holds always visible, even no reasonable data
-	* UniSens-E - enable live data gathering
-	* iMax B6* - fix missing energy calculation Ni battery type outside cycle
-	* MC3000 - fix to short wait time for possible adjustable rest time
-	* UniLog(1) * fix raw CSV export/import
-	* UniLog* * enable special efficiency calculation while n100W 99999, A1 torque input [Ncm]
-	* JetiAdapter - fix measurement name and unit related data type parser "Geschwindigkeit [kmh]"
-	* HoTTAdapter* - add missing GPS values (satellites, 3D-fix) live data gathering 
-	* HoTTAdapter* - adapt GPS fix values '-'=0, '2'=2, '3'=3, 'D'=4, unknown char=1
-	* HoTTAdapter* - adjust and synchronize Vario climb10 filter
-	* HoTTViewer - add measurement ENL, satellites, GPS-Fix
+	* OnLineCommander - add initial support
+	* HoTTAdpter2* - add missing property reduction/offset to Temperature Rx
+	* IGCAdapter - fix flight number parsing, parsing F record, record naming
 
 	
 Generelle Änderungen/Verbesserungen
-    * Zellenspannung Anzeigeposition korrigiert
-    * Abhängigkeiten zu guava-jre, joda-time entfernt
-    * Fehlende Lizenzdateien hinzugefügt
-    * Option, um Zehnerteilung der Messwert-Skalen hinzugefügt
-    * Klassen basiertes Loggen um eine Ebene erweitert (Beispiel gde.device.junsi.modbus)
-    * Auswahl gleichartiger USB HID Adapter ermöglicht
-    * Messwert-Trigger-Erweiterung in Eigenschaften-Editor eingebaut (funktional zugefügt in 3.4.0)
-    * Aufräumen des JAVA_IO_TMPDIR der GDE exportierten Hilfedateien implementiert
-    * macOS build - Code Signierung von App und DMG für Gatekeeper hinzugefügt
-    * Java Version Überprüfung zur Erkennung nicht unterstützter Versionen hinzugefügt
-    * jSerialComm Update zu Version 2.6.2 (serielle Schnittstelle)
-    * System Cursor wird jetzt zum Messen benutzt, um Positionierungs-Fehler zu vermeiden
-    * Dokumentations-Update
-    * Führende Leerzeichen bei CSV Export und relativem Zeitstempel entfernt
-    * Korrektur bei GPS Export (KMZ/KML) der LookAt Sektion, Anzeige Google Earth war dadurch falsch positioniert
-    * Anzeigeprobleme von Geo-Koordinaten in Kurvenvergleich korrigiert
-    * macOS Touch-Bar Unterstützung eingebaut
+    * Anzeigefehler in Geo-Koordinaten in Kurvenvergleich gelöst
+    * einige Namen angepasst, Beispiel "TrackAngle"
+    * KMZ Export, Höhenstartpunkt für die Bestimmung der relativen Starthöhe aus dem Kontext der LookAt Berechnung genommen
+    
 
 Geräte spezifische Änderungen/Verbesserungen
-    * iChargerUSB - Konfiguration von Ladeprogrammen unterstützt
-    * iChargerUSB - Leistung und Energieberechnung korrigiert
-    * iChargerUSB - Systeminformation Zeile bei Datenaufnahme hinzugefügt
-    * iChargerUSB - Korrektur beim Parsen Akku-Spannungen > 25,4 Volt
-    * iCharger S6/X12 - Unterstützung hinzugefügt
-    * GPS_Logger* - Korrektur der Anzeige von Längengrad und Breitengrad
-    * Spektrum-Telemetry - Frameloss und Holds sind jetzt immer sichtbar auch wenn der Wert bei 0 liegt
-    * UniSens-E - Live-Datenaufnahme unterstützt
-    * iMax B6* - fehlende Energieberechnung für Nickel Akkus ergänzt
-    * MC3000 - Korrektur der zu kurzen Wartezeiten entsprechend konfigurierbarem Wert
-    * UniLog(1) - Korrektur CSV export/import
-    * UniLog* - Spezielle Effektivitätsberechnung bei n100W=99999 und A1 Drehmoment in [Ncm] ermöglicht
-    * JetiAdapter - Korrektur des Daten-Parser, Ergänzung mit Messwertname "Geschwindigkeit [kmh]"
-    * HoTTAdapter* - fehlende GPS-Werte bei Live-Datenaufnahme (Anzahl Satelliten, 3D-fix) hinzugefügt
-    * HoTTAdapter* - Anpassung GPS Fix Werte '-'=0, '2'=2, '3'=3, 'D'=4 ergänzt (D kommt vom SM GPS-Logger)
-    * HoTTAdapter* - Korrektur der Vario Steigen10 Filter
-    * HoTTViewer - Messwerte ENL, Satelliten, GPS-Fix hinzugefügt
+    * OnLineCommander - Unterstützung hinzugefügt
+ 	* iChargerUSB - eine potentielle Fehlerquellen im iCharger Dialog, die beim Lesen von Daten auftreten können verhindert
+    * HoTTAdpter2* - fehlende Reduktion Temperatur Rx hinzugefügt
+    * IGCAdapter - Korrektur Flugnummer-Parsing, Fehler beim Parsen des F-Record, fehlende Namensanpassung korrigiert

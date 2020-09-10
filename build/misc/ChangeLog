@@ -1,12 +1,14 @@
 Development history / change log, please read from bottom up
 
-Version 3.4.3 - xx yy 2020
+Version 3.4.3 - 09 Sep 2020
 Generic changes/fixes
 	* fix display problem of geo-coordinates in degree curve compare
 	* update several naming
+	* KMZ export, remove definition of relative altitude start point out of definition of LookAt
 
 Device specific changes/fixes
 	* OnLineCommander - add initial support
+	* iChargerUSB - fix some possible exception in charger dialog reading data from connected device
 	* HoTTAdpter2* - add missing property reduction/offset to Temperature Rx
 	* IGCAdapter - fix flight number parsing, parsing F record, record naming
 
