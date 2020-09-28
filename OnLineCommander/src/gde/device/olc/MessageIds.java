@@ -24,15 +24,10 @@ package gde.device.olc;
  */ 
 public class MessageIds { 
 
-	public final static String	GDE_MSGT2750 = "GDE_MSGT2750";
-	public final static String	GDE_MSGT2751 = "GDE_MSGT2751";
-	public final static String	GDE_MSGT2752 = "GDE_MSGT2752";
 	public final static String	GDE_MSGT2753 = "GDE_MSGT2753";
 	public final static String	GDE_MSGT2754 = "GDE_MSGT2754";
 	public final static String	GDE_MSGT2755 = "GDE_MSGT2755";
 	public final static String	GDE_MSGT2756 = "GDE_MSGT2756";
 	public final static String	GDE_MSGT2757 = "GDE_MSGT2757";
-	public final static String	GDE_MSGT2758 = "GDE_MSGT2758";
-	public final static String	GDE_MSGT2759 = "GDE_MSGT2759";
 
  }

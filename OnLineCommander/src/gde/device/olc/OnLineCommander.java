@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import gde.Analyzer;
 import gde.GDE;
 import gde.comm.DeviceCommPort;
+import gde.config.Settings;
 import gde.data.Channel;
 import gde.data.Channels;
 import gde.data.Record;
@@ -62,6 +63,9 @@ public class OnLineCommander extends DeviceConfiguration implements IDevice {
 	 */
 	public OnLineCommander(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
+		// initializing the resource bundle for this device
+		Messages.setDeviceResourceBundle("gde.device.olc.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) {
@@ -77,6 +81,9 @@ public class OnLineCommander extends DeviceConfiguration implements IDevice {
 	 */
 	public OnLineCommander(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
+		// initializing the resource bundle for this device
+		Messages.setDeviceResourceBundle("gde.device.olc.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
 		if (this.application.getMenuToolBar() != null) {

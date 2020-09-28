@@ -1,5 +1,12 @@
 Development history / change log, please read from bottom up
 
+Version 3.4.4 - xx yy 2020
+Generic changes/fixes
+	* fix ..
+
+Device specific changes/fixes
+	* OnLineCommander - fix loading resource bundle
+
 Version 3.4.3 - 09 Sep 2020
 Generic changes/fixes
 	* fix display problem of geo-coordinates in degree curve compare
