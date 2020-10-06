@@ -2,7 +2,7 @@ Development history / change log, please read from bottom up
 
 Version 3.4.4 - xx yy 2020
 Generic changes/fixes
-	* fix ..
+	* fix statistics text position in description group to enable scroll
 
 Device specific changes/fixes
 	* OnLineCommander - fix loading resource bundle

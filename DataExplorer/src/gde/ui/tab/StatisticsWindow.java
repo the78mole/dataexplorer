@@ -196,8 +196,8 @@ public class StatisticsWindow extends CTabItem {
 					this.descriptionTextLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.descriptionTextLabel.setText("recordSetName, (fileDescription), recordSetDescription"); //$NON-NLS-1$
 					this.descriptionTextLabel.setBackground(this.innerAreaBackground);
-					if (!GDE.IS_MAC)	this.descriptionTextLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
-					else							this.descriptionTextLabel.setBounds(5, 3,   this.descriptionGroup.getClientArea().width-10, this.descriptionGroup.getClientArea().height-10);
+					if (GDE.IS_WINDOWS)	this.descriptionTextLabel.setBounds(10, 20, this.descriptionGroup.getClientArea().width-15, this.descriptionGroup.getClientArea().height-10);
+					else							  this.descriptionTextLabel.setBounds( 5, 3 , this.descriptionGroup.getClientArea().width-10, this.descriptionGroup.getClientArea().height-10);
 					this.descriptionTextLabel.setEditable(false);
 					this.descriptionTextLabel.setMenu(this.popupmenu);
 				}
