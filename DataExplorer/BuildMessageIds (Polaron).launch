@@ -9,6 +9,6 @@
 <booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
 <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="gde.tools.BuildMessageIds"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="&quot;gde.device.revolectrix&quot;&#13;&#10;&quot;../PowerLab/src/gde/device/revolectrix/messages.properties&quot;&#13;&#10;&quot;../PowerLab/src/gde/device/revolectrix/MessageIds.java&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="&quot;gde.device.graupner.polaron&quot;&#13;&#10;&quot;../Polaron/src/gde/device/graupner/polaron/messages.properties&quot;&#13;&#10;&quot;../Polaron/src/gde/device/graupner/polaron/MessageIds.java&quot;"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="DataExplorer"/>
 </launchConfiguration>

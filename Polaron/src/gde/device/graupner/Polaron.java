@@ -97,7 +97,17 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3106), //6 Error
 				Messages.getString(MessageIds.GDE_MSGT3107), //7 Balancing
 				Messages.getString(MessageIds.GDE_MSGT3122), //8 storage
-				Messages.getString(MessageIds.GDE_MSGT3109) };//9 Motor
+				Messages.getString(MessageIds.GDE_MSGT3109), //9 Motor
+				Messages.getString(MessageIds.GDE_MSGW3103), //10 Unknown
+				Messages.getString(MessageIds.GDE_MSGW3103), //11 Unknown
+				Messages.getString(MessageIds.GDE_MSGW3103), //12 Unknown
+				Messages.getString(MessageIds.GDE_MSGW3103), //13 Unknown
+				Messages.getString(MessageIds.GDE_MSGW3103), //14 Unknown
+				Messages.getString(MessageIds.GDE_MSGW3103), //15 Unknown
+				Messages.getString(MessageIds.GDE_MSGW3103), //16 Unknown
+				Messages.getString(MessageIds.GDE_MSGW3103), //17 Unknown
+				Messages.getString(MessageIds.GDE_MSGW3103), //18 Unknown
+				Messages.getString(MessageIds.GDE_MSGW3103)};//19 Unknown
 		this.CHARGE_TYPE = new String[] { 
 				Messages.getString(MessageIds.GDE_MSGT3110), //0 NiXx Automatic
 				Messages.getString(MessageIds.GDE_MSGT3111), //1 LiXy Automatic

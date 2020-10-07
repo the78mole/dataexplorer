@@ -151,11 +151,17 @@ public class PolaronGathererThread extends Thread {
 								this.recordSetKey1 = (String) ch1[1];
 							}
 							if (this.isProgrammExecuting2) { // checks for processes active includes check state change waiting to discharge to charge
-								byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2 + 9];
+								byte[] buffer = new byte[Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO)) / 2 + 11];
 								switch (this.device.getDeviceTypeIdentifier()) {
 								case PolaronSports:
 									System.arraycopy(dataBuffer, 0, buffer, 0, 9);//header, application, product code
-									System.arraycopy(dataBuffer, 77, buffer, 9, dataBuffer.length-77);
+									System.arraycopy(dataBuffer, 77, buffer, 9, dataBuffer.length-77); 
+									if (PolaronGathererThread.log.isLoggable(Level.FINE))log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+									break;
+
+								case PolaronEx:
+									System.arraycopy(dataBuffer, 0, buffer, 0, 11);//header, application, product code
+									System.arraycopy(dataBuffer, 125, buffer, 11, buffer.length-11); //160
 									if (PolaronGathererThread.log.isLoggable(Level.FINE))log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
 									break;
 
@@ -314,6 +320,9 @@ public class PolaronGathererThread extends Thread {
 	private Object[] processDataChannel(int number, RecordSet recordSet, String recordSetKey, byte[] dataBuffer, int[] points) throws DataInconsitsentException {
 		final String $METHOD_NAME = "processOutlet"; //$NON-NLS-1$
 		Object[] result = new Object[2];
+		if (PolaronSerialPort.log.isLoggable(Level.FINER)) {
+			log.logp(Level.FINER, PolaronSerialPort.$CLASS_NAME, $METHOD_NAME, number + " - " + StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
+		}
 		// 0=no processing 1=charge 2=discharge 3=delay 4=auto balance 5=error
 		int processNumber = this.device.getProcessingMode(dataBuffer);
 		String processName = this.isContinuousRecordSet ? Messages.getString(MessageIds.GDE_MSGT3126) : this.device.PROCESSING_MODE[processNumber];
