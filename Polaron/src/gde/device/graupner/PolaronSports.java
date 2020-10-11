@@ -355,6 +355,7 @@ public class PolaronSports extends Polaron {
 	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
 		if (outletNum == 1) {
 			int processingModeOut1 = getProcessingMode(dataBuffer);
+			processingModeOut1 = processingModeOut1 > 9 ? 0 : processingModeOut1;
 			if (Polaron.log.isLoggable(java.util.logging.Level.FINE)) {
 				Polaron.log.log(java.util.logging.Level.FINE, "processingModeOut1 = " + this.PROCESSING_MODE[processingModeOut1]); //$NON-NLS-1$
 			}

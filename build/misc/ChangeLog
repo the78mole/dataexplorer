@@ -7,6 +7,7 @@ Generic changes/fixes
 Device specific changes/fixes
 	* OnLineCommander - fix loading resource bundle
 	* PolaronEx - fix exception while processing channel 2
+	* Polaron* - fix processing detection channel 2
 
 Version 3.4.3 - 09 Sep 2020
 Generic changes/fixes

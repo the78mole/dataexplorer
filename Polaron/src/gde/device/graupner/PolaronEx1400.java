@@ -184,6 +184,7 @@ public class PolaronEx1400 extends Polaron {
 	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
 		if (outletNum == 1) {
 			int processingModeOut1 = getProcessingMode(dataBuffer);
+			processingModeOut1 = processingModeOut1 > 9 ? 0 : processingModeOut1;
 			if (Polaron.log.isLoggable(java.util.logging.Level.FINE)) {
 				Polaron.log.log(java.util.logging.Level.FINE, "processingModeOut1 = " + this.PROCESSING_MODE[processingModeOut1]); //$NON-NLS-1$
 			}
@@ -191,6 +192,7 @@ public class PolaronEx1400 extends Polaron {
 		}
 		else if (outletNum == 2) {
 			int processingModeOut2 = DataParser.parse2Short(dataBuffer, 131);
+			processingModeOut2 = processingModeOut2 > 9 ? 0 : processingModeOut2;
 			if (Polaron.log.isLoggable(java.util.logging.Level.FINE)) {
 				Polaron.log.log(java.util.logging.Level.OFF, "processingModeOut2 = " + this.PROCESSING_MODE[processingModeOut2]); //$NON-NLS-1$
 			}

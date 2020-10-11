@@ -122,9 +122,16 @@ public class PolaronGathererThread extends Thread {
 						this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
 					}
 					break;
-				case PolaronPro:
-					this.isProgrammExecuting1 = this.device.isProcessing(1, dataBuffer);
-					this.isProgrammExecuting2 = this.device.isProcessing(2, dataBuffer);
+				case PolaronEx1400:
+					this.isProgrammExecuting3 = this.device.isLinkedMode(dataBuffer);
+					if (!this.isProgrammExecuting3 && !this.isLinkedMode) { // outlet channel 1+2 combined 
+						this.isProgrammExecuting1 = ((PolaronEx1400)this.device).isProcessing(1, dataBuffer);
+						this.isProgrammExecuting2 = ((PolaronEx1400)this.device).isProcessing(2, dataBuffer);
+					}
+					break;
+				case PolaronSports:
+					this.isProgrammExecuting1 = ((PolaronSports)this.device).isProcessing(1, dataBuffer);
+					this.isProgrammExecuting2 = ((PolaronSports)this.device).isProcessing(2, dataBuffer);
 					this.isProgrammExecuting3 = false;
 					break;
 				}
@@ -156,20 +163,20 @@ public class PolaronGathererThread extends Thread {
 								case PolaronSports:
 									System.arraycopy(dataBuffer, 0, buffer, 0, 9);//header, application, product code
 									System.arraycopy(dataBuffer, 77, buffer, 9, dataBuffer.length-77); 
-									if (PolaronGathererThread.log.isLoggable(Level.FINE))log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+									if (PolaronGathererThread.log.isLoggable(Level.FINE))log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(buffer, buffer.length));
 									break;
 
 								case PolaronEx:
 									System.arraycopy(dataBuffer, 0, buffer, 0, 11);//header, application, product code
 									System.arraycopy(dataBuffer, 125, buffer, 11, buffer.length-11); //160
-									if (PolaronGathererThread.log.isLoggable(Level.FINE))log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+									if (PolaronGathererThread.log.isLoggable(Level.FINE))log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(buffer, buffer.length));
 									break;
 
 								case PolaronACDC:
 								case PolaronEx1400:
 									System.arraycopy(dataBuffer, 0, buffer, 0, 11);//header, application, product code
 									System.arraycopy(dataBuffer, 129, buffer, 11, 130);
-									if (PolaronGathererThread.log.isLoggable(Level.FINE))log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(buffer));
+									if (PolaronGathererThread.log.isLoggable(Level.FINE))log.logp(Level.FINE, PolaronGathererThread.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(buffer, buffer.length));
 									break;
 
 								default:

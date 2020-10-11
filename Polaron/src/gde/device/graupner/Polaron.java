@@ -98,16 +98,16 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3107), //7 Balancing
 				Messages.getString(MessageIds.GDE_MSGT3122), //8 storage
 				Messages.getString(MessageIds.GDE_MSGT3109), //9 Motor
-				Messages.getString(MessageIds.GDE_MSGW3103), //10 Unknown
-				Messages.getString(MessageIds.GDE_MSGW3103), //11 Unknown
-				Messages.getString(MessageIds.GDE_MSGW3103), //12 Unknown
-				Messages.getString(MessageIds.GDE_MSGW3103), //13 Unknown
-				Messages.getString(MessageIds.GDE_MSGW3103), //14 Unknown
-				Messages.getString(MessageIds.GDE_MSGW3103), //15 Unknown
-				Messages.getString(MessageIds.GDE_MSGW3103), //16 Unknown
-				Messages.getString(MessageIds.GDE_MSGW3103), //17 Unknown
-				Messages.getString(MessageIds.GDE_MSGW3103), //18 Unknown
-				Messages.getString(MessageIds.GDE_MSGW3103)};//19 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //10 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //11 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //12 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //13 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //14 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //15 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //16 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //17 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //18 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100)};//19 Unknown
 		this.CHARGE_TYPE = new String[] { 
 				Messages.getString(MessageIds.GDE_MSGT3110), //0 NiXx Automatic
 				Messages.getString(MessageIds.GDE_MSGT3111), //1 LiXy Automatic
@@ -158,7 +158,17 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 				Messages.getString(MessageIds.GDE_MSGT3106), //6 Error
 				Messages.getString(MessageIds.GDE_MSGT3107), //7 Balancing
 				Messages.getString(MessageIds.GDE_MSGT3122), //8 storage
-				Messages.getString(MessageIds.GDE_MSGT3109) };//9 Motor
+				Messages.getString(MessageIds.GDE_MSGT3109), //9 Motor
+				Messages.getString(MessageIds.GDE_MSGT3100), //10 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //11 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //12 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //13 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //14 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //15 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //16 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //17 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100), //18 Unknown
+				Messages.getString(MessageIds.GDE_MSGT3100)};//19 Unknown
 		this.CHARGE_TYPE = new String[] { 
 				Messages.getString(MessageIds.GDE_MSGT3110), //0 NiXx Automatic
 				Messages.getString(MessageIds.GDE_MSGT3111), //1 LiXy Automatic
@@ -734,13 +744,15 @@ public abstract class Polaron extends DeviceConfiguration implements IDevice {
 	public boolean isProcessing(int outletNum, byte[] dataBuffer) {
 		if (outletNum == 1) {
 			int processingModeOut1 = getProcessingMode(dataBuffer);
+			processingModeOut1 = processingModeOut1 > 9 ? 0 : processingModeOut1;
 			if (Polaron.log.isLoggable(java.util.logging.Level.FINE)) {
 				Polaron.log.log(java.util.logging.Level.FINE, "processingModeOut1 = " + this.PROCESSING_MODE[processingModeOut1]); //$NON-NLS-1$
 			}
-			return !(processingModeOut1 == Polaron.OPERATIONS_MODE_NONE || processingModeOut1 == Polaron.OPERATIONS_MODE_ERROR);
+			return !(processingModeOut1 == Polaron.OPERATIONS_MODE_NONE || processingModeOut1 == Polaron.OPERATIONS_MODE_ERROR );
 		}
 		else if (outletNum == 2) {
 			int processingModeOut2 = DataParser.parse2Short(dataBuffer, 127);
+			processingModeOut2 = processingModeOut2 > 9 ? 0 : processingModeOut2;
 			if (Polaron.log.isLoggable(java.util.logging.Level.FINE)) {
 				Polaron.log.log(java.util.logging.Level.FINE, "processingModeOut2 = " + this.PROCESSING_MODE[processingModeOut2]); //$NON-NLS-1$
 			}
