@@ -1017,19 +1017,19 @@ public class TelemetryData {
 					TelemetryVar par = sen.getVar(paramId);
 					if (par != null) {
 						switch (par.getUnit()) {
-						case "m":
 						case "A":
-						case "m/s":
 							decimals=3;
 							break;
 							
 						case "V":
-						case "km/h":
 						case "dbm":
+						case "m/s":
 						case "g":
 							decimals=2;
 							break;
 							
+						case "km/h":
+						case "m":
 						case "°C":
 						case "hPa":
 							decimals=1;
