@@ -260,6 +260,7 @@
 		<ant antfile="build.xml" target="clean" dir="Robbe" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="Spektrum-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="clean" dir="OnLineCommander" inheritall="true" />
+		<ant antfile="build.xml" target="clean" dir="Core-Telemetry" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -450,6 +451,7 @@
 		<ant antfile="build.xml" target="package" dir="Robbe" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="Spektrum-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="package" dir="OnLineCommander" inheritall="true" />
+		<ant antfile="build.xml" target="package" dir="Core-Telemetry" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 	
@@ -496,6 +498,7 @@
 		<ant antfile="build.xml" target="nonui_package" dir="Robbe" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="Spektrum-Telemetry" inheritall="true" />
 		<ant antfile="build.xml" target="nonui_package" dir="OnLineCommander" inheritall="true" />
+		<ant antfile="build.xml" target="nonui_package" dir="Core-Telemetry" inheritall="true" />
 		<!-- add new device here -->
 	</target>
 
@@ -541,6 +544,7 @@
 			<include name="Robbe/build/*.jar" />
 			<include name="Spektrum-Telemetry/build/*.jar" />
 			<include name="OnLineCommander/build/*.jar" />
+			<include name="Core-Telemetry/build/*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
@@ -588,6 +592,7 @@
 			<include name="Robbe/build/*NonUi*.jar" />
 			<include name="Spektrum-Telemetry/build/*NonUi*.jar" />
 			<include name="OnLineCommander/build/*NonUi*.jar" />
+			<include name="Core-Telemetry/build/*NonUi*.jar" />
 			<!-- add new device here -->
 		</patternset>
 	</fileset>
