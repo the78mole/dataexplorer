@@ -121,7 +121,7 @@ public class JetiAdapterDialog extends DeviceDialog {
 				this.dialogShell.setLayout(dialogShellLayout);
 				this.dialogShell.layout();
 				this.dialogShell.pack();
-				this.dialogShell.setSize(GDE.IS_LINUX ? 740 : 675, 500); //header + tab + label + this.measurementsCount * 26 + buttons
+				this.dialogShell.setSize(GDE.IS_MAC ? 675 : 740, 500); //header + tab + label + this.measurementsCount * 26 + buttons
 				this.dialogShell.setText(this.device.getName() + Messages.getString(gde.messages.MessageIds.GDE_MSGT0273));
 				this.dialogShell.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.dialogShell.setImage(SWTResourceManager.getImage("gde/resource/ToolBoxHot.gif")); //$NON-NLS-1$

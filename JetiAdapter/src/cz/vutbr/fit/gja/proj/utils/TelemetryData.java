@@ -1048,8 +1048,8 @@ public class TelemetryData {
 					intval = (byte) val;
 				else
 					intval = (int) val;
-				if (TelemetryData.log.isLoggable(Level.FINE))
-					log.log(Level.FINE, String.format("TelemetryData: deviceId=%d, paramId=%d, untit='%s', dataType=%d, state=%d, decimals=%d, value=%d, timeStamp=%d", deviceId, paramId, unit, dataType, state, decimals, intval, timestamp));
+				if (TelemetryData.log.isLoggable(Level.OFF))
+					log.log(Level.OFF, String.format("TelemetryData: deviceId=%d, paramId=%d, untit='%s', dataType=%d, state=%d, decimals=%d, value=%d, timeStamp=%d", deviceId, paramId, unit, dataType, state, decimals, intval, timestamp));
 				TelemetryItem item = new TelemetryItem(dataType, decimals, intval, timestamp);
 				TelemetrySensor sen = this.getSensor(deviceId);
 				if (sen != null) {

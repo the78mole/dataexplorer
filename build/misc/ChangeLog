@@ -9,6 +9,7 @@ Device specific changes/fixes
 	* PolaronEx - fix exception while processing channel 2
 	* Polaron* - fix processing detection channel 2
 	* Core-Telemetry - initial release
+	* JetiAdapter - update dialog width Windows
 
 Version 3.4.3 - 09 Sep 2020
 Generic changes/fixes
