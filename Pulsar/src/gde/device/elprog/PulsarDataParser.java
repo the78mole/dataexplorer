@@ -34,6 +34,7 @@ import gde.io.DataParser;
 public class PulsarDataParser extends DataParser {
 	static Logger			log										= Logger.getLogger(DataParser.class.getName());
 
+	protected double integratedEnergy = 0;
 	protected final int offset;
 	protected int intermediateState;
 	
@@ -123,7 +124,8 @@ public class PulsarDataParser extends DataParser {
 			values[1] = tmpValues[1];
 			values[2] = tmpValues[3] * 1000;			
 			values[3] = Double.valueOf((values[0] / 1000.0) * (values[1] / 1000.0) * 1000).intValue();							// power U*I [W]
-			values[4] = Double.valueOf((values[0] / 1000.0) * (values[2] / 1000.0)).intValue();											// energy U*C [mWh]
+			values[4] = Double.valueOf(integratedEnergy += ((values[0] / 1000.0 * values[1] / 1000.0) / 3600.0 + 0.5) * 1000.).intValue();
+			//values[4] = Double.valueOf((values[0] / 1000.0) * (values[2] / 1000.0)).intValue();											// energy U*C [mWh]
 			//5=Temperature 6=Ri
 			values[5] = tmpValues[2];
 			values[6] = tmpValues[4];
